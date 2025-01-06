@@ -48,12 +48,14 @@ See [IBM Verify Environments](docs/ibm-verify-environments.md) for detailed envi
 
 ### Authentication Endpoints
 
-POST /api/auth/signup # User registration
-POST /api/auth/signup/mfa # MFA registration
+```http
+POST /api/auth/signup         # User registration
+POST /api/auth/signup/mfa     # MFA registration
 POST /api/auth/password/signin # Password authentication
 POST /api/auth/passkey/options # Get passkey authentication options
 POST /api/auth/passkey/verify # Verify passkey authentication
-POST /api/auth/mfa/verify # Verify MFA code
+POST /api/auth/mfa/verify     # Verify MFA code
+```
 
 ## Getting Started
 
@@ -64,60 +66,44 @@ POST /api/auth/mfa/verify # Verify MFA code
 - AWS CLI (for deployment)
 
 ### Local Development Setup
-1. Clone the repository:
 
+1. Clone the repository:
 ```bash
 git clone https://github.com/cds-snc/gc-signin-ibm.git
 ```
 
-Running the application locally requires the following steps:
-
-2. Frontend
-
+2. Frontend:
 ```bash
 cd frontend
 npm install
 npm start
 ```
 
-3. Backend
-
+3. Backend:
+```bash
 cd backend
 pip install -r requirements.txt
 python app/main.py
 ```
 
-6. Access the application at http://localhost:3000
-
-### Deployment
-
-See [AWS Deployment](docs/aws-deployment.md) for detailed deployment instructions.
+4. Access the application at http://localhost:3000
 
 ### Documentation
 
-See [IBM Verify Documentation](https://docs.verify.ibm.com/verify/reference/overview) for detailed documentation.
-
-### Mermaid Diagrams
-
-See [Mermaid Diagrams](docs/mermaid-diagrams.md) for detailed documentation.
-
-### AWS Architecture
-See [AWS Architecture](docs/aws-architecture.json) for detailed documentation.
-
-### IBM Verify Documentation
-See [IBM Verify Documentation](https://docs.verify.ibm.com/verify/reference/overview) for detailed documentation.
-
-### IBM Verify API Documentation
-See [IBM Verify API Documentation](https://docs.verify.ibm.com/verify/reference/overview) for detailed documentation.
+- [IBM Verify Documentation](https://docs.verify.ibm.com/verify/reference/overview)
+- [Mermaid Diagrams](docs/mermaid-diagrams.md)
+- [AWS Architecture](docs/aws-architecture.json)
+- [AWS Deployment](docs/aws-deployment.md)
 
 ### Configuration
 
 Required environment variables:
-
+```env
 IBM_VERIFY_TENANT_URL=https://your-tenant.verify.ibm.com
 IBM_VERIFY_CLIENT_ID=your-client-id
 IBM_VERIFY_CLIENT_SECRET=your-client-secret
 IBM_VERIFY_REDIRECT_URI=http://localhost:8000
+```
 
 ### AWS Deployment
 See [AWS Architecture](docs/aws-architecture.json) for infrastructure details.
