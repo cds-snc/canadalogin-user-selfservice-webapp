@@ -1,55 +1,124 @@
-# IBM Security Verify Integration
+# GC Sign In
 
-A web application that integrates with IBM Security Verify, featuring a React frontend and Python backend proxy.
+Provides a modern frontend and a backend proxy layer to support GC Sign In across governemntal departments across the Government of Canada.
+
+
+## Overview
+
+GC Sign In Service integrates with IBM Security Verify to provide a secure and flexible authentication system with multiple authentication methods:
+- Password + MFA authentication
+- Passkey (FIDO2/WebAuthn) authentication
+- Multi-factor authentication (MFA) using TOTP
+
+## Architecture
+
+The service follows a microservices architecture:
+- Frontend: React-based SPA
+- Backend: FastAPI Python service
+- Authentication: IBM Security Verify CIAM
+- Infrastructure: AWS (ECS, ECR, ELB, Secrets Manager, CloudFront, Route 53, WAF, CloudWatch)
+
+### Environment Strategy
+- Development (DEV)
+- Test/QA (TEST)
+- Pre-production (PREPROD)
+- Production (PROD)
+
+See [IBM Verify Environments](docs/ibm-verify-environments.md) for detailed environment strategy.
 
 ## Features
-- User authentication via IBM Security Verify
-- User registration and profile management
-- OIDC support
-- Secure API communication
-- Dockerized deployment
 
-## Project Structure
-```
-project/
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── services/
-│   │   └── App.js
-│   ├── Dockerfile
-│   └── package.json
-├── backend/
-│   ├── app/
-│   │   ├── main.py
-│   │   └── config.py
-│   ├── Dockerfile
-│   └── requirements.txt
-├── docker-compose.yml
-└── .env
-```
+### Authentication Methods
+1. **Password + MFA**
+   - Email/password authentication
+   - TOTP-based second factor
+   - QR code setup for authenticator apps
 
-## Setup Instructions
+2. **Passkey Authentication**
+   - FIDO2/WebAuthn standard
+   - Biometric and PIN support
+   - Cross-device authentication
 
-1. Clone the repository
-2. Create `.env` file with your IBM Security Verify credentials:
-```env
-IBM_VERIFY_TENANT_URL=your_tenant_url
-IBM_VERIFY_CLIENT_ID=your_client_id
-IBM_VERIFY_CLIENT_SECRET=your_client_secret
-IBM_VERIFY_REDIRECT_URI=http://localhost:3000/callback
-```
-
-3. Build and run with Docker Compose:
-```bash
-docker-compose up --build
-```
-
-## Usage
-- Frontend runs on: http://localhost:3000
-- Backend API runs on: http://localhost:8000
+3. **Multi-Factor Authentication**
+   - Time-based One-Time Password (TOTP)
+   - Compatible with standard authenticator apps
+   - Secure enrollment process
 
 ## API Endpoints
-- POST /api/auth/login - Handle user login
-- POST /api/auth/signup - Handle user registration
-- GET /api/user/profile - Get user profile data
+
+### Authentication Endpoints
+
+POST /api/auth/signup # User registration
+POST /api/auth/signup/mfa # MFA registration
+POST /api/auth/password/signin # Password authentication
+POST /api/auth/passkey/options # Get passkey authentication options
+POST /api/auth/passkey/verify # Verify passkey authentication
+POST /api/auth/mfa/verify # Verify MFA code
+
+## Getting Started
+
+### Prerequisites
+- Node.js 16+
+- Python 3.9+
+- Docker and Docker Compose
+- AWS CLI (for deployment)
+
+### Local Development Setup
+1. Clone the repository:
+
+```bash
+git clone https://github.com/cds-snc/gc-signin-ibm.git
+```
+
+Running the application locally requires the following steps:
+
+2. Frontend
+
+```bash
+cd frontend
+npm install
+npm start
+```
+
+3. Backend
+
+cd backend
+pip install -r requirements.txt
+python app/main.py
+```
+
+6. Access the application at http://localhost:3000
+
+### Deployment
+
+See [AWS Deployment](docs/aws-deployment.md) for detailed deployment instructions.
+
+### Documentation
+
+See [IBM Verify Documentation](https://docs.verify.ibm.com/verify/reference/overview) for detailed documentation.
+
+### Mermaid Diagrams
+
+See [Mermaid Diagrams](docs/mermaid-diagrams.md) for detailed documentation.
+
+### AWS Architecture
+See [AWS Architecture](docs/aws-architecture.json) for detailed documentation.
+
+### IBM Verify Documentation
+See [IBM Verify Documentation](https://docs.verify.ibm.com/verify/reference/overview) for detailed documentation.
+
+### IBM Verify API Documentation
+See [IBM Verify API Documentation](https://docs.verify.ibm.com/verify/reference/overview) for detailed documentation.
+
+### Configuration
+
+Required environment variables:
+
+IBM_VERIFY_TENANT_URL=https://your-tenant.verify.ibm.com
+IBM_VERIFY_CLIENT_ID=your-client-id
+IBM_VERIFY_CLIENT_SECRET=your-client-secret
+IBM_VERIFY_REDIRECT_URI=http://localhost:8000
+
+### AWS Deployment
+See [AWS Architecture](docs/aws-architecture.json) for infrastructure details.
+
