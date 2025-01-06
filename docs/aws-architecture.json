@@ -1,0 +1,64 @@
+graph TB
+    subgraph "AWS Cloud - GC Sign In"
+        subgraph "VPC"
+            subgraph "Public Subnet"
+                ALB[Application Load Balancer]
+                WAF[AWS WAF]
+            end
+
+            subgraph "Private Subnet"
+                ECS[ECS Cluster]
+                subgraph "ECS Services"
+                    Frontend["Frontend Container<br/>(React)"]
+                    Backend["Backend Container<br/>(FastAPI)"]
+                end
+                
+                RDS[(Amazon RDS<br/>PostgreSQL)]
+                ElastiCache[(ElastiCache<br/>Redis)]
+            end
+
+            subgraph "Security & Monitoring"
+                CloudWatch[CloudWatch]
+                SecretsManager[Secrets Manager]
+                WAFLogs[WAF Logs]
+            end
+        end
+
+        Route53[Route 53]
+        CloudFront[CloudFront]
+        S3[S3 Bucket<br/>Static Assets]
+    end
+
+    subgraph "External Services"
+        IBMVerify["IBM Security Verify<br/>(CIAM)"]
+    end
+
+    Users[Users/Browsers]
+
+    %% Connections
+    Users -->|HTTPS| Route53
+    Route53 -->|DNS| CloudFront
+    CloudFront -->|Static Content| S3
+    CloudFront -->|Dynamic Content| ALB
+    WAF -->|Protect| ALB
+    ALB -->|Traffic| Frontend
+    ALB -->|API Requests| Backend
+    Backend -->|Auth Requests| IBMVerify
+    Backend -->|Session Data| ElastiCache
+    Backend -->|User Data| RDS
+    Backend -->|Secrets| SecretsManager
+    
+    %% Monitoring
+    ECS -.->|Logs| CloudWatch
+    WAF -.->|Logs| WAFLogs
+    Frontend -.->|Logs| CloudWatch
+    Backend -.->|Logs| CloudWatch
+
+    %% Styling
+    classDef aws fill:#FF9900,stroke:#232F3E,color:white;
+    classDef external fill:#1B46C2,stroke:#232F3E,color:white;
+    classDef users fill:#6BBE49,stroke:#232F3E,color:white;
+    
+    class Route53,CloudFront,ALB,WAF,ECS,RDS,ElastiCache,CloudWatch,SecretsManager,WAFLogs,S3 aws;
+    class IBMVerify external;
+    class Users users; 
