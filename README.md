@@ -72,14 +72,34 @@ POST /api/auth/mfa/verify     # Verify MFA code
 git clone https://github.com/cds-snc/gc-signin-ibm.git
 ```
 
-2. Frontend:
+### Configuration
+
+#### Backend Environment Variables:
+```env
+IBM_VERIFY_TENANT_URL=https://your-tenant.verify.ibm.com
+IBM_VERIFY_CLIENT_ID=your-client-id
+IBM_VERIFY_CLIENT_SECRET=your-client-secret
+IBM_VERIFY_REDIRECT_URI=http://localhost:8000
+```
+
+#### Frontend Environment Variables:
+```env
+BACKEND_API_URL=http://localhost:8000
+REACT_APP_IBM_VERIFY_URL=https://gcsignin2.verify.ibm.com/
+REACT_APP_CLIENT_ID=e70df5ae-b5c4-4831-8371-2edbacd4a12c
+REACT_APP_REDIRECT_URI=http://localhost:8000
+```
+
+### Running the Application
+
+1. Frontend:
 ```bash
 cd frontend
 npm install
 npm start
 ```
 
-3. Backend:
+2. Backend:
 ```bash
 cd backend
 pip install -r requirements.txt
@@ -95,15 +115,8 @@ python app/main.py
 - [AWS Architecture](docs/aws-architecture.json)
 - [AWS Deployment](docs/aws-deployment.md)
 
-### Configuration
 
-Required environment variables:
-```env
-IBM_VERIFY_TENANT_URL=https://your-tenant.verify.ibm.com
-IBM_VERIFY_CLIENT_ID=your-client-id
-IBM_VERIFY_CLIENT_SECRET=your-client-secret
-IBM_VERIFY_REDIRECT_URI=http://localhost:8000
-```
+Note: For local development, create a `.env` file in both the frontend and backend directories with these variables. For production deployment, these variables should be managed through your deployment platform's secrets management system.
 
 ### AWS Deployment
 See [AWS Architecture](docs/aws-architecture.json) for infrastructure details.
