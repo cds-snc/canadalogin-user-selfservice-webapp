@@ -1,0 +1,72 @@
+{
+  "common": {
+    "welcome": "Welcome",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "back": "Back",
+    "continue": "Continue",
+    "loading": "Loading...",
+    "error": "Error",
+    "or": "or",
+    "emailAddress": "Email address"
+  },
+  "footer": {
+    "socialMedia": "Social media",
+    "mobileApps": "Mobile applications",
+    "aboutCanada": "About Canada.ca",
+    "termsAndConditions": "Terms and conditions",
+    "privacy": "Privacy"
+  },
+  "auth": {
+    "signInWithGCKey": "Sign in with GC Key",
+    "continueToService": "to continue to your {{service}}",
+    "continueWithPasskey": "Continue with your passkey",
+    "continueWithInterac": "Continue with Interac®",
+    "continueWithPartner": "Continue with your Provincial partner",
+    "firstTimeUser": "First time using GC Sign in?",
+    "signUp": "Sign up",
+    "needHelp": "Having issues?",
+    "getHelp": "Help",
+    "signInWithPassword": "Sign in with Password",
+    "signInWithPasskey": "Sign in with Passkey",
+    "registerWithPassword": "Register with Password",
+    "registerWithPasskey": "Register with Passkey",
+    "registerWithMFA": "Register with MFA",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "backToOptions": "Back to Sign In Options",
+    "mfa": "Multi-Factor Authentication",
+    "passkey": "Passkey",
+    "createAccount": "Create an Account",
+    "passkeyDescription": "Register using a passkey for enhanced security without passwords",
+    "mfaDescription": "Register with password and authenticator app for two-factor security",
+    "passwordDescription": "Register using a password"
+  },
+  "dashboard": {
+    "welcomeMessage": "Welcome, {{name}}",
+    "successMessage": "You have successfully signed in to your Government of Canada account.",
+    "accessMessage": "From here you can access government services and manage your account settings.",
+    "accountSecurity": "Account Security",
+    "securityMessage": "Your account is protected with enhanced security measures. Make sure to keep your authentication methods up to date.",
+    "needHelp": "Need Help?",
+    "helpMessage": "If you need assistance with your account or have questions about government services, visit our help center or contact support."
+  },
+  "home": {
+    "title": "Sign in or Register",
+    "chooseMethod": "Choose your preferred method to sign in or register",
+    "newUser": "New User?",
+    "existingUser": "Existing User?",
+    "createAccount": "Create Account",
+    "passkeyDescription": "Sign in or register using a passkey for enhanced security",
+    "mfaDescription": "Register with password and authenticator app for two-factor security",
+    "passwordDescription": "Sign in or register using a password"
+  },
+  "language": {
+    "en": "English",
+    "fr": "Français",
+    "changeLanguage": "Change language"
+  }
+} 
