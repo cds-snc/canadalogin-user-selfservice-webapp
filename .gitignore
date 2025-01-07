@@ -1,2 +1,3 @@
 backend/app/__pycache__/*
 .terragrunt-cache
+backend/.env	
