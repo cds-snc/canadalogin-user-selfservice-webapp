@@ -2,12 +2,16 @@ locals {
   aws_region = "ca-central-1"
   environment = "dev"
   project = "gc-signin"
-
-  # Get the account ID
   aws_account_id = 891377066226
 }
 
-# Generate AWS provider block
+inputs = {
+  aws_region  = local.aws_region
+  environment = local.environment
+  project     = local.project
+  aws_account_id = local.aws_account_id
+}
+
 generate "provider" {
   path      = "provider.tf"
   if_exists = "overwrite_terragrunt"
@@ -26,7 +30,6 @@ provider "aws" {
 EOF
 }
 
-# Remote state configuration
 remote_state {
   backend = "s3"
   config = {
@@ -36,16 +39,4 @@ remote_state {
     encrypt        = true
     dynamodb_table = "${local.project}-${local.environment}-terraform-locks"
   }
-  generate = {
-    path      = "backend.tf"
-    if_exists = "overwrite_terragrunt"
-  }
-}
-
-# Global variables
-inputs = {
-  aws_region     = local.aws_region
-  environment    = local.environment
-  project        = local.project
-  aws_account_id = local.aws_account_id
 } 

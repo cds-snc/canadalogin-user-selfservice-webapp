@@ -15,7 +15,7 @@ locals {
 }
 
 inputs = {
-  repository_name = "${local.project}-${local.environment}"
+  repository_name = "${local.project}-frontend"
   image_tag_mutability = "MUTABLE"
   scan_on_push = true
   force_delete = true

@@ -8,7 +8,7 @@ include "common" {
 }
 
 terraform {
-  source = "../../../../modules/frontend/ecs"
+  source = "../../../../modules/backend/ecs"
 }
 
 dependency "vpc" {
@@ -33,7 +33,7 @@ dependency "ecr" {
   config_path = "../ecr"
 
   mock_outputs = {
-    repository_url = "000000000000.dkr.ecr.region.amazonaws.com/gc-signin-frontend"
+    repository_url = "000000000000.dkr.ecr.region.amazonaws.com/gc-signin-backend"
   }
 }
 
@@ -54,4 +54,4 @@ inputs = {
   service_desired_count = include.common.locals.service_desired_count
   task_definition_trigger = timestamp()
   environment_variables = include.common.locals.environment_variables
-}
+} 

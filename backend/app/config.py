@@ -6,7 +6,7 @@ class Settings(BaseSettings):
     IBM_VERIFY_CLIENT_ID: str
     IBM_VERIFY_CLIENT_SECRET: str
     IBM_VERIFY_REDIRECT_URI: str = "http://localhost:8000"
-    CORS_ORIGINS: str = "http://localhost:3000"
+    CORS_ORIGINS: str = "http://localhost:3000,http://gc-signin-dev-frontend-alb-698661334.ca-central-1.elb.amazonaws.com"
 
     @validator("CORS_ORIGINS")
     def parse_cors_origins(cls, v):
