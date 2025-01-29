@@ -26,4 +26,5 @@ variable "container_port" {
 variable "certificate_arn" {
   description = "ARN of the SSL certificate"
   type        = string
+  default     = null
 } 

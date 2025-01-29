@@ -1,5 +1,5 @@
 include "root" {
-  path = find_in_parent_folders()
+  path = find_in_parent_folders("terragrunt.hcl")
 }
 
 include "common" {
@@ -8,12 +8,12 @@ include "common" {
 }
 
 terraform {
-  source = "../../../../modules/vpc"
+  source = "${dirname(find_in_parent_folders())}/../../modules/backend/vpc"
 }
 
 inputs = {
-  project     = include.common.locals.project
-  environment = include.common.locals.environment
+  project     = "gc-signin-backend"
+  environment = "dev"
 
   vpc_cidr = "10.1.0.0/16"  # Backend VPC
   private_subnet_cidrs = ["10.1.1.0/24", "10.1.2.0/24", "10.1.3.0/24"]
