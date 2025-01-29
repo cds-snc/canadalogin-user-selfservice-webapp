@@ -34,10 +34,15 @@ EOF
 remote_state {
   backend = "s3"
   config = {
-    bucket         = "${local.project}-${local.environment}-terraform-state"
+    bucket         = "${local.project}-${local.environment}-terraform-state-${local.aws_account_id}"
     key            = "${path_relative_to_include()}/terraform.tfstate"
     region         = local.aws_region
     encrypt        = true
     dynamodb_table = "${local.project}-${local.environment}-terraform-locks"
+  }
+
+  generate = {
+    path      = "backend.tf"
+    if_exists = "overwrite_terragrunt"
   }
 } 

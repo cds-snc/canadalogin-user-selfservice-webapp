@@ -1,6 +1,6 @@
 locals {
   common_vars = read_terragrunt_config(find_in_parent_folders("common.hcl"))
-  environment = local.common_vars.locals.environment
+  environment = "dev"
   aws_region  = local.common_vars.locals.aws_region
   aws_account_id = 891377066226  # Adding explicit account ID
 
@@ -16,11 +16,12 @@ inputs = {
 
 remote_state {
   backend = "s3"
+  
   config = {
-    bucket         = "gc-signin-${local.environment}-terraform-state"
-    key            = "${path_relative_to_include()}/terraform.tfstate"
-    region         = local.aws_region
     encrypt        = true
+    bucket         = "gc-signin-${local.environment}-terraform-state-${local.aws_account_id}"
+    key            = "${path_relative_to_include()}/terraform.tfstate"
+    region         = "ca-central-1"
     dynamodb_table = "gc-signin-${local.environment}-terraform-locks"
   }
 }
