@@ -13,7 +13,9 @@ terraform {
 inputs = {
   project     = "gc-signin-frontend"
   environment = "dev"
-  vpc_id      = dependency.vpc.outputs.vpc_id
+  aws_region  = "ca-central-1"
+
+  vpc_id = dependency.vpc.outputs.vpc_id
   public_subnet_ids = dependency.vpc.outputs.public_subnets
   container_port = 3000
 } 

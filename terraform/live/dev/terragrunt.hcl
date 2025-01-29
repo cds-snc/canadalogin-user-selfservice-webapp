@@ -2,6 +2,7 @@ locals {
   common_vars = read_terragrunt_config(find_in_parent_folders("common.hcl"))
   environment = local.common_vars.locals.environment
   aws_region  = local.common_vars.locals.aws_region
+  aws_account_id = 891377066226  # Adding explicit account ID
 
   backend_project  = "gc-signin-backend"
   frontend_project = "gc-signin-frontend"
@@ -10,6 +11,7 @@ locals {
 inputs = {
   environment = local.environment
   aws_region  = local.aws_region
+  aws_account_id = local.aws_account_id
 }
 
 remote_state {
@@ -30,6 +32,7 @@ generate "provider" {
   contents  = <<EOF
 provider "aws" {
   region = "${local.aws_region}"
+  allowed_account_ids = ["${local.aws_account_id}"]
   
   default_tags {
     tags = {

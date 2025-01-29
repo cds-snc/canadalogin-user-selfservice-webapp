@@ -8,28 +8,14 @@ include "common" {
 
 dependency "vpc" {
   config_path = "../vpc"
-
-  mock_outputs = {
-    vpc_id         = "mock-vpc-id"
-    private_subnets = ["mock-subnet-1", "mock-subnet-2"]
-  }
 }
 
 dependency "alb" {
   config_path = "../alb"
-
-  mock_outputs = {
-    target_group_arn = "mock-target-group-arn"
-    alb_security_group_id = "mock-alb-sg-id"
-  }
 }
 
 dependency "ecr" {
   config_path = "../ecr"
-
-  mock_outputs = {
-    repository_url = "mock-repository-url"
-  }
 }
 
 terraform {

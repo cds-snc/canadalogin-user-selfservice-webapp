@@ -1,4 +1,5 @@
 backend/app/__pycache__/*
 .terragrunt-cache
+.terraform/
 backend/.env
 node_modules/
