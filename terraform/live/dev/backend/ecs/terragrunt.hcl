@@ -7,7 +7,7 @@ include "common" {
 }
 
 dependency "vpc" {
-  config_path = "../vpc"
+  config_path = "../../shared/vpc"
 }
 
 dependency "alb" {
@@ -20,6 +20,14 @@ dependency "ecr" {
 
 terraform {
   source = "${dirname(find_in_parent_folders())}/../../modules/backend/ecs"
+}
+
+dependencies {
+  paths = [
+    "../../shared/vpc",
+    "../alb",
+    "../ecr"
+  ]
 }
 
 inputs = {
