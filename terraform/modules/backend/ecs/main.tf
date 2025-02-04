@@ -36,6 +36,25 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
+# Add policy to allow reading from Secrets Manager
+resource "aws_iam_role_policy" "ecs_task_secrets_policy" {
+  name = "${var.project}-ecs-task-secrets-policy"
+  role = aws_iam_role.ecs_task_execution_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetSecretValue"
+        ]
+        Resource = [var.secrets_manager_arn]
+      }
+    ]
+  })
+}
+
 # Security Group for ECS Tasks
 resource "aws_security_group" "ecs_tasks" {
   name        = "${var.project}-ecs-tasks-sg"
@@ -88,6 +107,13 @@ resource "aws_ecs_task_definition" "main" {
         for key, value in var.environment_variables : {
           name  = key
           value = value
+        } if key != "IBM_VERIFY_CLIENT_SECRET"
+      ]
+
+      secrets = [
+        {
+          name = "IBM_VERIFY_CLIENT_SECRET"
+          valueFrom = "${var.secrets_manager_arn}:IBM_VERIFY_CLIENT_SECRET::"
         }
       ]
 

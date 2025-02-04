@@ -66,4 +66,9 @@ variable "task_definition_trigger" {
 variable "environment_variables" {
   description = "Environment variables for the container"
   type        = map(string)
+}
+
+variable "secrets_manager_arn" {
+  description = "ARN of the Secrets Manager secret"
+  type        = string
 } 
