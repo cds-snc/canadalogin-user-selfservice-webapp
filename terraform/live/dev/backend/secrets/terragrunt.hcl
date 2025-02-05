@@ -13,5 +13,5 @@ terraform {
 inputs = {
   project     = "gc-signin-backend"
   environment = "dev"
-  ibm_verify_client_secret = "uAVIuisL3e"  # In production, this should be passed securely
+  ibm_verify_client_secret = "add secret here"  # In production, this should be passed securely
 } 
