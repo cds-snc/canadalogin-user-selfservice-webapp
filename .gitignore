@@ -3,3 +3,4 @@ backend/app/__pycache__/*
 .terraform/
 backend/.env
 node_modules/
+.terraform.lock.hcl
