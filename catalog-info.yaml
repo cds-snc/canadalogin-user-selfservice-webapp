@@ -1,0 +1,13 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: gc-signin-ibm
+  description: >-
+    Consists of the custom CDS components and services to support GC Sign in and
+    their integration with the IBM Verify CIAM SaaS.
+  labels:
+    license: MIT
+spec:
+  type: website
+  lifecycle: experimental
+  owner: cds-snc
