@@ -5,10 +5,10 @@ include "root" {
 dependency "vpc" {
   config_path = "../../shared/vpc"
   mock_outputs = {
-    vpc_id = "mock-vpc-id"
-    public_subnets = ["mock-subnet-1", "mock-subnet-2"]
+    vpc_id = "vpc-12345678901234567"
+    public_subnets = ["subnet-12345678901234567", "subnet-23456789012345678"]
   }
-  skip_outputs = true
+  mock_outputs_allowed_terraform_commands = ["init", "validate", "plan", "apply"]
 }
 
 terraform {
