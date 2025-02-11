@@ -1,6 +1,6 @@
 # ECS Cluster
 resource "aws_ecs_cluster" "main" {
-  name = "${var.product_name}-${var.env}-cluster"
+  name = "${var.product_with_env}-frontend-cluster"
 
   setting {
     name  = "containerInsights"
@@ -8,14 +8,15 @@ resource "aws_ecs_cluster" "main" {
   }
 
   tags = {
-    Name        = "${var.product_name}-cluster"
+    Name        = "${var.product_name}-frontend-cluster"
     Environment = var.env
+    CostCenter  =  var.product_with_env
   }
 }
 
 # ECS Task Execution Role
 resource "aws_iam_role" "ecs_task_execution_role" {
-  name = "${var.product_name}-${var.env}-ecs-task-execution-role"
+  name = "${var.product_with_env}-frontend-ecs-task-execution-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -59,12 +60,13 @@ resource "aws_security_group" "ecs_tasks" {
   tags = {
     Name        = "${var.product_name}-ecs-tasks-sg"
     Environment = var.env
+    CostCenter  =  var.product_with_env
   }
 }
 
 # ECS Task Definition
 resource "aws_ecs_task_definition" "main" {
-  family                   = "${var.product_name}-${var.env}-task"
+  family                   = "${var.product_with_env}-frontend-task"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = var.task_cpu
@@ -73,7 +75,7 @@ resource "aws_ecs_task_definition" "main" {
 
   container_definitions = jsonencode([
     {
-      name  = "${var.product_name}-${var.env}-container"
+      name  = "${var.product_with_env}-frontend-container"
       image = "${var.ecr_repository_url}:latest"
       
       portMappings = [
@@ -94,7 +96,7 @@ resource "aws_ecs_task_definition" "main" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          "awslogs-group"         = "/ecs/${var.product_name}-${var.env}"
+          "awslogs-group"         = "/ecs/${var.product_with_env}-frontend"
           "awslogs-region"        = var.region
           "awslogs-stream-prefix" = "ecs"
         }
@@ -106,23 +108,25 @@ resource "aws_ecs_task_definition" "main" {
     Name        = "${var.product_name}-task"
     Environment = var.env
     Trigger     = var.task_definition_trigger
+    CostCenter  =  var.product_with_env
   }
 }
 
 # CloudWatch Log Group
 resource "aws_cloudwatch_log_group" "main" {
-  name              = "/ecs/${var.product_name}-${var.env}"
+  name              = "/ecs/${var.product_with_env}-frontend"
   retention_in_days = 30
 
   tags = {
     Name        = "${var.product_name}-logs"
     Environment = var.env
+    CostCenter  =  var.product_with_env
   }
 }
 
 # ECS Service
 resource "aws_ecs_service" "main" {
-  name                               = "${var.product_name}-${var.env}-service"
+  name                               = "${var.product_with_env}-frontend-service"
   cluster                           = aws_ecs_cluster.main.id
   task_definition                   = aws_ecs_task_definition.main.arn
   desired_count                     = var.service_desired_count
@@ -138,7 +142,7 @@ resource "aws_ecs_service" "main" {
 
   load_balancer {
     target_group_arn = var.target_group_arn
-    container_name   = "${var.product_name}-${var.env}-container"
+    container_name   = "${var.product_with_env}-frontend-container"
     container_port   = var.container_port
   }
 
@@ -147,7 +151,8 @@ resource "aws_ecs_service" "main" {
   }
 
   tags = {
-    Name        = "${var.product_name}-service"
+    Name        = "${var.product_name}-frontend-service"
     Environment = var.env
+    CostCenter  =  var.product_with_env
   }
 } 

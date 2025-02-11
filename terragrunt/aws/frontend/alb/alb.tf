@@ -1,5 +1,5 @@
 resource "aws_security_group" "alb" {
-  name        = "${var.product_name}-${var.env}-alb-sg"
+  name        = "${var.product_with_env}-frontend-alb-sg"
   description = "Security group for frontend ALB"
   vpc_id      = var.vpc_id
 
@@ -18,26 +18,28 @@ resource "aws_security_group" "alb" {
   }
 
   tags = {
-    Name        = "${var.product_name}-alb-sg"
+    Name        = "${var.product_name}-frontend-alb-sg"
     Environment = var.env
+    CostCenter =  var.product_with_env
   }
 }
 
 resource "aws_lb" "main" {
-  name               = "${var.product_name}-${var.env}-alb"
+  name               = "${var.product_with_env}-frontend-alb"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb.id]
   subnets           = var.public_subnet_ids
 
   tags = {
-    Name        = "${var.product_name}-alb"
+    Name        = "${var.product_name}-frontend-alb"
     Environment = var.env
+    CostCenter =  var.product_with_env
   }
 }
 
 resource "aws_lb_target_group" "main" {
-  name        = "${var.product_name}-${var.env}-tg"
+  name        = "${var.product_with_env}-frontend-tg"
   port        = var.container_port
   protocol    = "HTTP"
   vpc_id      = var.vpc_id
@@ -50,8 +52,9 @@ resource "aws_lb_target_group" "main" {
   }
 
   tags = {
-    Name        = "${var.product_name}-tg"
+    Name        = "${var.product_name}-frontend-tg"
     Environment = var.env
+    CostCenter =  var.product_with_env
   }
 }
 

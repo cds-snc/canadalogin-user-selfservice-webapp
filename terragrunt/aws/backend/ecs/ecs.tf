@@ -1,5 +1,5 @@
 resource "aws_ecs_cluster" "main" {
-  name = "${var.product_name}-${var.env}-cluster"
+  name = "${var.product_with_env}-backend-cluster"
 
   setting {
     name  = "containerInsights"
@@ -7,14 +7,14 @@ resource "aws_ecs_cluster" "main" {
   }
 
   tags = {
-    Name        = "${var.product_name}-cluster"
+    Name        = "${var.product_name}-backend-cluster"
     Environment = var.env
-    (var.billing_tag_key) = var.billing_tag_value
+    CostCenter =  var.product_with_env
   }
 }
 
 resource "aws_iam_role" "ecs_task_execution_role" {
-  name = "${var.product_name}-${var.env}-ecs-task-execution-role"
+  name = "${var.product_with_env}-backend-ecs-task-execution-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -37,7 +37,7 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
 
 # Add policy to allow reading from Secrets Manager
 resource "aws_iam_role_policy" "ecs_task_secrets_policy" {
-  name = "${var.product_name}-${var.env}-ecs-task-secrets-policy"
+  name = "${var.product_with_env}-backend-ecs-task-secrets-policy"
   role = aws_iam_role.ecs_task_execution_role.id
 
   policy = jsonencode({
@@ -55,7 +55,7 @@ resource "aws_iam_role_policy" "ecs_task_secrets_policy" {
 }
 
 resource "aws_security_group" "ecs_tasks" {
-  name        = "${var.product_name}-${var.env}-ecs-tasks-sg"
+  name        = "${var.product_with_env}-backend-ecs-tasks-sg"
   description = "Allow inbound traffic from ALB to ECS tasks"
   vpc_id      = var.vpc_id
 
@@ -76,11 +76,12 @@ resource "aws_security_group" "ecs_tasks" {
   tags = {
     Name        = "${var.product_name}-ecs-tasks-sg"
     Environment = var.env
+    CostCenter =  var.product_with_env
   }
 }
 
 resource "aws_ecs_task_definition" "main" {
-  family                   = "${var.product_name}-${var.env}-task"
+  family                   = "${var.product_with_env}-backend-task"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = var.task_cpu
@@ -89,7 +90,7 @@ resource "aws_ecs_task_definition" "main" {
 
   container_definitions = jsonencode([
     {
-      name  = "${var.product_name}-${var.env}-container"
+      name  = "${var.product_with_env}-backend-container"
       image = "${var.ecr_repository_url}:latest"
       
       portMappings = [
@@ -117,7 +118,7 @@ resource "aws_ecs_task_definition" "main" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          "awslogs-group"         = "/ecs/${var.product_name}-${var.env}"
+          "awslogs-group"         = "/ecs/${var.product_with_env}-backend"
           "awslogs-region"        = var.region
           "awslogs-stream-prefix" = "ecs"
         }
@@ -129,21 +130,23 @@ resource "aws_ecs_task_definition" "main" {
     Name        = "${var.product_name}-task"
     Environment = var.env
     Trigger     = var.task_definition_trigger
+    CostCenter  =  var.product_with_env
   }
 }
 
 resource "aws_cloudwatch_log_group" "main" {
-  name              = "/ecs/${var.product_name}-${var.env}"
+  name              = "/ecs/${var.product_with_env}-backend"
   retention_in_days = 30
 
   tags = {
     Name        = "${var.product_name}-logs"
     Environment = var.env
+    CostCenter  =  var.product_with_env
   }
 }
 
 resource "aws_ecs_service" "main" {
-  name                               = "${var.product_name}-${var.env}-service"
+  name                               = "${var.product_with_env}-backend-service"
   cluster                           = aws_ecs_cluster.main.id
   task_definition                   = aws_ecs_task_definition.main.arn
   desired_count                     = var.service_desired_count
@@ -159,7 +162,7 @@ resource "aws_ecs_service" "main" {
 
   load_balancer {
     target_group_arn = var.target_group_arn
-    container_name   = "${var.product_name}-${var.env}-container"
+    container_name   = "${var.product_with_env}-backend-container"
     container_port   = var.container_port
   }
 
@@ -170,5 +173,6 @@ resource "aws_ecs_service" "main" {
   tags = {
     Name        = "${var.product_name}-service"
     Environment = var.env
+    CostCenter  = var.product_with_env
   }
 } 

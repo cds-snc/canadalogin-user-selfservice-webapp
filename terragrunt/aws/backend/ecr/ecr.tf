@@ -1,5 +1,5 @@
 resource "aws_ecr_repository" "backend_ecr" {
-  name = "${var.product_name}-${var.env}"
+  name = "${var.product_with_env}-backend"
   force_delete = true
 
   image_scanning_configuration {
@@ -7,8 +7,9 @@ resource "aws_ecr_repository" "backend_ecr" {
   }
 
   tags = {
-    Name        = var.product_name
+    Name        = "${var.product_name}-backend"
     Environment = var.env
+    CostCenter =  var.product_with_env
   }
 }
 

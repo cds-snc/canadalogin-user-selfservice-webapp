@@ -9,7 +9,8 @@ resource "aws_vpc" "main" {
 
   tags = {
     Name        = "${var.product_name}-vpc"
-    Environment = var.env
+    Environment =  var.env
+    CostCenter  =  var.product_with_env
   }
 }
 
@@ -19,6 +20,7 @@ resource "aws_eip" "nat" {
   tags = {
     Name        = "${var.product_name}-nat-eip"
     Environment = var.env
+    CostCenter  = var.product_with_env
   }
 }
 
@@ -30,6 +32,7 @@ resource "aws_nat_gateway" "main" {
   tags = {
     Name        = "${var.product_name}-nat"
     Environment = var.env
+    CostCenter  = var.product_with_env
   }
 }
 
@@ -43,6 +46,7 @@ resource "aws_subnet" "private" {
   tags = {
     Name        = "${var.product_name}-private-subnet-${count.index + 1}"
     Environment = var.env
+    CostCenter  = var.product_with_env
   }
 }
 
@@ -57,6 +61,7 @@ resource "aws_subnet" "public" {
   tags = {
     Name        = "${var.product_name}-public-subnet-${count.index + 1}"
     Environment = var.env
+    CostCenter  = var.product_with_env
   }
 }
 
@@ -67,6 +72,7 @@ resource "aws_internet_gateway" "main" {
   tags = {
     Name        = "${var.product_name}-igw"
     Environment = var.env
+    CostCenter  = var.product_with_env
   }
 }
 
@@ -83,6 +89,7 @@ resource "aws_route_table" "private" {
   tags = {
     Name        = "${var.product_name}-private-rt-${count.index + 1}"
     Environment = var.env
+    CostCenter  =  var.product_with_env
   }
 }
 
@@ -98,6 +105,7 @@ resource "aws_route_table" "public" {
   tags = {
     Name        = "${var.product_name}-public-rt"
     Environment = var.env
+    CostCenter  =  var.product_with_env
   }
 }
 

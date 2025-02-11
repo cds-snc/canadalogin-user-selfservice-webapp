@@ -4,16 +4,15 @@
 # to set an environment's global varialbes.
 #
 locals {
-  billing_code           = "${local.env_vars.inputs.product_name}-${local.env_vars.inputs.env}"
+  product_with_env       = "${local.env_vars.inputs.product_name}-${local.env_vars.inputs.env}"
   env_vars               = read_terragrunt_config(find_in_parent_folders("env_vars.hcl"))
   is_prod_env            = local.env_vars.inputs.env == "prod" ? 1 : 0
 }
 
 inputs = {
   account_id             = local.env_vars.inputs.account_id
-  billing_code           = local.billing_code
-  billing_tag_value      = local.billing_code
   env                    = local.env_vars.inputs.env
+  product_with_env       = "${local.env_vars.inputs.product_name}-${local.env_vars.inputs.env}"
   is_prod_env            = local.is_prod_env
   product_name           = local.env_vars.inputs.product_name
   region                 = local.env_vars.inputs.region
@@ -43,7 +42,7 @@ remote_state {
     dynamodb_table      = "terraform-state-lock-dynamo"
     region              = local.env_vars.inputs.region
     key                 = "${path_relative_to_include()}/terraform.tfstate"
-    s3_bucket_tags      = { CostCenter : local.billing_code }
-    dynamodb_table_tags = { CostCenter : local.billing_code }
+    s3_bucket_tags      = { CostCenter : local.product_with_env }
+    dynamodb_table_tags = { CostCenter : local.product_with_env }
   }
 }
