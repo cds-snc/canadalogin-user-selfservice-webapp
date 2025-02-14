@@ -3,7 +3,7 @@ resource "aws_secretsmanager_secret" "ibm_verify" {
   description = "IBM Verify secrets for GC Sign In backend"
 
   tags = {
-    Name        = "${var.product_name}-backend-ibm-verify-secrets"
+    Name        = "${var.product_with_env}-backend-ibm-verify-secrets"
     Environment = var.env
     CostCenter  = var.product_with_env
   }
