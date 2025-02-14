@@ -120,4 +120,3 @@ Note: For local development, create a `.env` file in both the frontend and backe
 
 ### AWS Deployment
 See [AWS Architecture](docs/aws-architecture.json) for infrastructure details.
-

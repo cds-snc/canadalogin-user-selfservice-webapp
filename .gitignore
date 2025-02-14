@@ -1,4 +1,9 @@
 backend/app/__pycache__/*
 .terragrunt-cache
+.terraform/
 backend/.env
 node_modules/
+.terraform.lock.hcl
+.env
+.DS_Store
+*/.DS_Store
