@@ -6,8 +6,7 @@
   "scripts": {
     "dev": "parcel",
     "start": "parcel --port 3000",
-    "build": "parcel build",
-    "test": "jest"
+    "build": "parcel build"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
@@ -23,14 +22,6 @@
     "react-router-dom": "^6.11.2"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "babel-jest": "^27.5.1",
-    "babel-preset-react-app": "^10.1.0",
-    "eslint": "^8.57.1",
-    "eslint-config-react-app": "^7.0.1",
-    "identity-obj-proxy": "^3.0.0",
-    "jest": "^27.5.1",
-    "jest-watch-typeahead": "^1.1.0",
     "parcel": "^2.13.3",
     "process": "^0.11.10"
   },
