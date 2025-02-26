@@ -1,0 +1,45 @@
+{
+	"name": "gcsignin-devcontainer",
+	"image": "mcr.microsoft.com/devcontainers/go:bullseye@sha256:97da4fd204f27fa7e0b3a8212e2b2976749629306ac99320b811c3d3cc809d63",
+	"containerEnv": {
+		"SHELL": "/bin/zsh"
+	},
+	"features": {
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {},
+		"ghcr.io/devcontainers/features/python:1": {
+			"version": "3.12",
+			"installTools": "false"
+		},
+		"ghcr.io/devcontainers/features/terraform:1": {
+			"version": "1.9.4",
+			"terragrunt": "0.66.9"
+		},
+		"ghcr.io/dhoeric/features/terraform-docs:1": {
+			"version": "0.19.0"
+		},
+		"node": {
+			"version": "lts",
+			"nodeGypDependencies": true
+		},
+		"ghcr.io/devcontainers/features/aws-cli:1": {
+			"version": "latest"
+		}
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"GitHub.copilot",
+				"hashicorp.terraform",
+				"redhat.vscode-yaml",
+				"ms-python.python",
+				"ms-python.debugpy",
+				"hashicorp.hcl"
+			],
+			"settings": {
+				"[terraform]": {
+					"editor.formatOnSave": true
+				}
+			}
+		}
+	}
+}

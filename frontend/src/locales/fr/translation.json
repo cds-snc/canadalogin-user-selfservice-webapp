@@ -1,0 +1,72 @@
+{
+  "common": {
+    "welcome": "Bienvenue",
+    "signIn": "Se connecter",
+    "signOut": "Se déconnecter",
+    "register": "S'inscrire",
+    "email": "Courriel",
+    "password": "Mot de passe",
+    "back": "Retour",
+    "continue": "Continuer",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "or": "ou",
+    "emailAddress": "Adresse courriel"
+  },
+  "footer": {
+    "socialMedia": "Médias sociaux",
+    "mobileApps": "Applications mobiles",
+    "aboutCanada": "À propos de Canada.ca",
+    "termsAndConditions": "Avis",
+    "privacy": "Confidentialité"
+  },
+  "auth": {
+    "signInWithGCKey": "Se connecter avec une clé GC",
+    "continueToService": "pour continuer vers votre {{service}}",
+    "continueWithPasskey": "Continuer avec votre clé d'accès",
+    "continueWithInterac": "Continuer avec Interac®",
+    "continueWithPartner": "Continuer avec votre partenaire provincial",
+    "firstTimeUser": "Première utilisation de CléGC?",
+    "signUp": "S'inscrire",
+    "needHelp": "Vous éprouvez des difficultés?",
+    "getHelp": "Aide",
+    "signInWithPassword": "Se connecter avec un mot de passe",
+    "signInWithPasskey": "Se connecter avec une clé d'accès",
+    "registerWithPassword": "S'inscrire avec un mot de passe",
+    "registerWithPasskey": "S'inscrire avec une clé d'accès",
+    "registerWithMFA": "S'inscrire avec l'authentification à deux facteurs",
+    "noAccount": "Vous n'avez pas de compte?",
+    "haveAccount": "Vous avez déjà un compte?",
+    "backToOptions": "Retour aux options de connexion",
+    "mfa": "Authentification à deux facteurs",
+    "passkey": "Clé d'accès",
+    "createAccount": "Créer un compte",
+    "passkeyDescription": "S'inscrire avec une clé d'accès pour une sécurité renforcée sans mot de passe",
+    "mfaDescription": "S'inscrire avec un mot de passe et une application d'authentification pour une sécurité à deux facteurs",
+    "passwordDescription": "S'inscrire avec un mot de passe"
+  },
+  "dashboard": {
+    "welcomeMessage": "Bienvenue, {{name}}",
+    "successMessage": "Vous vous êtes connecté avec succès à votre compte du gouvernement du Canada.",
+    "accessMessage": "À partir d'ici, vous pouvez accéder aux services gouvernementaux et gérer les paramètres de votre compte.",
+    "accountSecurity": "Sécurité du compte",
+    "securityMessage": "Votre compte est protégé par des mesures de sécurité renforcées. Assurez-vous de maintenir vos méthodes d'authentification à jour.",
+    "needHelp": "Besoin d'aide?",
+    "helpMessage": "Si vous avez besoin d'aide avec votre compte ou si vous avez des questions sur les services gouvernementaux, visitez notre centre d'aide ou contactez le support."
+  },
+  "home": {
+    "title": "Se connecter ou s'inscrire",
+    "chooseMethod": "Choisissez votre méthode préférée pour vous connecter ou vous inscrire",
+    "newUser": "Nouvel utilisateur?",
+    "existingUser": "Utilisateur existant?",
+    "createAccount": "Créer un compte",
+    "passkeyDescription": "Se connecter ou s'inscrire en utilisant une clé d'accès pour une sécurité renforcée",
+    "mfaDescription": "S'inscrire avec un mot de passe et une application d'authentification pour une sécurité à deux facteurs",
+    "passwordDescription": "Se connecter ou s'inscrire en utilisant un mot de passe"
+  },
+  "language": {
+    "en": "English",
+    "fr": "Français",
+    "changeLanguage": "Changer de langue"
+  }
+}

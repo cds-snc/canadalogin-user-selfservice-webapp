@@ -1,0 +1,11 @@
+backend/app/__pycache__/*
+.terragrunt-cache
+.terraform/
+backend/.env
+node_modules/
+.parcel-cache/
+dist/
+.terraform.lock.hcl
+.env
+.DS_Store
+*/.DS_Store
