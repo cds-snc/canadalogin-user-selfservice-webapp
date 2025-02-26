@@ -3,7 +3,7 @@
 	"image": "mcr.microsoft.com/devcontainers/go:bullseye@sha256:97da4fd204f27fa7e0b3a8212e2b2976749629306ac99320b811c3d3cc809d63",
 	"containerEnv": {
 		"SHELL": "/bin/zsh"
-	},	
+	},
 	"features": {
 		"ghcr.io/devcontainers/features/docker-in-docker:2": {},
 		"ghcr.io/devcontainers/features/python:1": {
@@ -27,14 +27,19 @@
 	},
 	"customizations": {
 		"vscode": {
-			"extensions": [ 
+			"extensions": [
 				"GitHub.copilot",
-				"HashiCorp.HCL",
 				"hashicorp.terraform",
 				"redhat.vscode-yaml",
 				"ms-python.python",
-				"ms-python.debugpy"
-			]
+				"ms-python.debugpy",
+				"hashicorp.hcl"
+			],
+			"settings": {
+				"[terraform]": {
+					"editor.formatOnSave": true
+				}
+			}
 		}
 	}
 }

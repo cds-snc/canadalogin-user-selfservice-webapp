@@ -33,3 +33,23 @@ variable "product_with_env" {
   description = "(Required) the value we use to track billing"
   type        = string
 }
+
+variable "root_domain_en" {
+  description = "(Required) Root English domain for the environment."
+  type        = string
+}
+
+variable "root_domain_fr" {
+  description = "(Required) Root French domain for the environment."
+  type        = string
+}
+
+variable "frontend_subdomain_en" {
+  description = "(Required) Frontend en subdomain for the environment."
+  type        = string
+}
+
+variable "backend_subdomain_en" {
+  description = "(Required) Backend en subdomain for the environment."
+  type        = string
+}
