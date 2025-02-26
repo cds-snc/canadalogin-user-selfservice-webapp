@@ -4,18 +4,25 @@
 # to set an environment's global varialbes.
 #
 locals {
-  product_with_env       = "${local.env_vars.inputs.product_name}-${local.env_vars.inputs.env}"
-  env_vars               = read_terragrunt_config(find_in_parent_folders("env_vars.hcl"))
-  is_prod_env            = local.env_vars.inputs.env == "prod" ? 1 : 0
+  product_with_env      = "${local.env_vars.inputs.product_name}-${local.env_vars.inputs.env}"
+  env_vars              = read_terragrunt_config(find_in_parent_folders("env_vars.hcl"))
+  is_prod_env           = local.env_vars.inputs.env == "prod" ? 1 : 0
+  frontend_subdomain_en = "${local.env_vars.inputs.frontend_subdomain_name}.${local.env_vars.inputs.root_domain_en}"
+  backend_subdomain_en  = "${local.env_vars.inputs.backend_subdomain_name}.${local.env_vars.inputs.root_domain_en}"
 }
 
 inputs = {
-  account_id             = local.env_vars.inputs.account_id
-  env                    = local.env_vars.inputs.env
-  product_with_env       = "${local.env_vars.inputs.product_name}-${local.env_vars.inputs.env}"
-  is_prod_env            = local.is_prod_env
-  product_name           = local.env_vars.inputs.product_name
-  region                 = local.env_vars.inputs.region
+  account_id            = local.env_vars.inputs.account_id
+  env                   = local.env_vars.inputs.env
+  product_with_env      = "${local.env_vars.inputs.product_name}-${local.env_vars.inputs.env}"
+  is_prod_env           = local.is_prod_env
+  product_name          = local.env_vars.inputs.product_name
+  region                = local.env_vars.inputs.region
+  root_domain_en        = local.env_vars.inputs.root_domain_en
+  root_domain_fr        = local.env_vars.inputs.root_domain_fr
+  frontend_subdomain_en = local.frontend_subdomain_en
+  backend_subdomain_en  = local.backend_subdomain_en
+
 }
 
 generate "provider" {
