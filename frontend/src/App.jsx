@@ -1,5 +1,5 @@
 //comment to revert to demo
-import {BrowserRouter as Router, Routes, Route, Navigate, useParams} from 'react-router';
+import {BrowserRouter as Router, Routes, Route, Navigate} from 'react-router';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Default from './components/Default';
