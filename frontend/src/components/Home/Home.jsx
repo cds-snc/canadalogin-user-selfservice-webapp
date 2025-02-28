@@ -1,20 +1,19 @@
 import {GcdsContainer, GcdsHeading, GcdsButton, GcdsLink, GcdsText, GcdsDetails, GcdsInput} from "@cdssnc/gcds-components-react";
-import {SERVICES} from "../common/constants";
+import {AVAILABLE_LANGUAGES, SERVICES} from "../../utils/constants";
 import {useNavigate} from "react-router";
-import {getLanguage, getPageContent} from '../common/functions'
+import {getPageContent} from '../../utils/functions'
 
-export default function Default() {
-    const currentLang = getLanguage();
+export default function Home({currentLang}) {
     const navigate = useNavigate();
-    const pageContentJson = getPageContent(currentLang, "Default");
+    const pageContentJson = getPageContent(currentLang, "Home");
 
     return (
-        <GcdsContainer padding="100" mainContainer>
+        <GcdsContainer padding="100" >
             <GcdsContainer centered>
                 <GcdsHeading tag="h1">
                     {pageContentJson['1']}
                     <GcdsText marginTop="200" marginBottom="0"> {pageContentJson['2']}
-                        <strong>{` ${SERVICES[0].title}`}  {pageContentJson['3']}</strong>
+                        <strong>{` ${SERVICES[0].title}`}  {currentLang===AVAILABLE_LANGUAGES.en?pageContentJson['3']:''}</strong>
                     </GcdsText>
                 </GcdsHeading>
                 <GcdsDetails detailsTitle={pageContentJson['4']}>
