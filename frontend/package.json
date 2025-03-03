@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "parcel --port 3000",
     "start": "parcel --port 3000",
-    "build": "parcel build"
+    "build": "parcel build",
+    "test": "vitest --coverage"
   },
   "dependencies": {
     "@cdssnc/gcds-components": "^0.32.0",
@@ -24,13 +25,23 @@
     "react-i18next": "^15.4.1",
     "react-router": "^7.2.0",
     "react-router-dom": "^6.11.2",
-    "tailwindcss": "^4.0.9",
-    "tailwinds": "^0.0.0"
+    "tailwindcss": "^4.0.9"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react": "^4.3.4",
+    "@vitest/coverage-v8": "^3.0.7",
     "buffer": "^6.0.3",
+    "jsdom": "^26.0.0",
     "parcel": "^2.13.3",
-    "process": "^0.11.10"
+    "process": "^0.11.10",
+    "vitest": "^3.0.7"
+  },
+  "vitest": {
+    "jsx": "react-jsx"
   },
   "browserslist": {
     "production": [

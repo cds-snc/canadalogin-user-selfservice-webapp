@@ -13,7 +13,7 @@ import PasskeyLogin from './components/PasskeyLogin';
 import MFASignup from './components/MFASignup';
 import Dashboard from './components/Dashboard';
 
-function App() {
+function App_old() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -42,4 +42,4 @@ function App() {
   );
 }
 
-export default App; 
+export default App_old;

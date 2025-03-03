@@ -5,7 +5,7 @@ export default function Footer({currentLang}){
 
     return  (
         <GcdsContainer>
-            <GcdsFooter display="compact" subLinks={getFooter(currentLang)} ></GcdsFooter>
+            <GcdsFooter display="compact" subLinks={getFooter(currentLang)} data-testid="gcds-footer"/>
         </GcdsContainer>
     );
 }
