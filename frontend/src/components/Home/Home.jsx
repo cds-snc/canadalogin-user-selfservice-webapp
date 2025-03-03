@@ -1,18 +1,25 @@
-import {GcdsContainer, GcdsHeading, GcdsButton, GcdsLink, GcdsText, GcdsDetails, GcdsInput} from "@cdssnc/gcds-components-react";
+import {
+    GcdsContainer,
+    GcdsHeading,
+    GcdsButton,
+    GcdsLink,
+    GcdsText,
+    GcdsDetails,
+    GcdsInput
+} from "@cdssnc/gcds-components-react";
 import {AVAILABLE_LANGUAGES, SERVICES} from "../../utils/constants";
-import {getPageContent} from '../../utils/functions'
+import {getPageContent} from '../../utils/functions';
+
 
 export default function Home({currentLang}) {
     const pageContentJson = getPageContent(currentLang, "Home");
-
-
     return (
-        <GcdsContainer>
+        <GcdsContainer className="gcds-content" >
             <GcdsContainer centered>
                     <GcdsHeading tag="h1">
                         {pageContentJson['1']}
                         <GcdsText marginTop="200" marginBottom="0"> {pageContentJson['2']}
-                            <strong>{currentLang===AVAILABLE_LANGUAGES.fr?pageContentJson['3']+' ':''}{` ${SERVICES[0].title}`}{currentLang===AVAILABLE_LANGUAGES.en?' '+pageContentJson['3']:''}</strong>
+                            <strong> {currentLang===AVAILABLE_LANGUAGES.fr?pageContentJson['3']+' ':''}{` ${SERVICES[0].title}`}{currentLang===AVAILABLE_LANGUAGES.en?' '+pageContentJson['3']:''}</strong>
                         </GcdsText>
                     </GcdsHeading>
                     <GcdsDetails detailsTitle={pageContentJson['4']}>
@@ -44,7 +51,7 @@ export default function Home({currentLang}) {
                 <GcdsHeading tag="h2">
                     {pageContentJson['10']}
                     <GcdsText marginTop="200" marginBottom="0">
-                        <GcdsLink h>
+                        <GcdsLink>
                             {pageContentJson['11']}
                         </GcdsLink>
                     </GcdsText>

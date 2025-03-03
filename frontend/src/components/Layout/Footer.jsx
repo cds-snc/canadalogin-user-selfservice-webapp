@@ -4,7 +4,7 @@ import {getFooter} from "../../utils/functions";
 export default function Footer({currentLang}){
 
     return  (
-        <GcdsContainer>
+        <GcdsContainer className='gcds-footer'>
             <GcdsFooter display="compact" subLinks={getFooter(currentLang)} data-testid="gcds-footer"/>
         </GcdsContainer>
     );
