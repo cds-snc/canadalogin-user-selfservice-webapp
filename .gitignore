@@ -9,3 +9,4 @@ dist/
 .env
 .DS_Store
 */.DS_Store
+backend/tests/__pycache__
