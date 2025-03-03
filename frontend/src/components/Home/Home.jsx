@@ -32,7 +32,7 @@ export default function Home({currentLang}) {
                         <form>
                             <GcdsInput
                                 inputId="email"
-                                label="Email address"
+                                label={pageContentJson['8']}
                                 name="email"
                             ></GcdsInput>
                             <GcdsButton type="submit">
