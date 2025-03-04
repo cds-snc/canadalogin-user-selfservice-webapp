@@ -1,5 +1,5 @@
 import App from '../App';
-import {cleanup, render, screen, queryByAttribute} from '@testing-library/react';
+import {cleanup, render, screen} from '@testing-library/react';
 import {describe, expect} from "vitest";
 import '@testing-library/jest-dom';
 import {AVAILABLE_LANGUAGES, NAVIGATION_LINKS, SERVICES} from "../utils/constants";
@@ -16,7 +16,7 @@ describe('Routing Test', () => {
     const subLinks =  {attribute:'sub-links', en:getFooter(AVAILABLE_LANGUAGES.en), fr:getFooter(AVAILABLE_LANGUAGES.fr)};
 
     test("Check home route with no language defined", () => {
-        const dom =render(
+        render(
             <MemoryRouter initialEntries={['/']}>
                 <App />
             </MemoryRouter>,
