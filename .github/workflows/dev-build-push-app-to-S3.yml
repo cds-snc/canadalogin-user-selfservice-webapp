@@ -52,3 +52,7 @@ jobs:
       - name: Deploy App to S3
         run: |
           aws s3 sync ${{ matrix.module }}/dist s3://${{ secrets.FRONTEND_APP_S3_BUCKET }}
+
+      - name: Invalidate FRONTEND_APP_CLOUDFRONT_DISTRIBUTION cache
+        run: |
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.FRONTEND_APP_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/index.html"
