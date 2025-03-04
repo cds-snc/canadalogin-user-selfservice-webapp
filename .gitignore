@@ -9,3 +9,6 @@ dist/
 .env
 .DS_Store
 */.DS_Store
+
+# ACT GITHUB LOCAL Test Runner Environment
+.actrc
