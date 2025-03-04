@@ -2,14 +2,6 @@ locals {
   github_action_push_S3 = "github_action_push_S3"
 }
 
-# 
-# Built-in AWS policy attached to the roles
-#
-data "aws_iam_policy" "admin" {
-  # checkov:skip=CKV_AWS_275:This policy is required for the Terraform apply
-  name = "AdministratorAccess"
-}
-
 #
 # Create the OIDC roles used by the GitHub workflows
 # The roles can be assumed by the GitHub workflows according to the `claim`
