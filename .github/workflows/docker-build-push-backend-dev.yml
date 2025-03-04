@@ -3,7 +3,7 @@ name: Docker build and push to dev
 on:
   push:
     branches:
-      - main
+      - setup-gh-actions
     paths:
       - 'backend/**'
 
