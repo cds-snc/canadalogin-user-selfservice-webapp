@@ -9,6 +9,7 @@ dist/
 .env
 .DS_Store
 */.DS_Store
+backend/tests/__pycache__
 
 # ACT GITHUB LOCAL Test Runner Environment
 .actrc

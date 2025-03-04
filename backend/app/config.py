@@ -1,5 +1,6 @@
 from pydantic import BaseSettings, validator
 from typing import List
+import os
 
 class Settings(BaseSettings):
     IBM_VERIFY_TENANT_URL: str
@@ -15,7 +16,7 @@ class Settings(BaseSettings):
         raise ValueError("CORS_ORIGINS must be a comma-separated string")
 
     class Config:
-        env_file = ".env"
+        env_file = os.environ.get("ENV_FILE", ".env")
         env_file_encoding = "utf-8"
         case_sensitive = True
 
