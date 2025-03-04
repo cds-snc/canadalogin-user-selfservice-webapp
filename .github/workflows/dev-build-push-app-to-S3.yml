@@ -5,8 +5,8 @@ on:
     branches:
       - main
     paths:
-      - 'frontend/*'
-      - '.github/workflows/dev-build-push-app-to-S3'
+      - "frontend/*"
+      - ".github/workflows/dev-build-push-app-to-S3"
   workflow_dispatch:
 
 env:
@@ -20,7 +20,7 @@ permissions:
 jobs:
   build-push:
     runs-on: ubuntu-latest
-    environment: 'dev'
+    environment: "dev"
 
     strategy:
       fail-fast: false
@@ -39,19 +39,16 @@ jobs:
       - name: configure aws credentials using OIDC role
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
         with:
-          role-to-assume: 
-          role-session-name: 
+          role-to-assume: arn:aws:iam::329599618423:role/github_action_push_S3
+          role-session-name: GHPushAppS3
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Install dependencies
         working-directory: ${{ matrix.module }}
         run: |
-            npm install
-            npm run build
+          npm install
+          npm run build
 
       - name: Deploy App to S3
         run: |
           aws s3 sync ${{ matrix.module }}/dist s3://${{ secrets.FRONTEND_APP_S3_BUCKET }}
-
-
-            
