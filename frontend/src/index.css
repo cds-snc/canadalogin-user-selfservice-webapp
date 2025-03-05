@@ -20,12 +20,13 @@
     }
     .gcds-page{
         display: flex;
-        padding: var(--gcds-spacing-225, 18px) 15px var(--gcds-spacing-550, 44px) 15px;
+        padding: var(--gcds-spacing-225, 18px) 10px var(--gcds-spacing-550, 44px) 15px;
         flex-direction: column;
         align-items: flex-start;
         gap: var(--gcds-spacing-350, 28px);
         align-self: stretch;
     }
+
     .gcds-content{
         display: flex;
         flex-direction: column;

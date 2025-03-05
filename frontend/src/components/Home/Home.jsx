@@ -19,7 +19,7 @@ export default function Home({currentLang}) {
             <GcdsContainer>
                 <GcdsHeading tag="h1">
                         {pageContentJson['1']}
-                        <GcdsText marginTop="200" marginBottom="0">
+                        <GcdsText marginTop="150" marginBottom="0">
                             {pageContentJson['2']}
                             <strong>
                                 {currentLang===AVAILABLE_LANGUAGES.fr?pageContentJson['3']+' ':''}
