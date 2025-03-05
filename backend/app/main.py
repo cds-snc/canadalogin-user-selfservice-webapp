@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends, Request, APIRouter, status
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 from fastapi.openapi.utils import get_openapi
