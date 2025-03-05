@@ -2,11 +2,9 @@
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
 
-# Define response models
 class RootResponse(BaseModel):
     message: str = Field(..., description="Welcome message", example="GC Sign In Backend Service")
 
-# Create router
 router = APIRouter(
     prefix="",
     tags=["Root"],

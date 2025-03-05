@@ -4,7 +4,6 @@ from pydantic import BaseModel
 from typing import Dict
 from ..passkey_auth import passkey_auth
 
-# Define request models
 class AuthenticationOptionsRequest(BaseModel):
     username: str
 
@@ -12,7 +11,6 @@ class AuthenticationVerificationRequest(BaseModel):
     username: str
     credential: Dict
 
-# Create router
 router = APIRouter(
     prefix="/api",
     tags=["Passkey Authentication"],

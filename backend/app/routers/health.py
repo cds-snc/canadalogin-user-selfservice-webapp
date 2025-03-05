@@ -3,17 +3,14 @@ from fastapi import APIRouter
 from pydantic import BaseModel, Field
 from datetime import datetime
 
-# API version
 API_VERSION = "1.0.0"
 
-# Define response models
 class HealthResponse(BaseModel):
     status: str = Field(..., description="Service health status", example="healthy")
     timestamp: str = Field(..., description="Current UTC timestamp in ISO format", example="2024-03-05T12:34:56.789Z")
     service: str = Field(..., description="Service name", example="gc-signin-backend")
     version: str = Field(..., description="Service version", example="1.0.0")
 
-# Create router
 router = APIRouter(
     prefix="",
     tags=["Health"],

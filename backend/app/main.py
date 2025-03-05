@@ -26,7 +26,6 @@ from .passkey_auth import passkey_auth
 from pydantic import BaseModel, Field
 from typing import Dict, Optional, List
 
-# Import routers
 from .routers import health, root, passkey
 
 logging.basicConfig(
@@ -36,7 +35,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Define API metadata
 API_TITLE = "GC Sign In Backend API"
 API_DESCRIPTION = """
 ## GC Sign In Backend API
@@ -57,7 +55,6 @@ CONTACT_INFO = {
     "email": "gcsignin@cds-snc.ca"
 }
 
-# Define response models for better documentation
 class HealthResponse(BaseModel):
     status: str = Field(..., description="Service health status", example="healthy")
     timestamp: str = Field(..., description="Current UTC timestamp in ISO format", example="2024-03-05T12:34:56.789Z")
@@ -77,7 +74,6 @@ app = FastAPI(
     openapi_url="/openapi.json"
 )
 
-# Include routers
 app.include_router(health.router)
 app.include_router(root.router)
 app.include_router(passkey.router)
