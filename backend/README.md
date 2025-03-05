@@ -7,6 +7,7 @@ This is the FastAPI backend application for the GC Sign In proxy service.
 ### Prerequisites
 
 - Docker installed on your machine
+- Python 3.12 (if running locally without Docker)
 - `.env` file with required environment variables
 
 ### Environment Variables
