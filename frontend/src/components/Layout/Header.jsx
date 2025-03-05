@@ -4,7 +4,7 @@ import React from "react";
 export default function Header({langHref,currentLang}){
     return  (
         <GcdsContainer>
-            <GcdsHeader langHref={`${langHref}`} skipToHref="#" signature-variant={"colour"} lang={currentLang} data-testid="gcds-header"/>
+            <GcdsHeader langHref={`${langHref}`} skipToHref="#" signature-variant={"colour"} lang={currentLang} />
         </GcdsContainer>
     );
 }

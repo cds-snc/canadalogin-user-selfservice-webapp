@@ -21,7 +21,10 @@ export default function Home({currentLang}) {
                         {pageContentJson['1']}
                         <GcdsText marginTop="200" marginBottom="0">
                             {pageContentJson['2']}
-                            <strong> {currentLang===AVAILABLE_LANGUAGES.fr?pageContentJson['3']+' ':''}{` ${SERVICES[0].title}`}{currentLang===AVAILABLE_LANGUAGES.en?' '+pageContentJson['3']:''}</strong>
+                            <strong>
+                                {currentLang===AVAILABLE_LANGUAGES.fr?pageContentJson['3']+' ':''}
+                                {` ${SERVICES[0].title}`}{currentLang===AVAILABLE_LANGUAGES.en?' '+pageContentJson['3']:''}
+                            </strong>
                         </GcdsText>
                 </GcdsHeading>
                 <GcdsDetails detailsTitle={pageContentJson['4']} data-testid="gcds-details">
@@ -43,7 +46,6 @@ export default function Home({currentLang}) {
                                 inputId="email"
                                 label={pageContentJson['8']}
                                 name="email"
-                                data-testid="gcds-input"
                             ></GcdsInput>
                             <GcdsButton type="submit">
                                 {pageContentJson['9']}
@@ -54,7 +56,7 @@ export default function Home({currentLang}) {
                 <GcdsHeading tag="h2">
                     {pageContentJson['10']}
                     <GcdsText marginTop="200" marginBottom="0">
-                        <GcdsLink href={`/${currentLang}${NAVIGATION_LINKS.signUp}`} data-testid="gcds-link">
+                        <GcdsLink href={`/${currentLang}${NAVIGATION_LINKS.signUp}`} >
                             {pageContentJson['11']}
                         </GcdsLink>
                     </GcdsText>
