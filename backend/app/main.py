@@ -1,5 +1,8 @@
-from fastapi import FastAPI, HTTPException, Depends, Request, APIRouter
+from fastapi import FastAPI, HTTPException, Depends, Request, APIRouter, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
+from fastapi.openapi.utils import get_openapi
+from fastapi.responses import JSONResponse
 import requests
 import logging
 import json
@@ -20,8 +23,11 @@ import uuid
 from .password_auth import authenticate_password
 from .mfa_auth import mfa_signup
 from .passkey_auth import passkey_auth
-from pydantic import BaseModel
-from typing import Dict
+from pydantic import BaseModel, Field
+from typing import Dict, Optional, List
+
+# Import routers
+from .routers import health, root, passkey
 
 logging.basicConfig(
     level=logging.INFO,
@@ -30,7 +36,51 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="IBM Verify Integration")
+# Define API metadata
+API_TITLE = "GC Sign In Backend API"
+API_DESCRIPTION = """
+## GC Sign In Backend API
+
+This API provides authentication services for the GC Sign In application, integrating with IBM Verify.
+
+### Features
+
+* Password-based authentication
+* Multi-factor authentication (MFA)
+* Passkey authentication
+* IBM Verify integration
+"""
+API_VERSION = "1.0.0"
+CONTACT_INFO = {
+    "name": "GC Sign In Team",
+    "url": "https://github.com/cds-snc/gc-signin-ibm",
+    "email": "gcsignin@cds-snc.ca"
+}
+
+# Define response models for better documentation
+class HealthResponse(BaseModel):
+    status: str = Field(..., description="Service health status", example="healthy")
+    timestamp: str = Field(..., description="Current UTC timestamp in ISO format", example="2024-03-05T12:34:56.789Z")
+    service: str = Field(..., description="Service name", example="gc-signin-backend")
+    version: str = Field(..., description="Service version", example="1.0.0")
+
+class RootResponse(BaseModel):
+    message: str = Field(..., description="Welcome message", example="GC Sign In Backend Service")
+
+app = FastAPI(
+    title=API_TITLE,
+    description=API_DESCRIPTION,
+    version=API_VERSION,
+    contact=CONTACT_INFO,
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/openapi.json"
+)
+
+# Include routers
+app.include_router(health.router)
+app.include_router(root.router)
+app.include_router(passkey.router)
 
 # CORS
 app.add_middleware(
@@ -446,23 +496,38 @@ async def signup_with_mfa(request: Request):
         logger.error(f"MFA Signup error: {str(e)}", exc_info=True)
         raise HTTPException(status_code=400, detail=str(e))
 
-@app.get("/health")
-async def health_check():
-    """
-    Health check endpoint to monitor service status
-    Returns:
-        dict: Service status information
-    """
-    return {
-        "status": "healthy",
-        "timestamp": datetime.utcnow().isoformat(),
-        "service": "gc-signin-backend",
-        "version": "1.0.0"
-    }
+# Custom endpoint to get the OpenAPI schema
+@app.get("/api/openapi.json", include_in_schema=False)
+async def get_open_api_endpoint():
+    """Get the OpenAPI schema for this API."""
+    return JSONResponse(get_openapi(
+        title=API_TITLE,
+        version=API_VERSION,
+        description=API_DESCRIPTION,
+        routes=app.routes,
+        contact=CONTACT_INFO
+    ))
 
-@app.get("/")
-async def root():
-    return {"message": "GC Sign In Backend Service"}
+# Custom Swagger UI endpoint
+@app.get("/api/docs", include_in_schema=False)
+async def custom_swagger_ui_html():
+    """Get custom Swagger UI HTML."""
+    return get_swagger_ui_html(
+        openapi_url="/api/openapi.json",
+        title=f"{API_TITLE} - Swagger UI",
+        swagger_js_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.9.0/swagger-ui-bundle.js",
+        swagger_css_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.9.0/swagger-ui.css",
+    )
+
+# Custom ReDoc endpoint
+@app.get("/api/redoc", include_in_schema=False)
+async def custom_redoc_html():
+    """Get custom ReDoc HTML."""
+    return get_redoc_html(
+        openapi_url="/api/openapi.json",
+        title=f"{API_TITLE} - ReDoc",
+        redoc_js_url="https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js",
+    )
 
 # Startup event to verify configuration
 @app.on_event("startup")
@@ -472,28 +537,3 @@ async def startup_event():
     logger.info(f"Client ID: {settings.IBM_VERIFY_CLIENT_ID}")
     logger.info(f"Redirect URI: {settings.IBM_VERIFY_REDIRECT_URI}")
     logger.info("Application startup complete") 
-
-router = APIRouter(prefix="/api")
-
-class AuthenticationOptionsRequest(BaseModel):
-    username: str
-
-class AuthenticationVerificationRequest(BaseModel):
-    username: str
-    credential: Dict
-
-@router.post("/auth/passkey/options")
-async def get_authentication_options(request: AuthenticationOptionsRequest):
-    """Get authentication options for passkey signin"""
-    return await passkey_auth.generate_authentication_options(request.username)
-
-@router.post("/auth/passkey/verify")
-async def verify_passkey_auth(request: AuthenticationVerificationRequest):
-    """Verify passkey authentication and return access token"""
-    return await passkey_auth.verify_authentication(
-        request.username,
-        request.credential
-    )
-
-# Make sure to include the router in the FastAPI app
-app.include_router(router) 
