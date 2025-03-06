@@ -1,11 +1,15 @@
 @import '@cdssnc/gcds-components-react/gcds.css';
-@import 'tailwindcss';
+
 
 .gcds-main{
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     height: 100vh;
+}
+body {
+    margin: auto;
+    height: 100%
 }
 
 @media screen and (max-width:767px) {
