@@ -2,8 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, CssBaseline, Container, Box } from '@mui/material';
 import theme from './theme';
-import Header from './components/Header';
-import Footer from './components/Footer';
+import Header from './components/Layout/Header';
+import Footer from './components/Layout/Footer';
 import Home from './components/Home';
 import Login from './components/Login';
 import Signup from './components/Signup';
@@ -13,7 +13,7 @@ import PasskeyLogin from './components/PasskeyLogin';
 import MFASignup from './components/MFASignup';
 import Dashboard from './components/Dashboard';
 
-function App() {
+function App_old() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -42,4 +42,4 @@ function App() {
   );
 }
 
-export default App; 
+export default App_old;
