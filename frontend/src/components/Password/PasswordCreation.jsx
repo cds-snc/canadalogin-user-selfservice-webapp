@@ -8,7 +8,7 @@ import {useActionState} from 'react';
 export default function PasswordCreation({currentLang}) {
     const navigate = useNavigate();
     const pageContentJson = getPageContent(currentLang, "PasswordCreation");
-
+ 
     function Form(){
         const [formState, actions] = useActionState(
             {   password: "",
