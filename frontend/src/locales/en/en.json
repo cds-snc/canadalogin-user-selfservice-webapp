@@ -11,5 +11,25 @@
     "9": "Continue",
     "10": "First time using GC Sign in?",
     "11": "Create an account"
-  }
+  },
+"PasswordCreation": {
+  "1": "Your email was successfully verified",
+  "2": "Step 2 of 5", 
+  "3": "Create a password",
+  "4": "Your password should be a phrase or series of words that only you can recognize. It must be ",
+  "5": "at least 12 characters. ",
+  "6": "You can use multiple words seprated by spaces to meet the character limit.",
+  "7": "Password safety tips",
+  "8": "The longer and more unusual the password, the harder it is to guess. So avoid using common phrases. Also avoid repeating passwords from other online accounts such as banks, email and social media.",
+  "9": "Password",
+  "10": "example: pillow moose dish",
+  "11": "Show password",
+  "12": "Minimum length: ", 
+  "13": "/ 12 characters", 
+  "14": "Password strength:",
+  "15": "None",
+  "16": "Continue",
+  "17": "Already have a GC Sign in account?",
+  "18": "Sign in"
+}
 }

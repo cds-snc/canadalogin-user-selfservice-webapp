@@ -79,4 +79,10 @@ body {
         flex-direction: column;
         align-items: flex-start;
     }
+    .gdcs-notice{
+        display: flex;
+        align-items: flex-start;
+        gap: var(--space-175, 14px);
+        align-self: stretch;
+    }
 }
