@@ -11,6 +11,12 @@ const filesToInclude =[
 
 export default defineConfig({
     plugins: [react()],
+    preview: {
+        port: 3001,
+    },
+    dev: {
+        port: 3000,
+    },
     test: {
         globals: true,
         coverage: {

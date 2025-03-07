@@ -3,13 +3,12 @@ backend/app/__pycache__/*
 .terraform/
 backend/.env
 node_modules/
-.parcel-cache/
-dist/
 .terraform.lock.hcl
 .env
 .DS_Store
 */.DS_Store
 backend/tests/__pycache__
+frontend/package-lock.json
 
 # ACT GITHUB LOCAL Test Runner Environment
 .actrc
