@@ -1,8 +1,8 @@
 sequenceDiagram
-    participant enduser
+    participant frontend
     participant gc-signin-ibm (backend)
     participant ibm verify api
-    enduser->>gc-signin-ibm (backend): user's(?) oauth token to request user's profile    
+    frontend->>gc-signin-ibm (backend): user's(?) oauth token to request user's profile    
     gc-signin-ibm (backend)->>ibm verify api: makes profile request
     ibm verify api->>gc-signin-ibm (backend): sends profile data
-    gc-signin-ibm (backend) ->>enduser: sends profile data
+    gc-signin-ibm (backend) ->>frontend: sends profile data
