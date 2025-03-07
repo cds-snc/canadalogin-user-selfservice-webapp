@@ -14,12 +14,10 @@ module "github_workflow_roles" {
     {
       name      = local.github_action_push_S3
       repo_name = "gc-signin-ibm"
-      claim     = "ref:refs/heads/main"
+      claim     = "environment:${var.env}"
     }
   ]
 }
-
-
 
 
 resource "aws_iam_role_policy_attachment" "github_action_s3_full_access" {
