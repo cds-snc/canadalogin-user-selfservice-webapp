@@ -6,7 +6,7 @@ import {GcdsContainer} from "@cdssnc/gcds-components-react";
 
 export default function PasswordPage() {
     const {langHref, currentLang} = getLangValues();
-
+ 
     return (
         <GcdsContainer mainContainer centered>
             <GcdsContainer className="gcds-main">
