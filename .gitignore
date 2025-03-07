@@ -3,8 +3,6 @@ backend/app/__pycache__/*
 .terraform/
 backend/.env
 node_modules/
-.parcel-cache/
-dist/
 .terraform.lock.hcl
 .env
 .DS_Store
