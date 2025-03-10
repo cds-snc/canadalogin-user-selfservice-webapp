@@ -1,4 +1,3 @@
-import { fn } from '@storybook/test';
 import FirstTimeGc from "../../components/Layout/FirstTimeGc.jsx";
 
 export default {
