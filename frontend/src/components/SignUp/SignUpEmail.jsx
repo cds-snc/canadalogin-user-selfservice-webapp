@@ -7,6 +7,7 @@ import {AVAILABLE_LANGUAGES, SERVICES} from "../../utils/constants";
 import {getPageContent} from '../../utils/functions';
 import FirstTimeGc from "../Layout/FirstTimeGc";
 import EmailCollectionForm from "./EmailCollectionForm";
+import AlreadyGc from "../Layout/AlreadyGc.jsx";
 
 
 export default function SignUpEmail({currentLang}) {
@@ -27,7 +28,7 @@ export default function SignUpEmail({currentLang}) {
                 </GcdsHeading>
                 <EmailCollectionForm currentLang={currentLang}/>
             </GcdsContainer>
-            <FirstTimeGc currentLang={currentLang}/>
+            <AlreadyGc currentLang={currentLang}/>
         </GcdsContainer>
     )
 }
