@@ -5,7 +5,6 @@ import {
 } from "@cdssnc/gcds-components-react";
 import {AVAILABLE_LANGUAGES, SERVICES} from "../../utils/constants";
 import {getPageContent} from '../../utils/functions';
-import FirstTimeGc from "../Layout/FirstTimeGc";
 import EmailCollectionForm from "./EmailCollectionForm";
 import AlreadyGc from "../Layout/AlreadyGc.jsx";
 
