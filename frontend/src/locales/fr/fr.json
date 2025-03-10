@@ -8,8 +8,29 @@
     "6": "Les programmes et services participants vous demanderont de créer un compte Connexion GC pour accéder à vos renseignements sur leur site Web ou application de manière sécurisée.",
     "7": "Vous pouvez utiliser le même nom d'utilisateur et le même mot de passe pour accéder à tous les programme et services partenaires de Connexion GC.",
     "8": "Adresse courriel",
-    "9": "Continuer",
-    "10": "Vous n'avez pas encoure de compte Connexion GC?",
-    "11": "Créer une compte"
+    "9": "Continuer"
+  },
+  "SignUpEmail": {
+    "1": "Créez un compte Connexion GC",
+    "2": "pour accéder à votre",
+    "3": "compte",
+    "4": "Entrez une adresse courriel"
+  },
+  "FirstTimeGc": {
+    "1": "Vous possédez déjà un compte Connexion GC?",
+    "2": "Se connecter"
+  },
+  "AlreadyGc": {
+    "1": "Vous n’avez pas encore de compte Connexion GC?",
+    "2": "Créer un compte"
+  },
+  "EmailCollectionForm": {
+    "1": "Entrez une adresse courriel",
+    "2": "Veuillez choisir la langue que vous préférez utiliser pour la correspondance par courriel",
+    "3": "(obligatoire)",
+    "4": "Vous recevrez les courriels de Connexion GC dans la langue de votre choix.",
+    "5": "Continuer",
+    "6": "Anglais",
+    "7": "Français"
   }
 }
