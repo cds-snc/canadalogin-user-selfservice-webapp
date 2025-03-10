@@ -1,6 +1,6 @@
 export const AVAILABLE_LANGUAGES = {en:'en', fr:'fr'};
 export const NAVIGATION_LINKS = {
-    signUp: '/signUp'
+    signUp: '/signup'
 };
 
 export const FOOTERS = {

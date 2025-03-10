@@ -13,6 +13,13 @@ body {
 
 @media screen and (max-width:767px) {
 
+    .gcds-email-fieldset{
+
+        /* Mobile/Standard text size (18px)/Small line height (140%)/Bold */
+
+        font-size: 18px;
+        font-style: normal;
+    }
     .gcds-header{
         display: flex;
         padding: var(--gcds-spacing-100, 8px) 0 var(--gcds-spacing-450, 36px) 0;
