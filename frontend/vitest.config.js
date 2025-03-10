@@ -5,8 +5,7 @@ const filesToInclude =[
     '**/src/App.jsx',
     '**/src/utils/*.jsx',
     '**/src/views/**/*.jsx',
-    '**/src/components/Home/*.jsx',
-    '**/src/components/Layout/*.jsx'
+    '**/src/components/**/*.jsx'
 ]
 
 export default defineConfig({
