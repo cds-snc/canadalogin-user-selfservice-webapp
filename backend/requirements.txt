@@ -7,3 +7,4 @@ python-dotenv==1.0.1
 webauthn==1.11.1
 cryptography==44.0.1
 pydantic-settings==2.8.1
+pydantic==2.10.6
