@@ -1,8 +1,9 @@
-import AlreadyGc from "../../components/Layout/AlreadyGc.jsx";
+import { fn } from '@storybook/test';
+import FirstTimeGc from "../../components/Layout/FirstTimeGc.jsx";
 
 export default {
-    title: 'GC Sign In/Layout/Already',
-    component: AlreadyGc,
+    title: 'GC Sign In/Layout/FirstTime',
+    component: FirstTimeGc,
     // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs
     tags: ['autodocs'],
     parameters: {

@@ -1,6 +1,5 @@
 import {GcdsHeading, GcdsLink, GcdsText} from "@cdssnc/gcds-components-react";
 import {getPageContent} from "../../utils/functions";
-import {NAVIGATION_LINKS} from "../../utils/constants.jsx";
 
 
 

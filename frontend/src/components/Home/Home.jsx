@@ -8,8 +8,7 @@ import {
 } from "@cdssnc/gcds-components-react";
 import {AVAILABLE_LANGUAGES, SERVICES} from "../../utils/constants";
 import {getPageContent} from '../../utils/functions';
-import AlreadyGc from "../Layout/AlreadyGc.jsx";
-import FirstTimeGc from "../Layout/FirstTimeGc.jsx";
+import FirstTimeGc from "../Layout/FirstTimeGc";
 
 
 export default function Home({currentLang}) {

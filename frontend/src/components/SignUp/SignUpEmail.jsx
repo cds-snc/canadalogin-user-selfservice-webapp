@@ -1,13 +1,9 @@
 import {
     GcdsContainer,
     GcdsHeading,
-    GcdsButton,
-    GcdsLink,
-    GcdsText,
-    GcdsDetails,
-    GcdsInput
+    GcdsText
 } from "@cdssnc/gcds-components-react";
-import {AVAILABLE_LANGUAGES, SERVICES, NAVIGATION_LINKS} from "../../utils/constants";
+import {AVAILABLE_LANGUAGES, SERVICES} from "../../utils/constants";
 import {getPageContent} from '../../utils/functions';
 import FirstTimeGc from "../Layout/FirstTimeGc";
 import EmailCollectionForm from "./EmailCollectionForm";
