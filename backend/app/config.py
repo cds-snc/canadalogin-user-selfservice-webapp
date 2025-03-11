@@ -1,23 +1,32 @@
-from pydantic import BaseSettings, validator
-from typing import List
-import os
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import BaseModel, Field, AnyUrl
+
+
+class AppInfo(BaseModel):
+    app_name: str = "GC Sign In Backend API"
+    github_url: AnyUrl = "https://github.com/cds-snc/gc-signin-ibm"
+    email: str = "gcsignin@cds-snc.ca"
+
+
+class IBMVerify(BaseModel):
+    IBM_VERIFY_TENANT_URL: str = Field(
+        "https://cds-gcsignin-dev.verify.ibm.com/oauth2/.well-known/openid-configuration", env="IBM_VERIFY_TENANT_URL")
+
+    IBM_VERIFY_CLIENT_ID: str = Field(
+        "53a6abe8-b54e-4164-bfbc-6a98760604e3", env="IBM_VERIFY_CLIENT_ID")
+    IBM_VERIFY_CLIENT_SECRET: str = Field("0", env="IBM_VERIFY_CLIENT_SECRET")
+    IBM_VERIFY_REDIRECT_URI: str = Field(
+        "http://localhost:8000", env="IBM_VERIFY_REDIRECT_URI")
+
 
 class Settings(BaseSettings):
-    IBM_VERIFY_TENANT_URL: str
-    IBM_VERIFY_CLIENT_ID: str
-    IBM_VERIFY_CLIENT_SECRET: str
-    IBM_VERIFY_REDIRECT_URI: str = "http://localhost:8000"
-    CORS_ORIGINS: str = "http://localhost:3000,http://gc-signin-dev-frontend-alb-698661334.ca-central-1.elb.amazonaws.com"
+    model_config = SettingsConfigDict(
+        env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    ENVIRONMENT: str
+    app_info: AppInfo = AppInfo()
+    ibm_verify: IBMVerify = IBMVerify()
+    CORS_ORIGINS: str = Field(
+        "http://localhost:3000", env="CORS_ORIGINS")
 
-    @validator("CORS_ORIGINS")
-    def parse_cors_origins(cls, v):
-        if isinstance(v, str):
-            return [origin.strip() for origin in v.split(",")]
-        raise ValueError("CORS_ORIGINS must be a comma-separated string")
 
-    class Config:
-        env_file = os.environ.get("ENV_FILE", ".env")
-        env_file_encoding = "utf-8"
-        case_sensitive = True
-
-settings = Settings() 
+settings = Settings()
