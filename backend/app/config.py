@@ -28,7 +28,7 @@ class Settings(BaseSettings):
         "http://localhost:3000", env="CORS_ORIGINS")
 
     model_config = SettingsConfigDict(
-        env_file=".env", env_file_encoding="utf-8", extra="ignore")
+        env_file=".env", env_file_encoding="utf-8", extra="ignore", case_sensitive=True)
 
 
 @lru_cache
