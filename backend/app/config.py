@@ -9,6 +9,13 @@ class AppInfo(BaseModel):
     email: str = "gcsignin@cds-snc.ca"
 
 
+class IBMAPI(BaseModel):
+    IBM_VERIFY_API_CLIENT_ID: str = Field(
+        "53a6abe8-b54e-4164-bfbc-6a98760604e3", env="IBM_VERIFY_API_CLIENT_ID")
+    IBM_VERIFY_API_CLIENT_SECRET: str = Field(
+        "0", env="IBM_VERIFY_API_CLIENT_SECRET")
+
+
 class IBMVerify(BaseModel):
     IBM_VERIFY_TENANT_URL: str = Field(
         "https://cds-gcsignin-dev.verify.ibm.com/oauth2/.well-known/openid-configuration", env="IBM_VERIFY_TENANT_URL")
