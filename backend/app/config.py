@@ -21,13 +21,14 @@ class IBMVerify(BaseModel):
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(
-        env_file=".env", env_file_encoding="utf-8", extra="ignore")
     ENVIRONMENT: str
     app_info: AppInfo = AppInfo()
     ibm_verify: IBMVerify = IBMVerify()
     CORS_ORIGINS: str = Field(
         "http://localhost:3000", env="CORS_ORIGINS")
+
+    model_config = SettingsConfigDict(
+        env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
 
 @lru_cache
