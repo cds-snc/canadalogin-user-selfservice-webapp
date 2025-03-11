@@ -1,35 +1,36 @@
+import base64
+import uuid
 from contextlib import asynccontextmanager
-from functools import lru_cache
 from typing_extensions import Annotated
+from pydantic import BaseModel, Field
+from typing import Dict, Optional, List
 from fastapi import FastAPI, HTTPException, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 from fastapi.openapi.utils import get_openapi
 from fastapi.responses import JSONResponse
-# import requests
+import requests
 import logging
-# import json
-# from datetime import datetime
-from . import config
-# from webauthn import (
-#     generate_registration_options,
-#     verify_registration_response,
-# )
-# from webauthn.helpers.cose import COSEAlgorithmIdentifier
-# from webauthn.helpers.structs import (
-#     AuthenticatorSelectionCriteria,
-#     UserVerificationRequirement,
-#     RegistrationCredential,
-# )
-# import base64
-# import uuid
-# from .password_auth import authenticate_password
-# from .mfa_auth import mfa_signup
-# from .passkey_auth import passkey_auth
-# from pydantic import BaseModel, Field
-# from typing import Dict, Optional, List
+import json
+from datetime import datetime
+from .config import get_settings, Settings
+from webauthn import (
+    generate_registration_options,
+    verify_registration_response,
+)
+from webauthn.helpers.cose import COSEAlgorithmIdentifier
+from webauthn.helpers.structs import (
+    AuthenticatorSelectionCriteria,
+    UserVerificationRequirement,
+    RegistrationCredential,
+)
 
-# from .routers import health, root, passkey
+from .password_auth import authenticate_password
+from .mfa_auth import mfa_signup
+from .passkey_auth import passkey_auth
+
+
+from .routers import health, root, passkey
 
 logging.basicConfig(
     level=logging.INFO,
@@ -37,11 +38,6 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 logger = logging.getLogger(__name__)
-
-
-@lru_cache
-def get_settings():
-    return config.Settings()
 
 
 config_settings = get_settings()
@@ -109,7 +105,7 @@ app = FastAPI(
 
 
 @app.get("/info")
-async def info(settings: Annotated[config, Depends(get_settings)]):
+async def info(settings: Annotated[Settings, Depends(get_settings)]):
     return {
         "app_name": settings.app_info.app_name,
     }
