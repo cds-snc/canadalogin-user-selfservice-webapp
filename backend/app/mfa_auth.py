@@ -18,7 +18,7 @@ class MFASignup:
         self.tenant_url = settings.IBM_VERIFY_TENANT_URL.rstrip('/')
         self.client_id = settings.IBM_VERIFY_CLIENT_ID
         self.client_secret = settings.IBM_VERIFY_CLIENT_SECRET
-        self.password_source_id = "3546b745-8790-4578-b4b5-401390cbc9b4"
+        self.password_source_id = settings.PASSWORD_SOURCE_ID
 
     def log_api_call(self, method: str, url: str, headers: dict, data: dict = None, params: dict = None, response: requests.Response = None):
         """Helper function to log API requests and responses"""
