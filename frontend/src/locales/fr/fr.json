@@ -32,5 +32,9 @@
     "5": "Continuer",
     "6": "Anglais",
     "7": "Français"
+  },
+  "Error":{
+    "1": "Un problème est survenu",
+    "2": "Adresse courriel invalide. Votre adresse courriel doit contenir un symbole @."
   }
 }
