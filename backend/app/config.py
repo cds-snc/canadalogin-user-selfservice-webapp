@@ -30,7 +30,7 @@ class IBMVerify(BaseModel):
 
 
 class Settings(BaseSettings):
-    ENVIRONMENT: str
+    ENVIRONMENT: str = Field("dev", env="ENVIRONMENT")
     app_info: AppInfo = AppInfo()
     ibm_verify: IBMVerify = IBMVerify()
     CORS_ORIGINS: str = Field(
