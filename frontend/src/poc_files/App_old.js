@@ -2,18 +2,18 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, CssBaseline, Container, Box } from '@mui/material';
 import theme from './theme';
-import Header from './components/Header';
-import Footer from './components/Footer';
-import Home from './components/Home';
-import Login from './components/Login';
-import Signup from './components/Signup';
-import PasswordSignup from './components/PasswordSignup';
-import PasskeySignup from './components/PasskeySignup';
-import PasskeyLogin from './components/PasskeyLogin';
-import MFASignup from './components/MFASignup';
-import Dashboard from './components/Dashboard';
+import Header from '../components/Layout/Header';
+import Footer from '../components/Layout/Footer';
+import Home from './POC_Components/Home';
+import Login from './POC_Components/Login';
+import Signup from './POC_Components/Signup';
+import PasswordSignup from './POC_Components/PasswordSignup';
+import PasskeySignup from './POC_Components/PasskeySignup';
+import PasskeyLogin from './POC_Components/PasskeyLogin';
+import MFASignup from './POC_Components/MFASignup';
+import Dashboard from './POC_Components/Dashboard';
 
-function App() {
+function App_old() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -42,4 +42,4 @@ function App() {
   );
 }
 
-export default App; 
+export default App_old;

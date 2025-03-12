@@ -7,6 +7,7 @@ This is the FastAPI backend application for the GC Sign In proxy service.
 ### Prerequisites
 
 - Docker installed on your machine
+- Python 3.12 (if running locally without Docker)
 - `.env` file with required environment variables
 
 ### Environment Variables
@@ -119,4 +120,28 @@ Expected response:
   "service": "gc-signin-backend",
   "version": "1.0.0"
 }
-``` 
+```
+
+## Running Tests
+
+To run the unit tests, follow these steps:
+
+1. Install the development dependencies:
+   ```bash
+   pip install -r requirements-dev.txt
+   ```
+
+2. Run the tests:
+   ```bash
+   pytest
+   ```
+
+3. To run tests with coverage report:
+   ```bash
+   pytest --cov=app --cov-report=term-missing
+   ```
+
+4. To run a specific test:
+   ```bash
+   pytest tests/test_hello.py::test_hello_world -v
+   ```
