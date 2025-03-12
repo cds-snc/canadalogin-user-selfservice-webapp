@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 from fastapi.openapi.utils import get_openapi
 from fastapi.responses import JSONResponse
+from fastapi_versioning import VersionedFastAPI
 import requests
 import logging
 import json
@@ -78,8 +79,16 @@ app = FastAPI(
     lifespan=lifespan,
     title=settings.app_info.app_name,
     description=API_DESCRIPTION,
-    version=API_VERSION,
+    # version=API_VERSION,
     contact=CONTACT_INFO,
+)
+
+app.include_router(health.router, prefix="/health")
+app.include_router(root.router)
+app.include_router(passkey.router)
+
+app = VersionedFastAPI(
+    app, version_format="{major}", prefix_format=f"/v{{major}}"
 )
 
 
@@ -98,9 +107,6 @@ class RootResponse(BaseModel):
                          example="GC Sign In Backend Service")
 
 
-app.include_router(health.router)
-app.include_router(root.router)
-app.include_router(passkey.router)
 # CORS
 app.add_middleware(
     CORSMiddleware,
