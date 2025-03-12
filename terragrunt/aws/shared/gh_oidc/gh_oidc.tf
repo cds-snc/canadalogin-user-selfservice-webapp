@@ -14,12 +14,10 @@ module "github_workflow_roles" {
     {
       name      = local.github_action_push_S3
       repo_name = "gc-signin-ibm"
-      claim     = "ref:refs/heads/main"
+      claim     = "environment:${var.env}"
     }
   ]
 }
-
-
 
 
 resource "aws_iam_role_policy_attachment" "github_action_s3_full_access" {
@@ -45,6 +43,18 @@ data "aws_iam_policy_document" "allow_all_s3_actions" {
       "arn:aws:s3:::${var.frontend_client_app_s3_bucket_id}",
       "arn:aws:s3:::${var.frontend_client_app_s3_bucket_id}/*"
     ]
+  }
+
+  statement {
+    sid    = "AllowCloudfrontInvalidation"
+    effect = "Allow"
+    actions = [
+      "cloudfront:CreateInvalidation",
+      "cloudfront:GetDistribution",
+      "cloudfront:GetInvalidation",
+      "cloudfront:ListDistributions"
+    ]
+    resources = ["arn:aws:cloudfront::${var.account_id}:distribution/${var.frontend_client_app_cloudfront_distribution_id}"]
   }
 }
 

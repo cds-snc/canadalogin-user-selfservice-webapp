@@ -16,6 +16,7 @@ dependency "s3" {
 
 inputs = {
   frontend_client_app_s3_bucket_id = dependency.s3.outputs.frontend_client_app_s3_bucket_id
+  frontend_client_app_cloudfront_distribution_id = dependency.s3.outputs.frontend_client_app_cloudfront_distribution_id
 } 
 
 
