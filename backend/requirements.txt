@@ -9,4 +9,3 @@ cryptography==44.0.1
 pydantic-settings==2.8.1
 pydantic==2.10.6
 starlette==0.45.3
-fastapi-versioning==0.10.0
