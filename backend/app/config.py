@@ -18,6 +18,8 @@ class IBMVerify(BaseModel):
     IBM_VERIFY_CLIENT_SECRET: str = Field("0", env="IBM_VERIFY_CLIENT_SECRET")
     IBM_VERIFY_REDIRECT_URI: str = Field(
         "http://localhost:8000", env="IBM_VERIFY_REDIRECT_URI")
+    # Password Source ID for IBM Verify, currently used in mfa_auth and password_auth. I think its for debugging purposes
+    PASSWORD_SOURCE_ID: str = Field("0", env="PASSWORD_SOURCE_ID")
 
 
 class Settings(BaseSettings):

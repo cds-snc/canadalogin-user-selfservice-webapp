@@ -134,7 +134,7 @@ async def authenticate_password(username: str, password: str):
         tenant_url = settings.IBM_VERIFY_TENANT_URL.rstrip(
             '/')  # Remove trailing slash if present
         # Password identity source identifier
-        password_source_id = "3546b745-8790-4578-b4b5-401390cbc9b4"
+        password_source_id = settings.PASSWORD_SOURCE_ID
         initiate_url = f"{tenant_url}/v1.0/authnmethods/password/{password_source_id}"
         initiate_headers = {
             "Authorization": f"Bearer {admin_token}",
