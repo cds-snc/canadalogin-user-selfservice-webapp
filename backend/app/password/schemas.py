@@ -40,7 +40,7 @@ class PasswordPolicyResponse(BaseModel):
     pwdMaxAge: int
     pwdMaxFailure: int
     pwdMinLength: int
-    pwdMaxLength: int = Field(65, description="Minimum length of the password")
+    pwdMaxLength: int = Field(65, description="Max length of the password")
     pwdCheckSyntax: int
 
 
