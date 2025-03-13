@@ -1,8 +1,8 @@
 export const AVAILABLE_LANGUAGES = {en:'en', fr:'fr'};
 export const NAVIGATION_LINKS = {
     signUp: '/signup',
-    verifyEmail: '/verifyemail',
-    resendCode: '/resendcode'
+    verifyEmail: '/signup/verifyemail',
+    resendCode: '/signin/resendcode'
 };
 
 export const FOOTERS = {
