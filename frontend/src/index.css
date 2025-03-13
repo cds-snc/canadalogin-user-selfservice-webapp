@@ -10,8 +10,12 @@
 body {
     margin: auto;
 }
+.gcds-gap{
+    margin-bottom: var(--gcds-spacing-500);
+}
 
 @media screen and (max-width:767px) {
+
 
     .gcds-email-fieldset{
 
