@@ -12,17 +12,16 @@ import AlreadyGc from "../Layout/AlreadyGc.jsx";
 
 
 const submitForm = async () =>{
-
     //update logic for sending to server once we have the back end
+    const response = {success:true, message:"Successfully submitted", error:null}
+    return response;
 }
 
 export default function SignUpEmail({currentLang}) {
     const [state, isPending] =
         useActionState(submitForm,{success:false, message:null, error:null});
     const [errorJson, setError] = useState({heading: null, emailError:null});
-
     const pageContentJson = getPageContent(currentLang, "SignUpEmail");
-
 
     return (
         <GcdsContainer className="gcds-content" >
