@@ -3,6 +3,7 @@ import logging
 import json
 from fastapi import HTTPException
 from .config import get_settings
+from .config import get_settings
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,

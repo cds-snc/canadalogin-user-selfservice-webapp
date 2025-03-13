@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --port 3000",
+    "dev": "vite --port 3000 --host 0.0.0.0",
     "preview": "vite preview --port 3001",
     "build": "vite build",
     "lint": "eslint .",
@@ -17,7 +17,9 @@
     "@cdssnc/gcds-components-react": "^0.32.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-router": "^7.2.0"
+    "react-router": "^7.2.0",
+    "react-password-strength-bar": "^0.4.1",
+    "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^3.2.5",

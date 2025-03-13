@@ -55,25 +55,24 @@ This API provides authentication services for the GC Sign In application, integr
 
 CONTACT_INFO = {
     "name": "GC Sign In Team",
-    "url": settings.app_info.github_url,
-    "email": settings.app_info.email
+    "url": "https://github.com/cds-snc/gc-signin-ibm",
+    "email": "gcsignin@cds-snc.ca"
 }
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    app.state.config = get_settings().ibm_verify_config
+class HealthResponse(BaseModel):
+    status: str = Field(..., description="Service health status",
+                        example="healthy")
+    timestamp: str = Field(..., description="Current UTC timestamp in ISO format",
+                           example="2024-03-05T12:34:56.789Z")
+    service: str = Field(..., description="Service name",
+                         example="gc-signin-backend")
+    version: str = Field(..., description="Service version", example="1.0.0")
 
-    logger.info("Starting IBM Verify Integration API")
-    logger.info(
-        f"Tenant URL: {app.state.config.IBM_VERIFY_TENANT_URL}")
-    logger.info(
-        f"Client ID: {app.state.config.IBM_VERIFY_CLIENT_ID}")
-    logger.info(
-        f"Redirect URI: {app.state.config.IBM_VERIFY_REDIRECT_URI}")
-    logger.info("Application startup complete")
-    yield
-    logger.info("Shutting down IBM Verify Integration API")
+
+class RootResponse(BaseModel):
+    message: str = Field(..., description="Welcome message",
+                         example="GC Sign In Backend Service")
 
 
 app = FastAPI(
@@ -124,7 +123,7 @@ RP_ID = "localhost"
 RP_NAME = "IBM Verify Integration"
 ORIGIN = "http://localhost:3000"
 
-# # Helper functions for base64url encoding/decoding
+# Helper functions for base64url encoding/decoding
 
 
 def bytes_to_base64url(bytes_data):
@@ -180,13 +179,6 @@ async def get_admin_token():
         logger.error(f"Error getting admin token: {str(e)}", exc_info=True)
         raise HTTPException(
             status_code=400, detail=f"Admin token error: {str(e)}")
-
-
-@app.get("/info")
-async def info():
-    return {
-        "app_name": "test"
-    }
 
 
 @app.post("/api/auth/signup")

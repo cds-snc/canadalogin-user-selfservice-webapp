@@ -2,13 +2,13 @@ import {
     GcdsContainer,
     GcdsHeading,
     GcdsButton,
-    GcdsLink,
     GcdsText,
     GcdsDetails,
     GcdsInput
 } from "@cdssnc/gcds-components-react";
-import {AVAILABLE_LANGUAGES, SERVICES, NAVIGATION_LINKS} from "../../utils/constants";
+import {AVAILABLE_LANGUAGES, SERVICES} from "../../utils/constants";
 import {getPageContent} from '../../utils/functions';
+import FirstTimeGc from "../Layout/FirstTimeGc";
 
 
 export default function Home({currentLang}) {
@@ -53,14 +53,7 @@ export default function Home({currentLang}) {
                         </form>
                     </GcdsText>
                 </GcdsContainer>
-                <GcdsHeading tag="h2">
-                    {pageContentJson['10']}
-                    <GcdsText marginTop="200" marginBottom="0">
-                        <GcdsLink href={`/${currentLang}${NAVIGATION_LINKS.signUp}`} >
-                            {pageContentJson['11']}
-                        </GcdsLink>
-                    </GcdsText>
-                </GcdsHeading>
+            <FirstTimeGc currentLang={currentLang}/>
         </GcdsContainer>
     )
 }
