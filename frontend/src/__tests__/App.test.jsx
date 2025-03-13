@@ -65,7 +65,6 @@ describe('Routing Test', () => {
                 <App />
             </MemoryRouter>,
         )
-        console.log(screen.debug());
         checkSignUpPageContents(lang.en, engJson["SignUpEmail"],langHref.fr+NAVIGATION_LINKS.signUp, engJson["EmailCollectionForm"], engJson['Button'], engJson["AlreadyGc"]);
     });
 
