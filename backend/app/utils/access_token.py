@@ -57,6 +57,7 @@ async def get_access_token() -> str:
                 f"Failed to get access token. Response: {response}")
             raise HTTPException(
                 status_code=500, detail="Failed to get access token")
+        print(access_token)
         return access_token
 
     except Exception as e:

@@ -13,13 +13,16 @@ router = APIRouter()
 
 
 @router.get("/policy",
+            response_model=PasswordPolicyResponse,
+            response_model_exclude_none=True,
+
             summary="Get the password policy",
             description="Returns the password policy for the tenant")
-async def password_policy(password_policy: str = Depends(get_password_policy)):
+async def password_policy():
     """
     Root endpoint of the API.
 
     Returns:
         RootResponse: A simple welcome message
     """
-    return password_policy
+    return await get_password_policy()

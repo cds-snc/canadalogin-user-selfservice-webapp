@@ -4,6 +4,8 @@ from app.utils.schemas import ResponseModel
 
 
 class IBMVerifyPasswordPolicy(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
     schemas: List[str]
     passwordMinAlphaChars: int
     passwordMinOtherChars: int
@@ -20,11 +22,11 @@ class IBMVerifyPasswordPolicy(BaseModel):
     pwdAllowUserChange: bool
     pwdFailureCountInterval: int
     passwordMaxRepeatedChars: int
-    pwdSafeModify: bool
-    passwordMaxConsecutiveRepeatedChars: int
-    passwordMinDiffChars: int
-    pwdCheckSyntax: int
-    ibm_pwdPolicy: bool
+    pwdSafeModify: Optional[bool] = None
+    passwordMaxConsecutiveRepeatedChars: Optional[int] = 0
+    passwordMinDiffChars: Optional[int] = 0
+    pwdCheckSyntax: Optional[int] = 0
+    ibm_pwdPolicy: Optional[bool] = None
 
 
 class PasswordPolicyResponse(BaseModel):
