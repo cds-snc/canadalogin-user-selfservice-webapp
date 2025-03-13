@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 from app.password.schemas import PasswordPolicyResponse
 from app.password.service import get_password_policy
@@ -15,11 +15,11 @@ router = APIRouter()
 @router.get("/policy",
             summary="Get the password policy",
             description="Returns the password policy for the tenant")
-async def password_policy():
+async def password_policy(password_policy: str = Depends(get_password_policy)):
     """
     Root endpoint of the API.
 
     Returns:
         RootResponse: A simple welcome message
     """
-    return await get_password_policy()
+    return password_policy

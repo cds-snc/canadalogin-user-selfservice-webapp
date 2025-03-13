@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 from .config import get_settings
 from fastapi import HTTPException
-settings = get_settings().ibm_verify
+settings = get_settings().ibm_verify_config
 
 
 # Configure logging

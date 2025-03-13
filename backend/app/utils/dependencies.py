@@ -11,7 +11,7 @@ async def request_access_token():
     """Request token from IBM Verify API"""
     try:
 
-        settings = get_settings().ibm_verify
+        settings = get_settings().ibm_verify_config
 
         token_url = f"{settings.IBM_VERIFY_TENANT_URL}/oauth2/token"
         data = {
@@ -41,7 +41,7 @@ async def request_access_token():
             status_code=400, detail=f"Token request error: {str(e)}")
 
 
-async def get_access_token():
+async def get_access_token() -> str:
     """Get access token for IBM Verify API operations"""
     try:
         logger.info("Attempting to get admin token")
