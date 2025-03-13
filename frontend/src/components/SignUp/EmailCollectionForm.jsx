@@ -1,5 +1,4 @@
 import {
-    GcdsButton,
     GcdsContainer,
     GcdsFieldset,
     GcdsInput,
@@ -7,11 +6,14 @@ import {
 } from "@cdssnc/gcds-components-react";
 import {useState} from "react";
 import {getPageContent, isEmailValid} from "../../utils/functions";
-
+import {useNavigate} from "react-router";
+import {NAVIGATION_LINKS} from "../../utils/constants.jsx";
+import SubmitButton from "../Layout/SubmitButton.jsx";
 
 
 export default function EmailCollectionForm({currentLang, submitForm, errorJson, setError}) {
     const [email, setEmail] = useState("");
+    const navigate = useNavigate();
     const errorPageJson = getPageContent(currentLang, "Error");
     const pageFormJson = getPageContent(currentLang, "EmailCollectionForm");
 
@@ -27,17 +29,23 @@ export default function EmailCollectionForm({currentLang, submitForm, errorJson,
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         const formData = new FormData(e.target);
-        setEmail(formData.get('email'));
+        const formEmail = formData.get('email')
+        setEmail(formEmail);
 
-        if(!isEmailValid(formData.get('email'))){
+        if(!isEmailValid(formEmail)){
             setError({emailError: errorPageJson[2], heading: errorPageJson['1']});
             return;
         }
+
         setError({emailError:null, heading:null});
 
-        await submitForm();
+        const response = await submitForm(formData, currentLang);
+
+        if (response.error)
+            alert(response.error);
+        else
+            navigate("/"+ currentLang+NAVIGATION_LINKS.verifyEmail+'/'+formEmail);
 
     }
     return (
@@ -69,9 +77,7 @@ export default function EmailCollectionForm({currentLang, submitForm, errorJson,
                                 ]`}
                     />
                 </GcdsFieldset>
-                <GcdsButton type="submit" >
-                    {pageFormJson['5']}
-                </GcdsButton>
+                <SubmitButton currentLang={currentLang} />
             </GcdsContainer>
         </form>
     )

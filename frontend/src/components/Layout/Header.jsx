@@ -1,5 +1,4 @@
 import {GcdsContainer, GcdsHeader} from "@cdssnc/gcds-components-react";
-import React from "react";
 
 export default function Header({langHref,currentLang}){
     return  (
