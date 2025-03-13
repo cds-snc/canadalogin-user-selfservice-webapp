@@ -1,4 +1,10 @@
-from fastapi import FastAPI, HTTPException, Request
+import base64
+import uuid
+from contextlib import asynccontextmanager
+from typing_extensions import Annotated
+from pydantic import BaseModel, Field
+from typing import Dict, Optional, List
+from fastapi import FastAPI, HTTPException, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 from fastapi.openapi.utils import get_openapi
@@ -7,7 +13,7 @@ import requests
 import logging
 import json
 from datetime import datetime
-from .config import settings
+from .config import get_settings, Settings
 from webauthn import (
     generate_registration_options,
     verify_registration_response,
@@ -18,15 +24,13 @@ from webauthn.helpers.structs import (
     UserVerificationRequirement,
     RegistrationCredential,
 )
-import base64
-import uuid
+
 from .password_auth import authenticate_password
 from .mfa_auth import mfa_signup
 from .passkey_auth import passkey_auth
-from pydantic import BaseModel, Field
-from typing import Dict, Optional, List
-
 from .routers import health, root, passkey
+
+settings = get_settings()
 
 logging.basicConfig(
     level=logging.INFO,
@@ -35,10 +39,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-API_TITLE = "GC Sign In Backend API"
-API_DESCRIPTION = """
-## GC Sign In Backend API
 
+API_DESCRIPTION = """
 This API provides authentication services for the GC Sign In application, integrating with IBM Verify.
 
 ### Features
@@ -51,33 +53,54 @@ This API provides authentication services for the GC Sign In application, integr
 API_VERSION = "1.0.0"
 CONTACT_INFO = {
     "name": "GC Sign In Team",
-    "url": "https://github.com/cds-snc/gc-signin-ibm",
-    "email": "gcsignin@cds-snc.ca"
+    "url": settings.app_info.github_url,
+    "email": settings.app_info.email
 }
 
-class HealthResponse(BaseModel):
-    status: str = Field(..., description="Service health status", example="healthy")
-    timestamp: str = Field(..., description="Current UTC timestamp in ISO format", example="2024-03-05T12:34:56.789Z")
-    service: str = Field(..., description="Service name", example="gc-signin-backend")
-    version: str = Field(..., description="Service version", example="1.0.0")
 
-class RootResponse(BaseModel):
-    message: str = Field(..., description="Welcome message", example="GC Sign In Backend Service")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    app.state.config = get_settings()
+
+    logger.info("Starting IBM Verify Integration API")
+    logger.info(
+        f"Tenant URL: {app.state.config.ibm_verify.IBM_VERIFY_TENANT_URL}")
+    logger.info(
+        f"Client ID: {app.state.config.ibm_verify.IBM_VERIFY_CLIENT_ID}")
+    logger.info(
+        f"Redirect URI: {app.state.config.ibm_verify.IBM_VERIFY_REDIRECT_URI}")
+    logger.info("Application startup complete")
+    yield
+    logger.info("Shutting down IBM Verify Integration API")
+
 
 app = FastAPI(
-    title=API_TITLE,
+    lifespan=lifespan,
+    title=settings.app_info.app_name,
     description=API_DESCRIPTION,
     version=API_VERSION,
     contact=CONTACT_INFO,
-    docs_url="/docs",
-    redoc_url="/redoc",
-    openapi_url="/openapi.json"
 )
+
+
+class HealthResponse(BaseModel):
+    status: str = Field(..., description="Service health status",
+                        example="healthy")
+    timestamp: str = Field(..., description="Current UTC timestamp in ISO format",
+                           example="2024-03-05T12:34:56.789Z")
+    service: str = Field(..., description="Service name",
+                         example="gc-signin-backend")
+    version: str = Field(..., description="Service version", example="1.0.0")
+
+
+class RootResponse(BaseModel):
+    message: str = Field(..., description="Welcome message",
+                         example="GC Sign In Backend Service")
+
 
 app.include_router(health.router)
 app.include_router(root.router)
 app.include_router(passkey.router)
-
 # CORS
 app.add_middleware(
     CORSMiddleware,
@@ -94,22 +117,29 @@ RP_NAME = "IBM Verify Integration"
 ORIGIN = "http://localhost:3000"
 
 # Helper functions for base64url encoding/decoding
+
+
 def bytes_to_base64url(bytes_data):
     return base64.urlsafe_b64encode(bytes_data).rstrip(b'=').decode('ascii')
+
 
 def base64url_to_bytes(base64url_data):
     padding = b'=' * (-len(base64url_data) % 4)
     return base64.urlsafe_b64decode(base64url_data.encode('ascii') + padding)
 
+
 def log_request_response(endpoint: str, request_data: dict, response: requests.Response):
     """Log request and response details"""
     try:
-        logger.info(f"[{endpoint}] Request data: {json.dumps(request_data, indent=2)}")
+        logger.info(
+            f"[{endpoint}] Request data: {json.dumps(request_data, indent=2)}")
         logger.info(f"[{endpoint}] Response status: {response.status_code}")
         logger.info(f"[{endpoint}] Response headers: {dict(response.headers)}")
-        logger.info(f"[{endpoint}] Response body: {json.dumps(response.json(), indent=2)}")
+        logger.info(
+            f"[{endpoint}] Response body: {json.dumps(response.json(), indent=2)}")
     except Exception as e:
         logger.error(f"[{endpoint}] Error logging request/response: {str(e)}")
+
 
 async def get_admin_token():
     """Get admin token for IBM Verify API operations"""
@@ -122,23 +152,27 @@ async def get_admin_token():
             "client_secret": settings.IBM_VERIFY_CLIENT_SECRET,
             "scope": "openid"
         }
-        
+
         logger.debug(f"Token URL: {token_url}")
         start_time = datetime.now()
         response = requests.post(token_url, data=data)
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(f"Token request completed in {duration:.2f} seconds")
-        
+
         if response.status_code != 200:
-            logger.error(f"Failed to get admin token. Status: {response.status_code}")
+            logger.error(
+                f"Failed to get admin token. Status: {response.status_code}")
             logger.error(f"Error response: {response.text}")
-            raise HTTPException(status_code=400, detail="Failed to get admin token")
-            
+            raise HTTPException(
+                status_code=400, detail="Failed to get admin token")
+
         logger.info("Successfully obtained admin token")
         return response.json()["access_token"]
     except Exception as e:
         logger.error(f"Error getting admin token: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=400, detail=f"Admin token error: {str(e)}")
+        raise HTTPException(
+            status_code=400, detail=f"Admin token error: {str(e)}")
+
 
 @app.post("/api/auth/signup")
 async def signup(request: Request):
@@ -146,18 +180,19 @@ async def signup(request: Request):
     try:
         logger.info("Processing signup request")
         user_data = await request.json()
-        logger.debug(f"Received user data: {json.dumps({**user_data, 'password': '***REDACTED***'}, indent=2)}")
-        
+        logger.debug(
+            f"Received user data: {json.dumps({**user_data, 'password': '***REDACTED***'}, indent=2)}")
+
         # Get admin token for user creation
         admin_token = await get_admin_token()
-        
+
         signup_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/Users"
         headers = {
             "Authorization": f"Bearer {admin_token}",
             "Content-Type": "application/scim+json",
             "Accept": "application/scim+json"
         }
-        
+
         # Prepare user data according to SCIM 2.0 schema
         verify_user_data = {
             "schemas": [
@@ -183,7 +218,7 @@ async def signup(request: Request):
                 "userCategory": "regular"
             }
         }
-        
+
         # Log request details (excluding sensitive data)
         log_data = {**verify_user_data}
         log_data["password"] = "***REDACTED***"
@@ -191,30 +226,35 @@ async def signup(request: Request):
         logger.debug(f"Request headers: {headers}")
         logger.debug(f"Request body: {json.dumps(log_data, indent=2)}")
         logger.info(f"Attempting to create user: {user_data.get('userName')}")
-        
+
         start_time = datetime.now()
-        response = requests.post(signup_url, json=verify_user_data, headers=headers)
+        response = requests.post(
+            signup_url, json=verify_user_data, headers=headers)
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(f"Signup request completed in {duration:.2f} seconds")
-        
+
         if response.status_code == 201:
-            logger.info(f"Successfully created user: {user_data.get('userName')}")
+            logger.info(
+                f"Successfully created user: {user_data.get('userName')}")
             return response.json()
         else:
             error_detail = response.json()
             logger.error(f"Signup failed. Status: {response.status_code}")
-            logger.error(f"Error response: {json.dumps(error_detail, indent=2)}")
+            logger.error(
+                f"Error response: {json.dumps(error_detail, indent=2)}")
             raise HTTPException(
                 status_code=response.status_code,
-                detail=error_detail.get("detail", error_detail.get("message", "Signup failed"))
+                detail=error_detail.get(
+                    "detail", error_detail.get("message", "Signup failed"))
             )
-            
+
     except HTTPException as he:
         logger.error(f"HTTP Exception in signup: {str(he)}")
         raise he
     except Exception as e:
         logger.error(f"Signup error: {str(e)}", exc_info=True)
         raise HTTPException(status_code=400, detail=f"Signup error: {str(e)}")
+
 
 @app.post("/api/auth/login")
 async def login(code: str):
@@ -229,23 +269,24 @@ async def login(code: str):
             "code": code,
             "redirect_uri": settings.IBM_VERIFY_REDIRECT_URI
         }
-        
+
         logger.debug(f"Login URL: {token_url}")
         start_time = datetime.now()
         response = requests.post(token_url, data=data)
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(f"Login request completed in {duration:.2f} seconds")
-        
+
         if response.status_code != 200:
             logger.error(f"Login failed. Status: {response.status_code}")
             logger.error(f"Error response: {response.text}")
             raise HTTPException(status_code=400, detail="Login failed")
-            
+
         logger.info("Login successful")
         return response.json()
     except Exception as e:
         logger.error(f"Login error: {str(e)}", exc_info=True)
         raise HTTPException(status_code=400, detail=str(e))
+
 
 @app.get("/api/user/profile")
 async def get_user_profile(token: str):
@@ -254,23 +295,26 @@ async def get_user_profile(token: str):
         logger.info("Fetching user profile")
         userinfo_url = f"{settings.IBM_VERIFY_TENANT_URL}/oauth2/userinfo"
         headers = {"Authorization": f"Bearer {token}"}
-        
+
         logger.debug(f"Profile URL: {userinfo_url}")
         start_time = datetime.now()
         response = requests.get(userinfo_url, headers=headers)
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(f"Profile request completed in {duration:.2f} seconds")
-        
+
         if response.status_code != 200:
-            logger.error(f"Failed to fetch profile. Status: {response.status_code}")
+            logger.error(
+                f"Failed to fetch profile. Status: {response.status_code}")
             logger.error(f"Error response: {response.text}")
-            raise HTTPException(status_code=400, detail="Failed to fetch profile")
-            
+            raise HTTPException(
+                status_code=400, detail="Failed to fetch profile")
+
         logger.info("Successfully retrieved user profile")
         return response.json()
     except Exception as e:
         logger.error(f"Profile error: {str(e)}", exc_info=True)
         raise HTTPException(status_code=400, detail=str(e))
+
 
 @app.post("/api/auth/passkey/register/options")
 async def get_registration_options(request: Request):
@@ -278,9 +322,10 @@ async def get_registration_options(request: Request):
     try:
         user_data = await request.json()
         user_id = str(uuid.uuid4())  # Generate a unique user ID
-        
-        logger.debug(f"Available algorithms: {[alg.name for alg in COSEAlgorithmIdentifier]}")
-        
+
+        logger.debug(
+            f"Available algorithms: {[alg.name for alg in COSEAlgorithmIdentifier]}")
+
         options = generate_registration_options(
             rp_id=RP_ID,
             rp_name=RP_NAME,
@@ -296,7 +341,7 @@ async def get_registration_options(request: Request):
                 -257  # RS256 (RSASSA-PKCS1-v1_5 with SHA-256)
             ],
         )
-        
+
         # Store registration state for verification
         # In production, this should be stored in a database
         registration_state = {
@@ -304,9 +349,10 @@ async def get_registration_options(request: Request):
             "user_data": user_data,
             "challenge": bytes_to_base64url(options.challenge),
         }
-        
-        logger.info(f"Generated registration options for user: {user_data.get('userName')}")
-        
+
+        logger.info(
+            f"Generated registration options for user: {user_data.get('userName')}")
+
         # Convert options to JSON-serializable format
         options_json = {
             "rp": {
@@ -319,7 +365,8 @@ async def get_registration_options(request: Request):
                 "displayName": f"{user_data.get('name', {}).get('givenName', '')} {user_data.get('name', {}).get('familyName', '')}",
             },
             "challenge": bytes_to_base64url(options.challenge),
-            "pubKeyCredParams": [{"type": "public-key", "alg": alg} for alg in [-7, -257]],  # ES256 and RS256
+            # ES256 and RS256
+            "pubKeyCredParams": [{"type": "public-key", "alg": alg} for alg in [-7, -257]],
             "timeout": 60000,  # 60 seconds
             "attestation": "none",
             "authenticatorSelection": {
@@ -329,15 +376,17 @@ async def get_registration_options(request: Request):
                 "userVerification": "preferred",
             },
         }
-        
+
         return {
             "options": options_json,
             "state": registration_state
         }
-        
+
     except Exception as e:
-        logger.error(f"Error generating registration options: {str(e)}", exc_info=True)
+        logger.error(
+            f"Error generating registration options: {str(e)}", exc_info=True)
         raise HTTPException(status_code=400, detail=str(e))
+
 
 @app.post("/api/auth/passkey/register/verify")
 async def verify_registration(request: Request):
@@ -346,16 +395,19 @@ async def verify_registration(request: Request):
         data = await request.json()
         credential_data = data.get("credential")
         registration_state = data.get("state")
-        
+
         if not credential_data or not registration_state:
-            raise HTTPException(status_code=400, detail="Missing registration data")
-            
+            raise HTTPException(
+                status_code=400, detail="Missing registration data")
+
         try:
             # Convert the credential data to the expected format
             raw_id = base64url_to_bytes(credential_data["rawId"])
-            client_data = base64url_to_bytes(credential_data["response"]["clientDataJSON"])
-            att_obj = base64url_to_bytes(credential_data["response"]["attestationObject"])
-            
+            client_data = base64url_to_bytes(
+                credential_data["response"]["clientDataJSON"])
+            att_obj = base64url_to_bytes(
+                credential_data["response"]["attestationObject"])
+
             credential = RegistrationCredential(
                 id=credential_data["id"],
                 raw_id=raw_id,
@@ -365,28 +417,29 @@ async def verify_registration(request: Request):
                 },
                 type=credential_data["type"]
             )
-            
+
             try:
                 verification = verify_registration_response(
                     credential=credential,
-                    expected_challenge=base64url_to_bytes(registration_state["challenge"]),
+                    expected_challenge=base64url_to_bytes(
+                        registration_state["challenge"]),
                     expected_origin=ORIGIN,
                     expected_rp_id=RP_ID,
                 )
-                
+
                 logger.info("Verification result:", verification)
-                
+
                 # Create user in IBM Verify with passkey credentials
                 user_data = registration_state["user_data"]
                 admin_token = await get_admin_token()
-                
+
                 signup_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/Users"
                 headers = {
                     "Authorization": f"Bearer {admin_token}",
                     "Content-Type": "application/scim+json",
                     "Accept": "application/scim+json"
                 }
-                
+
                 verify_user_data = {
                     "schemas": [
                         "urn:ietf:params:scim:schemas:core:2.0:User",
@@ -418,34 +471,42 @@ async def verify_registration(request: Request):
                         ]
                     }
                 }
-                
-                response = requests.post(signup_url, json=verify_user_data, headers=headers)
-                
+
+                response = requests.post(
+                    signup_url, json=verify_user_data, headers=headers)
+
                 if response.status_code == 201:
-                    logger.info(f"Successfully created user with passkey: {user_data.get('userName')}")
+                    logger.info(
+                        f"Successfully created user with passkey: {user_data.get('userName')}")
                     return response.json()
                 else:
                     error_detail = response.json()
-                    logger.error(f"Passkey signup failed. Status: {response.status_code}")
-                    logger.error(f"Error response: {json.dumps(error_detail, indent=2)}")
+                    logger.error(
+                        f"Passkey signup failed. Status: {response.status_code}")
+                    logger.error(
+                        f"Error response: {json.dumps(error_detail, indent=2)}")
                     raise HTTPException(
                         status_code=response.status_code,
-                        detail=error_detail.get("detail", "Passkey signup failed")
+                        detail=error_detail.get(
+                            "detail", "Passkey signup failed")
                     )
-                    
+
             except Exception as e:
                 logger.error(f"Error during verification: {str(e)}")
-                raise HTTPException(status_code=400, detail=f"Verification failed: {str(e)}")
-                
+                raise HTTPException(
+                    status_code=400, detail=f"Verification failed: {str(e)}")
+
         except Exception as e:
-            logger.error(f"Error verifying passkey registration: {str(e)}", exc_info=True)
+            logger.error(
+                f"Error verifying passkey registration: {str(e)}", exc_info=True)
             raise HTTPException(status_code=400, detail=str(e))
-            
+
     except HTTPException as he:
         raise he
     except Exception as e:
         logger.error(f"Passkey registration error: {str(e)}", exc_info=True)
         raise HTTPException(status_code=400, detail=str(e))
+
 
 @app.post("/api/auth/password/signin")
 async def password_signin(request: Request):
@@ -456,7 +517,8 @@ async def password_signin(request: Request):
         password = data.get("password")
 
         if not username or not password:
-            raise HTTPException(status_code=400, detail="Username and password are required")
+            raise HTTPException(
+                status_code=400, detail="Username and password are required")
 
         logger.info(f"Processing password sign-in for user: {username}")
         result = await authenticate_password(username, password)
@@ -469,67 +531,27 @@ async def password_signin(request: Request):
         logger.error(f"Sign-in error: {str(e)}", exc_info=True)
         raise HTTPException(status_code=400, detail=f"Sign-in error: {str(e)}")
 
+
 @app.post("/api/auth/signup/mfa")
 async def signup_with_mfa(request: Request):
     """Handle user registration with MFA through IBM Verify"""
     try:
         user_data = await request.json()
-        logger.debug(f"Received MFA signup data: {json.dumps({**user_data, 'password': '***REDACTED***'}, indent=2)}")
-        
+        logger.debug(
+            f"Received MFA signup data: {json.dumps({**user_data, 'password': '***REDACTED***'}, indent=2)}")
+
         # If TOTP code is provided, complete verification
         totp_code = user_data.pop("totpCode", None)
         user_id = user_data.pop("userId", None)
         totp_id = user_data.pop("totpId", None)
-        
+
         if user_id and totp_id and totp_code:
             # Verify TOTP code
             return await mfa_signup.verify_totp(user_id, totp_id, totp_code)
-        
+
         # Start MFA signup process
         return await mfa_signup.signup_with_mfa(user_data)
-        
+
     except Exception as e:
         logger.error(f"MFA Signup error: {str(e)}", exc_info=True)
         raise HTTPException(status_code=400, detail=str(e))
-
-# Custom endpoint to get the OpenAPI schema
-@app.get("/api/openapi.json", include_in_schema=False)
-async def get_open_api_endpoint():
-    """Get the OpenAPI schema for this API."""
-    return JSONResponse(get_openapi(
-        title=API_TITLE,
-        version=API_VERSION,
-        description=API_DESCRIPTION,
-        routes=app.routes,
-        contact=CONTACT_INFO
-    ))
-
-# Custom Swagger UI endpoint
-@app.get("/api/docs", include_in_schema=False)
-async def custom_swagger_ui_html():
-    """Get custom Swagger UI HTML."""
-    return get_swagger_ui_html(
-        openapi_url="/api/openapi.json",
-        title=f"{API_TITLE} - Swagger UI",
-        swagger_js_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.9.0/swagger-ui-bundle.js",
-        swagger_css_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.9.0/swagger-ui.css",
-    )
-
-# Custom ReDoc endpoint
-@app.get("/api/redoc", include_in_schema=False)
-async def custom_redoc_html():
-    """Get custom ReDoc HTML."""
-    return get_redoc_html(
-        openapi_url="/api/openapi.json",
-        title=f"{API_TITLE} - ReDoc",
-        redoc_js_url="https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js",
-    )
-
-# Startup event to verify configuration
-@app.on_event("startup")
-async def startup_event():
-    logger.info("Starting IBM Verify Integration API")
-    logger.info(f"Tenant URL: {settings.IBM_VERIFY_TENANT_URL}")
-    logger.info(f"Client ID: {settings.IBM_VERIFY_CLIENT_ID}")
-    logger.info(f"Redirect URI: {settings.IBM_VERIFY_REDIRECT_URI}")
-    logger.info("Application startup complete") 
