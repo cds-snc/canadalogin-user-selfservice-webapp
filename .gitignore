@@ -12,3 +12,6 @@ frontend/package-lock.json
 
 # ACT GITHUB LOCAL Test Runner Environment
 .actrc
+
+#Backend
+__pycache__
