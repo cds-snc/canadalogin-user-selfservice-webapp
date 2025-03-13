@@ -32,5 +32,9 @@
     "5": "Continue",
     "6": "English",
     "7": "French"
+  },
+  "Error":{
+    "1": "There was a problem",
+    "2": "Invalid email. Email must contain an ‘@’ symbol."
   }
 }

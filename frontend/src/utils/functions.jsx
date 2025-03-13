@@ -54,3 +54,12 @@ export function getFooter(language){
 
     return FOOTERS.default.en;
 }
+
+export function isEmailValid(email){
+
+    const isValidEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    return (email!=null && email.match(isValidEmail));
+
+
+}
