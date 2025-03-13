@@ -5,7 +5,7 @@ from fastapi import HTTPException
 from httpx import AsyncClient
 from backend.app.utils.access_token import get_access_token
 from app.config import get_settings
-from backend.app.utils.helper import accessTokenHeaders
+from backend.app.utils.access_token import get_auth_request_headers
 from app.password.schemas import IBMVerifyPasswordPolicy
 from app.utils.schemas import ResponseModel
 
@@ -22,7 +22,7 @@ async def get_password_policy():
             raise HTTPException(
                 status_code=500, detail="Failed to get access token")
 
-        headers = accessTokenHeaders(access_token)
+        headers = get_auth_request_headers(access_token)
         settings = get_settings().ibm_verify_config
 
         password_policy_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/PasswordPolicies"

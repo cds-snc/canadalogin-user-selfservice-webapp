@@ -64,3 +64,25 @@ async def get_access_token() -> str:
         logger.error(f"Error getting admin token: {str(e)}", exc_info=True)
         raise HTTPException(
             status_code=400, detail=f"Admin token error: {str(e)}")
+
+
+def get_auth_request_headers(access_token: str) -> dict:
+    """Headers and access token to be included in the Authorization header
+
+      Args:
+        access_token (str): The access token to be included in the Authorization header.
+
+        Returns:
+            dict: A dictionary containing the authentication headers, including:
+                - "Authorization": "Bearer <access_token>"
+                - "Content-Type": "application/scim+json"
+                - "Accept": "application/scim+json"
+
+        """
+
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/scim+json",
+        "Accept": "application/scim+json"
+    }
+    return headers
