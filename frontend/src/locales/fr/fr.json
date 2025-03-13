@@ -10,6 +10,26 @@
     "8": "Adresse courriel",
     "9": "Continuer"
   },
+  "PasswordCreation": {
+    "1": "Votre adresse courriel a bien été vérifiée",
+    "2": "Étape 2 de 5",
+    "3": "Créer un mot de passe",
+    "4": "Votre mot de passe doit être une phrase ou une série de mots que personne ne peut reconnaître à part vous. Il doit être composé ",
+    "5": "d’au moins 12 caractères. ", 
+    "6": "Vous pouvez utiliser plusieurs mots séparés par des espaces pour atteindre la limite de caractères.",
+    "7": "Conseils de sécurité pour les mots de passe",
+    "8": "Plus le mot de passe est long et inhabituel, plus il est difficile à deviner. Évitez donc d’utiliser des phrases courantes. Évitez également de réutiliser un mot de passe que vous utilisez pour d’autres comptes en ligne (banques, courriels ou encore réseaux sociaux).",
+    "9": "Mot de passe",
+    "10": "exemple : coussin orignal plat",
+    "11": "Afficher le mot de passe",
+    "12": "Longueur minimale : ",
+    "13": "/ 12 caractères",
+    "14": "Robustesse du mot de passe : ",
+    "15": "Nulle",
+    "16": "Continuer",
+    "17": "Vous possédez déjà un compte Connexion GC?",
+    "18": "Se connecter"
+  },
   "SignUpEmail": {
     "1": "Créez un compte Connexion GC",
     "2": "pour accéder à votre",
@@ -38,3 +58,4 @@
     "2": "Adresse courriel invalide. Votre adresse courriel doit contenir un symbole @."
   }
 }
+
