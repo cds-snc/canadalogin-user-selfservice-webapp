@@ -63,5 +63,8 @@ body, .mainBody {
         vertical-align: middle;
         gap: var(--gcds-spacing-300);
     }
+    .gcds-footer{
+        padding-top: var(--gcds-spacing-400);
+    }
 
 }

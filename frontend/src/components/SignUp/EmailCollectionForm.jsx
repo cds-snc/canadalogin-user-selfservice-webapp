@@ -69,12 +69,12 @@ export default function EmailCollectionForm({currentLang, submitForm, errorJson,
                     <br />
                     <GcdsRadioGroup
                         name="language"
-                        options={`[
-                                    {"label": "${pageFormJson['6']}",
-                                     "id": "english", "value": "eng"${ currentLang!=='fr'?',"checked":"true"':'' }},
-                                    {"label": "${pageFormJson['7']}",
-                                     "id": "french", "value": "fr"${ currentLang==='fr'?',"checked":"true"':'' }}
-                                ]`}
+                        options={'['+
+                                    `{"label": "${pageFormJson['6']}",`+
+                                    `"id": "english", "value": "eng"${ currentLang!=='fr'?',"checked":"true"':'' }},`+
+                                   `{"label": "${pageFormJson['7']}",`+
+                                    `"id": "french", "value": "fr"${ currentLang==='fr'?',"checked":"true"':'' }}`+
+                               `]`}
                     />
                 </GcdsFieldset>
                 <SubmitButton currentLang={currentLang} />

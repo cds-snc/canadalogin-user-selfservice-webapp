@@ -6,11 +6,11 @@ import {
     GcdsStepper,
     GcdsText
 } from "@cdssnc/gcds-components-react";
-import AlreadyGc from "../Layout/AlreadyGc.jsx";
-import {NAVIGATION_LINKS} from "../../utils/constants.jsx";
+import AlreadyGc from "../../Layout/AlreadyGc.jsx";
+import {NAVIGATION_LINKS} from "../../../utils/constants.jsx";
 import {useEffect, useState} from "react";
-import SubmitButton from "../Layout/SubmitButton.jsx";
-import {getPageContent} from "../../utils/functions.jsx";
+import SubmitButton from "../../Layout/SubmitButton.jsx";
+import {getPageContent} from "../../../utils/functions.jsx";
 
 const initialTime=10;
 
@@ -79,7 +79,7 @@ export default function EmailVerification({currentLang, email}) {
                 </GcdsHeading>
                 <GcdsContainer>
                     <GcdsText marginTop="200">
-                        <GcdsLink href={`/${currentLang}/${NAVIGATION_LINKS.signUp}`} >
+                        <GcdsLink href={`/${currentLang}${NAVIGATION_LINKS.signUp}`} >
                             {pageContentJson['8']}
                         </GcdsLink>
                     </GcdsText>
