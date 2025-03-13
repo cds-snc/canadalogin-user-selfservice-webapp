@@ -2,7 +2,6 @@ import logging
 import json
 from pydantic import ValidationError
 from fastapi import HTTPException
-from datetime import datetime
 from httpx import AsyncClient
 from backend.app.utils.access_token import get_access_token
 from app.config import get_settings
@@ -16,8 +15,6 @@ logger = logging.getLogger(__name__)
 
 async def get_password_policy():
     """Get password policy from IBM Verify API"""
-    """Request token from IBM Verify API"""
-
     try:
         access_token = await get_access_token()
         if not access_token:

@@ -55,8 +55,8 @@ This API provides authentication services for the GC Sign In application, integr
 
 CONTACT_INFO = {
     "name": "GC Sign In Team",
-    "url": "https://github.com/cds-snc/gc-signin-ibm",
-    "email": "gcsignin@cds-snc.ca"
+    "url": settings.app_info.github_url,
+    "email": settings.app_info.email
 }
 
 

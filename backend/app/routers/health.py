@@ -2,8 +2,6 @@
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
 from datetime import datetime
-from fastapi_versioning import version
-
 
 API_VERSION = "1.0.0"
 
@@ -39,5 +37,3 @@ async def health_check():
         "service": "gc-signin-backend",
         "version": API_VERSION
     }
-
-router = version(1)(router)
