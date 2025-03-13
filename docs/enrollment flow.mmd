@@ -8,21 +8,25 @@ sequenceDiagram
     Frontend->>Backend: POST /api/auth/signup
     Backend->>IBM Verify: /oauth2/token
     IBM Verify-->>Backend:Admin token
-    Backend->>IBM Verify:POST /v2.0/Users
-    IBM Verify-->>Backend: User created userid (str) and username
     Backend->>IBM Verify: POST factors/emailotp/transient/verifications to email passcode to user
     IBM Verify -->> User: Email passcode to user
     User ->> Frontend: user sends passcode to frontend
     Frontend ->> Backend: POST(URL TBD)
-    Backend ->> IBM Verify: POST v2.0/factors/emailotp/{id}/verifications/{trxnId} (body contains passcode and other info)
+    Backend ->> IBM Verify: POST v2.0/factors/emailotp/{id}/verifications/{trxnId} - Verify passcode
     IBM Verify -->> Backend: Verify sends HTTP 204 code - The supplied one-time password was successfully verified.
-    Backend ->> IBM Verify: POST /v2.0/factors/emailotp (enroll user into accessing email OTPs)
-    Backend -->> IBM Verify: POST /v2.0/factors/smsotp (enroll user into accessing SMS OTPs)
-    IBM Verify ->> Backend : Backend receives prior verifications
-    Backend -->> IBM Verify: POST v2.0/factors/smsotp/transient/verifications to SMS passcode to user
-    IBM Verify ->> User : SMS passcode to user
+    Backend ->> Frontend: backend informs frontend of  OTP success
+    Backend->>IBM Verify:POST /v2.0/Users - create user
+    IBM Verify -->> Backend: user created HTTP 204
+    Backend ->> Frontend: user created HTTP 204
+    User ->> Frontend: user enrolls 2FA method
+    Frontend ->> Backend: POST(URL TBD)
+    Backend ->> IBM Verify: POST /v2.0/factors/smsotp (enroll user into accessing SMS OTPs) or v2.0/factors/voiceotp (enroll user into accessing voice OTPs)
+    IBM Verify -->> Backend : Backend receives 2FA choice
+    Backend ->> Frontend : Frontend receives 2FA choice
+    Backend ->> IBM Verify: POST v2.0/factors/smsotp/transient/verifications to SMS passcode to user or POST v2.0/factors/voiceotp/transient/verifications
+    IBM Verify -->> User : SMS or Voice passcode to user
     User ->> Frontend: User sends passcode to frontend
     Frontend ->> Backend:  POST(URL TBD)
-    Backend->>IBM Verify: POST /v2.0/factors/smsotp/transient/verifications/{trxnId} (body contains passcode and other info)
+    Backend->>IBM Verify: POST /v2.0/factors/smsotp/transient/verifications/{trxnId} or POST /v2.0/factors/voiceotp/transient/verifications/{trxnId}
     IBM Verify -->> Backend: Verify sends HTTP 204 code - the supplied one-time password was successfully verified.
-    Backend -->> Frontend: Frontend acknowledges success
+    Backend ->> Frontend: Frontend acknowledges success
