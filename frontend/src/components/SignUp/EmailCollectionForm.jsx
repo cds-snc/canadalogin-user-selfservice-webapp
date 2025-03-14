@@ -52,7 +52,7 @@ export default function EmailCollectionForm({currentLang, errorJson, setError}) 
         if (response.error)
             alert(response.error);
         else {
-            const userData = {...state.userData, email: email, emailLanguage: formData.get('language')};
+            const userData = {...state.userData, email: formEmail, emailLanguage: formData.get('language')};
             dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
             navigate("/" + currentLang + NAVIGATION_LINKS.verifyEmail);
         }
