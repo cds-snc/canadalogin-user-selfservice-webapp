@@ -9,13 +9,20 @@ import {getPageContent, isEmailValid} from "../../utils/functions";
 import {useNavigate} from "react-router";
 import {NAVIGATION_LINKS} from "../../utils/constants.jsx";
 import SubmitButton from "../Layout/SubmitButton.jsx";
+import {useUser} from "../Providers/UserContext.jsx";
 
-
-export default function EmailCollectionForm({currentLang, submitForm, errorJson, setError}) {
-    const [email, setEmail] = useState("");
+export default function EmailCollectionForm({currentLang, errorJson, setError}) {
+    const {state, dispatch} = useUser();
+    const [email, setEmail] = useState('');
     const navigate = useNavigate();
     const errorPageJson = getPageContent(currentLang, "Error");
     const pageFormJson = getPageContent(currentLang, "EmailCollectionForm");
+
+    const submitForm = async () =>{
+        //update logic for sending to server once we have the back end
+        const response = {success:true, message:"Successfully submitted", error:null}
+        return response;
+    }
 
     const validateEmail = (e) => {
 
@@ -44,8 +51,11 @@ export default function EmailCollectionForm({currentLang, submitForm, errorJson,
 
         if (response.error)
             alert(response.error);
-        else
-            navigate("/"+ currentLang+NAVIGATION_LINKS.verifyEmail+'/'+formEmail);
+        else {
+            const userData = {...state.userData, email: email, emailLanguage: formData.get('language')};
+            dispatch({type: 'SET_EMAIL', payload: userData});
+            navigate("/" + currentLang + NAVIGATION_LINKS.verifyEmail);
+        }
 
     }
     return (

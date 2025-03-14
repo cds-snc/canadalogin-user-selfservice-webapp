@@ -4,22 +4,15 @@ import {
     GcdsHeading,
     GcdsText
 } from "@cdssnc/gcds-components-react";
-import {useActionState, useState} from "react";
+import {useState} from "react";
 import {AVAILABLE_LANGUAGES, SERVICES} from "../../utils/constants";
 import {getPageContent} from '../../utils/functions';
 import EmailCollectionForm from "./EmailCollectionForm";
 import AlreadyGc from "../Layout/AlreadyGc.jsx";
-
-
-const submitForm = async () =>{
-    //update logic for sending to server once we have the back end
-    const response = {success:true, message:"Successfully submitted", error:null}
-    return response;
-}
+import {useUser} from "../Providers/UserContext.jsx";
 
 export default function SignUpEmail({currentLang}) {
-    const [state, isPending] =
-        useActionState(submitForm,{success:false, message:null, error:null});
+    const {state} = useUser();
     const [errorJson, setError] = useState({heading: null, emailError:null});
     const pageContentJson = getPageContent(currentLang, "SignUpEmail");
 
@@ -36,13 +29,13 @@ export default function SignUpEmail({currentLang}) {
                     {pageContentJson['1']}
                     <GcdsText marginTop="200" marginBottom="0">
                         {pageContentJson['2']}
-                        <strong> {currentLang===AVAILABLE_LANGUAGES.fr&&(pageContentJson['3']+' ')}{` ${SERVICES[0].title}`}{currentLang===AVAILABLE_LANGUAGES.en&&(' '+pageContentJson['3'])}</strong>
+                        <strong> {currentLang===AVAILABLE_LANGUAGES.fr&&(pageContentJson['3']+' ')}{` ${state.userData.service}`}{currentLang===AVAILABLE_LANGUAGES.en&&(' '+pageContentJson['3'])}</strong>
                     </GcdsText>
                 </GcdsHeading>
                 <GcdsHeading tag="h2">
                     {pageContentJson['4']}
                 </GcdsHeading>
-                <EmailCollectionForm currentLang={currentLang} submitForm={submitForm} errorJson={errorJson} setError={setError}/>
+                <EmailCollectionForm currentLang={currentLang}  errorJson={errorJson} setError={setError}/>
             </GcdsContainer>
             <AlreadyGc currentLang={currentLang}/>
         </GcdsContainer>
