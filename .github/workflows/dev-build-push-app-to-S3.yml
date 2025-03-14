@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "frontend/*"
+      - "frontend/**"
       - ".github/workflows/dev-build-push-app-to-S3"
   workflow_dispatch:
 
