@@ -54,7 +54,7 @@
   "Error":{
     "1": "There was a problem",
     "2": "Invalid email. Email must contain an ‘@’ symbol.",
-    "3": "Code must be 6 digits."
+    "3": "Codes must be six digits. Try again."
   },
   "EmailVerification":{
     "1": "Check your email",
