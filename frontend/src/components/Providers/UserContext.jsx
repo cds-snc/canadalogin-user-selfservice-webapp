@@ -1,6 +1,5 @@
 import {createContext, useReducer, useContext} from "react";
 import {SERVICES} from "../../utils/constants.jsx";
-import {useParams} from "react-router";
 
 const initialState = {
     isAuthenticated: false,

@@ -6,8 +6,8 @@ import {isEmailValid} from "../../utils/functions.jsx";
 function PrivateRoute ({route, children}){
     const {state} = useUser();
 
-    if((route="signUpPassword" && !state.userData.emailValidated && !isEmailValid(state.userData.email)) ||
-        (route="signUpVerifyEmail" && !isEmailValid(state.userData.email)))
+    if((route==="signUpPassword" && !state.userData.emailValidated && !isEmailValid(state.userData.email)) ||
+        (route==="signUpVerifyEmail" && !isEmailValid(state.userData.email)))
         return <Navigate to="/" />;
 
     return children;

@@ -5,7 +5,7 @@ import {
     GcdsText
 } from "@cdssnc/gcds-components-react";
 import {useState} from "react";
-import {AVAILABLE_LANGUAGES, SERVICES} from "../../utils/constants";
+import {AVAILABLE_LANGUAGES} from "../../utils/constants";
 import {getPageContent} from '../../utils/functions';
 import EmailCollectionForm from "./EmailCollectionForm";
 import AlreadyGc from "../Layout/AlreadyGc.jsx";

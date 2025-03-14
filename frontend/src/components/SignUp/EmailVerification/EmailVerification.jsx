@@ -10,7 +10,7 @@ import AlreadyGc from "../../Layout/AlreadyGc.jsx";
 import {NAVIGATION_LINKS} from "../../../utils/constants.jsx";
 import {useEffect, useState} from "react";
 import SubmitButton from "../../Layout/SubmitButton.jsx";
-import {getPageContent, isCodeValid, isEmailValid} from "../../../utils/functions.jsx";
+import {getPageContent, isCodeValid} from "../../../utils/functions.jsx";
 import {useUser} from "../../Providers/UserContext.jsx";
 import {useNavigate} from "react-router";
 
