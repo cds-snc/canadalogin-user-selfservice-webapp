@@ -2,7 +2,12 @@ export const AVAILABLE_LANGUAGES = {en:'en', fr:'fr'};
 export const NAVIGATION_LINKS = {
     signUp: '/signup',
     verifyEmail: '/signup/verifyemail',
-    resendCode: '/signin/resendcode'
+    password: '/signup/password'
+};
+export const CONTEXT_ACTIONS = {
+    signUp: 'SIGN_UP',
+    signIn: 'SIGN_IN',
+    logOut: 'LOG_OUT'
 };
 
 export const FOOTERS = {

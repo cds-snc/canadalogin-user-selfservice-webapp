@@ -6,25 +6,32 @@ import {
     GcdsStepper,
     GcdsText
 } from "@cdssnc/gcds-components-react";
-import AlreadyGc from "../../Layout/AlreadyGc.jsx";
-import {NAVIGATION_LINKS} from "../../../utils/constants.jsx";
 import {useEffect, useState} from "react";
+import {useNavigate} from "react-router";
+import AlreadyGc from "../../Layout/AlreadyGc.jsx";
+import {CONTEXT_ACTIONS, NAVIGATION_LINKS} from "../../../utils/constants.jsx";
 import SubmitButton from "../../Layout/SubmitButton.jsx";
-import {getPageContent} from "../../../utils/functions.jsx";
+import {getPageContent, isCodeValid} from "../../../utils/functions.jsx";
+import {useUser} from "../../Providers/UserContext.jsx";
+
 
 const initialTime=10;
 
 const submitForm = async () =>{
-
     //update logic for sending to server once we have the back end
+    const response = {success:true, message:"Successfully submitted", error:null}
+    return response;
+
 }
 
-
-export default function EmailVerification({currentLang, email}) {
-
+export default function EmailVerification({currentLang}) {
+    const {state, dispatch} = useUser();
     const [time, setTime] = useState(initialTime);
     const [timesRequested, setTimesRequested] = useState(2);
+    const [errorJson, setError] = useState({heading: null, codeError:null});
+    const navigate = useNavigate();
     const pageContentJson = getPageContent(currentLang, "EmailVerification");
+    const errorPageJson = getPageContent(currentLang, "Error");
 
     useEffect(()=>{
         if(time<=0)
@@ -46,6 +53,29 @@ export default function EmailVerification({currentLang, email}) {
         //update logic for requesting new code once API is available
     }
 
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const formCode = formData.get('verificationCode')
+        console.log(formCode);
+        console.log("is valid", !isCodeValid(formCode));
+        if(!isCodeValid(formCode)){
+            setError({codeError: errorPageJson[3], heading: errorPageJson['1']});
+            return;
+        }
+
+        const response = await submitForm(formData, currentLang);
+
+        if (response.error)
+            alert(response.error);
+        else {
+            const userData = {...state.userData, emailValidated:true};
+            dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
+            navigate("/" + currentLang + NAVIGATION_LINKS.password);
+        }
+
+    }
+
     return (
         <GcdsContainer className="gcds-content" >
             <GcdsContainer>
@@ -57,7 +87,7 @@ export default function EmailVerification({currentLang, email}) {
                 </GcdsContainer>
                 <GcdsContainer>
                     <GcdsText>
-                        {pageContentJson['2']} <strong>{email}</strong>
+                        {pageContentJson['2']} <strong>{state.userData.email}</strong>
                     </GcdsText>
                     <GcdsText>
                         {pageContentJson['3']}
@@ -65,14 +95,17 @@ export default function EmailVerification({currentLang, email}) {
                     <GcdsText>
                         {pageContentJson['4']}<strong>{pageContentJson['5']}</strong>
                     </GcdsText>
-                    <GcdsInput
-                        inputId="verificationCode"
-                        label={pageContentJson['6']}
-                        name="verificationCode"
-                        type="text"
-                        validateOn="other"
-                        required ></GcdsInput>
-                   <SubmitButton currentLang={currentLang} />
+                    <form onSubmit={handleSubmit}>
+                        <GcdsInput
+                            inputId="verificationCode"
+                            label={pageContentJson['6']}
+                            name="verificationCode"
+                            type="text"
+                            validateOn="other"
+                            errorMessage={errorJson.codeError}
+                            required ></GcdsInput>
+                       <SubmitButton currentLang={currentLang} />
+                    </form>
                 </GcdsContainer>
                 <GcdsHeading tag="h2">
                     {pageContentJson['7']}
