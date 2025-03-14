@@ -60,6 +60,22 @@ CONTACT_INFO = {
 }
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    app.state.config = get_settings()
+
+    logger.info("Starting IBM Verify Integration API")
+    logger.info(
+        f"Tenant URL: {app.state.config.ibm_verify_config.IBM_VERIFY_TENANT_URL}")
+    logger.info(
+        f"Client ID: {app.state.config.ibm_verify_config.IBM_VERIFY_CLIENT_ID}")
+    logger.info(
+        f"Redirect URI: {app.state.config.ibm_verify_config.IBM_VERIFY_REDIRECT_URI}")
+    logger.info("Application startup complete")
+    yield
+    logger.info("Shutting down IBM Verify Integration API")
+
+
 class HealthResponse(BaseModel):
     status: str = Field(..., description="Service health status",
                         example="healthy")

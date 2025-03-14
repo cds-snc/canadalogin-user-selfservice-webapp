@@ -3,9 +3,9 @@ import json
 from pydantic import ValidationError
 from fastapi import HTTPException
 from httpx import AsyncClient
-from backend.app.utils.access_token import get_access_token
+from app.utils.access_token import get_access_token
 from app.config import get_settings
-from backend.app.utils.access_token import get_auth_request_headers
+from app.utils.access_token import get_auth_request_headers
 from app.password.schemas import IBMVerifyPasswordPolicy
 from app.utils.schemas import ResponseModel
 
