@@ -63,3 +63,10 @@ export function isEmailValid(email){
 
 
 }
+
+export function isPasswordValid(password){
+
+    const isPasswordValid = /^.{12,65}$/;
+
+    return (password != null && password.length >=12 && password.length <=65);
+}
