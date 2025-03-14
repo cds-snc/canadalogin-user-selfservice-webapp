@@ -3,8 +3,6 @@ import {AVAILABLE_LANGUAGES, SERVICES, NAVIGATION_LINKS} from "../../utils/const
 // import {useNavigate} from "react-router";
 import {getPageContent} from '../../utils/functions';
 import { useState, useActionState } from 'react';
-import passwordValidator from 'password-validator';
-import PasswordCollectionForm from "./PasswordCollectionForm";
 import AlreadyGc from "../Layout/AlreadyGc.jsx";
 
 const submitForm = async () => {

@@ -9,7 +9,6 @@ const submitForm = async () =>{
 
 export default function PasswordCreation({currentLang}) {
 
-
     const [checkedValue, setCheckedValue] = useState(true);
     const [passwordStrength, setPasswordStrength] = useState(0);
     const [strengthLevel, setStrengthLevel] = useState("None");
@@ -20,7 +19,7 @@ export default function PasswordCreation({currentLang}) {
 
     const errorPageJson = getPageContent(currentLang, "Error");
 
-    const handleSubmit = (event) => {
+    async function handleSubmit (event) {
         event.preventDefault();
 
         const formData = new FormData(event.target);
@@ -30,8 +29,8 @@ export default function PasswordCreation({currentLang}) {
             setError({passwordError: errorPageJson[4], heading: errorPageJson['1']});
         return;
             }
-            // setError({emailError:null, heading:null});
-            // await submitForm();
+            setError({passwordError:null, heading:null});
+            await submitForm();
         };
 
   //Checkbox implementation (hide/show password)
@@ -42,7 +41,6 @@ export default function PasswordCreation({currentLang}) {
 
     function handlePasswordChange (event) {
         const password = event.target.value;
-        setPassword(password);
         setPasswordStrength(password.length);
         updatePasswordStrength(password);
     };
@@ -138,8 +136,7 @@ export default function PasswordCreation({currentLang}) {
                     <GcdsText>
                         {pageContentJson['14']} <strong>{strengthLevel}</strong>
                     </GcdsText>     
-                        <GcdsButton type="submit" size="small" 
-                        onChange= {(e) => actions.setPassword(e.target.value)}>
+                        <GcdsButton type="submit" size="small">
                             {pageContentJson['16']}
                         </GcdsButton>
                     </form>
@@ -148,7 +145,7 @@ export default function PasswordCreation({currentLang}) {
             <GcdsHeading tag="h2">
                 {pageContentJson['17']}
             <GcdsText marginTop="200" marginBottom="0">
-            <GcdsLink href={`/${currentLang}`} data-testid="gcds-link">
+            <GcdsLink href={`/${currentLang}`}>
                 {pageContentJson['18']}
             </GcdsLink>
             </GcdsText>
