@@ -27,11 +27,11 @@ export default function SignUpPassword({currentLang}){
                     {pageContentJson['1']}
                     <GcdsText marginTop="200" marginBottom="0">
                         {pageContentJson['2']}
-                        <strong> {currentLang===AVAILABLE_LANGUAGES.fr&&(pageContentJson['3']+' ')}{` ${SERVICES[0].title}`}{currentLang===AVAILABLE_LANGUAGES.en&&(' '+pageContentJson['3'])}</strong>
+                        <strong> {currentLang===AVAILABLE_LANGUAGES.fr&&(pageContentJson['4']+' ')}{` ${SERVICES[0].title}`}{currentLang===AVAILABLE_LANGUAGES.en&&(' '+pageContentJson['3'])}</strong>
                     </GcdsText>
                 </GcdsHeading>
                 <GcdsHeading tag="h2">
-                    {pageContentJson['4']}
+                    {pageContentJson['5']}
                 </GcdsHeading>
             
             <PasswordCollectionForm currentLang={currentLang} submitForm={submitForm} errorJson={errorJson} setError={setError}/>
