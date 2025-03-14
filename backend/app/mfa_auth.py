@@ -3,6 +3,7 @@ import logging
 import json
 from fastapi import HTTPException
 from .config import get_settings
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -14,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 class MFASignup:
     def __init__(self):
-        settings = get_settings().ibm_verify
+        settings = get_settings().ibm_verify_config
         self.tenant_url = settings.IBM_VERIFY_TENANT_URL.rstrip('/')
         self.client_id = settings.IBM_VERIFY_CLIENT_ID
         self.client_secret = settings.IBM_VERIFY_CLIENT_SECRET

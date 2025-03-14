@@ -1,5 +1,8 @@
 import base64
 import uuid
+import requests
+import logging
+import json
 from contextlib import asynccontextmanager
 from typing_extensions import Annotated
 from pydantic import BaseModel, Field
@@ -9,11 +12,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 from fastapi.openapi.utils import get_openapi
 from fastapi.responses import JSONResponse
-import requests
-import logging
-import json
+
 from datetime import datetime
-from .config import get_settings, Settings
+from app.config import get_settings, Settings
 from webauthn import (
     generate_registration_options,
     verify_registration_response,
@@ -29,6 +30,7 @@ from .password_auth import authenticate_password
 from .mfa_auth import mfa_signup
 from .passkey_auth import passkey_auth
 from .routers import health, root, passkey
+from app.password import v1_router as v1_password_router
 
 settings = get_settings()
 
@@ -50,7 +52,7 @@ This API provides authentication services for the GC Sign In application, integr
 * Passkey authentication
 * IBM Verify integration
 """
-API_VERSION = "1.0.0"
+
 CONTACT_INFO = {
     "name": "GC Sign In Team",
     "url": settings.app_info.github_url,
@@ -64,22 +66,46 @@ async def lifespan(app: FastAPI):
 
     logger.info("Starting IBM Verify Integration API")
     logger.info(
-        f"Tenant URL: {app.state.config.ibm_verify.IBM_VERIFY_TENANT_URL}")
+        f"Tenant URL: {app.state.config.ibm_verify_config.IBM_VERIFY_TENANT_URL}")
     logger.info(
-        f"Client ID: {app.state.config.ibm_verify.IBM_VERIFY_CLIENT_ID}")
+        f"Client ID: {app.state.config.ibm_verify_config.IBM_VERIFY_CLIENT_ID}")
     logger.info(
-        f"Redirect URI: {app.state.config.ibm_verify.IBM_VERIFY_REDIRECT_URI}")
+        f"Redirect URI: {app.state.config.ibm_verify_config.IBM_VERIFY_REDIRECT_URI}")
     logger.info("Application startup complete")
     yield
     logger.info("Shutting down IBM Verify Integration API")
+
+
+class HealthResponse(BaseModel):
+    status: str = Field(..., description="Service health status",
+                        example="healthy")
+    timestamp: str = Field(..., description="Current UTC timestamp in ISO format",
+                           example="2024-03-05T12:34:56.789Z")
+    service: str = Field(..., description="Service name",
+                         example="gc-signin-backend")
+    version: str = Field(..., description="Service version", example="1.0.0")
+
+
+class RootResponse(BaseModel):
+    message: str = Field(..., description="Welcome message",
+                         example="GC Sign In Backend Service")
 
 
 app = FastAPI(
     lifespan=lifespan,
     title=settings.app_info.app_name,
     description=API_DESCRIPTION,
-    version=API_VERSION,
     contact=CONTACT_INFO,
+)
+
+app.include_router(health.router, prefix="/health")
+app.include_router(root.router)
+app.include_router(passkey.router)
+
+app.include_router(
+    v1_password_router.router,
+    prefix=f"{settings.V1_API_PATH}/password",
+    tags=["Password Related APIs"],
 )
 
 
@@ -98,9 +124,6 @@ class RootResponse(BaseModel):
                          example="GC Sign In Backend Service")
 
 
-app.include_router(health.router)
-app.include_router(root.router)
-app.include_router(passkey.router)
 # CORS
 app.add_middleware(
     CORSMiddleware,

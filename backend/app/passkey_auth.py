@@ -3,7 +3,7 @@ import logging
 import json
 from fastapi import HTTPException
 from .config import get_settings
-settings = get_settings().ibm_verify
+settings = get_settings().ibm_verify_config
 
 
 # Configure logging
