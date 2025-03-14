@@ -65,6 +65,6 @@ export function isEmailValid(email){
 export function isCodeValid(code){
 
     const isValidCode = /^[0-9]{6}$/;
-    console.log(code.match(isValidCode));
-    return code.match(isValidCode);
+
+    return (code!=null && code.match(isValidCode));
 }
