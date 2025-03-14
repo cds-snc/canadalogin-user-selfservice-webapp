@@ -1,7 +1,6 @@
 import {
     GcdsContainer,
     GcdsHeading,
-    GcdsButton,
     GcdsText,
     GcdsDetails,
     GcdsInput
@@ -9,6 +8,7 @@ import {
 import {AVAILABLE_LANGUAGES, SERVICES} from "../../utils/constants";
 import {getPageContent} from '../../utils/functions';
 import FirstTimeGc from "../Layout/FirstTimeGc";
+import SubmitButton from "../Layout/SubmitButton.jsx";
 
 
 export default function Home({currentLang}) {
@@ -47,9 +47,7 @@ export default function Home({currentLang}) {
                                 label={pageContentJson['8']}
                                 name="email"
                             ></GcdsInput>
-                            <GcdsButton type="submit">
-                                {pageContentJson['9']}
-                            </GcdsButton>
+                            <SubmitButton currentLang={currentLang} />
                         </form>
                     </GcdsText>
                 </GcdsContainer>

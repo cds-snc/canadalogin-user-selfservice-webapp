@@ -1,19 +1,23 @@
 import {getLangValues} from "../../utils/functions";
 import Header from '../../components/Layout/Header';
 import Footer from '../../components/Layout/Footer';
-import SignUpEmail from "../../components/SignUp/SignUpEmail";
+import EmailVerification from "../../components/SignUp/EmailVerification/EmailVerification.jsx";
 import {GcdsContainer} from "@cdssnc/gcds-components-react";
+import {useParams} from "react-router";
 
-export default function SignUpPage() {
+export default function EmailVerificationPage() {
+    const {email} = useParams();
     const {langHref, currentLang} = getLangValues();
 
     return (
-        <div className="mainBody">
+        <GcdsContainer mainContainer centered>
+            <GcdsContainer className="gcds-main">
                 <Header langHref={langHref} currentLang={currentLang}/>
                 <GcdsContainer className="gcds-page">
-                    <SignUpEmail currentLang={currentLang}/>
+                    <EmailVerification currentLang={currentLang} email={email}/>
                 </GcdsContainer>
                 <Footer currentLang={currentLang}/>
-        </div>
+            </GcdsContainer>
+        </GcdsContainer>
     );
 }

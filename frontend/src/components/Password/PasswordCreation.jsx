@@ -2,66 +2,31 @@ import {GcdsContainer, GcdsHeading, GcdsButton, GcdsLink, GcdsText, GcdsDetails,
 import {AVAILABLE_LANGUAGES, SERVICES, NAVIGATION_LINKS} from "../../utils/constants";
 import {getPageContent, isPasswordValid} from '../../utils/functions';
 import { useState } from 'react';
-
-const submitForm = async () =>{
-    //update logic for sending to server API mockup
-}
+import {useActionState} from 'react';
+import {useUser} from "../Providers/UserContext.jsx";
 
 export default function PasswordCreation({currentLang}) {
-
-    const [checkedValue, setCheckedValue] = useState(true);
-    const [passwordStrength, setPasswordStrength] = useState(0);
-    const [strengthLevel, setStrengthLevel] = useState("None");
-    const [password, setPassword] = useState("");
-    const [visibility, setVisibility] = useState(false);
-    const [errorJson, setError] = useState({heading: null, passwordError:null});
+    const {state} = useUser();
+    const navigate = useNavigate();
     const pageContentJson = getPageContent(currentLang, "PasswordCreation");
-
-    const errorPageJson = getPageContent(currentLang, "Error");
-
-    async function handleSubmit (event) {
-        event.preventDefault();
-
-        const formData = new FormData(event.target);
-        setPassword(formData.get('password'));
-        setVisibility(!visibility);
-        if(!isPasswordValid(formData.get('password'))){
-            setError({passwordError: errorPageJson[4], heading: errorPageJson['1']});
-        return;
+    console.log(state); //remove this later. just here for testing and debugging
+    function Form(){
+        const [formState, actions] = useActionState(
+            {   password: "",
+                visibility: false,
+            },
+            {
+                setPassword: (state, value) => ({...state, password: value }),
+                setVisibility: (state, value) => ({...state, visibility: value }),
             }
-            setError({passwordError:null, heading:null});
-            await submitForm();
+        );
+        const handleSubmit = (event) => {
+            event.preventDefault();
+            console.log(formState);
+            console.log(actions);
+            console.log(actions.setVisibility(!actions.visibility));
         };
-
-  //Checkbox implementation (hide/show password)
-    function validateCheckbox ()  {
-        console.log(checkedValue);
-        setCheckedValue (!checkedValue);
-    }
-
-    function handlePasswordChange (event) {
-        const password = event.target.value;
-        setPasswordStrength(password.length);
-        updatePasswordStrength(password);
-    };
-
- //Password length meter implementation 
-    function updatePasswordStrength (password) {
-
-        if (password.length >= 15) 
-            setStrengthLevel("Very Strong");      
-        else if (password.length >=12) 
-            setStrengthLevel("Strong");       
-        else if (password.length >=10)  
-            setStrengthLevel("Medium");     
-        else if (password.length >= 3)
-            setStrengthLevel("Weak");
-        else 
-            setStrengthLevel("None");
-
-        setPasswordStrength(password.length);
-    };
-
+  };
 
     return (
         <GcdsContainer className="gcds-content" >

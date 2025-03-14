@@ -9,15 +9,13 @@ export default function PasswordPage() {
     const {langHref, currentLang} = getLangValues();
  
     return (
-        <GcdsContainer mainContainer centered>
-            <GcdsContainer className="gcds-main">
+        <div className="mainBody">
                 <Header langHref={langHref} currentLang={currentLang}/>
                 <GcdsContainer className="gcds-page">
                     <PasswordCreation currentLang={currentLang}/>
                     {/* <SignUpPassword currentLang={currentLang}/> */}
                 </GcdsContainer>
                 <Footer currentLang={currentLang}/>
-            </GcdsContainer>
-        </GcdsContainer>
+        </div>
         );
 }
