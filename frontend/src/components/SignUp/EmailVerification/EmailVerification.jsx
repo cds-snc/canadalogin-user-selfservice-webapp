@@ -6,13 +6,14 @@ import {
     GcdsStepper,
     GcdsText
 } from "@cdssnc/gcds-components-react";
-import AlreadyGc from "../../Layout/AlreadyGc.jsx";
-import {NAVIGATION_LINKS} from "../../../utils/constants.jsx";
 import {useEffect, useState} from "react";
+import {useNavigate} from "react-router";
+import AlreadyGc from "../../Layout/AlreadyGc.jsx";
+import {CONTEXT_ACTIONS, NAVIGATION_LINKS} from "../../../utils/constants.jsx";
 import SubmitButton from "../../Layout/SubmitButton.jsx";
 import {getPageContent, isCodeValid} from "../../../utils/functions.jsx";
 import {useUser} from "../../Providers/UserContext.jsx";
-import {useNavigate} from "react-router";
+
 
 const initialTime=10;
 
@@ -69,7 +70,7 @@ export default function EmailVerification({currentLang}) {
             alert(response.error);
         else {
             const userData = {...state.userData, emailValidated:true};
-            dispatch({type: 'SET_EMAIL', payload: userData});
+            dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
             navigate("/" + currentLang + NAVIGATION_LINKS.password);
         }
 

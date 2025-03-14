@@ -7,7 +7,7 @@ import {
 import {useState} from "react";
 import {getPageContent, isEmailValid} from "../../utils/functions";
 import {useNavigate} from "react-router";
-import {NAVIGATION_LINKS} from "../../utils/constants.jsx";
+import {CONTEXT_ACTIONS, NAVIGATION_LINKS} from "../../utils/constants.jsx";
 import SubmitButton from "../Layout/SubmitButton.jsx";
 import {useUser} from "../Providers/UserContext.jsx";
 
@@ -53,7 +53,7 @@ export default function EmailCollectionForm({currentLang, errorJson, setError}) 
             alert(response.error);
         else {
             const userData = {...state.userData, email: email, emailLanguage: formData.get('language')};
-            dispatch({type: 'SET_EMAIL', payload: userData});
+            dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
             navigate("/" + currentLang + NAVIGATION_LINKS.verifyEmail);
         }
 

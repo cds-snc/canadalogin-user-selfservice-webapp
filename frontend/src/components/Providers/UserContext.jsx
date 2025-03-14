@@ -1,5 +1,5 @@
 import {createContext, useReducer, useContext} from "react";
-import {SERVICES} from "../../utils/constants.jsx";
+import {SERVICES, CONTEXT_ACTIONS} from "../../utils/constants.jsx";
 
 const initialState = {
     isAuthenticated: false,
@@ -12,18 +12,15 @@ const initialState = {
     }
 }
 
-const SET_USER = 'SET_USER';
-const SET_EMAIL = 'SET_EMAIL';
-const LOG_OUT = 'LOG_OUT';
 
 function userReducer(state=initialState, action=LOG_OUT) {
     switch (action.type) {
-        case SET_EMAIL:
+        case CONTEXT_ACTIONS.signUp:
             return {
                 ...state,
                 userData: action.payload
             };
-        case LOG_OUT:
+        case CONTEXT_ACTIONS.logOut:
             return {
                 initialState
             };
