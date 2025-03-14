@@ -9,7 +9,7 @@ resource "aws_ecs_cluster" "main" {
   tags = {
     Name        = "${var.product_name}-backend-cluster"
     Environment = var.env
-    CostCenter =  var.product_with_env
+    CostCenter  = var.product_with_env
   }
 }
 
@@ -76,7 +76,7 @@ resource "aws_security_group" "ecs_tasks" {
   tags = {
     Name        = "${var.product_name}-ecs-tasks-sg"
     Environment = var.env
-    CostCenter =  var.product_with_env
+    CostCenter  = var.product_with_env
   }
 }
 
@@ -92,7 +92,7 @@ resource "aws_ecs_task_definition" "main" {
     {
       name  = "${var.product_with_env}-backend-container"
       image = "${var.ecr_repository_url}:latest"
-      
+
       portMappings = [
         {
           containerPort = var.container_port
@@ -101,16 +101,22 @@ resource "aws_ecs_task_definition" "main" {
         }
       ]
 
-      environment = [
-        for key, value in var.env_variables : {
+      environment = concat(
+        [
+          {
+            name  = "ENVIRONMENT"
+            value = var.env
+          }
+        ],
+        [for key, value in var.env_variables : {
           name  = key
           value = value
-        } if key != "IBM_VERIFY_CLIENT_SECRET"
-      ]
+        } if key != "CLIENT_SECRET"]
+      )
 
       secrets = [
         {
-          name = "IBM_VERIFY_CLIENT_SECRET"
+          name      = "IBM_VERIFY_CLIENT_SECRET"
           valueFrom = "${var.secrets_manager_arn}:IBM_VERIFY_CLIENT_SECRET::"
         }
       ]
@@ -130,7 +136,7 @@ resource "aws_ecs_task_definition" "main" {
     Name        = "${var.product_name}-task"
     Environment = var.env
     Trigger     = var.task_definition_trigger
-    CostCenter  =  var.product_with_env
+    CostCenter  = var.product_with_env
   }
 }
 
@@ -141,12 +147,12 @@ resource "aws_cloudwatch_log_group" "main" {
   tags = {
     Name        = "${var.product_name}-logs"
     Environment = var.env
-    CostCenter  =  var.product_with_env
+    CostCenter  = var.product_with_env
   }
 }
 
 resource "aws_ecs_service" "main" {
-  name                               = "${var.product_with_env}-backend-service"
+  name                              = "${var.product_with_env}-backend-service"
   cluster                           = aws_ecs_cluster.main.id
   task_definition                   = aws_ecs_task_definition.main.arn
   desired_count                     = var.service_desired_count
@@ -175,4 +181,4 @@ resource "aws_ecs_service" "main" {
     Environment = var.env
     CostCenter  = var.product_with_env
   }
-} 
+}
