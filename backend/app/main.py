@@ -32,7 +32,7 @@ from .mfa_auth import mfa_signup
 from .passkey_auth import passkey_auth
 from .routers import health, root, passkey
 from app.password import v1_router as v1_password_router
-from app.users_auth import v1_router as v1_users_auth_router
+from app.users import v1_router as v1_users_router
 
 settings = get_settings()
 
@@ -105,9 +105,9 @@ app.include_router(root.router)
 app.include_router(passkey.router)
 
 app.include_router(
-    v1_users_auth_router.router,
-    prefix=f"{settings.V1_API_PATH}/users/auth",
-    tags=["User Authentication APIs"],
+    v1_users_router.router,
+    prefix=f"{settings.V1_API_PATH}/users",
+    tags=["Users"],
 )
 
 app.include_router(

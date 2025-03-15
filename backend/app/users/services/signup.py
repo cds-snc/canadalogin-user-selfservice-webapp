@@ -1,4 +1,3 @@
-
 import logging
 import json
 from datetime import datetime
@@ -9,7 +8,7 @@ from app.utils.access_token import get_access_token
 from app.utils.helpers import generate_error_response
 from app.config import get_settings
 from app.utils.access_token import get_auth_request_headers
-from app.users_auth.schemas import CoreUser, SignupRequest, IBMCreateUserResponse
+from app.users.schemas import CoreUser, BasicUserAuthRequiredData, IBMCreateUserResponse
 from app.utils.schemas import ResponseModel
 
 
@@ -44,7 +43,7 @@ async def create_user(core_user_data: CoreUser):
             status_code=400, detail=f"Signup error: {str(e)}")
 
 
-async def signup(user: SignupRequest):
+async def signup(user: BasicUserAuthRequiredData):
     """Handle user registration through IBM Verify"""
     try:
         # Prepare user data according to SCIM 2.0 schema

@@ -16,7 +16,7 @@ class CoreUser(BaseModel):
     active: bool = True
 
 
-class SignupRequest(BaseModel):
+class BasicUserAuthRequiredData(BaseModel):
     email: EmailStr
     password: str
 
@@ -28,3 +28,18 @@ class IBMCreateUserResponse(BaseModel):
 
 class SignUpResponse(ResponseModel):
     data: Optional[IBMCreateUserResponse] = None
+
+
+class IBMAuthenticateUserBasic(BaseModel):
+    schemas: List[str] = [
+        "urn:ietf:params:scim:schemas:ibm:core:2.0:AuthenticateUser"]
+    userName: EmailStr
+    password: str
+
+
+class AuthenticatedUserId(BaseModel):
+    id: str
+
+
+class AuthenticatedUserResponse(ResponseModel):
+    data: AuthenticatedUserId
