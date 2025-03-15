@@ -8,13 +8,14 @@ from typing_extensions import Annotated
 from pydantic import BaseModel, Field
 from typing import Dict, Optional, List
 from fastapi import FastAPI, HTTPException, Request, Depends
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 from fastapi.openapi.utils import get_openapi
-from fastapi.responses import JSONResponse
 
 from datetime import datetime
 from app.config import get_settings, Settings
+from app.utils.helpers import generate_error_response
 from webauthn import (
     generate_registration_options,
     verify_registration_response,
@@ -31,6 +32,7 @@ from .mfa_auth import mfa_signup
 from .passkey_auth import passkey_auth
 from .routers import health, root, passkey
 from app.password import v1_router as v1_password_router
+from app.users_auth import v1_router as v1_users_auth_router
 
 settings = get_settings()
 
@@ -103,10 +105,31 @@ app.include_router(root.router)
 app.include_router(passkey.router)
 
 app.include_router(
+    v1_users_auth_router.router,
+    prefix=f"{settings.V1_API_PATH}/users/auth",
+    tags=["User Authentication APIs"],
+)
+
+app.include_router(
     v1_password_router.router,
     prefix=f"{settings.V1_API_PATH}/password",
     tags=["Password Related APIs"],
 )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    # The Signup user endpoint uses Pydantic to validate the email
+    # THis handler is required to send a common format for errors
+
+    error_message = ""
+    for error in exc.errors():
+        error_message = error["msg"]
+        break
+    return generate_error_response(
+        status_code=400,
+        message=error_message
+    )
 
 
 class HealthResponse(BaseModel):
