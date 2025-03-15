@@ -60,6 +60,11 @@ export function isEmailValid(email){
     const isValidEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
     return (email!=null && email.match(isValidEmail));
+}
 
+export function isCodeValid(code){
 
+    const isValidCode = /^[0-9]{6}$/;
+
+    return (code!=null && code.match(isValidCode));
 }

@@ -1,5 +1,4 @@
 import {
-    GcdsButton,
     GcdsContainer,
     GcdsFieldset,
     GcdsInput,
@@ -7,13 +6,23 @@ import {
 } from "@cdssnc/gcds-components-react";
 import {useState} from "react";
 import {getPageContent, isEmailValid} from "../../utils/functions";
+import {useNavigate} from "react-router";
+import {CONTEXT_ACTIONS, NAVIGATION_LINKS} from "../../utils/constants.jsx";
+import SubmitButton from "../Layout/SubmitButton.jsx";
+import {useUser} from "../Providers/UserContext.jsx";
 
-
-
-export default function EmailCollectionForm({currentLang, submitForm, errorJson, setError}) {
-    const [email, setEmail] = useState("");
+export default function EmailCollectionForm({currentLang, errorJson, setError}) {
+    const {state, dispatch} = useUser();
+    const [email, setEmail] = useState('');
+    const navigate = useNavigate();
     const errorPageJson = getPageContent(currentLang, "Error");
     const pageFormJson = getPageContent(currentLang, "EmailCollectionForm");
+
+    const submitForm = async () =>{
+        //update logic for sending to server once we have the back end
+        const response = {success:true, message:"Successfully submitted", error:null}
+        return response;
+    }
 
     const validateEmail = (e) => {
 
@@ -27,17 +36,26 @@ export default function EmailCollectionForm({currentLang, submitForm, errorJson,
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         const formData = new FormData(e.target);
-        setEmail(formData.get('email'));
+        const formEmail = formData.get('email')
+        setEmail(formEmail);
 
-        if(!isEmailValid(formData.get('email'))){
+        if(!isEmailValid(formEmail)){
             setError({emailError: errorPageJson[2], heading: errorPageJson['1']});
             return;
         }
+
         setError({emailError:null, heading:null});
 
-        await submitForm();
+        const response = await submitForm(formData, currentLang);
+
+        if (response.error)
+            alert(response.error);
+        else {
+            const userData = {...state.userData, email: formEmail, emailLanguage: formData.get('language')};
+            dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
+            navigate("/" + currentLang + NAVIGATION_LINKS.verifyEmail);
+        }
 
     }
     return (
@@ -61,17 +79,15 @@ export default function EmailCollectionForm({currentLang, submitForm, errorJson,
                     <br />
                     <GcdsRadioGroup
                         name="language"
-                        options={`[
-                                    {"label": "${pageFormJson['6']}",
-                                     "id": "english", "value": "eng"${ currentLang!=='fr'?',"checked":"true"':'' }},
-                                    {"label": "${pageFormJson['7']}",
-                                     "id": "french", "value": "fr"${ currentLang==='fr'?',"checked":"true"':'' }}
-                                ]`}
+                        options={'['+
+                                    `{"label": "${pageFormJson['6']}",`+
+                                    `"id": "english", "value": "eng"${ currentLang!=='fr'?',"checked":"true"':'' }},`+
+                                   `{"label": "${pageFormJson['7']}",`+
+                                    `"id": "french", "value": "fr"${ currentLang==='fr'?',"checked":"true"':'' }}`+
+                               `]`}
                     />
                 </GcdsFieldset>
-                <GcdsButton type="submit" >
-                    {pageFormJson['5']}
-                </GcdsButton>
+                <SubmitButton currentLang={currentLang} />
             </GcdsContainer>
         </form>
     )

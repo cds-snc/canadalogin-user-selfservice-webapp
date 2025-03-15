@@ -14,8 +14,11 @@ async def request_access_token():
         settings = get_settings().ibm_verify_config
 
         token_url = f"{settings.IBM_VERIFY_TENANT_URL}/oauth2/token"
+<<<<<<< HEAD
         logger.info("Attempting to get access token", token_url)
 
+=======
+>>>>>>> 28fe796c1d84c9b25e790dc6231a9b4723dc33e2
         data = {
             "grant_type": "client_credentials",
             "client_id": settings.IBM_VERIFY_API_CLIENT_ID,
@@ -46,7 +49,11 @@ async def request_access_token():
 async def get_access_token() -> str:
     """Get access token for IBM Verify API operations"""
     try:
+<<<<<<< HEAD
         logger.info("Attempting to get access token")
+=======
+        logger.info("Attempting to get admin token")
+>>>>>>> 28fe796c1d84c9b25e790dc6231a9b4723dc33e2
 
         start_time = datetime.now()
         response = await request_access_token()
