@@ -1,4 +1,4 @@
 -r requirements.txt
-pytest==8.0.2
+pytest==8.3.5
 pytest-cov==4.1.0
 fastapi-cli==0.0.7
