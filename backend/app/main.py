@@ -120,7 +120,7 @@ app.include_router(
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     # The Signup user endpoint uses Pydantic to validate the email
-    # THis handler is required to send a common format for errors
+    # This handler is required to send a common format for errors
 
     error_message = ""
     for error in exc.errors():
