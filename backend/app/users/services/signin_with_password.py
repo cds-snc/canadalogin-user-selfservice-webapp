@@ -111,7 +111,9 @@ async def signin_with_password(user: UserLoginRequestData):
         if response.status_code != 200:
             error_message = response_json.get('detail', 'Unknown error')
             if response.status_code == 400:
-                return generate_error_response(response.status_code, error_message)
+                error_message = response_json.get(
+                    'messageDescription', 'Unknown error')
+            return generate_error_response(response.status_code, error_message)
 
         if user_id is None:
             error_message = response_json.get('detail', 'Unknown error')
