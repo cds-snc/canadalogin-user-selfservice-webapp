@@ -8,14 +8,14 @@ from app.utils.access_token import get_access_token
 from app.utils.helpers import generate_error_response
 from app.config import get_settings
 from app.utils.access_token import get_auth_request_headers
-from app.users.schemas import CoreUser, BasicUserAuthRequiredData, IBMCreateUserResponse
+from app.users.schemas import IBMUserCreateRequest, UserLoginRequestData, IBMUserCreateResponse
 from app.utils.schemas import ResponseModel
 
 
 logger = logging.getLogger(__name__)
 
 
-async def create_user(core_user_data: CoreUser):
+async def create_user(core_user_data: IBMUserCreateRequest):
 
     try:
         access_token = await get_access_token()
@@ -43,18 +43,17 @@ async def create_user(core_user_data: CoreUser):
             status_code=400, detail=f"Signup error: {str(e)}")
 
 
-async def signup(user: BasicUserAuthRequiredData):
+async def signup_with_password(user: UserLoginRequestData):
     """Handle user registration through IBM Verify"""
     try:
         # Prepare user data according to SCIM 2.0 schema
         core_user_data = {
-            "userName": user.email,
-            "emails": [{"value": user.email}],
+            "userName": user.userName,
+            "emails": [{"value": user.userName}],
             "password": user.password,
         }
-        core_user = CoreUser(**core_user_data)
+        core_user = IBMUserCreateRequest(**core_user_data)
 
-        # print(json.dumps(verify_user_data, indent=4))
         start_time = datetime.now()
         response = await create_user(core_user)
         response_json = response.json()
@@ -69,7 +68,7 @@ async def signup(user: BasicUserAuthRequiredData):
             f"Signup request completed in {duration:.2f} seconds")
 
         try:
-            validated_data = IBMCreateUserResponse(**response_json)
+            validated_data = IBMUserCreateResponse(**response_json)
         except ValidationError as e:
             logger.error(f"Validation Error: {e.json()}")
             print(json.dumps(e.json(), indent=4))

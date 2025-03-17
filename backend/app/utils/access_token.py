@@ -66,11 +66,12 @@ async def get_access_token() -> str:
             status_code=400, detail=f"Admin token error: {str(e)}")
 
 
-def get_auth_request_headers(access_token: str) -> dict:
+def get_auth_request_headers(access_token: str, json_content_type: bool = False) -> dict:
     """Headers and access token to be included in the Authorization header
 
       Args:
         access_token (str): The access token to be included in the Authorization header.
+        json_content_type (bool): If True, the Content-Type and Accept headers will be set to "application/json".
 
         Returns:
             dict: A dictionary containing the authentication headers, including:
@@ -79,6 +80,15 @@ def get_auth_request_headers(access_token: str) -> dict:
                 - "Accept": "application/scim+json"
 
         """
+    headers = {}
+
+    if json_content_type:
+        headers = {
+            "Authorization": f"Bearer {access_token}",
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        }
+        return headers
 
     headers = {
         "Authorization": f"Bearer {access_token}",

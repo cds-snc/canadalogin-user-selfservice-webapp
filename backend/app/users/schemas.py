@@ -8,7 +8,14 @@ class EmailModel(BaseModel):
     type: str = "work"
 
 
-class CoreUser(BaseModel):
+class UserLoginRequestData(BaseModel):
+    userName: EmailStr
+    password: str
+
+# Signup Schema
+
+
+class IBMUserCreateRequest(BaseModel):
     schemas: List[str] = ["urn:ietf:params:scim:schemas:core:2.0:User"]
     userName: str
     emails: List[EmailModel]
@@ -16,30 +23,26 @@ class CoreUser(BaseModel):
     active: bool = True
 
 
-class BasicUserAuthRequiredData(BaseModel):
-    email: EmailStr
-    password: str
-
-
-class IBMCreateUserResponse(BaseModel):
+class IBMUserCreateResponse(BaseModel):
     userName: str
     id: str
 
 
 class SignUpResponse(ResponseModel):
-    data: Optional[IBMCreateUserResponse] = None
+    data: Optional[IBMUserCreateResponse] = None
+
+# Signin Schema
 
 
-class IBMAuthenticateUserBasic(BaseModel):
-    schemas: List[str] = [
-        "urn:ietf:params:scim:schemas:ibm:core:2.0:AuthenticateUser"]
-    userName: EmailStr
+class IBMUsernamePasswordAuthRequestData(BaseModel):
+    username: EmailStr  # Lowercase username is required here -> https://docs.verify.ibm.com/verify/reference/authenticatewithpassword. Signup request requires userName in camelCase
     password: str
 
 
-class AuthenticatedUserId(BaseModel):
+class AuthenticatedUserData(BaseModel):
     id: str
+    assertion: str
 
 
 class AuthenticatedUserResponse(ResponseModel):
-    data: AuthenticatedUserId
+    data: AuthenticatedUserData

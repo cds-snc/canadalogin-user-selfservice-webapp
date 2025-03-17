@@ -1,8 +1,7 @@
 from fastapi import APIRouter, Depends, status
-from pydantic import BaseModel, EmailStr, Field
-from app.users.schemas import BasicUserAuthRequiredData, SignUpResponse, AuthenticatedUserResponse
-from app.users.services.signup import signup
-from app.users.services.signin import basic_signin
+from app.users.schemas import UserLoginRequestData, SignUpResponse, AuthenticatedUserResponse
+from backend.app.users.services.signup_with_password import signup_with_password
+from backend.app.users.services.signin_with_password import signin_with_password
 
 router = APIRouter()
 
@@ -13,12 +12,12 @@ router = APIRouter()
              tags=["Users"],
              summary="Creates a new user",
              description="Basic Authentication - Email and Password")
-async def user_signup(user: BasicUserAuthRequiredData):
+async def user_signup(user: UserLoginRequestData):
     """
     Creates a new user.
     Returns: ID and Username
     """
-    return await signup(user)
+    return await signup_with_password(user)
 
 
 @router.post("/signin",
@@ -26,9 +25,9 @@ async def user_signup(user: BasicUserAuthRequiredData):
              tags=["Users"],
              summary="Authenticate user - basic authentication",
              description="Basic Authentication - Email and Password")
-async def user_password_signin(user: BasicUserAuthRequiredData):
+async def user_password_signin(user: UserLoginRequestData):
     """
     Creates a new user.
     Returns: ID and Username
     """
-    return await basic_signin(user)
+    return await signin_with_password(user)
