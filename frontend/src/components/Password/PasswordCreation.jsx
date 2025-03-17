@@ -4,11 +4,13 @@ import {useNavigate} from "react-router";
 import {getPageContent} from '../../utils/functions';
 import { useState } from 'react';
 import {useActionState} from 'react';
+import {useUser} from "../Providers/UserContext.jsx";
 
 export default function PasswordCreation({currentLang}) {
+    const {state} = useUser();
     const navigate = useNavigate();
     const pageContentJson = getPageContent(currentLang, "PasswordCreation");
- 
+    console.log(state); //remove this later. just here for testing and debugging
     function Form(){
         const [formState, actions] = useActionState(
             {   password: "",
