@@ -6,7 +6,7 @@ from backend.app.users.services.signin_with_password import signin_with_password
 router = APIRouter()
 
 
-@router.post("/signup",
+@router.post("/create",
              response_model=SignUpResponse,
              status_code=status.HTTP_201_CREATED,
              tags=["Users"],
@@ -20,7 +20,7 @@ async def user_signup(user: UserLoginRequestData):
     return await signup_with_password(user)
 
 
-@router.post("/signin",
+@router.post("/login",
              response_model=AuthenticatedUserResponse,
              tags=["Users"],
              summary="Authenticate user - basic authentication",
