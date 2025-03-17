@@ -1,6 +1,8 @@
 import base64
 import uuid
 from contextlib import asynccontextmanager
+
+from fastapi.encoders import jsonable_encoder
 from typing_extensions import Annotated
 from pydantic import BaseModel, Field
 from typing import Dict, Optional, List
@@ -25,9 +27,11 @@ from webauthn.helpers.structs import (
     RegistrationCredential,
 )
 
+from .models import ResponseMessage, EmailOtpResponse
 from .password_auth import authenticate_password
 from .mfa_auth import mfa_signup
 from .passkey_auth import passkey_auth
+from .responses import OPENAPI_RESPONSE_EMAIL_OTP_NOT_FOUND
 from .routers import health, root, passkey
 
 settings = get_settings()
@@ -145,11 +149,11 @@ async def get_admin_token():
     """Get admin token for IBM Verify API operations"""
     try:
         logger.info("Attempting to get admin token")
-        token_url = f"{settings.IBM_VERIFY_TENANT_URL}/oauth2/token"
+        token_url = f"{settings.ibm_verify_config.IBM_VERIFY_TENANT_URL}/oauth2/token"
         data = {
             "grant_type": "client_credentials",
-            "client_id": settings.IBM_VERIFY_CLIENT_ID,
-            "client_secret": settings.IBM_VERIFY_CLIENT_SECRET,
+            "client_id": settings.ibm_verify_config.IBM_VERIFY_API_CLIENT_ID,
+            "client_secret": settings.ibm_verify_config.IBM_VERIFY_API_CLIENT_SECRET,
             "scope": "openid"
         }
 
@@ -186,7 +190,7 @@ async def signup(request: Request):
         # Get admin token for user creation
         admin_token = await get_admin_token()
 
-        signup_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/Users"
+        signup_url = f"{settings.ibm_verify_config.IBM_VERIFY_TENANT_URL}/v2.0/Users"
         headers = {
             "Authorization": f"Bearer {admin_token}",
             "Content-Type": "application/scim+json",
@@ -555,3 +559,79 @@ async def signup_with_mfa(request: Request):
     except Exception as e:
         logger.error(f"MFA Signup error: {str(e)}", exc_info=True)
         raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.post("/api/email/sendEmailOtp",status_code=201)
+async def send_email_otp(request: Request) -> EmailOtpResponse:
+    response = None  #initialilize response object
+
+    data = await request.json()
+
+    email_address = {
+        "emailAddress" : data.get("emailAddress")
+    }
+
+    if not email_address:
+        raise HTTPException(
+            status_code=400, detail="Email address is required")
+
+    try:
+        admin_token = await get_admin_token()
+
+        headers = {
+            "Authorization": f"Bearer {admin_token}",
+            "Content-Type": "application/json"
+        }
+        transient_email_otp_url = f"{settings.ibm_verify_config.IBM_VERIFY_TENANT_URL}/v2.0/factors/emailotp/transient/verifications"
+
+        logger.info("Attempting to send email OTP")
+
+        response = requests.post(transient_email_otp_url, json=email_address, headers=headers)
+
+        if response.status_code == 201:
+            logger.info("Email OTP created and sent")
+
+        successful_response = EmailOtpResponse(
+            transactionID=response.json()['id'],
+            type=response.json()['type'],
+            created=response.json()['created'],
+            updated=response.json()['updated'],
+            expiry=response.json()['expiry'],
+            state=response.json()['state'],
+            correlationID=response.json()['correlation'],
+            emailAddress=response.json()['emailAddress'],
+            attempts=str(response.json()['attempts']),
+            retries=str(response.json()['retries'])
+        )
+
+        return successful_response
+
+    except Exception as e:
+        raise HTTPException(status_code=response.status_code, detail=str(response.reason))
+
+
+@app.post("/api/email/verifyEmailOtp",status_code=204)
+async def verify_email_otp(request: Request):
+    data = await request.json()
+    admin_token = await get_admin_token()
+    response = None
+
+    headers = {
+        "Authorization": f"Bearer {admin_token}",
+        "Content-Type": "application/json",
+    }
+    pass_code = {
+        "otp" : data.get('otp')
+    }
+    dd = data.get('trxnId')
+    try:
+        transient_email_verification_url = f"{settings.ibm_verify_config.IBM_VERIFY_TENANT_URL}/v2.0/factors/emailotp/transient/verifications/{dd}"
+        response = requests.post(transient_email_verification_url, json=pass_code, headers=headers)
+
+        if response.status_code == 204:
+            logger.info("Email OTP has been validated")
+            return response.content
+
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(status_code=response.status_code, detail=str(response.reason))
