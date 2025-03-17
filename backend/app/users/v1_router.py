@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, status
 from app.users.schemas import UserLoginRequestData, SignUpResponse, AuthenticatedUserResponse
-from backend.app.users.services.signup_with_password import signup_with_password
-from backend.app.users.services.signin_with_password import signin_with_password
+from backend.app.users.services.create import signup_with_password
+from backend.app.users.services.login import signin_with_password
 
 router = APIRouter()
 
