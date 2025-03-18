@@ -1,0 +1,8 @@
+sequenceDiagram
+    participant frontend
+    participant gc-signin-ibm (backend)
+    participant ibm verify api
+    frontend->>gc-signin-ibm (backend): user's OIDC code sent to backend's login endpoint   
+    gc-signin-ibm (backend)->>ibm verify api: makes request for fresh jwt
+    ibm verify api->>gc-signin-ibm (backend): login response
+    gc-signin-ibm (backend)->>frontend: forwards login response to enduser

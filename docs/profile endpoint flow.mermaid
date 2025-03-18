@@ -1,0 +1,8 @@
+sequenceDiagram
+    participant frontend
+    participant gc-signin-ibm (backend)
+    participant ibm verify api
+    frontend->>gc-signin-ibm (backend): user's(?) oauth token to request user's profile    
+    gc-signin-ibm (backend)->>ibm verify api: makes profile request
+    ibm verify api->>gc-signin-ibm (backend): sends profile data
+    gc-signin-ibm (backend) ->>frontend: sends profile data

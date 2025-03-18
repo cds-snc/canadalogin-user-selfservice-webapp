@@ -10,3 +10,4 @@ pydantic-settings==2.8.1
 pydantic==2.10.6
 starlette==0.46.1
 httpx==0.28.1
+email-validator==2.2.1
