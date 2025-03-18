@@ -124,22 +124,11 @@ export default function PasswordCreation({currentLang}) {
                 <GcdsText>
                     {pageContentJson['12']} <strong>{passwordStrength}</strong> {pageContentJson['13']}
                 </GcdsText>
-                    <div className="rectangle-container">
-                        <span className="rectangle" style={{ backgroundColor: passwordStrength >= 3 ? (passwordStrength >= 10 ? (passwordStrength >= 12 ? (passwordStrength >= 15 ? 'green' : 'green') : 'yellow') : 'red') : (passwordStrength >= 1 ? 'red' : 'grey') }}></span>
-                        <span className="rectangle" style={{ backgroundColor: passwordStrength >= 10 ? (passwordStrength >= 12 ? (passwordStrength >= 15 ? 'green' : 'green') : 'yellow') : 'grey' }}></span>
-                        <span className="rectangle" style={{ backgroundColor: passwordStrength >= 12 ? (passwordStrength >= 15 ? 'green' : 'green') : 'grey' }}></span>
-                        <span className="rectangle" style={{ backgroundColor: passwordStrength >= 15 ? 'green' : 'grey' }}></span>
-                    </div>
 
-                </GcdsContainer>
-
-                {/* only warn on submit if character length is below 12 characters */}
-                    <GcdsText>
-                        {pageContentJson['14']} <strong>{strengthLevel}</strong>
-                    </GcdsText>     
-                        <GcdsButton type="submit" size="small">
-                            {pageContentJson['16']}
-                        </GcdsButton>
+                </GcdsContainer>    
+                    <GcdsButton type="submit" size="small">
+                        {pageContentJson['16']}
+                    </GcdsButton>
                     </form>
             </GcdsContainer>
             
