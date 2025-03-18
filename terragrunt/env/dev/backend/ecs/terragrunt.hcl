@@ -72,9 +72,12 @@ inputs = {
   task_definition_trigger = timestamp()
   secrets_manager_arn = dependency.secrets.outputs.secret_arn
   env_variables = {
-    IBM_VERIFY_TENANT_URL = "https://gcsignin2.verify.ibm.com/"
-    IBM_VERIFY_CLIENT_ID = "e70df5ae-b5c4-4831-8371-2edbacd4a12c"
+    IBM_VERIFY_TENANT_URL = "https://cds-gcsignin-dev.verify.ibm.com"
+    IBM_VERIFY_CLIENT_ID = "53a6abe8-b54e-4164-bfbc-6a98760604e3"
     IBM_VERIFY_REDIRECT_URI = "http://localhost:8000"
     CORS_ORIGINS = "http://${dependency.frontend_alb.outputs.alb_dns_name}"
+    IBM_VERIFY_API_CLIENT_ID="bc0a1a0c-667d-4bbb-9f21-ba5b37e56bfa"
+    IBM_VERIFY_API_CLIENT_SECRET="LMwElvbwlY"
+    PASSWORD_SOURCE_ID="3546b745-8790-4578-b4b5-401390cbc9b4"
   }
 } 
