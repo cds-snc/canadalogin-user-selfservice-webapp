@@ -15,8 +15,6 @@
   "dependencies": {
     "@cdssnc/gcds-components": "^0.32.0",
     "@cdssnc/gcds-components-react": "^0.32.0",
-    "cors": "^2.8.5",
-    "express": "^4.21.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-password-strength-bar": "^0.4.1",
@@ -68,6 +66,4 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "proxy": "http://gc-signin-ibm-dev-backend-alb-1283301102.ca-central-1.elb.amazonaws.com"
 }
