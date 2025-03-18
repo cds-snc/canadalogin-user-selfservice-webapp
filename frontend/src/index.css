@@ -40,6 +40,22 @@ body, .mainBody {
         align-items: center;
         gap: var(--gcds-spacing-350);
     }
+    .rectangle-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 10px; /* Adjusted gap to match Figma styling */
+        align-self: stretch;
+        margin-top: 8px; /* Added margin-top to match Figma styling */
+    }
+    .rectangle {
+        width: 65.4px; /* Adjusted width to match Figma styling */
+        height: 9.4px; /* Adjusted height to match Figma styling */
+        background-color: grey;
+        flex-shrink: 0;
+        border-radius: 2px;
+        background: var(--Tokens-color-grayscale-100, #D6D9DD);
+    }
 }
 
 @media screen and (min-width:768px) {
@@ -65,6 +81,22 @@ body, .mainBody {
     }
     .gcds-footer{
         padding-top: var(--gcds-spacing-400);
+    }
+    .rectangle-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 4px; /* Adjusted gap to match Figma styling */
+        align-self: stretch;
+        margin-top: 8px; /* Added margin-top to match Figma styling */
+    }
+    .rectangle {
+        width: 65.3px; /* Adjusted width to match Figma styling */
+        height: 9.4px; /* Adjusted height to match Figma styling */
+        background-color: grey;
+        flex-shrink: 0;
+        border-radius: 2px;
+        background: var(--Tokens-color-grayscale-100, #D6D9DD);
     }
 
 }

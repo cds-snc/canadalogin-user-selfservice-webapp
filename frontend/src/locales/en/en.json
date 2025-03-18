@@ -29,6 +29,20 @@
     "17": "Already have a GC Sign in account?",
     "18": "Sign in"
   },
+  "PasswordCollectionForm":{
+    "1": "Password",
+    "2":"example: pillow moose dish",
+    "3": "Show password",
+    "4": "Continue"
+  },
+  "SignUpPassword":{
+    "1": "Create a password",
+    "2": "Your password should be a phrase or series of words that only you can recognize. It must be ",
+    "3": "at least 12 characters. ",
+    "4": "You can use multiple words seprated by spaces to meet the character limit.",
+    "5": "Password safety tips",
+    "6": "The longer and more unusual the password, the harder it is to guess. So avoid using common phrases. Also avoid repeating passwords from other online accounts such as banks, email and social media."
+  },
   "SignUpEmail": {
     "1": "Create a GC Sign in",
     "2": "to continue to your",
@@ -54,7 +68,9 @@
   "Error":{
     "1": "There was a problem",
     "2": "Invalid email. Email must contain an ‘@’ symbol.",
-    "3": "Codes must be six digits. Try again."
+    "3": "Codes must be six digits. Try again.",
+    "4": "Password must be 12 characters",
+    "5": "Invalid password. Password must be at least 12 characters and maximum 65 characters."
   },
   "EmailVerification":{
     "1": "Check your email",

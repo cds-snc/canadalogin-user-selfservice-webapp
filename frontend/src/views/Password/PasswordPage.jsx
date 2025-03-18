@@ -12,6 +12,7 @@ export default function PasswordPage() {
                 <Header langHref={langHref} currentLang={currentLang}/>
                 <GcdsContainer className="gcds-page">
                     <PasswordCreation currentLang={currentLang}/>
+                    {/* <SignUpPassword currentLang={currentLang}/> */}
                 </GcdsContainer>
                 <Footer currentLang={currentLang}/>
         </div>
