@@ -51,13 +51,13 @@ export default function EmailCollectionForm({currentLang, errorJson, setError}) 
                     email: formData.get('email'),
                     language: formData.get('language')
                 });
-
-                if(response.success){
+                console.log(response);
+                if(response.success && response.data.transactionID){
                     const userData = {
                         ...state.userData,
                         email: formEmail,
                         emailLanguage: formData.get('language'),
-                        trxnId: response.trxnId
+                        trxnId: response.data.transactionID
                     };
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                     navigate("/" + currentLang + NAVIGATION_LINKS.verifyEmail);
