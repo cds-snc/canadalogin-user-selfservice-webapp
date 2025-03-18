@@ -69,8 +69,8 @@
     "8": "Utiliser une autre adresse courriel",
     "9": "Vous pourrez demander un nouveau code dans ",
     "10": "secondes",
-    "11": "Demander un nouveau code"
-
+    "11": "Demander un nouveau code",
+    "12": "Nous vous avons envoyé un nouveau code"
   },
   "Button":{
       "submit": "Continuer"

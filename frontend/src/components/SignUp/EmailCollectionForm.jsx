@@ -4,25 +4,22 @@ import {
     GcdsInput,
     GcdsRadioGroup
 } from "@cdssnc/gcds-components-react";
-import {useState} from "react";
+import {useState, useTransition} from "react";
 import {getPageContent, isEmailValid} from "../../utils/functions";
 import {useNavigate} from "react-router";
 import {CONTEXT_ACTIONS, NAVIGATION_LINKS} from "../../utils/constants.jsx";
 import SubmitButton from "../Layout/SubmitButton.jsx";
 import {useUser} from "../Providers/UserContext.jsx";
+import {authService} from "../../services/authService.jsx";
+
 
 export default function EmailCollectionForm({currentLang, errorJson, setError}) {
     const {state, dispatch} = useUser();
     const [email, setEmail] = useState('');
+    const [isPending, startTransition] = useTransition();
     const navigate = useNavigate();
     const errorPageJson = getPageContent(currentLang, "Error");
     const pageFormJson = getPageContent(currentLang, "EmailCollectionForm");
-
-    const submitForm = async () =>{
-        //update logic for sending to server once we have the back end
-        const response = {success:true, message:"Successfully submitted", error:null}
-        return response;
-    }
 
     const validateEmail = (e) => {
 
@@ -34,30 +31,47 @@ export default function EmailCollectionForm({currentLang, errorJson, setError}) 
             setError({emailError:errorPageJson[2], heading:errorPageJson['1']});
     }
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        const formEmail = formData.get('email')
-        setEmail(formEmail);
 
-        if(!isEmailValid(formEmail)){
-            setError({emailError: errorPageJson[2], heading: errorPageJson['1']});
-            return;
-        }
+    function handleSubmit(e) {
+        startTransition(async()=> {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const formEmail = formData.get('email')
+            await setEmail(formEmail);
 
-        setError({emailError:null, heading:null});
+            if(!isEmailValid(formEmail)){
+                setError({emailError: errorPageJson[2], heading: errorPageJson['1']});
+                return;
+            }
 
-        const response = await submitForm(formData, currentLang);
+            setError({emailError:null, heading:null});
 
-        if (response.error)
-            alert(response.error);
-        else {
-            const userData = {...state.userData, email: formEmail, emailLanguage: formData.get('language')};
-            dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
-            navigate("/" + currentLang + NAVIGATION_LINKS.verifyEmail);
-        }
+            try {
+                const response = await authService.signup({
+                    email: formData.get('email'),
+                    language: formData.get('language')
+                });
 
+                if(response.success){
+                    const userData = {
+                        ...state.userData,
+                        email: formEmail,
+                        emailLanguage: formData.get('language'),
+                        trxnId: response.trxnId
+                    };
+                    await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
+                    navigate("/" + currentLang + NAVIGATION_LINKS.verifyEmail);
+                    }else {
+                        console.log("Error....", response);
+                        setError({emailError: response.message, heading: errorPageJson['1']});
+                    }
+                } catch (error) {
+                    console.error('Signup error:', error);
+                    setError({emailError: response.message, heading: errorPageJson['1']});
+            }
+        })
     }
+
     return (
         <form onSubmit={handleSubmit}>
             <GcdsContainer marginTop="100" marginBottom="0" >
@@ -87,7 +101,7 @@ export default function EmailCollectionForm({currentLang, errorJson, setError}) 
                                `]`}
                     />
                 </GcdsFieldset>
-                <SubmitButton currentLang={currentLang} />
+                <SubmitButton currentLang={currentLang} disabled={isPending} />
             </GcdsContainer>
         </form>
     )

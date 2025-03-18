@@ -54,7 +54,8 @@
   "Error":{
     "1": "There was a problem",
     "2": "Invalid email. Email must contain an ‘@’ symbol.",
-    "3": "Codes must be six digits. Try again."
+    "3": "Codes must be six digits. Try again.",
+    "4": "Code sent does not match. Try again."
   },
   "EmailVerification":{
     "1": "Check your email",
@@ -67,7 +68,8 @@
     "8": "Use a different email",
     "9": "You can request a new code in ",
     "10": "seconds",
-    "11": "Send the code again"
+    "11": "Send the code again",
+    "12": "We have sent you a new code"
 
   },
   "Button":{

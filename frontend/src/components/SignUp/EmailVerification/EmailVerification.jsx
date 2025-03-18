@@ -1,33 +1,28 @@
 import {
-    GcdsContainer,
+    GcdsContainer, GcdsErrorSummary,
     GcdsHeading,
     GcdsInput,
-    GcdsLink,
+    GcdsLink, GcdsNotice,
     GcdsStepper,
     GcdsText
 } from "@cdssnc/gcds-components-react";
-import {useEffect, useState} from "react";
+import { useEffect, useState, useTransition} from "react";
 import {useNavigate} from "react-router";
 import AlreadyGc from "../../Layout/AlreadyGc.jsx";
 import {CONTEXT_ACTIONS, NAVIGATION_LINKS} from "../../../utils/constants.jsx";
 import SubmitButton from "../../Layout/SubmitButton.jsx";
 import {getPageContent, isCodeValid} from "../../../utils/functions.jsx";
 import {useUser} from "../../Providers/UserContext.jsx";
-
+import {authService} from "../../../services/authService.jsx";
 
 const initialTime=10;
-
-const submitForm = async () =>{
-    //update logic for sending to server once we have the back end
-    const response = {success:true, message:"Successfully submitted", error:null}
-    return response;
-
-}
 
 export default function EmailVerification({currentLang}) {
     const {state, dispatch} = useUser();
     const [time, setTime] = useState(initialTime);
+    const [codeRequested, setCodeRequested] = useState(false);
     const [timesRequested, setTimesRequested] = useState(2);
+    const [isPending, startTransition] = useTransition();
     const [errorJson, setError] = useState({heading: null, codeError:null});
     const navigate = useNavigate();
     const pageContentJson = getPageContent(currentLang, "EmailVerification");
@@ -45,40 +40,78 @@ export default function EmailVerification({currentLang}) {
 
     },[time]);
 
+    async function requestNewCode (e){
+        setError({codeError:null, heading:null});
+        startTransition(async()=> {
+            e.preventDefault();
+            try {
+                const response = await authService.requestNewCode({
+                    trxnId: state.userData.trxnId
+                });
+                console.log(response);
+                if(response.success){
+                    setCodeRequested(true);
+                }else {
+                    console.log("Error....", response);
+                    setError({codeError: response.message, heading: errorPageJson['1']});
+                }
+            } catch (error) {
+                console.error('Signup error:', error);
+                setError({codeError: response.message, heading: errorPageJson['1']});
+            }
 
-    const requestNewCode = async (e) =>{
-        e.preventDefault();
-        setTimesRequested(prevState => prevState+1);
-        setTime(initialTime*timesRequested);
-        //update logic for requesting new code once API is available
+            setTimesRequested(prevState => prevState + 1);
+            setTime(initialTime * timesRequested);
+
+        })
     }
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        const formCode = formData.get('verificationCode')
-        console.log(formCode);
-        console.log("is valid", !isCodeValid(formCode));
-        if(!isCodeValid(formCode)){
-            setError({codeError: errorPageJson[3], heading: errorPageJson['1']});
-            return;
-        }
-
-        const response = await submitForm(formData, currentLang);
-
-        if (response.error)
-            alert(response.error);
-        else {
-            const userData = {...state.userData, emailValidated:true};
-            dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
-            navigate("/" + currentLang + NAVIGATION_LINKS.password);
-        }
-
+    function  handleSubmit (e){
+        startTransition(async()=> {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const formCode = formData.get('verificationCode')
+            setCodeRequested(false);
+            if (!isCodeValid(formCode)) {
+                setError({codeError: errorPageJson[3], heading: errorPageJson['1']});
+                return;
+            }
+            setError({codeError:null, heading:null});
+            try {
+                const response = await authService.emailVerification({
+                    trxnId: state.userData.trxnId,
+                    otp: formData.get('verificationCode')
+                });
+                console.log(response);
+                if(response.success){
+                    const userData = {...state.userData, emailValidated: true};
+                    await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
+                    navigate("/" + currentLang + NAVIGATION_LINKS.password);
+                }else {
+                    console.log("Error....", response);
+                    setError({codeError: response.message, heading: errorPageJson['1']});
+                }
+            } catch (error) {
+                console.error('Signup error:', error);
+                setError({codeError: response.message, heading: errorPageJson['1']});
+            }
+        })
     }
 
     return (
         <GcdsContainer className="gcds-content" >
             <GcdsContainer>
+                {
+                    errorJson.codeError!==null&&(<GcdsErrorSummary
+                        errorLinks={`{"#verificationCode": "${errorJson.codeError}"}`}
+                        heading={errorJson.heading}
+                    />)
+                }
+                {
+                    codeRequested && (<GcdsNotice type="success" noticeTitleTag="h2" noticeTitle="We have sent you a new code" data-testid="gcds-notice">
+                        &nbsp;
+                    </GcdsNotice>)
+                }
                 <GcdsContainer className="gcds-gap" >
                     <GcdsStepper currentStep="1" totalSteps="5"
                                  tag="h1"  >
@@ -104,7 +137,7 @@ export default function EmailVerification({currentLang}) {
                             validateOn="other"
                             errorMessage={errorJson.codeError}
                             required ></GcdsInput>
-                       <SubmitButton currentLang={currentLang} />
+                       <SubmitButton currentLang={currentLang} disabled={isPending}/>
                     </form>
                 </GcdsContainer>
                 <GcdsHeading tag="h2">
