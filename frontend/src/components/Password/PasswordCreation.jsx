@@ -1,36 +1,59 @@
-import {GcdsContainer, GcdsHeading, GcdsButton, GcdsLink, GcdsText, GcdsDetails, GcdsInput, GcdsNotice, GcdsStepper, GcdsCheckbox, GcdsIcon} from "@cdssnc/gcds-components-react";
+import {GcdsContainer, GcdsHeading, GcdsButton, GcdsLink, GcdsText, GcdsDetails, GcdsInput, GcdsNotice, GcdsStepper, GcdsCheckbox, GcdsErrorSummary} from "@cdssnc/gcds-components-react";
 import {AVAILABLE_LANGUAGES, SERVICES, NAVIGATION_LINKS} from "../../utils/constants";
-import {useNavigate} from "react-router";
-import {getPageContent} from '../../utils/functions';
+import {getPageContent, isPasswordValid} from '../../utils/functions';
 import { useState } from 'react';
-import {useActionState} from 'react';
-import {useUser} from "../Providers/UserContext.jsx";
+
+const submitForm = async () =>{
+    //update logic for sending to server API mockup
+}
 
 export default function PasswordCreation({currentLang}) {
-    const {state} = useUser();
-    const navigate = useNavigate();
+
+
+    const [checkedValue, setCheckedValue] = useState(true);
+    const [passwordStrength, setPasswordStrength] = useState(0);
+    const [visibility, setVisibility] = useState(false);
+    const [errorJson, setError] = useState({heading: null, passwordError:null});
     const pageContentJson = getPageContent(currentLang, "PasswordCreation");
-    console.log(state); //remove this later. just here for testing and debugging
-    function Form(){
-        const [formState, actions] = useActionState(
-            {   password: "",
-                visibility: false,
-            },
-            {
-                setPassword: (state, value) => ({...state, password: value }),
-                setVisibility: (state, value) => ({...state, visibility: value }),
+
+    const errorPageJson = getPageContent(currentLang, "Error");
+
+    async function handleSubmit (event) {
+        event.preventDefault();
+
+        const formData = new FormData(event.target);
+        formData.get('password');
+        setVisibility(!visibility);
+        if(!isPasswordValid(formData.get('password'))){
+            setError({passwordError: errorPageJson[5], heading: errorPageJson['1']});
+        return;
             }
-        );
-        const handleSubmit = (event) => {
-            event.preventDefault();
-            console.log(formState);
-            console.log(actions);
-            console.log(actions.setVisibility(!actions.visibility));
+            setError({passwordError:null, heading:null});
+            await submitForm();
         };
-  };
+
+  //Checkbox implementation (hide/show password)
+    function validateCheckbox ()  {
+        console.log(checkedValue);
+        setCheckedValue (!checkedValue);
+    }
+
+    function handlePasswordChange (event) {
+        const password = event.target.value;
+        setPasswordStrength(password.length);
+    };
+
+
+
 
     return (
         <GcdsContainer className="gcds-content" >
+            {
+            errorJson.passwordError!==null&&(<GcdsErrorSummary
+                errorLinks={`{"#password": "${errorJson.passwordError}"}`}
+                heading={errorJson.heading}
+                />)
+            }
             <GcdsContainer centered className="gcds-notice">
                 <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={pageContentJson['1']} data-testid="gcds-notice">
                     &nbsp;
@@ -41,55 +64,60 @@ export default function PasswordCreation({currentLang}) {
                         {pageContentJson['3']}
                     </GcdsStepper>
                 </GcdsText>
-                    <gcds-text> 
+                    <GcdsText> 
                         {pageContentJson['4']}<strong>{pageContentJson['5']}</strong>{pageContentJson['6']}
-                    </gcds-text>
+                    </GcdsText>
                     <GcdsDetails detailsTitle={pageContentJson['7']} data-testid="gcds-title">
                     <GcdsText>
                         {pageContentJson['8']}
                     </GcdsText>
                     </GcdsDetails>
-
-           
-            <GcdsContainer>
-                    <form onSubmit={Form.handleSubmit} >
-                        <GcdsInput
-                        inputId="input-password"
-                        label={pageContentJson['9']}
-                        name="example-default"
-                        hint={pageContentJson['10']}
-                        lang={currentLang}
-                        >
-                            {console.log(Form.password)}
-                        </GcdsInput>
+        <GcdsContainer>
+            <form onSubmit={handleSubmit} >
+                <GcdsInput
+                    inputId="input-password"
+                    label={pageContentJson['9']}
+                    name="password"
+                    hint={pageContentJson['10']}
+                    lang={currentLang}
+                    type={checkedValue? "password" : "text"}
+                    className="form-control"
+                    onGcdsInput={handlePasswordChange}
+                    errorMessage={errorJson.passwordError}
+                    required
+                >
+                </GcdsInput>
+                    <small className="help-block" id="password-text"></small>
                         <GcdsCheckbox
                             checkboxId="checkbox-default"
                             label={pageContentJson['11']}
                             name="checkbox"
                             data-testid="gcds-checkbox"
+                            onGcdsChange={validateCheckbox}
                             >
+                                <GcdsText>
+                                    {checkedValue? "false" : "true"}
+                                </GcdsText>  
                         </GcdsCheckbox>
-                
+
+
+                    <GcdsContainer centered className="rectangle-container">
+                      
                 <GcdsText>
-                    {pageContentJson['12']} <strong>0</strong> {pageContentJson['13']}
+                    {pageContentJson['12']} <strong>{passwordStrength}</strong> {pageContentJson['13']}
                 </GcdsText>
 
-                    <GcdsText>
-                        {pageContentJson['14']} <strong>{pageContentJson['15']}</strong>
-                    </GcdsText>     
-
-                        <GcdsButton type="submit" size="small" 
-                        onChange= {(e) => actions.setPassword(e.target.value)}>
-                            {pageContentJson['16']}
-                        </GcdsButton>
+                </GcdsContainer>    
+                    <GcdsButton type="submit" size="small">
+                        {pageContentJson['16']}
+                    </GcdsButton>
                     </form>
-
             </GcdsContainer>
             
             <GcdsHeading tag="h2">
                 {pageContentJson['17']}
             <GcdsText marginTop="200" marginBottom="0">
-            <GcdsLink href={`/${currentLang}`} data-testid="gcds-link">
+            <GcdsLink href={`/${currentLang}`}>
                 {pageContentJson['18']}
             </GcdsLink>
             </GcdsText>
@@ -98,4 +126,6 @@ export default function PasswordCreation({currentLang}) {
         </GcdsContainer>
     )
 }
+
+
 
