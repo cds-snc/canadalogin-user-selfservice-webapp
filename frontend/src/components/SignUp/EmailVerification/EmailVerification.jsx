@@ -95,7 +95,7 @@ export default function EmailVerification({currentLang}) {
                 }
             } catch (error) {
                 console.error('Signup error:', error);
-                setError({codeError: response.message, heading: errorPageJson['1']});
+                setError({emailError:  errorPageJson[5], heading: errorPageJson['1']});
             }
         })
     }

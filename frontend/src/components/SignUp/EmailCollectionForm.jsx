@@ -67,7 +67,7 @@ export default function EmailCollectionForm({currentLang, errorJson, setError}) 
                 }
             } catch (error) {
                 console.error('Signup error:', error);
-                setError({emailError: response.message, heading: errorPageJson['1']});
+                setError({emailError:  errorPageJson[5], heading: errorPageJson['1']});
             }
         })
     }
