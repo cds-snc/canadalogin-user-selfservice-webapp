@@ -12,8 +12,6 @@ export default function PasswordCreation({currentLang}) {
 
     const [checkedValue, setCheckedValue] = useState(true);
     const [passwordStrength, setPasswordStrength] = useState(0);
-    const [strengthLevel, setStrengthLevel] = useState("None");
-    const [password, setPassword] = useState("");
     const [visibility, setVisibility] = useState(false);
     const [errorJson, setError] = useState({heading: null, passwordError:null});
     const pageContentJson = getPageContent(currentLang, "PasswordCreation");
@@ -24,7 +22,7 @@ export default function PasswordCreation({currentLang}) {
         event.preventDefault();
 
         const formData = new FormData(event.target);
-        setPassword(formData.get('password'));
+        formData.get('password');
         setVisibility(!visibility);
         if(!isPasswordValid(formData.get('password'))){
             setError({passwordError: errorPageJson[5], heading: errorPageJson['1']});
@@ -43,25 +41,9 @@ export default function PasswordCreation({currentLang}) {
     function handlePasswordChange (event) {
         const password = event.target.value;
         setPasswordStrength(password.length);
-        updatePasswordStrength(password);
     };
 
- //Password length meter implementation 
-    function updatePasswordStrength (password) {
 
-        if (password.length >= 15) 
-            setStrengthLevel("Very Strong");      
-        else if (password.length >=12) 
-            setStrengthLevel("Strong");       
-        else if (password.length >=10)  
-            setStrengthLevel("Medium");     
-        else if (password.length >= 3)
-            setStrengthLevel("Weak");
-        else 
-            setStrengthLevel("None");
-
-        setPasswordStrength(password.length);
-    };
 
 
     return (
