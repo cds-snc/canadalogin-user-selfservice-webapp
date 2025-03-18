@@ -56,8 +56,8 @@ export default function EmailVerification({currentLang}) {
                     setError({codeError: response.message, heading: errorPageJson['1']});
                 }
             } catch (error) {
-                console.error('Signup error:', error);
-                setError({codeError: response.message, heading: errorPageJson['1']});
+                console.error('Server error:', error);
+                setError({codeError: errorPageJson[5], heading: errorPageJson['1']});
             }
 
             setTimesRequested(prevState => prevState + 1);
@@ -110,7 +110,7 @@ export default function EmailVerification({currentLang}) {
                     />)
                 }
                 {
-                    codeRequested && (<GcdsNotice type="success" noticeTitleTag="h2" noticeTitle="We have sent you a new code" data-testid="gcds-notice">
+                    codeRequested && (<GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={pageContentJson['12']} data-testid="gcds-notice">
                         &nbsp;
                     </GcdsNotice>)
                 }
