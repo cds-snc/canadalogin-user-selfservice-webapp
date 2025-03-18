@@ -1,9 +1,9 @@
 import {getLangValues} from "../../utils/functions";
 import Header from '../../components/Layout/Header';
 import Footer from '../../components/Layout/Footer';
-import PasswordCreation from "../../components/Password/PasswordCreation";
+import PasswordCreation from "../../components/SignUp/Password/PasswordCreation";
 import {GcdsContainer} from "@cdssnc/gcds-components-react";
-import SignUpPassword from "../../components/Password/SignUpPassword";
+import SignUpPassword from "../../components/SignUp/Password/SignUpPassword";
 
 export default function PasswordPage() {
     const {langHref, currentLang} = getLangValues();
