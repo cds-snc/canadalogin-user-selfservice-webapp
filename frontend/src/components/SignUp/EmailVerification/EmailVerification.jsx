@@ -72,15 +72,17 @@ export default function EmailVerification({currentLang}) {
             const formData = new FormData(e.target);
             const formCode = formData.get('verificationCode')
             setCodeRequested(false);
+            sessionStorage.setItem('verificationCode', formCode);
             if (!isCodeValid(formCode)) {
                 setError({codeError: errorPageJson[3], heading: errorPageJson['1']});
                 return;
             }
             setError({codeError:null, heading:null});
+
             try {
                 const response = await authService.emailVerification({
                     trxnId: state.userData.trxnId,
-                    otp: formData.get('verificationCode')
+                    otp: formCode
                 });
                 console.log(response);
                 if(response.success){
@@ -135,6 +137,7 @@ export default function EmailVerification({currentLang}) {
                             name="verificationCode"
                             type="text"
                             validateOn="other"
+                            value={sessionStorage.getItem('verificationCode')}
                             errorMessage={errorJson.codeError}
                             required ></GcdsInput>
                        <SubmitButton currentLang={currentLang} disabled={isPending}/>

@@ -15,7 +15,7 @@ import {authService} from "../../services/authService.jsx";
 
 export default function EmailCollectionForm({currentLang, errorJson, setError}) {
     const {state, dispatch} = useUser();
-    const [email, setEmail] = useState('');
+    const [email, setEmail] = useState(state.userData.email);
     const [isPending, startTransition] = useTransition();
     const navigate = useNavigate();
     const errorPageJson = getPageContent(currentLang, "Error");
@@ -61,13 +61,13 @@ export default function EmailCollectionForm({currentLang, errorJson, setError}) 
                     };
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                     navigate("/" + currentLang + NAVIGATION_LINKS.verifyEmail);
-                    }else {
-                        console.log("Error....", response);
-                        setError({emailError: response.message, heading: errorPageJson['1']});
-                    }
-                } catch (error) {
-                    console.error('Signup error:', error);
+                }else {
+                    console.log("Error....", response);
                     setError({emailError: response.message, heading: errorPageJson['1']});
+                }
+            } catch (error) {
+                console.error('Signup error:', error);
+                setError({emailError: response.message, heading: errorPageJson['1']});
             }
         })
     }
