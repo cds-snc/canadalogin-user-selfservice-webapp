@@ -42,14 +42,21 @@ export default function EmailVerification({currentLang}) {
 
     async function requestNewCode (e){
         setError({codeError:null, heading:null});
+        sessionStorage.setItem('verificationCode', "");
         startTransition(async()=> {
             e.preventDefault();
             try {
-                const response = await authService.requestNewCode({
-                    trxnId: state.userData.trxnId
+                const response = await authService.signup({
+                    emailAddress: state.userData.email
                 });
                 console.log(response);
-                if(response.success){
+                if(response.transactionID){
+                    const userData = {
+                        ...state.userData,
+                        email: state.userData.email,
+                        trxnId: response.transactionID
+                    };
+                    await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                     setCodeRequested(true);
                 }else {
                     console.log("Error....", response);
@@ -85,13 +92,13 @@ export default function EmailVerification({currentLang}) {
                     otp: formCode
                 });
                 console.log(response);
-                if(response.success){
+                if(response.status===204){
                     const userData = {...state.userData, emailValidated: true};
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                     navigate("/" + currentLang + NAVIGATION_LINKS.password);
                 }else {
                     console.log("Error....", response);
-                    setError({codeError: response.message, heading: errorPageJson['1']});
+                    setError({codeError: errorPageJson[5], heading: errorPageJson['1']});
                 }
             } catch (error) {
                 console.error('Signup error:', error);
@@ -153,10 +160,10 @@ export default function EmailVerification({currentLang}) {
                         </GcdsLink>
                     </GcdsText>
                     <GcdsText>
-                        {time>0?(<span>{pageContentJson['9']}<strong>{time} {pageContentJson['10']}</strong></span>)
-                            :(<GcdsLink href="#" onClick={requestNewCode} >
+                        {time>0 && !isPending?(<span>{pageContentJson['9']}<strong>{time} {pageContentJson['10']}</strong></span>)
+                            :!isPending?(<GcdsLink href="#" onClick={requestNewCode} >
                                 {pageContentJson['11']}
-                              </GcdsLink>)}
+                              </GcdsLink>):""}
                     </GcdsText>
                 </GcdsContainer>
             </GcdsContainer>

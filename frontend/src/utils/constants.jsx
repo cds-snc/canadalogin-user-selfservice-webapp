@@ -28,7 +28,8 @@ export const SERVICES=[
 export const SUBMIT_END_POINTS = {
     signup: '/api/email/sendEmailOtp',
     emailVerification: '/api/email/verifyEmailOtp',
-    requestNewCode: '/api/email/requestNewCode'
+    requestNewCode: '/api/email/requestNewCode',
+    requestPasswordPolicy: '/v1/password/policy'
 }
 
 

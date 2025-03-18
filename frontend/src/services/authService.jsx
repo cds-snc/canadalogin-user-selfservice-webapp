@@ -9,10 +9,10 @@ export const authService = {
     },
     emailVerification: async (userData) => {
         const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.emailVerification}`, userData);
-        return response.data;
+        return response;
     },
-    requestNewCode: async (userData) => {
-        const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.requestNewCode}`, userData);
+    requestPasswordPolicy:async (userData) => {
+        const response = await axios.get(`${config.apiUrl}${SUBMIT_END_POINTS.requestPasswordPolicy}`, userData);
         return response.data;
     }
 }

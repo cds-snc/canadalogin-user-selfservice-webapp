@@ -31,7 +31,6 @@ export default function EmailCollectionForm({currentLang, errorJson, setError}) 
             setError({emailError:errorPageJson[2], heading:errorPageJson['1']});
     }
 
-
     function handleSubmit(e) {
         startTransition(async()=> {
             e.preventDefault();
@@ -48,16 +47,15 @@ export default function EmailCollectionForm({currentLang, errorJson, setError}) 
 
             try {
                 const response = await authService.signup({
-                    email: formData.get('email'),
-                    language: formData.get('language')
+                    emailAddress: formData.get('email')
                 });
                 console.log(response);
-                if(response.success && response.data.transactionID){
+                if(response.transactionID){
                     const userData = {
                         ...state.userData,
                         email: formEmail,
                         emailLanguage: formData.get('language'),
-                        trxnId: response.data.transactionID
+                        trxnId: response.transactionID
                     };
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                     navigate("/" + currentLang + NAVIGATION_LINKS.verifyEmail);
