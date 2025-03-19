@@ -31,7 +31,6 @@ export default function PasswordCreation({currentLang}) {
         let policy = {min:12, max:65};
         try {
             const response = await authService.requestPasswordPolicy();
-            console.log("------resp---",response);
             if(response.success)
                 policy = {min: response.data.pwdMinLength, max: response.data.pwdMaxLength};
             else
