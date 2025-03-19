@@ -9,11 +9,12 @@ import {AVAILABLE_LANGUAGES, SERVICES} from "../../utils/constants";
 import {getPageContent} from '../../utils/functions';
 import FirstTimeGc from "../Layout/FirstTimeGc";
 import SubmitButton from "../Layout/SubmitButton.jsx";
+import config from "../../config.jsx";
 
 
 export default function Home({currentLang}) {
     const pageContentJson = getPageContent(currentLang, "Home");
-
+    console.log("Config URL", config.apiUrl);
     return (
         <GcdsContainer className="gcds-content" >
             <GcdsContainer>
