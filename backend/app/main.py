@@ -4,8 +4,8 @@ import requests
 import logging
 import json
 from contextlib import asynccontextmanager
-
 from fastapi.encoders import jsonable_encoder
+
 from typing_extensions import Annotated
 from pydantic import BaseModel, Field
 from typing import Dict, Optional, List
@@ -28,15 +28,17 @@ from webauthn.helpers.structs import (
     UserVerificationRequirement,
     RegistrationCredential,
 )
-
 from .models import ResponseMessage, EmailOtpResponse
+
 from .password_auth import authenticate_password
 from .mfa_auth import mfa_signup
 from .passkey_auth import passkey_auth
 from .responses import OPENAPI_RESPONSE_EMAIL_OTP_NOT_FOUND
+
 from .routers import health, root, passkey
 from app.password import v1_router as v1_password_router
 from app.users import v1_router as v1_users_router
+from app.otp import v1_router as v1_otp_router
 
 settings = get_settings()
 
@@ -71,11 +73,12 @@ async def lifespan(app: FastAPI):
     app.state.config = get_settings().ibm_verify_config
 
     logger.info("Starting IBM Verify Integration API")
-        f"Tenant URL: {app.state.config.ibm_verify_config.IBM_VERIFY_TENANT_URL}")
     logger.info(
-        f"Client ID: {app.state.config.ibm_verify_config.IBM_VERIFY_CLIENT_ID}")
+        f"Tenant URL: {app.state.config.IBM_VERIFY_TENANT_URL}")
     logger.info(
-        f"Redirect URI: {app.state.config.ibm_verify_config.IBM_VERIFY_REDIRECT_URI}")
+        f"Client ID: {app.state.config.IBM_VERIFY_CLIENT_ID}")
+    logger.info(
+        f"Redirect URI: {app.state.config.IBM_VERIFY_REDIRECT_URI}")
     logger.info("Application startup complete")
     yield
     logger.info("Shutting down IBM Verify Integration API")
@@ -117,6 +120,12 @@ app.include_router(
     v1_password_router.router,
     prefix=f"{settings.V1_API_PATH}/password",
     tags=["Password Related APIs"],
+)
+
+app.include_router(
+    v1_otp_router.router,
+    prefix=f"{settings.V1_API_PATH}/otp",
+    tags=["OTP"],
 )
 
 
@@ -606,14 +615,14 @@ async def signup_with_mfa(request: Request):
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@app.post("/api/email/sendEmailOtp",status_code=201)
+@app.post("/api/email/sendEmailOtp", status_code=201)
 async def send_email_otp(request: Request) -> EmailOtpResponse:
-    response = None  #initialilize response object
+    response = None  # initialilize response object
 
     data = await request.json()
 
     email_address = {
-        "emailAddress" : data.get("emailAddress")
+        "emailAddress": data.get("emailAddress")
     }
 
     if not email_address:
@@ -631,7 +640,8 @@ async def send_email_otp(request: Request) -> EmailOtpResponse:
 
         logger.info("Attempting to send email OTP")
 
-        response = requests.post(transient_email_otp_url, json=email_address, headers=headers)
+        response = requests.post(
+            transient_email_otp_url, json=email_address, headers=headers)
 
         if response.status_code == 201:
             logger.info("Email OTP created and sent")
@@ -652,10 +662,11 @@ async def send_email_otp(request: Request) -> EmailOtpResponse:
         return successful_response
 
     except Exception as e:
-        raise HTTPException(status_code=response.status_code, detail=str(response.reason))
+        raise HTTPException(status_code=response.status_code,
+                            detail=str(response.reason))
 
 
-@app.post("/api/email/verifyEmailOtp",status_code=204)
+@app.post("/api/email/verifyEmailOtp", status_code=204)
 async def verify_email_otp(request: Request):
     data = await request.json()
     admin_token = await get_admin_token()
@@ -666,12 +677,13 @@ async def verify_email_otp(request: Request):
         "Content-Type": "application/json",
     }
     pass_code = {
-        "otp" : data.get('otp')
+        "otp": data.get('otp')
     }
     dd = data.get('trxnId')
     try:
         transient_email_verification_url = f"{settings.ibm_verify_config.IBM_VERIFY_TENANT_URL}/v2.0/factors/emailotp/transient/verifications/{dd}"
-        response = requests.post(transient_email_verification_url, json=pass_code, headers=headers)
+        response = requests.post(
+            transient_email_verification_url, json=pass_code, headers=headers)
 
         if response.status_code == 204:
             logger.info("Email OTP has been validated")
@@ -679,4 +691,5 @@ async def verify_email_otp(request: Request):
 
     except Exception as e:
         logger.error(e)
-        raise HTTPException(status_code=response.status_code, detail=str(response.reason))
+        raise HTTPException(status_code=response.status_code,
+                            detail=str(response.reason))

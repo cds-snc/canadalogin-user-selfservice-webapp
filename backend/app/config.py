@@ -1,4 +1,5 @@
 from functools import lru_cache
+from typing import List
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import BaseModel, Field, AnyUrl
 
@@ -22,7 +23,6 @@ class IBMVerifyConfig(BaseSettings):
     # Password Source ID for IBM Verify, currently used in mfa_auth and password_auth. I think its for debugging purposes
     PASSWORD_SOURCE_ID: str
 
-
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
@@ -37,8 +37,9 @@ class Settings(BaseSettings):
     V1_API_PATH: str = '/v1'
     app_info: AppInfo = AppInfo()
     ibm_verify_config: IBMVerifyConfig = IBMVerifyConfig()
-    CORS_ORIGINS: str = Field(
-        "http://localhost:3000", env="CORS_ORIGINS")
+    # CORS_ORIGINS - allow all only for demo purposes, should be set to the frontend URL
+    # Todo - set cors to frontend URL
+    CORS_ORIGINS: List[str] = ["*"]
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

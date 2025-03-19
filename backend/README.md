@@ -38,7 +38,7 @@ docker build -t gc-signin-backend .
 
 ```bash
 docker run -p 8000:8000 \
-  --env-file .env \
+  --env-file ../.env \
   gc-signin-backend
 ```
 
