@@ -1,13 +1,10 @@
-import json
 import logging
-from datetime import datetime
 from fastapi import HTTPException
-from pydantic import ValidationError
 from httpx import AsyncClient
 
 from app.config import get_settings
 from app.utils.helpers import generate_error_response
-from app.otp.schemas import EmailOtpResponse, UserName, EmailOtpVerification
+from app.otp.schemas import EmailOtpVerification
 from app.utils.access_token import get_access_token, get_auth_request_headers
 from app.utils.schemas import ResponseModel
 
