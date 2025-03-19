@@ -37,6 +37,8 @@ class Settings(BaseSettings):
     V1_API_PATH: str = '/v1'
     app_info: AppInfo = AppInfo()
     ibm_verify_config: IBMVerifyConfig = IBMVerifyConfig()
+    # CORS_ORIGINS - allow all only for demo purposes, should be set to the frontend URL
+    # Todo - set cors to frontend URL
     CORS_ORIGINS: List[str] = ["*"]
     model_config = SettingsConfigDict(
         env_file=".env",
