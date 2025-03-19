@@ -1,11 +1,14 @@
 from fastapi import APIRouter, Depends, status
-from app.otp.schemas import UserName, EmailOtpRequestResponse
-from app.otp.services.email_otp import send_email_otp
+from app.otp.schemas import UserName, EmailOtpRequestResponse, EmailOtpVerification
+from app.otp.services.send_email_otp import send_email_otp
+from app.otp.services.verify_email_otp import verify_email_otp
+from app.utils.schemas import ResponseModel
+
 
 router = APIRouter()
 
 
-@router.post("/email/verification",
+@router.post("/email/send",
              response_model=EmailOtpRequestResponse,
              status_code=status.HTTP_200_OK,
              tags=["OTP"],
@@ -19,14 +22,15 @@ async def email_otp(userName: UserName):
     return await send_email_otp(userName)
 
 
-# @router.post("/email/verification/{id}",
-#              response_model=AuthenticatedUserResponse,
-#              tags=["Users"],
-#              summary="Authenticate user - basic authentication",
-#              description="Basic Authentication - Email and Password")
-# async def user_password_signin(user: UserLoginRequestData):
-#     """
-#     Creates a new user.
-#     Returns: ID and Username
-#     """
-#     return await signin_with_password(user)
+@router.post("/email/verify",
+             response_model=ResponseModel,
+             status_code=status.HTTP_200_OK,
+             tags=["OTP"],
+             summary="Verifies an email OTP",
+             description="User sends in the trxnId and OTP to verify the email")
+async def verify_user_email_otp(data: EmailOtpVerification):
+    """
+    Verifies an otp and trxnId for email
+    Returns: Transaction ID
+    """
+    return await verify_email_otp(data)

@@ -17,7 +17,7 @@ class UserName(BaseModel):
 class EmailOtpResponse(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    id: str = Field(alias="transactionID")
+    id: str = Field(alias="trxnId")
     type: str
     created: str
     updated: str
@@ -27,6 +27,11 @@ class EmailOtpResponse(BaseModel):
     emailAddress: str
     attempts: int
     retries: int
+
+
+class EmailOtpVerification(BaseModel):
+    otp: str
+    trxnId: str
 
 
 class AuthenticatedUserData(BaseModel):
