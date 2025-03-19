@@ -8,7 +8,7 @@ export default function AlreadyGc({currentLang})
     const pageContentJson = getPageContent(currentLang, "AlreadyGc");
 
     return(
-        <GcdsHeading tag="h2">
+        <GcdsHeading tag="h3">
             {pageContentJson['1']}
             <GcdsText marginTop="200" marginBottom="0">
                 <GcdsLink href={`/${currentLang}`} >

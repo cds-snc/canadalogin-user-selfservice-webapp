@@ -22,7 +22,7 @@
     "10": "example: pillow moose dish",
     "11": "Show password",
     "12": "Minimum length: ", 
-    "13": "/ 12 characters", 
+    "13": " characters",
     "14": "Password strength:",
     "15": "None",
     "16": "Continue",
@@ -86,10 +86,20 @@
     "9": "You can request a new code in ",
     "10": "seconds",
     "11": "Send the code again"
-
+  },
+  "RegisterVerification":{
+    "1": "Protect your account with 2-step verification",
+    "2": "Two-step verification adds a second layer of security to your password.",
+    "3": "Learn more about two-step verification (opens in a new tab)",
+    "4": "Choose a 2-step verification method",
+    "5": "You will be prompted for this every time you sign in.",
+    "6": "Text (SMS) or voice message",
+    "7": "Receive a secure code by text or phone. Carrier charges may apply.",
+    "8": "Single-use verification codes",
+    "9": "Save or print out a list of single-use verification codes."
   },
   "Button":{
-    "submit": "Submit"
+    "submit": "Continue"
   }
 }
 

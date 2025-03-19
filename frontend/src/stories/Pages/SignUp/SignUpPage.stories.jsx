@@ -1,11 +1,20 @@
-import SignUpPage from "../../views/SignUp/SignUpPage";
+import SignUpPage from "../../../views/SignUp/SignUpPage";
 import { withRouter, reactRouterParameters } from 'storybook-addon-remix-react-router';
-import {NAVIGATION_LINKS} from "../../utils/constants.jsx";
+import {NAVIGATION_LINKS} from "../../../utils/constants.jsx";
+import {UserProvider} from "../../../components/Providers/UserContext.jsx";
+
+
 
 export default {
-    title: 'GC Sign In/Pages/Sign Up Page',
+    title: 'GC Sign In/Pages/Sign Up/Sign Up Page',
     component: SignUpPage,
-    decorators: [withRouter],
+    decorators: [withRouter,
+        (Story) => (
+            <UserProvider>
+                <Story />
+            </UserProvider>
+        )
+    ],
     // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs
     tags: ['autodocs'],
 
@@ -31,7 +40,7 @@ export const French = {
             routing: { path: '/:language'+NAVIGATION_LINKS.signUp }
         }),
     }
+
+
 };
-
-
 

@@ -5,6 +5,7 @@ import SignUpPage from "./views/SignUp/SignUpPage";
 import EmailVerification from "./views/SignUp/EmailVerificationPage";
 import {UserProvider} from "./components/Providers/UserContext";
 import PrivateRoute from "./components/Providers/PrivateRoute.jsx";
+import RegisterVerificationPage from "./views/SignUp/RegisterVerificationPage.jsx";
 
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
                   <Route path="/:language/signup" element={<SignUpPage/>}/>
                   <Route path="/:language/signup/verifyemail/" element={<PrivateRoute route="signUpVerifyEmail"><EmailVerification /></PrivateRoute>}/>
                   <Route path="/:language/signup/password" element={ <PrivateRoute route="signUpPassword"><PasswordPage /></PrivateRoute>} />
+                  <Route path="/:language/signup/registerverification" element={<PrivateRoute route="signUpVerification"><RegisterVerificationPage/></PrivateRoute>}/>
                   <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
           </UserProvider>

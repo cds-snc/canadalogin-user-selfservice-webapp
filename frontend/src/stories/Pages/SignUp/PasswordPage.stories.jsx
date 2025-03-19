@@ -1,11 +1,15 @@
-import HomePage from "../../views/Home/HomePage.jsx";
 import { withRouter, reactRouterParameters } from 'storybook-addon-remix-react-router';
-import {UserProvider} from "../../components/Providers/UserContext.jsx";
+import {NAVIGATION_LINKS} from "../../../utils/constants.jsx";
+import {useUser} from "../../../components/Providers/UserContext.jsx";
+import {UserProvider} from "../../../components/Providers/UserContext.jsx";
+import EmailVerificationPage from "../../../views/SignUp/EmailVerificationPage.jsx";
+import PasswordPage from "../../../views/Password/PasswordPage.jsx";
+
 
 
 export default {
-    title: 'GC Sign In/Pages/Landing Page',
-    component: HomePage,
+    title: 'GC Sign In/Pages/Sign Up/Password Page',
+    component: PasswordPage,
     decorators: [withRouter,
         (Story) => (
             <UserProvider>
@@ -24,7 +28,7 @@ export const English = {
             location: {
                 pathParams: { language: 'en' },
             },
-            routing: { path: '/:language' },
+            routing: { path: '/:language'+NAVIGATION_LINKS.password }
         }),
     }
 };
@@ -35,19 +39,10 @@ export const French = {
             location: {
                 pathParams: { language: 'fr' },
             },
-            routing: { path: '/:language' },
+            routing: { path: '/:language'+NAVIGATION_LINKS.password }
         }),
     }
-};
 
-export const Default = {
-    parameters: {
-        reactRouter: reactRouterParameters({
-            location: {
-                pathParams: { language: '' },
-            },
-            routing: { path: '' },
-        }),
-    }
+
 };
 
