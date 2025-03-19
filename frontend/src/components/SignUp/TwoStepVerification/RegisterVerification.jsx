@@ -1,8 +1,6 @@
 import {
     GcdsContainer, GcdsFieldset,
-    GcdsHeading,
-    GcdsLink,
-    GcdsNotice, GcdsRadioGroup,
+    GcdsLink, GcdsRadioGroup,
     GcdsStepper,
     GcdsText
 } from "@cdssnc/gcds-components-react";
@@ -13,7 +11,6 @@ import {NAVIGATION_LINKS} from "../../../utils/constants.jsx";
 import SubmitButton from "../../Layout/SubmitButton.jsx";
 
 export default function RegisterVerification({currentLang}) {
-    const {state} = useUser();
     const pageContentJson = getPageContent(currentLang, "RegisterVerification");
 
     return (
