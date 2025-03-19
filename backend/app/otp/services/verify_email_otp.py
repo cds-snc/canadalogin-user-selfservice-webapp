@@ -64,31 +64,3 @@ async def verify_email_otp(data: EmailOtpVerification):
     except Exception as e:
         raise HTTPException(status_code=response.status_code,
                             detail=str(response.reason))
-
-
-# async def verify_email_otp(data: EmailOtpVerification):
-#     data = await request.json()
-#     admin_token = await get_admin_token()
-#     response = None
-
-#     headers = {
-#         "Authorization": f"Bearer {admin_token}",
-#         "Content-Type": "application/json",
-#     }
-#     pass_code = {
-#         "otp": data.get('otp')
-#     }
-#     dd = data.get('trxnId')
-#     try:
-#         transient_email_verification_url = f"{settings.ibm_verify_config.IBM_VERIFY_TENANT_URL}/v2.0/factors/emailotp/transient/verifications/{dd}"
-#         response = requests.post(
-#             transient_email_verification_url, json=pass_code, headers=headers)
-
-#         if response.status_code == 204:
-#             logger.info("Email OTP has been validated")
-#             return response.content
-
-#     except Exception as e:
-#         logger.error(e)
-#         raise HTTPException(status_code=response.status_code,
-#                             detail=str(response.reason))
