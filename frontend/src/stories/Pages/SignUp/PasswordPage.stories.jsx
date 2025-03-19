@@ -1,8 +1,6 @@
 import { withRouter, reactRouterParameters } from 'storybook-addon-remix-react-router';
 import {NAVIGATION_LINKS} from "../../../utils/constants.jsx";
-import {useUser} from "../../../components/Providers/UserContext.jsx";
 import {UserProvider} from "../../../components/Providers/UserContext.jsx";
-import EmailVerificationPage from "../../../views/SignUp/EmailVerificationPage.jsx";
 import PasswordPage from "../../../views/Password/PasswordPage.jsx";
 
 
