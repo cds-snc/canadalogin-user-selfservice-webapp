@@ -1,13 +1,5 @@
-from typing import List, Any, Optional
 from pydantic import BaseModel, Field, EmailStr, ConfigDict
 from app.utils.schemas import ResponseModel
-
-from app.models import ResponseMessage
-
-# OPENAPI_RESPONSE_EMAIL_OTP_NOT_FOUND = {
-#     "model": ResponseMessage,
-#     "description": "email otp not found"
-# }
 
 
 class UserName(BaseModel):
