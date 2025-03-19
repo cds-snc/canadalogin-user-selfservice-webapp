@@ -25,6 +25,11 @@ export const SERVICES=[
     }
 ];
 
-export const SUBMIT_ACTIONS_URL = {
-    createPassword: 'http://gc-signin-ibm-dev-backend-alb-1283301102.ca-central-1.elb.amazonaws.com/v1/password/policy',
+export const SUBMIT_END_POINTS = {
+    signup: '/api/email/sendEmailOtp',
+    emailVerification: '/api/email/verifyEmailOtp',
+    requestNewCode: '/api/email/requestNewCode',
+    requestPasswordPolicy: '/v1/password/policy'
 }
+
+

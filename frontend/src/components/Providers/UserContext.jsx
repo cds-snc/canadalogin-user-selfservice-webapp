@@ -4,16 +4,17 @@ import {SERVICES, CONTEXT_ACTIONS} from "../../utils/constants.jsx";
 const initialState = {
     isAuthenticated: false,
     userData: {
-      service: SERVICES[0].title, //to be set later when url referrer is given, also need to refactor other pages to use this value
-      language: 'en', //to be set later when refactoring possibly
-      email: null,
-      emailLanguage: null,
-      emailValidated: false
+        service: SERVICES[0].title, //to be set later when url referrer is given, also need to refactor other pages to use this value
+        language: 'en', //to be set later when refactoring possibly
+        email: null,
+        emailLanguage: null,
+        emailValidated: false,
+        trxnId: null
     }
 }
 
 
-function userReducer(state=initialState, action=LOG_OUT) {
+function userReducer(state=initialState, action) {
     switch (action.type) {
         case CONTEXT_ACTIONS.signUp:
             return {
