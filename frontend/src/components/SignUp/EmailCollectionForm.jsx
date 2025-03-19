@@ -35,7 +35,7 @@ export default function EmailCollectionForm({currentLang, errorJson, setError}) 
         startTransition(async()=> {
             e.preventDefault();
             const formData = new FormData(e.target);
-            const formEmail = formData.get('email')
+            const formEmail = formData.get('email');
             await setEmail(formEmail);
 
             if(!isEmailValid(formEmail)){
@@ -65,7 +65,7 @@ export default function EmailCollectionForm({currentLang, errorJson, setError}) 
                 }
             } catch (error) {
                 console.error('Signup error:', error);
-                setError({emailError:  errorPageJson[5], heading: errorPageJson['1']});
+                setError({emailError:  errorPageJson[7], heading: errorPageJson['1']});
             }
         })
     }
@@ -86,7 +86,7 @@ export default function EmailCollectionForm({currentLang, errorJson, setError}) 
                 <GcdsFieldset
                     fieldset-id="gcds-email-fieldset"
                     legend={pageFormJson['2']}
-                    hint= {pageFormJson['4']}
+                    hint={pageFormJson['4']}
                     required>
                     <br />
                     <GcdsRadioGroup

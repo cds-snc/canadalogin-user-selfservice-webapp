@@ -64,7 +64,7 @@ export default function EmailVerification({currentLang}) {
                 }
             } catch (error) {
                 console.error('Server error:', error);
-                setError({codeError: errorPageJson[5], heading: errorPageJson['1']});
+                setError({codeError: errorPageJson[7], heading: errorPageJson['1']});
             }
 
             setTimesRequested(prevState => prevState + 1);
@@ -98,11 +98,11 @@ export default function EmailVerification({currentLang}) {
                     navigate("/" + currentLang + NAVIGATION_LINKS.password);
                 }else {
                     console.log("Error....", response);
-                    setError({codeError: errorPageJson[5], heading: errorPageJson['1']});
+                    setError({codeError: errorPageJson[7], heading: errorPageJson['1']});
                 }
             } catch (error) {
                 console.error('Signup error:', error);
-                setError({emailError:  errorPageJson[5], heading: errorPageJson['1']});
+                setError({emailError:  errorPageJson[7], heading: errorPageJson['1']});
             }
         })
     }
