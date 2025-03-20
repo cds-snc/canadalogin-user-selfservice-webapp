@@ -23,7 +23,7 @@
     "10": "exemple : coussin orignal plat",
     "11": "Afficher le mot de passe",
     "12": "Longueur minimale : ",
-    "13": "/ 12 caractères",
+    "13": "caractères",
     "14": "Robustesse du mot de passe : ",
     "15": "Nulle",
     "16": "Continuer",
@@ -75,6 +75,17 @@
     "10": "secondes",
     "11": "Demander un nouveau code",
     "12": "We have sent you a new code"
+  },
+  "RegisterVerification":{
+    "1": "Protégez votre compte grâce à la vérification en 2 étapes",
+    "2": "La vérification en 2 étapes ajoute une seconde mesure de sécurité à votre mot de passe.",
+    "3": "Apprenez-en plus sur la vérification en 2 étapes (s’ouvre dans un nouvel onglet)",
+    "4": "Choisissez une méthode de vérification en 2 étapes",
+    "5": "On vous demandera une vérification à chaque connexion.",
+    "6": "Message texte (SMS) ou appel téléphonique",
+    "7": "Recevez un code sécurisé par message texte ou par appel téléphonique. Des frais d’opérateur peuvent s’appliquer.",
+    "8": "Codes de vérification à usage unique",
+    "9": "Enregistrez ou imprimez une liste de codes de vérification à usage unique."
   },
   "Button":{
       "submit": "Continuer"

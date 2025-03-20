@@ -12,7 +12,11 @@ export const authService = {
         return response;
     },
     requestPasswordPolicy:async (userData) => {
-        const response = await axios.get(`${config.apiUrl}${SUBMIT_END_POINTS.requestPasswordPolicy}`, userData);
+        const response = await axios.get(`${config.apiUrl}${SUBMIT_END_POINTS.requestPasswordPolicy}`);
+        return response.data;
+    },
+    create:async (userData) => {
+        const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.create}`, userData);
         return response.data;
     }
 }
