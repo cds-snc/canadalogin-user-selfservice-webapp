@@ -85,7 +85,8 @@
     "8": "Use a different email",
     "9": "You can request a new code in ",
     "10": "seconds",
-    "11": "Send the code again"
+    "11": "Send the code again",
+    "12": "We have sent you a new code"
   },
   "RegisterVerification":{
     "1": "Protect your account with 2-step verification",

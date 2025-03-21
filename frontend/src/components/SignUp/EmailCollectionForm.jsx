@@ -46,16 +46,16 @@ export default function EmailCollectionForm({currentLang, errorJson, setError}) 
             setError({emailError:null, heading:null});
 
             try {
-                const response = await authService.signup({
-                    emailAddress: formData.get('email')
+                const response = await authService.sendOtpCode({
+                    userName: formData.get('email')
                 });
                 console.log(response);
-                if(response.transactionID){
+                if(response.success){
                     const userData = {
                         ...state.userData,
                         email: formEmail,
                         emailLanguage: formData.get('language'),
-                        trxnId: response.transactionID
+                        trxnId: response.data.trxnId
                     };
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                     navigate("/" + currentLang + NAVIGATION_LINKS.verifyEmail);

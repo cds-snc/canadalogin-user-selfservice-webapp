@@ -42,19 +42,18 @@ export default function EmailVerification({currentLang}) {
 
     async function requestNewCode (e){
         setError({codeError:null, heading:null});
-        sessionStorage.setItem('verificationCode', "");
+
         startTransition(async()=> {
             e.preventDefault();
             try {
-                const response = await authService.signup({
-                    emailAddress: state.userData.email
+                const response = await authService.sendOtpCode({
+                    userName: state.userData.email
                 });
                 console.log(response);
-                if(response.transactionID){
+                if(response.success){
                     const userData = {
                         ...state.userData,
-                        email: state.userData.email,
-                        trxnId: response.transactionID
+                        trxnId: response.data.trxnId
                     };
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                     setCodeRequested(true);
@@ -79,7 +78,6 @@ export default function EmailVerification({currentLang}) {
             const formData = new FormData(e.target);
             const formCode = formData.get('verificationCode')
             setCodeRequested(false);
-            sessionStorage.setItem('verificationCode', formCode);
             if (!isCodeValid(formCode)) {
                 setError({codeError: errorPageJson[3], heading: errorPageJson['1']});
                 return;
@@ -88,11 +86,10 @@ export default function EmailVerification({currentLang}) {
 
             try {
                 const response = await authService.emailVerification({
-                    trxnId: state.userData.trxnId,
-                    otp: formCode
+                    otp: formCode,
+                    trxnId: state.userData.trxnId
                 });
-                console.log(response);
-                if(response.status===204){
+                if(response.success){
                     const userData = {...state.userData, emailValidated: true};
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                     navigate("/" + currentLang + NAVIGATION_LINKS.password);
@@ -117,7 +114,7 @@ export default function EmailVerification({currentLang}) {
                     />)
                 }
                 {
-                    codeRequested && (<GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={pageContentJson['12']} data-testid="gcds-notice">
+                    codeRequested && (<GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={pageContentJson['12']}>
                         &nbsp;
                     </GcdsNotice>)
                 }
@@ -144,7 +141,6 @@ export default function EmailVerification({currentLang}) {
                             name="verificationCode"
                             type="text"
                             validateOn="other"
-                            value={sessionStorage.getItem('verificationCode')}
                             errorMessage={errorJson.codeError}
                             required ></GcdsInput>
                        <SubmitButton currentLang={currentLang} disabled={isPending}/>
