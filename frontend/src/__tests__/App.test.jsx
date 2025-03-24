@@ -146,7 +146,6 @@ describe('Routing Test', () => {
 
     function checkSignUpPageContents(language, pageContentJson, langLink, formContentJson, buttonJson, alreadyGcJson) {
 
-        console.log(language)
         const header = screen.queryByLabelText("gcds-header");
         verifyHeader(header, langLink, language);
 
@@ -200,6 +199,9 @@ describe('Routing Test', () => {
                 expect(screen.queryByText(pageContentJson[key])).toBeInTheDocument();
         });
 
+        expect(screen.queryByText(buttonJson['submit'])).toBeInTheDocument();
+        Object.keys(alreadyGcJson).forEach(key => expect(screen.queryByText(alreadyGcJson[key])).toBeInTheDocument());
+
         const links = screen.queryAllByLabelText('gcds-link', {selector: 'gcds-link'});
         expect(links[0]).toHaveAttribute('href-value', '/'+language+NAVIGATION_LINKS.signUp);
         verifyFooterWithAlreadyLink(links[1], langHref[language], subLinks[language]);
@@ -216,6 +218,4 @@ describe('Routing Test', () => {
         expect(link).toHaveAttribute('href-value', langLink);
         expect(screen.queryByLabelText('gcds-footer', {selector: 'gcds-footer'})).toHaveAttribute(subLinks.attribute,subLink);
     }
-
-
 })
