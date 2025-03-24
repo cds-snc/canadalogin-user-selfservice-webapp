@@ -132,7 +132,7 @@ export default function EmailVerification({currentLang}) {
                         {pageContentJson['3']}
                     </GcdsText>
                     <GcdsText>
-                        {pageContentJson['4']}<strong>{pageContentJson['5']}</strong>
+                        {pageContentJson['4']}<strong> {pageContentJson['5']}</strong>
                     </GcdsText>
                     <form onSubmit={handleSubmit}>
                         <GcdsInput
@@ -156,7 +156,7 @@ export default function EmailVerification({currentLang}) {
                         </GcdsLink>
                     </GcdsText>
                     <GcdsText>
-                        {time>0 && !isPending?(<span>{pageContentJson['9']}<strong>{time} {pageContentJson['10']}</strong></span>)
+                        {time>0 && !isPending?(<span>{pageContentJson['9']}<strong> {time} {pageContentJson['10']}</strong></span>)
                             :!isPending?(<GcdsLink href="#" onClick={requestNewCode} >
                                 {pageContentJson['11']}
                               </GcdsLink>):""}
