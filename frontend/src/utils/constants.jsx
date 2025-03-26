@@ -34,4 +34,39 @@ export const SUBMIT_END_POINTS = {
     create: '/v1/users/create'
 }
 
+export const GCDS_TAG_ATTRIBUTES = {
+    'gcds-input':{
+        name:'gcds-input',
+        attributes: ['input-id', 'label', 'name', 'type', 'validate-on']
+    },
+    'gcds-fieldset':{
+        name:'gcds-fieldset',
+        attributes: ["fieldset-id", "hint", "legend"]
+    },
+    'gcds-radio-group':{
+        name:'gcds-radio-group',
+        attributes:  ["name", "options"]
+    },
+    'gcds-button':{
+        name:'gcds-button',
+        attributes: ["type"]
+    },
+    'gcds-footer':{
+        name:'gcds-footer',
+        attributes: ["sub-links"]
+    },
+    'gcds-header':{
+        name:'gcds-header',
+        attributes: ['lang', 'lang-href', 'signature-variant']
+    },
+    'gcds-details':{
+        name:'gcds-details',
+        attributes: ['details-title']
+    },
+    'gcds-stepper':{
+        name:'gcds-stepper',
+        attributes: ['current-step', 'tag', 'total-steps']
+    }
+}
+
 
