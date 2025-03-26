@@ -123,7 +123,6 @@ describe('Routing Test', () => {
                 expect(screen.queryByText(pageContentJson[key])).toBeInTheDocument();
         });
 
-        screen.debug();
         verifyGcdsHtmlElement('gcds-button', createMap('gcds-button', ['submit']));
         expect(screen.queryByText(buttonJson['submit'])).toBeInTheDocument();
 
@@ -171,7 +170,7 @@ describe('Routing Test', () => {
     }
 
     function checkEmailVerificationPageContents(language, pageContentJson, langLink, buttonJson, alreadyGcJson) {
-        screen.debug();
+
         verifyGcdsHtmlElement('gcds-header',  createMap('gcds-header', [language, langLink, 'colour'] ));
 
         verifyGcdsHtmlElement('gcds-stepper', createMap('gcds-stepper', ['1', 'h1', '5'] ));
