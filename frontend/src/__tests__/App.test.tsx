@@ -1,6 +1,6 @@
 import App from '../App';
 import {cleanup, render, screen} from '@testing-library/react';
-import {describe, expect, test, afterEach, vi, Mock} from "vitest";
+import {describe, expect, test, afterEach, vi} from "vitest";
 import '@testing-library/jest-dom';
 import {AVAILABLE_LANGUAGES, NAVIGATION_LINKS, SERVICES, GCDS_TAG_ATTRIBUTES} from "../utils/constants";
 import {getFooter} from "../utils/functions";
