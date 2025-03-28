@@ -2,7 +2,7 @@ import App from '../App';
 import {cleanup, render, screen} from '@testing-library/react';
 import {describe, expect, test, afterEach, vi} from "vitest";
 import '@testing-library/jest-dom';
-import {AVAILABLE_LANGUAGES, NAVIGATION_LINKS, SERVICES, GCDS_TAG_ATTRIBUTES} from "../utils/constants";
+import {AVAILABLE_LANGUAGES, NAVIGATION_LINKS, SERVICES} from "../utils/constants";
 import {getFooter} from "../utils/functions";
 import {MemoryRouter} from "react-router";
 // @ts-ignore
@@ -187,7 +187,7 @@ describe('Routing Test', () => {
         expect(screen.queryByText(buttonJson['submit'])).toBeInTheDocument();
 
         Object.keys(alreadyGcJson).forEach(key => expect(screen.queryByText(alreadyGcJson[key])).toBeInTheDocument());
-        verifyGcdsHtmlElement(GCDS_TAG_ATTRIBUTES['gcds-footer'].name, createMap(GCDS_TAG_ATTRIBUTES['gcds-footer'].name, [subLinks[language]]));
+        verifyGcdsHtmlElement('gcds-footer', createMap('gcds-footer', [subLinks[language]]));
     }
 
 
@@ -202,6 +202,33 @@ describe('Routing Test', () => {
     }
 
     function createMap(type:string, values:Array<string>) {
+
+        const GCDS_TAG_ATTRIBUTES = {
+            'gcds-input':{
+                attributes: ['input-id', 'label', 'name', 'type', 'validate-on']
+            },
+            'gcds-fieldset':{
+                attributes: ["fieldset-id", "hint", "legend"]
+            },
+            'gcds-radio-group':{
+                attributes:  ["name", "options"]
+            },
+            'gcds-button':{
+                attributes: ["type"]
+            },
+            'gcds-footer':{
+                attributes: ["sub-links"]
+            },
+            'gcds-header':{
+                attributes: ['lang', 'lang-href', 'signature-variant']
+            },
+            'gcds-details':{
+                attributes: ['details-title']
+            },
+            'gcds-stepper':{
+                attributes: ['current-step', 'tag', 'total-steps']
+            }
+        }
 
         try{
             const map = new Map();
