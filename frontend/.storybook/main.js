@@ -20,7 +20,7 @@ const config = {
     "name": "@storybook/react-vite",
     "options": {}
   },
-
+  staticDirs: ['../public'],
   docs: {
     autodocs: true
   },

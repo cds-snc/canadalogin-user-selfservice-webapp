@@ -46,6 +46,8 @@
     "eslint-plugin-storybook": "^0.11.4",
     "globals": "^15.15.0",
     "jsdom": "^26.0.0",
+    "msw": "^2.7.3",
+    "msw-storybook-addon": "^2.0.4",
     "playwright": "^1.50.1",
     "prop-types": "^15.8.1",
     "storybook": "^8.6.8",
@@ -66,6 +68,11 @@
       "last 1 chrome version",
       "last 1 firefox version",
       "last 1 safari version"
+    ]
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
     ]
   }
 }

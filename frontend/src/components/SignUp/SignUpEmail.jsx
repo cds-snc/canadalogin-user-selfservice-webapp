@@ -20,7 +20,7 @@ export default function SignUpEmail({currentLang}) {
         <GcdsContainer className="gcds-content" >
              <GcdsContainer>
                 {
-                    errorJson.emailError!==null&&(<GcdsErrorSummary
+                    errorJson.emailError!==null&&(<GcdsErrorSummary data-testid='errorSummary'
                                 errorLinks={`{"#email": "${errorJson.emailError}"}`}
                                 heading={errorJson.heading}
                        />)
