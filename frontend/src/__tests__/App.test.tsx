@@ -10,9 +10,6 @@ import * as engJson from  '../locales/en/en.json';
 // @ts-ignore
 import * as frJson from '../locales/fr/fr.json';
 
-
-
-
 describe('Routing Test', () => {
 
     const langHref = {attribute:'lang-href', en:'/'+AVAILABLE_LANGUAGES.en, fr:'/'+AVAILABLE_LANGUAGES.fr}
@@ -99,6 +96,22 @@ describe('Routing Test', () => {
             </MemoryRouter>,
         )
         checkEmailVerificationPageContents(AVAILABLE_LANGUAGES.fr, frJson["EmailVerification"], langHref.en + NAVIGATION_LINKS.verifyEmail, frJson['Button'], frJson["AlreadyGc"]);
+    });
+
+    test("Check password creation page route with en language defined", () => {
+
+        vi.mock("../components/Providers/PrivateRoute.jsx", () => {
+            return {
+                default: (props:any) => props.children,
+            };
+        });
+
+        render(
+            <MemoryRouter initialEntries={[langHref.en + NAVIGATION_LINKS.password]}>
+                <App/>
+            </MemoryRouter>,
+        )
+        checkPasswordCreationPageContents(AVAILABLE_LANGUAGES.en, engJson["PasswordCreation"], langHref.fr + NAVIGATION_LINKS.password, engJson['Button'], engJson["AlreadyGc"]);
     });
 
     afterEach(() => {
@@ -188,6 +201,32 @@ describe('Routing Test', () => {
 
         Object.keys(alreadyGcJson).forEach(key => expect(screen.queryByText(alreadyGcJson[key])).toBeInTheDocument());
         verifyGcdsHtmlElement('gcds-footer', createMap('gcds-footer', [subLinks[language]]));
+    }
+
+    function checkPasswordCreationPageContents(language, pageContentJson, langLink, buttonJson, alreadyGcJson) {
+        verifyGcdsHtmlElement('gcds-header', createMap('gcds-header', [language, langLink, 'colour', '#']));
+        verifyGcdsHtmlElement('gcds-stepper', createMap('gcds-stepper2', ['2', 'h1', '5', language, '0', '150']));
+        screen.debug()
+        verifyGcdsHtmlElement('gcds-notice', createMap('gcds-notice', ['Your email was successfully verified', 'h2', 'success']));
+        verifyGcdsHtmlElement('gcds-details', createMap('gcds-details2', ['Password safety tips']));
+        verifyGcdsHtmlElement('small', createMap('small', ['help-block', 'password-text']));
+        verifyGcdsHtmlElement('gcds-checkbox', createMap('gcds-checkbox', ['checkbox-default', 'Show password', 'checkbox']));
+
+        Object.keys(pageContentJson).forEach(key => {
+            if (key ==='9')
+                verifyGcdsHtmlElement('gcds-input', createMap('gcds-input2', ['input-password', pageContentJson[key], 'password', 'password', 'form-control', 'example: pillow moose dish'] ));
+            // else if (key!=='1')
+            if (key === '4'){
+                console.log("key #4: ", pageContentJson[key]);
+                expect(screen.queryByText(pageContentJson[key])).toBeInTheDocument();
+            }
+
+        });
+        verifyGcdsHtmlElement('gcds-button', createMap('gcds-button', ['submit']));
+        expect(screen.queryByText(buttonJson['submit'])).toBeInTheDocument();
+
+        verifyGcdsHtmlElement('gcds-footer', createMap('gcds-footer', [subLinks[language]]));
+
     }
 
 

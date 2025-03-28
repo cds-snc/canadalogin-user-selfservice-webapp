@@ -33,3 +33,72 @@ export const SUBMIT_END_POINTS = {
     requestPasswordPolicy: '/v1/password/policy',
     create: '/v1/users/create'
 }
+
+export const GCDS_TAG_ATTRIBUTES = {
+    'gcds-input':{
+        name:'gcds-input',
+        attributes: ['input-id', 'label', 'name', 'type', 'validate-on']
+    },
+    'gcds-input2':{
+        name:'gcds-input',
+        attributes: ['input-id', 'label', 'name', 'type', 'class', 'hint']
+    },
+    'gcds-fieldset':{
+        name:'gcds-fieldset',
+        attributes: ["fieldset-id", "hint", "legend"]
+    },
+    'gcds-radio-group':{
+        name:'gcds-radio-group',
+        attributes:  ["name", "options"]
+    },
+    'gcds-button':{
+        name:'gcds-button',
+        attributes: ["type"]
+    },
+    'gcds-footer':{
+        name:'gcds-footer',
+        attributes: ["sub-links"]
+    },
+    'gcds-footer2':{
+        name:'gcds-footer',
+        attributes: ["display", "sub-links"]
+    },
+    'gcds-header':{
+        name:'gcds-header',
+        attributes: ['lang', 'lang-href', 'signature-variant']
+    },
+    'gcds-header2':{
+        name:'gcds-header',
+        attributes: ['lang', 'lang-href', 'signature-variant', 'skip-to-href']
+    },
+    'gcds-details':{
+        name:'gcds-details',
+        attributes: ['details-title']
+    },
+    'gcds-details2':{
+        name:'gcds-details',
+        attributes: ['details-title']
+    },
+    'gcds-stepper':{
+        name:'gcds-stepper',
+        attributes: ['current-step', 'tag', 'total-steps']
+    },
+    'gcds-stepper2':{
+        name:'gcds-stepper',
+        attributes: ['current-step', 'tag', 'total-steps', 'lang', 'margin-bottom', 'margin-top']
+    },
+    'gcds-notice':{
+        name:'gcds-notice',
+        attributes: ['notice-title', 'notice-title-tag', 'type']
+    },
+    'small':{
+        name:'small',
+        attributes: ['class', 'id']
+    },
+    'gcds-checkbox':{
+        name:'gcds-checkbox',
+        attributes: ['checkbox-id', 'label', 'name']
+    }
+}
+
+

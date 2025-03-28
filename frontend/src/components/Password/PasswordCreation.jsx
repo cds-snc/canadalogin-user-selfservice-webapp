@@ -99,7 +99,7 @@ export default function PasswordCreation({currentLang}) {
                 />)
             }
             <GcdsContainer centered className="gcds-notice">
-                <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={pageContentJson['1']} data-testid="gcds-notice">
+                <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={pageContentJson['1']}>
                     &nbsp;
                 </GcdsNotice>
             </GcdsContainer>
@@ -111,7 +111,7 @@ export default function PasswordCreation({currentLang}) {
                     <GcdsText> 
                         {pageContentJson['4']}<strong>{pageContentJson['5']}</strong>{pageContentJson['6']}
                     </GcdsText>
-                    <GcdsDetails detailsTitle={pageContentJson['7']} data-testid="gcds-title">
+                    <GcdsDetails detailsTitle={pageContentJson['7']}>
                     <GcdsText>
                         {pageContentJson['8']}
                     </GcdsText>
@@ -123,7 +123,6 @@ export default function PasswordCreation({currentLang}) {
                     label={pageContentJson['9']}
                     name="password"
                     hint={pageContentJson['10']}
-                    lang={currentLang}
                     type={checkedValue? "password" : "text"}
                     className="form-control"
                     onGcdsInput={handlePasswordChange}
@@ -136,7 +135,6 @@ export default function PasswordCreation({currentLang}) {
                             checkboxId="checkbox-default"
                             label={pageContentJson['11']}
                             name="checkbox"
-                            data-testid="gcds-checkbox"
                             onGcdsChange={validateCheckbox}
                             >
                                 <GcdsText>
@@ -152,10 +150,10 @@ export default function PasswordCreation({currentLang}) {
             </GcdsContainer>
             
             <GcdsHeading tag="h2">
-                {pageContentJson['17']}
+                {pageContentJson['14']}
             <GcdsText marginTop="200" marginBottom="0">
             <GcdsLink href={`/${currentLang}`}>
-                {pageContentJson['18']}
+                {pageContentJson['15']}
             </GcdsLink>
             </GcdsText>
         </GcdsHeading>
