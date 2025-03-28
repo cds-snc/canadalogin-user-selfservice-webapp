@@ -99,6 +99,27 @@
     "8": "Single-use verification codes",
     "9": "Save or print out a list of single-use verification codes."
   },
+  "VerificationSetUp":{
+    "1": "Protect your account with 2-step verification",
+    "2": "Two-step verification adds a second layer of security to your password.",
+    "3": "Learn more about two-step verification (opens in a new tab)",
+    "4": "Enter your phone number",
+    "5": "Enter the phone number you want to receive security codes at each time you sign in. We may also use this phone number to contact you about activity on your account.",
+    "6": "Read our",
+    "7": "privacy notice",
+    "8": "for more information on how we use your personal information.",
+    "9": "Country",
+    "10": "Phone number",
+    "11": "My country is not listed here",
+    "12": "Some countries are not supported due to technical limitations. If your country is not listed,",
+    "13": "select a different 2-step verification method.",
+    "14": "How should we send you the code?",
+    "15": "You can change this the next time you sign in.",
+    "16": "Text message (SMS)",
+    "17": "Mobile only. Carrier charges may apply.",
+    "18": "Voice call",
+    "19": "Mobile or landline. Carrier charges may apply."
+  },
   "Button":{
     "submit": "Continue"
   }
