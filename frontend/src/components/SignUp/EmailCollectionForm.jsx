@@ -71,17 +71,18 @@ export default function EmailCollectionForm({currentLang, errorJson, setError}) 
     }
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form id="emailForm" onSubmit={handleSubmit}>
             <GcdsContainer marginTop="100" marginBottom="0" >
                 <GcdsInput
                     inputId="email"
                     label={pageFormJson['1']}
                     name="email"
                     type="email"
-                    value={email}
+                    value={state.testData!=null?state.testData.email:email}
                     validateOn="other"
                     onGcdsChange={validateEmail}
                     errorMessage={errorJson.emailError}
+                    data-testid="email"
                     required ></GcdsInput>
                 <GcdsFieldset
                     fieldset-id="gcds-email-fieldset"

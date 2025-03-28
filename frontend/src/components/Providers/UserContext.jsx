@@ -33,8 +33,9 @@ function userReducer(state=initialState, action) {
 
 const UserContext = createContext();
 
-export function UserProvider ({ children }) {
-    const [state, dispatch] = useReducer(userReducer, initialState);
+export function UserProvider ({ children, initial=initialState}) {
+
+    const [state, dispatch] = useReducer(userReducer, initial);
 
     return(
         <UserContext.Provider value={{state, dispatch}} >
