@@ -1,8 +1,15 @@
 /** @type { import('@storybook/react').Preview } */
 import '../src/index.css';
+import { initialize, mswLoader } from 'msw-storybook-addon';
+
+initialize();
 
 const preview = {
-  parameters: {
+    loaders: [mswLoader],
+    parameters: {
+        reactRouter: {
+            routePath: '/myroute',
+        },
     controls: {
       matchers: {
        color: /(background|color)$/i,

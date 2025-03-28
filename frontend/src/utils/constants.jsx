@@ -33,5 +33,3 @@ export const SUBMIT_END_POINTS = {
     requestPasswordPolicy: '/v1/password/policy',
     create: '/v1/users/create'
 }
-
-
