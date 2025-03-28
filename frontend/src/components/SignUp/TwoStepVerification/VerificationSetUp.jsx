@@ -1,6 +1,6 @@
 import {
-    GcdsContainer, GcdsDetails, GcdsFieldset, GcdsHeading, GcdsInput,
-    GcdsLink, GcdsRadioGroup, GcdsSelect,
+    GcdsContainer, GcdsDetails, GcdsFieldset, GcdsHeading,
+    GcdsLink, GcdsRadioGroup,
     GcdsStepper,
     GcdsText
 } from "@cdssnc/gcds-components-react";
@@ -12,9 +12,7 @@ import { useState } from 'react';
 import {
     PhoneInput,
     defaultCountries,
-    FlagImage,
     parseCountry,
-    usePhoneInput
 } from 'react-international-phone';
 import 'react-international-phone/style.css';
 
