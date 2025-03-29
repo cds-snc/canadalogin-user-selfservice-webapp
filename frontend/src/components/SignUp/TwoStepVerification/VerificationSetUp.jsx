@@ -1,5 +1,5 @@
 import {
-    GcdsContainer, GcdsDetails, GcdsFieldset, GcdsHeading,
+    GcdsContainer, GcdsDetails, GcdsFieldset,
     GcdsLink, GcdsRadioGroup,
     GcdsStepper,
     GcdsText
@@ -11,13 +11,14 @@ import SubmitButton from "../../Layout/SubmitButton.jsx";
 import { useState } from 'react';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/material.css';
-import fr from 'react-phone-input-2/lang/es.json';
-import VerificationSetUpInfoEng from "./VerificationSetUpInfo.jsx";
 import VerificationSetUpInfo from "./VerificationSetUpInfo.jsx";
+import {useUser} from "../../Providers/UserContext.jsx";
 
 export default function RegisterVerification({currentLang}) {
-    const pageContentJson = getPageContent(currentLang, "VerificationSetUp");
+    const {state, dispatch} = useUser();
     const [phone, setPhone] = useState('');
+    const pageContentJson = getPageContent(currentLang, "VerificationSetUp");
+
     return (
         <GcdsContainer className="gcds-content" >
             <GcdsContainer>
