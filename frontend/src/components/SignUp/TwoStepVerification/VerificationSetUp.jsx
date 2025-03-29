@@ -6,68 +6,51 @@ import {
 } from "@cdssnc/gcds-components-react";
 import {getPageContent} from '../../../utils/functions';
 import AlreadyGc from "../../Layout/AlreadyGc.jsx";
-import {NAVIGATION_LINKS} from "../../../utils/constants.jsx";
+import {countryMapping, NAVIGATION_LINKS} from "../../../utils/constants.jsx";
 import SubmitButton from "../../Layout/SubmitButton.jsx";
 import { useState } from 'react';
-import {
-    PhoneInput,
-    defaultCountries,
-    parseCountry,
-} from 'react-international-phone';
-import 'react-international-phone/style.css';
-
-
-
-const countries = defaultCountries.filter((country) => {
-    const { iso2 } = parseCountry(country);
-    return ['ca', 'us', 'gb' ].includes(iso2);
-});
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/material.css';
+import fr from 'react-phone-input-2/lang/es.json';
+import VerificationSetUpInfoEng from "./VerificationSetUpInfo.jsx";
+import VerificationSetUpInfo from "./VerificationSetUpInfo.jsx";
 
 export default function RegisterVerification({currentLang}) {
     const pageContentJson = getPageContent(currentLang, "VerificationSetUp");
     const [phone, setPhone] = useState('');
-    const [country, setCountry] = useState('');
     return (
         <GcdsContainer className="gcds-content" >
             <GcdsContainer>
                 <GcdsContainer className="gcds-gap" >
                     <GcdsStepper currentStep="3" totalSteps="5"
-                                 tag="h1"  >
+                                 tag="h1"
+                                 lang={currentLang}>
                         {pageContentJson['1']}
                     </GcdsStepper>
                 </GcdsContainer>
                 <GcdsContainer>
-                    <GcdsText>
-                        {pageContentJson['2']}
-                    </GcdsText>
-                    <GcdsText>
-                        <GcdsLink href={`/${currentLang}${NAVIGATION_LINKS.signUp}`} >
-                            {pageContentJson['3']}
-                        </GcdsLink>
-                    </GcdsText>
-                    <GcdsHeading tag="h2">
-                        {pageContentJson['4']}
-                    </GcdsHeading>
-                    <GcdsText>
-                        {pageContentJson['5']}
-                    </GcdsText>
-                    <GcdsText>
-                        {pageContentJson['6']}&nbsp;
-                        <GcdsLink href={`/${currentLang}${NAVIGATION_LINKS.signUp}`} >
-                            {pageContentJson['7']}
-                        </GcdsLink>
-                        &nbsp;{pageContentJson['8']}
-                    </GcdsText>
-                    {// Need to customize the phone dropdown and input.
-                         }
+                    <VerificationSetUpInfo currentLang={currentLang} pageContentJson={pageContentJson} />
+                    <GcdsContainer padding="200">
                     <PhoneInput
-                        label="test"
-                        defaultCountry="ca"
+                        inputProps={{
+                            name: 'phone',
+                            required: true,
+                            autoFocus: true,
+                        }}
+                        specialLabel={pageContentJson['10']}
+                        country={'ca'}
+                        onlyCountries={countryMapping.countries}
+                        localization={currentLang==='fr'?countryMapping.frLocalization:countryMapping.localization}
                         value={phone}
-                        onChange={(phone) => setPhone(phone)}
-                        countries={countries}
-                        forceDialCode={true}
+                        className={'high-res'}
+                        enableSearch={true}
+                        countryCodeEditable={false}
+                        disableSearchIcon={false}
+                        defaultErrorMessage={"Phone number is required"}
+                        onChange={phone =>  setPhone(phone)}
                     />
+                        <br />
+                    </GcdsContainer>
                     <GcdsText>
                         <GcdsDetails detailsTitle={pageContentJson['11']}>
                             <GcdsText>

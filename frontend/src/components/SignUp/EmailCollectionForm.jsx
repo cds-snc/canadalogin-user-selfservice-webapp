@@ -21,14 +21,17 @@ export default function EmailCollectionForm({currentLang, errorJson, setError}) 
     const errorPageJson = getPageContent(currentLang, "Error");
     const pageFormJson = getPageContent(currentLang, "EmailCollectionForm");
 
-    const validateEmail = (e) => {
+    function validateEmail(email) {
+        setEmail(email);
 
-        setEmail(e.target.value);
-
-        if(e.target?.value && isEmailValid(e.target.value))
-            setError({emailError:null, heading:null});
-        else
-            setError({emailError:errorPageJson[2], heading:errorPageJson['1']});
+        if(isEmailValid(email)) {
+            setError({emailError: null, heading: null});
+            return true;
+        }
+        else {
+            setError({emailError: errorPageJson[2], heading: errorPageJson['1']});
+            return false;
+        }
     }
 
     function handleSubmit(e) {
@@ -36,14 +39,9 @@ export default function EmailCollectionForm({currentLang, errorJson, setError}) 
             e.preventDefault();
             const formData = new FormData(e.target);
             const formEmail = formData.get('email');
-            await setEmail(formEmail);
 
-            if(!isEmailValid(formEmail)){
-                setError({emailError: errorPageJson[2], heading: errorPageJson['1']});
+            if(!validateEmail(formEmail))
                 return;
-            }
-
-            setError({emailError:null, heading:null});
 
             try {
                 const response = await authService.sendOtpCode({
@@ -80,7 +78,7 @@ export default function EmailCollectionForm({currentLang, errorJson, setError}) 
                     type="email"
                     value={state.testData!=null?state.testData.email:email}
                     validateOn="other"
-                    onGcdsChange={validateEmail}
+                    onGcdsChange={(e) => {validateEmail(e.target.value)}}
                     errorMessage={errorJson.emailError}
                     data-testid="email"
                     required ></GcdsInput>

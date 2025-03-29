@@ -19,7 +19,7 @@ function App() {
                   <Route path="/:language/signup/verifyemail/" element={<PrivateRoute route="signUpVerifyEmail"><EmailVerification /></PrivateRoute>}/>
                   <Route path="/:language/signup/password" element={ <PrivateRoute route="signUpPassword"><PasswordPage /></PrivateRoute>} />
                   <Route path="/:language/signup/registerverification" element={<PrivateRoute route="signUpVerification"><RegisterVerificationPage/></PrivateRoute>}/>
-                  <Route path="/:language/signup/verificationsetup" element={<VerificationSetUpPage/>}/>
+                  <Route path="/:language/signup/verificationsetup" element={<PrivateRoute route="signUpVerification"><VerificationSetUpPage/></PrivateRoute>}/>
                   <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
           </UserProvider>

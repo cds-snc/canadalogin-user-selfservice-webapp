@@ -120,7 +120,8 @@ export default function EmailVerification({currentLang}) {
                 }
                 <GcdsContainer className="gcds-gap" >
                     <GcdsStepper currentStep="1" totalSteps="5"
-                                 tag="h1"  >
+                                 tag="h1"
+                                 lang={currentLang} >
                         {pageContentJson['1']}
                     </GcdsStepper>
                 </GcdsContainer>
