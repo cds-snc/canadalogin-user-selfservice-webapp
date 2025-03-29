@@ -11,6 +11,7 @@ import {NAVIGATION_LINKS} from "../../../utils/constants.jsx";
 import SubmitButton from "../../Layout/SubmitButton.jsx";
 
 export default function RegisterVerification({currentLang}) {
+    const {state, dispatch} = useUser();
     const pageContentJson = getPageContent(currentLang, "RegisterVerification");
 
     return (
