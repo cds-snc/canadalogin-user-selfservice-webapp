@@ -82,7 +82,6 @@ export default function RegisterVerification({currentLang}) {
                     <SubmitButton currentLang={currentLang}  />
                 </GcdsContainer>
             </GcdsContainer>
-            <AlreadyGc currentLang={currentLang}/>
         </GcdsContainer>
     )
 }
