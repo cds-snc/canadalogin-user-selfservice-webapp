@@ -5,7 +5,6 @@ import {
     GcdsText
 } from "@cdssnc/gcds-components-react";
 import {getPageContent} from '../../../utils/functions';
-import AlreadyGc from "../../Layout/AlreadyGc.jsx";
 import {countryMapping, NAVIGATION_LINKS} from "../../../utils/constants.jsx";
 import SubmitButton from "../../Layout/SubmitButton.jsx";
 import { useState } from 'react';
