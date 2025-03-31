@@ -33,7 +33,8 @@ export const SUBMIT_END_POINTS = {
     requestNewCode: '/v1/otp/email/send',
     requestPasswordPolicy: '/v1/password/policy',
     create: '/v1/users/create',
-    sendTwoStepVerification: '/v1/otp/sms/send'
+    sendTwoStepVerification: '/v1/otp/transient_sms/send',
+    sendVerificationCode: '/v1/otp/transient_sms/verify'
 }
 
 export const countryMapping = {
