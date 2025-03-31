@@ -1,19 +1,14 @@
 import {
-    GcdsContainer, GcdsDetails, GcdsFieldset, GcdsHeader, GcdsHeading, GcdsInput,
-    GcdsLink, GcdsRadioGroup,
+    GcdsContainer, GcdsHeading, GcdsInput,
+    GcdsLink,
     GcdsStepper,
     GcdsText
 } from "@cdssnc/gcds-components-react";
 import {getPageContent} from '../../../utils/functions';
 import AlreadyGc from "../../Layout/AlreadyGc.jsx";
-import {countryMapping, NAVIGATION_LINKS} from "../../../utils/constants.jsx";
-import SubmitButton from "../../Layout/SubmitButton.jsx";
-import { useState } from 'react';
-import PhoneInput from 'react-phone-input-2';
-import 'react-phone-input-2/lib/material.css';
-import VerificationSetUpInfo from "./VerificationSetUpInfo.jsx";
-import {useUser} from "../../Providers/UserContext.jsx";
+import {NAVIGATION_LINKS} from "../../../utils/constants.jsx";
 import {useParams} from "react-router";
+import SubmitButton from "../../Layout/SubmitButton.jsx";
 
 export default function Verification({currentLang}) {
     const {type} = useParams();
@@ -41,12 +36,15 @@ export default function Verification({currentLang}) {
                 <GcdsHeading tag='h2'>
                     {pageContentJson['7']}
                 </GcdsHeading>
-                <GcdsInput
-                    inputId="verificationCode"
-                    label={pageContentJson['8']}
-                    name="verificationCode"
-                    type="text"
-                    required ></GcdsInput>
+                <form>
+                    <GcdsInput
+                        inputId="verificationCode"
+                        label={pageContentJson['8']}
+                        name="verificationCode"
+                        type="text"
+                        required ></GcdsInput>
+                    <SubmitButton currentLang={currentLang} />
+                </form>
             </GcdsContainer>
             <GcdsHeading tag='h2'>
                 {pageContentJson['9']}
