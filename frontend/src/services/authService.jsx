@@ -18,5 +18,9 @@ export const authService = {
     create:async (userData) => {
         const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.create}`, userData);
         return response.data;
+    },
+    sendTwoStepVerificationCode: async (userData) => {
+        const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.sendTwoStepVerification}`, userData);
+        return response.data;
     }
 }

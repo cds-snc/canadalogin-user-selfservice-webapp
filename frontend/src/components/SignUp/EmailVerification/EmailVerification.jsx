@@ -120,7 +120,8 @@ export default function EmailVerification({currentLang}) {
                 }
                 <GcdsContainer className="gcds-gap" >
                     <GcdsStepper currentStep="1" totalSteps="5"
-                                 tag="h1"  >
+                                 tag="h1"
+                                 lang={currentLang} >
                         {pageContentJson['1']}
                     </GcdsStepper>
                 </GcdsContainer>
@@ -142,6 +143,7 @@ export default function EmailVerification({currentLang}) {
                             type="text"
                             validateOn="other"
                             errorMessage={errorJson.codeError}
+                            lang={currentLang}
                             required ></GcdsInput>
                        <SubmitButton currentLang={currentLang} disabled={isPending}/>
                     </form>

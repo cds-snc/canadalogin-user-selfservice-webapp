@@ -11,6 +11,7 @@ import {NAVIGATION_LINKS} from "../../../utils/constants.jsx";
 import SubmitButton from "../../Layout/SubmitButton.jsx";
 
 export default function RegisterVerification({currentLang}) {
+    const {state, dispatch} = useUser();
     const pageContentJson = getPageContent(currentLang, "RegisterVerification");
 
     return (
@@ -18,7 +19,8 @@ export default function RegisterVerification({currentLang}) {
             <GcdsContainer>
                 <GcdsContainer className="gcds-gap" >
                     <GcdsStepper currentStep="3" totalSteps="5"
-                                 tag="h1"  >
+                                 tag="h1"
+                                 lang={currentLang}>
                         {pageContentJson['1']}
                     </GcdsStepper>
                 </GcdsContainer>
@@ -35,6 +37,7 @@ export default function RegisterVerification({currentLang}) {
                         fieldset-id="gcds-verification-fieldset"
                         legend={pageContentJson['4']}
                         hint={pageContentJson['5']}
+                        lang={currentLang}
                         required>
                         <br />
                         <GcdsRadioGroup

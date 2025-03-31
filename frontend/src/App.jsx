@@ -6,7 +6,8 @@ import EmailVerification from "./views/SignUp/EmailVerificationPage";
 import {UserProvider} from "./components/Providers/UserContext";
 import PrivateRoute from "./components/Providers/PrivateRoute.jsx";
 import RegisterVerificationPage from "./views/SignUp/RegisterVerificationPage.jsx";
-// import VerificationSetUpPage from "./views/SignUp/VerificationSetUpPage.jsx";
+import VerificationSetUpPage from "./views/SignUp/VerificationSetUpPage.jsx";
+import VerificationPage from "./views/SignUp/VerificationPage.jsx";
 
 
 function App() {
@@ -19,7 +20,8 @@ function App() {
                   <Route path="/:language/signup/verifyemail/" element={<PrivateRoute route="signUpVerifyEmail"><EmailVerification /></PrivateRoute>}/>
                   <Route path="/:language/signup/password" element={ <PrivateRoute route="signUpPassword"><PasswordPage /></PrivateRoute>} />
                   <Route path="/:language/signup/registerverification" element={<PrivateRoute route="signUpVerification"><RegisterVerificationPage/></PrivateRoute>}/>
-                  {/*<Route path="/:language/signup/verificationsetup" element={<VerificationSetUpPage/>}/>*/}
+                  <Route path="/:language/signup/verificationsetup" element={<PrivateRoute route="signUpVerification"><VerificationSetUpPage/></PrivateRoute>}/>
+                  <Route path="/:language/signup/verification/:type" element={<VerificationPage/>}/>
                   <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
           </UserProvider>

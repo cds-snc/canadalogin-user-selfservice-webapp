@@ -230,9 +230,10 @@ describe('Routing Test', () => {
     {
         console.log("tag: ", tag);
         const element = document.querySelector(tag) as HTMLElement;
+        expect(element).toBeTruthy();
         expect(element).toBeInTheDocument();
         attributes.forEach((value, attribute) => {
-            expect(element&&value).toBeTruthy();
+            expect(attribute&&value).toBeTruthy();
             expect(element).toHaveAttribute(attribute, value);
         });
     }
