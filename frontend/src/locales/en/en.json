@@ -75,7 +75,7 @@
     "7": "Server Error. Please try again later.",
     "8": "Invalid phone number. Phone numbers for the country you selected should be ",
     "9": " digits. Make sure you selected the right country, or try typing your phone number again. Extensions are not allowed.",
-    "10": ""
+    "10": "Enter a phone number to continue."
   },
   "EmailVerification":{
     "1": "Check your email",
@@ -102,7 +102,7 @@
     "8": "Single-use verification codes",
     "9": "Save or print out a list of single-use verification codes."
   },
-  "VerificationSetUp": {
+  "VerificationSetUp":{
     "1": "Protect your account with 2-step verification",
     "2": "Two-step verification adds a second layer of security to your password.",
     "3": "Learn more about two-step verification (opens in a new tab)",
@@ -122,23 +122,6 @@
     "17": "Mobile only. Carrier charges may apply.",
     "18": "Voice call",
     "19": "Mobile or landline. Carrier charges may apply."
-  },
-  "Verification":{
-    "1": "Check your phone",
-    "2": "We have sent a text message with a 6-digit verification code to:",
-    "3": "Your text (SMS) might take a few minutes to arrive.",
-    "4": "Your call might take a few minutes to arrive.",
-    "5": "Your code will expire in",
-    "6": "10 minutes.",
-    "7": "Enter the code",
-    "8": "6-digit code",
-    "9": "Problems with the code?",
-    "10": "Call me instead",
-    "11": "Send me a text (SMS) instead",
-    "12": "Use a different phone number",
-    "13": "Request a new code in",
-    "14": "seconds",
-    "15": "Request a new code"
   },
   "Button":{
     "submit": "Continue"

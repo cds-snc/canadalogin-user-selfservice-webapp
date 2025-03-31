@@ -63,7 +63,7 @@
     "7": "Server Error. Please try again later.",
     "8": "Numéro de téléphone invalide. Les numéros de téléphone pour le pays que vous avez sélectionné doivent être composés de ",
     "9": " chiffres. Assurez-vous d’avoir sélectionné le bon pays ou essayez d’entrer à nouveau votre numéro de téléphone. Les extensions ne sont pas permises.",
-    "10": ""
+    "10": "Veuillez entrer un numéro de téléphone pour continuer."
   },
   "EmailVerification":{
     "1": "Vérifiez votre boîte de réception courrie",
