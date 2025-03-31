@@ -32,9 +32,6 @@ export default function VerificationSetUp({currentLang}) {
             const formNumber = await formData.get('phone').replace(/\D/g,'');
             const formType = formData.get('verificationType');
 
-
-
-
             if (phone.length < countryCodeLength) {
                 if(phone.length===0)
                     setError({phoneError: errorPageJson[10], heading: errorPageJson['1']});
@@ -54,7 +51,7 @@ export default function VerificationSetUp({currentLang}) {
                     const userData = {...state.userData, smsSent: true};
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                     console.log("success....", response);
-                   // navigate("/" + currentLang + NAVIGATION_LINKS.password);
+                    navigate("/" + currentLang + NAVIGATION_LINKS.verification+'/'+formType);
                 }else {
                     console.log("Error....", response);
                     setError({phoneError: errorPageJson[7], heading: errorPageJson['1']});

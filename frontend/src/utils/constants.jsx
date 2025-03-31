@@ -3,7 +3,8 @@ export const NAVIGATION_LINKS = {
     signUp: '/signup',
     verifyEmail: '/signup/verifyemail',
     password: '/signup/password',
-    twoStepVerification: '/signup/verificationsetup'
+    twoStepVerification: '/signup/verificationsetup',
+    verification: '/signup/verification'
 };
 export const CONTEXT_ACTIONS = {
     signUp: 'SIGN_UP',
