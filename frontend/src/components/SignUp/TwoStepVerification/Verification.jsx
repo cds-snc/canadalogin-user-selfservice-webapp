@@ -42,6 +42,7 @@ export default function Verification({currentLang}) {
                         label={pageContentJson['8']}
                         name="verificationCode"
                         type="text"
+                        lang={currentLang}
                         required ></GcdsInput>
                     <SubmitButton currentLang={currentLang} />
                 </form>

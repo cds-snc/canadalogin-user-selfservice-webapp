@@ -81,11 +81,13 @@ export default function EmailCollectionForm({currentLang, errorJson, setError}) 
                     onGcdsChange={(e) => {validateEmail(e.target.value)}}
                     errorMessage={errorJson.emailError}
                     data-testid="email"
+                    lang={currentLang}
                     required ></GcdsInput>
                 <GcdsFieldset
                     fieldset-id="gcds-email-fieldset"
                     legend={pageFormJson['2']}
                     hint={pageFormJson['4']}
+                    lang={currentLang}
                     required>
                     <br />
                     <GcdsRadioGroup
