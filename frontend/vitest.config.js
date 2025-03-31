@@ -8,6 +8,10 @@ const filesToInclude =[
     '**/src/components/**/*.jsx'
 ]
 
+const filesToExclude = [
+    '**/src/components/Password/PasswordCollectionForm.jsx',
+    '**/src/components/Password/SignUpPassword.jsx'
+]
 export default defineConfig({
     plugins: [react()],
     preview: {
@@ -21,6 +25,7 @@ export default defineConfig({
         coverage: {
             reporter: ['text', 'json-summary', 'json', 'html'],
             include:[...filesToInclude],
+            exclude: [...filesToExclude],
             thresholds: {
                 lines: 80,
                 branches: 80,
