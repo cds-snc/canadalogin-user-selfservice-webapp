@@ -79,7 +79,7 @@
     "11": "Demander un nouveau code",
     "12": "Nous vous avons envoyé un nouveau code"
   },
-  "RegisterVerification":{
+  "RegisterVerification": {
     "1": "Protégez votre compte grâce à la vérification en 2 étapes",
     "2": "La vérification en 2 étapes ajoute une seconde mesure de sécurité à votre mot de passe.",
     "3": "Apprenez-en plus sur la vérification en 2 étapes (s’ouvre dans un nouvel onglet)",
@@ -91,22 +91,22 @@
     "9": "Enregistrez ou imprimez une liste de codes de vérification à usage unique."
   },
   "VerificationSetUp":{
-  "1": "Entrez votre numéro de téléphone",
-  "2": "Entrez le numéro de téléphone auquel vous souhaitez recevoir vos codes de sécurité à chaque connexion. Il est possible que nous utilisions également ce numéro de téléphone pour vous contacter au sujet des activités relatives à votre compte.",
-  "3": "Lisez notre",
-  "4": "avis de confidentialité",
-  "5": "pour en savoir plus sur la manière dont nous utilisons vos renseignements personnels.",
-  "10": "Numéro de téléphone",
-  "11": "Mon pays n’apparaît pas dans la liste",
-  "12": "Certains pays ne sont pas pris en charge en raison de limitations techniques. Si votre pays n’apparaît pas dans la liste,",
-  "13": " sélectionnez une autre méthode de vérification à deux étapes",
-  "14": "Comment souhaitez-vous recevoir le code?",
-  "15": "Vous pourrez modifier ce choix lors de votre prochaine connexion.",
-  "16": "Message texte (SMS)",
-  "17": "Numéro de téléphone cellulaire seulement. Des frais d’opérateur peuvent s’appliquer.",
-  "18": "Appel vocal",
-  "19": "Numéro de téléphone cellulaire ou fixe. Des frais d’opérateur peuvent s’appliquer."
-},
+    "1": "Entrez votre numéro de téléphone",
+    "2": "Entrez le numéro de téléphone auquel vous souhaitez recevoir vos codes de sécurité à chaque connexion. Il est possible que nous utilisions également ce numéro de téléphone pour vous contacter au sujet des activités relatives à votre compte.",
+    "3": "Lisez notre",
+    "4": "avis de confidentialité",
+    "5": "pour en savoir plus sur la manière dont nous utilisons vos renseignements personnels.",
+    "10": "Numéro de téléphone",
+    "11": "Mon pays n’apparaît pas dans la liste",
+    "12": "Certains pays ne sont pas pris en charge en raison de limitations techniques. Si votre pays n’apparaît pas dans la liste,",
+    "13": " sélectionnez une autre méthode de vérification à deux étapes",
+    "14": "Comment souhaitez-vous recevoir le code?",
+    "15": "Vous pourrez modifier ce choix lors de votre prochaine connexion.",
+    "16": "Message texte (SMS)",
+    "17": "Numéro de téléphone cellulaire seulement. Des frais d’opérateur peuvent s’appliquer.",
+    "18": "Appel vocal",
+    "19": "Numéro de téléphone cellulaire ou fixe. Des frais d’opérateur peuvent s’appliquer."
+  },
   "Verification":{
     "1": "Vérifiez votre téléphone",
     "2": "Nous avons envoyé un code de vérification à 6 chiffres au numéro suivant par le biais d’un message texte :",
