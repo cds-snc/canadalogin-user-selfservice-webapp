@@ -4,7 +4,7 @@ from httpx import AsyncClient
 
 from app.config import get_settings
 from app.utils.helpers import generate_error_response
-from app.otp.schemas import EmailOtpVerification
+from app.otp.schemas import OtpVerification
 from app.utils.access_token import get_access_token, get_auth_request_headers
 from app.utils.schemas import ResponseModel
 
@@ -12,7 +12,7 @@ from app.utils.schemas import ResponseModel
 logger = logging.getLogger(__name__)
 
 
-async def ibm_verify_email_opt(data: EmailOtpVerification):
+async def ibm_verify_email_opt(data: OtpVerification):
     try:
 
         trxnId = data.trxnId
@@ -27,7 +27,7 @@ async def ibm_verify_email_opt(data: EmailOtpVerification):
 
         async with AsyncClient() as client:
             response = await client.post(transient_email_verification_url, json=pass_code, headers=headers)
-            logger.info("Request returned")
+            logger.info("HTTP Request: returned successfully")
             return response
 
     except Exception as error:
@@ -36,7 +36,7 @@ async def ibm_verify_email_opt(data: EmailOtpVerification):
         return error
 
 
-async def verify_email_otp(data: EmailOtpVerification):
+async def verify_email_otp(data: OtpVerification):
 
     try:
 
