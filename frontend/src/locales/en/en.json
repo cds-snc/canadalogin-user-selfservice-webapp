@@ -72,7 +72,10 @@
     "4": "Password must be 12 characters",
     "5": "Invalid password. Password must be at least 12 characters and maximum 65 characters.",
     "6": "Code sent does not match. Try again.",
-    "7": "Server Error. Please try again later."
+    "7": "Server Error. Please try again later.",
+    "8": "Invalid phone number. Phone numbers for the country you selected should be ",
+    "9": " digits. Make sure you selected the right country, or try typing your phone number again. Extensions are not allowed.",
+    "10": "Enter a phone number to continue."
   },
   "EmailVerification":{
     "1": "Check your email",
