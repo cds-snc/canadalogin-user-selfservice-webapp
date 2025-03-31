@@ -79,7 +79,7 @@
     "11": "Demander un nouveau code",
     "12": "Nous vous avons envoyé un nouveau code"
   },
-  "RegisterVerification": {
+  "RegisterVerification":{
     "1": "Protégez votre compte grâce à la vérification en 2 étapes",
     "2": "La vérification en 2 étapes ajoute une seconde mesure de sécurité à votre mot de passe.",
     "3": "Apprenez-en plus sur la vérification en 2 étapes (s’ouvre dans un nouvel onglet)",
@@ -90,7 +90,7 @@
     "8": "Codes de vérification à usage unique",
     "9": "Enregistrez ou imprimez une liste de codes de vérification à usage unique."
   },
-  "VerificationSetUp":{
+  "VerificationSetUp": {
     "1": "Entrez votre numéro de téléphone",
     "2": "Entrez le numéro de téléphone auquel vous souhaitez recevoir vos codes de sécurité à chaque connexion. Il est possible que nous utilisions également ce numéro de téléphone pour vous contacter au sujet des activités relatives à votre compte.",
     "3": "Lisez notre",

@@ -44,11 +44,10 @@ export default function VerificationSetUp({currentLang}) {
             try {
                 const response = await authService.sendTwoStepVerificationCode({
                     phoneNumber: formNumber,
-                    verificationType: formType,
-                    trxnId: 'f8e0a6bf-e74d-4df5-afeb-77ee601d45d0'//state.userData.trxnId
+                    verificationType: formType
                 });
                 if(response.success){
-                    const userData = {...state.userData, smsSent: true};
+                    const userData = {...state.userData, phone:formData.get('phone'), stepVerificationSent: true, trxnId:response.data.trxnId};
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                     console.log("success....", response);
                     navigate("/" + currentLang + NAVIGATION_LINKS.verification+'/'+formType);
