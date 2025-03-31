@@ -108,7 +108,7 @@ export default function PasswordCreation({currentLang}) {
                         {pageContentJson['3']}
                     </GcdsStepper>
                 </GcdsText>
-            <GcdsText testId="password-text">
+            <GcdsText>
                 {pageContentJson['4']}<strong>{pageContentJson['5']}</strong>{pageContentJson['6']}
             </GcdsText>
                     <GcdsDetails detailsTitle={pageContentJson['7']}>

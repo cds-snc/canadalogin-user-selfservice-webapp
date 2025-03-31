@@ -111,7 +111,6 @@ describe('Routing Test', () => {
                 <App/>
             </MemoryRouter>,
         )
-        screen.debug()
         checkPasswordCreationPageContents(AVAILABLE_LANGUAGES.en, engJson["PasswordCreation"], langHref.fr + NAVIGATION_LINKS.password, engJson['Button'], engJson["AlreadyGc"]);
     });
 
