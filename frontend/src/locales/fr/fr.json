@@ -61,8 +61,8 @@
     "5": "Invalid password. Password must be at least 12 characters and maximum 65 characters.",
     "6": "Code invalide. Veuillez réessayer.",
     "7": "Server Error. Please try again later.",
-    "8": "Invalid phone number. Phone numbers for the country you selected should be ",
-    "9": " digits. Make sure you selected the right country, or try typing your phone number again. Extensions are not allowed.",
+    "8": "Numéro de téléphone invalide. Les numéros de téléphone pour le pays que vous avez sélectionné doivent être composés de ",
+    "9": " chiffres. Assurez-vous d’avoir sélectionné le bon pays ou essayez d’entrer à nouveau votre numéro de téléphone. Les extensions ne sont pas permises.",
     "10": "Veuillez entrer un numéro de téléphone pour continuer."
   },
   "EmailVerification":{
@@ -79,7 +79,7 @@
     "11": "Demander un nouveau code",
     "12": "Nous vous avons envoyé un nouveau code"
   },
-  "RegisterVerification":{
+  "RegisterVerification": {
     "1": "Protégez votre compte grâce à la vérification en 2 étapes",
     "2": "La vérification en 2 étapes ajoute une seconde mesure de sécurité à votre mot de passe.",
     "3": "Apprenez-en plus sur la vérification en 2 étapes (s’ouvre dans un nouvel onglet)",
@@ -106,6 +106,23 @@
     "17": "Numéro de téléphone cellulaire seulement. Des frais d’opérateur peuvent s’appliquer.",
     "18": "Appel vocal",
     "19": "Numéro de téléphone cellulaire ou fixe. Des frais d’opérateur peuvent s’appliquer."
+  },
+  "Verification":{
+    "1": "Vérifiez votre téléphone",
+    "2": "Nous avons envoyé un code de vérification à 6 chiffres au numéro suivant par le biais d’un message texte :",
+    "3": "Votre message texte (SMS) pourrait mettre quelques minutes à vous parvenir.",
+    "4": "L’appel pourrait mettre quelques minutes à vous parvenir.",
+    "5": "Votre code expirera dans",
+    "6": "10 minutes.",
+    "7": "Entrez le code",
+    "8": "Code à 6 chiffres",
+    "9": "Des problèmes avec votre code?",
+    "10": "Recevoir le code par appel vocal",
+    "11": "Send me a text (SMS) instead",
+    "12": "Utiliser un autre numéro de téléphone",
+    "13": "Vous pourrez demander un nouveau code dans",
+    "14": "secondes",
+    "15": "Demander un nouveau code"
   },
   "Button":{
       "submit": "Continuer"

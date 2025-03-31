@@ -143,6 +143,7 @@ export default function EmailVerification({currentLang}) {
                             type="text"
                             validateOn="other"
                             errorMessage={errorJson.codeError}
+                            lang={currentLang}
                             required ></GcdsInput>
                        <SubmitButton currentLang={currentLang} disabled={isPending}/>
                     </form>

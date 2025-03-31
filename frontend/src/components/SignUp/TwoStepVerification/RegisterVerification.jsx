@@ -37,6 +37,7 @@ export default function RegisterVerification({currentLang}) {
                         fieldset-id="gcds-verification-fieldset"
                         legend={pageContentJson['4']}
                         hint={pageContentJson['5']}
+                        lang={currentLang}
                         required>
                         <br />
                         <GcdsRadioGroup
