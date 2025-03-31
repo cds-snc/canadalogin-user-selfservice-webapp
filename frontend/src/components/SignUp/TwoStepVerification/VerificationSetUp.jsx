@@ -4,7 +4,7 @@ import {
     GcdsStepper,
     GcdsText
 } from "@cdssnc/gcds-components-react";
-import {getPageContent, isCodeValid} from '../../../utils/functions';
+import {getPageContent} from '../../../utils/functions';
 import {CONTEXT_ACTIONS, countryMapping, NAVIGATION_LINKS} from "../../../utils/constants.jsx";
 import SubmitButton from "../../Layout/SubmitButton.jsx";
 import {useState, useTransition} from 'react';
@@ -104,7 +104,7 @@ export default function VerificationSetUp({currentLang}) {
                             defaultErrorMessage={"Phone number is required"}
                             onChange={phone =>  setPhone(phone)}
                             isValid={(inputNumber, country) => {
-                                setCountryCodeLength(country.format.replace(/[^\.]/g,'').length)
+                                setCountryCodeLength(country.format.replace(/[^.]/g,'').length)
                                 return errorJson.phoneError===null;
                             }}
                         />
