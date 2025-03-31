@@ -108,9 +108,9 @@ export default function PasswordCreation({currentLang}) {
                         {pageContentJson['3']}
                     </GcdsStepper>
                 </GcdsText>
-                    <GcdsText> 
-                        {pageContentJson['4']}<strong>{pageContentJson['5']}</strong>{pageContentJson['6']}
-                    </GcdsText>
+            <GcdsText testId="password-text">
+                {pageContentJson['4']}<strong>{pageContentJson['5']}</strong>{pageContentJson['6']}
+            </GcdsText>
                     <GcdsDetails detailsTitle={pageContentJson['7']}>
                     <GcdsText>
                         {pageContentJson['8']}
@@ -130,7 +130,6 @@ export default function PasswordCreation({currentLang}) {
                     required
                 >
                 </GcdsInput>
-                    <small className="help-block" id="password-text"></small>
                         <GcdsCheckbox
                             checkboxId="checkbox-default"
                             label={pageContentJson['11']}
@@ -139,7 +138,7 @@ export default function PasswordCreation({currentLang}) {
                             >
                                 <GcdsText>
                                     {checkedValue? "false" : "true"}
-                                </GcdsText>  
+                                </GcdsText>
                         </GcdsCheckbox>
 
                 <GcdsText>
@@ -148,7 +147,7 @@ export default function PasswordCreation({currentLang}) {
                 <SubmitButton currentLang={currentLang} disabled={isPending} />
                 </form>
             </GcdsContainer>
-            
+
             <GcdsHeading tag="h2">
                 {pageContentJson['14']}
             <GcdsText marginTop="200" marginBottom="0">
