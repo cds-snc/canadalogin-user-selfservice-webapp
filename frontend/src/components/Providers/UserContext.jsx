@@ -10,7 +10,8 @@ const initialState = {
         emailLanguage: null,
         emailValidated: false,
         trxnId: null,
-        passwordSubmitted:false
+        passwordSubmitted:false,
+        smsSent: false,
     }
 }
 
