@@ -117,46 +117,42 @@ export default function PasswordCreation({currentLang}) {
                     </GcdsText>
                     </GcdsDetails>
             <GcdsContainer>
-            <form onSubmit={handleSubmit} >
-                <GcdsInput
-                    inputId="input-password"
-                    label={pageContentJson['9']}
-                    name="password"
-                    hint={pageContentJson['10']}
-                    type={checkedValue? "password" : "text"}
-                    className="form-control"
-                    onGcdsInput={handlePasswordChange}
-                    errorMessage={errorJson.passwordError}
-                    required
-                >
-                </GcdsInput>
+                <form onSubmit={handleSubmit} >
+                    <GcdsInput
+                        inputId="input-password"
+                        label={pageContentJson['9']}
+                        name="password"
+                        hint={pageContentJson['10']}
+                        type={checkedValue? "password" : "text"}
+                        className="form-control"
+                        onGcdsInput={handlePasswordChange}
+                        errorMessage={errorJson.passwordError}
+                        required
+                    >
+                    </GcdsInput>
                         <GcdsCheckbox
                             checkboxId="checkbox-default"
                             label={pageContentJson['11']}
                             name="checkbox"
-                            onGcdsChange={validateCheckbox}
-                            >
-                                <GcdsText>
-                                    {checkedValue? "false" : "true"}
-                                </GcdsText>
+                            onGcdsChange={validateCheckbox}>
+                            <GcdsText>
+                                {checkedValue? "false" : "true"}
+                            </GcdsText>
                         </GcdsCheckbox>
-
-                <GcdsText>
-                    {pageContentJson['12']} <strong>{passwordStrength}</strong>/{passwordPolicy.min} {pageContentJson['13']}
-                </GcdsText>
-                <SubmitButton currentLang={currentLang} disabled={isPending} />
+                        <GcdsText>
+                            {pageContentJson['12']} <strong>{passwordStrength}</strong>/{passwordPolicy.min} {pageContentJson['13']}
+                        </GcdsText>
+                    <SubmitButton currentLang={currentLang} disabled={isPending} />
                 </form>
             </GcdsContainer>
-
             <GcdsHeading tag="h2">
                 {pageContentJson['14']}
-            <GcdsText marginTop="200" marginBottom="0">
-            <GcdsLink href={`/${currentLang}`}>
-                {pageContentJson['15']}
-            </GcdsLink>
-            </GcdsText>
-        </GcdsHeading>
-
+                <GcdsText marginTop="200" marginBottom="0">
+                    <GcdsLink href={`/${currentLang}`}>
+                        {pageContentJson['15']}
+                    </GcdsLink>
+                </GcdsText>
+            </GcdsHeading>
         </GcdsContainer>
     )
 }
