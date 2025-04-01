@@ -48,7 +48,7 @@ class SendTransientVoiceOTP:
             raise HTTPException(status_code=response.status_code,
                                     detail=str(response.reason))
 
-    async def dispatch_voice_otp(self, user_phone_number: str):
+    async def dispatch_voice_otp(self, user_phone_number: int):
         user_phone_number = {
             "phoneNumber": user_phone_number
         }

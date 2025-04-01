@@ -1,6 +1,5 @@
-from fastapi import APIRouter, Depends, status
-from app.otp.schemas import UserName, EmailOtpRequestResponse, OtpVerification, ViaPhoneOtpResponse, PhoneNumber, \
-    SMSOtpRequestResponse, OtpVerification, OtpVerification, VoiceOtpRequestResponse
+from fastapi import APIRouter, status
+from app.otp.schemas import UserName, EmailOtpRequestResponse, PhoneNumber, SMSOtpRequestResponse, OtpVerification, VoiceOtpRequestResponse
 from app.otp.services.send_email_otp import send_email_otp
 from app.otp.services.send_transient_SMS_otp import SendTransientSMSOTP
 

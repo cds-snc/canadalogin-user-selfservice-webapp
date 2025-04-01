@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field, EmailStr, ConfigDict
 from app.utils.schemas import ResponseModel
 
 class PhoneNumber(BaseModel):
-    phoneNumber: str
+    phoneNumber: int
 
 class UserName(BaseModel):
     userName: EmailStr
@@ -33,7 +33,7 @@ class ViaPhoneOtpResponse(BaseModel):
     expiry: str
     state: str
     correlation: str = Field(alias="correlationID")
-    phoneNumber: str
+    phoneNumber: int
     attempts: int
     retries: int
 

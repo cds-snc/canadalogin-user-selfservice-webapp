@@ -51,7 +51,7 @@ class SendTransientSMSOTP:
                                     detail=str(response.reason))
 
 
-    async def dispatch_sms_otp(self,user_phone_number: str):
+    async def dispatch_sms_otp(self,user_phone_number: int):
         user_phone_number = {
             "phoneNumber": user_phone_number
         }
