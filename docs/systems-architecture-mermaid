@@ -31,21 +31,29 @@ graph TB
         S3[S3 Bucket<br/>Front-end Web assets]
     end
 
-    subgraph "External Services"
-        IBMVerify["IBM Security Verify<br/>(CIAM)"]
+    subgraph "IBM Cloud (Canada)"
+        subgraph IBMVerify["IBM Verify SaaS"]
+            IBMVerifyAPI["IBM Verify APIs"]
+            IBMIDaaS["OIDC Services"]
+            IBMMonitoringReporting["Monitoring and Reporting"]
+            IBMIDStore["Identity Store"]
+            IBMMFA["MFA Enroll and Verify"]
+        end
     end
 
     RelyingParty[Relying Party]
     WebBrowser["Users (Web Browser)"]
+    Sentinel["Microsoft Sentinel"]
 
     %% Connections
     WebBrowser -->|HTTPS| CloudFront
     WebBrowser -->|"API Calls<br/>HTTPS"| ALB
+    WebBrowser -->|"OIDC endpoints<br/>HTTPS"| IBMVerify
     CloudFront -->|Static Content| S3
     WAF -.->|Protect| ALB
     CFWAF -.->|Protect| CloudFront
     ALB -->|API Requests| APIProxy
-    APIClient -->|Signin+Signup+Profile HTTPS| IBMVerify
+    APIClient -->|Signup+Signin+MFA+Profile HTTPS| IBMVerify
     APIClient -->|Secrets| SecretsManager
     RelyingParty-->|"OIDC endpoints<br/>HTTPS"| IBMVerify
     RelyingParty-->|"Redirect (authorize)<br/>HTTPS"| WebBrowser
@@ -55,3 +63,5 @@ graph TB
     %% Monitoring
     WAF -.->|Logs| CloudWatch
     APIProxy -.->|Logs| CloudWatch
+    CloudWatch -->|Logs| Sentinel
+    IBMMonitoringReporting -->|Logs| Sentinel
