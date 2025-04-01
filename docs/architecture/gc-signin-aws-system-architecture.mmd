@@ -1,3 +1,4 @@
+%%{init: {'theme':'neutral'}}%%
 graph TB
     subgraph "AWS Cloud - GC Sign In (Region: ca-central-1)"
         subgraph "VPC"
@@ -17,10 +18,8 @@ graph TB
             end
         end
 
-        subgraph "Security & Monitoring"
-            CloudWatch[CloudWatch]
-            SecretsManager[Secrets Manager]
-        end
+        CloudWatch[CloudWatch]
+        SecretsManager[Secrets Manager]
 
         subgraph "CloudFront Edge"
             CloudFront[CloudFront]
@@ -28,6 +27,7 @@ graph TB
         end
 
         Route53["Route 53 (DNS)"]
+        
         S3[S3 Bucket<br/>Front-end Web assets]
     end
 
@@ -65,3 +65,16 @@ graph TB
     APIProxy -.->|Logs| CloudWatch
     CloudWatch -->|Logs| Sentinel
     IBMMonitoringReporting -->|Logs| Sentinel
+
+    %% Styling
+    classDef aws fill:#FF9900,stroke:#232F3E,color:white;
+    classDef gcsignin fill:#FF5733,stroke:#232F3E,color:white;
+    classDef ibm fill:#3B76e2,stroke:#232F3E,color:white;
+    classDef ibmchild fill:#1B46C2,stroke:#232F3E,color:white;
+    classDef users fill:#6BBE49,stroke:#232F3E,color:white;
+
+    class Route53,CloudFront,ALB,WAF,CFWAF,ECS,CloudWatch,SecretsManager,WAFLogs,S3 aws;
+    class IBMVerify ibm;
+    class IBMVerifyAPI,IBMIDaaS,IBMMonitoringReporting,IBMIDStore,IBMMFA ibmchild;
+    class RelyingParty,WebBrowser users;
+    class GCSigninFrontEnd,APIProxy,APIClient gcsignin;
