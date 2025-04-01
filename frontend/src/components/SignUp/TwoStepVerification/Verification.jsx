@@ -4,7 +4,7 @@ import {
     GcdsStepper,
     GcdsText
 } from "@cdssnc/gcds-components-react";
-import {getPageContent} from '../../../utils/functions';
+import {getPageContent, isCodeValid} from '../../../utils/functions';
 import AlreadyGc from "../../Layout/AlreadyGc.jsx";
 import {CONTEXT_ACTIONS, NAVIGATION_LINKS} from "../../../utils/constants.jsx";
 import {useNavigate, useParams} from "react-router";
@@ -27,7 +27,6 @@ export default function Verification({currentLang}) {
     const errorPageJson = getPageContent(currentLang, "Error");
     const pageContentJson = getPageContent(currentLang, "Verification");
 
-
     useEffect(()=>{
         if(time<=0)
             return;
@@ -40,47 +39,92 @@ export default function Verification({currentLang}) {
 
     },[time]);
 
-    async function requestNewCode (e){
+    async function useNewNumber(){
+        const userData = {...state.userData, phone:null, stepVerificationSent: false, trxnId:null};
+        await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
+        navigate("/" + currentLang + NAVIGATION_LINKS.twoStepVerification);
+    }
+
+    async function requestSameTypeCode (e){
         setError({codeError:null, heading:null});
 
         startTransition(async()=> {
             e.preventDefault();
-            try {
-                const response = await authService.sendTwoStepVerificationCode({
-                    phoneNumber: state.userData.phone,
-                    verificationType: 'sms'
-                });
-                console.log(response);
-                if(response.success){
-                    const userData = {
-                        ...state.userData,
-                        stepVerificationSent: true,
-                        trxnId:response.data.trxnId
-                    };
-                    await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
-                    setCodeRequested(true);
-                }else {
-                    console.log("Error....", response);
-                    setError({codeError: response.message, heading: errorPageJson['1']});
-                }
-            } catch (error) {
-                console.error('Server error:', error);
-                setError({codeError: errorPageJson[7], heading: errorPageJson['1']});
-            }
-
-            setTimesRequested(prevState => prevState + 1);
-            setTime(initialTime * timesRequested);
-
+            await requestNewCode(type, false);
         })
     }
 
-    async function useNewNumber(){
-        const userData = {...state.userData, phone:formData.get('phone'), stepVerificationSent: true, trxnId:response.data.trxnId};
-        await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
-        console.log("success....", state);
-        navigate("/" + currentLang + NAVIGATION_LINKS.verification+'/'+formType);
+    function requestNewTypeCode(e){
+        setError({codeError:null, heading:null});
+
+        startTransition(async()=> {
+            e.preventDefault();
+            const newType =  type==='voice'?'sms':'voice'
+            await requestNewCode(newType, true);
+        })
     }
 
+    async function requestNewCode(codeType, didTypeChange){
+
+        try {
+            const response = await authService.sendTwoStepVerificationCode({
+                phoneNumber: state.userData.phone,
+                verificationType: codeType
+            });
+
+            if(response.success){
+                setCodeRequested(true);
+                if(didTypeChange)
+                    navigate("/" + currentLang + NAVIGATION_LINKS.verification+'/'+codeType)
+            }else {
+                console.log("Error....", response);
+                setError({codeError: response.message, heading: errorPageJson['1']});
+            }
+        } catch (error) {
+            console.error('Server error:', error);
+            setError({codeError: errorPageJson[7], heading: errorPageJson['1']});
+        }
+
+        setTimesRequested(prevState => prevState + 1);
+        setTime(initialTime * timesRequested);
+    }
+
+    function  handleSubmit (e){
+        startTransition(async()=> {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+            const formCode = formData.get('verificationCode')
+            setCodeRequested(false);
+            if (!isCodeValid(formCode)) {
+                setError({codeError: errorPageJson[3], heading: errorPageJson['1']});
+                return;
+            }
+            setError({codeError:null, heading:null});
+
+            try {
+                console.log(formCode);
+                console.log(state.userData.trxnId);
+                const response = await authService.twoStepVerification({
+                    otp: formCode,
+                    verificationType: type,
+                    trxnId: state.userData.trxnId
+                });
+                if(response.success){
+                    const userData = {...state.userData, stepVerified: true};
+                    await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
+                    console.log("success...",response)
+                 //   navigate("/" + currentLang + NAVIGATION_LINKS.password);
+                }else {
+                    console.log("Error....", response);
+                    setError({codeError: errorPageJson[7], heading: errorPageJson['1']});
+                }
+            } catch (error) {
+                console.error('Signup error:', error);
+                setError({emailError:  errorPageJson[7], heading: errorPageJson['1']});
+            }
+        })
+    }
 
     return (
         <GcdsContainer className="gcds-content" >
@@ -91,7 +135,7 @@ export default function Verification({currentLang}) {
                 />)
             }
             {
-                codeRequested && (<GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={pageContentJson['16']}>
+                codeRequested && (<GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={pageContentJson['17']}>
                     &nbsp;
                 </GcdsNotice>)
             }
@@ -104,45 +148,45 @@ export default function Verification({currentLang}) {
             </GcdsContainer>
             <GcdsContainer>
                 <GcdsText>
-                    {pageContentJson['2']}&nbsp;<strong>{state.userData.phone}</strong>
+                    {type==='voice'?pageContentJson['3']:pageContentJson['2']}&nbsp;<strong>{state.userData.phone}</strong>
                 </GcdsText>
                 <GcdsText>
-                    {type==='voice'?pageContentJson['4']:pageContentJson['3']}
+                    {type==='voice'?pageContentJson['5']:pageContentJson['4']}
                 </GcdsText>
                 <GcdsText>
-                    {pageContentJson['5']} <strong>{pageContentJson['6']}</strong>
+                    {pageContentJson['6']} <strong>{pageContentJson['7']}</strong>
                 </GcdsText>
                 <GcdsHeading tag='h2'>
-                    {pageContentJson['7']}
+                    {pageContentJson['8']}
                 </GcdsHeading>
-                <form>
+                <form onSubmit={handleSubmit}>
                     <GcdsInput
                         inputId="verificationCode"
-                        label={pageContentJson['8']}
+                        label={pageContentJson['9']}
                         name="verificationCode"
                         type="text"
                         lang={currentLang}
                         required ></GcdsInput>
-                    <SubmitButton currentLang={currentLang} />
+                    <SubmitButton currentLang={currentLang} disabled={isPending}/>
                 </form>
             </GcdsContainer>
             <GcdsHeading tag='h2'>
-                {pageContentJson['9']}
+                {pageContentJson['10']}
             </GcdsHeading>
             <GcdsText>
-                <GcdsLink href={`/${currentLang}${NAVIGATION_LINKS.signUp}`} >
-                    {type==='voice'?pageContentJson['11']:pageContentJson['10']}
-                </GcdsLink>
+                {time<=0 && !isPending?(<GcdsLink href="#" onClick={requestNewTypeCode} >
+                        {type==='voice'?pageContentJson['12']:pageContentJson['11']}
+                    </GcdsLink>):""}
             </GcdsText>
             <GcdsText>
                 <GcdsLink href="#" onClick={useNewNumber}  >
-                    {pageContentJson['12']}
+                    {pageContentJson['13']}
                 </GcdsLink>
             </GcdsText>
             <GcdsText>
-                {time>0 && !isPending?(<span>{pageContentJson['13']}<strong> {time} {pageContentJson['14']}</strong></span>)
-                    :!isPending?(<GcdsLink href="#" onClick={requestNewCode} >
-                        {pageContentJson['15']}
+                {time>0 && !isPending?(<span>{pageContentJson['14']}<strong> {time} {pageContentJson['15']}</strong></span>)
+                    :!isPending?(<GcdsLink href="#" onClick={requestSameTypeCode} >
+                        {pageContentJson['16']}
                     </GcdsLink>):""}
             </GcdsText>
             <AlreadyGc currentLang={currentLang}/>

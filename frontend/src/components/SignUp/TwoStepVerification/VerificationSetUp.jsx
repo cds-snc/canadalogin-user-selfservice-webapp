@@ -120,6 +120,7 @@ export default function VerificationSetUp({currentLang}) {
                             fieldset-id="gcds-verification-fieldset"
                             legend={pageContentJson['14']}
                             hint={pageContentJson['15']}
+                            lang={currentLang}
                             required>
                             <br />
                             <GcdsRadioGroup
