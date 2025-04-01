@@ -57,7 +57,7 @@ graph TB
     GitHubIBMClient-->|Configure| IBMVerify
     GCSigninCodeRepo-->GitHubActions
     
-    WebBrowser -->|"OIDC endpoints<br/>HTTPS"| IBMVerify
+    WebBrowser -->|"OIDC endpoints<br/>HTTPS<br/>TO BE DECIDED (this could go through AWS API Proxy instead)"| IBMVerify
     WebBrowser -->|"HTTPS"| AWS
     CloudFront -->|Static Content| S3
     WAF -.->|Protect| ALB
@@ -65,7 +65,7 @@ graph TB
     ALB -->|API Requests| APIProxy
     APIClient -->|Signup+Signin+MFA+Profile HTTPS| IBMVerify
     APIClient -->|Secrets| SecretsManager
-    RelyingParty-->|"OIDC endpoints<br/>HTTPS"| IBMVerify
+    RelyingParty-->|"OIDC endpoints<br/>HTTPS<br/>TO BE DECIDED (this could go through AWS API Proxy instead)"| IBMVerify
     RelyingParty-->|"Redirect (authorize)<br/>HTTPS"| WebBrowser
     WebBrowser-->|"Redirect (callback)<br/>HTTPS"| RelyingParty
     APIProxy-->|Uses| APIClient
