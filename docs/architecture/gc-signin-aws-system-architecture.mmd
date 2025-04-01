@@ -1,10 +1,9 @@
 %%{init: {'theme':'neutral'}}%%
 graph TB
-    subgraph "AWS Cloud - GC Sign In (Region: ca-central-1)"
+    subgraph AWS["CDS AWS Cloud ca-central-1"]
         subgraph "VPC"
-            subgraph "Public Subnet"
+            subgraph PublicSubnet["Public Subnet"]
                 ALB[Application Load Balancer]
-                WAF[AWS WAF]
             end
 
             subgraph "Private Subnet"
@@ -20,24 +19,19 @@ graph TB
 
         CloudWatch[CloudWatch]
         SecretsManager[Secrets Manager]
-
-        subgraph "CloudFront Edge"
-            CloudFront[CloudFront]
-            CFWAF[AWS WAF]
-        end
-
+        CloudFront[CloudFront]
         Route53["Route 53 (DNS)"]
-        
         S3[S3 Bucket<br/>Front-end Web assets]
+        WAF[AWS WAF]
     end
 
     subgraph "IBM Cloud (Canada)"
         subgraph IBMVerify["IBM Verify SaaS"]
-            IBMVerifyAPI["IBM Verify APIs"]
             IBMIDaaS["OIDC Services"]
             IBMMonitoringReporting["Monitoring and Reporting"]
             IBMIDStore["Identity Store"]
-            IBMMFA["MFA Enroll and Verify"]
+            IBMMFA["MFA Enroll/Verify"]
+            IBMVerifyAPI["APIs"]
         end
     end
 
@@ -47,11 +41,10 @@ graph TB
 
     %% Connections
     WebBrowser -->|HTTPS| CloudFront
-    WebBrowser -->|"API Calls<br/>HTTPS"| ALB
     WebBrowser -->|"OIDC endpoints<br/>HTTPS"| IBMVerify
     CloudFront -->|Static Content| S3
     WAF -.->|Protect| ALB
-    CFWAF -.->|Protect| CloudFront
+    WAF -.->|Protect| CloudFront
     ALB -->|API Requests| APIProxy
     APIClient -->|Signup+Signin+MFA+Profile HTTPS| IBMVerify
     APIClient -->|Secrets| SecretsManager
@@ -72,9 +65,11 @@ graph TB
     classDef ibm fill:#3B76e2,stroke:#232F3E,color:white;
     classDef ibmchild fill:#1B46C2,stroke:#232F3E,color:white;
     classDef users fill:#6BBE49,stroke:#232F3E,color:white;
+    classDef rp fill:#8B8000,stroke:#232F3E,color:white;
 
     class Route53,CloudFront,ALB,WAF,CFWAF,ECS,CloudWatch,SecretsManager,WAFLogs,S3 aws;
     class IBMVerify ibm;
     class IBMVerifyAPI,IBMIDaaS,IBMMonitoringReporting,IBMIDStore,IBMMFA ibmchild;
-    class RelyingParty,WebBrowser users;
+    class WebBrowser users;
+    class RelyingParty rp;
     class GCSigninFrontEnd,APIProxy,APIClient gcsignin;
