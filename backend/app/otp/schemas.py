@@ -33,7 +33,7 @@ class ViaPhoneOtpResponse(BaseModel):
     expiry: str
     state: str
     correlation: str = Field(alias="correlationID")
-    phoneNumber: int
+    phoneNumber: str
     attempts: int
     retries: int
 
@@ -56,9 +56,9 @@ class EmailOtpRequestResponse(ResponseModel):
     data: EmailOtpResponse
 
 
-class SMSOtpRequestResponse(BaseModel):
+class SMSOtpRequestResponse(ResponseModel):
     data: ViaPhoneOtpResponse
 
 
-class VoiceOtpRequestResponse(BaseModel):
+class VoiceOtpRequestResponse(ResponseModel):
     data: ViaPhoneOtpResponse
