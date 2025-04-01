@@ -72,7 +72,7 @@ export default function VerificationSetUp({currentLang}) {
                     />)
                 }
                 <GcdsContainer className="gcds-gap" >
-                    <GcdsStepper currentStep="3" totalSteps="5"
+                    <GcdsStepper currentStep="3" totalSteps="4"
                                  tag="h1"
                                  lang={currentLang}>
                         {pageContentJson['1']}

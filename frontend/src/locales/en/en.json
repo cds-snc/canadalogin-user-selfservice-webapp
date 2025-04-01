@@ -139,6 +139,16 @@
     "16": "Request a new code",
     "17": "We have sent you a new code"
   },
+  "CreateCoreProfile": {
+    "1": "Your GC Sign in account has been created",
+    "2": "Complete your profile",
+    "3": "Read our" ,
+    "4": "privacy notice",
+    "5": "for more details on how we use your personal information.",
+    "6": "Enter your name",
+    "7": "First name",
+    "8": "Last name"
+  },
   "Button":{
     "submit": "Continue"
   }

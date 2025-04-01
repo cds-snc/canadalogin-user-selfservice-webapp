@@ -18,7 +18,7 @@ export default function RegisterVerification({currentLang}) {
         <GcdsContainer className="gcds-content" >
             <GcdsContainer>
                 <GcdsContainer className="gcds-gap" >
-                    <GcdsStepper currentStep="3" totalSteps="5"
+                    <GcdsStepper currentStep="3" totalSteps="4"
                                  tag="h1"
                                  lang={currentLang}>
                         {pageContentJson['1']}

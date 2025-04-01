@@ -186,7 +186,7 @@ describe('Routing Test', () => {
 
         verifyGcdsHtmlElement('gcds-header',  createMap('gcds-header', [language, langLink, 'colour'] ));
 
-        verifyGcdsHtmlElement('gcds-stepper', createMap('gcds-stepper', ['1', 'h1', '5'] ));
+        verifyGcdsHtmlElement('gcds-stepper', createMap('gcds-stepper', ['1', 'h1', '4'] ));
 
         Object.keys(pageContentJson).forEach(key => {
             if(key==='6')
@@ -205,7 +205,7 @@ describe('Routing Test', () => {
 
     function checkPasswordCreationPageContents(language, pageContentJson, langLink, buttonJson, alreadyGcJson) {
         verifyGcdsHtmlElement('gcds-header', createMap('gcds-header', [language, langLink, 'colour', '#']));
-        verifyGcdsHtmlElement('gcds-stepper', createMap('gcds-stepper2', ['2', 'h1', '5', language, '0', '150']));
+        verifyGcdsHtmlElement('gcds-stepper', createMap('gcds-stepper2', ['2', 'h1', '4', language, '0', '150']));
         verifyGcdsHtmlElement('gcds-notice', createMap('gcds-notice', ['Your email was successfully verified', 'h2', 'success']));
         verifyGcdsHtmlElement('gcds-details', createMap('gcds-details', ['Password safety tips']));
         verifyGcdsHtmlElement('gcds-checkbox', createMap('gcds-checkbox', ['checkbox-default', 'Show password', 'checkbox']));
