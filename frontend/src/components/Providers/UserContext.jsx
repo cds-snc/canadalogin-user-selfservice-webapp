@@ -11,7 +11,9 @@ const initialState = {
         emailValidated: false,
         trxnId: null,
         passwordSubmitted:false,
-        smsSent: false,
+        phone: null,
+        stepVerificationSent: false,
+        stepVerified:false
     }
 }
 

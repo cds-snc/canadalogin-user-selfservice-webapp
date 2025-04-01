@@ -4,14 +4,35 @@ import {isEmailValid} from "../../utils/functions.jsx";
 
 
 function PrivateRoute ({route, children}){
-    const {state} = useUser();
 
-    if((route==="signUpVerification" && !state.userData.emailValidated && !isEmailValid(state.userData.email) && !state.userData.passwordSubmitted) ||
-        (route==="signUpPassword" && !state.userData.emailValidated && !isEmailValid(state.userData.email)) ||
-        (route==="signUpVerifyEmail" && !isEmailValid(state.userData.email)))
+    if(!isValidRoute(route))
         return <Navigate to="/" />;
 
     return children;
 }
 
+
+function isValidRoute (route) {
+    const {state} = useUser();
+
+    switch(route){
+        case("signUpVerifyTwoStep"):
+            return (state.userData.stepVerificationSent &&
+                    state.userData.passwordSubmitted &&
+                    state.userData.emailValidated &&
+                    isEmailValid(state.userData.email));
+        case("signUpVerification"):
+            return (state.userData.passwordSubmitted &&
+                    state.userData.emailValidated &&
+                    isEmailValid(state.userData.email));
+        case("signUpPassword"):
+            return (state.userData.emailValidated &&
+                    isEmailValid(state.userData.email));
+        case("signUpVerifyEmail"):
+            return isEmailValid(state.userData.email);
+        default:
+            return false;
+
+    }
+}
 export default PrivateRoute;
