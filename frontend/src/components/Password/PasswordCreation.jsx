@@ -104,7 +104,7 @@ export default function PasswordCreation({currentLang}) {
                 </GcdsNotice>
             </GcdsContainer>
                 <GcdsText>
-                    <GcdsStepper currentStep="2" totalSteps="5" tag="h1" lang={currentLang} marginTop="150" marginBottom="0">
+                    <GcdsStepper currentStep="2" totalSteps="4" tag="h1" lang={currentLang} marginTop="150" marginBottom="0">
                         {pageContentJson['3']}
                     </GcdsStepper>
                 </GcdsText>

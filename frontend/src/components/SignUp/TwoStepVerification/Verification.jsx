@@ -103,8 +103,6 @@ export default function Verification({currentLang}) {
             setError({codeError:null, heading:null});
 
             try {
-                console.log(formCode);
-                console.log(state.userData.trxnId);
                 const response = await authService.twoStepVerification({
                     otp: formCode,
                     verificationType: type,
@@ -114,7 +112,7 @@ export default function Verification({currentLang}) {
                     const userData = {...state.userData, stepVerified: true};
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                     console.log("success...",response)
-                 //   navigate("/" + currentLang + NAVIGATION_LINKS.password);
+                    navigate("/" + currentLang + NAVIGATION_LINKS.coreProfile);
                 }else {
                     console.log("Error....", response);
                     setError({codeError: errorPageJson[7], heading: errorPageJson['1']});
@@ -140,7 +138,7 @@ export default function Verification({currentLang}) {
                 </GcdsNotice>)
             }
             <GcdsContainer className="gcds-gap" >
-                <GcdsStepper currentStep="3" totalSteps="5"
+                <GcdsStepper currentStep="3" totalSteps="4"
                              tag="h1"
                              lang={currentLang}>
                     {pageContentJson['1']}

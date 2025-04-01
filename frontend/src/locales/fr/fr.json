@@ -107,7 +107,7 @@
     "18": "Appel vocal",
     "19": "Numéro de téléphone cellulaire ou fixe. Des frais d’opérateur peuvent s’appliquer."
   },
-  "Verification":{
+  "Verification": {
     "1": "Vérifiez votre téléphone",
     "2": "Nous avons envoyé un code de vérification à 6 chiffres au numéro suivant par le biais d’un message texte :",
     "3": "Nous avons envoyé un code de vérification à 6 chiffres au numéro suivant par le biais d’un appel vocal :",
@@ -125,6 +125,16 @@
     "15": "secondes",
     "16": "Demander un nouveau code",
     "17": "Nous vous avons envoyé un nouveau code"
+  },
+  "CreateCoreProfile": {
+    "1": "Your GC Sign in account has been created",
+    "2": "Complete your profile",
+    "3": "Read our" ,
+    "4": "privacy notice",
+    "5": "for more details on how we use your personal information.",
+    "6": "Enter your name",
+    "7": "First name",
+    "8": "Last name"
   },
   "Button":{
       "submit": "Continuer"

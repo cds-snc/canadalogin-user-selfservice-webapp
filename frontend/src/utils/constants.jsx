@@ -4,7 +4,8 @@ export const NAVIGATION_LINKS = {
     verifyEmail: '/signup/verifyemail',
     password: '/signup/password',
     twoStepVerification: '/signup/verificationsetup',
-    verification: '/signup/verification'
+    verification: '/signup/verification',
+    coreProfile: '/signup/profile',
 };
 export const CONTEXT_ACTIONS = {
     signUp: 'SIGN_UP',
