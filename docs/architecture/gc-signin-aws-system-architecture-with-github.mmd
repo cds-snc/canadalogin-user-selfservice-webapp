@@ -31,6 +31,20 @@ graph TB
         IBMVerifyFeatures["<strong>IBM VERIFY SaaS</strong><br/><br/>OIDC Services<br/>Monitoring and Repoting<br/>APIs<br/>MFA Enroll/Verify<br/>Identity Store"]
     end
 
+    subgraph GitHub
+        subgraph CDSGitHub["CDS GitHub Org"]
+            subgraph GitHubActions["GC Sign in GitHub actions"]
+                GitHubIBMClient["IBM Verify API Client"]
+                GitHubAWSOIDCClient["AWS OIDC Client"]
+            end
+            GitHubSecrets["GitHub Secrets"]
+            subgraph GCSigninCodeRepo["GC Sign in Code Repo"]
+                ApplicationCode["Application Code"]
+                InfrastructureCode["Infrastructure Code"]
+            end
+        end
+    end
+
     RelyingParty[Relying Party]
     WebBrowser["Users (Web Browser)"]
 
@@ -39,6 +53,10 @@ graph TB
     end
     
     %% Connections
+    GitHubAWSOIDCClient-->|Deploy| AWS
+    GitHubIBMClient-->|Configure| IBMVerify
+    GCSigninCodeRepo-->GitHubActions
+    
     WebBrowser -->|"OIDC endpoints<br/>HTTPS"| IBMVerify
     WebBrowser -->|"HTTPS"| AWS
     CloudFront -->|Static Content| S3
@@ -65,6 +83,8 @@ graph TB
     classDef ibmchild fill:#1B46C2,stroke:#232F3E,color:white;
     classDef users fill:#6BBE49,stroke:#232F3E,color:white;
     classDef rp fill:#8B8000,stroke:#232F3E,color:white;
+    classDef github fill:#92C3D2,stroke:#23F3E,color:white;
+    classDef githubchild fill:#6299B2,stroke:#23F3E,color:white;
     classDef azure fill:#12267d,stroke:#23F3E,color:white;
 
     class Route53,CloudFront,ALB,WAF,CFWAF,ECS,CloudWatch,SecretsManager,WAFLogs,S3 aws;
@@ -72,4 +92,6 @@ graph TB
     class WebBrowser users;
     class RelyingParty rp;
     class GCSigninFrontEnd,APIProxy,APIClient gcsignin;
+    class GitHubActions,GCSigninCodeRepo,GitHubSecrets github;
+    class GitHubIBMClient,GitHubAWSOIDCClient,ApplicationCode,InfrastructureCode githubchild;
     class Sentinel azure;
