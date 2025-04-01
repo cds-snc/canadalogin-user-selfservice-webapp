@@ -1,0 +1,1 @@
+This folder is deprecated and for reference only, it contains the diagrams for the original GC Sign in prototype application.

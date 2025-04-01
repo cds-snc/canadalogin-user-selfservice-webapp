@@ -33,7 +33,8 @@
 				"redhat.vscode-yaml",
 				"ms-python.python",
 				"ms-python.debugpy",
-				"hashicorp.hcl"
+				"hashicorp.hcl",
+				"mermaidchart.vscode-mermaid-chart"
 			],
 			"settings": {
 				"[terraform]": {
