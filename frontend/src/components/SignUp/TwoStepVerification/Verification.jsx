@@ -40,6 +40,7 @@ export default function Verification({currentLang}) {
     },[time]);
 
     async function useNewNumber(){
+        setError({codeError:null, heading:null});
         const userData = {...state.userData, phone:null, stepVerificationSent: false, trxnId:null};
         await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
         navigate("/" + currentLang + NAVIGATION_LINKS.twoStepVerification);
@@ -65,14 +66,16 @@ export default function Verification({currentLang}) {
     }
 
     async function requestNewCode(codeType, didTypeChange){
-
+        setError({codeError:null, heading:null});
         try {
             const response = await authService.sendTwoStepVerificationCode({
-                phoneNumber: state.userData.phone,
+                phoneNumber: state.userData.phone.replace(/\D/g,''),
                 verificationType: codeType
             });
 
             if(response.success){
+                const userData = {...state.userData, trxnId:response.data.trxnId};
+                await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                 setCodeRequested(true);
                 if(didTypeChange)
                     navigate("/" + currentLang + NAVIGATION_LINKS.verification+'/'+codeType)
@@ -162,6 +165,7 @@ export default function Verification({currentLang}) {
                         inputId="verificationCode"
                         label={pageContentJson['9']}
                         name="verificationCode"
+                        validateOn="other"
                         type="text"
                         lang={currentLang}
                         required ></GcdsInput>
