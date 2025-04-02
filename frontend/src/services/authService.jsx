@@ -20,18 +20,22 @@ export const authService = {
         return response.data;
     },
     sendTwoStepVerificationCode: async (userData) => {
-        let response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.sendTwoStepVerificationCode}`, userData);
+        let response = null;
 
         if(userData.verificationType==='voice')
             response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.sendTwoStepVerificationCodeVoice}`, userData);
+        else
+            response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.sendTwoStepVerificationCode}`, userData);
 
         return response.data;
     },
     twoStepVerification: async (userData) => {
-        let response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.twoStepVerification}`, userData);
+        let response = null;
 
         if(userData.verificationType==='voice')
             response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.twoStepVerificationVoice}`, userData);
+        else
+            response =  await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.twoStepVerification}`, userData);
 
         return response.data;
     }
