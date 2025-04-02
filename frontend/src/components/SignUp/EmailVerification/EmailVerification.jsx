@@ -111,10 +111,11 @@ export default function EmailVerification({currentLang}) {
                     errorJson.codeError!==null&&(<GcdsErrorSummary
                         errorLinks={`{"#verificationCode": "${errorJson.codeError}"}`}
                         heading={errorJson.heading}
+                        data-testid="errorSummary"
                     />)
                 }
                 {
-                    codeRequested && (<GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={pageContentJson['12']}>
+                    codeRequested && (<GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={pageContentJson['12']} data-testid="linkSuccess">
                         &nbsp;
                     </GcdsNotice>)
                 }
@@ -135,11 +136,12 @@ export default function EmailVerification({currentLang}) {
                     <GcdsText>
                         {pageContentJson['4']}<strong> {pageContentJson['5']}</strong>
                     </GcdsText>
-                    <form onSubmit={handleSubmit}>
+                    <form id="form" onSubmit={handleSubmit}>
                         <GcdsInput
                             inputId="verificationCode"
                             label={pageContentJson['6']}
                             name="verificationCode"
+                            value={state.testData!=null?state.testData.otp:''}
                             type="text"
                             validateOn="other"
                             errorMessage={errorJson.codeError}

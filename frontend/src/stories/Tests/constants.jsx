@@ -12,6 +12,9 @@ export const TestDataUserProvider = {
         passwordSubmitted:false
     },
     testData:{
-        email: null
+        email: null,
+        otp: null,
+        phone: null,
+        verificationCode: null
     }
 }

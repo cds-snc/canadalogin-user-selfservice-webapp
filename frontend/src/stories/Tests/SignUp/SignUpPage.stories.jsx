@@ -190,7 +190,7 @@ SuccessfulEmailBackEndTest.play = async ({ canvasElement, step }) => {
     const canvas = await within(canvasElement);
     await new Promise((r) => setTimeout(r, 1000));
 
-    await step('Submit form with bad email in English For Back End Error', async () => {
+    await step('Submit form with good email in English', async () => {
         await userEvent.click(canvas.queryByRole('button'));
     });
 
