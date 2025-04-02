@@ -1,9 +1,8 @@
-import {reactRouterParameters, withRouter} from 'storybook-addon-remix-react-router';
+import {withRouter} from 'storybook-addon-remix-react-router';
 import {AVAILABLE_LANGUAGES, NAVIGATION_LINKS, SUBMIT_END_POINTS} from "../../../utils/constants.jsx";
 import {UserProvider} from "../../../components/Providers/UserContext.jsx";
 import {getPageContent} from "../../../utils/functions.jsx";
 import {TestDataUserProvider} from "../constants.jsx";
-import EmailVerificationPage from "../../../views/SignUp/EmailVerificationPage.jsx";
 import {
     errorSummaryTest,
     storyParameters,

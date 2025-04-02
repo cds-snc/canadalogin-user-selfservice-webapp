@@ -1,9 +1,9 @@
 import {withRouter} from 'storybook-addon-remix-react-router';
-import {AVAILABLE_LANGUAGES, NAVIGATION_LINKS, SUBMIT_END_POINTS} from "../../../utils/constants.jsx";
+import {AVAILABLE_LANGUAGES, NAVIGATION_LINKS,} from "../../../utils/constants.jsx";
 import {UserProvider} from "../../../components/Providers/UserContext.jsx";
 import {getPageContent} from "../../../utils/functions.jsx";
 import {TestDataUserProvider} from "../constants.jsx";
-import {errorSummaryTest, storyParameters, successSummaryTest} from "../functions.jsx";
+import {errorSummaryTest, storyParameters} from "../functions.jsx";
 import VerificationSetUpPage from "../../../views/SignUp/VerificationSetUpPage.jsx";
 
 const engErrorPageJson = getPageContent('en', "Error");
@@ -64,8 +64,8 @@ const EmailTemplateBE = (args) =>   {
 export const EngBadFrontEndTest = BadEmailTemplateFE.bind({});
 export const FrBadFrontEndTest = BadEmailTemplateFE.bind({});
 //export const BadBackEndTest = EmailTemplateBE.bind({});
-// export const SuccessfulBackEndTest = EmailTemplateBE.bind({});
-// //export const ServerErrorBackEndTest = EmailTemplateBE.bind({});ServerErrorBackEndTest
+//export const SuccessfulBackEndTest = EmailTemplateBE.bind({});
+//export const ServerErrorBackEndTest = EmailTemplateBE.bind({});ServerErrorBackEndTest
 
 EngBadFrontEndTest.parameters = storyParameters(false, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.twoStepVerification);
 EngBadFrontEndTest.play = async ({ canvasElement, step }) => {
