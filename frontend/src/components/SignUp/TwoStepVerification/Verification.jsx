@@ -162,14 +162,27 @@ export default function Verification({currentLang}) {
                     {pageContentJson['8']}
                 </GcdsHeading>
                 <form id="form"  onSubmit={handleSubmit}>
-                    <GcdsInput
+                    {  state.testData!==undefined&&(<GcdsInput
                         inputId="verificationCode"
                         label={pageContentJson['9']}
                         name="verificationCode"
-                        value={state.testData!=null?state.testData.otp:''}
+                        value={state.testData.otp}
                         type="text"
+                        validateOn="other"
+                        errorMessage={errorJson.codeError}
                         lang={currentLang}
-                        required ></GcdsInput>
+                        required ></GcdsInput>)
+                    }
+                    {  state.testData===undefined&&(<GcdsInput
+                        inputId="verificationCode"
+                        label={pageContentJson['9']}
+                        name="verificationCode"
+                        type="text"
+                        validateOn="other"
+                        errorMessage={errorJson.codeError}
+                        lang={currentLang}
+                        required ></GcdsInput>)
+                    }
                     <SubmitButton currentLang={currentLang} disabled={isPending}/>
                 </form>
             </GcdsContainer>
