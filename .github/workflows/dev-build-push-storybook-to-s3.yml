@@ -1,0 +1,65 @@
+name: DEV Build Push Storybook to S3
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "frontend/**"
+      - ".github/workflows/dev-build-push-storybook-to-s3"
+  workflow_dispatch:
+
+env:
+  AWS_REGION: ca-central-1
+  GITHUB_SHA: ${{ github.sha }}
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-push:
+    runs-on: ubuntu-latest
+    environment: "dev"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - module: frontend
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4.3.0
+        with:
+          node-version: "latest"
+
+      - name: configure aws credentials using OIDC role
+        uses: aws-actions/configure-aws-credentials@ececac1a45f3b08a01d2dd070d28d111c5fe6722 # v4.1.0
+        with:
+          role-to-assume: arn:aws:iam::329599618423:role/github_action_push_S3
+          role-session-name: GHPushAppS3
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Set up Environment Variables
+        run: |
+          echo "VITE_BACKEND_API_URL=${{ secrets.VITE_BACKEND_API_URL }}" >> $GITHUB_ENV
+          echo "VITE_REACT_APP_IBM_VERIFY_URL=${{ secrets.VITE_REACT_APP_IBM_VERIFY_URL }}" >> $GITHUB_ENV
+          echo "VITE_REACT_APP_CLIENT_ID=${{ secrets.VITE_REACT_APP_CLIENT_ID }}" >> $GITHUB_ENV
+          echo "VITE_REACT_APP_REDIRECT_URI=${{ secrets.VITE_REACT_APP_REDIRECT_URI }}" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        working-directory: ${{ matrix.module }}
+        run: |
+          npm install --legacy-peer-deps
+          npm run build-storybook
+
+      - name: Deploy App to S3
+        run: |
+          aws s3 sync ${{ matrix.module }}/storybook-static s3://${{ secrets.STORYBOOK_FRONTEND_APP_S3_BUCKET }}
+
+      - name: Invalidate STORYBOOK_CLOUDFRONT_DISTRIBUTION cache
+        run: |
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.STORYBOOK_FRONTEND_APP_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/index.html"
