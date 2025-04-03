@@ -2,14 +2,8 @@ import {withRouter} from 'storybook-addon-remix-react-router';
 import {AVAILABLE_LANGUAGES, NAVIGATION_LINKS, SUBMIT_END_POINTS} from "../../../utils/constants.jsx";
 import {UserProvider} from "../../../components/Providers/UserContext.jsx";
 import {getPageContent} from "../../../utils/functions.jsx";
-import {TestDataUserProvider} from "../constants.jsx";
-import {
-    errorSummaryTest,
-    storyParameters,
-    successLinkTest,
-    successLinkTestNewPage,
-    successSummaryTest
-} from "../functions.jsx";
+import {ACTION_TYPES, TEST_TYPES, TestDataUserProvider} from "../constants.jsx";
+import {storyParameters, testCase} from "../functions.jsx";
 import VerificationPage from "../../../views/SignUp/VerificationPage.jsx";
 
 const engErrorPageJson = getPageContent('en', "Error");
@@ -70,145 +64,170 @@ const EmailTemplateBE = (args) =>   {
     )
 }
 
-export const EngBadFrontEndTest = BadEmailTemplateFE.bind({});
-export const FrBadFrontEndTest = BadEmailTemplateFE.bind({});
-export const SmsBadBackEndTest = EmailTemplateBE.bind({});
-export const SmsSuccessfulBackEndTest = EmailTemplateBE.bind({});
-export const VoiceBadBackEndTest = EmailTemplateBE.bind({});
-export const VoiceSuccessfulBackEndTest = EmailTemplateBE.bind({});
-export const ServerErrorBackEndTest = EmailTemplateBE.bind({});
+export const EngErrorFrontEnd = BadEmailTemplateFE.bind({});
+export const FrErrorFrontEnd = BadEmailTemplateFE.bind({});
+export const SmsErrorBackEnd = EmailTemplateBE.bind({});
+export const SmsSuccessfulBackEnd = EmailTemplateBE.bind({});
+export const VoiceErrorBackEnd = EmailTemplateBE.bind({});
+export const VoiceSuccessfulBackEnd = EmailTemplateBE.bind({});
+export const ServerErrorBackEnd = EmailTemplateBE.bind({});
 export const EngRequestNewCode = EmailTemplateBE.bind({});
 export const FrRequestNewCode = EmailTemplateBE.bind({});
 export const EngRequestNewTypeCode = EmailTemplateBE.bind({});
-EngBadFrontEndTest.parameters = storyParameters(false, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.verifyEmail+"/sms");
-EngBadFrontEndTest.play = async ({ canvasElement, step }) => {
 
-    await errorSummaryTest({
+EngErrorFrontEnd.parameters = storyParameters(false, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.verifyEmail+"/sms");
+EngErrorFrontEnd.play = async ({ canvasElement, step }) => {
+
+    await testCase({
         canvasElement,
         step,
-        message: "Submit form with bad code in English",
+        stepMessage:"Submit form with bad code in English",
         link: 'verificationCode',
         heading: engErrorPageJson[1],
-        error: engErrorPageJson[3]
+        message: engErrorPageJson[3],
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.error
     })
 }
 
-FrBadFrontEndTest.parameters = storyParameters(false, AVAILABLE_LANGUAGES.fr, NAVIGATION_LINKS.verifyEmail+"/sms");
-FrBadFrontEndTest.play = async ({ canvasElement, step }) => {
+FrErrorFrontEnd.parameters = storyParameters(false, AVAILABLE_LANGUAGES.fr, NAVIGATION_LINKS.verifyEmail+"/sms");
+FrErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
-    await errorSummaryTest({
+    await testCase({
         canvasElement,
         step,
-        message: "Submit form with bad code in French",
+        stepMessage:"Submit form with bad code in French",
         link: 'verificationCode',
         heading: frErrorPageJson[1],
-        error: frErrorPageJson[3]
+        message: frErrorPageJson[3],
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.error
     })
 }
 
-SmsBadBackEndTest.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.verifyEmail+"/sms", SUBMIT_END_POINTS.twoStepVerification, errorResponse);
-SmsBadBackEndTest.play = async ({ canvasElement, step }) => {
+SmsErrorBackEnd.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.verifyEmail+"/sms", SUBMIT_END_POINTS.twoStepVerification, errorResponse);
+SmsErrorBackEnd.play = async ({ canvasElement, step }) => {
 
-    await errorSummaryTest({
+    await testCase({
         canvasElement,
         step,
-        message: "Submit form with bad code For Back End Error",
+        stepMessage:"Submit form with bad code For Back End Error",
         link: 'verificationCode',
         heading: engErrorPageJson[1],
-        error: engErrorPageJson[7]
+        message: engErrorPageJson[7],
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.error
     })
-
 }
 
-SmsSuccessfulBackEndTest.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.verifyEmail+"/sms", SUBMIT_END_POINTS.twoStepVerification, successResponse);
-SmsSuccessfulBackEndTest.play = async ({ canvasElement, step }) => {
+SmsSuccessfulBackEnd.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.verifyEmail+"/sms", SUBMIT_END_POINTS.twoStepVerification, successResponse);
+SmsSuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
-    await successSummaryTest({
+    await testCase({
         canvasElement,
         step,
-        message: "Submit form with good code",
-        link: 'verificationCode'
+        stepMessage: "Submit form with good code",
+        link: 'verificationCode',
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.redirect
     })
-
 }
 
-VoiceBadBackEndTest.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.verifyEmail+"/voice", SUBMIT_END_POINTS.twoStepVerification, errorResponse);
-VoiceBadBackEndTest.play = async ({ canvasElement, step }) => {
+VoiceErrorBackEnd.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.verifyEmail+"/voice", SUBMIT_END_POINTS.twoStepVerification, errorResponse);
+VoiceErrorBackEnd.play = async ({ canvasElement, step }) => {
 
-    await errorSummaryTest({
+    await testCase({
         canvasElement,
         step,
-        message: "Submit form with bad code For Back End Error",
+        stepMessage:"Submit form with bad code For Back End Error",
         link: 'verificationCode',
         heading: engErrorPageJson[1],
-        error: engErrorPageJson[7]
+        message: engErrorPageJson[7],
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.error
     })
-
 }
 
-VoiceSuccessfulBackEndTest.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.verifyEmail+"/voice", SUBMIT_END_POINTS.twoStepVerification, successResponse);
-VoiceSuccessfulBackEndTest.play = async ({ canvasElement, step }) => {
+VoiceSuccessfulBackEnd.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.verifyEmail+"/voice", SUBMIT_END_POINTS.twoStepVerification, successResponse);
+VoiceSuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
-    await successSummaryTest({
+    await testCase({
         canvasElement,
         step,
-        message: "Submit form with good code",
-        link: 'verificationCode'
+        stepMessage: "Submit form with good code",
+        link: 'verificationCode',
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.redirect
     })
-
 }
 
-ServerErrorBackEndTest.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.verifyEmail+"/voice", SUBMIT_END_POINTS.twoStepVerification);
-ServerErrorBackEndTest.play = async ({ canvasElement, step }) => {
+ServerErrorBackEnd.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.verifyEmail+"/voice", SUBMIT_END_POINTS.twoStepVerification);
+ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
 
-    await errorSummaryTest({
+    await testCase({
         canvasElement,
         step,
-        message: "Submit form with Back End No Response Error",
+        stepMessage:"Submit form with Back End No Response Error",
         link: 'verificationCode',
         heading: engErrorPageJson[1],
-        error: engErrorPageJson[7]
+        message: engErrorPageJson[7],
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.error
     })
-
 }
-
 
 EngRequestNewCode.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.verifyEmail+'/sms', SUBMIT_END_POINTS.sendTwoStepVerificationCode, successResponse);
 EngRequestNewCode.play = async ({ canvasElement, step }) => {
 
-    await successLinkTest({
+    await testCase({
         canvasElement,
         step,
         stepMessage: "Successful resend code",
         link: 'verificationCode',
         message: engPageContentJson[17],
-        linkText: engPageContentJson[16]
+        linkText: engPageContentJson[16],
+        delay: 11000,
+        actionType: ACTION_TYPES.link,
+        type: TEST_TYPES.success
     })
 }
 
 FrRequestNewCode.parameters = storyParameters(true, AVAILABLE_LANGUAGES.fr, NAVIGATION_LINKS.verifyEmail+'/sms', SUBMIT_END_POINTS.sendTwoStepVerificationCode, successResponse);
 FrRequestNewCode.play = async ({ canvasElement, step }) => {
 
-    await successLinkTest({
+    await testCase({
         canvasElement,
         step,
         stepMessage: "Successful resend code",
         link: 'verificationCode',
         message: frPageContentJson[17],
-        linkText: frPageContentJson[16]
+        linkText: frPageContentJson[16],
+        delay: 11000,
+        actionType: ACTION_TYPES.link,
+        type: TEST_TYPES.success
     })
 }
 
 EngRequestNewTypeCode.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.verifyEmail+'/sms', SUBMIT_END_POINTS.sendTwoStepVerificationCodeVoice, successResponse);
 EngRequestNewTypeCode.play = async ({ canvasElement, step }) => {
 
-    await successLinkTestNewPage({
+    await testCase({
         canvasElement,
         step,
         stepMessage: "Successful resend code",
         link: 'verificationCode',
         message: engPageContentJson[17],
-        linkText: engPageContentJson[11]
+        linkText: engPageContentJson[11],
+        delay: 11000,
+        actionType: ACTION_TYPES.link,
+        type: TEST_TYPES.redirect
     })
 }
 

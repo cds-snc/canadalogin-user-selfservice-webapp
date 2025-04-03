@@ -57,7 +57,7 @@ export default function VerificationSetUp({currentLang}) {
                 }
             } catch (error) {
                 console.error('Signup error:', error);
-                setError({emailError:  errorPageJson[7], heading: errorPageJson['1']});
+                setError({phoneError:  errorPageJson[7], heading: errorPageJson['1']});
             }
         })
     }

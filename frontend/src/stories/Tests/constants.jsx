@@ -18,3 +18,13 @@ export const TestDataUserProvider = {
         verificationCode: null
     }
 }
+
+export const ACTION_TYPES = {
+    link: 'Link',
+    submit: 'Submit'
+}
+export const TEST_TYPES = {
+    error: 'Error',
+    success: 'Success',
+    redirect: 'Redirect',
+}

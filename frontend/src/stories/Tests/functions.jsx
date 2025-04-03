@@ -2,87 +2,43 @@ import {expect, userEvent, within} from "@storybook/test";
 import {reactRouterParameters} from "storybook-addon-remix-react-router";
 import {http, HttpResponse} from "msw";
 import config from "../../config.jsx";
+import {ACTION_TYPES, TEST_TYPES} from "./constants.jsx";
 
+const stepErrorMessage = 'Verify error message is on Page.';
+const stepSuccessMessage = 'Verify error message is on Page.';
+const stepNavigateMessage = 'Verify page was navigated properly.';
 
-export async function successSummaryTest({ canvasElement, step, message }) {
-    const canvas = await within(canvasElement);
-    await new Promise((r) => setTimeout(r, 1000));
+export async function testCase({ canvasElement, step, stepMessage, message, linkText, link, heading, delay, type, actionType }) {
 
-    await step(message, async () => {
-        await userEvent.click(canvas.queryByRole('button', {name: /test/i}));
-    });
+    const canvas = await testItem.canvas(canvasElement, delay);
 
-    await new Promise((r) => setTimeout(r, 1000));
+    switch (actionType) {
+        case(ACTION_TYPES.link):
+            await testItem.clickLink(canvas, step, stepMessage, linkText);
+            break;
+        case(ACTION_TYPES.submit):
+            await testItem.clickButton(canvas, step, message);
+            break;
+        default:
+            await expect(false).toBeTruthy();
+            break;
+    }
 
-    await step('Verify page was navigated properly.', async () => {
-        //need to see if possible to test further
-        await expect(canvas.queryByText("404 Not Found")).toBeInTheDocument();
-    });
-
-}
-
-export async function successLinkTestNewPage({ canvasElement, step, stepMessage, message, linkText }) {
-    const canvas = await within(canvasElement);
-    console.log(linkText);
-    await new Promise((r) => setTimeout(r, 11000));
-
-
-    await step(stepMessage, async () => {
-        const link = canvas.queryByText(linkText);
-        console.log(link)
-        await expect(link).toBeInTheDocument();
-        await userEvent.click(link)
-
-    });
-
-    await new Promise((r) => setTimeout(r, 1000));
-
-    await step('Verify page was navigated properly.', async () => {
-        //need to see if possible to test further
-        await expect(canvas.queryByText("404 Not Found")).toBeInTheDocument();
-    });
-}
-
-
-export async function successLinkTest({ canvasElement, step, stepMessage, message, linkText }) {
-    const canvas = await within(canvasElement);
-    console.log(linkText);
-    await new Promise((r) => setTimeout(r, 11000));
-
-
-    await step(stepMessage, async () => {
-        const link = canvas.queryByText(linkText);
-        console.log(link)
-        await expect(link).toBeInTheDocument();
-        await userEvent.click(link)
-
-    });
-
-    await new Promise((r) => setTimeout(r, 1000));
-
-    await step('Verify success message is on Page.', async () => {
-        const linkSuccess = await canvas.queryByTestId('linkSuccess');
-        await expect(linkSuccess).toBeInTheDocument();
-        await expect(linkSuccess).toHaveAttribute("notice-title", message);
-    });
-}
-
-export async function errorSummaryTest({ canvasElement, step, message, link, heading, error, isName }) {
-    const canvas = await within(canvasElement);
-    await new Promise((r) => setTimeout(r, 1000));
-
-    await step(message, async () => {
-        await userEvent.click(canvas.queryByRole('button', {name: /test/i}));
-    });
-
-    await new Promise((r) => setTimeout(r, 1000));
-
-    await step('Verify Error Summary was populated.', async () => {
-        const errorSummary = await canvas.queryByTestId('errorSummary');
-        await expect(errorSummary).toBeInTheDocument();
-        await expect(errorSummary.getAttribute('error-links')).toEqual("{\"#"+link+"\": \""+error+"\"}");
-        await expect(errorSummary).toHaveAttribute("heading", heading);
-    });
+    switch (type) {
+        case(TEST_TYPES.error):
+            await testItem.checkErrorMsg(canvas, step, stepErrorMessage, link, message, heading);
+            break;
+        case(TEST_TYPES.success):
+            await testItem.checkAttribute(canvas, step, stepSuccessMessage, message, 'notice-title', 'linkSuccess');
+            break;
+        case(TEST_TYPES.redirect):
+            //need to investigate further
+            await testItem.queryPageText(canvas, step, stepNavigateMessage, "404 Not Found" );
+            break;
+        default:
+            await expect(false).toBeTruthy();
+            break;
+    }
 }
 
 export function storyParameters(isBackEndTest, language, link, endpoint, response){
@@ -112,4 +68,58 @@ export function storyParameters(isBackEndTest, language, link, endpoint, respons
             routing: {path: '/:language' + link}
         })
     };
+}
+
+const testItem = {
+   canvas: async(canvasElement, timeToWait)=>{
+        const canvas = await within(canvasElement);
+        await new Promise((r) => setTimeout(r, timeToWait));
+        return canvas;
+    },
+    clickButton: async(canvas, step, message) =>{
+        await step(message, async () => {
+            await userEvent.click(canvas.queryByRole('button', {name: /test/i}));
+        });
+        await new Promise((r) => setTimeout(r, 1000));
+    },
+    queryPageText: async(canvas, step, message, text) =>{
+        await step(message, async () => {
+            await expect(canvas.queryByText(text)).toBeInTheDocument();
+        });
+    },
+    clickLink: async(canvas, step, stepMessage, linkText)=>{
+
+        await step(stepMessage, async () => {
+            const link = canvas.queryByText(linkText);
+            await expect(link).toBeInTheDocument();
+            await userEvent.click(link)
+
+        });
+        await new Promise((r) => setTimeout(r, 1000));
+    },
+    checkErrorMsg: async(canvas, step, stepMessage, link, message, heading)=>{
+        await step(stepMessage, async () => {
+            const errorSummary = await canvas.queryByTestId('errorSummary');
+            await expect(errorSummary).toBeInTheDocument();
+            await expect(errorSummary.getAttribute('error-links')).toEqual("{\"#"+link+"\": \""+message+"\"}");
+            await expect(errorSummary.getAttribute('heading')).toEqual(heading);
+        });
+    },
+    checkAttribute: async(canvas, step, stepMessage, message, attribute, testId) =>{
+        await step(stepMessage, async () => {
+            const linkSuccess = await canvas.queryByTestId(testId);
+            await expect(linkSuccess).toBeInTheDocument();
+            await expect(linkSuccess).toHaveAttribute(attribute, message);
+        });
+    },
+    routingParameters: async (language, link) => {
+       return {
+           reactRouter: reactRouterParameters({
+               location: {
+                   pathParams: {language},
+               },
+               routing: {path: '/:language' + link}
+           })
+       };
+    }
 }
