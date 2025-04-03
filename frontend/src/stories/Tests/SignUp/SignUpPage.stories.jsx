@@ -1,12 +1,10 @@
 import SignUpPage from "../../../views/SignUp/SignUpPage";
-import {reactRouterParameters, withRouter} from 'storybook-addon-remix-react-router';
-import {NAVIGATION_LINKS, SUBMIT_END_POINTS} from "../../../utils/constants.jsx";
+import {withRouter} from 'storybook-addon-remix-react-router';
+import {AVAILABLE_LANGUAGES, NAVIGATION_LINKS, SUBMIT_END_POINTS} from "../../../utils/constants.jsx";
 import {UserProvider} from "../../../components/Providers/UserContext.jsx";
-import {expect, userEvent, within} from '@storybook/test';
 import {getPageContent} from "../../../utils/functions.jsx";
-import config from "../../../config.jsx";
-import {http, HttpResponse} from "msw";
-import {TestDataUserProvider} from "../constants.jsx";
+import {ACTION_TYPES, TEST_TYPES, TestDataUserProvider} from "../constants.jsx";
+import {storyParameters, testCase} from "../functions.jsx";
 
 const serverError =  "value is not a valid email address: There must be something after the @-sign.";
 const engErrorPageJson = getPageContent('en', "Error");
@@ -45,13 +43,12 @@ export default {
 
 };
 
-
 const BadEmailTemplateFE = (args) =>   {
 
     TestDataUserProvider.testData.email = "test@test";
 
     return(
-        <UserProvider initial={TestDataUserProvider}><SignUpPage /><button type="submit"  form="emailForm"></button></UserProvider>
+        <UserProvider initial={TestDataUserProvider}><SignUpPage /><button  aria-label="test" type="submit"  form="form"></button></UserProvider>
     )
 }
 
@@ -60,183 +57,90 @@ const EmailTemplateBE = (args) =>   {
     TestDataUserProvider.testData.email = "test@test.com";
 
     return(
-        <UserProvider initial={TestDataUserProvider}><SignUpPage /><button type="submit"  form="emailForm"></button></UserProvider>
+        <UserProvider initial={TestDataUserProvider}><SignUpPage /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
     )
 }
 
-export const EngWithBadEmailFrontEndTest = BadEmailTemplateFE.bind({});
-export const FrenchWithBadEmail = BadEmailTemplateFE.bind({});
-export const BadEmailBackEndTest = EmailTemplateBE.bind({});
-export const SuccessfulEmailBackEndTest = EmailTemplateBE.bind({});
-export const ServerErrorBackEndTest = EmailTemplateBE.bind({});ServerErrorBackEndTest
+export const EngErrorFrontEnd = BadEmailTemplateFE.bind({});
+export const FrErrorFrontEnd = BadEmailTemplateFE.bind({});
+export const ErrorBackEnd = EmailTemplateBE.bind({});
+export const SuccessfulBackEnd = EmailTemplateBE.bind({});
+export const ServerErrorBackEnd = EmailTemplateBE.bind({});
 
-EngWithBadEmailFrontEndTest.parameters = {
+EngErrorFrontEnd.parameters = storyParameters(false, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.signUp);
+EngErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
-    reactRouter: reactRouterParameters({
-        location: {
-            pathParams: { language: 'en' },
-        },
-        routing: { path: '/:language'+NAVIGATION_LINKS.signUp }
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage:"Submit form with bad email in English",
+        link: 'email',
+        heading: engErrorPageJson[1],
+        message: engErrorPageJson[2],
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.error
     })
 }
 
-EngWithBadEmailFrontEndTest.play = async ({ canvasElement, step }) => {
+FrErrorFrontEnd.parameters = storyParameters(false, AVAILABLE_LANGUAGES.fr, NAVIGATION_LINKS.signUp);
+FrErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
-    const canvas = await within(canvasElement);
-    await new Promise((r) => setTimeout(r, 1000));
-
-    await step('Submit form with bad email in English', async () => {
-        await userEvent.click(canvas.queryByRole('button'));
-    });
-
-    await new Promise((r) => setTimeout(r, 1000));
-
-    await step('Verify Error Summary was populated.', async () => {
-        const errorSummary = await canvas.queryByTestId('errorSummary');
-        await expect(errorSummary).toBeInTheDocument();
-        await expect(errorSummary.getAttribute('error-links')).toEqual("{\"#email\": \""+engErrorPageJson[2]+"\"}");
-        await expect(errorSummary).toHaveAttribute("heading", engErrorPageJson['1']);
-    });
-
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage:"Submit form with bad email in French",
+        link: 'email',
+        heading: frErrorPageJson[1],
+        message: frErrorPageJson[2],
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.error
+    })
 }
 
-FrenchWithBadEmail.parameters = {
+ErrorBackEnd.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en,  NAVIGATION_LINKS.signUp, SUBMIT_END_POINTS.sendOtpCode, errorResponse);
+ErrorBackEnd.play = async ({ canvasElement, step }) => {
 
-    reactRouter: reactRouterParameters({
-        location: {
-            pathParams: { language: 'fr' },
-        },
-        routing: { path: '/:language'+NAVIGATION_LINKS.signUp }
-    }),
-
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage:"Submit form with bad email For Back End Error",
+        link: 'email',
+        heading: engErrorPageJson[1],
+        message: serverError,
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.error
+    })
 }
 
-FrenchWithBadEmail.play = async ({ canvasElement, step }) => {
+SuccessfulBackEnd.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en,  NAVIGATION_LINKS.signUp, SUBMIT_END_POINTS.sendOtpCode, successResponse);
+SuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
-    const canvas = await within(canvasElement);
-    await new Promise((r) => setTimeout(r, 1000));
-
-    await step('Submit form with bad email in French', async () => {
-        await userEvent.click(canvas.queryByRole('button'));
-    });
-
-    await new Promise((r) => setTimeout(r, 1000));
-
-    await step('Verify Error Summary was populated.', async () => {
-        const errorSummary = await canvas.queryByTestId('errorSummary');
-        await expect(errorSummary).toBeInTheDocument();
-        await expect(errorSummary.getAttribute('error-links')).toEqual("{\"#email\": \""+frErrorPageJson[2]+"\"}");
-        await expect(errorSummary).toHaveAttribute("heading", frErrorPageJson['1']);
-    });
-
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage: "Submit form with good email",
+        link: 'email',
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.redirect
+    })
 }
 
-BadEmailBackEndTest.parameters = {
+ServerErrorBackEnd.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.signUp, SUBMIT_END_POINTS.sendOtpCode, null);
+ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
 
-    reactRouter: reactRouterParameters({
-        location: {
-            pathParams: { language: 'en' },
-        },
-        routing: { path: '/:language'+NAVIGATION_LINKS.signUp }
-    }),
-    msw: {
-        handlers: [
-            http.post(`${config.apiUrl}${SUBMIT_END_POINTS.sendOtpCode}`, async () => {
-                return HttpResponse.json(errorResponse);
-            }),
-        ],
-    },
-}
-
-BadEmailBackEndTest.play = async ({ canvasElement, step }) => {
-
-    const canvas = await within(canvasElement);
-    await new Promise((r) => setTimeout(r, 1000));
-
-    await step('Submit form with bad email in English For Back End Error', async () => {
-        await userEvent.click(canvas.queryByRole('button'));
-    });
-
-    await new Promise((r) => setTimeout(r, 1000));
-
-    await step('Verify Error Summary was populated.', async () => {
-        const errorSummary = await canvas.queryByTestId('errorSummary');
-        await expect(errorSummary).toBeInTheDocument();
-        await expect(errorSummary.getAttribute('error-links')).toEqual("{\"#email\": \""+serverError+"\"}");
-        await expect(errorSummary).toHaveAttribute("heading", engErrorPageJson['1']);
-    });
-
-}
-
-SuccessfulEmailBackEndTest.parameters = {
-
-    reactRouter: reactRouterParameters({
-        location: {
-            pathParams: { language: 'en' },
-        },
-        routing: { path: '/:language'+NAVIGATION_LINKS.signUp }
-    }),
-    msw: {
-        handlers: [
-            http.post(`${config.apiUrl}${SUBMIT_END_POINTS.sendOtpCode}`, () => {
-                return HttpResponse.json(successResponse);
-            }),
-        ],
-    },
-}
-
-SuccessfulEmailBackEndTest.play = async ({ canvasElement, step }) => {
-
-    const canvas = await within(canvasElement);
-    await new Promise((r) => setTimeout(r, 1000));
-
-    await step('Submit form with bad email in English For Back End Error', async () => {
-        await userEvent.click(canvas.queryByRole('button'));
-    });
-
-    await new Promise((r) => setTimeout(r, 1000));
-
-    await step('Verify page was navigated properly.', async () => {
-        //need to see if possible to test further
-        await expect(canvas.queryByText("404 Not Found")).toBeInTheDocument();
-    });
-
-}
-
-ServerErrorBackEndTest.parameters = {
-
-    reactRouter: reactRouterParameters({
-        location: {
-            pathParams: { language: 'en' },
-        },
-        routing: { path: '/:language'+NAVIGATION_LINKS.signUp }
-    }),
-    msw: {
-        handlers: [
-            http.post(`${config.apiUrl}${SUBMIT_END_POINTS.sendOtpCode}`, () => {
-                return null;
-            }),
-        ],
-    },
-}
-
-ServerErrorBackEndTest.play = async ({ canvasElement, step }) => {
-
-    const canvas = await within(canvasElement);
-    await new Promise((r) => setTimeout(r, 1000));
-
-    await step('Submit form with bad email in English For Back End Error', async () => {
-        await userEvent.click(canvas.queryByRole('button'));
-    });
-
-    await new Promise((r) => setTimeout(r, 3000));
-
-    await step('Verify page was navigated properly.', async () => {
-        //need to see if possible to test further
-        const errorSummary = await canvas.queryByTestId('errorSummary');
-        await expect(errorSummary).toBeInTheDocument();
-        await expect(errorSummary.getAttribute('error-links')).toEqual("{\"#email\": \""+engErrorPageJson['7']+"\"}");
-        await expect(errorSummary).toHaveAttribute("heading", engErrorPageJson['1']);
-    });
-
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage:"Submit form with Back End No Response Error",
+        link: 'email',
+        heading: engErrorPageJson[1],
+        message: engErrorPageJson[7],
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.error
+    })
 }

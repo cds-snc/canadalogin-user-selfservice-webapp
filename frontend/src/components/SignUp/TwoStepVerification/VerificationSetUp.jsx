@@ -57,7 +57,7 @@ export default function VerificationSetUp({currentLang}) {
                 }
             } catch (error) {
                 console.error('Signup error:', error);
-                setError({emailError:  errorPageJson[7], heading: errorPageJson['1']});
+                setError({phoneError:  errorPageJson[7], heading: errorPageJson['1']});
             }
         })
     }
@@ -69,6 +69,7 @@ export default function VerificationSetUp({currentLang}) {
                     errorJson.phoneError!==null&&(<GcdsErrorSummary
                         errorLinks={`{"#phone": "${errorJson.phoneError}"}`}
                         heading={errorJson.heading}
+                        data-testid="errorSummary"
                     />)
                 }
                 <GcdsContainer className="gcds-gap" >
@@ -79,7 +80,7 @@ export default function VerificationSetUp({currentLang}) {
                     </GcdsStepper>
                 </GcdsContainer>
                 <GcdsContainer>
-                    <form onSubmit={handleSubmit}>
+                    <form id="form"  onSubmit={handleSubmit}>
                         <VerificationSetUpInfo currentLang={currentLang} pageContentJson={pageContentJson} />
                         <GcdsContainer padding="200">
                         <PhoneInput
@@ -92,7 +93,7 @@ export default function VerificationSetUp({currentLang}) {
                             country={'ca'}
                             onlyCountries={countryMapping.countries}
                             localization={currentLang==='fr'?countryMapping.frLocalization:countryMapping.localization}
-                            value={phone}
+                            value={state.testData!=null?state.testData.phone:phone}
                             className={'high-res'}
                             enableSearch={true}
                             countryCodeEditable={false}

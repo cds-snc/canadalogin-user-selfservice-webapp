@@ -69,7 +69,7 @@ export default function EmailCollectionForm({currentLang, errorJson, setError}) 
     }
 
     return (
-        <form id="emailForm" onSubmit={handleSubmit}>
+        <form id="form" onSubmit={handleSubmit}>
             <GcdsContainer marginTop="100" marginBottom="0" >
                 <GcdsInput
                     inputId="email"

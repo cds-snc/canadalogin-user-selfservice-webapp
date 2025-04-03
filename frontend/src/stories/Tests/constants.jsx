@@ -12,6 +12,19 @@ export const TestDataUserProvider = {
         passwordSubmitted:false
     },
     testData:{
-        email: null
+        email: null,
+        otp: null,
+        phone: null,
+        verificationCode: null
     }
+}
+
+export const ACTION_TYPES = {
+    link: 'Link',
+    submit: 'Submit'
+}
+export const TEST_TYPES = {
+    error: 'Error',
+    success: 'Success',
+    redirect: 'Redirect',
 }

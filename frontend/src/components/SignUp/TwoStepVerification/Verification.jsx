@@ -133,10 +133,11 @@ export default function Verification({currentLang}) {
                 errorJson.codeError!==null&&(<GcdsErrorSummary
                     errorLinks={`{"#verificationCode": "${errorJson.codeError}"}`}
                     heading={errorJson.heading}
+                    data-testid="errorSummary"
                 />)
             }
             {
-                codeRequested && (<GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={pageContentJson['17']}>
+                codeRequested && (<GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={pageContentJson['17']} data-testid="linkSuccess">
                     &nbsp;
                 </GcdsNotice>)
             }
@@ -160,12 +161,12 @@ export default function Verification({currentLang}) {
                 <GcdsHeading tag='h2'>
                     {pageContentJson['8']}
                 </GcdsHeading>
-                <form onSubmit={handleSubmit}>
+                <form id="form"  onSubmit={handleSubmit}>
                     <GcdsInput
                         inputId="verificationCode"
                         label={pageContentJson['9']}
                         name="verificationCode"
-                        validateOn="other"
+                        value={state.testData!=null?state.testData.otp:''}
                         type="text"
                         lang={currentLang}
                         required ></GcdsInput>

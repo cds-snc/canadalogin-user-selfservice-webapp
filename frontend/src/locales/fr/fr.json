@@ -127,12 +127,12 @@
     "17": "Nous vous avons envoyé un nouveau code"
   },
   "CreateCoreProfile": {
-    "1": "Your GC Sign in account has been created",
-    "2": "Complete your profile",
-    "3": "Read our" ,
-    "4": "privacy notice",
-    "5": "for more details on how we use your personal information.",
-    "6": "Enter your name",
+    "1": "Votre compte de connexion GC a bien été créé.",
+    "2": "Complétez votre profil",
+    "3": "Lisez notre" ,
+    "4": "avis de confidentialité",
+    "5": "pour en savoir plus sur la manière dont nous utilisons vos renseignements personnels.",
+    "6": "Entrez votre nom",
     "7": "First name",
     "8": "Last name"
   },
