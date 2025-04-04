@@ -194,7 +194,7 @@ describe('Routing Test', () => {
         checkVerificationPageContents(AVAILABLE_LANGUAGES.fr, frJson["Verification"], langHref.en + NAVIGATION_LINKS.verification+'/sms', frJson['Button'], frJson["AlreadyGc"], false);
     });
 
-    test("Check verification page route for voice with en language defined", () => {
+    test("Check verification page route for voice with fr language defined", () => {
 
         vi.mock("../components/Providers/PrivateRoute.jsx", () => {
             return {
