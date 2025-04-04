@@ -57,13 +57,15 @@
     "1": "Un problème est survenu",
     "2": "Adresse courriel invalide. Votre adresse courriel doit contenir un symbole @.",
     "3": "Les codes doivent être composés de six chiffres. Veuillez réessayer.",
-    "4": "Password must be 12 characters",
-    "5": "Invalid password. Password must be at least 12 characters and maximum 65 characters.",
+    "4": "Les mots de passe doivent être composés d’au moins 12 caractères.",
+    "5": "Invalid password. Password must be at least",
     "6": "Code invalide. Veuillez réessayer.",
     "7": "Server Error. Please try again later.",
     "8": "Numéro de téléphone invalide. Les numéros de téléphone pour le pays que vous avez sélectionné doivent être composés de ",
     "9": " chiffres. Assurez-vous d’avoir sélectionné le bon pays ou essayez d’entrer à nouveau votre numéro de téléphone. Les extensions ne sont pas permises.",
-    "10": "Veuillez entrer un numéro de téléphone pour continuer."
+    "10": "Veuillez entrer un numéro de téléphone pour continuer.",
+    "11": "and a maximum of",
+    "12": "characters."
   },
   "EmailVerification":{
     "1": "Vérifiez votre boîte de réception courrie",

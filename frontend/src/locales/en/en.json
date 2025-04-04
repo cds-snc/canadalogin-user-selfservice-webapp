@@ -11,11 +11,11 @@
   },
   "PasswordCreation": {
     "1": "Your email was successfully verified",
-    "2": "Step 2 of 5", 
+    "2": "Step 2 of 4",
     "3": "Create a password",
     "4": "Your password should be a phrase or series of words that only you can recognize. It must be",
-    "5": "at least 12 characters.",
-    "6": "You can use multiple words seprated by spaces to meet the character limit.",
+    "5": "at least",
+    "6": " characters. You can use multiple words separated by spaces to meet the character limit.",
     "7": "Password safety tips",
     "8": "The longer and more unusual the password, the harder it is to guess. So avoid using common phrases. Also avoid repeating passwords from other online accounts such as banks, email and social media.",
     "9": "Password",
@@ -25,20 +25,6 @@
     "13": "characters",
     "14": "Already have a GC Sign in account?",
     "15": "Sign in"
-  },
-  "PasswordCollectionForm":{
-    "1": "Password",
-    "2":"example: pillow moose dish",
-    "3": "Show password",
-    "4": "Continue"
-  },
-  "SignUpPassword":{
-    "1": "Create a password",
-    "2": "Your password should be a phrase or series of words that only you can recognize. It must be ",
-    "3": "at least 12 characters. ",
-    "4": "You can use multiple words seperated by spaces to meet the character limit.",
-    "5": "Password safety tips",
-    "6": "The longer and more unusual the password, the harder it is to guess. So avoid using common phrases. Also avoid repeating passwords from other online accounts such as banks, email and social media."
   },
   "SignUpEmail": {
     "1": "Create a GC Sign in",
@@ -67,12 +53,14 @@
     "2": "Invalid email. Email must contain an ‘@’ symbol.",
     "3": "Codes must be six digits. Try again.",
     "4": "Password must be 12 characters",
-    "5": "Invalid password. Password must be at least 12 characters and maximum 65 characters.",
+    "5": "Invalid password. Password must be at least",
     "6": "Code sent does not match. Try again.",
     "7": "Server Error. Please try again later.",
     "8": "Invalid phone number. Phone numbers for the country you selected should be ",
     "9": " digits. Make sure you selected the right country, or try typing your phone number again. Extensions are not allowed.",
-    "10": "Enter a phone number to continue."
+    "10": "Enter a phone number to continue.",
+    "11": "and a maximum of",
+    "12": "characters."
   },
   "EmailVerification":{
     "1": "Check your email",

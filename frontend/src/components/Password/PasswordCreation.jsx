@@ -48,7 +48,8 @@ export default function PasswordCreation({currentLang}) {
             formData.get('password');
             setVisibility(!visibility);
             if (!isPasswordValid(formData.get('password'))) {
-                setError({passwordError: errorPageJson[5], heading: errorPageJson['1']});
+                const errorString = `${errorPageJson[5]} ${passwordPolicy.min} ${errorPageJson[11]} ${passwordPolicy.max} ${errorPageJson[12]}`
+                setError({passwordError: errorString, heading: errorPageJson['1']});
                 return;
             }
 
@@ -96,6 +97,7 @@ export default function PasswordCreation({currentLang}) {
             errorJson.passwordError!==null&&(<GcdsErrorSummary
                 errorLinks={`{"#password": "${errorJson.passwordError}"}`}
                 heading={errorJson.heading}
+                data-testid="errorSummary"
                 />)
             }
             <GcdsContainer centered className="gcds-notice">
@@ -109,7 +111,7 @@ export default function PasswordCreation({currentLang}) {
                     </GcdsStepper>
                 </GcdsText>
             <GcdsText>
-                {pageContentJson['4']}<strong>{pageContentJson['5']}</strong>{pageContentJson['6']}
+                {pageContentJson['4']}<strong> {pageContentJson['5']} {passwordPolicy.min} </strong>{pageContentJson['6']}{pageContentJson['7']}
             </GcdsText>
                     <GcdsDetails detailsTitle={pageContentJson['7']}>
                     <GcdsText>
@@ -117,19 +119,30 @@ export default function PasswordCreation({currentLang}) {
                     </GcdsText>
                     </GcdsDetails>
             <GcdsContainer>
-                <form onSubmit={handleSubmit} >
-                    <GcdsInput
+                <form id="form" onSubmit={handleSubmit} >
+                    { state.testData!==undefined&&(
+                        <GcdsInput
+                            inputId="input-password"
+                            label={pageContentJson['9']}
+                            name="password"
+                            value={state.testData.password}
+                            // value={state.testData!==undefined?state.testData.password:""}
+                            hint={pageContentJson['10']}
+                            type={checkedValue? "password" : "text"}
+                            onGcdsInput={handlePasswordChange}
+                            errorMessage={errorJson.passwordError}
+                            required ></GcdsInput>)
+                    }
+                    { state.testData===undefined&&(<GcdsInput
                         inputId="input-password"
                         label={pageContentJson['9']}
                         name="password"
                         hint={pageContentJson['10']}
                         type={checkedValue? "password" : "text"}
-                        className="form-control"
                         onGcdsInput={handlePasswordChange}
                         errorMessage={errorJson.passwordError}
-                        required
-                    >
-                    </GcdsInput>
+                        required ></GcdsInput>)
+                    }
                         <GcdsCheckbox
                             checkboxId="checkbox-default"
                             label={pageContentJson['11']}
