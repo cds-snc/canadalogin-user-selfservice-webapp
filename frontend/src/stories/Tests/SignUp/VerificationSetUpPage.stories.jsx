@@ -1,5 +1,5 @@
 import {withRouter} from 'storybook-addon-remix-react-router';
-import {AVAILABLE_LANGUAGES, NAVIGATION_LINKS,} from "../../../utils/constants.jsx";
+import {AVAILABLE_LANGUAGES, NAVIGATION_LINKS, SUBMIT_END_POINTS,} from "../../../utils/constants.jsx";
 import {UserProvider} from "../../../components/Providers/UserContext.jsx";
 import {getPageContent} from "../../../utils/functions.jsx";
 import {ACTION_TYPES, TEST_TYPES, TestDataUserProvider} from "../constants.jsx";
@@ -45,32 +45,31 @@ export default {
 
 
 const BadEmailTemplateFE = (args) =>   {
-
-    TestDataUserProvider.testData.phone = "1416123";
     return(
         <UserProvider initial={TestDataUserProvider}><VerificationSetUpPage /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
     )
 }
 
 const EmailTemplateBE = (args) =>   {
-
-    TestDataUserProvider.testData.phone = "141612345678";
-
     return(
         <UserProvider initial={TestDataUserProvider}><VerificationSetUpPage /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
     )
 }
+export const EngNoNumberErrorFrontEndTest = BadEmailTemplateFE.bind({});
+export const FrNoNumberErrorFrontEndTest = BadEmailTemplateFE.bind({});
+export const EngDigitErrorFrontEndTest = BadEmailTemplateFE.bind({});
+export const FrDigitErrorFrontEndTest = BadEmailTemplateFE.bind({});
+export const ErrorBackEnd = EmailTemplateBE.bind({});
+export const ServerErrorBackEnd = EmailTemplateBE.bind({});
+export const SuccessfulBackEnd = EmailTemplateBE.bind({});
 
-export const EngErrorFrontEndTest = BadEmailTemplateFE.bind({});
-export const FrErrorFrontEndTest = BadEmailTemplateFE.bind({});
-
-EngErrorFrontEndTest.parameters = storyParameters(false, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.twoStepVerification);
-EngErrorFrontEndTest.play = async ({ canvasElement, step }) => {
+EngNoNumberErrorFrontEndTest.parameters = storyParameters(false, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.twoStepVerification);
+EngNoNumberErrorFrontEndTest.play = async ({ canvasElement, step }) => {
 
     await testCase({
         canvasElement,
         step,
-        stepMessage:"Submit form with  Phone number in English",
+        stepMessage:"Submit form with bad Phone number in English",
         link: 'phone',
         heading: engErrorPageJson[1],
         message: engErrorPageJson[10],
@@ -80,13 +79,13 @@ EngErrorFrontEndTest.play = async ({ canvasElement, step }) => {
     })
 }
 
-FrErrorFrontEndTest.parameters = storyParameters(false, AVAILABLE_LANGUAGES.fr, NAVIGATION_LINKS.twoStepVerification);
-FrErrorFrontEndTest.play = async ({ canvasElement, step }) => {
+FrNoNumberErrorFrontEndTest.parameters = storyParameters(false, AVAILABLE_LANGUAGES.fr, NAVIGATION_LINKS.twoStepVerification);
+FrNoNumberErrorFrontEndTest.play = async ({ canvasElement, step }) => {
 
     await testCase({
         canvasElement,
         step,
-        stepMessage:"Submit form with bad Phone number in French",
+        stepMessage:"Submit form with bad Phone number in English",
         link: 'phone',
         heading: frErrorPageJson[1],
         message: frErrorPageJson[10],
@@ -94,4 +93,86 @@ FrErrorFrontEndTest.play = async ({ canvasElement, step }) => {
         actionType: ACTION_TYPES.submit,
         type: TEST_TYPES.error
     })
+}
+
+EngDigitErrorFrontEndTest.parameters = storyParameters(false, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.twoStepVerification);
+EngDigitErrorFrontEndTest.play = async ({ canvasElement, step }) => {
+
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage:"Submit form with bad Phone number in English",
+        link: 'phone',
+        heading: engErrorPageJson[1],
+        message: engErrorPageJson[8]+'11'+engErrorPageJson[9],
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.error,
+        input: {inputType: 'textBox', stepMessage:'Enter phone Number without enough digits.', value: '416123'}
+    })
+}
+
+FrDigitErrorFrontEndTest.parameters = storyParameters(false, AVAILABLE_LANGUAGES.fr, NAVIGATION_LINKS.twoStepVerification);
+FrDigitErrorFrontEndTest.play = async ({ canvasElement, step }) => {
+
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage:"Submit form with bad Phone number in English",
+        link: 'phone',
+        heading: frErrorPageJson[1],
+        message: frErrorPageJson[8]+'11'+frErrorPageJson[9],
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.error,
+        input: {inputType: 'textBox', stepMessage:'Enter phone Number without enough digits.', value: '416123'}
+    })
  }
+
+ErrorBackEnd.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.twoStepVerification, SUBMIT_END_POINTS.sendTwoStepVerificationCode, errorResponse);
+ErrorBackEnd.play = async ({ canvasElement, step }) => {
+
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage:"Submit form with bad Phone number in English",
+        link: 'phone',
+        heading: engErrorPageJson[1],
+        message: errorResponse.message,
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.error,
+        input: {inputType: 'textBox', stepMessage:'Enter phone Number with enough digits.', value: '4161234567'}
+    })
+}
+ServerErrorBackEnd.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.signUp, SUBMIT_END_POINTS.sendTwoStepVerificationCode, null);
+ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
+
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage:"Submit form with Back End No Response Error",
+        link: 'phone',
+        heading: engErrorPageJson[1],
+        message: engErrorPageJson[7],
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.error,
+        input: {inputType: 'textBox', stepMessage:'Enter phone Number with enough digits.', value: '4161234567'}
+    })
+}
+
+SuccessfulBackEnd.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.signUp, SUBMIT_END_POINTS.sendTwoStepVerificationCode, successResponse);
+SuccessfulBackEnd.play = async ({ canvasElement, step }) => {
+
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage: "Submit form with good email",
+        link: 'phone',
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.redirect,
+        input: {inputType: 'textBox', stepMessage:'Enter phone Number with enough digits.', value: '4161234567'}
+    })
+}

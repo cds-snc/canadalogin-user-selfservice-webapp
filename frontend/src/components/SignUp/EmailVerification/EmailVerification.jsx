@@ -103,7 +103,7 @@ export default function EmailVerification({currentLang}) {
             }
         })
     }
-    console.log(state.testData)
+
     return (
         <GcdsContainer className="gcds-content" >
             <GcdsContainer>

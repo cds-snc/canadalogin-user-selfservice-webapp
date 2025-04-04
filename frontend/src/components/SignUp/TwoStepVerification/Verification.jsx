@@ -118,11 +118,11 @@ export default function Verification({currentLang}) {
                     navigate("/" + currentLang + NAVIGATION_LINKS.coreProfile);
                 }else {
                     console.log("Error....", response);
-                    setError({codeError: errorPageJson[7], heading: errorPageJson['1']});
+                    setError({codeError: response.message, heading: errorPageJson['1']});
                 }
             } catch (error) {
                 console.error('Signup error:', error);
-                setError({emailError:  errorPageJson[7], heading: errorPageJson['1']});
+                setError({codeError:  errorPageJson[7], heading: errorPageJson['1']});
             }
         })
     }
