@@ -103,7 +103,7 @@ export default function EmailVerification({currentLang}) {
             }
         })
     }
-
+    console.log(state.testData)
     return (
         <GcdsContainer className="gcds-content" >
             <GcdsContainer>
@@ -137,16 +137,27 @@ export default function EmailVerification({currentLang}) {
                         {pageContentJson['4']}<strong> {pageContentJson['5']}</strong>
                     </GcdsText>
                     <form id="form" onSubmit={handleSubmit}>
-                        <GcdsInput
+                        {  state.testData!==undefined&&(<GcdsInput
                             inputId="verificationCode"
                             label={pageContentJson['6']}
                             name="verificationCode"
-                            value={state.testData!=null?state.testData.otp:''}
+                            value={state.testData.otp}
                             type="text"
                             validateOn="other"
                             errorMessage={errorJson.codeError}
                             lang={currentLang}
-                            required ></GcdsInput>
+                            required ></GcdsInput>)
+                        }
+                        {  state.testData===undefined&&(<GcdsInput
+                            inputId="verificationCode"
+                            label={pageContentJson['6']}
+                            name="verificationCode"
+                            type="text"
+                            validateOn="other"
+                            errorMessage={errorJson.codeError}
+                            lang={currentLang}
+                            required ></GcdsInput>)
+                        }
                        <SubmitButton currentLang={currentLang} disabled={isPending}/>
                     </form>
                 </GcdsContainer>
