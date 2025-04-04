@@ -99,11 +99,11 @@ export default function EmailVerification({currentLang}) {
                 }
             } catch (error) {
                 console.error('Signup error:', error);
-                setError({emailError:  errorPageJson[7], heading: errorPageJson['1']});
+                setError({codeError:  errorPageJson[7], heading: errorPageJson['1']});
             }
         })
     }
-
+    console.log(state.testData)
     return (
         <GcdsContainer className="gcds-content" >
             <GcdsContainer>
@@ -111,16 +111,18 @@ export default function EmailVerification({currentLang}) {
                     errorJson.codeError!==null&&(<GcdsErrorSummary
                         errorLinks={`{"#verificationCode": "${errorJson.codeError}"}`}
                         heading={errorJson.heading}
+                        data-testid="errorSummary"
                     />)
                 }
                 {
-                    codeRequested && (<GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={pageContentJson['12']}>
+                    codeRequested && (<GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={pageContentJson['12']} data-testid="linkSuccess">
                         &nbsp;
                     </GcdsNotice>)
                 }
                 <GcdsContainer className="gcds-gap" >
-                    <GcdsStepper currentStep="1" totalSteps="5"
-                                 tag="h1"  >
+                    <GcdsStepper currentStep="1" totalSteps="4"
+                                 tag="h1"
+                                 lang={currentLang} >
                         {pageContentJson['1']}
                     </GcdsStepper>
                 </GcdsContainer>
@@ -132,17 +134,30 @@ export default function EmailVerification({currentLang}) {
                         {pageContentJson['3']}
                     </GcdsText>
                     <GcdsText>
-                        {pageContentJson['4']}<strong>{pageContentJson['5']}</strong>
+                        {pageContentJson['4']}<strong> {pageContentJson['5']}</strong>
                     </GcdsText>
-                    <form onSubmit={handleSubmit}>
-                        <GcdsInput
+                    <form id="form" onSubmit={handleSubmit}>
+                        {  state.testData!==undefined&&(<GcdsInput
+                            inputId="verificationCode"
+                            label={pageContentJson['6']}
+                            name="verificationCode"
+                            value={state.testData.otp}
+                            type="text"
+                            validateOn="other"
+                            errorMessage={errorJson.codeError}
+                            lang={currentLang}
+                            required ></GcdsInput>)
+                        }
+                        {  state.testData===undefined&&(<GcdsInput
                             inputId="verificationCode"
                             label={pageContentJson['6']}
                             name="verificationCode"
                             type="text"
                             validateOn="other"
                             errorMessage={errorJson.codeError}
-                            required ></GcdsInput>
+                            lang={currentLang}
+                            required ></GcdsInput>)
+                        }
                        <SubmitButton currentLang={currentLang} disabled={isPending}/>
                     </form>
                 </GcdsContainer>
@@ -156,7 +171,7 @@ export default function EmailVerification({currentLang}) {
                         </GcdsLink>
                     </GcdsText>
                     <GcdsText>
-                        {time>0 && !isPending?(<span>{pageContentJson['9']}<strong>{time} {pageContentJson['10']}</strong></span>)
+                        {time>0 && !isPending?(<span>{pageContentJson['9']}<strong> {time} {pageContentJson['10']}</strong></span>)
                             :!isPending?(<GcdsLink href="#" onClick={requestNewCode} >
                                 {pageContentJson['11']}
                               </GcdsLink>):""}

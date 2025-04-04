@@ -6,6 +6,7 @@ const config = {
     "../src/**/*.mdx",
     "../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"
   ],
+
   "addons": [
     "@storybook/addon-essentials",
     "@storybook/addon-onboarding",
@@ -14,9 +15,18 @@ const config = {
     'storybook-addon-remix-react-router',
     '@storybook/addon-links'
   ],
+
   "framework": {
     "name": "@storybook/react-vite",
     "options": {}
+  },
+  staticDirs: ['../public'],
+  docs: {
+    autodocs: true
+  },
+
+  typescript: {
+    reactDocgen: "react-docgen-typescript"
   }
 };
 export default config;

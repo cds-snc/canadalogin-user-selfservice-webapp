@@ -28,7 +28,7 @@ export default function Home({currentLang}) {
                             </strong>
                         </GcdsText>
                 </GcdsHeading>
-                <GcdsDetails detailsTitle={pageContentJson['4']} data-testid="gcds-details">
+                <GcdsDetails detailsTitle={pageContentJson['4']}>
                     <GcdsText>
                         {pageContentJson['5']}
                     </GcdsText>
@@ -46,7 +46,9 @@ export default function Home({currentLang}) {
                             <GcdsInput
                                 inputId="email"
                                 label={pageContentJson['8']}
+                                type="email"
                                 name="email"
+                                validateOn="other"
                             ></GcdsInput>
                             <SubmitButton currentLang={currentLang} />
                         </form>

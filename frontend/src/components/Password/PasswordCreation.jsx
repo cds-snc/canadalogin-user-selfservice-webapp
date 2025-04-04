@@ -99,67 +99,60 @@ export default function PasswordCreation({currentLang}) {
                 />)
             }
             <GcdsContainer centered className="gcds-notice">
-                <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={pageContentJson['1']} data-testid="gcds-notice">
+                <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={pageContentJson['1']}>
                     &nbsp;
                 </GcdsNotice>
             </GcdsContainer>
                 <GcdsText>
-                    <GcdsStepper currentStep="2" totalSteps="5" tag="h1" lang={currentLang} marginTop="150" marginBottom="0">
+                    <GcdsStepper currentStep="2" totalSteps="4" tag="h1" lang={currentLang} marginTop="150" marginBottom="0">
                         {pageContentJson['3']}
                     </GcdsStepper>
                 </GcdsText>
-                    <GcdsText> 
-                        {pageContentJson['4']}<strong>{pageContentJson['5']}</strong>{pageContentJson['6']}
-                    </GcdsText>
-                    <GcdsDetails detailsTitle={pageContentJson['7']} data-testid="gcds-title">
+            <GcdsText>
+                {pageContentJson['4']}<strong>{pageContentJson['5']}</strong>{pageContentJson['6']}
+            </GcdsText>
+                    <GcdsDetails detailsTitle={pageContentJson['7']}>
                     <GcdsText>
                         {pageContentJson['8']}
                     </GcdsText>
                     </GcdsDetails>
             <GcdsContainer>
-            <form onSubmit={handleSubmit} >
-                <GcdsInput
-                    inputId="input-password"
-                    label={pageContentJson['9']}
-                    name="password"
-                    hint={pageContentJson['10']}
-                    lang={currentLang}
-                    type={checkedValue? "password" : "text"}
-                    className="form-control"
-                    onGcdsInput={handlePasswordChange}
-                    errorMessage={errorJson.passwordError}
-                    required
-                >
-                </GcdsInput>
-                    <small className="help-block" id="password-text"></small>
+                <form onSubmit={handleSubmit} >
+                    <GcdsInput
+                        inputId="input-password"
+                        label={pageContentJson['9']}
+                        name="password"
+                        hint={pageContentJson['10']}
+                        type={checkedValue? "password" : "text"}
+                        className="form-control"
+                        onGcdsInput={handlePasswordChange}
+                        errorMessage={errorJson.passwordError}
+                        required
+                    >
+                    </GcdsInput>
                         <GcdsCheckbox
                             checkboxId="checkbox-default"
                             label={pageContentJson['11']}
                             name="checkbox"
-                            data-testid="gcds-checkbox"
-                            onGcdsChange={validateCheckbox}
-                            >
-                                <GcdsText>
-                                    {checkedValue? "false" : "true"}
-                                </GcdsText>  
+                            onGcdsChange={validateCheckbox}>
+                            <GcdsText>
+                                {checkedValue? "false" : "true"}
+                            </GcdsText>
                         </GcdsCheckbox>
-
-                <GcdsText>
-                    {pageContentJson['12']} <strong>{passwordStrength}</strong>/{passwordPolicy.min} {pageContentJson['13']}
-                </GcdsText>
-                <SubmitButton currentLang={currentLang} disabled={isPending} />
+                        <GcdsText>
+                            {pageContentJson['12']} <strong>{passwordStrength}</strong>/{passwordPolicy.min} {pageContentJson['13']}
+                        </GcdsText>
+                    <SubmitButton currentLang={currentLang} disabled={isPending} />
                 </form>
             </GcdsContainer>
-            
             <GcdsHeading tag="h2">
-                {pageContentJson['17']}
-            <GcdsText marginTop="200" marginBottom="0">
-            <GcdsLink href={`/${currentLang}`}>
-                {pageContentJson['18']}
-            </GcdsLink>
-            </GcdsText>
-        </GcdsHeading>
-
+                {pageContentJson['14']}
+                <GcdsText marginTop="200" marginBottom="0">
+                    <GcdsLink href={`/${currentLang}`}>
+                        {pageContentJson['15']}
+                    </GcdsLink>
+                </GcdsText>
+            </GcdsHeading>
         </GcdsContainer>
     )
 }

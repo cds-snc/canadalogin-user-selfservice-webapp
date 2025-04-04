@@ -1,0 +1,75 @@
+%%{init: {'theme':'neutral'}}%%
+graph TB
+    subgraph AWS["CDS AWS Cloud ca-central-1"]
+        subgraph "VPC"
+            subgraph PublicSubnet["Public Subnet"]
+                ALB["Application Load Balancer<br/>(routes API traffic)"]
+            end
+
+            subgraph "Private Subnet"
+                subgraph "ECS Cluster"
+                    subgraph "Backend Container"
+                        APIProxy["API Proxy (FastAPI)"]
+                        APIClient["IBM Verify API Client"]
+                    end
+                end
+
+            end
+        end
+
+        CloudWatch[CloudWatch]
+        SecretsManager[Secrets Manager]
+        CloudFront["CloudFront<br/>(serves custom Web assets)"]
+        Route53["Route 53 (DNS)"]
+        S3[S3 Bucket<br/>Front-end Web assets]
+        WAF[AWS WAF]
+
+        
+    end
+
+    subgraph IBMVerify["IBM Cloud (canada)"]
+        IBMVerifyFeatures["<strong>IBM VERIFY SaaS</strong><br/><br/>OIDC Services<br/>Monitoring and Repoting<br/>APIs<br/>MFA Enroll/Verify<br/>Identity Store"]
+    end
+
+    RelyingParty[Relying Party]
+    WebBrowser["Users (Web Browser)"]
+
+    subgraph Azure["CDS Azure Cloud (canada)"]
+        Sentinel["Microsoft Sentinel (CDS)"]
+    end
+    
+    %% Connections
+    WebBrowser -->|"OIDC endpoints<br/>HTTPS<br/>TO BE DECIDED (this could go through AWS API Proxy instead)"| IBMVerify
+    WebBrowser -->|"HTTPS"| AWS
+    CloudFront -->|Static Content| S3
+    WAF -.->|Protect| ALB
+    WAF -.->|Protect| CloudFront
+    ALB -->|API Requests| APIProxy
+    APIClient -->|Signup+Signin+MFA+Profile HTTPS| IBMVerify
+    APIClient -->|Secrets| SecretsManager
+    RelyingParty-->|"OIDC endpoints<br/>HTTPS<br/>TO BE DECIDED (this could go through AWS API Proxy instead)"| IBMVerify
+    RelyingParty-->|"Redirect (authorize)<br/>HTTPS"| WebBrowser
+    WebBrowser-->|"Redirect (callback)<br/>HTTPS"| RelyingParty
+    APIProxy-->|Uses| APIClient
+
+    %% Monitoring
+    WAF -.->|Logs| CloudWatch
+    APIProxy -.->|Logs| CloudWatch
+    CloudWatch -->|Logs| Sentinel
+    IBMVerify -->|Logs| Sentinel
+
+    %% Styling
+    classDef aws fill:#FF9900,stroke:#232F3E,color:white;
+    classDef gcsignin fill:#FF5733,stroke:#232F3E,color:white;
+    classDef ibm fill:#3B76e2,stroke:#232F3E,color:white;
+    classDef ibmchild fill:#1B46C2,stroke:#232F3E,color:white;
+    classDef users fill:#6BBE49,stroke:#232F3E,color:white;
+    classDef rp fill:#8B8000,stroke:#232F3E,color:white;
+    classDef azure fill:#12267d,stroke:#23F3E,color:white;
+
+    class Route53,CloudFront,ALB,WAF,CFWAF,ECS,CloudWatch,SecretsManager,WAFLogs,S3 aws;
+    class IBMVerifyFeatures ibm;
+    class WebBrowser users;
+    class RelyingParty rp;
+    class GCSigninFrontEnd,APIProxy,APIClient gcsignin;
+    class Sentinel azure;

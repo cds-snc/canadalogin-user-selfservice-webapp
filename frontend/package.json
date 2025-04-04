@@ -18,20 +18,21 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-password-strength-bar": "^0.4.1",
+    "react-phone-input-2": "^2.15.1",
     "react-router": "^7.2.0",
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^3.2.5",
     "@eslint/js": "^9.21.0",
-    "@storybook/addon-essentials": "^8.6.4",
-    "@storybook/addon-links": "^8.6.4",
-    "@storybook/addon-onboarding": "^8.6.4",
-    "@storybook/blocks": "^8.6.4",
-    "@storybook/experimental-addon-test": "^8.6.4",
-    "@storybook/react": "^8.6.4",
-    "@storybook/react-vite": "^8.6.4",
-    "@storybook/test": "^8.6.4",
+    "@storybook/addon-essentials": "^8.6.8",
+    "@storybook/addon-links": "^8.6.8",
+    "@storybook/addon-onboarding": "^8.6.8",
+    "@storybook/blocks": "^8.6.8",
+    "@storybook/experimental-addon-test": "^8.6.8",
+    "@storybook/react": "^8.6.8",
+    "@storybook/react-vite": "^8.6.8",
+    "@storybook/test": "^8.6.8",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
     "@types/react": "^19.0.10",
@@ -46,9 +47,11 @@
     "eslint-plugin-storybook": "^0.11.4",
     "globals": "^15.15.0",
     "jsdom": "^26.0.0",
+    "msw": "^2.7.3",
+    "msw-storybook-addon": "^2.0.4",
     "playwright": "^1.50.1",
     "prop-types": "^15.8.1",
-    "storybook": "^8.6.4",
+    "storybook": "^8.6.8",
     "storybook-addon-remix-react-router": "^4.0.1",
     "vite": "^6.2.1",
     "vitest": "^3.0.7"
@@ -66,6 +69,11 @@
       "last 1 chrome version",
       "last 1 firefox version",
       "last 1 safari version"
+    ]
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
     ]
   }
 }

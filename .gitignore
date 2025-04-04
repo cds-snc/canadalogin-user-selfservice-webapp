@@ -15,3 +15,6 @@ frontend/package-lock.json
 
 #Backend
 __pycache__
+
+#Storybook Build
+frontend/storybook-static/
