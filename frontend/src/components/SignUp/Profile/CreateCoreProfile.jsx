@@ -1,7 +1,7 @@
 import {
     GcdsContainer, GcdsErrorSummary, GcdsHeading, GcdsInput, GcdsLink, GcdsNotice, GcdsStepper, GcdsText,
 } from "@cdssnc/gcds-components-react";
-import {getPageContent, isCodeValid, isNameValid} from "../../../utils/functions.jsx";
+import {getPageContent, isNameValid} from "../../../utils/functions.jsx";
 import SubmitButton from "../../Layout/SubmitButton.jsx";
 import {useUser} from "../../Providers/UserContext.jsx";
 import {startTransition, useState} from "react";
