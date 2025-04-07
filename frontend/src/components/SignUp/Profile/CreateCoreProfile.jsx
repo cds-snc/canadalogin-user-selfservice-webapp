@@ -14,8 +14,6 @@ export default function CreateCoreProfile({currentLang}) {
     const errorPageJson = getPageContent(currentLang, "Error");
     const pageContentJson = getPageContent(currentLang, "CreateCoreProfile");
 
-
-
     function  handleSubmit (e){
         startTransition(async()=> {
             e.preventDefault();
