@@ -15,63 +15,63 @@ flowchart TD
     DeveloperWorkOnFeature("Developer checks out the branch and develops features")
     DeveloperCommitsChanges("Developer commits changes to their branch")
     CreatePullRequest("Developer creates a Pull Request")
+    LinkPRToIssue("(Optional)<br />Developer links the PR to the Task in the PR description<br/> (Example: 'Closes #10')")
     SlackAddPRMessage("Developer adds a link to the PR on dev channel to notify team")
     UnitTestsPass{"Coverage is 70% and Unit Tests Pass?"}
     AddUnitTests("Developer adds Unit Tests")
     ZenHubMoveToReview("Developer moves the Task to the Review column")
-    ZenHubLinkPR("Developer links the PR to the Task")
     PRReview("PR is reviewed by at least one developer")
     PRApproved("Pull Request is Approved")
     PRChangesRequired{Changes Required?}
     PRMakeChanges("Developer commits changes")
     MergePR("Developer merges PR to main branch, Task is closed")
 
-    StoryRefinement --> zenhubrefinement
-    subgraph zenhubrefinement["ZenHub"]
+    StoryRefinement --> ZenHubRefinementGraph
+    subgraph ZenHubRefinementGraph["ZenHub"]
         ProductTeamRefine
         AddTasksToProductBacklog("Tasks are added to Product Backlog")
     end
-    zenhubrefinement --> SprintPlanning
-    SprintPlanning --> zenhubplanning
-    subgraph zenhubplanning["ZenHub"]
+    ZenHubRefinementGraph --> SprintPlanning
+    SprintPlanning --> ZenHubPlanningGraph
+    subgraph ZenHubPlanningGraph["ZenHub"]
         BacklogGrooming
         AddTasks
     end
     BacklogGrooming --> AddTasks
     AddTasks --> PickTask
     PickTask -->|"Developer<br/>adds task<br/>(if missing)"| AddTasks
-    PickTask --> zenhub1
-    subgraph zenhub1["ZenHub"]
+    PickTask --> ZenHubTaskPickupGraph
+    subgraph ZenHubTaskPickupGraph["ZenHub"]
         ZenHubAddLabels
         ZenHubAssignTask
         ZenHubMoveToInProgress
     end
-    zenhub1 --> WorkOnTask
-    WorkOnTask --> github1
-    subgraph github1["GitHub"]
+    ZenHubTaskPickupGraph --> WorkOnTask
+    WorkOnTask --> GitHubWorkOnFeatureGraph
+    subgraph GitHubWorkOnFeatureGraph["GitHub"]
         GitHubCreateBranch
     end
-    github1 --> DeveloperWorkOnFeature
+    GitHubWorkOnFeatureGraph --> DeveloperWorkOnFeature
     DeveloperWorkOnFeature --> DeveloperCommitsChanges
     DeveloperCommitsChanges --> TaskIsReviwed
-    TaskIsReviwed --> github2
-    subgraph github2["GitHub"]
+    TaskIsReviwed --> GitHubCreatePRGraph
+    subgraph GitHubCreatePRGraph["GitHub"]
         CreatePullRequest
+        LinkPRToIssue
     end
-    github2 --> UnitTestsPass
-    UnitTestsPass -->|Yes| zenhub2
+    GitHubCreatePRGraph --> UnitTestsPass
+    UnitTestsPass -->|Yes| ZenHubTaskReviewGraph
     UnitTestsPass -->|No| AddUnitTests
-    AddUnitTests --> zenhub2
-    subgraph zenhub2["ZenHub"]
+    AddUnitTests --> ZenHubTaskReviewGraph
+    subgraph ZenHubTaskReviewGraph["ZenHub"]
         ZenHubMoveToReview
-        ZenHubLinkPR
     end
-    zenhub2 --> slack
-    subgraph slack["Slack"]
+    ZenHubTaskReviewGraph --> SlackGraph
+    subgraph SlackGraph["Slack"]
         SlackAddPRMessage
     end
-    slack --> github3
-    subgraph github3["GitHub"]
+    SlackGraph --> GitHubPRGraph
+    subgraph GitHubPRGraph["GitHub"]
         PRReview
         PRChangesRequired
         PRApproved
@@ -95,10 +95,10 @@ flowchart TD
     style DeveloperWorkOnFeature fill:#d0f0f0,stroke:#333,stroke-width:2px
     style DeveloperCommitsChanges fill:#d0f0f0,stroke:#333,stroke-width:2px
     style CreatePullRequest fill:#d0f0f0,stroke:#333,stroke-width:2px
+    style LinkPRToIssue fill:#d0f0f0,stroke:#333,stroke-width:2px
     style UnitTestsPass fill:#f0f0f0,stroke:#333,stroke-width:2px
     style AddUnitTests fill:#d0f0f0,stroke:#333,stroke-width:2px
     style ZenHubMoveToReview fill:#d0f0f0,stroke:#333,stroke-width:2px
-    style ZenHubLinkPR fill:#d0f0f0,stroke:#333,stroke-width:2px
     style PRReview fill:#d9f7d9,stroke:#333,stroke-width:2px
     style PRChangesRequired fill:#f0f0f0,stroke:#333,stroke-width:2px
     style PRMakeChanges fill:#d0f0f0,stroke:#333,stroke-width:2px
