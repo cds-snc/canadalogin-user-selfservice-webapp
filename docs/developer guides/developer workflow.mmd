@@ -32,7 +32,6 @@ flowchart TD
         AddTasksToProductBacklog("Tasks are added to Product Backlog")
     end
     zenhubrefinement --> SprintPlanning
-    SprintPlanning --> AddTasks
     SprintPlanning --> zenhubplanning
     subgraph zenhubplanning["ZenHub"]
         BacklogGrooming
@@ -40,7 +39,7 @@ flowchart TD
     end
     BacklogGrooming --> AddTasks
     AddTasks --> PickTask
-    PickTask -->|Add task| AddTasks
+    PickTask -->|"Developer<br/>adds task<br/>(if missing)"| AddTasks
     PickTask --> zenhub1
     subgraph zenhub1["ZenHub"]
         ZenHubAddLabels
