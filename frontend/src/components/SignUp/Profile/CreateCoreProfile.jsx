@@ -5,12 +5,14 @@ import {getPageContent, isNameValid} from "../../../utils/functions.jsx";
 import SubmitButton from "../../Layout/SubmitButton.jsx";
 import {useUser} from "../../Providers/UserContext.jsx";
 import {startTransition, useState} from "react";
-
+import {authService} from "../../../services/authService.jsx";
+import {CONTEXT_ACTIONS} from "../../../utils/constants.jsx";
+import {useNavigate} from "react-router";
 
 export default function CreateCoreProfile({currentLang}) {
     const {state, dispatch} = useUser();
     const [errorJson, setError] = useState({heading: null, nameError:null});
-
+    const navigate = useNavigate();
     const errorPageJson = getPageContent(currentLang, "Error");
     const pageContentJson = getPageContent(currentLang, "CreateCoreProfile");
 
@@ -28,6 +30,24 @@ export default function CreateCoreProfile({currentLang}) {
                 return;
             }
             setError({nameError:null, heading:null});
+
+            try {
+                const response = await authService.createCoreProfile({
+
+                });
+                if(response.success){
+                    const userData = {...state.userData, coreProfileCreated: true};
+                    await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
+                    console.log("success...",response)
+                    navigate("/" + currentLang );
+                }else {
+                    console.log("Error....", response);
+                    setError({nameError: response.message, heading: errorPageJson['1']});
+                }
+            } catch (error) {
+                console.error('Signup error:', error);
+                setError({nameError:  errorPageJson[7], heading: errorPageJson['1']});
+            }
         })
     }
 
