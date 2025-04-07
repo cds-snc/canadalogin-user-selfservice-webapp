@@ -5,9 +5,9 @@ flowchart TD
     BacklogGrooming("Backlog Grooming")
     AddTasks("Tasks are added to Sprint Backlog")
     PickTask["Developer Picks up a Task"]
-    WorkOnTask["Developer Begins working on a Task"]
+    WorkOnTask["Developer begins working on a Task"]
     TaskIsReviwed["Task review begins"]
-    ZenHubAssignTask("Developer assigns themselves to the Task")
+    ZenHubAssignTask("Developer assigns themselves to the Task (if not assigned already)")
     ZenHubMoveToInProgress("Developer moves Task to In Progress")
     ZenHubAddLabels("Developer adds Labels to the Task")
     GitHubCreateBranch("Developer creates a branch from the Task/Issue")
@@ -76,10 +76,7 @@ flowchart TD
     PRApproved -->MergePR
 
     style StoryRefinement fill:#ffff99,stroke:#333,stroke-width:2px
-    style ProductTeamRefine fill:#ffcccc,stroke:#333,stroke-width:2px
     style SprintPlanning fill:#ffff99,stroke:#333,stroke-width:2px
-    style BacklogGrooming fill:#ffcccc,stroke:#333,stroke-width:2px
-    style AddTasks fill:#ffcccc,stroke:#333,stroke-width:2px
     style PickTask fill:#ffff99,stroke:#333,stroke-width:2px
     style TaskIsReviwed fill:#ffff99,stroke:#333,stroke-width:2px
     style ZenHubAddLabels fill:#d0f0f0,stroke:#333,stroke-width:2px
@@ -99,3 +96,4 @@ flowchart TD
     style PRMakeChanges fill:#d0f0f0,stroke:#333,stroke-width:2px
     style PRApproved fill:#d9f7d9,stroke:#333,stroke-width:2px
     style MergePR fill:#d0f0f0,stroke:#333,stroke-width:2px
+    style SlackAddPRMessage fill:#d0f0f0,stroke:#333,stroke-width:2px
