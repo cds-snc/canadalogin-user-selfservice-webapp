@@ -1,0 +1,90 @@
+flowchart TD
+    SprintPlanning["Sprint Planning"]
+    BacklogGrooming["Backlog Grooming"]
+    AddTasks["Tasks Added to Sprint Backlog"]
+    PickTask["Developer Picks up a Task"]
+    WorkOnTask["Developer Begins working on a Task"]
+    TaskIsReviwed["Task review begins"]
+    ZenHubAssignTask("Assigns self to the Task")
+    ZenHubMoveToInProgress("Moves Task to In Progress")
+    ZenHubAddLabels("Adds Labels to the Task")
+    GitHubCreateBranch("Creates branch from the Task/Issue")
+    DeveloperWorkOnFeature("Checks out branch and develops features")
+    DeveloperCommitsChanges("Commits changes to the branch")
+    CreatePullRequest("Creates a Pull Request")
+    UnitTestsPass{"Coverage is 70% and Unit Tests Pass?"}
+    AddUnitTests("Adds Unit Tests")
+    ZenHubMoveToReview("Moves Task to Review column")
+    ZenHubLinkPR("Links the PR to the Task")
+    PRReview["PR is reviewed by at least one developer"]
+    PRApproved["Pull Request Approved"]
+    PRChangesRequired{Changes Required?}
+    PRMakeChanges("Commits changes")
+    MergePR("Merges PR to main branch, Task is closed")
+
+    SprintPlanning --> AddTasks
+    SprintPlanning --> BacklogGrooming
+    BacklogGrooming --> AddTasks
+    AddTasks --> PickTask
+    PickTask -->|Add task| AddTasks
+    PickTask --> zenhub1
+    subgraph zenhub1["ZenHub"]
+        ZenHubAddLabels
+        ZenHubAssignTask
+        ZenHubMoveToInProgress
+    end
+    zenhub1 --> WorkOnTask
+    WorkOnTask --> github1
+    subgraph github1["GitHub"]
+        GitHubCreateBranch
+    end
+    github1 --> DeveloperWorkOnFeature
+    DeveloperWorkOnFeature --> DeveloperCommitsChanges
+    DeveloperCommitsChanges --> TaskIsReviwed
+    TaskIsReviwed --> github2
+    subgraph github2["GitHub"]
+        CreatePullRequest
+    end
+    github2 --> UnitTestsPass
+    UnitTestsPass -->|Yes| zenhub2
+    UnitTestsPass -->|No| AddUnitTests
+    AddUnitTests --> zenhub2
+    subgraph zenhub2["ZenHub"]
+        ZenHubMoveToReview
+        ZenHubLinkPR
+    end
+    zenhub2 --> PRReview
+    subgraph github3["GitHub"]
+        PRReview
+        PRChangesRequired
+        PRApproved
+        MergePR
+    end
+    PRReview --> PRChangesRequired
+    PRChangesRequired -->|Yes|PRMakeChanges
+    PRMakeChanges-->PRReview
+    PRReview-->PRApproved
+    PRApproved -->MergePR
+
+    style SprintPlanning fill:#ffff99,stroke:#333,stroke-width:2px
+    style BacklogGrooming fill:#ffcccc,stroke:#333,stroke-width:2px
+    style AddTasks fill:#ffcccc,stroke:#333,stroke-width:2px
+    style PickTask fill:#ffff99,stroke:#333,stroke-width:2px
+    style TaskIsReviwed fill:#ffff99,stroke:#333,stroke-width:2px
+    style ZenHubAddLabels fill:#d0f0f0,stroke:#333,stroke-width:2px
+    style ZenHubAssignTask fill:#d0f0f0,stroke:#333,stroke-width:2px
+    style ZenHubMoveToInProgress fill:#d0f0f0,stroke:#333,stroke-width:2px
+    style WorkOnTask fill:#ffff99,stroke:#333,stroke-width:2px
+    style GitHubCreateBranch fill:#d0f0f0,stroke:#333,stroke-width:2px
+    style DeveloperWorkOnFeature fill:#d0f0f0,stroke:#333,stroke-width:2px
+    style DeveloperCommitsChanges fill:#d0f0f0,stroke:#333,stroke-width:2px
+    style CreatePullRequest fill:#d0f0f0,stroke:#333,stroke-width:2px
+    style UnitTestsPass fill:#f0f0f0,stroke:#333,stroke-width:2px
+    style AddUnitTests fill:#d0f0f0,stroke:#333,stroke-width:2px
+    style ZenHubMoveToReview fill:#d0f0f0,stroke:#333,stroke-width:2px
+    style ZenHubLinkPR fill:#d0f0f0,stroke:#333,stroke-width:2px
+    style PRReview fill:#d9f7d9,stroke:#333,stroke-width:2px
+    style PRChangesRequired fill:#f0f0f0,stroke:#333,stroke-width:2px
+    style PRMakeChanges fill:#d0f0f0,stroke:#333,stroke-width:2px
+    style PRApproved fill:#d9f7d9,stroke:#333,stroke-width:2px
+    style MergePR fill:#d0f0f0,stroke:#333,stroke-width:2px
