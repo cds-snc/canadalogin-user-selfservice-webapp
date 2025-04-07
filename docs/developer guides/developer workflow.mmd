@@ -1,27 +1,32 @@
 flowchart TD
+    StoryRefinement["Story Refinement"]
+    ProductTeamRefine("Product Team refines Features and creates tasks")
     SprintPlanning["Sprint Planning"]
-    BacklogGrooming["Backlog Grooming"]
-    AddTasks["Tasks Added to Sprint Backlog"]
+    BacklogGrooming("Backlog Grooming")
+    AddTasks("Tasks are added to Sprint Backlog")
     PickTask["Developer Picks up a Task"]
     WorkOnTask["Developer Begins working on a Task"]
     TaskIsReviwed["Task review begins"]
-    ZenHubAssignTask("Assigns self to the Task")
-    ZenHubMoveToInProgress("Moves Task to In Progress")
-    ZenHubAddLabels("Adds Labels to the Task")
-    GitHubCreateBranch("Creates branch from the Task/Issue")
-    DeveloperWorkOnFeature("Checks out branch and develops features")
-    DeveloperCommitsChanges("Commits changes to the branch")
-    CreatePullRequest("Creates a Pull Request")
+    ZenHubAssignTask("Developer assigns themselves to the Task")
+    ZenHubMoveToInProgress("Developer moves Task to In Progress")
+    ZenHubAddLabels("Developer adds Labels to the Task")
+    GitHubCreateBranch("Developer creates a branch from the Task/Issue")
+    DeveloperWorkOnFeature("Developer checks out the branch and develops features")
+    DeveloperCommitsChanges("Developer commits changes to their branch")
+    CreatePullRequest("Developer creates a Pull Request")
+    SlackAddPRMessage("Developer adds a link to the PR on dev channel to notify team")
     UnitTestsPass{"Coverage is 70% and Unit Tests Pass?"}
-    AddUnitTests("Adds Unit Tests")
-    ZenHubMoveToReview("Moves Task to Review column")
-    ZenHubLinkPR("Links the PR to the Task")
-    PRReview["PR is reviewed by at least one developer"]
-    PRApproved["Pull Request Approved"]
+    AddUnitTests("Developer adds Unit Tests")
+    ZenHubMoveToReview("Developer moves the Task to the Review column")
+    ZenHubLinkPR("Developer links the PR to the Task")
+    PRReview("PR is reviewed by at least one developer")
+    PRApproved("Pull Request is Approved")
     PRChangesRequired{Changes Required?}
-    PRMakeChanges("Commits changes")
-    MergePR("Merges PR to main branch, Task is closed")
+    PRMakeChanges("Developer commits changes")
+    MergePR("Developer merges PR to main branch, Task is closed")
 
+    StoryRefinement --> ProductTeamRefine
+    ProductTeamRefine --> SprintPlanning
     SprintPlanning --> AddTasks
     SprintPlanning --> BacklogGrooming
     BacklogGrooming --> AddTasks
@@ -53,7 +58,11 @@ flowchart TD
         ZenHubMoveToReview
         ZenHubLinkPR
     end
-    zenhub2 --> PRReview
+    zenhub2 --> slack
+    subgraph slack["Slack"]
+        SlackAddPRMessage
+    end
+    slack --> github3
     subgraph github3["GitHub"]
         PRReview
         PRChangesRequired
@@ -66,6 +75,8 @@ flowchart TD
     PRReview-->PRApproved
     PRApproved -->MergePR
 
+    style StoryRefinement fill:#ffff99,stroke:#333,stroke-width:2px
+    style ProductTeamRefine fill:#ffcccc,stroke:#333,stroke-width:2px
     style SprintPlanning fill:#ffff99,stroke:#333,stroke-width:2px
     style BacklogGrooming fill:#ffcccc,stroke:#333,stroke-width:2px
     style AddTasks fill:#ffcccc,stroke:#333,stroke-width:2px
