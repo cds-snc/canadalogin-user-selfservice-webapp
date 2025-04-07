@@ -75,3 +75,11 @@ export function isPasswordValid(password){
 
     return (password != null && password.length >=12 && password.length <=65);
 }
+
+export function isNameValid(name){
+
+    const isValidName = /^[a-zA-Z\-_ ’'‘ÆÐƎƏƐƔĲŊŒẞÞǷȜæðǝəɛɣĳŋœĸſßþƿȝĄƁÇĐƊĘĦĮƘŁØƠŞȘŢȚŦŲƯY̨ƳąɓçđɗęħįƙłøơşșţțŧųưyƴÁÀÂÄǍĂĀÃÅǺǼǢĆĊĈČĎḌÉÈĖÊËĚĔĒẸĠĜǦĞĢáàâäǎăāãåǻǽǣćċĉčďḍéèėêëěĕēẹġĝǧğģĤḤIÍÌİÎÏǏĬĪĨỊĴĶĹĻĽĿʼNŃ̈ŇÑŅÓÒÔÖǑŎŌÕŐỌǾĥḥıíìiîïǐĭīĩịĵķĺļľŀŉńnňñņóòôöǒŏōõőọǿŔŘŖŚŜŠṢŤṬÚÙÛÜǓŬŪŨŰŮỤẂẀŴẄÝỲŶŸȲỸŹŻŽẒŕřŗśŝšṣťṭúùûüǔŭūũűůụẃẁŵẅýỳŷÿȳỹźżžẓ]$/
+
+    return (name.match(isValidName))
+
+}
