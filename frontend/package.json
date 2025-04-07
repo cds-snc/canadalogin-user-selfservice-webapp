@@ -13,8 +13,8 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
-    "@cdssnc/gcds-components": "^0.32.0",
-    "@cdssnc/gcds-components-react": "^0.32.0",
+    "@cdssnc/gcds-components": "^0.33.0",
+    "@cdssnc/gcds-components-react": "^0.33.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-password-strength-bar": "^0.4.1",
@@ -45,7 +45,7 @@
     "eslint": "^9.21.0",
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.19",
-    "eslint-plugin-storybook": "^0.11.4",
+    "eslint-plugin-storybook": "^0.12.0",
     "globals": "^15.15.0",
     "jsdom": "^26.0.0",
     "msw": "^2.7.3",
