@@ -43,7 +43,7 @@ export default {
 
 };
 
-const BadEmailTemplateFE = (args) =>   {
+const BadTemplateFE = (args) =>   {
 
     TestDataUserProvider.testData.email = "test@test";
 
@@ -52,7 +52,7 @@ const BadEmailTemplateFE = (args) =>   {
     )
 }
 
-const EmailTemplateBE = (args) =>   {
+const TemplateBE = (args) =>   {
 
     TestDataUserProvider.testData.email = "test@test.com";
 
@@ -61,11 +61,11 @@ const EmailTemplateBE = (args) =>   {
     )
 }
 
-export const EngErrorFrontEnd = BadEmailTemplateFE.bind({});
-export const FrErrorFrontEnd = BadEmailTemplateFE.bind({});
-export const ErrorBackEnd = EmailTemplateBE.bind({});
-export const SuccessfulBackEnd = EmailTemplateBE.bind({});
-export const ServerErrorBackEnd = EmailTemplateBE.bind({});
+export const EngErrorFrontEnd = BadTemplateFE.bind({});
+export const FrErrorFrontEnd = BadTemplateFE.bind({});
+export const ErrorBackEnd = TemplateBE.bind({});
+export const SuccessfulBackEnd = TemplateBE.bind({});
+export const ServerErrorBackEnd = TemplateBE.bind({});
 
 EngErrorFrontEnd.parameters = storyParameters(false, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.signUp);
 EngErrorFrontEnd.play = async ({ canvasElement, step }) => {

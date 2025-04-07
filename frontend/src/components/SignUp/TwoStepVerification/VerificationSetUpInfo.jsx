@@ -10,11 +10,7 @@ export default function VerificationSetUpInfo({currentLang, pageContentJson}) {
                         {pageContentJson['2']}
                     </GcdsText>
                     <GcdsText>
-                        {pageContentJson['3']}&nbsp;
-                        <GcdsLink href={`/${currentLang}${NAVIGATION_LINKS.signUp}`} >
-                            {pageContentJson['4']}
-                        </GcdsLink>&nbsp;
-                        {pageContentJson['5']}
+                        <span>{pageContentJson['3']}</span> <GcdsLink href={`/${currentLang}${NAVIGATION_LINKS.signUp}`} >{pageContentJson['4']}</GcdsLink> {pageContentJson['5']}
                     </GcdsText>
             </GcdsContainer>
         )
@@ -35,11 +31,7 @@ export default function VerificationSetUpInfo({currentLang, pageContentJson}) {
                 {pageContentJson['5']}
             </GcdsText>
             <GcdsText>
-                {pageContentJson['6']}&nbsp;
-                <GcdsLink href={`/${currentLang}${NAVIGATION_LINKS.signUp}`} >
-                    {pageContentJson['7']}
-                </GcdsLink>
-                &nbsp;{pageContentJson['8']}
+                <span>{pageContentJson['6']}</span> <GcdsLink href={`/${currentLang}${NAVIGATION_LINKS.signUp}`} >{pageContentJson['7']}</GcdsLink> {pageContentJson['8']}
             </GcdsText>
         </GcdsContainer>
     )

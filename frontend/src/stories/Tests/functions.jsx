@@ -8,11 +8,21 @@ const stepErrorMessage = 'Verify error message is on Page.';
 const stepSuccessMessage = 'Verify error message is on Page.';
 const stepNavigateMessage = 'Verify page was navigated properly.';
 
-export async function testCase({ canvasElement, step, stepMessage, message, linkText, link, heading, delay, type, actionType }) {
+export async function testCase({ canvasElement, step, stepMessage, message, linkText, link, heading, delay, type, actionType, input }) {
 
     const canvas = await testItem.canvas(canvasElement, delay);
 
-    switch (actionType) {
+
+    if(input!==undefined)
+        switch(input.inputType) {
+            case('textBox'):
+                await testItem.typeInInput(canvas, step, input);
+                break;
+        }
+
+
+
+            switch (actionType) {
         case(ACTION_TYPES.link):
             await testItem.clickLink(canvas, step, stepMessage, linkText);
             break;
@@ -41,23 +51,41 @@ export async function testCase({ canvasElement, step, stepMessage, message, link
     }
 }
 
-export function storyParameters(isBackEndTest, language, link, endpoint, response){
+export function storyParameters(isBackEndTest, language, link, endpoint, response, type){
+
+
 
     if(isBackEndTest)
-        return { reactRouter: reactRouterParameters({
-                location: {
-                    pathParams: {language},
-                },
-                routing: {path: '/:language' + link}
-            }),
-            msw: {
-                handlers: [
-                    http.post(`${config.apiUrl}${endpoint}`, async () => {
-                        return HttpResponse.json(response);
-                    }),
-                ],
+        if(type)
+            return { reactRouter: reactRouterParameters({
+                    location: {
+                        pathParams: {language, type},
+                    },
+                    routing: {path: '/:language' + link + '/:type'}
+                }),
+                msw: {
+                    handlers: [
+                        http.post(`${config.apiUrl}${endpoint}`, async () => {
+                            return HttpResponse.json(response);
+                        }),
+                    ],
+                }
             }
-    }
+        else
+            return { reactRouter: reactRouterParameters({
+                    location: {
+                        pathParams: {language},
+                    },
+                    routing: {path: '/:language' + link }
+                }),
+                msw: {
+                    handlers: [
+                        http.post(`${config.apiUrl}${endpoint}`, async () => {
+                            return HttpResponse.json(response);
+                        }),
+                    ],
+                }
+            }
 
     return {
 
@@ -75,6 +103,14 @@ const testItem = {
         const canvas = await within(canvasElement);
         await new Promise((r) => setTimeout(r, timeToWait));
         return canvas;
+    },
+    typeInInput: async(canvas, step, input) =>{
+        await step(input.stepMessage, async () => {
+            const placeholder= canvas.queryByRole('textbox');
+            await userEvent.type(placeholder, input.value);
+            await userEvent.tab();
+        });
+        await new Promise((r) => setTimeout(r, 1000));
     },
     clickButton: async(canvas, step, message) =>{
         await step(message, async () => {

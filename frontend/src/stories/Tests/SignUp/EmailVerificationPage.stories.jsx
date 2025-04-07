@@ -48,7 +48,7 @@ export default {
 };
 
 
-const BadEmailTemplateFE = (args) =>   {
+const BadTemplateFE = (args) =>   {
 
     TestDataUserProvider.testData.otp = "12154e";
 
@@ -57,7 +57,7 @@ const BadEmailTemplateFE = (args) =>   {
     )
 }
 
-const EmailTemplateBE = (args) =>   {
+const TemplateBE = (args) =>   {
 
     TestDataUserProvider.testData.otp = "123456";
 
@@ -66,15 +66,15 @@ const EmailTemplateBE = (args) =>   {
     )
 }
 
-export const EngErrorFrontEnd = BadEmailTemplateFE.bind({});
-export const FrErrorFrontEnd = BadEmailTemplateFE.bind({});
-export const ErrorBackEnd = EmailTemplateBE.bind({});
-export const SuccessfulBackEnd = EmailTemplateBE.bind({});
-export const ServerErrorBackEnd = EmailTemplateBE.bind({});
-export const EngRequestNewCode = EmailTemplateBE.bind({});
-export const FrRequestNewCode = EmailTemplateBE.bind({});
-export const RequestNewCodeError = EmailTemplateBE.bind({});
-export const RequestNewCodeNoResponse = EmailTemplateBE.bind({});
+export const EngErrorFrontEnd = BadTemplateFE.bind({});
+export const FrErrorFrontEnd = BadTemplateFE.bind({});
+export const ErrorBackEnd = TemplateBE.bind({});
+export const SuccessfulBackEnd = TemplateBE.bind({});
+export const ServerErrorBackEnd = TemplateBE.bind({});
+export const EngRequestNewCode = TemplateBE.bind({});
+export const FrRequestNewCode = TemplateBE.bind({});
+export const RequestNewCodeError = TemplateBE.bind({});
+export const RequestNewCodeNoResponse = TemplateBE.bind({});
 
 EngErrorFrontEnd.parameters = storyParameters(false, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.verifyEmail);
 EngErrorFrontEnd.play = async ({ canvasElement, step }) => {

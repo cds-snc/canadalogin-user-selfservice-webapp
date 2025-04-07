@@ -53,7 +53,7 @@ export default function VerificationSetUp({currentLang}) {
                     navigate("/" + currentLang + NAVIGATION_LINKS.verification+'/'+formType);
                 }else {
                     console.log("Error....", response);
-                    setError({phoneError: errorPageJson[7], heading: errorPageJson['1']});
+                    setError({phoneError: response.message, heading: errorPageJson['1']});
                 }
             } catch (error) {
                 console.error('Signup error:', error);
