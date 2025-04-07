@@ -2,8 +2,7 @@ import logging
 
 from fastapi import HTTPException
 from httpx import AsyncClient
-
-from app.config import get_settings
+from pydantic_settings import BaseSettings
 from app.otp.schemas import OtpVerification
 from app.utils.access_token import get_access_token, get_auth_request_headers
 from app.utils.helpers import generate_error_response
@@ -11,9 +10,10 @@ from app.utils.schemas import ResponseModel
 
 
 class VerifyTransientSMSOTP:
-    def __init__(self):
-        self.settings = get_settings().ibm_verify_config
+    def __init__(self, settings: BaseSettings, http_client: AsyncClient):
         self.logger = logging.getLogger(__name__)
+        self.settings = settings
+        self.http_client = http_client
 
 
     async def handle_transient_sms_otp_verification(self, data: OtpVerification):
@@ -53,10 +53,8 @@ class VerifyTransientSMSOTP:
             access_token = await get_access_token()
             headers = get_auth_request_headers(access_token, True)
             transient_sms_verification_url = f"{self.settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/smsotp/transient/verifications/{trxnId}"
-
-            async with AsyncClient() as client:
-                response = await client.post(transient_sms_verification_url, json=pass_code, headers=headers)
-                return response
+            response = await self.http_client.post(transient_sms_verification_url, json=pass_code, headers=headers)
+            return response
 
         except Exception as error:
             self.logger.error(

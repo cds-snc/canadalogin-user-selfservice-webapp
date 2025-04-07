@@ -1,5 +1,7 @@
 import base64
 import uuid
+
+import httpx
 import requests
 import logging
 import json
@@ -80,7 +82,10 @@ async def lifespan(app: FastAPI):
     logger.info(
         f"Redirect URI: {app.state.config.IBM_VERIFY_REDIRECT_URI}")
     logger.info("Application startup complete")
+    app.state.request_client = httpx.AsyncClient()
     yield
+    logger.info("Closing global HTTP client")
+    await app.state.request_client.aclose()
     logger.info("Shutting down IBM Verify Integration API")
 
 
