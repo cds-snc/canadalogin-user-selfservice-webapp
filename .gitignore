@@ -2,6 +2,8 @@ backend/app/__pycache__/*
 .terragrunt-cache
 .terraform/
 backend/.env
+backend/venv
+backend/.pytest_cache
 node_modules/
 .terraform.lock.hcl
 .env
