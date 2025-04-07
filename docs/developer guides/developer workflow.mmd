@@ -1,8 +1,9 @@
 flowchart TD
     StoryRefinement["Story Refinement"]
-    ProductTeamRefine("Product Team refines Features and creates tasks")
+    ProductTeamRefine("Product Team refines stories and creates tasks")
+    AddTasksToProductBacklog("Tasks are added to Product Backlog")
     SprintPlanning["Sprint Planning"]
-    BacklogGrooming("Backlog Grooming")
+    BacklogGrooming("Product Team decides what to work on next from the backlog")
     AddTasks("Tasks are added to Sprint Backlog")
     PickTask["Developer Picks up a Task"]
     WorkOnTask["Developer begins working on a Task"]
@@ -25,10 +26,18 @@ flowchart TD
     PRMakeChanges("Developer commits changes")
     MergePR("Developer merges PR to main branch, Task is closed")
 
-    StoryRefinement --> ProductTeamRefine
-    ProductTeamRefine --> SprintPlanning
+    StoryRefinement --> zenhubrefinement
+    subgraph zenhubrefinement["ZenHub"]
+        ProductTeamRefine
+        AddTasksToProductBacklog("Tasks are added to Product Backlog")
+    end
+    zenhubrefinement --> SprintPlanning
     SprintPlanning --> AddTasks
-    SprintPlanning --> BacklogGrooming
+    SprintPlanning --> zenhubplanning
+    subgraph zenhubplanning["ZenHub"]
+        BacklogGrooming
+        AddTasks
+    end
     BacklogGrooming --> AddTasks
     AddTasks --> PickTask
     PickTask -->|Add task| AddTasks
