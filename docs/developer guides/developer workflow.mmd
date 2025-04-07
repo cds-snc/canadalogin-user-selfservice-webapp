@@ -79,8 +79,8 @@ flowchart TD
     end
     PRReview --> PRChangesRequired
     PRChangesRequired -->|Yes|PRMakeChanges
+    PRChangesRequired -->|No|PRApproved
     PRMakeChanges-->PRReview
-    PRReview-->PRApproved
     PRApproved -->MergePR
 
     style StoryRefinement fill:#ffff99,stroke:#333,stroke-width:2px
