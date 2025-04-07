@@ -46,9 +46,6 @@ jobs:
       - name: Set up Environment Variables
         run: |
           echo "VITE_BACKEND_API_URL=${{ secrets.VITE_BACKEND_API_URL }}" >> $GITHUB_ENV
-          echo "VITE_REACT_APP_IBM_VERIFY_URL=${{ secrets.VITE_REACT_APP_IBM_VERIFY_URL }}" >> $GITHUB_ENV
-          echo "VITE_REACT_APP_CLIENT_ID=${{ secrets.VITE_REACT_APP_CLIENT_ID }}" >> $GITHUB_ENV
-          echo "VITE_REACT_APP_REDIRECT_URI=${{ secrets.VITE_REACT_APP_REDIRECT_URI }}" >> $GITHUB_ENV
 
       - name: Install dependencies
         working-directory: ${{ matrix.module }}
