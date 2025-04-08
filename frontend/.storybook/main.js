@@ -13,7 +13,8 @@ const config = {
     "@chromatic-com/storybook",
     "@storybook/experimental-addon-test",
     'storybook-addon-remix-react-router',
-    '@storybook/addon-links'
+    '@storybook/addon-links',
+    "@storybook/addon-a11y"
   ],
 
   "framework": {

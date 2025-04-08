@@ -1,6 +1,6 @@
 import {
     GcdsContainer, GcdsDetails, GcdsErrorSummary, GcdsFieldset,
-    GcdsLink, GcdsRadioGroup,
+    GcdsRadioGroup,
     GcdsStepper,
     GcdsText
 } from "@cdssnc/gcds-components-react";
@@ -53,7 +53,7 @@ export default function VerificationSetUp({currentLang}) {
                     navigate("/" + currentLang + NAVIGATION_LINKS.verification+'/'+formType);
                 }else {
                     console.log("Error....", response);
-                    setError({phoneError: errorPageJson[7], heading: errorPageJson['1']});
+                    setError({phoneError: response.message, heading: errorPageJson['1']});
                 }
             } catch (error) {
                 console.error('Signup error:', error);
@@ -110,10 +110,7 @@ export default function VerificationSetUp({currentLang}) {
                         <GcdsText>
                             <GcdsDetails detailsTitle={pageContentJson['11']}>
                                 <GcdsText>
-                                    {pageContentJson['12']}&nbsp;
-                                    <GcdsLink href={`/${currentLang}${NAVIGATION_LINKS.signUp}`} >
-                                        {pageContentJson['13']}
-                                    </GcdsLink>
+                                    {pageContentJson['12']}
                                 </GcdsText>
                             </GcdsDetails>
                         </GcdsText>

@@ -1,4 +1,4 @@
-name: DEV Build Push App to S3
+name: DEV Build Push Storybook to S3
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - "frontend/**"
-      - ".github/workflows/dev-build-push-app-to-S3"
+      - ".github/workflows/dev-build-push-storybook-to-s3"
   workflow_dispatch:
 
 env:
@@ -46,17 +46,19 @@ jobs:
       - name: Set up Environment Variables
         run: |
           echo "VITE_BACKEND_API_URL=${{ secrets.VITE_BACKEND_API_URL }}" >> $GITHUB_ENV
+          echo "STORYBOOK_FRONTEND_APP_S3_BUCKET=${{ secrets.STORYBOOK_FRONTEND_APP_S3_BUCKET }}" >> $GITHUB_ENV
+          echo "STORYBOOK_FRONTEND_APP_CLOUDFRONT_DISTRIBUTION_ID=${{ secrets.STORYBOOK_FRONTEND_APP_CLOUDFRONT_DISTRIBUTION_ID }}" >> $GITHUB_ENV
 
       - name: Install dependencies
         working-directory: ${{ matrix.module }}
         run: |
-          npm install
-          npm run build
+          npm install --legacy-peer-deps
+          npm run build-storybook
 
       - name: Deploy App to S3
         run: |
-          aws s3 sync ${{ matrix.module }}/dist s3://${{ secrets.FRONTEND_APP_S3_BUCKET }}
+          aws s3 sync ${{ matrix.module }}/storybook-static s3://${{ secrets.STORYBOOK_FRONTEND_APP_S3_BUCKET }}
 
-      - name: Invalidate FRONTEND_APP_CLOUDFRONT_DISTRIBUTION cache
+      - name: Invalidate STORYBOOK_CLOUDFRONT_DISTRIBUTION cache
         run: |
-          aws cloudfront create-invalidation --distribution-id ${{ secrets.FRONTEND_APP_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/index.html"
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.STORYBOOK_FRONTEND_APP_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/index.html"
