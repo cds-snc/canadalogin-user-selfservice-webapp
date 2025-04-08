@@ -37,7 +37,8 @@ export const SUBMIT_END_POINTS = {
     sendTwoStepVerificationCode: '/v1/otp/transient_sms/send',
     twoStepVerification: '/v1/otp/transient_sms/verify',
     sendTwoStepVerificationCodeVoice: '/v1/otp/transient_voice/send',
-    twoStepVerificationVoice: '/v1/otp/transient_voice/verify'
+    twoStepVerificationVoice: '/v1/otp/transient_voice/verify',
+    createCoreProfile: '/v1/users/createcoreprofile'
 }
 
 export const countryMapping = {

@@ -38,5 +38,9 @@ export const authService = {
             response =  await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.twoStepVerification}`, userData);
 
         return response.data;
+    },
+    createCoreProfile:async (userData) => {
+        const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.createCoreProfile}`, userData);
+        return response.data;
     }
 }
