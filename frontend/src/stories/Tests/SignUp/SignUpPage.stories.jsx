@@ -6,7 +6,7 @@ import {getPageContent} from "../../../utils/functions.jsx";
 import {ACTION_TYPES, TEST_TYPES, TestDataUserProvider} from "../constants.jsx";
 import {storyParameters, testCase} from "../functions.jsx";
 
-const serverError =  "value is not a valid email address: There must be something after the @-sign.";
+const serverError =  "Value is not a valid email address: There must be something after the @-sign.";
 const engErrorPageJson = getPageContent('en', "Error");
 const frErrorPageJson = getPageContent('fr', "Error");
 
