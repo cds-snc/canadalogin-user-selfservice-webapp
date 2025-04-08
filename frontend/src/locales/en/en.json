@@ -58,7 +58,7 @@
   },
   "Error":{
     "1": "There was a problem",
-    "2": "Invalid email. Email must contain an ‘@’ symbol.",
+    "2": "Invalid email. Email must contain an ‘@’ symbol followed by a domain.",
     "3": "Codes must be six digits. Try again.",
     "4": "Password must be 12 characters",
     "5": "Invalid password. Password must be at least 12 characters and maximum 65 characters.",
@@ -106,7 +106,7 @@
     "9": "Country",
     "10": "Phone number",
     "11": "My country is not listed here",
-    "12": "Some countries are not supported due to technical limitations. If your country is not listed,",
+    "12": "Some countries are not supported due to technical limitations. If your country is not listed, you will be unable to create a GC Sign in account at this time. We apologize for the inconvenience.",
     "13": "select a different 2-step verification method.",
     "14": "How should we send you the code?",
     "15": "You can change this the next time you sign in.",

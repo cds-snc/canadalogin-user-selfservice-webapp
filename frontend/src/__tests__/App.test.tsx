@@ -303,7 +303,7 @@ describe('Routing Test', () => {
 
         verifyCommonElements(language, langLink, buttonJson, null, ['3', 'h1', '4', language]);
 
-        const textKeysToNotSearch = ['9', '15', '17', '18', '19'];
+        const textKeysToNotSearch = ['9', '13', '15', '17', '18', '19'];
         const gcdsElementMap = new Map();
         gcdsElementMap.set('11', ['gcds-details',  createMap('gcds-details', [pageContentJson['11']])])
         gcdsElementMap.set('14', ['gcds-fieldset', createMap('gcds-fieldset', ['gcds-verification-fieldset', pageContentJson['15'],pageContentJson['14']])]);

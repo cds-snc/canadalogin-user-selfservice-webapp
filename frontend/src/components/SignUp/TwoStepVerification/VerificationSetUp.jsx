@@ -110,10 +110,7 @@ export default function VerificationSetUp({currentLang}) {
                         <GcdsText>
                             <GcdsDetails detailsTitle={pageContentJson['11']}>
                                 <GcdsText>
-                                    {pageContentJson['12']}&nbsp;
-                                    <GcdsLink href={`/${currentLang}${NAVIGATION_LINKS.signUp}`} >
-                                        {pageContentJson['13']}
-                                    </GcdsLink>
+                                    {pageContentJson['12']}
                                 </GcdsText>
                             </GcdsDetails>
                         </GcdsText>
