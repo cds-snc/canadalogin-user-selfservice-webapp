@@ -1,0 +1,101 @@
+sequenceDiagram
+  participant User_Agent_Browser as User_Agent_Browser
+  participant RP_Geo as RP_Geo
+  participant Frontend_React as Frontend_React
+  participant Backend_Python as Backend_Python
+  box rgba(70,148,73) IBM Verify APIs
+  participant IBM_Verify_AuthEP as IBM_Verify_AuthEP
+  participant IBM_Verify_EMAILOTPEP as IBM_Verify_EMAILOTPEP
+  participant IBM_Verify_USEREP as IBM_Verify_USEREP
+  participant IBM_Verify_PWDPOLICYEP as IBM_Verify_PWDPOLICYEP
+  participant IBM_Verify_LoginEP as IBM_Verify_LoginEP
+  participant IBM_Verify_SMSOTPEP as IBM_Verify_SMSOTPEP
+  participant IBM_Verify_SESSIONEP as IBM_Verify_SESSIONEP
+  participant IBM_Verify_TokenEP as IBM_Verify_TokenEP
+  participant IBM_Verify_IntrospectEP as IBM_Verify_IntrospectEP
+  end
+
+  Backend_Python ->> IBM_Verify_TokenEP: POST /token wuth client_id, client_secret, grant_type=client_credentials
+  IBM_Verify_TokenEP ->> Backend_Python: Return access token, type bear.
+  Note left of IBM_Verify_TokenEP:  Backend_Python is a server side app, it accesses IBM Verify APIs in this use case using this access token.
+  
+  User_Agent_Browser ->> RP_Geo: Click GC Sign In
+  RP_Geo ->> Frontend_React: Redirect to GET IBM Verify /authorize&response_type=code&client_id=RP_Geo_Client_ID&redirect_uri=RP_Geo_LandingPage
+  Note right of Frontend_React:  to support passkey, Browser (front end) need interact with IBM Verify EP directly.
+  Frontend_React ->> IBM_Verify_AuthEP: follow redirect to /authorize
+  IBM_Verify_AuthEP ->> Frontend_React: Forward to Frontend GC Sign In for Resource Owner to login
+  Note left of IBM_Verify_AuthEP:  Need configure IBM Verify to redirect resource owner to GC Sign In (Frontend-React) as its login form.
+  Frontend_React ->> User_Agent_Browser: Display GC Sign In Page
+  
+  User_Agent_Browser ->> Frontend_React: Click Create An Account (&Targeturl=URL of RP_Geo login. At the end of the sign up sequence, it will redirect to this URL)
+  Note left of User_Agent_Browser:  Sign Up step 1: email validation.
+  
+  Frontend_React ->> Backend_Python: validate the email (generate and send a transient email OTP if email does not exist as userName in IBM Verify. o.s send account existing email to the user).
+  Backend_Python ->> IBM_Verify_EMAILOTPEP: Generate and send a Transient email OTP (Assume the email  does not exist).
+  IBM_Verify_EMAILOTPEP ->> Backend_Python: OTP for the Transient email successfully generated and sent to the email. A trxnId is returned in response.
+  Backend_Python ->> Frontend_React: Transient Email OTP successfully generated and sent 
+  Frontend_React ->> User_Agent_Browser: Display OTP verfication page 
+  User_Agent_Browser ->> Frontend_React: Enter the OTP code in the OPT verification page.
+  Frontend_React ->> Backend_Python: Verify Email OTP code with the trxnId.
+  Backend_Python ->> IBM_Verify_EMAILOTPEP: Verify Transient Email OTP code with the trxnId against IBM Verify.
+  IBM_Verify_EMAILOTPEP ->> Backend_Python: OTP for the Transient email is successfully verified against the trxnId.
+  Backend_Python ->> Frontend_React: Transient email OTP code is verified with response. Transient email validation completes successfully.
+  
+  Note left of User_Agent_Browser:  Sign Up step 2: password creation.
+  Frontend_React ->> Backend_Python: Retrieve the password policies.
+  Backend_Python ->> IBM_Verify_PWDPOLICYEP: Retrieve the password policies.
+  IBM_Verify_PWDPOLICYEP ->> Backend_Python: Return a list of password policies.
+  Backend_Python ->> Frontend_React: Return the list of password policies.
+  Frontend_React ->> User_Agent_Browser: Display Password Page with selected Password Complexity Rules Displayed.
+  User_Agent_Browser ->> Frontend_React: Resource owner enters a password. Inline Check password strength against the selected configured password rules.
+  Frontend_React ->> Backend_Python: Validate the password against a specific password policy with its password policy id.
+  Backend_Python ->> IBM_Verify_PWDPOLICYEP: Validate the password.
+  IBM_Verify_PWDPOLICYEP ->> Backend_Python: Password validation completes successfully
+  Backend_Python ->> Frontend_React: Password validation completes successfully
+  Frontend_React ->> Backend_Python: Create an account with the validated email and password into IBM Verify with account status of Active.
+  Backend_Python ->> IBM_Verify_USEREP: Create an account with the validated email and password into IBM Verify with status of Active.
+  IBM_Verify_USEREP ->> Backend_Python: User created successfully into IBM Verify.
+  Backend_Python ->> Frontend_React: An Active user created successfully into IBM Verify.
+  
+  Note left of User_Agent_Browser:  Sign Up step 3: 2FA creation - Phone based OTP
+  Frontend_React ->> User_Agent_Browser: Display 2FA page: entering phone number and selecting SMS (default) or Voice based OTP 
+  Note left of User_Agent_Browser:  Currently only support phone based 2FA - SMS/Voice OTP.
+  User_Agent_Browser ->> Frontend_React: Resource owner enters a valid phone number and select SMS or Voice OTP. Inline validate syntax of the phone number.
+  Frontend_React ->> Backend_Python: Generate and send a transient phone OTP.
+  Backend_Python ->> IBM_Verify_SMSOTPEP: Generate and send a Transient phone OTP.
+  IBM_Verify_SMSOTPEP ->> Backend_Python: OTP for the Transient phone successfully generated and sent to the phone. A trxnId is returned in response.
+  Backend_Python ->> Frontend_React: Transient phone OTP successfully generated and sent 
+  Frontend_React ->> User_Agent_Browser: Display OTP verfication page 
+  User_Agent_Browser ->> Frontend_React: Enter the OTP code in the OPT verification page.
+  Frontend_React ->> Backend_Python: Verify phone OTP code with the trxnId.
+  Backend_Python ->> IBM_Verify_SMSOTPEP: Verify Transient phone OTP code with the trxnId against IBM Verify.
+  IBM_Verify_SMSOTPEP ->> Backend_Python: OTP for the Transient phone successfully is successfully verified against the trxnId.
+  Backend_Python ->> Frontend_React: Transient phone OTP code is verified with response. Transient phone validation completes successfully.
+  Frontend_React ->> Backend_Python: Create a SMS OTP enrollment with the phone number. 
+  Backend_Python ->> IBM_Verify_SMSOTPEP: Create a SMS OTP enrollment with the phone number.
+  IBM_Verify_SMSOTPEP ->> Backend_Python: Created a SMS OTP enrollment with the phone number for the user. 
+  Backend_Python ->> Frontend_React: Created a SMS OTP enrollment with the phone number for the user. 
+ 
+  Note left of User_Agent_Browser:  Sign Up step 4: Update User Profile
+  Frontend_React ->> User_Agent_Browser: Display user profile: first name and last name
+  User_Agent_Browser ->> Frontend_React: Resource owner enters first name and last name and click continue
+  Frontend_React ->> Backend_Python: Update the user profile
+  Backend_Python ->> IBM_Verify_USEREP: Update the user profile into IBM Verify
+  IBM_Verify_USEREP ->> Backend_Python: User profile is updated successfully
+  Backend_Python ->> Frontend_React: User profile is updated successfully. User sign up completes successfully.
+ 
+  Note left of Backend_Python:  Sign Up step 5: Programatically create an user authenticated session.
+  Frontend_React ->> Backend_Python:  Create an anthenticated session for the user.
+  Backend_Python ->> IBM_Verify_TokenEP: Trigger JWT-Bearer Token flow with registered user ID to programtically authenticate the registered user.
+  IBM_Verify_TokenEP ->> Backend_Python: Access token is successfully created and returned.
+  Backend_Python ->> Frontend_React: Returned the access token to Frontend.
+  Frontend_React ->> IBM_Verify_SESSIONEP: Exchange access token with an authenticated browser session.
+  IBM_Verify_SESSIONEP ->> Frontend_React: An authenticated user browser session is created.
+  Frontend_React ->> RP_Geo: Redirect user back to the RP login page to trigger OIDC flow.
+  
+  Note left of IBM_Verify_AuthEP:  RP_Geo has LoA2. Authenticated session is created for the user. Access is granted.
+  IBM_Verify_AuthEP ->> RP_Geo: Callback to RP_Geo using the redirec_uri and authcode /callback&code=ccc
+  RP_Geo ->> IBM_Verify_TokenEP: Exchange authcode for access token, id token and store them in the session
+  User_Agent_Browser ->> RP_Geo: Request services
+  RP_Geo ->> IBM_Verify_IntrospectEP: Validate Access Token
+  RP_Geo ->> User_Agent_Browser: Service requests
