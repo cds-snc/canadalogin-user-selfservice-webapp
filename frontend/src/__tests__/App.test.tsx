@@ -114,6 +114,22 @@ describe('Routing Test', () => {
         checkPasswordCreationPageContents(AVAILABLE_LANGUAGES.en, engJson["PasswordCreation"], langHref.fr + NAVIGATION_LINKS.password, engJson['Button'], engJson["AlreadyGc"]);
     });
 
+    test("Check password creation page route with fr language defined", () => {
+
+        vi.mock("../components/Providers/PrivateRoute.jsx", () => {
+            return {
+                default: (props:any) => props.children,
+            };
+        });
+
+        render(
+            <MemoryRouter initialEntries={[langHref.fr + NAVIGATION_LINKS.password]}>
+                <App/>
+            </MemoryRouter>,
+        )
+        checkPasswordCreationPageContents(AVAILABLE_LANGUAGES.fr, frJson["PasswordCreation"], langHref.en + NAVIGATION_LINKS.password, frJson['Button'], frJson["AlreadyGc"]);
+    });
+
     test("Check verification set up page route with en language defined", () => {
 
         vi.mock("../components/Providers/PrivateRoute.jsx", () => {
@@ -278,27 +294,26 @@ describe('Routing Test', () => {
 
     }
 
-    function checkPasswordCreationPageContents(language, pageContentJson, langLink, buttonJson, alreadyGcJson) {
-        verifyGcdsHtmlElement('gcds-header', createMap('gcds-header', [language, langLink, 'colour', '#']));
-        verifyGcdsHtmlElement('gcds-stepper', createMap('gcds-stepper2', ['2', 'h1', '4', language, '0', '150']));
+    function checkPasswordCreationPageContents(language, pageContentJson, langLink, buttonJson, alreadyGcJson:JSON) {
 
-        verifyGcdsHtmlElement('gcds-notice', createMap('gcds-notice', ['Your email was successfully verified', 'h2', 'success']));
-        verifyGcdsHtmlElement('gcds-details', createMap('gcds-details', ['Password safety tips']));
-        verifyGcdsHtmlElement('gcds-checkbox', createMap('gcds-checkbox', ['checkbox-default', 'Show password', 'checkbox']));
+        verifyCommonElements(language, langLink, buttonJson, alreadyGcJson, ['2', 'h1', '4', language]);
+
+        const textKeysToNotSearch = ['1','2','10'];
+
+        const gcdsElementMap = new Map();
+        gcdsElementMap.set('1', ['gcds-notice', createMap('gcds-notice', [pageContentJson['1'], 'h2', 'success'])])
+        gcdsElementMap.set('7', ['gcds-details',  createMap('gcds-details', [pageContentJson['7']])])
+        gcdsElementMap.set('9', ['gcds-input', createMap('gcds-input2', ["input-password", pageContentJson['9'], 'password', "password",  pageContentJson['10']])]);
+        gcdsElementMap.set('11', ['gcds-checkbox', createMap('gcds-checkbox', ['checkbox-default', pageContentJson['11'], 'checkbox'])]);
 
         Object.keys(pageContentJson).forEach(key => {
-            if (key ==='9')
-                verifyGcdsHtmlElement('gcds-input', createMap('gcds-input2', ['input-password', pageContentJson[key], 'password', 'password', 'form-control', 'example: pillow moose dish'] ));
-            else if (key!=='1' && key!=='2' && key!=='4' && key!=='6' && key!=='7' && key!=='9' && key!=='10' && key!=='11' && key!=='12' && key!=='13')
+            if(gcdsElementMap.has(key))
+                verifyGcdsHtmlElement(gcdsElementMap.get(key)[0], gcdsElementMap.get(key)[1]);
+            else if (!textKeysToNotSearch.includes(key))
                 expect(screen.queryByText(pageContentJson[key])).toBeInTheDocument();
-
         });
-        verifyGcdsHtmlElement('gcds-button', createMap('gcds-button', ['submit']));
-        expect(screen.queryByText(buttonJson['submit'])).toBeInTheDocument();
-
-        verifyGcdsHtmlElement('gcds-footer', createMap('gcds-footer', [subLinks[language]]));
-
     }
+
     function checkVerificationSetUpPageContents(language:string, pageContentJson: JSON, langLink: string,  buttonJson: JSON) {
 
         verifyCommonElements(language, langLink, buttonJson, null, ['3', 'h1', '4', language]);
@@ -362,7 +377,7 @@ describe('Routing Test', () => {
                 attributes: ['input-id', 'label', 'name', 'type', 'validate-on']
             },
             'gcds-input2':{
-                attributes: ['input-id', 'label', 'name', 'type', 'class', 'hint']
+                attributes: ['input-id', 'label', 'name', 'type', 'hint']
             },
             'gcds-fieldset':{
                 attributes: ["fieldset-id", "hint", "legend"]

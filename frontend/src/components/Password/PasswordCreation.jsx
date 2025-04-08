@@ -6,6 +6,7 @@ import {CONTEXT_ACTIONS, NAVIGATION_LINKS} from "../../utils/constants.jsx";
 import {useUser} from "../Providers/UserContext.jsx";
 import SubmitButton from "../Layout/SubmitButton.jsx";
 import {useNavigate} from "react-router";
+import AlreadyGc from "../Layout/AlreadyGc.jsx";
 
 
 
@@ -48,7 +49,7 @@ export default function PasswordCreation({currentLang}) {
             formData.get('password');
             setVisibility(!visibility);
             if (!isPasswordValid(formData.get('password'))) {
-                const errorString = `${errorPageJson[5]} ${passwordPolicy.min} ${errorPageJson[11]} ${passwordPolicy.max} ${errorPageJson[12]}`
+                const errorString = `${errorPageJson[5]} ${passwordPolicy.min} ${errorPageJson[12]} ${passwordPolicy.max} ${errorPageJson[13]}`
                 setError({passwordError: errorString, heading: errorPageJson['1']});
                 return;
             }
@@ -94,10 +95,10 @@ export default function PasswordCreation({currentLang}) {
     return (
         <GcdsContainer className="gcds-content" >
             {
-            errorJson.passwordError!==null&&(<GcdsErrorSummary
-                errorLinks={`{"#password": "${errorJson.passwordError}"}`}
-                heading={errorJson.heading}
-                data-testid="errorSummary"
+                errorJson.passwordError!==null&&(<GcdsErrorSummary
+                    errorLinks={`{"#password": "${errorJson.passwordError}"}`}
+                    heading={errorJson.heading}
+                    data-testid="errorSummary"
                 />)
             }
             <GcdsContainer centered className="gcds-notice">
@@ -105,19 +106,19 @@ export default function PasswordCreation({currentLang}) {
                     &nbsp;
                 </GcdsNotice>
             </GcdsContainer>
-                <GcdsText>
-                    <GcdsStepper currentStep="2" totalSteps="4" tag="h1" lang={currentLang} marginTop="150" marginBottom="0">
-                        {pageContentJson['3']}
-                    </GcdsStepper>
-                </GcdsText>
             <GcdsText>
-                {pageContentJson['4']}<strong> {pageContentJson['5']} {passwordPolicy.min} </strong>{pageContentJson['6']}{pageContentJson['7']}
+                <GcdsStepper currentStep="2" totalSteps="4" tag="h1" lang={currentLang} marginTop="150" marginBottom="0">
+                    {pageContentJson['3']}
+                </GcdsStepper>
             </GcdsText>
-                    <GcdsDetails detailsTitle={pageContentJson['7']}>
-                    <GcdsText>
-                        {pageContentJson['8']}
-                    </GcdsText>
-                    </GcdsDetails>
+            <GcdsText>
+                <span>{pageContentJson['4']}</span> <strong><span>{pageContentJson['5']}</span> {passwordPolicy.min} </strong> <span>{pageContentJson['6']}</span>
+            </GcdsText>
+            <GcdsDetails detailsTitle={pageContentJson['7']}>
+                <GcdsText>
+                    {pageContentJson['8']}
+                </GcdsText>
+            </GcdsDetails>
             <GcdsContainer>
                 <form id="form" onSubmit={handleSubmit} >
                     { state.testData!==undefined&&(
@@ -126,12 +127,11 @@ export default function PasswordCreation({currentLang}) {
                             label={pageContentJson['9']}
                             name="password"
                             value={state.testData.password}
-                            // value={state.testData!==undefined?state.testData.password:""}
                             hint={pageContentJson['10']}
                             type={checkedValue? "password" : "text"}
                             onGcdsInput={handlePasswordChange}
                             errorMessage={errorJson.passwordError}
-                            required ></GcdsInput>)
+                        ></GcdsInput>)
                     }
                     { state.testData===undefined&&(<GcdsInput
                         inputId="input-password"
@@ -141,34 +141,28 @@ export default function PasswordCreation({currentLang}) {
                         type={checkedValue? "password" : "text"}
                         onGcdsInput={handlePasswordChange}
                         errorMessage={errorJson.passwordError}
-                        required ></GcdsInput>)
+                    ></GcdsInput>)
                     }
-                        <GcdsCheckbox
-                            checkboxId="checkbox-default"
-                            label={pageContentJson['11']}
-                            name="checkbox"
-                            onGcdsChange={validateCheckbox}>
-                            <GcdsText>
-                                {checkedValue? "false" : "true"}
-                            </GcdsText>
-                        </GcdsCheckbox>
+                    <GcdsCheckbox
+                        checkboxId="checkbox-default"
+                        label={pageContentJson['11']}
+                        name="checkbox"
+                        onGcdsChange={validateCheckbox}>
                         <GcdsText>
-                            {pageContentJson['12']} <strong>{passwordStrength}</strong>/{passwordPolicy.min} {pageContentJson['13']}
+                            {checkedValue? "false" : "true"}
                         </GcdsText>
+                    </GcdsCheckbox>
+                    <GcdsText>
+                        <span>{pageContentJson['12']}</span> <strong>{passwordStrength}</strong> / {passwordPolicy.min} <span>{pageContentJson['13']}</span>
+                    </GcdsText>
                     <SubmitButton currentLang={currentLang} disabled={isPending} />
                 </form>
             </GcdsContainer>
-            <GcdsHeading tag="h2">
-                {pageContentJson['14']}
-                <GcdsText marginTop="200" marginBottom="0">
-                    <GcdsLink href={`/${currentLang}`}>
-                        {pageContentJson['15']}
-                    </GcdsLink>
-                </GcdsText>
-            </GcdsHeading>
+            <AlreadyGc currentLang={currentLang}/>
         </GcdsContainer>
     )
 }
+
 
 
 
