@@ -13,7 +13,7 @@ import {authService} from "../../services/authService.jsx";
 import SubmitButton from "../Layout/SubmitButton.jsx";
 
 export default function SignUpEmail({currentLang}) {
-    const {state} = useUser();
+    const {state, dispatch} = useUser();
     const [email, setEmail] = useState(state.userData.email);
     const [isPending, startTransition] = useTransition();
     const navigate = useNavigate();
@@ -47,7 +47,7 @@ export default function SignUpEmail({currentLang}) {
                 const response = await authService.sendOtpCode({
                     userName: formData.get('email')
                 });
-                console.log(response);
+                console.log("response", response);
                 if(response.success){
                     const userData = {
                         ...state.userData,

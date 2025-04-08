@@ -53,7 +53,7 @@ describe('Routing Test', () => {
             </MemoryRouter>,
         )
 
-       checkSignUpPageContents(AVAILABLE_LANGUAGES.en, engJson["SignUpEmail"],langHref.fr+NAVIGATION_LINKS.signUp, engJson["EmailCollectionForm"], engJson['Button'], engJson["AlreadyGc"]);
+       checkSignUpPageContents(AVAILABLE_LANGUAGES.en, engJson["SignUpEmail"],langHref.fr+NAVIGATION_LINKS.signUp, engJson['Button'], engJson["AlreadyGc"]);
     });
 
     test("Check sign up route with fr language defined", () => {
@@ -63,7 +63,7 @@ describe('Routing Test', () => {
                 <App />
             </MemoryRouter>,
         )
-        checkSignUpPageContents(AVAILABLE_LANGUAGES.fr, frJson["SignUpEmail"],langHref.en+NAVIGATION_LINKS.signUp, frJson["EmailCollectionForm"], frJson['Button'], frJson["AlreadyGc"]);
+        checkSignUpPageContents(AVAILABLE_LANGUAGES.fr, frJson["SignUpEmail"],langHref.en+NAVIGATION_LINKS.signUp, frJson['Button'], frJson["AlreadyGc"]);
     });
 
     test("Check email verification page route with en language defined", () => {
@@ -237,36 +237,29 @@ describe('Routing Test', () => {
 
     }
 
-    function checkSignUpPageContents(language:string, pageContentJson: JSON, langLink: string,  formContentJson: JSON, buttonJson: JSON, alreadyGcJson:JSON) {
+    function checkSignUpPageContents(language:string, pageContentJson: JSON, langLink: string,  buttonJson: JSON, alreadyGcJson:JSON) {
 
-        verifyCommonElements(language, langLink, buttonJson, alreadyGcJson, null);
+        verifyCommonElements(language, langLink, buttonJson, alreadyGcJson, ['1', 'h1', '4', language]);
 
-        Object.keys(pageContentJson).forEach(key => {
-            if(key==='3')
-                if (language === AVAILABLE_LANGUAGES.fr)
-                    expect(screen.queryByText(pageContentJson[key] + ' ' + SERVICES[0].title)).toBeInTheDocument();
-                else
-                    expect(screen.queryByText(SERVICES[0].title + ' ' + pageContentJson[key])).toBeInTheDocument();
-            else
-                expect(screen.queryByText(pageContentJson[key])).toBeInTheDocument();
-
-        });
-
+        const textKeysToNotSearch = ['4', '6'];
         const gcdsElementMap = new Map();
-        gcdsElementMap.set('1', ['gcds-input', createMap('gcds-input', ['email', formContentJson['1'], 'email', 'email', 'other'] )])
-        gcdsElementMap.set('2', ['gcds-fieldset', createMap('gcds-fieldset', ['gcds-email-fieldset',formContentJson['4'],formContentJson['2']])])
-
+        gcdsElementMap.set('2', ['gcds-input', createMap('gcds-input', ['email', pageContentJson['2'], 'email', 'email', 'other'] )]);
+        gcdsElementMap.set('3', ['gcds-fieldset', createMap('gcds-fieldset', ['gcds-email-fieldset',pageContentJson['4'],pageContentJson['3']])]);
         if(language===AVAILABLE_LANGUAGES.fr) {
-            const options ='[{"label": "'+formContentJson['6']+'","id": "english", "value": "eng"},{"label": "'+formContentJson['7']+'","id": "french", "value": "fr","checked":"true"}]';
-            gcdsElementMap.set('3', ['gcds-radio-group', createMap('gcds-radio-group', ['language',options])])
+            const options ='[{"label": "'+pageContentJson['5']+'","id": "english", "value": "eng"},{"label": "'+pageContentJson['6']+'","id": "french", "value": "fr","checked":"true"}]';
+            gcdsElementMap.set('5', ['gcds-radio-group', createMap('gcds-radio-group', ['language',options])]);
 
         }else{
-            const options = '[{"label": "' + formContentJson['6'] + '","id": "english", "value": "eng","checked":"true"},{"label": "' + formContentJson['7'] + '","id": "french", "value": "fr"}]';
-            gcdsElementMap.set('3', ['gcds-radio-group', createMap('gcds-radio-group', ['language', options])])
+            const options = '[{"label": "' + pageContentJson['5'] + '","id": "english", "value": "eng","checked":"true"},{"label": "' + pageContentJson['6'] + '","id": "french", "value": "fr"}]';
+            gcdsElementMap.set('5', ['gcds-radio-group', createMap('gcds-radio-group', ['language', options])]);
         }
 
-        gcdsElementMap.forEach(item => {verifyGcdsHtmlElement(item[0], item[1]);});
-
+        Object.keys(pageContentJson).forEach(key => {
+            if(gcdsElementMap.has(key))
+                verifyGcdsHtmlElement(gcdsElementMap.get(key)[0], gcdsElementMap.get(key)[1]);
+            else if(!textKeysToNotSearch.includes(key))
+                expect(screen.queryByText(pageContentJson[key])).toBeInTheDocument();
+        });
     }
 
     function checkEmailVerificationPageContents(language:string, pageContentJson: JSON, langLink: string,  buttonJson: JSON, alreadyGcJson:JSON) {
