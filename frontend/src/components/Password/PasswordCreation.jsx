@@ -1,4 +1,4 @@
-import {GcdsContainer, GcdsHeading, GcdsLink, GcdsText, GcdsDetails, GcdsInput, GcdsNotice, GcdsStepper, GcdsCheckbox, GcdsErrorSummary} from "@cdssnc/gcds-components-react";
+import {GcdsContainer, GcdsText, GcdsDetails, GcdsInput, GcdsNotice, GcdsStepper, GcdsCheckbox, GcdsErrorSummary} from "@cdssnc/gcds-components-react";
 import {getPageContent, isPasswordValid} from '../../utils/functions';
 import {useEffect, useState, useTransition} from 'react';
 import {authService} from "../../services/authService.jsx";
@@ -82,7 +82,6 @@ export default function PasswordCreation({currentLang}) {
     }
 
     function validateCheckbox ()  {
-        console.log(checkedValue);
         setCheckedValue (!checkedValue);
     }
 
@@ -148,9 +147,6 @@ export default function PasswordCreation({currentLang}) {
                         label={pageContentJson['11']}
                         name="checkbox"
                         onGcdsChange={validateCheckbox}>
-                        <GcdsText>
-                            {checkedValue? "false" : "true"}
-                        </GcdsText>
                     </GcdsCheckbox>
                     <GcdsText>
                         <span>{pageContentJson['12']}</span> <strong>{passwordStrength}</strong> / {passwordPolicy.min} <span>{pageContentJson['13']}</span>
