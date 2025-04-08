@@ -1,0 +1,76 @@
+tenant_url=cds-gcsignin-dev.verify.ibm.com/
+
+#OIDC Endpoints
+https://cds-gcsignin-dev.verify.ibm.com/oauth2/.well-known/openid-configuration
+
+{"issuer":"https://cds-gcsignin-dev.verify.ibm.com/oauth2",
+"authorization_endpoint":"https://cds-gcsignin-dev.verify.ibm.com/oauth2/authorize",
+"token_endpoint":         "https://cds-gcsignin-dev.verify.ibm.com/oauth2/token",
+"introspection_endpoint":"https://cds-gcsignin-dev.verify.ibm.com/oauth2/introspect",
+"userinfo_endpoint":"https://cds-gcsignin-dev.verify.ibm.com/oauth2/userinfo",
+
+#Login and SMS OTP APIs
+#userid-pwd based authentication POST
+https://tenant_url/v1.0/authnmethods/password/id
+
+#retrieve the list of smsotp registered by a user (filtered by userId). Remeber the id of the 2FA for the userId. GET 
+https://tenant_url/v2.0/factors/smsotp
+
+#Register a SMS OTP 2FA. POST
+https://{tenanturl}/v2.0/factors/smsotp
+
+#Create a transient SMS one-time password verification.
+https://{tenanturl}/v2.0/factors/smsotp/transient/verifications
+
+#Attempt a transient SMS one-time password verification.
+https://{tenanturl}/v2.0/factors/smsotp/transient/verifications/{trxnId}
+
+
+#Create a SMS OTP
+https://tenant_url/v2.0/factors/smsotp/id/verifications
+
+#verify SMS OTP. POST
+https://tenant_url/v2.0/factors/smsotp/id/verifications/trxnId
+
+
+#Transit Email OPT
+#Generate and send an OTP to the transit email.  POST. It will return a trxnId.
+https://{tenanturl}/v2.0/factors/emailotp/transient/verifications
+
+#Verify the OTP of the given trxnId.
+https://tenant_url/v2.0/factors/emailotp/transient/verifications/trxnId
+
+#Retrieve password policies GET
+https://tenant_url/v3.0/PasswordPolicies
+
+#Validate a password against a password policy. POST.
+https://{tenanturl}/v3.0/PasswordPolicies/{id}/validate
+
+#Create a user into IBM Verify. POST
+https://tenant_url/v2.0/Users
+
+#Search a user using userName as filter. GET.
+https://tenant_url/v2.0/Users
+
+#Update the user profile. PATCH
+https://tenant_url/v2.0/Users/id
+
+#Transit SMS OPT
+#Generate and send an OTP to the transit phone number.  POST. It will return a trxnId.
+https://tenant_url/v2.0/factors/smsotp/transient/verifications
+
+#Verify the SMS OTP of the given trxnId. POST
+https://tenant_url/v2.0/factors/smsotp/transient/verifications/trxnId
+
+
+#Create a SMS OTP 2FA. POST
+https://tenant_url/v2.0/factors/smsotp
+
+#Create a SMS OTP
+https://tenant_url/v2.0/factors/smsotp/id/verifications
+
+#verify SMS OTP. POST
+https://tenant_url/v2.0/factors/smsotp/id/verifications/trxnId
+
+#Exchange an access token for an browser authenticated session. GET.
+https://tenant_url/v1.0/auth/session
