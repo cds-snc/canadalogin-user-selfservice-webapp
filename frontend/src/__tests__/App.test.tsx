@@ -10,6 +10,50 @@ import * as engJson from  '../locales/en/en.json';
 // @ts-ignore
 import * as frJson from '../locales/fr/fr.json';
 
+const GCDS_TAG_ATTRIBUTES = {
+    'gcds-input':{
+        attributes: ['input-id', 'label', 'name', 'type', 'validate-on']
+    },
+    'gcds-input2':{
+        attributes: ['input-id', 'label', 'name', 'type', 'hint']
+    },
+    'gcds-input3':{
+        attributes: ['input-id', 'label', 'name', 'type']
+    },
+    'gcds-fieldset':{
+        attributes: ["fieldset-id", "hint", "legend"]
+    },
+    'gcds-radio-group':{
+        attributes:  ["name", "options"]
+    },
+    'gcds-button':{
+        attributes: ["type"]
+    },
+    'gcds-footer':{
+        attributes: ["sub-links"]
+    },
+    'gcds-header':{
+        attributes: ['lang', 'lang-href', 'signature-variant']
+    },
+    'gcds-details':{
+        attributes: ['details-title']
+    },
+    'gcds-stepper':{
+        attributes: ['current-step', 'tag', 'total-steps', 'lang']
+    },
+    'gcds-stepper2':{
+        attributes: ['current-step', 'tag', 'total-steps', 'lang', 'margin-bottom', 'margin-top']
+    },
+    'gcds-notice':{
+        name:'gcds-notice',
+        attributes: ['notice-title', 'notice-title-tag', 'type']
+    },
+    'gcds-checkbox':{
+        name:'gcds-checkbox',
+        attributes: ['checkbox-id', 'label', 'name']
+    }
+}
+
 describe('Routing Test', () => {
 
     const langHref = {attribute:'lang-href', en:'/'+AVAILABLE_LANGUAGES.en, fr:'/'+AVAILABLE_LANGUAGES.fr}
@@ -226,6 +270,37 @@ describe('Routing Test', () => {
         checkVerificationPageContents(AVAILABLE_LANGUAGES.fr, frJson["Verification"], langHref.en + NAVIGATION_LINKS.verification+'/voice', frJson['Button'], frJson["AlreadyGc"], true);
     });
 
+    test("Check core profile page route with en language defined", () => {
+
+        vi.mock("../components/Providers/PrivateRoute.jsx", () => {
+            return {
+                default: (props:any) => props.children,
+            };
+        });
+
+        render(
+            <MemoryRouter initialEntries={[langHref.en + NAVIGATION_LINKS.coreProfile]}>
+                <App/>
+            </MemoryRouter>,
+        )
+        checkCreateCoreProfilePageContents(AVAILABLE_LANGUAGES.en, engJson["CreateCoreProfile"], langHref.fr + NAVIGATION_LINKS.coreProfile, engJson['Button'], null, true);
+    });
+
+    test("Check core profile page route with fr language defined", () => {
+
+        vi.mock("../components/Providers/PrivateRoute.jsx", () => {
+            return {
+                default: (props:any) => props.children,
+            };
+        });
+
+        render(
+            <MemoryRouter initialEntries={[langHref.fr + NAVIGATION_LINKS.coreProfile]}>
+                <App/>
+            </MemoryRouter>,
+        )
+        checkCreateCoreProfilePageContents(AVAILABLE_LANGUAGES.fr, frJson["CreateCoreProfile"], langHref.en + NAVIGATION_LINKS.coreProfile, frJson['Button'], null, true);
+    });
 
     afterEach(() => {
         cleanup();
@@ -358,9 +433,36 @@ describe('Routing Test', () => {
 
     }
 
+    function checkCreateCoreProfilePageContents(language:string, pageContentJson: JSON, langLink: string,  buttonJson: JSON, alreadyGcJson:JSON, isVoice: boolean) {
+
+        verifyCommonElements(language, langLink, buttonJson, null, ['4', 'h1', '4', language]);
+        const gcdsElementMap = new Map();
+        gcdsElementMap.set('1', ['gcds-notice', createMap('gcds-notice', [pageContentJson['1'], 'h2', 'success'])]);
+        gcdsElementMap.set('7', ['gcds-input',  createMap('gcds-input3', ["firstName", pageContentJson['7'], 'firstName', 'text'] )]);
+        gcdsElementMap.set('8', ['gcds-input',  createMap('gcds-input', ["lastName", pageContentJson['8'], 'lastName', 'text', 'other'] )]);
+
+        Object.keys(pageContentJson).forEach(key => {
+            if(gcdsElementMap.has(key))
+                verifyGcdsHtmlElement(gcdsElementMap.get(key)[0], gcdsElementMap.get(key)[1]);
+            else
+                expect(screen.queryByText(pageContentJson[key])).toBeInTheDocument();
+        });
+    }
+
     function verifyGcdsHtmlElement(tag: string, attributes:Map<string,string>)
     {
-        const element = document.querySelector(tag) as HTMLElement;
+        const allElements = document.querySelectorAll(tag);
+        let element = document.querySelector(tag) as HTMLElement;
+
+        if(allElements!==null && allElements.length > 1) {
+            allElements.forEach((el: HTMLElement) => {
+                attributes.forEach((value, attribute) => {
+                    if (el.getAttribute(GCDS_TAG_ATTRIBUTES[tag].attributes[0]) === value)
+                        element = el;
+                });
+            })
+        }
+
         expect(element).toBeTruthy();
         expect(element).toBeInTheDocument();
 
@@ -371,47 +473,6 @@ describe('Routing Test', () => {
     }
 
     function createMap(type:string, values:Array<string>) {
-
-        const GCDS_TAG_ATTRIBUTES = {
-            'gcds-input':{
-                attributes: ['input-id', 'label', 'name', 'type', 'validate-on']
-            },
-            'gcds-input2':{
-                attributes: ['input-id', 'label', 'name', 'type', 'hint']
-            },
-            'gcds-fieldset':{
-                attributes: ["fieldset-id", "hint", "legend"]
-            },
-            'gcds-radio-group':{
-                attributes:  ["name", "options"]
-            },
-            'gcds-button':{
-                attributes: ["type"]
-            },
-            'gcds-footer':{
-                attributes: ["sub-links"]
-            },
-            'gcds-header':{
-                attributes: ['lang', 'lang-href', 'signature-variant']
-            },
-            'gcds-details':{
-                attributes: ['details-title']
-            },
-            'gcds-stepper':{
-                attributes: ['current-step', 'tag', 'total-steps', 'lang']
-            },
-            'gcds-stepper2':{
-                attributes: ['current-step', 'tag', 'total-steps', 'lang', 'margin-bottom', 'margin-top']
-            },
-            'gcds-notice':{
-                name:'gcds-notice',
-                attributes: ['notice-title', 'notice-title-tag', 'type']
-            },
-            'gcds-checkbox':{
-                name:'gcds-checkbox',
-                attributes: ['checkbox-id', 'label', 'name']
-            }
-        }
 
         try{
             const map = new Map();
