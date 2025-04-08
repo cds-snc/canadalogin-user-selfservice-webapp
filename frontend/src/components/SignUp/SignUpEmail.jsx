@@ -4,7 +4,7 @@ import {
     GcdsInput, GcdsRadioGroup, GcdsStepper
 } from "@cdssnc/gcds-components-react";
 import {useState, useTransition} from "react";
-import {AVAILABLE_LANGUAGES, CONTEXT_ACTIONS, NAVIGATION_LINKS} from "../../utils/constants";
+import { CONTEXT_ACTIONS, NAVIGATION_LINKS} from "../../utils/constants";
 import {getPageContent, isEmailValid} from '../../utils/functions';
 import AlreadyGc from "../Layout/AlreadyGc.jsx";
 import {useUser} from "../Providers/UserContext.jsx";
