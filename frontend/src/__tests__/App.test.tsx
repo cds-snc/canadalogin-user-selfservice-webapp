@@ -433,7 +433,7 @@ describe('Routing Test', () => {
 
     }
 
-    function checkCreateCoreProfilePageContents(language:string, pageContentJson: JSON, langLink: string,  buttonJson: JSON, alreadyGcJson:JSON, isVoice: boolean) {
+    function checkCreateCoreProfilePageContents(language:string, pageContentJson: JSON, langLink: string,  buttonJson: JSON) {
 
         verifyCommonElements(language, langLink, buttonJson, null, ['4', 'h1', '4', language]);
         const gcdsElementMap = new Map();
@@ -456,7 +456,7 @@ describe('Routing Test', () => {
 
         if(allElements!==null && allElements.length > 1) {
             allElements.forEach((el: HTMLElement) => {
-                attributes.forEach((value, attribute) => {
+                attributes.forEach((value) => {
                     if (el.getAttribute(GCDS_TAG_ATTRIBUTES[tag].attributes[0]) === value)
                         element = el;
                 });
