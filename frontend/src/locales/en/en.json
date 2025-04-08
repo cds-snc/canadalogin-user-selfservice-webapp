@@ -41,10 +41,12 @@
     "6": "The longer and more unusual the password, the harder it is to guess. So avoid using common phrases. Also avoid repeating passwords from other online accounts such as banks, email and social media."
   },
   "SignUpEmail": {
-    "1": "Create a GC Sign in",
-    "2": "to continue to your",
-    "3": "account",
-    "4": "Enter your email"
+    "1": "Enter your email",
+    "2": "Email address",
+    "3": "Choose your email language preference",
+    "4": "You will receive emails from GC Sign in in the language you choose.",
+    "5": "English",
+    "6": "French"
   },
   "FirstTimeGc": {
     "1": "First time using GC Sign in?",
@@ -53,14 +55,6 @@
   "AlreadyGc": {
     "1": "Already have a GC Sign in account?",
     "2": "Sign in"
-  },
-  "EmailCollectionForm": {
-    "1": "Email address",
-    "2": "Choose your email language preference",
-    "3": "(required)",
-    "4": "You will receive emails from GC Sign in in the language you choose.",
-    "6": "English",
-    "7": "French"
   },
   "Error":{
     "1": "There was a problem",

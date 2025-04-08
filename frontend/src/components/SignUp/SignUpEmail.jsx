@@ -1,20 +1,72 @@
 import {
     GcdsContainer,
-    GcdsErrorSummary,
-    GcdsHeading,
-    GcdsText
+    GcdsErrorSummary, GcdsFieldset,
+    GcdsInput, GcdsRadioGroup, GcdsStepper
 } from "@cdssnc/gcds-components-react";
-import {useState} from "react";
-import {AVAILABLE_LANGUAGES} from "../../utils/constants";
-import {getPageContent} from '../../utils/functions';
-import EmailCollectionForm from "./EmailCollectionForm";
+import {useState, useTransition} from "react";
+import {AVAILABLE_LANGUAGES, CONTEXT_ACTIONS, NAVIGATION_LINKS} from "../../utils/constants";
+import {getPageContent, isEmailValid} from '../../utils/functions';
 import AlreadyGc from "../Layout/AlreadyGc.jsx";
 import {useUser} from "../Providers/UserContext.jsx";
+import {useNavigate} from "react-router";
+import {authService} from "../../services/authService.jsx";
+import SubmitButton from "../Layout/SubmitButton.jsx";
 
 export default function SignUpEmail({currentLang}) {
     const {state} = useUser();
+    const [email, setEmail] = useState(state.userData.email);
+    const [isPending, startTransition] = useTransition();
+    const navigate = useNavigate();
     const [errorJson, setError] = useState({heading: null, emailError:null});
     const pageContentJson = getPageContent(currentLang, "SignUpEmail");
+    const errorPageJson = getPageContent(currentLang, "Error");
+
+    function validateEmail(email) {
+        setEmail(email);
+
+        if(isEmailValid(email)) {
+            setError({emailError: null, heading: null});
+            return true;
+        }
+        else {
+            setError({emailError: errorPageJson[2], heading: errorPageJson['1']});
+            return false;
+        }
+    }
+
+    function handleSubmit(e) {
+        startTransition(async()=> {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const formEmail = formData.get('email');
+
+            if(!validateEmail(formEmail))
+                return;
+
+            try {
+                const response = await authService.sendOtpCode({
+                    userName: formData.get('email')
+                });
+                console.log(response);
+                if(response.success){
+                    const userData = {
+                        ...state.userData,
+                        email: formEmail,
+                        emailLanguage: formData.get('language'),
+                        trxnId: response.data.trxnId
+                    };
+                    await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
+                    navigate("/" + currentLang + NAVIGATION_LINKS.verifyEmail);
+                }else {
+                    console.log("Error....", response);
+                    setError({emailError: response.message, heading: errorPageJson['1']});
+                }
+            } catch (error) {
+                console.error('Signup error:', error);
+                setError({emailError:  errorPageJson[7], heading: errorPageJson['1']});
+            }
+        })
+    }
 
     return (
         <GcdsContainer className="gcds-content" >
@@ -25,17 +77,45 @@ export default function SignUpEmail({currentLang}) {
                                 heading={errorJson.heading}
                        />)
                 }
-                <GcdsHeading tag="h1">
-                    {pageContentJson['1']}
-                    <GcdsText marginTop="200" marginBottom="0">
-                        {pageContentJson['2']}
-                        <strong> {currentLang===AVAILABLE_LANGUAGES.fr&&(pageContentJson['3']+' ')}{` ${state.userData.service}`}{currentLang===AVAILABLE_LANGUAGES.en&&(' '+pageContentJson['3'])}</strong>
-                    </GcdsText>
-                </GcdsHeading>
-                <GcdsHeading tag="h2">
-                    {pageContentJson['4']}
-                </GcdsHeading>
-                <EmailCollectionForm currentLang={currentLang}  errorJson={errorJson} setError={setError}/>
+                 <GcdsStepper currentStep="1" totalSteps="4"
+                              tag="h1"
+                              lang={currentLang}>
+                     {pageContentJson['1']}
+                 </GcdsStepper>
+                 <form id="form" onSubmit={handleSubmit}>
+                     <GcdsContainer marginTop="100" marginBottom="0" >
+                         <GcdsInput
+                             inputId="email"
+                             label={pageContentJson['2']}
+                             name="email"
+                             type="email"
+                             value={state.testData!=null?state.testData.email:email}
+                             validateOn="other"
+                             onGcdsChange={(e) => {validateEmail(e.target.value)}}
+                             errorMessage={errorJson.emailError}
+                             data-testid="email"
+                             lang={currentLang}
+                             required ></GcdsInput>
+                         <GcdsFieldset
+                             fieldset-id="gcds-email-fieldset"
+                             legend={pageContentJson['3']}
+                             hint={pageContentJson['4']}
+                             lang={currentLang}
+                             required>
+                             <br />
+                             <GcdsRadioGroup
+                                 name="language"
+                                 options={'['+
+                                     `{"label": "${pageContentJson['5']}",`+
+                                     `"id": "english", "value": "eng"${ currentLang!=='fr'?',"checked":"true"':'' }},`+
+                                     `{"label": "${pageContentJson['6']}",`+
+                                     `"id": "french", "value": "fr"${ currentLang==='fr'?',"checked":"true"':'' }}`+
+                                     `]`}
+                             />
+                         </GcdsFieldset>
+                         <SubmitButton currentLang={currentLang} disabled={isPending} />
+                     </GcdsContainer>
+                 </form>
             </GcdsContainer>
             <AlreadyGc currentLang={currentLang}/>
         </GcdsContainer>

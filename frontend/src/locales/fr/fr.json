@@ -31,10 +31,14 @@
     "18": "Se connecter"
   },
   "SignUpEmail": {
-    "1": "Créez un compte Connexion GC",
-    "2": "pour accéder à votre",
-    "3": "compte",
-    "4": "Entrez une adresse courriel"
+    "1": "Entrez une adresse courriel",
+    "2": "Entrez une adresse courriel",
+    "3": "Veuillez choisir la langue que vous préférez utiliser pour la correspondance par courriel",
+    "4": "Vous recevrez les courriels de Connexion GC dans la langue de votre choix.",
+    "5": "Anglais",
+    "6": "Français"
+
+
   },
   "FirstTimeGc": {
     "1": "Vous possédez déjà un compte Connexion GC?",
@@ -43,15 +47,6 @@
   "AlreadyGc": {
     "1": "Vous n’avez pas encore de compte Connexion GC?",
     "2": "Créer un compte"
-  },
-  "EmailCollectionForm": {
-    "1": "Entrez une adresse courriel",
-    "2": "Veuillez choisir la langue que vous préférez utiliser pour la correspondance par courriel",
-    "3": "(obligatoire)",
-    "4": "Vous recevrez les courriels de Connexion GC dans la langue de votre choix.",
-    "5": "Continuer",
-    "6": "Anglais",
-    "7": "Français"
   },
   "Error":{
     "1": "Un problème est survenu",
