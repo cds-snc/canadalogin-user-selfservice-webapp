@@ -11,34 +11,18 @@
   },
   "PasswordCreation": {
     "1": "Your email was successfully verified",
-    "2": "Step 2 of 5", 
+    "2": "Step 2 of 4",
     "3": "Create a password",
     "4": "Your password should be a phrase or series of words that only you can recognize. It must be",
-    "5": "at least 12 characters.",
-    "6": "You can use multiple words seprated by spaces to meet the character limit.",
+    "5": "at least",
+    "6": "characters. You can use multiple words separated by spaces to meet the character limit.",
     "7": "Password safety tips",
     "8": "The longer and more unusual the password, the harder it is to guess. So avoid using common phrases. Also avoid repeating passwords from other online accounts such as banks, email and social media.",
     "9": "Password",
     "10": "example: pillow moose dish",
     "11": "Show password",
     "12": "Minimum length:",
-    "13": "characters",
-    "14": "Already have a GC Sign in account?",
-    "15": "Sign in"
-  },
-  "PasswordCollectionForm":{
-    "1": "Password",
-    "2":"example: pillow moose dish",
-    "3": "Show password",
-    "4": "Continue"
-  },
-  "SignUpPassword":{
-    "1": "Create a password",
-    "2": "Your password should be a phrase or series of words that only you can recognize. It must be ",
-    "3": "at least 12 characters. ",
-    "4": "You can use multiple words seperated by spaces to meet the character limit.",
-    "5": "Password safety tips",
-    "6": "The longer and more unusual the password, the harder it is to guess. So avoid using common phrases. Also avoid repeating passwords from other online accounts such as banks, email and social media."
+    "13": "characters"
   },
   "SignUpEmail": {
     "1": "Enter your email",
@@ -67,7 +51,9 @@
     "8": "Invalid phone number. Phone numbers for the country you selected should be ",
     "9": " digits. Make sure you selected the right country, or try typing your phone number again. Extensions are not allowed.",
     "10": "Enter a phone number to continue.",
-    "11": "Enter a last name to continue. If you have a single name, enter it in the last name field."
+    "11": "Enter a last name to continue. If you have a single name, enter it in the last name field.",
+    "12": "and a maximum of",
+    "13": "characters."
   },
   "EmailVerification":{
     "1": "Check your email",
