@@ -1,6 +1,6 @@
 import {
     GcdsContainer, GcdsDetails, GcdsErrorSummary, GcdsFieldset,
-    GcdsLink, GcdsRadioGroup,
+    GcdsRadioGroup,
     GcdsStepper,
     GcdsText
 } from "@cdssnc/gcds-components-react";
