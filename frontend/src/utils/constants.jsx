@@ -4,7 +4,7 @@ export const NAVIGATION_LINKS = {
     verifyEmail: '/signup/verifyemail',
     password: '/signup/password',
     twoStepVerification: '/signup/verificationsetup',
-    verification: '/signup/verification',
+    verification: '/verification',
     coreProfile: '/signup/profile',
 };
 export const CONTEXT_ACTIONS = {
@@ -12,6 +12,17 @@ export const CONTEXT_ACTIONS = {
     signIn: 'SIGN_IN',
     logOut: 'LOG_OUT'
 };
+
+export const FLOW_TYPES={
+    signUp: "signup",
+    signIn: "signin",
+    sms: "sms",
+    voice: "voice"
+}
+
+export const PAGES ={
+    verification: 'Verification'
+}
 
 export const FOOTERS = {
         default: {

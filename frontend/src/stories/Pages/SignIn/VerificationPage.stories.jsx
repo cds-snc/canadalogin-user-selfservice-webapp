@@ -6,7 +6,7 @@ import Page from "../../../views/Page.tsx";
 
 
 export default {
-    title: 'GC Sign In/Pages/Sign Up/Verification Page',
+    title: 'GC Sign In/Pages/Sign In/Verification Page',
     component: Page,
     args: {page:PAGES.verification},
     decorators: [withRouter,
@@ -25,7 +25,7 @@ export const SMSEnglish = {
     parameters: {
         reactRouter: reactRouterParameters({
             location: {
-                pathParams: { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp, type:FLOW_TYPES.sms },
+                pathParams: { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.sms },
             },
             routing: { path: '/:language'+'/:flow'+NAVIGATION_LINKS.verification+'/:type' }
         })
@@ -36,7 +36,7 @@ export const SMSFrench = {
     parameters: {
         reactRouter: reactRouterParameters({
             location: {
-                pathParams: { language: AVAILABLE_LANGUAGES.fr , flow: FLOW_TYPES.signUp, type:FLOW_TYPES.sms },
+                pathParams: { language: AVAILABLE_LANGUAGES.fr , flow: FLOW_TYPES.signIn, type:FLOW_TYPES.sms },
             },
             routing: { path: '/:language'+'/:flow'+NAVIGATION_LINKS.verification+'/:type' }
         }),
@@ -48,7 +48,7 @@ export const VoiceEnglish = {
     parameters: {
         reactRouter: reactRouterParameters({
             location: {
-                pathParams: { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp, type:FLOW_TYPES.voice },
+                pathParams: { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.voice },
             },
             routing: { path: '/:language'+'/:flow'+NAVIGATION_LINKS.verification+'/:type' }
         })
@@ -65,4 +65,6 @@ export const VoiceFrench = {
         }),
     }
 };
+
+
 

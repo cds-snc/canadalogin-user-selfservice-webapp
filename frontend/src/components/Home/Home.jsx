@@ -23,7 +23,7 @@ export default function Home({currentLang}) {
                         <GcdsText marginTop="150" marginBottom="0">
                             {pageContentJson['2']}
                             <strong>
-                                {currentLang===AVAILABLE_LANGUAGES.fr?pageContentJson['3']+' ':''}
+                                {currentLang===AVAILABLE_LANGUAGES.fr?' '+pageContentJson['3']+' ':''}
                                 {` ${SERVICES[0].title}`}{currentLang===AVAILABLE_LANGUAGES.en?' '+pageContentJson['3']:''}
                             </strong>
                         </GcdsText>

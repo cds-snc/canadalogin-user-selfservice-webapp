@@ -5,11 +5,10 @@ import PasswordPage from "./views/Password/PasswordPage";
 import SignUpPage from "./views/SignUp/SignUpPage";
 import EmailVerification from "./views/SignUp/EmailVerificationPage";
 import PrivateRoute from "./components/Providers/PrivateRoute.jsx";
-import RegisterVerificationPage from "./views/SignUp/RegisterVerificationPage.jsx";
 import VerificationSetUpPage from "./views/SignUp/VerificationSetUpPage.jsx";
-import VerificationPage from "./views/SignUp/VerificationPage.jsx";
 import CreateCoreProfilePage from "./views/SignUp/CreateCoreProfilePage.jsx";
-
+import Page from "./views/Page.js";
+import {PAGES} from "./utils/constants.jsx";
 
 function App() {
       return (
@@ -20,9 +19,8 @@ function App() {
                   <Route path="/:language/signup" element={<SignUpPage/>}/>
                   <Route path="/:language/signup/verifyemail/" element={<PrivateRoute route="signUpVerifyEmail"><EmailVerification /></PrivateRoute>}/>
                   <Route path="/:language/signup/password" element={ <PrivateRoute route="signUpPassword"><PasswordPage /></PrivateRoute>} />
-                  <Route path="/:language/signup/registerverification" element={<PrivateRoute route="signUpVerification"><RegisterVerificationPage/></PrivateRoute>}/>
                   <Route path="/:language/signup/verificationsetup" element={<PrivateRoute route="signUpVerification"><VerificationSetUpPage/></PrivateRoute>}/>
-                  <Route path="/:language/signup/verification/:type" element={<PrivateRoute route="signUpVerifyTwoStep"><VerificationPage/></PrivateRoute>}/>
+                  <Route path="/:language/:flow/verification/:type" element={<PrivateRoute route={PAGES.verification}><Page page={PAGES.verification}/></PrivateRoute>}/>
                   <Route path="/:language/signup/profile" element={<PrivateRoute route="signUpCoreProfile"><CreateCoreProfilePage/></PrivateRoute>}/>
                   <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>

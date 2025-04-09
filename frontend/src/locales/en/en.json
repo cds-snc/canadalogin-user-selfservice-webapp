@@ -118,7 +118,11 @@
     "14": "Request a new code in",
     "15": "seconds",
     "16": "Request a new code",
-    "17": "We have sent you a new code"
+    "17": "We have sent you a new code",
+    "18": "Complete 2-step verification",
+    "19": "to continue to your",
+    "20": "account",
+    "21": "Try another way"
   },
   "CreateCoreProfile": {
     "1": "Your GC Sign in account has been created",
