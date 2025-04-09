@@ -4,7 +4,7 @@ import {
 import {getPageContent, isNameValid} from "../../../utils/functions.jsx";
 import SubmitButton from "../../Layout/SubmitButton.jsx";
 import {useUser} from "../../Providers/UserContext.jsx";
-import {startTransition, useState} from "react";
+import {useState, useTransition} from "react";
 import {authService} from "../../../services/authService.jsx";
 import {CONTEXT_ACTIONS} from "../../../utils/constants.jsx";
 import {useNavigate} from "react-router";
@@ -15,6 +15,7 @@ export default function CreateCoreProfile({currentLang}) {
     const navigate = useNavigate();
     const errorPageJson = getPageContent(currentLang, "Error");
     const pageContentJson = getPageContent(currentLang, "CreateCoreProfile");
+    const [isPending, startTransition] = useTransition();
 
     function  handleSubmit (e){
         startTransition(async()=> {
@@ -32,8 +33,13 @@ export default function CreateCoreProfile({currentLang}) {
             setError({nameError:null, heading:null});
 
             try {
-                const response = await authService.createCoreProfile({
+                let name = formLastName.trim();
 
+                if(formFirstName!==null)
+                    name = formFirstName.trim() + ' ' + name;
+
+                const response = await authService.createCoreProfile({
+                    name: name
                 });
                 if(response.success){
                     const userData = {...state.userData, coreProfileCreated: true};
@@ -73,7 +79,7 @@ export default function CreateCoreProfile({currentLang}) {
             </GcdsContainer>
             <GcdsContainer>
                 <GcdsText>
-                    {pageContentJson['3']}&nbsp;
+                    <span>{pageContentJson['3']}</span>
                     <GcdsLink href="#">{pageContentJson['4']}</GcdsLink>
                     &nbsp;{pageContentJson['5']}
                 </GcdsText>
@@ -81,28 +87,59 @@ export default function CreateCoreProfile({currentLang}) {
                     {pageContentJson['6']}
                 </GcdsHeading>
                 <form id="form" onSubmit={handleSubmit}>
-                    <GcdsInput
-                        inputId="firstName"
-                        label={pageContentJson['7']}
-                        name="firstName"
-                        type="text"
-                        lang={currentLang}
-                        optional
-                    ></GcdsInput>
-                    <GcdsInput
-                        inputId="lastName"
-                        label={pageContentJson['8']}
-                        name="lastName"
-                        type="text"
-                        validateOn="other"
-                        errorMessage={errorJson.nameError}
-                        lang={currentLang}
-                        required
-                    ></GcdsInput>
-                    <SubmitButton currentLang={currentLang} />
+                    <InputBox currentLang={currentLang} errorJson={errorJson} pageContentJson={pageContentJson} state={state} />
+                    <SubmitButton currentLang={currentLang} disabled={isPending}/>
                 </form>
             </GcdsContainer>
         </GcdsContainer>
     )
 }
 
+function InputBox({pageContentJson, currentLang, errorJson, state}) {
+
+
+    if(state.testData!==undefined)
+        return (<>
+                <GcdsInput
+                    inputId="firstName"
+                    label={pageContentJson['7']}
+                    name="firstName"
+                    value={state.testData.firstName}
+                    type="text"
+                    lang={currentLang}
+                    optional
+                ></GcdsInput>
+                <GcdsInput
+                    inputId="lastName"
+                    label={pageContentJson['8']}
+                    name="lastName"
+                    type="text"
+                    value={state.testData.lastName}
+                    validateOn="other"
+                    errorMessage={errorJson.nameError}
+                    lang={currentLang}
+                    required
+                ></GcdsInput></>
+        )
+
+    return (<>
+                <GcdsInput
+                    inputId="firstName"
+                    label={pageContentJson['7']}
+                    name="firstName"
+                    type="text"
+                    lang={currentLang}
+                    optional
+                ></GcdsInput>
+                <GcdsInput
+                    inputId="lastName"
+                    label={pageContentJson['8']}
+                    name="lastName"
+                    type="text"
+                    validateOn="other"
+                    errorMessage={errorJson.nameError}
+                    lang={currentLang}
+                    required
+                ></GcdsInput></>
+    )
+}
