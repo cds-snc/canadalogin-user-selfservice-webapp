@@ -1,4 +1,4 @@
-# GC Sign In
+# GC Sign in
 
 Provides a modern frontend and a backend proxy layer to support GC Sign In across governemntal departments across the Government of Canada.
 
