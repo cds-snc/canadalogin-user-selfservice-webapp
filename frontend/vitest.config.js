@@ -9,8 +9,7 @@ const filesToInclude =[
 ]
 
 const filesToExclude = [
-    '**/src/components/Password/PasswordCollectionForm.jsx',
-    '**/src/components/Password/SignUpPassword.jsx'
+
 ]
 export default defineConfig({
     plugins: [react()],

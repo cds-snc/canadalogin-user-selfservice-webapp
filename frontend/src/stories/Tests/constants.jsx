@@ -15,7 +15,10 @@ export const TestDataUserProvider = {
         email: null,
         otp: null,
         phone: null,
-        verificationCode: null
+        verificationCode: null,
+        password:null,
+        firstname: null,
+        lastName: null
     }
 }
 

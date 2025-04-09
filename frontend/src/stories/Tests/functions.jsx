@@ -20,9 +20,7 @@ export async function testCase({ canvasElement, step, stepMessage, message, link
                 break;
         }
 
-
-
-            switch (actionType) {
+    switch (actionType) {
         case(ACTION_TYPES.link):
             await testItem.clickLink(canvas, step, stepMessage, linkText);
             break;

@@ -44,27 +44,27 @@ export default {
 };
 
 
-const BadEmailTemplateFE = (args) =>   {
+const BadTemplateBE = (args) =>   {
     return(
         <UserProvider initial={TestDataUserProvider}><VerificationSetUpPage /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
     )
 }
 
-const EmailTemplateBE = (args) =>   {
+const TemplateBE = (args) =>   {
     return(
         <UserProvider initial={TestDataUserProvider}><VerificationSetUpPage /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
     )
 }
-export const EngNoNumberErrorFrontEndTest = BadEmailTemplateFE.bind({});
-export const FrNoNumberErrorFrontEndTest = BadEmailTemplateFE.bind({});
-export const EngDigitErrorFrontEndTest = BadEmailTemplateFE.bind({});
-export const FrDigitErrorFrontEndTest = BadEmailTemplateFE.bind({});
-export const ErrorBackEnd = EmailTemplateBE.bind({});
-export const ServerErrorBackEnd = EmailTemplateBE.bind({});
-export const SuccessfulBackEnd = EmailTemplateBE.bind({});
+export const EngNoNumberErrorFrontEnd = BadTemplateBE.bind({});
+export const FrNoNumberErrorFrontEnd = BadTemplateBE.bind({});
+export const EngDigitErrorFrontEnd = BadTemplateBE.bind({});
+export const FrDigitErrorFrontEnd = BadTemplateBE.bind({});
+export const ErrorBackEnd = TemplateBE.bind({});
+export const ServerErrorBackEnd = TemplateBE.bind({});
+export const SuccessfulBackEnd = TemplateBE.bind({});
 
-EngNoNumberErrorFrontEndTest.parameters = storyParameters(false, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.twoStepVerification);
-EngNoNumberErrorFrontEndTest.play = async ({ canvasElement, step }) => {
+EngNoNumberErrorFrontEnd.parameters = storyParameters(false, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.twoStepVerification);
+EngNoNumberErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
         canvasElement,
@@ -79,8 +79,8 @@ EngNoNumberErrorFrontEndTest.play = async ({ canvasElement, step }) => {
     })
 }
 
-FrNoNumberErrorFrontEndTest.parameters = storyParameters(false, AVAILABLE_LANGUAGES.fr, NAVIGATION_LINKS.twoStepVerification);
-FrNoNumberErrorFrontEndTest.play = async ({ canvasElement, step }) => {
+FrNoNumberErrorFrontEnd.parameters = storyParameters(false, AVAILABLE_LANGUAGES.fr, NAVIGATION_LINKS.twoStepVerification);
+FrNoNumberErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
         canvasElement,
@@ -95,8 +95,8 @@ FrNoNumberErrorFrontEndTest.play = async ({ canvasElement, step }) => {
     })
 }
 
-EngDigitErrorFrontEndTest.parameters = storyParameters(false, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.twoStepVerification);
-EngDigitErrorFrontEndTest.play = async ({ canvasElement, step }) => {
+EngDigitErrorFrontEnd.parameters = storyParameters(false, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.twoStepVerification);
+EngDigitErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
         canvasElement,
@@ -112,8 +112,8 @@ EngDigitErrorFrontEndTest.play = async ({ canvasElement, step }) => {
     })
 }
 
-FrDigitErrorFrontEndTest.parameters = storyParameters(false, AVAILABLE_LANGUAGES.fr, NAVIGATION_LINKS.twoStepVerification);
-FrDigitErrorFrontEndTest.play = async ({ canvasElement, step }) => {
+FrDigitErrorFrontEnd.parameters = storyParameters(false, AVAILABLE_LANGUAGES.fr, NAVIGATION_LINKS.twoStepVerification);
+FrDigitErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
         canvasElement,

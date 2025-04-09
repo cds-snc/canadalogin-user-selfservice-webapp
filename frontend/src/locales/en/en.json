@@ -4,47 +4,33 @@
     "2": "to continue to your",
     "3": "account",
     "4": "What is GC Sign in?",
-    "5": "Use one account and password for secure, private access participating programs and services.",
+    "5": "GC Sign in allows you to use one account and password for secure, private access to participating programs and services.",
     "6": "Participating programs and services will ask you to create a GC Sign in to securely access your information on their website or application.",
-    "7": "You can use the same username and password to access any program or service that partners with GC Sign in.",
+    "7": "You can use the same username and password to access any program or service that uses GC Sign in.",
     "8": "Email address"
   },
   "PasswordCreation": {
     "1": "Your email was successfully verified",
-    "2": "Step 2 of 5", 
+    "2": "Step 2 of 4",
     "3": "Create a password",
     "4": "Your password should be a phrase or series of words that only you can recognize. It must be",
-    "5": "at least 12 characters.",
-    "6": "You can use multiple words seprated by spaces to meet the character limit.",
+    "5": "at least",
+    "6": "characters. You can use multiple words separated by spaces to meet the character limit.",
     "7": "Password safety tips",
     "8": "The longer and more unusual the password, the harder it is to guess. So avoid using common phrases. Also avoid repeating passwords from other online accounts such as banks, email and social media.",
     "9": "Password",
     "10": "example: pillow moose dish",
     "11": "Show password",
     "12": "Minimum length:",
-    "13": "characters",
-    "14": "Already have a GC Sign in account?",
-    "15": "Sign in"
-  },
-  "PasswordCollectionForm":{
-    "1": "Password",
-    "2":"example: pillow moose dish",
-    "3": "Show password",
-    "4": "Continue"
-  },
-  "SignUpPassword":{
-    "1": "Create a password",
-    "2": "Your password should be a phrase or series of words that only you can recognize. It must be ",
-    "3": "at least 12 characters. ",
-    "4": "You can use multiple words seperated by spaces to meet the character limit.",
-    "5": "Password safety tips",
-    "6": "The longer and more unusual the password, the harder it is to guess. So avoid using common phrases. Also avoid repeating passwords from other online accounts such as banks, email and social media."
+    "13": "characters"
   },
   "SignUpEmail": {
-    "1": "Create a GC Sign in",
-    "2": "to continue to your",
-    "3": "account",
-    "4": "Enter your email"
+    "1": "Enter your email",
+    "2": "Email address",
+    "3": "Choose your email language preference",
+    "4": "You will receive emails from GC Sign in in the language you choose.",
+    "5": "English",
+    "6": "French"
   },
   "FirstTimeGc": {
     "1": "First time using GC Sign in?",
@@ -54,17 +40,9 @@
     "1": "Already have a GC Sign in account?",
     "2": "Sign in"
   },
-  "EmailCollectionForm": {
-    "1": "Email address",
-    "2": "Choose your email language preference",
-    "3": "(required)",
-    "4": "You will receive emails from GC Sign in in the language you choose.",
-    "6": "English",
-    "7": "French"
-  },
   "Error":{
     "1": "There was a problem",
-    "2": "Invalid email. Email must contain an ‘@’ symbol.",
+    "2": "Invalid email. Email must contain an ‘@’ symbol followed by a domain.",
     "3": "Codes must be six digits. Try again.",
     "4": "Password must be 12 characters",
     "5": "Invalid password. Password must be at least 12 characters and maximum 65 characters.",
@@ -72,7 +50,10 @@
     "7": "Server Error. Please try again later.",
     "8": "Invalid phone number. Phone numbers for the country you selected should be ",
     "9": " digits. Make sure you selected the right country, or try typing your phone number again. Extensions are not allowed.",
-    "10": "Enter a phone number to continue."
+    "10": "Enter a phone number to continue.",
+    "11": "Enter a last name to continue. If you have a single name, enter it in the last name field.",
+    "12": "and a maximum of",
+    "13": "characters."
   },
   "EmailVerification":{
     "1": "Check your email",
@@ -111,7 +92,7 @@
     "9": "Country",
     "10": "Phone number",
     "11": "My country is not listed here",
-    "12": "Some countries are not supported due to technical limitations. If your country is not listed,",
+    "12": "Some countries are not supported due to technical limitations. If your country is not listed, you will be unable to create a GC Sign in account at this time. We apologize for the inconvenience.",
     "13": "select a different 2-step verification method.",
     "14": "How should we send you the code?",
     "15": "You can change this the next time you sign in.",

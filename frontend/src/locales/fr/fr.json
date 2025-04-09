@@ -12,29 +12,27 @@
   },
   "PasswordCreation": {
     "1": "Votre adresse courriel a bien été vérifiée",
-    "2": "Étape 2 de 5",
     "3": "Créer un mot de passe",
-    "4": "Votre mot de passe doit être une phrase ou une série de mots que personne ne peut reconnaître à part vous. Il doit être composé ",
-    "5": "d’au moins 12 caractères. ", 
-    "6": "Vous pouvez utiliser plusieurs mots séparés par des espaces pour atteindre la limite de caractères.",
+    "4": "Votre mot de passe doit être une phrase ou une série de mots que personne ne peut reconnaître à part vous. Il doit être composé",
+    "5": "d’au moins",
+    "6": "caractères. Vous pouvez utiliser plusieurs mots séparés par des espaces pour atteindre la limite de caractères.",
     "7": "Conseils de sécurité pour les mots de passe",
     "8": "Plus le mot de passe est long et inhabituel, plus il est difficile à deviner. Évitez donc d’utiliser des phrases courantes. Évitez également de réutiliser un mot de passe que vous utilisez pour d’autres comptes en ligne (banques, courriels ou encore réseaux sociaux).",
     "9": "Mot de passe",
-    "10": "exemple : coussin orignal plat",
+    "10": "exemple : coussin orignal plat",
     "11": "Afficher le mot de passe",
-    "12": "Longueur minimale : ",
-    "13": "caractères",
-    "14": "Robustesse du mot de passe : ",
-    "15": "Nulle",
-    "16": "Continuer",
-    "17": "Vous possédez déjà un compte Connexion GC?",
-    "18": "Se connecter"
+    "12": "Longueur minimale :",
+    "13": "caractères"
   },
   "SignUpEmail": {
-    "1": "Créez un compte Connexion GC",
-    "2": "pour accéder à votre",
-    "3": "compte",
-    "4": "Entrez une adresse courriel"
+    "1": "Entrez une adresse courriel",
+    "2": "Entrez une adresse courriel",
+    "3": "Veuillez choisir la langue que vous préférez utiliser pour la correspondance par courriel",
+    "4": "Vous recevrez les courriels de Connexion GC dans la langue de votre choix.",
+    "5": "Anglais",
+    "6": "Français"
+
+
   },
   "FirstTimeGc": {
     "1": "Vous possédez déjà un compte Connexion GC?",
@@ -43,15 +41,6 @@
   "AlreadyGc": {
     "1": "Vous n’avez pas encore de compte Connexion GC?",
     "2": "Créer un compte"
-  },
-  "EmailCollectionForm": {
-    "1": "Entrez une adresse courriel",
-    "2": "Veuillez choisir la langue que vous préférez utiliser pour la correspondance par courriel",
-    "3": "(obligatoire)",
-    "4": "Vous recevrez les courriels de Connexion GC dans la langue de votre choix.",
-    "5": "Continuer",
-    "6": "Anglais",
-    "7": "Français"
   },
   "Error":{
     "1": "Un problème est survenu",
@@ -63,7 +52,10 @@
     "7": "Server Error. Please try again later.",
     "8": "Numéro de téléphone invalide. Les numéros de téléphone pour le pays que vous avez sélectionné doivent être composés de ",
     "9": " chiffres. Assurez-vous d’avoir sélectionné le bon pays ou essayez d’entrer à nouveau votre numéro de téléphone. Les extensions ne sont pas permises.",
-    "10": "Veuillez entrer un numéro de téléphone pour continuer."
+    "10": "Veuillez entrer un numéro de téléphone pour continuer.",
+    "11": "Veuillez entrer un nom de famille pour continuer. Si vous n’avez qu’un seul nom, entrez-le dans le champ destiné au nom de famille.",
+    "12": "and a maximum of",
+    "13": "caractères."
   },
   "EmailVerification":{
     "1": "Vérifiez votre boîte de réception courrie",
@@ -133,8 +125,8 @@
     "4": "avis de confidentialité",
     "5": "pour en savoir plus sur la manière dont nous utilisons vos renseignements personnels.",
     "6": "Entrez votre nom",
-    "7": "First name",
-    "8": "Last name"
+    "7": "Prénom",
+    "8": "Nom"
   },
   "Button":{
       "submit": "Continuer"

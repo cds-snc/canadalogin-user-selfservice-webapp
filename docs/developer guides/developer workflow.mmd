@@ -1,0 +1,107 @@
+flowchart TD
+    StoryRefinement["Story Refinement"]
+    ProductTeamRefine("Product Team refines stories and creates tasks")
+    AddTasksToProductBacklog("Tasks are added to Product Backlog")
+    SprintPlanning["Sprint Planning"]
+    BacklogGrooming("Product Team decides what to work on next from the backlog")
+    AddTasks("Tasks are added to Sprint Backlog")
+    PickTask["Developer Picks up a Task"]
+    WorkOnTask["Developer begins working on a Task"]
+    TaskIsReviwed["Task review begins"]
+    ZenHubAssignTask("Developer assigns themselves to the Task (if not assigned already)")
+    ZenHubMoveToInProgress("Developer moves Task to In Progress")
+    ZenHubAddLabels("Developer adds Labels to the Task")
+    GitHubCreateBranch("Developer creates a branch from the Task/Issue")
+    DeveloperWorkOnFeature("Developer checks out the branch and develops features")
+    DeveloperCommitsChanges("Developer commits changes to their branch")
+    CreatePullRequest("Developer creates a Pull Request")
+    LinkPRToIssue("(Optional)<br />Developer links the PR to the Task in the PR description<br/> (Example: 'Closes #10')")
+    SlackAddPRMessage("Developer adds a link to the PR on dev channel to notify team")
+    UnitTestsPass{"Coverage is 70% and Unit Tests Pass?"}
+    AddUnitTests("Developer adds Unit Tests")
+    ZenHubMoveToReview("Developer moves the Task to the Review column")
+    PRReview("PR is reviewed by at least one developer")
+    PRApproved("Pull Request is Approved")
+    PRChangesRequired{Changes Required?}
+    PRMakeChanges("Developer commits changes")
+    MergePR("Developer merges PR to main branch, Task is closed")
+
+    StoryRefinement --> ZenHubRefinementGraph
+    subgraph ZenHubRefinementGraph["ZenHub"]
+        ProductTeamRefine
+        AddTasksToProductBacklog
+    end
+    ZenHubRefinementGraph --> SprintPlanning
+    SprintPlanning --> ZenHubPlanningGraph
+    subgraph ZenHubPlanningGraph["ZenHub"]
+        BacklogGrooming
+        AddTasks
+    end
+    BacklogGrooming --> AddTasks
+    AddTasks --> PickTask
+    PickTask -->|"Developer<br/>adds task<br/>(if missing)"| AddTasks
+    PickTask --> ZenHubTaskPickupGraph
+    subgraph ZenHubTaskPickupGraph["ZenHub"]
+        ZenHubAddLabels
+        ZenHubAssignTask
+        ZenHubMoveToInProgress
+    end
+    ZenHubTaskPickupGraph --> WorkOnTask
+    WorkOnTask --> GitHubWorkOnFeatureGraph
+    subgraph GitHubWorkOnFeatureGraph["GitHub"]
+        GitHubCreateBranch
+    end
+    GitHubWorkOnFeatureGraph --> DeveloperWorkOnFeature
+    DeveloperWorkOnFeature --> DeveloperCommitsChanges
+    DeveloperCommitsChanges --> TaskIsReviwed
+    TaskIsReviwed --> GitHubCreatePRGraph
+    subgraph GitHubCreatePRGraph["GitHub"]
+        CreatePullRequest
+        LinkPRToIssue
+    end
+    GitHubCreatePRGraph --> UnitTestsPass
+    UnitTestsPass -->|Yes| ZenHubTaskReviewGraph
+    UnitTestsPass -->|No| AddUnitTests
+    AddUnitTests --> ZenHubTaskReviewGraph
+    subgraph ZenHubTaskReviewGraph["ZenHub"]
+        ZenHubMoveToReview
+    end
+    ZenHubTaskReviewGraph --> SlackGraph
+    subgraph SlackGraph["Slack"]
+        SlackAddPRMessage
+    end
+    SlackGraph --> GitHubPRGraph
+    subgraph GitHubPRGraph["GitHub"]
+        PRReview
+        PRChangesRequired
+        PRApproved
+        MergePR
+    end
+    PRReview --> PRChangesRequired
+    PRChangesRequired -->|Yes|PRMakeChanges
+    PRChangesRequired -->|No|PRApproved
+    PRMakeChanges-->PRReview
+    PRApproved -->MergePR
+
+    style StoryRefinement fill:#ffff99,stroke:#333,stroke-width:2px
+    style SprintPlanning fill:#ffff99,stroke:#333,stroke-width:2px
+    style PickTask fill:#ffff99,stroke:#333,stroke-width:2px
+    style TaskIsReviwed fill:#ffff99,stroke:#333,stroke-width:2px
+    style ZenHubAddLabels fill:#d0f0f0,stroke:#333,stroke-width:2px
+    style ZenHubAssignTask fill:#d0f0f0,stroke:#333,stroke-width:2px
+    style ZenHubMoveToInProgress fill:#d0f0f0,stroke:#333,stroke-width:2px
+    style WorkOnTask fill:#ffff99,stroke:#333,stroke-width:2px
+    style GitHubCreateBranch fill:#d0f0f0,stroke:#333,stroke-width:2px
+    style DeveloperWorkOnFeature fill:#d0f0f0,stroke:#333,stroke-width:2px
+    style DeveloperCommitsChanges fill:#d0f0f0,stroke:#333,stroke-width:2px
+    style CreatePullRequest fill:#d0f0f0,stroke:#333,stroke-width:2px
+    style LinkPRToIssue fill:#d0f0f0,stroke:#333,stroke-width:2px
+    style UnitTestsPass fill:#f0f0f0,stroke:#333,stroke-width:2px
+    style AddUnitTests fill:#d0f0f0,stroke:#333,stroke-width:2px
+    style ZenHubMoveToReview fill:#d0f0f0,stroke:#333,stroke-width:2px
+    style PRReview fill:#d9f7d9,stroke:#333,stroke-width:2px
+    style PRChangesRequired fill:#f0f0f0,stroke:#333,stroke-width:2px
+    style PRMakeChanges fill:#d0f0f0,stroke:#333,stroke-width:2px
+    style PRApproved fill:#d9f7d9,stroke:#333,stroke-width:2px
+    style MergePR fill:#d0f0f0,stroke:#333,stroke-width:2px
+    style SlackAddPRMessage fill:#d0f0f0,stroke:#333,stroke-width:2px
