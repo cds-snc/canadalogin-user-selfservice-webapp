@@ -196,6 +196,15 @@ export default function Verification() {
                 <GcdsText>
                     {pageContentJson['6']} <strong>{pageContentJson['7']}</strong>
                 </GcdsText>
+                {
+                    flow===FLOW_TYPES.signIn&&(
+                        <GcdsText>
+                            <GcdsLink href="#" onClick={useNewNumber}>
+                                {pageContentJson['21']}
+                            </GcdsLink>
+                        </GcdsText>
+                    )
+                }
                 <GcdsHeading tag='h2'>
                     {pageContentJson['8']}
                 </GcdsHeading>
@@ -229,11 +238,15 @@ export default function Verification() {
             <GcdsHeading tag='h2'>
                 {pageContentJson['10']}
             </GcdsHeading>
-            <GcdsText>
-                <GcdsLink href="#" onClick={useNewNumber}>
-                    {flow===FLOW_TYPES.signUp?pageContentJson['13']:pageContentJson['21']}
-                </GcdsLink>
-            </GcdsText>
+            {
+                flow===FLOW_TYPES.signUp&&(
+                    <GcdsText>
+                        <GcdsLink href="#" onClick={useNewNumber}>
+                            {pageContentJson['13']}
+                        </GcdsLink>
+                    </GcdsText>
+                )
+            }
             <GcdsText>
                 {time<=0 && !isPending?(<GcdsLink href="#" onClick={requestNewTypeCode}>
                         {type===FLOW_TYPES.voice?pageContentJson['12']:pageContentJson['11']}
