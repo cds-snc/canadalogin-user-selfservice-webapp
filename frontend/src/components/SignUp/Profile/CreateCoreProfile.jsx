@@ -79,7 +79,7 @@ export default function CreateCoreProfile({currentLang}) {
             </GcdsContainer>
             <GcdsContainer>
                 <GcdsText>
-                    <span>{pageContentJson['3']}</span>
+                    <span>{pageContentJson['3']} </span>
                     <GcdsLink href="#">{pageContentJson['4']}</GcdsLink>
                     &nbsp;{pageContentJson['5']}
                 </GcdsText>
