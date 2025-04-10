@@ -16,9 +16,6 @@ Create a `.env` file in the root directory with the following variables:
 
 ```env
 IBM_VERIFY_TENANT_URL=your_tenant_url
-IBM_VERIFY_CLIENT_ID=your_client_id
-IBM_VERIFY_CLIENT_SECRET=your_client_secret
-IBM_VERIFY_REDIRECT_URI=http://localhost:8000
 CORS_ORIGINS=http://localhost:3000
 IBM_VERIFY_API_CLIENT_ID=
 IBM_VERIFY_API_CLIENT_SECRET=

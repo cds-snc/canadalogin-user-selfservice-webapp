@@ -52,17 +52,13 @@ async def lifespan(app: FastAPI):
     logger.info(
         f"Tenant URL: {app.state.config.IBM_VERIFY_TENANT_URL}")
     logger.info(
-        f"Client ID: {app.state.config.IBM_VERIFY_CLIENT_ID}")
-    logger.info(
-        f"Redirect URI: {app.state.config.IBM_VERIFY_REDIRECT_URI}")
+        f"Client ID: {app.state.config.IBM_VERIFY_API_CLIENT_ID}")
     logger.info("Application startup complete")
     app.state.request_client = httpx.AsyncClient()
     yield
     logger.info("Closing global HTTP client")
     await app.state.request_client.aclose()
     logger.info("Shutting down IBM Verify Integration API")
-
-
 
 
 app = FastAPI(
@@ -117,7 +113,6 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["*"]
 )
-
 
 
 def log_request_response(endpoint: str, request_data: dict, response: requests.Response):
