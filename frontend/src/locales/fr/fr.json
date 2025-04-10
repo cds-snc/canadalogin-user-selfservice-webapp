@@ -31,8 +31,6 @@
     "4": "Vous recevrez les courriels de Connexion GC dans la langue de votre choix.",
     "5": "Anglais",
     "6": "Français"
-
-
   },
   "FirstTimeGc": {
     "1": "Vous possédez déjà un compte Connexion GC?",
@@ -116,7 +114,11 @@
     "14": "Vous pourrez demander un nouveau code dans",
     "15": "secondes",
     "16": "Demander un nouveau code",
-    "17": "Nous vous avons envoyé un nouveau code"
+    "17": "Nous vous avons envoyé un nouveau code",
+    "18": "Connectez-vous avec Connextion GC",
+    "19": "pour accéder à vôtre",
+    "20": "compte",
+    "21": "Try another way"
   },
   "CreateCoreProfile": {
     "1": "Votre compte de connexion GC a bien été créé.",

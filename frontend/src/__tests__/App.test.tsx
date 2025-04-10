@@ -2,13 +2,14 @@ import App from '../App';
 import {cleanup, render, screen} from '@testing-library/react';
 import {describe, expect, test, afterEach, vi} from "vitest";
 import '@testing-library/jest-dom';
-import {AVAILABLE_LANGUAGES, NAVIGATION_LINKS, SERVICES} from "../utils/constants";
+import {AVAILABLE_LANGUAGES, NAVIGATION_LINKS, SERVICES, FLOW_TYPES} from "../utils/constants";
 import {getFooter} from "../utils/functions";
 import {MemoryRouter} from "react-router";
 // @ts-ignore
 import * as engJson from  '../locales/en/en.json';
 // @ts-ignore
 import * as frJson from '../locales/fr/fr.json';
+import {buildTestSuite} from "./testSuite";
 
 const GCDS_TAG_ATTRIBUTES = {
     'gcds-input':{
@@ -206,23 +207,7 @@ describe('Routing Test', () => {
         checkVerificationSetUpPageContents(AVAILABLE_LANGUAGES.fr, frJson["VerificationSetUp"], langHref.en + NAVIGATION_LINKS.twoStepVerification, frJson['Button']);
     });
 
-    test("Check verification page route for sms with en language defined", () => {
-
-            vi.mock("../components/Providers/PrivateRoute.jsx", () => {
-                return {
-                    default: (props:any) => props.children,
-                };
-            });
-
-            render(
-                <MemoryRouter initialEntries={[langHref.en + NAVIGATION_LINKS.verification+'/sms']}>
-                    <App/>
-                </MemoryRouter>,
-            )
-            checkVerificationPageContents(AVAILABLE_LANGUAGES.en, engJson["Verification"], langHref.fr + NAVIGATION_LINKS.verification+'/sms', engJson['Button'], engJson["AlreadyGc"], false);
-    });
-
-    test("Check verification page route for voice with en language defined", () => {
+    test("Check sign up verification page route for sms with en language defined", () => {
 
         vi.mock("../components/Providers/PrivateRoute.jsx", () => {
             return {
@@ -230,15 +215,16 @@ describe('Routing Test', () => {
             };
         });
 
+        const link = '/' +FLOW_TYPES.signUp+NAVIGATION_LINKS.verification+'/'+FLOW_TYPES.sms;
         render(
-            <MemoryRouter initialEntries={[langHref.en + NAVIGATION_LINKS.verification+'/voice']}>
+            <MemoryRouter initialEntries={[langHref.en + link]}>
                 <App/>
             </MemoryRouter>,
         )
-        checkVerificationPageContents(AVAILABLE_LANGUAGES.en, engJson["Verification"], langHref.fr + NAVIGATION_LINKS.verification+'/voice', engJson['Button'], engJson["AlreadyGc"], true);
+        buildTestSuite.verificationPage(AVAILABLE_LANGUAGES.en, false, link, FLOW_TYPES.signUp);
     });
 
-    test("Check verification page route for sms with fr language defined", () => {
+    test("Check sign up verification page route for voice with en language defined", () => {
 
         vi.mock("../components/Providers/PrivateRoute.jsx", () => {
             return {
@@ -246,15 +232,17 @@ describe('Routing Test', () => {
             };
         });
 
+        const link = '/' +FLOW_TYPES.signUp+NAVIGATION_LINKS.verification+'/'+FLOW_TYPES.voice;
+
         render(
-            <MemoryRouter initialEntries={[langHref.fr + NAVIGATION_LINKS.verification+'/sms']}>
+            <MemoryRouter initialEntries={[langHref.en +link]}>
                 <App/>
             </MemoryRouter>,
         )
-        checkVerificationPageContents(AVAILABLE_LANGUAGES.fr, frJson["Verification"], langHref.en + NAVIGATION_LINKS.verification+'/sms', frJson['Button'], frJson["AlreadyGc"], false);
+        buildTestSuite.verificationPage(AVAILABLE_LANGUAGES.en, true, link, FLOW_TYPES.signUp);
     });
 
-    test("Check verification page route for voice with fr language defined", () => {
+    test("Check sign up verification page route for sms with fr language defined", () => {
 
         vi.mock("../components/Providers/PrivateRoute.jsx", () => {
             return {
@@ -262,12 +250,104 @@ describe('Routing Test', () => {
             };
         });
 
+        const link = '/' +FLOW_TYPES.signUp+NAVIGATION_LINKS.verification+'/'+FLOW_TYPES.sms;
+
         render(
-            <MemoryRouter initialEntries={[langHref.fr + NAVIGATION_LINKS.verification+'/voice']}>
+            <MemoryRouter initialEntries={[langHref.fr + link]}>
                 <App/>
             </MemoryRouter>,
         )
-        checkVerificationPageContents(AVAILABLE_LANGUAGES.fr, frJson["Verification"], langHref.en + NAVIGATION_LINKS.verification+'/voice', frJson['Button'], frJson["AlreadyGc"], true);
+        buildTestSuite.verificationPage(AVAILABLE_LANGUAGES.fr, false, link, FLOW_TYPES.signUp);
+    });
+
+    test("Check sign up verification page route for voice with fr language defined", () => {
+
+        vi.mock("../components/Providers/PrivateRoute.jsx", () => {
+            return {
+                default: (props:any) => props.children,
+            };
+        });
+
+        const link = '/' +FLOW_TYPES.signUp+NAVIGATION_LINKS.verification+'/'+FLOW_TYPES.voice;
+
+        render(
+            <MemoryRouter initialEntries={[langHref.fr + link]}>
+                <App/>
+            </MemoryRouter>,
+        )
+        buildTestSuite.verificationPage(AVAILABLE_LANGUAGES.fr, true, link, FLOW_TYPES.signUp);
+    });
+
+    test("Check sign in verification page route for sms with en language defined", () => {
+
+        vi.mock("../components/Providers/PrivateRoute.jsx", () => {
+            return {
+                default: (props:any) => props.children,
+            };
+        });
+
+        const link = '/' +FLOW_TYPES.signIn+NAVIGATION_LINKS.verification+'/'+FLOW_TYPES.sms;
+
+        render(
+            <MemoryRouter initialEntries={[langHref.en + link]}>
+                <App/>
+            </MemoryRouter>,
+        )
+        buildTestSuite.verificationPage(AVAILABLE_LANGUAGES.en, false, link, FLOW_TYPES.signIn);
+    });
+
+    test("Check sign in verification page route for voice with en language defined", () => {
+
+        vi.mock("../components/Providers/PrivateRoute.jsx", () => {
+            return {
+                default: (props:any) => props.children,
+            };
+        });
+
+        const link = '/' +FLOW_TYPES.signIn+NAVIGATION_LINKS.verification+'/'+FLOW_TYPES.voice;
+
+        render(
+            <MemoryRouter initialEntries={[langHref.en + link]}>
+                <App/>
+            </MemoryRouter>,
+        )
+        buildTestSuite.verificationPage(AVAILABLE_LANGUAGES.en, true, link, FLOW_TYPES.signIn);
+    });
+
+    test("Check sign in verification page route for sms with fr language defined", () => {
+
+        vi.mock("../components/Providers/PrivateRoute.jsx", () => {
+            return {
+                default: (props:any) => props.children,
+            };
+        });
+
+        const link = '/' +FLOW_TYPES.signIn+NAVIGATION_LINKS.verification+'/'+FLOW_TYPES.sms;
+
+        render(
+            <MemoryRouter initialEntries={[langHref.fr + link]}>
+                <App/>
+            </MemoryRouter>,
+        )
+        buildTestSuite.verificationPage(AVAILABLE_LANGUAGES.fr, false, link, FLOW_TYPES.signIn);
+    });
+
+    test("Check sign in verification page route for voice with fr language defined", () => {
+
+        vi.mock("../components/Providers/PrivateRoute.jsx", () => {
+            return {
+                default: (props:any) => props.children,
+            };
+        });
+
+        const link = '/' +FLOW_TYPES.signIn+NAVIGATION_LINKS.verification+'/'+FLOW_TYPES.voice;
+
+        render(
+            <MemoryRouter initialEntries={[langHref.fr + link]}>
+                <App/>
+            </MemoryRouter>,
+        )
+        buildTestSuite.verificationPage(AVAILABLE_LANGUAGES.fr, true, link, FLOW_TYPES.signIn);
     });
 
     test("Check core profile page route with en language defined", () => {
@@ -283,7 +363,7 @@ describe('Routing Test', () => {
                 <App/>
             </MemoryRouter>,
         )
-        checkCreateCoreProfilePageContents(AVAILABLE_LANGUAGES.en, engJson["CreateCoreProfile"], langHref.fr + NAVIGATION_LINKS.coreProfile, engJson['Button'], null, true);
+        checkCreateCoreProfilePageContents(AVAILABLE_LANGUAGES.en, engJson["CreateCoreProfile"], langHref.fr + NAVIGATION_LINKS.coreProfile, engJson['Button']);
     });
 
     test("Check core profile page route with fr language defined", () => {
@@ -299,7 +379,7 @@ describe('Routing Test', () => {
                 <App/>
             </MemoryRouter>,
         )
-        checkCreateCoreProfilePageContents(AVAILABLE_LANGUAGES.fr, frJson["CreateCoreProfile"], langHref.en + NAVIGATION_LINKS.coreProfile, frJson['Button'], null, true);
+        checkCreateCoreProfilePageContents(AVAILABLE_LANGUAGES.fr, frJson["CreateCoreProfile"], langHref.en + NAVIGATION_LINKS.coreProfile, frJson['Button']);
     });
 
     afterEach(() => {
@@ -411,28 +491,6 @@ describe('Routing Test', () => {
 
     }
 
-    function checkVerificationPageContents(language:string, pageContentJson: JSON, langLink: string,  buttonJson: JSON, alreadyGcJson:JSON, isVoice: boolean) {
-
-        verifyCommonElements(language, langLink, buttonJson, alreadyGcJson, ['3', 'h1', '4', language]);
-
-        const textKeysToNotSearch = ['11', '12', '15', '16', '17'];
-        const smsTextKeys = ['2', '4'];
-        const voiceTextKeys = ['3', '5'];
-
-        Object.keys(pageContentJson).forEach(key => {
-
-            if(key=='9')
-                verifyGcdsHtmlElement('gcds-input',  createMap('gcds-input', ["verificationCode", pageContentJson[key], 'verificationCode', 'text', 'other'] ));
-            else if (!textKeysToNotSearch.includes(key))
-                if (smsTextKeys.includes(key) && !isVoice)
-                    expect(screen.queryByText(pageContentJson[key])).toBeInTheDocument();
-                else if (voiceTextKeys.includes(key) && isVoice)
-                    expect(screen.queryByText(pageContentJson[key])).toBeInTheDocument();
-
-        });
-
-    }
-
     function checkCreateCoreProfilePageContents(language:string, pageContentJson: JSON, langLink: string,  buttonJson: JSON) {
 
         verifyCommonElements(language, langLink, buttonJson, null, ['4', 'h1', '4', language]);
@@ -462,7 +520,6 @@ describe('Routing Test', () => {
                 });
             })
         }
-
         expect(element).toBeTruthy();
         expect(element).toBeInTheDocument();
 

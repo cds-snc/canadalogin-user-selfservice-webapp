@@ -1,11 +1,15 @@
 import {withRouter} from 'storybook-addon-remix-react-router';
-import {AVAILABLE_LANGUAGES, NAVIGATION_LINKS, SUBMIT_END_POINTS} from "../../../utils/constants.jsx";
+import {
+    AVAILABLE_LANGUAGES, FLOW_TYPES,
+    NAVIGATION_LINKS,
+    PAGES,
+    SUBMIT_END_POINTS
+} from "../../../utils/constants.jsx";
 import {UserProvider} from "../../../components/Providers/UserContext.jsx";
 import {getPageContent} from "../../../utils/functions.jsx";
 import {ACTION_TYPES, TEST_TYPES, TestDataUserProvider} from "../constants.jsx";
-import {storyParameters, testCase} from "../functions.jsx";
-import VerificationPage from "../../../views/SignUp/VerificationPage.jsx";
-
+import {storyParametersNew, testCase} from "../functions.jsx";
+import Page from "../../../views/Page.tsx";
 const engErrorPageJson = getPageContent('en', "Error");
 const frErrorPageJson = getPageContent('fr', "Error");
 const engPageContentJson = getPageContent('en', "Verification");
@@ -34,11 +38,58 @@ const successResponse = {
         "retries": 4
     }
 }
+const frontEndStoryParameters = {
+    isBackEndTest:false,
+    link:NAVIGATION_LINKS.verification,
+    flow:FLOW_TYPES.signUp
+}
 
+const backEndStoryParameters = {
+    isBackEndTest:true,
+    link:NAVIGATION_LINKS.verification,
+    flow:FLOW_TYPES.signUp
+}
+const smsStoryParameters = {
+    ...backEndStoryParameters,
+    endpoint:SUBMIT_END_POINTS.twoStepVerification,
+    type:FLOW_TYPES.sms,
+}
+const voiceStoryParameters = {
+    ...backEndStoryParameters,
+    endpoint:SUBMIT_END_POINTS.twoStepVerificationVoice,
+    type:FLOW_TYPES.voice,
+}
+const smsNewCodeStoryParameters = {
+    ...backEndStoryParameters,
+    endpoint:SUBMIT_END_POINTS.sendTwoStepVerificationCode,
+    type:FLOW_TYPES.sms,
+}
+const voiceNewCodeStoryParameters = {
+    ...backEndStoryParameters,
+    endpoint:SUBMIT_END_POINTS.sendTwoStepVerificationCodeVoice,
+    type:FLOW_TYPES.voice,
+}
+const smsNewTypeCodeStoryParameters = {
+    ...backEndStoryParameters,
+    endpoint:SUBMIT_END_POINTS.sendTwoStepVerificationCodeVoice,
+    type:FLOW_TYPES.sms,
+}
+const voiceNewTypeCodeStoryParameters = {
+    ...backEndStoryParameters,
+    endpoint:SUBMIT_END_POINTS.sendTwoStepVerificationCode,
+    type:FLOW_TYPES.voice,
+}
+const useNewNumberStoryParameters = {
+    isBackEndTest:true,
+    link:NAVIGATION_LINKS.twoStepVerification,
+    flow:FLOW_TYPES.signUp,
+    endpoint:SUBMIT_END_POINTS.sendTwoStepVerificationCode,
+    type:FLOW_TYPES.voice,
+}
 export default {
 
     title: 'GC Sign In/Tests/Sign Up/Verification Page',
-    component: VerificationPage,
+    component: Page,
     decorators: [withRouter],
     // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs
     tags: ['autodocs'],
@@ -51,7 +102,7 @@ const BadTemplateFE = (args) =>   {
 
     TestDataUserProvider.testData.otp = "12154e";
     return(
-        <UserProvider initial={TestDataUserProvider}><VerificationPage /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
+        <UserProvider initial={TestDataUserProvider}><Page page={PAGES.verification} /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
     )
 }
 
@@ -60,7 +111,7 @@ const TemplateBE = (args) =>   {
     TestDataUserProvider.testData.otp = "123456";
 
     return(
-        <UserProvider initial={TestDataUserProvider}><VerificationPage /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
+        <UserProvider initial={TestDataUserProvider}><Page page={PAGES.verification} /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
     )
 }
 
@@ -80,7 +131,10 @@ export const ServerErrorReqNewCode = TemplateBE.bind({});
 export const UseNewNumber = TemplateBE.bind({});
 
 
-EngErrorFrontEnd.parameters = storyParameters(false, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.verification);
+EngErrorFrontEnd.parameters = storyParametersNew({
+    ...frontEndStoryParameters,
+    language:AVAILABLE_LANGUAGES.en
+});
 EngErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -96,7 +150,10 @@ EngErrorFrontEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-FrErrorFrontEnd.parameters = storyParameters(false, AVAILABLE_LANGUAGES.fr, NAVIGATION_LINKS.verification);
+FrErrorFrontEnd.parameters = storyParametersNew({
+    ...frontEndStoryParameters,
+    language:AVAILABLE_LANGUAGES.fr,
+});
 FrErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -112,7 +169,11 @@ FrErrorFrontEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-SmsErrorBackEnd.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.verification, SUBMIT_END_POINTS.twoStepVerification, errorResponse, 'sms');
+SmsErrorBackEnd.parameters = storyParametersNew({
+    ...smsStoryParameters,
+    language:AVAILABLE_LANGUAGES.en,
+    response:errorResponse,
+});
 SmsErrorBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -128,7 +189,11 @@ SmsErrorBackEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-SmsSuccessfulBackEnd.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.verification, SUBMIT_END_POINTS.twoStepVerification, successResponse, 'sms');
+SmsSuccessfulBackEnd.parameters = storyParametersNew({
+    ...smsStoryParameters,
+    language:AVAILABLE_LANGUAGES.en,
+    response:successResponse,
+});
 SmsSuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -142,7 +207,11 @@ SmsSuccessfulBackEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-VoiceErrorBackEnd.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.verification, SUBMIT_END_POINTS.twoStepVerificationVoice, errorResponse, 'voice');
+VoiceErrorBackEnd.parameters = storyParametersNew({
+    ...voiceStoryParameters,
+    language:AVAILABLE_LANGUAGES.en,
+    response:errorResponse,
+});
 VoiceErrorBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -158,7 +227,11 @@ VoiceErrorBackEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-VoiceSuccessfulBackEnd.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.verification, SUBMIT_END_POINTS.twoStepVerificationVoice, successResponse, 'voice');
+VoiceSuccessfulBackEnd.parameters = storyParametersNew({
+    ...voiceStoryParameters,
+    language:AVAILABLE_LANGUAGES.en,
+    response:successResponse,
+});
 VoiceSuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -172,7 +245,11 @@ VoiceSuccessfulBackEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-ServerErrorBackEnd.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.verification, SUBMIT_END_POINTS.twoStepVerification, null, 'sms');
+ServerErrorBackEnd.parameters = storyParametersNew({
+    ...voiceStoryParameters,
+    language:AVAILABLE_LANGUAGES.en,
+    response:null,
+});
 ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -188,7 +265,11 @@ ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-EngRequestNewCode.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.verification, SUBMIT_END_POINTS.sendTwoStepVerificationCode, successResponse, 'sms');
+EngRequestNewCode.parameters = storyParametersNew({
+    ...smsNewCodeStoryParameters,
+    language:AVAILABLE_LANGUAGES.en,
+    response:successResponse,
+});
 EngRequestNewCode.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -204,7 +285,11 @@ EngRequestNewCode.play = async ({ canvasElement, step }) => {
     })
 }
 
-FrRequestNewCode.parameters = storyParameters(true, AVAILABLE_LANGUAGES.fr, NAVIGATION_LINKS.verification, SUBMIT_END_POINTS.sendTwoStepVerificationCodeVoice, successResponse, 'voice');
+FrRequestNewCode.parameters = storyParametersNew({
+    ...voiceNewCodeStoryParameters,
+    language:AVAILABLE_LANGUAGES.fr,
+    response:successResponse,
+});
 FrRequestNewCode.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -219,7 +304,11 @@ FrRequestNewCode.play = async ({ canvasElement, step }) => {
         type: TEST_TYPES.success
     })
 }
-NewCodeBackEndError.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.verification, SUBMIT_END_POINTS.sendTwoStepVerificationCodeVoice, errorResponse, 'voice');
+NewCodeBackEndError.parameters = storyParametersNew({
+    ...voiceNewCodeStoryParameters,
+    language:AVAILABLE_LANGUAGES.en,
+    response:errorResponse,
+});
 NewCodeBackEndError.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -237,7 +326,11 @@ NewCodeBackEndError.play = async ({ canvasElement, step }) => {
 }
 
 
-ServerErrorReqNewCode.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.verification, SUBMIT_END_POINTS.sendTwoStepVerificationCodeVoice, null, 'voice');
+ServerErrorReqNewCode.parameters = storyParametersNew({
+    ...voiceNewCodeStoryParameters,
+    language:AVAILABLE_LANGUAGES.en,
+    response:null,
+});
 ServerErrorReqNewCode.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -254,7 +347,11 @@ ServerErrorReqNewCode.play = async ({ canvasElement, step }) => {
     })
 }
 
-EngRequestNewTypeCode.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.verification, SUBMIT_END_POINTS.sendTwoStepVerificationCodeVoice, successResponse, 'sms');
+EngRequestNewTypeCode.parameters = storyParametersNew({
+    ...smsNewTypeCodeStoryParameters,
+    language:AVAILABLE_LANGUAGES.en,
+    response:successResponse,
+});
 EngRequestNewTypeCode.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -269,7 +366,11 @@ EngRequestNewTypeCode.play = async ({ canvasElement, step }) => {
         type: TEST_TYPES.success
     })
 }
-FrRequestNewTypeCode.parameters = storyParameters(true, AVAILABLE_LANGUAGES.fr, NAVIGATION_LINKS.verification, SUBMIT_END_POINTS.sendTwoStepVerificationCode, successResponse, 'voice');
+FrRequestNewTypeCode.parameters = storyParametersNew({
+    ...voiceNewTypeCodeStoryParameters,
+    language:AVAILABLE_LANGUAGES.fr,
+    response:successResponse,
+});
 FrRequestNewTypeCode.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -285,7 +386,11 @@ FrRequestNewTypeCode.play = async ({ canvasElement, step }) => {
     })
 }
 
-UseNewNumber.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.twoStepVerification, SUBMIT_END_POINTS.sendTwoStepVerificationCode, successResponse, 'voice');
+UseNewNumber.parameters = storyParametersNew({
+    ...useNewNumberStoryParameters,
+    language:AVAILABLE_LANGUAGES.en,
+    response:successResponse,
+});
 UseNewNumber.play = async ({ canvasElement, step }) => {
 
     await testCase({

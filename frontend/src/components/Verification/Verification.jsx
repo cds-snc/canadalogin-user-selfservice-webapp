@@ -4,19 +4,25 @@ import {
     GcdsStepper,
     GcdsText
 } from "@cdssnc/gcds-components-react";
-import {getPageContent, isCodeValid} from '../../../utils/functions';
-import AlreadyGc from "../../Layout/AlreadyGc.jsx";
-import {CONTEXT_ACTIONS, NAVIGATION_LINKS} from "../../../utils/constants.jsx";
+import {getPageContent, isCodeValid} from '../../utils/functions.jsx';
+import AlreadyGc from "../Layout/AlreadyGc.jsx";
+import {
+    AVAILABLE_LANGUAGES,
+    CONTEXT_ACTIONS,
+    FLOW_TYPES,
+    NAVIGATION_LINKS,
+    SERVICES
+} from "../../utils/constants.jsx";
 import {useNavigate, useParams} from "react-router";
-import SubmitButton from "../../Layout/SubmitButton.jsx";
-import {useUser} from "../../Providers/UserContext.jsx";
-import {authService} from "../../../services/authService.jsx";
+import SubmitButton from "../Layout/SubmitButton.jsx";
+import {useUser} from "../Providers/UserContext.jsx";
+import {authService} from "../../services/authService.jsx";
 import {useEffect, useState, useTransition} from "react";
 
 const initialTime=10;
 
-export default function Verification({currentLang}) {
-    const {type} = useParams();
+export default function Verification() {
+    const {type, flow,language} = useParams();
     const {state, dispatch} = useUser();
     const [isPending, startTransition] = useTransition();
     const [time, setTime] = useState(initialTime);
@@ -24,8 +30,8 @@ export default function Verification({currentLang}) {
     const [timesRequested, setTimesRequested] = useState(2);
     const [errorJson, setError] = useState({heading: null, codeError:null});
     const navigate = useNavigate();
-    const errorPageJson = getPageContent(currentLang, "Error");
-    const pageContentJson = getPageContent(currentLang, "Verification");
+    const errorPageJson = getPageContent(language, "Error");
+    const pageContentJson = getPageContent(language, "Verification");
 
     useEffect(()=>{
         if(time<=0)
@@ -43,7 +49,7 @@ export default function Verification({currentLang}) {
         setError({codeError:null, heading:null});
         const userData = {...state.userData, phone:null, stepVerificationSent: false, trxnId:null};
         await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
-        navigate("/" + currentLang + NAVIGATION_LINKS.twoStepVerification);
+        navigate("/" + language + NAVIGATION_LINKS.twoStepVerification);
     }
 
     async function requestSameTypeCode (e){
@@ -60,7 +66,7 @@ export default function Verification({currentLang}) {
 
         startTransition(async()=> {
             e.preventDefault();
-            const newType =  type==='voice'?'sms':'voice'
+            const newType =  type===FLOW_TYPES.voice?FLOW_TYPES.sms:FLOW_TYPES.voice
             await requestNewCode(newType, true);
         })
     }
@@ -78,7 +84,7 @@ export default function Verification({currentLang}) {
                 await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                 setCodeRequested(true);
                 if(didTypeChange)
-                    navigate("/" + currentLang + NAVIGATION_LINKS.verification+'/'+codeType)
+                    navigate("/" + language +"/"+ flow +NAVIGATION_LINKS.verification + '/' +codeType)
             }else {
                 console.log("Error....", response);
                 setError({codeError: response.message, heading: errorPageJson['1']});
@@ -109,13 +115,21 @@ export default function Verification({currentLang}) {
                 const response = await authService.twoStepVerification({
                     otp: formCode,
                     verificationType: type,
+                    flow: flow,
                     trxnId: state.userData.trxnId
                 });
                 if(response.success){
-                    const userData = {...state.userData, stepVerified: true};
-                    await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
-                    console.log("success...",response)
-                    navigate("/" + currentLang + NAVIGATION_LINKS.coreProfile);
+                    if(flow===FLOW_TYPES.signUp) {
+                        const userData = {...state.userData, stepVerified: true};
+                        await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
+                        console.log("success...sign up", response)
+                        navigate("/" + language + NAVIGATION_LINKS.coreProfile);
+                    }else if(flow===FLOW_TYPES.signIn){
+                        const userData = {...state.userData, stepVerified: true};
+                        await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
+                        console.log("success...sign in", response)
+                     //   navigate("/" + language + NAVIGATION_LINKS.coreProfile);
+                    }
                 }else {
                     console.log("Error....", response);
                     setError({codeError: response.message, heading: errorPageJson['1']});
@@ -130,30 +144,54 @@ export default function Verification({currentLang}) {
     return (
         <GcdsContainer className="gcds-content" >
             {
-                errorJson.codeError!==null&&(<GcdsErrorSummary
-                    errorLinks={`{"#verificationCode": "${errorJson.codeError}"}`}
-                    heading={errorJson.heading}
-                    data-testid="errorSummary"
-                />)
+                errorJson.codeError!==null&&(
+                    <GcdsErrorSummary
+                        errorLinks={`{"#verificationCode": "${errorJson.codeError}"}`}
+                        heading={errorJson.heading}
+                        data-testid="errorSummary"
+                    />)
+            }
+            {codeRequested &&(<GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={pageContentJson['17']} data-testid="linkSuccess">&nbsp;</GcdsNotice>)}
+            {
+                flow===FLOW_TYPES.signIn&&(
+                    <GcdsHeading tag="h1">
+                        {pageContentJson['18']}
+                        <GcdsText marginTop="150" marginBottom="0">
+                            {pageContentJson['19']}
+                            <strong>
+                                {language===AVAILABLE_LANGUAGES.fr?' '+pageContentJson['20']+' ':''}
+                                {` ${SERVICES[0].title}`}{language===AVAILABLE_LANGUAGES.en?' '+pageContentJson['20']:''}
+                            </strong>
+                        </GcdsText>
+                    </GcdsHeading>
+
+                )
             }
             {
-                codeRequested && (<GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={pageContentJson['17']} data-testid="linkSuccess">
-                    &nbsp;
-                </GcdsNotice>)
+                flow===FLOW_TYPES.signUp&&(
+                    <GcdsContainer className="gcds-gap" >
+                        <GcdsStepper currentStep="3"
+                                     totalSteps="4"
+                                     tag="h1"
+                                     lang={language}>
+                                    {pageContentJson['1']}
+                        </GcdsStepper>
+                    </GcdsContainer>
+                )
             }
-            <GcdsContainer className="gcds-gap" >
-                <GcdsStepper currentStep="3" totalSteps="4"
-                             tag="h1"
-                             lang={currentLang}>
-                    {pageContentJson['1']}
-                </GcdsStepper>
-            </GcdsContainer>
+            {
+                flow===FLOW_TYPES.signIn&&(
+                    <GcdsHeading tag="h2">
+                        {pageContentJson['1']}
+                    </GcdsHeading>
+                )
+            }
             <GcdsContainer>
                 <GcdsText>
-                    {type==='voice'?pageContentJson['3']:pageContentJson['2']}&nbsp;<strong>{state.userData.phone}</strong>
+                    {type===FLOW_TYPES.voice?pageContentJson['3']:pageContentJson['2']}&nbsp;<strong>{state.userData.phone}</strong>
                 </GcdsText>
                 <GcdsText>
-                    {type==='voice'?pageContentJson['5']:pageContentJson['4']}
+                    {type===FLOW_TYPES.voice?pageContentJson['5']:pageContentJson['4']}
                 </GcdsText>
                 <GcdsText>
                     {pageContentJson['6']} <strong>{pageContentJson['7']}</strong>
@@ -162,7 +200,8 @@ export default function Verification({currentLang}) {
                     {pageContentJson['8']}
                 </GcdsHeading>
                 <form id="form"  onSubmit={handleSubmit}>
-                    {  state.testData!==undefined&&(<GcdsInput
+                    {
+                        state.testData!==undefined&&(<GcdsInput
                         inputId="verificationCode"
                         label={pageContentJson['9']}
                         name="verificationCode"
@@ -170,34 +209,35 @@ export default function Verification({currentLang}) {
                         type="text"
                         validateOn="other"
                         errorMessage={errorJson.codeError}
-                        lang={currentLang}
+                        lang={language}
                         required ></GcdsInput>)
                     }
-                    {  state.testData===undefined&&(<GcdsInput
+                    {
+                        state.testData===undefined&&(<GcdsInput
                         inputId="verificationCode"
                         label={pageContentJson['9']}
                         name="verificationCode"
                         type="text"
                         validateOn="other"
                         errorMessage={errorJson.codeError}
-                        lang={currentLang}
+                        lang={language}
                         required ></GcdsInput>)
                     }
-                    <SubmitButton currentLang={currentLang} disabled={isPending}/>
+                    <SubmitButton currentLang={language} disabled={isPending}/>
                 </form>
             </GcdsContainer>
             <GcdsHeading tag='h2'>
                 {pageContentJson['10']}
             </GcdsHeading>
             <GcdsText>
-                {time<=0 && !isPending?(<GcdsLink href="#" onClick={requestNewTypeCode} >
-                        {type==='voice'?pageContentJson['12']:pageContentJson['11']}
-                    </GcdsLink>):""}
+                <GcdsLink href="#" onClick={useNewNumber}>
+                    {flow===FLOW_TYPES.signUp?pageContentJson['13']:pageContentJson['21']}
+                </GcdsLink>
             </GcdsText>
             <GcdsText>
-                <GcdsLink href="#" onClick={useNewNumber}  >
-                    {pageContentJson['13']}
-                </GcdsLink>
+                {time<=0 && !isPending?(<GcdsLink href="#" onClick={requestNewTypeCode}>
+                        {type===FLOW_TYPES.voice?pageContentJson['12']:pageContentJson['11']}
+                    </GcdsLink>):""}
             </GcdsText>
             <GcdsText>
                 {time>0 && !isPending?(<span>{pageContentJson['14']}<strong> {time} {pageContentJson['15']}</strong></span>)
@@ -205,7 +245,7 @@ export default function Verification({currentLang}) {
                         {pageContentJson['16']}
                     </GcdsLink>):""}
             </GcdsText>
-            <AlreadyGc currentLang={currentLang}/>
+            {flow===FLOW_TYPES.signUp&&(<AlreadyGc currentLang={language}/>)}
         </GcdsContainer>
     )
 }
