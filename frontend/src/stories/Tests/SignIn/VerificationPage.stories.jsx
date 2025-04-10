@@ -41,13 +41,13 @@ const successResponse = {
 const frontEndStoryParameters = {
     isBackEndTest:false,
     link:NAVIGATION_LINKS.verification,
-    flow:FLOW_TYPES.signUp
+    flow:FLOW_TYPES.signIn
 }
 
 const backEndStoryParameters = {
     isBackEndTest:true,
     link:NAVIGATION_LINKS.verification,
-    flow:FLOW_TYPES.signUp
+    flow:FLOW_TYPES.signIn
 }
 const smsStoryParameters = {
     ...backEndStoryParameters,
@@ -82,13 +82,13 @@ const voiceNewTypeCodeStoryParameters = {
 const useNewNumberStoryParameters = {
     isBackEndTest:true,
     link:NAVIGATION_LINKS.twoStepVerification,
-    flow:FLOW_TYPES.signUp,
+    flow:FLOW_TYPES.signIn,
     endpoint:SUBMIT_END_POINTS.sendTwoStepVerificationCode,
     type:FLOW_TYPES.voice,
 }
 export default {
 
-    title: 'GC Sign In/Tests/Sign Up/Verification Page',
+    title: 'GC Sign In/Tests/Sign In/Verification Page',
     component: Page,
     decorators: [withRouter],
     // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs
@@ -96,7 +96,7 @@ export default {
 
 };
 
-TestDataUserProvider.userData.phone = '+1 (416) 123 - 4567';
+TestDataUserProvider.userData.phone = '+1 (***) *** - 4567';
 
 const BadTemplateFE = (args) =>   {
 
@@ -399,7 +399,7 @@ UseNewNumber.play = async ({ canvasElement, step }) => {
         stepMessage: "Successful use new number",
         link: 'verificationCode',
         message: engPageContentJson[17],
-        linkText: engPageContentJson[13],
+        linkText: engPageContentJson[21],
         delay: 1000,
         actionType: ACTION_TYPES.link,
         type: TEST_TYPES.redirect

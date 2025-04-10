@@ -2,9 +2,9 @@ import {withRouter} from 'storybook-addon-remix-react-router';
 import {AVAILABLE_LANGUAGES, NAVIGATION_LINKS, SUBMIT_END_POINTS} from "../../../utils/constants.jsx";
 import {UserProvider} from "../../../components/Providers/UserContext.jsx";
 import {getPageContent} from "../../../utils/functions.jsx";
-import {ACTION_TYPES, TEST_TYPES, TestDataUserProvider} from "../constants.jsx";
+import {ACTION_TYPES, TEST_TYPES, TestDataUserProvider} from "../utils/constants.jsx";
 import EmailVerificationPage from "../../../views/SignUp/EmailVerificationPage.jsx";
-import {storyParameters, testCase} from "../functions.jsx";
+import {storyParameters, testCase} from "../utils/functions.jsx";
 
 const engErrorPageJson = getPageContent('en', "Error");
 const frErrorPageJson = getPageContent('fr', "Error");

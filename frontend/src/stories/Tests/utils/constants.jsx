@@ -1,4 +1,4 @@
-import {SERVICES} from "../../utils/constants.jsx";
+import {SERVICES} from "../../../utils/constants.jsx";
 
 export const TestDataUserProvider = {
     isAuthenticated: false,
