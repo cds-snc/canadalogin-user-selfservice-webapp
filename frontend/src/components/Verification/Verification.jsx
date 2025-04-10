@@ -128,7 +128,7 @@ export default function Verification() {
                         const userData = {...state.userData, stepVerified: true};
                         await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                         console.log("success...sign in", response)
-                     //   navigate("/" + language + NAVIGATION_LINKS.coreProfile);
+                        navigate("/" + language + '/redirecttorp');
                     }
                 }else {
                     console.log("Error....", response);

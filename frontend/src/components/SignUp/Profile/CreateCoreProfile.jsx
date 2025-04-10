@@ -45,7 +45,7 @@ export default function CreateCoreProfile({currentLang}) {
                     const userData = {...state.userData, coreProfileCreated: true};
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                     console.log("success...",response)
-                    navigate("/" + currentLang );
+                    navigate("/" + currentLang + '/redirecttorp');
                 }else {
                     console.log("Error....", response);
                     setError({nameError: response.message, heading: errorPageJson['1']});

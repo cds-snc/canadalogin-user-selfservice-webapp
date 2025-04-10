@@ -1,11 +1,11 @@
 import {expect, userEvent, within} from "@storybook/test";
 import {reactRouterParameters} from "storybook-addon-remix-react-router";
 import {http, HttpResponse} from "msw";
-import config from "../../config.jsx";
+import config from "../../../config.jsx";
 import {ACTION_TYPES, TEST_TYPES} from "./constants.jsx";
 
 const stepErrorMessage = 'Verify error message is on Page.';
-const stepSuccessMessage = 'Verify error message is on Page.';
+const stepSuccessMessage = 'Verify success message is on Page.';
 const stepNavigateMessage = 'Verify page was navigated properly.';
 
 export async function testCase({ canvasElement, step, stepMessage, message, linkText, link, heading, delay, type, actionType, input }) {
@@ -176,7 +176,6 @@ const testItem = {
         });
     },
     clickLink: async(canvas, step, stepMessage, linkText)=>{
-
         await step(stepMessage, async () => {
             const link = canvas.queryByText(linkText);
             await expect(link).toBeInTheDocument();

@@ -22,6 +22,7 @@ function App() {
                   <Route path="/:language/signup/verificationsetup" element={<PrivateRoute route="signUpVerification"><VerificationSetUpPage/></PrivateRoute>}/>
                   <Route path="/:language/:flow/verification/:type" element={<PrivateRoute route={PAGES.verification}><Page page={PAGES.verification}/></PrivateRoute>}/>
                   <Route path="/:language/signup/profile" element={<PrivateRoute route="signUpCoreProfile"><CreateCoreProfilePage/></PrivateRoute>}/>
+                  <Route path="/:language/redirecttorp" element={ <Page page="RP"/>} />
                   <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
           </UserProvider>

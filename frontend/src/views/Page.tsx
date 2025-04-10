@@ -4,6 +4,7 @@ import Footer from '../components/Layout/Footer';
 import {GcdsContainer} from "@cdssnc/gcds-components-react";
 import Verification from "../components/Verification/Verification.jsx"
 import {PAGES} from "../utils/constants";
+import {useUser} from "../components/Providers/UserContext";
 
 function PageContents({page}:{page:string}) {
 
@@ -12,6 +13,8 @@ function PageContents({page}:{page:string}) {
             return (
                 <Verification />
             );
+        case "RP":
+            return (<div>Redirect to RP</div>);
         default:
             return (<div>Error</div>);
     }
@@ -19,10 +22,11 @@ function PageContents({page}:{page:string}) {
 
 export default function Page({page}:{page:string}) {
     const {langHref, currentLang} = getLangValues();
+    const {state} = useUser();
 
     return (
         <div className="mainBody">
-            <Header langHref={langHref} currentLang={currentLang}/>
+            <Header langHref={langHref} currentLang={currentLang} service={state.userData.service}/>
             <GcdsContainer className="gcds-page">
                 <PageContents page={page} />
             </GcdsContainer>
