@@ -122,7 +122,3 @@ async def verify_voice_otp(data: OtpVerification,request: Request):
     otp = VerifyTransientVoiceOTP(settings, http_client)
     return await otp.handle_transient_voice_otp_verification(data)
 
-@router.get("/hello")
-async def read_main():
-    return {"msg": "Hello World"}
-
