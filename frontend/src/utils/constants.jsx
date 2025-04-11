@@ -21,7 +21,8 @@ export const FLOW_TYPES={
 }
 
 export const PAGES ={
-    verification: 'Verification'
+    signup: 'SignUpEmail',
+    verification: 'Verification',
 }
 
 export const FOOTERS = {

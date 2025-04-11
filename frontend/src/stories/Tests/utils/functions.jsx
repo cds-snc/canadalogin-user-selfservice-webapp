@@ -12,7 +12,6 @@ export async function testCase({ canvasElement, step, stepMessage, message, link
 
     const canvas = await testItem.canvas(canvasElement, delay);
 
-
     if(input!==undefined)
         switch(input.inputType) {
             case('textBox'):

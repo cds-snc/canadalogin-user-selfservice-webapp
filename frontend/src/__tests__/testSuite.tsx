@@ -1,12 +1,13 @@
 import {screen} from '@testing-library/react';
 import {expect} from "vitest";
 import '@testing-library/jest-dom';
-import {AVAILABLE_LANGUAGES, SERVICES, FLOW_TYPES} from "../utils/constants";
+import {AVAILABLE_LANGUAGES, FLOW_TYPES, SERVICES} from "../utils/constants";
 import {getFooter} from "../utils/functions";
 // @ts-ignore
-import * as engJson from  '../locales/en/en.json';
+import * as engJson from '../locales/en/en.json';
 // @ts-ignore
 import * as frJson from '../locales/fr/fr.json';
+import {PAGES} from "../utils/constants.jsx";
 
 const subLinks =  {attribute:'sub-links', en:getFooter(AVAILABLE_LANGUAGES.en), fr:getFooter(AVAILABLE_LANGUAGES.fr)};
 const GCDS_TAG_ATTRIBUTES = {
@@ -61,80 +62,157 @@ interface TestParameters {
     alreadyGcJson:JSON,
     isVoice: boolean,
     stepper:Array<string>,
-    textKeysToNotSearch: Array<string>
+    textKeysToNotSearch: Array<string>,
+    smsTextKeys: Array<string>,
+    voiceTextKeys: Array<string>,
+    serviceKey: string
 }
 
 export const buildTestSuite = {
-    verificationPage: (language: string, isVoice: boolean, link: string, flow:string) => {
-        testSuite.verificationPage(testSuite.verificationParameters(language, isVoice, link, flow));
+    test:(language: string, page:string, flow:string, link: string, isVoice:boolean)=>{
+        testSuite.page(page, testSuite.parameters(language, page, flow, link, isVoice));
+    }
+}
+
+const pageSetup ={
+    button: (language:string) =>{
+        return language !== AVAILABLE_LANGUAGES.fr ? engJson['Button'] : frJson['Button'];
+    },
+    alreadyGc: (page:string, language:string, flow:string) =>{
+        switch(page) {
+            case PAGES.signup:
+                return language !== AVAILABLE_LANGUAGES.fr ? engJson["AlreadyGc"] : frJson["AlreadyGc"];
+            case PAGES.verification:
+                if (flow === FLOW_TYPES.signUp)
+                    return language !== AVAILABLE_LANGUAGES.fr ? engJson["AlreadyGc"] : frJson["AlreadyGc"];
+                else
+                    return null;
+            default:
+                return null;
+        }
+    },
+    stepper: (page:string, language:string, flow:string) =>{
+        switch(page){
+            case PAGES.signup:
+                return ['1', 'h1', '4', language];
+            case PAGES.verification:
+                if(flow===FLOW_TYPES.signUp)
+                    return ['3', 'h1', '4', language];
+                else
+                    return  null;
+            default:
+                return null;
+        }
+    },
+    textKeysToNotSearch: (page:string, flow:string) =>{
+        switch(page){
+            case PAGES.signup:
+                return ['4', '6'];
+            case PAGES.verification:
+                if(flow===FLOW_TYPES.signUp)
+                    return ['11', '12', '15', '16', '17', '18', '19','20', '21'];
+                else
+                    return  ['11', '12', '13', '15', '16', '17'];
+            default:
+                return [];
+        }
+    },
+    smsTextKeys: (page:string) =>{
+        switch(page){
+            case PAGES.verification:
+                return ['2', '4'];
+            default:
+                return [];
+        }
+    },
+    voiceTextKeys: (page:string) =>{
+        switch(page){
+            case PAGES.verification:
+                return ['3', '5'];
+            default:
+                return [];
+        }
+    },
+    serviceKey: (page:string) =>{
+        switch(page){
+            case PAGES.verification:
+                return '20';
+            default:
+                return null;
+        }
+    },
+    gcdsMap:(language:string, page:string, pageContentJson:JSON)=>{
+        switch(page){
+            case PAGES.signup:
+                return pageSetup.signUpEmailGcdsMap(language, pageContentJson);
+            case PAGES.verification:
+                return pageSetup.verificationGcdsMap(language, pageContentJson);
+            default:
+                return new Map();
+        }
+    },
+    signUpEmailGcdsMap: (language:string, pageContentJson:JSON)=>{
+
+        const gcdsElementMap = new Map();
+        gcdsElementMap.set('2', ['gcds-input', createMap('gcds-input', ['email', pageContentJson['2'], 'email', 'email', 'other'] )]);
+        gcdsElementMap.set('3', ['gcds-fieldset', createMap('gcds-fieldset', ['gcds-email-fieldset',pageContentJson['4'],pageContentJson['3']])]);
+        if(language===AVAILABLE_LANGUAGES.fr) {
+            const options ='[{"label": "'+pageContentJson['5']+'","id": "english", "value": "eng"},{"label": "'+pageContentJson['6']+'","id": "french", "value": "fr","checked":"true"}]';
+            gcdsElementMap.set('5', ['gcds-radio-group', createMap('gcds-radio-group', ['language',options])]);
+
+        }else{
+            const options = '[{"label": "' + pageContentJson['5'] + '","id": "english", "value": "eng","checked":"true"},{"label": "' + pageContentJson['6'] + '","id": "french", "value": "fr"}]';
+            gcdsElementMap.set('5', ['gcds-radio-group', createMap('gcds-radio-group', ['language', options])]);
+        }
+
+        return gcdsElementMap;
+    },
+    verificationGcdsMap: (language:string, pageContentJson:JSON)=>{
+
+        const gcdsElementMap = new Map();
+        gcdsElementMap.set('9', ['gcds-input',  createMap('gcds-input', ["verificationCode", pageContentJson['9'], 'verificationCode', 'text', 'other'])]);
+
+        return gcdsElementMap;
     }
 }
 
 const testSuite = {
-    verificationParameters: (language:string, isVoice:boolean, link:string, flow:string) =>{
+    parameters: (language: string, page:string, flow:string, link: string, isVoice:boolean)=>{
 
-        let testParameters = {
-            language:language,
-            pageContentJson:engJson["Verification"],
-            langLink: '/'+AVAILABLE_LANGUAGES.fr+link,
-            buttonJson: engJson['Button'],
-            alreadyGcJson: engJson["AlreadyGc"],
+        return {
+            language: language,
+            pageContentJson: language !== AVAILABLE_LANGUAGES.fr ? engJson[page] : frJson[page],
+            langLink: link,
+            buttonJson: pageSetup.button(language),
+            alreadyGcJson: pageSetup.alreadyGc(page, language, flow),
+            stepper: pageSetup.stepper(page, language, flow),
+            textKeysToNotSearch:  pageSetup.textKeysToNotSearch(page, flow),
             isVoice: isVoice,
-            stepper:['3', 'h1', '4', AVAILABLE_LANGUAGES.en],
-            textKeysToNotSearch:  ['11', '12', '15', '16', '17', '18', '19','20', '21']
-        }
-
-        if(language===AVAILABLE_LANGUAGES.fr){
-            testParameters = {
-                ...testParameters,
-                pageContentJson:frJson["Verification"],
-                langLink: '/'+AVAILABLE_LANGUAGES.en+link,
-                buttonJson: frJson['Button'],
-                alreadyGcJson: frJson["AlreadyGc"],
-                stepper:['3', 'h1', '4', AVAILABLE_LANGUAGES.fr],
-            }
-        }
-
-        if(flow===FLOW_TYPES.signIn)
-        {
-            testParameters = {
-                ...testParameters,
-                textKeysToNotSearch: ['11', '12', '13', '15', '16', '17'],
-                alreadyGcJson: null,
-                stepper:null,
-            }
-        }
-
-        return testParameters;
+            smsTextKeys: pageSetup.smsTextKeys(page),
+            voiceTextKeys: pageSetup.voiceTextKeys(page),
+            serviceKey: pageSetup.serviceKey(page),
+        };
     },
-    verificationPage:  ({language, pageContentJson, langLink,  buttonJson, alreadyGcJson, isVoice, stepper, textKeysToNotSearch}:TestParameters) => {
-
+    page:(page:string, {language, pageContentJson, langLink,  buttonJson, alreadyGcJson, stepper, textKeysToNotSearch, isVoice, smsTextKeys, voiceTextKeys, serviceKey}:TestParameters)=>{
         verifyCommonElements(language, langLink, buttonJson, alreadyGcJson, stepper);
 
-        const smsTextKeys = ['2', '4'];
-        const voiceTextKeys = ['3', '5'];
+        const gcdsElementMap = pageSetup.gcdsMap(language, page, pageContentJson);
 
         Object.keys(pageContentJson).forEach(key => {
-            if(key=='9')
-                verifyGcdsHtmlElement('gcds-input',  createMap('gcds-input', ["verificationCode", pageContentJson[key], 'verificationCode', 'text', 'other'] ));
-            else if (!textKeysToNotSearch.includes(key)) {
-                if (smsTextKeys.includes(key) && !isVoice)
-                    expect(screen.queryByText(pageContentJson[key])).toBeInTheDocument();
-                else if (voiceTextKeys.includes(key) && isVoice)
-                    expect(screen.queryByText(pageContentJson[key])).toBeInTheDocument();
-                else if(!smsTextKeys.includes(key) && !voiceTextKeys.includes(key))
-                    if(key==='20')
-                        if(language===AVAILABLE_LANGUAGES.fr)
-                            expect(screen.queryByText(pageContentJson[key] + ' '+SERVICES[0].title)).toBeInTheDocument();
-                        else
-                            expect(screen.queryByText(SERVICES[0].title+' '+ pageContentJson[key])).toBeInTheDocument();
+            if(gcdsElementMap.has(key))
+                verifyGcdsHtmlElement(gcdsElementMap.get(key)[0], gcdsElementMap.get(key)[1]);
+            else if (!textKeysToNotSearch.includes(key))
+                if(key===serviceKey)
+                    if(language===AVAILABLE_LANGUAGES.fr)
+                        expect(screen.queryByText(pageContentJson[key] + ' '+SERVICES[0].title)).toBeInTheDocument();
                     else
-                        expect(screen.queryByText(pageContentJson[key])).toBeInTheDocument();
-            }
+                        expect(screen.queryByText(SERVICES[0].title+' '+ pageContentJson[key])).toBeInTheDocument();
+               else if ((!smsTextKeys.includes(key) && !voiceTextKeys.includes(key))
+                        || (smsTextKeys.includes(key) && !isVoice)
+                        || (voiceTextKeys.includes(key) && isVoice))
+                    expect(screen.queryByText(pageContentJson[key])).toBeInTheDocument();
         });
     }
-
-
 }
 
 function verifyGcdsHtmlElement(tag: string, attributes:Map<string,string>)
@@ -175,6 +253,7 @@ function createMap(type:string, values:Array<string>) {
 }
 
 function verifyCommonElements(language: string, langLink: string,  buttonJson: JSON, alreadyGcJson: JSON, stepper:Array<string>){
+
     verifyGcdsHtmlElement('gcds-header',  createMap('gcds-header', [language, langLink, 'colour'] ));
 
     if(stepper)

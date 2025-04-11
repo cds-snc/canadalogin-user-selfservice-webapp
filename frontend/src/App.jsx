@@ -2,7 +2,6 @@ import {Routes, Route, Navigate} from 'react-router';
 import {UserProvider} from "./components/Providers/UserContext";
 import HomePage from "./views/Home/HomePage";
 import PasswordPage from "./views/Password/PasswordPage";
-import SignUpPage from "./views/SignUp/SignUpPage";
 import EmailVerification from "./views/SignUp/EmailVerificationPage";
 import PrivateRoute from "./components/Providers/PrivateRoute.jsx";
 import VerificationSetUpPage from "./views/SignUp/VerificationSetUpPage.jsx";
@@ -16,7 +15,7 @@ function App() {
               <Routes>
                   <Route path="/" element={ <HomePage />} />
                   <Route path="/:language" element={ <HomePage />} />
-                  <Route path="/:language/signup" element={<SignUpPage/>}/>
+                  <Route path="/:language/signup" element={<Page page={PAGES.signup}/>}/>
                   <Route path="/:language/signup/verifyemail/" element={<PrivateRoute route="signUpVerifyEmail"><EmailVerification /></PrivateRoute>}/>
                   <Route path="/:language/signup/password" element={ <PrivateRoute route="signUpPassword"><PasswordPage /></PrivateRoute>} />
                   <Route path="/:language/signup/verificationsetup" element={<PrivateRoute route="signUpVerification"><VerificationSetUpPage/></PrivateRoute>}/>
