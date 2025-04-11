@@ -27,14 +27,14 @@ logger = logging.getLogger(__name__)
 
 
 API_DESCRIPTION = """
-This API provides authentication services for the GC Sign In application, integrating with IBM Verify.
+This API backend service primarily interacts with [IBM Verify service](https://docs.verify.ibm.com/verify/reference). 
+API endpoints are consumed by our frontend application to perform user authentication and profile management.
+The API endpoints enable our custom frontend application to implement complex workflows and user interfaces without limitations.
 
 ### Features
 
 * Password-based authentication
-* Multi-factor authentication (MFA)
-* Passkey authentication
-* IBM Verify integration
+* SMS, Email, Voice callback one-time passcode (OTP)
 """
 
 CONTACT_INFO = {
