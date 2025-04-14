@@ -18,3 +18,7 @@ __pycache__
 
 #Storybook Build
 frontend/storybook-static/
+
+#Test Coverage
+frontend/coverage/
+frontend/test-results/

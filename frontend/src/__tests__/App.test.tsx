@@ -10,6 +10,7 @@ import * as engJson from  '../locales/en/en.json';
 // @ts-ignore
 import * as frJson from '../locales/fr/fr.json';
 import {buildTestSuite} from "./testSuite";
+import {PAGES} from "../utils/constants.jsx";
 
 const GCDS_TAG_ATTRIBUTES = {
     'gcds-input':{
@@ -97,8 +98,7 @@ describe('Routing Test', () => {
                 <App />
             </MemoryRouter>,
         )
-
-       checkSignUpPageContents(AVAILABLE_LANGUAGES.en, engJson["SignUpEmail"],langHref.fr+NAVIGATION_LINKS.signUp, engJson['Button'], engJson["AlreadyGc"]);
+        buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.signup, FLOW_TYPES.signUp, null, langHref.fr+NAVIGATION_LINKS.signUp);
     });
 
     test("Check sign up route with fr language defined", () => {
@@ -108,7 +108,7 @@ describe('Routing Test', () => {
                 <App />
             </MemoryRouter>,
         )
-        checkSignUpPageContents(AVAILABLE_LANGUAGES.fr, frJson["SignUpEmail"],langHref.en+NAVIGATION_LINKS.signUp, frJson['Button'], frJson["AlreadyGc"]);
+        buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.signup, FLOW_TYPES.signUp, null, langHref.en+NAVIGATION_LINKS.signUp);
     });
 
     test("Check email verification page route with en language defined", () => {
@@ -118,13 +118,13 @@ describe('Routing Test', () => {
                 default: (props:any) => props.children,
             };
         });
-
+        const link = '/' +FLOW_TYPES.signUp+NAVIGATION_LINKS.verification+'/'+FLOW_TYPES.email;
         render(
-            <MemoryRouter initialEntries={[langHref.en + NAVIGATION_LINKS.verifyEmail]}>
+            <MemoryRouter initialEntries={[langHref.en + link]}>
                 <App/>
             </MemoryRouter>,
         )
-        checkEmailVerificationPageContents(AVAILABLE_LANGUAGES.en, engJson["EmailVerification"], langHref.fr + NAVIGATION_LINKS.verifyEmail, engJson['Button'], engJson["AlreadyGc"]);
+        buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.verification, FLOW_TYPES.signUp, FLOW_TYPES.email, langHref.fr+link);
     });
 
     test("Check email verification page route with fr language defined", () => {
@@ -134,13 +134,13 @@ describe('Routing Test', () => {
                 default: (props:any) => props.children,
             };
         });
-
+        const link = '/' +FLOW_TYPES.signUp+NAVIGATION_LINKS.verification+'/'+FLOW_TYPES.email;
         render(
             <MemoryRouter initialEntries={[langHref.fr + NAVIGATION_LINKS.verifyEmail]}>
                 <App/>
             </MemoryRouter>,
         )
-        checkEmailVerificationPageContents(AVAILABLE_LANGUAGES.fr, frJson["EmailVerification"], langHref.en + NAVIGATION_LINKS.verifyEmail, frJson['Button'], frJson["AlreadyGc"]);
+        buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.verification, FLOW_TYPES.signUp, FLOW_TYPES.email, langHref.en+link);
     });
 
     test("Check password creation page route with en language defined", () => {
@@ -221,7 +221,8 @@ describe('Routing Test', () => {
                 <App/>
             </MemoryRouter>,
         )
-        buildTestSuite.verificationPage(AVAILABLE_LANGUAGES.en, false, link, FLOW_TYPES.signUp);
+
+        buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.verification, FLOW_TYPES.signUp, FLOW_TYPES.sms, langHref.fr + link);
     });
 
     test("Check sign up verification page route for voice with en language defined", () => {
@@ -239,7 +240,7 @@ describe('Routing Test', () => {
                 <App/>
             </MemoryRouter>,
         )
-        buildTestSuite.verificationPage(AVAILABLE_LANGUAGES.en, true, link, FLOW_TYPES.signUp);
+        buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.verification, FLOW_TYPES.signUp, FLOW_TYPES.voice, langHref.fr + link);
     });
 
     test("Check sign up verification page route for sms with fr language defined", () => {
@@ -257,7 +258,7 @@ describe('Routing Test', () => {
                 <App/>
             </MemoryRouter>,
         )
-        buildTestSuite.verificationPage(AVAILABLE_LANGUAGES.fr, false, link, FLOW_TYPES.signUp);
+        buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.verification, FLOW_TYPES.signUp, FLOW_TYPES.sms, langHref.en + link);
     });
 
     test("Check sign up verification page route for voice with fr language defined", () => {
@@ -275,7 +276,7 @@ describe('Routing Test', () => {
                 <App/>
             </MemoryRouter>,
         )
-        buildTestSuite.verificationPage(AVAILABLE_LANGUAGES.fr, true, link, FLOW_TYPES.signUp);
+        buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.verification, FLOW_TYPES.signUp, FLOW_TYPES.voice, langHref.en + link);
     });
 
     test("Check sign in verification page route for sms with en language defined", () => {
@@ -293,7 +294,7 @@ describe('Routing Test', () => {
                 <App/>
             </MemoryRouter>,
         )
-        buildTestSuite.verificationPage(AVAILABLE_LANGUAGES.en, false, link, FLOW_TYPES.signIn);
+        buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.verification, FLOW_TYPES.signIn, FLOW_TYPES.sms, langHref.fr + link);
     });
 
     test("Check sign in verification page route for voice with en language defined", () => {
@@ -311,7 +312,7 @@ describe('Routing Test', () => {
                 <App/>
             </MemoryRouter>,
         )
-        buildTestSuite.verificationPage(AVAILABLE_LANGUAGES.en, true, link, FLOW_TYPES.signIn);
+        buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.verification, FLOW_TYPES.signIn, FLOW_TYPES.voice, langHref.fr + link);
     });
 
     test("Check sign in verification page route for sms with fr language defined", () => {
@@ -329,7 +330,7 @@ describe('Routing Test', () => {
                 <App/>
             </MemoryRouter>,
         )
-        buildTestSuite.verificationPage(AVAILABLE_LANGUAGES.fr, false, link, FLOW_TYPES.signIn);
+        buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.verification, FLOW_TYPES.signIn, FLOW_TYPES.sms, langHref.en + link);
     });
 
     test("Check sign in verification page route for voice with fr language defined", () => {
@@ -347,7 +348,7 @@ describe('Routing Test', () => {
                 <App/>
             </MemoryRouter>,
         )
-        buildTestSuite.verificationPage(AVAILABLE_LANGUAGES.fr, true, link, FLOW_TYPES.signIn);
+        buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.verification, FLOW_TYPES.signIn, FLOW_TYPES.voice, langHref.en + link);
     });
 
     test("Check core profile page route with en language defined", () => {
@@ -404,47 +405,6 @@ describe('Routing Test', () => {
                 verifyGcdsHtmlElement(gcdsElementMap.get(key)[0], gcdsElementMap.get(key)[1]);
             else
                 expect(screen.queryByText(pageContentJson[key])).toBeInTheDocument();
-        });
-
-    }
-
-    function checkSignUpPageContents(language:string, pageContentJson: JSON, langLink: string,  buttonJson: JSON, alreadyGcJson:JSON) {
-
-        verifyCommonElements(language, langLink, buttonJson, alreadyGcJson, ['1', 'h1', '4', language]);
-
-        const textKeysToNotSearch = ['4', '6'];
-        const gcdsElementMap = new Map();
-        gcdsElementMap.set('2', ['gcds-input', createMap('gcds-input', ['email', pageContentJson['2'], 'email', 'email', 'other'] )]);
-        gcdsElementMap.set('3', ['gcds-fieldset', createMap('gcds-fieldset', ['gcds-email-fieldset',pageContentJson['4'],pageContentJson['3']])]);
-        if(language===AVAILABLE_LANGUAGES.fr) {
-            const options ='[{"label": "'+pageContentJson['5']+'","id": "english", "value": "eng"},{"label": "'+pageContentJson['6']+'","id": "french", "value": "fr","checked":"true"}]';
-            gcdsElementMap.set('5', ['gcds-radio-group', createMap('gcds-radio-group', ['language',options])]);
-
-        }else{
-            const options = '[{"label": "' + pageContentJson['5'] + '","id": "english", "value": "eng","checked":"true"},{"label": "' + pageContentJson['6'] + '","id": "french", "value": "fr"}]';
-            gcdsElementMap.set('5', ['gcds-radio-group', createMap('gcds-radio-group', ['language', options])]);
-        }
-
-        Object.keys(pageContentJson).forEach(key => {
-            if(gcdsElementMap.has(key))
-                verifyGcdsHtmlElement(gcdsElementMap.get(key)[0], gcdsElementMap.get(key)[1]);
-            else if(!textKeysToNotSearch.includes(key))
-                expect(screen.queryByText(pageContentJson[key])).toBeInTheDocument();
-        });
-    }
-
-    function checkEmailVerificationPageContents(language:string, pageContentJson: JSON, langLink: string,  buttonJson: JSON, alreadyGcJson:JSON) {
-
-        verifyCommonElements(language, langLink, buttonJson, alreadyGcJson, ['1', 'h1', '4', language]);
-
-        const textKeysToNotSearch = ['10', '11', '12'];
-
-        Object.keys(pageContentJson).forEach(key => {
-            if(key==='6')
-                verifyGcdsHtmlElement('gcds-input', createMap('gcds-input', ['verificationCode', pageContentJson[key], 'verificationCode', 'text', 'other'] ));
-            else if(!textKeysToNotSearch.includes(key))
-                expect(screen.queryByText(pageContentJson[key])).toBeInTheDocument();
-
         });
 
     }
