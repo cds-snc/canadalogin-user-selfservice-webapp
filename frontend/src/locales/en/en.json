@@ -122,7 +122,12 @@
     "18": "Complete 2-step verification",
     "19": "to continue to your",
     "20": "account",
-    "21": "Try another way"
+    "21": "Try another way",
+    "22": "Check your email",
+    "23": "We have sent an email with a 6-digit code to :",
+    "24": "Your email might take a few minutes to arrive. If you do not get an email, check your spam folder.",
+    "25": "Use a different email",
+    "26": "Send the code again"
   },
   "CreateCoreProfile": {
     "1": "Your GC Sign in account has been created",

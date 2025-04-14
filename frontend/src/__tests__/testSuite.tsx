@@ -69,8 +69,8 @@ interface TestParameters {
 }
 
 export const buildTestSuite = {
-    test:(language: string, page:string, flow:string, link: string, isVoice:boolean)=>{
-        testSuite.page(page, testSuite.parameters(language, page, flow, link, isVoice));
+    test:(language: string, page:string, flow:string, type:string, link: string)=>{
+        testSuite.page(page, testSuite.parameters(language, page, flow, type, link));
     }
 }
 
@@ -91,28 +91,34 @@ const pageSetup ={
                 return null;
         }
     },
-    stepper: (page:string, language:string, flow:string) =>{
+    stepper: (page:string, language:string, flow:string, type:string) =>{
         switch(page){
             case PAGES.signup:
                 return ['1', 'h1', '4', language];
             case PAGES.verification:
                 if(flow===FLOW_TYPES.signUp)
-                    return ['3', 'h1', '4', language];
+                    if(type===FLOW_TYPES.email)
+                        return ['1', 'h1', '4', language];
+                    else
+                        return ['3', 'h1', '4', language];
                 else
                     return  null;
             default:
                 return null;
         }
     },
-    textKeysToNotSearch: (page:string, flow:string) =>{
+    textKeysToNotSearch: (page:string, flow:string, type:string) =>{
         switch(page){
             case PAGES.signup:
                 return ['4', '6'];
             case PAGES.verification:
                 if(flow===FLOW_TYPES.signUp)
-                    return ['11', '12', '15', '16', '17', '18', '19','20', '21'];
+                    if(type===FLOW_TYPES.email)
+                        return ['1','2','3','4','5', '8','11','12', '13','15','16','17','18','19','20','21','26'];
+                    else
+                        return ['11', '12', '15', '16', '17', '18', '19','20', '21', '22','23','24','25', '26'];
                 else
-                    return  ['11', '12', '13', '15', '16', '17'];
+                    return  ['11', '12', '13', '15', '16', '17', '22','23','24','25', '26'];
             default:
                 return [];
         }
@@ -177,7 +183,7 @@ const pageSetup ={
 }
 
 const testSuite = {
-    parameters: (language: string, page:string, flow:string, link: string, isVoice:boolean)=>{
+    parameters: (language: string, page:string, flow:string, type:string, link: string)=>{
 
         return {
             language: language,
@@ -185,9 +191,9 @@ const testSuite = {
             langLink: link,
             buttonJson: pageSetup.button(language),
             alreadyGcJson: pageSetup.alreadyGc(page, language, flow),
-            stepper: pageSetup.stepper(page, language, flow),
-            textKeysToNotSearch:  pageSetup.textKeysToNotSearch(page, flow),
-            isVoice: isVoice,
+            stepper: pageSetup.stepper(page, language, flow, type),
+            textKeysToNotSearch:  pageSetup.textKeysToNotSearch(page, flow, type),
+            isVoice: type === FLOW_TYPES.voice,
             smsTextKeys: pageSetup.smsTextKeys(page),
             voiceTextKeys: pageSetup.voiceTextKeys(page),
             serviceKey: pageSetup.serviceKey(page),

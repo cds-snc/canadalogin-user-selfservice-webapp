@@ -57,6 +57,7 @@ export default function SignUpEmail() {
                         trxnId: response.data.trxnId
                     };
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
+                    console.log("success", "/" + language + NAVIGATION_LINKS.verifyEmail);
                     navigate("/" + language + NAVIGATION_LINKS.verifyEmail);
                 }else {
                     console.log("Error....", response);
