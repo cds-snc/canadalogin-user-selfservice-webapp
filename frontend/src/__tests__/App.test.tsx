@@ -98,7 +98,7 @@ describe('Routing Test', () => {
                 <App />
             </MemoryRouter>,
         )
-        buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.signup, FLOW_TYPES.signUp, null, langHref.fr+NAVIGATION_LINKS.signUp, false);
+        buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.signup, FLOW_TYPES.signUp, null, langHref.fr+NAVIGATION_LINKS.signUp);
     });
 
     test("Check sign up route with fr language defined", () => {
