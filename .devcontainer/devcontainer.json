@@ -34,7 +34,8 @@
 				"ms-python.python",
 				"ms-python.debugpy",
 				"hashicorp.hcl",
-				"mermaidchart.vscode-mermaid-chart"
+				"mermaidchart.vscode-mermaid-chart",
+				"eamodio.gitlens"
 			],
 			"settings": {
 				"[terraform]": {
