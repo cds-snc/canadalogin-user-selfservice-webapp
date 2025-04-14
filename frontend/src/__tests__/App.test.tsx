@@ -210,6 +210,14 @@ describe('Routing Test', () => {
         checkVerificationPageContents(AVAILABLE_LANGUAGES.fr, frJson["Verification"], langHref.en + NAVIGATION_LINKS.verification+'/voice', frJson['Button'], frJson["AlreadyGc"], true);
     });
 
+    test("Check create profile route with en language defined", () => {
+        render(
+            <MemoryRouter initialEntries={[langHref.en + NAVIGATION_LINKS.createProfile]}>
+                <App />
+            </MemoryRouter>
+        );
+        checkCreateProfilePageContents(AVAILABLE_LANGUAGES.en, engJson["CreateProfile"]);
+    });
 
     afterEach(() => {
         cleanup();
@@ -348,6 +356,15 @@ describe('Routing Test', () => {
 
         });
 
+    }
+
+    function checkCreateProfilePageContents(language: string, pageContentJson: any) {
+        expect(screen.getByText(pageContentJson['1'])).toBeInTheDocument(); 
+        expect(screen.getByText(pageContentJson['2'])).toBeInTheDocument(); 
+        expect(screen.getByText(pageContentJson['4'])).toBeInTheDocument(); 
+        expect(screen.getByText(pageContentJson['5'])).toBeInTheDocument(); 
+        expect(screen.getByText(pageContentJson['21'])).toBeInTheDocument(); 
+        expect(screen.getByText("Continue")).toBeInTheDocument(); 
     }
 
     function verifyGcdsHtmlElement(tag: string, attributes:Map<string,string>)

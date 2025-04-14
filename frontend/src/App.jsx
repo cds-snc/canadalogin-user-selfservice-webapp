@@ -9,6 +9,7 @@ import RegisterVerificationPage from "./views/SignUp/RegisterVerificationPage.js
 import VerificationSetUpPage from "./views/SignUp/VerificationSetUpPage.jsx";
 import VerificationPage from "./views/SignUp/VerificationPage.jsx";
 import CreateCoreProfilePage from "./views/SignUp/CreateCoreProfilePage.jsx";
+import CreateProfilePage from "./views/SignUp/CreateProfilePage.jsx";
 
 
 function App() {
@@ -24,6 +25,8 @@ function App() {
                   <Route path="/:language/signup/verificationsetup" element={<PrivateRoute route="signUpVerification"><VerificationSetUpPage/></PrivateRoute>}/>
                   <Route path="/:language/signup/verification/:type" element={<PrivateRoute route="signUpVerifyTwoStep"><VerificationPage/></PrivateRoute>}/>
                   <Route path="/:language/signup/profile" element={<PrivateRoute route="signUpCoreProfile"><CreateCoreProfilePage/></PrivateRoute>}/>
+                  <Route path="/:language/signup/createprofile" element={<PrivateRoute route="signUpCreateProfile"><CreateProfilePage/></PrivateRoute>}/>
+
                   <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
           </UserProvider>
