@@ -8,9 +8,10 @@
     "preview": "vite preview --port 3001",
     "build": "vite build",
     "lint": "eslint .",
-    "test": "vitest --coverage",
+    "test": "npm run install-playwright && vitest --coverage",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "install-playwright": "npx playwright install-deps && npx playwright install"
   },
   "dependencies": {
     "@cdssnc/gcds-components": "^0.33.0",
