@@ -1,17 +1,16 @@
 import {expect, userEvent, within} from "@storybook/test";
 import {reactRouterParameters} from "storybook-addon-remix-react-router";
 import {http, HttpResponse} from "msw";
-import config from "../../config.jsx";
+import config from "../../../config.jsx";
 import {ACTION_TYPES, TEST_TYPES} from "./constants.jsx";
 
 const stepErrorMessage = 'Verify error message is on Page.';
-const stepSuccessMessage = 'Verify error message is on Page.';
+const stepSuccessMessage = 'Verify success message is on Page.';
 const stepNavigateMessage = 'Verify page was navigated properly.';
 
 export async function testCase({ canvasElement, step, stepMessage, message, linkText, link, heading, delay, type, actionType, input }) {
 
     const canvas = await testItem.canvas(canvasElement, delay);
-
 
     if(input!==undefined)
         switch(input.inputType) {
@@ -20,9 +19,7 @@ export async function testCase({ canvasElement, step, stepMessage, message, link
                 break;
         }
 
-
-
-            switch (actionType) {
+    switch (actionType) {
         case(ACTION_TYPES.link):
             await testItem.clickLink(canvas, step, stepMessage, linkText);
             break;
@@ -52,8 +49,6 @@ export async function testCase({ canvasElement, step, stepMessage, message, link
 }
 
 export function storyParameters(isBackEndTest, language, link, endpoint, response, type){
-
-
 
     if(isBackEndTest)
         if(type)
@@ -98,6 +93,62 @@ export function storyParameters(isBackEndTest, language, link, endpoint, respons
     };
 }
 
+
+export function storyParametersNew({isBackEndTest, language, link, endpoint, response, type, flow}){
+
+    if(isBackEndTest)
+        if(type)
+            return { reactRouter: reactRouterParameters({
+                    location: {
+                        pathParams: {language, flow, type},
+                    },
+                    routing: {path: '/:language' +'/:flow'+ link + '/:type'}
+                }),
+                msw: {
+                    handlers: [
+                        http.post(`${config.apiUrl}${endpoint}`, async () => {
+                            return HttpResponse.json(response);
+                        }),
+                    ],
+                }
+            }
+        else
+            return { reactRouter: reactRouterParameters({
+                    location: {
+                        pathParams: {language, flow},
+                    },
+                    routing: {path: '/:language' +'/:flow'+ link }
+                }),
+                msw: {
+                    handlers: [
+                        http.post(`${config.apiUrl}${endpoint}`, async () => {
+                            return HttpResponse.json(response);
+                        }),
+                    ],
+                }
+            }
+    if(type)
+        return {
+
+            reactRouter: reactRouterParameters({
+                location: {
+                    pathParams: {language, flow, type},
+                },
+                routing: {path: '/:language' +'/:flow'+ link+ '/:type'}
+            })
+        };
+    else
+        return {
+
+            reactRouter: reactRouterParameters({
+                location: {
+                    pathParams: {language, flow},
+                },
+                routing: {path: '/:language' +'/:flow'+ link}
+            })
+        };
+}
+
 const testItem = {
    canvas: async(canvasElement, timeToWait)=>{
         const canvas = await within(canvasElement);
@@ -124,7 +175,6 @@ const testItem = {
         });
     },
     clickLink: async(canvas, step, stepMessage, linkText)=>{
-
         await step(stepMessage, async () => {
             const link = canvas.queryByText(linkText);
             await expect(link).toBeInTheDocument();

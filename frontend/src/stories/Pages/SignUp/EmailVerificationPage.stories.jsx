@@ -1,13 +1,14 @@
 import { withRouter, reactRouterParameters } from 'storybook-addon-remix-react-router';
-import {NAVIGATION_LINKS} from "../../../utils/constants.jsx";
+import {AVAILABLE_LANGUAGES, FLOW_TYPES, NAVIGATION_LINKS, PAGES} from "../../../utils/constants.jsx";
 import {UserProvider} from "../../../components/Providers/UserContext.jsx";
-import EmailVerificationPage from "../../../views/SignUp/EmailVerificationPage.jsx";
+import Page from "../../../views/Page.js";
 
 
 
 export default {
     title: 'GC Sign In/Pages/Sign Up/Email Verification Page',
-    component: EmailVerificationPage,
+    component: Page,
+    args: {page:PAGES.verification},
     decorators: [withRouter,
         (Story) => (
             <UserProvider>
@@ -24,9 +25,9 @@ export const English = {
     parameters: {
         reactRouter: reactRouterParameters({
             location: {
-                pathParams: { language: 'en' },
+                pathParams: { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp, type:FLOW_TYPES.email },
             },
-            routing: { path: '/:language'+NAVIGATION_LINKS.verifyEmail }
+            routing: { path: '/:language'+'/:flow'+NAVIGATION_LINKS.verification+'/:type' }
         }),
     }
 };
@@ -35,9 +36,9 @@ export const French = {
     parameters: {
         reactRouter: reactRouterParameters({
             location: {
-                pathParams: { language: 'fr' },
+                pathParams: { language: AVAILABLE_LANGUAGES.fr, flow: FLOW_TYPES.signUp, type:FLOW_TYPES.email },
             },
-            routing: { path: '/:language'+NAVIGATION_LINKS.verifyEmail }
+            routing: { path: '/:language'+'/:flow'+NAVIGATION_LINKS.verification+'/:type' }
         }),
     }
 

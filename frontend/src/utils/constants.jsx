@@ -1,18 +1,32 @@
 export const AVAILABLE_LANGUAGES = {en:'en', fr:'fr'};
 export const NAVIGATION_LINKS = {
     signUp: '/signup',
-    verifyEmail: '/signup/verifyemail',
+    verifyEmail: '/signup/verification/email',
     password: '/signup/password',
     twoStepVerification: '/signup/verificationsetup',
-    verification: '/signup/verification',
+    verification: '/verification',
     coreProfile: '/signup/profile',
-    createProfile: '/signup/createprofile',
+    createProfile: '/signup/createprofile'
 };
 export const CONTEXT_ACTIONS = {
     signUp: 'SIGN_UP',
     signIn: 'SIGN_IN',
     logOut: 'LOG_OUT'
 };
+
+export const FLOW_TYPES={
+    signUp: "signup",
+
+    signIn: "signin",
+    sms: "sms",
+    voice: "voice",
+    email: "email"
+}
+
+export const PAGES ={
+    signup: 'SignUpEmail',
+    verification: 'Verification',
+}
 
 export const FOOTERS = {
         default: {
@@ -38,7 +52,8 @@ export const SUBMIT_END_POINTS = {
     sendTwoStepVerificationCode: '/v1/otp/transient_sms/send',
     twoStepVerification: '/v1/otp/transient_sms/verify',
     sendTwoStepVerificationCodeVoice: '/v1/otp/transient_voice/send',
-    twoStepVerificationVoice: '/v1/otp/transient_voice/verify'
+    twoStepVerificationVoice: '/v1/otp/transient_voice/verify',
+    createCoreProfile: '/v1/users/createcoreprofile'
 }
 
 export const countryMapping = {

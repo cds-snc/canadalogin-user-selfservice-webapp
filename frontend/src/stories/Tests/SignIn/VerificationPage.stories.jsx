@@ -41,24 +41,13 @@ const successResponse = {
 const frontEndStoryParameters = {
     isBackEndTest:false,
     link:NAVIGATION_LINKS.verification,
-    flow:FLOW_TYPES.signUp
+    flow:FLOW_TYPES.signIn
 }
-const smsFrontEndStoryParameters = {
-    ...frontEndStoryParameters,
-    type:FLOW_TYPES.sms
-}
-const voiceFrontEndStoryParameters = {
-    ...frontEndStoryParameters,
-    type:FLOW_TYPES.voice
-}
-const emailFrontEndStoryParameters = {
-    ...frontEndStoryParameters,
-    type:FLOW_TYPES.email
-}
+
 const backEndStoryParameters = {
     isBackEndTest:true,
     link:NAVIGATION_LINKS.verification,
-    flow:FLOW_TYPES.signUp
+    flow:FLOW_TYPES.signIn
 }
 const smsStoryParameters = {
     ...backEndStoryParameters,
@@ -70,11 +59,6 @@ const voiceStoryParameters = {
     endpoint:SUBMIT_END_POINTS.twoStepVerificationVoice,
     type:FLOW_TYPES.voice,
 }
-const emailStoryParameters = {
-    ...backEndStoryParameters,
-    endpoint:SUBMIT_END_POINTS.emailVerification,
-    type:FLOW_TYPES.email,
-}
 const smsNewCodeStoryParameters = {
     ...backEndStoryParameters,
     endpoint:SUBMIT_END_POINTS.sendTwoStepVerificationCode,
@@ -84,11 +68,6 @@ const voiceNewCodeStoryParameters = {
     ...backEndStoryParameters,
     endpoint:SUBMIT_END_POINTS.sendTwoStepVerificationCodeVoice,
     type:FLOW_TYPES.voice,
-}
-const emailNewCodeStoryParameters = {
-    ...backEndStoryParameters,
-    endpoint:SUBMIT_END_POINTS.sendOtpCode,
-    type:FLOW_TYPES.email,
 }
 const smsNewTypeCodeStoryParameters = {
     ...backEndStoryParameters,
@@ -103,20 +82,13 @@ const voiceNewTypeCodeStoryParameters = {
 const useNewNumberStoryParameters = {
     isBackEndTest:true,
     link:NAVIGATION_LINKS.twoStepVerification,
-    flow:FLOW_TYPES.signUp,
+    flow:FLOW_TYPES.signIn,
     endpoint:SUBMIT_END_POINTS.sendTwoStepVerificationCode,
     type:FLOW_TYPES.voice,
 }
-const useNewEmailStoryParameters = {
-    isBackEndTest:true,
-    link:NAVIGATION_LINKS.signUp,
-    flow:FLOW_TYPES.signUp,
-    endpoint:SUBMIT_END_POINTS.sendOtpCode,
-    type:FLOW_TYPES.email,
-}
 export default {
 
-    title: 'GC Sign In/Tests/Sign Up/Verification Page',
+    title: 'GC Sign In/Tests/Sign In/Verification Page',
     component: Page,
     decorators: [withRouter],
     // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs
@@ -124,7 +96,7 @@ export default {
 
 };
 
-TestDataUserProvider.userData.phone = '+1 (416) 123 - 4567';
+TestDataUserProvider.userData.phone = '+1 (***) *** - 4567';
 
 const BadTemplateFE = (args) =>   {
 
@@ -143,37 +115,32 @@ const TemplateBE = (args) =>   {
     )
 }
 
-export const EngEmailErrorFrontEnd = BadTemplateFE.bind({});
-export const EngSmsErrorFrontEnd = BadTemplateFE.bind({});
-export const FrVoiceErrorFrontEnd = BadTemplateFE.bind({});
-export const EmailErrorBackEnd = TemplateBE.bind({});
-export const EmailSuccessfulBackEnd = TemplateBE.bind({});
+export const EngErrorFrontEnd = BadTemplateFE.bind({});
+export const FrErrorFrontEnd = BadTemplateFE.bind({});
 export const SmsErrorBackEnd = TemplateBE.bind({});
 export const SmsSuccessfulBackEnd = TemplateBE.bind({});
 export const VoiceErrorBackEnd = TemplateBE.bind({});
 export const VoiceSuccessfulBackEnd = TemplateBE.bind({});
 export const ServerErrorBackEnd = TemplateBE.bind({});
-export const EngEmailRequestNewCode = TemplateBE.bind({});
-export const EngSmsRequestNewCode = TemplateBE.bind({});
-export const FrVoiceRequestNewCode = TemplateBE.bind({});
+export const EngRequestNewCode = TemplateBE.bind({});
+export const FrRequestNewCode = TemplateBE.bind({});
 export const EngRequestNewTypeCode = TemplateBE.bind({});
 export const FrRequestNewTypeCode = TemplateBE.bind({});
-export const EmailNewCodeBackEndError = TemplateBE.bind({});
-export const VoiceNewCodeBackEndError = TemplateBE.bind({});
+export const NewCodeBackEndError = TemplateBE.bind({});
 export const ServerErrorReqNewCode = TemplateBE.bind({});
 export const UseNewNumber = TemplateBE.bind({});
-export const UseNewEmail = TemplateBE.bind({});
 
-EngEmailErrorFrontEnd.parameters = storyParametersNew({
-    ...emailFrontEndStoryParameters,
+
+EngErrorFrontEnd.parameters = storyParametersNew({
+    ...frontEndStoryParameters,
     language:AVAILABLE_LANGUAGES.en
 });
-EngEmailErrorFrontEnd.play = async ({ canvasElement, step }) => {
+EngErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
         canvasElement,
         step,
-        stepMessage:"Submit form with bad code in English for Email",
+        stepMessage:"Submit form with bad code in English",
         link: 'verificationCode',
         heading: engErrorPageJson[1],
         message: engErrorPageJson[3],
@@ -183,80 +150,22 @@ EngEmailErrorFrontEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-
-EngSmsErrorFrontEnd.parameters = storyParametersNew({
-    ...smsFrontEndStoryParameters,
-    language:AVAILABLE_LANGUAGES.en
-});
-EngSmsErrorFrontEnd.play = async ({ canvasElement, step }) => {
-
-    await testCase({
-        canvasElement,
-        step,
-        stepMessage:"Submit form with bad code in English for SMS",
-        link: 'verificationCode',
-        heading: engErrorPageJson[1],
-        message: engErrorPageJson[3],
-        delay: 1000,
-        actionType: ACTION_TYPES.submit,
-        type: TEST_TYPES.error
-    })
-}
-
-FrVoiceErrorFrontEnd.parameters = storyParametersNew({
-    ...voiceFrontEndStoryParameters,
+FrErrorFrontEnd.parameters = storyParametersNew({
+    ...frontEndStoryParameters,
     language:AVAILABLE_LANGUAGES.fr,
 });
-FrVoiceErrorFrontEnd.play = async ({ canvasElement, step }) => {
+FrErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
         canvasElement,
         step,
-        stepMessage:"Submit form with bad code in French for Voice",
+        stepMessage:"Submit form with bad code in French",
         link: 'verificationCode',
         heading: frErrorPageJson[1],
         message: frErrorPageJson[3],
         delay: 1000,
         actionType: ACTION_TYPES.submit,
         type: TEST_TYPES.error
-    })
-}
-
-EmailErrorBackEnd.parameters = storyParametersNew({
-    ...emailStoryParameters,
-    language:AVAILABLE_LANGUAGES.en,
-    response:errorResponse,
-});
-EmailErrorBackEnd.play = async ({ canvasElement, step }) => {
-
-    await testCase({
-        canvasElement,
-        step,
-        stepMessage:"Submit form with bad code for email Back End Error",
-        link: 'verificationCode',
-        heading: engErrorPageJson[1],
-        message: serverError,
-        delay: 1000,
-        actionType: ACTION_TYPES.submit,
-        type: TEST_TYPES.error
-    })
-}
-
-EmailSuccessfulBackEnd.parameters = storyParametersNew({
-    ...emailStoryParameters,
-    language:AVAILABLE_LANGUAGES.en,
-    response:successResponse,
-});
-EmailSuccessfulBackEnd.play = async ({ canvasElement, step }) => {
-
-    await testCase({
-        canvasElement,
-        step,
-        stepMessage: "Submit form with good code for Email",
-        link: 'verificationCode',
-        delay: 1000,
-        actionType: ACTION_TYPES.submit,
-        type: TEST_TYPES.redirect
     })
 }
 
@@ -270,7 +179,7 @@ SmsErrorBackEnd.play = async ({ canvasElement, step }) => {
     await testCase({
         canvasElement,
         step,
-        stepMessage:"Submit form with bad code for SMS Back End Error",
+        stepMessage:"Submit form with bad code For Back End Error",
         link: 'verificationCode',
         heading: engErrorPageJson[1],
         message: serverError,
@@ -290,7 +199,7 @@ SmsSuccessfulBackEnd.play = async ({ canvasElement, step }) => {
     await testCase({
         canvasElement,
         step,
-        stepMessage: "Submit form with good code for SMS",
+        stepMessage: "Submit form with good code",
         link: 'verificationCode',
         delay: 1000,
         actionType: ACTION_TYPES.submit,
@@ -308,7 +217,7 @@ VoiceErrorBackEnd.play = async ({ canvasElement, step }) => {
     await testCase({
         canvasElement,
         step,
-        stepMessage:"Submit form with bad code for Voice Back End Error",
+        stepMessage:"Submit form with bad code For Back End Error",
         link: 'verificationCode',
         heading: engErrorPageJson[1],
         message: serverError,
@@ -328,7 +237,7 @@ VoiceSuccessfulBackEnd.play = async ({ canvasElement, step }) => {
     await testCase({
         canvasElement,
         step,
-        stepMessage: "Submit form with good code for Voice",
+        stepMessage: "Submit form with good code",
         link: 'verificationCode',
         delay: 1000,
         actionType: ACTION_TYPES.submit,
@@ -356,33 +265,12 @@ ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-
-EngEmailRequestNewCode.parameters = storyParametersNew({
-    ...emailNewCodeStoryParameters,
-    language:AVAILABLE_LANGUAGES.en,
-    response:successResponse,
-});
-EngEmailRequestNewCode.play = async ({ canvasElement, step }) => {
-
-    await testCase({
-        canvasElement,
-        step,
-        stepMessage: "Successful resend code",
-        link: 'verificationCode',
-        message: engPageContentJson[17],
-        linkText: engPageContentJson[26],
-        delay: 11000,
-        actionType: ACTION_TYPES.link,
-        type: TEST_TYPES.success
-    })
-}
-
-EngSmsRequestNewCode.parameters = storyParametersNew({
+EngRequestNewCode.parameters = storyParametersNew({
     ...smsNewCodeStoryParameters,
     language:AVAILABLE_LANGUAGES.en,
     response:successResponse,
 });
-EngSmsRequestNewCode.play = async ({ canvasElement, step }) => {
+EngRequestNewCode.play = async ({ canvasElement, step }) => {
 
     await testCase({
         canvasElement,
@@ -397,12 +285,12 @@ EngSmsRequestNewCode.play = async ({ canvasElement, step }) => {
     })
 }
 
-FrVoiceRequestNewCode.parameters = storyParametersNew({
+FrRequestNewCode.parameters = storyParametersNew({
     ...voiceNewCodeStoryParameters,
     language:AVAILABLE_LANGUAGES.fr,
     response:successResponse,
 });
-FrVoiceRequestNewCode.play = async ({ canvasElement, step }) => {
+FrRequestNewCode.play = async ({ canvasElement, step }) => {
 
     await testCase({
         canvasElement,
@@ -416,41 +304,21 @@ FrVoiceRequestNewCode.play = async ({ canvasElement, step }) => {
         type: TEST_TYPES.success
     })
 }
-EmailNewCodeBackEndError.parameters = storyParametersNew({
-    ...emailNewCodeStoryParameters,
+NewCodeBackEndError.parameters = storyParametersNew({
+    ...voiceNewCodeStoryParameters,
     language:AVAILABLE_LANGUAGES.en,
     response:errorResponse,
 });
-EmailNewCodeBackEndError.play = async ({ canvasElement, step }) => {
+NewCodeBackEndError.play = async ({ canvasElement, step }) => {
 
     await testCase({
         canvasElement,
         step,
-        stepMessage:"Resend code with Back End for Email No Response Error",
+        stepMessage:"Resend code with Back End No Response Error",
         link: 'verificationCode',
         heading: engErrorPageJson[1],
         message: serverError,
-        linkText: engPageContentJson[26],
-        delay: 11000,
-        actionType: ACTION_TYPES.link,
-        type: TEST_TYPES.error
-    })
-}
-VoiceNewCodeBackEndError.parameters = storyParametersNew({
-    ...voiceNewCodeStoryParameters,
-    language:AVAILABLE_LANGUAGES.fr,
-    response:errorResponse,
-});
-VoiceNewCodeBackEndError.play = async ({ canvasElement, step }) => {
-
-    await testCase({
-        canvasElement,
-        step,
-        stepMessage:"Resend code with Back End for Voice Fr No Response Error",
-        link: 'verificationCode',
-        heading: frErrorPageJson[1],
-        message: serverError,
-        linkText: frPageContentJson[16],
+        linkText: engPageContentJson[16],
         delay: 11000,
         actionType: ACTION_TYPES.link,
         type: TEST_TYPES.error
@@ -531,27 +399,7 @@ UseNewNumber.play = async ({ canvasElement, step }) => {
         stepMessage: "Successful use new number",
         link: 'verificationCode',
         message: engPageContentJson[17],
-        linkText: engPageContentJson[13],
-        delay: 1000,
-        actionType: ACTION_TYPES.link,
-        type: TEST_TYPES.redirect
-    })
-}
-
-UseNewEmail.parameters = storyParametersNew({
-    ...useNewEmailStoryParameters,
-    language:AVAILABLE_LANGUAGES.en,
-    response:successResponse,
-});
-UseNewEmail.play = async ({ canvasElement, step }) => {
-
-    await testCase({
-        canvasElement,
-        step,
-        stepMessage: "Successful use a different email",
-        link: 'verificationCode',
-        message: engPageContentJson[17],
-        linkText: engPageContentJson[25],
+        linkText: engPageContentJson[21],
         delay: 1000,
         actionType: ACTION_TYPES.link,
         type: TEST_TYPES.redirect

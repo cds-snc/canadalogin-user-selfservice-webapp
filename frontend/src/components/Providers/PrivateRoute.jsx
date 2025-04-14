@@ -1,6 +1,7 @@
-import {Navigate} from "react-router";
+import {Navigate, useParams} from "react-router";
 import {useUser} from "./UserContext.jsx";
 import {isEmailValid} from "../../utils/functions.jsx";
+import {FLOW_TYPES, PAGES} from "../../utils/constants.jsx";
 
 
 function PrivateRoute ({route, children}){
@@ -13,20 +14,30 @@ function PrivateRoute ({route, children}){
 }
 
 
-function isValidRoute (route) {
+function isValidRoute (page) {
     const {state} = useUser();
+    const {flow, type} = useParams();
 
-    if(!isEmailValid(state.userData.email))
-        return false;
 
-    switch(route){
+    if(flow===FLOW_TYPES.signIn)
+        switch (page) {
+            case(PAGES.verification):
+                return true;
+            default:
+                return false;
+        }
+
+    switch(page){
         case("signUpCoreProfile"):
             return (
                 state.userData.stepVerified &&
                 state.userData.stepVerificationSent &&
                 state.userData.passwordSubmitted &&
                 state.userData.emailValidated);
-        case("signUpVerifyTwoStep"):
+        case(PAGES.verification):
+            if(type===FLOW_TYPES.email)
+                return isEmailValid(state.userData.email);
+
             return (state.userData.stepVerificationSent &&
                     state.userData.passwordSubmitted &&
                     state.userData.emailValidated);
@@ -36,7 +47,7 @@ function isValidRoute (route) {
         case("signUpPassword"):
             return (state.userData.emailValidated);
         default:
-            return true;
+            return false;
 
     }
 }

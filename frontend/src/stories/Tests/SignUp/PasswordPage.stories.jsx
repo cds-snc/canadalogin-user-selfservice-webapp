@@ -1,21 +1,17 @@
-import Page from "../../../views/Page";
 import {withRouter} from 'storybook-addon-remix-react-router';
-import {
-    AVAILABLE_LANGUAGES,
-    FLOW_TYPES,
-    NAVIGATION_LINKS,
-    PAGES,
-    SUBMIT_END_POINTS
-} from "../../../utils/constants.jsx";
+import {AVAILABLE_LANGUAGES, NAVIGATION_LINKS, SUBMIT_END_POINTS} from "../../../utils/constants.jsx";
 import {UserProvider} from "../../../components/Providers/UserContext.jsx";
 import {getPageContent} from "../../../utils/functions.jsx";
 import {ACTION_TYPES, TEST_TYPES, TestDataUserProvider} from "../utils/constants.jsx";
-import {storyParametersNew, testCase} from "../utils/functions.jsx";
+import {storyParameters, testCase} from "../utils/functions.jsx";
+import PasswordPage from "../../../views/Password/PasswordPage.jsx";
 
-const serverError =  "Value is not a valid email address: There must be something after the @-sign.";
+
 const engErrorPageJson = getPageContent('en', "Error");
 const frErrorPageJson = getPageContent('fr', "Error");
 
+
+const serverError =  "The system cannot process the request because the password was not found.";
 const errorResponse = {
     "success": false,
     "message": serverError,
@@ -24,7 +20,7 @@ const errorResponse = {
 
 const successResponse = {
     "success": true,
-    "message": "OTP sent successfully",
+    "message": "Password sent successfully",
     "data": {
         "trxnId": "eac50d6d-c2d9-47ef-a3ad-7ddc27d683b1",
         "type": "emailotp",
@@ -39,46 +35,37 @@ const successResponse = {
     }
 }
 
-const frontEndStoryParameters = {
-    isBackEndTest:false,
-    link:NAVIGATION_LINKS.signUp,
-    flow:FLOW_TYPES.signUp
-}
-
-const backEndStoryParameters = {
-    ...frontEndStoryParameters,
-    isBackEndTest:true,
-    endpoint:SUBMIT_END_POINTS.sendOtpCode
-}
+TestDataUserProvider.userData.password = "123456789012";
 
 export default {
 
-    title: 'GC Sign In/Tests/Sign Up/Sign Up Page',
-    component: Page,
-
+    title: 'GC Sign In/Tests/Sign Up/Password Creation Page',
+    component: PasswordPage,
     decorators: [withRouter],
     // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs
     tags: ['autodocs'],
 
 };
 
+
 const BadTemplateFE = (args) =>   {
 
-    TestDataUserProvider.testData.email = "test@test";
+    TestDataUserProvider.testData.password = "1234567890";
 
     return(
-        <UserProvider initial={TestDataUserProvider}><Page page={PAGES.signup} /><button  aria-label="test" type="submit"  form="form"></button></UserProvider>
+        <UserProvider initial={TestDataUserProvider}><PasswordPage /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
     )
 }
 
 const TemplateBE = (args) =>   {
 
-    TestDataUserProvider.testData.email = "test@test.com";
+    TestDataUserProvider.testData.password = "123456789012";
 
     return(
-        <UserProvider initial={TestDataUserProvider}><Page page={PAGES.signup} /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
+        <UserProvider initial={TestDataUserProvider}><PasswordPage /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
     )
 }
+
 
 export const EngErrorFrontEnd = BadTemplateFE.bind({});
 export const FrErrorFrontEnd = BadTemplateFE.bind({});
@@ -86,56 +73,47 @@ export const ErrorBackEnd = TemplateBE.bind({});
 export const SuccessfulBackEnd = TemplateBE.bind({});
 export const ServerErrorBackEnd = TemplateBE.bind({});
 
-EngErrorFrontEnd.parameters = storyParametersNew({
-    ...frontEndStoryParameters,
-    language:AVAILABLE_LANGUAGES.en,
-});
+
+EngErrorFrontEnd.parameters = storyParameters(false, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.password);
 EngErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
         canvasElement,
         step,
-        stepMessage:"Submit form with bad email in English",
-        link: 'email',
+        stepMessage: "Submit form with bad password in English",
+        link: 'password',
         heading: engErrorPageJson[1],
-        message: engErrorPageJson[2],
-        delay: 1000,
+        message: `${engErrorPageJson[5]} 12 ${engErrorPageJson[12]} 65 ${engErrorPageJson[13]}`,
+        delay: 3000,
         actionType: ACTION_TYPES.submit,
         type: TEST_TYPES.error
     })
 }
 
-FrErrorFrontEnd.parameters = storyParametersNew({
-    ...frontEndStoryParameters,
-    language:AVAILABLE_LANGUAGES.fr,
-});
+FrErrorFrontEnd.parameters = storyParameters(false, AVAILABLE_LANGUAGES.fr, NAVIGATION_LINKS.password);
 FrErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
         canvasElement,
         step,
-        stepMessage:"Submit form with bad email in French",
-        link: 'email',
+        stepMessage: "Submit form with bad password in French",
+        link: 'password',
         heading: frErrorPageJson[1],
-        message: frErrorPageJson[2],
+        message: `${frErrorPageJson[5]} 12 ${frErrorPageJson[12]} 65 ${frErrorPageJson[13]}`,
         delay: 1000,
         actionType: ACTION_TYPES.submit,
         type: TEST_TYPES.error
     })
 }
 
-ErrorBackEnd.parameters = storyParametersNew({
-    ...backEndStoryParameters,
-    language:AVAILABLE_LANGUAGES.en,
-    response:errorResponse
-});
+ErrorBackEnd.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.password, SUBMIT_END_POINTS.create, errorResponse);
 ErrorBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
         canvasElement,
         step,
-        stepMessage:"Submit form with bad email For Back End Error",
-        link: 'email',
+        stepMessage: "Submit form with bad password For Back End Error",
+        link: 'password',
         heading: engErrorPageJson[1],
         message: serverError,
         delay: 1000,
@@ -144,36 +122,28 @@ ErrorBackEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-SuccessfulBackEnd.parameters =  storyParametersNew({
-    ...backEndStoryParameters,
-    language:AVAILABLE_LANGUAGES.en,
-    response:successResponse
-});
+SuccessfulBackEnd.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.password, SUBMIT_END_POINTS.create, successResponse);
 SuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
         canvasElement,
         step,
-        stepMessage: "Submit form with good email",
-        link: 'email',
-        delay: 1000,
+        stepMessage: "Submit form with good password For Back End Success",
+        link: 'password',
+        delay: 3000,
         actionType: ACTION_TYPES.submit,
         type: TEST_TYPES.redirect
     })
 }
 
-ServerErrorBackEnd.parameters =  storyParametersNew({
-    ...backEndStoryParameters,
-    language:AVAILABLE_LANGUAGES.en,
-    response:null
-});
+ServerErrorBackEnd.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.password, SUBMIT_END_POINTS.create, null);
 ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
         canvasElement,
         step,
-        stepMessage:"Submit form with Back End No Response Error",
-        link: 'email',
+        stepMessage: "Submit form with Back End No Response Error",
+        link: 'password',
         heading: engErrorPageJson[1],
         message: engErrorPageJson[7],
         delay: 1000,
@@ -181,3 +151,4 @@ ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
         type: TEST_TYPES.error
     })
 }
+
