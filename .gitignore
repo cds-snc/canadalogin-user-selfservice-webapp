@@ -22,5 +22,5 @@ frontend/storybook-static/
 #Test Coverage
 frontend/coverage/*
 # But keep the placeholder
-!coverage/.gitkeep
+!frontend/coverage/README.md
 frontend/test-results/
