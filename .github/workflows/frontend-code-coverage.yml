@@ -62,5 +62,5 @@ jobs:
           with:
             working-directory: '${{ matrix.module }}'
             json-summary-compare-path: 'coverage-compare-summary.json'
-            json-summary-path: 'coverage-summary-frontend.json'
+            # json-summary-path: 'coverage-summary-frontend.json'
             json-final-path: 'coverage-final-frontend.json'
