@@ -24,6 +24,9 @@ export default defineConfig({
         coverage: {
             reporter: ['text', 'json-summary', 'json', 'html'],
             reportOnFailure: true,
+            all: true,
+            enabled: true,
+            provider: 'istanbul',
             include: [...filesToInclude],
             exclude: [...filesToExclude],
             thresholds: {
