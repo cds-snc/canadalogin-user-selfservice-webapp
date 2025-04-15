@@ -1,10 +1,16 @@
 import {withRouter} from 'storybook-addon-remix-react-router';
-import {AVAILABLE_LANGUAGES, NAVIGATION_LINKS, SUBMIT_END_POINTS} from "../../../utils/constants.jsx";
+import {
+    AVAILABLE_LANGUAGES,
+    FLOW_TYPES,
+    NAVIGATION_LINKS,
+    PAGES,
+    SUBMIT_END_POINTS
+} from "../../../utils/constants.jsx";
 import {UserProvider} from "../../../components/Providers/UserContext.jsx";
 import {getPageContent} from "../../../utils/functions.jsx";
 import {ACTION_TYPES, TEST_TYPES, TestDataUserProvider} from "../utils/constants.jsx";
-import {storyParameters, testCase} from "../utils/functions.jsx";
-import PasswordPage from "../../../views/Password/PasswordPage.jsx";
+import {storyParametersNew, testCase} from "../utils/functions.jsx";
+import Page from "../../../views/Page.js";
 
 
 const engErrorPageJson = getPageContent('en', "Error");
@@ -34,13 +40,25 @@ const successResponse = {
         "retries": 4
     }
 }
+const frontEndStoryParameters = {
+    isBackEndTest:false,
+    link:NAVIGATION_LINKS.password,
+    flow:FLOW_TYPES.signUp
+}
+
+const backEndStoryParameters = {
+    ...frontEndStoryParameters,
+    isBackEndTest:true,
+    endpoint:SUBMIT_END_POINTS.create
+}
+
 
 TestDataUserProvider.userData.password = "123456789012";
 
 export default {
 
     title: 'GC Sign In/Tests/Sign Up/Password Creation Page',
-    component: PasswordPage,
+    component: Page,
     decorators: [withRouter],
     // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs
     tags: ['autodocs'],
@@ -48,12 +66,12 @@ export default {
 };
 
 
-const BadTemplateFE = (args) =>   {
+const TemplateFE = (args) =>   {
 
     TestDataUserProvider.testData.password = "1234567890";
 
     return(
-        <UserProvider initial={TestDataUserProvider}><PasswordPage /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
+        <UserProvider initial={TestDataUserProvider}><Page page={PAGES.password} /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
     )
 }
 
@@ -62,19 +80,22 @@ const TemplateBE = (args) =>   {
     TestDataUserProvider.testData.password = "123456789012";
 
     return(
-        <UserProvider initial={TestDataUserProvider}><PasswordPage /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
+        <UserProvider initial={TestDataUserProvider}><Page page={PAGES.password} /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
     )
 }
 
 
-export const EngErrorFrontEnd = BadTemplateFE.bind({});
-export const FrErrorFrontEnd = BadTemplateFE.bind({});
+export const EngErrorFrontEnd = TemplateFE.bind({});
+export const FrErrorFrontEnd = TemplateFE.bind({});
 export const ErrorBackEnd = TemplateBE.bind({});
 export const SuccessfulBackEnd = TemplateBE.bind({});
 export const ServerErrorBackEnd = TemplateBE.bind({});
 
 
-EngErrorFrontEnd.parameters = storyParameters(false, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.password);
+EngErrorFrontEnd.parameters = storyParametersNew({
+    ...frontEndStoryParameters,
+    language:AVAILABLE_LANGUAGES.en,
+});
 EngErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -90,7 +111,10 @@ EngErrorFrontEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-FrErrorFrontEnd.parameters = storyParameters(false, AVAILABLE_LANGUAGES.fr, NAVIGATION_LINKS.password);
+FrErrorFrontEnd.parameters = storyParametersNew({
+    ...frontEndStoryParameters,
+    language:AVAILABLE_LANGUAGES.fr,
+});
 FrErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -106,7 +130,11 @@ FrErrorFrontEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-ErrorBackEnd.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.password, SUBMIT_END_POINTS.create, errorResponse);
+ErrorBackEnd.parameters = storyParametersNew({
+    ...backEndStoryParameters,
+    language:AVAILABLE_LANGUAGES.en,
+    response:errorResponse
+});
 ErrorBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -122,7 +150,11 @@ ErrorBackEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-SuccessfulBackEnd.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.password, SUBMIT_END_POINTS.create, successResponse);
+SuccessfulBackEnd.parameters = storyParametersNew({
+    ...backEndStoryParameters,
+    language:AVAILABLE_LANGUAGES.en,
+    response:successResponse
+});
 SuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -136,7 +168,11 @@ SuccessfulBackEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-ServerErrorBackEnd.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.password, SUBMIT_END_POINTS.create, null);
+ServerErrorBackEnd.parameters = storyParametersNew({
+    ...backEndStoryParameters,
+    language:AVAILABLE_LANGUAGES.en,
+    response:null
+});
 ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({

@@ -1,9 +1,14 @@
 import { withRouter, reactRouterParameters } from 'storybook-addon-remix-react-router';
-import {NAVIGATION_LINKS, SUBMIT_END_POINTS} from "../../../utils/constants.jsx";
+import {
+    AVAILABLE_LANGUAGES,
+    NAVIGATION_LINKS,
+    PAGES,
+    SUBMIT_END_POINTS
+} from "../../../utils/constants.jsx";
 import {UserProvider} from "../../../components/Providers/UserContext.jsx";
-import PasswordPage from "../../../views/Password/PasswordPage.jsx";
 import {http, HttpResponse} from "msw";
 import config from "../../../config.jsx";
+import Page from "../../../views/Page.js";
 
 const policy = {
 
@@ -28,7 +33,8 @@ const policy = {
 
 export default {
     title: 'GC Sign In/Pages/Sign Up/Password Page',
-    component: PasswordPage,
+    component: Page,
+    args: {page:PAGES.password},
     decorators: [withRouter,
         (Story) => (
             <UserProvider>
@@ -41,11 +47,11 @@ export default {
 
 };
 
-export const English = {
+export const English ={
     parameters: {
         reactRouter: reactRouterParameters({
             location: {
-                pathParams: { language: 'en' },
+                pathParams: { language: AVAILABLE_LANGUAGES.en },
             },
             routing: { path: '/:language'+NAVIGATION_LINKS.password }
         }),
@@ -63,7 +69,7 @@ export const French = {
     parameters: {
         reactRouter: reactRouterParameters({
             location: {
-                pathParams: { language: 'fr' },
+                pathParams: { language: AVAILABLE_LANGUAGES.fr },
             },
             routing: { path: '/:language'+NAVIGATION_LINKS.password }
         }),

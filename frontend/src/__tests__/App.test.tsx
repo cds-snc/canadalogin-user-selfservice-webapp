@@ -156,7 +156,8 @@ describe('Routing Test', () => {
                 <App/>
             </MemoryRouter>,
         )
-        checkPasswordCreationPageContents(AVAILABLE_LANGUAGES.en, engJson["PasswordCreation"], langHref.fr + NAVIGATION_LINKS.password, engJson['Button'], engJson["AlreadyGc"]);
+        buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.password, FLOW_TYPES.signUp, null, langHref.fr + NAVIGATION_LINKS.password);
+       // checkPasswordCreationPageContents(AVAILABLE_LANGUAGES.en, engJson["PasswordCreation"], langHref.fr + NAVIGATION_LINKS.password, engJson['Button'], engJson["AlreadyGc"]);
     });
 
     test("Check password creation page route with fr language defined", () => {
@@ -172,7 +173,7 @@ describe('Routing Test', () => {
                 <App/>
             </MemoryRouter>,
         )
-        checkPasswordCreationPageContents(AVAILABLE_LANGUAGES.fr, frJson["PasswordCreation"], langHref.en + NAVIGATION_LINKS.password, frJson['Button'], frJson["AlreadyGc"]);
+        buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.password, FLOW_TYPES.signUp, null, langHref.en + NAVIGATION_LINKS.password);
     });
 
     test("Check verification set up page route with en language defined", () => {
@@ -182,13 +183,12 @@ describe('Routing Test', () => {
                 default: (props:any) => props.children,
             };
         });
-
         render(
             <MemoryRouter initialEntries={[langHref.en + NAVIGATION_LINKS.twoStepVerification]}>
                 <App/>
             </MemoryRouter>,
         )
-        checkVerificationSetUpPageContents(AVAILABLE_LANGUAGES.en, engJson["VerificationSetUp"], langHref.fr + NAVIGATION_LINKS.twoStepVerification, engJson['Button']);
+        buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.verificationSetUp, FLOW_TYPES.signUp, null, langHref.fr+NAVIGATION_LINKS.twoStepVerification);
     });
 
     test("Check verification set up page route with fr language defined", () => {
@@ -204,7 +204,7 @@ describe('Routing Test', () => {
                 <App/>
             </MemoryRouter>,
         )
-        checkVerificationSetUpPageContents(AVAILABLE_LANGUAGES.fr, frJson["VerificationSetUp"], langHref.en + NAVIGATION_LINKS.twoStepVerification, frJson['Button']);
+        buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.verificationSetUp, FLOW_TYPES.signUp, null, langHref.en+NAVIGATION_LINKS.twoStepVerification);
     });
 
     test("Check sign up verification page route for sms with en language defined", () => {
@@ -364,7 +364,7 @@ describe('Routing Test', () => {
                 <App/>
             </MemoryRouter>,
         )
-        checkCreateCoreProfilePageContents(AVAILABLE_LANGUAGES.en, engJson["CreateCoreProfile"], langHref.fr + NAVIGATION_LINKS.coreProfile, engJson['Button']);
+        buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.coreProfile, FLOW_TYPES.signIn, null, langHref.fr + NAVIGATION_LINKS.coreProfile);
     });
 
     test("Check core profile page route with fr language defined", () => {
@@ -380,7 +380,7 @@ describe('Routing Test', () => {
                 <App/>
             </MemoryRouter>,
         )
-        checkCreateCoreProfilePageContents(AVAILABLE_LANGUAGES.fr, frJson["CreateCoreProfile"], langHref.en + NAVIGATION_LINKS.coreProfile, frJson['Button']);
+        buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.coreProfile, FLOW_TYPES.signIn, null, langHref.en + NAVIGATION_LINKS.coreProfile);
     });
 
     afterEach(() => {
@@ -407,64 +407,6 @@ describe('Routing Test', () => {
                 expect(screen.queryByText(pageContentJson[key])).toBeInTheDocument();
         });
 
-    }
-
-    function checkPasswordCreationPageContents(language, pageContentJson, langLink, buttonJson, alreadyGcJson:JSON) {
-
-        verifyCommonElements(language, langLink, buttonJson, alreadyGcJson, ['2', 'h1', '4', language]);
-
-        const textKeysToNotSearch = ['1','2','10'];
-
-        const gcdsElementMap = new Map();
-        gcdsElementMap.set('1', ['gcds-notice', createMap('gcds-notice', [pageContentJson['1'], 'h2', 'success'])])
-        gcdsElementMap.set('7', ['gcds-details',  createMap('gcds-details', [pageContentJson['7']])])
-        gcdsElementMap.set('9', ['gcds-input', createMap('gcds-input2', ["input-password", pageContentJson['9'], 'password', "password",  pageContentJson['10']])]);
-        gcdsElementMap.set('11', ['gcds-checkbox', createMap('gcds-checkbox', ['checkbox-default', pageContentJson['11'], 'checkbox'])]);
-
-        Object.keys(pageContentJson).forEach(key => {
-            if(gcdsElementMap.has(key))
-                verifyGcdsHtmlElement(gcdsElementMap.get(key)[0], gcdsElementMap.get(key)[1]);
-            else if (!textKeysToNotSearch.includes(key))
-                expect(screen.queryByText(pageContentJson[key])).toBeInTheDocument();
-        });
-    }
-
-    function checkVerificationSetUpPageContents(language:string, pageContentJson: JSON, langLink: string,  buttonJson: JSON) {
-
-        verifyCommonElements(language, langLink, buttonJson, null, ['3', 'h1', '4', language]);
-
-        const textKeysToNotSearch = ['9', '13', '15', '17', '18', '19'];
-        const gcdsElementMap = new Map();
-        gcdsElementMap.set('11', ['gcds-details',  createMap('gcds-details', [pageContentJson['11']])])
-        gcdsElementMap.set('14', ['gcds-fieldset', createMap('gcds-fieldset', ['gcds-verification-fieldset', pageContentJson['15'],pageContentJson['14']])]);
-        const options ='[{"label": "'+pageContentJson['16']+'","id": "sms", "value": "sms","checked":"true","hint": "'+pageContentJson['17']+'"},{"label": "'+pageContentJson['18']+'","id": "voice", "value": "voice","hint": "'+pageContentJson['19']+'"}]';
-        gcdsElementMap.set('16', ['gcds-radio-group',  createMap('gcds-radio-group', ['verificationType',options])]);
-
-        Object.keys(pageContentJson).forEach(key => {
-
-            if(gcdsElementMap.has(key))
-                verifyGcdsHtmlElement(gcdsElementMap.get(key)[0], gcdsElementMap.get(key)[1]);
-            else if(!textKeysToNotSearch.includes(key))
-                expect(screen.queryByText(pageContentJson[key])).toBeInTheDocument();
-
-        });
-
-    }
-
-    function checkCreateCoreProfilePageContents(language:string, pageContentJson: JSON, langLink: string,  buttonJson: JSON) {
-
-        verifyCommonElements(language, langLink, buttonJson, null, ['4', 'h1', '4', language]);
-        const gcdsElementMap = new Map();
-        gcdsElementMap.set('1', ['gcds-notice', createMap('gcds-notice', [pageContentJson['1'], 'h2', 'success'])]);
-        gcdsElementMap.set('7', ['gcds-input',  createMap('gcds-input3', ["firstName", pageContentJson['7'], 'firstName', 'text'] )]);
-        gcdsElementMap.set('8', ['gcds-input',  createMap('gcds-input', ["lastName", pageContentJson['8'], 'lastName', 'text', 'other'] )]);
-
-        Object.keys(pageContentJson).forEach(key => {
-            if(gcdsElementMap.has(key))
-                verifyGcdsHtmlElement(gcdsElementMap.get(key)[0], gcdsElementMap.get(key)[1]);
-            else
-                expect(screen.queryByText(pageContentJson[key])).toBeInTheDocument();
-        });
     }
 
     function verifyGcdsHtmlElement(tag: string, attributes:Map<string,string>)

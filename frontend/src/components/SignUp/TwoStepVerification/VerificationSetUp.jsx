@@ -13,17 +13,18 @@ import 'react-phone-input-2/lib/material.css';
 import VerificationSetUpInfo from "./VerificationSetUpInfo.jsx";
 import {useUser} from "../../Providers/UserContext.jsx";
 import {authService} from "../../../services/authService.jsx";
-import {useNavigate} from "react-router";
+import {useNavigate, useParams} from "react-router";
 
-export default function VerificationSetUp({currentLang}) {
+export default function VerificationSetUp() {
     const {state, dispatch} = useUser();
+    const {language} = useParams();
     const [phone, setPhone] = useState('');
     const [countryCodeLength, setCountryCodeLength] = useState(0);
     const [errorJson, setError] = useState({heading: null, phoneError:null});
     const [isPending, startTransition] = useTransition();
     const navigate = useNavigate();
-    const pageContentJson = getPageContent(currentLang, "VerificationSetUp");
-    const errorPageJson = getPageContent(currentLang, "Error");
+    const pageContentJson = getPageContent(language, "VerificationSetUp");
+    const errorPageJson = getPageContent(language, "Error");
 
     function  handleSubmit (e){
         startTransition(async()=> {
@@ -50,7 +51,7 @@ export default function VerificationSetUp({currentLang}) {
                     const userData = {...state.userData, phone:formData.get('phone'), stepVerificationSent: true, trxnId:response.data.trxnId};
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                     console.log("success....", response);
-                    navigate("/" + currentLang +"/"+FLOW_TYPES.signUp +NAVIGATION_LINKS.verification+'/'+formType);
+                    navigate("/" + language +"/"+FLOW_TYPES.signUp +NAVIGATION_LINKS.verification+'/'+formType);
                 }else {
                     console.log("Error....", response);
                     setError({phoneError: response.message, heading: errorPageJson['1']});
@@ -75,13 +76,13 @@ export default function VerificationSetUp({currentLang}) {
                 <GcdsContainer className="gcds-gap" >
                     <GcdsStepper currentStep="3" totalSteps="4"
                                  tag="h1"
-                                 lang={currentLang}>
+                                 lang={language}>
                         {pageContentJson['1']}
                     </GcdsStepper>
                 </GcdsContainer>
                 <GcdsContainer>
                     <form id="form"  onSubmit={handleSubmit}>
-                        <VerificationSetUpInfo currentLang={currentLang} pageContentJson={pageContentJson} />
+                        <VerificationSetUpInfo currentLang={language} pageContentJson={pageContentJson} />
                         <GcdsContainer padding="200">
                         <PhoneInput
                             inputProps={{
@@ -92,7 +93,7 @@ export default function VerificationSetUp({currentLang}) {
                             specialLabel={pageContentJson['10']}
                             country={'ca'}
                             onlyCountries={countryMapping.countries}
-                            localization={currentLang==='fr'?countryMapping.frLocalization:countryMapping.localization}
+                            localization={language==='fr'?countryMapping.frLocalization:countryMapping.localization}
                             value={state.testData!=null?state.testData.phone:phone}
                             className={'high-res'}
                             enableSearch={true}
@@ -118,7 +119,7 @@ export default function VerificationSetUp({currentLang}) {
                             fieldset-id="gcds-verification-fieldset"
                             legend={pageContentJson['14']}
                             hint={pageContentJson['15']}
-                            lang={currentLang}
+                            lang={language}
                             required>
                             <br />
                             <GcdsRadioGroup
@@ -132,7 +133,7 @@ export default function VerificationSetUp({currentLang}) {
                                     `"hint": "${pageContentJson['19']}"}]`}
                             />
                         </GcdsFieldset>
-                        <SubmitButton currentLang={currentLang} disabled={isPending} />
+                        <SubmitButton currentLang={language} disabled={isPending} />
                     </form>
                 </GcdsContainer>
             </GcdsContainer>

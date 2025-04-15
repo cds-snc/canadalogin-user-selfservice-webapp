@@ -82,6 +82,8 @@ const pageSetup ={
         switch(page) {
             case PAGES.signup:
                 return language !== AVAILABLE_LANGUAGES.fr ? engJson["AlreadyGc"] : frJson["AlreadyGc"];
+            case PAGES.password:
+                return language !== AVAILABLE_LANGUAGES.fr ? engJson["AlreadyGc"] : frJson["AlreadyGc"];
             case PAGES.verification:
                 if (flow === FLOW_TYPES.signUp)
                     return language !== AVAILABLE_LANGUAGES.fr ? engJson["AlreadyGc"] : frJson["AlreadyGc"];
@@ -95,6 +97,8 @@ const pageSetup ={
         switch(page){
             case PAGES.signup:
                 return ['1', 'h1', '4', language];
+            case PAGES.password:
+                return ['2', 'h1', '4', language];
             case PAGES.verification:
                 if(flow===FLOW_TYPES.signUp)
                     if(type===FLOW_TYPES.email)
@@ -103,6 +107,10 @@ const pageSetup ={
                         return ['3', 'h1', '4', language];
                 else
                     return  null;
+            case PAGES.verificationSetUp:
+                return ['3', 'h1', '4', language];
+            case PAGES.coreProfile:
+                return ['4', 'h1', '4', language];
             default:
                 return null;
         }
@@ -111,6 +119,8 @@ const pageSetup ={
         switch(page){
             case PAGES.signup:
                 return ['4', '6'];
+            case PAGES.password:
+                return ['2','10'];
             case PAGES.verification:
                 if(flow===FLOW_TYPES.signUp)
                     if(type===FLOW_TYPES.email)
@@ -119,6 +129,8 @@ const pageSetup ={
                         return ['11', '12', '15', '16', '17', '18', '19','20', '21', '22','23','24','25', '26'];
                 else
                     return  ['11', '12', '13', '15', '16', '17', '22','23','24','25', '26'];
+            case PAGES.verificationSetUp:
+                return ['9', '13', '15', '17', '18', '19'];
             default:
                 return [];
         }
@@ -151,8 +163,14 @@ const pageSetup ={
         switch(page){
             case PAGES.signup:
                 return pageSetup.signUpEmailGcdsMap(language, pageContentJson);
+            case PAGES.password:
+                return pageSetup.passwordGcdsMap(pageContentJson);
             case PAGES.verification:
-                return pageSetup.verificationGcdsMap(language, pageContentJson);
+                return pageSetup.verificationGcdsMap(pageContentJson);
+            case PAGES.verificationSetUp:
+                return pageSetup.verificationSetUpGcdsMap(pageContentJson);
+            case PAGES.coreProfile:
+                return pageSetup.coreProfileSetUpGcdsMap(pageContentJson);
             default:
                 return new Map();
         }
@@ -173,10 +191,40 @@ const pageSetup ={
 
         return gcdsElementMap;
     },
-    verificationGcdsMap: (language:string, pageContentJson:JSON)=>{
+    passwordGcdsMap: (pageContentJson:JSON)=>{
+
+        const gcdsElementMap = new Map();
+        gcdsElementMap.set('1', ['gcds-notice', createMap('gcds-notice', [pageContentJson['1'], 'h2', 'success'])])
+        gcdsElementMap.set('7', ['gcds-details',  createMap('gcds-details', [pageContentJson['7']])])
+        gcdsElementMap.set('9', ['gcds-input', createMap('gcds-input2', ["input-password", pageContentJson['9'], 'password', "password",  pageContentJson['10']])]);
+        gcdsElementMap.set('11', ['gcds-checkbox', createMap('gcds-checkbox', ['checkbox-default', pageContentJson['11'], 'checkbox'])]);
+
+
+        return gcdsElementMap;
+    },
+    verificationGcdsMap: (pageContentJson:JSON)=>{
 
         const gcdsElementMap = new Map();
         gcdsElementMap.set('9', ['gcds-input',  createMap('gcds-input', ["verificationCode", pageContentJson['9'], 'verificationCode', 'text', 'other'])]);
+
+        return gcdsElementMap;
+    },
+    verificationSetUpGcdsMap: (pageContentJson:JSON)=>{
+
+        const gcdsElementMap = new Map();
+        gcdsElementMap.set('11', ['gcds-details',  createMap('gcds-details', [pageContentJson['11']])])
+        gcdsElementMap.set('14', ['gcds-fieldset', createMap('gcds-fieldset', ['gcds-verification-fieldset', pageContentJson['15'],pageContentJson['14']])]);
+        const options ='[{"label": "'+pageContentJson['16']+'","id": "sms", "value": "sms","checked":"true","hint": "'+pageContentJson['17']+'"},{"label": "'+pageContentJson['18']+'","id": "voice", "value": "voice","hint": "'+pageContentJson['19']+'"}]';
+        gcdsElementMap.set('16', ['gcds-radio-group',  createMap('gcds-radio-group', ['verificationType',options])]);
+
+        return gcdsElementMap;
+    },
+    coreProfileSetUpGcdsMap: (pageContentJson:JSON)=>{
+
+        const gcdsElementMap = new Map();
+        gcdsElementMap.set('1', ['gcds-notice', createMap('gcds-notice', [pageContentJson['1'], 'h2', 'success'])]);
+        gcdsElementMap.set('7', ['gcds-input',  createMap('gcds-input3', ["firstName", pageContentJson['7'], 'firstName', 'text'] )]);
+        gcdsElementMap.set('8', ['gcds-input',  createMap('gcds-input', ["lastName", pageContentJson['8'], 'lastName', 'text', 'other'] )]);
 
         return gcdsElementMap;
     }

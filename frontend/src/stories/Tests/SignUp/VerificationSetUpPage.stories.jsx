@@ -1,10 +1,30 @@
 import {withRouter} from 'storybook-addon-remix-react-router';
-import {AVAILABLE_LANGUAGES, NAVIGATION_LINKS, SUBMIT_END_POINTS,} from "../../../utils/constants.jsx";
+import {
+    AVAILABLE_LANGUAGES,
+    FLOW_TYPES,
+    NAVIGATION_LINKS,
+    PAGES,
+    SUBMIT_END_POINTS,
+} from "../../../utils/constants.jsx";
 import {UserProvider} from "../../../components/Providers/UserContext.jsx";
 import {getPageContent} from "../../../utils/functions.jsx";
 import {ACTION_TYPES, TEST_TYPES, TestDataUserProvider} from "../utils/constants.jsx";
-import {storyParameters, testCase} from "../utils/functions.jsx";
-import VerificationSetUpPage from "../../../views/SignUp/VerificationSetUpPage.jsx";
+import {storyParametersNew, testCase} from "../utils/functions.jsx";
+import Page from "../../../views/Page.js";
+
+
+const frontEndStoryParameters = {
+    isBackEndTest:false,
+    link:NAVIGATION_LINKS.twoStepVerification,
+    flow:FLOW_TYPES.signUp
+}
+
+const backEndStoryParameters = {
+    isBackEndTest:true,
+    link:NAVIGATION_LINKS.twoStepVerification,
+    flow:FLOW_TYPES.signUp,
+    endpoint:SUBMIT_END_POINTS.sendTwoStepVerificationCode
+}
 
 const engErrorPageJson = getPageContent('en', "Error");
 const frErrorPageJson = getPageContent('fr', "Error");
@@ -36,40 +56,36 @@ const successResponse = {
 export default {
 
     title: 'GC Sign In/Tests/Sign Up/Verification Set Up Page',
-    component: VerificationSetUpPage,
+    component: Page,
     decorators: [withRouter],
     // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs
     tags: ['autodocs'],
 
 };
 
-
-const BadTemplateBE = (args) =>   {
+const Template = (args) =>   {
     return(
-        <UserProvider initial={TestDataUserProvider}><VerificationSetUpPage /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
+        <UserProvider initial={TestDataUserProvider}><Page page={PAGES.verificationSetUp} /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
     )
 }
+export const EngNoNumberErrorFrontEnd = Template.bind({});
+export const FrNoNumberErrorFrontEnd = Template.bind({});
+export const EngDigitErrorFrontEnd = Template.bind({});
+export const FrDigitErrorFrontEnd = Template.bind({});
+export const ErrorBackEnd = Template.bind({});
+export const ServerErrorBackEnd = Template.bind({});
+export const SuccessfulBackEnd = Template.bind({});
 
-const TemplateBE = (args) =>   {
-    return(
-        <UserProvider initial={TestDataUserProvider}><VerificationSetUpPage /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
-    )
-}
-export const EngNoNumberErrorFrontEnd = BadTemplateBE.bind({});
-export const FrNoNumberErrorFrontEnd = BadTemplateBE.bind({});
-export const EngDigitErrorFrontEnd = BadTemplateBE.bind({});
-export const FrDigitErrorFrontEnd = BadTemplateBE.bind({});
-export const ErrorBackEnd = TemplateBE.bind({});
-export const ServerErrorBackEnd = TemplateBE.bind({});
-export const SuccessfulBackEnd = TemplateBE.bind({});
-
-EngNoNumberErrorFrontEnd.parameters = storyParameters(false, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.twoStepVerification);
+EngNoNumberErrorFrontEnd.parameters = storyParametersNew({
+    ...frontEndStoryParameters,
+    language:AVAILABLE_LANGUAGES.en
+});
 EngNoNumberErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
         canvasElement,
         step,
-        stepMessage:"Submit form with bad Phone number in English",
+        stepMessage:"Submit form with no Phone number in English",
         link: 'phone',
         heading: engErrorPageJson[1],
         message: engErrorPageJson[10],
@@ -79,13 +95,16 @@ EngNoNumberErrorFrontEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-FrNoNumberErrorFrontEnd.parameters = storyParameters(false, AVAILABLE_LANGUAGES.fr, NAVIGATION_LINKS.twoStepVerification);
+FrNoNumberErrorFrontEnd.parameters = storyParametersNew({
+    ...frontEndStoryParameters,
+    language:AVAILABLE_LANGUAGES.fr
+});
 FrNoNumberErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
         canvasElement,
         step,
-        stepMessage:"Submit form with bad Phone number in English",
+        stepMessage:"Submit form with no Phone number in French",
         link: 'phone',
         heading: frErrorPageJson[1],
         message: frErrorPageJson[10],
@@ -95,7 +114,10 @@ FrNoNumberErrorFrontEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-EngDigitErrorFrontEnd.parameters = storyParameters(false, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.twoStepVerification);
+EngDigitErrorFrontEnd.parameters = storyParametersNew({
+    ...frontEndStoryParameters,
+    language:AVAILABLE_LANGUAGES.en
+});
 EngDigitErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -112,13 +134,16 @@ EngDigitErrorFrontEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-FrDigitErrorFrontEnd.parameters = storyParameters(false, AVAILABLE_LANGUAGES.fr, NAVIGATION_LINKS.twoStepVerification);
+FrDigitErrorFrontEnd.parameters = storyParametersNew({
+    ...frontEndStoryParameters,
+    language:AVAILABLE_LANGUAGES.fr
+});
 FrDigitErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
         canvasElement,
         step,
-        stepMessage:"Submit form with bad Phone number in English",
+        stepMessage:"Submit form with bad Phone number in French",
         link: 'phone',
         heading: frErrorPageJson[1],
         message: frErrorPageJson[8]+'11'+frErrorPageJson[9],
@@ -129,13 +154,17 @@ FrDigitErrorFrontEnd.play = async ({ canvasElement, step }) => {
     })
  }
 
-ErrorBackEnd.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.twoStepVerification, SUBMIT_END_POINTS.sendTwoStepVerificationCode, errorResponse);
+ErrorBackEnd.parameters = storyParametersNew({
+    ...backEndStoryParameters,
+    language:AVAILABLE_LANGUAGES.en,
+    response:errorResponse
+});
 ErrorBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
         canvasElement,
         step,
-        stepMessage:"Submit form with bad Phone number in English",
+        stepMessage:"Submit form with Phone number in English for back end error test",
         link: 'phone',
         heading: engErrorPageJson[1],
         message: errorResponse.message,
@@ -145,7 +174,11 @@ ErrorBackEnd.play = async ({ canvasElement, step }) => {
         input: {inputType: 'textBox', stepMessage:'Enter phone Number with enough digits.', value: '4161234567'}
     })
 }
-ServerErrorBackEnd.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.signUp, SUBMIT_END_POINTS.sendTwoStepVerificationCode, null);
+ServerErrorBackEnd.parameters =storyParametersNew({
+    ...backEndStoryParameters,
+    language:AVAILABLE_LANGUAGES.en,
+    response:null
+});
 ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -162,13 +195,17 @@ ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-SuccessfulBackEnd.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.signUp, SUBMIT_END_POINTS.sendTwoStepVerificationCode, successResponse);
+SuccessfulBackEnd.parameters = storyParametersNew({
+    ...backEndStoryParameters,
+    language:AVAILABLE_LANGUAGES.en,
+    response:successResponse
+});
 SuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
         canvasElement,
         step,
-        stepMessage: "Submit form with good email",
+        stepMessage: "Submit form with good phone number",
         link: 'phone',
         delay: 1000,
         actionType: ACTION_TYPES.submit,
