@@ -1,7 +1,7 @@
 export const AVAILABLE_LANGUAGES = {en:'en', fr:'fr'};
 export const NAVIGATION_LINKS = {
     signUp: '/signup',
-    verifyEmail: '/signup/verifyemail',
+    verifyEmail: '/signup/verification/email',
     password: '/signup/password',
     twoStepVerification: '/signup/verificationsetup',
     verification: '/verification',
@@ -17,11 +17,16 @@ export const FLOW_TYPES={
     signUp: "signup",
     signIn: "signin",
     sms: "sms",
-    voice: "voice"
+    voice: "voice",
+    email: "email"
 }
 
 export const PAGES ={
-    verification: 'Verification'
+    signup: 'SignUpEmail',
+    verification: 'Verification',
+    verificationSetUp: 'VerificationSetUp',
+    coreProfile: 'CreateCoreProfile',
+    password: 'Password'
 }
 
 export const FOOTERS = {

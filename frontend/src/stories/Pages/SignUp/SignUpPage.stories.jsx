@@ -1,13 +1,20 @@
-import SignUpPage from "../../../views/SignUp/SignUpPage";
-import { withRouter, reactRouterParameters } from 'storybook-addon-remix-react-router';
-import {NAVIGATION_LINKS} from "../../../utils/constants.jsx";
+import { withRouter } from 'storybook-addon-remix-react-router';
+import {AVAILABLE_LANGUAGES, FLOW_TYPES, NAVIGATION_LINKS, PAGES} from "../../../utils/constants.jsx";
 import {UserProvider} from "../../../components/Providers/UserContext.jsx";
+import Page from "../../../views/Page";
+import {storyParametersNew} from "../../Tests/utils/functions.jsx";
 
 
+const frontEndStoryParameters = {
+    isBackEndTest:false,
+    link:NAVIGATION_LINKS.signUp,
+    flow:FLOW_TYPES.signUp
+}
 
 export default {
     title: 'GC Sign In/Pages/Sign Up/Sign Up Page',
-    component: SignUpPage,
+    component: Page,
+    args: {page:PAGES.signup},
     decorators: [withRouter,
         (Story) => (
             <UserProvider>
@@ -20,26 +27,18 @@ export default {
 
 };
 
-export const English = {
-    parameters: {
-        reactRouter: reactRouterParameters({
-            location: {
-                pathParams: { language: 'en' },
-            },
-            routing: { path: '/:language'+NAVIGATION_LINKS.signUp }
-        }),
-    }
+export const English={
+    parameters: storyParametersNew({
+                           ...frontEndStoryParameters,
+                           language:AVAILABLE_LANGUAGES.en
+                       })
 };
 
 export const French = {
-    parameters: {
-        reactRouter: reactRouterParameters({
-            location: {
-                pathParams: { language: 'fr' },
-            },
-            routing: { path: '/:language'+NAVIGATION_LINKS.signUp }
-        }),
-    }
+    parameters: storyParametersNew({
+        ...frontEndStoryParameters,
+        language:AVAILABLE_LANGUAGES.fr
+    })
 
 
 };

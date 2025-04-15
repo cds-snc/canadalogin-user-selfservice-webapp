@@ -16,7 +16,7 @@ function PrivateRoute ({route, children}){
 
 function isValidRoute (page) {
     const {state} = useUser();
-    const {flow} = useParams();
+    const {flow, type} = useParams();
 
 
     if(flow===FLOW_TYPES.signIn)
@@ -27,27 +27,27 @@ function isValidRoute (page) {
                 return false;
         }
 
-    if(!isEmailValid(state.userData.email))
-        return false;
-
     switch(page){
-        case("signUpCoreProfile"):
+        case(PAGES.coreProfile):
             return (
                 state.userData.stepVerified &&
                 state.userData.stepVerificationSent &&
                 state.userData.passwordSubmitted &&
                 state.userData.emailValidated);
-        case("signUpVerifyTwoStep"):
+        case(PAGES.verification):
+            if(type===FLOW_TYPES.email)
+                return isEmailValid(state.userData.email);
+
             return (state.userData.stepVerificationSent &&
                     state.userData.passwordSubmitted &&
                     state.userData.emailValidated);
-        case(PAGES.verification):
+        case(PAGES.verificationSetUp):
             return (state.userData.passwordSubmitted &&
                     state.userData.emailValidated );
-        case("signUpPassword"):
+        case(PAGES.password):
             return (state.userData.emailValidated);
         default:
-            return true;
+            return false;
 
     }
 }

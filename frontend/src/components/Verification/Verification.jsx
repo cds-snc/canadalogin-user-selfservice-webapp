@@ -45,11 +45,15 @@ export default function Verification() {
 
     },[time]);
 
-    async function useNewNumber(){
+    async function useNewVerification(){
         setError({codeError:null, heading:null});
-        const userData = {...state.userData, phone:null, stepVerificationSent: false, trxnId:null};
-        await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
-        navigate("/" + language + NAVIGATION_LINKS.twoStepVerification);
+        if(type===FLOW_TYPES.email){
+            navigate("/" + language + NAVIGATION_LINKS.signUp);
+        } else{
+            const userData = {...state.userData, phone:null, stepVerificationSent: false, trxnId:null};
+            await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
+            navigate("/" + language + NAVIGATION_LINKS.twoStepVerification);
+        }
     }
 
     async function requestSameTypeCode (e){
@@ -74,8 +78,10 @@ export default function Verification() {
     async function requestNewCode(codeType, didTypeChange){
         setError({codeError:null, heading:null});
         try {
+            const number = state.userData.phone!==null?state.userData.phone:"";
             const response = await authService.sendTwoStepVerificationCode({
-                phoneNumber: state.userData.phone.replace(/\D/g,''),
+                phoneNumber: number.replace(/\D/g,''),
+                userName: state.userData.email,
                 verificationType: codeType
             });
 
@@ -120,10 +126,18 @@ export default function Verification() {
                 });
                 if(response.success){
                     if(flow===FLOW_TYPES.signUp) {
-                        const userData = {...state.userData, stepVerified: true};
-                        await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
-                        console.log("success...sign up", response)
-                        navigate("/" + language + NAVIGATION_LINKS.coreProfile);
+                        if(type===FLOW_TYPES.email)
+                        {
+                            const userData = {...state.userData, emailValidated: true};
+                            await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
+                            console.log(userData);
+                            navigate("/" + language + NAVIGATION_LINKS.password);
+                        }else                        {
+                            const userData = {...state.userData, stepVerified: true};
+                            await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
+                            console.log("success...sign up", response)
+                            navigate("/" + language + NAVIGATION_LINKS.coreProfile);
+                        }
                     }else if(flow===FLOW_TYPES.signIn){
                         const userData = {...state.userData, stepVerified: true};
                         await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
@@ -170,11 +184,11 @@ export default function Verification() {
             {
                 flow===FLOW_TYPES.signUp&&(
                     <GcdsContainer className="gcds-gap" >
-                        <GcdsStepper currentStep="3"
+                        <GcdsStepper currentStep={type===FLOW_TYPES.email?'1':'3'}
                                      totalSteps="4"
                                      tag="h1"
                                      lang={language}>
-                                    {pageContentJson['1']}
+                                    {type===FLOW_TYPES.email?pageContentJson['22']:pageContentJson['1']}
                         </GcdsStepper>
                     </GcdsContainer>
                 )
@@ -188,10 +202,11 @@ export default function Verification() {
             }
             <GcdsContainer>
                 <GcdsText>
-                    {type===FLOW_TYPES.voice?pageContentJson['3']:pageContentJson['2']}&nbsp;<strong>{state.userData.phone}</strong>
+                    {type===FLOW_TYPES.voice?pageContentJson['3']:type===FLOW_TYPES.sms?pageContentJson['2']:pageContentJson['23']}&nbsp;
+                    <strong>{type!==FLOW_TYPES.email?state.userData.phone:state.userData.email}</strong>
                 </GcdsText>
                 <GcdsText>
-                    {type===FLOW_TYPES.voice?pageContentJson['5']:pageContentJson['4']}
+                    {type===FLOW_TYPES.voice?pageContentJson['5']:type===FLOW_TYPES.sms?pageContentJson['4']:pageContentJson['24']}
                 </GcdsText>
                 <GcdsText>
                     {pageContentJson['6']} <strong>{pageContentJson['7']}</strong>
@@ -199,15 +214,19 @@ export default function Verification() {
                 {
                     flow===FLOW_TYPES.signIn&&(
                         <GcdsText>
-                            <GcdsLink href="#" onClick={useNewNumber}>
+                            <GcdsLink href="#" onClick={useNewVerification}>
                                 {pageContentJson['21']}
                             </GcdsLink>
                         </GcdsText>
                     )
                 }
-                <GcdsHeading tag='h2'>
-                    {pageContentJson['8']}
-                </GcdsHeading>
+                {
+                    type!==FLOW_TYPES.email&&(
+                        <GcdsHeading tag='h2'>
+                            {pageContentJson['8']}
+                        </GcdsHeading>
+                    )
+                }
                 <form id="form"  onSubmit={handleSubmit}>
                     {
                         state.testData!==undefined&&(<GcdsInput
@@ -241,21 +260,25 @@ export default function Verification() {
             {
                 flow===FLOW_TYPES.signUp&&(
                     <GcdsText>
-                        <GcdsLink href="#" onClick={useNewNumber}>
-                            {pageContentJson['13']}
+                        <GcdsLink href="#" onClick={useNewVerification}>
+                            {type===FLOW_TYPES.email?pageContentJson['25']:pageContentJson['13']}
                         </GcdsLink>
                     </GcdsText>
                 )
             }
-            <GcdsText>
-                {time<=0 && !isPending?(<GcdsLink href="#" onClick={requestNewTypeCode}>
-                        {type===FLOW_TYPES.voice?pageContentJson['12']:pageContentJson['11']}
-                    </GcdsLink>):""}
-            </GcdsText>
+            {
+                type!==FLOW_TYPES.email&&(
+                    <GcdsText>
+                        {time<=0 && !isPending?(<GcdsLink href="#" onClick={requestNewTypeCode}>
+                            {type===FLOW_TYPES.voice?pageContentJson['12']:pageContentJson['11']}
+                        </GcdsLink>):""}
+                    </GcdsText>
+                )
+            }
             <GcdsText>
                 {time>0 && !isPending?(<span>{pageContentJson['14']}<strong> {time} {pageContentJson['15']}</strong></span>)
                     :!isPending?(<GcdsLink href="#" onClick={requestSameTypeCode} >
-                        {pageContentJson['16']}
+                        {type!==FLOW_TYPES.email?pageContentJson['16']:pageContentJson['26']}
                     </GcdsLink>):""}
             </GcdsText>
             {flow===FLOW_TYPES.signUp&&(<AlreadyGc currentLang={language}/>)}

@@ -13,15 +13,8 @@ class AppInfo(BaseSettings):
 class IBMVerifyConfig(BaseSettings):
 
     IBM_VERIFY_TENANT_URL: str
-    IBM_VERIFY_CLIENT_ID: str
-    IBM_VERIFY_CLIENT_SECRET: str
-    IBM_VERIFY_REDIRECT_URI: str
     IBM_VERIFY_API_CLIENT_ID: str
     IBM_VERIFY_API_CLIENT_SECRET: str
-    IBM_VERIFY_API_CLIENT_ID: str
-    IBM_VERIFY_API_CLIENT_SECRET: str
-    # Password Source ID for IBM Verify, currently used in mfa_auth and password_auth. I think its for debugging purposes
-    PASSWORD_SOURCE_ID: str
 
     model_config = SettingsConfigDict(
         env_file=".env",

@@ -2,17 +2,18 @@ import {GcdsContainer, GcdsText, GcdsDetails, GcdsInput, GcdsNotice, GcdsStepper
 import {getPageContent, isPasswordValid} from '../../utils/functions';
 import {useEffect, useState, useTransition} from 'react';
 import {authService} from "../../services/authService.jsx";
-import {CONTEXT_ACTIONS, NAVIGATION_LINKS} from "../../utils/constants.jsx";
+import {CONTEXT_ACTIONS, NAVIGATION_LINKS, PAGES} from "../../utils/constants.jsx";
 import {useUser} from "../Providers/UserContext.jsx";
 import SubmitButton from "../Layout/SubmitButton.jsx";
-import {useNavigate} from "react-router";
+import {useNavigate, useParams} from "react-router";
 import AlreadyGc from "../Layout/AlreadyGc.jsx";
 
 
 
 
-export default function PasswordCreation({currentLang}) {
+export default function PasswordCreation() {
     const {state, dispatch} = useUser();
+    const {language} = useParams();
     const [checkedValue, setCheckedValue] = useState(true);
     const [passwordPolicy, setPasswordPolicy] = useState({min: 12, max:65})
     const [passwordStrength, setPasswordStrength] = useState(0);
@@ -20,8 +21,8 @@ export default function PasswordCreation({currentLang}) {
     const [errorJson, setError] = useState({heading: null, passwordError:null});
     const [isPending, startTransition] = useTransition();
     const navigate = useNavigate();
-    const pageContentJson = getPageContent(currentLang, "PasswordCreation");
-    const errorPageJson = getPageContent(currentLang, "Error");
+    const pageContentJson = getPageContent(language, PAGES.password);
+    const errorPageJson = getPageContent(language, "Error");
 
     useEffect( () => {
         loadMinMax();
@@ -67,8 +68,8 @@ export default function PasswordCreation({currentLang}) {
                     const userData = {...state.userData, passwordSubmitted: true};
                     console.log("userData ", userData);
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
-                    console.log("navigate ", "/" + currentLang + NAVIGATION_LINKS.twoStepVerification);
-                    navigate("/" + currentLang + NAVIGATION_LINKS.twoStepVerification);
+                    console.log("navigate ", "/" + language + NAVIGATION_LINKS.twoStepVerification);
+                    navigate("/" + language + NAVIGATION_LINKS.twoStepVerification);
                     console.log("navigating.....")
                 } else {
                     console.log("Error....", response);
@@ -106,7 +107,7 @@ export default function PasswordCreation({currentLang}) {
                 </GcdsNotice>
             </GcdsContainer>
             <GcdsText>
-                <GcdsStepper currentStep="2" totalSteps="4" tag="h1" lang={currentLang} marginTop="150" marginBottom="0">
+                <GcdsStepper currentStep="2" totalSteps="4" tag="h1" lang={language} marginTop="150" marginBottom="0">
                     {pageContentJson['3']}
                 </GcdsStepper>
             </GcdsText>
@@ -151,10 +152,10 @@ export default function PasswordCreation({currentLang}) {
                     <GcdsText>
                         <span>{pageContentJson['12']}</span> <strong>{passwordStrength}</strong> / {passwordPolicy.min} <span>{pageContentJson['13']}</span>
                     </GcdsText>
-                    <SubmitButton currentLang={currentLang} disabled={isPending} />
+                    <SubmitButton currentLang={language} disabled={isPending} />
                 </form>
             </GcdsContainer>
-            <AlreadyGc currentLang={currentLang}/>
+            <AlreadyGc currentLang={language}/>
         </GcdsContainer>
     )
 }
