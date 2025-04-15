@@ -60,6 +60,7 @@ jobs:
         - name: "Report Coverage"
           uses: davelosert/vitest-coverage-report-action@v2
           with:
+            working-directory: '${{ matrix.module }}/coverage'
             json-summary-compare-path: '${{ matrix.module }}/coverage/coverage-compare-summary.json'
             json-summary-path: '${{ matrix.module }}/coverage/coverage-summary-frontend.json'
             json-final-path: '${{ matrix.module }}/coverage/coverage-final-frontend.json'
