@@ -71,7 +71,7 @@ jobs:
         - name: "Report Coverage"
           uses: davelosert/vitest-coverage-report-action@v2
           with:
-            vite-config-path: "./frontend/vitest.config.js"
+            vite-config-path: "./vitest.config.js"
             working-directory: ./frontend
             # json-summary-compare-path: 'coverage-compare-summary.json'
             # json-summary-path: 'coverage-summary-frontend.json'
