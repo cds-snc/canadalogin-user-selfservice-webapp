@@ -28,7 +28,7 @@ async def handle_otp_verification(data: OtpVerification, global_http_client: Asy
             return generate_error_response(400, "Unknown error")
 
         if otp_verification_response.status_code != 204:
-            logger.error(f"verify {data.otp_type} request Error: {otp_verification_response.body}")
+            logger.error(f"verify {data.otp_type} request Error: {otp_verification_response.text}")
             return generate_error_response(otp_verification_response.status_code, "Unknown error")
 
         if otp_verification_response.status_code == 204 and data.flow == 'transient' and data.otp_type != 'email':
@@ -41,12 +41,12 @@ async def handle_otp_verification(data: OtpVerification, global_http_client: Asy
 
 
     except HTTPException as he:
-        logger.error(f"HTTP Exception in signup: {str(he)}")
+        logger.error(f"HTTP Exception in {data.otp_type} OTP verification: {str(he)}")
         raise he
     except Exception as e:
-        logger.error(f"Signup error: {str(e)}", exc_info=True)
+        logger.error(f"{data.otp_type} verification error: {str(e)}", exc_info=True)
         raise HTTPException(
-            status_code=400, detail=f"Signup error: {str(e)}")
+            status_code=400, detail=f"{data.otp_type} verification error: {str(e)}")
 
 
 async def verify_otp(data: OtpVerification):

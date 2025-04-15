@@ -54,7 +54,7 @@ async def handle_enrolling_user_into_2fa(two_factor_enrollment_data: TwoFactorEn
     except Exception as e:
         logger.error(f"{otp_type} 2FA enrollment error: {str(e)}", exc_info=True)
         raise HTTPException(
-            status_code=400, detail=f"2FA enrollment error: {str(e)}")
+            status_code=400, detail=f"{otp_type} verification 2FA enrollment error: {str(e)}")
 
 
 async def enroll_user(two_factor_enrollment_data: TwoFactorEnrollmentUserData, otp_type: str):
