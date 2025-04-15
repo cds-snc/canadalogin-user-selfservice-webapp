@@ -42,8 +42,8 @@ jobs:
       - name: "Upload Coverage"
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.module }}-coverage
-          path: ${{ matrix.module }}/coverage
+          name: ${{ matrix.module }}
+          path: ${{ matrix.module }}
   report-coverage:
       needs: code-coverage
       runs-on: ubuntu-latest
@@ -55,12 +55,12 @@ jobs:
         - name: "Download Coverage Artifacts"
           uses: actions/download-artifact@v4
           with:
-            name: ${{ matrix.module }}-coverage
-            path: ${{ matrix.module }}/coverage
+            name: ${{ matrix.module }}
+            path: ${{ matrix.module }}
         - name: "Report Coverage"
           uses: davelosert/vitest-coverage-report-action@v2
           with:
-            working-directory: '${{ matrix.module }}/coverage'
-            json-summary-compare-path: '${{ matrix.module }}/coverage/coverage-compare-summary.json'
-            json-summary-path: '${{ matrix.module }}/coverage/coverage-summary-frontend.json'
-            json-final-path: '${{ matrix.module }}/coverage/coverage-final-frontend.json'
+            working-directory: '${{ matrix.module }}'
+            json-summary-compare-path: 'coverage-compare-summary.json'
+            json-summary-path: 'coverage-summary-frontend.json'
+            json-final-path: 'coverage-final-frontend.json'
