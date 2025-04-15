@@ -58,6 +58,9 @@ jobs:
           with:
             name: frontend-coverage-report
             path: coverage
+        
+        - name: Checkout repository
+          uses: actions/checkout@v4
 
         - name: "Report Coverage"
           uses: davelosert/vitest-coverage-report-action@v2
