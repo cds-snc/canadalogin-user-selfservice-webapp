@@ -9,7 +9,7 @@
     "7": "You can use the same username and password to access any program or service that uses GC Sign in.",
     "8": "Email address"
   },
-  "PasswordCreation": {
+  "Password": {
     "1": "Your email was successfully verified",
     "2": "Step 2 of 4",
     "3": "Create a password",
@@ -54,20 +54,6 @@
     "11": "Enter a last name to continue. If you have a single name, enter it in the last name field.",
     "12": "and a maximum of",
     "13": "characters."
-  },
-  "EmailVerification":{
-    "1": "Check your email",
-    "2": "We have sent an email with a 6-digit code to :",
-    "3": "Your email might take a few minutes to arrive. If you do not get an email, check your spam folder.",
-    "4": "Your code will expire in",
-    "5": "10 minutes.",
-    "6": "6-digit code",
-    "7": "Problems with the code?",
-    "8": "Use a different email",
-    "9": "You can request a new code in",
-    "10": "seconds",
-    "11": "Send the code again",
-    "12": "We have sent you a new code"
   },
   "RegisterVerification":{
     "1": "Protect your account with 2-step verification",
@@ -122,7 +108,12 @@
     "18": "Complete 2-step verification",
     "19": "to continue to your",
     "20": "account",
-    "21": "Try another way"
+    "21": "Try another way",
+    "22": "Check your email",
+    "23": "We have sent an email with a 6-digit code to :",
+    "24": "Your email might take a few minutes to arrive. If you do not get an email, check your spam folder.",
+    "25": "Use a different email",
+    "26": "Send the code again"
   },
   "CreateCoreProfile": {
     "1": "Your GC Sign in account has been created",

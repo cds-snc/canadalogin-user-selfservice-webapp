@@ -10,7 +10,7 @@
     "8": "Adresse courriel",
     "9": "Continuer"
   },
-  "PasswordCreation": {
+  "Password": {
     "1": "Votre adresse courriel a bien été vérifiée",
     "3": "Créer un mot de passe",
     "4": "Votre mot de passe doit être une phrase ou une série de mots que personne ne peut reconnaître à part vous. Il doit être composé",
@@ -54,20 +54,6 @@
     "11": "Veuillez entrer un nom de famille pour continuer. Si vous n’avez qu’un seul nom, entrez-le dans le champ destiné au nom de famille.",
     "12": "and a maximum of",
     "13": "caractères."
-  },
-  "EmailVerification":{
-    "1": "Vérifiez votre boîte de réception courrie",
-    "2": "Nous avons envoyé un courriel contenant un code à 6 chiffres à l’adresse :",
-    "3": "Le courriel pourrait prendre quelques minutes à arriver. Si vous ne voyez pas le courriel, vérifiez s’il se trouve dans votre dossier de pourriels.",
-    "4": "Votre code expirera dans",
-    "5": "10 minutes.",
-    "6": "Code à 6 chiffres",
-    "7": "Des problèmes avec votre code?",
-    "8": "Utiliser une autre adresse courriel",
-    "9": "Vous pourrez demander un nouveau code dans",
-    "10": "secondes",
-    "11": "Demander un nouveau code",
-    "12": "Nous vous avons envoyé un nouveau code"
   },
   "RegisterVerification":{
     "1": "Protégez votre compte grâce à la vérification en 2 étapes",
@@ -118,7 +104,12 @@
     "18": "Connectez-vous avec Connextion GC",
     "19": "pour accéder à vôtre",
     "20": "compte",
-    "21": "Try another way"
+    "21": "Try another way",
+    "22": "Vérifiez votre boîte de réception courrie",
+    "23": "Nous avons envoyé un courriel contenant un code à 6 chiffres à l’adresse :",
+    "24": "Le courriel pourrait prendre quelques minutes à arriver. Si vous ne voyez pas le courriel, vérifiez s’il se trouve dans votre dossier de pourriels.",
+    "25": "Utiliser une autre adresse courriel",
+    "26": "Nous vous avons envoyé un nouveau code"
   },
   "CreateCoreProfile": {
     "1": "Votre compte de connexion GC a bien été créé.",

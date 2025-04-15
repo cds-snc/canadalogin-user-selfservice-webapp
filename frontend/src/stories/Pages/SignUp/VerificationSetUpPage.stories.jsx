@@ -1,13 +1,14 @@
 import { withRouter, reactRouterParameters } from 'storybook-addon-remix-react-router';
-import {NAVIGATION_LINKS} from "../../../utils/constants.jsx";
+import {NAVIGATION_LINKS, PAGES} from "../../../utils/constants.jsx";
 import {UserProvider} from "../../../components/Providers/UserContext.jsx";
-import VerificationSetUpPage from "../../../views/SignUp/VerificationSetUpPage.jsx";
+import Page from "../../../views/Page.js";
 
 
 
 export default {
     title: 'GC Sign In/Pages/Sign Up/Verification Set Up Page',
-    component: VerificationSetUpPage,
+    component: Page,
+    args: {page:PAGES.verificationSetUp},
     decorators: [withRouter,
         (Story) => (
             <UserProvider>
