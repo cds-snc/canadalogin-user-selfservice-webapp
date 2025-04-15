@@ -39,34 +39,12 @@ jobs:
         working-directory: ${{ matrix.module }}
         run: npm run test
 
-      - name: "Upload Coverage"
-        uses: actions/upload-artifact@v4
+      - name: 'Report Coverage'
+        # Set if: always() to also generate the report if tests are failing
+        # Only works if you set `reportOnFailure: true` in your vite config as specified above
+        if: always() 
+        uses:  davelosert/vitest-coverage-report-action@v2
         with:
-          name: frontend-coverage-report
-          path: ${{ matrix.module }}/coverage
+          working-directory: ${{ matrix.module }}
 
-  report-coverage:
-      needs: code-coverage
-      runs-on: ubuntu-latest
-      strategy:
-        matrix:
-          include:
-            - module: frontend
-      steps:
-        - name: "Download Coverage Artifacts"
-          uses: actions/download-artifact@v4
-          with:
-            name: frontend-coverage-report
-            path: coverage
-        
-        - name: Checkout repository
-          uses: actions/checkout@v4
-
-        - name: "Report Coverage"
-          uses: davelosert/vitest-coverage-report-action@v2
-          with:
-            vite-config-path: "./frontend/vitest.config.js"
-          #   working-directory: ./coverage
-            # json-summary-compare-path: 'coverage-compare-summary.json'
-            # json-summary-path: 'coverage-summary-frontend.json'
-            # json-final-path: 'coverage-final-frontend.json'
+    
