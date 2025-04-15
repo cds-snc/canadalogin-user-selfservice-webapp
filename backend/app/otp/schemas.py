@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field, EmailStr, ConfigDict
 from app.utils.schemas import ResponseModel
 
 class PhoneNumber(BaseModel):
-    phoneNumber: int
+    phoneNumber: str
 
 class UserName(BaseModel):
     userName: EmailStr
@@ -41,7 +41,11 @@ class ViaPhoneOtpResponse(BaseModel):
 class OtpVerification(BaseModel):
     otp: str
     trxnId: str
-
+    otp_type: str
+    flow: str
+    userId: str
+    trxnId: str
+    phoneNumber: str
 
 class AuthenticatedUserData(BaseModel):
     id: str

@@ -1,5 +1,8 @@
+from enum import Enum
 from typing import List, Any, Optional
 from pydantic import BaseModel, Field, EmailStr
+
+from app.otp.schemas import PhoneNumber
 from app.utils.schemas import ResponseModel
 
 
@@ -46,3 +49,23 @@ class AuthenticatedUserData(BaseModel):
 
 class AuthenticatedUserResponse(ResponseModel):
     data: AuthenticatedUserData
+
+
+# 2FA enrollment
+class TwoFactorEnrollmentUserData(BaseModel):
+    userId: str
+    phoneNumber: str
+    otp_type: str
+
+class VerifyTwofactorEnrollmentResponse(BaseModel):
+    id: str
+    userId: str
+    type: str
+    created: str
+    updated: str
+    enabled: bool
+    validated: bool
+    attributes: dict[str,str]
+
+class VerifyTwofactorResponse(ResponseModel):
+    data: VerifyTwofactorEnrollmentResponse
