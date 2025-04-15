@@ -5,7 +5,8 @@ export const NAVIGATION_LINKS = {
     password: '/signup/password',
     twoStepVerification: '/signup/verificationsetup',
     verification: '/verification',
-    coreProfile: '/signup/profile'
+    coreProfile: '/signup/profile',
+    home: '/'
 };
 export const CONTEXT_ACTIONS = {
     signUp: 'SIGN_UP',

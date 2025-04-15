@@ -23,6 +23,8 @@ function isValidRoute (page) {
         switch (page) {
             case(PAGES.verification):
                 return true;
+            case(PAGES.password):
+                return true;
             default:
                 return false;
         }
