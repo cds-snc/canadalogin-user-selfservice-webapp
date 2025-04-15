@@ -31,7 +31,7 @@ async def handle_otp_verification(data: OtpVerification, global_http_client: Asy
             logger.error(f"verify {data.otp_type} request Error: {otp_verification_response.body}")
             return generate_error_response(otp_verification_response.status_code, "Unknown error")
 
-        if otp_verification_response.status_code == 204 and data.flow == 'authenticate' and data.otp_type != 'email':
+        if otp_verification_response.status_code == 204 and data.flow == 'transient' and data.otp_type != 'email':
             enrollment_data = TwoFactorEnrollmentUserData(userId=data.userId, phoneNumber=data.phoneNumber, otp_type=data.otp_type)
             await handle_enrolling_user_into_2fa(enrollment_data, data.otp_type, http_client)
 

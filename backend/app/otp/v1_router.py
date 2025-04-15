@@ -75,8 +75,8 @@ async def send_voice_otp(data: PhoneNumber, request: Request):
              status_code=status.HTTP_200_OK,
              tags=["OTP"],
              summary="Verifies an OTP",
-             description="Verifies any otp type.<br>If parameter 'flow' is set to 'authenticate' - "
-                         +"the user will be enrolled in sms or voice 2FA. Email 2FA is not possible.")
+             description="Verifies any otp type.<br>If parameter 'flow' is set to 'transient' - "
+                         + "the user will be enrolled in sms or voice 2FA. Email 2FA is not possible.")
 async def verify_otp(data: OtpVerification, request: Request):
     http_client = request.app.state.request_client
     return await handle_otp_verification(data, http_client)
