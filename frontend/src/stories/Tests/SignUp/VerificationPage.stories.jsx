@@ -62,17 +62,17 @@ const backEndStoryParameters = {
 }
 const smsStoryParameters = {
     ...backEndStoryParameters,
-    endpoint:SUBMIT_END_POINTS.twoStepVerification,
+    endpoint:SUBMIT_END_POINTS.otpVerify,
     type:FLOW_TYPES.sms,
 }
 const voiceStoryParameters = {
     ...backEndStoryParameters,
-    endpoint:SUBMIT_END_POINTS.twoStepVerificationVoice,
+    endpoint:SUBMIT_END_POINTS.otpVerify,
     type:FLOW_TYPES.voice,
 }
 const emailStoryParameters = {
     ...backEndStoryParameters,
-    endpoint:SUBMIT_END_POINTS.emailVerification,
+    endpoint:SUBMIT_END_POINTS.otpVerify,
     type:FLOW_TYPES.email,
 }
 const smsNewCodeStoryParameters = {

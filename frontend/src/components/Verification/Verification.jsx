@@ -120,9 +120,11 @@ export default function Verification() {
             try {
                 const response = await authService.twoStepVerification({
                     otp: formCode,
-                    verificationType: type,
-                    flow: flow,
-                    trxnId: state.userData.trxnId
+                    otp_type: type,
+                    flow: flow===FLOW_TYPES.signUp?'transient':'authenticate',
+                    trxnId: state.userData.trxnId,
+                    phoneNumber: type!==FLOW_TYPES.email?state.userData.phone.replace(/\D/g,''):'',
+                    id: type!==FLOW_TYPES.email?state.userData.id:''
                 });
                 if(response.success){
                     if(flow===FLOW_TYPES.signUp) {

@@ -13,7 +13,8 @@ const initialState = {
         passwordSubmitted:false,
         phone: null,
         stepVerificationSent: false,
-        stepVerified:false
+        stepVerified:false,
+        id: null
     }
 }
 

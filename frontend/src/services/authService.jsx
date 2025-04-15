@@ -7,10 +7,6 @@ export const authService = {
         const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.sendOtpCode}`, userData);
         return response.data;
     },
-    emailVerification: async (userData) => {
-        const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.emailVerification}`, userData);
-        return response.data;
-    },
     requestPasswordPolicy:async () => {
         const response = await axios.get(`${config.apiUrl}${SUBMIT_END_POINTS.requestPasswordPolicy}`);
         return response.data;
@@ -33,14 +29,8 @@ export const authService = {
         return response.data;
     },
     twoStepVerification: async (userData) => {
-        let endpoint = SUBMIT_END_POINTS.twoStepVerification;
 
-        if(userData.verificationType==='voice')
-            endpoint = SUBMIT_END_POINTS.twoStepVerificationVoice;
-        else if(userData.verificationType==='email')
-            endpoint = SUBMIT_END_POINTS.emailVerification;
-
-        const response =  await axios.post(`${config.apiUrl}${endpoint}`, userData);
+        const response =  await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.otpVerify}`, userData);
 
         return response.data;
     },

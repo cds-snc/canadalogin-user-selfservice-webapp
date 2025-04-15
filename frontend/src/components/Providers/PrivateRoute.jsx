@@ -33,6 +33,7 @@ function isValidRoute (page) {
                 state.userData.stepVerified &&
                 state.userData.stepVerificationSent &&
                 state.userData.passwordSubmitted &&
+                state.userData.id &&
                 state.userData.emailValidated);
         case(PAGES.verification):
             if(type===FLOW_TYPES.email)
@@ -40,9 +41,11 @@ function isValidRoute (page) {
 
             return (state.userData.stepVerificationSent &&
                     state.userData.passwordSubmitted &&
+                    state.userData.id &&
                     state.userData.emailValidated);
         case(PAGES.verificationSetUp):
             return (state.userData.passwordSubmitted &&
+                    state.userData.id &&
                     state.userData.emailValidated );
         case(PAGES.password):
             return (state.userData.emailValidated);
