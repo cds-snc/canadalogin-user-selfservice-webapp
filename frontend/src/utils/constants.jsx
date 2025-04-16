@@ -2,7 +2,7 @@ export const AVAILABLE_LANGUAGES = {en:'en', fr:'fr'};
 export const NAVIGATION_LINKS = {
     signUp: '/signup',
     verifyEmail: '/signup/verification/email',
-    password: '/signup/password',
+    password: '/password',
     twoStepVerification: '/signup/verificationsetup',
     verification: '/verification',
     coreProfile: '/signup/profile',

@@ -28,7 +28,7 @@ import AlreadyGc from "../Layout/AlreadyGc.jsx";
 
 
 
-export default function PasswordCreation() {
+export default function Password() {
     const {state, dispatch} = useUser();
     const {language, flow} = useParams();
     const [checkedValue, setCheckedValue] = useState(true);
@@ -52,8 +52,9 @@ export default function PasswordCreation() {
             const response = await authService.requestPasswordPolicy();
             if(response.success)
                 policy = {min: response.data.pwdMinLength, max: response.data.pwdMaxLength};
-            else
+            else {
                 console.log(response.message);
+            }
         }catch(err){
             console.log(err);
         }

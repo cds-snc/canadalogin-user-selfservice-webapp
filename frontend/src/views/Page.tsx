@@ -3,7 +3,7 @@ import Header from '../components/Layout/Header';
 import Footer from '../components/Layout/Footer';
 import {GcdsContainer} from "@cdssnc/gcds-components-react";
 import Verification from "../components/Verification/Verification.jsx";
-import PasswordCreation from "../components/Password/PasswordCreation.jsx";
+import Password from "../components/Password/Password.jsx";
 import SignUpEmail from "../components/SignUp/SignUpEmail.jsx";
 import CreateCoreProfile from "../components/SignUp/Profile/CreateCoreProfile.jsx";
 import VerificationSetUp from "../components/SignUp/TwoStepVerification/VerificationSetUp"
@@ -19,7 +19,7 @@ function PageContents({page}:{page:string}) {
             );
         case PAGES.password:
             return (
-                <PasswordCreation />
+                <Password />
             );
         case PAGES.verification:
             return (
