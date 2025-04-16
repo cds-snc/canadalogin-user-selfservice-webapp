@@ -16,7 +16,6 @@ export const CONTEXT_ACTIONS = {
 
 export const FLOW_TYPES={
     signUp: "signup",
-
     signIn: "signin",
     sms: "sms",
     voice: "voice",
@@ -26,7 +25,10 @@ export const FLOW_TYPES={
 export const PAGES ={
     signup: 'SignUpEmail',
     verification: 'Verification',
-    createProfile: 'CreateProfile'
+    createProfile: 'CreateProfilePage',
+    verificationSetUp: 'VerificationSetUp',
+    coreProfile: 'CreateCoreProfile',
+    password: 'Password'
 }
 
 export const FOOTERS = {

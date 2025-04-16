@@ -1,10 +1,10 @@
 import {withRouter} from 'storybook-addon-remix-react-router';
-import {AVAILABLE_LANGUAGES, NAVIGATION_LINKS, SUBMIT_END_POINTS,} from "../../../utils/constants.jsx";
+import {AVAILABLE_LANGUAGES, NAVIGATION_LINKS, PAGES, SUBMIT_END_POINTS,} from "../../../utils/constants.jsx";
 import {UserProvider} from "../../../components/Providers/UserContext.jsx";
 import {getPageContent} from "../../../utils/functions.jsx";
 import {ACTION_TYPES, TEST_TYPES, TestDataUserProvider} from "../utils/constants.jsx";
 import {storyParameters, testCase} from "../utils/functions.jsx";
-import CreateCoreProfilePage from "../../../views/SignUp/CreateCoreProfilePage.jsx";
+import Page from "../../../views/Page.js";
 
 const engErrorPageJson = getPageContent('en', "Error");
 const frErrorPageJson = getPageContent('fr', "Error");
@@ -36,7 +36,7 @@ const successResponse = {
 export default {
 
     title: 'GC Sign In/Tests/Sign Up/Create Core Profile Page',
-    component: CreateCoreProfilePage,
+    component: Page,
     decorators: [withRouter],
     // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs
     tags: ['autodocs'],
@@ -47,7 +47,7 @@ const BadTC1TemplateBE = (args) =>   {
     TestDataUserProvider.testData.firstName = "Test";
     TestDataUserProvider.testData.lastName = "";
     return(
-        <UserProvider initial={TestDataUserProvider}><CreateCoreProfilePage /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
+        <UserProvider initial={TestDataUserProvider}><Page page={PAGES.coreProfile} /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
     )
 }
 
@@ -56,7 +56,7 @@ const BadTC2TemplateBE = (args) =>   {
     TestDataUserProvider.testData.lastName = "M";
 
     return(
-        <UserProvider initial={TestDataUserProvider}><CreateCoreProfilePage /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
+        <UserProvider initial={TestDataUserProvider}><Page page={PAGES.coreProfile} /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
     )
 }
 const BadTC3TemplateBE = (args) =>   {
@@ -64,14 +64,14 @@ const BadTC3TemplateBE = (args) =>   {
     TestDataUserProvider.testData.lastName = "Test!";
 
     return(
-        <UserProvider initial={TestDataUserProvider}><CreateCoreProfilePage /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
+        <UserProvider initial={TestDataUserProvider}><Page page={PAGES.coreProfile} /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
     )
 }
 const BadTC4TemplateBE = (args) =>   {
     TestDataUserProvider.testData.lastName = "Test";
     TestDataUserProvider.testData.firstName = "Test@";
     return(
-        <UserProvider initial={TestDataUserProvider}><CreateCoreProfilePage /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
+        <UserProvider initial={TestDataUserProvider}><Page page={PAGES.coreProfile} /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
     )
 }
 
@@ -79,7 +79,7 @@ const TemplateBE = (args) =>   {
     TestDataUserProvider.testData.lastName = "Test";
     TestDataUserProvider.testData.firstName = "Test";
     return(
-        <UserProvider initial={TestDataUserProvider}><CreateCoreProfilePage /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
+        <UserProvider initial={TestDataUserProvider}><Page page={PAGES.coreProfile} /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
     )
 }
 
@@ -87,7 +87,7 @@ const FrTemplateBE = (args) =>   {
     TestDataUserProvider.testData.lastName = "Test";
     TestDataUserProvider.testData.firstName = "Ç'âêîôû-àèù ëïü";
     return(
-        <UserProvider initial={TestDataUserProvider}><CreateCoreProfilePage /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
+        <UserProvider initial={TestDataUserProvider}><Page page={PAGES.coreProfile} /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
     )
 }
 
