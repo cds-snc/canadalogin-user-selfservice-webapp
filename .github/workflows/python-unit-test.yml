@@ -7,12 +7,12 @@ on:
   push:
     branches: ["*"]
     paths:
-      - "backend/*"
+      - "backend/**"
       - ".github/workflows/python-unit-test.yml"
   pull_request:
     branches: ["*"]
     paths:
-      - "backend/*"
+      - "backend/**"
       - ".github/workflows/python-unit-test.yml"
 
 permissions:
