@@ -6,7 +6,7 @@ export const NAVIGATION_LINKS = {
     twoStepVerification: '/signup/verificationsetup',
     verification: '/verification',
     coreProfile: '/signup/profile',
-    createProfile: '/signup/createprofile'
+    createProfile: '/createprofile'
 };
 export const CONTEXT_ACTIONS = {
     signUp: 'SIGN_UP',
@@ -26,6 +26,7 @@ export const FLOW_TYPES={
 export const PAGES ={
     signup: 'SignUpEmail',
     verification: 'Verification',
+    createProfile: 'CreateProfile'
 }
 
 export const FOOTERS = {

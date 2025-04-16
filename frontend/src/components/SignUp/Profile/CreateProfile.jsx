@@ -11,6 +11,8 @@ import AlreadyGc from "../../Layout/AlreadyGc.jsx";
 
 export default function CreateProfile({ currentLang }) {
     const pageContentJson = getPageContent(currentLang, "CreateProfile");
+    const pageContentJsonHome = getPageContent(currentLang, "Home");
+
     return (
         <GcdsContainer>
             <GcdsHeading tag='h1'>
@@ -18,9 +20,15 @@ export default function CreateProfile({ currentLang }) {
                 <GcdsText>{pageContentJson['2']}
                 </GcdsText>
             </GcdsHeading>
-            <GcdsDetails detailsTitle={pageContentJson['3']}>
+            <GcdsDetails detailsTitle={pageContentJsonHome['4']}>
                 <GcdsText>
-                    {pageContentJson['4']}
+                    {pageContentJsonHome['5']}
+                </GcdsText>
+                <GcdsText>
+                    {pageContentJsonHome['6']}
+                </GcdsText>
+                <GcdsText>
+                    {pageContentJsonHome['7']}
                 </GcdsText>
             </GcdsDetails>
             <GcdsHeading tag='h2'>
