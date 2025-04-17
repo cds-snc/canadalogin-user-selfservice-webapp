@@ -367,6 +367,8 @@ describe('Routing Test', () => {
         buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.coreProfile, FLOW_TYPES.signIn, null, langHref.fr + NAVIGATION_LINKS.coreProfile);
     });
 
+    test("Check create profile page route with en language defined", () => {
+
         vi.mock("../components/Providers/PrivateRoute.jsx", () => {
             return {
                 default: (props:any) => props.children,
