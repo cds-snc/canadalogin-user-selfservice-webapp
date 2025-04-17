@@ -32,7 +32,7 @@ const policy = {
 }
 
 export default {
-    title: 'GC Sign In/Pages/Sign Up/Password Page',
+    title: 'GC Sign In/Pages/Sign In/Password Page',
     component: Page,
     args: {page:PAGES.password},
     decorators: [withRouter,
@@ -51,7 +51,7 @@ export const English ={
     parameters: {
         reactRouter: reactRouterParameters({
             location: {
-                pathParams: { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
+                pathParams: { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn },
             },
             routing: { path: '/:language'+'/:flow'+NAVIGATION_LINKS.password }
         }),
@@ -69,7 +69,7 @@ export const French = {
     parameters: {
         reactRouter: reactRouterParameters({
             location: {
-                pathParams: { language: AVAILABLE_LANGUAGES.fr, flow: FLOW_TYPES.signUp },
+                pathParams: { language: AVAILABLE_LANGUAGES.fr, flow: FLOW_TYPES.signIn },
             },
             routing: { path: '/:language'+'/:flow'+NAVIGATION_LINKS.password }
         }),
