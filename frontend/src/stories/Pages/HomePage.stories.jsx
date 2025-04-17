@@ -1,21 +1,18 @@
 import HomePage from "../../views/Home/HomePage.jsx";
-import { withRouter, reactRouterParameters } from 'storybook-addon-remix-react-router';
+import { reactRouterParameters } from 'storybook-addon-remix-react-router';
 import {UserProvider} from "../../components/Providers/UserContext.jsx";
 
 
 export default {
     title: 'GC Sign In/Pages/Landing Page',
     component: HomePage,
-    decorators: [withRouter,
+    decorators: [
         (Story) => (
             <UserProvider>
                 <Story />
             </UserProvider>
         )
-    ],
-    // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs
-    tags: ['autodocs'],
-
+    ]
 };
 
 export const English = {

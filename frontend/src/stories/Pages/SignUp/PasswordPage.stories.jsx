@@ -1,21 +1,18 @@
-import { withRouter, reactRouterParameters } from 'storybook-addon-remix-react-router';
+
 import {
-    AVAILABLE_LANGUAGES, FLOW_TYPES,
+    AVAILABLE_LANGUAGES,
+    FLOW_TYPES,
     NAVIGATION_LINKS,
-    PAGES,
-    SUBMIT_END_POINTS
+    PAGES, SUBMIT_END_POINTS
 } from "../../../utils/constants.jsx";
-import {UserProvider} from "../../../components/Providers/UserContext.jsx";
-import {http, HttpResponse} from "msw";
-import config from "../../../config.jsx";
-import Page from "../../../views/Page.js";
+import {buildTestCase, Template} from "../../Tests/utils/functions.jsx";
 
 const policy = {
 
     "success": true,
     "message": "Password policy retrieved successfully",
     "data": {
-    "passwordMinAlphaChars": 0,
+        "passwordMinAlphaChars": 0,
         "passwordMinOtherChars": 1,
         "pwdMinAge": 0,
         "pwdExpireWarning": 0,
@@ -31,56 +28,18 @@ const policy = {
 
 }
 
+
 export default {
-    title: 'GC Sign In/Pages/Sign Up/Password Page',
-    component: Page,
-    args: {page:PAGES.password},
-    decorators: [withRouter,
-        (Story) => (
-            <UserProvider>
-                <Story />
-            </UserProvider>
-        )
-    ],
-    // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs
-    tags: ['autodocs'],
-
-};
-
-export const English ={
-    parameters: {
-        reactRouter: reactRouterParameters({
-            location: {
-                pathParams: { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
-            },
-            routing: { path: '/:language'+'/:flow'+NAVIGATION_LINKS.password }
-        }),
-        msw: {
-            handlers: [
-                http.get(`${config.apiUrl}${SUBMIT_END_POINTS.requestPasswordPolicy}`, async () => {
-                    return HttpResponse.json(policy);
-                }),
-            ],
-        }
+    title: 'GC Sign In/Pages/Sign In/Password Page',
+    args:{
+        page:PAGES.password
     }
 };
 
-export const French = {
-    parameters: {
-        reactRouter: reactRouterParameters({
-            location: {
-                pathParams: { language: AVAILABLE_LANGUAGES.fr, flow: FLOW_TYPES.signUp },
-            },
-            routing: { path: '/:language'+'/:flow'+NAVIGATION_LINKS.password }
-        }),
-        msw: {
-            handlers: [
-                http.get(`${config.apiUrl}${SUBMIT_END_POINTS.requestPasswordPolicy}`, async () => {
-                    return HttpResponse.json(policy);
-                }),
-            ],
-        }
-    }
+const mswResponse = {type:"get", endpoint: SUBMIT_END_POINTS.requestPasswordPolicy, response:policy }
 
-};
+export const English  = Template.bind({});
+English.parameters = buildTestCase.parameters(NAVIGATION_LINKS.password, { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp }, mswResponse);
 
+export const French  = Template.bind({});
+French.parameters = buildTestCase.parameters(NAVIGATION_LINKS.password, { language: AVAILABLE_LANGUAGES.fr, flow: FLOW_TYPES.signUp, type:FLOW_TYPES.email }, mswResponse);

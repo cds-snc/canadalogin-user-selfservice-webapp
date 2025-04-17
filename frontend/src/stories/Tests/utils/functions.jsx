@@ -3,6 +3,9 @@ import {reactRouterParameters} from "storybook-addon-remix-react-router";
 import {http, HttpResponse} from "msw";
 import config from "../../../config.jsx";
 import {ACTION_TYPES, TEST_TYPES} from "./constants.jsx";
+import Page from "../../../views/Page.js";
+import {UserProvider} from "../../../components/Providers/UserContext.jsx";
+
 
 const stepErrorMessage = 'Verify error message is on Page.';
 const stepSuccessMessage = 'Verify success message is on Page.';
@@ -209,3 +212,59 @@ const testItem = {
        };
     }
 }
+
+export const buildTestCase ={
+    parameters: (navigationLink, pathParams, msw)=>{
+
+        const routingPath = buildPath(pathParams, navigationLink);
+
+        if(msw===null)
+            return {
+                reactRouter: reactRouterParameters({
+                    location: {
+                        pathParams: pathParams,
+                    },
+                    routing: routingPath
+                })
+            };
+
+        let mswResponse = null;
+
+        if(msw.type==="get")
+            mswResponse = {
+                msw: {
+                    handlers: [
+                        http.get(`${config.apiUrl}${msw.endpoint}`, async () => {
+                            return HttpResponse.json(msw.response);
+                        }),
+                    ],
+                }
+            }
+
+
+        return {
+            reactRouter: reactRouterParameters({
+                location: {
+                    pathParams: pathParams,
+                },
+                routing: routingPath
+            }),
+            ...mswResponse
+        };
+    },
+
+
+}
+function buildPath(pathParams, navigationLink){
+
+    if(pathParams.type !== undefined)
+        return {path: '/:language' + '/:flow' + navigationLink+'/:type'}
+
+    return {path: '/:language' + '/:flow' + navigationLink}
+
+}
+
+export const Template = (args) =>   {
+    return(<UserProvider><Page page={args.page}/></UserProvider>);
+}
+

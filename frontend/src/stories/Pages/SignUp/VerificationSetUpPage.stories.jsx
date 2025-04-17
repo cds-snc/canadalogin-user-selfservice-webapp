@@ -1,47 +1,20 @@
-import { withRouter, reactRouterParameters } from 'storybook-addon-remix-react-router';
-import {NAVIGATION_LINKS, PAGES} from "../../../utils/constants.jsx";
-import {UserProvider} from "../../../components/Providers/UserContext.jsx";
-import Page from "../../../views/Page.js";
-
-
+import {
+    AVAILABLE_LANGUAGES,
+    FLOW_TYPES,
+    NAVIGATION_LINKS,
+    PAGES,
+} from "../../../utils/constants.jsx";
+import {buildTestCase, Template} from "../../Tests/utils/functions.jsx";
 
 export default {
     title: 'GC Sign In/Pages/Sign Up/Verification Set Up Page',
-    component: Page,
-    args: {page:PAGES.verificationSetUp},
-    decorators: [withRouter,
-        (Story) => (
-            <UserProvider>
-                <Story />
-            </UserProvider>
-        )
-    ],
-    // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs
-    tags: ['autodocs'],
-
-};
-
-export const English = {
-    parameters: {
-        reactRouter: reactRouterParameters({
-            location: {
-                pathParams: { language: 'en' },
-            },
-            routing: { path: '/:language'+NAVIGATION_LINKS.verifyEmail }
-        }),
+    args:{
+        page:PAGES.verificationSetUp
     }
 };
 
-export const French = {
-    parameters: {
-        reactRouter: reactRouterParameters({
-            location: {
-                pathParams: { language: 'fr' },
-            },
-            routing: { path: '/:language'+NAVIGATION_LINKS.verifyEmail }
-        }),
-    }
+export const English  = Template.bind({});
+English.parameters = buildTestCase.parameters(NAVIGATION_LINKS.twoStepVerification, { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp }, null);
 
-
-};
-
+export const French  = Template.bind({});
+French.parameters =buildTestCase.parameters(NAVIGATION_LINKS.twoStepVerification, { language: AVAILABLE_LANGUAGES.fr, flow: FLOW_TYPES.signUp }, null);
