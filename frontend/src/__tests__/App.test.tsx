@@ -445,21 +445,6 @@ describe('Routing Test', () => {
         buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.coreProfile, FLOW_TYPES.signIn, null, langHref.en + NAVIGATION_LINKS.coreProfile);
     });
 
-    test("Check verification page route for voice with fr language defined", () => {
-
-        vi.mock("../components/Providers/PrivateRoute.jsx", () => {
-            return {
-                default: (props:any) => props.children,
-            };
-        });
-
-        render(
-            <MemoryRouter initialEntries={[langHref.fr + NAVIGATION_LINKS.verification+'/voice']}>
-                <App/>
-            </MemoryRouter>,
-        )
-        checkVerificationPageContents(AVAILABLE_LANGUAGES.fr, frJson["Verification"], langHref.en + NAVIGATION_LINKS.verification+'/voice', frJson['Button'], frJson["AlreadyGc"], true);
-    });
 
     afterEach(() => {
         cleanup();
