@@ -3,7 +3,7 @@ import {AVAILABLE_LANGUAGES, NAVIGATION_LINKS, PAGES, SUBMIT_END_POINTS,} from "
 import {UserProvider} from "../../../components/Providers/UserContext.jsx";
 import {getPageContent} from "../../../utils/functions.jsx";
 import {ACTION_TYPES, TEST_TYPES, TestDataUserProvider} from "../utils/constants.jsx";
-import {storyParameters, testCase} from "../utils/functions.jsx";
+import {storyParameters, testCase} from "../utils/functions.tsx";
 import Page from "../../../views/Page.js";
 
 const engErrorPageJson = getPageContent('en', "Error");

@@ -31,3 +31,25 @@ export const TEST_TYPES = {
     success: 'Success',
     redirect: 'Redirect',
 }
+
+
+export const POLICY_RESPONSE = {
+
+    "success": true,
+    "message": "Password policy retrieved successfully",
+    "data": {
+        "passwordMinAlphaChars": 0,
+        "passwordMinOtherChars": 1,
+        "pwdMinAge": 0,
+        "pwdExpireWarning": 0,
+        "pwdInHistory": 3,
+        "pwdLockout": true,
+        "pwdLockoutDuration": 15,
+        "pwdMaxAge": 0,
+        "pwdMaxFailure": 5,
+        "pwdMinLength": 12,
+        "pwdMaxLength": 65,
+        "pwdCheckSyntax": 1
+    }
+
+}

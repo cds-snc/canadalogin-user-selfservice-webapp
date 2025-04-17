@@ -9,7 +9,7 @@ import {
 import {UserProvider} from "../../../components/Providers/UserContext.jsx";
 import {getPageContent} from "../../../utils/functions.jsx";
 import {ACTION_TYPES, TEST_TYPES, TestDataUserProvider} from "../utils/constants.jsx";
-import {storyParametersNew, testCase} from "../utils/functions.jsx";
+import {storyParametersNew, testCase} from "../utils/functions.tsx";
 import Page from "../../../views/Page.js";
 
 

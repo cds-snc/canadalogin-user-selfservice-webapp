@@ -4,7 +4,7 @@ import {
     NAVIGATION_LINKS,
     PAGES,
 } from "../../../utils/constants.jsx";
-import {buildTestCase, Template} from "../../Tests/utils/functions.jsx";
+import {buildTestCase, Template} from "../../Tests/utils/functions.tsx";
 
 export default {
     title: 'GC Sign In/Pages/Sign Up/Verification Set Up Page',

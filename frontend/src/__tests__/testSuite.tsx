@@ -303,7 +303,7 @@ function verifyGcdsHtmlElement(tag: string, attributes:Map<string,string>)
     expect(element).toBeTruthy();
     expect(element).toBeInTheDocument();
 
-    attributes.forEach((value, attribute) => {
+    attributes.forEach((value:string, attribute:string) => {
         expect(attribute).toBeTruthy();
         expect(element).toHaveAttribute(attribute, value);
     });

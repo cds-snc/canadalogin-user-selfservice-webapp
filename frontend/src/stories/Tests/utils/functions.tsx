@@ -5,13 +5,46 @@ import config from "../../../config.jsx";
 import {ACTION_TYPES, TEST_TYPES} from "./constants.jsx";
 import Page from "../../../views/Page.js";
 import {UserProvider} from "../../../components/Providers/UserContext.jsx";
+import {AVAILABLE_LANGUAGES, FLOW_TYPES, SUBMIT_END_POINTS} from "../../../utils/constants";
 
 
 const stepErrorMessage = 'Verify error message is on Page.';
 const stepSuccessMessage = 'Verify success message is on Page.';
 const stepNavigateMessage = 'Verify page was navigated properly.';
 
-export async function testCase({ canvasElement, step, stepMessage, message, linkText, link, heading, delay, type, actionType, input }) {
+interface TestCase {
+    canvasElement: any,
+    step: any,
+    stepMessage: string,
+    message: string,
+    linkText: string,
+    link: string,
+    heading: string,
+    delay: number,
+    type: string,
+    actionType: string,
+    input: Input
+}
+
+interface Input{
+    inputType: string,
+    stepMessage:string,
+    value: string
+}
+
+interface PathParams{
+    language: string,
+    flow: string,
+    type: string
+}
+
+interface MSW {
+    type: string,
+    endpoint: string,
+    response: string
+}
+
+export async function testCase({ canvasElement, step, stepMessage, message, linkText, link, heading, delay, type, actionType, input }:TestCase) {
 
     const canvas = await testItem.canvas(canvasElement, delay);
 
@@ -153,12 +186,12 @@ export function storyParametersNew({isBackEndTest, language, link, endpoint, res
 }
 
 const testItem = {
-   canvas: async(canvasElement, timeToWait)=>{
-        const canvas = await within(canvasElement);
+   canvas: async(canvasElement:any, timeToWait:number)=>{
+        const canvas = within(canvasElement);
         await new Promise((r) => setTimeout(r, timeToWait));
         return canvas;
     },
-    typeInInput: async(canvas, step, input) =>{
+    typeInInput: async(canvas:any, step:any, input:Input) =>{
         await step(input.stepMessage, async () => {
             const placeholder= canvas.queryByRole('textbox');
             await userEvent.type(placeholder, input.value);
@@ -166,18 +199,18 @@ const testItem = {
         });
         await new Promise((r) => setTimeout(r, 1000));
     },
-    clickButton: async(canvas, step, message) =>{
+    clickButton: async(canvas:any, step:any, message:string) =>{
         await step(message, async () => {
             await userEvent.click(canvas.queryByRole('button', {name: /test/i}));
         });
         await new Promise((r) => setTimeout(r, 1000));
     },
-    queryPageText: async(canvas, step, message, text) =>{
+    queryPageText: async(canvas:any, step:any, message:string, text:string) =>{
         await step(message, async () => {
             await expect(canvas.queryByText(text)).toBeInTheDocument();
         });
     },
-    clickLink: async(canvas, step, stepMessage, linkText)=>{
+    clickLink: async(canvas:any, step:any, stepMessage:string, linkText:string)=>{
         await step(stepMessage, async () => {
             const link = canvas.queryByText(linkText);
             await expect(link).toBeInTheDocument();
@@ -186,7 +219,7 @@ const testItem = {
         });
         await new Promise((r) => setTimeout(r, 1000));
     },
-    checkErrorMsg: async(canvas, step, stepMessage, link, message, heading)=>{
+    checkErrorMsg: async(canvas:any, step:any, stepMessage:string, link:string, message:string, heading:string)=>{
         await step(stepMessage, async () => {
             const errorSummary = await canvas.queryByTestId('errorSummary');
             await expect(errorSummary).toBeInTheDocument();
@@ -194,68 +227,31 @@ const testItem = {
             await expect(errorSummary.getAttribute('heading')).toEqual(heading);
         });
     },
-    checkAttribute: async(canvas, step, stepMessage, message, attribute, testId) =>{
+    checkAttribute: async(canvas:any, step:any, stepMessage:string, message:string, attribute:string, testId:string) =>{
         await step(stepMessage, async () => {
             const linkSuccess = await canvas.queryByTestId(testId);
             await expect(linkSuccess).toBeInTheDocument();
             await expect(linkSuccess).toHaveAttribute(attribute, message);
         });
-    },
-    routingParameters: async (language, link) => {
-       return {
-           reactRouter: reactRouterParameters({
-               location: {
-                   pathParams: {language},
-               },
-               routing: {path: '/:language' + link}
-           })
-       };
     }
 }
 
 export const buildTestCase ={
-    parameters: (navigationLink, pathParams, msw)=>{
+    parameters: (navigationLink:string, pathParams:PathParams, msw:Map<string, MSW>)=>{
 
         const routingPath = buildPath(pathParams, navigationLink);
-
-        if(msw===null)
-            return {
-                reactRouter: reactRouterParameters({
-                    location: {
-                        pathParams: pathParams,
-                    },
-                    routing: routingPath
-                })
-            };
-
-        let mswResponse = null;
-
-        if(msw.type==="get")
-            mswResponse = {
-                msw: {
-                    handlers: [
-                        http.get(`${config.apiUrl}${msw.endpoint}`, async () => {
-                            return HttpResponse.json(msw.response);
-                        }),
-                    ],
-                }
-            }
+        const reactRoutingParameters = buildRoutingParams(pathParams, routingPath);
+        const mswResponse = buildMswMapping(msw);
 
 
         return {
-            reactRouter: reactRouterParameters({
-                location: {
-                    pathParams: pathParams,
-                },
-                routing: routingPath
-            }),
+            ...reactRoutingParameters,
             ...mswResponse
         };
     },
-
-
 }
-function buildPath(pathParams, navigationLink){
+
+function buildPath(pathParams:PathParams, navigationLink:string){
 
     if(pathParams.type !== undefined)
         return {path: '/:language' + '/:flow' + navigationLink+'/:type'}
@@ -264,7 +260,63 @@ function buildPath(pathParams, navigationLink){
 
 }
 
-export const Template = (args) =>   {
+function buildRoutingParams(pathParams: PathParams, routingPath: { path: string }){
+
+    return {
+        reactRouter: reactRouterParameters({
+            location: {
+                pathParams: {...pathParams},
+            },
+            routing: routingPath
+        })
+    }
+}
+
+function buildMswMapping(mswMapping:Map<string, MSW>){
+
+    let handlers = [];
+
+    mswMapping.forEach((msw, key)=>{
+        if(msw.type==='get')
+            handlers.push(http.get(`${config.apiUrl}${msw.endpoint}`, async () => {return HttpResponse.json(msw.response);}))
+        else if(msw.type==='post')
+            handlers.push(http.post(`${config.apiUrl}${msw.endpoint}`, async () => {return HttpResponse.json(msw.response);}))
+    });
+
+    if(handlers.length){
+        return {
+            msw: {
+                handlers: handlers
+            }
+        }
+    }
+    return null;
+}
+
+
+function buildMsw(msw:MSW){
+
+    if(msw!==null) {
+        const handlers = new Map();
+        handlers.set('get', http.get(`${config.apiUrl}${msw.endpoint}`, async () => {
+            return HttpResponse.json(msw.response);
+        }))
+        handlers.set('post', http.get(`${config.apiUrl}${msw.endpoint}`, async () => {
+            return HttpResponse.json(msw.response);
+        }))
+
+        return {
+            msw: {
+                handlers: [
+                    handlers.get(msw.type)
+                ],
+            }
+        }
+    }
+    return null;
+}
+
+export const Template = (args:any) =>   {
     return(<UserProvider><Page page={args.page}/></UserProvider>);
 }
 

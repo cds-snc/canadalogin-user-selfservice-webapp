@@ -1,5 +1,5 @@
 import {AVAILABLE_LANGUAGES, FLOW_TYPES, NAVIGATION_LINKS, PAGES} from "../../../utils/constants.jsx";
-import {buildTestCase, Template} from "../../Tests/utils/functions.jsx";
+import {buildTestCase, Template} from "../../Tests/utils/functions.tsx";
 
 
 

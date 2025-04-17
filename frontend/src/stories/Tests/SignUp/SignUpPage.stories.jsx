@@ -10,7 +10,7 @@ import {
 import {UserProvider} from "../../../components/Providers/UserContext.jsx";
 import {getPageContent} from "../../../utils/functions.jsx";
 import {ACTION_TYPES, TEST_TYPES, TestDataUserProvider} from "../utils/constants.jsx";
-import {storyParametersNew, testCase} from "../utils/functions.jsx";
+import {storyParametersNew, testCase} from "../utils/functions.tsx";
 
 const serverError =  "Value is not a valid email address: There must be something after the @-sign.";
 const engErrorPageJson = getPageContent('en', "Error");
