@@ -28,7 +28,7 @@ function isValidRoute (page) {
         }
 
     switch(page){
-        case("signUpCoreProfile"):
+        case(PAGES.coreProfile):
             return (
                 state.userData.stepVerified &&
                 state.userData.stepVerificationSent &&
@@ -41,10 +41,10 @@ function isValidRoute (page) {
             return (state.userData.stepVerificationSent &&
                     state.userData.passwordSubmitted &&
                     state.userData.emailValidated);
-        case("signUpVerification"):
+        case(PAGES.verificationSetUp):
             return (state.userData.passwordSubmitted &&
                     state.userData.emailValidated );
-        case("signUpPassword"):
+        case(PAGES.password):
             return (state.userData.emailValidated);
         default:
             return false;

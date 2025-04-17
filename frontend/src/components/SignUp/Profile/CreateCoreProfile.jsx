@@ -7,14 +7,15 @@ import {useUser} from "../../Providers/UserContext.jsx";
 import {useState, useTransition} from "react";
 import {authService} from "../../../services/authService.jsx";
 import {CONTEXT_ACTIONS} from "../../../utils/constants.jsx";
-import {useNavigate} from "react-router";
+import {useNavigate, useParams} from "react-router";
 
-export default function CreateCoreProfile({currentLang}) {
+export default function CreateCoreProfile() {
     const {state, dispatch} = useUser();
+    const {language} = useParams();
     const [errorJson, setError] = useState({heading: null, nameError:null});
     const navigate = useNavigate();
-    const errorPageJson = getPageContent(currentLang, "Error");
-    const pageContentJson = getPageContent(currentLang, "CreateCoreProfile");
+    const errorPageJson = getPageContent(language, "Error");
+    const pageContentJson = getPageContent(language, "CreateCoreProfile");
     const [isPending, startTransition] = useTransition();
 
     function  handleSubmit (e){
@@ -45,7 +46,7 @@ export default function CreateCoreProfile({currentLang}) {
                     const userData = {...state.userData, coreProfileCreated: true};
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                     console.log("success...",response)
-                    navigate("/" + currentLang + '/redirecttorp');
+                    navigate("/" + language + '/redirecttorp');
                 }else {
                     console.log("Error....", response);
                     setError({nameError: response.message, heading: errorPageJson['1']});
@@ -73,7 +74,7 @@ export default function CreateCoreProfile({currentLang}) {
             <GcdsContainer className="gcds-gap" >
                 <GcdsStepper currentStep="4" totalSteps="4"
                              tag="h1"
-                             lang={currentLang}>
+                             lang={language}>
                     {pageContentJson['2']}
                 </GcdsStepper>
             </GcdsContainer>
@@ -87,15 +88,15 @@ export default function CreateCoreProfile({currentLang}) {
                     {pageContentJson['6']}
                 </GcdsHeading>
                 <form id="form" onSubmit={handleSubmit}>
-                    <InputBox currentLang={currentLang} errorJson={errorJson} pageContentJson={pageContentJson} state={state} />
-                    <SubmitButton currentLang={currentLang} disabled={isPending}/>
+                    <InputBox language={language} errorJson={errorJson} pageContentJson={pageContentJson} state={state} />
+                    <SubmitButton currentLang={language} disabled={isPending}/>
                 </form>
             </GcdsContainer>
         </GcdsContainer>
     )
 }
 
-function InputBox({pageContentJson, currentLang, errorJson, state}) {
+function InputBox({pageContentJson, language, errorJson, state}) {
 
 
     if(state.testData!==undefined)
@@ -106,7 +107,7 @@ function InputBox({pageContentJson, currentLang, errorJson, state}) {
                     name="firstName"
                     value={state.testData.firstName}
                     type="text"
-                    lang={currentLang}
+                    lang={language}
                     optional
                 ></GcdsInput>
                 <GcdsInput
@@ -117,7 +118,7 @@ function InputBox({pageContentJson, currentLang, errorJson, state}) {
                     value={state.testData.lastName}
                     validateOn="other"
                     errorMessage={errorJson.nameError}
-                    lang={currentLang}
+                    lang={language}
                     required
                 ></GcdsInput></>
         )
@@ -128,7 +129,7 @@ function InputBox({pageContentJson, currentLang, errorJson, state}) {
                     label={pageContentJson['7']}
                     name="firstName"
                     type="text"
-                    lang={currentLang}
+                    lang={language}
                     optional
                 ></GcdsInput>
                 <GcdsInput
@@ -138,7 +139,7 @@ function InputBox({pageContentJson, currentLang, errorJson, state}) {
                     type="text"
                     validateOn="other"
                     errorMessage={errorJson.nameError}
-                    lang={currentLang}
+                    lang={language}
                     required
                 ></GcdsInput></>
     )
