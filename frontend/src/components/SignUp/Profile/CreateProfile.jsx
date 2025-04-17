@@ -8,27 +8,35 @@ import {
 import { getPageContent } from "../../../utils/functions.jsx";
 import SubmitButton from "../../Layout/SubmitButton.jsx";
 import AlreadyGc from "../../Layout/AlreadyGc.jsx";
+import { useParams } from "react-router";
+import {AVAILABLE_LANGUAGES, SERVICES} from "../../../utils/constants.jsx";
 
-export default function CreateProfile({ currentLang }) {
-    const pageContentJson = getPageContent(currentLang, "CreateProfile");
-    const pageContentJsonHome = getPageContent(currentLang, "Home");
+export default function CreateProfile() {
+    const { language } = useParams();
+
+    const pageContentJson = getPageContent(language, "CreateProfile");
 
     return (
         <GcdsContainer>
             <GcdsHeading tag='h1'>
                 {pageContentJson['1']}
-                <GcdsText>{pageContentJson['2']}
+                <GcdsText marginTop="150" marginBottom="0">
+                    {pageContentJson['2']}
+                    <strong>
+                        {language === AVAILABLE_LANGUAGES.fr ? ' ' + pageContentJson['3'] + ' ' : ''}
+                        {` ${SERVICES[0].title}`}{language === AVAILABLE_LANGUAGES.en ? ' ' + pageContentJson['3'] : ''}
+                    </strong>
                 </GcdsText>
             </GcdsHeading>
-            <GcdsDetails detailsTitle={pageContentJsonHome['4']}>
+            <GcdsDetails detailsTitle={pageContentJson['42']}>
                 <GcdsText>
-                    {pageContentJsonHome['5']}
+                <span>{pageContentJson['43']}</span>
                 </GcdsText>
                 <GcdsText>
-                    {pageContentJsonHome['6']}
+                <span>{pageContentJson['44']}</span>
                 </GcdsText>
                 <GcdsText>
-                    {pageContentJsonHome['7']}
+                <span>{pageContentJson['45']}</span>
                 </GcdsText>
             </GcdsDetails>
             <GcdsHeading tag='h2'>
@@ -40,48 +48,47 @@ export default function CreateProfile({ currentLang }) {
                 <li>{pageContentJson['7']}</li>
                 <li>{pageContentJson['8']}</li>
             </ul>
-            <GcdsText tag="p">
+            <GcdsText>
                 {pageContentJson['9']}{" "}
                 <strong>{pageContentJson['10']}</strong> {pageContentJson['11']}{" "}
                 <GcdsLink href="#" >{pageContentJson['12']}</GcdsLink>
             </GcdsText>
-            <GcdsText tag="p">
-                {pageContentJson['13']} <strong>{pageContentJson['14']}</strong> {pageContentJson['15']}{" "}
-                <strong>{pageContentJson['17']}</strong> {pageContentJson['18']}{" "}
-                <strong>{pageContentJson['19']}</strong>{pageContentJson['20']}{" "}
-                <GcdsLink href="#" >{pageContentJson['21']}</GcdsLink> {pageContentJson['22']}
+            <GcdsText>
+                {pageContentJson['13']} <strong>{pageContentJson['14']}</strong> <span>{pageContentJson['15']}</span>{" "}
+                <strong>{pageContentJson['17']}</strong> <span>{pageContentJson['18']}</span>{" "}
+                <strong>{pageContentJson['19']}</strong> <span>{pageContentJson['20']}</span>{" "}
+                <GcdsLink href="#" >{pageContentJson['21']}</GcdsLink> <span>{pageContentJson['22']}</span>
             </GcdsText>
             <GcdsDetails detailsTitle={pageContentJson['23']}>
-                <GcdsText tag="p">
-                    {pageContentJson['24']} <GcdsLink href="#" lang="en">{pageContentJson['27']}</GcdsLink> {pageContentJson['28']} <GcdsLink href="#" lang="en">{pageContentJson['29']}</GcdsLink>.
+                <GcdsText>
+                <span>{pageContentJson['24']}</span> <GcdsLink href="#" lang="en"><span>{pageContentJson['27']}</span></GcdsLink> <span>{pageContentJson['28']}</span> <GcdsLink href="#" lang="en">{pageContentJson['29']}</GcdsLink>.
                 </GcdsText>
 
-                <GcdsText tag="p">
-                    {pageContentJson['30']} <GcdsLink href="#" lang="en">{pageContentJson['31']}</GcdsLink> {pageContentJson['32']}
+                <GcdsText>
+                <span>{pageContentJson['30']} </span><GcdsLink href="#" lang="en"> <span>{pageContentJson['31']}</span></GcdsLink> {pageContentJson['32']}
                 </GcdsText>
 
-                <GcdsText tag="p">
+                <GcdsText>
                     {pageContentJson['33']}
                 </GcdsText>
             </GcdsDetails>
             <GcdsDetails detailsTitle={pageContentJson['25']}>
-                <GcdsText tag="p">
-                    {pageContentJson['34']} <GcdsLink href="#" lang="en">{pageContentJson['35']}</GcdsLink> {pageContentJson['36']} <GcdsLink href="#" lang="en">{pageContentJson['37']}</GcdsLink>.
+                <GcdsText>
+                <span>{pageContentJson['34']} </span><GcdsLink href="#" lang="en">{pageContentJson['35']}</GcdsLink> <span>{pageContentJson['36']}</span><GcdsLink href="#" lang="en">{pageContentJson['37']}</GcdsLink>.
                 </GcdsText>
 
-                <GcdsText tag="p">
-                    {pageContentJson['38']} <GcdsLink href="#" lang="en">{pageContentJson['39']}</GcdsLink>:
+                <GcdsText>
+                <span> {pageContentJson['38']} </span><GcdsLink href="#" lang="en"><span>{pageContentJson['39']}</span></GcdsLink>:
                 </GcdsText>
 
-                <GcdsText tag="p">
+                <GcdsText>
                     <GcdsLink href="">{pageContentJson['40']}</GcdsLink><br />
-                    {pageContentJson['41']}
+                    <span> {pageContentJson['41']}</span>
                 </GcdsText>
             </GcdsDetails>
             <br />
-            <SubmitButton currentLang={currentLang} />
-            <AlreadyGc currentLang={currentLang} />
+            <SubmitButton currentLang={language} />
+            <AlreadyGc currentLang={language} />
         </GcdsContainer>
     )
 }
-

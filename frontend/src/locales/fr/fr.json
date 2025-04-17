@@ -40,7 +40,7 @@
     "1": "Vous n’avez pas encore de compte Connexion GC?",
     "2": "Créer un compte"
   },
-  "Error":{
+  "Error": {
     "1": "Un problème est survenu",
     "2": "Adresse courriel invalide. Votre adresse courriel doit contenir un symbole @.",
     "3": "Les codes doivent être composés de six chiffres. Veuillez réessayer.",
@@ -55,7 +55,7 @@
     "12": "and a maximum of",
     "13": "caractères."
   },
-  "RegisterVerification":{
+  "RegisterVerification": {
     "1": "Protégez votre compte grâce à la vérification en 2 étapes",
     "2": "La vérification en 2 étapes ajoute une seconde mesure de sécurité à votre mot de passe.",
     "3": "Apprenez-en plus sur la vérification en 2 étapes (s’ouvre dans un nouvel onglet)",
@@ -114,55 +114,58 @@
   "CreateCoreProfile": {
     "1": "Votre compte de connexion GC a bien été créé.",
     "2": "Complétez votre profil",
-    "3": "Lisez notre" ,
+    "3": "Lisez notre",
     "4": "avis de confidentialité",
     "5": "pour en savoir plus sur la manière dont nous utilisons vos renseignements personnels.",
     "6": "Entrez votre nom",
     "7": "Prénom",
     "8": "Nom"
   },
-  "Button":{
-      "submit": "Continuer"
+  "Button": {
+    "submit": "Continuer"
   },
   "CreateProfile": {
-    "1": "Créez une connexion GC",
-    "2": "pour continuer vers votre compte GEO.ca",
+    "1": "Créer une Connexion GC",
+    "2": "pour continuer vers votre",
+    "3": "compte",
     "5": "Confidentialité",
-    "6": "Lorsque vous créez votre compte, GC Connexion vous demandera de fournir des renseignements personnels de base. Nous vous demandons ces renseignements pour :",
-    "7": "pour vous permettre d'accéder plus rapidement aux services, et",
+    "6": "Lorsque vous créez votre compte, Connexion GC vous demandera de fournir des renseignements personnels de base. Nous demandons ces renseignements afin de :",
+    "7": "faciliter votre accès aux services, et",
     "8": "vous contacter concernant la sécurité de votre compte.",
     "9": "Vos renseignements personnels sont",
-    "10": "stockés dans une base de données sécurisée",
+    "10": "conservés dans une base de données sécurisée",
     "11": "gérés par",
     "12": "Emploi et Développement social Canada.",
     "13": "Vos renseignements personnels sont",
-    "14": "également partagés avec des ministères ou organismes",
-    "15": "auxquels vous vous connectez et qui sont stockés selon leurs propres politiques et processus. Vos renseignements personnels sont",
-    "17": "non",
+    "14": "également partagés avec d’autres ministères ou organismes",
+    "15": "auxquels vous vous connectez et conservés selon leurs propres politiques et processus. Vos renseignements personnels sont",
+    "17": "pas",
     "18": "partagés avec des programmes ou services",
-    "19": "à moins que vous ne les connectiez à votre compte GC Connexion",
-    "20": ". Visitez nos",
+    "19": "à moins que vous ne les connectiez à votre compte Connexion GC",
+    "20": ". Consultez nos",
     "21": "Conditions",
     "22": "pour en savoir plus.",
     "23": "Vos renseignements personnels et la loi",
     "24": "Les renseignements personnels sont recueillis conformément à la",
     "25": "Questions ou plaintes",
-    "26": "Texte de signature",
     "27": "Loi sur la protection des renseignements personnels",
-    "28": "et la Partie 4 de la",
-    "29": "Loi sur le ministère de l'Emploi et du Développement social Canada",
-    "30": "L'article 5.1 de la",
-    "31": "Loi sur le ministère de l'Emploi et du Développement social",
-    "32": "nous permet de recueillir vos renseignements personnels afin de créer un compte que vous pouvez utiliser pour accéder aux programmes et services du Gouvernement du Canada. GC Connexion n'utilise pas les renseignements personnels que vous fournissez à d'autres fins.",
-    "33": "Vous avez le droit d'accéder et de corriger les renseignements personnels de votre compte; vous pouvez le faire dans les Paramètres.",
+    "28": "et à la Partie 4 de la",
+    "29": "Loi sur le ministère de l’Emploi et du Développement social Canada",
+    "30": "L’article 5.1 de la",
+    "31": "Loi sur l’Emploi et le Développement social Canada",
+    "32": "nous permet de recueillir vos renseignements personnels pour créer un compte que vous pouvez utiliser pour vous connecter aux programmes et services du gouvernement du Canada. Connexion GC n’utilise pas les renseignements personnels que vous fournissez à d’autres fins.",
+    "33": "Vous avez le droit d’accéder et de corriger les renseignements personnels dans votre compte ; vous pouvez le faire dans les Paramètres.",
     "34": "Envoyez vos questions concernant vos renseignements personnels à",
-    "35": "le Coordonnateur d’accès à l’information et à la protection des renseignements personnels d’Emploi et Développement social Canada",
+    "35": "l’administrateur de l’accès à l’information et de la protection des renseignements personnels d’Emploi et Développement social Canada",
     "36": "en remplissant",
     "37": "ce formulaire",
-    "38": "Envoyez vos plaintes concernant la gestion de vos renseignements personnels au",
-    "39": "Bureau du Commissaire à la protection de la vie privée du Canada",
+    "38": "Envoyez vos plaintes concernant la gestion de vos renseignements personnels à",
+    "39": "Bureau du commissaire à la protection de la vie privée du Canada",
     "40": "info@priv.gc.ca",
-    "41": "1-800-282-1376"
+    "41": "1‑800‑282‑1376",
+    "42": "Qu’est‑ce que Connexion GC ?",
+    "43": "Connexion GC vous permet d’utiliser un seul nom d’utilisateur et un seul mot de passe pour accéder de façon sécurisée et privée aux programmes et services participants.",
+    "44": "Les programmes et services participants vous demanderont de créer une connexion GC afin d’accéder en toute sécurité à vos renseignements sur leur site Web ou leur application.",
+    "45": "Vous pouvez utiliser le même nom d’utilisateur et mot de passe pour accéder à n’importe quel programme ou service qui utilise Connexion GC."
   }
 }
-

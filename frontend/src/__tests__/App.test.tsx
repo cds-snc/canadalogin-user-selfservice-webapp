@@ -367,6 +367,36 @@ describe('Routing Test', () => {
         buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.coreProfile, FLOW_TYPES.signIn, null, langHref.fr + NAVIGATION_LINKS.coreProfile);
     });
 
+        vi.mock("../components/Providers/PrivateRoute.jsx", () => {
+            return {
+                default: (props:any) => props.children,
+            };
+        });
+
+        render(
+            <MemoryRouter initialEntries={[langHref.en + NAVIGATION_LINKS.createProfile]}>
+                <App/>
+            </MemoryRouter>,
+        )
+        buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.createProfile , FLOW_TYPES.signUp, null, langHref.fr + NAVIGATION_LINKS.createProfile);
+    });
+
+    test("Check create profile page route with fr language defined", () => {
+
+        vi.mock("../components/Providers/PrivateRoute.jsx", () => {
+            return {
+                default: (props:any) => props.children,
+            };
+        });
+
+        render(
+            <MemoryRouter initialEntries={[langHref.fr + NAVIGATION_LINKS.createProfile]}>
+                <App/>
+            </MemoryRouter>,
+        )
+        buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.createProfile, FLOW_TYPES.signUp, null, langHref.en + NAVIGATION_LINKS.createProfile);
+    });
+    
     test("Check core profile page route with fr language defined", () => {
 
         vi.mock("../components/Providers/PrivateRoute.jsx", () => {

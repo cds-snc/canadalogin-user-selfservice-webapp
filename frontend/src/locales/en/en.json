@@ -130,7 +130,8 @@
   },
   "CreateProfile": {
     "1": "Create a GC sign in",
-    "2": "to continue to your GEO.ca account",
+    "2": "to continue to your",
+    "3": "account",
     "5": "Privacy",
     "6": "When you set up your account, GC Sign in will ask you to provide basic personal information. We ask for this information to:",
     "7": "make it faster for you to access services, and",
@@ -151,7 +152,6 @@
     "23": "Your personal information and the law",
     "24": "Personal information is collected in compliance with the",
     "25": "Questions or complaints",
-    "26": "Sign text",
     "27": "Privacy Act",
     "28": "and Part 4 of the",
     "29": "Department of Employment and Social Development Canada Act",
@@ -166,7 +166,11 @@
     "38": "Send complaints about how your personal information has been handled to the",
     "39": "Office of the Privacy Commissioner of Canada",
     "40": "info@priv.gc.ca",
-    "41": "1-800-282-1376"  
+    "41": "1-800-282-1376",
+    "42": "What is GC Sign in?",
+    "43": "GC Sign in allows you to use one account and password for secure, private access to participating programs and services.",
+    "44": "Participating programs and services will ask you to create a GC Sign in to securely access your information on their website or application.",
+    "45": "You can use the same username and password to access any program or service that uses GC Sign in."
   }
 }
 

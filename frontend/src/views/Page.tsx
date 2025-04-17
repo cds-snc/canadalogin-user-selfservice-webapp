@@ -6,12 +6,12 @@ import Verification from "../components/Verification/Verification.jsx";
 import PasswordCreation from "../components/Password/PasswordCreation.jsx";
 import SignUpEmail from "../components/SignUp/SignUpEmail.jsx";
 import CreateCoreProfile from "../components/SignUp/Profile/CreateCoreProfile.jsx";
+import CreateProfile from "../components/SignUp/Profile/CreateProfile.jsx";
 import VerificationSetUp from "../components/SignUp/TwoStepVerification/VerificationSetUp"
 import {PAGES} from "../utils/constants";
 import {useUser} from "../components/Providers/UserContext";
 
 function PageContents({page}:{page:string}) {
-
     switch(page) {
         case PAGES.signup:
             return (
@@ -32,6 +32,10 @@ function PageContents({page}:{page:string}) {
         case PAGES.coreProfile:
             return (
                 <CreateCoreProfile />
+            );
+        case PAGES.createProfile:
+            return (
+                <CreateProfile />
             );
         case "RP":
             return (<div>Redirect to RP</div>);

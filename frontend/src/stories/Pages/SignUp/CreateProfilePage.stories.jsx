@@ -26,7 +26,7 @@ export const English = {
             location: {
                 pathParams: { language: 'en' },
             },
-            routing: { path: '/:language'+NAVIGATION_LINKS.coreProfile }
+            routing: { path: '/:language'+NAVIGATION_LINKS.createProfile }
         }),
     }
 };
@@ -37,7 +37,7 @@ export const French = {
             location: {
                 pathParams: { language: 'fr' },
             },
-            routing: { path: '/:language'+NAVIGATION_LINKS.coreProfile }
+            routing: { path: '/:language'+NAVIGATION_LINKS.createProfile }
         }),
     }
 
