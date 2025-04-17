@@ -22,7 +22,13 @@
     "10": "example: pillow moose dish",
     "11": "Show password",
     "12": "Minimum length:",
-    "13": "characters"
+    "13": "characters",
+    "14": "Enter your password",
+    "15": "to continue to your",
+    "16": "account",
+    "17": "example.name@gmail.com",
+    "18": "Use a different email",
+    "19": "I forgot my password"
   },
   "SignUpEmail": {
     "1": "Enter your email",

@@ -69,8 +69,8 @@ interface TestParameters {
 }
 
 export const buildTestSuite = {
-    test: (language: string, page: string, flow: string, type: string, link: string) => {
-        testSuite.page(page, testSuite.parameters(language, page, flow, type, link));
+    test:(language: string, page:string, flow:string, type:string, link: string)=>{
+        testSuite.page(page, flow, testSuite.parameters(language, page, flow, type, link));
     }
 }
 
@@ -83,7 +83,10 @@ const pageSetup = {
             case PAGES.signup:
                 return language !== AVAILABLE_LANGUAGES.fr ? engJson["AlreadyGc"] : frJson["AlreadyGc"];
             case PAGES.password:
-                return language !== AVAILABLE_LANGUAGES.fr ? engJson["AlreadyGc"] : frJson["AlreadyGc"];
+                if(flow===FLOW_TYPES.signUp)
+                    return language !== AVAILABLE_LANGUAGES.fr ? engJson["AlreadyGc"] : frJson["AlreadyGc"];
+                else
+                    return null;
             case PAGES.verification:
                 if (flow === FLOW_TYPES.signUp)
                     return language !== AVAILABLE_LANGUAGES.fr ? engJson["AlreadyGc"] : frJson["AlreadyGc"];
@@ -100,7 +103,10 @@ const pageSetup = {
             case PAGES.signup:
                 return ['1', 'h1', '4', language];
             case PAGES.password:
-                return ['2', 'h1', '4', language];
+                if(flow===FLOW_TYPES.signUp)
+                    return ['2', 'h1', '4', language];
+                else
+                    return null;
             case PAGES.verification:
                 if (flow === FLOW_TYPES.signUp)
                     if (type === FLOW_TYPES.email)
@@ -122,11 +128,14 @@ const pageSetup = {
             case PAGES.signup:
                 return ['4', '6'];
             case PAGES.password:
-                return ['2', '10'];
+                if(flow===FLOW_TYPES.signUp)
+                    return ['2','10', '14','15','16','17','18','19'];
+                else
+                    return ['1','2','3','4','5','6','7','8','9','10','11','12','13'];
             case PAGES.verification:
-                if (flow === FLOW_TYPES.signUp)
-                    if (type === FLOW_TYPES.email)
-                        return ['1', '2', '3', '4', '5', '8', '11', '12', '13', '15', '16', '17', '18', '19', '20', '21', '26'];
+                if(flow===FLOW_TYPES.signUp)
+                    if(type===FLOW_TYPES.email)
+                        return ['1','2','3','4','5','8','11','12','13','15','16','17','18','19','20','21','26'];
                     else
                         return ['11', '12', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26'];
                 else
@@ -156,8 +165,13 @@ const pageSetup = {
                 return [];
         }
     },
-    serviceKey: (page: string) => {
-        switch (page) {
+    serviceKey: (page:string, flow:string) =>{
+        switch(page){
+            case PAGES.password:
+                if(flow===FLOW_TYPES.signUp)
+                    return null;
+                else
+                    return '16';
             case PAGES.verification:
                 return '20';
             case PAGES.createProfile:
@@ -166,12 +180,12 @@ const pageSetup = {
                 return null;
         }
     },
-    gcdsMap: (language: string, page: string, pageContentJson: JSON) => {
-        switch (page) {
+    gcdsMap:(language:string, page:string, pageContentJson:JSON, flow:string)=>{
+        switch(page){
             case PAGES.signup:
                 return pageSetup.signUpEmailGcdsMap(language, pageContentJson);
             case PAGES.password:
-                return pageSetup.passwordGcdsMap(pageContentJson);
+                return pageSetup.passwordGcdsMap(flow, pageContentJson);
             case PAGES.verification:
                 return pageSetup.verificationGcdsMap(pageContentJson);
             case PAGES.verificationSetUp:
@@ -200,14 +214,16 @@ const pageSetup = {
 
         return gcdsElementMap;
     },
-    passwordGcdsMap: (pageContentJson: JSON) => {
+    passwordGcdsMap: (flow:string, pageContentJson:JSON)=>{
 
         const gcdsElementMap = new Map();
-        gcdsElementMap.set('1', ['gcds-notice', createMap('gcds-notice', [pageContentJson['1'], 'h2', 'success'])])
-        gcdsElementMap.set('7', ['gcds-details', createMap('gcds-details', [pageContentJson['7']])])
-        gcdsElementMap.set('9', ['gcds-input', createMap('gcds-input2', ["input-password", pageContentJson['9'], 'password', "password", pageContentJson['10']])]);
-        gcdsElementMap.set('11', ['gcds-checkbox', createMap('gcds-checkbox', ['checkbox-default', pageContentJson['11'], 'checkbox'])]);
+        gcdsElementMap.set('9', ['gcds-input', createMap('gcds-input2', ["input-password", pageContentJson['9'], 'password', "password", flow===FLOW_TYPES.signUp?pageContentJson['10']:''])]);
 
+        if(flow===FLOW_TYPES.signUp) {
+            gcdsElementMap.set('1', ['gcds-notice', createMap('gcds-notice', [pageContentJson['1'], 'h2', 'success'])]);
+            gcdsElementMap.set('7', ['gcds-details', createMap('gcds-details', [pageContentJson['7']])]);
+            gcdsElementMap.set('11', ['gcds-checkbox', createMap('gcds-checkbox', ['checkbox-default', pageContentJson['11'], 'checkbox'])]);
+        }
 
         return gcdsElementMap;
     },
@@ -259,15 +275,18 @@ const testSuite = {
             isVoice: type === FLOW_TYPES.voice,
             smsTextKeys: pageSetup.smsTextKeys(page),
             voiceTextKeys: pageSetup.voiceTextKeys(page),
-            serviceKey: pageSetup.serviceKey(page),
+            serviceKey: pageSetup.serviceKey(page, flow),
         };
     },
-    page: (page: string, { language, pageContentJson, langLink, buttonJson, alreadyGcJson, stepper, textKeysToNotSearch, isVoice, smsTextKeys, voiceTextKeys, serviceKey }: TestParameters) => {
+    page:(page:string, flow:string, {language, pageContentJson, langLink,  buttonJson, alreadyGcJson, stepper, textKeysToNotSearch, isVoice, smsTextKeys, voiceTextKeys, serviceKey}:TestParameters)=>{
         verifyCommonElements(language, langLink, buttonJson, alreadyGcJson, stepper);
 
-        const gcdsElementMap = pageSetup.gcdsMap(language, page, pageContentJson);
+        const gcdsElementMap = pageSetup.gcdsMap(language, page, pageContentJson, flow);
+
         Object.keys(pageContentJson).forEach(key => {
-            if (gcdsElementMap.has(key))
+            console.log("key: ",key);
+            console.log(pageContentJson[key]);
+            if(gcdsElementMap.has(key))
                 verifyGcdsHtmlElement(gcdsElementMap.get(key)[0], gcdsElementMap.get(key)[1]);
             else if (!textKeysToNotSearch.includes(key))
                 if (key === serviceKey)
@@ -299,7 +318,7 @@ function verifyGcdsHtmlElement(tag: string, attributes: Map<string, string>) {
     expect(element).toBeInTheDocument();
 
     attributes.forEach((value, attribute) => {
-        expect(attribute && value).toBeTruthy();
+        expect(attribute).toBeTruthy();
         expect(element).toHaveAttribute(attribute, value);
     });
 }

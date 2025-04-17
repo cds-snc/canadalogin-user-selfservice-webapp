@@ -131,7 +131,7 @@ export default function Verification() {
                             const userData = {...state.userData, emailValidated: true};
                             await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                             console.log(userData);
-                            navigate("/" + language + NAVIGATION_LINKS.password);
+                            navigate("/" + language + "/"+flow+NAVIGATION_LINKS.password);
                         }else                        {
                             const userData = {...state.userData, stepVerified: true};
                             await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});

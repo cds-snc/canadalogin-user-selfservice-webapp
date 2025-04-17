@@ -150,14 +150,13 @@ describe('Routing Test', () => {
                 default: (props:any) => props.children,
             };
         });
-
+        const link = '/' +FLOW_TYPES.signUp+NAVIGATION_LINKS.password;
         render(
-            <MemoryRouter initialEntries={[langHref.en + NAVIGATION_LINKS.password]}>
+            <MemoryRouter initialEntries={[langHref.en + link]}>
                 <App/>
             </MemoryRouter>,
         )
-        buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.password, FLOW_TYPES.signUp, null, langHref.fr + NAVIGATION_LINKS.password);
-       // checkPasswordCreationPageContents(AVAILABLE_LANGUAGES.en, engJson["PasswordCreation"], langHref.fr + NAVIGATION_LINKS.password, engJson['Button'], engJson["AlreadyGc"]);
+        buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.password, FLOW_TYPES.signUp, null, langHref.fr + link);
     });
 
     test("Check password creation page route with fr language defined", () => {
@@ -167,13 +166,44 @@ describe('Routing Test', () => {
                 default: (props:any) => props.children,
             };
         });
-
+        const link = '/' +FLOW_TYPES.signUp+NAVIGATION_LINKS.password;
         render(
-            <MemoryRouter initialEntries={[langHref.fr + NAVIGATION_LINKS.password]}>
+            <MemoryRouter initialEntries={[langHref.fr + link]}>
                 <App/>
             </MemoryRouter>,
         )
-        buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.password, FLOW_TYPES.signUp, null, langHref.en + NAVIGATION_LINKS.password);
+        buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.password, FLOW_TYPES.signUp, null, langHref.en + link);
+    });
+
+    test("Check sign in password page route with en language defined", () => {
+
+        vi.mock("../components/Providers/PrivateRoute.jsx", () => {
+            return {
+                default: (props:any) => props.children,
+            };
+        });
+        const link = '/' +FLOW_TYPES.signIn+NAVIGATION_LINKS.password;
+        render(
+            <MemoryRouter initialEntries={[langHref.en + link]}>
+                <App/>
+            </MemoryRouter>,
+        )
+        buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.password, FLOW_TYPES.signIn, null, langHref.fr + link);
+    });
+    test("Check sign in password page route with fr language defined", () => {
+
+        vi.mock("../components/Providers/PrivateRoute.jsx", () => {
+            return {
+                default: (props:any) => props.children,
+            };
+        });
+        const link = '/' +FLOW_TYPES.signIn+NAVIGATION_LINKS.password;
+        render(
+            <MemoryRouter initialEntries={[langHref.fr + link]}>
+                <App/>
+            </MemoryRouter>,
+        )
+        buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.password, FLOW_TYPES.signIn, null, langHref.en + link);
     });
 
     test("Check verification set up page route with en language defined", () => {
