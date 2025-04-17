@@ -4,9 +4,12 @@ import Footer from '../../components/Layout/Footer';
 import Home from "../../components/Home/Home";
 import {GcdsContainer} from "@cdssnc/gcds-components-react";
 import {useUser} from "../../components/Providers/UserContext.jsx";
+import {useLocation, useParams} from "react-router";
 
 export default function HomePage() {
-    const {langHref, currentLang} = getLangValues();
+    const {pathname} = useLocation();
+    const {language} = useParams();
+    const {langHref, currentLang} = getLangValues(language, pathname);
     const {state} = useUser();
 
     return (

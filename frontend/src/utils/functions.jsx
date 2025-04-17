@@ -1,4 +1,3 @@
-import {useLocation, useParams} from "react-router";
 import engJson from '../locales/en/en.json';
 import frJson from '../locales/fr/fr.json';
 import {AVAILABLE_LANGUAGES, FOOTERS} from './constants';
@@ -17,8 +16,8 @@ function getLangHref(currentLang, pathname)
     return '/'+AVAILABLE_LANGUAGES.fr+newPathname.replaceAll('//','/');
 }
 
-function getLanguage(){
-    const {language} = useParams();
+function getLanguage(language){
+
     const browserLanguage = navigator.languages[1];
 
     if(language===AVAILABLE_LANGUAGES.fr || language===AVAILABLE_LANGUAGES.en)
@@ -30,10 +29,8 @@ function getLanguage(){
 
 }
 
-export function getLangValues(){
-
-    const {pathname} = useLocation();
-    const currentLang = getLanguage();
+export function getLangValues(language, pathname){
+    const currentLang = getLanguage(language);
     const langHref =getLangHref(currentLang, pathname);
 
     return {langHref, currentLang};

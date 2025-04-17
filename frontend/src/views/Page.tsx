@@ -9,6 +9,7 @@ import CreateCoreProfile from "../components/SignUp/Profile/CreateCoreProfile.js
 import VerificationSetUp from "../components/SignUp/TwoStepVerification/VerificationSetUp"
 import {PAGES} from "../utils/constants";
 import {useUser} from "../components/Providers/UserContext";
+import {useLocation, useParams} from "react-router";
 
 function PageContents({page}:{page:string}) {
 
@@ -41,7 +42,9 @@ function PageContents({page}:{page:string}) {
 }
 
 export default function Page({page}:{page:string}) {
-    const {langHref, currentLang} = getLangValues();
+    const {pathname} = useLocation();
+    const {language} = useParams();
+    const {langHref, currentLang} = getLangValues(language, pathname);
     const {state} = useUser();
     return (
         <div className="mainBody">
