@@ -5,7 +5,7 @@ import {
     GcdsDetails,
     GcdsInput, GcdsErrorSummary
 } from "@cdssnc/gcds-components-react";
-import {AVAILABLE_LANGUAGES, CONTEXT_ACTIONS, NAVIGATION_LINKS, SERVICES} from "../../utils/constants";
+import {AVAILABLE_LANGUAGES, CONTEXT_ACTIONS, FLOW_TYPES, NAVIGATION_LINKS, SERVICES} from "../../utils/constants";
 import {getPageContent, isEmailValid} from '../../utils/functions';
 import FirstTimeGc from "../Layout/FirstTimeGc";
 import SubmitButton from "../Layout/SubmitButton.jsx";
@@ -57,7 +57,7 @@ export default function Home({currentLang}) {
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                     console.log("userData: ", userData);
                     console.log("success", "/" + currentLang + NAVIGATION_LINKS.verifyEmail);
-                    // navigate("/" + language + NAVIGATION_LINKS.verifyEmail);
+                    navigate("/" + language + "/" + FLOW_TYPES.signIn + NAVIGATION_LINKS.password);
             } catch (error) {
                 console.error('Signin error:', error);
                 setError({emailError:  errorPageJson[7], heading: errorPageJson['1']});

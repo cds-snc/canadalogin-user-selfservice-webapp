@@ -15,7 +15,6 @@ export const CONTEXT_ACTIONS = {
 
 export const FLOW_TYPES={
     signUp: "signup",
-
     signIn: "signin",
     sms: "sms",
     voice: "voice",
