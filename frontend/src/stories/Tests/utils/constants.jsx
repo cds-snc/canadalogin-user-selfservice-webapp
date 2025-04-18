@@ -26,30 +26,41 @@ export const ACTION_TYPES = {
     link: 'Link',
     submit: 'Submit'
 }
+
 export const TEST_TYPES = {
     error: 'Error',
     success: 'Success',
     redirect: 'Redirect',
 }
 
-
 export const POLICY_RESPONSE = {
-
     "success": true,
     "message": "Password policy retrieved successfully",
     "data": {
-        "passwordMinAlphaChars": 0,
-        "passwordMinOtherChars": 1,
-        "pwdMinAge": 0,
-        "pwdExpireWarning": 0,
-        "pwdInHistory": 3,
-        "pwdLockout": true,
-        "pwdLockoutDuration": 15,
-        "pwdMaxAge": 0,
-        "pwdMaxFailure": 5,
-        "pwdMinLength": 12,
-        "pwdMaxLength": 65,
-        "pwdCheckSyntax": 1
+            "pwdMinLength": 12,
+            "pwdMaxLength": 65
     }
-
 }
+
+export const SUCCESS_RESPONSE = {
+    "success": true,
+    "message": "OTP sent successfully",
+    "data": {
+        "trxnId": "eac50d6d-c2d9-47ef-a3ad-7ddc27d683b1",
+        "type": "emailotp",
+        "created": "2025-03-28T16:48:21.561Z",
+        "updated": "2025-03-28T16:48:21.561Z",
+        "expiry": "2025-03-28T16:53:21.561Z",
+        "state": "PENDING",
+        "correlationID": "7322",
+        "emailAddress": "test@test.com",
+        "attempts": 0,
+        "retries": 4
+    }
+}
+
+export const ERROR_RESPONSE = {
+    "success": false,
+    "message": "The system cannot process the request at this time",
+    "data": null
+};

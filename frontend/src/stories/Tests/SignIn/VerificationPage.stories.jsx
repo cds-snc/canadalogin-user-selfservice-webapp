@@ -15,10 +15,10 @@ const frErrorPageJson = getPageContent('fr', "Error");
 const engPageContentJson = getPageContent('en', "Verification");
 const frPageContentJson = getPageContent('fr', "Verification");
 
-const serverError =  "The system cannot process the request because the verification was not found.";
+const serverError =  "The system cannot process the request at this time";
 const errorResponse = {
     "success": false,
-    "message": serverError,
+    "message": "The system cannot process the request at this time",
     "data": null
 };
 
@@ -86,14 +86,21 @@ const useNewNumberStoryParameters = {
     endpoint:SUBMIT_END_POINTS.sendTwoStepVerificationCode,
     type:FLOW_TYPES.voice,
 }
+// export default {
+//
+//     title: 'GC Sign In/Tests/Sign In/Verification Page',
+//     component: Page,
+//     decorators: [withRouter],
+//     // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs
+//     tags: ['autodocs'],
+//
+// };
+
 export default {
-
     title: 'GC Sign In/Tests/Sign In/Verification Page',
-    component: Page,
-    decorators: [withRouter],
-    // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs
-    tags: ['autodocs'],
-
+    args:{
+        page:PAGES.verification,
+    }
 };
 
 TestDataUserProvider.userData.phone = '+1 (***) *** - 4567';
