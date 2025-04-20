@@ -74,7 +74,7 @@ export default function CreateProfile() {
             </GcdsDetails>
             <GcdsDetails detailsTitle={pageContentJson['25']}>
                 <GcdsText>
-                <span>{pageContentJson['34']} </span><GcdsLink href="#" lang="en">{pageContentJson['35']}</GcdsLink> <span>{pageContentJson['36']}</span><GcdsLink href="#" lang="en">{pageContentJson['37']}</GcdsLink>.
+                <span>{pageContentJson['34']} </span><GcdsLink href="#" lang="en">{pageContentJson['35']}</GcdsLink> <span>{pageContentJson['36']}</span>{" "}<GcdsLink href="#" lang="en">{pageContentJson['37']}</GcdsLink>.
                 </GcdsText>
 
                 <GcdsText>
@@ -82,7 +82,8 @@ export default function CreateProfile() {
                 </GcdsText>
 
                 <GcdsText>
-                    <GcdsLink href="">{pageContentJson['40']}</GcdsLink><br />
+                <span> {pageContentJson['46']} </span>
+                    <GcdsLink href="#">{pageContentJson['40']}</GcdsLink><br />
                     <span> {pageContentJson['41']}</span>
                 </GcdsText>
             </GcdsDetails>

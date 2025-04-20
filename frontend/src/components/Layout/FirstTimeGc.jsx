@@ -12,7 +12,7 @@ export default function FirstTimeGc({currentLang})
         <GcdsHeading tag="h2">
             {pageContentJson['1']}
             <GcdsText marginTop="200" marginBottom="0">
-                <GcdsLink href={`/${currentLang}${NAVIGATION_LINKS.signUp}`} >
+                <GcdsLink href={`/${currentLang}${NAVIGATION_LINKS.createProfile}`} >
                     {pageContentJson['2']}
                 </GcdsLink>
             </GcdsText>

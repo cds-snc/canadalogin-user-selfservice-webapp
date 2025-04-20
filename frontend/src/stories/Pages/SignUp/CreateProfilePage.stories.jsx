@@ -1,13 +1,14 @@
 import { withRouter, reactRouterParameters } from 'storybook-addon-remix-react-router';
-import {NAVIGATION_LINKS} from "../../../utils/constants.jsx";
+import {AVAILABLE_LANGUAGES, NAVIGATION_LINKS, PAGES} from "../../../utils/constants.jsx";
 import {UserProvider} from "../../../components/Providers/UserContext.jsx";
-import CreateProfilePage from "../../../views/SignUp/CreateProfilePage.jsx";
 
+import Page from "../../../views/Page.js";
 
 
 export default {
-    title: 'GC Sign In/Pages/Sign Up/Profile Page',
-    component: CreateProfilePage,
+    title: 'GC Sign In/Pages/Sign Up/Create Profile Page',
+    component: Page,
+    args: {page:PAGES.createProfile},
     decorators: [withRouter,
         (Story) => (
             <UserProvider>
@@ -24,7 +25,7 @@ export const English = {
     parameters: {
         reactRouter: reactRouterParameters({
             location: {
-                pathParams: { language: 'en' },
+                pathParams: { language: AVAILABLE_LANGUAGES.en },
             },
             routing: { path: '/:language'+NAVIGATION_LINKS.createProfile }
         }),
@@ -35,7 +36,7 @@ export const French = {
     parameters: {
         reactRouter: reactRouterParameters({
             location: {
-                pathParams: { language: 'fr' },
+                pathParams: { language: AVAILABLE_LANGUAGES.fr},
             },
             routing: { path: '/:language'+NAVIGATION_LINKS.createProfile }
         }),
@@ -43,4 +44,5 @@ export const French = {
 
 
 };
+
 
