@@ -1,6 +1,5 @@
 import {Routes, Route, Navigate} from 'react-router';
 import {UserProvider} from "./components/Providers/UserContext";
-import HomePage from "./views/Home/HomePage";
 import PrivateRoute from "./components/Providers/PrivateRoute.jsx";
 import Page from "./views/Page.js";
 import {PAGES} from "./utils/constants.jsx";
