@@ -120,6 +120,11 @@ export const MSW_VERIFICATION = {
             error:{type: "post", endpoint: SUBMIT_END_POINTS.createCoreProfile, response: ERROR_RESPONSE},
             serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.createCoreProfile, response: null},
             success: {type: "post", endpoint: SUBMIT_END_POINTS.createCoreProfile, response: SUCCESS_RESPONSE}
+        },
+        password:{
+            error:{type: "post", endpoint: SUBMIT_END_POINTS.create, response: ERROR_RESPONSE},
+            serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.create, response: null},
+            success: {type: "post", endpoint: SUBMIT_END_POINTS.create, response: SUCCESS_RESPONSE}
         }
     }
 }

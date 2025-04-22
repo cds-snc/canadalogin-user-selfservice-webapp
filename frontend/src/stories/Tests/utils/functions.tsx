@@ -5,7 +5,6 @@ import config from "../../../config.jsx";
 import {ACTION_TYPES, TEST_TYPES, TestDataUserProvider} from "./constants.jsx";
 import Page from "../../../views/Page.js";
 import {UserProvider} from "../../../components/Providers/UserContext.jsx";
-import {SERVICES} from "../../../utils/constants";
 
 const stepErrorMessage = 'Verify error message is on Page.';
 const stepSuccessMessage = 'Verify success message is on Page.';
@@ -316,6 +315,7 @@ export const TestTemplate = (args:any) =>   {
     TestDataUserProvider.userData.phone = args.phone;
     TestDataUserProvider.testData.firstName = args.firstName;
     TestDataUserProvider.testData.lastName =  args.lastName;
+    TestDataUserProvider.testData.password =  args.password;
     console.log(args)
     return (
         <UserProvider initial={TestDataUserProvider}><Page page={args.page} /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
