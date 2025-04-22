@@ -80,7 +80,7 @@ FrErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
 SmsErrorBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.sms },
-    [MSW_VERIFICATION.signin.sms.error]);
+    [MSW_VERIFICATION.signin.verification.sms.error]);
 SmsErrorBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -98,7 +98,7 @@ SmsErrorBackEnd.play = async ({ canvasElement, step }) => {
 
 SmsSuccessfulBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.sms },
-    [MSW_VERIFICATION.signin.sms.success]);
+    [MSW_VERIFICATION.signin.verification.sms.success]);
 SmsSuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -114,7 +114,7 @@ SmsSuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
 VoiceErrorBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.voice },
-    [MSW_VERIFICATION.signin.voice.error]);
+    [MSW_VERIFICATION.signin.verification.voice.error]);
 VoiceErrorBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -132,7 +132,7 @@ VoiceErrorBackEnd.play = async ({ canvasElement, step }) => {
 
 VoiceSuccessfulBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.voice },
-    [MSW_VERIFICATION.signin.voice.success]);
+    [MSW_VERIFICATION.signin.verification.voice.success]);
 VoiceSuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -148,7 +148,7 @@ VoiceSuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
 ServerErrorBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.voice },
-    [MSW_VERIFICATION.signin.serverTimeOut]);
+    [MSW_VERIFICATION.signin.verification.serverTimeOut]);
 ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -166,7 +166,7 @@ ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
 
 EngRequestNewCode.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.sms },
-    [MSW_VERIFICATION.signin.requestNewCode.sms.success]);
+    [MSW_VERIFICATION.signin.verification.requestNewCode.sms.success]);
 EngRequestNewCode.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -184,7 +184,7 @@ EngRequestNewCode.play = async ({ canvasElement, step }) => {
 
 FrRequestNewCode.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.fr, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.voice },
-    [MSW_VERIFICATION.signin.requestNewCode.voice.success]);
+    [MSW_VERIFICATION.signin.verification.requestNewCode.voice.success]);
 FrRequestNewCode.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -202,7 +202,7 @@ FrRequestNewCode.play = async ({ canvasElement, step }) => {
 
 NewCodeBackEndError.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.sms },
-    [MSW_VERIFICATION.signin.requestNewCode.sms.error]);
+    [MSW_VERIFICATION.signin.verification.requestNewCode.sms.error]);
 NewCodeBackEndError.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -221,7 +221,7 @@ NewCodeBackEndError.play = async ({ canvasElement, step }) => {
 
 ServerErrorReqNewCode.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.voice },
-    [MSW_VERIFICATION.signin.requestNewCode.serverTimeOut]);
+    [MSW_VERIFICATION.signin.verification.requestNewCode.serverTimeOut]);
 ServerErrorReqNewCode.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -240,7 +240,7 @@ ServerErrorReqNewCode.play = async ({ canvasElement, step }) => {
 
 EngRequestNewTypeCode.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.sms },
-    [MSW_VERIFICATION.signin.requestNewCode.voice.success]);
+    [MSW_VERIFICATION.signin.verification.requestNewCode.voice.success]);
 EngRequestNewTypeCode.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -258,7 +258,7 @@ EngRequestNewTypeCode.play = async ({ canvasElement, step }) => {
 
 FrRequestNewTypeCode.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.fr, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.voice },
-    [MSW_VERIFICATION.signin.requestNewCode.sms.success]);
+    [MSW_VERIFICATION.signin.verification.requestNewCode.sms.success]);
 FrRequestNewTypeCode.play = async ({ canvasElement, step }) => {
 
     await testCase({

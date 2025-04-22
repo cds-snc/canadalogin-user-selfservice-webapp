@@ -68,26 +68,58 @@ export const ERROR_RESPONSE = {
 export const MSW_PASSWORD_POLICY = {type:"get", endpoint: SUBMIT_END_POINTS.requestPasswordPolicy, response:POLICY_RESPONSE }
 export const MSW_VERIFICATION = {
     signin: {
-        sms: {
-            error: {type: "post", endpoint: SUBMIT_END_POINTS.twoStepVerification, response: ERROR_RESPONSE},
-            success:{type: "post", endpoint: SUBMIT_END_POINTS.twoStepVerification, response: SUCCESS_RESPONSE}
-        },
-        voice: {
-            error: {type: "post", endpoint: SUBMIT_END_POINTS.twoStepVerificationVoice, response: ERROR_RESPONSE},
-            success:{type: "post", endpoint: SUBMIT_END_POINTS.twoStepVerificationVoice, response: SUCCESS_RESPONSE}
-
-        },
-        requestNewCode: {
-            sms:{
-                    success: {type: "post", endpoint: SUBMIT_END_POINTS.sendTwoStepVerificationCode, response: SUCCESS_RESPONSE},
-                    error: {type: "post", endpoint: SUBMIT_END_POINTS.sendTwoStepVerificationCode, response: ERROR_RESPONSE}
+        verification: {
+            sms: {
+                error: {type: "post", endpoint: SUBMIT_END_POINTS.twoStepVerification, response: ERROR_RESPONSE},
+                success: {type: "post", endpoint: SUBMIT_END_POINTS.twoStepVerification, response: SUCCESS_RESPONSE}
             },
             voice: {
-                    success: {type: "post", endpoint: SUBMIT_END_POINTS.sendTwoStepVerificationCodeVoice, response: SUCCESS_RESPONSE},
-                    error: {type: "post", endpoint: SUBMIT_END_POINTS.sendTwoStepVerificationCodeVoice, response: ERROR_RESPONSE}
+                error: {type: "post", endpoint: SUBMIT_END_POINTS.twoStepVerificationVoice, response: ERROR_RESPONSE},
+                success: {type: "post",
+                    endpoint: SUBMIT_END_POINTS.twoStepVerificationVoice,
+                    response: SUCCESS_RESPONSE
+                }
+
             },
-            serverTimeOut:{type: "post", endpoint: SUBMIT_END_POINTS.sendTwoStepVerificationCodeVoice, response: null}
-        },
-        serverTimeOut:{type: "post", endpoint: SUBMIT_END_POINTS.twoStepVerificationVoice, response: null}
+            requestNewCode: {
+                sms: {
+                    success: {
+                        type: "post",
+                        endpoint: SUBMIT_END_POINTS.sendTwoStepVerificationCode,
+                        response: SUCCESS_RESPONSE
+                    },
+                    error: {
+                        type: "post",
+                        endpoint: SUBMIT_END_POINTS.sendTwoStepVerificationCode,
+                        response: ERROR_RESPONSE
+                    }
+                },
+                voice: {
+                    success: {
+                        type: "post",
+                        endpoint: SUBMIT_END_POINTS.sendTwoStepVerificationCodeVoice,
+                        response: SUCCESS_RESPONSE
+                    },
+                    error: {
+                        type: "post",
+                        endpoint: SUBMIT_END_POINTS.sendTwoStepVerificationCodeVoice,
+                        response: ERROR_RESPONSE
+                    }
+                },
+                serverTimeOut: {
+                    type: "post",
+                    endpoint: SUBMIT_END_POINTS.sendTwoStepVerificationCodeVoice,
+                    response: null
+                }
+            },
+            serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.twoStepVerificationVoice, response: null}
+        }
+    },
+    signup:{
+        coreProfile:{
+            error:{type: "post", endpoint: SUBMIT_END_POINTS.createCoreProfile, response: ERROR_RESPONSE},
+            serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.createCoreProfile, response: null},
+            success: {type: "post", endpoint: SUBMIT_END_POINTS.createCoreProfile, response: SUCCESS_RESPONSE}
+        }
     }
 }
