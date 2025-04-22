@@ -1,9 +1,8 @@
 import App from '../App';
-import {cleanup, render, screen} from '@testing-library/react';
-import {describe, expect, test, afterEach, vi} from "vitest";
+import {cleanup, render} from '@testing-library/react';
+import {describe, test, afterEach, vi} from "vitest";
 import '@testing-library/jest-dom';
-import {AVAILABLE_LANGUAGES, NAVIGATION_LINKS, SERVICES, FLOW_TYPES} from "../utils/constants";
-import {getFooter} from "../utils/functions";
+import {AVAILABLE_LANGUAGES, NAVIGATION_LINKS, FLOW_TYPES} from "../utils/constants";
 import {MemoryRouter} from "react-router";
 import {buildTestSuite} from "./testSuite";
 import {PAGES} from "../utils/constants.jsx";
