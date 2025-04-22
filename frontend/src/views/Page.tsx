@@ -5,15 +5,21 @@ import {GcdsContainer} from "@cdssnc/gcds-components-react";
 import Verification from "../components/Verification/Verification.jsx";
 import Password from "../components/Password/Password.jsx";
 import SignUpEmail from "../components/SignUp/SignUpEmail.jsx";
+import Home from "../components/Home/Home.jsx";
 import CreateCoreProfile from "../components/SignUp/Profile/CreateCoreProfile.jsx";
 import VerificationSetUp from "../components/SignUp/TwoStepVerification/VerificationSetUp"
 import {PAGES} from "../utils/constants";
 import {useUser} from "../components/Providers/UserContext";
 import {useLocation, useParams} from "react-router";
 
+
 function PageContents({page}:{page:string}) {
 
     switch(page) {
+        case PAGES.home:
+            return (
+                <Home />
+            );
         case PAGES.signup:
             return (
                 <SignUpEmail />
