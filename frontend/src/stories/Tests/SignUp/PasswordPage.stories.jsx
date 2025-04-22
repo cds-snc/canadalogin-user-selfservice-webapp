@@ -1,4 +1,3 @@
-import {withRouter} from 'storybook-addon-remix-react-router';
 import {
     AVAILABLE_LANGUAGES,
     FLOW_TYPES,
@@ -6,58 +5,18 @@ import {
     PAGES,
     SUBMIT_END_POINTS
 } from "../../../utils/constants.jsx";
-import {UserProvider} from "../../../components/Providers/UserContext.jsx";
 import {getPageContent} from "../../../utils/functions.jsx";
 import {
     ACTION_TYPES,
     ERROR_RESPONSE,
     MSW_PASSWORD_POLICY,
     MSW_VERIFICATION,
-    TEST_TYPES,
-    TestDataUserProvider
+    TEST_TYPES
 } from "../utils/constants.jsx";
-import {buildTestCase, storyParametersNew, Template, testCase, TestTemplate} from "../utils/functions.tsx";
-import Page from "../../../views/Page.js";
-
+import {buildTestCase, testCase, TestTemplate} from "../utils/functions.tsx";
 
 const engErrorPageJson = getPageContent('en', "Error");
 const frErrorPageJson = getPageContent('fr', "Error");
-
-
-const serverError =  "The system cannot process the request because the password was not found.";
-const errorResponse = {
-    "success": false,
-    "message": serverError,
-    "data": null
-};
-
-const successResponse = {
-    "success": true,
-    "message": "Password sent successfully",
-    "data": {
-        "trxnId": "eac50d6d-c2d9-47ef-a3ad-7ddc27d683b1",
-        "type": "emailotp",
-        "created": "2025-03-28T16:48:21.561Z",
-        "updated": "2025-03-28T16:48:21.561Z",
-        "expiry": "2025-03-28T16:53:21.561Z",
-        "state": "PENDING",
-        "correlationID": "7322",
-        "emailAddress": "test@test.com",
-        "attempts": 0,
-        "retries": 4
-    }
-}
-const frontEndStoryParameters = {
-    isBackEndTest:false,
-    link:NAVIGATION_LINKS.password,
-    flow:FLOW_TYPES.signUp
-}
-
-const backEndStoryParameters = {
-    ...frontEndStoryParameters,
-    isBackEndTest:true,
-    endpoint:SUBMIT_END_POINTS.create
-}
 
 export default {
     title: 'GC Sign In/Tests/Sign Up/Password Creation Page',
