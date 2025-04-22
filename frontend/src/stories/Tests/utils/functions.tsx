@@ -2,7 +2,7 @@ import {expect, userEvent, within} from "@storybook/test";
 import {reactRouterParameters} from "storybook-addon-remix-react-router";
 import {http, HttpResponse} from "msw";
 import config from "../../../config.jsx";
-import {ACTION_TYPES, POLICY_RESPONSE, TEST_TYPES} from "./constants.jsx";
+import {ACTION_TYPES, MSW, POLICY_RESPONSE, TEST_TYPES, TestDataUserProvider} from "./constants.jsx";
 import Page from "../../../views/Page.js";
 import {UserProvider} from "../../../components/Providers/UserContext.jsx";
 import {AVAILABLE_LANGUAGES, FLOW_TYPES, PAGES, SUBMIT_END_POINTS} from "../../../utils/constants";
@@ -54,14 +54,6 @@ interface MSW {
     endpoint: string,
     response: Response
 }
-
-const mswMapping = new Map<string, MSW>([
-    ["Password Policy", {type:"get", endpoint: SUBMIT_END_POINTS.requestPasswordPolicy, response:POLICY_RESPONSE }]
-]);
-
-const pageToMswMapping = new Map<string, Array<string>>([
-    [PAGES.password, ["Password Policy"] ]
-]);
 
 export async function testCase({ canvasElement, step, stepMessage, message, linkText, link, heading, delay, type, actionType, input }:TestCase) {
 
@@ -256,12 +248,12 @@ const testItem = {
 }
 
 export const buildTestCase ={
-    parameters: (navigationLink:string, pathParams:PathParams, page:string)=>{
+    parameters: (navigationLink:string, pathParams:PathParams, mswArray:Array<MSW>)=>{
 
         const routingPath = buildPath(pathParams, navigationLink);
         const reactRoutingParameters = buildRoutingParams(pathParams, routingPath);
-        const mswResponse = buildMswMapping(page)
-
+        const mswResponse = buildMswMapping(mswArray)
+        console.log("MA", mswArray);
         return {
             ...reactRoutingParameters,
             ...mswResponse
@@ -290,14 +282,14 @@ function buildRoutingParams(pathParams: PathParams, routingPath: { path: string 
     }
 }
 
-function buildMswMapping(page:string){
+function buildMswMapping(mswArray:Array<MSW>){
 
     let handlers = [];
-    const pages = pageToMswMapping.get(page);
-
-    if(pages!==undefined)
-        pages.forEach((response, key)=>{
-            const msw =  mswMapping.get(response);
+    console.log("MA", mswArray);
+    if(mswArray!=null)
+        Object.keys(mswArray).forEach(key => {
+            const msw = mswArray[key];
+            console.log("msw", msw);
             if(msw.type==='get')
                 handlers.push(http.get(`${config.apiUrl}${msw.endpoint}`, async () => {return HttpResponse.json(msw.response);}));
             else if(msw.type==='post')
@@ -316,5 +308,15 @@ function buildMswMapping(page:string){
 
 export const Template = (args:any) =>   {
     return(<UserProvider><Page page={args.page}/></UserProvider>);
+}
+
+
+export const TestTemplate = (args:any) =>   {
+    console.log(args);
+    TestDataUserProvider.testData.otp = args.otp;
+    TestDataUserProvider.userData.phone = args.phone;
+    return (
+        <UserProvider initial={TestDataUserProvider}><Page page={args.page} /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
+    )
 }
 
