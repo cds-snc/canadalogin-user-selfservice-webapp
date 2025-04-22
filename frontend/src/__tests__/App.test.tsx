@@ -5,61 +5,12 @@ import '@testing-library/jest-dom';
 import {AVAILABLE_LANGUAGES, NAVIGATION_LINKS, SERVICES, FLOW_TYPES} from "../utils/constants";
 import {getFooter} from "../utils/functions";
 import {MemoryRouter} from "react-router";
-// @ts-ignore
-import * as engJson from  '../locales/en/en.json';
-// @ts-ignore
-import * as frJson from '../locales/fr/fr.json';
 import {buildTestSuite} from "./testSuite";
 import {PAGES} from "../utils/constants.jsx";
-
-const GCDS_TAG_ATTRIBUTES = {
-    'gcds-input':{
-        attributes: ['input-id', 'label', 'name', 'type', 'validate-on']
-    },
-    'gcds-input2':{
-        attributes: ['input-id', 'label', 'name', 'type', 'hint']
-    },
-    'gcds-input3':{
-        attributes: ['input-id', 'label', 'name', 'type']
-    },
-    'gcds-fieldset':{
-        attributes: ["fieldset-id", "hint", "legend"]
-    },
-    'gcds-radio-group':{
-        attributes:  ["name", "options"]
-    },
-    'gcds-button':{
-        attributes: ["type"]
-    },
-    'gcds-footer':{
-        attributes: ["sub-links"]
-    },
-    'gcds-header':{
-        attributes: ['lang', 'lang-href', 'signature-variant']
-    },
-    'gcds-details':{
-        attributes: ['details-title']
-    },
-    'gcds-stepper':{
-        attributes: ['current-step', 'tag', 'total-steps', 'lang']
-    },
-    'gcds-stepper2':{
-        attributes: ['current-step', 'tag', 'total-steps', 'lang', 'margin-bottom', 'margin-top']
-    },
-    'gcds-notice':{
-        name:'gcds-notice',
-        attributes: ['notice-title', 'notice-title-tag', 'type']
-    },
-    'gcds-checkbox':{
-        name:'gcds-checkbox',
-        attributes: ['checkbox-id', 'label', 'name']
-    }
-}
 
 describe('Routing Test', () => {
 
     const langHref = {attribute:'lang-href', en:'/'+AVAILABLE_LANGUAGES.en, fr:'/'+AVAILABLE_LANGUAGES.fr}
-    const subLinks =  {attribute:'sub-links', en:getFooter(AVAILABLE_LANGUAGES.en), fr:getFooter(AVAILABLE_LANGUAGES.fr)};
 
     test("Check home route with no language defined", () => {
 
@@ -68,7 +19,7 @@ describe('Routing Test', () => {
                 <App />
             </MemoryRouter>,
         )
-        checkHomePageContents(AVAILABLE_LANGUAGES.en, engJson["Home"], langHref.fr, engJson['Button'], engJson["FirstTimeGc"]);
+        buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.home, FLOW_TYPES.signUp,null, langHref.fr );
     });
 
     test("Check home route with en language defined", () => {
@@ -78,7 +29,7 @@ describe('Routing Test', () => {
                 <App />
             </MemoryRouter>,
         )
-        checkHomePageContents(AVAILABLE_LANGUAGES.en, engJson["Home"], langHref.fr, engJson['Button'], engJson["FirstTimeGc"]);
+        buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.home, FLOW_TYPES.signUp,null, langHref.fr );
     });
 
     test("Check home route with fr language defined", () => {
@@ -88,7 +39,7 @@ describe('Routing Test', () => {
                 <App />
             </MemoryRouter>,
         )
-        checkHomePageContents(AVAILABLE_LANGUAGES.fr, frJson["Home"], langHref.en, frJson['Button'], frJson["FirstTimeGc"]);
+        buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.home, FLOW_TYPES.signUp,null, langHref.en );
     });
 
     test("Check sign up route with en language defined", () => {
@@ -251,7 +202,6 @@ describe('Routing Test', () => {
                 <App/>
             </MemoryRouter>,
         )
-
         buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.verification, FLOW_TYPES.signUp, FLOW_TYPES.sms, langHref.fr + link);
     });
 
@@ -416,80 +366,4 @@ describe('Routing Test', () => {
     afterEach(() => {
         cleanup();
     });
-
-    function checkHomePageContents(language: string, pageContentJson: JSON, langLink: string, buttonJson: JSON, alreadyGcJson: JSON) {
-
-        verifyCommonElements(language, langLink, buttonJson, alreadyGcJson, null);
-
-        const gcdsElementMap = new Map();
-        gcdsElementMap.set('4', ['gcds-details', createMap('gcds-details', [pageContentJson['4']])])
-        gcdsElementMap.set('8', ['gcds-input', createMap('gcds-input', ['email', pageContentJson[8], 'email', 'email', 'other'] )])
-
-        Object.keys(pageContentJson).forEach(key => {
-            if(key==='3')
-                if(language===AVAILABLE_LANGUAGES.fr)
-                    expect(screen.queryByText(pageContentJson[key] + ' '+SERVICES[0].title)).toBeInTheDocument();
-                else
-                    expect(screen.queryByText(SERVICES[0].title+' '+ pageContentJson[key])).toBeInTheDocument();
-            else if(gcdsElementMap.has(key))
-                verifyGcdsHtmlElement(gcdsElementMap.get(key)[0], gcdsElementMap.get(key)[1]);
-            else
-                expect(screen.queryByText(pageContentJson[key])).toBeInTheDocument();
-        });
-
-    }
-
-    function verifyGcdsHtmlElement(tag: string, attributes:Map<string,string>)
-    {
-        const allElements = document.querySelectorAll(tag);
-        let element = document.querySelector(tag) as HTMLElement;
-
-        if(allElements!==null && allElements.length > 1) {
-            allElements.forEach((el: HTMLElement) => {
-                attributes.forEach((value) => {
-                    if (el.getAttribute(GCDS_TAG_ATTRIBUTES[tag].attributes[0]) === value)
-                        element = el;
-                });
-            })
-        }
-        expect(element).toBeTruthy();
-        expect(element).toBeInTheDocument();
-
-        attributes.forEach((value, attribute) => {
-            expect(attribute&&value).toBeTruthy();
-            expect(element).toHaveAttribute(attribute, value);
-        });
-    }
-
-    function createMap(type:string, values:Array<string>) {
-
-        try{
-            const map = new Map();
-            const attributes = GCDS_TAG_ATTRIBUTES[type].attributes;
-            attributes.forEach((attribute:string, key:string) => {
-                map.set(attribute, values[key]);
-            });
-            return map;
-        }catch(e){
-            console.error(e);
-            return null;
-        }
-    }
-
-    function verifyCommonElements(language: string, langLink: string,  buttonJson: JSON, alreadyGcJson: JSON, stepper:Array<string>){
-        verifyGcdsHtmlElement('gcds-header',  createMap('gcds-header', [language, langLink, 'colour'] ));
-
-        if(stepper)
-            verifyGcdsHtmlElement('gcds-stepper', createMap('gcds-stepper', stepper));
-
-        if(buttonJson){
-            verifyGcdsHtmlElement('gcds-button', createMap('gcds-button', ['submit']));
-            expect(screen.queryByText(buttonJson['submit'])).toBeInTheDocument();
-        }
-
-        if(alreadyGcJson)
-            Object.keys(alreadyGcJson).forEach(key => expect(screen.queryByText(alreadyGcJson[key])).toBeInTheDocument());
-
-        verifyGcdsHtmlElement('gcds-footer', createMap('gcds-footer', [subLinks[language]]));
-    }
 })

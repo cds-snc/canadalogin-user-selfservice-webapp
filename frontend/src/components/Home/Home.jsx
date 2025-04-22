@@ -26,7 +26,7 @@ export default function Home() {
                             {pageContentJson['2']}
                             <strong>
                                 {language===AVAILABLE_LANGUAGES.fr?' '+pageContentJson['3']+' ':''}
-                                {` ${SERVICES[0].title}`}{language===AVAILABLE_LANGUAGES.en?' '+pageContentJson['3']:''}
+                                {` ${SERVICES[0].title}`}{language!==AVAILABLE_LANGUAGES.fr?' '+pageContentJson['3']:''}
                             </strong>
                         </GcdsText>
                 </GcdsHeading>
