@@ -8,9 +8,7 @@ const filesToInclude = [
     '**/src/components/**/*.jsx'
 ]
 
-const filesToExclude = [
-
-]
+const filesToExclude = ['**/src/components/SignUp/TwoStepVerification/RegisterVerificationPage.jsx']
 export default defineConfig({
     plugins: [react()],
     preview: {
