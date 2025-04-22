@@ -316,6 +316,7 @@ export const TestTemplate = (args:any) =>   {
     TestDataUserProvider.testData.firstName = args.firstName;
     TestDataUserProvider.testData.lastName =  args.lastName;
     TestDataUserProvider.testData.password =  args.password;
+    TestDataUserProvider.testData.email =  args.email;
     console.log(args)
     return (
         <UserProvider initial={TestDataUserProvider}><Page page={args.page} /><button aria-label="test" type="submit"  form="form"></button></UserProvider>

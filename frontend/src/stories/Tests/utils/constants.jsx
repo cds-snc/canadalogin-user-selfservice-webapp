@@ -125,6 +125,11 @@ export const MSW_VERIFICATION = {
             error:{type: "post", endpoint: SUBMIT_END_POINTS.create, response: ERROR_RESPONSE},
             serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.create, response: null},
             success: {type: "post", endpoint: SUBMIT_END_POINTS.create, response: SUCCESS_RESPONSE}
+        },
+        signUp:{
+            error:{type: "post", endpoint: SUBMIT_END_POINTS.sendOtpCode, response: ERROR_RESPONSE},
+            serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.sendOtpCode, response: null},
+            success: {type: "post", endpoint: SUBMIT_END_POINTS.sendOtpCode, response: SUCCESS_RESPONSE}
         }
     }
 }
