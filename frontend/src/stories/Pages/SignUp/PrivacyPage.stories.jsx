@@ -6,9 +6,9 @@ import Page from "../../../views/Page.js";
 
 
 export default {
-    title: 'GC Sign In/Pages/Sign Up/Create Profile Page',
+    title: 'GC Sign In/Pages/Sign Up/Privacy Page',
     component: Page,
-    args: {page:PAGES.createProfile},
+    args: {page:PAGES.privacy},
     decorators: [withRouter,
         (Story) => (
             <UserProvider>
@@ -27,7 +27,7 @@ export const English = {
             location: {
                 pathParams: { language: AVAILABLE_LANGUAGES.en },
             },
-            routing: { path: '/:language'+NAVIGATION_LINKS.createProfile }
+            routing: { path: '/:language'+NAVIGATION_LINKS.privacy }
         }),
     }
 };
@@ -38,7 +38,7 @@ export const French = {
             location: {
                 pathParams: { language: AVAILABLE_LANGUAGES.fr},
             },
-            routing: { path: '/:language'+NAVIGATION_LINKS.createProfile }
+            routing: { path: '/:language'+NAVIGATION_LINKS.privacy }
         }),
     }
 

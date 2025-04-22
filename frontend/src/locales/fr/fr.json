@@ -130,7 +130,7 @@
   "Button": {
     "submit": "Continuer"
   },
-  "CreateProfile": {
+  "Privacy": {
     "1": "Créer une Connexion GC",
     "2": "pour continuer vers votre",
     "3": "compte",
@@ -172,7 +172,6 @@
     "42": "Qu’est‑ce que Connexion GC ?",
     "43": "Connexion GC vous permet d’utiliser un seul nom d’utilisateur et un seul mot de passe pour accéder de façon sécurisée et privée aux programmes et services participants.",
     "44": "Les programmes et services participants vous demanderont de créer une connexion GC afin d’accéder en toute sécurité à vos renseignements sur leur site Web ou leur application.",
-    "45": "Vous pouvez utiliser le même nom d’utilisateur et mot de passe pour accéder à n’importe quel programme ou service qui utilise Connexion GC.",
-    "46": "courriel à :"
+    "45": "Vous pouvez utiliser le même nom d’utilisateur et mot de passe pour accéder à n’importe quel programme ou service qui utilise Connexion GC."
   }
 }

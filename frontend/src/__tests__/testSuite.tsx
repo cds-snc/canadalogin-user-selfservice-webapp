@@ -92,7 +92,7 @@ const pageSetup = {
                     return language !== AVAILABLE_LANGUAGES.fr ? engJson["AlreadyGc"] : frJson["AlreadyGc"];
                 else
                     return null;
-            case PAGES.createProfile:
+            case PAGES.privacy:
                 return language !== AVAILABLE_LANGUAGES.fr ? engJson["AlreadyGc"] : frJson["AlreadyGc"];
             default:
                 return null;
@@ -142,7 +142,7 @@ const pageSetup = {
                     return ['11', '12', '13', '15', '16', '17', '22', '23', '24', '25', '26'];
             case PAGES.verificationSetUp:
                 return ['9', '13', '15', '17', '18', '19'];
-            case PAGES.createProfile:
+            case PAGES.privacy:
                 return ['11','25','27','42'];
             default:
                 return [];
@@ -174,7 +174,7 @@ const pageSetup = {
                     return '16';
             case PAGES.verification:
                 return '20';
-            case PAGES.createProfile:
+            case PAGES.privacy:
                 return '3';
             default:
                 return null;
@@ -192,8 +192,8 @@ const pageSetup = {
                 return pageSetup.verificationSetUpGcdsMap(pageContentJson);
             case PAGES.coreProfile:
                 return pageSetup.coreProfileSetUpGcdsMap(pageContentJson);
-            case PAGES.createProfile:
-                return pageSetup.createProfileGcdsMap(pageContentJson);
+            case PAGES.privacy:
+                return pageSetup.privacyGcdsMap(pageContentJson);
             default:
                 return new Map();
         }
@@ -253,7 +253,7 @@ const pageSetup = {
 
         return gcdsElementMap;
     },
-    createProfileGcdsMap: (pageContentJson: JSON) => {
+    privacyGcdsMap: (pageContentJson: JSON) => {
         const gcdsElementMap = new Map();
         gcdsElementMap.set('23', ['gcds-details', createMap('gcds-details', [pageContentJson['23']])])
         return gcdsElementMap;

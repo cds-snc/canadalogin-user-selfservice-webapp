@@ -6,7 +6,7 @@ import Verification from "../components/Verification/Verification.jsx";
 import Password from "../components/Password/Password.jsx";
 import SignUpEmail from "../components/SignUp/SignUpEmail.jsx";
 import CreateCoreProfile from "../components/SignUp/Profile/CreateCoreProfile.jsx";
-import CreateProfile from "../components/SignUp/Profile/CreateProfile.jsx";
+import Privacy from "../components/SignUp/Profile/Privacy.jsx";
 import VerificationSetUp from "../components/SignUp/TwoStepVerification/VerificationSetUp"
 import {PAGES} from "../utils/constants";
 import {useUser} from "../components/Providers/UserContext";
@@ -33,9 +33,9 @@ function PageContents({page}:{page:string}) {
             return (
                 <CreateCoreProfile />
             );
-        case PAGES.createProfile:
+        case PAGES.privacy:
             return (
-                <CreateProfile />
+                <Privacy />
             );
         case "RP":
             return (<div>Redirect to RP</div>);

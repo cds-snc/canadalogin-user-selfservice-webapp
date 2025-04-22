@@ -11,7 +11,7 @@ function App() {
               <Routes>
                   <Route path="/" element={ <HomePage />} />
                   <Route path="/:language" element={ <HomePage />} />
-                  <Route path="/:language/:flow/createprofile" element={<Page page={PAGES.createProfile}/>}/>
+                  <Route path="/:language/:flow/privacy" element={<Page page={PAGES.privacy}/>}/>
                   <Route path="/:language/signup" element={<Page page={PAGES.signup}/>}/>
                   <Route path="/:language/:flow/verification/:type" element={<PrivateRoute route={PAGES.verification}><Page page={PAGES.verification}/></PrivateRoute>}/>
                   <Route path="/:language/:flow/password" element={ <PrivateRoute route={PAGES.password}><Page page={PAGES.password}/></PrivateRoute>} />

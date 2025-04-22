@@ -397,7 +397,7 @@ describe('Routing Test', () => {
         buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.coreProfile, FLOW_TYPES.signIn, null, langHref.fr + NAVIGATION_LINKS.coreProfile);
     });
 
-    test("Check create profile page route with en language defined", () => {
+    test("Check privacy page route with en language defined", () => {
 
         vi.mock("../components/Providers/PrivateRoute.jsx", () => {
             return {
@@ -406,14 +406,14 @@ describe('Routing Test', () => {
         });
 
         render(
-            <MemoryRouter initialEntries={[langHref.en + NAVIGATION_LINKS.createProfile]}>
+            <MemoryRouter initialEntries={[langHref.en + NAVIGATION_LINKS.privacy]}>
                 <App/>
             </MemoryRouter>,
         )
-        buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.createProfile , FLOW_TYPES.signUp, null, langHref.fr + NAVIGATION_LINKS.createProfile);
+        buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.privacy , FLOW_TYPES.signUp, null, langHref.fr + NAVIGATION_LINKS.privacy);
     });
 
-    test("Check create profile page route with fr language defined", () => {
+    test("Check privacy page route with fr language defined", () => {
 
         vi.mock("../components/Providers/PrivateRoute.jsx", () => {
             return {
@@ -422,11 +422,11 @@ describe('Routing Test', () => {
         });
 
         render(
-            <MemoryRouter initialEntries={[langHref.fr + NAVIGATION_LINKS.createProfile]}>
+            <MemoryRouter initialEntries={[langHref.fr + NAVIGATION_LINKS.privacy]}>
                 <App/>
             </MemoryRouter>,
         )
-        buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.createProfile, FLOW_TYPES.signUp, null, langHref.en + NAVIGATION_LINKS.createProfile);
+        buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.privacy, FLOW_TYPES.signUp, null, langHref.en + NAVIGATION_LINKS.privacy);
     });
     
     test("Check core profile page route with fr language defined", () => {

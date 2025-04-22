@@ -10,11 +10,23 @@ import SubmitButton from "../../Layout/SubmitButton.jsx";
 import AlreadyGc from "../../Layout/AlreadyGc.jsx";
 import { useParams } from "react-router";
 import {AVAILABLE_LANGUAGES, SERVICES} from "../../../utils/constants.jsx";
-
-export default function CreateProfile() {
+import {useUser} from "../../Providers/UserContext.jsx";
+import { useEffect } from "react";
+import {CONTEXT_ACTIONS} from "../../../utils/constants.jsx";
+export default function Privacy() {
     const { language } = useParams();
+    const {state, dispatch} = useUser();
+    
+    useEffect(() => {
+        async function updateUserData() {
+            const userData = {...state.userData, viewPrivacy: true};
+            await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
+        }
+        updateUserData();
+    }, []);
 
-    const pageContentJson = getPageContent(language, "CreateProfile");
+
+    const pageContentJson = getPageContent(language, "Privacy");
 
     return (
         <GcdsContainer>
@@ -82,8 +94,7 @@ export default function CreateProfile() {
                 </GcdsText>
 
                 <GcdsText>
-                <span> {pageContentJson['46']} </span>
-                    <GcdsLink href="#">{pageContentJson['40']}</GcdsLink><br />
+                    <GcdsLink href={`mailto:${pageContentJson['40']}`}>{pageContentJson['40']}</GcdsLink><br />
                     <span> {pageContentJson['41']}</span>
                 </GcdsText>
             </GcdsDetails>
