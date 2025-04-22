@@ -9,7 +9,7 @@ import Home from "../components/Home/Home.jsx";
 import CreateCoreProfile from "../components/SignUp/Profile/CreateCoreProfile.jsx";
 import VerificationSetUp from "../components/SignUp/TwoStepVerification/VerificationSetUp"
 import {PAGES} from "../utils/constants";
-import {useUser} from "../components/Providers/UserContext";
+import {useUser} from "../components/Providers/useUser";
 import {useLocation, useParams} from "react-router";
 
 

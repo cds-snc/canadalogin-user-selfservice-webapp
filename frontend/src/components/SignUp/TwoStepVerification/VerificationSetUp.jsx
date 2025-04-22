@@ -11,7 +11,7 @@ import {useState, useTransition} from 'react';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/material.css';
 import VerificationSetUpInfo from "./VerificationSetUpInfo.jsx";
-import {useUser} from "../../Providers/UserContext.jsx";
+import {useUser} from "../../Providers/useUser.tsx";
 import {authService} from "../../../services/authService.jsx";
 import {useNavigate, useParams} from "react-router";
 

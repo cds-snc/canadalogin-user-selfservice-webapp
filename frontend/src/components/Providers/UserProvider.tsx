@@ -1,5 +1,6 @@
-import {createContext, useReducer, useContext} from "react";
+import {useReducer} from "react";
 import {SERVICES, CONTEXT_ACTIONS} from "../../utils/constants.jsx";
+import UserContext from "./UserContext";
 
 const initialState = {
     isAuthenticated: false,
@@ -34,10 +35,9 @@ function userReducer(state=initialState, action) {
     }
 }
 
-const UserContext = createContext();
-
 export function UserProvider ({ children, initial=initialState}) {
 
+    // @ts-ignore
     const [state, dispatch] = useReducer(userReducer, initial);
 
     return(
@@ -45,13 +45,4 @@ export function UserProvider ({ children, initial=initialState}) {
             {children}
         </UserContext.Provider>
     )
-}
-
-export function useUser (){
-    const context = useContext(UserContext);
-
-    if(!context)
-        throw new Error("useUser should be used within a Provider");
-
-    return context;
 }

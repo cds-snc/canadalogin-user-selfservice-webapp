@@ -19,7 +19,7 @@ export default {
     title: 'GC Sign In/Tests/Sign Up/Verification Page',
     args:{
         page: PAGES.verification,
-        phone: '+1 (***) *** - 4567',
+        phone: '+1 (123) 456 - 7890',
         email: 'test@test.com',
         otp: '12345e'
     },

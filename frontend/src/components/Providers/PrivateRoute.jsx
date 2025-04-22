@@ -1,5 +1,5 @@
 import {Navigate, useParams} from "react-router";
-import {useUser} from "./UserContext.jsx";
+import {useUser} from "./useUser.tsx";
 import {isEmailValid} from "../../utils/functions.jsx";
 import {FLOW_TYPES, PAGES} from "../../utils/constants.jsx";
 

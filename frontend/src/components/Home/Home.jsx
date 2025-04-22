@@ -15,6 +15,7 @@ import {useParams} from "react-router";
 
 export default function Home() {
     const {language} = useParams();
+
     const pageContentJson = getPageContent(language, "Home");
     console.log("Config URL", config.apiUrl);
     return (

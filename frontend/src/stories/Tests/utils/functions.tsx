@@ -4,7 +4,7 @@ import {http, HttpResponse} from "msw";
 import config from "../../../config.jsx";
 import {ACTION_TYPES, TEST_TYPES, TestDataUserProvider} from "./constants.jsx";
 import Page from "../../../views/Page.js";
-import {UserProvider} from "../../../components/Providers/UserContext.jsx";
+import {UserProvider} from "../../../components/Providers/UserProvider";
 
 const stepErrorMessage = 'Verify error message is on Page.';
 const stepSuccessMessage = 'Verify success message is on Page.';

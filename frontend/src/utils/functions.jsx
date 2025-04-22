@@ -16,7 +16,7 @@ function getLangHref(currentLang, pathname)
     return '/'+AVAILABLE_LANGUAGES.fr+newPathname.replaceAll('//','/');
 }
 
-function getLanguage(language){
+export function getLanguage(language){
 
     const browserLanguage = navigator.languages[1];
 
