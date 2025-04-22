@@ -3,10 +3,10 @@ import {
     AVAILABLE_LANGUAGES,
     FLOW_TYPES,
     NAVIGATION_LINKS,
-    PAGES, SUBMIT_END_POINTS
+    PAGES
 } from "../../../utils/constants.jsx";
 import {buildTestCase, Template} from "../../Tests/utils/functions.tsx";
-import {MSW_PASSWORD_POLICY, POLICY_RESPONSE} from "../../Tests/utils/constants.jsx";
+import {MSW_PASSWORD_POLICY} from "../../Tests/utils/constants.jsx";
 
 export default {
     title: 'GC Sign In/Pages/Sign Up/Password Page',
