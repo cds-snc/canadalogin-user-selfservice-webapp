@@ -1,124 +1,45 @@
-from typing import Annotated
+import logging
 
-from fastapi import APIRouter, status, Depends
-from pydantic_settings import BaseSettings
+from fastapi import APIRouter, status
+from fastapi import Request
 
-from app.config import Settings, get_settings
-from app.otp.schemas import UserName, EmailOtpRequestResponse, PhoneNumber, SMSOtpRequestResponse, OtpVerification, VoiceOtpRequestResponse
-from app.otp.services.send_transient_SMS_otp import SendTransientSMSOTP
-from app.otp.services.send_transient_email_otp import SendTransientEmailOTP
-
-from app.otp.services.send_transient_voice_otp import SendTransientVoiceOTP
-from app.otp.services.verify_transient_SMS_otp import VerifyTransientSMSOTP
-from app.otp.services.verify_transient_email_otp import VerifyTransientEmailOTP
-from app.otp.services.verify_transient_voice_otp import VerifyTransientVoiceOTP
+from app.otp.schemas import UserOtpInfo, OtpType, OtpRequestResponse, UserOtpVerificationInfo
+from app.otp.services.send_transient_otp import handle_otp_send
+from app.otp.services.transient_otp_verification import handle_otp_verification
+from app.utils.helpers import generate_error_response
 from app.utils.schemas import ResponseModel
-from fastapi import FastAPI, Request
 
-
-
-
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
-
-@router.post("/email/send",
-             response_model=EmailOtpRequestResponse,
+@router.post("/transient_otp/send/{otp_type}",
+             response_model=OtpRequestResponse,
              status_code=status.HTTP_200_OK,
              tags=["OTP"],
-             summary="Sends an email with a OTP",
-             description="Validate a users email ")
-async def email_otp(userName: UserName, request: Request):
-    """
-    Emails a OTP password
-    Returns: Transaction ID
-    """
-    settings = get_settings().ibm_verify_config
-    http_client = request.app.state.request_client
-    otp = SendTransientEmailOTP(settings, http_client)
-    return await otp.handle_transient_email_otp(userName)
+             summary="Sends OTPs: email; voice; or SMS",
+             description="Proves a user's phone number or email address")
+async def verify_voice_otp(user_otp_info: UserOtpInfo, otp_type: OtpType, request: Request):
+
+    if user_otp_info.phoneNumber and user_otp_info.emailAddress:
+        logger.error(f"Choose to send an OTP to a phone number, or and email address. Cannot do both.")
+        return generate_error_response(400, "Unknown error")
+
+    elif user_otp_info.phoneNumber and otp_type.value == OtpType.SMS or otp_type.value == OtpType.VOICE:
+        return await handle_otp_send(user_otp_info, otp_type, request.app.state.request_client)
+
+    elif user_otp_info.emailAddress and otp_type.value == OtpType.EMAIL:
+        return await handle_otp_send(user_otp_info, otp_type, request.app.state.request_client)
+
+    else:
+        logger.error(f"Check that you're sending user_otp_info that matches the url parameter: {otp_type}")
+        return generate_error_response(400, "Unknown error")
 
 
-@router.post("/email/verify",
+@router.post("/transient_otp/verify/{otp_type}",
              response_model=ResponseModel,
              status_code=status.HTTP_200_OK,
              tags=["OTP"],
-             summary="Verifies an email OTP",
-             description="User sends in the trxnId and OTP to verify the email")
-async def verify_user_email_otp(data: OtpVerification, request: Request):
-    """
-    Verifies an otp and trxnId for email
-    Returns: Transaction ID
-    """
-    settings = get_settings().ibm_verify_config
-    http_client = request.app.state.request_client
-    otp = VerifyTransientEmailOTP(settings,http_client)
-    return await otp.handle_transient_email_otp_verification(data)
-
-
-@router.post("/transient_sms/send",
-             response_model=SMSOtpRequestResponse,
-             status_code=status.HTTP_200_OK,
-             tags=["OTP"],
-             summary="Sends a SMS OTP",
-             description="Verify a user's phone number")
-async def sms_otp(data: PhoneNumber, request: Request):
-    """
-    Sends an OTP via SMS
-    Returns: Transaction ID
-    """
-    http_client = request.app.state.request_client
-    settings = get_settings().ibm_verify_config
-    otp = SendTransientSMSOTP(settings, http_client)
-    return await otp.handle_transient_sms_otp(data)
-
-
-@router.post("/transient_sms/verify",
-             response_model=ResponseModel,
-             status_code=status.HTTP_200_OK,
-             tags=["OTP"],
-             summary="Verifies a SMS OTP",
-             description="Proves a user's phone number")
-async def sms_otp(data: OtpVerification, request: Request):
-    """
-    Verify an SMS OTP Passcode
-    Returns: a verification success message
-    """
-    http_client = request.app.state.request_client
-    settings = get_settings().ibm_verify_config
-    otp = VerifyTransientSMSOTP(settings, http_client)
-    return await otp.handle_transient_sms_otp_verification(data)
-
-
-@router.post("/transient_voice/send",
-             response_model=VoiceOtpRequestResponse,
-             status_code=status.HTTP_200_OK,
-             tags=["OTP"],
-             summary="Sends a voice OTP",
-             description="Verifies a user's phone number")
-async def send_voice_otp(data: PhoneNumber, request: Request):
-    """
-    Sends and OTP via Voice
-    Returns: Transaction ID
-    """
-    http_client = request.app.state.request_client
-    settings = get_settings().ibm_verify_config
-    otp = SendTransientVoiceOTP(settings,http_client)
-    return await otp.handle_transient_voice_otp(data)
-
-
-@router.post("/transient_voice/verify",
-             response_model=ResponseModel,
-             status_code=status.HTTP_200_OK,
-             tags=["OTP"],
-             summary="Verifies a voice OTP",
-             description="Proves a user's phone number")
-async def verify_voice_otp(data: OtpVerification,request: Request):
-    """
-    Verify a voice OTP
-    Returns: a verification success message
-    """
-    http_client = request.app.state.request_client
-    settings = get_settings().ibm_verify_config
-    otp = VerifyTransientVoiceOTP(settings, http_client)
-    return await otp.handle_transient_voice_otp_verification(data)
-
+             summary="Sends OTPs: email; voice; or SMS",
+             description="Proves a user's phone number or email address")
+async def verify_voice_otp(verification_data: UserOtpVerificationInfo, otp_type: OtpType, request: Request):
+        return await handle_otp_verification(verification_data, otp_type, request.app.state.request_client)

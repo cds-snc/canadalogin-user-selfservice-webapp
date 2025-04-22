@@ -1,5 +1,7 @@
-from typing import List, Any, Optional
-from pydantic import BaseModel, Field, EmailStr
+from typing import List, Optional
+from pydantic import BaseModel, EmailStr
+from pydantic_extra_types.phone_numbers import PhoneNumber
+
 from app.utils.schemas import ResponseModel
 
 
@@ -46,3 +48,20 @@ class AuthenticatedUserData(BaseModel):
 
 class AuthenticatedUserResponse(ResponseModel):
     data: AuthenticatedUserData
+
+class TwoFactorEnrollmentUserData(BaseModel):
+    userId: str
+    phoneNumber: PhoneNumber
+
+class TwofactorEnrollmentResponse(BaseModel):
+    id: str
+    userId: str
+    type: str
+    created: str
+    updated: str
+    enabled: bool
+    validated: bool
+    attributes: dict[str,str]
+
+class VerifiedTwofactorEnrollmentResponse(ResponseModel):
+    data: TwofactorEnrollmentResponse
