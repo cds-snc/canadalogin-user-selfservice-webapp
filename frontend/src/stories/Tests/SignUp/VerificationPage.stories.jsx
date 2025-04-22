@@ -49,7 +49,6 @@ export const ServerErrorReqNewCode = TestTemplate.bind({});
 export const UseNewNumber = TestTemplate.bind({});
 export const UseNewEmail = TestTemplate.bind({});
 
-
 EngEmailErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -64,7 +63,6 @@ EngEmailErrorFrontEnd.play = async ({ canvasElement, step }) => {
         type: TEST_TYPES.error
     })
 }
-
 
 EngSmsErrorFrontEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp, type:FLOW_TYPES.sms },
