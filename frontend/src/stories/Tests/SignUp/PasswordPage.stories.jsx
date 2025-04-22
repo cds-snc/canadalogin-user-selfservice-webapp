@@ -2,8 +2,7 @@ import {
     AVAILABLE_LANGUAGES,
     FLOW_TYPES,
     NAVIGATION_LINKS,
-    PAGES,
-    SUBMIT_END_POINTS
+    PAGES
 } from "../../../utils/constants.jsx";
 import {getPageContent} from "../../../utils/functions.jsx";
 import {
