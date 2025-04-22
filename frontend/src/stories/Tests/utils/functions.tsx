@@ -251,7 +251,7 @@ export const buildTestCase ={
         const routingPath = buildPath(pathParams, navigationLink);
         const reactRoutingParameters = buildRoutingParams(pathParams, routingPath);
         const mswResponse = buildMswMapping(mswArray)
-        console.log("MA", mswArray);
+
         return {
             ...reactRoutingParameters,
             ...mswResponse
@@ -283,11 +283,9 @@ function buildRoutingParams(pathParams: PathParams, routingPath: { path: string 
 function buildMswMapping(mswArray:Array<MSW>){
 
     let handlers = [];
-    console.log("MA", mswArray);
     if(mswArray!=null)
         Object.keys(mswArray).forEach(key => {
             const msw = mswArray[key];
-            console.log("msw", msw);
             if(msw.type==='get')
                 handlers.push(http.get(`${config.apiUrl}${msw.endpoint}`, async () => {return HttpResponse.json(msw.response);}));
             else if(msw.type==='post')
@@ -310,15 +308,16 @@ export const Template = (args:any) =>   {
 
 
 export const TestTemplate = (args:any) =>   {
-    console.log(args);
-    TestDataUserProvider.testData.otp = args.otp;
+
+    TestDataUserProvider.userData.email =  args.email;
     TestDataUserProvider.userData.phone = args.phone;
+
+    TestDataUserProvider.testData.otp = args.otp;
     TestDataUserProvider.testData.firstName = args.firstName;
     TestDataUserProvider.testData.lastName =  args.lastName;
     TestDataUserProvider.testData.password =  args.password;
-    TestDataUserProvider.userData.email =  args.email;
     TestDataUserProvider.testData.email =  args.email;
-    console.log(args)
+
     return (
         <UserProvider initial={TestDataUserProvider}><Page page={args.page} /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
     )
