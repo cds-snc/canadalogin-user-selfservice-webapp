@@ -66,7 +66,7 @@ const BadTemplateFE = (args) =>   {
     )
 }
 
-const SuccessfulPassFE = (args) =>   {
+const GoodTemplateFE = (args) =>   {
 
     TestDataUserProvider.testData.email = "test@test.com";
 
@@ -77,9 +77,9 @@ const SuccessfulPassFE = (args) =>   {
 
 export const EngErrorFrontEnd = BadTemplateFE.bind({});
 export const FrErrorFrontEnd = BadTemplateFE.bind({});
-// export const ErrorBackEnd = TemplateBE.bind({});
-// export const SuccessfulBackEnd = TemplateBE.bind({});
-// export const ServerErrorBackEnd = TemplateBE.bind({});
+export const SuccessfulPassFE = GoodTemplateFE.bind({});
+// export const SuccessfulBackEnd = GoodTemplateFE.bind({});
+// export const ServerErrorBackEnd = GoodTemplateFE.bind({});
 
 EngErrorFrontEnd.parameters = storyParametersNew({
     ...frontEndStoryParameters,
@@ -119,24 +119,24 @@ FrErrorFrontEnd.play = async ({ canvasElement, step }) => {
     })
 }
 //
-ErrorBackEnd.parameters = storyParametersNew({
-    ...backEndStoryParameters,
+SuccessfulPassFE.parameters = storyParametersNew({
+    // ...backEndStoryParameters,
+    ...frontEndStoryParameters,
     language:AVAILABLE_LANGUAGES.en,
-    response:errorResponse,
 
 });
-ErrorBackEnd.play = async ({ canvasElement, step }) => {
+SuccessfulPassFE.play = async ({ canvasElement, step }) => {
 
     await testCase({
         canvasElement,
         step,
-        stepMessage:"Submit form with bad email For Back End Error",
+        stepMessage:"Submit form with good email for next page",
         link: 'email',
         heading: engErrorPageJson[1],
         message: serverError,
         delay: 1000,
         actionType: ACTION_TYPES.submit,
-        type: TEST_TYPES.error
+        type: TEST_TYPES.redirect
     })
 }
 //

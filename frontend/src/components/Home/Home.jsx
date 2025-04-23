@@ -56,8 +56,8 @@ export default function Home({currentLang}) {
                     };
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                     console.log("userData: ", userData);
-                    console.log("success", "/" + currentLang + NAVIGATION_LINKS.verifyEmail);
-                    navigate("/" + language + "/" + FLOW_TYPES.signIn + NAVIGATION_LINKS.password);
+                    console.log("success", "/" + currentLang + "/" + FLOW_TYPES.signIn + NAVIGATION_LINKS.password);
+                    navigate("/" + currentLang + "/" + FLOW_TYPES.signIn + NAVIGATION_LINKS.password);
             } catch (error) {
                 console.error('Signin error:', error);
                 setError({emailError:  errorPageJson[7], heading: errorPageJson['1']});
