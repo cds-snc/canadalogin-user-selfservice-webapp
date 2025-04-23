@@ -5,7 +5,9 @@ const filesToInclude = [
     '**/src/App.jsx',
     '**/src/utils/*',
     '**/src/views/**/*',
-    '**/src/components/**/*'
+    '**/src/components/**/*',
+    '**/src/services/*',
+    '**/src/locales/**/*'
 ]
 
 const filesToExclude = [];
