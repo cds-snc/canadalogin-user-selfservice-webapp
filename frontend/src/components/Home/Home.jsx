@@ -13,18 +13,19 @@ import {useState, useTransition} from "react";
 import config from "../../config.jsx";
 import {useUser} from "../Providers/UserContext.jsx";
 import {useNavigate, useParams} from "react-router";
+import {useParams} from "react-router";
 
 console.log("Config URL", config.apiUrl);
 
-export default function Home({currentLang}) {
-    // const {language} = useParams();
+export default function Home() {
+    const {language} = useParams();
     const {state, dispatch} = useUser();
     const [email, setEmail] = useState("");
     const [errorJson, setError] = useState({heading: null, emailError:null});
     const [isPending, startTransition] = useTransition();
     const navigate = useNavigate();
-    const pageContentJson = getPageContent(currentLang, "Home");
-    const errorPageJson = getPageContent(currentLang, "Error");
+    const pageContentJson = getPageContent(language, "Home");
+    const errorPageJson = getPageContent(language, "Error");
 
     function validateEmail(email) {
         setEmail(email);
@@ -48,16 +49,16 @@ export default function Home({currentLang}) {
                 return;
 
             try {
-                    // await {userEmail: formData.get('email')}
+                // await {userEmail: formData.get('email')}
                 console.log("formEmail: ", formEmail);
-                    const userData = {
-                        ...state.userData,
-                        email: formEmail,
-                    };
-                    await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
-                    console.log("userData: ", userData);
-                    console.log("success", "/" + currentLang + "/" + FLOW_TYPES.signIn + NAVIGATION_LINKS.password);
-                    navigate("/" + currentLang + "/" + FLOW_TYPES.signIn + NAVIGATION_LINKS.password);
+                const userData = {
+                    ...state.userData,
+                    email: formEmail,
+                };
+                await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
+                console.log("userData: ", userData);
+                console.log("success", "/" + language + "/" + FLOW_TYPES.signIn + NAVIGATION_LINKS.password);
+                navigate("/" + language + "/" + FLOW_TYPES.signIn + NAVIGATION_LINKS.password);
             } catch (error) {
                 console.error('Signin error:', error);
                 setError({emailError:  errorPageJson[7], heading: errorPageJson['1']});
@@ -65,6 +66,7 @@ export default function Home({currentLang}) {
         })
     }
 
+    console.log("Config URL", config.apiUrl);
     return (
         <GcdsContainer className="gcds-content" >
             <GcdsContainer>
@@ -79,8 +81,8 @@ export default function Home({currentLang}) {
                         <GcdsText marginTop="150" marginBottom="0">
                             {pageContentJson['2']}
                             <strong>
-                                {currentLang===AVAILABLE_LANGUAGES.fr?' '+pageContentJson['3']+' ':''}
-                                {` ${SERVICES[0].title}`}{currentLang===AVAILABLE_LANGUAGES.en?' '+pageContentJson['3']:''}
+                                {language===AVAILABLE_LANGUAGES.fr?' '+pageContentJson['3']+' ':''}
+                                {` ${SERVICES[0].title}`}{language!==AVAILABLE_LANGUAGES.fr?' '+pageContentJson['3']:''}
                             </strong>
                         </GcdsText>
                 </GcdsHeading>
@@ -111,11 +113,11 @@ export default function Home({currentLang}) {
                                 data-testid="signin-email"
                                 lang={currentLang}
                             ></GcdsInput>
-                            <SubmitButton currentLang={currentLang} disabled={isPending} />
+                            <SubmitButton currentLang={language} />
                         </form>
                     </GcdsText>
                 </GcdsContainer>
-            <FirstTimeGc currentLang={currentLang}/>
+            <FirstTimeGc currentLang={language}/>
         </GcdsContainer>
     )
 }

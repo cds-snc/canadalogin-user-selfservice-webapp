@@ -15,7 +15,7 @@ import {
 } from "../../utils/constants.jsx";
 import {useNavigate, useParams} from "react-router";
 import SubmitButton from "../Layout/SubmitButton.jsx";
-import {useUser} from "../Providers/UserContext.jsx";
+import {useUser} from "../Providers/useUser.tsx";
 import {authService} from "../../services/authService.jsx";
 import {useEffect, useState, useTransition} from "react";
 

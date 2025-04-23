@@ -80,6 +80,8 @@ const pageSetup ={
     },
     alreadyGc: (page:string, language:string, flow:string) =>{
         switch(page) {
+            case PAGES.home:
+                return language !== AVAILABLE_LANGUAGES.fr ? engJson["FirstTimeGc"] : frJson["FirstTimeGc"];
             case PAGES.signup:
                 return language !== AVAILABLE_LANGUAGES.fr ? engJson["AlreadyGc"] : frJson["AlreadyGc"];
             case PAGES.password:
@@ -162,6 +164,8 @@ const pageSetup ={
     },
     serviceKey: (page:string, flow:string) =>{
         switch(page){
+            case PAGES.home:
+                return '3';
             case PAGES.password:
                 if(flow===FLOW_TYPES.signUp)
                     return null;
@@ -175,6 +179,8 @@ const pageSetup ={
     },
     gcdsMap:(language:string, page:string, pageContentJson:JSON, flow:string)=>{
         switch(page){
+            case PAGES.home:
+                return pageSetup.homePageGcdsMap(pageContentJson);
             case PAGES.signup:
                 return pageSetup.signUpEmailGcdsMap(language, pageContentJson);
             case PAGES.password:
@@ -188,6 +194,14 @@ const pageSetup ={
             default:
                 return new Map();
         }
+    },
+    homePageGcdsMap: (pageContentJson:JSON)=>{
+
+        const gcdsElementMap = new Map();
+        gcdsElementMap.set('4', ['gcds-details', createMap('gcds-details', [pageContentJson['4']])])
+        gcdsElementMap.set('8', ['gcds-input', createMap('gcds-input', ['email', pageContentJson[8], 'email', 'email', 'other'] )])
+
+        return gcdsElementMap;
     },
     signUpEmailGcdsMap: (language:string, pageContentJson:JSON)=>{
 
@@ -269,8 +283,6 @@ const testSuite = {
         const gcdsElementMap = pageSetup.gcdsMap(language, page, pageContentJson, flow);
 
         Object.keys(pageContentJson).forEach(key => {
-            console.log("key: ",key);
-            console.log(pageContentJson[key]);
             if(gcdsElementMap.has(key))
                 verifyGcdsHtmlElement(gcdsElementMap.get(key)[0], gcdsElementMap.get(key)[1]);
             else if (!textKeysToNotSearch.includes(key))
@@ -303,7 +315,7 @@ function verifyGcdsHtmlElement(tag: string, attributes:Map<string,string>)
     expect(element).toBeTruthy();
     expect(element).toBeInTheDocument();
 
-    attributes.forEach((value, attribute) => {
+    attributes.forEach((value:string, attribute:string) => {
         expect(attribute).toBeTruthy();
         expect(element).toHaveAttribute(attribute, value);
     });

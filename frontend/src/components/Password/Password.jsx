@@ -20,13 +20,10 @@ import {
     PAGES,
     SERVICES
 } from "../../utils/constants.jsx";
-import {useUser} from "../Providers/UserContext.jsx";
+import {useUser} from "../Providers/useUser.tsx";
 import SubmitButton from "../Layout/SubmitButton.jsx";
 import {useNavigate, useParams} from "react-router";
 import AlreadyGc from "../Layout/AlreadyGc.jsx";
-
-
-
 
 export default function Password() {
     const {state, dispatch} = useUser();
