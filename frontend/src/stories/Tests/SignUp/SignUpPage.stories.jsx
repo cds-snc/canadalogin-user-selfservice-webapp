@@ -25,7 +25,6 @@ export default {
         null)
 };
 
-
 export const EngErrorFrontEnd = TestTemplate.bind({});
 export const FrErrorFrontEnd = TestTemplate.bind({});
 export const ErrorBackEnd = TestTemplate.bind({});

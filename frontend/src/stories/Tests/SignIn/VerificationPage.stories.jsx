@@ -15,7 +15,6 @@ const frErrorPageJson = getPageContent('fr', "Error");
 const engPageContentJson = getPageContent(AVAILABLE_LANGUAGES.en, PAGES.verification);
 const frPageContentJson = getPageContent(AVAILABLE_LANGUAGES.fr, PAGES.verification);
 
-
 export default {
     title: 'GC Sign In/Tests/Sign In/Verification Page',
     args:{

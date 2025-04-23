@@ -1,10 +1,6 @@
 import {AVAILABLE_LANGUAGES, FLOW_TYPES, NAVIGATION_LINKS, PAGES} from "../../../utils/constants.jsx";
 import {buildTestCase, Template} from "../../Tests/utils/functions.tsx";
 
-
-
-
-
 export default {
     title: 'GC Sign In/Pages/Sign Up/Core Profile Page',
     args:{

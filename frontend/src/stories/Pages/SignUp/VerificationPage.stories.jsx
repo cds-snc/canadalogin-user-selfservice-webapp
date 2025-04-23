@@ -7,9 +7,6 @@ import {
 } from "../../../utils/constants.jsx";
 import {buildTestCase, Template} from "../../Tests/utils/functions.tsx";
 
-
-
-
 export default {
     title: 'GC Sign In/Pages/Sign Up/Verification Page',
     args:{
