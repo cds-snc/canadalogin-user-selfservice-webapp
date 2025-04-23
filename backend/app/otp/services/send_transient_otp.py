@@ -2,6 +2,7 @@ import logging
 from datetime import datetime
 
 from fastapi import Request, HTTPException
+from httpx import AsyncClient
 from pydantic import ValidationError
 
 from app.config import get_settings
@@ -11,41 +12,30 @@ from app.utils.helpers import generate_error_response
 from app.utils.schemas import ResponseModel
 
 logger = logging.getLogger(__name__)
-settings = get_settings().ibm_verify_config
 
-end_user_otp_info = None
-end_user_otp_type = None
-http_client = None
-http_client_response = None
 
-async def handle_otp_send(user_otp_info: UserOtpInfo, otp_type: OtpType, request: Request ):
-    global end_user_otp_info
-    global end_user_otp_type
-    global http_client
-    global http_client_response
-
-    end_user_otp_info = user_otp_info
-    end_user_otp_type = otp_type
-    http_client = request
+async def handle_otp_send(user_otp_info: UserOtpInfo, otp_type: OtpType, global_http_client: AsyncClient):
+    """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
+    Use it for ALL API calls."""
 
     try:
-        logger.info(f"Attempting to send {end_user_otp_type.value} OTP")
+        logger.info(f"Attempting to send {otp_type} OTP")
         start_time = datetime.now()
-        http_client_response = await dispatch_otp()
+        http_client_response = await dispatch_otp(user_otp_info, otp_type, global_http_client)
         duration = (datetime.now() - start_time).total_seconds()
-        logger.info(f"{end_user_otp_type.value} OTP send request response received in {duration:.2f} seconds")
+        logger.info(f"{otp_type} OTP send request response received in {duration:.2f} seconds")
 
         if http_client_response.status_code is None:
             return generate_error_response(400, "Unknown error")
 
         if http_client_response.status_code != 201:
-            logger.error(f"Error while sending {end_user_otp_type.value} OTP: {http_client_response.json()}")
+            logger.error(f"Error while sending {otp_type} OTP: {http_client_response.json()}")
             return generate_error_response(http_client_response.status_code, "Unknown error")
 
         response_json = http_client_response.json()
 
         if http_client_response.status_code == 201:
-            logger.info(f"{end_user_otp_type.value} OTP created and sent")
+            logger.info(f"{otp_type} OTP created and sent")
 
             try:
                 validated_data = OtpSentResponse(**response_json)
@@ -57,43 +47,47 @@ async def handle_otp_send(user_otp_info: UserOtpInfo, otp_type: OtpType, request
             return ResponseModel(
                 success=True,
                 data=validated_data,
-                message=f"{end_user_otp_type.value} OTP sent successfully")
+                message=f"{otp_type} OTP sent successfully")
 
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Send transient {end_user_otp_type.value} error: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Send transient {otp_type} error: {str(e)}")
 
 
-async def dispatch_otp():
+async def dispatch_otp(user_otp_info: UserOtpInfo, otp_type: OtpType, global_http_client: AsyncClient):
+    """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
+    Use it for ALL API calls."""
 
-    if end_user_otp_type == OtpType.VOICE or end_user_otp_type == OtpType.SMS:
-
+    if otp_type == OtpType.VOICE or otp_type == OtpType.SMS:
         user_phone_number = {
-            "phoneNumber": ''.join(c for c in end_user_otp_info.phoneNumber if c.isdigit()) # Verify's transient sms and voice OTPs do not accept non-numbers in the input string
+            "phoneNumber": ''.join(c for c in user_otp_info.phoneNumber if c.isdigit()) # Verify's transient sms and voice endpoints do not accept non-numbers in the input string
         }
-
     else:
         user_email_address = {
-            "emailAddress": end_user_otp_info.emailAddress
+            "emailAddress": user_otp_info.emailAddress
         }
 
     try:
         access_token = await get_access_token()
         headers = get_auth_request_headers(access_token, True)
+        settings = get_settings().ibm_verify_config
 
-        if end_user_otp_type == OtpType.SMS:
+        if otp_type == OtpType.SMS:
             send_transient_otp_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/smsotp/transient/verifications"
-            response = await http_client.post(send_transient_otp_url, json=user_phone_number, headers=headers)
+            response = await global_http_client.post(send_transient_otp_url, json=user_phone_number, headers=headers)
             return response
 
-        if end_user_otp_type == OtpType.VOICE:
+        elif otp_type == OtpType.VOICE:
             send_transient_otp_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/voiceotp/transient/verifications"
-            response = await http_client.post(send_transient_otp_url, json=user_phone_number, headers=headers)
+            response = await global_http_client.post(send_transient_otp_url, json=user_phone_number, headers=headers)
             return response
 
-        if end_user_otp_type == OtpType.EMAIL:
+        elif otp_type == OtpType.EMAIL:
             send_transient_otp_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/emailotp/transient/verifications"
-            response = await http_client.post(send_transient_otp_url, json=user_email_address, headers=headers)
+            response = await global_http_client.post(send_transient_otp_url, json=user_email_address, headers=headers)
             return response
+
+        else:
+            generate_error_response(400, 'Unknown error')
 
     except Exception as error:
         logger.error(

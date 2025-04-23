@@ -24,9 +24,9 @@ class EmailOtpResponse(BaseModel):
     retries: int
 
 class OtpType(str, Enum):
-    SMS = 'SMS'
-    EMAIL = 'EMAIL'
-    VOICE = 'VOICE'
+    SMS = 'sms'
+    EMAIL = 'email'
+    VOICE = 'voice'
 
 class OtpVerification(BaseModel):
     otp: str

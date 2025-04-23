@@ -5,7 +5,7 @@ from fastapi import Request
 
 from app.otp.schemas import UserOtpInfo, OtpType, OtpRequestResponse, UserOtpVerificationInfo
 from app.otp.services.send_transient_otp import handle_otp_send
-from app.otp.services.transient_otp_verification import handle_otp_verification
+from app.otp.services.verify_transient_otp import handle_otp_verification
 from app.utils.helpers import generate_error_response
 from app.utils.schemas import ResponseModel
 
@@ -16,7 +16,7 @@ router = APIRouter()
              response_model=OtpRequestResponse,
              status_code=status.HTTP_200_OK,
              tags=["OTP"],
-             summary="Sends OTPs: email; voice; or SMS",
+             summary="Sends OTPs: email; voice; or sms",
              description="Proves a user's phone number or email address")
 async def verify_voice_otp(user_otp_info: UserOtpInfo, otp_type: OtpType, request: Request):
 
@@ -24,10 +24,10 @@ async def verify_voice_otp(user_otp_info: UserOtpInfo, otp_type: OtpType, reques
         logger.error(f"Choose to send an OTP to a phone number, or and email address. Cannot do both.")
         return generate_error_response(400, "Unknown error")
 
-    elif user_otp_info.phoneNumber and otp_type.value == OtpType.SMS or otp_type.value == OtpType.VOICE:
+    elif user_otp_info.phoneNumber and otp_type == OtpType.SMS or otp_type == OtpType.VOICE: #check for correct input combo
         return await handle_otp_send(user_otp_info, otp_type, request.app.state.request_client)
 
-    elif user_otp_info.emailAddress and otp_type.value == OtpType.EMAIL:
+    elif user_otp_info.emailAddress and otp_type.value == OtpType.EMAIL:  #check for correct input combo
         return await handle_otp_send(user_otp_info, otp_type, request.app.state.request_client)
 
     else:
@@ -42,4 +42,5 @@ async def verify_voice_otp(user_otp_info: UserOtpInfo, otp_type: OtpType, reques
              summary="Sends OTPs: email; voice; or SMS",
              description="Proves a user's phone number or email address")
 async def verify_voice_otp(verification_data: UserOtpVerificationInfo, otp_type: OtpType, request: Request):
-        return await handle_otp_verification(verification_data, otp_type, request.app.state.request_client)
+
+    return await handle_otp_verification(verification_data, otp_type, request.app.state.request_client)

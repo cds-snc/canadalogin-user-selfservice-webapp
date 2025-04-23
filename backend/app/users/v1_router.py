@@ -46,7 +46,7 @@ async def user_password_signin(user: UserLoginRequestData):
             response_model=VerifiedTwofactorEnrollmentResponse,
             tags=["Users"],
             summary="Enrols user into Voice or SMS 2FA ",
-            description="Basic Authentication - Email and Password")
+            description="")
 async def user_2fa_enroll(user_enrollment_data: TwoFactorEnrollmentUserData, otp_type: OtpType, request: Request):
 
     if otp_type == OtpType.EMAIL:
