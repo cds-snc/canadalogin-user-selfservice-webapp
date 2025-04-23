@@ -2,6 +2,11 @@ import {useReducer} from "react";
 import {SERVICES, CONTEXT_ACTIONS} from "../../utils/constants.jsx";
 import UserContext from "./UserContext";
 
+interface Action {
+    type: string
+    payload: JSON
+}
+
 const initialState = {
     isAuthenticated: false,
     userData: {
@@ -19,16 +24,12 @@ const initialState = {
 }
 
 
-function userReducer(state=initialState, action) {
+function userReducer(state=initialState, action: Action) {
     switch (action.type) {
         case CONTEXT_ACTIONS.signUp:
             return {
                 ...state,
                 userData: action.payload
-            };
-        case CONTEXT_ACTIONS.logOut:
-            return {
-                initialState
             };
         default:
             return state;
@@ -37,7 +38,6 @@ function userReducer(state=initialState, action) {
 
 export function UserProvider ({ children, initial=initialState}) {
 
-    // @ts-ignore
     const [state, dispatch] = useReducer(userReducer, initial);
 
     return(
