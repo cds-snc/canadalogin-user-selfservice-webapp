@@ -17,19 +17,17 @@ export default function Privacy() {
     const { language } = useParams();
     const {state, dispatch} = useUser();
     
-    useEffect(() => {
-        async function updateUserData() {
-            const userData = {...state.userData, viewPrivacy: true};
-            await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
-        }
-        updateUserData();
-    }, []);
-
+    async function handleSubmit(event) {
+        event.preventDefault();
+        const userData = { ...state.userData, viewPrivacy: true };
+        await dispatch({ type: CONTEXT_ACTIONS.signUp, payload: userData });
+    }
 
     const pageContentJson = getPageContent(language, "Privacy");
 
     return (
         <GcdsContainer>
+             <form onSubmit={handleSubmit}>
             <GcdsHeading tag='h1'>
                 {pageContentJson['1']}
                 <GcdsText marginTop="150" marginBottom="0">
@@ -101,6 +99,7 @@ export default function Privacy() {
             <br />
             <SubmitButton currentLang={language} />
             <AlreadyGc currentLang={language} />
+            </form>
         </GcdsContainer>
     )
 }

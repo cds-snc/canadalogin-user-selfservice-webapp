@@ -1,13 +1,15 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react'
 
+
 const filesToInclude = [
     '**/src/App.jsx',
-    '**/src/utils/*.jsx',
-    '**/src/views/**/*.jsx',
-    '**/src/components/**/*.jsx'
+    '**/src/utils/*',
+    '**/src/views/**/*',
+    '**/src/components/**/*',
+    '**/src/services/*',
+    '**/src/locales/**/*'
 ]
-
 const filesToExclude = [
 
 ]
