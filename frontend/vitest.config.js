@@ -10,9 +10,8 @@ const filesToInclude = [
     '**/src/services/*',
     '**/src/locales/**/*'
 ]
-const filesToExclude = [
 
-]
+const filesToExclude = [];
 export default defineConfig({
     plugins: [react()],
     preview: {

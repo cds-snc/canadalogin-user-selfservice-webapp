@@ -1,5 +1,5 @@
 import {GcdsHeading, GcdsLink, GcdsText} from "@cdssnc/gcds-components-react";
-import {getPageContent} from "../../utils/functions";
+import {getLanguage, getPageContent} from "../../utils/functions";
 import {NAVIGATION_LINKS} from "../../utils/constants.jsx";
 
 
@@ -7,7 +7,7 @@ import {NAVIGATION_LINKS} from "../../utils/constants.jsx";
 export default function FirstTimeGc({currentLang})
 {
     const pageContentJson = getPageContent(currentLang, "FirstTimeGc");
-
+    const language = getLanguage(currentLang);
     return(
         <GcdsHeading tag="h2">
             {pageContentJson['1']}

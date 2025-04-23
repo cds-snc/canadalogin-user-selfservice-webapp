@@ -22,9 +22,7 @@ const config = {
     "options": {}
   },
   staticDirs: ['../public'],
-  docs: {
-    autodocs: true
-  },
+  docs: {},
 
   typescript: {
     reactDocgen: "react-docgen-typescript"

@@ -7,7 +7,7 @@ import {useState, useTransition} from "react";
 import { CONTEXT_ACTIONS, NAVIGATION_LINKS} from "../../utils/constants";
 import {getPageContent, isEmailValid} from '../../utils/functions';
 import AlreadyGc from "../Layout/AlreadyGc.jsx";
-import {useUser} from "../Providers/UserContext.jsx";
+import {useUser} from "../Providers/useUser";
 import {useNavigate, useParams} from "react-router";
 import {authService} from "../../services/authService.jsx";
 import SubmitButton from "../Layout/SubmitButton.jsx";

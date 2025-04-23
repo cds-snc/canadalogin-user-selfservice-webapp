@@ -29,7 +29,8 @@ export const PAGES ={
     privacy: 'Privacy',
     verificationSetUp: 'VerificationSetUp',
     coreProfile: 'CreateCoreProfile',
-    password: 'Password'
+    password: 'Password',
+    home: 'Home'
 }
 
 export const FOOTERS = {

@@ -1,68 +1,27 @@
-import { withRouter, reactRouterParameters } from 'storybook-addon-remix-react-router';
-import {AVAILABLE_LANGUAGES, FLOW_TYPES, NAVIGATION_LINKS, PAGES} from "../../../utils/constants.jsx";
-import {UserProvider} from "../../../components/Providers/UserContext.jsx";
-import Page from "../../../views/Page.tsx";
 
-
+import {
+    AVAILABLE_LANGUAGES,
+    FLOW_TYPES,
+    NAVIGATION_LINKS,
+    PAGES
+} from "../../../utils/constants.jsx";
+import {buildTestCase, Template} from "../../Tests/utils/functions.tsx";
 
 export default {
     title: 'GC Sign In/Pages/Sign Up/Verification Page',
-    component: Page,
-    args: {page:PAGES.verification},
-    decorators: [withRouter,
-        (Story) => (
-            <UserProvider>
-                <Story />
-            </UserProvider>
-        )
-    ],
-    // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs
-    tags: ['autodocs'],
-
-};
-
-export const SMSEnglish = {
-    parameters: {
-        reactRouter: reactRouterParameters({
-            location: {
-                pathParams: { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp, type:FLOW_TYPES.sms },
-            },
-            routing: { path: '/:language'+'/:flow'+NAVIGATION_LINKS.verification+'/:type' }
-        })
+    args:{
+        page:PAGES.verification
     }
 };
 
-export const SMSFrench = {
-    parameters: {
-        reactRouter: reactRouterParameters({
-            location: {
-                pathParams: { language: AVAILABLE_LANGUAGES.fr , flow: FLOW_TYPES.signUp, type:FLOW_TYPES.sms },
-            },
-            routing: { path: '/:language'+'/:flow'+NAVIGATION_LINKS.verification+'/:type' }
-        }),
-    }
-};
+export const SMSEnglish  = Template.bind({});
+SMSEnglish.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification, { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp, type:FLOW_TYPES.sms }, null);
 
+export const SMSFrench  = Template.bind({});
+SMSFrench.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification, { language: AVAILABLE_LANGUAGES.fr, flow: FLOW_TYPES.signUp, type:FLOW_TYPES.sms }, null);
 
-export const VoiceEnglish = {
-    parameters: {
-        reactRouter: reactRouterParameters({
-            location: {
-                pathParams: { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp, type:FLOW_TYPES.voice },
-            },
-            routing: { path: '/:language'+'/:flow'+NAVIGATION_LINKS.verification+'/:type' }
-        })
-    }
-};
+export const VoiceEnglish  = Template.bind({});
+VoiceEnglish.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification, { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp, type:FLOW_TYPES.voice }, null);
 
-export const VoiceFrench = {
-    parameters: {
-        reactRouter: reactRouterParameters({
-            location: {
-                pathParams: { language: AVAILABLE_LANGUAGES.fr , flow: FLOW_TYPES.signIn, type:FLOW_TYPES.voice },
-            },
-            routing: { path: '/:language'+'/:flow'+NAVIGATION_LINKS.verification+'/:type' }
-        }),
-    }
-};
-
+export const VoiceFrench  = Template.bind({});
+VoiceFrench.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification, { language: AVAILABLE_LANGUAGES.fr, flow: FLOW_TYPES.signUp, type:FLOW_TYPES.voice }, null);
