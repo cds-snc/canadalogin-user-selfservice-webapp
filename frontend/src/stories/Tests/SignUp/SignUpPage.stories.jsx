@@ -120,8 +120,7 @@ ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-
-TestUser.args ={email: TEST_USERS.keys().next().value,};
+TestUser.args ={email: TEST_USERS.keys().next().value};
 TestUser.play = async ({ canvasElement, step }) => {
 
     await testCase({

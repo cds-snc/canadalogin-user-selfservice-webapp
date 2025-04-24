@@ -4,7 +4,7 @@ import {
     GcdsInput, GcdsRadioGroup, GcdsStepper
 } from "@cdssnc/gcds-components-react";
 import {useState, useTransition} from "react";
-import { CONTEXT_ACTIONS, NAVIGATION_LINKS} from "../../utils/constants";
+import {CONTEXT_ACTIONS, FLOW_TYPES, NAVIGATION_LINKS} from "../../utils/constants";
 import {getPageContent, isEmailValid} from '../../utils/functions';
 import AlreadyGc from "../Layout/AlreadyGc.jsx";
 import {useUser} from "../Providers/useUser";
@@ -45,8 +45,9 @@ export default function SignUpEmail() {
                 return;
 
             try {
-                const response = await authService.sendOtpCode({
-                    userName: formData.get('email')
+                const response = await authService.sendTwoStepVerificationCode({
+                    userName: formData.get('email'),
+                    verificationType: FLOW_TYPES.email
                 });
                 console.log("response", response);
                 if(response.success){

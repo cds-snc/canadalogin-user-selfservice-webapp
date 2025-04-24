@@ -1,17 +1,9 @@
 import axios from 'axios';
 import config from '../config';
-import {SUBMIT_END_POINTS} from "../utils/constants.jsx";
+import {FLOW_TYPES, SUBMIT_END_POINTS} from "../utils/constants.jsx";
 import {ERROR_RESPONSE, TEST_RESPONSES, TEST_USERS} from "../stories/Tests/utils/constants.jsx";
 
 export const authService = {
-    sendOtpCode: async (userData) => {
-
-        if(TEST_USERS.has(userData.userName))
-            return buildTestResponse(userData, "sendOtpCode");
-
-        const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.sendOtpCode}`, userData);
-        return response.data;
-    },
     requestPasswordPolicy:async () => {
         const response = await axios.get(`${config.apiUrl}${SUBMIT_END_POINTS.requestPasswordPolicy}`);
         return response.data;
@@ -30,9 +22,9 @@ export const authService = {
 
         let endpoint = SUBMIT_END_POINTS.sendTwoStepVerificationCode;
 
-        if(userData.verificationType==='voice')
+        if(userData.verificationType===FLOW_TYPES.voice)
             endpoint = SUBMIT_END_POINTS.sendTwoStepVerificationCodeVoice;
-        else if(userData.verificationType==='email')
+        else if(userData.verificationType===FLOW_TYPES.email)
             endpoint = SUBMIT_END_POINTS.sendOtpCode;
 
         const response =  await axios.post(`${config.apiUrl}${endpoint}`, userData);
@@ -46,9 +38,9 @@ export const authService = {
 
         let endpoint = SUBMIT_END_POINTS.twoStepVerification;
 
-        if(userData.verificationType==='voice')
+        if(userData.verificationType===FLOW_TYPES.voice)
             endpoint = SUBMIT_END_POINTS.twoStepVerificationVoice;
-        else if(userData.verificationType==='email')
+        else if(userData.verificationType===FLOW_TYPES.email)
             endpoint = SUBMIT_END_POINTS.emailVerification;
 
         const response =  await axios.post(`${config.apiUrl}${endpoint}`, userData);
@@ -64,40 +56,34 @@ export const authService = {
 function buildTestResponse (userData, type) {
     console.log("Mocking "+type+" responses for user testing.");
     let response = null;
-    const now = new Date();
-    const expires = now;
-    expires.setMinutes(now.getMinutes() + 5);
-    switch (type) {
-        case "sendOtpCode":
-            response = TEST_RESPONSES.signUpResponse;
-            response.data.emailAddress = userData.userName;
-            response.data.created = now.toISOString();
-            response.data.expiry =  expires.toISOString();
 
-            return response;
+    switch (type) {
         case "twoStepVerification":
-            if(userData.verificationType==='email' && (userData.otp === TEST_USERS.get(userData.userName).emailOtp))
+            if(userData.verificationType===FLOW_TYPES.email && (userData.otp === TEST_USERS.get(userData.userName).emailOtp))
                 return TEST_RESPONSES.verificationEmailResponse;
-            else if(userData.verificationType==='sms' && (userData.otp === TEST_USERS.get(userData.userName).smsOtp))
+            else if(userData.verificationType===FLOW_TYPES.sms && (userData.otp === TEST_USERS.get(userData.userName).smsOtp))
                 return TEST_RESPONSES.verificationSmsResponse;
-            else if(userData.verificationType==='voice' && (userData.otp===TEST_USERS.get(userData.userName).voiceOtp))
+            else if(userData.verificationType===FLOW_TYPES.voice && (userData.otp===TEST_USERS.get(userData.userName).voiceOtp))
                 return TEST_RESPONSES.verificationVoiceResponse;
 
             return ERROR_RESPONSE;
         case "sendTwoStepVerificationCode":
-            if(userData.verificationType==='email') {
+            if(userData.verificationType===FLOW_TYPES.email) {
                 response = TEST_RESPONSES.signUpResponse;
                 response.data.emailAddress = userData.userName;
-            }else if(userData.verificationType==='sms') {
-                response = TEST_RESPONSES.verificationSmsSetUpResponse;
-                response.data.phoneNumber = userData.phoneNumber;
-            }else{
+            }else if(userData.verificationType===FLOW_TYPES.voice) {
                 response = TEST_RESPONSES.verificationVoiceSetUpResponse;
                 response.data.phoneNumber = userData.phoneNumber;
+            }else{
+                response = TEST_RESPONSES.verificationSmsSetUpResponse;
+                response.data.phoneNumber = userData.phoneNumber;
             }
+            const now = new Date();
+            const expires =new Date();
+            expires.setMinutes(expires.getMinutes() + 5);
             response.data.created = now.toISOString();
             response.data.expiry =  expires.toISOString();
-            console.log(response);
+
             return response;
         case "create":
             response = TEST_RESPONSES.passwordResponse;
