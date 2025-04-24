@@ -108,7 +108,7 @@ const testItem = {
         await new Promise((r) => setTimeout(r, 1000));
     },
     clickButton: async(canvas:any, step:any, message:string) =>{
-        await step('Click button', async () => {
+        await step('Click button'+message, async () => {
             await userEvent.click(canvas.queryByRole('button', {name: /test/i}));
         });
         await new Promise((r) => setTimeout(r, 1000));
