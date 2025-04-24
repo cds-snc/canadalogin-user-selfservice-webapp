@@ -45,7 +45,8 @@ export default function VerificationSetUp() {
             try {
                 const response = await authService.sendTwoStepVerificationCode({
                     phoneNumber: formNumber,
-                    verificationType: formType
+                    verificationType: formType,
+                    userName: state.userData.email
                 });
                 if(response.success){
                     const userData = {...state.userData, phone:formData.get('phone'), stepVerificationSent: true, trxnId:response.data.trxnId};

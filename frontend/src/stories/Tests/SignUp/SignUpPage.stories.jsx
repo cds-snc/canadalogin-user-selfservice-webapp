@@ -30,6 +30,7 @@ export const FrErrorFrontEnd = TestTemplate.bind({});
 export const ErrorBackEnd = TestTemplate.bind({});
 export const SuccessfulBackEnd = TestTemplate.bind({});
 export const ServerErrorBackEnd = TestTemplate.bind({});
+export const TestUser = TestTemplate.bind({});
 
 EngErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
@@ -116,5 +117,20 @@ ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
         delay: 1000,
         actionType: ACTION_TYPES.submit,
         type: TEST_TYPES.error
+    })
+}
+
+
+TestUser.args ={email: "test@test.gc.ca"};
+TestUser.play = async ({ canvasElement, step }) => {
+
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage: "Submit form with test user",
+        link: 'email',
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.redirect
     })
 }

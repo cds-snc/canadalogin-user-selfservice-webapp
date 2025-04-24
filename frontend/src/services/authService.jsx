@@ -1,11 +1,7 @@
 import axios from 'axios';
 import config from '../config';
 import {SUBMIT_END_POINTS} from "../utils/constants.jsx";
-import {ERROR_RESPONSE, TEST_RESPONSES,} from "../stories/Tests/utils/constants.jsx";
-const testUsers = new Map([
-    ['test@test.gc.ca', {emailOtp: '441234', smsOtp: '515136', voiceOtp: '151136'}],
-]);
-
+import {ERROR_RESPONSE, TEST_RESPONSES, testUsers,} from "../stories/Tests/utils/constants.jsx";
 
 export const authService = {
     sendOtpCode: async (userData) => {
@@ -106,12 +102,6 @@ function buildTestResponse (userData, type) {
         case "create":
             response = TEST_RESPONSES.passwordResponse;
             response.data.userName = userData.userName;
-
             return response;
-        default:
-        {
-            console.log("No case found for mocking")
-            return response;
-        }
     }
 }

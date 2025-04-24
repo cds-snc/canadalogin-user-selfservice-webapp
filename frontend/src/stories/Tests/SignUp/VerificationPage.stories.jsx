@@ -7,9 +7,10 @@ import {getPageContent} from "../../../utils/functions.jsx";
 import {
     ACTION_TYPES, ERROR_RESPONSE,
     MSW_VERIFICATION,
-    TEST_TYPES,
+    TEST_TYPES, testUsers,
 } from "../utils/constants.jsx";
 import {buildTestCase, testCase, TestTemplate} from "../utils/functions.tsx";
+import {TestUser} from "./SignUpPage.stories.jsx";
 const engErrorPageJson = getPageContent('en', "Error");
 const frErrorPageJson = getPageContent('fr', "Error");
 const engPageContentJson = getPageContent('en',  PAGES.verification);
@@ -48,6 +49,9 @@ export const VoiceNewCodeBackEndError = TestTemplate.bind({});
 export const ServerErrorReqNewCode = TestTemplate.bind({});
 export const UseNewNumber = TestTemplate.bind({});
 export const UseNewEmail = TestTemplate.bind({});
+export const TestUserEmail = TestTemplate.bind({});
+export const TestUserSms = TestTemplate.bind({});
+export const TestUserVoice = TestTemplate.bind({});
 
 EngEmailErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
@@ -405,4 +409,53 @@ UseNewEmail.play = async ({ canvasElement, step }) => {
         type: TEST_TYPES.redirect
     })
 }
+
+TestUserEmail.args ={email: "test@test.gc.ca", otp: testUsers.get("test@test.gc.ca").emailOtp};
+TestUserEmail.play = async ({ canvasElement, step }) => {
+
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage: "Submit form with test user email",
+        link: 'email',
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.redirect
+    })
+}
+
+TestUserSms.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
+    { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp, type:FLOW_TYPES.sms },
+    null);
+TestUserSms.args ={email: "test@test.gc.ca", otp: testUsers.get("test@test.gc.ca").smsOtp};
+TestUserSms.play = async ({ canvasElement, step }) => {
+
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage: "Submit form with test user sms",
+        link: 'email',
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.redirect
+    })
+}
+
+TestUserVoice.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
+    { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp, type:FLOW_TYPES.voice },
+    null);
+TestUserVoice.args ={email: "test@test.gc.ca", otp: testUsers.get("test@test.gc.ca").voiceOtp};
+TestUserVoice.play = async ({ canvasElement, step }) => {
+
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage: "Submit form with test user voice",
+        link: 'email',
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.redirect
+    })
+}
+
 

@@ -28,6 +28,9 @@ export const FrDigitErrorFrontEnd = TestTemplate.bind({});
 export const ErrorBackEnd = TestTemplate.bind({});
 export const ServerErrorBackEnd = TestTemplate.bind({});
 export const SuccessfulBackEnd = TestTemplate.bind({});
+export const TestUser = TestTemplate.bind({});
+
+
 
 EngNoNumberErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
@@ -143,6 +146,21 @@ SuccessfulBackEnd.play = async ({ canvasElement, step }) => {
         step,
         stepMessage: "Submit form with good phone number",
         link: 'phone',
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.redirect,
+        input: {inputType: 'textBox', stepMessage:'Enter phone Number with enough digits.', value: '4161234567'}
+    })
+}
+
+TestUser.args ={email: "test@test.gc.ca", };
+TestUser.play = async ({ canvasElement, step }) => {
+
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage: "Submit form with test user",
+        link: 'email',
         delay: 1000,
         actionType: ACTION_TYPES.submit,
         type: TEST_TYPES.redirect,
