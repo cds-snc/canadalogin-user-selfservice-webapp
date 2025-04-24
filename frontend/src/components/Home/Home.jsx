@@ -5,7 +5,7 @@ import {
     GcdsDetails,
     GcdsInput, GcdsErrorSummary
 } from "@cdssnc/gcds-components-react";
-import {AVAILABLE_LANGUAGES, CONTEXT_ACTIONS, FLOW_TYPES, NAVIGATION_LINKS, SERVICES} from "../../utils/constants";
+import {AVAILABLE_LANGUAGES, CONTEXT_ACTIONS, FLOW_TYPES, NAVIGATION_LINKS, SERVICES, PAGES} from "../../utils/constants";
 import {getPageContent, isEmailValid} from '../../utils/functions';
 import FirstTimeGc from "../Layout/FirstTimeGc";
 import SubmitButton from "../Layout/SubmitButton.jsx";
@@ -19,15 +19,16 @@ import {getLanguage} from "../../utils/functions";
 console.log("Config URL", config.apiUrl);
 
 export default function Home() {
-    const {currentLang} = useParams();
+    const {language} = useParams();
     const {state, dispatch} = useUser();
     const [email, setEmail] = useState("");
     const [errorJson, setError] = useState({heading: null, emailError:null});
     const [isPending, startTransition] = useTransition();
     const navigate = useNavigate();
-    const language = getLanguage(currentLang);
-    const pageContentJson = getPageContent(language, "Home");
-    const errorPageJson = getPageContent(language, "Error");
+    const currentLang = getLanguage(language);
+    console.log("language: ", language);
+    const pageContentJson = getPageContent(currentLang, PAGES.home);
+    const errorPageJson = getPageContent(currentLang, "Error");
 
 
     function validateEmail(email) {
@@ -60,8 +61,8 @@ export default function Home() {
                 };
                 await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                 console.log("userData: ", userData);
-                console.log("success", "/" + language + "/" + FLOW_TYPES.signIn + NAVIGATION_LINKS.password);
-                navigate("/" + language + "/" + FLOW_TYPES.signIn + NAVIGATION_LINKS.password);
+                console.log("success", "/" + currentLang + "/" + FLOW_TYPES.signIn + NAVIGATION_LINKS.password);
+                navigate("/" + currentLang + "/" + FLOW_TYPES.signIn + NAVIGATION_LINKS.password);
             } catch (error) {
                 console.error('Signin error:', error);
                 setError({emailError:  errorPageJson[7], heading: errorPageJson['1']});
@@ -84,8 +85,8 @@ export default function Home() {
                         <GcdsText marginTop="150" marginBottom="0">
                             {pageContentJson['2']}
                             <strong>
-                                {language===AVAILABLE_LANGUAGES.fr?' '+pageContentJson['3']+' ':''}
-                                {` ${SERVICES[0].title}`}{language!==AVAILABLE_LANGUAGES.fr?' '+pageContentJson['3']:''}
+                                {currentLang===AVAILABLE_LANGUAGES.fr?' '+pageContentJson['3']+' ':''}
+                                {` ${SERVICES[0].title}`}{currentLang!==AVAILABLE_LANGUAGES.fr?' '+pageContentJson['3']:''}
                             </strong>
                         </GcdsText>
                 </GcdsHeading>
@@ -114,13 +115,13 @@ export default function Home() {
                                 onGcdsChange={(e) => {validateEmail(e.target.value)}}
                                 errorMessage={errorJson.emailError}
                                 data-testid="signin-email"
-                                lang={language}
+                                lang={currentLang}
                             ></GcdsInput>
-                            <SubmitButton currentLang={language} />
+                            <SubmitButton currentLang={currentLang} />
                         </form>
                     </GcdsText>
                 </GcdsContainer>
-            <FirstTimeGc currentLang={language}/>
+            <FirstTimeGc currentLang={currentLang}/>
         </GcdsContainer>
     )
 }
