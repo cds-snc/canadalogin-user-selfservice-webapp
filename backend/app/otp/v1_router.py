@@ -18,7 +18,7 @@ router = APIRouter()
              tags=["OTP"],
              summary="Sends OTPs: email; voice; or sms",
              description="Proves a user's phone number or email address")
-async def verify_voice_otp(user_otp_info: UserOtpInfo, request: Request):
+async def send_otp(user_otp_info: UserOtpInfo, request: Request):
         return await handle_otp_send(user_otp_info, request.app.state.request_client)
 
 @router.post("/transient_otp/verify",
@@ -27,5 +27,5 @@ async def verify_voice_otp(user_otp_info: UserOtpInfo, request: Request):
              tags=["OTP"],
              summary="Sends OTPs: email; voice; or SMS",
              description="Proves a user's phone number or email address")
-async def verify_voice_otp(verification_data: UserOtpVerificationInfo, request: Request):
+async def verify_otp(verification_data: UserOtpVerificationInfo, request: Request):
     return await handle_otp_verification(verification_data, request.app.state.request_client)

@@ -44,7 +44,7 @@ class EmailOtpRequestResponse(ResponseModel):
 
 class UserOtpInfo(BaseModel):
     phoneNumber: Optional[PhoneNumber]= None
-    userName: str
+    userName: EmailStr
     otpType: OtpType
 
 class OtpSentResponse(BaseModel):
