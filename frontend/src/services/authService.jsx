@@ -76,11 +76,11 @@ function buildTestResponse (userData, type) {
 
             return response;
         case "twoStepVerification":
-            if(userData.verificationType==='email' && (userData.otp === testUsers.get(userData.userName).emailOtp))
+            if(userData.verificationType==='email' && (userData.otp === TEST_USERS.get(userData.userName).emailOtp))
                 return TEST_RESPONSES.verificationEmailResponse;
-            else if(userData.verificationType==='sms' && (userData.otp === testUsers.get(userData.userName).smsOtp))
+            else if(userData.verificationType==='sms' && (userData.otp === TEST_USERS.get(userData.userName).smsOtp))
                 return TEST_RESPONSES.verificationSmsResponse;
-            else if(userData.verificationType==='voice' && (userData.otp===testUsers.get(userData.userName).voiceOtp))
+            else if(userData.verificationType==='voice' && (userData.otp===TEST_USERS.get(userData.userName).voiceOtp))
                 return TEST_RESPONSES.verificationVoiceResponse;
 
             return ERROR_RESPONSE;

@@ -409,11 +409,11 @@ UseNewEmail.play = async ({ canvasElement, step }) => {
     })
 }
 const testUserEmail =  TEST_USERS.keys().next().value;
-const testUserOtps =  TEST_USERS.entries().next().value;
+const testUserOtps =  TEST_USERS.get(testUserEmail);
 
 TestUserEmail.args ={email: testUserEmail, otp: testUserOtps.emailOtp};
 TestUserEmail.play = async ({ canvasElement, step }) => {
-
+console.log(testUserOtps)
     await testCase({
         canvasElement,
         step,
