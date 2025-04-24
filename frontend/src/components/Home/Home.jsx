@@ -14,18 +14,21 @@ import config from "../../config.jsx";
 import {useUser} from "../Providers/useUser.tsx";
 import {useNavigate} from "react-router";
 import {useParams} from "react-router";
+import {getLanguage} from "../../utils/functions";
 
 console.log("Config URL", config.apiUrl);
 
 export default function Home() {
-    const {language} = useParams();
+    const {currentLang} = useParams();
     const {state, dispatch} = useUser();
     const [email, setEmail] = useState("");
     const [errorJson, setError] = useState({heading: null, emailError:null});
     const [isPending, startTransition] = useTransition();
     const navigate = useNavigate();
+    const language = getLanguage(currentLang);
     const pageContentJson = getPageContent(language, "Home");
     const errorPageJson = getPageContent(language, "Error");
+
 
     function validateEmail(email) {
         setEmail(email);

@@ -11,6 +11,7 @@ import {
     TEST_TYPES,
 } from "../utils/constants.jsx";
 import {buildTestCase, testCase, TestTemplate} from "../utils/functions.jsx";
+import {ServerErrorBackEnd} from "../SignUp/SignUpPage.stories.jsx";
 
 const serverError =  "Value is not a valid email address: There must be something after the @-sign.";
 const engErrorPageJson = getPageContent('en', "Error");
@@ -31,11 +32,26 @@ export default {
 export const NoLanguageFrontEnd = TestTemplate.bind({});
 export const EngErrorFrontEnd = TestTemplate.bind({});
 export const FrErrorFrontEnd = TestTemplate.bind({});
-// export const SuccessfulBackEnd = TestTemplate.bind({});
-// export const ServerErrorBackEnd = TestTemplate.bind({});
-// export const ServerTimeOut = TestTemplate.bind({});
+export const SuccessfulSubmit = TestTemplate.bind({});
 
+NoLanguageFrontEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.home,
+    { flow:FLOW_TYPES.signUp },
+    null);
 
+NoLanguageFrontEnd.play = async ({ canvasElement, step }) => {
+
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage:"Submit form with no language selected",
+        link: 'email',
+        heading: engErrorPageJson[1],
+        message: engErrorPageJson[2],
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.error
+    })
+}
 
 EngErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
@@ -70,6 +86,21 @@ FrErrorFrontEnd.play = async ({ canvasElement, step }) => {
         type: TEST_TYPES.error
     })
 }
+
+SuccessfulSubmit.args ={email: "test@test.com"};
+SuccessfulSubmit.play = async ({ canvasElement, step }) => {
+
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage: "Submit form with good email",
+        link: 'email',
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.redirect
+    })
+}
+
 
 // SuccessfulPassFE.parameters = buildTestCase.parameters(NAVIGATION_LINKS.home,
 //     {langage:AVAILABLE_LANGUAGES.en, flow:FLOW_TYPES.signIn },
