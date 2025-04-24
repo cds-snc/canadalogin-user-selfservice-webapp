@@ -3,7 +3,7 @@ import {
 } from "@cdssnc/gcds-components-react";
 import {getPageContent, isNameValid} from "../../../utils/functions.jsx";
 import SubmitButton from "../../Layout/SubmitButton.jsx";
-import {useUser} from "../../Providers/UserContext.jsx";
+import {useUser} from "../../Providers/useUser.tsx";
 import {useState, useTransition} from "react";
 import {authService} from "../../../services/authService.jsx";
 import {CONTEXT_ACTIONS} from "../../../utils/constants.jsx";

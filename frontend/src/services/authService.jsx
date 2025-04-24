@@ -7,10 +7,6 @@ export const authService = {
         const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.sendOtpCode}`, userData);
         return response.data;
     },
-    emailVerification: async (userData) => {
-        const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.emailVerification}`, userData);
-        return response.data;
-    },
     requestPasswordPolicy:async () => {
         const response = await axios.get(`${config.apiUrl}${SUBMIT_END_POINTS.requestPasswordPolicy}`);
         return response.data;

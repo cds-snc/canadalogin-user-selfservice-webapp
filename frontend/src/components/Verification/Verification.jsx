@@ -15,7 +15,7 @@ import {
 } from "../../utils/constants.jsx";
 import {useNavigate, useParams} from "react-router";
 import SubmitButton from "../Layout/SubmitButton.jsx";
-import {useUser} from "../Providers/UserContext.jsx";
+import {useUser} from "../Providers/useUser.tsx";
 import {authService} from "../../services/authService.jsx";
 import {useEffect, useState, useTransition} from "react";
 
@@ -131,7 +131,7 @@ export default function Verification() {
                             const userData = {...state.userData, emailValidated: true};
                             await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                             console.log(userData);
-                            navigate("/" + language + NAVIGATION_LINKS.password);
+                            navigate("/" + language + "/"+flow+NAVIGATION_LINKS.password);
                         }else                        {
                             const userData = {...state.userData, stepVerified: true};
                             await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});

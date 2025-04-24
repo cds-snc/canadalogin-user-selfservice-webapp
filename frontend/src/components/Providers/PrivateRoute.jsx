@@ -1,27 +1,29 @@
 import {Navigate, useParams} from "react-router";
-import {useUser} from "./UserContext.jsx";
+import {useUser} from "./useUser.tsx";
 import {isEmailValid} from "../../utils/functions.jsx";
 import {FLOW_TYPES, PAGES} from "../../utils/constants.jsx";
 
 
 function PrivateRoute ({route, children}){
+    const {state} = useUser();
+    const {flow, type} = useParams();
 
-
-    if(!isValidRoute(route))
+    if(!isValidRoute(route, state, flow, type))
         return <Navigate to="/" />;
 
     return children;
 }
 
 
-function isValidRoute (page) {
-    const {state} = useUser();
-    const {flow, type} = useParams();
+function isValidRoute (page, state, flow, type) {
+
 
 
     if(flow===FLOW_TYPES.signIn)
         switch (page) {
             case(PAGES.verification):
+                return true;
+            case(PAGES.password):
                 return true;
             default:
                 return false;

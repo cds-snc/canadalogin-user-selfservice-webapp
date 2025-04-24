@@ -2,10 +2,11 @@ export const AVAILABLE_LANGUAGES = {en:'en', fr:'fr'};
 export const NAVIGATION_LINKS = {
     signUp: '/signup',
     verifyEmail: '/signup/verification/email',
-    password: '/signup/password',
+    password: '/password',
     twoStepVerification: '/signup/verificationsetup',
     verification: '/verification',
-    coreProfile: '/signup/profile'
+    coreProfile: '/signup/profile',
+    home: '/'
 };
 export const CONTEXT_ACTIONS = {
     signUp: 'SIGN_UP',
@@ -26,7 +27,8 @@ export const PAGES ={
     verification: 'Verification',
     verificationSetUp: 'VerificationSetUp',
     coreProfile: 'CreateCoreProfile',
-    password: 'Password'
+    password: 'Password',
+    home: 'Home'
 }
 
 export const FOOTERS = {

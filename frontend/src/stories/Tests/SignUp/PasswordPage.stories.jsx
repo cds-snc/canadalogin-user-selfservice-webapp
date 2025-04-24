@@ -1,101 +1,39 @@
-import {withRouter} from 'storybook-addon-remix-react-router';
 import {
     AVAILABLE_LANGUAGES,
     FLOW_TYPES,
     NAVIGATION_LINKS,
-    PAGES,
-    SUBMIT_END_POINTS
+    PAGES
 } from "../../../utils/constants.jsx";
-import {UserProvider} from "../../../components/Providers/UserContext.jsx";
 import {getPageContent} from "../../../utils/functions.jsx";
-import {ACTION_TYPES, TEST_TYPES, TestDataUserProvider} from "../utils/constants.jsx";
-import {storyParametersNew, testCase} from "../utils/functions.jsx";
-import Page from "../../../views/Page.js";
-
+import {
+    ACTION_TYPES,
+    ERROR_RESPONSE,
+    MSW_PASSWORD_POLICY,
+    MSW_VERIFICATION,
+    TEST_TYPES
+} from "../utils/constants.jsx";
+import {buildTestCase, testCase, TestTemplate} from "../utils/functions.tsx";
 
 const engErrorPageJson = getPageContent('en', "Error");
 const frErrorPageJson = getPageContent('fr', "Error");
 
-
-const serverError =  "The system cannot process the request because the password was not found.";
-const errorResponse = {
-    "success": false,
-    "message": serverError,
-    "data": null
-};
-
-const successResponse = {
-    "success": true,
-    "message": "Password sent successfully",
-    "data": {
-        "trxnId": "eac50d6d-c2d9-47ef-a3ad-7ddc27d683b1",
-        "type": "emailotp",
-        "created": "2025-03-28T16:48:21.561Z",
-        "updated": "2025-03-28T16:48:21.561Z",
-        "expiry": "2025-03-28T16:53:21.561Z",
-        "state": "PENDING",
-        "correlationID": "7322",
-        "emailAddress": "test@test.com",
-        "attempts": 0,
-        "retries": 4
-    }
-}
-const frontEndStoryParameters = {
-    isBackEndTest:false,
-    link:NAVIGATION_LINKS.password,
-    flow:FLOW_TYPES.signUp
-}
-
-const backEndStoryParameters = {
-    ...frontEndStoryParameters,
-    isBackEndTest:true,
-    endpoint:SUBMIT_END_POINTS.create
-}
-
-
-TestDataUserProvider.userData.password = "123456789012";
-
 export default {
-
     title: 'GC Sign In/Tests/Sign Up/Password Creation Page',
-    component: Page,
-    decorators: [withRouter],
-    // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs
-    tags: ['autodocs'],
-
+    args:{
+        page: PAGES.password,
+        password: "1234567890"
+    },
+    parameters: buildTestCase.parameters(NAVIGATION_LINKS.password,
+        { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
+        [MSW_PASSWORD_POLICY])
 };
 
+export const EngErrorFrontEnd = TestTemplate.bind({});
+export const FrErrorFrontEnd = TestTemplate.bind({});
+export const ErrorBackEnd = TestTemplate.bind({});
+export const SuccessfulBackEnd = TestTemplate.bind({});
+export const ServerErrorBackEnd = TestTemplate.bind({});
 
-const TemplateFE = (args) =>   {
-
-    TestDataUserProvider.testData.password = "1234567890";
-
-    return(
-        <UserProvider initial={TestDataUserProvider}><Page page={PAGES.password} /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
-    )
-}
-
-const TemplateBE = (args) =>   {
-
-    TestDataUserProvider.testData.password = "123456789012";
-
-    return(
-        <UserProvider initial={TestDataUserProvider}><Page page={PAGES.password} /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
-    )
-}
-
-
-export const EngErrorFrontEnd = TemplateFE.bind({});
-export const FrErrorFrontEnd = TemplateFE.bind({});
-export const ErrorBackEnd = TemplateBE.bind({});
-export const SuccessfulBackEnd = TemplateBE.bind({});
-export const ServerErrorBackEnd = TemplateBE.bind({});
-
-
-EngErrorFrontEnd.parameters = storyParametersNew({
-    ...frontEndStoryParameters,
-    language:AVAILABLE_LANGUAGES.en,
-});
 EngErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -111,10 +49,9 @@ EngErrorFrontEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-FrErrorFrontEnd.parameters = storyParametersNew({
-    ...frontEndStoryParameters,
-    language:AVAILABLE_LANGUAGES.fr,
-});
+FrErrorFrontEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.password,
+    { language: AVAILABLE_LANGUAGES.fr, flow: FLOW_TYPES.signUp },
+    [MSW_PASSWORD_POLICY]);
 FrErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -130,11 +67,10 @@ FrErrorFrontEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-ErrorBackEnd.parameters = storyParametersNew({
-    ...backEndStoryParameters,
-    language:AVAILABLE_LANGUAGES.en,
-    response:errorResponse
-});
+ErrorBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.coreProfile,
+    { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
+    [MSW_PASSWORD_POLICY, MSW_VERIFICATION.signup.password.error]);
+ErrorBackEnd.args = {password:"123456789012"};
 ErrorBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -143,18 +79,17 @@ ErrorBackEnd.play = async ({ canvasElement, step }) => {
         stepMessage: "Submit form with bad password For Back End Error",
         link: 'password',
         heading: engErrorPageJson[1],
-        message: serverError,
+        message: ERROR_RESPONSE.message,
         delay: 1000,
         actionType: ACTION_TYPES.submit,
         type: TEST_TYPES.error
     })
 }
 
-SuccessfulBackEnd.parameters = storyParametersNew({
-    ...backEndStoryParameters,
-    language:AVAILABLE_LANGUAGES.en,
-    response:successResponse
-});
+SuccessfulBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.coreProfile,
+    { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
+    [MSW_PASSWORD_POLICY, MSW_VERIFICATION.signup.password.success]);
+SuccessfulBackEnd.args = {password:"123456789012"};
 SuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -168,11 +103,10 @@ SuccessfulBackEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-ServerErrorBackEnd.parameters = storyParametersNew({
-    ...backEndStoryParameters,
-    language:AVAILABLE_LANGUAGES.en,
-    response:null
-});
+ServerErrorBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.coreProfile,
+    { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
+    [MSW_PASSWORD_POLICY, MSW_VERIFICATION.signup.password.serverTimeOut]);
+ServerErrorBackEnd.args = {password:"123456789012"};
 ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({

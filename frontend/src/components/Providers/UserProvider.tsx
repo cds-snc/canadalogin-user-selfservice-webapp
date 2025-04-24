@@ -1,5 +1,11 @@
-import {createContext, useReducer, useContext} from "react";
+import {useReducer} from "react";
 import {SERVICES, CONTEXT_ACTIONS} from "../../utils/constants.jsx";
+import UserContext from "./UserContext";
+
+interface Action {
+    type: string
+    payload: JSON
+}
 
 const initialState = {
     isAuthenticated: false,
@@ -18,23 +24,17 @@ const initialState = {
 }
 
 
-function userReducer(state=initialState, action) {
+function userReducer(state=initialState, action: Action) {
     switch (action.type) {
         case CONTEXT_ACTIONS.signUp:
             return {
                 ...state,
                 userData: action.payload
             };
-        case CONTEXT_ACTIONS.logOut:
-            return {
-                initialState
-            };
         default:
             return state;
     }
 }
-
-const UserContext = createContext();
 
 export function UserProvider ({ children, initial=initialState}) {
 
@@ -45,13 +45,4 @@ export function UserProvider ({ children, initial=initialState}) {
             {children}
         </UserContext.Provider>
     )
-}
-
-export function useUser (){
-    const context = useContext(UserContext);
-
-    if(!context)
-        throw new Error("useUser should be used within a Provider");
-
-    return context;
 }

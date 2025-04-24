@@ -1,4 +1,3 @@
-import {useLocation, useParams} from "react-router";
 import engJson from '../locales/en/en.json';
 import frJson from '../locales/fr/fr.json';
 import {AVAILABLE_LANGUAGES, FOOTERS} from './constants';
@@ -17,8 +16,8 @@ function getLangHref(currentLang, pathname)
     return '/'+AVAILABLE_LANGUAGES.fr+newPathname.replaceAll('//','/');
 }
 
-function getLanguage(){
-    const {language} = useParams();
+export function getLanguage(language){
+
     const browserLanguage = navigator.languages[1];
 
     if(language===AVAILABLE_LANGUAGES.fr || language===AVAILABLE_LANGUAGES.en)
@@ -30,10 +29,8 @@ function getLanguage(){
 
 }
 
-export function getLangValues(){
-
-    const {pathname} = useLocation();
-    const currentLang = getLanguage();
+export function getLangValues(language, pathname){
+    const currentLang = getLanguage(language);
     const langHref =getLangHref(currentLang, pathname);
 
     return {langHref, currentLang};
@@ -70,24 +67,19 @@ export function isCodeValid(code){
 }
 
 export function isPasswordValid(password){
-
-    const isPasswordValid = /^.{12,65}$/;
-
     return (password != null && password.length >=12 && password.length <=65);
 }
 
 export function isNameValid(name, minLength){
 
-
     if(minLength===0)
         if(name!==null && name.length>0) {
-            const isValidName = /^[a-zA-Z\-_ ’'‘ÆÐƎƏƐƔĲŊŒẞÞǷȜæðǝəɛɣĳŋœĸſßþƿȝĄƁÇĐƊĘĦĮƘŁØƠŞȘŢȚŦŲƯY̨ƳąɓçđɗęħįƙłøơşșţțŧųưyƴÁÀÂÄǍĂĀÃÅǺǼǢĆĊĈČĎḌÉÈĖÊËĚĔĒẸĠĜǦĞĢáàâäǎăāãåǻǽǣćċĉčďḍéèėêëěĕēẹġĝǧğģĤḤIÍÌİÎÏǏĬĪĨỊĴĶĹĻĽĿʼNŃ̈ŇÑŅÓÒÔÖǑŎŌÕŐỌǾĥḥıíìiîïǐĭīĩịĵķĺļľŀŉńnňñņóòôöǒŏōõőọǿŔŘŖŚŜŠṢŤṬÚÙÛÜǓŬŪŨŰŮỤẂẀŴẄÝỲŶŸȲỸŹŻŽẒŕřŗśŝšṣťṭúùûüǔŭūũűůụẃẁŵẅýỳŷÿȳỹźżžẓ]+$/
+            const isValidName = /^[a-zA-Z\-_ ’'‘ÀàÂâÆæÇçÉéÈèÊêËëÎîÏïÔôŒœÙùÛûÜüŸÿ]+$/
             return (name.match(isValidName));
         }else
             return true;
 
-
-    const isValidName = /^[a-zA-Z\-_ ’'‘ÆÐƎƏƐƔĲŊŒẞÞǷȜæðǝəɛɣĳŋœĸſßþƿȝĄƁÇĐƊĘĦĮƘŁØƠŞȘŢȚŦŲƯY̨ƳąɓçđɗęħįƙłøơşșţțŧųưyƴÁÀÂÄǍĂĀÃÅǺǼǢĆĊĈČĎḌÉÈĖÊËĚĔĒẸĠĜǦĞĢáàâäǎăāãåǻǽǣćċĉčďḍéèėêëěĕēẹġĝǧğģĤḤIÍÌİÎÏǏĬĪĨỊĴĶĹĻĽĿʼNŃ̈ŇÑŅÓÒÔÖǑŎŌÕŐỌǾĥḥıíìiîïǐĭīĩịĵķĺļľŀŉńnňñņóòôöǒŏōõőọǿŔŘŖŚŜŠṢŤṬÚÙÛÜǓŬŪŨŰŮỤẂẀŴẄÝỲŶŸȲỸŹŻŽẒŕřŗśŝšṣťṭúùûüǔŭūũűůụẃẁŵẅýỳŷÿȳỹźżžẓ]{2,}$/
+    const isValidName = /^[a-zA-Z\-_ ’'‘ÀàÂâÆæÇçÉéÈèÊêËëÎîÏïÔôŒœÙùÛûÜüŸÿ]{2,}$/
 
     return (name !==null && name.match(isValidName));
 
