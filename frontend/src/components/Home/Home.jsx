@@ -11,8 +11,8 @@ import FirstTimeGc from "../Layout/FirstTimeGc";
 import SubmitButton from "../Layout/SubmitButton.jsx";
 import {useState, useTransition} from "react";
 import config from "../../config.jsx";
-import {useUser} from "../Providers/UserContext.jsx";
-import {useNavigate, useParams} from "react-router";
+import {useUser} from "../Providers/useUser.tsx";
+import {useNavigate} from "react-router";
 import {useParams} from "react-router";
 
 console.log("Config URL", config.apiUrl);
@@ -111,7 +111,7 @@ export default function Home() {
                                 onGcdsChange={(e) => {validateEmail(e.target.value)}}
                                 errorMessage={errorJson.emailError}
                                 data-testid="signin-email"
-                                lang={currentLang}
+                                lang={language}
                             ></GcdsInput>
                             <SubmitButton currentLang={language} />
                         </form>
