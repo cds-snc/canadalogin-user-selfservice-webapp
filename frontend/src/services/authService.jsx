@@ -59,7 +59,8 @@ export const authService = {
 function buildTestResponse (userData, type) {
     console.log("Mocking "+type+" responses for user testing.");
     let response = null;
-
+    const now = new Date();
+    const expires = new Date();
     switch (type) {
         case "twoStepVerification":
             if(userData.verificationType===FLOW_TYPES.email && (userData.otp === TEST_USERS.get(userData.userName).emailOtp))
@@ -81,8 +82,7 @@ function buildTestResponse (userData, type) {
                 response = TEST_RESPONSES.verificationSmsSetUpResponse;
                 response.data.phoneNumber = userData.phoneNumber;
             }
-            const now = new Date();
-            const expires =new Date();
+
             expires.setMinutes(expires.getMinutes() + 5);
             response.data.created = now.toISOString();
             response.data.expiry =  expires.toISOString();
