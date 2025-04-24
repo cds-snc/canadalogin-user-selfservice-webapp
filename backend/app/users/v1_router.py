@@ -42,19 +42,10 @@ async def user_password_signin(user: UserLoginRequestData):
     return await signin_with_password(user)
 
 
-@router.post("/2fa/enroll/{otp_type}",
+@router.post("/2fa/enroll",
             response_model=VerifiedTwofactorEnrollmentResponse,
             tags=["Users"],
             summary="Enrols user into Voice or SMS 2FA ",
             description="")
-async def user_2fa_enroll(user_enrollment_data: TwoFactorEnrollmentUserData, otp_type: OtpType, request: Request):
-
-    if otp_type == OtpType.EMAIL:
-        logger.error("As per CDS - cannot use email as a 2FA type")
-        return generate_error_response(400, "Unknown error")
-
-    elif OtpType.VOICE or OtpType.SMS:
-        return await handle_enrolling_user_into_2fa(user_enrollment_data, otp_type, request.app.state.request_client)
-
-    else:
-        return generate_error_response(400, "Unknown error")
+async def user_2fa_enroll(user_enrollment_data: TwoFactorEnrollmentUserData, request: Request):
+        return await handle_enrolling_user_into_2fa(user_enrollment_data, request.app.state.request_client)

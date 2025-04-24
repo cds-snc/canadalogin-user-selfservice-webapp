@@ -12,38 +12,38 @@ from app.utils.schemas import ResponseModel
 
 logger = logging.getLogger(__name__)
 
-async def handle_otp_verification(user_verification_data: UserOtpVerificationInfo, otp_type: OtpType, global_http_client: AsyncClient):
+async def handle_otp_verification(user_verification_data: UserOtpVerificationInfo, global_http_client: AsyncClient):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
     try:
-        logger.info(f"Attempting to verify {otp_type.value} OTP")
+        logger.info(f"Attempting to verify {user_verification_data.otpType} OTP")
         start_time = datetime.now()
-        otp_verification_response = await verify_otp(user_verification_data, otp_type, global_http_client)
+        otp_verification_response = await verify_otp(user_verification_data,global_http_client)
         duration = (datetime.now() - start_time).total_seconds()
-        logger.info(f"{otp_type} OTP verification response received in {duration:.2f} seconds")
+        logger.info(f"{user_verification_data.otpType} OTP verification response received in {duration:.2f} seconds")
 
         if otp_verification_response.status_code is None:
             return generate_error_response(400, "Unknown error")
 
         if otp_verification_response.status_code != 204:
-            logger.error(f"Failed to verify {otp_type} OTP. Response: {otp_verification_response.json()}")
-            return generate_error_response(otp_verification_response.status_code, "Unknown error")
+            logger.error(f"Failed to verify {user_verification_data.otpType} OTP. Response: {otp_verification_response.json()}")
+            return generate_error_response(otp_verification_response.status_code, otp_verification_response.json())
 
         return ResponseModel(# Plain ResponseModel since the response has no content
             success=True,
-            message=f"{otp_type} OTP has been verified")
+            message=f"{user_verification_data.otpType} OTP has been verified")
 
 
     except HTTPException as he:
-        logger.error(f"HTTP Exception in {otp_type} OTP verification: {str(he)}")
+        logger.error(f"HTTP Exception in {user_verification_data.otpType} OTP verification: {str(he)}")
         raise he
     except Exception as e:
-        logger.error(f"{otp_type} verification error: {str(e)}", exc_info=True)
+        logger.error(f"{user_verification_data.otpType} verification error: {str(e)}", exc_info=True)
         raise HTTPException(
-            status_code=400, detail=f"{otp_type} verification error: {str(e)}")
+            status_code=400, detail=f"{user_verification_data.otpType} verification error: {str(e)}")
 
 
-async def verify_otp(user_verification_data: UserOtpVerificationInfo, otp_type: OtpType, global_http_client: AsyncClient):
+async def verify_otp(user_verification_data: UserOtpVerificationInfo, global_http_client: AsyncClient):
     try:
 
         trxnId = user_verification_data.trxnId
@@ -55,13 +55,13 @@ async def verify_otp(user_verification_data: UserOtpVerificationInfo, otp_type: 
         headers = get_auth_request_headers(access_token, True)
         settings = get_settings().ibm_verify_config
 
-        if otp_type == OtpType.SMS:
+        if user_verification_data.otpType == OtpType.SMS:
             verification_endpoint_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/smsotp/transient/verifications/{trxnId}"
 
-        elif otp_type == OtpType.VOICE:
+        elif user_verification_data.otpType == OtpType.VOICE:
             verification_endpoint_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/voiceotp/transient/verifications/{trxnId}"
 
-        elif otp_type == OtpType.EMAIL:
+        elif user_verification_data.otpType == OtpType.EMAIL:
             verification_endpoint_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/emailotp/transient/verifications/{trxnId}"
 
         else:
@@ -71,10 +71,10 @@ async def verify_otp(user_verification_data: UserOtpVerificationInfo, otp_type: 
         return response
 
     except HTTPException as he:
-        logger.error(f"HTTP Exception in {otp_type} verification: {str(he)}")
+        logger.error(f"HTTP Exception in {user_verification_data.otpType} verification: {str(he)}")
         raise he
     except Exception as e:
         logger.error(
-            f"{otp_type} verification error: {str(e)}", exc_info=True)
+            f"{user_verification_data.otpType} verification error: {str(e)}", exc_info=True)
         raise HTTPException(
-            status_code=400, detail=f"{otp_type} verification error: {str(e)}")
+            status_code=400, detail=f"{user_verification_data.otpType} verification error: {str(e)}")

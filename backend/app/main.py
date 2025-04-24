@@ -101,7 +101,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         break
     return generate_error_response(
         status_code=400,
-        message='Unknown error'
+        message=error_message
     )
 
 

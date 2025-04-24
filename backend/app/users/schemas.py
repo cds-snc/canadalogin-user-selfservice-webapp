@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import List, Optional
 from pydantic import BaseModel, EmailStr
 from pydantic_extra_types.phone_numbers import PhoneNumber
@@ -49,9 +50,17 @@ class AuthenticatedUserData(BaseModel):
 class AuthenticatedUserResponse(ResponseModel):
     data: AuthenticatedUserData
 
+
+class TwoFactorEnrollmentType(str, Enum):
+    SMS = 'sms'
+    VOICE = 'voice'
+
+
 class TwoFactorEnrollmentUserData(BaseModel):
     userId: str
     phoneNumber: PhoneNumber
+    enrollmentType: TwoFactorEnrollmentType
+
 
 class TwofactorEnrollmentResponse(BaseModel):
     id: str
@@ -62,6 +71,7 @@ class TwofactorEnrollmentResponse(BaseModel):
     enabled: bool
     validated: bool
     attributes: dict[str,str]
+
 
 class VerifiedTwofactorEnrollmentResponse(ResponseModel):
     data: TwofactorEnrollmentResponse

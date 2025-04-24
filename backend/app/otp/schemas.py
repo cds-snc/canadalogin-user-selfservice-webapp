@@ -44,7 +44,8 @@ class EmailOtpRequestResponse(ResponseModel):
 
 class UserOtpInfo(BaseModel):
     phoneNumber: Optional[PhoneNumber]= None
-    emailAddress: Optional[EmailStr] = None
+    userName: str
+    otpType: OtpType
 
 class OtpSentResponse(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
@@ -66,3 +67,4 @@ class OtpRequestResponse(ResponseModel):
 class UserOtpVerificationInfo(BaseModel):
     otp: str
     trxnId: str
+    otpType: OtpType
