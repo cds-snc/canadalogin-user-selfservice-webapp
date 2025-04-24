@@ -47,6 +47,9 @@ jobs:
           path: ${{ matrix.module }}
 
   report-coverage:
+    permissions:
+      contents: read
+      pull-requests: write
     needs: vite-test
     runs-on: ubuntu-latest
     strategy:
