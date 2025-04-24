@@ -195,3 +195,79 @@ export const MSW_VERIFICATION = {
         }
     }
 }
+
+
+export const TEST_RESPONSES = {
+    signUpResponse: {
+        success: true,
+        message: 'OTP sent successfully',
+        data:{
+            attempts: 0,
+            correlationID: "3995",
+            created: "2025-04-23T11:55:43.872Z",
+            emailAddress: "test@test.com",
+            expiry: "2025-04-23T12:00:43.872Z",
+            retries: 4,
+            state: "PENDING",
+            trxnId: "b3cea5a1-1e96-43d6-a4d0-0c5ba8beaa19",
+            type: "emailotp",
+            updated: "2025-04-23T11:55:43.872Z"
+        }
+    },
+    verificationEmailResponse: {
+        success: true,
+        message: 'Email OTP has been validated',
+        data: null
+    },
+    passwordResponse: {
+        success: true,
+        message: 'User created successfully',
+        data: {
+            id: '772001COT4',
+            userName: 'test@test.com'
+        }
+    },
+    verificationSmsSetUpResponse: {
+        success: true,
+        message: 'SMS OTP sent successfully',
+        data: {
+            attempts: 0,
+            correlationID: "4711",
+            created: "2025-04-23T12:12:56.916Z",
+            phoneNumber: "14161234567",
+            expiry: "2025-04-23T12:00:43.872Z",
+            retries: 4,
+            state: "PENDING",
+            trxnId: "776aab11-e3e6-4e9d-981e-abafca74a077",
+            type: "smsotp",
+            updated: "2025-04-23T12:17:56.916Z"
+        }
+    },
+    verificationVoiceSetUpResponse: {
+        success: true,
+        message: 'Voice OTP sent successfully',
+        data: {
+            attempts: 0,
+            correlationID: "4711",
+            created: "2025-04-23T12:12:56.916Z",
+            phoneNumber: "14161234567",
+            expiry: "2025-04-23T12:00:43.872Z",
+            retries: 4,
+            state: "PENDING",
+            trxnId: "776aab11-e3e6-4e9d-981e-abafca74a077",
+            type: "voiceotp",
+            updated: "2025-04-23T12:17:56.916Z"
+        }
+    },
+    verificationSmsResponse: {
+        success: true,
+        message: 'Transient sms OTP has been validated',
+        data: null
+    },
+    verificationVoiceResponse: {
+        success: true,
+        message: 'Transient voice OTP has been validated',
+        data: null
+    }
+}
+
