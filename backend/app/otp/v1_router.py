@@ -17,7 +17,7 @@ router = APIRouter()
              status_code=status.HTTP_200_OK,
              tags=["OTP"],
              summary="Sends OTPs: email; voice; or sms",
-             description="Proves a user's phone number or email address")
+             description="Attempts to prove a user's phone number or email address")
 async def send_otp(user_otp_info: UserOtpInfo, request: Request):
         return await handle_otp_send(user_otp_info, request.app.state.request_client)
 
@@ -25,7 +25,7 @@ async def send_otp(user_otp_info: UserOtpInfo, request: Request):
              response_model=ResponseModel,
              status_code=status.HTTP_200_OK,
              tags=["OTP"],
-             summary="Sends OTPs: email; voice; or SMS",
-             description="Proves a user's phone number or email address")
+             summary="Verifies OTPs: email; voice; or SMS",
+             description="Attempts to verify a user's phone number or email address")
 async def verify_otp(verification_data: UserOtpVerificationInfo, request: Request):
     return await handle_otp_verification(verification_data, request.app.state.request_client)
