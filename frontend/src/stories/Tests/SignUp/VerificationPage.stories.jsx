@@ -48,9 +48,11 @@ export const VoiceNewCodeBackEndError = TestTemplate.bind({});
 export const ServerErrorReqNewCode = TestTemplate.bind({});
 export const UseNewNumber = TestTemplate.bind({});
 export const UseNewEmail = TestTemplate.bind({});
+export const TestUserBadCode = TestTemplate.bind({});
 export const TestUserEmail = TestTemplate.bind({});
 export const TestUserSms = TestTemplate.bind({});
 export const TestUserVoice = TestTemplate.bind({});
+export const TestUserRequestVoiceCode = TestTemplate.bind({});
 
 EngEmailErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
@@ -409,6 +411,23 @@ UseNewEmail.play = async ({ canvasElement, step }) => {
     })
 }
 const testUserEmail =  TEST_USERS.keys().next().value;
+
+TestUserBadCode.args ={email: testUserEmail, otp: '123456'};
+TestUserBadCode.play = async ({ canvasElement, step }) => {
+    console.log(testUserOtps)
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage:"Submit form with bad code, test user",
+        link: 'verificationCode',
+        heading: engErrorPageJson[1],
+        message: ERROR_RESPONSE.message,
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.error
+    })
+}
+
 const testUserOtps =  TEST_USERS.get(testUserEmail);
 
 TestUserEmail.args ={email: testUserEmail, otp: testUserOtps.emailOtp};
@@ -456,6 +475,43 @@ TestUserVoice.play = async ({ canvasElement, step }) => {
         delay: 1000,
         actionType: ACTION_TYPES.submit,
         type: TEST_TYPES.redirect
+    })
+}
+
+TestUserVoice.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
+    { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp, type:FLOW_TYPES.voice },
+    null);
+TestUserVoice.args ={email: testUserEmail, otp: testUserOtps.voiceOtp};
+TestUserVoice.play = async ({ canvasElement, step }) => {
+
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage: "Submit form with test user voice",
+        link: 'email',
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.redirect
+    })
+}
+
+
+TestUserRequestVoiceCode.parameters =  buildTestCase.parameters(NAVIGATION_LINKS.verification,
+    { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp, type:FLOW_TYPES.sms },
+    null);
+TestUserRequestVoiceCode.args ={email: testUserEmail}
+TestUserRequestVoiceCode.play = async ({ canvasElement, step }) => {
+
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage: "Successful resend code",
+        link: 'verificationCode',
+        message: engPageContentJson[17],
+        linkText: engPageContentJson[11],
+        delay: 11000,
+        actionType: ACTION_TYPES.link,
+        type: TEST_TYPES.success
     })
 }
 

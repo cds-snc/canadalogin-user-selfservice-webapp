@@ -10,7 +10,7 @@ import {
     AVAILABLE_LANGUAGES,
     CONTEXT_ACTIONS,
     FLOW_TYPES,
-    NAVIGATION_LINKS,
+    NAVIGATION_LINKS, PAGES,
     SERVICES
 } from "../../utils/constants.jsx";
 import {useNavigate, useParams} from "react-router";
@@ -31,7 +31,7 @@ export default function Verification() {
     const [errorJson, setError] = useState({heading: null, codeError:null});
     const navigate = useNavigate();
     const errorPageJson = getPageContent(language, "Error");
-    const pageContentJson = getPageContent(language, "Verification");
+    const pageContentJson = getPageContent(language, PAGES.verification);
 
     useEffect(()=>{
         if(time<=0)

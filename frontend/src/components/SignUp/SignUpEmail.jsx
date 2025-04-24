@@ -4,7 +4,7 @@ import {
     GcdsInput, GcdsRadioGroup, GcdsStepper
 } from "@cdssnc/gcds-components-react";
 import {useState, useTransition} from "react";
-import {CONTEXT_ACTIONS, FLOW_TYPES, NAVIGATION_LINKS} from "../../utils/constants";
+import {CONTEXT_ACTIONS, FLOW_TYPES, NAVIGATION_LINKS, PAGES} from "../../utils/constants";
 import {getPageContent, isEmailValid} from '../../utils/functions';
 import AlreadyGc from "../Layout/AlreadyGc.jsx";
 import {useUser} from "../Providers/useUser";
@@ -19,7 +19,7 @@ export default function SignUpEmail() {
     const [errorJson, setError] = useState({heading: null, emailError:null});
     const [isPending, startTransition] = useTransition();
     const navigate = useNavigate();
-    const pageContentJson = getPageContent(language, "SignUpEmail");
+    const pageContentJson = getPageContent(language, PAGES.signup);
     const errorPageJson = getPageContent(language, "Error");
 
     function validateEmail(email) {

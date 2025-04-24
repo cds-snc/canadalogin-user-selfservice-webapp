@@ -5,7 +5,7 @@ import {
     GcdsText
 } from "@cdssnc/gcds-components-react";
 import {getPageContent} from '../../../utils/functions';
-import {CONTEXT_ACTIONS, countryMapping, FLOW_TYPES, NAVIGATION_LINKS} from "../../../utils/constants.jsx";
+import {CONTEXT_ACTIONS, countryMapping, FLOW_TYPES, NAVIGATION_LINKS, PAGES} from "../../../utils/constants.jsx";
 import SubmitButton from "../../Layout/SubmitButton.jsx";
 import {useState, useTransition} from 'react';
 import PhoneInput from 'react-phone-input-2';
@@ -23,7 +23,7 @@ export default function VerificationSetUp() {
     const [errorJson, setError] = useState({heading: null, phoneError:null});
     const [isPending, startTransition] = useTransition();
     const navigate = useNavigate();
-    const pageContentJson = getPageContent(language, "VerificationSetUp");
+    const pageContentJson = getPageContent(language, PAGES.verificationSetUp);
     const errorPageJson = getPageContent(language, "Error");
 
     function  handleSubmit (e){
