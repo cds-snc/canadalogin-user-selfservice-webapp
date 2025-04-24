@@ -48,8 +48,11 @@ export const authService = {
         return response.data;
     },
     createCoreProfile:async (userData) => {
-        //const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.createCoreProfile}`, userData);
-        return SUCCESS_RESPONSE;
+        if(TEST_USERS.has(userData.userName))
+            return SUCCESS_RESPONSE;
+
+        const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.createCoreProfile}`, userData);
+        return response.data;
     }
 }
 

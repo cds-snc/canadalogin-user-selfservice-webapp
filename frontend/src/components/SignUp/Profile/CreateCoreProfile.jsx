@@ -40,7 +40,8 @@ export default function CreateCoreProfile() {
                     name = formFirstName.trim() + ' ' + name;
 
                 const response = await authService.createCoreProfile({
-                    name: name
+                    name: name,
+                    userName: state.userData.email
                 });
                 if(response.success){
                     const userData = {...state.userData, coreProfileCreated: true};
