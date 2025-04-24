@@ -36,8 +36,6 @@ export const ServerErrorBackEnd = TestTemplate.bind({});
 export const SuccessfulBackEnd = TestTemplate.bind({});
 export const TestUser = TestTemplate.bind({});
 
-
-
 EngNoNumberErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -159,7 +157,7 @@ SuccessfulBackEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-TestUser.args ={email:  TEST_USERS.keys().next().value };
+TestUser.args ={email: TEST_USERS.keys().next().value };
 TestUser.play = async ({ canvasElement, step }) => {
 
     await testCase({

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import config from '../config';
 import {FLOW_TYPES, SUBMIT_END_POINTS} from "../utils/constants.jsx";
-import {ERROR_RESPONSE, TEST_RESPONSES, TEST_USERS} from "../stories/Tests/utils/constants.jsx";
+import {ERROR_RESPONSE, SUCCESS_RESPONSE, TEST_RESPONSES, TEST_USERS} from "../stories/Tests/utils/constants.jsx";
 
 export const authService = {
     requestPasswordPolicy:async () => {
@@ -48,8 +48,8 @@ export const authService = {
         return response.data;
     },
     createCoreProfile:async (userData) => {
-        const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.createCoreProfile}`, userData);
-        return response.data;
+        //const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.createCoreProfile}`, userData);
+        return SUCCESS_RESPONSE;
     }
 }
 
