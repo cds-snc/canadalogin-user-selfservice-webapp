@@ -10,24 +10,28 @@ import SubmitButton from "../../Layout/SubmitButton.jsx";
 import AlreadyGc from "../../Layout/AlreadyGc.jsx";
 import { useParams } from "react-router";
 import {AVAILABLE_LANGUAGES, SERVICES} from "../../../utils/constants.jsx";
-import {useUser} from "../../Providers/UserContext.jsx";
-import { useEffect } from "react";
+import {useUser} from "../../Providers/useUser.tsx";
 import {CONTEXT_ACTIONS} from "../../../utils/constants.jsx";
+import {useNavigate} from "react-router";
+import {NAVIGATION_LINKS} from "../../../utils/constants.jsx";
+
 export default function Privacy() {
     const { language } = useParams();
     const {state, dispatch} = useUser();
-    
+    const navigate = useNavigate();
+
     async function handleSubmit(event) {
         event.preventDefault();
         const userData = { ...state.userData, viewPrivacy: true };
         await dispatch({ type: CONTEXT_ACTIONS.signUp, payload: userData });
+        navigate("/" + language + NAVIGATION_LINKS.signUp);
     }
 
     const pageContentJson = getPageContent(language, "Privacy");
 
     return (
         <GcdsContainer>
-             <form onSubmit={handleSubmit}>
+             <form  id="form"  onSubmit={handleSubmit}>
             <GcdsHeading tag='h1'>
                 {pageContentJson['1']}
                 <GcdsText marginTop="150" marginBottom="0">
