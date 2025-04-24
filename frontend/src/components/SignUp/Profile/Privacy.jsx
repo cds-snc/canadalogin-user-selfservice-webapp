@@ -75,11 +75,11 @@ export default function Privacy() {
             </GcdsText>
             <GcdsDetails detailsTitle={pageContentJson['23']}>
                 <GcdsText>
-                <span>{pageContentJson['24']}</span> <GcdsLink href="#" lang="en"><span>{pageContentJson['27']}</span></GcdsLink> <span>{pageContentJson['28']}</span> <GcdsLink href="#" lang="en">{pageContentJson['29']}</GcdsLink>.
+                <span>{pageContentJson['24']}</span> <GcdsLink href="#" lang="en"><i>{pageContentJson['27']}</i></GcdsLink> <span>{pageContentJson['28']}</span> <GcdsLink href="#" lang="en"><i>{pageContentJson['29']}</i></GcdsLink>.
                 </GcdsText>
 
                 <GcdsText>
-                <span>{pageContentJson['30']} </span><GcdsLink href="#" lang="en"> <span>{pageContentJson['31']}</span></GcdsLink> {pageContentJson['32']}
+                <span>{pageContentJson['30']} </span><GcdsLink href="#" lang="en"> <i>{pageContentJson['31']}</i></GcdsLink> {pageContentJson['32']}
                 </GcdsText>
 
                 <GcdsText>
