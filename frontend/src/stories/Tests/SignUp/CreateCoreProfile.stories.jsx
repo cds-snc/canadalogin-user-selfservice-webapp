@@ -5,7 +5,7 @@ import {
     PAGES,
 } from "../../../utils/constants.jsx";
 import {getPageContent} from "../../../utils/functions.jsx";
-import {ACTION_TYPES, ERROR_RESPONSE, MSW_VERIFICATION, TEST_TYPES,} from "../utils/constants.jsx";
+import {ACTION_TYPES, ERROR_RESPONSE, MSW_VERIFICATION, TEST_TYPES, TEST_USERS,} from "../utils/constants.jsx";
 import {buildTestCase, testCase, TestTemplate} from "../utils/functions.tsx";
 import {EngErrorFrontEnd} from "../SignIn/VerificationPage.stories.jsx";
 
@@ -36,8 +36,21 @@ export const ErrorBackEnd = TestTemplate.bind({});
 export const ServerErrorBackEnd = TestTemplate.bind({});
 export const SuccessfulBackEnd = TestTemplate.bind({});
 export const SuccessfulWithFrCharsBackEnd = TestTemplate.bind({});
+export const TestUser = TestTemplate.bind({});
 
+TestUser.args ={lastName: 'Test', email: TEST_USERS.keys().next().value};
+TestUser.play = async ({ canvasElement, step }) => {
 
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage: "Submit form with test user",
+        link: 'lastName',
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.redirect
+    })
+}
 EngErrorFrontEnd.args = {firstName: "Test"};
 EngNoLastName.play = async ({ canvasElement, step }) => {
 

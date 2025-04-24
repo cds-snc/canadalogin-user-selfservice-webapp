@@ -5,7 +5,7 @@ import {
     GcdsDetails,
     GcdsInput
 } from "@cdssnc/gcds-components-react";
-import {AVAILABLE_LANGUAGES, SERVICES} from "../../utils/constants";
+import {AVAILABLE_LANGUAGES, PAGES, SERVICES} from "../../utils/constants";
 import {getPageContent} from '../../utils/functions';
 import FirstTimeGc from "../Layout/FirstTimeGc";
 import SubmitButton from "../Layout/SubmitButton.jsx";
@@ -16,7 +16,7 @@ import {useParams} from "react-router";
 export default function Home() {
     const {language} = useParams();
 
-    const pageContentJson = getPageContent(language, "Home");
+    const pageContentJson = getPageContent(language, PAGES.home);
     console.log("Config URL", config.apiUrl);
     return (
         <GcdsContainer className="gcds-content" >

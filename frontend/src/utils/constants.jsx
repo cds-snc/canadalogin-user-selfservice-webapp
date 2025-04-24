@@ -49,7 +49,6 @@ export const SERVICES=[
 export const SUBMIT_END_POINTS = {
     sendOtpCode: '/v1/otp/email/send',
     emailVerification: '/v1/otp/email/verify',
-    requestNewCode: '/v1/otp/email/send',
     requestPasswordPolicy: '/v1/password/policy',
     create: '/v1/users/create',
     sendTwoStepVerificationCode: '/v1/otp/transient_sms/send',
