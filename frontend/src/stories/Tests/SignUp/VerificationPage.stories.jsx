@@ -478,24 +478,6 @@ TestUserVoice.play = async ({ canvasElement, step }) => {
     })
 }
 
-TestUserVoice.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
-    { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp, type:FLOW_TYPES.voice },
-    null);
-TestUserVoice.args ={email: testUserEmail, otp: testUserOtps.voiceOtp};
-TestUserVoice.play = async ({ canvasElement, step }) => {
-
-    await testCase({
-        canvasElement,
-        step,
-        stepMessage: "Submit form with test user voice",
-        link: 'email',
-        delay: 1000,
-        actionType: ACTION_TYPES.submit,
-        type: TEST_TYPES.redirect
-    })
-}
-
-
 TestUserRequestVoiceCode.parameters =  buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp, type:FLOW_TYPES.sms },
     null);
