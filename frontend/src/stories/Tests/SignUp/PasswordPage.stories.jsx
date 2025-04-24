@@ -10,7 +10,7 @@ import {
     ERROR_RESPONSE,
     MSW_PASSWORD_POLICY,
     MSW_VERIFICATION,
-    TEST_TYPES
+    TEST_TYPES, TEST_USERS
 } from "../utils/constants.jsx";
 import {buildTestCase, testCase, TestTemplate} from "../utils/functions.tsx";
 
@@ -123,7 +123,7 @@ ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-TestUser.args = {email: "test@test.gc.ca", password:"123456789012"};
+TestUser.args = {email: TEST_USERS.keys().next().value, password:"123456789012"};
 TestUser.play = async ({ canvasElement, step }) => {
 
     await testCase({

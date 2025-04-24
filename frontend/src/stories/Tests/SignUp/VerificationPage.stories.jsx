@@ -7,10 +7,9 @@ import {getPageContent} from "../../../utils/functions.jsx";
 import {
     ACTION_TYPES, ERROR_RESPONSE,
     MSW_VERIFICATION,
-    TEST_TYPES, testUsers,
+    TEST_TYPES, TEST_USERS
 } from "../utils/constants.jsx";
 import {buildTestCase, testCase, TestTemplate} from "../utils/functions.tsx";
-import {TestUser} from "./SignUpPage.stories.jsx";
 const engErrorPageJson = getPageContent('en', "Error");
 const frErrorPageJson = getPageContent('fr', "Error");
 const engPageContentJson = getPageContent('en',  PAGES.verification);
@@ -409,8 +408,10 @@ UseNewEmail.play = async ({ canvasElement, step }) => {
         type: TEST_TYPES.redirect
     })
 }
+const testUserEmail =  TEST_USERS.keys().next().value;
+const testUserOtps =  TEST_USERS.entries().next().value;
 
-TestUserEmail.args ={email: "test@test.gc.ca", otp: testUsers.get("test@test.gc.ca").emailOtp};
+TestUserEmail.args ={email: testUserEmail, otp: testUserOtps.emailOtp};
 TestUserEmail.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -427,7 +428,7 @@ TestUserEmail.play = async ({ canvasElement, step }) => {
 TestUserSms.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp, type:FLOW_TYPES.sms },
     null);
-TestUserSms.args ={email: "test@test.gc.ca", otp: testUsers.get("test@test.gc.ca").smsOtp};
+TestUserSms.args ={email: testUserEmail, otp: testUserOtps.smsOtp};
 TestUserSms.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -444,7 +445,7 @@ TestUserSms.play = async ({ canvasElement, step }) => {
 TestUserVoice.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp, type:FLOW_TYPES.voice },
     null);
-TestUserVoice.args ={email: "test@test.gc.ca", otp: testUsers.get("test@test.gc.ca").voiceOtp};
+TestUserVoice.args ={email: testUserEmail, otp: testUserOtps.voiceOtp};
 TestUserVoice.play = async ({ canvasElement, step }) => {
 
     await testCase({

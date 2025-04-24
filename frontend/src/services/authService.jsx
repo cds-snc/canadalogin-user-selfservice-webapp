@@ -1,12 +1,12 @@
 import axios from 'axios';
 import config from '../config';
 import {SUBMIT_END_POINTS} from "../utils/constants.jsx";
-import {ERROR_RESPONSE, TEST_RESPONSES, testUsers,} from "../stories/Tests/utils/constants.jsx";
+import {ERROR_RESPONSE, TEST_RESPONSES, TEST_USERS} from "../stories/Tests/utils/constants.jsx";
 
 export const authService = {
     sendOtpCode: async (userData) => {
 
-        if(testUsers.has(userData.userName))
+        if(TEST_USERS.has(userData.userName))
             return buildTestResponse(userData, "sendOtpCode");
 
         const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.sendOtpCode}`, userData);
@@ -17,7 +17,7 @@ export const authService = {
         return response.data;
     },
     create:async (userData) => {
-        if(testUsers.has(userData.userName))
+        if(TEST_USERS.has(userData.userName))
             return buildTestResponse(userData, "create");
 
         const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.create}`, userData);
@@ -25,7 +25,7 @@ export const authService = {
     },
     sendTwoStepVerificationCode: async (userData) => {
 
-        if(testUsers.has(userData.userName))
+        if(TEST_USERS.has(userData.userName))
             return buildTestResponse(userData, "sendTwoStepVerificationCode");
 
         let endpoint = SUBMIT_END_POINTS.sendTwoStepVerificationCode;
@@ -41,7 +41,7 @@ export const authService = {
     },
     twoStepVerification: async (userData) => {
 
-        if(testUsers.has(userData.userName))
+        if(TEST_USERS.has(userData.userName))
             return buildTestResponse(userData, "twoStepVerification");
 
         let endpoint = SUBMIT_END_POINTS.twoStepVerification;

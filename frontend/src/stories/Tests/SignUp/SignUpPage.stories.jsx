@@ -8,7 +8,7 @@ import {getPageContent} from "../../../utils/functions.jsx";
 import {
     ACTION_TYPES, ERROR_RESPONSE,
     MSW_VERIFICATION,
-    TEST_TYPES
+    TEST_TYPES, TEST_USERS
 } from "../utils/constants.jsx";
 import {buildTestCase, testCase, TestTemplate} from "../utils/functions.tsx";
 const engErrorPageJson = getPageContent('en', "Error");
@@ -121,7 +121,7 @@ ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
 }
 
 
-TestUser.args ={email: "test@test.gc.ca"};
+TestUser.args ={email: TEST_USERS.keys().next().value};
 TestUser.play = async ({ canvasElement, step }) => {
 
     await testCase({
