@@ -9,6 +9,7 @@ function App() {
           <UserProvider>
               <Routes>
                   <Route path="/" element={ <Page page={PAGES.home}/>} />
+                  <Route path="/:language" element={ <Page page={PAGES.home}/>} />
                   <Route path="/:language/" element={ <Page page={PAGES.home}/>} />
                   <Route path="/:language/:flow/privacy" element={<Page page={PAGES.privacy}/>}/>
                   <Route path="/:language/:flow" element={<Page page={PAGES.signup}/>}/>
