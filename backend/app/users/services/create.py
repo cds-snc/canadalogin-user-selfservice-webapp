@@ -19,18 +19,13 @@ async def create_user(core_user_data: IBMUserCreateRequest):
 
     try:
         access_token = await get_access_token()
-        base_headers = get_auth_request_headers(access_token)
-        headers = {
-            **base_headers,
-            "usershouldnotneedtoresetpassword": "true",
-        }
+        headers = get_auth_request_headers(access_token)
         settings = get_settings().ibm_verify_config
         signup_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/Users"
-        # core_user_data.active = False
 
-        core_user_data_json = core_user_data.model_dump()
+        core_user_data_json = core_user_data.model_dump(
+            by_alias=True)
         async with AsyncClient() as client:
-            print(core_user_data_json)
             print(headers)
 
             response = await client.post(signup_url, json=core_user_data_json, headers=headers)
