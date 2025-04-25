@@ -79,10 +79,10 @@ export default function Verification() {
         setError({codeError:null, heading:null});
         try {
             const number = state.userData.phone!==null?state.userData.phone:"";
-            const response = await authService.sendTwoStepVerificationCode({
-                phoneNumber: number.replace(/\D/g,''),
+            const response = await authService.transientOtpSend({
+                phoneNumber: '+'+number.replace(/\D/g,''),
                 userName: state.userData.email,
-                verificationType: codeType
+                otpType: codeType
             });
 
             if(response.success){
@@ -118,14 +118,11 @@ export default function Verification() {
             setError({codeError:null, heading:null});
 
             try {
-                const response = await authService.twoStepVerification({
+                const response = await authService.transientOtpVerify({
                     otp: formCode,
-                    otp_type: type,
-                    flow: flow===FLOW_TYPES.signUp?'transient':'authenticate',
+                    otpType: type,
                     trxnId: state.userData.trxnId,
-                    phoneNumber: type!==FLOW_TYPES.email?state.userData.phone.replace(/\D/g,''):'',
-                    id: type!==FLOW_TYPES.email?state.userData.id:'',
-                    userName: state.userData.email
+                    userName: state.userData.email  //part of TEST_USERS, not needed if removed
                 });
                 if(response.success){
                     if(flow===FLOW_TYPES.signUp) {

@@ -47,14 +47,11 @@ export const SERVICES=[
 ];
 
 export const SUBMIT_END_POINTS = {
-    sendOtpCode: '/v1/otp/email/send',
-    requestNewCode: '/v1/otp/email/send',
     requestPasswordPolicy: '/v1/password/policy',
     create: '/v1/users/create',
-    sendTwoStepVerificationCode: '/v1/otp/transient_sms/send',
-    sendTwoStepVerificationCodeVoice: '/v1/otp/transient_voice/send',
     createCoreProfile: '/v1/users/createcoreprofile',
-    otpVerify: '/v1/otp/verify'
+    transientOtpVerify: '/v1/otp/transient_otp/verify',
+    transientOtpSend: '/v1/otp/transient_otp/send'
 }
 
 export const countryMapping = {
