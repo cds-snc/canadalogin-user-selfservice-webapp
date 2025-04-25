@@ -5,13 +5,13 @@ import {
     GcdsText
 } from "@cdssnc/gcds-components-react";
 import {getPageContent} from '../../../utils/functions';
-import {CONTEXT_ACTIONS, countryMapping, FLOW_TYPES, NAVIGATION_LINKS} from "../../../utils/constants.jsx";
+import {CONTEXT_ACTIONS, countryMapping, FLOW_TYPES, NAVIGATION_LINKS, PAGES} from "../../../utils/constants.jsx";
 import SubmitButton from "../../Layout/SubmitButton.jsx";
 import {useState, useTransition} from 'react';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/material.css';
 import VerificationSetUpInfo from "./VerificationSetUpInfo.jsx";
-import {useUser} from "../../Providers/UserContext.jsx";
+import {useUser} from "../../Providers/useUser.tsx";
 import {authService} from "../../../services/authService.jsx";
 import {useNavigate, useParams} from "react-router";
 
@@ -23,7 +23,7 @@ export default function VerificationSetUp() {
     const [errorJson, setError] = useState({heading: null, phoneError:null});
     const [isPending, startTransition] = useTransition();
     const navigate = useNavigate();
-    const pageContentJson = getPageContent(language, "VerificationSetUp");
+    const pageContentJson = getPageContent(language, PAGES.verificationSetUp);
     const errorPageJson = getPageContent(language, "Error");
 
     function  handleSubmit (e){
@@ -45,7 +45,8 @@ export default function VerificationSetUp() {
             try {
                 const response = await authService.sendTwoStepVerificationCode({
                     phoneNumber: formNumber,
-                    verificationType: formType
+                    verificationType: formType,
+                    userName: state.userData.email
                 });
                 if(response.success){
                     const userData = {...state.userData, phone:formData.get('phone'), stepVerificationSent: true, trxnId:response.data.trxnId};

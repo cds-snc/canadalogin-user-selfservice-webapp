@@ -22,7 +22,13 @@
     "10": "exemple : coussin orignal plat",
     "11": "Afficher le mot de passe",
     "12": "Longueur minimale :",
-    "13": "caractères"
+    "13": "caractères",
+    "14": "Enter your password",
+    "15": "to continue to your",
+    "16": "account",
+    "17": "example.name@gmail.com",
+    "18": "Use a different email",
+    "19": "I forgot my password"
   },
   "SignUpEmail": {
     "1": "Entrez une adresse courriel",

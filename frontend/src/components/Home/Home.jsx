@@ -5,15 +5,18 @@ import {
     GcdsDetails,
     GcdsInput
 } from "@cdssnc/gcds-components-react";
-import {AVAILABLE_LANGUAGES, SERVICES} from "../../utils/constants";
+import {AVAILABLE_LANGUAGES, PAGES, SERVICES} from "../../utils/constants";
 import {getPageContent} from '../../utils/functions';
 import FirstTimeGc from "../Layout/FirstTimeGc";
 import SubmitButton from "../Layout/SubmitButton.jsx";
 import config from "../../config.jsx";
+import {useParams} from "react-router";
 
 
-export default function Home({currentLang}) {
-    const pageContentJson = getPageContent(currentLang, "Home");
+export default function Home() {
+    const {language} = useParams();
+
+    const pageContentJson = getPageContent(language, PAGES.home);
     console.log("Config URL", config.apiUrl);
     return (
         <GcdsContainer className="gcds-content" >
@@ -23,8 +26,8 @@ export default function Home({currentLang}) {
                         <GcdsText marginTop="150" marginBottom="0">
                             {pageContentJson['2']}
                             <strong>
-                                {currentLang===AVAILABLE_LANGUAGES.fr?' '+pageContentJson['3']+' ':''}
-                                {` ${SERVICES[0].title}`}{currentLang===AVAILABLE_LANGUAGES.en?' '+pageContentJson['3']:''}
+                                {language===AVAILABLE_LANGUAGES.fr?' '+pageContentJson['3']+' ':''}
+                                {` ${SERVICES[0].title}`}{language!==AVAILABLE_LANGUAGES.fr?' '+pageContentJson['3']:''}
                             </strong>
                         </GcdsText>
                 </GcdsHeading>
@@ -50,11 +53,11 @@ export default function Home({currentLang}) {
                                 name="email"
                                 validateOn="other"
                             ></GcdsInput>
-                            <SubmitButton currentLang={currentLang} />
+                            <SubmitButton currentLang={language} />
                         </form>
                     </GcdsText>
                 </GcdsContainer>
-            <FirstTimeGc currentLang={currentLang}/>
+            <FirstTimeGc currentLang={language}/>
         </GcdsContainer>
     )
 }

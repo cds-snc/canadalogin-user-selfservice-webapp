@@ -20,5 +20,10 @@ __pycache__
 frontend/storybook-static/
 
 #Test Coverage
-frontend/coverage/
+frontend/coverage/*
+# Keep coverage folder for CI/CD workflows - otherwise the directory doesn't exist when CI/CD is running
+!frontend/coverage/README.md
 frontend/test-results/
+
+# Build output
+frontend/dist

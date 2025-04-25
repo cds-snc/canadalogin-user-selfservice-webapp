@@ -1,110 +1,57 @@
-import {withRouter} from 'storybook-addon-remix-react-router';
-import {AVAILABLE_LANGUAGES, NAVIGATION_LINKS, PAGES, SUBMIT_END_POINTS,} from "../../../utils/constants.jsx";
-import {UserProvider} from "../../../components/Providers/UserContext.jsx";
+import {
+    AVAILABLE_LANGUAGES,
+    FLOW_TYPES,
+    NAVIGATION_LINKS,
+    PAGES,
+} from "../../../utils/constants.jsx";
 import {getPageContent} from "../../../utils/functions.jsx";
-import {ACTION_TYPES, TEST_TYPES, TestDataUserProvider} from "../utils/constants.jsx";
-import {storyParameters, testCase} from "../utils/functions.jsx";
-import Page from "../../../views/Page.js";
+import {ACTION_TYPES, ERROR_RESPONSE, MSW_VERIFICATION, TEST_TYPES, TEST_USERS,} from "../utils/constants.jsx";
+import {buildTestCase, testCase, TestTemplate} from "../utils/functions.tsx";
+import {EngErrorFrontEnd} from "../SignIn/VerificationPage.stories.jsx";
 
 const engErrorPageJson = getPageContent('en', "Error");
 const frErrorPageJson = getPageContent('fr', "Error");
 
-const serverError =  "The system cannot process the request because the name is not valid.";
-const errorResponse = {
-    "success": false,
-    "message": serverError,
-    "data": null
-};
-
-const successResponse = {
-    "success": true,
-    "message": "Profile sent successfully",
-    "data": {
-        "trxnId": "eac50d6d-c2d9-47ef-a3ad-7ddc27d683b1",
-        "type": "emailotp",
-        "created": "2025-03-28T16:48:21.561Z",
-        "updated": "2025-03-28T16:48:21.561Z",
-        "expiry": "2025-03-28T16:53:21.561Z",
-        "state": "PENDING",
-        "correlationID": "7322",
-        "emailAddress": "test@test.com",
-        "attempts": 0,
-        "retries": 4
-    }
-}
-
 export default {
-
     title: 'GC Sign In/Tests/Sign Up/Create Core Profile Page',
-    component: Page,
-    decorators: [withRouter],
-    // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs
-    tags: ['autodocs'],
-
+    args:{
+        page: PAGES.coreProfile,
+        firstName:"",
+        lastName:""
+    },
+    parameters: buildTestCase.parameters(NAVIGATION_LINKS.coreProfile,
+        { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
+        null)
 };
 
-const BadTC1TemplateBE = (args) =>   {
-    TestDataUserProvider.testData.firstName = "Test";
-    TestDataUserProvider.testData.lastName = "";
-    return(
-        <UserProvider initial={TestDataUserProvider}><Page page={PAGES.coreProfile} /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
-    )
+export const EngNoLastName = TestTemplate.bind({});
+export const EngLastNameOneChar = TestTemplate.bind({});
+export const EngLastNameBadChar = TestTemplate.bind({});
+export const EngFirstNameBadChar = TestTemplate.bind({});
+export const FrNoLastName = TestTemplate.bind({});
+export const FrLastNameOneChar = TestTemplate.bind({});
+export const FrLastNameBadChar = TestTemplate.bind({});
+export const FrFirstNameBadChar = TestTemplate.bind({});
+export const ErrorBackEnd = TestTemplate.bind({});
+export const ServerErrorBackEnd = TestTemplate.bind({});
+export const SuccessfulBackEnd = TestTemplate.bind({});
+export const SuccessfulWithFrCharsBackEnd = TestTemplate.bind({});
+export const TestUser = TestTemplate.bind({});
+
+TestUser.args ={lastName: 'Test', email: TEST_USERS.keys().next().value};
+TestUser.play = async ({ canvasElement, step }) => {
+
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage: "Submit form with test user",
+        link: 'lastName',
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.redirect
+    })
 }
-
-const BadTC2TemplateBE = (args) =>   {
-    TestDataUserProvider.testData.firstName = "";
-    TestDataUserProvider.testData.lastName = "M";
-
-    return(
-        <UserProvider initial={TestDataUserProvider}><Page page={PAGES.coreProfile} /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
-    )
-}
-const BadTC3TemplateBE = (args) =>   {
-    TestDataUserProvider.testData.firstName = "";
-    TestDataUserProvider.testData.lastName = "Test!";
-
-    return(
-        <UserProvider initial={TestDataUserProvider}><Page page={PAGES.coreProfile} /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
-    )
-}
-const BadTC4TemplateBE = (args) =>   {
-    TestDataUserProvider.testData.lastName = "Test";
-    TestDataUserProvider.testData.firstName = "Test@";
-    return(
-        <UserProvider initial={TestDataUserProvider}><Page page={PAGES.coreProfile} /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
-    )
-}
-
-const TemplateBE = (args) =>   {
-    TestDataUserProvider.testData.lastName = "Test";
-    TestDataUserProvider.testData.firstName = "Test";
-    return(
-        <UserProvider initial={TestDataUserProvider}><Page page={PAGES.coreProfile} /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
-    )
-}
-
-const FrTemplateBE = (args) =>   {
-    TestDataUserProvider.testData.lastName = "Test";
-    TestDataUserProvider.testData.firstName = "Ç'âêîôû-àèù ëïü";
-    return(
-        <UserProvider initial={TestDataUserProvider}><Page page={PAGES.coreProfile} /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
-    )
-}
-
-export const EngNoLastName = BadTC1TemplateBE.bind({});
-export const EngLastNameOneChar = BadTC2TemplateBE.bind({});
-export const EngLastNameBadChar = BadTC3TemplateBE.bind({});
-export const EngFirstNameBadChar = BadTC4TemplateBE.bind({});
-export const FrNoLastName = BadTC1TemplateBE.bind({});
-export const FrLastNameOneChar = BadTC2TemplateBE.bind({});
-export const FrLastNameBadChar = BadTC3TemplateBE.bind({});
-export const FrFirstNameBadChar = BadTC4TemplateBE.bind({});
-export const ErrorBackEnd = TemplateBE.bind({});
-export const ServerErrorBackEnd = TemplateBE.bind({});
-export const SuccessfulBackEnd = TemplateBE.bind({});
-export const SuccessfulWithFrCharsBackEnd = FrTemplateBE.bind({});
-
-EngNoLastName.parameters = storyParameters(false, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.twoStepVerification);
+EngErrorFrontEnd.args = {firstName: "Test"};
 EngNoLastName.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -120,7 +67,7 @@ EngNoLastName.play = async ({ canvasElement, step }) => {
     })
 }
 
-EngLastNameOneChar.parameters = storyParameters(false, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.twoStepVerification);
+EngLastNameOneChar.args = {lastName: "G"};
 EngLastNameOneChar.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -136,7 +83,7 @@ EngLastNameOneChar.play = async ({ canvasElement, step }) => {
     })
 }
 
-EngLastNameBadChar.parameters = storyParameters(false, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.twoStepVerification);
+EngLastNameBadChar.args = {lastName: "Test!"};
 EngLastNameBadChar.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -152,7 +99,8 @@ EngLastNameBadChar.play = async ({ canvasElement, step }) => {
     })
 }
 
-EngFirstNameBadChar.parameters = storyParameters(false, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.twoStepVerification);
+
+EngFirstNameBadChar.args = {firstName:"Test@" , lastName: "Test"};
 EngFirstNameBadChar.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -168,9 +116,12 @@ EngFirstNameBadChar.play = async ({ canvasElement, step }) => {
     })
 }
 
+const frenchParameters =  buildTestCase.parameters(NAVIGATION_LINKS.coreProfile,
+    { language: AVAILABLE_LANGUAGES.fr, flow: FLOW_TYPES.signUp },
+    null);
 
-
-FrNoLastName.parameters = storyParameters(false, AVAILABLE_LANGUAGES.fr, NAVIGATION_LINKS.twoStepVerification);
+FrNoLastName.parameters = frenchParameters;
+FrNoLastName.args = {firstName: "Test"};
 FrNoLastName.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -186,7 +137,8 @@ FrNoLastName.play = async ({ canvasElement, step }) => {
     })
 }
 
-FrLastNameOneChar.parameters = storyParameters(false, AVAILABLE_LANGUAGES.fr, NAVIGATION_LINKS.twoStepVerification);
+FrLastNameOneChar.parameters = frenchParameters;
+FrLastNameOneChar.args = {lastName: "G"};
 FrLastNameOneChar.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -202,7 +154,8 @@ FrLastNameOneChar.play = async ({ canvasElement, step }) => {
     })
 }
 
-FrLastNameBadChar.parameters = storyParameters(false, AVAILABLE_LANGUAGES.fr, NAVIGATION_LINKS.twoStepVerification);
+FrLastNameBadChar.parameters = frenchParameters;
+FrLastNameBadChar.args = {lastName: "Test!"};
 FrLastNameBadChar.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -218,7 +171,8 @@ FrLastNameBadChar.play = async ({ canvasElement, step }) => {
     })
 }
 
-FrFirstNameBadChar.parameters = storyParameters(false, AVAILABLE_LANGUAGES.fr, NAVIGATION_LINKS.twoStepVerification);
+FrFirstNameBadChar.parameters = frenchParameters;
+FrFirstNameBadChar.args = {firstName:"Test@" , lastName: "Test"};
 FrFirstNameBadChar.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -234,7 +188,10 @@ FrFirstNameBadChar.play = async ({ canvasElement, step }) => {
     })
 }
 
-ErrorBackEnd.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.coreProfile, SUBMIT_END_POINTS.createCoreProfile, errorResponse);
+ErrorBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.coreProfile,
+    { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
+    [MSW_VERIFICATION.signup.coreProfile.error]);
+ErrorBackEnd.args = {firstName:"Test" , lastName: "Test"};
 ErrorBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -243,14 +200,18 @@ ErrorBackEnd.play = async ({ canvasElement, step }) => {
         stepMessage:"Submit form with bad name in English",
         link: 'lastName',
         heading: engErrorPageJson[1],
-        message: serverError,
+        message: ERROR_RESPONSE.message,
         delay: 1000,
         actionType: ACTION_TYPES.submit,
         type: TEST_TYPES.error
     })
 }
 
-ServerErrorBackEnd.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.coreProfile, SUBMIT_END_POINTS.createCoreProfile, null);
+
+ServerErrorBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.coreProfile,
+    { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
+    [MSW_VERIFICATION.signup.coreProfile.serverTimeOut]);
+ServerErrorBackEnd.args = {firstName:"Test" , lastName: "Test"};
 ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -266,7 +227,10 @@ ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-SuccessfulBackEnd.parameters = storyParameters(true, AVAILABLE_LANGUAGES.en, NAVIGATION_LINKS.coreProfile, SUBMIT_END_POINTS.createCoreProfile, successResponse);
+SuccessfulBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.coreProfile,
+    { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
+    [MSW_VERIFICATION.signup.coreProfile.success]);
+SuccessfulBackEnd.args = {firstName:"Test" , lastName: "Test"};
 SuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -280,7 +244,10 @@ SuccessfulBackEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-SuccessfulWithFrCharsBackEnd.parameters = storyParameters(true, AVAILABLE_LANGUAGES.fr, NAVIGATION_LINKS.coreProfile, SUBMIT_END_POINTS.createCoreProfile, successResponse);
+SuccessfulWithFrCharsBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.coreProfile,
+    { language: AVAILABLE_LANGUAGES.fr, flow: FLOW_TYPES.signUp },
+    [MSW_VERIFICATION.signup.coreProfile.success]);
+SuccessfulWithFrCharsBackEnd.args = {firstName:"Test" , lastName: "Ç'âêîôû-àèù ëïü"};
 SuccessfulWithFrCharsBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({

@@ -1,95 +1,37 @@
-import Page from "../../../views/Page";
-import {withRouter} from 'storybook-addon-remix-react-router';
 import {
     AVAILABLE_LANGUAGES,
     FLOW_TYPES,
     NAVIGATION_LINKS,
-    PAGES,
-    SUBMIT_END_POINTS
+    PAGES
 } from "../../../utils/constants.jsx";
-import {UserProvider} from "../../../components/Providers/UserContext.jsx";
 import {getPageContent} from "../../../utils/functions.jsx";
-import {ACTION_TYPES, TEST_TYPES, TestDataUserProvider} from "../utils/constants.jsx";
-import {storyParametersNew, testCase} from "../utils/functions.jsx";
-
-const serverError =  "Value is not a valid email address: There must be something after the @-sign.";
+import {
+    ACTION_TYPES, ERROR_RESPONSE,
+    MSW_VERIFICATION,
+    TEST_TYPES, TEST_USERS
+} from "../utils/constants.jsx";
+import {buildTestCase, testCase, TestTemplate} from "../utils/functions.tsx";
 const engErrorPageJson = getPageContent('en', "Error");
 const frErrorPageJson = getPageContent('fr', "Error");
 
-const errorResponse = {
-    "success": false,
-    "message": serverError,
-    "data": null
-};
-
-const successResponse = {
-    "success": true,
-    "message": "OTP sent successfully",
-    "data": {
-        "trxnId": "eac50d6d-c2d9-47ef-a3ad-7ddc27d683b1",
-        "type": "emailotp",
-        "created": "2025-03-28T16:48:21.561Z",
-        "updated": "2025-03-28T16:48:21.561Z",
-        "expiry": "2025-03-28T16:53:21.561Z",
-        "state": "PENDING",
-        "correlationID": "7322",
-        "emailAddress": "test@test.com",
-        "attempts": 0,
-        "retries": 4
-    }
-}
-
-const frontEndStoryParameters = {
-    isBackEndTest:false,
-    link:NAVIGATION_LINKS.signUp,
-    flow:FLOW_TYPES.signUp
-}
-
-const backEndStoryParameters = {
-    ...frontEndStoryParameters,
-    isBackEndTest:true,
-    endpoint:SUBMIT_END_POINTS.sendOtpCode
-}
-
 export default {
-
     title: 'GC Sign In/Tests/Sign Up/Sign Up Page',
-    component: Page,
-
-    decorators: [withRouter],
-    // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs
-    tags: ['autodocs'],
-
+    args:{
+        page: PAGES.signup,
+        email: "test@test"
+    },
+    parameters: buildTestCase.parameters(NAVIGATION_LINKS.signUp,
+        { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
+        null)
 };
 
-const BadTemplateFE = (args) =>   {
+export const EngErrorFrontEnd = TestTemplate.bind({});
+export const FrErrorFrontEnd = TestTemplate.bind({});
+export const ErrorBackEnd = TestTemplate.bind({});
+export const SuccessfulBackEnd = TestTemplate.bind({});
+export const ServerErrorBackEnd = TestTemplate.bind({});
+export const TestUser = TestTemplate.bind({});
 
-    TestDataUserProvider.testData.email = "test@test";
-
-    return(
-        <UserProvider initial={TestDataUserProvider}><Page page={PAGES.signup} /><button  aria-label="test" type="submit"  form="form"></button></UserProvider>
-    )
-}
-
-const TemplateBE = (args) =>   {
-
-    TestDataUserProvider.testData.email = "test@test.com";
-
-    return(
-        <UserProvider initial={TestDataUserProvider}><Page page={PAGES.signup} /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
-    )
-}
-
-export const EngErrorFrontEnd = BadTemplateFE.bind({});
-export const FrErrorFrontEnd = BadTemplateFE.bind({});
-export const ErrorBackEnd = TemplateBE.bind({});
-export const SuccessfulBackEnd = TemplateBE.bind({});
-export const ServerErrorBackEnd = TemplateBE.bind({});
-
-EngErrorFrontEnd.parameters = storyParametersNew({
-    ...frontEndStoryParameters,
-    language:AVAILABLE_LANGUAGES.en,
-});
 EngErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -105,10 +47,9 @@ EngErrorFrontEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-FrErrorFrontEnd.parameters = storyParametersNew({
-    ...frontEndStoryParameters,
-    language:AVAILABLE_LANGUAGES.fr,
-});
+FrErrorFrontEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.signUp,
+    { language: AVAILABLE_LANGUAGES.fr, flow: FLOW_TYPES.signUp },
+    null);
 FrErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -124,11 +65,10 @@ FrErrorFrontEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-ErrorBackEnd.parameters = storyParametersNew({
-    ...backEndStoryParameters,
-    language:AVAILABLE_LANGUAGES.en,
-    response:errorResponse
-});
+ErrorBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.signUp,
+    { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
+    [MSW_VERIFICATION.signup.signUp.error]);
+ErrorBackEnd.args ={email: "test@test.com"};
 ErrorBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -137,18 +77,17 @@ ErrorBackEnd.play = async ({ canvasElement, step }) => {
         stepMessage:"Submit form with bad email For Back End Error",
         link: 'email',
         heading: engErrorPageJson[1],
-        message: serverError,
+        message: ERROR_RESPONSE.message,
         delay: 1000,
         actionType: ACTION_TYPES.submit,
         type: TEST_TYPES.error
     })
 }
 
-SuccessfulBackEnd.parameters =  storyParametersNew({
-    ...backEndStoryParameters,
-    language:AVAILABLE_LANGUAGES.en,
-    response:successResponse
-});
+SuccessfulBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.signUp,
+    { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
+    [MSW_VERIFICATION.signup.signUp.success]);
+SuccessfulBackEnd.args ={email: "test@test.com"};
 SuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -162,11 +101,10 @@ SuccessfulBackEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-ServerErrorBackEnd.parameters =  storyParametersNew({
-    ...backEndStoryParameters,
-    language:AVAILABLE_LANGUAGES.en,
-    response:null
-});
+ServerErrorBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.signUp,
+    { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
+    [MSW_VERIFICATION.signup.signUp.serverTimeOut]);
+ServerErrorBackEnd.args ={email: "test@test.com"};
 ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -179,5 +117,19 @@ ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
         delay: 1000,
         actionType: ACTION_TYPES.submit,
         type: TEST_TYPES.error
+    })
+}
+
+TestUser.args ={email: TEST_USERS.keys().next().value};
+TestUser.play = async ({ canvasElement, step }) => {
+
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage: "Submit form with test user",
+        link: 'email',
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.redirect
     })
 }

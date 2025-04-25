@@ -1,85 +1,41 @@
-import {withRouter} from 'storybook-addon-remix-react-router';
 import {
     AVAILABLE_LANGUAGES,
     FLOW_TYPES,
     NAVIGATION_LINKS,
-    PAGES,
-    SUBMIT_END_POINTS,
+    PAGES
 } from "../../../utils/constants.jsx";
-import {UserProvider} from "../../../components/Providers/UserContext.jsx";
 import {getPageContent} from "../../../utils/functions.jsx";
-import {ACTION_TYPES, TEST_TYPES, TestDataUserProvider} from "../utils/constants.jsx";
-import {storyParametersNew, testCase} from "../utils/functions.jsx";
-import Page from "../../../views/Page.js";
-
-
-const frontEndStoryParameters = {
-    isBackEndTest:false,
-    link:NAVIGATION_LINKS.twoStepVerification,
-    flow:FLOW_TYPES.signUp
-}
-
-const backEndStoryParameters = {
-    isBackEndTest:true,
-    link:NAVIGATION_LINKS.twoStepVerification,
-    flow:FLOW_TYPES.signUp,
-    endpoint:SUBMIT_END_POINTS.sendTwoStepVerificationCode
-}
+import {
+    ACTION_TYPES,
+    ERROR_RESPONSE,
+    MSW_VERIFICATION,
+    TEST_TYPES,
+    TEST_USERS
+} from "../utils/constants.jsx";
+import {buildTestCase, testCase, TestTemplate} from "../utils/functions.tsx";
 
 const engErrorPageJson = getPageContent('en', "Error");
 const frErrorPageJson = getPageContent('fr', "Error");
 
-const serverError =  "The system cannot process the request because the phone number is not valid.";
-const errorResponse = {
-    "success": false,
-    "message": serverError,
-    "data": null
-};
-
-const successResponse = {
-    "success": true,
-    "message": "Phone number sent successfully",
-    "data": {
-        "trxnId": "eac50d6d-c2d9-47ef-a3ad-7ddc27d683b1",
-        "type": "emailotp",
-        "created": "2025-03-28T16:48:21.561Z",
-        "updated": "2025-03-28T16:48:21.561Z",
-        "expiry": "2025-03-28T16:53:21.561Z",
-        "state": "PENDING",
-        "correlationID": "7322",
-        "emailAddress": "test@test.com",
-        "attempts": 0,
-        "retries": 4
-    }
-}
-
 export default {
-
     title: 'GC Sign In/Tests/Sign Up/Verification Set Up Page',
-    component: Page,
-    decorators: [withRouter],
-    // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs
-    tags: ['autodocs'],
-
+    args:{
+        page: PAGES.verificationSetUp
+    },
+    parameters: buildTestCase.parameters(NAVIGATION_LINKS.twoStepVerification,
+        { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
+        null)
 };
 
-const Template = (args) =>   {
-    return(
-        <UserProvider initial={TestDataUserProvider}><Page page={PAGES.verificationSetUp} /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
-    )
-}
-export const EngNoNumberErrorFrontEnd = Template.bind({});
-export const FrNoNumberErrorFrontEnd = Template.bind({});
-export const EngDigitErrorFrontEnd = Template.bind({});
-export const FrDigitErrorFrontEnd = Template.bind({});
-export const ErrorBackEnd = Template.bind({});
-export const ServerErrorBackEnd = Template.bind({});
-export const SuccessfulBackEnd = Template.bind({});
+export const EngNoNumberErrorFrontEnd = TestTemplate.bind({});
+export const FrNoNumberErrorFrontEnd = TestTemplate.bind({});
+export const EngDigitErrorFrontEnd = TestTemplate.bind({});
+export const FrDigitErrorFrontEnd = TestTemplate.bind({});
+export const ErrorBackEnd = TestTemplate.bind({});
+export const ServerErrorBackEnd = TestTemplate.bind({});
+export const SuccessfulBackEnd = TestTemplate.bind({});
+export const TestUser = TestTemplate.bind({});
 
-EngNoNumberErrorFrontEnd.parameters = storyParametersNew({
-    ...frontEndStoryParameters,
-    language:AVAILABLE_LANGUAGES.en
-});
 EngNoNumberErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -95,10 +51,10 @@ EngNoNumberErrorFrontEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-FrNoNumberErrorFrontEnd.parameters = storyParametersNew({
-    ...frontEndStoryParameters,
-    language:AVAILABLE_LANGUAGES.fr
-});
+const frenchParameters =  buildTestCase.parameters(NAVIGATION_LINKS.twoStepVerification,
+    { language: AVAILABLE_LANGUAGES.fr, flow: FLOW_TYPES.signUp },
+    null);
+FrNoNumberErrorFrontEnd.parameters = frenchParameters;
 FrNoNumberErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -114,10 +70,6 @@ FrNoNumberErrorFrontEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-EngDigitErrorFrontEnd.parameters = storyParametersNew({
-    ...frontEndStoryParameters,
-    language:AVAILABLE_LANGUAGES.en
-});
 EngDigitErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -134,10 +86,7 @@ EngDigitErrorFrontEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-FrDigitErrorFrontEnd.parameters = storyParametersNew({
-    ...frontEndStoryParameters,
-    language:AVAILABLE_LANGUAGES.fr
-});
+FrDigitErrorFrontEnd.parameters = frenchParameters;
 FrDigitErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -154,11 +103,9 @@ FrDigitErrorFrontEnd.play = async ({ canvasElement, step }) => {
     })
  }
 
-ErrorBackEnd.parameters = storyParametersNew({
-    ...backEndStoryParameters,
-    language:AVAILABLE_LANGUAGES.en,
-    response:errorResponse
-});
+ErrorBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.twoStepVerification,
+    { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
+    [MSW_VERIFICATION.signup.verificationSetUp.error]);
 ErrorBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -167,18 +114,16 @@ ErrorBackEnd.play = async ({ canvasElement, step }) => {
         stepMessage:"Submit form with Phone number in English for back end error test",
         link: 'phone',
         heading: engErrorPageJson[1],
-        message: errorResponse.message,
+        message: ERROR_RESPONSE.message,
         delay: 1000,
         actionType: ACTION_TYPES.submit,
         type: TEST_TYPES.error,
         input: {inputType: 'textBox', stepMessage:'Enter phone Number with enough digits.', value: '4161234567'}
     })
 }
-ServerErrorBackEnd.parameters =storyParametersNew({
-    ...backEndStoryParameters,
-    language:AVAILABLE_LANGUAGES.en,
-    response:null
-});
+ServerErrorBackEnd.parameters =buildTestCase.parameters(NAVIGATION_LINKS.twoStepVerification,
+    { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
+    [MSW_VERIFICATION.signup.verificationSetUp.serverTimeOut]);
 ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -195,11 +140,9 @@ ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-SuccessfulBackEnd.parameters = storyParametersNew({
-    ...backEndStoryParameters,
-    language:AVAILABLE_LANGUAGES.en,
-    response:successResponse
-});
+SuccessfulBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.twoStepVerification,
+    { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
+    [MSW_VERIFICATION.signup.verificationSetUp.success]);
 SuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -207,6 +150,21 @@ SuccessfulBackEnd.play = async ({ canvasElement, step }) => {
         step,
         stepMessage: "Submit form with good phone number",
         link: 'phone',
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.redirect,
+        input: {inputType: 'textBox', stepMessage:'Enter phone Number with enough digits.', value: '4161234567'}
+    })
+}
+
+TestUser.args ={email: TEST_USERS.keys().next().value };
+TestUser.play = async ({ canvasElement, step }) => {
+
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage: "Submit form with test user",
+        link: 'email',
         delay: 1000,
         actionType: ACTION_TYPES.submit,
         type: TEST_TYPES.redirect,

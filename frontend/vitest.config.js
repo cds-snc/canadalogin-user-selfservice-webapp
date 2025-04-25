@@ -1,16 +1,16 @@
-import {defineConfig} from 'vitest/config';
+import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react'
 
-const filesToInclude =[
+const filesToInclude = [
     '**/src/App.jsx',
-    '**/src/utils/*.jsx',
-    '**/src/views/**/*.jsx',
-    '**/src/components/**/*.jsx'
+    '**/src/utils/*',
+    '**/src/views/**/*',
+    '**/src/components/**/*',
+    '**/src/services/*',
+    '**/src/locales/**/*'
 ]
 
-const filesToExclude = [
-
-]
+const filesToExclude = [];
 export default defineConfig({
     plugins: [react()],
     preview: {
@@ -23,7 +23,11 @@ export default defineConfig({
         globals: true,
         coverage: {
             reporter: ['text', 'json-summary', 'json', 'html'],
-            include:[...filesToInclude],
+            reportOnFailure: true,
+            all: true,
+            enabled: true,
+            provider: 'istanbul',
+            include: [...filesToInclude],
             exclude: [...filesToExclude],
             thresholds: {
                 lines: 80,

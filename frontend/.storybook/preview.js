@@ -1,22 +1,31 @@
 /** @type { import('@storybook/react').Preview } */
 import '../src/index.css';
 import { initialize, mswLoader } from 'msw-storybook-addon';
+import Page from "../src/views/Page.js";
+import {withRouter} from "storybook-addon-remix-react-router";
 
 initialize();
 
 const preview = {
     loaders: [mswLoader],
+    decorators: [withRouter],
+    component: Page,
+    tags: ['autodocs'],
     parameters: {
-        reactRouter: {
-            routePath: '/myroute',
+      controls: {
+        matchers: {
+         color: /(background|color)$/i,
+         date: /Date$/i,
         },
-    controls: {
-      matchers: {
-       color: /(background|color)$/i,
-       date: /Date$/i,
       },
-    },
-  },
+
+      a11y: {
+        // 'todo' - show a11y violations in the test UI only
+        // 'error' - fail CI on a11y violations
+        // 'off' - skip a11y checks entirely
+        test: 'todo'
+      }
+    }
 };
 
 export default preview;

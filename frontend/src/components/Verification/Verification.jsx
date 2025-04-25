@@ -10,12 +10,12 @@ import {
     AVAILABLE_LANGUAGES,
     CONTEXT_ACTIONS,
     FLOW_TYPES,
-    NAVIGATION_LINKS,
+    NAVIGATION_LINKS, PAGES,
     SERVICES
 } from "../../utils/constants.jsx";
 import {useNavigate, useParams} from "react-router";
 import SubmitButton from "../Layout/SubmitButton.jsx";
-import {useUser} from "../Providers/UserContext.jsx";
+import {useUser} from "../Providers/useUser.tsx";
 import {authService} from "../../services/authService.jsx";
 import {useEffect, useState, useTransition} from "react";
 
@@ -31,7 +31,7 @@ export default function Verification() {
     const [errorJson, setError] = useState({heading: null, codeError:null});
     const navigate = useNavigate();
     const errorPageJson = getPageContent(language, "Error");
-    const pageContentJson = getPageContent(language, "Verification");
+    const pageContentJson = getPageContent(language, PAGES.verification);
 
     useEffect(()=>{
         if(time<=0)
@@ -70,7 +70,7 @@ export default function Verification() {
 
         startTransition(async()=> {
             e.preventDefault();
-            const newType =  type===FLOW_TYPES.voice?FLOW_TYPES.sms:FLOW_TYPES.voice
+            const newType =  type===FLOW_TYPES.voice?FLOW_TYPES.sms:FLOW_TYPES.voice;
             await requestNewCode(newType, true);
         })
     }
@@ -90,7 +90,7 @@ export default function Verification() {
                 await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                 setCodeRequested(true);
                 if(didTypeChange)
-                    navigate("/" + language +"/"+ flow +NAVIGATION_LINKS.verification + '/' +codeType)
+                    navigate("/" + language +"/"+ flow +NAVIGATION_LINKS.verification + '/' +codeType);
             }else {
                 console.log("Error....", response);
                 setError({codeError: response.message, heading: errorPageJson['1']});
@@ -109,7 +109,7 @@ export default function Verification() {
             e.preventDefault();
 
             const formData = new FormData(e.target);
-            const formCode = formData.get('verificationCode')
+            const formCode = formData.get('verificationCode');
             setCodeRequested(false);
             if (!isCodeValid(formCode)) {
                 setError({codeError: errorPageJson[3], heading: errorPageJson['1']});
@@ -124,7 +124,8 @@ export default function Verification() {
                     flow: flow===FLOW_TYPES.signUp?'transient':'authenticate',
                     trxnId: state.userData.trxnId,
                     phoneNumber: type!==FLOW_TYPES.email?state.userData.phone.replace(/\D/g,''):'',
-                    id: type!==FLOW_TYPES.email?state.userData.id:''
+                    id: type!==FLOW_TYPES.email?state.userData.id:'',
+                    userName: state.userData.email
                 });
                 if(response.success){
                     if(flow===FLOW_TYPES.signUp) {
@@ -132,18 +133,18 @@ export default function Verification() {
                         {
                             const userData = {...state.userData, emailValidated: true};
                             await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
-                            console.log(userData);
-                            navigate("/" + language + NAVIGATION_LINKS.password);
+                            console.log("success...sign up", response);
+                            navigate("/" + language + "/"+flow+NAVIGATION_LINKS.password);
                         }else                        {
                             const userData = {...state.userData, stepVerified: true};
                             await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
-                            console.log("success...sign up", response)
+                            console.log("success...sign up", response);
                             navigate("/" + language + NAVIGATION_LINKS.coreProfile);
                         }
                     }else if(flow===FLOW_TYPES.signIn){
                         const userData = {...state.userData, stepVerified: true};
                         await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
-                        console.log("success...sign in", response)
+                        console.log("success...sign in", response);
                         navigate("/" + language + '/redirecttorp');
                     }
                 }else {
