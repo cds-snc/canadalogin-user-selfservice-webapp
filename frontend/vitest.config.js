@@ -1,7 +1,6 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react'
 
-
 const filesToInclude = [
     '**/src/App.jsx',
     '**/src/utils/*',

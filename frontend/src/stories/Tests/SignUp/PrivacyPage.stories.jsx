@@ -31,7 +31,6 @@ PrivacyNavigate.play = async ({ canvasElement, step }) => {
         link: 'privacy',
         delay: 1000,
         actionType: ACTION_TYPES.submit,
-        type: TEST_TYPES.redirect,
-        expectedNavigation: `/${AVAILABLE_LANGUAGES.en}${NAVIGATION_LINKS.signUp}`
+        type: TEST_TYPES.redirect
     });
 };

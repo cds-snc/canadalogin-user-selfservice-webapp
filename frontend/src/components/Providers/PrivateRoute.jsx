@@ -40,8 +40,7 @@ function isValidRoute (page, state, flow, type) {
         case(PAGES.verification):
             if(type===FLOW_TYPES.email)
                 return isEmailValid(state.userData.email &&
-                    state.userData.viewPrivacy
-            )
+                    state.userData.viewPrivacy);
             return (state.userData.stepVerificationSent &&
                     state.userData.passwordSubmitted &&
                     state.userData.emailValidated &&
