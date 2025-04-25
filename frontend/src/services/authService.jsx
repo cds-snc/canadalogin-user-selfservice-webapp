@@ -24,7 +24,6 @@ export const authService = {
         return response.data;
     },
     transientOtpVerify: async (userData) => {
-        console.log(userData)
         if(TEST_USERS.has(userData.userName))
             return buildTestResponse(userData, "transientOtpVerify");
 
@@ -43,7 +42,6 @@ export const authService = {
 
 function buildTestResponse (userData, type) {
     console.log("Mocking "+type+" responses for user testing.");
-    console.log("userData",userData)
     let response = null;
     const now = new Date();
     const expires = new Date();
