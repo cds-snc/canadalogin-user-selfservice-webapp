@@ -43,9 +43,10 @@ jobs:
           role-session-name: GHPushAppS3
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Set up Environment Variables
+      - name: Environment Variables for build
         run: |
           echo "VITE_BACKEND_API_URL=${{ secrets.VITE_BACKEND_API_URL }}" >> $GITHUB_ENV
+          echo "VITE_GOOGLE_ANALYTICS_ID=${{ secrets.VITE_GOOGLE_ANALYTICS_ID }}" >> $GITHUB_ENV
 
       - name: Install dependencies
         working-directory: ${{ matrix.module }}
