@@ -69,7 +69,7 @@ export async function testCase({ canvasElement, step, stepMessage, message, link
             await testItem.clickLink(canvas, step, stepMessage, linkText);
             break;
         case(ACTION_TYPES.submit):
-            await testItem.clickButton(canvas, step, message);
+            await testItem.clickButton(canvas, step);
             break;
         default:
             await expect(false).toBeTruthy();
@@ -107,8 +107,8 @@ const testItem = {
         });
         await new Promise((r) => setTimeout(r, 1000));
     },
-    clickButton: async(canvas:any, step:any, message:string) =>{
-        await step(message, async () => {
+    clickButton: async(canvas:any, step:any) =>{
+        await step('Click button', async () => {
             await userEvent.click(canvas.queryByRole('button', {name: /test/i}));
         });
         await new Promise((r) => setTimeout(r, 1000));

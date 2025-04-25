@@ -10,7 +10,7 @@ import {
     ERROR_RESPONSE,
     MSW_PASSWORD_POLICY,
     MSW_VERIFICATION,
-    TEST_TYPES
+    TEST_TYPES, TEST_USERS
 } from "../utils/constants.jsx";
 import {buildTestCase, testCase, TestTemplate} from "../utils/functions.tsx";
 
@@ -33,6 +33,7 @@ export const FrErrorFrontEnd = TestTemplate.bind({});
 export const ErrorBackEnd = TestTemplate.bind({});
 export const SuccessfulBackEnd = TestTemplate.bind({});
 export const ServerErrorBackEnd = TestTemplate.bind({});
+export const TestUser = TestTemplate.bind({});
 
 EngErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
@@ -119,6 +120,20 @@ ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
         delay: 1000,
         actionType: ACTION_TYPES.submit,
         type: TEST_TYPES.error
+    })
+}
+
+TestUser.args = {email: TEST_USERS.keys().next().value, password:"123456789012"};
+TestUser.play = async ({ canvasElement, step }) => {
+
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage: "Submit form with test user",
+        link: 'password',
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.redirect
     })
 }
 

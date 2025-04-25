@@ -6,7 +6,7 @@ import SubmitButton from "../../Layout/SubmitButton.jsx";
 import {useUser} from "../../Providers/useUser.tsx";
 import {useState, useTransition} from "react";
 import {authService} from "../../../services/authService.jsx";
-import {CONTEXT_ACTIONS} from "../../../utils/constants.jsx";
+import {CONTEXT_ACTIONS, PAGES} from "../../../utils/constants.jsx";
 import {useNavigate, useParams} from "react-router";
 
 export default function CreateCoreProfile() {
@@ -15,7 +15,7 @@ export default function CreateCoreProfile() {
     const [errorJson, setError] = useState({heading: null, nameError:null});
     const navigate = useNavigate();
     const errorPageJson = getPageContent(language, "Error");
-    const pageContentJson = getPageContent(language, "CreateCoreProfile");
+    const pageContentJson = getPageContent(language, PAGES.coreProfile);
     const [isPending, startTransition] = useTransition();
 
     function  handleSubmit (e){
@@ -40,7 +40,8 @@ export default function CreateCoreProfile() {
                     name = formFirstName.trim() + ' ' + name;
 
                 const response = await authService.createCoreProfile({
-                    name: name
+                    name: name,
+                    userName: state.userData.email
                 });
                 if(response.success){
                     const userData = {...state.userData, coreProfileCreated: true};
