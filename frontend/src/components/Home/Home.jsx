@@ -117,7 +117,7 @@ export default function Home() {
                                 data-testid="signin-email"
                                 lang={currentLang}
                             ></GcdsInput>
-                            <SubmitButton currentLang={currentLang} />
+                            <SubmitButton currentLang={currentLang} disabled={isPending} />
                         </form>
                     </GcdsText>
                 </GcdsContainer>

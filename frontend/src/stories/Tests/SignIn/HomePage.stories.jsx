@@ -7,16 +7,12 @@ import {
 import {getPageContent} from "../../../utils/functions.jsx";
 import {
     ACTION_TYPES,
-    MSW_VERIFICATION,
     TEST_TYPES,
 } from "../utils/constants.jsx";
 import {buildTestCase, testCase, TestTemplate} from "../utils/functions.jsx";
-import {ServerErrorBackEnd} from "../SignUp/SignUpPage.stories.jsx";
 
-const serverError =  "Value is not a valid email address: There must be something after the @-sign.";
 const engErrorPageJson = getPageContent('en', "Error");
 const frErrorPageJson = getPageContent('fr', "Error");
-
 
 export default {
     title: 'GC Sign In/Tests/Sign Up/Landing Page',
@@ -100,61 +96,3 @@ SuccessfulSubmit.play = async ({ canvasElement, step }) => {
         type: TEST_TYPES.redirect
     })
 }
-
-
-// SuccessfulPassFE.parameters = buildTestCase.parameters(NAVIGATION_LINKS.home,
-//     {langage:AVAILABLE_LANGUAGES.en, flow:FLOW_TYPES.signIn },
-//     [MSW_VERIFICATION.signin.signIn.success]);
-//
-// SuccessfulPassFE.play = async ({ canvasElement, step }) => {
-//
-//     await testCase({
-//         canvasElement,
-//         step,
-//         stepMessage:"Submit form with good email for next page",
-//         link: 'email',
-//         heading: engErrorPageJson[1],
-//         message: serverError,
-//         delay: 1000,
-//         actionType: ACTION_TYPES.submit,
-//         type: TEST_TYPES.redirect
-//     })
-// }
-//
-// SuccessfulBackEnd.parameters =  storyParametersNew({
-//     ...backEndStoryParameters,
-//     language:AVAILABLE_LANGUAGES.en,
-//     response:successResponse
-// });
-// SuccessfulBackEnd.play = async ({ canvasElement, step }) => {
-//
-//     await testCase({
-//         canvasElement,
-//         step,
-//         stepMessage: "Submit form with good email",
-//         link: 'email',
-//         delay: 1000,
-//         actionType: ACTION_TYPES.submit,
-//         type: TEST_TYPES.redirect
-//     })
-// }
-//
-// ServerErrorBackEnd.parameters =  storyParametersNew({
-//     ...backEndStoryParameters,
-//     language:AVAILABLE_LANGUAGES.en,
-//     response:null
-// });
-// ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
-//
-//     await testCase({
-//         canvasElement,
-//         step,
-//         stepMessage:"Submit form with Back End No Response Error",
-//         link: 'email',
-//         heading: engErrorPageJson[1],
-//         message: engErrorPageJson[7],
-//         delay: 1000,
-//         actionType: ACTION_TYPES.submit,
-//         type: TEST_TYPES.error
-//     })
-// }
