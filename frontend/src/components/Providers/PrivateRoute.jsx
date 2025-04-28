@@ -35,19 +35,23 @@ function isValidRoute (page, state, flow, type) {
                 state.userData.stepVerified &&
                 state.userData.stepVerificationSent &&
                 state.userData.passwordSubmitted &&
-                state.userData.emailValidated);
+                state.userData.emailValidated &&
+                state.userData.viewPrivacy);
         case(PAGES.verification):
             if(type===FLOW_TYPES.email)
-                return isEmailValid(state.userData.email);
-
+                return (isEmailValid(state.userData.email) &&
+                    state.userData.viewPrivacy);
             return (state.userData.stepVerificationSent &&
                     state.userData.passwordSubmitted &&
-                    state.userData.emailValidated);
+                    state.userData.emailValidated &&
+                    state.userData.viewPrivacy);
         case(PAGES.verificationSetUp):
             return (state.userData.passwordSubmitted &&
-                    state.userData.emailValidated );
+                    state.userData.emailValidated &&
+                    state.userData.viewPrivacy);
         case(PAGES.password):
-            return (state.userData.emailValidated);
+            return (state.userData.emailValidated &&
+                state.userData.viewPrivacy);
         default:
             return false;
 
