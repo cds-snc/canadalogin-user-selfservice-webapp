@@ -9,7 +9,7 @@ install-dev-python:
 fmt-format-python:
 	black . $(ARGS) --target-version py311
 
-fmt-ci-format-check-python:
+fmt-ci-check-format-python:
 	black --check . --target-version py311
 
 lint-python:
