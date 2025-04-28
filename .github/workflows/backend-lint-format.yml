@@ -21,8 +21,8 @@ jobs:
       - name: Lint
         run: make lint-python
 
-      - name: Format
-        run: make fmt-ci-python
+      - name: Format Check
+        run: make fmt-ci-format-check-python
 
       - name: Test
         run: make run-tests

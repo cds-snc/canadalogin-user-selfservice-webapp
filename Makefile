@@ -6,13 +6,13 @@ install-python:
 install-dev-python:
 	@pip install -r ./backend/requirements-dev.txt
 
-fmt-python:
+fmt-format-python:
 	black . $(ARGS) --target-version py311
 
-fmt-ci-python:
+fmt-ci-format-check-python:
 	black --check . --target-version py311
 
-make lint-python:
+lint-python:
 	flake8 .
 
 run-tests:
