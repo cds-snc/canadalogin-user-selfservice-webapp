@@ -28,40 +28,14 @@ from fastapi.testclient import TestClient
 from app.config import IBMVerifyConfig, get_settings
 
 from app.config import get_settings, Settings, IBMVerifyConfig
-from pydantic import BaseSettings
 
 @pytest.fixture
 def client():
     # Initialize the TestClient to simulate HTTP requests
     return TestClient(app)
 
-
-# Define a base test class for mocking configuration
-class BaseTest:
-    @pytest.fixture(autouse=True)
-    def mock_env_vars(self, monkeypatch):
-        # Mock the environment variables required by IBMVerifyConfig
-        monkeypatch.setenv('IBM_VERIFY_TENANT_URL', 'http://mocked-url.com')
-        monkeypatch.setenv('IBM_VERIFY_API_CLIENT_ID', 'mocked-client-id')
-        monkeypatch.setenv('IBM_VERIFY_API_CLIENT_SECRET', 'mocked-client-secret')
-
-    @pytest.fixture(autouse=True)
-    def mock_get_settings(self):
-        # Patch get_settings to return a mocked Settings object
-        with patch.object(Settings, 'get_settings', return_value=Settings(
-            ibm_verify_config=IBMVerifyConfig(
-                IBM_VERIFY_TENANT_URL="http://mocked-url.com",
-                IBM_VERIFY_API_CLIENT_ID="mocked-client-id",
-                IBM_VERIFY_API_CLIENT_SECRET="mocked-client-secret"
-            )
-        )) as mock:
-            yield mock
-    
-
-class TestUserSignup(BaseTest):
-
-    @pytest.mark.asyncio
-    async def test_create_user_success(self, client):
+@pytest.mark.asyncio
+async def test_create_user_success(client):
         user_data = IBMUserCreateRequest(
             userName="test@example.com",
             emails=[{"value": "test@example.com"}],
@@ -101,8 +75,8 @@ class TestUserSignup(BaseTest):
             assert response.status_code == 201
             assert response.json()["id"] == "user-123"
 
-    @pytest.mark.asyncio
-    async def test_create_user_raises_generic_error(self, client):
+@pytest.mark.asyncio
+async def test_create_user_raises_generic_error(client):
         user_data = IBMUserCreateRequest(
             userName="test@example.com",
             emails=[{"value": "test@example.com"}],
@@ -129,8 +103,8 @@ class TestUserSignup(BaseTest):
             assert exc_info.value.status_code == 400
             assert "Signup error: Connection error" in str(exc_info.value.detail)
 
-    @pytest.mark.asyncio
-    async def test_signup_success(self, client):
+@pytest.mark.asyncio
+async def test_signup_success(client):
         user_data = UserLoginRequestData(
             userName="test@example.com", password="StrongPassword123"
         )
@@ -158,8 +132,8 @@ class TestUserSignup(BaseTest):
             assert result.message == "User created successfully"
             assert result.data.userName == "test@example.com"
 
-    @pytest.mark.asyncio
-    async def test_signup_failure_from_ibm(self, client):
+@pytest.mark.asyncio
+async def test_signup_failure_from_ibm(client):
         user_data = UserLoginRequestData(
             userName="fail@example.com", password="failpass"
         )
@@ -181,8 +155,8 @@ class TestUserSignup(BaseTest):
             assert result.body is not None
             assert b"Invalid user" in result.body
 
-    @pytest.mark.asyncio
-    async def test_signup_validation_error_response(self, client):
+@pytest.mark.asyncio
+async def test_signup_validation_error_response(client):
         user_data = UserLoginRequestData(
             userName="test@example.com", password="StrongPassword123"
         )
@@ -204,8 +178,8 @@ class TestUserSignup(BaseTest):
             assert exc_info.value.status_code == 422
             assert "Response validation error" in str(exc_info.value.detail)
 
-    @pytest.mark.asyncio
-    async def test_user_signup(self, client):
+@pytest.mark.asyncio
+async def test_user_signup(client):
         # Clear the cache before each test if necessary
         get_settings.cache_clear()
 
@@ -219,7 +193,7 @@ class TestUserSignup(BaseTest):
             success=True,
             message="User created successfully",
             data=IBMUserCreateResponse(id="user-123", userName="test@example.com"),
-            status_code=201
+            status_code=201,
         )
 
         # Patch the signup_with_password function to return the mock response
