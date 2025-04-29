@@ -43,11 +43,12 @@ export default function VerificationSetUp() {
             }
             await setError({phoneError:null, heading:null});
             try {
-                const response = await authService.sendTwoStepVerificationCode({
-                    phoneNumber: formNumber,
-                    verificationType: formType,
+                const response = await authService.transientOtpSend({
+                    phoneNumber: '+'+formNumber,
+                    otpType: formType,
                     userName: state.userData.email
                 });
+                console.log(response);
                 if(response.success){
                     const userData = {...state.userData, phone:formData.get('phone'), stepVerificationSent: true, trxnId:response.data.trxnId};
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
@@ -58,6 +59,7 @@ export default function VerificationSetUp() {
                     setError({phoneError: response.message, heading: errorPageJson['1']});
                 }
             } catch (error) {
+
                 console.error('Signup error:', error);
                 setError({phoneError:  errorPageJson[7], heading: errorPageJson['1']});
             }

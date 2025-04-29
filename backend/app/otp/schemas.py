@@ -25,9 +25,9 @@ class EmailOtpResponse(BaseModel):
 
 
 class OtpType(str, Enum):
-    SMS = "sms"
-    EMAIL = "email"
-    VOICE = "voice"
+    SMS = 'sms'
+    EMAIL = 'email'
+    VOICE = 'voice'
 
 
 class OtpVerification(BaseModel):

@@ -78,9 +78,9 @@ export default function Password() {
                     password: formData.get('password'),
                 });
 
-                if (response.success) {
+                if (response.success && response.data.id!==null) {
                     console.log("User created successfully ", response);
-                    const userData = {...state.userData, passwordSubmitted: true};
+                    const userData = {...state.userData, passwordSubmitted: true, id:response.data.id};
                     console.log("userData ", userData);
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                     console.log("navigate ", "/" + language + NAVIGATION_LINKS.twoStepVerification);
