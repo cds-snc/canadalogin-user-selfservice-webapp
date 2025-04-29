@@ -1,5 +1,4 @@
-from fastapi import APIRouter, Depends
-from pydantic import BaseModel, Field
+from fastapi import APIRouter
 from app.password.schemas import PasswordPolicyResponse
 from app.password.service import get_password_policy
 

@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 
 API_DESCRIPTION = """
-This API backend service primarily interacts with [IBM Verify service](https://docs.verify.ibm.com/verify/reference). 
+This API backend service primarily interacts with [IBM Verify service](https://docs.verify.ibm.com/verify/reference).
 API endpoints are consumed by our frontend application to perform user authentication and profile management.
 The API endpoints enable our custom frontend application to implement complex workflows and user interfaces without limitations.
 

@@ -7,7 +7,6 @@ from httpx import AsyncClient
 from pydantic import ValidationError
 
 from app.config import get_settings
-from app.otp.schemas import OtpType
 from app.users.schemas import (
     TwoFactorEnrollmentUserData,
     TwofactorEnrollmentResponse,

@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 
-from fastapi import Request, HTTPException
+from fastapi import HTTPException
 from httpx import AsyncClient
 from pydantic import ValidationError
 

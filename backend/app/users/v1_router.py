@@ -1,6 +1,5 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, status
 
-from app.otp.schemas import OtpType
 from app.users.schemas import (
     UserLoginRequestData,
     SignUpResponse,
@@ -11,7 +10,6 @@ from app.users.schemas import (
 from app.users.services.create import signup_with_password
 from app.users.services.login import signin_with_password
 from app.users.services.two_factor_enrollment import handle_enrolling_user_into_2fa
-from app.utils.helpers import generate_error_response
 import logging
 from fastapi import Request
 

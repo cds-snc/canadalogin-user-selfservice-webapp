@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from fastapi import Depends, HTTPException
+from fastapi import HTTPException
 from httpx import AsyncClient
 from app.config import get_settings
 

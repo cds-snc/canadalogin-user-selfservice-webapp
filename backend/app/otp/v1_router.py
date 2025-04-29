@@ -5,13 +5,11 @@ from fastapi import Request
 
 from app.otp.schemas import (
     UserOtpInfo,
-    OtpType,
     OtpRequestResponse,
     UserOtpVerificationInfo,
 )
 from app.otp.services.send_transient_otp import handle_otp_send
 from app.otp.services.verify_transient_otp import handle_otp_verification
-from app.utils.helpers import generate_error_response
 from app.utils.schemas import ResponseModel
 
 logger = logging.getLogger(__name__)
