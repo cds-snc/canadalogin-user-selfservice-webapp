@@ -47,7 +47,7 @@ class BaseTest:
 
     #     with patch("app.main.get_settings", return_value=mock_config):
     #         yield mock_config
-    def mock_env_vars(monkeypatch):
+    def mock_env_vars(self, monkeypatch):
         # Mock the environment variables required by IBMVerifyConfig
         monkeypatch.setenv('IBM_VERIFY_TENANT_URL', 'http://mocked-url.com')
         monkeypatch.setenv('IBM_VERIFY_API_CLIENT_ID', 'mocked-client-id')
