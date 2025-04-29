@@ -27,6 +27,8 @@ from fastapi.testclient import TestClient
 
 from app.config import IBMVerifyConfig, get_settings
 
+from app.config import get_settings, Settings, IBMVerifyConfig
+from pydantic import BaseSettings
 
 @pytest.fixture
 def client():
@@ -37,22 +39,24 @@ def client():
 # Define a base test class for mocking configuration
 class BaseTest:
     @pytest.fixture(autouse=True)
-    # def mock_config(self):
-    #     # Mock the IBMVerifyConfig in get_settings() once for all tests
-    #     mock_config = IBMVerifyConfig(
-    #         IBM_VERIFY_TENANT_URL="https://mock-tenant.url",
-    #         IBM_VERIFY_API_CLIENT_ID="fake-client-id",
-    #         IBM_VERIFY_API_CLIENT_SECRET="fake-client-secret",
-    #     )
-
-    #     with patch("app.main.get_settings", return_value=mock_config):
-    #         yield mock_config
     def mock_env_vars(self, monkeypatch):
         # Mock the environment variables required by IBMVerifyConfig
         monkeypatch.setenv('IBM_VERIFY_TENANT_URL', 'http://mocked-url.com')
         monkeypatch.setenv('IBM_VERIFY_API_CLIENT_ID', 'mocked-client-id')
         monkeypatch.setenv('IBM_VERIFY_API_CLIENT_SECRET', 'mocked-client-secret')
 
+    @pytest.fixture(autouse=True)
+    def mock_get_settings(self):
+        # Patch get_settings to return a mocked Settings object
+        with patch.object(Settings, 'get_settings', return_value=Settings(
+            ibm_verify_config=IBMVerifyConfig(
+                IBM_VERIFY_TENANT_URL="http://mocked-url.com",
+                IBM_VERIFY_API_CLIENT_ID="mocked-client-id",
+                IBM_VERIFY_API_CLIENT_SECRET="mocked-client-secret"
+            )
+        )) as mock:
+            yield mock
+    
 
 class TestUserSignup(BaseTest):
 
@@ -202,6 +206,9 @@ class TestUserSignup(BaseTest):
 
     @pytest.mark.asyncio
     async def test_user_signup(self, client):
+        # Clear the cache before each test if necessary
+        get_settings.cache_clear()
+
         # Mock user signup request data
         user_data = UserLoginRequestData(
             userName="test@example.com", password="testpassword123"
