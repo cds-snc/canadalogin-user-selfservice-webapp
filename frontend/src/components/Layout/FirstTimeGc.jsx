@@ -1,8 +1,6 @@
 import {GcdsHeading, GcdsLink, GcdsText} from "@cdssnc/gcds-components-react";
 import {getLanguage, getPageContent} from "../../utils/functions";
 import {NAVIGATION_LINKS} from "../../utils/constants.jsx";
-
-
 import ReactGA from "react-ga4";
 import {GA_CATEGORIES, GA_ACTIONS, GA_LABELS} from "../../utils/constants.jsx";
 
