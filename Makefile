@@ -15,7 +15,7 @@ fmt-ci-check-format-python:
 lint-python:
 	flake8 .
 
-run-tests:
+run-pytest:
 	pytest
 
 docker-build:
