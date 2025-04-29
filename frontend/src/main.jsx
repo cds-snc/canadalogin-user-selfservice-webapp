@@ -5,9 +5,12 @@ import App from './App.jsx';
 //need to remove when demo code removed
 import './index.css';
 import {BrowserRouter} from "react-router";
+import ReactGA from "react-ga4";
+import config from "./config.jsx";
 
 console.log('Starting React application...here');// Debug log
 
+ReactGA.initialize(config.gatag);
 try {
     createRoot(document.getElementById('root')).render(
         <StrictMode>

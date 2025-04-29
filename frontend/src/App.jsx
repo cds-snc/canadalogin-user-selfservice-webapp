@@ -1,10 +1,17 @@
-import {Routes, Route, Navigate} from 'react-router';
+import {Routes, Route, Navigate, useLocation} from 'react-router';
 import {UserProvider} from "./components/Providers/UserProvider";
 import PrivateRoute from "./components/Providers/PrivateRoute.jsx";
 import Page from "./views/Page.js";
 import {PAGES} from "./utils/constants.jsx";
+import ReactGA from "react-ga4";
+import { useEffect } from "react";
 
 function App() {
+
+    useEffect(() => {
+      ReactGA.send({ hitType: "pageview", page: location.pathname + location.search });
+    }, [location]);
+
       return (
           <UserProvider>
               <Routes>

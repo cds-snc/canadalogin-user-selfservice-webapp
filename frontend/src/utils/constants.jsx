@@ -402,4 +402,23 @@ export const countryMapping = {
         "zm":"Zambie",
         "zw":"Zimbabwe"
     }
+} 
+
+export const GA_CATEGORIES = {
+    ONBOARDING: "SignUp Flow",
+    AUTH: "Auth"
+}
+
+export const GA_ACTIONS = {
+    CLICK_FIRST_TIME_GC: "Clicked FirstTimeGC -> Privacy",
+    ACCEPT_PRIVACY: "Accepted Privacy",
+    SUBMIT_SIGNUP_EMAIL: "Submitted SignUp Email"
+}
+
+export const GA_LABELS = {
+    BUTTON: "Button",
+    LINK: "Link",
+    TEXT: "Text",
+    INPUT: "Input",
+    EMAIL: "Email",
 }

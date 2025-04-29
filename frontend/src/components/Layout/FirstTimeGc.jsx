@@ -12,7 +12,14 @@ export default function FirstTimeGc({currentLang})
         <GcdsHeading tag="h2">
             {pageContentJson['1']}
             <GcdsText marginTop="200" marginBottom="0">
-                <GcdsLink href={`/${language}${NAVIGATION_LINKS.privacy}`} >
+                <GcdsLink href={`/${language}${NAVIGATION_LINKS.privacy}`}
+                onClick={() => {
+                    ReactGA.event({
+                      category: GA_CATEGORIES.ONBOARDING,
+                      action: GA_ACTIONS.CLICK_FIRST_TIME_GC,
+                      label: GA_LABELS.LINK
+                    });
+                  }} >
                     {pageContentJson['2']}
                 </GcdsLink>
             </GcdsText>
