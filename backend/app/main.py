@@ -20,8 +20,8 @@ settings = get_settings()
 
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S'
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
 )
 logger = logging.getLogger(__name__)
 
@@ -40,7 +40,7 @@ The API endpoints enable our custom frontend application to implement complex wo
 CONTACT_INFO = {
     "name": "GC Sign In Team",
     "url": settings.app_info.github_url,
-    "email": settings.app_info.email
+    "email": settings.app_info.email,
 }
 
 
@@ -49,10 +49,8 @@ async def lifespan(app: FastAPI):
     app.state.config = get_settings().ibm_verify_config
 
     logger.info("Starting IBM Verify Integration API")
-    logger.info(
-        f"Tenant URL: {app.state.config.IBM_VERIFY_TENANT_URL}")
-    logger.info(
-        f"Client ID: {app.state.config.IBM_VERIFY_API_CLIENT_ID}")
+    logger.info(f"Tenant URL: {app.state.config.IBM_VERIFY_TENANT_URL}")
+    logger.info(f"Client ID: {app.state.config.IBM_VERIFY_API_CLIENT_ID}")
     logger.info("Application startup complete")
     app.state.request_client = httpx.AsyncClient()
     yield
@@ -99,10 +97,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         error_message = error["msg"]
         logger.error(f"Validation error: {error_message} at " + str(request.url))
         break
-    return generate_error_response(
-        status_code=400,
-        message=error_message
-    )
+    return generate_error_response(status_code=400, message=error_message)
 
 
 # CORS
@@ -112,18 +107,20 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["*"]
+    expose_headers=["*"],
 )
 
 
-def log_request_response(endpoint: str, request_data: dict, response: requests.Response):
+def log_request_response(
+    endpoint: str, request_data: dict, response: requests.Response
+):
     """Log request and response details"""
     try:
-        logger.info(
-            f"[{endpoint}] Request data: {json.dumps(request_data, indent=2)}")
+        logger.info(f"[{endpoint}] Request data: {json.dumps(request_data, indent=2)}")
         logger.info(f"[{endpoint}] Response status: {response.status_code}")
         logger.info(f"[{endpoint}] Response headers: {dict(response.headers)}")
         logger.info(
-            f"[{endpoint}] Response body: {json.dumps(response.json(), indent=2)}")
+            f"[{endpoint}] Response body: {json.dumps(response.json(), indent=2)}"
+        )
     except Exception as e:
         logger.error(f"[{endpoint}] Error logging request/response: {str(e)}")

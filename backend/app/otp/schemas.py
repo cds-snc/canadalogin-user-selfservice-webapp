@@ -23,29 +23,36 @@ class EmailOtpResponse(BaseModel):
     attempts: int
     retries: int
 
+
 class OtpType(str, Enum):
-    SMS = 'sms'
-    EMAIL = 'email'
-    VOICE = 'voice'
+    SMS = "sms"
+    EMAIL = "email"
+    VOICE = "voice"
+
 
 class OtpVerification(BaseModel):
     otp: str
     trxnId: str
 
+
 class AuthenticatedUserData(BaseModel):
     id: str
     assertion: str
 
+
 class AuthenticatedUserResponse(ResponseModel):
     data: AuthenticatedUserData
+
 
 class EmailOtpRequestResponse(ResponseModel):
     data: EmailOtpResponse
 
+
 class UserOtpInfo(BaseModel):
-    phoneNumber: Optional[PhoneNumber]= None
+    phoneNumber: Optional[PhoneNumber] = None
     userName: EmailStr
     otpType: OtpType
+
 
 class OtpSentResponse(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
@@ -61,8 +68,10 @@ class OtpSentResponse(BaseModel):
     attempts: int
     retries: int
 
+
 class OtpRequestResponse(ResponseModel):
     data: OtpSentResponse
+
 
 class UserOtpVerificationInfo(BaseModel):
     otp: str
