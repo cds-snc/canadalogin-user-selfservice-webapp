@@ -7,6 +7,7 @@ import ReactGA from "react-ga4";
 import { useEffect } from "react";
 
 function App() {
+    const location = useLocation();
 
     useEffect(() => {
       ReactGA.send({ hitType: "pageview", page: location.pathname + location.search });
