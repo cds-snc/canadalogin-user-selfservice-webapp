@@ -1,4 +1,4 @@
-name: "coverage"
+name: "Backend Code Coverage"
 on:
   pull_request:
     branches:
@@ -19,6 +19,10 @@ jobs:
         run: make install-dev-python
 
       - name: Test with pytest
+        env:
+          IBM_VERIFY_TENANT_URL: test.com
+          IBM_VERIFY_API_CLIENT_ID: a12345
+          IBM_VERIFY_API_CLIENT_SECRET: a123456
         run: make run-pytest
       - name: Check Coverage
         uses: orgoro/coverage@v3

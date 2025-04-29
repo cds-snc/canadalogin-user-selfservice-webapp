@@ -32,6 +32,13 @@ jobs:
 
       - name: Format Check
         run: make fmt-ci-check-format-python
+      
+      - name: Test with pytest
+        env:
+          IBM_VERIFY_TENANT_URL: test.com
+          IBM_VERIFY_API_CLIENT_ID: a12345
+          IBM_VERIFY_API_CLIENT_SECRET: a123456
+        run: make run-pytest
 
       - name: Build image
         run: make docker-build
