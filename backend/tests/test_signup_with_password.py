@@ -1,4 +1,5 @@
 import pytest
+import os
 import asyncio
 from unittest.mock import patch, AsyncMock, MagicMock
 from pydantic import ValidationError
@@ -6,12 +7,51 @@ from fastapi import HTTPException
 from app.main import app  # Your FastAPI app instance
 
 from app.users.services.create import signup_with_password, create_user, IBMUserCreateRequest
-from app.users.schemas import UserLoginRequestData, SignUpResponse, AuthenticatedUserResponse, IBMUserCreateResponse,AuthenticatedUserResponse, AuthenticatedUserData
+from app.users.schemas import UserLoginRequestData, SignUpResponse, IBMUserCreateResponse,AuthenticatedUserResponse, AuthenticatedUserData
 from app.utils.schemas import ResponseModel
 
 from starlette.responses import JSONResponse
 
 from fastapi.testclient import TestClient
+
+from app.config import IBMVerifyConfig, get_settings
+
+@pytest.mark.asyncio
+async def test_user_signup(client):
+    # Mocking the environment variables needed for IBMVerifyConfig
+    with patch.dict(os.environ, {
+        "IBM_VERIFY_TENANT_URL": "https://mock-tenant.url",
+        "IBM_VERIFY_API_CLIENT_ID": "fake-client-id",
+        "IBM_VERIFY_API_CLIENT_SECRET": "fake-client-secret"
+    }):
+        # Mocking IBMVerifyConfig constructor and settings
+        with patch.object(IBMVerifyConfig, "__init__", lambda x: None):
+            mock_config = IBMVerifyConfig()
+            mock_config.IBM_VERIFY_TENANT_URL = "https://mock-tenant.url"
+            mock_config.IBM_VERIFY_API_CLIENT_ID = "fake-client-id"
+            mock_config.IBM_VERIFY_API_CLIENT_SECRET = "fake-client-secret"
+            
+            # Patch the settings to return this mock config
+            with patch("app.config.get_settings", return_value=mock_config):
+                # Prepare mock data for the user signup request
+                user_data = UserLoginRequestData(userName="test@example.com", password="testpassword123")
+                
+                # Mock the response from signup_with_password
+                mock_response = AuthenticatedUserResponse(
+                    success=True,
+                    message="Login successful",
+                    data=AuthenticatedUserData(
+                        id="user-123",
+                        assertion="fake-jwt-token"
+                    )
+                )
+                
+                # PATCH THE FUNCTION WHERE IT IS USED
+                with patch("app.users.v1_router.signup_with_password", return_value=mock_response):
+                    response = client.post("/v1/users/create", json=user_data.dict())
+        
+                    assert response.status_code == 201
+                    assert response.json() == {"id": "user-123", "userName": "test@example.com"}
 
 
 
