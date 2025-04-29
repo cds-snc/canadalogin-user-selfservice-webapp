@@ -6,10 +6,10 @@ install-python:
 install-dev-python:
 	@pip install -r ./backend/requirements-dev.txt
 
-fmt-format-python:
+fmt-python:
 	black . $(ARGS) --target-version py311
 
-fmt-ci-check-format-python:
+fmt-ci-python:
 	black --check . --target-version py311
 
 lint-python:

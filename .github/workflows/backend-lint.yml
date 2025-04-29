@@ -31,7 +31,7 @@ jobs:
         run: make lint-python
 
       - name: Format Check
-        run: make fmt-ci-check-format-python
+        run: make fmt-ci-python
       
       - name: Test with pytest
         env:

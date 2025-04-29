@@ -54,8 +54,8 @@ class AuthenticatedUserResponse(ResponseModel):
 
 
 class TwoFactorEnrollmentType(str, Enum):
-    SMS = 'sms'
-    VOICE = 'voice'
+    SMS = "sms"
+    VOICE = "voice"
 
 
 class TwoFactorEnrollmentUserData(BaseModel):
