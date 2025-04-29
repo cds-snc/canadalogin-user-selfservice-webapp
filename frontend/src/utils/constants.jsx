@@ -49,15 +49,11 @@ export const SERVICES=[
 ];
 
 export const SUBMIT_END_POINTS = {
-    sendOtpCode: '/v1/otp/email/send',
-    emailVerification: '/v1/otp/email/verify',
     requestPasswordPolicy: '/v1/password/policy',
     create: '/v1/users/create',
-    sendTwoStepVerificationCode: '/v1/otp/transient_sms/send',
-    twoStepVerification: '/v1/otp/transient_sms/verify',
-    sendTwoStepVerificationCodeVoice: '/v1/otp/transient_voice/send',
-    twoStepVerificationVoice: '/v1/otp/transient_voice/verify',
-    createCoreProfile: '/v1/users/createcoreprofile'
+    createCoreProfile: '/v1/users/createcoreprofile',
+    transientOtpVerify: '/v1/otp/transient_otp/verify',
+    transientOtpSend: '/v1/otp/transient_otp/send'
 }
 
 export const countryMapping = {
