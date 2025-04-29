@@ -45,7 +45,7 @@ class BaseTest:
             IBM_VERIFY_API_CLIENT_SECRET="fake-client-secret",
         )
 
-        with patch("app.config.get_settings", return_value=mock_config):
+        with patch("app.main.get_settings", return_value=mock_config):
             yield mock_config
 
 
