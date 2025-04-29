@@ -16,4 +16,8 @@ lint-python:
 	flake8 .
 
 run-tests:
-	@python -m unittest discover -v -s .
+	pytest --cov=backend --cov-report=xml --cov-report=term-missing backend/tests/
+
+docker-build:
+	docker build -t gc-signin-ci-build ./backend
+

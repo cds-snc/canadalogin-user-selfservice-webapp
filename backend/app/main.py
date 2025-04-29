@@ -72,19 +72,19 @@ app.include_router(health.router, prefix="/health")
 
 app.include_router(
     v1_users_router.router,
-    prefix=f"{settings.V1_API_PATH}/users",
+    prefix=f"{settings.V1_API_VERSION}/users",
     tags=["Users"],
 )
 
 app.include_router(
     v1_password_router.router,
-    prefix=f"{settings.V1_API_PATH}/password",
+    prefix=f"{settings.V1_API_VERSION}/password",
     tags=["Password Related APIs"],
 )
 
 app.include_router(
     v1_otp_router.router,
-    prefix=f"{settings.V1_API_PATH}/otp",
+    prefix=f"{settings.V1_API_VERSION}/otp",
     tags=["OTP"],
 )
 

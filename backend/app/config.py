@@ -1,7 +1,7 @@
 from functools import lru_cache
 from typing import List
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import BaseModel, Field, AnyUrl
+from pydantic import BaseModel, AnyUrl
 
 
 class AppInfo(BaseSettings):
@@ -25,9 +25,7 @@ class IBMVerifyConfig(BaseSettings):
 
 
 class Settings(BaseSettings):
-
-    ENVIRONMENT: str = Field("dev", env="ENVIRONMENT")
-    V1_API_PATH: str = '/v1'
+    V1_API_VERSION: str = '/v1'
     app_info: AppInfo = AppInfo()
     ibm_verify_config: IBMVerifyConfig = IBMVerifyConfig()
     # CORS_ORIGINS - allow all only for demo purposes, should be set to the frontend URL

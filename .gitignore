@@ -15,6 +15,9 @@ frontend/package-lock.json
 
 #Backend
 __pycache__
+backend/.coverage
+.coverage
+coverage.xml
 
 #Storybook Build
 frontend/storybook-static/

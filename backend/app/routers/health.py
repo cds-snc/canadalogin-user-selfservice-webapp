@@ -7,13 +7,9 @@ API_VERSION = "1.0.0"
 
 
 class HealthResponse(BaseModel):
-    status: str = Field(..., description="Service health status",
-                        example="healthy")
-    timestamp: str = Field(..., description="Current UTC timestamp in ISO format",
-                           example="2024-03-05T12:34:56.789Z")
-    service: str = Field(..., description="Service name",
-                         example="gc-signin-backend")
-    version: str = Field(..., description="Service version", example="1.0.0")
+    status: str = Field(..., description="Service health status")
+    timestamp: str = Field(..., description="Todays date")
+    service: str = Field(..., description="Service name")
 
 
 router = APIRouter()
@@ -33,7 +29,6 @@ async def health_check():
     """
     return {
         "status": "healthy",
-        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "timestamp": datetime.today().strftime("%Y-%m-%d %H:%M:%S"),
         "service": "gc-signin-backend",
-        "version": API_VERSION
     }

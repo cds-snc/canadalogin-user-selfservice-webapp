@@ -25,5 +25,6 @@ jobs:
 
       - name: Format Check
         run: make fmt-ci-check-format-python
-      
-        
+
+      - name: Build image
+        run: make docker-build
