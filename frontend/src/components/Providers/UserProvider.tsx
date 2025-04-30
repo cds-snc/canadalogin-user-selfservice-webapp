@@ -20,8 +20,8 @@ const initialState = {
         phone: null,
         stepVerificationSent: false,
         stepVerified:false,
-        viewPrivacy:false
-
+        viewPrivacy:false,
+        id: null
     }
 }
 

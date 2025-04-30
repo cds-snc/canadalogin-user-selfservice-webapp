@@ -15,35 +15,19 @@ export const authService = {
         const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.create}`, userData);
         return response.data;
     },
-    sendTwoStepVerificationCode: async (userData) => {
-
+    transientOtpSend: async (userData) => {
         if(TEST_USERS.has(userData.userName))
-            return buildTestResponse(userData, "sendTwoStepVerificationCode");
+            return buildTestResponse(userData, "transientOtpSend");
 
-        let endpoint = SUBMIT_END_POINTS.sendTwoStepVerificationCode;
-
-        if(userData.verificationType===FLOW_TYPES.voice)
-            endpoint = SUBMIT_END_POINTS.sendTwoStepVerificationCodeVoice;
-        else if(userData.verificationType===FLOW_TYPES.email)
-            endpoint = SUBMIT_END_POINTS.sendOtpCode;
-
-        const response =  await axios.post(`${config.apiUrl}${endpoint}`, userData);
+        const response =  await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.transientOtpSend}`, userData);
 
         return response.data;
     },
-    twoStepVerification: async (userData) => {
-
+    transientOtpVerify: async (userData) => {
         if(TEST_USERS.has(userData.userName))
-            return buildTestResponse(userData, "twoStepVerification");
+            return buildTestResponse(userData, "transientOtpVerify");
 
-        let endpoint = SUBMIT_END_POINTS.twoStepVerification;
-
-        if(userData.verificationType===FLOW_TYPES.voice)
-            endpoint = SUBMIT_END_POINTS.twoStepVerificationVoice;
-        else if(userData.verificationType===FLOW_TYPES.email)
-            endpoint = SUBMIT_END_POINTS.emailVerification;
-
-        const response =  await axios.post(`${config.apiUrl}${endpoint}`, userData);
+        const response =  await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.transientOtpVerify}`, userData);
 
         return response.data;
     },
@@ -62,20 +46,20 @@ function buildTestResponse (userData, type) {
     const now = new Date();
     const expires = new Date();
     switch (type) {
-        case "twoStepVerification":
-            if(userData.verificationType===FLOW_TYPES.email && (userData.otp === TEST_USERS.get(userData.userName).emailOtp))
+        case "transientOtpVerify":
+            if(userData.otpType===FLOW_TYPES.email && (userData.otp === TEST_USERS.get(userData.userName).emailOtp))
                 return TEST_RESPONSES.verificationEmailResponse;
-            else if(userData.verificationType===FLOW_TYPES.sms && (userData.otp === TEST_USERS.get(userData.userName).smsOtp))
+            else if(userData.otpType===FLOW_TYPES.sms && (userData.otp === TEST_USERS.get(userData.userName).smsOtp))
                 return TEST_RESPONSES.verificationSmsResponse;
-            else if(userData.verificationType===FLOW_TYPES.voice && (userData.otp===TEST_USERS.get(userData.userName).voiceOtp))
+            else if(userData.otpType===FLOW_TYPES.voice && (userData.otp===TEST_USERS.get(userData.userName).voiceOtp))
                 return TEST_RESPONSES.verificationVoiceResponse;
 
             return ERROR_RESPONSE;
-        case "sendTwoStepVerificationCode":
-            if(userData.verificationType===FLOW_TYPES.email) {
+        case "transientOtpSend":
+            if(userData.otpType===FLOW_TYPES.email) {
                 response = TEST_RESPONSES.signUpResponse;
-                response.data.emailAddress = userData.userName;
-            }else if(userData.verificationType===FLOW_TYPES.voice) {
+                response.data.phoneNumber = null;
+            }else if(userData.otpType===FLOW_TYPES.voice) {
                 response = TEST_RESPONSES.verificationVoiceSetUpResponse;
                 response.data.phoneNumber = userData.phoneNumber;
             }else{
@@ -83,6 +67,7 @@ function buildTestResponse (userData, type) {
                 response.data.phoneNumber = userData.phoneNumber;
             }
 
+            response.data.emailAddress = userData.userName;
             expires.setMinutes(expires.getMinutes() + 5);
             response.data.created = now.toISOString();
             response.data.expiry =  expires.toISOString();
