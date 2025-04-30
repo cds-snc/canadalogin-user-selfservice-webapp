@@ -9,7 +9,7 @@ import { getPageContent } from "../../../utils/functions.jsx";
 import SubmitButton from "../../Layout/SubmitButton.jsx";
 import AlreadyGc from "../../Layout/AlreadyGc.jsx";
 import { useParams } from "react-router";
-import {AVAILABLE_LANGUAGES, SERVICES} from "../../../utils/constants.jsx";
+import {AVAILABLE_LANGUAGES, PAGES, SERVICES} from "../../../utils/constants.jsx";
 import {useUser} from "../../Providers/useUser.tsx";
 import {CONTEXT_ACTIONS} from "../../../utils/constants.jsx";
 import {useNavigate} from "react-router";
@@ -27,7 +27,7 @@ export default function Privacy() {
         navigate("/" + language + NAVIGATION_LINKS.signUp);
     }
 
-    const pageContentJson = getPageContent(language, "Privacy");
+    const pageContentJson = getPageContent(language, PAGES.privacy);
 
     return (
         <GcdsContainer>
