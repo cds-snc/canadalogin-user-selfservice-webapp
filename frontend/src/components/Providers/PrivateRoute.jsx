@@ -36,6 +36,7 @@ function isValidRoute (page, state, flow, type) {
                 state.userData.stepVerificationSent &&
                 state.userData.passwordSubmitted &&
                 state.userData.emailValidated &&
+                state.userData.id &&
                 state.userData.viewPrivacy);
         case(PAGES.verification):
             if(type===FLOW_TYPES.email)
@@ -44,6 +45,7 @@ function isValidRoute (page, state, flow, type) {
             return (state.userData.stepVerificationSent &&
                     state.userData.passwordSubmitted &&
                     state.userData.emailValidated &&
+                    state.userData.id &&
                     state.userData.viewPrivacy);
         case(PAGES.verificationSetUp):
             return (state.userData.passwordSubmitted &&
@@ -52,6 +54,8 @@ function isValidRoute (page, state, flow, type) {
         case(PAGES.password):
             return (state.userData.emailValidated &&
                 state.userData.viewPrivacy);
+        case(PAGES.signup):
+            return state.userData.viewPrivacy;
         default:
             return false;
 

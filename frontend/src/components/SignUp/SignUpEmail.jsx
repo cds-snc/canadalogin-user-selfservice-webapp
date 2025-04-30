@@ -52,11 +52,10 @@ export default function SignUpEmail() {
                 return;
 
             try {
-                const response = await authService.sendTwoStepVerificationCode({
+                const response = await authService.transientOtpSend({
                     userName: formData.get('email'),
-                    verificationType: FLOW_TYPES.email
+                    otpType: FLOW_TYPES.email
                 });
-                console.log("response", response);
                 if(response.success){
                     const userData = {
                         ...state.userData,
