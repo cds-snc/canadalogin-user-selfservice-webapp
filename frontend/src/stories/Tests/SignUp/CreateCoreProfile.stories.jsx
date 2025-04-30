@@ -5,7 +5,13 @@ import {
     PAGES,
 } from "../../../utils/constants.jsx";
 import {getPageContent} from "../../../utils/functions.jsx";
-import {ACTION_TYPES, ERROR_RESPONSE, MSW_VERIFICATION, TEST_TYPES, TEST_USERS,} from "../utils/constants.jsx";
+import {
+    ACTION_TYPES,
+    ERROR_RESPONSE,
+    MSW_MOCKS,
+    TEST_TYPES,
+    TEST_USERS,
+} from "../utils/constants.jsx";
 import {buildTestCase, testCase, TestTemplate} from "../utils/functions.tsx";
 import {EngErrorFrontEnd} from "../SignIn/VerificationPage.stories.jsx";
 
@@ -190,7 +196,7 @@ FrFirstNameBadChar.play = async ({ canvasElement, step }) => {
 
 ErrorBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.coreProfile,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
-    [MSW_VERIFICATION.signup.coreProfile.error]);
+    [MSW_MOCKS.createCoreProfile.error]);
 ErrorBackEnd.args = {firstName:"Test" , lastName: "Test"};
 ErrorBackEnd.play = async ({ canvasElement, step }) => {
 
@@ -210,7 +216,7 @@ ErrorBackEnd.play = async ({ canvasElement, step }) => {
 
 ServerErrorBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.coreProfile,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
-    [MSW_VERIFICATION.signup.coreProfile.serverTimeOut]);
+    [MSW_MOCKS.createCoreProfile.serverTimeOut]);
 ServerErrorBackEnd.args = {firstName:"Test" , lastName: "Test"};
 ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
 
@@ -229,7 +235,7 @@ ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
 
 SuccessfulBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.coreProfile,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
-    [MSW_VERIFICATION.signup.coreProfile.success]);
+    [MSW_MOCKS.createCoreProfile.success]);
 SuccessfulBackEnd.args = {firstName:"Test" , lastName: "Test"};
 SuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
@@ -246,7 +252,7 @@ SuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
 SuccessfulWithFrCharsBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.coreProfile,
     { language: AVAILABLE_LANGUAGES.fr, flow: FLOW_TYPES.signUp },
-    [MSW_VERIFICATION.signup.coreProfile.success]);
+    [MSW_MOCKS.createCoreProfile.success]);
 SuccessfulWithFrCharsBackEnd.args = {firstName:"Test" , lastName: "Ç'âêîôû-àèù ëïü"};
 SuccessfulWithFrCharsBackEnd.play = async ({ canvasElement, step }) => {
 

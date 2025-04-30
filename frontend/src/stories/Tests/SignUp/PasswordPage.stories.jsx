@@ -8,8 +8,7 @@ import {getPageContent} from "../../../utils/functions.jsx";
 import {
     ACTION_TYPES,
     ERROR_RESPONSE,
-    MSW_PASSWORD_POLICY,
-    MSW_VERIFICATION,
+    MSW_MOCKS,
     TEST_TYPES, TEST_USERS
 } from "../utils/constants.jsx";
 import {buildTestCase, testCase, TestTemplate} from "../utils/functions.tsx";
@@ -25,7 +24,7 @@ export default {
     },
     parameters: buildTestCase.parameters(NAVIGATION_LINKS.password,
         { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
-        [MSW_PASSWORD_POLICY])
+        [MSW_MOCKS.passwordPolicy])
 };
 
 export const EngErrorFrontEnd = TestTemplate.bind({});
@@ -52,7 +51,7 @@ EngErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
 FrErrorFrontEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.password,
     { language: AVAILABLE_LANGUAGES.fr, flow: FLOW_TYPES.signUp },
-    [MSW_PASSWORD_POLICY]);
+    [MSW_MOCKS.passwordPolicy]);
 FrErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -70,7 +69,7 @@ FrErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
 ErrorBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.coreProfile,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
-    [MSW_PASSWORD_POLICY, MSW_VERIFICATION.signup.password.error]);
+    [MSW_MOCKS.passwordPolicy, MSW_MOCKS.create.error]);
 ErrorBackEnd.args = {password:"123456789012"};
 ErrorBackEnd.play = async ({ canvasElement, step }) => {
 
@@ -89,7 +88,7 @@ ErrorBackEnd.play = async ({ canvasElement, step }) => {
 
 SuccessfulBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.coreProfile,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
-    [MSW_PASSWORD_POLICY, MSW_VERIFICATION.signup.password.success]);
+    [MSW_MOCKS.passwordPolicy, MSW_MOCKS.create.success]);
 SuccessfulBackEnd.args = {password:"123456789012"};
 SuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
@@ -106,7 +105,7 @@ SuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
 ServerErrorBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.coreProfile,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
-    [MSW_PASSWORD_POLICY, MSW_VERIFICATION.signup.password.serverTimeOut]);
+    [MSW_MOCKS.passwordPolicy, MSW_MOCKS.create.serverTimeOut]);
 ServerErrorBackEnd.args = {password:"123456789012"};
 ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
 

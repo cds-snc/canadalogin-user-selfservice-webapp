@@ -1,13 +1,24 @@
 import App from '../App';
 import {cleanup, render} from '@testing-library/react';
-import {describe, test, afterEach, vi} from "vitest";
+import {describe, test, afterEach, vi, beforeAll} from "vitest";
 import '@testing-library/jest-dom';
 import {AVAILABLE_LANGUAGES, NAVIGATION_LINKS, FLOW_TYPES} from "../utils/constants";
 import {MemoryRouter} from "react-router";
 import {buildTestSuite} from "./testSuite";
 import {PAGES} from "../utils/constants.jsx";
+import {useUser} from "../components/Providers/useUser";
+import {TestDataUserProvider} from '../stories/Tests/utils/constants';
 
-describe('Routing Test', () => {
+describe('Routing Tests', () => {
+
+    vi.mock("../components/Providers/useUser.tsx", ()=>({
+        useUser:vi.fn()
+    }));
+    const signUpData = {...TestDataUserProvider};
+    (useUser as jest.Mock).mockReturnValue({state:signUpData});
+    const mockedRoutesUserData ={
+        signup: null
+    }
 
     const langHref = {attribute:'lang-href', en:'/'+AVAILABLE_LANGUAGES.en, fr:'/'+AVAILABLE_LANGUAGES.fr}
 
@@ -43,6 +54,7 @@ describe('Routing Test', () => {
 
     test("Check sign up route with en language defined", () => {
 
+        signUpData.userData = {...signUpData.userData, ...mockedRoutesUserData.signup.signUp};
         render(
             <MemoryRouter initialEntries={[langHref.en+NAVIGATION_LINKS.signUp]}>
                 <App />
@@ -53,6 +65,7 @@ describe('Routing Test', () => {
 
     test("Check sign up route with fr language defined", () => {
 
+        signUpData.userData = {...signUpData.userData, ...mockedRoutesUserData.signup.signUp};
         render(
             <MemoryRouter initialEntries={[langHref.fr+NAVIGATION_LINKS.signUp]}>
                 <App />
@@ -61,13 +74,27 @@ describe('Routing Test', () => {
         buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.signup, FLOW_TYPES.signUp, null, langHref.en+NAVIGATION_LINKS.signUp);
     });
 
+    test("Check route with incorrect flow for sign up en", () => {
+
+        render(
+            <MemoryRouter initialEntries={[langHref.en + NAVIGATION_LINKS.signUp]}>
+                <App/>
+            </MemoryRouter>,
+        )
+        buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.home, FLOW_TYPES.signUp, null, langHref.fr);
+    });
+    test("Check route with incorrect flow for sign up fr", () => {
+
+        render(
+            <MemoryRouter initialEntries={[langHref.fr+NAVIGATION_LINKS.signUp]}>
+                <App />
+            </MemoryRouter>,
+        )
+        buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.home, FLOW_TYPES.signUp,null, langHref.fr );
+    });
     test("Check email verification page route with en language defined", () => {
 
-        vi.mock("../components/Providers/PrivateRoute.jsx", () => {
-            return {
-                default: (props:any) => props.children,
-            };
-        });
+        signUpData.userData = {...signUpData.userData, ...mockedRoutesUserData.signup.emailVerification};
         const link = '/' +FLOW_TYPES.signUp+NAVIGATION_LINKS.verification+'/'+FLOW_TYPES.email;
         render(
             <MemoryRouter initialEntries={[langHref.en + link]}>
@@ -79,11 +106,7 @@ describe('Routing Test', () => {
 
     test("Check email verification page route with fr language defined", () => {
 
-        vi.mock("../components/Providers/PrivateRoute.jsx", () => {
-            return {
-                default: (props:any) => props.children,
-            };
-        });
+        signUpData.userData = {...signUpData.userData, ...mockedRoutesUserData.signup.emailVerification};
         const link = '/' +FLOW_TYPES.signUp+NAVIGATION_LINKS.verification+'/'+FLOW_TYPES.email;
         render(
             <MemoryRouter initialEntries={[langHref.fr + NAVIGATION_LINKS.verifyEmail]}>
@@ -95,11 +118,7 @@ describe('Routing Test', () => {
 
     test("Check password creation page route with en language defined", () => {
 
-        vi.mock("../components/Providers/PrivateRoute.jsx", () => {
-            return {
-                default: (props:any) => props.children,
-            };
-        });
+        signUpData.userData = {...signUpData.userData, ...mockedRoutesUserData.signup.passwordCreation};
         const link = '/' +FLOW_TYPES.signUp+NAVIGATION_LINKS.password;
         render(
             <MemoryRouter initialEntries={[langHref.en + link]}>
@@ -111,11 +130,7 @@ describe('Routing Test', () => {
 
     test("Check password creation page route with fr language defined", () => {
 
-        vi.mock("../components/Providers/PrivateRoute.jsx", () => {
-            return {
-                default: (props:any) => props.children,
-            };
-        });
+        signUpData.userData = {...signUpData.userData, ...mockedRoutesUserData.signup.passwordCreation};
         const link = '/' +FLOW_TYPES.signUp+NAVIGATION_LINKS.password;
         render(
             <MemoryRouter initialEntries={[langHref.fr + link]}>
@@ -127,11 +142,6 @@ describe('Routing Test', () => {
 
     test("Check sign in password page route with en language defined", () => {
 
-        vi.mock("../components/Providers/PrivateRoute.jsx", () => {
-            return {
-                default: (props:any) => props.children,
-            };
-        });
         const link = '/' +FLOW_TYPES.signIn+NAVIGATION_LINKS.password;
         render(
             <MemoryRouter initialEntries={[langHref.en + link]}>
@@ -142,11 +152,6 @@ describe('Routing Test', () => {
     });
     test("Check sign in password page route with fr language defined", () => {
 
-        vi.mock("../components/Providers/PrivateRoute.jsx", () => {
-            return {
-                default: (props:any) => props.children,
-            };
-        });
         const link = '/' +FLOW_TYPES.signIn+NAVIGATION_LINKS.password;
         render(
             <MemoryRouter initialEntries={[langHref.fr + link]}>
@@ -158,11 +163,7 @@ describe('Routing Test', () => {
 
     test("Check verification set up page route with en language defined", () => {
 
-        vi.mock("../components/Providers/PrivateRoute.jsx", () => {
-            return {
-                default: (props:any) => props.children,
-            };
-        });
+        signUpData.userData = {...signUpData.userData, ...mockedRoutesUserData.signup.verificationSetUp};
         render(
             <MemoryRouter initialEntries={[langHref.en + NAVIGATION_LINKS.twoStepVerification]}>
                 <App/>
@@ -173,12 +174,7 @@ describe('Routing Test', () => {
 
     test("Check verification set up page route with fr language defined", () => {
 
-        vi.mock("../components/Providers/PrivateRoute.jsx", () => {
-            return {
-                default: (props:any) => props.children,
-            };
-        });
-
+        signUpData.userData = {...signUpData.userData, ...mockedRoutesUserData.signup.verificationSetUp};
         render(
             <MemoryRouter initialEntries={[langHref.fr + NAVIGATION_LINKS.twoStepVerification]}>
                 <App/>
@@ -189,12 +185,7 @@ describe('Routing Test', () => {
 
     test("Check sign up verification page route for sms with en language defined", () => {
 
-        vi.mock("../components/Providers/PrivateRoute.jsx", () => {
-            return {
-                default: (props:any) => props.children,
-            };
-        });
-
+        signUpData.userData = {...signUpData.userData, ...mockedRoutesUserData.signup.verification};
         const link = '/' +FLOW_TYPES.signUp+NAVIGATION_LINKS.verification+'/'+FLOW_TYPES.sms;
         render(
             <MemoryRouter initialEntries={[langHref.en + link]}>
@@ -206,14 +197,8 @@ describe('Routing Test', () => {
 
     test("Check sign up verification page route for voice with en language defined", () => {
 
-        vi.mock("../components/Providers/PrivateRoute.jsx", () => {
-            return {
-                default: (props:any) => props.children,
-            };
-        });
-
+        signUpData.userData = {...signUpData.userData, ...mockedRoutesUserData.signup.verification};
         const link = '/' +FLOW_TYPES.signUp+NAVIGATION_LINKS.verification+'/'+FLOW_TYPES.voice;
-
         render(
             <MemoryRouter initialEntries={[langHref.en +link]}>
                 <App/>
@@ -224,12 +209,7 @@ describe('Routing Test', () => {
 
     test("Check sign up verification page route for sms with fr language defined", () => {
 
-        vi.mock("../components/Providers/PrivateRoute.jsx", () => {
-            return {
-                default: (props:any) => props.children,
-            };
-        });
-
+        signUpData.userData = {...signUpData.userData, ...mockedRoutesUserData.signup.verification};
         const link = '/' +FLOW_TYPES.signUp+NAVIGATION_LINKS.verification+'/'+FLOW_TYPES.sms;
 
         render(
@@ -242,12 +222,7 @@ describe('Routing Test', () => {
 
     test("Check sign up verification page route for voice with fr language defined", () => {
 
-        vi.mock("../components/Providers/PrivateRoute.jsx", () => {
-            return {
-                default: (props:any) => props.children,
-            };
-        });
-
+        signUpData.userData = {...signUpData.userData, ...mockedRoutesUserData.signup.verification};
         const link = '/' +FLOW_TYPES.signUp+NAVIGATION_LINKS.verification+'/'+FLOW_TYPES.voice;
 
         render(
@@ -260,14 +235,7 @@ describe('Routing Test', () => {
 
     test("Check sign in verification page route for sms with en language defined", () => {
 
-        vi.mock("../components/Providers/PrivateRoute.jsx", () => {
-            return {
-                default: (props:any) => props.children,
-            };
-        });
-
         const link = '/' +FLOW_TYPES.signIn+NAVIGATION_LINKS.verification+'/'+FLOW_TYPES.sms;
-
         render(
             <MemoryRouter initialEntries={[langHref.en + link]}>
                 <App/>
@@ -278,14 +246,7 @@ describe('Routing Test', () => {
 
     test("Check sign in verification page route for voice with en language defined", () => {
 
-        vi.mock("../components/Providers/PrivateRoute.jsx", () => {
-            return {
-                default: (props:any) => props.children,
-            };
-        });
-
         const link = '/' +FLOW_TYPES.signIn+NAVIGATION_LINKS.verification+'/'+FLOW_TYPES.voice;
-
         render(
             <MemoryRouter initialEntries={[langHref.en + link]}>
                 <App/>
@@ -296,14 +257,7 @@ describe('Routing Test', () => {
 
     test("Check sign in verification page route for sms with fr language defined", () => {
 
-        vi.mock("../components/Providers/PrivateRoute.jsx", () => {
-            return {
-                default: (props:any) => props.children,
-            };
-        });
-
         const link = '/' +FLOW_TYPES.signIn+NAVIGATION_LINKS.verification+'/'+FLOW_TYPES.sms;
-
         render(
             <MemoryRouter initialEntries={[langHref.fr + link]}>
                 <App/>
@@ -314,14 +268,7 @@ describe('Routing Test', () => {
 
     test("Check sign in verification page route for voice with fr language defined", () => {
 
-        vi.mock("../components/Providers/PrivateRoute.jsx", () => {
-            return {
-                default: (props:any) => props.children,
-            };
-        });
-
         const link = '/' +FLOW_TYPES.signIn+NAVIGATION_LINKS.verification+'/'+FLOW_TYPES.voice;
-
         render(
             <MemoryRouter initialEntries={[langHref.fr + link]}>
                 <App/>
@@ -332,12 +279,7 @@ describe('Routing Test', () => {
 
     test("Check core profile page route with en language defined", () => {
 
-        vi.mock("../components/Providers/PrivateRoute.jsx", () => {
-            return {
-                default: (props:any) => props.children,
-            };
-        });
-
+        signUpData.userData = {...signUpData.userData, ...mockedRoutesUserData.signup.coreProfile};
         render(
             <MemoryRouter initialEntries={[langHref.en + NAVIGATION_LINKS.coreProfile]}>
                 <App/>
@@ -346,13 +288,18 @@ describe('Routing Test', () => {
         buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.coreProfile, FLOW_TYPES.signIn, null, langHref.fr + NAVIGATION_LINKS.coreProfile);
     });
 
-    test("Check privacy page route with en language defined", () => {
+    test("Check core profile page route with fr language defined", () => {
 
-        vi.mock("../components/Providers/PrivateRoute.jsx", () => {
-            return {
-                default: (props:any) => props.children,
-            };
-        });
+        signUpData.userData = {...signUpData.userData, ...mockedRoutesUserData.signup.coreProfile};
+        render(
+            <MemoryRouter initialEntries={[langHref.fr + NAVIGATION_LINKS.coreProfile]}>
+                <App/>
+            </MemoryRouter>,
+        )
+        buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.coreProfile, FLOW_TYPES.signIn, null, langHref.en + NAVIGATION_LINKS.coreProfile);
+    });
+
+    test("Check privacy page route with en language defined", () => {
 
         render(
             <MemoryRouter initialEntries={[langHref.en + NAVIGATION_LINKS.privacy]}>
@@ -362,40 +309,28 @@ describe('Routing Test', () => {
         buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.privacy , FLOW_TYPES.signUp, null, langHref.fr + NAVIGATION_LINKS.privacy);
     });
 
-    test("Check privacy page route with fr language defined", () => {
-
-        vi.mock("../components/Providers/PrivateRoute.jsx", () => {
-            return {
-                default: (props:any) => props.children,
-            };
-        });
-
-        render(
-            <MemoryRouter initialEntries={[langHref.fr + NAVIGATION_LINKS.privacy]}>
-                <App/>
-            </MemoryRouter>,
-        )
-        buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.privacy, FLOW_TYPES.signUp, null, langHref.en + NAVIGATION_LINKS.privacy);
-    });
-    
-    test("Check core profile page route with fr language defined", () => {
-
-        vi.mock("../components/Providers/PrivateRoute.jsx", () => {
-            return {
-                default: (props:any) => props.children,
-            };
-        });
-
-        render(
-            <MemoryRouter initialEntries={[langHref.fr + NAVIGATION_LINKS.coreProfile]}>
-                <App/>
-            </MemoryRouter>,
-        )
-        buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.coreProfile, FLOW_TYPES.signIn, null, langHref.en + NAVIGATION_LINKS.coreProfile);
+    beforeAll(()=>{
+        mockedRoutesUserData.signup = getMockedSignUpData();
     });
 
+    beforeEach(()=>{
+       signUpData.userData = {...TestDataUserProvider.userData};
+    });
 
     afterEach(() => {
+        vi.clearAllMocks();
         cleanup();
     });
 })
+
+function getMockedSignUpData(){
+
+    const signUp = { viewPrivacy: true};
+    const emailVerification = {...signUp, email:'test@test.com'};
+    const passwordCreation = {...signUp, emailValidated:true};
+    const verificationSetUp = {...passwordCreation, passwordSubmitted: true, id: '5479'};
+    const verification = {...verificationSetUp, phone: '+4161234567890', stepVerificationSent: true};
+    const coreProfile = {...verification, stepVerified:true};
+
+    return {signUp, emailVerification, passwordCreation, verificationSetUp, verification, coreProfile};
+}

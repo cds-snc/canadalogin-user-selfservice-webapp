@@ -14,10 +14,7 @@ function PrivateRoute ({route, children}){
     return children;
 }
 
-
 function isValidRoute (page, state, flow, type) {
-
-
 
     if(flow===FLOW_TYPES.signIn)
         switch (page) {
@@ -31,34 +28,41 @@ function isValidRoute (page, state, flow, type) {
 
     switch(page){
         case(PAGES.coreProfile):
-            return (
-                state.userData.stepVerified &&
-                state.userData.stepVerificationSent &&
-                state.userData.passwordSubmitted &&
-                state.userData.emailValidated &&
-                state.userData.id &&
-                state.userData.viewPrivacy);
+            return checkCoreProfilePage(state);
         case(PAGES.verification):
-            if(type===FLOW_TYPES.email)
-                return (isEmailValid(state.userData.email) &&
-                    state.userData.viewPrivacy);
-            return (state.userData.stepVerificationSent &&
-                    state.userData.passwordSubmitted &&
-                    state.userData.emailValidated &&
-                    state.userData.id &&
-                    state.userData.viewPrivacy);
+            return checkVerificationPage(state, type);
         case(PAGES.verificationSetUp):
-            return (state.userData.passwordSubmitted &&
-                    state.userData.emailValidated &&
-                    state.userData.viewPrivacy);
+            return checkVerificationSetUpPage(state);
         case(PAGES.password):
-            return (state.userData.emailValidated &&
-                state.userData.viewPrivacy);
+            return  checkPasswordPage(state);
         case(PAGES.signup):
-            return state.userData.viewPrivacy;
+            return checkSignUpPage(state);
         default:
             return false;
 
     }
+}
+
+function checkSignUpPage(state){
+    return state.userData.viewPrivacy;
+}
+
+function checkVerificationPage(state, type){
+    if(type===FLOW_TYPES.email)
+        return checkSignUpPage(state)&&isEmailValid(state.userData.email);
+    else
+        return checkVerificationSetUpPage(state)&&state.userData.stepVerificationSent&&state.userData.phone;
+}
+
+function checkPasswordPage(state){
+    return checkSignUpPage(state)&&state.userData.emailValidated;
+}
+
+function checkVerificationSetUpPage(state){
+    return checkPasswordPage(state)&&state.userData.passwordSubmitted&&state.userData.id;
+}
+
+function checkCoreProfilePage(state){
+    return checkVerificationPage(state, null)&&state.userData.stepVerified;
 }
 export default PrivateRoute;
