@@ -22,8 +22,10 @@ class NotifyType(str, Enum):
 
 
 class IBMNotificationExtension(BaseModel):
-    notifyPassword: bool = Field(default=False)
-    notifyType: NotifyType = Field(default=NotifyType.NONE)
+    notifyPassword: bool = Field(
+        default=False, description="Notify the user the password they entered. Setting to true will send a email with the password they entered")
+    notifyType: NotifyType = Field(
+        default=NotifyType.EMAIL, description="Setting to NONE will not send any notification, Setting the value to EMAIL will send a notification email to the user that the account was created")
 
 
 class IBMUserCreateRequest(BaseModel):
