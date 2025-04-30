@@ -1,7 +1,7 @@
 import ReactGA from "react-ga4";
 
 export function trackPage(path) {
-    gtag('event', 'page_view', {
+    trackEvent('event', 'page_view', {
       page_path: path,
     });
   }
