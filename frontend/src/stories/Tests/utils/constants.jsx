@@ -11,7 +11,12 @@ export const TestDataUserProvider = {
         emailLanguage: null,
         emailValidated: false,
         trxnId: null,
-        passwordSubmitted:false
+        passwordSubmitted:false,
+        phone: null,
+        stepVerificationSent: false,
+        stepVerified:false,
+        viewPrivacy:false,
+        id: null
     },
     testData:{
         email: null,
@@ -67,142 +72,11 @@ export const ERROR_RESPONSE = {
     "data": null
 };
 
-export const MSW_PASSWORD_POLICY = {type:"get", endpoint: SUBMIT_END_POINTS.requestPasswordPolicy, response:POLICY_RESPONSE }
-export const MSW_VERIFICATION = {
-    signin: {
-        verification: {
-            sms: {
-                error: {type: "post", endpoint: SUBMIT_END_POINTS.twoStepVerification, response: ERROR_RESPONSE},
-                success: {type: "post", endpoint: SUBMIT_END_POINTS.twoStepVerification, response: SUCCESS_RESPONSE}
-            },
-            voice: {
-                error: {type: "post", endpoint: SUBMIT_END_POINTS.twoStepVerificationVoice, response: ERROR_RESPONSE},
-                success: {type: "post",
-                    endpoint: SUBMIT_END_POINTS.twoStepVerificationVoice,
-                    response: SUCCESS_RESPONSE
-                }
-            },
-            requestNewCode: {
-                sms: {
-                    success: {
-                        type: "post",
-                        endpoint: SUBMIT_END_POINTS.sendTwoStepVerificationCode,
-                        response: SUCCESS_RESPONSE
-                    },
-                    error: {
-                        type: "post",
-                        endpoint: SUBMIT_END_POINTS.sendTwoStepVerificationCode,
-                        response: ERROR_RESPONSE
-                    }
-                },
-                voice: {
-                    success: {
-                        type: "post",
-                        endpoint: SUBMIT_END_POINTS.sendTwoStepVerificationCodeVoice,
-                        response: SUCCESS_RESPONSE
-                    },
-                    error: {
-                        type: "post",
-                        endpoint: SUBMIT_END_POINTS.sendTwoStepVerificationCodeVoice,
-                        response: ERROR_RESPONSE
-                    }
-                },
-                serverTimeOut: {
-                    type: "post",
-                    endpoint: SUBMIT_END_POINTS.sendTwoStepVerificationCodeVoice,
-                    response: null
-                }
-            },
-            serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.twoStepVerificationVoice, response: null}
-        }
-    },
-    signup:{
-        coreProfile:{
-            error:{type: "post", endpoint: SUBMIT_END_POINTS.createCoreProfile, response: ERROR_RESPONSE},
-            serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.createCoreProfile, response: null},
-            success: {type: "post", endpoint: SUBMIT_END_POINTS.createCoreProfile, response: SUCCESS_RESPONSE}
-        },
-        verificationSetUp:{
-            error:{type: "post", endpoint: SUBMIT_END_POINTS.sendTwoStepVerificationCode, response: ERROR_RESPONSE},
-            serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.sendTwoStepVerificationCode, response: null},
-            success: {type: "post", endpoint: SUBMIT_END_POINTS.sendTwoStepVerificationCode, response: SUCCESS_RESPONSE}
-        },
-        password:{
-            error:{type: "post", endpoint: SUBMIT_END_POINTS.create, response: ERROR_RESPONSE},
-            serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.create, response: null},
-            success: {type: "post", endpoint: SUBMIT_END_POINTS.create, response: SUCCESS_RESPONSE}
-        },
-        signUp:{
-            error:{type: "post", endpoint: SUBMIT_END_POINTS.sendOtpCode, response: ERROR_RESPONSE},
-            serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.sendOtpCode, response: null},
-            success: {type: "post", endpoint: SUBMIT_END_POINTS.sendOtpCode, response: SUCCESS_RESPONSE}
-        },
-        verification: {
-            email: {
-                error: {type: "post", endpoint: SUBMIT_END_POINTS.emailVerification, response: ERROR_RESPONSE},
-                success: {type: "post", endpoint: SUBMIT_END_POINTS.emailVerification, response: SUCCESS_RESPONSE}
-            },
-            sms: {
-                error: {type: "post", endpoint: SUBMIT_END_POINTS.twoStepVerification, response: ERROR_RESPONSE},
-                success: {type: "post", endpoint: SUBMIT_END_POINTS.twoStepVerification, response: SUCCESS_RESPONSE}
-            },
-            voice: {
-                error: {type: "post", endpoint: SUBMIT_END_POINTS.twoStepVerificationVoice, response: ERROR_RESPONSE},
-                success: {type: "post", endpoint: SUBMIT_END_POINTS.twoStepVerificationVoice, response: SUCCESS_RESPONSE}
-            },
-            requestNewCode: {
-                email: {
-                    success: {
-                        type: "post",
-                        endpoint: SUBMIT_END_POINTS.sendOtpCode,
-                        response: SUCCESS_RESPONSE
-                    },
-                    error: {
-                        type: "post",
-                        endpoint: SUBMIT_END_POINTS.sendOtpCode,
-                        response: ERROR_RESPONSE
-                    }
-                },
-                sms: {
-                    success: {
-                        type: "post",
-                        endpoint: SUBMIT_END_POINTS.sendTwoStepVerificationCode,
-                        response: SUCCESS_RESPONSE
-                    },
-                    error: {
-                        type: "post",
-                        endpoint: SUBMIT_END_POINTS.sendTwoStepVerificationCode,
-                        response: ERROR_RESPONSE
-                    }
-                },
-                voice: {
-                    success: {
-                        type: "post",
-                        endpoint: SUBMIT_END_POINTS.sendTwoStepVerificationCodeVoice,
-                        response: SUCCESS_RESPONSE
-                    },
-                    error: {
-                        type: "post",
-                        endpoint: SUBMIT_END_POINTS.sendTwoStepVerificationCodeVoice,
-                        response: ERROR_RESPONSE
-                    }
-                },
-                serverTimeOut: {
-                    type: "post",
-                    endpoint: SUBMIT_END_POINTS.sendTwoStepVerificationCodeVoice,
-                    response: null
-                }
-            },
-            serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.twoStepVerificationVoice, response: null}
-        }
-    }
-}
-
 
 export const TEST_RESPONSES = {
     signUpResponse: {
         success: true,
-        message: 'OTP sent successfully',
+        message: 'Email.OTP sent successfully',
         data:{
             attempts: 0,
             correlationID: "3995",
@@ -231,7 +105,7 @@ export const TEST_RESPONSES = {
     },
     verificationSmsSetUpResponse: {
         success: true,
-        message: 'SMS OTP sent successfully',
+        message: 'SMS.OTP sent successfully',
         data: {
             attempts: 0,
             correlationID: "4711",
@@ -247,7 +121,7 @@ export const TEST_RESPONSES = {
     },
     verificationVoiceSetUpResponse: {
         success: true,
-        message: 'Voice OTP sent successfully',
+        message: 'Voice.OTP sent successfully',
         data: {
             attempts: 0,
             correlationID: "4711",
@@ -270,6 +144,35 @@ export const TEST_RESPONSES = {
         success: true,
         message: 'Transient voice OTP has been validated',
         data: null
+    }
+}
+export const MSW_PASSWORD_POLICY = {type:"get", endpoint: SUBMIT_END_POINTS.requestPasswordPolicy, response:POLICY_RESPONSE };
+
+export const MSW_MOCKS ={
+    passwordPolicy: {type:"get", endpoint: SUBMIT_END_POINTS.requestPasswordPolicy, response:POLICY_RESPONSE },
+    transientOtpSend:{
+        error:  {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpSend, response: ERROR_RESPONSE},
+        serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpSend, response: null},
+        emailSuccess: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpSend, response: TEST_RESPONSES.signUpResponse},
+        smsSuccess: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpSend, response: TEST_RESPONSES.verificationSmsSetUpResponse},
+        voiceSuccess: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpSend, response: TEST_RESPONSES.verificationVoiceSetUpResponse}
+    },
+    create:{
+        error:  {type: "post", endpoint: SUBMIT_END_POINTS.create, response: ERROR_RESPONSE},
+        serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.create, response: null},
+        success: {type: "post", endpoint: SUBMIT_END_POINTS.create, response: TEST_RESPONSES.passwordResponse}
+    },
+    transientOtpVerify:{
+        error:  {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpVerify, response: ERROR_RESPONSE},
+        serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpVerify, response: null},
+        emailSuccess: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpVerify, response: TEST_RESPONSES.verificationEmailResponse},
+        smsSuccess: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpVerify, response: TEST_RESPONSES.verificationSmsResponse},
+        voiceSuccess: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpVerify, response: TEST_RESPONSES.verificationVoiceResponse}
+    },
+    createCoreProfile:{
+        error:  {type: "post", endpoint: SUBMIT_END_POINTS.createCoreProfile, response: ERROR_RESPONSE},
+        serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.createCoreProfile, response: null},
+        success: {type: "post", endpoint: SUBMIT_END_POINTS.createCoreProfile, response: SUCCESS_RESPONSE}
     }
 }
 

@@ -1,67 +1,67 @@
-import {screen} from '@testing-library/react';
-import {expect} from "vitest";
+import { screen } from '@testing-library/react';
+import { expect } from "vitest";
 import '@testing-library/jest-dom';
-import {AVAILABLE_LANGUAGES, FLOW_TYPES, SERVICES} from "../utils/constants";
-import {getFooter} from "../utils/functions";
+import { AVAILABLE_LANGUAGES, FLOW_TYPES, SERVICES } from "../utils/constants";
+import { getFooter } from "../utils/functions";
 // @ts-ignore
 import * as engJson from '../locales/en/en.json';
 // @ts-ignore
 import * as frJson from '../locales/fr/fr.json';
-import {PAGES} from "../utils/constants.jsx";
+import { PAGES } from "../utils/constants.jsx";
 
-const subLinks =  {attribute:'sub-links', en:getFooter(AVAILABLE_LANGUAGES.en), fr:getFooter(AVAILABLE_LANGUAGES.fr)};
+const subLinks = { attribute: 'sub-links', en: getFooter(AVAILABLE_LANGUAGES.en), fr: getFooter(AVAILABLE_LANGUAGES.fr) };
 const GCDS_TAG_ATTRIBUTES = {
-    'gcds-input':{
+    'gcds-input': {
         attributes: ['input-id', 'label', 'name', 'type', 'validate-on']
     },
-    'gcds-input2':{
+    'gcds-input2': {
         attributes: ['input-id', 'label', 'name', 'type', 'hint']
     },
-    'gcds-input3':{
+    'gcds-input3': {
         attributes: ['input-id', 'label', 'name', 'type']
     },
-    'gcds-fieldset':{
+    'gcds-fieldset': {
         attributes: ["fieldset-id", "hint", "legend"]
     },
-    'gcds-radio-group':{
-        attributes:  ["name", "options"]
+    'gcds-radio-group': {
+        attributes: ["name", "options"]
     },
-    'gcds-button':{
+    'gcds-button': {
         attributes: ["type"]
     },
-    'gcds-footer':{
+    'gcds-footer': {
         attributes: ["sub-links"]
     },
-    'gcds-header':{
+    'gcds-header': {
         attributes: ['lang', 'lang-href', 'signature-variant']
     },
-    'gcds-details':{
+    'gcds-details': {
         attributes: ['details-title']
     },
-    'gcds-stepper':{
+    'gcds-stepper': {
         attributes: ['current-step', 'tag', 'total-steps', 'lang']
     },
-    'gcds-stepper2':{
+    'gcds-stepper2': {
         attributes: ['current-step', 'tag', 'total-steps', 'lang', 'margin-bottom', 'margin-top']
     },
-    'gcds-notice':{
-        name:'gcds-notice',
+    'gcds-notice': {
+        name: 'gcds-notice',
         attributes: ['notice-title', 'notice-title-tag', 'type']
     },
-    'gcds-checkbox':{
-        name:'gcds-checkbox',
+    'gcds-checkbox': {
+        name: 'gcds-checkbox',
         attributes: ['checkbox-id', 'label', 'name']
     }
 }
 
 interface TestParameters {
-    language:string,
+    language: string,
     pageContentJson: JSON,
     langLink: string,
     buttonJson: JSON,
-    alreadyGcJson:JSON,
+    alreadyGcJson: JSON,
     isVoice: boolean,
-    stepper:Array<string>,
+    stepper: Array<string>,
     textKeysToNotSearch: Array<string>,
     smsTextKeys: Array<string>,
     voiceTextKeys: Array<string>,
@@ -74,8 +74,8 @@ export const buildTestSuite = {
     }
 }
 
-const pageSetup ={
-    button: (language:string) =>{
+const pageSetup = {
+    button: (language: string) => {
         return language !== AVAILABLE_LANGUAGES.fr ? engJson['Button'] : frJson['Button'];
     },
     alreadyGc: (page:string, language:string, flow:string) =>{
@@ -94,12 +94,14 @@ const pageSetup ={
                     return language !== AVAILABLE_LANGUAGES.fr ? engJson["AlreadyGc"] : frJson["AlreadyGc"];
                 else
                     return null;
+            case PAGES.privacy:
+                return language !== AVAILABLE_LANGUAGES.fr ? engJson["AlreadyGc"] : frJson["AlreadyGc"];
             default:
                 return null;
         }
     },
-    stepper: (page:string, language:string, flow:string, type:string) =>{
-        switch(page){
+    stepper: (page: string, language: string, flow: string, type: string) => {
+        switch (page) {
             case PAGES.signup:
                 return ['1', 'h1', '4', language];
             case PAGES.password:
@@ -108,13 +110,13 @@ const pageSetup ={
                 else
                     return null;
             case PAGES.verification:
-                if(flow===FLOW_TYPES.signUp)
-                    if(type===FLOW_TYPES.email)
+                if (flow === FLOW_TYPES.signUp)
+                    if (type === FLOW_TYPES.email)
                         return ['1', 'h1', '4', language];
                     else
                         return ['3', 'h1', '4', language];
                 else
-                    return  null;
+                    return null;
             case PAGES.verificationSetUp:
                 return ['3', 'h1', '4', language];
             case PAGES.coreProfile:
@@ -123,8 +125,8 @@ const pageSetup ={
                 return null;
         }
     },
-    textKeysToNotSearch: (page:string, flow:string, type:string) =>{
-        switch(page){
+    textKeysToNotSearch: (page: string, flow: string, type: string) => {
+        switch (page) {
             case PAGES.signup:
                 return ['4', '6'];
             case PAGES.password:
@@ -137,25 +139,28 @@ const pageSetup ={
                     if(type===FLOW_TYPES.email)
                         return ['1','2','3','4','5','8','11','12','13','15','16','17','18','19','20','21','26'];
                     else
-                        return ['11', '12', '15', '16', '17', '18', '19','20', '21', '22','23','24','25', '26'];
+                        return ['11', '12', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26'];
                 else
-                    return  ['11', '12', '13', '15', '16', '17', '22','23','24','25', '26'];
+                    return ['11', '12', '13', '15', '16', '17', '22', '23', '24', '25', '26'];
             case PAGES.verificationSetUp:
                 return ['9', '13', '15', '17', '18', '19'];
+            case PAGES.privacy:
+                return ['11','25','27','42'];
             default:
                 return [];
         }
     },
-    smsTextKeys: (page:string) =>{
-        switch(page){
+
+    smsTextKeys: (page: string) => {
+        switch (page) {
             case PAGES.verification:
                 return ['2', '4'];
             default:
                 return [];
         }
     },
-    voiceTextKeys: (page:string) =>{
-        switch(page){
+    voiceTextKeys: (page: string) => {
+        switch (page) {
             case PAGES.verification:
                 return ['3', '5'];
             default:
@@ -173,6 +178,8 @@ const pageSetup ={
                     return '16';
             case PAGES.verification:
                 return '20';
+            case PAGES.privacy:
+                return '3';
             default:
                 return null;
         }
@@ -191,6 +198,8 @@ const pageSetup ={
                 return pageSetup.verificationSetUpGcdsMap(pageContentJson);
             case PAGES.coreProfile:
                 return pageSetup.coreProfileSetUpGcdsMap(pageContentJson);
+            case PAGES.privacy:
+                return pageSetup.privacyGcdsMap(pageContentJson);
             default:
                 return new Map();
         }
@@ -206,13 +215,13 @@ const pageSetup ={
     signUpEmailGcdsMap: (language:string, pageContentJson:JSON)=>{
 
         const gcdsElementMap = new Map();
-        gcdsElementMap.set('2', ['gcds-input', createMap('gcds-input', ['email', pageContentJson['2'], 'email', 'email', 'other'] )]);
-        gcdsElementMap.set('3', ['gcds-fieldset', createMap('gcds-fieldset', ['gcds-email-fieldset',pageContentJson['4'],pageContentJson['3']])]);
-        if(language===AVAILABLE_LANGUAGES.fr) {
-            const options ='[{"label": "'+pageContentJson['5']+'","id": "english", "value": "eng"},{"label": "'+pageContentJson['6']+'","id": "french", "value": "fr","checked":"true"}]';
-            gcdsElementMap.set('5', ['gcds-radio-group', createMap('gcds-radio-group', ['language',options])]);
+        gcdsElementMap.set('2', ['gcds-input', createMap('gcds-input', ['email', pageContentJson['2'], 'email', 'email', 'other'])]);
+        gcdsElementMap.set('3', ['gcds-fieldset', createMap('gcds-fieldset', ['gcds-email-fieldset', pageContentJson['4'], pageContentJson['3']])]);
+        if (language === AVAILABLE_LANGUAGES.fr) {
+            const options = '[{"label": "' + pageContentJson['5'] + '","id": "english", "value": "eng"},{"label": "' + pageContentJson['6'] + '","id": "french", "value": "fr","checked":"true"}]';
+            gcdsElementMap.set('5', ['gcds-radio-group', createMap('gcds-radio-group', ['language', options])]);
 
-        }else{
+        } else {
             const options = '[{"label": "' + pageContentJson['5'] + '","id": "english", "value": "eng","checked":"true"},{"label": "' + pageContentJson['6'] + '","id": "french", "value": "fr"}]';
             gcdsElementMap.set('5', ['gcds-radio-group', createMap('gcds-radio-group', ['language', options])]);
         }
@@ -232,36 +241,42 @@ const pageSetup ={
 
         return gcdsElementMap;
     },
-    verificationGcdsMap: (pageContentJson:JSON)=>{
+    verificationGcdsMap: (pageContentJson: JSON) => {
 
         const gcdsElementMap = new Map();
-        gcdsElementMap.set('9', ['gcds-input',  createMap('gcds-input', ["verificationCode", pageContentJson['9'], 'verificationCode', 'text', 'other'])]);
+        gcdsElementMap.set('9', ['gcds-input', createMap('gcds-input', ["verificationCode", pageContentJson['9'], 'verificationCode', 'text', 'other'])]);
 
         return gcdsElementMap;
     },
-    verificationSetUpGcdsMap: (pageContentJson:JSON)=>{
+    verificationSetUpGcdsMap: (pageContentJson: JSON) => {
 
         const gcdsElementMap = new Map();
-        gcdsElementMap.set('11', ['gcds-details',  createMap('gcds-details', [pageContentJson['11']])])
-        gcdsElementMap.set('14', ['gcds-fieldset', createMap('gcds-fieldset', ['gcds-verification-fieldset', pageContentJson['15'],pageContentJson['14']])]);
-        const options ='[{"label": "'+pageContentJson['16']+'","id": "sms", "value": "sms","checked":"true","hint": "'+pageContentJson['17']+'"},{"label": "'+pageContentJson['18']+'","id": "voice", "value": "voice","hint": "'+pageContentJson['19']+'"}]';
-        gcdsElementMap.set('16', ['gcds-radio-group',  createMap('gcds-radio-group', ['verificationType',options])]);
+        gcdsElementMap.set('11', ['gcds-details', createMap('gcds-details', [pageContentJson['11']])])
+        gcdsElementMap.set('14', ['gcds-fieldset', createMap('gcds-fieldset', ['gcds-verification-fieldset', pageContentJson['15'], pageContentJson['14']])]);
+        const options = '[{"label": "' + pageContentJson['16'] + '","id": "sms", "value": "sms","checked":"true","hint": "' + pageContentJson['17'] + '"},{"label": "' + pageContentJson['18'] + '","id": "voice", "value": "voice","hint": "' + pageContentJson['19'] + '"}]';
+        gcdsElementMap.set('16', ['gcds-radio-group', createMap('gcds-radio-group', ['verificationType', options])]);
 
         return gcdsElementMap;
     },
-    coreProfileSetUpGcdsMap: (pageContentJson:JSON)=>{
+    coreProfileSetUpGcdsMap: (pageContentJson: JSON) => {
 
         const gcdsElementMap = new Map();
         gcdsElementMap.set('1', ['gcds-notice', createMap('gcds-notice', [pageContentJson['1'], 'h2', 'success'])]);
-        gcdsElementMap.set('7', ['gcds-input',  createMap('gcds-input3', ["firstName", pageContentJson['7'], 'firstName', 'text'] )]);
-        gcdsElementMap.set('8', ['gcds-input',  createMap('gcds-input', ["lastName", pageContentJson['8'], 'lastName', 'text', 'other'] )]);
+        gcdsElementMap.set('7', ['gcds-input', createMap('gcds-input3', ["firstName", pageContentJson['7'], 'firstName', 'text'])]);
+        gcdsElementMap.set('8', ['gcds-input', createMap('gcds-input', ["lastName", pageContentJson['8'], 'lastName', 'text', 'other'])]);
 
         return gcdsElementMap;
+    },
+    privacyGcdsMap: (pageContentJson: JSON) => {
+        const gcdsElementMap = new Map();
+        gcdsElementMap.set('23', ['gcds-details', createMap('gcds-details', [pageContentJson['23']])])
+        return gcdsElementMap;
     }
+
 }
 
 const testSuite = {
-    parameters: (language: string, page:string, flow:string, type:string, link: string)=>{
+    parameters: (language: string, page: string, flow: string, type: string, link: string) => {
 
         return {
             language: language,
@@ -270,7 +285,7 @@ const testSuite = {
             buttonJson: pageSetup.button(language),
             alreadyGcJson: pageSetup.alreadyGc(page, language, flow),
             stepper: pageSetup.stepper(page, language, flow, type),
-            textKeysToNotSearch:  pageSetup.textKeysToNotSearch(page, flow, type),
+            textKeysToNotSearch: pageSetup.textKeysToNotSearch(page, flow, type),
             isVoice: type === FLOW_TYPES.voice,
             smsTextKeys: pageSetup.smsTextKeys(page),
             voiceTextKeys: pageSetup.voiceTextKeys(page),
@@ -286,25 +301,24 @@ const testSuite = {
             if(gcdsElementMap.has(key))
                 verifyGcdsHtmlElement(gcdsElementMap.get(key)[0], gcdsElementMap.get(key)[1]);
             else if (!textKeysToNotSearch.includes(key))
-                if(key===serviceKey)
-                    if(language===AVAILABLE_LANGUAGES.fr)
-                        expect(screen.queryByText(pageContentJson[key] + ' '+SERVICES[0].title)).toBeInTheDocument();
+                if (key === serviceKey)
+                    if (language === AVAILABLE_LANGUAGES.fr)
+                        expect(screen.queryByText(pageContentJson[key] + ' ' + SERVICES[0].title)).toBeInTheDocument();
                     else
-                        expect(screen.queryByText(SERVICES[0].title+' '+ pageContentJson[key])).toBeInTheDocument();
-               else if ((!smsTextKeys.includes(key) && !voiceTextKeys.includes(key))
-                        || (smsTextKeys.includes(key) && !isVoice)
-                        || (voiceTextKeys.includes(key) && isVoice))
+                        expect(screen.queryByText(SERVICES[0].title + ' ' + pageContentJson[key])).toBeInTheDocument();
+                else if ((!smsTextKeys.includes(key) && !voiceTextKeys.includes(key))
+                    || (smsTextKeys.includes(key) && !isVoice)
+                    || (voiceTextKeys.includes(key) && isVoice))
                     expect(screen.queryByText(pageContentJson[key])).toBeInTheDocument();
         });
     }
 }
 
-function verifyGcdsHtmlElement(tag: string, attributes:Map<string,string>)
-{
+function verifyGcdsHtmlElement(tag: string, attributes: Map<string, string>) {
     const allElements = document.querySelectorAll(tag);
     let element = document.querySelector(tag) as HTMLElement;
 
-    if(allElements!==null && allElements.length > 1) {
+    if (allElements !== null && allElements.length > 1) {
         allElements.forEach((el: HTMLElement) => {
             attributes.forEach((value) => {
                 if (el.getAttribute(GCDS_TAG_ATTRIBUTES[tag].attributes[0]) === value)
@@ -321,34 +335,34 @@ function verifyGcdsHtmlElement(tag: string, attributes:Map<string,string>)
     });
 }
 
-function createMap(type:string, values:Array<string>) {
+function createMap(type: string, values: Array<string>) {
 
-    try{
+    try {
         const map = new Map();
         const attributes = GCDS_TAG_ATTRIBUTES[type].attributes;
-        attributes.forEach((attribute:string, key:string) => {
+        attributes.forEach((attribute: string, key: string) => {
             map.set(attribute, values[key]);
         });
         return map;
-    }catch(e){
+    } catch (e) {
         console.error(e);
         return null;
     }
 }
 
-function verifyCommonElements(language: string, langLink: string,  buttonJson: JSON, alreadyGcJson: JSON, stepper:Array<string>){
+function verifyCommonElements(language: string, langLink: string, buttonJson: JSON, alreadyGcJson: JSON, stepper: Array<string>) {
 
-    verifyGcdsHtmlElement('gcds-header',  createMap('gcds-header', [language, langLink, 'colour'] ));
+    verifyGcdsHtmlElement('gcds-header', createMap('gcds-header', [language, langLink, 'colour']));
 
-    if(stepper)
+    if (stepper)
         verifyGcdsHtmlElement('gcds-stepper', createMap('gcds-stepper', stepper));
 
-    if(buttonJson){
+    if (buttonJson) {
         verifyGcdsHtmlElement('gcds-button', createMap('gcds-button', ['submit']));
         expect(screen.queryByText(buttonJson['submit'])).toBeInTheDocument();
     }
 
-    if(alreadyGcJson)
+    if (alreadyGcJson)
         Object.keys(alreadyGcJson).forEach(key => expect(screen.queryByText(alreadyGcJson[key])).toBeInTheDocument());
 
     verifyGcdsHtmlElement('gcds-footer', createMap('gcds-footer', [subLinks[language]]));

@@ -1,5 +1,8 @@
-from typing import List, Any, Optional
-from pydantic import BaseModel, Field, EmailStr, ConfigDict
+from enum import Enum
+from typing import List, Optional
+from pydantic import BaseModel, EmailStr, ConfigDict
+from pydantic_extra_types.phone_numbers import PhoneNumber
+
 from app.utils.schemas import ResponseModel
 from enum import Enum
 
@@ -66,3 +69,29 @@ class AuthenticatedUserData(BaseModel):
 
 class AuthenticatedUserResponse(ResponseModel):
     data: AuthenticatedUserData
+
+
+class TwoFactorEnrollmentType(str, Enum):
+    SMS = 'sms'
+    VOICE = 'voice'
+
+
+class TwoFactorEnrollmentUserData(BaseModel):
+    userId: str
+    phoneNumber: PhoneNumber
+    enrollmentType: TwoFactorEnrollmentType
+
+
+class TwofactorEnrollmentResponse(BaseModel):
+    id: str
+    userId: str
+    type: str
+    created: str
+    updated: str
+    enabled: bool
+    validated: bool
+    attributes: dict[str, str]
+
+
+class VerifiedTwofactorEnrollmentResponse(ResponseModel):
+    data: TwofactorEnrollmentResponse
