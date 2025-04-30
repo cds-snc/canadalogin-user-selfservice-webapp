@@ -3,13 +3,13 @@ graph TB
     subgraph AWS["CDS AWS Cloud ca-central-1"]
         subgraph "VPC"
             subgraph PublicSubnet["Public Subnet"]
-                ALB["Application Load Balancer<br/>(routes API traffic)"]
+                ALB["Application Load Balancer<br/>(routes backend API traffic)"]
             end
 
             subgraph "Private Subnet"
-                subgraph "ECS Cluster"
+                subgraph ECS["ECS Cluster"]
                     subgraph "Backend Container"
-                        APIProxy["API Proxy (FastAPI)"]
+                        APIBackend["GC Sign in Backend API (FastAPI)"]
                         APIClient["IBM Verify API Client"]
                     end
                 end
@@ -20,22 +20,22 @@ graph TB
         CloudWatch[CloudWatch]
         SecretsManager[Secrets Manager]
         CloudFront["CloudFront<br/>(serves custom Web assets)"]
+        ECR["ECR"]
         Route53["Route 53 (DNS)"]
-        S3[S3 Bucket<br/>Front-end Web assets]
+        subgraph S3[S3 Bucket]
+            GCSigninFrontEnd[GC Sign in Frontend Web assets]
+        end
         WAF[AWS WAF]
 
         
     end
 
-    subgraph IBMVerify["IBM Cloud (canada)"]
-        IBMVerifyFeatures["<strong>IBM VERIFY SaaS</strong><br/><br/>OIDC Services<br/>Monitoring and Repoting<br/>APIs<br/>MFA Enroll/Verify<br/>Identity Store"]
-    end
-
     subgraph GitHub
         subgraph CDSGitHub["CDS GitHub Org"]
             subgraph GitHubActions["GC Sign in GitHub actions"]
-                GitHubIBMClient["IBM Verify API Client"]
                 GitHubAWSOIDCClient["AWS OIDC Client"]
+                GitHubCodeCoverage["Code Coverage"]
+                GitHubCodeScanning["Code Scanning"]
             end
             GitHubSecrets["GitHub Secrets"]
             subgraph GCSigninCodeRepo["GC Sign in Code Repo"]
@@ -45,8 +45,12 @@ graph TB
         end
     end
 
+    subgraph IBMVerify["IBM Cloud (canada)"]
+        IBMVerifyFeatures["<strong>IBM VERIFY SaaS</strong><br/><br/>OIDC Services<br/>Monitoring and Repoting<br/>APIs<br/>MFA Enroll/Verify<br/>Identity Store"]
+    end
+
     RelyingParty[Relying Party]
-    WebBrowser["Users (Web Browser)"]
+    WebBrowser["User Agent (Web Browser)"]
 
     subgraph Azure["CDS Azure Cloud (canada)"]
         Sentinel["Microsoft Sentinel (CDS)"]
@@ -54,25 +58,22 @@ graph TB
     
     %% Connections
     GitHubAWSOIDCClient-->|Deploy| AWS
-    GitHubIBMClient-->|Configure| IBMVerify
     GCSigninCodeRepo-->GitHubActions
-    
-    WebBrowser -->|"OIDC endpoints<br/>HTTPS<br/>TO BE DECIDED (this could go through AWS API Proxy instead)"| IBMVerify
+
     WebBrowser -->|"HTTPS"| AWS
     CloudFront -->|Static Content| S3
     WAF -.->|Protect| ALB
     WAF -.->|Protect| CloudFront
-    ALB -->|API Requests| APIProxy
-    APIClient -->|Signup+Signin+MFA+Profile HTTPS| IBMVerify
+    ALB -->|API Requests| APIBackend
+    APIClient -->|HTTPS| IBMVerify
     APIClient -->|Secrets| SecretsManager
-    RelyingParty-->|"OIDC endpoints<br/>HTTPS<br/>TO BE DECIDED (this could go through AWS API Proxy instead)"| IBMVerify
-    RelyingParty-->|"Redirect (authorize)<br/>HTTPS"| WebBrowser
-    WebBrowser-->|"Redirect (callback)<br/>HTTPS"| RelyingParty
-    APIProxy-->|Uses| APIClient
+    RelyingParty-->|"OIDC endpoints<br/>HTTPS"| IBMVerify
+    WebBrowser-->|"Access<br/>HTTPS"| RelyingParty
+    APIBackend-->|Uses| APIClient
 
     %% Monitoring
     WAF -.->|Logs| CloudWatch
-    APIProxy -.->|Logs| CloudWatch
+    APIBackend -.->|Logs| CloudWatch
     CloudWatch -->|Logs| Sentinel
     IBMVerify -->|Logs| Sentinel
 
@@ -87,11 +88,11 @@ graph TB
     classDef githubchild fill:#6299B2,stroke:#23F3E,color:white;
     classDef azure fill:#12267d,stroke:#23F3E,color:white;
 
-    class Route53,CloudFront,ALB,WAF,CFWAF,ECS,CloudWatch,SecretsManager,WAFLogs,S3 aws;
+    class Route53,CloudFront,ALB,WAF,CFWAF,ECS,ECR,CloudWatch,SecretsManager,WAFLogs,S3 aws;
     class IBMVerifyFeatures ibm;
     class WebBrowser users;
     class RelyingParty rp;
-    class GCSigninFrontEnd,APIProxy,APIClient gcsignin;
+    class GCSigninFrontEnd,APIBackend,APIClient gcsignin;
     class GitHubActions,GCSigninCodeRepo,GitHubSecrets github;
-    class GitHubIBMClient,GitHubAWSOIDCClient,ApplicationCode,InfrastructureCode githubchild;
+    class GitHubAWSOIDCClient,ApplicationCode,InfrastructureCode,GitHubCodeCoverage,GitHubCodeScanning githubchild;
     class Sentinel azure;
