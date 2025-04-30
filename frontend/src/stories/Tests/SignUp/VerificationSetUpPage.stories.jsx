@@ -8,7 +8,7 @@ import {getPageContent} from "../../../utils/functions.jsx";
 import {
     ACTION_TYPES,
     ERROR_RESPONSE,
-    MSW_VERIFICATION,
+    MSW_MOCKS,
     TEST_TYPES,
     TEST_USERS
 } from "../utils/constants.jsx";
@@ -105,7 +105,7 @@ FrDigitErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
 ErrorBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.twoStepVerification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
-    [MSW_VERIFICATION.signup.verificationSetUp.error]);
+    [MSW_MOCKS.transientOtpSend.error]);
 ErrorBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -123,7 +123,7 @@ ErrorBackEnd.play = async ({ canvasElement, step }) => {
 }
 ServerErrorBackEnd.parameters =buildTestCase.parameters(NAVIGATION_LINKS.twoStepVerification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
-    [MSW_VERIFICATION.signup.verificationSetUp.serverTimeOut]);
+    [MSW_MOCKS.transientOtpSend.serverTimeOut]);
 ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -142,13 +142,13 @@ ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
 
 SuccessfulBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.twoStepVerification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
-    [MSW_VERIFICATION.signup.verificationSetUp.success]);
+    [MSW_MOCKS.transientOtpSend.smsSuccess]);
 SuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
         canvasElement,
         step,
-        stepMessage: "Submit form with good phone number",
+        stepMessage: "Submit form with good phone number for SMS",
         link: 'phone',
         delay: 1000,
         actionType: ACTION_TYPES.submit,
