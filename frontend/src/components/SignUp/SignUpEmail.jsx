@@ -11,7 +11,7 @@ import {useUser} from "../Providers/useUser";
 import {useNavigate, useParams} from "react-router";
 import {authService} from "../../services/authService.jsx";
 import SubmitButton from "../Layout/SubmitButton.jsx";
-import ReactGA from "react-ga4";
+import { trackEvent } from "../../utils/gatag.jsx";
 import {GA_CATEGORIES, GA_ACTIONS, GA_LABELS} from "../../utils/constants.jsx";
 
 export default function SignUpEmail() {
@@ -42,10 +42,10 @@ export default function SignUpEmail() {
             e.preventDefault();
             const formData = new FormData(e.target);
             const formEmail = formData.get('email');
-            ReactGA.event({
-                category: GA_CATEGORIES.ONBOARDING,
-                action: GA_ACTIONS.SUBMIT_SIGNUP_EMAIL,
-                label: GA_LABELS.EMAIL
+            trackEvent({
+                category: GA_CATEGORIES.onboarding,
+                action: GA_ACTIONS.submitSignUpEmail,
+                label: GA_LABELS.email
               });
 
             if(!validateEmail(formEmail))

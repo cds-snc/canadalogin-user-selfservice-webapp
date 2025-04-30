@@ -14,7 +14,7 @@ import {useUser} from "../../Providers/useUser.tsx";
 import {CONTEXT_ACTIONS} from "../../../utils/constants.jsx";
 import {useNavigate} from "react-router";
 import {NAVIGATION_LINKS} from "../../../utils/constants.jsx";
-import ReactGA from "react-ga4";
+import { trackEvent } from "../../../utils/gatag.jsx";
 import {GA_CATEGORIES, GA_ACTIONS, GA_LABELS} from "../../../utils/constants.jsx";
 
 export default function Privacy() {
@@ -24,10 +24,10 @@ export default function Privacy() {
 
     async function handleSubmit(event) {
         event.preventDefault();
-        ReactGA.event({
-            category: GA_CATEGORIES.ONBOARDING,
-            action: GA_ACTIONS.ACCEPT_PRIVACY,
-            label: GA_LABELS.BUTTON
+        trackEvent({
+            category: GA_CATEGORIES.onboarding,
+            action: GA_ACTIONS.acceptPrivacy,
+            label: GA_LABELS.button
           });
 
         const userData = { ...state.userData, viewPrivacy: true };

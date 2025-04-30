@@ -3,15 +3,15 @@ import {UserProvider} from "./components/Providers/UserProvider";
 import PrivateRoute from "./components/Providers/PrivateRoute.jsx";
 import Page from "./views/Page.js";
 import {PAGES} from "./utils/constants.jsx";
-import ReactGA from "react-ga4";
+import { trackPage } from "./utils/gatag.jsx";
 import { useEffect } from "react";
 
 function App() {
     const location = useLocation();
 
     useEffect(() => {
-      ReactGA.send({ hitType: "pageview", page: location.pathname + location.search });
-    }, [location]);
+        trackPage(location.pathname + location.search);
+      }, [location]);
 
       return (
           <UserProvider>

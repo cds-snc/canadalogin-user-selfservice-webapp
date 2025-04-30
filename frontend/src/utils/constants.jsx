@@ -405,20 +405,19 @@ export const countryMapping = {
 } 
 
 export const GA_CATEGORIES = {
-    ONBOARDING: "SignUp Flow",
-    AUTH: "Auth"
+    onboarding: "SignUp Flow"
 }
 
 export const GA_ACTIONS = {
-    CLICK_FIRST_TIME_GC: "Clicked FirstTimeGC -> Privacy",
-    ACCEPT_PRIVACY: "Accepted Privacy",
-    SUBMIT_SIGNUP_EMAIL: "Submitted SignUp Email"
+    clickFirstTimeGc: "Clicked FirstTimeGC -> Privacy",
+    acceptPrivacy: "Accepted Privacy",
+    submitSignUpEmail: "Submitted SignUp Email"
 }
 
 export const GA_LABELS = {
-    BUTTON: "Button",
-    LINK: "Link",
-    TEXT: "Text",
-    INPUT: "Input",
-    EMAIL: "Email",
+    button: "Button",
+    link: "Link",
+    text: "Text",
+    input: "Input",
+    email: "Email",
 }
