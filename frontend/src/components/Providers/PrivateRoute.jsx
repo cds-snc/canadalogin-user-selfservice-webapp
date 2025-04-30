@@ -54,6 +54,8 @@ function isValidRoute (page, state, flow, type) {
         case(PAGES.password):
             return (state.userData.emailValidated &&
                 state.userData.viewPrivacy);
+        case(PAGES.signup):
+            return state.userData.viewPrivacy;
         default:
             return false;
 
