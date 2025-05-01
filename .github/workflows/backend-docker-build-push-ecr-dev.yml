@@ -3,7 +3,7 @@ name: Backend Docker Build and Push to ECR
 on:
   push:
     branches:
-      - 00-github-action-deploy-backend-api-to-aws
+      - main
     paths:
       - "backend/**"
       - ".github/workflows/backend-docker-build-push-ecr-dev.yml"
