@@ -14,8 +14,10 @@ on:
 
 env: 
   AWS_REGION: ca-central-1
-  NAME: gc-signin-dev-backend-api
-  ECR: ${{ secrets.DEV_AWS_ACCOUNT_ID }}.dkr.ecr.ca-central-1.amazonaws.com
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+  ECR: ${{ secrets.DEV_AWS_ACCOUNT_ID }}.dkr.ecr.ca-central-1.amazonaws.com/gc-signin-dev-backend-api
   GITHUB_SHA: ${{ github.sha }}
   TAG_VERSION: ${{ github.ref_name }}
 
@@ -34,33 +36,38 @@ jobs:
         DNS_PROXY_LOGANALYTICSWORKSPACEID: ${{ secrets.LOG_ANALYTICS_WORKSPACE_ID }}
         DNS_PROXY_LOGANALYTICSSHAREDKEY: ${{ secrets.LOG_ANALYTICS_WORKSPACE_KEY }}
 
-    - name: Setup QEMU
-      uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # v3.6.0
+    # - name: Setup QEMU
+    #   uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # v3.6.0
   
-    - name: Setup Docker Buildx
-      uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2 # v3.10.0
+    # - name: Setup Docker Buildx
+    #   uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2 # v3.10.0
+
+    - name: Confirm secret is accessible
+      run: |
+        if [ -z "${{ secrets.DEV_AWS_ACCOUNT_ID }}" ]; then
+          echo "❌ DEV_AWS_ACCOUNT_ID is not set"
+          exit 1
+        else
+          echo "✅ DEV_AWS_ACCOUNT_ID is available"
+        fi
 
     - name: Checkout
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
     # TODO: Replace with a locked down IAM role
-    - name: configure aws credentials using OIDC
-      uses: aws-actions/configure-aws-credentials@ececac1a45f3b08a01d2dd070d28d111c5fe6722 # v4.1.0
-      with:
-        role-to-assume: arn:aws:iam::${{ secrets.DEV_AWS_ACCOUNT_ID }}:role/gc-signin-ibm-apply
-        role-session-name: PushContainer
-        aws-region: ${{ env.AWS_REGION }}
-
-    - name: Set REGISTRY variable
-      run: echo "REGISTRY=$ECR/$NAME" >> $GITHUB_ENV
+    # - name: Install AWS CLI
+    #   run: |
+    #       sudo apt-get update
+    #       sudo apt-get install -y awscli
 
     - name: Build Docker image
       working-directory: ./backend/
       run: |
+        echo "======= NAME is $NAME"
+
         docker build \
-        --build-arg GIT_SHA=$GITHUB_SHA \
-        --tag $REGISTRY:sha-$GITHUB_SHA \
-        --tag $REGISTRY:latest .
+        --tag $ECR:sha-$GITHUB_SHA \
+        --tag $ECR:latest .
 
     - name: Login to Amazon ECR
       id: login-ecr
@@ -68,15 +75,15 @@ jobs:
 
     - name: Push Container to Amazon ECR
       run: |
-        docker push $REGISTRY:$GITHUB_SHA
-        docker push $REGISTRY:latest
+        docker push $ECR:$GITHUB_SHA
+        docker push $ECR:latest
 
     - name: Docker generate SBOM
       uses: cds-snc/security-tools/.github/actions/generate-sbom@34794baf2af592913bb5b51d8df4f8d0acc49b6f # v3.2.0
       env:
         TRIVY_DB_REPOSITORY: ${{ vars.TRIVY_DB_REPOSITORY }}
       with:
-        docker_image: $REGISTRY:latest
+        docker_image: $ECR:latest
         dockerfile_path: "backend/Dockerfile"
-        sbom_name: ${{ env.NAME }}
+        sbom_name: "gc-signin-dev-backend-api"
         token: "${{ secrets.GITHUB_TOKEN }}"
