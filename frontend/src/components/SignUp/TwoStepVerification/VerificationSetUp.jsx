@@ -1,5 +1,5 @@
 import {
-    GcdsContainer, GcdsDetails, GcdsErrorSummary, GcdsFieldset,
+    GcdsContainer, GcdsDetails, GcdsErrorSummary, GcdsFieldset, GcdsHeading, GcdsLink,
     GcdsRadioGroup,
     GcdsStepper,
     GcdsText
@@ -10,7 +10,6 @@ import SubmitButton from "../../Layout/SubmitButton.jsx";
 import {useState, useTransition} from 'react';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/material.css';
-import VerificationSetUpInfo from "./VerificationSetUpInfo.jsx";
 import {useUser} from "../../Providers/useUser.tsx";
 import {authService} from "../../../services/authService.jsx";
 import {useNavigate, useParams} from "react-router";
@@ -85,7 +84,25 @@ export default function VerificationSetUp() {
                 </GcdsContainer>
                 <GcdsContainer>
                     <form id="form"  onSubmit={handleSubmit}>
-                        <VerificationSetUpInfo currentLang={language} pageContentJson={pageContentJson} />
+                        <GcdsContainer>
+                            <GcdsText>
+                                {pageContentJson['2']}
+                            </GcdsText>
+                            <GcdsText>
+                                <GcdsLink href={`/${language}${NAVIGATION_LINKS.signUp}`} >
+                                    {pageContentJson['3']}
+                                </GcdsLink>
+                            </GcdsText>
+                            <GcdsHeading tag="h2">
+                                {pageContentJson['4']}
+                            </GcdsHeading>
+                            <GcdsText>
+                                {pageContentJson['5']}
+                            </GcdsText>
+                            <GcdsText>
+                                <span>{pageContentJson['6']}</span> <GcdsLink href={`/${language}${NAVIGATION_LINKS.signUp}`} >{pageContentJson['7']}</GcdsLink> {pageContentJson['8']}
+                            </GcdsText>
+                        </GcdsContainer>
                         <GcdsContainer padding="200">
                         <PhoneInput
                             inputProps={{
@@ -114,7 +131,7 @@ export default function VerificationSetUp() {
                         <GcdsText>
                             <GcdsDetails detailsTitle={pageContentJson['11']}>
                                 <GcdsText>
-                                    {pageContentJson['12']}
+                                    <span>{pageContentJson['12']}</span>
                                 </GcdsText>
                             </GcdsDetails>
                         </GcdsText>
