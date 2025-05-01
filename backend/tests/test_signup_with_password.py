@@ -41,15 +41,14 @@ async def test_create_user_success(client):
         "userName": "test@abc.com",
     }
 
-    with patch(
-        "app.users.services.create.get_access_token", new_callable=AsyncMock
-    ) as mock_token, patch(
-        "app.users.services.create.get_auth_request_headers"
-    ) as mock_headers, patch(
-        "app.users.services.create.get_settings"
-    ) as mock_settings, patch(
-        "app.users.services.create.AsyncClient"
-    ) as mock_client_class:
+    with (
+        patch(
+            "app.users.services.create.get_access_token", new_callable=AsyncMock
+        ) as mock_token,
+        patch("app.users.services.create.get_auth_request_headers") as mock_headers,
+        patch("app.users.services.create.get_settings") as mock_settings,
+        patch("app.users.services.create.AsyncClient") as mock_client_class,
+    ):
 
         mock_token.return_value = "fake--token"
         mock_headers.return_value = {"Authorization": "Bearer fake-token"}
@@ -76,13 +75,12 @@ async def test_create_user_raises_generic_error(client):
         password="StrongPassword123",
     )
 
-    with patch(
-        "app.users.services.create.get_access_token", new_callable=AsyncMock
-    ), patch("app.users.services.create.get_auth_request_headers"), patch(
-        "app.users.services.create.get_settings"
-    ), patch(
-        "app.users.services.create.AsyncClient"
-    ) as mock_client_class:
+    with (
+        patch("app.users.services.create.get_access_token", new_callable=AsyncMock),
+        patch("app.users.services.create.get_auth_request_headers"),
+        patch("app.users.services.create.get_settings"),
+        patch("app.users.services.create.AsyncClient") as mock_client_class,
+    ):
 
         mock_client = AsyncMock()
         mock_client.__aenter__.return_value = mock_client
@@ -113,10 +111,10 @@ async def test_signup_success(client):
     }
 
     # Patch only what's necessary
-    with patch(
-        "app.users.services.create.create_user", return_value=mock_response
-    ), patch("app.users.services.create.IBMUserCreateRequest"), patch(
-        "app.users.services.create.logger"
+    with (
+        patch("app.users.services.create.create_user", return_value=mock_response),
+        patch("app.users.services.create.IBMUserCreateRequest"),
+        patch("app.users.services.create.logger"),
     ):
 
         result = await signup_with_password(user_data)
@@ -135,10 +133,10 @@ async def test_signup_failure_from_ibm(client):
     mock_response.status_code = 400
     mock_response.json.return_value = {"detail": "Invalid user"}
 
-    with patch(
-        "app.users.services.create.create_user", return_value=mock_response
-    ), patch("app.users.services.create.IBMUserCreateRequest"), patch(
-        "app.users.services.create.logger"
+    with (
+        patch("app.users.services.create.create_user", return_value=mock_response),
+        patch("app.users.services.create.IBMUserCreateRequest"),
+        patch("app.users.services.create.logger"),
     ):
 
         result = await signup_with_password(user_data)
@@ -160,10 +158,10 @@ async def test_signup_validation_error_response(client):
     mock_response.status_code = 201
     mock_response.json.return_value = {"invalid_field": "unexpected"}
 
-    with patch(
-        "app.users.services.create.create_user", return_value=mock_response
-    ), patch("app.users.services.create.IBMUserCreateRequest"), patch(
-        "app.users.services.create.logger"
+    with (
+        patch("app.users.services.create.create_user", return_value=mock_response),
+        patch("app.users.services.create.IBMUserCreateRequest"),
+        patch("app.users.services.create.logger"),
     ):
 
         with pytest.raises(HTTPException) as exc_info:
@@ -189,11 +187,12 @@ async def test_user_signup(client):
     )
 
     # Patch the signup_with_password function to return the mock response
-    with patch(
-        "app.users.v1_router.signup_with_password", return_value=mock_response
-    ), patch(
-        "app.users.services.create.get_access_token", new_callable=AsyncMock
-    ) as mock_get_token:
+    with (
+        patch("app.users.v1_router.signup_with_password", return_value=mock_response),
+        patch(
+            "app.users.services.create.get_access_token", new_callable=AsyncMock
+        ) as mock_get_token,
+    ):
 
         # Mock the token response to simulate a successful access token request
         mock_get_token.return_value = "fake-token"
