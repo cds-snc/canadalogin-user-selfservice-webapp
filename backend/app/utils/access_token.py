@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from fastapi import Depends, HTTPException
+from fastapi import HTTPException
 from httpx import AsyncClient
 from app.config import get_settings
 
@@ -20,18 +20,23 @@ async def request_access_token():
             "grant_type": "client_credentials",
             "client_id": settings.IBM_VERIFY_API_CLIENT_ID,
             "client_secret": settings.IBM_VERIFY_API_CLIENT_SECRET,
-            "scope": "openid"
+            "scope": "openid",
         }
         logger.debug(f"Token URL: {token_url}")
 
         async with AsyncClient() as client:
-            response = await client.post(token_url, data=data, headers={"Content-Type": "application/x-www-form-urlencoded"})
+            response = await client.post(
+                token_url,
+                data=data,
+                headers={"Content-Type": "application/x-www-form-urlencoded"},
+            )
 
             if response.status_code != 200:
-                logger.error(
-                    f"Failed to get access token. Response: {response}")
+                logger.error(f"Failed to get access token. Response: {response}")
                 raise HTTPException(
-                    status_code=response.status_code, detail="Failed to get access token")
+                    status_code=response.status_code,
+                    detail="Failed to get access token",
+                )
 
             logger.info("Request returned successfully")
             return response
@@ -39,8 +44,7 @@ async def request_access_token():
     except Exception as e:
 
         logger.error(f"Error requesting token: {str(e)}", exc_info=True)
-        raise HTTPException(
-            status_code=400, detail=f"Token request error: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Token request error: {str(e)}")
 
 
 async def get_access_token() -> str:
@@ -55,46 +59,45 @@ async def get_access_token() -> str:
 
         access_token = response.json().get("access_token")
         if not access_token:
-            logger.error(
-                f"Failed to get access token. Response: {response}")
-            raise HTTPException(
-                status_code=500, detail="Failed to get access token")
+            logger.error(f"Failed to get access token. Response: {response}")
+            raise HTTPException(status_code=500, detail="Failed to get access token")
         print(access_token)
         return access_token
 
     except Exception as e:
         logger.error(f"Error getting admin token: {str(e)}", exc_info=True)
-        raise HTTPException(
-            status_code=400, detail=f"Admin token error: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Admin token error: {str(e)}")
 
 
-def get_auth_request_headers(access_token: str, json_content_type: bool = False) -> dict:
+def get_auth_request_headers(
+    access_token: str, json_content_type: bool = False
+) -> dict:
     """Headers and access token to be included in the Authorization header
 
-      Args:
-        access_token (str): The access token to be included in the Authorization header.
-        json_content_type (bool): If True, the Content-Type and Accept headers will be set to "application/json".
+    Args:
+      access_token (str): The access token to be included in the Authorization header.
+      json_content_type (bool): If True, the Content-Type and Accept headers will be set to "application/json".
 
-        Returns:
-            dict: A dictionary containing the authentication headers, including:
-                - "Authorization": "Bearer <access_token>"
-                - "Content-Type": "application/scim+json"
-                - "Accept": "application/scim+json"
+      Returns:
+          dict: A dictionary containing the authentication headers, including:
+              - "Authorization": "Bearer <access_token>"
+              - "Content-Type": "application/scim+json"
+              - "Accept": "application/scim+json"
 
-        """
+    """
     headers = {}
 
     if json_content_type:
         headers = {
             "Authorization": f"Bearer {access_token}",
             "Content-Type": "application/json",
-            "Accept": "application/json"
+            "Accept": "application/json",
         }
         return headers
 
     headers = {
         "Authorization": f"Bearer {access_token}",
         "Content-Type": "application/scim+json",
-        "Accept": "application/scim+json"
+        "Accept": "application/scim+json",
     }
     return headers
