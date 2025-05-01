@@ -52,8 +52,8 @@ async def test_create_user_success(client):
     ) as mock_client_class:
 
         mock_token.return_value = "fake-access-token"
-        mock_headers.return_value = {"Authorization": 
-                                     "Bearer fake-access-token"}
+        mock_headers.return_value = \
+            {"Authorization": "Bearer fake-access-token"}
         mock_settings.return_value.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
             "https://fake.ibm.com"
         )
@@ -130,8 +130,8 @@ async def test_signup_success(client):
 
 @pytest.mark.asyncio
 async def test_signup_failure_from_ibm(client):
-    user_data = UserLoginRequestData(userName="fail@example.com", 
-                                     password="failpass")
+    user_data = \
+        UserLoginRequestData(userName="fail@example.com", password="failpass")
 
     mock_response = MagicMock()
     mock_response.status_code = 400
