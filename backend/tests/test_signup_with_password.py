@@ -207,7 +207,7 @@ async def test_user_signup(client):
             mock_get_token.return_value = "fake-access-token"  # Return a fake token
 
             # Simulate the actual API call
-            response = client.post("/v1/users/create", json=user_data.dict())
+            response = client.post("/v1/users/create", json=user_data.model_dump())
 
             # Debugging: Print the response body to understand the error
             print("Response text:", response.text)
