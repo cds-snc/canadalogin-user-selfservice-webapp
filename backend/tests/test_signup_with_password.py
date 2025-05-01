@@ -29,8 +29,8 @@ def client():
 @pytest.mark.asyncio
 async def test_create_user_success(client):
     user_data = IBMUserCreateRequest(
-        userName="test@example.com",
-        emails=[{"value": "test@example.com"}],
+        userName="test@abc.com",
+        emails=[{"value": "test@abc.com"}],
         password="StrongPassword123",
     )
 
@@ -38,7 +38,7 @@ async def test_create_user_success(client):
     mock_response.status_code = 201
     mock_response.json.return_value = {
         "id": "user-123",
-        "userName": "test@example.com",
+        "userName": "test@abc.com",
     }
 
     with patch(
@@ -51,9 +51,8 @@ async def test_create_user_success(client):
         "app.users.services.create.AsyncClient"
     ) as mock_client_class:
 
-        mock_token.return_value = "fake-access-token"
-        mock_headers.return_value = \
-            {"Authorization": "Bearer fake-access-token"}
+        mock_token.return_value = "fake--token"
+        mock_headers.return_value = {"Authorization": "Bearer fake-token"}
         mock_settings.return_value.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
             "https://fake.ibm.com"
         )
@@ -72,8 +71,8 @@ async def test_create_user_success(client):
 @pytest.mark.asyncio
 async def test_create_user_raises_generic_error(client):
     user_data = IBMUserCreateRequest(
-        userName="test@example.com",
-        emails=[{"value": "test@example.com"}],
+        userName="test@abc.com",
+        emails=[{"value": "test@abc.com"}],
         password="StrongPassword123",
     )
 
@@ -101,16 +100,16 @@ async def test_create_user_raises_generic_error(client):
 @pytest.mark.asyncio
 async def test_signup_success(client):
     user_data = UserLoginRequestData(
-        userName="test@example.com", password="StrongPassword123"
+        userName="test@abc.com", password="StrongPassword123"
     )
 
     # Mock response object
     mock_response = MagicMock()
     mock_response.status_code = 201
     mock_response.json.return_value = {
-        "userName": "test@example.com",
+        "userName": "test@abc.com",
         "id": "abc123",
-        "emails": [{"value": "test@example.com"}],
+        "emails": [{"value": "test@abc.com"}],
     }
 
     # Patch only what's necessary
@@ -125,13 +124,12 @@ async def test_signup_success(client):
         assert isinstance(result, ResponseModel)
         assert result.success is True
         assert result.message == "User created successfully"
-        assert result.data.userName == "test@example.com"
+        assert result.data.userName == "test@abc.com"
 
 
 @pytest.mark.asyncio
 async def test_signup_failure_from_ibm(client):
-    user_data = \
-        UserLoginRequestData(userName="fail@example.com", password="failpass")
+    user_data = UserLoginRequestData(userName="user@abc.com", password="pass")
 
     mock_response = MagicMock()
     mock_response.status_code = 400
@@ -154,7 +152,7 @@ async def test_signup_failure_from_ibm(client):
 @pytest.mark.asyncio
 async def test_signup_validation_error_response(client):
     user_data = UserLoginRequestData(
-        userName="test@example.com", password="StrongPassword123"
+        userName="test@abc.com", password="StrongPassword123"
     )
 
     # Malformed response that fails Pydantic validation
@@ -179,14 +177,14 @@ async def test_signup_validation_error_response(client):
 async def test_user_signup(client):
     # Mock user signup request data
     user_data = UserLoginRequestData(
-        userName="test@example.com", password="testpassword123"
+        userName="test@abc.com", password="testpassword123"
     )
 
     # Mock the response returned from signup_with_password
     mock_response = SignUpResponse(
         success=True,
         message="User created successfully",
-        data=IBMUserCreateResponse(id="user-123", userName="test@example.com"),
+        data=IBMUserCreateResponse(id="user-123", userName="test@abc.com"),
         status_code=201,
     )
 
@@ -198,7 +196,7 @@ async def test_user_signup(client):
     ) as mock_get_token:
 
         # Mock the token response to simulate a successful access token request
-        mock_get_token.return_value = "fake-access-token"
+        mock_get_token.return_value = "fake-token"
 
         # Simulate the actual API call
         response = client.post("/v1/users/create", json=user_data.model_dump())
@@ -211,5 +209,5 @@ async def test_user_signup(client):
         assert response.json() == {
             "success": True,
             "message": "User created successfully",
-            "data": {"id": "user-123", "userName": "test@example.com"},
+            "data": {"id": "user-123", "userName": "test@abc.com"},
         }
