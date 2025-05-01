@@ -3,24 +3,8 @@ graph TB
     RelyingParty[Relying Party]
     WebBrowser["User Agent (Web Browser)"]
 
-    subgraph AWS["CDS AWS Cloud ca-central-1"]
-        subgraph GC Sign in Backend
-            subgraph "VPC"
-                subgraph PublicSubnet["Public Subnet"]
-                    ALB["Application Load Balancer<br/>(routes backend API traffic)"]
-                end
 
-                subgraph PrivateSubnet["Private Subnet"]
-                    subgraph ECS["ECS Cluster (FARGATE)"]
-                        subgraph BackendContainer["Backend Container"]
-                            APIBackend["GC Sign in Backend API (FastAPI)"]
-                            APIClient["IBM Verify API Client"]
-                        end
-                    end
-                end
-            end
-        end
-
+    subgraph AWS["AWS Cloud"]
         subgraph GC Sign in Frontend
             CloudFront["CloudFront<br/>(serves custom Web assets)"]
             subgraph S3[S3 Bucket]
@@ -28,11 +12,30 @@ graph TB
             end
         end
 
-        CloudWatch[CloudWatch]
-        SecretsManager[Secrets Manager]
-        ECR["ECR"]
-        Route53["Route 53 (DNS)"]
-        WAF[AWS WAF]
+        subgraph AWSCanada["CDS AWS ca-central-1"]
+            subgraph GC Sign in Backend
+                subgraph "VPC"
+                    subgraph PublicSubnet["Public Subnet"]
+                        ALB["Application Load Balancer<br/>(routes backend API traffic)"]
+                    end
+
+                    subgraph PrivateSubnet["Private Subnet"]
+                        subgraph ECS["ECS Cluster (FARGATE)"]
+                            subgraph BackendContainer["Backend Container"]
+                                APIBackend["GC Sign in Backend API (FastAPI)"]
+                                APIClient["IBM Verify API Client"]
+                            end
+                        end
+                    end
+                end
+            end
+
+            CloudWatch[CloudWatch]
+            SecretsManager[Secrets Manager]
+            ECR["ECR"]
+            Route53["Route 53 (DNS)"]
+            WAF[AWS WAF]
+        end
     end
 
     subgraph IBMVerify["IBM Cloud (canada)"]
@@ -43,11 +46,9 @@ graph TB
         Sentinel["Microsoft Sentinel (CDS)"]
     end
     
-    
-
     %% Connections
     WebBrowser-->|"Access<br/>HTTPS"| RelyingParty
-    WebBrowser ------->|"HTTPS<br/>Sign in / Sign up / Manage"| AWS
+    WebBrowser----->|"HTTPS<br/>Sign in / Sign up / Manage"| AWS
     RelyingParty-->|"OIDC endpoints<br/>HTTPS"| IBMVerify
     RelyingParty-->|"Redirect (authorize)"| WebBrowser
     CloudFront -->|Web Content| S3
