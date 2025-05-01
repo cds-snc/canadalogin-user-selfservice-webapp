@@ -1,57 +1,62 @@
 %%{init: {'theme':'neutral'}}%%
 graph TB
-    subgraph AWS["CDS AWS Cloud ca-central-1"]
-        subgraph "VPC"
-            subgraph PublicSubnet["Public Subnet"]
-                ALB["Application Load Balancer<br/>(routes backend API traffic)"]
-            end
+    RelyingParty[Relying Party]
+    WebBrowser["User Agent (Web Browser)"]
 
-            subgraph "Private Subnet"
-                subgraph ECS["ECS Cluster"]
-                    subgraph "Backend Container"
-                        APIBackend["GC Sign in Backend API (FastAPI)"]
-                        APIClient["IBM Verify API Client"]
-                    end
+    subgraph AWS["CDS AWS Cloud ca-central-1"]
+        subgraph GC Sign in Backend
+            subgraph "VPC"
+                subgraph PublicSubnet["Public Subnet"]
+                    ALB["Application Load Balancer<br/>(routes backend API traffic)"]
                 end
 
+                subgraph PrivateSubnet["Private Subnet"]
+                    subgraph ECS["ECS Cluster (FARGATE)"]
+                        subgraph BackendContainer["Backend Container"]
+                            APIBackend["GC Sign in Backend API (FastAPI)"]
+                            APIClient["IBM Verify API Client"]
+                        end
+                    end
+                end
+            end
+        end
+
+        subgraph GC Sign in Frontend
+            CloudFront["CloudFront<br/>(serves custom Web assets)"]
+            subgraph S3[S3 Bucket]
+                GCSigninFrontEnd[GC Sign in Frontend Web assets]
             end
         end
 
         CloudWatch[CloudWatch]
         SecretsManager[Secrets Manager]
-        CloudFront["CloudFront<br/>(serves custom Web assets)"]
         ECR["ECR"]
         Route53["Route 53 (DNS)"]
-        subgraph S3[S3 Bucket]
-            GCSigninFrontEnd[GC Sign in Frontend Web assets]
-        end
         WAF[AWS WAF]
-
-        
     end
 
     subgraph IBMVerify["IBM Cloud (canada)"]
         IBMVerifyFeatures["<strong>IBM VERIFY SaaS</strong><br/><br/>OIDC Services<br/>Monitoring and Repoting<br/>APIs<br/>MFA Enroll/Verify<br/>Identity Store"]
     end
 
-    RelyingParty[Relying Party]
-    WebBrowser["User Agent (Web Browser)"]
-
     subgraph Azure["CDS Azure Cloud (canada)"]
         Sentinel["Microsoft Sentinel (CDS)"]
     end
     
+    
+
     %% Connections
-    WebBrowser -->|"HTTPS"| AWS
+    WebBrowser-->|"Access<br/>HTTPS"| RelyingParty
+    WebBrowser ------->|"HTTPS<br/>Sign in / Sign up / Manage"| AWS
+    RelyingParty-->|"OIDC endpoints<br/>HTTPS"| IBMVerify
+    RelyingParty-->|"Redirect (authorize)"| WebBrowser
     CloudFront -->|Static Content| S3
     WAF -.->|Protect| ALB
     WAF -.->|Protect| CloudFront
-    ALB -->|API Requests| APIBackend
+    PublicSubnet -->|API Requests| PrivateSubnet
+    APIBackend-->|Uses| APIClient
     APIClient -->|HTTPS| IBMVerify
     APIClient -->|Secrets| SecretsManager
-    RelyingParty-->|"OIDC endpoints<br/>HTTPS"| IBMVerify
-    WebBrowser-->|"Access<br/>HTTPS"| RelyingParty
-    APIBackend-->|Uses| APIClient
 
     %% Monitoring
     WAF -.->|Logs| CloudWatch
@@ -67,6 +72,7 @@ graph TB
     classDef users fill:#6BBE49,stroke:#232F3E,color:white;
     classDef rp fill:#8B8000,stroke:#232F3E,color:white;
     classDef azure fill:#12267d,stroke:#23F3E,color:white;
+    classDef docker fill:#EEEEEE,stroke:#23F3E,color:grey;
 
     class Route53,CloudFront,ALB,WAF,CFWAF,ECS,ECR,CloudWatch,SecretsManager,WAFLogs,S3 aws;
     class IBMVerifyFeatures ibm;
@@ -74,3 +80,4 @@ graph TB
     class RelyingParty rp;
     class GCSigninFrontEnd,APIBackend,APIClient gcsignin;
     class Sentinel azure;
+    class BackendContainer docker;
