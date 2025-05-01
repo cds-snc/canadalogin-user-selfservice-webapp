@@ -24,7 +24,7 @@ graph TB
         subgraph GC Sign in Frontend
             CloudFront["CloudFront<br/>(serves custom Web assets)"]
             subgraph S3[S3 Bucket]
-                GCSigninFrontEnd[GC Sign in Frontend Web assets]
+                GCSigninFrontEnd["<strong>GC Sign in Frontend Web</strong><br/><br/>Minified JS files (React)<br/>CSS files<br/>Images"]
             end
         end
 
@@ -50,7 +50,7 @@ graph TB
     WebBrowser ------->|"HTTPS<br/>Sign in / Sign up / Manage"| AWS
     RelyingParty-->|"OIDC endpoints<br/>HTTPS"| IBMVerify
     RelyingParty-->|"Redirect (authorize)"| WebBrowser
-    CloudFront -->|Static Content| S3
+    CloudFront -->|Web Content| S3
     WAF -.->|Protect| ALB
     WAF -.->|Protect| CloudFront
     PublicSubnet -->|API Requests| PrivateSubnet

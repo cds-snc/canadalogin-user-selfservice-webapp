@@ -25,7 +25,7 @@ graph TB
         subgraph GC Sign in Frontend
             CloudFront["CloudFront<br/>(serves custom Web assets)"]
             subgraph S3[S3 Bucket]
-                GCSigninFrontEnd[GC Sign in Frontend Web assets]
+                GCSigninFrontEnd["<strong>GC Sign in Frontend Web</strong><br/><br/>Minified JS files (React)<br/>CSS files<br/>Images"]
             end
         end
 
@@ -39,9 +39,9 @@ graph TB
     subgraph GitHub
         subgraph CDSGitHub["CDS GitHub Org"]
             subgraph GitHubActions["GC Sign in GitHub actions"]
-                GitHubAWSOIDCClient["Code Deploy<br/>(AWS OIDC Client)"]
                 GitHubCodeCoverage["Code Coverage"]
                 GitHubCodeScanning["Code Scanning"]
+                GitHubAWSOIDCClient["Code Deploy<br/>(AWS OIDC Client)"]
             end
             GitHubSecrets["GitHub Secrets"]
             subgraph GCSigninCodeRepo["GC Sign in Code Repo"]
@@ -69,7 +69,7 @@ graph TB
     GitHubAWSOIDCClient-->|Deploy| AWS
     GCSigninCodeRepo-->GitHubActions
     GitHubSecrets-->GitHubActions
-    CloudFront -->|Static Content| S3
+    CloudFront -->|Web Content| S3
     WAF -.->|Protect| ALB
     WAF -.->|Protect| CloudFront
     PublicSubnet -->|API Requests| PrivateSubnet
