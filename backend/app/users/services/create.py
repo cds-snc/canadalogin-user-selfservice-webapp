@@ -27,10 +27,11 @@ async def create_user(core_user_data: IBMUserCreateRequest):
         settings = get_settings().ibm_verify_config
         signup_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/Users"
 
-        core_user_data_json = core_user_data.model_dump(
-            by_alias=True)
+        core_user_data_json = core_user_data.model_dump(by_alias=True)
         async with AsyncClient() as client:
-            response = await client.post(signup_url, json=core_user_data_json, headers=headers)
+            response = await client.post(
+                signup_url, json=core_user_data_json, headers=headers
+            )
             logger.info("Request returned")
             return response
 
