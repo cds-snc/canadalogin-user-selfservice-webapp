@@ -398,4 +398,23 @@ export const countryMapping = {
         "zm":"Zambie",
         "zw":"Zimbabwe"
     }
+} 
+
+export const GA_CATEGORIES = {
+    pageView: "pageview",
+    onboarding: "SignUp Flow"
+}
+
+export const GA_ACTIONS = {
+    clickFirstTimeGc: "Clicked FirstTimeGC -> Privacy",
+    acceptPrivacy: "Accepted Privacy",
+    submitSignUpEmail: "Submitted SignUp Email"
+}
+
+export const GA_LABELS = {
+    button: "Button",
+    link: "Link",
+    text: "Text",
+    input: "Input",
+    email: "Email",
 }
