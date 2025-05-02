@@ -1,41 +1,48 @@
 %%{init: {'theme':'neutral'}}%%
 graph TB
-    subgraph AWS["CDS AWS Cloud ca-central-1"]
-        subgraph "VPC"
-            subgraph PublicSubnet["Public Subnet"]
-                ALB["Application Load Balancer<br/>(routes API traffic)"]
-            end
-
-            subgraph "Private Subnet"
-                subgraph "ECS Cluster"
-                    subgraph "Backend Container"
-                        APIProxy["API Proxy (FastAPI)"]
-                        APIClient["IBM Verify API Client"]
-                    end
-                end
-
+    RelyingParty[Relying Party]
+    WebBrowser["User Agent (Web Browser)"]
+    
+    subgraph AWS["AWS Cloud"]
+        subgraph GC Sign in Frontend
+            CloudFront["CloudFront<br/>(serves custom Web assets)"]
+            subgraph S3[S3 Bucket]
+                GCSigninFrontEnd["<strong>GC Sign in Frontend Web</strong><br/><br/>Static Web content<br/>Minified JS files (React)<br/>CSS files<br/>Images"]
             end
         end
 
-        CloudWatch[CloudWatch]
-        SecretsManager[Secrets Manager]
-        CloudFront["CloudFront<br/>(serves custom Web assets)"]
-        Route53["Route 53 (DNS)"]
-        S3[S3 Bucket<br/>Front-end Web assets]
-        WAF[AWS WAF]
+        subgraph AWSCanada["CDS AWS ca-central-1"]
+            subgraph GC Sign in Backend
+                subgraph "VPC"
+                    subgraph PublicSubnet["Public Subnet"]
+                        ALB["Application Load Balancer<br/>(routes backend API traffic)"]
+                    end
 
-        
-    end
+                    subgraph PrivateSubnet["Private Subnet"]
+                        subgraph ECS["ECS Cluster (FARGATE)"]
+                            subgraph BackendContainer["Backend Container"]
+                                APIBackend["GC Sign in Backend API (FastAPI)"]
+                                APIClient["IBM Verify API Client"]
+                            end
+                        end
+                    end
+                end
+            end
 
-    subgraph IBMVerify["IBM Cloud (canada)"]
-        IBMVerifyFeatures["<strong>IBM VERIFY SaaS</strong><br/><br/>OIDC Services<br/>Monitoring and Repoting<br/>APIs<br/>MFA Enroll/Verify<br/>Identity Store"]
+            CloudWatch[CloudWatch]
+            SecretsManager[Secrets Manager]
+            ECR["ECR"]
+            Route53["Route 53 (DNS)"]
+            WAF[AWS WAF]
+        end
     end
 
     subgraph GitHub
         subgraph CDSGitHub["CDS GitHub Org"]
             subgraph GitHubActions["GC Sign in GitHub actions"]
-                GitHubIBMClient["IBM Verify API Client"]
-                GitHubAWSOIDCClient["AWS OIDC Client"]
+                GitHubCodeCoverage["Code Coverage"]
+                GitHubCodeScanning["Code Scanning"]
+                GitHubAWSOIDCClient["Code Deploy<br/>(AWS OIDC Client)"]
             end
             GitHubSecrets["GitHub Secrets"]
             subgraph GCSigninCodeRepo["GC Sign in Code Repo"]
@@ -45,34 +52,35 @@ graph TB
         end
     end
 
-    RelyingParty[Relying Party]
-    WebBrowser["Users (Web Browser)"]
+    subgraph IBMVerify["IBM Cloud (canada)"]
+        IBMVerifyFeatures["<strong>IBM VERIFY SaaS</strong><br/><br/>OIDC Services<br/>Monitoring and Repoting<br/>APIs<br/>MFA Enroll/Verify<br/>Identity Store"]
+    end
 
     subgraph Azure["CDS Azure Cloud (canada)"]
         Sentinel["Microsoft Sentinel (CDS)"]
     end
     
-    %% Connections
-    GitHubAWSOIDCClient-->|Deploy| AWS
-    GitHubIBMClient-->|Configure| IBMVerify
-    GCSigninCodeRepo-->GitHubActions
     
-    WebBrowser -->|"OIDC endpoints<br/>HTTPS<br/>TO BE DECIDED (this could go through AWS API Proxy instead)"| IBMVerify
-    WebBrowser -->|"HTTPS"| AWS
-    CloudFront -->|Static Content| S3
+
+    %% Connections
+    WebBrowser-->|"Access<br/>HTTPS"| RelyingParty
+    WebBrowser----->|"HTTPS<br/>Sign in / Sign up / Manage"| AWS
+    RelyingParty-->|"OIDC endpoints<br/>HTTPS"| IBMVerify
+    RelyingParty-->|"Redirect (authorize)"| WebBrowser    
+    GitHubAWSOIDCClient-->|Deploy| AWS
+    GCSigninCodeRepo-->GitHubActions
+    GitHubSecrets-->GitHubActions
+    CloudFront -->|Web Content| S3
     WAF -.->|Protect| ALB
     WAF -.->|Protect| CloudFront
-    ALB -->|API Requests| APIProxy
-    APIClient -->|Signup+Signin+MFA+Profile HTTPS| IBMVerify
+    PublicSubnet -->|API Requests| PrivateSubnet
+    APIBackend-->|Uses| APIClient
+    APIClient -->|HTTPS| IBMVerify
     APIClient -->|Secrets| SecretsManager
-    RelyingParty-->|"OIDC endpoints<br/>HTTPS<br/>TO BE DECIDED (this could go through AWS API Proxy instead)"| IBMVerify
-    RelyingParty-->|"Redirect (authorize)<br/>HTTPS"| WebBrowser
-    WebBrowser-->|"Redirect (callback)<br/>HTTPS"| RelyingParty
-    APIProxy-->|Uses| APIClient
-
+    
     %% Monitoring
     WAF -.->|Logs| CloudWatch
-    APIProxy -.->|Logs| CloudWatch
+    APIBackend -.->|Logs| CloudWatch
     CloudWatch -->|Logs| Sentinel
     IBMVerify -->|Logs| Sentinel
 
@@ -86,12 +94,14 @@ graph TB
     classDef github fill:#92C3D2,stroke:#23F3E,color:white;
     classDef githubchild fill:#6299B2,stroke:#23F3E,color:white;
     classDef azure fill:#12267d,stroke:#23F3E,color:white;
+    classDef docker fill:#EEEEEE,stroke:#23F3E,color:grey;
 
-    class Route53,CloudFront,ALB,WAF,CFWAF,ECS,CloudWatch,SecretsManager,WAFLogs,S3 aws;
+    class Route53,CloudFront,ALB,WAF,CFWAF,ECS,ECR,CloudWatch,SecretsManager,WAFLogs,S3 aws;
     class IBMVerifyFeatures ibm;
     class WebBrowser users;
     class RelyingParty rp;
-    class GCSigninFrontEnd,APIProxy,APIClient gcsignin;
+    class GCSigninFrontEnd,APIBackend,APIClient gcsignin;
     class GitHubActions,GCSigninCodeRepo,GitHubSecrets github;
-    class GitHubIBMClient,GitHubAWSOIDCClient,ApplicationCode,InfrastructureCode githubchild;
+    class GitHubAWSOIDCClient,ApplicationCode,InfrastructureCode,GitHubCodeCoverage,GitHubCodeScanning githubchild;
     class Sentinel azure;
+    class BackendContainer docker;

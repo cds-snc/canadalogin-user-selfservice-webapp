@@ -14,6 +14,8 @@ import {useUser} from "../../Providers/useUser.tsx";
 import {CONTEXT_ACTIONS} from "../../../utils/constants.jsx";
 import {useNavigate} from "react-router";
 import {NAVIGATION_LINKS} from "../../../utils/constants.jsx";
+import { trackEvent } from "../../../utils/gatag.jsx";
+import {GA_CATEGORIES, GA_ACTIONS, GA_LABELS} from "../../../utils/constants.jsx";
 
 export default function Privacy() {
     const { language } = useParams();
@@ -22,6 +24,12 @@ export default function Privacy() {
 
     async function handleSubmit(event) {
         event.preventDefault();
+        trackEvent({
+            category: GA_CATEGORIES.onboarding,
+            action: GA_ACTIONS.acceptPrivacy,
+            label: GA_LABELS.button
+          });
+
         const userData = { ...state.userData, viewPrivacy: true };
         await dispatch({ type: CONTEXT_ACTIONS.signUp, payload: userData });
         navigate("/" + language + NAVIGATION_LINKS.signUp);

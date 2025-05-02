@@ -5,6 +5,7 @@ import Page from "./views/Page.js";
 import {PAGES} from "./utils/constants.jsx";
 
 function App() {
+
       return (
           <UserProvider>
               <Routes>

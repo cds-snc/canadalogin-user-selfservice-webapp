@@ -19,8 +19,7 @@ async def get_password_policy():
         access_token = await get_access_token()
         if not access_token:
             logger.error("Failed to get access token")
-            raise HTTPException(
-                status_code=500, detail="Failed to get access token")
+            raise HTTPException(status_code=500, detail="Failed to get access token")
 
         headers = get_auth_request_headers(access_token)
         settings = get_settings().ibm_verify_config
@@ -34,10 +33,11 @@ async def get_password_policy():
             response = await client.get(password_policy_url, headers=headers)
 
             if response.status_code != 200:
-                logger.error(
-                    f"Failed to get password policy. Response: {response}")
+                logger.error(f"Failed to get password policy. Response: {response}")
                 raise HTTPException(
-                    status_code=response.status_code, detail="Failed to get password policy")
+                    status_code=response.status_code,
+                    detail="Failed to get password policy",
+                )
 
             logger.info("Request returned successfully")
             response_json = response.json()
@@ -49,14 +49,13 @@ async def get_password_policy():
                 logger.error(f"Validation Error: {e.json()}")
                 print(json.dumps(e.json(), indent=4))
 
-                raise HTTPException(
-                    status_code=422, detail="Response validation error")
+                raise HTTPException(status_code=422, detail="Response validation error")
         return ResponseModel(
             success=True,
             data=validated_data,
-            message="Password policy retrieved successfully")
+            message="Password policy retrieved successfully",
+        )
 
     except Exception as e:
         logger.error(f"Error requesting token: {str(e)}", exc_info=True)
-        raise HTTPException(
-            status_code=400, detail=f"Token request error: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Token request error: {str(e)}")
