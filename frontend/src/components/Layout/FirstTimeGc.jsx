@@ -8,19 +8,17 @@ export default function FirstTimeGc({currentLang})
 {
     const pageContentJson = getPageContent(currentLang, "FirstTimeGc");
     const language = getLanguage(currentLang);
-    const handleClick = () => {
-        trackEvent({
-            category: GA_CATEGORIES.onboarding,
-            action: GA_ACTIONS.clickFirstTimeGc,
-            label: GA_LABELS.link
-      })
-    }
+
     return(
         <GcdsHeading tag="h2">
             {pageContentJson['1']}
             <GcdsText marginTop="200" marginBottom="0">
                 <GcdsLink href={`/${language}${NAVIGATION_LINKS.privacy}`}
-                onClick={handleClick} >
+                onClick={() => trackEvent({
+                    category: GA_CATEGORIES.onboarding,
+                    action: GA_ACTIONS.clickFirstTimeGc,
+                    label: GA_LABELS.link
+                  })} >
                     {pageContentJson['2']}
                 </GcdsLink>
             </GcdsText>
