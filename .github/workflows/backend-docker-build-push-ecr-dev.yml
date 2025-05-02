@@ -1,4 +1,4 @@
-name: Backend Docker Build and Push to ECR
+name: DEV Backend Docker Build and Push to ECR
 
 on:
   push:
@@ -7,19 +7,13 @@ on:
     paths:
       - "backend/**"
       - ".github/workflows/backend-docker-build-push-ecr-dev.yml"
-  pull_request:
-    paths:
-      - "backend/**"
-      - ".github/workflows/backend-docker-build-push-ecr-dev.yml"
 
 env: 
   AWS_REGION: ca-central-1
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+  DEV_AWS_ACCOUNT_ID: ${{secrets.DEV_AWS_ACCOUNT_ID}}
+  TAG_NAME: gc-signin-dev-backend-api
   ECR: ${{ secrets.DEV_AWS_ACCOUNT_ID }}.dkr.ecr.ca-central-1.amazonaws.com/gc-signin-dev-backend-api
   GITHUB_SHA: ${{ github.sha }}
-  TAG_VERSION: ${{ github.ref_name }}
 
 permissions:
   id-token: write
@@ -27,6 +21,7 @@ permissions:
   
 jobs:
   docker-push:
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
     - name: Audit DNS requests
@@ -36,35 +31,19 @@ jobs:
         DNS_PROXY_LOGANALYTICSWORKSPACEID: ${{ secrets.LOG_ANALYTICS_WORKSPACE_ID }}
         DNS_PROXY_LOGANALYTICSSHAREDKEY: ${{ secrets.LOG_ANALYTICS_WORKSPACE_KEY }}
 
-    - name: Setup QEMU
-      uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # v3.6.0
-  
-    - name: Setup Docker Buildx
-      uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2 # v3.10.0
-
-    - name: Confirm secret is accessible
-      run: |
-        if [ -z "${{ secrets.DEV_AWS_ACCOUNT_ID }}" ]; then
-          echo "❌ DEV_AWS_ACCOUNT_ID is not set"
-          exit 1
-        else
-          echo "✅ DEV_AWS_ACCOUNT_ID is available"
-        fi
-
     - name: Checkout
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-    # TODO: Replace with a locked down IAM role
-    # - name: Install AWS CLI
-    #   run: |
-    #       sudo apt-get update
-    #       sudo apt-get install -y awscli
+    - name: configure aws credentials using OIDC role
+      uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
+      with:
+        role-to-assume: arn:aws:iam::$DEV_AWS_ACCOUNT_ID:role/gc-signin-ibm-apply
+        role-session-name: ECRPush 
+        aws-region: ${{ env.AWS_REGION }}
 
     - name: Build Docker image
       working-directory: ./backend/
       run: |
-        echo "======= NAME is $NAME"
-
         docker build \
         --tag $ECR:sha-$GITHUB_SHA \
         --tag $ECR:latest .
@@ -83,7 +62,7 @@ jobs:
       env:
         TRIVY_DB_REPOSITORY: ${{ vars.TRIVY_DB_REPOSITORY }}
       with:
-        docker_image: $ECR:latest
-        dockerfile_path: "backend/Dockerfile"
-        sbom_name: "gc-signin-dev-backend-api"
+        docker_image: $TAG_NAME:latest
+        dockerfile_path: backend/Dockerfile
+        sbom_name: $TAG_NAME
         token: "${{ secrets.GITHUB_TOKEN }}"
