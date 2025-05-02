@@ -42,9 +42,9 @@ git clone https://github.com/cds-snc/gc-signin-ibm.git
 - [IBM Verify Documentation](https://docs.verify.ibm.com/verify/reference/overview)
 
 ### Other GC Sign in Repos
-- [AWS Deployment (Terraform Repo)](https://github.com/cds-snc/gc-signin-terraform)
+- [GC Sign in Terraform Repo (AWS Deployment)](https://github.com/cds-snc/gc-signin-terraform)
 - [IBM Tenant Configuration Repo](https://github.com/cds-snc/gc-signin-ibm-configuration)
-- [GC Sign in Static site](https://github.com/cds-snc/gc-signin-static-website)
+- [GC Sign in Static website](https://github.com/cds-snc/gc-signin-static-website)
 
 ### AWS Deployment
-See [AWS Architecture](docs/architecture/gc-signin-aws-system-architecture.mmd) for infrastructure details and visit the [AWS Deployment (Terraform Repo)](https://github.com/cds-snc/gc-signin-terraform).
+See [AWS Architecture](docs/architecture/gc-signin-aws-system-architecture.mmd) for infrastructure details and visit the [gc-signin-terraform repo](https://github.com/cds-snc/gc-signin-terraform).
