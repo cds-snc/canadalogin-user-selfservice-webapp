@@ -1,11 +1,10 @@
-import {Routes, Route, Navigate, useLocation} from 'react-router';
+import {Routes, Route, Navigate} from 'react-router';
 import {UserProvider} from "./components/Providers/UserProvider";
 import PrivateRoute from "./components/Providers/PrivateRoute.jsx";
 import Page from "./views/Page.js";
 import {PAGES} from "./utils/constants.jsx";
 
 function App() {
-    const location = useLocation();
 
       return (
           <UserProvider>
