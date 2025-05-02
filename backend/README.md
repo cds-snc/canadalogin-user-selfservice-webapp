@@ -1,26 +1,23 @@
 # Backend Application
 
-This is the FastAPI backend application for the GC Sign In proxy service.
+This is the FastAPI backend application for the GC Sign in proxy service.
 
 ## Running with Docker
 
 ### Prerequisites
 
-- Docker installed on your machine
+- Docker installed on your machine (use Colima if on a CDS MacBook)
 - Python 3.12 (if running locally without Docker)
 - `.env` file with required environment variables
 
 ### Environment Variables
 
-Create a `.env` file in the root directory with the following variables:
+Create a `.env` file with the following variables:
 
 ```env
 IBM_VERIFY_TENANT_URL=your_tenant_url
-CORS_ORIGINS=http://localhost:3000
 IBM_VERIFY_API_CLIENT_ID=
 IBM_VERIFY_API_CLIENT_SECRET=
-ENVIRONMENT="dev"
-
 ```
 
 ### Quick Start
@@ -35,7 +32,7 @@ docker build -t gc-signin-backend .
 
 ```bash
 docker run -p 8000:8000 \
-  --env-file ../.env \
+  --env-file ./.env \
   gc-signin-backend
 ```
 
@@ -59,39 +56,12 @@ docker run -p 8000:8000 \
   gc-signin-backend \
   uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
-
-### Project Structure
-
-```
-backend/
-    ├── Dockerfile          # Docker configuration
-├── requirements.txt    # Python dependencies
-└── app/
-    ├── __init__.py
-    ├── main.py        # FastAPI application
-    ├── config.py      # Configuration settings
-    ├── mfa_auth.py    # MFA authentication
-    ├── passkey_auth.py # Passkey authentication
-    └── password_auth.py # Password authentication
-```
-
-### Available Endpoints
-
-- `GET /`: Root endpoint
-- `GET /health`: Health check endpoint
-- `POST /api/auth/signup`: User registration
-- `POST /api/auth/login`: User login
-- `POST /api/auth/password/signin`: Password-based authentication
-- `POST /api/auth/signup/mfa`: MFA registration
-- `POST /api/auth/passkey/register/options`: Get passkey registration options
-- `POST /api/auth/passkey/register/verify`: Verify passkey registration
-
 ### Troubleshooting
 
 1. If you encounter permission issues:
    ```bash
    docker run -p 8000:8000 \
-     --env-file .env \
+     --env-file ./.env \
      -u $(id -u):$(id -g) \
      gc-signin-backend
    ```
@@ -110,7 +80,7 @@ backend/
 
 Monitor the application health:
 ```bash
-curl http://localhost:8000/health
+curl http://localhost:8000/health/health
 ```
 
 Expected response:
@@ -127,22 +97,29 @@ Expected response:
 
 To run the unit tests, follow these steps:
 
-1. Install the development dependencies:
+1. Install the development dependencies (run this from root of the repo):
    ```bash
-   pip install -r requirements-dev.txt
+   make install-dev-python
    ```
 
-2. Run the tests:
+2. Set environment variables (they can be dummy values for mock tests)
    ```bash
-   pytest
+   export IBM_VERIFY_TENANT_URL=abc123
+   export IBM_VERIFY_API_CLIENT_ID=abc123
+   export IBM_VERIFY_API_CLIENT_SECRET=abc123
    ```
 
-3. To run tests with coverage report:
+3. Run all the tests (run this from root of the repo):
+   ```bash
+   make run-pytest
+   ```
+
+4. To run tests with coverage report:
    ```bash
    pytest --cov=app --cov-report=term-missing
    ```
 
-4. To run a specific test:
+5. To run a specific test:
    ```bash
    pytest tests/test_hello.py::test_hello_world -v
    ```
