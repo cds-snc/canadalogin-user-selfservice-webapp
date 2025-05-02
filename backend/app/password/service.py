@@ -56,6 +56,10 @@ async def get_password_policy():
             message="Password policy retrieved successfully",
         )
 
+    except HTTPException as http_exc:
+        # Let existing HTTPExceptions pass through
+        raise http_exc
+
     except Exception as e:
-        logger.error(f"Error requesting token: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=400, detail=f"Token request error: {str(e)}")
+        # Only catch unexpected exceptions
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
