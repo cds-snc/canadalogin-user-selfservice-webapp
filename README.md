@@ -14,7 +14,7 @@ GC Sign in Service integrates with IBM Security Verify to provide a secure and f
 - Multi-factor authentication (MFA) using TOTP
 
 ## Architecture
-The service follows a BFF (backend for frontend) architectural pattern:
+This solution follows a BFF (backend for frontend) architectural pattern:
 - Frontend: React-based SPA
 - Backend: FastAPI Python service
 - Authentication (including OIDC services, Identity Store and RP integration): IBM Security Verify CIAM
