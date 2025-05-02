@@ -59,6 +59,7 @@ export default function Page({page}:{page:string}) {
     const {state} = useUser();
     
     useEffect(() => {
+        trackPage(pathname, page)
     }, [pathname]);
 
     return (

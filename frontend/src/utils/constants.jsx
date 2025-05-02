@@ -401,7 +401,7 @@ export const countryMapping = {
 } 
 
 export const GA_CATEGORIES = {
-    pageView: "Page View",
+    pageView: "pageview",
     onboarding: "SignUp Flow"
 }
 
