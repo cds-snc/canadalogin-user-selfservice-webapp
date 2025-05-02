@@ -31,11 +31,6 @@ async def create_user(core_user_data: IBMUserCreateRequest):
             by_alias=True)
         async with AsyncClient() as client:
             response = await client.post(signup_url, json=core_user_data_json, headers=headers)
-            print(core_user_data_json)
-
-            response = await client.post(
-                signup_url, json=core_user_data_json, headers=headers
-            )
             logger.info("Request returned")
             return response
 
