@@ -1,29 +1,30 @@
-name: "coverage"
+name: "Backend Code Coverage"
 on:
   pull_request:
     branches:
       - main
     paths:
-      - "backend/*"
-      - ".github/workflows/codecoverage.yml"
+      - "backend/**"
+      - ".github/workflows/backend-code-coverage.yml"
 jobs:
-  coverage:
+  backend-code-coverage:
     runs-on: ubuntu-latest
+      
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - name: Set up Python 3.12
+      - name: Set up Python
         uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55 # v5.5.0
         with:
           python-version: "3.13"
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install flake8 pytest
-          if [ -f backend/requirements-dev.txt ]; then pip install -r backend/requirements-dev.txt; fi
+      - name: Install dev dependencies
+        run: make install-dev-python
+
       - name: Test with pytest
-        run: |
-          pytest
-          pytest --cov=backend --cov-report=xml --cov-report=term-missing backend/tests/
+        env:
+          IBM_VERIFY_TENANT_URL: test.com
+          IBM_VERIFY_API_CLIENT_ID: a12345
+          IBM_VERIFY_API_CLIENT_SECRET: a123456
+        run: make run-pytest
       - name: Check Coverage
         uses: orgoro/coverage@v3
         with:

@@ -36,7 +36,8 @@
 				"hashicorp.hcl",
 				"mermaidchart.vscode-mermaid-chart",
 				"eamodio.gitlens",
-				"github.vscode-github-actions"
+				"github.vscode-github-actions",
+				"ms-vscode.makefile-tools"
 			],
 			"settings": {
 				"[terraform]": {

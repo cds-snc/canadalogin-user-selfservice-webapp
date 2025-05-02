@@ -7,8 +7,7 @@ import {
 import {getPageContent} from "../../../utils/functions.jsx";
 import {
     ACTION_TYPES, ERROR_RESPONSE,
-    MSW_VERIFICATION,
-    TEST_TYPES, TEST_USERS
+    TEST_TYPES, TEST_USERS, MSW_MOCKS
 } from "../utils/constants.jsx";
 import {buildTestCase, testCase, TestTemplate} from "../utils/functions.tsx";
 const engErrorPageJson = getPageContent('en', "Error");
@@ -67,7 +66,7 @@ FrErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
 ErrorBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.signUp,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
-    [MSW_VERIFICATION.signup.signUp.error]);
+    [MSW_MOCKS.transientOtpSend.error]);
 ErrorBackEnd.args ={email: "test@test.com"};
 ErrorBackEnd.play = async ({ canvasElement, step }) => {
 
@@ -86,7 +85,7 @@ ErrorBackEnd.play = async ({ canvasElement, step }) => {
 
 SuccessfulBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.signUp,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
-    [MSW_VERIFICATION.signup.signUp.success]);
+    [MSW_MOCKS.transientOtpSend.emailSuccess]);
 SuccessfulBackEnd.args ={email: "test@test.com"};
 SuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
@@ -103,7 +102,7 @@ SuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
 ServerErrorBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.signUp,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
-    [MSW_VERIFICATION.signup.signUp.serverTimeOut]);
+    [MSW_MOCKS.transientOtpSend.serverTimeOut]);
 ServerErrorBackEnd.args ={email: "test@test.com"};
 ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
 
