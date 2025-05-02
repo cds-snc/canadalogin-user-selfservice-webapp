@@ -4,7 +4,7 @@ Provides a modern and accessible React front-end built on top of the [GC Design 
 
 ## Overview
 
-GC Sign in Service integrates with IBM Security Verify to provide a secure and flexible authentication system supporting the following authentication methods.
+**GC Sign in** integrates with IBM Security Verify to provide a secure and flexible authentication system supporting the following authentication methods.
 
 ### For initial pilot release
 - Password + SMS or Voice OTP MFA authentication
