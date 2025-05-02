@@ -1,6 +1,6 @@
 # Backend Application
 
-This is the FastAPI backend application for the GC Sign in proxy service.
+This is the FastAPI application for the GC Sign in back-end API.
 
 ## Running with Docker
 
@@ -15,9 +15,9 @@ This is the FastAPI backend application for the GC Sign in proxy service.
 Create a `.env` file with the following variables:
 
 ```env
-IBM_VERIFY_TENANT_URL=your_tenant_url
-IBM_VERIFY_API_CLIENT_ID=
-IBM_VERIFY_API_CLIENT_SECRET=
+IBM_VERIFY_TENANT_URL=set_this_to_the_dev_tenant
+IBM_VERIFY_API_CLIENT_ID=set_this_to_the_dev_api_client_id
+IBM_VERIFY_API_CLIENT_SECRET=set_this_to_the_dev_api_client_secret
 ```
 
 ### Quick Start
@@ -114,12 +114,24 @@ To run the unit tests, follow these steps:
    make run-pytest
    ```
 
-4. To run tests with coverage report:
+4. Run tests and generate a coverage report:
    ```bash
    pytest --cov=app --cov-report=term-missing
    ```
 
-5. To run a specific test:
+5. Run a specific test:
    ```bash
    pytest tests/test_hello.py::test_hello_world -v
+   ```
+
+## Other commands
+
+- Format python (from root folder)
+   ```bash
+   make fmt-python
+   ```
+
+- Run Lint (from root folder)
+   ```bash
+   make lint-python
    ```
