@@ -4,7 +4,6 @@ from pydantic import BaseModel, Field, EmailStr, ConfigDict
 from pydantic_extra_types.phone_numbers import PhoneNumber
 
 from app.utils.schemas import ResponseModel
-from enum import Enum
 
 
 class EmailModel(BaseModel):
