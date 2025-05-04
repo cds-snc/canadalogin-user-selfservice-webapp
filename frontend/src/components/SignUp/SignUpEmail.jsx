@@ -57,6 +57,11 @@ export default function SignUpEmail() {
                     otpType: FLOW_TYPES.email
                 });
                 if(response.success){
+                    trackEvent({
+                        category: GA_CATEGORIES.onboarding,
+                        action: GA_ACTIONS.submitSignUpEmailSuccess,
+                        label: GA_LABELS.email
+                      });
                     const userData = {
                         ...state.userData,
                         email: formEmail,
@@ -67,10 +72,20 @@ export default function SignUpEmail() {
                     console.log("success", "/" + language + NAVIGATION_LINKS.verifyEmail);
                     navigate("/" + language + NAVIGATION_LINKS.verifyEmail);
                 }else {
+                    trackEvent({
+                        category: GA_CATEGORIES.onboarding,
+                        action: GA_ACTIONS.submitSignUpEmailFailure,
+                        label: GA_LABELS.email
+                      });
                     console.log("Error....", response);
                     setError({emailError: response.message, heading: errorPageJson['1']});
                 }
             } catch (error) {
+                trackEvent({
+                    category: GA_CATEGORIES.onboarding,
+                    action: GA_ACTIONS.submitSignUpEmailError,
+                    label: GA_LABELS.email
+                  });
                 console.error('Signup error:', error);
                 setError({emailError:  errorPageJson[7], heading: errorPageJson['1']});
             }
