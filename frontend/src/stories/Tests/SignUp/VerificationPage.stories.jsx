@@ -414,7 +414,6 @@ const testUserEmail =  TEST_USERS.keys().next().value;
 
 TestUserBadCode.args ={email: testUserEmail, otp: '123456'};
 TestUserBadCode.play = async ({ canvasElement, step }) => {
-    console.log(testUserOtps)
     await testCase({
         canvasElement,
         step,
@@ -432,7 +431,6 @@ const testUserOtps =  TEST_USERS.get(testUserEmail);
 
 TestUserEmail.args ={email: testUserEmail, otp: testUserOtps.emailOtp};
 TestUserEmail.play = async ({ canvasElement, step }) => {
-console.log(testUserOtps)
     await testCase({
         canvasElement,
         step,

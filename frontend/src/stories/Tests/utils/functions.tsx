@@ -188,7 +188,10 @@ function buildMswMapping(mswArray:Array<MSW>){
             if(msw.type==='get')
                 handlers.push(http.get(`${config.apiUrl}${msw.endpoint}`, async () => {return HttpResponse.json(msw.response);}));
             else if(msw.type==='post')
-                handlers.push(http.post(`${config.apiUrl}${msw.endpoint}`, async () => {return HttpResponse.json(msw.response);}));
+                if(msw.response?.status)
+                    handlers.push(http.post(`${config.apiUrl}${msw.endpoint}`, async () => {return HttpResponse.json(msw.response.data, {status: msw.response.status});}));
+                else
+                    handlers.push(http.post(`${config.apiUrl}${msw.endpoint}`, async () => {return HttpResponse.json(msw.response);}));
         });
 
     if(handlers.length){
