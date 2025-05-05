@@ -408,7 +408,26 @@ export const GA_CATEGORIES = {
 export const GA_ACTIONS = {
     clickFirstTimeGc: "Clicked FirstTimeGC -> Privacy",
     acceptPrivacy: "Accepted Privacy",
-    submitSignUpEmail: "Submitted SignUp Email"
+    submitSignUpEmail: "Submitted SignUp Email",
+    submitSignUpEmailSuccess: "SignUp Email Success",
+    submitSignUpEmailFailure: "SignUp Email Failure",
+    submitSignUpEmailError: "SignUp Email Error",
+    submitSignUpEmailOTP: "SignUp Email OTP Submitted",
+    submitSignUpEmailOTPSuccess: "SignUp Email OTP Success",
+    submitSignUpEmailOTPFailure: "SignUp Email OTP Failure",
+    submitSignUpEmailOTPError: "SignUp Email OTP Error",
+    submitEmailSignUpPassword: "Submitted SignUp Password",
+    submitEmailSignUpPasswordSuccess: "SignUp Password Success",
+    submitEmailSignUpPasswordFailure: "SignUp Password Failure",
+    submitEmailSignUpPasswordError: "SignUp Password Error",
+    submitSignUpCoreProfile: "Submitted SignUp Core Profile",
+    submitSignUpCoreProfileSuccess: "SignUp Core Profile Success",
+    submitSignUpCoreProfileFailure: "SignUp Core Profile Failure",
+    submitSignUpCoreProfileError: "SignUp Core Profile Error",
+    submitPhoneNumberOTPType: "Submitted Phone Number and OTP Type",
+    submitPhoneNumberOTPSuccess: "Phone Number verification and OTP Type Success",
+    submitPhoneNumberOTPFailure: "Phone Number verification and OTP Type Failure",
+    submitPhoneNumberOTPError: "Phone Number verification and OTP Type Error"
 }
 
 export const GA_LABELS = {

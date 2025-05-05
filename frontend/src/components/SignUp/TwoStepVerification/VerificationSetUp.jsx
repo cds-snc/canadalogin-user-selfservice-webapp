@@ -13,6 +13,8 @@ import 'react-phone-input-2/lib/material.css';
 import {useUser} from "../../Providers/useUser.tsx";
 import {authService} from "../../../services/authService.jsx";
 import {useNavigate, useParams} from "react-router";
+import { trackEvent } from "../../../utils/gatag.jsx";
+import {GA_CATEGORIES, GA_ACTIONS} from "../../../utils/constants.jsx";
 
 export default function VerificationSetUp() {
     const {state, dispatch} = useUser();
@@ -31,6 +33,11 @@ export default function VerificationSetUp() {
             const formData = new FormData(e.target);
             const formNumber = await formData.get('phone').replace(/\D/g,'');
             const formType = formData.get('verificationType');
+            trackEvent({
+                category: GA_CATEGORIES.onboarding,
+                action: GA_ACTIONS.submitPhoneNumberOTPType,
+                label: formType
+            });
 
             if (phone.length < countryCodeLength) {
                 if(phone.length===0)
@@ -49,16 +56,30 @@ export default function VerificationSetUp() {
                 });
                 console.log(response);
                 if(response.success){
+                    trackEvent({
+                        category: GA_CATEGORIES.onboarding,
+                        action: GA_ACTIONS.submitPhoneNumberOTPSuccess,
+                        label: formType
+                    });
                     const userData = {...state.userData, phone:formData.get('phone'), stepVerificationSent: true, trxnId:response.data.trxnId};
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                     console.log("success....", response);
                     navigate("/" + language +"/"+FLOW_TYPES.signUp +NAVIGATION_LINKS.verification+'/'+formType);
                 }else {
+                    trackEvent({
+                        category: GA_CATEGORIES.onboarding,
+                        action: GA_ACTIONS.submitPhoneNumberOTPFailure,
+                        label: formType
+                    });
                     console.log("Error....", response);
                     setError({phoneError: response.message, heading: errorPageJson['1']});
                 }
             } catch (error) {
-
+                trackEvent({
+                    category: GA_CATEGORIES.onboarding,
+                    action: GA_ACTIONS.submitPhoneNumberOTPError,
+                    label: formType
+                });
                 console.error('Signup error:', error);
                 setError({phoneError:  errorPageJson[7], heading: errorPageJson['1']});
             }

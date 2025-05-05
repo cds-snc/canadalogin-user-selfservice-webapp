@@ -18,6 +18,8 @@ import SubmitButton from "../Layout/SubmitButton.jsx";
 import {useUser} from "../Providers/useUser.tsx";
 import {authService} from "../../services/authService.jsx";
 import {useEffect, useState, useTransition} from "react";
+import { trackEvent } from "../../utils/gatag.jsx";
+import {GA_CATEGORIES, GA_ACTIONS, GA_LABELS} from "../../utils/constants.jsx";
 
 const initialTime=10;
 
@@ -107,6 +109,11 @@ export default function Verification() {
     function  handleSubmit (e){
         startTransition(async()=> {
             e.preventDefault();
+            trackEvent({
+                category: GA_CATEGORIES.onboarding,
+                action: GA_ACTIONS.submitSignUpEmailOTP,
+                label: GA_LABELS.email
+            });
 
             const formData = new FormData(e.target);
             const formCode = formData.get('verificationCode');
@@ -125,6 +132,11 @@ export default function Verification() {
                     userName: state.userData.email  //part of TEST_USERS, not needed if removed
                 });
                 if(response.success){
+                    trackEvent({
+                        category: GA_CATEGORIES.onboarding,
+                        action: GA_ACTIONS.submitSignUpEmailOTPSuccess,
+                        label: GA_LABELS.email
+                    });
                     if(flow===FLOW_TYPES.signUp) {
                         if(type===FLOW_TYPES.email)
                         {
@@ -145,10 +157,20 @@ export default function Verification() {
                         navigate("/" + language + '/redirecttorp');
                     }
                 }else {
+                    trackEvent({
+                        category: GA_CATEGORIES.onboarding,
+                        action: GA_ACTIONS.submitSignUpEmailOTPFailure,
+                        label: GA_LABELS.email
+                    });
                     console.log("Error....", response);
                     setError({codeError: response.message, heading: errorPageJson['1']});
                 }
             } catch (error) {
+                trackEvent({
+                    category: GA_CATEGORIES.onboarding,
+                    action: GA_ACTIONS.submitSignUpEmailOTPError,
+                    label: GA_LABELS.email
+                });
                 console.error('Signup error:', error);
                 setError({codeError:  errorPageJson[7], heading: errorPageJson['1']});
             }

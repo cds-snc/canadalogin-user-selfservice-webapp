@@ -24,6 +24,8 @@ import {useUser} from "../Providers/useUser.tsx";
 import SubmitButton from "../Layout/SubmitButton.jsx";
 import {useNavigate, useParams} from "react-router";
 import AlreadyGc from "../Layout/AlreadyGc.jsx";
+import { trackEvent } from "../../utils/gatag.jsx";
+import {GA_CATEGORIES, GA_ACTIONS, GA_LABELS} from "../../utils/constants.jsx";
 
 export default function Password() {
     const {state, dispatch} = useUser();
@@ -60,6 +62,11 @@ export default function Password() {
     async function handleSubmit (event) {
         startTransition(async()=> {
             event.preventDefault();
+            trackEvent({
+                category: GA_CATEGORIES.onboarding,
+                action: GA_ACTIONS.submitEmailSignUpPassword,
+                label: GA_LABELS.email
+            });
 
             const formData = new FormData(event.target);
             formData.get('password');
@@ -79,6 +86,11 @@ export default function Password() {
                 });
 
                 if (response.success && response.data.id!==null) {
+                    trackEvent({
+                        category: GA_CATEGORIES.onboarding,
+                        action: GA_ACTIONS.submitEmailSignUpPasswordSuccess,
+                        label: GA_LABELS.email
+                    });
                     console.log("User created successfully ", response);
                     const userData = {...state.userData, passwordSubmitted: true, id:response.data.id};
                     console.log("userData ", userData);
@@ -87,10 +99,20 @@ export default function Password() {
                     navigate("/" + language + NAVIGATION_LINKS.twoStepVerification);
                     console.log("navigating.....")
                 } else {
+                    trackEvent({
+                        category: GA_CATEGORIES.onboarding,
+                        action: GA_ACTIONS.submitEmailSignUpPasswordFailure,
+                        label: GA_LABELS.email
+                    });
                     console.log("Error....", response);
                     setError({passwordError: response.message, heading: errorPageJson['1']});
                 }
             } catch (error) {
+                trackEvent({
+                    category: GA_CATEGORIES.onboarding,
+                    action: GA_ACTIONS.submitEmailSignUpPasswordError,
+                    label: GA_LABELS.email
+                });
                 console.error('Signup error:', error);
                 setError({passwordError: errorPageJson[7], heading: errorPageJson['1']});
             }
