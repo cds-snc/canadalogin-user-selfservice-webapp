@@ -1,6 +1,6 @@
 from enum import Enum
 from typing import List, Optional
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, Field, EmailStr, ConfigDict
 from pydantic_extra_types.phone_numbers import PhoneNumber
 
 from app.utils.schemas import ResponseModel
@@ -19,12 +19,37 @@ class UserLoginRequestData(BaseModel):
 # Signup Schema
 
 
+class NotifyType(str, Enum):
+    EMAIL = "EMAIL"
+    NONE = "NONE"
+
+
+class IBMNotificationExtension(BaseModel):
+    notifyPassword: bool = Field(
+        default=False,
+        description="Notify the user the password they entered. Setting to true will send a email with the password they entered",
+    )
+    notifyType: NotifyType = Field(
+        default=NotifyType.EMAIL,
+        description="Setting to NONE will not send any notification, Setting the value to EMAIL will send a notification email to the user that the account was created",
+    )
+
+
 class IBMUserCreateRequest(BaseModel):
-    schemas: List[str] = ["urn:ietf:params:scim:schemas:core:2.0:User"]
+    model_config = ConfigDict(populate_by_name=True, validate_by_name=True)
+
+    schemas: List[str] = [
+        "urn:ietf:params:scim:schemas:core:2.0:User",
+        "urn:ietf:params:scim:schemas:extension:ibm:2.0:Notification",
+    ]
     userName: str
     emails: List[EmailModel]
     password: str
     active: bool = True
+    notification: IBMNotificationExtension = Field(
+        default_factory=IBMNotificationExtension,
+        alias="urn:ietf:params:scim:schemas:extension:ibm:2.0:Notification",
+    )
 
 
 class IBMUserCreateResponse(BaseModel):

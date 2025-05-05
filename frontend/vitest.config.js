@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react'
 const filesToInclude = [
     '**/src/App.jsx',
     '**/src/utils/*',
+    '**/src/hooks/*',
     '**/src/views/**/*',
     '**/src/components/**/*',
     '**/src/services/*',

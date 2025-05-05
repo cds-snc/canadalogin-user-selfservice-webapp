@@ -72,6 +72,24 @@ export const ERROR_RESPONSE = {
     "data": null
 };
 
+export const EMAIL_ERROR_RESPONSE =
+{
+    "data": {
+        "success": false,
+        "message": "value is not a valid email address: The part after the @-sign is not valid. It should have a period.",
+        "data": null
+    },
+    "status": 400,
+}
+export const SERVER_TIMEOUT_RESPONSE =
+{
+    "data": {
+        "success": false,
+        "message": null,
+        "data": null
+    },
+    "status": 500,
+}
 
 export const TEST_RESPONSES = {
     signUpResponse: {
@@ -151,6 +169,7 @@ export const MSW_PASSWORD_POLICY = {type:"get", endpoint: SUBMIT_END_POINTS.requ
 export const MSW_MOCKS ={
     passwordPolicy: {type:"get", endpoint: SUBMIT_END_POINTS.requestPasswordPolicy, response:POLICY_RESPONSE },
     transientOtpSend:{
+        emailError: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpSend, response: EMAIL_ERROR_RESPONSE},
         error:  {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpSend, response: ERROR_RESPONSE},
         serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpSend, response: null},
         emailSuccess: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpSend, response: TEST_RESPONSES.signUpResponse},

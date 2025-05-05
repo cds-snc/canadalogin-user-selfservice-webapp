@@ -18,9 +18,9 @@ function isValidRoute (page, state, flow, type) {
 
     if(flow===FLOW_TYPES.signIn)
         switch (page) {
-            case(PAGES.verification):
-                return true;
             case(PAGES.password):
+                return signIn.checkPasswordPage(state);
+            case(PAGES.verification):
                 return true;
             default:
                 return false;
@@ -28,41 +28,49 @@ function isValidRoute (page, state, flow, type) {
 
     switch(page){
         case(PAGES.coreProfile):
-            return checkCoreProfilePage(state);
+            return signUp.checkCoreProfilePage(state);
         case(PAGES.verification):
-            return checkVerificationPage(state, type);
+            return signUp.checkVerificationPage(state, type);
         case(PAGES.verificationSetUp):
-            return checkVerificationSetUpPage(state);
+            return signUp.checkVerificationSetUpPage(state);
         case(PAGES.password):
-            return  checkPasswordPage(state);
+            return  signUp.checkPasswordPage(state);
         case(PAGES.signup):
-            return checkSignUpPage(state);
+            return signUp.checkSignUpPage(state);
         default:
             return false;
 
     }
 }
 
-function checkSignUpPage(state){
-    return state.userData.viewPrivacy;
+const signUp = {
+    checkSignUpPage: (state)=> {
+        return state.userData.viewPrivacy;
+    },
+    checkVerificationPage: (state, type) => {
+        if (type === FLOW_TYPES.email) {
+            return signUp.checkSignUpPage(state) && isEmailValid(state.userData.email);
+        }
+        else {
+            return signUp.checkVerificationSetUpPage(state) && state.userData.stepVerificationSent && state.userData.phone;
+        }
+    },
+    checkPasswordPage: (state) => {
+        return signUp.checkVerificationPage(state, 'email') && state.userData.emailValidated;
+    },
+    checkVerificationSetUpPage: (state) => {
+        return signUp.checkPasswordPage(state) && state.userData.passwordSubmitted && state.userData.id;
+    },
+    checkCoreProfilePage: (state) => {
+
+        return signUp.checkVerificationPage(state, null) && state.userData.stepVerified;
+    }
 }
 
-function checkVerificationPage(state, type){
-    if(type===FLOW_TYPES.email)
-        return checkSignUpPage(state)&&isEmailValid(state.userData.email);
-    else
-        return checkVerificationSetUpPage(state)&&state.userData.stepVerificationSent&&state.userData.phone;
+const signIn = {
+    checkPasswordPage: (state) =>{
+        return isEmailValid(state.userData.email)
+    }
 }
 
-function checkPasswordPage(state){
-    return checkSignUpPage(state)&&state.userData.emailValidated;
-}
-
-function checkVerificationSetUpPage(state){
-    return checkPasswordPage(state)&&state.userData.passwordSubmitted&&state.userData.id;
-}
-
-function checkCoreProfilePage(state){
-    return checkVerificationPage(state, null)&&state.userData.stepVerified;
-}
 export default PrivateRoute;

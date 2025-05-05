@@ -64,7 +64,7 @@ export default function Password() {
             event.preventDefault();
             trackEvent({
                 category: GA_CATEGORIES.onboarding,
-                action: GA_ACTIONS.submitEmailSignUpPassword,
+                action: GA_ACTIONS.emailSignUpPassword,
                 label: GA_LABELS.email
             });
 
@@ -80,39 +80,26 @@ export default function Password() {
             setError({passwordError: null, heading: null});
 
             try {
-                const response = await authService.create({
-                    userName: state.userData.email,
-                    password: formData.get('password'),
-                });
+                if(flow===FLOW_TYPES.signUp) {
+                    const response = await authService.create({
+                        userName: state.userData.email,
+                        password: formData.get('password'),
+                    });
 
-                if (response.success && response.data.id!==null) {
-                    trackEvent({
-                        category: GA_CATEGORIES.onboarding,
-                        action: GA_ACTIONS.submitEmailSignUpPasswordSuccess,
-                        label: GA_LABELS.email
-                    });
-                    console.log("User created successfully ", response);
-                    const userData = {...state.userData, passwordSubmitted: true, id:response.data.id};
-                    console.log("userData ", userData);
-                    await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
-                    console.log("navigate ", "/" + language + NAVIGATION_LINKS.twoStepVerification);
-                    navigate("/" + language + NAVIGATION_LINKS.twoStepVerification);
-                    console.log("navigating.....")
-                } else {
-                    trackEvent({
-                        category: GA_CATEGORIES.onboarding,
-                        action: GA_ACTIONS.submitEmailSignUpPasswordFailure,
-                        label: GA_LABELS.email
-                    });
-                    console.log("Error....", response);
-                    setError({passwordError: response.message, heading: errorPageJson['1']});
+                    if (response.success && response.data.id !== null) {
+                        console.log("User created successfully ", response);
+                        const userData = {...state.userData, passwordSubmitted: true, id: response.data.id};
+                        console.log("userData ", userData);
+                        await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
+                        console.log("navigate ", "/" + language + NAVIGATION_LINKS.twoStepVerification);
+                        navigate("/" + language + NAVIGATION_LINKS.twoStepVerification);
+                        console.log("navigating.....")
+                    } else {
+                        console.log("Error....", response);
+                        setError({passwordError: response.message, heading: errorPageJson['1']});
+                    }
                 }
             } catch (error) {
-                trackEvent({
-                    category: GA_CATEGORIES.onboarding,
-                    action: GA_ACTIONS.submitEmailSignUpPasswordError,
-                    label: GA_LABELS.email
-                });
                 console.error('Signup error:', error);
                 setError({passwordError: errorPageJson[7], heading: errorPageJson['1']});
             }

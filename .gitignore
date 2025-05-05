@@ -15,6 +15,7 @@ frontend/package-lock.json
 
 #Backend
 __pycache__
+core
 backend/.coverage
 .coverage
 coverage.xml
