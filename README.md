@@ -1,6 +1,6 @@
 # GC Sign in
 
-Provides a modern and accessible React front-end built on top of the [GC Design System](https://github.com/cds-snc/gcds-components), and a supporting FastAPI back-end API that integrates with the IBM Verify SaaS to enable OIDC single sign-on flows including Sign Up with password+MFA, Sign in and Management of a user's profile.
+Provides a modern and accessible React front-end built with the [GC Design System](https://github.com/cds-snc/gcds-components), and a supporting FastAPI back-end API that integrates with the IBM Verify SaaS to enable OIDC single sign-on flows including Sign Up with password+MFA, Sign in and Management of a user's profile.
 
 ## Overview
 
@@ -17,10 +17,11 @@ Provides a modern and accessible React front-end built on top of the [GC Design 
 This solution follows a BFF (backend for frontend) architectural pattern:
 - Frontend: React-based SPA
 - Backend: FastAPI Python service
-- Authentication (including OIDC services, Identity Store and RP integration): IBM Security Verify CIAM
-- Infrastructure: AWS (ECS, ECR, ALB, Secrets Manager, CloudFront, Route 53, WAF, CloudWatch), IBM Verify SaaS Tenants
+- Authentication and Identity Store: IBM Security Verify CIAM
+- Infrastructure (AWS): ECS, ECR, ALB, Secrets Manager, CloudFront, Route 53, WAF, CloudWatch
+- Infrastructure (IBM): IBM Security Verify SaaS Tenants
 
-### Environment Strategy
+### Environments
 - Development (DEV)
 - Staging (STAGING)
 - Production (PROD)
