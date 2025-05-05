@@ -6,8 +6,9 @@ import {
 } from "../../../utils/constants.jsx";
 import {getPageContent} from "../../../utils/functions.jsx";
 import {
-    ACTION_TYPES, ERROR_RESPONSE,
-    TEST_TYPES, TEST_USERS, MSW_MOCKS
+    ACTION_TYPES,
+    TEST_TYPES, TEST_USERS,
+    MSW_MOCKS, EMAIL_ERROR_RESPONSE
 } from "../utils/constants.jsx";
 import {buildTestCase, testCase, TestTemplate} from "../utils/functions.tsx";
 const engErrorPageJson = getPageContent('en', "Error");
@@ -66,7 +67,7 @@ FrErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
 ErrorBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.signUp,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
-    [MSW_MOCKS.transientOtpSend.error]);
+    [MSW_MOCKS.transientOtpSend.emailError]);
 ErrorBackEnd.args ={email: "test@test.com"};
 ErrorBackEnd.play = async ({ canvasElement, step }) => {
 
@@ -76,7 +77,7 @@ ErrorBackEnd.play = async ({ canvasElement, step }) => {
         stepMessage:"Submit form with bad email For Back End Error",
         link: 'email',
         heading: engErrorPageJson[1],
-        message: ERROR_RESPONSE.message,
+        message: EMAIL_ERROR_RESPONSE.data.message,
         delay: 1000,
         actionType: ACTION_TYPES.submit,
         type: TEST_TYPES.error
