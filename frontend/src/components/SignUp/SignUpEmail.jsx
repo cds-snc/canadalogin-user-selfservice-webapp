@@ -18,7 +18,7 @@ import {useError} from "../../hooks/useError";
 
 
 export default function SignUpEmail() {
-    const {language} = useParams();
+    const {language, flow} = useParams();
     const {state} = useUser();
     const [email, setEmail] = useState(state.userData.email);
     const pageContentJson = getPageContent(language, PAGES.signup);
@@ -39,6 +39,7 @@ export default function SignUpEmail() {
         endpoint: SUBMIT_END_POINTS.transientOtpSend,
         navigateTo: "/" + language + NAVIGATION_LINKS.verifyEmail, type:FLOW_TYPES.email,
         page: PAGES.signup,
+        flow: flow,
         onError: (err)=> setError('#email',err)
     };
     const {handleSubmit, isPending} = useSubmit(submitDataOptions, validateEmail );
