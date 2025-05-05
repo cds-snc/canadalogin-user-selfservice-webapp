@@ -1,5 +1,5 @@
 import {FormEvent, useTransition} from 'react';
-import {CONTEXT_ACTIONS, FLOW_TYPES, GA_CATEGORIES, GA_LABELS, PAGES, SUBMIT_END_POINTS} from "../utils/constants.jsx";
+import {CONTEXT_ACTIONS, FLOW_TYPES, GA_LABELS, PAGES, SUBMIT_END_POINTS} from "../utils/constants.jsx";
 import {useUser} from "../components/Providers/useUser";
 import {authService} from "../services/authService.jsx";
 import {useNavigate} from "react-router";
@@ -14,7 +14,6 @@ interface SubmitDataOptions {
     navigateTo: string,
     onError: (error: Error) => void
 }
-
 
 export function useSubmit(submitDataOptions:SubmitDataOptions, validateFunction:any ) {
     const {state, dispatch} = useUser();
