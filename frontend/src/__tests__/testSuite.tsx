@@ -298,6 +298,7 @@ const testSuite = {
         const gcdsElementMap = pageSetup.gcdsMap(language, page, pageContentJson, flow);
 
         Object.keys(pageContentJson).forEach(key => {
+
             if(gcdsElementMap.has(key))
                 verifyGcdsHtmlElement(gcdsElementMap.get(key)[0], gcdsElementMap.get(key)[1]);
             else if (!textKeysToNotSearch.includes(key))
