@@ -44,7 +44,7 @@ jobs:
       working-directory: ./backend/
       run: |
         docker build \
-        --tag $ECR:sha-$GITHUB_SHA \
+        --tag $ECR:$GITHUB_SHA \
         --tag $ECR:latest .
 
     - name: Login to Amazon ECR
