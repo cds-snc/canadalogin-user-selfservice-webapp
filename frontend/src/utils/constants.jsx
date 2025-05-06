@@ -60,7 +60,7 @@ export const SUBMIT_END_POINTS = {
 
 export const GA_CATEGORIES = {
     pageView: "pageview",
-    onboarding: "sign_up_flow",
+    signup: "sign_up_flow",
     signIn: "sign_in",
 }
 
@@ -68,15 +68,10 @@ export const GA_ACTIONS = {
     clickFirstTimeGc: "Clicked FirstTimeGC -> Privacy",
     acceptPrivacy: "Accepted Privacy",
     submitSignUpEmail: "SignUp Email",
-
-    submitSignUpEmailOTP: "Email OTP Submitted",
-
+    signUpEmailOTP: "Email OTP Submitted",
     emailSignUpPassword: "SignUp Password",
-
     signUpCoreProfile: "SignUp Core Profile",
-
     phoneNumberOTPType: "Phone Number and OTP Type",
-
 }
 
 export const GA_LABELS = {

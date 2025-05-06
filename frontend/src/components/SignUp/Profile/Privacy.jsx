@@ -25,7 +25,7 @@ export default function Privacy() {
     async function handleSubmit(event) {
         event.preventDefault();
         trackEvent({
-            category: GA_CATEGORIES.onboarding,
+            category: GA_CATEGORIES.signup,
             action: GA_ACTIONS.acceptPrivacy,
             label: GA_LABELS.button
           });

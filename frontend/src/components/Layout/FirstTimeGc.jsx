@@ -15,7 +15,7 @@ export default function FirstTimeGc({currentLang})
             <GcdsText marginTop="200" marginBottom="0">
                 <GcdsLink href={`/${language}${NAVIGATION_LINKS.privacy}`}
                 onClick={() => trackEvent({
-                    category: GA_CATEGORIES.onboarding,
+                    category: GA_CATEGORIES.signup,
                     action: GA_ACTIONS.clickFirstTimeGc,
                     label: GA_LABELS.link
                   })} >

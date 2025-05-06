@@ -24,8 +24,8 @@ export default function CreateCoreProfile() {
         startTransition(async()=> {
             e.preventDefault();
             trackEvent({
-                category: GA_CATEGORIES.onboarding,
-                action: GA_ACTIONS.submitSignUpCoreProfile,
+                category: GA_CATEGORIES.signup,
+                action: GA_ACTIONS.signUpCoreProfile,
                 label: GA_LABELS.button
             });
 
@@ -51,30 +51,15 @@ export default function CreateCoreProfile() {
                     userName: state.userData.email
                 });
                 if(response.success){
-                    trackEvent({
-                        category: GA_CATEGORIES.onboarding,
-                        action: GA_ACTIONS.submitSignUpCoreProfileSuccess,
-                        label: GA_LABELS.button
-                    });
                     const userData = {...state.userData, coreProfileCreated: true};
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                     console.log("success...",response)
                     navigate("/" + language + '/redirecttorp');
                 }else {
-                    trackEvent({
-                        category: GA_CATEGORIES.onboarding,
-                        action: GA_ACTIONS.submitSignUpCoreProfileFailure,
-                        label: GA_LABELS.button
-                    });
                     console.log("Error....", response);
                     setError({nameError: response.message, heading: errorPageJson['1']});
                 }
             } catch (error) {
-                trackEvent({
-                    category: GA_CATEGORIES.onboarding,
-                    action: GA_ACTIONS.submitSignUpCoreProfileError,
-                    label: GA_LABELS.button
-                });
                 console.error('Signup error:', error);
                 setError({nameError:  errorPageJson[7], heading: errorPageJson['1']});
             }

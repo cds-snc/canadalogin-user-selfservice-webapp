@@ -110,9 +110,9 @@ export default function Verification() {
         startTransition(async()=> {
             e.preventDefault();
             trackEvent({
-                category: GA_CATEGORIES.onboarding,
-                action: GA_ACTIONS.submitSignUpEmailOTP,
-                label: GA_LABELS.email
+                category: GA_CATEGORIES.signup,
+                action: GA_ACTIONS.signUpEmailOTP,
+                label: GA_LABELS.button
             });
 
             const formData = new FormData(e.target);
@@ -132,11 +132,6 @@ export default function Verification() {
                     userName: state.userData.email  //part of TEST_USERS, not needed if removed
                 });
                 if(response.success){
-                    trackEvent({
-                        category: GA_CATEGORIES.onboarding,
-                        action: GA_ACTIONS.submitSignUpEmailOTPSuccess,
-                        label: GA_LABELS.email
-                    });
                     if(flow===FLOW_TYPES.signUp) {
                         if(type===FLOW_TYPES.email)
                         {
@@ -157,20 +152,10 @@ export default function Verification() {
                         navigate("/" + language + '/redirecttorp');
                     }
                 }else {
-                    trackEvent({
-                        category: GA_CATEGORIES.onboarding,
-                        action: GA_ACTIONS.submitSignUpEmailOTPFailure,
-                        label: GA_LABELS.email
-                    });
                     console.log("Error....", response);
                     setError({codeError: response.message, heading: errorPageJson['1']});
                 }
             } catch (error) {
-                trackEvent({
-                    category: GA_CATEGORIES.onboarding,
-                    action: GA_ACTIONS.submitSignUpEmailOTPError,
-                    label: GA_LABELS.email
-                });
                 console.error('Signup error:', error);
                 setError({codeError:  errorPageJson[7], heading: errorPageJson['1']});
             }

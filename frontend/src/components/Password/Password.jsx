@@ -63,9 +63,9 @@ export default function Password() {
         startTransition(async()=> {
             event.preventDefault();
             trackEvent({
-                category: GA_CATEGORIES.onboarding,
+                category: GA_CATEGORIES.signup,
                 action: GA_ACTIONS.emailSignUpPassword,
-                label: GA_LABELS.email
+                label: GA_LABELS.button
             });
 
             const formData = new FormData(event.target);

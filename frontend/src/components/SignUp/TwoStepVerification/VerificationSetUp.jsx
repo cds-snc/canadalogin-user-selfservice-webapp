@@ -34,8 +34,8 @@ export default function VerificationSetUp() {
             const formNumber = await formData.get('phone').replace(/\D/g,'');
             const formType = formData.get('verificationType');
             trackEvent({
-                category: GA_CATEGORIES.onboarding,
-                action: GA_ACTIONS.submitPhoneNumberOTPType,
+                category: GA_CATEGORIES.signup,
+                action: GA_ACTIONS.phoneNumberOTPType,
                 label: formType
             });
 
@@ -56,30 +56,15 @@ export default function VerificationSetUp() {
                 });
                 console.log(response);
                 if(response.success){
-                    trackEvent({
-                        category: GA_CATEGORIES.onboarding,
-                        action: GA_ACTIONS.submitPhoneNumberOTPSuccess,
-                        label: formType
-                    });
                     const userData = {...state.userData, phone:formData.get('phone'), stepVerificationSent: true, trxnId:response.data.trxnId};
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                     console.log("success....", response);
                     navigate("/" + language +"/"+FLOW_TYPES.signUp +NAVIGATION_LINKS.verification+'/'+formType);
                 }else {
-                    trackEvent({
-                        category: GA_CATEGORIES.onboarding,
-                        action: GA_ACTIONS.submitPhoneNumberOTPFailure,
-                        label: formType
-                    });
                     console.log("Error....", response);
                     setError({phoneError: response.message, heading: errorPageJson['1']});
                 }
             } catch (error) {
-                trackEvent({
-                    category: GA_CATEGORIES.onboarding,
-                    action: GA_ACTIONS.submitPhoneNumberOTPError,
-                    label: formType
-                });
                 console.error('Signup error:', error);
                 setError({phoneError:  errorPageJson[7], heading: errorPageJson['1']});
             }
