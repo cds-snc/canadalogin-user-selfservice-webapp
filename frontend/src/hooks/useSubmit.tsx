@@ -28,7 +28,7 @@ export function useSubmit(submitDataOptions:SubmitDataOptions, validateFunction:
                     if (!validateObject(submitDataOptions.page, formData, validateFunction))
                         return;
 
-                    const response = await callAuthService(submitDataOptions, formData);
+                    const response = await callAuthService(submitDataOptions, formData, state.userData);
                     const userData = setUserData(submitDataOptions.page, formData, state.userData, response);
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                     await callAnalytics(submitDataOptions, "submit_success");
@@ -61,7 +61,7 @@ async function callAnalytics(submitDataOptions: SubmitDataOptions, submitAction:
     });
 }
 
-async function callAuthService(submitDataOptions:SubmitDataOptions, formData:FormData) {
+async function callAuthService(submitDataOptions:SubmitDataOptions, formData:FormData, userData:any) {
     let payload = {};
     switch(submitDataOptions.endpoint){
         case(SUBMIT_END_POINTS.transientOtpSend):
@@ -71,6 +71,12 @@ async function callAuthService(submitDataOptions:SubmitDataOptions, formData:For
                     otpType: FLOW_TYPES.email
                 };
             return await authService.transientOtpSend({...payload});
+        case(SUBMIT_END_POINTS.create):
+            payload = {
+                userName: userData.email,
+                password: formData.get('password')
+            }
+            return await authService.create({...payload});
         default :
             return {};
     }
@@ -81,16 +87,13 @@ function setUserData(page:string, formData: FormData, userData:any, response:any
     switch (page) {
         case PAGES.signup:
             return  {
-                ...userData,
-                email: formData.get(FLOW_TYPES.email),
-                emailLanguage: formData.get('language'),
-                trxnId: response.data.trxnId
+                ...userData, email: formData.get(FLOW_TYPES.email),
+                emailLanguage: formData.get('language'), trxnId: response.data.trxnId
             }
         case PAGES.home:
-            return {
-                ...userData,
-                email: formData.get(FLOW_TYPES.email)
-            }
+            return {...userData, email: formData.get(FLOW_TYPES.email)};
+        case PAGES.password:
+            return {...userData, passwordSubmitted: true, id: response.data.id};
         default:
             return {}
     }
@@ -102,6 +105,8 @@ function validateObject(page: string, formData:any, validateFunction: any) {
             return  validateFunction(formData.get(FLOW_TYPES.email));
         case PAGES.home:
             return  validateFunction(formData.get(FLOW_TYPES.email));
+        case PAGES.password:
+            return  validateFunction(formData.get('password'));
         default:
             return true;
     }
