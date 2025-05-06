@@ -11,6 +11,8 @@ on:
 env: 
   AWS_REGION: ca-central-1
   TAG_NAME: gc-signin-dev-backend-api
+  ECS_SERVICE: gc-signin-dev_ecs_cluster_service
+  ECS_CLUSTER: gc-signin-dev_ecs_cluster
   ECR: ${{ vars.DEV_AWS_ACCOUNT_ID }}.dkr.ecr.ca-central-1.amazonaws.com/gc-signin-dev-backend-api
   GITHUB_SHA: ${{ github.sha }}
 
@@ -61,7 +63,30 @@ jobs:
       env:
         TRIVY_DB_REPOSITORY: ${{ vars.TRIVY_DB_REPOSITORY }}
       with:
-        docker_image: $TAG_NAME:latest
+        docker_image: "${{ env.ECR }}:latest"
         dockerfile_path: backend/Dockerfile
-        sbom_name: $TAG_NAME
+        sbom_name: ${{ env.TAG_NAME }}
         token: "${{ secrets.GITHUB_TOKEN }}"
+
+    - name: Download ECS task definition
+      run: |
+          aws ecs describe-task-definition \
+            --task-definition ${{env.ECS_SERVICE}} \
+            --query taskDefinition > task-definition.json
+  
+    - name: Update ECS task image
+      id: task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@e89b6874818d80bb892e7010a5013519bde9d9a6 # v1.7.2
+      with:
+        task-definition: task-definition.json
+        container-name: ${{env.ECS_SERVICE}}
+        image: ${{ env.ECR }}:${{ env.GITHUB_SHA }}
+  
+    - name: Deploy updated ECS task
+      uses: aws-actions/amazon-ecs-deploy-task-definition@538b32884c2bf327057c6805f0315e5ee92102cc # v2.3.2
+      with:
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        service: ${{ env.ECS_SERVICE }}
+        cluster: ${{ env.ECS_CLUSTER }}
+        wait-for-service-stability: true
+        propagate-tags: SERVICE
