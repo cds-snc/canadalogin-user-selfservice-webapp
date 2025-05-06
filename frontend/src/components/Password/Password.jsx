@@ -41,6 +41,10 @@ export default function Password() {
         loadMinMax();
     },[])
 
+    function handlePasswordChange (event) {
+        clearAllErrors();
+        setPasswordStrength(event.target.value.length);
+    }
     function validatePassword(pass) {
         clearAllErrors();
         if(!isPasswordValid(pass)) {
@@ -76,7 +80,7 @@ export default function Password() {
         policy: passwordPolicy,
         onError: (err)=> setError('#password',err)
     };
-    console.log('ppsubmit',submitDataOptions);
+
     const {handleSubmit, isPending} = useSubmit(submitDataOptions, validatePassword );
 
     return (
@@ -147,7 +151,7 @@ export default function Password() {
                             value={state.testData.password}
                             hint={flow===FLOW_TYPES.signUp?pageContentJson['10']:''}
                             type={checkedValue? "password" : "text"}
-                            onGcdsInput={(e) => {clearAllErrors();setPasswordStrength(e.target.value.length);}}
+                            onGcdsInput={handlePasswordChange}
                             errorMessage={error.errorMsg}
                         ></GcdsInput>)
                     }
@@ -157,7 +161,7 @@ export default function Password() {
                         name="password"
                         hint={flow===FLOW_TYPES.signUp?pageContentJson['10']:''}
                         type={checkedValue? "password" : "text"}
-                        onGcdsInput={(e) => {clearAllErrors();setPasswordStrength(e.target.value.length);}}
+                        onGcdsInput={handlePasswordChange}
                         errorMessage={error.errorMsg}
                     ></GcdsInput>)
                     }
