@@ -71,7 +71,15 @@ export const ERROR_RESPONSE = {
     "message": "The system cannot process the request at this time",
     "data": null
 };
-
+export const PASSWORD_ERROR_RESPONSE =
+    {
+        "data": {
+            "success": false,
+            "message": "The system detected an error.",
+            "data": null
+        },
+        "status": 400,
+    }
 export const EMAIL_ERROR_RESPONSE =
 {
     "data": {
@@ -164,10 +172,9 @@ export const TEST_RESPONSES = {
         data: null
     }
 }
-export const MSW_PASSWORD_POLICY = {type:"get", endpoint: SUBMIT_END_POINTS.requestPasswordPolicy, response:POLICY_RESPONSE };
 
 export const MSW_MOCKS ={
-    passwordPolicy: {type:"get", endpoint: SUBMIT_END_POINTS.requestPasswordPolicy, response:POLICY_RESPONSE },
+    passwordPolicy: {type:"get", endpoint: SUBMIT_END_POINTS.requestPasswordPolicy, response: POLICY_RESPONSE },
     transientOtpSend:{
         emailError: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpSend, response: EMAIL_ERROR_RESPONSE},
         error:  {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpSend, response: ERROR_RESPONSE},
@@ -177,7 +184,7 @@ export const MSW_MOCKS ={
         voiceSuccess: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpSend, response: TEST_RESPONSES.verificationVoiceSetUpResponse}
     },
     create:{
-        error:  {type: "post", endpoint: SUBMIT_END_POINTS.create, response: ERROR_RESPONSE},
+        error:  {type: "post", endpoint: SUBMIT_END_POINTS.create, response: PASSWORD_ERROR_RESPONSE},
         serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.create, response: null},
         success: {type: "post", endpoint: SUBMIT_END_POINTS.create, response: TEST_RESPONSES.passwordResponse}
     },

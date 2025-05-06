@@ -20,7 +20,6 @@ export const authService = {
             return buildTestResponse(userData, "transientOtpSend");
 
         const response =  await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.transientOtpSend}`, userData);
-
         return response.data;
     },
     transientOtpVerify: async (userData) => {
@@ -28,7 +27,6 @@ export const authService = {
             return buildTestResponse(userData, "transientOtpVerify");
 
         const response =  await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.transientOtpVerify}`, userData);
-
         return response.data;
     },
     createCoreProfile:async (userData) => {
@@ -37,6 +35,19 @@ export const authService = {
 
         const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.createCoreProfile}`, userData);
         return response.data;
+    },
+    //logic will need to be updated once backend has been completed
+    login:async (userData) => {
+        const response = SUCCESS_RESPONSE;
+        response.data.id = '155151-68967896-997097';
+
+        if(TEST_USERS.has(userData.userName))
+        {
+            response.data.otpType=FLOW_TYPES.sms;
+            return response;
+        }
+        response.data.otpType=FLOW_TYPES.voice;
+        return SUCCESS_RESPONSE;
     }
 }
 

@@ -29,8 +29,8 @@ import {useError} from "../../hooks/useError.js";
 export default function Password() {
     const {state} = useUser();
     const {language, flow} = useParams();
-    const [checkedValue, setCheckedValue] = useState(true);
     const {setError, clearAllErrors, getError, hasErrors} = useError(language);
+    const [checkedValue, setCheckedValue] = useState(true);
     const [passwordPolicy, setPasswordPolicy] = useState({min: 12, max:65})
     const [passwordStrength, setPasswordStrength] = useState(0);
     const pageContentJson = getPageContent(language, PAGES.password);
@@ -41,14 +41,10 @@ export default function Password() {
         loadMinMax();
     },[])
 
-    function validateCheckbox ()  {
-        setCheckedValue (!checkedValue);
-    }
-
     function validatePassword(pass) {
         clearAllErrors();
         if(!isPasswordValid(pass)) {
-            const errMessage = errorPageJson[5]+' '+passwordPolicy.min+' '+errorPageJson[12]+' '+passwordPolicy.max+' '+errorPageJson[13];
+            const errMessage = `${errorPageJson[5]} ${passwordPolicy.min} ${errorPageJson[12]} ${passwordPolicy.max} ${errorPageJson[13]}`;
             setError('#password', errMessage);
             return false;
         }
@@ -73,20 +69,21 @@ export default function Password() {
 
     const submitDataOptions = {
         language,
-        endpoint: flow===FLOW_TYPES.signUp?SUBMIT_END_POINTS.create:'',
-        navigateTo: flow===FLOW_TYPES.signUp?'/' + language + NAVIGATION_LINKS.twoStepVerification:'',
+        endpoint: flow===FLOW_TYPES.signUp?SUBMIT_END_POINTS.create:SUBMIT_END_POINTS.login,
+        navigateTo: flow===FLOW_TYPES.signUp?'/'+language+NAVIGATION_LINKS.twoStepVerification:'/'+language+'/'+FLOW_TYPES.signIn+NAVIGATION_LINKS.verification,
         page: PAGES.password,
         flow: flow,
         policy: passwordPolicy,
         onError: (err)=> setError('#password',err)
     };
+    console.log('ppsubmit',submitDataOptions);
     const {handleSubmit, isPending} = useSubmit(submitDataOptions, validatePassword );
 
     return (
         <GcdsContainer className="gcds-content" >
             {
                 hasErrors()&&(<GcdsErrorSummary data-testid='errorSummary'
-                                                errorLinks={`{"#email": "${error.errorMsg}"}`}
+                                                errorLinks={`{"#password": "${error.errorMsg}"}`}
                                                 heading={ error.heading}
                 />)
             }
@@ -168,7 +165,7 @@ export default function Password() {
                         checkboxId="checkbox-default"
                         label={pageContentJson['11']}
                         name="checkbox"
-                        onGcdsChange={validateCheckbox}>
+                        onGcdsChange={()=> setCheckedValue (!checkedValue)}>
                     </GcdsCheckbox>
                     {
                         flow===FLOW_TYPES.signUp&&(
@@ -201,7 +198,3 @@ export default function Password() {
         </GcdsContainer>
     )
 }
-
-
-
-

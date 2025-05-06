@@ -29,10 +29,11 @@ export function useSubmit(submitDataOptions:SubmitDataOptions, validateFunction:
                         return;
 
                     const response = await callAuthService(submitDataOptions, formData, state.userData);
-                    const userData = setUserData(submitDataOptions.page, formData, state.userData, response);
+                    const userData = setUserData(submitDataOptions, formData, state.userData, response);
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                     await callAnalytics(submitDataOptions, "submit_success");
-                    navigate(submitDataOptions.navigateTo);
+                    const navigateTo = setNavigateTo(submitDataOptions, response);
+                    navigate(navigateTo);
                     return;
                 } catch (error){
                     const serverMessage = error.response?.data?.message;
@@ -50,6 +51,15 @@ export function useSubmit(submitDataOptions:SubmitDataOptions, validateFunction:
     return {handleSubmit, isPending};
 }
 
+function setNavigateTo(submitDataOptions: SubmitDataOptions, response:any) {
+
+    switch(submitDataOptions.flow+submitDataOptions.page) {
+        case FLOW_TYPES.signIn+PAGES.password:
+            return submitDataOptions.navigateTo+"/"+response.data.otpType;
+        default:
+            return submitDataOptions.navigateTo;
+    }
+}
 async function callAnalytics(submitDataOptions: SubmitDataOptions, submitAction:string) {
 
     const action =  submitDataOptions.page.toLowerCase() + "_" + submitAction;
@@ -77,14 +87,20 @@ async function callAuthService(submitDataOptions:SubmitDataOptions, formData:For
                 password: formData.get('password')
             }
             return await authService.create({...payload});
+        case(SUBMIT_END_POINTS.login):
+            payload = {
+                userName: userData.email,
+                password: formData.get('password')
+            }
+            return await authService.login({...payload});
         default :
             return {};
     }
 }
 
-function setUserData(page:string, formData: FormData, userData:any, response:any) {
+function setUserData(submitDataOptions:SubmitDataOptions, formData: FormData, userData:any, response:any) {
 
-    switch (page) {
+    switch (submitDataOptions.page) {
         case PAGES.signup:
             return  {
                 ...userData, email: formData.get(FLOW_TYPES.email),
@@ -93,7 +109,9 @@ function setUserData(page:string, formData: FormData, userData:any, response:any
         case PAGES.home:
             return {...userData, email: formData.get(FLOW_TYPES.email)};
         case PAGES.password:
-            return {...userData, passwordSubmitted: true, id: response.data.id};
+            if(submitDataOptions.flow===FLOW_TYPES.signIn)
+                return {...userData, passwordSubmitted: true, id: response.data.id};
+            return {...userData, otpType: response.otpType, id: response.data.id};
         default:
             return {}
     }
