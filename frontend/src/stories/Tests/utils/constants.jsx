@@ -72,11 +72,18 @@ export const ERROR_RESPONSE = {
     "data": null
 };
 
-export const EMAIL_ERROR_RESPONSE =
-{
+export const EMAIL_ERROR_RESPONSE = {
     "data": {
         "success": false,
         "message": "value is not a valid email address: The part after the @-sign is not valid. It should have a period.",
+        "data": null
+    },
+    "status": 400,
+}
+export const PHONE_NUMBER_ERROR_RESPONSE = {
+    "data": {
+        "success": false,
+        "message": "value is not a valid phone number",
         "data": null
     },
     "status": 400,
@@ -174,7 +181,8 @@ export const MSW_MOCKS ={
         serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpSend, response: null},
         emailSuccess: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpSend, response: TEST_RESPONSES.signUpResponse},
         smsSuccess: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpSend, response: TEST_RESPONSES.verificationSmsSetUpResponse},
-        voiceSuccess: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpSend, response: TEST_RESPONSES.verificationVoiceSetUpResponse}
+        voiceSuccess: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpSend, response: TEST_RESPONSES.verificationVoiceSetUpResponse},
+        phoneError: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpSend, response: PHONE_NUMBER_ERROR_RESPONSE}
     },
     create:{
         error:  {type: "post", endpoint: SUBMIT_END_POINTS.create, response: ERROR_RESPONSE},

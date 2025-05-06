@@ -20,7 +20,6 @@ export const authService = {
             return buildTestResponse(userData, "transientOtpSend");
 
         const response =  await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.transientOtpSend}`, userData);
-
         return response.data;
     },
     transientOtpVerify: async (userData) => {
@@ -28,7 +27,6 @@ export const authService = {
             return buildTestResponse(userData, "transientOtpVerify");
 
         const response =  await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.transientOtpVerify}`, userData);
-
         return response.data;
     },
     createCoreProfile:async (userData) => {
