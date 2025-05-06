@@ -7,8 +7,7 @@ import {
 import {getPageContent} from "../../../utils/functions.jsx";
 import {
     ACTION_TYPES,
-    ERROR_RESPONSE,
-    MSW_MOCKS, PASSWORD_ERROR_RESPONSE,
+    MSW_MOCKS,
     TEST_TYPES, TEST_USERS
 } from "../utils/constants.jsx";
 import {buildTestCase, testCase, TestTemplate} from "../utils/functions.tsx";

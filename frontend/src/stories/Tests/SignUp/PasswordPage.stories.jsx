@@ -7,8 +7,7 @@ import {
 import {getPageContent} from "../../../utils/functions.jsx";
 import {
     ACTION_TYPES,
-    ERROR_RESPONSE,
-    MSW_MOCKS,
+    MSW_MOCKS, PASSWORD_ERROR_RESPONSE,
     TEST_TYPES, TEST_USERS
 } from "../utils/constants.jsx";
 import {buildTestCase, testCase, TestTemplate} from "../utils/functions.tsx";
@@ -79,7 +78,7 @@ ErrorBackEnd.play = async ({ canvasElement, step }) => {
         stepMessage: "Submit form with bad password For Back End Error",
         link: 'password',
         heading: engErrorPageJson[1],
-        message: ERROR_RESPONSE.message,
+        message: PASSWORD_ERROR_RESPONSE.data.message,
         delay: 1000,
         actionType: ACTION_TYPES.submit,
         type: TEST_TYPES.error
