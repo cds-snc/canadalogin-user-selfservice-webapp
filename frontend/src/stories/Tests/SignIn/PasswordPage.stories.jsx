@@ -67,7 +67,7 @@ FrErrorFrontEnd.play = async ({ canvasElement, step }) => {
 }
 SuccessfulBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.coreProfile,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn },
-    [MSW_MOCKS.passwordPolicy, MSW_MOCKS.login.success]);
+    [MSW_MOCKS.passwordPolicy, MSW_MOCKS.create.success]);
 SuccessfulBackEnd.args = {password:"123456789012"};
 SuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
