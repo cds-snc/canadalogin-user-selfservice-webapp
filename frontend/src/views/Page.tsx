@@ -12,7 +12,8 @@ import VerificationSetUp from "../components/SignUp/TwoStepVerification/Verifica
 import {PAGES} from "../utils/constants";
 import {useUser} from "../components/Providers/useUser";
 import {useLocation, useParams} from "react-router";
-
+import { trackPage } from "../utils/gatag.jsx";
+import { useEffect } from "react";
 
 function PageContents({page}:{page:string}) {
     switch(page) {
@@ -56,6 +57,11 @@ export default function Page({page}:{page:string}) {
     const {language} = useParams();
     const {langHref, currentLang} = getLangValues(language, pathname);
     const {state} = useUser();
+    
+    useEffect(() => {
+        trackPage(pathname, page)
+    }, [pathname]);
+
     return (
         <div className="mainBody">
             <Header langHref={langHref} currentLang={currentLang} service={state.userData.service}/>

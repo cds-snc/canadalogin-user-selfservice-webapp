@@ -1,81 +1,56 @@
 import {
     GcdsContainer,
-    GcdsErrorSummary, GcdsFieldset,
-    GcdsInput, GcdsRadioGroup, GcdsStepper
+    GcdsErrorSummary,
+    GcdsFieldset,
+    GcdsInput,
+    GcdsRadioGroup,
+    GcdsStepper
 } from "@cdssnc/gcds-components-react";
-import {useState, useTransition} from "react";
-import {CONTEXT_ACTIONS, FLOW_TYPES, NAVIGATION_LINKS, PAGES} from "../../utils/constants";
+import {useState} from "react";
+import {FLOW_TYPES, NAVIGATION_LINKS, PAGES, SUBMIT_END_POINTS} from "../../utils/constants";
 import {getPageContent, isEmailValid} from '../../utils/functions';
 import AlreadyGc from "../Layout/AlreadyGc.jsx";
 import {useUser} from "../Providers/useUser";
-import {useNavigate, useParams} from "react-router";
-import {authService} from "../../services/authService.jsx";
+import {useParams} from "react-router";
 import SubmitButton from "../Layout/SubmitButton.jsx";
+import {useSubmit} from "../../hooks/useSubmit";
+import {useError} from "../../hooks/useError";
+
 
 export default function SignUpEmail() {
-    const {language} = useParams();
-    const {state, dispatch} = useUser();
+    const {language, flow} = useParams();
+    const {state} = useUser();
     const [email, setEmail] = useState(state.userData.email);
-    const [errorJson, setError] = useState({heading: null, emailError:null});
-    const [isPending, startTransition] = useTransition();
-    const navigate = useNavigate();
     const pageContentJson = getPageContent(language, PAGES.signup);
-    const errorPageJson = getPageContent(language, "Error");
+    const {setError, clearAllErrors, getError, hasErrors} = useError(language);
+    const error = getError('#email');
 
     function validateEmail(email) {
         setEmail(email);
-
-        if(isEmailValid(email)) {
-            setError({emailError: null, heading: null});
-            return true;
-        }
-        else {
-            setError({emailError: errorPageJson[2], heading: errorPageJson['1']});
+        clearAllErrors();
+        if(!isEmailValid(email)) {
+            setError('#email', '2');
             return false;
         }
+        return true;
     }
+    const submitDataOptions = {
+        language,
+        endpoint: SUBMIT_END_POINTS.transientOtpSend,
+        navigateTo: "/" + language + NAVIGATION_LINKS.verifyEmail, type:FLOW_TYPES.email,
+        page: PAGES.signup,
+        flow: flow,
+        onError: (err)=> setError('#email',err)
+    };
+    const {handleSubmit, isPending} = useSubmit(submitDataOptions, validateEmail );
 
-    function handleSubmit(e) {
-        startTransition(async()=> {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const formEmail = formData.get('email');
-
-            if(!validateEmail(formEmail))
-                return;
-
-            try {
-                const response = await authService.transientOtpSend({
-                    userName: formData.get('email'),
-                    otpType: FLOW_TYPES.email
-                });
-                if(response.success){
-                    const userData = {
-                        ...state.userData,
-                        email: formEmail,
-                        emailLanguage: formData.get('language'),
-                        trxnId: response.data.trxnId
-                    };
-                    await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
-                    console.log("success", "/" + language + NAVIGATION_LINKS.verifyEmail);
-                    navigate("/" + language + NAVIGATION_LINKS.verifyEmail);
-                }else {
-                    console.log("Error....", response);
-                    setError({emailError: response.message, heading: errorPageJson['1']});
-                }
-            } catch (error) {
-                console.error('Signup error:', error);
-                setError({emailError:  errorPageJson[7], heading: errorPageJson['1']});
-            }
-        })
-    }
     return (
         <GcdsContainer className="gcds-content" >
              <GcdsContainer>
                 {
-                    errorJson.emailError!==null&&(<GcdsErrorSummary data-testid='errorSummary'
-                                errorLinks={`{"#email": "${errorJson.emailError}"}`}
-                                heading={errorJson.heading}
+                    hasErrors()&&(<GcdsErrorSummary data-testid='errorSummary'
+                                errorLinks={`{"#email": "${error.errorMsg}"}`}
+                                heading={ error.heading}
                        />)
                 }
                  <GcdsStepper currentStep="1" totalSteps="4"
@@ -93,7 +68,7 @@ export default function SignUpEmail() {
                              value={state.testData!=null?state.testData.email:email}
                              validateOn="other"
                              onGcdsChange={(e) => {validateEmail(e.target.value)}}
-                             errorMessage={errorJson.emailError}
+                             errorMessage={error.errorMsg}
                              data-testid="email"
                              lang={language}
                              required ></GcdsInput>
@@ -122,4 +97,3 @@ export default function SignUpEmail() {
         </GcdsContainer>
     )
 }
-

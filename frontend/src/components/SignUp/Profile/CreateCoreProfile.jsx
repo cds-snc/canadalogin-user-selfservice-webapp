@@ -8,6 +8,8 @@ import {useState, useTransition} from "react";
 import {authService} from "../../../services/authService.jsx";
 import {CONTEXT_ACTIONS, PAGES} from "../../../utils/constants.jsx";
 import {useNavigate, useParams} from "react-router";
+import { trackEvent } from "../../../utils/gatag.jsx";
+import {GA_CATEGORIES, GA_ACTIONS, GA_LABELS} from "../../../utils/constants.jsx";
 
 export default function CreateCoreProfile() {
     const {state, dispatch} = useUser();
@@ -21,6 +23,11 @@ export default function CreateCoreProfile() {
     function  handleSubmit (e){
         startTransition(async()=> {
             e.preventDefault();
+            trackEvent({
+                category: GA_CATEGORIES.onboarding,
+                action: GA_ACTIONS.submitSignUpCoreProfile,
+                label: GA_LABELS.button
+            });
 
             const formData = new FormData(e.target);
             const formFirstName = formData.get('firstName');
@@ -44,15 +51,30 @@ export default function CreateCoreProfile() {
                     userName: state.userData.email
                 });
                 if(response.success){
+                    trackEvent({
+                        category: GA_CATEGORIES.onboarding,
+                        action: GA_ACTIONS.submitSignUpCoreProfileSuccess,
+                        label: GA_LABELS.button
+                    });
                     const userData = {...state.userData, coreProfileCreated: true};
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                     console.log("success...",response)
                     navigate("/" + language + '/redirecttorp');
                 }else {
+                    trackEvent({
+                        category: GA_CATEGORIES.onboarding,
+                        action: GA_ACTIONS.submitSignUpCoreProfileFailure,
+                        label: GA_LABELS.button
+                    });
                     console.log("Error....", response);
                     setError({nameError: response.message, heading: errorPageJson['1']});
                 }
             } catch (error) {
+                trackEvent({
+                    category: GA_CATEGORIES.onboarding,
+                    action: GA_ACTIONS.submitSignUpCoreProfileError,
+                    label: GA_LABELS.button
+                });
                 console.error('Signup error:', error);
                 setError({nameError:  errorPageJson[7], heading: errorPageJson['1']});
             }
