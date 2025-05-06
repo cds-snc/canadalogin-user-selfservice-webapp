@@ -13,7 +13,7 @@ Create a `.actrc` file in your root folder that has the following contents
 ```
 # Set the default platform for runners
 -P ubuntu-latest=ghcr.io/catthehacker/ubuntu:act-latest
-
+--container-daemon-socket -
 # Pass environment variables directly
 --env AWS_ACCESS_KEY_ID=
 --env AWS_SECRET_ACCESS_KEY=
@@ -76,3 +76,7 @@ Full example of implementing the aws cli and credentials
             echo "AWS credentials are set for locally testing the github action."
 
 ```
+
+## Debug Docker daemon 
+https://github.com/nektos/act/issues/1051
+https://github.com/nektos/act/issues/2239
