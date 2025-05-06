@@ -51,10 +51,14 @@ export default function Verification() {
         setError({codeError:null, heading:null});
         if(type===FLOW_TYPES.email){
             navigate("/" + language + NAVIGATION_LINKS.signUp);
-        } else{
+        } else if(flow===FLOW_TYPES.signUp){
             const userData = {...state.userData, phone:null, stepVerificationSent: false, trxnId:null};
             await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
             navigate("/" + language + NAVIGATION_LINKS.twoStepVerification);
+        } else {
+            const userData = {...state.userData, stepVerificationSent: false, trxnId:null};
+            await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
+            navigate("/" + language + NAVIGATION_LINKS.verificationSelection);
         }
     }
 
@@ -249,7 +253,7 @@ export default function Verification() {
                         </GcdsHeading>
                     )
                 }
-                <form id="form"  onSubmit={handleSubmit}>
+                <form id="form" onSubmit={handleSubmit}>
                     {
                         state.testData!==undefined&&(<GcdsInput
                         inputId="verificationCode"

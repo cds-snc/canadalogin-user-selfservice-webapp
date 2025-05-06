@@ -109,9 +109,9 @@ function setUserData(submitDataOptions:SubmitDataOptions, formData: FormData, us
         case PAGES.home:
             return {...userData, email: formData.get(FLOW_TYPES.email)};
         case PAGES.password:
-            if(submitDataOptions.flow===FLOW_TYPES.signIn)
+            if(submitDataOptions.flow===FLOW_TYPES.signUp)
                 return {...userData, passwordSubmitted: true, id: response.data.id};
-            return {...userData, otpType: response.otpType, id: response.data.id};
+            return {...userData, otpType: response.data.otpType, id: response.data.id, phone: response.data.phone};
         default:
             return {}
     }

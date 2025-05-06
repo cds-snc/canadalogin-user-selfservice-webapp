@@ -40,7 +40,7 @@ export const authService = {
     login:async (userData) => {
         const response = SUCCESS_RESPONSE;
         response.data.id = '155151-68967896-997097';
-
+        response.data.phone = '+1(***) ***-1234'
         if(TEST_USERS.has(userData.userName))
         {
             response.data.otpType=FLOW_TYPES.sms;

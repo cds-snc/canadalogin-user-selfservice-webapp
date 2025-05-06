@@ -22,6 +22,8 @@ function isValidRoute (page, state, flow, type) {
                 return signIn.checkPasswordPage(state);
             case(PAGES.verification):
                 return true;
+            case(PAGES.verificationSelection):
+                return true;
             default:
                 return false;
         }

@@ -7,7 +7,8 @@ export const NAVIGATION_LINKS = {
     verification: '/verification',
     coreProfile: '/signup/profile',
     privacy: '/signup/privacy',
-    home: '/'
+    home: '/',
+    verificationSelection: '/signin/selectverification',
 };
 export const CONTEXT_ACTIONS = {
     signUp: 'SIGN_UP',
@@ -31,7 +32,8 @@ export const PAGES ={
     coreProfile: 'CreateCoreProfile',
     password: 'Password',
     home: 'Home',
-    error: 'Error'
+    error: 'Error',
+    verificationSelection: 'VerificationSelection'
 }
 
 export const FOOTERS = {
