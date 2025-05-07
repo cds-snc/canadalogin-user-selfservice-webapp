@@ -72,7 +72,7 @@ const signIn = {
     checkPasswordPage: (state) =>{
         return isEmailValid(state.userData.email)
     },
-    checkVerificationPage: (state, type) => {
+    checkVerificationPage: (state) => {
        return signIn.checkPasswordPage(state) && state.userData.passwordValidated && state.userData.phone && state.userData.id;
 
     }
