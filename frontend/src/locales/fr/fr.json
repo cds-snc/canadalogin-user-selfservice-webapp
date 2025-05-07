@@ -114,12 +114,21 @@
     "18": "Connectez-vous avec Connextion GC",
     "19": "pour accéder à vôtre",
     "20": "compte",
-    "21": "Try another way",
+    "21": "Essayer une autre méthode",
     "22": "Consultez vos courriels",
     "23": "Nous avons envoyé un courriel contenant un code à 6 chiffres à l’adresse :",
     "24": "Le courriel pourrait prendre quelques minutes à arriver. Si vous ne voyez pas le courriel, vérifiez s’il se trouve dans votre dossier de pourriels.",
     "25": "Utiliser une autre adresse courriel",
     "26": "Demander un nouveau code"
+  },
+  "VerificationSelection": {
+    "1": "Choisissez une méthode de connexion",
+    "2": "pour accéder à votre",
+    "3": " compte ",
+    "4": "Choisissez une méthode de connexion",
+    "5": "Code à 6 chiffres reçu par SMS",
+    "6": "Code à 6 chiffres reçu par appel vocal",
+    "7": "Par défaut"
   },
   "CreateCoreProfile": {
     "1": "Votre compte de connexion GC a bien été créé.",

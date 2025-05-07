@@ -21,9 +21,9 @@ function isValidRoute (page, state, flow, type) {
             case(PAGES.password):
                 return signIn.checkPasswordPage(state);
             case(PAGES.verification):
-                return true;
+                return signIn.checkVerificationPage(state);
             case(PAGES.verificationSelection):
-                return true;
+                return signIn.checkVerificationPage(state);
             default:
                 return false;
         }
@@ -64,7 +64,6 @@ const signUp = {
         return signUp.checkPasswordPage(state) && state.userData.passwordSubmitted && state.userData.id;
     },
     checkCoreProfilePage: (state) => {
-
         return signUp.checkVerificationPage(state, null) && state.userData.stepVerified;
     }
 }
@@ -72,6 +71,10 @@ const signUp = {
 const signIn = {
     checkPasswordPage: (state) =>{
         return isEmailValid(state.userData.email)
+    },
+    checkVerificationPage: (state, type) => {
+       return signIn.checkPasswordPage(state) && state.userData.passwordValidated && state.userData.phone && state.userData.id;
+
     }
 }
 

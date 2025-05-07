@@ -85,11 +85,20 @@ export default function Verification() {
         setError({codeError:null, heading:null});
         try {
             const number = state.userData.phone!==null?state.userData.phone:"";
-            const response = await authService.transientOtpSend({
-                phoneNumber: '+'+number.replace(/\D/g,''),
-                userName: state.userData.email,
-                otpType: codeType
-            });
+            let response = null;
+            if(flow===FLOW_TYPES.signUp)
+                response = await authService.transientOtpSend({
+                    phoneNumber: '+'+number.replace(/\D/g,''),
+                    userName: state.userData.email,
+                    otpType: codeType
+                });
+            else
+                response = await authService.otpSend({
+                    phoneNumber: '+'+number.replace(/\D/g,''),
+                    userName: state.userData.email,
+                    otpType: codeType,
+                    id: state.userData.id,
+                });
 
             if(response.success){
                 const userData = {...state.userData, trxnId:response.data.trxnId};
@@ -129,12 +138,22 @@ export default function Verification() {
             setError({codeError:null, heading:null});
 
             try {
-                const response = await authService.transientOtpVerify({
-                    otp: formCode,
-                    otpType: type,
-                    trxnId: state.userData.trxnId,
-                    userName: state.userData.email  //part of TEST_USERS, not needed if removed
-                });
+                let response = null;
+
+                if(flow===FLOW_TYPES.signUp)
+                    response = await authService.transientOtpVerify({
+                        otp: formCode,
+                        otpType: type,
+                        trxnId: state.userData.trxnId,
+                        userName: state.userData.email  //part of TEST_USERS, not needed if removed
+                    });
+                else
+                    response = await authService.otpVerify({
+                        otp: formCode,
+                        otpType: type,
+                        trxnId: state.userData.trxnId,
+                        userName: state.userData.email  //part of TEST_USERS, not needed if removed
+                    });
                 if(response.success){
                     trackEvent({
                         category: GA_CATEGORIES.onboarding,

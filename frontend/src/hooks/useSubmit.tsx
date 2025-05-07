@@ -29,6 +29,7 @@ export function useSubmit(submitDataOptions:SubmitDataOptions, validateFunction:
                         return;
 
                     const response = await callAuthService(submitDataOptions, formData, state.userData);
+                    console.log("success....", response);
                     const userData = setUserData(submitDataOptions, formData, state.userData, response);
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                     await callAnalytics(submitDataOptions, "submit_success");
@@ -73,6 +74,7 @@ async function callAnalytics(submitDataOptions: SubmitDataOptions, submitAction:
 
 async function callAuthService(submitDataOptions:SubmitDataOptions, formData:FormData, userData:any) {
     let payload = {};
+    console.log("callAuthService", submitDataOptions.endpoint);
     switch(submitDataOptions.endpoint){
         case(SUBMIT_END_POINTS.transientOtpSend):
             if(submitDataOptions.type === FLOW_TYPES.email)
@@ -80,11 +82,18 @@ async function callAuthService(submitDataOptions:SubmitDataOptions, formData:For
                     userName: formData.get(FLOW_TYPES.email),
                     otpType: FLOW_TYPES.email
                 };
+            else
+                payload = {
+                    userName: userData.email,
+                    otpType: userData.otpType,
+                    phone: userData.phone
+                };
             return await authService.transientOtpSend({...payload});
         case(SUBMIT_END_POINTS.create):
             payload = {
                 userName: userData.email,
-                password: formData.get('password')
+                password: formData.get('password'),
+                txrId: userData.txrId
             }
             return await authService.create({...payload});
         case(SUBMIT_END_POINTS.login):
@@ -93,6 +102,19 @@ async function callAuthService(submitDataOptions:SubmitDataOptions, formData:For
                 password: formData.get('password')
             }
             return await authService.login({...payload});
+        case(SUBMIT_END_POINTS.otpVerify):
+            payload = {
+                userName: userData.email,
+                otpType: submitDataOptions.type
+            }
+            return await authService.otpVerify({...payload});
+        case(SUBMIT_END_POINTS.otpSend):
+            payload = {
+                userName: userData.email,
+                otpType: userData.otpType,
+                phone: userData.phone
+            };
+            return await authService.otpSend({...payload});
         default :
             return {};
     }
@@ -111,7 +133,9 @@ function setUserData(submitDataOptions:SubmitDataOptions, formData: FormData, us
         case PAGES.password:
             if(submitDataOptions.flow===FLOW_TYPES.signUp)
                 return {...userData, passwordSubmitted: true, id: response.data.id};
-            return {...userData, otpType: response.data.otpType, id: response.data.id, phone: response.data.phone};
+            return {...userData, otpType: response.data.otpType, id: response.data.id, phone: response.data.phone, passwordValidated: true};
+        case PAGES.verificationSelection:
+            return {...userData, trxnId: response.data.trxnId};
         default:
             return {}
     }

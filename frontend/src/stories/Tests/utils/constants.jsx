@@ -1,6 +1,6 @@
 import {SERVICES, SUBMIT_END_POINTS} from "../../../utils/constants.jsx";
 export const TEST_USERS = new Map([
-    ['test@test.gc.ca', {emailOtp: '441234', smsOtp: '515136', voiceOtp: '151136'}],
+    ['test@test.gc.ca', {emailOtp: '441234', smsOtp: '515136', voiceOtp: '151136', login: 'testUser12345'}],
 ]);
 export const TestDataUserProvider = {
     isAuthenticated: false,
@@ -16,7 +16,9 @@ export const TestDataUserProvider = {
         stepVerificationSent: false,
         stepVerified:false,
         viewPrivacy:false,
-        id: null
+        id: null,
+        otpType: null,
+        passwordValidated:false
     },
     testData:{
         email: null,
