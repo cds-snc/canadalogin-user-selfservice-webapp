@@ -104,6 +104,7 @@ export default function Verification() {
                 const userData = {...state.userData, trxnId:response.data.trxnId};
                 await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                 setCodeRequested(true);
+                console.log("success...", response);
                 if(didTypeChange)
                     navigate("/" + language +"/"+ flow +NAVIGATION_LINKS.verification + '/' +codeType);
             }else {

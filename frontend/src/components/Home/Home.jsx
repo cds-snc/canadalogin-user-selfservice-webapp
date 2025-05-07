@@ -49,7 +49,7 @@ export default function Home() {
         navigateTo: "/" + currentLang + "/" + FLOW_TYPES.signIn + NAVIGATION_LINKS.password,
         type:FLOW_TYPES.email,
         page: PAGES.home,
-        flow: flow,
+        flow: FLOW_TYPES.signIn,
         onError: (err)=> setError('#email',err)
     };
     const {handleSubmit, isPending} = useSubmit(submitDataOptions, validateEmail );

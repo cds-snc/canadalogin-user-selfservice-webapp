@@ -93,13 +93,18 @@ function buildTestResponse (userData, type) {
 
             return response;
         case "otpVerify":
-            if(userData.otpType===FLOW_TYPES.sms && (userData.otp === TEST_USERS.get(userData.userName).smsOtp))
+            if(userData.otpType===FLOW_TYPES.sms && (userData.otp === TEST_USERS.get(userData.userName).smsOtp)) {
+                TEST_RESPONSES.verificationSmsResponse.message = "Sign in sms OTP has been validated"
                 return TEST_RESPONSES.verificationSmsResponse;
-            else if(userData.otpType===FLOW_TYPES.voice && (userData.otp===TEST_USERS.get(userData.userName).voiceOtp))
+            }
+            else if(userData.otpType===FLOW_TYPES.voice && (userData.otp===TEST_USERS.get(userData.userName).voiceOtp)) {
+                TEST_RESPONSES.verificationVoiceResponse.message = "Sign in voice OTP has been validated"
                 return TEST_RESPONSES.verificationVoiceResponse;
+            }
 
             return ERROR_RESPONSE;
         case "otpSend":
+            console.log("sending for ", userData.otpType)
             if(userData.otpType===FLOW_TYPES.voice) {
                 response = TEST_RESPONSES.verificationVoiceSetUpResponse;
                 response.data.phoneNumber = userData.phoneNumber;

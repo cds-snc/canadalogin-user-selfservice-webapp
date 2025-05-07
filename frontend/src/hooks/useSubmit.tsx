@@ -64,7 +64,6 @@ function setNavigateTo(submitDataOptions: SubmitDataOptions, response:any) {
 async function callAnalytics(submitDataOptions: SubmitDataOptions, submitAction:string) {
 
     const action =  submitDataOptions.page.toLowerCase() + "_" + submitAction;
-
     trackEvent({
         category: submitDataOptions.flow,
         action: action,
@@ -74,7 +73,6 @@ async function callAnalytics(submitDataOptions: SubmitDataOptions, submitAction:
 
 async function callAuthService(submitDataOptions:SubmitDataOptions, formData:FormData, userData:any) {
     let payload = {};
-    console.log("callAuthService", submitDataOptions.endpoint);
     switch(submitDataOptions.endpoint){
         case(SUBMIT_END_POINTS.transientOtpSend):
             if(submitDataOptions.type === FLOW_TYPES.email)
@@ -124,16 +122,15 @@ function setUserData(submitDataOptions:SubmitDataOptions, formData: FormData, us
 
     switch (submitDataOptions.page) {
         case PAGES.signup:
-            return  {
-                ...userData, email: formData.get(FLOW_TYPES.email),
-                emailLanguage: formData.get('language'), trxnId: response.data.trxnId
-            }
+            return  {...userData, email: formData.get(FLOW_TYPES.email),
+                emailLanguage: formData.get('language'), trxnId: response.data.trxnId }
         case PAGES.home:
             return {...userData, email: formData.get(FLOW_TYPES.email)};
         case PAGES.password:
             if(submitDataOptions.flow===FLOW_TYPES.signUp)
                 return {...userData, passwordSubmitted: true, id: response.data.id};
-            return {...userData, otpType: response.data.otpType, id: response.data.id, phone: response.data.phone, passwordValidated: true};
+            return {...userData, otpType: response.data.otpType,
+                id: response.data.id, phone: response.data.phone, passwordValidated: true};
         case PAGES.verificationSelection:
             return {...userData, trxnId: response.data.trxnId};
         default:
