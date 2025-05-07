@@ -26,7 +26,7 @@ import {useParams} from "react-router";
 console.log("Config URL", config.apiUrl);
 
 export default function Home() {
-    const {language, flow} = useParams();
+    const {language} = useParams();
     const {state} = useUser();
     const [email, setEmail] = useState(state.userData.email);
     const currentLang = getLanguage(language);
