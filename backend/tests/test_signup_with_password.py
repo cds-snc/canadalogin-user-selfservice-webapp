@@ -43,7 +43,7 @@ async def test_create_user_success(client):
 
     with (
         patch(
-            "app.users.services.create.get_access_token", new_callable=AsyncMock
+            "app.users.services.create.get_admin_token", new_callable=AsyncMock
         ) as mock_token,
         patch("app.users.services.create.get_auth_request_headers") as mock_headers,
         patch("app.users.services.create.get_settings") as mock_settings,
@@ -76,7 +76,7 @@ async def test_create_user_raises_generic_error(client):
     )
 
     with (
-        patch("app.users.services.create.get_access_token", new_callable=AsyncMock),
+        patch("app.users.services.create.get_admin_token", new_callable=AsyncMock),
         patch("app.users.services.create.get_auth_request_headers"),
         patch("app.users.services.create.get_settings"),
         patch("app.users.services.create.AsyncClient") as mock_client_class,
@@ -190,7 +190,7 @@ async def test_user_signup(client):
     with (
         patch("app.users.v1_router.signup_with_password", return_value=mock_response),
         patch(
-            "app.users.services.create.get_access_token", new_callable=AsyncMock
+            "app.users.services.create.get_admin_token", new_callable=AsyncMock
         ) as mock_get_token,
     ):
 
