@@ -11,29 +11,33 @@ spec:
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: gc-signin-ibm
-  title: GC Sign-in IBM Application
+  name: gc-signin-frontend
+  title: GC Sign in React Application
   description: >-
     Consists of the custom CDS components and services to support GC Sign in and
     their integration with the IBM Verify CIAM SaaS.
+  tags:
+    - frontend
+    - react
+    - web
   labels:
     license: MIT
 spec:
   type: website
   lifecycle: experimental
   owner: group:cds-snc/digital-credentials-gc-sign-in
-  system: gc-signin-ibm-solution
+  system: gc-signin-solution
 ---
 apiVersion: backstage.io/v1alpha1
 kind: API
 metadata:
-  name: gc-signin-ibm-backend
-  title: GC Sign-in Backend API
-  description: API Service for the GC Sign-in Custom Frontend
+  name: gc-signin-backend
+  title: GC Sign in Backend API
+  description: API Service for supporting the GC Sign-in Custom Frontend
 spec:
   type: openapi
   lifecycle: experimental
   owner: group:cds-snc/digital-credentials-gc-sign-in
   definition:
     $text: https://api.gc-signin.cdssandbox.xyz/openapi.json
-  system: gc-signin-ibm-solution
+  system: gc-signin-solution
