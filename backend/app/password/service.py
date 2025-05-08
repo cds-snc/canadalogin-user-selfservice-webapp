@@ -13,7 +13,7 @@ from app.utils.schemas import ResponseModel
 logger = logging.getLogger(__name__)
 
 
-async def get_password_policy():
+async def get_password_policy(global_http_client: AsyncClient):
     """Get password policy from IBM Verify API"""
     try:
         access_token = await get_access_token()
@@ -28,28 +28,26 @@ async def get_password_policy():
 
         logger.debug(f"Password Policy URL: {password_policy_url}")
 
-        async with AsyncClient() as client:
+        response = await global_http_client.get(password_policy_url, headers=headers)
 
-            response = await client.get(password_policy_url, headers=headers)
+        if response.status_code != 200:
+            logger.error(f"Failed to get password policy. Response: {response}")
+            raise HTTPException(
+                status_code=response.status_code,
+                detail="Failed to get password policy",
+            )
 
-            if response.status_code != 200:
-                logger.error(f"Failed to get password policy. Response: {response}")
-                raise HTTPException(
-                    status_code=response.status_code,
-                    detail="Failed to get password policy",
-                )
+        logger.info("Request returned successfully")
+        response_json = response.json()
+        print(json.dumps(response_json, indent=4))
 
-            logger.info("Request returned successfully")
-            response_json = response.json()
-            print(json.dumps(response_json, indent=4))
+        try:
+            validated_data = IBMVerifyPasswordPolicy(**response_json)
+        except ValidationError as e:
+            logger.error(f"Validation Error: {e.json()}")
+            print(json.dumps(e.json(), indent=4))
+            raise HTTPException(status_code=422, detail="Response validation error")
 
-            try:
-                validated_data = IBMVerifyPasswordPolicy(**response_json)
-            except ValidationError as e:
-                logger.error(f"Validation Error: {e.json()}")
-                print(json.dumps(e.json(), indent=4))
-
-                raise HTTPException(status_code=422, detail="Response validation error")
         return ResponseModel(
             success=True,
             data=validated_data,
