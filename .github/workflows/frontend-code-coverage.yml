@@ -58,13 +58,13 @@ jobs:
           - module: frontend
     steps:
       - name: "Download Coverage Artifacts"
-        uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: frontend-coverage-report
           path: ${{ matrix.module }}
 
       - name: "Report Coverage"
-        uses: davelosert/vitest-coverage-report-action@7bf7d3c1b17a0e27c7e0d14190fb39168584bed2 # v2.8.1
+        uses: davelosert/vitest-coverage-report-action@adec81c7327940e0578d70d0bbdd87b0ca21df55 # v2.8.2
         with:
           vite-config-path: "./vitest.config.js"
           working-directory: "./${{ matrix.module }}"
