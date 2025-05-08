@@ -261,7 +261,7 @@ const pageSetup = {
 
         const gcdsElementMap = new Map();
         gcdsElementMap.set('11', ['gcds-details', createMap('gcds-details', [pageContentJson['11']])])
-        gcdsElementMap.set('3', ['gcds-fieldset', createMap('gcds-fieldset', ['gcds-email-fieldset', pageContentJson['4'], pageContentJson['3']])]);
+        gcdsElementMap.set('14', ['gcds-fieldset', createMap('gcds-fieldset', ['gcds-verification-fieldset', pageContentJson['15'], pageContentJson['14']])]);
         const options = '[{"label": "' + pageContentJson['16'] + '","id": "sms", "value": "sms","checked":"true","hint": "' + pageContentJson['17'] + '"},{"label": "' + pageContentJson['18'] + '","id": "voice", "value": "voice","hint": "' + pageContentJson['19'] + '"}]';
         gcdsElementMap.set('16', ['gcds-radio-group', createMap('gcds-radio-group', ['verificationType', options])]);
 
