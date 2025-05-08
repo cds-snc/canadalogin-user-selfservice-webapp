@@ -13,8 +13,9 @@ logger = logging.getLogger(__name__)
 lock = threading.Lock()
 settings = get_settings().ibm_verify_config
 
-"""Caches our single token response for the number Time To Live (ttl(in second))"""
-@cached(cache=TTLCache(maxsize=1, ttl=settings.ADMIN_TOKEN_TTL))
+"""Caches our single token response for the number Time To Live ttl(in seconds)"""
+admin_token_ttl = 7170 #Actual TTL for verify's oauth token is 7200. Setting the cache to 7170 gives us a buffer.
+@cached(cache=TTLCache(maxsize=1, ttl=settings.admin_token_ttl))
 def get_admin_token():
     with lock:
         return get_access_token()
