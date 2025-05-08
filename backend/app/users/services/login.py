@@ -22,7 +22,6 @@ async def requestCloudDirectoryId(global_http_client: AsyncClient):
         settings = get_settings().ibm_verify_config
         signin_url = f"{settings.IBM_VERIFY_TENANT_URL}/v1.0/authnmethods/password?search=name%20%3D%20%22Cloud%20Directory%22"
 
-
         response = await global_http_client.get(signin_url, headers=headers)
         logger.info("Request returned")
         return response
@@ -61,8 +60,7 @@ async def getCloudDirectoryId(global_http_client: AsyncClient):
         raise HTTPException(status_code=400, detail=f"Signup error: {str(e)}")
 
 
-async def signin_with_username_password(
-    username_password: IBMUsernamePasswordAuthRequestData, global_http_client: AsyncClient):
+async def signin_with_username_password(username_password: IBMUsernamePasswordAuthRequestData, global_http_client: AsyncClient):
 
     try:
         access_token = await get_access_token()
@@ -89,6 +87,7 @@ async def signin_with_username_password(
         logger.error(f"Signup error: {str(e)}", exc_info=True)
         raise HTTPException(status_code=400, detail=f"Signup error: {str(e)}")
 # await global_http_client.get
+
 
 async def signin_with_password(user: UserLoginRequestData, global_http_client: AsyncClient):
 

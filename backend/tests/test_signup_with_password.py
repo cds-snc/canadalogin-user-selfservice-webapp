@@ -110,7 +110,6 @@ async def test_signup_success(client):
         "id": "abc123",
         "emails": [{"value": "test@abc.com"}],
     }
-    
     mock_http_client = AsyncMock(spec=AsyncClient)
 
     # Patch only what's necessary
