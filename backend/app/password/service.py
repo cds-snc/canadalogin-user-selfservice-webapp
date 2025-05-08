@@ -3,7 +3,7 @@ import json
 from pydantic import ValidationError
 from fastapi import HTTPException
 from httpx import AsyncClient
-from app.utils.access_token import get_access_token
+from app.utils.access_token import get_admin_token
 from app.config import get_settings
 from app.utils.access_token import get_auth_request_headers
 from app.password.schemas import IBMVerifyPasswordPolicy
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 async def get_password_policy():
     """Get password policy from IBM Verify API"""
     try:
-        access_token = await get_access_token()
+        access_token = await get_admin_token()
         if not access_token:
             logger.error("Failed to get access token")
             raise HTTPException(status_code=500, detail="Failed to get access token")

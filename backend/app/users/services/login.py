@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 from fastapi import HTTPException
 from httpx import AsyncClient
-from app.utils.access_token import get_access_token
+from app.utils.access_token import get_admin_token
 from app.utils.helpers import generate_error_response
 from app.config import get_settings
 from app.utils.access_token import get_auth_request_headers
@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 async def requestCloudDirectoryId():
     try:
-        access_token = await get_access_token()
+        access_token = await get_admin_token()
         headers = get_auth_request_headers(access_token, True)
         settings = get_settings().ibm_verify_config
         signin_url = f"{settings.IBM_VERIFY_TENANT_URL}/v1.0/authnmethods/password?search=name%20%3D%20%22Cloud%20Directory%22"
@@ -67,7 +67,7 @@ async def signin_with_username_password(
 ):
 
     try:
-        access_token = await get_access_token()
+        access_token = await get_admin_token()
         headers = get_auth_request_headers(access_token, True)
         settings = get_settings().ibm_verify_config
         cloud_directory_id = await getCloudDirectoryId()

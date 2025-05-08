@@ -15,7 +15,6 @@ class IBMVerifyConfig(BaseSettings):
     IBM_VERIFY_TENANT_URL: str
     IBM_VERIFY_API_CLIENT_ID: str
     IBM_VERIFY_API_CLIENT_SECRET: str
-
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore", case_sensitive=True
     )

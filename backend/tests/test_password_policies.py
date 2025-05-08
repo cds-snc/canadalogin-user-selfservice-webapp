@@ -27,7 +27,7 @@ def mock_settings(scope="session"):
 
 @pytest.mark.asyncio
 @patch("app.password.service.AsyncClient")
-@patch("app.password.service.get_access_token", new_callable=AsyncMock)
+@patch("app.password.service.get_admin_token", new_callable=AsyncMock)
 @patch("app.password.service.get_settings")
 @patch("app.password.service.get_auth_request_headers")
 async def test_get_password_policy_success(
@@ -73,7 +73,7 @@ async def test_get_password_policy_success(
 
 @pytest.mark.asyncio
 @patch("app.password.service.get_settings")
-@patch("app.password.service.get_access_token", new_callable=AsyncMock)
+@patch("app.password.service.get_admin_token", new_callable=AsyncMock)
 async def test_get_password_policy_token_failure(
     mock_get_token, mock_get_settings, mock_settings, client
 ):
@@ -88,7 +88,7 @@ async def test_get_password_policy_token_failure(
 
 
 @pytest.mark.asyncio
-@patch("app.password.service.get_access_token", new_callable=AsyncMock)
+@patch("app.password.service.get_admin_token", new_callable=AsyncMock)
 @patch("app.password.service.AsyncClient")
 @patch("app.password.service.get_auth_request_headers")
 @patch("app.password.service.get_settings")
@@ -124,7 +124,7 @@ class DummyModel(BaseModel):
 
 
 @pytest.mark.asyncio
-@patch("app.password.service.get_access_token", new_callable=AsyncMock)
+@patch("app.password.service.get_admin_token", new_callable=AsyncMock)
 @patch("app.password.service.AsyncClient")
 @patch("app.password.service.get_auth_request_headers")
 @patch("app.password.service.get_settings")
