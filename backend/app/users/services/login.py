@@ -60,7 +60,10 @@ async def getCloudDirectoryId(global_http_client: AsyncClient):
         raise HTTPException(status_code=400, detail=f"Signup error: {str(e)}")
 
 
-async def signin_with_username_password(username_password: IBMUsernamePasswordAuthRequestData, global_http_client: AsyncClient):
+async def signin_with_username_password(
+    username_password: IBMUsernamePasswordAuthRequestData,
+    global_http_client: AsyncClient,
+):
 
     try:
         access_token = await get_access_token()
@@ -86,10 +89,14 @@ async def signin_with_username_password(username_password: IBMUsernamePasswordAu
     except Exception as e:
         logger.error(f"Signup error: {str(e)}", exc_info=True)
         raise HTTPException(status_code=400, detail=f"Signup error: {str(e)}")
+
+
 # await global_http_client.get
 
 
-async def signin_with_password(user: UserLoginRequestData, global_http_client: AsyncClient):
+async def signin_with_password(
+    user: UserLoginRequestData, global_http_client: AsyncClient
+):
 
     try:
 
@@ -100,7 +107,9 @@ async def signin_with_password(user: UserLoginRequestData, global_http_client: A
         username_password = IBMUsernamePasswordAuthRequestData(**user_data)
 
         start_time = datetime.now()
-        response = await signin_with_username_password(username_password, global_http_client)
+        response = await signin_with_username_password(
+            username_password, global_http_client
+        )
         response_json = response.json()
         user_id = response_json.get("id")
         assertion = response_json.get("assertion")

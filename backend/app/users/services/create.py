@@ -19,7 +19,9 @@ from app.utils.schemas import ResponseModel
 logger = logging.getLogger(__name__)
 
 
-async def create_user(core_user_data: IBMUserCreateRequest, global_http_client: AsyncClient):
+async def create_user(
+    core_user_data: IBMUserCreateRequest, global_http_client: AsyncClient
+):
 
     try:
         access_token = await get_access_token()
@@ -28,7 +30,9 @@ async def create_user(core_user_data: IBMUserCreateRequest, global_http_client: 
         signup_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/Users"
 
         core_user_data_json = core_user_data.model_dump(by_alias=True)
-        response = await global_http_client.post(signup_url, json=core_user_data_json, headers=headers)
+        response = await global_http_client.post(
+            signup_url, json=core_user_data_json, headers=headers
+        )
         logger.info("Request returned")
         return response
 
@@ -40,7 +44,9 @@ async def create_user(core_user_data: IBMUserCreateRequest, global_http_client: 
         raise HTTPException(status_code=400, detail=f"Signup error: {str(e)}")
 
 
-async def signup_with_password(user: UserLoginRequestData, global_http_client: AsyncClient):
+async def signup_with_password(
+    user: UserLoginRequestData, global_http_client: AsyncClient
+):
     """Handle user registration through IBM Verify"""
     try:
         # Prepare user data according to SCIM 2.0 schema

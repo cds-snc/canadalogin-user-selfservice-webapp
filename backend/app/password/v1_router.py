@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from app.password.schemas import PasswordPolicyResponse
 from app.password.service import get_password_policy
 from fastapi import Request
+
 router = APIRouter()
 
 

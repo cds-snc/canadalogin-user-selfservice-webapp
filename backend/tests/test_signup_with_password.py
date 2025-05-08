@@ -119,7 +119,9 @@ async def test_signup_success(client):
         patch("app.users.services.create.logger"),
     ):
 
-        result = await signup_with_password(user_data, global_http_client=mock_http_client)
+        result = await signup_with_password(
+            user_data, global_http_client=mock_http_client
+        )
 
         assert isinstance(result, ResponseModel)
         assert result.success is True
@@ -143,7 +145,9 @@ async def test_signup_failure_from_ibm(client):
         patch("app.users.services.create.logger"),
     ):
 
-        result = await signup_with_password(user_data, global_http_client=mock_http_client)
+        result = await signup_with_password(
+            user_data, global_http_client=mock_http_client
+        )
 
         assert isinstance(result, JSONResponse)
         assert result.status_code == 400
