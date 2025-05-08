@@ -21,9 +21,9 @@ function isValidRoute (page, state, flow, type) {
             case(PAGES.password):
                 return signIn.checkPasswordPage(state);
             case(PAGES.verification):
-                return signIn.checkVerificationPage(state);
+                return signIn.checkLoginValidation(state);
             case(PAGES.verificationSelection):
-                return signIn.checkVerificationPage(state);
+                return signIn.checkLoginValidation(state);
             default:
                 return false;
         }
@@ -72,7 +72,7 @@ const signIn = {
     checkPasswordPage: (state) =>{
         return isEmailValid(state.userData.email)
     },
-    checkVerificationPage: (state) => {
+    checkLoginValidation: (state) => {
        return signIn.checkPasswordPage(state) && state.userData.passwordValidated && state.userData.phone && state.userData.id;
 
     }

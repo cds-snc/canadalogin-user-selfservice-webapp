@@ -7,13 +7,13 @@ import {
 import {getPageContent} from "../../../utils/functions.jsx";
 import {
     ACTION_TYPES,
-    MSW_MOCKS,
+    MSW_MOCKS, PASSWORD_ERROR_RESPONSE,
     TEST_TYPES, TEST_USERS
 } from "../utils/constants.jsx";
 import {buildTestCase, testCase, TestTemplate} from "../utils/functions.tsx";
 
-const engErrorPageJson = getPageContent('en', "Error");
-const frErrorPageJson = getPageContent('fr', "Error");
+const engErrorPageJson = getPageContent(AVAILABLE_LANGUAGES.en, PAGES.error);
+const frErrorPageJson = getPageContent(AVAILABLE_LANGUAGES.fr, PAGES.error);
 
 export default {
     title: 'GC Sign In/Tests/Sign In/Password Page',
@@ -65,9 +65,10 @@ FrErrorFrontEnd.play = async ({ canvasElement, step }) => {
         type: TEST_TYPES.error
     })
 }
-SuccessfulBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.coreProfile,
+
+SuccessfulBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn },
-    [MSW_MOCKS.passwordPolicy, MSW_MOCKS.create.success]);
+    [MSW_MOCKS.passwordPolicy, MSW_MOCKS.login.success]);
 SuccessfulBackEnd.args = {password:"123456789012"};
 SuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
@@ -82,7 +83,45 @@ SuccessfulBackEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-TestUser.args = {email: TEST_USERS.keys().next().value, password:"123456789012"};
+ErrorBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
+    { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn },
+    [MSW_MOCKS.passwordPolicy, MSW_MOCKS.login.error]);
+ErrorBackEnd.args = {password:"123456789012"};
+ErrorBackEnd.play = async ({ canvasElement, step }) => {
+
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage: "Submit form with bad password For Back End Error",
+        link: 'password',
+        heading: engErrorPageJson[1],
+        message: PASSWORD_ERROR_RESPONSE.data.message,
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.error
+    })
+}
+
+ServerErrorBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
+    { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn },
+    [MSW_MOCKS.passwordPolicy, MSW_MOCKS.login.serverTimeOut]);
+ServerErrorBackEnd.args = {password:"123456789012"};
+ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
+
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage: "Submit form with Back End No Response Error",
+        link: 'password',
+        heading: engErrorPageJson[1],
+        message: engErrorPageJson[7],
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.error
+    })
+}
+
+TestUser.args = {email: TEST_USERS.keys().next().value, password:"testUser12345"};
 TestUser.play = async ({ canvasElement, step }) => {
 
     await testCase({

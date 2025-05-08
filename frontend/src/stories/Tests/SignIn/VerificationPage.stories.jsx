@@ -10,8 +10,8 @@ import {
     testCase,
     TestTemplate
 } from "../utils/functions.tsx";
-const engErrorPageJson = getPageContent('en', "Error");
-const frErrorPageJson = getPageContent('fr', "Error");
+const engErrorPageJson = getPageContent(AVAILABLE_LANGUAGES.en, PAGES.error);
+const frErrorPageJson = getPageContent(AVAILABLE_LANGUAGES.fr, PAGES.error);
 const engPageContentJson = getPageContent(AVAILABLE_LANGUAGES.en, PAGES.verification);
 const frPageContentJson = getPageContent(AVAILABLE_LANGUAGES.fr, PAGES.verification);
 
@@ -79,7 +79,7 @@ FrErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
 SmsErrorBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.sms },
-    [MSW_MOCKS.transientOtpVerify.error]);
+    [MSW_MOCKS.otpVerify.error]);
 SmsErrorBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -97,7 +97,7 @@ SmsErrorBackEnd.play = async ({ canvasElement, step }) => {
 
 SmsSuccessfulBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.sms },
-    [MSW_MOCKS.transientOtpVerify.smsSuccess]);
+    [MSW_MOCKS.otpVerify.smsSuccess]);
 SmsSuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -113,7 +113,7 @@ SmsSuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
 VoiceErrorBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.voice },
-    [MSW_MOCKS.transientOtpVerify.error]);
+    [MSW_MOCKS.otpVerify.error]);
 VoiceErrorBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -131,7 +131,7 @@ VoiceErrorBackEnd.play = async ({ canvasElement, step }) => {
 
 VoiceSuccessfulBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.voice },
-    [MSW_MOCKS.transientOtpVerify.voiceSuccess]);
+    [MSW_MOCKS.otpVerify.voiceSuccess]);
 VoiceSuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -147,7 +147,7 @@ VoiceSuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
 ServerErrorBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.voice },
-    [MSW_MOCKS.transientOtpVerify.serverTimeOut]);
+    [MSW_MOCKS.otpVerify.serverTimeOut]);
 ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -165,7 +165,7 @@ ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
 
 EngRequestNewCode.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.sms },
-    [MSW_MOCKS.transientOtpSend.smsSuccess]);
+    [MSW_MOCKS.otpSend.smsSuccess]);
 EngRequestNewCode.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -183,7 +183,7 @@ EngRequestNewCode.play = async ({ canvasElement, step }) => {
 
 FrRequestNewCode.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.fr, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.voice },
-    [MSW_MOCKS.transientOtpSend.voiceSuccess]);
+    [MSW_MOCKS.otpSend.voiceSuccess]);
 FrRequestNewCode.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -201,7 +201,7 @@ FrRequestNewCode.play = async ({ canvasElement, step }) => {
 
 NewCodeBackEndError.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.sms },
-    [MSW_MOCKS.transientOtpSend.error]);
+    [MSW_MOCKS.otpSend.error]);
 NewCodeBackEndError.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -220,7 +220,7 @@ NewCodeBackEndError.play = async ({ canvasElement, step }) => {
 
 ServerErrorReqNewCode.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.voice },
-    [MSW_MOCKS.transientOtpSend.serverTimeOut]);
+    [MSW_MOCKS.otpSend.serverTimeOut]);
 ServerErrorReqNewCode.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -239,7 +239,7 @@ ServerErrorReqNewCode.play = async ({ canvasElement, step }) => {
 
 EngRequestNewTypeCode.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.sms },
-    [MSW_MOCKS.transientOtpSend.voiceSuccess]);
+    [MSW_MOCKS.otpSend.voiceSuccess]);
 EngRequestNewTypeCode.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -257,7 +257,7 @@ EngRequestNewTypeCode.play = async ({ canvasElement, step }) => {
 
 FrRequestNewTypeCode.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.fr, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.voice },
-    [MSW_MOCKS.transientOtpSend.smsSuccess]);
+    [MSW_MOCKS.otpSend.smsSuccess]);
 FrRequestNewTypeCode.play = async ({ canvasElement, step }) => {
 
     await testCase({

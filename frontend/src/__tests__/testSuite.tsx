@@ -23,6 +23,9 @@ const GCDS_TAG_ATTRIBUTES = {
     'gcds-fieldset': {
         attributes: ["fieldset-id", "hint", "legend"]
     },
+    'gcds-fieldset2': {
+        attributes: ["fieldset-id", "legend"]
+    },
     'gcds-radio-group': {
         attributes: ["name", "options"]
     },
@@ -146,6 +149,8 @@ const pageSetup = {
                 return ['9', '13', '15', '17', '18', '19'];
             case PAGES.privacy:
                 return ['11','25','27','42'];
+            case PAGES.verificationSelection:
+                return ['6','7'];
             default:
                 return [];
         }
@@ -180,6 +185,8 @@ const pageSetup = {
                 return '20';
             case PAGES.privacy:
                 return '3';
+            case PAGES.verificationSelection:
+                return '3';
             default:
                 return null;
         }
@@ -200,6 +207,8 @@ const pageSetup = {
                 return pageSetup.coreProfileSetUpGcdsMap(pageContentJson);
             case PAGES.privacy:
                 return pageSetup.privacyGcdsMap(pageContentJson);
+            case PAGES.verificationSelection:
+                return pageSetup.verificationSelectionGcdsMap(pageContentJson)
             default:
                 return new Map();
         }
@@ -252,7 +261,7 @@ const pageSetup = {
 
         const gcdsElementMap = new Map();
         gcdsElementMap.set('11', ['gcds-details', createMap('gcds-details', [pageContentJson['11']])])
-        gcdsElementMap.set('14', ['gcds-fieldset', createMap('gcds-fieldset', ['gcds-verification-fieldset', pageContentJson['15'], pageContentJson['14']])]);
+        gcdsElementMap.set('3', ['gcds-fieldset', createMap('gcds-fieldset', ['gcds-email-fieldset', pageContentJson['4'], pageContentJson['3']])]);
         const options = '[{"label": "' + pageContentJson['16'] + '","id": "sms", "value": "sms","checked":"true","hint": "' + pageContentJson['17'] + '"},{"label": "' + pageContentJson['18'] + '","id": "voice", "value": "voice","hint": "' + pageContentJson['19'] + '"}]';
         gcdsElementMap.set('16', ['gcds-radio-group', createMap('gcds-radio-group', ['verificationType', options])]);
 
@@ -270,6 +279,19 @@ const pageSetup = {
     privacyGcdsMap: (pageContentJson: JSON) => {
         const gcdsElementMap = new Map();
         gcdsElementMap.set('23', ['gcds-details', createMap('gcds-details', [pageContentJson['23']])])
+        return gcdsElementMap;
+    },
+    verificationSelectionGcdsMap: (pageContentJson: JSON) => {
+        const gcdsElementMap = new Map();
+        gcdsElementMap.set('4', ['gcds-fieldset', createMap('gcds-fieldset2', ['gcds-email-fieldset', pageContentJson['4']])]);
+        const options = '['+
+            `{"label": "+1(***) ***-1234",`+
+            `"hint": "${pageContentJson['5']} (${pageContentJson['7']})",`+
+            `"id": "english", "value": "+1(***) ***-1234","checked":"true"}`+
+            `]`
+        gcdsElementMap.set('5', ['gcds-radio-group', createMap('gcds-radio-group', ['number', options])]);
+
+
         return gcdsElementMap;
     }
 

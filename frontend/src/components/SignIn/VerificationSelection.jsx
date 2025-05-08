@@ -57,7 +57,7 @@ export default function VerificationSelection() {
                         >
                         <br />
                         <GcdsRadioGroup
-                            name="language"
+                            name="number"
                             options={'['+
                                 `{"label": "${state.userData.phone}",`+
                                  `"hint": "${state.userData.otpType===FLOW_TYPES.sms?pageContentJson['5']:pageContentJson['6']} (${pageContentJson['7']})",`+
