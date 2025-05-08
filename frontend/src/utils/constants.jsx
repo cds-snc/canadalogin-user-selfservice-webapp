@@ -7,7 +7,8 @@ export const NAVIGATION_LINKS = {
     verification: '/verification',
     coreProfile: '/signup/profile',
     privacy: '/signup/privacy',
-    home: '/'
+    home: '/',
+    verificationSelection: '/signin/selectverification',
 };
 export const CONTEXT_ACTIONS = {
     signUp: 'SIGN_UP',
@@ -31,7 +32,8 @@ export const PAGES ={
     coreProfile: 'CreateCoreProfile',
     password: 'Password',
     home: 'Home',
-    error: 'Error'
+    error: 'Error',
+    verificationSelection: 'VerificationSelection'
 }
 
 export const FOOTERS = {
@@ -54,7 +56,10 @@ export const SUBMIT_END_POINTS = {
     create: '/v1/users/create',
     createCoreProfile: '/v1/users/createcoreprofile',
     transientOtpVerify: '/v1/otp/transient_otp/verify',
-    transientOtpSend: '/v1/otp/transient_otp/send'
+    transientOtpSend: '/v1/otp/transient_otp/send',
+    login: '/v1/otp/users/login',
+    otpVerify: '/v1/otp/otp/verify',
+    otpSend: '/v1/otp/otp/send',
 }
 
 

@@ -53,6 +53,7 @@ describe('Routing Tests', () => {
         buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.home, FLOW_TYPES.signUp,null, langHref.en );
     });
 
+    //-------------Sign Up Tests------------------------>
     test("Check sign up route with en language defined", () => {
 
         stateData.userData = {...stateData.userData , ...mockedRoutesUserData.signup.signUp};
@@ -141,29 +142,6 @@ describe('Routing Tests', () => {
         buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.password, FLOW_TYPES.signUp, null, langHref.en + link);
     });
 
-    test("Check sign in password page route with en language defined", () => {
-
-        stateData.userData = {...stateData.userData , ... mockedRoutesUserData.signin.password};
-        const link = '/' +FLOW_TYPES.signIn+NAVIGATION_LINKS.password;
-        render(
-            <MemoryRouter initialEntries={[langHref.en + link]}>
-                <App/>
-            </MemoryRouter>,
-        )
-        buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.password, FLOW_TYPES.signIn, null, langHref.fr + link);
-    });
-    test("Check sign in password page route with fr language defined", () => {
-
-        stateData.userData = {...stateData.userData , ... mockedRoutesUserData.signin.password};
-        const link = '/' +FLOW_TYPES.signIn+NAVIGATION_LINKS.password;
-        render(
-            <MemoryRouter initialEntries={[langHref.fr + link]}>
-                <App/>
-            </MemoryRouter>,
-        )
-        buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.password, FLOW_TYPES.signIn, null, langHref.en + link);
-    });
-
     test("Check verification set up page route with en language defined", () => {
 
         stateData.userData = {...stateData.userData , ...mockedRoutesUserData.signup.verificationSetUp};
@@ -236,50 +214,6 @@ describe('Routing Tests', () => {
         buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.verification, FLOW_TYPES.signUp, FLOW_TYPES.voice, langHref.en + link);
     });
 
-    test("Check sign in verification page route for sms with en language defined", () => {
-
-        const link = '/' +FLOW_TYPES.signIn+NAVIGATION_LINKS.verification+'/'+FLOW_TYPES.sms;
-        render(
-            <MemoryRouter initialEntries={[langHref.en + link]}>
-                <App/>
-            </MemoryRouter>,
-        )
-        buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.verification, FLOW_TYPES.signIn, FLOW_TYPES.sms, langHref.fr + link);
-    });
-
-    test("Check sign in verification page route for voice with en language defined", () => {
-
-        const link = '/' +FLOW_TYPES.signIn+NAVIGATION_LINKS.verification+'/'+FLOW_TYPES.voice;
-        render(
-            <MemoryRouter initialEntries={[langHref.en + link]}>
-                <App/>
-            </MemoryRouter>,
-        )
-        buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.verification, FLOW_TYPES.signIn, FLOW_TYPES.voice, langHref.fr + link);
-    });
-
-    test("Check sign in verification page route for sms with fr language defined", () => {
-
-        const link = '/' +FLOW_TYPES.signIn+NAVIGATION_LINKS.verification+'/'+FLOW_TYPES.sms;
-        render(
-            <MemoryRouter initialEntries={[langHref.fr + link]}>
-                <App/>
-            </MemoryRouter>,
-        )
-        buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.verification, FLOW_TYPES.signIn, FLOW_TYPES.sms, langHref.en + link);
-    });
-
-    test("Check sign in verification page route for voice with fr language defined", () => {
-
-        const link = '/' +FLOW_TYPES.signIn+NAVIGATION_LINKS.verification+'/'+FLOW_TYPES.voice;
-        render(
-            <MemoryRouter initialEntries={[langHref.fr + link]}>
-                <App/>
-            </MemoryRouter>,
-        )
-        buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.verification, FLOW_TYPES.signIn, FLOW_TYPES.voice, langHref.en + link);
-    });
-
     test("Check core profile page route with en language defined", () => {
 
         stateData.userData = {...stateData.userData , ...mockedRoutesUserData.signup.coreProfile};
@@ -312,6 +246,103 @@ describe('Routing Tests', () => {
         buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.privacy , FLOW_TYPES.signUp, null, langHref.fr + NAVIGATION_LINKS.privacy);
     });
 
+    //-------------Sign In Tests------------------------>
+    test("Check sign in verification page route for sms with en language defined", () => {
+
+        stateData.userData = {...stateData.userData , ...mockedRoutesUserData.signin.logInValidation};
+        const link = '/' +FLOW_TYPES.signIn+NAVIGATION_LINKS.verification+'/'+FLOW_TYPES.sms;
+        render(
+            <MemoryRouter initialEntries={[langHref.en + link]}>
+                <App/>
+            </MemoryRouter>,
+        )
+        buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.verification, FLOW_TYPES.signIn, FLOW_TYPES.sms, langHref.fr + link);
+    });
+
+    test("Check sign in verification page route for voice with en language defined", () => {
+
+        stateData.userData = {...stateData.userData , ...mockedRoutesUserData.signin.logInValidation};
+        const link = '/' +FLOW_TYPES.signIn+NAVIGATION_LINKS.verification+'/'+FLOW_TYPES.voice;
+        render(
+            <MemoryRouter initialEntries={[langHref.en + link]}>
+                <App/>
+            </MemoryRouter>,
+        )
+        buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.verification, FLOW_TYPES.signIn, FLOW_TYPES.voice, langHref.fr + link);
+    });
+
+    test("Check sign in verification page route for sms with fr language defined", () => {
+
+        stateData.userData = {...stateData.userData , ...mockedRoutesUserData.signin.logInValidation};
+        const link = '/' +FLOW_TYPES.signIn+NAVIGATION_LINKS.verification+'/'+FLOW_TYPES.sms;
+        render(
+            <MemoryRouter initialEntries={[langHref.fr + link]}>
+                <App/>
+            </MemoryRouter>,
+        )
+        buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.verification, FLOW_TYPES.signIn, FLOW_TYPES.sms, langHref.en + link);
+    });
+
+    test("Check sign in verification page route for voice with fr language defined", () => {
+
+        stateData.userData = {...stateData.userData , ...mockedRoutesUserData.signin.logInValidation};
+        const link = '/' +FLOW_TYPES.signIn+NAVIGATION_LINKS.verification+'/'+FLOW_TYPES.voice;
+        render(
+            <MemoryRouter initialEntries={[langHref.fr + link]}>
+                <App/>
+            </MemoryRouter>,
+        )
+        buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.verification, FLOW_TYPES.signIn, FLOW_TYPES.voice, langHref.en + link);
+    });
+
+    test("Check sign in password page route with en language defined", () => {
+
+        stateData.userData = {...stateData.userData , ... mockedRoutesUserData.signin.password};
+        const link = '/' +FLOW_TYPES.signIn+NAVIGATION_LINKS.password;
+        render(
+            <MemoryRouter initialEntries={[langHref.en + link]}>
+                <App/>
+            </MemoryRouter>,
+        )
+        buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.password, FLOW_TYPES.signIn, null, langHref.fr + link);
+    });
+
+    test("Check sign in password page route with fr language defined", () => {
+
+        stateData.userData = {...stateData.userData , ... mockedRoutesUserData.signin.password};
+        const link = '/' +FLOW_TYPES.signIn+NAVIGATION_LINKS.password;
+        render(
+            <MemoryRouter initialEntries={[langHref.fr + link]}>
+                <App/>
+            </MemoryRouter>,
+        )
+        buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.password, FLOW_TYPES.signIn, null, langHref.en + link);
+    });
+
+    test("Check sign in verification selection page route with en language defined", () => {
+
+        stateData.userData = {...stateData.userData , ... mockedRoutesUserData.signin.logInValidation};
+        render(
+            <MemoryRouter initialEntries={[langHref.en + NAVIGATION_LINKS.verificationSelection]}>
+                <App/>
+            </MemoryRouter>,
+        )
+
+        buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.verificationSelection, FLOW_TYPES.signIn, null, langHref.fr + NAVIGATION_LINKS.verificationSelection);
+    });
+
+    test("Check sign in verification selection page route with en language defined", () => {
+
+        stateData.userData = {...stateData.userData , ... mockedRoutesUserData.signin.logInValidation};
+        render(
+            <MemoryRouter initialEntries={[langHref.fr + NAVIGATION_LINKS.verificationSelection]}>
+                <App/>
+            </MemoryRouter>,
+        )
+
+        buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.verificationSelection, FLOW_TYPES.signIn, null, langHref.en + NAVIGATION_LINKS.verificationSelection);
+    });
+
     beforeAll(()=>{
         mockedRoutesUserData.signup = getMockedSignUpData();
         mockedRoutesUserData.signin = getMockedSignInData();
@@ -342,6 +373,7 @@ function getMockedSignInData(){
 
 
     const password = { email:'test@test.com'};
+    const logInValidation ={...password, passwordValidated:true, phone: '+1(***) ***-1234', id:'12345-12346', otpType:'sms'}
 
-    return {password};
+    return {password, logInValidation};
 }

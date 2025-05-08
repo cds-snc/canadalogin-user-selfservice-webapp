@@ -10,8 +10,8 @@ import {
     TEST_TYPES, TEST_USERS
 } from "../utils/constants.jsx";
 import {buildTestCase, testCase, TestTemplate} from "../utils/functions.tsx";
-const engErrorPageJson = getPageContent('en', "Error");
-const frErrorPageJson = getPageContent('fr', "Error");
+const engErrorPageJson = getPageContent(AVAILABLE_LANGUAGES.en, PAGES.error);
+const frErrorPageJson = getPageContent(AVAILABLE_LANGUAGES.fr, PAGES.error);
 const engPageContentJson = getPageContent('en',  PAGES.verification);
 const frPageContentJson = getPageContent('fr', PAGES.verification);
 
