@@ -130,7 +130,7 @@ export default function Password() {
     }
 
     return (
-        <GcdsContainer className="gcds-content" >
+        <GcdsContainer>
             {
                 errorJson.passwordError!==null&&(<GcdsErrorSummary
                     errorLinks={`{"#password": "${errorJson.passwordError}"}`}

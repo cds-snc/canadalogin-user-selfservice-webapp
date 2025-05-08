@@ -87,7 +87,7 @@ export default function VerificationSetUp() {
     }
 
     return (
-        <GcdsContainer className="gcds-content" >
+        <GcdsContainer>
             <GcdsContainer>
                 {
                     errorJson.phoneError!==null&&(<GcdsErrorSummary

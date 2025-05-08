@@ -82,7 +82,7 @@ export default function CreateCoreProfile() {
     }
 
     return (
-        <GcdsContainer className="gcds-content" >
+        <GcdsContainer>
             <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={pageContentJson['1']} >
                 &nbsp;
             </GcdsNotice>

@@ -92,7 +92,7 @@ export default function SignUpEmail() {
         })
     }
     return (
-        <GcdsContainer className="gcds-content" >
+        <GcdsContainer>
              <GcdsContainer>
                 {
                     errorJson.emailError!==null&&(<GcdsErrorSummary data-testid='errorSummary'

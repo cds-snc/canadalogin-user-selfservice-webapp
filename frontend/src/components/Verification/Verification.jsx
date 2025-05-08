@@ -178,7 +178,7 @@ export default function Verification() {
     }
 
     return (
-        <GcdsContainer className="gcds-content" >
+        <GcdsContainer>
             {
                 errorJson.codeError!==null&&(
                     <GcdsErrorSummary
