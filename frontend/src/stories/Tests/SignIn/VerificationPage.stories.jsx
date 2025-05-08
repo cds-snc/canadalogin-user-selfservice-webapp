@@ -4,7 +4,7 @@ import {
     PAGES
 } from "../../../utils/constants.jsx";
 import {getPageContent} from "../../../utils/functions.jsx";
-import {ACTION_TYPES, ERROR_RESPONSE, MSW_MOCKS, TEST_TYPES} from "../utils/constants.jsx";
+import {ACTION_TYPES, ERROR_RESPONSE, MSW_MOCKS, TEST_TYPES, TEST_USERS} from "../utils/constants.jsx";
 import {
     buildTestCase,
     testCase,
@@ -38,6 +38,9 @@ export const FrRequestNewTypeCode = TestTemplate.bind({});
 export const NewCodeBackEndError = TestTemplate.bind({});
 export const ServerErrorReqNewCode = TestTemplate.bind({});
 export const UseNewNumber = TestTemplate.bind({});
+export const TestUserSms = TestTemplate.bind({});
+export const TestUserVoice = TestTemplate.bind({});
+export const TestUserIncorrectOtp = TestTemplate.bind({});
 
 EngErrorFrontEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.sms },
@@ -291,3 +294,54 @@ UseNewNumber.play = async ({ canvasElement, step }) => {
     })
 }
 
+TestUserSms.args = {email: TEST_USERS.keys().next().value, passwordValidated:true, phone: '+1(***) ***-1234', id:'12345-12346', otpType:'sms', otp: TEST_USERS.get(TEST_USERS.keys().next().value).smsOtp};
+TestUserSms.parameters= buildTestCase.parameters(NAVIGATION_LINKS.verification,
+    { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type: 'sms' },
+    []);
+TestUserSms.play = async ({ canvasElement, step }) => {
+
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage: "Submit form with test user for SMS",
+        link: 'password',
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.redirect
+    })
+}
+TestUserVoice.args = {email: TEST_USERS.keys().next().value, passwordValidated:true, phone: '+1(***) ***-1234', id:'12345-12346', otpType:'voice', otp: TEST_USERS.get(TEST_USERS.keys().next().value).voiceOtp};
+TestUserVoice.parameters= buildTestCase.parameters(NAVIGATION_LINKS.verification,
+    { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type: 'voice' },
+    []);
+TestUserVoice.play = async ({ canvasElement, step }) => {
+
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage: "Submit form with test user for Voice",
+        link: 'password',
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.redirect
+    })
+}
+
+TestUserIncorrectOtp.args = {email: TEST_USERS.keys().next().value, passwordValidated:true, phone: '+1(***) ***-1234', id:'12345-12346', otpType:'sms', otp: TEST_USERS.get(TEST_USERS.keys().next().value).voiceOtp};
+TestUserIncorrectOtp.parameters= buildTestCase.parameters(NAVIGATION_LINKS.verification,
+    { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type: 'sms' },
+    []);
+TestUserIncorrectOtp.play = async ({ canvasElement, step }) => {
+
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage: "Submit form with test user for Incorrect Otp",
+        link: 'verificationCode',
+        heading: engErrorPageJson[1],
+        message: ERROR_RESPONSE.message,
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.error
+    })
+}

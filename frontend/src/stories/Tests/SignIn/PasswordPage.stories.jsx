@@ -122,7 +122,7 @@ ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-TestUser.args = {email: TEST_USERS.keys().next().value, password:"testUser12345"};
+TestUser.args = {email: TEST_USERS.keys().next().value, password:TEST_USERS.get(TEST_USERS.keys().next().value).login};
 TestUser.play = async ({ canvasElement, step }) => {
 
     await testCase({
