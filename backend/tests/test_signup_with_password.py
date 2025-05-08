@@ -1,5 +1,6 @@
 import pytest
 from unittest.mock import patch, AsyncMock, MagicMock
+from httpx import AsyncClient
 from fastapi import HTTPException
 from app.main import app  # Your FastAPI app instance
 
@@ -56,12 +57,12 @@ async def test_create_user_success(client):
             "https://fake.ibm.com"
         )
 
-        mock_client = AsyncMock()
+        mock_client = AsyncMock(spec=AsyncClient)
         mock_client.__aenter__.return_value = mock_client
         mock_client.post.return_value = mock_response
         mock_client_class.return_value = mock_client
 
-        response = await create_user(user_data)
+        response = await create_user(user_data, global_http_client=mock_client)
 
         assert response.status_code == 201
         assert response.json()["id"] == "user-123"
@@ -82,14 +83,14 @@ async def test_create_user_raises_generic_error(client):
         patch("app.users.services.create.AsyncClient") as mock_client_class,
     ):
 
-        mock_client = AsyncMock()
+        mock_client = AsyncMock(spec=AsyncClient)
         mock_client.__aenter__.return_value = mock_client
         # Simulate internal failure
         mock_client.post.side_effect = Exception("Connection error")
         mock_client_class.return_value = mock_client
 
         with pytest.raises(HTTPException) as exc_info:
-            await create_user(user_data)
+            await create_user(user_data, global_http_client=mock_client)
 
         assert exc_info.value.status_code == 400
         assert "Signup error: Connection error" in str(exc_info.value.detail)
@@ -109,6 +110,8 @@ async def test_signup_success(client):
         "id": "abc123",
         "emails": [{"value": "test@abc.com"}],
     }
+    
+    mock_http_client = AsyncMock(spec=AsyncClient)
 
     # Patch only what's necessary
     with (
@@ -117,7 +120,7 @@ async def test_signup_success(client):
         patch("app.users.services.create.logger"),
     ):
 
-        result = await signup_with_password(user_data)
+        result = await signup_with_password(user_data, global_http_client=mock_http_client)
 
         assert isinstance(result, ResponseModel)
         assert result.success is True
@@ -133,13 +136,15 @@ async def test_signup_failure_from_ibm(client):
     mock_response.status_code = 400
     mock_response.json.return_value = {"detail": "Invalid user"}
 
+    mock_http_client = AsyncMock(spec=AsyncClient)
+
     with (
         patch("app.users.services.create.create_user", return_value=mock_response),
         patch("app.users.services.create.IBMUserCreateRequest"),
         patch("app.users.services.create.logger"),
     ):
 
-        result = await signup_with_password(user_data)
+        result = await signup_with_password(user_data, global_http_client=mock_http_client)
 
         assert isinstance(result, JSONResponse)
         assert result.status_code == 400
@@ -158,6 +163,8 @@ async def test_signup_validation_error_response(client):
     mock_response.status_code = 201
     mock_response.json.return_value = {"invalid_field": "unexpected"}
 
+    mock_http_client = AsyncMock(spec=AsyncClient)
+
     with (
         patch("app.users.services.create.create_user", return_value=mock_response),
         patch("app.users.services.create.IBMUserCreateRequest"),
@@ -165,7 +172,7 @@ async def test_signup_validation_error_response(client):
     ):
 
         with pytest.raises(HTTPException) as exc_info:
-            await signup_with_password(user_data)
+            await signup_with_password(user_data, global_http_client=mock_http_client)
 
         assert exc_info.value.status_code == 422
         assert "Response validation error" in str(exc_info.value.detail)
@@ -196,6 +203,9 @@ async def test_user_signup(client):
 
         # Mock the token response to simulate a successful access token request
         mock_get_token.return_value = "fake-token"
+
+        mock_client = AsyncMock(spec=AsyncClient)
+        client.app.state.request_client = mock_client
 
         # Simulate the actual API call
         response = client.post("/v1/users/create", json=user_data.model_dump())
