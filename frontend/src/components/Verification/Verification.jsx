@@ -51,10 +51,14 @@ export default function Verification() {
         setError({codeError:null, heading:null});
         if(type===FLOW_TYPES.email){
             navigate("/" + language + NAVIGATION_LINKS.signUp);
-        } else{
+        } else if(flow===FLOW_TYPES.signUp){
             const userData = {...state.userData, phone:null, stepVerificationSent: false, trxnId:null};
             await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
             navigate("/" + language + NAVIGATION_LINKS.twoStepVerification);
+        } else {
+            const userData = {...state.userData, stepVerificationSent: false, trxnId:null};
+            await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
+            navigate("/" + language + NAVIGATION_LINKS.verificationSelection);
         }
     }
 
@@ -81,16 +85,26 @@ export default function Verification() {
         setError({codeError:null, heading:null});
         try {
             const number = state.userData.phone!==null?state.userData.phone:"";
-            const response = await authService.transientOtpSend({
-                phoneNumber: '+'+number.replace(/\D/g,''),
-                userName: state.userData.email,
-                otpType: codeType
-            });
+            let response = null;
+            if(flow===FLOW_TYPES.signUp)
+                response = await authService.transientOtpSend({
+                    phoneNumber: '+'+number.replace(/\D/g,''),
+                    userName: state.userData.email,
+                    otpType: codeType
+                });
+            else
+                response = await authService.otpSend({
+                    phoneNumber: '+'+number.replace(/\D/g,''),
+                    userName: state.userData.email,
+                    otpType: codeType,
+                    id: state.userData.id,
+                });
 
             if(response.success){
                 const userData = {...state.userData, trxnId:response.data.trxnId};
                 await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                 setCodeRequested(true);
+                console.log("success...", response);
                 if(didTypeChange)
                     navigate("/" + language +"/"+ flow +NAVIGATION_LINKS.verification + '/' +codeType);
             }else {
@@ -125,12 +139,22 @@ export default function Verification() {
             setError({codeError:null, heading:null});
 
             try {
-                const response = await authService.transientOtpVerify({
-                    otp: formCode,
-                    otpType: type,
-                    trxnId: state.userData.trxnId,
-                    userName: state.userData.email  //part of TEST_USERS, not needed if removed
-                });
+                let response = null;
+
+                if(flow===FLOW_TYPES.signUp)
+                    response = await authService.transientOtpVerify({
+                        otp: formCode,
+                        otpType: type,
+                        trxnId: state.userData.trxnId,
+                        userName: state.userData.email  //part of TEST_USERS, not needed if removed
+                    });
+                else
+                    response = await authService.otpVerify({
+                        otp: formCode,
+                        otpType: type,
+                        trxnId: state.userData.trxnId,
+                        userName: state.userData.email  //part of TEST_USERS, not needed if removed
+                    });
                 if(response.success){
                     trackEvent({
                         category: GA_CATEGORIES.onboarding,
@@ -249,7 +273,7 @@ export default function Verification() {
                         </GcdsHeading>
                     )
                 }
-                <form id="form"  onSubmit={handleSubmit}>
+                <form id="form" onSubmit={handleSubmit}>
                     {
                         state.testData!==undefined&&(<GcdsInput
                         inputId="verificationCode"
