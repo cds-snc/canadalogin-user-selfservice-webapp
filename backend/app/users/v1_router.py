@@ -26,12 +26,12 @@ logger = logging.getLogger(__name__)
     summary="Creates a new user",
     description="Basic Authentication - Email and Password",
 )
-async def user_signup(user: UserLoginRequestData):
+async def user_signup(user: UserLoginRequestData, request: Request):
     """
     Creates a new user.
     Returns: ID and Username
     """
-    return await signup_with_password(user)
+    return await signup_with_password(user, request.app.state.request_client)
 
 
 @router.post(
@@ -41,12 +41,12 @@ async def user_signup(user: UserLoginRequestData):
     summary="Authenticate user - basic authentication",
     description="Basic Authentication - Email and Password",
 )
-async def user_password_signin(user: UserLoginRequestData):
+async def user_password_signin(user: UserLoginRequestData, request: Request):
     """
     Creates a new user.
     Returns: ID and Username
     """
-    return await signin_with_password(user)
+    return await signin_with_password(user, request.app.state.request_client)
 
 
 @router.post(
