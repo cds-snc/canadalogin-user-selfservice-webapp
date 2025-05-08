@@ -1,5 +1,5 @@
 import {
-    GcdsContainer, GcdsFieldset, GcdsHeading, GcdsRadioGroup, GcdsText,
+    GcdsContainer, GcdsErrorSummary, GcdsFieldset, GcdsHeading, GcdsRadioGroup, GcdsText,
 } from "@cdssnc/gcds-components-react";
 import {
     AVAILABLE_LANGUAGES,
@@ -21,8 +21,9 @@ import {useError} from "../../hooks/useError.js";
 export default function VerificationSelection() {
     const {language, flow} = useParams();
     const {state} = useUser();
+    const {setError, hasErrors, getError} = useError(language);
     const pageContentJson = getPageContent(language, PAGES.verificationSelection);
-    const {setError} = useError(language);
+    const error = getError('#number');
 
     const submitDataOptions = {
         language,
@@ -31,7 +32,7 @@ export default function VerificationSelection() {
         page: PAGES.verificationSelection,
         flow: flow,
         policy: null,
-        onError: (err)=> setError('#email',err)
+        onError: (err)=> setError('#number',err)
     };
 
     const {handleSubmit, isPending} = useSubmit(submitDataOptions, null );
@@ -39,6 +40,12 @@ export default function VerificationSelection() {
     return (
         <GcdsContainer className="gcds-content" >
             <GcdsContainer>
+                {
+                    hasErrors()&&(<GcdsErrorSummary data-testid='errorSummary'
+                                                    errorLinks={`{"#number": "${error.errorMsg}"}`}
+                                                    heading={ error.heading}
+                    />)
+                }
                 <GcdsHeading tag="h1">
                     {pageContentJson['1']}
                     <GcdsText marginTop="150" marginBottom="0">

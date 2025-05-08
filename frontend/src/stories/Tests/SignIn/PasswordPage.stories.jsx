@@ -32,6 +32,7 @@ export const ErrorBackEnd = TestTemplate.bind({});
 export const SuccessfulBackEnd = TestTemplate.bind({});
 export const ServerErrorBackEnd = TestTemplate.bind({});
 export const TestUser = TestTemplate.bind({});
+export const TestUserIncorrectPassword = TestTemplate.bind({});
 
 EngErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
@@ -134,4 +135,22 @@ TestUser.play = async ({ canvasElement, step }) => {
         type: TEST_TYPES.redirect
     })
 }
+
+TestUserIncorrectPassword.args = {email: TEST_USERS.keys().next().value, password:"testUser123456"};
+TestUserIncorrectPassword.play = async ({ canvasElement, step }) => {
+
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage: "Submit form with test user and incorrect password.",
+        link: 'password',
+        heading: engErrorPageJson[1],
+        message: engErrorPageJson[7],
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.error
+    })
+}
+
+
 
