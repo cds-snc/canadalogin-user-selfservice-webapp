@@ -124,7 +124,7 @@ async function callAuthService(submitDataOptions:SubmitDataOptions, formData:For
                 lastName: formData.get('lastName'),
                 id: userData.id
             };
-            return await authService.otpSend({...payload});
+            return await authService.createCoreProfile({...payload});
         default :
             return {};
     }
