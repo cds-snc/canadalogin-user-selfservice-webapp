@@ -33,7 +33,7 @@ export function useSubmit(submitDataOptions:SubmitDataOptions, validateFunction:
                     const userData = setUserData(submitDataOptions, formData, state.userData, response);
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                     await callAnalytics(submitDataOptions, "submit_success");
-                    const navigateTo = setNavigateTo(submitDataOptions, response);
+                    const navigateTo = setNavigateTo(submitDataOptions, response, formData);
                     navigate(navigateTo);
                     return;
                 } catch (error){
