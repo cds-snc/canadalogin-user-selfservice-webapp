@@ -7,7 +7,7 @@ from pydantic import ValidationError
 
 from app.config import get_settings
 from app.otp.schemas import UserOtpInfo, OtpType, OtpSentResponse
-from app.utils.access_token import get_access_token, get_auth_request_headers
+from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.helpers import (
     generate_error_response,
     prepare_pydantic_phone_number_for_verify,
@@ -71,7 +71,7 @@ async def dispatch_otp(user_otp_info: UserOtpInfo, global_http_client: AsyncClie
     Use it for ALL API calls."""
 
     try:
-        access_token = await get_access_token()
+        access_token = await get_admin_token()
         headers = get_auth_request_headers(access_token, True)
         settings = get_settings().ibm_verify_config
 

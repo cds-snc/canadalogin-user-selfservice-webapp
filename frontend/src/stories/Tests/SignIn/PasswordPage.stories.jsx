@@ -16,13 +16,13 @@ const engErrorPageJson = getPageContent(AVAILABLE_LANGUAGES.en, PAGES.error);
 const frErrorPageJson = getPageContent(AVAILABLE_LANGUAGES.fr, PAGES.error);
 
 export default {
-    title: 'GC Sign In/Tests/Sign Up/Password Creation Page',
+    title: 'GC Sign In/Tests/Sign In/Password Page',
     args:{
         page: PAGES.password,
         password: "1234567890"
     },
     parameters: buildTestCase.parameters(NAVIGATION_LINKS.password,
-        { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
+        { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn },
         [MSW_MOCKS.passwordPolicy])
 };
 
@@ -32,6 +32,7 @@ export const ErrorBackEnd = TestTemplate.bind({});
 export const SuccessfulBackEnd = TestTemplate.bind({});
 export const ServerErrorBackEnd = TestTemplate.bind({});
 export const TestUser = TestTemplate.bind({});
+export const TestUserIncorrectPassword = TestTemplate.bind({});
 
 EngErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
@@ -49,7 +50,7 @@ EngErrorFrontEnd.play = async ({ canvasElement, step }) => {
 }
 
 FrErrorFrontEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.password,
-    { language: AVAILABLE_LANGUAGES.fr, flow: FLOW_TYPES.signUp },
+    { language: AVAILABLE_LANGUAGES.fr, flow: FLOW_TYPES.signIn },
     [MSW_MOCKS.passwordPolicy]);
 FrErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
@@ -66,9 +67,26 @@ FrErrorFrontEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-ErrorBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.coreProfile,
-    { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
-    [MSW_MOCKS.passwordPolicy, MSW_MOCKS.create.error]);
+SuccessfulBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
+    { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn },
+    [MSW_MOCKS.passwordPolicy, MSW_MOCKS.login.success]);
+SuccessfulBackEnd.args = {password:"123456789012"};
+SuccessfulBackEnd.play = async ({ canvasElement, step }) => {
+
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage: "Submit form with good password For Back End Success",
+        link: 'password',
+        delay: 3000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.redirect
+    })
+}
+
+ErrorBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
+    { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn },
+    [MSW_MOCKS.passwordPolicy, MSW_MOCKS.login.error]);
 ErrorBackEnd.args = {password:"123456789012"};
 ErrorBackEnd.play = async ({ canvasElement, step }) => {
 
@@ -85,26 +103,9 @@ ErrorBackEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-SuccessfulBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.coreProfile,
-    { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
-    [MSW_MOCKS.passwordPolicy, MSW_MOCKS.create.success]);
-SuccessfulBackEnd.args = {password:"123456789012"};
-SuccessfulBackEnd.play = async ({ canvasElement, step }) => {
-
-    await testCase({
-        canvasElement,
-        step,
-        stepMessage: "Submit form with good password For Back End Success",
-        link: 'password',
-        delay: 3000,
-        actionType: ACTION_TYPES.submit,
-        type: TEST_TYPES.redirect
-    })
-}
-
-ServerErrorBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.coreProfile,
-    { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
-    [MSW_MOCKS.passwordPolicy, MSW_MOCKS.create.serverTimeOut]);
+ServerErrorBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
+    { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn },
+    [MSW_MOCKS.passwordPolicy, MSW_MOCKS.login.serverTimeOut]);
 ServerErrorBackEnd.args = {password:"123456789012"};
 ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
 
@@ -121,7 +122,7 @@ ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
     })
 }
 
-TestUser.args = {email: TEST_USERS.keys().next().value, password:"123456789012"};
+TestUser.args = {email: TEST_USERS.keys().next().value, password:TEST_USERS.get(TEST_USERS.keys().next().value).login};
 TestUser.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -134,4 +135,22 @@ TestUser.play = async ({ canvasElement, step }) => {
         type: TEST_TYPES.redirect
     })
 }
+
+TestUserIncorrectPassword.args = {email: TEST_USERS.keys().next().value, password:"testUser123456"};
+TestUserIncorrectPassword.play = async ({ canvasElement, step }) => {
+
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage: "Submit form with test user and incorrect password.",
+        link: 'password',
+        heading: engErrorPageJson[1],
+        message: engErrorPageJson[7],
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.error
+    })
+}
+
+
 

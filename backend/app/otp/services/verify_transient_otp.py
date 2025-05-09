@@ -6,7 +6,7 @@ from httpx import AsyncClient
 
 from app.config import get_settings
 from app.otp.schemas import OtpType, UserOtpVerificationInfo
-from app.utils.access_token import get_access_token, get_auth_request_headers
+from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.helpers import generate_error_response
 from app.utils.schemas import ResponseModel
 
@@ -71,7 +71,7 @@ async def verify_otp(
             "otp": user_verification_data.otp,
         }
 
-        access_token = await get_access_token()
+        access_token = await get_admin_token()
         headers = get_auth_request_headers(access_token, True)
         settings = get_settings().ibm_verify_config
 

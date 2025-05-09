@@ -12,7 +12,7 @@ from app.users.schemas import (
     TwofactorEnrollmentResponse,
     TwoFactorEnrollmentType,
 )
-from app.utils.access_token import get_access_token, get_auth_request_headers
+from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.helpers import generate_error_response
 from app.utils.schemas import ResponseModel
 
@@ -67,7 +67,7 @@ async def handle_enrolling_user_into_2fa(
 
 async def enroll_user(two_factor_enrollment_data, global_http_client):
     try:
-        access_token = await get_access_token()
+        access_token = await get_admin_token()
         headers = get_auth_request_headers(access_token, True)
         settings = get_settings().ibm_verify_config
 
