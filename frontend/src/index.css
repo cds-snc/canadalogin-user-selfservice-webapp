@@ -40,22 +40,6 @@ body, .mainBody {
         align-items: center;
         gap: var(--gcds-spacing-350);
     }
-    .rectangle-container {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 10px; /* Adjusted gap to match Figma styling */
-        align-self: stretch;
-        margin-top: 8px; /* Added margin-top to match Figma styling */
-    }
-    .rectangle {
-        width: 65.4px; /* Adjusted width to match Figma styling */
-        height: 9.4px; /* Adjusted height to match Figma styling */
-        background-color: grey;
-        flex-shrink: 0;
-        border-radius: 2px;
-        background: var(--Tokens-color-grayscale-100, #D6D9DD);
-    }
 }
 
 @media screen and (min-width:768px) {
@@ -72,31 +56,16 @@ body, .mainBody {
         background: #FFF;
         display: flex;
         width:750px;
-        padding: 80px 80px;
+        /*padding: 80px 80px;*/
         justify-content: center;
         align-items: center;
         margin:auto;
         vertical-align: middle;
         gap: var(--gcds-spacing-300);
+        /* 600=48, hence 720 = 60 ; 1000= 80 px*/
+        padding: var(--gcds-spacing-1000) var(--gcds-spacing-1000) var(--gcds-spacing-600) var(--gcds-spacing-1000);
     }
     .gcds-footer{
         padding-top: var(--gcds-spacing-400);
     }
-    .rectangle-container {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 4px; /* Adjusted gap to match Figma styling */
-        align-self: stretch;
-        margin-top: 8px; /* Added margin-top to match Figma styling */
-    }
-    .rectangle {
-        width: 65.3px; /* Adjusted width to match Figma styling */
-        height: 9.4px; /* Adjusted height to match Figma styling */
-        background-color: grey;
-        flex-shrink: 0;
-        border-radius: 2px;
-        background: var(--Tokens-color-grayscale-100, #D6D9DD);
-    }
-
 }

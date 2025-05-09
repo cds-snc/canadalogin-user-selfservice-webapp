@@ -303,7 +303,7 @@ export default function Verification() {
                         {type!==FLOW_TYPES.email?pageContentJson['16']:pageContentJson['26']}
                     </GcdsLink>):""}
             </GcdsText>
-            {flow===FLOW_TYPES.signUp&&(<AlreadyGc currentLang={language}/>)}
+            {flow===FLOW_TYPES.signUp}
         </GcdsContainer>
     )
 }
