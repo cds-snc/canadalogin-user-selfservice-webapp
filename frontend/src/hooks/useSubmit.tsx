@@ -52,11 +52,13 @@ export function useSubmit(submitDataOptions:SubmitDataOptions, validateFunction:
     return {handleSubmit, isPending};
 }
 
-function setNavigateTo(submitDataOptions: SubmitDataOptions, response:any) {
+function setNavigateTo(submitDataOptions: SubmitDataOptions, response:any, formData:FormData) {
 
     switch(submitDataOptions.flow+submitDataOptions.page) {
         case FLOW_TYPES.signIn+PAGES.password:
             return submitDataOptions.navigateTo+"/"+response.data.otpType;
+        case FLOW_TYPES.signUp+PAGES.verificationSetUp:
+            return submitDataOptions.navigateTo+"/"+formData.get('verificationType');
         default:
             return submitDataOptions.navigateTo;
     }
@@ -80,12 +82,14 @@ async function callAuthService(submitDataOptions:SubmitDataOptions, formData:For
                     userName: formData.get(FLOW_TYPES.email),
                     otpType: FLOW_TYPES.email
                 };
-            else
+            else {
+                const phoneNumber = formData.get('phone').toString();
                 payload = {
                     userName: userData.email,
-                    otpType: userData.otpType,
-                    phone: userData.phone
-                };
+                    otpType: formData.get('verificationType'),
+                    phoneNumber: '+' + phoneNumber.replace(/\D/g, '')
+                }
+            }
             return await authService.transientOtpSend({...payload});
         case(SUBMIT_END_POINTS.create):
             payload = {
@@ -133,6 +137,15 @@ function setUserData(submitDataOptions:SubmitDataOptions, formData: FormData, us
                 id: response.data.id, phone: response.data.phone, passwordValidated: true};
         case PAGES.verificationSelection:
             return {...userData, trxnId: response.data.trxnId};
+        case PAGES.verificationSetUp:
+            return  {
+                ...userData,
+                phone:formData.get('phone'),
+                stepVerificationSent: true,
+                trxnId:response.data.trxnId,
+            }
+        case PAGES.privacy:
+                return {...userData, viewPrivacy: true};
         default:
             return {}
     }
@@ -140,12 +153,14 @@ function setUserData(submitDataOptions:SubmitDataOptions, formData: FormData, us
 
 function validateObject(page: string, formData:any, validateFunction: any) {
     switch(page){
-        case PAGES.signup:
-            return  validateFunction(formData.get(FLOW_TYPES.email));
         case PAGES.home:
+            return  validateFunction(formData.get(FLOW_TYPES.email));
+        case PAGES.signup:
             return  validateFunction(formData.get(FLOW_TYPES.email));
         case PAGES.password:
             return  validateFunction(formData.get('password'));
+        case PAGES.verificationSetUp:
+            return  validateFunction();
         default:
             return true;
     }
