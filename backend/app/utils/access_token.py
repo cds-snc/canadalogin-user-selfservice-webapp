@@ -1,9 +1,6 @@
 import logging
 import threading
 from datetime import datetime
-
-from cachetools import cached
-from cachetools import TTLCache
 from fastapi import HTTPException
 from httpx import AsyncClient
 from app.config import get_settings
@@ -16,7 +13,7 @@ admin_token_ttl = 7170
 
 
 async def get_admin_token():
-        return await get_access_token()
+    return await get_access_token()
 
 
 async def request_access_token():
