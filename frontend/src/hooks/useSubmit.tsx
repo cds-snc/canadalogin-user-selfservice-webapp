@@ -34,7 +34,6 @@ export function useSubmit(submitDataOptions:SubmitDataOptions, validateFunction:
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                     await callAnalytics(submitDataOptions, "submit_success");
                     const navigateTo = setNavigateTo(submitDataOptions, response, formData);
-                    console.log("success....", response);
                     navigate(navigateTo);
                     return;
                 } catch (error){
