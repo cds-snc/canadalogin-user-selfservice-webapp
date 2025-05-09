@@ -34,6 +34,7 @@ export function useSubmit(submitDataOptions:SubmitDataOptions, validateFunction:
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                     await callAnalytics(submitDataOptions, "submit_success");
                     const navigateTo = setNavigateTo(submitDataOptions, response, formData);
+                    console.log("success....", response);
                     navigate(navigateTo);
                     return;
                 } catch (error){
@@ -117,6 +118,14 @@ async function callAuthService(submitDataOptions:SubmitDataOptions, formData:For
                 phone: userData.phone
             };
             return await authService.otpSend({...payload});
+        case(SUBMIT_END_POINTS.createCoreProfile):
+            payload = {
+                userName: userData.email,
+                firstName: formData.get('firstName'),
+                lastName: formData.get('lastName'),
+                id: userData.id
+            };
+            return await authService.otpSend({...payload});
         default :
             return {};
     }
@@ -147,7 +156,7 @@ function setUserData(submitDataOptions:SubmitDataOptions, formData: FormData, us
         case PAGES.privacy:
                 return {...userData, viewPrivacy: true};
         default:
-            return {}
+            return {...userData}
     }
 }
 
@@ -161,6 +170,8 @@ function validateObject(page: string, formData:any, validateFunction: any) {
             return  validateFunction(formData.get('password'));
         case PAGES.verificationSetUp:
             return  validateFunction();
+        case PAGES.coreProfile:
+            return validateFunction(formData.get('firstName'), formData.get('lastName'));
         default:
             return true;
     }
