@@ -15,10 +15,8 @@ settings = get_settings().ibm_verify_config
 admin_token_ttl = 7170
 
 
-@cached(cache=TTLCache(maxsize=1, ttl=admin_token_ttl))
-def get_admin_token():
-    with lock:
-        return get_access_token()
+async def get_admin_token():
+        return await get_access_token()
 
 
 async def request_access_token():
