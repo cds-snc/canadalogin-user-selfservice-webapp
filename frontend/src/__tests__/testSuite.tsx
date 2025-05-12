@@ -85,7 +85,7 @@ const pageSetup = {
             case PAGES.signup:
                 return language !== AVAILABLE_LANGUAGES.fr ? engJson["AlreadyGc"] : frJson["AlreadyGc"];
             case PAGES.verification:
-                if (flow === FLOW_TYPES.signUp && type === FLOW_TYPES.sms || FLOW_TYPES.voice)
+                if (flow === FLOW_TYPES.signUp && (type === FLOW_TYPES.email))
                     return language !== AVAILABLE_LANGUAGES.fr ? engJson["AlreadyGc"] : frJson["AlreadyGc"];
                 else
                     return null;
@@ -272,7 +272,6 @@ const pageSetup = {
 
 const testSuite = {
     parameters: (language: string, page: string, flow: string, type: string, link: string) => {
-
         return {
             language: language,
             pageContentJson: language !== AVAILABLE_LANGUAGES.fr ? engJson[page] : frJson[page],

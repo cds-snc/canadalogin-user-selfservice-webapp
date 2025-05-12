@@ -23,7 +23,6 @@ import {
 import {useUser} from "../Providers/useUser.tsx";
 import SubmitButton from "../Layout/SubmitButton.jsx";
 import {useNavigate, useParams} from "react-router";
-import AlreadyGc from "../Layout/AlreadyGc.jsx";
 import { trackEvent } from "../../utils/gatag.jsx";
 import {GA_CATEGORIES, GA_ACTIONS, GA_LABELS} from "../../utils/constants.jsx";
 
@@ -192,28 +191,30 @@ export default function Password() {
             }
             <GcdsContainer>
                 <form id="form" onSubmit={handleSubmit} >
-                    { state.testData!==undefined&&(
-                        <GcdsInput
+                    <GcdsContainer className="max480">
+                        { state.testData!==undefined&&(
+                            <GcdsInput
+                                inputId="input-password"
+                                label={pageContentJson['9']}
+                                name="password"
+                                value={state.testData.password}
+                                hint={flow===FLOW_TYPES.signUp?pageContentJson['10']:''}
+                                type={checkedValue? "password" : "text"}
+                                onGcdsInput={handlePasswordChange}
+                                errorMessage={errorJson.passwordError}
+                            ></GcdsInput>)
+                        }
+                        { state.testData===undefined&&(<GcdsInput
                             inputId="input-password"
                             label={pageContentJson['9']}
                             name="password"
-                            value={state.testData.password}
                             hint={flow===FLOW_TYPES.signUp?pageContentJson['10']:''}
                             type={checkedValue? "password" : "text"}
                             onGcdsInput={handlePasswordChange}
                             errorMessage={errorJson.passwordError}
                         ></GcdsInput>)
-                    }
-                    { state.testData===undefined&&(<GcdsInput
-                        inputId="input-password"
-                        label={pageContentJson['9']}
-                        name="password"
-                        hint={flow===FLOW_TYPES.signUp?pageContentJson['10']:''}
-                        type={checkedValue? "password" : "text"}
-                        onGcdsInput={handlePasswordChange}
-                        errorMessage={errorJson.passwordError}
-                    ></GcdsInput>)
-                    }
+                        }
+                    </GcdsContainer>
                     <GcdsCheckbox
                         checkboxId="checkbox-default"
                         label={pageContentJson['11']}

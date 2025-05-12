@@ -128,6 +128,7 @@ function InputBox({pageContentJson, language, errorJson, state}) {
                     inputId="firstName"
                     label={pageContentJson['7']}
                     name="firstName"
+                    size="10"
                     value={state.testData.firstName}
                     type="text"
                     lang={language}
@@ -137,6 +138,7 @@ function InputBox({pageContentJson, language, errorJson, state}) {
                     inputId="lastName"
                     label={pageContentJson['8']}
                     name="lastName"
+                    size="10"
                     type="text"
                     value={state.testData.lastName}
                     validateOn="other"
@@ -152,6 +154,7 @@ function InputBox({pageContentJson, language, errorJson, state}) {
                     label={pageContentJson['7']}
                     name="firstName"
                     type="text"
+                    size="10"
                     lang={language}
                     optional
                 ></GcdsInput>
@@ -160,6 +163,7 @@ function InputBox({pageContentJson, language, errorJson, state}) {
                     label={pageContentJson['8']}
                     name="lastName"
                     type="text"
+                    size="10"
                     validateOn="other"
                     errorMessage={errorJson.nameError}
                     lang={language}
