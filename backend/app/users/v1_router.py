@@ -6,10 +6,14 @@ from app.users.schemas import (
     AuthenticatedUserResponse,
     TwoFactorEnrollmentUserData,
     VerifiedTwofactorEnrollmentResponse,
+    ProfileCreateResponse,
+    ProfileUserData,
 )
 from app.users.services.create import signup_with_password
 from app.users.services.login import signin_with_password
 from app.users.services.two_factor_enrollment import handle_enrolling_user_into_2fa
+from app.users.services.profile import create_profile
+
 import logging
 from fastapi import Request
 
@@ -62,3 +66,14 @@ async def user_2fa_enroll(
     return await handle_enrolling_user_into_2fa(
         user_enrollment_data, request.app.state.request_client
     )
+
+
+@router.post(
+    "/createcoreprofile",
+    response_model=ProfileCreateResponse,
+    tags=["Users"],
+    summary="Create user profile in verify",
+    description="",
+)
+async def user_create_profile(user_data: ProfileUserData, request: Request):
+    return await create_profile(user_data, request.app.state.request_client)

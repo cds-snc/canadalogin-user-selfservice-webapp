@@ -2,8 +2,6 @@ import logging
 import threading
 from datetime import datetime
 
-from cachetools import cached
-from cachetools import TTLCache
 from fastapi import HTTPException
 from httpx import AsyncClient
 from app.config import get_settings
@@ -15,10 +13,8 @@ settings = get_settings().ibm_verify_config
 admin_token_ttl = 7170
 
 
-@cached(cache=TTLCache(maxsize=1, ttl=admin_token_ttl))
 def get_admin_token():
-    with lock:
-        return get_access_token()
+    return get_access_token()
 
 
 async def request_access_token():

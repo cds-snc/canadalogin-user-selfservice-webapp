@@ -57,6 +57,18 @@ class IBMUserCreateResponse(BaseModel):
     id: str
 
 
+class ProfileCreateResponse(ResponseModel):
+    schemas: Optional[str] = None
+    status: Optional[str] = None
+    detail: Optional[str] = None
+
+
+class ProfileUserData(BaseModel):
+    userid: str
+    firstName: Optional[str] = None
+    lastName: str
+
+
 class SignUpResponse(ResponseModel):
     data: Optional[IBMUserCreateResponse] = None
 
