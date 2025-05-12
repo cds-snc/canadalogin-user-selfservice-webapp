@@ -10,32 +10,23 @@ import SubmitButton from "../../Layout/SubmitButton.jsx";
 import AlreadyGc from "../../Layout/AlreadyGc.jsx";
 import { useParams } from "react-router";
 import {AVAILABLE_LANGUAGES, PAGES, SERVICES} from "../../../utils/constants.jsx";
-import {useUser} from "../../Providers/useUser.tsx";
-import {CONTEXT_ACTIONS} from "../../../utils/constants.jsx";
-import {useNavigate} from "react-router";
 import {NAVIGATION_LINKS} from "../../../utils/constants.jsx";
-import { trackEvent } from "../../../utils/gatag.jsx";
-import {GA_CATEGORIES, GA_ACTIONS, GA_LABELS} from "../../../utils/constants.jsx";
+import {useSubmit} from "../../../hooks/useSubmit.js";
+
 
 export default function Privacy() {
-    const { language } = useParams();
-    const {state, dispatch} = useUser();
-    const navigate = useNavigate();
-
-    async function handleSubmit(event) {
-        event.preventDefault();
-        trackEvent({
-            category: GA_CATEGORIES.onboarding,
-            action: GA_ACTIONS.acceptPrivacy,
-            label: GA_LABELS.button
-          });
-
-        const userData = { ...state.userData, viewPrivacy: true };
-        await dispatch({ type: CONTEXT_ACTIONS.signUp, payload: userData });
-        navigate("/" + language + NAVIGATION_LINKS.signUp);
-    }
-
+    const { language, flow } = useParams();
     const pageContentJson = getPageContent(language, PAGES.privacy);
+
+    const submitDataOptions = {
+        endpoint: null,
+        navigateTo: "/" + language + NAVIGATION_LINKS.signUp,
+        type: null,
+        page: PAGES.privacy,
+        flow: flow,
+        onError: null
+    };
+    const {handleSubmit, isPending} = useSubmit(submitDataOptions, null );
 
     return (
         <GcdsContainer>
@@ -109,7 +100,7 @@ export default function Privacy() {
                 </GcdsText>
             </GcdsDetails>
             <br />
-            <SubmitButton currentLang={language} />
+            <SubmitButton currentLang={language} disabled={isPending} />
             <AlreadyGc currentLang={language} />
             </form>
         </GcdsContainer>
