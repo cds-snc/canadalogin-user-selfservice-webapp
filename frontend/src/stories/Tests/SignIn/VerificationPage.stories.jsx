@@ -4,14 +4,14 @@ import {
     PAGES
 } from "../../../utils/constants.jsx";
 import {getPageContent} from "../../../utils/functions.jsx";
-import {ACTION_TYPES, ERROR_RESPONSE, MSW_MOCKS, TEST_TYPES} from "../utils/constants.jsx";
+import {ACTION_TYPES, ERROR_RESPONSE, MSW_MOCKS, TEST_TYPES, TEST_USERS} from "../utils/constants.jsx";
 import {
     buildTestCase,
     testCase,
     TestTemplate
 } from "../utils/functions.tsx";
-const engErrorPageJson = getPageContent('en', "Error");
-const frErrorPageJson = getPageContent('fr', "Error");
+const engErrorPageJson = getPageContent(AVAILABLE_LANGUAGES.en, PAGES.error);
+const frErrorPageJson = getPageContent(AVAILABLE_LANGUAGES.fr, PAGES.error);
 const engPageContentJson = getPageContent(AVAILABLE_LANGUAGES.en, PAGES.verification);
 const frPageContentJson = getPageContent(AVAILABLE_LANGUAGES.fr, PAGES.verification);
 
@@ -38,6 +38,9 @@ export const FrRequestNewTypeCode = TestTemplate.bind({});
 export const NewCodeBackEndError = TestTemplate.bind({});
 export const ServerErrorReqNewCode = TestTemplate.bind({});
 export const UseNewNumber = TestTemplate.bind({});
+export const TestUserSms = TestTemplate.bind({});
+export const TestUserVoice = TestTemplate.bind({});
+export const TestUserIncorrectOtp = TestTemplate.bind({});
 
 EngErrorFrontEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.sms },
@@ -79,7 +82,7 @@ FrErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
 SmsErrorBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.sms },
-    [MSW_MOCKS.transientOtpVerify.error]);
+    [MSW_MOCKS.otpVerify.error]);
 SmsErrorBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -97,7 +100,7 @@ SmsErrorBackEnd.play = async ({ canvasElement, step }) => {
 
 SmsSuccessfulBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.sms },
-    [MSW_MOCKS.transientOtpVerify.smsSuccess]);
+    [MSW_MOCKS.otpVerify.smsSuccess]);
 SmsSuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -113,7 +116,7 @@ SmsSuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
 VoiceErrorBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.voice },
-    [MSW_MOCKS.transientOtpVerify.error]);
+    [MSW_MOCKS.otpVerify.error]);
 VoiceErrorBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -131,7 +134,7 @@ VoiceErrorBackEnd.play = async ({ canvasElement, step }) => {
 
 VoiceSuccessfulBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.voice },
-    [MSW_MOCKS.transientOtpVerify.voiceSuccess]);
+    [MSW_MOCKS.otpVerify.voiceSuccess]);
 VoiceSuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -147,7 +150,7 @@ VoiceSuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
 ServerErrorBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.voice },
-    [MSW_MOCKS.transientOtpVerify.serverTimeOut]);
+    [MSW_MOCKS.otpVerify.serverTimeOut]);
 ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -165,7 +168,7 @@ ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
 
 EngRequestNewCode.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.sms },
-    [MSW_MOCKS.transientOtpSend.smsSuccess]);
+    [MSW_MOCKS.otpSend.smsSuccess]);
 EngRequestNewCode.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -183,7 +186,7 @@ EngRequestNewCode.play = async ({ canvasElement, step }) => {
 
 FrRequestNewCode.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.fr, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.voice },
-    [MSW_MOCKS.transientOtpSend.voiceSuccess]);
+    [MSW_MOCKS.otpSend.voiceSuccess]);
 FrRequestNewCode.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -201,7 +204,7 @@ FrRequestNewCode.play = async ({ canvasElement, step }) => {
 
 NewCodeBackEndError.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.sms },
-    [MSW_MOCKS.transientOtpSend.error]);
+    [MSW_MOCKS.otpSend.error]);
 NewCodeBackEndError.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -220,7 +223,7 @@ NewCodeBackEndError.play = async ({ canvasElement, step }) => {
 
 ServerErrorReqNewCode.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.voice },
-    [MSW_MOCKS.transientOtpSend.serverTimeOut]);
+    [MSW_MOCKS.otpSend.serverTimeOut]);
 ServerErrorReqNewCode.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -239,7 +242,7 @@ ServerErrorReqNewCode.play = async ({ canvasElement, step }) => {
 
 EngRequestNewTypeCode.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.sms },
-    [MSW_MOCKS.transientOtpSend.voiceSuccess]);
+    [MSW_MOCKS.otpSend.voiceSuccess]);
 EngRequestNewTypeCode.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -257,7 +260,7 @@ EngRequestNewTypeCode.play = async ({ canvasElement, step }) => {
 
 FrRequestNewTypeCode.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.fr, flow: FLOW_TYPES.signIn, type:FLOW_TYPES.voice },
-    [MSW_MOCKS.transientOtpSend.smsSuccess]);
+    [MSW_MOCKS.otpSend.smsSuccess]);
 FrRequestNewTypeCode.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -291,3 +294,54 @@ UseNewNumber.play = async ({ canvasElement, step }) => {
     })
 }
 
+TestUserSms.args = {email: TEST_USERS.keys().next().value, passwordValidated:true, phone: '+1(***) ***-1234', id:'12345-12346', otpType:'sms', otp: TEST_USERS.get(TEST_USERS.keys().next().value).smsOtp};
+TestUserSms.parameters= buildTestCase.parameters(NAVIGATION_LINKS.verification,
+    { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type: 'sms' },
+    []);
+TestUserSms.play = async ({ canvasElement, step }) => {
+
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage: "Submit form with test user for SMS",
+        link: 'password',
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.redirect
+    })
+}
+TestUserVoice.args = {email: TEST_USERS.keys().next().value, passwordValidated:true, phone: '+1(***) ***-1234', id:'12345-12346', otpType:'voice', otp: TEST_USERS.get(TEST_USERS.keys().next().value).voiceOtp};
+TestUserVoice.parameters= buildTestCase.parameters(NAVIGATION_LINKS.verification,
+    { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type: 'voice' },
+    []);
+TestUserVoice.play = async ({ canvasElement, step }) => {
+
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage: "Submit form with test user for Voice",
+        link: 'password',
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.redirect
+    })
+}
+
+TestUserIncorrectOtp.args = {email: TEST_USERS.keys().next().value, passwordValidated:true, phone: '+1(***) ***-1234', id:'12345-12346', otpType:'sms', otp: TEST_USERS.get(TEST_USERS.keys().next().value).voiceOtp};
+TestUserIncorrectOtp.parameters= buildTestCase.parameters(NAVIGATION_LINKS.verification,
+    { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signIn, type: 'sms' },
+    []);
+TestUserIncorrectOtp.play = async ({ canvasElement, step }) => {
+
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage: "Submit form with test user for Incorrect Otp",
+        link: 'verificationCode',
+        heading: engErrorPageJson[1],
+        message: ERROR_RESPONSE.message,
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.error
+    })
+}

@@ -10,38 +10,49 @@ import {
     GcdsHeading, GcdsLink
 } from "@cdssnc/gcds-components-react";
 import {getPageContent, isPasswordValid} from '../../utils/functions';
-import {useEffect, useState, useTransition} from 'react';
+import {useEffect, useState} from 'react';
 import {authService} from "../../services/authService.jsx";
 import {
     AVAILABLE_LANGUAGES,
-    CONTEXT_ACTIONS,
     FLOW_TYPES,
     NAVIGATION_LINKS,
     PAGES,
-    SERVICES
+    SERVICES, SUBMIT_END_POINTS
 } from "../../utils/constants.jsx";
 import {useUser} from "../Providers/useUser.tsx";
 import SubmitButton from "../Layout/SubmitButton.jsx";
-import {useNavigate, useParams} from "react-router";
-import { trackEvent } from "../../utils/gatag.jsx";
-import {GA_CATEGORIES, GA_ACTIONS, GA_LABELS} from "../../utils/constants.jsx";
+import {useParams} from "react-router";
+import {useSubmit} from "../../hooks/useSubmit.js";
+import {useError} from "../../hooks/useError.js";
 
 export default function Password() {
-    const {state, dispatch} = useUser();
+    const {state} = useUser();
     const {language, flow} = useParams();
+    const {setError, clearAllErrors, getError, hasErrors} = useError(language);
     const [checkedValue, setCheckedValue] = useState(true);
     const [passwordPolicy, setPasswordPolicy] = useState({min: 12, max:65})
     const [passwordStrength, setPasswordStrength] = useState(0);
-    const [visibility, setVisibility] = useState(false);
-    const [errorJson, setError] = useState({heading: null, passwordError:null});
-    const [isPending, startTransition] = useTransition();
-    const navigate = useNavigate();
     const pageContentJson = getPageContent(language, PAGES.password);
-    const errorPageJson = getPageContent(language, "Error");
+    const errorPageJson = getPageContent(language, PAGES.error);
+    const error = getError('#password');
 
     useEffect( () => {
         loadMinMax();
     },[])
+
+    function handlePasswordChange (event) {
+        clearAllErrors();
+        setPasswordStrength(event.target.value.length);
+    }
+    function validatePassword(pass) {
+        clearAllErrors();
+        if(!isPasswordValid(pass)) {
+            const errMessage = `${errorPageJson[5]} ${passwordPolicy.min} ${errorPageJson[12]} ${passwordPolicy.max} ${errorPageJson[13]}`;
+            setError('#password', errMessage);
+            return false;
+        }
+        return true;
+    }
 
     async function loadMinMax(){
 
@@ -58,85 +69,25 @@ export default function Password() {
         }
         setPasswordPolicy(policy);
     }
-    async function handleSubmit (event) {
-        startTransition(async()=> {
-            event.preventDefault();
-            trackEvent({
-                category: GA_CATEGORIES.onboarding,
-                action: GA_ACTIONS.submitEmailSignUpPassword,
-                label: GA_LABELS.email
-            });
 
-            const formData = new FormData(event.target);
-            formData.get('password');
-            setVisibility(!visibility);
-            if (!isPasswordValid(formData.get('password'))) {
-                const errorString = `${errorPageJson[5]} ${passwordPolicy.min} ${errorPageJson[12]} ${passwordPolicy.max} ${errorPageJson[13]}`
-                setError({passwordError: errorString, heading: errorPageJson['1']});
-                return;
-            }
+    const submitDataOptions = {
+        language,
+        endpoint: flow===FLOW_TYPES.signUp?SUBMIT_END_POINTS.create:SUBMIT_END_POINTS.login,
+        navigateTo: flow===FLOW_TYPES.signUp?'/'+language+NAVIGATION_LINKS.twoStepVerification:'/'+language+'/'+FLOW_TYPES.signIn+NAVIGATION_LINKS.verification,
+        page: PAGES.password,
+        flow: flow,
+        policy: passwordPolicy,
+        onError: (err)=> setError('#password',err)
+    };
 
-            setError({passwordError: null, heading: null});
-
-            try {
-                if(flow===FLOW_TYPES.signUp) {
-                    const response = await authService.create({
-                        userName: state.userData.email,
-                        password: formData.get('password'),
-                    });
-
-                    if (response.success && response.data.id !== null) {
-                        trackEvent({
-                            category: GA_CATEGORIES.onboarding,
-                            action: GA_ACTIONS.submitEmailSignUpPasswordSuccess,
-                            label: GA_LABELS.email
-                        });
-                        console.log("User created successfully ", response);
-                        const userData = {...state.userData, passwordSubmitted: true, id: response.data.id};
-                        console.log("userData ", userData);
-                        await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
-                        console.log("navigate ", "/" + language + NAVIGATION_LINKS.twoStepVerification);
-                        navigate("/" + language + NAVIGATION_LINKS.twoStepVerification);
-                        console.log("navigating.....")
-                    } else {
-                        trackEvent({
-                            category: GA_CATEGORIES.onboarding,
-                            action: GA_ACTIONS.submitEmailSignUpPasswordFailure,
-                            label: GA_LABELS.email
-                        });
-                        console.log("Error....", response);
-                        setError({passwordError: response.message, heading: errorPageJson['1']});
-                    }
-                }
-            } catch (error) {
-                trackEvent({
-                    category: GA_CATEGORIES.onboarding,
-                    action: GA_ACTIONS.submitEmailSignUpPasswordError,
-                    label: GA_LABELS.email
-                });
-                console.error('Signup error:', error);
-                setError({passwordError: errorPageJson[7], heading: errorPageJson['1']});
-            }
-        });
-    }
-
-    function validateCheckbox ()  {
-        setCheckedValue (!checkedValue);
-    }
-
-    function handlePasswordChange (event) {
-        const password = event.target.value;
-        setError({passwordError: null, heading: null});
-        setPasswordStrength(password.length);
-    }
+    const {handleSubmit, isPending} = useSubmit(submitDataOptions, validatePassword );
 
     return (
         <GcdsContainer>
             {
-                errorJson.passwordError!==null&&(<GcdsErrorSummary
-                    errorLinks={`{"#password": "${errorJson.passwordError}"}`}
-                    heading={errorJson.heading}
-                    data-testid="errorSummary"
+                hasErrors()&&(<GcdsErrorSummary data-testid='errorSummary'
+                                                errorLinks={`{"#password": "${error.errorMsg}"}`}
+                                                heading={ error.heading}
                 />)
             }
             {
@@ -201,7 +152,7 @@ export default function Password() {
                                 hint={flow===FLOW_TYPES.signUp?pageContentJson['10']:''}
                                 type={checkedValue? "password" : "text"}
                                 onGcdsInput={handlePasswordChange}
-                                errorMessage={errorJson.passwordError}
+                                errorMessage={error.errorMsg}
                             ></GcdsInput>)
                         }
                         { state.testData===undefined&&(<GcdsInput
@@ -211,7 +162,7 @@ export default function Password() {
                             hint={flow===FLOW_TYPES.signUp?pageContentJson['10']:''}
                             type={checkedValue? "password" : "text"}
                             onGcdsInput={handlePasswordChange}
-                            errorMessage={errorJson.passwordError}
+                            errorMessage={error.errorMsg}
                         ></GcdsInput>)
                         }
                     </GcdsContainer>
@@ -219,7 +170,7 @@ export default function Password() {
                         checkboxId="checkbox-default"
                         label={pageContentJson['11']}
                         name="checkbox"
-                        onGcdsChange={validateCheckbox}>
+                        onGcdsChange={()=> setCheckedValue (!checkedValue)}>
                     </GcdsCheckbox>
                     {
                         flow===FLOW_TYPES.signUp&&(
@@ -250,7 +201,3 @@ export default function Password() {
         </GcdsContainer>
     )
 }
-
-
-
-

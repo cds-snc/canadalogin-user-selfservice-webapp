@@ -1,6 +1,7 @@
 import pytest
 from unittest.mock import AsyncMock, patch, MagicMock
 from fastapi import HTTPException
+from httpx import AsyncClient
 from app.password.service import get_password_policy
 from fastapi.testclient import TestClient
 from app.main import app
@@ -27,7 +28,7 @@ def mock_settings(scope="session"):
 
 @pytest.mark.asyncio
 @patch("app.password.service.AsyncClient")
-@patch("app.password.service.get_access_token", new_callable=AsyncMock)
+@patch("app.password.service.get_admin_token", new_callable=AsyncMock)
 @patch("app.password.service.get_settings")
 @patch("app.password.service.get_auth_request_headers")
 async def test_get_password_policy_success(
@@ -56,7 +57,7 @@ async def test_get_password_policy_success(
         "requireNumber": True,
         "requireSpecialCharacter": False,
     }
-    mock_client = AsyncMock()
+    mock_client = AsyncMock(spec=AsyncClient)
     mock_client.get.return_value = mock_response
     mock_client_class.return_value.__aenter__.return_value = mock_client
 
@@ -65,7 +66,7 @@ async def test_get_password_policy_success(
         "app.password.service.IBMVerifyPasswordPolicy",
         return_value="validated_model",
     ):
-        result = await get_password_policy()
+        result = await get_password_policy(global_http_client=mock_client)
 
     assert result.success is True
     assert result.data == "validated_model"
@@ -73,22 +74,24 @@ async def test_get_password_policy_success(
 
 @pytest.mark.asyncio
 @patch("app.password.service.get_settings")
-@patch("app.password.service.get_access_token", new_callable=AsyncMock)
+@patch("app.password.service.get_admin_token", new_callable=AsyncMock)
 async def test_get_password_policy_token_failure(
     mock_get_token, mock_get_settings, mock_settings, client
 ):
     mock_get_settings.return_value = mock_settings
     mock_get_token.return_value = None
 
+    mock_client = AsyncMock(spec=AsyncClient)
+
     with pytest.raises(HTTPException) as exc:
-        await get_password_policy()
+        await get_password_policy(global_http_client=mock_client)
 
     assert exc.value.status_code == 500
     assert "Failed to get access token" in exc.value.detail
 
 
 @pytest.mark.asyncio
-@patch("app.password.service.get_access_token", new_callable=AsyncMock)
+@patch("app.password.service.get_admin_token", new_callable=AsyncMock)
 @patch("app.password.service.AsyncClient")
 @patch("app.password.service.get_auth_request_headers")
 @patch("app.password.service.get_settings")
@@ -108,12 +111,12 @@ async def test_get_password_policy_http_error(
     mock_response.status_code = 401
     mock_response.json.return_value = {}
 
-    mock_client = AsyncMock()
+    mock_client = AsyncMock(spec=AsyncClient)
     mock_client.get.return_value = mock_response
     mock_client_class.return_value.__aenter__.return_value = mock_client
 
     with pytest.raises(HTTPException) as exc:
-        await get_password_policy()
+        await get_password_policy(global_http_client=mock_client)
 
     assert exc.value.status_code == 401
     assert "Failed to get password policy" in exc.value.detail
@@ -124,7 +127,7 @@ class DummyModel(BaseModel):
 
 
 @pytest.mark.asyncio
-@patch("app.password.service.get_access_token", new_callable=AsyncMock)
+@patch("app.password.service.get_admin_token", new_callable=AsyncMock)
 @patch("app.password.service.AsyncClient")
 @patch("app.password.service.get_auth_request_headers")
 @patch("app.password.service.get_settings")
@@ -145,7 +148,7 @@ async def test_get_password_policy_validation_error(
     mock_response.status_code = 200
     mock_response.json.return_value = {"invalid": "data"}
 
-    mock_client = AsyncMock()
+    mock_client = AsyncMock(spec=AsyncClient)
     mock_client.get.return_value = mock_response
     mock_client_class.return_value.__aenter__.return_value = mock_client
 
@@ -156,7 +159,7 @@ async def test_get_password_policy_validation_error(
             mock_model.side_effect = e
 
         with pytest.raises(HTTPException) as exc:
-            await get_password_policy()
+            await get_password_policy(global_http_client=mock_client)
 
     assert exc.value.status_code == 422
     assert "Response validation error" in exc.value.detail
@@ -192,6 +195,9 @@ def test_policy_endpoint_success(mock_policy_func, client):
         "message": "Password policy retrieved successfully",
     }
 
+    mock_client = AsyncMock(spec=AsyncClient)
+    client.app.state.request_client = mock_client
+
     response = client.get("/v1/password/policy")
     assert response.status_code == 200
     assert response.json()["success"] is True
@@ -204,6 +210,9 @@ def test_policy_endpoint_token_failure(mock_policy_func, client):
         status_code=500, detail="Failed to get access token"
     )
 
+    mock_client = AsyncMock(spec=AsyncClient)
+    client.app.state.request_client = mock_client
+
     response = client.get("/v1/password/policy")
     assert response.status_code == 500
     assert response.json()["detail"] == "Failed to get access token"
@@ -215,6 +224,9 @@ def test_policy_endpoint_http_error(mock_policy_func, client):
         status_code=401, detail="Failed to get password policy"
     )
 
+    mock_client = AsyncMock(spec=AsyncClient)
+    client.app.state.request_client = mock_client
+
     response = client.get("/v1/password/policy")
     assert response.status_code == 401
     assert response.json()["detail"] == "Failed to get password policy"
@@ -225,6 +237,9 @@ def test_policy_endpoint_validation_error(mock_policy_func, client):
     mock_policy_func.side_effect = HTTPException(
         status_code=422, detail="Response validation error"
     )
+
+    mock_client = AsyncMock(spec=AsyncClient)
+    client.app.state.request_client = mock_client
 
     response = client.get("/v1/password/policy")
     assert response.status_code == 422

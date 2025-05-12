@@ -1,18 +1,24 @@
 import logging
+import threading
 from datetime import datetime
 from fastapi import HTTPException
 from httpx import AsyncClient
 from app.config import get_settings
 
 logger = logging.getLogger(__name__)
+lock = threading.Lock()
+settings = get_settings().ibm_verify_config
+
+admin_token_ttl = 7170
+
+
+async def get_admin_token():
+    return await get_access_token()
 
 
 async def request_access_token():
     """Request token from IBM Verify API"""
     try:
-
-        settings = get_settings().ibm_verify_config
-
         token_url = f"{settings.IBM_VERIFY_TENANT_URL}/oauth2/token"
         logger.info(f"Attempting to get access token from: {token_url}")
 

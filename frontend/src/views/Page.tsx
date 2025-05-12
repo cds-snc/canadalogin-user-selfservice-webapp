@@ -9,6 +9,7 @@ import Home from "../components/Home/Home.jsx";
 import CreateCoreProfile from "../components/SignUp/Profile/CreateCoreProfile.jsx";
 import Privacy from "../components/SignUp/Profile/Privacy.jsx";
 import VerificationSetUp from "../components/SignUp/TwoStepVerification/VerificationSetUp"
+import VerificationSelection from "../components/SignIn/VerificationSelection"
 import {PAGES} from "../utils/constants";
 import {useUser} from "../components/Providers/useUser";
 import {useLocation, useParams} from "react-router";
@@ -36,6 +37,10 @@ function PageContents({page}:{page:string}) {
         case PAGES.verificationSetUp:
             return (
                 <VerificationSetUp />
+            );
+        case PAGES.verificationSelection:
+            return (
+                <VerificationSelection/>
             );
         case PAGES.coreProfile:
             return (

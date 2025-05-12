@@ -21,7 +21,9 @@ const initialState = {
         stepVerificationSent: false,
         stepVerified:false,
         viewPrivacy:false,
-        id: null
+        id: null,
+        otpType: null,
+        passwordValidated:false
     }
 }
 
