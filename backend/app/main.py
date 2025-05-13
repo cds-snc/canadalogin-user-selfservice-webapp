@@ -17,7 +17,6 @@ from .routers import health
 from app.password import v1_router as v1_password_router
 from app.users import v1_router as v1_users_router
 from app.otp import v1_router as v1_otp_router
-import os
 
 settings = get_settings()
 
