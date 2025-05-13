@@ -71,7 +71,6 @@ body, .mainBody {
         padding-top: var(--gcds-spacing-400);
     }
     .privacy-notice{
-        font-size: 16px;
         padding-left: 3em;
     }
 }
