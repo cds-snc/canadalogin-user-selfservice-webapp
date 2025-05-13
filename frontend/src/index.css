@@ -16,19 +16,26 @@ body, .mainBody {
     display:flex;
     flex-direction:column;
 }
+.privacy-notice{
+    padding-left: 3em;
+}
+
+
 
 @media screen and (max-width:767px) {
-    .gcds-email-fieldset{
+    .gcds-email-fieldset {
         font-size: 18px;
         font-style: normal;
     }
-    .gcds-header{
+
+    .gcds-header {
         padding: var(--gcds-spacing-100) var(--gcds-spacing-0) var(--gcds-spacing-100) var(--gcds-spacing-0);
         align-items: center;
         gap: var(--gcds-spacing-350);
         align-self: stretch;
     }
-    .gcds-page{
+
+    .gcds-page {
         display: flex;
         padding: var(--gcds-spacing-0) var(--gcds-spacing-200) var(--gcds-spacing-550) var(--gcds-spacing-200);
         flex-direction: column;
@@ -36,41 +43,37 @@ body, .mainBody {
         gap: var(--gcds-spacing-350);
         align-self: stretch;
     }
-    .gcds-content{
+
+    .gcds-content {
         align-items: center;
         gap: var(--gcds-spacing-350);
-    }
-    .privacy-notice{
-        font-size: 16px;
-        padding-left: 3em;
     }
 }
 
 @media screen and (min-width:768px) {
-    .gcds-page{
+    .gcds-page {
         max-width: fit-content;
         margin-left: auto;
         margin-right: auto;
         padding: var(--gcds-spacing-300) var(--gcds-spacing-200) var(--gcds-spacing-550) var(--gcds-spacing-200);
         gap: var(--gcds-spacing-300);
     }
-    .gcds-content{
+
+    .gcds-content {
         border-radius: 10px;
         border: 1px solid var(--gcds-color-grayscale-300, #A8ADB4);
         background: #FFF;
         display: flex;
-        width:750px;
+        width: 750px;
         justify-content: center;
         align-items: center;
-        margin:auto;
+        margin: auto;
         vertical-align: middle;
         gap: var(--gcds-spacing-300);
         padding: var(--gcds-spacing-1000) var(--gcds-spacing-1000) var(--gcds-spacing-600) var(--gcds-spacing-1000);
     }
-    .gcds-footer{
+
+    .gcds-footer {
         padding-top: var(--gcds-spacing-400);
-    }
-    .privacy-notice{
-        padding-left: 3em;
     }
 }
