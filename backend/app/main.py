@@ -1,3 +1,5 @@
+import tempfile
+
 import httpx
 import requests
 import logging
@@ -15,6 +17,7 @@ from .routers import health
 from app.password import v1_router as v1_password_router
 from app.users import v1_router as v1_users_router
 from app.otp import v1_router as v1_otp_router
+import os
 
 settings = get_settings()
 
@@ -47,7 +50,7 @@ CONTACT_INFO = {
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     app.state.config = get_settings().ibm_verify_config
-
+    app.state.admin_token_cache_file = tempfile.NamedTemporaryFile()
     logger.info("Starting IBM Verify Integration API")
     logger.info(f"Tenant URL: {app.state.config.IBM_VERIFY_TENANT_URL}")
     logger.info(f"Client ID: {app.state.config.IBM_VERIFY_API_CLIENT_ID}")

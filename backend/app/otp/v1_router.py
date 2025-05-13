@@ -21,7 +21,7 @@ router = APIRouter()
     description="Attempts to prove a user's phone number or email address",
 )
 async def send_otp(user_otp_info: UserOtpInfo, request: Request):
-    return await handle_otp_send(user_otp_info, request.app.state.request_client)
+    return await handle_otp_send(user_otp_info, request.app.state.request_client, request.app.state.admin_token_cache_file)
 
 
 @router.post(
@@ -34,5 +34,4 @@ async def send_otp(user_otp_info: UserOtpInfo, request: Request):
 )
 async def verify_otp(verification_data: UserOtpVerificationInfo, request: Request):
     return await handle_otp_verification(
-        verification_data, request.app.state.request_client
-    )
+        verification_data, request.app.state.request_client, request.app.state.admin_token_cache_file)

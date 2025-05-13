@@ -18,4 +18,4 @@ async def password_policy(request: Request):
     Get Password Policy from IBM Verify API.
     Returns: The password policy for the tenant
     """
-    return await get_password_policy(request.app.state.request_client)
+    return await get_password_policy(request.app.state.request_client, request.app.state.admin_token_cache_file)

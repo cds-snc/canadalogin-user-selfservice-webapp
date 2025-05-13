@@ -31,7 +31,7 @@ async def user_signup(user: UserLoginRequestData, request: Request):
     Creates a new user.
     Returns: ID and Username
     """
-    return await signup_with_password(user, request.app.state.request_client)
+    return await signup_with_password(user, request.app.state.request_client, request.app.state.admin_token_cache_file)
 
 
 @router.post(
@@ -46,7 +46,7 @@ async def user_password_signin(user: UserLoginRequestData, request: Request):
     Creates a new user.
     Returns: ID and Username
     """
-    return await signin_with_password(user, request.app.state.request_client)
+    return await signin_with_password(user, request.app.state.request_client, request.app.state.admin_token_cache_file)
 
 
 @router.post(
@@ -60,5 +60,5 @@ async def user_2fa_enroll(
     user_enrollment_data: TwoFactorEnrollmentUserData, request: Request
 ):
     return await handle_enrolling_user_into_2fa(
-        user_enrollment_data, request.app.state.request_client
+        user_enrollment_data, request.app.state.request_client, request.app.state.admin_token_cache_file
     )

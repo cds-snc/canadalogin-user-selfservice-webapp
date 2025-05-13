@@ -1,3 +1,6 @@
+import tempfile
+from tempfile import TemporaryFile
+
 import pytest
 from unittest.mock import AsyncMock, patch, MagicMock
 from fastapi import HTTPException
@@ -66,7 +69,7 @@ async def test_get_password_policy_success(
         "app.password.service.IBMVerifyPasswordPolicy",
         return_value="validated_model",
     ):
-        result = await get_password_policy(global_http_client=mock_client)
+        result = await get_password_policy(global_http_client=mock_client, admin_token_cache_file=tempfile.NamedTemporaryFile())
 
     assert result.success is True
     assert result.data == "validated_model"
@@ -84,7 +87,7 @@ async def test_get_password_policy_token_failure(
     mock_client = AsyncMock(spec=AsyncClient)
 
     with pytest.raises(HTTPException) as exc:
-        await get_password_policy(global_http_client=mock_client)
+        await get_password_policy(global_http_client=mock_client, admin_token_cache_file=tempfile.NamedTemporaryFile())
 
     assert exc.value.status_code == 500
     assert "Failed to get access token" in exc.value.detail
@@ -116,7 +119,7 @@ async def test_get_password_policy_http_error(
     mock_client_class.return_value.__aenter__.return_value = mock_client
 
     with pytest.raises(HTTPException) as exc:
-        await get_password_policy(global_http_client=mock_client)
+        await get_password_policy(global_http_client=mock_client, admin_token_cache_file=tempfile.NamedTemporaryFile())
 
     assert exc.value.status_code == 401
     assert "Failed to get password policy" in exc.value.detail
@@ -159,7 +162,7 @@ async def test_get_password_policy_validation_error(
             mock_model.side_effect = e
 
         with pytest.raises(HTTPException) as exc:
-            await get_password_policy(global_http_client=mock_client)
+            await get_password_policy(global_http_client=mock_client, admin_token_cache_file=tempfile.NamedTemporaryFile())
 
     assert exc.value.status_code == 422
     assert "Response validation error" in exc.value.detail

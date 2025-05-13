@@ -1,22 +1,34 @@
+import json
 import logging
-import threading
-from datetime import datetime
+from datetime import datetime, timedelta
 from fastapi import HTTPException
 from httpx import AsyncClient
+from pydantic import ValidationError
 from app.config import get_settings
+import os
+
+from app.utils.helpers import generate_error_response
+from app.utils.schemas import AdminTokenResponse
 
 logger = logging.getLogger(__name__)
-lock = threading.Lock()
 settings = get_settings().ibm_verify_config
 
-admin_token_ttl = 7170
+async def get_admin_token(global_http_client: AsyncClient, admin_token_cache_file):
+    # At the start of the application a temp file will be created at runtime. Detect the empty file.
+    if os.stat(admin_token_cache_file.name).st_size == 0:
+        return await request_access_token(global_http_client, admin_token_cache_file)
+    else:
+        # Open the file to overwrite old token data. Only one token at a time can be cached.
+        with open(admin_token_cache_file.name, "r") as file:
+            token_data = file.read()
+            if not is_expired_token(token_data):
+                data = AdminTokenResponse(**json.loads(token_data))
+                return data.access_token
+            else:
+                return await request_access_token(global_http_client, admin_token_cache_file)
 
 
-async def get_admin_token():
-    return await get_access_token()
-
-
-async def request_access_token():
+async def request_access_token(global_http_client: AsyncClient, admin_token_cache_file):
     """Request token from IBM Verify API"""
     try:
         token_url = f"{settings.IBM_VERIFY_TENANT_URL}/oauth2/token"
@@ -28,52 +40,47 @@ async def request_access_token():
             "client_secret": settings.IBM_VERIFY_API_CLIENT_SECRET,
             "scope": "openid",
         }
+
         logger.debug(f"Token URL: {token_url}")
 
-        async with AsyncClient() as client:
-            response = await client.post(
-                token_url,
-                data=data,
-                headers={"Content-Type": "application/x-www-form-urlencoded"},
-            )
-
-            if response.status_code != 200:
-                logger.error(f"Failed to get access token. Response: {response}")
-                raise HTTPException(
-                    status_code=response.status_code,
-                    detail="Failed to get access token",
-                )
-
-            logger.info("Request returned successfully")
-            return response
-
-    except Exception as e:
-
-        logger.error(f"Error requesting token: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=400, detail=f"Token request error: {str(e)}")
-
-
-async def get_access_token() -> str:
-    """Get access token for IBM Verify API operations"""
-    try:
-        logger.info("Attempting to get access token")
-
         start_time = datetime.now()
-        response = await request_access_token()
+        response = await global_http_client.post(
+            token_url,
+            data=data,
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+        )
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(f"Token request completed in {duration:.2f} seconds")
 
-        access_token = response.json().get("access_token")
-        if not access_token:
-            logger.error(f"Failed to get access token. Response: {response}")
-            raise HTTPException(status_code=500, detail="Failed to get access token")
-        print(access_token)
-        return access_token
+        try:
+            validated_token = AdminTokenResponse(**response.json())
+            validated_token.created = datetime.now()
+        except ValidationError as e:
+            logger.error(f"Validation Error: {e.json()}")
+            print(json.dumps(e.json(), indent=4))
+            raise HTTPException(status_code=422, detail="Response validation error")
+
+        if response.status_code != 200:
+            logger.error(f"Failed to get admin token. Response: {response}")
+            return generate_error_response(response.status_code, response.json())
+
+        # Write new token to cache
+        with open(admin_token_cache_file.name, "w") as file:
+            file.write(validated_token.model_dump_json())
+
+        logger.info("Request returned successfully")
+        return response.json()['access_token']
 
     except Exception as e:
         logger.error(f"Error getting admin token: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=400, detail=f"Admin token error: {str(e)}")
+        return generate_error_response(500, str(e))
 
+
+def is_expired_token(token_data):
+    token = AdminTokenResponse(**json.loads(token_data))
+    # Verify's default oath token TTL (expires_in) is 7200sec/2hrs. 5 minutes = 300 seconds,
+    # giving us a grace period of 5 minute before TTL.
+    return datetime.now() - token.created  >=  timedelta(seconds=token.expires_in - 300)
 
 def get_auth_request_headers(
     access_token: str, json_content_type: bool = False

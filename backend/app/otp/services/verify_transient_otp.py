@@ -14,15 +14,14 @@ logger = logging.getLogger(__name__)
 
 
 async def handle_otp_verification(
-    user_verification_data: UserOtpVerificationInfo, global_http_client: AsyncClient
-):
+    user_verification_data: UserOtpVerificationInfo, global_http_client: AsyncClient, admin_token_cache_file):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
     try:
         logger.info(f"Attempting to verify {user_verification_data.otpType} OTP")
         start_time = datetime.now()
         otp_verification_response = await verify_otp(
-            user_verification_data, global_http_client
+            user_verification_data, global_http_client, admin_token_cache_file
         )
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(
@@ -62,8 +61,7 @@ async def handle_otp_verification(
 
 
 async def verify_otp(
-    user_verification_data: UserOtpVerificationInfo, global_http_client: AsyncClient
-):
+    user_verification_data: UserOtpVerificationInfo, global_http_client: AsyncClient, admin_token_cache_file):
     try:
 
         trxnId = user_verification_data.trxnId
@@ -71,7 +69,7 @@ async def verify_otp(
             "otp": user_verification_data.otp,
         }
 
-        access_token = await get_admin_token()
+        access_token = await get_admin_token(global_http_client, admin_token_cache_file)
         headers = get_auth_request_headers(access_token, True)
         settings = get_settings().ibm_verify_config
 

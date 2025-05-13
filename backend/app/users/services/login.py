@@ -15,9 +15,9 @@ logger = logging.getLogger(__name__)
 # https://cds-gcsignin-dev.verify.ibm.com/v1.0/authnmethods/password/login?returnJwt=true
 
 
-async def requestCloudDirectoryId(global_http_client: AsyncClient):
+async def requestCloudDirectoryId(global_http_client: AsyncClient, admin_token_cache_file):
     try:
-        access_token = await get_admin_token()
+        access_token = await get_admin_token(global_http_client, admin_token_cache_file)
         headers = get_auth_request_headers(access_token, True)
         settings = get_settings().ibm_verify_config
         signin_url = f"{settings.IBM_VERIFY_TENANT_URL}/v1.0/authnmethods/password?search=name%20%3D%20%22Cloud%20Directory%22"
@@ -34,10 +34,10 @@ async def requestCloudDirectoryId(global_http_client: AsyncClient):
         raise HTTPException(status_code=400, detail=f"Signup error: {str(e)}")
 
 
-async def getCloudDirectoryId(global_http_client: AsyncClient):
+async def getCloudDirectoryId(global_http_client: AsyncClient, admin_token_cache_file):
     try:
 
-        response = await requestCloudDirectoryId(global_http_client)
+        response = await requestCloudDirectoryId(global_http_client, admin_token_cache_file)
         response_json = response.json()
         cloud_directory_id = response_json.get("password")[0].get("id")
 
@@ -63,13 +63,14 @@ async def getCloudDirectoryId(global_http_client: AsyncClient):
 async def signin_with_username_password(
     username_password: IBMUsernamePasswordAuthRequestData,
     global_http_client: AsyncClient,
+    admin_token_cache_file
 ):
 
     try:
-        access_token = await get_admin_token()
+        access_token = await get_admin_token(global_http_client, admin_token_cache_file)
         headers = get_auth_request_headers(access_token, True)
         settings = get_settings().ibm_verify_config
-        cloud_directory_id = await getCloudDirectoryId(global_http_client)
+        cloud_directory_id = await getCloudDirectoryId(global_http_client, admin_token_cache_file)
         signin_url = f"{settings.IBM_VERIFY_TENANT_URL}/v1.0/authnmethods/password/{cloud_directory_id}?returnJwt=true"
 
         core_user_data_dict = username_password.model_dump()
@@ -95,7 +96,7 @@ async def signin_with_username_password(
 
 
 async def signin_with_password(
-    user: UserLoginRequestData, global_http_client: AsyncClient
+    user: UserLoginRequestData, global_http_client: AsyncClient, admin_token_cache_file
 ):
 
     try:
@@ -108,7 +109,7 @@ async def signin_with_password(
 
         start_time = datetime.now()
         response = await signin_with_username_password(
-            username_password, global_http_client
+            username_password, global_http_client, admin_token_cache_file
         )
         response_json = response.json()
         user_id = response_json.get("id")

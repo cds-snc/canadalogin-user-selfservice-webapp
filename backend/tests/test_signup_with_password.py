@@ -1,3 +1,5 @@
+import tempfile
+
 import pytest
 from unittest.mock import patch, AsyncMock, MagicMock
 from httpx import AsyncClient
@@ -62,7 +64,7 @@ async def test_create_user_success(client):
         mock_client.post.return_value = mock_response
         mock_client_class.return_value = mock_client
 
-        response = await create_user(user_data, global_http_client=mock_client)
+        response = await create_user(user_data, global_http_client=mock_client, admin_token_cache_file=tempfile.NamedTemporaryFile())
 
         assert response.status_code == 201
         assert response.json()["id"] == "user-123"
@@ -90,7 +92,7 @@ async def test_create_user_raises_generic_error(client):
         mock_client_class.return_value = mock_client
 
         with pytest.raises(HTTPException) as exc_info:
-            await create_user(user_data, global_http_client=mock_client)
+            await create_user(user_data, global_http_client=mock_client, admin_token_cache_file=tempfile.NamedTemporaryFile())
 
         assert exc_info.value.status_code == 400
         assert "Signup error: Connection error" in str(exc_info.value.detail)
@@ -120,7 +122,7 @@ async def test_signup_success(client):
     ):
 
         result = await signup_with_password(
-            user_data, global_http_client=mock_http_client
+            user_data, global_http_client=mock_http_client, admin_token_cache_file=tempfile.NamedTemporaryFile()
         )
 
         assert isinstance(result, ResponseModel)
@@ -146,7 +148,7 @@ async def test_signup_failure_from_ibm(client):
     ):
 
         result = await signup_with_password(
-            user_data, global_http_client=mock_http_client
+            user_data, global_http_client=mock_http_client, admin_token_cache_file=tempfile.NamedTemporaryFile()
         )
 
         assert isinstance(result, JSONResponse)
@@ -175,7 +177,7 @@ async def test_signup_validation_error_response(client):
     ):
 
         with pytest.raises(HTTPException) as exc_info:
-            await signup_with_password(user_data, global_http_client=mock_http_client)
+            await signup_with_password(user_data, global_http_client=mock_http_client, admin_token_cache_file=tempfile.NamedTemporaryFile())
 
         assert exc_info.value.status_code == 422
         assert "Response validation error" in str(exc_info.value.detail)
@@ -209,7 +211,7 @@ async def test_user_signup(client):
 
         mock_client = AsyncMock(spec=AsyncClient)
         client.app.state.request_client = mock_client
-
+        client.app.state.admin_token_cache_file = tempfile.NamedTemporaryFile()
         # Simulate the actual API call
         response = client.post("/v1/users/create", json=user_data.model_dump())
 

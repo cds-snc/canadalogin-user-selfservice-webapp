@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 async def handle_enrolling_user_into_2fa(
     two_factor_enrollment_data: TwoFactorEnrollmentUserData,
     global_http_client: AsyncClient,
+        admin_token_cache_file
 ):
 
     try:
@@ -65,9 +66,9 @@ async def handle_enrolling_user_into_2fa(
         )
 
 
-async def enroll_user(two_factor_enrollment_data, global_http_client):
+async def enroll_user(two_factor_enrollment_data, global_http_client, admin_token_cache_file):
     try:
-        access_token = await get_admin_token()
+        access_token = await get_admin_token(global_http_client, admin_token_cache_file)
         headers = get_auth_request_headers(access_token, True)
         settings = get_settings().ibm_verify_config
 

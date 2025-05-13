@@ -20,11 +20,11 @@ logger = logging.getLogger(__name__)
 
 
 async def create_user(
-    core_user_data: IBMUserCreateRequest, global_http_client: AsyncClient
+    core_user_data: IBMUserCreateRequest, global_http_client: AsyncClient, admin_token_cache_file
 ):
 
     try:
-        access_token = await get_admin_token()
+        access_token = await get_admin_token(global_http_client, admin_token_cache_file)
         headers = get_auth_request_headers(access_token)
         settings = get_settings().ibm_verify_config
         signup_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/Users"
@@ -45,7 +45,7 @@ async def create_user(
 
 
 async def signup_with_password(
-    user: UserLoginRequestData, global_http_client: AsyncClient
+    user: UserLoginRequestData, global_http_client: AsyncClient, admin_token_cache_file
 ):
     """Handle user registration through IBM Verify"""
     try:
@@ -58,7 +58,7 @@ async def signup_with_password(
         core_user = IBMUserCreateRequest(**core_user_data)
 
         start_time = datetime.now()
-        response = await create_user(core_user, global_http_client)
+        response = await create_user(core_user, global_http_client, admin_token_cache_file)
         response_json = response.json()
         if response.status_code != 201:
             error_message = response_json.get("detail", "Unknown error")
