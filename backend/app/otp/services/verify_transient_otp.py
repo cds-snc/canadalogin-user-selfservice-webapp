@@ -13,8 +13,8 @@ from app.utils.schemas import ResponseModel
 logger = logging.getLogger(__name__)
 
 
-async def handle_otp_verification(
-    user_verification_data: UserOtpVerificationInfo, global_http_client: AsyncClient, admin_token_cache_file):
+async def handle_otp_verification(user_verification_data: UserOtpVerificationInfo, global_http_client: AsyncClient,
+                                  admin_token_cache_file):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
     try:
