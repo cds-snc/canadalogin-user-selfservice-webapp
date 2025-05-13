@@ -60,8 +60,8 @@ async def handle_otp_verification(
         )
 
 
-async def verify_otp(
-    user_verification_data: UserOtpVerificationInfo, global_http_client: AsyncClient, admin_token_cache_file):
+async def verify_otp(user_verification_data: UserOtpVerificationInfo, global_http_client: AsyncClient,
+                     admin_token_cache_file):
     try:
 
         trxnId = user_verification_data.trxnId

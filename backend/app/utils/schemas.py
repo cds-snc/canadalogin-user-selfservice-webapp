@@ -8,6 +8,7 @@ class ResponseModel(BaseModel):
     message: str
     data: Optional[Any] = None
 
+
 class AdminTokenResponse(BaseModel):
     access_token: str
     grant_id: str
