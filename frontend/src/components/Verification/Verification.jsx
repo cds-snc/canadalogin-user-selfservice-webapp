@@ -284,6 +284,7 @@ export default function Verification() {
                         validateOn="other"
                         errorMessage={errorJson.codeError}
                         lang={language}
+                        size="6"
                         required ></GcdsInput>)
                     }
                     {
@@ -295,6 +296,7 @@ export default function Verification() {
                         validateOn="other"
                         errorMessage={errorJson.codeError}
                         lang={language}
+                        size="6"
                         required ></GcdsInput>)
                     }
                     <SubmitButton currentLang={language} disabled={isPending}/>

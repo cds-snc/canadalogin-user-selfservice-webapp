@@ -40,12 +40,13 @@ body, .mainBody {
         align-items: center;
         gap: var(--gcds-spacing-350);
     }
+    .privacy-notice{
+        font-size: 16px;
+        padding-left: 3em;
+    }
 }
 
 @media screen and (min-width:768px) {
-    .max480{
-        max-width: 480px;
-    }
     .gcds-page{
         max-width: fit-content;
         margin-left: auto;
@@ -59,16 +60,18 @@ body, .mainBody {
         background: #FFF;
         display: flex;
         width:750px;
-        /*padding: 80px 80px;*/
         justify-content: center;
         align-items: center;
         margin:auto;
         vertical-align: middle;
         gap: var(--gcds-spacing-300);
-        /* 600=48, hence 720 = 60 ; 1000= 80 px*/
         padding: var(--gcds-spacing-1000) var(--gcds-spacing-1000) var(--gcds-spacing-600) var(--gcds-spacing-1000);
     }
     .gcds-footer{
         padding-top: var(--gcds-spacing-400);
+    }
+    .privacy-notice{
+        font-size: 16px;
+        padding-left: 3em;
     }
 }

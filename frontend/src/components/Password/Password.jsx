@@ -142,7 +142,6 @@ export default function Password() {
             }
             <GcdsContainer>
                 <form id="form" onSubmit={handleSubmit} >
-                    <GcdsContainer className="max480">
                         { state.testData!==undefined&&(
                             <GcdsInput
                                 inputId="input-password"
@@ -165,7 +164,6 @@ export default function Password() {
                             errorMessage={error.errorMsg}
                         ></GcdsInput>)
                         }
-                    </GcdsContainer>
                     <GcdsCheckbox
                         checkboxId="checkbox-default"
                         label={pageContentJson['11']}

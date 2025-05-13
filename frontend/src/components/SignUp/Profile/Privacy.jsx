@@ -103,8 +103,9 @@ export default function Privacy() {
                 <span> {pageContentJson['38']} </span><GcdsLink href="#" lang="en"><span>{pageContentJson['39']}</span></GcdsLink>:
                 </GcdsText>
 
-                <GcdsText>
-                    <GcdsLink href={`mailto:${pageContentJson['40']}`}>{pageContentJson['40']}</GcdsLink> <span>{pageContentJson['41']}</span><br />
+                <GcdsText className="privacy-notice">
+                    <GcdsLink href={`mailto:${pageContentJson['40']}`}>{pageContentJson['40']}</GcdsLink><br />
+                    <span> {pageContentJson['41']}</span>
                 </GcdsText>
             </GcdsDetails>
             <br />
