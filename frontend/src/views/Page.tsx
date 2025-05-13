@@ -71,7 +71,9 @@ export default function Page({page}:{page:string}) {
         <div className="mainBody">
             <Header langHref={langHref} currentLang={currentLang} service={state.userData.service}/>
             <GcdsContainer className="gcds-page">
-                <PageContents page={page} />
+                <GcdsContainer size="sm" className="gcds-content" >
+                    <PageContents page={page} />
+                </GcdsContainer>
             </GcdsContainer>
             <Footer currentLang={currentLang}/>
         </div>

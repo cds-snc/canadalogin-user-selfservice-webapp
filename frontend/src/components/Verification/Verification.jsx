@@ -202,7 +202,7 @@ export default function Verification() {
     }
 
     return (
-        <GcdsContainer className="gcds-content" >
+        <GcdsContainer>
             {
                 errorJson.codeError!==null&&(
                     <GcdsErrorSummary
@@ -284,6 +284,7 @@ export default function Verification() {
                         validateOn="other"
                         errorMessage={errorJson.codeError}
                         lang={language}
+                        size="6"
                         required ></GcdsInput>)
                     }
                     {
@@ -295,6 +296,7 @@ export default function Verification() {
                         validateOn="other"
                         errorMessage={errorJson.codeError}
                         lang={language}
+                        size="6"
                         required ></GcdsInput>)
                     }
                     <SubmitButton currentLang={language} disabled={isPending}/>
@@ -327,7 +329,7 @@ export default function Verification() {
                         {type!==FLOW_TYPES.email?pageContentJson['16']:pageContentJson['26']}
                     </GcdsLink>):""}
             </GcdsText>
-            {flow===FLOW_TYPES.signUp&&(<AlreadyGc currentLang={language}/>)}
+            {flow===FLOW_TYPES.signUp&&type===FLOW_TYPES.email&&(<AlreadyGc currentLang={language}/>)}
         </GcdsContainer>
     )
 }

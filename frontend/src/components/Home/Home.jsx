@@ -57,7 +57,7 @@ export default function Home() {
 
     console.log("Config URL", config.apiUrl);
     return (
-        <GcdsContainer className="gcds-content" >
+        <GcdsContainer>
             <GcdsContainer>
                 {
                     hasErrors()&&(<GcdsErrorSummary data-testid='errorSummary'

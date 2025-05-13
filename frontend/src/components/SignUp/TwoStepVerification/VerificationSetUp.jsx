@@ -54,7 +54,7 @@ export default function VerificationSetUp() {
     const {handleSubmit, isPending} = useSubmit(submitDataOptions, validatePhone );
 
     return (
-        <GcdsContainer className="gcds-content" >
+        <GcdsContainer>
             <GcdsContainer>
                 {
                     hasErrors()&&(<GcdsErrorSummary data-testid='errorSummary'

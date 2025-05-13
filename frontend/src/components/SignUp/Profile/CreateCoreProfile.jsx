@@ -38,7 +38,7 @@ export default function CreateCoreProfile() {
     const {handleSubmit, isPending} = useSubmit(submitDataOptions, validateNames);
 
     return (
-        <GcdsContainer className="gcds-content" >
+        <GcdsContainer>
             <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={pageContentJson['1']} >
                 &nbsp;
             </GcdsNotice>
@@ -83,6 +83,7 @@ function InputBox({pageContentJson, language, error, state}) {
                     inputId="firstName"
                     label={pageContentJson['7']}
                     name="firstName"
+                    size="10"
                     value={state.testData.firstName}
                     type="text"
                     lang={language}
@@ -92,6 +93,7 @@ function InputBox({pageContentJson, language, error, state}) {
                     inputId="lastName"
                     label={pageContentJson['8']}
                     name="lastName"
+                    size="10"
                     type="text"
                     value={state.testData.lastName}
                     validateOn="other"
@@ -107,6 +109,7 @@ function InputBox({pageContentJson, language, error, state}) {
                     label={pageContentJson['7']}
                     name="firstName"
                     type="text"
+                    size="10"
                     lang={language}
                     optional
                 ></GcdsInput>
@@ -115,6 +118,7 @@ function InputBox({pageContentJson, language, error, state}) {
                     label={pageContentJson['8']}
                     name="lastName"
                     type="text"
+                    size="10"
                     validateOn="other"
                     errorMessage={error}
                     lang={language}
