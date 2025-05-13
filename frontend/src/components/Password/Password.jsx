@@ -182,9 +182,6 @@ export default function Password() {
                 </form>
             </GcdsContainer>
             {
-                flow===FLOW_TYPES.signUp
-            }
-            {
                 flow===FLOW_TYPES.signIn&&(
                     <>
                         <br />
