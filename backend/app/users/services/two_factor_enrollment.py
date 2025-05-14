@@ -67,7 +67,7 @@ async def handle_enrolling_user_into_2fa(
 
 async def enroll_user(two_factor_enrollment_data, global_http_client):
     try:
-        access_token = await get_admin_token()
+        access_token = await get_admin_token(global_http_client)
         headers = get_auth_request_headers(access_token, True)
         settings = get_settings().ibm_verify_config
 
