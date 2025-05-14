@@ -9,9 +9,9 @@ import {
     GcdsErrorSummary,
     GcdsHeading, GcdsLink
 } from "@cdssnc/gcds-components-react";
-import {getPageContent, isPasswordValid} from '../../utils/functions';
-import {useEffect, useState, useTransition} from 'react';
-import {authService} from "../../services/authService.jsx";
+import { getPageContent, isPasswordValid } from '../../utils/functions';
+import { useEffect, useState, useTransition } from 'react';
+import { authService } from "../../services/authService.jsx";
 import {
     AVAILABLE_LANGUAGES,
     CONTEXT_ACTIONS,
@@ -20,47 +20,47 @@ import {
     PAGES,
     SERVICES
 } from "../../utils/constants.jsx";
-import {useUser} from "../Providers/useUser.tsx";
+import { useUser } from "../Providers/useUser.tsx";
 import SubmitButton from "../Layout/SubmitButton.jsx";
-import {useNavigate, useParams} from "react-router";
+import { useNavigate, useParams } from "react-router";
 import AlreadyGc from "../Layout/AlreadyGc.jsx";
 import { trackEvent } from "../../utils/gatag.jsx";
-import {GA_CATEGORIES, GA_ACTIONS, GA_LABELS} from "../../utils/constants.jsx";
+import { GA_CATEGORIES, GA_ACTIONS, GA_LABELS } from "../../utils/constants.jsx";
 
 export default function Password() {
-    const {state, dispatch} = useUser();
-    const {language, flow} = useParams();
+    const { state, dispatch } = useUser();
+    const { language, flow } = useParams();
     const [checkedValue, setCheckedValue] = useState(true);
-    const [passwordPolicy, setPasswordPolicy] = useState({min: 12, max:65})
+    const [passwordPolicy, setPasswordPolicy] = useState({ min: 12, max: 65 })
     const [passwordStrength, setPasswordStrength] = useState(0);
     const [visibility, setVisibility] = useState(false);
-    const [errorJson, setError] = useState({heading: null, passwordError:null});
+    const [errorJson, setError] = useState({ heading: null, passwordError: null });
     const [isPending, startTransition] = useTransition();
     const navigate = useNavigate();
     const pageContentJson = getPageContent(language, PAGES.password);
     const errorPageJson = getPageContent(language, "Error");
 
-    useEffect( () => {
+    useEffect(() => {
         loadMinMax();
-    },[])
+    }, [])
 
-    async function loadMinMax(){
+    async function loadMinMax() {
 
-        let policy = {min:12, max:65};
+        let policy = { min: 12, max: 65 };
         try {
             const response = await authService.requestPasswordPolicy();
-            if(response.success)
-                policy = {min: response.data.pwdMinLength, max: response.data.pwdMaxLength};
+            if (response.success)
+                policy = { min: response.data.pwdMinLength, max: response.data.pwdMaxLength };
             else {
                 console.log(response.message);
             }
-        }catch(err){
+        } catch (err) {
             console.log(err);
         }
         setPasswordPolicy(policy);
     }
-    async function handleSubmit (event) {
-        startTransition(async()=> {
+    async function handleSubmit(event) {
+        startTransition(async () => {
             event.preventDefault();
             trackEvent({
                 category: GA_CATEGORIES.onboarding,
@@ -73,14 +73,14 @@ export default function Password() {
             setVisibility(!visibility);
             if (!isPasswordValid(formData.get('password'))) {
                 const errorString = `${errorPageJson[5]} ${passwordPolicy.min} ${errorPageJson[12]} ${passwordPolicy.max} ${errorPageJson[13]}`
-                setError({passwordError: errorString, heading: errorPageJson['1']});
+                setError({ passwordError: errorString, heading: errorPageJson['1'] });
                 return;
             }
 
-            setError({passwordError: null, heading: null});
+            setError({ passwordError: null, heading: null });
 
             try {
-                if(flow===FLOW_TYPES.signUp) {
+                if (flow === FLOW_TYPES.signUp) {
                     const response = await authService.create({
                         userName: state.userData.email,
                         password: formData.get('password'),
@@ -93,9 +93,9 @@ export default function Password() {
                             label: GA_LABELS.email
                         });
                         console.log("User created successfully ", response);
-                        const userData = {...state.userData, passwordSubmitted: true, id: response.data.id};
+                        const userData = { ...state.userData, passwordSubmitted: true, id: response.data.id };
                         console.log("userData ", userData);
-                        await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
+                        await dispatch({ type: CONTEXT_ACTIONS.signUp, payload: userData });
                         console.log("navigate ", "/" + language + NAVIGATION_LINKS.twoStepVerification);
                         navigate("/" + language + NAVIGATION_LINKS.twoStepVerification);
                         console.log("navigating.....")
@@ -106,7 +106,14 @@ export default function Password() {
                             label: GA_LABELS.email
                         });
                         console.log("Error....", response);
-                        setError({passwordError: response.message, heading: errorPageJson['1']});
+                        setError({ passwordError: response.message, heading: errorPageJson['1'] });
+                    }
+
+                    if (flow === FLOW_TYPES.signIn) {
+                        const response = await authService.create({
+                            userName: state.userData.email,
+                            password: formData.get('password'),
+                        });
                     }
                 }
             } catch (error) {
@@ -116,64 +123,64 @@ export default function Password() {
                     label: GA_LABELS.email
                 });
                 console.error('Signup error:', error);
-                setError({passwordError: errorPageJson[7], heading: errorPageJson['1']});
+                setError({ passwordError: errorPageJson[7], heading: errorPageJson['1'] });
             }
         });
     }
 
-    function validateCheckbox ()  {
-        setCheckedValue (!checkedValue);
+    function validateCheckbox() {
+        setCheckedValue(!checkedValue);
     }
 
-    function handlePasswordChange (event) {
+    function handlePasswordChange(event) {
         const password = event.target.value;
-        setError({passwordError: null, heading: null});
+        setError({ passwordError: null, heading: null });
         setPasswordStrength(password.length);
     }
 
     return (
         <GcdsContainer className="gcds-content" >
             {
-                errorJson.passwordError!==null&&(<GcdsErrorSummary
+                errorJson.passwordError !== null && (<GcdsErrorSummary
                     errorLinks={`{"#password": "${errorJson.passwordError}"}`}
                     heading={errorJson.heading}
                     data-testid="errorSummary"
                 />)
             }
             {
-                flow===FLOW_TYPES.signUp&&(
-                   <>
-                       <GcdsContainer centered className="gcds-notice">
-                           <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={pageContentJson['1']}>
-                               &nbsp;
-                           </GcdsNotice>
-                       </GcdsContainer>
-                       <GcdsText>
-                           <GcdsStepper currentStep="2" totalSteps="4" tag="h1" lang={language} marginTop="150" marginBottom="0">
-                               {pageContentJson['3']}
-                           </GcdsStepper>
-                       </GcdsText>
-                       <GcdsText>
-                           <span>{pageContentJson['4']}</span> <strong><span>{pageContentJson['5']}</span> {passwordPolicy.min} </strong> <span>{pageContentJson['6']}</span>
-                       </GcdsText>
-                       <GcdsDetails detailsTitle={pageContentJson['7']}>
-                           <GcdsText>
-                               {pageContentJson['8']}
-                           </GcdsText>
-                       </GcdsDetails>
-                   </>
+                flow === FLOW_TYPES.signUp && (
+                    <>
+                        <GcdsContainer centered className="gcds-notice">
+                            <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={pageContentJson['1']}>
+                                &nbsp;
+                            </GcdsNotice>
+                        </GcdsContainer>
+                        <GcdsText>
+                            <GcdsStepper currentStep="2" totalSteps="4" tag="h1" lang={language} marginTop="150" marginBottom="0">
+                                {pageContentJson['3']}
+                            </GcdsStepper>
+                        </GcdsText>
+                        <GcdsText>
+                            <span>{pageContentJson['4']}</span> <strong><span>{pageContentJson['5']}</span> {passwordPolicy.min} </strong> <span>{pageContentJson['6']}</span>
+                        </GcdsText>
+                        <GcdsDetails detailsTitle={pageContentJson['7']}>
+                            <GcdsText>
+                                {pageContentJson['8']}
+                            </GcdsText>
+                        </GcdsDetails>
+                    </>
                 )
             }
             {
-                flow===FLOW_TYPES.signIn&&(
+                flow === FLOW_TYPES.signIn && (
                     <>
                         <GcdsHeading tag="h1">
                             {pageContentJson['14']}
                             <GcdsText marginTop="150" marginBottom="0">
                                 {pageContentJson['15']}
                                 <strong>
-                                    {language===AVAILABLE_LANGUAGES.fr?' '+pageContentJson['16']+' ':''}
-                                    {` ${SERVICES[0].title}`}{language===AVAILABLE_LANGUAGES.en?' '+pageContentJson['16']:''}
+                                    {language === AVAILABLE_LANGUAGES.fr ? ' ' + pageContentJson['16'] + ' ' : ''}
+                                    {` ${SERVICES[0].title}`}{language === AVAILABLE_LANGUAGES.en ? ' ' + pageContentJson['16'] : ''}
                                 </strong>
                             </GcdsText>
                         </GcdsHeading>
@@ -192,24 +199,24 @@ export default function Password() {
             }
             <GcdsContainer>
                 <form id="form" onSubmit={handleSubmit} >
-                    { state.testData!==undefined&&(
+                    {state.testData !== undefined && (
                         <GcdsInput
                             inputId="input-password"
                             label={pageContentJson['9']}
                             name="password"
                             value={state.testData.password}
-                            hint={flow===FLOW_TYPES.signUp?pageContentJson['10']:''}
-                            type={checkedValue? "password" : "text"}
+                            hint={flow === FLOW_TYPES.signUp ? pageContentJson['10'] : ''}
+                            type={checkedValue ? "password" : "text"}
                             onGcdsInput={handlePasswordChange}
                             errorMessage={errorJson.passwordError}
                         ></GcdsInput>)
                     }
-                    { state.testData===undefined&&(<GcdsInput
+                    {state.testData === undefined && (<GcdsInput
                         inputId="input-password"
                         label={pageContentJson['9']}
                         name="password"
-                        hint={flow===FLOW_TYPES.signUp?pageContentJson['10']:''}
-                        type={checkedValue? "password" : "text"}
+                        hint={flow === FLOW_TYPES.signUp ? pageContentJson['10'] : ''}
+                        type={checkedValue ? "password" : "text"}
                         onGcdsInput={handlePasswordChange}
                         errorMessage={errorJson.passwordError}
                     ></GcdsInput>)
@@ -221,10 +228,10 @@ export default function Password() {
                         onGcdsChange={validateCheckbox}>
                     </GcdsCheckbox>
                     {
-                        flow===FLOW_TYPES.signUp&&(
-                                <GcdsText>
-                                    <span>{pageContentJson['12']}</span> <strong>{passwordStrength}</strong> / {passwordPolicy.min} <span>{pageContentJson['13']}</span>
-                                </GcdsText>
+                        flow === FLOW_TYPES.signUp && (
+                            <GcdsText>
+                                <span>{pageContentJson['12']}</span> <strong>{passwordStrength}</strong> / {passwordPolicy.min} <span>{pageContentJson['13']}</span>
+                            </GcdsText>
                         )
                     }
 
@@ -232,12 +239,12 @@ export default function Password() {
                 </form>
             </GcdsContainer>
             {
-                flow===FLOW_TYPES.signUp&&(
-                    <AlreadyGc currentLang={language}/>
+                flow === FLOW_TYPES.signUp && (
+                    <AlreadyGc currentLang={language} />
                 )
             }
             {
-                flow===FLOW_TYPES.signIn&&(
+                flow === FLOW_TYPES.signIn && (
                     <>
                         <br />
                         <GcdsText>

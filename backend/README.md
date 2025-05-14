@@ -36,6 +36,12 @@ docker run -p 8000:8000 \
   gc-signin-backend
 ```
 
+3. You can also run the fastapi server locally from the root folder:
+```
+make install-dev-python
+fastapi run backend/app/main.py
+```
+
 The API will be available at `http://localhost:8000`
 
 ### API Documentation
