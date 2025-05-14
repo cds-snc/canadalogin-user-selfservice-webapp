@@ -71,7 +71,7 @@ async def dispatch_otp(user_otp_info: UserOtpInfo, global_http_client: AsyncClie
     Use it for ALL API calls."""
 
     try:
-        access_token = await get_admin_token()
+        access_token = await get_admin_token(global_http_client)
         headers = get_auth_request_headers(access_token, True)
         settings = get_settings().ibm_verify_config
 

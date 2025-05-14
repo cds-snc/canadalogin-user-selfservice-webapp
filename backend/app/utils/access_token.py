@@ -12,11 +12,11 @@ settings = get_settings().ibm_verify_config
 admin_token_ttl = 7170
 
 
-async def get_admin_token():
-    return await get_access_token()
+async def get_admin_token(global_http_client: AsyncClient()):
+    return await get_access_token(global_http_client)
 
 
-async def request_access_token():
+async def request_access_token(global_http_client: AsyncClient()):
     """Request token from IBM Verify API"""
     try:
         token_url = f"{settings.IBM_VERIFY_TENANT_URL}/oauth2/token"
@@ -30,22 +30,20 @@ async def request_access_token():
         }
         logger.debug(f"Token URL: {token_url}")
 
-        async with AsyncClient() as client:
-            response = await client.post(
-                token_url,
-                data=data,
-                headers={"Content-Type": "application/x-www-form-urlencoded"},
+        response = await global_http_client.post(
+            token_url,
+            data=data,
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+        )
+
+        if response.status_code != 200:
+            logger.error(f"Failed to get access token. Response: {response}")
+            raise HTTPException(
+                status_code=response.status_code,
+                detail="Failed to get access token",
             )
-
-            if response.status_code != 200:
-                logger.error(f"Failed to get access token. Response: {response}")
-                raise HTTPException(
-                    status_code=response.status_code,
-                    detail="Failed to get access token",
-                )
-
-            logger.info("Request returned successfully")
-            return response
+        logger.info("Request returned successfully")
+        return response
 
     except Exception as e:
 
@@ -53,13 +51,13 @@ async def request_access_token():
         raise HTTPException(status_code=400, detail=f"Token request error: {str(e)}")
 
 
-async def get_access_token() -> str:
+async def get_access_token(global_http_client: AsyncClient()) -> str:
     """Get access token for IBM Verify API operations"""
     try:
         logger.info("Attempting to get access token")
 
         start_time = datetime.now()
-        response = await request_access_token()
+        response = await request_access_token(global_http_client)
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(f"Token request completed in {duration:.2f} seconds")
 
