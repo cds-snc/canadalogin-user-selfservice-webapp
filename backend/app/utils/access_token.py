@@ -33,7 +33,8 @@ async def request_access_token(global_http_client: AsyncClient()):
         response = await global_http_client.post(
             token_url,
             data=data,
-            headers={"Content-Type": "application/x-www-form-urlencoded"})
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+        )
 
         if response.status_code != 200:
             logger.error(f"Failed to get access token. Response: {response}")
