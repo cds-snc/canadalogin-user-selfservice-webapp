@@ -5,7 +5,12 @@ from fastapi import HTTPException
 from httpx import AsyncClient
 from app.users.services.create import get_auth_request_headers, get_admin_token
 from app.config import get_settings
-from app.users.schemas import ProfileCreateResponse, ProfileUserData
+from app.users.schemas import (
+    ProfileCreateResponse,
+    ProfileUserData,
+    ProfileCreateRequest,
+    Operations,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -22,21 +27,22 @@ async def create_profile(user_data: ProfileUserData, global_http_client: AsyncCl
         last_name = user_data.lastName
         formatted_name = f"{first_name} {last_name}" if first_name else last_name
 
-        operations = [
-            {"op": "replace", "path": "name.formatted", "value": formatted_name},
-            {"op": "replace", "path": "name.familyName", "value": last_name},
+        operation_list = [
+            Operations(
+                op="add",
+                path="urn:ietf:params:scim:schemas:extension:ibm:2.0:Notification:notifyType",
+                value="NONE",
+            ),
+            Operations(op="replace", path="name.formatted", value=formatted_name),
+            Operations(op="replace", path="name.familyName", value=last_name),
         ]
         if first_name:
-            operations.append(
-                {"op": "replace", "path": "name.givenName", "value": first_name}
+            operation_list.append(
+                Operations(op="replace", path="name.givenName", value=first_name)
             )
-
-        payload = {
-            "schemas": ["urn:ietf:params:scim:api:messages:2.0:PatchOp"],
-            "Operations": operations,
-        }
-
-        request_json = payload
+        create_request = ProfileCreateRequest(Operations=operation_list)
+        # create_request.notification.notifyType = "NONE"
+        request_json = create_request.model_dump()
         response = await global_http_client.patch(
             create_profile_url, json=request_json, headers=headers
         )

@@ -57,9 +57,21 @@ class IBMUserCreateResponse(BaseModel):
     id: str
 
 
+class Operations(BaseModel):
+    op: str
+    path: str
+    value: str
+
+
+class ProfileCreateRequest(BaseModel):
+    schemas: List[str] = ["urn:ietf:params:scim:api:messages:2.0:PatchOp"]
+    # notification: IBMNotificationExtension = Field(
+    #     default_factory=IBMNotificationExtension,
+    #     alias="urn:ietf:params:scim:schemas:extension:ibm:2.0:Notification")
+    Operations: List[Operations]
+
+
 class ProfileCreateResponse(ResponseModel):
-    schemas: Optional[str] = None
-    status: Optional[str] = None
     detail: Optional[str] = None
 
 
