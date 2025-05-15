@@ -143,8 +143,10 @@ export async function callAuthService(submitDataOptions:SubmitDataOptions, submi
             return await authService.login({...payload});
         case(SUBMIT_END_POINTS.otpVerify):
             payload = {
+                otp: submitData.verificationCode,
+                otpType: submitDataOptions.type,
                 userName: userData.email,
-                otpType: submitDataOptions.type
+                trxId: userData.trxId,
             }
             return await authService.otpVerify({...payload});
         case(SUBMIT_END_POINTS.otpSend):

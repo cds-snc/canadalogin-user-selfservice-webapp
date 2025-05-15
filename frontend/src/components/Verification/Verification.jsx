@@ -28,7 +28,7 @@ export default function Verification() {
     const {setError, clearAllErrors, getError, hasErrors} = useError(language);
     const [time, setTime] = useState(initialTime);
     const pageContentJson = getPageContent(language, PAGES.verification);
-    const error = getError('#validation');
+    const error = getError('#verificationCode');
 
     const submitDataOptions = {
         language,
@@ -37,7 +37,7 @@ export default function Verification() {
         page: PAGES.verification,
         flow: flow,
         type: type,
-        onError: (err)=> setError('#validation',err)
+        onError: (err)=> setError('#verificationCode',err)
     };
 
 
@@ -48,7 +48,7 @@ export default function Verification() {
         page: PAGES.verification,
         flow: flow,
         type: type,
-        onError: (err)=> setError('#validation',err)
+        onError: (err)=> setError('#verificationCode',err)
     };
 
     const {handleSubmit, isPending} = useSubmit(submitDataOptions, validateCode);
@@ -69,7 +69,7 @@ export default function Verification() {
     function validateCode(code) {
         clearAllErrors();
         if(!isCodeValid(code)) {
-            setError('#validation', '3');
+            setError('#verificationCode', '3');
             return false;
         }
         return true;
@@ -79,7 +79,7 @@ export default function Verification() {
         <GcdsContainer>
             {
                 hasErrors()&&(<GcdsErrorSummary data-testid='errorSummary'
-                                                errorLinks={`{"#verification": "${error.errorMsg}"}`}
+                                                errorLinks={`{"#verificationCode": "${error.errorMsg}"}`}
                                                 heading={ error.heading}
                 />)
             }
@@ -189,7 +189,12 @@ export default function Verification() {
             {
                 type!==FLOW_TYPES.email&&(
                     <GcdsText>
-                        {time<=0 && !isPending?(<GcdsLink href="#" onClick={()=>handleLinkSubmit(LINK_SUBMIT_TYPES.requestNewCode, true).then(()=>setTime(initialTime*timesRequested))}>
+                        {time<=0 && !isPending?(<GcdsLink href="#" onClick={()=>{
+                            clearAllErrors();
+                            handleLinkSubmit(LINK_SUBMIT_TYPES.requestNewCode, true).then(()=>setTime(initialTime*timesRequested));
+                            document.getElementById("form").reset();
+                            }
+                        }>
                             {type===FLOW_TYPES.voice?pageContentJson['12']:pageContentJson['11']}
                         </GcdsLink>):""}
                     </GcdsText>
@@ -197,7 +202,12 @@ export default function Verification() {
             }
             <GcdsText>
                 {time>0 && !isPending?(<span>{pageContentJson['14']}<strong> {time} {pageContentJson['15']}</strong></span>)
-                    :!isPending?(<GcdsLink href="#" onClick={()=>handleLinkSubmit(LINK_SUBMIT_TYPES.requestNewCode, false).then(()=>setTime(initialTime*timesRequested))}>
+                    :!isPending?(<GcdsLink href="#" onClick={()=>{
+                        clearAllErrors();
+                        handleLinkSubmit(LINK_SUBMIT_TYPES.requestNewCode, false).then(()=>setTime(initialTime*timesRequested));
+                        document.getElementById("form").reset();
+                        }
+                    }>
                         {type!==FLOW_TYPES.email?pageContentJson['16']:pageContentJson['26']}
                     </GcdsLink>):""}
             </GcdsText>
