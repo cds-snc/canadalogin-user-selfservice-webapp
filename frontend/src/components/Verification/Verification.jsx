@@ -189,7 +189,7 @@ export default function Verification() {
             {
                 type!==FLOW_TYPES.email&&(
                     <GcdsText>
-                        {time<=0 && !isPending?(<GcdsLink href="#" onClick={()=>handleLinkSubmit(LINK_SUBMIT_TYPES.requestNewCode, true).then(r=>setTime(initialTime*timesRequested))}>
+                        {time<=0 && !isPending?(<GcdsLink href="#" onClick={()=>handleLinkSubmit(LINK_SUBMIT_TYPES.requestNewCode, true).then(()=>setTime(initialTime*timesRequested))}>
                             {type===FLOW_TYPES.voice?pageContentJson['12']:pageContentJson['11']}
                         </GcdsLink>):""}
                     </GcdsText>
@@ -197,7 +197,7 @@ export default function Verification() {
             }
             <GcdsText>
                 {time>0 && !isPending?(<span>{pageContentJson['14']}<strong> {time} {pageContentJson['15']}</strong></span>)
-                    :!isPending?(<GcdsLink href="#" onClick={()=>handleLinkSubmit(LINK_SUBMIT_TYPES.requestNewCode, false).then(r=>setTime(initialTime*timesRequested))}>
+                    :!isPending?(<GcdsLink href="#" onClick={()=>handleLinkSubmit(LINK_SUBMIT_TYPES.requestNewCode, false).then(()=>setTime(initialTime*timesRequested))}>
                         {type!==FLOW_TYPES.email?pageContentJson['16']:pageContentJson['26']}
                     </GcdsLink>):""}
             </GcdsText>

@@ -5,7 +5,7 @@ import {useNavigate} from "react-router";
 import {callAnalytics, callAuthService, SubmitData, SubmitDataOptions} from "./useSubmit";
 
 
-export function useLinkSubmit(submitDataOptions:SubmitDataOptions, setStateOne:any, setStateTwo:any) {
+export function useLinkSubmit(submitDataOptions:SubmitDataOptions) {
     const {state, dispatch} = useUser();
     const navigate = useNavigate();
     const [isPending, startTransition] = useTransition();
