@@ -6,7 +6,7 @@ from httpx import AsyncClient
 from pydantic import ValidationError
 
 from app.config import get_settings
-from app.otp.schemas import UserOtpInfo, OtpType, OtpSentResponse
+from app.otp.schemas import UserOtpInfo, OtpType, OtpDataResponse
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.helpers import (
     generate_error_response,
@@ -47,7 +47,7 @@ async def handle_otp_send(user_otp_info: UserOtpInfo, global_http_client: AsyncC
             logger.info(f"{user_otp_info.otpType} OTP created and sent")
 
             try:
-                validated_data = OtpSentResponse(**response_json)
+                validated_data = OtpDataResponse(**response_json)
 
             except ValidationError as e:
                 logger.error(f"Validation Error: {e.json()}")
