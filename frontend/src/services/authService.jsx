@@ -1,7 +1,13 @@
 import axios from 'axios';
 import config from '../config';
 import {FLOW_TYPES, SUBMIT_END_POINTS} from "../utils/constants.jsx";
-import {ERROR_RESPONSE, SUCCESS_RESPONSE, TEST_RESPONSES, TEST_USERS} from "../stories/Tests/utils/constants.jsx";
+import {
+    ERROR_RESPONSE,
+    SUCCESS_RESPONSE,
+    TEST_RESPONSES,
+    TEST_USERS,
+    VALIDATION_ERROR_RESPONSE
+} from "../stories/Tests/utils/constants.jsx";
 
 export const authService = {
     requestPasswordPolicy:async () => {
@@ -73,7 +79,7 @@ function buildTestResponse (userData, type) {
             else if(userData.otpType===FLOW_TYPES.voice && (userData.otp===TEST_USERS.get(userData.userName).voiceOtp))
                 return TEST_RESPONSES.verificationVoiceResponse;
 
-            return ERROR_RESPONSE;
+            throw {response:VALIDATION_ERROR_RESPONSE};
         case "transientOtpSend":
             if(userData.otpType===FLOW_TYPES.email) {
                 response = TEST_RESPONSES.signUpResponse;
@@ -101,8 +107,8 @@ function buildTestResponse (userData, type) {
                 TEST_RESPONSES.verificationVoiceResponse.message = "Sign in voice OTP has been validated"
                 return TEST_RESPONSES.verificationVoiceResponse;
             }
-
-            return ERROR_RESPONSE;
+        console.log(VALIDATION_ERROR_RESPONSE);
+            return VALIDATION_ERROR_RESPONSE;
         case "otpSend":
             console.log("sending for ", userData.otpType)
             if(userData.otpType===FLOW_TYPES.voice) {

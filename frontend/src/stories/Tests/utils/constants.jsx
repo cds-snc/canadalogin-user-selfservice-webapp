@@ -109,6 +109,15 @@ export const PROFILE_ERROR_RESPONSE = {
     "status": 400,
 }
 
+export const VALIDATION_ERROR_RESPONSE = {
+    "data": {
+        "success": false,
+        "message": "Code does not match.",
+        "data": null
+    },
+    "status": 400,
+}
+
 export const SERVER_TIMEOUT_RESPONSE =
 {
     "status": 500,
