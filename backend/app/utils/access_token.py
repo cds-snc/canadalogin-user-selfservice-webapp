@@ -1,7 +1,6 @@
 import logging
 import threading
 from datetime import datetime
-
 from fastapi import HTTPException
 from httpx import AsyncClient
 from app.config import get_settings
@@ -13,8 +12,8 @@ settings = get_settings().ibm_verify_config
 admin_token_ttl = 7170
 
 
-def get_admin_token():
-    return get_access_token()
+async def get_admin_token():
+    return await get_access_token()
 
 
 async def request_access_token():
