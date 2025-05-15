@@ -36,7 +36,9 @@ async def create_profile(user_data: ProfileUserData, global_http_client: AsyncCl
             ),
             Operations(op="replace", path="name.formatted", value=formatted_name),
             Operations(op="replace", path="name.familyName", value=last_name),
-            Operations(op="replace", path="preferredLanguage", value=preferred_language)
+            Operations(
+                op="replace", path="preferredLanguage", value=preferred_language
+            ),
         ]
         if first_name:
             operation_list.append(
