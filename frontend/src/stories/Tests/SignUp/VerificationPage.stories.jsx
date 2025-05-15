@@ -5,7 +5,7 @@ import {
 } from "../../../utils/constants.jsx";
 import {getPageContent} from "../../../utils/functions.jsx";
 import {
-    ACTION_TYPES, ERROR_RESPONSE,
+    ACTION_TYPES,
     MSW_MOCKS,
     TEST_TYPES, TEST_USERS, VALIDATION_CODE_ERROR_RESPONSE
 } from "../utils/constants.jsx";
