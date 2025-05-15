@@ -125,14 +125,14 @@ export async function callAuthService(submitDataOptions:SubmitDataOptions, submi
                     otp: submitData.verificationCode,
                     otpType: submitDataOptions.type,
                     userName: userData.email,
-                    trxId: userData.trxId,
+                    trxnId: userData.trxnId,
                 };
             return await authService.transientOtpVerify({...payload});
         case(SUBMIT_END_POINTS.create):
             payload = {
                 userName: userData.email,
                 password: submitData.password,
-                txrId: userData.txrId
+                trxnId: userData.trxnId
             }
             return await authService.create({...payload});
         case(SUBMIT_END_POINTS.login):
@@ -146,7 +146,7 @@ export async function callAuthService(submitDataOptions:SubmitDataOptions, submi
                 otp: submitData.verificationCode,
                 otpType: submitDataOptions.type,
                 userName: userData.email,
-                trxId: userData.trxId,
+                trxnId: userData.trxnId,
             }
             return await authService.otpVerify({...payload});
         case(SUBMIT_END_POINTS.otpSend):
