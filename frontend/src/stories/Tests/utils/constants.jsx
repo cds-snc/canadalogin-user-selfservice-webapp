@@ -109,6 +109,15 @@ export const PROFILE_ERROR_RESPONSE = {
     "status": 400,
 }
 
+export const VALIDATION_CODE_ERROR_RESPONSE = {
+    "data": {
+        "success": false,
+        "message": "Code does not match.",
+        "data": null
+    },
+    "status": 400,
+}
+
 export const SERVER_TIMEOUT_RESPONSE =
 {
     "status": 500,
@@ -200,7 +209,7 @@ export const MSW_MOCKS ={
         phoneError: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpSend, response: PHONE_NUMBER_ERROR_RESPONSE}
     },
     transientOtpVerify:{
-        error:  {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpVerify, response: ERROR_RESPONSE},
+        error:  {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpVerify, response: VALIDATION_CODE_ERROR_RESPONSE},
         serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpVerify, response: SERVER_TIMEOUT_RESPONSE},
         emailSuccess: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpVerify, response: TEST_RESPONSES.verificationEmailResponse},
         smsSuccess: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpVerify, response: TEST_RESPONSES.verificationSmsResponse},
@@ -224,7 +233,7 @@ export const MSW_MOCKS ={
         voiceSuccess: {type: "post", endpoint: SUBMIT_END_POINTS.otpSend, response: TEST_RESPONSES.verificationVoiceSetUpResponse}
     },
     otpVerify:{
-        error:  {type: "post", endpoint: SUBMIT_END_POINTS.otpVerify, response: ERROR_RESPONSE},
+        error:  {type: "post", endpoint: SUBMIT_END_POINTS.otpVerify, response: VALIDATION_CODE_ERROR_RESPONSE},
         serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.otpVerify, response: SERVER_TIMEOUT_RESPONSE},
         smsSuccess: {type: "post", endpoint: SUBMIT_END_POINTS.otpVerify, response: TEST_RESPONSES.verificationSmsResponse},
         voiceSuccess: {type: "post", endpoint: SUBMIT_END_POINTS.otpVerify, response: TEST_RESPONSES.verificationVoiceResponse}
