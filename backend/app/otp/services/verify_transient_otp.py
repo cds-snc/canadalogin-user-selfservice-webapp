@@ -71,7 +71,7 @@ async def verify_otp(
             "otp": user_verification_data.otp,
         }
 
-        access_token = await get_admin_token()
+        access_token = await get_admin_token(global_http_client)
         headers = get_auth_request_headers(access_token, True)
         settings = get_settings().ibm_verify_config
 
