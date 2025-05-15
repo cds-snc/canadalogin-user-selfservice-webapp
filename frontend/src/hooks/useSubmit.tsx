@@ -42,15 +42,13 @@ export function useSubmit(submitDataOptions:SubmitDataOptions, validateFunction:
                     const response = await callAuthService(submitDataOptions, submitData, state.userData);
                     console.log("success....", response);
                     const userData = setUserData(submitDataOptions, submitData, state.userData, response);
-                    console.log("userData....", userData);
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
-                    console.log("state.userData....", state.userData);
                     await callAnalytics(submitDataOptions, "submit_success", GA_LABELS.button);
                     const navigateTo = setNavigateTo(submitDataOptions, response, submitData);
-                    console.log("navigateTo....", navigateTo);
                     navigate(navigateTo);
                     return;
                 } catch (error){
+                    console.log("error....", error);
                     const serverMessage = error.response?.data?.message;
                     if(submitDataOptions.onError) {
                         submitDataOptions.onError(serverMessage);

@@ -19,6 +19,7 @@ export function useLinkSubmit(submitDataOptions:SubmitDataOptions) {
                     adjustEndpoint(linkFlowType, submitDataOptions);
                     const submitData =setSubmitData(submitDataOptions, state.userData, changeType);
                     const response = await callAuthService(submitDataOptions, submitData, state.userData);
+                    console.log("success....", response);
                     const userData = setUserData(linkFlowType+submitDataOptions.type, state.userData, response, submitData);
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                     const navigateTo = setNavigateTo(submitDataOptions, linkFlowType, changeType);
