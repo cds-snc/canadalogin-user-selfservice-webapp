@@ -43,7 +43,7 @@ export function useSubmit(submitDataOptions:SubmitDataOptions, validateFunction:
                     console.log("success....", response);
                     const userData = setUserData(submitDataOptions, submitData, state.userData, response);
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
-                    await callAnalytics(submitDataOptions, "submit_success", GA_LABELS.button);
+                    await callAnalytics(submitDataOptions, submitDataOptions.type+'_submit_success', GA_LABELS.button);
                     const navigateTo = setNavigateTo(submitDataOptions, response, submitData);
                     navigate(navigateTo);
                     return;
@@ -53,9 +53,9 @@ export function useSubmit(submitDataOptions:SubmitDataOptions, validateFunction:
                     if(submitDataOptions.onError) {
                         submitDataOptions.onError(serverMessage);
                         if(serverMessage)
-                            await callAnalytics(submitDataOptions, "submit_error", GA_LABELS.button);
+                            await callAnalytics(submitDataOptions, submitDataOptions.type+'submit_error', GA_LABELS.button);
                         else
-                            await callAnalytics(submitDataOptions, "submit_timeout", GA_LABELS.button);
+                            await callAnalytics(submitDataOptions, submitDataOptions.type+"submit_timeout", GA_LABELS.button);
                     }
                 }
            });
@@ -93,10 +93,7 @@ function setNavigateTo(submitDataOptions: SubmitDataOptions, response:any, submi
 }
 export async function callAnalytics(submitDataOptions: SubmitDataOptions, submitAction:string, label:string) {
 
-    let action =  submitDataOptions.page.toLowerCase() + "_" + submitAction;
-
-    if (submitDataOptions.type)
-        action =  submitDataOptions.page.toLowerCase()+"_"+ submitDataOptions.type + "_" + submitAction;
+    const action =  submitDataOptions.page.toLowerCase() + "_" + submitAction;
 
     trackEvent({
         category: submitDataOptions.flow,

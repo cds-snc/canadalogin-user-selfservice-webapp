@@ -15,6 +15,7 @@ export function useLinkSubmit(submitDataOptions:SubmitDataOptions) {
     const handleLinkSubmit =
         async (linkFlowType:string, changeType:boolean) => {
             startTransition(async () => {
+                const analyticsTag = setTag(submitDataOptions, linkFlowType, changeType);
                 try {
                     adjustEndpoint(linkFlowType, submitDataOptions);
                     const submitData =setSubmitData(submitDataOptions, state.userData, changeType);
@@ -22,6 +23,7 @@ export function useLinkSubmit(submitDataOptions:SubmitDataOptions) {
                     console.log("success....", response);
                     const userData = setUserData(linkFlowType+submitDataOptions.type, state.userData, response, submitData);
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
+                    await callAnalytics(submitDataOptions, analyticsTag+'_success', GA_LABELS.link);
                     const navigateTo = setNavigateTo(submitDataOptions, linkFlowType, changeType);
                     setStates(linkFlowType);
                     if(navigateTo)
@@ -33,9 +35,9 @@ export function useLinkSubmit(submitDataOptions:SubmitDataOptions) {
                     if(submitDataOptions.onError) {
                         submitDataOptions.onError(serverMessage);
                         if(serverMessage)
-                            await callAnalytics(submitDataOptions, "submit_error", GA_LABELS.link);
+                            await callAnalytics(submitDataOptions, analyticsTag+'_error', GA_LABELS.link);
                         else
-                            await callAnalytics(submitDataOptions, "submit_timeout", GA_LABELS.link);
+                            await callAnalytics(submitDataOptions, analyticsTag+'_timeout', GA_LABELS.link);
                     }
                 }
             });
@@ -50,7 +52,16 @@ export function useLinkSubmit(submitDataOptions:SubmitDataOptions) {
 
     return {handleLinkSubmit, isPending, codeRequested, timesRequested};
 }
+function setTag(submitDataOptions:SubmitDataOptions, linkFlowType:string, changeType:boolean) {
 
+    if(linkFlowType===LINK_SUBMIT_TYPES.useNewVerification)
+        return 'redirect_' + linkFlowType.toLowerCase() + '_' + submitDataOptions.type;
+    else {
+        const type = changeType?(submitDataOptions.type===FLOW_TYPES.sms?FLOW_TYPES.voice:FLOW_TYPES.sms):submitDataOptions.type;
+
+        return 'submit_' + linkFlowType.toLowerCase() + '_'+ type;
+    }
+}
 function setUserData(type:string, userData:any, response:any, submitData:SubmitData) {
     switch (type) {
         case LINK_SUBMIT_TYPES.useNewVerification+FLOW_TYPES.email:
