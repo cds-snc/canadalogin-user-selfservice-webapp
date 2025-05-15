@@ -12,8 +12,8 @@ import {
 import {buildTestCase, testCase, TestTemplate} from "../utils/functions.tsx";
 const engErrorPageJson = getPageContent(AVAILABLE_LANGUAGES.en, PAGES.error);
 const frErrorPageJson = getPageContent(AVAILABLE_LANGUAGES.fr, PAGES.error);
-const engPageContentJson = getPageContent('en',  PAGES.verification);
-const frPageContentJson = getPageContent('fr', PAGES.verification);
+const engPageContentJson = getPageContent(AVAILABLE_LANGUAGES.en,  PAGES.verification);
+const frPageContentJson = getPageContent(AVAILABLE_LANGUAGES.fr, PAGES.verification);
 
 export default {
     title: 'GC Sign In/Tests/Sign Up/Verification Page',
