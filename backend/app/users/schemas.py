@@ -65,9 +65,6 @@ class Operations(BaseModel):
 
 class ProfileCreateRequest(BaseModel):
     schemas: List[str] = ["urn:ietf:params:scim:api:messages:2.0:PatchOp"]
-    # notification: IBMNotificationExtension = Field(
-    #     default_factory=IBMNotificationExtension,
-    #     alias="urn:ietf:params:scim:schemas:extension:ibm:2.0:Notification")
     Operations: List[Operations]
 
 
@@ -79,6 +76,7 @@ class ProfileUserData(BaseModel):
     userid: str
     firstName: Optional[str] = None
     lastName: str
+    preferredLanguage: str
 
 
 class SignUpResponse(ResponseModel):
