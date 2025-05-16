@@ -45,16 +45,17 @@ export const PAGES ={
 
 export const FOOTERS = {
     default: {
-        en: '{ "About GC Sign in": "#", "Help": "#", "Terms": "#" }',
-        fr: '{ "À propos de Connexion GC": "#", "Aide": "#", "Avis": "#" }'
+        en: '{ "About GC Sign in": "https://gc-signin.cdssandbox.xyz/en/", "Help": "https://gc-signin.cdssandbox.xyz/en/", "Terms": "https://gc-signin.cdssandbox.xyz/en/" }',
+        fr: '{ "À propos de Connexion GC": "https://gc-signin.cdssandbox.xyz/en/", "Aide": "https://gc-signin.cdssandbox.xyz/fr/", "Avis": "https://gc-signin.cdssandbox.xyz/en/" }'
     }
 }
 
 export const SERVICES=[
     {
         id: 1,
-        title: 'GEO.ca',
-        description: ''
+        title: 'Parks Canada Reservations',
+        description: '',
+        url: '#'
     }
 ];
 
