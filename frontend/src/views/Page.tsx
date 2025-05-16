@@ -10,6 +10,7 @@ import CreateCoreProfile from "../components/SignUp/Profile/CreateCoreProfile.js
 import Privacy from "../components/SignUp/Profile/Privacy.jsx";
 import VerificationSetUp from "../components/SignUp/TwoStepVerification/VerificationSetUp"
 import VerificationSelection from "../components/SignIn/VerificationSelection"
+import ManageDashboard from "../components/Manage/ManageDashboard.jsx";
 import {PAGES} from "../utils/constants";
 import {useUser} from "../components/Providers/useUser";
 import {useLocation, useParams} from "react-router";
@@ -49,6 +50,10 @@ function PageContents({page}:{page:string}) {
         case PAGES.privacy:
             return (
                 <Privacy />
+            );
+        case PAGES.manageDashboard:
+            return (
+                <ManageDashboard/>
             );
         case "RP":
             return (<div>Redirect to RP</div>);

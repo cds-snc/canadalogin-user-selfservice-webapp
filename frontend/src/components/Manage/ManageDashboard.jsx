@@ -5,28 +5,38 @@ import {
     GcdsLink,
     GcdsButton,
     GcdsErrorSummary,
-    GcdsNotice,
+    GcdsCard
 } from "@cdssnc/gcds-components-react";
+import {
+    AVAILABLE_LANGUAGES,
+    PAGES,
+    SERVICES
+} from "../../utils/constants";
 import {useUser} from "../Providers/useUser";
 import {useParams} from "react-router";
-import {PAGES} from "../../utils/constants";
 import {useError} from "../../hooks/useError";
+import {getPageContent} from "../../utils/functions.jsx";
 
 export default function ManageDashboard() {
     const {state} = useUser();
     const {language} = useParams();
     const {setError, getError, hasErrors, clearAllErrors} = useError(language);
     const error = getError("#dashboard");
+    const pageContentJson = getPageContent(language, PAGES.manage);
 
     const services = state.userData?.services || []; // Example: Fetch user services from state
 
     return (
         <GcdsContainer>
-            {/* Notice Section */}
-            <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle="Manage Dashboard">
-                Welcome to your account management page.
-            </GcdsNotice>
-            <br />
+                {/*{pageContentJson['1']}*/}
+                <GcdsText marginTop="150" marginBottom="0">
+                    {/*{pageContentJson['2']}*/}
+                    <strong>
+                        {/*{language===AVAILABLE_LANGUAGES.fr?' '+pageContentJson['3']+' ':''}*/}
+                        {/*{` ${SERVICES[0].title}`}{language===AVAILABLE_LANGUAGES.en?' '+pageContentJson['3']:''}*/}
+                    </strong>
+                </GcdsText>
+
 
             {/* Error Summary */}
             {hasErrors() && (
@@ -40,37 +50,22 @@ export default function ManageDashboard() {
             {/* Welcome Section */}
             <GcdsContainer className="gcds-welcome">
                 <GcdsHeading tag="h1" className="gcds-heading">
-                    Welcome, {state.userData?.name || "User"}
+                    Welcome,  {state.userData?.name || "<Name"} of User >
                 </GcdsHeading>
-                <GcdsText>
-                    Manage your account and services below.
-                </GcdsText>
             </GcdsContainer>
 
-            {/* Services Section */}
-            <GcdsContainer className="gcds-services">
-                <GcdsHeading tag="h2">Your Services</GcdsHeading>
-                {services.length > 0 ? (
-                    services.map((service, index) => (
-                        <GcdsContainer key={index} className="gcds-service-item">
-                            <GcdsText>{service.name}</GcdsText>
-                            <GcdsLink href={service.link}>Manage</GcdsLink>
-                        </GcdsContainer>
-                    ))
-                ) : (
-                    <GcdsText>No services available.</GcdsText>
-                )}
-            </GcdsContainer>
+            {/* Dashboard Section */}
+
 
             {/* Action Buttons */}
-            <GcdsContainer className="gcds-actions">
-                <GcdsButton type="button" onClick={() => console.log("Add Service")}>
-                    Add a Service
-                </GcdsButton>
-                <GcdsButton type="button" onClick={() => console.log("Sign Out")}>
-                    Sign Out
-                </GcdsButton>
-            </GcdsContainer>
+            {/*<GcdsContainer className="gcds-actions">*/}
+            {/*    <GcdsButton type="button" onClick={() => console.log("Add Service")}>*/}
+            {/*        Add a Service*/}
+            {/*    </GcdsButton>*/}
+            {/*    <GcdsButton type="button" onClick={() => console.log("Sign Out")}>*/}
+            {/*        Sign Out*/}
+            {/*    </GcdsButton>*/}
+            {/*</GcdsContainer>*/}
         </GcdsContainer>
     );
 }
