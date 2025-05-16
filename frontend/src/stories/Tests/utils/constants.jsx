@@ -2,11 +2,14 @@ import {SERVICES, SUBMIT_END_POINTS} from "../../../utils/constants.jsx";
 export const TEST_USERS = new Map([
     ['test@test.gc.ca', {emailOtp: '441234', smsOtp: '515136', voiceOtp: '151136', login: 'testUser12345'}],
 ]);
-export const PROTOTYPES = new Map([
-    ['email', {mobileUrl: '#', desktopUrl: 'https://www.figma.com/design/Et4mcEGQ92y1Fl7iu4y7is/Pilot-Usability-Test-Prototype?node-id=49-6234&m=dev'}],
-    ['sms', {mobileUrl: '#', desktopUrl: 'https://www.figma.com/design/Et4mcEGQ92y1Fl7iu4y7is/Pilot-Usability-Test-Prototype?node-id=49-6234&m=dev'}],
-    ['voice', {mobileUrl: '#', desktopUrl: 'https://www.figma.com/design/Et4mcEGQ92y1Fl7iu4y7is/Pilot-Usability-Test-Prototype?node-id=49-6234&m=dev'}],
-    ['signUpRedirect', {mobileUrl: 'https://www.figma.com/design/Et4mcEGQ92y1Fl7iu4y7is/Pilot-Usability-Test-Prototype?node-id=18-1002&p=f&m=dev', desktopUrl: 'https://www.figma.com/design/Et4mcEGQ92y1Fl7iu4y7is/Pilot-Usability-Test-Prototype?node-id=37-1445&m=dev'}]
+export const TEST_PROTOTYPES = new Map([
+    ['email', { mobileUrl: 'https://www.figma.com/proto/Et4mcEGQ92y1Fl7iu4y7is/Pilot-Usability-Test-Prototype?page-id=18%3A1007&node-id=98-6298&viewport=263%2C646%2C0.82&t=Iw4k7fo5gthLDwb4-8&scaling=min-zoom&content-scaling=fixed&hotspot-hints=0&hide-ui=1',
+                desktopUrl: 'https://www.figma.com/proto/Et4mcEGQ92y1Fl7iu4y7is/Pilot-Usability-Test-Prototype?page-id=18%3A1006&node-id=49-6234&p=f&viewport=50%2C250%2C0.8&t=StkDWwaRG7cFfwE4-8&scaling=min-zoom&content-scaling=fixed&hotspot-hints=0&hide-ui=1'}],
+    ['sms', {mobileUrl: 'https://www.figma.com/proto/Et4mcEGQ92y1Fl7iu4y7is/Pilot-Usability-Test-Prototype?page-id=18%3A1003&node-id=98-6274&viewport=1312%2C1238%2C1.03&t=NJPA8cShNZf0g6qA-8&scaling=min-zoom&content-scaling=fixed&hotspot-hints=0&hide-ui=1',
+             desktopUrl: 'https://www.figma.com/proto/Et4mcEGQ92y1Fl7iu4y7is/Pilot-Usability-Test-Prototype?page-id=18%3A1003&node-id=98-6274&viewport=1312%2C1238%2C1.03&t=NJPA8cShNZf0g6qA-8&scaling=min-zoom&content-scaling=fixed&hotspot-hints=0&hide-ui=1'}],
+    ['voice', {mobileUrl: 'http://localhost:3000/en/phoneotp', desktopUrl: 'http://localhost:3000/en/phoneotp'}],
+    ['signUpRedirect', {mobileUrl: 'https://www.figma.com/proto/Et4mcEGQ92y1Fl7iu4y7is/Pilot-Usability-Test-Prototype?page-id=18%3A1002&node-id=21-1415&p=f&viewport=435%2C109%2C0.42&t=QboqD6UYjdJd7wVn-8&scaling=min-zoom&content-scaling=fixed&hotspot-hints=0&hide-ui=1',
+                        desktopUrl: 'https://www.figma.com/proto/Et4mcEGQ92y1Fl7iu4y7is/Pilot-Usability-Test-Prototype?page-id=18%3A1004&node-id=19-1015&p=f&viewport=1919%2C485%2C0.69&t=sVzdH632D009Xd8s-8&scaling=min-zoom&content-scaling=fixed&starting-point-node-id=19%3A1015&hotspot-hints=0&hide-ui=1'}]
 ]);
 export const TestDataUserProvider = {
     isAuthenticated: false,

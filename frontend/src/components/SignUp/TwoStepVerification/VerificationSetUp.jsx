@@ -76,7 +76,7 @@ export default function VerificationSetUp() {
                                 {pageContentJson['2']}
                             </GcdsText>
                             <GcdsText>
-                                <GcdsLink href={`/${language}${NAVIGATION_LINKS.signUp}`} >
+                                <GcdsLink href='#' onClick={()=> window.open('https://gc-signin.cdssandbox.xyz/en/get-started/two-step-verification-methods/', '_blank').focus()}>
                                     {pageContentJson['3']}
                                 </GcdsLink>
                             </GcdsText>
@@ -87,7 +87,7 @@ export default function VerificationSetUp() {
                                 {pageContentJson['5']}
                             </GcdsText>
                             <GcdsText>
-                                <span>{pageContentJson['6']}</span> <GcdsLink href={`/${language}${NAVIGATION_LINKS.signUp}`} >{pageContentJson['7']}</GcdsLink> {pageContentJson['8']}
+                                <span>{pageContentJson['6']}</span> <GcdsLink href='#'> {pageContentJson['7']}</GcdsLink> {pageContentJson['8']}
                             </GcdsText>
                         </GcdsContainer>
                         <GcdsContainer padding="200">
