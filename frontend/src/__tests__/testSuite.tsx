@@ -146,6 +146,8 @@ const pageSetup = {
                 return ['11','25','27','42'];
             case PAGES.verificationSelection:
                 return ['6','7'];
+            case PAGES.coreProfile:
+                return ['1'];
             default:
                 return [];
         }
@@ -265,7 +267,6 @@ const pageSetup = {
     coreProfileSetUpGcdsMap: (pageContentJson: JSON) => {
 
         const gcdsElementMap = new Map();
-        gcdsElementMap.set('1', ['gcds-notice', createMap('gcds-notice', [pageContentJson['1'], 'h2', 'success'])]);
         gcdsElementMap.set('7', ['gcds-input', createMap('gcds-input3', ["firstName", pageContentJson['7'], 'firstName', 'text'])]);
         gcdsElementMap.set('8', ['gcds-input', createMap('gcds-input', ["lastName", pageContentJson['8'], 'lastName', 'text', 'other'])]);
 
@@ -286,10 +287,8 @@ const pageSetup = {
             `]`
         gcdsElementMap.set('5', ['gcds-radio-group', createMap('gcds-radio-group', ['number', options])]);
 
-
         return gcdsElementMap;
     }
-
 }
 
 const testSuite = {

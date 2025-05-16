@@ -39,10 +39,6 @@ export default function CreateCoreProfile() {
 
     return (
         <GcdsContainer>
-            <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={pageContentJson['1']} >
-                &nbsp;
-            </GcdsNotice>
-            <br/>
             {
                 hasErrors()&&(<GcdsErrorSummary data-testid='errorSummary'
                                                 errorLinks={`{"#profile": "${error.errorMsg}"}`}
