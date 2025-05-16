@@ -10,6 +10,13 @@ const stepErrorMessage = 'Verify error message is on Page.';
 const stepSuccessMessage = 'Verify success message is on Page.';
 const stepNavigateMessage = 'Verify page was navigated properly.';
 
+export function isMobileMediaQuery() {
+    try {
+        return window.matchMedia("(max-width: 767px)").matches;
+    }catch(error){
+        return false;
+    }
+}
 interface TestCase {
     canvasElement: any,
     step: any,

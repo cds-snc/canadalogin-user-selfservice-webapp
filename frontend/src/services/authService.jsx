@@ -2,12 +2,13 @@ import axios from 'axios';
 import config from '../config';
 import {FLOW_TYPES, SUBMIT_END_POINTS} from "../utils/constants.jsx";
 import {
-    ERROR_RESPONSE,
+    ERROR_RESPONSE, PROTOTYPES,
     SUCCESS_RESPONSE,
     TEST_RESPONSES,
     TEST_USERS,
     VALIDATION_CODE_ERROR_RESPONSE
 } from "../stories/Tests/utils/constants.jsx";
+import {isMobileMediaQuery} from "../stories/Tests/utils/functions.js";
 
 export const authService = {
     requestPasswordPolicy:async () => {
@@ -96,6 +97,8 @@ function buildTestResponse (userData, type) {
             expires.setMinutes(expires.getMinutes() + 5);
             response.data.created = now.toISOString();
             response.data.expiry =  expires.toISOString();
+            //for un-moderated testing purposes
+            openPrototypeWindow(userData.otpType);
 
             return response;
         case "otpVerify":
@@ -140,5 +143,19 @@ function buildTestResponse (userData, type) {
            return ERROR_RESPONSE;
 
 
+    }
+}
+
+function openPrototypeWindow(otpType){
+
+    const prototypeUrlsMap = PROTOTYPES.get(otpType);
+    if (isMobileMediaQuery()) {
+        // Code for mobile devices
+        window.open(prototypeUrlsMap.mobileUrl, '_blank').focus();
+        console.log("Mobile device detected for "+ otpType);
+    } else {
+        // Code for non-mobile devices
+        window.open(prototypeUrlsMap.desktopUrl, '_blank').focus();
+        console.log("Non-mobile device detected for "+ otpType);
     }
 }

@@ -54,7 +54,6 @@ export default function Home() {
     };
     const {handleSubmit, isPending} = useSubmit(submitDataOptions, validateEmail );
 
-
     console.log("Config URL", config.apiUrl);
     return (
         <GcdsContainer>
@@ -67,14 +66,14 @@ export default function Home() {
                 }
                 <GcdsHeading tag="h1">
                         {pageContentJson['1']}
-                        <GcdsText marginTop="150" marginBottom="0">
-                            {pageContentJson['2']}
-                            <strong>
-                                {currentLang===AVAILABLE_LANGUAGES.fr?' '+pageContentJson['3']+' ':''}
-                                {` ${SERVICES[0].title}`}{currentLang!==AVAILABLE_LANGUAGES.fr?' '+pageContentJson['3']:''}
-                            </strong>
-                        </GcdsText>
                 </GcdsHeading>
+                <GcdsText>
+                    <span>{pageContentJson['2']}</span> <strong>{pageContentJson['9']}</strong> {pageContentJson['10']}
+                    <strong>
+                        {currentLang===AVAILABLE_LANGUAGES.fr?' '+pageContentJson['3']+' ':<br/>}
+                        {` ${SERVICES[0].title}`}{currentLang!==AVAILABLE_LANGUAGES.fr?' '+pageContentJson['3']:''}
+                    </strong>
+                </GcdsText>
                 <GcdsDetails detailsTitle={pageContentJson['4']}>
                     <GcdsText>
                         {pageContentJson['5']}

@@ -2,6 +2,12 @@ import {SERVICES, SUBMIT_END_POINTS} from "../../../utils/constants.jsx";
 export const TEST_USERS = new Map([
     ['test@test.gc.ca', {emailOtp: '441234', smsOtp: '515136', voiceOtp: '151136', login: 'testUser12345'}],
 ]);
+export const PROTOTYPES = new Map([
+    ['email', {mobileUrl: '#', desktopUrl: 'https://www.figma.com/design/Et4mcEGQ92y1Fl7iu4y7is/Pilot-Usability-Test-Prototype?node-id=49-6234&m=dev'}],
+    ['sms', {mobileUrl: '#', desktopUrl: 'https://www.figma.com/design/Et4mcEGQ92y1Fl7iu4y7is/Pilot-Usability-Test-Prototype?node-id=49-6234&m=dev'}],
+    ['voice', {mobileUrl: '#', desktopUrl: 'https://www.figma.com/design/Et4mcEGQ92y1Fl7iu4y7is/Pilot-Usability-Test-Prototype?node-id=49-6234&m=dev'}],
+    ['signUpRedirect', {mobileUrl: 'https://www.figma.com/design/Et4mcEGQ92y1Fl7iu4y7is/Pilot-Usability-Test-Prototype?node-id=18-1002&p=f&m=dev', desktopUrl: 'https://www.figma.com/design/Et4mcEGQ92y1Fl7iu4y7is/Pilot-Usability-Test-Prototype?node-id=37-1445&m=dev'}]
+]);
 export const TestDataUserProvider = {
     isAuthenticated: false,
     userData: {
