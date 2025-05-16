@@ -2,6 +2,7 @@ from enum import Enum
 from typing import List, Optional
 from pydantic import BaseModel, Field, EmailStr, ConfigDict
 from pydantic_extra_types.phone_numbers import PhoneNumber
+from datetime import datetime
 
 from app.utils.schemas import ResponseModel
 
@@ -81,6 +82,57 @@ class ProfileUserData(BaseModel):
 
 class SignUpResponse(ResponseModel):
     data: Optional[IBMUserCreateResponse] = None
+
+
+class ProfileGetUserData(BaseModel):
+    userid: str
+
+
+class EmailItem(BaseModel):
+    type: str
+    value: EmailStr
+
+
+class Meta(BaseModel):
+    created: datetime
+    location: str
+    lastModified: datetime
+    resourceType: str
+
+
+class Name(BaseModel):
+    formatted: str
+    familyName: str
+    givenName: Optional[str]
+
+
+class IBMExtension(BaseModel):
+    pwdReset: bool
+    userCategory: str
+    twoFactorAuthentication: bool
+    realm: str
+    pwdChangedTime: datetime
+
+
+class ProfileGetResponseData(BaseModel):
+    emails: List[EmailItem]
+    preferredLanguage: Optional[str]
+    meta: Meta
+    schemas: List[str]
+    name: Name
+    ibm_extension: IBMExtension = Field(
+        ..., alias="urn:ietf:params:scim:schemas:extension:ibm:2.0:User"
+    )
+    active: bool
+    id: str
+    userName: EmailStr
+
+    class Config:
+        populate_by_name = True
+
+
+class ProfileGetResponse(ResponseModel):
+    data: ProfileGetResponseData
 
 
 # Signin Schema
