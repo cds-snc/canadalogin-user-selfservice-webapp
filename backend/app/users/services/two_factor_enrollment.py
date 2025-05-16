@@ -13,7 +13,7 @@ from app.users.schemas import (
     TwoFactorEnrollmentType,
 )
 from app.utils.access_token import get_admin_token, get_auth_request_headers
-from app.utils.helpers import generate_error_response
+from app.utils.helpers import generate_error_response, format_error_response
 from app.utils.schemas import ResponseModel
 
 logger = logging.getLogger(__name__)
@@ -33,7 +33,9 @@ async def handle_enrolling_user_into_2fa(
             logger.error(
                 f"Failed to enroll user in {two_factor_enrollment_data.enrollmentType} 2FA. Response: {response.json()}"
             )
-            return generate_error_response(response.status_code, response.json())
+            return generate_error_response(
+                response.status_code, format_error_response(response.json())
+            )
 
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(f"2FA enrollment request completed in {duration:.2f} seconds")
