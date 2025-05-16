@@ -4,94 +4,49 @@ import {
 import {getPageContent, isNameValid} from "../../../utils/functions.jsx";
 import SubmitButton from "../../Layout/SubmitButton.jsx";
 import {useUser} from "../../Providers/useUser.tsx";
-import {useState, useTransition} from "react";
-import {authService} from "../../../services/authService.jsx";
-import {CONTEXT_ACTIONS, PAGES} from "../../../utils/constants.jsx";
-import {useNavigate, useParams} from "react-router";
-import { trackEvent } from "../../../utils/gatag.jsx";
-import {GA_CATEGORIES, GA_ACTIONS, GA_LABELS} from "../../../utils/constants.jsx";
+import {PAGES, SUBMIT_END_POINTS} from "../../../utils/constants.jsx";
+import {useParams} from "react-router";
+import {useSubmit} from "../../../hooks/useSubmit.js";
+import {useError} from "../../../hooks/useError.js";
 
 export default function CreateCoreProfile() {
-    const {state, dispatch} = useUser();
-    const {language} = useParams();
-    const [errorJson, setError] = useState({heading: null, nameError:null});
-    const navigate = useNavigate();
-    const errorPageJson = getPageContent(language, "Error");
+    const {state} = useUser();
+    const {language, flow} = useParams();
     const pageContentJson = getPageContent(language, PAGES.coreProfile);
-    const [isPending, startTransition] = useTransition();
+    const {setError, getError, hasErrors, clearAllErrors} = useError(language);
+    const error = getError('#profile');
 
-    function  handleSubmit (e){
-        startTransition(async()=> {
-            e.preventDefault();
-            trackEvent({
-                category: GA_CATEGORIES.onboarding,
-                action: GA_ACTIONS.submitSignUpCoreProfile,
-                label: GA_LABELS.button
-            });
-
-            const formData = new FormData(e.target);
-            const formFirstName = formData.get('firstName');
-            const formLastName= formData.get('lastName');
-
-            if (!isNameValid(formLastName) || (formFirstName!==null && !isNameValid(formFirstName) )) {
-                console.log("name is not valid")
-                setError({nameError: errorPageJson[11], heading: errorPageJson['1']});
-                return;
-            }
-            setError({nameError:null, heading:null});
-
-            try {
-                let name = formLastName.trim();
-
-                if(formFirstName!==null)
-                    name = formFirstName.trim() + ' ' + name;
-
-                const response = await authService.createCoreProfile({
-                    name: name,
-                    userName: state.userData.email
-                });
-                if(response.success){
-                    trackEvent({
-                        category: GA_CATEGORIES.onboarding,
-                        action: GA_ACTIONS.submitSignUpCoreProfileSuccess,
-                        label: GA_LABELS.button
-                    });
-                    const userData = {...state.userData, coreProfileCreated: true};
-                    await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
-                    console.log("success...",response)
-                    navigate("/" + language + '/redirecttorp');
-                }else {
-                    trackEvent({
-                        category: GA_CATEGORIES.onboarding,
-                        action: GA_ACTIONS.submitSignUpCoreProfileFailure,
-                        label: GA_LABELS.button
-                    });
-                    console.log("Error....", response);
-                    setError({nameError: response.message, heading: errorPageJson['1']});
-                }
-            } catch (error) {
-                trackEvent({
-                    category: GA_CATEGORIES.onboarding,
-                    action: GA_ACTIONS.submitSignUpCoreProfileError,
-                    label: GA_LABELS.button
-                });
-                console.error('Signup error:', error);
-                setError({nameError:  errorPageJson[7], heading: errorPageJson['1']});
-            }
-        })
+    function validateNames(firstName, lastName){
+        clearAllErrors();
+        if(!isNameValid(lastName) || (firstName!==null && !isNameValid(firstName) )) {
+            setError('#profile','11')
+            return false;
+        }
+        return true;
     }
 
+    const submitDataOptions = {
+        language,
+        endpoint: SUBMIT_END_POINTS.createCoreProfile,
+        navigateTo: "/" + language + '/redirecttorp',
+        page: PAGES.coreProfile,
+        flow: flow,
+        policy: null,
+        onError: (err)=> setError('#profile',err)
+    };
+
+    const {handleSubmit, isPending} = useSubmit(submitDataOptions, validateNames);
+
     return (
-        <GcdsContainer className="gcds-content" >
+        <GcdsContainer>
             <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={pageContentJson['1']} >
                 &nbsp;
             </GcdsNotice>
             <br/>
             {
-                errorJson.nameError!==null&&(<GcdsErrorSummary
-                    errorLinks={`{"#lastName": "${errorJson.nameError}"}`}
-                    heading={errorJson.heading}
-                    data-testid="errorSummary"
+                hasErrors()&&(<GcdsErrorSummary data-testid='errorSummary'
+                                                errorLinks={`{"#profile": "${error.errorMsg}"}`}
+                                                heading={error.heading}
                 />)
             }
             <GcdsContainer className="gcds-gap" >
@@ -111,7 +66,7 @@ export default function CreateCoreProfile() {
                     {pageContentJson['6']}
                 </GcdsHeading>
                 <form id="form" onSubmit={handleSubmit}>
-                    <InputBox language={language} errorJson={errorJson} pageContentJson={pageContentJson} state={state} />
+                    <InputBox language={language} errorJson={error.errorMsg} pageContentJson={pageContentJson} state={state} />
                     <SubmitButton currentLang={language} disabled={isPending}/>
                 </form>
             </GcdsContainer>
@@ -119,7 +74,7 @@ export default function CreateCoreProfile() {
     )
 }
 
-function InputBox({pageContentJson, language, errorJson, state}) {
+function InputBox({pageContentJson, language, error, state}) {
 
 
     if(state.testData!==undefined)
@@ -128,6 +83,7 @@ function InputBox({pageContentJson, language, errorJson, state}) {
                     inputId="firstName"
                     label={pageContentJson['7']}
                     name="firstName"
+                    size="10"
                     value={state.testData.firstName}
                     type="text"
                     lang={language}
@@ -137,10 +93,11 @@ function InputBox({pageContentJson, language, errorJson, state}) {
                     inputId="lastName"
                     label={pageContentJson['8']}
                     name="lastName"
+                    size="10"
                     type="text"
                     value={state.testData.lastName}
                     validateOn="other"
-                    errorMessage={errorJson.nameError}
+                    errorMessage={error}
                     lang={language}
                     required
                 ></GcdsInput></>
@@ -152,6 +109,7 @@ function InputBox({pageContentJson, language, errorJson, state}) {
                     label={pageContentJson['7']}
                     name="firstName"
                     type="text"
+                    size="10"
                     lang={language}
                     optional
                 ></GcdsInput>
@@ -160,8 +118,9 @@ function InputBox({pageContentJson, language, errorJson, state}) {
                     label={pageContentJson['8']}
                     name="lastName"
                     type="text"
+                    size="10"
                     validateOn="other"
-                    errorMessage={errorJson.nameError}
+                    errorMessage={error}
                     lang={language}
                     required
                 ></GcdsInput></>

@@ -5,7 +5,7 @@ import {authService} from "../services/authService.jsx";
 import {useNavigate} from "react-router";
 import { trackEvent } from "../utils/gatag.jsx";
 
-interface SubmitDataOptions {
+export interface SubmitDataOptions {
     language: string,
     page: string,
     flow: string,
@@ -13,6 +13,17 @@ interface SubmitDataOptions {
     endpoint: string,
     navigateTo: string,
     onError: (error: Error) => void
+}
+
+export interface SubmitData {
+    email: string,
+    language: string,
+    verificationCode: string,
+    password: string,
+    phone: string,
+    verificationType: string,
+    firstName: string,
+    lastName: string
 }
 
 export function useSubmit(submitDataOptions:SubmitDataOptions, validateFunction:any ) {
@@ -24,26 +35,27 @@ export function useSubmit(submitDataOptions:SubmitDataOptions, validateFunction:
             startTransition(async () => {
                 event.preventDefault();
                 try {
-                    const formData = new FormData(event.currentTarget);
-                    if (!validateObject(submitDataOptions.page, formData, validateFunction))
+                    const submitData = setSubmitData(new FormData(event.currentTarget));
+                    if (!validateObject(submitDataOptions.page, submitData, validateFunction))
                         return;
 
-                    const response = await callAuthService(submitDataOptions, formData, state.userData);
+                    const response = await callAuthService(submitDataOptions, submitData, state.userData);
                     console.log("success....", response);
-                    const userData = setUserData(submitDataOptions, formData, state.userData, response);
+                    const userData = setUserData(submitDataOptions, submitData, state.userData, response);
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
-                    await callAnalytics(submitDataOptions, "submit_success");
-                    const navigateTo = setNavigateTo(submitDataOptions, response);
+                    await callAnalytics(submitDataOptions, submitDataOptions.type+'_submit_success', GA_LABELS.button);
+                    const navigateTo = setNavigateTo(submitDataOptions, response, submitData);
                     navigate(navigateTo);
                     return;
                 } catch (error){
+                    console.log("error....", error);
                     const serverMessage = error.response?.data?.message;
                     if(submitDataOptions.onError) {
                         submitDataOptions.onError(serverMessage);
                         if(serverMessage)
-                            await callAnalytics(submitDataOptions, "submit_error");
+                            await callAnalytics(submitDataOptions, submitDataOptions.type+'submit_error', GA_LABELS.button);
                         else
-                            await callAnalytics(submitDataOptions, "submit_timeout");
+                            await callAnalytics(submitDataOptions, submitDataOptions.type+"submit_timeout", GA_LABELS.button);
                     }
                 }
            });
@@ -51,59 +63,90 @@ export function useSubmit(submitDataOptions:SubmitDataOptions, validateFunction:
 
     return {handleSubmit, isPending};
 }
+function setSubmitData(formData: FormData) {
+    const submitData = {
+        email: null,
+        language: null,
+        verificationCode: null,
+        password: null,
+        phone: null,
+        verificationType: null,
+        firstName: null,
+        lastName: null
+    };
 
-function setNavigateTo(submitDataOptions: SubmitDataOptions, response:any) {
+    formData.forEach((value, key) => submitData[key] = value);
+
+    return submitData;
+}
+
+function setNavigateTo(submitDataOptions: SubmitDataOptions, response:any, submitData:SubmitData) {
 
     switch(submitDataOptions.flow+submitDataOptions.page) {
         case FLOW_TYPES.signIn+PAGES.password:
             return submitDataOptions.navigateTo+"/"+response.data.otpType;
+        case FLOW_TYPES.signUp+PAGES.verificationSetUp:
+            return submitDataOptions.navigateTo+"/"+submitData.verificationType;
         default:
             return submitDataOptions.navigateTo;
     }
 }
-async function callAnalytics(submitDataOptions: SubmitDataOptions, submitAction:string) {
+export async function callAnalytics(submitDataOptions: SubmitDataOptions, submitAction:string, label:string) {
 
     const action =  submitDataOptions.page.toLowerCase() + "_" + submitAction;
+
     trackEvent({
         category: submitDataOptions.flow,
         action: action,
-        label: GA_LABELS.button
+        label: label
     });
 }
 
-async function callAuthService(submitDataOptions:SubmitDataOptions, formData:FormData, userData:any) {
+export async function callAuthService(submitDataOptions:SubmitDataOptions, submitData:SubmitData, userData:any) {
     let payload = {};
     switch(submitDataOptions.endpoint){
         case(SUBMIT_END_POINTS.transientOtpSend):
             if(submitDataOptions.type === FLOW_TYPES.email)
                 payload = {
-                    userName: formData.get(FLOW_TYPES.email),
+                    userName: submitData.email,
                     otpType: FLOW_TYPES.email
                 };
-            else
+            else {
+                const phoneNumber = submitData.phone.toString();
                 payload = {
                     userName: userData.email,
-                    otpType: userData.otpType,
-                    phone: userData.phone
-                };
+                    otpType: submitData.verificationType,
+                    phoneNumber: '+' + phoneNumber.replace(/\D/g, '')
+                }
+            }
             return await authService.transientOtpSend({...payload});
+        case(SUBMIT_END_POINTS.transientOtpVerify):
+                payload = {
+                    otp: submitData.verificationCode,
+                    otpType: submitDataOptions.type,
+                    userName: userData.email,
+                    trxnId: userData.trxnId,
+                };
+            return await authService.transientOtpVerify({...payload});
         case(SUBMIT_END_POINTS.create):
             payload = {
                 userName: userData.email,
-                password: formData.get('password'),
-                txrId: userData.txrId
+                password: submitData.password,
+                trxnId: userData.trxnId
             }
             return await authService.create({...payload});
         case(SUBMIT_END_POINTS.login):
             payload = {
                 userName: userData.email,
-                password: formData.get('password')
+                password: submitData.password
             }
             return await authService.login({...payload});
         case(SUBMIT_END_POINTS.otpVerify):
             payload = {
+                otp: submitData.verificationCode,
+                otpType: submitDataOptions.type,
                 userName: userData.email,
-                otpType: submitDataOptions.type
+                trxnId: userData.trxnId,
             }
             return await authService.otpVerify({...payload});
         case(SUBMIT_END_POINTS.otpSend):
@@ -113,19 +156,27 @@ async function callAuthService(submitDataOptions:SubmitDataOptions, formData:For
                 phone: userData.phone
             };
             return await authService.otpSend({...payload});
+        case(SUBMIT_END_POINTS.createCoreProfile):
+            payload = {
+                userName: userData.email,
+                firstName: submitData.firstName,
+                lastName: submitData.lastName,
+                id: userData.id
+            };
+            return await authService.createCoreProfile({...payload});
         default :
             return {};
     }
 }
 
-function setUserData(submitDataOptions:SubmitDataOptions, formData: FormData, userData:any, response:any) {
+function setUserData(submitDataOptions:SubmitDataOptions, submitData: SubmitData, userData:any, response:any) {
 
     switch (submitDataOptions.page) {
         case PAGES.signup:
-            return  {...userData, email: formData.get(FLOW_TYPES.email),
-                emailLanguage: formData.get('language'), trxnId: response.data.trxnId }
+            return  {...userData, email: submitData.email,
+                emailLanguage: submitData.language, trxnId: response.data.trxnId }
         case PAGES.home:
-            return {...userData, email: formData.get(FLOW_TYPES.email)};
+            return {...userData, email: submitData.email};
         case PAGES.password:
             if(submitDataOptions.flow===FLOW_TYPES.signUp)
                 return {...userData, passwordSubmitted: true, id: response.data.id};
@@ -133,19 +184,39 @@ function setUserData(submitDataOptions:SubmitDataOptions, formData: FormData, us
                 id: response.data.id, phone: response.data.phone, passwordValidated: true};
         case PAGES.verificationSelection:
             return {...userData, trxnId: response.data.trxnId};
+        case PAGES.verificationSetUp:
+            return  {
+                ...userData,
+                phone:submitData.phone,
+                stepVerificationSent: true,
+                trxnId:response.data.trxnId,
+            }
+        case PAGES.verification:
+            if(submitDataOptions.flow===FLOW_TYPES.signUp && submitDataOptions.type===FLOW_TYPES.email) {
+                return {...userData, emailValidated: true}
+            }
+            return  {...userData, stepVerified: true}
+        case PAGES.privacy:
+                return {...userData, viewPrivacy: true};
         default:
-            return {}
+            return {...userData}
     }
 }
 
-function validateObject(page: string, formData:any, validateFunction: any) {
+function validateObject(page: string, submitData:SubmitData, validateFunction: any) {
     switch(page){
-        case PAGES.signup:
-            return  validateFunction(formData.get(FLOW_TYPES.email));
         case PAGES.home:
-            return  validateFunction(formData.get(FLOW_TYPES.email));
+            return  validateFunction(submitData.email);
+        case PAGES.signup:
+            return  validateFunction(submitData.email);
         case PAGES.password:
-            return  validateFunction(formData.get('password'));
+            return  validateFunction(submitData.password);
+        case PAGES.verificationSetUp:
+            return  validateFunction();
+        case PAGES.coreProfile:
+            return validateFunction(submitData.firstName, submitData.lastName);
+        case PAGES.verification:
+            return validateFunction(submitData.verificationCode);
         default:
             return true;
     }

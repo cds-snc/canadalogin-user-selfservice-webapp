@@ -81,19 +81,14 @@ const pageSetup = {
     button: (language: string) => {
         return language !== AVAILABLE_LANGUAGES.fr ? engJson['Button'] : frJson['Button'];
     },
-    alreadyGc: (page:string, language:string, flow:string) =>{
+    alreadyGc: (page:string, language:string, flow:string, type:string) =>{
         switch(page) {
             case PAGES.home:
                 return language !== AVAILABLE_LANGUAGES.fr ? engJson["FirstTimeGc"] : frJson["FirstTimeGc"];
             case PAGES.signup:
                 return language !== AVAILABLE_LANGUAGES.fr ? engJson["AlreadyGc"] : frJson["AlreadyGc"];
-            case PAGES.password:
-                if(flow===FLOW_TYPES.signUp)
-                    return language !== AVAILABLE_LANGUAGES.fr ? engJson["AlreadyGc"] : frJson["AlreadyGc"];
-                else
-                    return null;
             case PAGES.verification:
-                if (flow === FLOW_TYPES.signUp)
+                if (flow === FLOW_TYPES.signUp && (type === FLOW_TYPES.email))
                     return language !== AVAILABLE_LANGUAGES.fr ? engJson["AlreadyGc"] : frJson["AlreadyGc"];
                 else
                     return null;
@@ -299,13 +294,12 @@ const pageSetup = {
 
 const testSuite = {
     parameters: (language: string, page: string, flow: string, type: string, link: string) => {
-
         return {
             language: language,
             pageContentJson: language !== AVAILABLE_LANGUAGES.fr ? engJson[page] : frJson[page],
             langLink: link,
             buttonJson: pageSetup.button(language),
-            alreadyGcJson: pageSetup.alreadyGc(page, language, flow),
+            alreadyGcJson: pageSetup.alreadyGc(page, language, flow, type),
             stepper: pageSetup.stepper(page, language, flow, type),
             textKeysToNotSearch: pageSetup.textKeysToNotSearch(page, flow, type),
             isVoice: type === FLOW_TYPES.voice,

@@ -30,7 +30,7 @@ class IBMNotificationExtension(BaseModel):
         description="Notify the user the password they entered. Setting to true will send a email with the password they entered",
     )
     notifyType: NotifyType = Field(
-        default=NotifyType.EMAIL,
+        default=NotifyType.NONE,
         description="Setting to NONE will not send any notification, Setting the value to EMAIL will send a notification email to the user that the account was created",
     )
 
