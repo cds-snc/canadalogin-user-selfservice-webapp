@@ -11,6 +11,7 @@ from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.helpers import (
     generate_error_response,
     prepare_pydantic_phone_number_for_verify,
+    format_error_response,
 )
 from app.utils.schemas import ResponseModel
 
@@ -38,7 +39,8 @@ async def handle_otp_send(user_otp_info: UserOtpInfo, global_http_client: AsyncC
                 f"Error while sending {user_otp_info.otpType} OTP: {http_client_response.json()}"
             )
             return generate_error_response(
-                http_client_response.status_code, http_client_response.json()
+                http_client_response.status_code,
+                format_error_response(http_client_response.json()),
             )
 
         response_json = http_client_response.json()
