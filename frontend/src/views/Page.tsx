@@ -60,12 +60,12 @@ function PageContents({page}:{page:string}) {
             return (
                 <GcdsText>
                     <iframe width="100%" height="166" scrolling="no" frameBorder="no" allow="autoplay"
-                            src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/2096948601&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe>
+                            src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/2097120054&color=%23ff5500&auto_play=true&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe>
                     <div
                        style={{fontSize: "10px", color: "#cccccc",lineBreak: "anywhere",wordBreak: "normal",overflow: "hidden",whiteSpace: "nowrap",textOverflow: "ellipsis", fontFamily: "Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif",fontWeight: "100"}} >
                         <a href="https://soundcloud.com/gcsignin-554663209" title="GC Sign in" target="_blank"
                            style={{color: '#cccccc',  textDecoration: 'none'}}>GC Sign in</a> · <a
-                        href="https://soundcloud.com/gcsignin-554663209/gc-sign-in-one-time-code"
+                        href="https://soundcloud.com/gcsignin-554663209/gc-sign-in-voice-code"
                         title="GC Sign in one time code" target="_blank" style={{color: '#cccccc',  textDecoration: 'none'}}>GC
                         Sign in one time code</a></div>
                 </GcdsText>
