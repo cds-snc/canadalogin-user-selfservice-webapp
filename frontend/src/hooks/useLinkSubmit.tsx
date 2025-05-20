@@ -59,6 +59,8 @@ async function callEndpoints(submitDataOptions: SubmitDataOptions, submitData: S
             console.log("success....", response);
             currentUserData = setUserData(linkFlowType + submitDataOptions.type, currentUserData, response, submitData);
         }
+    else
+        currentUserData = setUserData(linkFlowType + submitDataOptions.type, currentUserData, {}, submitData);
 
     return currentUserData;
 }
