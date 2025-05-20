@@ -80,10 +80,6 @@ class SignUpResponse(ResponseModel):
     data: Optional[IBMUserCreateResponse] = None
 
 
-class ProfileGetUserData(BaseModel):
-    userid: str
-
-
 class EmailItem(BaseModel):
     type: str
     value: EmailStr

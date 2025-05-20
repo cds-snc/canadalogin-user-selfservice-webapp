@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, Path
 
 from app.users.schemas import (
     UserLoginRequestData,
@@ -7,7 +7,6 @@ from app.users.schemas import (
     TwoFactorEnrollmentUserData,
     VerifiedTwofactorEnrollmentResponse,
     ProfileUserData,
-    ProfileGetUserData,
     ProfileResponse,
 )
 from app.users.services.create import signup_with_password
@@ -81,11 +80,13 @@ async def user_create_profile(user_data: ProfileUserData, request: Request):
 
 
 @router.get(
-    "/profile",
+    "/profile/{user_id}",
     response_model=ProfileResponse,
     tags=["Users"],
     summary="Get a single user's profile",
     description="",
 )
-async def user_get_profile(user_data: ProfileGetUserData, request: Request):
-    return await get_profile(user_data, request.app.state.request_client)
+async def user_get_profile(
+    request: Request, user_id: str = Path(..., description="User ID")
+):
+    return await get_profile(request.app.state.request_client, user_id)
