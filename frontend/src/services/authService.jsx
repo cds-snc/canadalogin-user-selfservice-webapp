@@ -2,7 +2,7 @@ import axios from 'axios';
 import config from '../config';
 import {FLOW_TYPES, SUBMIT_END_POINTS} from "../utils/constants.jsx";
 import {
-    ERROR_RESPONSE,
+    ERROR_RESPONSE, TEST_PROTOTYPES,
     SUCCESS_RESPONSE,
     TEST_RESPONSES,
     TEST_USERS,
@@ -36,8 +36,11 @@ export const authService = {
         return response.data;
     },
     createCoreProfile:async (userData) => {
-        if(TEST_USERS.has(userData.userName))
+        if(TEST_USERS.has(userData.userName))        {
+            //for un-moderated testing purposes
+            openPrototypeWindow('signUpRedirect');
             return SUCCESS_RESPONSE;
+        }
 
         const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.createCoreProfile}`, userData);
         return response.data;
@@ -96,6 +99,8 @@ function buildTestResponse (userData, type) {
             expires.setMinutes(expires.getMinutes() + 5);
             response.data.created = now.toISOString();
             response.data.expiry =  expires.toISOString();
+            //for un-moderated testing purposes
+            openPrototypeWindow(userData.otpType);
 
             return response;
         case "otpVerify":
@@ -140,5 +145,28 @@ function buildTestResponse (userData, type) {
            return ERROR_RESPONSE;
 
 
+    }
+}
+
+function openPrototypeWindow(otpType){
+
+    const prototypeUrlsMap = TEST_PROTOTYPES.get(otpType);
+    if (isMobileMediaQuery()) {
+        // Code for mobile devices
+        window.open(prototypeUrlsMap.mobileUrl, '_blank').focus();
+        console.log("Mobile device detected for "+ otpType);
+    } else {
+        // Code for non-mobile devices
+        window.open(prototypeUrlsMap.desktopUrl, '_blank').focus();
+        console.log("Non-mobile device detected for "+ otpType);
+    }
+}
+
+export function isMobileMediaQuery() {
+    try {
+        return window.matchMedia("(max-width: 767px)").matches;
+    }catch(error){
+        console.log(error.message);
+        return false;
     }
 }

@@ -33,35 +33,33 @@ export default function Privacy() {
              <form  id="form"  onSubmit={handleSubmit}>
             <GcdsHeading tag='h1'>
                 {pageContentJson['1']}
-                <GcdsText marginTop="150" marginBottom="0">
-                    {pageContentJson['2']}
-                    <strong>
-                        {language === AVAILABLE_LANGUAGES.fr ? ' ' + pageContentJson['3'] + ' ' : ''}
-                        {` ${SERVICES[0].title}`}{language === AVAILABLE_LANGUAGES.en ? ' ' + pageContentJson['3'] : ''}
-                    </strong>
-                </GcdsText>
             </GcdsHeading>
+             <GcdsText>
+                 <span>{pageContentJson['2']}</span> <strong>{pageContentJson['46']}</strong> {pageContentJson['47']}
+                 <strong>
+                     {language===AVAILABLE_LANGUAGES.fr?' '+pageContentJson['3']+' ':<br/>}
+                     {` ${SERVICES[0].title}`}{language!==AVAILABLE_LANGUAGES.fr?' '+pageContentJson['3']:''}
+                 </strong>
+             </GcdsText>
             <GcdsDetails detailsTitle={pageContentJson['42']}>
                 <GcdsText>
-                <span>{pageContentJson['43']}</span>
+                    {pageContentJson['43']}
                 </GcdsText>
                 <GcdsText>
-                <span>{pageContentJson['44']}</span>
+                    {pageContentJson['44']}
                 </GcdsText>
                 <GcdsText>
-                <span>{pageContentJson['45']}</span>
+                    {pageContentJson['45']}
                 </GcdsText>
             </GcdsDetails>
             <GcdsHeading tag='h2'>
                 {pageContentJson['5']}
             </GcdsHeading>
-            <GcdsText>{pageContentJson['6']}
-            </GcdsText>
-            <ul>
-                <li>{pageContentJson['7']}</li>
-                <li>{pageContentJson['8']}</li>
-            </ul>
-            <GcdsText>
+                 <GcdsText><span>{pageContentJson['6']}</span>
+                <ul style={{margin: 0}}>
+                    <li>{pageContentJson['7']}</li>
+                    <li>{pageContentJson['8']}</li>
+                </ul>
                 {pageContentJson['9']}{" "}
                 <strong>{pageContentJson['10']}</strong> {pageContentJson['11']}{" "}
                 <GcdsLink href="#" >{pageContentJson['12']}</GcdsLink>
