@@ -108,7 +108,15 @@ export const PHONE_NUMBER_ERROR_RESPONSE = {
     },
     "status": 400,
 }
-
+export const ENROLL_OTP_ERROR_RESPONSE =
+    {
+        "data": {
+            "success": false,
+            "message": "Field Missing",
+            "data": null
+        },
+        "status": 400,
+    }
 export const PROFILE_ERROR_RESPONSE = {
     "data": {
         "success": false,
@@ -285,7 +293,7 @@ export const MSW_MOCKS ={
         success: {type: "post", endpoint: SUBMIT_END_POINTS.createCoreProfile, response: TEST_RESPONSES.passwordResponse}
     },
     enrollOtp:{
-        error:  {type: "post", endpoint: SUBMIT_END_POINTS.enrollOtp, response: PROFILE_ERROR_RESPONSE},
+        error:  {type: "post", endpoint: SUBMIT_END_POINTS.enrollOtp, response: ENROLL_OTP_ERROR_RESPONSE},
         serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.enrollOtp, response: SERVER_TIMEOUT_RESPONSE},
         smsSuccess: {type: "post", endpoint: SUBMIT_END_POINTS.enrollOtp, response: TEST_RESPONSES.smsEnrollOTPResponse},
         voiceSuccess: {type: "post", endpoint: SUBMIT_END_POINTS.enrollOtp, response: TEST_RESPONSES.voiceEnrollOTPResponse}

@@ -25,6 +25,7 @@ export default function CreateCoreProfile() {
         return true;
     }
 
+    //once create core profile is updated may need to switch order of endpoints
     const submitDataOptions = {
         language,
         endpoints: [SUBMIT_END_POINTS.enrollOtp, SUBMIT_END_POINTS.createCoreProfile],

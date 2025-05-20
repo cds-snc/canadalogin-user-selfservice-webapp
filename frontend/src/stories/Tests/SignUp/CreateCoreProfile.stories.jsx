@@ -6,7 +6,7 @@ import {
 } from "../../../utils/constants.jsx";
 import {getPageContent} from "../../../utils/functions.jsx";
 import {
-    ACTION_TYPES,
+    ACTION_TYPES, ENROLL_OTP_ERROR_RESPONSE,
     MSW_MOCKS,
     PROFILE_ERROR_RESPONSE,
     TEST_TYPES,
@@ -41,6 +41,8 @@ export const FrLastNameBadChar = TestTemplate.bind({});
 export const FrFirstNameBadChar = TestTemplate.bind({});
 export const ErrorBackEnd = TestTemplate.bind({});
 export const ServerErrorBackEnd = TestTemplate.bind({});
+export const ErrorBackEndEnroll = TestTemplate.bind({});
+export const ServerErrorBackEndEnroll = TestTemplate.bind({});
 export const SuccessfulBackEnd = TestTemplate.bind({});
 export const SuccessfulWithFrCharsBackEnd = TestTemplate.bind({});
 export const TestUser = TestTemplate.bind({});
@@ -220,6 +222,45 @@ ServerErrorBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.corePr
     [MSW_MOCKS.enrollOtp.voiceSuccess, MSW_MOCKS.createCoreProfile.serverTimeOut]);
 ServerErrorBackEnd.args = {firstName:"Test" , lastName: "Test"};
 ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
+
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage:"Submit form with Back End No Response Error",
+        link: 'profile',
+        heading: engErrorPageJson[1],
+        message: engErrorPageJson[7],
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.error
+    })
+}
+
+ErrorBackEndEnroll.parameters = buildTestCase.parameters(NAVIGATION_LINKS.coreProfile,
+    { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
+    [MSW_MOCKS.enrollOtp.error, MSW_MOCKS.createCoreProfile.success]);
+ErrorBackEndEnroll.args = {firstName:"Test" , lastName: "Test"};
+ErrorBackEndEnroll.play = async ({ canvasElement, step }) => {
+
+    await testCase({
+        canvasElement,
+        step,
+        stepMessage:"Submit form with Enroll Error",
+        link: 'profile',
+        heading: engErrorPageJson[1],
+        message: ENROLL_OTP_ERROR_RESPONSE.data.message,
+        delay: 1000,
+        actionType: ACTION_TYPES.submit,
+        type: TEST_TYPES.error
+    })
+}
+
+
+ServerErrorBackEndEnroll.parameters = buildTestCase.parameters(NAVIGATION_LINKS.coreProfile,
+    { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
+    [MSW_MOCKS.enrollOtp.serverTimeOut, MSW_MOCKS.createCoreProfile.success]);
+ServerErrorBackEndEnroll.args = {firstName:"Test" , lastName: "Test"};
+ServerErrorBackEndEnroll.play = async ({ canvasElement, step }) => {
 
     await testCase({
         canvasElement,
