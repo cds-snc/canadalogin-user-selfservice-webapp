@@ -23,7 +23,8 @@ export default {
     args:{
         page: PAGES.coreProfile,
         firstName:"",
-        lastName:""
+        lastName:"",
+        phone: "+1 (416) 123-4567"
     },
     parameters: buildTestCase.parameters(NAVIGATION_LINKS.coreProfile,
         { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
@@ -196,7 +197,7 @@ FrFirstNameBadChar.play = async ({ canvasElement, step }) => {
 
 ErrorBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.coreProfile,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
-    [MSW_MOCKS.createCoreProfile.error]);
+    [MSW_MOCKS.enrollOtp.smsSuccess, MSW_MOCKS.createCoreProfile.error]);
 ErrorBackEnd.args = {firstName:"Test" , lastName: "Test"};
 ErrorBackEnd.play = async ({ canvasElement, step }) => {
 
@@ -216,7 +217,7 @@ ErrorBackEnd.play = async ({ canvasElement, step }) => {
 
 ServerErrorBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.coreProfile,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
-    [MSW_MOCKS.createCoreProfile.serverTimeOut]);
+    [MSW_MOCKS.enrollOtp.voiceSuccess, MSW_MOCKS.createCoreProfile.serverTimeOut]);
 ServerErrorBackEnd.args = {firstName:"Test" , lastName: "Test"};
 ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
 
@@ -235,7 +236,7 @@ ServerErrorBackEnd.play = async ({ canvasElement, step }) => {
 
 SuccessfulBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.coreProfile,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
-    [MSW_MOCKS.createCoreProfile.success]);
+    [MSW_MOCKS.enrollOtp.smsSuccess, MSW_MOCKS.createCoreProfile.success]);
 SuccessfulBackEnd.args = {firstName:"Test" , lastName: "Test"};
 SuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
@@ -252,7 +253,7 @@ SuccessfulBackEnd.play = async ({ canvasElement, step }) => {
 
 SuccessfulWithFrCharsBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.coreProfile,
     { language: AVAILABLE_LANGUAGES.fr, flow: FLOW_TYPES.signUp },
-    [MSW_MOCKS.createCoreProfile.success]);
+    [MSW_MOCKS.enrollOtp.voiceSuccess, MSW_MOCKS.createCoreProfile.success]);
 SuccessfulWithFrCharsBackEnd.args = {firstName:"Test" , lastName: "Ç'âêîôû-àèù ëïü"};
 SuccessfulWithFrCharsBackEnd.play = async ({ canvasElement, step }) => {
 

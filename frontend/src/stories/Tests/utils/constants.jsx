@@ -283,6 +283,12 @@ export const MSW_MOCKS ={
         error:  {type: "post", endpoint: SUBMIT_END_POINTS.createCoreProfile, response: PROFILE_ERROR_RESPONSE},
         serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.createCoreProfile, response: SERVER_TIMEOUT_RESPONSE},
         success: {type: "post", endpoint: SUBMIT_END_POINTS.createCoreProfile, response: TEST_RESPONSES.passwordResponse}
+    },
+    enrollOtp:{
+        error:  {type: "post", endpoint: SUBMIT_END_POINTS.enrollOtp, response: PROFILE_ERROR_RESPONSE},
+        serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.enrollOtp, response: SERVER_TIMEOUT_RESPONSE},
+        smsSuccess: {type: "post", endpoint: SUBMIT_END_POINTS.enrollOtp, response: TEST_RESPONSES.smsEnrollOTPResponse},
+        voiceSuccess: {type: "post", endpoint: SUBMIT_END_POINTS.enrollOtp, response: TEST_RESPONSES.voiceEnrollOTPResponse}
     }
 }
 
