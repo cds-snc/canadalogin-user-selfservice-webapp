@@ -6,10 +6,9 @@ from app.users.schemas import (
     AuthenticatedUserResponse,
     TwoFactorEnrollmentUserData,
     VerifiedTwofactorEnrollmentResponse,
-    ProfileCreateResponse,
     ProfileUserData,
     ProfileGetUserData,
-    ProfileGetResponse,
+    ProfileResponse,
 )
 from app.users.services.create import signup_with_password
 from app.users.services.login import signin_with_password
@@ -72,7 +71,7 @@ async def user_2fa_enroll(
 
 @router.post(
     "/profile",
-    response_model=ProfileCreateResponse,
+    response_model=ProfileResponse,
     tags=["Users"],
     summary="Create user profile in verify",
     description="",
@@ -83,7 +82,7 @@ async def user_create_profile(user_data: ProfileUserData, request: Request):
 
 @router.get(
     "/profile",
-    response_model=ProfileGetResponse,
+    response_model=ProfileResponse,
     tags=["Users"],
     summary="Get a single user's profile",
     description="",

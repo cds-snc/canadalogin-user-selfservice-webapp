@@ -69,10 +69,6 @@ class ProfileCreateRequest(BaseModel):
     Operations: List[Operations]
 
 
-class ProfileCreateResponse(ResponseModel):
-    detail: Optional[str] = None
-
-
 class ProfileUserData(BaseModel):
     userid: str
     firstName: Optional[str] = None
@@ -118,11 +114,7 @@ class ProfileGetResponseData(BaseModel):
     emails: List[EmailItem]
     preferredLanguage: Optional[str]
     meta: Meta
-    schemas: List[str]
     name: Name
-    ibm_extension: IBMExtension = Field(
-        ..., alias="urn:ietf:params:scim:schemas:extension:ibm:2.0:User"
-    )
     active: bool
     id: str
     userName: EmailStr
@@ -131,8 +123,8 @@ class ProfileGetResponseData(BaseModel):
         populate_by_name = True
 
 
-class ProfileGetResponse(ResponseModel):
-    data: ProfileGetResponseData
+class ProfileResponse(ResponseModel):
+    data: Optional[ProfileGetResponseData]
 
 
 # Signin Schema
