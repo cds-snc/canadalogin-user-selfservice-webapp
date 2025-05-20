@@ -45,6 +45,7 @@ export default function Home() {
     }
 
     const submitDataOptions = {
+        language: currentLang,
         endpoints: null,
         navigateTo: "/" + currentLang + "/" + FLOW_TYPES.signIn + NAVIGATION_LINKS.password,
         type:FLOW_TYPES.email,

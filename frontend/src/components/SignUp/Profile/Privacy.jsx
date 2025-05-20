@@ -19,6 +19,7 @@ export default function Privacy() {
     const pageContentJson = getPageContent(language, PAGES.privacy);
 
     const submitDataOptions = {
+        language,
         endpoints: null,
         navigateTo: "/" + language + NAVIGATION_LINKS.signUp,
         type: null,

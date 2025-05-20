@@ -71,7 +71,6 @@ export const SUBMIT_END_POINTS = {
     enrollOtp: '/v1/users/2fa/enroll',
 }
 
-
 export const GA_CATEGORIES = {
     pageView: "pageview",
     onboarding: "sign_up_flow",
