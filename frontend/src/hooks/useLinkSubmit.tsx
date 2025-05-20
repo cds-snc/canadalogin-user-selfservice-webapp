@@ -80,7 +80,9 @@ function setUserData(type:string, userData:any, response:any, submitData:SubmitD
         case LINK_SUBMIT_TYPES.useNewVerification+FLOW_TYPES.email:
             return {...userData, email: null};
         default:
-            return {...userData, trxnId: response.data.trxnId, otpType: submitData.verificationType,};
+            if(response?.data)
+                return {...userData, trxnId: response.data.trxnId, otpType: submitData.verificationType,};
+            return {...userData};
     }
 }
 
