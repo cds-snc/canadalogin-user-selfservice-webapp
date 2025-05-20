@@ -32,7 +32,7 @@ export default function Verification() {
 
     const submitDataOptions = {
         language,
-        endpoint: flow===FLOW_TYPES.signUp?SUBMIT_END_POINTS.transientOtpVerify:SUBMIT_END_POINTS.otpVerify,
+        endpoints: [flow===FLOW_TYPES.signUp?SUBMIT_END_POINTS.transientOtpVerify:SUBMIT_END_POINTS.otpVerify],
         navigateTo: flow===FLOW_TYPES.signUp?type===FLOW_TYPES.email? "/" + language + "/" + flow + NAVIGATION_LINKS.password:"/" + language + NAVIGATION_LINKS.coreProfile:"/" + language + '/redirecttorp',
         page: PAGES.verification,
         flow: flow,
@@ -43,7 +43,7 @@ export default function Verification() {
 
     const linkSubmitDataOptions = {
         language,
-        endpoint: flow===FLOW_TYPES.signUp?SUBMIT_END_POINTS.transientOtpSend:SUBMIT_END_POINTS.otpSend,
+        endpoints: [flow===FLOW_TYPES.signUp?SUBMIT_END_POINTS.transientOtpSend:SUBMIT_END_POINTS.otpSend],
         navigateTo: null,
         page: PAGES.verification,
         flow: flow,

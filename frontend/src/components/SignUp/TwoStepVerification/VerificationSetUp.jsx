@@ -44,7 +44,7 @@ export default function VerificationSetUp() {
     }
 
     const submitDataOptions = {
-        endpoint: SUBMIT_END_POINTS.transientOtpSend,
+        endpoints: [SUBMIT_END_POINTS.transientOtpSend],
         navigateTo: "/" + language + "/" + FLOW_TYPES.signUp + NAVIGATION_LINKS.verification,
         type: null,
         page: PAGES.verificationSetUp,

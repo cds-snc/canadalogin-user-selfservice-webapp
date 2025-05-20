@@ -68,6 +68,7 @@ export const SUBMIT_END_POINTS = {
     login: '/v1/otp/users/login',
     otpVerify: '/v1/otp/otp/verify',
     otpSend: '/v1/otp/otp/send',
+    enrollOtp: '/v1/users/2fa/enroll',
 }
 
 

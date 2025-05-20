@@ -10,7 +10,7 @@ export interface SubmitDataOptions {
     page: string,
     flow: string,
     type: string,
-    endpoint: string,
+    endpoints: string[],
     navigateTo: string,
     onError: (error: Error) => void
 }
@@ -39,12 +39,10 @@ export function useSubmit(submitDataOptions:SubmitDataOptions, validateFunction:
                     if (!validateObject(submitDataOptions.page, submitData, validateFunction))
                         return;
 
-                    const response = await callAuthService(submitDataOptions, submitData, state.userData);
-                    console.log("success....", response);
-                    const userData = setUserData(submitDataOptions, submitData, state.userData, response);
+                    const userData = await callEndpoints(submitDataOptions, submitData, state.userData);
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                     await callAnalytics(submitDataOptions, submitDataOptions.type+'_submit_success', GA_LABELS.button);
-                    const navigateTo = setNavigateTo(submitDataOptions, response, submitData);
+                    const navigateTo = setNavigateTo(submitDataOptions, state.userData, submitData);
                     navigate(navigateTo);
                     return;
                 } catch (error){
@@ -63,6 +61,19 @@ export function useSubmit(submitDataOptions:SubmitDataOptions, validateFunction:
 
     return {handleSubmit, isPending};
 }
+
+async function callEndpoints(submitDataOptions: SubmitDataOptions, submitData: SubmitData, currentUserData: any) {
+
+    if (submitDataOptions.endpoints)
+        for (const endpoint of submitDataOptions.endpoints) {
+            const response = await callAuthService(submitDataOptions, submitData, currentUserData, endpoint);
+            console.log("success....", response);
+            currentUserData = setUserData(submitDataOptions, submitData, currentUserData, response);
+        }
+
+    return currentUserData;
+}
+
 function setSubmitData(formData: FormData) {
     const submitData = {
         email: null,
@@ -80,11 +91,11 @@ function setSubmitData(formData: FormData) {
     return submitData;
 }
 
-function setNavigateTo(submitDataOptions: SubmitDataOptions, response:any, submitData:SubmitData) {
+function setNavigateTo(submitDataOptions: SubmitDataOptions, userData:any, submitData:SubmitData) {
 
     switch(submitDataOptions.flow+submitDataOptions.page) {
         case FLOW_TYPES.signIn+PAGES.password:
-            return submitDataOptions.navigateTo+"/"+response.data.otpType;
+            return submitDataOptions.navigateTo+"/"+userData.otpType;
         case FLOW_TYPES.signUp+PAGES.verificationSetUp:
             return submitDataOptions.navigateTo+"/"+submitData.verificationType;
         default:
@@ -102,9 +113,9 @@ export async function callAnalytics(submitDataOptions: SubmitDataOptions, submit
     });
 }
 
-export async function callAuthService(submitDataOptions:SubmitDataOptions, submitData:SubmitData, userData:any) {
+export async function callAuthService(submitDataOptions:SubmitDataOptions, submitData:SubmitData, userData:any, endpoint:string) {
     let payload = {};
-    switch(submitDataOptions.endpoint){
+    switch(endpoint){
         case(SUBMIT_END_POINTS.transientOtpSend):
             if(submitDataOptions.type === FLOW_TYPES.email)
                 payload = {
@@ -164,6 +175,15 @@ export async function callAuthService(submitDataOptions:SubmitDataOptions, submi
                 id: userData.id
             };
             return await authService.createCoreProfile({...payload});
+        case(SUBMIT_END_POINTS.enrollOtp):
+            const phoneNumber = userData.phone.toString();
+            payload = {
+                userName: userData.email,
+                userId: userData.id,
+                enrollmentType: userData.otpType,
+                phoneNumber: '+' + phoneNumber.replace(/\D/g, '')
+            };
+            return await authService.enrollOtp({...payload});
         default :
             return {};
     }
@@ -195,7 +215,7 @@ function setUserData(submitDataOptions:SubmitDataOptions, submitData: SubmitData
             if(submitDataOptions.flow===FLOW_TYPES.signUp && submitDataOptions.type===FLOW_TYPES.email) {
                 return {...userData, emailValidated: true}
             }
-            return  {...userData, stepVerified: true}
+            return  {...userData, stepVerified: true, otpType: submitDataOptions.type}
         case PAGES.privacy:
                 return {...userData, viewPrivacy: true};
         default:

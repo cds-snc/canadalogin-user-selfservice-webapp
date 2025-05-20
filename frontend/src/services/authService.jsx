@@ -45,6 +45,14 @@ export const authService = {
         const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.createCoreProfile}`, userData);
         return response.data;
     },
+    enrollOtp: async (userData) => {
+
+        if(TEST_USERS.has(userData.userName))
+            return buildTestResponse(userData, "enrollOtp");
+
+        const response =  await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.enrollOtp}`, userData);
+        return response.data;
+    },
     //logic will need to be updated once backend has been completed
     login:async (userData) => {
         if(TEST_USERS.has(userData.userName))
@@ -143,8 +151,15 @@ function buildTestResponse (userData, type) {
                 return response;
            }
            return ERROR_RESPONSE;
+        case "enrollOtp":
+            response = TEST_RESPONSES.smsEnrollOTPResponse;
+            if(userData.otpType===FLOW_TYPES.voice)
+                response = TEST_RESPONSES.voiceEnrollOTPResponse;
 
-
+            response.data.attributes.phoneNumber = userData.phoneNumber;
+            response.data.created = now.toISOString();
+            response.data.updated = now.toISOString();
+            return response;
     }
 }
 

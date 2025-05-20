@@ -203,6 +203,38 @@ export const TEST_RESPONSES = {
         success: true,
         message: 'Transient voice OTP has been validated',
         data: null
+    },
+    smsEnrollOTPResponse: {
+        success: true,
+        message: "User enrolled into TwoFactorEnrollmentType.SMS 2FA  successfully",
+        data: {
+            id: "30d69d8c-5b95-4e6d-acf1-44d24507e524",
+            userId: "772001DLUA",
+            type: "smsotp",
+            created: "2025-05-20T14:22:43.863Z",
+            updated: "2025-05-20T14:22:43.863Z",
+            enabled: true,
+            validated: false,
+            attributes: {
+                phoneNumber: "14161234567"
+            }
+        }
+    },
+    voiceEnrollOTPResponse: {
+        success: true,
+        message: "User enrolled into TwoFactorEnrollmentType.Voice 2FA  successfully",
+        data: {
+            id: "30d69d8c-5b95-4e6d-acf1-44d24507e524",
+            userId: "772001DLUA",
+            type: "voiceotp",
+            created: "2025-05-20T14:22:43.863Z",
+            updated: "2025-05-20T14:22:43.863Z",
+            enabled: true,
+            validated: false,
+            attributes: {
+                phoneNumber: "14161234567"
+            }
+        }
     }
 }
 

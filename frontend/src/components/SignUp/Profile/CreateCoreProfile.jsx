@@ -27,7 +27,7 @@ export default function CreateCoreProfile() {
 
     const submitDataOptions = {
         language,
-        endpoint: SUBMIT_END_POINTS.createCoreProfile,
+        endpoints: [SUBMIT_END_POINTS.enrollOtp,SUBMIT_END_POINTS.createCoreProfile],
         navigateTo: "/" + language + '/redirecttorp',
         page: PAGES.coreProfile,
         flow: flow,

@@ -72,7 +72,7 @@ export default function Password() {
 
     const submitDataOptions = {
         language,
-        endpoint: flow===FLOW_TYPES.signUp?SUBMIT_END_POINTS.create:SUBMIT_END_POINTS.login,
+        endpoints: [flow===FLOW_TYPES.signUp?SUBMIT_END_POINTS.create:SUBMIT_END_POINTS.login],
         navigateTo: flow===FLOW_TYPES.signUp?'/'+language+NAVIGATION_LINKS.twoStepVerification:'/'+language+'/'+FLOW_TYPES.signIn+NAVIGATION_LINKS.verification,
         page: PAGES.password,
         flow: flow,

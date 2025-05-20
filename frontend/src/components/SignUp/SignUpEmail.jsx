@@ -36,7 +36,7 @@ export default function SignUpEmail() {
     }
     const submitDataOptions = {
         language,
-        endpoint: SUBMIT_END_POINTS.transientOtpSend,
+        endpoints: [SUBMIT_END_POINTS.transientOtpSend],
         navigateTo: "/" + language + NAVIGATION_LINKS.verifyEmail, type:FLOW_TYPES.email,
         page: PAGES.signup,
         flow: flow,

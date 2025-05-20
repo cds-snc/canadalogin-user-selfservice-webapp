@@ -18,10 +18,8 @@ export function useLinkSubmit(submitDataOptions:SubmitDataOptions) {
                 const analyticsTag = setTag(submitDataOptions, linkFlowType, changeType);
                 try {
                     adjustEndpoint(linkFlowType, submitDataOptions);
-                    const submitData =setSubmitData(submitDataOptions, state.userData, changeType);
-                    const response = await callAuthService(submitDataOptions, submitData, state.userData);
-                    console.log("success....", response);
-                    const userData = setUserData(linkFlowType+submitDataOptions.type, state.userData, response, submitData);
+                    const submitData = setSubmitData(submitDataOptions, state.userData, changeType);
+                    const userData =  await callEndpoints(submitDataOptions, submitData, state.userData, linkFlowType);
                     await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                     await callAnalytics(submitDataOptions, analyticsTag+'_success', GA_LABELS.link);
                     const navigateTo = setNavigateTo(submitDataOptions, linkFlowType, changeType);
@@ -52,6 +50,19 @@ export function useLinkSubmit(submitDataOptions:SubmitDataOptions) {
 
     return {handleLinkSubmit, isPending, codeRequested, timesRequested};
 }
+
+async function callEndpoints(submitDataOptions: SubmitDataOptions, submitData: SubmitData, currentUserData: any, linkFlowType:string) {
+
+    if(submitDataOptions.endpoints)
+        for (const endpoint of submitDataOptions.endpoints) {
+            const response = await callAuthService(submitDataOptions, submitData, currentUserData, endpoint);
+            console.log("success....", response);
+            currentUserData = setUserData(linkFlowType + submitDataOptions.type, currentUserData, response, submitData);
+        }
+
+    return currentUserData;
+}
+
 function setTag(submitDataOptions:SubmitDataOptions, linkFlowType:string, changeType:boolean) {
 
     if(linkFlowType===LINK_SUBMIT_TYPES.useNewVerification)
@@ -67,7 +78,7 @@ function setUserData(type:string, userData:any, response:any, submitData:SubmitD
         case LINK_SUBMIT_TYPES.useNewVerification+FLOW_TYPES.email:
             return {...userData, email: null};
         default:
-            return {...userData, trxId: response.trxId, otpType: submitData.verificationType,};
+            return {...userData, trxnId: response.data.trxnId, otpType: submitData.verificationType,};
     }
 }
 
@@ -85,7 +96,7 @@ function setSubmitData(submitDataOptions:SubmitDataOptions, userData:any, change
 }
 function adjustEndpoint(linkFlowType:string, submitDataOptions:SubmitDataOptions) {
     if(linkFlowType===LINK_SUBMIT_TYPES.useNewVerification)
-        submitDataOptions.endpoint = null;
+        submitDataOptions.endpoints = null;
 }
 function setNavigateTo(submitDataOptions:SubmitDataOptions, linkFlowType:string, changeType:boolean) {
 

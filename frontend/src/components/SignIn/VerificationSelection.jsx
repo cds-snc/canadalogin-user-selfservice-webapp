@@ -27,7 +27,7 @@ export default function VerificationSelection() {
 
     const submitDataOptions = {
         language,
-        endpoint: SUBMIT_END_POINTS.otpSend,
+        endpoints: [SUBMIT_END_POINTS.otpSend],
         navigateTo:  "/" + language + "/" + FLOW_TYPES.signIn + NAVIGATION_LINKS.verification+'/'+state.userData.otpType,
         page: PAGES.verificationSelection,
         flow: flow,
