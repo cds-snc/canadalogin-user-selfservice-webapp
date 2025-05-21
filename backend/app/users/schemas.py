@@ -82,18 +82,6 @@ class Operations(BaseModel):
     value: str
 
 
-class ProfileCreateRequest(BaseModel):
-    schemas: List[str] = ["urn:ietf:params:scim:api:messages:2.0:PatchOp"]
-    Operations: List[Operations]
-
-
-class ProfileUserData(BaseModel):
-    userid: str
-    firstName: Optional[str] = None
-    lastName: str
-    preferredLanguage: str
-
-
 class SignUpResponse(ResponseModel):
     data: Optional[IBMUserCreateResponse] = None
 

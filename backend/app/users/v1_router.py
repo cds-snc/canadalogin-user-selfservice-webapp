@@ -14,7 +14,6 @@ from app.users.services.login import signin_with_password
 from app.users.services.two_factor_enrollment import handle_enrolling_user_into_2fa
 from app.users.services.profile import create_profile, get_profile
 
-from app.users.services.profile import create_profile, get_profile
 
 import logging
 from fastapi import Request
