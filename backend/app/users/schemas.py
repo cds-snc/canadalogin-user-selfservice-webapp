@@ -126,9 +126,9 @@ class IBMExtension(BaseModel):
 
 class ProfileGetResponseData(BaseModel):
     emails: List[EmailItem]
-    preferredLanguage: Optional[str]
+    preferredLanguage: Optional[str] = None
     meta: Meta
-    name: Name
+    name: Optional[Name] = None
     active: bool
     id: str
     userName: EmailStr
