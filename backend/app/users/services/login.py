@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 async def requestCloudDirectoryId(global_http_client: AsyncClient):
     try:
-        access_token = await get_admin_token()
+        access_token = await get_admin_token(global_http_client)
         headers = get_auth_request_headers(access_token, True)
         settings = get_settings().ibm_verify_config
         signin_url = f"{settings.IBM_VERIFY_TENANT_URL}/v1.0/authnmethods/password?search=name%20%3D%20%22Cloud%20Directory%22"
@@ -66,7 +66,7 @@ async def signin_with_username_password(
 ):
 
     try:
-        access_token = await get_admin_token()
+        access_token = await get_admin_token(global_http_client)
         headers = get_auth_request_headers(access_token, True)
         settings = get_settings().ibm_verify_config
         cloud_directory_id = await getCloudDirectoryId(global_http_client)
@@ -74,14 +74,13 @@ async def signin_with_username_password(
 
         core_user_data_dict = username_password.model_dump()
 
-        async with AsyncClient() as client:
-            print(core_user_data_dict)
+        print(core_user_data_dict)
 
-            response = await client.post(
-                signin_url, json=core_user_data_dict, headers=headers
-            )
-            logger.info("Request returned")
-            return response
+        response = await global_http_client.post(
+            signin_url, json=core_user_data_dict, headers=headers
+        )
+        logger.info("Request returned")
+        return response
 
     except HTTPException as he:
         logger.error(f"HTTP Exception in signup: {str(he)}")
