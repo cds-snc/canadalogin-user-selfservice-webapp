@@ -41,7 +41,6 @@ export const PAGES ={
     home: 'Home',
     error: 'Error',
     verificationSelection: 'VerificationSelection',
-    ProfileHome: 'ProfileHome',
     ProfileNameEdit: 'ProfileNameEdit'
 }
 

@@ -15,7 +15,6 @@ import {useUser} from "../components/Providers/useUser";
 import {useLocation, useParams} from "react-router";
 import { trackPage } from "../utils/gatag.jsx";
 import { useEffect } from "react";
-import ProfileHome from "../components/PersonalInfo/ProfileHome.jsx";
 import ProfileNameEdit from "../components/PersonalInfo/ProfileNameEdit.jsx";
 
 function PageContents({page}:{page:string}) {
@@ -51,10 +50,6 @@ function PageContents({page}:{page:string}) {
         case PAGES.privacy:
             return (
                 <Privacy />
-            );
-        case PAGES.ProfileHome:
-            return (
-                <ProfileHome />
             );
         case PAGES.ProfileNameEdit:
             return (
