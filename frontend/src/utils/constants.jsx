@@ -40,7 +40,9 @@ export const PAGES ={
     password: 'Password',
     home: 'Home',
     error: 'Error',
-    verificationSelection: 'VerificationSelection'
+    verificationSelection: 'VerificationSelection',
+    ProfileHome: 'ProfileHome',
+    ProfileNameEdit: 'ProfileNameEdit'
 }
 
 export const FOOTERS = {

@@ -190,6 +190,12 @@
     "45": "You can use the same username and password to access any program or service that uses GC Sign in.",
     "46": "GC Sign in",
     "47": "to continue to your"
+  },
+  "ProfileNameEdit": {
+    "1": "What services have access to your name",
+    "2": "First Name",
+    "3": "Last Name",
+    "4": "Cancel"
   }
 }
 
