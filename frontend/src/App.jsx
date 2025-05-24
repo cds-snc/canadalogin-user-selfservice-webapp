@@ -19,6 +19,7 @@ function App() {
                   <Route path="/:language/:flow/selectverification" element={<PrivateRoute route={PAGES.verificationSelection}><Page page={PAGES.verificationSelection}/></PrivateRoute>}/>
                   <Route path="/:language/:flow/profile" element={<PrivateRoute route={PAGES.coreProfile}><Page page={PAGES.coreProfile}/></PrivateRoute>}/>
                   <Route path="/:language/redirecttorp" element={ <Page page="RP"/>} />
+                  <Route path="/:language/phoneotp" element={ <Page page="Phone OTP"/>} />
                   <Route path="*" element={<Navigate to="/" replace />} />
                   <Route path="/:language/profilehome" element={ <Page page={PAGES.ProfileHome}/>} />
               </Routes>

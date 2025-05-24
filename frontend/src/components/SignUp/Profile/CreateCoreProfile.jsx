@@ -1,5 +1,5 @@
 import {
-    GcdsContainer, GcdsErrorSummary, GcdsHeading, GcdsInput, GcdsLink, GcdsNotice, GcdsStepper, GcdsText,
+    GcdsContainer, GcdsErrorSummary, GcdsHeading, GcdsInput, GcdsLink, GcdsStepper, GcdsText,
 } from "@cdssnc/gcds-components-react";
 import {getPageContent, isNameValid} from "../../../utils/functions.jsx";
 import SubmitButton from "../../Layout/SubmitButton.jsx";
@@ -39,10 +39,6 @@ export default function CreateCoreProfile() {
 
     return (
         <GcdsContainer>
-            <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={pageContentJson['1']} >
-                &nbsp;
-            </GcdsNotice>
-            <br/>
             {
                 hasErrors()&&(<GcdsErrorSummary data-testid='errorSummary'
                                                 errorLinks={`{"#profile": "${error.errorMsg}"}`}
