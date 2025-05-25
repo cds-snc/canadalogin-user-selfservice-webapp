@@ -52,7 +52,7 @@ function ProfileNameEdit() {
                         lang={language}
                          ></GcdsInput>
                          <SubmitButton currentLang={language} disabled={false}/>
-                         <GcdsButton style={{marginLeft: "10px"}} >{pageNameEditJson['4']}</GcdsButton>
+                         <GcdsButton style={{marginLeft: "10px"}} buttonRole='secondary' >{pageNameEditJson['4']}</GcdsButton>
                 </GcdsContainer>
             </form>
         </GcdsContainer>
