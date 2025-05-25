@@ -19,8 +19,11 @@ body, .mainBody {
 .privacy-notice{
     padding-left: 3em;
 }
-
-
+.profile-home-gcds-container {
+    padding: 0px 20px;
+    border: 1px solid var(--colour-gray-300, #A8ADB4);
+    border-radius: 10px
+}
 
 @media screen and (max-width:767px) {
     .gcds-email-fieldset {
