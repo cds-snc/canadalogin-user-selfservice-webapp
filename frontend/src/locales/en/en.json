@@ -193,9 +193,12 @@
   },
   "ProfileNameEdit": {
     "1": "What services have access to your name",
-    "2": "First Name",
-    "3": "Last Name",
-    "4": "Cancel"
+    "2": "First name",
+    "3": "Last name",
+    "4": "Cancel",
+    "5": "Edit your name",
+    "6": "This will update your name with ",
+    "7": "every service you have shared your name with through GC Sign in."
   }
 }
 
