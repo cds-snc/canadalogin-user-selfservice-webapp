@@ -60,7 +60,7 @@ export default function ProfileHome() {
           </GcdsLink>
         </GcdsGrid>
 
-        <gcds-grid columns="auto auto" className="verifiedBadge">
+        <gcds-grid columns="auto auto" className="verifiedBadge verifiedBadgeBottom">
           <gcds-icon name="check" className="verifiedIcon" size="sm" />
           <gcds-text className="verifiedText">
             {pageContent['9']}
