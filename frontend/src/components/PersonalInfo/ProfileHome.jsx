@@ -20,7 +20,7 @@ export default function ProfileHome() {
       <GcdsHeading tag="h2">{pageContent['2']}</GcdsHeading>
 
       <gcds-container className="sectionCard">
-        <GcdsHeading tag="h6">{pageContent['3']}</GcdsHeading>
+        <GcdsHeading tag="h6" marginTop='300'>{pageContent['3']}</GcdsHeading>
         <GcdsGrid columns="1fr auto" className="gridInline">
           <GcdsText>{pageContent['4']}</GcdsText>
           <GcdsLink href="#" size="regular">
@@ -29,9 +29,9 @@ export default function ProfileHome() {
         </GcdsGrid>
       </gcds-container>
 
-      <GcdsHeading tag="h2">{pageContent['6']}</GcdsHeading>
+      <GcdsHeading tag="h2" marginTop='300'>{pageContent['6']}</GcdsHeading>
       <gcds-container className="sectionCard">
-        <GcdsHeading tag="h3">{pageContent['7']}</GcdsHeading>
+        <GcdsHeading tag="h3" marginTop='300'>{pageContent['7']}</GcdsHeading>
         <GcdsText>{pageContent['8']}</GcdsText>
 
         <GcdsGrid columns="1fr auto" className="gridInline">
@@ -50,7 +50,7 @@ export default function ProfileHome() {
 
         <div className="separator" />
 
-        <GcdsHeading tag="h3">{pageContent['10']}</GcdsHeading>
+        <GcdsHeading tag="h3" marginTop='300'>{pageContent['10']}</GcdsHeading>
         <GcdsText>{pageContent['11']}</GcdsText>
 
         <GcdsGrid columns="1fr auto" className="gridInline">
@@ -70,7 +70,7 @@ export default function ProfileHome() {
 
       <GcdsHeading tag="h2">{pageContent['12']}</GcdsHeading>
       <gcds-container className="sectionCard">
-        <GcdsHeading tag="h3">{pageContent['13']}</GcdsHeading>
+        <GcdsHeading tag="h3" marginTop='300'>{pageContent['13']}</GcdsHeading>
         <GcdsGrid columns="1fr auto" className="gridInline">
           <GcdsText>{pageContent['14']}</GcdsText>
           <GcdsLink href="#" size="regular">
@@ -80,7 +80,7 @@ export default function ProfileHome() {
 
         <div className="separator" />
 
-        <GcdsHeading tag="h3">{pageContent['15']}</GcdsHeading>
+        <GcdsHeading tag="h3" marginTop='300'>{pageContent['15']}</GcdsHeading>
         <GcdsText>{pageContent['16']}</GcdsText>
         <GcdsText>{pageContent['17']}</GcdsText>
       </gcds-container>
