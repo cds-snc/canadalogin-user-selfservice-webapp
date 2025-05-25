@@ -20,6 +20,7 @@ function App() {
                   <Route path="/:language/:flow/profile" element={<PrivateRoute route={PAGES.coreProfile}><Page page={PAGES.coreProfile}/></PrivateRoute>}/>
                   <Route path="/:language/redirecttorp" element={ <Page page="RP"/>} />
                   <Route path="/:language/phoneotp" element={ <Page page="Phone OTP"/>} />
+                  <Route path="/:language/areyousure" element={ <Page page={PAGES.areYouSureToUpdateName} />} />
                   <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
           </UserProvider>
