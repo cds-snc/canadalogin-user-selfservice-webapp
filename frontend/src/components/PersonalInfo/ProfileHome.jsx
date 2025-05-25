@@ -42,9 +42,10 @@ function ProfileHome() {
                             padding: 'var(--gcds-spacing-100) var(--gcds-spacing-200)',
                             height: '32px',
                             border: '1px solid var(--colour-green-10, #E6F6EC)',
-                            borderRadius: '5px' }}
+                            borderRadius: '5px'
+                        }}
                     >
-                        <gcds-icon name="check" style={{color: 'var(--gcds-color-green-500)'}}/>
+                        <gcds-icon name="check" style={{ color: 'var(--gcds-color-green-500)' }} />
                         <gcds-text
                             style={{ color: 'var(--gcds-color-green-500)' }}>
                             Verified
