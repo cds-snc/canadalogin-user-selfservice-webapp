@@ -1,111 +1,89 @@
 import React from 'react';
-import { GcdsContainer, GcdsHeading } from '@cdssnc/gcds-components-react';
+import { useParams } from 'react-router';
+import { getPageContent } from '../../utils/functions.jsx';
+import { PAGES } from '../../utils/constants.jsx';
 import {
-    GcdsGrid,
-    GcdsText,
-    GcdsLink
+  GcdsContainer,
+  GcdsHeading,
+  GcdsGrid,
+  GcdsText,
+  GcdsLink
 } from '@cdssnc/gcds-components-react';
-function ProfileHome() {
 
-    return (
-        <GcdsContainer>
-            <GcdsHeading tag="h1">Personal information</GcdsHeading>
-            <GcdsHeading tag="h2">
-                Basic information
-            </GcdsHeading>
-            <gcds-container className="profile-home-gcds-container">
-                <GcdsHeading tag="h6">Name</GcdsHeading>
-                <GcdsGrid
-                    columns="1fr auto" >
-                    <GcdsText >Example Name</GcdsText>
-                    <GcdsLink href="#" size='regular'>Edit</GcdsLink>
-                </GcdsGrid>
-            </gcds-container>
+export default function ProfileHome() {
+  const { language } = useParams();
+  const pageContent = getPageContent(language, PAGES.ProfileHome);
 
-            <GcdsHeading tag="h2">Contact information</GcdsHeading>
-            <gcds-container>
-                <GcdsText style={{ padding: '0px 20px', border: '1px solid var(--colour-gray-300, #A8ADB4)', borderRadius: '10px' }}>
-                    <GcdsHeading tag="h3">Email</GcdsHeading>
-                    <GcdsText>
-                        This email is used for signing in and contacting you:
-                    </GcdsText>
-                    <GcdsGrid
-                        columns="1fr auto" >
-                        <GcdsText>Ex****@gmail.com</GcdsText>
-                        <GcdsLink href="#" size="regular">Edit</GcdsLink>
-                    </GcdsGrid>
-                    <gcds-grid
-                        columns="auto auto"
-                        style={{
-                            display: 'inline-flex',
-                            background: 'var(--colour-green-100, #E6F6EC)',
-                            padding: 'var(--gcds-spacing-100) var(--gcds-spacing-200)',
-                            height: '32px',
-                            border: '1px solid var(--colour-green-10, #E6F6EC)',
-                            borderRadius: '5px'
-                        }}
-                    >
-                        <gcds-icon name="check" style={{ color: 'var(--gcds-color-green-500)' }} />
-                        <gcds-text
-                            style={{ color: 'var(--gcds-color-green-500)' }}>
-                            Verified
-                        </gcds-text>
-                    </gcds-grid>
-                    <GcdsText style={{
-                        borderBottom: '1px solid #A8ADB4'
-                    }}></GcdsText>
-                    <GcdsHeading tag="h3">Contact phone number</GcdsHeading>
-                    <GcdsText>
-                        This number is used for contacting you:
-                    </GcdsText>
-                    <GcdsGrid
-                        columns="1fr auto">
-                        <GcdsText>+1 (***) ***-2839</GcdsText>
-                        <GcdsLink href="#" size="regular">Edit</GcdsLink>
-                    </GcdsGrid>
-                    <gcds-grid
-                        columns="auto auto"
-                        style={{
-                            display: 'inline-flex',
-                            background: 'var(--colour-green-100, #E6F6EC)',
-                            padding: 'var(--gcds-spacing-100) var(--gcds-spacing-200)',
-                            border: '1px solid var(--colour-green-10, #E6F6EC)',
-                            borderRadius: '5px',
-                            height: '32px',
-                        }}
-                    >
-                        <gcds-icon name="check" size="sm" />
-                        <gcds-text
-                            size="body"
-                            style={{ marginLeft: 'var(--gcds-spacing-100)', color: '#03662A' }}>
-                            Verified
-                        </gcds-text>
-                    </gcds-grid>
-                </GcdsText>
+  return (
+    <GcdsContainer>
+      <GcdsHeading tag="h1">{pageContent['1']}</GcdsHeading>
+      <GcdsHeading tag="h2">{pageContent['2']}</GcdsHeading>
 
-                <GcdsHeading tag="h2">
-                    Communication
-                </GcdsHeading>
-                <gcds-container style={{ padding: '0px 20px', border: '1px solid var(--colour-gray-300, #A8ADB4)', borderRadius: '10px' }}>
-                    <GcdsHeading tag="h3">Language Preference</GcdsHeading>
-                    <GcdsGrid
-                        columns="1fr auto">
-                        <GcdsText >English</GcdsText>
-                        <GcdsLink href="#" size="regular">Edit</GcdsLink>
-                    </GcdsGrid>
-                    <GcdsText style={{
-                        borderBottom: '1px solid #A8ADB4'
-                    }}></GcdsText>
-                    <GcdsHeading tag="h3">Notifications</GcdsHeading>
-                    <GcdsText>
-                        We will send account-related notifications to the email registered to your account.</GcdsText>
-                    <GcdsText >
-                        You may also receive notifications from services connected to your GC Sign in. You can manage those preferences in each service’s settings.
-                    </GcdsText>
-                </gcds-container>
-            </gcds-container>
-        </GcdsContainer>
-    );
+      <gcds-container className="sectionCard">
+        <GcdsHeading tag="h6">{pageContent['3']}</GcdsHeading>
+        <GcdsGrid columns="1fr auto" className="gridInline">
+          <GcdsText>{pageContent['4']}</GcdsText>
+          <GcdsLink href="#" size="regular">
+            {pageContent['5']}
+          </GcdsLink>
+        </GcdsGrid>
+      </gcds-container>
+
+      <GcdsHeading tag="h2">{pageContent['6']}</GcdsHeading>
+      <gcds-container className="sectionCard">
+        <GcdsHeading tag="h3">{pageContent['7']}</GcdsHeading>
+        <GcdsText>{pageContent['8']}</GcdsText>
+
+        <GcdsGrid columns="1fr auto" className="gridInline">
+          <GcdsText>Ex****@gmail.com</GcdsText>
+          <GcdsLink href="#" size="regular">
+            {pageContent['5']}
+          </GcdsLink>
+        </GcdsGrid>
+
+        <gcds-grid columns="auto auto" className="verifiedBadge">
+          <gcds-icon name="check" className="verifiedIcon" size="sm" />
+          <gcds-text className="verifiedText">
+            {pageContent['9']}
+          </gcds-text>
+        </gcds-grid>
+
+        <div className="separator" />
+
+        <GcdsHeading tag="h3">{pageContent['10']}</GcdsHeading>
+        <GcdsText>{pageContent['11']}</GcdsText>
+
+        <GcdsGrid columns="1fr auto" className="gridInline">
+          <GcdsText>+1 (***) ***-2839</GcdsText>
+          <GcdsLink href="#" size="regular">
+            {pageContent['5']}
+          </GcdsLink>
+        </GcdsGrid>
+
+        <gcds-grid columns="auto auto" className="verifiedBadge">
+          <gcds-icon name="check" className="verifiedIcon" size="sm" />
+          <gcds-text className="verifiedText">
+            {pageContent['9']}
+          </gcds-text>
+        </gcds-grid>
+      </gcds-container>
+
+      <GcdsHeading tag="h2">{pageContent['12']}</GcdsHeading>
+      <gcds-container className="sectionCard">
+        <GcdsHeading tag="h3">{pageContent['13']}</GcdsHeading>
+        <GcdsGrid columns="1fr auto" className="gridInline">
+          <GcdsText>{pageContent['14']}</GcdsText>
+          <GcdsLink href="#" size="regular">
+            {pageContent['5']}
+          </GcdsLink>
+        </GcdsGrid>
+
+        <div className="separator" />
+
+        <GcdsHeading tag="h3">{pageContent['15']}</GcdsHeading>
+        <GcdsText>{pageContent['16']}</GcdsText>
+        <GcdsText>{pageContent['17']}</GcdsText>
+      </gcds-container>
+    </GcdsContainer>
+  );
 }
-
-export default ProfileHome;

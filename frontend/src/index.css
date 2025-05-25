@@ -80,3 +80,44 @@ body, .mainBody {
         padding-top: var(--gcds-spacing-400);
     }
 }
+/* ProfileHome css */
+
+.sectionCard {
+    padding: var(--gcds-spacing-100) var(--gcds-spacing-200);
+    border: 1px solid var(--colour-gray-300, #A8ADB4);
+    border-radius: 10px;
+    margin-bottom: var(--gcds-spacing-300);
+  }
+  
+  .gridInline {
+    gap: var(--gcds-spacing-100);
+    align-items: center;
+  }
+  
+  .separator {
+    border-bottom: 1px solid #A8ADB4;
+    margin: var(--gcds-spacing-200) 0;
+    width: 100%;
+  }
+  
+  .verifiedBadge {
+    display: inline-flex;
+    align-items: center;
+    background: var(--colour-green-100, #E6F6EC);
+    padding: var(--gcds-spacing-100) var(--gcds-spacing-200);
+    height: 30px;
+    border: 1px solid var(--colour-green-10, #E6F6EC);
+    border-radius: 5px;
+  }
+  
+  .verifiedIcon {
+    color: var(--gcds-color-green-500);
+  }
+  
+  .verifiedText {
+    width: 58px;
+    height: 24px;
+    margin-top: -3px;
+    margin-left: -15px;
+  }
+  
