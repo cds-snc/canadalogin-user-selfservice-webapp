@@ -5,7 +5,7 @@ import {
     GcdsHeading,
     GcdsInput,
     GcdsDetails,
-    GcdsText
+    GcdsText, GcdsLink
 } from '@cdssnc/gcds-components-react';
 import { useParams } from 'react-router';
 import { getPageContent } from '../../utils/functions';
@@ -27,7 +27,20 @@ export default function ProfileNameEdit() {
                     {pageNameEditJson['7']}</strong>
             </GcdsText>
 
-            <GcdsDetails detailsTitle={pageNameEditJson['1']} />
+            <GcdsDetails detailsTitle={pageNameEditJson['1']} >
+
+                <GcdsText><span>{pageNameEditJson['8']}</span></GcdsText>
+                <ul style={{margin: 0}}>
+                    <li>{pageNameEditJson['9']}</li>
+                </ul>
+                <GcdsText>{pageNameEditJson['10']}</GcdsText>
+                <GcdsText>
+                    {pageNameEditJson['11']}&nbsp;
+                    <GcdsLink href="https://accounts.gc.ca/directory">
+                        {pageNameEditJson['12']}
+                    </GcdsLink>.
+                </GcdsText>
+            </GcdsDetails>
 
             <form id="form" style={{ marginTop: '38px' }}>
                 <GcdsContainer marginTop="100" marginBottom="0">
