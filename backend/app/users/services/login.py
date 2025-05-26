@@ -90,14 +90,14 @@ async def signin_with_username_password(
         raise HTTPException(status_code=400, detail=f"Signup error: {str(e)}")
 
 
-async def get_user_access_token(assertion: str):
+async def get_user_access_token(assertion: str, global_http_client: AsyncClient):
     try:
-        access_token = await get_access_token()
+        access_token = await get_admin_token(global_http_client)
         headers = get_auth_request_headers(access_token, True)
         headers["Content-Type"] = "application/x-www-form-urlencoded"
 
         settings = get_settings().ibm_verify_config
-        get_user_access_token_url = f"{settings.IBM_VERIFY_TENANT_URL}/oauth2/token"
+        user_access_token_url = f"{settings.IBM_VERIFY_TENANT_URL}/oauth2/token"
 
         oidc_data = {
             "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
@@ -107,12 +107,12 @@ async def get_user_access_token(assertion: str):
             "client_secret": settings.IBM_VERIFY_CLIENT_SECRET,
         }
 
-        async with AsyncClient() as client:
-            response = await client.post(
-                get_user_access_token_url, data=oidc_data, headers=headers
-            )
-            logger.info("Request returned")
-            return response.json()
+        response = await global_http_client.post(
+            user_access_token_url, data=oidc_data, headers=headers
+        )
+
+        logger.info("Request returned")
+        return response.json()
 
     except HTTPException as he:
         logger.error(f"HTTP Exception in signup: {str(he)}")
@@ -122,7 +122,7 @@ async def get_user_access_token(assertion: str):
         raise HTTPException(status_code=400, detail=f"Signup error: {str(e)}")
 
 
-async def signin_with_password(user: UserLoginRequestData):
+async def signin_with_password(user: UserLoginRequestData, global_http_client: AsyncClient):
 
     try:
 
@@ -158,7 +158,7 @@ async def signin_with_password(user: UserLoginRequestData):
 
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(f"Signup request completed in {duration:.2f} seconds")
-        user_access_token = await get_user_access_token(assertion)
+        user_access_token = await get_user_access_token(assertion, global_http_client)
         success_data = {
             "id": user_id,
             "assertion": user_access_token.get("access_token"),
