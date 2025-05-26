@@ -38,7 +38,6 @@ export default function Home() {
 
     function validateEmail(email) {
         setEmail(email);
-        console.log(state.userData)
         clearAllErrors();
         if (!isEmailValid(email)) {
             setError('#email', '2');
