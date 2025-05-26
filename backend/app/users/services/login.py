@@ -159,7 +159,10 @@ async def signin_with_password(user: UserLoginRequestData):
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(f"Signup request completed in {duration:.2f} seconds")
         user_access_token = await get_user_access_token(assertion)
-        success_data = {"id": user_id, "assertion": user_access_token.get("access_token")}
+        success_data = {
+            "id": user_id,
+            "assertion": user_access_token.get("access_token"),
+        }
 
         return ResponseModel(
             success=True, data=success_data, message="Successfully signed in"
