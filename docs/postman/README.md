@@ -3,7 +3,7 @@ Download and Install Postman (https://www.postman.com/downloads)
 
 ### Import the POSTMAN collection
 In the top left corner there is an import button. 
-Either drag the [docs/postman/GC_Sign_In_DEV.postman_collection.json](docs/postman/GC_Sign_In_DEV.postman_collection.json) file into the window or click choose files and select it.
+Either drag the [docs/postman/GC_Sign_In_DEV.postman_collection.json](GC_Sign_In_DEV.postman_collection.json) file into the window or click choose files and select it.
 
 ### POSTMAN Environment Variables
 To get started, set the required environment values. 
