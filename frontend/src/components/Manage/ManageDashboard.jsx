@@ -2,7 +2,7 @@ import {
     GcdsContainer,
     GcdsHeading,
     GcdsText,
-    GcdsLink,
+    GcdsGrid,
     GcdsButton,
     GcdsErrorSummary,
     GcdsCard
@@ -57,15 +57,25 @@ export default function ManageDashboard() {
             {/* Dashboard Section */}
 
 
-            {/* Action Buttons */}
-            {/*<GcdsContainer className="gcds-actions">*/}
-            {/*    <GcdsButton type="button" onClick={() => console.log("Add Service")}>*/}
-            {/*        Add a Service*/}
-            {/*    </GcdsButton>*/}
-            {/*    <GcdsButton type="button" onClick={() => console.log("Sign Out")}>*/}
-            {/*        Sign Out*/}
-            {/*    </GcdsButton>*/}
-            {/*</GcdsContainer>*/}
+            {/* Action Cards */}
+            <GcdsGrid columns="repeat(auto-fit, minmax(100px, 200px))">
+                <p><GcdsCard
+                    cardTitle="Personal Information"
+                    href="#"
+                    cardTitleTag="h3"
+                >
+                </GcdsCard>
+                </p>
+                <p>
+                    <GcdsCard
+                    cardTitle="Security settings"
+                    href="#"
+                    cardTitleTag="h3"
+                >
+                </GcdsCard></p>
+
+            </GcdsGrid>
+
         </GcdsContainer>
     );
 }
