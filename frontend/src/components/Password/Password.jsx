@@ -108,13 +108,18 @@ export default function Password() {
                         console.log("Error....", response);
                         setError({ passwordError: response.message, heading: errorPageJson['1'] });
                     }
+                }
+                if (flow === FLOW_TYPES.signIn) {
+                    const response = await authService.login({
+                        userName: state.userData.email,
+                        password: formData.get('password'),
+                    });
+                    console.log("login ", response);
+                    console.log("user state ", state.userData.stateId);
 
-                    if (flow === FLOW_TYPES.signIn) {
-                        const response = await authService.create({
-                            userName: state.userData.email,
-                            password: formData.get('password'),
-                        });
-                    }
+                    const redirect_url = encodeURIComponent(state.userData.stateId);
+                    window.location.href = `https://cds-gcsignin-dev.verify.ibm.com/v1.0/auth/session?access_token=${response.data.assertion}&redirect_url=${redirect_url}&scoped=false`;
+
                 }
             } catch (error) {
                 trackEvent({

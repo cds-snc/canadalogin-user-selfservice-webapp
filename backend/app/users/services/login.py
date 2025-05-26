@@ -92,6 +92,41 @@ async def signin_with_username_password(
         raise HTTPException(status_code=400, detail=f"Signup error: {str(e)}")
 
 
+async def get_user_access_token(assertion: str):
+    try:
+        access_token = await get_access_token()
+
+        headers = {
+            "Authorization": f"Bearer {access_token}",
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Accept": "application/json",
+        }
+        settings = get_settings().ibm_verify_config
+        get_user_access_token_url = f"{settings.IBM_VERIFY_TENANT_URL}/oauth2/token"
+
+        oidc_data = {
+            "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
+            "assertion": assertion,
+            "scope": "openid profile offline_access email",
+            "client_id": settings.IBM_VERIFY_CLIENT_ID,
+            "client_secret": settings.IBM_VERIFY_CLIENT_SECRET,
+        }
+
+        async with AsyncClient() as client:
+            response = await client.post(
+                get_user_access_token_url, data=oidc_data, headers=headers
+            )
+            logger.info("Request returned")
+            return response.json()
+
+    except HTTPException as he:
+        logger.error(f"HTTP Exception in signup: {str(he)}")
+        raise he
+    except Exception as e:
+        logger.error(f"Signup error: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=400, detail=f"Signup error: {str(e)}")
+
+
 async def signin_with_password(user: UserLoginRequestData):
 
     try:
@@ -126,7 +161,9 @@ async def signin_with_password(user: UserLoginRequestData):
 
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(f"Signup request completed in {duration:.2f} seconds")
-        success_data = {"id": user_id, "assertion": assertion}
+        user_access_token = await get_user_access_token(assertion)
+        success_data = {"id": user_id, "assertion": user_access_token.get("access_token")}
+
         return ResponseModel(
             success=True, data=success_data, message="Successfully signed in"
         )

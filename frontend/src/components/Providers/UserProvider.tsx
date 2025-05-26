@@ -1,5 +1,5 @@
-import {useReducer} from "react";
-import {SERVICES, CONTEXT_ACTIONS} from "../../utils/constants.jsx";
+import { useReducer } from "react";
+import { SERVICES, CONTEXT_ACTIONS } from "../../utils/constants.jsx";
 import UserContext from "./UserContext";
 
 interface Action {
@@ -16,17 +16,18 @@ const initialState = {
         emailLanguage: null,
         emailValidated: false,
         trxnId: null,
-        passwordSubmitted:false,
+        passwordSubmitted: false,
         phone: null,
         stepVerificationSent: false,
-        stepVerified:false,
-        viewPrivacy:false,
-        id: null
+        stepVerified: false,
+        viewPrivacy: false,
+        id: null,
+        stateId: null,
     }
 }
 
 
-function userReducer(state=initialState, action: Action) {
+function userReducer(state = initialState, action: Action) {
     switch (action.type) {
         case CONTEXT_ACTIONS.signUp:
             return {
@@ -38,12 +39,12 @@ function userReducer(state=initialState, action: Action) {
     }
 }
 
-export function UserProvider ({ children, initial=initialState}) {
+export function UserProvider({ children, initial = initialState }) {
 
     const [state, dispatch] = useReducer(userReducer, initial);
 
-    return(
-        <UserContext.Provider value={{state, dispatch}} >
+    return (
+        <UserContext.Provider value={{ state, dispatch }} >
             {children}
         </UserContext.Provider>
     )

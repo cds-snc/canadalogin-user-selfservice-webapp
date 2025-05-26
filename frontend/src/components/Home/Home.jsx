@@ -11,48 +11,79 @@ import {
     NAVIGATION_LINKS,
     SERVICES,
     PAGES,
+    CONTEXT_ACTIONS
 } from "../../utils/constants";
-import {getPageContent, isEmailValid} from '../../utils/functions';
+
+import { getPageContent, isEmailValid } from '../../utils/functions';
 import FirstTimeGc from "../Layout/FirstTimeGc";
 import SubmitButton from "../Layout/SubmitButton.jsx";
-import {useState} from "react";
+import { useState, useEffect } from "react";
 import config from "../../config.jsx";
-import {useUser} from "../Providers/useUser.tsx";
-import {getLanguage} from "../../utils/functions";
-import {useError} from "../../hooks/useError.js";
-import {useSubmit} from "../../hooks/useSubmit.js";
-import {useParams} from "react-router";
+import { useUser } from "../Providers/useUser.tsx";
+import { getLanguage } from "../../utils/functions";
+import { useError } from "../../hooks/useError.js";
+import { useSubmit } from "../../hooks/useSubmit.js";
+import { useParams } from "react-router";
 
 console.log("Config URL", config.apiUrl);
 
 export default function Home() {
-    const {language, flow} = useParams();
-    const {state} = useUser();
+    const { language, flow } = useParams();
+    const { state, dispatch } = useUser();
     const [email, setEmail] = useState(state.userData.email);
+    const [stateId, setStateId] = useState(state.userData.stateId);
     const currentLang = getLanguage(language);
     const pageContentJson = getPageContent(currentLang, PAGES.home);
-    const {setError, clearAllErrors, getError, hasErrors} = useError(currentLang);
+    const { setError, clearAllErrors, getError, hasErrors } = useError(currentLang);
     const error = getError('#email');
+
+    function setStateIdfromSearchParams() {
+        const outerParams = new URLSearchParams(window.location.search)
+        const targetUrl = outerParams.get("Target")
+
+        if (targetUrl) {
+            try {
+                const innerParams = new URLSearchParams(
+                    new URL(targetUrl).search
+                )
+                const state = innerParams.get("stateId")
+                setStateId(state)
+                const userData = { ...state.userData, stateId: targetUrl };
+                dispatch({ type: CONTEXT_ACTIONS.signUp, payload: userData });
+
+            } catch (err) {
+                console.error("Invalid Target URL", err)
+            }
+        }
+    }
 
     function validateEmail(email) {
         setEmail(email);
+        setStateIdfromSearchParams();
+        console.log(state.userData)
         clearAllErrors();
-        if(!isEmailValid(email)) {
+        if (!isEmailValid(email)) {
             setError('#email', '2');
             return false;
         }
         return true;
     }
 
+
+
+    useEffect(() => {
+        setStateIdfromSearchParams()
+    }, [])
+
     const submitDataOptions = {
         endpoint: null,
         navigateTo: "/" + currentLang + "/" + FLOW_TYPES.signIn + NAVIGATION_LINKS.password,
-        type:FLOW_TYPES.email,
+        type: FLOW_TYPES.email,
         page: PAGES.home,
         flow: flow,
-        onError: (err)=> setError('#email',err)
+        onError: (err) => setError('#email', err)
     };
-    const {handleSubmit, isPending} = useSubmit(submitDataOptions, validateEmail );
+    const { handleSubmit, isPending } = useSubmit(submitDataOptions, validateEmail);
 
 
     console.log("Config URL", config.apiUrl);
@@ -60,20 +91,20 @@ export default function Home() {
         <GcdsContainer className="gcds-content" >
             <GcdsContainer>
                 {
-                    hasErrors()&&(<GcdsErrorSummary data-testid='errorSummary'
-                                                    errorLinks={`{"#email": "${error.errorMsg}"}`}
-                                                    heading={ error.heading}
+                    hasErrors() && (<GcdsErrorSummary data-testid='errorSummary'
+                        errorLinks={`{"#email": "${error.errorMsg}"}`}
+                        heading={error.heading}
                     />)
                 }
                 <GcdsHeading tag="h1">
-                        {pageContentJson['1']}
-                        <GcdsText marginTop="150" marginBottom="0">
-                            {pageContentJson['2']}
-                            <strong>
-                                {currentLang===AVAILABLE_LANGUAGES.fr?' '+pageContentJson['3']+' ':''}
-                                {` ${SERVICES[0].title}`}{currentLang!==AVAILABLE_LANGUAGES.fr?' '+pageContentJson['3']:''}
-                            </strong>
-                        </GcdsText>
+                    {pageContentJson['1']}
+                    <GcdsText marginTop="150" marginBottom="0">
+                        {pageContentJson['2']}
+                        <strong>
+                            {currentLang === AVAILABLE_LANGUAGES.fr ? ' ' + pageContentJson['3'] + ' ' : ''}
+                            {` ${SERVICES[0].title}`}{currentLang !== AVAILABLE_LANGUAGES.fr ? ' ' + pageContentJson['3'] : ''}
+                        </strong>
+                    </GcdsText>
                 </GcdsHeading>
                 <GcdsDetails detailsTitle={pageContentJson['4']}>
                     <GcdsText>
@@ -83,30 +114,30 @@ export default function Home() {
                         {pageContentJson['6']}
                     </GcdsText>
                     <GcdsText>
-                            {pageContentJson['7']}
+                        {pageContentJson['7']}
                     </GcdsText>
                 </GcdsDetails>
             </GcdsContainer>
-                <GcdsContainer>
-                    <GcdsText marginTop="100" marginBottom="0">
-                        <form id="form" onSubmit={handleSubmit} >
-                            <GcdsInput
-                                inputId="email"
-                                label={pageContentJson['8']}
-                                name="email"
-                                type="email"
-                                value={state.testData!=null?state.testData.email:email}
-                                validateOn="other"
-                                onGcdsChange={(e) => {validateEmail(e.target.value)}}
-                                errorMessage={error.errorMsg}
-                                data-testid="signin-email"
-                                lang={currentLang}
-                            ></GcdsInput>
-                            <SubmitButton currentLang={currentLang} disabled={isPending} />
-                        </form>
-                    </GcdsText>
-                </GcdsContainer>
-            <FirstTimeGc currentLang={currentLang}/>
+            <GcdsContainer>
+                <GcdsText marginTop="100" marginBottom="0">
+                    <form id="form" onSubmit={handleSubmit} >
+                        <GcdsInput
+                            inputId="email"
+                            label={pageContentJson['8']}
+                            name="email"
+                            type="email"
+                            value={state.testData != null ? state.testData.email : email}
+                            validateOn="other"
+                            onGcdsChange={(e) => { validateEmail(e.target.value) }}
+                            errorMessage={error.errorMsg}
+                            data-testid="signin-email"
+                            lang={currentLang}
+                        ></GcdsInput>
+                        <SubmitButton currentLang={currentLang} disabled={isPending} />
+                    </form>
+                </GcdsText>
+            </GcdsContainer>
+            <FirstTimeGc currentLang={currentLang} />
         </GcdsContainer>
     )
 }

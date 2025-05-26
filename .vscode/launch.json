@@ -9,7 +9,7 @@
             "request": "launch",
             "type": "chrome",
             "url": "http://localhost:3000",
-            "webRoot": "${workspaceFolder}"
+            "webRoot": "${workspaceFolder}/frontend/src"
         },
         {
             "name": "Python Debugger: FastAPI",
