@@ -16,7 +16,6 @@ export const authService = {
         return response.data;
     },
     login: async (userData) => {
-        console.log("login userData", userData);
         const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.login}`, userData);
         return response.data;
     },

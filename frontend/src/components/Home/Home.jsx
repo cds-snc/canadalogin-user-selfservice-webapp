@@ -31,35 +31,13 @@ export default function Home() {
     const { language, flow } = useParams();
     const { state, dispatch } = useUser();
     const [email, setEmail] = useState(state.userData.email);
-    const [stateId, setStateId] = useState(state.userData.stateId);
     const currentLang = getLanguage(language);
     const pageContentJson = getPageContent(currentLang, PAGES.home);
     const { setError, clearAllErrors, getError, hasErrors } = useError(currentLang);
     const error = getError('#email');
 
-    function setStateIdfromSearchParams() {
-        const outerParams = new URLSearchParams(window.location.search)
-        const targetUrl = outerParams.get("Target")
-
-        if (targetUrl) {
-            try {
-                const innerParams = new URLSearchParams(
-                    new URL(targetUrl).search
-                )
-                const state = innerParams.get("stateId")
-                setStateId(state)
-                const userData = { ...state.userData, stateId: targetUrl };
-                dispatch({ type: CONTEXT_ACTIONS.signUp, payload: userData });
-
-            } catch (err) {
-                console.error("Invalid Target URL", err)
-            }
-        }
-    }
-
     function validateEmail(email) {
         setEmail(email);
-        setStateIdfromSearchParams();
         console.log(state.userData)
         clearAllErrors();
         if (!isEmailValid(email)) {
@@ -69,11 +47,23 @@ export default function Home() {
         return true;
     }
 
-
+    function setRelyingPartyParams() {
+        const searchParams = new URLSearchParams(window.location.search)
+        const rpTargetUrl = searchParams.get("Target")
+        if (rpTargetUrl) {
+            try {
+                const userData = { ...state.userData, relyingPartyTargetValue: rpTargetUrl };
+                dispatch({ type: CONTEXT_ACTIONS.signUp, payload: userData });
+            } catch (err) {
+                console.error("Missing Target URL", err)
+            }
+        }
+    }
 
     useEffect(() => {
-        setStateIdfromSearchParams()
-    }, [])
+        setRelyingPartyParams()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const submitDataOptions = {
         endpoint: null,

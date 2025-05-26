@@ -114,11 +114,14 @@ export default function Password() {
                         userName: state.userData.email,
                         password: formData.get('password'),
                     });
-                    console.log("login ", response);
-                    console.log("user state ", state.userData.stateId);
-
-                    const redirect_url = encodeURIComponent(state.userData.stateId);
-                    window.location.href = `https://cds-gcsignin-dev.verify.ibm.com/v1.0/auth/session?access_token=${response.data.assertion}&redirect_url=${redirect_url}&scoped=false`;
+                    // If the login is successful, redirect to the relying party target URL
+                    // this is temporary and will probably be removed once the flow designer is implemented
+                    if (response.data && response.data.assertion) {
+                        const redirect_url = encodeURIComponent(state.userData.relyingPartyTargetValue);
+                        window.location.href = `https://cds-gcsignin-dev.verify.ibm.com/v1.0/auth/session?access_token=${response.data.assertion}&redirect_url=${redirect_url}&scoped=false`;
+                    } else {
+                        setError({ passwordError: response.message, heading: errorPageJson['1'] });
+                    }
 
                 }
             } catch (error) {

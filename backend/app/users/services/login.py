@@ -95,12 +95,9 @@ async def signin_with_username_password(
 async def get_user_access_token(assertion: str):
     try:
         access_token = await get_access_token()
+        headers = get_auth_request_headers(access_token, True)
+        headers["Content-Type"] = "application/x-www-form-urlencoded"
 
-        headers = {
-            "Authorization": f"Bearer {access_token}",
-            "Content-Type": "application/x-www-form-urlencoded",
-            "Accept": "application/json",
-        }
         settings = get_settings().ibm_verify_config
         get_user_access_token_url = f"{settings.IBM_VERIFY_TENANT_URL}/oauth2/token"
 

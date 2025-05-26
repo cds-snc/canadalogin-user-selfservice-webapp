@@ -22,7 +22,7 @@ const initialState = {
         stepVerified: false,
         viewPrivacy: false,
         id: null,
-        stateId: null,
+        relyingPartyTargetValue: null,
     }
 }
 
