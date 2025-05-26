@@ -73,6 +73,12 @@ export default function ManageDashboard() {
                     cardTitleTag="h3"
                 >
                 </GcdsCard></p>
+                <p><GcdsCard
+                        cardTitle="Connected services"
+                        href="#"
+                        cardTitleTag="h3"
+                    >
+                </GcdsCard></p>
 
             </GcdsGrid>
 
