@@ -8,32 +8,51 @@ import {getPageContent, isCodeValid} from '../../utils/functions.jsx';
 import AlreadyGc from "../Layout/AlreadyGc.jsx";
 import {
     AVAILABLE_LANGUAGES,
-    CONTEXT_ACTIONS,
-    FLOW_TYPES,
+    FLOW_TYPES, LINK_SUBMIT_TYPES,
     NAVIGATION_LINKS, PAGES,
-    SERVICES
+    SERVICES, SUBMIT_END_POINTS
 } from "../../utils/constants.jsx";
-import {useNavigate, useParams} from "react-router";
+import {useParams} from "react-router";
 import SubmitButton from "../Layout/SubmitButton.jsx";
 import {useUser} from "../Providers/useUser.tsx";
-import {authService} from "../../services/authService.jsx";
-import {useEffect, useState, useTransition} from "react";
-import { trackEvent } from "../../utils/gatag.jsx";
-import {GA_CATEGORIES, GA_ACTIONS, GA_LABELS} from "../../utils/constants.jsx";
+import {useEffect, useState} from "react";
+import {useLinkSubmit} from "../../hooks/useLinkSubmit.js";
+import {useSubmit} from "../../hooks/useSubmit";
+import {useError} from "../../hooks/useError";
 
 const initialTime=10;
 
 export default function Verification() {
     const {type, flow,language} = useParams();
-    const {state, dispatch} = useUser();
-    const [isPending, startTransition] = useTransition();
+    const {state} = useUser();
+    const {setError, clearAllErrors, getError, hasErrors} = useError(language);
     const [time, setTime] = useState(initialTime);
-    const [codeRequested, setCodeRequested] = useState(false);
-    const [timesRequested, setTimesRequested] = useState(2);
-    const [errorJson, setError] = useState({heading: null, codeError:null});
-    const navigate = useNavigate();
-    const errorPageJson = getPageContent(language, "Error");
     const pageContentJson = getPageContent(language, PAGES.verification);
+    const error = getError('#verificationCode');
+
+    const submitDataOptions = {
+        language,
+        endpoint: flow===FLOW_TYPES.signUp?SUBMIT_END_POINTS.transientOtpVerify:SUBMIT_END_POINTS.otpVerify,
+        navigateTo: flow===FLOW_TYPES.signUp?type===FLOW_TYPES.email? "/" + language + "/" + flow + NAVIGATION_LINKS.password:"/" + language + NAVIGATION_LINKS.coreProfile:"/" + language + '/redirecttorp',
+        page: PAGES.verification,
+        flow: flow,
+        type: type,
+        onError: (err)=> setError('#verificationCode',err)
+    };
+
+
+    const linkSubmitDataOptions = {
+        language,
+        endpoint: flow===FLOW_TYPES.signUp?SUBMIT_END_POINTS.transientOtpSend:SUBMIT_END_POINTS.otpSend,
+        navigateTo: null,
+        page: PAGES.verification,
+        flow: flow,
+        type: type,
+        onError: (err)=> setError('#verificationCode',err)
+    };
+
+    const {handleSubmit, isPending} = useSubmit(submitDataOptions, validateCode);
+    const {handleLinkSubmit, isLinkPending, codeRequested, timesRequested} = useLinkSubmit(linkSubmitDataOptions);
 
     useEffect(()=>{
         if(time<=0)
@@ -47,145 +66,22 @@ export default function Verification() {
 
     },[time]);
 
-    async function useNewVerification(){
-        setError({codeError:null, heading:null});
-        if(type===FLOW_TYPES.email){
-            navigate("/" + language + NAVIGATION_LINKS.signUp);
-        } else{
-            const userData = {...state.userData, phone:null, stepVerificationSent: false, trxnId:null};
-            await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
-            navigate("/" + language + NAVIGATION_LINKS.twoStepVerification);
+    function validateCode(code) {
+        clearAllErrors();
+        if(!isCodeValid(code)) {
+            setError('#verificationCode', '3');
+            return false;
         }
-    }
-
-    async function requestSameTypeCode (e){
-        setError({codeError:null, heading:null});
-
-        startTransition(async()=> {
-            e.preventDefault();
-            await requestNewCode(type, false);
-        })
-    }
-
-    function requestNewTypeCode(e){
-        setError({codeError:null, heading:null});
-
-        startTransition(async()=> {
-            e.preventDefault();
-            const newType =  type===FLOW_TYPES.voice?FLOW_TYPES.sms:FLOW_TYPES.voice;
-            await requestNewCode(newType, true);
-        })
-    }
-
-    async function requestNewCode(codeType, didTypeChange){
-        setError({codeError:null, heading:null});
-        try {
-            const number = state.userData.phone!==null?state.userData.phone:"";
-            const response = await authService.transientOtpSend({
-                phoneNumber: '+'+number.replace(/\D/g,''),
-                userName: state.userData.email,
-                otpType: codeType
-            });
-
-            if(response.success){
-                const userData = {...state.userData, trxnId:response.data.trxnId};
-                await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
-                setCodeRequested(true);
-                if(didTypeChange)
-                    navigate("/" + language +"/"+ flow +NAVIGATION_LINKS.verification + '/' +codeType);
-            }else {
-                console.log("Error....", response);
-                setError({codeError: response.message, heading: errorPageJson['1']});
-            }
-        } catch (error) {
-            console.error('Server error:', error);
-            setError({codeError: errorPageJson[7], heading: errorPageJson['1']});
-        }
-
-        setTimesRequested(prevState => prevState + 1);
-        setTime(initialTime * timesRequested);
-    }
-
-    function  handleSubmit (e){
-        startTransition(async()=> {
-            e.preventDefault();
-            trackEvent({
-                category: GA_CATEGORIES.onboarding,
-                action: GA_ACTIONS.submitSignUpEmailOTP,
-                label: GA_LABELS.email
-            });
-
-            const formData = new FormData(e.target);
-            const formCode = formData.get('verificationCode');
-            setCodeRequested(false);
-            if (!isCodeValid(formCode)) {
-                setError({codeError: errorPageJson[3], heading: errorPageJson['1']});
-                return;
-            }
-            setError({codeError:null, heading:null});
-
-            try {
-                const response = await authService.transientOtpVerify({
-                    otp: formCode,
-                    otpType: type,
-                    trxnId: state.userData.trxnId,
-                    userName: state.userData.email  //part of TEST_USERS, not needed if removed
-                });
-                if(response.success){
-                    trackEvent({
-                        category: GA_CATEGORIES.onboarding,
-                        action: GA_ACTIONS.submitSignUpEmailOTPSuccess,
-                        label: GA_LABELS.email
-                    });
-                    if(flow===FLOW_TYPES.signUp) {
-                        if(type===FLOW_TYPES.email)
-                        {
-                            const userData = {...state.userData, emailValidated: true};
-                            await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
-                            console.log("success...sign up", response);
-                            navigate("/" + language + "/"+flow+NAVIGATION_LINKS.password);
-                        }else                        {
-                            const userData = {...state.userData, stepVerified: true};
-                            await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
-                            console.log("success...sign up", response);
-                            navigate("/" + language + NAVIGATION_LINKS.coreProfile);
-                        }
-                    }else if(flow===FLOW_TYPES.signIn){
-                        const userData = {...state.userData, stepVerified: true};
-                        await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
-                        console.log("success...sign in", response);
-                        navigate("/" + language + '/redirecttorp');
-                    }
-                }else {
-                    trackEvent({
-                        category: GA_CATEGORIES.onboarding,
-                        action: GA_ACTIONS.submitSignUpEmailOTPFailure,
-                        label: GA_LABELS.email
-                    });
-                    console.log("Error....", response);
-                    setError({codeError: response.message, heading: errorPageJson['1']});
-                }
-            } catch (error) {
-                trackEvent({
-                    category: GA_CATEGORIES.onboarding,
-                    action: GA_ACTIONS.submitSignUpEmailOTPError,
-                    label: GA_LABELS.email
-                });
-                console.error('Signup error:', error);
-                setError({codeError:  errorPageJson[7], heading: errorPageJson['1']});
-            }
-        })
+        return true;
     }
 
     return (
-        <GcdsContainer className="gcds-content" >
+        <GcdsContainer>
             {
-                errorJson.codeError!==null&&(
-                    <GcdsErrorSummary
-                        errorLinks={`{"#verificationCode": "${errorJson.codeError}"}`}
-                        heading={errorJson.heading}
-                        data-testid="errorSummary"
-                    />)
+                hasErrors()&&(<GcdsErrorSummary data-testid='errorSummary'
+                                                errorLinks={`{"#verificationCode": "${error.errorMsg}"}`}
+                                                heading={ error.heading}
+                />)
             }
             {codeRequested &&(<GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={pageContentJson['17']} data-testid="linkSuccess">&nbsp;</GcdsNotice>)}
             {
@@ -236,7 +132,7 @@ export default function Verification() {
                 {
                     flow===FLOW_TYPES.signIn&&(
                         <GcdsText>
-                            <GcdsLink href="#" onClick={useNewVerification}>
+                            <GcdsLink href="#" onClick={()=>handleLinkSubmit(LINK_SUBMIT_TYPES.useNewVerification, false)}>
                                 {pageContentJson['21']}
                             </GcdsLink>
                         </GcdsText>
@@ -249,7 +145,7 @@ export default function Verification() {
                         </GcdsHeading>
                     )
                 }
-                <form id="form"  onSubmit={handleSubmit}>
+                <form id="form" onSubmit={handleSubmit}>
                     {
                         state.testData!==undefined&&(<GcdsInput
                         inputId="verificationCode"
@@ -258,8 +154,9 @@ export default function Verification() {
                         value={state.testData.otp}
                         type="text"
                         validateOn="other"
-                        errorMessage={errorJson.codeError}
+                        errorMessage={error.errorMsg}
                         lang={language}
+                        size="6"
                         required ></GcdsInput>)
                     }
                     {
@@ -269,11 +166,12 @@ export default function Verification() {
                         name="verificationCode"
                         type="text"
                         validateOn="other"
-                        errorMessage={errorJson.codeError}
+                        errorMessage={error.errorMsg}
                         lang={language}
+                        size="6"
                         required ></GcdsInput>)
                     }
-                    <SubmitButton currentLang={language} disabled={isPending}/>
+                    <SubmitButton currentLang={language} disabled={isPending&&isLinkPending}/>
                 </form>
             </GcdsContainer>
             <GcdsHeading tag='h2'>
@@ -282,7 +180,7 @@ export default function Verification() {
             {
                 flow===FLOW_TYPES.signUp&&(
                     <GcdsText>
-                        <GcdsLink href="#" onClick={useNewVerification}>
+                        <GcdsLink href="#" onClick={()=>handleLinkSubmit(LINK_SUBMIT_TYPES.useNewVerification, false)}>
                             {type===FLOW_TYPES.email?pageContentJson['25']:pageContentJson['13']}
                         </GcdsLink>
                     </GcdsText>
@@ -291,7 +189,12 @@ export default function Verification() {
             {
                 type!==FLOW_TYPES.email&&(
                     <GcdsText>
-                        {time<=0 && !isPending?(<GcdsLink href="#" onClick={requestNewTypeCode}>
+                        {time<=0 && !isPending?(<GcdsLink href="#" onClick={()=>{
+                            clearAllErrors();
+                            handleLinkSubmit(LINK_SUBMIT_TYPES.requestNewCode, true).then(()=>setTime(initialTime*timesRequested));
+                            document.getElementById("form").reset();
+                            }
+                        }>
                             {type===FLOW_TYPES.voice?pageContentJson['12']:pageContentJson['11']}
                         </GcdsLink>):""}
                     </GcdsText>
@@ -299,11 +202,16 @@ export default function Verification() {
             }
             <GcdsText>
                 {time>0 && !isPending?(<span>{pageContentJson['14']}<strong> {time} {pageContentJson['15']}</strong></span>)
-                    :!isPending?(<GcdsLink href="#" onClick={requestSameTypeCode} >
+                    :!isPending?(<GcdsLink href="#" onClick={()=>{
+                        clearAllErrors();
+                        handleLinkSubmit(LINK_SUBMIT_TYPES.requestNewCode, false).then(()=>setTime(initialTime*timesRequested));
+                        document.getElementById("form").reset();
+                        }
+                    }>
                         {type!==FLOW_TYPES.email?pageContentJson['16']:pageContentJson['26']}
                     </GcdsLink>):""}
             </GcdsText>
-            {flow===FLOW_TYPES.signUp&&(<AlreadyGc currentLang={language}/>)}
+            {flow===FLOW_TYPES.signUp&&type===FLOW_TYPES.email&&(<AlreadyGc currentLang={language}/>)}
         </GcdsContainer>
     )
 }

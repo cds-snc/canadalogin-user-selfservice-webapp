@@ -10,67 +10,56 @@ import SubmitButton from "../../Layout/SubmitButton.jsx";
 import AlreadyGc from "../../Layout/AlreadyGc.jsx";
 import { useParams } from "react-router";
 import {AVAILABLE_LANGUAGES, PAGES, SERVICES} from "../../../utils/constants.jsx";
-import {useUser} from "../../Providers/useUser.tsx";
-import {CONTEXT_ACTIONS} from "../../../utils/constants.jsx";
-import {useNavigate} from "react-router";
 import {NAVIGATION_LINKS} from "../../../utils/constants.jsx";
-import { trackEvent } from "../../../utils/gatag.jsx";
-import {GA_CATEGORIES, GA_ACTIONS, GA_LABELS} from "../../../utils/constants.jsx";
+import {useSubmit} from "../../../hooks/useSubmit.js";
+
 
 export default function Privacy() {
-    const { language } = useParams();
-    const {state, dispatch} = useUser();
-    const navigate = useNavigate();
-
-    async function handleSubmit(event) {
-        event.preventDefault();
-        trackEvent({
-            category: GA_CATEGORIES.onboarding,
-            action: GA_ACTIONS.acceptPrivacy,
-            label: GA_LABELS.button
-          });
-
-        const userData = { ...state.userData, viewPrivacy: true };
-        await dispatch({ type: CONTEXT_ACTIONS.signUp, payload: userData });
-        navigate("/" + language + NAVIGATION_LINKS.signUp);
-    }
-
+    const { language, flow } = useParams();
     const pageContentJson = getPageContent(language, PAGES.privacy);
+
+    const submitDataOptions = {
+        endpoint: null,
+        navigateTo: "/" + language + NAVIGATION_LINKS.signUp,
+        type: null,
+        page: PAGES.privacy,
+        flow: flow,
+        onError: null
+    };
+    const {handleSubmit, isPending} = useSubmit(submitDataOptions, null );
 
     return (
         <GcdsContainer>
              <form  id="form"  onSubmit={handleSubmit}>
             <GcdsHeading tag='h1'>
                 {pageContentJson['1']}
-                <GcdsText marginTop="150" marginBottom="0">
-                    {pageContentJson['2']}
-                    <strong>
-                        {language === AVAILABLE_LANGUAGES.fr ? ' ' + pageContentJson['3'] + ' ' : ''}
-                        {` ${SERVICES[0].title}`}{language === AVAILABLE_LANGUAGES.en ? ' ' + pageContentJson['3'] : ''}
-                    </strong>
-                </GcdsText>
             </GcdsHeading>
+             <GcdsText>
+                 <span>{pageContentJson['2']}</span> <strong>{pageContentJson['46']}</strong> {pageContentJson['47']}
+                 <strong>
+                     {language===AVAILABLE_LANGUAGES.fr?' '+pageContentJson['3']+' ':<br/>}
+                     {` ${SERVICES[0].title}`}{language!==AVAILABLE_LANGUAGES.fr?' '+pageContentJson['3']:''}
+                 </strong>
+             </GcdsText>
             <GcdsDetails detailsTitle={pageContentJson['42']}>
                 <GcdsText>
-                <span>{pageContentJson['43']}</span>
+                    {pageContentJson['43']}
                 </GcdsText>
                 <GcdsText>
-                <span>{pageContentJson['44']}</span>
+                    {pageContentJson['44']}
                 </GcdsText>
                 <GcdsText>
-                <span>{pageContentJson['45']}</span>
+                    {pageContentJson['45']}
                 </GcdsText>
             </GcdsDetails>
             <GcdsHeading tag='h2'>
                 {pageContentJson['5']}
             </GcdsHeading>
-            <GcdsText>{pageContentJson['6']}
-            </GcdsText>
-            <ul>
-                <li>{pageContentJson['7']}</li>
-                <li>{pageContentJson['8']}</li>
-            </ul>
-            <GcdsText>
+                 <GcdsText><span>{pageContentJson['6']}</span>
+                <ul style={{margin: 0}}>
+                    <li>{pageContentJson['7']}</li>
+                    <li>{pageContentJson['8']}</li>
+                </ul>
                 {pageContentJson['9']}{" "}
                 <strong>{pageContentJson['10']}</strong> {pageContentJson['11']}{" "}
                 <GcdsLink href="#" >{pageContentJson['12']}</GcdsLink>
@@ -103,13 +92,13 @@ export default function Privacy() {
                 <span> {pageContentJson['38']} </span><GcdsLink href="#" lang="en"><span>{pageContentJson['39']}</span></GcdsLink>:
                 </GcdsText>
 
-                <GcdsText>
+                <GcdsText className="privacy-notice">
                     <GcdsLink href={`mailto:${pageContentJson['40']}`}>{pageContentJson['40']}</GcdsLink><br />
                     <span> {pageContentJson['41']}</span>
                 </GcdsText>
             </GcdsDetails>
             <br />
-            <SubmitButton currentLang={language} />
+            <SubmitButton currentLang={language} disabled={isPending} />
             <AlreadyGc currentLang={language} />
             </form>
         </GcdsContainer>

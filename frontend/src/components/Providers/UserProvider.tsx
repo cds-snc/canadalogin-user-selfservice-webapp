@@ -22,6 +22,11 @@ const initialState = {
         stepVerified: false,
         viewPrivacy: false,
         id: null,
+        otpType: null,
+        passwordValidated: false
+        stepVerified: false,
+        viewPrivacy: false,
+        id: null,
         relyingPartyTargetValue: null,
     }
 }

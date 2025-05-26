@@ -1,7 +1,13 @@
 import axios from 'axios';
 import config from '../config';
 import { FLOW_TYPES, SUBMIT_END_POINTS } from "../utils/constants.jsx";
-import { ERROR_RESPONSE, SUCCESS_RESPONSE, TEST_RESPONSES, TEST_USERS } from "../stories/Tests/utils/constants.jsx";
+import {
+    ERROR_RESPONSE, TEST_PROTOTYPES,
+    SUCCESS_RESPONSE,
+    TEST_RESPONSES,
+    TEST_USERS,
+    VALIDATION_CODE_ERROR_RESPONSE
+} from "../stories/Tests/utils/constants.jsx";
 
 export const authService = {
     requestPasswordPolicy: async () => {
@@ -24,7 +30,6 @@ export const authService = {
             return buildTestResponse(userData, "transientOtpSend");
 
         const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.transientOtpSend}`, userData);
-
         return response.data;
     },
     transientOtpVerify: async (userData) => {
@@ -32,16 +37,39 @@ export const authService = {
             return buildTestResponse(userData, "transientOtpVerify");
 
         const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.transientOtpVerify}`, userData);
-
         return response.data;
     },
     createCoreProfile: async (userData) => {
-        if (TEST_USERS.has(userData.userName))
+        if (TEST_USERS.has(userData.userName)) {
+            //for un-moderated testing purposes
+            openPrototypeWindow('signUpRedirect');
             return SUCCESS_RESPONSE;
+        }
 
         const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.createCoreProfile}`, userData);
         return response.data;
-    }
+    },
+    //logic will need to be updated once backend has been completed
+    login: async (userData) => {
+        if (TEST_USERS.has(userData.userName))
+            return buildTestResponse(userData, "login");
+        const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.login}`, userData);
+        return response.data;
+    },
+    otpSend: async (userData) => {
+        if (TEST_USERS.has(userData.userName))
+            return buildTestResponse(userData, "otpSend");
+
+        const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.otpSend}`, userData);
+        return response.data;
+    },
+    otpVerify: async (userData) => {
+        if (TEST_USERS.has(userData.userName))
+            return buildTestResponse(userData, "otpVerify");
+
+        const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.otpVerify}`, userData);
+        return response.data;
+    },
 }
 
 function buildTestResponse(userData, type) {
@@ -58,12 +86,41 @@ function buildTestResponse(userData, type) {
             else if (userData.otpType === FLOW_TYPES.voice && (userData.otp === TEST_USERS.get(userData.userName).voiceOtp))
                 return TEST_RESPONSES.verificationVoiceResponse;
 
-            return ERROR_RESPONSE;
+            throw { response: VALIDATION_CODE_ERROR_RESPONSE };
         case "transientOtpSend":
             if (userData.otpType === FLOW_TYPES.email) {
                 response = TEST_RESPONSES.signUpResponse;
                 response.data.phoneNumber = null;
             } else if (userData.otpType === FLOW_TYPES.voice) {
+                response = TEST_RESPONSES.verificationVoiceSetUpResponse;
+                response.data.phoneNumber = userData.phoneNumber;
+            } else {
+                response = TEST_RESPONSES.verificationSmsSetUpResponse;
+                response.data.phoneNumber = userData.phoneNumber;
+            }
+
+            response.data.emailAddress = userData.userName;
+            expires.setMinutes(expires.getMinutes() + 5);
+            response.data.created = now.toISOString();
+            response.data.expiry = expires.toISOString();
+            //for un-moderated testing purposes
+            openPrototypeWindow(userData.otpType);
+
+            return response;
+        case "otpVerify":
+            if (userData.otpType === FLOW_TYPES.sms && (userData.otp === TEST_USERS.get(userData.userName).smsOtp)) {
+                TEST_RESPONSES.verificationSmsResponse.message = "Sign in sms OTP has been validated"
+                return TEST_RESPONSES.verificationSmsResponse;
+            }
+            else if (userData.otpType === FLOW_TYPES.voice && (userData.otp === TEST_USERS.get(userData.userName).voiceOtp)) {
+                TEST_RESPONSES.verificationVoiceResponse.message = "Sign in voice OTP has been validated"
+                return TEST_RESPONSES.verificationVoiceResponse;
+            }
+
+            throw { response: VALIDATION_CODE_ERROR_RESPONSE };
+        case "otpSend":
+            console.log("sending for ", userData.otpType)
+            if (userData.otpType === FLOW_TYPES.voice) {
                 response = TEST_RESPONSES.verificationVoiceSetUpResponse;
                 response.data.phoneNumber = userData.phoneNumber;
             } else {
@@ -81,5 +138,39 @@ function buildTestResponse(userData, type) {
             response = TEST_RESPONSES.passwordResponse;
             response.data.userName = userData.userName;
             return response;
+        case 'login':
+            if (userData.password === TEST_USERS.get(userData.userName).login) {
+                response = SUCCESS_RESPONSE;
+                response.data.id = '155151-68967896-997097';
+                response.data.phone = '+1(***) ***-1234'
+                response.data.otpType = FLOW_TYPES.sms;
+                return response;
+            }
+            return ERROR_RESPONSE;
+
+
+    }
+}
+
+function openPrototypeWindow(otpType) {
+
+    const prototypeUrlsMap = TEST_PROTOTYPES.get(otpType);
+    if (isMobileMediaQuery()) {
+        // Code for mobile devices
+        window.open(prototypeUrlsMap.mobileUrl, '_blank').focus();
+        console.log("Mobile device detected for " + otpType);
+    } else {
+        // Code for non-mobile devices
+        window.open(prototypeUrlsMap.desktopUrl, '_blank').focus();
+        console.log("Non-mobile device detected for " + otpType);
+    }
+}
+
+export function isMobileMediaQuery() {
+    try {
+        return window.matchMedia("(max-width: 767px)").matches;
+    } catch (error) {
+        console.log(error.message);
+        return false;
     }
 }

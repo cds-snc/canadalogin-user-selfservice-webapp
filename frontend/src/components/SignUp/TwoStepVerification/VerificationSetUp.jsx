@@ -5,95 +5,61 @@ import {
     GcdsText
 } from "@cdssnc/gcds-components-react";
 import {getPageContent} from '../../../utils/functions';
-import {CONTEXT_ACTIONS, countryMapping, FLOW_TYPES, NAVIGATION_LINKS, PAGES} from "../../../utils/constants.jsx";
+import {
+    countryMapping,
+    FLOW_TYPES,
+    NAVIGATION_LINKS,
+    PAGES,
+    SUBMIT_END_POINTS
+} from "../../../utils/constants.jsx";
 import SubmitButton from "../../Layout/SubmitButton.jsx";
-import {useState, useTransition} from 'react';
+import {useState} from 'react';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/material.css';
 import {useUser} from "../../Providers/useUser.tsx";
-import {authService} from "../../../services/authService.jsx";
-import {useNavigate, useParams} from "react-router";
-import { trackEvent } from "../../../utils/gatag.jsx";
-import {GA_CATEGORIES, GA_ACTIONS} from "../../../utils/constants.jsx";
+import {useParams} from "react-router";
+import {useSubmit} from "../../../hooks/useSubmit.js";
+import {useError} from "../../../hooks/useError.js";
 
 export default function VerificationSetUp() {
-    const {state, dispatch} = useUser();
-    const {language} = useParams();
+    const {state} = useUser();
+    const {language, flow} = useParams();
     const [phone, setPhone] = useState('');
     const [countryCodeLength, setCountryCodeLength] = useState(0);
-    const [errorJson, setError] = useState({heading: null, phoneError:null});
-    const [isPending, startTransition] = useTransition();
-    const navigate = useNavigate();
     const pageContentJson = getPageContent(language, PAGES.verificationSetUp);
-    const errorPageJson = getPageContent(language, "Error");
+    const {setError, getError, hasErrors, clearAllErrors} = useError(language);
+    const error = getError('#phone');
+    const errorPageJson = getPageContent(language, PAGES.error);
 
-    function  handleSubmit (e){
-        startTransition(async()=> {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const formNumber = await formData.get('phone').replace(/\D/g,'');
-            const formType = formData.get('verificationType');
-            trackEvent({
-                category: GA_CATEGORIES.onboarding,
-                action: GA_ACTIONS.submitPhoneNumberOTPType,
-                label: formType
-            });
-
-            if (phone.length < countryCodeLength) {
-                if(phone.length===0)
-                    setError({phoneError: errorPageJson[10], heading: errorPageJson['1']});
-                else
-                    setError({phoneError: errorPageJson[8]+countryCodeLength+errorPageJson[9], heading: errorPageJson['1']});
-
-                return;
-            }
-            await setError({phoneError:null, heading:null});
-            try {
-                const response = await authService.transientOtpSend({
-                    phoneNumber: '+'+formNumber,
-                    otpType: formType,
-                    userName: state.userData.email
-                });
-                console.log(response);
-                if(response.success){
-                    trackEvent({
-                        category: GA_CATEGORIES.onboarding,
-                        action: GA_ACTIONS.submitPhoneNumberOTPSuccess,
-                        label: formType
-                    });
-                    const userData = {...state.userData, phone:formData.get('phone'), stepVerificationSent: true, trxnId:response.data.trxnId};
-                    await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
-                    console.log("success....", response);
-                    navigate("/" + language +"/"+FLOW_TYPES.signUp +NAVIGATION_LINKS.verification+'/'+formType);
-                }else {
-                    trackEvent({
-                        category: GA_CATEGORIES.onboarding,
-                        action: GA_ACTIONS.submitPhoneNumberOTPFailure,
-                        label: formType
-                    });
-                    console.log("Error....", response);
-                    setError({phoneError: response.message, heading: errorPageJson['1']});
-                }
-            } catch (error) {
-                trackEvent({
-                    category: GA_CATEGORIES.onboarding,
-                    action: GA_ACTIONS.submitPhoneNumberOTPError,
-                    label: formType
-                });
-                console.error('Signup error:', error);
-                setError({phoneError:  errorPageJson[7], heading: errorPageJson['1']});
-            }
-        })
+    function validatePhone() {
+        clearAllErrors();
+        if (phone.length < countryCodeLength) {
+            if (phone.length === 0)
+                setError('#phone', '10');
+            else
+                setError('#phone', errorPageJson[8] + countryCodeLength + errorPageJson[9]);
+            return false;
+        }
+        return true;
     }
 
+    const submitDataOptions = {
+        endpoint: SUBMIT_END_POINTS.transientOtpSend,
+        navigateTo: "/" + language + "/" + FLOW_TYPES.signUp + NAVIGATION_LINKS.verification,
+        type: null,
+        page: PAGES.verificationSetUp,
+        flow: flow,
+        onError: (err)=> setError('#phone',err)
+    };
+    const {handleSubmit, isPending} = useSubmit(submitDataOptions, validatePhone );
+
     return (
-        <GcdsContainer className="gcds-content" >
+        <GcdsContainer>
             <GcdsContainer>
                 {
-                    errorJson.phoneError!==null&&(<GcdsErrorSummary
-                        errorLinks={`{"#phone": "${errorJson.phoneError}"}`}
-                        heading={errorJson.heading}
-                        data-testid="errorSummary"
+                    hasErrors()&&(<GcdsErrorSummary data-testid='errorSummary'
+                                                    errorLinks={`{"#phone": "${error.errorMsg}"}`}
+                                                    heading={error.heading}
                     />)
                 }
                 <GcdsContainer className="gcds-gap" >
@@ -110,7 +76,7 @@ export default function VerificationSetUp() {
                                 {pageContentJson['2']}
                             </GcdsText>
                             <GcdsText>
-                                <GcdsLink href={`/${language}${NAVIGATION_LINKS.signUp}`} >
+                                <GcdsLink href='#' onClick={()=> window.open('https://gc-signin.cdssandbox.xyz/en/get-started/two-step-verification-methods/', '_blank').focus()}>
                                     {pageContentJson['3']}
                                 </GcdsLink>
                             </GcdsText>
@@ -121,7 +87,7 @@ export default function VerificationSetUp() {
                                 {pageContentJson['5']}
                             </GcdsText>
                             <GcdsText>
-                                <span>{pageContentJson['6']}</span> <GcdsLink href={`/${language}${NAVIGATION_LINKS.signUp}`} >{pageContentJson['7']}</GcdsLink> {pageContentJson['8']}
+                                <span>{pageContentJson['6']}</span> <GcdsLink href='#'> {pageContentJson['7']}</GcdsLink> {pageContentJson['8']}
                             </GcdsText>
                         </GcdsContainer>
                         <GcdsContainer padding="200">
@@ -143,8 +109,7 @@ export default function VerificationSetUp() {
                             defaultErrorMessage={"Phone number is required"}
                             onChange={phone =>  setPhone(phone)}
                             isValid={(inputNumber, country) => {
-                                setCountryCodeLength(country.format.replace(/[^.]/g,'').length)
-                                return errorJson.phoneError===null;
+                                try {setCountryCodeLength(country.format.replace(/[^.]/g, '').length);} catch(err){setError('#server', err)}
                             }}
                         />
                         <br />

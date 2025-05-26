@@ -9,21 +9,6 @@ class UserName(BaseModel):
     userName: EmailStr
 
 
-class EmailOtpResponse(BaseModel):
-    model_config = ConfigDict(populate_by_name=True)
-
-    id: str = Field(alias="trxnId")
-    type: str
-    created: str
-    updated: str
-    expiry: str
-    state: str
-    correlation: str = Field(alias="correlationID")
-    emailAddress: str
-    attempts: int
-    retries: int
-
-
 class OtpType(str, Enum):
     SMS = "sms"
     EMAIL = "email"
@@ -44,17 +29,13 @@ class AuthenticatedUserResponse(ResponseModel):
     data: AuthenticatedUserData
 
 
-class EmailOtpRequestResponse(ResponseModel):
-    data: EmailOtpResponse
-
-
 class UserOtpInfo(BaseModel):
     phoneNumber: Optional[PhoneNumber] = None
     userName: EmailStr
     otpType: OtpType
 
 
-class OtpSentResponse(BaseModel):
+class OtpDataResponse(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
     id: str = Field(alias="trxnId")
     type: str
@@ -70,10 +51,15 @@ class OtpSentResponse(BaseModel):
 
 
 class OtpRequestResponse(ResponseModel):
-    data: OtpSentResponse
+    data: OtpDataResponse
 
 
 class UserOtpVerificationInfo(BaseModel):
     otp: str
+    trxnId: str
+    otpType: OtpType
+
+
+class RetrievalData(BaseModel):
     trxnId: str
     otpType: OtpType

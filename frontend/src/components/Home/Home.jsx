@@ -28,7 +28,7 @@ import { useParams } from "react-router";
 console.log("Config URL", config.apiUrl);
 
 export default function Home() {
-    const { language, flow } = useParams();
+    const { language } = useParams();
     const { state, dispatch } = useUser();
     const [email, setEmail] = useState(state.userData.email);
     const currentLang = getLanguage(language);
@@ -69,7 +69,7 @@ export default function Home() {
         navigateTo: "/" + currentLang + "/" + FLOW_TYPES.signIn + NAVIGATION_LINKS.password,
         type: FLOW_TYPES.email,
         page: PAGES.home,
-        flow: flow,
+        flow: FLOW_TYPES.signIn,
         onError: (err) => setError('#email', err)
     };
     const { handleSubmit, isPending } = useSubmit(submitDataOptions, validateEmail);
@@ -77,7 +77,7 @@ export default function Home() {
 
     console.log("Config URL", config.apiUrl);
     return (
-        <GcdsContainer className="gcds-content" >
+        <GcdsContainer>
             <GcdsContainer>
                 {
                     hasErrors() && (<GcdsErrorSummary data-testid='errorSummary'

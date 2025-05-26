@@ -6,8 +6,8 @@ from httpx import AsyncClient
 
 from app.config import get_settings
 from app.otp.schemas import OtpType, UserOtpVerificationInfo
-from app.utils.access_token import get_access_token, get_auth_request_headers
-from app.utils.helpers import generate_error_response
+from app.utils.access_token import get_admin_token, get_auth_request_headers
+from app.utils.helpers import generate_error_response, format_error_response
 from app.utils.schemas import ResponseModel
 
 logger = logging.getLogger(__name__)
@@ -36,8 +36,10 @@ async def handle_otp_verification(
             logger.error(
                 f"Failed to verify {user_verification_data.otpType} OTP. Response: {otp_verification_response.json()}"
             )
+
             return generate_error_response(
-                otp_verification_response.status_code, otp_verification_response.json()
+                otp_verification_response.status_code,
+                format_error_response(otp_verification_response.json()),
             )
 
         return ResponseModel(  # Plain ResponseModel since the response has no content
@@ -71,7 +73,7 @@ async def verify_otp(
             "otp": user_verification_data.otp,
         }
 
-        access_token = await get_access_token()
+        access_token = await get_admin_token(global_http_client)
         headers = get_auth_request_headers(access_token, True)
         settings = get_settings().ibm_verify_config
 

@@ -205,7 +205,9 @@ function buildMswMapping(mswArray:Array<MSW>){
 }
 
 export const Template = (args:any) =>   {
-    return(<UserProvider><Page page={args.page}/></UserProvider>);
+    TestDataUserProvider.userData.phone = args.phone;
+    TestDataUserProvider.userData.otpType = args.otpType;
+    return(<UserProvider initial={TestDataUserProvider}><Page page={args.page}/></UserProvider>);
 }
 
 
@@ -213,6 +215,9 @@ export const TestTemplate = (args:any) =>   {
 
     TestDataUserProvider.userData.email =  args.email;
     TestDataUserProvider.userData.phone = args.phone;
+    TestDataUserProvider.userData.id = args.id;
+    TestDataUserProvider.userData.otpType = args.otpType;
+    TestDataUserProvider.userData.passwordValidated = args.passwordValidated;
 
     TestDataUserProvider.testData.otp = args.otp;
     TestDataUserProvider.testData.firstName = args.firstName;

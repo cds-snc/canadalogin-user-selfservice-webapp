@@ -23,6 +23,9 @@ const GCDS_TAG_ATTRIBUTES = {
     'gcds-fieldset': {
         attributes: ["fieldset-id", "hint", "legend"]
     },
+    'gcds-fieldset2': {
+        attributes: ["fieldset-id", "legend"]
+    },
     'gcds-radio-group': {
         attributes: ["name", "options"]
     },
@@ -78,19 +81,14 @@ const pageSetup = {
     button: (language: string) => {
         return language !== AVAILABLE_LANGUAGES.fr ? engJson['Button'] : frJson['Button'];
     },
-    alreadyGc: (page:string, language:string, flow:string) =>{
+    alreadyGc: (page:string, language:string, flow:string, type:string) =>{
         switch(page) {
             case PAGES.home:
                 return language !== AVAILABLE_LANGUAGES.fr ? engJson["FirstTimeGc"] : frJson["FirstTimeGc"];
             case PAGES.signup:
                 return language !== AVAILABLE_LANGUAGES.fr ? engJson["AlreadyGc"] : frJson["AlreadyGc"];
-            case PAGES.password:
-                if(flow===FLOW_TYPES.signUp)
-                    return language !== AVAILABLE_LANGUAGES.fr ? engJson["AlreadyGc"] : frJson["AlreadyGc"];
-                else
-                    return null;
             case PAGES.verification:
-                if (flow === FLOW_TYPES.signUp)
+                if (flow === FLOW_TYPES.signUp && (type === FLOW_TYPES.email))
                     return language !== AVAILABLE_LANGUAGES.fr ? engJson["AlreadyGc"] : frJson["AlreadyGc"];
                 else
                     return null;
@@ -146,6 +144,10 @@ const pageSetup = {
                 return ['9', '13', '15', '17', '18', '19'];
             case PAGES.privacy:
                 return ['11','25','27','42'];
+            case PAGES.verificationSelection:
+                return ['6','7'];
+            case PAGES.coreProfile:
+                return ['1'];
             default:
                 return [];
         }
@@ -180,6 +182,8 @@ const pageSetup = {
                 return '20';
             case PAGES.privacy:
                 return '3';
+            case PAGES.verificationSelection:
+                return '3';
             default:
                 return null;
         }
@@ -200,6 +204,8 @@ const pageSetup = {
                 return pageSetup.coreProfileSetUpGcdsMap(pageContentJson);
             case PAGES.privacy:
                 return pageSetup.privacyGcdsMap(pageContentJson);
+            case PAGES.verificationSelection:
+                return pageSetup.verificationSelectionGcdsMap(pageContentJson)
             default:
                 return new Map();
         }
@@ -261,7 +267,6 @@ const pageSetup = {
     coreProfileSetUpGcdsMap: (pageContentJson: JSON) => {
 
         const gcdsElementMap = new Map();
-        gcdsElementMap.set('1', ['gcds-notice', createMap('gcds-notice', [pageContentJson['1'], 'h2', 'success'])]);
         gcdsElementMap.set('7', ['gcds-input', createMap('gcds-input3', ["firstName", pageContentJson['7'], 'firstName', 'text'])]);
         gcdsElementMap.set('8', ['gcds-input', createMap('gcds-input', ["lastName", pageContentJson['8'], 'lastName', 'text', 'other'])]);
 
@@ -271,19 +276,29 @@ const pageSetup = {
         const gcdsElementMap = new Map();
         gcdsElementMap.set('23', ['gcds-details', createMap('gcds-details', [pageContentJson['23']])])
         return gcdsElementMap;
-    }
+    },
+    verificationSelectionGcdsMap: (pageContentJson: JSON) => {
+        const gcdsElementMap = new Map();
+        gcdsElementMap.set('4', ['gcds-fieldset', createMap('gcds-fieldset2', ['gcds-email-fieldset', pageContentJson['4']])]);
+        const options = '['+
+            `{"label": "+1(***) ***-1234",`+
+            `"hint": "${pageContentJson['5']} (${pageContentJson['7']})",`+
+            `"id": "english", "value": "+1(***) ***-1234","checked":"true"}`+
+            `]`
+        gcdsElementMap.set('5', ['gcds-radio-group', createMap('gcds-radio-group', ['number', options])]);
 
+        return gcdsElementMap;
+    }
 }
 
 const testSuite = {
     parameters: (language: string, page: string, flow: string, type: string, link: string) => {
-
         return {
             language: language,
             pageContentJson: language !== AVAILABLE_LANGUAGES.fr ? engJson[page] : frJson[page],
             langLink: link,
             buttonJson: pageSetup.button(language),
-            alreadyGcJson: pageSetup.alreadyGc(page, language, flow),
+            alreadyGcJson: pageSetup.alreadyGc(page, language, flow, type),
             stepper: pageSetup.stepper(page, language, flow, type),
             textKeysToNotSearch: pageSetup.textKeysToNotSearch(page, flow, type),
             isVoice: type === FLOW_TYPES.voice,

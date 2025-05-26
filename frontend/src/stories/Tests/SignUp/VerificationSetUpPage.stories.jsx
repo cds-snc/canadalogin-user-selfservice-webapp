@@ -7,15 +7,14 @@ import {
 import {getPageContent} from "../../../utils/functions.jsx";
 import {
     ACTION_TYPES,
-    ERROR_RESPONSE,
-    MSW_MOCKS,
+    MSW_MOCKS, PHONE_NUMBER_ERROR_RESPONSE,
     TEST_TYPES,
     TEST_USERS
 } from "../utils/constants.jsx";
 import {buildTestCase, testCase, TestTemplate} from "../utils/functions.tsx";
 
-const engErrorPageJson = getPageContent('en', "Error");
-const frErrorPageJson = getPageContent('fr', "Error");
+const engErrorPageJson = getPageContent(AVAILABLE_LANGUAGES.en, PAGES.error);
+const frErrorPageJson = getPageContent(AVAILABLE_LANGUAGES.fr, PAGES.error);
 
 export default {
     title: 'GC Sign In/Tests/Sign Up/Verification Set Up Page',
@@ -105,7 +104,7 @@ FrDigitErrorFrontEnd.play = async ({ canvasElement, step }) => {
 
 ErrorBackEnd.parameters = buildTestCase.parameters(NAVIGATION_LINKS.twoStepVerification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp },
-    [MSW_MOCKS.transientOtpSend.error]);
+    [MSW_MOCKS.transientOtpSend.phoneError]);
 ErrorBackEnd.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -114,7 +113,7 @@ ErrorBackEnd.play = async ({ canvasElement, step }) => {
         stepMessage:"Submit form with Phone number in English for back end error test",
         link: 'phone',
         heading: engErrorPageJson[1],
-        message: ERROR_RESPONSE.message,
+        message: PHONE_NUMBER_ERROR_RESPONSE.data.message,
         delay: 1000,
         actionType: ACTION_TYPES.submit,
         type: TEST_TYPES.error,

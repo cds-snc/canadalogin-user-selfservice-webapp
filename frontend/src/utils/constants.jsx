@@ -7,7 +7,8 @@ export const NAVIGATION_LINKS = {
     verification: '/verification',
     coreProfile: '/signup/profile',
     privacy: '/signup/privacy',
-    home: '/'
+    home: '/',
+    verificationSelection: '/signin/selectverification',
 };
 export const CONTEXT_ACTIONS = {
     signUp: 'SIGN_UP',
@@ -23,6 +24,13 @@ export const FLOW_TYPES = {
     email: "email"
 }
 
+export const LINK_SUBMIT_TYPES = {
+    useNewVerification: 'useNewVerification',
+    requestNewCode: 'requestNewCode'
+}
+
+export const FORM_FIELDS = ['email', 'language', 'verificationCode', 'password', 'phone', 'verificationType', 'firstName', 'lastName'];
+
 export const PAGES = {
     signup: 'SignUpEmail',
     verification: 'Verification',
@@ -31,21 +39,23 @@ export const PAGES = {
     coreProfile: 'CreateCoreProfile',
     password: 'Password',
     home: 'Home',
-    error: 'Error'
+    error: 'Error',
+    verificationSelection: 'VerificationSelection'
 }
 
 export const FOOTERS = {
     default: {
-        en: '{ "About GC Sign in": "#", "Help": "#", "Terms": "#" }',
-        fr: '{ "À propos de Connexion GC": "#", "Aide": "#", "Avis": "#" }'
+        en: '{ "About GC Sign in": "https://gc-signin.cdssandbox.xyz/en/", "Help": "https://gc-signin.cdssandbox.xyz/en/", "Terms": "https://gc-signin.cdssandbox.xyz/en/" }',
+        fr: '{ "À propos de Connexion GC": "https://gc-signin.cdssandbox.xyz/en/", "Aide": "https://gc-signin.cdssandbox.xyz/fr/", "Avis": "https://gc-signin.cdssandbox.xyz/en/" }'
     }
 }
 
 export const SERVICES = [
     {
         id: 1,
-        title: 'GEO.ca',
-        description: ''
+        title: 'Parks Canada Reservations',
+        description: '',
+        url: '#'
     }
 ];
 
@@ -55,7 +65,10 @@ export const SUBMIT_END_POINTS = {
     login: '/v1/users/login',
     createCoreProfile: '/v1/users/createcoreprofile',
     transientOtpVerify: '/v1/otp/transient_otp/verify',
-    transientOtpSend: '/v1/otp/transient_otp/send'
+    transientOtpSend: '/v1/otp/transient_otp/send',
+    login: '/v1/otp/users/login',
+    otpVerify: '/v1/otp/otp/verify',
+    otpSend: '/v1/otp/otp/send',
 }
 
 
@@ -67,27 +80,6 @@ export const GA_CATEGORIES = {
 
 export const GA_ACTIONS = {
     clickFirstTimeGc: "Clicked FirstTimeGC -> Privacy",
-    acceptPrivacy: "Accepted Privacy",
-    submitSignUpEmail: "Submitted SignUp Email",
-    submitSignUpEmailSuccess: "SignUp Email Success",
-    submitSignUpEmailFailure: "SignUp Email Failure",
-    submitSignUpEmailError: "SignUp Email Error",
-    submitSignUpEmailOTP: "SignUp Email OTP Submitted",
-    submitSignUpEmailOTPSuccess: "SignUp Email OTP Success",
-    submitSignUpEmailOTPFailure: "SignUp Email OTP Failure",
-    submitSignUpEmailOTPError: "SignUp Email OTP Error",
-    submitEmailSignUpPassword: "Submitted SignUp Password",
-    submitEmailSignUpPasswordSuccess: "SignUp Password Success",
-    submitEmailSignUpPasswordFailure: "SignUp Password Failure",
-    submitEmailSignUpPasswordError: "SignUp Password Error",
-    submitSignUpCoreProfile: "Submitted SignUp Core Profile",
-    submitSignUpCoreProfileSuccess: "SignUp Core Profile Success",
-    submitSignUpCoreProfileFailure: "SignUp Core Profile Failure",
-    submitSignUpCoreProfileError: "SignUp Core Profile Error",
-    submitPhoneNumberOTPType: "Submitted Phone Number and OTP Type",
-    submitPhoneNumberOTPSuccess: "Phone Number verification and OTP Type Success",
-    submitPhoneNumberOTPFailure: "Phone Number verification and OTP Type Failure",
-    submitPhoneNumberOTPError: "Phone Number verification and OTP Type Error"
 }
 
 export const GA_LABELS = {
