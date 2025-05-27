@@ -7,7 +7,7 @@ import {
 import {buildTestCase, Template} from "../../Tests/utils/functions.tsx";
 
 export default {
-    title: 'GC Sign In/Pages/Profile/Profile Landing Page',
+    title: 'GC Sign In/Pages/Manage/Profile Landing Page',
     args:{
         page:PAGES.ProfileHome
     }
