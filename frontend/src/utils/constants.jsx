@@ -9,6 +9,7 @@ export const NAVIGATION_LINKS = {
     privacy: '/signup/privacy',
     home: '/',
     verificationSelection: '/signin/selectverification',
+    dashboard: '/dashboard',
 };
 export const CONTEXT_ACTIONS = {
     signUp: 'SIGN_UP',
@@ -21,7 +22,8 @@ export const FLOW_TYPES={
     signIn: "signin",
     sms: "sms",
     voice: "voice",
-    email: "email"
+    email: "email",
+    dashboard: "dashboard"
 }
 
 export const LINK_SUBMIT_TYPES = {
@@ -41,7 +43,7 @@ export const PAGES ={
     home: 'Home',
     error: 'Error',
     verificationSelection: 'VerificationSelection',
-    manage: 'Manage'
+    manageHome: 'Manage'
 }
 
 export const FOOTERS = {
