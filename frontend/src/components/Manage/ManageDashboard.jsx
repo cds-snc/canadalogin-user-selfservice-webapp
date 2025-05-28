@@ -21,7 +21,10 @@ export default function ManageDashboard() {
     const error = getError("#dashboard");
     const pageContent = getPageContent(language, PAGES.manageHome);
     const { userData } = useContext(UserContext);
-    const userName = userData?.name || "<Name of User" ;
+    const firstName = userData?.firstName?.trim();
+    const userName = firstName ? firstName : userData?.lastName || "<Name of User";
+
+    // const userName = userData?.name || "<Name of User" ;
     // const services = state.userData?.services || []; // Example: Fetch user services from state
 
     return (
