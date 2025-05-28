@@ -1,3 +1,5 @@
+import ProfileNameEdit from "../components/PersonalInfo/ProfileNameEdit";
+
 export const AVAILABLE_LANGUAGES = {en:'en', fr:'fr'};
 export const NAVIGATION_LINKS = {
     signUp: '/signup',
@@ -9,6 +11,7 @@ export const NAVIGATION_LINKS = {
     privacy: '/signup/privacy',
     home: '/',
     verificationSelection: '/signin/selectverification',
+    ProfileNameEdit: '/ProfileNameEdit',
 };
 export const CONTEXT_ACTIONS = {
     signUp: 'SIGN_UP',
@@ -21,7 +24,8 @@ export const FLOW_TYPES={
     signIn: "signin",
     sms: "sms",
     voice: "voice",
-    email: "email"
+    email: "email",
+    profile: "profile"
 }
 
 export const LINK_SUBMIT_TYPES = {
