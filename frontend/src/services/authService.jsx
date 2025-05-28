@@ -21,10 +21,6 @@ export const authService = {
         const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.create}`, userData);
         return response.data;
     },
-    login: async (userData) => {
-        const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.login}`, userData);
-        return response.data;
-    },
     transientOtpSend: async (userData) => {
         if (TEST_USERS.has(userData.userName))
             return buildTestResponse(userData, "transientOtpSend");
