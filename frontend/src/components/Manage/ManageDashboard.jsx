@@ -1,18 +1,13 @@
 import {
     GcdsContainer,
     GcdsHeading,
-    GcdsText,
     GcdsGrid,
-    GcdsButton,
     GcdsErrorSummary,
     GcdsCard
 } from "@cdssnc/gcds-components-react";
 import {
-    AVAILABLE_LANGUAGES,
     PAGES,
-    SERVICES
 } from "../../utils/constants";
-import {useUser} from "../Providers/useUser";
 import {useParams} from "react-router";
 import {useError} from "../../hooks/useError";
 import {getPageContent} from "../../utils/functions.jsx";
@@ -21,14 +16,13 @@ import UserContext from "../Providers/UserContext";
 
 
 export default function ManageDashboard() {
-    const {state} = useUser();
     const {language} = useParams();
-    const {setError, getError, hasErrors, clearAllErrors} = useError(language);
+    const { getError, hasErrors} = useError(language);
     const error = getError("#dashboard");
     const pageContent = getPageContent(language, PAGES.manageHome);
     const { userData } = useContext(UserContext);
     const userName = userData?.name || "<Name of User" ;
-    const services = state.userData?.services || []; // Example: Fetch user services from state
+    // const services = state.userData?.services || []; // Example: Fetch user services from state
 
     return (
         <GcdsContainer>
