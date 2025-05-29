@@ -70,7 +70,6 @@ class ProfileCreateRequest(BaseModel):
 
 
 class ProfileUserData(BaseModel):
-    userid: str
     firstName: Optional[str] = None
     lastName: str
     preferredLanguage: str

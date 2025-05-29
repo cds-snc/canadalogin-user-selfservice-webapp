@@ -70,18 +70,18 @@ async def user_2fa_enroll(
 
 
 @router.post(
-    "/profile",
+    "/users/{user_id}/profile",
     response_model=ProfileResponse,
     tags=["Users"],
     summary="Create user profile in verify",
     description="",
 )
-async def user_create_profile(user_data: ProfileUserData, request: Request):
-    return await create_profile(user_data, request.app.state.request_client)
+async def user_create_profile(user_id, user_data: ProfileUserData, request: Request):
+    return await create_profile(user_id, user_data, request.app.state.request_client)
 
 
 @router.get(
-    "/profile/{user_id}",
+    "/users/{user_id}/profile/",
     response_model=ProfileResponse,
     tags=["Users"],
     summary="Get a single user's profile",

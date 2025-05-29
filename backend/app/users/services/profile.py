@@ -16,13 +16,15 @@ from app.users.schemas import (
 logger = logging.getLogger(__name__)
 
 
-async def create_profile(user_data: ProfileUserData, global_http_client: AsyncClient):
+async def create_profile(
+    user_id, user_data: ProfileUserData, global_http_client: AsyncClient
+):
     try:
         access_token = await get_admin_token(global_http_client)
         headers = get_auth_request_headers(access_token)
         settings = get_settings().ibm_verify_config
-        user_id = user_data.userid
-        create_profile_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/Users/{user_id}"
+        userid = user_id
+        create_profile_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/Users/{userid}"
         first_name = user_data.firstName
         last_name = user_data.lastName
         preferred_language = user_data.preferredLanguage
