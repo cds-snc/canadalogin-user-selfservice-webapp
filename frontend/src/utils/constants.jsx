@@ -1,3 +1,5 @@
+import ManageDashboard from "../components/Manage/ManageDashboard.jsx";
+
 export const AVAILABLE_LANGUAGES = {en:'en', fr:'fr'};
 export const NAVIGATION_LINKS = {
     signUp: '/signup',
@@ -43,7 +45,7 @@ export const PAGES ={
     home: 'Home',
     error: 'Error',
     verificationSelection: 'VerificationSelection',
-    ManageDashboard: 'ManageDashboard'
+    manageDashboard: 'ManageDashboard'
 }
 
 export const FOOTERS = {

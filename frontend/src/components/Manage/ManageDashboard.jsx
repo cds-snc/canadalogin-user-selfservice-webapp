@@ -20,7 +20,7 @@ export default function ManageDashboard() {
     const {language} = useParams();
     const { getError, hasErrors} = useError(language);
     const error = getError("#dashboard");
-    const pageContent = getPageContent(language, PAGES.ManageDashboard);
+    const pageContent = getPageContent(language, PAGES.manageDashboard);
     const { userData } = useContext(UserContext);
     const firstName = userData?.firstName?.trim();
     const userName = firstName ? firstName : userData?.lastName || "<Name of User";

@@ -189,5 +189,11 @@
     "45": "Vous pouvez utiliser le même nom d’utilisateur et mot de passe pour accéder à n’importe quel programme ou service qui utilise Connexion GC.",
     "46": "Connexion GC",
     "47": "pour continuer vers votre"
+  },
+  "ManageDashboard": {
+    "1": "Welcome,",
+    "2": "Personal information",
+    "3": "Security settings",
+    "4": "Connected services"
   }
 }

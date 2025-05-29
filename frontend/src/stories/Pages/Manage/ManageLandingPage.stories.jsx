@@ -9,7 +9,7 @@ import {buildTestCase, Template} from "../../Tests/utils/functions.tsx";
 export default {
     title: 'GC Sign In/Pages/Manage/Manage Landing Page',
     args:{
-        page:PAGES.ManageDashboard
+        page:PAGES.manageDashboard
     }
 };
 
