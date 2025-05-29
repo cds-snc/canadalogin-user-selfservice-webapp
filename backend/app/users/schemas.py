@@ -15,6 +15,7 @@ class EmailModel(BaseModel):
 class UserLoginRequestData(BaseModel):
     userName: EmailStr
     password: str
+    trxnId: str
 
 
 # Signup Schema
