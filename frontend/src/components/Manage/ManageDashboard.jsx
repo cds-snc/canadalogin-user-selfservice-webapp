@@ -1,3 +1,4 @@
+import React from 'react';
 import {
     GcdsContainer,
     GcdsHeading,
@@ -19,7 +20,7 @@ export default function ManageDashboard() {
     const {language} = useParams();
     const { getError, hasErrors} = useError(language);
     const error = getError("#dashboard");
-    const pageContent = getPageContent(language, PAGES.manageHome);
+    const pageContent = getPageContent(language, PAGES.ManageDashboard);
     const { userData } = useContext(UserContext);
     const firstName = userData?.firstName?.trim();
     const userName = firstName ? firstName : userData?.lastName || "<Name of User";
@@ -45,28 +46,23 @@ export default function ManageDashboard() {
                     {pageContent['1']} {userName}
                 </GcdsHeading>
             </GcdsContainer>
-
             {/* Dashboard Section */}
 
 
             {/* Action Cards */}
             <GcdsGrid columns="repeat(auto-fit, minmax(100px, 290px))">
-                <p><GcdsCard
+                <GcdsCard
                     cardTitle="Personal Information"
                     href="#"
                     cardTitleTag="h3"
                 >
                 </GcdsCard>
-                </p>
-                <p>
                     <GcdsCard
                     cardTitle="Security settings"
                     href="#"
                     cardTitleTag="h3"
                 >
                 </GcdsCard>
-                </p>
-
             </GcdsGrid>
 
         </GcdsContainer>
