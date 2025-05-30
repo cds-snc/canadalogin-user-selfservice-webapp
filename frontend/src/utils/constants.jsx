@@ -1,4 +1,5 @@
 import ProfileNameEdit from "../components/PersonalInfo/ProfileNameEdit";
+import ProfileHome from "../components/Manage/ProfileHome";
 
 export const AVAILABLE_LANGUAGES = {en:'en', fr:'fr'};
 export const NAVIGATION_LINKS = {
@@ -12,6 +13,7 @@ export const NAVIGATION_LINKS = {
     home: '/',
     verificationSelection: '/signin/selectverification',
     ProfileNameEdit: '/ProfileNameEdit',
+    profileHome: '/profilehome',
 };
 export const CONTEXT_ACTIONS = {
     signUp: 'SIGN_UP',
@@ -25,7 +27,7 @@ export const FLOW_TYPES={
     sms: "sms",
     voice: "voice",
     email: "email",
-    profile: "profile"
+    profile: "profile",
 }
 
 export const LINK_SUBMIT_TYPES = {
@@ -45,7 +47,8 @@ export const PAGES ={
     home: 'Home',
     error: 'Error',
     verificationSelection: 'VerificationSelection',
-    ProfileNameEdit: 'ProfileNameEdit'
+    ProfileNameEdit: 'ProfileNameEdit',
+    ProfileHome: 'ProfileHome'
 }
 
 export const FOOTERS = {

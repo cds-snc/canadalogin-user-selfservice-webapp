@@ -16,6 +16,7 @@ import {useLocation, useParams} from "react-router";
 import { trackPage } from "../utils/gatag.jsx";
 import { useEffect } from "react";
 import ProfileNameEdit from "../components/PersonalInfo/ProfileNameEdit.jsx";
+import ProfileHome from "../components/Manage/ProfileHome.jsx";
 
 function PageContents({page}:{page:string}) {
     switch(page) {
@@ -54,6 +55,10 @@ function PageContents({page}:{page:string}) {
         case PAGES.ProfileNameEdit:
             return (
                 <ProfileNameEdit />
+            );
+        case PAGES.ProfileHome:
+            return (
+                <ProfileHome />
             );
         case "RP":
             return (
