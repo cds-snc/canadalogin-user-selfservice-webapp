@@ -29,7 +29,7 @@ export default function ManageDashboard() {
     // const services = state.userData?.services || []; // Example: Fetch user services from state
 
     return (
-        <GcdsContainer>
+        <GcdsContainer className="gcds-container">
 
             {/* Error Summary */}
             {hasErrors() && (
@@ -40,30 +40,33 @@ export default function ManageDashboard() {
                 />
             )}
 
-            {/* Welcome Section */}
-            <GcdsContainer className="gcds-welcome">
                 <GcdsHeading tag="h1" marginTop='250'>
                     {pageContent['1']} {userName}
                 </GcdsHeading>
-            </GcdsContainer>
-            {/* Dashboard Section */}
 
 
             {/* Action Cards */}
-            <GcdsGrid columns="repeat(auto-fit, minmax(100px, 290px))">
-                <GcdsCard
-                    cardTitle="Personal Information"
-                    href="#"
-                    cardTitleTag="h3"
-                >
-                </GcdsCard>
-                <GcdsCard
-                    cardTitle="Security settings"
-                    href="#"
-                    cardTitleTag="h3"
-                >
-                </GcdsCard>
-            </GcdsGrid>
+            <gcds-grid columns="repeat(auto-fit, minmax(200px, 450px))">
+                <p><gcds-card card-title="Trouble signing up" href="{{ links.troublesigningup }}" description="Can’t verify your email? Not sure what makes a strong password? We’ll help you resolve account-creation issues." card-title-tag="h4"></gcds-card></p>
+                <p><gcds-card card-title="Trouble signing in" href="{{ links.troublesigningin }}" description="Forgot your password? Locked out of your account? We’ll help you resolve access issues." card-title-tag="h4"></gcds-card></p>
+                <p><gcds-card card-title="Managing your GC Sign in account" href="{{ links.manageyouraccount }}" description="Change your account settings including your password, phone number, email and more." card-title-tag="h4"></gcds-card></p>
+            </gcds-grid>
+                {/*<p>*/}
+                {/*<GcdsCard*/}
+                {/*    cardTitle="Personal Information"*/}
+                {/*    href="#"*/}
+                {/*    cardTitleTag="h3"*/}
+                {/*>*/}
+                {/*</GcdsCard>*/}
+                {/*</p>*/}
+                {/*<p>*/}
+                {/*<GcdsCard*/}
+                {/*    cardTitle="Security settings"*/}
+                {/*    href="#"*/}
+                {/*    cardTitleTag="h3"*/}
+                {/*>*/}
+                {/*</GcdsCard>*/}
+                {/*</p>*/}
 
         </GcdsContainer>
     );
