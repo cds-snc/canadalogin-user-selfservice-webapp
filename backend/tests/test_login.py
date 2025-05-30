@@ -19,8 +19,8 @@ async def test_request_cloud_directory_id_success():
         "password": [
             {
                 "name": "Cloud Directory",
-                "location": "https://cds-gcsignin-dev.verify.ibm.com/v1.0/authnmethods/password/d67ed8...-a376-2b357a9ef0e4",
-                "id": "d67ed8ae-5971-423b-a376-2b357a9ef0e4",
+                "location": "https://mocktenant.verify.ibm.com/v1.0/authnmethods/password/d67ed8...-a376-2b357a9ef0e4",
+                "id": "435345783450784728527828075870543708354",
                 "type": "ibmldap",
             }
         ],
@@ -89,8 +89,8 @@ async def test_get_cloud_directory_id_success():
         "password": [
             {
                 "name": "Cloud Directory",
-                "location": "https://cds-gcsignin-dev.verify.ibm.com/v1.0/authnmethods/password/d67ed8...-a376-2b357a9ef0e4",
-                "id": "d67ed8ae-5971-423b-a376-2b357a9ef0e4",
+                "location": "https://mocktenant.verify.ibm.com/v1.0/authnmethods/password/d67ed8...-a376-2b357a9ef0e4",
+                "id": "435345783450784728527828075870543708354",
                 "type": "ibmldap",
             }
         ],
@@ -115,7 +115,7 @@ async def test_get_cloud_directory_id_success():
         mock_token.assert_called_once()
         mock_headers.assert_called_once()
         mock_settings.assert_called_once()
-        assert response == "d67ed8ae-5971-423b-a376-2b357a9ef0e4"
+        assert response == "435345783450784728527828075870543708354"
 
 
 @pytest.mark.asyncio
