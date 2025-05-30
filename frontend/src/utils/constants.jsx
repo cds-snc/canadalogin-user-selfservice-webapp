@@ -45,7 +45,6 @@ export const PAGES ={
     home: 'Home',
     error: 'Error',
     verificationSelection: 'VerificationSelection',
-    areYouSureToUpdateName: 'AreYouSureToUpdateName',
     ProfileHome: 'ProfileHome',
     areYouSureEditYourName: 'AreYouSureEditYourName',
 }
