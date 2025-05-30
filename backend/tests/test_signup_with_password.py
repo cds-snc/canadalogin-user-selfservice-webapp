@@ -8,7 +8,8 @@ from app.main import app  # Your FastAPI app instance
 from app.users.services.create import (
     signup_with_password,
     create_user,
-    IBMUserCreateRequest, is_verified_email,
+    IBMUserCreateRequest,
+    is_verified_email,
 )
 from app.users.schemas import (
     UserLoginRequestData,
@@ -45,14 +46,15 @@ async def test_create_user_success(client):
 
     with (
         patch(
-            "app.users.services.create.get_admin_token", new_callable=AsyncMock
-        ) as mock_token,
+            "app.users.services.create.get_admin_token",
+            new=AsyncMock(return_value="fake-token"),
+        ),
         patch("app.users.services.create.get_auth_request_headers") as mock_headers,
         patch("app.users.services.create.get_settings") as mock_settings,
         patch("app.users.services.create.AsyncClient") as mock_client_class,
     ):
 
-        mock_token.return_value = "fake--token"
+        # mock_token.return_value = "fake--token"
         mock_headers.return_value = {"Authorization": "Bearer fake-token"}
         mock_settings.return_value.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
             "https://fake.ibm.com"
@@ -78,7 +80,10 @@ async def test_create_user_raises_generic_error(client):
     )
 
     with (
-        patch("app.users.services.create.get_admin_token", new_callable=AsyncMock),
+        patch(
+            "app.users.services.create.get_admin_token",
+            new=AsyncMock(return_value="fake-token"),
+        ),
         patch("app.users.services.create.get_auth_request_headers"),
         patch("app.users.services.create.get_settings"),
         patch("app.users.services.create.AsyncClient") as mock_client_class,
@@ -150,12 +155,8 @@ async def test_signup_failure_from_ibm(client):
         patch("app.users.services.create.create_user", return_value=mock_response),
         patch("app.users.services.create.IBMUserCreateRequest"),
         patch("app.users.services.create.logger"),
-        patch(
-            "app.users.services.create.get_admin_token", new_callable=AsyncMock
-        ) as mock_get_token,
         patch("app.users.services.create.is_verified_email", return_value=True),
     ):
-        mock_get_token.return_value = "fake-token"
         result = await signup_with_password(
             user_data, global_http_client=mock_http_client
         )
@@ -216,13 +217,9 @@ async def test_signup_validation_error_response(client):
         patch(
             "app.users.services.create.is_verified_email", return_value=True
         ) as verified_email,
-        patch(
-            "app.users.services.create.get_admin_token", new_callable=AsyncMock
-        ) as mock_get_token,
         patch("app.users.services.create.logger"),
     ):
 
-        mock_get_token.return_value = "fake-token"
         with pytest.raises(HTTPException) as exc_info:
             await signup_with_password(user_data, global_http_client=mock_http_client)
 
@@ -249,13 +246,9 @@ async def test_user_signup(client):
     # Patch the signup_with_password function to return the mock response
     with (
         patch("app.users.v1_router.signup_with_password", return_value=mock_response),
-        patch(
-            "app.users.services.create.get_admin_token", new_callable=AsyncMock
-        ) as mock_get_token,
     ):
 
         # Mock the token response to simulate a successful access token request
-        mock_get_token.return_value = "fake-token"
 
         mock_client = AsyncMock(spec=AsyncClient)
         client.app.state.request_client = mock_client
@@ -282,31 +275,34 @@ async def test_is_verified_email():
     mock_response.json.return_value = {
         "success": "true",
         "message": "User created successfully",
-        "data": {
-            "userName": "Brawndo@gmail.com",
-            "id": "771001FZOI"
-        }
+        "data": {"userName": "Brawndo@gmail.com", "id": "771001FZOI"},
     }
+
     with (
         patch(
-            "app.users.services.create.get_admin_token", new_callable=AsyncMock
-        ) as mock_token,
-        patch("app.users.services.create.get_auth_request_headers") as mock_headers,
+            "app.users.services.create.get_admin_token",
+            new=AsyncMock(return_value="fake-token"),
+        ),
+        patch(
+            "app.users.services.create.get_auth_request_headers",
+            return_value={"Authorization": "Bearer fake-token"},
+        ),
         patch("app.users.services.create.get_settings") as mock_settings,
         patch("app.users.services.create.AsyncClient") as mock_client_class,
     ):
-        mock_token.return_value = "fake--token"
-        mock_headers.return_value = {"Authorization": "Bearer fake-token"}
+
         mock_settings.return_value.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
             "https://fake.ibm.com"
         )
 
-        mock_client = AsyncMock(spec=AsyncClient)
+        mock_client = AsyncMock()
         mock_client.__aenter__.return_value = mock_client
-        mock_client.get.return_value = mock_response
+        mock_client.get.return_value = MagicMock(
+            status_code=200, json=MagicMock(return_value={"state": "VERIFIED"})
+        )
         mock_client_class.return_value = mock_client
 
-    user_data = UserLoginRequestData(
-        userName="test@abc.com", password="testpassword123", trxnId=""
-    )
-    response = await is_verified_email(user_data, global_http_client=mock_client)
+        user_data = UserLoginRequestData(
+            userName="test@abc.com", password="testpassword123", trxnId="123456"
+        )
+        response = await is_verified_email(user_data, global_http_client=mock_client)
