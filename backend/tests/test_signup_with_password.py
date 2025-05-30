@@ -3,13 +3,12 @@ from unittest.mock import patch, AsyncMock, MagicMock
 from httpx import AsyncClient
 from fastapi import HTTPException
 
-from app.config import Settings, IBMVerifyConfig
 from app.main import app  # Your FastAPI app instance
 
 from app.users.services.create import (
     signup_with_password,
     create_user,
-    IBMUserCreateRequest, is_verified_email,
+    IBMUserCreateRequest,
 )
 from app.users.schemas import (
     UserLoginRequestData,
@@ -117,7 +116,9 @@ async def test_signup_success(client):
     # Patch only what's necessary
     with (
         patch("app.users.services.create.create_user", return_value=mock_response),
-        patch("app.users.services.create.is_verified_email", return_value = True) as is_verified_email,
+        patch(
+            "app.users.services.create.is_verified_email", return_value=True
+        ) as email_check,
         patch("app.users.services.create.IBMUserCreateRequest"),
         patch("app.users.services.create.logger"),
     ):
@@ -126,7 +127,7 @@ async def test_signup_success(client):
             user_data, global_http_client=mock_http_client
         )
 
-        is_verified_email.assert_called_once()
+        email_check.assert_called_once()
         assert isinstance(result, ResponseModel)
         assert result.success is True
         assert result.message == "User created successfully"
@@ -135,7 +136,9 @@ async def test_signup_success(client):
 
 @pytest.mark.asyncio
 async def test_signup_failure_from_ibm(client):
-    user_data = UserLoginRequestData(userName="user@abc.com", password="pass", trxnId="")
+    user_data = UserLoginRequestData(
+        userName="user@abc.com", password="pass", trxnId=""
+    )
 
     mock_response = MagicMock()
     mock_response.status_code = 400
@@ -147,7 +150,9 @@ async def test_signup_failure_from_ibm(client):
         patch("app.users.services.create.create_user", return_value=mock_response),
         patch("app.users.services.create.IBMUserCreateRequest"),
         patch("app.users.services.create.logger"),
-        patch("app.users.services.create.get_admin_token", new_callable=AsyncMock) as mock_get_token,
+        patch(
+            "app.users.services.create.get_admin_token", new_callable=AsyncMock
+        ) as mock_get_token,
         patch("app.users.services.create.is_verified_email", return_value=True),
     ):
         mock_get_token.return_value = "fake-token"
@@ -163,7 +168,9 @@ async def test_signup_failure_from_ibm(client):
 
 @pytest.mark.asyncio
 async def test_signup_failure_caused_by_unverified_email(client):
-    user_data = UserLoginRequestData(userName="user@abc.com", password="pass", trxnId="")
+    user_data = UserLoginRequestData(
+        userName="user@abc.com", password="pass", trxnId=""
+    )
 
     mock_response = MagicMock()
     mock_response.status_code = 400
@@ -172,7 +179,9 @@ async def test_signup_failure_caused_by_unverified_email(client):
 
     with (
         patch("app.users.services.create.create_user", return_value=mock_response),
-        patch("app.users.services.create.is_verified_email", return_value=False) as is_verified_email,
+        patch(
+            "app.users.services.create.is_verified_email", return_value=False
+        ) as is_verified_email,
         patch("app.users.services.create.IBMUserCreateRequest"),
         patch("app.users.services.create.logger"),
     ):
@@ -186,6 +195,7 @@ async def test_signup_failure_caused_by_unverified_email(client):
         assert result.body is not None
         is_verified_email.assert_called_once()
         assert b"Email has not been verified" in result.body
+
 
 @pytest.mark.asyncio
 async def test_signup_validation_error_response(client):
@@ -203,12 +213,14 @@ async def test_signup_validation_error_response(client):
     with (
         patch("app.users.services.create.create_user", return_value=mock_response),
         patch("app.users.services.create.IBMUserCreateRequest"),
-        patch("app.users.services.create.is_verified_email", return_value=True) as verified_email,
-        patch("app.users.services.create.get_admin_token", new_callable=AsyncMock) as mock_get_token,
+        patch(
+            "app.users.services.create.is_verified_email", return_value=True
+        ) as verified_email,
+        patch(
+            "app.users.services.create.get_admin_token", new_callable=AsyncMock
+        ) as mock_get_token,
         patch("app.users.services.create.logger"),
-
     ):
-
 
         mock_get_token.return_value = "fake-token"
         with pytest.raises(HTTPException) as exc_info:
