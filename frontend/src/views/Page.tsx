@@ -15,7 +15,7 @@ import {useUser} from "../components/Providers/useUser";
 import {useLocation, useParams} from "react-router";
 import { trackPage } from "../utils/gatag.jsx";
 import { useEffect } from "react";
-import AreYouSureEditYourName from "../components/PersonalInfo/AreYouSureEditYourName.jsx";
+import AreYouSureEditYourName from "../components/Manage/AreYouSureEditYourName.jsx";
 import ProfileHome from "../components/Manage/ProfileHome.jsx";
 
 function PageContents({page}:{page:string}) {
@@ -76,7 +76,7 @@ function PageContents({page}:{page:string}) {
                         Sign in one time code</a></div>
                 </GcdsText>
             );
-        case PAGES.areYouSureToUpdateName:
+        case PAGES.areYouSureEditYourName:
             return (
                 <AreYouSureEditYourName />
             ) 
