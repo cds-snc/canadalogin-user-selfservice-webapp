@@ -1,6 +1,3 @@
-import ProfileNameEdit from "../components/PersonalInfo/ProfileNameEdit";
-import ProfileHome from "../components/Manage/ProfileHome";
-
 export const AVAILABLE_LANGUAGES = {en:'en', fr:'fr'};
 export const NAVIGATION_LINKS = {
     signUp: '/signup',
