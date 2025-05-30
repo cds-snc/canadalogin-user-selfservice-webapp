@@ -11,7 +11,7 @@ export const NAVIGATION_LINKS = {
     privacy: '/signup/privacy',
     home: '/',
     verificationSelection: '/signin/selectverification',
-    manageDashboard: '/managedashboard'
+    manage: '/manage'
 };
 export const CONTEXT_ACTIONS = {
     signUp: 'SIGN_UP',

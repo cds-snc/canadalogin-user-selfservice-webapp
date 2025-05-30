@@ -51,7 +51,7 @@ function PageContents({page}:{page:string}) {
             return (
                 <Privacy />
             );
-        case PAGES.ManageDashboard:
+        case PAGES.manageDashboard:
             return (
                 <ManageDashboard/>
             );
