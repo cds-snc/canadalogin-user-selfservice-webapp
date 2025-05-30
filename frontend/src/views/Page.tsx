@@ -16,6 +16,8 @@ import {useLocation, useParams} from "react-router";
 import { trackPage } from "../utils/gatag.jsx";
 import { useEffect } from "react";
 import AreYouSureEditYourName from "../components/PersonalInfo/AreYouSureEditYourName.jsx";
+import ProfileHome from "../components/Manage/ProfileHome.jsx";
+
 function PageContents({page}:{page:string}) {
     switch(page) {
         case PAGES.home:
@@ -49,6 +51,10 @@ function PageContents({page}:{page:string}) {
         case PAGES.privacy:
             return (
                 <Privacy />
+            );
+        case PAGES.ProfileHome:
+            return (
+                <ProfileHome />
             );
         case "RP":
             return (

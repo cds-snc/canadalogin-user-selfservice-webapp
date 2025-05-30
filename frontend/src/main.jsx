@@ -10,7 +10,11 @@ import config from "./config.jsx";
 
 console.log('Starting React application...here');// Debug log
 
-ReactGA.initialize(config.gatag);
+ReactGA.initialize(config.gatag, {
+    gaOptions: {
+      anonymize_ip: true
+    }
+  });
 try {
     createRoot(document.getElementById('root')).render(
         <StrictMode>

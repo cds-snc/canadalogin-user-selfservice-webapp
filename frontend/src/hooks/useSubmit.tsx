@@ -161,7 +161,8 @@ export async function callAuthService(submitDataOptions:SubmitDataOptions, submi
                 userName: userData.email,
                 firstName: submitData.firstName,
                 lastName: submitData.lastName,
-                id: userData.id
+                id: userData.id,
+                language: userData.emailLanguage
             };
             return await authService.createCoreProfile({...payload});
         default :
