@@ -1,4 +1,5 @@
 import ManageDashboard from "../components/Manage/ManageDashboard.jsx";
+import ProfileHome from "../components/Manage/ProfileHome";
 
 export const AVAILABLE_LANGUAGES = {en:'en', fr:'fr'};
 export const NAVIGATION_LINKS = {
@@ -11,7 +12,8 @@ export const NAVIGATION_LINKS = {
     privacy: '/signup/privacy',
     home: '/',
     verificationSelection: '/signin/selectverification',
-    manage: '/manage'
+    manage: '/manage',
+    profileHome: '/profilehome',
 };
 export const CONTEXT_ACTIONS = {
     signUp: 'SIGN_UP',
@@ -25,7 +27,8 @@ export const FLOW_TYPES={
     sms: "sms",
     voice: "voice",
     email: "email",
-    dashboard: "dashboard"
+    dashboard: "dashboard",
+    profile: "profile",
 }
 
 export const LINK_SUBMIT_TYPES = {
@@ -45,7 +48,8 @@ export const PAGES ={
     home: 'Home',
     error: 'Error',
     verificationSelection: 'VerificationSelection',
-    manageDashboard: 'ManageDashboard'
+    manageDashboard: 'ManageDashboard',
+    ProfileHome: 'ProfileHome'
 }
 
 export const FOOTERS = {
