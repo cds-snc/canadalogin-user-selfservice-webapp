@@ -22,6 +22,8 @@ function App() {
                   <Route path="/:language/phoneotp" element={ <Page page="Phone OTP"/>} />
                   <Route path="*" element={<Navigate to="/" replace />} />
                   <Route path="/:language/profilehome" element={ <Page page={PAGES.ProfileHome}/>} />
+                  <Route path="/:language/firstverifyitsyou" element={ <Page page={PAGES.FirstVerifyItsYou}/>} />
+
               </Routes>
           </UserProvider>
       );
