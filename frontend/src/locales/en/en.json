@@ -209,6 +209,9 @@
     "15": "Notifications",
     "16": "We will send account-related notifications to the email registered to your account.",
     "17": "You may also receive notifications from services connected to your GC Sign in. You can manage those preferences in each service’s settings."
+  },
+  "CompleteTwoStepVerification":{
+    "1": "Complete 2-step verification"
   }
 }
 
