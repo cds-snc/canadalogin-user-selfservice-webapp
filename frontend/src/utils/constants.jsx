@@ -12,6 +12,7 @@ export const NAVIGATION_LINKS = {
     home: '/',
     verificationSelection: '/signin/selectverification',
     profileHome: '/profilehome',
+    enterNewEmail: '/enternewemail',
 };
 export const CONTEXT_ACTIONS = {
     signUp: 'SIGN_UP',
@@ -45,7 +46,8 @@ export const PAGES ={
     home: 'Home',
     error: 'Error',
     verificationSelection: 'VerificationSelection',
-    ProfileHome: 'ProfileHome'
+    ProfileHome: 'ProfileHome',
+    EnterNewEmail: 'EnterNewEmail',
 }
 
 export const FOOTERS = {

@@ -16,6 +16,7 @@ import {useLocation, useParams} from "react-router";
 import { trackPage } from "../utils/gatag.jsx";
 import { useEffect } from "react";
 import ProfileHome from "../components/Manage/ProfileHome.jsx";
+import EnterNewEmail from "../components/Manage/EnterNewEmail.jsx";
 
 function PageContents({page}:{page:string}) {
     switch(page) {
@@ -55,7 +56,12 @@ function PageContents({page}:{page:string}) {
             return (
                 <ProfileHome />
             );
-        case "RP":
+        case PAGES.EnterNewEmail:
+            return (
+                <EnterNewEmail />
+            );
+
+            case "RP":
             return (
                 <GcdsText>
                     <strong>You are now logged into GC Sign in and have been redirected to Parks Canada Reservations</strong>
