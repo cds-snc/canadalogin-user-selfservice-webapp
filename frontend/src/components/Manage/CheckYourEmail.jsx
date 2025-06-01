@@ -7,8 +7,11 @@ import {
   GcdsHeading,
   GcdsGrid,
   GcdsText,
-  GcdsLink
+  GcdsLink,
+  GcdsInput,
+  GcdsButton
 } from '@cdssnc/gcds-components-react';
+import SubmitButton from "../Layout/SubmitButton.jsx";
 
 export default function CheckYourEmail() {
   const { language } = useParams();
@@ -17,6 +20,40 @@ export default function CheckYourEmail() {
   return (
     <GcdsContainer>
       <GcdsHeading tag="h1">{pageContent['1']}</GcdsHeading>
+      <GcdsText>
+        {pageContent['2']} <strong>{pageContent['3']}</strong>
+      </GcdsText>
+      <GcdsText>
+        {pageContent['4']}
+      </GcdsText>
+      <GcdsText>
+        {pageContent['5']} <strong>{pageContent['6']}</strong>
+      </GcdsText>
+      <form id="form">
+        <GcdsInput
+          inputId="verificationCode"
+          label={pageContent['7']}
+          name="verificationCode"
+          type="text"
+          validateOn="other"
+        />
+        <GcdsGrid columns="auto auto" gap="10px" align-items="center">
+          <SubmitButton buttonRole="primary">
+            {pageContent['8']}
+          </SubmitButton>
+          <GcdsButton buttonRole="secondary">
+            {pageContent['9']}
+          </GcdsButton>
+        </GcdsGrid>
+      </form>
+      <GcdsHeading tag='h2'>
+        {pageContent['10']}
+      </GcdsHeading>
+      <GcdsLink href="#">{pageContent['11']}</GcdsLink>
+      <br />&nbsp;
+      <GcdsText>
+        {pageContent['12']} <strong>{pageContent['13']}</strong>
+      </GcdsText>
     </GcdsContainer>
   );
 }

@@ -208,5 +208,20 @@
     "15": "Notifications",
     "16": "Nous enverrons des notifications relatives à votre compte à l'adresse e-mail associée à votre compte.",
     "17": "Vous pouvez également recevoir des notifications des services connectés à votre compte GC. Vous pouvez gérer ces préférences dans les paramètres de chaque service."
-}
+  },
+  "CheckYourEmail": {
+    "1": "Vérifiez votre adresse e-mail",
+    "2": "Nous avons envoyé un e-mail avec un code à 6 chiffres à :",
+    "3": "test.user@gmail.com.",
+    "4": "Votre e-mail peut prendre quelques minutes à arriver. Si vous ne le recevez pas, vérifiez vos spams.",
+    "5": "Votre code expirera dans",
+    "6": "10 minutes.",
+    "7": "Code à 6 chiffres",
+    "8": "Continuer",
+    "9": "Annuler",
+    "10": "Problèmes avec le code ?",
+    "11": "Utiliser une autre adresse e-mail",
+    "12": "Vous pouvez demander un nouveau code dans",
+    "13": "10 secondes"
+  }
 }

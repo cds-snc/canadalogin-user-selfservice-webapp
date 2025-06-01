@@ -211,7 +211,19 @@
     "17": "You may also receive notifications from services connected to your GC Sign in. You can manage those preferences in each service’s settings."
   },
   "CheckYourEmail": {
-    "1": "Check your email"
+    "1": "Check your email",
+    "2": "We have sent an email with a 6-digit code to:",
+    "3": "test.user@gmail.com.",
+    "4": "Your email might take a few minutes to arrive. If you do not get an email, check your spam folder.",
+    "5": "Your code will expire in",
+    "6": "10 minutes.",
+    "7": "6-digit code",
+    "8": "Continue",
+    "9": "Cancel",
+    "10": "Problems with the code?",
+    "11": "Use a different email",
+    "12": "You can request a new code in",
+    "13": "10 seconds"
   }
 }
 
