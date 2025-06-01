@@ -37,7 +37,7 @@ export default function CheckYourEmail() {
           type="text"
           validateOn="other"
         />
-        <GcdsGrid columns="auto auto" gap="10px" align-items="center">
+        <GcdsGrid columns="repeat(auto-fit, minmax(100px, 100px))" gap="10px" align-items="center">
           <SubmitButton buttonRole="primary">
             {pageContent['8']}
           </SubmitButton>
