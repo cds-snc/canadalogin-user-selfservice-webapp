@@ -1,5 +1,3 @@
-import ProfileHome from "../components/Manage/ProfileHome";
-
 export const AVAILABLE_LANGUAGES = {en:'en', fr:'fr'};
 export const NAVIGATION_LINKS = {
     signUp: '/signup',
@@ -12,6 +10,7 @@ export const NAVIGATION_LINKS = {
     home: '/',
     verificationSelection: '/signin/selectverification',
     profileHome: '/profilehome',
+    checkYourEmail: '/checkyouremail',
 };
 export const CONTEXT_ACTIONS = {
     signUp: 'SIGN_UP',
@@ -45,7 +44,8 @@ export const PAGES ={
     home: 'Home',
     error: 'Error',
     verificationSelection: 'VerificationSelection',
-    ProfileHome: 'ProfileHome'
+    ProfileHome: 'ProfileHome',
+    CheckYourEmail: 'CheckYourEmail',
 }
 
 export const FOOTERS = {
