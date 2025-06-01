@@ -7,7 +7,7 @@ import {
   GcdsHeading,
   GcdsGrid,
   GcdsText,
-  GcdsLink
+  GcdsInput, GcdsButton
 } from '@cdssnc/gcds-components-react';
 
 export default function FirstVerifyItsYou() {
@@ -17,6 +17,21 @@ export default function FirstVerifyItsYou() {
   return (
     <GcdsContainer>
       <GcdsHeading tag="h1">{pageContent['1']}</GcdsHeading>
+      <GcdsText>{pageContent['2']} </GcdsText>
+      <GcdsInput
+        inputId="input-password"
+        label={pageContent['3']}
+        name="password"
+
+      ></GcdsInput>
+      <GcdsGrid columns="auto auto" gap="10px" align-items="center">
+        <GcdsButton>
+          {pageContent["4"]}
+        </GcdsButton>
+        <GcdsButton buttonRole="secondary">
+          {pageContent["5"]}
+        </GcdsButton>
+      </GcdsGrid>
     </GcdsContainer>
   );
 }

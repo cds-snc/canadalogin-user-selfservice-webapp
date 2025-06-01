@@ -208,5 +208,12 @@
     "15": "Notifications",
     "16": "Nous enverrons des notifications relatives à votre compte à l'adresse e-mail associée à votre compte.",
     "17": "Vous pouvez également recevoir des notifications des services connectés à votre compte GC. Vous pouvez gérer ces préférences dans les paramètres de chaque service."
-}
+},
+  "FirstVerifyItsYou":{
+    "1": "Vérifiez d'abord qu'il s'agit de vous",
+    "2": "Pour modifier votre adresse e-mail, saisissez d'abord votre mot de passe actuel.",
+    "3": "Mot de passe",
+    "4": "Continuer",
+    "5": "Annuler"
+  }
 }
