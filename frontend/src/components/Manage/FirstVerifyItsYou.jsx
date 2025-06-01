@@ -9,6 +9,7 @@ import {
   GcdsText,
   GcdsInput, GcdsButton
 } from '@cdssnc/gcds-components-react';
+import SubmitButton from '../Layout/SubmitButton.jsx';
 
 export default function FirstVerifyItsYou() {
   const { language } = useParams();
@@ -18,20 +19,21 @@ export default function FirstVerifyItsYou() {
     <GcdsContainer>
       <GcdsHeading tag="h1">{pageContent['1']}</GcdsHeading>
       <GcdsText>{pageContent['2']} </GcdsText>
+      <form id="form">
       <GcdsInput
         inputId="input-password"
         label={pageContent['3']}
         name="password"
-
       ></GcdsInput>
-      <GcdsGrid columns="auto auto" gap="10px" align-items="center">
-        <GcdsButton>
+      <GcdsGrid columns="repeat(auto-fit, minmax(100px, 100px))" gap="10px" align-items="center">
+        <SubmitButton buttonRole="primary">
           {pageContent["4"]}
-        </GcdsButton>
+        </SubmitButton>
         <GcdsButton buttonRole="secondary">
           {pageContent["5"]}
         </GcdsButton>
       </GcdsGrid>
+      </form>
     </GcdsContainer>
   );
 }
