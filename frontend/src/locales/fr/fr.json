@@ -208,5 +208,21 @@
     "15": "Notifications",
     "16": "Nous enverrons des notifications relatives à votre compte à l'adresse e-mail associée à votre compte.",
     "17": "Vous pouvez également recevoir des notifications des services connectés à votre compte GC. Vous pouvez gérer ces préférences dans les paramètres de chaque service."
-}
+},
+  "EnterNewEmail":{
+    "1": "Entrez une nouvelle adresse courriel",
+    "2": "La modification de votre adresse courriel affectera :",
+    "3": "L'adresse courriel que vous utilisez pour vous connecter",
+    "4": "L'adresse courriel que Connexion GC utilise pour vous contacter",
+    "5": "L'adresse courriel que les services connectés à Connexion GC peuvent utiliser pour vous contacter",
+    "6": "Quels services ont accès à votre adresse courriel ?",
+    "7": "Les services suivants ont accès à votre adresse courriel :",
+    "8": "GEO.ca",
+    "9": "Si vous essayez de mettre à jour votre adresse courriel avec un service non connecté à Connexion GC, vous devrez accéder à ce compte.",
+    "10": "Pour rechercher un autre compte GC, consultez le",
+    "11": "Répertoire des comptes GC.",
+    "12": "Courriel",
+    "13": "Continuer",
+    "14": "Annuler"
+  }
 }

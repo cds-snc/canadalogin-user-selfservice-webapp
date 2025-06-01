@@ -211,7 +211,20 @@
     "17": "You may also receive notifications from services connected to your GC Sign in. You can manage those preferences in each service’s settings."
   },
   "EnterNewEmail":{
-    "1": "Enter a new email address"
+    "1": "Enter a new email address",
+    "2": "Changing your email address will affect:",
+    "3": "The email address you use to sign in",
+    "4": "The email address that GC Sign in uses to contact you",
+    "5": "The email address that services connected to your GC Sign in may use to contact you",
+    "6": "What services have access to your email address",
+    "7": "The following services have access to your email address:",
+    "8": "GEO.ca",
+    "9": "If you are trying to update your email address with a service that’s not connected to GC Sign in, you’ll need to go to that account.",
+    "10": "To search for another GC Account, visit the",
+    "11": "GC Account directory.",
+    "12": "Email",
+    "13": "Continue",
+    "14": "Cancel"
   }
 }
 
