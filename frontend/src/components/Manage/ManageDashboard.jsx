@@ -23,13 +23,13 @@ export default function ManageDashboard() {
     const pageContent = getPageContent(language, PAGES.manageDashboard);
     const { userData } = useContext(UserContext);
     const firstName = userData?.firstName?.trim();
-    const userName = firstName ? firstName : userData?.lastName || "<Name of User";
+    const userName = firstName ? firstName : userData?.lastName || "<Name of User>";
 
     // const userName = userData?.name || "<Name of User" ;
     // const services = state.userData?.services || []; // Example: Fetch user services from state
 
     return (
-        <GcdsContainer className="gcds-container">
+        <GcdsContainer>
 
             {/* Error Summary */}
             {hasErrors() && (
@@ -40,33 +40,44 @@ export default function ManageDashboard() {
                 />
             )}
 
-                <GcdsHeading tag="h1" marginTop='250'>
+                <GcdsHeading tag="h1">
                     {pageContent['1']} {userName}
                 </GcdsHeading>
 
 
             {/* Action Cards */}
-            <gcds-grid columns="repeat(auto-fit, minmax(200px, 450px))">
-                <p><gcds-card card-title="Trouble signing up" href="{{ links.troublesigningup }}" description="Can’t verify your email? Not sure what makes a strong password? We’ll help you resolve account-creation issues." card-title-tag="h4"></gcds-card></p>
-                <p><gcds-card card-title="Trouble signing in" href="{{ links.troublesigningin }}" description="Forgot your password? Locked out of your account? We’ll help you resolve access issues." card-title-tag="h4"></gcds-card></p>
-                <p><gcds-card card-title="Managing your GC Sign in account" href="{{ links.manageyouraccount }}" description="Change your account settings including your password, phone number, email and more." card-title-tag="h4"></gcds-card></p>
+
+            <gcds-grid tag="managedashboard" columns-desktop="1fr 1fr 1fr" columns-tablet="1fr 1fr" columns="repeat(auto-fit, minmax(200px, 250px))" placeContent="center" equalRowHeight>
+                <GcdsCard
+                    cardTitle={pageContent['2']}
+                    href="#"
+                    cardTitleTag="h3"
+                >
+                </GcdsCard>
+                <GcdsCard
+                    cardTitle={pageContent['3']}
+                    href="#"
+                    cardTitleTag="h3"
+                >
+                </GcdsCard>
             </gcds-grid>
-                {/*<p>*/}
-                {/*<GcdsCard*/}
-                {/*    cardTitle="Personal Information"*/}
-                {/*    href="#"*/}
-                {/*    cardTitleTag="h3"*/}
-                {/*>*/}
-                {/*</GcdsCard>*/}
-                {/*</p>*/}
-                {/*<p>*/}
-                {/*<GcdsCard*/}
-                {/*    cardTitle="Security settings"*/}
-                {/*    href="#"*/}
-                {/*    cardTitleTag="h3"*/}
-                {/*>*/}
-                {/*</GcdsCard>*/}
-                {/*</p>*/}
+
+
+
+            {/*<GcdsGrid columns="repeat(auto-fit, minmax(100px, 290px))">*/}
+            {/*    <GcdsCard*/}
+            {/*        cardTitle="Personal Information"*/}
+            {/*        href="#"*/}
+            {/*        cardTitleTag="h3"*/}
+            {/*    >*/}
+            {/*    </GcdsCard>*/}
+            {/*    <GcdsCard*/}
+            {/*        cardTitle="Security settings"*/}
+            {/*        href="#"*/}
+            {/*        cardTitleTag="h3"*/}
+            {/*    >*/}
+            {/*    </GcdsCard>*/}
+            {/*</GcdsGrid>*/}
 
         </GcdsContainer>
     );
