@@ -21,6 +21,7 @@ function App() {
                   <Route path="/:language/redirecttorp" element={ <Page page="RP"/>} />
                   <Route path="/:language/phoneotp" element={ <Page page="Phone OTP"/>} />
                   <Route path="*" element={<Navigate to="/" replace />} />
+                  <Route path="/:language/profilenameedit" element={ <Page page={PAGES.ProfileNameEdit}/>} />
                   <Route path="/:language/profilehome" element={ <Page page={PAGES.ProfileHome}/>} />
               </Routes>
           </UserProvider>

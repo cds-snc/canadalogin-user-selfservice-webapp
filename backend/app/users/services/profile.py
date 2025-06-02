@@ -10,20 +10,21 @@ from app.users.schemas import (
     ProfileCreateRequest,
     Operations,
     ProfileGetResponseData,
-    ProfileGetUserData,
     ProfileResponse,
 )
 
 logger = logging.getLogger(__name__)
 
 
-async def create_profile(user_data: ProfileUserData, global_http_client: AsyncClient):
+async def create_profile(
+    user_id, user_data: ProfileUserData, global_http_client: AsyncClient
+):
     try:
         access_token = await get_admin_token(global_http_client)
         headers = get_auth_request_headers(access_token)
         settings = get_settings().ibm_verify_config
-        user_id = user_data.userid
-        create_profile_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/Users/{user_id}"
+        userid = user_id
+        create_profile_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/Users/{userid}"
         first_name = user_data.firstName
         last_name = user_data.lastName
         preferred_language = user_data.preferredLanguage
@@ -58,8 +59,7 @@ async def create_profile(user_data: ProfileUserData, global_http_client: AsyncCl
     if response.status_code == 204:
         logger.info("User profile created successfully.")
         get_response = await get_profile(
-            ProfileGetUserData(userid=user_id),
-            global_http_client=global_http_client,
+            global_http_client=global_http_client, user_id=user_id
         )
         get_dict = get_response.model_dump()
         logger.info(get_dict)
@@ -76,12 +76,11 @@ async def create_profile(user_data: ProfileUserData, global_http_client: AsyncCl
         )
 
 
-async def get_profile(user_data: ProfileGetUserData, global_http_client: AsyncClient):
+async def get_profile(global_http_client: AsyncClient, user_id: str):
     try:
         access_token = await get_admin_token(global_http_client)
         headers = get_auth_request_headers(access_token)
         settings = get_settings().ibm_verify_config
-        user_id = user_data.userid
         get_profile_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/Users/{user_id}"
         response = await global_http_client.get(get_profile_url, headers=headers)
     except ValidationError as e:
