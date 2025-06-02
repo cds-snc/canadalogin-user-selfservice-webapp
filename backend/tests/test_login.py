@@ -146,7 +146,6 @@ async def test_signin_with_password_successfully():
     mock_response.status_code = 200
     user_login_request_data = UserLoginRequestData(
         userName="testuser@example.com", password="frpY3wU*zm%+BL15", trxnId=""
-
     )
 
     with (
@@ -180,7 +179,6 @@ async def test_signin_with_password_status_code_is_400():
 
     user_login_request_data = UserLoginRequestData(
         userName="testuser@example.com", password="frpY3wU*zm%+BL15", trxnId=""
-
     )
 
     with (
