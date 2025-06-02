@@ -190,6 +190,39 @@
     "45": "You can use the same username and password to access any program or service that uses GC Sign in.",
     "46": "GC Sign in",
     "47": "to continue to your"
+  },
+  "ProfileNameEdit": {
+    "1": "What services have access to your name",
+    "2": "First name",
+    "3": "Last name",
+    "4": "Cancel",
+    "5": "Edit your name",
+    "6": "This will update your name with ",
+    "7": "every service you have shared your name with through GC Sign in.",
+    "8": "The following services have access to your name through GC Sign in:",
+    "9": "GEO.ca",
+    "10": "If you are trying to update your name with a service that’s not connected to GC Sign in, you’ll need to go to that account.",
+    "11": "To search for another GC Account, visit the",
+    "12": "GC Account directory"
+  },
+  "ProfileHome": {
+    "1": "Personal information",
+    "2": "Basic information",
+    "3": "Name",
+    "4": "Example Name",
+    "5": "Edit",
+    "6": "Contact information",
+    "7": "Email",
+    "8": "This email is used for signing in and contacting you:",
+    "9": "Verified",
+    "10": "Contact phone number",
+    "11": "This number is used for contacting you:",
+    "12": "Communication",
+    "13": "Language Preference",
+    "14": "English",
+    "15": "Notifications",
+    "16": "We will send account-related notifications to the email registered to your account.",
+    "17": "You may also receive notifications from services connected to your GC Sign in. You can manage those preferences in each service’s settings."
   }
 }
 
