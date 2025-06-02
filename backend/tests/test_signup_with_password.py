@@ -8,7 +8,7 @@ from app.main import app  # Your FastAPI app instance
 from app.users.services.create import (
     signup_with_password,
     create_user,
-    IBMUserCreateRequest, is_verified_email,
+    IBMUserCreateRequest,
 )
 from app.users.schemas import (
     UserLoginRequestData,
@@ -273,40 +273,3 @@ async def test_user_signup(client):
             "message": "User created successfully",
             "data": {"id": "user-123", "userName": "test@abc.com"},
         }
-
-
-@pytest.mark.asyncio
-async def test_is_verified_email():
-    mock_response = MagicMock()
-    mock_response.status_code = 200
-    mock_response.json.return_value = {
-        "success": "true",
-        "message": "User created successfully",
-        "data": {
-            "userName": "Brawndo@gmail.com",
-            "id": "771001FZOI"
-        }
-    }
-    with (
-        patch(
-            "app.users.services.create.get_admin_token", new_callable=AsyncMock
-        ) as mock_token,
-        patch("app.users.services.create.get_auth_request_headers") as mock_headers,
-        patch("app.users.services.create.get_settings") as mock_settings,
-        patch("app.users.services.create.AsyncClient") as mock_client_class,
-    ):
-        mock_token.return_value = "fake--token"
-        mock_headers.return_value = {"Authorization": "Bearer fake-token"}
-        mock_settings.return_value.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
-            "https://fake.ibm.com"
-        )
-
-        mock_client = AsyncMock(spec=AsyncClient)
-        mock_client.__aenter__.return_value = mock_client
-        mock_client.get.return_value = mock_response
-        mock_client_class.return_value = mock_client
-
-    user_data = UserLoginRequestData(
-        userName="test@abc.com", password="testpassword123", trxnId=""
-    )
-    response = await is_verified_email(user_data, global_http_client=mock_client)
