@@ -16,7 +16,7 @@ export default function ProfileYouMayUpdateName() {
 
   return (
     <GcdsContainer>
-      <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={pageContentJson["0"]}>
+      <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle=' '>
         <GcdsText>
           <strong>{pageContentJson["1"]}</strong>
         </GcdsText>
