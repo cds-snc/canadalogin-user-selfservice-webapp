@@ -195,5 +195,24 @@
     "2": "Renseignements personnels",
     "3": "Paramètres de sécurité",
     "4": "Connected services"
-  }
+  },
+  "ProfileHome": {
+    "1": "Informations personnelles",
+    "2": "Informations de base",
+    "3": "Nom",
+    "4": "Exemple de nom",
+    "5": "Modifier",
+    "6": "Coordonnées",
+    "7": "E-mail",
+    "8": "Cette adresse e-mail est utilisée pour vous connecter et vous contacter :",
+    "9": "Vérifié",
+    "10": "Numéro de téléphone",
+    "11": "Ce numéro est utilisé pour vous contacter :",
+    "12": "Communication",
+    "13": "Préférence de langue",
+    "14": "Anglais",
+    "15": "Notifications",
+    "16": "Nous enverrons des notifications relatives à votre compte à l'adresse e-mail associée à votre compte.",
+    "17": "Vous pouvez également recevoir des notifications des services connectés à votre compte GC. Vous pouvez gérer ces préférences dans les paramètres de chaque service."
+}
 }

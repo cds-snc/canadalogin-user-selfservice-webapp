@@ -1,5 +1,5 @@
 module "frontend_client_app" {
-  source                  = "github.com/cds-snc/terraform-modules//simple_static_website?ref=v10.4.2"
+  source                  = "github.com/cds-snc/terraform-modules//simple_static_website?ref=v10.4.6"
   domain_name_source      = var.frontend_subdomain_en
   billing_tag_value       = var.product_with_env
   s3_bucket_name          = var.frontend_subdomain_en
