@@ -4,7 +4,7 @@ import {
   GcdsHeading,
   GcdsText,
   GcdsNotice,
-  GcdsButton, GcdsGrid,GcdsLink
+  GcdsButton, GcdsGrid, GcdsLink
 } from "@cdssnc/gcds-components-react";
 import { getPageContent } from "../../utils/functions";
 import { PAGES } from "../../utils/constants";
@@ -26,14 +26,15 @@ export default function ProfileYouMayUpdateName() {
       <GcdsText>{pageContentJson["4"]}</GcdsText>
       <GcdsText>{pageContentJson["5"]} <GcdsLink href="#" >{pageContentJson["8"]}</GcdsLink></GcdsText>
       <GcdsText>{pageContentJson["9"]} <GcdsLink href="#" >{pageContentJson["10"]}</GcdsLink>{pageContentJson["11"]}</GcdsText>
-      
-        <GcdsButton>
+
+      <GcdsGrid columns="auto auto" gap="1rem" align-items="center">
+        <GcdsButton style={{ width: 'fit-content' }}>
           {pageContentJson["6"]}
-        </GcdsButton>&nbsp;&nbsp;
-        <GcdsButton buttonRole="secondary">
+        </GcdsButton>&nbsp;
+        <GcdsButton buttonRole="secondary" style={{ width: 'fit-content' }}>
           {pageContentJson["7"]}
         </GcdsButton>
-
+      </GcdsGrid>
     </GcdsContainer>
   );
 }
