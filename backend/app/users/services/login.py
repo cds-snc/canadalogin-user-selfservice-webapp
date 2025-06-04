@@ -122,7 +122,9 @@ async def get_user_access_token(assertion: str, global_http_client: AsyncClient)
         raise HTTPException(status_code=400, detail=f"Signup error: {str(e)}")
 
 
-async def signin_with_password(user: UserLoginRequestData, global_http_client: AsyncClient):
+async def signin_with_password(
+    user: UserLoginRequestData, global_http_client: AsyncClient
+):
 
     try:
 
