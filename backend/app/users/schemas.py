@@ -23,6 +23,7 @@ class NewUserCreationData(BaseModel):
     password: str
     trxnId: str
 
+
 # Signup Schema
 
 

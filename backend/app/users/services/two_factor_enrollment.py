@@ -24,7 +24,9 @@ async def handle_enrolling_user_into_2fa(
     two_factor_enrollment_data: TwoFactorEnrollmentUserData,
     global_http_client: AsyncClient,
 ):
-    if await otp_method_is_verified(global_http_client, None, two_factor_enrollment_data):
+    if await otp_method_is_verified(
+        global_http_client, None, two_factor_enrollment_data
+    ):
         try:
             start_time = datetime.now()
             response = await enroll_user(two_factor_enrollment_data, global_http_client)
@@ -69,6 +71,7 @@ async def handle_enrolling_user_into_2fa(
     else:
         generate_error_response(400, "User's 2fa method has not been verified")
 
+
 async def enroll_user(two_factor_enrollment_data, global_http_client):
     try:
         access_token = await get_admin_token(global_http_client)
@@ -111,4 +114,3 @@ async def enroll_user(two_factor_enrollment_data, global_http_client):
             status_code=400,
             detail=f"{two_factor_enrollment_data.enrollmentType} 2FA enrollment error: {str(e)}",
         )
-

@@ -12,7 +12,8 @@ from app.config import get_settings
 from app.utils.access_token import get_auth_request_headers
 from app.users.schemas import (
     IBMUserCreateRequest,
-    IBMUserCreateResponse, NewUserCreationData,
+    IBMUserCreateResponse,
+    NewUserCreationData,
 )
 from app.utils.schemas import ResponseModel
 
