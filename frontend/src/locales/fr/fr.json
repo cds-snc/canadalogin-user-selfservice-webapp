@@ -1,14 +1,15 @@
 {
   "Home": {
-    "1": "Connectez-vous avec Connextion GC",
-    "2": "pour accéder à vôtre",
+    "1": "Connectez-vous",
+    "2": "Utilisez vôtre",
     "3": "compte",
     "4": "Qu’est-ce que Connexion GC?",
     "5": "Connexion GC vous permet d’utiliser un seul compte et un seul mot de passe pour un accès sécurisé et privé aux programmes et services participants.",
     "6": "Les programmes et services participants vous demanderont de créer un compte Connexion GC pour accéder à vos renseignements sur leur site Web ou application de manière sécurisée.",
     "7": "Vous pouvez utiliser le même nom d’utilisateur et le même mot de passe pour accéder à tous les programmes et services utilisant Connexion GC.",
     "8": "Adresse courriel",
-    "9": "Continuer"
+    "9": "Connexion GC",
+    "10": "pour continuer vers votre"
   },
   "Password": {
     "1": "Votre adresse courriel a bien été vérifiée",
@@ -34,7 +35,7 @@
     "1": "Entrez votre adresse courriel",
     "2": "Adresse courriel",
     "3": "Veuillez choisir la langue que vous préférez utiliser pour la correspondance par courriel",
-    "4": "Vous recevrez les courriels de Connexion GC dans la langue sélectionnée",
+    "4": "Vous recevrez les courriels de Connexion GC dans la langue sélectionnée",
     "5": "Anglais",
     "6": "Français"
   },
@@ -50,8 +51,8 @@
     "1": "Un problème est survenu",
     "2": "Adresse courriel invalide. L’adresse courriel doit contenir un symbole « @ » suivi d’un domaine.",
     "3": "Les codes doivent être composés de six chiffres. Veuillez réessayer.",
-    "4": "Password must be 12 characters",
-    "5": "Invalid password. Password must be at least 12 characters and maximum 65 characters.",
+    "4": "Les mots de passe doivent être composés de 12 caractères",
+    "5": "Mot de passe invalide. Les mots de passe doivent être composés de 12 à 65 caractères.",
     "6": "Code invalide. Veuillez réessayer.",
     "7": "Server Error. Please try again later.",
     "8": "Numéro de téléphone invalide. Les numéros de téléphone pour le pays que vous avez sélectionné doivent être composés de ",
@@ -114,12 +115,21 @@
     "18": "Connectez-vous avec Connextion GC",
     "19": "pour accéder à vôtre",
     "20": "compte",
-    "21": "Try another way",
+    "21": "Essayer une autre méthode",
     "22": "Consultez vos courriels",
     "23": "Nous avons envoyé un courriel contenant un code à 6 chiffres à l’adresse :",
     "24": "Le courriel pourrait prendre quelques minutes à arriver. Si vous ne voyez pas le courriel, vérifiez s’il se trouve dans votre dossier de pourriels.",
     "25": "Utiliser une autre adresse courriel",
     "26": "Demander un nouveau code"
+  },
+  "VerificationSelection": {
+    "1": "Choisissez une méthode de connexion",
+    "2": "pour accéder à votre",
+    "3": "compte",
+    "4": "Choisissez une méthode de connexion",
+    "5": "Code à 6 chiffres reçu par SMS",
+    "6": "Code à 6 chiffres reçu par appel vocal",
+    "7": "Par défaut"
   },
   "CreateCoreProfile": {
     "1": "Votre compte de connexion GC a bien été créé.",
@@ -136,7 +146,7 @@
   },
   "Privacy": {
     "1": "Créer une Connexion GC",
-    "2": "pour continuer vers votre",
+    "2": "Créer une",
     "3": "compte",
     "5": "Confidentialité",
     "6": "Lorsque vous créez votre compte, Connexion GC vous demandera de fournir des renseignements personnels de base. Nous demandons ces renseignements afin de :",
@@ -176,6 +186,41 @@
     "42": "Qu’est‑ce que Connexion GC ?",
     "43": "Connexion GC vous permet d’utiliser un seul nom d’utilisateur et un seul mot de passe pour accéder de façon sécurisée et privée aux programmes et services participants.",
     "44": "Les programmes et services participants vous demanderont de créer une connexion GC afin d’accéder en toute sécurité à vos renseignements sur leur site Web ou leur application.",
-    "45": "Vous pouvez utiliser le même nom d’utilisateur et mot de passe pour accéder à n’importe quel programme ou service qui utilise Connexion GC."
+    "45": "Vous pouvez utiliser le même nom d’utilisateur et mot de passe pour accéder à n’importe quel programme ou service qui utilise Connexion GC.",
+    "46": "Connexion GC",
+    "47": "pour continuer vers votre"
+  },
+  "ProfileHome": {
+    "1": "Informations personnelles",
+    "2": "Informations de base",
+    "3": "Nom",
+    "4": "Exemple de nom",
+    "5": "Modifier",
+    "6": "Coordonnées",
+    "7": "E-mail",
+    "8": "Cette adresse e-mail est utilisée pour vous connecter et vous contacter :",
+    "9": "Vérifié",
+    "10": "Numéro de téléphone",
+    "11": "Ce numéro est utilisé pour vous contacter :",
+    "12": "Communication",
+    "13": "Préférence de langue",
+    "14": "Anglais",
+    "15": "Notifications",
+    "16": "Nous enverrons des notifications relatives à votre compte à l'adresse e-mail associée à votre compte.",
+    "17": "Vous pouvez également recevoir des notifications des services connectés à votre compte GC. Vous pouvez gérer ces préférences dans les paramètres de chaque service."
+},
+  "ProfileNameEdit": {
+    "1": "Quels services ont accès à votre nom ?",
+    "2": "Prénom",
+    "3": "Nom de famille",
+    "4": "Annuler",
+    "5": "Modifier votre nom",
+    "6": "Votre nom sera mis à jour avec",
+    "7": "tous les services avec lesquels vous avez partagé votre nom via Connexion GC.",
+    "8": "Les services suivants ont accès à votre nom via Connexion GC :",
+    "9": "GEO.ca",
+    "10": "Si vous essayez de mettre à jour votre nom avec un service qui n'est pas connecté à Connexion GC, vous devrez accéder à ce compte.",
+    "11": "Pour rechercher un autre compte GC, consultez le",
+    "12": "Répertoire des comptes GC"
   }
 }

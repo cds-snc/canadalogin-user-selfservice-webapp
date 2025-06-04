@@ -12,8 +12,8 @@ from app.users.schemas import (
     TwofactorEnrollmentResponse,
     TwoFactorEnrollmentType,
 )
-from app.utils.access_token import get_access_token, get_auth_request_headers
-from app.utils.helpers import generate_error_response
+from app.utils.access_token import get_admin_token, get_auth_request_headers
+from app.utils.helpers import generate_error_response, format_error_response
 from app.utils.schemas import ResponseModel
 
 logger = logging.getLogger(__name__)
@@ -33,7 +33,9 @@ async def handle_enrolling_user_into_2fa(
             logger.error(
                 f"Failed to enroll user in {two_factor_enrollment_data.enrollmentType} 2FA. Response: {response.json()}"
             )
-            return generate_error_response(response.status_code, response.json())
+            return generate_error_response(
+                response.status_code, format_error_response(response.json())
+            )
 
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(f"2FA enrollment request completed in {duration:.2f} seconds")
@@ -67,7 +69,7 @@ async def handle_enrolling_user_into_2fa(
 
 async def enroll_user(two_factor_enrollment_data, global_http_client):
     try:
-        access_token = await get_access_token()
+        access_token = await get_admin_token(global_http_client)
         headers = get_auth_request_headers(access_token, True)
         settings = get_settings().ibm_verify_config
 

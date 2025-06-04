@@ -2,6 +2,7 @@ from enum import Enum
 from typing import List, Optional
 from pydantic import BaseModel, Field, EmailStr, ConfigDict
 from pydantic_extra_types.phone_numbers import PhoneNumber
+from datetime import datetime
 
 from app.utils.schemas import ResponseModel
 
@@ -30,7 +31,7 @@ class IBMNotificationExtension(BaseModel):
         description="Notify the user the password they entered. Setting to true will send a email with the password they entered",
     )
     notifyType: NotifyType = Field(
-        default=NotifyType.EMAIL,
+        default=NotifyType.NONE,
         description="Setting to NONE will not send any notification, Setting the value to EMAIL will send a notification email to the user that the account was created",
     )
 
@@ -57,8 +58,74 @@ class IBMUserCreateResponse(BaseModel):
     id: str
 
 
+class Operations(BaseModel):
+    op: str
+    path: str
+    value: str
+
+
+class ProfileCreateRequest(BaseModel):
+    schemas: List[str] = ["urn:ietf:params:scim:api:messages:2.0:PatchOp"]
+    Operations: List[Operations]
+
+
+class ProfileUserData(BaseModel):
+    firstName: Optional[str] = None
+    lastName: str
+    preferredLanguage: str
+
+
+class Operations(BaseModel):
+    op: str
+    path: str
+    value: str
+
+
 class SignUpResponse(ResponseModel):
     data: Optional[IBMUserCreateResponse] = None
+
+
+class EmailItem(BaseModel):
+    type: str
+    value: EmailStr
+
+
+class Meta(BaseModel):
+    created: datetime
+    location: str
+    lastModified: datetime
+    resourceType: str
+
+
+class Name(BaseModel):
+    formatted: str
+    familyName: str
+    givenName: Optional[str]
+
+
+class IBMExtension(BaseModel):
+    pwdReset: bool
+    userCategory: str
+    twoFactorAuthentication: bool
+    realm: str
+    pwdChangedTime: datetime
+
+
+class ProfileGetResponseData(BaseModel):
+    emails: List[EmailItem]
+    preferredLanguage: Optional[str] = None
+    meta: Meta
+    name: Optional[Name] = None
+    active: bool
+    id: str
+    userName: EmailStr
+
+    class Config:
+        populate_by_name = True
+
+
+class ProfileResponse(ResponseModel):
+    data: Optional[ProfileGetResponseData]
 
 
 # Signin Schema

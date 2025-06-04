@@ -7,7 +7,10 @@ export const NAVIGATION_LINKS = {
     verification: '/verification',
     coreProfile: '/signup/profile',
     privacy: '/signup/privacy',
-    home: '/'
+    home: '/',
+    verificationSelection: '/signin/selectverification',
+    ProfileNameEdit: '/ProfileNameEdit',
+    profileHome: '/profilehome',
 };
 export const CONTEXT_ACTIONS = {
     signUp: 'SIGN_UP',
@@ -20,8 +23,16 @@ export const FLOW_TYPES={
     signIn: "signin",
     sms: "sms",
     voice: "voice",
-    email: "email"
+    email: "email",
+    profile: "profile",
 }
+
+export const LINK_SUBMIT_TYPES = {
+    useNewVerification: 'useNewVerification',
+    requestNewCode: 'requestNewCode'
+}
+
+export const FORM_FIELDS = [ 'email', 'language', 'verificationCode', 'password', 'phone', 'verificationType', 'firstName', 'lastName'];
 
 export const PAGES ={
     signup: 'SignUpEmail',
@@ -31,21 +42,25 @@ export const PAGES ={
     coreProfile: 'CreateCoreProfile',
     password: 'Password',
     home: 'Home',
-    error: 'Error'
+    error: 'Error',
+    verificationSelection: 'VerificationSelection',
+    ProfileNameEdit: 'ProfileNameEdit',
+    ProfileHome: 'ProfileHome'
 }
 
 export const FOOTERS = {
     default: {
-        en: '{ "About GC Sign in": "#", "Help": "#", "Terms": "#" }',
-        fr: '{ "À propos de Connexion GC": "#", "Aide": "#", "Avis": "#" }'
+        en: '{ "About GC Sign in": "https://gc-signin.cdssandbox.xyz/en/", "Help": "https://gc-signin.cdssandbox.xyz/en/", "Terms": "https://gc-signin.cdssandbox.xyz/en/" }',
+        fr: '{ "À propos de Connexion GC": "https://gc-signin.cdssandbox.xyz/en/", "Aide": "https://gc-signin.cdssandbox.xyz/fr/", "Avis": "https://gc-signin.cdssandbox.xyz/en/" }'
     }
 }
 
 export const SERVICES=[
     {
         id: 1,
-        title: 'GEO.ca',
-        description: ''
+        title: 'Parks Canada Reservations',
+        description: '',
+        url: '#'
     }
 ];
 
@@ -54,7 +69,10 @@ export const SUBMIT_END_POINTS = {
     create: '/v1/users/create',
     createCoreProfile: '/v1/users/createcoreprofile',
     transientOtpVerify: '/v1/otp/transient_otp/verify',
-    transientOtpSend: '/v1/otp/transient_otp/send'
+    transientOtpSend: '/v1/otp/transient_otp/send',
+    login: '/v1/otp/users/login',
+    otpVerify: '/v1/otp/otp/verify',
+    otpSend: '/v1/otp/otp/send',
 }
 
 
@@ -66,12 +84,6 @@ export const GA_CATEGORIES = {
 
 export const GA_ACTIONS = {
     clickFirstTimeGc: "Clicked FirstTimeGC -> Privacy",
-    acceptPrivacy: "Accepted Privacy",
-    submitSignUpEmail: "SignUp Email",
-    signUpEmailOTP: "Email OTP Submitted",
-    emailSignUpPassword: "SignUp Password",
-    signUpCoreProfile: "SignUp Core Profile",
-    phoneNumberOTPType: "Phone Number and OTP Type",
 }
 
 export const GA_LABELS = {

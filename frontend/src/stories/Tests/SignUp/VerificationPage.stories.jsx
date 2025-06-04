@@ -5,15 +5,15 @@ import {
 } from "../../../utils/constants.jsx";
 import {getPageContent} from "../../../utils/functions.jsx";
 import {
-    ACTION_TYPES, ERROR_RESPONSE,
+    ACTION_TYPES,
     MSW_MOCKS,
-    TEST_TYPES, TEST_USERS
+    TEST_TYPES, TEST_USERS, VALIDATION_CODE_ERROR_RESPONSE
 } from "../utils/constants.jsx";
 import {buildTestCase, testCase, TestTemplate} from "../utils/functions.tsx";
-const engErrorPageJson = getPageContent('en', "Error");
-const frErrorPageJson = getPageContent('fr', "Error");
-const engPageContentJson = getPageContent('en',  PAGES.verification);
-const frPageContentJson = getPageContent('fr', PAGES.verification);
+const engErrorPageJson = getPageContent(AVAILABLE_LANGUAGES.en, PAGES.error);
+const frErrorPageJson = getPageContent(AVAILABLE_LANGUAGES.fr, PAGES.error);
+const engPageContentJson = getPageContent(AVAILABLE_LANGUAGES.en,  PAGES.verification);
+const frPageContentJson = getPageContent(AVAILABLE_LANGUAGES.fr, PAGES.verification);
 
 export default {
     title: 'GC Sign In/Tests/Sign Up/Verification Page',
@@ -117,7 +117,7 @@ EmailErrorBackEnd.play = async ({ canvasElement, step }) => {
         stepMessage:"Submit form with bad code for email Back End Error",
         link: 'verificationCode',
         heading: engErrorPageJson[1],
-        message: ERROR_RESPONSE.message,
+        message: VALIDATION_CODE_ERROR_RESPONSE.data.message,
         delay: 1000,
         actionType: ACTION_TYPES.submit,
         type: TEST_TYPES.error
@@ -153,7 +153,7 @@ SmsErrorBackEnd.play = async ({ canvasElement, step }) => {
         stepMessage:"Submit form with bad code for SMS Back End Error",
         link: 'verificationCode',
         heading: engErrorPageJson[1],
-        message: ERROR_RESPONSE.message,
+        message: VALIDATION_CODE_ERROR_RESPONSE.data.message,
         delay: 1000,
         actionType: ACTION_TYPES.submit,
         type: TEST_TYPES.error
@@ -189,7 +189,7 @@ VoiceErrorBackEnd.play = async ({ canvasElement, step }) => {
         stepMessage:"Submit form with bad code for Voice Back End Error",
         link: 'verificationCode',
         heading: engErrorPageJson[1],
-        message: ERROR_RESPONSE.message,
+        message: VALIDATION_CODE_ERROR_RESPONSE.data.message,
         delay: 1000,
         actionType: ACTION_TYPES.submit,
         type: TEST_TYPES.error
@@ -288,7 +288,7 @@ FrVoiceRequestNewCode.play = async ({ canvasElement, step }) => {
 }
 EmailNewCodeBackEndError.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.signUp, type:FLOW_TYPES.email },
-    [MSW_MOCKS.transientOtpSend.error]);
+    [MSW_MOCKS.transientOtpSend.serverTimeOut]);
 EmailNewCodeBackEndError.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -297,7 +297,7 @@ EmailNewCodeBackEndError.play = async ({ canvasElement, step }) => {
         stepMessage:"Resend code with Back End for Email No Response Error",
         link: 'verificationCode',
         heading: engErrorPageJson[1],
-        message: ERROR_RESPONSE.message,
+        message: engErrorPageJson[7],
         linkText: engPageContentJson[26],
         delay: 11000,
         actionType: ACTION_TYPES.link,
@@ -306,7 +306,7 @@ EmailNewCodeBackEndError.play = async ({ canvasElement, step }) => {
 }
 VoiceNewCodeBackEndError.parameters = buildTestCase.parameters(NAVIGATION_LINKS.verification,
     { language: AVAILABLE_LANGUAGES.fr, flow: FLOW_TYPES.signUp, type:FLOW_TYPES.voice },
-    [MSW_MOCKS.transientOtpSend.error]);
+    [MSW_MOCKS.transientOtpSend.serverTimeOut]);
 VoiceNewCodeBackEndError.play = async ({ canvasElement, step }) => {
 
     await testCase({
@@ -315,7 +315,7 @@ VoiceNewCodeBackEndError.play = async ({ canvasElement, step }) => {
         stepMessage:"Resend code with Back End for Voice Fr No Response Error",
         link: 'verificationCode',
         heading: frErrorPageJson[1],
-        message: ERROR_RESPONSE.message,
+        message: frErrorPageJson[7],
         linkText: frPageContentJson[16],
         delay: 11000,
         actionType: ACTION_TYPES.link,
@@ -420,7 +420,7 @@ TestUserBadCode.play = async ({ canvasElement, step }) => {
         stepMessage:"Submit form with bad code, test user",
         link: 'verificationCode',
         heading: engErrorPageJson[1],
-        message: ERROR_RESPONSE.message,
+        message: VALIDATION_CODE_ERROR_RESPONSE.data.message,
         delay: 1000,
         actionType: ACTION_TYPES.submit,
         type: TEST_TYPES.error

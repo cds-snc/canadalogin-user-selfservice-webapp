@@ -6,11 +6,12 @@ from httpx import AsyncClient
 from pydantic import ValidationError
 
 from app.config import get_settings
-from app.otp.schemas import UserOtpInfo, OtpType, OtpSentResponse
-from app.utils.access_token import get_access_token, get_auth_request_headers
+from app.otp.schemas import UserOtpInfo, OtpType, OtpDataResponse
+from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.helpers import (
     generate_error_response,
     prepare_pydantic_phone_number_for_verify,
+    format_error_response,
 )
 from app.utils.schemas import ResponseModel
 
@@ -38,7 +39,8 @@ async def handle_otp_send(user_otp_info: UserOtpInfo, global_http_client: AsyncC
                 f"Error while sending {user_otp_info.otpType} OTP: {http_client_response.json()}"
             )
             return generate_error_response(
-                http_client_response.status_code, http_client_response.json()
+                http_client_response.status_code,
+                format_error_response(http_client_response.json()),
             )
 
         response_json = http_client_response.json()
@@ -47,7 +49,7 @@ async def handle_otp_send(user_otp_info: UserOtpInfo, global_http_client: AsyncC
             logger.info(f"{user_otp_info.otpType} OTP created and sent")
 
             try:
-                validated_data = OtpSentResponse(**response_json)
+                validated_data = OtpDataResponse(**response_json)
 
             except ValidationError as e:
                 logger.error(f"Validation Error: {e.json()}")
@@ -71,7 +73,7 @@ async def dispatch_otp(user_otp_info: UserOtpInfo, global_http_client: AsyncClie
     Use it for ALL API calls."""
 
     try:
-        access_token = await get_access_token()
+        access_token = await get_admin_token(global_http_client)
         headers = get_auth_request_headers(access_token, True)
         settings = get_settings().ibm_verify_config
 

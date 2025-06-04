@@ -45,7 +45,7 @@ export default function SignUpEmail() {
     const {handleSubmit, isPending} = useSubmit(submitDataOptions, validateEmail );
 
     return (
-        <GcdsContainer className="gcds-content" >
+        <GcdsContainer>
              <GcdsContainer>
                 {
                     hasErrors()&&(<GcdsErrorSummary data-testid='errorSummary'

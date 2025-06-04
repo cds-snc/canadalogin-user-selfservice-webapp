@@ -48,4 +48,4 @@ git clone https://github.com/cds-snc/gc-signin-ibm.git
 - [GC Sign in Static website](https://github.com/cds-snc/gc-signin-static-website)
 
 ### AWS Deployment
-See [AWS Architecture](docs/architecture/gc-signin-aws-system-architecture.mmd) for infrastructure details and visit the [gc-signin-terraform repo](https://github.com/cds-snc/gc-signin-terraform).
+See [AWS Architecture](docs/architecture/gc-signin-pilot-architecture.png) for infrastructure details and visit the [gc-signin-terraform repo](https://github.com/cds-snc/gc-signin-terraform).

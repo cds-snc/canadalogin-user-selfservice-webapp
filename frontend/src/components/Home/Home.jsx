@@ -26,7 +26,7 @@ import {useParams} from "react-router";
 console.log("Config URL", config.apiUrl);
 
 export default function Home() {
-    const {language, flow} = useParams();
+    const {language} = useParams();
     const {state} = useUser();
     const [email, setEmail] = useState(state.userData.email);
     const currentLang = getLanguage(language);
@@ -49,15 +49,14 @@ export default function Home() {
         navigateTo: "/" + currentLang + "/" + FLOW_TYPES.signIn + NAVIGATION_LINKS.password,
         type:FLOW_TYPES.email,
         page: PAGES.home,
-        flow: flow,
+        flow: FLOW_TYPES.signIn,
         onError: (err)=> setError('#email',err)
     };
     const {handleSubmit, isPending} = useSubmit(submitDataOptions, validateEmail );
 
-
     console.log("Config URL", config.apiUrl);
     return (
-        <GcdsContainer className="gcds-content" >
+        <GcdsContainer>
             <GcdsContainer>
                 {
                     hasErrors()&&(<GcdsErrorSummary data-testid='errorSummary'
@@ -67,14 +66,14 @@ export default function Home() {
                 }
                 <GcdsHeading tag="h1">
                         {pageContentJson['1']}
-                        <GcdsText marginTop="150" marginBottom="0">
-                            {pageContentJson['2']}
-                            <strong>
-                                {currentLang===AVAILABLE_LANGUAGES.fr?' '+pageContentJson['3']+' ':''}
-                                {` ${SERVICES[0].title}`}{currentLang!==AVAILABLE_LANGUAGES.fr?' '+pageContentJson['3']:''}
-                            </strong>
-                        </GcdsText>
                 </GcdsHeading>
+                <GcdsText>
+                    <span>{pageContentJson['2']}</span> <strong>{pageContentJson['9']}</strong> {pageContentJson['10']}
+                    <strong>
+                        {currentLang===AVAILABLE_LANGUAGES.fr?' '+pageContentJson['3']+' ':<br/>}
+                        {` ${SERVICES[0].title}`}{currentLang!==AVAILABLE_LANGUAGES.fr?' '+pageContentJson['3']:''}
+                    </strong>
+                </GcdsText>
                 <GcdsDetails detailsTitle={pageContentJson['4']}>
                     <GcdsText>
                         {pageContentJson['5']}

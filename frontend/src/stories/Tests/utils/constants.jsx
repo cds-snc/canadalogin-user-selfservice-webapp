@@ -1,6 +1,15 @@
 import {SERVICES, SUBMIT_END_POINTS} from "../../../utils/constants.jsx";
 export const TEST_USERS = new Map([
-    ['test@test.gc.ca', {emailOtp: '441234', smsOtp: '515136', voiceOtp: '151136'}],
+    ['test@test.gc.ca', {emailOtp: '441234', smsOtp: '515136', voiceOtp: '151136', login: 'testUser12345'}],
+]);
+export const TEST_PROTOTYPES = new Map([
+    ['email', { mobileUrl: 'https://www.figma.com/proto/Et4mcEGQ92y1Fl7iu4y7is/Pilot-Usability-Test-Prototype?page-id=18%3A1007&node-id=98-6298&viewport=263%2C646%2C0.82&t=Iw4k7fo5gthLDwb4-8&scaling=min-zoom&content-scaling=fixed&hotspot-hints=0&hide-ui=1',
+                desktopUrl: 'https://www.figma.com/proto/Et4mcEGQ92y1Fl7iu4y7is/Pilot-Usability-Test-Prototype?page-id=18%3A1006&node-id=49-6234&p=f&viewport=50%2C250%2C0.8&t=StkDWwaRG7cFfwE4-8&scaling=min-zoom&content-scaling=fixed&hotspot-hints=0&hide-ui=1'}],
+    ['sms', {mobileUrl: 'https://www.figma.com/proto/Et4mcEGQ92y1Fl7iu4y7is/Pilot-Usability-Test-Prototype?page-id=18%3A1003&node-id=98-6274&viewport=1312%2C1238%2C1.03&t=NJPA8cShNZf0g6qA-8&scaling=min-zoom&content-scaling=fixed&hotspot-hints=0&hide-ui=1',
+             desktopUrl: 'https://www.figma.com/proto/Et4mcEGQ92y1Fl7iu4y7is/Pilot-Usability-Test-Prototype?page-id=18%3A1003&node-id=98-6274&viewport=1312%2C1238%2C1.03&t=NJPA8cShNZf0g6qA-8&scaling=min-zoom&content-scaling=fixed&hotspot-hints=0&hide-ui=1'}],
+    ['voice', {mobileUrl: 'https://app.gc-signin.cdssandbox.xyz/en/phoneotp', desktopUrl: 'https://app.gc-signin.cdssandbox.xyz/en/phoneotp'}],
+    ['signUpRedirect', {mobileUrl: 'https://www.figma.com/proto/Et4mcEGQ92y1Fl7iu4y7is/Pilot-Usability-Test-Prototype?page-id=18%3A1002&node-id=21-1415&p=f&viewport=435%2C109%2C0.42&t=QboqD6UYjdJd7wVn-8&scaling=min-zoom&content-scaling=fixed&hotspot-hints=0&hide-ui=1',
+                        desktopUrl: 'https://www.figma.com/proto/Et4mcEGQ92y1Fl7iu4y7is/Pilot-Usability-Test-Prototype?page-id=18%3A1005&node-id=37-1445&p=f&viewport=163%2C118%2C0.51&t=4EvuCHaprUKVeBwU-8&scaling=min-zoom&content-scaling=fixed&hotspot-hints=0&hide-ui=1'}]
 ]);
 export const TestDataUserProvider = {
     isAuthenticated: false,
@@ -16,7 +25,9 @@ export const TestDataUserProvider = {
         stepVerificationSent: false,
         stepVerified:false,
         viewPrivacy:false,
-        id: null
+        id: null,
+        otpType: null,
+        passwordValidated:false
     },
     testData:{
         email: null,
@@ -71,7 +82,15 @@ export const ERROR_RESPONSE = {
     "message": "The system cannot process the request at this time",
     "data": null
 };
-
+export const PASSWORD_ERROR_RESPONSE =
+    {
+        "data": {
+            "success": false,
+            "message": "The system detected an error.",
+            "data": null
+        },
+        "status": 400,
+    }
 export const EMAIL_ERROR_RESPONSE =
 {
     "data": {
@@ -81,13 +100,35 @@ export const EMAIL_ERROR_RESPONSE =
     },
     "status": 400,
 }
-export const SERVER_TIMEOUT_RESPONSE =
-{
+export const PHONE_NUMBER_ERROR_RESPONSE = {
     "data": {
         "success": false,
-        "message": null,
+        "message": "value is not a valid phone number",
         "data": null
     },
+    "status": 400,
+}
+
+export const PROFILE_ERROR_RESPONSE = {
+    "data": {
+        "success": false,
+        "message": "Name is invalid.",
+        "data": null
+    },
+    "status": 400,
+}
+
+export const VALIDATION_CODE_ERROR_RESPONSE = {
+    "data": {
+        "success": false,
+        "message": "Code does not match.",
+        "data": null
+    },
+    "status": 400,
+}
+
+export const SERVER_TIMEOUT_RESPONSE =
+{
     "status": 500,
 }
 
@@ -164,34 +205,52 @@ export const TEST_RESPONSES = {
         data: null
     }
 }
-export const MSW_PASSWORD_POLICY = {type:"get", endpoint: SUBMIT_END_POINTS.requestPasswordPolicy, response:POLICY_RESPONSE };
 
 export const MSW_MOCKS ={
-    passwordPolicy: {type:"get", endpoint: SUBMIT_END_POINTS.requestPasswordPolicy, response:POLICY_RESPONSE },
+    passwordPolicy: {type:"get", endpoint: SUBMIT_END_POINTS.requestPasswordPolicy, response: POLICY_RESPONSE },
     transientOtpSend:{
         emailError: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpSend, response: EMAIL_ERROR_RESPONSE},
         error:  {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpSend, response: ERROR_RESPONSE},
-        serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpSend, response: null},
+        serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpSend, response: SERVER_TIMEOUT_RESPONSE},
         emailSuccess: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpSend, response: TEST_RESPONSES.signUpResponse},
         smsSuccess: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpSend, response: TEST_RESPONSES.verificationSmsSetUpResponse},
-        voiceSuccess: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpSend, response: TEST_RESPONSES.verificationVoiceSetUpResponse}
-    },
-    create:{
-        error:  {type: "post", endpoint: SUBMIT_END_POINTS.create, response: ERROR_RESPONSE},
-        serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.create, response: null},
-        success: {type: "post", endpoint: SUBMIT_END_POINTS.create, response: TEST_RESPONSES.passwordResponse}
+        voiceSuccess: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpSend, response: TEST_RESPONSES.verificationVoiceSetUpResponse},
+        phoneError: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpSend, response: PHONE_NUMBER_ERROR_RESPONSE}
     },
     transientOtpVerify:{
-        error:  {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpVerify, response: ERROR_RESPONSE},
-        serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpVerify, response: null},
+        error:  {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpVerify, response: VALIDATION_CODE_ERROR_RESPONSE},
+        serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpVerify, response: SERVER_TIMEOUT_RESPONSE},
         emailSuccess: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpVerify, response: TEST_RESPONSES.verificationEmailResponse},
         smsSuccess: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpVerify, response: TEST_RESPONSES.verificationSmsResponse},
         voiceSuccess: {type: "post", endpoint: SUBMIT_END_POINTS.transientOtpVerify, response: TEST_RESPONSES.verificationVoiceResponse}
     },
+    create:{
+        error:  {type: "post", endpoint: SUBMIT_END_POINTS.create, response: PASSWORD_ERROR_RESPONSE},
+        serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.create, response: SERVER_TIMEOUT_RESPONSE},
+        success: {type: "post", endpoint: SUBMIT_END_POINTS.create, response: TEST_RESPONSES.passwordResponse}
+    },
+    login:{
+        error:  {type: "post", endpoint: SUBMIT_END_POINTS.login, response: PASSWORD_ERROR_RESPONSE},
+        serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.login, response: SERVER_TIMEOUT_RESPONSE},
+        success: {type: "post", endpoint: SUBMIT_END_POINTS.login, response: TEST_RESPONSES.passwordResponse}
+    },
+    otpSend:{
+        error:  {type: "post", endpoint: SUBMIT_END_POINTS.otpSend, response: ERROR_RESPONSE},
+        serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.otpSend, response: SERVER_TIMEOUT_RESPONSE},
+        emailSuccess: {type: "post", endpoint: SUBMIT_END_POINTS.otpSend, response: TEST_RESPONSES.signUpResponse},
+        smsSuccess: {type: "post", endpoint: SUBMIT_END_POINTS.otpSend, response: TEST_RESPONSES.verificationSmsSetUpResponse},
+        voiceSuccess: {type: "post", endpoint: SUBMIT_END_POINTS.otpSend, response: TEST_RESPONSES.verificationVoiceSetUpResponse}
+    },
+    otpVerify:{
+        error:  {type: "post", endpoint: SUBMIT_END_POINTS.otpVerify, response: VALIDATION_CODE_ERROR_RESPONSE},
+        serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.otpVerify, response: SERVER_TIMEOUT_RESPONSE},
+        smsSuccess: {type: "post", endpoint: SUBMIT_END_POINTS.otpVerify, response: TEST_RESPONSES.verificationSmsResponse},
+        voiceSuccess: {type: "post", endpoint: SUBMIT_END_POINTS.otpVerify, response: TEST_RESPONSES.verificationVoiceResponse}
+    },
     createCoreProfile:{
-        error:  {type: "post", endpoint: SUBMIT_END_POINTS.createCoreProfile, response: ERROR_RESPONSE},
-        serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.createCoreProfile, response: null},
-        success: {type: "post", endpoint: SUBMIT_END_POINTS.createCoreProfile, response: SUCCESS_RESPONSE}
+        error:  {type: "post", endpoint: SUBMIT_END_POINTS.createCoreProfile, response: PROFILE_ERROR_RESPONSE},
+        serverTimeOut: {type: "post", endpoint: SUBMIT_END_POINTS.createCoreProfile, response: SERVER_TIMEOUT_RESPONSE},
+        success: {type: "post", endpoint: SUBMIT_END_POINTS.createCoreProfile, response: TEST_RESPONSES.passwordResponse}
     }
 }
 
