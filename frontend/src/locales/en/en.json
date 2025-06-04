@@ -191,6 +191,20 @@
     "46": "GC Sign in",
     "47": "to continue to your"
   },
+  "AreYouSureEditYourName": {
+    "1": "Are you sure you want to update your name?",
+    "2": "You’ve requested to update your name to:",
+    "3": "Example Newname",
+    "4": "This will update your name with the following services:",
+    "5": "GEO.ca",
+    "6": "Heads up",
+    "7": "This ",
+    "8": "Yes, update",
+    "9": "Cancel",
+    "10": "Digital Talent",
+    "11": "does not ",
+    "12": "legally change your name."
+  },
   "ProfileNameEdit": {
     "1": "What services have access to your name",
     "2": "First name",

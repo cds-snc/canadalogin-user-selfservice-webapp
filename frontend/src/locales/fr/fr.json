@@ -190,6 +190,20 @@
     "46": "Connexion GC",
     "47": "pour continuer vers votre"
   },
+  "AreYouSureEditYourName": {
+    "1": "Êtes-vous sûr de vouloir mettre à jour votre nom ?",
+    "2": "Vous avez demandé à mettre à jour votre nom :",
+    "3": "Exemple : Nouveau nom",
+    "4": "Votre nom sera mis à jour avec les services suivants :",
+    "5": "GEO.ca",
+    "6": "Attention",
+    "7": "Ceci",
+    "8": "Enregistrer les modifications",
+    "9": "Annuler",
+    "10": "Talent numérique",
+    "11": "ne modifie pas",
+    "12": "légalement votre nom."
+  },
   "ProfileHome": {
     "1": "Informations personnelles",
     "2": "Informations de base",
