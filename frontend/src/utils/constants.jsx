@@ -9,6 +9,7 @@ export const NAVIGATION_LINKS = {
     privacy: '/signup/privacy',
     home: '/',
     verificationSelection: '/signin/selectverification',
+    ProfileNameEdit: '/ProfileNameEdit',
     profileHome: '/profilehome',
     firstVerifyItsYou: '/firstverifyitsyou',
 
@@ -46,7 +47,8 @@ export const PAGES ={
     error: 'Error',
     verificationSelection: 'VerificationSelection',
     ProfileHome: 'ProfileHome',
-    FirstVerifyItsYou: 'FirstVerifyItsYou'
+    FirstVerifyItsYou: 'FirstVerifyItsYou',
+    ProfileNameEdit: 'ProfileNameEdit'
 }
 
 export const FOOTERS = {
