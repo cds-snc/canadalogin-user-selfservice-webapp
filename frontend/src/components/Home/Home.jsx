@@ -51,7 +51,7 @@ export default function Home() {
         const rpTargetUrl = searchParams.get("Target")
         if (rpTargetUrl) {
             try {
-                const userData = { ...state.userData, relyingPartyTargetValue: rpTargetUrl };
+                const userData = { ...state.userData, relyingPartyTargetValue: encodeURIComponent(rpTargetUrl) };
                 dispatch({ type: CONTEXT_ACTIONS.signUp, payload: userData });
             } catch (err) {
                 console.error("Missing Target URL", err)

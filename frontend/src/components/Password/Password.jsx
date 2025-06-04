@@ -70,10 +70,20 @@ export default function Password() {
         setPasswordPolicy(policy);
     }
 
+    function setNavigationLinks() {
+        let navigationLink = '';
+        if (flow === FLOW_TYPES.signUp) {
+            navigationLink = '/' + language + NAVIGATION_LINKS.twoStepVerification;
+        } else {
+            navigationLink = state.userData.relyingPartyTargetValue
+        }
+        return navigationLink;
+    };
+
     const submitDataOptions = {
         language,
         endpoint: flow === FLOW_TYPES.signUp ? SUBMIT_END_POINTS.create : SUBMIT_END_POINTS.login,
-        navigateTo: flow === FLOW_TYPES.signUp ? '/' + language + NAVIGATION_LINKS.twoStepVerification : '/' + language + '/' + FLOW_TYPES.signIn + NAVIGATION_LINKS.verification,
+        navigateTo: setNavigationLinks(),
         page: PAGES.password,
         flow: flow,
         policy: passwordPolicy,
@@ -81,7 +91,6 @@ export default function Password() {
     };
 
     const { handleSubmit, isPending } = useSubmit(submitDataOptions, validatePassword);
-
     return (
         <GcdsContainer>
             {

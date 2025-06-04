@@ -71,7 +71,6 @@ export const SUBMIT_END_POINTS = {
     createCoreProfile: '/v1/users/createcoreprofile',
     transientOtpVerify: '/v1/otp/transient_otp/verify',
     transientOtpSend: '/v1/otp/transient_otp/send',
-    login: '/v1/otp/users/login',
     otpVerify: '/v1/otp/otp/verify',
     otpSend: '/v1/otp/otp/send',
 }
