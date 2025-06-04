@@ -26,10 +26,10 @@ export default function FirstVerifyItsYou() {
         name="password"
       ></GcdsInput>
       <GcdsGrid columns="repeat(auto-fit, minmax(100px, 100px))" gap="10px" align-items="center">
-        <SubmitButton buttonRole="primary">
+        <SubmitButton buttonRole="primary" style={{ width: 'fit-content' }}>
           {pageContent["4"]}
         </SubmitButton>
-        <GcdsButton buttonRole="secondary">
+        <GcdsButton buttonRole="secondary" style={{ width: 'fit-content' }}>
           {pageContent["5"]}
         </GcdsButton>
       </GcdsGrid>
