@@ -1,3 +1,5 @@
+import json
+
 import pytest
 from unittest.mock import patch, AsyncMock, MagicMock
 from httpx import AsyncClient
@@ -102,40 +104,50 @@ async def test_create_user_raises_generic_error(client):
 
 
 @pytest.mark.asyncio
-async def test_signup_success(client):
+async def test_signup_success_when_email_is_verified():
     user_data = NewUserCreationData(
-        userName="test@abc.com", password="StrongPassword123", trxnId=""
+        userName="testuser@testing.com", password="StrongPassword123", trxnId=""
     )
 
     # Mock response object
     mock_response = MagicMock()
     mock_response.status_code = 201
     mock_response.json.return_value = {
-        "userName": "test@abc.com",
-        "id": "abc123",
-        "emails": [{"value": "test@abc.com"}],
+        "id": "xxxxxx",
+        "userName": "testuser@testing.com",
     }
-    mock_http_client = AsyncMock(spec=AsyncClient)
 
-    # Patch only what's necessary
     with (
-        patch("app.users.services.create.create_user", return_value=mock_response),
-        patch(
-            "app.users.services.otp_verified_check.otp_method_is_verified", return_value=True
-        ) as email_check,
-        patch("app.users.services.create.IBMUserCreateRequest"),
-        patch("app.users.services.create.logger"),
-    ):
+        patch("app.users.services.create.otp_method_is_verified", return_value=True) as is_verified,
+        patch("app.users.services.create.create_user", return_value=mock_response)):
+        mock_http_client = AsyncMock(spec=AsyncClient)
 
         result = await signup_with_password(
             user_data, global_http_client=mock_http_client
         )
 
-        email_check.assert_called_once()
+        is_verified.assert_called_once()
         assert isinstance(result, ResponseModel)
         assert result.success is True
         assert result.message == "User created successfully"
-        assert result.data.userName == "test@abc.com"
+        assert result.data.userName == "testuser@testing.com"
+
+
+@pytest.mark.asyncio
+async def test_signup_success_when_email_is_not_verified():
+    user_data = NewUserCreationData(
+        userName="testuser@testing.com", password="StrongPassword123", trxnId=""
+    )
+    with (patch("app.users.services.create.otp_method_is_verified", return_value=False) as is_verified):
+        mock_http_client = AsyncMock(spec=AsyncClient)
+
+        result = await signup_with_password(
+            user_data, global_http_client=mock_http_client
+        )
+        is_verified.assert_called_once()
+        assert isinstance(result, JSONResponse)
+        assert result.status_code == 400
+        assert result.body is not None
 
 
 @pytest.mark.asyncio
@@ -154,12 +166,13 @@ async def test_signup_failure_from_ibm(client):
         patch("app.users.services.create.create_user", return_value=mock_response),
         patch("app.users.services.create.IBMUserCreateRequest"),
         patch("app.users.services.create.logger"),
-        patch("app.users.services.otp_verified_check.otp_method_is_verified", return_value=True),
+        patch("app.users.services.create.otp_method_is_verified", return_value=True) as is_verified,
     ):
         result = await signup_with_password(
             user_data, global_http_client=mock_http_client
         )
 
+        is_verified.assert_called_once()
         assert isinstance(result, JSONResponse)
         assert result.status_code == 400
         assert result.body is not None
@@ -168,7 +181,7 @@ async def test_signup_failure_from_ibm(client):
 
 @pytest.mark.asyncio
 async def test_signup_failure_caused_by_unverified_email(client):
-    user_data = UserLoginRequestData(
+    user_data = NewUserCreationData(
         userName="user@abc.com", password="pass", trxnId=""
     )
 
@@ -180,7 +193,7 @@ async def test_signup_failure_caused_by_unverified_email(client):
     with (
         patch("app.users.services.create.create_user", return_value=mock_response),
         patch(
-            "app.users.services.otp_verified_check.otp_method_is_verified", return_value=False
+            "app.users.services.create.otp_method_is_verified", return_value=False
         ) as is_verified_email,
         patch("app.users.services.create.IBMUserCreateRequest"),
         patch("app.users.services.create.logger"),
@@ -214,7 +227,7 @@ async def test_signup_validation_error_response(client):
         patch("app.users.services.create.create_user", return_value=mock_response),
         patch("app.users.services.create.IBMUserCreateRequest"),
         patch(
-            "app.users.services.otp_verified_check.otp_method_is_verified", return_value=True
+            "app.users.services.create.otp_method_is_verified", return_value=True
         ) as verified_email,
         patch("app.users.services.create.logger"),
     ):
