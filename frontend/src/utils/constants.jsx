@@ -1,4 +1,3 @@
-
 export const AVAILABLE_LANGUAGES = {en:'en', fr:'fr'};
 export const NAVIGATION_LINKS = {
     signUp: '/signup',
@@ -10,6 +9,7 @@ export const NAVIGATION_LINKS = {
     privacy: '/signup/privacy',
     home: '/',
     verificationSelection: '/signin/selectverification',
+    ProfileNameEdit: '/ProfileNameEdit',
     profileHome: '/profilehome',
     areYouSureEditYourName: '/areYouSureEditYourName',
 };
@@ -47,6 +47,7 @@ export const PAGES ={
     verificationSelection: 'VerificationSelection',
     ProfileHome: 'ProfileHome',
     areYouSureEditYourName: 'AreYouSureEditYourName',
+    ProfileNameEdit: 'ProfileNameEdit'
 }
 
 export const FOOTERS = {

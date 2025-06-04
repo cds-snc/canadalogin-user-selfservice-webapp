@@ -222,5 +222,19 @@
     "15": "Notifications",
     "16": "Nous enverrons des notifications relatives à votre compte à l'adresse e-mail associée à votre compte.",
     "17": "Vous pouvez également recevoir des notifications des services connectés à votre compte GC. Vous pouvez gérer ces préférences dans les paramètres de chaque service."
-}
+},
+  "ProfileNameEdit": {
+    "1": "Quels services ont accès à votre nom ?",
+    "2": "Prénom",
+    "3": "Nom de famille",
+    "4": "Annuler",
+    "5": "Modifier votre nom",
+    "6": "Votre nom sera mis à jour avec",
+    "7": "tous les services avec lesquels vous avez partagé votre nom via Connexion GC.",
+    "8": "Les services suivants ont accès à votre nom via Connexion GC :",
+    "9": "GEO.ca",
+    "10": "Si vous essayez de mettre à jour votre nom avec un service qui n'est pas connecté à Connexion GC, vous devrez accéder à ce compte.",
+    "11": "Pour rechercher un autre compte GC, consultez le",
+    "12": "Répertoire des comptes GC"
+  }
 }
