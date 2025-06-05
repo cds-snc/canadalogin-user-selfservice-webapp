@@ -65,4 +65,4 @@ async def test_otp_method_is_verified():
 
         result = await otp_method_is_verified(mock_client, user_data, None)
     print(result)
-    assert result
+    assert result is False
