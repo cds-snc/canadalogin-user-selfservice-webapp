@@ -13,6 +13,8 @@ export const NAVIGATION_LINKS = {
     profileHome: '/profilehome',
     firstVerifyItsYou: '/firstverifyitsyou',
 
+    profileYouMayUpdateName: '/profileyoumayupdatename',
+    areYouSureEditYourName: '/areYouSureEditYourName',
 };
 export const CONTEXT_ACTIONS = {
     signUp: 'SIGN_UP',
@@ -48,6 +50,8 @@ export const PAGES ={
     verificationSelection: 'VerificationSelection',
     ProfileHome: 'ProfileHome',
     FirstVerifyItsYou: 'FirstVerifyItsYou',
+    profileYouMayUpdateName: 'ProfileYouMayUpdateName',
+    areYouSureEditYourName: 'AreYouSureEditYourName',
     ProfileNameEdit: 'ProfileNameEdit'
 }
 
