@@ -190,6 +190,20 @@
     "46": "Connexion GC",
     "47": "pour continuer vers votre"
   },
+  "AreYouSureEditYourName": {
+    "1": "Êtes-vous sûr de vouloir mettre à jour votre nom ?",
+    "2": "Vous avez demandé à mettre à jour votre nom :",
+    "3": "Exemple : Nouveau nom",
+    "4": "Votre nom sera mis à jour avec les services suivants :",
+    "5": "GEO.ca",
+    "6": "Attention",
+    "7": "Ceci",
+    "8": "Enregistrer les modifications",
+    "9": "Annuler",
+    "10": "Talent numérique",
+    "11": "ne modifie pas",
+    "12": "légalement votre nom."
+  },
   "ProfileHome": {
     "1": "Informations personnelles",
     "2": "Informations de base",
@@ -222,5 +236,19 @@
     "9": "Pour voir les services connectés à votre compte GC Sign in, accédez à ",
     "10": "Services connectés",
     "11": "dans votre tableau de bord GC Sign in."
+},
+  "ProfileNameEdit": {
+    "1": "Quels services ont accès à votre nom ?",
+    "2": "Prénom",
+    "3": "Nom de famille",
+    "4": "Annuler",
+    "5": "Modifier votre nom",
+    "6": "Votre nom sera mis à jour avec",
+    "7": "tous les services avec lesquels vous avez partagé votre nom via Connexion GC.",
+    "8": "Les services suivants ont accès à votre nom via Connexion GC :",
+    "9": "GEO.ca",
+    "10": "Si vous essayez de mettre à jour votre nom avec un service qui n'est pas connecté à Connexion GC, vous devrez accéder à ce compte.",
+    "11": "Pour rechercher un autre compte GC, consultez le",
+    "12": "Répertoire des comptes GC"
   }
 }
