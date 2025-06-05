@@ -107,5 +107,4 @@ async def test_otp_method_is_verified():
         mock_client_class.return_value = mock_client
 
         result = await otp_method_is_verified(mock_client, user_data, None)
-        
     assert result is True
