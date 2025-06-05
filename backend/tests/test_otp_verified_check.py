@@ -65,6 +65,7 @@ async def test_otp_method_is_verified_not():
 
     assert result is False
 
+
 @pytest.mark.asyncio
 async def test_otp_method_is_verified():
     user_data = NewUserCreationData(userName="user@abc.com", password="pass", trxnId="")
