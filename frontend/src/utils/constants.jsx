@@ -11,6 +11,7 @@ export const NAVIGATION_LINKS = {
     verificationSelection: '/signin/selectverification',
     ProfileNameEdit: '/ProfileNameEdit',
     profileHome: '/profilehome',
+    profileYouMayUpdateName: '/profileyoumayupdatename',
     areYouSureEditYourName: '/areYouSureEditYourName',
 };
 export const CONTEXT_ACTIONS = {
@@ -46,6 +47,7 @@ export const PAGES ={
     error: 'Error',
     verificationSelection: 'VerificationSelection',
     ProfileHome: 'ProfileHome',
+    profileYouMayUpdateName: 'ProfileYouMayUpdateName',
     areYouSureEditYourName: 'AreYouSureEditYourName',
     ProfileNameEdit: 'ProfileNameEdit'
 }
