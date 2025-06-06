@@ -29,6 +29,7 @@ export const FLOW_TYPES={
     email: "email",
     dashboard: "dashboard",
     profile: "profile",
+    manage: "manage"
 }
 
 export const LINK_SUBMIT_TYPES = {
