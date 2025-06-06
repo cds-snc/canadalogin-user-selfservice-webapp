@@ -204,6 +204,7 @@
     "10": "Digital Talent",
     "11": "does not ",
     "12": "legally change your name."
+  
   },
   "ProfileNameEdit": {
     "1": "What services have access to your name",
@@ -250,6 +251,13 @@
     "9": "Call me instead",
     "10": "You can request a new code in",
     "11": "10 seconds"
+  },
+  "FirstVerifyItsYou":{
+    "1": "First, verify it's you ",
+    "2": "To edit your email, first enter your current password.",
+    "3": "Password",
+    "4": "Continue",
+    "5": "Cancel"
   },
   "ProfileYouMayUpdateName":{
     "0": "Success",
