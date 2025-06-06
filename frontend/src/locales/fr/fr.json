@@ -237,6 +237,13 @@
     "10": "Services connectés",
     "11": "dans votre tableau de bord GC Sign in."
 },
+  "FirstVerifyItsYou":{
+    "1": "Vérifiez d'abord qu'il s'agit bien de vous",
+    "2": "Pour modifier votre adresse e-mail, saisissez d'abord votre mot de passe actuel.",
+    "3": "Mot de passe",
+    "4": "Continuer",
+    "5": "Annuler"
+  },
   "ProfileNameEdit": {
     "1": "Quels services ont accès à votre nom ?",
     "2": "Prénom",
