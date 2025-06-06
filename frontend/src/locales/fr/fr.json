@@ -238,6 +238,19 @@
     "12": "Vous pouvez demander un nouveau code dans",
     "13": "10 secondes"
   },
+  "CompleteTwoStepVerification": {
+    "1": "Terminer la vérification en 2 étapes",
+    "2": "Pour modifier votre adresse e-mail, saisissez d'abord le code à 6 chiffres que nous vous avons envoyé",
+    "3": "+1 (***) *** - 2934",
+    "4": "Essayer autrement",
+    "5": "Code à 6 chiffres",
+    "6": "Continuer",
+    "7": "Annuler",
+    "8": "Problèmes avec le code ?",
+    "9": "Appelez-moi plutôt",
+    "10": "Vous pouvez demander un nouveau code dans",
+    "11": "10 secondes"
+  },
   "ProfileYouMayUpdateName":{
     "0": "Réussite",
     "1": "Votre nom a été mis à jour vers Example Newname",
@@ -252,6 +265,13 @@
     "10": "Services connectés",
     "11": "dans votre tableau de bord GC Sign in."
 },
+  "FirstVerifyItsYou":{
+    "1": "Vérifiez d'abord qu'il s'agit bien de vous",
+    "2": "Pour modifier votre adresse e-mail, saisissez d'abord votre mot de passe actuel.",
+    "3": "Mot de passe",
+    "4": "Continuer",
+    "5": "Annuler"
+  },
   "ProfileNameEdit": {
     "1": "Quels services ont accès à votre nom ?",
     "2": "Prénom",

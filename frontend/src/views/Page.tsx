@@ -19,6 +19,8 @@ import AreYouSureEditYourName from "../components/Manage/AreYouSureEditYourName.
 import ProfileNameEdit from "../components/PersonalInfo/ProfileNameEdit.jsx";
 import ProfileHome from "../components/Manage/ProfileHome.jsx";
 import CheckYourEmail from "../components/Manage/CheckYourEmail.jsx";
+import CompleteTwoStepVerification from "../components/Manage/CompleteTwoStepVerification.jsx";
+import FirstVerifyItsYou from "../components/Manage/FirstVerifyItsYou.jsx";
 import ProfileYouMayUpdateName from "../components/Manage/ProfileYouMayUpdateName.jsx";
 
 function PageContents({page}:{page:string}) {
@@ -67,6 +69,14 @@ function PageContents({page}:{page:string}) {
             return (
                 <CheckYourEmail />
             );
+        case PAGES.CompleteTwoStepVerification:
+            return (
+                <CompleteTwoStepVerification />
+            );
+        case PAGES.FirstVerifyItsYou:
+            return (
+                <FirstVerifyItsYou />
+            );    
         case PAGES.profileYouMayUpdateName:
             return (
                 <ProfileYouMayUpdateName />
