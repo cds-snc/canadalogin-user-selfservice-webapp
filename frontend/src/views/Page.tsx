@@ -15,8 +15,11 @@ import {useUser} from "../components/Providers/useUser";
 import {useLocation, useParams} from "react-router";
 import { trackPage } from "../utils/gatag.jsx";
 import { useEffect } from "react";
+import AreYouSureEditYourName from "../components/Manage/AreYouSureEditYourName.jsx";
+import ProfileNameEdit from "../components/PersonalInfo/ProfileNameEdit.jsx";
 import ProfileHome from "../components/Manage/ProfileHome.jsx";
 import CheckYourEmail from "../components/Manage/CheckYourEmail.jsx";
+import ProfileYouMayUpdateName from "../components/Manage/ProfileYouMayUpdateName.jsx";
 
 function PageContents({page}:{page:string}) {
     switch(page) {
@@ -52,6 +55,10 @@ function PageContents({page}:{page:string}) {
             return (
                 <Privacy />
             );
+        case PAGES.ProfileNameEdit:
+            return (
+                <ProfileNameEdit />
+            );
         case PAGES.ProfileHome:
             return (
                 <ProfileHome />
@@ -59,6 +66,9 @@ function PageContents({page}:{page:string}) {
         case PAGES.CheckYourEmail:
             return (
                 <CheckYourEmail />
+        case PAGES.profileYouMayUpdateName:
+            return (
+                <ProfileYouMayUpdateName />
             );
         case "RP":
             return (
@@ -80,6 +90,10 @@ function PageContents({page}:{page:string}) {
                         Sign in one time code</a></div>
                 </GcdsText>
             );
+        case PAGES.areYouSureEditYourName:
+            return (
+                <AreYouSureEditYourName />
+            ) 
         default:
             return (<div>Error</div>);
     }

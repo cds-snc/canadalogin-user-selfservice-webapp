@@ -9,8 +9,11 @@ export const NAVIGATION_LINKS = {
     privacy: '/signup/privacy',
     home: '/',
     verificationSelection: '/signin/selectverification',
+    ProfileNameEdit: '/ProfileNameEdit',
     profileHome: '/profilehome',
     checkYourEmail: '/checkyouremail',
+    profileYouMayUpdateName: '/profileyoumayupdatename',
+    areYouSureEditYourName: '/areYouSureEditYourName',
 };
 export const CONTEXT_ACTIONS = {
     signUp: 'SIGN_UP',
@@ -46,6 +49,9 @@ export const PAGES ={
     verificationSelection: 'VerificationSelection',
     ProfileHome: 'ProfileHome',
     CheckYourEmail: 'CheckYourEmail',
+    profileYouMayUpdateName: 'ProfileYouMayUpdateName',
+    areYouSureEditYourName: 'AreYouSureEditYourName',
+    ProfileNameEdit: 'ProfileNameEdit'
 }
 
 export const FOOTERS = {
