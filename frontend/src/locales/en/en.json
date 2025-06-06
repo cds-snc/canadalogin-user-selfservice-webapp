@@ -204,6 +204,7 @@
     "10": "Digital Talent",
     "11": "does not ",
     "12": "legally change your name."
+  
   },
   "ProfileNameEdit": {
     "1": "What services have access to your name",
@@ -244,6 +245,7 @@
     "3": "Password",
     "4": "Continue",
     "5": "Cancel"
+  },
   "ProfileYouMayUpdateName":{
     "0": "Success",
     "1": "Your name has been updated to Example Newname",
