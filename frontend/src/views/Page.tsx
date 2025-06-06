@@ -67,6 +67,7 @@ function PageContents({page}:{page:string}) {
         case PAGES.CompleteTwoStepVerification:
             return (
                 <CompleteTwoStepVerification />
+            );
         case PAGES.FirstVerifyItsYou:
             return (
                 <FirstVerifyItsYou />
