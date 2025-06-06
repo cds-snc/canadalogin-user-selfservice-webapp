@@ -66,9 +66,7 @@ function PageContents({page}:{page:string}) {
         case PAGES.FirstVerifyItsYou:
             return (
                 <FirstVerifyItsYou />
-            );
-
-            case "RP":
+            );    
         case PAGES.profileYouMayUpdateName:
             return (
                 <ProfileYouMayUpdateName />
