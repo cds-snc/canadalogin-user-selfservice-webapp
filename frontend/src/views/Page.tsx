@@ -66,6 +66,7 @@ function PageContents({page}:{page:string}) {
         case PAGES.CheckYourEmail:
             return (
                 <CheckYourEmail />
+            );
         case PAGES.profileYouMayUpdateName:
             return (
                 <ProfileYouMayUpdateName />
