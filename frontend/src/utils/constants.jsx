@@ -12,6 +12,8 @@ export const NAVIGATION_LINKS = {
     ProfileNameEdit: '/ProfileNameEdit',
     profileHome: '/profilehome',
     completeTwoStepVerification: '/completetwostepverification',
+    profileYouMayUpdateName: '/profileyoumayupdatename',
+    areYouSureEditYourName: '/areYouSureEditYourName',
 };
 export const CONTEXT_ACTIONS = {
     signUp: 'SIGN_UP',
@@ -47,6 +49,8 @@ export const PAGES ={
     verificationSelection: 'VerificationSelection',
     ProfileHome: 'ProfileHome',
     CompleteTwoStepVerification: 'CompleteTwoStepVerification',
+    profileYouMayUpdateName: 'ProfileYouMayUpdateName',
+    areYouSureEditYourName: 'AreYouSureEditYourName',
     ProfileNameEdit: 'ProfileNameEdit'
 }
 
