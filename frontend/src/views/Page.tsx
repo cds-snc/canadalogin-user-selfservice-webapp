@@ -21,6 +21,7 @@ import ProfileHome from "../components/Manage/ProfileHome.jsx";
 import CompleteTwoStepVerification from "../components/Manage/CompleteTwoStepVerification.jsx";
 import FirstVerifyItsYou from "../components/Manage/FirstVerifyItsYou.jsx";
 import ProfileYouMayUpdateName from "../components/Manage/ProfileYouMayUpdateName.jsx";
+import EnterNewPhoneNumber from "../components/Manage/EnterNewPhoneNumber.jsx";
 
 function PageContents({page}:{page:string}) {
     switch(page) {
@@ -76,6 +77,11 @@ function PageContents({page}:{page:string}) {
             return (
                 <ProfileYouMayUpdateName />
             );
+        case PAGES.enterNewPhoneNumber:
+            return (
+                <EnterNewPhoneNumber />
+            );
+    
         case "RP":
             return (
                 <GcdsText>
