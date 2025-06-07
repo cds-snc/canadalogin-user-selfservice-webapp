@@ -272,6 +272,9 @@
     "9": "To view what services are connected to your GC Sign in, go to ",
     "10": "Connected Services ",
     "11": "in your GC Sign in dashboard."
+  },
+  "AreYouSureUpdateYourEmail":{
+    "1": "Are you sure you want to update your email?"
   }
 }
 

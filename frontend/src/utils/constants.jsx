@@ -13,9 +13,9 @@ export const NAVIGATION_LINKS = {
     profileHome: '/profilehome',
     completeTwoStepVerification: '/completetwostepverification',
     firstVerifyItsYou: '/firstverifyitsyou',
-
     profileYouMayUpdateName: '/profileyoumayupdatename',
     areYouSureEditYourName: '/areYouSureEditYourName',
+    areYouSureUpdateYourEmail: '/areYouSureUpdateYourEmail'
 };
 export const CONTEXT_ACTIONS = {
     signUp: 'SIGN_UP',
@@ -54,7 +54,8 @@ export const PAGES ={
     FirstVerifyItsYou: 'FirstVerifyItsYou',
     profileYouMayUpdateName: 'ProfileYouMayUpdateName',
     areYouSureEditYourName: 'AreYouSureEditYourName',
-    ProfileNameEdit: 'ProfileNameEdit'
+    ProfileNameEdit: 'ProfileNameEdit',
+    areYouSureUpdateYourEmail: 'AreYouSureUpdateYourEmail',
 }
 
 export const FOOTERS = {
