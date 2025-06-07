@@ -272,6 +272,9 @@
     "9": "To view what services are connected to your GC Sign in, go to ",
     "10": "Connected Services ",
     "11": "in your GC Sign in dashboard."
+  },
+  "YouMayUpdateEmailAtOtherPlaces":{
+    "1": "youMayUpdateEmailAtOtherPlaces"
   }
 }
 
