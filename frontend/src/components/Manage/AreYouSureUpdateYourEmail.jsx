@@ -19,10 +19,11 @@ export default function AreYouSureUpdateYourEmail() {
           <GcdsText>
               {pageContentJson["2"]} <strong>test.user@gmail.com</strong>.
           </GcdsText>
-          <GcdsText>{pageContentJson["3"]}</GcdsText>
-          <ul>
+          <GcdsText>{pageContentJson["3"]}
+          <ul style={{margin: 0}}>
               <li>{pageContentJson["4"]}</li>
           </ul>
+          </GcdsText>
           <br /> &nbsp;
           <GcdsGrid columns="auto auto" gap="1rem" align-items="center">
               <GcdsButton>
