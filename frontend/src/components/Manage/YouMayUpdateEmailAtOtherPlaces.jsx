@@ -16,7 +16,22 @@ export default function YouMayUpdateEmailAtOtherPlaces() {
 
   return (
     <GcdsContainer>
-      <GcdsHeading tag="h1">{pageContentJson["1"]}</GcdsHeading>
+      <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle=' '>
+              <GcdsText>{pageContentJson["1"]} test.user@gmail.com</GcdsText>
+            </GcdsNotice>
+            <br />&nbsp;
+      <GcdsHeading tag="h1">{pageContentJson["2"]}</GcdsHeading>
+      <GcdsHeading tag="h4">{pageContentJson["3"]}</GcdsHeading>
+      <GcdsText>{pageContentJson["4"]}</GcdsText>
+      <GcdsText>{pageContentJson["5"]} <GcdsLink href="#" >{pageContentJson["6"]}</GcdsLink></GcdsText>
+      <GcdsGrid columns="auto auto" gap="1rem" align-items="center">
+              <GcdsButton style={{ width: 'fit-content' }}>
+                {pageContentJson["7"]}
+              </GcdsButton>&nbsp;
+              <GcdsButton buttonRole="secondary" style={{ width: 'fit-content' }}>
+                {pageContentJson["8"]}
+              </GcdsButton>
+            </GcdsGrid>
     </GcdsContainer>
   );
 }

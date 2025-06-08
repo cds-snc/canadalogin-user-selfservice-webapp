@@ -270,5 +270,15 @@
     "10": "Si vous essayez de mettre à jour votre nom avec un service qui n'est pas connecté à Connexion GC, vous devrez accéder à ce compte.",
     "11": "Pour rechercher un autre compte GC, consultez le",
     "12": "Répertoire des comptes GC"
+  },
+  "YouMayUpdateEmailAtOtherPlaces": {
+    "1": "Votre adresse e-mail a été mise à jour vers",
+    "2": "Vous devrez peut-être mettre à jour votre adresse e-mail ailleurs",
+    "3": "Ceci ne modifie votre adresse e-mail que pour les services connectés à votre compte GC.",
+    "4": "Si vous essayez de mettre à jour votre adresse e-mail avec un service non connecté à votre compte GC, vous devrez accéder à ce compte.",
+    "5": "Pour rechercher un autre compte GC, consultez le",
+    "6": "Répertoire des comptes GC.",
+    "7": "Retour au profil",
+    "8": "Déconnexion"
   }
 }
