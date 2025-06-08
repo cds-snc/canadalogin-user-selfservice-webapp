@@ -274,7 +274,12 @@
     "11": "in your GC Sign in dashboard."
   },
   "AreYouSureUpdateYourEmail":{
-    "1": "Are you sure you want to update your email?"
+    "1": "Are you sure you want to update your email?",
+    "2": "You’ve requested to update your email to:",
+    "3": "This will update the email you use to sign in, as well as the email the following services use to contact you:",
+    "4": "GEO.ca",
+    "5": "Yes, update",
+    "6": "Cancel"
   }
 }
 

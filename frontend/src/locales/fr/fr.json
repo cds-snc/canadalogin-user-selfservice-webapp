@@ -270,5 +270,13 @@
     "10": "Si vous essayez de mettre à jour votre nom avec un service qui n'est pas connecté à Connexion GC, vous devrez accéder à ce compte.",
     "11": "Pour rechercher un autre compte GC, consultez le",
     "12": "Répertoire des comptes GC"
+  },
+  "AreYouSureUpdateYourEmail": {
+    "1": "Êtes-vous sûr de vouloir mettre à jour votre adresse courriel ?",
+    "2": "Vous avez demandé la mise à jour de votre adresse courriel :",
+    "3": "Cette action mettra à jour l'adresse courriel que vous utilisez pour vous connecter, ainsi que celle que les services suivants utilisent pour vous contacter :",
+    "4": "GEO.ca",
+    "5": "Oui, mettre à jour",
+    "6": "Annuler"
   }
 }
