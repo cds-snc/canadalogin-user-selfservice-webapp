@@ -51,8 +51,8 @@ export default function EnterNewPhoneNumber() {
                         <GcdsText>{pageContentJson['12']}</GcdsText>
                         </GcdsDetails>
                         <br />&nbsp;
-                        <GcdsGrid columns="auto auto" gap="1rem" align-items="center">
-                          <SubmitButton style={{ width: 'fit-content' }}>
+<GcdsGrid columns="repeat(auto-fit, minmax(100px, 100px))" gap="10px" align-items="center">
+                            <SubmitButton style={{ width: 'fit-content' }}>
                             {pageContentJson["13"]}
                           </SubmitButton>
                           <GcdsButton buttonRole="secondary" style={{ width: 'fit-content' }}>
