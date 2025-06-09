@@ -75,10 +75,15 @@ class ProfileUserData(BaseModel):
     preferredLanguage: str
 
 
-class Operations(BaseModel):
-    op: str
-    path: str
-    value: str
+class PatchUser2faRequest(BaseModel):
+    schemas: List[str] = ["urn:ietf:params:scim:api:messages:2.0:PatchOp"]
+    Operations: List[Operations]
+
+
+# class Operations(BaseModel):
+#     op: str
+#     path: str
+#     value: str
 
 
 class SignUpResponse(ResponseModel):

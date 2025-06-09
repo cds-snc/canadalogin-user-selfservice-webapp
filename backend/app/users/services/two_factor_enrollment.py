@@ -10,7 +10,7 @@ from app.config import get_settings
 from app.users.schemas import (
     TwoFactorEnrollmentUserData,
     TwofactorEnrollmentResponse,
-    TwoFactorEnrollmentType,
+    TwoFactorEnrollmentType, Operations, PatchUser2faRequest,
 )
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.helpers import generate_error_response, format_error_response
@@ -20,10 +20,9 @@ logger = logging.getLogger(__name__)
 
 
 async def handle_enrolling_user_into_2fa(
-    two_factor_enrollment_data: TwoFactorEnrollmentUserData,
-    global_http_client: AsyncClient,
+        two_factor_enrollment_data: TwoFactorEnrollmentUserData,
+        global_http_client: AsyncClient,
 ):
-
     try:
         start_time = datetime.now()
         response = await enroll_user(two_factor_enrollment_data, global_http_client)
@@ -46,6 +45,8 @@ async def handle_enrolling_user_into_2fa(
             logger.error(f"Validation Error: {e.json()}")
             print(json.dumps(e.json(), indent=4))
             raise HTTPException(status_code=422, detail="Response validation error")
+
+        await update_user_profile(two_factor_enrollment_data, global_http_client)
 
         return ResponseModel(
             success=True,
@@ -108,4 +109,49 @@ async def enroll_user(two_factor_enrollment_data, global_http_client):
         raise HTTPException(
             status_code=400,
             detail=f"{two_factor_enrollment_data.enrollmentType} 2FA enrollment error: {str(e)}",
+        )
+
+
+async def update_user_profile(two_factor_enrollment_data: TwoFactorEnrollmentUserData, global_http_client: AsyncClient):
+    try:
+        access_token = await get_admin_token(global_http_client)
+        headers = get_auth_request_headers(access_token)
+        settings = get_settings().ibm_verify_config
+
+        userid = two_factor_enrollment_data.userId
+        edit_profile_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/Users/{userid}"
+
+        operation_list = [
+            Operations(
+                op="add",
+                path="urn:ietf:params:scim:schemas:extension:ibm:2.0:Notification:notifyType",
+                value="NONE",
+
+            ),
+            Operations(
+                op="replace",
+                path="urn:ietf:params:scim:schemas:extension:ibm:2.0:User:customAttributes[name eq \"preferredtwofactorauthmethod\"].values",
+                value='["sms"]'
+            )
+        ]
+
+        create_request = PatchUser2faRequest(Operations=operation_list)
+
+        request_json = create_request.model_dump()
+        response = await global_http_client.patch(
+            edit_profile_url, json=request_json, headers=headers
+        )
+    except ValidationError as e:
+        logger.error(f"Validation Error: {e.json()}")
+        print(json.dumps(e.json(), indent=4))
+        raise HTTPException(status_code=422, detail="Request data validation error")
+
+    if response.status_code == 204:
+        logger.info("User profile updated successfully.")
+
+    else:
+        logger.error(f"Failed to update profile. Response: {response.text}")
+        error_details = response.json().get("detail")
+        raise HTTPException(
+            status_code=response.status_code, detail=f"HTTP error, {error_details}"
         )
