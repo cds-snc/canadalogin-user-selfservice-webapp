@@ -130,8 +130,8 @@ async def update_user_profile(two_factor_enrollment_data: TwoFactorEnrollmentUse
             ),
             Operations(
                 op="replace",
-                path="urn:ietf:params:scim:schemas:extension:ibm:2.0:User:customAttributes[name eq \"preferredtwofactorauthmethod\"].values",
-                value='["sms"]'
+                path="urn:ietf:params:scim:schemas:extension:ibm:2.0:User:customAttributes[name eq \"preferredTwoFactorAuthMethod\"].value",
+                value="sms"
             )
         ]
 
