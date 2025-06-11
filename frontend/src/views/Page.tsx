@@ -18,6 +18,7 @@ import { useEffect } from "react";
 import AreYouSureEditYourName from "../components/Manage/AreYouSureEditYourName.jsx";
 import ProfileNameEdit from "../components/PersonalInfo/ProfileNameEdit.jsx";
 import ProfileHome from "../components/Manage/ProfileHome.jsx";
+import CheckYourEmail from "../components/Manage/CheckYourEmail.jsx";
 import CompleteTwoStepVerification from "../components/Manage/CompleteTwoStepVerification.jsx";
 import FirstVerifyItsYou from "../components/Manage/FirstVerifyItsYou.jsx";
 import ProfileYouMayUpdateName from "../components/Manage/ProfileYouMayUpdateName.jsx";
@@ -63,6 +64,10 @@ function PageContents({page}:{page:string}) {
         case PAGES.ProfileHome:
             return (
                 <ProfileHome />
+            );
+        case PAGES.CheckYourEmail:
+            return (
+                <CheckYourEmail />
             );
         case PAGES.CompleteTwoStepVerification:
             return (
