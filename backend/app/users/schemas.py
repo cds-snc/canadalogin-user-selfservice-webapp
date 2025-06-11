@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import List, Optional, Dict
+from typing import List, Optional
 from pydantic import BaseModel, Field, EmailStr, ConfigDict
 from pydantic_extra_types.phone_numbers import PhoneNumber
 from datetime import datetime
@@ -115,17 +115,20 @@ class IBMExtension(BaseModel):
     realm: str
     pwdChangedTime: datetime
 
+
 class CustomAttributes(BaseModel):
     name: str
     values: List[str]
 
+
 class CustomAttributeValues(BaseModel):
     pwdReset: bool
     userCategory: str
-    twoFactorAuthentication : bool
+    twoFactorAuthentication: bool
     realm: str
-    pwdChangedTime:str
+    pwdChangedTime: str
     customAttributes: List[CustomAttributes]
+
 
 class ProfileGetResponseData(BaseModel):
     emails: List[EmailItem]
