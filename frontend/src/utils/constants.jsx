@@ -14,6 +14,7 @@ export const NAVIGATION_LINKS = {
     completeTwoStepVerification: '/completetwostepverification',
     firstVerifyItsYou: '/firstverifyitsyou',
 
+    enterNewEmail: '/enternewemail',
     profileYouMayUpdateName: '/profileyoumayupdatename',
     areYouSureEditYourName: '/areYouSureEditYourName',
     enterNewPhoneNumber: '/enterNewPhoneNumber',
@@ -53,6 +54,7 @@ export const PAGES ={
     ProfileHome: 'ProfileHome',
     CompleteTwoStepVerification: 'CompleteTwoStepVerification',
     FirstVerifyItsYou: 'FirstVerifyItsYou',
+    EnterNewEmail: 'EnterNewEmail',
     profileYouMayUpdateName: 'ProfileYouMayUpdateName',
     areYouSureEditYourName: 'AreYouSureEditYourName',
     ProfileNameEdit: 'ProfileNameEdit',

@@ -20,6 +20,7 @@ import ProfileNameEdit from "../components/PersonalInfo/ProfileNameEdit.jsx";
 import ProfileHome from "../components/Manage/ProfileHome.jsx";
 import CompleteTwoStepVerification from "../components/Manage/CompleteTwoStepVerification.jsx";
 import FirstVerifyItsYou from "../components/Manage/FirstVerifyItsYou.jsx";
+import EnterNewEmail from "../components/Manage/EnterNewEmail.jsx";
 import ProfileYouMayUpdateName from "../components/Manage/ProfileYouMayUpdateName.jsx";
 import EnterNewPhoneNumber from "../components/Manage/EnterNewPhoneNumber.jsx";
 
@@ -73,6 +74,12 @@ function PageContents({page}:{page:string}) {
             return (
                 <FirstVerifyItsYou />
             );    
+        case PAGES.EnterNewEmail:
+            return (
+                <EnterNewEmail />
+            );
+
+            case "RP":
         case PAGES.profileYouMayUpdateName:
             return (
                 <ProfileYouMayUpdateName />
