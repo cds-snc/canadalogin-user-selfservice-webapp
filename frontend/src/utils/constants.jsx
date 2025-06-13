@@ -11,6 +11,7 @@ export const NAVIGATION_LINKS = {
     verificationSelection: '/signin/selectverification',
     ProfileNameEdit: '/ProfileNameEdit',
     profileHome: '/profilehome',
+    checkYourEmail: '/checkyouremail',
     completeTwoStepVerification: '/completetwostepverification',
     firstVerifyItsYou: '/firstverifyitsyou',
 
@@ -52,6 +53,7 @@ export const PAGES ={
     error: 'Error',
     verificationSelection: 'VerificationSelection',
     ProfileHome: 'ProfileHome',
+    CheckYourEmail: 'CheckYourEmail',
     CompleteTwoStepVerification: 'CompleteTwoStepVerification',
     FirstVerifyItsYou: 'FirstVerifyItsYou',
     EnterNewEmail: 'EnterNewEmail',
