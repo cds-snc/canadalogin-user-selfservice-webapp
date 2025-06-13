@@ -44,11 +44,11 @@ async def handle_enrolling_user_into_2fa(
             logger.info(f"2FA enrollment request completed in {duration:.2f} seconds")
 
             try:
-                 validated_data = TwofactorEnrollmentResponse(**response_json)
+                validated_data = TwofactorEnrollmentResponse(**response_json)
             except ValidationError as e:
-                 logger.error(f"Validation Error: {e.json()}")
-                 print(json.dumps(e.json(), indent=4))
-                 raise HTTPException(status_code=422, detail="Response validation error")
+                logger.error(f"Validation Error: {e.json()}")
+                print(json.dumps(e.json(), indent=4))
+                raise HTTPException(status_code=422, detail="Response validation error")
 
         except HTTPException as he:
             logger.error(f"HTTP Exception in 2FA enrollment: {str(he)}")
