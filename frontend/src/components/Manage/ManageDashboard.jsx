@@ -2,9 +2,8 @@ import React from 'react';
 import {
     GcdsContainer,
     GcdsHeading,
-    GcdsGrid,
     GcdsErrorSummary,
-    GcdsCard
+    GcdsCard, GcdsGrid
 } from "@cdssnc/gcds-components-react";
 import {
     PAGES,
@@ -41,13 +40,13 @@ export default function ManageDashboard() {
             )}
 
                 <GcdsHeading tag="h1">
-                    {pageContent['1']} {userName}
+                    {pageContent['1']}
                 </GcdsHeading>
 
 
             {/* Action Cards */}
 
-            <gcds-grid tag="managedashboard" columns-desktop="1fr 1fr 1fr" columns-tablet="1fr 1fr" columns="repeat(auto-fit, minmax(200px, 250px))" placeContent="center" >
+            <GcdsGrid tag="managedashboard" columnsDesktop="1fr 1fr 1fr" columnsTablet="1fr 1fr" columns="repeat(auto-fit, minmax(200px, 250px))" placeContent="center" >
                 <GcdsCard
                     cardTitle={pageContent['2']}
                     href="#"
@@ -70,7 +69,7 @@ export default function ManageDashboard() {
                         <path d="M52.6221 25.3186V36.6907C52.622 41.4852 51.1837 45.8366 48.291 49.7727C45.4558 53.6304 41.9047 56.0951 37.6221 57.219C33.4757 56.1309 30.0147 53.7862 27.2256 50.1369L26.9531 49.7727C24.0605 45.8366 22.6221 41.4852 22.6221 36.6907V25.3186L37.6221 19.7551L52.6221 25.3186ZM50.6221 26.6477L49.9697 26.4055L37.9697 21.9543L37.6221 21.8254L37.2744 21.9543L25.2744 26.4055L24.6221 26.6477V36.6907C24.6221 40.8829 25.8178 44.7087 28.2012 48.1409C30.5818 51.5688 33.6239 53.8922 37.3223 55.053L37.6221 55.1467L37.9219 55.053C41.6202 53.8922 44.6624 51.5688 47.043 48.1409C49.4264 44.7087 50.622 40.8829 50.6221 36.6907V26.6477Z" fill="#2B4380" stroke="#2B4380" />
                     </svg>
                 </GcdsCard>
-            </gcds-grid>
+            </GcdsGrid>
 
 
 

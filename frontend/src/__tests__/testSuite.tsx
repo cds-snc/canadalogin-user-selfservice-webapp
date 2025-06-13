@@ -8,6 +8,7 @@ import * as engJson from '../locales/en/en.json';
 // @ts-ignore
 import * as frJson from '../locales/fr/fr.json';
 import { PAGES } from "../utils/constants.jsx";
+import {page} from "@vitest/browser/context";
 
 const subLinks = { attribute: 'sub-links', en: getFooter(AVAILABLE_LANGUAGES.en), fr: getFooter(AVAILABLE_LANGUAGES.fr) };
 const GCDS_TAG_ATTRIBUTES = {
@@ -54,6 +55,9 @@ const GCDS_TAG_ATTRIBUTES = {
     'gcds-checkbox': {
         name: 'gcds-checkbox',
         attributes: ['checkbox-id', 'label', 'name']
+    },
+    'gcds-card': {
+        attributes:['card-title', 'href', 'card-title-tag']
     }
 }
 
@@ -78,8 +82,14 @@ export const buildTestSuite = {
 }
 
 const pageSetup = {
-    button: (language: string) => {
-        return language !== AVAILABLE_LANGUAGES.fr ? engJson['Button'] : frJson['Button'];
+    button: (page:string, language: string) => {
+        switch(page){
+            case PAGES.manageDashboard:
+                return null;
+            default:
+                return language !== AVAILABLE_LANGUAGES.fr ? engJson['Button'] : frJson['Button'];
+        }
+
     },
     alreadyGc: (page:string, language:string, flow:string, type:string) =>{
         switch(page) {
@@ -206,6 +216,8 @@ const pageSetup = {
                 return pageSetup.privacyGcdsMap(pageContentJson);
             case PAGES.verificationSelection:
                 return pageSetup.verificationSelectionGcdsMap(pageContentJson)
+            case PAGES.manageDashboard:
+                return pageSetup.manageDashboardGcdsMap(pageContentJson);
             default:
                 return new Map();
         }
@@ -288,6 +300,11 @@ const pageSetup = {
         gcdsElementMap.set('5', ['gcds-radio-group', createMap('gcds-radio-group', ['number', options])]);
 
         return gcdsElementMap;
+    },
+    manageDashboardGcdsMap (pageContentJson: JSON) {
+        const gcdsElementMap = new Map();
+        gcdsElementMap.set('2',['gcds-card', createMap('gcds-card', [pageContentJson['2'], '#', 'h3'])]);
+        return gcdsElementMap;
     }
 }
 
@@ -297,7 +314,7 @@ const testSuite = {
             language: language,
             pageContentJson: language !== AVAILABLE_LANGUAGES.fr ? engJson[page] : frJson[page],
             langLink: link,
-            buttonJson: pageSetup.button(language),
+            buttonJson: pageSetup.button(page, language),
             alreadyGcJson: pageSetup.alreadyGc(page, language, flow, type),
             stepper: pageSetup.stepper(page, language, flow, type),
             textKeysToNotSearch: pageSetup.textKeysToNotSearch(page, flow, type),
@@ -313,6 +330,7 @@ const testSuite = {
         const gcdsElementMap = pageSetup.gcdsMap(language, page, pageContentJson, flow);
 
         Object.keys(pageContentJson).forEach(key => {
+            console.log("key:", key);
             if(gcdsElementMap.has(key))
                 verifyGcdsHtmlElement(gcdsElementMap.get(key)[0], gcdsElementMap.get(key)[1]);
             else if (!textKeysToNotSearch.includes(key))
@@ -324,7 +342,8 @@ const testSuite = {
                 else if ((!smsTextKeys.includes(key) && !voiceTextKeys.includes(key))
                     || (smsTextKeys.includes(key) && !isVoice)
                     || (voiceTextKeys.includes(key) && isVoice))
-                    expect(screen.queryByText(pageContentJson[key])).toBeInTheDocument();
+                { console.log("pageContentJson[key]: ", pageContentJson[key])
+                    expect(screen.queryByText(pageContentJson[key])).toBeInTheDocument();}
         });
     }
 }
@@ -341,6 +360,7 @@ function verifyGcdsHtmlElement(tag: string, attributes: Map<string, string>) {
             });
         })
     }
+
     expect(element).toBeTruthy();
     expect(element).toBeInTheDocument();
 
@@ -371,7 +391,6 @@ function verifyCommonElements(language: string, langLink: string, buttonJson: JS
 
     if (stepper)
         verifyGcdsHtmlElement('gcds-stepper', createMap('gcds-stepper', stepper));
-
     if (buttonJson) {
         verifyGcdsHtmlElement('gcds-button', createMap('gcds-button', ['submit']));
         expect(screen.queryByText(buttonJson['submit'])).toBeInTheDocument();
