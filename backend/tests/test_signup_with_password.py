@@ -2,6 +2,7 @@ import pytest
 from unittest.mock import patch, AsyncMock, MagicMock
 from httpx import AsyncClient
 from fastapi import HTTPException
+
 from app.main import app  # Your FastAPI app instance
 
 from app.users.services.create import (
@@ -13,6 +14,7 @@ from app.users.schemas import (
     UserLoginRequestData,
     SignUpResponse,
     IBMUserCreateResponse,
+    NewUserCreationData,
 )
 from app.utils.schemas import ResponseModel
 
@@ -44,14 +46,15 @@ async def test_create_user_success(client):
 
     with (
         patch(
-            "app.users.services.create.get_admin_token", new_callable=AsyncMock
-        ) as mock_token,
+            "app.users.services.create.get_admin_token",
+            new=AsyncMock(return_value="fake-token"),
+        ),
         patch("app.users.services.create.get_auth_request_headers") as mock_headers,
         patch("app.users.services.create.get_settings") as mock_settings,
         patch("app.users.services.create.AsyncClient") as mock_client_class,
     ):
 
-        mock_token.return_value = "fake--token"
+        # mock_token.return_value = "fake--token"
         mock_headers.return_value = {"Authorization": "Bearer fake-token"}
         mock_settings.return_value.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
             "https://fake.ibm.com"
@@ -77,7 +80,10 @@ async def test_create_user_raises_generic_error(client):
     )
 
     with (
-        patch("app.users.services.create.get_admin_token", new_callable=AsyncMock),
+        patch(
+            "app.users.services.create.get_admin_token",
+            new=AsyncMock(return_value="fake-token"),
+        ),
         patch("app.users.services.create.get_auth_request_headers"),
         patch("app.users.services.create.get_settings"),
         patch("app.users.services.create.AsyncClient") as mock_client_class,
@@ -97,41 +103,62 @@ async def test_create_user_raises_generic_error(client):
 
 
 @pytest.mark.asyncio
-async def test_signup_success(client):
-    user_data = UserLoginRequestData(
-        userName="test@abc.com", password="StrongPassword123"
+async def test_signup_success_when_email_is_verified():
+    user_data = NewUserCreationData(
+        userName="testuser@testing.com", password="StrongPassword123", trxnId=""
     )
 
     # Mock response object
     mock_response = MagicMock()
     mock_response.status_code = 201
     mock_response.json.return_value = {
-        "userName": "test@abc.com",
-        "id": "abc123",
-        "emails": [{"value": "test@abc.com"}],
+        "id": "xxxxxx",
+        "userName": "testuser@testing.com",
     }
-    mock_http_client = AsyncMock(spec=AsyncClient)
 
-    # Patch only what's necessary
     with (
+        patch(
+            "app.users.services.create.otp_method_is_verified", return_value=True
+        ) as is_verified,
         patch("app.users.services.create.create_user", return_value=mock_response),
-        patch("app.users.services.create.IBMUserCreateRequest"),
-        patch("app.users.services.create.logger"),
     ):
+        mock_http_client = AsyncMock(spec=AsyncClient)
 
         result = await signup_with_password(
             user_data, global_http_client=mock_http_client
         )
 
+        is_verified.assert_called_once()
         assert isinstance(result, ResponseModel)
         assert result.success is True
         assert result.message == "User created successfully"
-        assert result.data.userName == "test@abc.com"
+        assert result.data.userName == "testuser@testing.com"
+
+
+@pytest.mark.asyncio
+async def test_signup_success_when_email_is_not_verified():
+    user_data = NewUserCreationData(
+        userName="testuser@testing.com", password="StrongPassword123", trxnId=""
+    )
+    with patch(
+        "app.users.services.create.otp_method_is_verified", return_value=False
+    ) as is_verified:
+        mock_http_client = AsyncMock(spec=AsyncClient)
+
+        result = await signup_with_password(
+            user_data, global_http_client=mock_http_client
+        )
+        is_verified.assert_called_once()
+        assert isinstance(result, JSONResponse)
+        assert result.status_code == 400
+        assert result.body is not None
 
 
 @pytest.mark.asyncio
 async def test_signup_failure_from_ibm(client):
-    user_data = UserLoginRequestData(userName="user@abc.com", password="pass")
+    user_data = UserLoginRequestData(
+        userName="user@abc.com", password="pass", trxnId=""
+    )
 
     mock_response = MagicMock()
     mock_response.status_code = 400
@@ -143,6 +170,37 @@ async def test_signup_failure_from_ibm(client):
         patch("app.users.services.create.create_user", return_value=mock_response),
         patch("app.users.services.create.IBMUserCreateRequest"),
         patch("app.users.services.create.logger"),
+        patch(
+            "app.users.services.create.otp_method_is_verified", return_value=True
+        ) as is_verified,
+    ):
+        result = await signup_with_password(
+            user_data, global_http_client=mock_http_client
+        )
+
+        is_verified.assert_called_once()
+        assert isinstance(result, JSONResponse)
+        assert result.status_code == 400
+        assert result.body is not None
+        assert b"Invalid user" in result.body
+
+
+@pytest.mark.asyncio
+async def test_signup_failure_caused_by_unverified_email(client):
+    user_data = NewUserCreationData(userName="user@abc.com", password="pass", trxnId="")
+
+    mock_response = MagicMock()
+    mock_response.status_code = 400
+
+    mock_http_client = AsyncMock(spec=AsyncClient)
+
+    with (
+        patch("app.users.services.create.create_user", return_value=mock_response),
+        patch(
+            "app.users.services.create.otp_method_is_verified", return_value=False
+        ) as is_verified_email,
+        patch("app.users.services.create.IBMUserCreateRequest"),
+        patch("app.users.services.create.logger"),
     ):
 
         result = await signup_with_password(
@@ -152,13 +210,14 @@ async def test_signup_failure_from_ibm(client):
         assert isinstance(result, JSONResponse)
         assert result.status_code == 400
         assert result.body is not None
-        assert b"Invalid user" in result.body
+        is_verified_email.assert_called_once()
+        assert b"Email has not been verified" in result.body
 
 
 @pytest.mark.asyncio
 async def test_signup_validation_error_response(client):
     user_data = UserLoginRequestData(
-        userName="test@abc.com", password="StrongPassword123"
+        userName="test@abc.com", password="StrongPassword123", trxnId=""
     )
 
     # Malformed response that fails Pydantic validation
@@ -171,12 +230,16 @@ async def test_signup_validation_error_response(client):
     with (
         patch("app.users.services.create.create_user", return_value=mock_response),
         patch("app.users.services.create.IBMUserCreateRequest"),
+        patch(
+            "app.users.services.create.otp_method_is_verified", return_value=True
+        ) as verified_email,
         patch("app.users.services.create.logger"),
     ):
 
         with pytest.raises(HTTPException) as exc_info:
             await signup_with_password(user_data, global_http_client=mock_http_client)
 
+        verified_email.assert_called_once()
         assert exc_info.value.status_code == 422
         assert "Response validation error" in str(exc_info.value.detail)
 
@@ -185,7 +248,7 @@ async def test_signup_validation_error_response(client):
 async def test_user_signup(client):
     # Mock user signup request data
     user_data = UserLoginRequestData(
-        userName="test@abc.com", password="testpassword123"
+        userName="test@abc.com", password="testpassword123", trxnId=""
     )
 
     # Mock the response returned from signup_with_password
@@ -199,13 +262,9 @@ async def test_user_signup(client):
     # Patch the signup_with_password function to return the mock response
     with (
         patch("app.users.v1_router.signup_with_password", return_value=mock_response),
-        patch(
-            "app.users.services.create.get_admin_token", new_callable=AsyncMock
-        ) as mock_get_token,
     ):
 
         # Mock the token response to simulate a successful access token request
-        mock_get_token.return_value = "fake-token"
 
         mock_client = AsyncMock(spec=AsyncClient)
         client.app.state.request_client = mock_client
