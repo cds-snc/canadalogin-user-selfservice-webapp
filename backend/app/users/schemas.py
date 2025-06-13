@@ -15,6 +15,13 @@ class EmailModel(BaseModel):
 class UserLoginRequestData(BaseModel):
     userName: EmailStr
     password: str
+    trxnId: str
+
+
+class NewUserCreationData(BaseModel):
+    userName: EmailStr
+    password: str
+    trxnId: str
 
 
 # Signup Schema
@@ -177,6 +184,7 @@ class TwoFactorEnrollmentUserData(BaseModel):
     userId: str
     phoneNumber: PhoneNumber
     enrollmentType: TwoFactorEnrollmentType
+    trxnId: str
 
 
 class TwofactorEnrollmentResponse(BaseModel):

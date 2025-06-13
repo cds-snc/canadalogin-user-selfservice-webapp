@@ -204,6 +204,7 @@
     "10": "Digital Talent",
     "11": "does not ",
     "12": "legally change your name."
+  
   },
   "ProfileNameEdit": {
     "1": "What services have access to your name",
@@ -237,6 +238,26 @@
     "15": "Notifications",
     "16": "We will send account-related notifications to the email registered to your account.",
     "17": "You may also receive notifications from services connected to your GC Sign in. You can manage those preferences in each service’s settings."
+  },
+  "CompleteTwoStepVerification":{
+    "1": "Complete 2-step verification",
+    "2": "To edit your email, first enter the 6-digit code we sent to:",
+    "3": "+1 (***) *** - 2934",
+    "4": "Try another way",
+    "5": "6-digit code",
+    "6": "Continue",
+    "7": "Cancel",
+    "8": "Problems with the code?",
+    "9": "Call me instead",
+    "10": "You can request a new code in",
+    "11": "10 seconds"
+  },
+  "FirstVerifyItsYou":{
+    "1": "First, verify it's you ",
+    "2": "To edit your email, first enter your current password.",
+    "3": "Password",
+    "4": "Continue",
+    "5": "Cancel"
   },
   "ProfileYouMayUpdateName":{
     "0": "Success",

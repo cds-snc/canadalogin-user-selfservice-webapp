@@ -12,6 +12,7 @@ from app.users.schemas import (
     TwofactorEnrollmentResponse,
     TwoFactorEnrollmentType,
 )
+from app.users.services.otp_verified_check import otp_method_is_verified
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.helpers import generate_error_response, format_error_response
 from app.utils.schemas import ResponseModel
@@ -23,28 +24,44 @@ async def handle_enrolling_user_into_2fa(
     two_factor_enrollment_data: TwoFactorEnrollmentUserData,
     global_http_client: AsyncClient,
 ):
-    try:
-        start_time = datetime.now()
-        response = await enroll_user(two_factor_enrollment_data, global_http_client)
-        response_json = response.json()
-
-        if response.status_code != 201:
-            logger.error(
-                f"Failed to enroll user in {two_factor_enrollment_data.enrollmentType} 2FA. Response: {response.json()}"
-            )
-            return generate_error_response(
-                response.status_code, format_error_response(response.json())
-            )
-
-        duration = (datetime.now() - start_time).total_seconds()
-        logger.info(f"2FA enrollment request completed in {duration:.2f} seconds")
-
+    if await otp_method_is_verified(
+        global_http_client, None, two_factor_enrollment_data
+    ):
         try:
-            validated_data = TwofactorEnrollmentResponse(**response_json)
-        except ValidationError as e:
-            logger.error(f"Validation Error: {e.json()}")
-            print(json.dumps(e.json(), indent=4))
-            raise HTTPException(status_code=422, detail="Response validation error")
+            start_time = datetime.now()
+            response = await enroll_user(two_factor_enrollment_data, global_http_client)
+            response_json = response.json()
+
+            if response.status_code != 201:
+                logger.error(
+                    f"Failed to enroll user in {two_factor_enrollment_data.enrollmentType} 2FA. Response: {response.json()}"
+                )
+                return generate_error_response(
+                    response.status_code, format_error_response(response.json())
+                )
+
+            duration = (datetime.now() - start_time).total_seconds()
+            logger.info(f"2FA enrollment request completed in {duration:.2f} seconds")
+
+            try:
+                 validated_data = TwofactorEnrollmentResponse(**response_json)
+            except ValidationError as e:
+                 logger.error(f"Validation Error: {e.json()}")
+                 print(json.dumps(e.json(), indent=4))
+                 raise HTTPException(status_code=422, detail="Response validation error")
+
+        except HTTPException as he:
+            logger.error(f"HTTP Exception in 2FA enrollment: {str(he)}")
+            raise he
+        except Exception as e:
+            logger.error(
+                f"{two_factor_enrollment_data.enrollmentType} 2FA enrollment error: {str(e)}",
+                exc_info=True,
+            )
+            raise HTTPException(
+                status_code=400,
+                detail=f"{two_factor_enrollment_data.enrollmentType} 2FA verification enrollment error: {str(e)}",
+            )
 
         await set_user_preferred_2fa_method(
             two_factor_enrollment_data, global_http_client
@@ -56,18 +73,8 @@ async def handle_enrolling_user_into_2fa(
             message=f"User enrolled into {two_factor_enrollment_data.enrollmentType} 2FA  successfully",
         )
 
-    except HTTPException as he:
-        logger.error(f"HTTP Exception in 2FA enrollment: {str(he)}")
-        raise he
-    except Exception as e:
-        logger.error(
-            f"{two_factor_enrollment_data.enrollmentType} 2FA enrollment error: {str(e)}",
-            exc_info=True,
-        )
-        raise HTTPException(
-            status_code=400,
-            detail=f"{two_factor_enrollment_data.enrollmentType} 2FA verification enrollment error: {str(e)}",
-        )
+    else:
+        generate_error_response(400, "User's 2fa method has not been verified")
 
 
 async def enroll_user(two_factor_enrollment_data, global_http_client):
