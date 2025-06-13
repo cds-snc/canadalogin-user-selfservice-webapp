@@ -73,6 +73,8 @@ class ProfileUserData(BaseModel):
     firstName: Optional[str] = None
     lastName: str
     preferredLanguage: str
+    mobileNumber: str
+    workNumber: Optional[str] = None
 
 
 class Operations(BaseModel):
@@ -169,3 +171,8 @@ class TwofactorEnrollmentResponse(BaseModel):
 
 class VerifiedTwofactorEnrollmentResponse(ResponseModel):
     data: TwofactorEnrollmentResponse
+
+
+class PasswordChangeRequest(BaseModel):
+    current_password: str
+    new_password: str

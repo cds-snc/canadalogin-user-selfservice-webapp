@@ -8,11 +8,16 @@ from app.users.schemas import (
     VerifiedTwofactorEnrollmentResponse,
     ProfileUserData,
     ProfileResponse,
+    PasswordChangeRequest,
 )
 from app.users.services.create import signup_with_password
 from app.users.services.login import signin_with_password
 from app.users.services.two_factor_enrollment import handle_enrolling_user_into_2fa
-from app.users.services.profile import create_profile, get_profile
+from app.users.services.profile import (
+    create_manage_profile,
+    get_profile,
+    update_password,
+)
 
 
 import logging
@@ -77,7 +82,37 @@ async def user_2fa_enroll(
     description="",
 )
 async def user_create_profile(user_id, user_data: ProfileUserData, request: Request):
-    return await create_profile(user_id, user_data, request.app.state.request_client)
+    return await create_manage_profile(
+        user_id, user_data, request.app.state.request_client
+    )
+
+
+@router.put(
+    "/users/{user_id}/profile",
+    response_model=ProfileResponse,
+    tags=["Users"],
+    summary="Manage user profile in verify",
+    description="",
+)
+async def user_manage_profile(user_id, user_data: ProfileUserData, request: Request):
+    return await create_manage_profile(
+        user_id, user_data, request.app.state.request_client
+    )
+
+
+@router.post(
+    "/users/me/password",
+    response_model=ProfileResponse,
+    tags=["Users"],
+    summary="Update current user password in verify",
+    description="",
+)
+async def user_update_password(
+    access_token, user_data: PasswordChangeRequest, request: Request
+):
+    return await update_password(
+        access_token, user_data, request.app.state.request_client
+    )
 
 
 @router.get(

@@ -11,12 +11,13 @@ from app.users.schemas import (
     Operations,
     ProfileGetResponseData,
     ProfileResponse,
+    PasswordChangeRequest,
 )
 
 logger = logging.getLogger(__name__)
 
 
-async def create_profile(
+async def create_manage_profile(
     user_id, user_data: ProfileUserData, global_http_client: AsyncClient
 ):
     try:
@@ -29,6 +30,8 @@ async def create_profile(
         last_name = user_data.lastName
         preferred_language = user_data.preferredLanguage
         formatted_name = f"{first_name} {last_name}" if first_name else last_name
+        mobile_number = user_data.mobileNumber
+        work_number = user_data.workNumber
 
         operation_list = [
             Operations(
@@ -41,11 +44,17 @@ async def create_profile(
             Operations(
                 op="replace", path="preferredLanguage", value=preferred_language
             ),
+            Operations(op="replace", path="phoneNumbers.mobile", value=mobile_number),
         ]
         if first_name:
             operation_list.append(
                 Operations(op="replace", path="name.givenName", value=first_name)
             )
+        if work_number:
+            operation_list.append(
+                Operations(op="replace", path="phoneNumbers.work", value=work_number),
+            )
+
         create_request = ProfileCreateRequest(Operations=operation_list)
         request_json = create_request.model_dump()
         response = await global_http_client.patch(
@@ -101,4 +110,39 @@ async def get_profile(global_http_client: AsyncClient, user_id: str):
         error_details = response.json().get("detail")
         raise HTTPException(
             status_code=response.status_code, detail=f"HTTP error, {error_details}"
+        )
+
+
+async def update_password(
+    access_token, user_data: PasswordChangeRequest, global_http_client: AsyncClient
+):
+    settings = get_settings().ibm_verify_config
+    update_password_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/Me/password"
+
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json",
+    }
+    payload = {
+        "schemas": [
+            "urn:ietf:params:scim:schemas:ibm:core:2.0:ChangePassword",
+            "urn:ietf:params:scim:schemas:extension:ibm:2.0:Notification",
+        ],
+        "currentPassword": user_data.current_password,
+        "newPassword": user_data.new_password,
+        "urn:ietf:params:scim:schemas:extension:ibm:2.0:Notification": {
+            "notifyType": "NONE"
+        },
+    }
+
+    response = await global_http_client.put(
+        update_password_url, json=payload, headers=headers
+    )
+
+    if response.status_code == 200:
+        return {"message": "Password updated successfully"}
+    else:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.json().get("message", "Failed to update password"),
         )
