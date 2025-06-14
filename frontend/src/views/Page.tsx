@@ -22,6 +22,7 @@ import CheckYourEmail from "../components/Manage/CheckYourEmail.jsx";
 import CompleteTwoStepVerification from "../components/Manage/CompleteTwoStepVerification.jsx";
 import FirstVerifyItsYou from "../components/Manage/FirstVerifyItsYou.jsx";
 import ProfileYouMayUpdateName from "../components/Manage/ProfileYouMayUpdateName.jsx";
+import AreYouSureUpdateContactNumber from "../components/Manage/AreYouSureUpdateContactNumber.jsx";
 
 function PageContents({page}:{page:string}) {
     switch(page) {
@@ -104,6 +105,10 @@ function PageContents({page}:{page:string}) {
         case PAGES.areYouSureEditYourName:
             return (
                 <AreYouSureEditYourName />
+            ) 
+        case PAGES.areYouSureUpdateContactNumber:
+            return (
+                <AreYouSureUpdateContactNumber />
             ) 
         default:
             return (<div>Error</div>);

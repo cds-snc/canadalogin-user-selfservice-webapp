@@ -17,6 +17,7 @@ export const NAVIGATION_LINKS = {
 
     profileYouMayUpdateName: '/profileyoumayupdatename',
     areYouSureEditYourName: '/areYouSureEditYourName',
+    areYouSureUpdateContactNumber: '/areYouSureUpdateContactNumber'
 };
 export const CONTEXT_ACTIONS = {
     signUp: 'SIGN_UP',
@@ -56,7 +57,8 @@ export const PAGES ={
     FirstVerifyItsYou: 'FirstVerifyItsYou',
     profileYouMayUpdateName: 'ProfileYouMayUpdateName',
     areYouSureEditYourName: 'AreYouSureEditYourName',
-    ProfileNameEdit: 'ProfileNameEdit'
+    ProfileNameEdit: 'ProfileNameEdit',
+    areYouSureUpdateContactNumber: 'AreYouSureUpdateContactNumber'
 }
 
 export const FOOTERS = {
