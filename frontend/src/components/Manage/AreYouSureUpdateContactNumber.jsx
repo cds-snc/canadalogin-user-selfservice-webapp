@@ -18,28 +18,28 @@ export default function AreYouSureUpdateContactNumber() {
       <GcdsContainer>
           <GcdsHeading tag="h1">{pageContentJson["1"]}</GcdsHeading>
           <GcdsText>
-              You’ve requested to update your contact phone number to: <br />
-              <strong>+1 (594) 050 - 2039.</strong>
+              {pageContentJson["2"]} <br />
+              <strong>{pageContentJson["3"]}</strong>
           </GcdsText>
               <GcdsText>
-                  This will update your contact phone number with the following services:
+               {pageContentJson["4"]}
               </GcdsText>
               <ul>
-                  <li>GEO.ca</li>
+                  <li>{pageContentJson["5"]}</li>
               </ul>
 
               <GcdsNotice type="info" noticeTitleTag="h2" noticeTitle=' '>
                   <GcdsText>
-                    This only changes your <strong>contact phone number.</strong> To change your 2-step verification number, go to your <GcdsLink href="#">security settings.</GcdsLink> 
+                    {pageContentJson["6"]} <strong>{pageContentJson["7"]}</strong> {pageContentJson["8"]} <GcdsLink href="#">{pageContentJson[9]}</GcdsLink> 
                   </GcdsText>
               </GcdsNotice>
               <br/>
                   <GcdsButton>
-                      Yes, update
+                     {pageContentJson["10"]}
                   </GcdsButton>
                 &nbsp;
                   <GcdsButton buttonRole="secondary" >
-                      Cancel
+                      {pageContentJson["11"]}
                   </GcdsButton>
     </GcdsContainer>
   );
