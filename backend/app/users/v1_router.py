@@ -32,12 +32,12 @@ logger = logging.getLogger(__name__)
     summary="Creates a new user",
     description="Basic Authentication - Email and Password",
 )
-async def user_signup(user: UserLoginRequestData, request: Request, response: Response):
+async def user_signup(user: UserLoginRequestData, request: Request, httpResponse: Response):
     """
     Creates a new user.
     Returns: ID and Username
     """
-    return await signup_with_password(user, request.app.state.request_client, response)
+    return await signup_with_password(user, request.app.state.request_client, httpResponse)
 
 
 @router.post(

@@ -59,13 +59,12 @@ def set_secure_cookie(response: Response, access_token: str):
 
 
 async def signup_with_password(
-    user: NewUserCreationData, global_http_client: AsyncClient, response: Response
+    user: NewUserCreationData, global_http_client: AsyncClient, httpResponse: Response
 ):
-    email = await otp_method_is_verified(global_http_client, user)
+    # email = await otp_method_is_verified(global_http_client, user)
 
-    if not email:
-        return generate_error_response(400, "Email has not been verified.")
-
+    # if not email:
+    #     return generate_error_response(400, "Email has not been verified.")
     """Handle user registration through IBM Verify"""
     try:
         # Prepare user data according to SCIM 2.0 schema
@@ -88,10 +87,8 @@ async def signup_with_password(
         logger.info(f"Signup request completed in {duration:.2f} seconds")
 
         try:
-            login_user = UserLoginRequestData(
-                userName=user.userName, password=user.password
-            )
-            signin_user_response = await signin_with_password(login_user, global_http_client)
+
+            signin_user_response = await signin_with_password(user, global_http_client)
             signin_user_response_json = signin_user_response
 
         except Exception as log_error:
@@ -103,7 +100,7 @@ async def signup_with_password(
                 "userName": create_user_response_json.get("userName"),
                 "id": create_user_response_json.get("id"),
             }
-            set_secure_cookie(response, access_token)
+            set_secure_cookie(httpResponse, access_token)
             validated_data = IBMUserCreateResponse(**authenticated_user)
         except ValidationError as e:
             logger.error(f"Validation Error: {e.json()}")
