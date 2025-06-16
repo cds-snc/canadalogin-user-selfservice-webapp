@@ -190,6 +190,20 @@
     "46": "Connexion GC",
     "47": "pour continuer vers votre"
   },
+  "AreYouSureEditYourName": {
+    "1": "Êtes-vous sûr de vouloir mettre à jour votre nom ?",
+    "2": "Vous avez demandé à mettre à jour votre nom :",
+    "3": "Exemple : Nouveau nom",
+    "4": "Votre nom sera mis à jour avec les services suivants :",
+    "5": "GEO.ca",
+    "6": "Attention",
+    "7": "Ceci",
+    "8": "Enregistrer les modifications",
+    "9": "Annuler",
+    "10": "Talent numérique",
+    "11": "ne modifie pas",
+    "12": "légalement votre nom."
+  },
   "ProfileHome": {
     "1": "Informations personnelles",
     "2": "Informations de base",
@@ -208,7 +222,56 @@
     "15": "Notifications",
     "16": "Nous enverrons des notifications relatives à votre compte à l'adresse e-mail associée à votre compte.",
     "17": "Vous pouvez également recevoir des notifications des services connectés à votre compte GC. Vous pouvez gérer ces préférences dans les paramètres de chaque service."
+  },
+  "CheckYourEmail": {
+    "1": "Vérifiez votre adresse e-mail",
+    "2": "Nous avons envoyé un e-mail avec un code à 6 chiffres à :",
+    "3": "test.user@gmail.com.",
+    "4": "Votre e-mail peut prendre quelques minutes à arriver. Si vous ne le recevez pas, vérifiez vos spams.",
+    "5": "Votre code expirera dans",
+    "6": "10 minutes.",
+    "7": "Code à 6 chiffres",
+    "8": "Continuer",
+    "9": "Annuler",
+    "10": "Problèmes avec le code ?",
+    "11": "Utiliser une autre adresse e-mail",
+    "12": "Vous pouvez demander un nouveau code dans",
+    "13": "10 secondes"
+  },
+  "CompleteTwoStepVerification": {
+    "1": "Terminer la vérification en 2 étapes",
+    "2": "Pour modifier votre adresse e-mail, saisissez d'abord le code à 6 chiffres que nous vous avons envoyé",
+    "3": "+1 (***) *** - 2934",
+    "4": "Essayer autrement",
+    "5": "Code à 6 chiffres",
+    "6": "Continuer",
+    "7": "Annuler",
+    "8": "Problèmes avec le code ?",
+    "9": "Appelez-moi plutôt",
+    "10": "Vous pouvez demander un nouveau code dans",
+    "11": "10 secondes"
+  },
+  "ProfileYouMayUpdateName":{
+    "0": "Réussite",
+    "1": "Votre nom a été mis à jour vers Example Newname",
+    "2": "Vous devrez peut-être mettre à jour votre nom à d'autres endroits.",
+    "3": "Ceci ne modifie votre nom que pour les services connectés à votre compte GC Sign in.",
+    "4": "Si vous essayez de mettre à jour votre nom pour un service qui n'est pas connecté à votre compte GC Sign in, vous devrez accéder à ce compte.",
+    "5": "Pour rechercher un autre compte GC, consultez la section ",
+    "6": "Retour au profil",
+    "7": "Déconnexion",
+    "8": "Répertoire des comptes GC.",
+    "9": "Pour voir les services connectés à votre compte GC Sign in, accédez à ",
+    "10": "Services connectés",
+    "11": "dans votre tableau de bord GC Sign in."
 },
+  "FirstVerifyItsYou":{
+    "1": "Vérifiez d'abord qu'il s'agit bien de vous",
+    "2": "Pour modifier votre adresse e-mail, saisissez d'abord votre mot de passe actuel.",
+    "3": "Mot de passe",
+    "4": "Continuer",
+    "5": "Annuler"
+  },
   "ProfileNameEdit": {
     "1": "Quels services ont accès à votre nom ?",
     "2": "Prénom",

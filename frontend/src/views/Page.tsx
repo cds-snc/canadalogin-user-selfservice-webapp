@@ -15,8 +15,13 @@ import {useUser} from "../components/Providers/useUser";
 import {useLocation, useParams} from "react-router";
 import { trackPage } from "../utils/gatag.jsx";
 import { useEffect } from "react";
+import AreYouSureEditYourName from "../components/Manage/AreYouSureEditYourName.jsx";
 import ProfileNameEdit from "../components/PersonalInfo/ProfileNameEdit.jsx";
 import ProfileHome from "../components/Manage/ProfileHome.jsx";
+import CheckYourEmail from "../components/Manage/CheckYourEmail.jsx";
+import CompleteTwoStepVerification from "../components/Manage/CompleteTwoStepVerification.jsx";
+import FirstVerifyItsYou from "../components/Manage/FirstVerifyItsYou.jsx";
+import ProfileYouMayUpdateName from "../components/Manage/ProfileYouMayUpdateName.jsx";
 
 function PageContents({page}:{page:string}) {
     switch(page) {
@@ -60,6 +65,22 @@ function PageContents({page}:{page:string}) {
             return (
                 <ProfileHome />
             );
+        case PAGES.CheckYourEmail:
+            return (
+                <CheckYourEmail />
+            );
+        case PAGES.CompleteTwoStepVerification:
+            return (
+                <CompleteTwoStepVerification />
+            );
+        case PAGES.FirstVerifyItsYou:
+            return (
+                <FirstVerifyItsYou />
+            );    
+        case PAGES.profileYouMayUpdateName:
+            return (
+                <ProfileYouMayUpdateName />
+            );
         case "RP":
             return (
                 <GcdsText>
@@ -80,6 +101,10 @@ function PageContents({page}:{page:string}) {
                         Sign in one time code</a></div>
                 </GcdsText>
             );
+        case PAGES.areYouSureEditYourName:
+            return (
+                <AreYouSureEditYourName />
+            ) 
         default:
             return (<div>Error</div>);
     }

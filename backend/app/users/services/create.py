@@ -4,14 +4,16 @@ from datetime import datetime
 from pydantic import ValidationError
 from fastapi import HTTPException, Response
 from httpx import AsyncClient
+
+from app.users.services.otp_verified_check import otp_method_is_verified
 from app.utils.access_token import get_admin_token
 from app.utils.helpers import generate_error_response
 from app.config import get_settings
 from app.utils.access_token import get_auth_request_headers
 from app.users.schemas import (
     IBMUserCreateRequest,
-    UserLoginRequestData,
     IBMUserCreateResponse,
+    NewUserCreationData,
 )
 from app.utils.schemas import ResponseModel
 from app.users.services.login import signin_with_password
@@ -57,8 +59,13 @@ def set_secure_cookie(response: Response, access_token: str):
 
 
 async def signup_with_password(
-    user: UserLoginRequestData, global_http_client: AsyncClient, response: Response
+    user: NewUserCreationData, global_http_client: AsyncClient, response: Response
 ):
+    email = await otp_method_is_verified(global_http_client, user)
+
+    if not email:
+        return generate_error_response(400, "Email has not been verified.")
+
     """Handle user registration through IBM Verify"""
     try:
         # Prepare user data according to SCIM 2.0 schema
