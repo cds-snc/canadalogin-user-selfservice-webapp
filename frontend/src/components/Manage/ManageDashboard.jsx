@@ -11,8 +11,8 @@ import {
 import {useParams} from "react-router";
 import {useError} from "../../hooks/useError";
 import {getPageContent} from "../../utils/functions.jsx";
-import { useContext } from "react";
-import UserContext from "../Providers/UserContext";
+// import { useContext } from "react";
+// import UserContext from "../Providers/UserContext";
 
 
 export default function ManageDashboard() {
@@ -20,9 +20,9 @@ export default function ManageDashboard() {
     const { getError, hasErrors} = useError(language);
     const error = getError("#dashboard");
     const pageContent = getPageContent(language, PAGES.manageDashboard);
-    const { userData } = useContext(UserContext);
-    const firstName = userData?.firstName?.trim();
-    const userName = firstName ? firstName : userData?.lastName || "<Name of User>";
+    // const { userData } = useContext(UserContext);
+    // const firstName = userData?.firstName?.trim();
+    // const userName = firstName ? firstName : userData?.lastName || "<Name of User>";
 
     // const userName = userData?.name || "<Name of User" ;
     // const services = state.userData?.services || []; // Example: Fetch user services from state
