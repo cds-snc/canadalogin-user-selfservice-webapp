@@ -2,7 +2,7 @@ import logging
 import json
 from datetime import datetime
 from pydantic import ValidationError
-from fastapi import HTTPException
+from fastapi import HTTPException, Response
 from httpx import AsyncClient
 from app.utils.access_token import get_admin_token
 from app.utils.helpers import generate_error_response
@@ -14,6 +14,7 @@ from app.users.schemas import (
     IBMUserCreateResponse,
 )
 from app.utils.schemas import ResponseModel
+from app.users.services.login import signin_with_password
 
 
 logger = logging.getLogger(__name__)
@@ -44,8 +45,19 @@ async def create_user(
         raise HTTPException(status_code=400, detail=f"Signup error: {str(e)}")
 
 
+def set_secure_cookie(response: Response, access_token: str):
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        httponly=True,
+        secure=False,  # Set to True in production
+        samesite="Lax",  # or "Lax" if needed
+        path="/"
+    )
+
+
 async def signup_with_password(
-    user: UserLoginRequestData, global_http_client: AsyncClient
+    user: UserLoginRequestData, global_http_client: AsyncClient, response: Response
 ):
     """Handle user registration through IBM Verify"""
     try:
@@ -58,18 +70,34 @@ async def signup_with_password(
         core_user = IBMUserCreateRequest(**core_user_data)
 
         start_time = datetime.now()
-        response = await create_user(core_user, global_http_client)
-        response_json = response.json()
-        if response.status_code != 201:
-            error_message = response_json.get("detail", "Unknown error")
+        create_user_response = await create_user(core_user, global_http_client)
+        create_user_response_json = create_user_response.json()
+        if create_user_response.status_code != 201:
+            error_message = create_user_response_json.get("detail", "Unknown error")
             logger.error(f"Failed to create user. Response: {error_message}")
-            return generate_error_response(response.status_code, error_message)
+            return generate_error_response(create_user_response.status_code, error_message)
 
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(f"Signup request completed in {duration:.2f} seconds")
 
         try:
-            validated_data = IBMUserCreateResponse(**response_json)
+            login_user = UserLoginRequestData(
+                userName=user.userName, password=user.password
+            )
+            signin_user_response = await signin_with_password(login_user, global_http_client)
+            signin_user_response_json = signin_user_response
+
+        except Exception as log_error:
+            logger.error(f"Error logging user creation: {str(log_error)}")
+
+        try:
+            access_token = signin_user_response_json.data.get("assertion")
+            authenticated_user = {
+                "userName": create_user_response_json.get("userName"),
+                "id": create_user_response_json.get("id"),
+            }
+            set_secure_cookie(response, access_token)
+            validated_data = IBMUserCreateResponse(**authenticated_user)
         except ValidationError as e:
             logger.error(f"Validation Error: {e.json()}")
             print(json.dumps(e.json(), indent=4))

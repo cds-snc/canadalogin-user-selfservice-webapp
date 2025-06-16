@@ -111,7 +111,7 @@ async def get_user_access_token(assertion: str, global_http_client: AsyncClient)
             user_access_token_url, data=oidc_data, headers=headers
         )
 
-        return await response.json()
+        return response
 
     except HTTPException as he:
         logger.error(f"HTTP Exception in signup: {str(he)}")
@@ -162,7 +162,9 @@ async def signin_with_password(
         response_user_access_token = await get_user_access_token(
             assertion, global_http_client
         )
-        user_access_token = response_user_access_token.get("access_token")
+        user_access_token_response_json = response_user_access_token.json()
+
+        user_access_token = user_access_token_response_json.get("access_token")
         success_data = {
             "id": user_id,
             "assertion": user_access_token,

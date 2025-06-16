@@ -85,9 +85,10 @@ function setSubmitData(formData: FormData) {
 }
 
 function setNavigateTo(submitDataOptions: SubmitDataOptions, response: any, submitData: SubmitData) {
+    const authSessionUrl = "https://cds-gcsignin-dev.verify.ibm.com/v1.0/auth/session?access_token="
+
     switch (submitDataOptions.flow + submitDataOptions.page) {
         case FLOW_TYPES.signIn + PAGES.password:
-            const authSessionUrl = "https://cds-gcsignin-dev.verify.ibm.com/v1.0/auth/session?access_token="
             return `${authSessionUrl}${response.data.assertion}&redirect_url=${submitDataOptions.navigateTo}&scoped=false`;
         case FLOW_TYPES.signUp + PAGES.verificationSetUp:
             return submitDataOptions.navigateTo + "/" + submitData.verificationType;

@@ -68,7 +68,7 @@ export const SUBMIT_END_POINTS = {
     requestPasswordPolicy: '/v1/password/policy',
     create: '/v1/users/create',
     login: '/v1/users/login',
-    createCoreProfile: '/v1/users/createcoreprofile',
+    createCoreProfile: '/v1/users/profile',
     transientOtpVerify: '/v1/otp/transient_otp/verify',
     transientOtpSend: '/v1/otp/transient_otp/send',
     otpVerify: '/v1/otp/otp/verify',

@@ -9,6 +9,9 @@ import {
     VALIDATION_CODE_ERROR_RESPONSE
 } from "../stories/Tests/utils/constants.jsx";
 
+// Set it globally for all axios requests
+axios.defaults.withCredentials = true;
+
 export const authService = {
     requestPasswordPolicy: async () => {
         const response = await axios.get(`${config.apiUrl}${SUBMIT_END_POINTS.requestPasswordPolicy}`);
@@ -18,7 +21,8 @@ export const authService = {
         if (TEST_USERS.has(userData.userName))
             return buildTestResponse(userData, "create");
 
-        const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.create}`, userData);
+        const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.create}`, userData
+        );
         return response.data;
     },
     transientOtpSend: async (userData) => {
@@ -41,7 +45,7 @@ export const authService = {
             openPrototypeWindow('signUpRedirect');
             return SUCCESS_RESPONSE;
         }
-
+        console.log("Creating core profile with data: ", userData);
         const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.createCoreProfile}`, userData);
         return response.data;
     },

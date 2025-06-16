@@ -16,15 +16,13 @@ from app.users.schemas import (
 logger = logging.getLogger(__name__)
 
 
-async def create_profile(
-    user_id, user_data: ProfileUserData, global_http_client: AsyncClient
-):
+async def create_profile(user_data: ProfileUserData, global_http_client: AsyncClient, user_access_token: str):
     try:
         access_token = await get_admin_token(global_http_client)
         headers = get_auth_request_headers(access_token)
         settings = get_settings().ibm_verify_config
-        userid = user_id
-        create_profile_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/Users/{userid}"
+        # userid = user_id
+        create_profile_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/Users/Me"
         first_name = user_data.firstName
         last_name = user_data.lastName
         preferred_language = user_data.preferredLanguage
@@ -56,18 +54,18 @@ async def create_profile(
         print(json.dumps(e.json(), indent=4))
         raise HTTPException(status_code=422, detail="Request data validation error")
 
-    if response.status_code == 204:
-        logger.info("User profile created successfully.")
-        get_response = await get_profile(
-            global_http_client=global_http_client, user_id=user_id
-        )
-        get_dict = get_response.model_dump()
-        logger.info(get_dict)
-        return ProfileResponse(
-            success=True,
-            message="User profile created successfully.",
-            data=ProfileGetResponseData(**get_dict["data"]),
-        )
+    # if response.status_code == 204:
+    #     logger.info("User profile created successfully.")
+    #     get_response = await get_profile(
+    #         global_http_client=global_http_client, user_id=user_id
+    #     )
+    #     get_dict = get_response.model_dump()
+    #     logger.info(get_dict)
+    #     return ProfileResponse(
+    #         success=True,
+    #         message="User profile created successfully.",
+    #         data=ProfileGetResponseData(**get_dict["data"]),
+    #     )
     else:
         logger.error(f"Failed to retrieve profile. Response: {response.text}")
         error_details = response.json().get("detail")

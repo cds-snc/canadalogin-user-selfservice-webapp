@@ -1,4 +1,5 @@
-from fastapi import APIRouter, status, Path
+from fastapi import APIRouter, status, Path, Response
+from fastapi import Cookie
 
 from app.users.schemas import (
     UserLoginRequestData,
@@ -31,12 +32,12 @@ logger = logging.getLogger(__name__)
     summary="Creates a new user",
     description="Basic Authentication - Email and Password",
 )
-async def user_signup(user: UserLoginRequestData, request: Request):
+async def user_signup(user: UserLoginRequestData, request: Request, response: Response):
     """
     Creates a new user.
     Returns: ID and Username
     """
-    return await signup_with_password(user, request.app.state.request_client)
+    return await signup_with_password(user, request.app.state.request_client, response)
 
 
 @router.post(
@@ -70,14 +71,14 @@ async def user_2fa_enroll(
 
 
 @router.post(
-    "/users/{user_id}/profile",
+    "/profile",
     response_model=ProfileResponse,
     tags=["Users"],
     summary="Create user profile in verify",
     description="",
 )
-async def user_create_profile(user_id, user_data: ProfileUserData, request: Request):
-    return await create_profile(user_id, user_data, request.app.state.request_client)
+async def user_create_profile(user_data: ProfileUserData, request: Request, access_token: str = Cookie(None)):
+    return await create_profile(user_data, request.app.state.request_client, access_token)
 
 
 @router.get(

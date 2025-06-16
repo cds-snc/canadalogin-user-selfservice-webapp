@@ -46,24 +46,6 @@ export default function Home() {
         return true;
     }
 
-    function setRelyingPartyParams() {
-        const searchParams = new URLSearchParams(window.location.search)
-        const rpTargetUrl = searchParams.get("Target")
-        if (rpTargetUrl) {
-            try {
-                const userData = { ...state.userData, relyingPartyTargetValue: encodeURIComponent(rpTargetUrl) };
-                dispatch({ type: CONTEXT_ACTIONS.signUp, payload: userData });
-            } catch (err) {
-                console.error("Missing Target URL", err)
-            }
-        }
-    }
-
-    useEffect(() => {
-        setRelyingPartyParams()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
     const submitDataOptions = {
         endpoint: null,
         navigateTo: "/" + currentLang + "/" + FLOW_TYPES.signIn + NAVIGATION_LINKS.password,
