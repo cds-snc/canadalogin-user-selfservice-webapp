@@ -77,18 +77,19 @@ async def user_2fa_enroll(
     summary="Create user profile in verify",
     description="",
 )
-async def user_create_profile(user_data: ProfileUserData, request: Request, access_token: str = Cookie(None)):
-    return await create_profile(user_data, request.app.state.request_client, access_token)
+async def user_create_profile(user_data: ProfileUserData, request: Request, user_access_token: str = Cookie(..., description="User access token")):
+    return await create_profile(user_data, request.app.state.request_client, user_access_token)
 
 
 @router.get(
-    "/users/{user_id}/profile/",
+    "/users/profile",
     response_model=ProfileResponse,
     tags=["Users"],
     summary="Get a single user's profile",
     description="",
 )
 async def user_get_profile(
-    request: Request, user_id: str = Path(..., description="User ID")
+    request: Request,
+    user_access_token: str = Cookie(..., description="User access token")
 ):
-    return await get_profile(request.app.state.request_client, user_id)
+    return await get_profile(request.app.state.request_client, user_access_token)

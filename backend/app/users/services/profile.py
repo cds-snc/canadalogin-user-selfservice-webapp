@@ -18,14 +18,15 @@ logger = logging.getLogger(__name__)
 
 async def create_profile(user_data: ProfileUserData, global_http_client: AsyncClient, user_access_token: str):
     try:
+        get_user_info = await get_profile(global_http_client, user_access_token)
+        user_id = get_user_info.data.id
         access_token = await get_admin_token(global_http_client)
         headers = get_auth_request_headers(access_token)
         settings = get_settings().ibm_verify_config
-        # userid = user_id
-        create_profile_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/Users/Me"
+        create_profile_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/Users/{user_id}"
         first_name = user_data.firstName
         last_name = user_data.lastName
-        preferred_language = user_data.preferredLanguage
+        preferred_language = user_data.language
         formatted_name = f"{first_name} {last_name}" if first_name else last_name
 
         operation_list = [
@@ -54,18 +55,18 @@ async def create_profile(user_data: ProfileUserData, global_http_client: AsyncCl
         print(json.dumps(e.json(), indent=4))
         raise HTTPException(status_code=422, detail="Request data validation error")
 
-    # if response.status_code == 204:
-    #     logger.info("User profile created successfully.")
-    #     get_response = await get_profile(
-    #         global_http_client=global_http_client, user_id=user_id
-    #     )
-    #     get_dict = get_response.model_dump()
-    #     logger.info(get_dict)
-    #     return ProfileResponse(
-    #         success=True,
-    #         message="User profile created successfully.",
-    #         data=ProfileGetResponseData(**get_dict["data"]),
-    #     )
+    if response.status_code == 204:
+        logger.info("User profile created successfully.")
+        get_response = await get_profile(
+            global_http_client=global_http_client, user_access_token=user_access_token
+        )
+        get_dict = get_response.model_dump()
+        logger.info(get_dict)
+        return ProfileResponse(
+            success=True,
+            message="User profile created successfully.",
+            data=ProfileGetResponseData(**get_dict["data"]),
+        )
     else:
         logger.error(f"Failed to retrieve profile. Response: {response.text}")
         error_details = response.json().get("detail")
@@ -74,12 +75,11 @@ async def create_profile(user_data: ProfileUserData, global_http_client: AsyncCl
         )
 
 
-async def get_profile(global_http_client: AsyncClient, user_id: str):
+async def get_profile(global_http_client: AsyncClient, user_access_token: str):
     try:
-        access_token = await get_admin_token(global_http_client)
-        headers = get_auth_request_headers(access_token)
+        headers = get_auth_request_headers(user_access_token)
         settings = get_settings().ibm_verify_config
-        get_profile_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/Users/{user_id}"
+        get_profile_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/Me"
         response = await global_http_client.get(get_profile_url, headers=headers)
     except ValidationError as e:
         logger.error(f"Validation Error: {e.json()}")

@@ -79,13 +79,7 @@ class ProfileCreateRequest(BaseModel):
 class ProfileUserData(BaseModel):
     firstName: Optional[str] = None
     lastName: str
-    preferredLanguage: str
-
-
-class Operations(BaseModel):
-    op: str
-    path: str
-    value: str
+    language: str
 
 
 class SignUpResponse(ResponseModel):

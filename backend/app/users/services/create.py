@@ -47,10 +47,10 @@ async def create_user(
         raise HTTPException(status_code=400, detail=f"Signup error: {str(e)}")
 
 
-def set_secure_cookie(response: Response, access_token: str):
+def set_secure_cookie(response: Response, user_access_token: str):
     response.set_cookie(
-        key="access_token",
-        value=access_token,
+        key="user_access_token",
+        value=user_access_token,
         httponly=True,
         secure=False,  # Set to True in production
         samesite="Lax",  # or "Lax" if needed
@@ -95,12 +95,12 @@ async def signup_with_password(
             logger.error(f"Error logging user creation: {str(log_error)}")
 
         try:
-            access_token = signin_user_response_json.data.get("assertion")
+            user_access_token = signin_user_response_json.data.get("assertion")
             authenticated_user = {
                 "userName": create_user_response_json.get("userName"),
                 "id": create_user_response_json.get("id"),
             }
-            set_secure_cookie(httpResponse, access_token)
+            set_secure_cookie(httpResponse, user_access_token)
             validated_data = IBMUserCreateResponse(**authenticated_user)
         except ValidationError as e:
             logger.error(f"Validation Error: {e.json()}")
