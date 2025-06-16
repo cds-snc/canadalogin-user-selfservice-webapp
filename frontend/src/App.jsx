@@ -8,6 +8,7 @@ import TargetUrl from "./components/Providers/TargetUrl.tsx";
 function App() {
     return (
         <UserProvider>
+            <TargetUrl />
             <Routes>
                 <Route path="/" element={<Page page={PAGES.home} />} />
                 <Route path="/:language" element={<Page page={PAGES.home} />} />
