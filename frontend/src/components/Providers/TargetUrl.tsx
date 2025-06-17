@@ -17,14 +17,14 @@ export default function rpTargetUrl() {
         const rpTargetUrl = searchParams.get("Target")
         const stateId = searchParams.get("stateId");
         const themeId = searchParams.get("themeId");
-        if (rpTargetUrl) {
+        if (rpTargetUrl && stateId && themeId) {
             console.log("rpTargetUrl and stateID", stateId, themeId)
             try {
                 const params = new URLSearchParams({
                     stateId: stateId,
                     themeId: themeId
                 });
-                const fullUrl = `${rpTargetUrl}&${params.toString()}`;
+                const fullUrl = `${rpTargetUrl}&stateId=${stateId}&themeId=${themeId}`;
 
                 const userData = { ...state.userData, relyingPartyTargetValue: encodeURIComponent(fullUrl) };
                 dispatch({ type: CONTEXT_ACTIONS.signUp, payload: userData });
