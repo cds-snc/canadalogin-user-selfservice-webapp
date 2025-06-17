@@ -24,6 +24,7 @@ import FirstVerifyItsYou from "../components/Manage/FirstVerifyItsYou.jsx";
 import EnterNewEmail from "../components/Manage/EnterNewEmail.jsx";
 import ProfileYouMayUpdateName from "../components/Manage/ProfileYouMayUpdateName.jsx";
 import EnterNewPhoneNumber from "../components/Manage/EnterNewPhoneNumber.jsx";
+import AreYouSureUpdateYourEmail from "../components/Manage/AreYouSureUpdateYourEmail.jsx";
 
 function PageContents({page}:{page:string}) {
     switch(page) {
@@ -94,6 +95,10 @@ function PageContents({page}:{page:string}) {
                 <EnterNewPhoneNumber />
             );
     
+        case PAGES.areYouSureUpdateYourEmail:
+            return (
+                <AreYouSureUpdateYourEmail />
+            );
         case "RP":
             return (
                 <GcdsText>
