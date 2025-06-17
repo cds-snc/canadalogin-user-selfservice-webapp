@@ -61,6 +61,7 @@ async def create_profile(user_data: ProfileUserData, global_http_client: AsyncCl
             global_http_client=global_http_client, user_access_token=user_access_token
         )
         get_dict = get_response.model_dump()
+        get_dict["data"]["user_access_token"] = user_access_token
         logger.info(get_dict)
         return ProfileResponse(
             success=True,

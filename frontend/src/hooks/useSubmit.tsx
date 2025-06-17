@@ -45,7 +45,12 @@ export function useSubmit(submitDataOptions: SubmitDataOptions, validateFunction
                     await dispatch({ type: CONTEXT_ACTIONS.signUp, payload: userData });
                     await callAnalytics(submitDataOptions, submitDataOptions.type + '_submit_success', GA_LABELS.button);
                     const navigateTo = setNavigateTo(submitDataOptions, response, submitData);
-                    if (submitDataOptions.flow === FLOW_TYPES.signIn && submitDataOptions.page === PAGES.password) {
+
+                    const isSignInPassword = submitDataOptions.flow === FLOW_TYPES.signIn && submitDataOptions.page === PAGES.password;
+                    const isSignUpProfile = submitDataOptions.flow === FLOW_TYPES.signUp && submitDataOptions.page === PAGES.coreProfile;
+
+
+                    if (isSignInPassword || isSignUpProfile) {
                         window.location.href = navigateTo; // Redirect to the auth session URL
                     } else {
                         navigate(navigateTo);
@@ -92,6 +97,8 @@ function setNavigateTo(submitDataOptions: SubmitDataOptions, response: any, subm
             return `${authSessionUrl}${response.data.assertion}&redirect_url=${submitDataOptions.navigateTo}&scoped=false`;
         case FLOW_TYPES.signUp + PAGES.verificationSetUp:
             return submitDataOptions.navigateTo + "/" + submitData.verificationType;
+        case FLOW_TYPES.signUp + PAGES.coreProfile:
+            return `${authSessionUrl}${response.data.user_access_token}&redirect_url=${submitDataOptions.navigateTo}&scoped=false`;
         default:
             return submitDataOptions.navigateTo;
     }

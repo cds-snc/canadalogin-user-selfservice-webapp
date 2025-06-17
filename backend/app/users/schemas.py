@@ -15,7 +15,7 @@ class EmailModel(BaseModel):
 class UserLoginRequestData(BaseModel):
     userName: EmailStr
     password: str
-    trxnId: str
+    trxnId: str = None
 
 
 class NewUserCreationData(BaseModel):
@@ -120,6 +120,7 @@ class ProfileGetResponseData(BaseModel):
     active: bool
     id: str
     userName: EmailStr
+    user_access_token: Optional[str] = None
 
     class Config:
         populate_by_name = True
