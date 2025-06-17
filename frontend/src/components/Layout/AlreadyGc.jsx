@@ -1,17 +1,21 @@
-import {GcdsHeading, GcdsLink, GcdsText} from "@cdssnc/gcds-components-react";
-import {getPageContent} from "../../utils/functions";
+import { GcdsHeading, GcdsLink, GcdsText } from "@cdssnc/gcds-components-react";
+import { useNavigate } from "react-router";
+import { getPageContent } from "../../utils/functions";
 
 
 
-export default function AlreadyGc({currentLang})
-{
+export default function AlreadyGc({ currentLang }) {
     const pageContentJson = getPageContent(currentLang, "AlreadyGc");
+    const navigate = useNavigate();
 
-    return(
+    return (
         <GcdsHeading tag="h3">
             {pageContentJson['1']}
             <GcdsText marginTop="200" marginBottom="0">
-                <GcdsLink href={`/${currentLang}`} >
+                <GcdsLink
+                    onClick={() => {
+                        navigate(`/${currentLang}`);
+                    }} >
                     {pageContentJson['2']}
                 </GcdsLink>
             </GcdsText>

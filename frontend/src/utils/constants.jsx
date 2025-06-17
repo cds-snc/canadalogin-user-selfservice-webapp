@@ -1,3 +1,4 @@
+
 export const AVAILABLE_LANGUAGES = { en: 'en', fr: 'fr' };
 export const NAVIGATION_LINKS = {
     signUp: '/signup',
@@ -21,7 +22,7 @@ export const NAVIGATION_LINKS = {
 export const CONTEXT_ACTIONS = {
     signUp: 'SIGN_UP',
     signIn: 'SIGN_IN',
-    logOut: 'LOG_OUT'
+    logOut: 'LOG_OUT',
 };
 
 export const FLOW_TYPES = {

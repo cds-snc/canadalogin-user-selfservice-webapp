@@ -8,7 +8,6 @@ import {
 
 export default function rpTargetUrl() {
     const { state, dispatch } = useUser();
-    console.log("rpTargetUrl component mounted LAODED");
     function setRelyingPartyParams() {
 
         const searchParams = new URLSearchParams(window.location.search)
@@ -17,22 +16,20 @@ export default function rpTargetUrl() {
         const rpTargetUrl = searchParams.get("Target")
         const stateId = searchParams.get("stateId");
         const themeId = searchParams.get("themeId");
-        if (rpTargetUrl && stateId && themeId) {
-            console.log("rpTargetUrl and stateID", stateId, themeId)
-            try {
-                const params = new URLSearchParams({
-                    stateId: stateId,
-                    themeId: themeId
-                });
-                const fullUrl = `${rpTargetUrl}&stateId=${stateId}&themeId=${themeId}`;
+        if (rpTargetUrl) {
+            console.log("rpTargetUrl and stateID", rpTargetUrl)
 
-                const userData = { ...state.userData, relyingPartyTargetValue: encodeURIComponent(fullUrl) };
-                dispatch({ type: CONTEXT_ACTIONS.signUp, payload: userData });
-                console.log("added to user data", userData)
-            } catch (err) {
-                console.error("Missing Target URL", err)
-            }
+            const fullUrl = `${rpTargetUrl}&stateId=${stateId}&themeId=${themeId}`; // required if we use signup redirect from flow designer
+            console.log(decodeURIComponent(rpTargetUrl).length)
+            const userData = { ...state.userData, relyingPartyTargetValue: encodeURIComponent(rpTargetUrl) };
+            dispatch({ type: CONTEXT_ACTIONS.signUp, payload: userData });
+            console.log("added to user data", state)
+
+        } else {
+            console.error("Missing Target URL")
+
         }
+        console.log("added to user data", state)
     }
 
     useEffect(() => {

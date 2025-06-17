@@ -51,6 +51,7 @@ export function useSubmit(submitDataOptions: SubmitDataOptions, validateFunction
 
 
                     if (isSignInPassword || isSignUpProfile) {
+                        console.log("redirecting to auth session URL", navigateTo);
                         window.location.href = navigateTo; // Redirect to the auth session URL
                     } else {
                         navigate(navigateTo);
@@ -183,7 +184,6 @@ export async function callAuthService(submitDataOptions: SubmitDataOptions, subm
 }
 
 function setUserData(submitDataOptions: SubmitDataOptions, submitData: SubmitData, userData: any, response: any) {
-
     switch (submitDataOptions.page) {
         case PAGES.signup:
             return {

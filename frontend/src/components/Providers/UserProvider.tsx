@@ -34,7 +34,10 @@ function userReducer(state = initialState, action: Action) {
         case CONTEXT_ACTIONS.signUp:
             return {
                 ...state,
-                userData: action.payload
+                userData: {
+                    ...state.userData,
+                    ...action.payload
+                }
             };
         default:
             return state;

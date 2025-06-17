@@ -58,6 +58,7 @@ export default function Home() {
 
 
     console.log("Config URL", config.apiUrl);
+    console.log("State User Data", state.userData);
     return (
         <GcdsContainer>
             <GcdsContainer>

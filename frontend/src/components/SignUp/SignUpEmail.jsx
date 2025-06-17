@@ -43,7 +43,7 @@ export default function SignUpEmail() {
         onError: (err) => setError('#email', err)
     };
     const { handleSubmit, isPending } = useSubmit(submitDataOptions, validateEmail);
-    console.log("state.userData", state.userData);
+    console.log("state.userData", state);
     return (
         <GcdsContainer>
             <GcdsContainer>
