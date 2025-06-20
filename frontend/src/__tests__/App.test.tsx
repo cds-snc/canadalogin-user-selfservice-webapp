@@ -341,7 +341,7 @@ describe('Routing Tests', () => {
             </MemoryRouter>,
         )
 
-        buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.verificationSelection, FLOW_TYPES.signIn, null, langHref.fr + NAVIGATION_LINKS.verificationSelection);
+        buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.verificationSelection, FLOW_TYPES.signIn, null, langHref.en + NAVIGATION_LINKS.verificationSelection);
     });
 
     //-------------Manage Tests------------------------>
@@ -356,6 +356,18 @@ describe('Routing Tests', () => {
         )
             screen.debug()
         buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.manageDashboard, FLOW_TYPES.manage , null, langHref.fr + NAVIGATION_LINKS.manage);
+    });
+
+    test("Manage profile landing page with fr language defined", () => {
+
+        stateData.userData = {...stateData.userData , ... mockedRoutesUserData.manage};
+        render(
+            <MemoryRouter initialEntries={[langHref.fr + NAVIGATION_LINKS.manage]}>
+                <App/>
+            </MemoryRouter>,
+        )
+        screen.debug()
+        buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.manageDashboard, FLOW_TYPES.manage , null, langHref.en + NAVIGATION_LINKS.manage);
     });
 
 
