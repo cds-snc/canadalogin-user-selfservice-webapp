@@ -18,6 +18,7 @@ export const NAVIGATION_LINKS = {
     profileYouMayUpdateName: '/profileyoumayupdatename',
     areYouSureEditYourName: '/areYouSureEditYourName',
     enterNewPhoneNumber: '/enterNewPhoneNumber',
+    youMayUpdateEmailAtOtherPlaces: '/youMayUpdateEmailAtOtherPlaces',
     areYouSureUpdateYourEmail: '/areYouSureUpdateYourEmail'
 };
 export const CONTEXT_ACTIONS = {
@@ -61,6 +62,7 @@ export const PAGES ={
     areYouSureEditYourName: 'AreYouSureEditYourName',
     ProfileNameEdit: 'ProfileNameEdit',
     enterNewPhoneNumber: 'EnterNewPhoneNumber',
+    youMayUpdateEmailAtOtherPlaces: 'YouMayUpdateEmailAtOtherPlaces',
     areYouSureUpdateYourEmail: 'AreYouSureUpdateYourEmail',
 }
 
