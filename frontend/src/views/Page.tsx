@@ -23,6 +23,7 @@ import CompleteTwoStepVerification from "../components/Manage/CompleteTwoStepVer
 import FirstVerifyItsYou from "../components/Manage/FirstVerifyItsYou.jsx";
 import ProfileYouMayUpdateName from "../components/Manage/ProfileYouMayUpdateName.jsx";
 import YouMayUpdateEmailAtOtherPlaces from "../components/Manage/YouMayUpdateEmailAtOtherPlaces.jsx";
+import AreYouSureUpdateYourEmail from "../components/Manage/AreYouSureUpdateYourEmail.jsx";
 
 function PageContents({page}:{page:string}) {
     switch(page) {
@@ -87,6 +88,10 @@ function PageContents({page}:{page:string}) {
                 <YouMayUpdateEmailAtOtherPlaces />
             );
     
+        case PAGES.areYouSureUpdateYourEmail:
+            return (
+                <AreYouSureUpdateYourEmail />
+            );
         case "RP":
             return (
                 <GcdsText>

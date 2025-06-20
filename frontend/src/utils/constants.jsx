@@ -14,10 +14,10 @@ export const NAVIGATION_LINKS = {
     checkYourEmail: '/checkyouremail',
     completeTwoStepVerification: '/completetwostepverification',
     firstVerifyItsYou: '/firstverifyitsyou',
-
     profileYouMayUpdateName: '/profileyoumayupdatename',
     areYouSureEditYourName: '/areYouSureEditYourName',
     youMayUpdateEmailAtOtherPlaces: '/youMayUpdateEmailAtOtherPlaces',
+    areYouSureUpdateYourEmail: '/areYouSureUpdateYourEmail'
 };
 export const CONTEXT_ACTIONS = {
     signUp: 'SIGN_UP',
@@ -59,6 +59,7 @@ export const PAGES ={
     areYouSureEditYourName: 'AreYouSureEditYourName',
     ProfileNameEdit: 'ProfileNameEdit',
     youMayUpdateEmailAtOtherPlaces: 'YouMayUpdateEmailAtOtherPlaces',
+    areYouSureUpdateYourEmail: 'AreYouSureUpdateYourEmail',
 }
 
 export const FOOTERS = {

@@ -295,5 +295,13 @@
     "6": "Répertoire des comptes GC.",
     "7": "Retour au profil",
     "8": "Déconnexion"
+  },
+  "AreYouSureUpdateYourEmail": {
+    "1": "Êtes-vous sûr de vouloir mettre à jour votre adresse courriel ?",
+    "2": "Vous avez demandé la mise à jour de votre adresse courriel :",
+    "3": "Cette action mettra à jour l'adresse courriel que vous utilisez pour vous connecter, ainsi que celle que les services suivants utilisent pour vous contacter :",
+    "4": "GEO.ca",
+    "5": "Oui, mettre à jour",
+    "6": "Annuler"
   }
 }
