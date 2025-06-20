@@ -7,7 +7,7 @@ import {
 import {buildTestCase, Template} from "../../Tests/utils/functions.tsx";
 
 export default {
-    title: 'GC Sign In/Pages/Manage/You May Update Email A tOther Places Page',
+    title: 'GC Sign In/Pages/Manage/You May Update Email At Other Places Page',
     args:{
         page:PAGES.youMayUpdateEmailAtOtherPlaces
     }
