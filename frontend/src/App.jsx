@@ -28,6 +28,8 @@ function App() {
                   <Route path="/:language/completetwostepverification" element={ <Page page={PAGES.CompleteTwoStepVerification}/>} />
                   <Route path="/:language/firstverifyitsyou" element={ <Page page={PAGES.FirstVerifyItsYou}/>} />
                   <Route path="/:language/profileYouMayUpdateName" element={ <Page page={PAGES.profileYouMayUpdateName}/>} />
+                  <Route path="/:language/youMayUpdateEmailAtOtherPlaces" element={ <Page page={PAGES.youMayUpdateEmailAtOtherPlaces}/>} />
+
                   <Route path="/:language/areYouSureUpdateYourEmail" element={ <Page page={PAGES.areYouSureUpdateYourEmail}/>} />
               </Routes>
           </UserProvider>

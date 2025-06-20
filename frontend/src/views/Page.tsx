@@ -22,6 +22,7 @@ import CheckYourEmail from "../components/Manage/CheckYourEmail.jsx";
 import CompleteTwoStepVerification from "../components/Manage/CompleteTwoStepVerification.jsx";
 import FirstVerifyItsYou from "../components/Manage/FirstVerifyItsYou.jsx";
 import ProfileYouMayUpdateName from "../components/Manage/ProfileYouMayUpdateName.jsx";
+import YouMayUpdateEmailAtOtherPlaces from "../components/Manage/YouMayUpdateEmailAtOtherPlaces.jsx";
 import AreYouSureUpdateYourEmail from "../components/Manage/AreYouSureUpdateYourEmail.jsx";
 
 function PageContents({page}:{page:string}) {
@@ -82,6 +83,11 @@ function PageContents({page}:{page:string}) {
             return (
                 <ProfileYouMayUpdateName />
             );
+        case PAGES.youMayUpdateEmailAtOtherPlaces:
+            return (
+                <YouMayUpdateEmailAtOtherPlaces />
+            );
+    
         case PAGES.areYouSureUpdateYourEmail:
             return (
                 <AreYouSureUpdateYourEmail />

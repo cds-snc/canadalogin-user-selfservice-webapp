@@ -288,6 +288,16 @@
     "10": "Connected Services ",
     "11": "in your GC Sign in dashboard."
   },
+  "YouMayUpdateEmailAtOtherPlaces":{
+    "1": "Your email has been updated to",
+    "2": "You may need to update your email other places",
+    "3": "This only changes your email with services connected to your GC Sign in.",
+    "4": "If you are trying to update your email with a service that’s not connected to your GC Sign in, you’ll need to go to that account.",
+    "5": "To search for another GC Account, visit the",
+    "6": "GC Account directory.",
+    "7": "Back to profile",
+    "8": "Sign out"
+  },
   "AreYouSureUpdateYourEmail":{
     "1": "Are you sure you want to update your email?",
     "2": "You’ve requested to update your email to:",
