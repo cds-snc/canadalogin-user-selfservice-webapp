@@ -14,13 +14,10 @@ export const NAVIGATION_LINKS = {
     checkYourEmail: '/checkyouremail',
     completeTwoStepVerification: '/completetwostepverification',
     firstVerifyItsYou: '/firstverifyitsyou',
-
     enterNewEmail: '/enternewemail',
     profileYouMayUpdateName: '/profileyoumayupdatename',
     areYouSureEditYourName: '/areYouSureEditYourName',
     enterNewPhoneNumber: '/enterNewPhoneNumber',
-    profileYouMayUpdateName: '/profileyoumayupdatename',
-    areYouSureEditYourName: '/areYouSureEditYourName',
     areYouSureUpdateYourEmail: '/areYouSureUpdateYourEmail'
 };
 export const CONTEXT_ACTIONS = {
