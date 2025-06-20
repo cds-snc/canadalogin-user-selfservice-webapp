@@ -15,6 +15,13 @@ class EmailModel(BaseModel):
 class UserLoginRequestData(BaseModel):
     userName: EmailStr
     password: str
+    trxnId: str
+
+
+class NewUserCreationData(BaseModel):
+    userName: EmailStr
+    password: str
+    trxnId: str
 
 
 # Signup Schema
@@ -70,18 +77,19 @@ class ProfileCreateRequest(BaseModel):
 
 
 class ProfileUserData(BaseModel):
-    userid: str
     firstName: Optional[str] = None
     lastName: str
     preferredLanguage: str
 
 
+class Operations(BaseModel):
+    op: str
+    path: str
+    value: str
+
+
 class SignUpResponse(ResponseModel):
     data: Optional[IBMUserCreateResponse] = None
-
-
-class ProfileGetUserData(BaseModel):
-    userid: str
 
 
 class EmailItem(BaseModel):
@@ -112,9 +120,9 @@ class IBMExtension(BaseModel):
 
 class ProfileGetResponseData(BaseModel):
     emails: List[EmailItem]
-    preferredLanguage: Optional[str]
+    preferredLanguage: Optional[str] = None
     meta: Meta
-    name: Name
+    name: Optional[Name] = None
     active: bool
     id: str
     userName: EmailStr
@@ -153,6 +161,7 @@ class TwoFactorEnrollmentUserData(BaseModel):
     userId: str
     phoneNumber: PhoneNumber
     enrollmentType: TwoFactorEnrollmentType
+    trxnId: str
 
 
 class TwofactorEnrollmentResponse(BaseModel):

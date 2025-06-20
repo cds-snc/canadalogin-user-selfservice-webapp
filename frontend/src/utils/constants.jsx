@@ -1,6 +1,5 @@
 import ManageDashboard from "../components/Manage/ManageDashboard.jsx";
 import ProfileHome from "../components/Manage/ProfileHome";
-
 export const AVAILABLE_LANGUAGES = {en:'en', fr:'fr'};
 export const NAVIGATION_LINKS = {
     signUp: '/signup',
@@ -13,7 +12,14 @@ export const NAVIGATION_LINKS = {
     home: '/',
     verificationSelection: '/signin/selectverification',
     manage: '/manage',
+    ProfileNameEdit: '/ProfileNameEdit',
     profileHome: '/profilehome',
+    checkYourEmail: '/checkyouremail',
+    completeTwoStepVerification: '/completetwostepverification',
+    firstVerifyItsYou: '/firstverifyitsyou',
+    profileYouMayUpdateName: '/profileyoumayupdatename',
+    areYouSureEditYourName: '/areYouSureEditYourName',
+    areYouSureUpdateYourEmail: '/areYouSureUpdateYourEmail'
 };
 export const CONTEXT_ACTIONS = {
     signUp: 'SIGN_UP',
@@ -50,7 +56,14 @@ export const PAGES ={
     error: 'Error',
     verificationSelection: 'VerificationSelection',
     manageDashboard: 'ManageDashboard',
-    ProfileHome: 'ProfileHome'
+    ProfileHome: 'ProfileHome',
+    CheckYourEmail: 'CheckYourEmail',
+    CompleteTwoStepVerification: 'CompleteTwoStepVerification',
+    FirstVerifyItsYou: 'FirstVerifyItsYou',
+    profileYouMayUpdateName: 'ProfileYouMayUpdateName',
+    areYouSureEditYourName: 'AreYouSureEditYourName',
+    ProfileNameEdit: 'ProfileNameEdit',
+    areYouSureUpdateYourEmail: 'AreYouSureUpdateYourEmail'
 }
 
 export const FOOTERS = {
