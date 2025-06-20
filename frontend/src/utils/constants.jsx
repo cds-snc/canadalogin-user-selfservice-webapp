@@ -14,8 +14,10 @@ export const NAVIGATION_LINKS = {
     checkYourEmail: '/checkyouremail',
     completeTwoStepVerification: '/completetwostepverification',
     firstVerifyItsYou: '/firstverifyitsyou',
+    enterNewEmail: '/enternewemail',
     profileYouMayUpdateName: '/profileyoumayupdatename',
     areYouSureEditYourName: '/areYouSureEditYourName',
+    enterNewPhoneNumber: '/enterNewPhoneNumber',
     youMayUpdateEmailAtOtherPlaces: '/youMayUpdateEmailAtOtherPlaces',
     areYouSureUpdateYourEmail: '/areYouSureUpdateYourEmail'
 };
@@ -55,9 +57,11 @@ export const PAGES ={
     CheckYourEmail: 'CheckYourEmail',
     CompleteTwoStepVerification: 'CompleteTwoStepVerification',
     FirstVerifyItsYou: 'FirstVerifyItsYou',
+    EnterNewEmail: 'EnterNewEmail',
     profileYouMayUpdateName: 'ProfileYouMayUpdateName',
     areYouSureEditYourName: 'AreYouSureEditYourName',
     ProfileNameEdit: 'ProfileNameEdit',
+    enterNewPhoneNumber: 'EnterNewPhoneNumber',
     youMayUpdateEmailAtOtherPlaces: 'YouMayUpdateEmailAtOtherPlaces',
     areYouSureUpdateYourEmail: 'AreYouSureUpdateYourEmail',
 }
