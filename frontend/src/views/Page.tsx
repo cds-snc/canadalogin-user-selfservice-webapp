@@ -94,6 +94,7 @@ function PageContents({page}:{page:string}) {
         case PAGES.enterNewPhoneNumber:
             return (
                 <EnterNewPhoneNumber />
+            );
         case PAGES.youMayUpdateEmailAtOtherPlaces:
             return (
                 <YouMayUpdateEmailAtOtherPlaces />
