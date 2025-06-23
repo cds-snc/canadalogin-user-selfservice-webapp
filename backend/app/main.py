@@ -12,9 +12,7 @@ from app.config import get_settings
 from app.utils.helpers import generate_error_response
 
 from .routers import health
-from app.password import v1_router as v1_password_router
 from app.users import v1_router as v1_users_router
-from app.otp import v1_router as v1_otp_router
 
 settings = get_settings()
 
@@ -72,18 +70,6 @@ app.include_router(
     v1_users_router.router,
     prefix=f"{settings.V1_API_VERSION}/users",
     tags=["Users"],
-)
-
-app.include_router(
-    v1_password_router.router,
-    prefix=f"{settings.V1_API_VERSION}/password",
-    tags=["Password Related APIs"],
-)
-
-app.include_router(
-    v1_otp_router.router,
-    prefix=f"{settings.V1_API_VERSION}/otp",
-    tags=["OTP"],
 )
 
 
