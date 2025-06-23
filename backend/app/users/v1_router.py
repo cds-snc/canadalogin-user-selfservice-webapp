@@ -102,7 +102,6 @@ async def user_manage_profile(user_id, user_data: ProfileUserData, request: Requ
 
 @router.post(
     "/users/me/password",
-    response_model=ProfileResponse,
     tags=["Users"],
     summary="Update current user password in verify",
     description="",
