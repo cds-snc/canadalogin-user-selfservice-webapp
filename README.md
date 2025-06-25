@@ -13,7 +13,7 @@ This solution follows a BFF (backend for frontend) architectural pattern:
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/cds-snc/gc-signin-ibm.git
+git clone https://github.com/cds-snc/gc-signin-user-selfservice-webapp.git
 ```
 
 ### Running the Application Locally
