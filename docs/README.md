@@ -1,8 +1,12 @@
-# Authentication Flow Diagrams
+# GC Sign in Architecture and Application Flow Diagrams
 
 This folder contains the system design and architecture documentation for GC Sign in.
 
-We have chosen to use Mermaid for diagrams for its simplicity and ability to commit diagrams as code.
+For architecture diagrams, we have chosen to use draw.io (https://app.diagrams.net/), as it is a common industry standard tool.
+
+For sequence and flow diagrams, we have chosen to use Mermaid for its simplicity and ability to commit diagrams as code.
+
+## Mermaid Diagrams
 
 ### Using the Online Mermaid Editor
 1. Go to [Mermaid Live Editor](https://mermaid.live/)
@@ -12,8 +16,7 @@ We have chosen to use Mermaid for diagrams for its simplicity and ability to com
 ### Using Mermaid in VS Code
 1. The Mermaid extension is included in our devcontainer config
 2. Create a markdown file
-3. Paste the diagram code between triple backticks with mermaid tag:   ```mermaid
-   // paste diagram here   ```
+3. Paste the diagram code between triple backticks with mermaid tag
 4. Use VS Code's markdown preview to view the diagram
 
 ### Using GitHub
