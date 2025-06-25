@@ -1,4 +1,4 @@
-# GC Sign in User Self-service application
+# GC Sign in - User self-service web application
 
 A modern and accessible web application that allows users to make changes to their GC Sign in account.  Built with a React front-end using the [GC Design System](https://github.com/cds-snc/gcds-components), and a supporting FastAPI back-end API that integrates with the IBM Verify SaaS (IdP) to handle login, logout and profile updates.
 
@@ -6,9 +6,8 @@ A modern and accessible web application that allows users to make changes to the
 This solution follows a BFF (backend for frontend) architectural pattern:
 - Frontend: React-based SPA
 - Backend: FastAPI Python service
-- Authentication and Identity Store: IBM Security Verify CIAM
+- Authentication and Identity Store: IBM Security Verify CIAM SaaS
 - Infrastructure (AWS): ECS, ECR, ALB, Secrets Manager, CloudFront, Route 53, WAF, CloudWatch
-- Infrastructure (IdP): IBM Security Verify SaaS
 
 ### Local Development Setup
 
