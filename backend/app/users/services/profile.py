@@ -1,9 +1,10 @@
-import logging
 import json
-from pydantic import ValidationError
+import logging
+
 from fastapi import HTTPException
 from httpx import AsyncClient
-from app.users.services.create import get_auth_request_headers, get_admin_token
+from pydantic import ValidationError
+
 from app.config import get_settings
 from app.users.schemas import (
     ProfileUserData,
@@ -12,6 +13,7 @@ from app.users.schemas import (
     ProfileGetResponseData,
     ProfileResponse,
 )
+from app.utils.access_token import get_admin_token, get_auth_request_headers
 
 logger = logging.getLogger(__name__)
 
