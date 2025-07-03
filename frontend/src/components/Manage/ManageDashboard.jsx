@@ -11,8 +11,7 @@ import {
 import {useParams} from "react-router";
 import {useError} from "../../hooks/useError";
 import {getPageContent} from "../../utils/functions.jsx";
-// import { useContext } from "react";
-// import UserContext from "../Providers/UserContext";
+
 
 
 export default function ManageDashboard() {
@@ -20,17 +19,10 @@ export default function ManageDashboard() {
     const { getError, hasErrors} = useError(language);
     const error = getError("#dashboard");
     const pageContent = getPageContent(language, PAGES.manageDashboard);
-    // const { userData } = useContext(UserContext);
-    // const firstName = userData?.firstName?.trim();
-    // const userName = firstName ? firstName : userData?.lastName || "<Name of User>";
 
-    // const userName = userData?.name || "<Name of User" ;
-    // const services = state.userData?.services || []; // Example: Fetch user services from state
 
     return (
         <GcdsContainer>
-
-            {/* Error Summary */}
             {hasErrors() && (
                 <GcdsErrorSummary
                     data-testid="errorSummary"
@@ -38,13 +30,9 @@ export default function ManageDashboard() {
                     heading={error.heading}
                 />
             )}
-
                 <GcdsHeading tag="h1">
                     {pageContent['1']}
                 </GcdsHeading>
-
-
-            {/* Action Cards */}
 
             <GcdsGrid tag="managedashboard" columnsDesktop="1fr 1fr 1fr" columnsTablet="1fr 1fr" columns="repeat(auto-fit, minmax(200px, 250px))" placeContent="center" >
                 <GcdsCard
@@ -70,24 +58,6 @@ export default function ManageDashboard() {
                     </svg>
                 </GcdsCard>
             </GcdsGrid>
-
-
-
-            {/*<GcdsGrid columns="repeat(auto-fit, minmax(100px, 290px))">*/}
-            {/*    <GcdsCard*/}
-            {/*        cardTitle="Personal Information"*/}
-            {/*        href="#"*/}
-            {/*        cardTitleTag="h3"*/}
-            {/*    >*/}
-            {/*    </GcdsCard>*/}
-            {/*    <GcdsCard*/}
-            {/*        cardTitle="Security settings"*/}
-            {/*        href="#"*/}
-            {/*        cardTitleTag="h3"*/}
-            {/*    >*/}
-            {/*    </GcdsCard>*/}
-            {/*</GcdsGrid>*/}
-
         </GcdsContainer>
     );
 }

@@ -331,7 +331,7 @@ const testSuite = {
         const gcdsElementMap = pageSetup.gcdsMap(language, page, pageContentJson, flow);
 
         Object.keys(pageContentJson).forEach(key => {
-            console.log("key:", key);
+
             if(gcdsElementMap.has(key))
                 verifyGcdsHtmlElement(gcdsElementMap.get(key)[0], gcdsElementMap.get(key)[1]);
             else if (!textKeysToNotSearch.includes(key))
@@ -343,7 +343,7 @@ const testSuite = {
                 else if ((!smsTextKeys.includes(key) && !voiceTextKeys.includes(key))
                     || (smsTextKeys.includes(key) && !isVoice)
                     || (voiceTextKeys.includes(key) && isVoice))
-                { console.log("pageContentJson[key]: ", pageContentJson[key])
+                {
                     expect(screen.queryByText(pageContentJson[key])).toBeInTheDocument();}
         });
     }
