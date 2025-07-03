@@ -11,9 +11,15 @@ export const NAVIGATION_LINKS = {
     verificationSelection: '/signin/selectverification',
     ProfileNameEdit: '/ProfileNameEdit',
     profileHome: '/profilehome',
+    checkYourEmail: '/checkyouremail',
+    completeTwoStepVerification: '/completetwostepverification',
+    firstVerifyItsYou: '/firstverifyitsyou',
     enterNewEmail: '/enternewemail',
     profileYouMayUpdateName: '/profileyoumayupdatename',
     areYouSureEditYourName: '/areYouSureEditYourName',
+    enterNewPhoneNumber: '/enterNewPhoneNumber',
+    youMayUpdateEmailAtOtherPlaces: '/youMayUpdateEmailAtOtherPlaces',
+    areYouSureUpdateYourEmail: '/areYouSureUpdateYourEmail'
 };
 export const CONTEXT_ACTIONS = {
     signUp: 'SIGN_UP',
@@ -48,10 +54,16 @@ export const PAGES ={
     error: 'Error',
     verificationSelection: 'VerificationSelection',
     ProfileHome: 'ProfileHome',
+    CheckYourEmail: 'CheckYourEmail',
+    CompleteTwoStepVerification: 'CompleteTwoStepVerification',
+    FirstVerifyItsYou: 'FirstVerifyItsYou',
     EnterNewEmail: 'EnterNewEmail',
     profileYouMayUpdateName: 'ProfileYouMayUpdateName',
     areYouSureEditYourName: 'AreYouSureEditYourName',
-    ProfileNameEdit: 'ProfileNameEdit'
+    ProfileNameEdit: 'ProfileNameEdit',
+    enterNewPhoneNumber: 'EnterNewPhoneNumber',
+    youMayUpdateEmailAtOtherPlaces: 'YouMayUpdateEmailAtOtherPlaces',
+    areYouSureUpdateYourEmail: 'AreYouSureUpdateYourEmail',
 }
 
 export const FOOTERS = {

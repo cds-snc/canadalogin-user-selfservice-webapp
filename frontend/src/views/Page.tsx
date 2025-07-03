@@ -18,8 +18,14 @@ import { useEffect } from "react";
 import AreYouSureEditYourName from "../components/Manage/AreYouSureEditYourName.jsx";
 import ProfileNameEdit from "../components/PersonalInfo/ProfileNameEdit.jsx";
 import ProfileHome from "../components/Manage/ProfileHome.jsx";
+import CheckYourEmail from "../components/Manage/CheckYourEmail.jsx";
+import CompleteTwoStepVerification from "../components/Manage/CompleteTwoStepVerification.jsx";
+import FirstVerifyItsYou from "../components/Manage/FirstVerifyItsYou.jsx";
 import EnterNewEmail from "../components/Manage/EnterNewEmail.jsx";
 import ProfileYouMayUpdateName from "../components/Manage/ProfileYouMayUpdateName.jsx";
+import EnterNewPhoneNumber from "../components/Manage/EnterNewPhoneNumber.jsx";
+import YouMayUpdateEmailAtOtherPlaces from "../components/Manage/YouMayUpdateEmailAtOtherPlaces.jsx";
+import AreYouSureUpdateYourEmail from "../components/Manage/AreYouSureUpdateYourEmail.jsx";
 
 function PageContents({page}:{page:string}) {
     switch(page) {
@@ -63,6 +69,18 @@ function PageContents({page}:{page:string}) {
             return (
                 <ProfileHome />
             );
+        case PAGES.CheckYourEmail:
+            return (
+                <CheckYourEmail />
+            );
+        case PAGES.CompleteTwoStepVerification:
+            return (
+                <CompleteTwoStepVerification />
+            );
+        case PAGES.FirstVerifyItsYou:
+            return (
+                <FirstVerifyItsYou />
+            );    
         case PAGES.EnterNewEmail:
             return (
                 <EnterNewEmail />
@@ -72,6 +90,19 @@ function PageContents({page}:{page:string}) {
         case PAGES.profileYouMayUpdateName:
             return (
                 <ProfileYouMayUpdateName />
+            );
+        case PAGES.enterNewPhoneNumber:
+            return (
+                <EnterNewPhoneNumber />
+            );
+        case PAGES.youMayUpdateEmailAtOtherPlaces:
+            return (
+                <YouMayUpdateEmailAtOtherPlaces />
+            );
+    
+        case PAGES.areYouSureUpdateYourEmail:
+            return (
+                <AreYouSureUpdateYourEmail />
             );
         case "RP":
             return (
