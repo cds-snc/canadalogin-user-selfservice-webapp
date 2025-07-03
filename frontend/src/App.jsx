@@ -11,6 +11,7 @@ function App() {
                   <Route path="/" element={ <Page page={PAGES.home}/>} />
                   <Route path="/:language" element={ <Page page={PAGES.home}/>} />
                   <Route path="/:language/" element={ <Page page={PAGES.home}/>} />
+                  <Route path="/:language/manage" element={<Page page={PAGES.manageDashboard}/>} />
                   <Route path="/:language/:flow/privacy" element={<Page page={PAGES.privacy}/>}/>
                   <Route path="/:language/:flow" element={<PrivateRoute route={PAGES.signup}><Page page={PAGES.signup}/></PrivateRoute>}/>
                   <Route path="/:language/:flow/verification/:type" element={<PrivateRoute route={PAGES.verification}><Page page={PAGES.verification}/></PrivateRoute>}/>
@@ -27,9 +28,14 @@ function App() {
                   <Route path="/:language/checkyouremail" element={ <Page page={PAGES.CheckYourEmail}/>} />
                   <Route path="/:language/completetwostepverification" element={ <Page page={PAGES.CompleteTwoStepVerification}/>} />
                   <Route path="/:language/firstverifyitsyou" element={ <Page page={PAGES.FirstVerifyItsYou}/>} />
+                  <Route path="/:language/enternewemail" element={ <Page page={PAGES.EnterNewEmail}/>} />
                   <Route path="/:language/profileYouMayUpdateName" element={ <Page page={PAGES.profileYouMayUpdateName}/>} />
                   <Route path="/:language/areYouSureUpdateContactNumber" element={ <Page page={PAGES.areYouSureUpdateContactNumber}/>} />
 
+                  <Route path="/:language/enterNewPhoneNumber" element={ <Page page={PAGES.enterNewPhoneNumber}/>} />
+                  <Route path="/:language/youMayUpdateEmailAtOtherPlaces" element={ <Page page={PAGES.youMayUpdateEmailAtOtherPlaces}/>} />
+
+                  <Route path="/:language/areYouSureUpdateYourEmail" element={ <Page page={PAGES.areYouSureUpdateYourEmail}/>} />
               </Routes>
           </UserProvider>
       );

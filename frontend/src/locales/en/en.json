@@ -191,6 +191,11 @@
     "46": "GC Sign in",
     "47": "to continue to your"
   },
+  "ManageDashboard": {
+    "1": "Welcome, <Name of User>",
+    "2": "Personal information",
+    "3": "Security settings"
+},
   "AreYouSureEditYourName": {
     "1": "Are you sure you want to update your name?",
     "2": "You’ve requested to update your name to:",
@@ -274,6 +279,22 @@
     "4": "Continue",
     "5": "Cancel"
   },
+  "EnterNewEmail":{
+    "1": "Enter a new email address",
+    "2": "Changing your email address will affect:",
+    "3": "The email address you use to sign in",
+    "4": "The email address that GC Sign in uses to contact you",
+    "5": "The email address that services connected to your GC Sign in may use to contact you",
+    "6": "What services have access to your email address",
+    "7": "The following services have access to your email address:",
+    "8": "GEO.ca",
+    "9": "If you are trying to update your email address with a service that’s not connected to GC Sign in, you’ll need to go to that account.",
+    "10": "To search for another GC Account, visit the",
+    "11": "GC Account directory.",
+    "12": "Email",
+    "13": "Continue",
+    "14": "Cancel"
+  },
   "ProfileYouMayUpdateName":{
     "0": "Success",
     "1": "Your name has been updated to Example Newname",
@@ -300,6 +321,40 @@
     "9": "security settings.",
     "10": "Yes, update",
     "11": "Cancel"
+  },
+  "EnterNewPhoneNumber":{
+    "1": "Enter a new phone number",
+    "2": "This will update the phone number that GC Sign in, and services connected to your GC Sign in may use to contact you.",
+    "3": "What services have access to your contact phone number",
+    "4": "The following services have access to your contact phone number:",
+    "5": "GEO.ca",
+    "6": "If you are trying to update your contact phone number with a service that’s not connected to GC Sign in, you’ll need to go to that account.",
+    "7": "To search for another GC Account, visit the",
+    "8": "GC Account directory",
+    "9": "Country",
+    "10": "Phone number",
+    "11": "I don’t see my country",
+    "12": "Some countries are not supported due to technical limitations. If your country is not listed, you will be unable to create a GC Sign in account at this time. We apologize for the inconvenience.",
+    "13": "Continue",
+    "14": "Cancel"
+  },
+  "YouMayUpdateEmailAtOtherPlaces":{
+    "1": "Your email has been updated to",
+    "2": "You may need to update your email other places",
+    "3": "This only changes your email with services connected to your GC Sign in.",
+    "4": "If you are trying to update your email with a service that’s not connected to your GC Sign in, you’ll need to go to that account.",
+    "5": "To search for another GC Account, visit the",
+    "6": "GC Account directory.",
+    "7": "Back to profile",
+    "8": "Sign out"
+  },
+  "AreYouSureUpdateYourEmail":{
+    "1": "Are you sure you want to update your email?",
+    "2": "You’ve requested to update your email to:",
+    "3": "This will update the email you use to sign in, as well as the email the following services use to contact you:",
+    "4": "GEO.ca",
+    "5": "Yes, update",
+    "6": "Cancel"
   }
 }
 

@@ -1,3 +1,5 @@
+import ManageDashboard from "../components/Manage/ManageDashboard.jsx";
+import ProfileHome from "../components/Manage/ProfileHome";
 export const AVAILABLE_LANGUAGES = {en:'en', fr:'fr'};
 export const NAVIGATION_LINKS = {
     signUp: '/signup',
@@ -9,15 +11,19 @@ export const NAVIGATION_LINKS = {
     privacy: '/signup/privacy',
     home: '/',
     verificationSelection: '/signin/selectverification',
+    manage: '/manage',
     ProfileNameEdit: '/ProfileNameEdit',
     profileHome: '/profilehome',
     checkYourEmail: '/checkyouremail',
     completeTwoStepVerification: '/completetwostepverification',
     firstVerifyItsYou: '/firstverifyitsyou',
-
+    enterNewEmail: '/enternewemail',
     profileYouMayUpdateName: '/profileyoumayupdatename',
     areYouSureEditYourName: '/areYouSureEditYourName',
     areYouSureUpdateContactNumber: '/areYouSureUpdateContactNumber'
+    enterNewPhoneNumber: '/enterNewPhoneNumber',
+    youMayUpdateEmailAtOtherPlaces: '/youMayUpdateEmailAtOtherPlaces',
+    areYouSureUpdateYourEmail: '/areYouSureUpdateYourEmail'
 };
 export const CONTEXT_ACTIONS = {
     signUp: 'SIGN_UP',
@@ -31,7 +37,9 @@ export const FLOW_TYPES={
     sms: "sms",
     voice: "voice",
     email: "email",
+    dashboard: "dashboard",
     profile: "profile",
+    manage: "manage"
 }
 
 export const LINK_SUBMIT_TYPES = {
@@ -51,14 +59,20 @@ export const PAGES ={
     home: 'Home',
     error: 'Error',
     verificationSelection: 'VerificationSelection',
+    manageDashboard: 'ManageDashboard',
     ProfileHome: 'ProfileHome',
     CheckYourEmail: 'CheckYourEmail',
     CompleteTwoStepVerification: 'CompleteTwoStepVerification',
     FirstVerifyItsYou: 'FirstVerifyItsYou',
+    EnterNewEmail: 'EnterNewEmail',
     profileYouMayUpdateName: 'ProfileYouMayUpdateName',
     areYouSureEditYourName: 'AreYouSureEditYourName',
     ProfileNameEdit: 'ProfileNameEdit',
     areYouSureUpdateContactNumber: 'AreYouSureUpdateContactNumber'
+    enterNewPhoneNumber: 'EnterNewPhoneNumber',
+    youMayUpdateEmailAtOtherPlaces: 'YouMayUpdateEmailAtOtherPlaces',
+    areYouSureUpdateYourEmail: 'AreYouSureUpdateYourEmail'
+
 }
 
 export const FOOTERS = {
