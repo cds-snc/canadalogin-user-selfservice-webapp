@@ -191,6 +191,11 @@
     "46": "GC Sign in",
     "47": "to continue to your"
   },
+  "ManageDashboard": {
+    "1": "Welcome, <Name of User>",
+    "2": "Personal information",
+    "3": "Security settings"
+},
   "AreYouSureEditYourName": {
     "1": "Are you sure you want to update your name?",
     "2": "You’ve requested to update your name to:",

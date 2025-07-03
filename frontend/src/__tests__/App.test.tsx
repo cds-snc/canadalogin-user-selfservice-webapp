@@ -1,5 +1,5 @@
 import App from '../App';
-import {cleanup, render} from '@testing-library/react';
+import {cleanup, render, screen} from '@testing-library/react';
 import {describe, test, afterEach, vi, beforeAll} from "vitest";
 import '@testing-library/jest-dom';
 import {AVAILABLE_LANGUAGES, NAVIGATION_LINKS, FLOW_TYPES} from "../utils/constants";
@@ -18,7 +18,8 @@ describe('Routing Tests', () => {
     (useUser as jest.Mock).mockReturnValue({state:stateData});
     const mockedRoutesUserData ={
         signup: null,
-        signin: null
+        signin: null,
+        manage: null
     }
 
     const langHref = {attribute:'lang-href', en:'/'+AVAILABLE_LANGUAGES.en, fr:'/'+AVAILABLE_LANGUAGES.fr}
@@ -331,7 +332,7 @@ describe('Routing Tests', () => {
         buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.verificationSelection, FLOW_TYPES.signIn, null, langHref.fr + NAVIGATION_LINKS.verificationSelection);
     });
 
-    test("Check sign in verification selection page route with en language defined", () => {
+    test("Check sign in verification selection page route with fr language defined", () => {
 
         stateData.userData = {...stateData.userData , ... mockedRoutesUserData.signin.logInValidation};
         render(
@@ -343,9 +344,38 @@ describe('Routing Tests', () => {
         buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.verificationSelection, FLOW_TYPES.signIn, null, langHref.en + NAVIGATION_LINKS.verificationSelection);
     });
 
+    //-------------Manage Tests------------------------>
+
+    test("Manage profile landing page with en language defined", () => {
+
+        stateData.userData = {...stateData.userData , ... mockedRoutesUserData.manage};
+        render(
+            <MemoryRouter initialEntries={[langHref.en + NAVIGATION_LINKS.manage]}>
+                <App/>
+            </MemoryRouter>,
+        )
+            screen.debug()
+        buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.manageDashboard, FLOW_TYPES.manage , null, langHref.fr + NAVIGATION_LINKS.manage);
+    });
+
+    test("Manage profile landing page with fr language defined", () => {
+
+        stateData.userData = {...stateData.userData , ... mockedRoutesUserData.manage};
+        render(
+            <MemoryRouter initialEntries={[langHref.fr + NAVIGATION_LINKS.manage]}>
+                <App/>
+            </MemoryRouter>,
+        )
+        screen.debug()
+        buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.manageDashboard, FLOW_TYPES.manage , null, langHref.en + NAVIGATION_LINKS.manage);
+    });
+
+
+
     beforeAll(()=>{
         mockedRoutesUserData.signup = getMockedSignUpData();
         mockedRoutesUserData.signin = getMockedSignInData();
+        mockedRoutesUserData.manage = getMockedSignUpData()
     });
 
     beforeEach(()=>{
@@ -374,6 +404,7 @@ function getMockedSignInData(){
 
     const password = { email:'test@test.com'};
     const logInValidation ={...password, passwordValidated:true, phone: '+1(***) ***-1234', id:'12345-12346', otpType:'sms'}
+    const dashboard = {...logInValidation}
 
-    return {password, logInValidation};
+    return {password, logInValidation, dashboard};
 }

@@ -10,6 +10,7 @@ import CreateCoreProfile from "../components/SignUp/Profile/CreateCoreProfile.js
 import Privacy from "../components/SignUp/Profile/Privacy.jsx";
 import VerificationSetUp from "../components/SignUp/TwoStepVerification/VerificationSetUp"
 import VerificationSelection from "../components/SignIn/VerificationSelection"
+import ManageDashboard from "../components/Manage/ManageDashboard.jsx";
 import {PAGES} from "../utils/constants";
 import {useUser} from "../components/Providers/useUser";
 import {useLocation, useParams} from "react-router";
@@ -61,6 +62,11 @@ function PageContents({page}:{page:string}) {
             return (
                 <Privacy />
             );
+        case PAGES.manageDashboard:
+            return (
+                <ManageDashboard/>
+              );
+
         case PAGES.ProfileNameEdit:
             return (
                 <ProfileNameEdit />
@@ -116,7 +122,7 @@ function PageContents({page}:{page:string}) {
                     <iframe width="100%" height="166" scrolling="no" frameBorder="no" allow="autoplay"
                             src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/2097120054&color=%23ff5500&auto_play=true&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe>
                     <div
-                       style={{fontSize: "10px", color: "#cccccc",lineBreak: "anywhere",wordBreak: "normal",overflow: "hidden",whiteSpace: "nowrap",textOverflow: "ellipsis", fontFamily: "Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif",fontWeight: "100"}} >
+                        style={{fontSize: "10px", color: "#cccccc",lineBreak: "anywhere",wordBreak: "normal",overflow: "hidden",whiteSpace: "nowrap",textOverflow: "ellipsis", fontFamily: "Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif",fontWeight: "100"}} >
                         <a href="https://soundcloud.com/gcsignin-554663209" title="GC Sign in" target="_blank"
                            style={{color: '#cccccc',  textDecoration: 'none'}}>GC Sign in</a> · <a
                         href="https://soundcloud.com/gcsignin-554663209/gc-sign-in-voice-code"
@@ -155,3 +161,4 @@ export default function Page({page}: { page: string }) {
         </div>
     );
 }
+

@@ -190,6 +190,12 @@
     "46": "Connexion GC",
     "47": "pour continuer vers votre"
   },
+  "ManageDashboard": {
+    "1": "Bienvenue,",
+    "2": "Renseignements personnels",
+    "3": "Paramètres de sécurité"
+},
+
   "AreYouSureEditYourName": {
     "1": "Êtes-vous sûr de vouloir mettre à jour votre nom ?",
     "2": "Vous avez demandé à mettre à jour votre nom :",
