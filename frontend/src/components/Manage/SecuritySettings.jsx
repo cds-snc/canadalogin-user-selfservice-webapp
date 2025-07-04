@@ -34,7 +34,6 @@ export default function SecuritySettings() {
                 <GcdsHeading tag="h3" marginTop='300'>{pageContent['7']}</GcdsHeading>
                 <GcdsText>{pageContent['8']}</GcdsText>
 
-
                 <GcdsGrid >
                     <GcdsText >
                         <div className='verifiedIconBadge'>
@@ -49,7 +48,6 @@ export default function SecuritySettings() {
                     </GcdsLink>
                 </GcdsGrid>
             </GcdsContainer>
-
         </GcdsContainer>
     );
 }
