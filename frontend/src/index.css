@@ -109,6 +109,24 @@ body, .mainBody {
     border: 1px solid var(--colour-green-10, #E6F6EC);
     border-radius: 5px;
   }
+
+  .verifiedIconBadge{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 30px;
+      padding: 0px 10px;
+      gap: 5px;
+      background: var(--colour-blue-100, #D7E5F5);
+      border-radius: 5px;
+
+      /* Mobile/Text/Small */
+      /*font-family: var(--typography-font-family-Text, "Noto Sans");*/
+      /*font-size: var(--typography-font-size-mobile-text-small_fontsize, 16px);*/
+      /*font-style: normal;*/
+      /*font-weight: 100;*/
+      /*line-height: var(--typography-line-height-mobile-text-small_lineheight, 24px); !* 150% *!*/
+  }
   
   .verifiedIcon {
     color: var(--gcds-color-green-500);
