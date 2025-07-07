@@ -49,6 +49,14 @@ Once running, you can access:
 
 For development with hot-reload:
 
+Start the server from the root directory with the [FastAPI CLI](https://fastapi.tiangolo.com/#run-it) command or Uvicorn
+```bash
+fastapi dev backend/app/main.py
+uvicorn app.main:app --reload --app-dir backend
+```
+
+
+
 ```bash
 docker run -p 8000:8000 \
   --env-file .env \

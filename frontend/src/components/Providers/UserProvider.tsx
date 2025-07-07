@@ -1,10 +1,23 @@
-import {useReducer} from "react";
-import {SERVICES, CONTEXT_ACTIONS} from "../../utils/constants.jsx";
+import { useReducer, useEffect, ReactNode } from "react";
+import { SERVICES, CONTEXT_ACTIONS } from "../../utils/constants.jsx";
 import UserContext from "./UserContext";
+import { authService } from "../../services/authService.jsx";
+
 
 interface Action {
     type: string
-    payload: JSON
+    payload: any
+}
+
+interface UserState {
+    isAuthenticated: boolean;
+    userProfile: any;
+    userData: any;
+}
+
+interface UserProviderProps {
+    children: ReactNode;
+    initial?: UserState;
 }
 
 const initialState = {
@@ -16,36 +29,61 @@ const initialState = {
         emailLanguage: null,
         emailValidated: false,
         trxnId: null,
-        passwordSubmitted:false,
+        passwordSubmitted: false,
         phone: null,
         stepVerificationSent: false,
-        stepVerified:false,
-        viewPrivacy:false,
+        stepVerified: false,
+        viewPrivacy: false,
         id: null,
         otpType: null,
-        passwordValidated:false
-    }
+        passwordValidated: false
+    },
+    userProfile: null
 }
 
 
-function userReducer(state=initialState, action: Action) {
+function userReducer(state = initialState, action: Action) {
     switch (action.type) {
         case CONTEXT_ACTIONS.signUp:
             return {
                 ...state,
                 userData: action.payload
             };
+        case CONTEXT_ACTIONS.signin_success:
+            return {
+                ...state,
+                isAuthenticated: true,
+                userProfile: action.payload,
+            };
         default:
             return state;
     }
 }
 
-export function UserProvider ({ children, initial=initialState}) {
+export function UserProvider({ children, initial = initialState }: UserProviderProps) {
 
     const [state, dispatch] = useReducer(userReducer, initial);
 
-    return(
-        <UserContext.Provider value={{state, dispatch}} >
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const response = await authService.my_user_profile();
+                if (response.success)
+                    dispatch({ type: CONTEXT_ACTIONS.signin_success, payload: response });
+                else {
+                    console.log(response.message);
+                }
+            } catch (err) {
+                console.log(err);
+            }
+        };
+
+        fetchUser();
+
+    }, []);
+
+    return (
+        <UserContext.Provider value={{ state, dispatch }} >
             {children}
         </UserContext.Provider>
     )

@@ -1,7 +1,8 @@
 import logging
 
-from fastapi import APIRouter, Path
+from fastapi import APIRouter, Path, Cookie
 from fastapi import Request
+from typing import Annotated
 
 from app.users.schemas import (
     ProfileUserData,
@@ -35,3 +36,15 @@ async def user_get_profile(
     request: Request, user_id: str = Path(..., description="User ID")
 ):
     return await get_profile(request.app.state.request_client, user_id)
+
+
+@router.get(
+    "/me",
+    # response_model=ProfileResponse,
+    tags=["User"],
+    summary="Get a single user's profile",
+    description="",
+)
+async def me(session: Annotated[str | None, Cookie()] = None):
+    print(f"Session: {session}")
+    return {session: "This is a placeholder for the /me endpoint."}

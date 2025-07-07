@@ -15,6 +15,8 @@ class IBMVerifyConfig(BaseSettings):
     IBM_VERIFY_TENANT_URL: str
     IBM_VERIFY_API_CLIENT_ID: str
     IBM_VERIFY_API_CLIENT_SECRET: str
+    IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID: str
+    IBM_VERIFY_PROFILE_MANAGEMENT_SECRET: str
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore", case_sensitive=True
     )
@@ -26,6 +28,8 @@ class Settings(BaseSettings):
     ibm_verify_config: IBMVerifyConfig = IBMVerifyConfig()
     # CORS_ORIGINS - allow all only for demo purposes, should be set to the frontend URL
     # Todo - set cors to frontend URL
+    PROFILE_MANAGEMENT_ORIGIN: str = "http://localhost:3000"  # URL of the frontend application
+    SESSION_MIDDLEWARE_DOMAIN: str | None = None  # set to the domain. For example: .cdssandbox.xyz
     CORS_ORIGINS: List[str] = ["*"]
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore"

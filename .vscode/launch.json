@@ -21,6 +21,13 @@
                 "PYTHONPATH": "backend"
             },
             "jinja": true
-        }
+        },
+        {
+            "name": "React Debugger",
+            "request": "launch",
+            "type": "chrome",
+            "url": "http://localhost:3000",
+            "webRoot": "${workspaceFolder}/frontend/src"
+        },
     ]
 }

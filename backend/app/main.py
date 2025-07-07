@@ -7,12 +7,15 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.sessions import SessionMiddleware
 
 from app.config import get_settings
 from app.utils.helpers import generate_error_response
 
 from .routers import health
 from app.users import v1_router as v1_users_router
+from app.auth import v1_router as v1_auth_router
+from app.auth.services import oidc_config
 
 settings = get_settings()
 
@@ -63,6 +66,8 @@ app = FastAPI(
     description=API_DESCRIPTION,
     contact=CONTACT_INFO,
 )
+oidc_config.register_oidc()
+
 
 app.include_router(health.router, prefix="/health")
 
@@ -70,6 +75,12 @@ app.include_router(
     v1_users_router.router,
     prefix=f"{settings.V1_API_VERSION}/users",
     tags=["Users"],
+)
+
+app.include_router(
+    v1_auth_router.router,
+    prefix=f"{settings.V1_API_VERSION}/auth",
+    tags=["Auth"],
 )
 
 
@@ -85,6 +96,17 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         break
     return generate_error_response(status_code=400, message=error_message)
 
+
+# Update the middleware to have the correct values for non development environments
+# we need this to save temporary code & state in session - https://docs.authlib.org/en/latest/client/fastapi.html
+# SessionMiddleware
+app.add_middleware(
+    SessionMiddleware,
+    secret_key="some-random-string",  # Use a strong secret in production
+    https_only=False,  # Optional but recommended for HTTPS
+    same_site="lax",  # Can be "strict", "lax", or "none"
+    # domain=settings.PROFILE_MANAGEMENT_ORIGIN,  # Set to your domain if needed
+)
 
 # CORS
 app.add_middleware(

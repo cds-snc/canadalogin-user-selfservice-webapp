@@ -1,43 +1,50 @@
-import {Navigate, useParams} from "react-router";
-import {useUser} from "./useUser.tsx";
-import {isEmailValid} from "../../utils/functions.jsx";
-import {FLOW_TYPES, PAGES} from "../../utils/constants.jsx";
+import { useEffect } from "react";
+import { Navigate, useParams } from "react-router";
+import { useUser } from "./useUser.tsx";
+import { isEmailValid } from "../../utils/functions.jsx";
+import { FLOW_TYPES, PAGES, OIDC_REDIRECT } from "../../utils/constants.jsx";
 
 
-function PrivateRoute ({route, children}){
-    const {state} = useUser();
-    const {flow, type} = useParams();
+function PrivateRoute({ route, children }) {
+    const { state } = useUser();
+    const { flow, type } = useParams();
 
-    if(!isValidRoute(route, state, flow, type))
+    useEffect(() => {
+        if (!state?.userProfile) {
+            window.location.href = OIDC_REDIRECT.login;
+        }
+    }, [state]);
+
+    if (!isValidRoute(route, state, flow, type))
         return <Navigate to="/" />;
 
     return children;
 }
 
-function isValidRoute (page, state, flow, type) {
+function isValidRoute(page, state, flow, type) {
 
-    if(flow===FLOW_TYPES.signIn)
+    if (flow === FLOW_TYPES.signIn)
         switch (page) {
-            case(PAGES.password):
+            case (PAGES.password):
                 return signIn.checkPasswordPage(state);
-            case(PAGES.verification):
+            case (PAGES.verification):
                 return signIn.checkLoginValidation(state);
-            case(PAGES.verificationSelection):
+            case (PAGES.verificationSelection):
                 return signIn.checkLoginValidation(state);
             default:
                 return false;
         }
 
-    switch(page){
-        case(PAGES.coreProfile):
+    switch (page) {
+        case (PAGES.coreProfile):
             return signUp.checkCoreProfilePage(state);
-        case(PAGES.verification):
+        case (PAGES.verification):
             return signUp.checkVerificationPage(state, type);
-        case(PAGES.verificationSetUp):
+        case (PAGES.verificationSetUp):
             return signUp.checkVerificationSetUpPage(state);
-        case(PAGES.password):
-            return  signUp.checkPasswordPage(state);
-        case(PAGES.signup):
+        case (PAGES.password):
+            return signUp.checkPasswordPage(state);
+        case (PAGES.signup):
             return signUp.checkSignUpPage(state);
         default:
             return false;
@@ -46,7 +53,7 @@ function isValidRoute (page, state, flow, type) {
 }
 
 const signUp = {
-    checkSignUpPage: (state)=> {
+    checkSignUpPage: (state) => {
         return state.userData.viewPrivacy;
     },
     checkVerificationPage: (state, type) => {
@@ -69,11 +76,11 @@ const signUp = {
 }
 
 const signIn = {
-    checkPasswordPage: (state) =>{
+    checkPasswordPage: (state) => {
         return isEmailValid(state.userData.email)
     },
     checkLoginValidation: (state) => {
-       return signIn.checkPasswordPage(state) && state.userData.passwordValidated && state.userData.phone && state.userData.id;
+        return signIn.checkPasswordPage(state) && state.userData.passwordValidated && state.userData.phone && state.userData.id;
 
     }
 }
