@@ -11,7 +11,7 @@ interface Action {
 
 interface UserState {
     isAuthenticated: boolean;
-    userProfile: any;
+    userSession: string | null;
     userData: any;
     isLoading: boolean;
 }
@@ -40,9 +40,7 @@ const initialState = {
         otpType: null,
         passwordValidated: false
     },
-    userProfile: {
-        trxnId: "123",
-    }
+    userSession: null
 }
 
 
@@ -56,16 +54,14 @@ function userReducer(state = initialState, action: Action) {
         case CONTEXT_ACTIONS.signin_success:
             return {
                 ...state,
-                isAuthenticated: true,
-                userProfile: action.payload,
+                userSession: action.payload,
                 isLoading: false
             };
         case CONTEXT_ACTIONS.signin_failure:
             return {
                 ...state,
-                isAuthenticated: false,
-                userProfile: null,
-                isLoading: true
+                userSession: null,
+                isLoading: false
             };
         default:
             return state;

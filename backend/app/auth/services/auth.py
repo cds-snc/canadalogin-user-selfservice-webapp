@@ -29,6 +29,7 @@ async def callback_handler(request: Request):
         # Use the OAuth instance to handle the callback
         token = await oauth.verify.authorize_access_token(request)
         request.session['user'] = dict(token)
+        print(f"User session: {request.session['user']}")
         return RedirectResponse(url=config.PROFILE_MANAGEMENT_ORIGIN)
     except OAuthError as e:
         raise Exception(f"OAuth error: {str(e)}")

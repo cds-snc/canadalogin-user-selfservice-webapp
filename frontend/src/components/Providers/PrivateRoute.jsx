@@ -9,13 +9,12 @@ function PrivateRoute() {
     const { state } = useUser();
 
     useEffect(() => {
-        if (!state.isLoading && !state.isAuthenticated) {
+        if (!state.isLoading && !state.userSession) {
             window.location.href = OIDC_REDIRECT.login;
         }
-    }, [state.isLoading, state.isAuthenticated]);
+    }, [state.isLoading, state.userSession]);
 
     if (state.isLoading) return <div>Loading...</div>;
-
 
     return <Outlet />;
 }
