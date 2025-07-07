@@ -22,7 +22,8 @@ export const NAVIGATION_LINKS = {
     areYouSureEditYourName: '/areYouSureEditYourName',
     enterNewPhoneNumber: '/enterNewPhoneNumber',
     youMayUpdateEmailAtOtherPlaces: '/youMayUpdateEmailAtOtherPlaces',
-    areYouSureUpdateYourEmail: '/areYouSureUpdateYourEmail'
+    areYouSureUpdateYourEmail: '/areYouSureUpdateYourEmail',
+    securitySettings: '/securitysettings',
 };
 export const CONTEXT_ACTIONS = {
     signUp: 'SIGN_UP',
