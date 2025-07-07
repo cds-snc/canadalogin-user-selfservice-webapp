@@ -10,7 +10,6 @@ interface Action {
 }
 
 interface UserState {
-    isAuthenticated: boolean;
     userSession: string | null;
     userData: any;
     isLoading: boolean;
@@ -22,7 +21,6 @@ interface UserProviderProps {
 }
 
 const initialState = {
-    isAuthenticated: false,
     isLoading: true,
     userData: {
         service: SERVICES[0].title, //to be set later when url referrer is given, also need to refactor other pages to use this value
@@ -82,6 +80,8 @@ export function UserProvider({ children, initial = initialState }: UserProviderP
                     dispatch({ type: CONTEXT_ACTIONS.signin_failure, payload: null });
                 }
             } catch (err) {
+                dispatch({ type: CONTEXT_ACTIONS.signin_failure, payload: null });
+
                 console.log(err);
             }
         };

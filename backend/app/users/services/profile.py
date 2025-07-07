@@ -106,7 +106,7 @@ async def get_profile(global_http_client: AsyncClient, user_id: str):
         )
 
 
-async def my_profile(global_http_client: AsyncClient, user_id: str):
+async def my_profile():
     return "ok"
     # try:
     #     access_token = await get_admin_token(global_http_client)

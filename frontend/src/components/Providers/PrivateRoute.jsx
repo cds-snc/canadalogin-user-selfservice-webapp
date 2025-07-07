@@ -15,6 +15,7 @@ function PrivateRoute() {
     }, [state.isLoading, state.userSession]);
 
     if (state.isLoading) return <div>Loading...</div>;
+    if (!state.userSession) return null;
 
     return <Outlet />;
 }

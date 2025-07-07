@@ -69,6 +69,27 @@ app = FastAPI(
 oidc_config.register_oidc()
 
 
+# Sets the session cookie - https://docs.authlib.org/en/latest/client/fastapi.html
+# SessionMiddleware
+app.add_middleware(
+    SessionMiddleware,
+    secret_key="some-random-string",  # Use a strong secret in production
+    https_only=False,  # Optional but recommended for HTTPS
+    same_site="lax",  # Can be "strict", "lax", or "none"
+    # domain=settings.PROFILE_MANAGEMENT_ORIGIN,  # Set to your domain if needed
+)
+
+# CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["*"],
+)
+
+
 app.include_router(health.router, prefix="/health")
 
 app.include_router(
@@ -95,28 +116,6 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         logger.error(f"Validation error: {error_message} at " + str(request.url))
         break
     return generate_error_response(status_code=400, message=error_message)
-
-
-# Update the middleware to have the correct values for non development environments
-# we need this to save temporary code & state in session - https://docs.authlib.org/en/latest/client/fastapi.html
-# SessionMiddleware
-app.add_middleware(
-    SessionMiddleware,
-    secret_key="some-random-string",  # Use a strong secret in production
-    https_only=False,  # Optional but recommended for HTTPS
-    same_site="lax",  # Can be "strict", "lax", or "none"
-    # domain=settings.PROFILE_MANAGEMENT_ORIGIN,  # Set to your domain if needed
-)
-
-# CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-    expose_headers=["*"],
-)
 
 
 def log_request_response(
