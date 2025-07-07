@@ -91,8 +91,6 @@ function PageContents({page}:{page:string}) {
             return (
                 <EnterNewEmail />
             );
-
-            case "RP":
         case PAGES.profileYouMayUpdateName:
             return (
                 <ProfileYouMayUpdateName />

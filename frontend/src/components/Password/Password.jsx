@@ -5,7 +5,6 @@ import {
     GcdsInput,
     GcdsNotice,
     GcdsStepper,
-    GcdsCheckbox,
     GcdsErrorSummary,
     GcdsHeading, GcdsLink
 } from "@cdssnc/gcds-components-react";
@@ -164,12 +163,6 @@ export default function Password() {
                             errorMessage={error.errorMsg}
                         ></GcdsInput>)
                         }
-                    <GcdsCheckbox
-                        checkboxId="checkbox-default"
-                        label={pageContentJson['11']}
-                        name="checkbox"
-                        onGcdsChange={()=> setCheckedValue (!checkedValue)}>
-                    </GcdsCheckbox>
                     {
                         flow===FLOW_TYPES.signUp&&(
                                 <GcdsText>
