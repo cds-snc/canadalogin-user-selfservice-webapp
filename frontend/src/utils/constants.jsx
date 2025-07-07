@@ -34,6 +34,7 @@ export const CONTEXT_ACTIONS = {
     signIn: 'SIGN_IN',
     logOut: 'LOG_OUT',
     signin_success: 'SIGNIN_SUCCESS',
+    signin_failure: 'SIGNIN_FAILURE',
 };
 
 export const FLOW_TYPES = {

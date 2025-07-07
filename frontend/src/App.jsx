@@ -6,10 +6,13 @@ import { PAGES } from "./utils/constants.jsx";
 function App() {
     return (
         <Routes>
-            {/* <Route path="/" element={<Page page={PAGES.home} element={<PrivateRoute route={PAGES.manageDashboard}><Page page={PAGES.manageDashboard} /></PrivateRoute>} />} /> */}
-            <Route path="/" element={<PrivateRoute route={PAGES.ProfileHome}><Page page={PAGES.ProfileHome} /></PrivateRoute>} />
+            <Route element={<PrivateRoute />}>
+                <Route path="/" element={<Page page={PAGES.manageDashboard} />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+            </Route>
+            {/* <Route path="/" element={<PrivateRoute route={PAGES.ProfileHome}><Page page={PAGES.ProfileHome} /></PrivateRoute>} /> */}
 
-            <Route path="/:language" element={<Page page={PAGES.home} />} />
+            {/* <Route path="/:language" element={<Page page={PAGES.home} />} />
             <Route path="/:language/" element={<Page page={PAGES.home} />} />
             <Route path="/:language/manage" element={<Page page={PAGES.manageDashboard} />} />
             <Route path="/:language/:flow/privacy" element={<Page page={PAGES.privacy} />} />
@@ -32,7 +35,7 @@ function App() {
             <Route path="/:language/profileYouMayUpdateName" element={<Page page={PAGES.profileYouMayUpdateName} />} />
             <Route path="/:language/enterNewPhoneNumber" element={<Page page={PAGES.enterNewPhoneNumber} />} />
             <Route path="/:language/youMayUpdateEmailAtOtherPlaces" element={<Page page={PAGES.youMayUpdateEmailAtOtherPlaces} />} />
-            <Route path="/:language/areYouSureUpdateYourEmail" element={<Page page={PAGES.areYouSureUpdateYourEmail} />} />
+            <Route path="/:language/areYouSureUpdateYourEmail" element={<Page page={PAGES.areYouSureUpdateYourEmail} />} /> */}
         </Routes>
     );
 }

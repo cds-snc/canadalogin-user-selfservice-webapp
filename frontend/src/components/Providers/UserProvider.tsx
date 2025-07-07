@@ -13,6 +13,7 @@ interface UserState {
     isAuthenticated: boolean;
     userProfile: any;
     userData: any;
+    isLoading: boolean;
 }
 
 interface UserProviderProps {
@@ -22,6 +23,7 @@ interface UserProviderProps {
 
 const initialState = {
     isAuthenticated: false,
+    isLoading: true,
     userData: {
         service: SERVICES[0].title, //to be set later when url referrer is given, also need to refactor other pages to use this value
         language: 'en', //to be set later when refactoring possibly
@@ -38,7 +40,9 @@ const initialState = {
         otpType: null,
         passwordValidated: false
     },
-    userProfile: null
+    userProfile: {
+        trxnId: "123",
+    }
 }
 
 
@@ -54,6 +58,14 @@ function userReducer(state = initialState, action: Action) {
                 ...state,
                 isAuthenticated: true,
                 userProfile: action.payload,
+                isLoading: false
+            };
+        case CONTEXT_ACTIONS.signin_failure:
+            return {
+                ...state,
+                isAuthenticated: false,
+                userProfile: null,
+                isLoading: true
             };
         default:
             return state;
@@ -68,10 +80,10 @@ export function UserProvider({ children, initial = initialState }: UserProviderP
         const fetchUser = async () => {
             try {
                 const response = await authService.my_user_profile();
-                if (response.success)
+                if (response)
                     dispatch({ type: CONTEXT_ACTIONS.signin_success, payload: response });
                 else {
-                    console.log(response.message);
+                    dispatch({ type: CONTEXT_ACTIONS.signin_failure, payload: null });
                 }
             } catch (err) {
                 console.log(err);
@@ -81,7 +93,7 @@ export function UserProvider({ children, initial = initialState }: UserProviderP
         fetchUser();
 
     }, []);
-
+    console.log("state", state)
     return (
         <UserContext.Provider value={{ state, dispatch }} >
             {children}
