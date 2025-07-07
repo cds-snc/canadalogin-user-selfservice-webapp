@@ -22,7 +22,7 @@ export default function SecuritySettings() {
             <GcdsText>{pageContent['3']}</GcdsText>
             <GcdsContainer className="sectionCard">
                 <GcdsHeading tag="h3">{pageContent['4']}</GcdsHeading>
-                <GcdsGrid >
+                <GcdsGrid columns="1fr" gap="1rem" align-items="center">
                     <GcdsText>{pageContent['5']}</GcdsText>
                     <GcdsLink href="#" size="regular">
                         {pageContent['6']}
@@ -34,7 +34,7 @@ export default function SecuritySettings() {
                 <GcdsHeading tag="h3" marginTop='300'>{pageContent['7']}</GcdsHeading>
                 <GcdsText>{pageContent['8']}</GcdsText>
 
-                <GcdsGrid >
+                <GcdsGrid columns="1fr" gap="1rem" align-items="center">
                     <GcdsText >
                         <div className='verifiedIconBadge'>
                             <svg xmlns="http://www.w3.org/2000/svg" width="13" height="17" viewBox="0 0 13 17" fill="none">
