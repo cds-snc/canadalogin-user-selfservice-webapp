@@ -104,3 +104,32 @@ async def get_profile(global_http_client: AsyncClient, user_id: str):
         raise HTTPException(
             status_code=response.status_code, detail=f"HTTP error, {error_details}"
         )
+
+
+async def my_profile(global_http_client: AsyncClient, user_id: str):
+    return "ok"
+    # try:
+    #     access_token = await get_admin_token(global_http_client)
+    #     headers = get_auth_request_headers(access_token)
+    #     settings = get_settings().ibm_verify_config
+    #     get_profile_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/Users/{user_id}"
+    #     response = await global_http_client.get(get_profile_url, headers=headers)
+    # except ValidationError as e:
+    #     logger.error(f"Validation Error: {e.json()}")
+    #     print(json.dumps(e.json(), indent=4))
+    #     raise HTTPException(status_code=422, detail="Request data validation error")
+
+    # if response.status_code == 200:
+    #     logger.info("User profile retrieved successfully.")
+    #     response_data = ProfileGetResponseData(**response.json())
+    #     return ProfileResponse(
+    #         success=True,
+    #         message="User profile retrieved successfully.",
+    #         data=response_data,
+    #     )
+    # else:
+    #     logger.error(f"Failed to retrieve profile. Response: {response.text}")
+    #     error_details = response.json().get("detail")
+    #     raise HTTPException(
+    #         status_code=response.status_code, detail=f"HTTP error, {error_details}"
+    #     )
