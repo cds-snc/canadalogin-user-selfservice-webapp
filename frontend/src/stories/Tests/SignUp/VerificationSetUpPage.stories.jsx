@@ -8,8 +8,7 @@ import {getPageContent} from "../../../utils/functions.jsx";
 import {
     ACTION_TYPES,
     MSW_MOCKS, PHONE_NUMBER_ERROR_RESPONSE,
-    TEST_TYPES,
-    TEST_USERS
+    TEST_TYPES
 } from "../utils/constants.jsx";
 import {buildTestCase, testCase, TestTemplate} from "../utils/functions.tsx";
 

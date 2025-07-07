@@ -8,7 +8,6 @@ import * as engJson from '../locales/en/en.json';
 // @ts-ignore
 import * as frJson from '../locales/fr/fr.json';
 import { PAGES } from "../utils/constants.jsx";
-import {page} from "@vitest/browser/context";
 
 const subLinks = { attribute: 'sub-links', en: getFooter(AVAILABLE_LANGUAGES.en), fr: getFooter(AVAILABLE_LANGUAGES.fr) };
 const GCDS_TAG_ATTRIBUTES = {
