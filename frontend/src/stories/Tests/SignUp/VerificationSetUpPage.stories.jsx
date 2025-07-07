@@ -155,18 +155,3 @@ SuccessfulBackEnd.play = async ({ canvasElement, step }) => {
         input: {inputType: 'textBox', stepMessage:'Enter phone Number with enough digits.', value: '4161234567'}
     })
 }
-
-TestUser.args ={email: TEST_USERS.keys().next().value };
-TestUser.play = async ({ canvasElement, step }) => {
-
-    await testCase({
-        canvasElement,
-        step,
-        stepMessage: "Submit form with test user",
-        link: 'email',
-        delay: 1000,
-        actionType: ACTION_TYPES.submit,
-        type: TEST_TYPES.redirect,
-        input: {inputType: 'textBox', stepMessage:'Enter phone Number with enough digits.', value: '4161234567'}
-    })
-}
