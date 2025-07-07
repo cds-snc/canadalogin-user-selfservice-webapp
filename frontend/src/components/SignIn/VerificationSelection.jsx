@@ -1,5 +1,5 @@
 import {
-    GcdsContainer, GcdsErrorSummary, GcdsFieldset, GcdsHeading, GcdsRadioGroup, GcdsText,
+    GcdsContainer, GcdsErrorSummary, GcdsHeading, GcdsText,
 } from "@cdssnc/gcds-components-react";
 import {
     AVAILABLE_LANGUAGES,
@@ -57,21 +57,6 @@ export default function VerificationSelection() {
                     </GcdsText>
                 </GcdsHeading>
                 <form id="form" onSubmit={handleSubmit} >
-                    <GcdsFieldset
-                        fieldset-id="gcds-email-fieldset"
-                        legend={pageContentJson['4']}
-                        lang={language}
-                        >
-                        <br />
-                        <GcdsRadioGroup
-                            name="number"
-                            options={'['+
-                                `{"label": "${state.userData.phone}",`+
-                                 `"hint": "${state.userData.otpType===FLOW_TYPES.sms?pageContentJson['5']:pageContentJson['6']} (${pageContentJson['7']})",`+
-                                `"id": "english", "value": "${state.userData.phone}","checked":"true"}`+
-                                `]`}
-                        />
-                    </GcdsFieldset>
                     <SubmitButton currentLang={language} disabled={isPending} />
                 </form>
             </GcdsContainer>

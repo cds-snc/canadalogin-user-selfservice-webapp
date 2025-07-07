@@ -1,5 +1,5 @@
 import App from '../App';
-import {cleanup, render, screen} from '@testing-library/react';
+import {cleanup, render} from '@testing-library/react';
 import {describe, test, afterEach, vi, beforeAll} from "vitest";
 import '@testing-library/jest-dom';
 import {AVAILABLE_LANGUAGES, NAVIGATION_LINKS, FLOW_TYPES} from "../utils/constants";
@@ -354,7 +354,6 @@ describe('Routing Tests', () => {
                 <App/>
             </MemoryRouter>,
         )
-            screen.debug()
         buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.manageDashboard, FLOW_TYPES.manage , null, langHref.fr + NAVIGATION_LINKS.manage);
     });
 
@@ -366,7 +365,6 @@ describe('Routing Tests', () => {
                 <App/>
             </MemoryRouter>,
         )
-        screen.debug()
         buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.manageDashboard, FLOW_TYPES.manage , null, langHref.en + NAVIGATION_LINKS.manage);
     });
 
