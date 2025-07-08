@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Navigate, useParams, Outlet } from "react-router";
+import { Outlet } from "react-router";
 import { useUser } from "./useUser.tsx";
 import { isEmailValid } from "../../utils/functions.jsx";
 import { FLOW_TYPES, PAGES, OIDC_REDIRECT } from "../../utils/constants.jsx";
