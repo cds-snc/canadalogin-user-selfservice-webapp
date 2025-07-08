@@ -1,7 +1,6 @@
 from fastapi import Request, HTTPException
 from fastapi.responses import RedirectResponse
 from authlib.integrations.starlette_client import OAuthError
-from starlette.requests import Request
 from app.auth.services.oidc_config import oauth
 from app.config import get_settings
 from app.utils.access_token import SESSION_USER_ACCESS_TOKEN_KEY
