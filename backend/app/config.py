@@ -1,7 +1,7 @@
 from functools import lru_cache
 from typing import List
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import AnyUrl
+from pydantic import AnyUrl, Field
 
 
 class AppInfo(BaseSettings):
@@ -31,11 +31,23 @@ class Settings(BaseSettings):
     PROFILE_MANAGEMENT_DOMAIN: str = (
         "localhost"  # For non local environments, set domain to app.gc-signin.cdssandbox.xyz
     )
-    CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:8000"]
+
+    CORS_ORIGINS: str = Field(
+        default="http://localhost:3000,http://localhost:8000",
+        description="Comma-separated list of CORS origins, Terraform cant pass in a list[str]."
+    )
+
+    # CORS_ORIGINS: List[str] = ["https://app.gc-signin.cdssandbox.xyz", "https://api.gc-signin.cdssandbox.xyz"]
+
     ENV: str = "local"
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore"
     )
+
+    @property
+    def cors_origins_list(self) -> List[str]:
+        """Convert comma-separated CORS_ORIGINS string to list"""
+        return [origin.strip() for origin in self.CORS_ORIGINS.split(",")]
 
 
 @lru_cache

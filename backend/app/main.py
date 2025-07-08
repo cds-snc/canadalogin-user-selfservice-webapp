@@ -55,7 +55,8 @@ async def lifespan(app: FastAPI):
     logger.info("Application startup complete")
     app.state.request_client = httpx.AsyncClient()
     oidc_config.register_oidc(ibm_verify_config)
-
+    print(settings.cors_origins_list)
+    logger.info(f"CORS Origins: {settings.cors_origins_list}")
     yield
     logger.info("Closing global HTTP client")
     await app.state.request_client.aclose()
