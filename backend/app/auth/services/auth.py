@@ -13,7 +13,12 @@ async def get_redirect_url(request: Request):
     """
     try:
         # Use the OAuth instance to get the redirect URL
-        redirect_uri = request.url_for("callback_route")
+        config = get_settings()
+        callback_route = request.url_for("callback_route")
+        redirect_uri = callback_route
+
+        if config.ENV != "local":
+            redirect_uri = str(callback_route).replace("http://", "https://")
         return await oauth.verify.authorize_redirect(request, redirect_uri)
     except OAuthError as e:
         raise Exception(f"OAuth error: {str(e)}")
@@ -37,7 +42,6 @@ async def callback_handler(request: Request):
 
         if config.ENV == "local":
             redirectValue = f"http://{config.PROFILE_MANAGEMENT_DOMAIN}:3000"
-            return RedirectResponse(url=redirectValue)
 
         return RedirectResponse(url=redirectValue)
     except OAuthError as e:

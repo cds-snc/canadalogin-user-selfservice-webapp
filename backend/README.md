@@ -18,8 +18,6 @@ Create a `.env` file with the following variables:
 IBM_VERIFY_TENANT_URL=set_this_to_the_dev_tenant
 IBM_VERIFY_API_CLIENT_ID=set_this_to_the_dev_api_client_id
 IBM_VERIFY_API_CLIENT_SECRET=set_this_to_the_dev_api_client_secret
-IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID: a123456
-IBM_VERIFY_PROFILE_MANAGEMENT_SECRET: a123456
 ```
 
 ### Quick Start
@@ -38,6 +36,13 @@ docker run -p 8000:8000 \
   gc-signin-backend
 ```
 
+3. You can also run the fastapi server locally from the root folder:
+Start the server from the root directory with the [FastAPI CLI](https://fastapi.tiangolo.com/#run-it) command or Uvicorn
+```
+make install-dev-python
+fastapi run backend/app/main.py or uvicorn app.main:app --reload --app-dir backend
+```
+
 The API will be available at `http://localhost:8000`
 
 ### API Documentation
@@ -50,14 +55,6 @@ Once running, you can access:
 ### Development Mode
 
 For development with hot-reload:
-
-Start the server from the root directory with the [FastAPI CLI](https://fastapi.tiangolo.com/#run-it) command or Uvicorn
-```bash
-fastapi dev backend/app/main.py
-uvicorn app.main:app --reload --app-dir backend
-```
-
-
 
 ```bash
 docker run -p 8000:8000 \
@@ -144,4 +141,8 @@ To run the unit tests, follow these steps:
 - Run Lint (from root folder)
    ```bash
    make lint-python
+   ```
+- Building a Dockerimage from your macbook M1 to AWS
+   ``` bash
+   docker buildx  build --platform linux/amd64 -t [NAME] .
    ```
