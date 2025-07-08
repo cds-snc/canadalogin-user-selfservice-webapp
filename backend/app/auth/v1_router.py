@@ -2,7 +2,6 @@ import logging
 
 from fastapi import APIRouter
 from fastapi import Request
-from fastapi.responses import RedirectResponse
 from app.auth.services.auth import get_redirect_url, callback_handler
 
 router = APIRouter()
