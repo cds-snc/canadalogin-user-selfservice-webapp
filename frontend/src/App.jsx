@@ -8,6 +8,7 @@ function App() {
         <Routes>
             <Route element={<PrivateRoute />}>
                 <Route path="/" element={<Page page={PAGES.manageDashboard} />} />
+                <Route path="/:language/profilehome" element={<Page page={PAGES.ProfileHome} />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
             {/* <Route path="/" element={<PrivateRoute route={PAGES.ProfileHome}><Page page={PAGES.ProfileHome} /></PrivateRoute>} /> */}
@@ -27,7 +28,6 @@ function App() {
             <Route path="/:language/areYouSureEditYourName" element={<Page page={PAGES.areYouSureEditYourName} />} />
             <Route path="*" element={<Navigate to="/" replace />} />
             <Route path="/:language/profilenameedit" element={<Page page={PAGES.ProfileNameEdit} />} />
-            <Route path="/:language/profilehome" element={<Page page={PAGES.ProfileHome} />} />
             <Route path="/:language/checkyouremail" element={<Page page={PAGES.CheckYourEmail} />} />
             <Route path="/:language/completetwostepverification" element={<Page page={PAGES.CompleteTwoStepVerification} />} />
             <Route path="/:language/firstverifyitsyou" element={<Page page={PAGES.FirstVerifyItsYou} />} />

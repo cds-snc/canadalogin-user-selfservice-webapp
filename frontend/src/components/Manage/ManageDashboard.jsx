@@ -6,12 +6,12 @@ import {
 } from "@cdssnc/gcds-components-react";
 import {
     PAGES,
+    NAVIGATION_LINKS
 } from "../../utils/constants";
 import { useParams } from "react-router";
 import { useError } from "../../hooks/useError";
 import { getPageContent } from "../../utils/functions.jsx";
 import { useUser } from "../Providers/useUser.tsx";
-
 
 
 export default function ManageDashboard() {
@@ -39,7 +39,7 @@ export default function ManageDashboard() {
             <GcdsGrid tag="managedashboard" columnsDesktop="1fr 1fr 1fr" columnsTablet="1fr 1fr" columns="repeat(auto-fit, minmax(200px, 250px))" placeContent="center" >
                 <GcdsCard
                     cardTitle={pageContent['2']}
-                    href="#"
+                    href={`/${language}${NAVIGATION_LINKS.profileHome}`}
                     cardTitleTag="h3"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" width="76" height="76" viewBox="0 0 76 76" fill="none">
