@@ -27,6 +27,7 @@ import ProfileYouMayUpdateName from "../components/Manage/ProfileYouMayUpdateNam
 import EnterNewPhoneNumber from "../components/Manage/EnterNewPhoneNumber.jsx";
 import YouMayUpdateEmailAtOtherPlaces from "../components/Manage/YouMayUpdateEmailAtOtherPlaces.jsx";
 import AreYouSureUpdateYourEmail from "../components/Manage/AreYouSureUpdateYourEmail.jsx";
+import SecuritySettings from "../components/Manage/SecuritySettings.jsx";
 
 function PageContents({page}:{page:string}) {
     switch(page) {
@@ -107,6 +108,10 @@ function PageContents({page}:{page:string}) {
         case PAGES.areYouSureUpdateYourEmail:
             return (
                 <AreYouSureUpdateYourEmail />
+            );
+        case PAGES.securitySettings:
+            return (
+                <SecuritySettings />
             );
         case "RP":
             return (

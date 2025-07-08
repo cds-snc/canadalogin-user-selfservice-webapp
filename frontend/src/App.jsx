@@ -32,8 +32,9 @@ function App() {
                   <Route path="/:language/profileYouMayUpdateName" element={ <Page page={PAGES.profileYouMayUpdateName}/>} />
                   <Route path="/:language/enterNewPhoneNumber" element={ <Page page={PAGES.enterNewPhoneNumber}/>} />
                   <Route path="/:language/youMayUpdateEmailAtOtherPlaces" element={ <Page page={PAGES.youMayUpdateEmailAtOtherPlaces}/>} />
-
                   <Route path="/:language/areYouSureUpdateYourEmail" element={ <Page page={PAGES.areYouSureUpdateYourEmail}/>} />
+                  <Route path="/:language/securitysettings" element={ <Page page={PAGES.securitySettings}/>} />
+
               </Routes>
           </UserProvider>
       );
