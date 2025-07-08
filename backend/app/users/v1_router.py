@@ -45,5 +45,7 @@ async def user_get_profile(
     summary="Get a single user's profile",
     description="",
 )
-async def me(request: Request, user_access_token: str = Depends(get_users_current_session)):
+async def me(
+    request: Request, user_access_token: str = Depends(get_users_current_session)
+):
     return await my_profile(request.app.state.request_client, user_access_token)

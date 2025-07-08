@@ -13,7 +13,7 @@ async def get_redirect_url(request: Request):
     """
     try:
         # Use the OAuth instance to get the redirect URL
-        redirect_uri = request.url_for('callback_route')
+        redirect_uri = request.url_for("callback_route")
         return await oauth.verify.authorize_redirect(request, redirect_uri)
     except OAuthError as e:
         raise Exception(f"OAuth error: {str(e)}")
@@ -29,7 +29,9 @@ async def callback_handler(request: Request):
 
         # Use the OAuth instance to handle the callback
         oidc_response = await oauth.verify.authorize_access_token(request)
-        request.session[SESSION_USER_ACCESS_TOKEN_KEY] = oidc_response.get('access_token')
+        request.session[SESSION_USER_ACCESS_TOKEN_KEY] = oidc_response.get(
+            "access_token"
+        )
         return RedirectResponse(url=config.PROFILE_MANAGEMENT_ORIGIN)
     except OAuthError as e:
         raise Exception(f"OAuth error: {str(e)}")

@@ -28,8 +28,3 @@ async def redirect_url(request: Request):
 )
 async def callback(request: Request):
     return await callback_handler(request)
-
-
-@router.get("/test-redirect",)
-def test_redirect():
-    return RedirectResponse("http://localhost:3000")
