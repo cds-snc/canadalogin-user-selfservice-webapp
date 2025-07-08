@@ -12,15 +12,6 @@ function App() {
                   <Route path="/:language" element={ <Page page={PAGES.home}/>} />
                   <Route path="/:language/" element={ <Page page={PAGES.home}/>} />
                   <Route path="/:language/manage" element={<Page page={PAGES.manageDashboard}/>} />
-                  <Route path="/:language/:flow/privacy" element={<Page page={PAGES.privacy}/>}/>
-                  <Route path="/:language/:flow" element={<PrivateRoute route={PAGES.signup}><Page page={PAGES.signup}/></PrivateRoute>}/>
-                  <Route path="/:language/:flow/verification/:type" element={<PrivateRoute route={PAGES.verification}><Page page={PAGES.verification}/></PrivateRoute>}/>
-                  <Route path="/:language/:flow/password" element={ <PrivateRoute route={PAGES.password}><Page page={PAGES.password}/></PrivateRoute>} />
-                  <Route path="/:language/:flow/verificationsetup" element={<PrivateRoute route={PAGES.verificationSetUp}><Page page={PAGES.verificationSetUp}/></PrivateRoute>}/>
-                  <Route path="/:language/:flow/selectverification" element={<PrivateRoute route={PAGES.verificationSelection}><Page page={PAGES.verificationSelection}/></PrivateRoute>}/>
-                  <Route path="/:language/:flow/profile" element={<PrivateRoute route={PAGES.coreProfile}><Page page={PAGES.coreProfile}/></PrivateRoute>}/>
-                  <Route path="/:language/redirecttorp" element={ <Page page="RP"/>} />
-                  <Route path="/:language/phoneotp" element={ <Page page="Phone OTP"/>} />
                   <Route path="/:language/areYouSureEditYourName" element={ <Page page={PAGES.areYouSureEditYourName} />} />
                   <Route path="*" element={<Navigate to="/" replace />} />
                   <Route path="/:language/profilenameedit" element={ <Page page={PAGES.ProfileNameEdit}/>} />
