@@ -26,6 +26,8 @@ jobs:
           IBM_VERIFY_API_CLIENT_SECRET: a123456
           PROFILE_MANAGEMENT_ORIGIN: test.com
           SESSION_MIDDLEWARE_DOMAIN: test.com
+          IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID: a123456
+          IBM_VERIFY_PROFILE_MANAGEMENT_SECRET: a123456
         run: make run-pytest
       - name: Check Coverage
         uses: orgoro/coverage@v3
