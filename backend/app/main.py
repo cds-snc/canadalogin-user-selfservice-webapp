@@ -47,13 +47,15 @@ CONTACT_INFO = {
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    app.state.config = get_settings().ibm_verify_config
-
+    app.state.config = get_settings()
+    ibm_verify_config = app.state.config.ibm_verify_config
     logger.info("Starting IBM Verify Integration API")
-    logger.info(f"Tenant URL: {app.state.config.IBM_VERIFY_TENANT_URL}")
-    logger.info(f"Client ID: {app.state.config.IBM_VERIFY_API_CLIENT_ID}")
+    logger.info(f"Tenant URL: {ibm_verify_config.IBM_VERIFY_TENANT_URL}")
+    logger.info(f"Client ID: {ibm_verify_config.IBM_VERIFY_API_CLIENT_ID}")
     logger.info("Application startup complete")
     app.state.request_client = httpx.AsyncClient()
+    oidc_config.register_oidc(ibm_verify_config)
+
     yield
     logger.info("Closing global HTTP client")
     await app.state.request_client.aclose()
@@ -66,7 +68,6 @@ app = FastAPI(
     description=API_DESCRIPTION,
     contact=CONTACT_INFO,
 )
-oidc_config.register_oidc()
 
 
 # Sets the session cookie - https://docs.authlib.org/en/latest/client/fastapi.html

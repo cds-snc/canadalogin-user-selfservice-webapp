@@ -10,7 +10,7 @@ interface Action {
 }
 
 interface UserState {
-    userSession: string | null;
+    userProfile: null;
     userData: any;
     isLoading: boolean;
 }
@@ -38,7 +38,7 @@ const initialState = {
         otpType: null,
         passwordValidated: false
     },
-    userSession: null
+    userProfile: null
 }
 
 
@@ -52,13 +52,13 @@ function userReducer(state = initialState, action: Action) {
         case CONTEXT_ACTIONS.signin_success:
             return {
                 ...state,
-                userSession: action.payload,
+                userProfile: action.payload,
                 isLoading: false
             };
         case CONTEXT_ACTIONS.signin_failure:
             return {
                 ...state,
-                userSession: null,
+                userProfile: null,
                 isLoading: false
             };
         default:
@@ -74,8 +74,9 @@ export function UserProvider({ children, initial = initialState }: UserProviderP
         const fetchUser = async () => {
             try {
                 const response = await authService.my_user_profile();
-                if (response)
-                    dispatch({ type: CONTEXT_ACTIONS.signin_success, payload: response });
+                if (response && response.data) {
+                    dispatch({ type: CONTEXT_ACTIONS.signin_success, payload: response.data });
+                }
                 else {
                     dispatch({ type: CONTEXT_ACTIONS.signin_failure, payload: null });
                 }
@@ -89,7 +90,6 @@ export function UserProvider({ children, initial = initialState }: UserProviderP
         fetchUser();
 
     }, []);
-    console.log("state", state)
     return (
         <UserContext.Provider value={{ state, dispatch }} >
             {children}

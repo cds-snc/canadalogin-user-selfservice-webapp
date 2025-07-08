@@ -1,14 +1,14 @@
 import logging
 
-from fastapi import APIRouter, Path, Cookie
-from fastapi import Request, HTTPException, Depends
-from typing import Annotated
+from fastapi import APIRouter, Path
+from fastapi import Request, Depends
 
 from app.users.schemas import (
     ProfileUserData,
     ProfileResponse,
 )
 from app.users.services.profile import create_profile, get_profile, my_profile
+from app.auth.services.auth import get_users_current_session
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -38,21 +38,12 @@ async def user_get_profile(
     return await get_profile(request.app.state.request_client, user_id)
 
 
-async def get_current_user_session(session: Annotated[str | None, Cookie()] = None):
-    if not session:
-        raise HTTPException(status_code=401, detail="Not authenticated")
-    return session
-
-
 @router.get(
     "/me",
-    # response_model=ProfileResponse,
+    response_model=ProfileResponse,
     tags=["User"],
     summary="Get a single user's profile",
     description="",
 )
-async def me(user=Depends(get_current_user_session)):
-    # print(f"Session: {session}")
-    # print("Origin:", request.headers.get("origin"))
-
-    return await my_profile()
+async def me(request: Request, user_access_token: str = Depends(get_users_current_session)):
+    return await my_profile(request.app.state.request_client, user_access_token)
