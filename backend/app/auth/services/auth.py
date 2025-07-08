@@ -32,7 +32,14 @@ async def callback_handler(request: Request):
         request.session[SESSION_USER_ACCESS_TOKEN_KEY] = oidc_response.get(
             "access_token"
         )
-        return RedirectResponse(url=config.PROFILE_MANAGEMENT_ORIGIN)
+
+        redirectValue = f"https://{config.PROFILE_MANAGEMENT_DOMAIN}"
+
+        if config.ENV == "local":
+            redirectValue = f"http://{config.PROFILE_MANAGEMENT_DOMAIN}:3000"
+            return RedirectResponse(url=redirectValue)
+
+        return RedirectResponse(url=redirectValue)
     except OAuthError as e:
         raise Exception(f"OAuth error: {str(e)}")
 

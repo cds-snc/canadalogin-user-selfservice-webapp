@@ -75,9 +75,9 @@ app = FastAPI(
 app.add_middleware(
     SessionMiddleware,
     secret_key="some-random-string",  # Use a strong secret in production
-    https_only=False,  # Optional but recommended for HTTPS
+    https_only=settings.ENV != "local",
     same_site="lax",  # Can be "strict", "lax", or "none"
-    # domain=settings.PROFILE_MANAGEMENT_ORIGIN,  # Set to your domain if needed
+    domain=None if settings.ENV == "local" else settings.PROFILE_MANAGEMENT_DOMAIN,
 )
 
 # CORS

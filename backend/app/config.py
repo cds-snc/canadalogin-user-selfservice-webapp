@@ -28,13 +28,11 @@ class Settings(BaseSettings):
     ibm_verify_config: IBMVerifyConfig = IBMVerifyConfig()
     # CORS_ORIGINS - allow all only for demo purposes, should be set to the frontend URL
     # Todo - set cors to frontend URL
-    PROFILE_MANAGEMENT_ORIGIN: str = (
-        "http://localhost:3000"  # URL of the frontend application
+    PROFILE_MANAGEMENT_DOMAIN: str = (
+        "localhost"  # For non local environments, set domain to app.gc-signin.cdssandbox.xyz
     )
-    SESSION_MIDDLEWARE_DOMAIN: str | None = (
-        None  # set to the domain. For example: .cdssandbox.xyz
-    )
-    CORS_ORIGINS: List[str] = ["*"]
+    CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:8000"]
+    ENV: str = "local"
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore"
     )

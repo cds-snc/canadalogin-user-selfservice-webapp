@@ -18,6 +18,8 @@ Create a `.env` file with the following variables:
 IBM_VERIFY_TENANT_URL=set_this_to_the_dev_tenant
 IBM_VERIFY_API_CLIENT_ID=set_this_to_the_dev_api_client_id
 IBM_VERIFY_API_CLIENT_SECRET=set_this_to_the_dev_api_client_secret
+IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID: a123456
+IBM_VERIFY_PROFILE_MANAGEMENT_SECRET: a123456
 ```
 
 ### Quick Start
