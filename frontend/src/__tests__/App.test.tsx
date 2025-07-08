@@ -1,5 +1,5 @@
 import App from '../App';
-import {cleanup, render} from '@testing-library/react';
+import {cleanup, render, screen} from '@testing-library/react';
 import {describe, test, afterEach, vi, beforeAll} from "vitest";
 import '@testing-library/jest-dom';
 import {AVAILABLE_LANGUAGES, NAVIGATION_LINKS, FLOW_TYPES} from "../utils/constants";
@@ -368,7 +368,17 @@ describe('Routing Tests', () => {
         buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.manageDashboard, FLOW_TYPES.manage , null, langHref.en + NAVIGATION_LINKS.manage);
     });
 
+    test("Manage Security Settings page with en language defined", () => {
 
+        stateData.userData = {...stateData.userData , ... mockedRoutesUserData.manage};
+        render(
+            <MemoryRouter initialEntries={[langHref.en + NAVIGATION_LINKS.securitySettings]}>
+                <App/>
+            </MemoryRouter>,
+        )
+        screen.debug()
+        buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.securitySettings, FLOW_TYPES.manage , null, langHref.fr + NAVIGATION_LINKS.securitySettings);
+    });
 
     beforeAll(()=>{
         mockedRoutesUserData.signup = getMockedSignUpData();
