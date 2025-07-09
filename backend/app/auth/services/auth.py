@@ -16,8 +16,8 @@ async def get_redirect_url(request: Request):
     This function is used to initiate the login process with IBM Verify.
     """
     try:
-        # Use the OAuth instance to get the redirect URL
         config = get_settings()
+        # this request.url_for gets the url based on the callback route defined
         callback_route = request.url_for("callback_route")
         redirect_uri = callback_route
 
