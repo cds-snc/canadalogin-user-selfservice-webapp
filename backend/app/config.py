@@ -49,7 +49,9 @@ class Settings(BaseSettings):
         http_value = "https://"
         if self.ENVIRONMENT == "local":
             http_value = "http://"
-        return [f"{http_value}{origin.strip()}" for origin in self.CORS_ORIGINS.split(",")]
+        return [
+            f"{http_value}{origin.strip()}" for origin in self.CORS_ORIGINS.split(",")
+        ]
 
 
 @lru_cache

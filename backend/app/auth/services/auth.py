@@ -54,9 +54,7 @@ async def callback_handler(request: Request):
         return RedirectResponse(url=redirectValue)
     except OAuthError as error:
         logger.error(f"OAuth error: {error}")
-        return generate_error_response(
-            400, format_error_response(str(error))
-        )
+        return generate_error_response(400, format_error_response(str(error)))
 
 
 async def get_users_current_session(request: Request):
