@@ -1,6 +1,5 @@
 from fastapi.responses import JSONResponse
 from pydantic_extra_types.phone_numbers import PhoneNumber
-from typing import Dict
 from app.utils.schemas import ResponseModel
 
 

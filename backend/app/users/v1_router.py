@@ -1,13 +1,13 @@
 import logging
 
-from fastapi import APIRouter, Path
+from fastapi import APIRouter
 from fastapi import Request, Depends
 
 from app.users.schemas import (
     ProfileUserData,
     ProfileResponse,
 )
-from app.users.services.profile import create_profile, get_profile, my_profile
+from app.users.services.profile import create_profile, my_profile
 from app.auth.services.auth import get_users_current_session
 
 router = APIRouter()
