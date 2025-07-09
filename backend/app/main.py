@@ -84,7 +84,7 @@ app.add_middleware(
     secret_key="some-random-string",  # Use a strong secret in production
     https_only=settings.ENVIRONMENT != "local",
     same_site="lax",  # Can be "strict", "lax", or "none"
-    domain=session_domain
+    domain=session_domain,
 )
 
 # Trusted Host Middleware - (Separate from session)
@@ -93,7 +93,7 @@ if settings.ENVIRONMENT != "local":
     app.add_middleware(
         TrustedHostMiddleware,
         # allowed_hosts=settings.allowed_hosts,  # This will include the ROOT_DOMAIN and LOADBALANCER_DNS_NAME
-        allowed_hosts=["*"]
+        allowed_hosts=["*"],
     )
 
 # CORS

@@ -64,10 +64,10 @@ async def get_users_current_session(request: Request):
     The user access token is stored in memory on the server
     """
     user_access_token = request.session.get(SESSION_USER_ACCESS_TOKEN_KEY)
-    logger.info(f"Get Users Session")
+    logger.info("Get Users Session")
 
     if not user_access_token:
-        logger.info(f"Not authenticated")
+        logger.info("Not authenticated")
         raise HTTPException(status_code=401, detail="Not authenticated")
-    logger.info(f"Access Token found in session")
+    logger.info("Access Token found in session")
     return user_access_token

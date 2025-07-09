@@ -27,15 +27,19 @@ class Settings(BaseSettings):
     ibm_verify_config: IBMVerifyConfig = IBMVerifyConfig()
     ENVIRONMENT: str = Field(default="local")
     V1_API_VERSION: str = "/v1"
-    LOADBALANCER_DNS_NAME: Optional[str] = None  # Not required for local development - "DNS name of the FastAPI backend load balancer, used for configuring TrustedHostMiddleware for the backend server (https://www.starlette.io/middleware/#trustedhostmiddleware)"
-    ROOT_DOMAIN: Optional[str] = None  # Not required for local development, when deployed env needs to be e.g. ".gc-signin.cdssandbox.xyz"
+    LOADBALANCER_DNS_NAME: Optional[str] = (
+        None  # Not required for local development - "DNS name of the FastAPI backend load balancer, used for configuring TrustedHostMiddleware for the backend server (https://www.starlette.io/middleware/#trustedhostmiddleware)"
+    )
+    ROOT_DOMAIN: Optional[str] = (
+        None  # Not required for local development, when deployed env needs to be e.g. ".gc-signin.cdssandbox.xyz"
+    )
     PROFILE_MANAGEMENT_DOMAIN: str = (
         "http://localhost:3000"  # For non local environments, set domain to app.gc-signin.cdssandbox.xyz
     )
 
     CORS_ORIGINS: str = Field(
         default="http://localhost:3000,http://localhost:8000",
-        description="Comma-separated list of CORS origins, Terraform cant pass in a list[str]."
+        description="Comma-separated list of CORS origins, Terraform cant pass in a list[str].",
     )
 
     model_config = SettingsConfigDict(
@@ -50,7 +54,9 @@ class Settings(BaseSettings):
     @property
     def allowed_hosts(self) -> List[str]:
         """Convert comma-separated CORS_ORIGINS string to list"""
-        allowed_hosts_value = [origin.strip() for origin in self.CORS_ORIGINS.split(",")]
+        allowed_hosts_value = [
+            origin.strip() for origin in self.CORS_ORIGINS.split(",")
+        ]
 
         if self.ROOT_DOMAIN:
             allowed_hosts_value.append(f"*.{self.ROOT_DOMAIN}")

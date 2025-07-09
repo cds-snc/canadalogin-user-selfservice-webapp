@@ -1,9 +1,9 @@
 """Health-related endpoints."""
+
 import logging
 from fastapi import APIRouter, Request
 from pydantic import BaseModel, Field
 from datetime import datetime
-from fastapi import Request
 
 API_VERSION = "1.0.0"
 
