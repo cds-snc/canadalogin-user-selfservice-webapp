@@ -87,14 +87,14 @@ app.add_middleware(
     domain=session_domain,
 )
 
-# Trusted Host Middleware - (Separate from session)
-if settings.ENVIRONMENT != "local":
-    logger.info(f"settings.allowed_hosts: {settings.allowed_hosts}")
-    app.add_middleware(
-        TrustedHostMiddleware,
-        # allowed_hosts=settings.allowed_hosts,  # This will include the ROOT_DOMAIN and LOADBALANCER_DNS_NAME
-        allowed_hosts=["*"],
-    )
+# # Trusted Host Middleware - (Separate from session)
+# if settings.ENVIRONMENT != "local":
+#     logger.info(f"settings.allowed_hosts: {settings.allowed_hosts}")
+#     app.add_middleware(
+#         TrustedHostMiddleware,
+#         # allowed_hosts=settings.allowed_hosts,  # This will include the ROOT_DOMAIN and LOADBALANCER_DNS_NAME
+#         allowed_hosts=["*"],
+#     )
 
 # CORS
 app.add_middleware(

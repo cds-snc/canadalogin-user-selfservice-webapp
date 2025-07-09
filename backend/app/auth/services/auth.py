@@ -5,7 +5,7 @@ from authlib.integrations.starlette_client import OAuthError
 from app.auth.services.oidc_config import oauth
 from app.config import get_settings
 from app.utils.access_token import SESSION_USER_ACCESS_TOKEN_KEY
-
+from app.utils.helpers import generate_error_response, format_error_response
 
 logger = logging.getLogger(__name__)
 
@@ -53,8 +53,11 @@ async def callback_handler(request: Request):
         logger.info("OIDC Callback Handler")
         logger.info(f"Redirect to PROFILE_MANAGEMENT_DOMAIN: {redirectValue}")
         return RedirectResponse(url=redirectValue)
-    except OAuthError as e:
-        raise Exception(f"OAuth error: {str(e)}")
+    except OAuthError as error:
+        logger.error(f"OAuth error: {error}")
+        return generate_error_response(
+            400, format_error_response(str(error))
+        )
 
 
 async def get_users_current_session(request: Request):

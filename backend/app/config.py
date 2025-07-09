@@ -38,7 +38,7 @@ class Settings(BaseSettings):
     )
 
     CORS_ORIGINS: str = Field(
-        default="http://localhost:3000,http://localhost:8000",
+        default="localhost:3000,localhost:8000",
         description="Comma-separated list of CORS origins, Terraform cant pass in a list[str].",
     )
 
@@ -49,7 +49,10 @@ class Settings(BaseSettings):
     @property
     def cors_origins_list(self) -> List[str]:
         """Convert comma-separated CORS_ORIGINS string to list"""
-        return [f"https://{origin.strip()}" for origin in self.CORS_ORIGINS.split(",")]
+        http_value = "https://"
+        if self.ENVIRONMENT == "local":
+            http_value = "http://"
+        return [f"{http_value}{origin.strip()}" for origin in self.CORS_ORIGINS.split(",")]
 
     @property
     def allowed_hosts(self) -> List[str]:

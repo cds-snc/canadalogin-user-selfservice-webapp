@@ -19,7 +19,9 @@ def prepare_pydantic_phone_number_for_verify(phone_number: PhoneNumber):
     return "".join(c for c in phone_number if c.isdigit())
 
 
-def format_error_response(json: Dict):
-    message_id = json.get("messageId", "Unknown error")
-    message_description = json.get("messageDescription", "Unknown error")
-    return f"{message_id} - {message_description}"
+def format_error_response(message: str = None, description: str = None) -> str:
+    if not message:
+        message = "Unknown error"
+    if not description:
+        description = ""
+    return f"{message} - {description}"
