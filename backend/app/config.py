@@ -27,14 +27,11 @@ class Settings(BaseSettings):
     ibm_verify_config: IBMVerifyConfig = IBMVerifyConfig()
     ENVIRONMENT: str = Field(default="local")
     V1_API_VERSION: str = "/v1"
-    LOADBALANCER_DNS_NAME: Optional[str] = (
-        None  # Not required for local development - "DNS name of the FastAPI backend load balancer, used for configuring TrustedHostMiddleware for the backend server (https://www.starlette.io/middleware/#trustedhostmiddleware)"
-    )
     ROOT_DOMAIN: Optional[str] = (
-        None  # Not required for local development, when deployed env needs to be e.g. ".gc-signin.cdssandbox.xyz"
+        None  # Not required for local development, value should be ".gc-signin.cdssandbox.xyz"
     )
     PROFILE_MANAGEMENT_DOMAIN: str = (
-        "http://localhost:3000"  # For non local environments, set domain to app.gc-signin.cdssandbox.xyz
+        "http://localhost:3000"  # Frontend Management App domain to app.gc-signin.cdssandbox.xyz
     )
 
     CORS_ORIGINS: str = Field(
@@ -48,30 +45,11 @@ class Settings(BaseSettings):
 
     @property
     def cors_origins_list(self) -> List[str]:
-        """Convert comma-separated CORS_ORIGINS string to list"""
+        """Convert comma-separated CORS_ORIGINS string to list - Terraform cant pass in a list[str]."""
         http_value = "https://"
         if self.ENVIRONMENT == "local":
             http_value = "http://"
         return [f"{http_value}{origin.strip()}" for origin in self.CORS_ORIGINS.split(",")]
-
-    @property
-    def allowed_hosts(self) -> List[str]:
-        """Convert comma-separated CORS_ORIGINS string to list"""
-        allowed_hosts_value = [
-            origin.strip() for origin in self.CORS_ORIGINS.split(",")
-        ]
-
-        if self.ROOT_DOMAIN:
-            allowed_hosts_value.append(f"*.{self.ROOT_DOMAIN}")
-            # allowed_hosts_value.append(f"api.{self.ROOT_DOMAIN}")
-
-        if self.LOADBALANCER_DNS_NAME:
-            allowed_hosts_value.append(self.LOADBALANCER_DNS_NAME)
-
-        if self.PROFILE_MANAGEMENT_DOMAIN:
-            allowed_hosts_value.append(self.PROFILE_MANAGEMENT_DOMAIN)
-
-        return allowed_hosts_value
 
 
 @lru_cache
