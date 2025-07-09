@@ -8,6 +8,7 @@ function App() {
         <Routes>
             <Route element={<PrivateRoute />}>
                 <Route path="/" element={<Page page={PAGES.manageDashboard} />} />
+                <Route path="/:language" element={<Page page={PAGES.manageDashboard} />} />
                 <Route path="/:language/profilehome" element={<Page page={PAGES.ProfileHome} />} />
                 <Route path="/:language/youMayUpdateEmailAtOtherPlaces" element={<Page page={PAGES.youMayUpdateEmailAtOtherPlaces} />} />
                 <Route path="/:language/securitysettings" element={<Page page={PAGES.securitySettings} />} />
