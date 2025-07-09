@@ -76,7 +76,8 @@ export const PAGES = {
     ProfileNameEdit: 'ProfileNameEdit',
     enterNewPhoneNumber: 'EnterNewPhoneNumber',
     youMayUpdateEmailAtOtherPlaces: 'YouMayUpdateEmailAtOtherPlaces',
-    areYouSureUpdateYourEmail: 'AreYouSureUpdateYourEmail'
+    areYouSureUpdateYourEmail: 'AreYouSureUpdateYourEmail',
+    securitySettings: 'SecuritySettings'
 
 }
 

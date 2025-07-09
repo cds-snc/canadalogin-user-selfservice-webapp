@@ -341,5 +341,17 @@
     "4": "GEO.ca",
     "5": "Yes, update",
     "6": "Cancel"
+  },
+  "SecuritySettings": {
+    "1": "Security settings",
+    "2": "How you sign in to GC Sign in",
+    "3": "Make sure you can always access your GC Sign in by keeping this information up to date.",
+    "4": "Password",
+    "5": "Last changed on January 3, 2025",
+    "6": "Change",
+    "7": "2-step verification",
+    "8": "A second step after your password helps verify it’s you signing in.",
+    "9": "Enabled",
+    "10": "Manage"
   }
 }

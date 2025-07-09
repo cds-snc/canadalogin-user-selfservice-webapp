@@ -1,6 +1,5 @@
 import {
-    GcdsContainer, GcdsDetails, GcdsErrorSummary, GcdsFieldset, GcdsHeading, GcdsLink,
-    GcdsRadioGroup,
+    GcdsContainer, GcdsDetails, GcdsErrorSummary, GcdsHeading, GcdsLink,
     GcdsStepper,
     GcdsText
 } from "@cdssnc/gcds-components-react";
@@ -121,24 +120,6 @@ export default function VerificationSetUp() {
                                 </GcdsText>
                             </GcdsDetails>
                         </GcdsText>
-                        <GcdsFieldset
-                            fieldset-id="gcds-verification-fieldset"
-                            legend={pageContentJson['14']}
-                            hint={pageContentJson['15']}
-                            lang={language}
-                            required>
-                            <br />
-                            <GcdsRadioGroup
-                                name="verificationType"
-                                options={'['+
-                                    `{"label": "${pageContentJson['16']}",`+
-                                    `"id": "sms", "value": "sms","checked":"true",`+
-                                    `"hint": "${pageContentJson['17']}"},`+
-                                    `{"label": "${pageContentJson['18']}",`+
-                                    `"id": "voice", "value": "voice",`+
-                                    `"hint": "${pageContentJson['19']}"}]`}
-                            />
-                        </GcdsFieldset>
                         <SubmitButton currentLang={language} disabled={isPending} />
                     </form>
                 </GcdsContainer>
