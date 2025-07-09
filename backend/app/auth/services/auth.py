@@ -62,9 +62,9 @@ async def callback_handler(request: Request):
 
 async def get_users_current_session(request: Request):
     """
-    Dependency to extract and validate the session cookie.
     Session cookie contains an identifier for the user session.
     The user access token is stored in memory on the server
+    Authlib docs - https://docs.authlib.org/en/latest/client/fastapi.html
     """
     user_access_token = request.session.get(SESSION_USER_ACCESS_TOKEN_KEY)
     logger.info("Get Users Session")
