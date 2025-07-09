@@ -8,6 +8,7 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from app.config import get_settings
 from app.utils.helpers import generate_error_response
@@ -70,21 +71,35 @@ app = FastAPI(
     contact=CONTACT_INFO,
 )
 
+# Determine session domain
+session_domain = None
+if settings.ENVIRONMENT != "local":
+    session_domain = f".{settings.ROOT_DOMAIN}"
+logger.info(f"ROOT_DOMAIN: {session_domain}")
 
 # Sets the session cookie - https://docs.authlib.org/en/latest/client/fastapi.html
 # SessionMiddleware
 app.add_middleware(
     SessionMiddleware,
     secret_key="some-random-string",  # Use a strong secret in production
-    https_only=settings.ENV != "local",
+    https_only=settings.ENVIRONMENT != "local",
     same_site="lax",  # Can be "strict", "lax", or "none"
-    domain=None if settings.ENV == "local" else settings.PROFILE_MANAGEMENT_DOMAIN,
+    domain=session_domain
 )
+
+# Trusted Host Middleware - (Separate from session)
+if settings.ENVIRONMENT != "local":
+    logger.info(f"settings.allowed_hosts: {settings.allowed_hosts}")
+    app.add_middleware(
+        TrustedHostMiddleware,
+        # allowed_hosts=settings.allowed_hosts,  # This will include the ROOT_DOMAIN and LOADBALANCER_DNS_NAME
+        allowed_hosts=["*"]
+    )
 
 # CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
+    allow_origins=settings.cors_origins_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -1,5 +1,5 @@
 from functools import lru_cache
-from typing import List
+from typing import List, Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import AnyUrl, Field
 
@@ -23,13 +23,14 @@ class IBMVerifyConfig(BaseSettings):
 
 
 class Settings(BaseSettings):
-    V1_API_VERSION: str = "/v1"
     app_info: AppInfo = AppInfo()
     ibm_verify_config: IBMVerifyConfig = IBMVerifyConfig()
-    # CORS_ORIGINS - allow all only for demo purposes, should be set to the frontend URL
-    # Todo - set cors to frontend URL
+    ENVIRONMENT: str = Field(default="local")
+    V1_API_VERSION: str = "/v1"
+    LOADBALANCER_DNS_NAME: Optional[str] = None  # Not required for local development - "DNS name of the FastAPI backend load balancer, used for configuring TrustedHostMiddleware for the backend server (https://www.starlette.io/middleware/#trustedhostmiddleware)"
+    ROOT_DOMAIN: Optional[str] = None  # Not required for local development, when deployed env needs to be e.g. ".gc-signin.cdssandbox.xyz"
     PROFILE_MANAGEMENT_DOMAIN: str = (
-        "localhost"  # For non local environments, set domain to app.gc-signin.cdssandbox.xyz
+        "http://localhost:3000"  # For non local environments, set domain to app.gc-signin.cdssandbox.xyz
     )
 
     CORS_ORIGINS: str = Field(
@@ -37,9 +38,6 @@ class Settings(BaseSettings):
         description="Comma-separated list of CORS origins, Terraform cant pass in a list[str]."
     )
 
-    # CORS_ORIGINS: List[str] = ["https://app.gc-signin.cdssandbox.xyz", "https://api.gc-signin.cdssandbox.xyz"]
-
-    ENV: str = "local"
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore"
     )
@@ -47,12 +45,26 @@ class Settings(BaseSettings):
     @property
     def cors_origins_list(self) -> List[str]:
         """Convert comma-separated CORS_ORIGINS string to list"""
-        return [origin.strip() for origin in self.CORS_ORIGINS.split(",")]
+        return [f"https://{origin.strip()}" for origin in self.CORS_ORIGINS.split(",")]
+
+    @property
+    def allowed_hosts(self) -> List[str]:
+        """Convert comma-separated CORS_ORIGINS string to list"""
+        allowed_hosts_value = [origin.strip() for origin in self.CORS_ORIGINS.split(",")]
+
+        if self.ROOT_DOMAIN:
+            allowed_hosts_value.append(f"*.{self.ROOT_DOMAIN}")
+            # allowed_hosts_value.append(f"api.{self.ROOT_DOMAIN}")
+
+        if self.LOADBALANCER_DNS_NAME:
+            allowed_hosts_value.append(self.LOADBALANCER_DNS_NAME)
+
+        if self.PROFILE_MANAGEMENT_DOMAIN:
+            allowed_hosts_value.append(self.PROFILE_MANAGEMENT_DOMAIN)
+
+        return allowed_hosts_value
 
 
 @lru_cache
 def get_settings():
     return Settings()
-
-
-print(get_settings().model_dump_json(indent=2))

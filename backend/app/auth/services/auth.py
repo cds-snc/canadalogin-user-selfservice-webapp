@@ -1,9 +1,13 @@
+import logging
 from fastapi import Request, HTTPException
 from fastapi.responses import RedirectResponse
 from authlib.integrations.starlette_client import OAuthError
 from app.auth.services.oidc_config import oauth
 from app.config import get_settings
 from app.utils.access_token import SESSION_USER_ACCESS_TOKEN_KEY
+
+
+logger = logging.getLogger(__name__)
 
 
 async def get_redirect_url(request: Request):
@@ -17,8 +21,9 @@ async def get_redirect_url(request: Request):
         callback_route = request.url_for("callback_route")
         redirect_uri = callback_route
 
-        if config.ENV != "local":
+        if config.ENVIRONMENT != "local":
             redirect_uri = str(callback_route).replace("http://", "https://")
+        logger.info(f"Callback Redirect URI: {redirect_uri}")
         return await oauth.verify.authorize_redirect(request, redirect_uri)
     except OAuthError as e:
         raise Exception(f"OAuth error: {str(e)}")
@@ -34,15 +39,19 @@ async def callback_handler(request: Request):
 
         # Use the OAuth instance to handle the callback
         oidc_response = await oauth.verify.authorize_access_token(request)
+        logger.info("OIDC Responsed")
+
         request.session[SESSION_USER_ACCESS_TOKEN_KEY] = oidc_response.get(
             "access_token"
         )
 
-        redirectValue = f"https://{config.PROFILE_MANAGEMENT_DOMAIN}"
+        redirectValue = config.PROFILE_MANAGEMENT_DOMAIN
 
-        if config.ENV == "local":
-            redirectValue = f"http://{config.PROFILE_MANAGEMENT_DOMAIN}:3000"
+        if config.ENVIRONMENT != "local":
+            redirectValue = f"https://{config.PROFILE_MANAGEMENT_DOMAIN}"
 
+        logger.info("OIDC Callback Handler")
+        logger.info(f"Redirect to PROFILE_MANAGEMENT_DOMAIN: {redirectValue}")
         return RedirectResponse(url=redirectValue)
     except OAuthError as e:
         raise Exception(f"OAuth error: {str(e)}")
@@ -55,6 +64,10 @@ async def get_users_current_session(request: Request):
     The user access token is stored in memory on the server
     """
     user_access_token = request.session.get(SESSION_USER_ACCESS_TOKEN_KEY)
+    logger.info(f"Get Users Session")
+
     if not user_access_token:
+        logger.info(f"Not authenticated")
         raise HTTPException(status_code=401, detail="Not authenticated")
+    logger.info(f"Access Token found in session")
     return user_access_token

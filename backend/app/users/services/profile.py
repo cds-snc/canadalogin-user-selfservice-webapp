@@ -108,6 +108,7 @@ async def get_profile(global_http_client: AsyncClient, user_id: str):
 
 async def my_profile(global_http_client: AsyncClient, user_access_token: str):
     try:
+        logger.info("Get my profile")
         headers = get_auth_request_headers(user_access_token)
         settings = get_settings().ibm_verify_config
         get_profile_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/Me"
