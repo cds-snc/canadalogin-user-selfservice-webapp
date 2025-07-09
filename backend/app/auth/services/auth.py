@@ -37,7 +37,6 @@ async def callback_handler(request: Request):
     try:
         config = get_settings()
 
-        # Use the OAuth instance to handle the callback
         oidc_response = await oauth.verify.authorize_access_token(request)
         logger.info("OIDC Responsed")
 
