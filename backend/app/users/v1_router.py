@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 @router.post(
-    "/users/{user_id}/profile",
+    "/{user_id}/profile",
     response_model=ProfileResponse,
     tags=["Users"],
     summary="Create user profile in verify",
@@ -26,22 +26,9 @@ async def user_create_profile(user_id, user_data: ProfileUserData, request: Requ
 
 
 @router.get(
-    "/users/{user_id}/profile/",
-    response_model=ProfileResponse,
-    tags=["Users"],
-    summary="Get a single user's profile",
-    description="",
-)
-async def user_get_profile(
-    request: Request, user_id: str = Path(..., description="User ID")
-):
-    return await get_profile(request.app.state.request_client, user_id)
-
-
-@router.get(
     "/me",
     response_model=ProfileResponse,
-    tags=["User"],
+    tags=["Users"],
     summary="Get a single user's profile",
     description="",
 )
