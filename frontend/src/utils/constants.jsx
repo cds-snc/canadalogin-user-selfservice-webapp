@@ -12,7 +12,7 @@ export const NAVIGATION_LINKS = {
     privacy: '/signup/privacy',
     home: '/',
     verificationSelection: '/signin/selectverification',
-    manage: '/manage',
+    manage: '/',
     ProfileNameEdit: '/ProfileNameEdit',
     profileHome: '/profilehome',
     checkYourEmail: '/checkyouremail',
