@@ -63,11 +63,9 @@ body, .mainBody {
     }
 
     .gcds-content {
-        border-radius: 10px;
-        border: 1px solid var(--gcds-color-grayscale-300, #A8ADB4);
         background: #FFF;
         display: flex;
-        width: 750px;
+        width: 900px;
         justify-content: center;
         align-items: center;
         margin: auto;
@@ -109,7 +107,21 @@ body, .mainBody {
     border: 1px solid var(--colour-green-10, #E6F6EC);
     border-radius: 5px;
   }
-  
+
+.dashboard-grid {
+    display: grid;
+    gap: 1rem;
+    /* For mobile, allow auto-fit with minmax */
+    justify-items: center;
+}
+.dashboard-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 1rem;
+}
+
   .verifiedIcon {
     color: var(--gcds-color-green-500);
   }
