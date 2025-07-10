@@ -36,7 +36,7 @@ export default function ManageDashboard() {
                 {pageContent['1']} {username}
             </GcdsHeading>
 
-            <GcdsGrid tag="managedashboard" columnsDesktop="1fr 1fr 1fr" columnsTablet="1fr 1fr" columns="repeat(auto-fit, minmax(200px, 250px))" placeContent="center" >
+            <GcdsGrid tag="managedashboard" columnsDesktop="1fr 1fr" columnsTablet="1fr 1fr" columns="repeat(auto-fit, minmax(200px, 250px))" placeContent="center">
                 <GcdsCard
                     cardTitle={pageContent['2']}
                     href={`/${language}${NAVIGATION_LINKS.profileHome}`}
