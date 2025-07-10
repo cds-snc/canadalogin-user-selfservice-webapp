@@ -25,6 +25,9 @@ body, .mainBody {
     border-radius: 10px
 }
 
+
+
+
 @media screen and (max-width:767px) {
     .gcds-email-fieldset {
         font-size: 18px;
@@ -51,6 +54,21 @@ body, .mainBody {
         align-items: center;
         gap: var(--gcds-spacing-350);
     }
+    .manage-container{
+        display: flex;
+        padding: 0px 15px var(--space-550, 44px) 15px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-350, 28px);
+        align-self: stretch;
+    }
+    /*.dashboard-card {*/
+    /*    display: flex;*/
+    /*    flex-direction: row;*/
+    /*    align-items: center;*/
+    /*    justify-content: flex-start;*/
+    /*    gap: 1rem;*/
+    /*}*/
 }
 
 @media screen and (min-width:768px) {
@@ -69,7 +87,7 @@ body, .mainBody {
         justify-content: center;
         align-items: center;
         margin: auto;
-        vertical-align: middle;
+        /*vertical-align: middle;*/
         gap: var(--gcds-spacing-300);
         padding: var(--gcds-spacing-1000) var(--gcds-spacing-1000) var(--gcds-spacing-600) var(--gcds-spacing-1000);
     }
@@ -77,6 +95,15 @@ body, .mainBody {
     .gcds-footer {
         padding-top: var(--gcds-spacing-400);
     }
+    .manage-container {
+        display: flex;
+        width: 950px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-350, 28px);
+    }
+
+
 }
 /* ProfileHome css */
 
@@ -114,13 +141,6 @@ body, .mainBody {
     /* For mobile, allow auto-fit with minmax */
     justify-items: center;
 }
-.dashboard-card {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 1rem;
-}
 
   .verifiedIcon {
     color: var(--gcds-color-green-500);
@@ -135,4 +155,3 @@ body, .mainBody {
   .verifiedBadgeBottom{
     margin-bottom: 20px;
   }
-  
