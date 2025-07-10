@@ -26,8 +26,6 @@ body, .mainBody {
 }
 
 
-
-
 @media screen and (max-width:767px) {
     .gcds-email-fieldset {
         font-size: 18px;
@@ -62,13 +60,7 @@ body, .mainBody {
         gap: var(--space-350, 28px);
         align-self: stretch;
     }
-    /*.dashboard-card {*/
-    /*    display: flex;*/
-    /*    flex-direction: row;*/
-    /*    align-items: center;*/
-    /*    justify-content: flex-start;*/
-    /*    gap: 1rem;*/
-    /*}*/
+
 }
 
 @media screen and (min-width:768px) {
@@ -105,7 +97,6 @@ body, .mainBody {
 
 
 }
-/* ProfileHome css */
 
 .sectionCard {
     padding: var(--gcds-spacing-100) var(--gcds-spacing-200);
@@ -138,7 +129,6 @@ body, .mainBody {
 .dashboard-grid {
     display: grid;
     gap: 1rem;
-    /* For mobile, allow auto-fit with minmax */
     justify-items: center;
 }
 
