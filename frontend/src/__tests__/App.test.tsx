@@ -64,7 +64,6 @@ describe('Routing Tests', () => {
                 <App/>
             </MemoryRouter>,
         )
-            screen.debug()
         buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.manageDashboard, FLOW_TYPES.manage , null, langHref.fr + NAVIGATION_LINKS.manage);
     });
 
