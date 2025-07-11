@@ -10,7 +10,67 @@ import {
 import { getPageContent } from '../../utils/functions.jsx';
 import { PAGES } from '../../utils/constants.jsx';
 import { useUser } from "../Providers/useUser.tsx";
+import parsePhoneNumber from 'libphonenumber-js';
 
+
+const DisplayPhoneNumbers = ({ phoneNumbers }) => {
+  console.log("phoneNumbers", phoneNumbers)
+
+  return (
+    <>
+
+      <GcdsGrid columns="1fr">
+
+        {
+          phoneNumbers.map((phoneNumber, index) => {
+            let formatted = phoneNumber.value;
+
+            try {
+              const parsed = parsePhoneNumber(phoneNumber.value, 'US'); // You can change the region if needed
+              formatted = parsed.formatNational();
+
+            } catch (e) {
+              console.warn(`Failed to parse phone number: ${phoneNumber.value}`);
+            }
+            return (
+              <GcdsText key={index} margin-bottom="0">
+                {phoneNumber.type}: {formatted}
+              </GcdsText>
+            )
+
+          })
+        }
+      </GcdsGrid>
+
+    </>
+  )
+}
+
+const ContactPhoneNumber = (props) => {
+  const { pageContent, phoneNumbers } = props;
+  return (
+    <div className="separator">
+
+      <GcdsHeading tag="h3" marginTop='300'>{pageContent['10']}</GcdsHeading>
+      <GcdsText>{pageContent['11']}</GcdsText>
+
+      <GcdsGrid columns="1fr auto" className="gridInline">
+        <DisplayPhoneNumbers phoneNumbers={phoneNumbers} />
+
+        <GcdsLink href="#" size="regular">
+          {pageContent['5']}
+        </GcdsLink>
+      </GcdsGrid>
+
+      <gcds-grid columns="auto auto" className="verifiedBadge verifiedBadgeBottom">
+        <gcds-icon name="check" className="verifiedIcon" size="sm" />
+        <gcds-text className="verifiedText">
+          {pageContent['9']}
+        </gcds-text>
+      </gcds-grid>
+    </div>
+  )
+}
 
 export default function ProfileHome() {
   const { language } = useParams();
@@ -18,7 +78,7 @@ export default function ProfileHome() {
   const { state } = useUser();
   const name = state?.userProfile?.name.formatted || "";
   const email = state?.userProfile?.userName || "";
-
+  const phoneNumbers = state?.userProfile?.phoneNumbers;
 
 
 
@@ -55,25 +115,10 @@ export default function ProfileHome() {
             {pageContent['9']}
           </gcds-text>
         </gcds-grid>
+        {
+          phoneNumbers != null ? <ContactPhoneNumber pageContent={pageContent} phoneNumbers={phoneNumbers} /> : null
+        }
 
-        <div className="separator" />
-
-        <GcdsHeading tag="h3" marginTop='300'>{pageContent['10']}</GcdsHeading>
-        <GcdsText>{pageContent['11']}</GcdsText>
-
-        <GcdsGrid columns="1fr auto" className="gridInline">
-          <GcdsText>+1 (***) ***-2839</GcdsText>
-          <GcdsLink href="#" size="regular">
-            {pageContent['5']}
-          </GcdsLink>
-        </GcdsGrid>
-
-        <gcds-grid columns="auto auto" className="verifiedBadge verifiedBadgeBottom">
-          <gcds-icon name="check" className="verifiedIcon" size="sm" />
-          <gcds-text className="verifiedText">
-            {pageContent['9']}
-          </gcds-text>
-        </gcds-grid>
       </gcds-container>
 
       <GcdsHeading tag="h2">{pageContent['12']}</GcdsHeading>
