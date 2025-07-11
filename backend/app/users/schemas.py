@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum
 from typing import List, Optional
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 from app.utils.schemas import ResponseModel
 
@@ -55,6 +55,19 @@ class EmailItem(BaseModel):
     value: EmailStr
 
 
+class MetaDataTypeValue(BaseModel):
+    type: Optional[str] = None
+    value: Optional[str] = None
+
+
+class SCIMUserDetails(BaseModel):
+    emailVerified: Optional[str] = None
+    lastLogin: Optional[str] = None
+    lastMFA: Optional[List[MetaDataTypeValue]] = None
+    twoFactorAuthentication: Optional[bool] = None
+    pwdChangedTime: Optional[str] = None
+
+
 class Meta(BaseModel):
     created: datetime
     location: str
@@ -76,9 +89,13 @@ class ProfileGetResponseData(BaseModel):
     active: bool
     id: str
     userName: EmailStr
-
-    class Config:
-        populate_by_name = True
+    phoneNumbers: Optional[List[MetaDataTypeValue]] = None
+    details: Optional[SCIMUserDetails] = Field(
+        default=None,
+        validation_alias="urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+        serialization_alias="details"
+    )
+    model_config = ConfigDict(validate_by_name=True, validate_by_alias=True)
 
 
 class ProfileResponse(ResponseModel):
