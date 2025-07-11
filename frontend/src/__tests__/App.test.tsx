@@ -1,5 +1,5 @@
 import App from '../App';
-import {cleanup, render, screen} from '@testing-library/react';
+import {cleanup, render} from '@testing-library/react';
 import {describe, test, afterEach, vi, beforeAll} from "vitest";
 import '@testing-library/jest-dom';
 import {AVAILABLE_LANGUAGES, NAVIGATION_LINKS, FLOW_TYPES} from "../utils/constants";
