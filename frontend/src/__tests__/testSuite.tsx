@@ -214,7 +214,7 @@ const pageSetup = {
                 return pageSetup.coreProfileSetUpGcdsMap(pageContentJson);
             case PAGES.privacy:
                 return pageSetup.privacyGcdsMap(pageContentJson);
-            case PAGES.verificationSelection:
+            case PAGES.manageDashboard:
                 return pageSetup.manageDashboardGcdsMap(pageContentJson);
             default:
                 return new Map();
@@ -272,12 +272,6 @@ const pageSetup = {
     privacyGcdsMap: (pageContentJson: JSON) => {
         const gcdsElementMap = new Map();
         gcdsElementMap.set('23', ['gcds-details', createMap('gcds-details', [pageContentJson['23']])])
-        return gcdsElementMap;
-    },
-    manageDashboardGcdsMap (pageContentJson: JSON) {
-        const gcdsElementMap = new Map();
-        gcdsElementMap.set('2',['gcds-card', createMap('gcds-card', [pageContentJson['2'], '#', 'h3'])]);
-        gcdsElementMap.set('3',['gcds-card', createMap('gcds-card', [pageContentJson['3'], '#', 'h3'])]);
         return gcdsElementMap;
     },
     manageDashboardGcdsMap (pageContentJson: JSON) {

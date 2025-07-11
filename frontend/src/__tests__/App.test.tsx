@@ -54,31 +54,6 @@ describe('Routing Tests', () => {
         buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.home, FLOW_TYPES.signUp,null, langHref.en );
     });
 
-
-    //-------------Manage Tests------------------------>
-
-    test("Manage profile landing page with en language defined", () => {
-
-        stateData.userData = {...stateData.userData , ... mockedRoutesUserData.manage};
-        render(
-            <MemoryRouter initialEntries={[langHref.en + NAVIGATION_LINKS.manage]}>
-                <App/>
-            </MemoryRouter>,
-        )
-        buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.manageDashboard, FLOW_TYPES.manage , null, langHref.fr + NAVIGATION_LINKS.manage);
-    });
-
-    test("Manage profile landing page with fr language defined", () => {
-
-        stateData.userData = {...stateData.userData , ... mockedRoutesUserData.manage};
-        render(
-            <MemoryRouter initialEntries={[langHref.fr + NAVIGATION_LINKS.manage]}>
-                <App/>
-            </MemoryRouter>,
-        )
-        buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.manageDashboard, FLOW_TYPES.manage , null, langHref.en + NAVIGATION_LINKS.manage);
-    });
-
     //-------------Manage Tests------------------------>
 
     test("Manage profile landing page with en language defined", () => {
@@ -101,11 +76,8 @@ describe('Routing Tests', () => {
                 <App/>
             </MemoryRouter>,
         )
-        screen.debug()
         buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.manageDashboard, FLOW_TYPES.manage , null, langHref.en + NAVIGATION_LINKS.manage);
     });
-
-
 
     beforeAll(()=>{
         mockedRoutesUserData.signup = getMockedSignUpData();
