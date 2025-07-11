@@ -215,8 +215,6 @@ const pageSetup = {
             case PAGES.privacy:
                 return pageSetup.privacyGcdsMap(pageContentJson);
             case PAGES.verificationSelection:
-                return pageSetup.verificationSelectionGcdsMap(pageContentJson)
-            case PAGES.manageDashboard:
                 return pageSetup.manageDashboardGcdsMap(pageContentJson);
             default:
                 return new Map();
