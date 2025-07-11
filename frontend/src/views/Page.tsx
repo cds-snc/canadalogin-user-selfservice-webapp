@@ -147,6 +147,8 @@ export default function Page({ page }: { page: string }) {
     const { language } = useParams();
     const { langHref, currentLang } = getLangValues(language, pathname);
     const { state } = useUser();
+    console.log("langHref", langHref)
+    console.log("currentLang", currentLang)
 
     useEffect(() => {
         trackPage(pathname, page)

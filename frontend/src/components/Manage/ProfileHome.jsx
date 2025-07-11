@@ -1,7 +1,5 @@
 import React from 'react';
 import { useParams } from 'react-router';
-import { getPageContent } from '../../utils/functions.jsx';
-import { PAGES } from '../../utils/constants.jsx';
 import {
   GcdsContainer,
   GcdsHeading,
@@ -9,10 +7,20 @@ import {
   GcdsText,
   GcdsLink
 } from '@cdssnc/gcds-components-react';
+import { getPageContent } from '../../utils/functions.jsx';
+import { PAGES } from '../../utils/constants.jsx';
+import { useUser } from "../Providers/useUser.tsx";
+
 
 export default function ProfileHome() {
   const { language } = useParams();
   const pageContent = getPageContent(language, PAGES.ProfileHome);
+  const { state } = useUser();
+  const name = state?.userProfile?.name.formatted || "";
+  const email = state?.userProfile?.userName || "";
+
+
+
 
   return (
     <GcdsContainer>
@@ -22,7 +30,7 @@ export default function ProfileHome() {
       <gcds-container className="sectionCard">
         <GcdsHeading tag="h6" marginTop='300'>{pageContent['3']}</GcdsHeading>
         <GcdsGrid columns="1fr auto" className="gridInline">
-          <GcdsText>{pageContent['4']}</GcdsText>
+          <GcdsText>{name}</GcdsText>
           <GcdsLink href="#" size="regular">
             {pageContent['5']}
           </GcdsLink>
@@ -35,7 +43,7 @@ export default function ProfileHome() {
         <GcdsText>{pageContent['8']}</GcdsText>
 
         <GcdsGrid columns="1fr auto" className="gridInline">
-          <GcdsText>Ex****@gmail.com</GcdsText>
+          <GcdsText>{email}</GcdsText>
           <GcdsLink href="#" size="regular">
             {pageContent['5']}
           </GcdsLink>

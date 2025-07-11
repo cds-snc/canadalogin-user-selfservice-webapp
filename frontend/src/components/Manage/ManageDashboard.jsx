@@ -10,6 +10,7 @@ import {
 } from "../../utils/constants";
 import { useParams } from "react-router";
 import { useError } from "../../hooks/useError";
+import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
 import { getPageContent } from "../../utils/functions.jsx";
 import { useUser } from "../Providers/useUser.tsx";
 
@@ -22,6 +23,9 @@ export default function ManageDashboard() {
     const error = getError("#dashboard");
     const pageContent = getPageContent(language, PAGES.manageDashboard);
     console.log(state)
+    const personalInformationLink = `/${language}${NAVIGATION_LINKS.profileHome}`;
+    const securitySettingsLink = `/${language}${NAVIGATION_LINKS.securitySettings}`;
+    const navigateHelper = useNavigateHelper();
 
     return (
         <GcdsContainer>
@@ -39,8 +43,12 @@ export default function ManageDashboard() {
             <GcdsGrid tag="managedashboard" columnsDesktop="1fr 1fr" columnsTablet="1fr 1fr" columns="repeat(auto-fit, minmax(200px, 250px))" placeContent="center">
                 <GcdsCard
                     cardTitle={pageContent['2']}
-                    href={`/${language}${NAVIGATION_LINKS.profileHome}`}
                     cardTitleTag="h3"
+                    href={personalInformationLink}
+                    onGcdsClick={(ev) => {
+                        ev.preventDefault();
+                        navigateHelper(ev.detail)
+                    }}
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" width="76" height="76" viewBox="0 0 76 76" fill="none">
                         <circle cx="37.6221" cy="38.4707" r="37.5" fill="#DBEAFE" />
@@ -50,8 +58,12 @@ export default function ManageDashboard() {
                 </GcdsCard>
                 <GcdsCard
                     cardTitle={pageContent['3']}
-                    href="#"
                     cardTitleTag="h3"
+                    href={securitySettingsLink}
+                    onGcdsClick={(ev) => {
+                        ev.preventDefault();
+                        navigateHelper(ev.detail)
+                    }}
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" width="76" height="76" viewBox="0 0 76 76" fill="none">
                         <circle cx="37.6221" cy="38.4707" r="37.5" fill="#DBEAFE" />
