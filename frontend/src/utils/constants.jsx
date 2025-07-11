@@ -1,7 +1,7 @@
 import ManageDashboard from "../components/Manage/ManageDashboard.jsx";
 import ProfileHome from "../components/Manage/ProfileHome";
 import config from '../config';
-export const AVAILABLE_LANGUAGES = { en: 'en-ca', fr: 'fr-ca' };
+export const AVAILABLE_LANGUAGES = { en: 'en', fr: 'fr' };
 export const NAVIGATION_LINKS = {
     signUp: '/signup',
     verifyEmail: '/signup/verification/email',
