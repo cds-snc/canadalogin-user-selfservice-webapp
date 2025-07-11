@@ -75,11 +75,10 @@ body, .mainBody {
     .gcds-content {
         background: #FFF;
         display: flex;
-        width: 900px;
+        width: 950px;
         justify-content: center;
         align-items: center;
         margin: auto;
-        /*vertical-align: middle;*/
         gap: var(--gcds-spacing-300);
         padding: var(--gcds-spacing-1000) var(--gcds-spacing-1000) var(--gcds-spacing-600) var(--gcds-spacing-1000);
     }
