@@ -5,7 +5,6 @@ import {
     GcdsInput,
     GcdsNotice,
     GcdsStepper,
-    GcdsCheckbox,
     GcdsErrorSummary,
     GcdsHeading, GcdsLink
 } from "@cdssnc/gcds-components-react";
@@ -29,7 +28,6 @@ export default function Password() {
     const {state} = useUser();
     const {language, flow} = useParams();
     const {setError, clearAllErrors, getError, hasErrors} = useError(language);
-    const [checkedValue, setCheckedValue] = useState(true);
     const [passwordPolicy, setPasswordPolicy] = useState({min: 12, max:65})
     const [passwordStrength, setPasswordStrength] = useState(0);
     const pageContentJson = getPageContent(language, PAGES.password);
@@ -149,7 +147,7 @@ export default function Password() {
                                 name="password"
                                 value={state.testData.password}
                                 hint={flow===FLOW_TYPES.signUp?pageContentJson['10']:''}
-                                type={checkedValue? "password" : "text"}
+                                type="password"
                                 onGcdsInput={handlePasswordChange}
                                 errorMessage={error.errorMsg}
                             ></GcdsInput>)
@@ -159,17 +157,11 @@ export default function Password() {
                             label={pageContentJson['9']}
                             name="password"
                             hint={flow===FLOW_TYPES.signUp?pageContentJson['10']:''}
-                            type={checkedValue? "password" : "text"}
+                            type="password"
                             onGcdsInput={handlePasswordChange}
                             errorMessage={error.errorMsg}
                         ></GcdsInput>)
                         }
-                    <GcdsCheckbox
-                        checkboxId="checkbox-default"
-                        label={pageContentJson['11']}
-                        name="checkbox"
-                        onGcdsChange={()=> setCheckedValue (!checkedValue)}>
-                    </GcdsCheckbox>
                     {
                         flow===FLOW_TYPES.signUp&&(
                                 <GcdsText>

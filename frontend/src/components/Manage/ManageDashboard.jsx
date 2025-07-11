@@ -13,8 +13,6 @@ import {useError} from "../../hooks/useError";
 import {getPageContent} from "../../utils/functions.jsx";
 import "../../index.css";
 
-
-
 export default function ManageDashboard() {
     const {language} = useParams();
     const { getError, hasErrors} = useError(language);

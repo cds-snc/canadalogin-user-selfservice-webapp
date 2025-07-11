@@ -1,9 +1,7 @@
 import {
     GcdsContainer,
     GcdsErrorSummary,
-    GcdsFieldset,
     GcdsInput,
-    GcdsRadioGroup,
     GcdsStepper
 } from "@cdssnc/gcds-components-react";
 import {useState} from "react";
@@ -72,23 +70,6 @@ export default function SignUpEmail() {
                              data-testid="email"
                              lang={language}
                              required ></GcdsInput>
-                         <GcdsFieldset
-                             fieldset-id="gcds-email-fieldset"
-                             legend={pageContentJson['3']}
-                             hint={pageContentJson['4']}
-                             lang={language}
-                             required>
-                             <br />
-                             <GcdsRadioGroup
-                                 name="language"
-                                 options={'['+
-                                     `{"label": "${pageContentJson['5']}",`+
-                                     `"id": "english", "value": "eng"${ language!=='fr'?',"checked":"true"':'' }},`+
-                                     `{"label": "${pageContentJson['6']}",`+
-                                     `"id": "french", "value": "fr"${ language==='fr'?',"checked":"true"':'' }}`+
-                                     `]`}
-                             />
-                         </GcdsFieldset>
                          <SubmitButton currentLang={language} disabled={isPending} />
                      </GcdsContainer>
                  </form>
