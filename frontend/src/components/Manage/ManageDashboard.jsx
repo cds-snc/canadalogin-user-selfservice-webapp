@@ -21,7 +21,7 @@ export default function ManageDashboard() {
 
 
     return (
-        <GcdsContainer className="manage-container">
+        <GcdsContainer>
             {hasErrors() && (
                 <GcdsErrorSummary
                     data-testid="errorSummary"

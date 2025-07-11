@@ -52,15 +52,6 @@ body, .mainBody {
         align-items: center;
         gap: var(--gcds-spacing-350);
     }
-    .manage-container{
-        display: flex;
-        padding: 0px 15px var(--space-550, 44px) 15px;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: var(--space-350, 28px);
-        align-self: stretch;
-    }
-
 }
 
 @media screen and (min-width:768px) {
@@ -86,13 +77,6 @@ body, .mainBody {
     .gcds-footer {
         padding-top: var(--gcds-spacing-400);
     }
-    .manage-container {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: var(--space-350, 28px);
-    }
-
 
 }
 
