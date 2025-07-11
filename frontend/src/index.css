@@ -19,7 +19,11 @@ body, .mainBody {
 .privacy-notice{
     padding-left: 3em;
 }
-
+.profile-home-gcds-container {
+    padding: 0px 20px;
+    border: 1px solid var(--colour-gray-300, #A8ADB4);
+    border-radius: 10px
+}
 
 
 @media screen and (max-width:767px) {
@@ -48,6 +52,15 @@ body, .mainBody {
         align-items: center;
         gap: var(--gcds-spacing-350);
     }
+    .manage-container{
+        display: flex;
+        padding: 0px 15px var(--space-550, 44px) 15px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-350, 28px);
+        align-self: stretch;
+    }
+
 }
 
 @media screen and (min-width:768px) {
@@ -60,15 +73,13 @@ body, .mainBody {
     }
 
     .gcds-content {
-        border-radius: 10px;
-        border: 1px solid var(--gcds-color-grayscale-300, #A8ADB4);
         background: #FFF;
         display: flex;
-        width: 750px;
+        width: 900px;
         justify-content: center;
         align-items: center;
         margin: auto;
-        vertical-align: middle;
+        /*vertical-align: middle;*/
         gap: var(--gcds-spacing-300);
         padding: var(--gcds-spacing-1000) var(--gcds-spacing-1000) var(--gcds-spacing-600) var(--gcds-spacing-1000);
     }
@@ -76,4 +87,61 @@ body, .mainBody {
     .gcds-footer {
         padding-top: var(--gcds-spacing-400);
     }
+    .manage-container {
+        display: flex;
+        width: 950px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-350, 28px);
+    }
+
+
 }
+
+.sectionCard {
+    padding: var(--gcds-spacing-100) var(--gcds-spacing-200);
+    border: 1px solid var(--colour-gray-300, #A8ADB4);
+    border-radius: 10px;
+    margin-bottom: var(--gcds-spacing-300);
+  }
+  
+  .gridInline {
+    gap: var(--gcds-spacing-100);
+    align-items: center;
+  }
+  
+  .separator {
+    border-bottom: 1px solid #A8ADB4;
+    margin: var(--gcds-spacing-200) 0;
+    width: 100%;
+  }
+  
+  .verifiedBadge {
+    display: inline-flex;
+    align-items: center;
+    background: var(--colour-green-100, #E6F6EC);
+    padding: var(--gcds-spacing-100) var(--gcds-spacing-200);
+    height: 30px;
+    border: 1px solid var(--colour-green-10, #E6F6EC);
+    border-radius: 5px;
+  }
+
+.dashboard-grid {
+    display: grid;
+    gap: 1rem;
+    justify-items: center;
+}
+
+  .verifiedIcon {
+    color: var(--gcds-color-green-500);
+  }
+  
+  .verifiedText {
+    width: 58px;
+    height: 24px;
+    margin-top: -6px;
+    margin-left: -15px;
+  }
+  .verifiedBadgeBottom{
+    margin-bottom: 20px;
+  }

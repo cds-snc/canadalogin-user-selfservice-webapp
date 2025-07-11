@@ -6,7 +6,7 @@ from pydantic import AnyUrl
 
 class AppInfo(BaseSettings):
     app_name: str = "GC Sign In Backend API"
-    github_url: AnyUrl = "https://github.com/cds-snc/gc-signin-ibm"
+    github_url: AnyUrl = "https://github.com/cds-snc/gc-signin-user-self-service-webapp"
     email: str = "gcsignin@cds-snc.ca"
 
 

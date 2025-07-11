@@ -1,6 +1,6 @@
-# GC Sign in Frontend Application
+# GC Sign in - User self-service Frontend Application
 
-This is the frontend application built with React and GC Design System for the Government of Canada GC Sign in service.
+This is the frontend application built with React and GC Design System for the Government of Canada GC Sign in user self-service application.
 
 ## Running the Application
 

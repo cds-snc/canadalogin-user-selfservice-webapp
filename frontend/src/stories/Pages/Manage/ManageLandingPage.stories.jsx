@@ -9,12 +9,13 @@ import {buildTestCase, Template} from "../../Tests/utils/functions.tsx";
 export default {
     title: 'GC Sign In/Pages/Manage/Manage Landing Page',
     args:{
-        page:PAGES.manageHome
+        page:PAGES.manageDashboard
     }
 };
 
 export const English  = Template.bind({});
-English.parameters = buildTestCase.parameters(NAVIGATION_LINKS.manageDashboard, { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.dashboard }, null);
+English.parameters = buildTestCase.parameters(NAVIGATION_LINKS.manage, { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.dashboard }, null);
 
 export const French  = Template.bind({});
-French.parameters =buildTestCase.parameters(NAVIGATION_LINKS.manageDashboard, { language: AVAILABLE_LANGUAGES.fr, flow: FLOW_TYPES.dashboard }, null);
+French.parameters =buildTestCase.parameters(NAVIGATION_LINKS.manage, { language: AVAILABLE_LANGUAGES.fr, flow: FLOW_TYPES.dashboard }, null);
+
