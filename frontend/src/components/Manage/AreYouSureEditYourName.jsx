@@ -9,18 +9,39 @@ import {
 import { useParams } from "react-router";
 
 import { getPageContent } from "../../utils/functions";
-import { PAGES, NAVIGATION_LINKS } from "../../utils/constants";
+import { PAGES, NAVIGATION_LINKS, CONTEXT_ACTIONS } from "../../utils/constants";
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
 import { useUser } from "../Providers/useUser";
+import { authService } from "../../services/authService.jsx";
 
 export default function AreYouSureEditYourName() {
   const { language } = useParams();
-  const { state } = useUser();
+  const { state, dispatch } = useUser();
 
   const pageContentJson = getPageContent(language, PAGES.areYouSureEditYourName);
   const navigateHelper = useNavigateHelper();
+  const successPage = `/${language}${NAVIGATION_LINKS.profileYouMayUpdateName}`;
   const backtoProfile = `/${language}${NAVIGATION_LINKS.profileHome}`;
+
   const username = state?.editProfile?.name.formatted || "";
+
+  const saveUpdatedProfileData = async () => {
+    try {
+      const response = await authService.update_my_user_profile(state.editProfile);
+      if (response) {
+        dispatch({ type: CONTEXT_ACTIONS.updated_profile_success, payload: response.data });
+        return true;
+      }
+      else {
+        // Todo: handle errors
+      }
+    } catch (err) {
+      // Todo: handle errors
+      console.log(err);
+    }
+  };
+
+  console.log("state", state)
 
   return (
     <GcdsContainer>
@@ -39,7 +60,11 @@ export default function AreYouSureEditYourName() {
           {pageContentJson["12"]}</GcdsText>
       </GcdsNotice>
       <GcdsGrid columns="auto auto" gap="1rem" align-items="center">
-        <GcdsButton>
+        <GcdsButton onGcdsClick={async (ev) => {
+          ev.preventDefault();
+          const success = await saveUpdatedProfileData();
+          if (success) { navigateHelper(successPage) }
+        }}>
           {pageContentJson["8"]}
         </GcdsButton>
         <GcdsButton buttonRole="secondary" onGcdsClick={(ev) => {

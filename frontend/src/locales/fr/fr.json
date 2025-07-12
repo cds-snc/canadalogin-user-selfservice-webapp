@@ -194,8 +194,7 @@
     "1": "Bienvenue,",
     "2": "Renseignements personnels",
     "3": "Paramètres de sécurité"
-},
-
+  },
   "AreYouSureEditYourName": {
     "1": "Êtes-vous sûr de vouloir mettre à jour votre nom ?",
     "2": "Vous avez demandé à mettre à jour votre nom :",
@@ -228,8 +227,8 @@
     "15": "Notifications",
     "16": "Nous enverrons des notifications relatives à votre compte à l'adresse e-mail associée à votre compte.",
     "17": "Vous pouvez également recevoir des notifications des services connectés à votre compte GC. Vous pouvez gérer ces préférences dans les paramètres de chaque service."
-},
-  "EnterNewEmail":{
+  },
+  "EnterNewEmail": {
     "1": "Entrez une nouvelle adresse courriel",
     "2": "La modification de votre adresse courriel affectera :",
     "3": "L'adresse courriel que vous utilisez pour vous connecter",
@@ -273,9 +272,9 @@
     "10": "Vous pouvez demander un nouveau code dans",
     "11": "10 secondes"
   },
-  "ProfileYouMayUpdateName":{
+  "ProfileYouMayUpdateName": {
     "0": "Réussite",
-    "1": "Votre nom a été mis à jour vers Example Newname",
+    "1": "Votre nom a été mis à jour vers",
     "2": "Vous devrez peut-être mettre à jour votre nom à d'autres endroits.",
     "3": "Ceci ne modifie votre nom que pour les services connectés à votre compte GC Sign in.",
     "4": "Si vous essayez de mettre à jour votre nom pour un service qui n'est pas connecté à votre compte GC Sign in, vous devrez accéder à ce compte.",
@@ -286,8 +285,8 @@
     "9": "Pour voir les services connectés à votre compte GC Sign in, accédez à ",
     "10": "Services connectés",
     "11": "dans votre tableau de bord GC Sign in."
-},
-  "FirstVerifyItsYou":{
+  },
+  "FirstVerifyItsYou": {
     "1": "Vérifiez d'abord qu'il s'agit bien de vous",
     "2": "Pour modifier votre adresse e-mail, saisissez d'abord votre mot de passe actuel.",
     "3": "Mot de passe",

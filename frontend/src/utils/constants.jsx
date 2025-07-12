@@ -37,7 +37,8 @@ export const CONTEXT_ACTIONS = {
     signin_success: 'SIGNIN_SUCCESS',
     signin_failure: 'SIGNIN_FAILURE',
     clone_profile: 'CLONE_PROFILE',
-    update_profile: 'UPDATE_PROFILE'
+    update_profile: 'UPDATE_PROFILE',
+    updated_profile_success: 'UPDATE_PROFILE_SUCCESS',
 };
 
 export const FLOW_TYPES = {
@@ -110,6 +111,7 @@ export const SUBMIT_END_POINTS = {
     otpVerify: '/v1/otp/otp/verify',
     otpSend: '/v1/otp/otp/send',
     me: '/v1/users/me',
+    profile: '/v1/users/profile',
 }
 
 

@@ -296,7 +296,7 @@
   },
   "ProfileYouMayUpdateName": {
     "0": "Success",
-    "1": "Your name has been updated to Example Newname",
+    "1": "Your name has been updated to",
     "2": "You may need to update your name with other places.",
     "3": "This only changes your name with services connected to your GC Sign in.",
     "4": "If you are trying to update your name with a service that’s not connected to your GC Sign in, you’ll need to go to that account.",

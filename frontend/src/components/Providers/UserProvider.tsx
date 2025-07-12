@@ -75,6 +75,11 @@ function userReducer(state = initialState, action: Action) {
                     ...action.payload
                 }
             };
+        case CONTEXT_ACTIONS.updated_profile_success:
+            return {
+                ...state,
+                userProfile: action.payload,
+            };
         default:
             return state;
     }
