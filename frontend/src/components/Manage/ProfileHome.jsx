@@ -89,6 +89,7 @@ export default function ProfileHome() {
   const email = state?.userProfile?.userName || "";
   const phoneNumbers = state?.userProfile?.phoneNumbers;
   const editProfile = `/${language}${NAVIGATION_LINKS.ProfileNameEdit}`;
+  const editLanguagePreferences = `/${language}${NAVIGATION_LINKS.editLanguagePreferences}`
 
 
 
@@ -97,7 +98,7 @@ export default function ProfileHome() {
       <GcdsHeading tag="h1">{pageContent['1']}</GcdsHeading>
       <GcdsHeading tag="h2">{pageContent['2']}</GcdsHeading>
 
-      <gcds-container className="sectionCard">
+      <GcdsContainer className="sectionCard">
         <GcdsHeading tag="h6" marginTop='300'>{pageContent['3']}</GcdsHeading>
         <GcdsGrid columns="1fr auto" className="gridInline">
           <GcdsText>{name}</GcdsText>
@@ -110,10 +111,10 @@ export default function ProfileHome() {
             {pageContent['5']}
           </GcdsLink>
         </GcdsGrid>
-      </gcds-container>
+      </GcdsContainer>
 
       <GcdsHeading tag="h2" marginTop='300'>{pageContent['6']}</GcdsHeading>
-      <gcds-container className="sectionCard">
+      <GcdsContainer className="sectionCard">
         <GcdsHeading tag="h3" marginTop='300'>{pageContent['7']}</GcdsHeading>
         <GcdsText>{pageContent['8']}</GcdsText>
 
@@ -139,14 +140,17 @@ export default function ProfileHome() {
           ) : null
         }
 
-      </gcds-container>
+      </GcdsContainer>
 
       <GcdsHeading tag="h2">{pageContent['12']}</GcdsHeading>
-      <gcds-container className="sectionCard">
+      <GcdsContainer className="sectionCard">
         <GcdsHeading tag="h3" marginTop='300'>{pageContent['13']}</GcdsHeading>
         <GcdsGrid columns="1fr auto" className="gridInline">
           <GcdsText>{pageContent['14']}</GcdsText>
-          <GcdsLink href="#" size="regular">
+          <GcdsLink href={editLanguagePreferences} size="regular" onGcdsClick={(ev) => {
+            ev.preventDefault();
+            navigateHelper(ev.detail)
+          }}>
             {pageContent['5']}
           </GcdsLink>
         </GcdsGrid>
@@ -156,7 +160,7 @@ export default function ProfileHome() {
         <GcdsHeading tag="h3" marginTop='300'>{pageContent['15']}</GcdsHeading>
         <GcdsText>{pageContent['16']}</GcdsText>
         <GcdsText>{pageContent['17']}</GcdsText>
-      </gcds-container>
+      </GcdsContainer>
     </GcdsContainer>
   );
 }

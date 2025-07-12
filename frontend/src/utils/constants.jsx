@@ -1,7 +1,7 @@
 import ManageDashboard from "../components/Manage/ManageDashboard.jsx";
 import ProfileHome from "../components/Manage/ProfileHome";
 import config from '../config';
-export const AVAILABLE_LANGUAGES = { en: 'en', fr: 'fr' };
+export const AVAILABLE_LANGUAGES = { en: 'en', fr: 'fr', profileEn: 'en-ca', profileFr: 'en-fr' };
 export const NAVIGATION_LINKS = {
     signUp: '/signup',
     verifyEmail: '/signup/verification/email',
@@ -25,6 +25,7 @@ export const NAVIGATION_LINKS = {
     youMayUpdateEmailAtOtherPlaces: '/youMayUpdateEmailAtOtherPlaces',
     areYouSureUpdateYourEmail: '/areYouSureUpdateYourEmail',
     securitySettings: '/securitysettings',
+    editLanguagePreferences: '/editlanguage',
 };
 export const OIDC_REDIRECT = {
     login: `${config.apiUrl}/v1/auth/login`,
@@ -81,7 +82,8 @@ export const PAGES = {
     enterNewPhoneNumber: 'EnterNewPhoneNumber',
     youMayUpdateEmailAtOtherPlaces: 'YouMayUpdateEmailAtOtherPlaces',
     areYouSureUpdateYourEmail: 'AreYouSureUpdateYourEmail',
-    securitySettings: 'SecuritySettings'
+    securitySettings: 'SecuritySettings',
+    editLanguagePreferences: 'EditLanguagePreferences'
 
 }
 

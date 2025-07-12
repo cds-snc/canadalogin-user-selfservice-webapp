@@ -28,6 +28,7 @@ import EnterNewPhoneNumber from "../components/Manage/EnterNewPhoneNumber.jsx";
 import YouMayUpdateEmailAtOtherPlaces from "../components/Manage/YouMayUpdateEmailAtOtherPlaces.jsx";
 import AreYouSureUpdateYourEmail from "../components/Manage/AreYouSureUpdateYourEmail.jsx";
 import SecuritySettings from "../components/Manage/SecuritySettings.jsx";
+import EditLanguagePreferences from "../components/Manage/EditLanguagePreferences.jsx";
 
 function PageContents({ page }: { page: string }) {
     switch (page) {
@@ -136,6 +137,10 @@ function PageContents({ page }: { page: string }) {
         case PAGES.areYouSureEditYourName:
             return (
                 <AreYouSureEditYourName />
+            )
+        case PAGES.editLanguagePreferences:
+            return (
+                <EditLanguagePreferences />
             )
         default:
             return (<div>Error</div>);
