@@ -338,6 +338,37 @@
     "13": "English",
     "14": "French",
     "15": "Continuer",
-    "16": "Annuler"
+    "16": "Annuler",
+    "17": "Are you sure you want to update your language preference to:",
+    "18": "This will update your language with the following services:",
+    "19": "GEO.ca"
+  },
+  "ProfileYouMayUpdateLanguage": {
+    "0": "Réussite",
+    "1": "Votre nom a été mis à jour vers",
+    "2": "Vous devrez peut-être mettre à jour votre nom à d'autres endroits.",
+    "3": "Ceci ne modifie votre nom que pour les services connectés à votre compte GC Sign in.",
+    "4": "Si vous essayez de mettre à jour votre nom pour un service qui n'est pas connecté à votre compte GC Sign in, vous devrez accéder à ce compte.",
+    "5": "Pour rechercher un autre compte GC, consultez la section ",
+    "6": "Retour au profil",
+    "7": "Déconnexion",
+    "8": "Répertoire des comptes GC.",
+    "9": "Pour voir les services connectés à votre compte GC Sign in, accédez à ",
+    "10": "Services connectés",
+    "11": "dans votre tableau de bord GC Sign in."
+  },
+  "AreYouSureEditYourLanguage": {
+    "1": "Êtes-vous sûr de vouloir mettre à jour votre nom ?",
+    "2": "Vous avez demandé à mettre à jour votre nom :",
+    "3": "Exemple : Nouveau nom",
+    "4": "Votre nom sera mis à jour avec les services suivants :",
+    "5": "GEO.ca",
+    "6": "Attention",
+    "7": "Ceci",
+    "8": "Enregistrer les modifications",
+    "9": "Annuler",
+    "10": "Talent numérique",
+    "11": "ne modifie pas",
+    "12": "légalement votre nom."
   }
 }

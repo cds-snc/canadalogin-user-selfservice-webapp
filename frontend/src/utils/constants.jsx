@@ -1,7 +1,16 @@
 import ManageDashboard from "../components/Manage/ManageDashboard.jsx";
 import ProfileHome from "../components/Manage/ProfileHome";
 import config from '../config';
-export const AVAILABLE_LANGUAGES = { en: 'en', fr: 'fr', profileEn: 'en-ca', profileFr: 'en-fr' };
+export const AVAILABLE_LANGUAGES = { en: 'en', fr: 'fr' };
+export const PROFILE_LANGUAGES = {
+    en: 'en-ca',
+    fr: 'fr-ca',
+};
+export const LANGUAGE_DISPLAY_NAMES = {
+    'en-ca': 'English',
+    'fr-ca': 'French',
+};
+
 export const NAVIGATION_LINKS = {
     signUp: '/signup',
     verifyEmail: '/signup/verification/email',
@@ -26,6 +35,9 @@ export const NAVIGATION_LINKS = {
     areYouSureUpdateYourEmail: '/areYouSureUpdateYourEmail',
     securitySettings: '/securitysettings',
     editLanguagePreferences: '/editlanguage',
+    areYouSureEditYourLanguage: '/areYouSureEditYourLanguage',
+    profileYouMayUpdateLanguage: '/profileyoumayupdatelanguage'
+
 };
 export const OIDC_REDIRECT = {
     login: `${config.apiUrl}/v1/auth/login`,
@@ -83,8 +95,9 @@ export const PAGES = {
     youMayUpdateEmailAtOtherPlaces: 'YouMayUpdateEmailAtOtherPlaces',
     areYouSureUpdateYourEmail: 'AreYouSureUpdateYourEmail',
     securitySettings: 'SecuritySettings',
-    editLanguagePreferences: 'EditLanguagePreferences'
-
+    editLanguagePreferences: 'EditLanguagePreferences',
+    areYouSureEditYourLanguage: 'AreYouSureEditYourLanguage',
+    profileYouMayUpdateLanguage: 'ProfileYouMayUpdateLanguage',
 }
 
 export const FOOTERS = {

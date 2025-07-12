@@ -5,9 +5,12 @@ import { PAGES, NAVIGATION_LINKS } from "./utils/constants.jsx";
 
 function App() {
     const editLanguagePreferences = `/:language${NAVIGATION_LINKS.editLanguagePreferences}`
+    const areYouSureEditYourLanguage = `/:language${NAVIGATION_LINKS.areYouSureEditYourLanguage}`
+    const profileYouMayUpdateLanguage = `/:language${NAVIGATION_LINKS.profileYouMayUpdateLanguage}`
+
     return (
         <Routes>
-            {/* <Route element={<PrivateRoute />}> */}
+            <Route element={<PrivateRoute />}>
             <Route path="/" element={<Page page={PAGES.manageDashboard} />} />
             <Route path="/:language" element={<Page page={PAGES.manageDashboard} />} />
             <Route path="/:language/" element={<Page page={PAGES.manageDashboard} />} />
@@ -24,8 +27,10 @@ function App() {
             <Route path="/:language/areYouSureUpdateYourEmail" element={<Page page={PAGES.areYouSureUpdateYourEmail} />} />
             <Route path="/:language/securitysettings" element={<Page page={PAGES.securitySettings} />} />
             <Route path={editLanguagePreferences} element={<Page page={PAGES.editLanguagePreferences} />} />
+            <Route path={areYouSureEditYourLanguage} element={<Page page={PAGES.areYouSureEditYourLanguage} />} />
+            <Route path={profileYouMayUpdateLanguage} element={<Page page={PAGES.profileYouMayUpdateLanguage} />} />
             <Route path="*" element={<Navigate to="/" replace />} />
-            {/* </Route> */}
+            </Route>
         </Routes>
     );
 }

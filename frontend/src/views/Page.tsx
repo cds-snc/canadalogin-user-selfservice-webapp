@@ -29,6 +29,8 @@ import YouMayUpdateEmailAtOtherPlaces from "../components/Manage/YouMayUpdateEma
 import AreYouSureUpdateYourEmail from "../components/Manage/AreYouSureUpdateYourEmail.jsx";
 import SecuritySettings from "../components/Manage/SecuritySettings.jsx";
 import EditLanguagePreferences from "../components/Manage/EditLanguagePreferences.jsx";
+import AreYouSureEditYourLanguage from "../components/Manage/AreYouSureEditYourLanguage.jsx";
+import ProfileYouMayUpdateLanguage from "../components/Manage/ProfileYouMayUpdateLanguage.jsx";
 
 function PageContents({ page }: { page: string }) {
     switch (page) {
@@ -141,6 +143,14 @@ function PageContents({ page }: { page: string }) {
         case PAGES.editLanguagePreferences:
             return (
                 <EditLanguagePreferences />
+            )
+        case PAGES.areYouSureEditYourLanguage:
+            return (
+                <AreYouSureEditYourLanguage />
+            )
+        case PAGES.profileYouMayUpdateLanguage:
+            return (
+                <ProfileYouMayUpdateLanguage />
             )
         default:
             return (<div>Error</div>);

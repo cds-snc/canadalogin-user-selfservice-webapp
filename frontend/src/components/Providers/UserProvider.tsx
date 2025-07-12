@@ -68,6 +68,7 @@ function userReducer(state = initialState, action: Action) {
                 editProfile: { ...state.userProfile || {} }
             };
         case CONTEXT_ACTIONS.update_profile:
+            console.log(action.payload)
             return {
                 ...state,
                 editProfile: {

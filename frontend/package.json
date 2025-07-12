@@ -16,6 +16,7 @@
   "dependencies": {
     "@cdssnc/gcds-components": "^0.36.0",
     "@cdssnc/gcds-components-react": "^0.36.0",
+    "date-fns": "^4.1.0",
     "libphonenumber-js": "^1.12.9",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

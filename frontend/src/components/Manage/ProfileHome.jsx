@@ -10,7 +10,7 @@ import {
 import parsePhoneNumberFromString from 'libphonenumber-js';
 
 import { getPageContent, capitalizeFirstLetter } from '../../utils/functions.jsx';
-import { PAGES, NAVIGATION_LINKS } from '../../utils/constants.jsx';
+import { PAGES, NAVIGATION_LINKS, LANGUAGE_DISPLAY_NAMES } from '../../utils/constants.jsx';
 import { useUser } from "../Providers/useUser.tsx";
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
 
@@ -88,6 +88,8 @@ export default function ProfileHome() {
   const name = state?.userProfile?.name.formatted || "";
   const email = state?.userProfile?.userName || "";
   const phoneNumbers = state?.userProfile?.phoneNumbers;
+  const preferredLanguage = state?.userProfile?.preferredLanguage || "";
+
   const editProfile = `/${language}${NAVIGATION_LINKS.ProfileNameEdit}`;
   const editLanguagePreferences = `/${language}${NAVIGATION_LINKS.editLanguagePreferences}`
 
@@ -146,7 +148,7 @@ export default function ProfileHome() {
       <GcdsContainer className="sectionCard">
         <GcdsHeading tag="h3" marginTop='300'>{pageContent['13']}</GcdsHeading>
         <GcdsGrid columns="1fr auto" className="gridInline">
-          <GcdsText>{pageContent['14']}</GcdsText>
+          <GcdsText>{LANGUAGE_DISPLAY_NAMES[preferredLanguage]}</GcdsText>
           <GcdsLink href={editLanguagePreferences} size="regular" onGcdsClick={(ev) => {
             ev.preventDefault();
             navigateHelper(ev.detail)
