@@ -7,10 +7,13 @@ import {
   GcdsText,
   GcdsLink
 } from '@cdssnc/gcds-components-react';
-import { getPageContent, capitalizeFirstLetter } from '../../utils/functions.jsx';
-import { PAGES } from '../../utils/constants.jsx';
-import { useUser } from "../Providers/useUser.tsx";
 import parsePhoneNumberFromString from 'libphonenumber-js';
+
+import { getPageContent, capitalizeFirstLetter } from '../../utils/functions.jsx';
+import { PAGES, NAVIGATION_LINKS } from '../../utils/constants.jsx';
+import { useUser } from "../Providers/useUser.tsx";
+import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
+
 
 
 const DisplayPhoneNumbers = ({ phoneNumbers }) => {
@@ -38,11 +41,9 @@ const DisplayPhoneNumbers = ({ phoneNumbers }) => {
               console.warn(`Failed to parse phone number: ${phoneNumber.value}`);
             }
             return (
-              <>
-                <GcdsText key={index} margin-bottom={isLast ? '400' : '0'} placeContent="center">
-                  {numberType}: {profilePhoneNumber}
-                </GcdsText>
-              </>
+              <GcdsText key={index} margin-bottom={isLast ? '400' : '0'} placeContent="center">
+                {numberType}: {profilePhoneNumber}
+              </GcdsText>
             )
 
           })
@@ -83,9 +84,11 @@ export default function ProfileHome() {
   const { language } = useParams();
   const pageContent = getPageContent(language, PAGES.ProfileHome);
   const { state } = useUser();
+  const navigateHelper = useNavigateHelper();
   const name = state?.userProfile?.name.formatted || "";
   const email = state?.userProfile?.userName || "";
   const phoneNumbers = state?.userProfile?.phoneNumbers;
+  const editProfile = `/${language}${NAVIGATION_LINKS.ProfileNameEdit}`;
 
 
 
@@ -98,7 +101,12 @@ export default function ProfileHome() {
         <GcdsHeading tag="h6" marginTop='300'>{pageContent['3']}</GcdsHeading>
         <GcdsGrid columns="1fr auto" className="gridInline">
           <GcdsText>{name}</GcdsText>
-          <GcdsLink href="#" size="regular">
+          <GcdsLink href={editProfile} size="regular"
+            onGcdsClick={(ev) => {
+              ev.preventDefault();
+              navigateHelper(ev.detail)
+            }}
+          >
             {pageContent['5']}
           </GcdsLink>
         </GcdsGrid>

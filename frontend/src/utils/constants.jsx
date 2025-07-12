@@ -36,6 +36,8 @@ export const CONTEXT_ACTIONS = {
     logOut: 'LOG_OUT',
     signin_success: 'SIGNIN_SUCCESS',
     signin_failure: 'SIGNIN_FAILURE',
+    clone_profile: 'CLONE_PROFILE',
+    update_profile: 'UPDATE_PROFILE'
 };
 
 export const FLOW_TYPES = {

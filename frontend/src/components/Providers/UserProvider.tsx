@@ -38,7 +38,8 @@ const initialState = {
         otpType: null,
         passwordValidated: false
     },
-    userProfile: null
+    userProfile: null,
+    editProfile: null
 }
 
 
@@ -60,6 +61,19 @@ function userReducer(state = initialState, action: Action) {
                 ...state,
                 userProfile: null,
                 isLoading: false
+            };
+        case CONTEXT_ACTIONS.clone_profile:
+            return {
+                ...state,
+                editProfile: { ...state.userProfile || {} }
+            };
+        case CONTEXT_ACTIONS.update_profile:
+            return {
+                ...state,
+                editProfile: {
+                    ...state.editProfile || {},
+                    ...action.payload
+                }
             };
         default:
             return state;

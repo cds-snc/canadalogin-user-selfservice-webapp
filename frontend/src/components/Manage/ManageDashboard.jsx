@@ -22,10 +22,11 @@ export default function ManageDashboard() {
     const { getError, hasErrors } = useError(language);
     const error = getError("#dashboard");
     const pageContent = getPageContent(language, PAGES.manageDashboard);
+    const navigateHelper = useNavigateHelper();
+
     console.log(state)
     const personalInformationLink = `/${language}${NAVIGATION_LINKS.profileHome}`;
     const securitySettingsLink = `/${language}${NAVIGATION_LINKS.securitySettings}`;
-    const navigateHelper = useNavigateHelper();
 
     return (
         <GcdsContainer>

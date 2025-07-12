@@ -6,18 +6,27 @@ import {
   GcdsNotice,
   GcdsButton, GcdsGrid
 } from "@cdssnc/gcds-components-react";
-import { getPageContent } from "../../utils/functions";
-import { PAGES } from "../../utils/constants";
 import { useParams } from "react-router";
+
+import { getPageContent } from "../../utils/functions";
+import { PAGES, NAVIGATION_LINKS } from "../../utils/constants";
+import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
+import { useUser } from "../Providers/useUser";
 
 export default function AreYouSureEditYourName() {
   const { language } = useParams();
+  const { state } = useUser();
+
   const pageContentJson = getPageContent(language, PAGES.areYouSureEditYourName);
+  const navigateHelper = useNavigateHelper();
+  const backtoProfile = `/${language}${NAVIGATION_LINKS.profileHome}`;
+  const username = state?.editProfile?.name.formatted || "";
+
   return (
     <GcdsContainer>
       <GcdsHeading tag="h1">{pageContentJson["1"]}</GcdsHeading>
       <GcdsText>
-        {pageContentJson["2"]} <strong>{pageContentJson["3"]}</strong>.
+        {pageContentJson["2"]} <strong>{username}</strong>.
       </GcdsText>
       <GcdsText>{pageContentJson["4"]}</GcdsText>
       <ul>
@@ -33,7 +42,10 @@ export default function AreYouSureEditYourName() {
         <GcdsButton>
           {pageContentJson["8"]}
         </GcdsButton>
-        <GcdsButton buttonRole="secondary">
+        <GcdsButton buttonRole="secondary" onGcdsClick={(ev) => {
+          ev.preventDefault();
+          navigateHelper(backtoProfile)
+        }}>
           {pageContentJson["9"]}
         </GcdsButton>
       </GcdsGrid>
