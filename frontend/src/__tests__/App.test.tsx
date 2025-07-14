@@ -380,6 +380,18 @@ describe('Routing Tests', () => {
         buildTestSuite.test(AVAILABLE_LANGUAGES.en, PAGES.securitySettings, FLOW_TYPES.manage , null, langHref.fr + NAVIGATION_LINKS.securitySettings);
     });
 
+    test("Manage Security Settings page with fr language defined", () => {
+
+        stateData.userData = {...stateData.userData , ... mockedRoutesUserData.manage};
+        render(
+            <MemoryRouter initialEntries={[langHref.fr + NAVIGATION_LINKS.securitySettings]}>
+                <App/>
+            </MemoryRouter>,
+        )
+        screen.debug()
+        buildTestSuite.test(AVAILABLE_LANGUAGES.fr, PAGES.securitySettings, FLOW_TYPES.manage , null, langHref.en + NAVIGATION_LINKS.securitySettings);
+    });
+
     beforeAll(()=>{
         mockedRoutesUserData.signup = getMockedSignUpData();
         mockedRoutesUserData.signin = getMockedSignInData();

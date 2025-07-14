@@ -57,7 +57,10 @@ const GCDS_TAG_ATTRIBUTES = {
     },
     'gcds-card': {
         attributes:['card-title', 'href', 'card-title-tag']
-    }
+    },
+    'gcds-grid': {
+        attributes: []
+    },
 }
 
 interface TestParameters {
@@ -84,6 +87,8 @@ const pageSetup = {
     button: (page:string, language: string) => {
         switch(page){
             case PAGES.manageDashboard:
+                return null;
+            case PAGES.securitySettings:
                 return null;
             default:
                 return language !== AVAILABLE_LANGUAGES.fr ? engJson['Button'] : frJson['Button'];
@@ -215,8 +220,6 @@ const pageSetup = {
                 return pageSetup.privacyGcdsMap(pageContentJson);
             case PAGES.manageDashboard:
                 return pageSetup.manageDashboardGcdsMap(pageContentJson);
-            case PAGES.securitySettings:
-                return pageSetup.securitySettingsGcdsMap(pageContentJson);
             default:
                 return new Map();
         }
