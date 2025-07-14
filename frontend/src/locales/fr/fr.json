@@ -327,15 +327,15 @@
     "6": "Annuler"
   },
   "SecuritySettings": {
-    "1": "Security settings",
-    "2": "How you sign in to GC Sign in",
-    "3": "Make sure you can always access your GC Sign in by keeping this information up to date.",
-    "4": "Password",
-    "5": "Last changed on January 3, 2025",
-    "6": "Change",
-    "7": "2-step verification",
-    "8": "A second step after your password helps verify it’s you signing in.",
-    "9": "Enabled",
-    "10": "Manage"
+    "1": "Paramètres de sécurité",
+    "2": "Comment vous vous connectez à Connexion GC",
+    "3": "Veillez à toujours avoir accès à votre compte Connexion GC en maintenant ces renseignements à jour.",
+    "4": "Mot de passe",
+    "5": "Dernière modification le 3 janvier 2025",
+    "6": "Modifier",
+    "7": "Vérification en deux étapes",
+    "8": "L’ajout d’une étape supplémentaire à la vérification de votre mot de passe permet de confirmer votre identité.",
+    "9": "Activée",
+    "10": "Gérer"
   }
 }
