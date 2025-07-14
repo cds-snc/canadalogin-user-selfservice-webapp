@@ -100,9 +100,9 @@ class ProfileGetResponseData(BaseModel):
 
 class ProfilePUTData(BaseModel):
     schemas: List[str] = Field(
-        default_factory=lambda: [
+        default=[
             "urn:ietf:params:scim:schemas:core:2.0:User",
-            "urn:ietf:params:scim:schemas:extension:ibm:2.0:User"
+            "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
         ]
     )
     preferredLanguage: Optional[str] = None

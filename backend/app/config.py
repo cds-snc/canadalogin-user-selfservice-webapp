@@ -59,8 +59,8 @@ class Configuration(BaseSettings):
         return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.ME.value}"
 
     @property
-    def ibm_well_known_config(self) -> str:
-        return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.WELLKNOWNCONFIG.value}"
+    def oidc_well_known_config(self) -> str:
+        return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.OIDC_WELL_KNOWN_CONFIG.value}"
 
 
 @lru_cache

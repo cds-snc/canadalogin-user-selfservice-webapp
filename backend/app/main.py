@@ -57,7 +57,7 @@ async def lifespan(app: FastAPI):
     oidc_config.register_oidc(app.state.config)
     print(app.state.config.cors_origins_list)
     logger.info(f"CORS Origins: {app.state.config.cors_origins_list}")
-    logger.info(f"ibm_well_known_config: {app.state.config.ibm_well_known_config}")
+    logger.info(f"oidc_well_known_config: {app.state.config.oidc_well_known_config}")
     logger.info(f"my_profile_endpoint: {app.state.config.profile_api_endpoint}")
     yield
     logger.info("Closing global HTTP client")

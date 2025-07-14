@@ -5,12 +5,7 @@ from fastapi import HTTPException
 from httpx import AsyncClient
 from pydantic import ValidationError
 
-from app.config import get_configuration
-from app.users.schemas import (
-    ProfileGetResponseData,
-    ProfileResponse,
-    ProfilePUTData
-)
+from app.users.schemas import ProfileGetResponseData, ProfileResponse, ProfilePUTData
 from app.utils.access_token import get_auth_request_headers
 
 logger = logging.getLogger(__name__)
@@ -20,18 +15,16 @@ async def update_profile(
     global_http_client: AsyncClient,
     user_data: ProfilePUTData,
     user_access_token,
-    profile_api_endpoint: str
-
+    profile_api_endpoint: str,
 ):
     try:
         headers = get_auth_request_headers(user_access_token)
-        settings = get_configuration().ibm_verify_config
-        print(settings)
-        create_request = ProfilePUTData(**user_data.model_dump())  # validation and then turns it into a ProfilePUTData data object
+        create_request = ProfilePUTData(
+            **user_data.model_dump()
+        )  # validation and then turns it into a ProfilePUTData data object
         request_json = create_request.model_dump_json(
-            by_alias=True,
-            exclude_unset=True,
-            exclude_none=True)
+            by_alias=True, exclude_unset=True, exclude_none=True
+        )
         response = await global_http_client.put(
             profile_api_endpoint, content=request_json, headers=headers
         )
@@ -56,12 +49,12 @@ async def update_profile(
         )
 
 
-async def my_profile(global_http_client: AsyncClient, user_access_token: str, profile_api_endpoint: str):
+async def my_profile(
+    global_http_client: AsyncClient, user_access_token: str, profile_api_endpoint: str
+):
     try:
         logger.info("Get my profile")
         headers = get_auth_request_headers(user_access_token)
-        settings = get_configuration().ibm_verify_config
-        get_profile_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/Me"
         response = await global_http_client.get(profile_api_endpoint, headers=headers)
     except ValidationError as e:
         logger.error(f"Validation Error: {e.json()}")

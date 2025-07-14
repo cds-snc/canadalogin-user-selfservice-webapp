@@ -27,7 +27,7 @@ async def user_profile(
         request.app.state.request_client,
         user_data,
         user_access_token,
-        profile_api_endpoint=request.app.state.config.profile_api_endpoint
+        profile_api_endpoint=request.app.state.config.profile_api_endpoint,
     )
 
 
@@ -41,5 +41,8 @@ async def user_profile(
 async def me(
     request: Request, user_access_token: str = Depends(get_users_current_session)
 ):
-    return await my_profile(request.app.state.request_client, user_access_token, profile_api_endpoint=request.app.state.config.profile_api_endpoint
-                            )
+    return await my_profile(
+        request.app.state.request_client,
+        user_access_token,
+        profile_api_endpoint=request.app.state.config.profile_api_endpoint,
+    )
