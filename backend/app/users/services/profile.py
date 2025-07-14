@@ -7,7 +7,6 @@ from pydantic import ValidationError
 
 from app.config import get_settings
 from app.users.schemas import (
-    ProfileUserData,
     ProfileCreateRequest,
     Operations,
     ProfileGetResponseData,
@@ -19,7 +18,9 @@ logger = logging.getLogger(__name__)
 
 
 async def update_profile(
-    global_http_client: AsyncClient, user_data: ProfileGetResponseData, user_access_token
+    global_http_client: AsyncClient,
+    user_data: ProfileGetResponseData,
+    user_access_token,
 ):
     try:
         admin_token = await get_admin_token(global_http_client)
@@ -128,7 +129,7 @@ async def my_profile(global_http_client: AsyncClient, user_access_token: str):
         )
     else:
         logger.error(f"Failed to retrieve profile. Response: {response.text}")
-        if (response.status_code == 401):
+        if response.status_code == 401:
             raise HTTPException(status_code=401, detail="Not authenticated")
         else:
             error_details = response.json().get("detail")

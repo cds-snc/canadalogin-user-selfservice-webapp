@@ -3,11 +3,7 @@ import logging
 from fastapi import APIRouter
 from fastapi import Request, Depends
 
-from app.users.schemas import (
-    ProfileUserData,
-    ProfileResponse,
-    ProfileGetResponseData
-)
+from app.users.schemas import ProfileResponse, ProfileGetResponseData
 from app.users.services.profile import update_profile, my_profile
 from app.auth.services.auth import get_users_current_session
 
@@ -22,8 +18,14 @@ logger = logging.getLogger(__name__)
     summary="Update a user profile in verify",
     description="",
 )
-async def user_profile(request: Request, user_data: ProfileGetResponseData , user_access_token: str = Depends(get_users_current_session)):
-    return await update_profile(request.app.state.request_client, user_data, user_access_token)
+async def user_profile(
+    request: Request,
+    user_data: ProfileGetResponseData,
+    user_access_token: str = Depends(get_users_current_session),
+):
+    return await update_profile(
+        request.app.state.request_client, user_data, user_access_token
+    )
 
 
 @router.get(

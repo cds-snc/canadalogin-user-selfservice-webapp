@@ -93,7 +93,7 @@ class ProfileGetResponseData(BaseModel):
     details: Optional[SCIMUserDetails] = Field(
         default=None,
         validation_alias="urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
-        serialization_alias="details"
+        serialization_alias="details",
     )
     model_config = ConfigDict(validate_by_name=True, validate_by_alias=True)
 
