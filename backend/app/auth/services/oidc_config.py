@@ -1,13 +1,15 @@
 from authlib.integrations.starlette_client import OAuth
-
+from app.constants.verify_endpoints import VerifyAPIEndpoint
 oauth = OAuth()
 
 
-def register_oidc(verify_config):
+def register_oidc(config):
+    verify_config = config.ibm_verify_config
+
     oauth.register(
         name="verify",
         client_id=verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID,
         client_secret=verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_SECRET,
-        server_metadata_url=f"{verify_config.IBM_VERIFY_TENANT_URL}/oauth2/.well-known/openid-configuration",
-        client_kwargs={"scope": "openid email profile"},
+        server_metadata_url=config.ibm_well_known_config,
+        client_kwargs={"scope": "openid email profile phone"},
     )

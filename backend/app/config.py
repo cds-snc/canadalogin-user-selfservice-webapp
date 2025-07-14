@@ -2,6 +2,7 @@ from functools import lru_cache
 from typing import List, Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import AnyUrl, Field
+from app.constants.verify_endpoints import VerifyAPIEndpoint
 
 
 class AppInfo(BaseSettings):
@@ -22,7 +23,7 @@ class IBMVerifyConfig(BaseSettings):
     )
 
 
-class Settings(BaseSettings):
+class Configuration(BaseSettings):
     app_info: AppInfo = AppInfo()
     ibm_verify_config: IBMVerifyConfig = IBMVerifyConfig()
     ENVIRONMENT: str = Field(default="local")
@@ -53,7 +54,15 @@ class Settings(BaseSettings):
             f"{http_value}{origin.strip()}" for origin in self.CORS_ORIGINS.split(",")
         ]
 
+    @property
+    def profile_api_endpoint(self) -> str:
+        return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.ME.value}"
+
+    @property
+    def ibm_well_known_config(self) -> str:
+        return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.WELLKNOWNCONFIG.value}"
+
 
 @lru_cache
-def get_settings():
-    return Settings()
+def get_configuration():
+    return Configuration()

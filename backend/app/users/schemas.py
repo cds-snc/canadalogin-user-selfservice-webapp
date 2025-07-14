@@ -75,17 +75,17 @@ class Meta(BaseModel):
     resourceType: str
 
 
-class Name(BaseModel):
+class UserProfileName(BaseModel):
     formatted: Optional[str] = None
     familyName: Optional[str] = None
     givenName: Optional[str] = None
 
 
 class ProfileGetResponseData(BaseModel):
-    emails: List[EmailItem]
+    emails: List[EmailItem] = None
     preferredLanguage: Optional[str] = None
     meta: Meta
-    name: Optional[Name] = None
+    name: Optional[UserProfileName] = None
     active: bool
     id: str
     userName: EmailStr
@@ -95,6 +95,20 @@ class ProfileGetResponseData(BaseModel):
         validation_alias="urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
         serialization_alias="details",
     )
+    model_config = ConfigDict(validate_by_name=True, validate_by_alias=True)
+
+
+class ProfilePUTData(BaseModel):
+    schemas: List[str] = Field(
+        default_factory=lambda: [
+            "urn:ietf:params:scim:schemas:core:2.0:User",
+            "urn:ietf:params:scim:schemas:extension:ibm:2.0:User"
+        ]
+    )
+    preferredLanguage: Optional[str] = None
+    name: Optional[UserProfileName] = None
+    userName: EmailStr
+    phoneNumbers: Optional[List[MetaDataTypeValue]] = None
     model_config = ConfigDict(validate_by_name=True, validate_by_alias=True)
 
 

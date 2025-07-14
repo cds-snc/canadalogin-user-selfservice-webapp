@@ -3,7 +3,7 @@ from fastapi import Request, HTTPException
 from fastapi.responses import RedirectResponse
 from authlib.integrations.starlette_client import OAuthError
 from app.auth.services.oidc_config import oauth
-from app.config import get_settings
+from app.config import get_configuration
 from app.utils.access_token import SESSION_USER_ACCESS_TOKEN_KEY
 from app.utils.helpers import generate_error_response, string_error_response
 
@@ -16,7 +16,7 @@ async def get_redirect_url(request: Request):
     This function is used to initiate the login process with IBM Verify.
     """
     try:
-        config = get_settings()
+        config = get_configuration()
         # this request.url_for gets the url based on the callback route defined
         callback_route = request.url_for("callback_route")
         redirect_uri = callback_route
@@ -35,7 +35,7 @@ async def callback_handler(request: Request):
     This function is used to initiate the login process with IBM Verify.
     """
     try:
-        config = get_settings()
+        config = get_configuration()
 
         oidc_response = await oauth.verify.authorize_access_token(request)
         logger.info("OIDC Responsed")

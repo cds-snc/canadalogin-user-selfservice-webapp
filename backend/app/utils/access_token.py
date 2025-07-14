@@ -3,11 +3,11 @@ import threading
 from datetime import datetime
 from fastapi import HTTPException
 from httpx import AsyncClient
-from app.config import get_settings
+from app.config import get_configuration
 
 logger = logging.getLogger(__name__)
 lock = threading.Lock()
-settings = get_settings().ibm_verify_config
+settings = get_configuration().ibm_verify_config
 
 admin_token_ttl = 7170
 

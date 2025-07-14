@@ -26,7 +26,6 @@ export default function EditLanguagePreferences() {
     const navigateHelper = useNavigateHelper();
     const areYouSureEditYourLanguage = `/${language}${NAVIGATION_LINKS.areYouSureEditYourLanguage}`
 
-    const successPage = `/${language}${NAVIGATION_LINKS.areYouSur}`;
     const backtoProfile = `/${language}${NAVIGATION_LINKS.profileHome}`;
 
     const profilePreferredLanguage = state?.userProfile?.preferredLanguage;
@@ -62,7 +61,7 @@ export default function EditLanguagePreferences() {
 
     useEffect(() => {
         dispatch({ type: CONTEXT_ACTIONS.clone_profile, payload: null });
-    }, []);
+    }, [dispatch, state.userProfile]);
 
     return (
         <GcdsContainer>
