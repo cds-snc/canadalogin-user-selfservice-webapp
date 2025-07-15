@@ -1,20 +1,21 @@
 import logging
 
-from fastapi import APIRouter, Path
-from fastapi import Request
+from fastapi import APIRouter
+from fastapi import Request, Depends
 
 from app.users.schemas import (
     ProfileUserData,
     ProfileResponse,
 )
-from app.users.services.profile import create_profile, get_profile
+from app.users.services.profile import create_profile, my_profile
+from app.auth.services.auth import get_users_current_session
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
 @router.post(
-    "/users/{user_id}/profile",
+    "/{user_id}/profile",
     response_model=ProfileResponse,
     tags=["Users"],
     summary="Create user profile in verify",
@@ -25,13 +26,13 @@ async def user_create_profile(user_id, user_data: ProfileUserData, request: Requ
 
 
 @router.get(
-    "/users/{user_id}/profile/",
+    "/me",
     response_model=ProfileResponse,
     tags=["Users"],
     summary="Get a single user's profile",
     description="",
 )
-async def user_get_profile(
-    request: Request, user_id: str = Path(..., description="User ID")
+async def me(
+    request: Request, user_access_token: str = Depends(get_users_current_session)
 ):
-    return await get_profile(request.app.state.request_client, user_id)
+    return await my_profile(request.app.state.request_client, user_access_token)

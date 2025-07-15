@@ -38,6 +38,9 @@ jobs:
           IBM_VERIFY_TENANT_URL: test.com
           IBM_VERIFY_API_CLIENT_ID: a12345
           IBM_VERIFY_API_CLIENT_SECRET: a123456
+          PROFILE_MANAGEMENT_DOMAIN: test.com
+          IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID: a123456
+          IBM_VERIFY_PROFILE_MANAGEMENT_SECRET: a123456
         run: make run-pytest
 
       - name: Build image

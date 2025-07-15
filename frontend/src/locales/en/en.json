@@ -48,7 +48,7 @@
     "1": "Already have a GC Sign in account?",
     "2": "Sign in"
   },
-  "Error":{
+  "Error": {
     "1": "There was a problem",
     "2": "Invalid email. Email must contain an ‘@’ symbol followed by a domain.",
     "3": "Codes must be six digits. Try again.",
@@ -63,7 +63,7 @@
     "12": "and a maximum of",
     "13": "characters."
   },
-  "RegisterVerification":{
+  "RegisterVerification": {
     "1": "Protect your account with 2-step verification",
     "2": "Two-step verification adds a second layer of security to your password.",
     "3": "Learn more about two-step verification (opens in a new tab)",
@@ -95,7 +95,7 @@
     "18": "Voice call",
     "19": "Mobile or landline. Carrier charges may apply."
   },
-  "Verification":{
+  "Verification": {
     "1": "Check your phone",
     "2": "We have sent a text message with a 6-digit verification code to:",
     "3": "We have sent a 6-digit verification code via voice call to:",
@@ -135,14 +135,14 @@
   "CreateCoreProfile": {
     "1": "Your GC Sign in account has been created",
     "2": "Complete your profile",
-    "3": "Read our" ,
+    "3": "Read our",
     "4": "privacy notice",
     "5": "for more details on how we use your personal information.",
     "6": "Enter your name",
     "7": "First name",
     "8": "Last name"
   },
-  "Button":{
+  "Button": {
     "submit": "Continue"
   },
   "Privacy": {
@@ -153,17 +153,17 @@
     "6": "When you set up your account, GC Sign in will ask you to provide basic personal information. We ask for this information to:",
     "7": "make it faster for you to access services, and",
     "8": "contact you about account security.",
-    "9": "Your personal information is",  
+    "9": "Your personal information is",
     "10": "stored in a secure database",
-    "11":"managed by",
+    "11": "managed by",
     "12": "Employment and Social Development Canada.",
-    "13":"Your personal information is",
+    "13": "Your personal information is",
     "14": "also shared with departments or agencies",
     "15": "that you connect to and is stored according to their own policies and processes. Your personal information is",
     "17": "not",
-    "18":"shared with programs or services",
-    "19":"unless you connect them to your GC Sign in account.",
-    "20":"Visit our",
+    "18": "shared with programs or services",
+    "19": "unless you connect them to your GC Sign in account.",
+    "20": "Visit our",
     "21": "Terms",
     "22": "to learn more.",
     "23": "Your personal information and the law",
@@ -192,10 +192,10 @@
     "47": "to continue to your"
   },
   "ManageDashboard": {
-    "1": "Welcome, <Name of User>",
+    "1": "Welcome,",
     "2": "Personal information",
     "3": "Security settings"
-},
+  },
   "AreYouSureEditYourName": {
     "1": "Are you sure you want to update your name?",
     "2": "You’ve requested to update your name to:",
@@ -209,7 +209,6 @@
     "10": "Digital Talent",
     "11": "does not ",
     "12": "legally change your name."
-
   },
   "ProfileNameEdit": {
     "1": "What services have access to your name",
@@ -259,7 +258,7 @@
     "12": "You can request a new code in",
     "13": "10 seconds"
   },
-  "CompleteTwoStepVerification":{
+  "CompleteTwoStepVerification": {
     "1": "Complete 2-step verification",
     "2": "To edit your email, first enter the 6-digit code we sent to:",
     "3": "+1 (***) *** - 2934",
@@ -272,14 +271,14 @@
     "10": "You can request a new code in",
     "11": "10 seconds"
   },
-  "FirstVerifyItsYou":{
+  "FirstVerifyItsYou": {
     "1": "First, verify it's you ",
     "2": "To edit your email, first enter your current password.",
     "3": "Password",
     "4": "Continue",
     "5": "Cancel"
   },
-  "EnterNewEmail":{
+  "EnterNewEmail": {
     "1": "Enter a new email address",
     "2": "Changing your email address will affect:",
     "3": "The email address you use to sign in",
@@ -295,7 +294,7 @@
     "13": "Continue",
     "14": "Cancel"
   },
-  "ProfileYouMayUpdateName":{
+  "ProfileYouMayUpdateName": {
     "0": "Success",
     "1": "Your name has been updated to Example Newname",
     "2": "You may need to update your name with other places.",
@@ -309,7 +308,7 @@
     "10": "Connected Services ",
     "11": "in your GC Sign in dashboard."
   },
-  "EnterNewPhoneNumber":{
+  "EnterNewPhoneNumber": {
     "1": "Enter a new phone number",
     "2": "This will update the phone number that GC Sign in, and services connected to your GC Sign in may use to contact you.",
     "3": "What services have access to your contact phone number",
@@ -325,7 +324,7 @@
     "13": "Continue",
     "14": "Cancel"
   },
-  "YouMayUpdateEmailAtOtherPlaces":{
+  "YouMayUpdateEmailAtOtherPlaces": {
     "1": "Your email has been updated to",
     "2": "You may need to update your email other places",
     "3": "This only changes your email with services connected to your GC Sign in.",
@@ -335,7 +334,7 @@
     "7": "Back to profile",
     "8": "Sign out"
   },
-  "AreYouSureUpdateYourEmail":{
+  "AreYouSureUpdateYourEmail": {
     "1": "Are you sure you want to update your email?",
     "2": "You’ve requested to update your email to:",
     "3": "This will update the email you use to sign in, as well as the email the following services use to contact you:",
@@ -356,4 +355,3 @@
     "10": "Manage"
   }
 }
-
