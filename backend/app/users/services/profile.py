@@ -30,7 +30,6 @@ async def update_profile(
         )
     except ValidationError as e:
         logger.error(f"Validation Error: {e.json()}")
-        print(json.dumps(e.json(), indent=4))
         raise HTTPException(status_code=422, detail="Request data validation error")
 
     if response.status_code == 200:
@@ -58,7 +57,6 @@ async def my_profile(
         response = await global_http_client.get(profile_api_endpoint, headers=headers)
     except ValidationError as e:
         logger.error(f"Validation Error: {e.json()}")
-        print(json.dumps(e.json(), indent=4))
         raise HTTPException(status_code=422, detail="Request data validation error")
 
     if response.status_code == 200:
