@@ -7,18 +7,6 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field
 from app.utils.schemas import ResponseModel
 
 
-class UserLoginRequestData(BaseModel):
-    userName: EmailStr
-    password: str
-    trxnId: str
-
-
-class NewUserCreationData(BaseModel):
-    userName: EmailStr
-    password: str
-    trxnId: str
-
-
 class NotifyType(str, Enum):
     EMAIL = "EMAIL"
     NONE = "NONE"
