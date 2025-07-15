@@ -37,8 +37,9 @@ const DisplayPhoneNumbers = ({ phoneNumbers }) => {
               if (parsedPhoneNumber) {
                 profilePhoneNumber = parsedPhoneNumber.formatInternational();
               }
-            } catch (e) {
+            } catch (error) {
               console.warn(`Failed to parse phone number: ${phoneNumber.value}`);
+              console.warn(`Failed to parse phone number: ${error}`);
             }
             return (
               <GcdsText key={index} margin-bottom={isLast ? '400' : '0'} placeContent="center">

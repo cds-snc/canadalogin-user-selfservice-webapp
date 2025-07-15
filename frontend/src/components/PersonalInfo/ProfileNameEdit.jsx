@@ -48,7 +48,7 @@ export default function ProfileNameEdit() {
 
     useEffect(() => {
         dispatch({ type: CONTEXT_ACTIONS.clone_profile, payload: null });
-    }, []);
+    }, [dispatch, state.userProfile]);
 
     console.log('State', state)
 
