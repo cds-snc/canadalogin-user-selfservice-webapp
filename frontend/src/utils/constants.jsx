@@ -24,7 +24,7 @@ export const NAVIGATION_LINKS = {
     enterNewPhoneNumber: '/enterNewPhoneNumber',
     youMayUpdateEmailAtOtherPlaces: '/youMayUpdateEmailAtOtherPlaces',
     areYouSureUpdateYourEmail: '/areYouSureUpdateYourEmail',
-    securitySettings: '/securitysettings',,
+    securitySettings: '/securitysettings'
 };
 export const OIDC_REDIRECT = {
     login: `${config.apiUrl}/v1/auth/login`,
