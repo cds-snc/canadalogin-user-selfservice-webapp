@@ -20,6 +20,7 @@ async def redirect_to_verify(request: Request):
         # this request.url_for gets the url based on the callback route defined
         callback_route = request.url_for("callback_route")
         redirect_uri = callback_route
+        logger.info("Health check hit - headers: %s", dict(request.headers))
 
         if config.ENVIRONMENT != "local":
             redirect_uri = str(callback_route).replace("http://", "https://")
