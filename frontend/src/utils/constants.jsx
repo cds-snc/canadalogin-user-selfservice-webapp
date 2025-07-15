@@ -71,6 +71,7 @@ export const LINK_SUBMIT_TYPES = {
 }
 
 export const FORM_FIELDS = ['email', 'language', 'verificationCode', 'password', 'phone', 'verificationType', 'firstName', 'lastName'];
+export const FORM_FIELDS = ['email', 'language', 'verificationCode', 'password', 'phone', 'verificationType', 'firstName', 'lastName'];
 
 export const PAGES = {
     signup: 'SignUpEmail',

@@ -18,6 +18,18 @@ interface UserState {
 interface UserProviderProps {
     children: ReactNode;
     initial?: UserState;
+    payload: any
+}
+
+interface UserState {
+    userProfile: null;
+    userData: any;
+    isLoading: boolean;
+}
+
+interface UserProviderProps {
+    children: ReactNode;
+    initial?: UserState;
 }
 
 const initialState = {

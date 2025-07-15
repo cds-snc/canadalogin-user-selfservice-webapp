@@ -8,12 +8,15 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
+from starlette.middleware.sessions import SessionMiddleware
 
 from app.config import get_configuration
 from app.utils.helpers import generate_error_response
 
 from .routers import health
 from app.users import v1_router as v1_users_router
+from app.auth import v1_router as v1_auth_router
+from app.auth.services import oidc_config
 from app.auth import v1_router as v1_auth_router
 from app.auth.services import oidc_config
 
