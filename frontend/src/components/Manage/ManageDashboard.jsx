@@ -7,7 +7,6 @@ import {
 import {
     PAGES,
     NAVIGATION_LINKS
-    NAVIGATION_LINKS
 } from "../../utils/constants";
 import { useParams } from "react-router";
 import { useError } from "../../hooks/useError";
@@ -19,12 +18,8 @@ import { useUser } from "../Providers/useUser.tsx";
 export default function ManageDashboard() {
     const { language } = useParams();
     const { state } = useUser();
-    const username = state?.userProfile?.name.formatted || "";
     const { getError, hasErrors } = useError(language);
-    const { language } = useParams();
-    const { state } = useUser();
     const username = state?.userProfile?.name.formatted || "";
-    const { getError, hasErrors } = useError(language);
     const error = getError("#dashboard");
     const pageContent = getPageContent(language, PAGES.manageDashboard);
     const navigateHelper = useNavigateHelper();
@@ -42,9 +37,6 @@ export default function ManageDashboard() {
                     heading={error.heading}
                 />
             )}
-            <GcdsHeading tag="h1">
-                {pageContent['1']} {username}
-            </GcdsHeading>
             <GcdsHeading tag="h1">
                 {pageContent['1']} {username}
             </GcdsHeading>
