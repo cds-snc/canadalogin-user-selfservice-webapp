@@ -2,6 +2,15 @@ import ManageDashboard from "../components/Manage/ManageDashboard.jsx";
 import ProfileHome from "../components/Manage/ProfileHome";
 import config from '../config';
 export const AVAILABLE_LANGUAGES = { en: 'en', fr: 'fr' };
+export const PROFILE_LANGUAGES = {
+    en: 'en-ca',
+    fr: 'fr-ca',
+};
+export const LANGUAGE_DISPLAY_NAMES = {
+    'en-ca': 'English',
+    'fr-ca': 'French',
+};
+
 export const NAVIGATION_LINKS = {
     signUp: '/signup',
     verifyEmail: '/signup/verification/email',
@@ -24,6 +33,11 @@ export const NAVIGATION_LINKS = {
     enterNewPhoneNumber: '/enterNewPhoneNumber',
     youMayUpdateEmailAtOtherPlaces: '/youMayUpdateEmailAtOtherPlaces',
     areYouSureUpdateYourEmail: '/areYouSureUpdateYourEmail',
+    securitySettings: '/securitysettings',
+    editLanguagePreferences: '/editlanguage',
+    areYouSureEditYourLanguage: '/areYouSureEditYourLanguage',
+    profileYouMayUpdateLanguage: '/profileyoumayupdatelanguage'
+
 };
 export const OIDC_REDIRECT = {
     login: `${config.apiUrl}/v1/auth/login`,
@@ -35,6 +49,9 @@ export const CONTEXT_ACTIONS = {
     logOut: 'LOG_OUT',
     signin_success: 'SIGNIN_SUCCESS',
     signin_failure: 'SIGNIN_FAILURE',
+    clone_profile: 'CLONE_PROFILE',
+    update_profile: 'UPDATE_PROFILE',
+    updated_profile_success: 'UPDATE_PROFILE_SUCCESS',
 };
 
 export const FLOW_TYPES = {
@@ -77,8 +94,10 @@ export const PAGES = {
     enterNewPhoneNumber: 'EnterNewPhoneNumber',
     youMayUpdateEmailAtOtherPlaces: 'YouMayUpdateEmailAtOtherPlaces',
     areYouSureUpdateYourEmail: 'AreYouSureUpdateYourEmail',
-    securitySettings: 'SecuritySettings'
-
+    securitySettings: 'SecuritySettings',
+    editLanguagePreferences: 'EditLanguagePreferences',
+    areYouSureEditYourLanguage: 'AreYouSureEditYourLanguage',
+    profileYouMayUpdateLanguage: 'ProfileYouMayUpdateLanguage',
 }
 
 export const FOOTERS = {
@@ -107,6 +126,7 @@ export const SUBMIT_END_POINTS = {
     otpVerify: '/v1/otp/otp/verify',
     otpSend: '/v1/otp/otp/send',
     me: '/v1/users/me',
+    profile: '/v1/users/profile',
 }
 
 

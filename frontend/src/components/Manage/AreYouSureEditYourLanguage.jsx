@@ -8,22 +8,22 @@ import {
 } from "@cdssnc/gcds-components-react";
 import { useParams } from "react-router";
 
-import { getPageContent } from "../../utils/functions";
-import { PAGES, NAVIGATION_LINKS, CONTEXT_ACTIONS } from "../../utils/constants";
+import { getPageContent } from "../../utils/functions.jsx";
+import { PAGES, NAVIGATION_LINKS, CONTEXT_ACTIONS, LANGUAGE_DISPLAY_NAMES } from "../../utils/constants.jsx";
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
-import { useUser } from "../Providers/useUser";
+import { useUser } from "../Providers/useUser.tsx";
 import { authService } from "../../services/authService.jsx";
 
-export default function AreYouSureEditYourName() {
+export default function AreYouSureEditYourLanguage() {
   const { language } = useParams();
   const { state, dispatch } = useUser();
 
-  const pageContentJson = getPageContent(language, PAGES.areYouSureEditYourName);
+  const pageContentJson = getPageContent(language, PAGES.areYouSureEditYourLanguage);
   const navigateHelper = useNavigateHelper();
-  const successPage = `/${language}${NAVIGATION_LINKS.profileYouMayUpdateName}`;
+  const successPage = `/${language}${NAVIGATION_LINKS.profileYouMayUpdateLanguage}`;
   const backtoProfile = `/${language}${NAVIGATION_LINKS.profileHome}`;
 
-  const username = state?.editProfile?.name.formatted || "";
+  const selectedLanguage = state?.editProfile?.preferredLanguage || "";
 
   const saveUpdatedProfileData = async () => {
     try {
@@ -43,27 +43,25 @@ export default function AreYouSureEditYourName() {
 
   console.log("state", state)
 
+
   return (
     <GcdsContainer>
       <GcdsHeading tag="h1">{pageContentJson["1"]}</GcdsHeading>
       <GcdsText>
-        {pageContentJson["2"]} <strong>{username}</strong>.
+        {pageContentJson["2"]} <strong>{LANGUAGE_DISPLAY_NAMES[selectedLanguage]}</strong>.
       </GcdsText>
       <GcdsText>{pageContentJson["4"]}</GcdsText>
       <ul>
         <li>{pageContentJson["5"]}</li>
         <li>{pageContentJson["10"]}</li>
       </ul>
-      <GcdsNotice type="info" noticeTitleTag="h2" noticeTitle=' '>
-        <GcdsText>{pageContentJson["7"]}
-          <strong>{pageContentJson["11"]}</strong>
-          {pageContentJson["12"]}</GcdsText>
-      </GcdsNotice>
+
       <GcdsGrid columns="auto auto" gap="1rem" align-items="center">
         <GcdsButton onGcdsClick={async (ev) => {
           ev.preventDefault();
           const success = await saveUpdatedProfileData();
           if (success) { navigateHelper(successPage) }
+          navigateHelper(successPage)
         }}>
           {pageContentJson["8"]}
         </GcdsButton>
