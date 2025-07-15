@@ -56,7 +56,7 @@ class Configuration(BaseSettings):
 
     @property
     def profile_api_endpoint(self) -> str:
-        return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.ME.value}"
+        return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.PROFILE.value}"
 
     @property
     def oidc_well_known_config(self) -> str:
