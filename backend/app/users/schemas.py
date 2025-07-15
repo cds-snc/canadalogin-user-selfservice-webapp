@@ -63,9 +63,9 @@ class Meta(BaseModel):
 
 
 class Name(BaseModel):
-    formatted: str
-    familyName: str
-    givenName: Optional[str]
+    formatted: Optional[str] = None
+    familyName: Optional[str] = None
+    givenName: Optional[str] = None
 
 
 class ProfileGetResponseData(BaseModel):

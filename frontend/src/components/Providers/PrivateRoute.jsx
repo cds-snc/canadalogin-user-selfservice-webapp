@@ -1,52 +1,58 @@
-import {Navigate, useParams} from "react-router";
-import {useUser} from "./useUser.tsx";
-import {isEmailValid} from "../../utils/functions.jsx";
-import {FLOW_TYPES, PAGES} from "../../utils/constants.jsx";
+import { useEffect } from "react";
+import { Outlet } from "react-router";
+import { useUser } from "./useUser.tsx";
+import { isEmailValid } from "../../utils/functions.jsx";
+import { FLOW_TYPES, PAGES, OIDC_REDIRECT } from "../../utils/constants.jsx";
 
 
-function PrivateRoute ({route, children}){
-    const {state} = useUser();
-    const {flow, type} = useParams();
+function PrivateRoute() {
+    const { state } = useUser();
 
-    if(!isValidRoute(route, state, flow, type))
-        return <Navigate to="/" />;
-
-    return children;
-}
-
-function isValidRoute (page, state, flow, type) {
-
-    if(flow===FLOW_TYPES.signIn)
-        switch (page) {
-            case(PAGES.password):
-                return signIn.checkPasswordPage(state);
-            case(PAGES.verification):
-                return signIn.checkLoginValidation(state);
-            case(PAGES.verificationSelection):
-                return signIn.checkLoginValidation(state);
-            default:
-                return false;
+    useEffect(() => {
+        if (!state.isLoading && !state.userProfile) {
+            window.location.href = OIDC_REDIRECT.login;
         }
+    }, [state.isLoading, state.userProfile]);
 
-    switch(page){
-        case(PAGES.coreProfile):
-            return signUp.checkCoreProfilePage(state);
-        case(PAGES.verification):
-            return signUp.checkVerificationPage(state, type);
-        case(PAGES.verificationSetUp):
-            return signUp.checkVerificationSetUpPage(state);
-        case(PAGES.password):
-            return  signUp.checkPasswordPage(state);
-        case(PAGES.signup):
-            return signUp.checkSignUpPage(state);
-        default:
-            return false;
+    if (state.isLoading) return <div>Loading...</div>;
+    if (!state.userProfile) return null;
 
-    }
+    return <Outlet />;
 }
+
+// function isValidRoute(page, state, flow, type) {
+
+//     if (flow === FLOW_TYPES.signIn)
+//         switch (page) {
+//             case (PAGES.password):
+//                 return signIn.checkPasswordPage(state);
+//             case (PAGES.verification):
+//                 return signIn.checkLoginValidation(state);
+//             case (PAGES.verificationSelection):
+//                 return signIn.checkLoginValidation(state);
+//             default:
+//                 return false;
+//         }
+
+//     switch (page) {
+//         case (PAGES.coreProfile):
+//             return signUp.checkCoreProfilePage(state);
+//         case (PAGES.verification):
+//             return signUp.checkVerificationPage(state, type);
+//         case (PAGES.verificationSetUp):
+//             return signUp.checkVerificationSetUpPage(state);
+//         case (PAGES.password):
+//             return signUp.checkPasswordPage(state);
+//         case (PAGES.signup):
+//             return signUp.checkSignUpPage(state);
+//         default:
+//             return false;
+
+//     }
+// }
 
 const signUp = {
-    checkSignUpPage: (state)=> {
+    checkSignUpPage: (state) => {
         return state.userData.viewPrivacy;
     },
     checkVerificationPage: (state, type) => {
@@ -69,11 +75,11 @@ const signUp = {
 }
 
 const signIn = {
-    checkPasswordPage: (state) =>{
+    checkPasswordPage: (state) => {
         return isEmailValid(state.userData.email)
     },
     checkLoginValidation: (state) => {
-       return signIn.checkPasswordPage(state) && state.userData.passwordValidated && state.userData.phone && state.userData.id;
+        return signIn.checkPasswordPage(state) && state.userData.passwordValidated && state.userData.phone && state.userData.id;
 
     }
 }
