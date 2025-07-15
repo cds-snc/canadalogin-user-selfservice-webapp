@@ -10,7 +10,7 @@ from app.utils.helpers import generate_error_response, string_error_response
 logger = logging.getLogger(__name__)
 
 
-async def get_redirect_url(request: Request):
+async def redirect_to_verify(request: Request):
     """
     Get the redirect URL for the OAuth login flow.
     This function is used to initiate the login process with IBM Verify.
