@@ -1,6 +1,5 @@
 from functools import lru_cache
 from typing import List, Optional
-from typing import List, Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import AnyUrl, Field
 from app.constants.verify_endpoints import VerifyAPIEndpoint
