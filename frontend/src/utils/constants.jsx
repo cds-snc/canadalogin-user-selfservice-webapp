@@ -79,7 +79,6 @@ export const PAGES = {
     youMayUpdateEmailAtOtherPlaces: 'YouMayUpdateEmailAtOtherPlaces',
     areYouSureUpdateYourEmail: 'AreYouSureUpdateYourEmail',
     securitySettings: 'SecuritySettings',
-    securitySettings: 'SecuritySettings'
 
 }
 
