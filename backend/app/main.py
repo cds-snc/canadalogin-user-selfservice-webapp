@@ -52,7 +52,9 @@ async def lifespan(app: FastAPI):
     logger.info("Starting IBM Verify Integration API")
     logger.info(f"Tenant URL: {ibm_verify_config.IBM_VERIFY_TENANT_URL}")
     logger.info(f"Client ID: {ibm_verify_config.IBM_VERIFY_API_CLIENT_ID}")
-    logger.info(f"PROFILE_MANAGEMENT_CLIENT_ID: {ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID}")
+    logger.info(
+        f"PROFILE_MANAGEMENT_CLIENT_ID: {ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID}"
+    )
     logger.info("Application startup complete")
     app.state.request_client = httpx.AsyncClient()
     oidc_config.register_oidc(app.state.config)
