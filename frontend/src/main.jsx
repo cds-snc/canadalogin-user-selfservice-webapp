@@ -7,8 +7,10 @@ import './index.css';
 import { BrowserRouter } from "react-router";
 import ReactGA from "react-ga4";
 import { UserProvider } from "./components/Providers/UserProvider";
+import { LanguageProvider } from './components/Providers/LanguageProvider.js';
 
 import config from "./config.jsx";
+import { AppLanguageSetup } from './components/Providers/SetAppLanguage.js';
 
 console.log('Starting React application...here');// Debug log
 
@@ -23,11 +25,14 @@ try {
             <Suspense fallback="Loading...">
                 <UserProvider>
                     <BrowserRouter>
-                        <App />
+                        <LanguageProvider>
+                            <AppLanguageSetup />
+                            <App />
+                        </LanguageProvider>
                     </BrowserRouter>
                 </UserProvider>
             </Suspense>
-        </StrictMode>
+        </StrictMode >
     );
     console.log('React application rendered successfully'); // Debug log
 } catch (error) {

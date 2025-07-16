@@ -52,6 +52,7 @@ export const CONTEXT_ACTIONS = {
     clone_profile: 'CLONE_PROFILE',
     update_profile: 'UPDATE_PROFILE',
     updated_profile_success: 'UPDATE_PROFILE_SUCCESS',
+    set_language: 'SET_LANGUAGE',
 };
 
 export const FLOW_TYPES = {
