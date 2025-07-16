@@ -5,11 +5,11 @@
 '  Install the VScode extension: PlantUML jebbs
 '  Right click on the diagram and select "Preview Current Diagram"
 
-title OIDC Flow Management App Sequence Diagram
+title OIDC Flow for Profile Management App
 
 actor User
 participant RP_Geo
-participant ReactApp as "React App\napp.gc-signin.cdssandbox.xyz"
+participant ReactApp as "Profile Management App\napp.gc-signin.cdssandbox.xyz"
 participant FastAPI as "FastAPI Backend\napi.gc-signin.cdssandbox.xyz"
 participant IBMVerify as "IBM Verify IDP"
 
