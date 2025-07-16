@@ -124,6 +124,25 @@ function userReducer(state = initialState, action: Action) {
                 ...state,
                 userProfile: action.payload,
             };
+        case CONTEXT_ACTIONS.clone_profile:
+            return {
+                ...state,
+                editProfile: { ...state.userProfile || {} }
+            };
+        case CONTEXT_ACTIONS.update_profile:
+            console.log(action.payload)
+            return {
+                ...state,
+                editProfile: {
+                    ...state.editProfile || {},
+                    ...action.payload
+                }
+            };
+        case CONTEXT_ACTIONS.updated_profile_success:
+            return {
+                ...state,
+                userProfile: action.payload,
+            };
         default:
             return state;
     }
