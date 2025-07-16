@@ -41,8 +41,9 @@ export default function ManageDashboard() {
                 {pageContent['1']} {username}
             </GcdsHeading>
 
-            <GcdsGrid tag="managedashboard" columnsDesktop="1fr 1fr" columnsTablet="1fr 1fr" columns="repeat(auto-fit, minmax(200px, 250px))" placeContent="center">
+            <GcdsGrid columns="repeat(auto-fit, minmax(200px, 450px))" >
                 <GcdsCard
+                    className="dashboard-card"
                     cardTitle={pageContent['2']}
                     cardTitleTag="h3"
                     href={personalInformationLink}
@@ -60,7 +61,9 @@ export default function ManageDashboard() {
                         <path d="M38.7986 58.4707V51.2354L51.7986 38.2942C52.1515 37.9413 52.5437 37.6864 52.975 37.5295C53.4064 37.3727 53.8378 37.2942 54.2692 37.2942C54.7398 37.2942 55.1907 37.3825 55.6221 37.5589C56.0535 37.7354 56.4456 38.0001 56.7986 38.353L58.975 40.5295C59.2888 40.8825 59.5339 41.2746 59.7103 41.706C59.8868 42.1374 59.975 42.5687 59.975 43.0001C59.975 43.4315 59.8966 43.8727 59.7398 44.3236C59.5829 44.7746 59.328 45.1766 58.975 45.5295L46.0339 58.4707H38.7986ZM42.328 54.9413H44.5633L51.6809 47.7648L50.6221 46.6472L49.5045 45.5883L42.328 52.706V54.9413ZM50.6221 46.6472L49.5045 45.5883L51.6809 47.7648L50.6221 46.6472Z" fill="#26374A" />
                     </svg>
                 </GcdsCard>
+
                 <GcdsCard
+                    className="dashboard-card"
                     cardTitle={pageContent['3']}
                     cardTitleTag="h3"
                     href={securitySettingsLink}
