@@ -1,7 +1,5 @@
 import React from 'react';
 import { useParams } from 'react-router';
-import { getPageContent } from '../../utils/functions.jsx';
-import { PAGES } from '../../utils/constants.jsx';
 import {
   GcdsContainer,
   GcdsHeading,
@@ -9,33 +7,122 @@ import {
   GcdsText,
   GcdsLink
 } from '@cdssnc/gcds-components-react';
+import parsePhoneNumberFromString from 'libphonenumber-js';
+
+import { getPageContent, capitalizeFirstLetter } from '../../utils/functions.jsx';
+import { PAGES, NAVIGATION_LINKS, LANGUAGE_DISPLAY_NAMES } from '../../utils/constants.jsx';
+import { useUser } from "../Providers/useUser.tsx";
+import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
+
+
+
+const DisplayPhoneNumbers = ({ phoneNumbers }) => {
+  console.log("phoneNumbers", phoneNumbers)
+
+  return (
+    <>
+
+      <GcdsGrid columns="1fr">
+
+        {
+          phoneNumbers.map((phoneNumber, index) => {
+            let profilePhoneNumber = `+${phoneNumber.value}`;
+            let numberType = capitalizeFirstLetter(phoneNumber.type)
+            const isLast = index === phoneNumbers.length - 1;
+
+            try {
+
+              const parsedPhoneNumber = parsePhoneNumberFromString(profilePhoneNumber);
+
+              if (parsedPhoneNumber) {
+                profilePhoneNumber = parsedPhoneNumber.formatInternational();
+              }
+            } catch (error) {
+              console.warn(`Failed to parse phone number: ${phoneNumber.value}`);
+              console.warn(`Failed to parse phone number: ${error}`);
+            }
+            return (
+              <GcdsText key={index} margin-bottom={isLast ? '400' : '0'} placeContent="center">
+                {numberType}: {profilePhoneNumber}
+              </GcdsText>
+            )
+
+          })
+        }
+      </GcdsGrid>
+
+    </>
+  )
+}
+
+const ContactPhoneNumber = (props) => {
+  const { pageContent, phoneNumbers } = props;
+  return (
+    <>
+
+      <GcdsHeading tag="h3" marginTop='300'>{pageContent['10']}</GcdsHeading>
+      <GcdsText>{pageContent['11']}</GcdsText>
+
+      <GcdsGrid columns="1fr auto" className="gridInline">
+        <DisplayPhoneNumbers phoneNumbers={phoneNumbers} />
+
+        <GcdsLink href="#" size="regular">
+          {pageContent['5']}
+        </GcdsLink>
+      </GcdsGrid>
+
+      <gcds-grid columns="auto auto" className="verifiedBadge verifiedBadgeBottom">
+        <gcds-icon name="check" className="verifiedIcon" size="md" />
+        <gcds-text className="verifiedText">
+          {pageContent['9']}
+        </gcds-text>
+      </gcds-grid>
+    </>
+  )
+}
 
 export default function ProfileHome() {
   const { language } = useParams();
   const pageContent = getPageContent(language, PAGES.ProfileHome);
+  const { state } = useUser();
+  const navigateHelper = useNavigateHelper();
+  const name = state?.userProfile?.name.formatted || "";
+  const email = state?.userProfile?.userName || "";
+  const phoneNumbers = state?.userProfile?.phoneNumbers;
+  const preferredLanguage = state?.userProfile?.preferredLanguage || "";
+
+  const editProfile = `/${language}${NAVIGATION_LINKS.ProfileNameEdit}`;
+  const editLanguagePreferences = `/${language}${NAVIGATION_LINKS.editLanguagePreferences}`
+
+
 
   return (
     <GcdsContainer>
       <GcdsHeading tag="h1">{pageContent['1']}</GcdsHeading>
       <GcdsHeading tag="h2">{pageContent['2']}</GcdsHeading>
 
-      <gcds-container className="sectionCard">
+      <GcdsContainer className="sectionCard">
         <GcdsHeading tag="h6" marginTop='300'>{pageContent['3']}</GcdsHeading>
         <GcdsGrid columns="1fr auto" className="gridInline">
-          <GcdsText>{pageContent['4']}</GcdsText>
-          <GcdsLink href="#" size="regular">
+          <GcdsText>{name}</GcdsText>
+          <GcdsLink href={editProfile} size="regular"
+            onGcdsClick={(ev) => {
+              ev.preventDefault();
+              navigateHelper(ev.detail)
+            }}
+          >
             {pageContent['5']}
           </GcdsLink>
         </GcdsGrid>
-      </gcds-container>
+      </GcdsContainer>
 
       <GcdsHeading tag="h2" marginTop='300'>{pageContent['6']}</GcdsHeading>
-      <gcds-container className="sectionCard">
+      <GcdsContainer className="sectionCard">
         <GcdsHeading tag="h3" marginTop='300'>{pageContent['7']}</GcdsHeading>
         <GcdsText>{pageContent['8']}</GcdsText>
 
         <GcdsGrid columns="1fr auto" className="gridInline">
-          <GcdsText>Ex****@gmail.com</GcdsText>
+          <GcdsText>{email}</GcdsText>
           <GcdsLink href="#" size="regular">
             {pageContent['5']}
           </GcdsLink>
@@ -47,33 +134,26 @@ export default function ProfileHome() {
             {pageContent['9']}
           </gcds-text>
         </gcds-grid>
+        {
+          phoneNumbers != null ? (
+            <>
+              <div className="separator" />
+              <ContactPhoneNumber pageContent={pageContent} phoneNumbers={phoneNumbers} />
+            </>
+          ) : null
+        }
 
-        <div className="separator" />
-
-        <GcdsHeading tag="h3" marginTop='300'>{pageContent['10']}</GcdsHeading>
-        <GcdsText>{pageContent['11']}</GcdsText>
-
-        <GcdsGrid columns="1fr auto" className="gridInline">
-          <GcdsText>+1 (***) ***-2839</GcdsText>
-          <GcdsLink href="#" size="regular">
-            {pageContent['5']}
-          </GcdsLink>
-        </GcdsGrid>
-
-        <gcds-grid columns="auto auto" className="verifiedBadge verifiedBadgeBottom">
-          <gcds-icon name="check" className="verifiedIcon" size="sm" />
-          <gcds-text className="verifiedText">
-            {pageContent['9']}
-          </gcds-text>
-        </gcds-grid>
-      </gcds-container>
+      </GcdsContainer>
 
       <GcdsHeading tag="h2">{pageContent['12']}</GcdsHeading>
-      <gcds-container className="sectionCard">
+      <GcdsContainer className="sectionCard">
         <GcdsHeading tag="h3" marginTop='300'>{pageContent['13']}</GcdsHeading>
         <GcdsGrid columns="1fr auto" className="gridInline">
-          <GcdsText>{pageContent['14']}</GcdsText>
-          <GcdsLink href="#" size="regular">
+          <GcdsText>{LANGUAGE_DISPLAY_NAMES[preferredLanguage]}</GcdsText>
+          <GcdsLink href={editLanguagePreferences} size="regular" onGcdsClick={(ev) => {
+            ev.preventDefault();
+            navigateHelper(ev.detail)
+          }}>
             {pageContent['5']}
           </GcdsLink>
         </GcdsGrid>
@@ -83,7 +163,7 @@ export default function ProfileHome() {
         <GcdsHeading tag="h3" marginTop='300'>{pageContent['15']}</GcdsHeading>
         <GcdsText>{pageContent['16']}</GcdsText>
         <GcdsText>{pageContent['17']}</GcdsText>
-      </gcds-container>
+      </GcdsContainer>
     </GcdsContainer>
   );
 }

@@ -18,6 +18,18 @@ interface UserState {
 interface UserProviderProps {
     children: ReactNode;
     initial?: UserState;
+    payload: any
+}
+
+interface UserState {
+    userProfile: null;
+    userData: any;
+    isLoading: boolean;
+}
+
+interface UserProviderProps {
+    children: ReactNode;
+    initial?: UserState;
 }
 
 const initialState = {
@@ -38,7 +50,8 @@ const initialState = {
         otpType: null,
         passwordValidated: false
     },
-    userProfile: null
+    userProfile: null,
+    editProfile: null
 }
 
 
@@ -60,6 +73,25 @@ function userReducer(state = initialState, action: Action) {
                 ...state,
                 userProfile: null,
                 isLoading: false
+            };
+        case CONTEXT_ACTIONS.clone_profile:
+            return {
+                ...state,
+                editProfile: { ...state.userProfile || {} }
+            };
+        case CONTEXT_ACTIONS.update_profile:
+            console.log(action.payload)
+            return {
+                ...state,
+                editProfile: {
+                    ...state.editProfile || {},
+                    ...action.payload
+                }
+            };
+        case CONTEXT_ACTIONS.updated_profile_success:
+            return {
+                ...state,
+                userProfile: action.payload,
             };
         default:
             return state;

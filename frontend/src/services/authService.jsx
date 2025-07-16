@@ -73,6 +73,10 @@ export const authService = {
         const response = await axios.get(`${config.apiUrl}${SUBMIT_END_POINTS.me}`);
         return response.data;
     },
+    update_my_user_profile: async (editedProfile) => {
+        const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.profile}`, editedProfile);
+        return response.data;
+    },
 }
 
 function buildTestResponse(userData, type) {
