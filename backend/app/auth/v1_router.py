@@ -2,7 +2,7 @@ import logging
 
 from fastapi import APIRouter
 from fastapi import Request
-from app.auth.services.auth import get_redirect_url, callback_handler
+from app.auth.services.auth import redirect_to_verify, callback_handler
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
     description="",
 )
 async def redirect_url(request: Request):
-    return await get_redirect_url(request)
+    return await redirect_to_verify(request)
 
 
 @router.get(

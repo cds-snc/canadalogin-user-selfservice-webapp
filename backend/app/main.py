@@ -9,7 +9,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 
-from app.config import get_settings
+from app.config import get_configuration
 from app.utils.helpers import generate_error_response
 
 from .routers import health
@@ -17,7 +17,7 @@ from app.users import v1_router as v1_users_router
 from app.auth import v1_router as v1_auth_router
 from app.auth.services import oidc_config
 
-settings = get_settings()
+configuration = get_configuration()
 
 logging.basicConfig(
     level=logging.INFO,
@@ -40,23 +40,27 @@ The API endpoints enable our custom frontend application to implement complex wo
 
 CONTACT_INFO = {
     "name": "GC Sign In Team",
-    "url": settings.app_info.github_url,
-    "email": settings.app_info.email,
+    "url": configuration.app_info.github_url,
+    "email": configuration.app_info.email,
 }
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    app.state.config = get_settings()
+    app.state.config = configuration
     ibm_verify_config = app.state.config.ibm_verify_config
     logger.info("Starting IBM Verify Integration API")
     logger.info(f"Tenant URL: {ibm_verify_config.IBM_VERIFY_TENANT_URL}")
     logger.info(f"Client ID: {ibm_verify_config.IBM_VERIFY_API_CLIENT_ID}")
+    logger.info(
+        f"PROFILE_MANAGEMENT_CLIENT_ID: {ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID}"
+    )
     logger.info("Application startup complete")
     app.state.request_client = httpx.AsyncClient()
-    oidc_config.register_oidc(ibm_verify_config)
-    print(settings.cors_origins_list)
-    logger.info(f"CORS Origins: {settings.cors_origins_list}")
+    oidc_config.register_oidc(app.state.config)
+    logger.info(f"CORS Origins: {app.state.config.cors_origins_list}")
+    logger.info(f"oidc_well_known_config: {app.state.config.oidc_well_known_config}")
+    logger.info(f"my_profile_endpoint: {app.state.config.profile_api_endpoint}")
     yield
     logger.info("Closing global HTTP client")
     await app.state.request_client.aclose()
@@ -65,15 +69,15 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     lifespan=lifespan,
-    title=settings.app_info.app_name,
+    title=configuration.app_info.app_name,
     description=API_DESCRIPTION,
     contact=CONTACT_INFO,
 )
 
 # Determine session domain
 session_domain = None
-if settings.ENVIRONMENT != "local":
-    session_domain = f".{settings.ROOT_DOMAIN}"
+if configuration.ENVIRONMENT != "local":
+    session_domain = f".{configuration.ROOT_DOMAIN}"
 logger.info(f"ROOT_DOMAIN: {session_domain}")
 
 # Sets the session cookie - https://docs.authlib.org/en/latest/client/fastapi.html
@@ -81,7 +85,7 @@ logger.info(f"ROOT_DOMAIN: {session_domain}")
 app.add_middleware(
     SessionMiddleware,
     secret_key="some-random-string",  # Use a strong secret in production
-    https_only=settings.ENVIRONMENT != "local",
+    https_only=configuration.ENVIRONMENT != "local",
     same_site="lax",  # Can be "strict", "lax", or "none"
     domain=session_domain,
 )
@@ -89,7 +93,7 @@ app.add_middleware(
 # CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins_list,
+    allow_origins=configuration.cors_origins_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -101,13 +105,13 @@ app.include_router(health.router, prefix="/health")
 
 app.include_router(
     v1_users_router.router,
-    prefix=f"{settings.V1_API_VERSION}/users",
+    prefix=f"{configuration.V1_API_VERSION}/users",
     tags=["Users"],
 )
 
 app.include_router(
     v1_auth_router.router,
-    prefix=f"{settings.V1_API_VERSION}/auth",
+    prefix=f"{configuration.V1_API_VERSION}/auth",
     tags=["Auth"],
 )
 

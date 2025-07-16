@@ -1,5 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router';
+import { format } from 'date-fns';
 import { getPageContent } from '../../utils/functions.jsx';
 import { PAGES } from '../../utils/constants.jsx';
 import {
@@ -9,12 +10,16 @@ import {
     GcdsText,
     GcdsLink, GcdsIcon
 } from '@cdssnc/gcds-components-react';
+import { useUser } from "../Providers/useUser.tsx";
+
 
 
 export default function SecuritySettings() {
     const { language } = useParams();
     const pageContent = getPageContent(language, PAGES.securitySettings);
-
+    const { state } = useUser();
+    const lastPasswordChange = state?.userProfile?.details?.pwdChangedTime || "";
+    const formattedPasswordChangeDate = format(new Date(lastPasswordChange), 'MMMM d, yyyy');
     return (
         <GcdsContainer>
             <GcdsHeading tag="h1">{pageContent['1']}</GcdsHeading>
@@ -23,7 +28,7 @@ export default function SecuritySettings() {
             <GcdsContainer className="sectionCard">
                 <GcdsHeading tag="h3">{pageContent['4']}</GcdsHeading>
                 <GcdsGrid columns="1fr" gap="1rem" align-items="center">
-                    <GcdsText>{pageContent['5']}</GcdsText>
+                    <GcdsText>{pageContent['5']} {formattedPasswordChangeDate}</GcdsText>
                     <GcdsLink href="#" size="regular">
                         {pageContent['6']}
                     </GcdsLink>

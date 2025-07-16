@@ -1,9 +1,13 @@
 import { Routes, Route, Navigate } from 'react-router';
 import PrivateRoute from "./components/Providers/PrivateRoute.jsx";
 import Page from "./views/Page.js";
-import { PAGES } from "./utils/constants.jsx";
+import { PAGES, NAVIGATION_LINKS } from "./utils/constants.jsx";
 
 function App() {
+    const editLanguagePreferences = `/:language${NAVIGATION_LINKS.editLanguagePreferences}`
+    const areYouSureEditYourLanguage = `/:language${NAVIGATION_LINKS.areYouSureEditYourLanguage}`
+    const profileYouMayUpdateLanguage = `/:language${NAVIGATION_LINKS.profileYouMayUpdateLanguage}`
+
     return (
         <Routes>
             <Route element={<PrivateRoute />}>
@@ -22,6 +26,9 @@ function App() {
                 <Route path="/:language/youMayUpdateEmailAtOtherPlaces" element={<Page page={PAGES.youMayUpdateEmailAtOtherPlaces} />} />
                 <Route path="/:language/areYouSureUpdateYourEmail" element={<Page page={PAGES.areYouSureUpdateYourEmail} />} />
                 <Route path="/:language/securitysettings" element={<Page page={PAGES.securitySettings} />} />
+                <Route path={editLanguagePreferences} element={<Page page={PAGES.editLanguagePreferences} />} />
+                <Route path={areYouSureEditYourLanguage} element={<Page page={PAGES.areYouSureEditYourLanguage} />} />
+                <Route path={profileYouMayUpdateLanguage} element={<Page page={PAGES.profileYouMayUpdateLanguage} />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
         </Routes>
