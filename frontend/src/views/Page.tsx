@@ -167,7 +167,7 @@ export default function Page({ page }: { page: string }) {
     useEffect(() => {
         trackPage(pathname, page)
     }, [pathname]);
-
+    console.log("currentLang", currentLang)
     return (
         <div className="mainBody">
             <Header langHref={langHref} currentLang={currentLang} service={state.userData.service} />

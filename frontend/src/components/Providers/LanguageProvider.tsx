@@ -1,5 +1,8 @@
 import { createContext, useContext, useReducer, ReactNode, Dispatch } from "react";
 import { LANGUAGE_DISPLAY_NAMES, AVAILABLE_LANGUAGES, PROFILE_LANGUAGES, CONTEXT_ACTIONS } from "../../utils/constants.jsx";
+import { validateSelectedLanguage } from "../../utils/functions.jsx";
+
+
 
 const initialState = {
     language: AVAILABLE_LANGUAGES.en,
@@ -42,9 +45,8 @@ export const LanguageProvider = ({ children, initial = initialState }: LanguageP
     const [state, dispatch] = useReducer(languageReducer, initial);
 
     const setAppLanguage = (selectedLanguage) => {
-        const base = selectedLanguage.split("-")[0].toLowerCase();
-        const languageValue = [AVAILABLE_LANGUAGES.en, AVAILABLE_LANGUAGES.fr].includes(base) ? (base as "en" | "fr") : "en";
-        dispatch({ type: CONTEXT_ACTIONS.set_language, payload: languageValue });
+        const languageToDisplay = validateSelectedLanguage(selectedLanguage);
+        dispatch({ type: CONTEXT_ACTIONS.set_language, payload: languageToDisplay });
     };
 
     return (

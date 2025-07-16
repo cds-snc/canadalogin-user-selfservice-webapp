@@ -10,7 +10,7 @@ import { UserProvider } from "./components/Providers/UserProvider";
 import { LanguageProvider } from './components/Providers/LanguageProvider.js';
 
 import config from "./config.jsx";
-import { AppLanguageSetup } from './components/Providers/SetAppLanguage.js';
+import { AppLanguageSetup } from './components/Providers/AppLanguageSetup.js';
 
 console.log('Starting React application...here');// Debug log
 

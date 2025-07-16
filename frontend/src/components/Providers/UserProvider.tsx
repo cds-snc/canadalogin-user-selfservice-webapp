@@ -54,7 +54,7 @@ interface UserProviderProps {
 
 
 const initialState = {
-    isLoading: false,
+    isLoading: true,
     userData: {
         service: SERVICES[0].title, //to be set later when url referrer is given, also need to refactor other pages to use this value
         language: 'en', //to be set later when refactoring possibly
@@ -71,17 +71,7 @@ const initialState = {
         otpType: null,
         passwordValidated: false
     },
-    userProfile: {
-        active: true,
-        details: { emailVerified: null, lastLogin: '2025-07-15T20:40:15Z', lastMFA: null, twoFactorAuthentication: false, pwdChangedTime: '2025-07-14T14:04:48Z' },
-        emails: null,
-        id: "772001FQY9",
-        meta: { created: '2025-07-14T14:04:48Z', location: 'https://cds-gcsignin-dev.verify.ibm.com/v2.0/Users/772001FQY9', lastModified: '2025-07-15T20:40:15Z', resourceType: 'User' },
-        name: { formatted: 'Test Here', familyName: 'Here', givenName: 'Test' },
-        phoneNumbers: null,
-        preferredLanguage: "en-ca",
-        userName: "mahamoud.mohamoud+1@cds-snc.ca"
-    },
+    userProfile: null,
     editProfile: null
 }
 
