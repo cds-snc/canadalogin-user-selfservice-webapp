@@ -37,7 +37,8 @@
 				"mermaidchart.vscode-mermaid-chart",
 				"eamodio.gitlens",
 				"github.vscode-github-actions",
-				"ms-vscode.makefile-tools"
+				"ms-vscode.makefile-tools",
+				"jebbs.plantuml"
 			],
 			"settings": {
 				"[terraform]": {
