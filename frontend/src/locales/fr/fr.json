@@ -370,5 +370,17 @@
     "10": "Talent numérique",
     "11": "ne modifie pas",
     "12": "légalement votre nom."
+  },
+  "SecuritySettings": {
+    "1": "Paramètres de sécurité",
+    "2": "Comment vous vous connectez à Connexion GC",
+    "3": "Veillez à toujours avoir accès à votre compte Connexion GC en maintenant ces renseignements à jour.",
+    "4": "Mot de passe",
+    "5": "Dernière modification le 3 janvier 2025",
+    "6": "Modifier",
+    "7": "Vérification en deux étapes",
+    "8": "L’ajout d’une étape supplémentaire à la vérification de votre mot de passe permet de confirmer votre identité.",
+    "9": "Activée",
+    "10": "Gérer"
   }
 }
