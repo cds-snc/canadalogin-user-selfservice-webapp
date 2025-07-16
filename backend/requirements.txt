@@ -13,3 +13,5 @@ email-validator==2.2.0
 pydantic-extra-types==2.10.5
 phonenumbers==9.0.8
 cachetools==5.5.2
+authlib==1.6.0
+itsdangerous==2.2.0

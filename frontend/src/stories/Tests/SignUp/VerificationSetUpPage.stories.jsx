@@ -8,8 +8,7 @@ import {getPageContent} from "../../../utils/functions.jsx";
 import {
     ACTION_TYPES,
     MSW_MOCKS, PHONE_NUMBER_ERROR_RESPONSE,
-    TEST_TYPES,
-    TEST_USERS
+    TEST_TYPES
 } from "../utils/constants.jsx";
 import {buildTestCase, testCase, TestTemplate} from "../utils/functions.tsx";
 
@@ -149,21 +148,6 @@ SuccessfulBackEnd.play = async ({ canvasElement, step }) => {
         step,
         stepMessage: "Submit form with good phone number for SMS",
         link: 'phone',
-        delay: 1000,
-        actionType: ACTION_TYPES.submit,
-        type: TEST_TYPES.redirect,
-        input: {inputType: 'textBox', stepMessage:'Enter phone Number with enough digits.', value: '4161234567'}
-    })
-}
-
-TestUser.args ={email: TEST_USERS.keys().next().value };
-TestUser.play = async ({ canvasElement, step }) => {
-
-    await testCase({
-        canvasElement,
-        step,
-        stepMessage: "Submit form with test user",
-        link: 'email',
         delay: 1000,
         actionType: ACTION_TYPES.submit,
         type: TEST_TYPES.redirect,

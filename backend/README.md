@@ -36,6 +36,13 @@ docker run -p 8000:8000 \
   gc-signin-backend
 ```
 
+3. You can also run the fastapi server locally from the root folder:
+Start the server from the root directory with the [FastAPI CLI](https://fastapi.tiangolo.com/#run-it) command or Uvicorn
+```
+make install-dev-python
+fastapi run backend/app/main.py or uvicorn app.main:app --reload --app-dir backend
+```
+
 The API will be available at `http://localhost:8000`
 
 ### API Documentation
@@ -134,4 +141,8 @@ To run the unit tests, follow these steps:
 - Run Lint (from root folder)
    ```bash
    make lint-python
+   ```
+- Building a Dockerimage from your macbook M1 to AWS
+   ``` bash
+   docker buildx  build --platform linux/amd64 -t [NAME] .
    ```

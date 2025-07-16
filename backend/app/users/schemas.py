@@ -2,21 +2,9 @@ from datetime import datetime
 from enum import Enum
 from typing import List, Optional
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 from app.utils.schemas import ResponseModel
-
-
-class UserLoginRequestData(BaseModel):
-    userName: EmailStr
-    password: str
-    trxnId: str
-
-
-class NewUserCreationData(BaseModel):
-    userName: EmailStr
-    password: str
-    trxnId: str
 
 
 class NotifyType(str, Enum):
@@ -55,6 +43,19 @@ class EmailItem(BaseModel):
     value: EmailStr
 
 
+class MetaDataTypeValue(BaseModel):
+    type: Optional[str] = None
+    value: Optional[str] = None
+
+
+class SCIMUserDetails(BaseModel):
+    emailVerified: Optional[str] = None
+    lastLogin: Optional[str] = None
+    lastMFA: Optional[List[MetaDataTypeValue]] = None
+    twoFactorAuthentication: Optional[bool] = None
+    pwdChangedTime: Optional[str] = None
+
+
 class Meta(BaseModel):
     created: datetime
     location: str
@@ -62,23 +63,41 @@ class Meta(BaseModel):
     resourceType: str
 
 
-class Name(BaseModel):
-    formatted: str
-    familyName: str
-    givenName: Optional[str]
+class UserProfileName(BaseModel):
+    formatted: Optional[str] = None
+    familyName: Optional[str] = None
+    givenName: Optional[str] = None
 
 
 class ProfileGetResponseData(BaseModel):
-    emails: List[EmailItem]
+    emails: List[EmailItem] = None
     preferredLanguage: Optional[str] = None
     meta: Meta
-    name: Optional[Name] = None
+    name: Optional[UserProfileName] = None
     active: bool
     id: str
     userName: EmailStr
+    phoneNumbers: Optional[List[MetaDataTypeValue]] = None
+    details: Optional[SCIMUserDetails] = Field(
+        default=None,
+        validation_alias="urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+        serialization_alias="details",
+    )
+    model_config = ConfigDict(validate_by_name=True, validate_by_alias=True)
 
-    class Config:
-        populate_by_name = True
+
+class ProfilePUTData(BaseModel):
+    schemas: List[str] = Field(
+        default=[
+            "urn:ietf:params:scim:schemas:core:2.0:User",
+            "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+        ]
+    )
+    preferredLanguage: Optional[str] = None
+    name: Optional[UserProfileName] = None
+    userName: EmailStr
+    phoneNumbers: Optional[List[MetaDataTypeValue]] = None
+    model_config = ConfigDict(validate_by_name=True, validate_by_alias=True)
 
 
 class ProfileResponse(ResponseModel):
