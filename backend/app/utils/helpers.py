@@ -1,6 +1,6 @@
+from typing import Dict
 from fastapi.responses import JSONResponse
 from pydantic_extra_types.phone_numbers import PhoneNumber
-from typing import Dict
 from app.utils.schemas import ResponseModel
 
 
@@ -23,3 +23,11 @@ def format_error_response(json: Dict):
     message_id = json.get("messageId", "Unknown error")
     message_description = json.get("messageDescription", "Unknown error")
     return f"{message_id} - {message_description}"
+
+
+def string_error_response(message: str = None, description: str = None) -> str:
+    if not message:
+        message = "Unknown error"
+    if not description:
+        description = ""
+    return f"{message} - {description}"
