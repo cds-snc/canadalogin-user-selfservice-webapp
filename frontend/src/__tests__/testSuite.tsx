@@ -8,6 +8,7 @@ import * as engJson from '../locales/en/en.json';
 // @ts-ignore
 import * as frJson from '../locales/fr/fr.json';
 import { PAGES } from "../utils/constants.jsx";
+import {page} from "@vitest/browser/context";
 
 const subLinks = { attribute: 'sub-links', en: getFooter(AVAILABLE_LANGUAGES.en), fr: getFooter(AVAILABLE_LANGUAGES.fr) };
 const GCDS_TAG_ATTRIBUTES = {
@@ -57,7 +58,10 @@ const GCDS_TAG_ATTRIBUTES = {
     },
     'gcds-card': {
         attributes:['card-title', 'href', 'card-title-tag']
-    }
+    },
+    'gcds-grid': {
+        attributes: []
+    },
 }
 
 interface TestParameters {
@@ -84,6 +88,8 @@ const pageSetup = {
     button: (page:string, language: string) => {
         switch(page){
             case PAGES.manageDashboard:
+                return null;
+            case PAGES.securitySettings:
                 return null;
             default:
                 return language !== AVAILABLE_LANGUAGES.fr ? engJson['Button'] : frJson['Button'];
@@ -277,6 +283,11 @@ const pageSetup = {
         const gcdsElementMap = new Map();
         gcdsElementMap.set('2',['gcds-card', createMap('gcds-card', [pageContentJson['2'], '#', 'h3'])]);
         gcdsElementMap.set('3',['gcds-card', createMap('gcds-card', [pageContentJson['3'], '#', 'h3'])]);
+        return gcdsElementMap;
+    },
+    securitySettingsGcdsMap: (pageContentJson: JSON) => {
+        const gcdsElementMap = new Map();
+
         return gcdsElementMap;
     }
 }

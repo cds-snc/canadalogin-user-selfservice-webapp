@@ -8,26 +8,26 @@ import {
   GcdsNotice,
   GcdsButton, GcdsGrid, GcdsLink
 } from "@cdssnc/gcds-components-react";
-import { getPageContent } from "../../utils/functions";
-import { PAGES, NAVIGATION_LINKS, CONTEXT_ACTIONS } from "../../utils/constants";
-import { useUser } from "../Providers/useUser";
+import { getPageContent } from "../../utils/functions.jsx";
+import { PAGES, NAVIGATION_LINKS, LANGUAGE_DISPLAY_NAMES } from "../../utils/constants.jsx";
+import { useUser } from "../Providers/useUser.tsx";
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
 
 
-export default function ProfileYouMayUpdateName() {
+export default function ProfileYouMayUpdateLanguage() {
   const { language } = useParams();
   const { state } = useUser();
-  const pageContentJson = getPageContent(language, PAGES.profileYouMayUpdateName);
+  const pageContentJson = getPageContent(language, PAGES.profileYouMayUpdateLanguage);
   const navigateHelper = useNavigateHelper();
   const backtoProfile = `/${language}${NAVIGATION_LINKS.profileHome}`;
 
-  const username = state?.userProfile?.name.formatted || "";
+  const preferredLanguage = state?.userProfile?.preferredLanguage || "";
   console.log("state", state)
   return (
     <GcdsContainer>
       <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle=' '>
         <GcdsText>
-          <strong>{pageContentJson["1"]} {username}</strong>
+          <strong>{pageContentJson["1"]} {LANGUAGE_DISPLAY_NAMES[preferredLanguage]}</strong>
         </GcdsText>
       </GcdsNotice>
       <GcdsHeading tag="h1">{pageContentJson["2"]}</GcdsHeading>
