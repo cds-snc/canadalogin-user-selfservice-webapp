@@ -21,7 +21,7 @@ export const NAVIGATION_LINKS = {
     enterNewEmail: '/enternewemail',
     profileYouMayUpdateName: '/profileyoumayupdatename',
     areYouSureEditYourName: '/areYouSureEditYourName',
-    areYouSureUpdateContactNumber: '/areYouSureUpdateContactNumber'
+    areYouSureUpdateContactNumber: '/areYouSureUpdateContactNumber',
     enterNewPhoneNumber: '/enterNewPhoneNumber',
     youMayUpdateEmailAtOtherPlaces: '/youMayUpdateEmailAtOtherPlaces',
     areYouSureUpdateYourEmail: '/areYouSureUpdateYourEmail',
@@ -75,7 +75,7 @@ export const PAGES = {
     profileYouMayUpdateName: 'ProfileYouMayUpdateName',
     areYouSureEditYourName: 'AreYouSureEditYourName',
     ProfileNameEdit: 'ProfileNameEdit',
-    areYouSureUpdateContactNumber: 'AreYouSureUpdateContactNumber'
+    areYouSureUpdateContactNumber: 'AreYouSureUpdateContactNumber',
     enterNewPhoneNumber: 'EnterNewPhoneNumber',
     youMayUpdateEmailAtOtherPlaces: 'YouMayUpdateEmailAtOtherPlaces',
     areYouSureUpdateYourEmail: 'AreYouSureUpdateYourEmail',
