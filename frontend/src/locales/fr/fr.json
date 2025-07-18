@@ -307,7 +307,20 @@
     "11": "Pour rechercher un autre compte GC, consultez le",
     "12": "Répertoire des comptes GC"
   },
-  "YouMayUpdateEmailAtOtherPlaces": {
+  "AreYouSureUpdateContactNumber":{
+    "1": "Êtes-vous sûr de vouloir mettre à jour votre numéro de téléphone ?",
+    "2": "Vous avez demandé à mettre à jour votre numéro de téléphone :",
+    "3": "+1 (123) 456-7890",
+    "4": "Votre numéro de téléphone sera mis à jour avec les services suivants :",
+    "5": "GEO.ca",
+    "6": "Ceci ne modifie que votre",
+    "7": "numéro de téléphone.",
+    "8": "Pour modifier votre numéro de vérification en deux étapes, accédez à vos",
+    "9": "paramètres de sécurité.",
+    "10": "Oui, mettre à jour",
+    "11": "Annuler"
+  },
+    "YouMayUpdateEmailAtOtherPlaces": {
     "1": "Votre adresse e-mail a été mise à jour vers",
     "2": "Vous devrez peut-être mettre à jour votre adresse e-mail ailleurs",
     "3": "Ceci ne modifie votre adresse e-mail que pour les services connectés à votre compte GC.",

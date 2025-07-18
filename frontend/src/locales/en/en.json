@@ -308,6 +308,19 @@
     "10": "Connected Services ",
     "11": "in your GC Sign in dashboard."
   },
+  "AreYouSureUpdateContactNumber":{
+    "1": "Are you sure you want to update your contact phone number?",
+    "2": "You’ve requested to update your contact number to:",
+    "3": "+1 (123) 456-7890",
+    "4": "This will update your contact number with the following services:",
+    "5": "GEO.ca",
+    "6": "This only changes your",
+    "7": "contact phone number.",
+    "8": "To change your 2-step verification number, go to your",
+    "9": "security settings.",
+    "10": "Yes, update",
+    "11": "Cancel"
+  },
   "EnterNewPhoneNumber": {
     "1": "Enter a new phone number",
     "2": "This will update the phone number that GC Sign in, and services connected to your GC Sign in may use to contact you.",

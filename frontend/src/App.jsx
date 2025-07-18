@@ -21,6 +21,7 @@ function App() {
                 <Route path="/:language/firstverifyitsyou" element={<Page page={PAGES.FirstVerifyItsYou} />} />
                 <Route path="/:language/enternewemail" element={<Page page={PAGES.EnterNewEmail} />} />
                 <Route path="/:language/profileYouMayUpdateName" element={<Page page={PAGES.profileYouMayUpdateName} />} />
+                <Route path="/:language/areYouSureUpdateContactNumber" element={ <Page page={PAGES.areYouSureUpdateContactNumber}/>} />
                 <Route path="/:language/areYouSureEditYourName" element={<Page page={PAGES.areYouSureEditYourName} />} />
                 <Route path="/:language/enterNewPhoneNumber" element={<Page page={PAGES.enterNewPhoneNumber} />} />
                 <Route path="/:language/youMayUpdateEmailAtOtherPlaces" element={<Page page={PAGES.youMayUpdateEmailAtOtherPlaces} />} />
