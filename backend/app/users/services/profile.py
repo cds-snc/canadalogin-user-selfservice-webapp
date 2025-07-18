@@ -40,6 +40,9 @@ async def update_profile(
             data=response_data,
         )
     else:
+        if response.status_code == 401:
+            logger.error("User is not authenticated.")
+            raise HTTPException(status_code=401, detail="Not authenticated")
         logger.error(f"Failed to save profile. Response: {response.text}")
         error_details = response.json().get("detail")
         raise HTTPException(

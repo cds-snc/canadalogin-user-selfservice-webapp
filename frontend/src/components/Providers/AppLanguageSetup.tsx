@@ -15,21 +15,35 @@ export const AppLanguageSetup = () => {
     const { state: languageState, setAppLanguage } = useLanguage();
     const { language } = languageState;
     const { state } = useUser();
-    const { userProfile, isLoading } = state;
+    const { userProfile, isLoading, editProfile } = state;
     console.log("language", language)
-    const urlLanguage = pathname.split("/")[1]?.toLowerCase();
+
+
     const preferredLanguage = userProfile?.preferredLanguage?.toLowerCase();
-    const languageDefault = preferredLanguage || AVAILABLE_LANGUAGES.en;
-    const languageToDisplay = validateSelectedLanguage(urlLanguage || languageDefault);
+    const editProfilePreferredLanguage = editProfile?.preferredLanguage?.toLowerCase();
+    const languageDefault = preferredLanguage || editProfilePreferredLanguage || AVAILABLE_LANGUAGES.en;
 
     useEffect(() => {
         if (isLoading) return;
+
+        const urlPath = pathname.split("/").filter(Boolean);
+        const urlLanguage = urlPath[0]?.toLowerCase();
+        const languageToDisplay = validateSelectedLanguage(urlLanguage || languageDefault);
+
         setAppLanguage(languageToDisplay);
         if (urlLanguage !== languageToDisplay) {
-            navigateHelper(languageToDisplay, true);
+            if (urlPath.length > 1) {
+                urlPath[0] = languageToDisplay;
+                const newPath = urlPath.join("/");
+                navigateHelper(newPath, true);
+
+            } else {
+                navigateHelper(languageToDisplay, true);
+
+            }
         }
 
-    }, [pathname, isLoading, preferredLanguage]);
+    }, [pathname, isLoading, languageDefault]);
 
     return null;
 };

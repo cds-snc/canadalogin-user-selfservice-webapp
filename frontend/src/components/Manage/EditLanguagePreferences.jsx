@@ -10,16 +10,23 @@ import {
     GcdsLink
 } from "@cdssnc/gcds-components-react";
 
-import { useParams } from "react-router";
+import { useParams, useLocation } from "react-router";
 
 import { getPageContent } from "../../utils/functions";
 import { PAGES, NAVIGATION_LINKS, CONTEXT_ACTIONS, PROFILE_LANGUAGES } from "../../utils/constants";
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
 import { useUser } from "../Providers/useUser";
+import { useLanguage } from "../Providers/LanguageProvider.tsx";
+import { validateSelectedLanguage } from "../../utils/functions.jsx";
+
 
 export default function EditLanguagePreferences() {
-    const { language } = useParams();
+    const { language, } = useParams();
     const { state, dispatch } = useUser();
+    const { pathname } = useLocation();
+
+    const { state: languageState, setAppLanguage } = useLanguage();
+
     const [editProfile, setEditProfile] = useState({ ...state.editProfile });
 
     const pageContentJson = getPageContent(language, PAGES.editLanguagePreferences);
@@ -36,6 +43,13 @@ export default function EditLanguagePreferences() {
 
     const languageOptions = [englistSelection, frenchSelection]
 
+    const updateLanguageUrl = (updatedLanguage) => {
+        const selectedLanguage = validateSelectedLanguage(updatedLanguage);
+        let segments = pathname.split("/").filter(Boolean);
+        segments[0] = selectedLanguage
+        // navigateHelper(`/${segments.join("/")}`, true);
+        console.log("segments", segments);
+    }
 
 
     const handleProfileChange = (e) => {
@@ -46,6 +60,10 @@ export default function EditLanguagePreferences() {
             ...prev,
             preferredLanguage: value,
         }));
+        // setAppLanguage(value);
+        // navigateHelper(value, true);
+        updateLanguageUrl(value)
+
     };
 
     const onSubmitHandler = (event) => {

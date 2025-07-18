@@ -1,6 +1,7 @@
 import axios from 'axios';
 import config from '../config';
-import { FLOW_TYPES, SUBMIT_END_POINTS } from "../utils/constants.jsx";
+import { FLOW_TYPES, SUBMIT_END_POINTS, OIDC_REDIRECT } from "../utils/constants.jsx";
+import { redirectToLogin } from "../utils/redirect.jsx";
 import {
     ERROR_RESPONSE, TEST_PROTOTYPES,
     SUCCESS_RESPONSE,
@@ -70,13 +71,27 @@ export const authService = {
     },
 
     my_user_profile: async () => {
-        const response = await axios.get(`${config.apiUrl}${SUBMIT_END_POINTS.me}`);
-        return response.data;
+        try {
+            const response = await axios.get(`${config.apiUrl}${SUBMIT_END_POINTS.me}`);
+            return response.data;
+        }
+        catch (error) {
+            if (error.response && error.response.status === 401) {
+                redirectToLogin();
+            }
+        }
     },
     update_my_user_profile: async (editedProfile) => {
-        const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.profile}`, editedProfile);
-        return response.data;
-    },
+        try {
+            const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.profile}`, editedProfile);
+            return response.data;
+        }
+        catch (error) {
+            if (error.response && error.response.status === 401) {
+                redirectToLogin();
+            }
+        }
+    }
 }
 
 function buildTestResponse(userData, type) {
