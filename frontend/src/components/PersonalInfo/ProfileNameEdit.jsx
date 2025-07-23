@@ -9,6 +9,7 @@ import {
 } from '@cdssnc/gcds-components-react';
 import { useParams } from 'react-router';
 import { getPageContent } from '../../utils/functions';
+import { userProfileDispatch } from "../../utils/userProfileDispatch.jsx";
 import { PAGES, NAVIGATION_LINKS, CONTEXT_ACTIONS } from '../../utils/constants';
 import SubmitButton from '../Layout/SubmitButton';
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
@@ -19,6 +20,7 @@ export default function ProfileNameEdit() {
     const { state, dispatch } = useUser();
     const pageNameEditJson = getPageContent(language, PAGES.ProfileNameEdit);
     const navigateHelper = useNavigateHelper();
+    const { cloneUserProfile, updateClonedProfile } = userProfileDispatch(dispatch);
     const confirmation = `/${language}${NAVIGATION_LINKS.areYouSureEditYourName}`;
     const backtoProfile = `/${language}${NAVIGATION_LINKS.profileHome}`;
     const [editProfile, setEditProfile] = useState({ ...state.editProfile });
@@ -33,21 +35,29 @@ export default function ProfileNameEdit() {
 
     const useSubmitHandler = (event) => {
         event.preventDefault()
-        dispatch({
-            type: CONTEXT_ACTIONS.update_profile,
-            payload: {
-                name: {
-                    givenName: editProfile.givenName,
-                    familyName: editProfile.familyName,
-                    formatted: `${editProfile.givenName} ${editProfile.familyName}`
-                }
-            }
-        });
+        const updatedName = {
+            givenName: editProfile.givenName,
+            familyName: editProfile.familyName,
+            formatted: `${editProfile.givenName} ${editProfile.familyName}`
+
+        }
+        updateClonedProfile({ name: updatedName });
+
+        // dispatch({
+        //     type: CONTEXT_ACTIONS.update_cloned_profile,
+        //     payload: {
+        //         name: {
+        //             givenName: editProfile.givenName,
+        //             familyName: editProfile.familyName,
+        //             formatted: `${editProfile.givenName} ${editProfile.familyName}`
+        //         }
+        //     }
+        // });
         navigateHelper(confirmation);
     }
 
     useEffect(() => {
-        dispatch({ type: CONTEXT_ACTIONS.clone_profile, payload: null });
+        cloneUserProfile();
     }, [dispatch, state.userProfile]);
 
     console.log('State', state)

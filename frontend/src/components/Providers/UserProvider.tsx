@@ -38,6 +38,9 @@ export interface UserState {
     userProfile: UserProfile | null;
     userData: any;
     isLoading: boolean;
+    editProfile: UserProfile | null;
+    urlLanguageBeforeEdit: string | null;
+    cancelProfileEditing: boolean;
 }
 
 interface UserProviderProps {
@@ -72,7 +75,9 @@ const initialState = {
         passwordValidated: false
     },
     userProfile: null,
-    editProfile: null
+    editProfile: null,
+    urlLanguageBeforeEdit: null,
+    cancelProfileEditing: false
 }
 
 
@@ -100,7 +105,7 @@ function userReducer(state = initialState, action: Action) {
                 ...state,
                 editProfile: { ...state.userProfile || {} }
             };
-        case CONTEXT_ACTIONS.update_profile:
+        case CONTEXT_ACTIONS.update_cloned_profile:
             console.log(action.payload)
             return {
                 ...state,
@@ -112,26 +117,28 @@ function userReducer(state = initialState, action: Action) {
         case CONTEXT_ACTIONS.updated_profile_success:
             return {
                 ...state,
-                userProfile: action.payload,
+                userProfile: action.payload
             };
         case CONTEXT_ACTIONS.clone_profile:
             return {
                 ...state,
                 editProfile: { ...state.userProfile || {} }
             };
-        case CONTEXT_ACTIONS.update_profile:
-            console.log(action.payload)
+        case CONTEXT_ACTIONS.clear_edit_profile:
             return {
                 ...state,
-                editProfile: {
-                    ...state.editProfile || {},
-                    ...action.payload
-                }
+                editProfile: null,
+                urlLanguageBeforeEdit: null
             };
-        case CONTEXT_ACTIONS.updated_profile_success:
+        case CONTEXT_ACTIONS.set_original_language_before_edit:
             return {
                 ...state,
-                userProfile: action.payload,
+                urlLanguageBeforeEdit: action.payload
+            };
+        case CONTEXT_ACTIONS.cancel_profile_editing:
+            return {
+                ...state,
+                cancelProfileEditing: action.payload
             };
         default:
             return state;

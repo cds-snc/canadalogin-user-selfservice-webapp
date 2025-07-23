@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import {
     GcdsContainer,
     GcdsHeading,
@@ -10,32 +10,32 @@ import {
     GcdsLink
 } from "@cdssnc/gcds-components-react";
 
-import { useParams, useLocation } from "react-router";
+import { useParams } from "react-router";
 
 import { getPageContent } from "../../utils/functions";
+import { userProfileDispatch } from "../../utils/userProfileDispatch.jsx";
+
 import { PAGES, NAVIGATION_LINKS, CONTEXT_ACTIONS, PROFILE_LANGUAGES } from "../../utils/constants";
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
 import { useUser } from "../Providers/useUser";
 import { useLanguage } from "../Providers/LanguageProvider.tsx";
-import { validateSelectedLanguage } from "../../utils/functions.jsx";
 
 
 export default function EditLanguagePreferences() {
-    const { language, } = useParams();
+    const { language } = useParams();
+    const { setAppLanguage } = useLanguage();
+    const navigateHelper = useNavigateHelper();
+
     const { state, dispatch } = useUser();
-    const { pathname } = useLocation();
-
-    const { state: languageState, setAppLanguage } = useLanguage();
-
-    const [editProfile, setEditProfile] = useState({ ...state.editProfile });
+    const { userProfile, cancelEditingProfile, editProfile } = state;
+    const { cloneUserProfile, clearEditProfile, updateClonedProfile, setOriginalLanguageBeforeEdit, cancelProfileEditing } = userProfileDispatch(dispatch);
 
     const pageContentJson = getPageContent(language, PAGES.editLanguagePreferences);
-    const navigateHelper = useNavigateHelper();
     const areYouSureEditYourLanguage = `/${language}${NAVIGATION_LINKS.areYouSureEditYourLanguage}`
 
     const backtoProfile = `/${language}${NAVIGATION_LINKS.profileHome}`;
 
-    const profilePreferredLanguage = state?.userProfile?.preferredLanguage;
+    const profilePreferredLanguage = userProfile?.preferredLanguage;
 
     const englistSelection = { "label": pageContentJson['13'], "id": PROFILE_LANGUAGES.en, "value": PROFILE_LANGUAGES.en, "checked": profilePreferredLanguage === PROFILE_LANGUAGES.en };
     const frenchSelection = { "label": pageContentJson['14'], "id": PROFILE_LANGUAGES.fr, "value": PROFILE_LANGUAGES.fr, "checked": profilePreferredLanguage === PROFILE_LANGUAGES.fr };
@@ -43,43 +43,38 @@ export default function EditLanguagePreferences() {
 
     const languageOptions = [englistSelection, frenchSelection]
 
-    const updateLanguageUrl = (updatedLanguage) => {
-        const selectedLanguage = validateSelectedLanguage(updatedLanguage);
-        let segments = pathname.split("/").filter(Boolean);
-        segments[0] = selectedLanguage
-        // navigateHelper(`/${segments.join("/")}`, true);
-        console.log("segments", segments);
-    }
-
-
     const handleProfileChange = (e) => {
         const { name, value } = e.target;
         console.log(name)
         console.log(value)
-        setEditProfile(prev => ({
-            ...prev,
-            preferredLanguage: value,
-        }));
-        // setAppLanguage(value);
-        // navigateHelper(value, true);
-        updateLanguageUrl(value)
-
+        updateClonedProfile({ preferredLanguage: value });
     };
 
     const onSubmitHandler = (event) => {
         event.preventDefault()
-        dispatch({
-            type: CONTEXT_ACTIONS.update_profile,
-            payload: {
-                preferredLanguage: editProfile.preferredLanguage
-            }
-        });
         navigateHelper(areYouSureEditYourLanguage);
     }
 
+    const resetLanguage = () => {
+        const originalLanguage = state?.urlLanguageBeforeEdit;
+        if (originalLanguage) {
+            setAppLanguage(originalLanguage);
+        }
+    }
+
     useEffect(() => {
-        dispatch({ type: CONTEXT_ACTIONS.clone_profile, payload: null });
-    }, [dispatch, state.userProfile]);
+        cloneUserProfile();
+        setOriginalLanguageBeforeEdit(language);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [dispatch, userProfile]);
+
+    useEffect(() => {
+        if (cancelEditingProfile && editProfile === null) {
+            navigateHelper(backtoProfile); // Navigate after state is cleared
+            cancelProfileEditing(false);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [editProfile]);
 
     return (
         <GcdsContainer>
@@ -129,7 +124,9 @@ export default function EditLanguagePreferences() {
                 </GcdsButton>
                 <GcdsButton buttonRole="secondary" onGcdsClick={(ev) => {
                     ev.preventDefault();
-                    navigateHelper(backtoProfile)
+                    cancelProfileEditing(true);
+                    resetLanguage();
+                    clearEditProfile();
                 }}>
                     {pageContentJson["16"]}
                 </GcdsButton>

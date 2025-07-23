@@ -9,6 +9,8 @@ import {
 import { useParams } from "react-router";
 
 import { getPageContent } from "../../utils/functions.jsx";
+import { userProfileDispatch } from "../../utils/userProfileDispatch.jsx";
+
 import { PAGES, NAVIGATION_LINKS, CONTEXT_ACTIONS, LANGUAGE_DISPLAY_NAMES } from "../../utils/constants.jsx";
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
 import { useUser } from "../Providers/useUser.tsx";
@@ -17,6 +19,7 @@ import { authService } from "../../services/authService.jsx";
 export default function AreYouSureEditYourLanguage() {
   const { language } = useParams();
   const { state, dispatch } = useUser();
+  const { clearEditProfile, updateProfileSuccess } = userProfileDispatch(dispatch);
 
   const pageContentJson = getPageContent(language, PAGES.areYouSureEditYourLanguage);
   const navigateHelper = useNavigateHelper();
@@ -29,7 +32,8 @@ export default function AreYouSureEditYourLanguage() {
     try {
       const response = await authService.update_my_user_profile(state.editProfile);
       if (response) {
-        dispatch({ type: CONTEXT_ACTIONS.updated_profile_success, payload: response.data });
+        clearEditProfile();
+        updateProfileSuccess(response.data);
         return true;
       }
       else {
@@ -66,6 +70,7 @@ export default function AreYouSureEditYourLanguage() {
           {pageContentJson["8"]}
         </GcdsButton>
         <GcdsButton buttonRole="secondary" onGcdsClick={(ev) => {
+          clearEditProfile();
           ev.preventDefault();
           navigateHelper(backtoProfile)
         }}>

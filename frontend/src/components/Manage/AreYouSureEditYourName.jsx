@@ -13,11 +13,12 @@ import { PAGES, NAVIGATION_LINKS, CONTEXT_ACTIONS } from "../../utils/constants"
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
 import { useUser } from "../Providers/useUser";
 import { authService } from "../../services/authService.jsx";
+import { userProfileDispatch } from "../../utils/userProfileDispatch.jsx";
 
 export default function AreYouSureEditYourName() {
   const { language } = useParams();
   const { state, dispatch } = useUser();
-
+  const { clearEditProfile, updateProfileSuccess } = userProfileDispatch(dispatch);
   const pageContentJson = getPageContent(language, PAGES.areYouSureEditYourName);
   const navigateHelper = useNavigateHelper();
   const successPage = `/${language}${NAVIGATION_LINKS.profileYouMayUpdateName}`;
@@ -29,7 +30,8 @@ export default function AreYouSureEditYourName() {
     try {
       const response = await authService.update_my_user_profile(state.editProfile);
       if (response) {
-        dispatch({ type: CONTEXT_ACTIONS.updated_profile_success, payload: response.data });
+        clearEditProfile();
+        updateProfileSuccess(response.data);
         return true;
       }
       else {
@@ -69,6 +71,7 @@ export default function AreYouSureEditYourName() {
         </GcdsButton>
         <GcdsButton buttonRole="secondary" onGcdsClick={(ev) => {
           ev.preventDefault();
+          clearEditProfile();
           navigateHelper(backtoProfile)
         }}>
           {pageContentJson["9"]}

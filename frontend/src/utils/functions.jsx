@@ -89,10 +89,3 @@ export function capitalizeFirstLetter(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-export function validateSelectedLanguage(selectedLanguage) {
-    const SUPPORTED_LANGUAGES = [AVAILABLE_LANGUAGES.en, AVAILABLE_LANGUAGES.fr];
-    const languageValue = selectedLanguage.includes("-") ? selectedLanguage.split("-")[0].toLowerCase() : selectedLanguage.toLowerCase();
-    const languageToDisplay = SUPPORTED_LANGUAGES.includes(languageValue) ? (languageValue) : AVAILABLE_LANGUAGES.en;
-
-    return languageToDisplay;
-}

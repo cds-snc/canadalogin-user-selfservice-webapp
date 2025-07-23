@@ -1,11 +1,10 @@
 import { createContext, useContext, useReducer, ReactNode, Dispatch } from "react";
 import { LANGUAGE_DISPLAY_NAMES, AVAILABLE_LANGUAGES, PROFILE_LANGUAGES, CONTEXT_ACTIONS } from "../../utils/constants.jsx";
-import { validateSelectedLanguage } from "../../utils/functions.jsx";
 
 
 
 const initialState = {
-    language: AVAILABLE_LANGUAGES.en,
+    language: null,
 };
 
 interface Action {
@@ -45,8 +44,7 @@ export const LanguageProvider = ({ children, initial = initialState }: LanguageP
     const [state, dispatch] = useReducer(languageReducer, initial);
 
     const setAppLanguage = (selectedLanguage) => {
-        const languageToDisplay = validateSelectedLanguage(selectedLanguage);
-        dispatch({ type: CONTEXT_ACTIONS.set_language, payload: languageToDisplay });
+        dispatch({ type: CONTEXT_ACTIONS.set_language, payload: selectedLanguage });
     };
 
     return (
