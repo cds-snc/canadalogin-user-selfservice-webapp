@@ -27,7 +27,10 @@ async def redirect_to_verify(request: Request):
         logger.info(f"Callback Redirect URI: {redirect_uri}")
         return await oauth.verify.authorize_redirect(request, redirect_uri)
     except OAuthError as e:
-        raise Exception(f"OAuth error: {str(e)}")
+        return generate_error_response(400, string_error_response(str(e)))
+    except Exception as e:
+        logger.exception("Unexpected error during redirect_to_verify")
+        return generate_error_response(500, string_error_response())
 
 
 async def callback_handler(request: Request):
@@ -38,8 +41,12 @@ async def callback_handler(request: Request):
     try:
         config = get_configuration()
 
-        oidc_response = await oauth.verify.authorize_access_token(request)
-        logger.info("OIDC Responsed")
+        try:
+            oidc_response = await oauth.verify.authorize_access_token(request)
+            logger.info("OIDC Responsed")
+        except OAuthError as error:
+            logger.error(f"OAuth error during token retrieval: {error}")
+            return generate_error_response(400, string_error_response(str(error)))
 
         request.session[SESSION_USER_ACCESS_TOKEN_KEY] = oidc_response.get(
             "access_token"
@@ -56,6 +63,9 @@ async def callback_handler(request: Request):
     except OAuthError as error:
         logger.error(f"OAuth error: {error}")
         return generate_error_response(400, string_error_response(str(error)))
+    except Exception as e:
+        logger.exception("Unexpected error during callback")
+        return generate_error_response(500, string_error_response())
 
 
 async def get_users_current_session(request: Request):
