@@ -27,9 +27,10 @@ async def redirect_to_verify(request: Request):
         logger.info(f"Callback Redirect URI: {redirect_uri}")
         return await oauth.verify.authorize_redirect(request, redirect_uri)
     except OAuthError as e:
-        return generate_error_response(400, string_error_response(str(e)))
+        logger.exception("Unexpected error during redirect_to_verify", str(e))
+        return generate_error_response(401, string_error_response(str(e)))
     except Exception as e:
-        logger.exception("Unexpected error during redirect_to_verify")
+        logger.exception("Unexpected error during redirect_to_verify", str(e))
         return generate_error_response(500, string_error_response())
 
 
@@ -63,9 +64,9 @@ async def callback_handler(request: Request):
         return RedirectResponse(url=redirectValue)
     except OAuthError as error:
         logger.error(f"OAuth error: {error}")
-        return generate_error_response(400, string_error_response(str(error)))
+        return generate_error_response(401, string_error_response(str(error)))
     except Exception as e:
-        logger.exception("Unexpected error during callback")
+        logger.error(f"OAuth error: {e}")
         return generate_error_response(500, string_error_response())
 
 
