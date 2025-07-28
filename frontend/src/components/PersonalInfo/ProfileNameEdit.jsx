@@ -42,23 +42,12 @@ export default function ProfileNameEdit() {
 
         }
         updateClonedProfile({ name: updatedName });
-
-        // dispatch({
-        //     type: CONTEXT_ACTIONS.update_cloned_profile,
-        //     payload: {
-        //         name: {
-        //             givenName: editProfile.givenName,
-        //             familyName: editProfile.familyName,
-        //             formatted: `${editProfile.givenName} ${editProfile.familyName}`
-        //         }
-        //     }
-        // });
         navigateHelper(confirmation);
     }
 
     useEffect(() => {
         cloneUserProfile();
-    }, [dispatch, state.userProfile]);
+    }, [dispatch, state.userProfile, cloneUserProfile]);
 
     console.log('State', state)
 
