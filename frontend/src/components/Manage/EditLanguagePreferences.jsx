@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import {
     GcdsContainer,
     GcdsHeading,
@@ -27,8 +27,8 @@ export default function EditLanguagePreferences() {
     const navigateHelper = useNavigateHelper();
 
     const { state, dispatch } = useUser();
-    const { userProfile, cancelEditingProfile, editProfile } = state;
-    const { cloneUserProfile, clearEditProfile, updateClonedProfile, setOriginalLanguageBeforeEdit, cancelProfileEditing } = userProfileDispatch(dispatch);
+    const { userProfile, cancelProfileEditing, editProfile } = state;
+    const { cloneUserProfile, clearEditProfile, updateClonedProfile, setOriginalLanguageBeforeEdit, setCancelProfileEditing } = userProfileDispatch(dispatch);
 
     const pageContentJson = getPageContent(language, PAGES.editLanguagePreferences);
     const areYouSureEditYourLanguage = `/${language}${NAVIGATION_LINKS.areYouSureEditYourLanguage}`
@@ -55,26 +55,35 @@ export default function EditLanguagePreferences() {
         navigateHelper(areYouSureEditYourLanguage);
     }
 
-    const resetLanguage = () => {
+    const resetLanguage = useCallback(() => {
         const originalLanguage = state?.urlLanguageBeforeEdit;
         if (originalLanguage) {
             setAppLanguage(originalLanguage);
         }
-    }
+    }, [state?.urlLanguageBeforeEdit, setAppLanguage]);
+
+    const handleCancel = useCallback((event) => {
+        event.preventDefault();
+        clearEditProfile();
+        resetLanguage();
+    }, [clearEditProfile, resetLanguage]);
+
 
     useEffect(() => {
         cloneUserProfile();
         setOriginalLanguageBeforeEdit(language);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [dispatch, userProfile]);
-
-    useEffect(() => {
-        if (cancelEditingProfile && editProfile === null) {
-            navigateHelper(backtoProfile); // Navigate after state is cleared
-            cancelProfileEditing(false);
+        return () => {
+            setCancelProfileEditing(false);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [editProfile]);
+    }, []);
+
+    useEffect(() => {
+        if (cancelProfileEditing && editProfile === null) {
+            navigateHelper(backtoProfile); // Navigate after state is cleared
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [cancelProfileEditing]);
 
     return (
         <GcdsContainer>
@@ -122,12 +131,7 @@ export default function EditLanguagePreferences() {
                 }}>
                     {pageContentJson["15"]}
                 </GcdsButton>
-                <GcdsButton buttonRole="secondary" onGcdsClick={(ev) => {
-                    ev.preventDefault();
-                    cancelProfileEditing(true);
-                    resetLanguage();
-                    clearEditProfile();
-                }}>
+                <GcdsButton buttonRole="secondary" onGcdsClick={handleCancel}>
                     {pageContentJson["16"]}
                 </GcdsButton>
             </GcdsGrid>

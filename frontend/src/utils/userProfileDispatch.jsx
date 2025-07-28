@@ -1,5 +1,10 @@
-// utils/profileActions.ts
-import { AVAILABLE_LANGUAGES, FOOTERS, CONTEXT_ACTIONS } from './constants';
+// import React, { useEffect, useCallback } from "react";
+// import { useParams } from "react-router";
+
+// import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
+// import { useUser } from "../Providers/useUser";
+// import { useLanguage } from "../Providers/LanguageProvider.tsx";
+import { CONTEXT_ACTIONS } from './constants';
 
 export const userProfileDispatch = (dispatch) => ({
     cloneUserProfile: () =>
@@ -17,7 +22,7 @@ export const userProfileDispatch = (dispatch) => ({
                 type: CONTEXT_ACTIONS.set_original_language_before_edit, payload: language
             }
         ),
-    cancelProfileEditing: (boolean) =>
+    setCancelProfileEditing: (boolean) =>
         dispatch({ type: CONTEXT_ACTIONS.cancel_profile_editing, payload: boolean }),
 
     clearEditProfile: () =>
@@ -28,8 +33,35 @@ export const userProfileDispatch = (dispatch) => ({
 
     updateProfileFailure: () =>
         dispatch({ type: CONTEXT_ACTIONS.updated_profile_success, payload: null }),
-
-
-
-
 });
+
+// export const cancelLanguageEditing = () => {
+//     const { language } = useParams();
+//     const { setAppLanguage } = useLanguage();
+//     const navigateHelper = useNavigateHelper();
+
+//     const { state, dispatch } = useUser();
+//     const { userProfile, cancelProfileEditing, editProfile } = state;
+//     const { clearEditProfile } = userProfileDispatch(dispatch);
+
+
+//     const resetLanguage = useCallback(() => {
+//         const originalLanguage = state?.urlLanguageBeforeEdit;
+//         if (originalLanguage) {
+//             setAppLanguage(originalLanguage);
+//         }
+//     }, [state?.urlLanguageBeforeEdit, setAppLanguage]);
+
+//     const handleCancel = useCallback((event) => {
+//         event.preventDefault();
+//         clearEditProfile();
+//         resetLanguage();
+//     }, [clearEditProfile, resetLanguage]);
+
+//     useEffect(() => {
+//         if (cancelProfileEditing && editProfile === null) {
+//             navigateHelper(backtoProfile); // Navigate after state is cleared
+//         }
+//         // eslint-disable-next-line react-hooks/exhaustive-deps
+//     }, [cancelProfileEditing]);
+// }

@@ -103,7 +103,9 @@ function userReducer(state = initialState, action: Action) {
         case CONTEXT_ACTIONS.clone_profile:
             return {
                 ...state,
-                editProfile: { ...state.userProfile || {} }
+                editProfile: { ...state.userProfile || {} },
+                cancelProfileEditing: false,
+                urlLanguageBeforeEdit: null,
             };
         case CONTEXT_ACTIONS.update_cloned_profile:
             console.log(action.payload)
@@ -119,16 +121,11 @@ function userReducer(state = initialState, action: Action) {
                 ...state,
                 userProfile: action.payload
             };
-        case CONTEXT_ACTIONS.clone_profile:
-            return {
-                ...state,
-                editProfile: { ...state.userProfile || {} }
-            };
         case CONTEXT_ACTIONS.clear_edit_profile:
             return {
                 ...state,
                 editProfile: null,
-                urlLanguageBeforeEdit: null
+                cancelProfileEditing: true
             };
         case CONTEXT_ACTIONS.set_original_language_before_edit:
             return {

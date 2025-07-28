@@ -40,22 +40,23 @@ async def callback_handler(request: Request):
     """
     try:
         config = get_configuration()
+        redirectValue = config.PROFILE_MANAGEMENT_DOMAIN
+
+        if config.ENVIRONMENT != "local":
+            redirectValue = f"https://{config.PROFILE_MANAGEMENT_DOMAIN}"
 
         try:
             oidc_response = await oauth.verify.authorize_access_token(request)
             logger.info("OIDC Responsed")
         except OAuthError as error:
             logger.error(f"OAuth error during token retrieval: {error}")
-            return generate_error_response(400, string_error_response(str(error)))
+            logger.error(f"Redirect user back to IBM Verify to be re-authenticated: {redirectValue}")
+            # redirect back to IBM Verify to retry authentication
+            return RedirectResponse(url=redirectValue)
 
         request.session[SESSION_USER_ACCESS_TOKEN_KEY] = oidc_response.get(
             "access_token"
         )
-
-        redirectValue = config.PROFILE_MANAGEMENT_DOMAIN
-
-        if config.ENVIRONMENT != "local":
-            redirectValue = f"https://{config.PROFILE_MANAGEMENT_DOMAIN}"
 
         logger.info("OIDC Callback Handler")
         logger.info(f"Redirect to PROFILE_MANAGEMENT_DOMAIN: {redirectValue}")
