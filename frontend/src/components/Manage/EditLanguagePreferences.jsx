@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect } from "react";
 import {
     GcdsContainer,
     GcdsHeading,
@@ -15,20 +15,17 @@ import { useParams } from "react-router";
 import { getPageContent } from "../../utils/functions";
 import { userProfileDispatch, useCancelLanguageEditing } from "../../utils/userProfileDispatch.jsx";
 
-import { PAGES, NAVIGATION_LINKS, CONTEXT_ACTIONS, PROFILE_LANGUAGES } from "../../utils/constants";
+import { PAGES, NAVIGATION_LINKS, PROFILE_LANGUAGES } from "../../utils/constants";
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
 import { useUser } from "../Providers/useUser";
-import { useLanguage } from "../Providers/LanguageProvider.tsx";
-
 
 export default function EditLanguagePreferences() {
     const { language } = useParams();
-    const { setAppLanguage } = useLanguage();
     const navigateHelper = useNavigateHelper();
 
     const { state, dispatch } = useUser();
-    const { userProfile, cancelProfileEditing, editProfile } = state;
-    const { cloneUserProfile, clearEditProfile, updateClonedProfile, setOriginalLanguageBeforeEdit, setCancelProfileEditing } = userProfileDispatch(dispatch);
+    const { userProfile } = state;
+    const { cloneUserProfile, updateClonedProfile, setOriginalLanguageBeforeEdit, setCancelProfileEditing } = userProfileDispatch(dispatch);
     const backtoProfile = `/${language}${NAVIGATION_LINKS.profileHome}`;
     const { handleCancel } = useCancelLanguageEditing(backtoProfile);
     const pageContentJson = getPageContent(language, PAGES.editLanguagePreferences);
