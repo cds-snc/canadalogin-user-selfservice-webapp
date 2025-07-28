@@ -13,7 +13,7 @@ import {
 import { useParams } from "react-router";
 
 import { getPageContent } from "../../utils/functions";
-import { userProfileDispatch } from "../../utils/userProfileDispatch.jsx";
+import { userProfileDispatch, useCancelLanguageEditing } from "../../utils/userProfileDispatch.jsx";
 
 import { PAGES, NAVIGATION_LINKS, CONTEXT_ACTIONS, PROFILE_LANGUAGES } from "../../utils/constants";
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
@@ -29,11 +29,11 @@ export default function EditLanguagePreferences() {
     const { state, dispatch } = useUser();
     const { userProfile, cancelProfileEditing, editProfile } = state;
     const { cloneUserProfile, clearEditProfile, updateClonedProfile, setOriginalLanguageBeforeEdit, setCancelProfileEditing } = userProfileDispatch(dispatch);
-
+    const backtoProfile = `/${language}${NAVIGATION_LINKS.profileHome}`;
+    const { handleCancel } = useCancelLanguageEditing(backtoProfile);
     const pageContentJson = getPageContent(language, PAGES.editLanguagePreferences);
     const areYouSureEditYourLanguage = `/${language}${NAVIGATION_LINKS.areYouSureEditYourLanguage}`
 
-    const backtoProfile = `/${language}${NAVIGATION_LINKS.profileHome}`;
 
     const profilePreferredLanguage = userProfile?.preferredLanguage;
 
@@ -55,19 +55,6 @@ export default function EditLanguagePreferences() {
         navigateHelper(areYouSureEditYourLanguage);
     }
 
-    const resetLanguage = useCallback(() => {
-        const originalLanguage = state?.urlLanguageBeforeEdit;
-        if (originalLanguage) {
-            setAppLanguage(originalLanguage);
-        }
-    }, [state?.urlLanguageBeforeEdit, setAppLanguage]);
-
-    const handleCancel = useCallback((event) => {
-        event.preventDefault();
-        clearEditProfile();
-        resetLanguage();
-    }, [clearEditProfile, resetLanguage]);
-
 
     useEffect(() => {
         cloneUserProfile();
@@ -77,13 +64,6 @@ export default function EditLanguagePreferences() {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-    useEffect(() => {
-        if (cancelProfileEditing && editProfile === null) {
-            navigateHelper(backtoProfile); // Navigate after state is cleared
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [cancelProfileEditing]);
 
     return (
         <GcdsContainer>

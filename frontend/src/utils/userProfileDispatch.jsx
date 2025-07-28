@@ -1,9 +1,9 @@
-// import React, { useEffect, useCallback } from "react";
-// import { useParams } from "react-router";
+import React, { useEffect, useCallback } from "react";
+import { useParams } from "react-router";
 
-// import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
-// import { useUser } from "../Providers/useUser";
-// import { useLanguage } from "../Providers/LanguageProvider.tsx";
+import { useNavigateHelper } from "../hooks/useNavigate.tsx";
+import { useUser } from "../components/Providers/useUser";
+import { useLanguage } from "../components/Providers/LanguageProvider.tsx";
 import { CONTEXT_ACTIONS } from './constants';
 
 export const userProfileDispatch = (dispatch) => ({
@@ -34,34 +34,45 @@ export const userProfileDispatch = (dispatch) => ({
     updateProfileFailure: () =>
         dispatch({ type: CONTEXT_ACTIONS.updated_profile_success, payload: null }),
 });
+export const useCancelLanguageEditing = (backtoProfile) => {
+    const { state, dispatch } = useUser();
+    const { setAppLanguage } = useLanguage();
+    const navigateHelper = useNavigateHelper();
 
-// export const cancelLanguageEditing = () => {
-//     const { language } = useParams();
-//     const { setAppLanguage } = useLanguage();
-//     const navigateHelper = useNavigateHelper();
+    const { cancelProfileEditing, editProfile } = state;
+    const { clearEditProfile, setCancelProfileEditing } = userProfileDispatch(dispatch);
 
-//     const { state, dispatch } = useUser();
-//     const { userProfile, cancelProfileEditing, editProfile } = state;
-//     const { clearEditProfile } = userProfileDispatch(dispatch);
+    const resetLanguage = useCallback(() => {
+        const originalLanguage = state?.urlLanguageBeforeEdit;
+        if (originalLanguage) {
+            setAppLanguage(originalLanguage);
+        }
+    }, [state?.urlLanguageBeforeEdit, setAppLanguage]);
 
+    const handleCancel = useCallback((event) => {
+        event.preventDefault();
 
-//     const resetLanguage = useCallback(() => {
-//         const originalLanguage = state?.urlLanguageBeforeEdit;
-//         if (originalLanguage) {
-//             setAppLanguage(originalLanguage);
-//         }
-//     }, [state?.urlLanguageBeforeEdit, setAppLanguage]);
+        // Clear the edit profile state
+        clearEditProfile();
 
-//     const handleCancel = useCallback((event) => {
-//         event.preventDefault();
-//         clearEditProfile();
-//         resetLanguage();
-//     }, [clearEditProfile, resetLanguage]);
+        // Reset language to original
+        resetLanguage();
 
-//     useEffect(() => {
-//         if (cancelProfileEditing && editProfile === null) {
-//             navigateHelper(backtoProfile); // Navigate after state is cleared
-//         }
-//         // eslint-disable-next-line react-hooks/exhaustive-deps
-//     }, [cancelProfileEditing]);
-// }
+        // Set cancel flag to trigger navigation effect
+        setCancelProfileEditing(true);
+    }, [clearEditProfile, resetLanguage, setCancelProfileEditing]);
+
+    // Effect to handle navigation after cancel
+    useEffect(() => {
+        if (cancelProfileEditing && editProfile === null) {
+            navigateHelper(backtoProfile);
+            // Reset the cancel flag after navigation
+            setCancelProfileEditing(false);
+        }
+    }, [cancelProfileEditing, editProfile, navigateHelper, backtoProfile, setCancelProfileEditing]);
+
+    return {
+        handleCancel,
+        resetLanguage
+    };
+};

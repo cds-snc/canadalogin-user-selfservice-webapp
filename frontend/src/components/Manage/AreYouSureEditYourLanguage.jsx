@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   GcdsContainer,
   GcdsHeading,
@@ -9,8 +9,7 @@ import {
 import { useParams } from "react-router";
 
 import { getPageContent } from "../../utils/functions.jsx";
-import { userProfileDispatch } from "../../utils/userProfileDispatch.jsx";
-
+import { userProfileDispatch, useCancelLanguageEditing } from "../../utils/userProfileDispatch.jsx";
 import { PAGES, NAVIGATION_LINKS, CONTEXT_ACTIONS, LANGUAGE_DISPLAY_NAMES } from "../../utils/constants.jsx";
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
 import { useUser } from "../Providers/useUser.tsx";
@@ -19,12 +18,15 @@ import { authService } from "../../services/authService.jsx";
 export default function AreYouSureEditYourLanguage() {
   const { language } = useParams();
   const { state, dispatch } = useUser();
-  const { clearEditProfile, updateProfileSuccess } = userProfileDispatch(dispatch);
+  const { clearEditProfile, updateProfileSuccess, setCancelProfileEditing } = userProfileDispatch(dispatch);
 
   const pageContentJson = getPageContent(language, PAGES.areYouSureEditYourLanguage);
   const navigateHelper = useNavigateHelper();
-  const successPage = `/${language}${NAVIGATION_LINKS.profileYouMayUpdateLanguage}`;
+
   const backtoProfile = `/${language}${NAVIGATION_LINKS.profileHome}`;
+  const { handleCancel } = useCancelLanguageEditing(backtoProfile);
+
+  const successPage = `/${language}${NAVIGATION_LINKS.profileYouMayUpdateLanguage}`;
 
   const selectedLanguage = state?.editProfile?.preferredLanguage || "";
 
@@ -44,6 +46,15 @@ export default function AreYouSureEditYourLanguage() {
       console.log(err);
     }
   };
+
+  useEffect(() => {
+
+    return () => {
+      // reset the cancel profile editing state when component unmounts
+      setCancelProfileEditing(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   console.log("state", state)
 
@@ -69,11 +80,7 @@ export default function AreYouSureEditYourLanguage() {
         }}>
           {pageContentJson["8"]}
         </GcdsButton>
-        <GcdsButton buttonRole="secondary" onGcdsClick={(ev) => {
-          clearEditProfile();
-          ev.preventDefault();
-          navigateHelper(backtoProfile)
-        }}>
+        <GcdsButton buttonRole="secondary" onGcdsClick={handleCancel}>
           {pageContentJson["9"]}
         </GcdsButton>
       </GcdsGrid>
