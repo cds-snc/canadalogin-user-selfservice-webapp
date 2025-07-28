@@ -1,5 +1,4 @@
 import React, { useEffect, useCallback } from "react";
-import { useParams } from "react-router";
 
 import { useNavigateHelper } from "../hooks/useNavigate.tsx";
 import { useUser } from "../components/Providers/useUser";

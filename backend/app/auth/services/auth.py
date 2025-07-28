@@ -51,7 +51,9 @@ async def callback_handler(request: Request):
             logger.info("OIDC Responsed")
         except OAuthError as error:
             logger.error(f"OAuth error during token retrieval: {error}")
-            logger.error(f"Redirect user back to IBM Verify to be re-authenticated: {redirectValue}")
+            logger.error(
+                f"Redirect user back to IBM Verify to be re-authenticated: {redirectValue}"
+            )
             # redirect back to IBM Verify to retry authentication
             return RedirectResponse(url=redirectValue)
 
