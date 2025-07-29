@@ -130,7 +130,6 @@ export const SUBMIT_END_POINTS = {
     login: '/v1/otp/users/login',
     otpVerify: '/v1/otp/otp/verify',
     otpSend: '/v1/otp/otp/send',
-    me: '/v1/users/me',
     profile: '/v1/users/profile',
 }
 

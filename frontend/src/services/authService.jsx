@@ -72,7 +72,7 @@ export const authService = {
 
     my_user_profile: async () => {
         try {
-            const response = await axios.get(`${config.apiUrl}${SUBMIT_END_POINTS.me}`);
+            const response = await axios.get(`${config.apiUrl}${SUBMIT_END_POINTS.profile}`);
             return response.data;
         }
         catch (error) {
