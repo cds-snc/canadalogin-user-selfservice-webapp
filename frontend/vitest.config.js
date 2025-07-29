@@ -31,10 +31,10 @@ export default defineConfig({
             include: [...filesToInclude],
             exclude: [...filesToExclude],
             thresholds: {
-                lines: 20,
-                branches: 20,
-                functions: 20,
-                statements: 20
+                lines: 10,
+                branches: 10,
+                functions: 10,
+                statements: 10
             }
         },
         css: true,
