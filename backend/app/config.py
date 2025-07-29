@@ -62,6 +62,10 @@ class Configuration(BaseSettings):
     def oidc_well_known_config(self) -> str:
         return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.OIDC_WELL_KNOWN_CONFIG.value}"
 
+    @property
+    def rp_user_applications_api_endpoint(self) -> str:
+        return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.RP_USER_APPLICATIONS.value}"
+
 
 @lru_cache
 def get_configuration():

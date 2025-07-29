@@ -91,7 +91,20 @@ export const authService = {
                 redirectToLogin();
             }
         }
-    }
+    },
+    get_rp_info: async (rp) => {
+        try {
+            const response = await axios.get(`${config.apiUrl}${SUBMIT_END_POINTS.rp_info}`, {
+                params: { rp }
+            });
+            return response.data;
+        }
+        catch (error) {
+            if (error.response && error.response.status === 401) {
+                // redirectToLogin();
+            }
+        }
+    },
 }
 
 function buildTestResponse(userData, type) {

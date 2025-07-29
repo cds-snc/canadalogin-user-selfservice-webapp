@@ -23,14 +23,14 @@ try {
     createRoot(document.getElementById('root')).render(
         <StrictMode>
             <Suspense fallback="Loading...">
-                <UserProvider>
-                    <BrowserRouter>
+                <BrowserRouter>
+                    <UserProvider>
                         <LanguageProvider>
                             <AppLanguageSetup />
                             <App />
                         </LanguageProvider>
-                    </BrowserRouter>
-                </UserProvider>
+                    </UserProvider>
+                </BrowserRouter>
             </Suspense>
         </StrictMode >
     );

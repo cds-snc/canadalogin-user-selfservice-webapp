@@ -1,4 +1,5 @@
 import { useReducer, useEffect, ReactNode } from "react";
+import { useSearchParams } from 'react-router';
 import { SERVICES, CONTEXT_ACTIONS } from "../../utils/constants.jsx";
 import UserContext from "./UserContext";
 import { authService } from "../../services/authService.jsx";
@@ -41,6 +42,7 @@ export interface UserState {
     editProfile: UserProfile | null;
     urlLanguageBeforeEdit: string | null;
     cancelProfileEditing: boolean;
+    relyingPartyInfo: any | null;
 }
 
 interface UserProviderProps {
@@ -77,7 +79,8 @@ const initialState = {
     userProfile: null,
     editProfile: null,
     urlLanguageBeforeEdit: null,
-    cancelProfileEditing: false
+    cancelProfileEditing: false,
+    relyingPartyInfo: null
 }
 
 
@@ -137,6 +140,11 @@ function userReducer(state = initialState, action: Action) {
                 ...state,
                 cancelProfileEditing: action.payload
             };
+        case CONTEXT_ACTIONS.set_relying_party_data:
+            return {
+                ...state,
+                relyingPartyInfo: action.payload
+            };
         default:
             return state;
     }
@@ -145,6 +153,8 @@ function userReducer(state = initialState, action: Action) {
 export function UserProvider({ children, initial = initialState }: UserProviderProps) {
 
     const [state, dispatch] = useReducer(userReducer, initial);
+    const [searchParams] = useSearchParams();
+
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -162,10 +172,36 @@ export function UserProvider({ children, initial = initialState }: UserProviderP
                 console.log(err);
             }
         };
-
         fetchUser();
-
     }, []);
+
+    useEffect(() => {
+
+        const setRelyingPartyInfo = async () => {
+            try {
+                const urlRelyingPartyId = searchParams.get("rp");
+                console.log("Relying Party ID:", urlRelyingPartyId);
+                if (urlRelyingPartyId) {
+                    sessionStorage.setItem("rpid", urlRelyingPartyId);
+                }
+                const rpid = sessionStorage.getItem("rpid");
+                if (rpid) {
+                    const response = await authService.get_rp_info(rpid);
+                    if (response && response.data) {
+                        // dispatch({ type: CONTEXT_ACTIONS.signin_success, payload: response.data });
+                    }
+                    else {
+                        // dispatch({ type: CONTEXT_ACTIONS.signin_failure, payload: null });
+                    }
+                }
+
+            } catch (err) {
+                // dispatch({ type: CONTEXT_ACTIONS.signin_failure, payload: null });
+            }
+        };
+        setRelyingPartyInfo();
+    }, []);
+
     return (
         <UserContext.Provider value={{ state, dispatch }} >
             {children}
