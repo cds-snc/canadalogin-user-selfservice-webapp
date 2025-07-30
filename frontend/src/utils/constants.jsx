@@ -51,8 +51,13 @@ export const CONTEXT_ACTIONS = {
     signin_success: 'SIGNIN_SUCCESS',
     signin_failure: 'SIGNIN_FAILURE',
     clone_profile: 'CLONE_PROFILE',
+    clear_edit_profile: 'CLEAR_EDIT_PROFILE',
+    update_cloned_profile: 'UPDATED_CLONE_PROFILE',
     update_profile: 'UPDATE_PROFILE',
     updated_profile_success: 'UPDATE_PROFILE_SUCCESS',
+    set_original_language_before_edit: 'SET_ORIGINAL_LANGUAGE_BEFORE_EDIT',
+    cancel_profile_editing: 'CANCEL_PROFILE_EDITING',
+    set_language: 'SET_LANGUAGE',
 };
 
 export const FLOW_TYPES = {
@@ -127,7 +132,6 @@ export const SUBMIT_END_POINTS = {
     login: '/v1/otp/users/login',
     otpVerify: '/v1/otp/otp/verify',
     otpSend: '/v1/otp/otp/send',
-    me: '/v1/users/me',
     profile: '/v1/users/profile',
 }
 

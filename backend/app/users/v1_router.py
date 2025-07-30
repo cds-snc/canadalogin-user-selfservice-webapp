@@ -32,13 +32,13 @@ async def user_profile(
 
 
 @router.get(
-    "/me",
+    "/profile",
     response_model=ProfileResponse,
     tags=["Users"],
     summary="Get a single user's profile",
     description="",
 )
-async def me(
+async def profile(
     request: Request, user_access_token: str = Depends(get_users_current_session)
 ):
     return await my_profile(

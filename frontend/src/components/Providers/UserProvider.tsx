@@ -3,16 +3,44 @@ import { SERVICES, CONTEXT_ACTIONS } from "../../utils/constants.jsx";
 import UserContext from "./UserContext";
 import { authService } from "../../services/authService.jsx";
 
-
 interface Action {
     type: string
     payload: any
 }
 
-interface UserState {
-    userProfile: null;
+export interface UserProfile {
+    id: string;
+    active: boolean;
+    details: null | {
+        emailVerified: boolean | null;
+        lastLogin: string | null;
+        lastMFA: string | null;
+        twoFactorAuthentication: boolean;
+        pwdChangedTime: string | null;
+    };
+    emails: null | Array<{ value: string; type: string }>;
+    phoneNumbers: null | Array<{ value: string; type: string }>;
+    meta: {
+        created: string;
+        location: string;
+        lastModified: string;
+        resourceType: string;
+    };
+    userName: string;
+    preferredLanguage?: string;
+    name?: {
+        givenName?: string;
+        familyName?: string;
+        formatted?: string;
+    };
+}
+export interface UserState {
+    userProfile: UserProfile | null;
     userData: any;
     isLoading: boolean;
+    editProfile: UserProfile | null;
+    urlLanguageBeforeEdit: string | null;
+    cancelProfileEditing: boolean;
 }
 
 interface UserProviderProps {
@@ -21,16 +49,12 @@ interface UserProviderProps {
     payload: any
 }
 
-interface UserState {
-    userProfile: null;
-    userData: any;
-    isLoading: boolean;
-}
 
 interface UserProviderProps {
     children: ReactNode;
     initial?: UserState;
 }
+
 
 const initialState = {
     isLoading: true,
@@ -51,7 +75,9 @@ const initialState = {
         passwordValidated: false
     },
     userProfile: null,
-    editProfile: null
+    editProfile: null,
+    urlLanguageBeforeEdit: null,
+    cancelProfileEditing: false
 }
 
 
@@ -77,9 +103,11 @@ function userReducer(state = initialState, action: Action) {
         case CONTEXT_ACTIONS.clone_profile:
             return {
                 ...state,
-                editProfile: { ...state.userProfile || {} }
+                editProfile: { ...state.userProfile || {} },
+                cancelProfileEditing: false,
+                urlLanguageBeforeEdit: null,
             };
-        case CONTEXT_ACTIONS.update_profile:
+        case CONTEXT_ACTIONS.update_cloned_profile:
             console.log(action.payload)
             return {
                 ...state,
@@ -91,7 +119,23 @@ function userReducer(state = initialState, action: Action) {
         case CONTEXT_ACTIONS.updated_profile_success:
             return {
                 ...state,
-                userProfile: action.payload,
+                userProfile: action.payload
+            };
+        case CONTEXT_ACTIONS.clear_edit_profile:
+            return {
+                ...state,
+                editProfile: null,
+                cancelProfileEditing: true
+            };
+        case CONTEXT_ACTIONS.set_original_language_before_edit:
+            return {
+                ...state,
+                urlLanguageBeforeEdit: action.payload
+            };
+        case CONTEXT_ACTIONS.cancel_profile_editing:
+            return {
+                ...state,
+                cancelProfileEditing: action.payload
             };
         default:
             return state;

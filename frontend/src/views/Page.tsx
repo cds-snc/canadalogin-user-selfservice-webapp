@@ -1,3 +1,8 @@
+import { useEffect } from "react";
+import { useLocation, useParams } from "react-router";
+import { useUser } from "../components/Providers/useUser";
+import { useLanguage } from "../components/Providers/LanguageProvider.tsx";
+
 import { getLangValues } from "../utils/functions";
 import Header from '../components/Layout/Header';
 import Footer from '../components/Layout/Footer';
@@ -5,17 +10,13 @@ import { GcdsContainer, GcdsText } from "@cdssnc/gcds-components-react";
 import Verification from "../components/Verification/Verification.jsx";
 import Password from "../components/Password/Password.jsx";
 import SignUpEmail from "../components/SignUp/SignUpEmail.jsx";
-import Home from "../components/Home/Home.jsx";
 import CreateCoreProfile from "../components/SignUp/Profile/CreateCoreProfile.jsx";
 import Privacy from "../components/SignUp/Profile/Privacy.jsx";
 import VerificationSetUp from "../components/SignUp/TwoStepVerification/VerificationSetUp"
 import VerificationSelection from "../components/SignIn/VerificationSelection"
 import ManageDashboard from "../components/Manage/ManageDashboard.jsx";
 import { PAGES } from "../utils/constants";
-import { useUser } from "../components/Providers/useUser";
-import { useLocation, useParams } from "react-router";
 import { trackPage } from "../utils/gatag.jsx";
-import { useEffect } from "react";
 import AreYouSureEditYourName from "../components/Manage/AreYouSureEditYourName.jsx";
 import ProfileNameEdit from "../components/PersonalInfo/ProfileNameEdit.jsx";
 import ProfileHome from "../components/Manage/ProfileHome.jsx";
@@ -35,18 +36,6 @@ import ProfileYouMayUpdateLanguage from "../components/Manage/ProfileYouMayUpdat
 
 function PageContents({ page }: { page: string }) {
     switch (page) {
-        case PAGES.home:
-            return (
-                <Home />
-            );
-        case PAGES.signup:
-            return (
-                <SignUpEmail />
-            );
-        case PAGES.password:
-            return (
-                <Password />
-            );
         case PAGES.verification:
             return (
                 <Verification />
@@ -165,25 +154,24 @@ function PageContents({ page }: { page: string }) {
 
 export default function Page({ page }: { page: string }) {
     const { pathname } = useLocation();
-    const { language } = useParams();
-    const { langHref, currentLang } = getLangValues(language, pathname);
     const { state } = useUser();
+    const { state: languageState } = useLanguage();
+    const { language } = languageState;
+    const { langHref } = getLangValues(language, pathname);
 
 
     useEffect(() => {
         trackPage(pathname, page)
     }, [pathname]);
-
     return (
         <div className="mainBody">
-            <Header langHref={langHref} currentLang={currentLang} service={state.userData.service} />
+            <Header langHref={langHref} currentLang={language} service={state.userData.service} />
             <GcdsContainer className="gcds-page">
                 <GcdsContainer size="lg" className="gcds-content">
                     <PageContents page={page} />
                 </GcdsContainer>
             </GcdsContainer>
-            <Footer currentLang={currentLang} />
+            <Footer currentLang={language} />
         </div>
     );
 }
-
