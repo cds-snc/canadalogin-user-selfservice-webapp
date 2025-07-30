@@ -11,13 +11,14 @@ flowchart TD
     ZenHubAssignTask("Developer assigns themselves to the Task (if not assigned already)")
     ZenHubMoveToInProgress("Developer moves Task to In Progress")
     ZenHubAddLabels("Developer adds Labels to the Task")
+    ZenHubAddStoryPoints("Developer adds Story Points to the Task (if not added already)")
     GitHubCreateBranch("Developer creates a branch from the Task/Issue")
     DeveloperWorkOnFeature("Developer checks out the branch and develops features")
     DeveloperCommitsChanges("Developer commits changes to their branch")
     CreatePullRequest("Developer creates a Pull Request")
     LinkPRToIssue("(Optional)<br />Developer links the PR to the Task in the PR description<br/> (Example: 'Closes #10')")
     SlackAddPRMessage("Developer adds a link to the PR on dev channel to notify team")
-    UnitTestsPass{"Coverage is 70% and Unit Tests Pass?"}
+    UnitTestsPass{"Coverage is 70% and Unit Tests Pass? <br/><strong>NOTE: This only applies to changes that can be unit tested.</strong>"}
     AddUnitTests("Developer adds Unit Tests")
     ZenHubMoveToReview("Developer moves the Task to the Review column")
     PRReview("PR is reviewed by at least one developer")
@@ -45,6 +46,7 @@ flowchart TD
         ZenHubAddLabels
         ZenHubAssignTask
         ZenHubMoveToInProgress
+        ZenHubAddStoryPoints
     end
     ZenHubTaskPickupGraph --> WorkOnTask
     WorkOnTask --> GitHubWorkOnFeatureGraph
@@ -90,6 +92,7 @@ flowchart TD
     style ZenHubAddLabels fill:#d0f0f0,stroke:#333,stroke-width:2px
     style ZenHubAssignTask fill:#d0f0f0,stroke:#333,stroke-width:2px
     style ZenHubMoveToInProgress fill:#d0f0f0,stroke:#333,stroke-width:2px
+    style ZenHubAddStoryPoints fill:#d0f0f0,stroke:#333,stroke-width:2px
     style WorkOnTask fill:#ffff99,stroke:#333,stroke-width:2px
     style GitHubCreateBranch fill:#d0f0f0,stroke:#333,stroke-width:2px
     style DeveloperWorkOnFeature fill:#d0f0f0,stroke:#333,stroke-width:2px
