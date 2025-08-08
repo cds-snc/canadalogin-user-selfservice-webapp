@@ -1,0 +1,50 @@
+@startuml oidc-flow-management-app
+'  To update a plantuml diagram, you have to:
+'  sudo apt update  
+'  sudo apt-get install -y openjdk-11-jdk
+'  Install the VScode extension: PlantUML jebbs
+'  Right click on the diagram and select "Preview Current Diagram"
+
+title OIDC Flow for Profile Management App
+
+actor User
+participant RP_Geo
+participant ReactApp as "Profile Management App\napp.gc-signin.cdssandbox.xyz"
+participant FastAPI as "FastAPI Backend\napi.gc-signin.cdssandbox.xyz"
+participant IBMVerify as "IBM Verify IDP"
+
+User -> RP_Geo : A user visits a Relying Party application.\n and selects the option to view their GC Profile
+
+RP_Geo -> ReactApp : User is redirected to the Profile Management application
+ReactApp -> FastAPI : On app load the Frontend will make a request to \n get the users profile -> GET /profile
+FastAPI -> FastAPI : Checks if a sessionID was included in the request
+
+opt sessionID found
+   FastAPI -> FastAPI : Use the session ID to retrieve the access token from the server-side session.
+    FastAPI -> IBMVerify : Request user info (GET /v2.0/Me) using the users access token
+    IBMVerify --> FastAPI : User info response
+    FastAPI --> ReactApp : Return users profile
+    ReactApp --> RP_Geo : After viewing or editing their profile, \nthe user can click a link to navigate \nback to the original Relying Party application.
+end
+
+    FastAPI --> ReactApp : A 401 unauthorized is returned to the client
+    ReactApp -> FastAPI : On 401 Unauthorized, frontend triggers a redirect to (GET /v1/auth/login - HTTP 302)
+    FastAPI -> IBMVerify :  populate required parameters in the authorization request,\nsuch as client_id, redirect_uri and scope and\nredirect the user to the authorize endpoint 
+    IBMVerify -> User : Displays the IBM Verify login page
+
+    User -> IBMVerify : IBM Verify Authenticates the user
+    IBMVerify -> FastAPI : Redirects back with the auth code\n (GET /v1/auth/callback - HTTP 307 Temporary Redirect)
+
+    FastAPI -> IBMVerify : Exchange the code for a users access token
+    IBMVerify -> FastAPI : An access token is returned
+    FastAPI -> FastAPI : Store the access token in a server-side session
+    FastAPI --> ReactApp : Set the session ID in a cookie\n(HttpOnly, Secure, SameSite=Lax,\ndomain=.gc-signin.cdssandbox.xyz)
+    FastAPI --> ReactApp : Redirect back to client
+    ReactApp -> FastAPI : On app load the Frontend will (GET /profile)
+    FastAPI -> FastAPI : Use the session ID to retrieve the access token from the server-side session.
+    FastAPI -> IBMVerify : Request user info (GET /v2.0/Me) using the users access token
+    IBMVerify --> FastAPI : User info response
+    FastAPI --> ReactApp : Return users profile
+    ReactApp --> RP_Geo : After viewing or editing their profile, \nthe user can click a link to navigate \nback to the original Relying Party application.
+
+@enduml
