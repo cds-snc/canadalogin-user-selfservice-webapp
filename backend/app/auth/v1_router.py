@@ -4,8 +4,7 @@ from fastapi import APIRouter
 from fastapi import Request
 from app.auth.services.auth import (
     redirect_to_verify,
-    callback_handler,
-    reauthenticate_user,
+    callback_handler
 )
 
 router = APIRouter()
