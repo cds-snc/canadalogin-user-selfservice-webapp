@@ -31,14 +31,3 @@ async def redirect_url(request: Request):
 )
 async def callback(request: Request):
     return await callback_handler(request)
-
-
-@router.get(
-    "/reauth",
-    tags=["Auth"],
-    summary="Reauthenticate user via IBM Verify",
-    name="reauth",
-    description="",
-)
-async def reauth(request: Request):
-    return await reauthenticate_user(request)

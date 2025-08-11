@@ -86,29 +86,3 @@ async def get_users_current_session(request: Request):
         raise HTTPException(status_code=401, detail="Not authenticated")
     logger.info("Access Token found in session")
     return user_access_token
-
-
-async def reauthenticate_user(request: Request):
-    """
-    Get the redirect URL for the OAuth login flow.
-    This function is used to initiate the login process with IBM Verify.
-    """
-    try:
-        config = get_configuration()
-        # this request.url_for gets the url based on the callback route defined
-        callback_route = request.url_for("callback_route")
-        redirect_uri = callback_route
-        logger.info("Health check hit - headers: %s", dict(request.headers))
-
-        if config.ENVIRONMENT != "local":
-            redirect_uri = str(callback_route).replace("http://", "https://")
-        logger.info(f"Callback Redirect URI: {redirect_uri}")
-        return await oauth.verify.authorize_redirect(
-            request, redirect_uri, prompt="login", max_age=0
-        )
-    except OAuthError as e:
-        logger.exception("Unexpected error during redirect_to_verify", str(e))
-        return generate_error_response(401, string_error_response(str(e)))
-    except Exception as e:
-        logger.exception("Unexpected error during redirect_to_verify", str(e))
-        return generate_error_response(500, string_error_response())
