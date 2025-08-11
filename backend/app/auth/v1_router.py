@@ -2,7 +2,7 @@ import logging
 
 from fastapi import APIRouter
 from fastapi import Request
-from app.auth.services.auth import redirect_to_verify, callback_handler
+from app.auth.services.auth import redirect_to_verify, callback_handler, reauthenticate_user
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -27,3 +27,14 @@ async def redirect_url(request: Request):
 )
 async def callback(request: Request):
     return await callback_handler(request)
+
+
+@router.get(
+    "/reauth",
+    tags=["Auth"],
+    summary="Reauthenticate user via IBM Verify",
+    name="reauth",
+    description="",
+)
+async def reauth(request: Request):
+    return await reauthenticate_user(request)

@@ -1,8 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router';
 import { format } from 'date-fns';
-import { getPageContent } from '../../utils/functions.jsx';
-import { PAGES } from '../../utils/constants.jsx';
 import {
     GcdsContainer,
     GcdsHeading,
@@ -10,6 +8,10 @@ import {
     GcdsText,
     GcdsLink,
 } from '@cdssnc/gcds-components-react';
+import { getPageContent } from '../../utils/functions.jsx';
+import { PAGES } from '../../utils/constants.jsx';
+import { redirectToReauth } from '../../utils/redirect.jsx';
+
 import { useUser } from "../Providers/useUser.tsx";
 
 
