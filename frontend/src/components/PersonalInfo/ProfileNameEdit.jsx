@@ -42,6 +42,13 @@ export default function ProfileNameEdit() {
 
         }
         updateClonedProfile({ name: updatedName });
+        const updatedName = {
+            givenName: editProfile.givenName,
+            familyName: editProfile.familyName,
+            formatted: `${editProfile.givenName} ${editProfile.familyName}`
+
+        }
+        updateClonedProfile({ name: updatedName });
         navigateHelper(confirmation);
     }
 

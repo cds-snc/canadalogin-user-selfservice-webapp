@@ -25,6 +25,7 @@ import CompleteTwoStepVerification from "../components/Manage/CompleteTwoStepVer
 import FirstVerifyItsYou from "../components/Manage/FirstVerifyItsYou.jsx";
 import EnterNewEmail from "../components/Manage/EnterNewEmail.jsx";
 import ProfileYouMayUpdateName from "../components/Manage/ProfileYouMayUpdateName.jsx";
+import AreYouSureUpdateContactNumber from "../components/Manage/AreYouSureUpdateContactNumber.jsx";
 import EnterNewPhoneNumber from "../components/Manage/EnterNewPhoneNumber.jsx";
 import YouMayUpdateEmailAtOtherPlaces from "../components/Manage/YouMayUpdateEmailAtOtherPlaces.jsx";
 import AreYouSureUpdateYourEmail from "../components/Manage/AreYouSureUpdateYourEmail.jsx";
@@ -128,7 +129,12 @@ function PageContents({ page }: { page: string }) {
         case PAGES.areYouSureEditYourName:
             return (
                 <AreYouSureEditYourName />
-            )
+            ) 
+        case PAGES.areYouSureUpdateContactNumber:
+            return (
+                <AreYouSureUpdateContactNumber />
+            ) 
+            
         case PAGES.editLanguagePreferences:
             return (
                 <EditLanguagePreferences />

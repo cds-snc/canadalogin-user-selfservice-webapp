@@ -80,6 +80,15 @@ export const authService = {
                 redirectToLogin();
             }
         }
+        try {
+            const response = await axios.get(`${config.apiUrl}${SUBMIT_END_POINTS.profile}`);
+            return response.data;
+        }
+        catch (error) {
+            if (error.response && error.response.status === 401) {
+                redirectToLogin();
+            }
+        }
     },
     update_my_user_profile: async (editedProfile) => {
         try {
