@@ -2,10 +2,7 @@ import logging
 
 from fastapi import APIRouter
 from fastapi import Request
-from app.auth.services.auth import (
-    redirect_to_verify,
-    callback_handler
-)
+from app.auth.services.auth import redirect_to_verify, callback_handler
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
