@@ -47,7 +47,8 @@ export default function ProfileNameEdit() {
 
     useEffect(() => {
         cloneUserProfile();
-    }, [dispatch, state.userProfile, cloneUserProfile]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     console.log('State', state)
 
