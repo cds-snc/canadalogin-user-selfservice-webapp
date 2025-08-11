@@ -35,6 +35,14 @@ export interface UserProfile {
         formatted?: string;
     };
 }
+
+export interface RelyingPartyInfo {
+    icon: string;
+    id: string;
+    linkName: string;
+    url: string;
+}
+
 export interface UserState {
     userProfile: UserProfile | null;
     userData: any;
@@ -42,7 +50,7 @@ export interface UserState {
     editProfile: UserProfile | null;
     urlLanguageBeforeEdit: string | null;
     cancelProfileEditing: boolean;
-    relyingPartyInfo: any | null;
+    relyingPartyInfo: RelyingPartyInfo | null;
 }
 
 interface UserProviderProps {
