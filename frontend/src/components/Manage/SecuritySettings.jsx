@@ -11,6 +11,7 @@ import {
     GcdsLink, GcdsIcon
 } from '@cdssnc/gcds-components-react';
 import { useUser } from "../Providers/useUser.tsx";
+import { redirectToReauth } from "../../utils/redirect.jsx";
 
 
 
@@ -29,7 +30,7 @@ export default function SecuritySettings() {
                 <GcdsHeading tag="h3">{pageContent['4']}</GcdsHeading>
                 <GcdsGrid columns="1fr" gap="1rem" align-items="center">
                     <GcdsText>{pageContent['5']} {formattedPasswordChangeDate}</GcdsText>
-                    <GcdsLink href="#" size="regular">
+                    <GcdsLink onGcdsClick={() => redirectToReauth()} size="regular">
                         {pageContent['6']}
                     </GcdsLink>
                 </GcdsGrid>

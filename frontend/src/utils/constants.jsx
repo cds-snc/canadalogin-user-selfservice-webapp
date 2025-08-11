@@ -41,6 +41,7 @@ export const NAVIGATION_LINKS = {
 };
 export const OIDC_REDIRECT = {
     login: `${config.apiUrl}/v1/auth/login`,
+    reauth: `${config.apiUrl}/v1/auth/reauth`,
 }
 
 export const CONTEXT_ACTIONS = {

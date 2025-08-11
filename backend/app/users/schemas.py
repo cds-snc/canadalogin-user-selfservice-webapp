@@ -102,3 +102,14 @@ class ProfilePUTData(BaseModel):
 
 class ProfileResponse(ResponseModel):
     data: Optional[ProfileGetResponseData]
+
+
+class RelyingPartyInfo(BaseModel):
+    icon: str
+    id: str
+    linkName: str
+    url: str
+
+
+class RelyingPartyResponse(ResponseModel):
+    data: Optional[RelyingPartyInfo]

@@ -178,25 +178,27 @@ export function UserProvider({ children, initial = initialState }: UserProviderP
     useEffect(() => {
 
         const setRelyingPartyInfo = async () => {
+            const rpKey = "rp";
+            if (typeof window === 'undefined' || typeof sessionStorage === 'undefined') return;
+            let relyingPartyId = sessionStorage.getItem(rpKey);
+
+            const urlRelyingPartyId = searchParams.get(rpKey);
+            if (!urlRelyingPartyId && !relyingPartyId) return;
             try {
-                const urlRelyingPartyId = searchParams.get("rp");
-                console.log("Relying Party ID:", urlRelyingPartyId);
                 if (urlRelyingPartyId) {
-                    sessionStorage.setItem("rpid", urlRelyingPartyId);
-                }
-                const rpid = sessionStorage.getItem("rpid");
-                if (rpid) {
-                    const response = await authService.get_rp_info(rpid);
-                    if (response && response.id) {
-                        dispatch({ type: CONTEXT_ACTIONS.set_relying_party_data, payload: response });
-                    }
-                    else {
-                        // dispatch({ type: CONTEXT_ACTIONS.signin_failure, payload: null });
-                    }
+                    sessionStorage.setItem(rpKey, urlRelyingPartyId);
+                    relyingPartyId = urlRelyingPartyId;
                 }
 
+                const response = await authService.get_rp_info(relyingPartyId);
+                if (response && response.data && response.data.id) {
+                    dispatch({ type: CONTEXT_ACTIONS.set_relying_party_data, payload: response.data });
+                }
+                else {
+                    console.error("Error in getting relying party info:", response);
+                }
             } catch (err) {
-                // dispatch({ type: CONTEXT_ACTIONS.signin_failure, payload: null });
+                console.error("Error in getting relying party info:", err);
             }
         };
         setRelyingPartyInfo();
