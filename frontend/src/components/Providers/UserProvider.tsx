@@ -168,7 +168,7 @@ export function UserProvider({ children, initial = initialState }: UserProviderP
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const response = await authService.my_user_profile();
+                const response = await authService.get_my_user_profile();
                 if (response && response.data) {
                     dispatch({ type: CONTEXT_ACTIONS.signin_success, payload: response.data });
                 }
