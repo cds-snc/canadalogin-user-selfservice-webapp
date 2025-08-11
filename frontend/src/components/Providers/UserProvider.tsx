@@ -187,8 +187,8 @@ export function UserProvider({ children, initial = initialState }: UserProviderP
                 const rpid = sessionStorage.getItem("rpid");
                 if (rpid) {
                     const response = await authService.get_rp_info(rpid);
-                    if (response && response.data) {
-                        // dispatch({ type: CONTEXT_ACTIONS.signin_success, payload: response.data });
+                    if (response && response.id) {
+                        dispatch({ type: CONTEXT_ACTIONS.set_relying_party_data, payload: response });
                     }
                     else {
                         // dispatch({ type: CONTEXT_ACTIONS.signin_failure, payload: null });

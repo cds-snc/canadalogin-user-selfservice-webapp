@@ -94,9 +94,7 @@ export const authService = {
     },
     get_rp_info: async (rp) => {
         try {
-            const response = await axios.get(`${config.apiUrl}${SUBMIT_END_POINTS.rp_info}`, {
-                params: { rp }
-            });
+            const response = await axios.get(`${config.apiUrl}${SUBMIT_END_POINTS.rp_info}/${rp}`);
             return response.data;
         }
         catch (error) {
