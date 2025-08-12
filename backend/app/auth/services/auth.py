@@ -25,14 +25,17 @@ def get_callback_redirect_uri(request: Request):
     return redirect_uri
 
 
-async def redirect_to_verify(request: Request):
+async def redirect_user_to_idp_verify(request: Request):
     """
     Get the redirect URL for the OAuth login flow.
     This function is used to initiate the login process with IBM Verify.
     """
     try:
         callback_redirect_uri = get_callback_redirect_uri(request)
-        return await oauth.verify.authorize_redirect(request, callback_redirect_uri)
+        return await oauth.verify.authorize_redirect(
+            request,
+            callback_redirect_uri
+        )
     except OAuthError as e:
         logger.exception("Unexpected error during redirect_to_verify", str(e))
         return generate_error_response(401, string_error_response(str(e)))
