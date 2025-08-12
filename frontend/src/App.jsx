@@ -1,9 +1,10 @@
-import { Routes, Route, Navigate } from 'react-router';
-import PrivateRoute from "./components/Providers/PrivateRoute.jsx";
+import { Routes, Route, Navigate, useParams } from 'react-router';
+import { PrivateRoute, StepupPrivateRoute } from "./components/Providers/PrivateRoute.jsx";
 import Page from "./views/Page.js";
 import { PAGES, NAVIGATION_LINKS } from "./utils/constants.jsx";
 
 function App() {
+    const { language } = useParams();
     const editLanguagePreferences = `/:language${NAVIGATION_LINKS.editLanguagePreferences}`
     const areYouSureEditYourLanguage = `/:language${NAVIGATION_LINKS.areYouSureEditYourLanguage}`
     const profileYouMayUpdateLanguage = `/:language${NAVIGATION_LINKS.profileYouMayUpdateLanguage}`
@@ -21,12 +22,15 @@ function App() {
                 <Route path="/:language/firstverifyitsyou" element={<Page page={PAGES.FirstVerifyItsYou} />} />
                 <Route path="/:language/enternewemail" element={<Page page={PAGES.EnterNewEmail} />} />
                 <Route path="/:language/profileYouMayUpdateName" element={<Page page={PAGES.profileYouMayUpdateName} />} />
-                <Route path="/:language/areYouSureUpdateContactNumber" element={ <Page page={PAGES.areYouSureUpdateContactNumber}/>} />
+                <Route path="/:language/areYouSureUpdateContactNumber" element={<Page page={PAGES.areYouSureUpdateContactNumber} />} />
                 <Route path="/:language/areYouSureEditYourName" element={<Page page={PAGES.areYouSureEditYourName} />} />
                 <Route path="/:language/enterNewPhoneNumber" element={<Page page={PAGES.enterNewPhoneNumber} />} />
                 <Route path="/:language/youMayUpdateEmailAtOtherPlaces" element={<Page page={PAGES.youMayUpdateEmailAtOtherPlaces} />} />
                 <Route path="/:language/areYouSureUpdateYourEmail" element={<Page page={PAGES.areYouSureUpdateYourEmail} />} />
-                <Route path="/:language/securitysettings" element={<Page page={PAGES.securitySettings} />} />
+                <Route element={<StepupPrivateRoute />}>
+                    <Route path="/:language/securitysettings" element={<Page page={PAGES.securitySettings} />} />
+                </Route>
+
                 <Route path={editLanguagePreferences} element={<Page page={PAGES.editLanguagePreferences} />} />
                 <Route path={areYouSureEditYourLanguage} element={<Page page={PAGES.areYouSureEditYourLanguage} />} />
                 <Route path={profileYouMayUpdateLanguage} element={<Page page={PAGES.profileYouMayUpdateLanguage} />} />

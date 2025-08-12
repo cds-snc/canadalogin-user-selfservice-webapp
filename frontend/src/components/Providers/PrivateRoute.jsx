@@ -1,8 +1,11 @@
 import { useEffect } from "react";
-import { Outlet } from "react-router";
+import { Outlet, useParams, useLocation, useSearchParams } from "react-router";
 import { useUser } from "./useUser.tsx";
 import { isEmailValid } from "../../utils/functions.jsx";
 import { FLOW_TYPES, OIDC_REDIRECT } from "../../utils/constants.jsx";
+import { userProfileDispatch } from "../../utils/userProfileDispatch.jsx";
+import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
+
 
 
 function PrivateRoute() {
@@ -16,6 +19,37 @@ function PrivateRoute() {
 
     if (state.isLoading) return <div>Loading...</div>;
     if (!state.userProfile) return null;
+
+    return <Outlet />;
+}
+
+function StepupPrivateRoute() {
+    const { state, dispatch } = useUser();
+    const { setAuthenticatedPage } = userProfileDispatch(dispatch);
+    const { pathname } = useLocation();
+    const [searchParams] = useSearchParams();
+    const navigateHelper = useNavigateHelper();
+    const returnToPageKey = "returnToPage";
+    const returnToPagePath = searchParams.get(returnToPageKey);
+
+    console.log(pathname, "location pathname");
+
+    useEffect(() => {
+        if (state.isLoading) return;
+        if (!state.userProfile) return;
+        const isAuthenticatedPage = state.authenticatedPages.includes(pathname);
+        if (isAuthenticatedPage) return; // without this you will get into a redirect loop
+
+        if (!returnToPagePath || returnToPagePath != pathname) {
+            window.location.href = `${OIDC_REDIRECT.reauth}?${returnToPageKey}=${encodeURIComponent(pathname)}`;
+        } else {
+            setAuthenticatedPage(pathname);
+            navigateHelper(returnToPagePath, { replace: true });
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [state.isLoading, state.userProfile, pathname, returnToPagePath]);
+
+
 
     return <Outlet />;
 }
@@ -53,4 +87,4 @@ const signIn = {
     }
 }
 
-export default PrivateRoute;
+export { PrivateRoute, StepupPrivateRoute };

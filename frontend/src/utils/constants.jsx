@@ -60,6 +60,7 @@ export const CONTEXT_ACTIONS = {
     cancel_profile_editing: 'CANCEL_PROFILE_EDITING',
     set_language: 'SET_LANGUAGE',
     set_relying_party_data: 'SET_RELYING_PARTY_DATA',
+    set_authenticated_pages: 'SET_AUTHENTICATED_PAGES',
 };
 
 export const FLOW_TYPES = {

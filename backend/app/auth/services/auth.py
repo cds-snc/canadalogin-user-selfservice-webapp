@@ -53,8 +53,11 @@ async def callback_handler(request: Request):
         if config.ENVIRONMENT != "local":
             redirectValue = f"https://{config.PROFILE_MANAGEMENT_DOMAIN}"
 
-        if request.session.get(SessionKeys.RETURN_TO_PAGE.value):
-            redirectValue += request.session.get(SessionKeys.RETURN_TO_PAGE.value)
+        returnToPageValue = request.session.get(SessionKeys.RETURN_TO_PAGE.value)
+
+        if returnToPageValue:
+            clientRedirectValue = f"{returnToPageValue}?{SessionKeys.RETURN_TO_PAGE.value}={returnToPageValue}"
+            redirectValue += clientRedirectValue
             logger.info(f"Return to page set in session: {redirectValue}")
 
         try:
