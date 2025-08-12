@@ -32,10 +32,7 @@ async def redirect_user_to_idp_verify(request: Request):
     """
     try:
         callback_redirect_uri = get_callback_redirect_uri(request)
-        return await oauth.verify.authorize_redirect(
-            request,
-            callback_redirect_uri
-        )
+        return await oauth.verify.authorize_redirect(request, callback_redirect_uri)
     except OAuthError as e:
         logger.exception("Unexpected error during redirect_to_verify", str(e))
         return generate_error_response(401, string_error_response(str(e)))
@@ -71,8 +68,8 @@ async def callback_handler(request: Request):
             # redirect back to IBM Verify to retry authentication
             return RedirectResponse(url=redirectValue)
 
-        request.session[SessionKeys.SESSION_USER_ACCESS_TOKEN_KEY.value] = oidc_response.get(
-            "access_token"
+        request.session[SessionKeys.SESSION_USER_ACCESS_TOKEN_KEY.value] = (
+            oidc_response.get("access_token")
         )
 
         logger.info("OIDC Callback Handler")
@@ -92,7 +89,9 @@ async def get_users_current_session(request: Request):
     The user access token is stored in memory on the server
     Authlib docs - https://docs.authlib.org/en/latest/client/fastapi.html
     """
-    user_access_token = request.session.get(SessionKeys.SESSION_USER_ACCESS_TOKEN_KEY.value)
+    user_access_token = request.session.get(
+        SessionKeys.SESSION_USER_ACCESS_TOKEN_KEY.value
+    )
     logger.info("Get Users Session")
 
     if not user_access_token:
@@ -116,9 +115,7 @@ async def reauthenticate_user(request: Request, returnToPage: str = "/"):
             logger.info(f"Return to page set in session: {returnToPage}")
 
         return await oauth.verify.authorize_redirect(
-            request,
-            callback_redirect_uri,
-            acr_values="update_password"
+            request, callback_redirect_uri, acr_values="update_password"
         )
     except OAuthError as e:
         logger.exception("Unexpected error during redirect_to_verify", str(e))

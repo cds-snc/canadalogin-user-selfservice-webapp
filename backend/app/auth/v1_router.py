@@ -2,7 +2,12 @@ import logging
 
 from fastapi import APIRouter
 from fastapi import Request, Depends
-from app.auth.services.auth import redirect_user_to_idp_verify, callback_handler, reauthenticate_user, get_users_current_session
+from app.auth.services.auth import (
+    redirect_user_to_idp_verify,
+    callback_handler,
+    reauthenticate_user,
+    get_users_current_session,
+)
 from app.constants.session_keys import SessionKeys
 
 router = APIRouter()
@@ -37,5 +42,9 @@ async def callback(request: Request):
     name="reauth",
     description="",
 )
-async def reauth(request: Request, returnToPage: str = "/", user_access_token: None = Depends(get_users_current_session)):
+async def reauth(
+    request: Request,
+    returnToPage: str = "/",
+    user_access_token: None = Depends(get_users_current_session),
+):
     return await reauthenticate_user(request, returnToPage)
