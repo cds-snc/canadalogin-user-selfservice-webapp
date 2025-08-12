@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams } from 'react-router';
+import { useParams, useLocation } from 'react-router';
 import { format } from 'date-fns';
 import {
     GcdsContainer,
@@ -17,6 +17,7 @@ import { useUser } from "../Providers/useUser.tsx";
 
 
 export default function SecuritySettings() {
+    const { pathname } = useLocation();
     const { language } = useParams();
     const pageContent = getPageContent(language, PAGES.securitySettings);
     const { state } = useUser();
@@ -31,7 +32,11 @@ export default function SecuritySettings() {
                 <GcdsHeading tag="h3">{pageContent['4']}</GcdsHeading>
                 <GcdsGrid columns="1fr" gap="1rem" align-items="center">
                     <GcdsText>{pageContent['5']} {formattedPasswordChangeDate}</GcdsText>
-                    <GcdsLink href="#" size="regular">
+                    <GcdsLink size="regular"
+                        onGcdsClick={(ev) => {
+                            ev.preventDefault();
+                            redirectToReauth(pathname)
+                        }}>
                         {pageContent['6']}
                     </GcdsLink>
                 </GcdsGrid>

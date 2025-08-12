@@ -4,6 +4,6 @@ export const redirectToLogin = () => {
     window.location.href = OIDC_REDIRECT.login;
 }
 
-export const redirectToReauth = () => {
-    window.location.href = OIDC_REDIRECT.reauth;
+export const redirectToReauth = (pathname) => {
+    window.location.href = `${OIDC_REDIRECT.reauth}?returnToPage=${encodeURIComponent(pathname)}`;
 }
