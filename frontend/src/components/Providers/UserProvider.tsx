@@ -1,4 +1,5 @@
 import { useReducer, useEffect, ReactNode } from "react";
+import { useSearchParams } from 'react-router';
 import { SERVICES, CONTEXT_ACTIONS } from "../../utils/constants.jsx";
 import UserContext from "./UserContext";
 import { authService } from "../../services/authService.jsx";
@@ -34,6 +35,14 @@ export interface UserProfile {
         formatted?: string;
     };
 }
+
+export interface RelyingPartyInfo {
+    icon: string;
+    id: string;
+    linkName: string;
+    url: string;
+}
+
 export interface UserState {
     userProfile: UserProfile | null;
     userData: any;
@@ -41,6 +50,7 @@ export interface UserState {
     editProfile: UserProfile | null;
     urlLanguageBeforeEdit: string | null;
     cancelProfileEditing: boolean;
+    relyingPartyInfo: RelyingPartyInfo | null;
 }
 
 interface UserProviderProps {
@@ -54,6 +64,7 @@ interface UserProviderProps {
     children: ReactNode;
     initial?: UserState;
 }
+
 
 
 const initialState = {
@@ -77,7 +88,8 @@ const initialState = {
     userProfile: null,
     editProfile: null,
     urlLanguageBeforeEdit: null,
-    cancelProfileEditing: false
+    cancelProfileEditing: false,
+    relyingPartyInfo: null
 }
 
 
@@ -137,6 +149,11 @@ function userReducer(state = initialState, action: Action) {
                 ...state,
                 cancelProfileEditing: action.payload
             };
+        case CONTEXT_ACTIONS.set_relying_party_data:
+            return {
+                ...state,
+                relyingPartyInfo: action.payload
+            };
         default:
             return state;
     }
@@ -145,11 +162,13 @@ function userReducer(state = initialState, action: Action) {
 export function UserProvider({ children, initial = initialState }: UserProviderProps) {
 
     const [state, dispatch] = useReducer(userReducer, initial);
+    const [searchParams] = useSearchParams();
+
 
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const response = await authService.my_user_profile();
+                const response = await authService.get_my_user_profile();
                 if (response && response.data) {
                     dispatch({ type: CONTEXT_ACTIONS.signin_success, payload: response.data });
                 }
@@ -162,10 +181,38 @@ export function UserProvider({ children, initial = initialState }: UserProviderP
                 console.log(err);
             }
         };
-
         fetchUser();
-
     }, []);
+
+    useEffect(() => {
+
+        const setRelyingPartyInfo = async () => {
+            const rpKey = "rp";
+            if (typeof window === 'undefined' || typeof sessionStorage === 'undefined') return;
+            let relyingPartyId = sessionStorage.getItem(rpKey);
+
+            const urlRelyingPartyId = searchParams.get(rpKey);
+            if (!urlRelyingPartyId && !relyingPartyId) return;
+            try {
+                if (urlRelyingPartyId) {
+                    sessionStorage.setItem(rpKey, urlRelyingPartyId);
+                    relyingPartyId = urlRelyingPartyId;
+                }
+
+                const response = await authService.get_rp_info(relyingPartyId);
+                if (response && response.data && response.data.id) {
+                    dispatch({ type: CONTEXT_ACTIONS.set_relying_party_data, payload: response.data });
+                }
+                else {
+                    console.error("Error in getting relying party info:", response);
+                }
+            } catch (err) {
+                console.error("Error in getting relying party info:", err);
+            }
+        };
+        setRelyingPartyInfo();
+    }, []);
+
     return (
         <UserContext.Provider value={{ state, dispatch }} >
             {children}

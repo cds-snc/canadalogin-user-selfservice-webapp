@@ -7,10 +7,10 @@ import './index.css';
 import { BrowserRouter } from "react-router";
 import ReactGA from "react-ga4";
 import { UserProvider } from "./components/Providers/UserProvider";
-import { LanguageProvider } from './components/Providers/LanguageProvider.js';
+import { LanguageProvider } from './components/Providers/LanguageProvider';
 
 import config from "./config.jsx";
-import { AppLanguageSetup } from './components/Providers/AppLanguageSetup.js';
+import { AppLanguageSetup } from './components/Providers/AppLanguageSetup';
 
 console.log('Starting React application...here');// Debug log
 
@@ -23,14 +23,14 @@ try {
     createRoot(document.getElementById('root')).render(
         <StrictMode>
             <Suspense fallback="Loading...">
-                <UserProvider>
-                    <BrowserRouter>
+                <BrowserRouter>
+                    <UserProvider>
                         <LanguageProvider>
                             <AppLanguageSetup />
                             <App />
                         </LanguageProvider>
-                    </BrowserRouter>
-                </UserProvider>
+                    </UserProvider>
+                </BrowserRouter>
             </Suspense>
         </StrictMode >
     );

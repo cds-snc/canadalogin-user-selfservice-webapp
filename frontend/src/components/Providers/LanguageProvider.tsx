@@ -19,7 +19,7 @@ interface LanguageProviderProps {
 }
 
 interface LanguageState {
-    language: string;
+    language: string | null;
 }
 
 function languageReducer(state = initialState, action: Action) {

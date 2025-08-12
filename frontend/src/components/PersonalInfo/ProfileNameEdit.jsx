@@ -39,7 +39,6 @@ export default function ProfileNameEdit() {
             givenName: editProfile.givenName,
             familyName: editProfile.familyName,
             formatted: `${editProfile.givenName} ${editProfile.familyName}`
-
         }
         updateClonedProfile({ name: updatedName });
         navigateHelper(confirmation);
@@ -47,7 +46,8 @@ export default function ProfileNameEdit() {
 
     useEffect(() => {
         cloneUserProfile();
-    }, [dispatch, state.userProfile, cloneUserProfile]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     console.log('State', state)
 

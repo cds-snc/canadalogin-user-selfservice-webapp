@@ -58,6 +58,7 @@ export const CONTEXT_ACTIONS = {
     set_original_language_before_edit: 'SET_ORIGINAL_LANGUAGE_BEFORE_EDIT',
     cancel_profile_editing: 'CANCEL_PROFILE_EDITING',
     set_language: 'SET_LANGUAGE',
+    set_relying_party_data: 'SET_RELYING_PARTY_DATA',
 };
 
 export const FLOW_TYPES = {
@@ -133,6 +134,7 @@ export const SUBMIT_END_POINTS = {
     otpVerify: '/v1/otp/otp/verify',
     otpSend: '/v1/otp/otp/send',
     profile: '/v1/users/profile',
+    rp_info: '/v1/users/rp_info',
 }
 
 

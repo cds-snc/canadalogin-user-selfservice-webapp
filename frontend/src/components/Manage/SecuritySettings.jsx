@@ -8,7 +8,7 @@ import {
     GcdsHeading,
     GcdsGrid,
     GcdsText,
-    GcdsLink, GcdsIcon
+    GcdsLink,
 } from '@cdssnc/gcds-components-react';
 import { useUser } from "../Providers/useUser.tsx";
 
