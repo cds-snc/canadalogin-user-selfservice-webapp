@@ -25,7 +25,7 @@
     "11": "Show password",
     "12": "Minimum length:",
     "13": "characters",
-    "14": "Enter your password",
+    "14": "Enter a new password",
     "15": "to continue to your",
     "16": "account",
     "17": "example.name@gmail.com",
@@ -308,7 +308,7 @@
     "10": "Connected Services ",
     "11": "in your GC Sign in dashboard."
   },
-  "AreYouSureUpdateContactNumber":{
+  "AreYouSureUpdateContactNumber": {
     "1": "Are you sure you want to update your contact phone number?",
     "2": "You’ve requested to update your contact number to:",
     "3": "+1 (123) 456-7890",

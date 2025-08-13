@@ -5,10 +5,10 @@ import { PAGES, NAVIGATION_LINKS } from "./utils/constants.jsx";
 
 function App() {
     const { language } = useParams();
-    const editLanguagePreferences = `/:language${NAVIGATION_LINKS.editLanguagePreferences}`
-    const areYouSureEditYourLanguage = `/:language${NAVIGATION_LINKS.areYouSureEditYourLanguage}`
-    const profileYouMayUpdateLanguage = `/:language${NAVIGATION_LINKS.profileYouMayUpdateLanguage}`
-
+    const editLanguagePreferences = `/:language${NAVIGATION_LINKS.editLanguagePreferences}`;
+    const areYouSureEditYourLanguage = `/:language${NAVIGATION_LINKS.areYouSureEditYourLanguage}`;
+    const profileYouMayUpdateLanguage = `/:language${NAVIGATION_LINKS.profileYouMayUpdateLanguage}`;
+    const newPasswordPage = `/:language${NAVIGATION_LINKS.password}`;
     return (
         <Routes>
             <Route element={<PrivateRoute />}>
@@ -27,8 +27,10 @@ function App() {
                 <Route path="/:language/enterNewPhoneNumber" element={<Page page={PAGES.enterNewPhoneNumber} />} />
                 <Route path="/:language/youMayUpdateEmailAtOtherPlaces" element={<Page page={PAGES.youMayUpdateEmailAtOtherPlaces} />} />
                 <Route path="/:language/areYouSureUpdateYourEmail" element={<Page page={PAGES.areYouSureUpdateYourEmail} />} />
+                <Route path="/:language/securitysettings" element={<Page page={PAGES.securitySettings} />} />
+
                 <Route element={<StepupPrivateRoute />}>
-                    <Route path="/:language/securitysettings" element={<Page page={PAGES.securitySettings} />} />
+                    <Route path={newPasswordPage} element={<Page page={PAGES.password} />} />
                 </Route>
 
                 <Route path={editLanguagePreferences} element={<Page page={PAGES.editLanguagePreferences} />} />

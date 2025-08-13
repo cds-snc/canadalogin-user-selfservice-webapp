@@ -10,11 +10,11 @@ export const LANGUAGE_DISPLAY_NAMES = {
     'en-ca': 'English',
     'fr-ca': 'French',
 };
-
+const securitySettings = '/securitysettings';
 export const NAVIGATION_LINKS = {
     signUp: '/signup',
     verifyEmail: '/signup/verification/email',
-    password: '/password',
+    password: `${securitySettings}/password`,
     twoStepVerification: '/signup/verificationsetup',
     verification: '/verification',
     coreProfile: '/signup/profile',
@@ -34,7 +34,7 @@ export const NAVIGATION_LINKS = {
     enterNewPhoneNumber: '/enterNewPhoneNumber',
     youMayUpdateEmailAtOtherPlaces: '/youMayUpdateEmailAtOtherPlaces',
     areYouSureUpdateYourEmail: '/areYouSureUpdateYourEmail',
-    securitySettings: '/securitysettings',
+    securitySettings: securitySettings,
     editLanguagePreferences: '/editlanguage',
     areYouSureEditYourLanguage: '/areYouSureEditYourLanguage',
     profileYouMayUpdateLanguage: '/profileyoumayupdatelanguage'

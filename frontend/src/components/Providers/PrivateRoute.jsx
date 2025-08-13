@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { Outlet, useParams, useLocation, useSearchParams } from "react-router";
 import { useUser } from "./useUser.tsx";
 import { isEmailValid } from "../../utils/functions.jsx";
@@ -29,28 +29,93 @@ function StepupPrivateRoute() {
     const { pathname } = useLocation();
     const [searchParams] = useSearchParams();
     const navigateHelper = useNavigateHelper();
+
     const returnToPageKey = "returnToPage";
     const returnToPagePath = searchParams.get(returnToPageKey);
+    const isAuthenticatedPage = state.authenticatedPages?.includes(pathname) || false;
 
-    console.log(pathname, "location pathname");
+    const shouldShowContent = state.isLoading ||
+        !state.userProfile ||
+        isAuthenticatedPage ||
+        (returnToPagePath === pathname);
+
+    const performStepupRedirect = useCallback(() => {
+        const redirectUrl = `${OIDC_REDIRECT.reauth}?${returnToPageKey}=${encodeURIComponent(pathname)}`;
+        window.location.href = redirectUrl;
+    }, [pathname, returnToPageKey]);
+
+
+    const handleAuthenticationSuccess = useCallback(() => {
+        console.log('Step-up authentication successful, marking page as authenticated');
+        setAuthenticatedPage(pathname);
+        navigateHelper(returnToPagePath, { replace: true });
+
+    }, [pathname, setAuthenticatedPage, returnToPagePath, navigateHelper]);
 
     useEffect(() => {
-        if (state.isLoading) return;
-        if (!state.userProfile) return;
-        const isAuthenticatedPage = state.authenticatedPages.includes(pathname);
-        if (isAuthenticatedPage) return; // without this you will get into a redirect loop
-
-        if (!returnToPagePath || returnToPagePath != pathname) {
-            window.location.href = `${OIDC_REDIRECT.reauth}?${returnToPageKey}=${encodeURIComponent(pathname)}`;
-        } else {
-            setAuthenticatedPage(pathname);
-            navigateHelper(returnToPagePath, { replace: true });
+        if (state.isLoading) {
+            console.log('Still loading user state...');
+            return;
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [state.isLoading, state.userProfile, pathname, returnToPagePath]);
 
+        if (!state.userProfile) {
+            console.log('No user profile found');
+            return;
+        }
 
+        // If page is already authenticated, allow access
+        if (isAuthenticatedPage) {
+            console.log('Page already authenticated:', pathname);
+            return;
+        }
 
+        // Check if we're returning from a step-up authentication
+        const isReturningFromAuth = returnToPagePath === pathname;
+
+        if (isReturningFromAuth) {
+            // User successfully completed step-up auth
+            handleAuthenticationSuccess();
+        } else {
+            // Need to perform step-up authentication
+            console.log('Step-up authentication required for:', pathname);
+            performStepupRedirect();
+        }
+    }, [
+        state.isLoading,
+        state.userProfile,
+        pathname,
+        returnToPagePath,
+        isAuthenticatedPage,
+        performStepupRedirect,
+        handleAuthenticationSuccess
+    ]);
+
+    // Loading state
+    if (state.isLoading) {
+        return (
+            <div role="status" aria-live="polite">
+                <span className="sr-only">Loading authentication state...</span>
+                Loading...
+            </div>
+        );
+    }
+
+    // Unauthenticated state
+    if (!state.userProfile) {
+        return null;
+    }
+
+    if (!shouldShowContent) {
+        // Without this, the password page will appear to the user before we redirect to IDP
+        return (
+            <div>
+                <div>Authenticating...</div>
+                Redirecting for additional authentication...
+            </div>
+        );
+    }
+
+    // Render protected sensitive page
     return <Outlet />;
 }
 
