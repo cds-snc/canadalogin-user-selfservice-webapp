@@ -1,10 +1,9 @@
-import { Routes, Route, Navigate, useParams } from 'react-router';
+import { Routes, Route, Navigate } from 'react-router';
 import { PrivateRoute, StepupPrivateRoute } from "./components/Providers/PrivateRoute.jsx";
 import Page from "./views/Page.js";
 import { PAGES, NAVIGATION_LINKS } from "./utils/constants.jsx";
 
 function App() {
-    const { language } = useParams();
     const editLanguagePreferences = `/:language${NAVIGATION_LINKS.editLanguagePreferences}`;
     const areYouSureEditYourLanguage = `/:language${NAVIGATION_LINKS.areYouSureEditYourLanguage}`;
     const profileYouMayUpdateLanguage = `/:language${NAVIGATION_LINKS.profileYouMayUpdateLanguage}`;

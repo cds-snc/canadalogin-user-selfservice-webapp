@@ -1,5 +1,5 @@
 import { useEffect, useCallback } from "react";
-import { Outlet, useParams, useLocation, useSearchParams } from "react-router";
+import { Outlet, useLocation, useSearchParams } from "react-router";
 import { useUser } from "./useUser.tsx";
 import { isEmailValid } from "../../utils/functions.jsx";
 import { FLOW_TYPES, OIDC_REDIRECT } from "../../utils/constants.jsx";
