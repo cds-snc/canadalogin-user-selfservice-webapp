@@ -90,7 +90,7 @@ function StepupPrivateRoute() {
         handleAuthenticationSuccess
     ]);
 
-    // Loading state
+    // Loading state - this can be a general loading component or spinner in the future
     if (state.isLoading) {
         return (
             <div role="status" aria-live="polite">
@@ -107,6 +107,7 @@ function StepupPrivateRoute() {
 
     if (!shouldShowContent) {
         // Without this, the password page will appear to the user before we redirect to IDP
+        // Loading state - this can be a general loading component or spinner in the future
         return (
             <div>
                 <div>Authenticating...</div>
