@@ -105,6 +105,3 @@ def get_auth_request_headers(
         "Accept": "application/scim+json",
     }
     return headers
-
-
-SESSION_USER_ACCESS_TOKEN_KEY = "user_access_token"

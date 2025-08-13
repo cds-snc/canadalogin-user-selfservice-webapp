@@ -10,11 +10,11 @@ export const LANGUAGE_DISPLAY_NAMES = {
     'en-ca': 'English',
     'fr-ca': 'French',
 };
-
+const securitySettings = '/securitysettings';
 export const NAVIGATION_LINKS = {
     signUp: '/signup',
     verifyEmail: '/signup/verification/email',
-    password: '/password',
+    password: `${securitySettings}/password`,
     twoStepVerification: '/signup/verificationsetup',
     verification: '/verification',
     coreProfile: '/signup/profile',
@@ -34,7 +34,7 @@ export const NAVIGATION_LINKS = {
     enterNewPhoneNumber: '/enterNewPhoneNumber',
     youMayUpdateEmailAtOtherPlaces: '/youMayUpdateEmailAtOtherPlaces',
     areYouSureUpdateYourEmail: '/areYouSureUpdateYourEmail',
-    securitySettings: '/securitysettings',
+    securitySettings: securitySettings,
     editLanguagePreferences: '/editlanguage',
     areYouSureEditYourLanguage: '/areYouSureEditYourLanguage',
     profileYouMayUpdateLanguage: '/profileyoumayupdatelanguage'
@@ -42,6 +42,7 @@ export const NAVIGATION_LINKS = {
 };
 export const OIDC_REDIRECT = {
     login: `${config.apiUrl}/v1/auth/login`,
+    reauth: `${config.apiUrl}/v1/auth/reauth`,
 }
 
 export const CONTEXT_ACTIONS = {
@@ -59,6 +60,7 @@ export const CONTEXT_ACTIONS = {
     cancel_profile_editing: 'CANCEL_PROFILE_EDITING',
     set_language: 'SET_LANGUAGE',
     set_relying_party_data: 'SET_RELYING_PARTY_DATA',
+    set_authenticated_pages: 'SET_AUTHENTICATED_PAGES',
 };
 
 export const FLOW_TYPES = {

@@ -4,28 +4,35 @@ from fastapi.responses import RedirectResponse
 from authlib.integrations.starlette_client import OAuthError
 from app.auth.services.oidc_config import oauth
 from app.config import get_configuration
-from app.utils.access_token import SESSION_USER_ACCESS_TOKEN_KEY
+from app.constants.session_keys import SessionKeys
 from app.utils.helpers import generate_error_response, string_error_response
 
 logger = logging.getLogger(__name__)
 
 
-async def redirect_to_verify(request: Request):
+def get_callback_redirect_uri(request: Request):
+    """
+    Get the redirect URI for the OAuth login flow.
+    This function is used to initiate the login process with IBM Verify.
+    """
+    config = get_configuration()
+    redirect_uri = request.url_for(SessionKeys.CALLBACK_ROUTE_NAME.value)
+
+    if config.ENVIRONMENT != "local":
+        redirect_uri = str(redirect_uri).replace("http://", "https://")
+
+    logger.info(f"Callback Redirect URI: {redirect_uri}")
+    return redirect_uri
+
+
+async def redirect_user_to_idp_verify(request: Request):
     """
     Get the redirect URL for the OAuth login flow.
     This function is used to initiate the login process with IBM Verify.
     """
     try:
-        config = get_configuration()
-        # this request.url_for gets the url based on the callback route defined
-        callback_route = request.url_for("callback_route")
-        redirect_uri = callback_route
-        logger.info("Health check hit - headers: %s", dict(request.headers))
-
-        if config.ENVIRONMENT != "local":
-            redirect_uri = str(callback_route).replace("http://", "https://")
-        logger.info(f"Callback Redirect URI: {redirect_uri}")
-        return await oauth.verify.authorize_redirect(request, redirect_uri)
+        callback_redirect_uri = get_callback_redirect_uri(request)
+        return await oauth.verify.authorize_redirect(request, callback_redirect_uri)
     except OAuthError as e:
         logger.exception("Unexpected error during redirect_to_verify", str(e))
         return generate_error_response(401, string_error_response(str(e)))
@@ -46,6 +53,13 @@ async def callback_handler(request: Request):
         if config.ENVIRONMENT != "local":
             redirectValue = f"https://{config.PROFILE_MANAGEMENT_DOMAIN}"
 
+        returnToPageValue = request.session.get(SessionKeys.RETURN_TO_PAGE.value)
+
+        if returnToPageValue:
+            clientRedirectValue = f"{returnToPageValue}?{SessionKeys.RETURN_TO_PAGE.value}={returnToPageValue}"
+            redirectValue += clientRedirectValue
+            logger.info(f"Return to page set in session: {redirectValue}")
+
         try:
             oidc_response = await oauth.verify.authorize_access_token(request)
             logger.info("OIDC Responsed")
@@ -57,8 +71,8 @@ async def callback_handler(request: Request):
             # redirect back to IBM Verify to retry authentication
             return RedirectResponse(url=redirectValue)
 
-        request.session[SESSION_USER_ACCESS_TOKEN_KEY] = oidc_response.get(
-            "access_token"
+        request.session[SessionKeys.SESSION_USER_ACCESS_TOKEN_KEY.value] = (
+            oidc_response.get("access_token")
         )
 
         logger.info("OIDC Callback Handler")
@@ -78,7 +92,9 @@ async def get_users_current_session(request: Request):
     The user access token is stored in memory on the server
     Authlib docs - https://docs.authlib.org/en/latest/client/fastapi.html
     """
-    user_access_token = request.session.get(SESSION_USER_ACCESS_TOKEN_KEY)
+    user_access_token = request.session.get(
+        SessionKeys.SESSION_USER_ACCESS_TOKEN_KEY.value
+    )
     logger.info("Get Users Session")
 
     if not user_access_token:
@@ -86,3 +102,27 @@ async def get_users_current_session(request: Request):
         raise HTTPException(status_code=401, detail="Not authenticated")
     logger.info("Access Token found in session")
     return user_access_token
+
+
+async def reauthenticate_user(request: Request, returnToPage: str = "/"):
+    """
+    Get the redirect URL for the OAuth login flow.
+    This function is used to initiate a reauthentication flow with IBM Verify.
+    """
+    try:
+
+        callback_redirect_uri = get_callback_redirect_uri(request)
+
+        if returnToPage:
+            request.session[SessionKeys.RETURN_TO_PAGE.value] = returnToPage
+            logger.info(f"Return to page set in session: {returnToPage}")
+
+        return await oauth.verify.authorize_redirect(
+            request, callback_redirect_uri, acr_values="update_password"
+        )
+    except OAuthError as e:
+        logger.exception("Unexpected error during redirect_to_verify", str(e))
+        return generate_error_response(401, string_error_response(str(e)))
+    except Exception as e:
+        logger.exception("Unexpected error during redirect_to_verify", str(e))
+        return generate_error_response(500, string_error_response())

@@ -51,6 +51,7 @@ export interface UserState {
     urlLanguageBeforeEdit: string | null;
     cancelProfileEditing: boolean;
     relyingPartyInfo: RelyingPartyInfo | null;
+    authenticatedPages: string[];
 }
 
 interface UserProviderProps {
@@ -89,7 +90,8 @@ const initialState = {
     editProfile: null,
     urlLanguageBeforeEdit: null,
     cancelProfileEditing: false,
-    relyingPartyInfo: null
+    relyingPartyInfo: null,
+    authenticatedPages: [],
 }
 
 
@@ -153,6 +155,11 @@ function userReducer(state = initialState, action: Action) {
             return {
                 ...state,
                 relyingPartyInfo: action.payload
+            };
+        case CONTEXT_ACTIONS.set_authenticated_pages:
+            return {
+                ...state,
+                authenticatedPages: [...state.authenticatedPages, action.payload]
             };
         default:
             return state;

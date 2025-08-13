@@ -129,12 +129,12 @@ function PageContents({ page }: { page: string }) {
         case PAGES.areYouSureEditYourName:
             return (
                 <AreYouSureEditYourName />
-            ) 
+            )
         case PAGES.areYouSureUpdateContactNumber:
             return (
                 <AreYouSureUpdateContactNumber />
-            ) 
-            
+            )
+
         case PAGES.editLanguagePreferences:
             return (
                 <EditLanguagePreferences />
@@ -146,6 +146,10 @@ function PageContents({ page }: { page: string }) {
         case PAGES.profileYouMayUpdateLanguage:
             return (
                 <ProfileYouMayUpdateLanguage />
+            )
+        case PAGES.password:
+            return (
+                <Password />
             )
         default:
             return (<div>Error</div>);
