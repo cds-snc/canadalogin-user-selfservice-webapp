@@ -118,9 +118,7 @@ async def reauthenticate_user(request: Request, returnToPage: str = "/"):
             logger.info(f"Return to page set in session: {returnToPage}")
 
         return await oauth.verify.authorize_redirect(
-            request,
-            callback_redirect_uri,
-            acr_values="update_password"
+            request, callback_redirect_uri, acr_values="update_password"
         )
     except OAuthError as e:
         logger.exception("Unexpected error during redirect_to_verify", str(e))
