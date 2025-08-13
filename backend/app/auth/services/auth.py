@@ -107,7 +107,7 @@ async def get_users_current_session(request: Request):
 async def reauthenticate_user(request: Request, returnToPage: str = "/"):
     """
     Get the redirect URL for the OAuth login flow.
-    This function is used to initiate the login process with IBM Verify.
+    This function is used to initiate a reauthentication flow with IBM Verify.
     """
     try:
 
