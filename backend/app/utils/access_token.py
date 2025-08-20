@@ -7,25 +7,22 @@ from app.config import get_configuration
 
 logger = logging.getLogger(__name__)
 lock = threading.Lock()
-settings = get_configuration().ibm_verify_config
 
 admin_token_ttl = 7170
-
-
-async def get_admin_token(global_http_client: AsyncClient) -> str:
-    return await get_access_token(global_http_client)
 
 
 async def request_access_token(global_http_client: AsyncClient):
     """Request token from IBM Verify API"""
     try:
+        settings = get_configuration().ibm_verify_config
+
         token_url = f"{settings.IBM_VERIFY_TENANT_URL}/oauth2/token"
         logger.info(f"Attempting to get access token from: {token_url}")
 
         data = {
             "grant_type": "client_credentials",
-            "client_id": settings.IBM_VERIFY_API_CLIENT_ID,
-            "client_secret": settings.IBM_VERIFY_API_CLIENT_SECRET,
+            "client_id": settings.IBM_VERIFY_PROFILE_MANAGEMENT_API_CLIENT_ID,
+            "client_secret": settings.IBM_VERIFY_PROFILE_MANAGEMENT_API_SECRET,
             "scope": "openid",
         }
         logger.debug(f"Token URL: {token_url}")
@@ -65,12 +62,15 @@ async def get_access_token(global_http_client: AsyncClient) -> str:
         if not access_token:
             logger.error(f"Failed to get access token. Response: {response}")
             raise HTTPException(status_code=500, detail="Failed to get access token")
-        print(access_token)
         return access_token
 
     except Exception as e:
         logger.error(f"Error getting admin token: {str(e)}", exc_info=True)
         raise HTTPException(status_code=400, detail=f"Admin token error: {str(e)}")
+
+
+async def get_admin_token(global_http_client: AsyncClient) -> str:
+    return await get_access_token(global_http_client)
 
 
 def get_auth_request_headers(
