@@ -8,7 +8,11 @@ from app.auth.services.auth import (
     reauthenticate_user,
     get_users_current_session,
 )
+from app.auth.services.update_password import (
+    first_step_update_password
+)
 from app.constants.session_keys import SessionKeys
+from app.auth.schemas import FirstStepPasswordUpdate
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -48,3 +52,17 @@ async def reauth(
     user_access_token: None = Depends(get_users_current_session),
 ):
     return await reauthenticate_user(request, returnToPage)
+
+
+@router.post(
+    "/password/update",
+    tags=["Auth"],
+    summary="Update a users password",
+    description="",
+)
+async def password_update(
+    request: Request,
+    data: FirstStepPasswordUpdate,
+    user_access_token: None = Depends(get_users_current_session),
+):
+    return await first_step_update_password(request, data)

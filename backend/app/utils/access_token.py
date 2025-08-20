@@ -12,11 +12,11 @@ settings = get_configuration().ibm_verify_config
 admin_token_ttl = 7170
 
 
-async def get_admin_token(global_http_client: AsyncClient()):
+async def get_admin_token(global_http_client: AsyncClient) -> str:
     return await get_access_token(global_http_client)
 
 
-async def request_access_token(global_http_client: AsyncClient()):
+async def request_access_token(global_http_client: AsyncClient):
     """Request token from IBM Verify API"""
     try:
         token_url = f"{settings.IBM_VERIFY_TENANT_URL}/oauth2/token"
@@ -51,7 +51,7 @@ async def request_access_token(global_http_client: AsyncClient()):
         raise HTTPException(status_code=400, detail=f"Token request error: {str(e)}")
 
 
-async def get_access_token(global_http_client: AsyncClient()) -> str:
+async def get_access_token(global_http_client: AsyncClient) -> str:
     """Get access token for IBM Verify API operations"""
     try:
         logger.info("Attempting to get access token")
