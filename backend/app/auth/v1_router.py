@@ -65,4 +65,4 @@ async def password_update(
     data: FirstStepPasswordUpdate,
     user_access_token: None = Depends(get_users_current_session),
 ):
-    return await first_step_update_password(request, data)
+    return await first_step_update_password(request.app.state.request_client, data)

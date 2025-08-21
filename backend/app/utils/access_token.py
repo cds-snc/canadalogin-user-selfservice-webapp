@@ -2,7 +2,7 @@ import logging
 import threading
 from datetime import datetime
 from fastapi import HTTPException
-from httpx import AsyncClient
+from httpx import AsyncClient, HTTPStatusError, TimeoutException
 from app.config import get_configuration
 
 logger = logging.getLogger(__name__)
@@ -32,41 +32,37 @@ async def request_access_token(global_http_client: AsyncClient):
             data=data,
             headers={"Content-Type": "application/x-www-form-urlencoded"},
         )
-
-        if response.status_code != 200:
-            logger.error(f"Failed to get access token. Response: {response}")
-            raise HTTPException(
-                status_code=response.status_code,
-                detail="Failed to get access token",
-            )
+        response.raise_for_status()
         logger.info("Request returned successfully")
         return response
 
-    except Exception as e:
+    except HTTPStatusError as e:
+        logger.error("Token endpoint error (status=%s)", str(e))
+        raise HTTPException(status_code=400, detail="Server Error")
 
+    except TimeoutException as e:
+        logger.error("Token request timed out: %s", e)
+        raise HTTPException(status_code=400, detail="Server Error")
+
+    except Exception as e:
         logger.error(f"Error requesting token: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=400, detail=f"Token request error: {str(e)}")
+        raise HTTPException(status_code=400, detail="Server Error")
 
 
 async def get_access_token(global_http_client: AsyncClient) -> str:
     """Get access token for IBM Verify API operations"""
-    try:
-        logger.info("Attempting to get access token")
+    logger.info("Attempting to get access token")
 
-        start_time = datetime.now()
-        response = await request_access_token(global_http_client)
-        duration = (datetime.now() - start_time).total_seconds()
-        logger.info(f"Token request completed in {duration:.2f} seconds")
+    start_time = datetime.now()
+    response = await request_access_token(global_http_client)
+    duration = (datetime.now() - start_time).total_seconds()
+    logger.info(f"Token request completed in {duration:.2f} seconds")
 
-        access_token = response.json().get("access_token")
-        if not access_token:
-            logger.error(f"Failed to get access token. Response: {response}")
-            raise HTTPException(status_code=500, detail="Failed to get access token")
-        return access_token
-
-    except Exception as e:
-        logger.error(f"Error getting admin token: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=400, detail=f"Admin token error: {str(e)}")
+    access_token = response.json().get("access_token")
+    if not access_token:
+        logger.error(f"Failed to get access token. Response: {response}")
+        raise HTTPException(status_code=400, detail="Server Error")
+    return access_token
 
 
 async def get_admin_token(global_http_client: AsyncClient) -> str:
