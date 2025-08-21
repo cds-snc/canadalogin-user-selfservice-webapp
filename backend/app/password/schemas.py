@@ -15,7 +15,7 @@ class OtpType(str, Enum):
     VOICEOTP = "voiceotp"
 
 
-class FirstStepPasswordUpdate(BaseModel):
+class FirstStepPasswordUpdatePayload(BaseModel):
     userName: EmailStr
     otpMethod: OtpType
 
@@ -23,26 +23,33 @@ class FirstStepPasswordUpdate(BaseModel):
 class NextStep(BaseModel):
     method: str
     httpMethod: str
-    creationTime: datetime
-    expiryTime: datetime
+    creationTime: Optional[datetime] = None
+    expiryTime: Optional[datetime] = None
     uri: str
 
 
-class FirstStepPasswordApiResponse(BaseModel):
+class UpdatePasswordIbmApiResponse(BaseModel):
     trxId: str
     stepsRemaining: int
     nextStep: NextStep
+    userId: Optional[str] = None
 
 
-class FirstStepPasswordResponse(BaseModel):
+class UpdatePasswordClientResponsePayload(BaseModel):
     trxId: str
     stepsRemaining: int
-    expiryTime: datetime
+    expiryTime: Optional[datetime] = None
     method: str
+    userId: Optional[str] = None
 
 
-class FirstStepPasswordResetClientResponse(ResponseModel):
-    data: FirstStepPasswordResponse
+class UpdatePasswordClientResponse(ResponseModel):
+    data: UpdatePasswordClientResponsePayload
+
+
+class SecondStepPasswordUpdatePayload(BaseModel):
+    otp: str
+    trxId: str
 
 
 # class OtpVerification(BaseModel):

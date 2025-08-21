@@ -28,6 +28,13 @@ class RequestErrorHandler:
             logger.error("%s timed out", context)
             raise HTTPException(status_code=504, detail=f"{context} timed out") from exc
 
+        elif isinstance(exc, ValidationError):
+            logger.error("%s schema validation failed: %s", context, exc.errors())
+            raise HTTPException(status_code=422, detail=f"Validation Error") from exc
+
+        elif isinstance(exc, HTTPException):
+            raise  # don’t swallow already-raised FastAPI errors
+
         else:
             logger.exception("Unexpected error during %s", context)
             raise HTTPException(status_code=500, detail=f"Unexpected {context} error") from exc

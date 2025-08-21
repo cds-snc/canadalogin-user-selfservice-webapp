@@ -16,6 +16,7 @@ from app.utils.helpers import generate_error_response
 from .routers import health
 from app.users import v1_router as v1_users_router
 from app.auth import v1_router as v1_auth_router
+from app.password import v1_router as v1_password_router
 from app.auth.services import oidc_config
 
 configuration = get_configuration()
@@ -114,6 +115,12 @@ app.include_router(
     v1_auth_router.router,
     prefix=f"{configuration.V1_API_VERSION}/auth",
     tags=["Auth"],
+)
+
+app.include_router(
+    v1_password_router.router,
+    prefix=f"{configuration.V1_API_VERSION}/password",
+    tags=["Password"],
 )
 
 
