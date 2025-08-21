@@ -66,6 +66,10 @@ class Configuration(BaseSettings):
     def rp_user_applications_api_endpoint(self) -> str:
         return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.RP_USER_APPLICATIONS.value}"
 
+    @property
+    def password_resetter_api_endpoint(self) -> str:
+        return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.PASSWORD_RESETTER.value}"
+
 
 @lru_cache
 def get_configuration():

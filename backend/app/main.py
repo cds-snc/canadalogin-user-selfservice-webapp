@@ -4,7 +4,8 @@ import logging
 import json
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
@@ -127,6 +128,14 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         logger.error(f"Validation error: {error_message} at " + str(request.url))
         break
     return generate_error_response(status_code=400, message=error_message)
+
+
+@app.exception_handler(HTTPException)
+async def custom_http_exception_handler(request: Request, exc: HTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"success": False, "message": exc.detail},
+    )
 
 
 def log_request_response(

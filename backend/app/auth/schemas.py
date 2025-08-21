@@ -1,5 +1,6 @@
+from datetime import datetime
 from enum import Enum
-from typing import Optional
+from typing import Literal, Optional
 from pydantic import BaseModel, Field, EmailStr, ConfigDict
 from app.utils.schemas import ResponseModel
 from pydantic_extra_types.phone_numbers import PhoneNumber
@@ -16,26 +17,32 @@ class OtpType(str, Enum):
 
 class FirstStepPasswordUpdate(BaseModel):
     userName: EmailStr
-    otp_method: OtpType
+    otpMethod: OtpType
 
 
-class OtpDataResponse(BaseModel):
-    model_config = ConfigDict(populate_by_name=True)
-    id: str = Field(alias="trxnId")
-    type: str
-    created: str
-    updated: str
-    expiry: str
-    state: str
-    correlation: str = Field(alias="correlationID")
-    phoneNumber: Optional[str] = None
-    emailAddress: Optional[str] = None
-    attempts: int
-    retries: int
+class NextStep(BaseModel):
+    method: str
+    httpMethod: str
+    creationTime: datetime
+    expiryTime: datetime
+    uri: str
 
 
-class OtpRequestResponse(ResponseModel):
-    data: OtpDataResponse
+class FirstStepPasswordApiResponse(BaseModel):
+    trxId: str
+    stepsRemaining: int
+    nextStep: NextStep
+
+
+class FirstStepPasswordResponse(BaseModel):
+    trxId: str
+    stepsRemaining: int
+    expiryTime: datetime
+    method: str
+
+
+class FirstStepPasswordResetClientResponse(ResponseModel):
+    data: FirstStepPasswordResponse
 
 
 # class OtpVerification(BaseModel):

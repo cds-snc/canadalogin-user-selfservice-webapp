@@ -62,7 +62,10 @@ async def reauth(
 )
 async def password_update(
     request: Request,
-    data: FirstStepPasswordUpdate,
+    payload: FirstStepPasswordUpdate,
     user_access_token: None = Depends(get_users_current_session),
 ):
-    return await first_step_update_password(request.app.state.request_client, data)
+    return await first_step_update_password(
+        request.app.state.request_client,
+        payload,
+    )
