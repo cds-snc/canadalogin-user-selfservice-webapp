@@ -72,20 +72,20 @@ async def dispatch_password_otp(
         headers = get_auth_request_headers(access_token, True)
         settings = get_configuration()
 
-        password_resetter_api_endpoint = settings.password_resetter_api_endpoint
+        first_step_resetter_api_endpoint = settings.password_resetter_api_endpoint
 
         form_data = {
             "userName": payload.userName,
             "steps": [{"method": payload.otpMethod.value}],
         }
-        logger.info(f"api endpoint for reset: {password_resetter_api_endpoint}")
+        logger.info(f"api endpoint for reset: {first_step_resetter_api_endpoint}")
         response = await global_http_client.post(
-            password_resetter_api_endpoint, json=form_data, headers=headers
+            first_step_resetter_api_endpoint, json=form_data, headers=headers
         )
         logger.info(f"returned response from resetter_api_endpoint: {response.json()}")
 
         response.raise_for_status()
-        logger.info("password_resetter_api_endpoint returned successfully")
+        logger.info("first_step_resetter_api_endpoint returned successfully")
         return response
 
     except Exception as e:
