@@ -66,17 +66,17 @@ async def dispatch_update_password(
         headers = get_auth_request_headers(access_token, True)
         settings = get_configuration()
 
-        password_resetter_api_endpoint = (
+        final_resetter_api_endpoint = (
             f"{settings.password_resetter_api_endpoint}/{payload.trxId}"
         )
 
         form_data = {"otp": payload.otp, "password": payload.password}
 
         logger.info(
-            f"final step - resetter_api_endpoint: {password_resetter_api_endpoint}"
+            f"final step - resetter_api_endpoint: {final_resetter_api_endpoint}"
         )
         response = await global_http_client.put(
-            password_resetter_api_endpoint, json=form_data, headers=headers
+            final_resetter_api_endpoint, json=form_data, headers=headers
         )
         logger.info(
             f"returned response from final step resetter_api_endpoint: {response.json()}"
