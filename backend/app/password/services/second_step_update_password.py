@@ -83,19 +83,19 @@ async def dispatch_password_otp_validator(
         }
 
         logger.info(
-            f"dispatch_password_otp_validator api endpoint: {password_resetter_otp_api_endpoint}"
+            f"dispatch_otp_validator api endpoint: {password_resetter_otp_api_endpoint}"
         )
         response = await global_http_client.post(
             password_resetter_otp_api_endpoint, json=form_data, headers=headers
         )
         logger.info(
-            f"returned response from password_resetter_otp_api_endpoint: {response.json()}"
+            f"returned response from resetter_otp_api_endpoint: {response.json()}"
         )
 
         response.raise_for_status()
-        logger.info("password_resetter_otp_api_endpoint returned successfully")
+        logger.info("resetter_otp_api_endpoint returned successfully")
         return response
 
     except Exception as e:
-        logger.error(f"Error dispatch_password_reset_otp: {str(e)}", exc_info=True)
+        logger.error(f"Error dispatch_reset_otp: {str(e)}", exc_info=True)
         RequestErrorHandler.handle(e, context="Second Step Password Update")
