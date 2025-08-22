@@ -74,7 +74,7 @@ async def dispatch_password_otp_validator(
         headers = get_auth_request_headers(access_token, True)
         settings = get_configuration()
 
-        password_resetter_otp_api_endpoint = (
+        resetter_otp_validator_api_endpoint = (
             f"{settings.password_resetter_api_endpoint}/{payload.trxId}/validator"
         )
 
@@ -83,10 +83,10 @@ async def dispatch_password_otp_validator(
         }
 
         logger.info(
-            f"dispatch_otp_validator api endpoint: {password_resetter_otp_api_endpoint}"
+            f"dispatch_otp_validator api endpoint: {resetter_otp_validator_api_endpoint}"
         )
         response = await global_http_client.post(
-            password_resetter_otp_api_endpoint, json=form_data, headers=headers
+            resetter_otp_validator_api_endpoint, json=form_data, headers=headers
         )
         logger.info(
             f"returned response from resetter_otp_api_endpoint: {response.json()}"
