@@ -83,7 +83,7 @@ async def dispatch_password_otp_validator(
         }
 
         logger.info(
-            f"Form data for password reset: {password_resetter_otp_api_endpoint} => {form_data}"
+            f"Form data for dispatch_password_otp_validator: {password_resetter_otp_api_endpoint}"
         )
         response = await global_http_client.post(
             password_resetter_otp_api_endpoint, json=form_data, headers=headers
