@@ -55,7 +55,9 @@ async def lifespan(app: FastAPI):
     ibm_verify_config = app.state.config.ibm_verify_config
     logger.info("Starting IBM Verify Integration API")
     logger.info(f"Tenant URL: {ibm_verify_config.IBM_VERIFY_TENANT_URL}")
-    logger.info(f"Client ID: {ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_API_CLIENT_ID}")
+    logger.info(
+        f"Client ID: {ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_API_CLIENT_ID}"
+    )
     logger.info(
         f"PROFILE_MANAGEMENT_CLIENT_ID: {ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID}"
     )

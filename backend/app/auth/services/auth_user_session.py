@@ -18,7 +18,9 @@ async def get_http_client(request: Request) -> AsyncClient:
     return request.app.state.request_client
 
 
-async def introspect_user_token(global_http_client: AsyncClient, user_access_token: str):
+async def introspect_user_token(
+    global_http_client: AsyncClient, user_access_token: str
+):
 
     try:
         admin_access_token = await get_admin_token(global_http_client)
@@ -39,7 +41,9 @@ async def introspect_user_token(global_http_client: AsyncClient, user_access_tok
 
         response.raise_for_status()
         response_json = response.json()
-        logger.info(f"returned response from introspect_token_api_endpoint: {response_json}")
+        logger.info(
+            f"returned response from introspect_token_api_endpoint: {response_json}"
+        )
         return response_json
     except Exception as e:
         logger.error(f"Error introspect_user_token: {str(e)}", exc_info=True)
@@ -64,7 +68,9 @@ async def get_users_current_session(request: Request):
         raise OAuthError("user access token not found")
     logger.info("Access Token found in session")
     http_client = await get_http_client(request)
-    validate_user_token_response = await introspect_user_token(http_client, user_access_token)
+    validate_user_token_response = await introspect_user_token(
+        http_client, user_access_token
+    )
     data = validate_user_token_response
     if not data.get("active"):
         request.session.clear()

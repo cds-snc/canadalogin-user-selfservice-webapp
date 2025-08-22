@@ -32,7 +32,7 @@ class RequestErrorHandler:
                     body = {"messageDescription": exc.response.text}
                 raise HTTPException(
                     status_code=400,
-                    detail=body.get("messageDescription", "Bad request")
+                    detail=body.get("messageDescription", "Bad request"),
                 ) from exc
             if status == 401:
                 raise OAuthError("Invalid or expired token")
@@ -54,4 +54,6 @@ class RequestErrorHandler:
 
         else:
             logger.exception("Unexpected error during %s", context)
-            raise HTTPException(status_code=500, detail=f"Unexpected {context} error") from exc
+            raise HTTPException(
+                status_code=500, detail=f"Unexpected {context} error"
+            ) from exc

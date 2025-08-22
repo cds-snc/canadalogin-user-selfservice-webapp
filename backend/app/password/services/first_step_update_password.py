@@ -6,7 +6,11 @@ from httpx import AsyncClient
 from pydantic import ValidationError
 
 from app.config import get_configuration
-from app.password.schemas import FirstStepPasswordUpdatePayload, UpdatePasswordIbmApiResponse, UpdatePasswordClientResponsePayload
+from app.password.schemas import (
+    FirstStepPasswordUpdatePayload,
+    UpdatePasswordIbmApiResponse,
+    UpdatePasswordClientResponsePayload,
+)
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from backend.app.utils.request_error_handler import RequestErrorHandler
 from app.utils.schemas import ResponseModel
@@ -14,7 +18,9 @@ from app.utils.schemas import ResponseModel
 logger = logging.getLogger(__name__)
 
 
-async def first_step_update_password(global_http_client: AsyncClient, payload: FirstStepPasswordUpdatePayload):
+async def first_step_update_password(
+    global_http_client: AsyncClient, payload: FirstStepPasswordUpdatePayload
+):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
 
@@ -39,7 +45,7 @@ async def first_step_update_password(global_http_client: AsyncClient, payload: F
             trxId=validated_data.trxId,
             stepsRemaining=validated_data.stepsRemaining,
             expiryTime=validated_data.nextStep.expiryTime,
-            method=validated_data.nextStep.method
+            method=validated_data.nextStep.method,
         )
 
         return ResponseModel(
@@ -55,7 +61,9 @@ async def first_step_update_password(global_http_client: AsyncClient, payload: F
         RequestErrorHandler.handle(e, context="First Step Password Update")
 
 
-async def dispatch_password_otp(global_http_client: AsyncClient, payload: FirstStepPasswordUpdatePayload):
+async def dispatch_password_otp(
+    global_http_client: AsyncClient, payload: FirstStepPasswordUpdatePayload
+):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
 
@@ -68,13 +76,17 @@ async def dispatch_password_otp(global_http_client: AsyncClient, payload: FirstS
 
         form_data = {
             "userName": payload.userName,
-            "steps": [{"method": payload.otpMethod.value}]
+            "steps": [{"method": payload.otpMethod.value}],
         }
-        logger.info(f"Form data for password reset: {password_resetter_api_endpoint} => {form_data}")
+        logger.info(
+            f"Form data for password reset: {password_resetter_api_endpoint} => {form_data}"
+        )
         response = await global_http_client.post(
             password_resetter_api_endpoint, json=form_data, headers=headers
         )
-        logger.info(f"returned response from password_resetter_api_endpoint: {response.json()}")
+        logger.info(
+            f"returned response from password_resetter_api_endpoint: {response.json()}"
+        )
 
         response.raise_for_status()
         logger.info("password_resetter_api_endpoint returned successfully")

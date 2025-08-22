@@ -6,7 +6,11 @@ from httpx import AsyncClient
 from pydantic import ValidationError
 
 from app.config import get_configuration
-from app.password.schemas import ThirdStepPasswordUpdatePayload, UpdatePasswordClientResponsePayload, CompleteUpdatePasswordIbmApiResponse
+from app.password.schemas import (
+    ThirdStepPasswordUpdatePayload,
+    UpdatePasswordClientResponsePayload,
+    CompleteUpdatePasswordIbmApiResponse,
+)
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from backend.app.utils.request_error_handler import RequestErrorHandler
 from app.utils.schemas import ResponseModel
@@ -15,14 +19,18 @@ from app.utils.helpers import generate_error_response
 logger = logging.getLogger(__name__)
 
 
-async def third_step_update_password(global_http_client: AsyncClient, payload: ThirdStepPasswordUpdatePayload):
+async def third_step_update_password(
+    global_http_client: AsyncClient, payload: ThirdStepPasswordUpdatePayload
+):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
 
     try:
         logger.info(f"Third step - attempting update password for: {payload}")
         start_time = datetime.now()
-        password_otp_response = await dispatch_update_password(global_http_client, payload)
+        password_otp_response = await dispatch_update_password(
+            global_http_client, payload
+        )
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(
             f"Third step - dispatch_password_reset_otp returned in {duration:.2f} seconds - {payload}"
@@ -49,7 +57,9 @@ async def third_step_update_password(global_http_client: AsyncClient, payload: T
         RequestErrorHandler.handle(e, context="Second Step Password Update")
 
 
-async def dispatch_update_password(global_http_client: AsyncClient, payload: ThirdStepPasswordUpdatePayload):
+async def dispatch_update_password(
+    global_http_client: AsyncClient, payload: ThirdStepPasswordUpdatePayload
+):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
 
@@ -58,18 +68,21 @@ async def dispatch_update_password(global_http_client: AsyncClient, payload: Thi
         headers = get_auth_request_headers(access_token, True)
         settings = get_configuration()
 
-        password_resetter_api_endpoint = f"{settings.password_resetter_api_endpoint}/{payload.trxId}"
+        password_resetter_api_endpoint = (
+            f"{settings.password_resetter_api_endpoint}/{payload.trxId}"
+        )
 
-        form_data = {
-            "otp": payload.otp,
-            "password": payload.password
-        }
+        form_data = {"otp": payload.otp, "password": payload.password}
 
-        logger.info(f"Form data for password reset: {password_resetter_api_endpoint} => {payload.otp}")
+        logger.info(
+            f"Form data for password reset: {password_resetter_api_endpoint} => {payload.otp}"
+        )
         response = await global_http_client.put(
             password_resetter_api_endpoint, json=form_data, headers=headers
         )
-        logger.info(f"returned response from password_resetter_api_endpoint: {response.json()}")
+        logger.info(
+            f"returned response from password_resetter_api_endpoint: {response.json()}"
+        )
 
         response.raise_for_status()
         logger.info("password_resetter_api_endpoint returned successfully")

@@ -4,18 +4,20 @@ from fastapi import APIRouter
 from fastapi import Request, Depends
 from app.auth.services.auth_user_session import get_users_current_session
 
-from app.password.services.first_step_update_password import (
-    first_step_update_password
-)
+from app.password.services.first_step_update_password import first_step_update_password
 from app.password.services.second_step_update_password import (
-    second_step_update_password
+    second_step_update_password,
 )
 
-from app.password.services.third_step_update_password import (
-    third_step_update_password
-)
+from app.password.services.third_step_update_password import third_step_update_password
 
-from app.password.schemas import FirstStepPasswordUpdatePayload, SecondStepPasswordUpdatePayload, UpdatePasswordClientResponse, ThirdStepPasswordUpdatePayload, CompleteUpdatePasswordClientResponse
+from app.password.schemas import (
+    FirstStepPasswordUpdatePayload,
+    SecondStepPasswordUpdatePayload,
+    UpdatePasswordClientResponse,
+    ThirdStepPasswordUpdatePayload,
+    CompleteUpdatePasswordClientResponse,
+)
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
