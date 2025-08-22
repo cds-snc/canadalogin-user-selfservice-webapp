@@ -5,13 +5,15 @@ import json
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
+from authlib.integrations.starlette_client import OAuthError
 
 from app.config import get_configuration
 from app.utils.helpers import generate_error_response
+from app.auth.services.auth import redirect_user_to_idp_verify
 
 from .routers import health
 from app.users import v1_router as v1_users_router
@@ -143,6 +145,14 @@ async def custom_http_exception_handler(request: Request, exc: HTTPException):
         status_code=exc.status_code,
         content={"success": False, "message": exc.detail},
     )
+
+
+@app.exception_handler(OAuthError)
+async def oauth_error_handler(request: Request, exc: OAuthError):
+    """Catch OAuth errors and redirect user to IdP login."""
+    logger.error("OAuth exception handler error: %s", exc)
+
+    return await redirect_user_to_idp_verify(request)
 
 
 def log_request_response(

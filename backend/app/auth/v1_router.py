@@ -6,6 +6,9 @@ from app.auth.services.auth import (
     redirect_user_to_idp_verify,
     callback_handler,
     reauthenticate_user,
+)
+
+from app.auth.services.auth_user_session import (
     get_users_current_session,
 )
 

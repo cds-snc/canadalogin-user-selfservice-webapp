@@ -6,7 +6,7 @@ from fastapi import Request, Depends
 from app.users.schemas import ProfileResponse, ProfilePUTData, RelyingPartyResponse
 from app.users.services.profile import update_profile, my_profile
 from app.users.services.rp_info import get_relying_party_info
-from app.auth.services.auth import get_users_current_session
+from app.auth.services.auth_user_session import get_users_current_session
 
 router = APIRouter()
 logger = logging.getLogger(__name__)

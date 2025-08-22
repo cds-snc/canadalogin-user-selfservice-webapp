@@ -1,6 +1,7 @@
 import logging
 from fastapi import HTTPException
 from httpx import HTTPStatusError, TimeoutException
+from authlib.integrations.starlette_client import OAuthError
 from pydantic import ValidationError
 
 logger = logging.getLogger(__name__)
@@ -33,6 +34,8 @@ class RequestErrorHandler:
                     status_code=400,
                     detail=body.get("messageDescription", "Bad request")
                 ) from exc
+            if status == 401:
+                raise OAuthError("Invalid or expired token")
             raise HTTPException(status_code=status, detail=f"{context} failed") from exc
 
         elif isinstance(exc, TimeoutException):
@@ -45,6 +48,9 @@ class RequestErrorHandler:
 
         elif isinstance(exc, HTTPException):
             raise  # don’t swallow already-raised FastAPI errors
+
+        elif isinstance(exc, OAuthError):
+            raise
 
         else:
             logger.exception("Unexpected error during %s", context)

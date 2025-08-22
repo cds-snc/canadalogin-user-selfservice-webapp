@@ -2,9 +2,8 @@ import logging
 
 from fastapi import APIRouter
 from fastapi import Request, Depends
-from app.auth.services.auth import (
-    get_users_current_session,
-)
+from app.auth.services.auth_user_session import get_users_current_session
+
 from app.password.services.first_step_update_password import (
     first_step_update_password
 )

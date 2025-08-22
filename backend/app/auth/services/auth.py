@@ -1,11 +1,12 @@
 import logging
-from fastapi import Request, HTTPException
+from fastapi import Request, HTTPException, status
 from fastapi.responses import RedirectResponse
 from authlib.integrations.starlette_client import OAuthError
 from app.auth.services.oidc_config import oauth
 from app.config import get_configuration
 from app.constants.session_keys import SessionKeys
 from app.utils.helpers import generate_error_response, string_error_response
+from app.utils.request_error_handler import RequestErrorHandler
 
 logger = logging.getLogger(__name__)
 
@@ -33,12 +34,9 @@ async def redirect_user_to_idp_verify(request: Request):
     try:
         callback_redirect_uri = get_callback_redirect_uri(request)
         return await oauth.verify.authorize_redirect(request, callback_redirect_uri)
-    except OAuthError as e:
-        logger.exception("Unexpected error during redirect_to_verify", str(e))
-        return generate_error_response(401, string_error_response(str(e)))
     except Exception as e:
         logger.exception("Unexpected error during redirect_to_verify", str(e))
-        return generate_error_response(500, string_error_response())
+        raise RequestErrorHandler.handle(e, context="Unexpected error during idp redirect")
 
 
 async def callback_handler(request: Request):
@@ -69,8 +67,7 @@ async def callback_handler(request: Request):
                 f"Redirect user back to IBM Verify to be re-authenticated: {redirectValue}"
             )
             # redirect back to IBM Verify to retry authentication
-            return RedirectResponse(url=redirectValue)
-
+            raise OAuthError("Invalid or expired token")
         request.session[SessionKeys.SESSION_USER_ACCESS_TOKEN_KEY.value] = (
             oidc_response.get("access_token")
         )
@@ -80,28 +77,10 @@ async def callback_handler(request: Request):
         return RedirectResponse(url=redirectValue)
     except OAuthError as error:
         logger.error(f"OAuth error: {error}")
-        return generate_error_response(401, string_error_response(str(error)))
+        raise OAuthError("Invalid or expired token")
     except Exception as e:
         logger.error(f"OAuth error: {e}")
-        return generate_error_response(500, string_error_response())
-
-
-async def get_users_current_session(request: Request):
-    """
-    Session cookie contains an identifier for the user session.
-    The user access token is stored in memory on the server
-    Authlib docs - https://docs.authlib.org/en/latest/client/fastapi.html
-    """
-    user_access_token = request.session.get(
-        SessionKeys.SESSION_USER_ACCESS_TOKEN_KEY.value
-    )
-    logger.info("Get Users Session")
-
-    if not user_access_token:
-        logger.info("Not authenticated")
-        raise HTTPException(status_code=401, detail="Not authenticated")
-    logger.info("Access Token found in session")
-    return user_access_token
+        raise RequestErrorHandler.handle(e, context="Unexpected error during idp redirect")
 
 
 async def reauthenticate_user(request: Request, returnToPage: str = "/"):
@@ -120,9 +99,9 @@ async def reauthenticate_user(request: Request, returnToPage: str = "/"):
         return await oauth.verify.authorize_redirect(
             request, callback_redirect_uri, acr_values="update_password"
         )
-    except OAuthError as e:
+    except OAuthError as error:
         logger.exception("Unexpected error during redirect_to_verify", str(e))
-        return generate_error_response(401, string_error_response(str(e)))
+        raise OAuthError("Invalid or expired token")
     except Exception as e:
         logger.exception("Unexpected error during redirect_to_verify", str(e))
-        return generate_error_response(500, string_error_response())
+        raise RequestErrorHandler.handle(e, context="Unexpected error")

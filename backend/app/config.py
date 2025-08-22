@@ -70,6 +70,10 @@ class Configuration(BaseSettings):
     def password_resetter_api_endpoint(self) -> str:
         return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.PASSWORD_RESETTER.value}"
 
+    @property
+    def introspect_token_api_endpoint(self) -> str:
+        return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.INTROSPECT_TOKEN.value}"
+
 
 @lru_cache
 def get_configuration():
