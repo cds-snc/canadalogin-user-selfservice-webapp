@@ -4,7 +4,7 @@ from datetime import datetime
 from fastapi import HTTPException
 from httpx import AsyncClient
 from app.config import get_configuration
-from backend.app.utils.request_error_handler import RequestErrorHandler
+from app.utils.request_error_handler import RequestErrorHandler
 
 logger = logging.getLogger(__name__)
 lock = threading.Lock()

@@ -1,9 +1,8 @@
 from datetime import datetime
 from enum import Enum
-from typing import Literal, Optional
-from pydantic import BaseModel, Field, EmailStr, ConfigDict
+from typing import Optional
+from pydantic import BaseModel, Field, EmailStr
 from app.utils.schemas import ResponseModel
-from pydantic_extra_types.phone_numbers import PhoneNumber
 
 
 class UserName(BaseModel):

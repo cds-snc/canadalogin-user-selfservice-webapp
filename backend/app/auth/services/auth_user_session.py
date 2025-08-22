@@ -1,15 +1,11 @@
 import logging
-from fastapi import Depends, Request, HTTPException, status
-from fastapi.responses import RedirectResponse
+from fastapi import Request, HTTPException
 from authlib.integrations.starlette_client import OAuthError
 from httpx import AsyncClient
-from app.auth.services.oidc_config import oauth
 from app.config import get_configuration
 from app.constants.session_keys import SessionKeys
-from app.utils.helpers import generate_error_response, string_error_response
 from app.utils.access_token import get_admin_token, get_auth_request_headers
-from backend.app.auth.services.auth import redirect_user_to_idp_verify
-from backend.app.utils.request_error_handler import RequestErrorHandler
+from app.utils.request_error_handler import RequestErrorHandler
 
 logger = logging.getLogger(__name__)
 

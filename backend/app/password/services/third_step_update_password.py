@@ -8,13 +8,11 @@ from pydantic import ValidationError
 from app.config import get_configuration
 from app.password.schemas import (
     ThirdStepPasswordUpdatePayload,
-    UpdatePasswordClientResponsePayload,
     CompleteUpdatePasswordIbmApiResponse,
 )
 from app.utils.access_token import get_admin_token, get_auth_request_headers
-from backend.app.utils.request_error_handler import RequestErrorHandler
+from app.utils.request_error_handler import RequestErrorHandler
 from app.utils.schemas import ResponseModel
-from app.utils.helpers import generate_error_response
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +45,7 @@ async def third_step_update_password(
         return ResponseModel(
             success=True,
             data=validated_data,
-            message=f"OTP sent successfully",
+            message="OTP sent successfully",
         )
 
     except Exception as e:

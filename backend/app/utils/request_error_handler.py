@@ -44,7 +44,7 @@ class RequestErrorHandler:
 
         elif isinstance(exc, ValidationError):
             logger.error("%s schema validation failed: %s", context, exc.errors())
-            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=f"Validation Error") from exc
+            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Validation Error") from exc
 
         elif isinstance(exc, HTTPException):
             raise  # don’t swallow already-raised FastAPI errors

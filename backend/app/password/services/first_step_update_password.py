@@ -12,7 +12,7 @@ from app.password.schemas import (
     UpdatePasswordClientResponsePayload,
 )
 from app.utils.access_token import get_admin_token, get_auth_request_headers
-from backend.app.utils.request_error_handler import RequestErrorHandler
+from app.utils.request_error_handler import RequestErrorHandler
 from app.utils.schemas import ResponseModel
 
 logger = logging.getLogger(__name__)
@@ -51,7 +51,7 @@ async def first_step_update_password(
         return ResponseModel(
             success=True,
             data=client_data,
-            message=f"OTP sent successfully",
+            message="OTP sent successfully",
         )
 
     except Exception as e:
