@@ -1,20 +1,27 @@
 import logging
-from fastapi import Request, HTTPException, status
+from fastapi import Request
 from fastapi.responses import RedirectResponse
 from authlib.integrations.starlette_client import OAuthError
 from app.auth.services.oidc_config import oauth
 from app.config import get_configuration
 from app.constants.session_keys import SessionKeys
-from app.utils.helpers import generate_error_response, string_error_response
 from app.utils.request_error_handler import RequestErrorHandler
 
 logger = logging.getLogger(__name__)
 
 
+def get_base_profile_management_url():
+    config = get_configuration()
+    redirectValue = config.PROFILE_MANAGEMENT_DOMAIN
+
+    if config.ENVIRONMENT != "local":
+        redirectValue = f"https://{config.PROFILE_MANAGEMENT_DOMAIN}"
+    return redirectValue
+
+
 def get_callback_redirect_uri(request: Request):
     """
     Get the redirect URI for the OAuth login flow.
-    This function is used to initiate the login process with IBM Verify.
     """
     config = get_configuration()
     redirect_uri = request.url_for(SessionKeys.CALLBACK_ROUTE_NAME.value)
@@ -47,12 +54,7 @@ async def callback_handler(request: Request):
     This function is used to initiate the login process with IBM Verify.
     """
     try:
-        config = get_configuration()
-        redirectValue = config.PROFILE_MANAGEMENT_DOMAIN
-
-        if config.ENVIRONMENT != "local":
-            redirectValue = f"https://{config.PROFILE_MANAGEMENT_DOMAIN}"
-
+        redirectValue = get_base_profile_management_url()
         returnToPageValue = request.session.get(SessionKeys.RETURN_TO_PAGE.value)
 
         if returnToPageValue:
@@ -69,7 +71,7 @@ async def callback_handler(request: Request):
                 f"Redirect user back to IBM Verify to be re-authenticated: {redirectValue}"
             )
             # redirect back to IBM Verify to retry authentication
-            raise OAuthError("Invalid or expired token")
+            raise OAuthError("Invalid or expired token") from error
         request.session[SessionKeys.SESSION_USER_ACCESS_TOKEN_KEY.value] = (
             oidc_response.get("access_token")
         )
@@ -79,9 +81,9 @@ async def callback_handler(request: Request):
         return RedirectResponse(url=redirectValue)
     except OAuthError as error:
         logger.error(f"OAuth error: {error}")
-        raise OAuthError("Invalid or expired token")
+        raise OAuthError("Invalid or expired token") from error
     except Exception as e:
-        logger.error(f"OAuth error: {e}")
+        logger.error(f"Unexpected error: {e}")
         raise RequestErrorHandler.handle(
             e, context="Unexpected error during idp redirect"
         )
@@ -104,8 +106,8 @@ async def reauthenticate_user(request: Request, returnToPage: str = "/"):
             request, callback_redirect_uri, acr_values="update_password"
         )
     except OAuthError as error:
-        logger.exception("Unexpected error during redirect_to_verify", str(e))
-        raise OAuthError("Invalid or expired token")
+        logger.exception("Unexpected error during redirect_to_verify")
+        raise OAuthError("Invalid or expired token") from error
     except Exception as e:
-        logger.exception("Unexpected error during redirect_to_verify", str(e))
+        logger.exception("Unexpected error during redirect_to_verify")
         raise RequestErrorHandler.handle(e, context="Unexpected error")
