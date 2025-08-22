@@ -79,7 +79,7 @@ async def dispatch_password_otp(
             "steps": [{"method": payload.otpMethod.value}],
         }
         logger.info(
-            f"Form data for password reset: {password_resetter_api_endpoint} => {form_data}"
+            f"Form data for password reset: {password_resetter_api_endpoint}"
         )
         response = await global_http_client.post(
             password_resetter_api_endpoint, json=form_data, headers=headers
