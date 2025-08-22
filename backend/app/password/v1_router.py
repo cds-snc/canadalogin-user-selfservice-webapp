@@ -11,14 +11,19 @@ from app.password.services.first_step_update_password import (
 from app.password.services.second_step_update_password import (
     second_step_update_password
 )
-from app.password.schemas import FirstStepPasswordUpdatePayload, SecondStepPasswordUpdatePayload, UpdatePasswordClientResponse
+
+from app.password.services.third_step_update_password import (
+    third_step_update_password
+)
+
+from app.password.schemas import FirstStepPasswordUpdatePayload, SecondStepPasswordUpdatePayload, UpdatePasswordClientResponse, ThirdStepPasswordUpdatePayload, CompleteUpdatePasswordClientResponse
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
 @router.post(
-    "/update",
+    "/update/initiate",
     tags=["Password"],
     summary="Update a users password",
     description="",
@@ -36,18 +41,36 @@ async def password_update(
 
 
 @router.post(
-    "/update/otp",
+    "/update/validate",
     tags=["Password"],
-    summary="Verify the OTP that was sent to the user",
+    summary="Validate the OTP that was sent to the user",
     description="",
     response_model=UpdatePasswordClientResponse,
 )
-async def password_verify_otp(
+async def password_validate_otp(
     request: Request,
     payload: SecondStepPasswordUpdatePayload,
     user_access_token: None = Depends(get_users_current_session),
 ):
     return await second_step_update_password(
+        request.app.state.request_client,
+        payload,
+    )
+
+
+@router.put(
+    "/update/complete",
+    tags=["Password"],
+    summary="Final step to update the users password",
+    description="",
+    response_model=CompleteUpdatePasswordClientResponse,
+)
+async def password_complete(
+    request: Request,
+    payload: ThirdStepPasswordUpdatePayload,
+    user_access_token: None = Depends(get_users_current_session),
+):
+    return await third_step_update_password(
         request.app.state.request_client,
         payload,
     )

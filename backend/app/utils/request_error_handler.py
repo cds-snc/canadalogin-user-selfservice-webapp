@@ -1,6 +1,7 @@
 import logging
 from fastapi import HTTPException
 from httpx import HTTPStatusError, TimeoutException
+from pydantic import ValidationError
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +22,16 @@ class RequestErrorHandler:
                         "context": context,
                         "message": "Rate limit exceeded, please retry later.",
                     },
+                ) from exc
+
+            if status == 400:
+                try:
+                    body = exc.response.json()
+                except ValueError:
+                    body = {"messageDescription": exc.response.text}
+                raise HTTPException(
+                    status_code=400,
+                    detail=body.get("messageDescription", "Bad request")
                 ) from exc
             raise HTTPException(status_code=status, detail=f"{context} failed") from exc
 

@@ -52,59 +52,16 @@ class SecondStepPasswordUpdatePayload(BaseModel):
     trxId: str
 
 
-# class OtpVerification(BaseModel):
-#     otp: str
-#     trxnId: str
+class ThirdStepPasswordUpdatePayload(BaseModel):
+    otp: str
+    trxId: str
+    password: str = Field(..., min_length=12)
 
 
-# class AuthenticatedUserData(BaseModel):
-#     id: str
-#     assertion: str
+class CompleteUpdatePasswordIbmApiResponse(BaseModel):
+    stateId: str
+    userId: str
 
 
-# class AuthenticatedUserResponse(ResponseModel):
-#     data: AuthenticatedUserData
-
-
-# class UserOtpInfo(BaseModel):
-#     phoneNumber: Optional[PhoneNumber] = None
-#     userName: EmailStr
-#     otpType: OtpType
-
-
-# class UserOtpVerificationInfo(BaseModel):
-#     otp: str
-#     trxnId: str
-#     otpType: OtpType
-
-
-# class RetrievalData(BaseModel):
-#     trxnId: str
-#     otpType: OtpType
-
-
-# class TwoFactorEnrollmentType(str, Enum):
-#     SMS = "sms"
-#     VOICE = "voice"
-
-
-# class TwoFactorEnrollmentUserData(BaseModel):
-#     userId: str
-#     phoneNumber: PhoneNumber
-#     enrollmentType: TwoFactorEnrollmentType
-#     trxnId: str
-
-
-# class TwofactorEnrollmentResponse(BaseModel):
-#     id: str
-#     userId: str
-#     type: str
-#     created: str
-#     updated: str
-#     enabled: bool
-#     validated: bool
-#     attributes: dict[str, str]
-
-
-# class VerifiedTwofactorEnrollmentResponse(ResponseModel):
-#     data: TwofactorEnrollmentResponse
+class CompleteUpdatePasswordClientResponse(ResponseModel):
+    data: CompleteUpdatePasswordIbmApiResponse
