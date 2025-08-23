@@ -8,20 +8,20 @@ import {
     GcdsErrorSummary,
     GcdsHeading, GcdsLink, GcdsCheckboxes
 } from "@cdssnc/gcds-components-react";
-import { getPageContent, isPasswordValid } from '../../utils/functions';
+import { getPageContent, isPasswordValid } from '../../../utils/functions.jsx';
 import { useEffect, useState } from 'react';
-import { authService } from "../../services/authService.jsx";
+import { authService } from "../../../services/authService.jsx";
 import {
     FLOW_TYPES,
     NAVIGATION_LINKS,
     PAGES,
     SUBMIT_END_POINTS
-} from "../../utils/constants.jsx";
-import { useUser } from "../Providers/useUser.tsx";
-import SubmitButton from "../Layout/SubmitButton.jsx";
+} from "../../../utils/constants.jsx";
+import { useUser } from "../../../components/Providers/useUser.tsx";
+import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 import { useParams } from "react-router";
-import { useSubmit } from "../../hooks/useSubmit.js";
-import { useError } from "../../hooks/useError.js";
+import { useSubmit } from "../../../hooks/useSubmit.js";
+import { useError } from "../../../hooks/useError.js";
 
 export default function Password() {
     const { state } = useUser();
