@@ -307,7 +307,7 @@
     "11": "Pour rechercher un autre compte GC, consultez le",
     "12": "Répertoire des comptes GC"
   },
-  "AreYouSureUpdateContactNumber":{
+  "AreYouSureUpdateContactNumber": {
     "1": "Êtes-vous sûr de vouloir mettre à jour votre numéro de téléphone ?",
     "2": "Vous avez demandé à mettre à jour votre numéro de téléphone :",
     "3": "+1 (123) 456-7890",
@@ -320,7 +320,7 @@
     "10": "Oui, mettre à jour",
     "11": "Annuler"
   },
-    "YouMayUpdateEmailAtOtherPlaces": {
+  "YouMayUpdateEmailAtOtherPlaces": {
     "1": "Votre adresse e-mail a été mise à jour vers",
     "2": "Vous devrez peut-être mettre à jour votre adresse e-mail ailleurs",
     "3": "Ceci ne modifie votre adresse e-mail que pour les services connectés à votre compte GC.",
@@ -395,5 +395,17 @@
     "8": "L’ajout d’une étape supplémentaire à la vérification de votre mot de passe permet de confirmer votre identité.",
     "9": "Activée",
     "10": "Gérer"
+  },
+  "UpdatePassword": {
+    "1": "First, verify it's you ",
+    "2": "Two-step verification adds a second layer of security before updating your password.",
+    "3": "Learn more about two-step verification (opens in a new tab)",
+    "4": "select a different 2-step verification method.",
+    "5": "How should we send you the code?",
+    "6": "You can change this the next time you sign in.",
+    "7": "Text message (SMS)",
+    "8": "Mobile only. Carrier charges may apply.",
+    "9": "Voice call",
+    "10": "Mobile or landline. Carrier charges may apply."
   }
 }

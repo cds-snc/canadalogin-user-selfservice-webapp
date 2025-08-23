@@ -8,7 +8,8 @@ import Header from '../components/Layout/Header';
 import Footer from '../components/Layout/Footer';
 import { GcdsContainer, GcdsText } from "@cdssnc/gcds-components-react";
 import Verification from "../components/Verification/Verification.jsx";
-import Password from "../components/Password/Password.jsx";
+import Password from "../features/ChangePassword/components/Password.jsx";
+import OtpSelection from "../features/ChangePassword/components/OtpSelection.jsx";
 import SignUpEmail from "../components/SignUp/SignUpEmail.jsx";
 import CreateCoreProfile from "../components/SignUp/Profile/CreateCoreProfile.jsx";
 import Privacy from "../components/SignUp/Profile/Privacy.jsx";
@@ -147,9 +148,9 @@ function PageContents({ page }: { page: string }) {
             return (
                 <ProfileYouMayUpdateLanguage />
             )
-        case PAGES.password:
+        case PAGES.updatePassword:
             return (
-                <Password />
+                <OtpSelection />
             )
         default:
             return (<div>Error</div>);

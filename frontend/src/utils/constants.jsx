@@ -87,7 +87,7 @@ export const PAGES = {
     privacy: 'Privacy',
     verificationSetUp: 'VerificationSetUp',
     coreProfile: 'CreateCoreProfile',
-    password: 'Password',
+    updatePassword: 'UpdatePassword',
     home: 'Home',
     error: 'Error',
     verificationSelection: 'VerificationSelection',

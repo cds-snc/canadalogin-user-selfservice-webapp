@@ -412,5 +412,17 @@
     "9": "To view what services are connected to your GC Sign in, go to ",
     "10": "Connected Services ",
     "11": "in your GC Sign in dashboard."
+  },
+  "UpdatePassword": {
+    "1": "First, verify it's you ",
+    "2": "Two-step verification adds a second layer of security before updating your password.",
+    "3": "Learn more about two-step verification (opens in a new tab)",
+    "4": "To update your password, you’ll need to verify your identity by receiving a one-time passcode (OTP).",
+    "5": "How should we send you the code?",
+    "6": "You can change this the next time you sign in.",
+    "7": "Text message (SMS)",
+    "8": "Mobile only. Carrier charges may apply.",
+    "9": "Voice call",
+    "10": "Mobile or landline. Carrier charges may apply."
   }
 }
