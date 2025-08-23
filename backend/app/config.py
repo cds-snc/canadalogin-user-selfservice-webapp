@@ -74,6 +74,10 @@ class Configuration(BaseSettings):
     def introspect_token_api_endpoint(self) -> str:
         return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.INTROSPECT_TOKEN.value}"
 
+    @property
+    def user_otp_factors_api_endpoint(self) -> str:
+        return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.USER_OTP_FACTORS.value}"
+
 
 @lru_cache
 def get_configuration():

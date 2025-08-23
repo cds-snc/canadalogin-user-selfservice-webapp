@@ -3,10 +3,17 @@ import logging
 from fastapi import APIRouter
 from fastapi import Request, Depends
 
-from app.users.schemas import ProfileResponse, ProfilePUTData, RelyingPartyResponse
+from app.users.schemas import ProfileResponse, ProfilePUTData, RelyingPartyResponse, UserAuthFactorsResponse
 from app.users.services.profile import update_profile, my_profile
 from app.users.services.rp_info import get_relying_party_info
+from app.users.services.otp_factors import get_user_otp_factors
+
 from app.auth.services.auth_user_session import get_users_current_session
+
+from app.password.schemas import (
+    OtpType
+)
+
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -45,7 +52,6 @@ async def profile(
     return await my_profile(
         request.app.state.request_client,
         user_access_token,
-        profile_api_endpoint=request.app.state.config.profile_api_endpoint,
     )
 
 
@@ -65,4 +71,25 @@ async def rp_info(
         request.app.state.request_client,
         relying_party_id,
         rp_user_applications_api_endpoint=request.app.state.config.rp_user_applications_api_endpoint,
+    )
+
+
+@router.get(
+    "/otp_factors/{user_id}/{otp_type}",
+    response_model=UserAuthFactorsResponse,
+    tags=["Users"],
+    summary="Get the users authentication factors",
+    description="",
+)
+async def user_factors(
+    request: Request,
+    user_id: str,
+    otp_type: OtpType,
+    user_access_token: str = Depends(get_users_current_session),
+):
+    return await get_user_otp_factors(
+        request.app.state.request_client,
+        user_id,
+        otp_type,
+        user_access_token,
     )

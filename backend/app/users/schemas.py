@@ -113,3 +113,31 @@ class RelyingPartyInfo(BaseModel):
 
 class RelyingPartyResponse(ResponseModel):
     data: Optional[RelyingPartyInfo]
+
+
+class Attributes(BaseModel):
+    phoneNumber: str
+
+
+class Factor(BaseModel):
+    id: str
+    userId: str
+    type: str
+    created: datetime
+    updated: datetime
+    attempted: datetime
+    enabled: bool
+    validated: bool
+    attributes: Attributes
+
+
+class UserAuthFactorsIbmResponse(BaseModel):
+    factors: List[Factor]
+    count: int
+    limit: int
+    page: int
+    total: int
+
+
+class UserAuthFactorsResponse(ResponseModel):
+    data: str

@@ -7,3 +7,4 @@ class VerifyAPIEndpoint(str, Enum):
     RP_USER_APPLICATIONS = "/v1.0/user/applications"
     PASSWORD_RESETTER = "/v1.0/usc/password/resetter"
     INTROSPECT_TOKEN = "/oauth2/introspect"
+    USER_OTP_FACTORS = "/v2.0/factors"

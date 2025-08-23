@@ -6,6 +6,7 @@ from pydantic import ValidationError
 
 from app.users.schemas import ProfileGetResponseData, ProfileResponse, ProfilePUTData
 from app.utils.access_token import get_auth_request_headers
+from app.config import get_configuration
 
 logger = logging.getLogger(__name__)
 
@@ -51,9 +52,12 @@ async def update_profile(
 
 
 async def my_profile(
-    global_http_client: AsyncClient, user_access_token: str, profile_api_endpoint: str
+    global_http_client: AsyncClient, user_access_token: str
 ):
     try:
+        settings = get_configuration()
+
+        profile_api_endpoint = settings.profile_api_endpoint
         logger.info("Get my profile")
         headers = get_auth_request_headers(user_access_token)
         response = await global_http_client.get(profile_api_endpoint, headers=headers)
