@@ -75,10 +75,10 @@ async def rp_info(
 
 
 @router.get(
-    "/otp_factors/{user_id}/{otp_type}",
+    "/{user_id}/otp_factors/{otp_type}",
     response_model=UserAuthFactorsResponse,
     tags=["Users"],
-    summary="Get the users authentication factors",
+    summary="Get the users phone number authentication factors",
     description="",
 )
 async def user_factors(

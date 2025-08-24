@@ -10,6 +10,7 @@ import { GcdsContainer, GcdsText } from "@cdssnc/gcds-components-react";
 import Verification from "../components/Verification/Verification.jsx";
 import Password from "../features/ChangePassword/components/Password.jsx";
 import OtpSelection from "../features/ChangePassword/components/OtpSelection.jsx";
+import OtpVerification from "../features/ChangePassword/components/OtpVerification.jsx";
 import SignUpEmail from "../components/SignUp/SignUpEmail.jsx";
 import CreateCoreProfile from "../components/SignUp/Profile/CreateCoreProfile.jsx";
 import Privacy from "../components/SignUp/Profile/Privacy.jsx";
@@ -150,7 +151,7 @@ function PageContents({ page }: { page: string }) {
             )
         case PAGES.updatePassword:
             return (
-                <OtpSelection />
+                <OtpVerification />
             )
         default:
             return (<div>Error</div>);

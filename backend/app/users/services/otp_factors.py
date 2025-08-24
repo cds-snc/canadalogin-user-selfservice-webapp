@@ -1,4 +1,5 @@
 import logging
+import phonenumbers
 from datetime import datetime
 
 from fastapi import HTTPException
@@ -8,7 +9,8 @@ from pydantic import ValidationError
 from app.config import get_configuration
 from app.users.schemas import (
     UserAuthFactorsIbmResponse,
-    UserAuthFactorsResponse
+    UserAuthFactorsResponse,
+    UserOTPFactors
 )
 from app.password.schemas import (
     OtpType
@@ -21,7 +23,31 @@ from app.utils.request_error_handler import RequestErrorHandler
 logger = logging.getLogger(__name__)
 
 
-async def parse_auth_factors_response(data: UserAuthFactorsIbmResponse):
+async def mask_phone_last4(phone: str, region: str = "US") -> str:
+    """
+    Parse and format a phone number with phonenumbers,
+    but mask all except the last 4 digits.
+    """
+    try:
+        # Parse the phone number
+        parsed = phonenumbers.parse(phone, region)
+
+        # Format ((123) 456-7890) - also removes the country code
+        formatted_to_string = phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.NATIONAL)
+
+        # Extract phone number string only
+        digits = ''.join(filter(str.isdigit, formatted_to_string))
+
+        # Mask everything except the last 4
+        last4 = digits[-4:]
+        masked = f"*** *** {last4}"
+
+        return masked
+    except Exception as e:
+        return f"Invalid phone number: {str(e)}"
+
+
+async def parse_auth_factors_response(data: UserAuthFactorsIbmResponse) -> UserOTPFactors:
     logger.info("parse_auth_factors_response")
     factors = data.factors
     if not factors:
@@ -38,7 +64,10 @@ async def parse_auth_factors_response(data: UserAuthFactorsIbmResponse):
         logger.warning("No OTP factors found for user")
         raise HTTPException(status_code=404, detail="No OTP factors found for user")
 
-    return phone_number
+    return {
+        "type": first_factor.type,
+        "phoneNumber": phone_number
+    }
 
 
 async def dispatch_user_auth_factors(
@@ -106,12 +135,16 @@ async def get_user_otp_factors(
                     raise HTTPException(status_code=422, detail="Invalid response")
 
                 phone_number_otp_factor = await parse_auth_factors_response(validated_data)
-
+                masked_phone_number = await mask_phone_last4(phone_number_otp_factor["phoneNumber"])
+                data = {
+                    "type": phone_number_otp_factor["type"],
+                    "phoneNumber": masked_phone_number
+                }
                 logger.info("success response and data validation for user auth factors")
                 return UserAuthFactorsResponse(
                     success=True,
                     message="User factor retrieved successfully.",
-                    data=phone_number_otp_factor
+                    data=data
                 )
             else:
                 logger.info("user_id and user profile id dont math ")

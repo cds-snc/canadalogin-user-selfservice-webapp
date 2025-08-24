@@ -120,7 +120,8 @@
     "23": "Nous avons envoyé un courriel contenant un code à 6 chiffres à l’adresse :",
     "24": "Le courriel pourrait prendre quelques minutes à arriver. Si vous ne voyez pas le courriel, vérifiez s’il se trouve dans votre dossier de pourriels.",
     "25": "Utiliser une autre adresse courriel",
-    "26": "Demander un nouveau code"
+    "26": "Demander un nouveau code",
+    "27": "Annuler"
   },
   "VerificationSelection": {
     "1": "Choisissez une méthode de connexion",

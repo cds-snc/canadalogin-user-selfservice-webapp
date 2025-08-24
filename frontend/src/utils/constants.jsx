@@ -66,8 +66,8 @@ export const CONTEXT_ACTIONS = {
 export const FLOW_TYPES = {
     signUp: "signup",
     signIn: "signin",
-    sms: "sms",
-    voice: "voice",
+    sms: "smsotp",
+    voice: "voiceotp",
     email: "email",
     dashboard: "dashboard",
     profile: "profile",
@@ -137,6 +137,7 @@ export const SUBMIT_END_POINTS = {
     otpSend: '/v1/otp/otp/send',
     profile: '/v1/users/profile',
     rp_info: '/v1/users/rp_info',
+    users: '/v1/users'
 }
 
 
