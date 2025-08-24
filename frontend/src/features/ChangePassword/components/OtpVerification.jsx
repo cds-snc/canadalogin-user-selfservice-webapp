@@ -114,9 +114,12 @@ export default function Verification() {
             }
         };
 
-        requestOtpCode();
-        setTime(initialTime);
-        setRequestNewCode(false);
+        if (!setFirstStepCompleted) {
+            requestOtpCode();
+            setTime(initialTime);
+            setRequestNewCode(false);
+        }
+
     }, [userName, type, requestNewCode]);
 
 

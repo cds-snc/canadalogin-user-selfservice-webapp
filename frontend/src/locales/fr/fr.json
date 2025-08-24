@@ -397,7 +397,7 @@
     "9": "Activée",
     "10": "Gérer"
   },
-  "UpdatePassword": {
+  "OtpSelection": {
     "1": "First, verify it's you ",
     "2": "Two-step verification adds a second layer of security before updating your password.",
     "3": "Learn more about two-step verification (opens in a new tab)",

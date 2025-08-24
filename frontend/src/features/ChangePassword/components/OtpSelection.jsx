@@ -6,8 +6,7 @@ import {
 } from "@cdssnc/gcds-components-react";
 import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 import { useUser } from "../../../components/Providers/useUser.tsx";
-// import { useSubmit } from "../../../hooks/useSubmit.js";
-// import { useError } from "../../../hooks/useError.js";
+
 import { getPageContent } from '../../../utils/functions.jsx';
 import { gcHelpCentreLinks } from '../../../utils/gcHelpCentreLinks.jsx';
 
@@ -19,74 +18,56 @@ import {
 } from "../../../utils/constants.jsx";
 
 
-export default function VerificationSetUp() {
-    const { state } = useUser();
+export default function OtpSelection({ step, totalSteps, onNext, userProfile, userMfaType, onChangeUserMfaType }) {
     const { language, flow } = useParams();
     const [phone, setPhone] = useState('');
-    const pageContentJson = getPageContent(language, PAGES.updatePassword);
-    // const { setError, getError, hasErrors, clearAllErrors } = useError(language);
-    // const error = getError('#phone');
-    // const errorPageJson = getPageContent(language, PAGES.error);
+    const pageContentJson = getPageContent(language, PAGES.otpSelection);
+    console.log('userMfaType == FLOW_TYPES.sms', userMfaType == FLOW_TYPES.voice)
 
-
-    // const submitDataOptions = {
-    //     endpoint: SUBMIT_END_POINTS.transientOtpSend,
-    //     navigateTo: "/" + language + "/" + FLOW_TYPES.signUp + NAVIGATION_LINKS.verification,
-    //     type: null,
-    //     page: PAGES.verificationSetUp,
-    //     flow: flow,
-    //     onError: (err) => setError('#phone', err)
-    // };
-    // const { handleSubmit, isPending } = useSubmit(submitDataOptions);
-    const smsOtp = "smsOtp";
-    const voiceOtp = "voiceotp";
-
-    const smsOtpRadioOption = { "label": pageContentJson['7'], "id": smsOtp, "value": smsOtp, "hint": pageContentJson['8'], checked: true };
-    const voiceOtpRadioOption = { "label": pageContentJson['9'], "id": voiceOtp, "value": voiceOtp, "hint": pageContentJson['10'], checked: true };
+    const smsOtpRadioOption = { "label": pageContentJson['7'], "id": FLOW_TYPES.sms, "value": FLOW_TYPES.sms, "hint": pageContentJson['8'], checked: userMfaType == FLOW_TYPES.sms };
+    const voiceOtpRadioOption = { "label": pageContentJson['9'], "id": FLOW_TYPES.voice, "value": FLOW_TYPES.voice, "hint": pageContentJson['10'], checked: userMfaType == FLOW_TYPES.voice };
     const radioOptions = [smsOtpRadioOption, voiceOtpRadioOption]
-    console.log(JSON.stringify(radioOptions))
+
     return (
         <GcdsContainer>
+            <GcdsContainer className="gcds-gap" >
+                <GcdsStepper currentStep={step} totalSteps={totalSteps}
+                    tag="h1"
+                    lang={language}>
+                    {pageContentJson['1']}
+                </GcdsStepper>
+            </GcdsContainer>
             <GcdsContainer>
-
-                <GcdsContainer className="gcds-gap" >
-                    <GcdsStepper currentStep="2" totalSteps="3"
-                        tag="h1"
-                        lang={language}>
-                        {pageContentJson['1']}
-                    </GcdsStepper>
-                </GcdsContainer>
                 <GcdsContainer>
-                    <GcdsContainer>
-                        <GcdsText>
-                            {pageContentJson['4']}
-                        </GcdsText>
-                        <GcdsText>
-                            <GcdsLink
-                                href={gcHelpCentreLinks.twoStepVerification}
-                                target="_blank"
-                            >
-                                {pageContentJson['3']}
-                            </GcdsLink>
-                        </GcdsText>
-                        {/* <GcdsHeading tag="h6">
-                            {pageContentJson['5']}
-                        </GcdsHeading>
-                        <GcdsText>
-                            <span>{pageContentJson['6']}</span> <GcdsLink href='#'> {pageContentJson['7']}</GcdsLink> {pageContentJson['8']}
-                        </GcdsText> */}
-                    </GcdsContainer>
-
-
-                    <GcdsRadios
-                        name="radio"
-                        legend={pageContentJson['5']}
-                        hint={pageContentJson['6']}
-                        options={radioOptions}
-                    >
-                    </GcdsRadios>
-                    <SubmitButton currentLang={language} />
+                    <GcdsText>
+                        {pageContentJson['4']}
+                    </GcdsText>
+                    <GcdsText>
+                        <GcdsLink
+                            href={gcHelpCentreLinks.twoStepVerification}
+                            target="_blank"
+                        >
+                            {pageContentJson['3']}
+                        </GcdsLink>
+                    </GcdsText>
+                    {/* <GcdsHeading tag="h6"> daf
+                        {pageContentJson['5']}
+                    </GcdsHeading> */}
+                    {/* <GcdsText>
+                        <span>{pageContentJson['6']}</span> <GcdsLink href='#'> {pageContentJson['7']}</GcdsLink> {pageContentJson['8']}
+                    </GcdsText> */}
                 </GcdsContainer>
+
+
+                <GcdsRadios
+                    name="radio"
+                    legend={pageContentJson['5']}
+                    hint={pageContentJson['6']}
+                    options={radioOptions}
+                    onGcdsChange={(e) => onChangeUserMfaType(e.target.value)}
+                >
+                </GcdsRadios>
+                <SubmitButton currentLang={language} />
             </GcdsContainer>
         </GcdsContainer>
     )

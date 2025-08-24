@@ -8,9 +8,7 @@ import Header from '../components/Layout/Header';
 import Footer from '../components/Layout/Footer';
 import { GcdsContainer, GcdsText } from "@cdssnc/gcds-components-react";
 import Verification from "../components/Verification/Verification.jsx";
-import Password from "../features/ChangePassword/components/Password.jsx";
-import OtpSelection from "../features/ChangePassword/components/OtpSelection.jsx";
-import OtpVerification from "../features/ChangePassword/components/OtpVerification.jsx";
+import ChangePasswordIndex from "../features/ChangePassword/components/ChangePasswordIndex.jsx";
 import SignUpEmail from "../components/SignUp/SignUpEmail.jsx";
 import CreateCoreProfile from "../components/SignUp/Profile/CreateCoreProfile.jsx";
 import Privacy from "../components/SignUp/Profile/Privacy.jsx";
@@ -151,7 +149,7 @@ function PageContents({ page }: { page: string }) {
             )
         case PAGES.updatePassword:
             return (
-                <OtpVerification />
+                <ChangePasswordIndex />
             )
         default:
             return (<div>Error</div>);
