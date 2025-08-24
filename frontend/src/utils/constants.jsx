@@ -137,7 +137,8 @@ export const SUBMIT_END_POINTS = {
     otpSend: '/v1/otp/otp/send',
     profile: '/v1/users/profile',
     rp_info: '/v1/users/rp_info',
-    users: '/v1/users'
+    users: '/v1/users',
+    passwordUpdate: '/v1/password/update',
 }
 
 

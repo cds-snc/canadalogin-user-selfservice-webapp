@@ -1,8 +1,10 @@
 from datetime import datetime
 from enum import Enum
-from typing import Optional
-from pydantic import BaseModel, Field, EmailStr
+from typing import Annotated, Optional
+from pydantic import BaseModel, Field, EmailStr, StringConstraints, constr
 from app.utils.schemas import ResponseModel
+
+UserProvidedOtpValue = Annotated[str, StringConstraints(min_length=6, max_length=6)]
 
 
 class UserName(BaseModel):
@@ -47,12 +49,12 @@ class UpdatePasswordClientResponse(ResponseModel):
 
 
 class SecondStepPasswordUpdatePayload(BaseModel):
-    otp: str
+    otp: UserProvidedOtpValue
     trxId: str
 
 
 class ThirdStepPasswordUpdatePayload(BaseModel):
-    otp: str
+    otp: UserProvidedOtpValue
     trxId: str
     password: str = Field(..., min_length=12)
 

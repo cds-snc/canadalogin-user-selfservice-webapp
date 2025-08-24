@@ -153,7 +153,11 @@ async def custom_http_exception_handler(request: Request, exc: HTTPException):
 async def oauth_error_handler(request: Request, exc: OAuthError):
     """Catch OAuth errors and redirect user to IdP login."""
     logger.error("OAuth exception handler error: %s", exc)
-
+    if "application/json" in request.headers.get("accept", ""):
+        return JSONResponse(
+            status_code=401,
+            content={"detail": "Invalid or expired token"},
+        )
     return await redirect_user_to_idp_verify(request)
 
 

@@ -7,7 +7,8 @@ import {
     GcdsText,
     GcdsButton, GcdsGrid
 } from "@cdssnc/gcds-components-react";
-import { otpFactors } from "../api/otpFactors.jsx"
+import { otpFactors } from "../api/otpFactors.jsx";
+import { passwordUpdate } from "../api/passwordUpdate.jsx";
 import { getPageContent, isCodeValid } from '../../../utils/functions.jsx';
 import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 
@@ -32,19 +33,44 @@ export default function Verification() {
     const { language } = useParams();
     const { state } = useUser();
     const [userPhonenumber, setUserPhonenumber] = useState('');
+    const [localLoading, setLocalLoading] = useState(false);
+
     const [requestNewCode, setRequestNewCode] = useState(false);
+    const [codeRequested, setCodeRequested] = useState(false);
+    const [firstStepCompleted, setFirstStepCompleted] = useState(false);
+    const [otpData, setOtpData] = useState(null);
+    const [userOtpValue, setUserOtpValue] = useState("");
+
     const navigateHelper = useNavigateHelper();
     const backToSecuritySettingsPage = `/${language}${NAVIGATION_LINKS.securitySettings}`;
     // const { setError, clearAllErrors, getError, hasErrors } = useError(language);
     const [time, setTime] = useState(initialTime);
     const pageContentJson = getPageContent(language, PAGES.verification);
+    const { submit } = getPageContent(language, "Button");
+
     // const error = getError('#verificationCode');
-    const { details, id } = state.userProfile ?? {};
+    const { details, id, userName } = state.userProfile ?? {};
     const userDefaultMfa = details?.lastMFA?.[0]?.type ?? null;
     const type = userDefaultMfa
     console.log('state', state)
     console.log('userDefaultMfa', userDefaultMfa)
 
+    const validateOtpCode = async (userOtpValue) => {
+        try {
+            const response = await passwordUpdate.secondStep(userOtpValue, otpData.trxId);
+            if (response && response.success) {
+                setOtpData(response.data)
+                setFirstStepCompleted(true);
+            }
+        } catch (err) {
+            console.log('err', err)
+        }
+    };
+
+    const handleChange = (e) => {
+        const value = e.target.value;
+        setUserOtpValue(value);
+    };
 
     useEffect(() => {
         if (time <= 0)
@@ -77,22 +103,21 @@ export default function Verification() {
     }, [id, userDefaultMfa]);
 
     useEffect(() => {
-
-        const fetchUserOtpPhonenumber = async () => {
+        const requestOtpCode = async () => {
             try {
-                const response = await otpFactors.getUserOtpNumber(id, userDefaultMfa);
+                const response = await passwordUpdate.firstStep(userName, type);
                 if (response && response.success) {
-                    setUserPhonenumber(response.data.phoneNumber);
+                    setOtpData(response.data)
                 }
             } catch (err) {
                 console.log('err', err)
             }
         };
 
-        fetchUserOtpPhonenumber();
-
-
-    }, [id, userDefaultMfa]);
+        requestOtpCode();
+        setTime(initialTime);
+        setRequestNewCode(false);
+    }, [userName, type, requestNewCode]);
 
 
 
@@ -107,13 +132,14 @@ export default function Verification() {
 
     return (
         <GcdsContainer>
-            {/* {
-                hasErrors() && (<GcdsErrorSummary data-testid='errorSummary'
-                    errorLinks={`{"#verificationCode": "${error.errorMsg}"}`}
-                    heading={error.heading}
-                />)
-            } */}
-            {/* {codeRequested && (<GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={pageContentJson['17']} data-testid="linkSuccess">&nbsp;</GcdsNotice>)} */}
+
+            {/* <GcdsErrorSummary
+                data-testid='errorSummary'
+                errorLinks={"Anohter "}
+                heading="Error Message"
+            /> */}
+
+            {codeRequested && (<GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={pageContentJson['17']} data-testid="linkSuccess">&nbsp;</GcdsNotice>)}
 
 
             <GcdsContainer>
@@ -150,28 +176,39 @@ export default function Verification() {
                         name="verificationCode"
                         value={state.testData.otp}
                         type="text"
+                        autofocus
                         validateOn="other"
                         // errorMessage={error.errorMsg}
                         lang={language}
                         size="6"
+                        maxlength={6}
                         required ></GcdsInput>)
                 }
                 {
                     state.testData === undefined && (<GcdsInput
                         inputId="verificationCode"
                         label={pageContentJson['9']}
-                        // label="adf"
+                        autofocus
                         name="verificationCode"
                         type="text"
                         validateOn="other"
                         // errorMessage={error.errorMsg}
+                        onGcdsInput={handleChange}
                         lang={language}
                         size="6"
+                        maxlength={6}
+                        minlength={6}
                         required ></GcdsInput>)
                 }
 
                 <GcdsGrid columns="repeat(auto-fit, minmax(100px, 100px))" gap="10px" align-items="center">
-                    <SubmitButton currentLang={language} />
+                    <GcdsButton disabled={userOtpValue.length < 6} style={{ width: 'fit-content' }} onGcdsClick={(ev) => {
+                        ev.preventDefault();
+                        validateOtpCode(userOtpValue)
+                    }}>
+                        {submit}
+                    </GcdsButton>
+
                     <GcdsButton buttonRole="secondary" style={{ width: 'fit-content' }} onGcdsClick={(ev) => {
                         ev.preventDefault();
                         navigateHelper(backToSecuritySettingsPage)
@@ -202,7 +239,8 @@ export default function Verification() {
                 {time > 0 ? (<span>{pageContentJson['14']}<strong> {time} {pageContentJson['15']}</strong></span>)
                     : (<GcdsLink onGcdsClick={(e) => {
                         console.log('e', e)
-                        setRequestNewCode();
+                        setRequestNewCode(true);
+                        setCodeRequested(true);
                         // handleLinkSubmit(LINK_SUBMIT_TYPES.requestNewCode, false).then(() => setTime(initialTime * timesRequested));
                         // document.getElementById("form").reset();
                     }
