@@ -1,15 +1,6 @@
 import { useEffect, useState } from "react";
 
-import {
-    GcdsContainer, GcdsErrorSummary, GcdsHeading, GcdsInput,
-    GcdsLink, GcdsNotice,
-    GcdsStepper,
-    GcdsText,
-    GcdsButton, GcdsGrid
-} from "@cdssnc/gcds-components-react";
 import { otpFactors } from "../api/otpFactors.jsx";
-import { passwordUpdate } from "../api/passwordUpdate.jsx";
-import { getPageContent, isCodeValid } from '../../../utils/functions.jsx';
 import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 
 import OtpSelection from "./OtpSelection.jsx";
@@ -17,18 +8,12 @@ import OtpVerification from "./OtpVerification.jsx";
 import Password from "./Password.jsx";
 
 import {
-    AVAILABLE_LANGUAGES,
-    FLOW_TYPES, LINK_SUBMIT_TYPES,
-    NAVIGATION_LINKS, PAGES,
-    SERVICES, SUBMIT_END_POINTS
+    NAVIGATION_LINKS
 } from "../../../utils/constants.jsx";
 import { useParams } from "react-router";
-import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
-
 import { useUser } from "../../../components/Providers/useUser.tsx";
-// import { useLinkSubmit } from "../../hooks/useLinkSubmit.js";
-// import { useSubmit } from "../../hooks/useSubmit";
-// import { useError } from "../../hooks/useError";
+
+const defaulPasswordUpdatetStep = "otpSelection";
 
 export default function ChangePasswordIndex() {
     const { language } = useParams();
@@ -36,27 +21,17 @@ export default function ChangePasswordIndex() {
     const [userPhoneFactors, setUserPhoneFactors] = useState([]);
 
     const [otpSentResponse, setOtpSentResponse] = useState(null);
+    const [userOtpValue, setUserOtpValue] = useState("");
 
-    const [passwordUpdateStep, setPasswordUpdateStep] = useState("otpSelection");
-
+    const [passwordUpdateStep, setPasswordUpdateStep] = useState(defaulPasswordUpdatetStep);
     const [localLoading, setLocalLoading] = useState(false);
 
-    const [requestNewCode, setRequestNewCode] = useState(false);
-    const [codeRequested, setCodeRequested] = useState(false);
-    const [firstStepCompleted, setFirstStepCompleted] = useState(false);
-
     const [step, setStep] = useState(2);
-    const [userOtpValue, setUserOtpValue] = useState("");
     const { userProfile } = state;
-    const { details, id } = userProfile ?? {};
-    // const { lastMFA } = details ?? {};
-    // const userDefaultMfa = lastMFA !== null && lastMFA.length > 0 ? lastMFA[0]?.type : null;
+    const { id } = userProfile ?? {};
     const [userSelectedMfaType, setUserSelectedMfaType] = useState(null);
     const navigateHelper = useNavigateHelper();
     const backToSecuritySettingsPage = `/${language}${NAVIGATION_LINKS.securitySettings}`;
-    // const { setError, clearAllErrors, getError, hasErrors } = useError(language);
-    const pageContentJson = getPageContent(language, PAGES.verification);
-    const { submit } = getPageContent(language, "Button");
 
     const handleChangeUserMfaSelection = (mfaType) => {
         const selectedMfaType = userPhoneFactors.find(factor => factor.type === mfaType);
@@ -73,6 +48,10 @@ export default function ChangePasswordIndex() {
     const handleOtpSentResponse = (otpResponse) => {
         setOtpSentResponse(otpResponse);
     };
+
+    const handleSetUserOtpValue = (userOtpValue) => {
+        setUserOtpValue(userOtpValue);
+    }
 
     useEffect(() => {
 
@@ -94,20 +73,8 @@ export default function ChangePasswordIndex() {
         };
 
         fetchUserOtpPhoneFactors();
-
-
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-
-    // useEffect(() => {
-    //     if (!lastMFA) return navigateHelper(backToSecuritySettingsPage)
-    //     if (!lastMFA || lastMFA.length == 0) {
-    //         return navigateHelper(backToSecuritySettingsPage)
-    //     }
-    //     if (!lastMFA || lastMFA.length == 1) {
-    //         setPasswordUpdateStep("otpValidation");
-    //     }
-    // }, [backToSecuritySettingsPage, lastMFA, navigateHelper]);
 
     const steps = {
         otpSelection: (
@@ -121,7 +88,6 @@ export default function ChangePasswordIndex() {
                 step={step}
                 totalSteps={4}
                 onNext={() => {
-                    // set the users prefered OTP selection
                     setPasswordUpdateStep("otpValidation");
                     setStep(3)
                 }}
@@ -133,8 +99,11 @@ export default function ChangePasswordIndex() {
                 userSelectedMfaType={userSelectedMfaType}
                 localLoading={localLoading}
                 setLocalLoading={handleLoading}
+                onChangeUserMfaType={handleChangeUserMfaSelection}
                 step={step}
                 totalSteps={4}
+                userOtpValue={userOtpValue}
+                setUserOtpValue={handleSetUserOtpValue}
                 otpSentResponse={otpSentResponse}
                 setOtpSentResponse={handleOtpSentResponse}
                 onNext={() => {
@@ -153,6 +122,7 @@ export default function ChangePasswordIndex() {
                 setLocalLoading={handleLoading}
                 totalSteps={4}
                 otpSentResponse={otpSentResponse}
+                userOtpValue={userOtpValue}
                 onBack={() => setPasswordUpdateStep("otpValidation")}
             />
         ),
@@ -160,11 +130,10 @@ export default function ChangePasswordIndex() {
 
 
     return (
-        <GcdsContainer>
+        <>
             {
                 (userSelectedMfaType) ? steps[passwordUpdateStep] : "Loading"
             }
-
-        </GcdsContainer>
+        </>
     )
 }

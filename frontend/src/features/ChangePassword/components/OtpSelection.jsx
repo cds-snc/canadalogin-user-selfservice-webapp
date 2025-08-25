@@ -1,11 +1,8 @@
 import { useParams } from "react-router";
-import { useState } from 'react';
 import {
-    GcdsContainer, GcdsDetails, GcdsErrorSummary, GcdsRadios, GcdsHeading, GcdsLink, GcdsStepper,
+    GcdsContainer, GcdsRadios, GcdsLink, GcdsStepper,
     GcdsText, GcdsGrid, GcdsButton
 } from "@cdssnc/gcds-components-react";
-import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
-import { useUser } from "../../../components/Providers/useUser.tsx";
 import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 
 import { getPageContent } from '../../../utils/functions.jsx';
@@ -15,11 +12,10 @@ import {
     FLOW_TYPES,
     NAVIGATION_LINKS,
     PAGES,
-    SUBMIT_END_POINTS
 } from "../../../utils/constants.jsx";
 
 
-export default function OtpSelection({ step, totalSteps, onNext, userProfile, userSelectedMfaType, onChangeUserMfaType, userPhoneFactors }) {
+export default function OtpSelection({ step, totalSteps, onNext, userSelectedMfaType, onChangeUserMfaType, userPhoneFactors }) {
     const { language } = useParams();
     const navigateHelper = useNavigateHelper();
 
@@ -66,12 +62,6 @@ export default function OtpSelection({ step, totalSteps, onNext, userProfile, us
                             {pageContentJson['3']}
                         </GcdsLink>
                     </GcdsText>
-                    {/* <GcdsHeading tag="h6"> daf
-                        {pageContentJson['5']}
-                    </GcdsHeading> */}
-                    {/* <GcdsText>
-                        <span>{pageContentJson['6']}</span> <GcdsLink href='#'> {pageContentJson['7']}</GcdsLink> {pageContentJson['8']}
-                    </GcdsText> */}
                 </GcdsContainer>
 
 
@@ -82,9 +72,6 @@ export default function OtpSelection({ step, totalSteps, onNext, userProfile, us
                     onGcdsChange={(e) => onChangeUserMfaType(e.target.value)}
                 >
                 </GcdsRadios>
-                {/* <SubmitButton currentLang={language} /> */}
-
-
                 <GcdsGrid columns="repeat(auto-fit, minmax(100px, 100px))" gap="10px" align-items="center">
                     <GcdsButton style={{ width: 'fit-content' }} onGcdsClick={(ev) => {
                         ev.preventDefault();
@@ -100,8 +87,6 @@ export default function OtpSelection({ step, totalSteps, onNext, userProfile, us
                         {cancel}
                     </GcdsButton>
                 </GcdsGrid>
-
-
             </GcdsContainer>
         </GcdsContainer>
     )

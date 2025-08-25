@@ -78,6 +78,10 @@ class Configuration(BaseSettings):
     def user_otp_factors_api_endpoint(self) -> str:
         return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.USER_OTP_FACTORS.value}"
 
+    @property
+    def password_policy_api_endpoint(self) -> str:
+        return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.PASSWORDPOLICY.value}"
+
 
 @lru_cache
 def get_configuration():

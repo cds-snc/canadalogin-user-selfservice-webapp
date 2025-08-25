@@ -22,21 +22,17 @@ import { useParams } from "react-router";
 import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 
 import { useUser } from "../../../components/Providers/useUser.tsx";
-// import { useLinkSubmit } from "../../hooks/useLinkSubmit.js";
-// import { useSubmit } from "../../hooks/useSubmit";
-// import { useError } from "../../hooks/useError";
 
 const initialTime = 10;
 let counter = 1;
 
-export default function OtpVerification({ step, totalSteps, onNext, userProfile, userSelectedMfaType, otpSentResponse, setOtpSentResponse }) {
+export default function OtpVerification({ step, totalSteps, onNext, userProfile, userSelectedMfaType, otpSentResponse, setOtpSentResponse, setUserOtpValue, userOtpValue, onChangeUserMfaType, onBack }) {
     const { language } = useParams();
     const { state } = useUser();
 
     const [requestNewCode, setRequestNewCode] = useState(false);
     const [codeRequested, setCodeRequested] = useState(false);
     const [displayTooManyRequestsError, setDisplayTooManyRequestsError] = useState(false);
-    const [userOtpValue, setUserOtpValue] = useState("");
 
     const navigateHelper = useNavigateHelper();
     const backToSecuritySettingsPage = `/${language}${NAVIGATION_LINKS.securitySettings}`;
@@ -44,7 +40,7 @@ export default function OtpVerification({ step, totalSteps, onNext, userProfile,
     const [time, setTime] = useState(initialTime);
     const pageContentJson = getPageContent(language, PAGES.verification);
     const errorPageJson = getPageContent(language, PAGES.error);
-    const { submit } = getPageContent(language, "Button");
+    const { submit, cancel } = getPageContent(language, "Button");
 
     // const error = getError('#verificationCode');
     const { id, userName } = userProfile ?? {};
@@ -98,7 +94,7 @@ export default function OtpVerification({ step, totalSteps, onNext, userProfile,
             }
         };
 
-        if (userProfile.id) {
+        if (id) {
             // requestOtpCode();
             setTime(initialTime);
             setRequestNewCode(false);
@@ -106,7 +102,7 @@ export default function OtpVerification({ step, totalSteps, onNext, userProfile,
         }
 
 
-    }, [userName, userSelectedMfaType, requestNewCode, setOtpSentResponse, userProfile.id]);
+    }, [userName, userSelectedMfaType, requestNewCode, setOtpSentResponse, id]);
 
     const userMfaType = userSelectedMfaType.type;
     return (
@@ -201,7 +197,7 @@ export default function OtpVerification({ step, totalSteps, onNext, userProfile,
                         ev.preventDefault();
                         navigateHelper(backToSecuritySettingsPage)
                     }}>
-                        {pageContentJson["27"]}
+                        {cancel}
                     </GcdsButton>
                 </GcdsGrid>
 
@@ -210,19 +206,17 @@ export default function OtpVerification({ step, totalSteps, onNext, userProfile,
                 {pageContentJson['10']}
             </GcdsHeading>
 
-            {/* {
-                <GcdsText>
-                    {time <= 0 ? (<GcdsLink href="#" onClick={() => {
-                        // clearAllErrors();
-                        // handleLinkSubmit(LINK_SUBMIT_TYPES.requestNewCode, true).then(() => setTime(initialTime * timesRequested));
-                        // document.getElementById("form").reset();
-                    }
-                    }>
-                        {type === FLOW_TYPES.voice ? pageContentJson['12'] : pageContentJson['11']}
-                    </GcdsLink>) : ""}
-                </GcdsText>
 
-            } */}
+            <GcdsText>
+                {time <= 0 ? (<GcdsLink onGcdsClick={() => {
+                    onBack()
+                }
+                }>
+                    {pageContentJson['21']}
+                </GcdsLink>) : ""}
+            </GcdsText>
+
+
             <GcdsText>
                 {time > 0 ? (<span>{pageContentJson['14']}<strong> {time} {pageContentJson['15']}</strong></span>)
                     : (<GcdsLink onGcdsClick={(e) => {

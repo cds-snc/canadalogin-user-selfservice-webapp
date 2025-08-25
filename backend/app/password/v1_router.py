@@ -10,9 +10,12 @@ from app.password.services.second_step_update_password import (
 )
 
 from app.password.services.third_step_update_password import third_step_update_password
+from app.password.services.password_policy import get_password_policy
+
 
 from app.password.schemas import (
     FirstStepPasswordUpdatePayload,
+    PasswordPolicyResponse,
     SecondStepPasswordUpdatePayload,
     UpdatePasswordClientResponse,
     ThirdStepPasswordUpdatePayload,
@@ -73,5 +76,24 @@ async def password_complete(
 ):
     return await third_step_update_password(
         request.app.state.request_client,
+        request.session,
         payload,
     )
+
+
+@router.get(
+    "/policy",
+    response_model=PasswordPolicyResponse,
+    response_model_exclude_none=True,
+    summary="Get the password policy",
+    description="Returns the password policy for the tenant",
+)
+async def password_policy(
+    request: Request,
+    user_access_token: None = Depends(get_users_current_session),
+):
+    """
+    Get Password Policy from IBM Verify API.
+    Returns: The password policy for the tenant
+    """
+    return await get_password_policy(request.app.state.request_client)

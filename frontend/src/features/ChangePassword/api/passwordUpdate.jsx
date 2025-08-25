@@ -39,9 +39,12 @@ export const passwordUpdate = {
             if (error.response && error.response.status === 401) {
                 redirectToLogin();
             }
+            if (error.response) {
+                throw error.response
+            }
         }
     },
-    thirdStep: async (userOtp, trxId, password) => {
+    finalStep: async (userOtp, trxId, password) => {
         try {
             const data = {
                 "otp": userOtp,
@@ -55,29 +58,9 @@ export const passwordUpdate = {
             if (error.response && error.response.status === 401) {
                 redirectToLogin();
             }
+            if (error.response) {
+                throw error.response
+            }
         }
-    },
-
-    // update_my_user_profile: async (editedProfile) => {
-    //     try {
-    //         const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.profile}`, editedProfile);
-    //         return response.data;
-    //     }
-    //     catch (error) {
-    //         if (error.response && error.response.status === 401) {
-    //             redirectToLogin();
-    //         }
-    //     }
-    // },
-    // get_rp_info: async (rp) => {
-    //     try {
-    //         const response = await axios.get(`${config.apiUrl}${SUBMIT_END_POINTS.rp_info}/${rp}`);
-    //         return response.data;
-    //     }
-    //     catch (error) {
-    //         if (error.response && error.response.status === 401) {
-    //             // redirectToLogin();
-    //         }
-    //     }
-    // },
+    }
 }

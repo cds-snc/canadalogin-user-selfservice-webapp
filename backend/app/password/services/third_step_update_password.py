@@ -2,6 +2,8 @@ import logging
 from datetime import datetime
 
 from fastapi import HTTPException
+from fastapi.responses import JSONResponse
+from authlib.integrations.starlette_client import OAuthError
 from httpx import AsyncClient
 from pydantic import ValidationError
 
@@ -18,20 +20,20 @@ logger = logging.getLogger(__name__)
 
 
 async def third_step_update_password(
-    global_http_client: AsyncClient, payload: ThirdStepPasswordUpdatePayload
+    global_http_client: AsyncClient, session: dict, payload: ThirdStepPasswordUpdatePayload
 ):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
 
     try:
-        logger.info(f"Third step - attempting update password for: {payload}")
+        logger.info(f"Third step - attempting update password for")
         start_time = datetime.now()
         password_otp_response = await dispatch_update_password(
             global_http_client, payload
         )
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(
-            f"Third step - dispatch_password_reset_otp returned in {duration:.2f} seconds - {payload}"
+            f"Third step - dispatch_password_reset_otp returned in {duration:.2f} seconds"
         )
 
         response_json = password_otp_response.json()
@@ -42,11 +44,10 @@ async def third_step_update_password(
             logger.warning("Invalid API response schema: %s", validation_error.errors())
             raise HTTPException(status_code=422, detail="Invalid API response schema")
         # To do: Since we get the userid back, we should verify that user session matches the userid returned from the api
-        return ResponseModel(
-            success=True,
-            data=validated_data,
-            message="OTP sent successfully",
-        )
+
+        # Revoke and invalidate the session here
+        session.clear()
+        raise OAuthError("Invalid Session and Token")
 
     except Exception as e:
         logger.error("Failed second_step_update_password", exc_info=True)

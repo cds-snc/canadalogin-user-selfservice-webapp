@@ -8,3 +8,4 @@ class VerifyAPIEndpoint(str, Enum):
     PASSWORD_RESETTER = "/v1.0/usc/password/resetter"
     INTROSPECT_TOKEN = "/oauth2/introspect"
     USER_OTP_FACTORS = "/v2.0/factors"
+    PASSWORDPOLICY = "/v2.0/PasswordPolicies"

@@ -88,6 +88,7 @@ export const PAGES = {
     verificationSetUp: 'VerificationSetUp',
     coreProfile: 'CreateCoreProfile',
     otpSelection: 'OtpSelection',
+    password: "Password",
     home: 'Home',
     error: 'Error',
     verificationSelection: 'VerificationSelection',
