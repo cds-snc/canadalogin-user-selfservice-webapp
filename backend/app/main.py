@@ -7,7 +7,9 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.middleware.sessions import SessionMiddleware
+from starsessions import SessionMiddleware, SessionAutoloadMiddleware,InMemoryStore
+from redis.asyncio import Redis
+from starsessions.stores.redis import RedisStore
 
 from app.config import get_configuration
 from app.utils.helpers import generate_error_response
@@ -44,7 +46,6 @@ CONTACT_INFO = {
     "email": configuration.app_info.email,
 }
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     app.state.config = configuration
@@ -57,6 +58,13 @@ async def lifespan(app: FastAPI):
     )
     logger.info("Application startup complete")
     app.state.request_client = httpx.AsyncClient()
+
+    if configuration.session_config.SESSION_STORE_TYPE == "REDISSTORE":
+        from redis.asyncio import Redis
+        app.state.redis_client = Redis.from_url(configuration.session_config.SESSION_REDIS_URL or "redis://localhost:6379/0")
+        logger.info("Using RedisStore for session management")
+ 
+
     oidc_config.register_oidc(app.state.config)
     logger.info(f"CORS Origins: {app.state.config.cors_origins_list}")
     logger.info(f"oidc_well_known_config: {app.state.config.oidc_well_known_config}")
@@ -65,6 +73,11 @@ async def lifespan(app: FastAPI):
     logger.info("Closing global HTTP client")
     await app.state.request_client.aclose()
     logger.info("Shutting down IBM Verify Integration API")
+    if configuration.session_config.SESSION_STORE_TYPE.upper() == "REDISSTORE" and hasattr(app.state, 'redis_client'):
+        redis_client = app.state.redis_client
+        await redis_client.close()
+        logger.info("Closing Redis client")
+
 
 
 app = FastAPI(
@@ -80,15 +93,30 @@ if configuration.ENVIRONMENT != "local":
     session_domain = f".{configuration.ROOT_DOMAIN}"
 logger.info(f"ROOT_DOMAIN: {session_domain}")
 
+#Determine session store
+session_store = InMemoryStore()
+if configuration.session_config.SESSION_STORE_TYPE == "REDISSTORE":
+    session_store = RedisStore(connection=app.state.redis_client, prefix="session:", gc_ttl=600)
+    logger.info("Using RedisStore for session management")
+
+# Determine if cookie should be secure
+cookie_secure = False if configuration.ENVIRONMENT == "local" else True
+logger.info(f"Cookie Secure: {cookie_secure}")
+
 # Sets the session cookie - https://docs.authlib.org/en/latest/client/fastapi.html
+# Autoload session if cookie is present
+app.add_middleware(SessionAutoloadMiddleware)
 # SessionMiddleware
 app.add_middleware(
     SessionMiddleware,
-    secret_key="some-random-string",  # Use a strong secret in production
-    https_only=configuration.ENVIRONMENT != "local",
-    same_site="lax",  # Can be "strict", "lax", or "none"
-    domain=session_domain,
+    store=session_store,
+    rolling=False,
+    cookie_https_only= cookie_secure,
+    lifetime=60 * 20,  # 20 minutes
+    cookie_domain=session_domain,
+    cookie_name="gc-manage-app",
 )
+
 
 # CORS
 app.add_middleware(
