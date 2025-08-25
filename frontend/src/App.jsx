@@ -27,9 +27,12 @@ function App() {
                 <Route path="/:language/youMayUpdateEmailAtOtherPlaces" element={<Page page={PAGES.youMayUpdateEmailAtOtherPlaces} />} />
                 <Route path="/:language/areYouSureUpdateYourEmail" element={<Page page={PAGES.areYouSureUpdateYourEmail} />} />
                 <Route path="/:language/securitysettings" element={<Page page={PAGES.securitySettings} />} />
+                <Route path="/:language/verificationsetup" element={<Page page={PAGES.verificationSetUp} />} />
+                <Route path="/:language/selectverification" element={<Page page={PAGES.verificationSelection} />} />
+                <Route path="/:language/verification" element={<Page page={PAGES.verification} />} />
 
                 <Route element={<StepupPrivateRoute />}>
-                    <Route path={newPasswordPage} element={<Page page={PAGES.password} />} />
+                    <Route path={newPasswordPage} element={<Page page={PAGES.updatePassword} />} />
                 </Route>
 
                 <Route path={editLanguagePreferences} element={<Page page={PAGES.editLanguagePreferences} />} />

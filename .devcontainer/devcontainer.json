@@ -49,5 +49,6 @@
 				}
 			}
 		}
-	}
+	},
+	"postCreateCommand": "make install-dev-python && make install-frontend-deps"
 }
