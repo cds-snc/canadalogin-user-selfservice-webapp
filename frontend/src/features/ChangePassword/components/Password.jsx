@@ -25,6 +25,7 @@ export default function Password({ step, totalSteps, onNext, otpSentResponse, us
     const { language } = useParams();
     const { submit, cancel } = getPageContent(language, "Button");
     const [passwordPolicy, setPasswordPolicy] = useState({ min: 12, max: 110 })
+    const [serverErrorMessage, setServerErrorMessage] = useState("")
     const [checkedValue, setCheckedValue] = useState(false);
     const [password, setPassword] = useState("");
 
@@ -54,17 +55,21 @@ export default function Password({ step, totalSteps, onNext, otpSentResponse, us
     function handlePasswordChange(event) {
         setPasswordStrength(event.target.value.length);
         setPassword(event.target.value);
+        setServerErrorMessage("");
     }
 
 
     const completePasswordUpdate = async () => {
         try {
-
+            setServerErrorMessage("");
             const response = await passwordUpdate.finalStep(userOtpValue, otpSentResponse.trxId, password);
             if (response && response.success) {
                 onNext(response.data);
             }
         } catch (err) {
+            if (err && err.data && err.data.message) {
+                setServerErrorMessage(err.data.message);
+            }
             console.log('err', err)
         }
     };
@@ -120,7 +125,7 @@ export default function Password({ step, totalSteps, onNext, otpSentResponse, us
                     hint={pageContentJson['10']}
                     type={checkedValue ? "text" : "password"}
                     onGcdsInput={handlePasswordChange}
-                    // errorMessage={error.errorMsg}
+                    errorMessage={serverErrorMessage}
                     minlength={passwordPolicy.min}
                     maxlength={passwordPolicy.max}
                     lang={language}

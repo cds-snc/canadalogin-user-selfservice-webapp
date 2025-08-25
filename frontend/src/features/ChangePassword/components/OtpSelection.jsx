@@ -25,17 +25,24 @@ export default function OtpSelection({ step, totalSteps, onNext, userSelectedMfa
     const backToSecuritySettingsPage = `/${language}${NAVIGATION_LINKS.securitySettings}`;
 
     const configureRadioOptions = () => {
+        let radioOptionsValues = []
+
         const smsPhoneFactorValue = userPhoneFactors.find(factor => factor.type === FLOW_TYPES.sms);
         const voicePhoneFactorValue = userPhoneFactors.find(factor => factor.type === FLOW_TYPES.voice);
 
-        const smsLabel = `${pageContentJson['7']} ${smsPhoneFactorValue.phoneNumber}`;
-        const voiceLabel = `${pageContentJson['9']} ${voicePhoneFactorValue.phoneNumber}`;
+        if (smsPhoneFactorValue) {
+            const smsLabel = `${pageContentJson['7']} ${smsPhoneFactorValue.phoneNumber}`;
+            const smsOtpRadioOption = { "label": smsLabel, "id": FLOW_TYPES.sms, "value": FLOW_TYPES.sms, "hint": pageContentJson['8'], checked: userSelectedMfaType.type == FLOW_TYPES.sms };
+            radioOptionsValues.push(smsOtpRadioOption)
+        }
 
-        const smsOtpRadioOption = { "label": smsLabel, "id": FLOW_TYPES.sms, "value": FLOW_TYPES.sms, "hint": pageContentJson['8'], checked: userSelectedMfaType.type == FLOW_TYPES.sms };
-        const voiceOtpRadioOption = { "label": voiceLabel, "id": FLOW_TYPES.voice, "value": FLOW_TYPES.voice, "hint": pageContentJson['10'], checked: userSelectedMfaType.type == FLOW_TYPES.voice };
-        const radioOptions = [smsOtpRadioOption, voiceOtpRadioOption]
+        if (voicePhoneFactorValue) {
+            const voiceLabel = `${pageContentJson['9']} ${voicePhoneFactorValue.phoneNumber}`;
+            const voiceOtpRadioOption = { "label": voiceLabel, "id": FLOW_TYPES.voice, "value": FLOW_TYPES.voice, "hint": pageContentJson['10'], checked: userSelectedMfaType.type == FLOW_TYPES.voice };
+            radioOptionsValues.push(voiceOtpRadioOption)
+        }
 
-        return radioOptions;
+        return radioOptionsValues;
     };
 
     const radioOptions = configureRadioOptions();
@@ -64,14 +71,26 @@ export default function OtpSelection({ step, totalSteps, onNext, userSelectedMfa
                     </GcdsText>
                 </GcdsContainer>
 
+                {
+                    (radioOptions.length > 1) ? (
 
-                <GcdsRadios
-                    name="radio"
-                    legend={pageContentJson['5']}
-                    options={radioOptions}
-                    onGcdsChange={(e) => onChangeUserMfaType(e.target.value)}
-                >
-                </GcdsRadios>
+                        <GcdsRadios
+                            name="radio"
+                            legend={pageContentJson['5']}
+                            options={radioOptions}
+                            onGcdsChange={(e) => onChangeUserMfaType(e.target.value)}
+                        >
+                        </GcdsRadios>
+                    ) : <>
+                        <GcdsText>
+                            {radioOptions[0].label}
+                        </GcdsText>
+                        <GcdsText>
+                            {radioOptions[0].hint}
+                        </GcdsText>
+                    </>
+                }
+
                 <GcdsGrid columns="repeat(auto-fit, minmax(100px, 100px))" gap="10px" align-items="center">
                     <GcdsButton style={{ width: 'fit-content' }} onGcdsClick={(ev) => {
                         ev.preventDefault();
