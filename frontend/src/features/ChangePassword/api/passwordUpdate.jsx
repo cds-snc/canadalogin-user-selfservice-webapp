@@ -21,6 +21,9 @@ export const passwordUpdate = {
             if (error.response && error.response.status === 401) {
                 redirectToLogin();
             }
+            if (error.response.status === 429) {
+                throw error.response.status;
+            }
         }
     },
     secondStep: async (userOtp, trxId) => {

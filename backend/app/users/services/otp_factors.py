@@ -9,8 +9,8 @@ from pydantic import ValidationError
 from app.config import get_configuration
 from app.users.schemas import (
     UserAuthFactorsIbmResponse,
-    UserAuthFactorsResponse,
-    UserOTPFactors
+    UserPhoneAuthFactorsResponse,
+    UserPhoneOTPFactors
 )
 from app.password.schemas import (
     OtpType
@@ -47,27 +47,37 @@ async def mask_phone_last4(phone: str, region: str = "US") -> str:
         return f"Invalid phone number: {str(e)}"
 
 
-async def parse_auth_factors_response(data: UserAuthFactorsIbmResponse) -> UserOTPFactors:
+async def parse_phone_auth_factors_response(data: UserAuthFactorsIbmResponse) -> UserPhoneOTPFactors:
     logger.info("parse_auth_factors_response")
     factors = data.factors
     if not factors:
         logger.warning("No OTP factors found for user")
         raise HTTPException(status_code=404, detail="No OTP factors found for user")
-
     first_factor = factors[0]
     if not first_factor:
         logger.warning("No OTP factors found for user")
         raise HTTPException(status_code=404, detail="No OTP factors found for user")
 
-    phone_number = getattr(first_factor.attributes, "phoneNumber", None)
-    if not phone_number:
+    phone_factors = []
+    ALLOWED_TYPES = {OtpType.SMSOTP.value, OtpType.VOICEOTP.value}
+
+    for factor in factors:
+        if factor.type in ALLOWED_TYPES:
+            phone_number = getattr(factor.attributes, "phoneNumber", None)
+            if not phone_number:
+                logger.warning("Factor %s has no phoneNumber", factor.id)
+                continue
+            masked_phonenumber = await mask_phone_last4(phone_number)
+            phone_factors.append({
+                "type": factor.type,
+                "phoneNumber": masked_phonenumber,
+            })
+
+    if not phone_factors:
         logger.warning("No OTP factors found for user")
         raise HTTPException(status_code=404, detail="No OTP factors found for user")
 
-    return {
-        "type": first_factor.type,
-        "phoneNumber": phone_number
-    }
+    return phone_factors
 
 
 async def dispatch_user_auth_factors(
@@ -88,7 +98,7 @@ async def dispatch_user_auth_factors(
         search_params = {
             "enabled": True,
             "validated": True,
-            "search": f'userId="{user_profile_id}"&type="{otp_type.value}"'
+            "search": f'userId="{user_profile_id}"'
         }
 
         otp_factor_response = await global_http_client.get(
@@ -107,7 +117,6 @@ async def dispatch_user_auth_factors(
 async def get_user_otp_factors(
     global_http_client: AsyncClient,
     user_id: str,
-    otp_type: OtpType,
     user_access_token: str,
 ):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
@@ -134,17 +143,12 @@ async def get_user_otp_factors(
                     logger.warning("Invalid API response schema: %s", validation_error.errors())
                     raise HTTPException(status_code=422, detail="Invalid response")
 
-                phone_number_otp_factor = await parse_auth_factors_response(validated_data)
-                masked_phone_number = await mask_phone_last4(phone_number_otp_factor["phoneNumber"])
-                data = {
-                    "type": phone_number_otp_factor["type"],
-                    "phoneNumber": masked_phone_number
-                }
+                phone_number_otp_factor = await parse_phone_auth_factors_response(validated_data)
                 logger.info("success response and data validation for user auth factors")
-                return UserAuthFactorsResponse(
+                return UserPhoneAuthFactorsResponse(
                     success=True,
                     message="User factor retrieved successfully.",
-                    data=data
+                    data=phone_number_otp_factor
                 )
             else:
                 logger.info("user_id and user profile id dont math ")

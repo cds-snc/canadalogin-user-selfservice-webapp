@@ -1,18 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 import {
     GcdsContainer, GcdsErrorSummary, GcdsHeading, GcdsInput,
     GcdsLink, GcdsNotice,
     GcdsStepper,
     GcdsText,
-    GcdsButton, GcdsGrid
+    GcdsButton, GcdsGrid, GcdsErrorMessage
 } from "@cdssnc/gcds-components-react";
 import { otpFactors } from "../api/otpFactors.jsx";
 import { passwordUpdate } from "../api/passwordUpdate.jsx";
 import { getPageContent, isCodeValid } from '../../../utils/functions.jsx';
 import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 
-import AlreadyGc from "../../../components/Layout/AlreadyGc.jsx";
 import {
     AVAILABLE_LANGUAGES,
     FLOW_TYPES, LINK_SUBMIT_TYPES,
@@ -28,17 +27,15 @@ import { useUser } from "../../../components/Providers/useUser.tsx";
 // import { useError } from "../../hooks/useError";
 
 const initialTime = 10;
+let counter = 1;
 
-export default function Verification() {
+export default function OtpVerification({ step, totalSteps, onNext, userProfile, userMfaType, setOtpSentResponse }) {
     const { language } = useParams();
     const { state } = useUser();
-    const [userPhonenumber, setUserPhonenumber] = useState('');
-    const [localLoading, setLocalLoading] = useState(false);
 
     const [requestNewCode, setRequestNewCode] = useState(false);
     const [codeRequested, setCodeRequested] = useState(false);
-    const [firstStepCompleted, setFirstStepCompleted] = useState(false);
-    const [otpData, setOtpData] = useState(null);
+    const [displayTooManyRequestsError, setDisplayTooManyRequestsError] = useState(false);
     const [userOtpValue, setUserOtpValue] = useState("");
 
     const navigateHelper = useNavigateHelper();
@@ -46,21 +43,18 @@ export default function Verification() {
     // const { setError, clearAllErrors, getError, hasErrors } = useError(language);
     const [time, setTime] = useState(initialTime);
     const pageContentJson = getPageContent(language, PAGES.verification);
+    const errorPageJson = getPageContent(language, PAGES.error);
     const { submit } = getPageContent(language, "Button");
 
     // const error = getError('#verificationCode');
-    const { details, id, userName } = state.userProfile ?? {};
-    const userDefaultMfa = details?.lastMFA?.[0]?.type ?? null;
-    const type = userDefaultMfa
-    console.log('state', state)
-    console.log('userDefaultMfa', userDefaultMfa)
+    const { id, userName } = userProfile ?? {};
+
 
     const validateOtpCode = async (userOtpValue) => {
         try {
             const response = await passwordUpdate.secondStep(userOtpValue, otpData.trxId);
             if (response && response.success) {
-                setOtpData(response.data)
-                setFirstStepCompleted(true);
+                onNext(response.data);
             }
         } catch (err) {
             console.log('err', err)
@@ -88,7 +82,7 @@ export default function Verification() {
 
         const fetchUserOtpPhonenumber = async () => {
             try {
-                const response = await otpFactors.getUserOtpNumber(id, userDefaultMfa);
+                const response = await otpFactors.getUserOtpNumber(id, userMfaType);
                 if (response && response.success) {
                     setUserPhonenumber(response.data.phoneNumber);
                 }
@@ -100,38 +94,37 @@ export default function Verification() {
         fetchUserOtpPhonenumber();
 
 
-    }, [id, userDefaultMfa]);
+    }, [id, userMfaType]);
+    const didFetch = useRef(false);
 
     useEffect(() => {
         const requestOtpCode = async () => {
+            if (didFetch.current) return;
+            didFetch.current = true;
             try {
-                const response = await passwordUpdate.firstStep(userName, type);
+                console.log("counter", counter + 1)
+                const response = await passwordUpdate.firstStep(userName, userMfaType);
                 if (response && response.success) {
-                    setOtpData(response.data)
+                    setOtpSentResponse(response.data)
                 }
             } catch (err) {
+                if (err === 429) {
+                    setDisplayTooManyRequestsError(true);
+                }
                 console.log('err', err)
             }
         };
 
-        if (!setFirstStepCompleted) {
+        if (userProfile.id) {
             requestOtpCode();
             setTime(initialTime);
             setRequestNewCode(false);
+            setDisplayTooManyRequestsError(false);
         }
 
-    }, [userName, type, requestNewCode]);
 
+    }, [userName, userMfaType, requestNewCode, setOtpSentResponse, userProfile.id]);
 
-
-    // function validateCode(code) {
-    //     clearAllErrors();
-    //     if (!isCodeValid(code)) {
-    //         setError('#verificationCode', '3');
-    //         return false;
-    //     }
-    //     return true;
-    // }
 
     return (
         <GcdsContainer>
@@ -141,31 +134,39 @@ export default function Verification() {
                 errorLinks={"Anohter "}
                 heading="Error Message"
             /> */}
+            {
+                displayTooManyRequestsError && (
+                    <GcdsErrorMessage messageId="message-props">
+                        {errorPageJson['14']}
+                    </GcdsErrorMessage>
+                )
+            }
 
             {codeRequested && (<GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={pageContentJson['17']} data-testid="linkSuccess">&nbsp;</GcdsNotice>)}
 
 
             <GcdsContainer>
 
-                <GcdsStepper currentStep={'2'}
-                    totalSteps="3"
+                <GcdsStepper
+                    currentStep={step}
+                    totalSteps={totalSteps}
                     tag="h1"
                     lang={language}>
-                    {type === FLOW_TYPES.email ? pageContentJson['22'] : pageContentJson['1']}
+                    {userMfaType === FLOW_TYPES.email ? pageContentJson['22'] : pageContentJson['1']}
                 </GcdsStepper>
 
                 <GcdsText>
-                    {type === FLOW_TYPES.voice ? pageContentJson['3'] : type === FLOW_TYPES.sms ? pageContentJson['2'] : pageContentJson['23']}&nbsp;
+                    {userMfaType === FLOW_TYPES.voice ? pageContentJson['3'] : userMfaType === FLOW_TYPES.sms ? pageContentJson['2'] : pageContentJson['23']}&nbsp;
                     <strong>{userPhonenumber}</strong>
                 </GcdsText>
                 <GcdsText>
-                    {type === FLOW_TYPES.voice ? pageContentJson['5'] : type === FLOW_TYPES.sms ? pageContentJson['4'] : pageContentJson['24']}
+                    {userMfaType === FLOW_TYPES.voice ? pageContentJson['5'] : userMfaType === FLOW_TYPES.sms ? pageContentJson['4'] : pageContentJson['24']}
                 </GcdsText>
                 <GcdsText>
                     {pageContentJson['6']} <strong>{pageContentJson['7']}</strong>
                 </GcdsText>
                 {
-                    type !== FLOW_TYPES.email && (
+                    userMfaType !== FLOW_TYPES.email && (
                         <GcdsHeading tag='h2'>
                             {pageContentJson['8']}
                         </GcdsHeading>
@@ -201,7 +202,8 @@ export default function Verification() {
                         size="6"
                         maxlength={6}
                         minlength={6}
-                        required ></GcdsInput>)
+                        disabled={displayTooManyRequestsError}
+                        required={!displayTooManyRequestsError} ></GcdsInput>)
                 }
 
                 <GcdsGrid columns="repeat(auto-fit, minmax(100px, 100px))" gap="10px" align-items="center">
@@ -248,7 +250,7 @@ export default function Verification() {
                         // document.getElementById("form").reset();
                     }
                     }>
-                        {type !== FLOW_TYPES.email ? pageContentJson['16'] : pageContentJson['26']}
+                        {userMfaType !== FLOW_TYPES.email ? pageContentJson['16'] : pageContentJson['26']}
                     </GcdsLink>)}
             </GcdsText>
         </GcdsContainer>

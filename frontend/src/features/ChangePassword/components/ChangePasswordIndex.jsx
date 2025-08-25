@@ -30,12 +30,12 @@ import { useUser } from "../../../components/Providers/useUser.tsx";
 // import { useSubmit } from "../../hooks/useSubmit";
 // import { useError } from "../../hooks/useError";
 
-const initialTime = 10;
-
-export default function Verification() {
+export default function ChangePasswordIndex() {
     const { language } = useParams();
     const { state } = useUser();
-    const [time, setTime] = useState(initialTime);
+    const [userPhonenumber, setUserPhonenumber] = useState('');
+
+    const [otpSentResponse, setOtpSentResponse] = useState(null);
 
     const [passwordUpdateStep, setPasswordUpdateStep] = useState("otpSelection");
 
@@ -45,13 +45,12 @@ export default function Verification() {
     const [codeRequested, setCodeRequested] = useState(false);
     const [firstStepCompleted, setFirstStepCompleted] = useState(false);
 
-
     const [step, setStep] = useState(2);
-    const [otpData, setOtpData] = useState(null);
     const [userOtpValue, setUserOtpValue] = useState("");
     const { userProfile } = state;
     const { details } = userProfile ?? {};
-    const userDefaultMfa = details?.lastMFA?.[0]?.type ?? null;
+    const { lastMFA } = details ?? {};
+    const userDefaultMfa = lastMFA !== null && lastMFA.length > 0 ? lastMFA[0]?.type : null;
     const [userMfaType, setUserMfaType] = useState(userDefaultMfa);
     const navigateHelper = useNavigateHelper();
     const backToSecuritySettingsPage = `/${language}${NAVIGATION_LINKS.securitySettings}`;
@@ -66,6 +65,39 @@ export default function Verification() {
     const handleLoading = (bool) => {
         setLocalLoading(bool)
     };
+
+    const handleOtpSentResponse = (otpResponse) => {
+        setOtpSentResponse(otpResponse);
+    };
+
+    useEffect(() => {
+
+        const fetchUserOtpPhonenumber = async () => {
+            try {
+                const response = await otpFactors.getUserOtpNumber(id, userMfaType);
+                if (response && response.success) {
+                    setUserPhonenumber(response.data.phoneNumber);
+                }
+            } catch (err) {
+                console.log('err', err)
+            }
+        };
+
+        fetchUserOtpPhonenumber();
+
+
+    }, [id, userMfaType]);
+
+
+    // useEffect(() => {
+    //     if (!lastMFA) return navigateHelper(backToSecuritySettingsPage)
+    //     if (!lastMFA || lastMFA.length == 0) {
+    //         return navigateHelper(backToSecuritySettingsPage)
+    //     }
+    //     if (!lastMFA || lastMFA.length == 1) {
+    //         setPasswordUpdateStep("otpValidation");
+    //     }
+    // }, [backToSecuritySettingsPage, lastMFA, navigateHelper]);
 
     const steps = {
         otpSelection: (
@@ -92,9 +124,9 @@ export default function Verification() {
                 setLocalLoading={handleLoading}
                 step={step}
                 totalSteps={4}
-                onNext={(data) => {
+                setOtpSentResponse={handleOtpSentResponse}
+                onNext={() => {
                     setStep(4)
-                    setOtpData(data);
                     setPasswordUpdateStep("passwordChange");
                 }}
                 onBack={() => setPasswordUpdateStep("otpSelection")}
@@ -108,7 +140,7 @@ export default function Verification() {
                 localLoading={localLoading}
                 setLocalLoading={handleLoading}
                 totalSteps={4}
-                otpData={otpData}
+                otpSentResponse={otpSentResponse}
                 onBack={() => setPasswordUpdateStep("otpValidation")}
             />
         ),

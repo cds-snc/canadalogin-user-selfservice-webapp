@@ -61,7 +61,8 @@
     "10": "Enter a phone number to continue.",
     "11": "Enter a last name to continue. If you have a single name, enter it in the last name field.",
     "12": "and a maximum of",
-    "13": "characters."
+    "13": "characters.",
+    "14": "Too Many Attempts"
   },
   "RegisterVerification": {
     "1": "Protect your account with 2-step verification",

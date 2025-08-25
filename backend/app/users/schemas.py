@@ -140,10 +140,14 @@ class UserAuthFactorsIbmResponse(BaseModel):
     total: int
 
 
-class UserOTPFactors(BaseModel):
+class UserPhoneOTP(BaseModel):
     type: OtpType
     phoneNumber: str
 
 
-class UserAuthFactorsResponse(ResponseModel):
-    data: UserOTPFactors
+class UserPhoneOTPFactors(BaseModel):
+    factors: list[UserPhoneOTP]
+
+
+class UserPhoneAuthFactorsResponse(ResponseModel):
+    data: list[UserPhoneOTP]

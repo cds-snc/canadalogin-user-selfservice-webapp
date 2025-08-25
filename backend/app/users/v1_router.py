@@ -3,7 +3,7 @@ import logging
 from fastapi import APIRouter
 from fastapi import Request, Depends
 
-from app.users.schemas import ProfileResponse, ProfilePUTData, RelyingPartyResponse, UserAuthFactorsResponse
+from app.users.schemas import ProfileResponse, ProfilePUTData, RelyingPartyResponse, UserPhoneAuthFactorsResponse
 from app.users.services.profile import update_profile, my_profile
 from app.users.services.rp_info import get_relying_party_info
 from app.users.services.otp_factors import get_user_otp_factors
@@ -75,8 +75,8 @@ async def rp_info(
 
 
 @router.get(
-    "/{user_id}/otp_factors/{otp_type}",
-    response_model=UserAuthFactorsResponse,
+    "/{user_id}/otp_factors",
+    response_model=UserPhoneAuthFactorsResponse,
     tags=["Users"],
     summary="Get the users phone number authentication factors",
     description="",
@@ -84,12 +84,10 @@ async def rp_info(
 async def user_factors(
     request: Request,
     user_id: str,
-    otp_type: OtpType,
     user_access_token: str = Depends(get_users_current_session),
 ):
     return await get_user_otp_factors(
         request.app.state.request_client,
         user_id,
-        otp_type,
         user_access_token,
     )

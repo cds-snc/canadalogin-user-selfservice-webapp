@@ -60,7 +60,8 @@
     "10": "Veuillez entrer un numéro de téléphone pour continuer.",
     "11": "Veuillez entrer un nom de famille pour continuer. Si vous n’avez qu’un seul nom, entrez-le dans le champ destiné au nom de famille.",
     "12": "and a maximum of",
-    "13": "caractères."
+    "13": "caractères.",
+    "14": "Trop de tentatives"
   },
   "RegisterVerification": {
     "1": "Protégez votre compte avec la vérification en deux étapes",
