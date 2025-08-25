@@ -120,7 +120,7 @@ class Attributes(BaseModel):
     phoneNumber: Optional[str] = None
 
     class Config:
-        extra = 'allow'
+        extra = "allow"
 
 
 class Factor(BaseModel):
