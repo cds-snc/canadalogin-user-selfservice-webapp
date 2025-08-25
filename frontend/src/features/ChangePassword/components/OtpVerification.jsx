@@ -42,7 +42,12 @@ export default function OtpVerification({ step, totalSteps, onNext, userProfile,
 
     // const error = getError('#verificationCode');
     const { id, userName } = userProfile ?? {};
-
+    const didFetch = useRef(false);
+    const fetchInProgress = (bool) => {
+        // in dev the component makes two requests
+        // this might not be needed when its built in a production environment
+        didFetch.current = bool;
+    }
 
     const validateOtpCode = async (userOtpValue) => {
         try {
@@ -72,21 +77,22 @@ export default function OtpVerification({ step, totalSteps, onNext, userProfile,
 
     }, [time]);
 
-    const didFetch = useRef(false);
 
     useEffect(() => {
         const requestOtpCode = async () => {
             if (didFetch.current) return;
-            didFetch.current = true;
+            fetchInProgress(true);
             try {
                 const response = await passwordUpdate.firstStep(userName, userSelectedMfaType.type);
                 if (response && response.success) {
                     setOtpSentResponse(response.data)
                 }
+                fetchInProgress(false);
             } catch (err) {
                 if (err === 429) {
                     setDisplayTooManyRequestsError(true);
                 }
+                fetchInProgress(false);
                 console.log('err', err)
             }
         };
@@ -102,6 +108,7 @@ export default function OtpVerification({ step, totalSteps, onNext, userProfile,
     }, [userName, userSelectedMfaType, requestNewCode, setOtpSentResponse, id]);
 
     const userMfaType = userSelectedMfaType.type;
+    const errorMessage = displayTooManyRequestsError ? errorPageJson['14'] : "";
     return (
         <GcdsContainer>
 
@@ -172,7 +179,7 @@ export default function OtpVerification({ step, totalSteps, onNext, userProfile,
                         name="verificationCode"
                         type="text"
                         validateOn="other"
-                        // errorMessage={error.errorMsg}
+                        errorMessage={errorMessage}
                         onGcdsInput={handleChange}
                         lang={language}
                         size="6"
