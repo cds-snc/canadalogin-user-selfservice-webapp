@@ -26,7 +26,7 @@ async def dispatch_get_password_policy(global_http_client: AsyncClient):
 
         settings = get_configuration()
         password_policy_url = settings.password_policy_api_endpoint
-        logger.info(f"Password Policy URL: {password_policy_url}")
+        logger.info(f"Retrieve Password Policy URL")
         response = await global_http_client.get(password_policy_url, headers=headers)
 
         logger.info(f"returned response from password policy: {response.json()}")
