@@ -7,9 +7,8 @@ import {
     GcdsText,
     GcdsButton, GcdsGrid, GcdsErrorMessage
 } from "@cdssnc/gcds-components-react";
-import { otpFactors } from "../api/otpFactors.jsx";
 import { passwordUpdate } from "../api/passwordUpdate.jsx";
-import { getPageContent, isCodeValid } from '../../../utils/functions.jsx';
+import { getPageContent } from '../../../utils/functions.jsx';
 import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 
 import {
@@ -25,7 +24,7 @@ import { useUser } from "../../../components/Providers/useUser.tsx";
 
 const initialTime = 10;
 
-export default function OtpVerification({ step, totalSteps, onNext, userProfile, userSelectedMfaType, otpSentResponse, setOtpSentResponse, setUserOtpValue, userOtpValue, onChangeUserMfaType, onBack }) {
+export default function OtpVerification({ step, totalSteps, onNext, userProfile, userSelectedMfaType, otpSentResponse, setOtpSentResponse, setUserOtpValue, userOtpValue, onBack }) {
     const { language } = useParams();
     const { state } = useUser();
 
@@ -221,9 +220,10 @@ export default function OtpVerification({ step, totalSteps, onNext, userProfile,
 
             <GcdsText>
                 {
-                    time > 0 ? (<span>{pageContentJson['14']}<strong> {time} {pageContentJson['15']}</strong></span>)
+                    time > 0 ? (
+                        <span>{pageContentJson['14']}<strong> {time} {pageContentJson['15']}</strong></span>)
                         : (
-                            <GcdsLink onGcdsClick={(e) => {
+                            <GcdsLink onGcdsClick={() => {
                                 setRequestNewCode(true);
                                 setCodeRequested(true);
                             }
