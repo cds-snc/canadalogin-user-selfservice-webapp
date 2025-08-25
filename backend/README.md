@@ -12,12 +12,13 @@ This is the FastAPI application for the GC Sign in back-end API.
 
 ### Environment Variables
 
-Create a `.env` file with the following variables:
+Create a `.env` file with the following variables, referene .env.sample file:
 
 ```env
 IBM_VERIFY_TENANT_URL=set_this_to_the_dev_tenant
 IBM_VERIFY_API_CLIENT_ID=set_this_to_the_dev_api_client_id
 IBM_VERIFY_API_CLIENT_SECRET=set_this_to_the_dev_api_client_secret
+...
 ```
 
 ### Quick Start

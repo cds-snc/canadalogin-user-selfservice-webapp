@@ -17,3 +17,4 @@ authlib==1.6.0
 itsdangerous==2.2.0
 starsessions==2.2.1
 PyJWT==2.8.0
+redis==6.4.0
