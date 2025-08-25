@@ -24,7 +24,6 @@ import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 import { useUser } from "../../../components/Providers/useUser.tsx";
 
 const initialTime = 10;
-let counter = 1;
 
 export default function OtpVerification({ step, totalSteps, onNext, userProfile, userSelectedMfaType, otpSentResponse, setOtpSentResponse, setUserOtpValue, userOtpValue, onChangeUserMfaType, onBack }) {
     const { language } = useParams();
@@ -81,7 +80,6 @@ export default function OtpVerification({ step, totalSteps, onNext, userProfile,
             if (didFetch.current) return;
             didFetch.current = true;
             try {
-                console.log("counter", counter + 1)
                 const response = await passwordUpdate.firstStep(userName, userSelectedMfaType.type);
                 if (response && response.success) {
                     setOtpSentResponse(response.data)
@@ -95,7 +93,7 @@ export default function OtpVerification({ step, totalSteps, onNext, userProfile,
         };
 
         if (id) {
-            // requestOtpCode();
+            requestOtpCode();
             setTime(initialTime);
             setRequestNewCode(false);
             setDisplayTooManyRequestsError(false);
@@ -208,27 +206,32 @@ export default function OtpVerification({ step, totalSteps, onNext, userProfile,
 
 
             <GcdsText>
-                {time <= 0 ? (<GcdsLink onGcdsClick={() => {
-                    onBack()
+                {
+                    time <= 0 ? (
+                        <GcdsLink onGcdsClick={() => {
+                            onBack()
+                        }
+                        }>
+                            {pageContentJson['21']}
+                        </GcdsLink>
+                    ) : ""
                 }
-                }>
-                    {pageContentJson['21']}
-                </GcdsLink>) : ""}
             </GcdsText>
 
 
             <GcdsText>
-                {time > 0 ? (<span>{pageContentJson['14']}<strong> {time} {pageContentJson['15']}</strong></span>)
-                    : (<GcdsLink onGcdsClick={(e) => {
-                        console.log('e', e)
-                        setRequestNewCode(true);
-                        setCodeRequested(true);
-                        // handleLinkSubmit(LINK_SUBMIT_TYPES.requestNewCode, false).then(() => setTime(initialTime * timesRequested));
-                        // document.getElementById("form").reset();
-                    }
-                    }>
-                        {userMfaType !== FLOW_TYPES.email ? pageContentJson['16'] : pageContentJson['26']}
-                    </GcdsLink>)}
+                {
+                    time > 0 ? (<span>{pageContentJson['14']}<strong> {time} {pageContentJson['15']}</strong></span>)
+                        : (
+                            <GcdsLink onGcdsClick={(e) => {
+                                setRequestNewCode(true);
+                                setCodeRequested(true);
+                            }
+                            }>
+                                {userMfaType !== FLOW_TYPES.email ? pageContentJson['16'] : pageContentJson['26']}
+                            </GcdsLink>
+                        )
+                }
             </GcdsText>
         </GcdsContainer>
     )
