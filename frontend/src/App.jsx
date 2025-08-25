@@ -31,9 +31,9 @@ function App() {
                 <Route path="/:language/selectverification" element={<Page page={PAGES.verificationSelection} />} />
                 <Route path="/:language/verification" element={<Page page={PAGES.verification} />} />
 
-                {/* <Route element={<StepupPrivateRoute />}> */}
-                <Route path={newPasswordPage} element={<Page page={PAGES.updatePassword} />} />
-                {/* </Route> */}
+                <Route element={<StepupPrivateRoute />}>
+                    <Route path={newPasswordPage} element={<Page page={PAGES.updatePassword} />} />
+                </Route>
 
                 <Route path={editLanguagePreferences} element={<Page page={PAGES.editLanguagePreferences} />} />
                 <Route path={areYouSureEditYourLanguage} element={<Page page={PAGES.areYouSureEditYourLanguage} />} />
