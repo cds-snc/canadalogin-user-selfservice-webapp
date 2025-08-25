@@ -51,9 +51,7 @@ async def update_profile(
         )
 
 
-async def my_profile(
-    global_http_client: AsyncClient, user_access_token: str
-):
+async def my_profile(global_http_client: AsyncClient, user_access_token: str):
     try:
         settings = get_configuration()
 

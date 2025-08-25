@@ -2,7 +2,6 @@ import logging
 from datetime import datetime
 
 from fastapi import HTTPException
-from fastapi.responses import JSONResponse
 from authlib.integrations.starlette_client import OAuthError
 from httpx import AsyncClient
 from pydantic import ValidationError
@@ -14,19 +13,20 @@ from app.password.schemas import (
 )
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.request_error_handler import RequestErrorHandler
-from app.utils.schemas import ResponseModel
 
 logger = logging.getLogger(__name__)
 
 
 async def third_step_update_password(
-    global_http_client: AsyncClient, session: dict, payload: ThirdStepPasswordUpdatePayload
+    global_http_client: AsyncClient,
+    session: dict,
+    payload: ThirdStepPasswordUpdatePayload,
 ):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
 
     try:
-        logger.info(f"Third step - attempting update password for")
+        logger.info("Third step - attempting update password for")
         start_time = datetime.now()
         password_otp_response = await dispatch_update_password(
             global_http_client, payload
@@ -39,7 +39,7 @@ async def third_step_update_password(
         response_json = password_otp_response.json()
 
         try:
-            validated_data = CompleteUpdatePasswordIbmApiResponse(**response_json)
+            CompleteUpdatePasswordIbmApiResponse(**response_json)
         except ValidationError as validation_error:
             logger.warning("Invalid API response schema: %s", validation_error.errors())
             raise HTTPException(status_code=422, detail="Invalid API response schema")

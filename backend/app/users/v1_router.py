@@ -3,17 +3,17 @@ import logging
 from fastapi import APIRouter
 from fastapi import Request, Depends
 
-from app.users.schemas import ProfileResponse, ProfilePUTData, RelyingPartyResponse, UserPhoneAuthFactorsResponse
+from app.users.schemas import (
+    ProfileResponse,
+    ProfilePUTData,
+    RelyingPartyResponse,
+    UserPhoneAuthFactorsResponse,
+)
 from app.users.services.profile import update_profile, my_profile
 from app.users.services.rp_info import get_relying_party_info
 from app.users.services.otp_factors import get_user_otp_factors
 
 from app.auth.services.auth_user_session import get_users_current_session
-
-from app.password.schemas import (
-    OtpType
-)
-
 
 router = APIRouter()
 logger = logging.getLogger(__name__)

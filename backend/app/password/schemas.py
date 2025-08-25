@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 from typing import Annotated, List, Optional
-from pydantic import BaseModel, ConfigDict, Field, EmailStr, StringConstraints, constr
+from pydantic import BaseModel, ConfigDict, Field, EmailStr, StringConstraints
 from app.utils.schemas import ResponseModel
 
 UserProvidedOtpValue = Annotated[str, StringConstraints(min_length=6, max_length=6)]

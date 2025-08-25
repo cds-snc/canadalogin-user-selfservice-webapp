@@ -1,5 +1,4 @@
 import logging
-import json
 from pydantic import ValidationError
 from fastapi import HTTPException
 from httpx import AsyncClient
@@ -27,14 +26,10 @@ async def dispatch_get_password_policy(global_http_client: AsyncClient):
 
         settings = get_configuration()
         password_policy_url = settings.password_policy_api_endpoint
-        logger.info(
-            f"Password Policy URL: {password_policy_url}"
-        )
+        logger.info(f"Password Policy URL: {password_policy_url}")
         response = await global_http_client.get(password_policy_url, headers=headers)
 
-        logger.info(
-            f"returned response from password policy: {response.json()}"
-        )
+        logger.info(f"returned response from password policy: {response.json()}")
 
         response.raise_for_status()
         logger.info("password policy returned successfully")
@@ -49,7 +44,9 @@ async def get_password_policy(global_http_client: AsyncClient):
     """Get password policy from IBM Verify API"""
     try:
 
-        password_policy_response = await dispatch_get_password_policy(global_http_client)
+        password_policy_response = await dispatch_get_password_policy(
+            global_http_client
+        )
 
         logger.info("password_policy_response returned successfully")
         response_json = password_policy_response.json()
