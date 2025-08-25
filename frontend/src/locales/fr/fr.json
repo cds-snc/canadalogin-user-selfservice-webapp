@@ -60,7 +60,8 @@
     "10": "Veuillez entrer un numéro de téléphone pour continuer.",
     "11": "Veuillez entrer un nom de famille pour continuer. Si vous n’avez qu’un seul nom, entrez-le dans le champ destiné au nom de famille.",
     "12": "and a maximum of",
-    "13": "caractères."
+    "13": "caractères.",
+    "14": "Trop de tentatives"
   },
   "RegisterVerification": {
     "1": "Protégez votre compte avec la vérification en deux étapes",
@@ -120,7 +121,8 @@
     "23": "Nous avons envoyé un courriel contenant un code à 6 chiffres à l’adresse :",
     "24": "Le courriel pourrait prendre quelques minutes à arriver. Si vous ne voyez pas le courriel, vérifiez s’il se trouve dans votre dossier de pourriels.",
     "25": "Utiliser une autre adresse courriel",
-    "26": "Demander un nouveau code"
+    "26": "Demander un nouveau code",
+    "27": "Annuler"
   },
   "VerificationSelection": {
     "1": "Choisissez une méthode de connexion",
@@ -142,7 +144,8 @@
     "8": "Nom"
   },
   "Button": {
-    "submit": "Continuer"
+    "submit": "Continuer",
+    "cancel": "Annuler"
   },
   "Privacy": {
     "1": "Créer une Connexion GC",
@@ -307,7 +310,7 @@
     "11": "Pour rechercher un autre compte GC, consultez le",
     "12": "Répertoire des comptes GC"
   },
-  "AreYouSureUpdateContactNumber":{
+  "AreYouSureUpdateContactNumber": {
     "1": "Êtes-vous sûr de vouloir mettre à jour votre numéro de téléphone ?",
     "2": "Vous avez demandé à mettre à jour votre numéro de téléphone :",
     "3": "+1 (123) 456-7890",
@@ -320,7 +323,7 @@
     "10": "Oui, mettre à jour",
     "11": "Annuler"
   },
-    "YouMayUpdateEmailAtOtherPlaces": {
+  "YouMayUpdateEmailAtOtherPlaces": {
     "1": "Votre adresse e-mail a été mise à jour vers",
     "2": "Vous devrez peut-être mettre à jour votre adresse e-mail ailleurs",
     "3": "Ceci ne modifie votre adresse e-mail que pour les services connectés à votre compte GC.",
@@ -395,5 +398,17 @@
     "8": "L’ajout d’une étape supplémentaire à la vérification de votre mot de passe permet de confirmer votre identité.",
     "9": "Activée",
     "10": "Gérer"
+  },
+  "OtpSelection": {
+    "1": "Vérifiez d'abord qu'il s'agit bien de vous",
+    "2": "La vérification en 2 étapes ajoute une seconde mesure de sécurité à votre mot de passe.",
+    "3": "Apprenez-en plus sur la vérification en deux étapes (s’ouvre dans un nouvel onglet)",
+    "4": "Sélectionnez une autre méthode de vérification à deux étapes",
+    "5": "How should we send you the code?",
+    "6": "You can change this the next time you sign in.",
+    "7": "Text message (SMS)",
+    "8": "Mobile only. Carrier charges may apply.",
+    "9": "Voice call",
+    "10": "Mobile or landline. Carrier charges may apply."
   }
 }

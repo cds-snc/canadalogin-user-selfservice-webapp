@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "start": "npm run dev",
     "dev": "vite --port 3000 --host 0.0.0.0",
     "preview": "vite preview --port 3001",
     "build": "vite build",

@@ -61,7 +61,8 @@
     "10": "Enter a phone number to continue.",
     "11": "Enter a last name to continue. If you have a single name, enter it in the last name field.",
     "12": "and a maximum of",
-    "13": "characters."
+    "13": "characters.",
+    "14": "Too Many Attempts"
   },
   "RegisterVerification": {
     "1": "Protect your account with 2-step verification",
@@ -121,7 +122,8 @@
     "23": "We have sent an email with a 6-digit code to:",
     "24": "Your email might take a few minutes to arrive. If you do not get an email, check your spam folder.",
     "25": "Use a different email",
-    "26": "Send the code again"
+    "26": "Send the code again",
+    "27": "Cancel"
   },
   "VerificationSelection": {
     "1": "Choose a sign in method",
@@ -143,7 +145,8 @@
     "8": "Last name"
   },
   "Button": {
-    "submit": "Continue"
+    "submit": "Continue",
+    "cancel": "Cancel"
   },
   "Privacy": {
     "1": "Create a GC Sign in",
@@ -412,5 +415,17 @@
     "9": "To view what services are connected to your GC Sign in, go to ",
     "10": "Connected Services ",
     "11": "in your GC Sign in dashboard."
+  },
+  "OtpSelection": {
+    "1": "First, verify it's you ",
+    "2": "Two-step verification adds a second layer of security before updating your password.",
+    "3": "Learn more about two-step verification (opens in a new tab)",
+    "4": "To update your password, you’ll need to verify your identity by receiving a one-time passcode (OTP).",
+    "5": "How should we send you the code?",
+    "6": "You can change this in 2-step verification - Security Settings.",
+    "7": "Text message (SMS)",
+    "8": "Mobile only. Carrier charges may apply.",
+    "9": "Voice call",
+    "10": "Mobile or landline. Carrier charges may apply."
   }
 }

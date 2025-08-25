@@ -5,6 +5,7 @@ from typing import List, Optional
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 from app.utils.schemas import ResponseModel
+from app.password.schemas import OtpType
 
 
 class NotifyType(str, Enum):
@@ -113,3 +114,43 @@ class RelyingPartyInfo(BaseModel):
 
 class RelyingPartyResponse(ResponseModel):
     data: Optional[RelyingPartyInfo]
+
+
+class Attributes(BaseModel):
+    phoneNumber: Optional[str] = None
+
+    class Config:
+        extra = "allow"
+
+
+class Factor(BaseModel):
+    id: str
+    userId: str
+    type: str
+    created: datetime
+    updated: datetime
+    attempted: datetime
+    enabled: bool
+    validated: bool
+    attributes: Attributes
+
+
+class UserAuthFactorsIbmResponse(BaseModel):
+    factors: List[Factor]
+    count: int
+    limit: int
+    page: int
+    total: int
+
+
+class UserPhoneOTP(BaseModel):
+    type: OtpType
+    phoneNumber: str
+
+
+class UserPhoneOTPFactors(BaseModel):
+    factors: list[UserPhoneOTP]
+
+
+class UserPhoneAuthFactorsResponse(ResponseModel):
+    data: list[UserPhoneOTP]

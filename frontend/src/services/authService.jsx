@@ -14,8 +14,14 @@ axios.defaults.withCredentials = true;
 
 export const authService = {
     requestPasswordPolicy: async () => {
-        const response = await axios.get(`${config.apiUrl}${SUBMIT_END_POINTS.requestPasswordPolicy}`);
-        return response.data;
+        try {
+            const response = await axios.get(`${config.apiUrl}${SUBMIT_END_POINTS.requestPasswordPolicy}`);
+            return response.data;
+        } catch (error) {
+            if (error.response && error.response.status === 401) {
+                redirectToLogin();
+            }
+        }
     },
     create: async (userData) => {
         if (TEST_USERS.has(userData.userName))

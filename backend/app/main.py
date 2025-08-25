@@ -4,17 +4,21 @@ import logging
 import json
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
+from authlib.integrations.starlette_client import OAuthError
 
 from app.config import get_configuration
 from app.utils.helpers import generate_error_response
+from app.auth.services.auth import redirect_user_to_idp_verify
 
 from .routers import health
 from app.users import v1_router as v1_users_router
 from app.auth import v1_router as v1_auth_router
+from app.password import v1_router as v1_password_router
 from app.auth.services import oidc_config
 
 configuration = get_configuration()
@@ -51,7 +55,9 @@ async def lifespan(app: FastAPI):
     ibm_verify_config = app.state.config.ibm_verify_config
     logger.info("Starting IBM Verify Integration API")
     logger.info(f"Tenant URL: {ibm_verify_config.IBM_VERIFY_TENANT_URL}")
-    logger.info(f"Client ID: {ibm_verify_config.IBM_VERIFY_API_CLIENT_ID}")
+    logger.info(
+        f"Client ID: {ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_API_CLIENT_ID}"
+    )
     logger.info(
         f"PROFILE_MANAGEMENT_CLIENT_ID: {ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID}"
     )
@@ -115,6 +121,12 @@ app.include_router(
     tags=["Auth"],
 )
 
+app.include_router(
+    v1_password_router.router,
+    prefix=f"{configuration.V1_API_VERSION}/password",
+    tags=["Password"],
+)
+
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
@@ -127,6 +139,26 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         logger.error(f"Validation error: {error_message} at " + str(request.url))
         break
     return generate_error_response(status_code=400, message=error_message)
+
+
+@app.exception_handler(HTTPException)
+async def custom_http_exception_handler(request: Request, exc: HTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"success": False, "message": exc.detail},
+    )
+
+
+@app.exception_handler(OAuthError)
+async def oauth_error_handler(request: Request, exc: OAuthError):
+    """Catch OAuth errors and redirect user to IdP login."""
+    logger.error("OAuth exception handler error: %s", exc)
+    if "application/json" in request.headers.get("accept", ""):
+        return JSONResponse(
+            status_code=401,
+            content={"detail": "Invalid or expired token"},
+        )
+    return await redirect_user_to_idp_verify(request)
 
 
 def log_request_response(
