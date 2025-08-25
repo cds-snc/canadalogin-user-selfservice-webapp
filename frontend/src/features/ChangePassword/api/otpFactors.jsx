@@ -6,9 +6,9 @@ import { redirectToLogin } from "../../../utils/redirect.jsx";
 axios.defaults.withCredentials = true;
 
 export const otpFactors = {
-    getUserOtpNumber: async (user_id, otp_type) => {
+    getUserOtpPhoneFactors: async (user_id) => {
         try {
-            const response = await axios.get(`${config.apiUrl}${SUBMIT_END_POINTS.users}/${user_id}/otp_factors/${otp_type}`);
+            const response = await axios.get(`${config.apiUrl}${SUBMIT_END_POINTS.users}/${user_id}/otp_factors`);
             return response.data;
         }
         catch (error) {

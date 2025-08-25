@@ -2,10 +2,11 @@ import { useParams } from "react-router";
 import { useState } from 'react';
 import {
     GcdsContainer, GcdsDetails, GcdsErrorSummary, GcdsRadios, GcdsHeading, GcdsLink, GcdsStepper,
-    GcdsText
+    GcdsText, GcdsGrid, GcdsButton
 } from "@cdssnc/gcds-components-react";
 import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 import { useUser } from "../../../components/Providers/useUser.tsx";
+import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 
 import { getPageContent } from '../../../utils/functions.jsx';
 import { gcHelpCentreLinks } from '../../../utils/gcHelpCentreLinks.jsx';
@@ -18,15 +19,30 @@ import {
 } from "../../../utils/constants.jsx";
 
 
-export default function OtpSelection({ step, totalSteps, onNext, userProfile, userMfaType, onChangeUserMfaType }) {
-    const { language, flow } = useParams();
-    const [phone, setPhone] = useState('');
-    const pageContentJson = getPageContent(language, PAGES.otpSelection);
-    console.log('userMfaType == FLOW_TYPES.sms', userMfaType == FLOW_TYPES.voice)
+export default function OtpSelection({ step, totalSteps, onNext, userProfile, userSelectedMfaType, onChangeUserMfaType, userPhoneFactors }) {
+    const { language } = useParams();
+    const navigateHelper = useNavigateHelper();
 
-    const smsOtpRadioOption = { "label": pageContentJson['7'], "id": FLOW_TYPES.sms, "value": FLOW_TYPES.sms, "hint": pageContentJson['8'], checked: userMfaType == FLOW_TYPES.sms };
-    const voiceOtpRadioOption = { "label": pageContentJson['9'], "id": FLOW_TYPES.voice, "value": FLOW_TYPES.voice, "hint": pageContentJson['10'], checked: userMfaType == FLOW_TYPES.voice };
-    const radioOptions = [smsOtpRadioOption, voiceOtpRadioOption]
+    const pageContentJson = getPageContent(language, PAGES.otpSelection);
+
+    const { submit, cancel } = getPageContent(language, "Button");
+    const backToSecuritySettingsPage = `/${language}${NAVIGATION_LINKS.securitySettings}`;
+
+    const configureRadioOptions = () => {
+        const smsPhoneFactorValue = userPhoneFactors.find(factor => factor.type === FLOW_TYPES.sms);
+        const voicePhoneFactorValue = userPhoneFactors.find(factor => factor.type === FLOW_TYPES.voice);
+
+        const smsLabel = `${pageContentJson['7']} ${smsPhoneFactorValue.phoneNumber}`;
+        const voiceLabel = `${pageContentJson['9']} ${voicePhoneFactorValue.phoneNumber}`;
+
+        const smsOtpRadioOption = { "label": smsLabel, "id": FLOW_TYPES.sms, "value": FLOW_TYPES.sms, "hint": pageContentJson['8'], checked: userSelectedMfaType.type == FLOW_TYPES.sms };
+        const voiceOtpRadioOption = { "label": voiceLabel, "id": FLOW_TYPES.voice, "value": FLOW_TYPES.voice, "hint": pageContentJson['10'], checked: userSelectedMfaType.type == FLOW_TYPES.voice };
+        const radioOptions = [smsOtpRadioOption, voiceOtpRadioOption]
+
+        return radioOptions;
+    };
+
+    const radioOptions = configureRadioOptions();
 
     return (
         <GcdsContainer>
@@ -62,12 +78,30 @@ export default function OtpSelection({ step, totalSteps, onNext, userProfile, us
                 <GcdsRadios
                     name="radio"
                     legend={pageContentJson['5']}
-                    hint={pageContentJson['6']}
                     options={radioOptions}
                     onGcdsChange={(e) => onChangeUserMfaType(e.target.value)}
                 >
                 </GcdsRadios>
-                <SubmitButton currentLang={language} />
+                {/* <SubmitButton currentLang={language} /> */}
+
+
+                <GcdsGrid columns="repeat(auto-fit, minmax(100px, 100px))" gap="10px" align-items="center">
+                    <GcdsButton style={{ width: 'fit-content' }} onGcdsClick={(ev) => {
+                        ev.preventDefault();
+                        onNext()
+                    }}>
+                        {submit}
+                    </GcdsButton>
+
+                    <GcdsButton buttonRole="secondary" style={{ width: 'fit-content' }} onGcdsClick={(ev) => {
+                        ev.preventDefault();
+                        navigateHelper(backToSecuritySettingsPage)
+                    }}>
+                        {cancel}
+                    </GcdsButton>
+                </GcdsGrid>
+
+
             </GcdsContainer>
         </GcdsContainer>
     )

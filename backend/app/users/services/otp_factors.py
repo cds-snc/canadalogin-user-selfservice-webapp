@@ -82,8 +82,7 @@ async def parse_phone_auth_factors_response(data: UserAuthFactorsIbmResponse) ->
 
 async def dispatch_user_auth_factors(
     global_http_client: AsyncClient,
-    user_profile_id: str,
-    otp_type: OtpType,
+    user_profile_id: str
 ):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
@@ -133,7 +132,7 @@ async def get_user_otp_factors(
             if user_profile_id == user_id:
                 logger.info(f"user_otp_factors: {user_id}")
                 start_time = datetime.now()
-                user_otp_factors_response = await dispatch_user_auth_factors(global_http_client, user_profile_id, otp_type)
+                user_otp_factors_response = await dispatch_user_auth_factors(global_http_client, user_profile_id)
                 duration = (datetime.now() - start_time).total_seconds()
                 logger.info(f"user_otp_factors returned in {duration:.2f} seconds")
 

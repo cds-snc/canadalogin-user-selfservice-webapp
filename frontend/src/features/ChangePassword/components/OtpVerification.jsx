@@ -29,7 +29,7 @@ import { useUser } from "../../../components/Providers/useUser.tsx";
 const initialTime = 10;
 let counter = 1;
 
-export default function OtpVerification({ step, totalSteps, onNext, userProfile, userMfaType, setOtpSentResponse }) {
+export default function OtpVerification({ step, totalSteps, onNext, userProfile, userSelectedMfaType, otpSentResponse, setOtpSentResponse }) {
     const { language } = useParams();
     const { state } = useUser();
 
@@ -52,7 +52,7 @@ export default function OtpVerification({ step, totalSteps, onNext, userProfile,
 
     const validateOtpCode = async (userOtpValue) => {
         try {
-            const response = await passwordUpdate.secondStep(userOtpValue, otpData.trxId);
+            const response = await passwordUpdate.secondStep(userOtpValue, otpSentResponse.trxId);
             if (response && response.success) {
                 onNext(response.data);
             }
@@ -78,23 +78,6 @@ export default function OtpVerification({ step, totalSteps, onNext, userProfile,
 
     }, [time]);
 
-    useEffect(() => {
-
-        const fetchUserOtpPhonenumber = async () => {
-            try {
-                const response = await otpFactors.getUserOtpNumber(id, userMfaType);
-                if (response && response.success) {
-                    setUserPhonenumber(response.data.phoneNumber);
-                }
-            } catch (err) {
-                console.log('err', err)
-            }
-        };
-
-        fetchUserOtpPhonenumber();
-
-
-    }, [id, userMfaType]);
     const didFetch = useRef(false);
 
     useEffect(() => {
@@ -103,7 +86,7 @@ export default function OtpVerification({ step, totalSteps, onNext, userProfile,
             didFetch.current = true;
             try {
                 console.log("counter", counter + 1)
-                const response = await passwordUpdate.firstStep(userName, userMfaType);
+                const response = await passwordUpdate.firstStep(userName, userSelectedMfaType.type);
                 if (response && response.success) {
                     setOtpSentResponse(response.data)
                 }
@@ -116,16 +99,16 @@ export default function OtpVerification({ step, totalSteps, onNext, userProfile,
         };
 
         if (userProfile.id) {
-            requestOtpCode();
+            // requestOtpCode();
             setTime(initialTime);
             setRequestNewCode(false);
             setDisplayTooManyRequestsError(false);
         }
 
 
-    }, [userName, userMfaType, requestNewCode, setOtpSentResponse, userProfile.id]);
+    }, [userName, userSelectedMfaType, requestNewCode, setOtpSentResponse, userProfile.id]);
 
-
+    const userMfaType = userSelectedMfaType.type;
     return (
         <GcdsContainer>
 
@@ -157,7 +140,7 @@ export default function OtpVerification({ step, totalSteps, onNext, userProfile,
 
                 <GcdsText>
                     {userMfaType === FLOW_TYPES.voice ? pageContentJson['3'] : userMfaType === FLOW_TYPES.sms ? pageContentJson['2'] : pageContentJson['23']}&nbsp;
-                    <strong>{userPhonenumber}</strong>
+                    <strong>{userSelectedMfaType.phoneNumber}</strong>
                 </GcdsText>
                 <GcdsText>
                     {userMfaType === FLOW_TYPES.voice ? pageContentJson['5'] : userMfaType === FLOW_TYPES.sms ? pageContentJson['4'] : pageContentJson['24']}

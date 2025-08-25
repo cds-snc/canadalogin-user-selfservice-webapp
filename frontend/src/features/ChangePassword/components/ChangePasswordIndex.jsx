@@ -33,7 +33,7 @@ import { useUser } from "../../../components/Providers/useUser.tsx";
 export default function ChangePasswordIndex() {
     const { language } = useParams();
     const { state } = useUser();
-    const [userPhonenumber, setUserPhonenumber] = useState('');
+    const [userPhoneFactors, setUserPhoneFactors] = useState([]);
 
     const [otpSentResponse, setOtpSentResponse] = useState(null);
 
@@ -48,10 +48,10 @@ export default function ChangePasswordIndex() {
     const [step, setStep] = useState(2);
     const [userOtpValue, setUserOtpValue] = useState("");
     const { userProfile } = state;
-    const { details } = userProfile ?? {};
-    const { lastMFA } = details ?? {};
-    const userDefaultMfa = lastMFA !== null && lastMFA.length > 0 ? lastMFA[0]?.type : null;
-    const [userMfaType, setUserMfaType] = useState(userDefaultMfa);
+    const { details, id } = userProfile ?? {};
+    // const { lastMFA } = details ?? {};
+    // const userDefaultMfa = lastMFA !== null && lastMFA.length > 0 ? lastMFA[0]?.type : null;
+    const [userSelectedMfaType, setUserSelectedMfaType] = useState(null);
     const navigateHelper = useNavigateHelper();
     const backToSecuritySettingsPage = `/${language}${NAVIGATION_LINKS.securitySettings}`;
     // const { setError, clearAllErrors, getError, hasErrors } = useError(language);
@@ -59,7 +59,11 @@ export default function ChangePasswordIndex() {
     const { submit } = getPageContent(language, "Button");
 
     const handleChangeUserMfaSelection = (mfaType) => {
-        setUserMfaType(mfaType)
+        const selectedMfaType = userPhoneFactors.find(factor => factor.type === mfaType);
+
+        if (selectedMfaType.type && selectedMfaType.phoneNumber) {
+            setUserSelectedMfaType(selectedMfaType);
+        };
     };
 
     const handleLoading = (bool) => {
@@ -72,21 +76,27 @@ export default function ChangePasswordIndex() {
 
     useEffect(() => {
 
-        const fetchUserOtpPhonenumber = async () => {
+        const fetchUserOtpPhoneFactors = async () => {
             try {
-                const response = await otpFactors.getUserOtpNumber(id, userMfaType);
-                if (response && response.success) {
-                    setUserPhonenumber(response.data.phoneNumber);
+                const response = await otpFactors.getUserOtpPhoneFactors(id);
+                if (response && response.success && response.data.length > 0 && response.data[0].type) {
+                    setUserPhoneFactors(response.data);
+                    setUserSelectedMfaType(response.data[0]);
+                    if (response.data.length == 1) {
+                        setPasswordUpdateStep("otpValidation");
+                    }
+                } else {
+                    navigateHelper(backToSecuritySettingsPage)
                 }
             } catch (err) {
                 console.log('err', err)
             }
         };
 
-        fetchUserOtpPhonenumber();
+        fetchUserOtpPhoneFactors();
 
 
-    }, [id, userMfaType]);
+    }, []);
 
 
     // useEffect(() => {
@@ -103,8 +113,9 @@ export default function ChangePasswordIndex() {
         otpSelection: (
             <OtpSelection
                 userProfile={userProfile}
+                userPhoneFactors={userPhoneFactors}
                 onChangeUserMfaType={handleChangeUserMfaSelection}
-                userMfaType={userMfaType}
+                userSelectedMfaType={userSelectedMfaType}
                 localLoading={localLoading}
                 setLocalLoading={handleLoading}
                 step={step}
@@ -119,11 +130,12 @@ export default function ChangePasswordIndex() {
         otpValidation: (
             <OtpVerification
                 userProfile={userProfile}
-                userMfaType={userMfaType}
+                userSelectedMfaType={userSelectedMfaType}
                 localLoading={localLoading}
                 setLocalLoading={handleLoading}
                 step={step}
                 totalSteps={4}
+                otpSentResponse={otpSentResponse}
                 setOtpSentResponse={handleOtpSentResponse}
                 onNext={() => {
                     setStep(4)
@@ -136,7 +148,7 @@ export default function ChangePasswordIndex() {
             <Password
                 userProfile={userProfile}
                 step={step}
-                userMfaType={userMfaType}
+                userSelectedMfaType={userSelectedMfaType}
                 localLoading={localLoading}
                 setLocalLoading={handleLoading}
                 totalSteps={4}
@@ -149,7 +161,10 @@ export default function ChangePasswordIndex() {
 
     return (
         <GcdsContainer>
-            {steps[passwordUpdateStep]}
+            {
+                (userSelectedMfaType) ? steps[passwordUpdateStep] : "Loading"
+            }
+
         </GcdsContainer>
     )
 }

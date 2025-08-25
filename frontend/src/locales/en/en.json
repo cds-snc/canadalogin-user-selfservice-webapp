@@ -145,7 +145,8 @@
     "8": "Last name"
   },
   "Button": {
-    "submit": "Continue"
+    "submit": "Continue",
+    "cancel": "Cancel"
   },
   "Privacy": {
     "1": "Create a GC Sign in",

@@ -144,7 +144,8 @@
     "8": "Nom"
   },
   "Button": {
-    "submit": "Continuer"
+    "submit": "Continuer",
+    "cancel": "Annuler"
   },
   "Privacy": {
     "1": "Créer une Connexion GC",
