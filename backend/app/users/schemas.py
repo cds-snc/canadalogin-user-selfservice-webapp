@@ -117,7 +117,10 @@ class RelyingPartyResponse(ResponseModel):
 
 
 class Attributes(BaseModel):
-    phoneNumber: str
+    phoneNumber: Optional[str] = None
+
+    class Config:
+        extra = 'allow'
 
 
 class Factor(BaseModel):
