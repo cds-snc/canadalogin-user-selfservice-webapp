@@ -6,6 +6,7 @@ import Loader from "../../../components/Layout/Loading.jsx";
 import OtpSelection from "./OtpSelection.jsx";
 import OtpVerification from "./OtpVerification.jsx";
 import Password from "./Password.jsx";
+import PasswordChangedConfirmation from "./PasswordChangedConfirmation.jsx";
 
 import { otpFactors } from "../api/otpFactors.jsx";
 import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
@@ -138,13 +139,29 @@ export default function ChangePasswordIndex() {
                 onBack={() => setPasswordUpdateStep("otpValidation")}
             />
         ),
+        passwordChangedConfirmation: (
+            <PasswordChangedConfirmation
+                userProfile={userProfile}
+                step={4}
+                userSelectedMfaType={userSelectedMfaType}
+                localLoading={localLoading}
+                setLocalLoading={handleLoading}
+                totalSteps={4}
+                otpSentResponse={otpSentResponse}
+                userOtpValue={userOtpValue}
+                language={language}
+                onNext={() => {
+                    setPasswordUpdateStep("passwordChangedConfirmation");
+                }}
+            />
+        ),
     };
 
 
     return (
         <>
             {
-                (userSelectedMfaType) ? steps[passwordUpdateStep] : <Loader text="Checking your OTP Factors ..." />
+                (userSelectedMfaType) ? steps[passwordUpdateStep] : <Loader text="Retrieving your Authentication Factors ..." />
 
             }
         </>
