@@ -2,7 +2,6 @@ import logging
 from datetime import datetime
 
 from fastapi import HTTPException
-from authlib.integrations.starlette_client import OAuthError
 from httpx import AsyncClient
 from pydantic import ValidationError
 
@@ -52,8 +51,6 @@ async def third_step_update_password(
             data=completed_response,
             message="Password changed successfully",
         )
-        # session.clear()
-        # raise OAuthError("Invalid Session and Token")
 
     except Exception as e:
         logger.error("Failed second_step_update_password", exc_info=True)

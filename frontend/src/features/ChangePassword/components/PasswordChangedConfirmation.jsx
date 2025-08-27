@@ -6,21 +6,19 @@ import {
     GcdsHeading,
     GcdsText,
     GcdsNotice,
-    GcdsButton, GcdsGrid, GcdsLink
+    GcdsButton, GcdsGrid
 } from "@cdssnc/gcds-components-react";
 import { getPageContent } from "../../../utils/functions";
 import { PAGES } from "../../../utils/constants";
-import { redirectToLogin } from "../../../utils/redirect.jsx";
-import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 
 export default function YouMayUpdateEmailAtOtherPlaces() {
     const { language } = useParams();
     const [time, setTime] = useState(5);
-    const navigateHelper = useNavigateHelper();
-
-
     const pageContentJson = getPageContent(language, PAGES.passwordChangedConfirmation);
-    const backtoProfile = `/${language}`;
+
+    const redirectToHomepage = () => {
+        return window.location.href = "/";
+    }
 
     useEffect(() => {
         if (time <= 0)
@@ -36,8 +34,7 @@ export default function YouMayUpdateEmailAtOtherPlaces() {
 
     useEffect(() => {
         if (time <= 0) {
-            // redirectToLogin();
-            window.location.href = "/";
+            redirectToHomepage();
             return;
         }
     }, [time]);
@@ -54,7 +51,7 @@ export default function YouMayUpdateEmailAtOtherPlaces() {
             <GcdsGrid columns="auto auto" gap="1rem" align-items="center">
                 <GcdsButton style={{ width: 'fit-content' }} onGcdsClick={(ev) => {
                     ev.preventDefault();
-                    navigateHelper(backtoProfile)
+                    redirectToHomepage();
                 }}>
                     {pageContentJson["4"]}
                 </GcdsButton>
