@@ -61,6 +61,7 @@ export const CONTEXT_ACTIONS = {
     set_language: 'SET_LANGUAGE',
     set_relying_party_data: 'SET_RELYING_PARTY_DATA',
     set_authenticated_pages: 'SET_AUTHENTICATED_PAGES',
+    remove_authenticated_page: 'REMOVE_AUTHENTICATED_PAGE'
 };
 
 export const FLOW_TYPES = {

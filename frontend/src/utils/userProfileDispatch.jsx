@@ -34,6 +34,8 @@ export const userProfileDispatch = (dispatch) => ({
         dispatch({ type: CONTEXT_ACTIONS.updated_profile_success, payload: null }),
     setAuthenticatedPage: (value) =>
         dispatch({ type: CONTEXT_ACTIONS.set_authenticated_pages, payload: value }),
+    removeAuthenticatedPage: (value) =>
+        dispatch({ type: CONTEXT_ACTIONS.remove_authenticated_page, payload: value }),
 });
 export const useCancelLanguageEditing = (backtoProfile) => {
     const { state, dispatch } = useUser();

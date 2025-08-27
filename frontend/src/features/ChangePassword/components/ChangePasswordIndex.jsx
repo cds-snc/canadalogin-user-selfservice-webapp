@@ -1,23 +1,27 @@
 import { useEffect, useState } from "react";
-
-import { otpFactors } from "../api/otpFactors.jsx";
-import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
+import { useParams, useLocation } from "react-router";
+import { useUser } from "../../../components/Providers/useUser.tsx";
+import Loader from "../../../components/Layout/Loading.jsx";
 
 import OtpSelection from "./OtpSelection.jsx";
 import OtpVerification from "./OtpVerification.jsx";
 import Password from "./Password.jsx";
 
+import { otpFactors } from "../api/otpFactors.jsx";
+import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 import {
     NAVIGATION_LINKS
 } from "../../../utils/constants.jsx";
-import { useParams } from "react-router";
-import { useUser } from "../../../components/Providers/useUser.tsx";
+import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
 
 const defaulPasswordUpdatetStep = "otpSelection";
 
 export default function ChangePasswordIndex() {
     const { language } = useParams();
-    const { state } = useUser();
+    const { state, dispatch } = useUser();
+    const { removeAuthenticatedPage } = userProfileDispatch(dispatch);
+    const { pathname } = useLocation();
+
     const [userPhoneFactors, setUserPhoneFactors] = useState([]);
 
     const [otpSentResponse, setOtpSentResponse] = useState(null);
@@ -25,8 +29,6 @@ export default function ChangePasswordIndex() {
 
     const [passwordUpdateStep, setPasswordUpdateStep] = useState(defaulPasswordUpdatetStep);
     const [localLoading, setLocalLoading] = useState(false);
-
-    const [step, setStep] = useState(2);
     const { userProfile } = state;
     const { id } = userProfile ?? {};
     const [userSelectedMfaType, setUserSelectedMfaType] = useState(null);
@@ -61,9 +63,9 @@ export default function ChangePasswordIndex() {
                 if (response && response.success && response.data.length > 0 && response.data[0].type) {
                     setUserPhoneFactors(response.data);
                     setUserSelectedMfaType(response.data[0]);
-                    if (response.data.length == 1) {
-                        setPasswordUpdateStep("otpValidation");
-                    }
+                    // if (response.data.length == 1) {
+                    //     setPasswordUpdateStep("otpValidation");
+                    // }
                 } else {
                     navigateHelper(backToSecuritySettingsPage)
                 }
@@ -76,6 +78,15 @@ export default function ChangePasswordIndex() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    useEffect(() => {
+        return () => {
+            // when a user navigates away from this component, we remove the pathname from the array
+            // In the Private Route handler, we track the page to avoid a redirect loop to reautenticate the user
+            removeAuthenticatedPage(pathname);
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     const steps = {
         otpSelection: (
             <OtpSelection
@@ -85,11 +96,10 @@ export default function ChangePasswordIndex() {
                 userSelectedMfaType={userSelectedMfaType}
                 localLoading={localLoading}
                 setLocalLoading={handleLoading}
-                step={step}
+                step={2}
                 totalSteps={4}
                 onNext={() => {
                     setPasswordUpdateStep("otpValidation");
-                    setStep(3)
                 }}
             />
         ),
@@ -100,14 +110,13 @@ export default function ChangePasswordIndex() {
                 localLoading={localLoading}
                 setLocalLoading={handleLoading}
                 onChangeUserMfaType={handleChangeUserMfaSelection}
-                step={step}
+                step={3}
                 totalSteps={4}
                 userOtpValue={userOtpValue}
                 setUserOtpValue={handleSetUserOtpValue}
                 otpSentResponse={otpSentResponse}
                 setOtpSentResponse={handleOtpSentResponse}
                 onNext={() => {
-                    setStep(4)
                     setPasswordUpdateStep("passwordChange");
                 }}
                 onBack={() => setPasswordUpdateStep("otpSelection")}
@@ -116,13 +125,16 @@ export default function ChangePasswordIndex() {
         passwordChange: (
             <Password
                 userProfile={userProfile}
-                step={step}
+                step={4}
                 userSelectedMfaType={userSelectedMfaType}
                 localLoading={localLoading}
                 setLocalLoading={handleLoading}
                 totalSteps={4}
                 otpSentResponse={otpSentResponse}
                 userOtpValue={userOtpValue}
+                onNext={() => {
+                    navigateHelper(backToSecuritySettingsPage)
+                }}
                 onBack={() => setPasswordUpdateStep("otpValidation")}
             />
         ),
@@ -132,7 +144,8 @@ export default function ChangePasswordIndex() {
     return (
         <>
             {
-                (userSelectedMfaType) ? steps[passwordUpdateStep] : "Loading"
+                (userSelectedMfaType) ? steps[passwordUpdateStep] : <Loader text="Checking your OTP Factors ..." />
+
             }
         </>
     )
