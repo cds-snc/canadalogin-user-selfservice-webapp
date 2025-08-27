@@ -64,9 +64,6 @@ export default function ChangePasswordIndex() {
                 if (response && response.success && response.data.length > 0 && response.data[0].type) {
                     setUserPhoneFactors(response.data);
                     setUserSelectedMfaType(response.data[0]);
-                    // if (response.data.length == 1) {
-                    //     setPasswordUpdateStep("otpValidation");
-                    // }
                 } else {
                     navigateHelper(backToSecuritySettingsPage)
                 }
