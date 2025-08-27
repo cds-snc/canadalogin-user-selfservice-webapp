@@ -134,7 +134,7 @@ export default function ChangePasswordIndex() {
                 otpSentResponse={otpSentResponse}
                 userOtpValue={userOtpValue}
                 onNext={() => {
-                    navigateHelper(backToSecuritySettingsPage)
+                    setPasswordUpdateStep("passwordChangedConfirmation");
                 }}
                 onBack={() => setPasswordUpdateStep("otpValidation")}
             />
@@ -150,9 +150,6 @@ export default function ChangePasswordIndex() {
                 otpSentResponse={otpSentResponse}
                 userOtpValue={userOtpValue}
                 language={language}
-                onNext={() => {
-                    setPasswordUpdateStep("passwordChangedConfirmation");
-                }}
             />
         ),
     };

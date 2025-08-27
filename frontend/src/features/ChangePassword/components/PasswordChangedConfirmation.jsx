@@ -36,7 +36,8 @@ export default function YouMayUpdateEmailAtOtherPlaces() {
 
     useEffect(() => {
         if (time <= 0) {
-            redirectToLogin();
+            // redirectToLogin();
+            window.location.href = "/";
             return;
         }
     }, [time]);
