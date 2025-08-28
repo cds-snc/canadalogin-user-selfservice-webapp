@@ -9,7 +9,9 @@ node_modules/
 */.DS_Store
 backend/tests/__pycache__
 frontend/package-lock.json
-
+bin
+lib
+pyvenv.cfg
 # ACT GITHUB LOCAL Test Runner Environment
 .actrc
 
