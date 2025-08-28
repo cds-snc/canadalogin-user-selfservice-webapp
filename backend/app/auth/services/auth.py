@@ -1,5 +1,5 @@
 import logging
-from fastapi import Request
+from fastapi import Request, HTTPException
 from fastapi.responses import RedirectResponse
 from authlib.integrations.starlette_client import OAuthError
 from app.auth.services.oidc_config import oauth
@@ -11,6 +11,10 @@ import jwt
 from fastapi import Response
 from app.utils.schemas import ResponseModel
 import httpx # Added import
+from datetime import datetime
+from app.auth.services.auth_user_session import update_session_tokens
+from app.utils.request_error_handler import RequestErrorHandler
+from urllib.parse import urlencode
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +52,7 @@ async def redirect_user_to_idp_verify(request: Request):
         return await oauth.verify.authorize_redirect(request, callback_redirect_uri)
     except Exception as e:
         logger.exception("Unexpected error during redirect_to_verify", str(e))
-        raise RequestErrorHandler.handle(
+        RequestErrorHandler.handle(
             e, context="Unexpected error during idp redirect"
         )
 
@@ -77,15 +81,8 @@ async def callback_handler(request: Request):
             )
             # redirect back to IBM Verify to retry authentication
             raise OAuthError("Invalid or expired token") from error
-        request.session[SessionKeys.SESSION_USER_ACCESS_TOKEN_KEY.value] = (
-            oidc_response.get("access_token")
-        )
-        request.session[SessionKeys.SESSION_USER_INFO.value] = (
-            oidc_response.get("userinfo")
-        )
-        request.session[SessionKeys.SESSION_USER_REFRESH_TOKEN_KEY.value] = (
-            oidc_response.get("refresh_token")
-        )
+        await update_session_tokens(request, oidc_response)
+
         # Get the handler and set your sid as session id. sid is unique session id from GC Sign-In 
         handler = get_session_handler(request)  
         handler.session_id = oidc_response.get('userinfo').get('sid')
@@ -99,7 +96,7 @@ async def callback_handler(request: Request):
         raise OAuthError("Invalid or expired token") from error
     except Exception as e:
         logger.error(f"Unexpected error: {e}")
-        raise RequestErrorHandler.handle(
+        RequestErrorHandler.handle(
             e, context="Unexpected error during idp redirect"
         )
 
@@ -125,7 +122,7 @@ async def reauthenticate_user(request: Request, returnToPage: str = "/"):
         raise OAuthError("Invalid or expired token") from error
     except Exception as e:
         logger.exception("Unexpected error during redirect_to_verify")
-        raise RequestErrorHandler.handle(e, context="Unexpected error")
+        RequestErrorHandler.handle(e, context="Unexpected error")
 
 
 
@@ -186,3 +183,88 @@ async def backchannel_logout(request: Request):
     except Exception as e:
         logger.exception("Unexpected error during backchannel_logout", str(e))
         return generate_error_response(400, string_error_response())
+    
+async def logout_user(request: Request):
+    """
+    Logs out the user by clearing the session and redirecting to the logout endpoint.
+    """
+    try:
+        config = request.app.state.config
+        id_token = await get_id_token(request)
+
+        # Clear the session
+        request.session.clear()
+     
+        if not id_token:
+            logger.error("No id_token found in session during logout.")
+            raise HTTPException(status_code=400, detail="No id_token found in session")
+        
+        # Construct the logout redirect URL
+        end_session_endpoint = config.end_session_endpoint
+        post_logout_redirect_uri = get_base_profile_management_url()
+        
+        # Build the logout URL with query parameters
+        
+        params = {
+            "id_token_hint": id_token,
+            "post_logout_redirect_uri": post_logout_redirect_uri
+        }
+        redirect_url = f"{end_session_endpoint}?{urlencode(params)}"
+        
+        logger.debug(f"Constructed logout redirect URL: {redirect_url}")
+
+        # Return the redirect URL for the client to use
+        return ResponseModel(
+            success=True,
+            data=redirect_url,
+            message="Logout URL constructed successfully",
+        )
+    except Exception as e:
+        logger.exception("Unexpected error during logout", str(e))
+        RequestErrorHandler.handle(e, context="Unexpected error during logout")
+
+
+async def refresh_id_token(refresh_token: str):
+    """
+    Refreshes the id_token using the refresh_token.
+    """
+    try:
+        new_tokens = await oauth.verify.fetch_access_token(refresh_token=refresh_token, grant_type="refresh_token")
+        return new_tokens
+    except Exception as e:
+        logger.error(f"Error refreshing token: {e}")
+        return None
+
+
+async def get_id_token(request: Request):
+    """
+    Get the id_token from the session, refreshing it if necessary.
+    """
+    id_token = request.session.get(SessionKeys.SESSION_USER_ID_TOKEN_KEY.value)
+
+    if not id_token:
+        return None
+
+    try:
+        decoded_token = jwt.decode(id_token, options={"verify_signature": False})
+        exp = decoded_token.get("exp")
+        if exp and exp < datetime.now().timestamp() + 60:  # If token expires in 1 minute
+            refresh_token = request.session.get(SessionKeys.SESSION_USER_REFRESH_TOKEN_KEY.value)
+            if not refresh_token:
+                return None
+
+            new_tokens = await refresh_id_token(refresh_token)
+            if not new_tokens:
+                return None
+            
+            userinfo = await oauth.verify.parse_id_token(new_tokens, None)
+            new_tokens["userinfo"] = userinfo
+
+            await update_session_tokens(request, new_tokens)
+            return new_tokens.get("id_token")
+    except jwt.PyJWTError as e:
+        logger.error(f"Error decoding token: {e}")
+        return None
+
+    return id_token
+    

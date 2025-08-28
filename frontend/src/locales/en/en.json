@@ -7,9 +7,18 @@
     "5": "GC Sign in allows you to use one account and password for secure, private access to participating programs and services.",
     "6": "Participating programs and services will ask you to create a GC Sign in to securely access your information on their website or application.",
     "7": "You can use the same username and password to access any program or service that uses GC Sign in.",
-    "8": "Email address",
-    "9": "GC Sign in",
-    "10": "to continue to your"
+    "8": "Mobile only. Carrier charges may apply.",
+    "9": "Voice call",
+    "10": "Mobile or landline. Carrier charges may apply."
+  },
+  "SessionTimeout": {
+    "1": "Session Timeout Warning",
+    "2": "Your session will expire at {{time}}.",
+    "3": "Would you like to stay logged in or log out?",
+    "4": "Stay logged in",
+    "5": "Log out",
+    "6": "Extending...",
+    "7": "Logging you out..."
   },
   "Password": {
     "1": "Your email was successfully verified",

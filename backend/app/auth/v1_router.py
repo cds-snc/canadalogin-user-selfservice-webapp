@@ -6,6 +6,8 @@ from app.auth.services.auth import (
     redirect_user_to_idp_verify,
     callback_handler,
     reauthenticate_user,
+    backchannel_logout as backchannel_logout_service,
+    logout_user
 )
 
 from app.auth.services.auth_user_session import (
@@ -52,3 +54,38 @@ async def reauth(
     user_access_token: None = Depends(get_users_current_session),
 ):
     return await reauthenticate_user(request, returnToPage)
+
+
+@router.get(
+    "/session",
+    tags=["Auth"],
+    summary="Get user session",
+    description="",
+)
+async def get_session(request: Request):
+    return get_users_current_session(request)
+
+
+@router.get(
+    "/logout",
+    tags=["Auth"],
+    summary="Logout user",
+    description="",
+)
+async def logout(request: Request):
+    return await logout_user(request)
+
+
+@router.get(
+    "/keep-alive",
+    tags=["Auth"],
+    summary="Keep alive",
+    description="",
+)
+async def keep_alive():
+    return {"status": "ok"}
+
+
+@router.post("/backchannel-logout")
+async def backchannel_logout(request: Request):
+    return await backchannel_logout_service(request)

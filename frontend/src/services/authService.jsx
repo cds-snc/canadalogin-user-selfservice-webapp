@@ -109,6 +109,28 @@ export const authService = {
             }
         }
     },
+    keepAlive: async () => {
+        try {
+            const response = await axios.get(`${config.apiUrl}${SUBMIT_END_POINTS.keepAlive}`);
+            return response.data;
+        }
+        catch (error) {
+            if (error.response && error.response.status === 401) {
+                redirectToLogin();
+            }
+            throw error;
+        }
+    },
+    logout: async () => {
+        try {
+            const response = await axios.get(`${config.apiUrl}${SUBMIT_END_POINTS.logout}`);
+            return response.data;
+        }
+        catch (error) {
+            console.error('Logout error:', error);
+            throw error;
+        }
+    },
 }
 
 function buildTestResponse(userData, type) {

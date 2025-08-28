@@ -28,6 +28,9 @@ class SessionConfig(BaseSettings):
     SESSION_COOKIE_SECURE: bool = True
     SESSION_COOKIE_DOMAIN: Optional[str] = None
     SESSION_REDIS_URL: Optional[str] = None
+    SESSION_COOKIE_NAME: str = "gc-manage-app"
+    SESSION_EXPIRY_COOKIE_NAME: str = "session-expiry"
+    SESSION_LIFETIME: int = 60 * 20  # 20 minutes in seconds
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore", case_sensitive=True
     )
@@ -92,6 +95,9 @@ class Configuration(BaseSettings):
     @property
     def password_policy_api_endpoint(self) -> str:
         return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.PASSWORDPOLICY.value}"
+    @property
+    def end_session_endpoint(self) -> str:
+        return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.END_SESSION_ENDPOINT.value}"
 
 
 @lru_cache

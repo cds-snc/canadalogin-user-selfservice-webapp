@@ -8,3 +8,4 @@ class SessionKeys(str, Enum):
     SESSION_USER_INFO = "user_info"
     SESSION_USER_REFRESH_TOKEN_KEY = "user_refresh_token"
     SESSION_EXPIRY = "session_expiry"
+    SESSION_USER_ID_TOKEN_KEY = "user_id_token"

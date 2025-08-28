@@ -410,5 +410,14 @@
     "8": "Mobile only. Carrier charges may apply.",
     "9": "Voice call",
     "10": "Mobile or landline. Carrier charges may apply."
+  },
+  "SessionTimeout": {
+    "1": "Avertissement d'expiration de session",
+    "2": "Votre session expirera à {{time}}.",
+    "3": "Souhaitez-vous rester connecté ou vous déconnecter ?",
+    "4": "Rester connecté",
+    "5": "Se déconnecter",
+    "6": "Extension en cours...",
+    "7": "Déconnexion en cours..."
   }
 }

@@ -140,6 +140,8 @@ export const SUBMIT_END_POINTS = {
     rp_info: '/v1/users/rp_info',
     users: '/v1/users',
     passwordUpdate: '/v1/password/update',
+    keepAlive: '/v1/auth/keep-alive',
+    logout: '/v1/auth/logout',
 }
 
 

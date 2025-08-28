@@ -8,6 +8,7 @@ import { BrowserRouter } from "react-router";
 import ReactGA from "react-ga4";
 import { UserProvider } from "./components/Providers/UserProvider";
 import { LanguageProvider } from './components/Providers/LanguageProvider';
+import SessionManager from './services/SessionManager.jsx';
 
 import config from "./config.jsx";
 import { AppLanguageSetup } from './components/Providers/AppLanguageSetup';
@@ -27,7 +28,9 @@ try {
                     <UserProvider>
                         <LanguageProvider>
                             <AppLanguageSetup />
-                            <App />
+                            <SessionManager>
+                                <App />
+                            </SessionManager>
                         </LanguageProvider>
                     </UserProvider>
                 </BrowserRouter>
