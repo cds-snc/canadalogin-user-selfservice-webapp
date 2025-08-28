@@ -5,7 +5,7 @@ from fastapi import HTTPException
 from httpx import AsyncClient
 from pydantic import ValidationError
 
-from app.config import get_settings
+from app.config import get_configuration
 from app.otp.schemas import UserOtpInfo, OtpType, OtpDataResponse
 from app.utils.access_token import get_auth_request_headers
 from app.utils.helpers import (
@@ -81,7 +81,7 @@ async def dispatch_otp(
     try:
         access_token = user_access_token
         headers = get_auth_request_headers(access_token, True)
-        settings = get_settings().ibm_verify_config
+        settings = get_configuration().ibm_verify_config
 
         if user_otp_info.phoneNumber:
             user_phone_number = {

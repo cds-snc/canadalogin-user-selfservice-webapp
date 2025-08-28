@@ -19,6 +19,7 @@ from .routers import health
 from app.users import v1_router as v1_users_router
 from app.auth import v1_router as v1_auth_router
 from app.password import v1_router as v1_password_router
+from app.otp import v1_router as v1_otp_router
 from app.auth.services import oidc_config
 
 configuration = get_configuration()
@@ -125,6 +126,12 @@ app.include_router(
     v1_password_router.router,
     prefix=f"{configuration.V1_API_VERSION}/password",
     tags=["Password"],
+)
+
+app.include_router(
+    v1_otp_router.router,
+    prefix=f"{configuration.V1_API_VERSION}/otp",
+    tags=["OTP"],
 )
 
 

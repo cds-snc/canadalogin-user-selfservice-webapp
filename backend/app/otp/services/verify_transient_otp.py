@@ -4,7 +4,7 @@ from datetime import datetime
 from fastapi import HTTPException
 from httpx import AsyncClient
 
-from app.config import get_settings
+from app.config import get_configuration
 from app.otp.schemas import OtpType, UserOtpVerificationInfo
 from app.utils.access_token import get_auth_request_headers
 from app.utils.helpers import generate_error_response, format_error_response
@@ -79,7 +79,7 @@ async def verify_otp(
 
         access_token = user_access_token
         headers = get_auth_request_headers(access_token, True)
-        settings = get_settings().ibm_verify_config
+        settings = get_configuration().ibm_verify_config
 
         if user_verification_data.otpType == OtpType.SMS:
             verification_endpoint_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/smsotp/transient/verifications/{trxnId}"
