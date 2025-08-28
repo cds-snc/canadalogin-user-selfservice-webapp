@@ -11,7 +11,6 @@ backend/tests/__pycache__
 frontend/package-lock.json
 bin
 lib
-old_custom_implementation/gc-signin-ibm-main
 pyvenv.cfg
 # ACT GITHUB LOCAL Test Runner Environment
 .actrc
