@@ -142,6 +142,7 @@ export const SUBMIT_END_POINTS = {
     passwordUpdate: '/v1/password/update',
     keepAlive: '/v1/auth/keep-alive',
     logout: '/v1/auth/logout',
+    sessionStatus: '/v1/auth/session-status',
 }
 
 

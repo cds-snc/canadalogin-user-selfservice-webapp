@@ -1,24 +1,35 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import useSessionTimeout from '../hooks/useSessionTimeout.jsx';
 import SessionTimeoutModal from '../components/Layout/SessionTimeoutModal.jsx';
 import LoadingModal from '../components/Layout/LoadingModal.jsx';
 import { authService } from './authService.jsx';
 import { getPageContent } from '../utils/functions.jsx';
 import { useLanguage } from '../components/Providers/LanguageProvider.tsx';
+import { useUser } from '../components/Providers/useUser.tsx';
 
 const SessionManager = ({ children }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
+    const closeEventSourceRef = useRef(null);
     
     const { state: languageState } = useLanguage();
+    const { state: userState } = useUser();
     const currentLang = languageState.language || 'en';
+
+    // Only enable session timeout when user is logged in
+    const isUserLoggedIn = !userState.isLoading && userState.userProfile !== null;
 
     const pageContentJson = getPageContent(currentLang, "SessionTimeout");
 
     const handleLogout = useCallback(async () => {
         setIsModalOpen(false); // Close session timeout modal
         setIsLoggingOut(true);
+        
+        // Close EventSource connection before logging out
+        if (closeEventSourceRef.current) {
+            closeEventSourceRef.current();
+        }
          
         try {
             const response = await authService.logout();
@@ -39,8 +50,11 @@ const SessionManager = ({ children }) => {
     }, []);
 
     const handleWarning = useCallback(() => {
-        setIsModalOpen(true);
-    }, []);
+        // Only show modal if it's not already open
+        if (!isModalOpen) {
+            setIsModalOpen(true);
+        }
+    }, [isModalOpen]);
 
     const handleTimeout = useCallback(() => {
         // Auto logout when time expires
@@ -48,6 +62,11 @@ const SessionManager = ({ children }) => {
     }, [handleLogout]);
 
     const handleKeepSession = useCallback(async () => {
+        // Prevent multiple simultaneous calls
+        if (isLoading) {
+            return;
+        }
+        
         setIsLoading(true);
         try {
             await authService.keepAlive();
@@ -59,31 +78,41 @@ const SessionManager = ({ children }) => {
         } finally {
             setIsLoading(false);
         }
-    }, [handleLogout]);
+    }, [handleLogout, isLoading]);
 
 
     const {
         expirationTime,
+        closeEventSource,
     } = useSessionTimeout({
         onTimeout: handleTimeout,
         onWarning: handleWarning,
         onStayLoggedIn: handleKeepSession,
-        enabled: true
+        onLogout: handleLogout,
+        enabled: isUserLoggedIn
     });
+
+    // Store closeEventSource function in ref to avoid circular dependency
+    useEffect(() => {
+        closeEventSourceRef.current = closeEventSource;
+    }, [closeEventSource]);
 
 
 
     return (
         <>
             {children}
-            <SessionTimeoutModal
-                isOpen={isModalOpen}
-                expirationTime={expirationTime}
-                onKeepSession={handleKeepSession}
-                onLogout={handleLogout}
-                isLoading={isLoading}
-                currentLang={currentLang}
-            />
+            {isModalOpen && (
+                <SessionTimeoutModal
+                    key="session-timeout-modal"
+                    isOpen={isModalOpen}
+                    expirationTime={expirationTime}
+                    onKeepSession={handleKeepSession}
+                    onLogout={handleLogout}
+                    isLoading={isLoading}
+                    currentLang={currentLang}
+                />
+            )}
             <LoadingModal
                 isOpen={isLoggingOut}
                 message={pageContentJson['7']} // "Logging you out..."

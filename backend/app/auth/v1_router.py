@@ -7,7 +7,8 @@ from app.auth.services.auth import (
     callback_handler,
     reauthenticate_user,
     backchannel_logout as backchannel_logout_service,
-    logout_user
+    logout_user,
+    session_event_generator
 )
 
 from app.auth.services.auth_user_session import (
@@ -89,3 +90,10 @@ async def keep_alive():
 @router.post("/backchannel-logout")
 async def backchannel_logout(request: Request):
     return await backchannel_logout_service(request)
+
+# Server Side Event check Redis pubsub channel "notification:{session id}", send SSE message
+# return stream Event
+@router.get("/session-status")
+async def session_status(request: Request):
+    return await session_event_generator(request)
+

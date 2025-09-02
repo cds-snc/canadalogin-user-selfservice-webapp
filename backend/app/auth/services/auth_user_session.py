@@ -6,6 +6,7 @@ from app.config import get_configuration
 from app.constants.session_keys import SessionKeys
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.request_error_handler import RequestErrorHandler
+from starsessions.session import get_session_handler
 
 logger = logging.getLogger(__name__)
 
@@ -104,3 +105,30 @@ async def update_session_tokens(request: Request, new_tokens: dict):
     request.session[SessionKeys.SESSION_USER_ID_TOKEN_KEY.value] = new_tokens.get("id_token")
     request.session[SessionKeys.SESSION_USER_REFRESH_TOKEN_KEY.value] = new_tokens.get("refresh_token")
     request.session[SessionKeys.SESSION_USER_INFO.value] = new_tokens.get("userinfo")
+
+async def get_session_by_session_id(sessionid: str, request: Request):
+    try:
+        handler = get_session_handler(request)
+        # use Redis read session data key = "session:{sessionid}"
+        redis_key = f"session:{sessionid}"
+        redis_client = request.app.state.redis_client
+        data = await redis_client.get(redis_key)
+        if not data:
+            return None
+        return handler.serializer.deserialize(data)
+    except Exception as e:
+        logger.error(f"Error getting session by ID {sessionid}: {str(e)}", exc_info=True)
+        return None
+
+async def remove_session_by_session_id(sessionid: str, request: Request):
+    try:
+        handler = get_session_handler(request)
+        if handler.session_id != sessionid:
+            logger.warning(f"Session ID mismatch: handler session ID {handler.session_id} does not match provided session ID {sessionid}")
+            return
+        # use Redis delete session data key = "session:{sessionid}"
+        redis_key = f"session:{sessionid}"
+        redis_client = request.app.state.redis_client
+        await redis_client.delete(redis_key)
+    except Exception as e:
+        logger.error(f"Error removing session by ID {sessionid}: {str(e)}", exc_info=True)
