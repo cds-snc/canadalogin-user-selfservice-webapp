@@ -61,7 +61,9 @@
     "11": "Veuillez entrer un nom de famille pour continuer. Si vous n’avez qu’un seul nom, entrez-le dans le champ destiné au nom de famille.",
     "12": "and a maximum of",
     "13": "caractères.",
-    "14": "Trop de tentatives"
+    "CSIAM0010E": "La tentative d'authentification a échoué",
+    "CSIAM0011E": "Le code de vérification n'est pas valide ou a expiré.",
+    "CSIAM0038E": "Trop de tentatives"
   },
   "RegisterVerification": {
     "1": "Protégez votre compte avec la vérification en deux étapes",
@@ -410,7 +412,8 @@
     "8": "Mobile only. Carrier charges may apply.",
     "9": "Voice call",
     "10": "Mobile or landline. Carrier charges may apply.",
-    "11": "Chargement"
+    "11": "Chargement",
+    "12": "Chargement de vos méthodes MFA ..."
   },
   "PasswordChangedConfirmation": {
     "1": "Your email has been updated to",

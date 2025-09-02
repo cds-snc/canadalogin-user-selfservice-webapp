@@ -26,7 +26,7 @@ export default function OtpVerification({ step, totalSteps, onNext, userProfile,
     const { state } = useUser();
 
     const [codeRequested, setCodeRequested] = useState(false);
-    const [displayTooManyRequestsError, setDisplayTooManyRequestsError] = useState(false);
+    const [errorCode, setErrorCode] = useState("");
 
     const navigateHelper = useNavigateHelper();
     const backToSecuritySettingsPage = `/${language}${NAVIGATION_LINKS.securitySettings}`;
@@ -52,11 +52,10 @@ export default function OtpVerification({ step, totalSteps, onNext, userProfile,
                 setOtpSentResponse(response.data);
             }
         } catch (err) {
-            if (err === 429) {
-                setDisplayTooManyRequestsError(true);
+            if (err && err.data && err.data.message) {
+                setErrorCode(err.data.message);
             }
             setCodeRequested(false);
-            console.log('err', err)
         } finally {
             fetchInProgress(false);
         }
@@ -70,7 +69,9 @@ export default function OtpVerification({ step, totalSteps, onNext, userProfile,
                 onNext(response.data);
             }
         } catch (err) {
-            console.log('err', err)
+            if (err && err.data && err.data.message) {
+                setErrorCode(err.data.message);
+            }
         }
     };
 
@@ -102,7 +103,7 @@ export default function OtpVerification({ step, totalSteps, onNext, userProfile,
     }, [id]);
 
     const userMfaType = userSelectedMfaType.type;
-    const errorMessage = displayTooManyRequestsError ? errorPageJson['14'] : "";
+    const errorMessage = errorPageJson[errorCode] || "";
     return (
         <GcdsContainer>
 
@@ -112,9 +113,9 @@ export default function OtpVerification({ step, totalSteps, onNext, userProfile,
                 heading="Error Message"
             /> */}
             {
-                displayTooManyRequestsError && (
+                errorMessage != "" && (
                     <GcdsErrorMessage messageId="message-props">
-                        {errorPageJson['14']}
+                        {errorMessage}
                     </GcdsErrorMessage>
                 )
             }
@@ -174,19 +175,20 @@ export default function OtpVerification({ step, totalSteps, onNext, userProfile,
                         type="text"
                         validateOn="other"
                         errorMessage={errorMessage}
+                        value={userOtpValue}
                         onGcdsInput={handleChange}
                         lang={language}
                         size="6"
                         maxlength={6}
                         minlength={6}
-                        disabled={displayTooManyRequestsError}
-                        required={!displayTooManyRequestsError} ></GcdsInput>)
+                        required={errorMessage == ""} ></GcdsInput>)
                 }
 
                 <GcdsGrid columns="repeat(auto-fit, minmax(100px, 100px))" gap="10px" align-items="center">
                     <GcdsButton disabled={userOtpValue.length < 6} style={{ width: 'fit-content' }} onGcdsClick={(ev) => {
                         ev.preventDefault();
-                        validateOtpCode(userOtpValue)
+                        validateOtpCode(userOtpValue);
+                        setErrorCode("");
                     }}>
                         {submit}
                     </GcdsButton>
@@ -228,6 +230,8 @@ export default function OtpVerification({ step, totalSteps, onNext, userProfile,
                                 requestOtpCode();
                                 setCodeRequested(true);
                                 setTime(initialTime);
+                                setErrorCode("");
+                                setUserOtpValue("");
                             }
                             }>
                                 {userMfaType !== FLOW_TYPES.email ? pageContentJson['16'] : pageContentJson['26']}

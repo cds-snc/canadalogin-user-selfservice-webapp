@@ -9,6 +9,12 @@ logger = logging.getLogger(__name__)
 
 class RequestErrorHandler:
     """Reusable exception handler for token-related requests."""
+    @staticmethod
+    def extract_response_body(response):
+        try:
+            return response.json()
+        except ValueError:
+            return {"messageId": response.text}
 
     @staticmethod
     def handle(exc: Exception, context: str = "API request") -> None:
@@ -22,24 +28,29 @@ class RequestErrorHandler:
             logger.error(
                 "%s failed (status=%s, url=%s)", context, response_status_code, url
             )
-            if response_status_code == status.HTTP_429_TOO_MANY_REQUESTS:
-                raise HTTPException(
-                    status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                    detail={
-                        "context": context,
-                        "message": "Rate limit exceeded, please retry later.",
-                    },
-                ) from exc
+            if response_status_code in [status.HTTP_429_TOO_MANY_REQUESTS, status.HTTP_400_BAD_REQUEST]:
+                body = RequestErrorHandler.extract_response_body(exc.response)
 
-            if response_status_code == status.HTTP_400_BAD_REQUEST:
-                try:
-                    body = exc.response.json()
-                except ValueError:
-                    body = {"messageDescription": exc.response.text}
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=body.get("messageDescription", "Bad request"),
-                ) from exc
+                logger.error(
+                    "%s failed (status=%s, url=%s, messageId=%s, message=%s)",
+                    context,
+                    response_status_code,
+                    url,
+                    body.get("messageId", "N/A"),
+                    body.get("message", "N/A")
+                )
+
+                if response_status_code == status.HTTP_429_TOO_MANY_REQUESTS:
+                    raise HTTPException(
+                        status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                        detail=body.get("messageId", "Too many requests"),
+                    ) from exc
+                else:  # HTTP_400_BAD_REQUEST
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail=body.get("messageId", "Bad request"),
+                    ) from exc
+
             if response_status_code == status.HTTP_401_UNAUTHORIZED:
                 raise OAuthError("Invalid or expired token")
             raise HTTPException(
