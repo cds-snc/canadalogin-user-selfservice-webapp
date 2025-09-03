@@ -33,6 +33,18 @@ body,
     border-radius: 10px
 }
 
+.gcds-nav-name-container {
+    display: flex;
+    height: 65px;
+    background: var(--gcds-color-grayscale-50);
+    justify-content: center;
+    align-items: center;
+}
+
+.gcds-nav-width-spacer {
+        width: 90%;
+        max-width: var(--gcds-header-container-max-width);
+    }
 
 @media screen and (max-width:767px) {
     .gcds-email-fieldset {
@@ -59,6 +71,10 @@ body,
     .gcds-content {
         align-items: center;
         gap: var(--gcds-spacing-350);
+    }
+
+    .gcds-nav-name-container {
+        height: 45px;
     }
 }
 
