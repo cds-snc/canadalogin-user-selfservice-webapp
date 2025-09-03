@@ -171,7 +171,7 @@ export default function OtpVerification({ step, totalSteps, onNext, userProfile,
                         inputId="verificationCode"
                         label={pageContentJson['9']}
                         autofocus
-                        autocomplete="off"
+                        autocomplete="one-time-code"
                         name="verificationCode"
                         type="text"
                         validateOn="other"
