@@ -34,9 +34,7 @@ async def send_otp(
     user_otp_info: UserOtpInfo,
     user_access_token: str = Depends(get_users_current_session),
 ):
-    return await handle_otp_send(
-        request.app.state.request_client, user_otp_info
-    )
+    return await handle_otp_send(request.app.state.request_client, user_otp_info)
 
 
 @router.post(

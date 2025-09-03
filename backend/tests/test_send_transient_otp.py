@@ -1,9 +1,8 @@
 from unittest.mock import patch, AsyncMock, MagicMock
 import pytest
-from httpx import AsyncClient, Response
+from httpx import AsyncClient
 from app.otp.schemas import OtpType, UserOtpInfo
 from app.otp.services.send_transient_otp import handle_otp_send, dispatch_otp
-from app.utils.schemas import ResponseModel
 
 
 @pytest.mark.asyncio
@@ -31,7 +30,10 @@ async def test_handle_otp_send_success():
     )
 
     with (
-        patch("app.otp.services.send_transient_otp.dispatch_otp", return_value=mock_response) as dispatcher,
+        patch(
+            "app.otp.services.send_transient_otp.dispatch_otp",
+            return_value=mock_response,
+        ) as dispatcher,
     ):
         response = await handle_otp_send(user, global_http_client=AsyncMock())
         dispatcher.assert_called_once()
@@ -51,10 +53,14 @@ async def test_handle_otp_send_error():
         otpType=OtpType.SMS,
     )
 
-    with patch("app.otp.services.send_transient_otp.dispatch_otp", return_value=mock_response) as dispatcher:
+    with patch(
+        "app.otp.services.send_transient_otp.dispatch_otp", return_value=mock_response
+    ) as dispatcher:
         response = await handle_otp_send(user, global_http_client=AsyncMock())
         dispatcher.assert_called_once()
-        assert not response.success  # Validate the `success` attribute of the ResponseModel
+        assert (
+            not response.success
+        )  # Validate the `success` attribute of the ResponseModel
         assert response.message == "Invalid request"
 
 
@@ -67,13 +73,16 @@ async def test_dispatch_otp_sms():
     )
 
     with (
-        patch("app.otp.services.send_transient_otp.get_admin_token", return_value="fake-token") as mock_token,
-        patch("app.otp.services.send_transient_otp.get_auth_request_headers") as mock_headers,
+        patch(
+            "app.otp.services.send_transient_otp.get_auth_request_headers"
+        ) as mock_headers,
         patch("app.otp.services.send_transient_otp.get_configuration") as mock_settings,
         patch("app.otp.services.send_transient_otp.AsyncClient") as mock_client_class,
     ):
         mock_headers.return_value = {"Authorization": "Bearer fake-token"}
-        mock_settings.return_value.ibm_verify_config.IBM_VERIFY_TENANT_URL = "https://fake.ibm.com"
+        mock_settings.return_value.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
+            "https://fake.ibm.com"
+        )
 
         mock_client = AsyncMock(spec=AsyncClient)
         mock_client.__aenter__.return_value = mock_client
@@ -98,13 +107,16 @@ async def test_dispatch_otp_email():
     )
 
     with (
-        patch("app.otp.services.send_transient_otp.get_admin_token", return_value="fake-token") as mock_token,
-        patch("app.otp.services.send_transient_otp.get_auth_request_headers") as mock_headers,
+        patch(
+            "app.otp.services.send_transient_otp.get_auth_request_headers"
+        ) as mock_headers,
         patch("app.otp.services.send_transient_otp.get_configuration") as mock_settings,
         patch("app.otp.services.send_transient_otp.AsyncClient") as mock_client_class,
     ):
         mock_headers.return_value = {"Authorization": "Bearer fake-token"}
-        mock_settings.return_value.ibm_verify_config.IBM_VERIFY_TENANT_URL = "https://fake.ibm.com"
+        mock_settings.return_value.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
+            "https://fake.ibm.com"
+        )
 
         mock_client = AsyncMock(spec=AsyncClient)
         mock_client.__aenter__.return_value = mock_client
@@ -114,7 +126,9 @@ async def test_dispatch_otp_email():
         response = await dispatch_otp(user, mock_client)
         mock_client.post.assert_called_once_with(
             "https://fake.ibm.com/v2.0/factors/emailotp/transient/verifications",
-            json={"emailAddress": "testuser@testuser.com"},  # Ensure consistent formatting
+            json={
+                "emailAddress": "testuser@testuser.com"
+            },  # Ensure consistent formatting
             headers={"Authorization": "Bearer fake-token"},
         )
         assert response.status_code == 201
@@ -129,13 +143,16 @@ async def test_dispatch_otp_error():
     )
 
     with (
-        patch("app.otp.services.send_transient_otp.get_admin_token", return_value="fake-token") as mock_token,
-        patch("app.otp.services.send_transient_otp.get_auth_request_headers") as mock_headers,
+        patch(
+            "app.otp.services.send_transient_otp.get_auth_request_headers"
+        ) as mock_headers,
         patch("app.otp.services.send_transient_otp.get_configuration") as mock_settings,
         patch("app.otp.services.send_transient_otp.AsyncClient") as mock_client_class,
     ):
         mock_headers.return_value = {"Authorization": "Bearer fake-token"}
-        mock_settings.return_value.ibm_verify_config.IBM_VERIFY_TENANT_URL = "https://fake.ibm.com"
+        mock_settings.return_value.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
+            "https://fake.ibm.com"
+        )
 
         mock_client = AsyncMock(spec=AsyncClient)
         mock_client.__aenter__.return_value = mock_client

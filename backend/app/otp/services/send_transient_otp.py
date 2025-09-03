@@ -11,25 +11,20 @@ from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.helpers import (
     generate_error_response,
     prepare_pydantic_phone_number_for_verify,
-    format_error_response,
 )
 from app.utils.schemas import ResponseModel
 
 logger = logging.getLogger(__name__)
 
 
-async def handle_otp_send(
-    user_otp_info: UserOtpInfo, global_http_client: AsyncClient
-):
+async def handle_otp_send(user_otp_info: UserOtpInfo, global_http_client: AsyncClient):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
 
     try:
         logger.info(f"Attempting to send {user_otp_info.otpType} OTP")
         start_time = datetime.now()
-        http_client_response = await dispatch_otp(
-            user_otp_info, global_http_client
-        )
+        http_client_response = await dispatch_otp(user_otp_info, global_http_client)
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(
             f"{user_otp_info.otpType} OTP send request response received in {duration:.2f} seconds"
@@ -84,14 +79,14 @@ async def handle_otp_send(
         )
 
 
-async def dispatch_otp(
-    user_otp_info: UserOtpInfo, global_http_client: AsyncClient
-):
+async def dispatch_otp(user_otp_info: UserOtpInfo, global_http_client: AsyncClient):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
 
     try:
-        access_token = await get_admin_token(global_http_client)  # Pass global_http_client here
+        access_token = await get_admin_token(
+            global_http_client
+        )  # Pass global_http_client here
         headers = get_auth_request_headers(access_token, True)
         settings = get_configuration().ibm_verify_config
 
@@ -117,7 +112,9 @@ async def dispatch_otp(
             return response
 
         elif user_otp_info.userName and user_otp_info.otpType == OtpType.EMAIL:
-            user_email_address = {"emailAddress": user_otp_info.userName.lower()}  # Ensure consistent email formatting
+            user_email_address = {
+                "emailAddress": user_otp_info.userName.lower()
+            }  # Ensure consistent email formatting
             send_transient_otp_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/emailotp/transient/verifications"
             response = await global_http_client.post(
                 send_transient_otp_url, json=user_email_address, headers=headers

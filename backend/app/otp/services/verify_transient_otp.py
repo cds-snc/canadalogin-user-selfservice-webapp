@@ -23,7 +23,7 @@ async def handle_otp_verification(
         logger.info(f"Attempting to verify {user_verification_data.otpType} OTP")
         start_time = datetime.now()
         otp_verification_response = await verify_otp(
-            user_verification_data, global_http_client, user_access_token
+            user_verification_data, global_http_client
         )
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(
