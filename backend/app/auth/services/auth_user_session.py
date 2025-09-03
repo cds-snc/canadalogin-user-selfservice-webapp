@@ -2,6 +2,9 @@ import logging
 from fastapi import Request, HTTPException
 from authlib.integrations.starlette_client import OAuthError
 from httpx import AsyncClient
+import jwt
+from datetime import datetime
+from app.auth.services.oidc_config import oauth
 from app.config import get_configuration
 from app.constants.session_keys import SessionKeys
 from app.utils.access_token import get_admin_token, get_auth_request_headers
@@ -86,9 +89,52 @@ async def get_user_info(request: Request):
 
 async def get_user_id_token(request: Request):
     """
-    Get user id token from session
+    Get the id_token from the session, refreshing it if necessary.
     """
-    return request.session.get(SessionKeys.SESSION_USER_ID_TOKEN_KEY.value)
+    id_token = request.session.get(SessionKeys.SESSION_USER_ID_TOKEN_KEY.value)
+
+    if id_token is None:
+        return None
+
+    try:
+        decoded_token = jwt.decode(id_token, options={"verify_signature": False})
+        exp = decoded_token.get("exp")
+        if exp and exp < datetime.now().timestamp() + 60:  # If token expires in 1 minute
+            refresh_token = await get_user_refresh_token(request)
+            if not refresh_token:
+                return None
+
+            new_tokens = await refresh_id_token(refresh_token)
+            if not new_tokens:
+                return None
+            
+            if oauth.verify is None:
+                logger.error("OAuth verify client is not configured properly")
+                return None
+            userinfo = await oauth.verify.parse_id_token(new_tokens, None)
+            new_tokens["userinfo"] = userinfo
+
+            await update_session_tokens(request, new_tokens)
+            return new_tokens.get("id_token")
+    except jwt.PyJWTError as e:
+        logger.error(f"Error decoding token: {e}")
+        return None
+
+    return id_token
+
+async def refresh_id_token(refresh_token: str):
+    """
+    Refreshes the id_token using the refresh_token.
+    """
+    try:
+        if oauth.verify is None:
+            logger.error("OAuth verify client is not configured properly")
+            return None
+        new_tokens = await oauth.verify.fetch_access_token(refresh_token=refresh_token, grant_type="refresh_token")
+        return new_tokens
+    except Exception as e:
+        logger.error(f"Error refreshing token: {e}")
+        return None
 
 async def get_user_refresh_token(request: Request):
     """

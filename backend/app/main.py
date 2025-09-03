@@ -22,7 +22,6 @@ from app.auth import v1_router as v1_auth_router
 from app.password import v1_router as v1_password_router
 from app.auth.services import oidc_config
 from authlib.integrations.starlette_client import OAuthError
-from app.middleware import SessionExpiryCookieMiddleware
 
 configuration = get_configuration()
 
@@ -121,12 +120,11 @@ app.add_middleware(
     SessionMiddleware,
     store=session_store,
     rolling=True,
-    cookie_https_only= cookie_secure,
-    lifetime=60 * 20,  # 20 minutes
+    cookie_https_only=cookie_secure,
+    lifetime=configuration.session_config.SESSION_LIFETIME,
     cookie_domain=session_domain,
     cookie_name="gc-manage-app",
 )
-app.add_middleware(SessionExpiryCookieMiddleware)
 
 
 # CORS

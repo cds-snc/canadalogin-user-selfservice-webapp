@@ -8,7 +8,7 @@ from app.auth.services.auth import (
     reauthenticate_user,
     backchannel_logout as backchannel_logout_service,
     logout_user,
-    session_event_generator
+    session_event_sse_generator
 )
 
 from app.auth.services.auth_user_session import (
@@ -95,5 +95,5 @@ async def backchannel_logout(request: Request):
 # return stream Event
 @router.get("/session-status")
 async def session_status(request: Request):
-    return await session_event_generator(request)
+    return await session_event_sse_generator(request)
 

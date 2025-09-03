@@ -254,3 +254,13 @@ body, .mainBody {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+/* Red warning icon styling */
+.warning-icon-red {
+    color: #FF0000 !important;
+}
+
+.warning-icon-red svg {
+    fill: #FF0000 !important;
+    color: #FF0000 !important;
+}

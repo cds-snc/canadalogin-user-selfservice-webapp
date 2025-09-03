@@ -413,11 +413,12 @@
   },
   "SessionTimeout": {
     "1": "Avertissement d'expiration de session",
-    "2": "Votre session expirera à {{time}}.",
+    "2": "Si vous ne poursuivez pas votre session, vous serez automatiquement déconnecté.",
     "3": "Souhaitez-vous rester connecté ou vous déconnecter ?",
     "4": "Rester connecté",
     "5": "Se déconnecter",
     "6": "Extension en cours...",
-    "7": "Déconnexion en cours..."
+    "7": "Déconnexion en cours...",
+    "8": "Votre session expirera à {{time}}."
   }
 }

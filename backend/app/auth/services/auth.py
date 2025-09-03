@@ -2,7 +2,7 @@ import asyncio
 import logging
 import json
 from fastapi import Request, HTTPException
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, StreamingResponse, JSONResponse
 from authlib.integrations.starlette_client import OAuthError
 from app.auth.services.oidc_config import oauth
 from app.config import get_configuration
@@ -14,12 +14,11 @@ from fastapi import Response
 from app.utils.schemas import ResponseModel
 import httpx # Added import
 from datetime import datetime
-from app.auth.services.auth_user_session import get_user_info, update_session_tokens, get_session_by_session_id, remove_session_by_session_id
+from app.auth.services.auth_user_session import get_user_info, update_session_tokens, get_session_by_session_id, remove_session_by_session_id, get_user_id_token
 from app.utils.request_error_handler import RequestErrorHandler
 from urllib.parse import urlencode
 from redis.asyncio import Redis
 from redis.exceptions import ConnectionError, TimeoutError, RedisError
-from fastapi.responses import StreamingResponse
 from typing import AsyncGenerator
 
 logger = logging.getLogger(__name__)
@@ -140,59 +139,6 @@ async def callback_handler(request: Request):
         new_session_id = oidc_response.get('userinfo').get('sid')
         handler.session_id = new_session_id
 
-        # Create a Redis pubsub channel for the session
-        redis_channel = f"notification:{handler.session_id}"
-        logger.info(f"Subscribed to Redis pubsub channel: {redis_channel}")
-        
-        # create task run every 5 seconds to check session status
-        async def check_session_status():
-
-            config = get_configuration()
-            try:           
-                redis_client = await get_redis_client(request)
-                while True:
-                    await asyncio.sleep(5)
-                    # Check session status and send updates to the channel
-                    # If session is invalid, publish a message to the channel
-                    session_data = await get_session_by_session_id(new_session_id, request)
-                    if not session_data or not session_data.get(SessionKeys.SESSION_USER_INFO.value):
-                        message_data = {"status": "terminated"}
-                        await redis_retry_operation(
-                            lambda: redis_client.publish(redis_channel, json.dumps(message_data))
-                        )
-                        return
-                    else:
-                        session_metadata = session_data.get(SessionKeys.SESSION_METADATA.value)
-                        session_expire = config.session_config.SESSION_LIFETIME 
-                        if session_metadata:
-                            last_access = session_metadata.get(SessionKeys.SESSION_METADATA_LAST_ACCESS.value)
-                        if last_access:
-                            session_expire = last_access + session_expire
-                        # Prepare message data with optional last_access info
-                        message_data = {"status": "active", "expire": session_expire}
-                        await redis_retry_operation(
-                            lambda: redis_client.publish(redis_channel, json.dumps(message_data))
-                        )
-                        logger.debug(f"Send active message {message_data} to channel: {redis_channel}.")
-            except asyncio.CancelledError:
-                logger.info(f"redis channel not reachable: {redis_channel}")
-                return
-            except Exception as e:
-                logger.error(f"Error in session status publish: {e}")
-                return
-            finally:
-                 if redis_client and not hasattr(request.app.state, 'redis_client'):
-                    # Only close if we created our own connection
-                    try:
-                        await redis_client.close()
-                        logger.info(f"Cleaned up Redis connection for channel: {redis_channel}")
-                    except Exception as e:
-                        logger.error(f"Error cleaning up Redis connection: {str(e)}")
-
-        # Start the background task to monitor session status
-        asyncio.create_task(check_session_status())
-
-
         logger.info("OIDC Callback Handler")
         logger.info(f"Redirect to PROFILE_MANAGEMENT_DOMAIN: {redirectValue}")
         return RedirectResponse(url=redirectValue)
@@ -298,12 +244,12 @@ async def logout_user(request: Request):
     """
     try:
         config = request.app.state.config
-        id_token = await get_id_token(request)
-        user_info = await get_user_info(request)
-
+        id_token = await get_user_id_token(request)
         if not id_token:
             logger.error("No id_token found in session during logout.")
             raise HTTPException(status_code=400, detail="No id_token found in session")
+        
+        user_info = await get_user_info(request)
         # Clear the session
         # request.session.clear()
         # Remove the session associated with the 'sid'
@@ -312,197 +258,94 @@ async def logout_user(request: Request):
         # Construct the logout redirect URL
         end_session_endpoint = config.end_session_endpoint
         post_logout_redirect_uri = get_base_profile_management_url()
-        
+        locale = user_info.get("locale", "en")
+
         # Build the logout URL with query parameters
         
         params = {
             "id_token_hint": id_token,
-            "post_logout_redirect_uri": post_logout_redirect_uri
+            "post_logout_redirect_uri": post_logout_redirect_uri,
+            "ui_locales": locale
         }
         redirect_url = f"{end_session_endpoint}?{urlencode(params)}"
         
         logger.debug(f"Constructed logout redirect URL: {redirect_url}")
 
-        # Return the redirect URL for the client to use
-        return ResponseModel(
+        # Create response with the redirect URL
+        response_data = ResponseModel(
             success=True,
             data=redirect_url,
             message="Logout URL constructed successfully",
         )
+        
+        # Create a JSON response to set cookie expiration
+        response = JSONResponse(content=response_data.model_dump())
+        
+        # Expire the session cookie
+        cookie_name = config.session_config.SESSION_COOKIE_NAME
+        cookie_domain = config.session_config.SESSION_COOKIE_DOMAIN
+        cookie_secure = False if config.ENVIRONMENT == "local" else True
+        
+        response.delete_cookie(
+            key=cookie_name,
+            domain=cookie_domain,
+            secure=cookie_secure,
+            httponly=True,
+            samesite="lax"
+        )
+
+
+        logger.info(f"Session cookies '{cookie_name}' expired during logout")
+
+        return response
     except Exception as e:
         logger.exception("Unexpected error during logout", str(e))
         RequestErrorHandler.handle(e, context="Unexpected error during logout")
 
-
-async def refresh_id_token(refresh_token: str):
-    """
-    Refreshes the id_token using the refresh_token.
-    """
-    try:
-        if oauth.verify is None:
-            logger.error("OAuth verify client is not configured properly")
-            return None
-        new_tokens = await oauth.verify.fetch_access_token(refresh_token=refresh_token, grant_type="refresh_token")
-        return new_tokens
-    except Exception as e:
-        logger.error(f"Error refreshing token: {e}")
-        return None
-
-
-async def get_id_token(request: Request):
-    """
-    Get the id_token from the session, refreshing it if necessary.
-    """
-    id_token = request.session.get(SessionKeys.SESSION_USER_ID_TOKEN_KEY.value)
-
-    if not id_token:
-        return
-
-    try:
-        decoded_token = jwt.decode(id_token, options={"verify_signature": False})
-        exp = decoded_token.get("exp")
-        if exp and exp < datetime.now().timestamp() + 60:  # If token expires in 1 minute
-            refresh_token = request.session.get(SessionKeys.SESSION_USER_REFRESH_TOKEN_KEY.value)
-            if not refresh_token:
-                return None
-
-            new_tokens = await refresh_id_token(refresh_token)
-            if not new_tokens:
-                return None
-            
-            if oauth.verify is None:
-                logger.error("OAuth verify client is not configured properly")
-                return None
-            userinfo = await oauth.verify.parse_id_token(new_tokens, None)
-            new_tokens["userinfo"] = userinfo
-
-            await update_session_tokens(request, new_tokens)
-            return new_tokens.get("id_token")
-    except jwt.PyJWTError as e:
-        logger.error(f"Error decoding token: {e}")
-        return None
-
-    return id_token
     
-async def session_event_generator(request: Request):
-    """
-    Server-Sent Events (SSE) generator for streaming events to the client.
-    """
-    async def event_stream() -> AsyncGenerator[str, None]:
-        """Generate Server-Sent Events stream"""
-        redis_client = None
-        pubsub = None
-        user_info = request.session.get(SessionKeys.SESSION_USER_INFO.value)
-        if not user_info or not user_info.get("sid"):
-            return
+async def session_event_sse_generator(request: Request):
 
-        session_id = user_info.get("sid")
-
-        try:  
-            channel_name = f"notification:{session_id}"
-            logger.info(f"Starting SSE stream for session: {session_id}, channel: {channel_name}")
-            
-            # Get Redis client and create pubsub
-            redis_client = await get_redis_client(request)
-            pubsub = redis_client.pubsub()
-            await pubsub.subscribe(channel_name)
-            
-            # Send initial connection event
-            yield f"data: {json.dumps({'type': 'connected', 'session_id': session_id, 'timestamp': asyncio.get_event_loop().time()})}\n\n"
-            
-            # Listen for messages with timeout
+    async def event_stream(request: Request) -> AsyncGenerator[str, None]:
+        """
+        Generate Server-Sent Events (SSE) for a user session.
+        """
+        try:
+            config = get_configuration()
             while True:
-                try:
-                    # Check if client is still connected by checking if request is disconnected
-                    if await request.is_disconnected():
-                        logger.info(f"Client disconnected for session: {session_id}")
-                        break
-                    
-                    # Wait for message with timeout
-                    message = await asyncio.wait_for(pubsub.get_message(ignore_subscribe_messages=True), timeout=2.0)
-                    
-                    if message and message['type'] == 'message':
-                        # Decode and forward the message
-                        try:
-                            message_data = message['data']
-                            if isinstance(message_data, bytes):
-                                message_data = message_data.decode('utf-8')
-                            
-                            # Validate JSON and add timestamp
-                            try:
-                                parsed_data = json.loads(message_data)
-                                parsed_data['timestamp'] = asyncio.get_event_loop().time()
-                                message_data = json.dumps(parsed_data)
-                            except json.JSONDecodeError:
-                                # If not valid JSON, wrap in a standard format
-                                message_data = json.dumps({
-                                    'type': 'notification',
-                                    'message': message_data,
-                                    'timestamp': asyncio.get_event_loop().time()
-                                })
-                            
-                            yield f"data: {message_data}\n\n"
-                            logger.info(f"Sent SSE message to session {session_id}: {message_data}")
-                            
-                        except Exception as e:
-                            logger.error(f"Error processing message for session {session_id}: {str(e)}")
-                            error_data = json.dumps({
-                                'type': 'error',
-                                'message': 'Error processing notification',
-                                'timestamp': asyncio.get_event_loop().time()
-                            })
-                            yield f"data: {error_data}\n\n"
-                    
-                    # Small delay to prevent busy waiting
-                    await asyncio.sleep(0.1)
-                    
-                except asyncio.TimeoutError:
-                    # Send heartbeat on timeout
-                    heartbeat_data = json.dumps({
-                        'type': 'heartbeat',
-                        'timestamp': asyncio.get_event_loop().time()
-                    })
-                    yield f"data: {heartbeat_data}\n\n"
-                    
-                except Exception as e:
-                    logger.error(f"Error in SSE stream for session {session_id}: {str(e)}")
-                    error_data = json.dumps({
-                        'type': 'error',
-                        'message': str(e),
-                        'timestamp': asyncio.get_event_loop().time()
-                    })
-                    yield f"data: {error_data}\n\n"
+                if request._is_disconnected:
+                    logger.info("Client disconnected from SSE stream")
                     break
-                    
+                user_info = await get_user_info(request)
+                if user_info is None:
+                    logger.info("User not logged in")
+                    message_data = {"status": "non-authenticated"}
+                    yield f"data: {json.dumps(message_data)}\n\n"
+                    break
+                await asyncio.sleep(5)
+                session_data = await get_session_by_session_id(user_info.get("sid"), request)
+                if not session_data or not session_data.get(SessionKeys.SESSION_USER_INFO.value):
+                    message_data = {"status": "terminated"}
+                    yield f"data: {json.dumps(message_data)}\n\n"
+                    break
+                else:
+                    session_metadata = session_data.get(SessionKeys.SESSION_METADATA.value)
+                    session_expire = config.session_config.SESSION_LIFETIME 
+                    if session_metadata:
+                        last_access = session_metadata.get(SessionKeys.SESSION_METADATA_LAST_ACCESS.value)
+                    if last_access:
+                        session_expire = last_access + session_expire - 30
+                    # Prepare message data with optional last_access info
+                    message_data = {"status": "active", "expire": session_expire}
+                    yield f"data: {json.dumps(message_data)}\n\n"
+        except asyncio.CancelledError:
+            logger.info("SSE stream cancelled")
         except Exception as e:
-            logger.error(f"Fatal error in SSE stream: {str(e)}")
-            error_data = json.dumps({
-                'type': 'fatal_error',
-                'message': str(e),
-                'timestamp': asyncio.get_event_loop().time()
-            })
-            yield f"data: {error_data}\n\n"
-            
-        finally:
-            # Cleanup resources
-            if pubsub:
-                try:
-                    await pubsub.unsubscribe()
-                    await pubsub.close()
-                    logger.info(f"Cleaned up pubsub for session: {session_id}")
-                except Exception as e:
-                    logger.error(f"Error cleaning up pubsub: {str(e)}")
-            
-            if redis_client and not hasattr(request.app.state, 'redis_client'):
-                # Only close if we created our own connection
-                try:
-                    await redis_client.close()
-                    logger.info(f"Cleaned up Redis connection for session: {session_id}")
-                except Exception as e:
-                    logger.error(f"Error cleaning up Redis connection: {str(e)}")
-
+            logger.error(f"Error in event stream: {str(e)}")
+            message_data = {"status": "error", "error": str(e)}
+            yield f"data: {json.dumps(message_data)}\n\n"
+    
     return StreamingResponse(
-        event_stream(),
+        event_stream(request),
         media_type="text/event-stream",
         headers={
             "Cache-Control": "no-cache",

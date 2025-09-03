@@ -1,8 +1,10 @@
 
 import Modal from 'react-modal';
-import { GcdsButton, GcdsText } from '@cdssnc/gcds-components-react';
+import { useEffect } from 'react';
+import { GcdsButton, GcdsText, GcdsIcon } from '@cdssnc/gcds-components-react';
 import {getPageContent} from "../../utils/functions.jsx";
 import { formatTime } from "../../utils/cookieUtils.js";
+import { setWarningFavicon, restoreDefaultFavicon } from "../../utils/faviconUtils.js";
 
 const SessionTimeoutModal = ({ 
     isOpen, 
@@ -13,6 +15,20 @@ const SessionTimeoutModal = ({
     currentLang
 }) => {
     const pageContentJson = getPageContent(currentLang, "SessionTimeout");
+
+    // Change favicon when modal opens/closes
+    useEffect(() => {
+        if (isOpen) {
+            setWarningFavicon();
+        } else {
+            restoreDefaultFavicon();
+        }
+
+        // Cleanup: restore default favicon when component unmounts
+        return () => {
+            restoreDefaultFavicon();
+        };
+    }, [isOpen]);
 
     if (!isOpen) return null;
 
@@ -26,13 +42,20 @@ const SessionTimeoutModal = ({
             className="session-timeout-modal"
             overlayClassName="session-timeout-modal-overlay"
         >
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <GcdsIcon name="warning-triangle" size="h1" className="warning-icon-red" />
+            </div>
             <div className="modal-header">
                 <h2>{pageContentJson['1']}</h2>
             </div>
             
             <div className="session-timeout-content">
                 <GcdsText size="body">
-                    {pageContentJson['2'].replace('{{time}}', formatTime(expirationTime))}
+                    {pageContentJson['2']}
+                </GcdsText>
+
+                <GcdsText size="body" className="mt-3">
+                    {pageContentJson['8'].replace('{{time}}', formatTime(expirationTime))}
                 </GcdsText>
 
                 <GcdsText size="body" className="mt-3">
@@ -57,7 +80,7 @@ const SessionTimeoutModal = ({
                         buttonId="logout-btn"
                         size="default"
                         type="button"
-                        buttonRole="secondary"
+                        buttonRole="danger"
                         onClick={onLogout}
                         disabled={isLoading}
                     >

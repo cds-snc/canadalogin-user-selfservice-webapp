@@ -30,7 +30,7 @@ class SessionConfig(BaseSettings):
     SESSION_REDIS_URL: Optional[str] = None
     SESSION_COOKIE_NAME: str = "gc-manage-app"
     SESSION_EXPIRY_COOKIE_NAME: str = "session-expiry"
-    SESSION_LIFETIME: int = 60 * 20  # 20 minutes in seconds
+    SESSION_LIFETIME: int = 60 * 30  # default to 30 minutes in seconds
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore", case_sensitive=True
     )

@@ -6,7 +6,6 @@ const useSessionTimeout = ({
     onTimeout,
     onWarning,
     onStayLoggedIn,
-    onLogout,
     enabled = true
 }) => {
     const [isWarning, setIsWarning] = useState(false);
@@ -19,6 +18,8 @@ const useSessionTimeout = ({
 
     const resetTimer = useCallback((expireTime) => {
 
+        if (!enabled || !expireTime) return;
+
         // Clear existing timers
         if (timeoutRef.current) {
             clearTimeout(timeoutRef.current);
@@ -26,12 +27,8 @@ const useSessionTimeout = ({
         if (warningTimeoutRef.current) {
             clearTimeout(warningTimeoutRef.current);
         }
-
         // Reset warning state
         setIsWarning(false);
-        lastActivityRef.current = Date.now();
-
-        if (!enabled || !expireTime) return;
 
         const expirationDate = new Date(Number(expireTime) * 1000);
         setExpirationTime(expirationDate);
@@ -40,28 +37,30 @@ const useSessionTimeout = ({
         const now = new Date();
         const timeUntilExpiration = expirationDate.getTime() - now.getTime();
         
-        console.log('Time until expiration (minutes):', Math.round(timeUntilExpiration / 60000));
-        
         // Only proceed if there's actually time left
         if (timeUntilExpiration <= 0) {
             // Session has already expired
             console.log('Session has already expired');
             if (onTimeout) {
+                console.log('Timeout callback fired (expired before timers)');
                 onTimeout();
             }
             return;
         }
-        
-        const warningTime = Math.max(0, timeUntilExpiration - (config.sessionExpireWarning * 1000)); // Show warning 5 minutes before expiration
 
-        if (timeUntilExpiration > (config.sessionExpireWarning * 1000) && warningTime > 0) {
+        const warningTime = Math.max(0, timeUntilExpiration - (config.sessionExpireWarning * 1000)); // Show warning before expiration
+
+        if (warningTime > 0) {
             warningTimeoutRef.current = setTimeout(() => {
+                    console.log('Warning timer fired');
                     setIsWarning(true);
                     if (onWarning) {
+                        console.log('Warning callback fired');
                         onWarning();
                      }
             }, warningTime);
-        } else if (timeUntilExpiration <= (config.sessionExpireWarning * 1000) && timeUntilExpiration > 0) {
+        }
+        else {
             setIsWarning(true);
             if (onWarning) {
                 onWarning();
@@ -71,11 +70,14 @@ const useSessionTimeout = ({
         // Set timeout timer
         if (timeUntilExpiration > 0) {
             timeoutRef.current = setTimeout(() => {
+                console.log('Timeout timer fired');
                 if (onTimeout) {
+                    console.log('Timeout callback fired');
                     onTimeout();
                 }
             }, timeUntilExpiration);
         }
+        console.log('Timers set: warning in', Math.round(warningTime / 1000), 'seconds, timeout in', Math.round(timeUntilExpiration / 1000), 'seconds');
     }, [onTimeout, onWarning, enabled]);
 
     const initializeEventSource = useCallback(() => {
@@ -87,6 +89,8 @@ const useSessionTimeout = ({
             eventSourceRef.current.close();
             eventSourceRef.current = null;
         }
+
+        if (isWarning) return;
 
         const eventSourceUrl = `${config.apiUrl}${SUBMIT_END_POINTS.sessionStatus}`;
         console.log('Connecting to SSE:', eventSourceUrl);
@@ -102,7 +106,7 @@ const useSessionTimeout = ({
         eventSource.onmessage = (event) => {
             try {
                 const data = JSON.parse(event.data);
-                console.log('SSE message received:', data);
+                console.log('SSE message received:', data, 'timestamp:', Number(event.timeStamp).toFixed(0));
 
                 if (data.status === 'active' && data.expire) {
                     setSessionStatus('live');
@@ -135,7 +139,7 @@ const useSessionTimeout = ({
         };
 
         eventSourceRef.current = eventSource;
-    }, [enabled, resetTimer, onTimeout]);
+    }, [enabled, resetTimer, onTimeout, isWarning]);
 
     const extendSession = useCallback(async () => {
         if (onStayLoggedIn) {
@@ -170,7 +174,9 @@ const useSessionTimeout = ({
             // Check if the event originated from within the SessionTimeoutModal
             const target = event.target;
             const isFromModal = target.closest('.session-timeout-modal') || 
-                               target.closest('.session-timeout-modal-overlay');
+                               target.closest('.session-timeout-modal-overlay') ||
+                               target.closest('.loading-modal') ||
+                               target.closest('.loading-modal-overlay');
             
             // Ignore activity from the session timeout modal
             if (isFromModal) {
@@ -178,8 +184,8 @@ const useSessionTimeout = ({
             }
             
             const now = Date.now();
-            // If activity in last 2 seconds
-            if (now - lastActivityRef.current > 2000 && onStayLoggedIn) {
+            // If activity in last 3 seconds
+            if (now - lastActivityRef.current > 3000 && onStayLoggedIn) {
                 onStayLoggedIn();
                 console.log('User activity detected, call KeepSession');
                 lastActivityRef.current = now;
@@ -200,19 +206,13 @@ const useSessionTimeout = ({
                 document.removeEventListener(event, handleActivity, true);
             });
             
-            if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
-            }
-            if (warningTimeoutRef.current) {
-                clearTimeout(warningTimeoutRef.current);
-            }
             if (eventSourceRef.current) {
                 console.log('Cleaning up EventSource connection');
                 eventSourceRef.current.close();
                 eventSourceRef.current = null;
             }
         };
-    }, [initializeEventSource, enabled]);
+    }, [enabled]);
 
     return {
         isWarning,

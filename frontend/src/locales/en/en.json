@@ -12,13 +12,14 @@
     "10": "Mobile or landline. Carrier charges may apply."
   },
   "SessionTimeout": {
-    "1": "Session Timeout Warning",
-    "2": "Your session will expire at {{time}}.",
-    "3": "Would you like to stay logged in or log out?",
-    "4": "Stay logged in",
-    "5": "Log out",
+    "1": "Your session is about to end due to inactivity ",
+    "2": "If you do not continue your session you will be signed out automatically",
+    "3": "Do you wish to continue your session?",
+    "4": "Stay signed in",
+    "5": "Sign out",
     "6": "Extending...",
-    "7": "Logging you out..."
+    "7": "Signing you out...",
+    "8": "Your session will expire at {{time}}."
   },
   "Password": {
     "1": "Your email was successfully verified",
