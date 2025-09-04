@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 class RequestErrorHandler:
     """Reusable exception handler for token-related requests."""
+
     @staticmethod
     def extract_response_body(response):
         try:
@@ -28,7 +29,10 @@ class RequestErrorHandler:
             logger.error(
                 "%s failed (status=%s, url=%s)", context, response_status_code, url
             )
-            if response_status_code in [status.HTTP_429_TOO_MANY_REQUESTS, status.HTTP_400_BAD_REQUEST]:
+            if response_status_code in [
+                status.HTTP_429_TOO_MANY_REQUESTS,
+                status.HTTP_400_BAD_REQUEST,
+            ]:
                 body = RequestErrorHandler.extract_response_body(exc.response)
 
                 logger.error(
@@ -37,7 +41,7 @@ class RequestErrorHandler:
                     response_status_code,
                     url,
                     body.get("messageId", "N/A"),
-                    body.get("message", "N/A")
+                    body.get("message", "N/A"),
                 )
 
                 if response_status_code == status.HTTP_429_TOO_MANY_REQUESTS:
