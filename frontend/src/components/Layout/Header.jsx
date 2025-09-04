@@ -6,7 +6,6 @@ export default function Header({ langHref, currentLang }) {
     const { state } = useUser();
 
     const redirect = `${state.relyingPartyInfo?.url}`;
-
     return (
         <GcdsContainer className="gcds-header">
             <GcdsHeader langHref={langHref} skipToHref="#" signature-variant={"colour"} lang={currentLang} >
@@ -18,6 +17,5 @@ export default function Header({ langHref, currentLang }) {
                 </GcdsText>
             </GcdsHeader>
         </GcdsContainer>
-
     );
 }

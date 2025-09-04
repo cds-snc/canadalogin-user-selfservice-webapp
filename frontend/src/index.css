@@ -33,6 +33,10 @@ body,
     border-radius: 10px
 }
 
+.gcds-top-nav {
+    background: var(--gcds-color-grayscale-50);
+}
+
 .gcds-top-nav-container {
     display: flex;
     height: 65px;

@@ -49,6 +49,7 @@ export default function TopNav({ currentLang }) {
             slot="menu"
             label="Top navigation"
             alignment="right"
+            className="gcds-top-nav"
         >
             <GcdsNavLink href="#" slot="home">
                 {pageContentJson["1"]}
