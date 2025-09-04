@@ -43,6 +43,7 @@ async def request_access_token(global_http_client: AsyncClient):
         await RequestErrorHandler.handle(e)
         raise
 
+
 async def get_admin_token(global_http_client: AsyncClient) -> str:
     """Get access token for IBM Verify API operations"""
     try:
