@@ -36,7 +36,7 @@ async def test_handle_otp_send_success():
             return_value=mock_response,
         ) as dispatcher,
     ):
-        response = await handle_otp_send(user, global_http_client=AsyncMock())
+        response = await handle_otp_send(AsyncMock(), user)
         dispatcher.assert_called_once()
         assert response.success
         assert response.data
@@ -57,7 +57,7 @@ async def test_handle_otp_send_error():
     with patch(
         "app.otp.services.send_transient_otp.dispatch_otp", return_value=mock_response
     ) as dispatcher:
-        response = await handle_otp_send(user, global_http_client=AsyncMock())
+        response = await handle_otp_send(AsyncMock(), user)
         dispatcher.assert_called_once()
         assert (
             not response.success
@@ -90,13 +90,13 @@ async def test_dispatch_otp_sms():
         mock_client.post.side_effect = [
             MagicMock(
                 status_code=200,
-                json=AsyncMock(return_value={"access_token": "fake-token"}),
+                json=MagicMock(return_value={"access_token": "fake-token"}),
             ),  # Mock token request
             MagicMock(status_code=201),  # Mock OTP request
         ]
         mock_client_class.return_value = mock_client
 
-        response = await dispatch_otp(user, mock_client)
+        response = await dispatch_otp(mock_client, user)
         mock_client.post.assert_called_with(
             "https://fake.ibm.com/v2.0/factors/smsotp/transient/verifications",
             json={"phoneNumber": "19025555555"},
@@ -134,9 +134,24 @@ async def test_dispatch_otp_email():
             ),  # Mock token request
             MagicMock(status_code=201),  # Mock OTP request
         ]
+
+        # Mock token response with synchronous .json()
+        mock_token_response = MagicMock()
+        mock_token_response.status_code = 200
+        mock_token_response.json.return_value = {"access_token": "fake-token"}
+
+        # Mock OTP send response
+        mock_otp_response = MagicMock()
+        mock_otp_response.status_code = 201
+
+        mock_client.post.side_effect = [
+            mock_token_response,  # token request response
+            mock_otp_response,  # otp send response
+        ]
+
         mock_client_class.return_value = mock_client
 
-        response = await dispatch_otp(user, mock_client)
+        response = await dispatch_otp(mock_client, user)
         mock_client.post.assert_called_with(
             "https://fake.ibm.com/v2.0/factors/emailotp/transient/verifications",
             json={"emailAddress": "testuser@testuser.com"},
@@ -173,4 +188,4 @@ async def test_dispatch_otp_error():
         mock_client_class.return_value = mock_client
 
         with pytest.raises(HTTPException, match="Unexpected API request error"):
-            await dispatch_otp(user, mock_client)
+            await dispatch_otp(mock_client, user)
