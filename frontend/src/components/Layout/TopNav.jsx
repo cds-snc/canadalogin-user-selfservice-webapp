@@ -17,7 +17,11 @@ export default function TopNav({ currentLang }) {
         <GcdsNavLink href={`/${currentLang}/`}>{pageContentJson["3"]}</GcdsNavLink>
         <GcdsNavLink href={`/${currentLang}/profilehome`}>{pageContentJson["4"]}</GcdsNavLink>
         <GcdsNavLink href={`/${currentLang}/securitysettings`}>{pageContentJson["5"]}</GcdsNavLink>
-        {shouldRenderRelyingPartyLink && <GcdsNavLink href={relyingPartyUrl}>{pageContentJson["6"] + relyingPartyLinkName}</GcdsNavLink>}
+        {shouldRenderRelyingPartyLink && (
+            <GcdsNavLink href={relyingPartyUrl}>
+                {pageContentJson["6"] + relyingPartyLinkName}
+            </GcdsNavLink>
+        )}
         <GcdsNavLink href="#">{pageContentJson["7"]}</GcdsNavLink>
     </>)
 
