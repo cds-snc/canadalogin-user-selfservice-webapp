@@ -314,7 +314,7 @@ async def session_event_sse_generator(request: Request):
             logger.info("SSE stream cancelled")
         except Exception as e:
             logger.error(f"Error in event stream: {str(e)}")
-            message_data = {"status": "error", "error": str(e)}
+            message_data = {"status": "error", "error": "An internal error has occurred."}
             yield f"data: {json.dumps(message_data)}\n\n"
 
     return StreamingResponse(
