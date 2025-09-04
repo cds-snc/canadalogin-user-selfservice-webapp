@@ -2,11 +2,17 @@ import { useReducer, useEffect, ReactNode } from "react";
 import { useSearchParams } from 'react-router';
 import { SERVICES, CONTEXT_ACTIONS } from "../../utils/constants.jsx";
 import UserContext from "./UserContext";
+import { Dispatch } from "react";
 import { authService } from "../../services/authService.jsx";
 
 interface Action {
     type: string
     payload: any
+}
+
+export interface UserContextType {
+    state: UserState;
+    dispatch: Dispatch<Action>;
 }
 
 export interface UserProfile {
@@ -57,18 +63,11 @@ export interface UserState {
 interface UserProviderProps {
     children: ReactNode;
     initial?: UserState;
-    payload: any
-}
-
-
-interface UserProviderProps {
-    children: ReactNode;
-    initial?: UserState;
 }
 
 
 
-const initialState = {
+const initialState: UserState = {
     isLoading: true,
     userData: {
         service: SERVICES[0].title, //to be set later when url referrer is given, also need to refactor other pages to use this value
@@ -95,7 +94,7 @@ const initialState = {
 }
 
 
-function userReducer(state = initialState, action: Action) {
+function userReducer(state: UserState = initialState, action: Action): UserState {
     switch (action.type) {
         case CONTEXT_ACTIONS.signUp:
             return {
@@ -117,7 +116,7 @@ function userReducer(state = initialState, action: Action) {
         case CONTEXT_ACTIONS.clone_profile:
             return {
                 ...state,
-                editProfile: { ...state.userProfile || {} },
+                editProfile: state.userProfile ? { ...state.userProfile } : null,
                 cancelProfileEditing: false,
                 urlLanguageBeforeEdit: null,
             };
@@ -175,7 +174,7 @@ function userReducer(state = initialState, action: Action) {
 
 export function UserProvider({ children, initial = initialState }: UserProviderProps) {
 
-    const [state, dispatch] = useReducer(userReducer, initial);
+    const [state, dispatch] = useReducer(userReducer, initial || initialState);
     const [searchParams] = useSearchParams();
 
 
@@ -228,7 +227,7 @@ export function UserProvider({ children, initial = initialState }: UserProviderP
     }, []);
 
     return (
-        <UserContext.Provider value={{ state, dispatch }} >
+        <UserContext.Provider value={{ state, dispatch }}>
             {children}
         </UserContext.Provider>
     )

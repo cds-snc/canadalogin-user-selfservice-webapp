@@ -12,7 +12,7 @@ export const TEST_PROTOTYPES = new Map([
                         desktopUrl: 'https://www.figma.com/proto/Et4mcEGQ92y1Fl7iu4y7is/Pilot-Usability-Test-Prototype?page-id=18%3A1005&node-id=37-1445&p=f&viewport=163%2C118%2C0.51&t=4EvuCHaprUKVeBwU-8&scaling=min-zoom&content-scaling=fixed&hotspot-hints=0&hide-ui=1'}]
 ]);
 export const TestDataUserProvider = {
-    isAuthenticated: false,
+    isLoading: false,
     userData: {
         service: SERVICES[0].title, //to be set later when url referrer is given, also need to refactor other pages to use this value
         language: 'en', //to be set later when refactoring possibly
@@ -29,6 +29,17 @@ export const TestDataUserProvider = {
         otpType: null,
         passwordValidated:false
     },
+    userProfile: null,
+    editProfile: null,
+    urlLanguageBeforeEdit: null,
+    cancelProfileEditing: false,
+    relyingPartyInfo: {
+        icon: 'test-icon.png',
+        id: 'test-service',
+        linkName: 'Test Service',
+        url: 'https://example.com'
+    },
+    authenticatedPages: [],
     testData:{
         email: null,
         otp: null,

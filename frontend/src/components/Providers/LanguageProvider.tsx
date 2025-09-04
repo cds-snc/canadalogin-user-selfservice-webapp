@@ -15,7 +15,6 @@ interface Action {
 interface LanguageProviderProps {
     children: ReactNode;
     initial?: LanguageState;
-    payload: any
 }
 
 interface LanguageState {
@@ -48,7 +47,7 @@ export const LanguageProvider = ({ children, initial = initialState }: LanguageP
     };
 
     return (
-        <LanguageContext.Provider value={{ state, setAppLanguage }}>
+        <LanguageContext.Provider value={{ state, dispatch, setAppLanguage }}>
             {children}
         </LanguageContext.Provider>
     );
