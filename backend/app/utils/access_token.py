@@ -35,12 +35,13 @@ async def request_access_token(global_http_client: AsyncClient):
         )
         response.raise_for_status()
         logger.info("Request returned successfully")
+        logger.debug(f"Returning response of type: {type(response)}")
         return response
 
     except Exception as e:
         logger.error(f"Error requesting token: {str(e)}", exc_info=True)
-        RequestErrorHandler.handle(e)
-
+        await RequestErrorHandler.handle(e)
+        raise
 
 async def get_admin_token(global_http_client: AsyncClient) -> str:
     """Get access token for IBM Verify API operations"""
@@ -51,8 +52,7 @@ async def get_admin_token(global_http_client: AsyncClient) -> str:
         response = await request_access_token(global_http_client)  # Await the coroutine
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(f"Token request completed in {duration:.2f} seconds")
-
-        response_json = await response.json()  # Await the response JSON
+        response_json = response.json()
         access_token = response_json.get("access_token")
         if not access_token:
             logger.error(

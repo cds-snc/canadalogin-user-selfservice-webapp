@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 async def handle_otp_status_retrieval(
-    retrieval_data: RetrievalData, global_http_client: AsyncClient
+    global_http_client: AsyncClient, retrieval_data: RetrievalData
 ):
     try:
         logger.info(f"Attempting to retrieve {retrieval_data.otpType} OTP.")
@@ -64,7 +64,7 @@ async def handle_otp_status_retrieval(
 
 
 async def dispatch_otp_status_retrieval(
-    retrieval_data: RetrievalData, global_http_client: AsyncClient
+    global_http_client: AsyncClient, retrieval_data: RetrievalData
 ):
     try:
         access_token = await get_admin_token()

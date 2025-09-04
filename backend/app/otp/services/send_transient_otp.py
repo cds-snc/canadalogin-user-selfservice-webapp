@@ -17,14 +17,14 @@ from app.utils.schemas import ResponseModel
 logger = logging.getLogger(__name__)
 
 
-async def handle_otp_send(user_otp_info: UserOtpInfo, global_http_client: AsyncClient):
+async def handle_otp_send(global_http_client: AsyncClient, user_otp_info: UserOtpInfo):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
 
     try:
         logger.info(f"Attempting to send {user_otp_info.otpType} OTP")
         start_time = datetime.now()
-        http_client_response = await dispatch_otp(user_otp_info, global_http_client)
+        http_client_response = await dispatch_otp(global_http_client, user_otp_info)
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(
             f"{user_otp_info.otpType} OTP send request response received in {duration:.2f} seconds"
@@ -79,7 +79,7 @@ async def handle_otp_send(user_otp_info: UserOtpInfo, global_http_client: AsyncC
         )
 
 
-async def dispatch_otp(user_otp_info: UserOtpInfo, global_http_client: AsyncClient):
+async def dispatch_otp(global_http_client: AsyncClient, user_otp_info: UserOtpInfo):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
 
