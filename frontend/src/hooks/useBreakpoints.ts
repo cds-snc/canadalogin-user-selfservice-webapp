@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 export function useBreakpoints() {
   const queries = {
-    mobile: "(max-width: 767px)",
+    mobile: "(max-width: 47.999em)",
     tablet: "(min-width: 48em) and (max-width: 63.999em)"
   };
 
