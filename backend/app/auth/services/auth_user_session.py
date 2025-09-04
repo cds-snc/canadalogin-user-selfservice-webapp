@@ -87,6 +87,7 @@ async def get_user_info(request: Request):
         raise OAuthError("user info not found")
     return user_info
 
+
 async def get_user_id_token(request: Request):
     """
     Get the id_token from the session, refreshing it if necessary.
@@ -107,7 +108,7 @@ async def get_user_id_token(request: Request):
             new_tokens = await refresh_id_token(refresh_token)
             if not new_tokens:
                 return None
-            
+
             if oauth.verify is None:
                 logger.error("OAuth verify client is not configured properly")
                 return None
@@ -121,6 +122,7 @@ async def get_user_id_token(request: Request):
         return None
 
     return id_token
+
 
 async def refresh_id_token(refresh_token: str):
     """
@@ -136,12 +138,14 @@ async def refresh_id_token(refresh_token: str):
         logger.error(f"Error refreshing token: {e}")
         return None
 
+
 async def get_user_refresh_token(request: Request):
     """
 
     Get user refresh token from session
     """
     return request.session.get(SessionKeys.SESSION_USER_REFRESH_TOKEN_KEY.value)
+
 
 async def update_session_tokens(request: Request, new_tokens: dict):
     """
@@ -151,6 +155,7 @@ async def update_session_tokens(request: Request, new_tokens: dict):
     request.session[SessionKeys.SESSION_USER_ID_TOKEN_KEY.value] = new_tokens.get("id_token")
     request.session[SessionKeys.SESSION_USER_REFRESH_TOKEN_KEY.value] = new_tokens.get("refresh_token")
     request.session[SessionKeys.SESSION_USER_INFO.value] = new_tokens.get("userinfo")
+
 
 async def get_session_by_session_id(sessionid: str, request: Request):
     try:
@@ -165,6 +170,7 @@ async def get_session_by_session_id(sessionid: str, request: Request):
     except Exception as e:
         logger.error(f"Error getting session by ID {sessionid}: {str(e)}", exc_info=True)
         return None
+
 
 async def remove_session_by_session_id(sessionid: str, request: Request):
     try:

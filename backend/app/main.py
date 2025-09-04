@@ -8,7 +8,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from starsessions import SessionMiddleware, SessionAutoloadMiddleware,InMemoryStore
+from starsessions import SessionMiddleware, SessionAutoloadMiddleware, InMemoryStore
 from redis.asyncio import Redis
 from starsessions.stores.redis import RedisStore
 
@@ -55,6 +55,7 @@ if configuration.session_config.SESSION_STORE_TYPE.upper() == "REDISSTORE":
     redis_client = Redis.from_url(configuration.session_config.SESSION_REDIS_URL or "redis://localhost:6379/0")
     logger.info("Using RedisStore for session management")
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     app.state.config = configuration
@@ -73,7 +74,6 @@ async def lifespan(app: FastAPI):
     if configuration.session_config.SESSION_STORE_TYPE.upper() == "REDISSTORE" and redis_client is not None:
         app.state.redis_client = redis_client
         logger.info("Using RedisStore for session management")
- 
 
     oidc_config.register_oidc(app.state.config)
     logger.info(f"CORS Origins: {app.state.config.cors_origins_list}")
@@ -86,7 +86,6 @@ async def lifespan(app: FastAPI):
     if configuration.session_config.SESSION_STORE_TYPE.upper() == "REDISSTORE" and hasattr(app.state, 'redis_client'):
         await app.state.redis_client.close()
         logger.info("Closing Redis client")
-
 
 
 app = FastAPI(
@@ -102,7 +101,7 @@ if configuration.ENVIRONMENT != "local":
     session_domain = f".{configuration.ROOT_DOMAIN}"
 logger.info(f"ROOT_DOMAIN: {session_domain}")
 
-#Determine session store
+# Determine session store
 session_store = InMemoryStore()
 if configuration.session_config.SESSION_STORE_TYPE.upper() == "REDISSTORE" and redis_client is not None:
     session_store = RedisStore(connection=redis_client, prefix="session:", gc_ttl=600)

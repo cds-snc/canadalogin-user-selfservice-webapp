@@ -91,9 +91,9 @@ async def keep_alive():
 async def backchannel_logout(request: Request):
     return await backchannel_logout_service(request)
 
+
 # Server Side Event check Redis pubsub channel "notification:{session id}", send SSE message
 # return stream Event
 @router.get("/session-status")
 async def session_status(request: Request):
     return await session_event_sse_generator(request)
-

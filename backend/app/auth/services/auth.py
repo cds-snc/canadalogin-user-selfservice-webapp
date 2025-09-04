@@ -12,44 +12,14 @@ from starsessions.session import get_session_handler
 import jwt
 from fastapi import Response
 from app.utils.schemas import ResponseModel
-import httpx # Added import
-from datetime import datetime
+import httpx
 from app.auth.services.auth_user_session import get_user_info, update_session_tokens, get_session_by_session_id, remove_session_by_session_id, get_user_id_token
 from app.utils.request_error_handler import RequestErrorHandler
 from urllib.parse import urlencode
 from redis.asyncio import Redis
-from redis.exceptions import ConnectionError, TimeoutError, RedisError
 from typing import AsyncGenerator
 
 logger = logging.getLogger(__name__)
-
-
-async def redis_retry_operation(operation, max_retries=3, delay=1.0):
-    """
-    Retry Redis operations with exponential backoff.
-    
-    Args:
-        operation: Async function to execute
-        max_retries: Maximum number of retry attempts (default: 3)
-        delay: Initial delay between retries in seconds (default: 1.0)
-    
-    Returns:
-        Result of the operation if successful
-        
-    Raises:
-        RedisError: If all retry attempts fail
-    """
-    for attempt in range(max_retries + 1):
-        try:
-            return await operation()
-        except (ConnectionError, TimeoutError, RedisError) as e:
-            if attempt == max_retries:
-                logger.error(f"Redis operation failed after {max_retries} retries: {str(e)}")
-                raise e
-            
-            retry_delay = delay * (2 ** attempt)  # Exponential backoff
-            logger.warning(f"Redis operation failed (attempt {attempt + 1}/{max_retries + 1}): {str(e)}. Retrying in {retry_delay:.1f}s...")
-            await asyncio.sleep(retry_delay)
 
 
 async def get_redis_client(request: Request) -> Redis:
@@ -61,7 +31,6 @@ async def get_redis_client(request: Request) -> Redis:
         config = get_configuration()
         redis_url = config.session_config.SESSION_REDIS_URL or "redis://localhost:6379/0"
         return Redis.from_url(redis_url)
-
 
 
 def get_base_profile_management_url():
@@ -134,8 +103,8 @@ async def callback_handler(request: Request):
             raise OAuthError("Invalid or expired token") from error
         await update_session_tokens(request, oidc_response)
 
-        # Get the handler and set your sid as session id. sid is unique session id from GC Sign-In 
-        handler = get_session_handler(request)  
+        # Get the handler and set your sid as session id. sid is unique session id from GC Sign-In
+        handler = get_session_handler(request)
         new_session_id = oidc_response.get('userinfo').get('sid')
         handler.session_id = new_session_id
 
@@ -179,7 +148,6 @@ async def reauthenticate_user(request: Request, returnToPage: str = "/"):
         RequestErrorHandler.handle(e, context="Unexpected error")
 
 
-
 async def backchannel_logout(request: Request):
     """
     Logs out the user by clearing the session and redirecting to the logout endpoint.
@@ -213,9 +181,9 @@ async def backchannel_logout(request: Request):
         decoded_token = jwt.decode(
             logout_token,
             key=jwks,
-            algorithms=["RS256"], # Common algorithm for OIDC. Adjust if needed.
-            audience=config.IBM_VERIFY_API_CLIENT_ID, # Your client ID
-            issuer=config.oidc_well_known_config.get("issuer"), # IdP's issuer URL
+            algorithms=["RS256"],   # Common algorithm for OIDC. Adjust if needed.
+            audience=config.IBM_VERIFY_API_CLIENT_ID,   # Your client ID
+            issuer=config.oidc_well_known_config.get("issuer"),   # IdP's issuer URL
             options={"verify_signature": True}
         )
         sid = decoded_token.get("sid")
@@ -223,9 +191,8 @@ async def backchannel_logout(request: Request):
         if not sid:
             logger.error("No 'sid' claim found in logout_token.")
             raise HTTPException(status_code=400, detail="No 'sid' claim found in logout_token")
-        
-        # Get the handler and set your custom UUID  
-        handler = get_session_handler(request)  
+        # Get the handler and set your custom UUID
+        handler = get_session_handler(request)
         # Remove the session associated with the 'sub'
         await handler.store.remove(sid)
 
@@ -237,7 +204,8 @@ async def backchannel_logout(request: Request):
     except Exception as e:
         logger.exception("Unexpected error during backchannel_logout", str(e))
         return generate_error_response(400, string_error_response())
-    
+
+
 async def logout_user(request: Request):
     """
     Logs out the user by clearing the session and redirecting to the logout endpoint.
@@ -248,7 +216,7 @@ async def logout_user(request: Request):
         if not id_token:
             logger.error("No id_token found in session during logout.")
             raise HTTPException(status_code=400, detail="No id_token found in session")
-        
+
         user_info = await get_user_info(request)
         # Clear the session
         # request.session.clear()
@@ -261,14 +229,14 @@ async def logout_user(request: Request):
         locale = user_info.get("locale", "en")
 
         # Build the logout URL with query parameters
-        
+
         params = {
             "id_token_hint": id_token,
             "post_logout_redirect_uri": post_logout_redirect_uri,
             "ui_locales": locale
         }
         redirect_url = f"{end_session_endpoint}?{urlencode(params)}"
-        
+
         logger.debug(f"Constructed logout redirect URL: {redirect_url}")
 
         # Create response with the redirect URL
@@ -277,15 +245,15 @@ async def logout_user(request: Request):
             data=redirect_url,
             message="Logout URL constructed successfully",
         )
-        
+
         # Create a JSON response to set cookie expiration
         response = JSONResponse(content=response_data.model_dump())
-        
+
         # Expire the session cookie
         cookie_name = config.session_config.SESSION_COOKIE_NAME
         cookie_domain = config.session_config.SESSION_COOKIE_DOMAIN
         cookie_secure = False if config.ENVIRONMENT == "local" else True
-        
+
         response.delete_cookie(
             key=cookie_name,
             domain=cookie_domain,
@@ -294,7 +262,6 @@ async def logout_user(request: Request):
             samesite="lax"
         )
 
-
         logger.info(f"Session cookies '{cookie_name}' expired during logout")
 
         return response
@@ -302,7 +269,7 @@ async def logout_user(request: Request):
         logger.exception("Unexpected error during logout", str(e))
         RequestErrorHandler.handle(e, context="Unexpected error during logout")
 
-    
+
 async def session_event_sse_generator(request: Request):
 
     async def event_stream(request: Request) -> AsyncGenerator[str, None]:
@@ -329,7 +296,7 @@ async def session_event_sse_generator(request: Request):
                     break
                 else:
                     session_metadata = session_data.get(SessionKeys.SESSION_METADATA.value)
-                    session_expire = config.session_config.SESSION_LIFETIME 
+                    session_expire = config.session_config.SESSION_LIFETIME
                     if session_metadata:
                         last_access = session_metadata.get(SessionKeys.SESSION_METADATA_LAST_ACCESS.value)
                     if last_access:
@@ -343,7 +310,7 @@ async def session_event_sse_generator(request: Request):
             logger.error(f"Error in event stream: {str(e)}")
             message_data = {"status": "error", "error": str(e)}
             yield f"data: {json.dumps(message_data)}\n\n"
-    
+
     return StreamingResponse(
         event_stream(request),
         media_type="text/event-stream",

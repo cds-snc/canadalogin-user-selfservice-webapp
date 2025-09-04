@@ -22,6 +22,7 @@ class IBMVerifyConfig(BaseSettings):
         env_file=".env", env_file_encoding="utf-8", extra="ignore", case_sensitive=True
     )
 
+
 class SessionConfig(BaseSettings):
     SESSION_STORE_TYPE: str
     SESSION_SECRET: str = Field(..., description="Secret key for signing session cookies")
@@ -95,6 +96,7 @@ class Configuration(BaseSettings):
     @property
     def password_policy_api_endpoint(self) -> str:
         return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.PASSWORDPOLICY.value}"
+
     @property
     def end_session_endpoint(self) -> str:
         return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.END_SESSION_ENDPOINT.value}"
