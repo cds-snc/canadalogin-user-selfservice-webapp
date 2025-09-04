@@ -38,6 +38,7 @@ export default function TopNav({ currentLang }) {
                 slot="menu"
                 label="Top navigation"
                 alignment="right"
+                lang={currentLang}
             >
                 {navLinksJsx}
             </GcdsTopNav>
