@@ -33,6 +33,25 @@ body,
     border-radius: 10px
 }
 
+.gcds-top-nav {
+    background: var(--gcds-color-grayscale-50);
+}
+
+.gcds-top-nav-container {
+    display: flex;
+    height: 65px;
+    background: var(--gcds-color-grayscale-50);
+    justify-content: center;
+    align-items: center;
+}
+
+.gcds-top-nav-width-spacer {
+    display: flex;
+    width: 90%;
+    max-width: var(--gcds-header-container-max-width);
+    justify-content: space-between;
+    align-items: center;
+}
 
 @media screen and (max-width:767px) {
     .gcds-email-fieldset {
@@ -59,6 +78,10 @@ body,
     .gcds-content {
         align-items: center;
         gap: var(--gcds-spacing-350);
+    }
+
+    .gcds-top-nav-container {
+        height: 45px;
     }
 }
 
