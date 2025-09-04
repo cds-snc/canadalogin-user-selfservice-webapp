@@ -184,4 +184,3 @@ async def remove_session_by_session_id(sessionid: str, request: Request):
         await redis_client.delete(redis_key)
     except Exception as e:
         logger.error(f"Error removing session by ID {sessionid}: {str(e)}", exc_info=True)
-

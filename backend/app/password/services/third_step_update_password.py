@@ -2,7 +2,6 @@ import logging
 from datetime import datetime
 
 from fastapi import HTTPException
-from authlib.integrations.starlette_client import OAuthError
 from httpx import AsyncClient
 from pydantic import ValidationError
 

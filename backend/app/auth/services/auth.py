@@ -326,4 +326,3 @@ async def session_event_sse_generator(request: Request):
             "X-Accel-Buffering": "no",  # Disable nginx buffering
         }
     )
-
