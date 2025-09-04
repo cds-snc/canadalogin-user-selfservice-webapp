@@ -1,21 +1,36 @@
 import { GcdsBreadcrumbs, GcdsBreadcrumbsItem, GcdsContainer, GcdsHeader, GcdsNavGroup, GcdsNavLink, GcdsText, GcdsTopNav } from "@cdssnc/gcds-components-react";
 import { useBreakpoints } from "../../hooks/useBreakpoints";
+import { getPageContent } from "../../utils/functions.jsx";
+import { useUser } from "../Providers/useUser";
 
 export default function TopNav({ currentLang }) {
-    console.log(currentLang)
+    const pageContentJson = getPageContent(currentLang, "TopNavBar");
+    const { state } = useUser();
+
+    const relyingPartyLinkName = state.relyingPartyInfo?.linkName;
+    const relyingPartyUrl = state.relyingPartyInfo?.url;
+    const shouldRenderRelyingPartyLink = relyingPartyLinkName && relyingPartyUrl;
 
     const { mobile, tablet } = useBreakpoints();
 
-    // Note for nat:
-    // If we do end up using GcdsTopNav in the desktop case, we can pull the GcdsTopNav stuff into some shared thing.
-
+    const navLinksJsx = (<>
+        <GcdsNavLink href={`/${currentLang}/`}>{pageContentJson["3"]}</GcdsNavLink>
+        <GcdsNavLink href={`/${currentLang}/profilehome`}>{pageContentJson["4"]}</GcdsNavLink>
+        <GcdsNavLink href={`/${currentLang}/securitysettings`}>{pageContentJson["5"]}</GcdsNavLink>
+        {shouldRenderRelyingPartyLink && <GcdsNavLink href={relyingPartyUrl}>{pageContentJson["6"] + relyingPartyLinkName}</GcdsNavLink>}
+        <GcdsNavLink href="#">{pageContentJson["7"]}</GcdsNavLink>
+    </>)
 
     if(mobile || tablet) {
         return (<>
             <GcdsContainer slot="menu">
                 <div className="gcds-top-nav-container">
                     <div className="gcds-top-nav-width-spacer">
-                        <GcdsText marginBottom="0"><strong>GC Sign in</strong></GcdsText>
+                        <GcdsText marginBottom="0">
+                            <strong>
+                                {pageContentJson["1"]}
+                            </strong>
+                        </GcdsText>
                     </div>
                 </div>
             </GcdsContainer>
@@ -23,34 +38,24 @@ export default function TopNav({ currentLang }) {
                 slot="menu"
                 label="Top navigation"
                 alignment="right"
-                className="gcds-top-nav"
             >
-                <GcdsNavLink href="#">GC Sign in account</GcdsNavLink>
-                <GcdsNavLink href="#">Personal information</GcdsNavLink>
-                <GcdsNavLink href="#">Security settings</GcdsNavLink>
-                <GcdsNavLink href="#">Return to foo.com</GcdsNavLink>
-                <GcdsNavLink href="#">Sign out</GcdsNavLink>
+                {navLinksJsx}
             </GcdsTopNav>
         </>)
     }
 
-    // Our desktop design doesn't align with the design system, so we've
-    // implemented our own implementation here.
     return (
         <GcdsTopNav
-                slot="menu"
-                label="Top navigation"
-                alignment="right"
-                className="gcds-top-nav"
-            >
-                <GcdsNavLink href="#" slot="home">GC Sign in</GcdsNavLink>
-                <GcdsNavGroup open-trigger="Menu" menu-label="Menu">
-                    <GcdsNavLink href="#">GC Sign in account</GcdsNavLink>
-                    <GcdsNavLink href="#">Personal information</GcdsNavLink>
-                    <GcdsNavLink href="#">Security settings</GcdsNavLink>
-                    <GcdsNavLink href="#">Return to foo.com</GcdsNavLink>
-                    <GcdsNavLink href="#">Sign out</GcdsNavLink>
-                </GcdsNavGroup>
-            </GcdsTopNav>
+            slot="menu"
+            label="Top navigation"
+            alignment="right"
+        >
+            <GcdsNavLink href="#" slot="home">
+                {pageContentJson["1"]}
+            </GcdsNavLink>
+            <GcdsNavGroup open-trigger="Menu" menu-label="Menu">
+                {navLinksJsx}
+            </GcdsNavGroup>
+        </GcdsTopNav>
     )
 }
