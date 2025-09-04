@@ -19,14 +19,6 @@
         "18": "Use a different email",
         "19": "I forgot my password"
     },
-    "SignUpEmail": {
-        "1": "Entrez votre adresse courriel",
-        "2": "Adresse courriel",
-        "3": "Veuillez choisir la langue que vous préférez utiliser pour la correspondance par courriel",
-        "4": "Vous recevrez les courriels de Connexion GC dans la langue sélectionnée",
-        "5": "Anglais",
-        "6": "Français"
-    },
     "FirstTimeGc": {
         "1": "Pas de compte Connexion GC?",
         "2": "Créer un compte"

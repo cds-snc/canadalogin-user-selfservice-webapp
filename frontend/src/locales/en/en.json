@@ -20,14 +20,6 @@
     "18": "Use a different email",
     "19": "I forgot my password"
   },
-  "SignUpEmail": {
-    "1": "Enter your email",
-    "2": "Email address",
-    "3": "Choose your email language preference",
-    "4": "You will receive emails from GC Sign in in the language you choose.",
-    "5": "English",
-    "6": "French"
-  },
   "FirstTimeGc": {
     "1": "First time using GC Sign in?",
     "2": "Sign up"
