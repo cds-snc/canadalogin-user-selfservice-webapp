@@ -15,10 +15,21 @@ This is the FastAPI application for the GC Sign in back-end API.
 Create a `.env` file with the following variables:
 
 ```env
-IBM_VERIFY_TENANT_URL=set_this_to_the_dev_tenant
-IBM_VERIFY_API_CLIENT_ID=set_this_to_the_dev_api_client_id
-IBM_VERIFY_API_CLIENT_SECRET=set_this_to_the_dev_api_client_secret
+IBM_VERIFY_TENANT_URL=https://cds-gcsignin-dev.verify.ibm.com/
+IBM_VERIFY_PROFILE_MANAGEMENT_API_CLIENT_ID=
+IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID=
+IBM_VERIFY_PROFILE_MANAGEMENT_SECRET=
+IBM_VERIFY_PROFILE_MANAGEMENT_API_SECRET=
 ```
+
+#### IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID and IBM_VERIFY_PROFILE_MANAGEMENT_SECRET
+
+Head to https://cds-gcsignin-dev.verify.ibm.com/ui/admin/application/9053160440215070489?tab=sso, open the "Sign-on" tab, and copy the Client ID and Client secret.
+
+#### IBM_VERIFY_PROFILE_MANAGEMENT_API_CLIENT_ID and IBM_VERIFY_PROFILE_MANAGEMENT_API_SECRET
+
+Head to https://cds-gcsignin-dev.verify.ibm.com/ui/admin/application/9053160440215070489?tab=API%20access, open the "API access" tab. Select the DEV API Client key. Copy the Client ID and Client secret on the right side of the screen.
+
 
 ### Quick Start
 
@@ -34,6 +45,13 @@ docker build -t gc-signin-backend .
 docker run -p 8000:8000 \
   --env-file ./.env \
   gc-signin-backend
+```
+
+3. You can also run the fastapi server locally from the root folder:
+Start the server from the root directory with the [FastAPI CLI](https://fastapi.tiangolo.com/#run-it) command or Uvicorn
+```
+make install-dev-python
+fastapi run backend/app/main.py or uvicorn app.main:app --reload --app-dir backend
 ```
 
 The API will be available at `http://localhost:8000`
@@ -134,4 +152,8 @@ To run the unit tests, follow these steps:
 - Run Lint (from root folder)
    ```bash
    make lint-python
+   ```
+- Building a Dockerimage from your macbook M1 to AWS
+   ``` bash
+   docker buildx  build --platform linux/amd64 -t [NAME] .
    ```

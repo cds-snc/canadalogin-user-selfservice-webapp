@@ -1,10 +1,8 @@
 import {
-    GcdsContainer, GcdsDetails, GcdsErrorSummary, GcdsFieldset, GcdsHeading, GcdsLink,
-    GcdsRadioGroup,
-    GcdsStepper,
+    GcdsContainer, GcdsDetails, GcdsErrorSummary, GcdsFieldset, GcdsHeading, GcdsLink, GcdsStepper,
     GcdsText
 } from "@cdssnc/gcds-components-react";
-import {getPageContent} from '../../../utils/functions';
+import { getPageContent } from '../../../utils/functions';
 import {
     countryMapping,
     FLOW_TYPES,
@@ -13,21 +11,21 @@ import {
     SUBMIT_END_POINTS
 } from "../../../utils/constants.jsx";
 import SubmitButton from "../../Layout/SubmitButton.jsx";
-import {useState} from 'react';
+import { useState } from 'react';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/material.css';
-import {useUser} from "../../Providers/useUser.tsx";
-import {useParams} from "react-router";
-import {useSubmit} from "../../../hooks/useSubmit.js";
-import {useError} from "../../../hooks/useError.js";
+import { useUser } from "../../Providers/useUser.tsx";
+import { useParams } from "react-router";
+import { useSubmit } from "../../../hooks/useSubmit.js";
+import { useError } from "../../../hooks/useError.js";
 
 export default function VerificationSetUp() {
-    const {state} = useUser();
-    const {language, flow} = useParams();
+    const { state } = useUser();
+    const { language, flow } = useParams();
     const [phone, setPhone] = useState('');
     const [countryCodeLength, setCountryCodeLength] = useState(0);
     const pageContentJson = getPageContent(language, PAGES.verificationSetUp);
-    const {setError, getError, hasErrors, clearAllErrors} = useError(language);
+    const { setError, getError, hasErrors, clearAllErrors } = useError(language);
     const error = getError('#phone');
     const errorPageJson = getPageContent(language, PAGES.error);
 
@@ -49,34 +47,34 @@ export default function VerificationSetUp() {
         type: null,
         page: PAGES.verificationSetUp,
         flow: flow,
-        onError: (err)=> setError('#phone',err)
+        onError: (err) => setError('#phone', err)
     };
-    const {handleSubmit, isPending} = useSubmit(submitDataOptions, validatePhone );
+    const { handleSubmit, isPending } = useSubmit(submitDataOptions, validatePhone);
 
     return (
         <GcdsContainer>
             <GcdsContainer>
                 {
-                    hasErrors()&&(<GcdsErrorSummary data-testid='errorSummary'
-                                                    errorLinks={`{"#phone": "${error.errorMsg}"}`}
-                                                    heading={error.heading}
+                    hasErrors() && (<GcdsErrorSummary data-testid='errorSummary'
+                        errorLinks={`{"#phone": "${error.errorMsg}"}`}
+                        heading={error.heading}
                     />)
                 }
                 <GcdsContainer className="gcds-gap" >
                     <GcdsStepper currentStep="3" totalSteps="4"
-                                 tag="h1"
-                                 lang={language}>
+                        tag="h1"
+                        lang={language}>
                         {pageContentJson['1']}
                     </GcdsStepper>
                 </GcdsContainer>
                 <GcdsContainer>
-                    <form id="form"  onSubmit={handleSubmit}>
+                    <form id="form" onSubmit={handleSubmit}>
                         <GcdsContainer>
                             <GcdsText>
                                 {pageContentJson['2']}
                             </GcdsText>
                             <GcdsText>
-                                <GcdsLink href='#' onClick={()=> window.open('https://gc-signin.cdssandbox.xyz/en/get-started/two-step-verification-methods/', '_blank').focus()}>
+                                <GcdsLink href='#' onClick={() => window.open('https://gc-signin.cdssandbox.xyz/en/get-started/two-step-verification-methods/', '_blank').focus()}>
                                     {pageContentJson['3']}
                                 </GcdsLink>
                             </GcdsText>
@@ -91,28 +89,28 @@ export default function VerificationSetUp() {
                             </GcdsText>
                         </GcdsContainer>
                         <GcdsContainer padding="200">
-                        <PhoneInput
-                            inputProps={{
-                                name: 'phone',
-                                required: true,
-                                autoFocus: true,
-                            }}
-                            specialLabel={pageContentJson['10']}
-                            country={'ca'}
-                            onlyCountries={countryMapping.countries}
-                            localization={language==='fr'?countryMapping.frLocalization:countryMapping.localization}
-                            value={state.testData!=null?state.testData.phone:phone}
-                            className={'high-res'}
-                            enableSearch={true}
-                            countryCodeEditable={false}
-                            disableSearchIcon={false}
-                            defaultErrorMessage={"Phone number is required"}
-                            onChange={phone =>  setPhone(phone)}
-                            isValid={(inputNumber, country) => {
-                                try {setCountryCodeLength(country.format.replace(/[^.]/g, '').length);} catch(err){setError('#server', err)}
-                            }}
-                        />
-                        <br />
+                            <PhoneInput
+                                inputProps={{
+                                    name: 'phone',
+                                    required: true,
+                                    autoFocus: true,
+                                }}
+                                specialLabel={pageContentJson['10']}
+                                country={'ca'}
+                                onlyCountries={countryMapping.countries}
+                                localization={language === 'fr' ? countryMapping.frLocalization : countryMapping.localization}
+                                value={state.testData != null ? state.testData.phone : phone}
+                                className={'high-res'}
+                                enableSearch={true}
+                                countryCodeEditable={false}
+                                disableSearchIcon={false}
+                                defaultErrorMessage={"Phone number is required"}
+                                onChange={phone => setPhone(phone)}
+                                isValid={(inputNumber, country) => {
+                                    try { setCountryCodeLength(country.format.replace(/[^.]/g, '').length); } catch (err) { setError('#server', err) }
+                                }}
+                            />
+                            <br />
                         </GcdsContainer>
                         <GcdsText>
                             <GcdsDetails detailsTitle={pageContentJson['11']}>
@@ -121,7 +119,7 @@ export default function VerificationSetUp() {
                                 </GcdsText>
                             </GcdsDetails>
                         </GcdsText>
-                        <GcdsFieldset
+                        {/* <GcdsFieldset
                             fieldset-id="gcds-verification-fieldset"
                             legend={pageContentJson['14']}
                             hint={pageContentJson['15']}
@@ -130,15 +128,15 @@ export default function VerificationSetUp() {
                             <br />
                             <GcdsRadioGroup
                                 name="verificationType"
-                                options={'['+
-                                    `{"label": "${pageContentJson['16']}",`+
-                                    `"id": "sms", "value": "sms","checked":"true",`+
-                                    `"hint": "${pageContentJson['17']}"},`+
-                                    `{"label": "${pageContentJson['18']}",`+
-                                    `"id": "voice", "value": "voice",`+
+                                options={'[' +
+                                    `{"label": "${pageContentJson['16']}",` +
+                                    `"id": "sms", "value": "sms","checked":"true",` +
+                                    `"hint": "${pageContentJson['17']}"},` +
+                                    `{"label": "${pageContentJson['18']}",` +
+                                    `"id": "voice", "value": "voice",` +
                                     `"hint": "${pageContentJson['19']}"}]`}
                             />
-                        </GcdsFieldset>
+                        </GcdsFieldset> */}
                         <SubmitButton currentLang={language} disabled={isPending} />
                     </form>
                 </GcdsContainer>

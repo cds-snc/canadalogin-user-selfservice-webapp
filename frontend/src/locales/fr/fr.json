@@ -60,7 +60,8 @@
     "10": "Veuillez entrer un numéro de téléphone pour continuer.",
     "11": "Veuillez entrer un nom de famille pour continuer. Si vous n’avez qu’un seul nom, entrez-le dans le champ destiné au nom de famille.",
     "12": "and a maximum of",
-    "13": "caractères."
+    "13": "caractères.",
+    "14": "Trop de tentatives"
   },
   "RegisterVerification": {
     "1": "Protégez votre compte avec la vérification en deux étapes",
@@ -120,7 +121,8 @@
     "23": "Nous avons envoyé un courriel contenant un code à 6 chiffres à l’adresse :",
     "24": "Le courriel pourrait prendre quelques minutes à arriver. Si vous ne voyez pas le courriel, vérifiez s’il se trouve dans votre dossier de pourriels.",
     "25": "Utiliser une autre adresse courriel",
-    "26": "Demander un nouveau code"
+    "26": "Demander un nouveau code",
+    "27": "Annuler"
   },
   "VerificationSelection": {
     "1": "Choisissez une méthode de connexion",
@@ -142,7 +144,8 @@
     "8": "Nom"
   },
   "Button": {
-    "submit": "Continuer"
+    "submit": "Continuer",
+    "cancel": "Annuler"
   },
   "Privacy": {
     "1": "Créer une Connexion GC",
@@ -190,6 +193,11 @@
     "46": "Connexion GC",
     "47": "pour continuer vers votre"
   },
+  "ManageDashboard": {
+    "1": "Bienvenue,",
+    "2": "Renseignements personnels",
+    "3": "Paramètres de sécurité"
+  },
   "AreYouSureEditYourName": {
     "1": "Êtes-vous sûr de vouloir mettre à jour votre nom ?",
     "2": "Vous avez demandé à mettre à jour votre nom :",
@@ -222,8 +230,8 @@
     "15": "Notifications",
     "16": "Nous enverrons des notifications relatives à votre compte à l'adresse e-mail associée à votre compte.",
     "17": "Vous pouvez également recevoir des notifications des services connectés à votre compte GC. Vous pouvez gérer ces préférences dans les paramètres de chaque service."
-},
-  "EnterNewEmail":{
+  },
+  "EnterNewEmail": {
     "1": "Entrez une nouvelle adresse courriel",
     "2": "La modification de votre adresse courriel affectera :",
     "3": "L'adresse courriel que vous utilisez pour vous connecter",
@@ -267,9 +275,9 @@
     "10": "Vous pouvez demander un nouveau code dans",
     "11": "10 secondes"
   },
-  "ProfileYouMayUpdateName":{
+  "ProfileYouMayUpdateName": {
     "0": "Réussite",
-    "1": "Votre nom a été mis à jour vers Example Newname",
+    "1": "Votre nom a été mis à jour vers",
     "2": "Vous devrez peut-être mettre à jour votre nom à d'autres endroits.",
     "3": "Ceci ne modifie votre nom que pour les services connectés à votre compte GC Sign in.",
     "4": "Si vous essayez de mettre à jour votre nom pour un service qui n'est pas connecté à votre compte GC Sign in, vous devrez accéder à ce compte.",
@@ -280,8 +288,8 @@
     "9": "Pour voir les services connectés à votre compte GC Sign in, accédez à ",
     "10": "Services connectés",
     "11": "dans votre tableau de bord GC Sign in."
-},
-  "FirstVerifyItsYou":{
+  },
+  "FirstVerifyItsYou": {
     "1": "Vérifiez d'abord qu'il s'agit bien de vous",
     "2": "Pour modifier votre adresse e-mail, saisissez d'abord votre mot de passe actuel.",
     "3": "Mot de passe",
@@ -302,6 +310,19 @@
     "11": "Pour rechercher un autre compte GC, consultez le",
     "12": "Répertoire des comptes GC"
   },
+  "AreYouSureUpdateContactNumber": {
+    "1": "Êtes-vous sûr de vouloir mettre à jour votre numéro de téléphone ?",
+    "2": "Vous avez demandé à mettre à jour votre numéro de téléphone :",
+    "3": "+1 (123) 456-7890",
+    "4": "Votre numéro de téléphone sera mis à jour avec les services suivants :",
+    "5": "GEO.ca",
+    "6": "Ceci ne modifie que votre",
+    "7": "numéro de téléphone.",
+    "8": "Pour modifier votre numéro de vérification en deux étapes, accédez à vos",
+    "9": "paramètres de sécurité.",
+    "10": "Oui, mettre à jour",
+    "11": "Annuler"
+  },
   "YouMayUpdateEmailAtOtherPlaces": {
     "1": "Votre adresse e-mail a été mise à jour vers",
     "2": "Vous devrez peut-être mettre à jour votre adresse e-mail ailleurs",
@@ -319,5 +340,95 @@
     "4": "GEO.ca",
     "5": "Oui, mettre à jour",
     "6": "Annuler"
+  },
+  "EditLanguagePreferences": {
+    "1": "Modifiez votre préférence linguistique",
+    "2": "Cela mettra à jour la langue officielle dans laquelle GC Sign In et les services connectés vous enverront des communications.",
+    "3": "Choisissez votre préférence linguistique",
+    "4": "Quels services ont accès à votre préférence linguistique",
+    "8": "Les services suivants ont accès à votre nom via GC Sign In :",
+    "9": "GEO.ca",
+    "10": "Si vous tentez de mettre à jour votre nom auprès d’un service qui n’est pas connecté à GC Sign In, vous devrez le faire via ce compte.",
+    "11": "Pour rechercher un autre compte GC, visitez le",
+    "12": "Répertoire des comptes GC",
+    "13": "Anglais",
+    "14": "Français",
+    "15": "Continuer",
+    "16": "Annuler",
+    "17": "Êtes-vous certain de vouloir mettre à jour votre préférence linguistique vers :",
+    "18": "Cela mettra à jour votre langue auprès des services suivants :",
+    "19": "GEO.ca"
+  },
+  "ProfileYouMayUpdateLanguage": {
+    "0": "Réussite",
+    "1": "Votre nom a été mis à jour vers",
+    "2": "Vous devrez peut-être mettre à jour votre nom à d'autres endroits.",
+    "3": "Ceci ne modifie votre nom que pour les services connectés à votre compte GC Sign in.",
+    "4": "Si vous essayez de mettre à jour votre nom pour un service qui n'est pas connecté à votre compte GC Sign in, vous devrez accéder à ce compte.",
+    "5": "Pour rechercher un autre compte GC, consultez la section ",
+    "6": "Retour au profil",
+    "7": "Déconnexion",
+    "8": "Répertoire des comptes GC.",
+    "9": "Pour voir les services connectés à votre compte GC Sign in, accédez à ",
+    "10": "Services connectés",
+    "11": "dans votre tableau de bord GC Sign in."
+  },
+  "AreYouSureEditYourLanguage": {
+    "1": "Êtes-vous sûr de vouloir mettre à jour votre nom ?",
+    "2": "Vous avez demandé à mettre à jour votre nom :",
+    "3": "Exemple : Nouveau nom",
+    "4": "Votre nom sera mis à jour avec les services suivants :",
+    "5": "GEO.ca",
+    "6": "Attention",
+    "7": "Ceci",
+    "8": "Enregistrer les modifications",
+    "9": "Annuler",
+    "10": "Talent numérique",
+    "11": "ne modifie pas",
+    "12": "légalement votre nom."
+  },
+  "SecuritySettings": {
+    "1": "Paramètres de sécurité",
+    "2": "Comment vous vous connectez à Connexion GC",
+    "3": "Veillez à toujours avoir accès à votre compte Connexion GC en maintenant ces renseignements à jour.",
+    "4": "Mot de passe",
+    "5": "Dernière modification le 3 janvier 2025",
+    "6": "Modifier",
+    "7": "Vérification en deux étapes",
+    "8": "L’ajout d’une étape supplémentaire à la vérification de votre mot de passe permet de confirmer votre identité.",
+    "9": "Activée",
+    "10": "Gérer"
+  },
+  "OtpSelection": {
+    "1": "Vérifiez d'abord qu'il s'agit bien de vous",
+    "2": "La vérification en 2 étapes ajoute une seconde mesure de sécurité à votre mot de passe.",
+    "3": "Apprenez-en plus sur la vérification en deux étapes (s’ouvre dans un nouvel onglet)",
+    "4": "Sélectionnez une autre méthode de vérification à deux étapes",
+    "5": "How should we send you the code?",
+    "6": "You can change this the next time you sign in.",
+    "7": "Text message (SMS)",
+    "8": "Mobile only. Carrier charges may apply.",
+    "9": "Voice call",
+    "10": "Mobile or landline. Carrier charges may apply.",
+    "11": "Chargement"
+  },
+  "PasswordChangedConfirmation": {
+    "1": "Your email has been updated to",
+    "2": "You may need to update your email other places",
+    "3": "This only changes your email with services connected to your GC Sign in.",
+    "4": "If you are trying to update your email with a service that’s not connected to your GC Sign in, you’ll need to go to that account.",
+    "5": "To search for another GC Account, visit the",
+    "6": "GC Account directory.",
+    "7": "Back to profile",
+    "8": "Sign out"
+  },
+  "TopNavBar": {
+    "1": "Connexion GC",
+    "2": "Menu",
+    "3": "Compte Connexion GC",
+    "4": "Renseignements personnels",
+    "5": "Paramètres de sécurité",
+    "6": "Retour à ",
+    "7": "Se déconnecter"
   }
 }

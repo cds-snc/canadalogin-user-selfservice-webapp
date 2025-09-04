@@ -1,63 +1,16 @@
+from datetime import datetime
 from enum import Enum
 from typing import List, Optional
-from pydantic import BaseModel, Field, EmailStr, ConfigDict
-from pydantic_extra_types.phone_numbers import PhoneNumber
-from datetime import datetime
+
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 from app.utils.schemas import ResponseModel
-
-
-class EmailModel(BaseModel):
-    value: str
-    type: str = "work"
-
-
-class UserLoginRequestData(BaseModel):
-    userName: EmailStr
-    password: str
-    trxnId: str
-
-
-class NewUserCreationData(BaseModel):
-    userName: EmailStr
-    password: str
-    trxnId: str
-
-
-# Signup Schema
+from app.password.schemas import OtpType
 
 
 class NotifyType(str, Enum):
     EMAIL = "EMAIL"
     NONE = "NONE"
-
-
-class IBMNotificationExtension(BaseModel):
-    notifyPassword: bool = Field(
-        default=False,
-        description="Notify the user the password they entered. Setting to true will send a email with the password they entered",
-    )
-    notifyType: NotifyType = Field(
-        default=NotifyType.NONE,
-        description="Setting to NONE will not send any notification, Setting the value to EMAIL will send a notification email to the user that the account was created",
-    )
-
-
-class IBMUserCreateRequest(BaseModel):
-    model_config = ConfigDict(populate_by_name=True, validate_by_name=True)
-
-    schemas: List[str] = [
-        "urn:ietf:params:scim:schemas:core:2.0:User",
-        "urn:ietf:params:scim:schemas:extension:ibm:2.0:Notification",
-    ]
-    userName: str
-    emails: List[EmailModel]
-    password: str
-    active: bool = True
-    notification: IBMNotificationExtension = Field(
-        default_factory=IBMNotificationExtension,
-        alias="urn:ietf:params:scim:schemas:extension:ibm:2.0:Notification",
-    )
 
 
 class IBMUserCreateResponse(BaseModel):
@@ -82,12 +35,6 @@ class ProfileUserData(BaseModel):
     preferredLanguage: str
 
 
-class Operations(BaseModel):
-    op: str
-    path: str
-    value: str
-
-
 class SignUpResponse(ResponseModel):
     data: Optional[IBMUserCreateResponse] = None
 
@@ -97,6 +44,19 @@ class EmailItem(BaseModel):
     value: EmailStr
 
 
+class MetaDataTypeValue(BaseModel):
+    type: Optional[str] = None
+    value: Optional[str] = None
+
+
+class SCIMUserDetails(BaseModel):
+    emailVerified: Optional[str] = None
+    lastLogin: Optional[str] = None
+    lastMFA: Optional[List[MetaDataTypeValue]] = None
+    twoFactorAuthentication: Optional[bool] = None
+    pwdChangedTime: Optional[str] = None
+
+
 class Meta(BaseModel):
     created: datetime
     location: str
@@ -104,76 +64,93 @@ class Meta(BaseModel):
     resourceType: str
 
 
-class Name(BaseModel):
-    formatted: str
-    familyName: str
-    givenName: Optional[str]
-
-
-class IBMExtension(BaseModel):
-    pwdReset: bool
-    userCategory: str
-    twoFactorAuthentication: bool
-    realm: str
-    pwdChangedTime: datetime
+class UserProfileName(BaseModel):
+    formatted: Optional[str] = None
+    familyName: Optional[str] = None
+    givenName: Optional[str] = None
 
 
 class ProfileGetResponseData(BaseModel):
-    emails: List[EmailItem]
+    emails: List[EmailItem] = None
     preferredLanguage: Optional[str] = None
     meta: Meta
-    name: Optional[Name] = None
+    name: Optional[UserProfileName] = None
     active: bool
     id: str
     userName: EmailStr
+    phoneNumbers: Optional[List[MetaDataTypeValue]] = None
+    details: Optional[SCIMUserDetails] = Field(
+        default=None,
+        validation_alias="urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+        serialization_alias="details",
+    )
+    model_config = ConfigDict(validate_by_name=True, validate_by_alias=True)
 
-    class Config:
-        populate_by_name = True
+
+class ProfilePUTData(BaseModel):
+    schemas: List[str] = Field(
+        default=[
+            "urn:ietf:params:scim:schemas:core:2.0:User",
+            "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+        ]
+    )
+    preferredLanguage: Optional[str] = None
+    name: Optional[UserProfileName] = None
+    userName: EmailStr
+    phoneNumbers: Optional[List[MetaDataTypeValue]] = None
+    model_config = ConfigDict(validate_by_name=True, validate_by_alias=True)
 
 
 class ProfileResponse(ResponseModel):
     data: Optional[ProfileGetResponseData]
 
 
-# Signin Schema
-
-
-class IBMUsernamePasswordAuthRequestData(BaseModel):
-    username: EmailStr  # Lowercase username is required here -> https://docs.verify.ibm.com/verify/reference/authenticatewithpassword. Signup request requires userName in camelCase
-    password: str
-
-
-class AuthenticatedUserData(BaseModel):
+class RelyingPartyInfo(BaseModel):
+    icon: str
     id: str
-    assertion: str
+    linkName: str
+    url: str
 
 
-class AuthenticatedUserResponse(ResponseModel):
-    data: AuthenticatedUserData
+class RelyingPartyResponse(ResponseModel):
+    data: Optional[RelyingPartyInfo]
 
 
-class TwoFactorEnrollmentType(str, Enum):
-    SMS = "sms"
-    VOICE = "voice"
+class Attributes(BaseModel):
+    phoneNumber: Optional[str] = None
+
+    class Config:
+        extra = "allow"
 
 
-class TwoFactorEnrollmentUserData(BaseModel):
-    userId: str
-    phoneNumber: PhoneNumber
-    enrollmentType: TwoFactorEnrollmentType
-    trxnId: str
-
-
-class TwofactorEnrollmentResponse(BaseModel):
+class Factor(BaseModel):
     id: str
     userId: str
     type: str
-    created: str
-    updated: str
+    created: datetime
+    updated: datetime
+    attempted: datetime
     enabled: bool
     validated: bool
-    attributes: dict[str, str]
+    attributes: Attributes
 
 
-class VerifiedTwofactorEnrollmentResponse(ResponseModel):
-    data: TwofactorEnrollmentResponse
+class UserAuthFactorsIbmResponse(BaseModel):
+    factors: List[Factor]
+    count: int
+    limit: int
+    page: int
+    total: int
+
+
+class UserPhoneOTP(BaseModel):
+    type: OtpType
+    phoneNumber: str
+
+
+class UserPhoneOTPFactors(BaseModel):
+    factors: list[UserPhoneOTP]
+
+
+class UserPhoneAuthFactorsResponse(ResponseModel):
+    data: list[UserPhoneOTP]

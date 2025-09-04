@@ -5,9 +5,9 @@ from fastapi import HTTPException
 from httpx import AsyncClient
 from pydantic import ValidationError
 
-from app.config import get_settings
+from app.config import get_configuration
 from app.otp.schemas import RetrievalData, OtpDataResponse, OtpType
-from app.utils.access_token import get_admin_token, get_auth_request_headers
+from app.utils.access_token import get_auth_request_headers
 from app.utils.helpers import generate_error_response
 from app.utils.schemas import ResponseModel
 
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 async def handle_otp_status_retrieval(
-    retrieval_data: RetrievalData, global_http_client: AsyncClient
+    retrieval_data: RetrievalData, global_http_client: AsyncClient, user_access_token
 ):
     try:
         logger.info(f"Attempting to retrieve {retrieval_data.otpType} OTP.")
@@ -64,12 +64,12 @@ async def handle_otp_status_retrieval(
 
 
 async def dispatch_otp_status_retrieval(
-    retrieval_data: RetrievalData, global_http_client: AsyncClient
+    retrieval_data: RetrievalData, global_http_client: AsyncClient, user_access_token
 ):
     try:
-        access_token = await get_admin_token()
+        access_token = user_access_token
         headers = get_auth_request_headers(access_token, True)
-        settings = get_settings().ibm_verify_config
+        settings = get_configuration().ibm_verify_config
 
         if retrieval_data.otpType == OtpType.SMS:
             send_transient_otp_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/smsotp/transient/verifications/{retrieval_data.trxnId}"

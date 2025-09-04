@@ -1,40 +1,46 @@
-import {Routes, Route, Navigate} from 'react-router';
-import {UserProvider} from "./components/Providers/UserProvider";
-import PrivateRoute from "./components/Providers/PrivateRoute.jsx";
+import { Routes, Route, Navigate } from 'react-router';
+import { PrivateRoute, StepupPrivateRoute } from "./components/Providers/PrivateRoute.jsx";
 import Page from "./views/Page.js";
-import {PAGES} from "./utils/constants.jsx";
+import { PAGES, NAVIGATION_LINKS } from "./utils/constants.jsx";
 
 function App() {
-      return (
-          <UserProvider>
-              <Routes>
-                  <Route path="/" element={ <Page page={PAGES.home}/>} />
-                  <Route path="/:language" element={ <Page page={PAGES.home}/>} />
-                  <Route path="/:language/" element={ <Page page={PAGES.home}/>} />
-                  <Route path="/:language/:flow/privacy" element={<Page page={PAGES.privacy}/>}/>
-                  <Route path="/:language/:flow" element={<PrivateRoute route={PAGES.signup}><Page page={PAGES.signup}/></PrivateRoute>}/>
-                  <Route path="/:language/:flow/verification/:type" element={<PrivateRoute route={PAGES.verification}><Page page={PAGES.verification}/></PrivateRoute>}/>
-                  <Route path="/:language/:flow/password" element={ <PrivateRoute route={PAGES.password}><Page page={PAGES.password}/></PrivateRoute>} />
-                  <Route path="/:language/:flow/verificationsetup" element={<PrivateRoute route={PAGES.verificationSetUp}><Page page={PAGES.verificationSetUp}/></PrivateRoute>}/>
-                  <Route path="/:language/:flow/selectverification" element={<PrivateRoute route={PAGES.verificationSelection}><Page page={PAGES.verificationSelection}/></PrivateRoute>}/>
-                  <Route path="/:language/:flow/profile" element={<PrivateRoute route={PAGES.coreProfile}><Page page={PAGES.coreProfile}/></PrivateRoute>}/>
-                  <Route path="/:language/redirecttorp" element={ <Page page="RP"/>} />
-                  <Route path="/:language/phoneotp" element={ <Page page="Phone OTP"/>} />
-                  <Route path="/:language/areYouSureEditYourName" element={ <Page page={PAGES.areYouSureEditYourName} />} />
-                  <Route path="*" element={<Navigate to="/" replace />} />
-                  <Route path="/:language/profilenameedit" element={ <Page page={PAGES.ProfileNameEdit}/>} />
-                  <Route path="/:language/profilehome" element={ <Page page={PAGES.ProfileHome}/>} />
-                  <Route path="/:language/checkyouremail" element={ <Page page={PAGES.CheckYourEmail}/>} />
-                  <Route path="/:language/completetwostepverification" element={ <Page page={PAGES.CompleteTwoStepVerification}/>} />
-                  <Route path="/:language/firstverifyitsyou" element={ <Page page={PAGES.FirstVerifyItsYou}/>} />
-                  <Route path="/:language/enternewemail" element={ <Page page={PAGES.EnterNewEmail}/>} />
-                  <Route path="/:language/profileYouMayUpdateName" element={ <Page page={PAGES.profileYouMayUpdateName}/>} />
-                  <Route path="/:language/enterNewPhoneNumber" element={ <Page page={PAGES.enterNewPhoneNumber}/>} />
-                  <Route path="/:language/youMayUpdateEmailAtOtherPlaces" element={ <Page page={PAGES.youMayUpdateEmailAtOtherPlaces}/>} />
+    const editLanguagePreferences = `/:language${NAVIGATION_LINKS.editLanguagePreferences}`;
+    const areYouSureEditYourLanguage = `/:language${NAVIGATION_LINKS.areYouSureEditYourLanguage}`;
+    const profileYouMayUpdateLanguage = `/:language${NAVIGATION_LINKS.profileYouMayUpdateLanguage}`;
+    const newPasswordPage = `/:language${NAVIGATION_LINKS.password}`;
+    return (
+        <Routes>
+            <Route element={<PrivateRoute />}>
+                <Route path="/" element={<Page page={PAGES.manageDashboard} />} />
+                <Route path="/:language" element={<Page page={PAGES.manageDashboard} />} />
+                <Route path="/:language/" element={<Page page={PAGES.manageDashboard} />} />
+                <Route path="/:language/profilenameedit" element={<Page page={PAGES.ProfileNameEdit} />} />
+                <Route path="/:language/profilehome" element={<Page page={PAGES.ProfileHome} />} />
+                <Route path="/:language/checkyouremail" element={<Page page={PAGES.CheckYourEmail} />} />
+                <Route path="/:language/completetwostepverification" element={<Page page={PAGES.CompleteTwoStepVerification} />} />
+                <Route path="/:language/firstverifyitsyou" element={<Page page={PAGES.FirstVerifyItsYou} />} />
+                <Route path="/:language/enternewemail" element={<Page page={PAGES.EnterNewEmail} />} />
+                <Route path="/:language/profileYouMayUpdateName" element={<Page page={PAGES.profileYouMayUpdateName} />} />
+                <Route path="/:language/areYouSureUpdateContactNumber" element={<Page page={PAGES.areYouSureUpdateContactNumber} />} />
+                <Route path="/:language/areYouSureEditYourName" element={<Page page={PAGES.areYouSureEditYourName} />} />
+                <Route path="/:language/enterNewPhoneNumber" element={<Page page={PAGES.enterNewPhoneNumber} />} />
+                <Route path="/:language/youMayUpdateEmailAtOtherPlaces" element={<Page page={PAGES.youMayUpdateEmailAtOtherPlaces} />} />
+                <Route path="/:language/areYouSureUpdateYourEmail" element={<Page page={PAGES.areYouSureUpdateYourEmail} />} />
+                <Route path="/:language/securitysettings" element={<Page page={PAGES.securitySettings} />} />
+                <Route path="/:language/verificationsetup" element={<Page page={PAGES.verificationSetUp} />} />
+                <Route path="/:language/selectverification" element={<Page page={PAGES.verificationSelection} />} />
+                <Route path="/:language/verification" element={<Page page={PAGES.verification} />} />
 
-                  <Route path="/:language/areYouSureUpdateYourEmail" element={ <Page page={PAGES.areYouSureUpdateYourEmail}/>} />
-              </Routes>
-          </UserProvider>
-      );
+                <Route element={<StepupPrivateRoute />}>
+                    <Route path={newPasswordPage} element={<Page page={PAGES.updatePassword} />} />
+                </Route>
+
+                <Route path={editLanguagePreferences} element={<Page page={PAGES.editLanguagePreferences} />} />
+                <Route path={areYouSureEditYourLanguage} element={<Page page={PAGES.areYouSureEditYourLanguage} />} />
+                <Route path={profileYouMayUpdateLanguage} element={<Page page={PAGES.profileYouMayUpdateLanguage} />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+            </Route>
+        </Routes>
+    );
 }
 export default App;

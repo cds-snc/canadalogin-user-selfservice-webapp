@@ -1,4 +1,6 @@
 import React from "react";
+import { useParams } from "react-router";
+
 import {
   GcdsContainer,
   GcdsHeading,
@@ -7,18 +9,25 @@ import {
   GcdsButton, GcdsGrid, GcdsLink
 } from "@cdssnc/gcds-components-react";
 import { getPageContent } from "../../utils/functions";
-import { PAGES } from "../../utils/constants";
-import { useParams } from "react-router";
+import { PAGES, NAVIGATION_LINKS, CONTEXT_ACTIONS } from "../../utils/constants";
+import { useUser } from "../Providers/useUser";
+import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
+
 
 export default function ProfileYouMayUpdateName() {
   const { language } = useParams();
+  const { state } = useUser();
   const pageContentJson = getPageContent(language, PAGES.profileYouMayUpdateName);
+  const navigateHelper = useNavigateHelper();
+  const backtoProfile = `/${language}${NAVIGATION_LINKS.profileHome}`;
 
+  const username = state?.userProfile?.name.formatted || "";
+  console.log("state", state)
   return (
     <GcdsContainer>
       <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle=' '>
         <GcdsText>
-          <strong>{pageContentJson["1"]}</strong>
+          <strong>{pageContentJson["1"]} {username}</strong>
         </GcdsText>
       </GcdsNotice>
       <GcdsHeading tag="h1">{pageContentJson["2"]}</GcdsHeading>
@@ -28,10 +37,16 @@ export default function ProfileYouMayUpdateName() {
       <GcdsText>{pageContentJson["9"]} <GcdsLink href="#" >{pageContentJson["10"]}</GcdsLink>{pageContentJson["11"]}</GcdsText>
 
       <GcdsGrid columns="auto auto" gap="1rem" align-items="center">
-        <GcdsButton style={{ width: 'fit-content' }}>
+        <GcdsButton style={{ width: 'fit-content' }} onGcdsClick={(ev) => {
+          ev.preventDefault();
+          navigateHelper(backtoProfile)
+        }}>
           {pageContentJson["6"]}
         </GcdsButton>&nbsp;
-        <GcdsButton buttonRole="secondary" style={{ width: 'fit-content' }}>
+        <GcdsButton buttonRole="secondary" style={{ width: 'fit-content' }} onGcdsClick={(ev) => {
+          ev.preventDefault();
+          navigateHelper(backtoProfile)
+        }}>
           {pageContentJson["7"]}
         </GcdsButton>
       </GcdsGrid>
