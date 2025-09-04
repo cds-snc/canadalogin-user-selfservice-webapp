@@ -1,16 +1,4 @@
 {
-    "Home": {
-        "1": "Connectez-vous",
-        "2": "Utilisez vôtre",
-        "3": "compte",
-        "4": "Qu’est-ce que Connexion GC?",
-        "5": "Connexion GC vous permet d’utiliser un seul compte et un seul mot de passe pour un accès sécurisé et privé aux programmes et services participants.",
-        "6": "Les programmes et services participants vous demanderont de créer un compte Connexion GC pour accéder à vos renseignements sur leur site Web ou application de manière sécurisée.",
-        "7": "Vous pouvez utiliser le même nom d’utilisateur et le même mot de passe pour accéder à tous les programmes et services utilisant Connexion GC.",
-        "8": "Adresse courriel",
-        "9": "Connexion GC",
-        "10": "pour continuer vers votre"
-    },
     "Password": {
         "1": "Votre adresse courriel a bien été vérifiée",
         "3": "Créer un mot de passe",

@@ -176,8 +176,6 @@ function setUserData(submitDataOptions:SubmitDataOptions, submitData: SubmitData
         case PAGES.signup:
             return  {...userData, email: submitData.email,
                 emailLanguage: submitData.language, trxnId: response.data.trxnId }
-        case PAGES.home:
-            return {...userData, email: submitData.email};
         case PAGES.password:
             if(submitDataOptions.flow===FLOW_TYPES.signUp)
                 return {...userData, passwordSubmitted: true, id: response.data.id};
@@ -204,8 +202,6 @@ function setUserData(submitDataOptions:SubmitDataOptions, submitData: SubmitData
 
 function validateObject(page: string, submitData:SubmitData, validateFunction: any) {
     switch(page){
-        case PAGES.home:
-            return  validateFunction(submitData.email);
         case PAGES.signup:
             return  validateFunction(submitData.email);
         case PAGES.password:
