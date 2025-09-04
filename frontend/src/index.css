@@ -1,30 +1,57 @@
 @import '@cdssnc/gcds-components-react/gcds.css';
 
-.gcds-main{
+.gcds-main {
     height: 100vh;
 }
+
 .gcds-page {
     align-items: center;
     flex: 1 0 auto;
 }
-html, body, .mainBody{
-    height:100vh;
+
+html,
+body,
+.mainBody {
+    height: 100vh;
 }
-body, .mainBody {
+
+body,
+.mainBody {
     font-family: system-ui, sans-serif;
     margin: auto;
-    display:flex;
-    flex-direction:column;
+    display: flex;
+    flex-direction: column;
 }
-.privacy-notice{
+
+.privacy-notice {
     padding-left: 3em;
 }
+
 .profile-home-gcds-container {
     padding: 0px 20px;
     border: 1px solid var(--colour-gray-300, #A8ADB4);
     border-radius: 10px
 }
 
+.gcds-top-nav {
+    background: var(--gcds-color-grayscale-50);
+}
+
+.gcds-top-nav-container {
+    display: flex;
+    height: 65px;
+    background: var(--gcds-color-grayscale-50);
+    justify-content: center;
+    align-items: center;
+}
+
+.gcds-top-nav-width-spacer {
+    display: flex;
+    width: 90%;
+    max-width: var(--gcds-header-container-max-width);
+    justify-content: space-between;
+    align-items: center;
+}
 
 @media screen and (max-width:767px) {
     .gcds-email-fieldset {
@@ -51,6 +78,10 @@ body, .mainBody {
     .gcds-content {
         align-items: center;
         gap: var(--gcds-spacing-350);
+    }
+
+    .gcds-top-nav-container {
+        height: 45px;
     }
 }
 
@@ -85,20 +116,20 @@ body, .mainBody {
     border: 1px solid var(--colour-gray-300, #A8ADB4);
     border-radius: 10px;
     margin-bottom: var(--gcds-spacing-300);
-  }
-  
-  .gridInline {
+}
+
+.gridInline {
     gap: var(--gcds-spacing-100);
     align-items: center;
-  }
-  
-  .separator {
+}
+
+.separator {
     border-bottom: 1px solid #A8ADB4;
     margin: var(--gcds-spacing-200) 0;
     width: 100%;
-  }
-  
-  .verifiedBadge {
+}
+
+.verifiedBadge {
     display: inline-flex;
     align-items: center;
     background: var(--colour-green-100, #E6F6EC);
@@ -106,7 +137,7 @@ body, .mainBody {
     height: 30px;
     border: 1px solid var(--colour-green-10, #E6F6EC);
     border-radius: 5px;
-  }
+}
 
 
 .dashboard-grid {
@@ -115,17 +146,18 @@ body, .mainBody {
     justify-items: center;
 }
 
-  .verifiedIcon {
+.verifiedIcon {
     color: var(--gcds-color-green-500);
-  }
-  
-  .verifiedText {
+}
+
+.verifiedText {
     width: 58px;
     height: 24px;
     margin-top: -6px;
     margin-left: -15px;
-  }
-  .verifiedBadgeBottom{
+}
+
+.verifiedBadgeBottom {
     margin-bottom: 20px;
   }
 
@@ -263,4 +295,23 @@ body, .mainBody {
 .warning-icon-red svg {
     fill: #FF0000 !important;
     color: #FF0000 !important;
+}
+=======
+}
+
+.loader-fixed-position {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    height: 100%;
+
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 9999;
 }

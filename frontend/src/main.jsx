@@ -13,8 +13,6 @@ import SessionManager from './services/SessionManager.jsx';
 import config from "./config.jsx";
 import { AppLanguageSetup } from './components/Providers/AppLanguageSetup';
 
-console.log('Starting React application...here');// Debug log
-
 ReactGA.initialize(config.gatag, {
     gaOptions: {
         anonymize_ip: true

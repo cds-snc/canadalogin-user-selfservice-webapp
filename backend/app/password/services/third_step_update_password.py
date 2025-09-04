@@ -13,6 +13,7 @@ from app.password.schemas import (
 )
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.request_error_handler import RequestErrorHandler
+from app.utils.schemas import ResponseModel
 
 logger = logging.getLogger(__name__)
 
@@ -39,15 +40,18 @@ async def third_step_update_password(
         response_json = password_otp_response.json()
 
         try:
-            CompleteUpdatePasswordIbmApiResponse(**response_json)
+            completed_response = CompleteUpdatePasswordIbmApiResponse(**response_json)
         except ValidationError as validation_error:
             logger.warning("Invalid API response schema: %s", validation_error.errors())
             raise HTTPException(status_code=422, detail="Invalid API response schema")
-        # To do: Since we get the userid back, we should verify that user session matches the userid returned from the api
 
         # Revoke and invalidate the session here
-        session.clear()
-        raise OAuthError("Invalid Session and Token")
+
+        return ResponseModel(
+            success=True,
+            data=completed_response,
+            message="Password changed successfully",
+        )
 
     except Exception as e:
         logger.error("Failed second_step_update_password", exc_info=True)

@@ -19,6 +19,7 @@ from urllib.parse import urlencode
 from redis.asyncio import Redis
 from typing import AsyncGenerator
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -69,7 +70,7 @@ async def redirect_user_to_idp_verify(request: Request):
         return await oauth.verify.authorize_redirect(request, callback_redirect_uri)
     except Exception as e:
         logger.exception("Unexpected error during redirect_to_verify", str(e))
-        RequestErrorHandler.handle(
+        raise RequestErrorHandler.handle(
             e, context="Unexpected error during idp redirect"
         )
 
@@ -101,6 +102,7 @@ async def callback_handler(request: Request):
             )
             # redirect back to IBM Verify to retry authentication
             raise OAuthError("Invalid or expired token") from error
+
         await update_session_tokens(request, oidc_response)
 
         # Get the handler and set your sid as session id. sid is unique session id from GC Sign-In
@@ -116,7 +118,7 @@ async def callback_handler(request: Request):
         raise OAuthError("Invalid or expired token") from error
     except Exception as e:
         logger.error(f"Unexpected error: {e}")
-        RequestErrorHandler.handle(
+        raise RequestErrorHandler.handle(
             e, context="Unexpected error during idp redirect"
         )
 
@@ -137,15 +139,19 @@ async def reauthenticate_user(request: Request, returnToPage: str = "/"):
         if oauth.verify is None:
             logger.error("OAuth verify client is not configured properly")
             raise HTTPException(status_code=500, detail="OAuth configuration error")
+        # if the user recently logged in, we can set the max age to 15 minutes
+        # will reautenticate after max age value
+        max_age_in_seconds = 900
+
         return await oauth.verify.authorize_redirect(
-            request, callback_redirect_uri, acr_values="update_password"
+            request, callback_redirect_uri, max_age=max_age_in_seconds
         )
     except OAuthError as error:
         logger.exception("Unexpected error during redirect_to_verify")
         raise OAuthError("Invalid or expired token") from error
     except Exception as e:
         logger.exception("Unexpected error during redirect_to_verify")
-        RequestErrorHandler.handle(e, context="Unexpected error")
+        raise RequestErrorHandler.handle(e, context="Unexpected error")
 
 
 async def backchannel_logout(request: Request):
@@ -320,3 +326,4 @@ async def session_event_sse_generator(request: Request):
             "X-Accel-Buffering": "no",  # Disable nginx buffering
         }
     )
+

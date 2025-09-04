@@ -7,6 +7,7 @@ logger = logging.getLogger(__name__)
 
 def register_oidc(config):
     verify_config = config.ibm_verify_config
+
     logger.info(f"Config Settings: {verify_config}")
     logger.info(
         f"IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID: {verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID}"

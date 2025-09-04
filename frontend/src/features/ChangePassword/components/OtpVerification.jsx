@@ -12,13 +12,10 @@ import { getPageContent } from '../../../utils/functions.jsx';
 import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 
 import {
-    AVAILABLE_LANGUAGES,
-    FLOW_TYPES, LINK_SUBMIT_TYPES,
+    FLOW_TYPES,
     NAVIGATION_LINKS, PAGES,
-    SERVICES, SUBMIT_END_POINTS
 } from "../../../utils/constants.jsx";
 import { useParams } from "react-router";
-import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 
 import { useUser } from "../../../components/Providers/useUser.tsx";
 
@@ -28,7 +25,6 @@ export default function OtpVerification({ step, totalSteps, onNext, userProfile,
     const { language } = useParams();
     const { state } = useUser();
 
-    const [requestNewCode, setRequestNewCode] = useState(false);
     const [codeRequested, setCodeRequested] = useState(false);
     const [displayTooManyRequestsError, setDisplayTooManyRequestsError] = useState(false);
 
@@ -42,6 +38,29 @@ export default function OtpVerification({ step, totalSteps, onNext, userProfile,
 
     // const error = getError('#verificationCode');
     const { id, userName } = userProfile ?? {};
+    const didFetch = useRef(false);
+    const fetchInProgress = (bool) => {
+        // in dev the component makes two requests
+        // this might not be needed when its built in a production environment
+        didFetch.current = bool;
+    }
+
+    const requestOtpCode = async () => {
+        try {
+            const response = await passwordUpdate.firstStep(userName, userSelectedMfaType.type);
+            if (response && response.success) {
+                setOtpSentResponse(response.data);
+            }
+        } catch (err) {
+            if (err === 429) {
+                setDisplayTooManyRequestsError(true);
+            }
+            setCodeRequested(false);
+            console.log('err', err)
+        } finally {
+            fetchInProgress(false);
+        }
+    };
 
 
     const validateOtpCode = async (userOtpValue) => {
@@ -72,36 +91,16 @@ export default function OtpVerification({ step, totalSteps, onNext, userProfile,
 
     }, [time]);
 
-    const didFetch = useRef(false);
-
     useEffect(() => {
-        const requestOtpCode = async () => {
-            if (didFetch.current) return;
-            didFetch.current = true;
-            try {
-                const response = await passwordUpdate.firstStep(userName, userSelectedMfaType.type);
-                if (response && response.success) {
-                    setOtpSentResponse(response.data)
-                }
-            } catch (err) {
-                if (err === 429) {
-                    setDisplayTooManyRequestsError(true);
-                }
-                console.log('err', err)
-            }
-        };
-
-        if (id) {
-            requestOtpCode();
-            setTime(initialTime);
-            setRequestNewCode(false);
-            setDisplayTooManyRequestsError(false);
-        }
-
-
-    }, [userName, userSelectedMfaType, requestNewCode, setOtpSentResponse, id]);
+        if (!id || didFetch.current) return;
+        fetchInProgress(true);
+        requestOtpCode();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [id]);
 
     const userMfaType = userSelectedMfaType.type;
+    const errorMessage = displayTooManyRequestsError ? errorPageJson['14'] : "";
+
     return (
         <GcdsContainer>
 
@@ -172,7 +171,7 @@ export default function OtpVerification({ step, totalSteps, onNext, userProfile,
                         name="verificationCode"
                         type="text"
                         validateOn="other"
-                        // errorMessage={error.errorMsg}
+                        errorMessage={errorMessage}
                         onGcdsInput={handleChange}
                         lang={language}
                         size="6"
@@ -224,8 +223,9 @@ export default function OtpVerification({ step, totalSteps, onNext, userProfile,
                         <span>{pageContentJson['14']}<strong> {time} {pageContentJson['15']}</strong></span>)
                         : (
                             <GcdsLink onGcdsClick={() => {
-                                setRequestNewCode(true);
+                                requestOtpCode();
                                 setCodeRequested(true);
+                                setTime(initialTime);
                             }
                             }>
                                 {userMfaType !== FLOW_TYPES.email ? pageContentJson['16'] : pageContentJson['26']}

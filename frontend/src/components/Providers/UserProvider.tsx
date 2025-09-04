@@ -161,6 +161,13 @@ function userReducer(state = initialState, action: Action) {
                 ...state,
                 authenticatedPages: [...state.authenticatedPages, action.payload]
             };
+        case CONTEXT_ACTIONS.remove_authenticated_page:
+            return {
+                ...state,
+                authenticatedPages: state.authenticatedPages.filter(
+                    (page) => page !== action.payload
+                ),
+            };
         default:
             return state;
     }
