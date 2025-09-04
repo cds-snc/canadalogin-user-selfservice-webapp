@@ -183,8 +183,6 @@ function setUserData(submitDataOptions:SubmitDataOptions, submitData: SubmitData
                 return {...userData, passwordSubmitted: true, id: response.data.id};
             return {...userData, otpType: response.data.otpType,
                 id: response.data.id, phone: response.data.phone, passwordValidated: true};
-        case PAGES.verificationSelection:
-            return {...userData, trxnId: response.data.trxnId};
         case PAGES.verificationSetUp:
             return  {
                 ...userData,

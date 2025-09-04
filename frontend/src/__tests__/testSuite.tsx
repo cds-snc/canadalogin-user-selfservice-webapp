@@ -159,8 +159,6 @@ const pageSetup = {
                 return ['9', '13', '14', '15', '16', '17', '18', '19'];
             case PAGES.privacy:
                 return ['11','25','27','42'];
-            case PAGES.verificationSelection:
-                return ['4', '5', '6','7'];
             case PAGES.coreProfile:
                 return ['1'];
             default:
@@ -196,8 +194,6 @@ const pageSetup = {
             case PAGES.verification:
                 return '20';
             case PAGES.privacy:
-                return '3';
-            case PAGES.verificationSelection:
                 return '3';
             default:
                 return null;

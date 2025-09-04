@@ -13,7 +13,6 @@ import SignUpEmail from "../components/SignUp/SignUpEmail.jsx";
 import CreateCoreProfile from "../components/SignUp/Profile/CreateCoreProfile.jsx";
 import Privacy from "../components/SignUp/Profile/Privacy.jsx";
 import VerificationSetUp from "../components/SignUp/TwoStepVerification/VerificationSetUp"
-import VerificationSelection from "../components/SignIn/VerificationSelection"
 import ManageDashboard from "../components/Manage/ManageDashboard.jsx";
 import { PAGES } from "../utils/constants";
 import { trackPage } from "../utils/gatag.jsx";
@@ -43,10 +42,6 @@ function PageContents({ page }: { page: string }) {
         case PAGES.verificationSetUp:
             return (
                 <VerificationSetUp />
-            );
-        case PAGES.verificationSelection:
-            return (
-                <VerificationSelection />
             );
         case PAGES.coreProfile:
             return (
