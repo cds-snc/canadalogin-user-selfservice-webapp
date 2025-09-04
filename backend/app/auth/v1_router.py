@@ -8,7 +8,7 @@ from app.auth.services.auth import (
     reauthenticate_user,
     backchannel_logout as backchannel_logout_service,
     logout_user,
-    session_event_sse_generator
+    session_event_sse_generator,
 )
 
 from app.auth.services.auth_user_session import (

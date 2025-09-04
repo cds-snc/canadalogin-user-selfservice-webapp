@@ -53,7 +53,9 @@ CONTACT_INFO = {
 
 redis_client = None
 if configuration.session_config.SESSION_STORE_TYPE.upper() == "REDISSTORE":
-    redis_client = Redis.from_url(configuration.session_config.SESSION_REDIS_URL or "redis://localhost:6379/0")
+    redis_client = Redis.from_url(
+        configuration.session_config.SESSION_REDIS_URL or "redis://localhost:6379/0"
+    )
     logger.info("Using RedisStore for session management")
 
 
@@ -72,7 +74,10 @@ async def lifespan(app: FastAPI):
     logger.info("Application startup complete")
     app.state.request_client = httpx.AsyncClient()
 
-    if configuration.session_config.SESSION_STORE_TYPE.upper() == "REDISSTORE" and redis_client is not None:
+    if (
+        configuration.session_config.SESSION_STORE_TYPE.upper() == "REDISSTORE"
+        and redis_client is not None
+    ):
         app.state.redis_client = redis_client
         logger.info("Using RedisStore for session management")
 
@@ -84,7 +89,10 @@ async def lifespan(app: FastAPI):
     logger.info("Closing global HTTP client")
     await app.state.request_client.aclose()
     logger.info("Shutting down IBM Verify Integration API")
-    if configuration.session_config.SESSION_STORE_TYPE.upper() == "REDISSTORE" and hasattr(app.state, 'redis_client'):
+    if (
+        configuration.session_config.SESSION_STORE_TYPE.upper() == "REDISSTORE"
+        and hasattr(app.state, "redis_client")
+    ):
         await app.state.redis_client.close()
         logger.info("Closing Redis client")
 
@@ -104,7 +112,10 @@ logger.info(f"ROOT_DOMAIN: {session_domain}")
 
 # Determine session store
 session_store = InMemoryStore()
-if configuration.session_config.SESSION_STORE_TYPE.upper() == "REDISSTORE" and redis_client is not None:
+if (
+    configuration.session_config.SESSION_STORE_TYPE.upper() == "REDISSTORE"
+    and redis_client is not None
+):
     session_store = RedisStore(connection=redis_client, prefix="session:", gc_ttl=600)
     logger.info("Using RedisStore for session management")
 

@@ -25,7 +25,9 @@ class IBMVerifyConfig(BaseSettings):
 
 class SessionConfig(BaseSettings):
     SESSION_STORE_TYPE: str
-    SESSION_SECRET: str = Field(..., description="Secret key for signing session cookies")
+    SESSION_SECRET: str = Field(
+        ..., description="Secret key for signing session cookies"
+    )
     SESSION_COOKIE_SECURE: bool = True
     SESSION_COOKIE_DOMAIN: Optional[str] = None
     SESSION_REDIS_URL: Optional[str] = None

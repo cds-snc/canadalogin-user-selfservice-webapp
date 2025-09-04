@@ -13,7 +13,13 @@ import jwt
 from fastapi import Response
 from app.utils.schemas import ResponseModel
 import httpx
-from app.auth.services.auth_user_session import get_user_info, update_session_tokens, get_session_by_session_id, remove_session_by_session_id, get_user_id_token
+from app.auth.services.auth_user_session import (
+    get_user_info,
+    update_session_tokens,
+    get_session_by_session_id,
+    remove_session_by_session_id,
+    get_user_id_token,
+)
 from app.utils.request_error_handler import RequestErrorHandler
 from urllib.parse import urlencode
 from redis.asyncio import Redis
@@ -25,12 +31,14 @@ logger = logging.getLogger(__name__)
 
 async def get_redis_client(request: Request) -> Redis:
     """Get Redis client from the app state."""
-    if hasattr(request.app.state, 'redis_client'):
+    if hasattr(request.app.state, "redis_client"):
         return request.app.state.redis_client
     else:
         # Fallback to creating a new Redis connection if not available
         config = get_configuration()
-        redis_url = config.session_config.SESSION_REDIS_URL or "redis://localhost:6379/0"
+        redis_url = (
+            config.session_config.SESSION_REDIS_URL or "redis://localhost:6379/0"
+        )
         return Redis.from_url(redis_url)
 
 
@@ -107,7 +115,7 @@ async def callback_handler(request: Request):
 
         # Get the handler and set your sid as session id. sid is unique session id from GC Sign-In
         handler = get_session_handler(request)
-        new_session_id = oidc_response.get('userinfo').get('sid')
+        new_session_id = oidc_response.get("userinfo").get("sid")
         handler.session_id = new_session_id
 
         logger.info("OIDC Callback Handler")
@@ -187,16 +195,18 @@ async def backchannel_logout(request: Request):
         decoded_token = jwt.decode(
             logout_token,
             key=jwks,
-            algorithms=["RS256"],   # Common algorithm for OIDC. Adjust if needed.
-            audience=config.IBM_VERIFY_API_CLIENT_ID,   # Your client ID
-            issuer=config.oidc_well_known_config.get("issuer"),   # IdP's issuer URL
-            options={"verify_signature": True}
+            algorithms=["RS256"],  # Common algorithm for OIDC. Adjust if needed.
+            audience=config.IBM_VERIFY_API_CLIENT_ID,  # Your client ID
+            issuer=config.oidc_well_known_config.get("issuer"),  # IdP's issuer URL
+            options={"verify_signature": True},
         )
         sid = decoded_token.get("sid")
 
         if not sid:
             logger.error("No 'sid' claim found in logout_token.")
-            raise HTTPException(status_code=400, detail="No 'sid' claim found in logout_token")
+            raise HTTPException(
+                status_code=400, detail="No 'sid' claim found in logout_token"
+            )
         # Get the handler and set your custom UUID
         handler = get_session_handler(request)
         # Remove the session associated with the 'sub'
@@ -239,7 +249,7 @@ async def logout_user(request: Request):
         params = {
             "id_token_hint": id_token,
             "post_logout_redirect_uri": post_logout_redirect_uri,
-            "ui_locales": locale
+            "ui_locales": locale,
         }
         redirect_url = f"{end_session_endpoint}?{urlencode(params)}"
 
@@ -265,7 +275,7 @@ async def logout_user(request: Request):
             domain=cookie_domain,
             secure=cookie_secure,
             httponly=True,
-            samesite="lax"
+            samesite="lax",
         )
 
         logger.info(f"Session cookies '{cookie_name}' expired during logout")
@@ -295,16 +305,24 @@ async def session_event_sse_generator(request: Request):
                     yield f"data: {json.dumps(message_data)}\n\n"
                     break
                 await asyncio.sleep(5)
-                session_data = await get_session_by_session_id(user_info.get("sid"), request)
-                if not session_data or not session_data.get(SessionKeys.SESSION_USER_INFO.value):
+                session_data = await get_session_by_session_id(
+                    user_info.get("sid"), request
+                )
+                if not session_data or not session_data.get(
+                    SessionKeys.SESSION_USER_INFO.value
+                ):
                     message_data = {"status": "terminated"}
                     yield f"data: {json.dumps(message_data)}\n\n"
                     break
                 else:
-                    session_metadata = session_data.get(SessionKeys.SESSION_METADATA.value)
+                    session_metadata = session_data.get(
+                        SessionKeys.SESSION_METADATA.value
+                    )
                     session_expire = config.session_config.SESSION_LIFETIME
                     if session_metadata:
-                        last_access = session_metadata.get(SessionKeys.SESSION_METADATA_LAST_ACCESS.value)
+                        last_access = session_metadata.get(
+                            SessionKeys.SESSION_METADATA_LAST_ACCESS.value
+                        )
                     if last_access:
                         session_expire = last_access + session_expire - 30
                     # Prepare message data with optional last_access info
@@ -314,7 +332,10 @@ async def session_event_sse_generator(request: Request):
             logger.info("SSE stream cancelled")
         except Exception as e:
             logger.error(f"Error in event stream: {str(e)}")
-            message_data = {"status": "error", "error": "An internal error has occurred."}
+            message_data = {
+                "status": "error",
+                "error": "An internal error has occurred.",
+            }
             yield f"data: {json.dumps(message_data)}\n\n"
 
     return StreamingResponse(
@@ -324,5 +345,5 @@ async def session_event_sse_generator(request: Request):
             "Cache-Control": "no-cache",
             "Connection": "keep-alive",
             "X-Accel-Buffering": "no",  # Disable nginx buffering
-        }
+        },
     )

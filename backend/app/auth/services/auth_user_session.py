@@ -100,7 +100,9 @@ async def get_user_id_token(request: Request):
     try:
         decoded_token = jwt.decode(id_token, options={"verify_signature": False})
         exp = decoded_token.get("exp")
-        if exp and exp < datetime.now().timestamp() + 60:  # If token expires in 1 minute
+        if (
+            exp and exp < datetime.now().timestamp() + 60
+        ):  # If token expires in 1 minute
             refresh_token = await get_user_refresh_token(request)
             if not refresh_token:
                 return None
@@ -132,7 +134,9 @@ async def refresh_id_token(refresh_token: str):
         if oauth.verify is None:
             logger.error("OAuth verify client is not configured properly")
             return None
-        new_tokens = await oauth.verify.fetch_access_token(refresh_token=refresh_token, grant_type="refresh_token")
+        new_tokens = await oauth.verify.fetch_access_token(
+            refresh_token=refresh_token, grant_type="refresh_token"
+        )
         return new_tokens
     except Exception as e:
         logger.error(f"Error refreshing token: {e}")
@@ -151,9 +155,15 @@ async def update_session_tokens(request: Request, new_tokens: dict):
     """
     Update the session with new tokens.
     """
-    request.session[SessionKeys.SESSION_USER_ACCESS_TOKEN_KEY.value] = new_tokens.get("access_token")
-    request.session[SessionKeys.SESSION_USER_ID_TOKEN_KEY.value] = new_tokens.get("id_token")
-    request.session[SessionKeys.SESSION_USER_REFRESH_TOKEN_KEY.value] = new_tokens.get("refresh_token")
+    request.session[SessionKeys.SESSION_USER_ACCESS_TOKEN_KEY.value] = new_tokens.get(
+        "access_token"
+    )
+    request.session[SessionKeys.SESSION_USER_ID_TOKEN_KEY.value] = new_tokens.get(
+        "id_token"
+    )
+    request.session[SessionKeys.SESSION_USER_REFRESH_TOKEN_KEY.value] = new_tokens.get(
+        "refresh_token"
+    )
     request.session[SessionKeys.SESSION_USER_INFO.value] = new_tokens.get("userinfo")
 
 
@@ -168,7 +178,9 @@ async def get_session_by_session_id(sessionid: str, request: Request):
             return None
         return handler.serializer.deserialize(data)
     except Exception as e:
-        logger.error(f"Error getting session by ID {sessionid}: {str(e)}", exc_info=True)
+        logger.error(
+            f"Error getting session by ID {sessionid}: {str(e)}", exc_info=True
+        )
         return None
 
 
@@ -176,11 +188,15 @@ async def remove_session_by_session_id(sessionid: str, request: Request):
     try:
         handler = get_session_handler(request)
         if handler.session_id != sessionid:
-            logger.warning(f"Session ID mismatch: handler session ID {handler.session_id} does not match provided session ID {sessionid}")
+            logger.warning(
+                f"Session ID mismatch: handler session ID {handler.session_id} does not match provided session ID {sessionid}"
+            )
             return
         # use Redis delete session data key = "session:{sessionid}"
         redis_key = f"session:{sessionid}"
         redis_client = request.app.state.redis_client
         await redis_client.delete(redis_key)
     except Exception as e:
-        logger.error(f"Error removing session by ID {sessionid}: {str(e)}", exc_info=True)
+        logger.error(
+            f"Error removing session by ID {sessionid}: {str(e)}", exc_info=True
+        )
