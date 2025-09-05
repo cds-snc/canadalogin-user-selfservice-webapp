@@ -9,7 +9,6 @@ from urllib.parse import urlencode
 from fastapi import Request, HTTPException, Response
 from fastapi.responses import RedirectResponse, StreamingResponse, JSONResponse
 from starsessions.session import get_session_handler
-from redis.asyncio import Redis
 from authlib.integrations.starlette_client import OAuthError
 
 from app.auth.services.oidc_config import oauth
@@ -28,19 +27,6 @@ from app.utils.request_error_handler import RequestErrorHandler
 
 
 logger = logging.getLogger(__name__)
-
-
-async def get_redis_client(request: Request) -> Redis:
-    """Get Redis client from the app state."""
-    if hasattr(request.app.state, "redis_client"):
-        return request.app.state.redis_client
-    else:
-        # Fallback to creating a new Redis connection if not available
-        config = get_configuration()
-        redis_url = (
-            config.session_config.SESSION_REDIS_URL or "redis://localhost:6379/0"
-        )
-        return Redis.from_url(redis_url)
 
 
 def get_base_profile_management_url():
@@ -112,7 +98,7 @@ async def callback_handler(request: Request):
             # redirect back to IBM Verify to retry authentication
             raise OAuthError("Invalid or expired token") from error
 
-        await update_session_tokens(request, oidc_response)
+        update_session_tokens(request, oidc_response)
 
         # Get the handler and set your sid as session id. sid is unique session id from GC Sign-In
         handler = get_session_handler(request)

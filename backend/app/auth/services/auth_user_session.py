@@ -78,7 +78,7 @@ async def get_users_current_session(request: Request):
     return user_access_token
 
 
-async def get_user_info(request: Request):
+def get_user_info(request: Request):
     """
     Get user info from session
     """
@@ -103,7 +103,7 @@ async def get_user_id_token(request: Request):
         if (
             exp and exp < datetime.now().timestamp() + 60
         ):  # If token expires in 1 minute
-            refresh_token = await get_user_refresh_token(request)
+            refresh_token = get_user_refresh_token(request)
             if not refresh_token:
                 return None
 
@@ -117,7 +117,7 @@ async def get_user_id_token(request: Request):
             userinfo = await oauth.verify.parse_id_token(new_tokens, None)
             new_tokens["userinfo"] = userinfo
 
-            await update_session_tokens(request, new_tokens)
+            update_session_tokens(request, new_tokens)
             return new_tokens.get("id_token")
     except jwt.PyJWTError as e:
         logger.error(f"Error decoding token: {e}")
@@ -143,7 +143,7 @@ async def refresh_id_token(refresh_token: str):
         return None
 
 
-async def get_user_refresh_token(request: Request):
+def get_user_refresh_token(request: Request):
     """
 
     Get user refresh token from session
@@ -151,7 +151,7 @@ async def get_user_refresh_token(request: Request):
     return request.session.get(SessionKeys.SESSION_USER_REFRESH_TOKEN_KEY.value)
 
 
-async def update_session_tokens(request: Request, new_tokens: dict):
+def update_session_tokens(request: Request, new_tokens: dict):
     """
     Update the session with new tokens.
     """

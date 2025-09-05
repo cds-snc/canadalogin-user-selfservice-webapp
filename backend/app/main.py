@@ -52,11 +52,11 @@ CONTACT_INFO = {
 }
 
 redis_client = None
-if configuration.session_config.SESSION_STORE_TYPE.upper() == "REDISSTORE":
-    redis_client = Redis.from_url(
-        configuration.session_config.SESSION_REDIS_URL or "redis://localhost:6379/0"
-    )
-    logger.info("Using RedisStore for session management")
+if (
+    configuration.session_config.SESSION_STORE_TYPE.upper() == "REDISSTORE"
+    and configuration.session_config.SESSION_REDIS_URL
+):
+    redis_client = Redis.from_url(configuration.session_config.SESSION_REDIS_URL)
 
 
 @asynccontextmanager
@@ -78,8 +78,11 @@ async def lifespan(app: FastAPI):
         configuration.session_config.SESSION_STORE_TYPE.upper() == "REDISSTORE"
         and redis_client is not None
     ):
-        app.state.redis_client = redis_client
-        logger.info("Using RedisStore for session management")
+        pong = await redis_client.ping()
+        if pong:
+            logger.info("Connected to Redis server successfully")
+            app.state.redis_client = redis_client
+            logger.info("Using RedisStore for session management")
 
     oidc_config.register_oidc(app.state.config)
     logger.info(f"CORS Origins: {app.state.config.cors_origins_list}")
