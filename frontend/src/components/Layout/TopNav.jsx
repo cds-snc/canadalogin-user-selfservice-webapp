@@ -11,6 +11,7 @@ import {
 import { useBreakpoints } from "../../hooks/useBreakpoints";
 import { getPageContent } from "../../utils/functions.jsx";
 import { useUser } from "../Providers/useUser";
+import { NAVIGATION_LINKS } from "../../utils/constants.jsx";
 
 export default function TopNav({ currentLang }) {
   const pageContentJson = getPageContent(currentLang, "TopNavBar");
@@ -27,10 +28,10 @@ export default function TopNav({ currentLang }) {
       <GcdsNavLink href={`/${currentLang}/`}>
         {pageContentJson["3"]}
       </GcdsNavLink>
-      <GcdsNavLink href={`/${currentLang}/profile-home`}>
+      <GcdsNavLink href={`/${currentLang}${NAVIGATION_LINKS.profileHome}`}>
         {pageContentJson["4"]}
       </GcdsNavLink>
-      <GcdsNavLink href={`/${currentLang}/security-settings`}>
+      <GcdsNavLink href={`/${currentLang}${NAVIGATION_LINKS.securitySettings}`}>
         {pageContentJson["5"]}
       </GcdsNavLink>
       {shouldRenderRelyingPartyLink && (
