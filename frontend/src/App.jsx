@@ -24,11 +24,11 @@ function App() {
           element={<Page page={PAGES.manageDashboard} />}
         />
         <Route
-          path="/:language/profilenameedit"
+          path="/:language/profile/update-name"
           element={<Page page={PAGES.ProfileNameEdit} />}
         />
         <Route
-          path="/:language/profilehome"
+          path="/:language/profile-home"
           element={<Page page={PAGES.ProfileHome} />}
         />
         <Route
@@ -48,7 +48,7 @@ function App() {
           element={<Page page={PAGES.EnterNewEmail} />}
         />
         <Route
-          path="/:language/profileYouMayUpdateName"
+          path="/:language/profile/update-name/success"
           element={<Page page={PAGES.profileYouMayUpdateName} />}
         />
         <Route
@@ -56,7 +56,7 @@ function App() {
           element={<Page page={PAGES.areYouSureUpdateContactNumber} />}
         />
         <Route
-          path="/:language/areYouSureEditYourName"
+          path="/:language/profile/update-name/confirm-update"
           element={<Page page={PAGES.areYouSureEditYourName} />}
         />
         <Route
@@ -72,7 +72,7 @@ function App() {
           element={<Page page={PAGES.areYouSureUpdateYourEmail} />}
         />
         <Route
-          path="/:language/securitysettings"
+          path="/:language/security-settings"
           element={<Page page={PAGES.securitySettings} />}
         />
         <Route
