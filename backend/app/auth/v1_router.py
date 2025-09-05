@@ -58,16 +58,6 @@ async def reauth(
 
 
 @router.get(
-    "/session",
-    tags=["Auth"],
-    summary="Get user session",
-    description="",
-)
-async def get_session(request: Request):
-    return get_users_current_session(request)
-
-
-@router.get(
     "/logout",
     tags=["Auth"],
     summary="Logout user",
@@ -92,7 +82,7 @@ async def backchannel_logout(request: Request):
     return await backchannel_logout_service(request)
 
 
-# Server Side Event check Redis pubsub channel "notification:{session id}", send SSE message
+# Server Side Event send session status message
 # return stream Event
 @router.get("/session-status")
 async def session_status(request: Request):

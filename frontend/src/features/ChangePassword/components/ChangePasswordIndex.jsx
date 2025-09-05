@@ -77,6 +77,15 @@ export default function ChangePasswordIndex() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    useEffect(() => {
+        return () => {
+            // when a user navigates away from this component, we remove the pathname from the array
+            // In the Private Route handler, we track the page to avoid a redirect loop to reautenticate the user
+            removeAuthenticatedPage(pathname);
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+    
     const steps = {
         otpSelection: (
             <OtpSelection

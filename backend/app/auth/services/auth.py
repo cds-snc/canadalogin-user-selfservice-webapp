@@ -1,18 +1,22 @@
 import asyncio
 import logging
 import json
-from fastapi import Request, HTTPException
+import jwt
+import httpx
+
+from typing import AsyncGenerator
+from urllib.parse import urlencode
+from fastapi import Request, HTTPException, Response
 from fastapi.responses import RedirectResponse, StreamingResponse, JSONResponse
+from starsessions.session import get_session_handler
+from redis.asyncio import Redis
 from authlib.integrations.starlette_client import OAuthError
+
 from app.auth.services.oidc_config import oauth
 from app.config import get_configuration
 from app.constants.session_keys import SessionKeys
 from app.utils.helpers import generate_error_response, string_error_response
-from starsessions.session import get_session_handler
-import jwt
-from fastapi import Response
 from app.utils.schemas import ResponseModel
-import httpx
 from app.auth.services.auth_user_session import (
     get_user_info,
     update_session_tokens,
@@ -21,9 +25,6 @@ from app.auth.services.auth_user_session import (
     get_user_id_token,
 )
 from app.utils.request_error_handler import RequestErrorHandler
-from urllib.parse import urlencode
-from redis.asyncio import Redis
-from typing import AsyncGenerator
 
 
 logger = logging.getLogger(__name__)
