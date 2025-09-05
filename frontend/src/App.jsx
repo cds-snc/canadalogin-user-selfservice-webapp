@@ -3,11 +3,6 @@ import {
   PrivateRoute,
   StepupPrivateRoute,
 } from "./components/Providers/PrivateRoute.jsx";
-import { Routes, Route, Navigate } from "react-router";
-import {
-  PrivateRoute,
-  StepupPrivateRoute,
-} from "./components/Providers/PrivateRoute.jsx";
 import Page from "./views/Page.js";
 import { PAGES, NAVIGATION_LINKS } from "./utils/constants.jsx";
 
