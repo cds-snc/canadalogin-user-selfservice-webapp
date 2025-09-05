@@ -98,71 +98,26 @@ const pageSetup = {
     },
     alreadyGc: (page:string, language:string, flow:string, type:string) =>{
         switch(page) {
-            case PAGES.home:
-                return language !== AVAILABLE_LANGUAGES.fr ? engJson["FirstTimeGc"] : frJson["FirstTimeGc"];
-            case PAGES.signup:
-                return language !== AVAILABLE_LANGUAGES.fr ? engJson["AlreadyGc"] : frJson["AlreadyGc"];
             case PAGES.verification:
-                if (flow === FLOW_TYPES.signUp && (type === FLOW_TYPES.email))
-                    return language !== AVAILABLE_LANGUAGES.fr ? engJson["AlreadyGc"] : frJson["AlreadyGc"];
-                else
-                    return null;
-            case PAGES.privacy:
-                return language !== AVAILABLE_LANGUAGES.fr ? engJson["AlreadyGc"] : frJson["AlreadyGc"];
+                return null;
             default:
                 return null;
         }
     },
-    stepper: (page: string, language: string, flow: string, type: string) => {
+    stepper: (page: string, flow: string, type: string) => {
         switch (page) {
-            case PAGES.signup:
-                return ['1', 'h1', '4', language];
-            case PAGES.password:
-                if(flow===FLOW_TYPES.signUp)
-                    return ['2', 'h1', '4', language];
-                else
-                    return null;
             case PAGES.verification:
-                if (flow === FLOW_TYPES.signUp)
-                    if (type === FLOW_TYPES.email)
-                        return ['1', 'h1', '4', language];
-                    else
-                        return ['3', 'h1', '4', language];
-                else
-                    return null;
-            case PAGES.verificationSetUp:
-                return ['3', 'h1', '4', language];
-            case PAGES.coreProfile:
-                return ['4', 'h1', '4', language];
+                return null;
             default:
                 return null;
         }
     },
     textKeysToNotSearch: (page: string, flow: string, type: string) => {
         switch (page) {
-            case PAGES.signup:
-                return ['3','4', '5', '6'];
             case PAGES.password:
-                if(flow===FLOW_TYPES.signUp)
-                    return ['2','10','11', '14','15','16','17','18','19'];
-                else
-                    return ['1','2','3','4','5','6','7','8','9','10','11','12','13'];
+                return ['1','2','3','4','5','6','7','8','9','10','11','12','13'];
             case PAGES.verification:
-                if(flow===FLOW_TYPES.signUp)
-                    if(type===FLOW_TYPES.email)
-                        return ['1','2','3','4','5','8','11','12','13','15','16','17','18','19','20','21','26'];
-                    else
-                        return ['11', '12', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26'];
-                else
-                    return ['11', '12', '13', '15', '16', '17', '22', '23', '24', '25', '26'];
-            case PAGES.verificationSetUp:
-                return ['9', '13', '14', '15', '16', '17', '18', '19'];
-            case PAGES.privacy:
-                return ['11','25','27','42'];
-            case PAGES.verificationSelection:
-                return ['4', '5', '6','7'];
-            case PAGES.coreProfile:
-                return ['1'];
+                return ['11', '12', '13', '15', '16', '17', '22', '23', '24', '25', '26'];
             default:
                 return [];
         }
@@ -186,69 +141,30 @@ const pageSetup = {
     },
     serviceKey: (page:string, flow:string) =>{
         switch(page){
-            case PAGES.home:
-                return '3';
             case PAGES.password:
-                if(flow===FLOW_TYPES.signUp)
-                    return null;
-                else
-                    return '16';
+                return '16';
             case PAGES.verification:
                 return '20';
-            case PAGES.privacy:
-                return '3';
-            case PAGES.verificationSelection:
-                return '3';
             default:
                 return null;
         }
     },
     gcdsMap:(language:string, page:string, pageContentJson:JSON, flow:string)=>{
         switch(page){
-            case PAGES.home:
-                return pageSetup.homePageGcdsMap(pageContentJson);
-            case PAGES.signup:
-                return pageSetup.signUpEmailGcdsMap(language, pageContentJson);
             case PAGES.password:
                 return pageSetup.passwordGcdsMap(flow, pageContentJson);
             case PAGES.verification:
                 return pageSetup.verificationGcdsMap(pageContentJson);
-            case PAGES.verificationSetUp:
-                return pageSetup.verificationSetUpGcdsMap(pageContentJson);
-            case PAGES.coreProfile:
-                return pageSetup.coreProfileSetUpGcdsMap(pageContentJson);
-            case PAGES.privacy:
-                return pageSetup.privacyGcdsMap(pageContentJson);
             case PAGES.manageDashboard:
                 return pageSetup.manageDashboardGcdsMap(pageContentJson);
             default:
                 return new Map();
         }
     },
-    homePageGcdsMap: (pageContentJson:JSON)=>{
-
-        const gcdsElementMap = new Map();
-        gcdsElementMap.set('4', ['gcds-details', createMap('gcds-details', [pageContentJson['4']])])
-        gcdsElementMap.set('8', ['gcds-input', createMap('gcds-input', ['email', pageContentJson[8], 'email', 'email', 'other'] )])
-
-        return gcdsElementMap;
-    },
-    signUpEmailGcdsMap: (language:string, pageContentJson:JSON)=>{
-
-        const gcdsElementMap = new Map();
-        gcdsElementMap.set('2', ['gcds-input', createMap('gcds-input', ['email', pageContentJson['2'], 'email', 'email', 'other'])]);
-
-        return gcdsElementMap;
-    },
     passwordGcdsMap: (flow:string, pageContentJson:JSON)=>{
 
         const gcdsElementMap = new Map();
-        gcdsElementMap.set('9', ['gcds-input', createMap('gcds-input2', ["input-password", pageContentJson['9'], 'password', "password", flow===FLOW_TYPES.signUp?pageContentJson['10']:''])]);
-
-        if(flow===FLOW_TYPES.signUp) {
-            gcdsElementMap.set('1', ['gcds-notice', createMap('gcds-notice', [pageContentJson['1'], 'h2', 'success'])]);
-            gcdsElementMap.set('7', ['gcds-details', createMap('gcds-details', [pageContentJson['7']])]);
-        }
+        gcdsElementMap.set('9', ['gcds-input', createMap('gcds-input2', ["input-password", pageContentJson['9'], 'password', "password", ''])]);
 
         return gcdsElementMap;
     },
@@ -257,26 +173,6 @@ const pageSetup = {
         const gcdsElementMap = new Map();
         gcdsElementMap.set('9', ['gcds-input', createMap('gcds-input', ["verificationCode", pageContentJson['9'], 'verificationCode', 'text', 'other'])]);
 
-        return gcdsElementMap;
-    },
-    verificationSetUpGcdsMap: (pageContentJson: JSON) => {
-
-        const gcdsElementMap = new Map();
-        gcdsElementMap.set('11', ['gcds-details', createMap('gcds-details', [pageContentJson['11']])])
-
-        return gcdsElementMap;
-    },
-    coreProfileSetUpGcdsMap: (pageContentJson: JSON) => {
-
-        const gcdsElementMap = new Map();
-        gcdsElementMap.set('7', ['gcds-input', createMap('gcds-input3', ["firstName", pageContentJson['7'], 'firstName', 'text'])]);
-        gcdsElementMap.set('8', ['gcds-input', createMap('gcds-input', ["lastName", pageContentJson['8'], 'lastName', 'text', 'other'])]);
-
-        return gcdsElementMap;
-    },
-    privacyGcdsMap: (pageContentJson: JSON) => {
-        const gcdsElementMap = new Map();
-        gcdsElementMap.set('23', ['gcds-details', createMap('gcds-details', [pageContentJson['23']])])
         return gcdsElementMap;
     },
     manageDashboardGcdsMap (pageContentJson: JSON) {
@@ -300,7 +196,7 @@ const testSuite = {
             langLink: link,
             buttonJson: pageSetup.button(page, language),
             alreadyGcJson: pageSetup.alreadyGc(page, language, flow, type),
-            stepper: pageSetup.stepper(page, language, flow, type),
+            stepper: pageSetup.stepper(page, flow, type),
             textKeysToNotSearch: pageSetup.textKeysToNotSearch(page, flow, type),
             isVoice: type === FLOW_TYPES.voice,
             smsTextKeys: pageSetup.smsTextKeys(page),
