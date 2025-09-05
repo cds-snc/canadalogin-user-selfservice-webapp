@@ -392,5 +392,14 @@
         "6": "GC Account directory.",
         "7": "Back to profile",
         "8": "Sign out"
+    },
+    "TopNavBar": {
+        "1": "Connexion GC",
+        "2": "Menu",
+        "3": "Compte Connexion GC",
+        "4": "Renseignements personnels",
+        "5": "Paramètres de sécurité",
+        "6": "Retour à ",
+        "7": "Se déconnecter"
     }
 }
