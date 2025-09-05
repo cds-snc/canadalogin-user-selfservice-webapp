@@ -56,7 +56,7 @@ async def third_step_update_password(
         logger.error("Failed second_step_update_password", exc_info=True)
         if isinstance(e, HTTPException):
             raise
-        RequestErrorHandler.handle(e, context="Second Step Password Update")
+        await RequestErrorHandler.handle(e, context="Second Step Password Update")
 
 
 async def dispatch_update_password(
@@ -94,4 +94,4 @@ async def dispatch_update_password(
         logger.error(f"Error dispatch_password_reset_otp: {str(e)}", exc_info=True)
         if isinstance(e, HTTPException):
             raise
-        RequestErrorHandler.handle(e, context="Third Step Password Update")
+        await RequestErrorHandler.handle(e, context="Third Step Password Update")

@@ -35,13 +35,11 @@ async def request_access_token(global_http_client: AsyncClient):
         )
         response.raise_for_status()
         logger.info("Request returned successfully")
-        logger.debug(f"Returning response of type: {type(response)}")
         return response
 
     except Exception as e:
         logger.error(f"Error requesting token: {str(e)}", exc_info=True)
         await RequestErrorHandler.handle(e)
-        raise
 
 
 async def get_admin_token(global_http_client: AsyncClient) -> str:

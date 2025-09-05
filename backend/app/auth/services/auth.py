@@ -43,7 +43,7 @@ async def redirect_user_to_idp_verify(request: Request):
         return await oauth.verify.authorize_redirect(request, callback_redirect_uri)
     except Exception as e:
         logger.exception("Unexpected error during redirect_to_verify", str(e))
-        raise RequestErrorHandler.handle(
+        await RequestErrorHandler.handle(
             e, context="Unexpected error during idp redirect"
         )
 
@@ -84,7 +84,7 @@ async def callback_handler(request: Request):
         raise OAuthError("Invalid or expired token") from error
     except Exception as e:
         logger.error(f"Unexpected error: {e}")
-        raise RequestErrorHandler.handle(
+        await RequestErrorHandler.handle(
             e, context="Unexpected error during idp redirect"
         )
 
@@ -113,4 +113,4 @@ async def reauthenticate_user(request: Request, returnToPage: str = "/"):
         raise OAuthError("Invalid or expired token") from error
     except Exception as e:
         logger.exception("Unexpected error during redirect_to_verify")
-        raise RequestErrorHandler.handle(e, context="Unexpected error")
+        await RequestErrorHandler.handle(e, context="Unexpected error")

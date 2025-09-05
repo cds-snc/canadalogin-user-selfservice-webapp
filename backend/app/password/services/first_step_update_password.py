@@ -58,7 +58,7 @@ async def first_step_update_password(
         logger.error("Failed first_step_update_password", exc_info=True)
         if isinstance(e, HTTPException):
             raise
-        RequestErrorHandler.handle(e, context="First Step Password Update")
+        await RequestErrorHandler.handle(e, context="First Step Password Update")
 
 
 async def dispatch_password_otp(
@@ -90,4 +90,4 @@ async def dispatch_password_otp(
 
     except Exception as e:
         logger.error(f"Error dispatch_password_reset_otp: {str(e)}", exc_info=True)
-        RequestErrorHandler.handle(e)
+        await RequestErrorHandler.handle(e)
