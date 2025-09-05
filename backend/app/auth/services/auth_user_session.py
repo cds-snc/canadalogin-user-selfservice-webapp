@@ -200,3 +200,4 @@ async def remove_session_by_session_id(sessionid: str, request: Request):
         logger.error(
             f"Error removing session by ID {sessionid}: {str(e)}", exc_info=True
         )
+        RequestErrorHandler.handle(e, context="remove server session")
