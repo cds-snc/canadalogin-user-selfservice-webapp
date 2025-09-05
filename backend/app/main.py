@@ -133,8 +133,8 @@ app.add_middleware(
     rolling=True,
     cookie_https_only=cookie_secure,
     lifetime=configuration.session_config.SESSION_LIFETIME,
-    cookie_domain=session_domain,
-    cookie_name="gc-manage-app",
+    cookie_domain=configuration.session_config.SESSION_COOKIE_DOMAIN,
+    cookie_name=configuration.session_config.SESSION_COOKIE_NAME,
 )
 
 
