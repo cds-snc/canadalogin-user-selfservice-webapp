@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - "frontend/**"
-      - ".github/workflows/test-build-push-app-to-S3"
+      - ".github/workflows/test-build-push-app-to-S3.yml"
   workflow_dispatch:
 
 env:
