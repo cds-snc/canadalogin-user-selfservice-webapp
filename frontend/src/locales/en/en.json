@@ -64,7 +64,8 @@
     "13": "characters.",
     "CSIAM0010E": "The authentication attempt failed",
     "CSIAM0011E": "The verification code is invalid or has expired.",
-    "CSIAM0038E": "Too Many Attempts"
+    "CSIAM0038E": "Too Many Attempts",
+    "CSIAI0021E": "The password that you specified was used previously, and it cannot be reused."
   },
   "RegisterVerification": {
     "1": "Protect your account with 2-step verification",

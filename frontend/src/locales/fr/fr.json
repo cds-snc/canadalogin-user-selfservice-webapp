@@ -63,7 +63,8 @@
     "13": "caractères.",
     "CSIAM0010E": "La tentative d'authentification a échoué",
     "CSIAM0011E": "Le code de vérification n'est pas valide ou a expiré.",
-    "CSIAM0038E": "Trop de tentatives"
+    "CSIAM0038E": "Trop de tentatives",
+    "CSIAI0021E": "Le mot de passe que vous avez spécifié a déjà été utilisé et ne peut pas être réutilisé."
   },
   "RegisterVerification": {
     "1": "Protégez votre compte avec la vérification en deux étapes",
