@@ -10,8 +10,8 @@ interface Action {
 }
 
 export interface UserProfile {
-    id?: string;
-    active?: boolean;
+    id: string;
+    active: boolean;
     details?: null | {
         emailVerified: boolean | null;
         lastLogin: string | null;
