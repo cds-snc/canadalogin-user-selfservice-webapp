@@ -47,6 +47,12 @@ vi.mock("../../../services/authService.jsx", () => ({
   updateUser: vi.fn().mockResolvedValue({ success: true }),
 }));
 
+// Mock the navigate helper
+const mockNavigateHelper = vi.fn();
+vi.mock("../../../hooks/useNavigate.tsx", () => ({
+  useNavigateHelper: () => mockNavigateHelper,
+}));
+
 const mockUserState = {
   isLoading: false,
   userProfile: {
@@ -133,6 +139,7 @@ const mockUserState = {
 describe("ProfileNameEdit Component", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockNavigateHelper.mockClear();
   });
 
   it("renders the profile name edit form", () => {
@@ -190,6 +197,36 @@ describe("ProfileNameEdit Component", () => {
     // Verify the input value changed
     await waitFor(() => {
       expect(firstNameInput).toBeInTheDocument();
+    });
+  });
+
+  it("clicking Continue button goes to confirmation page", async () => {
+    render(
+      <BrowserRouter>
+        <LanguageProvider>
+          <UserProvider initialUserState={mockUserState}>
+            <ProfileNameEdit />
+          </UserProvider>
+        </LanguageProvider>
+      </BrowserRouter>
+    );
+
+    const continueButton = screen.getByText("Continue");
+    
+    // Fill in the form with some data first
+    const firstNameInput = screen.getByTestId("givenName");
+    const lastNameInput = screen.getByTestId("familyName");
+    
+    fireEvent.change(firstNameInput, { target: { value: "Jane" } });
+    fireEvent.change(lastNameInput, { target: { value: "Smith" } });
+
+    // Find the form by its ID and trigger submit
+    const form = document.getElementById("form");
+    fireEvent.submit(form);
+
+    // Verify it navigates to the confirmation page
+    await waitFor(() => {
+      expect(mockNavigateHelper).toHaveBeenCalledWith("/en/profile/update-name/confirm-update");
     });
   });
 });
