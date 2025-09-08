@@ -1,13 +1,20 @@
+import asyncio
 import logging
+import json
+from typing import AsyncGenerator
 from fastapi import Request
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, StreamingResponse
 from authlib.integrations.starlette_client import OAuthError
 from starsessions.session import get_session_handler
 from app.auth.services.oidc_config import oauth
 from app.config import get_configuration
 from app.constants.session_keys import SessionKeys
 from app.utils.request_error_handler import RequestErrorHandler
-from app.auth.services.auth_user_session import update_session_tokens
+from app.auth.services.auth_user_session import (
+    update_session_tokens,
+    get_user_info,
+    get_session_by_session_id,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -120,3 +127,65 @@ async def reauthenticate_user(request: Request, returnToPage: str = "/"):
     except Exception as e:
         logger.exception("Unexpected error during redirect_to_verify")
         raise RequestErrorHandler.handle(e, context="Unexpected error")
+
+
+async def session_event_sse_generator(request: Request):
+    async def event_stream(request: Request) -> AsyncGenerator[str, None]:
+        """
+        Generate Server-Sent Events (SSE) for a user session.
+        """
+        try:
+            config = get_configuration()
+            while True:
+                if request._is_disconnected:
+                    logger.info("Client disconnected from SSE stream")
+                    break
+                user_info = get_user_info(request)
+                if user_info is None:
+                    logger.info("User not logged in")
+                    message_data = {"status": "non-authenticated"}
+                    yield f"data: {json.dumps(message_data)}\n\n"
+                    break
+                await asyncio.sleep(5)
+                session_data = await get_session_by_session_id(
+                    user_info.get("sid"), request
+                )
+                if not session_data or not session_data.get(
+                    SessionKeys.SESSION_USER_INFO.value
+                ):
+                    message_data = {"status": "terminated"}
+                    yield f"data: {json.dumps(message_data)}\n\n"
+                    break
+                else:
+                    session_metadata = session_data.get(
+                        SessionKeys.SESSION_METADATA.value
+                    )
+                    session_expire = config.session_config.SESSION_LIFETIME
+                    if session_metadata:
+                        last_access = session_metadata.get(
+                            SessionKeys.SESSION_METADATA_LAST_ACCESS.value
+                        )
+                    if last_access:
+                        session_expire = last_access + session_expire - 30
+                    # Prepare message data with optional last_access info
+                    message_data = {"status": "active", "expire": session_expire}
+                    yield f"data: {json.dumps(message_data)}\n\n"
+        except asyncio.CancelledError:
+            logger.info("SSE stream cancelled")
+        except Exception as e:
+            logger.error(f"Error in event stream: {str(e)}")
+            message_data = {
+                "status": "error",
+                "error": "An internal error has occurred.",
+            }
+            yield f"data: {json.dumps(message_data)}\n\n"
+
+    return StreamingResponse(
+        event_stream(request),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",  # Disable nginx buffering
+        },
+    )

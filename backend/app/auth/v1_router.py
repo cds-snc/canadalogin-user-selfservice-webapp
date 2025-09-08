@@ -6,6 +6,7 @@ from app.auth.services.auth import (
     redirect_user_to_idp_verify,
     callback_handler,
     reauthenticate_user,
+    session_event_sse_generator,
 )
 
 from app.auth.services.auth_user_session import (
@@ -52,3 +53,10 @@ async def reauth(
     user_access_token: None = Depends(get_users_current_session),
 ):
     return await reauthenticate_user(request, returnToPage)
+
+
+# Server Side Event send session status message
+# return stream Event
+@router.get("/session-status")
+async def session_status(request: Request):
+    return await session_event_sse_generator(request)
