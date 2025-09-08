@@ -5,6 +5,7 @@ import config from "../../../config.jsx";
 import {ACTION_TYPES, TEST_TYPES, TestDataUserProvider} from "./constants.jsx";
 import Page from "../../../views/Page.js";
 import {UserProvider} from "../../../components/Providers/UserProvider";
+import {LanguageProvider} from "../../../components/Providers/LanguageProvider.tsx";
 
 const stepErrorMessage = 'Verify error message is on Page.';
 const stepSuccessMessage = 'Verify success message is on Page.';
@@ -181,7 +182,7 @@ function buildRoutingParams(pathParams: PathParams, routingPath: { path: string 
 
 function buildMswMapping(mswArray:Array<MSW>){
 
-    let handlers = [];
+    let handlers: any[] = [];
     if(mswArray!=null)
         Object.keys(mswArray).forEach(key => {
             const msw = mswArray[key];
@@ -207,7 +208,13 @@ function buildMswMapping(mswArray:Array<MSW>){
 export const Template = (args:any) =>   {
     TestDataUserProvider.userData.phone = args.phone;
     TestDataUserProvider.userData.otpType = args.otpType;
-    return(<UserProvider initial={TestDataUserProvider}><Page page={args.page}/></UserProvider>);
+    return(
+        <UserProvider initial={TestDataUserProvider}>
+            <LanguageProvider>
+                <Page page={args.page}/>
+            </LanguageProvider>
+        </UserProvider>
+    );
 }
 
 
@@ -226,7 +233,12 @@ export const TestTemplate = (args:any) =>   {
     TestDataUserProvider.testData.email =  args.email;
 
     return (
-        <UserProvider initial={TestDataUserProvider}><Page page={args.page} /><button aria-label="test" type="submit"  form="form"></button></UserProvider>
+        <UserProvider initial={TestDataUserProvider}>
+            <LanguageProvider>
+                <Page page={args.page} />
+                <button aria-label="test" type="submit"  form="form"></button>
+            </LanguageProvider>
+        </UserProvider>
     )
 }
 

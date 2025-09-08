@@ -57,12 +57,6 @@ export interface UserState {
 interface UserProviderProps {
   children: ReactNode;
   initial?: UserState;
-  payload: any;
-}
-
-interface UserProviderProps {
-  children: ReactNode;
-  initial?: UserState;
 }
 
 const initialState: UserState = {

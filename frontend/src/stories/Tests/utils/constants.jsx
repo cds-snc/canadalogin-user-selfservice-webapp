@@ -12,7 +12,7 @@ export const TEST_PROTOTYPES = new Map([
                         desktopUrl: 'https://www.figma.com/proto/Et4mcEGQ92y1Fl7iu4y7is/Pilot-Usability-Test-Prototype?page-id=18%3A1005&node-id=37-1445&p=f&viewport=163%2C118%2C0.51&t=4EvuCHaprUKVeBwU-8&scaling=min-zoom&content-scaling=fixed&hotspot-hints=0&hide-ui=1'}]
 ]);
 export const TestDataUserProvider = {
-    isAuthenticated: false,
+    isLoading: false,
     userData: {
         service: SERVICES[0].title, //to be set later when url referrer is given, also need to refactor other pages to use this value
         language: 'en', //to be set later when refactoring possibly
@@ -29,6 +29,37 @@ export const TestDataUserProvider = {
         otpType: null,
         passwordValidated:false
     },
+    userProfile: {
+        id: "test-user-123",
+        active: true,
+        details: {
+            emailVerified: true,
+            lastLogin: "2025-09-08T12:00:00Z",
+            lastMFA: "2025-09-08T12:00:00Z",
+            twoFactorAuthentication: true,
+            pwdChangedTime: "2025-09-08T12:00:00Z"
+        },
+        emails: [{ value: "test@example.com", type: "primary" }],
+        phoneNumbers: [{ value: "+1234567890", type: "primary" }],
+        meta: {
+            created: "2025-09-08T12:00:00Z",
+            location: "test",
+            lastModified: "2025-09-08T12:00:00Z",
+            resourceType: "User"
+        },
+        userName: "testuser",
+        preferredLanguage: "en",
+        name: {
+            givenName: "Test",
+            familyName: "User",
+            formatted: "Test User"
+        }
+    },
+    editProfile: null,
+    urlLanguageBeforeEdit: null,
+    cancelProfileEditing: false,
+    relyingPartyInfo: null,
+    authenticatedPages: [],
     testData:{
         email: null,
         otp: null,
