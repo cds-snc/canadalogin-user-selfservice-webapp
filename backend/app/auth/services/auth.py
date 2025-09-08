@@ -6,7 +6,6 @@ from fastapi import Request
 from fastapi.responses import RedirectResponse, StreamingResponse
 from authlib.integrations.starlette_client import OAuthError
 from starsessions.session import get_session_handler, get_session_metadata
-from starsessions.session import get_session_handler, get_session_metadata
 from app.auth.services.oidc_config import oauth
 from app.config import get_configuration
 from app.constants.session_keys import SessionKeys
@@ -155,8 +154,10 @@ async def session_event_sse_generator(request: Request):
                 # Get session metadata
                 session_metadata = get_session_metadata(request)
                 last_access_timestamp = session_metadata.get("last_access")
-                session_expire = config.session_config.SESSION_LIFETIME + last_access_timestamp - 30
-  
+                session_expire = (
+                    config.session_config.SESSION_LIFETIME + last_access_timestamp - 30
+                )
+
                 # Prepare message data with optional last_access info
                 message_data = SSEventData(status="active", expire=int(session_expire))
                 yield f"data: {message_data.model_dump_json()}\n\n"
@@ -164,7 +165,9 @@ async def session_event_sse_generator(request: Request):
             logger.info("SSE stream cancelled")
         except Exception as e:
             logger.error(f"Error in event stream: {str(e)}")
-            message_data = SSEventData(status="error", error="An internal error has occurred.")
+            message_data = SSEventData(
+                status="error", error="An internal error has occurred."
+            )
             yield f"data: {message_data.model_dump_json()}\n\n"
 
     return StreamingResponse(
@@ -191,13 +194,15 @@ async def session_extend(request: Request):
         if user_info is None:
             session_status = KeepAliveData(status="non-authenticated", login=login_url)
             return ResponseModel(
-                success=False, message="User not authenticated", data=session_status)
+                success=False, message="User not authenticated", data=session_status
+            )
         # Get session ID from user info
         session_id = user_info.get("sid")
         if not session_id:
             session_status = KeepAliveData(status="non-authenticated", login=login_url)
             return ResponseModel(
-                success=False, message="User not authenticated", data=session_status)
+                success=False, message="User not authenticated", data=session_status
+            )
 
         # Get session metadata
         session_metadata = get_session_metadata(request)
@@ -207,7 +212,9 @@ async def session_extend(request: Request):
         current_time = time.time()
         twelve_hours_in_seconds = 12 * 60 * 60  # 43200 seconds
 
-        session_expire = config.session_config.SESSION_LIFETIME + last_access_timestamp - 30
+        session_expire = (
+            config.session_config.SESSION_LIFETIME + last_access_timestamp - 30
+        )
 
         # Check if session is older than 12 hours
         if current_time - created_timestamp > twelve_hours_in_seconds:
@@ -217,15 +224,18 @@ async def session_extend(request: Request):
 
             session_status = KeepAliveData(status="terminated", login=login_url)
             return ResponseModel(
-                success=False, message="Session terminated", data=session_status)
+                success=False, message="Session terminated", data=session_status
+            )
 
         # Session is valid, auto extend last access time
         session_status = KeepAliveData(status="active", expire=int(session_expire))
         return ResponseModel(
-            success=True, message="Session is active", data=session_status)
+            success=True, message="Session is active", data=session_status
+        )
 
     except Exception as e:
         logger.error(f"Error in keep_alive endpoint: {str(e)}", exc_info=True)
         session_status = KeepAliveData(status="error", login=login_url)
         return ResponseModel(
-            success=False, message="Error in keep_alive endpoint", data=session_status)
+            success=False, message="Error in keep_alive endpoint", data=session_status
+        )

@@ -62,6 +62,7 @@ async def reauth(
 async def session_status(request: Request):
     return await session_event_sse_generator(request)
 
+
 @router.get(
     "/keep-alive",
     tags=["Auth"],
@@ -70,4 +71,3 @@ async def session_status(request: Request):
 )
 async def keep_alive(request: Request):
     return await session_extend(request)
-    
