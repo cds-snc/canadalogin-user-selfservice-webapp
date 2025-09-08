@@ -39,7 +39,7 @@ jobs:
       - name: configure aws credentials using OIDC role
         uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
         with:
-          role-to-assume: arn:aws:iam::329599618423:role/github_action_push_S3
+          role-to-assume: arn:aws:iam::${{env.AWS_ACCOUNT_ID}}:role/github_action_push_S3
           role-session-name: GHPushAppS3
           aws-region: ${{ env.AWS_REGION }}
 
