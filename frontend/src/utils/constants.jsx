@@ -30,7 +30,8 @@ export const NAVIGATION_LINKS = {
     securitySettings: securitySettings,
     editLanguagePreferences: '/editlanguage',
     areYouSureEditYourLanguage: '/areYouSureEditYourLanguage',
-    profileYouMayUpdateLanguage: '/profileyoumayupdatelanguage'
+    profileYouMayUpdateLanguage: '/profileyoumayupdatelanguage',
+    updateContactPhoneNumber: "/profile/update-contact-phone-number",
 
 };
 export const OIDC_REDIRECT = {
@@ -95,7 +96,8 @@ export const PAGES = {
     editLanguagePreferences: 'EditLanguagePreferences',
     areYouSureEditYourLanguage: 'AreYouSureEditYourLanguage',
     profileYouMayUpdateLanguage: 'ProfileYouMayUpdateLanguage',
-    passwordChangedConfirmation: 'PasswordChangedConfirmation'
+    passwordChangedConfirmation: 'PasswordChangedConfirmation',
+    updateContactPhoneNumber: 'UpdateContactPhoneNumber',
 }
 
 export const FOOTERS = {

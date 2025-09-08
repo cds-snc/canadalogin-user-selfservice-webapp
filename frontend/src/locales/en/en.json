@@ -138,7 +138,9 @@
     "14": "English",
     "15": "Notifications",
     "16": "We will send account-related notifications to the email registered to your account.",
-    "17": "You may also receive notifications from services connected to your GC Sign in. You can manage those preferences in each service’s settings."
+    "17": "You may also receive notifications from services connected to your GC Sign in. You can manage those preferences in each service’s settings.",
+    "18": "No contact phone number has been added",
+    "19": "Add Phone Number"
   },
   "CheckYourEmail": {
     "1": "Check your email",
@@ -341,5 +343,19 @@
     "5": "Security settings",
     "6": "Return to ",
     "7": "Sign out"
+  },
+  "UpdateContactPhoneNumber": {
+    "1": "Enter a new phone number",
+    "2": "Two-step verification adds a second layer of security to your password.",
+    "3": "Learn more about two-step verification (opens in a new tab)",
+    "4": "Enter your phone number",
+    "5": "Enter the phone number you want to receive security codes at each time you sign in. We may also use this phone number to contact you about activity on your account.",
+    "6": "Read our",
+    "7": "privacy notice",
+    "8": "for more information on how we use your personal information.",
+    "9": "Country",
+    "10": "Phone number",
+    "11": "My country is not listed here",
+    "12": "Some countries are not supported due to technical limitations. If your country is not listed, you will be unable to create a GC Sign in account at this time. We apologize for the inconvenience."
   }
 }
