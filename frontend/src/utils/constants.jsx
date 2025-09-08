@@ -12,15 +12,8 @@ export const LANGUAGE_DISPLAY_NAMES = {
 };
 const securitySettings = '/securitysettings';
 export const NAVIGATION_LINKS = {
-    signUp: '/signup',
-    verifyEmail: '/signup/verification/email',
     password: `${securitySettings}/password`,
-    twoStepVerification: '/signup/verificationsetup',
     verification: '/verification',
-    coreProfile: '/signup/profile',
-    privacy: '/signup/privacy',
-    home: '/',
-    verificationSelection: '/signin/selectverification',
     manage: '/',
     ProfileNameEdit: '/ProfileNameEdit',
     profileHome: '/profilehome',
@@ -46,7 +39,6 @@ export const OIDC_REDIRECT = {
 }
 
 export const CONTEXT_ACTIONS = {
-    signUp: 'SIGN_UP',
     signIn: 'SIGN_IN',
     logOut: 'LOG_OUT',
     signin_success: 'SIGNIN_SUCCESS',
@@ -65,7 +57,6 @@ export const CONTEXT_ACTIONS = {
 };
 
 export const FLOW_TYPES = {
-    signUp: "signup",
     signIn: "signin",
     sms: "smsotp",
     voice: "voiceotp",
@@ -83,16 +74,10 @@ export const LINK_SUBMIT_TYPES = {
 export const FORM_FIELDS = ['email', 'language', 'verificationCode', 'password', 'phone', 'verificationType', 'firstName', 'lastName'];
 
 export const PAGES = {
-    signup: 'SignUpEmail',
     verification: 'Verification',
-    privacy: 'Privacy',
-    verificationSetUp: 'VerificationSetUp',
-    coreProfile: 'CreateCoreProfile',
     otpSelection: 'OtpSelection',
     password: "Password",
-    home: 'Home',
     error: 'Error',
-    verificationSelection: 'VerificationSelection',
     manageDashboard: 'ManageDashboard',
     ProfileHome: 'ProfileHome',
     CheckYourEmail: 'CheckYourEmail',

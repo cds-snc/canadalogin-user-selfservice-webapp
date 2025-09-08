@@ -41,8 +41,6 @@ export function useSubmit(submitDataOptions:SubmitDataOptions, validateFunction:
 
                     const response = await callAuthService(submitDataOptions, submitData, state.userData);
                     console.log("success....", response);
-                    const userData = setUserData(submitDataOptions, submitData, state.userData, response);
-                    await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
                     await callAnalytics(submitDataOptions, submitDataOptions.type+'_submit_success', GA_LABELS.button);
                     const navigateTo = setNavigateTo(submitDataOptions, response, submitData);
                     navigate(navigateTo);
@@ -173,18 +171,11 @@ export async function callAuthService(submitDataOptions:SubmitDataOptions, submi
 function setUserData(submitDataOptions:SubmitDataOptions, submitData: SubmitData, userData:any, response:any) {
 
     switch (submitDataOptions.page) {
-        case PAGES.signup:
-            return  {...userData, email: submitData.email,
-                emailLanguage: submitData.language, trxnId: response.data.trxnId }
-        case PAGES.home:
-            return {...userData, email: submitData.email};
         case PAGES.password:
             if(submitDataOptions.flow===FLOW_TYPES.signUp)
                 return {...userData, passwordSubmitted: true, id: response.data.id};
             return {...userData, otpType: response.data.otpType,
                 id: response.data.id, phone: response.data.phone, passwordValidated: true};
-        case PAGES.verificationSelection:
-            return {...userData, trxnId: response.data.trxnId};
         case PAGES.verificationSetUp:
             return  {
                 ...userData,
@@ -206,8 +197,6 @@ function setUserData(submitDataOptions:SubmitDataOptions, submitData: SubmitData
 
 function validateObject(page: string, submitData:SubmitData, validateFunction: any) {
     switch(page){
-        case PAGES.home:
-            return  validateFunction(submitData.email);
         case PAGES.signup:
             return  validateFunction(submitData.email);
         case PAGES.password:
