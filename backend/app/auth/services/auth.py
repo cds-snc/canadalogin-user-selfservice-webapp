@@ -6,6 +6,7 @@ from fastapi import Request
 from fastapi.responses import RedirectResponse, StreamingResponse
 from authlib.integrations.starlette_client import OAuthError
 from starsessions.session import get_session_handler, get_session_metadata
+from starsessions.session import get_session_handler, get_session_metadata
 from app.auth.services.oidc_config import oauth
 from app.config import get_configuration
 from app.constants.session_keys import SessionKeys
@@ -27,6 +28,9 @@ def get_base_profile_management_url():
 
     if config.ENVIRONMENT != "local":
         redirectValue = f"https://{config.PROFILE_MANAGEMENT_DOMAIN}"
+    else:
+        redirectValue = f"http://{config.PROFILE_MANAGEMENT_DOMAIN}"
+    return redirectValue
 
 
 def get_callback_redirect_uri(request: Request):
@@ -179,9 +183,9 @@ async def session_extend(request: Request):
     Check session metadata for expiration. If session is older than 12 hours,
     remove it and return termination status with login URL.
     """
-    login_url = f"/v1/auth/login"
+    config = get_configuration()
+    login_url = f"{get_base_profile_management_url()}"
     try:
-        config = get_configuration()
         # Get user info from current session
         user_info = get_user_info(request)
         if user_info is None:

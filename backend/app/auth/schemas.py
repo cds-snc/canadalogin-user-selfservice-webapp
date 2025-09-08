@@ -1,8 +1,6 @@
-from enum import Enum
 from typing import Optional
-from pydantic import BaseModel, Field, EmailStr, ConfigDict
-from app.utils.schemas import ResponseModel
-from pydantic_extra_types.phone_numbers import PhoneNumber
+from pydantic import BaseModel
+
 
 class KeepAliveData(BaseModel):
     status: str
