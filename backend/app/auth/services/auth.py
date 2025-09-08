@@ -2,10 +2,12 @@ import logging
 from fastapi import Request
 from fastapi.responses import RedirectResponse
 from authlib.integrations.starlette_client import OAuthError
+from starsessions.session import get_session_handler
 from app.auth.services.oidc_config import oauth
 from app.config import get_configuration
 from app.constants.session_keys import SessionKeys
 from app.utils.request_error_handler import RequestErrorHandler
+from app.auth.services.auth_user_session import update_session_tokens
 
 logger = logging.getLogger(__name__)
 
@@ -72,9 +74,13 @@ async def callback_handler(request: Request):
             )
             # redirect back to IBM Verify to retry authentication
             raise OAuthError("Invalid or expired token") from error
-        request.session[SessionKeys.SESSION_USER_ACCESS_TOKEN_KEY.value] = (
-            oidc_response.get("access_token")
-        )
+
+        # Get the handler and set your sid as session id. sid is unique session id from GC Sign-In
+        handler = get_session_handler(request)
+        new_session_id = oidc_response.get("userinfo").get("sid")
+        handler.session_id = new_session_id
+
+        update_session_tokens(request, oidc_response)
 
         logger.info("OIDC Callback Handler")
         logger.info(f"Redirect to PROFILE_MANAGEMENT_DOMAIN: {redirectValue}")

@@ -23,9 +23,26 @@ class IBMVerifyConfig(BaseSettings):
     )
 
 
+class SessionConfig(BaseSettings):
+    SESSION_STORE_TYPE: str
+    SESSION_SECRET: str = Field(
+        ..., description="Secret key for signing session cookies"
+    )
+    SESSION_COOKIE_SECURE: bool = True
+    SESSION_COOKIE_DOMAIN: Optional[str] = None
+    SESSION_REDIS_URL: Optional[str] = None
+    SESSION_COOKIE_NAME: str = "gc-manage-app"
+    SESSION_EXPIRY_COOKIE_NAME: str = "session-expiry"
+    SESSION_LIFETIME: int = 60 * 30  # default to 30 minutes in seconds
+    model_config = SettingsConfigDict(
+        env_file=".env", env_file_encoding="utf-8", extra="ignore", case_sensitive=True
+    )
+
+
 class Configuration(BaseSettings):
     app_info: AppInfo = AppInfo()
     ibm_verify_config: IBMVerifyConfig = IBMVerifyConfig()
+    session_config: SessionConfig = SessionConfig()
     ENVIRONMENT: str = Field(default="local")
     V1_API_VERSION: str = "/v1"
     ROOT_DOMAIN: Optional[str] = (
