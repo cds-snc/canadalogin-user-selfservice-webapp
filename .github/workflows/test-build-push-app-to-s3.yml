@@ -1,4 +1,4 @@
-name: DEV Build Push App to S3
+name: TEST Build Push App to S3
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - "frontend/**"
-      - ".github/workflows/dev-build-push-app-to-S3.yml"
+      - ".github/workflows/test-build-push-app-to-S3.yml"
   workflow_dispatch:
 
 env:
@@ -20,7 +20,7 @@ permissions:
 jobs:
   build-push:
     runs-on: ubuntu-latest
-    environment: "dev"
+    environment: "test"
 
     strategy:
       fail-fast: false
