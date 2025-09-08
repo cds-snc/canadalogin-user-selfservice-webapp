@@ -143,7 +143,6 @@ export const GA_CATEGORIES = {
 };
 
 export const GA_ACTIONS = {
-  clickFirstTimeGc: "Clicked FirstTimeGC -> Privacy",
 };
 
 export const GA_LABELS = {

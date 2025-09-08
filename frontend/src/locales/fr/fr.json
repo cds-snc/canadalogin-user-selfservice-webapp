@@ -19,10 +19,6 @@
         "18": "Use a different email",
         "19": "I forgot my password"
     },
-    "FirstTimeGc": {
-        "1": "Pas de compte Connexion GC?",
-        "2": "Créer un compte"
-    },
     "Error": {
         "1": "Un problème est survenu",
         "2": "Adresse courriel invalide. L’adresse courriel doit contenir un symbole « @ » suivi d’un domaine.",

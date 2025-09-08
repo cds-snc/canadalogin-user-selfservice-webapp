@@ -20,10 +20,6 @@
     "18": "Use a different email",
     "19": "I forgot my password"
   },
-  "FirstTimeGc": {
-    "1": "First time using GC Sign in?",
-    "2": "Sign up"
-  },
   "Error": {
     "1": "There was a problem",
     "2": "Invalid email. Email must contain an ‘@’ symbol followed by a domain.",
