@@ -1,11 +1,10 @@
 import asyncio
 import logging
-import json
 from typing import AsyncGenerator
 from fastapi import Request
 from fastapi.responses import RedirectResponse, StreamingResponse
 from authlib.integrations.starlette_client import OAuthError
-from starsessions.session import get_session_handler
+from starsessions.session import get_session_handler, get_session_metadata
 from app.auth.services.oidc_config import oauth
 from app.config import get_configuration
 from app.constants.session_keys import SessionKeys
@@ -13,8 +12,8 @@ from app.utils.request_error_handler import RequestErrorHandler
 from app.auth.services.auth_user_session import (
     update_session_tokens,
     get_user_info,
-    get_session_by_session_id,
 )
+from app.auth.schemas import SSEventData
 
 logger = logging.getLogger(__name__)
 
@@ -145,42 +144,28 @@ async def session_event_sse_generator(request: Request):
                 user_info = get_user_info(request)
                 if user_info is None:
                     logger.info("User not logged in")
-                    message_data = {"status": "non-authenticated"}
-                    yield f"data: {json.dumps(message_data)}\n\n"
+                    message_data = SSEventData(status="non-authenticated")
+                    yield f"data: {message_data.model_dump_json()}\n\n"
                     break
                 await asyncio.sleep(5)
-                session_data = await get_session_by_session_id(
-                    user_info.get("sid"), request
+                # Get session metadata
+                session_metadata = get_session_metadata(request)
+                last_access_timestamp = session_metadata.get("last_access")
+                session_expire = (
+                    config.session_config.SESSION_LIFETIME + last_access_timestamp - 30
                 )
-                if not session_data or not session_data.get(
-                    SessionKeys.SESSION_USER_INFO.value
-                ):
-                    message_data = {"status": "terminated"}
-                    yield f"data: {json.dumps(message_data)}\n\n"
-                    break
-                else:
-                    session_metadata = session_data.get(
-                        SessionKeys.SESSION_METADATA.value
-                    )
-                    session_expire = config.session_config.SESSION_LIFETIME
-                    if session_metadata:
-                        last_access = session_metadata.get(
-                            SessionKeys.SESSION_METADATA_LAST_ACCESS.value
-                        )
-                    if last_access:
-                        session_expire = last_access + session_expire - 30
-                    # Prepare message data with optional last_access info
-                    message_data = {"status": "active", "expire": session_expire}
-                    yield f"data: {json.dumps(message_data)}\n\n"
+
+                # Prepare message data with optional last_access info
+                message_data = SSEventData(status="active", expire=int(session_expire))
+                yield f"data: {message_data.model_dump_json()}\n\n"
         except asyncio.CancelledError:
             logger.info("SSE stream cancelled")
         except Exception as e:
             logger.error(f"Error in event stream: {str(e)}")
-            message_data = {
-                "status": "error",
-                "error": "An internal error has occurred.",
-            }
-            yield f"data: {json.dumps(message_data)}\n\n"
+            message_data = SSEventData(
+                status="error", error="An internal error has occurred."
+            )
+            yield f"data: {message_data.model_dump_json()}\n\n"
 
     return StreamingResponse(
         event_stream(request),
