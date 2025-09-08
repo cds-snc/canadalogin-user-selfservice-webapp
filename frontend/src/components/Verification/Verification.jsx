@@ -5,7 +5,6 @@ import {
     GcdsText
 } from "@cdssnc/gcds-components-react";
 import {getPageContent, isCodeValid} from '../../utils/functions.jsx';
-import AlreadyGc from "../Layout/AlreadyGc.jsx";
 import {
     AVAILABLE_LANGUAGES,
     FLOW_TYPES, LINK_SUBMIT_TYPES,
@@ -211,7 +210,6 @@ export default function Verification() {
                         {type!==FLOW_TYPES.email?pageContentJson['16']:pageContentJson['26']}
                     </GcdsLink>):""}
             </GcdsText>
-            {flow===FLOW_TYPES.signUp&&type===FLOW_TYPES.email&&(<AlreadyGc currentLang={language}/>)}
         </GcdsContainer>
     )
 }

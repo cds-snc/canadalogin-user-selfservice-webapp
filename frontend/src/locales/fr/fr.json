@@ -23,10 +23,6 @@
         "1": "Pas de compte Connexion GC?",
         "2": "Créer un compte"
     },
-    "AlreadyGc": {
-        "1": "Vous utilisez déjà Connexion GC?",
-        "2": "Se connecter"
-    },
     "Error": {
         "1": "Un problème est survenu",
         "2": "Adresse courriel invalide. L’adresse courriel doit contenir un symbole « @ » suivi d’un domaine.",
