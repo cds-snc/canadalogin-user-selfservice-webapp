@@ -15,14 +15,14 @@ export default {
 
 export const English = Template.bind({});
 English.parameters = buildTestCase.parameters(
-    NAVIGATION_LINKS.profileYouMayUpdateName, 
+    NAVIGATION_LINKS.profileUpdateNameSuccess, 
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.profile },  
     null
 );
 
 export const French = Template.bind({});
 French.parameters = buildTestCase.parameters(
-    NAVIGATION_LINKS.profileYouMayUpdateName, 
+    NAVIGATION_LINKS.profileUpdateNameSuccess, 
     { language: AVAILABLE_LANGUAGES.fr, flow: FLOW_TYPES.profile }, 
     null
 );

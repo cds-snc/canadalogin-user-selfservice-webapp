@@ -24,7 +24,7 @@ export default function SecuritySettings() {
     const { state } = useUser();
     const lastPasswordChange = state?.userProfile?.details?.pwdChangedTime || "";
     const formattedPasswordChangeDate = format(new Date(lastPasswordChange), 'MMMM d, yyyy');
-    const passwordPage = `/${language}${NAVIGATION_LINKS.password}`;
+    const passwordPage = `/${language}${NAVIGATION_LINKS.securitySettingsUpdatePassword}`;
 
     return (
         <GcdsContainer>

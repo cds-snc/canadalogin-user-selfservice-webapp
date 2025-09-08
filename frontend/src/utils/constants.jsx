@@ -11,25 +11,25 @@ export const LANGUAGE_DISPLAY_NAMES = {
   "fr-ca": "French",
 };
 export const NAVIGATION_LINKS = {
-  password: `/security-settings/update-password`,
-  verification: "/verification",
   manage: "/",
-  ProfileNameEdit: "/profile/update-name",
-  profileHome: "/profile-home",
+  securitySettings: "/security-settings",
+  securitySettingsUpdatePassword: `/security-settings/update-password`,
+  verification: "/verification",
   checkYourEmail: "/checkyouremail",
   completeTwoStepVerification: "/completetwostepverification",
   firstVerifyItsYou: "/firstverifyitsyou",
   enterNewEmail: "/enternewemail",
-  profileYouMayUpdateName: "/profile/update-name/success",
-  areYouSureEditYourName: "/profile/update-name/confirm-update",
   areYouSureUpdateContactNumber: "/areYouSureUpdateContactNumber",
   enterNewPhoneNumber: "/enterNewPhoneNumber",
   youMayUpdateEmailAtOtherPlaces: "/youMayUpdateEmailAtOtherPlaces",
   areYouSureUpdateYourEmail: "/areYouSureUpdateYourEmail",
-  securitySettings: "/security-settings",
-  editLanguagePreferences: "/profile/update-language/",
-  areYouSureEditYourLanguage: "/profile/update-language/confirm-update",
-  profileYouMayUpdateLanguage: "/profile/update-language/success",
+  profileHome: "/profile-home",
+  profileUpdateName: "/profile/update-name",
+  profileUpdateNameSuccess: "/profile/update-name/success",
+  profileUpdateNameConfirmUpdate: "/profile/update-name/confirm-update",
+  profileUpdateLanguage: "/profile/update-language/",
+  profileUpdateLanguageConfirmUpdate: "/profile/update-language/confirm-update",
+  profileUpdateLanguageSuccess: "/profile/update-language/success",
 };
 export const OIDC_REDIRECT = {
   login: `${config.apiUrl}/v1/auth/login`,
@@ -135,8 +135,7 @@ export const GA_CATEGORIES = {
   pageView: "pageview",
 };
 
-export const GA_ACTIONS = {
-};
+export const GA_ACTIONS = {};
 
 export const GA_LABELS = {
   button: "Button",

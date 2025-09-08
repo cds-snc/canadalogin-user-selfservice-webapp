@@ -21,7 +21,7 @@ export default function ProfileNameEdit() {
     const pageNameEditJson = getPageContent(language, PAGES.ProfileNameEdit);
     const navigateHelper = useNavigateHelper();
     const { cloneUserProfile, updateClonedProfile } = userProfileDispatch(dispatch);
-    const confirmation = `/${language}${NAVIGATION_LINKS.areYouSureEditYourName}`;
+    const confirmation = `/${language}${NAVIGATION_LINKS.profileUpdateNameConfirmUpdate}`;
     const backtoProfile = `/${language}${NAVIGATION_LINKS.profileHome}`;
     const [editProfile, setEditProfile] = useState({ ...state.editProfile });
 

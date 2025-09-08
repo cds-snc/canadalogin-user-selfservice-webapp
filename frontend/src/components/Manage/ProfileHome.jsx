@@ -96,8 +96,8 @@ export default function ProfileHome() {
   const phoneNumbers = state?.userProfile?.phoneNumbers;
   const preferredLanguage = state?.userProfile?.preferredLanguage || "";
 
-  const editProfile = `/${language}${NAVIGATION_LINKS.ProfileNameEdit}`;
-  const editLanguagePreferences = `/${language}${NAVIGATION_LINKS.editLanguagePreferences}`;
+  const editProfile = `/${language}${NAVIGATION_LINKS.profileUpdateName}`;
+  const editLanguagePreferences = `/${language}${NAVIGATION_LINKS.profileUpdateLanguage}`;
 
   return (
     <GcdsContainer>

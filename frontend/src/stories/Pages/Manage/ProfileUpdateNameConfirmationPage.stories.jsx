@@ -16,14 +16,14 @@ export default {
 // Basic display stories
 export const English = Template.bind({});
 English.parameters = buildTestCase.parameters(
-    NAVIGATION_LINKS.areYouSureEditYourName, 
+    NAVIGATION_LINKS.profileUpdateNameConfirmUpdate, 
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.profile },  
     null
 );
 
 export const French = Template.bind({});
 French.parameters = buildTestCase.parameters(
-    NAVIGATION_LINKS.areYouSureEditYourName, 
+    NAVIGATION_LINKS.profileUpdateNameConfirmUpdate, 
     { language: AVAILABLE_LANGUAGES.fr, flow: FLOW_TYPES.profile }, 
     null
 );
@@ -35,7 +35,7 @@ ConfirmNameChangeEnglish.args = {
     lastName: "Doe"
 };
 ConfirmNameChangeEnglish.parameters = buildTestCase.parameters(
-    NAVIGATION_LINKS.areYouSureEditYourName,
+    NAVIGATION_LINKS.profileUpdateNameConfirmUpdate,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.profile },
     null
 );
@@ -46,7 +46,7 @@ ConfirmNameChangeFrench.args = {
     lastName: "Dupont"
 };
 ConfirmNameChangeFrench.parameters = buildTestCase.parameters(
-    NAVIGATION_LINKS.areYouSureEditYourName,
+    NAVIGATION_LINKS.profileUpdateNameConfirmUpdate,
     { language: AVAILABLE_LANGUAGES.fr, flow: FLOW_TYPES.profile },
     null
 );

@@ -21,7 +21,7 @@ export default function AreYouSureEditYourName() {
   const { clearEditProfile, updateProfileSuccess } = userProfileDispatch(dispatch);
   const pageContentJson = getPageContent(language, PAGES.areYouSureEditYourName);
   const navigateHelper = useNavigateHelper();
-  const successPage = `/${language}${NAVIGATION_LINKS.profileYouMayUpdateName}`;
+  const successPage = `/${language}${NAVIGATION_LINKS.profileUpdateNameSuccess}`;
   const backtoProfile = `/${language}${NAVIGATION_LINKS.profileHome}`;
 
   const username = state?.editProfile?.name.formatted || "";
