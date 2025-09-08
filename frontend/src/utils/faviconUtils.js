@@ -32,33 +32,13 @@ export const restoreDefaultFavicon = () => {
  * Changes favicon to a warning/alert icon (red triangle with white exclamation mark)
  */
 export const setWarningFavicon = () => {
-  // Create a red triangle with white exclamation mark favicon using canvas
-  const canvas = document.createElement('canvas');
-  canvas.width = 32;
-  canvas.height = 32;
-  const ctx = canvas.getContext('2d');
-  
-  // Clear canvas with transparent background
-  ctx.clearRect(0, 0, 32, 32);
-  
-  // Red triangle background
-  ctx.fillStyle = '#FF0000';
-  ctx.beginPath();
-  ctx.moveTo(16, 2);    // Top vertex
-  ctx.lineTo(30, 28);   // Bottom right vertex
-  ctx.lineTo(2, 28);    // Bottom left vertex
-  ctx.closePath();
-  ctx.fill();
-  
-  // White exclamation mark - main body
-  ctx.fillStyle = '#FFFFFF';
-  ctx.fillRect(14, 8, 4, 12);  // Vertical line of exclamation mark
-  
-  // White exclamation mark - dot
-  ctx.beginPath();
-  ctx.arc(16, 24, 2, 0, 2 * Math.PI);
-  ctx.fill();
-  
-  // Convert canvas to data URL and set as favicon
-  changeFavicon(canvas.toDataURL());
+  // Use a FontAwesome SVG warning icon as favicon
+  // Example uses the FontAwesome exclamation-triangle SVG path
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width="32" height="32">
+      <path fill="#FF0000" d="M569.517 440.13L327.4 49.98c-18.2-29.2-60.6-29.2-78.8 0L6.483 440.13C-12.2 469.3 9.8 512 48.9 512h478.2c39.1 0 61.1-42.7 42.4-71.87zM288 392c-17.7 0-32-14.3-32-32s14.3-32 32-32 32 14.3 32 32-14.3 32-32 32zm32-112c0 8.8-7.2 16-16 16h-32c-8.8 0-16-7.2-16-16v-96c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v96z"/>
+    </svg>
+  `;
+  const svgUrl = 'data:image/svg+xml;base64,' + btoa(svg);
+  changeFavicon(svgUrl);
 };

@@ -220,7 +220,7 @@ async def logout_user(request: Request):
             logger.error("No id_token found in session during logout.")
             raise HTTPException(status_code=400, detail="No id_token found in session")
 
-        user_info = await get_user_info(request)
+        user_info = get_user_info(request)
         # Clear the session
         # request.session.clear()
         # Remove the session associated with the 'sid'
@@ -285,7 +285,7 @@ async def session_event_sse_generator(request: Request):
                 if request._is_disconnected:
                     logger.info("Client disconnected from SSE stream")
                     break
-                user_info = await get_user_info(request)
+                user_info = get_user_info(request)
                 if user_info is None:
                     logger.info("User not logged in")
                     message_data = {"status": "non-authenticated"}
