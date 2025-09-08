@@ -13,6 +13,7 @@ vi.mock("react-router", async () => {
   return {
     ...actual,
     useNavigate: () => mockNavigate,
+    useParams: () => ({ language: "en" }),
   };
 });
 
@@ -44,24 +45,6 @@ vi.mock("../../../services/authService.jsx", () => ({
     },
   }),
   updateUser: vi.fn().mockResolvedValue({ success: true }),
-}));
-
-// Mock functions
-vi.mock("../../../utils/functions.jsx", () => ({
-  getPageContent: vi.fn().mockReturnValue({
-    1: "Service information",
-    2: "First name",
-    3: "Last name",
-    4: "Cancel",
-    5: "Edit your name",
-    6: "This will update your name with ",
-    7: "every service you have shared your name with through GC Sign in.",
-    8: "The following services have access to your name through GC Sign in:",
-    9: "GEO.ca",
-    10: "If you are trying to update your name with a service that's not connected to GC Sign in, you'll need to go to that account.",
-    11: "To search for another GC Account, visit the",
-    12: "GC Account directory",
-  }),
 }));
 
 const mockUserState = {
@@ -162,10 +145,11 @@ describe("ProfileNameEdit Component", () => {
         </LanguageProvider>
       </BrowserRouter>
     );
-
     expect(screen.getByText(/edit your name/i)).toBeInTheDocument();
     expect(screen.getByTestId("givenName")).toBeInTheDocument();
     expect(screen.getByTestId("familyName")).toBeInTheDocument();
+    expect(screen.getByText(/Cancel/i)).toBeInTheDocument();
+    expect(screen.getByText(/Continue/i)).toBeInTheDocument();
   });
 
   it("pre-fills form with existing user data", async () => {
