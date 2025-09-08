@@ -25,6 +25,8 @@ def get_base_profile_management_url():
 
     if config.ENVIRONMENT != "local":
         redirectValue = f"https://{config.PROFILE_MANAGEMENT_DOMAIN}"
+    else:
+        redirectValue = f"http://{config.PROFILE_MANAGEMENT_DOMAIN}"
     return redirectValue
 
 

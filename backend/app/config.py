@@ -29,7 +29,6 @@ class SessionConfig(BaseSettings):
         ..., description="Secret key for signing session cookies"
     )
     SESSION_COOKIE_SECURE: bool = True
-    SESSION_COOKIE_DOMAIN: Optional[str] = None
     SESSION_REDIS_URL: Optional[str] = None
     SESSION_COOKIE_NAME: str = "gc-manage-app"
     SESSION_EXPIRY_COOKIE_NAME: str = "session-expiry"
