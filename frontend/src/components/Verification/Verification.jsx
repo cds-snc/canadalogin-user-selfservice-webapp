@@ -22,7 +22,7 @@ import {useError} from "../../hooks/useError";
 const initialTime=10;
 
 export default function Verification() {
-    const {type, flow,language} = useParams();
+    const {type = FLOW_TYPES.email, flow = FLOW_TYPES.manage, language} = useParams();
     const {state} = useUser();
     const {setError, clearAllErrors, getError, hasErrors} = useError(language);
     const [time, setTime] = useState(initialTime);
@@ -31,8 +31,8 @@ export default function Verification() {
 
     const submitDataOptions = {
         language,
-        endpoint: flow===FLOW_TYPES.signUp?SUBMIT_END_POINTS.transientOtpVerify:SUBMIT_END_POINTS.otpVerify,
-        navigateTo: flow===FLOW_TYPES.signUp?type===FLOW_TYPES.email? "/" + language + "/" + flow + NAVIGATION_LINKS.password:"/" + language + NAVIGATION_LINKS.coreProfile:"/" + language + '/redirecttorp',
+        endpoint: SUBMIT_END_POINTS.otpVerify,
+        navigateTo: "/" + language + '/redirecttorp',
         page: PAGES.verification,
         flow: flow,
         type: type,
@@ -42,7 +42,7 @@ export default function Verification() {
 
     const linkSubmitDataOptions = {
         language,
-        endpoint: flow===FLOW_TYPES.signUp?SUBMIT_END_POINTS.transientOtpSend:SUBMIT_END_POINTS.otpSend,
+        endpoint: SUBMIT_END_POINTS.otpSend,
         navigateTo: null,
         page: PAGES.verification,
         flow: flow,
@@ -83,40 +83,7 @@ export default function Verification() {
                 />)
             }
             {codeRequested &&(<GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={pageContentJson['17']} data-testid="linkSuccess">&nbsp;</GcdsNotice>)}
-            {
-                flow===FLOW_TYPES.signIn&&(
-                    <GcdsHeading tag="h1">
-                        {pageContentJson['18']}
-                        <GcdsText marginTop="150" marginBottom="0">
-                            {pageContentJson['19']}
-                            <strong>
-                                {language===AVAILABLE_LANGUAGES.fr?' '+pageContentJson['20']+' ':''}
-                                {` ${SERVICES[0].title}`}{language===AVAILABLE_LANGUAGES.en?' '+pageContentJson['20']:''}
-                            </strong>
-                        </GcdsText>
-                    </GcdsHeading>
-
-                )
-            }
-            {
-                flow===FLOW_TYPES.signUp&&(
-                    <GcdsContainer className="gcds-gap" >
-                        <GcdsStepper currentStep={type===FLOW_TYPES.email?'1':'3'}
-                                     totalSteps="4"
-                                     tag="h1"
-                                     lang={language}>
-                                    {type===FLOW_TYPES.email?pageContentJson['22']:pageContentJson['1']}
-                        </GcdsStepper>
-                    </GcdsContainer>
-                )
-            }
-            {
-                flow===FLOW_TYPES.signIn&&(
-                    <GcdsHeading tag="h2">
-                        {pageContentJson['1']}
-                    </GcdsHeading>
-                )
-            }
+            
             <GcdsContainer>
                 <GcdsText>
                     {type===FLOW_TYPES.voice?pageContentJson['3']:type===FLOW_TYPES.sms?pageContentJson['2']:pageContentJson['23']}&nbsp;
@@ -128,15 +95,6 @@ export default function Verification() {
                 <GcdsText>
                     {pageContentJson['6']} <strong>{pageContentJson['7']}</strong>
                 </GcdsText>
-                {
-                    flow===FLOW_TYPES.signIn&&(
-                        <GcdsText>
-                            <GcdsLink href="#" onClick={()=>handleLinkSubmit(LINK_SUBMIT_TYPES.useNewVerification, false)}>
-                                {pageContentJson['21']}
-                            </GcdsLink>
-                        </GcdsText>
-                    )
-                }
                 {
                     type!==FLOW_TYPES.email&&(
                         <GcdsHeading tag='h2'>
@@ -176,15 +134,6 @@ export default function Verification() {
             <GcdsHeading tag='h2'>
                 {pageContentJson['10']}
             </GcdsHeading>
-            {
-                flow===FLOW_TYPES.signUp&&(
-                    <GcdsText>
-                        <GcdsLink href="#" onClick={()=>handleLinkSubmit(LINK_SUBMIT_TYPES.useNewVerification, false)}>
-                            {type===FLOW_TYPES.email?pageContentJson['25']:pageContentJson['13']}
-                        </GcdsLink>
-                    </GcdsText>
-                )
-            }
             {
                 type!==FLOW_TYPES.email&&(
                     <GcdsText>

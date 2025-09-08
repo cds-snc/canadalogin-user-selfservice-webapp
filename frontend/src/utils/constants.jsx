@@ -37,10 +37,7 @@ export const OIDC_REDIRECT = {
 };
 
 export const CONTEXT_ACTIONS = {
-  signIn: "SIGN_IN",
   logOut: "LOG_OUT",
-  signin_success: "SIGNIN_SUCCESS",
-  signin_failure: "SIGNIN_FAILURE",
   clone_profile: "CLONE_PROFILE",
   clear_edit_profile: "CLEAR_EDIT_PROFILE",
   update_cloned_profile: "UPDATED_CLONE_PROFILE",
@@ -52,10 +49,10 @@ export const CONTEXT_ACTIONS = {
   set_relying_party_data: "SET_RELYING_PARTY_DATA",
   set_authenticated_pages: "SET_AUTHENTICATED_PAGES",
   remove_authenticated_page: "REMOVE_AUTHENTICATED_PAGE",
+  set_loading: "SET_LOADING",
 };
 
 export const FLOW_TYPES = {
-  signIn: "signin",
   sms: "smsotp",
   voice: "voiceotp",
   email: "email",
@@ -125,8 +122,6 @@ export const SUBMIT_END_POINTS = {
   requestPasswordPolicy: "/v1/password/policy",
   create: "/v1/users/create",
   createCoreProfile: "/v1/users/createcoreprofile",
-  transientOtpVerify: "/v1/otp/transient_otp/verify",
-  transientOtpSend: "/v1/otp/transient_otp/send",
   login: "/v1/otp/users/login",
   otpVerify: "/v1/otp/otp/verify",
   otpSend: "/v1/otp/otp/send",
@@ -138,8 +133,6 @@ export const SUBMIT_END_POINTS = {
 
 export const GA_CATEGORIES = {
   pageView: "pageview",
-  onboarding: "sign_up_flow",
-  signIn: "sign_in",
 };
 
 export const GA_ACTIONS = {
