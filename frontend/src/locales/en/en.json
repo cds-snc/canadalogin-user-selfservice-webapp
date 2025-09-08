@@ -231,10 +231,9 @@
     "8": "GC Account directory",
     "9": "Country",
     "10": "Phone number",
-    "11": "I don’t see my country",
+    "11": "My country is not in the list",
     "12": "Some countries are not supported due to technical limitations. If your country is not listed, you will be unable to create a GC Sign in account at this time. We apologize for the inconvenience.",
-    "13": "Continue",
-    "14": "Cancel"
+    "13": "Verify your number"
   },
   "YouMayUpdateEmailAtOtherPlaces": {
     "1": "Your email has been updated to",
@@ -346,9 +345,9 @@
   },
   "UpdateContactPhoneNumber": {
     "1": "Enter a new phone number",
-    "2": "Two-step verification adds a second layer of security to your password.",
-    "3": "Learn more about two-step verification (opens in a new tab)",
-    "4": "Enter your phone number",
+    "2": "This will update the phone number that GC Sign in, and services connected to your GC Sign in may use to contact you.",
+    "3": "What services have access to your contact phone number",
+    "4": "The following services have access to your contact phone number:",
     "5": "Enter the phone number you want to receive security codes at each time you sign in. We may also use this phone number to contact you about activity on your account.",
     "6": "Read our",
     "7": "privacy notice",

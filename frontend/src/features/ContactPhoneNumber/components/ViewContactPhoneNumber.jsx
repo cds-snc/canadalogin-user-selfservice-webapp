@@ -69,6 +69,10 @@ const DisplayPhoneNumbers = ({ phoneNumbers }) => {
 
 const AddPhoneNumber = (props) => {
     const { pageContent } = props;
+    const { language } = useParams();
+    const { state } = useUser();
+    const navigateHelper = useNavigateHelper();
+    const updateContactPhoneNumber = `/${language}${NAVIGATION_LINKS.updateContactPhoneNumber}`;
     return (
         <>
 
@@ -76,8 +80,12 @@ const AddPhoneNumber = (props) => {
 
             <GcdsGrid columns="1fr auto" className="gridInline">
 
-                <GcdsLink href="#" size="regular">
-                    Add Phone Number
+                <GcdsLink href={updateContactPhoneNumber} size="regular" onGcdsClick={(ev) => {
+                    ev.preventDefault();
+                    console.log(ev)
+                    navigateHelper(ev.detail)
+                }}>
+                    {pageContent['19']}
                 </GcdsLink>
             </GcdsGrid>
         </>
@@ -112,10 +120,7 @@ export default function ViewContactPhoneNumber({ pageContent, phoneNumbers }) {
     const { language } = useParams();
     const { state } = useUser();
     const navigateHelper = useNavigateHelper();
-
-    const editProfile = `/${language}${NAVIGATION_LINKS.ProfileNameEdit}`;
-    const editLanguagePreferences = `/${language}${NAVIGATION_LINKS.editLanguagePreferences}`
-
+    const updateContactPhoneNumber = `/${language}${NAVIGATION_LINKS.updateContactPhoneNumber}`;
 
 
     return (

@@ -1,33 +1,44 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams, useLocation } from "react-router";
-import { useUser } from "../../../components/Providers/useUser.tsx";
-import Loader from "../../../components/Layout/Loading.jsx";
-
-import EnterPhoneNumber from "./EnterPhoneNumber.jsx";
-
-// import PasswordChangedConfirmation from "./PasswordChangedConfirmation.jsx";
-
 import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 import {
     NAVIGATION_LINKS
 } from "../../../utils/constants.jsx";
-import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
+import { useUser } from "../../../components/Providers/useUser.tsx";
+import EnterPhoneNumber from "./EnterPhoneNumber.jsx";
 
-const defaultStep = "enterPhoneNumber";
+const STEPS = {
+    ENTER: 'enterPhoneNumber',
+    VERIFY: 'verify',
+    CONFIRM: 'confirm',
+};
+
+const MFAMETHOD = {
+    SMS: 'sms',
+    VOICE: 'voice'
+};
+
+
 
 export default function UpdateContactPhoneNumber() {
     const { language } = useParams();
-    const { state, dispatch } = useUser();
+    const { state } = useUser();
     const { userProfile } = state;
     const { id } = userProfile ?? {};
 
     const { pathname } = useLocation();
     const [localLoading, setLocalLoading] = useState(false);
 
-    const [step, setStep] = useState < 'enterPhoneNumber' | 'verify' | 'confirm' > ('enterPhoneNumber');
-    const [userSelectedMFAMethod, setUserSelectedMFAMethod] = useState < 'sms' | 'voice' > ('sms');
+    const [step, setStep] = useState(STEPS.ENTER);
+    const [userSelectedMFAMethod, setUserSelectedMFAMethod] = useState(MFAMETHOD.SMS);
+    const [phoneForm, setPhoneForm] = useState({
+        'phoneNumber': '',
+        'otp': '',
+        'trxid': '',
+        'contactType': ''
+    });
 
-    const [otpSentResponse, setOtpSentResponse] = useState(null);
+    const [otpValidationResponse, setOtpValidationResponse] = useState(null);
     const [userOtpValue, setUserOtpValue] = useState("");
 
     const navigateHelper = useNavigateHelper();
@@ -42,26 +53,37 @@ export default function UpdateContactPhoneNumber() {
     };
 
     const handleOtpSentResponse = (otpResponse) => {
-        setOtpSentResponse(otpResponse);
+        setOtpValidationResponse(otpResponse);
     };
 
     const handleSetUserOtpValue = (userOtpValue) => {
         setUserOtpValue(userOtpValue);
-    }
+    };
+
+    const handlePhoneForm = (field, value) => {
+        setPhoneForm((prev) => ({
+            ...prev,
+            [field]: value,
+        }));
+    };
 
     const steps = {
         enterPhoneNumber: (
             <EnterPhoneNumber
                 userProfile={userProfile}
+                onChangePhoneForm={handlePhoneForm}
                 onChangeUserMfaType={handleChangeUserMfaSelection}
-                userSelectedMfaType={userSelectedMfaType}
-                localLoading={localLoading}
-                setLocalLoading={handleLoading}
-                step={2}
-                totalSteps={4}
+                userSelectedMfaType={userSelectedMFAMethod}
+                step={1}
+                totalSteps={3}
                 onNext={() => {
                     setStep("verify");
                 }}
+                onCancel={
+                    () => {
+                        navigateHelper(backtoProfile);
+                    }
+                }
             />
         ),
         // otpValidation: (
@@ -118,8 +140,7 @@ export default function UpdateContactPhoneNumber() {
     return (
         <>
             {
-                steps[passwordUpdateStep]
-
+                steps[step]
             }
         </>
     )

@@ -340,5 +340,20 @@
     "10": "Numéro de téléphone",
     "11": "Mon pays ne figure pas dans cette liste",
     "12": "Certains pays ne sont pas pris en charge en raison de limitations techniques. Si votre pays ne figure pas dans la liste, vous ne pourrez pas créer de compte GC Sign in pour le moment. Nous nous excusons pour la gêne occasionnée."
+  },
+  "EnterNewPhoneNumber": {
+    "1": "Entrez un nouveau numéro de téléphone",
+    "2": "Cela mettra à jour le numéro de téléphone que GC CléGC utilise, et les services connectés à votre GC CléGC peuvent l’utiliser pour vous contacter.",
+    "3": "Quels services ont accès à votre numéro de téléphone de contact",
+    "4": "Les services suivants ont accès à votre numéro de téléphone de contact :",
+    "5": "GEO.ca",
+    "6": "Si vous tentez de mettre à jour votre numéro de téléphone de contact auprès d’un service qui n’est pas connecté à GC CléGC, vous devrez accéder à ce compte directement.",
+    "7": "Pour rechercher un autre compte GC, visitez le",
+    "8": "répertoire des comptes GC",
+    "9": "Pays",
+    "10": "Numéro de téléphone",
+    "11": "Mon pays ne figure pas dans la liste",
+    "12": "Certains pays ne sont pas pris en charge en raison de limitations techniques. Si votre pays ne figure pas dans la liste, vous ne pourrez pas créer un compte GC CléGC pour le moment. Nous nous excusons pour tout inconvénient.",
+    "13": "Vérifiez votre numéro"
   }
 }
