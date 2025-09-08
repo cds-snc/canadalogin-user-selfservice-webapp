@@ -85,8 +85,6 @@ def get_user_info(request: Request):
     Get user info from session
     """
     user_info = request.session.get(SessionKeys.SESSION_USER_INFO.value)
-    if not user_info:
-        raise OAuthError("user info not found")
     return user_info
 
 
