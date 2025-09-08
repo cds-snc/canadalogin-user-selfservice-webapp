@@ -7,6 +7,7 @@ from app.auth.services.auth import (
     callback_handler,
     reauthenticate_user,
     session_event_sse_generator,
+    session_extend,
 )
 
 from app.auth.services.auth_user_session import (
@@ -60,3 +61,13 @@ async def reauth(
 @router.get("/session-status")
 async def session_status(request: Request):
     return await session_event_sse_generator(request)
+
+@router.get(
+    "/keep-alive",
+    tags=["Auth"],
+    summary="Keep alive",
+    description="",
+)
+async def keep_alive(request: Request):
+    return await session_extend(request)
+    

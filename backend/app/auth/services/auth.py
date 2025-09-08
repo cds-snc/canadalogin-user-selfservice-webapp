@@ -1,11 +1,11 @@
 import asyncio
 import logging
-import json
+import time
 from typing import AsyncGenerator
 from fastapi import Request
 from fastapi.responses import RedirectResponse, StreamingResponse
 from authlib.integrations.starlette_client import OAuthError
-from starsessions.session import get_session_handler
+from starsessions.session import get_session_handler, get_session_metadata
 from app.auth.services.oidc_config import oauth
 from app.config import get_configuration
 from app.constants.session_keys import SessionKeys
@@ -13,8 +13,10 @@ from app.utils.request_error_handler import RequestErrorHandler
 from app.auth.services.auth_user_session import (
     update_session_tokens,
     get_user_info,
-    get_session_by_session_id,
+    remove_session_by_session_id,
 )
+from app.auth.schemas import KeepAliveData, SSEventData
+from app.utils.schemas import ResponseModel
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +27,6 @@ def get_base_profile_management_url():
 
     if config.ENVIRONMENT != "local":
         redirectValue = f"https://{config.PROFILE_MANAGEMENT_DOMAIN}"
-    return redirectValue
 
 
 def get_callback_redirect_uri(request: Request):
@@ -143,42 +144,24 @@ async def session_event_sse_generator(request: Request):
                 user_info = get_user_info(request)
                 if user_info is None:
                     logger.info("User not logged in")
-                    message_data = {"status": "non-authenticated"}
-                    yield f"data: {json.dumps(message_data)}\n\n"
+                    message_data = SSEventData(status="non-authenticated")
+                    yield f"data: {message_data.model_dump_json()}\n\n"
                     break
                 await asyncio.sleep(5)
-                session_data = await get_session_by_session_id(
-                    user_info.get("sid"), request
-                )
-                if not session_data or not session_data.get(
-                    SessionKeys.SESSION_USER_INFO.value
-                ):
-                    message_data = {"status": "terminated"}
-                    yield f"data: {json.dumps(message_data)}\n\n"
-                    break
-                else:
-                    session_metadata = session_data.get(
-                        SessionKeys.SESSION_METADATA.value
-                    )
-                    session_expire = config.session_config.SESSION_LIFETIME
-                    if session_metadata:
-                        last_access = session_metadata.get(
-                            SessionKeys.SESSION_METADATA_LAST_ACCESS.value
-                        )
-                    if last_access:
-                        session_expire = last_access + session_expire - 30
-                    # Prepare message data with optional last_access info
-                    message_data = {"status": "active", "expire": session_expire}
-                    yield f"data: {json.dumps(message_data)}\n\n"
+                # Get session metadata
+                session_metadata = get_session_metadata(request)
+                last_access_timestamp = session_metadata.get("last_access")
+                session_expire = config.session_config.SESSION_LIFETIME + last_access_timestamp - 30
+  
+                # Prepare message data with optional last_access info
+                message_data = SSEventData(status="active", expire=int(session_expire))
+                yield f"data: {message_data.model_dump_json()}\n\n"
         except asyncio.CancelledError:
             logger.info("SSE stream cancelled")
         except Exception as e:
             logger.error(f"Error in event stream: {str(e)}")
-            message_data = {
-                "status": "error",
-                "error": "An internal error has occurred.",
-            }
-            yield f"data: {json.dumps(message_data)}\n\n"
+            message_data = SSEventData(status="error", error="An internal error has occurred.")
+            yield f"data: {message_data.model_dump_json()}\n\n"
 
     return StreamingResponse(
         event_stream(request),
@@ -189,3 +172,56 @@ async def session_event_sse_generator(request: Request):
             "X-Accel-Buffering": "no",  # Disable nginx buffering
         },
     )
+
+
+async def session_extend(request: Request):
+    """
+    Check session metadata for expiration. If session is older than 12 hours,
+    remove it and return termination status with login URL.
+    """
+    login_url = f"/v1/auth/login"
+    try:
+        config = get_configuration()
+        # Get user info from current session
+        user_info = get_user_info(request)
+        if user_info is None:
+            session_status = KeepAliveData(status="non-authenticated", login=login_url)
+            return ResponseModel(
+                success=False, message="User not authenticated", data=session_status)
+        # Get session ID from user info
+        session_id = user_info.get("sid")
+        if not session_id:
+            session_status = KeepAliveData(status="non-authenticated", login=login_url)
+            return ResponseModel(
+                success=False, message="User not authenticated", data=session_status)
+
+        # Get session metadata
+        session_metadata = get_session_metadata(request)
+        last_access_timestamp = session_metadata.get("last_access")
+        created_timestamp = session_metadata.get("created")
+
+        current_time = time.time()
+        twelve_hours_in_seconds = 12 * 60 * 60  # 43200 seconds
+
+        session_expire = config.session_config.SESSION_LIFETIME + last_access_timestamp - 30
+
+        # Check if session is older than 12 hours
+        if current_time - created_timestamp > twelve_hours_in_seconds:
+            # Session expired, remove it
+            await remove_session_by_session_id(session_id, request)
+            request.session.clear()
+
+            session_status = KeepAliveData(status="terminated", login=login_url)
+            return ResponseModel(
+                success=False, message="Session terminated", data=session_status)
+
+        # Session is valid, auto extend last access time
+        session_status = KeepAliveData(status="active", expire=int(session_expire))
+        return ResponseModel(
+            success=True, message="Session is active", data=session_status)
+
+    except Exception as e:
+        logger.error(f"Error in keep_alive endpoint: {str(e)}", exc_info=True)
+        session_status = KeepAliveData(status="error", login=login_url)
+        return ResponseModel(
+            success=False, message="Error in keep_alive endpoint", data=session_status)

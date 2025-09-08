@@ -9,5 +9,3 @@ class SessionKeys(str, Enum):
     SESSION_USER_REFRESH_TOKEN_KEY = "user_refresh_token"
     SESSION_EXPIRY = "session_expiry"
     SESSION_USER_ID_TOKEN_KEY = "user_id_token"
-    SESSION_METADATA = "__metadata__"
-    SESSION_METADATA_LAST_ACCESS = "last_access"
