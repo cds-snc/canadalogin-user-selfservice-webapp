@@ -6,6 +6,7 @@ from httpx import AsyncClient
 from fastapi import Request, HTTPException
 from authlib.integrations.starlette_client import OAuthError
 from starsessions.session import get_session_handler
+from redis.exceptions import RedisError
 
 from app.config import get_configuration
 from app.constants.session_keys import SessionKeys
@@ -81,9 +82,6 @@ async def get_users_current_session(request: Request):
 
 
 def get_user_info(request: Request):
-    """
-    Get user info from session
-    """
     user_info = request.session.get(SessionKeys.SESSION_USER_INFO.value)
     if not user_info:
         raise OAuthError("user info not found")
@@ -113,9 +111,6 @@ async def get_user_id_token(request: Request):
             if not new_tokens:
                 return None
 
-            if oauth.verify is None:
-                logger.error("OAuth verify client is not configured properly")
-                return None
             userinfo = await oauth.verify.parse_id_token(new_tokens, None)
             new_tokens["userinfo"] = userinfo
 
@@ -129,26 +124,13 @@ async def get_user_id_token(request: Request):
 
 
 async def refresh_id_token(refresh_token: str):
-    """
-    Refreshes the id_token using the refresh_token.
-    """
-    try:
-        if oauth.verify is None:
-            logger.error("OAuth verify client is not configured properly")
-            return None
-        new_tokens = await oauth.verify.fetch_access_token(
-            refresh_token=refresh_token, grant_type="refresh_token"
-        )
-        return new_tokens
-    except Exception as e:
-        logger.error(f"Error refreshing token: {e}")
-        return None
+    new_tokens = await oauth.verify.fetch_access_token(
+        refresh_token=refresh_token, grant_type="refresh_token"
+    )
+    return new_tokens
 
 
 def get_user_refresh_token(request: Request):
-    """
-    Get user refresh token from session
-    """
     return request.session.get(SessionKeys.SESSION_USER_REFRESH_TOKEN_KEY.value)
 
 
@@ -178,11 +160,11 @@ async def get_session_by_session_id(sessionid: str, request: Request):
         if not data:
             return None
         return handler.serializer.deserialize(data)
-    except Exception as e:
+    except RedisError as e:
         logger.error(
-            f"Error getting session by ID {sessionid}: {str(e)}", exc_info=True
+            f"Redis error getting session {sessionid}: {str(e)}", exc_info=True
         )
-        return None
+        RequestErrorHandler.handle(e, context="Redis error getting session")
 
 
 async def remove_session_by_session_id(sessionid: str, request: Request):
@@ -197,8 +179,8 @@ async def remove_session_by_session_id(sessionid: str, request: Request):
         redis_key = f"session:{sessionid}"
         redis_client = request.app.state.redis_client
         await redis_client.delete(redis_key)
-    except Exception as e:
-        logger.error(
-            f"Error removing session by ID {sessionid}: {str(e)}", exc_info=True
+    except RedisError as e:
+        logger.warning(
+            f"Redis error removing session by ID {sessionid}: {str(e)}", exc_info=True
         )
         RequestErrorHandler.handle(e, context="remove server session")
