@@ -100,6 +100,7 @@ export const PAGES = {
   areYouSureEditYourLanguage: "AreYouSureEditYourLanguage",
   profileYouMayUpdateLanguage: "ProfileYouMayUpdateLanguage",
   passwordChangedConfirmation: "PasswordChangedConfirmation",
+  ServicesWithAccessInfo: "ServicesWithAccessInfo",
 };
 
 export const FOOTERS = {

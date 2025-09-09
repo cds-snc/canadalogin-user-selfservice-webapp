@@ -187,18 +187,12 @@
         "5": "Annuler"
     },
     "ProfileUpdateName": {
-        "1": "Quels services ont accès à votre nom ?",
         "2": "Prénom",
         "3": "Nom de famille",
         "4": "Annuler",
         "5": "Modifier votre nom",
         "6": "Votre nom sera mis à jour avec",
-        "7": "tous les services avec lesquels vous avez partagé votre nom via Connexion GC.",
-        "8": "Les services suivants ont accès à votre nom via Connexion GC :",
-        "9": "GEO.ca",
-        "10": "Si vous essayez de mettre à jour votre nom avec un service qui n'est pas connecté à Connexion GC, vous devrez accéder à ce compte.",
-        "11": "Pour rechercher un autre compte GC, consultez le",
-        "12": "Répertoire des comptes GC"
+        "7": "tous les services avec lesquels vous avez partagé votre nom via Connexion GC."
     },
     "AreYouSureUpdateContactNumber": {
         "1": "Êtes-vous sûr de vouloir mettre à jour votre numéro de téléphone ?",
@@ -235,12 +229,6 @@
         "1": "Modifiez votre préférence linguistique",
         "2": "Cela mettra à jour la langue officielle dans laquelle GC Sign In et les services connectés vous enverront des communications.",
         "3": "Choisissez votre préférence linguistique",
-        "4": "Quels services ont accès à votre préférence linguistique",
-        "8": "Les services suivants ont accès à votre nom via GC Sign In :",
-        "9": "GEO.ca",
-        "10": "Si vous tentez de mettre à jour votre nom auprès d’un service qui n’est pas connecté à GC Sign In, vous devrez le faire via ce compte.",
-        "11": "Pour rechercher un autre compte GC, visitez le",
-        "12": "Répertoire des comptes GC",
         "13": "Anglais",
         "14": "Français",
         "15": "Continuer",
@@ -320,5 +308,13 @@
         "5": "Paramètres de sécurité",
         "6": "Retour à ",
         "7": "Se déconnecter"
+    },
+    "ServicesWithAccessInfo": {
+        "1": "Quels services ont accès à votre nom ?",
+        "2": "Les services suivants ont accès à votre nom via Connexion GC :",
+        "3": "GEO.ca",
+        "4": "Si vous essayez de mettre à jour votre nom avec un service qui n'est pas connecté à Connexion GC, vous devrez accéder à ce compte.",
+        "5": "Pour rechercher un autre compte GC, consultez le",
+        "6": "Répertoire des comptes GC"
     }
 }
