@@ -30,12 +30,11 @@ export default function UpdateContactPhoneNumber() {
     const [localLoading, setLocalLoading] = useState(false);
 
     const [step, setStep] = useState(STEPS.ENTER);
-    const [userSelectedMFAMethod, setUserSelectedMFAMethod] = useState(MFAMETHOD.SMS);
-    const [phoneForm, setPhoneForm] = useState({
+    const [phoneFormData, setPhoneFormData] = useState({
         'phoneNumber': '',
         'otp': '',
         'trxid': '',
-        'contactType': ''
+        'contactType': MFAMETHOD.SMS
     });
 
     const [otpValidationResponse, setOtpValidationResponse] = useState(null);
@@ -43,10 +42,6 @@ export default function UpdateContactPhoneNumber() {
 
     const navigateHelper = useNavigateHelper();
     const backtoProfile = `/${language}${NAVIGATION_LINKS.profileHome}`;
-
-    const handleChangeUserMfaSelection = (mfaType) => {
-        setUserSelectedMFAMethod(mfaType);
-    };
 
     const handleLoading = (bool) => {
         setLocalLoading(bool)
@@ -61,7 +56,7 @@ export default function UpdateContactPhoneNumber() {
     };
 
     const handlePhoneForm = (field, value) => {
-        setPhoneForm((prev) => ({
+        setPhoneFormData((prev) => ({
             ...prev,
             [field]: value,
         }));
@@ -71,9 +66,8 @@ export default function UpdateContactPhoneNumber() {
         enterPhoneNumber: (
             <EnterPhoneNumber
                 userProfile={userProfile}
+                phoneFormData={phoneFormData}
                 onChangePhoneForm={handlePhoneForm}
-                onChangeUserMfaType={handleChangeUserMfaSelection}
-                userSelectedMfaType={userSelectedMFAMethod}
                 step={1}
                 totalSteps={3}
                 onNext={() => {
@@ -136,7 +130,7 @@ export default function UpdateContactPhoneNumber() {
         // ),
     };
 
-
+    console.log('phoneForm', phoneFormData)
     return (
         <>
             {

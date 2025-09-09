@@ -161,13 +161,7 @@ export default function ProfileHome() {
             {pageContent['9']}
           </gcds-text>
         </gcds-grid>
-        {
-          phoneNumbers != null ? (
-            <>
-              <div className="separator" />
-            </>
-          ) : null
-        }
+        <div className="separator" />
         <ViewContactPhoneNumber pageContent={pageContent} phoneNumbers={phoneNumbers} />
 
       </GcdsContainer>

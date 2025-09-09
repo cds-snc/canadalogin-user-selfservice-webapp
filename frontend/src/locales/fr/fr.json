@@ -354,6 +354,8 @@
     "10": "Numéro de téléphone",
     "11": "Mon pays ne figure pas dans la liste",
     "12": "Certains pays ne sont pas pris en charge en raison de limitations techniques. Si votre pays ne figure pas dans la liste, vous ne pourrez pas créer un compte GC CléGC pour le moment. Nous nous excusons pour tout inconvénient.",
-    "13": "Vérifiez votre numéro"
+    "13": "Vérifiez votre numéro",
+    "14": "Le numéro de téléphone est requis",
+    "15": "Nous allons vérifier votre numéro de téléphone en envoyant un code à 6 chiffres sur votre téléphone."
   }
 }

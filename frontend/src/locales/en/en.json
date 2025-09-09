@@ -233,7 +233,9 @@
     "10": "Phone number",
     "11": "My country is not in the list",
     "12": "Some countries are not supported due to technical limitations. If your country is not listed, you will be unable to create a GC Sign in account at this time. We apologize for the inconvenience.",
-    "13": "Verify your number"
+    "13": "Verify your number",
+    "14": "Phone number is required",
+    "15": "We are going to verify your phone number by sending a 6-digit code to your phone."
   },
   "YouMayUpdateEmailAtOtherPlaces": {
     "1": "Your email has been updated to",
@@ -354,7 +356,7 @@
     "8": "for more information on how we use your personal information.",
     "9": "Country",
     "10": "Phone number",
-    "11": "My country is not listed here",
+    "11": "My country is not in the list",
     "12": "Some countries are not supported due to technical limitations. If your country is not listed, you will be unable to create a GC Sign in account at this time. We apologize for the inconvenience."
   }
 }
