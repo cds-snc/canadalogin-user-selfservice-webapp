@@ -34,7 +34,10 @@
     "11": "Enter a last name to continue. If you have a single name, enter it in the last name field.",
     "12": "and a maximum of",
     "13": "characters.",
-    "14": "Too Many Attempts"
+    "CSIAM0010E": "The authentication attempt failed",
+    "CSIAM0011E": "The verification code is invalid or has expired.",
+    "CSIAM0038E": "Too Many Attempts",
+    "CSIAI0021E": "The password that you specified was used previously, and it cannot be reused."
   },
   "RegisterVerification": {
     "1": "Protect your account with 2-step verification",
@@ -313,7 +316,8 @@
     "8": "Mobile only. Carrier charges may apply.",
     "9": "Voice call",
     "10": "Mobile or landline. Carrier charges may apply.",
-    "11": "Loading"
+    "11": "Loading",
+    "12": "Loading your MFA methods ..."
   },
   "PasswordChangedConfirmation": {
     "1": "Your Password changed successfully.",
