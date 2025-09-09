@@ -1,16 +1,4 @@
 {
-  "Home": {
-    "1": "Sign in",
-    "2": "Use your",
-    "3": "account",
-    "4": "What is GC Sign in?",
-    "5": "GC Sign in allows you to use one account and password for secure, private access to participating programs and services.",
-    "6": "Participating programs and services will ask you to create a GC Sign in to securely access your information on their website or application.",
-    "7": "You can use the same username and password to access any program or service that uses GC Sign in.",
-    "8": "Email address",
-    "9": "GC Sign in",
-    "10": "to continue to your"
-  },
   "Password": {
     "1": "Your email was successfully verified",
     "2": "Step 2 of 4",
@@ -31,14 +19,6 @@
     "17": "example.name@gmail.com",
     "18": "Use a different email",
     "19": "I forgot my password"
-  },
-  "SignUpEmail": {
-    "1": "Enter your email",
-    "2": "Email address",
-    "3": "Choose your email language preference",
-    "4": "You will receive emails from GC Sign in in the language you choose.",
-    "5": "English",
-    "6": "French"
   },
   "FirstTimeGc": {
     "1": "First time using GC Sign in?",
@@ -75,27 +55,6 @@
     "8": "Single-use verification codes",
     "9": "Save or print out a list of single-use verification codes."
   },
-  "VerificationSetUp": {
-    "1": "Protect your account with 2-step verification",
-    "2": "Two-step verification adds a second layer of security to your password.",
-    "3": "Learn more about two-step verification (opens in a new tab)",
-    "4": "Enter your phone number",
-    "5": "Enter the phone number you want to receive security codes at each time you sign in. We may also use this phone number to contact you about activity on your account.",
-    "6": "Read our",
-    "7": "privacy notice",
-    "8": "for more information on how we use your personal information.",
-    "9": "Country",
-    "10": "Phone number",
-    "11": "My country is not listed here",
-    "12": "Some countries are not supported due to technical limitations. If your country is not listed, you will be unable to create a GC Sign in account at this time. We apologize for the inconvenience.",
-    "13": "select a different 2-step verification method.",
-    "14": "How should we send you the code?",
-    "15": "You can change this the next time you sign in.",
-    "16": "Text message (SMS)",
-    "17": "Mobile only. Carrier charges may apply.",
-    "18": "Voice call",
-    "19": "Mobile or landline. Carrier charges may apply."
-  },
   "Verification": {
     "1": "Check your phone",
     "2": "We have sent a text message with a 6-digit verification code to:",
@@ -125,74 +84,9 @@
     "26": "Send the code again",
     "27": "Cancel"
   },
-  "VerificationSelection": {
-    "1": "Choose a sign in method",
-    "2": "to continue to your",
-    "3": "account",
-    "4": "Choose how you want to sign in",
-    "5": "6-digit SMS code",
-    "6": "6-digit voice code",
-    "7": "Default"
-  },
-  "CreateCoreProfile": {
-    "1": "Your GC Sign in account has been created",
-    "2": "Complete your profile",
-    "3": "Read our",
-    "4": "privacy notice",
-    "5": "for more details on how we use your personal information.",
-    "6": "Enter your name",
-    "7": "First name",
-    "8": "Last name"
-  },
   "Button": {
     "submit": "Continue",
     "cancel": "Cancel"
-  },
-  "Privacy": {
-    "1": "Create a GC Sign in",
-    "2": "Create a",
-    "3": "account",
-    "5": "Privacy",
-    "6": "When you set up your account, GC Sign in will ask you to provide basic personal information. We ask for this information to:",
-    "7": "make it faster for you to access services, and",
-    "8": "contact you about account security.",
-    "9": "Your personal information is",
-    "10": "stored in a secure database",
-    "11": "managed by",
-    "12": "Employment and Social Development Canada.",
-    "13": "Your personal information is",
-    "14": "also shared with departments or agencies",
-    "15": "that you connect to and is stored according to their own policies and processes. Your personal information is",
-    "17": "not",
-    "18": "shared with programs or services",
-    "19": "unless you connect them to your GC Sign in account.",
-    "20": "Visit our",
-    "21": "Terms",
-    "22": "to learn more.",
-    "23": "Your personal information and the law",
-    "24": "Personal information is collected in compliance with the",
-    "25": "Questions or complaints",
-    "27": "Privacy Act",
-    "28": "and Part 4 of the",
-    "29": "Department of Employment and Social Development Canada Act",
-    "30": "Section 5.1 of the",
-    "31": "Department of Employment and Social Development Act",
-    "32": "allows us to collect your personal information to create an account that you can use to connect to Government of Canada programs and services. GC Sign in does not use the personal information you provide for any other purpose.",
-    "33": "You have the right to access and correct the personal information in your account, you are able to do so in Settings.",
-    "34": "Send questions about your personal information to",
-    "35": "Employment and Social Development Canada’s",
-    "36": "Access to Information and Privacy Coordinator by completing",
-    "37": "this form",
-    "38": "Send complaints about how your personal information has been handled to the",
-    "39": "Office of the Privacy Commissioner of Canada",
-    "40": "info@priv.gc.ca",
-    "41": "1-800-282-1376",
-    "42": "What is GC Sign in?",
-    "43": "GC Sign in allows you to use one account and password for secure, private access to participating programs and services.",
-    "44": "Participating programs and services will ask you to create a GC Sign in to securely access your information on their website or application.",
-    "45": "You can use the same username and password to access any program or service that uses GC Sign in.",
-    "46": "GC Sign in",
-    "47": "to continue to your"
   },
   "ManageDashboard": {
     "1": "Welcome,",
@@ -438,5 +332,14 @@
     "6": "GC Account directory.",
     "7": "Back to profile",
     "8": "Sign out"
+  },
+  "TopNavBar": {
+    "1": "GC Sign in",
+    "2": "Menu",
+    "3": "GC Sign in account",
+    "4": "Personal information",
+    "5": "Security settings",
+    "6": "Return to ",
+    "7": "Sign out"
   }
 }

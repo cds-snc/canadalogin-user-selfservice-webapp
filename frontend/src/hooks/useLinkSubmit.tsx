@@ -96,7 +96,7 @@ function setNavigateTo(submitDataOptions:SubmitDataOptions, linkFlowType:string,
             else if(submitDataOptions.flow===FLOW_TYPES.signUp)
                 return ("/" + submitDataOptions.language + NAVIGATION_LINKS.twoStepVerification);
 
-            return ("/" + submitDataOptions.language + NAVIGATION_LINKS.verificationSelection);
+            return ("/" + submitDataOptions.language + NAVIGATION_LINKS.verification);
         case LINK_SUBMIT_TYPES.requestNewCode:
             if(changeType) {
                 const newType = submitDataOptions.type===FLOW_TYPES.sms?FLOW_TYPES.voice:FLOW_TYPES.sms;
