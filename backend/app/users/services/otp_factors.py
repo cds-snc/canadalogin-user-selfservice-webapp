@@ -102,6 +102,7 @@ async def dispatch_user_auth_factors(
             "validated": True,
             "search": f'userId="{user_profile_id}"',
         }
+        logger.info(f"get user auth factors, userid: {user_profile_id}")
 
         otp_factor_response = await global_http_client.get(
             user_otp_factors_api_endpoint, params=search_params, headers=headers
@@ -163,7 +164,9 @@ async def get_user_otp_factors(
                     data=phone_number_otp_factor,
                 )
             else:
-                logger.info("user_id and user profile id dont math ")
+                logger.info(
+                    f"user_id and user profile id dont match. user_profile_id = {user_profile_id}. user_profile.data.id = {user_profile.data.id}"
+                )
                 raise HTTPException(
                     status_code=404, detail="No OTP factors found for user"
                 )

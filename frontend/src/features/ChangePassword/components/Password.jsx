@@ -32,6 +32,7 @@ export default function Password({ step, totalSteps, onNext, otpSentResponse, us
 
     const [passwordStrength, setPasswordStrength] = useState(0);
     const pageContentJson = getPageContent(language, PAGES.password);
+    const errorPageJson = getPageContent(language, PAGES.error);
     const backToSecuritySettingsPage = `/${language}${NAVIGATION_LINKS.securitySettings}`;
     const navigateHelper = useNavigateHelper();
     console.log("passwordPolicy", passwordPolicy)
@@ -82,6 +83,7 @@ export default function Password({ step, totalSteps, onNext, otpSentResponse, us
             "checked": checkedValue
         }
     ];
+    const errorMessage = errorPageJson[serverErrorMessage] || "";
 
     return (
         <GcdsContainer>
@@ -125,7 +127,7 @@ export default function Password({ step, totalSteps, onNext, otpSentResponse, us
                     hint={pageContentJson['10']}
                     type={checkedValue ? "text" : "password"}
                     onGcdsInput={handlePasswordChange}
-                    errorMessage={serverErrorMessage}
+                    errorMessage={errorMessage}
                     minlength={passwordPolicy.min}
                     maxlength={passwordPolicy.max}
                     lang={language}
