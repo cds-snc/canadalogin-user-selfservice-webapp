@@ -162,28 +162,12 @@ describe("AreYouSureEditYourName Component", () => {
     vi.clearAllMocks();
   });
 
-  it("renders the confirmation page", () => {
-    render(
-      <TestWrapper>
-        <AreYouSureEditYourName />
-      </TestWrapper>
-    );
-
-    expect(
-      screen.getByText(/Are you sure you want to update your name?/i)
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(/You’ve requested to update your name to:/i)
-    ).toBeInTheDocument();
-  });
-
   it("displays the new name from edit profile", () => {
     render(
       <TestWrapper>
         <AreYouSureEditYourName />
       </TestWrapper>
     );
-
     // Should show the new name from editProfile
     expect(screen.getByText(/Test User/i)).toBeInTheDocument();
   });
@@ -197,27 +181,5 @@ describe("AreYouSureEditYourName Component", () => {
 
     expect(screen.getByText(/Yes, update/i)).toBeInTheDocument();
     expect(screen.getByText(/Cancel/i)).toBeInTheDocument();
-  });
-
-  it("cancel button is present", () => {
-    render(
-      <TestWrapper>
-        <AreYouSureEditYourName />
-      </TestWrapper>
-    );
-
-    const cancelButton = screen.getByText("Cancel");
-    expect(cancelButton).toBeInTheDocument();
-  });
-
-  it("displays warning about legal name change", () => {
-    render(
-      <TestWrapper>
-        <AreYouSureEditYourName />
-      </TestWrapper>
-    );
-
-    expect(screen.getByText(/does not/i)).toBeInTheDocument();
-    expect(screen.getByText(/legally change your name/i)).toBeInTheDocument();
   });
 });

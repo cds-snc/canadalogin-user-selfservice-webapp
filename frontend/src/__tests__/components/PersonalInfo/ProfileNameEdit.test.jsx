@@ -56,91 +56,110 @@ vi.mock("../../../hooks/useNavigate.tsx", () => ({
 
 const mockUserState = {
   isLoading: false,
-  userProfile: {
-    active: true,
+  userData: {
+    service: "Test Service",
+    language: "en",
+    email: "test@example.com",
+    emailLanguage: null,
+    emailValidated: true,
+    trxnId: null,
+    passwordSubmitted: false,
+    phone: null,
+    stepVerificationSent: false,
+    stepVerified: false,
+    viewPrivacy: false,
     id: "test-user-123",
-    name: {
-      givenName: "Test",
-      familyName: "User",
-      formatted: "Test User",
-    },
-    emails: [{ type: "primary", value: "test@example.com" }],
-    phoneNumbers: [{ type: "primary", value: "+1234567890" }],
-    preferredLanguage: "en",
+    otpType: null,
+    passwordValidated: false,
+  },
+  userProfile: {
+    id: "test-user-123",
+    active: true,
     details: {
       emailVerified: true,
-      twoFactorAuthentication: true,
       lastLogin: "2025-09-08T12:00:00Z",
       lastMFA: "2025-09-08T12:00:00Z",
+      twoFactorAuthentication: true,
       pwdChangedTime: "2025-09-08T12:00:00Z",
     },
+    emails: [{ value: "test@example.com", type: "primary" }],
+    phoneNumbers: [{ value: "+1234567890", type: "primary" }],
     meta: {
       created: "2025-09-08T12:00:00Z",
-      lastModified: "2025-09-08T12:00:00Z",
       location: "test",
+      lastModified: "2025-09-08T12:00:00Z",
       resourceType: "User",
+    },
+    userName: "testuser",
+    preferredLanguage: "en",
+    name: {
+      givenName: "John",
+      familyName: "Doe",
+      formatted: "John Doe",
     },
   },
   editProfile: {
-    active: true,
     id: "test-user-123",
+    active: true,
+    details: {
+      emailVerified: true,
+      lastLogin: "2025-09-08T12:00:00Z",
+      lastMFA: "2025-09-08T12:00:00Z",
+      twoFactorAuthentication: true,
+      pwdChangedTime: "2025-09-08T12:00:00Z",
+    },
+    emails: [{ value: "test@example.com", type: "primary" }],
+    phoneNumbers: [{ value: "+1234567890", type: "primary" }],
+    meta: {
+      created: "2025-09-08T12:00:00Z",
+      location: "test",
+      lastModified: "2025-09-08T12:00:00Z",
+      resourceType: "User",
+    },
+    userName: "testuser",
+    preferredLanguage: "en",
     name: {
       givenName: "Test",
       familyName: "User",
       formatted: "Test User",
     },
-    emails: [{ type: "primary", value: "test@example.com" }],
-    phoneNumbers: [{ type: "primary", value: "+1234567890" }],
-    preferredLanguage: "en",
-    details: {
-      emailVerified: true,
-      twoFactorAuthentication: true,
-      lastLogin: "2025-09-08T12:00:00Z",
-      lastMFA: "2025-09-08T12:00:00Z",
-      pwdChangedTime: "2025-09-08T12:00:00Z",
-    },
-    meta: {
-      created: "2025-09-08T12:00:00Z",
-      lastModified: "2025-09-08T12:00:00Z",
-      location: "test",
-      resourceType: "User",
-    },
   },
-  userData: {
-    language: "en",
-    email: null,
-    emailLanguage: null,
-    emailValidated: false,
-    id: null,
-    otpType: undefined,
-    passwordSubmitted: false,
-    passwordValidated: false,
-    phone: undefined,
-    service: "Parks Canada Reservations",
-    stepVerificationSent: false,
-    stepVerified: false,
-    trxnId: null,
-    viewPrivacy: false,
-  },
-  testData: {
-    email: null,
-    firstname: null,
-    lastName: null,
-    otp: null,
-    password: null,
-    phone: null,
-    verificationCode: null,
-  },
-  authenticatedPages: [],
+  urlLanguageBeforeEdit: null,
   cancelProfileEditing: false,
   relyingPartyInfo: null,
-  urlLanguageBeforeEdit: null,
+  authenticatedPages: [],
 };
 
 describe("ProfileNameEdit Component", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockNavigateHelper.mockClear();
+  });
+
+  it("updates edit profile when form values change", async () => {
+    const { container } = render(
+      <BrowserRouter>
+        <LanguageProvider>
+          <UserProvider initial={mockUserState}>
+            <ProfileNameEdit />
+          </UserProvider>
+        </LanguageProvider>
+      </BrowserRouter>
+    );
+
+    const firstNameInput = screen.getByTestId("givenName");
+    const lastNameInput = screen.getByTestId("familyName");
+
+    fireEvent.change(firstNameInput, { target: { value: "New" } });
+    fireEvent.change(lastNameInput, { target: { value: "Name" } });
+
+    // Verify the input value changed
+    await waitFor(() => {
+      expect(firstNameInput).toBeInTheDocument();
+      expect(lastNameInput).toBeInTheDocument();
+      expect(firstNameInput.value).toBe("New");
+      expect(lastNameInput.value).toBe("Name");
+    });
   });
 
   it("clicking Continue button goes to confirmation page", async () => {
