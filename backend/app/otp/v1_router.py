@@ -34,9 +34,7 @@ async def send_otp(
     user_otp_info: UserOtpInfo,
     user_access_token: str = Depends(get_users_current_session),
 ):
-    return await handle_otp_send(
-        request.app.state.request_client, user_otp_info, user_access_token
-    )
+    return await handle_otp_send(request.app.state.request_client, user_otp_info)
 
 
 @router.post(
@@ -53,7 +51,7 @@ async def verify_otp(
     user_access_token: str = Depends(get_users_current_session),
 ):
     return await handle_otp_verification(
-        request.app.state.request_client, verification_data, user_access_token
+        request.app.state.request_client, verification_data
     )
 
 
@@ -74,5 +72,4 @@ async def check_otp(
     return await handle_otp_status_retrieval(
         request.app.state.request_client,
         RetrievalData(trxnId=trxn_id, otpType=otp_type),
-        user_access_token,
     )
