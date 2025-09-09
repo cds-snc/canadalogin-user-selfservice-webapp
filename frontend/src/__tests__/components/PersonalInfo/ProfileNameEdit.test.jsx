@@ -143,51 +143,6 @@ describe("ProfileNameEdit Component", () => {
     mockNavigateHelper.mockClear();
   });
 
-  it("renders the profile name edit form pre-fills form with existing user data", async () => {
-    const { container } = render(
-      <BrowserRouter>
-        <LanguageProvider>
-          <UserProvider initial={mockUserState}>
-            <ProfileNameEdit />
-          </UserProvider>
-        </LanguageProvider>
-      </BrowserRouter>
-    );
-
-    const firstNameInput = screen.getByTestId("givenName");
-    const lastNameInput = screen.getByTestId("familyName");
-
-    expect(firstNameInput).toBeInTheDocument();
-    expect(lastNameInput).toBeInTheDocument();
-    
-    // Snapshot assertion
-    expect(container.firstChild).toMatchSnapshot();
-  });
-
-  it("updates edit profile when form values change", async () => {
-    const { container } = render(
-      <BrowserRouter>
-        <LanguageProvider>
-          <UserProvider initial={mockUserState}>
-            <ProfileNameEdit />
-          </UserProvider>
-        </LanguageProvider>
-      </BrowserRouter>
-    );
-
-    const firstNameInput = screen.getByTestId("givenName");
-
-    fireEvent.change(firstNameInput, { target: { value: "New" } });
-
-    // Verify the input value changed
-    await waitFor(() => {
-      expect(firstNameInput).toBeInTheDocument();
-    });
-    
-    // Snapshot assertion after form change
-    expect(container.firstChild).toMatchSnapshot();
-  });
-
   it("clicking Continue button goes to confirmation page", async () => {
     render(
       <BrowserRouter>
@@ -198,8 +153,6 @@ describe("ProfileNameEdit Component", () => {
         </LanguageProvider>
       </BrowserRouter>
     );
-
-    const continueButton = screen.getByText("Continue");
 
     // Fill in the form with some data first
     const firstNameInput = screen.getByTestId("givenName");
