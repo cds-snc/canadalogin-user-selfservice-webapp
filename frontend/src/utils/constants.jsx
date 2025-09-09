@@ -89,7 +89,7 @@ export const PAGES = {
   FirstVerifyItsYou: "FirstVerifyItsYou",
   EnterNewEmail: "EnterNewEmail",
   profileYouMayUpdateName: "ProfileYouMayUpdateName",
-  areYouSureEditYourName: "AreYouSureEditYourName",
+  profileUpdateNameConfirmUpdate: "ProfileUpdateNameConfirmUpdate",
   ProfileNameEdit: "ProfileNameEdit",
   areYouSureUpdateContactNumber: "AreYouSureUpdateContactNumber",
   enterNewPhoneNumber: "EnterNewPhoneNumber",

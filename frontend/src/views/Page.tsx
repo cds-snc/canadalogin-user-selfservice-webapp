@@ -12,7 +12,7 @@ import ChangePasswordIndex from "../features/ChangePassword/components/ChangePas
 import ManageDashboard from "../components/Manage/ManageDashboard.jsx";
 import { PAGES } from "../utils/constants";
 import { trackPage } from "../utils/gatag.jsx";
-import AreYouSureEditYourName from "../components/Manage/AreYouSureEditYourName.jsx";
+import ProfileUpdateNameConfirmUpdate from "../components/Manage/ProfileUpdateNameConfirmUpdate.jsx";
 import ProfileNameEdit from "../components/PersonalInfo/ProfileNameEdit.jsx";
 import ProfileHome from "../components/Manage/ProfileHome.jsx";
 import CheckYourEmail from "../components/Manage/CheckYourEmail.jsx";
@@ -105,9 +105,9 @@ function PageContents({ page }: { page: string }) {
                             Sign in one time code</a></div>
                 </GcdsText>
             );
-        case PAGES.areYouSureEditYourName:
+        case PAGES.profileUpdateNameConfirmUpdate:
             return (
-                <AreYouSureEditYourName />
+                <ProfileUpdateNameConfirmUpdate />
             )
         case PAGES.areYouSureUpdateContactNumber:
             return (

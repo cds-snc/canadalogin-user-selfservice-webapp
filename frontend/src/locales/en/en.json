@@ -85,7 +85,7 @@
     "2": "Personal information",
     "3": "Security settings"
   },
-  "AreYouSureEditYourName": {
+  "ProfileUpdateNameConfirmUpdate": {
     "1": "Are you sure you want to update your name?",
     "2": "You’ve requested to update your name to:",
     "3": "Example Newname",

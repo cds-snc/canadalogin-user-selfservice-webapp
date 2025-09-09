@@ -13,7 +13,7 @@ import {
 export default {
   title: "GC Sign In/Pages/Manage/Profile Update Name Confirmation Page",
   args: {
-    page: PAGES.areYouSureEditYourName,
+    page: PAGES.profileUpdateNameConfirmUpdate,
   },
 };
 
