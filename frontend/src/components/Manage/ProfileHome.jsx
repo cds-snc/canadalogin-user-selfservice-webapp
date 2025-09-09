@@ -1,4 +1,3 @@
-import React from "react";
 import { useParams } from "react-router";
 import {
   GcdsContainer,
@@ -6,6 +5,7 @@ import {
   GcdsGrid,
   GcdsText,
   GcdsLink,
+  GcdsIcon,
 } from "@cdssnc/gcds-components-react";
 import parsePhoneNumberFromString from "libphonenumber-js";
 
@@ -75,13 +75,17 @@ const ContactPhoneNumber = (props) => {
         </GcdsLink>
       </GcdsGrid>
 
-      <gcds-grid
+      <GcdsGrid
         columns="auto auto"
         className="verifiedBadge verifiedBadgeBottom"
       >
-        <gcds-icon name="check" className="verifiedIcon" size="md" />
-        <gcds-text className="verifiedText">{pageContent["9"]}</gcds-text>
-      </gcds-grid>
+        <GcdsIcon
+          name="checkmark-circle"
+          className="verifiedIcon"
+          size="text"
+        />
+        <GcdsText className="verifiedText">{pageContent["9"]}</GcdsText>
+      </GcdsGrid>
     </>
   );
 };
@@ -139,10 +143,16 @@ export default function ProfileHome() {
           </GcdsLink>
         </GcdsGrid>
 
-        <gcds-grid columns="auto auto" className="verifiedBadge">
-          <gcds-icon name="check" className="verifiedIcon" size="sm" />
-          <gcds-text className="verifiedText">{pageContent["9"]}</gcds-text>
-        </gcds-grid>
+        <GcdsGrid columns="auto auto" className="verifiedBadge">
+          <GcdsIcon
+            name="checkmark-circle"
+            className="verifiedIcon"
+            size="text-small"
+          />
+          <GcdsText className="verifiedText" style={{ paddingTop: "0.25rem" }}>
+            {pageContent["9"]}
+          </GcdsText>
+        </GcdsGrid>
         {phoneNumbers != null ? (
           <>
             <div className="separator" />
