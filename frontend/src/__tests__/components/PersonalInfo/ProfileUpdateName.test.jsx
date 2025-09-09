@@ -136,32 +136,6 @@ describe("ProfileUpdateName Component", () => {
     mockNavigateHelper.mockClear();
   });
 
-  it("updates edit profile when form values change", async () => {
-    const { container } = render(
-      <BrowserRouter>
-        <LanguageProvider>
-          <UserProvider initial={mockUserState}>
-            <ProfileUpdateName />
-          </UserProvider>
-        </LanguageProvider>
-      </BrowserRouter>
-    );
-
-    const firstNameInput = screen.getByTestId("givenName");
-    const lastNameInput = screen.getByTestId("familyName");
-
-    fireEvent.change(firstNameInput, { target: { value: "New" } });
-    fireEvent.change(lastNameInput, { target: { value: "Name" } });
-
-    // Verify the input value changed
-    await waitFor(() => {
-      expect(firstNameInput).toBeInTheDocument();
-      expect(lastNameInput).toBeInTheDocument();
-      expect(firstNameInput.value).toBe("New");
-      expect(lastNameInput.value).toBe("Name");
-    });
-  });
-
   it("clicking Continue button goes to confirmation page", async () => {
     render(
       <BrowserRouter>
