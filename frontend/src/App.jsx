@@ -26,6 +26,7 @@ function App() {
     const areYouSureUpdateYourEmail = `/:language${NAVIGATION_LINKS.areYouSureUpdateYourEmail}`;
     const securitySettings = `/:language${NAVIGATION_LINKS.securitySettings}`;
     const verification = `/:language${NAVIGATION_LINKS.verification}`;
+    const updateContactPhoneNumber = `/:language${NAVIGATION_LINKS.updateContactPhoneNumber}`;
 
     return (
         <Routes>
