@@ -2,22 +2,22 @@ import { useState } from "react";
 import { useParams, useLocation } from "react-router";
 import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 import {
-    NAVIGATION_LINKS
+    NAVIGATION_LINKS,
+    FLOW_TYPES,
+    PAGES
 } from "../../../utils/constants.jsx";
+import { getPageContent } from '../../../utils/functions.jsx';
+
 import { useUser } from "../../../components/Providers/useUser.tsx";
+import Loader from "../../../components/Layout/Loading.jsx";
 import EnterPhoneNumber from "./EnterPhoneNumber.jsx";
+import OtpVerification from "./OtpVerification.jsx";
 
 const STEPS = {
     ENTER: 'enterPhoneNumber',
-    VERIFY: 'verify',
+    VERIFY: 'otpValidation',
     CONFIRM: 'confirm',
 };
-
-const MFAMETHOD = {
-    SMS: 'sms',
-    VOICE: 'voice'
-};
-
 
 
 export default function UpdateContactPhoneNumber() {
@@ -30,11 +30,13 @@ export default function UpdateContactPhoneNumber() {
     const [localLoading, setLocalLoading] = useState(false);
 
     const [step, setStep] = useState(STEPS.ENTER);
+    const loadingMessage = getPageContent(language, PAGES.otpSelection);
+
     const [phoneFormData, setPhoneFormData] = useState({
         'phoneNumber': '',
         'otp': '',
         'trxid': '',
-        'contactType': MFAMETHOD.SMS
+        'contactType': FLOW_TYPES.sms
     });
 
     const [otpValidationResponse, setOtpValidationResponse] = useState(null);
@@ -68,10 +70,11 @@ export default function UpdateContactPhoneNumber() {
                 userProfile={userProfile}
                 phoneFormData={phoneFormData}
                 onChangePhoneForm={handlePhoneForm}
+                setLocalLoading={handleLoading}
                 step={1}
                 totalSteps={3}
                 onNext={() => {
-                    setStep("verify");
+                    setStep(STEPS.VERIFY);
                 }}
                 onCancel={
                     () => {
@@ -80,25 +83,23 @@ export default function UpdateContactPhoneNumber() {
                 }
             />
         ),
-        // otpValidation: (
-        //     <OtpVerification
-        //         userProfile={userProfile}
-        //         userSelectedMfaType={userSelectedMfaType}
-        //         localLoading={localLoading}
-        //         setLocalLoading={handleLoading}
-        //         onChangeUserMfaType={handleChangeUserMfaSelection}
-        //         step={3}
-        //         totalSteps={4}
-        //         userOtpValue={userOtpValue}
-        //         setUserOtpValue={handleSetUserOtpValue}
-        //         otpSentResponse={otpSentResponse}
-        //         setOtpSentResponse={handleOtpSentResponse}
-        //         onNext={() => {
-        //             setPasswordUpdateStep("passwordChange");
-        //         }}
-        //         onBack={() => setPasswordUpdateStep("otpSelection")}
-        //     />
-        // ),
+        otpValidation: (
+            <OtpVerification
+                userProfile={userProfile}
+                phoneFormData={phoneFormData}
+                onChangePhoneForm={handlePhoneForm}
+                step={1}
+                totalSteps={3}
+                onNext={() => {
+                    setStep(STEPS.VERIFY);
+                }}
+                onCancel={
+                    () => {
+                        navigateHelper(backtoProfile);
+                    }
+                }
+            />
+        ),
         // passwordChange: (
         //     <Password
         //         userProfile={userProfile}
@@ -131,11 +132,9 @@ export default function UpdateContactPhoneNumber() {
     };
 
     console.log('phoneForm', phoneFormData)
-    return (
-        <>
-            {
-                steps[step]
-            }
-        </>
-    )
+    console.log('localLoading', localLoading)
+
+    return localLoading
+        ? <Loader text={loadingMessage['11']} />
+        : steps[step];
 }

@@ -300,12 +300,12 @@
     "2": "La vérification en 2 étapes ajoute une seconde mesure de sécurité à votre mot de passe.",
     "3": "Apprenez-en plus sur la vérification en deux étapes (s’ouvre dans un nouvel onglet)",
     "4": "Sélectionnez une autre méthode de vérification à deux étapes",
-    "5": "How should we send you the code?",
-    "6": "You can change this the next time you sign in.",
-    "7": "Text message (SMS)",
-    "8": "Mobile only. Carrier charges may apply.",
-    "9": "Voice call",
-    "10": "Mobile or landline. Carrier charges may apply.",
+    "5": "Comment devons-nous vous envoyer le code ?",
+    "6": "Vous pourrez modifier ce paramètre lors de votre prochaine connexion.",
+    "7": "Message texte (SMS)",
+    "8": "Mobile uniquement. Des frais de l’opérateur peuvent s’appliquer.",
+    "9": "Appel vocal",
+    "10": "Mobile ou ligne fixe. Des frais de l’opérateur peuvent s’appliquer.",
     "11": "Chargement"
   },
   "PasswordChangedConfirmation": {

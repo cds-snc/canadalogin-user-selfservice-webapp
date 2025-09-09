@@ -96,7 +96,7 @@ const RadioButtons = ({ onChangePhoneForm, pageContentJson, phoneFormData }) => 
 };
 
 
-export default function EnterPhoneNumber({ step, totalSteps, onNext, onCancel, onChangePhoneForm, phoneFormData }) {
+export default function EnterPhoneNumber({ step, totalSteps, onNext, onCancel, onChangePhoneForm, phoneFormData, setLocalLoading }) {
     const { language } = useParams();
     const [phone, setPhone] = useState('');
     const [countryCodeLength, setCountryCodeLength] = useState(0);
@@ -127,6 +127,7 @@ export default function EnterPhoneNumber({ step, totalSteps, onNext, onCancel, o
                         }}
                         specialLabel={pageContentJson['10']}
                         country={'ca'}
+                        preferredCountries={['ca']}
                         onlyCountries={countryMapping.countries}
                         localization={language === 'fr' ? countryMapping.frLocalization : countryMapping.localization}
                         value={phoneFormData.phoneNumber}
@@ -158,6 +159,7 @@ export default function EnterPhoneNumber({ step, totalSteps, onNext, onCancel, o
             <GcdsGrid columns="repeat(auto-fit, minmax(100px, 100px))" gap="500" align-items="center">
                 <GcdsButton style={{ width: 'fit-content' }} onGcdsClick={(ev) => {
                     ev.preventDefault();
+                    // sendOTP Here
                     onNext()
                 }}>
                     {submit}
