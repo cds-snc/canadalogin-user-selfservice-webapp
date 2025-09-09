@@ -1,5 +1,4 @@
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { BrowserRouter } from "react-router";
 import AreYouSureEditYourName from "../../../components/Manage/AreYouSureEditYourName.jsx";
@@ -93,9 +92,9 @@ const mockUserState = {
     userName: "testuser",
     preferredLanguage: "en",
     name: {
-      givenName: "Jane",
-      familyName: "Smith",
-      formatted: "Jane Smith",
+      givenName: "Test",
+      familyName: "User",
+      formatted: "Test User",
     },
   },
   urlLanguageBeforeEdit: null,
@@ -186,7 +185,7 @@ describe("AreYouSureEditYourName Component", () => {
     );
 
     // Should show the new name from editProfile
-    expect(screen.getByText(/Jane Smith/i)).toBeInTheDocument();
+    expect(screen.getByText(/Test User/i)).toBeInTheDocument();
   });
 
   it("has confirm and cancel buttons", () => {

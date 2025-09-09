@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { BrowserRouter } from "react-router";
 import ProfileNameEdit from "../../../components/PersonalInfo/ProfileNameEdit.jsx";
 import { UserProvider } from "../../../components/Providers/UserProvider.tsx";
+import { useUser } from "../../../components/Providers/useUser.tsx";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider.tsx";
 import "@testing-library/jest-dom/vitest";
 
@@ -142,28 +143,11 @@ describe("ProfileNameEdit Component", () => {
     mockNavigateHelper.mockClear();
   });
 
-  it("renders the profile name edit form", () => {
-    render(
+  it("renders the profile name edit form pre-fills form with existing user data", async () => {
+    const { container } = render(
       <BrowserRouter>
         <LanguageProvider>
-          <UserProvider initialUserState={mockUserState}>
-            <ProfileNameEdit />
-          </UserProvider>
-        </LanguageProvider>
-      </BrowserRouter>
-    );
-    expect(screen.getByText(/edit your name/i)).toBeInTheDocument();
-    expect(screen.getByTestId("givenName")).toBeInTheDocument();
-    expect(screen.getByTestId("familyName")).toBeInTheDocument();
-    expect(screen.getByText(/Cancel/i)).toBeInTheDocument();
-    expect(screen.getByText(/Continue/i)).toBeInTheDocument();
-  });
-
-  it("pre-fills form with existing user data", async () => {
-    render(
-      <BrowserRouter>
-        <LanguageProvider>
-          <UserProvider initialUserState={mockUserState}>
+          <UserProvider initial={mockUserState}>
             <ProfileNameEdit />
           </UserProvider>
         </LanguageProvider>
@@ -173,17 +157,18 @@ describe("ProfileNameEdit Component", () => {
     const firstNameInput = screen.getByTestId("givenName");
     const lastNameInput = screen.getByTestId("familyName");
 
-    // Note: GCDS components might not show values immediately in tests
-    // We would need to check if they have the correct props
     expect(firstNameInput).toBeInTheDocument();
     expect(lastNameInput).toBeInTheDocument();
+    
+    // Snapshot assertion
+    expect(container.firstChild).toMatchSnapshot();
   });
 
   it("updates edit profile when form values change", async () => {
-    render(
+    const { container } = render(
       <BrowserRouter>
         <LanguageProvider>
-          <UserProvider initialUserState={mockUserState}>
+          <UserProvider initial={mockUserState}>
             <ProfileNameEdit />
           </UserProvider>
         </LanguageProvider>
@@ -192,19 +177,22 @@ describe("ProfileNameEdit Component", () => {
 
     const firstNameInput = screen.getByTestId("givenName");
 
-    fireEvent.change(firstNameInput, { target: { value: "Jane" } });
+    fireEvent.change(firstNameInput, { target: { value: "New" } });
 
     // Verify the input value changed
     await waitFor(() => {
       expect(firstNameInput).toBeInTheDocument();
     });
+    
+    // Snapshot assertion after form change
+    expect(container.firstChild).toMatchSnapshot();
   });
 
   it("clicking Continue button goes to confirmation page", async () => {
     render(
       <BrowserRouter>
         <LanguageProvider>
-          <UserProvider initialUserState={mockUserState}>
+          <UserProvider initial={mockUserState}>
             <ProfileNameEdit />
           </UserProvider>
         </LanguageProvider>
@@ -212,13 +200,13 @@ describe("ProfileNameEdit Component", () => {
     );
 
     const continueButton = screen.getByText("Continue");
-    
+
     // Fill in the form with some data first
     const firstNameInput = screen.getByTestId("givenName");
     const lastNameInput = screen.getByTestId("familyName");
-    
-    fireEvent.change(firstNameInput, { target: { value: "Jane" } });
-    fireEvent.change(lastNameInput, { target: { value: "Smith" } });
+
+    fireEvent.change(firstNameInput, { target: { value: "New" } });
+    fireEvent.change(lastNameInput, { target: { value: "User" } });
 
     // Find the form by its ID and trigger submit
     const form = document.getElementById("form");
@@ -226,7 +214,63 @@ describe("ProfileNameEdit Component", () => {
 
     // Verify it navigates to the confirmation page
     await waitFor(() => {
-      expect(mockNavigateHelper).toHaveBeenCalledWith("/en/profile/update-name/confirm-update");
+      expect(mockNavigateHelper).toHaveBeenCalledWith(
+        "/en/profile/update-name/confirm-update"
+      );
     });
+  });
+
+  it("updates global editProfile state when form is submitted", async () => {
+    let capturedState;
+
+    // Create a component that captures the state for testing
+    const StateCapture = () => {
+      const { state } = useUser();
+      capturedState = state;
+      return null;
+    };
+
+    render(
+      <BrowserRouter>
+        <LanguageProvider>
+          <UserProvider initial={mockUserState}>
+            <ProfileNameEdit />
+            <StateCapture />
+          </UserProvider>
+        </LanguageProvider>
+      </BrowserRouter>
+    );
+
+    // Wait for the component to mount and cloneUserProfile to be called
+    await waitFor(() => {
+      expect(capturedState?.editProfile).toBeTruthy();
+    });
+
+    // Fill in the form with new data
+    const firstNameInput = screen.getByTestId("givenName");
+    const lastNameInput = screen.getByTestId("familyName");
+
+    fireEvent.change(firstNameInput, {
+      target: { name: "givenName", value: "New" },
+    });
+    fireEvent.change(lastNameInput, {
+      target: { name: "familyName", value: "User" },
+    });
+
+    // Submit the form
+    const form = document.getElementById("form");
+    fireEvent.submit(form);
+
+    // Verify navigation happens first
+    await waitFor(() => {
+      expect(mockNavigateHelper).toHaveBeenCalledWith(
+        "/en/profile/update-name/confirm-update"
+      );
+    });
+
+    // Check that the editProfile was updated in the context
+    expect(capturedState?.editProfile?.name?.givenName).toBe("New");
+    expect(capturedState?.editProfile?.name?.familyName).toBe("User");
+    expect(capturedState?.editProfile?.name?.formatted).toBe("New User");
   });
 });

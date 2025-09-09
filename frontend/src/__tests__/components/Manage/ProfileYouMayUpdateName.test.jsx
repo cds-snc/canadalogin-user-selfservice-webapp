@@ -56,9 +56,9 @@ const mockUserState = {
     userName: "testuser",
     preferredLanguage: "en",
     name: {
-      givenName: "Jane",
-      familyName: "Smith",
-      formatted: "Jane Smith",
+      givenName: "Test",
+      familyName: "User",
+      formatted: "Test User",
     },
   },
   editProfile: null,
@@ -116,7 +116,7 @@ describe("ProfileYouMayUpdateName Component", () => {
       </TestWrapper>
     );
 
-    expect(screen.getByText(/Jane Smith/i)).toBeInTheDocument();
+    expect(screen.getByText(/Test User/i)).toBeInTheDocument();
   });
 
   it("shows continue to profile button", () => {

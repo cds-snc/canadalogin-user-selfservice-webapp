@@ -49,8 +49,6 @@ export default function ProfileNameEdit() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    console.log('State', state)
-
     return (
         <GcdsContainer>
             <GcdsHeading tag="h1">
