@@ -50,7 +50,7 @@ function App() {
         <Route path={profileHome} element={<Page page={PAGES.ProfileHome} />} />
         
         {/* Profile Update Name Routes */}
-        <Route path={profileUpdateName} element={<Page page={PAGES.ProfileNameEdit} />} />
+        <Route path={profileUpdateName} element={<Page page={PAGES.profileUpdateName} />} />
         <Route path={profileUpdateNameConfirmUpdate} element={<Page page={PAGES.profileUpdateNameConfirmUpdate} />} />
         <Route path={profileUpdateNameSuccess} element={<Page page={PAGES.profileUpdateNameSuccess} />} />
         

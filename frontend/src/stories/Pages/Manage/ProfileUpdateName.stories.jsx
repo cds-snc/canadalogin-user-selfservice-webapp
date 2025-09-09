@@ -8,9 +8,9 @@ import {
 import {buildTestCase, Template} from "../../Tests/utils/functions.tsx";
 
 export default {
-    title: 'GC Sign In/Pages/Manage/Profile Name Edit Page',
+    title: 'GC Sign In/Pages/Manage/Profile Update Name Page',
     args:{
-        page:PAGES.ProfileNameEdit
+        page:PAGES.profileUpdateName
     }
 };
 

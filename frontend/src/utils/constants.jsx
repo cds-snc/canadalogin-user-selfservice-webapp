@@ -90,7 +90,7 @@ export const PAGES = {
   EnterNewEmail: "EnterNewEmail",
   profileUpdateNameSuccess: "ProfileUpdateNameSuccess",
   profileUpdateNameConfirmUpdate: "ProfileUpdateNameConfirmUpdate",
-  ProfileNameEdit: "ProfileNameEdit",
+  profileUpdateName: "ProfileUpdateName",
   areYouSureUpdateContactNumber: "AreYouSureUpdateContactNumber",
   enterNewPhoneNumber: "EnterNewPhoneNumber",
   youMayUpdateEmailAtOtherPlaces: "YouMayUpdateEmailAtOtherPlaces",

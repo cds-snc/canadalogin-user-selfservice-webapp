@@ -8,17 +8,17 @@ import {
     GcdsText, GcdsLink
 } from '@cdssnc/gcds-components-react';
 import { useParams } from 'react-router';
-import { getPageContent } from '../../utils/functions';
+import { getPageContent } from '../../utils/functions.jsx';
 import { userProfileDispatch } from "../../utils/userProfileDispatch.jsx";
-import { PAGES, NAVIGATION_LINKS, CONTEXT_ACTIONS } from '../../utils/constants';
-import SubmitButton from '../Layout/SubmitButton';
+import { PAGES, NAVIGATION_LINKS, CONTEXT_ACTIONS } from '../../utils/constants.jsx';
+import SubmitButton from '../Layout/SubmitButton.jsx';
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
-import { useUser } from "../Providers/useUser";
+import { useUser } from "../Providers/useUser.tsx";
 
-export default function ProfileNameEdit() {
+export default function ProfileUpdateName() {
     const { language } = useParams();
     const { state, dispatch } = useUser();
-    const pageNameEditJson = getPageContent(language, PAGES.ProfileNameEdit);
+    const pageNameEditJson = getPageContent(language, PAGES.profileUpdateName);
     const navigateHelper = useNavigateHelper();
     const { cloneUserProfile, updateClonedProfile } = userProfileDispatch(dispatch);
     const confirmation = `/${language}${NAVIGATION_LINKS.profileUpdateNameConfirmUpdate}`;

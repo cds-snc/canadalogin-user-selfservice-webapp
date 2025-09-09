@@ -182,7 +182,7 @@
         "4": "Continuer",
         "5": "Annuler"
     },
-    "ProfileNameEdit": {
+    "ProfileUpdateName": {
         "1": "Quels services ont accès à votre nom ?",
         "2": "Prénom",
         "3": "Nom de famille",

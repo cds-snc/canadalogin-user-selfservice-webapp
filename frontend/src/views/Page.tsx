@@ -13,7 +13,7 @@ import ManageDashboard from "../components/Manage/ManageDashboard.jsx";
 import { PAGES } from "../utils/constants";
 import { trackPage } from "../utils/gatag.jsx";
 import ProfileUpdateNameConfirmUpdate from "../components/Manage/ProfileUpdateNameConfirmUpdate.jsx";
-import ProfileNameEdit from "../components/PersonalInfo/ProfileNameEdit.jsx";
+import ProfileUpdateName from "../components/PersonalInfo/ProfileUpdateName.jsx";
 import ProfileHome from "../components/Manage/ProfileHome.jsx";
 import CheckYourEmail from "../components/Manage/CheckYourEmail.jsx";
 import CompleteTwoStepVerification from "../components/Manage/CompleteTwoStepVerification.jsx";
@@ -40,9 +40,9 @@ function PageContents({ page }: { page: string }) {
                 <ManageDashboard />
             );
 
-        case PAGES.ProfileNameEdit:
+        case PAGES.profileUpdateName:
             return (
-                <ProfileNameEdit />
+                <ProfileUpdateName />
             );
         case PAGES.ProfileHome:
             return (
