@@ -39,7 +39,7 @@ async def request_access_token(global_http_client: AsyncClient):
 
     except Exception as e:
         logger.error(f"Error requesting token: {str(e)}", exc_info=True)
-        await RequestErrorHandler.handle(e)
+        RequestErrorHandler.handle(e)
 
 
 async def get_admin_token(global_http_client: AsyncClient) -> str:
@@ -48,7 +48,7 @@ async def get_admin_token(global_http_client: AsyncClient) -> str:
         logger.info("Attempting to get access token")
 
         start_time = datetime.now()
-        response = await request_access_token(global_http_client)  # Await the coroutine
+        response = await request_access_token(global_http_client)
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(f"Token request completed in {duration:.2f} seconds")
         response_json = response.json()

@@ -37,7 +37,7 @@ async def dispatch_get_password_policy(global_http_client: AsyncClient):
 
     except Exception as e:
         logger.error(f"Error password policy: {str(e)}", exc_info=True)
-        await RequestErrorHandler.handle(e, context="password policy")
+        RequestErrorHandler.handle(e, context="password policy")
 
 
 async def get_password_policy(global_http_client: AsyncClient):
@@ -65,4 +65,4 @@ async def get_password_policy(global_http_client: AsyncClient):
 
     except Exception as e:
         logger.error(f"Error dispatch_reset_otp: {str(e)}", exc_info=True)
-        await RequestErrorHandler.handle(e, context="Second Step Password Update")
+        RequestErrorHandler.handle(e, context="Second Step Password Update")

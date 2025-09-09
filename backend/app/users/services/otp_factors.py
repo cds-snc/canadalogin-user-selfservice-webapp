@@ -113,7 +113,7 @@ async def dispatch_user_auth_factors(
 
     except Exception as e:
         logger.error(f"Error dispatch_password_reset_otp: {str(e)}", exc_info=True)
-        await RequestErrorHandler.handle(e)
+        RequestErrorHandler.handle(e)
 
 
 async def get_user_otp_factors(
@@ -172,4 +172,4 @@ async def get_user_otp_factors(
 
     except Exception as e:
         logger.error(f"Error getting user auth factors: {str(e)}", exc_info=True)
-        await RequestErrorHandler.handle(e)
+        RequestErrorHandler.handle(e)

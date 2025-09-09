@@ -11,7 +11,7 @@ class RequestErrorHandler:
     """Reusable exception handler for token-related requests."""
 
     @staticmethod
-    async def handle(exc: Exception, context: str = "API request") -> None:
+    def handle(exc: Exception, context: str = "API request") -> None:
         if isinstance(exc, HTTPStatusError):
             response_status_code = (
                 exc.response.status_code
@@ -33,7 +33,7 @@ class RequestErrorHandler:
 
             if response_status_code == status.HTTP_400_BAD_REQUEST:
                 try:
-                    body = await exc.response.json()
+                    body = exc.response.json()
                 except ValueError:
                     body = {"messageDescription": exc.response.text}
                 raise HTTPException(

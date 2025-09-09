@@ -67,7 +67,7 @@ async def handle_otp_send(global_http_client: AsyncClient, user_otp_info: UserOt
             return ResponseModel(
                 success=True,
                 data=validated_data,
-                message=f"{user_otp_info.otpType} OTP sent successfully",
+                message=f"{user_otp_info.otpType.value} OTP sent successfully",
             )
 
     except Exception as e:

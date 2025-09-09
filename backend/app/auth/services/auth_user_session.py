@@ -45,7 +45,7 @@ async def introspect_user_token(
         logger.error(f"Error introspect_user_token: {str(e)}", exc_info=True)
         if isinstance(e, HTTPException):
             raise
-        await RequestErrorHandler.handle(e, context="introspect_user_token")
+        RequestErrorHandler.handle(e, context="introspect_user_token")
 
 
 async def get_users_current_session(request: Request):
