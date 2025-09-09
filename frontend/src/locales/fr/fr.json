@@ -161,7 +161,7 @@
         "10": "Vous pouvez demander un nouveau code dans",
         "11": "10 secondes"
     },
-    "ProfileYouMayUpdateName": {
+    "ProfileUpdateNameSuccess": {
         "0": "Réussite",
         "1": "Votre nom a été mis à jour vers",
         "2": "Vous devrez peut-être mettre à jour votre nom à d'autres endroits.",

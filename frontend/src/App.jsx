@@ -52,7 +52,7 @@ function App() {
         {/* Profile Update Name Routes */}
         <Route path={profileUpdateName} element={<Page page={PAGES.ProfileNameEdit} />} />
         <Route path={profileUpdateNameConfirmUpdate} element={<Page page={PAGES.profileUpdateNameConfirmUpdate} />} />
-        <Route path={profileUpdateNameSuccess} element={<Page page={PAGES.profileYouMayUpdateName} />} />
+        <Route path={profileUpdateNameSuccess} element={<Page page={PAGES.profileUpdateNameSuccess} />} />
         
         {/* Profile Update Language Routes */}
         <Route path={profileUpdateLanguage} element={<Page page={PAGES.editLanguagePreferences} />} />

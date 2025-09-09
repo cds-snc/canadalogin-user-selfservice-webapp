@@ -19,7 +19,7 @@ import CheckYourEmail from "../components/Manage/CheckYourEmail.jsx";
 import CompleteTwoStepVerification from "../components/Manage/CompleteTwoStepVerification.jsx";
 import FirstVerifyItsYou from "../components/Manage/FirstVerifyItsYou.jsx";
 import EnterNewEmail from "../components/Manage/EnterNewEmail.jsx";
-import ProfileYouMayUpdateName from "../components/Manage/ProfileYouMayUpdateName.jsx";
+import ProfileUpdateNameSuccess from "../components/Manage/ProfileUpdateNameSuccess.jsx";
 import AreYouSureUpdateContactNumber from "../components/Manage/AreYouSureUpdateContactNumber.jsx";
 import EnterNewPhoneNumber from "../components/Manage/EnterNewPhoneNumber.jsx";
 import YouMayUpdateEmailAtOtherPlaces from "../components/Manage/YouMayUpdateEmailAtOtherPlaces.jsx";
@@ -64,9 +64,9 @@ function PageContents({ page }: { page: string }) {
             return (
                 <EnterNewEmail />
             );
-        case PAGES.profileYouMayUpdateName:
+        case PAGES.profileUpdateNameSuccess:
             return (
-                <ProfileYouMayUpdateName />
+                <ProfileUpdateNameSuccess />
             );
         case PAGES.enterNewPhoneNumber:
             return (

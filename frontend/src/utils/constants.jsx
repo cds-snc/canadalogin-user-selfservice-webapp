@@ -88,7 +88,7 @@ export const PAGES = {
   CompleteTwoStepVerification: "CompleteTwoStepVerification",
   FirstVerifyItsYou: "FirstVerifyItsYou",
   EnterNewEmail: "EnterNewEmail",
-  profileYouMayUpdateName: "ProfileYouMayUpdateName",
+  profileUpdateNameSuccess: "ProfileUpdateNameSuccess",
   profileUpdateNameConfirmUpdate: "ProfileUpdateNameConfirmUpdate",
   ProfileNameEdit: "ProfileNameEdit",
   areYouSureUpdateContactNumber: "AreYouSureUpdateContactNumber",

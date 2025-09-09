@@ -183,7 +183,7 @@
     "13": "Continue",
     "14": "Cancel"
   },
-  "ProfileYouMayUpdateName": {
+  "ProfileUpdateNameSuccess": {
     "0": "Success",
     "1": "Your name has been updated to",
     "2": "You may need to update your name with other places.",

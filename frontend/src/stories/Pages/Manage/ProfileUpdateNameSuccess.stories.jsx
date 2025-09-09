@@ -9,7 +9,7 @@ import { buildTestCase, Template } from "../../Tests/utils/functions.tsx";
 export default {
   title: "GC Sign In/Pages/Manage/Profile Update Name Success Page",
   args: {
-    page: PAGES.profileYouMayUpdateName,
+    page: PAGES.profileUpdateNameSuccess,
   },
 };
 
