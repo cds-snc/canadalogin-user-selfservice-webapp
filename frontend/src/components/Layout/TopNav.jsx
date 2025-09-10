@@ -79,7 +79,7 @@ export default function TopNav({ currentLang }) {
       alignment="right"
       className="gcds-top-nav"
     >
-      <GcdsNavLink href="/" slot="home">
+      <GcdsNavLink href={homeLink} slot="home">
         {pageContentJson["1"]}
       </GcdsNavLink>
       <GcdsNavGroup open-trigger="Menu" menu-label="Menu">
