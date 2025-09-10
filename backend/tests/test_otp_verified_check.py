@@ -61,7 +61,9 @@ async def test_handle_otp_verification_failure(mock_verify_otp):
 @patch("app.utils.access_token.request_access_token")
 @patch("app.otp.services.verify_transient_otp.get_auth_request_headers")
 @patch("app.otp.services.verify_transient_otp.get_configuration")
-async def test_verify_otp_sms_success(mock_get_config, mock_get_headers, mock_request_token):
+async def test_verify_otp_sms_success(
+    mock_get_config, mock_get_headers, mock_request_token
+):
     user_data = UserOtpVerificationInfo(
         otp="111111", trxnId="txn_sms", otpType=OtpType.SMS
     )
@@ -79,7 +81,7 @@ async def test_verify_otp_sms_success(mock_get_config, mock_get_headers, mock_re
     mock_token_response = Response(
         status_code=200,
         content=b'{"access_token": "mocked_token"}',
-        request=Request("POST", "https://ibm/token")
+        request=Request("POST", "https://ibm/token"),
     )
     mock_request_token.return_value = mock_token_response
 
@@ -103,7 +105,9 @@ async def test_verify_otp_sms_success(mock_get_config, mock_get_headers, mock_re
 @patch("app.utils.access_token.request_access_token")
 @patch("app.otp.services.verify_transient_otp.get_auth_request_headers")
 @patch("app.otp.services.verify_transient_otp.get_configuration")
-async def test_verify_otp_email_success(mock_get_config, mock_get_headers, mock_request_token):
+async def test_verify_otp_email_success(
+    mock_get_config, mock_get_headers, mock_request_token
+):
     user_data = UserOtpVerificationInfo(
         otp="222222", trxnId="txn_email", otpType=OtpType.EMAIL
     )
@@ -121,7 +125,7 @@ async def test_verify_otp_email_success(mock_get_config, mock_get_headers, mock_
     mock_token_response = Response(
         status_code=200,
         content=b'{"access_token": "mocked_token"}',
-        request=Request("POST", "https://ibm/token")
+        request=Request("POST", "https://ibm/token"),
     )
     mock_request_token.return_value = mock_token_response
 
@@ -145,7 +149,9 @@ async def test_verify_otp_email_success(mock_get_config, mock_get_headers, mock_
 @patch("app.utils.access_token.request_access_token")
 @patch("app.otp.services.verify_transient_otp.get_auth_request_headers")
 @patch("app.otp.services.verify_transient_otp.get_configuration")
-async def test_verify_otp_invalid_type_returns_error(mock_get_config, mock_get_headers, mock_request_token):
+async def test_verify_otp_invalid_type_returns_error(
+    mock_get_config, mock_get_headers, mock_request_token
+):
     user_data = UserOtpVerificationInfo(
         otp="333333", trxnId="txn_invalid", otpType=OtpType.SMS
     )
@@ -156,13 +162,14 @@ async def test_verify_otp_invalid_type_returns_error(mock_get_config, mock_get_h
     mock_token_response = Response(
         status_code=200,
         content=b'{"access_token": "mocked_token"}',
-        request=Request("POST", "https://ibm/token")
+        request=Request("POST", "https://ibm/token"),
     )
     mock_request_token.return_value = mock_token_response
     mock_get_headers.return_value = {"Authorization": "Bearer token"}
 
     class Settings:
         IBM_VERIFY_TENANT_URL = "https://ibm"
+
     cfg = MagicMock()
     cfg.ibm_verify_config = Settings()
     mock_get_config.return_value = cfg
