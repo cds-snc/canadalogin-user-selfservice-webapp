@@ -219,4 +219,20 @@ describe("ProfileUpdateName Component", () => {
     expect(capturedState?.editProfile?.name?.familyName).toBe("User");
     expect(capturedState?.editProfile?.name?.formatted).toBe("New User");
   });
+
+  const TestWrapper = ({ children }) => (
+    <BrowserRouter>
+      <UserProvider initial={mockUserState}>
+        <LanguageProvider>{children}</LanguageProvider>
+      </UserProvider>
+    </BrowserRouter>
+  );
+  it("matches snapshot", () => {
+    const { container } = render(
+      <TestWrapper>
+        <ProfileUpdateName />
+      </TestWrapper>
+    );
+    expect(container).toMatchSnapshot();
+  });
 });
