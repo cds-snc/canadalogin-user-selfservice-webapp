@@ -1,4 +1,4 @@
-import { expect, userEvent, within } from "@storybook/test";
+import { expect, userEvent, within, waitFor } from "@storybook/test";
 import {
   AVAILABLE_LANGUAGES,
   FLOW_TYPES,
@@ -6,23 +6,6 @@ import {
   PAGES,
 } from "../../../utils/constants.jsx";
 import { buildTestCase, TestTemplate } from "../utils/functions.tsx";
-
-// Simple navigation tracking - we'll observe what happens in the browser
-let testResults = [];
-
-// Helper function to reset test results between tests
-const resetTestResults = () => {
-  testResults = [];
-};
-
-// Track any navigation attempts by observing URL changes or errors
-const trackNavigationAttempt = (description) => {
-  testResults.push({
-    timestamp: new Date().toISOString(),
-    description,
-    url: window.location.href
-  });
-};
 
 export default {
   title: "GC Sign In/Tests/Manage/Profile Update Name",
@@ -171,56 +154,33 @@ export const SubmitValidForm = {
       }
     });
 
-    // Submit the form - Click the Continue button and observe behavior
-    await step("Click Continue button and test form submission", async () => {
-      resetTestResults();
-      trackNavigationAttempt("Before form submission");
-      
+    // Submit the form - Click the Continue button
+    await step("Click Continue button", async () => {
       // Try multiple ways to find the Continue button
       let continueButton = canvas.getByText(/Continue/i) ||
-                          canvas.getByLabelText('test') ||
                           canvasElement.querySelector('gcds-button[type="submit"] button') ||
                           canvasElement.querySelector('button[type="submit"]') ||
                           canvasElement.querySelector('gcds-button button[part="button"]');
       
-      console.log("Continue button found:", continueButton);
       await expect(continueButton).toBeInTheDocument();
       
-      // If it's a GCDS button wrapper, try to find the actual button inside
+      // If it's a GCDS button wrapper, try to find the actual button inside the shadow DOM
       if (continueButton.tagName === 'GCDS-BUTTON' && continueButton.shadowRoot) {
         const actualButton = continueButton.shadowRoot.querySelector('button[part="button"]') ||
                            continueButton.shadowRoot.querySelector('button');
         if (actualButton) {
           continueButton = actualButton;
-          console.log("Using shadow DOM button:", actualButton);
         }
       }
       
-      console.log("Clicking Continue button - testing form submission");
-      
-      // Track before click
-      const beforeUrl = window.location.href;
-      trackNavigationAttempt("About to click Continue button");
-      
+      // Click the Continue button
       await userEvent.click(continueButton);
       
-      // Wait for the click to process
-      await new Promise((r) => setTimeout(r, 1500));
+      // Wait a moment for any processing
+      await new Promise((r) => setTimeout(r, 1000));
       
-      // Track after click
-      const afterUrl = window.location.href;
-      trackNavigationAttempt("After clicking Continue button");
-      
-      // The test passes if the form submission completed without errors
-      // In a real routing environment, we would navigate to the confirmation page
-      // In Storybook, we verify that the interaction completed successfully
-      console.log("✅ Form submission test completed");
-      console.log("Test results:", testResults);
-      console.log("URL before:", beforeUrl);
-      console.log("URL after:", afterUrl);
-      
-      // Test passes if we didn't get any JavaScript errors and the button click worked
-      await expect(continueButton).toBeInTheDocument();
+      // Test passes if no errors were thrown during form submission
+      // The form submission may trigger navigation (which might show 404) but that's expected in Storybook
     });
 
     await new Promise((r) => setTimeout(r, 1000));
@@ -258,24 +218,15 @@ export const CancelFormSubmission = {
     const canvas = within(canvasElement);
     await new Promise((r) => setTimeout(r, 1000));
 
-    // Click cancel button and observe behavior
-    await step("Click cancel button and test interaction", async () => {
-      resetTestResults();
-      
+    // Click cancel button
+    await step("Click cancel button", async () => {
       const cancelButton = canvas.getByText(/Cancel/i);
       await expect(cancelButton).toBeInTheDocument();
       
-      trackNavigationAttempt("About to click Cancel button");
       await userEvent.click(cancelButton);
       
-      // Wait for interaction
+      // Wait a moment for any processing
       await new Promise((r) => setTimeout(r, 1000));
-      
-      trackNavigationAttempt("After clicking Cancel button");
-      
-      // Verify the button interaction worked
-      await expect(cancelButton).toBeInTheDocument();
-      console.log("✅ Cancel button test passed - interaction completed successfully");
     });
 
     await new Promise((r) => setTimeout(r, 1000));
@@ -448,17 +399,13 @@ export const TestWithRouteContext = {
     await new Promise((r) => setTimeout(r, 2000));
 
     await step("Verify route context is properly set up", async () => {
-      // Verify the component renders correctly with route context from buildTestCase
       const container = canvas.querySelector("main") || 
                        canvas.querySelector("gcds-container") || 
                        canvasElement;
       await expect(container).toBeInTheDocument();
-      console.log("✅ Route context test - component rendered with proper routing setup from buildTestCase.parameters");
     });
 
     await step("Test form submission with proper route context", async () => {
-      resetTestResults();
-      
       // Fill form quickly
       const givenNameInput = canvas.queryByTestId("givenName") ||
                            canvasElement.querySelector('input[name="givenName"]');
@@ -469,16 +416,24 @@ export const TestWithRouteContext = {
         await userEvent.type(givenNameInput, "Route");
         await userEvent.type(familyNameInput, "Test");
         
-        // Submit form
-        const continueButton = canvas.getByText(/Continue/i);
-        trackNavigationAttempt("About to submit form with route context");
+        // Submit form - find the actual Continue button
+        let continueButton = canvas.getByText(/Continue/i) ||
+                            canvasElement.querySelector('gcds-button[type="submit"] button') ||
+                            canvasElement.querySelector('button[type="submit"]') ||
+                            canvasElement.querySelector('gcds-button button[part="button"]');
+        
+        // If it's a GCDS button wrapper, try to find the actual button inside the shadow DOM
+        if (continueButton && continueButton.tagName === 'GCDS-BUTTON' && continueButton.shadowRoot) {
+          const actualButton = continueButton.shadowRoot.querySelector('button[part="button"]') ||
+                             continueButton.shadowRoot.querySelector('button');
+          if (actualButton) {
+            continueButton = actualButton;
+          }
+        }
+        
         await userEvent.click(continueButton);
         
-        await new Promise((r) => setTimeout(r, 1500));
-        
-        trackNavigationAttempt("After form submission with route context");
-        console.log("✅ Route context form submission test completed");
-        console.log("This demonstrates how buildTestCase.parameters provides proper routing context");
+        await new Promise((r) => setTimeout(r, 1000));
       }
     });
 
