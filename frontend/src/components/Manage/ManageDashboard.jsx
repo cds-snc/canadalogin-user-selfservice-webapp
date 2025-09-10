@@ -16,7 +16,6 @@ import { useUser } from "../Providers/useUser.tsx";
 
 export default function ManageDashboard() {
     const { language } = useParams();
-    console.log("Language: ", language)
     const { state } = useUser();
     const { getError, hasErrors } = useError(language);
     const username = state?.userProfile?.name?.formatted || "";
