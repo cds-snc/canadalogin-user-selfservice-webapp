@@ -31,6 +31,11 @@ export const NAVIGATION_LINKS = {
   profileUpdateLanguageConfirmUpdate: "/profile/update-language/confirm-update",
   profileUpdateLanguageSuccess: "/profile/update-language/success",
 };
+
+export const EXTERNAL_NAVIGATION_LINKS = {
+  gcAccountDirectory:
+    "https://www.canada.ca/en/government/sign-in-online-account.html",
+};
 export const OIDC_REDIRECT = {
   login: `${config.apiUrl}/v1/auth/login`,
   reauth: `${config.apiUrl}/v1/auth/reauth`,

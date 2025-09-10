@@ -4,7 +4,7 @@ import {
   GcdsLink
 } from "@cdssnc/gcds-components-react";
 import { getPageContent } from "../../utils/functions.jsx";
-import { PAGES } from "../../utils/constants.jsx";
+import { EXTERNAL_NAVIGATION_LINKS, PAGES } from "../../utils/constants.jsx";
 
 export default function ServicesWithAccessInfoSection({ currentLang }) {
   const pageContentJson = getPageContent(currentLang, PAGES.ServicesWithAccessInfo);
@@ -19,7 +19,7 @@ export default function ServicesWithAccessInfoSection({ currentLang }) {
       <GcdsText>{pageContentJson["4"]}</GcdsText>
       <GcdsText>
         {pageContentJson["5"]}&nbsp;
-        <GcdsLink href="https://accounts.gc.ca/directory">
+        <GcdsLink href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}>
           {pageContentJson["6"]}
         </GcdsLink>
         .
