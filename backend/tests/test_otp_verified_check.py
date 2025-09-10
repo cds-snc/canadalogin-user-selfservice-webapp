@@ -1,5 +1,3 @@
-# tests/test_verify_transient_otp.py
-
 import pytest
 from unittest.mock import AsyncMock, patch, MagicMock
 from httpx import Response, Request
@@ -27,9 +25,8 @@ async def test_handle_otp_verification_success(mock_verify_otp):
         status_code=204, request=Request("POST", "https://example.com")
     )
 
-    result = await handle_otp_verification(user_data, AsyncMock())
+    result = await handle_otp_verification(AsyncMock(), user_data)
 
-    # ✅ No need for json.loads or .body
     assert result.success is True
     assert "OTP has been verified" in result.message
 
@@ -47,8 +44,8 @@ async def test_handle_otp_verification_failure(mock_verify_otp):
     mock_verify_otp.return_value = mock_resp
 
     result: JSONResponse = await handle_otp_verification(
-        user_data,
         AsyncMock(),
+        user_data,
     )
 
     body = json.loads(result.body)
@@ -61,9 +58,10 @@ async def test_handle_otp_verification_failure(mock_verify_otp):
 
 
 @pytest.mark.asyncio
+@patch("app.utils.access_token.request_access_token")
 @patch("app.otp.services.verify_transient_otp.get_auth_request_headers")
 @patch("app.otp.services.verify_transient_otp.get_configuration")
-async def test_verify_otp_sms_success(mock_get_config, mock_get_headers):
+async def test_verify_otp_sms_success(mock_get_config, mock_get_headers, mock_request_token):
     user_data = UserOtpVerificationInfo(
         otp="111111", trxnId="txn_sms", otpType=OtpType.SMS
     )
@@ -77,14 +75,22 @@ async def test_verify_otp_sms_success(mock_get_config, mock_get_headers):
     cfg.ibm_verify_config = Settings()
     mock_get_config.return_value = cfg
 
+    # Mock access token response
+    mock_token_response = Response(
+        status_code=200,
+        content=b'{"access_token": "mocked_token"}',
+        request=Request("POST", "https://ibm/token")
+    )
+    mock_request_token.return_value = mock_token_response
+
     mock_client = AsyncMock()
     expected_url = f"{Settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/smsotp/transient/verifications/{user_data.trxnId}"
     resp = Response(status_code=204, request=Request("POST", expected_url))
     mock_client.post.return_value = resp
 
     result = await verify_otp(
-        user_data,
         mock_client,
+        user_data,
     )
 
     assert result.status_code == 204
@@ -94,9 +100,10 @@ async def test_verify_otp_sms_success(mock_get_config, mock_get_headers):
 
 
 @pytest.mark.asyncio
+@patch("app.utils.access_token.request_access_token")
 @patch("app.otp.services.verify_transient_otp.get_auth_request_headers")
 @patch("app.otp.services.verify_transient_otp.get_configuration")
-async def test_verify_otp_email_success(mock_get_config, mock_get_headers):
+async def test_verify_otp_email_success(mock_get_config, mock_get_headers, mock_request_token):
     user_data = UserOtpVerificationInfo(
         otp="222222", trxnId="txn_email", otpType=OtpType.EMAIL
     )
@@ -110,35 +117,59 @@ async def test_verify_otp_email_success(mock_get_config, mock_get_headers):
     cfg.ibm_verify_config = Settings()
     mock_get_config.return_value = cfg
 
+    # Mock access token response
+    mock_token_response = Response(
+        status_code=200,
+        content=b'{"access_token": "mocked_token"}',
+        request=Request("POST", "https://ibm/token")
+    )
+    mock_request_token.return_value = mock_token_response
+
     mock_client = AsyncMock()
     expected_url = f"{Settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/emailotp/transient/verifications/{user_data.trxnId}"
     resp = Response(status_code=204, request=Request("POST", expected_url))
     mock_client.post.return_value = resp
 
     result = await verify_otp(
-        user_data,
         mock_client,
+        user_data,
     )
 
     assert result.status_code == 204
-    mock_client.post.assert_awaited_once()
+    mock_client.post.assert_awaited_once_with(
+        expected_url, json={"otp": user_data.otp}, headers=mock_headers
+    )
 
 
 @pytest.mark.asyncio
+@patch("app.utils.access_token.request_access_token")
 @patch("app.otp.services.verify_transient_otp.get_auth_request_headers")
 @patch("app.otp.services.verify_transient_otp.get_configuration")
-async def test_verify_otp_invalid_type_returns_error(mock_get_config, mock_get_headers):
+async def test_verify_otp_invalid_type_returns_error(mock_get_config, mock_get_headers, mock_request_token):
     user_data = UserOtpVerificationInfo(
         otp="333333", trxnId="txn_invalid", otpType=OtpType.SMS
     )
     # Simulate invalid type
     user_data.otpType = "INVALID"
 
-    result = await verify_otp(user_data, AsyncMock())
+    # Mock the token so it doesn’t error before reaching the type check
+    mock_token_response = Response(
+        status_code=200,
+        content=b'{"access_token": "mocked_token"}',
+        request=Request("POST", "https://ibm/token")
+    )
+    mock_request_token.return_value = mock_token_response
+    mock_get_headers.return_value = {"Authorization": "Bearer token"}
 
-    # ✅ Fix: Load response body if it's a JSONResponse
+    class Settings:
+        IBM_VERIFY_TENANT_URL = "https://ibm"
+    cfg = MagicMock()
+    cfg.ibm_verify_config = Settings()
+    mock_get_config.return_value = cfg
+
+    result = await verify_otp(AsyncMock(), user_data)
+
     body = json.loads(result.body)
-
     assert isinstance(body, dict)
     assert body["success"] is False
     assert "Unknown error" in body["message"]
