@@ -13,10 +13,14 @@ import { getPageContent } from "../../utils/functions.jsx";
 import { path } from "../../utils/routeHelpers.js";
 import { useUser } from "../Providers/useUser";
 import { PAGES } from "../../utils/constants.jsx";
+<<<<<<< HEAD
 import { authService } from "../../services/authService.jsx";
 import { userProfileDispatch } from "../../utils/userProfileDispatch.jsx";
+=======
+>>>>>>> d25b5d2 (Fix all navigation links to use new path helper)
 
 export default function TopNav({ currentLang }) {
+  console.log(currentLang)
   const pageContentJson = getPageContent(currentLang, "TopNavBar");
   const { state, dispatch } = useUser();
   const { setLoading } = userProfileDispatch(dispatch);

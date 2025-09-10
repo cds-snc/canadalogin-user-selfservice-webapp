@@ -23,6 +23,7 @@ function collectRoutes(routeList, parentPath = "") {
 function ensureRouteMap() {
   if (!routeMap) {
     routeMap = collectRoutes(appRoutes);
+    console.log(appRoutes)
   }
 }
 
