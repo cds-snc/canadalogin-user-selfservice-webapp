@@ -15,7 +15,6 @@ import { useUser } from "../Providers/useUser";
 import { PAGES } from "../../utils/constants.jsx";
 
 export default function TopNav({ currentLang }) {
-  console.log(currentLang)
   const pageContentJson = getPageContent(currentLang, "TopNavBar");
   const { state } = useUser();
 
