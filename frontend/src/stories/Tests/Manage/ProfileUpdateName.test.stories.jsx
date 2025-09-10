@@ -1,4 +1,4 @@
-import { expect, userEvent, within, waitFor } from "@storybook/test";
+import { expect, userEvent, within } from "@storybook/test";
 import {
   AVAILABLE_LANGUAGES,
   FLOW_TYPES,
@@ -300,40 +300,43 @@ export const ValidateRequiredFields = {
     });
 
     // Leave family name empty and try to submit
-    await step("Try to submit with empty family name and verify validation", async () => {
-      let familyNameInput =
-        canvas.queryByTestId("familyName") ||
-        canvas.querySelector('input[name="familyName"]') ||
-        canvas.querySelector("#familyName") ||
-        canvas.querySelector('gcds-input[input-id="familyName"] input');
+    await step(
+      "Try to submit with empty family name and verify validation",
+      async () => {
+        let familyNameInput =
+          canvas.queryByTestId("familyName") ||
+          canvas.querySelector('input[name="familyName"]') ||
+          canvas.querySelector("#familyName") ||
+          canvas.querySelector('gcds-input[input-id="familyName"] input');
 
-      await expect(familyNameInput).toBeInTheDocument();
+        await expect(familyNameInput).toBeInTheDocument();
 
-      // Click the actual Continue button instead of the test button
-      let continueButton =
-        canvas.getByText(/Continue/i) ||
-        canvasElement.querySelector('gcds-button[type="submit"] button') ||
-        canvasElement.querySelector('button[type="submit"]') ||
-        canvasElement.querySelector('gcds-button button[part="button"]');
+        // Click the actual Continue button instead of the test button
+        let continueButton =
+          canvas.getByText(/Continue/i) ||
+          canvasElement.querySelector('gcds-button[type="submit"] button') ||
+          canvasElement.querySelector('button[type="submit"]') ||
+          canvasElement.querySelector('gcds-button button[part="button"]');
 
-      await expect(continueButton).toBeInTheDocument();
+        await expect(continueButton).toBeInTheDocument();
 
-      // If it's a GCDS button wrapper, try to find the actual button inside the shadow DOM
-      if (
-        continueButton.tagName === "GCDS-BUTTON" &&
-        continueButton.shadowRoot
-      ) {
-        const actualButton =
-          continueButton.shadowRoot.querySelector('button[part="button"]') ||
-          continueButton.shadowRoot.querySelector("button");
-        if (actualButton) {
-          continueButton = actualButton;
+        // If it's a GCDS button wrapper, try to find the actual button inside the shadow DOM
+        if (
+          continueButton.tagName === "GCDS-BUTTON" &&
+          continueButton.shadowRoot
+        ) {
+          const actualButton =
+            continueButton.shadowRoot.querySelector('button[part="button"]') ||
+            continueButton.shadowRoot.querySelector("button");
+          if (actualButton) {
+            continueButton = actualButton;
+          }
         }
-      }
 
-      await userEvent.click(continueButton);
-      await new Promise((r) => setTimeout(r, 1000));
-    });
+        await userEvent.click(continueButton);
+        await new Promise((r) => setTimeout(r, 1000));
+      }
+    );
 
     await new Promise((r) => setTimeout(r, 1000));
   },
