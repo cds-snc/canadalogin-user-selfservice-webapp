@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { BrowserRouter } from "react-router";
 import ProfileUpdateNameSuccess from "../../../components/Manage/ProfileUpdateNameSuccess.jsx";
