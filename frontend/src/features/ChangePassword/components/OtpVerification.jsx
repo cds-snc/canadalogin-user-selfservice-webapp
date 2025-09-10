@@ -9,11 +9,11 @@ import {
 } from "@cdssnc/gcds-components-react";
 import { passwordUpdate } from "../api/passwordUpdate.jsx";
 import { getPageContent } from '../../../utils/functions.jsx';
+import { path } from "../../../utils/routeHelpers.js";
 import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 
 import {
-    FLOW_TYPES,
-    NAVIGATION_LINKS, PAGES,
+    FLOW_TYPES, PAGES,
 } from "../../../utils/constants.jsx";
 import { useParams } from "react-router";
 
@@ -29,7 +29,7 @@ export default function OtpVerification({ step, totalSteps, onNext, userProfile,
     const [errorCode, setErrorCode] = useState("");
 
     const navigateHelper = useNavigateHelper();
-    const backToSecuritySettingsPage = `/${language}${NAVIGATION_LINKS.securitySettings}`;
+    const backToSecuritySettingsPage = path(PAGES.securitySettings, { language: language });
     // const { setError, clearAllErrors, getError, hasErrors } = useError(language);
     const [time, setTime] = useState(initialTime);
     const pageContentJson = getPageContent(language, PAGES.verification);

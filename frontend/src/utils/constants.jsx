@@ -10,27 +10,6 @@ export const LANGUAGE_DISPLAY_NAMES = {
   "en-ca": "English",
   "fr-ca": "French",
 };
-export const NAVIGATION_LINKS = {
-  password: `/security-settings/update-password`,
-  verification: "/verification",
-  manage: "/",
-  ProfileNameEdit: "/profile/update-name",
-  profileHome: "/profile-home",
-  checkYourEmail: "/checkyouremail",
-  completeTwoStepVerification: "/completetwostepverification",
-  firstVerifyItsYou: "/firstverifyitsyou",
-  enterNewEmail: "/enternewemail",
-  profileYouMayUpdateName: "/profile/update-name/success",
-  areYouSureEditYourName: "/profile/update-name/confirm-update",
-  areYouSureUpdateContactNumber: "/areYouSureUpdateContactNumber",
-  enterNewPhoneNumber: "/enterNewPhoneNumber",
-  youMayUpdateEmailAtOtherPlaces: "/youMayUpdateEmailAtOtherPlaces",
-  areYouSureUpdateYourEmail: "/areYouSureUpdateYourEmail",
-  securitySettings: "/security-settings",
-  editLanguagePreferences: "/profile/update-language/",
-  areYouSureEditYourLanguage: "/profile/update-language/confirm-update",
-  profileYouMayUpdateLanguage: "/profile/update-language/success",
-};
 export const OIDC_REDIRECT = {
   login: `${config.apiUrl}/v1/auth/login`,
   reauth: `${config.apiUrl}/v1/auth/reauth`,

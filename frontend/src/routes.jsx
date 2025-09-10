@@ -1,3 +1,5 @@
+import { Navigate } from "react-router";
+
 import RootLayout from "./components/Layout/RootLayout.jsx";
 import { PrivateRoute, StepupPrivateRoute } from "./components/Providers/PrivateRoute.jsx";
 import { UserProvider } from "./components/Providers/UserProvider";
@@ -23,6 +25,7 @@ import SecuritySettings from "./components/Manage/SecuritySettings.jsx";
 import EditLanguagePreferences from "./components/Manage/EditLanguagePreferences.jsx";
 import AreYouSureEditYourLanguage from "./components/Manage/AreYouSureEditYourLanguage.jsx";
 import ProfileYouMayUpdateLanguage from "./components/Manage/ProfileYouMayUpdateLanguage.jsx";
+import { PAGES } from "./utils/constants.jsx";
 
 export const appRoutes = [
   {
@@ -36,44 +39,120 @@ export const appRoutes = [
     ),
     children: [
       { element: <RootLayout />, children: [
-        { path: "/", element: <ManageDashboard />, handle: { id: "ManageDashboard" } },
+        { path: "/", element: <Navigate to="/en" replace /> },
         {
-          path: ":language",
+          path: "/:language",
           children: [
-            { index: true, element: <ManageDashboard />, handle: { id: "ManageDashboard" } },
-            { path: "profile-home", element: <ProfileHome />, handle: { id: "ProfileHome" } },
-            { path: "checkyouremail", element: <CheckYourEmail />, handle: { id: "CheckYourEmail" } },
-            { path: "completetwostepverification", element: <CompleteTwoStepVerification /> },
-            { path: "firstverifyitsyou", element: <FirstVerifyItsYou /> },
-            { path: "enternewemail", element: <EnterNewEmail /> },
+            { 
+              index: true, 
+              element: <ManageDashboard />, 
+              handle: { id: PAGES.manageDashboard } 
+            },
+            { 
+              path: "profile-home", 
+              element: <ProfileHome />, 
+              handle: { id: PAGES.ProfileHome }
+            },
+            { 
+              path: "checkyouremail", 
+              element: <CheckYourEmail />, 
+              handle: { id: PAGES.CheckYourEmail } 
+            },
+            { 
+              path: "completetwostepverification", 
+              element: <CompleteTwoStepVerification />,
+              handle: { id: PAGES.CompleteTwoStepVerification }
+            },
+            { 
+              path: "firstverifyitsyou", 
+              element: <FirstVerifyItsYou />,
+              handle: { id: PAGES.FirstVerifyItsYou }
+            },
+            { 
+              path: "enternewemail", 
+              element: <EnterNewEmail />,
+              handle: { id: PAGES.EnterNewEmail }
+            },
             {
               path: "profile",
               children: [
-                { path: "update-name", element: <ProfileNameEdit /> },
-                { path: "update-name/success", element: <ProfileYouMayUpdateName /> },
-                { path: "update-name/confirm-update", element: <AreYouSureEditYourName /> },
-                { path: "update-language", element: <EditLanguagePreferences /> },
-                { path: "update-language/success", element: <ProfileYouMayUpdateLanguage /> },
-                { path: "update-language/confirm-update", element: <AreYouSureEditYourLanguage /> },
+                { 
+                  path: "update-name", 
+                  element: <ProfileNameEdit />,
+                  handle: { id: PAGES.ProfileNameEdit }
+                },
+                { 
+                  path: "update-name/success", 
+                  element: <ProfileYouMayUpdateName />,
+                  handle: { id: PAGES.profileYouMayUpdateName }
+                },
+                { 
+                  path: "update-name/confirm-update", 
+                  element: <AreYouSureEditYourName />,
+                  handle: { id: PAGES.areYouSureEditYourName }
+                },
+                { 
+                  path: "update-language", 
+                  element: <EditLanguagePreferences />,
+                  handle: { id: PAGES.editLanguagePreferences }
+                },
+                { 
+                  path: "update-language/success", 
+                  element: <ProfileYouMayUpdateLanguage />,
+                  handle: { id: PAGES.profileYouMayUpdateLanguage }
+                },
+                { 
+                  path: "update-language/confirm-update",
+                  element: <AreYouSureEditYourLanguage />,
+                  handle: { id: PAGES.areYouSureEditYourLanguage }
+                },
               ],
             },
-            { path: "areYouSureUpdateContactNumber", element: <AreYouSureUpdateContactNumber /> },
-            { path: "enterNewPhoneNumber", element: <EnterNewPhoneNumber /> },
-            { path: "youMayUpdateEmailAtOtherPlaces", element: <YouMayUpdateEmailAtOtherPlaces /> },
-            { path: "areYouSureUpdateYourEmail", element: <AreYouSureUpdateYourEmail /> },
+            { 
+              path: "areYouSureUpdateContactNumber", 
+              element: <AreYouSureUpdateContactNumber />,
+              handle: { id: PAGES.areYouSureUpdateContactNumber }
+            },
+            { 
+              path: "enterNewPhoneNumber", 
+              element: <EnterNewPhoneNumber />,
+              handle: { id: PAGES.enterNewPhoneNumber }
+            },
+            { 
+              path: "youMayUpdateEmailAtOtherPlaces", 
+              element: <YouMayUpdateEmailAtOtherPlaces />,
+              handle: { id: PAGES.youMayUpdateEmailAtOtherPlaces }
+            },
+            { 
+              path: "areYouSureUpdateYourEmail", 
+              element: <AreYouSureUpdateYourEmail />,
+              handle: { id: PAGES.areYouSureUpdateYourEmail }
+            },
             {
               path: "security-settings",
               children: [
-                { index: true, element: <SecuritySettings /> },
+                { 
+                  index: true, 
+                  element: <SecuritySettings />,
+                  handle: { id: PAGES.securitySettings }
+                },
                 {
                   element: <StepupPrivateRoute />,
                   children: [
-                    { path: "update-password", element: <ChangePasswordIndex /> },
+                    { 
+                      path: "update-password", 
+                      element: <ChangePasswordIndex />,
+                      handle: { id: PAGES.password }
+                    },
                   ],
                 },
               ],
             },
-            { path: "verification", element: <Verification /> },
+            { path: 
+              "verification", 
+              element: <Verification />,
+              handle: { id: PAGES.verification }
+            },
           ],
         },
         { path: "*", element: <ManageDashboard /> },

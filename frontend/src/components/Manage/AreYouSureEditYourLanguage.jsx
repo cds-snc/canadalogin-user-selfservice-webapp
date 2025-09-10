@@ -10,7 +10,8 @@ import { useParams } from "react-router";
 
 import { getPageContent } from "../../utils/functions.jsx";
 import { userProfileDispatch, useCancelLanguageEditing } from "../../utils/userProfileDispatch.jsx";
-import { PAGES, NAVIGATION_LINKS, CONTEXT_ACTIONS, LANGUAGE_DISPLAY_NAMES } from "../../utils/constants.jsx";
+import { path } from "../../utils/routeHelpers.js";
+import { PAGES, LANGUAGE_DISPLAY_NAMES } from "../../utils/constants.jsx";
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
 import { useUser } from "../Providers/useUser.tsx";
 import { authService } from "../../services/authService.jsx";
@@ -23,10 +24,10 @@ export default function AreYouSureEditYourLanguage() {
   const pageContentJson = getPageContent(language, PAGES.areYouSureEditYourLanguage);
   const navigateHelper = useNavigateHelper();
 
-  const backtoProfile = `/${language}${NAVIGATION_LINKS.profileHome}`;
-  const { handleCancel } = useCancelLanguageEditing(backtoProfile);
+  const backToProfile = path(PAGES.profileHome, { language: language });
+  const successPage = path(PAGES.profileYouMayUpdateLanguage, { language: language });
 
-  const successPage = `/${language}${NAVIGATION_LINKS.profileYouMayUpdateLanguage}`;
+  const { handleCancel } = useCancelLanguageEditing(backToProfile);
 
   const selectedLanguage = state?.editProfile?.preferredLanguage || "";
 

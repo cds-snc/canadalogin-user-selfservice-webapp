@@ -9,7 +9,8 @@ import {
   GcdsButton, GcdsGrid, GcdsLink
 } from "@cdssnc/gcds-components-react";
 import { getPageContent } from "../../utils/functions";
-import { PAGES, NAVIGATION_LINKS, CONTEXT_ACTIONS } from "../../utils/constants";
+import { path } from "../../utils/routeHelpers.js";
+import { PAGES } from "../../utils/constants";
 import { useUser } from "../Providers/useUser";
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
 
@@ -19,7 +20,7 @@ export default function ProfileYouMayUpdateName() {
   const { state } = useUser();
   const pageContentJson = getPageContent(language, PAGES.profileYouMayUpdateName);
   const navigateHelper = useNavigateHelper();
-  const backtoProfile = `/${language}${NAVIGATION_LINKS.profileHome}`;
+  const backToProfile = path(PAGES.profileHome, { language: language });
 
   const username = state?.userProfile?.name.formatted || "";
   console.log("state", state)
@@ -39,13 +40,13 @@ export default function ProfileYouMayUpdateName() {
       <GcdsGrid columns="auto auto" gap="1rem" align-items="center">
         <GcdsButton style={{ width: 'fit-content' }} onGcdsClick={(ev) => {
           ev.preventDefault();
-          navigateHelper(backtoProfile)
+          navigateHelper(backToProfile)
         }}>
           {pageContentJson["6"]}
         </GcdsButton>&nbsp;
         <GcdsButton buttonRole="secondary" style={{ width: 'fit-content' }} onGcdsClick={(ev) => {
           ev.preventDefault();
-          navigateHelper(backtoProfile)
+          navigateHelper(backToProfile)
         }}>
           {pageContentJson["7"]}
         </GcdsButton>

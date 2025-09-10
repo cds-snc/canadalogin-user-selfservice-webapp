@@ -10,10 +10,12 @@ import {
 } from "@cdssnc/gcds-components-react";
 import { useBreakpoints } from "../../hooks/useBreakpoints";
 import { getPageContent } from "../../utils/functions.jsx";
+import { path } from "../../utils/routeHelpers.js";
 import { useUser } from "../Providers/useUser";
-import { NAVIGATION_LINKS } from "../../utils/constants.jsx";
+import { PAGES } from "../../utils/constants.jsx";
 
 export default function TopNav({ currentLang }) {
+  console.log(currentLang)
   const pageContentJson = getPageContent(currentLang, "TopNavBar");
   const { state } = useUser();
 
@@ -23,15 +25,19 @@ export default function TopNav({ currentLang }) {
 
   const { mobile, tablet } = useBreakpoints();
 
+  const homeLink = path(PAGES.manageDashboard, { language: currentLang });
+  const profileLink = path(PAGES.ProfileHome, { language: currentLang });
+  const securitySettingsLink = path(PAGES.securitySettings, { language: currentLang }); 
+
   const navLinksJsx = (
     <>
-      <GcdsNavLink href={`/${currentLang}/`}>
+      <GcdsNavLink href={homeLink}>
         {pageContentJson["3"]}
       </GcdsNavLink>
-      <GcdsNavLink href={`/${currentLang}${NAVIGATION_LINKS.profileHome}`}>
+      <GcdsNavLink href={profileLink}>
         {pageContentJson["4"]}
       </GcdsNavLink>
-      <GcdsNavLink href={`/${currentLang}${NAVIGATION_LINKS.securitySettings}`}>
+      <GcdsNavLink href={securitySettingsLink}>
         {pageContentJson["5"]}
       </GcdsNavLink>
       {shouldRenderRelyingPartyLink && (

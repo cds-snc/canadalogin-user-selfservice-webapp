@@ -9,7 +9,8 @@ import {
     GcdsLink,
 } from '@cdssnc/gcds-components-react';
 import { getPageContent } from '../../utils/functions.jsx';
-import { PAGES, NAVIGATION_LINKS } from '../../utils/constants.jsx';
+import { path } from '../../utils/routeHelpers.js';
+import { PAGES } from '../../utils/constants.jsx';
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
 
 import { useUser } from "../Providers/useUser.tsx";
@@ -24,7 +25,8 @@ export default function SecuritySettings() {
     const { state } = useUser();
     const lastPasswordChange = state?.userProfile?.details?.pwdChangedTime || "";
     const formattedPasswordChangeDate = format(new Date(lastPasswordChange), 'MMMM d, yyyy');
-    const passwordPage = `/${language}${NAVIGATION_LINKS.password}`;
+
+    const passwordPage = path(PAGES.password, { language: language });
 
     return (
         <GcdsContainer>

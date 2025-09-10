@@ -1,8 +1,9 @@
 import {useState, useTransition} from 'react';
-import {CONTEXT_ACTIONS, FLOW_TYPES, GA_LABELS, LINK_SUBMIT_TYPES, NAVIGATION_LINKS,} from "../utils/constants.jsx";
+import {CONTEXT_ACTIONS, FLOW_TYPES, GA_LABELS, LINK_SUBMIT_TYPES, PAGES} from "../utils/constants.jsx";
 import {useUser} from "../components/Providers/useUser";
 import {useNavigate} from "react-router";
 import {callAnalytics, callAuthService, SubmitData, SubmitDataOptions} from "./useSubmit";
+import { path } from '../utils/routeHelpers.js';
 
 
 export function useLinkSubmit(submitDataOptions:SubmitDataOptions) {
@@ -88,19 +89,23 @@ function adjustEndpoint(linkFlowType:string, submitDataOptions:SubmitDataOptions
         submitDataOptions.endpoint = null;
 }
 function setNavigateTo(submitDataOptions:SubmitDataOptions, linkFlowType:string, changeType:boolean) {
+    const signupLink = path(PAGES.signUp, { language: submitDataOptions.language });
+    const twoStepVerificationLink = path(PAGES.CompleteTwoStepVerification, { language: submitDataOptions.language });
+    const verificationLink = path(PAGES.verification, { language: submitDataOptions.language });
+    const verificationPath = "/verification";
 
     switch (linkFlowType) {
         case LINK_SUBMIT_TYPES.useNewVerification:
             if(submitDataOptions.type===FLOW_TYPES.email)
-                return ("/" + submitDataOptions.language + NAVIGATION_LINKS.signUp);
+                return signupLink
             else if(submitDataOptions.flow===FLOW_TYPES.signUp)
-                return ("/" + submitDataOptions.language + NAVIGATION_LINKS.twoStepVerification);
+                return twoStepVerificationLink;
 
-            return ("/" + submitDataOptions.language + NAVIGATION_LINKS.verification);
+            return verificationLink
         case LINK_SUBMIT_TYPES.requestNewCode:
             if(changeType) {
                 const newType = submitDataOptions.type===FLOW_TYPES.sms?FLOW_TYPES.voice:FLOW_TYPES.sms;
-                return ("/" + submitDataOptions.language + '/' + submitDataOptions.flow + NAVIGATION_LINKS.verification + '/' + newType);
+                return ("/" + submitDataOptions.language + '/' + submitDataOptions.flow + verificationPath + '/' + newType);
             }
 
             return null;

@@ -9,7 +9,8 @@ import {
 import { useParams } from "react-router";
 
 import { getPageContent } from "../../utils/functions";
-import { PAGES, NAVIGATION_LINKS, CONTEXT_ACTIONS } from "../../utils/constants";
+import { PAGES } from "../../utils/constants";
+import { path } from "../../utils/routeHelpers.js";
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
 import { useUser } from "../Providers/useUser";
 import { authService } from "../../services/authService.jsx";
@@ -21,8 +22,8 @@ export default function AreYouSureEditYourName() {
   const { clearEditProfile, updateProfileSuccess } = userProfileDispatch(dispatch);
   const pageContentJson = getPageContent(language, PAGES.areYouSureEditYourName);
   const navigateHelper = useNavigateHelper();
-  const successPage = `/${language}${NAVIGATION_LINKS.profileYouMayUpdateName}`;
-  const backtoProfile = `/${language}${NAVIGATION_LINKS.profileHome}`;
+  const successPage = path(PAGES.profileYouMayUpdateName, { language: language });
+  const backToProfile = path(PAGES.profileHome, { language: language });
 
   const username = state?.editProfile?.name.formatted || "";
 
@@ -72,7 +73,7 @@ export default function AreYouSureEditYourName() {
         <GcdsButton buttonRole="secondary" onGcdsClick={(ev) => {
           ev.preventDefault();
           clearEditProfile();
-          navigateHelper(backtoProfile)
+          navigateHelper(backToProfile)
         }}>
           {pageContentJson["9"]}
         </GcdsButton>

@@ -23,6 +23,7 @@ function collectRoutes(routeList, parentPath = "") {
 function ensureRouteMap() {
   if (!routeMap) {
     routeMap = collectRoutes(appRoutes);
+    console.log(appRoutes)
   }
 }
 
@@ -30,5 +31,10 @@ export function path(id, params) {
   ensureRouteMap();
   const pattern = routeMap[id];
   if (!pattern) throw new Error(`No route with id=${id}`);
+
+  if(!params['language']) {
+    params['language'] = 'en'; // default to 'en' if language not provided
+  }
+
   return generatePath(pattern, params);
 }

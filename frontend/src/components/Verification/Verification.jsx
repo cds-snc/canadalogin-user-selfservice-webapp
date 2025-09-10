@@ -9,7 +9,7 @@ import AlreadyGc from "../Layout/AlreadyGc.jsx";
 import {
     AVAILABLE_LANGUAGES,
     FLOW_TYPES, LINK_SUBMIT_TYPES,
-    NAVIGATION_LINKS, PAGES,
+    PAGES,
     SERVICES, SUBMIT_END_POINTS
 } from "../../utils/constants.jsx";
 import {useParams} from "react-router";
@@ -19,7 +19,6 @@ import {useEffect, useState} from "react";
 import {useLinkSubmit} from "../../hooks/useLinkSubmit.js";
 import {useSubmit} from "../../hooks/useSubmit";
 import {useError} from "../../hooks/useError";
-
 const initialTime=10;
 
 export default function Verification() {
@@ -30,10 +29,12 @@ export default function Verification() {
     const pageContentJson = getPageContent(language, PAGES.verification);
     const error = getError('#verificationCode');
 
+    const passwordPath = "/security-settings/update-password";
+
     const submitDataOptions = {
         language,
         endpoint: flow===FLOW_TYPES.signUp?SUBMIT_END_POINTS.transientOtpVerify:SUBMIT_END_POINTS.otpVerify,
-        navigateTo: flow===FLOW_TYPES.signUp?type===FLOW_TYPES.email? "/" + language + "/" + flow + NAVIGATION_LINKS.password:"/" + language + NAVIGATION_LINKS.coreProfile:"/" + language + '/redirecttorp',
+        navigateTo: flow===FLOW_TYPES.signUp?type===FLOW_TYPES.email? "/" + language + "/" + flow + passwordPath:"#":"/" + language + '/redirecttorp',
         page: PAGES.verification,
         flow: flow,
         type: type,
