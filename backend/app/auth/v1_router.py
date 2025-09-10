@@ -6,10 +6,13 @@ from app.auth.services.auth import (
     redirect_user_to_idp_verify,
     callback_handler,
     reauthenticate_user,
+    logout_user,
+    backchannel_logout,
 )
 
 from app.auth.services.auth_user_session import (
     get_users_current_session,
+    get_users_id_token,
 )
 
 from app.constants.session_keys import SessionKeys
@@ -52,3 +55,18 @@ async def reauth(
     user_access_token: None = Depends(get_users_current_session),
 ):
     return await reauthenticate_user(request, returnToPage)
+
+
+@router.get(
+    "/logout",
+    tags=["Auth"],
+    summary="Logout user",
+    description="",
+)
+async def logout(request: Request, id_token: str = Depends(get_users_id_token)):
+    return await logout_user(request, id_token)
+
+
+@router.post("/backchannel-logout")
+async def handle_backchannel_logout(request: Request):
+    return await backchannel_logout(request)
