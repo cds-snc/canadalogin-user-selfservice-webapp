@@ -20,7 +20,7 @@ export default function ProfileYouMayUpdateName() {
   const { state } = useUser();
   const pageContentJson = getPageContent(language, PAGES.profileYouMayUpdateName);
   const navigateHelper = useNavigateHelper();
-  const backToProfile = path(PAGES.profileHome, { language: language });
+  const backToProfile = path(PAGES.ProfileHome, { language: language });
 
   const username = state?.userProfile?.name.formatted || "";
   console.log("state", state)

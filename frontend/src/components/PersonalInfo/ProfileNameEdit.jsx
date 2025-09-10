@@ -23,7 +23,7 @@ export default function ProfileNameEdit() {
     const navigateHelper = useNavigateHelper();
     const { cloneUserProfile, updateClonedProfile } = userProfileDispatch(dispatch);
     const confirmation = path(PAGES.areYouSureEditYourName, { language: language });
-    const backToProfile = path(PAGES.profileHome, { language: language });
+    const backToProfile = path(PAGES.ProfileHome, { language: language });
     const [editProfile, setEditProfile] = useState({ ...state.editProfile });
 
     const handleProfileChange = (e) => {

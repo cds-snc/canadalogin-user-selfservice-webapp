@@ -20,7 +20,7 @@ export default function ProfileYouMayUpdateLanguage() {
   const { state } = useUser();
   const pageContentJson = getPageContent(language, PAGES.profileYouMayUpdateLanguage);
   const navigateHelper = useNavigateHelper();
-  const backToProfile = path(PAGES.profileHome, { language: language });
+  const backToProfile = path(PAGES.ProfileHome, { language: language });
 
   const preferredLanguage = state?.userProfile?.preferredLanguage || "";
   console.log("state", state)

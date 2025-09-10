@@ -24,7 +24,7 @@ export default function AreYouSureEditYourLanguage() {
   const pageContentJson = getPageContent(language, PAGES.areYouSureEditYourLanguage);
   const navigateHelper = useNavigateHelper();
 
-  const backToProfile = path(PAGES.profileHome, { language: language });
+  const backToProfile = path(PAGES.ProfileHome, { language: language });
   const successPage = path(PAGES.profileYouMayUpdateLanguage, { language: language });
 
   const { handleCancel } = useCancelLanguageEditing(backToProfile);

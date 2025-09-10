@@ -23,7 +23,7 @@ export default function AreYouSureEditYourName() {
   const pageContentJson = getPageContent(language, PAGES.areYouSureEditYourName);
   const navigateHelper = useNavigateHelper();
   const successPage = path(PAGES.profileYouMayUpdateName, { language: language });
-  const backToProfile = path(PAGES.profileHome, { language: language });
+  const backToProfile = path(PAGES.ProfileHome, { language: language });
 
   const username = state?.editProfile?.name.formatted || "";
 
