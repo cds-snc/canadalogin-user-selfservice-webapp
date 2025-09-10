@@ -19,7 +19,7 @@ export default function ManageDashboard() {
     const { language } = useParams();
     const { state } = useUser();
     const { getError, hasErrors } = useError(language);
-    const username = state?.userProfile?.name.formatted || "";
+    const username = state?.userProfile?.name?.formatted || "";
     const error = getError("#dashboard");
     const pageContent = getPageContent(language, PAGES.manageDashboard);
     const navigateHelper = useNavigateHelper();

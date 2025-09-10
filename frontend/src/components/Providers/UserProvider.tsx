@@ -12,16 +12,16 @@ interface Action {
 export interface UserProfile {
     id: string;
     active: boolean;
-    details: null | {
+    details?: null | {
         emailVerified: boolean | null;
         lastLogin: string | null;
         lastMFA: string | null;
         twoFactorAuthentication: boolean;
         pwdChangedTime: string | null;
     };
-    emails: null | Array<{ value: string; type: string }>;
-    phoneNumbers: null | Array<{ value: string; type: string }>;
-    meta: {
+    emails?: null | Array<{ value: string; type: string }>;
+    phoneNumbers?: null | Array<{ value: string; type: string }>;
+    meta?: {
         created: string;
         location: string;
         lastModified: string;
@@ -33,7 +33,7 @@ export interface UserProfile {
         givenName?: string;
         familyName?: string;
         formatted?: string;
-    };
+    } | null;
 }
 
 export interface RelyingPartyInfo {

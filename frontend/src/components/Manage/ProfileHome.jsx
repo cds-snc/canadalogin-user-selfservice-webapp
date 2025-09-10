@@ -91,7 +91,7 @@ export default function ProfileHome() {
   const pageContent = getPageContent(language, PAGES.ProfileHome);
   const { state } = useUser();
   const navigateHelper = useNavigateHelper();
-  const name = state?.userProfile?.name.formatted || "";
+  const name = state?.userProfile?.name?.formatted || "";
   const email = state?.userProfile?.userName || "";
   const phoneNumbers = state?.userProfile?.phoneNumbers;
   const preferredLanguage = state?.userProfile?.preferredLanguage || "";
