@@ -27,7 +27,7 @@ export const NAVIGATION_LINKS = {
   youMayUpdateEmailAtOtherPlaces: "/youMayUpdateEmailAtOtherPlaces",
   areYouSureUpdateYourEmail: "/areYouSureUpdateYourEmail",
   securitySettings: "/security-settings",
-  editLanguagePreferences: "/profile/update-language/",
+  editLanguagePreferences: "/profile/update-language",
   areYouSureEditYourLanguage: "/profile/update-language/confirm-update",
   profileYouMayUpdateLanguage: "/profile/update-language/success",
   updateContactPhoneNumber: "/profile/update-contact-phone-number"

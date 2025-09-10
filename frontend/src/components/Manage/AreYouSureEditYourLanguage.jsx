@@ -23,7 +23,7 @@ export default function AreYouSureEditYourLanguage() {
   const pageContentJson = getPageContent(language, PAGES.areYouSureEditYourLanguage);
   const navigateHelper = useNavigateHelper();
 
-  const backtoProfile = `/${language}${NAVIGATION_LINKS.profileHome}`;
+  const backtoProfile = `/${language}`;
   const { handleCancel } = useCancelLanguageEditing(backtoProfile);
 
   const successPage = `/${language}${NAVIGATION_LINKS.profileYouMayUpdateLanguage}`;
@@ -34,8 +34,8 @@ export default function AreYouSureEditYourLanguage() {
     try {
       const response = await authService.update_my_user_profile(state.editProfile);
       if (response) {
-        clearEditProfile();
         updateProfileSuccess(response.data);
+        // clearEditProfile();
         return true;
       }
       else {
@@ -75,12 +75,16 @@ export default function AreYouSureEditYourLanguage() {
         <GcdsButton onGcdsClick={async (ev) => {
           ev.preventDefault();
           const success = await saveUpdatedProfileData();
-          if (success) { navigateHelper(successPage) }
-          navigateHelper(successPage)
+          if (success) {
+            navigateHelper(successPage);
+          }
         }}>
           {pageContentJson["8"]}
         </GcdsButton>
-        <GcdsButton buttonRole="secondary" onGcdsClick={handleCancel}>
+        <GcdsButton buttonRole="secondary" onGcdsClick={(ev) => {
+          ev.preventDefault();
+          handleCancel();
+        }}>
           {pageContentJson["9"]}
         </GcdsButton>
       </GcdsGrid>

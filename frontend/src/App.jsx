@@ -79,10 +79,10 @@ function App() {
                     path={areYouSureEditYourLanguage}
                     element={<Page page={PAGES.areYouSureEditYourLanguage} />}
                 />
-                <Route
+                {/* <Route
                     path={profileYouMayUpdateLanguage}
                     element={<Page page={PAGES.profileYouMayUpdateLanguage} />}
-                />
+                /> */}
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
         </Routes>

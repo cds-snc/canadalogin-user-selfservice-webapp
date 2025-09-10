@@ -156,6 +156,7 @@ export default function OtpVerification({ step, totalSteps, onNext, onCancel, on
                     inputId="verificationCode"
                     label={pageContentJson['9']}
                     autofocus
+                    autocomplete="one-time-code"
                     name="verificationCode"
                     type="text"
                     value={phoneFormData.otp}
@@ -172,7 +173,7 @@ export default function OtpVerification({ step, totalSteps, onNext, onCancel, on
                 </GcdsInput>
 
 
-                <GcdsGrid columns="repeat(auto-fit, minmax(100px, 100px))" gap="10px" align-items="center">
+                <GcdsGrid columns="repeat(auto-fit, minmax(200px, 200px))" align-items="center">
                     <GcdsButton disabled={phoneFormData.otp.length < 6} style={{ width: 'fit-content' }} onGcdsClick={(ev) => {
                         ev.preventDefault();
                         validateOtpCode(phoneFormData.otp)

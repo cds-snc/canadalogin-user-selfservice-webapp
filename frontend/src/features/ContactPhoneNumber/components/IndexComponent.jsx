@@ -16,6 +16,7 @@ import OtpVerification from "./OtpVerification.jsx";
 import ConfirmUpdate from "./ConfirmUpdate.jsx";
 import SuccessfullyUpdated from "./SuccessfullyUpdated.jsx";
 import { transientOtp } from "../api/transientOtp.jsx";
+import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
 
 
 const STEPS = {
@@ -38,7 +39,7 @@ const serverMapping = {
 
 export default function UpdateContactPhoneNumber() {
     const { language } = useParams();
-    const { state } = useUser();
+    const { state, dispatch } = useUser();
     const [errorCode, setErrorCode] = useState("");
 
     const { userProfile } = state;
@@ -49,6 +50,7 @@ export default function UpdateContactPhoneNumber() {
 
     const [step, setStep] = useState(STEPS.ENTER);
     const loadingMessage = getPageContent(language, PAGES.otpSelection);
+    const { clearEditProfile, updateProfileSuccess, setCancelProfileEditing } = userProfileDispatch(dispatch);
 
     const [phoneFormData, setPhoneFormData] = useState({
         'phoneNumber': '',
@@ -139,8 +141,9 @@ export default function UpdateContactPhoneNumber() {
             };
 
             const response = await authService.update_my_user_profile(formdata);
-            if (response && response.success) {
+            if (response && response.success && response.data) {
                 setStep(STEPS.SUCCESS);
+                updateProfileSuccess(response.data);
             }
 
         } catch (error) {

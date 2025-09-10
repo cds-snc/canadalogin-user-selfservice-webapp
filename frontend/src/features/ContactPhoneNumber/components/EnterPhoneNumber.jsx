@@ -148,11 +148,8 @@ export default function EnterPhoneNumber({ step, totalSteps, onNext, onCancel, o
                             onChangePhoneForm('formattedPhoneNumber', formatted);
                             const isNumberValid = isPhoneNumberValid(phone, country.countryCode);
                             setPhoneNumberValid(isNumberValid);
-
                         }}
                         isValid={(inputNumber, country) => {
-                            const capitalize = country.iso2.toUpperCase();
-                            const validatedPhoneNUmber = isValidPhoneNumber(phoneFormData.phoneNumber, capitalize);
                             return isPhoneNumberValid(inputNumber, country.iso2);
                         }}
                     />

@@ -38,7 +38,7 @@ const DisplayPhoneNumbers = ({ phoneNumbers }) => {
 
                 {
                     phoneNumbers.map((phoneNumber, index) => {
-                        let profilePhoneNumber = `+${phoneNumber.value}`;
+                        let profilePhoneNumber = `${phoneNumber.value}`;
                         let numberType = capitalizeFirstLetter(phoneNumber.type)
                         const isLast = index === phoneNumbers.length - 1;
 
@@ -58,7 +58,6 @@ const DisplayPhoneNumbers = ({ phoneNumbers }) => {
                                 {numberType}: {profilePhoneNumber}
                             </GcdsText>
                         )
-
                     })
                 }
             </GcdsGrid>
@@ -68,9 +67,7 @@ const DisplayPhoneNumbers = ({ phoneNumbers }) => {
 }
 
 const AddPhoneNumber = (props) => {
-    const { pageContent } = props;
-    const { language } = useParams();
-    const { state } = useUser();
+    const { pageContent, language } = props;
     const navigateHelper = useNavigateHelper();
     const updateContactPhoneNumber = `/${language}${NAVIGATION_LINKS.updateContactPhoneNumber}`;
     return (
@@ -95,14 +92,21 @@ const AddPhoneNumber = (props) => {
 
 
 const ContactPhoneNumber = (props) => {
-    const { pageContent, phoneNumbers } = props;
+    const { pageContent, phoneNumbers, language } = props;
+    const updateContactPhoneNumber = `/${language}${NAVIGATION_LINKS.updateContactPhoneNumber}`;
+    const navigateHelper = useNavigateHelper();
+
     return (
         <>
             <GcdsText>{pageContent['11']}</GcdsText>
 
             <GcdsGrid columns="1fr auto">
                 <DisplayPhoneNumbers phoneNumbers={phoneNumbers} />
-                <GcdsLink href="#" size="regular">
+                <GcdsLink href={updateContactPhoneNumber} size="regular" onGcdsClick={(ev) => {
+                    ev.preventDefault();
+                    console.log(ev)
+                    navigateHelper(ev.detail)
+                }}>
                     {pageContent['5']}
                 </GcdsLink>
             </GcdsGrid>
@@ -124,9 +128,9 @@ export default function ViewContactPhoneNumber({ pageContent, phoneNumbers }) {
             {
                 phoneNumbers != null ? (
                     <>
-                        <ContactPhoneNumber pageContent={pageContent} phoneNumbers={phoneNumbers} />
+                        <ContactPhoneNumber pageContent={pageContent} phoneNumbers={phoneNumbers} language={language} />
                     </>
-                ) : <AddPhoneNumber pageContent={pageContent} />
+                ) : <AddPhoneNumber pageContent={pageContent} language={language} />
             }
         </GcdsContainer>
     );
