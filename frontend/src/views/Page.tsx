@@ -28,7 +28,7 @@ import SecuritySettings from "../components/Manage/SecuritySettings.jsx";
 import EditLanguagePreferences from "../components/Manage/EditLanguagePreferences.jsx";
 import AreYouSureEditYourLanguage from "../components/Manage/AreYouSureEditYourLanguage.jsx";
 import ProfileYouMayUpdateLanguage from "../components/Manage/ProfileYouMayUpdateLanguage.jsx";
-import UpdateContactPhoneNumber from "../features/ContactPhoneNumber/components/UpdateContactPhoneNumber.jsx";;
+import UpdateContactPhoneNumber from "../features/ContactPhoneNumber/components/IndexComponent.jsx";;
 
 function PageContents({ page }: { page: string }) {
     switch (page) {

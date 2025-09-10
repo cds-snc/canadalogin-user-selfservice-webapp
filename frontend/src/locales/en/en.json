@@ -79,7 +79,7 @@
     "18": "Complete 2-step verification",
     "19": "to continue to your",
     "20": "account",
-    "21": "Try another way",
+    "21": "Use a different phone number",
     "22": "Check your email",
     "23": "We have sent an email with a 6-digit code to:",
     "24": "Your email might take a few minutes to arrive. If you do not get an email, check your spam folder.",
@@ -362,5 +362,28 @@
     "10": "Phone number",
     "11": "My country is not in the list",
     "12": "Some countries are not supported due to technical limitations. If your country is not listed, you will be unable to create a GC Sign in account at this time. We apologize for the inconvenience."
+  },
+  "ConfirmContactPhoneNumberUpdate": {
+    "1": "Are you sure you want to update your phone number?",
+    "2": "You’ve requested to update your contact phone number to:",
+    "3": "Example Newname",
+    "4": "This will update your contact phone number with the following services:",
+    "5": "GEO.ca",
+    "6": "This only changes your",
+    "7": "contact phone number.",
+    "8": "To change your 2-step verification number, go to your",
+    "9": "security settings.",
+    "10": "Yes, update",
+    "11": "Cancel"
+  },
+  "SuccessfullyUpdatedContactPhoneNumber": {
+    "1": "Your contact phone number has been updated to",
+    "2": "You may need to update your phone number in other places",
+    "3": "This only changes your contact phone number with services connected to your GC Sign in. ",
+    "4": "If you are trying to update your contact phone number with a service that’s not connected to your GC Sign in, you’ll need to go to that account.",
+    "5": "To search for another GC Account, visit the",
+    "6": "GC Account directory.",
+    "7": "Back to profile",
+    "8": "Sign out"
   }
 }

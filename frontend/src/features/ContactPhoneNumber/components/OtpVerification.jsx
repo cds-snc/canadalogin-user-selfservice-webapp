@@ -22,17 +22,17 @@ import { useUser } from "../../../components/Providers/useUser.tsx";
 
 const initialTime = 10;
 
-export default function OtpVerification({ step, totalSteps, onNext, onCancel, onChangePhoneForm, phoneFormData, userProfile }) {
+export default function OtpVerification({ step, totalSteps, onNext, onCancel, onBack, onChangePhoneForm, phoneFormData, userProfile }) {
     const { language } = useParams();
 
     const [codeRequested, setCodeRequested] = useState(false);
-
     const navigateHelper = useNavigateHelper();
     // const { setError, clearAllErrors, getError, hasErrors } = useError(language);
     const [time, setTime] = useState(initialTime);
     const pageContentJson = getPageContent(language, PAGES.verification);
     const errorPageJson = getPageContent(language, PAGES.error);
     const { submit, cancel } = getPageContent(language, "Button");
+
 
     // const error = getError('#verificationCode');
     const { id, userName } = userProfile ?? {};
@@ -44,37 +44,43 @@ export default function OtpVerification({ step, totalSteps, onNext, onCancel, on
     }
 
     const requestOtpCode = async () => {
-        try {
-            const response = await passwordUpdate.firstStep(userName, userSelectedMfaType.type);
-            if (response && response.success) {
-                setOtpSentResponse(response.data);
-            }
-        } catch (err) {
-            if (err === 429) {
-                setDisplayTooManyRequestsError(true);
-            }
-            setCodeRequested(false);
-            console.log('err', err)
-        } finally {
-            fetchInProgress(false);
-        }
+        // try {
+        //     const response = await passwordUpdate.firstStep(userName, userSelectedMfaType.type);
+        //     if (response && response.success) {
+        //         setOtpSentResponse(response.data);
+        //     }
+        // } catch (err) {
+        //     if (err === 429) {
+        //         setDisplayTooManyRequestsError(true);
+        //     }
+        //     setCodeRequested(false);
+        //     console.log('err', err)
+        // } finally {
+        //     fetchInProgress(false);
+        // }
     };
 
+    const clearValues = () => {
+        onChangePhoneForm('phoneNumber', "");
+        onChangePhoneForm('formattedPhoneNumber', "");
+        onChangePhoneForm('otp', "");
+    };
 
     const validateOtpCode = async (userOtpValue) => {
         //     try {
         //         const response = await passwordUpdate.secondStep(userOtpValue, otpSentResponse.trxId);
         //         if (response && response.success) {
-        //             onNext(response.data);
+        //             
         //         }
         //     } catch (err) {
         //         console.log('err', err)
         //     }
+        onNext();
     };
 
     const handleChange = (e) => {
         const value = e.target.value;
-        setUserOtpValue(value);
+        onChangePhoneForm('otp', value);
     };
 
     useEffect(() => {
@@ -101,26 +107,11 @@ export default function OtpVerification({ step, totalSteps, onNext, onCancel, on
 
     const userMfaType = phoneFormData.contactType;
     const errorMessage = "";
-    console.log('userMfaType === FLOW_TYPES.sms ', userMfaType === FLOW_TYPES.sms)
-    console.log('userMfaType === FLOW_TYPES.sms ', userMfaType)
-    console.log('userMfaType === FLOW_TYPES.sms ', FLOW_TYPES.sms)
+
     // console.log(pageContentJson['22'])
     // console.log('phone', pageContentJson['1'])
     return (
         <GcdsContainer>
-
-            {/* <GcdsErrorSummary
-                data-testid='errorSummary'
-                errorLinks={"Anohter "}
-                heading="Error Message"
-            /> */}
-            {/* {
-                displayTooManyRequestsError && (
-                    <GcdsErrorMessage messageId="message-props">
-                        {errorPageJson['14']}
-                    </GcdsErrorMessage>
-                )
-            } */}
 
             {/* {codeRequested && (<GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={pageContentJson['17']} data-testid="linkSuccess">&nbsp;</GcdsNotice>)} */}
 
@@ -137,7 +128,7 @@ export default function OtpVerification({ step, totalSteps, onNext, onCancel, on
 
                 <GcdsText>
                     {userMfaType === FLOW_TYPES.voice ? pageContentJson['3'] : userMfaType === FLOW_TYPES.sms ? pageContentJson['2'] : pageContentJson['23']}&nbsp;
-                    <strong>{phoneFormData.phoneNumber}</strong>
+                    <strong>{phoneFormData.formattedPhoneNumber}</strong>
                 </GcdsText>
                 <GcdsText>
                     {userMfaType === FLOW_TYPES.voice ? pageContentJson['5'] : userMfaType === FLOW_TYPES.sms ? pageContentJson['4'] : pageContentJson['24']}
@@ -185,7 +176,7 @@ export default function OtpVerification({ step, totalSteps, onNext, onCancel, on
 
                     <GcdsButton buttonRole="secondary" style={{ width: 'fit-content' }} onGcdsClick={(ev) => {
                         ev.preventDefault();
-                        navigateHelper(backToSecuritySettingsPage)
+                        onCancel()
                     }}>
                         {cancel}
                     </GcdsButton>
@@ -197,18 +188,19 @@ export default function OtpVerification({ step, totalSteps, onNext, onCancel, on
             </GcdsHeading>
 
 
+
             <GcdsText>
-                {
-                    time <= 0 ? (
-                        <GcdsLink onGcdsClick={() => {
-                            onBack()
-                        }
-                        }>
-                            {pageContentJson['21']}
-                        </GcdsLink>
-                    ) : ""
+                <GcdsLink onGcdsClick={() => {
+                    clearValues();
+                    onBack();
                 }
+                }>
+                    {pageContentJson['21']}
+
+                </GcdsLink>
+
             </GcdsText>
+
 
 
             <GcdsText>

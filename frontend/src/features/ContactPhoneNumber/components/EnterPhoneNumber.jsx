@@ -1,7 +1,9 @@
-import { useState, state } from 'react';
+import { useState } from 'react';
 import { useParams } from "react-router";
+import { isValidPhoneNumber, parsePhoneNumberFromString } from 'libphonenumber-js';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/material.css';
+
 import {
     GcdsContainer, GcdsDetails, GcdsGrid, GcdsHeading, GcdsLink, GcdsStepper, GcdsText, GcdsRadios, GcdsButton
 } from "@cdssnc/gcds-components-react";
@@ -99,7 +101,7 @@ const RadioButtons = ({ onChangePhoneForm, pageContentJson, phoneFormData }) => 
 export default function EnterPhoneNumber({ step, totalSteps, onNext, onCancel, onChangePhoneForm, phoneFormData, setLocalLoading }) {
     const { language } = useParams();
     const [phone, setPhone] = useState('');
-    const [countryCodeLength, setCountryCodeLength] = useState(0);
+    const [phoneNumberValid, setPhoneNumberValid] = useState(true);
     const pageContentJson = getPageContent(language, PAGES.enterNewPhoneNumber);
     const otpPageContentJson = getPageContent(language, PAGES.otpSelection);
 
@@ -137,9 +139,11 @@ export default function EnterPhoneNumber({ step, totalSteps, onNext, onCancel, o
                         disableSearchIcon={false}
                         defaultErrorMessage={pageContentJson['14']}
                         onChange={phone => onChangePhoneForm('phoneNumber', `+${phone}`)}
-                        isValid={(inputNumber) => {
-                            if (!inputNumber) return false;
-                            return true;
+                        isValid={(inputNumber, country) => {
+                            const capitalize = country.iso2.toUpperCase();
+                            const validatedPhoneNUmber = isValidPhoneNumber(phoneFormData.phoneNumber, capitalize);
+                            setPhoneNumberValid(validatedPhoneNUmber);
+                            return validatedPhoneNUmber;
                         }}
                     />
                 </section>
@@ -157,8 +161,15 @@ export default function EnterPhoneNumber({ step, totalSteps, onNext, onCancel, o
             </GcdsGrid>
 
             <GcdsGrid columns="repeat(auto-fit, minmax(100px, 100px))" gap="500" align-items="center">
-                <GcdsButton style={{ width: 'fit-content' }} onGcdsClick={(ev) => {
+                <GcdsButton disabled={!phoneNumberValid} style={{ width: 'fit-content' }} onGcdsClick={(ev) => {
                     ev.preventDefault();
+                    const parsedPhoneNumber = parsePhoneNumberFromString(phoneFormData.phoneNumber).formatInternational();
+                    if (parsedPhoneNumber) {
+                        onChangePhoneForm('formattedPhoneNumber', parsedPhoneNumber);
+                    } else {
+                        onChangePhoneForm('formattedPhoneNumber', phoneFormData.phoneNumber);
+                    }
+
                     // sendOTP Here
                     onNext()
                 }}>

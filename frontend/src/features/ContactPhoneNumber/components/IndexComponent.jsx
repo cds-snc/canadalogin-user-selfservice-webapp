@@ -12,11 +12,14 @@ import { useUser } from "../../../components/Providers/useUser.tsx";
 import Loader from "../../../components/Layout/Loading.jsx";
 import EnterPhoneNumber from "./EnterPhoneNumber.jsx";
 import OtpVerification from "./OtpVerification.jsx";
+import ConfirmUpdate from "./ConfirmUpdate.jsx";
+import SuccessfullyUpdated from "./SuccessfullyUpdated.jsx";
 
 const STEPS = {
     ENTER: 'enterPhoneNumber',
-    VERIFY: 'otpValidation',
+    VERIFY: 'otpVerification',
     CONFIRM: 'confirm',
+    SUCCESS: 'success',
 };
 
 
@@ -36,7 +39,8 @@ export default function UpdateContactPhoneNumber() {
         'phoneNumber': '',
         'otp': '',
         'trxid': '',
-        'contactType': FLOW_TYPES.sms
+        'contactType': FLOW_TYPES.sms,
+        'formattedPhoneNumber': ''
     });
 
     const [otpValidationResponse, setOtpValidationResponse] = useState(null);
@@ -83,15 +87,39 @@ export default function UpdateContactPhoneNumber() {
                 }
             />
         ),
-        otpValidation: (
+        otpVerification: (
             <OtpVerification
                 userProfile={userProfile}
                 phoneFormData={phoneFormData}
                 onChangePhoneForm={handlePhoneForm}
-                step={1}
+                step={2}
+                totalSteps={3}
+                onNext={
+                    () => {
+                        setStep(STEPS.CONFIRM);
+                    }
+                }
+                onCancel={
+                    () => {
+                        navigateHelper(backtoProfile);
+                    }
+                }
+                onBack={
+                    () => {
+                        setStep(STEPS.ENTER);
+                    }
+                }
+            />
+        ),
+        confirm: (
+            <ConfirmUpdate
+                userProfile={userProfile}
+                phoneFormData={phoneFormData}
+                onChangePhoneForm={handlePhoneForm}
+                step={3}
                 totalSteps={3}
                 onNext={() => {
-                    setStep(STEPS.VERIFY);
+                    setStep(STEPS.SUCCESS);
                 }}
                 onCancel={
                     () => {
@@ -100,35 +128,20 @@ export default function UpdateContactPhoneNumber() {
                 }
             />
         ),
-        // passwordChange: (
-        //     <Password
-        //         userProfile={userProfile}
-        //         step={4}
-        //         userSelectedMfaType={userSelectedMfaType}
-        //         localLoading={localLoading}
-        //         setLocalLoading={handleLoading}
-        //         totalSteps={4}
-        //         otpSentResponse={otpSentResponse}
-        //         userOtpValue={userOtpValue}
-        //         onNext={() => {
-        //             setPasswordUpdateStep("passwordChangedConfirmation");
-        //         }}
-        //         onBack={() => setPasswordUpdateStep("otpValidation")}
-        //     />
-        // ),
-        // passwordChangedConfirmation: (
-        //     <PasswordChangedConfirmation
-        //         userProfile={userProfile}
-        //         step={4}
-        //         userSelectedMfaType={userSelectedMfaType}
-        //         localLoading={localLoading}
-        //         setLocalLoading={handleLoading}
-        //         totalSteps={4}
-        //         otpSentResponse={otpSentResponse}
-        //         userOtpValue={userOtpValue}
-        //         language={language}
-        //     />
-        // ),
+        success: (
+            <SuccessfullyUpdated
+                userProfile={userProfile}
+                phoneFormData={phoneFormData}
+                onNext={() => {
+                    navigateHelper(backtoProfile);
+                }}
+                onCancel={
+                    () => {
+                        navigateHelper(backtoProfile);
+                    }
+                }
+            />
+        ),
     };
 
     console.log('phoneForm', phoneFormData)
