@@ -76,9 +76,9 @@ const AddPhoneNumber = (props) => {
     return (
         <>
 
-            <GcdsText>{pageContent['18']}</GcdsText>
 
             <GcdsGrid columns="1fr auto" className="gridInline">
+                <GcdsText>{pageContent['18']}</GcdsText>
 
                 <GcdsLink href={updateContactPhoneNumber} size="regular" onGcdsClick={(ev) => {
                     ev.preventDefault();
@@ -100,18 +100,13 @@ const ContactPhoneNumber = (props) => {
         <>
             <GcdsText>{pageContent['11']}</GcdsText>
 
-            <GcdsHeading tag="h3" marginTop='300'>{pageContent['10']}</GcdsHeading>
-            <GcdsText>{pageContent['11']}</GcdsText>
-
-            <GcdsGrid columns="1fr auto" className="gridInline">
+            <GcdsGrid columns="1fr auto">
                 <DisplayPhoneNumbers phoneNumbers={phoneNumbers} />
-
                 <GcdsLink href="#" size="regular">
                     {pageContent['5']}
                 </GcdsLink>
             </GcdsGrid>
-
-            <DisplayVerifiedBadge />
+            <DisplayVerifiedBadge pageContent={pageContent} />
         </>
     )
 }
@@ -126,16 +121,13 @@ export default function ViewContactPhoneNumber({ pageContent, phoneNumbers }) {
     return (
         <GcdsContainer>
             <GcdsHeading tag="h3" marginTop='300'>{pageContent['10']}</GcdsHeading>
-            <GcdsGrid columns="1fr auto" className="gridInline">
-                {
-                    phoneNumbers != null ? (
-                        <>
-                            <div className="separator" />
-                            <ContactPhoneNumber pageContent={pageContent} phoneNumbers={phoneNumbers} />
-                        </>
-                    ) : <AddPhoneNumber pageContent={pageContent} />
-                }
-            </GcdsGrid>
+            {
+                phoneNumbers != null ? (
+                    <>
+                        <ContactPhoneNumber pageContent={pageContent} phoneNumbers={phoneNumbers} />
+                    </>
+                ) : <AddPhoneNumber pageContent={pageContent} />
+            }
         </GcdsContainer>
     );
 }

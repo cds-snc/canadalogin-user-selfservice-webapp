@@ -4,7 +4,7 @@ from fastapi import HTTPException
 from httpx import AsyncClient
 from pydantic import ValidationError
 
-from app.users.schemas import ProfileGetResponseData, ProfileResponse, ProfilePUTData
+from app.users.schemas import ProfileGetResponseData, ProfileResponse, ProfilePUTData, ProfileUpdateData
 from app.utils.access_token import get_auth_request_headers
 from app.config import get_configuration
 
@@ -19,12 +19,25 @@ async def update_profile(
 ):
     try:
         headers = get_auth_request_headers(user_access_token)
-        create_request = ProfilePUTData(
-            **user_data.model_dump()
+        validate_updated_data = ProfilePUTData(
+            **user_data.model_dump(exclude_unset=True)
         )  # validation and then turns it into a ProfilePUTData data object
-        request_json = create_request.model_dump_json(
-            by_alias=True, exclude_unset=True, exclude_none=True
+
+        updated_data_dict = validate_updated_data.model_dump(exclude_unset=True, exclude_none=True)
+
+        user_profile = await my_profile(global_http_client, user_access_token)
+        user_profile_data = user_profile.data.model_dump()
+        updated_data_dict.pop("userName", None)
+
+        merged_profile = {**user_profile_data, **updated_data_dict}
+
+        validate_merged_profile = ProfileUpdateData(**merged_profile)
+
+        request_json = validate_merged_profile.model_dump_json(
+            by_alias=True, exclude_none=True
         )
+
+        print(request_json)
         response = await global_http_client.put(
             profile_api_endpoint, content=request_json, headers=headers
         )

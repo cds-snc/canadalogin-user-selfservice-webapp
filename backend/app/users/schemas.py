@@ -71,11 +71,34 @@ class UserProfileName(BaseModel):
 
 
 class ProfileGetResponseData(BaseModel):
-    emails: List[EmailItem] = None
+    emails: Optional[List[EmailItem]] = None
     preferredLanguage: Optional[str] = None
     meta: Meta
     name: Optional[UserProfileName] = None
     active: bool
+    id: str
+    userName: EmailStr
+    phoneNumbers: Optional[List[MetaDataTypeValue]] = None
+    details: Optional[SCIMUserDetails] = Field(
+        default=None,
+        validation_alias="urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+        serialization_alias="details",
+    )
+    model_config = ConfigDict(validate_by_name=True, validate_by_alias=True)
+
+
+class ProfileUpdateData(BaseModel):
+    schemas: List[str] = Field(
+        default=[
+            "urn:ietf:params:scim:schemas:core:2.0:User",
+            "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+        ]
+    )
+    emails: Optional[List[EmailItem]] = None
+    preferredLanguage: Optional[str] = None
+    meta: Optional[Meta] = None
+    name: Optional[UserProfileName] = None
+    active: bool = None
     id: str
     userName: EmailStr
     phoneNumbers: Optional[List[MetaDataTypeValue]] = None

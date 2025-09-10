@@ -22,7 +22,7 @@ import { useUser } from "../../../components/Providers/useUser.tsx";
 
 const initialTime = 10;
 
-export default function OtpVerification({ step, totalSteps, onNext, onCancel, onBack, onChangePhoneForm, phoneFormData, userProfile }) {
+export default function OtpVerification({ step, totalSteps, onNext, onCancel, onBack, onChangePhoneForm, phoneFormData, userProfile, errorCode }) {
     const { language } = useParams();
 
     const [codeRequested, setCodeRequested] = useState(false);
@@ -106,8 +106,7 @@ export default function OtpVerification({ step, totalSteps, onNext, onCancel, on
     }, [id]);
 
     const userMfaType = phoneFormData.contactType;
-    const errorMessage = "";
-
+    const errorMessage = errorPageJson[errorCode] || "";
     // console.log(pageContentJson['22'])
     // console.log('phone', pageContentJson['1'])
     return (
@@ -115,6 +114,13 @@ export default function OtpVerification({ step, totalSteps, onNext, onCancel, on
 
             {/* {codeRequested && (<GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={pageContentJson['17']} data-testid="linkSuccess">&nbsp;</GcdsNotice>)} */}
 
+            {
+                errorMessage != "" && (
+                    <GcdsErrorMessage messageId="message-props">
+                        {errorMessage}
+                    </GcdsErrorMessage>
+                )
+            }
 
             <GcdsContainer>
 

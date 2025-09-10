@@ -7,6 +7,7 @@ import {
     PAGES
 } from "../../../utils/constants.jsx";
 import { getPageContent } from '../../../utils/functions.jsx';
+import { authService } from '../../../services/authService.jsx';
 
 import { useUser } from "../../../components/Providers/useUser.tsx";
 import Loader from "../../../components/Layout/Loading.jsx";
@@ -14,6 +15,8 @@ import EnterPhoneNumber from "./EnterPhoneNumber.jsx";
 import OtpVerification from "./OtpVerification.jsx";
 import ConfirmUpdate from "./ConfirmUpdate.jsx";
 import SuccessfullyUpdated from "./SuccessfullyUpdated.jsx";
+import { transientOtp } from "../api/transientOtp.jsx";
+
 
 const STEPS = {
     ENTER: 'enterPhoneNumber',
@@ -22,12 +25,24 @@ const STEPS = {
     SUCCESS: 'success',
 };
 
+// Map frontend FLOW_TYPES to backend otpType
+// Backend: sms | voice
+// Frontnd: smsotp | voiceotp
+// IBM Verify seems to use both smsotp | voiceotp and sms | voice
+const serverMapping = {
+    [FLOW_TYPES.sms]: "sms",
+    [FLOW_TYPES.voice]: "voice"
+};
+
+
 
 export default function UpdateContactPhoneNumber() {
     const { language } = useParams();
     const { state } = useUser();
+    const [errorCode, setErrorCode] = useState("");
+
     const { userProfile } = state;
-    const { id } = userProfile ?? {};
+    const { id, userName } = userProfile ?? {};
 
     const { pathname } = useLocation();
     const [localLoading, setLocalLoading] = useState(false);
@@ -68,6 +83,75 @@ export default function UpdateContactPhoneNumber() {
         }));
     };
 
+    const sendOTP = async () => {
+        try {
+            setLocalLoading(true);
+            const formdata = {
+                "phoneNumber": phoneFormData.phoneNumber,
+                "userName": userName,
+                "otpType": serverMapping[phoneFormData.contactType]
+            };
+
+            const response = await transientOtp.sendOtp(formdata);
+            if (response && response.data && response.data.trxnId) {
+                handlePhoneForm('trxnId', response.data.trxnId);
+                setStep(STEPS.VERIFY);
+            }
+
+        } catch (error) {
+            if (error && error.data && error.data.message) {
+                setErrorCode(error.data.message);
+            }
+        } finally {
+            setLocalLoading(false);
+        }
+    };
+
+    const verifyOtp = async () => {
+        try {
+            setLocalLoading(true);
+            const formdata = {
+                "otp": phoneFormData.otp,
+                "trxnId": phoneFormData.trxnId,
+                "otpType": serverMapping[phoneFormData.contactType]
+            };
+
+            const response = await transientOtp.verifyOtp(formdata);
+            if (response && response.success) {
+                setStep(STEPS.CONFIRM);
+            }
+
+        } catch (error) {
+            if (error && error.data && error.data.message) {
+                setErrorCode(error.data.message);
+            }
+        } finally {
+            setLocalLoading(false);
+        }
+    };
+
+    const updateProfile = async () => {
+        try {
+            setLocalLoading(true);
+            const formdata = {
+                "userName": userName,
+                "phoneNumbers": [{ value: phoneFormData.phoneNumber, type: "mobile" }],
+            };
+
+            const response = await authService.update_my_user_profile(formdata);
+            if (response && response.success) {
+                setStep(STEPS.SUCCESS);
+            }
+
+        } catch (error) {
+            if (error && error.data && error.data.message) {
+                setErrorCode(error.data.message);
+            }
+        } finally {
+            setLocalLoading(false);
+        }
+    };
+
     const steps = {
         enterPhoneNumber: (
             <EnterPhoneNumber
@@ -77,8 +161,9 @@ export default function UpdateContactPhoneNumber() {
                 setLocalLoading={handleLoading}
                 step={1}
                 totalSteps={3}
+                errorCode={errorCode}
                 onNext={() => {
-                    setStep(STEPS.VERIFY);
+                    sendOTP();
                 }}
                 onCancel={
                     () => {
@@ -92,11 +177,12 @@ export default function UpdateContactPhoneNumber() {
                 userProfile={userProfile}
                 phoneFormData={phoneFormData}
                 onChangePhoneForm={handlePhoneForm}
+                errorCode={errorCode}
                 step={2}
                 totalSteps={3}
                 onNext={
                     () => {
-                        setStep(STEPS.CONFIRM);
+                        verifyOtp();
                     }
                 }
                 onCancel={
@@ -119,7 +205,7 @@ export default function UpdateContactPhoneNumber() {
                 step={3}
                 totalSteps={3}
                 onNext={() => {
-                    setStep(STEPS.SUCCESS);
+                    updateProfile();
                 }}
                 onCancel={
                     () => {
