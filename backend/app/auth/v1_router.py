@@ -57,7 +57,7 @@ async def reauth(
     return await reauthenticate_user(request, returnToPage)
 
 
-@router.get(
+@router.post(
     "/logout",
     tags=["Auth"],
     summary="Logout user",

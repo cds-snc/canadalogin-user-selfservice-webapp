@@ -421,6 +421,8 @@
     "4": "Renseignements personnels",
     "5": "Paramètres de sécurité",
     "6": "Retour à ",
-    "7": "Se déconnecter"
+    "7": "Se déconnecter",
+    "8": "Déconnexion en cours...",
+    "9": "Échec de la déconnexion. Redirection..."
   }
 }

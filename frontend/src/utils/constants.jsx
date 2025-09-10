@@ -134,6 +134,7 @@ export const SUBMIT_END_POINTS = {
   rp_info: "/v1/users/rp_info",
   users: "/v1/users",
   passwordUpdate: "/v1/password/update",
+  logout: "/v1/auth/logout",
 };
 
 export const GA_CATEGORIES = {
