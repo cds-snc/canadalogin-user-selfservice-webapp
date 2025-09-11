@@ -39,6 +39,7 @@ export const OIDC_REDIRECT = {
 export const CONTEXT_ACTIONS = {
   signIn: "SIGN_IN",
   logOut: "LOG_OUT",
+  set_loading: "SET_LOADING",
   signin_success: "SIGNIN_SUCCESS",
   signin_failure: "SIGNIN_FAILURE",
   clone_profile: "CLONE_PROFILE",
@@ -134,6 +135,7 @@ export const SUBMIT_END_POINTS = {
   rp_info: "/v1/users/rp_info",
   users: "/v1/users",
   passwordUpdate: "/v1/password/update",
+  logout: "/v1/auth/logout",
 };
 
 export const GA_CATEGORIES = {

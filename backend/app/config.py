@@ -82,6 +82,10 @@ class Configuration(BaseSettings):
     def password_policy_api_endpoint(self) -> str:
         return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.PASSWORDPOLICY.value}"
 
+    @property
+    def end_session_endpoint(self) -> str:
+        return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.END_SESSION_ENDPOINT.value}"
+
 
 @lru_cache
 def get_configuration():

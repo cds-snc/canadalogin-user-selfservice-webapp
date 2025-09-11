@@ -109,6 +109,17 @@ export const authService = {
             }
         }
     },
+    logout: async () => {
+        try {
+            const response = await axios.post(`${config.apiUrl}${SUBMIT_END_POINTS.logout}`);
+            return response.data;
+        } catch (error) {
+            if (error.response && error.response.status === 401) {
+                redirectToLogin();
+            }
+            throw error;
+        }
+    },
 }
 
 function buildTestResponse(userData, type) {
