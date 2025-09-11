@@ -29,7 +29,7 @@ export default function EditLanguagePreferences() {
     const backtoProfile = `/${language}${NAVIGATION_LINKS.profileHome}`;
     const { handleCancel } = useCancelLanguageEditing(backtoProfile);
     const pageContentJson = getPageContent(language, PAGES.editLanguagePreferences);
-    const areYouSureEditYourLanguage = `/${language}${NAVIGATION_LINKS.areYouSureEditYourLanguage}`
+    const areYouSureEditYourLanguage = `/${language}${NAVIGATION_LINKS.profileUpdateLanguageConfirmUpdate}`
 
 
     const profilePreferredLanguage = userProfile?.preferredLanguage;

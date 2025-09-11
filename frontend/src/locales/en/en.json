@@ -20,14 +20,6 @@
     "18": "Use a different email",
     "19": "I forgot my password"
   },
-  "FirstTimeGc": {
-    "1": "First time using GC Sign in?",
-    "2": "Sign up"
-  },
-  "AlreadyGc": {
-    "1": "Already have a GC Sign in account?",
-    "2": "Sign in"
-  },
   "Error": {
     "1": "There was a problem",
     "2": "Invalid email. Email must contain an ‘@’ symbol followed by a domain.",
@@ -96,7 +88,7 @@
     "2": "Personal information",
     "3": "Security settings"
   },
-  "AreYouSureEditYourName": {
+  "ProfileUpdateNameConfirmUpdate": {
     "1": "Are you sure you want to update your name?",
     "2": "You’ve requested to update your name to:",
     "3": "Example Newname",
@@ -110,7 +102,7 @@
     "11": "does not ",
     "12": "legally change your name."
   },
-  "ProfileNameEdit": {
+  "ProfileUpdateName": {
     "1": "What services have access to your name",
     "2": "First name",
     "3": "Last name",
@@ -194,7 +186,7 @@
     "13": "Continue",
     "14": "Cancel"
   },
-  "ProfileYouMayUpdateName": {
+  "ProfileUpdateNameSuccess": {
     "0": "Success",
     "1": "Your name has been updated to",
     "2": "You may need to update your name with other places.",

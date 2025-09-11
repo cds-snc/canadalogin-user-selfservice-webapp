@@ -8,16 +8,16 @@ import {
   GcdsNotice,
   GcdsButton, GcdsGrid, GcdsLink
 } from "@cdssnc/gcds-components-react";
-import { getPageContent } from "../../utils/functions";
-import { PAGES, NAVIGATION_LINKS, CONTEXT_ACTIONS } from "../../utils/constants";
-import { useUser } from "../Providers/useUser";
+import { getPageContent } from "../../utils/functions.jsx";
+import { PAGES, NAVIGATION_LINKS, CONTEXT_ACTIONS } from "../../utils/constants.jsx";
+import { useUser } from "../Providers/useUser.tsx";
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
 
 
-export default function ProfileYouMayUpdateName() {
+export default function ProfileUpdateNameSuccess() {
   const { language } = useParams();
   const { state } = useUser();
-  const pageContentJson = getPageContent(language, PAGES.profileYouMayUpdateName);
+  const pageContentJson = getPageContent(language, PAGES.profileUpdateNameSuccess);
   const navigateHelper = useNavigateHelper();
   const backtoProfile = `/${language}${NAVIGATION_LINKS.profileHome}`;
 

@@ -26,7 +26,7 @@ export default function AreYouSureEditYourLanguage() {
   const backtoProfile = `/${language}${NAVIGATION_LINKS.profileHome}`;
   const { handleCancel } = useCancelLanguageEditing(backtoProfile);
 
-  const successPage = `/${language}${NAVIGATION_LINKS.profileYouMayUpdateLanguage}`;
+  const successPage = `/${language}${NAVIGATION_LINKS.profileUpdateLanguageSuccess}`;
 
   const selectedLanguage = state?.editProfile?.preferredLanguage || "";
 

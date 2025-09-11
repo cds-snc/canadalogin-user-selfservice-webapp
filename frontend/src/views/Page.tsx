@@ -12,14 +12,14 @@ import ChangePasswordIndex from "../features/ChangePassword/components/ChangePas
 import ManageDashboard from "../components/Manage/ManageDashboard.jsx";
 import { PAGES } from "../utils/constants";
 import { trackPage } from "../utils/gatag.jsx";
-import AreYouSureEditYourName from "../components/Manage/AreYouSureEditYourName.jsx";
-import ProfileNameEdit from "../components/PersonalInfo/ProfileNameEdit.jsx";
+import ProfileUpdateNameConfirmUpdate from "../components/Manage/ProfileUpdateNameConfirmUpdate.jsx";
+import ProfileUpdateName from "../components/PersonalInfo/ProfileUpdateName.jsx";
 import ProfileHome from "../components/Manage/ProfileHome.jsx";
 import CheckYourEmail from "../components/Manage/CheckYourEmail.jsx";
 import CompleteTwoStepVerification from "../components/Manage/CompleteTwoStepVerification.jsx";
 import FirstVerifyItsYou from "../components/Manage/FirstVerifyItsYou.jsx";
 import EnterNewEmail from "../components/Manage/EnterNewEmail.jsx";
-import ProfileYouMayUpdateName from "../components/Manage/ProfileYouMayUpdateName.jsx";
+import ProfileUpdateNameSuccess from "../components/Manage/ProfileUpdateNameSuccess.jsx";
 import AreYouSureUpdateContactNumber from "../components/Manage/AreYouSureUpdateContactNumber.jsx";
 import EnterNewPhoneNumber from "../components/Manage/EnterNewPhoneNumber.jsx";
 import YouMayUpdateEmailAtOtherPlaces from "../components/Manage/YouMayUpdateEmailAtOtherPlaces.jsx";
@@ -40,9 +40,9 @@ function PageContents({ page }: { page: string }) {
                 <ManageDashboard />
             );
 
-        case PAGES.ProfileNameEdit:
+        case PAGES.profileUpdateName:
             return (
-                <ProfileNameEdit />
+                <ProfileUpdateName />
             );
         case PAGES.ProfileHome:
             return (
@@ -64,9 +64,9 @@ function PageContents({ page }: { page: string }) {
             return (
                 <EnterNewEmail />
             );
-        case PAGES.profileYouMayUpdateName:
+        case PAGES.profileUpdateNameSuccess:
             return (
-                <ProfileYouMayUpdateName />
+                <ProfileUpdateNameSuccess />
             );
         case PAGES.enterNewPhoneNumber:
             return (
@@ -105,9 +105,9 @@ function PageContents({ page }: { page: string }) {
                             Sign in one time code</a></div>
                 </GcdsText>
             );
-        case PAGES.areYouSureEditYourName:
+        case PAGES.profileUpdateNameConfirmUpdate:
             return (
-                <AreYouSureEditYourName />
+                <ProfileUpdateNameConfirmUpdate />
             )
         case PAGES.areYouSureUpdateContactNumber:
             return (
