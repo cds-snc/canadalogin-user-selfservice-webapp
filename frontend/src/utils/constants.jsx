@@ -1,5 +1,3 @@
-import ManageDashboard from "../components/Manage/ManageDashboard.jsx";
-import ProfileHome from "../components/Manage/ProfileHome";
 import config from "../config";
 export const AVAILABLE_LANGUAGES = { en: "en", fr: "fr" };
 export const PROFILE_LANGUAGES = {
@@ -11,25 +9,25 @@ export const LANGUAGE_DISPLAY_NAMES = {
   "fr-ca": "French",
 };
 export const NAVIGATION_LINKS = {
-  password: `/security-settings/update-password`,
-  verification: "/verification",
   manage: "/",
-  ProfileNameEdit: "/profile/update-name",
-  profileHome: "/profile-home",
+  securitySettings: "/security-settings",
+  securitySettingsUpdatePassword: `/security-settings/update-password`,
+  verification: "/verification",
   checkYourEmail: "/checkyouremail",
   completeTwoStepVerification: "/completetwostepverification",
   firstVerifyItsYou: "/firstverifyitsyou",
   enterNewEmail: "/enternewemail",
-  profileYouMayUpdateName: "/profile/update-name/success",
-  areYouSureEditYourName: "/profile/update-name/confirm-update",
   areYouSureUpdateContactNumber: "/areYouSureUpdateContactNumber",
   enterNewPhoneNumber: "/enterNewPhoneNumber",
   youMayUpdateEmailAtOtherPlaces: "/youMayUpdateEmailAtOtherPlaces",
   areYouSureUpdateYourEmail: "/areYouSureUpdateYourEmail",
-  securitySettings: "/security-settings",
-  editLanguagePreferences: "/profile/update-language/",
-  areYouSureEditYourLanguage: "/profile/update-language/confirm-update",
-  profileYouMayUpdateLanguage: "/profile/update-language/success",
+  profileHome: "/profile-home",
+  profileUpdateName: "/profile/update-name",
+  profileUpdateNameSuccess: "/profile/update-name/success",
+  profileUpdateNameConfirmUpdate: "/profile/update-name/confirm-update",
+  profileUpdateLanguage: "/profile/update-language/",
+  profileUpdateLanguageConfirmUpdate: "/profile/update-language/confirm-update",
+  profileUpdateLanguageSuccess: "/profile/update-language/success",
 };
 export const OIDC_REDIRECT = {
   login: `${config.apiUrl}/v1/auth/login`,
@@ -37,11 +35,8 @@ export const OIDC_REDIRECT = {
 };
 
 export const CONTEXT_ACTIONS = {
-  signIn: "SIGN_IN",
   logOut: "LOG_OUT",
   set_loading: "SET_LOADING",
-  signin_success: "SIGNIN_SUCCESS",
-  signin_failure: "SIGNIN_FAILURE",
   clone_profile: "CLONE_PROFILE",
   clear_edit_profile: "CLEAR_EDIT_PROFILE",
   update_cloned_profile: "UPDATED_CLONE_PROFILE",
@@ -56,7 +51,6 @@ export const CONTEXT_ACTIONS = {
 };
 
 export const FLOW_TYPES = {
-  signIn: "signin",
   sms: "smsotp",
   voice: "voiceotp",
   email: "email",
@@ -92,9 +86,9 @@ export const PAGES = {
   CompleteTwoStepVerification: "CompleteTwoStepVerification",
   FirstVerifyItsYou: "FirstVerifyItsYou",
   EnterNewEmail: "EnterNewEmail",
-  profileYouMayUpdateName: "ProfileYouMayUpdateName",
-  areYouSureEditYourName: "AreYouSureEditYourName",
-  ProfileNameEdit: "ProfileNameEdit",
+  profileUpdateNameSuccess: "ProfileUpdateNameSuccess",
+  profileUpdateNameConfirmUpdate: "ProfileUpdateNameConfirmUpdate",
+  profileUpdateName: "ProfileUpdateName",
   areYouSureUpdateContactNumber: "AreYouSureUpdateContactNumber",
   enterNewPhoneNumber: "EnterNewPhoneNumber",
   youMayUpdateEmailAtOtherPlaces: "YouMayUpdateEmailAtOtherPlaces",
@@ -126,8 +120,6 @@ export const SUBMIT_END_POINTS = {
   requestPasswordPolicy: "/v1/password/policy",
   create: "/v1/users/create",
   createCoreProfile: "/v1/users/createcoreprofile",
-  transientOtpVerify: "/v1/otp/transient_otp/verify",
-  transientOtpSend: "/v1/otp/transient_otp/send",
   login: "/v1/otp/users/login",
   otpVerify: "/v1/otp/otp/verify",
   otpSend: "/v1/otp/otp/send",
@@ -140,13 +132,9 @@ export const SUBMIT_END_POINTS = {
 
 export const GA_CATEGORIES = {
   pageView: "pageview",
-  onboarding: "sign_up_flow",
-  signIn: "sign_in",
 };
 
-export const GA_ACTIONS = {
-  clickFirstTimeGc: "Clicked FirstTimeGC -> Privacy",
-};
+export const GA_ACTIONS = {};
 
 export const GA_LABELS = {
   button: "Button",

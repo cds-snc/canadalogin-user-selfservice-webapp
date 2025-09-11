@@ -22,7 +22,7 @@ export function useLinkSubmit(submitDataOptions:SubmitDataOptions) {
                     const response = await callAuthService(submitDataOptions, submitData, state.userData);
                     console.log("success....", response);
                     const userData = setUserData(linkFlowType+submitDataOptions.type, state.userData, response, submitData);
-                    await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
+                    // Removed signUp dispatch since signup flows are removed
                     await callAnalytics(submitDataOptions, analyticsTag+'_success', GA_LABELS.link);
                     const navigateTo = setNavigateTo(submitDataOptions, linkFlowType, changeType);
                     setStates(linkFlowType);
@@ -91,11 +91,6 @@ function setNavigateTo(submitDataOptions:SubmitDataOptions, linkFlowType:string,
 
     switch (linkFlowType) {
         case LINK_SUBMIT_TYPES.useNewVerification:
-            if(submitDataOptions.type===FLOW_TYPES.email)
-                return ("/" + submitDataOptions.language + NAVIGATION_LINKS.signUp);
-            else if(submitDataOptions.flow===FLOW_TYPES.signUp)
-                return ("/" + submitDataOptions.language + NAVIGATION_LINKS.twoStepVerification);
-
             return ("/" + submitDataOptions.language + NAVIGATION_LINKS.verification);
         case LINK_SUBMIT_TYPES.requestNewCode:
             if(changeType) {
