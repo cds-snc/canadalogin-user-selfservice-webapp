@@ -9,3 +9,4 @@ class VerifyAPIEndpoint(str, Enum):
     INTROSPECT_TOKEN = "/oauth2/introspect"
     USER_OTP_FACTORS = "/v2.0/factors"
     PASSWORDPOLICY = "/v2.0/PasswordPolicies"
+    END_SESSION_ENDPOINT = "/oauth2/rplogout"

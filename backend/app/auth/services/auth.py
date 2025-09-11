@@ -1,4 +1,5 @@
 import logging
+from urllib.parse import urlencode
 from fastapi import Request
 from fastapi.responses import RedirectResponse
 from authlib.integrations.starlette_client import OAuthError
@@ -6,6 +7,8 @@ from app.auth.services.oidc_config import oauth
 from app.config import get_configuration
 from app.constants.session_keys import SessionKeys
 from app.utils.request_error_handler import RequestErrorHandler
+from app.utils.schemas import ResponseModel
+from app.auth.schemas import LogoutResponseModel
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +19,8 @@ def get_base_profile_management_url():
 
     if config.ENVIRONMENT != "local":
         redirectValue = f"https://{config.PROFILE_MANAGEMENT_DOMAIN}"
+    else:
+        redirectValue = f"http://{config.PROFILE_MANAGEMENT_DOMAIN}"
     return redirectValue
 
 
@@ -73,6 +78,9 @@ async def callback_handler(request: Request):
         request.session[SessionKeys.SESSION_USER_ACCESS_TOKEN_KEY.value] = (
             oidc_response.get("access_token")
         )
+        request.session[SessionKeys.SESSION_USER_ID_TOKEN_KEY.value] = (
+            oidc_response.get("id_token")
+        )
 
         logger.info("OIDC Callback Handler")
         logger.info(f"Redirect to PROFILE_MANAGEMENT_DOMAIN: {redirectValue}")
@@ -110,3 +118,49 @@ async def reauthenticate_user(request: Request, returnToPage: str = "/"):
     except Exception as e:
         logger.exception("Unexpected error during redirect_to_verify")
         RequestErrorHandler.handle(e, context="Unexpected error")
+
+
+async def logout_user(request: Request, id_token: str):
+    """
+    Logs out the user by clearing the session and redirecting to the logout endpoint.
+    """
+    try:
+        config = request.app.state.config
+        request.session.clear()
+
+        # Construct the logout redirect URL
+        end_session_endpoint = config.end_session_endpoint
+        post_logout_redirect_uri = get_base_profile_management_url()
+        # locale = user_info.get("locale", "en")
+
+        # Build the logout URL with query parameters
+        # id_token = get_users_id_token(request)
+        params = {
+            "id_token_hint": id_token,
+            "post_logout_redirect_uri": post_logout_redirect_uri,
+            # "ui_locales": locale,
+        }
+        redirect_url = f"{end_session_endpoint}?{urlencode(params)}"
+
+        logger.debug(f"Constructed logout redirect URL: {redirect_url}")
+
+        # Create response with the redirect URL
+        response_data = LogoutResponseModel(
+            redirect_url=redirect_url, source="logout_button"
+        )
+
+        return ResponseModel(
+            success=True,
+            data=response_data,
+            message="Redirect url to logout",
+        )
+    except Exception as e:
+        logger.exception("Unexpected error during logout", str(e))
+        RequestErrorHandler.handle(e, context="Unexpected error during logout")
+
+
+async def backchannel_logout(request: Request):
+    # placeholder for backchannel logout logic
+    return ResponseModel(
+        success=True, data=None, message="Backchannel logout successful"
+    )
