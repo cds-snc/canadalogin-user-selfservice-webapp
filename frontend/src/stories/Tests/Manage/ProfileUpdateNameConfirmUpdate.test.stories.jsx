@@ -54,7 +54,7 @@ export const ConfirmNameUpdate = {
             },
           },
         },
-      ]
+      ],
     ),
     test: {
       dangerouslyIgnoreUnhandledErrors: true,
@@ -81,7 +81,9 @@ export const ConfirmNameUpdate = {
       // Find the Save/Confirm button (primary button)
       let saveButton =
         canvas.getByText(/Yes, update/i) ||
-        canvasElement.querySelector('gcds-button:not([button-role="secondary"])') ||
+        canvasElement.querySelector(
+          'gcds-button:not([button-role="secondary"])',
+        ) ||
         canvasElement.querySelector('gcds-button button[part="button"]');
 
       await expect(saveButton).toBeInTheDocument();
@@ -115,7 +117,7 @@ export const CancelNameUpdate = {
         language: AVAILABLE_LANGUAGES.en,
         flow: FLOW_TYPES.profile,
       },
-      []
+      [],
     ),
     test: {
       dangerouslyIgnoreUnhandledErrors: true,
@@ -131,7 +133,7 @@ export const CancelNameUpdate = {
       let cancelButton =
         canvas.getByText(/Cancel|Back/i) ||
         canvasElement.querySelector('gcds-button[button-role="secondary"]') ||
-        canvasElement.querySelector('gcds-button:nth-child(2)');
+        canvasElement.querySelector("gcds-button:nth-child(2)");
 
       await expect(cancelButton).toBeInTheDocument();
 

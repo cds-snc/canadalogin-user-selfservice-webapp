@@ -31,8 +31,8 @@ export function path(id, params) {
   const pattern = routeMap[id];
   if (!pattern) throw new Error(`No route with id=${id}`);
 
-  if(!params['language']) {
-    params['language'] = 'en'; // default to 'en' if language not provided
+  if (!params["language"]) {
+    params["language"] = "en"; // default to 'en' if language not provided
   }
 
   return generatePath(pattern, params);

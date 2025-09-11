@@ -13,10 +13,7 @@ import {
   getPageContent,
   capitalizeFirstLetter,
 } from "../../utils/functions.jsx";
-import {
-  PAGES,
-  LANGUAGE_DISPLAY_NAMES,
-} from "../../utils/constants.jsx";
+import { PAGES, LANGUAGE_DISPLAY_NAMES } from "../../utils/constants.jsx";
 import { path } from "../../utils/routeHelpers.js";
 import { useUser } from "../Providers/useUser.tsx";
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
@@ -101,7 +98,9 @@ export default function ProfileHome() {
   const preferredLanguage = state?.userProfile?.preferredLanguage || "";
 
   const editProfile = path(PAGES.profileUpdateName, { language: language });
-  const editLanguagePreferences = path(PAGES.editLanguagePreferences, { language: language });
+  const editLanguagePreferences = path(PAGES.editLanguagePreferences, {
+    language: language,
+  });
 
   return (
     <GcdsContainer>

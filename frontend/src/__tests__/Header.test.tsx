@@ -65,7 +65,7 @@ describe.only("RelyingPartyComponent", () => {
             <App />
           </LanguageProvider>
         </UserProvider>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     // Wait for the relying party API call
@@ -73,7 +73,7 @@ describe.only("RelyingPartyComponent", () => {
       () => {
         expect(authService.get_rp_info).toHaveBeenCalledWith(mockRpid);
       },
-      { timeout: 3000 }
+      { timeout: 3000 },
     );
 
     // Wait for the breadcrumb to render with relying party info

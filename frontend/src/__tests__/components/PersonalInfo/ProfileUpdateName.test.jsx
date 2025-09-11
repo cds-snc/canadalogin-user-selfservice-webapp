@@ -144,7 +144,7 @@ describe("ProfileUpdateName Component", () => {
             <ProfileUpdateName />
           </UserProvider>
         </LanguageProvider>
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     // Fill in the form with some data first
@@ -161,7 +161,7 @@ describe("ProfileUpdateName Component", () => {
     // Verify it navigates to the confirmation page
     await waitFor(() => {
       expect(mockNavigateHelper).toHaveBeenCalledWith(
-        "/en/profile/update-name/confirm-update"
+        "/en/profile/update-name/confirm-update",
       );
     });
   });
@@ -184,7 +184,7 @@ describe("ProfileUpdateName Component", () => {
             <StateCapture />
           </UserProvider>
         </LanguageProvider>
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     // Wait for the component to mount and cloneUserProfile to be called
@@ -210,7 +210,7 @@ describe("ProfileUpdateName Component", () => {
     // Verify navigation happens first
     await waitFor(() => {
       expect(mockNavigateHelper).toHaveBeenCalledWith(
-        "/en/profile/update-name/confirm-update"
+        "/en/profile/update-name/confirm-update",
       );
     });
 
@@ -231,7 +231,7 @@ describe("ProfileUpdateName Component", () => {
     const { container } = render(
       <TestWrapper>
         <ProfileUpdateName />
-      </TestWrapper>
+      </TestWrapper>,
     );
     expect(container).toMatchSnapshot();
   });

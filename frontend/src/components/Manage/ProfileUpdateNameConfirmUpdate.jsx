@@ -4,7 +4,8 @@ import {
   GcdsHeading,
   GcdsText,
   GcdsNotice,
-  GcdsButton, GcdsGrid
+  GcdsButton,
+  GcdsGrid,
 } from "@cdssnc/gcds-components-react";
 import { useParams } from "react-router";
 
@@ -19,24 +20,31 @@ import { userProfileDispatch } from "../../utils/userProfileDispatch.jsx";
 export default function ProfileUpdateNameConfirmUpdate() {
   const { language } = useParams();
   const { state, dispatch } = useUser();
-  const { clearEditProfile, updateProfileSuccess } = userProfileDispatch(dispatch);
-  const pageContentJson = getPageContent(language, PAGES.profileUpdateNameConfirmUpdate);
+  const { clearEditProfile, updateProfileSuccess } =
+    userProfileDispatch(dispatch);
+  const pageContentJson = getPageContent(
+    language,
+    PAGES.profileUpdateNameConfirmUpdate,
+  );
   const navigateHelper = useNavigateHelper();
 
-  const successPage = path(PAGES.profileUpdateNameSuccess, { language: language });
+  const successPage = path(PAGES.profileUpdateNameSuccess, {
+    language: language,
+  });
   const backToProfile = path(PAGES.ProfileHome, { language: language });
 
   const username = state?.editProfile?.name.formatted || "";
 
   const saveUpdatedProfileData = async () => {
     try {
-      const response = await authService.update_my_user_profile(state.editProfile);
+      const response = await authService.update_my_user_profile(
+        state.editProfile,
+      );
       if (response) {
         clearEditProfile();
         updateProfileSuccess(response.data);
         return true;
-      }
-      else {
+      } else {
         // Todo: handle errors
       }
     } catch (err) {
@@ -45,7 +53,7 @@ export default function ProfileUpdateNameConfirmUpdate() {
     }
   };
 
-  console.log("state", state)
+  console.log("state", state);
 
   return (
     <GcdsContainer>
@@ -58,24 +66,33 @@ export default function ProfileUpdateNameConfirmUpdate() {
         <li>{pageContentJson["5"]}</li>
         <li>{pageContentJson["10"]}</li>
       </ul>
-      <GcdsNotice type="info" noticeTitleTag="h2" noticeTitle=' '>
-        <GcdsText>{pageContentJson["7"]}
+      <GcdsNotice type="info" noticeTitleTag="h2" noticeTitle=" ">
+        <GcdsText>
+          {pageContentJson["7"]}
           <strong>{pageContentJson["11"]}</strong>
-          {pageContentJson["12"]}</GcdsText>
+          {pageContentJson["12"]}
+        </GcdsText>
       </GcdsNotice>
       <GcdsGrid columns="auto auto" gap="1rem" align-items="center">
-        <GcdsButton onGcdsClick={async (ev) => {
-          ev.preventDefault();
-          const success = await saveUpdatedProfileData();
-          if (success) { navigateHelper(successPage) }
-        }}>
+        <GcdsButton
+          onGcdsClick={async (ev) => {
+            ev.preventDefault();
+            const success = await saveUpdatedProfileData();
+            if (success) {
+              navigateHelper(successPage);
+            }
+          }}
+        >
           {pageContentJson["8"]}
         </GcdsButton>
-        <GcdsButton buttonRole="secondary" onGcdsClick={(ev) => {
-          ev.preventDefault();
-          clearEditProfile();
-          navigateHelper(backToProfile)
-        }}>
+        <GcdsButton
+          buttonRole="secondary"
+          onGcdsClick={(ev) => {
+            ev.preventDefault();
+            clearEditProfile();
+            navigateHelper(backToProfile);
+          }}
+        >
           {pageContentJson["9"]}
         </GcdsButton>
       </GcdsGrid>

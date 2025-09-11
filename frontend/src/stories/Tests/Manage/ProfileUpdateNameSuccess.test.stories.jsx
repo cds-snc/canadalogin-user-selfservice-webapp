@@ -32,7 +32,7 @@ export const BackToProfileButton = {
         language: AVAILABLE_LANGUAGES.en,
         flow: FLOW_TYPES.profile,
       },
-      []
+      [],
     ),
     test: {
       dangerouslyIgnoreUnhandledErrors: true,
@@ -48,7 +48,7 @@ export const BackToProfileButton = {
       let primaryButton =
         canvas.getByText(/Back to Profile/i) ||
         canvasElement.querySelector(
-          'gcds-button:not([button-role="secondary"])'
+          'gcds-button:not([button-role="secondary"])',
         ) ||
         canvasElement.querySelector('gcds-button button[part="button"]');
 
@@ -85,7 +85,7 @@ export const SignOutButton = {
         language: AVAILABLE_LANGUAGES.en,
         flow: FLOW_TYPES.profile,
       },
-      []
+      [],
     ),
     test: {
       dangerouslyIgnoreUnhandledErrors: true,
@@ -103,10 +103,7 @@ export const SignOutButton = {
         selector: "gcds-button, button, a",
       });
       await expect(signOutButton).toBeInTheDocument();
-      if (
-        signOutButton.tagName === "GCDS-BUTTON" &&
-        signOutButton.shadowRoot
-      ) {
+      if (signOutButton.tagName === "GCDS-BUTTON" && signOutButton.shadowRoot) {
         const actualButton =
           signOutButton.shadowRoot.querySelector('button[part="button"]') ||
           signOutButton.shadowRoot.querySelector("button");

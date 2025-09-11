@@ -23,7 +23,7 @@ export default function RootLayout() {
       <Header langHref={langHref} currentLang={language} />
       <GcdsContainer className="gcds-page">
         <GcdsContainer size="lg" className="gcds-content">
-            <Outlet />
+          <Outlet />
         </GcdsContainer>
       </GcdsContainer>
 

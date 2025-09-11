@@ -22,12 +22,12 @@ export const English = Template.bind({});
 English.parameters = buildTestCase.parameters(
   NAVIGATION_LINKS.profileUpdateNameConfirmUpdate,
   { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.profile },
-  null
+  null,
 );
 
 export const French = Template.bind({});
 French.parameters = buildTestCase.parameters(
   NAVIGATION_LINKS.profileUpdateNameConfirmUpdate,
   { language: AVAILABLE_LANGUAGES.fr, flow: FLOW_TYPES.profile },
-  null
+  null,
 );
