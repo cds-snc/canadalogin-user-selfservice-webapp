@@ -10,13 +10,11 @@ import PasswordChangedConfirmation from "./PasswordChangedConfirmation.jsx";
 
 import { otpFactors } from "../api/otpFactors.jsx";
 import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
-import {
-    NAVIGATION_LINKS,
-    PAGES
-} from "../../../utils/constants.jsx";
+import { PAGES } from "../../../utils/constants.jsx";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
 
 import { getPageContent } from '../../../utils/functions.jsx';
+import { path } from "../../../utils/routeHelpers.js";
 
 const defaulPasswordUpdatetStep = "otpSelection";
 
@@ -38,7 +36,7 @@ export default function ChangePasswordIndex() {
     const { id } = userProfile ?? {};
     const [userSelectedMfaType, setUserSelectedMfaType] = useState(null);
     const navigateHelper = useNavigateHelper();
-    const backToSecuritySettingsPage = `/${language}${NAVIGATION_LINKS.securitySettings}`;
+    const backToSecuritySettingsPage = path(PAGES.securitySettings, { language: language });
 
     const handleChangeUserMfaSelection = (mfaType) => {
         const selectedMfaType = userPhoneFactors.find(factor => factor.type === mfaType);

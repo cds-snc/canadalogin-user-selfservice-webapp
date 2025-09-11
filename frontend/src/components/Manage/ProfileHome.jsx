@@ -15,9 +15,9 @@ import {
 } from "../../utils/functions.jsx";
 import {
   PAGES,
-  NAVIGATION_LINKS,
   LANGUAGE_DISPLAY_NAMES,
 } from "../../utils/constants.jsx";
+import { path } from "../../utils/routeHelpers.js";
 import { useUser } from "../Providers/useUser.tsx";
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
 
@@ -96,8 +96,8 @@ export default function ProfileHome() {
   const phoneNumbers = state?.userProfile?.phoneNumbers;
   const preferredLanguage = state?.userProfile?.preferredLanguage || "";
 
-  const editProfile = `/${language}${NAVIGATION_LINKS.profileUpdateName}`;
-  const editLanguagePreferences = `/${language}${NAVIGATION_LINKS.profileUpdateLanguage}`;
+  const editProfile = path(PAGES.profileUpdateName, { language: language });
+  const editLanguagePreferences = path(PAGES.editLanguagePreferences, { language: language });
 
   return (
     <GcdsContainer>
