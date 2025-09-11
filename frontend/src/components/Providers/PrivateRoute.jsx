@@ -19,7 +19,7 @@ function PrivateRoute() {
             window.location.href = OIDC_REDIRECT.login;
         }
     }, [state.isLoading, state.userProfile]);
-    if (state.isLoading) return <Loader text={pageContentJson['11']} />;
+    if (state.isLoading) return <Loader text={state.loadingText || pageContentJson['11']} />;
     if (!state.userProfile) return null;
 
     return <Outlet />;
@@ -97,7 +97,7 @@ function StepupPrivateRoute() {
     // Loading state - this can be a general loading component or spinner in the future
     if (state.isLoading) {
         return (
-            <Loader text="Loading Profile" />
+            <Loader text={state.loadingText || "Loading Profile"} />
         );
     }
 
