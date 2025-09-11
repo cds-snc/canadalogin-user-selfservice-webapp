@@ -33,7 +33,8 @@ export const AppLanguageSetup = () => {
 
         const editPreferredLanguage = editProfile?.preferredLanguage?.toLowerCase();
         const profilePreferredLanguage = userProfile?.preferredLanguage?.toLowerCase();
-        const possibleLanguages = editPreferredLanguage || language || normalizedUrlLanguage || profilePreferredLanguage || browserLanguage || AVAILABLE_LANGUAGES.en;
+        
+        const possibleLanguages = normalizedUrlLanguage || editPreferredLanguage || language || profilePreferredLanguage || browserLanguage || AVAILABLE_LANGUAGES.en;
 
 
         const languageToDisplay = validateSelectedLanguage(possibleLanguages);
