@@ -95,7 +95,7 @@ export default function ProfileUpdateName() {
             onGcdsClick={(ev) => {
               console.log(ev);
               ev.preventDefault();
-              navigateHelper(backtoProfile);
+              navigateHelper(backToProfile);
             }}
           >
             {pageNameEditJson["4"]}
