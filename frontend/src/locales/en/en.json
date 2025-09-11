@@ -324,7 +324,9 @@
     "4": "Personal information",
     "5": "Security settings",
     "6": "Return to ",
-    "7": "Sign out"
+    "7": "Sign out",
+    "8": "Signing you out...",
+    "9": "Failed to sign you out. Redirecting..."
   },
   "ServicesWithAccessInfo": {
     "1": "What services have access to your information",

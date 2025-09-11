@@ -1,5 +1,3 @@
-import ManageDashboard from "../components/Manage/ManageDashboard.jsx";
-import ProfileHome from "../components/Manage/ProfileHome";
 import config from "../config";
 export const AVAILABLE_LANGUAGES = { en: "en", fr: "fr" };
 export const PROFILE_LANGUAGES = {
@@ -43,6 +41,7 @@ export const OIDC_REDIRECT = {
 
 export const CONTEXT_ACTIONS = {
   logOut: "LOG_OUT",
+  set_loading: "SET_LOADING",
   clone_profile: "CLONE_PROFILE",
   clear_edit_profile: "CLEAR_EDIT_PROFILE",
   update_cloned_profile: "UPDATED_CLONE_PROFILE",
@@ -54,7 +53,6 @@ export const CONTEXT_ACTIONS = {
   set_relying_party_data: "SET_RELYING_PARTY_DATA",
   set_authenticated_pages: "SET_AUTHENTICATED_PAGES",
   remove_authenticated_page: "REMOVE_AUTHENTICATED_PAGE",
-  set_loading: "SET_LOADING",
 };
 
 export const FLOW_TYPES = {
@@ -135,6 +133,7 @@ export const SUBMIT_END_POINTS = {
   rp_info: "/v1/users/rp_info",
   users: "/v1/users",
   passwordUpdate: "/v1/password/update",
+  logout: "/v1/auth/logout",
 };
 
 export const GA_CATEGORIES = {
