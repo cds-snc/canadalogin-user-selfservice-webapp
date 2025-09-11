@@ -1,5 +1,3 @@
-import { useState } from "react";
-import { createPortal } from "react-dom";
 import {
   GcdsBreadcrumbs,
   GcdsBreadcrumbsItem,
@@ -13,15 +11,14 @@ import {
 import { useBreakpoints } from "../../hooks/useBreakpoints";
 import { getPageContent } from "../../utils/functions.jsx";
 import { useUser } from "../Providers/useUser";
-import { NAVIGATION_LINKS, CONTEXT_ACTIONS } from "../../utils/constants.jsx";
+import { NAVIGATION_LINKS } from "../../utils/constants.jsx";
 import { authService } from "../../services/authService.jsx";
-import Loader from "./Loading.jsx";
+import { userProfileDispatch } from "../../utils/userProfileDispatch.jsx";
 
 export default function TopNav({ currentLang }) {
   const pageContentJson = getPageContent(currentLang, "TopNavBar");
-  const { state } = useUser();
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [logoutError, setLogoutError] = useState(false);
+  const { state, dispatch } = useUser();
+  const { setLoading } = userProfileDispatch(dispatch);
 
   const relyingPartyLinkName = state.relyingPartyInfo?.linkName;
   const relyingPartyUrl = state.relyingPartyInfo?.url;
@@ -31,8 +28,7 @@ export default function TopNav({ currentLang }) {
 
   const handleLogout = async (e) => {
     e.preventDefault();
-    setIsLoggingOut(true);
-    setLogoutError(false);
+    setLoading(true, pageContentJson["8"]); // Use logout loading text
     
     try {
       const response = await authService.logout();
@@ -46,9 +42,9 @@ export default function TopNav({ currentLang }) {
       }
     } catch (error) {
       console.error('Logout failed:', error);
-      // Show error message for a brief moment before redirecting
-      setLogoutError(true);
-      // Redirect after showing error message for 2 seconds
+      // Update loading text to show error
+      setLoading(true, pageContentJson["9"]);
+      // Redirect after error
       setTimeout(() => {
         window.location.href = '/';
       }, 2000);
@@ -116,18 +112,6 @@ export default function TopNav({ currentLang }) {
   const renderNavigation = () => {
     return mobile || tablet ? renderMobileNavigation() : renderDesktopNavigation();
   };
-
-  if (isLoggingOut) {
-    return (
-      <>
-        {renderNavigation()}
-        {createPortal(
-          <Loader text={logoutError ? pageContentJson["9"] : pageContentJson["8"]} />,
-          document.body
-        )}
-      </>
-    );
-  }
 
   return renderNavigation();
 }

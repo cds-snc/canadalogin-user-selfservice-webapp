@@ -39,6 +39,7 @@ export const OIDC_REDIRECT = {
 export const CONTEXT_ACTIONS = {
   signIn: "SIGN_IN",
   logOut: "LOG_OUT",
+  set_loading: "SET_LOADING",
   signin_success: "SIGNIN_SUCCESS",
   signin_failure: "SIGNIN_FAILURE",
   clone_profile: "CLONE_PROFILE",
