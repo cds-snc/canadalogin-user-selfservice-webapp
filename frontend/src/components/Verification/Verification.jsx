@@ -8,7 +8,7 @@ import {getPageContent, isCodeValid} from '../../utils/functions.jsx';
 import {
     AVAILABLE_LANGUAGES,
     FLOW_TYPES, LINK_SUBMIT_TYPES,
-    NAVIGATION_LINKS, PAGES,
+    PAGES,
     SERVICES, SUBMIT_END_POINTS
 } from "../../utils/constants.jsx";
 import {useParams} from "react-router";
@@ -18,7 +18,6 @@ import {useEffect, useState} from "react";
 import {useLinkSubmit} from "../../hooks/useLinkSubmit.js";
 import {useSubmit} from "../../hooks/useSubmit";
 import {useError} from "../../hooks/useError";
-
 const initialTime=10;
 
 export default function Verification() {

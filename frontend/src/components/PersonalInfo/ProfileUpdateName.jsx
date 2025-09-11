@@ -10,8 +10,9 @@ import {
 import { useParams } from 'react-router';
 import { getPageContent } from '../../utils/functions.jsx';
 import { userProfileDispatch } from "../../utils/userProfileDispatch.jsx";
-import { PAGES, NAVIGATION_LINKS, CONTEXT_ACTIONS } from '../../utils/constants.jsx';
-import SubmitButton from '../Layout/SubmitButton.jsx';
+import { path } from '../../utils/routeHelpers.js';
+import { PAGES } from '../../utils/constants';
+import SubmitButton from '../Layout/SubmitButton';
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
 import { useUser } from "../Providers/useUser.tsx";
 
@@ -21,9 +22,10 @@ export default function ProfileUpdateName() {
     const pageNameEditJson = getPageContent(language, PAGES.profileUpdateName);
     const navigateHelper = useNavigateHelper();
     const { cloneUserProfile, updateClonedProfile } = userProfileDispatch(dispatch);
-    const confirmation = `/${language}${NAVIGATION_LINKS.profileUpdateNameConfirmUpdate}`;
-    const backtoProfile = `/${language}${NAVIGATION_LINKS.profileHome}`;
     const [editProfile, setEditProfile] = useState({ ...state.editProfile });
+
+    const confirmation = path(PAGES.profileUpdateNameConfirmUpdate, { language: language });
+    const backToProfile = path(PAGES.ProfileHome, { language: language });
 
     const handleProfileChange = (e) => {
         const { name, value } = e.target;
@@ -102,7 +104,7 @@ export default function ProfileUpdateName() {
                     <GcdsButton buttonRole="secondary" onGcdsClick={(ev) => {
                         console.log(ev)
                         ev.preventDefault();
-                        navigateHelper(backtoProfile)
+                        navigateHelper(backToProfile)
                     }}>
                         {pageNameEditJson['4']}
                     </GcdsButton>

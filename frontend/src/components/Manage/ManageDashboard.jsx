@@ -6,14 +6,13 @@ import {
 } from "@cdssnc/gcds-components-react";
 import {
     PAGES,
-    NAVIGATION_LINKS
 } from "../../utils/constants";
 import { useParams } from "react-router";
 import { useError } from "../../hooks/useError";
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
 import { getPageContent } from "../../utils/functions.jsx";
+import { path } from "../../utils/routeHelpers.js";
 import { useUser } from "../Providers/useUser.tsx";
-
 
 export default function ManageDashboard() {
     const { language } = useParams();
@@ -25,8 +24,8 @@ export default function ManageDashboard() {
     const navigateHelper = useNavigateHelper();
 
     console.log(state)
-    const personalInformationLink = `/${language}${NAVIGATION_LINKS.profileHome}`;
-    const securitySettingsLink = `/${language}${NAVIGATION_LINKS.securitySettings}`;
+    const personalInformationLink = path(PAGES.ProfileHome, { language: language });
+    const securitySettingsLink = path(PAGES.securitySettings, { language: language });
 
     return (
         <GcdsContainer>
