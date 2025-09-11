@@ -14,8 +14,6 @@ import { PAGES } from '../../utils/constants.jsx';
 
 import { useUser } from "../Providers/useUser.tsx";
 
-
-
 export default function SecuritySettings() {
     const { language } = useParams();
 

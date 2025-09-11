@@ -38,20 +38,16 @@ export const appRoutes = [
       </UserProvider>
     ),
     children: [
-      { element: <RootLayout />, children: [
+      {
+        element: <RootLayout />, children: [
         { path: "/", element: <Navigate to="/en" replace /> },
         {
           path: "/:language",
+          handle: { id: PAGES.manageDashboard, breadcrumbId: "4" },
           children: [
             { 
               index: true, 
-              element: <ManageDashboard />, 
-              handle: { id: PAGES.manageDashboard } 
-            },
-            { 
-              path: "profile-home", 
-              element: <ProfileHome />, 
-              handle: { id: PAGES.ProfileHome }
+              element: <ManageDashboard />,
             },
             { 
               path: "checkyouremail", 
@@ -75,7 +71,12 @@ export const appRoutes = [
             },
             {
               path: "profile",
+              handle: { id: PAGES.ProfileHome, breadcrumbId: "2" },
               children: [
+                {
+                  index: true,
+                  element: <ProfileHome />,
+                },
                 { 
                   path: "update-name", 
                   element: <ProfileUpdateName />,
@@ -130,11 +131,11 @@ export const appRoutes = [
             },
             {
               path: "security-settings",
+              handle: { id: PAGES.securitySettings, breadcrumbId: "11" },
               children: [
                 { 
                   index: true, 
                   element: <SecuritySettings />,
-                  handle: { id: PAGES.securitySettings }
                 },
                 {
                   element: <StepupPrivateRoute />,

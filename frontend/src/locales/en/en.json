@@ -86,7 +86,8 @@
   "ManageDashboard": {
     "1": "Welcome,",
     "2": "Personal information",
-    "3": "Security settings"
+    "3": "Security settings",
+    "4": "Manage GC Sign in"
   },
   "ProfileUpdateNameConfirmUpdate": {
     "1": "Are you sure you want to update your name?",
@@ -133,7 +134,8 @@
     "14": "English",
     "15": "Notifications",
     "16": "We will send account-related notifications to the email registered to your account.",
-    "17": "You may also receive notifications from services connected to your GC Sign in. You can manage those preferences in each service’s settings."
+    "17": "You may also receive notifications from services connected to your GC Sign in. You can manage those preferences in each service’s settings.",
+    "18": "Personal information"
   },
   "CheckYourEmail": {
     "1": "Check your email",
@@ -257,7 +259,8 @@
     "7": "2-step verification",
     "8": "A second step after your password helps verify it’s you signing in.",
     "9": "Enabled",
-    "10": "Manage"
+    "10": "Manage",
+    "11": "Security settings"
   },
   "EditLanguagePreferences": {
     "1": "Edit your language preference",
