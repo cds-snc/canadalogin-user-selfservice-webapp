@@ -72,3 +72,14 @@ async def get_users_current_session(request: Request):
         request.session.clear()
         raise OAuthError("Invalid or expired token")
     return user_access_token
+
+
+def get_users_id_token(request: Request):
+    """
+    Get the user's ID token from the session.
+    """
+    user_id_token = request.session.get(SessionKeys.SESSION_USER_ID_TOKEN_KEY.value)
+    if not user_id_token:
+        logger.info("Not authenticated - no user ID token found")
+        raise OAuthError("user ID token not found")
+    return user_id_token

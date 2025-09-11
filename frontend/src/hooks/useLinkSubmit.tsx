@@ -23,7 +23,7 @@ export function useLinkSubmit(submitDataOptions:SubmitDataOptions) {
                     const response = await callAuthService(submitDataOptions, submitData, state.userData);
                     console.log("success....", response);
                     const userData = setUserData(linkFlowType+submitDataOptions.type, state.userData, response, submitData);
-                    await dispatch({type: CONTEXT_ACTIONS.signUp, payload: userData});
+                    // Removed signUp dispatch since signup flows are removed
                     await callAnalytics(submitDataOptions, analyticsTag+'_success', GA_LABELS.link);
                     const navigateTo = setNavigateTo(submitDataOptions, linkFlowType, changeType);
                     setStates(linkFlowType);
@@ -89,19 +89,12 @@ function adjustEndpoint(linkFlowType:string, submitDataOptions:SubmitDataOptions
         submitDataOptions.endpoint = null;
 }
 function setNavigateTo(submitDataOptions:SubmitDataOptions, linkFlowType:string, changeType:boolean) {
-    const signupLink = path(PAGES.signUp, { language: submitDataOptions.language });
-    const twoStepVerificationLink = path(PAGES.CompleteTwoStepVerification, { language: submitDataOptions.language });
     const verificationLink = path(PAGES.verification, { language: submitDataOptions.language });
     const verificationPath = "/verification";
 
     switch (linkFlowType) {
         case LINK_SUBMIT_TYPES.useNewVerification:
-            if(submitDataOptions.type===FLOW_TYPES.email)
-                return signupLink
-            else if(submitDataOptions.flow===FLOW_TYPES.signUp)
-                return twoStepVerificationLink;
-
-            return verificationLink
+            return verificationLink;
         case LINK_SUBMIT_TYPES.requestNewCode:
             if(changeType) {
                 const newType = submitDataOptions.type===FLOW_TYPES.sms?FLOW_TYPES.voice:FLOW_TYPES.sms;

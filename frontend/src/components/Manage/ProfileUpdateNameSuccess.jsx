@@ -15,10 +15,10 @@ import { useUser } from "../Providers/useUser";
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
 
 
-export default function ProfileYouMayUpdateName() {
+export default function ProfileUpdateNameSuccess() {
   const { language } = useParams();
   const { state } = useUser();
-  const pageContentJson = getPageContent(language, PAGES.profileYouMayUpdateName);
+  const pageContentJson = getPageContent(language, PAGES.profileUpdateNameSuccess);
   const navigateHelper = useNavigateHelper();
   const backToProfile = path(PAGES.ProfileHome, { language: language });
 

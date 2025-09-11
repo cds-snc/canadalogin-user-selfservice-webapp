@@ -8,23 +8,24 @@ import {
     GcdsText, GcdsLink
 } from '@cdssnc/gcds-components-react';
 import { useParams } from 'react-router';
-import { getPageContent } from '../../utils/functions';
+import { getPageContent } from '../../utils/functions.jsx';
 import { userProfileDispatch } from "../../utils/userProfileDispatch.jsx";
 import { path } from '../../utils/routeHelpers.js';
 import { PAGES } from '../../utils/constants';
 import SubmitButton from '../Layout/SubmitButton';
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
-import { useUser } from "../Providers/useUser";
+import { useUser } from "../Providers/useUser.tsx";
 
-export default function ProfileNameEdit() {
+export default function ProfileUpdateName() {
     const { language } = useParams();
     const { state, dispatch } = useUser();
-    const pageNameEditJson = getPageContent(language, PAGES.ProfileNameEdit);
+    const pageNameEditJson = getPageContent(language, PAGES.profileUpdateName);
     const navigateHelper = useNavigateHelper();
     const { cloneUserProfile, updateClonedProfile } = userProfileDispatch(dispatch);
+    const [editProfile, setEditProfile] = useState({ ...state.editProfile });
+
     const confirmation = path(PAGES.areYouSureEditYourName, { language: language });
     const backToProfile = path(PAGES.ProfileHome, { language: language });
-    const [editProfile, setEditProfile] = useState({ ...state.editProfile });
 
     const handleProfileChange = (e) => {
         const { name, value } = e.target;
@@ -49,8 +50,6 @@ export default function ProfileNameEdit() {
         cloneUserProfile();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-    console.log('State', state)
 
     return (
         <GcdsContainer>

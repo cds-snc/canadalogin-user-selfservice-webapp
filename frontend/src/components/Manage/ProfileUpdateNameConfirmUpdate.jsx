@@ -12,16 +12,17 @@ import { getPageContent } from "../../utils/functions";
 import { PAGES } from "../../utils/constants";
 import { path } from "../../utils/routeHelpers.js";
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
-import { useUser } from "../Providers/useUser";
+import { useUser } from "../Providers/useUser.tsx";
 import { authService } from "../../services/authService.jsx";
 import { userProfileDispatch } from "../../utils/userProfileDispatch.jsx";
 
-export default function AreYouSureEditYourName() {
+export default function ProfileUpdateNameConfirmUpdate() {
   const { language } = useParams();
   const { state, dispatch } = useUser();
   const { clearEditProfile, updateProfileSuccess } = userProfileDispatch(dispatch);
-  const pageContentJson = getPageContent(language, PAGES.areYouSureEditYourName);
+  const pageContentJson = getPageContent(language, PAGES.profileUpdateNameConfirmUpdate);
   const navigateHelper = useNavigateHelper();
+  
   const successPage = path(PAGES.profileYouMayUpdateName, { language: language });
   const backToProfile = path(PAGES.ProfileHome, { language: language });
 

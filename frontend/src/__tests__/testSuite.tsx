@@ -69,7 +69,6 @@ interface TestParameters {
     pageContentJson: JSON,
     langLink: string,
     buttonJson: JSON,
-    alreadyGcJson: JSON,
     isVoice: boolean,
     stepper: Array<string>,
     textKeysToNotSearch: Array<string>,
@@ -95,14 +94,6 @@ const pageSetup = {
                 return language !== AVAILABLE_LANGUAGES.fr ? engJson['Button'] : frJson['Button'];
         }
 
-    },
-    alreadyGc: (page:string, language:string, flow:string, type:string) =>{
-        switch(page) {
-            case PAGES.verification:
-                return null;
-            default:
-                return null;
-        }
     },
     stepper: (page: string, flow: string, type: string) => {
         switch (page) {
@@ -195,7 +186,6 @@ const testSuite = {
             pageContentJson: language !== AVAILABLE_LANGUAGES.fr ? engJson[page] : frJson[page],
             langLink: link,
             buttonJson: pageSetup.button(page, language),
-            alreadyGcJson: pageSetup.alreadyGc(page, language, flow, type),
             stepper: pageSetup.stepper(page, flow, type),
             textKeysToNotSearch: pageSetup.textKeysToNotSearch(page, flow, type),
             isVoice: type === FLOW_TYPES.voice,
@@ -204,8 +194,8 @@ const testSuite = {
             serviceKey: pageSetup.serviceKey(page, flow),
         };
     },
-    page:(page:string, flow:string, {language, pageContentJson, langLink,  buttonJson, alreadyGcJson, stepper, textKeysToNotSearch, isVoice, smsTextKeys, voiceTextKeys, serviceKey}:TestParameters)=>{
-        verifyCommonElements(language, langLink, buttonJson, alreadyGcJson, stepper);
+    page:(page:string, flow:string, {language, pageContentJson, langLink,  buttonJson, stepper, textKeysToNotSearch, isVoice, smsTextKeys, voiceTextKeys, serviceKey}:TestParameters)=>{
+        verifyCommonElements(language, langLink, buttonJson, stepper);
 
         const gcdsElementMap = pageSetup.gcdsMap(language, page, pageContentJson, flow);
 
@@ -265,7 +255,7 @@ function createMap(type: string, values: Array<string>) {
     }
 }
 
-function verifyCommonElements(language: string, langLink: string, buttonJson: JSON, alreadyGcJson: JSON, stepper: Array<string>) {
+function verifyCommonElements(language: string, langLink: string, buttonJson: JSON, stepper: Array<string>) {
 
     verifyGcdsHtmlElement('gcds-header', createMap('gcds-header', [language, langLink, 'colour']));
 
@@ -275,9 +265,6 @@ function verifyCommonElements(language: string, langLink: string, buttonJson: JS
         verifyGcdsHtmlElement('gcds-button', createMap('gcds-button', ['submit']));
         expect(screen.queryByText(buttonJson['submit'])).toBeInTheDocument();
     }
-
-    if (alreadyGcJson)
-        Object.keys(alreadyGcJson).forEach(key => expect(screen.queryByText(alreadyGcJson[key])).toBeInTheDocument());
 
     verifyGcdsHtmlElement('gcds-footer', createMap('gcds-footer', [subLinks[language]]));
 }

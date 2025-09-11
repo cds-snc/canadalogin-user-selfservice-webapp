@@ -81,10 +81,6 @@ function setSubmitData(formData: FormData) {
 function setNavigateTo(submitDataOptions: SubmitDataOptions, response:any, submitData:SubmitData) {
 
     switch(submitDataOptions.flow+submitDataOptions.page) {
-        case FLOW_TYPES.signIn+PAGES.password:
-            return submitDataOptions.navigateTo+"/"+response.data.otpType;
-        case FLOW_TYPES.signUp+PAGES.verificationSetUp:
-            return submitDataOptions.navigateTo+"/"+submitData.verificationType;
         default:
             return submitDataOptions.navigateTo;
     }
@@ -103,29 +99,6 @@ export async function callAnalytics(submitDataOptions: SubmitDataOptions, submit
 export async function callAuthService(submitDataOptions:SubmitDataOptions, submitData:SubmitData, userData:any) {
     let payload = {};
     switch(submitDataOptions.endpoint){
-        case(SUBMIT_END_POINTS.transientOtpSend):
-            if(submitDataOptions.type === FLOW_TYPES.email)
-                payload = {
-                    userName: submitData.email,
-                    otpType: FLOW_TYPES.email
-                };
-            else {
-                const phoneNumber = submitData.phone.toString();
-                payload = {
-                    userName: userData.email,
-                    otpType: submitData.verificationType,
-                    phoneNumber: '+' + phoneNumber.replace(/\D/g, '')
-                }
-            }
-            return await authService.transientOtpSend({...payload});
-        case(SUBMIT_END_POINTS.transientOtpVerify):
-                payload = {
-                    otp: submitData.verificationCode,
-                    otpType: submitDataOptions.type,
-                    userName: userData.email,
-                    trxnId: userData.trxnId,
-                };
-            return await authService.transientOtpVerify({...payload});
         case(SUBMIT_END_POINTS.create):
             payload = {
                 userName: userData.email,
@@ -172,8 +145,6 @@ function setUserData(submitDataOptions:SubmitDataOptions, submitData: SubmitData
 
     switch (submitDataOptions.page) {
         case PAGES.password:
-            if(submitDataOptions.flow===FLOW_TYPES.signUp)
-                return {...userData, passwordSubmitted: true, id: response.data.id};
             return {...userData, otpType: response.data.otpType,
                 id: response.data.id, phone: response.data.phone, passwordValidated: true};
         case PAGES.verificationSetUp:
@@ -184,9 +155,6 @@ function setUserData(submitDataOptions:SubmitDataOptions, submitData: SubmitData
                 trxnId:response.data.trxnId,
             }
         case PAGES.verification:
-            if(submitDataOptions.flow===FLOW_TYPES.signUp && submitDataOptions.type===FLOW_TYPES.email) {
-                return {...userData, emailValidated: true}
-            }
             return  {...userData, stepVerified: true}
         case PAGES.privacy:
                 return {...userData, viewPrivacy: true};
