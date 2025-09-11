@@ -11,14 +11,11 @@ import { getPageContent } from '../../../utils/functions.jsx';
 import { authService } from "../../../services/authService.jsx";
 import { passwordUpdate } from "../api/passwordUpdate.jsx";
 
-import {
-    FLOW_TYPES,
-    NAVIGATION_LINKS,
-    PAGES,
-} from "../../../utils/constants.jsx";
+import { PAGES } from "../../../utils/constants.jsx";
 import { useUser } from "../../../components/Providers/useUser.tsx";
 import { useParams } from "react-router";
 import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
+import { path } from '../../../utils/routeHelpers.js';
 
 export default function Password({ step, totalSteps, onNext, otpSentResponse, userOtpValue }) {
     const { state } = useUser();
@@ -33,7 +30,7 @@ export default function Password({ step, totalSteps, onNext, otpSentResponse, us
     const [passwordStrength, setPasswordStrength] = useState(0);
     const pageContentJson = getPageContent(language, PAGES.password);
     const errorPageJson = getPageContent(language, PAGES.error);
-    const backToSecuritySettingsPage = `/${language}${NAVIGATION_LINKS.securitySettings}`;
+    const backToSecuritySettingsPage = path(PAGES.securitySettings, { language: language });
     const navigateHelper = useNavigateHelper();
     console.log("passwordPolicy", passwordPolicy)
 

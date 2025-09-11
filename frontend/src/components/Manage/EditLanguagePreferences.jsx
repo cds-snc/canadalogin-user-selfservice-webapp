@@ -18,9 +18,10 @@ import {
 
 import {
   PAGES,
-  NAVIGATION_LINKS,
+ 
   PROFILE_LANGUAGES,
 } from "../../utils/constants";
+import { path } from "../../utils/routeHelpers.js";
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
 import { useUser } from "../Providers/useUser";
 import ServicesWithAccessInfoSection from "../InfoBlocks/ServicesWithAccessInfoSection";
@@ -29,38 +30,22 @@ export default function EditLanguagePreferences() {
   const { language } = useParams();
   const navigateHelper = useNavigateHelper();
 
-  const { state, dispatch } = useUser();
-  const { userProfile } = state;
-  const {
-    cloneUserProfile,
-    updateClonedProfile,
-    setOriginalLanguageBeforeEdit,
-    setCancelProfileEditing,
-  } = userProfileDispatch(dispatch);
-  const backtoProfile = `/${language}${NAVIGATION_LINKS.profileHome}`;
-  const { handleCancel } = useCancelLanguageEditing(backtoProfile);
-  const pageContentJson = getPageContent(
-    language,
-    PAGES.editLanguagePreferences
-  );
-  const areYouSureEditYourLanguage = `/${language}${NAVIGATION_LINKS.profileUpdateLanguageConfirmUpdate}`;
+    const { state, dispatch } = useUser();
+    const { userProfile } = state;
+    const { cloneUserProfile, updateClonedProfile, setOriginalLanguageBeforeEdit, setCancelProfileEditing } = userProfileDispatch(dispatch);
+
+    const backToProfile = path(PAGES.ProfileHome, { language: language });
+    const areYouSureEditYourLanguage = path(PAGES.areYouSureEditYourLanguage, { language: language });
+
+    const { handleCancel } = useCancelLanguageEditing(backToProfile);
+    const pageContentJson = getPageContent(language, PAGES.editLanguagePreferences);
 
   const profilePreferredLanguage = userProfile?.preferredLanguage;
 
-  const englistSelection = {
-    label: pageContentJson["13"],
-    id: PROFILE_LANGUAGES.en,
-    value: PROFILE_LANGUAGES.en,
-    checked: profilePreferredLanguage === PROFILE_LANGUAGES.en,
-  };
-  const frenchSelection = {
-    label: pageContentJson["14"],
-    id: PROFILE_LANGUAGES.fr,
-    value: PROFILE_LANGUAGES.fr,
-    checked: profilePreferredLanguage === PROFILE_LANGUAGES.fr,
-  };
+    const englistSelection = { "label": pageContentJson['13'], "id": PROFILE_LANGUAGES.en, "value": PROFILE_LANGUAGES.en, "checked": profilePreferredLanguage === PROFILE_LANGUAGES.en };
+    const frenchSelection = { "label": pageContentJson['14'], "id": PROFILE_LANGUAGES.fr, "value": PROFILE_LANGUAGES.fr, "checked": profilePreferredLanguage === PROFILE_LANGUAGES.fr };
 
-  const languageOptions = [englistSelection, frenchSelection];
+    const languageOptions = [englistSelection, frenchSelection]
 
   const handleProfileChange = (e) => {
     const { name, value } = e.target;

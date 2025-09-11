@@ -8,8 +8,9 @@ import {
 } from "@cdssnc/gcds-components-react";
 import { useParams } from "react-router";
 
-import { getPageContent } from "../../utils/functions.jsx";
-import { PAGES, NAVIGATION_LINKS, CONTEXT_ACTIONS } from "../../utils/constants.jsx";
+import { getPageContent } from "../../utils/functions";
+import { PAGES } from "../../utils/constants";
+import { path } from "../../utils/routeHelpers.js";
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
 import { useUser } from "../Providers/useUser.tsx";
 import { authService } from "../../services/authService.jsx";
@@ -21,8 +22,9 @@ export default function ProfileUpdateNameConfirmUpdate() {
   const { clearEditProfile, updateProfileSuccess } = userProfileDispatch(dispatch);
   const pageContentJson = getPageContent(language, PAGES.profileUpdateNameConfirmUpdate);
   const navigateHelper = useNavigateHelper();
-  const successPage = `/${language}${NAVIGATION_LINKS.profileUpdateNameSuccess}`;
-  const backtoProfile = `/${language}${NAVIGATION_LINKS.profileHome}`;
+
+  const successPage = path(PAGES.profileUpdateNameSuccess, { language: language });
+  const backToProfile = path(PAGES.ProfileHome, { language: language });
 
   const username = state?.editProfile?.name.formatted || "";
 
@@ -72,7 +74,7 @@ export default function ProfileUpdateNameConfirmUpdate() {
         <GcdsButton buttonRole="secondary" onGcdsClick={(ev) => {
           ev.preventDefault();
           clearEditProfile();
-          navigateHelper(backtoProfile)
+          navigateHelper(backToProfile)
         }}>
           {pageContentJson["9"]}
         </GcdsButton>

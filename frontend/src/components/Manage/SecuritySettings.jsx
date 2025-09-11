@@ -9,8 +9,8 @@ import {
     GcdsLink,
 } from '@cdssnc/gcds-components-react';
 import { getPageContent } from '../../utils/functions.jsx';
-import { PAGES, NAVIGATION_LINKS } from '../../utils/constants.jsx';
-import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
+import { path } from '../../utils/routeHelpers.js';
+import { PAGES } from '../../utils/constants.jsx';
 
 import { useUser } from "../Providers/useUser.tsx";
 
@@ -18,13 +18,13 @@ import { useUser } from "../Providers/useUser.tsx";
 
 export default function SecuritySettings() {
     const { language } = useParams();
-    const navigateHelper = useNavigateHelper();
 
     const pageContent = getPageContent(language, PAGES.securitySettings);
     const { state } = useUser();
     const lastPasswordChange = state?.userProfile?.details?.pwdChangedTime || "";
     const formattedPasswordChangeDate = format(new Date(lastPasswordChange), 'MMMM d, yyyy');
-    const passwordPage = `/${language}${NAVIGATION_LINKS.securitySettingsUpdatePassword}`;
+
+    const passwordPage = path(PAGES.password, { language: language });
 
     return (
         <GcdsContainer>
@@ -35,11 +35,7 @@ export default function SecuritySettings() {
                 <GcdsHeading tag="h3">{pageContent['4']}</GcdsHeading>
                 <GcdsGrid columns="1fr" gap="1rem" align-items="center">
                     <GcdsText>{pageContent['5']} {formattedPasswordChangeDate}</GcdsText>
-                    <GcdsLink size="regular" href={passwordPage}
-                        onGcdsClick={(ev) => {
-                            ev.preventDefault();
-                            navigateHelper(ev.detail)
-                        }}>
+                    <GcdsLink size="regular" href={passwordPage}>
                         {pageContent['6']}
                     </GcdsLink>
                 </GcdsGrid>

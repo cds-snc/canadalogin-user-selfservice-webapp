@@ -7,10 +7,10 @@ import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 
 import { getPageContent } from '../../../utils/functions.jsx';
 import { gcHelpCentreLinks } from '../../../utils/gcHelpCentreLinks.jsx';
+import { path } from "../../../utils/routeHelpers.js";
 
 import {
     FLOW_TYPES,
-    NAVIGATION_LINKS,
     PAGES,
 } from "../../../utils/constants.jsx";
 
@@ -22,7 +22,7 @@ export default function OtpSelection({ step, totalSteps, onNext, userSelectedMfa
     const pageContentJson = getPageContent(language, PAGES.otpSelection);
 
     const { submit, cancel } = getPageContent(language, "Button");
-    const backToSecuritySettingsPage = `/${language}${NAVIGATION_LINKS.securitySettings}`;
+    const backToSecuritySettingsPage = path(PAGES.securitySettings, { language: language });
 
     const configureRadioOptions = () => {
         let radioOptionsValues = []
