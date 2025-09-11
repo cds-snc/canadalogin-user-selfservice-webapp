@@ -38,12 +38,12 @@
 				"eamodio.gitlens",
 				"github.vscode-github-actions",
 				"ms-vscode.makefile-tools",
-				"jebbs.plantuml"
+				"jebbs.plantuml",
+				"esbenp.prettier-vscode"
 			],
 			"settings": {
-				"[terraform]": {
-					"editor.formatOnSave": true
-				}
+				"editor.defaultFormatter": "esbenp.prettier-vscode",
+				"editor.formatOnSave": true
 			}
 		}
 	},
