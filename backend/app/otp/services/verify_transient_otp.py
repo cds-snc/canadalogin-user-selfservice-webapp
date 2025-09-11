@@ -6,7 +6,7 @@ from httpx import AsyncClient
 
 from app.config import get_configuration
 from app.otp.schemas import OtpType, UserOtpVerificationInfo
-from app.utils.access_token import get_auth_request_headers
+from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.helpers import generate_error_response, format_error_response
 from app.utils.schemas import ResponseModel
 
@@ -14,9 +14,8 @@ logger = logging.getLogger(__name__)
 
 
 async def handle_otp_verification(
-    user_verification_data: UserOtpVerificationInfo,
     global_http_client: AsyncClient,
-    user_access_token,
+    user_verification_data: UserOtpVerificationInfo,
 ):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
@@ -24,7 +23,7 @@ async def handle_otp_verification(
         logger.info(f"Attempting to verify {user_verification_data.otpType} OTP")
         start_time = datetime.now()
         otp_verification_response = await verify_otp(
-            user_verification_data, global_http_client, user_access_token
+            global_http_client, user_verification_data
         )
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(
@@ -46,7 +45,7 @@ async def handle_otp_verification(
 
         return ResponseModel(  # Plain ResponseModel since the response has no content
             success=True,
-            message=f"{user_verification_data.otpType} OTP has been verified",
+            message=f"{user_verification_data.otpType.value} OTP has been verified",
         )
 
     except HTTPException as he:
@@ -66,9 +65,8 @@ async def handle_otp_verification(
 
 
 async def verify_otp(
-    user_verification_data: UserOtpVerificationInfo,
     global_http_client: AsyncClient,
-    user_access_token,
+    user_verification_data: UserOtpVerificationInfo,
 ):
     try:
 
@@ -77,7 +75,7 @@ async def verify_otp(
             "otp": user_verification_data.otp,
         }
 
-        access_token = user_access_token
+        access_token = await get_admin_token(global_http_client)
         headers = get_auth_request_headers(access_token, True)
         settings = get_configuration().ibm_verify_config
 
@@ -92,10 +90,10 @@ async def verify_otp(
 
         else:
             return generate_error_response(400, "Unknown error")
-
         response = await global_http_client.post(
             verification_endpoint_url, json=otp, headers=headers
         )
+
         return response
 
     except HTTPException as he:

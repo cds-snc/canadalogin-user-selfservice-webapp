@@ -11,9 +11,12 @@ import PasswordChangedConfirmation from "./PasswordChangedConfirmation.jsx";
 import { otpFactors } from "../api/otpFactors.jsx";
 import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 import {
-    NAVIGATION_LINKS
+    NAVIGATION_LINKS,
+    PAGES
 } from "../../../utils/constants.jsx";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
+
+import { getPageContent } from '../../../utils/functions.jsx';
 
 const defaulPasswordUpdatetStep = "otpSelection";
 
@@ -27,6 +30,7 @@ export default function ChangePasswordIndex() {
 
     const [otpSentResponse, setOtpSentResponse] = useState(null);
     const [userOtpValue, setUserOtpValue] = useState("");
+    const pageContentJson = getPageContent(language, PAGES.otpSelection);
 
     const [passwordUpdateStep, setPasswordUpdateStep] = useState(defaulPasswordUpdatetStep);
     const [localLoading, setLocalLoading] = useState(false);
@@ -155,7 +159,7 @@ export default function ChangePasswordIndex() {
     return (
         <>
             {
-                (userSelectedMfaType) ? steps[passwordUpdateStep] : <Loader text="Retrieving your Authentication Factors ..." />
+                (userSelectedMfaType) ? steps[passwordUpdateStep] : <Loader text={pageContentJson["12"]} />
 
             }
         </>

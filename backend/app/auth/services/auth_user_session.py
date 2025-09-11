@@ -184,3 +184,14 @@ async def remove_session_by_session_id(sessionid: str, request: Request):
             f"Redis error removing session by ID {sessionid}: {str(e)}", exc_info=True
         )
         RequestErrorHandler.handle(e, context="remove server session")
+
+
+def get_users_id_token(request: Request):
+    """
+    Get the user's ID token from the session.
+    """
+    user_id_token = request.session.get(SessionKeys.SESSION_USER_ID_TOKEN_KEY.value)
+    if not user_id_token:
+        logger.info("Not authenticated - no user ID token found")
+        raise OAuthError("user ID token not found")
+    return user_id_token

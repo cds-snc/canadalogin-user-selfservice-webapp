@@ -12,16 +12,16 @@ interface Action {
 export interface UserProfile {
     id: string;
     active: boolean;
-    details: null | {
+    details?: null | {
         emailVerified: boolean | null;
         lastLogin: string | null;
         lastMFA: string | null;
         twoFactorAuthentication: boolean;
         pwdChangedTime: string | null;
     };
-    emails: null | Array<{ value: string; type: string }>;
-    phoneNumbers: null | Array<{ value: string; type: string }>;
-    meta: {
+    emails?: null | Array<{ value: string; type: string }>;
+    phoneNumbers?: null | Array<{ value: string; type: string }>;
+    meta?: {
         created: string;
         location: string;
         lastModified: string;
@@ -33,7 +33,7 @@ export interface UserProfile {
         givenName?: string;
         familyName?: string;
         formatted?: string;
-    };
+    } | null;
 }
 
 export interface RelyingPartyInfo {
@@ -47,6 +47,7 @@ export interface UserState {
     userProfile: UserProfile | null;
     userData: any;
     isLoading: boolean;
+    loadingText: string | null;
     editProfile: UserProfile | null;
     urlLanguageBeforeEdit: string | null;
     cancelProfileEditing: boolean;
@@ -70,6 +71,7 @@ interface UserProviderProps {
 
 const initialState = {
     isLoading: true,
+    loadingText: null,
     userData: {
         service: SERVICES[0].title, //to be set later when url referrer is given, also need to refactor other pages to use this value
         language: 'en', //to be set later when refactoring possibly
@@ -97,6 +99,12 @@ const initialState = {
 
 function userReducer(state = initialState, action: Action) {
     switch (action.type) {
+        case CONTEXT_ACTIONS.set_loading:
+            return {
+                ...state,
+                isLoading: action.payload.isLoading,
+                loadingText: action.payload.text || null
+            };
         case CONTEXT_ACTIONS.signUp:
             return {
                 ...state,

@@ -27,6 +27,9 @@ export const userProfileDispatch = (dispatch) => ({
     clearEditProfile: () =>
         dispatch({ type: CONTEXT_ACTIONS.clear_edit_profile, payload: null }),
 
+    setLoading: (isLoading, text = null) =>
+        dispatch({ type: CONTEXT_ACTIONS.set_loading, payload: { isLoading, text } }),
+
     updateProfileSuccess: (data) =>
         dispatch({ type: CONTEXT_ACTIONS.updated_profile_success, payload: data }),
 
