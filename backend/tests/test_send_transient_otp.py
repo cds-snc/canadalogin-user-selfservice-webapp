@@ -2,9 +2,11 @@ from unittest.mock import patch, AsyncMock, MagicMock
 import pytest
 from httpx import AsyncClient
 from fastapi import HTTPException
-from fastapi.responses import JSONResponse
 from app.otp.schemas import OtpType, UserOtpInfo
-from app.otp.services.send_transient_otp import handle_otp_send, dispatch_otp, my_profile
+from app.otp.services.send_transient_otp import (
+    handle_otp_send,
+    dispatch_otp,
+)
 
 
 @pytest.mark.asyncio
@@ -35,8 +37,14 @@ async def test_handle_otp_send_success():
         "attempts": 0,
         "retries": 0,
     }
-    with patch("app.otp.services.send_transient_otp.my_profile", new_callable=AsyncMock) as mock_my_profile, \
-         patch("app.otp.services.send_transient_otp.dispatch_otp", new_callable=AsyncMock) as mock_dispatch_otp:
+    with (
+        patch(
+            "app.otp.services.send_transient_otp.my_profile", new_callable=AsyncMock
+        ) as mock_my_profile,
+        patch(
+            "app.otp.services.send_transient_otp.dispatch_otp", new_callable=AsyncMock
+        ) as mock_dispatch_otp,
+    ):
 
         mock_my_profile.return_value = mock_profile_response
         mock_dispatch_otp.return_value = mock_dispatch_response
@@ -67,8 +75,14 @@ async def test_handle_otp_send_error():
     mock_dispatch_response.status_code = 400
     mock_dispatch_response.json.return_value = {"error": "Invalid request"}
 
-    with patch("app.otp.services.send_transient_otp.my_profile", new_callable=AsyncMock) as mock_my_profile, \
-         patch("app.otp.services.send_transient_otp.dispatch_otp", new_callable=AsyncMock) as mock_dispatch_otp:
+    with (
+        patch(
+            "app.otp.services.send_transient_otp.my_profile", new_callable=AsyncMock
+        ) as mock_my_profile,
+        patch(
+            "app.otp.services.send_transient_otp.dispatch_otp", new_callable=AsyncMock
+        ) as mock_dispatch_otp,
+    ):
 
         mock_my_profile.return_value = mock_profile_response
         mock_dispatch_otp.return_value = mock_dispatch_response
@@ -94,8 +108,14 @@ async def test_handle_otp_send_user_mismatch():
     mock_profile_response.data = MagicMock()
     mock_profile_response.data.userName = "otherUser@testUser.com"
 
-    with patch("app.otp.services.send_transient_otp.my_profile", new_callable=AsyncMock) as mock_my_profile, \
-         patch("app.otp.services.send_transient_otp.dispatch_otp", new_callable=AsyncMock) as mock_dispatch_otp:
+    with (
+        patch(
+            "app.otp.services.send_transient_otp.my_profile", new_callable=AsyncMock
+        ) as mock_my_profile,
+        patch(
+            "app.otp.services.send_transient_otp.dispatch_otp", new_callable=AsyncMock
+        ) as mock_dispatch_otp,
+    ):
 
         mock_my_profile.return_value = mock_profile_response
 
