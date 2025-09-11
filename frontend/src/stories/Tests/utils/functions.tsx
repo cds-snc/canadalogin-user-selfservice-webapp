@@ -100,7 +100,7 @@ export async function testCase({
         stepErrorMessage,
         link,
         message,
-        heading
+        heading,
       );
       break;
     case TEST_TYPES.success:
@@ -110,7 +110,7 @@ export async function testCase({
         stepSuccessMessage,
         message,
         "notice-title",
-        "linkSuccess"
+        "linkSuccess",
       );
       break;
     case TEST_TYPES.redirect:
@@ -119,7 +119,7 @@ export async function testCase({
         canvas,
         step,
         stepNavigateMessage,
-        "404 Not Found"
+        "404 Not Found",
       );
       break;
     default:
@@ -152,7 +152,7 @@ const testItem = {
     canvas: any,
     step: any,
     message: string,
-    text: string
+    text: string,
   ) => {
     await step(message, async () => {
       await expect(canvas.queryByText(text)).toBeInTheDocument();
@@ -162,7 +162,7 @@ const testItem = {
     canvas: any,
     step: any,
     stepMessage: string,
-    linkText: string
+    linkText: string,
   ) => {
     await step(stepMessage, async () => {
       const link = canvas.queryByText(linkText);
@@ -177,13 +177,13 @@ const testItem = {
     stepMessage: string,
     link: string,
     message: string,
-    heading: string
+    heading: string,
   ) => {
     await step(stepMessage, async () => {
       const errorSummary = await canvas.queryByTestId("errorSummary");
       await expect(errorSummary).toBeInTheDocument();
       await expect(errorSummary.getAttribute("error-links")).toEqual(
-        '{"#' + link + '": "' + message + '"}'
+        '{"#' + link + '": "' + message + '"}',
       );
       await expect(errorSummary.getAttribute("heading")).toEqual(heading);
     });
@@ -194,7 +194,7 @@ const testItem = {
     stepMessage: string,
     message: string,
     attribute: string,
-    testId: string
+    testId: string,
   ) => {
     await step(stepMessage, async () => {
       const linkSuccess = await canvas.queryByTestId(testId);
@@ -208,7 +208,7 @@ export const buildTestCase = {
   parameters: (
     navigationLink: string,
     pathParams: PathParams,
-    mswArray: Array<MSW>
+    mswArray: Array<MSW>,
   ) => {
     const routingPath = buildPath(pathParams, navigationLink);
     const reactRoutingParameters = buildRoutingParams(pathParams, routingPath);
@@ -230,7 +230,7 @@ function buildPath(pathParams: PathParams, navigationLink: string) {
 
 function buildRoutingParams(
   pathParams: PathParams,
-  routingPath: { path: string }
+  routingPath: { path: string },
 ) {
   return {
     reactRouter: reactRouterParameters({
@@ -251,7 +251,7 @@ function buildMswMapping(mswArray: Array<MSW>) {
         handlers.push(
           http.get(`${config.apiUrl}${msw.endpoint}`, async () => {
             return HttpResponse.json(msw.response);
-          })
+          }),
         );
       else if (msw.type === "post")
         if (msw.response?.status)
@@ -260,13 +260,13 @@ function buildMswMapping(mswArray: Array<MSW>) {
               return HttpResponse.json(msw.response.data, {
                 status: msw.response.status,
               });
-            })
+            }),
           );
         else
           handlers.push(
             http.post(`${config.apiUrl}${msw.endpoint}`, async () => {
               return HttpResponse.json(msw.response);
-            })
+            }),
           );
     });
 

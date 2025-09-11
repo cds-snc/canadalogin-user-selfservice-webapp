@@ -61,7 +61,7 @@ export const SubmitValidForm = {
             message: "User updated successfully",
           },
         },
-      ]
+      ],
     ),
     // Configure Storybook to handle navigation gracefully
     test: {
@@ -98,7 +98,7 @@ export const SubmitValidForm = {
           canvasElement.querySelector('input[name="givenName"]') ||
           canvasElement.querySelector("#givenName") ||
           canvasElement.querySelector(
-            'gcds-input[data-testid="givenName"] input'
+            'gcds-input[data-testid="givenName"] input',
           );
       }
 
@@ -134,7 +134,7 @@ export const SubmitValidForm = {
           canvasElement.querySelector('input[name="familyName"]') ||
           canvasElement.querySelector("#familyName") ||
           canvasElement.querySelector(
-            'gcds-input[data-testid="familyName"] input'
+            'gcds-input[data-testid="familyName"] input',
           );
       }
 
@@ -211,7 +211,7 @@ export const CancelFormSubmission = {
             },
           },
         },
-      ]
+      ],
     ),
     test: {
       dangerouslyIgnoreUnhandledErrors: true,
@@ -227,7 +227,7 @@ export const CancelFormSubmission = {
       let cancelButton =
         canvas.getByText(/Cancel/i) ||
         canvasElement.querySelector(
-          "#form > gcds-container > gcds-button:nth-child(4)"
+          "#form > gcds-container > gcds-button:nth-child(4)",
         ) ||
         canvasElement.querySelector('gcds-button[button-role="secondary"]') ||
         canvasElement.querySelector('gcds-button button[part="button"]');
@@ -277,7 +277,7 @@ export const ValidateRequiredFields = {
             },
           },
         },
-      ]
+      ],
     ),
     test: {
       dangerouslyIgnoreUnhandledErrors: true,
@@ -335,7 +335,7 @@ export const ValidateRequiredFields = {
 
         await userEvent.click(continueButton);
         await new Promise((r) => setTimeout(r, 1000));
-      }
+      },
     );
 
     await new Promise((r) => setTimeout(r, 1000));

@@ -141,10 +141,10 @@ vi.mock("../../../services/authService.jsx", () => ({
             formatted: "Test User",
           },
         },
-      })
+      }),
     ),
     update_my_user_profile: vi.fn(() =>
-      Promise.resolve({ data: { updated: true } })
+      Promise.resolve({ data: { updated: true } }),
     ),
   },
 }));
@@ -166,9 +166,8 @@ describe("ProfileUpdateNameConfirmUpdate Component", () => {
     const { container } = render(
       <TestWrapper>
         <ProfileUpdateNameConfirmUpdate />
-      </TestWrapper>
+      </TestWrapper>,
     );
     expect(container).toMatchSnapshot();
   });
-
 });
