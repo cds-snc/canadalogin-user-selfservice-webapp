@@ -11,7 +11,6 @@ import {
 import { getPageContent } from '../../utils/functions.jsx';
 import { path } from '../../utils/routeHelpers.js';
 import { PAGES } from '../../utils/constants.jsx';
-import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
 
 import { useUser } from "../Providers/useUser.tsx";
 
@@ -19,7 +18,6 @@ import { useUser } from "../Providers/useUser.tsx";
 
 export default function SecuritySettings() {
     const { language } = useParams();
-    const navigateHelper = useNavigateHelper();
 
     const pageContent = getPageContent(language, PAGES.securitySettings);
     const { state } = useUser();
@@ -37,11 +35,7 @@ export default function SecuritySettings() {
                 <GcdsHeading tag="h3">{pageContent['4']}</GcdsHeading>
                 <GcdsGrid columns="1fr" gap="1rem" align-items="center">
                     <GcdsText>{pageContent['5']} {formattedPasswordChangeDate}</GcdsText>
-                    <GcdsLink size="regular" href={passwordPage}
-                        onGcdsClick={(ev) => {
-                            ev.preventDefault();
-                            navigateHelper(ev.detail)
-                        }}>
+                    <GcdsLink size="regular" href={passwordPage}>
                         {pageContent['6']}
                     </GcdsLink>
                 </GcdsGrid>

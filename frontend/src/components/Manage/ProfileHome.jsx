@@ -96,7 +96,7 @@ export default function ProfileHome() {
   const phoneNumbers = state?.userProfile?.phoneNumbers;
   const preferredLanguage = state?.userProfile?.preferredLanguage || "";
 
-  const editProfile = path(PAGES.ProfileNameEdit, { language: language });
+  const editProfile = path(PAGES.profileUpdateName, { language: language });
   const editLanguagePreferences = path(PAGES.editLanguagePreferences, { language: language });
 
   return (

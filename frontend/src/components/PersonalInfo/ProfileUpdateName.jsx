@@ -24,7 +24,7 @@ export default function ProfileUpdateName() {
     const { cloneUserProfile, updateClonedProfile } = userProfileDispatch(dispatch);
     const [editProfile, setEditProfile] = useState({ ...state.editProfile });
 
-    const confirmation = path(PAGES.areYouSureEditYourName, { language: language });
+    const confirmation = path(PAGES.profileUpdateNameConfirmUpdate, { language: language });
     const backToProfile = path(PAGES.ProfileHome, { language: language });
 
     const handleProfileChange = (e) => {

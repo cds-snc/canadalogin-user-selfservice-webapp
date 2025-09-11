@@ -9,14 +9,13 @@ import { AppLanguageSetup } from "./components/Providers/AppLanguageSetup";
 import ManageDashboard from "./components/Manage/ManageDashboard.jsx";
 import Verification from "./components/Verification/Verification.jsx";
 import ChangePasswordIndex from "./features/ChangePassword/components/ChangePasswordIndex.jsx";
-import AreYouSureEditYourName from "./components/Manage/AreYouSureEditYourName.jsx";
-import ProfileNameEdit from "./components/PersonalInfo/ProfileNameEdit.jsx";
+import ProfileUpdateName from "./components/PersonalInfo/ProfileUpdateName.jsx";
 import ProfileHome from "./components/Manage/ProfileHome.jsx";
 import CheckYourEmail from "./components/Manage/CheckYourEmail.jsx";
 import CompleteTwoStepVerification from "./components/Manage/CompleteTwoStepVerification.jsx";
 import FirstVerifyItsYou from "./components/Manage/FirstVerifyItsYou.jsx";
 import EnterNewEmail from "./components/Manage/EnterNewEmail.jsx";
-import ProfileYouMayUpdateName from "./components/Manage/ProfileYouMayUpdateName.jsx";
+import ProfileUpdateNameSuccess from "./components/Manage/ProfileUpdateNameSuccess.jsx";
 import AreYouSureUpdateContactNumber from "./components/Manage/AreYouSureUpdateContactNumber.jsx";
 import EnterNewPhoneNumber from "./components/Manage/EnterNewPhoneNumber.jsx";
 import YouMayUpdateEmailAtOtherPlaces from "./components/Manage/YouMayUpdateEmailAtOtherPlaces.jsx";
@@ -26,6 +25,7 @@ import EditLanguagePreferences from "./components/Manage/EditLanguagePreferences
 import AreYouSureEditYourLanguage from "./components/Manage/AreYouSureEditYourLanguage.jsx";
 import ProfileYouMayUpdateLanguage from "./components/Manage/ProfileYouMayUpdateLanguage.jsx";
 import { PAGES } from "./utils/constants.jsx";
+import ProfileUpdateNameConfirmUpdate from "./components/Manage/ProfileUpdateNameConfirmUpdate.jsx";
 
 export const appRoutes = [
   {
@@ -78,18 +78,18 @@ export const appRoutes = [
               children: [
                 { 
                   path: "update-name", 
-                  element: <ProfileNameEdit />,
-                  handle: { id: PAGES.ProfileNameEdit }
+                  element: <ProfileUpdateName />,
+                  handle: { id: PAGES.profileUpdateName }
                 },
                 { 
                   path: "update-name/success", 
-                  element: <ProfileYouMayUpdateName />,
-                  handle: { id: PAGES.profileYouMayUpdateName }
+                  element: <ProfileUpdateNameSuccess />,
+                  handle: { id: PAGES.profileUpdateNameSuccess }
                 },
                 { 
                   path: "update-name/confirm-update", 
-                  element: <AreYouSureEditYourName />,
-                  handle: { id: PAGES.areYouSureEditYourName }
+                  element: <ProfileUpdateNameConfirmUpdate />,
+                  handle: { id: PAGES.profileUpdateNameConfirmUpdate }
                 },
                 { 
                   path: "update-language", 

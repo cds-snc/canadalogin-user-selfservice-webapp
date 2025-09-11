@@ -22,8 +22,8 @@ export default function ProfileUpdateNameConfirmUpdate() {
   const { clearEditProfile, updateProfileSuccess } = userProfileDispatch(dispatch);
   const pageContentJson = getPageContent(language, PAGES.profileUpdateNameConfirmUpdate);
   const navigateHelper = useNavigateHelper();
-  
-  const successPage = path(PAGES.profileYouMayUpdateName, { language: language });
+
+  const successPage = path(PAGES.profileUpdateNameSuccess, { language: language });
   const backToProfile = path(PAGES.ProfileHome, { language: language });
 
   const username = state?.editProfile?.name.formatted || "";
