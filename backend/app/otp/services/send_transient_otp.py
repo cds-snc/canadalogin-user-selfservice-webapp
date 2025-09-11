@@ -32,55 +32,52 @@ async def handle_otp_send(
         if my_profile_response.data.userName != user_otp_info.userName:
             logger.error("User mismatch - cannot send OTP")
             return generate_error_response(403, "User mismatch - cannot send OTP")
-        else:
-            logger.info("User verified to send OTP")
-            http_client_response = await dispatch_otp(global_http_client, user_otp_info)
-            duration = (datetime.now() - start_time).total_seconds()
-            logger.info(
-                f"{user_otp_info.otpType} OTP send request response received in {duration:.2f} seconds"
+        logger.info("User verified to send OTP")
+        http_client_response = await dispatch_otp(global_http_client, user_otp_info)
+        duration = (datetime.now() - start_time).total_seconds()
+        logger.info(
+            f"{user_otp_info.otpType} OTP send request response received in {duration:.2f} seconds"
+        )
+
+        if http_client_response.status_code is None:
+            return ResponseModel(
+                success=False,
+                data=None,
+                message="Unknown error",
             )
 
-            if http_client_response.status_code is None:
+        if http_client_response.status_code != 201:
+            logger.error(
+                f"Error while sending {user_otp_info.otpType} OTP: {http_client_response.json()}"
+            )
+            error_message = http_client_response.json().get("error", "Unknown error")
+            return ResponseModel(
+                success=False,
+                data=None,
+                message=error_message,
+            )
+
+        response_json = http_client_response.json()
+
+        if http_client_response.status_code == 201:
+            logger.info(f"{user_otp_info.otpType} OTP created and sent")
+
+            try:
+                validated_data = OtpDataResponse(**response_json)
+
+            except ValidationError as e:
+                logger.error(f"Validation Error: {e.json()}")
                 return ResponseModel(
                     success=False,
                     data=None,
-                    message="Unknown error",
+                    message="Server Error",
                 )
 
-            if http_client_response.status_code != 201:
-                logger.error(
-                    f"Error while sending {user_otp_info.otpType} OTP: {http_client_response.json()}"
-                )
-                error_message = http_client_response.json().get(
-                    "error", "Unknown error"
-                )
-                return ResponseModel(
-                    success=False,
-                    data=None,
-                    message=error_message,
-                )
-
-            response_json = http_client_response.json()
-
-            if http_client_response.status_code == 201:
-                logger.info(f"{user_otp_info.otpType} OTP created and sent")
-
-                try:
-                    validated_data = OtpDataResponse(**response_json)
-
-                except ValidationError as e:
-                    logger.error(f"Validation Error: {e.json()}")
-                    return ResponseModel(
-                        success=False,
-                        data=None,
-                        message="Server Error",
-                    )
-
-                return ResponseModel(
-                    success=True,
-                    data=validated_data,
-                    message=f"{user_otp_info.otpType.value} OTP sent successfully",
-                )
+            return ResponseModel(
+                success=True,
+                data=validated_data,
+                message=f"{user_otp_info.otpType.value} OTP sent successfully",
+            )
 
     except Exception as e:
         logger.error(f"Send transient {user_otp_info.otpType} error: {str(e)}")
