@@ -9,7 +9,9 @@ from app.password.schemas import OtpType
 
 SCIM_CORE_USER = "urn:ietf:params:scim:schemas:core:2.0:User"
 SCIM_IBM_USER_EXT = "urn:ietf:params:scim:schemas:extension:ibm:2.0:User"
-SCIM_IBM_NOTIFICATION_EXT = "urn:ietf:params:scim:schemas:extension:ibm:2.0:Notification"
+SCIM_IBM_NOTIFICATION_EXT = (
+    "urn:ietf:params:scim:schemas:extension:ibm:2.0:Notification"
+)
 
 
 class NotifyType(str, Enum):
@@ -108,11 +110,7 @@ class UserProfileUpdateRequest(BaseModel):
 
 class IBMVerifyUpdateUserProfile(IBMVerifyUserProfileSchema):
     schemas: List[str] = Field(
-        default=[
-            SCIM_CORE_USER,
-            SCIM_IBM_USER_EXT,
-            SCIM_IBM_NOTIFICATION_EXT
-        ]
+        default=[SCIM_CORE_USER, SCIM_IBM_USER_EXT, SCIM_IBM_NOTIFICATION_EXT]
     )
     # if we want to notify user of profile updates via email, we need to change notifyType to EMAIL
     # by default, we set it to NONE to avoid sending notification emails on every profile update

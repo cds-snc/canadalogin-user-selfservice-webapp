@@ -4,7 +4,12 @@ from fastapi import HTTPException, Request
 from httpx import AsyncClient, Response
 from pydantic import ValidationError
 
-from app.users.schemas import IBMVerifyUserProfileSchema, ProfileResponse, UserProfileUpdateRequest, IBMVerifyUpdateUserProfile
+from app.users.schemas import (
+    IBMVerifyUserProfileSchema,
+    ProfileResponse,
+    UserProfileUpdateRequest,
+    IBMVerifyUpdateUserProfile,
+)
 from app.utils.access_token import get_auth_request_headers
 from app.config import get_configuration
 from app.utils.request_error_handler import RequestErrorHandler
@@ -13,8 +18,12 @@ logger = logging.getLogger(__name__)
 
 
 def sanitize_user_profile_data(user_data: UserProfileUpdateRequest) -> dict:
-    validate_updated_data = UserProfileUpdateRequest(**user_data.model_dump())  # validation and then turns it into a UserProfileUpdateRequest data object
-    updated_data_dict = validate_updated_data.model_dump(exclude_unset=True, exclude_none=True)
+    validate_updated_data = UserProfileUpdateRequest(
+        **user_data.model_dump()
+    )  # validation and then turns it into a UserProfileUpdateRequest data object
+    updated_data_dict = validate_updated_data.model_dump(
+        exclude_unset=True, exclude_none=True
+    )
     return updated_data_dict
 
 
@@ -26,7 +35,9 @@ async def dispatch_update_user_profile(
     try:
         headers = get_auth_request_headers(user_access_token)
         response = await request.app.state.request_client.put(
-            request.app.state.config.profile_api_endpoint, content=user_profile_payload, headers=headers
+            request.app.state.config.profile_api_endpoint,
+            content=user_profile_payload,
+            headers=headers,
         )
         response.raise_for_status()
         logger.info("updating user profile changes returned successfully")
@@ -46,9 +57,13 @@ async def update_profile(
 
         updated_user_data_dict = sanitize_user_profile_data(user_data)
 
-        user_profile = await my_profile(request.app.state.request_client, user_access_token)
+        user_profile = await my_profile(
+            request.app.state.request_client, user_access_token
+        )
         user_profile_data = user_profile.data.model_dump()
-        updated_user_data_dict.pop("userName", None)  # Prevent changing the userName (email)
+        updated_user_data_dict.pop(
+            "userName", None
+        )  # Prevent changing the userName (email)
 
         merged_profile = {**user_profile_data, **updated_user_data_dict}
 
@@ -58,7 +73,9 @@ async def update_profile(
             by_alias=True, exclude_none=True
         )
 
-        response = await dispatch_update_user_profile(request, user_profile_payload, user_access_token)
+        response = await dispatch_update_user_profile(
+            request, user_profile_payload, user_access_token
+        )
         logger.info("User profile updated successfully.")
         response_data = IBMVerifyUserProfileSchema(**response.json())
         return ProfileResponse(
