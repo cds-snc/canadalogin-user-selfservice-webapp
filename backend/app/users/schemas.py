@@ -22,7 +22,7 @@ class NotifyType(str, Enum):
 class IBMNotifyTypeExtension(BaseModel):
     notifyType: NotifyType = Field(
         default=NotifyType.NONE,
-        description="Setting to NONE will not send any notification, Setting the value to EMAIL will send a notification email to the user that the account was created",
+        description="Setting to NONE will not send any notification, Setting the value to EMAIL will send a notification email to the user about the profile update.",
     )
 
 
