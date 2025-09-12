@@ -10,10 +10,6 @@ import { UserProvider } from "../components/Providers/UserProvider";
 import { LanguageProvider } from "../components/Providers/LanguageProvider";
 
 // Only mock external dependencies, not the providers we want to test
-
-const langHref = "/fr";
-const currentLang = "en";
-
 describe.only("RelyingPartyComponent", () => {
   beforeEach(() => {
     // Mock window.matchMedia for useBreakpoints hook
@@ -73,7 +69,7 @@ describe.only("RelyingPartyComponent", () => {
       ],
       {
         initialEntries: [`/?rp=${mockRpid}`],
-      }
+      },
     );
 
     // Render with RouterProvider
