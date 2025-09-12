@@ -99,6 +99,6 @@ export default function AreYouSureEditYourLanguage() {
           {pageContentJson["9"]}
         </GcdsButton>
       </GcdsGrid>
-    </GcdsContainer>
+</GcdsContainer>
   );
 }
