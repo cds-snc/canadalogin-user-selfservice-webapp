@@ -70,7 +70,7 @@ class UserProfileName(BaseModel):
     givenName: Optional[str] = None
 
 
-class ProfileGetResponseData(BaseModel):
+class IBMVerifyUserProfileSchema(BaseModel):
     emails: List[EmailItem] = None
     preferredLanguage: Optional[str] = None
     meta: Meta
@@ -102,7 +102,7 @@ class ProfilePUTData(BaseModel):
 
 
 class ProfileResponse(ResponseModel):
-    data: Optional[ProfileGetResponseData]
+    data: Optional[IBMVerifyUserProfileSchema]
 
 
 class RelyingPartyInfo(BaseModel):

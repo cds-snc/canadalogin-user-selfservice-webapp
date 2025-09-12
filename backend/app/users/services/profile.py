@@ -4,7 +4,7 @@ from fastapi import HTTPException
 from httpx import AsyncClient
 from pydantic import ValidationError
 
-from app.users.schemas import ProfileGetResponseData, ProfileResponse, ProfilePUTData
+from app.users.schemas import IBMVerifyUserProfileSchema, ProfileResponse, ProfilePUTData
 from app.utils.access_token import get_auth_request_headers
 from app.config import get_configuration
 
@@ -34,7 +34,7 @@ async def update_profile(
 
     if response.status_code == 200:
         logger.info("User profile updated successfully.")
-        response_data = ProfileGetResponseData(**response.json())
+        response_data = IBMVerifyUserProfileSchema(**response.json())
         return ProfileResponse(
             success=True,
             message="User profile updated successfully.",
@@ -65,7 +65,7 @@ async def my_profile(global_http_client: AsyncClient, user_access_token: str):
 
     if response.status_code == 200:
         logger.info("User profile retrieved successfully.")
-        response_data = ProfileGetResponseData(**response.json())
+        response_data = IBMVerifyUserProfileSchema(**response.json())
         return ProfileResponse(
             success=True,
             message="User profile retrieved successfully.",
