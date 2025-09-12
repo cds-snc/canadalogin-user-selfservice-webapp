@@ -111,7 +111,7 @@ class IBMVerifyUpdateUserProfile(IBMVerifyUserProfileSchema):
         default=[
             SCIM_CORE_USER,
             SCIM_IBM_USER_EXT,
-            # SCIM_IBM_NOTIFICATION_EXT
+            SCIM_IBM_NOTIFICATION_EXT
         ]
     )
     # if we want to notify user of profile updates via email, we need to change notifyType to EMAIL
