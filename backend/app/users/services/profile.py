@@ -18,9 +18,10 @@ logger = logging.getLogger(__name__)
 
 
 def sanitize_user_profile_data(user_data: UserProfileUpdateRequest) -> dict:
+    # validation and then turns it into a UserProfileUpdateRequest dict
     validate_updated_data = UserProfileUpdateRequest(
         **user_data.model_dump()
-    )  # validation and then turns it into a UserProfileUpdateRequest data object
+    )
     updated_data_dict = validate_updated_data.model_dump(
         exclude_unset=True, exclude_none=True
     )
