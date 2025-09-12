@@ -1,47 +1,8 @@
-import { beforeAll, afterEach, afterAll } from 'vitest'
-import { setupServer } from 'msw/node'
-import { http, HttpResponse } from 'msw'
+// Setup test environment without MSW server since no tests are making HTTP requests
+import { beforeAll } from 'vitest'
 
-// Create MSW server for Node.js environment (vitest)
-const server = setupServer(
-  // Handle the profile endpoint that's being called
-  http.get('http://localhost:8000/v1/users/profile', () => {
-    return HttpResponse.json({
-      id: "test-user-123",
-      active: true,
-      name: {
-        givenName: "Test",
-        familyName: "User",
-        formatted: "Test User",
-      },
-      emails: [{ type: "primary", value: "test@example.com" }],
-      phoneNumbers: [{ type: "primary", value: "+1234567890" }],
-      preferredLanguage: "en",
-      details: {
-        emailVerified: true,
-        twoFactorAuthentication: true,
-        lastLogin: "2025-09-08T12:00:00Z",
-        lastMFA: "2025-09-08T12:00:00Z",
-        pwdChangedTime: "2025-09-08T12:00:00Z",
-      },
-      meta: {
-        created: "2025-09-08T12:00:00Z",
-        lastModified: "2025-09-08T12:00:00Z",
-        location: "test",
-        resourceType: "User",
-      },
-    })
-  }),
-  
-  // Handle OPTIONS requests
-  http.options('http://localhost:8000/v1/users/profile', () => {
-    return new HttpResponse(null, { status: 200 })
-  })
-)
-
-// Setup MSW server and suppress GCDS component errors
+// Setup test environment and suppress GCDS component errors
 beforeAll(() => {
-  server.listen({ onUnhandledRequest: 'warn' })
   
   // Suppress console errors from third-party components in test environment
   const originalConsoleError = console.error;
@@ -290,12 +251,3 @@ beforeAll(() => {
     }
   });
 })
-
-// Clean up after each test
-afterEach(() => server.resetHandlers())
-
-// Close server after all tests
-afterAll(() => server.close())
-
-// Export server for use in tests if needed
-export { server }
