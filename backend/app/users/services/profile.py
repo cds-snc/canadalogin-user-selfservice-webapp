@@ -34,6 +34,7 @@ async def dispatch_update_user_profile(
     user_access_token: str,
 ) -> Response:
     try:
+        logger.info("dispatch_update_user_profile")
         headers = get_auth_request_headers(user_access_token)
         response = await request.app.state.request_client.put(
             request.app.state.config.profile_api_endpoint,
