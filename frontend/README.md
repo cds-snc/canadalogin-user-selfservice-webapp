@@ -32,3 +32,8 @@ This is the frontend application built with React and GC Design System for the G
    ```
 
    See package.json scripts for additional commands.
+
+4. Run Storybook:
+   ```bash
+   npm run storybook
+   ```
