@@ -7,10 +7,21 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field
 from app.utils.schemas import ResponseModel
 from app.password.schemas import OtpType
 
+SCIM_CORE_USER = "urn:ietf:params:scim:schemas:core:2.0:User"
+SCIM_IBM_USER_EXT = "urn:ietf:params:scim:schemas:extension:ibm:2.0:User"
+SCIM_IBM_NOTIFICATION_EXT = "urn:ietf:params:scim:schemas:extension:ibm:2.0:Notification"
+
 
 class NotifyType(str, Enum):
     EMAIL = "EMAIL"
     NONE = "NONE"
+
+
+class IBMNotifyTypeExtension(BaseModel):
+    notifyType: NotifyType = Field(
+        default=NotifyType.NONE,
+        description="Setting to NONE will not send any notification, Setting the value to EMAIL will send a notification email to the user that the account was created",
+    )
 
 
 class IBMUserCreateResponse(BaseModel):
@@ -87,18 +98,32 @@ class IBMVerifyUserProfileSchema(BaseModel):
     model_config = ConfigDict(validate_by_name=True, validate_by_alias=True)
 
 
-class ProfilePUTData(BaseModel):
-    schemas: List[str] = Field(
-        default=[
-            "urn:ietf:params:scim:schemas:core:2.0:User",
-            "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
-        ]
-    )
+class UserProfileUpdateRequest(BaseModel):
     preferredLanguage: Optional[str] = None
     name: Optional[UserProfileName] = None
     userName: EmailStr
     phoneNumbers: Optional[List[MetaDataTypeValue]] = None
     model_config = ConfigDict(validate_by_name=True, validate_by_alias=True)
+
+
+class IBMVerifyUpdateUserProfile(IBMVerifyUserProfileSchema):
+    schemas: List[str] = Field(
+        default=[
+            SCIM_CORE_USER,
+            SCIM_IBM_USER_EXT,
+            # SCIM_IBM_NOTIFICATION_EXT
+        ]
+    )
+    # if we want to notify user of profile updates via email, we need to change notifyType to EMAIL
+    # by default, we set it to NONE to avoid sending notification emails on every profile update
+    # Documentation: To turn off email notifications, send the notifications option "urn:ietf:params:scim:schemas:extension:ibm:2.0:Notification": {"notifyType":"NONE"} in the payload.
+    # https://docs.verify.ibm.com/verify/reference/putuser
+    notification: IBMNotifyTypeExtension = Field(
+        default_factory=IBMNotifyTypeExtension,
+        alias=SCIM_IBM_NOTIFICATION_EXT,
+    )
+
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class ProfileResponse(ResponseModel):
