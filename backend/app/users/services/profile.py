@@ -1,13 +1,13 @@
 import logging
 
 from fastapi import HTTPException, Request
-from httpx import AsyncClient
+from httpx import AsyncClient, Response
 from pydantic import ValidationError
 
 from app.users.schemas import IBMVerifyUserProfileSchema, ProfileResponse, UserProfileUpdateRequest, IBMVerifyUpdateUserProfile
 from app.utils.access_token import get_auth_request_headers
 from app.config import get_configuration
-from backend.app.utils.request_error_handler import RequestErrorHandler
+from app.utils.request_error_handler import RequestErrorHandler
 
 logger = logging.getLogger(__name__)
 
@@ -20,13 +20,13 @@ def sanitize_user_profile_data(user_data: UserProfileUpdateRequest) -> dict:
 
 async def dispatch_update_user_profile(
     request: Request,
-    user_data: IBMVerifyUpdateUserProfile,
+    user_profile_payload: IBMVerifyUpdateUserProfile,
     user_access_token: str,
-):
+) -> Response:
     try:
         headers = get_auth_request_headers(user_access_token)
         response = await request.app.state.request_client.put(
-            request.app.state.config.profile_api_endpoint, content=user_data, headers=headers
+            request.app.state.config.profile_api_endpoint, content=user_profile_payload, headers=headers
         )
         response.raise_for_status()
         logger.info("updating user profile changes returned successfully")
@@ -54,16 +54,11 @@ async def update_profile(
 
         validate_merged_profile = IBMVerifyUpdateUserProfile(**merged_profile)
 
-        validated_data = validate_merged_profile.model_dump_json(
+        user_profile_payload = validate_merged_profile.model_dump_json(
             by_alias=True, exclude_none=True
         )
 
-        response = await dispatch_update_user_profile(request, validated_data, user_access_token)
-    except ValidationError as e:
-        logger.error(f"Validation Error: {e.json()}")
-        raise HTTPException(status_code=422, detail="Request data validation error")
-
-    if response.status_code == 200:
+        response = await dispatch_update_user_profile(request, user_profile_payload, user_access_token)
         logger.info("User profile updated successfully.")
         response_data = IBMVerifyUserProfileSchema(**response.json())
         return ProfileResponse(
@@ -71,15 +66,10 @@ async def update_profile(
             message="User profile updated successfully.",
             data=response_data,
         )
-    else:
-        if response.status_code == 401:
-            logger.error("User is not authenticated.")
-            raise HTTPException(status_code=401, detail="Not authenticated")
-        logger.error(f"Failed to save profile. Response: {response.text}")
-        error_details = response.json().get("detail")
-        raise HTTPException(
-            status_code=response.status_code, detail=f"HTTP error, {error_details}"
-        )
+
+    except ValidationError as e:
+        logger.error(f"Validation Error: {e.json()}")
+        raise HTTPException(status_code=422, detail="Request data validation error")
 
 
 async def my_profile(global_http_client: AsyncClient, user_access_token: str):
