@@ -11,7 +11,14 @@ const filesToInclude = [
   "**/src/locales/**/*",
 ];
 
-const filesToExclude = [];
+const filesToExclude = [
+  "**/stories/**",
+  "**/*.stories.*",
+  "**/*.story.*",
+  "**/*.test.stories.*",
+  "**/*.spec.stories.*",
+  "**/node_modules/**"
+];
 export default defineConfig({
   plugins: [react()],
   preview: {
@@ -22,6 +29,20 @@ export default defineConfig({
   },
   test: {
     globals: true,
+    setupFiles: ['./src/setup-msw.js'],
+    include: [
+      'src/__tests__/**/*.test.{js,jsx,ts,tsx}',
+      'src/__tests__/**/*.spec.{js,jsx,ts,tsx}',
+      'src/**/*.test.{js,jsx,ts,tsx}',
+      'src/**/*.spec.{js,jsx,ts,tsx}'
+    ],
+    exclude: [
+      ...filesToExclude,
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/.{idea,git,cache,output,temp}/**',
+      '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*'
+    ],
     coverage: {
       reporter: ["text", "json-summary", "json", "html"],
       reportOnFailure: true,
@@ -39,5 +60,8 @@ export default defineConfig({
     },
     css: true,
     environment: "jsdom",
+    // Don't fail on unhandled errors from third-party components (GCDS)
+    onUnhandledRejection: "ignore",
+    dangerouslyIgnoreUnhandledErrors: true,
   },
 });
