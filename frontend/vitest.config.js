@@ -17,7 +17,7 @@ const filesToExclude = [
   "**/*.story.*",
   "**/*.test.stories.*",
   "**/*.spec.stories.*",
-  "**/node_modules/**"
+  "**/node_modules/**",
 ];
 export default defineConfig({
   plugins: [react()],
@@ -29,19 +29,19 @@ export default defineConfig({
   },
   test: {
     globals: true,
-    setupFiles: ['./src/setup-msw.js'],
+    setupFiles: ["./src/setup-msw.js"],
     include: [
-      'src/__tests__/**/*.test.{js,jsx,ts,tsx}',
-      'src/__tests__/**/*.spec.{js,jsx,ts,tsx}',
-      'src/**/*.test.{js,jsx,ts,tsx}',
-      'src/**/*.spec.{js,jsx,ts,tsx}'
+      "src/__tests__/**/*.test.{js,jsx,ts,tsx}",
+      "src/__tests__/**/*.spec.{js,jsx,ts,tsx}",
+      "src/**/*.test.{js,jsx,ts,tsx}",
+      "src/**/*.spec.{js,jsx,ts,tsx}",
     ],
     exclude: [
       ...filesToExclude,
-      '**/node_modules/**',
-      '**/dist/**',
-      '**/.{idea,git,cache,output,temp}/**',
-      '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*'
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/.{idea,git,cache,output,temp}/**",
+      "**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*",
     ],
     coverage: {
       reporter: ["text", "json-summary", "json", "html"],

@@ -9,6 +9,13 @@
     "preview": "vite preview --port 3001",
     "build": "vite build",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
+    "check": "npm run lint && npm run format:check",
+    "fix": "npm run lint:fix && npm run format",
+    "pre-push": "./.githooks/pre-push",
+    "prepare": "husky",
     "test": "npm run install-playwright && vitest --coverage",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
@@ -52,7 +59,9 @@
     "eslint-plugin-react-refresh": "^0.4.20",
     "eslint-plugin-storybook": "^0.12.0",
     "globals": "^15.15.0",
+    "husky": "^9.1.7",
     "jsdom": "^26.1.0",
+    "lint-staged": "^16.1.6",
     "msw": "^2.7.5",
     "msw-storybook-addon": "^2.0.4",
     "playwright": "^1.52.0",
@@ -81,6 +90,15 @@
   "msw": {
     "workerDirectory": [
       "public"
+    ]
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,css,md}": [
+      "prettier --write"
     ]
   }
 }
