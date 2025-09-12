@@ -19,9 +19,7 @@ logger = logging.getLogger(__name__)
 
 def sanitize_user_profile_data(user_data: UserProfileUpdateRequest) -> dict:
     # validation and then turns it into a UserProfileUpdateRequest dict
-    validate_updated_data = UserProfileUpdateRequest(
-        **user_data.model_dump()
-    )
+    validate_updated_data = UserProfileUpdateRequest(**user_data.model_dump())
     updated_data_dict = validate_updated_data.model_dump(
         exclude_unset=True, exclude_none=True
     )
@@ -63,6 +61,15 @@ async def update_profile(
             request.app.state.request_client, user_access_token
         )
         user_profile_data = user_profile.data.model_dump()
+
+        does_username_match = user_profile_data.get(
+            "userName"
+        ) == updated_user_data_dict.get("userName")
+
+        if not does_username_match:
+            logger.error("User mismatch - cannot update profile")
+            raise HTTPException(status_code=403, detail="cannot update profile")
+
         updated_user_data_dict.pop(
             "userName", None
         )  # Prevent changing the userName (email)
