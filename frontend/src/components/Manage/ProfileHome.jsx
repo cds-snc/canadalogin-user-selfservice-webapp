@@ -1,4 +1,3 @@
-import React from "react";
 import { useParams } from "react-router";
 import {
   GcdsContainer,
@@ -6,6 +5,7 @@ import {
   GcdsGrid,
   GcdsText,
   GcdsLink,
+  GcdsIcon,
 } from "@cdssnc/gcds-components-react";
 import parsePhoneNumberFromString from "libphonenumber-js";
 
@@ -13,11 +13,8 @@ import {
   getPageContent,
   capitalizeFirstLetter,
 } from "../../utils/functions.jsx";
-import {
-  PAGES,
-  NAVIGATION_LINKS,
-  LANGUAGE_DISPLAY_NAMES,
-} from "../../utils/constants.jsx";
+import { PAGES, LANGUAGE_DISPLAY_NAMES } from "../../utils/constants.jsx";
+import { path } from "../../utils/routeHelpers.js";
 import { useUser } from "../Providers/useUser.tsx";
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
 
@@ -75,13 +72,17 @@ const ContactPhoneNumber = (props) => {
         </GcdsLink>
       </GcdsGrid>
 
-      <gcds-grid
+      <GcdsGrid
         columns="auto auto"
         className="verifiedBadge verifiedBadgeBottom"
       >
-        <gcds-icon name="check" className="verifiedIcon" size="md" />
-        <gcds-text className="verifiedText">{pageContent["9"]}</gcds-text>
-      </gcds-grid>
+        <GcdsIcon
+          name="checkmark-circle"
+          className="verifiedIcon"
+          size="text"
+        />
+        <GcdsText className="verifiedText">{pageContent["9"]}</GcdsText>
+      </GcdsGrid>
     </>
   );
 };
@@ -96,8 +97,10 @@ export default function ProfileHome() {
   const phoneNumbers = state?.userProfile?.phoneNumbers;
   const preferredLanguage = state?.userProfile?.preferredLanguage || "";
 
-  const editProfile = `/${language}${NAVIGATION_LINKS.ProfileNameEdit}`;
-  const editLanguagePreferences = `/${language}${NAVIGATION_LINKS.editLanguagePreferences}`;
+  const editProfile = path(PAGES.profileUpdateName, { language: language });
+  const editLanguagePreferences = path(PAGES.editLanguagePreferences, {
+    language: language,
+  });
 
   return (
     <GcdsContainer>
@@ -139,10 +142,16 @@ export default function ProfileHome() {
           </GcdsLink>
         </GcdsGrid>
 
-        <gcds-grid columns="auto auto" className="verifiedBadge">
-          <gcds-icon name="check" className="verifiedIcon" size="sm" />
-          <gcds-text className="verifiedText">{pageContent["9"]}</gcds-text>
-        </gcds-grid>
+        <GcdsGrid columns="auto auto" className="verifiedBadge">
+          <GcdsIcon
+            name="checkmark-circle"
+            className="verifiedIcon"
+            size="text-small"
+          />
+          <GcdsText className="verifiedText" style={{ paddingTop: "0.25rem" }}>
+            {pageContent["9"]}
+          </GcdsText>
+        </GcdsGrid>
         {phoneNumbers != null ? (
           <>
             <div className="separator" />

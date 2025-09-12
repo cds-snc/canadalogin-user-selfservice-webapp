@@ -19,22 +19,6 @@
     "18": "Use a different email",
     "19": "I forgot my password"
   },
-  "SignUpEmail": {
-    "1": "Entrez votre adresse courriel",
-    "2": "Adresse courriel",
-    "3": "Veuillez choisir la langue que vous préférez utiliser pour la correspondance par courriel",
-    "4": "Vous recevrez les courriels de Connexion GC dans la langue sélectionnée",
-    "5": "Anglais",
-    "6": "Français"
-  },
-  "FirstTimeGc": {
-    "1": "Pas de compte Connexion GC?",
-    "2": "Créer un compte"
-  },
-  "AlreadyGc": {
-    "1": "Vous utilisez déjà Connexion GC?",
-    "2": "Se connecter"
-  },
   "Error": {
     "1": "Un problème est survenu",
     "2": "Adresse courriel invalide. L’adresse courriel doit contenir un symbole « @ » suivi d’un domaine.",
@@ -65,27 +49,6 @@
     "8": "Codes de vérification à usage unique",
     "9": "Enregistrez ou imprimez une liste de codes de vérification à usage unique."
   },
-  "VerificationSetUp": {
-    "1": "Protégez votre compte avec la vérification en deux étapes",
-    "2": "La vérification en 2 étapes ajoute une seconde mesure de sécurité à votre mot de passe.",
-    "3": "Apprenez-en plus sur la vérification en deux étapes (s’ouvre dans un nouvel onglet)",
-    "4": "Entrez votre numéro de téléphone",
-    "5": "Entrez le numéro de téléphone auquel vous souhaitez recevoir vos codes de sécurité à chaque connexion. Il est possible que nous utilisions également ce numéro de téléphone pour vous contacter au sujet des activités relatives à votre compte.",
-    "6": "Lisez notre",
-    "7": "avis de confidentialité",
-    "8": "pour en savoir plus sur la manière dont nous utilisons vos renseignements personnels.",
-    "9": "Pays",
-    "10": "Numéro de téléphone",
-    "11": "Mon pays n’apparaît pas dans la liste",
-    "12": "Certains pays ne sont pas pris en charge en raison de limitations techniques. Si votre pays n’apparaît pas dans la liste, vous ne pouvez pas créer de compte Connexion GC à l’heure actuelle. Nous nous excusons des désagréments que cela pourrait causer.",
-    "13": "sélectionnez une autre méthode de vérification à deux étapes",
-    "14": "Comment souhaitez-vous recevoir le code?",
-    "15": "Vous pourrez modifier ce choix lors de votre prochaine connexion.",
-    "16": "Message texte (SMS)",
-    "17": "Numéro de téléphone cellulaire seulement. Des frais d’opérateur peuvent s’appliquer.",
-    "18": "Appel vocal",
-    "19": "Numéro de téléphone cellulaire ou fixe. Des frais d’opérateur peuvent s’appliquer."
-  },
   "Verification": {
     "1": "Consultez votre téléphone",
     "2": "Nous avons envoyé un code de vérification à 6 chiffres au numéro suivant par le biais d’un message texte :",
@@ -115,81 +78,16 @@
     "26": "Demander un nouveau code",
     "27": "Annuler"
   },
-  "VerificationSelection": {
-    "1": "Choisissez une méthode de connexion",
-    "2": "pour accéder à votre",
-    "3": "compte",
-    "4": "Choisissez une méthode de connexion",
-    "5": "Code à 6 chiffres reçu par SMS",
-    "6": "Code à 6 chiffres reçu par appel vocal",
-    "7": "Par défaut"
-  },
-  "CreateCoreProfile": {
-    "1": "Votre compte de connexion GC a bien été créé.",
-    "2": "Complétez votre profil",
-    "3": "Lisez notre",
-    "4": "avis de confidentialité",
-    "5": "pour en savoir plus sur la manière dont nous utilisons vos renseignements personnels.",
-    "6": "Entrez votre nom",
-    "7": "Prénom",
-    "8": "Nom"
-  },
   "Button": {
     "submit": "Continuer",
     "cancel": "Annuler"
-  },
-  "Privacy": {
-    "1": "Créer une Connexion GC",
-    "2": "Créer une",
-    "3": "compte",
-    "5": "Confidentialité",
-    "6": "Lorsque vous créez votre compte, Connexion GC vous demandera de fournir des renseignements personnels de base. Nous demandons ces renseignements afin de :",
-    "7": "faciliter votre accès aux services, et",
-    "8": "vous contacter concernant la sécurité de votre compte.",
-    "9": "Vos renseignements personnels sont",
-    "10": "conservés dans une base de données sécurisée",
-    "11": "gérés par",
-    "12": "Emploi et Développement social Canada.",
-    "13": "Vos renseignements personnels sont",
-    "14": "également partagés avec d’autres ministères ou organismes",
-    "15": "auxquels vous vous connectez et conservés selon leurs propres politiques et processus. Vos renseignements personnels sont",
-    "17": "pas",
-    "18": "partagés avec des programmes ou services",
-    "19": "à moins que vous ne les connectiez à votre compte Connexion GC",
-    "20": ". Consultez nos",
-    "21": "Conditions",
-    "22": "pour en savoir plus.",
-    "23": "Vos renseignements personnels et la loi",
-    "24": "Les renseignements personnels sont recueillis conformément à la",
-    "25": "Questions ou plaintes",
-    "27": "Loi sur la protection des renseignements personnels",
-    "28": "et à la Partie 4 de la",
-    "29": "Loi sur le ministère de l’Emploi et du Développement social Canada",
-    "30": "L’article 5.1 de la",
-    "31": "Loi sur l’Emploi et le Développement social Canada",
-    "32": "nous permet de recueillir vos renseignements personnels pour créer un compte que vous pouvez utiliser pour vous connecter aux programmes et services du gouvernement du Canada. Connexion GC n’utilise pas les renseignements personnels que vous fournissez à d’autres fins.",
-    "33": "Vous avez le droit d’accéder et de corriger les renseignements personnels dans votre compte ; vous pouvez le faire dans les Paramètres.",
-    "34": "Envoyez vos questions concernant vos renseignements personnels à",
-    "35": "l’administrateur de l’accès à l’information et de la protection des renseignements personnels d’Emploi et Développement social Canada",
-    "36": "en remplissant",
-    "37": "ce formulaire",
-    "38": "Envoyez vos plaintes concernant la gestion de vos renseignements personnels à",
-    "39": "Bureau du commissaire à la protection de la vie privée du Canada",
-    "40": "info@priv.gc.ca",
-    "41": "1‑800‑282‑1376",
-    "42": "Qu’est‑ce que Connexion GC ?",
-    "43": "Connexion GC vous permet d’utiliser un seul nom d’utilisateur et un seul mot de passe pour accéder de façon sécurisée et privée aux programmes et services participants.",
-    "44": "Les programmes et services participants vous demanderont de créer une connexion GC afin d’accéder en toute sécurité à vos renseignements sur leur site Web ou leur application.",
-    "45": "Vous pouvez utiliser le même nom d’utilisateur et mot de passe pour accéder à n’importe quel programme ou service qui utilise Connexion GC.",
-    "46": "Connexion GC",
-    "47": "pour continuer vers votre"
   },
   "ManageDashboard": {
     "1": "Bienvenue,",
     "2": "Renseignements personnels",
     "3": "Paramètres de sécurité"
   },
-  "AreYouSureEditYourName": {
+  "ProfileUpdateNameConfirmUpdate": {
     "1": "Êtes-vous sûr de vouloir mettre à jour votre nom ?",
     "2": "Vous avez demandé à mettre à jour votre nom :",
     "3": "Exemple : Nouveau nom",
@@ -266,7 +164,7 @@
     "10": "Vous pouvez demander un nouveau code dans",
     "11": "10 secondes"
   },
-  "ProfileYouMayUpdateName": {
+  "ProfileUpdateNameSuccess": {
     "0": "Réussite",
     "1": "Votre nom a été mis à jour vers",
     "2": "Vous devrez peut-être mettre à jour votre nom à d'autres endroits.",
@@ -287,19 +185,13 @@
     "4": "Continuer",
     "5": "Annuler"
   },
-  "ProfileNameEdit": {
-    "1": "Quels services ont accès à votre nom ?",
+  "ProfileUpdateName": {
     "2": "Prénom",
     "3": "Nom de famille",
     "4": "Annuler",
     "5": "Modifier votre nom",
     "6": "Votre nom sera mis à jour avec",
-    "7": "tous les services avec lesquels vous avez partagé votre nom via Connexion GC.",
-    "8": "Les services suivants ont accès à votre nom via Connexion GC :",
-    "9": "GEO.ca",
-    "10": "Si vous essayez de mettre à jour votre nom avec un service qui n'est pas connecté à Connexion GC, vous devrez accéder à ce compte.",
-    "11": "Pour rechercher un autre compte GC, consultez le",
-    "12": "Répertoire des comptes GC"
+    "7": "tous les services avec lesquels vous avez partagé votre nom via Connexion GC."
   },
   "AreYouSureUpdateContactNumber": {
     "1": "Êtes-vous sûr de vouloir mettre à jour votre numéro de téléphone ?",
@@ -336,12 +228,6 @@
     "1": "Modifiez votre préférence linguistique",
     "2": "Cela mettra à jour la langue officielle dans laquelle GC Sign In et les services connectés vous enverront des communications.",
     "3": "Choisissez votre préférence linguistique",
-    "4": "Quels services ont accès à votre préférence linguistique",
-    "8": "Les services suivants ont accès à votre nom via GC Sign In :",
-    "9": "GEO.ca",
-    "10": "Si vous tentez de mettre à jour votre nom auprès d’un service qui n’est pas connecté à GC Sign In, vous devrez le faire via ce compte.",
-    "11": "Pour rechercher un autre compte GC, visitez le",
-    "12": "Répertoire des comptes GC",
     "13": "Anglais",
     "14": "Français",
     "15": "Continuer",
@@ -401,8 +287,7 @@
     "8": "Mobile only. Carrier charges may apply.",
     "9": "Voice call",
     "10": "Mobile or landline. Carrier charges may apply.",
-    "11": "Chargement",
-    "12": "Chargement de vos méthodes MFA ..."
+    "11": "Chargement"
   },
   "PasswordChangedConfirmation": {
     "1": "Your email has been updated to",
@@ -424,5 +309,13 @@
     "7": "Se déconnecter",
     "8": "Déconnexion en cours...",
     "9": "Échec de la déconnexion. Redirection..."
+  },
+  "ServicesWithAccessInfo": {
+    "1": "Quels services ont accès à votre nom ?",
+    "2": "Les services suivants ont accès à votre nom via Connexion GC :",
+    "3": "GEO.ca",
+    "4": "Si vous essayez de mettre à jour votre nom avec un service qui n'est pas connecté à Connexion GC, vous devrez accéder à ce compte.",
+    "5": "Pour rechercher un autre compte GC, consultez le",
+    "6": "Répertoire des comptes GC"
   }
 }
