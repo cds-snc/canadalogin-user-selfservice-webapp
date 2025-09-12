@@ -187,7 +187,7 @@ beforeAll(() => {
       this._formState = state;
     }
 
-    setValidity(flags, message, anchor) {
+    setValidity(flags, message) {
       if (flags && typeof flags === 'object') {
         Object.assign(this.validity, flags);
         this.validity.valid = !Object.values(flags).some(v => v === true);
@@ -207,22 +207,24 @@ beforeAll(() => {
   }
 
   // Set up the polyfill globally
-  if (typeof global !== 'undefined') {
-    global.ElementInternals = MockElementInternals;
+  if (typeof globalThis !== 'undefined') {
+    globalThis.ElementInternals = MockElementInternals;
   }
   if (typeof window !== 'undefined') {
     window.ElementInternals = MockElementInternals;
   }
 
   // Override attachInternals to always return our mock
-  const originalAttachInternals = HTMLElement.prototype.attachInternals;
   HTMLElement.prototype.attachInternals = function() {
     return new MockElementInternals();
   };
 
   // Suppress unhandled promise rejections from third-party components
+  // eslint-disable-next-line no-undef
   const originalUnhandledRejection = process.listeners('unhandledRejection')[0];
+  // eslint-disable-next-line no-undef
   process.removeAllListeners('unhandledRejection');
+  // eslint-disable-next-line no-undef
   process.on('unhandledRejection', (reason, promise) => {
     const reasonStr = reason?.toString() || '';
     const errorMsg = reason?.message || '';
@@ -258,8 +260,11 @@ beforeAll(() => {
   });
 
   // Also handle uncaught exceptions - but be more careful
+  // eslint-disable-next-line no-undef
   const originalUncaughtException = process.listeners('uncaughtException')[0];
+  // eslint-disable-next-line no-undef
   process.removeAllListeners('uncaughtException');
+  // eslint-disable-next-line no-undef
   process.on('uncaughtException', (error) => {
     const errorMsg = error?.message || '';
     const stackTrace = error?.stack || '';
