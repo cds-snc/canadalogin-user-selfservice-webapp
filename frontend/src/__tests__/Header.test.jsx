@@ -2,7 +2,7 @@ import React from "react";
 import { render, waitFor, screen } from "@testing-library/react";
 import { createMemoryRouter, RouterProvider } from "react-router";
 
-import { vi } from "vitest";
+import { vi, describe, beforeEach, it, expect } from "vitest";
 import RootLayout from "../components/Layout/RootLayout";
 import { authService } from "../services/authService.jsx";
 
@@ -10,7 +10,7 @@ import { UserProvider } from "../components/Providers/UserProvider";
 import { LanguageProvider } from "../components/Providers/LanguageProvider";
 
 // Only mock external dependencies, not the providers we want to test
-describe.only("RelyingPartyComponent", () => {
+describe("RelyingPartyComponent", () => {
   beforeEach(() => {
     // Mock window.matchMedia for useBreakpoints hook
     Object.defineProperty(window, "matchMedia", {
