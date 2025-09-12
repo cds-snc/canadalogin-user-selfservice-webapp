@@ -4,28 +4,26 @@ from datetime import datetime
 from fastapi import HTTPException
 from httpx import AsyncClient
 from app.config import get_configuration
+from app.utils.request_error_handler import RequestErrorHandler
 
 logger = logging.getLogger(__name__)
 lock = threading.Lock()
-settings = get_configuration().ibm_verify_config
 
 admin_token_ttl = 7170
 
 
-async def get_admin_token(global_http_client: AsyncClient()):
-    return await get_access_token(global_http_client)
-
-
-async def request_access_token(global_http_client: AsyncClient()):
+async def request_access_token(global_http_client: AsyncClient):
     """Request token from IBM Verify API"""
     try:
+        settings = get_configuration().ibm_verify_config
+
         token_url = f"{settings.IBM_VERIFY_TENANT_URL}/oauth2/token"
         logger.info(f"Attempting to get access token from: {token_url}")
 
         data = {
             "grant_type": "client_credentials",
-            "client_id": settings.IBM_VERIFY_API_CLIENT_ID,
-            "client_secret": settings.IBM_VERIFY_API_CLIENT_SECRET,
+            "client_id": settings.IBM_VERIFY_PROFILE_MANAGEMENT_API_CLIENT_ID,
+            "client_secret": settings.IBM_VERIFY_PROFILE_MANAGEMENT_API_SECRET,
             "scope": "openid",
         }
         logger.debug(f"Token URL: {token_url}")
@@ -35,23 +33,16 @@ async def request_access_token(global_http_client: AsyncClient()):
             data=data,
             headers={"Content-Type": "application/x-www-form-urlencoded"},
         )
-
-        if response.status_code != 200:
-            logger.error(f"Failed to get access token. Response: {response}")
-            raise HTTPException(
-                status_code=response.status_code,
-                detail="Failed to get access token",
-            )
+        response.raise_for_status()
         logger.info("Request returned successfully")
         return response
 
     except Exception as e:
-
         logger.error(f"Error requesting token: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=400, detail=f"Token request error: {str(e)}")
+        RequestErrorHandler.handle(e)
 
 
-async def get_access_token(global_http_client: AsyncClient()) -> str:
+async def get_admin_token(global_http_client: AsyncClient) -> str:
     """Get access token for IBM Verify API operations"""
     try:
         logger.info("Attempting to get access token")
@@ -60,17 +51,21 @@ async def get_access_token(global_http_client: AsyncClient()) -> str:
         response = await request_access_token(global_http_client)
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(f"Token request completed in {duration:.2f} seconds")
-
-        access_token = response.json().get("access_token")
+        response_json = response.json()
+        access_token = response_json.get("access_token")
         if not access_token:
-            logger.error(f"Failed to get access token. Response: {response}")
-            raise HTTPException(status_code=500, detail="Failed to get access token")
-        print(access_token)
+            logger.error(
+                "Failed to get access token. Status=%s, Body=%s",
+                response.status_code,
+                response.text,
+            )
+            raise HTTPException(status_code=400, detail="Server Error")
         return access_token
-
     except Exception as e:
-        logger.error(f"Error getting admin token: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=400, detail=f"Admin token error: {str(e)}")
+        if isinstance(e, HTTPException):
+            raise
+        logger.error("Unexpected error getting token", exc_info=True)
+        raise HTTPException(status_code=500, detail="Unexpected server error") from e
 
 
 def get_auth_request_headers(
@@ -105,6 +100,3 @@ def get_auth_request_headers(
         "Accept": "application/scim+json",
     }
     return headers
-
-
-SESSION_USER_ACCESS_TOKEN_KEY = "user_access_token"

@@ -37,13 +37,15 @@
 				"mermaidchart.vscode-mermaid-chart",
 				"eamodio.gitlens",
 				"github.vscode-github-actions",
-				"ms-vscode.makefile-tools"
+				"ms-vscode.makefile-tools",
+				"jebbs.plantuml",
+				"esbenp.prettier-vscode"
 			],
 			"settings": {
-				"[terraform]": {
-					"editor.formatOnSave": true
-				}
+				"editor.defaultFormatter": "esbenp.prettier-vscode",
+				"editor.formatOnSave": true
 			}
 		}
-	}
+	},
+	"postCreateCommand": "make install-dev-python && make install-frontend-deps"
 }

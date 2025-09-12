@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
@@ -7,16 +7,16 @@ import {
   TextField,
   Typography,
   CircularProgress,
-} from '@mui/material';
-import { authService } from '../services/authService';
+} from "@mui/material";
+import { authService } from "../services/authService";
 
 const SignIn = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [formData, setFormData] = useState({
-    userName: '',
-    password: '',
+    userName: "",
+    password: "",
   });
 
   const handleChange = (e) => {
@@ -29,25 +29,25 @@ const SignIn = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
-      console.log('Attempting sign in...');
+      console.log("Attempting sign in...");
       const response = await authService.passwordSignIn(formData);
-      console.log('Sign in successful');
-      
+      console.log("Sign in successful");
+
       if (response.access_token) {
-        localStorage.setItem('token', response.access_token);
+        localStorage.setItem("token", response.access_token);
         if (response.userInfo) {
-          localStorage.setItem('userInfo', JSON.stringify(response.userInfo));
+          localStorage.setItem("userInfo", JSON.stringify(response.userInfo));
         }
-        navigate('/dashboard');
+        navigate("/dashboard");
       } else {
-        throw new Error('No access token received');
+        throw new Error("No access token received");
       }
     } catch (err) {
-      console.error('Sign in error:', err);
-      setError(err.response?.data?.detail || err.message || 'Sign in failed');
+      console.error("Sign in error:", err);
+      setError(err.response?.data?.detail || err.message || "Sign in failed");
     } finally {
       setLoading(false);
     }
@@ -58,16 +58,20 @@ const SignIn = () => {
       <Box
         sx={{
           marginTop: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
         }}
       >
         <Typography component="h1" variant="h4" gutterBottom>
           Sign In
         </Typography>
 
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: '100%' }}>
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{ mt: 1, width: "100%" }}
+        >
           <TextField
             margin="normal"
             required
@@ -106,13 +110,13 @@ const SignIn = () => {
             sx={{ mt: 3, mb: 2 }}
             disabled={loading}
           >
-            {loading ? <CircularProgress size={24} /> : 'Sign In'}
+            {loading ? <CircularProgress size={24} /> : "Sign In"}
           </Button>
 
           <Button
             fullWidth
             variant="text"
-            onClick={() => navigate('/signup')}
+            onClick={() => navigate("/signup")}
             sx={{ mt: 1 }}
           >
             Don't have an account? Sign up
@@ -123,4 +127,4 @@ const SignIn = () => {
   );
 };
 
-export default SignIn; 
+export default SignIn;

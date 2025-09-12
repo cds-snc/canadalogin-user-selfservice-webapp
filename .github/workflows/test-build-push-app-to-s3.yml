@@ -1,0 +1,63 @@
+name: TEST Build Push App to S3
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "frontend/**"
+      - ".github/workflows/test-build-push-app-to-S3.yml"
+  workflow_dispatch:
+
+env:
+  AWS_REGION: ca-central-1
+  GITHUB_SHA: ${{ github.sha }}
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-push:
+    runs-on: ubuntu-latest
+    environment: "test"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - module: frontend
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "latest"
+
+      - name: configure aws credentials using OIDC role
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+        with:
+          role-to-assume: arn:aws:iam::${{vars.AWS_ACCOUNT_ID}}:role/github_action_push_S3
+          role-session-name: GHPushAppS3
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Environment Variables for build
+        run: |
+          echo "VITE_BACKEND_API_URL=${{ secrets.VITE_BACKEND_API_URL }}" >> $GITHUB_ENV
+          echo "VITE_GOOGLE_ANALYTICS_ID=${{ secrets.VITE_GOOGLE_ANALYTICS_ID }}" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        working-directory: ${{ matrix.module }}
+        run: |
+          npm install
+          npm run build
+
+      - name: Deploy App to S3
+        run: |
+          aws s3 sync ${{ matrix.module }}/dist s3://${{ secrets.FRONTEND_APP_S3_BUCKET }}
+
+      - name: Invalidate FRONTEND_APP_CLOUDFRONT_DISTRIBUTION cache
+        run: |
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.FRONTEND_APP_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/index.html"

@@ -1,35 +1,28 @@
-import { Suspense, StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
-import '@cdssnc/gcds-components-react/gcds.css';
-import App from './App.jsx';
+import { Suspense, StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "@cdssnc/gcds-components-react/gcds.css";
 //need to remove when demo code removed
-import './index.css';
-import { BrowserRouter } from "react-router";
+import "./index.css";
+import router from "./router";
+import { RouterProvider } from "react-router";
 import ReactGA from "react-ga4";
-import { UserProvider } from "./components/Providers/UserProvider";
 
 import config from "./config.jsx";
 
-console.log('Starting React application...here');// Debug log
-
 ReactGA.initialize(config.gatag, {
-    gaOptions: {
-        anonymize_ip: true
-    }
+  gaOptions: {
+    anonymize_ip: true,
+  },
 });
 try {
-    createRoot(document.getElementById('root')).render(
-        <StrictMode>
-            <Suspense fallback="Loading...">
-                <UserProvider>
-                    <BrowserRouter>
-                        <App />
-                    </BrowserRouter>
-                </UserProvider>
-            </Suspense>
-        </StrictMode>
-    );
-    console.log('React application rendered successfully'); // Debug log
+  createRoot(document.getElementById("root")).render(
+    <StrictMode>
+      <Suspense fallback="Loading...">
+        <RouterProvider router={router} />
+      </Suspense>
+    </StrictMode>,
+  );
+  console.log("React application rendered successfully"); // Debug log
 } catch (error) {
-    console.error('Error rendering React application:', error);
+  console.error("Error rendering React application:", error);
 }

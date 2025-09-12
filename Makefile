@@ -6,6 +6,9 @@ install-python:
 install-dev-python:
 	@pip install -r ./backend/requirements-dev.txt
 
+install-frontend-deps:
+	cd frontend && npm install
+
 fmt-python:
 	black . $(ARGS) --target-version py311
 

@@ -14,8 +14,8 @@ class AppInfo(BaseSettings):
 class IBMVerifyConfig(BaseSettings):
 
     IBM_VERIFY_TENANT_URL: str
-    IBM_VERIFY_API_CLIENT_ID: str
-    IBM_VERIFY_API_CLIENT_SECRET: str
+    IBM_VERIFY_PROFILE_MANAGEMENT_API_CLIENT_ID: str
+    IBM_VERIFY_PROFILE_MANAGEMENT_API_SECRET: str
     IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID: str
     IBM_VERIFY_PROFILE_MANAGEMENT_SECRET: str
     model_config = SettingsConfigDict(
@@ -61,6 +61,30 @@ class Configuration(BaseSettings):
     @property
     def oidc_well_known_config(self) -> str:
         return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.OIDC_WELL_KNOWN_CONFIG.value}"
+
+    @property
+    def rp_user_applications_api_endpoint(self) -> str:
+        return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.RP_USER_APPLICATIONS.value}"
+
+    @property
+    def password_resetter_api_endpoint(self) -> str:
+        return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.PASSWORD_RESETTER.value}"
+
+    @property
+    def introspect_token_api_endpoint(self) -> str:
+        return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.INTROSPECT_TOKEN.value}"
+
+    @property
+    def user_otp_factors_api_endpoint(self) -> str:
+        return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.USER_OTP_FACTORS.value}"
+
+    @property
+    def password_policy_api_endpoint(self) -> str:
+        return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.PASSWORDPOLICY.value}"
+
+    @property
+    def end_session_endpoint(self) -> str:
+        return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.END_SESSION_ENDPOINT.value}"
 
 
 @lru_cache

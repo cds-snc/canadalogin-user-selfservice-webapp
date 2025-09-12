@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Button,
   TextField,
@@ -11,22 +11,22 @@ import {
   Stepper,
   Step,
   StepLabel,
-} from '@mui/material';
-import KeyIcon from '@mui/icons-material/Key';
-import { authService } from '../services/authService';
+} from "@mui/material";
+import KeyIcon from "@mui/icons-material/Key";
+import { authService } from "../services/authService";
 
 const PasskeySignup = () => {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [formData, setFormData] = useState({
-    email: '',
-    firstName: '',
-    lastName: '',
+    email: "",
+    firstName: "",
+    lastName: "",
   });
 
-  const steps = ['Account Details', 'Create Passkey'];
+  const steps = ["Account Details", "Create Passkey"];
 
   const handleChange = (e) => {
     setFormData({
@@ -38,7 +38,7 @@ const PasskeySignup = () => {
   const handleSubmitAccountDetails = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
       const userData = {
@@ -46,26 +46,34 @@ const PasskeySignup = () => {
         name: {
           givenName: formData.firstName,
           familyName: formData.lastName,
-        }
+        },
       };
 
       await authService.signupWithPasskey(userData);
       setActiveStep(1);
-      navigate('/signin/passkey');  // Add redirect after successful registration
+      navigate("/signin/passkey"); // Add redirect after successful registration
     } catch (error) {
-      console.error('Passkey registration error:', error);
-      setError(error.response?.data?.detail || error.message || 'Registration failed');
+      console.error("Passkey registration error:", error);
+      setError(
+        error.response?.data?.detail || error.message || "Registration failed",
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Box sx={{ maxWidth: 'sm', mx: 'auto' }}>
-      <Typography variant="h1" component="h1" gutterBottom align="center" sx={{ mb: 4 }}>
+    <Box sx={{ maxWidth: "sm", mx: "auto" }}>
+      <Typography
+        variant="h1"
+        component="h1"
+        gutterBottom
+        align="center"
+        sx={{ mb: 4 }}
+      >
         Register with Passkey
       </Typography>
-      
+
       <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
         {steps.map((label) => (
           <Step key={label}>
@@ -75,9 +83,9 @@ const PasskeySignup = () => {
       </Stepper>
 
       {activeStep === 0 ? (
-        <Paper elevation={0} sx={{ p: 4, border: '1px solid #CCCCCC' }}>
-          <Box sx={{ textAlign: 'center', mb: 3 }}>
-            <KeyIcon sx={{ fontSize: 64, color: 'primary.main' }} />
+        <Paper elevation={0} sx={{ p: 4, border: "1px solid #CCCCCC" }}>
+          <Box sx={{ textAlign: "center", mb: 3 }}>
+            <KeyIcon sx={{ fontSize: 64, color: "primary.main" }} />
           </Box>
 
           <form onSubmit={handleSubmitAccountDetails}>
@@ -116,8 +124,8 @@ const PasskeySignup = () => {
                 {error}
               </Alert>
             )}
-            
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
               <Button
                 type="submit"
                 variant="contained"
@@ -125,12 +133,12 @@ const PasskeySignup = () => {
                 size="large"
                 fullWidth
               >
-                {loading ? <CircularProgress size={24} /> : 'Continue'}
+                {loading ? <CircularProgress size={24} /> : "Continue"}
               </Button>
-              
+
               <Button
                 variant="outlined"
-                onClick={() => navigate('/')}
+                onClick={() => navigate("/")}
                 size="large"
                 fullWidth
               >
@@ -140,14 +148,15 @@ const PasskeySignup = () => {
           </form>
         </Paper>
       ) : (
-        <Paper elevation={0} sx={{ p: 4, border: '1px solid #CCCCCC' }}>
-          <Box sx={{ textAlign: 'center', mb: 3 }}>
-            <KeyIcon sx={{ fontSize: 64, color: 'primary.main' }} />
+        <Paper elevation={0} sx={{ p: 4, border: "1px solid #CCCCCC" }}>
+          <Box sx={{ textAlign: "center", mb: 3 }}>
+            <KeyIcon sx={{ fontSize: 64, color: "primary.main" }} />
             <Typography variant="h2" gutterBottom>
               Create Your Passkey
             </Typography>
             <Typography variant="body1" sx={{ mb: 4 }}>
-              Follow your device's prompts to create a passkey. This will allow you to sign in securely without a password.
+              Follow your device's prompts to create a passkey. This will allow
+              you to sign in securely without a password.
             </Typography>
             <Typography variant="body2" color="text.secondary">
               Once completed, you'll be redirected to sign in.
@@ -156,13 +165,16 @@ const PasskeySignup = () => {
         </Paper>
       )}
 
-      <Box sx={{ mt: 4, textAlign: 'center' }}>
+      <Box sx={{ mt: 4, textAlign: "center" }}>
         <Typography variant="body2" color="text.secondary">
-          Already have an account? <Button variant="text" onClick={() => navigate('/signin/passkey')}>Sign in with Passkey</Button>
+          Already have an account?{" "}
+          <Button variant="text" onClick={() => navigate("/signin/passkey")}>
+            Sign in with Passkey
+          </Button>
         </Typography>
       </Box>
     </Box>
   );
 };
 
-export default PasskeySignup; 
+export default PasskeySignup;

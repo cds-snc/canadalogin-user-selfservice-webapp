@@ -6,6 +6,7 @@ from pydantic import ValidationError
 
 from app.users.schemas import ProfileGetResponseData, ProfileResponse, ProfilePUTData
 from app.utils.access_token import get_auth_request_headers
+from app.config import get_configuration
 
 logger = logging.getLogger(__name__)
 
@@ -40,6 +41,9 @@ async def update_profile(
             data=response_data,
         )
     else:
+        if response.status_code == 401:
+            logger.error("User is not authenticated.")
+            raise HTTPException(status_code=401, detail="Not authenticated")
         logger.error(f"Failed to save profile. Response: {response.text}")
         error_details = response.json().get("detail")
         raise HTTPException(
@@ -47,10 +51,11 @@ async def update_profile(
         )
 
 
-async def my_profile(
-    global_http_client: AsyncClient, user_access_token: str, profile_api_endpoint: str
-):
+async def my_profile(global_http_client: AsyncClient, user_access_token: str):
     try:
+        settings = get_configuration()
+
+        profile_api_endpoint = settings.profile_api_endpoint
         logger.info("Get my profile")
         headers = get_auth_request_headers(user_access_token)
         response = await global_http_client.get(profile_api_endpoint, headers=headers)
