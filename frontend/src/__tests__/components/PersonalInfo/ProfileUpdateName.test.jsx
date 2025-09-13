@@ -18,40 +18,15 @@ vi.mock("react-router", async () => {
   };
 });
 
-// Mock authService
-vi.mock("../../../services/authService.jsx", () => ({
-  get_my_user_profile: vi.fn().mockResolvedValue({
-    active: true,
-    id: "test-user-123",
-    name: {
-      givenName: "Test",
-      familyName: "User",
-      formatted: "Test User",
-    },
-    emails: [{ type: "primary", value: "test@example.com" }],
-    phoneNumbers: [{ type: "primary", value: "+1234567890" }],
-    preferredLanguage: "en",
-    details: {
-      emailVerified: true,
-      twoFactorAuthentication: true,
-      lastLogin: "2025-09-08T12:00:00Z",
-      lastMFA: "2025-09-08T12:00:00Z",
-      pwdChangedTime: "2025-09-08T12:00:00Z",
-    },
-    meta: {
-      created: "2025-09-08T12:00:00Z",
-      lastModified: "2025-09-08T12:00:00Z",
-      location: "test",
-      resourceType: "User",
-    },
-  }),
-  updateUser: vi.fn().mockResolvedValue({ success: true }),
-}));
-
 // Mock the navigate helper
 const mockNavigateHelper = vi.fn();
 vi.mock("../../../hooks/useNavigate.tsx", () => ({
   useNavigateHelper: () => mockNavigateHelper,
+}));
+
+// Mock the redirect function to prevent navigation errors
+vi.mock("../../../utils/redirect.jsx", () => ({
+  redirectToLogin: vi.fn(),
 }));
 
 const mockUserState = {

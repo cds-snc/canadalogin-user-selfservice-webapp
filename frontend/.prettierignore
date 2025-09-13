@@ -2,3 +2,5 @@
 node_modules
 old_custom_implementation
 public/mockServiceWorker.js
+coverage/
+.vscode/
