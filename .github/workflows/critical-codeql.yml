@@ -1,0 +1,9 @@
+name: "Example bad workflow"
+on: issue_comment
+
+jobs:
+  echo-body:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo '${{ github.event.comment.body }}'
