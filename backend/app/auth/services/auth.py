@@ -1,8 +1,13 @@
 import logging
 from urllib.parse import urlencode
-from fastapi import Request
+from typing import Dict, Any
+from fastapi import Request, HTTPException
 from fastapi.responses import RedirectResponse
 from authlib.integrations.starlette_client import OAuthError
+from authlib.jose import jwt, JsonWebKey 
+from authlib.jose.errors import JoseError  
+from authlib.jose.rfc7519.jwt import create_load_key  
+from starsessions.session import get_session_handler
 from app.auth.services.oidc_config import oauth
 from app.config import get_configuration
 from app.constants.session_keys import SessionKeys
@@ -157,8 +162,152 @@ async def logout_user(request: Request, id_token: str):
         RequestErrorHandler.handle(e, context="Unexpected error during logout")
 
 
-async def backchannel_logout(request: Request):
-    # placeholder for backchannel logout logic
-    return ResponseModel(
-        success=True, data=None, message="Backchannel logout successful"
-    )
+async def backchannel_logout(request: Request, form_data: Dict[str, Any]):
+
+    try:
+        claims = await validate_logout_token(request, form_data)
+        sid = claims.get('sid')
+        jti = claims.get('jti')  # JWT ID - unique identifier for the logout token
+        logger.debug(f"Backchannel logout for sid: {sid}, jti: {jti}")
+
+        # Ensure jti is present (it should be based on validation)
+        if not jti:
+            logger.error("Missing jti claim in logout token")
+            raise ValueError("Missing jti claim in logout token")
+
+        # Check if this logout token has already been processed
+        if await _is_logout_token_processed(request, jti):
+            logger.info(f"Logout token {jti} already processed, ignoring duplicate request")
+            return ResponseModel(
+                success=True, data=None, message="Backchannel logout already processed"
+            )
+
+        # Mark this logout token as processed to prevent duplicate processing
+        await _mark_logout_token_as_processed(request, jti)
+
+        # Try to get Redis client from the application state
+        redis_client = getattr(request.app.state, 'redis_client', None)
+        logger.info(f"Processing backchannel logout for sid: {sid}")
+        if redis_client is not None:
+            # Use Redis to check if token was processed
+            cache_key = f"session:{sid}"
+            await redis_client.delete(cache_key)
+
+        return ResponseModel(
+            success=True, data=None, message="Backchannel logout successful"
+        )
+    except ValueError as ve:
+        logger.error(f"Value error during backchannel logout: {ve}")
+        raise HTTPException(status_code=400, detail=str(ve)) from ve
+    except Exception as e:
+        logger.exception("Unexpected error during backchannel logout", str(e))
+        # IBM Verify expects a 400 response for any error during backchannel logout
+        raise HTTPException(status_code=400, detail="Internal error during backchannel logout")
+
+async def validate_logout_token(request: Request, form_data: Dict[str, Any]):  
+    """Validate logout token using your registered OAuth client"""  
+    if form_data is None:  
+        raise ValueError("Request must be a form submission")
+    logout_token = form_data.get('logout_token')
+    if not logout_token:  
+        raise ValueError("Missing logout_token parameter")  
+
+    # Get your registered client  
+    client = oauth.verify  
+    jwk_set_data = await client.fetch_jwk_set()  
+    load_key = create_load_key(jwk_set_data)  
+      
+    # Configure logout token specific claims  
+    claims_options = {  
+        'aud': {'essential': True, 'value': client.client_id},  
+        'iat': {'essential': True},  
+        'jti': {'essential': True},  
+        'events': {'essential': True, 'validate': _validate_logout_events},  
+        'sid': {'essential': False},    # Session ID (optional)  
+        'sub': {'essential': False},    # Subject (optional)  
+        'nonce': {'essential': False, 'validate': _reject_nonce},  # Must be None  
+    }  
+      
+    try:  
+        claims = jwt.decode(  
+            logout_token,  
+            key=load_key,  
+            claims_options=claims_options  
+        )  
+        claims.validate(leeway=120)  
+        return claims  
+    except JoseError as e:  
+        raise ValueError(f"Invalid logout token: {e}")  
+  
+def _validate_logout_events(claims, events):  
+    """Validate the events claim contains logout event"""  
+    logout_events = [  
+        'http://schemas.openid.net/event/backchannel-logout'   
+    ]  
+    return any(event in events for event in logout_events)  
+  
+def _reject_nonce(claims, nonce):  
+    """Logout tokens MUST NOT contain nonce"""  
+    return nonce is None
+
+
+async def _is_logout_token_processed(request: Request, jti: str) -> bool:
+    """
+    Check if a logout token (identified by jti) has already been processed.
+    
+    Args:
+        request: FastAPI request object
+        jti: JWT ID from the logout token
+        
+    Returns:
+        bool: True if the token has already been processed, False otherwise
+    """
+    if not jti:
+        return False
+        
+    # Try to get Redis client from the application state
+    redis_client = getattr(request.app.state, 'redis_client', None)
+    
+    if redis_client is not None:
+        # Use Redis to check if token was processed
+        cache_key = f"processed_logout_token:{jti}"
+        result = await redis_client.get(cache_key)
+        return result is not None
+    else:
+        # Fallback to in-memory storage (not recommended for production)
+        # This is for local development or when Redis is not available
+        if not hasattr(request.app.state, 'processed_logout_tokens'):
+            request.app.state.processed_logout_tokens = set()
+        return jti in request.app.state.processed_logout_tokens
+
+
+async def _mark_logout_token_as_processed(request: Request, jti: str, expiration_seconds: int = 1800):
+    """
+    Mark a logout token (identified by jti) as processed to prevent duplicate processing.
+    
+    Args:
+        request: FastAPI request object
+        jti: JWT ID from the logout token
+        expiration_seconds: How long to remember this token (default: 24 hours)
+    """
+    if not jti:
+        return
+        
+    # Try to get Redis client from the application state
+    redis_client = getattr(request.app.state, 'redis_client', None)
+    
+    if redis_client is not None:
+        # Use Redis to store the processed token with expiration
+        cache_key = f"processed_logout_token:{jti}"
+        await redis_client.setex(cache_key, expiration_seconds, "processed")
+        logger.debug(f"Marked logout token {jti} as processed in Redis with {expiration_seconds}s expiration")
+    else:
+        # Fallback to in-memory storage (not recommended for production)
+        # This is for local development or when Redis is not available
+        if not hasattr(request.app.state, 'processed_logout_tokens'):
+            request.app.state.processed_logout_tokens = set()
+        request.app.state.processed_logout_tokens.add(jti)
+        logger.debug(f"Marked logout token {jti} as processed in memory (fallback)")
+        
+        # Note: In-memory storage doesn't have automatic expiration
+        # In production, always use Redis or another persistent cache

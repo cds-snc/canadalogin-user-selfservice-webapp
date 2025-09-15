@@ -69,4 +69,7 @@ async def logout(request: Request, id_token: str = Depends(get_users_id_token)):
 
 @router.post("/backchannel-logout")
 async def handle_backchannel_logout(request: Request):
-    return await backchannel_logout(request)
+    form_data = await request.form()
+    # Convert FormData to dict for easier handling
+    form_dict = dict(form_data)
+    return await backchannel_logout(request, form_dict)
