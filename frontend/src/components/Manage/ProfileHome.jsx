@@ -20,102 +20,6 @@ import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
 import ViewContactPhoneNumber from "../../features/ContactPhoneNumber/components/ViewContactPhoneNumber.jsx"
 
 
-
-// const DisplayPhoneNumbers = ({ phoneNumbers }) => {
-//   console.log("phoneNumbers", phoneNumbers)
-
-//   return (
-//     <>
-
-//       <GcdsGrid columns="1fr">
-
-//         {
-//           phoneNumbers.map((phoneNumber, index) => {
-//             let profilePhoneNumber = `+${phoneNumber.value}`;
-//             let numberType = capitalizeFirstLetter(phoneNumber.type)
-//             const isLast = index === phoneNumbers.length - 1;
-
-//             try {
-
-//               const parsedPhoneNumber = parsePhoneNumberFromString(profilePhoneNumber);
-
-//               if (parsedPhoneNumber) {
-//                 profilePhoneNumber = parsedPhoneNumber.formatInternational();
-//               }
-//             } catch (error) {
-//               console.warn(`Failed to parse phone number: ${phoneNumber.value}`);
-//               console.warn(`Failed to parse phone number: ${error}`);
-//             }
-//             return (
-//               <GcdsText key={index} margin-bottom={isLast ? '400' : '0'} placeContent="center">
-//                 {numberType}: {profilePhoneNumber}
-//               </GcdsText>
-//             )
-
-//           })
-//         }
-//       </GcdsGrid>
-
-//     </>
-//   )
-// }
-
-// const AddPhoneNumber = (props) => {
-//   const { pageContent } = props;
-//   return (
-//     <>
-
-//       <GcdsHeading tag="h3" marginTop='300'>{pageContent['10']}</GcdsHeading>
-//       <GcdsText>{pageContent['11']} No contact phone number added</GcdsText>
-
-//       <GcdsGrid columns="1fr auto" className="gridInline">
-
-//         <GcdsLink href="#" size="regular">
-//           {pageContent['5']}
-//         </GcdsLink>
-//       </GcdsGrid>
-
-//       <gcds-grid columns="auto auto" className="verifiedBadge verifiedBadgeBottom">
-//         <gcds-icon name="check" className="verifiedIcon" size="md" />
-//         <gcds-text className="verifiedText">
-//           {pageContent['9']}
-//         </gcds-text>
-//       </gcds-grid>
-//     </>
-//   )
-// }
-
-// const ContactPhoneNumber = (props) => {
-//   const { pageContent, phoneNumbers } = props;
-//   return (
-//     <>
-
-//       <GcdsHeading tag="h3" marginTop='300'>{pageContent['10']}</GcdsHeading>
-//       <GcdsText>{pageContent['11']}</GcdsText>
-
-//       <GcdsGrid columns="1fr auto" className="gridInline">
-//         <DisplayPhoneNumbers phoneNumbers={phoneNumbers} />
-
-//         <GcdsLink href="#" size="regular">
-//           {pageContent['5']}
-//         </GcdsLink>
-//       </GcdsGrid>
-
-<GcdsGrid
-  columns="auto auto"
-  className="verifiedBadge verifiedBadgeBottom"
->
-  <GcdsIcon
-    name="checkmark-circle"
-    className="verifiedIcon"
-    size="text"
-  />
-  <GcdsText className="verifiedText">{pageContent["9"]}</GcdsText>
-</GcdsGrid>
-    </>
-  );
-};
-
 export default function ProfileHome() {
   const { language } = useParams();
   const pageContent = getPageContent(language, PAGES.ProfileHome);
@@ -181,15 +85,14 @@ export default function ProfileHome() {
             {pageContent["9"]}
           </GcdsText>
         </GcdsGrid>
-        {phoneNumbers != null ? (
-          <>
-            <div className="separator" />
-            <ContactPhoneNumber
-              pageContent={pageContent}
-              phoneNumbers={phoneNumbers}
-            />
-          </>
-        ) : null}
+
+        <div className="separator" />
+        <ViewContactPhoneNumber
+          pageContent={pageContent}
+          phoneNumbers={phoneNumbers}
+        />
+
+
       </GcdsContainer>
 
       <GcdsHeading tag="h2">{pageContent["12"]}</GcdsHeading>

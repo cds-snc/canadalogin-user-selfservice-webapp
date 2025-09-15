@@ -72,8 +72,6 @@ const AddPhoneNumber = (props) => {
     const updateContactPhoneNumber = `/${language}${NAVIGATION_LINKS.updateContactPhoneNumber}`;
     return (
         <>
-
-
             <GcdsGrid columns="1fr auto" className="gridInline">
                 <GcdsText>{pageContent['18']}</GcdsText>
 
