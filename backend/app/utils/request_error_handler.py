@@ -37,12 +37,13 @@ class RequestErrorHandler:
                 body = RequestErrorHandler.extract_response_body(exc.response)
 
                 logger.error(
-                    "%s failed (status=%s, url=%s, messageId=%s, message=%s)",
+                    "%s failed (status=%s, url=%s, messageId=%s, message=%s, detail=%s)",
                     context,
                     response_status_code,
                     url,
                     body.get("messageId", "N/A"),
                     body.get("message", "N/A"),
+                    body.get("detail", "N/A"),
                 )
 
                 if response_status_code == status.HTTP_429_TOO_MANY_REQUESTS:

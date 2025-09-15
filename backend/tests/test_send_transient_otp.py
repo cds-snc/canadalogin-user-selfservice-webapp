@@ -1,68 +1,131 @@
 from unittest.mock import patch, AsyncMock, MagicMock
 import pytest
 from httpx import AsyncClient
-from fastapi import HTTPException  # Import HTTPException
+from fastapi import HTTPException
 from app.otp.schemas import OtpType, UserOtpInfo
-from app.otp.services.send_transient_otp import handle_otp_send, dispatch_otp
+from app.otp.services.send_transient_otp import (
+    handle_otp_send,
+    dispatch_otp,
+)
 
 
 @pytest.mark.asyncio
 async def test_handle_otp_send_success():
-    mock_response = MagicMock()
-    mock_response.status_code = 201
-    mock_response.json.return_value = {
-        "id": "1e5fa156-3754-4265-8796-1a2f0a6f036f",
-        "type": "smsotp",
-        "created": "2018-07-16T02:13:47.719Z",
-        "updated": "2018-07-16T02:13:47.719Z",
-        "expiry": "2018-07-16T02:13:47.719Z",
-        "state": "PENDING",
-        "updatedBy": "50CP15KFD3",
-        "correlation": "4567",
-        "phoneNumber": "+15345678911",
-        "attempts": 0,
-        "retries": 4,
-    }
-
     user = UserOtpInfo(
         phoneNumber="+19025555555",
         userName="testUser@testUser.com",
         otpType=OtpType.SMS,
     )
 
+    # Mock my_profile response with matching userName
+    mock_profile_response = MagicMock()
+    mock_profile_response.data = MagicMock()
+    mock_profile_response.data.userName = user.userName
+
+    # Mock dispatch_otp response (successful)
+    mock_dispatch_response = MagicMock()
+    mock_dispatch_response.status_code = 201
+    mock_dispatch_response.json.return_value = {
+        "id": "some-id",
+        "type": "smsotp",
+        "state": "PENDING",
+        "correlation": "correlation-id",
+        "phoneNumber": user.phoneNumber,
+        "created": "2025-09-11T10:00:00Z",
+        "updated": "2025-09-11T10:01:00Z",
+        "expiry": "2025-09-11T10:05:00Z",
+        "attempts": 0,
+        "retries": 0,
+    }
     with (
         patch(
-            "app.otp.services.send_transient_otp.dispatch_otp",
-            return_value=mock_response,
-        ) as dispatcher,
+            "app.otp.services.send_transient_otp.my_profile", new_callable=AsyncMock
+        ) as mock_my_profile,
+        patch(
+            "app.otp.services.send_transient_otp.dispatch_otp", new_callable=AsyncMock
+        ) as mock_dispatch_otp,
     ):
-        response = await handle_otp_send(AsyncMock(), user)
-        dispatcher.assert_called_once()
-        assert response.success
-        assert response.data
+
+        mock_my_profile.return_value = mock_profile_response
+        mock_dispatch_otp.return_value = mock_dispatch_response
+
+        response = await handle_otp_send(AsyncMock(), user, "fake-token")
+
+        mock_my_profile.assert_called_once()
+        mock_dispatch_otp.assert_called_once()
+        assert response.success is True
+        assert response.data.phoneNumber == user.phoneNumber
 
 
 @pytest.mark.asyncio
 async def test_handle_otp_send_error():
-    mock_response = MagicMock()
-    mock_response.status_code = 400
-    mock_response.json.return_value = {"error": "Invalid request"}
-
     user = UserOtpInfo(
         phoneNumber="+19025555555",
         userName="testUser@testUser.com",
         otpType=OtpType.SMS,
     )
 
-    with patch(
-        "app.otp.services.send_transient_otp.dispatch_otp", return_value=mock_response
-    ) as dispatcher:
-        response = await handle_otp_send(AsyncMock(), user)
-        dispatcher.assert_called_once()
-        assert (
-            not response.success
-        )  # Validate the `success` attribute of the ResponseModel
+    # Mock my_profile response with matching userName
+    mock_profile_response = MagicMock()
+    mock_profile_response.data = MagicMock()
+    mock_profile_response.data.userName = user.userName
+
+    # Mock dispatch_otp response with error code != 201
+    mock_dispatch_response = MagicMock()
+    mock_dispatch_response.status_code = 400
+    mock_dispatch_response.json.return_value = {"error": "Invalid request"}
+
+    with (
+        patch(
+            "app.otp.services.send_transient_otp.my_profile", new_callable=AsyncMock
+        ) as mock_my_profile,
+        patch(
+            "app.otp.services.send_transient_otp.dispatch_otp", new_callable=AsyncMock
+        ) as mock_dispatch_otp,
+    ):
+
+        mock_my_profile.return_value = mock_profile_response
+        mock_dispatch_otp.return_value = mock_dispatch_response
+
+        response = await handle_otp_send(AsyncMock(), user, "fake-token")
+
+        mock_my_profile.assert_called_once()
+        mock_dispatch_otp.assert_called_once()
+        assert response.success is False
         assert response.message == "Invalid request"
+
+
+@pytest.mark.asyncio
+async def test_handle_otp_send_user_mismatch():
+    user = UserOtpInfo(
+        phoneNumber="+19025555555",
+        userName="testUser@testUser.com",
+        otpType=OtpType.SMS,
+    )
+
+    # Mock my_profile response with DIFFERENT userName (user mismatch)
+    mock_profile_response = MagicMock()
+    mock_profile_response.data = MagicMock()
+    mock_profile_response.data.userName = "otherUser@testUser.com"
+
+    with (
+        patch(
+            "app.otp.services.send_transient_otp.my_profile", new_callable=AsyncMock
+        ) as mock_my_profile,
+        patch(
+            "app.otp.services.send_transient_otp.dispatch_otp", new_callable=AsyncMock
+        ) as mock_dispatch_otp,
+    ):
+
+        mock_my_profile.return_value = mock_profile_response
+
+        response = await handle_otp_send(AsyncMock(), user, "fake-token")
+
+        mock_my_profile.assert_called_once()
+        mock_dispatch_otp.assert_not_called()
+
+        assert response.status_code == 403
+        assert "User mismatch" in response.body.decode()
 
 
 @pytest.mark.asyncio

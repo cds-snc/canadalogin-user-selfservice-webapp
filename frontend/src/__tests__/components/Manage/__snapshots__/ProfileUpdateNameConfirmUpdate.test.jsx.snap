@@ -1,0 +1,49 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ProfileUpdateNameConfirmUpdate Component > matches snapshot 1`] = `
+<div>
+  <gcds-container>
+    <gcds-heading>
+      Are you sure you want to update your name?
+    </gcds-heading>
+    <gcds-text>
+      You’ve requested to update your name to:
+       
+      <strong>
+        Test User
+      </strong>
+      .
+    </gcds-text>
+    <gcds-text>
+      This will update your name with the following services:
+    </gcds-text>
+    <ul>
+      <li>
+        GEO.ca
+      </li>
+      <li>
+        Digital Talent
+      </li>
+    </ul>
+    <gcds-notice>
+      <gcds-text>
+        This 
+        <strong>
+          does not 
+        </strong>
+        legally change your name.
+      </gcds-text>
+    </gcds-notice>
+    <gcds-grid
+      align-items="center"
+    >
+      <gcds-button>
+        Yes, update
+      </gcds-button>
+      <gcds-button>
+        Cancel
+      </gcds-button>
+    </gcds-grid>
+  </gcds-container>
+</div>
+`;

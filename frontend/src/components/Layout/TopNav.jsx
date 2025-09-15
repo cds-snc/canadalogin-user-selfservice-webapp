@@ -10,12 +10,16 @@ import {
 } from "@cdssnc/gcds-components-react";
 import { useBreakpoints } from "../../hooks/useBreakpoints";
 import { getPageContent } from "../../utils/functions.jsx";
+import { path } from "../../utils/routeHelpers.js";
 import { useUser } from "../Providers/useUser";
-import { NAVIGATION_LINKS } from "../../utils/constants.jsx";
+import { PAGES } from "../../utils/constants.jsx";
+import { authService } from "../../services/authService.jsx";
+import { userProfileDispatch } from "../../utils/userProfileDispatch.jsx";
 
 export default function TopNav({ currentLang }) {
   const pageContentJson = getPageContent(currentLang, "TopNavBar");
-  const { state } = useUser();
+  const { state, dispatch } = useUser();
+  const { setLoading } = userProfileDispatch(dispatch);
 
   const relyingPartyLinkName = state.relyingPartyInfo?.linkName;
   const relyingPartyUrl = state.relyingPartyInfo?.url;
@@ -23,15 +27,42 @@ export default function TopNav({ currentLang }) {
 
   const { mobile, tablet } = useBreakpoints();
 
+  const homeLink = path(PAGES.manageDashboard, { language: currentLang });
+  const profileLink = path(PAGES.ProfileHome, { language: currentLang });
+  const securitySettingsLink = path(PAGES.securitySettings, {
+    language: currentLang,
+  });
+
+  const handleLogout = async (e) => {
+    e.preventDefault();
+    setLoading(true, pageContentJson["8"]); // Use logout loading text
+
+    try {
+      const response = await authService.logout();
+
+      // Check if response has redirect_url and redirect
+      if (response && response.data && response.data.redirect_url) {
+        window.location.href = response.data.redirect_url;
+      } else {
+        // Fallback redirect if no redirect_url provided
+        window.location.href = "/";
+      }
+    } catch (error) {
+      console.error("Logout failed:", error);
+      // Update loading text to show error
+      setLoading(true, pageContentJson["9"]);
+      // Redirect after error
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 2000);
+    }
+  };
+
   const navLinksJsx = (
     <>
-      <GcdsNavLink href={`/${currentLang}/`}>
-        {pageContentJson["3"]}
-      </GcdsNavLink>
-      <GcdsNavLink href={`/${currentLang}${NAVIGATION_LINKS.profileHome}`}>
-        {pageContentJson["4"]}
-      </GcdsNavLink>
-      <GcdsNavLink href={`/${currentLang}${NAVIGATION_LINKS.securitySettings}`}>
+      <GcdsNavLink href={homeLink}>{pageContentJson["3"]}</GcdsNavLink>
+      <GcdsNavLink href={profileLink}>{pageContentJson["4"]}</GcdsNavLink>
+      <GcdsNavLink href={securitySettingsLink}>
         {pageContentJson["5"]}
       </GcdsNavLink>
       {shouldRenderRelyingPartyLink && (
@@ -39,42 +70,42 @@ export default function TopNav({ currentLang }) {
           {pageContentJson["6"] + relyingPartyLinkName}
         </GcdsNavLink>
       )}
-      <GcdsNavLink href="#">{pageContentJson["7"]}</GcdsNavLink>
+      <GcdsNavLink href="#" onClick={handleLogout}>
+        {pageContentJson["7"]}
+      </GcdsNavLink>
     </>
   );
 
-  if (mobile || tablet) {
-    return (
-      <>
-        <GcdsContainer slot="menu">
-          <div className="gcds-top-nav-container">
-            <div className="gcds-top-nav-width-spacer">
-              <GcdsText marginBottom="0">
-                <strong>{pageContentJson["1"]}</strong>
-              </GcdsText>
-            </div>
+  const renderMobileNavigation = () => (
+    <>
+      <GcdsContainer slot="menu">
+        <div className="gcds-top-nav-container">
+          <div className="gcds-top-nav-width-spacer">
+            <GcdsText marginBottom="0">
+              <strong>{pageContentJson["1"]}</strong>
+            </GcdsText>
           </div>
-        </GcdsContainer>
-        <GcdsTopNav
-          slot="menu"
-          label="Top navigation"
-          alignment="right"
-          lang={currentLang}
-        >
-          {navLinksJsx}
-        </GcdsTopNav>
-      </>
-    );
-  }
+        </div>
+      </GcdsContainer>
+      <GcdsTopNav
+        slot="menu"
+        label="Top navigation"
+        alignment="right"
+        lang={currentLang}
+      >
+        {navLinksJsx}
+      </GcdsTopNav>
+    </>
+  );
 
-  return (
+  const renderDesktopNavigation = () => (
     <GcdsTopNav
       slot="menu"
       label="Top navigation"
       alignment="right"
       className="gcds-top-nav"
     >
-      <GcdsNavLink href="/" slot="home">
+      <GcdsNavLink href={homeLink} slot="home">
         {pageContentJson["1"]}
       </GcdsNavLink>
       <GcdsNavGroup open-trigger="Menu" menu-label="Menu">
@@ -82,4 +113,12 @@ export default function TopNav({ currentLang }) {
       </GcdsNavGroup>
     </GcdsTopNav>
   );
+
+  const renderNavigation = () => {
+    return mobile || tablet
+      ? renderMobileNavigation()
+      : renderDesktopNavigation();
+  };
+
+  return renderNavigation();
 }

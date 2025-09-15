@@ -15,7 +15,8 @@ logger = logging.getLogger(__name__)
 
 
 async def handle_otp_verification(
-    global_http_client: AsyncClient, user_verification_data: UserOtpVerificationInfo
+    global_http_client: AsyncClient,
+    user_verification_data: UserOtpVerificationInfo,
 ):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
@@ -23,8 +24,7 @@ async def handle_otp_verification(
         logger.info(f"Attempting to verify {user_verification_data.otpType} OTP")
         start_time = datetime.now()
         otp_verification_response = await verify_otp(
-            global_http_client,
-            user_verification_data,
+            global_http_client, user_verification_data
         )
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(
@@ -46,7 +46,7 @@ async def handle_otp_verification(
 
         return ResponseModel(  # Plain ResponseModel since the response has no content
             success=True,
-            message=f"{user_verification_data.otpType} OTP has been verified",
+            message=f"{user_verification_data.otpType.value} OTP has been verified",
         )
 
     except HTTPException as he:
@@ -91,7 +91,6 @@ async def verify_otp(
 
         else:
             return generate_error_response(400, "Unknown error")
-
         response = await global_http_client.post(
             verification_endpoint_url, json=otp, headers=headers
         )

@@ -7,6 +7,8 @@ from pydantic import ValidationError
 
 from app.config import get_configuration
 from app.otp.schemas import UserOtpInfo, OtpType, OtpDataResponse
+
+from app.users.services.profile import my_profile
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.helpers import (
     generate_error_response,
@@ -17,13 +19,20 @@ from app.utils.schemas import ResponseModel
 logger = logging.getLogger(__name__)
 
 
-async def handle_otp_send(global_http_client: AsyncClient, user_otp_info: UserOtpInfo):
+async def handle_otp_send(
+    global_http_client: AsyncClient, user_otp_info: UserOtpInfo, user_access_token: str
+):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
 
     try:
         logger.info(f"Attempting to send {user_otp_info.otpType} OTP")
         start_time = datetime.now()
+        my_profile_response = await my_profile(global_http_client, user_access_token)
+        if my_profile_response.data.userName != user_otp_info.userName:
+            logger.error("User mismatch - cannot send OTP")
+            return generate_error_response(403, "User mismatch - cannot send OTP")
+        logger.info("User verified to send OTP")
         http_client_response = await dispatch_otp(global_http_client, user_otp_info)
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(
