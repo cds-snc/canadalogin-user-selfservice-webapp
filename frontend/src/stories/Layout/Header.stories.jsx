@@ -1,4 +1,6 @@
 import Header from "../../components/Layout/Header.jsx";
+import { UserProvider } from "../../components/Providers/UserProvider";
+import { LanguageProvider } from "../../components/Providers/LanguageProvider";
 
 export default {
   title: "GC Sign In/Layout/Header",
@@ -9,6 +11,16 @@ export default {
     // More on how to position stories at: https://storybook.js.org/docs/configure/story-layout
     layout: "fullscreen",
   },
+  decorators: [
+    // eslint-disable-next-line no-unused-vars
+    (Story) => (
+      <UserProvider>
+        <LanguageProvider>
+          <Story />
+        </LanguageProvider>
+      </UserProvider>
+    ),
+  ],
 };
 
 export const English = {

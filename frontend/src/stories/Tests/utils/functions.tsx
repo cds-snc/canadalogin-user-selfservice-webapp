@@ -7,7 +7,7 @@ import {
   TEST_TYPES,
   TestDataUserProvider,
 } from "./constants.jsx";
-import Page from "../../../views/Page.js";
+import PageRenderer from "./PageRenderer.jsx";
 import { UserProvider } from "../../../components/Providers/UserProvider";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider.tsx";
 
@@ -286,7 +286,7 @@ export const Template = (args: any) => {
   return (
     <UserProvider initial={TestDataUserProvider}>
       <LanguageProvider>
-        <Page page={args.page} />
+        <PageRenderer page={args.page} />
       </LanguageProvider>
     </UserProvider>
   );
@@ -308,7 +308,7 @@ export const TestTemplate = (args: any) => {
   return (
     <UserProvider initial={TestDataUserProvider}>
       <LanguageProvider>
-        <Page page={args.page} />
+        <PageRenderer page={args.page} />
         <button aria-label="test" type="submit" form="form"></button>
       </LanguageProvider>
     </UserProvider>
