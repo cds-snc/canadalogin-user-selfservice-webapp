@@ -1,20 +1,16 @@
 import React from "react";
 import { render, waitFor, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router";
+import { createMemoryRouter, RouterProvider } from "react-router";
 
-import { vi } from "vitest";
-import App from "../App";
+import { vi, describe, beforeEach, it, expect } from "vitest";
+import RootLayout from "../components/Layout/RootLayout";
 import { authService } from "../services/authService.jsx";
 
 import { UserProvider } from "../components/Providers/UserProvider";
 import { LanguageProvider } from "../components/Providers/LanguageProvider";
 
 // Only mock external dependencies, not the providers we want to test
-
-const langHref = "/fr";
-const currentLang = "en";
-
-describe.only("RelyingPartyComponent", () => {
+describe("RelyingPartyComponent", () => {
   beforeEach(() => {
     // Mock window.matchMedia for useBreakpoints hook
     Object.defineProperty(window, "matchMedia", {
@@ -57,16 +53,27 @@ describe.only("RelyingPartyComponent", () => {
       },
     });
 
-    // Render with real providers and URL query parameter to trigger relying party logic
-    render(
-      <MemoryRouter initialEntries={[`/?rp=${mockRpid}`]}>
-        <UserProvider>
-          <LanguageProvider>
-            <App />
-          </LanguageProvider>
-        </UserProvider>
-      </MemoryRouter>,
+    // Create a memory router with providers and relying party query parameter
+    const router = createMemoryRouter(
+      [
+        {
+          path: "/",
+          element: (
+            <UserProvider>
+              <LanguageProvider>
+                <RootLayout />
+              </LanguageProvider>
+            </UserProvider>
+          ),
+        },
+      ],
+      {
+        initialEntries: [`/?rp=${mockRpid}`],
+      },
     );
+
+    // Render with RouterProvider
+    render(<RouterProvider router={router} />);
 
     // Wait for the relying party API call
     await waitFor(

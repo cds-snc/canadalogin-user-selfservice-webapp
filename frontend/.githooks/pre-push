@@ -1,0 +1,30 @@
+#!/bin/sh
+# Pre-push hook that runs the same checks as GitHub Actions
+
+echo "🔍 Running pre-push checks (same as GitHub Actions)..."
+
+# Run ESLint
+echo "📋 Checking ESLint..."
+npm run lint
+if [ $? -ne 0 ]; then
+  echo "❌ ESLint failed. Please fix the issues and try again."
+  exit 1
+fi
+
+# Run Prettier check
+echo "💅 Checking Prettier formatting..."
+npm run format:check
+if [ $? -ne 0 ]; then
+  echo "❌ Prettier formatting failed. Run 'npm run format' to fix formatting."
+  exit 1
+fi
+
+# Run tests
+echo "🧪 Running tests..."
+npm test -- --run
+if [ $? -ne 0 ]; then
+  echo "❌ Tests failed. Please fix the failing tests."
+  exit 1
+fi
+
+echo "✅ All pre-push checks passed!"
