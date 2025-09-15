@@ -83,3 +83,69 @@ def get_users_id_token(request: Request):
         logger.info("Not authenticated - no user ID token found")
         raise OAuthError("user ID token not found")
     return user_id_token
+
+
+async def is_logout_token_processed(request: Request, jti: str) -> bool:
+    """
+    Check if a logout token (identified by jti) has already been processed.
+
+    Args:
+        request: FastAPI request object
+        jti: JWT ID from the logout token
+
+    Returns:
+        bool: True if the token has already been processed, False otherwise
+    """
+    if not jti:
+        return False
+
+    # Try to get Redis client from the application state
+    redis_client = getattr(request.app.state, "redis_client", None)
+
+    if redis_client is not None:
+        # Use Redis to check if token was processed
+        cache_key = f"processed_logout_token:{jti}"
+        result = await redis_client.get(cache_key)
+        return result is not None
+    else:
+        # Fallback to in-memory storage (not recommended for production)
+        # This is for local development or when Redis is not available
+        if not hasattr(request.app.state, "processed_logout_tokens"):
+            request.app.state.processed_logout_tokens = set()
+        return jti in request.app.state.processed_logout_tokens
+
+
+async def mark_logout_token_as_processed(
+    request: Request, jti: str, expiration_seconds: int = 1800
+):
+    """
+    Mark a logout token (identified by jti) as processed to prevent duplicate processing.
+
+    Args:
+        request: FastAPI request object
+        jti: JWT ID from the logout token
+        expiration_seconds: How long to remember this token (default: 24 hours)
+    """
+    if not jti:
+        return
+
+    # Try to get Redis client from the application state
+    redis_client = getattr(request.app.state, "redis_client", None)
+
+    if redis_client is not None:
+        # Use Redis to store the processed token with expiration
+        cache_key = f"processed_logout_token:{jti}"
+        await redis_client.setex(cache_key, expiration_seconds, "processed")
+        logger.debug(
+            f"Marked logout token {jti} as processed in Redis with {expiration_seconds}s expiration"
+        )
+    else:
+        # Fallback to in-memory storage (not recommended for production)
+        # This is for local development or when Redis is not available
+        if not hasattr(request.app.state, "processed_logout_tokens"):
+            request.app.state.processed_logout_tokens = set()
+        request.app.state.processed_logout_tokens.add(jti)
+        logger.debug(f"Marked logout token {jti} as processed in memory (fallback)")
+
+        # Note: In-memory storage doesn't have automatic expiration
+        # In production, always use Redis or another persistent cache
