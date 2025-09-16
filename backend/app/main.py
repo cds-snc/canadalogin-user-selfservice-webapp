@@ -122,6 +122,16 @@ if redis_client is not None:
 cookie_secure = False if configuration.ENVIRONMENT == "local" else True
 logger.info(f"Cookie Secure: {cookie_secure}")
 
+# CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["*"],
+)
+
 # Autoload session if cookie is present
 app.add_middleware(SessionAutoloadMiddleware)
 # SessionMiddleware
@@ -133,16 +143,6 @@ app.add_middleware(
     lifetime=configuration.session_config.SESSION_LIFETIME,
     cookie_domain=configuration.ROOT_DOMAIN,
     cookie_name=configuration.session_config.SESSION_COOKIE_NAME,
-)
-
-# CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=configuration.cors_origins_list,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-    expose_headers=["*"],
 )
 
 
