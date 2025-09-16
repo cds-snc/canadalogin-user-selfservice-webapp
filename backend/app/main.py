@@ -51,21 +51,16 @@ CONTACT_INFO = {
     "email": configuration.app_info.email,
 }
 
-redis_client = None
-if (
-    configuration.session_config.SESSION_STORE_TYPE.upper() == "REDISSTORE"
-    and configuration.session_config.SESSION_REDIS_URL
-):
-    redis_url = configuration.session_config.SESSION_REDIS_URL
-    if configuration.ENVIRONMENT != "local":
-        # Construct the Redis URL with TLS and authentication for non-local environments
-        redis_url = f"rediss://:{configuration.session_config.REDIS_AUTH_SECRET}@{configuration.session_config.REDIS_DOMAIN}:{configuration.session_config.REDIS_PORT}?ssl_cert_reqs=none"
-        logger.info(
-            f"Connecting to Redis at {configuration.session_config.REDIS_DOMAIN}"
-        )
-    else:
-        logger.info("Connecting to local Redis instance")
-    redis_client = Redis.from_url(redis_url)
+redis_url = configuration.session_config.SESSION_REDIS_URL
+if configuration.ENVIRONMENT != "local":
+    # Construct the Redis URL with TLS and authentication for non-local environments
+    redis_url = f"rediss://:{configuration.session_config.REDIS_AUTH_SECRET}@{configuration.session_config.REDIS_DOMAIN}:{configuration.session_config.REDIS_PORT}?ssl_cert_reqs=none"
+    logger.info(
+        f"Connecting to Redis at {configuration.session_config.REDIS_DOMAIN}"
+    )
+else:
+    logger.info("Connecting to local Redis instance")
+redis_client = Redis.from_url(redis_url)
 
 
 @asynccontextmanager
@@ -83,10 +78,7 @@ async def lifespan(app: FastAPI):
     logger.info("Application startup complete")
     app.state.request_client = httpx.AsyncClient()
 
-    if (
-        configuration.session_config.SESSION_STORE_TYPE.upper() == "REDISSTORE"
-        and redis_client is not None
-    ):
+    if redis_client is not None:
         pong = await redis_client.ping()
         if pong:
             logger.info("Connected to Redis server successfully")
@@ -101,10 +93,7 @@ async def lifespan(app: FastAPI):
     logger.info("Closing global HTTP client")
     await app.state.request_client.aclose()
     logger.info("Shutting down IBM Verify Integration API")
-    if (
-        configuration.session_config.SESSION_STORE_TYPE.upper() == "REDISSTORE"
-        and hasattr(app.state, "redis_client")
-    ):
+    if hasattr(app.state, "redis_client"):
         await app.state.redis_client.close()
         logger.info("Closing Redis client")
 
@@ -124,10 +113,7 @@ logger.info(f"ROOT_DOMAIN: {session_domain}")
 
 # Determine session store
 session_store = InMemoryStore()
-if (
-    configuration.session_config.SESSION_STORE_TYPE.upper() == "REDISSTORE"
-    and redis_client is not None
-):
+if redis_client is not None:
     session_store = RedisStore(
         connection=redis_client,
         prefix="session:",

@@ -24,12 +24,11 @@ class IBMVerifyConfig(BaseSettings):
 
 
 class SessionConfig(BaseSettings):
-    SESSION_STORE_TYPE: str
     SESSION_SECRET: str = Field(
         ..., description="Secret key for signing session cookies"
     )
     SESSION_COOKIE_SECURE: bool = True
-    SESSION_REDIS_URL: Optional[str] = None
+    SESSION_REDIS_URL: str = "redis://localhost:6379/0"
     SESSION_COOKIE_NAME: str = "gc-manage-app"
     SESSION_EXPIRY_COOKIE_NAME: str = "session-expiry"
     SESSION_LIFETIME: int = 60 * 30  # default to 30 minutes in seconds
