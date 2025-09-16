@@ -21,8 +21,6 @@ def get_base_profile_management_url():
 
     if config.ENVIRONMENT != "local":
         redirectValue = f"https://{config.PROFILE_MANAGEMENT_DOMAIN}"
-    else:
-        redirectValue = f"http://{config.PROFILE_MANAGEMENT_DOMAIN}"
     return redirectValue
 
 
@@ -163,6 +161,7 @@ async def logout_user(request: Request, id_token: str):
 
 async def backchannel_logout(request: Request):
     # placeholder for backchannel logout logic
+    logger.info("Backchannel logout successful")
     return ResponseModel(
         success=True, data=None, message="Backchannel logout successful"
     )

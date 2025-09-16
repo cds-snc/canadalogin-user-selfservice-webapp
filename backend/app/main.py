@@ -56,7 +56,12 @@ if (
     configuration.session_config.SESSION_STORE_TYPE.upper() == "REDISSTORE"
     and configuration.session_config.SESSION_REDIS_URL
 ):
-    redis_client = Redis.from_url(configuration.session_config.SESSION_REDIS_URL)
+    redis_url = configuration.session_config.SESSION_REDIS_URL
+    if configuration.ENVIRONMENT != "local":
+        # Construct the Redis URL with TLS and authentication for non-local environments
+        redis_url = f"rediss://:{configuration.session_config.REDIS_AUTH_SECRET}@{configuration.session_config.REDIS_DOMAIN}:{configuration.session_config.REDIS_PORT}?ssl_cert_reqs=none"
+    logger.info(f"Connecting to Redis at {redis_url}")
+    redis_client = Redis.from_url(redis_url)
 
 
 @asynccontextmanager
@@ -119,8 +124,11 @@ if (
     configuration.session_config.SESSION_STORE_TYPE.upper() == "REDISSTORE"
     and redis_client is not None
 ):
-    session_store = RedisStore(connection=redis_client, prefix="session:", gc_ttl=600)
-    logger.info("Using RedisStore for session management")
+    session_store = RedisStore(
+        connection=redis_client,
+        prefix="session:",
+        gc_ttl=configuration.session_config.SESSION_LIFETIME,
+    )
 
 # Determine if cookie should be secure
 cookie_secure = False if configuration.ENVIRONMENT == "local" else True

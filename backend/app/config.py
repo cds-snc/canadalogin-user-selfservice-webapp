@@ -33,6 +33,9 @@ class SessionConfig(BaseSettings):
     SESSION_COOKIE_NAME: str = "gc-manage-app"
     SESSION_EXPIRY_COOKIE_NAME: str = "session-expiry"
     SESSION_LIFETIME: int = 60 * 30  # default to 30 minutes in seconds
+    REDIS_AUTH_SECRET: str = "test-secret"
+    REDIS_DOMAIN: str = "master.gc-signin-dev-redis.8pd6gb.cac1.cache.amazonaws.com"
+    REDIS_PORT: int = 6379
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore", case_sensitive=True
     )
