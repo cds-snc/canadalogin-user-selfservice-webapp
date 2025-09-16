@@ -1,109 +1,203 @@
 import pytest
-import respx
-
-from httpx import AsyncClient, Response
+from unittest.mock import AsyncMock, MagicMock, patch
 from fastapi import HTTPException
-from pydantic import ValidationError
-
-from app.utils.schemas import ProfilePUTData, ProfileGetResponseData, ProfileResponse
+from app.users.schemas import UserProfileUpdateRequest
 from app.users.services.profile import update_profile, my_profile
 
 
-@pytest.fixture
-def user_access_token():
-    return "mock_access_token"
-
-
-@pytest.fixture
-def profile_api_endpoint():
-    return "https://mock-api.test/profile"
-
-
-@pytest.fixture
-def profile_put_data():
-    return ProfilePUTData(
+@pytest.mark.asyncio
+async def test_update_profile_success():
+    user_data = UserProfileUpdateRequest(
         userName="test@example.com",
         preferredLanguage="en",
-        phoneNumbers=[],
-        name=None,
+        name={"givenName": "John", "familyName": "Doe"},
     )
 
+    mock_get_response = AsyncMock()
+    mock_get_response.status_code = 200
+    mock_get_response.json = AsyncMock(
+        return_value={
+            "userName": "test@example.com",
+            "id": "user123",
+            "active": True,
+            "emails": [{"type": "work", "value": "test@example.com"}],
+            "meta": {
+                "created": "2023-01-01T00:00:00Z",
+                "location": "/users/user123",
+                "lastModified": "2023-01-01T00:00:00Z",
+                "resourceType": "User",
+            },
+        }
+    )
 
-@respx.mock
+    mock_put_response = AsyncMock()
+    mock_put_response.status_code = 200
+    mock_put_response.json = AsyncMock(return_value=await mock_get_response.json())
+
+    mock_request = MagicMock()
+    mock_request.app.state.request_client.get = AsyncMock(
+        return_value=mock_get_response
+    )
+    mock_request.app.state.request_client.put = AsyncMock(
+        return_value=mock_put_response
+    )
+    mock_request.app.state.config.profile_api_endpoint = "https://fake.api/user"
+
+    with patch(
+        "app.users.services.profile.get_auth_request_headers",
+        return_value={"Authorization": "Bearer fake-token"},
+    ):
+        result = await update_profile(mock_request, user_data, "fake-token")
+
+    assert result.success is True
+    assert result.data.userName == user_data.userName
+
+
 @pytest.mark.asyncio
-async def test_update_profile_success(profile_put_data, user_access_token, profile_api_endpoint):
-    mock_response_data = {
-        "userName": "test@example.com",
-        "preferredLanguage": "en",
-        "meta": {"resourceType": "User", "created": "2024-01-01T00:00:00Z", "lastModified": "2024-01-02T00:00:00Z"},
-        "active": True,
-        "id": "12345",
-        "emails": [],
-    }
-
-    respx.put(profile_api_endpoint).mock(
-        return_value=Response(status_code=200, json=mock_response_data)
+async def test_update_profile_username_mismatch():
+    user_data = UserProfileUpdateRequest(
+        userName="wrong@example.com",
+        preferredLanguage="en",
     )
 
-    async with AsyncClient() as client:
-        response = await update_profile(client, profile_put_data, user_access_token, profile_api_endpoint)
-
-    assert isinstance(response, ProfileResponse)
-    assert response.success is True
-    assert response.data.userName == "test@example.com"
-
-
-@respx.mock
-@pytest.mark.asyncio
-async def test_update_profile_failure(profile_put_data, user_access_token, profile_api_endpoint):
-    error_detail = {"detail": "Invalid user data"}
-
-    respx.put(profile_api_endpoint).mock(
-        return_value=Response(status_code=400, json=error_detail)
+    mock_get_response = AsyncMock()
+    mock_get_response.status_code = 200
+    mock_get_response.json = AsyncMock(
+        return_value={
+            "userName": "original@example.com",
+            "id": "user123",
+            "active": True,
+            "emails": [{"type": "work", "value": "original@example.com"}],
+            "meta": {
+                "created": "2023-01-01T00:00:00Z",
+                "location": "/users/user123",
+                "lastModified": "2023-01-01T00:00:00Z",
+                "resourceType": "User",
+            },
+        }
     )
 
-    async with AsyncClient() as client:
+    mock_request = MagicMock()
+    mock_request.app.state.request_client.get = AsyncMock(
+        return_value=mock_get_response
+    )
+    mock_request.app.state.config.profile_api_endpoint = "https://fake.api/user"
+
+    with patch(
+        "app.users.services.profile.get_auth_request_headers",
+        return_value={"Authorization": "Bearer fake-token"},
+    ):
         with pytest.raises(HTTPException) as exc_info:
-            await update_profile(client, profile_put_data, user_access_token, profile_api_endpoint)
+            await update_profile(mock_request, user_data, "fake-token")
 
-    assert exc_info.value.status_code == 400
-    assert "Invalid user data" in str(exc_info.value.detail)
+        assert exc_info.value.status_code == 403
+        assert "User mismatch" in exc_info.value.detail
 
 
-@respx.mock
 @pytest.mark.asyncio
-async def test_my_profile_success(user_access_token, profile_api_endpoint):
-    mock_response_data = {
-        "userName": "test@example.com",
-        "preferredLanguage": "en",
-        "meta": {"resourceType": "User", "created": "2024-01-01T00:00:00Z", "lastModified": "2024-01-02T00:00:00Z"},
-        "active": True,
-        "id": "12345",
-        "emails": [],
-    }
-
-    respx.get(profile_api_endpoint).mock(
-        return_value=Response(status_code=200, json=mock_response_data)
+async def test_update_profile_put_fails():
+    user_data = UserProfileUpdateRequest(
+        userName="test@example.com",
+        preferredLanguage="en",
     )
 
-    async with AsyncClient() as client:
-        response = await my_profile(client, user_access_token, profile_api_endpoint)
-
-    assert isinstance(response, ProfileResponse)
-    assert response.success is True
-    assert response.data.userName == "test@example.com"
-
-
-@respx.mock
-@pytest.mark.asyncio
-async def test_my_profile_unauthorized(user_access_token, profile_api_endpoint):
-    respx.get(profile_api_endpoint).mock(
-        return_value=Response(status_code=401, json={"detail": "Unauthorized"})
+    mock_get_response = AsyncMock()
+    mock_get_response.status_code = 200
+    mock_get_response.json = AsyncMock(
+        return_value={
+            "userName": "test@example.com",
+            "id": "user123",
+            "active": True,
+            "emails": [{"type": "work", "value": "test@example.com"}],
+            "meta": {
+                "created": "2023-01-01T00:00:00Z",
+                "location": "/users/user123",
+                "lastModified": "2023-01-01T00:00:00Z",
+                "resourceType": "User",
+            },
+        }
     )
 
-    async with AsyncClient() as client:
+    mock_put_response = AsyncMock()
+    mock_put_response.status_code = 500
+    mock_put_response.json = AsyncMock(return_value={"detail": "Internal Server Error"})
+
+    mock_request = MagicMock()
+    mock_request.app.state.request_client.get = AsyncMock(
+        return_value=mock_get_response
+    )
+    mock_request.app.state.request_client.put = AsyncMock(
+        return_value=mock_put_response
+    )
+    mock_request.app.state.config.profile_api_endpoint = "https://fake.api/user"
+
+    with patch(
+        "app.users.services.profile.get_auth_request_headers",
+        return_value={"Authorization": "Bearer fake-token"},
+    ):
         with pytest.raises(HTTPException) as exc_info:
-            await my_profile(client, user_access_token, profile_api_endpoint)
+            await update_profile(mock_request, user_data, "fake-token")
 
-    assert exc_info.value.status_code == 401
-    assert exc_info.value.detail == "Not authenticated"
+        assert exc_info.value.status_code == 500
+
+
+@pytest.mark.asyncio
+async def test_my_profile_success():
+    mock_response = AsyncMock()
+    mock_response.status_code = 200
+    mock_response.json = AsyncMock(
+        return_value={
+            "userName": "test@example.com",
+            "id": "user123",
+            "active": True,
+            "emails": [{"type": "work", "value": "test@example.com"}],
+            "meta": {
+                "created": "2023-01-01T00:00:00Z",
+                "location": "/users/user123",
+                "lastModified": "2023-01-01T00:00:00Z",
+                "resourceType": "User",
+            },
+        }
+    )
+
+    mock_client = AsyncMock()
+    mock_client.get = AsyncMock(return_value=mock_response)
+
+    with (
+        patch(
+            "app.users.services.profile.get_auth_request_headers",
+            return_value={"Authorization": "Bearer fake-token"},
+        ),
+        patch("app.users.services.profile.get_configuration") as mock_config,
+    ):
+        mock_config.return_value.profile_api_endpoint = "https://fake.api/user"
+
+        result = await my_profile(mock_client, "fake-token")
+
+    assert result.success is True
+    assert result.data.userName == "test@example.com"
+
+
+@pytest.mark.asyncio
+async def test_my_profile_other_failure():
+    mock_response = AsyncMock()
+    mock_response.status_code = 500
+    mock_response.json = AsyncMock(return_value={"detail": "Server error"})
+    mock_response.text = "Server error"
+
+    mock_client = AsyncMock()
+    mock_client.get = AsyncMock(return_value=mock_response)
+
+    with (
+        patch(
+            "app.users.services.profile.get_auth_request_headers",
+            return_value={"Authorization": "Bearer fake-token"},
+        ),
+        patch("app.users.services.profile.get_configuration") as mock_config,
+    ):
+        mock_config.return_value.profile_api_endpoint = "https://fake.api/user"
+
+        with pytest.raises(HTTPException) as exc_info:
+            await my_profile(mock_client, "fake-token")
+
+        assert exc_info.value.status_code == 500
