@@ -89,12 +89,12 @@ async def update_profile(
         )
         if response.status_code != 200:
             # parse error details safely
-            json_data = await response.json()
+            json_data = response.json()
             error_detail = json_data.get("detail", "Unknown error")
             raise HTTPException(status_code=response.status_code, detail=error_detail)
 
         logger.info("User profile updated successfully.")
-        json_data = await response.json()
+        json_data = response.json()
         response_data = IBMVerifyUserProfileSchema(**json_data)
         return ProfileResponse(
             success=True,
