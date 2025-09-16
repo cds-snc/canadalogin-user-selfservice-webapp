@@ -8,8 +8,10 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.middleware.sessions import SessionMiddleware
 from authlib.integrations.starlette_client import OAuthError
+from starsessions import SessionMiddleware, SessionAutoloadMiddleware, InMemoryStore
+from redis.asyncio import Redis
+from starsessions.stores.redis import RedisStore
 
 from app.config import get_configuration
 from app.utils.helpers import generate_error_response
@@ -49,6 +51,15 @@ CONTACT_INFO = {
     "email": configuration.app_info.email,
 }
 
+redis_url = configuration.session_config.SESSION_REDIS_URL
+if configuration.ENVIRONMENT != "local":
+    # Construct the Redis URL with TLS and authentication for non-local environments
+    redis_url = f"rediss://:{configuration.session_config.REDIS_AUTH_SECRET}@{configuration.session_config.REDIS_DOMAIN}:{configuration.session_config.REDIS_PORT}?ssl_cert_reqs=none"
+    logger.info(f"Connecting to Redis at {configuration.session_config.REDIS_DOMAIN}")
+else:
+    logger.info("Connecting to local Redis instance")
+redis_client = Redis.from_url(redis_url)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -64,6 +75,14 @@ async def lifespan(app: FastAPI):
     )
     logger.info("Application startup complete")
     app.state.request_client = httpx.AsyncClient()
+
+    if redis_client is not None:
+        pong = await redis_client.ping()
+        if pong:
+            logger.info("Connected to Redis server successfully")
+            app.state.redis_client = redis_client
+            logger.info("Using RedisStore for session management")
+
     oidc_config.register_oidc(app.state.config)
     logger.info(f"CORS Origins: {app.state.config.cors_origins_list}")
     logger.info(f"oidc_well_known_config: {app.state.config.oidc_well_known_config}")
@@ -72,6 +91,9 @@ async def lifespan(app: FastAPI):
     logger.info("Closing global HTTP client")
     await app.state.request_client.aclose()
     logger.info("Shutting down IBM Verify Integration API")
+    if hasattr(app.state, "redis_client"):
+        await app.state.redis_client.close()
+        logger.info("Closing Redis client")
 
 
 app = FastAPI(
@@ -87,14 +109,30 @@ if configuration.ENVIRONMENT != "local":
     session_domain = f".{configuration.ROOT_DOMAIN}"
 logger.info(f"ROOT_DOMAIN: {session_domain}")
 
-# Sets the session cookie - https://docs.authlib.org/en/latest/client/fastapi.html
+# Determine session store
+session_store = InMemoryStore()
+if redis_client is not None:
+    session_store = RedisStore(
+        connection=redis_client,
+        prefix="session:",
+        gc_ttl=configuration.session_config.SESSION_LIFETIME,
+    )
+
+# Determine if cookie should be secure
+cookie_secure = False if configuration.ENVIRONMENT == "local" else True
+logger.info(f"Cookie Secure: {cookie_secure}")
+
+# Autoload session if cookie is present
+app.add_middleware(SessionAutoloadMiddleware)
 # SessionMiddleware
 app.add_middleware(
     SessionMiddleware,
-    secret_key="some-random-string",  # Use a strong secret in production
-    https_only=configuration.ENVIRONMENT != "local",
-    same_site="lax",  # Can be "strict", "lax", or "none"
-    domain=session_domain,
+    store=session_store,
+    rolling=True,
+    cookie_https_only=cookie_secure,
+    lifetime=configuration.session_config.SESSION_LIFETIME,
+    cookie_domain=configuration.ROOT_DOMAIN,
+    cookie_name=configuration.session_config.SESSION_COOKIE_NAME,
 )
 
 # CORS
