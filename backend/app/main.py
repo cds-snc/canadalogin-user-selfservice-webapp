@@ -141,7 +141,7 @@ app.add_middleware(
     rolling=True,
     cookie_https_only=cookie_secure,
     lifetime=configuration.session_config.SESSION_LIFETIME,
-    cookie_domain="api.gc-signin.cdssandbox.xyz",
+    cookie_domain=configuration.ROOT_DOMAIN,
     cookie_name=configuration.session_config.SESSION_COOKIE_NAME,
 )
 
