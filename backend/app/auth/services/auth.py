@@ -207,7 +207,7 @@ async def backchannel_logout(request: Request):
         logger.error(f"Value error during backchannel logout: {ve}")
         raise HTTPException(status_code=400, detail=str(ve)) from ve
     except Exception as e:
-        logger.exception("Unexpected error during backchannel logout", str(e))
+        logger.exception("Unexpected error during backchannel logout")
         # IBM Verify expects a 400 response for any error during backchannel logout
         raise HTTPException(
             status_code=400, detail="Internal error during backchannel logout"
