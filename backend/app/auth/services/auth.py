@@ -193,7 +193,7 @@ async def backchannel_logout(request: Request):
         redis_client = getattr(request.app.state, "redis_client", None)
         logger.info(f"Processing backchannel logout for sid: {sid}")
         if redis_client is not None:
-            # Use Redis to check if token was processed
+            # Delete the session from Redis for the given sid
             cache_key = f"session:{sid}"
             await redis_client.delete(cache_key)
 
