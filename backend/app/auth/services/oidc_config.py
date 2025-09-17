@@ -30,11 +30,9 @@ async def validate_logout_token(request: Request):
     if form_data is None:
         raise ValueError("Missing logout_token parameter")
     form_dict = dict(form_data)
-    
+
     logout_token = form_dict["logout_token"]
-    if logout_token is None or not isinstance(
-        logout_token, str
-    ):
+    if logout_token is None or not isinstance(logout_token, str):
         raise ValueError("Missing logout_token parameter Or invalid type")
 
     # Get your registered client

@@ -189,9 +189,6 @@ async def backchannel_logout(request: Request):
                 success=True, data=None, message="Backchannel logout already processed"
             )
 
-        # Mark this logout token as processed to prevent duplicate processing
-        await mark_logout_token_as_processed(request, jti)
-
         # Try to get Redis client from the application state
         redis_client = getattr(request.app.state, "redis_client", None)
         logger.info(f"Processing backchannel logout for sid: {sid}")
@@ -199,6 +196,9 @@ async def backchannel_logout(request: Request):
             # Use Redis to check if token was processed
             cache_key = f"session:{sid}"
             await redis_client.delete(cache_key)
+
+        # Mark this logout token as processed to prevent duplicate processing
+        await mark_logout_token_as_processed(request, jti)
 
         return ResponseModel(
             success=True, data=None, message="Backchannel logout successful"
