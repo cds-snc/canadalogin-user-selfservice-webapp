@@ -181,7 +181,7 @@ async def mark_logout_token_as_processed(
     Args:
         request: FastAPI request object
         jti: JWT ID from the logout token
-        expiration_seconds: How long to remember this token (default: 24 hours)
+        expiration_seconds: How long to remember this token (default: 30 minutes)
     """
     if not jti:
         return
