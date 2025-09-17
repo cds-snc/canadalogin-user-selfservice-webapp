@@ -3,10 +3,12 @@ from urllib.parse import urlencode
 from fastapi import Request, HTTPException
 from fastapi.responses import RedirectResponse
 from authlib.integrations.starlette_client import OAuthError
+from starsessions.session import get_session_handler
 from app.auth.services.oidc_config import oauth, validate_logout_token
 from app.config import get_configuration
 from app.constants.session_keys import SessionKeys
 from app.utils.request_error_handler import RequestErrorHandler
+from app.auth.services.auth_user_session import update_session_tokens, get_user_info
 from app.utils.schemas import ResponseModel
 from app.auth.schemas import LogoutResponseModel
 from app.auth.services.auth_user_session import (
@@ -77,12 +79,13 @@ async def callback_handler(request: Request):
             )
             # redirect back to IBM Verify to retry authentication
             raise OAuthError("Invalid or expired token") from error
-        request.session[SessionKeys.SESSION_USER_ACCESS_TOKEN_KEY.value] = (
-            oidc_response.get("access_token")
-        )
-        request.session[SessionKeys.SESSION_USER_ID_TOKEN_KEY.value] = (
-            oidc_response.get("id_token")
-        )
+
+        # Get the handler and set your sid as session id. sid is uuid passed in id_token
+        handler = get_session_handler(request)
+        new_session_id = oidc_response.get("userinfo").get("sid")
+        handler.session_id = new_session_id
+
+        update_session_tokens(request, oidc_response)
 
         logger.info("OIDC Callback Handler")
         logger.info(f"Redirect to PROFILE_MANAGEMENT_DOMAIN: {redirectValue}")
@@ -128,28 +131,27 @@ async def logout_user(request: Request, id_token: str):
     """
     try:
         config = request.app.state.config
-        request.session.clear()
+        user_info = await get_user_info(request)
 
         # Construct the logout redirect URL
         end_session_endpoint = config.end_session_endpoint
         post_logout_redirect_uri = get_base_profile_management_url()
-        # locale = user_info.get("locale", "en")
-
+        locale = user_info.get("locale", "en")
         # Build the logout URL with query parameters
-        # id_token = get_users_id_token(request)
         params = {
             "id_token_hint": id_token,
             "post_logout_redirect_uri": post_logout_redirect_uri,
-            # "ui_locales": locale,
+            "ui_locales": locale,
         }
         redirect_url = f"{end_session_endpoint}?{urlencode(params)}"
-
         logger.debug(f"Constructed logout redirect URL: {redirect_url}")
 
         # Create response with the redirect URL
         response_data = LogoutResponseModel(
             redirect_url=redirect_url, source="logout_button"
         )
+        # Clear the session
+        request.session.clear()
 
         return ResponseModel(
             success=True,

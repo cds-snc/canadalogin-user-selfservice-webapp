@@ -1,11 +1,17 @@
 import logging
+from datetime import datetime
+from httpx import AsyncClient
+
 from fastapi import Request, HTTPException
 from authlib.integrations.starlette_client import OAuthError
-from httpx import AsyncClient
+from starsessions.session import get_session_handler
+from redis.exceptions import RedisError
+
 from app.config import get_configuration
 from app.constants.session_keys import SessionKeys
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.request_error_handler import RequestErrorHandler
+from app.auth.services.oidc_config import oauth
 
 logger = logging.getLogger(__name__)
 
@@ -74,15 +80,102 @@ async def get_users_current_session(request: Request):
     return user_access_token
 
 
-def get_users_id_token(request: Request):
+async def ensure_user_token(request: Request):
     """
-    Get the user's ID token from the session.
+    Dependency to ensure a valid user token is present in the session.
     """
-    user_id_token = request.session.get(SessionKeys.SESSION_USER_ID_TOKEN_KEY.value)
-    if not user_id_token:
-        logger.info("Not authenticated - no user ID token found")
-        raise OAuthError("user ID token not found")
-    return user_id_token
+    user_token = request.session.get(SessionKeys.SESSION_USER_TOKEN.value)
+    if not user_token:
+        logger.info("Not authenticated - no user token found")
+        raise OAuthError("user token not found")
+    expire_time = user_token.get("expires_at")
+    if (
+        expire_time and datetime.now().timestamp() > expire_time - 120
+    ):  # 2 minutes buffer
+        refresh_token = user_token.get("refresh_token")
+        if not refresh_token:
+            raise OAuthError("user token has expired")
+        user_token = await refresh_token(refresh_token)
+        update_session_tokens(request, user_token)
+        logger.info("User token refreshed and session updated")
+    return user_token
+
+
+async def get_user_info(request: Request):
+    token = await ensure_user_token(request)
+    return token.get("userinfo")
+
+
+async def get_user_access_token(request: Request):
+    token = await ensure_user_token(request)
+    return token.get("access_token")
+
+
+async def get_user_id_token(request: Request):
+    token = await ensure_user_token(request)
+    return token.get("id_token")
+
+
+async def get_user_refresh_token(request: Request):
+    token = await ensure_user_token(request)
+    return token.get("refresh_token")
+
+
+async def refresh_token(refresh_token: str):
+    try:
+        new_tokens = await oauth.verify.fetch_access_token(
+            refresh_token=refresh_token, grant_type="refresh_token"
+        )
+        return new_tokens
+    except Exception as e:
+        logger.error(f"Error refreshing ID token: {str(e)}", exc_info=True)
+        raise OAuthError("get new token has failed")
+
+
+def update_session_tokens(request: Request, new_tokens: dict):
+    """
+    Update the session with new tokens.
+    """
+    request.session[SessionKeys.SESSION_USER_ACCESS_TOKEN_KEY.value] = new_tokens.get(
+        "access_token"
+    )
+    request.session[SessionKeys.SESSION_USER_TOKEN.value] = new_tokens
+
+
+async def get_session_by_session_id(sessionid: str, request: Request):
+    try:
+        handler = get_session_handler(request)
+        # use Redis read session data key = "session:{sessionid}"
+        redis_key = f"session:{sessionid}"
+        redis_client = request.app.state.redis_client
+        data = await redis_client.get(redis_key)
+        if not data:
+            return None
+        return handler.serializer.deserialize(data)
+    except RedisError as e:
+        logger.error(
+            f"Redis error getting session {sessionid}: {str(e)}", exc_info=True
+        )
+        RequestErrorHandler.handle(e, context="Redis error getting session")
+
+
+async def remove_session_by_session_id(sessionid: str, request: Request):
+    try:
+        handler = get_session_handler(request)
+        if handler.session_id != sessionid:
+            logger.warning(
+                f"Session ID mismatch: handler session ID {handler.session_id} does not match provided session ID {sessionid}"
+            )
+            return
+        # use Redis delete session data key = "session:{sessionid}"
+        redis_key = f"session:{sessionid}"
+        redis_client = request.app.state.redis_client
+        await redis_client.delete(redis_key)
+    except RedisError as e:
+        logger.warning(
+            f"Redis error removing session by ID {sessionid}: {str(e)}", exc_info=True
+        )
+        RequestErrorHandler.handle(e, context="remove server session")
 
 
 async def is_logout_token_processed(request: Request, jti: str) -> bool:
