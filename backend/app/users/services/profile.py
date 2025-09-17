@@ -39,7 +39,7 @@ async def dispatch_update_user_profile(
             content=user_profile_payload,
             headers=headers,
         )
-        response.raise_for_status()
+        await response.raise_for_status()
         logger.info("updating user profile changes returned successfully")
         return response
 
@@ -68,7 +68,9 @@ async def update_profile(
 
         if not does_username_match:
             logger.error("User mismatch - cannot update profile")
-            raise HTTPException(status_code=403, detail="cannot update profile")
+            raise HTTPException(
+                status_code=403, detail="User mismatch - cannot update profile"
+            )
 
         updated_user_data_dict.pop(
             "userName", None
@@ -85,8 +87,15 @@ async def update_profile(
         response = await dispatch_update_user_profile(
             request, user_profile_payload, user_access_token
         )
+        if response.status_code != 200:
+            # parse error details safely
+            json_data = response.json()
+            error_detail = json_data.get("detail", "Unknown error")
+            raise HTTPException(status_code=response.status_code, detail=error_detail)
+
         logger.info("User profile updated successfully.")
-        response_data = IBMVerifyUserProfileSchema(**response.json())
+        json_data = response.json()
+        response_data = IBMVerifyUserProfileSchema(**json_data)
         return ProfileResponse(
             success=True,
             message="User profile updated successfully.",
@@ -112,7 +121,8 @@ async def my_profile(global_http_client: AsyncClient, user_access_token: str):
 
     if response.status_code == 200:
         logger.info("User profile retrieved successfully.")
-        response_data = IBMVerifyUserProfileSchema(**response.json())
+        json_data = response.json()
+        response_data = IBMVerifyUserProfileSchema(**json_data)
         return ProfileResponse(
             success=True,
             message="User profile retrieved successfully.",
@@ -123,7 +133,8 @@ async def my_profile(global_http_client: AsyncClient, user_access_token: str):
         if response.status_code == 401:
             raise HTTPException(status_code=401, detail="Not authenticated")
         else:
-            error_details = response.json().get("detail")
+            json_data = response.json()
+            error_details = json_data.get("detail")
             raise HTTPException(
                 status_code=response.status_code, detail=f"HTTP error, {error_details}"
             )

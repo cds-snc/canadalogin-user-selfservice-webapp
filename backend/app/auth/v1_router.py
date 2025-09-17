@@ -12,7 +12,7 @@ from app.auth.services.auth import (
 
 from app.auth.services.auth_user_session import (
     get_users_current_session,
-    get_users_id_token,
+    get_user_id_token,
 )
 
 from app.constants.session_keys import SessionKeys
@@ -63,7 +63,7 @@ async def reauth(
     summary="Logout user",
     description="",
 )
-async def logout(request: Request, id_token: str = Depends(get_users_id_token)):
+async def logout(request: Request, id_token: str = Depends(get_user_id_token)):
     return await logout_user(request, id_token)
 
 

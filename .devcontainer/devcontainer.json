@@ -23,6 +23,9 @@
 		},
 		"ghcr.io/devcontainers/features/aws-cli:1": {
 			"version": "latest"
+		},
+		"ghcr.io/itsmechlark/features/redis-server:1": {	
+			"version": "latest"
 		}
 	},
 	"customizations": {
