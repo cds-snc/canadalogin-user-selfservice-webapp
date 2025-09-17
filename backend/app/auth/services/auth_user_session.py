@@ -95,11 +95,9 @@ async def ensure_user_token(request: Request):
             raise OAuthError("user token has expired")
         user_token = await refresh_token(refresh_token)
         update_session_tokens(request, user_token)
-        userinfo = user_token.get('userinfo')
-        sid = userinfo.get('sid') if userinfo else None
-        logger.info(
-            f"User token refreshed and session updated. sid: {sid}"
-        )
+        userinfo = user_token.get("userinfo")
+        sid = userinfo.get("sid") if userinfo else None
+        logger.info(f"User token refreshed and session updated. sid: {sid}")
     return user_token
 
 
