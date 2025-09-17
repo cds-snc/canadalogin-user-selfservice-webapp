@@ -6,11 +6,9 @@ from app.auth.services.auth import (
     redirect_user_to_idp_verify,
     callback_handler,
     reauthenticate_user,
-    session_event_sse_generator,
 )
-from app.auth.services.auth_logout import (
-    logout_user,
-    backchannel_logout,
+from app.auth.services.auth_user_session import (
+    session_event_sse_generator,
 )
 from app.auth.services.auth_logout import (
     logout_user,

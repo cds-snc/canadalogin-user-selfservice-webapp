@@ -61,7 +61,6 @@ else:
 redis_client = Redis.from_url(redis_url)
 
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     app.state.config = configuration
