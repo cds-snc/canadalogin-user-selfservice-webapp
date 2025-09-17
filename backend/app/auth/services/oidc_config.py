@@ -36,7 +36,7 @@ async def validate_logout_token(request: Request):
         raise ValueError("Missing logout_token parameter Or invalid type")
 
     # Get your registered client
-    client = oauth.create_client("verify")
+    client = oauth.verify
     if client is None:
         raise ValueError("OAuth client 'verify' is not registered")
 
