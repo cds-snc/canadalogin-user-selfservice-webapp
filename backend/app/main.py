@@ -125,7 +125,7 @@ logger.info(f"Cookie Secure: {cookie_secure}")
 # CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=configuration.cors_origins_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -141,7 +141,7 @@ app.add_middleware(
     rolling=True,
     cookie_https_only=cookie_secure,
     lifetime=configuration.session_config.SESSION_LIFETIME,
-    cookie_domain="api.gc-signin.cdssandbox.xyz",
+    cookie_domain=configuration.ROOT_DOMAIN,
     cookie_name=configuration.session_config.SESSION_COOKIE_NAME,
 )
 
