@@ -4,8 +4,6 @@ from httpx import AsyncClient
 
 from fastapi import Request, HTTPException
 from authlib.integrations.starlette_client import OAuthError
-from starsessions.session import get_session_handler
-from redis.exceptions import RedisError
 
 from app.config import get_configuration
 from app.constants.session_keys import SessionKeys
@@ -82,7 +80,7 @@ async def get_users_current_session(request: Request):
 
 async def ensure_user_token(request: Request):
     """
-    Dependency to ensure a valid user token is present in the session.
+    Ensure the user token is valid and refresh if necessary.
     """
     user_token = request.session.get(SessionKeys.SESSION_USER_TOKEN.value)
     if not user_token:
@@ -97,7 +95,9 @@ async def ensure_user_token(request: Request):
             raise OAuthError("user token has expired")
         user_token = await refresh_token(refresh_token)
         update_session_tokens(request, user_token)
-        logger.info("User token refreshed and session updated")
+        userinfo = user_token.get("userinfo")
+        sid = userinfo.get("sid") if userinfo else None
+        logger.info(f"User token refreshed and session updated. sid: {sid}")
     return user_token
 
 
@@ -140,39 +140,3 @@ def update_session_tokens(request: Request, new_tokens: dict):
         "access_token"
     )
     request.session[SessionKeys.SESSION_USER_TOKEN.value] = new_tokens
-
-
-async def get_session_by_session_id(sessionid: str, request: Request):
-    try:
-        handler = get_session_handler(request)
-        # use Redis read session data key = "session:{sessionid}"
-        redis_key = f"session:{sessionid}"
-        redis_client = request.app.state.redis_client
-        data = await redis_client.get(redis_key)
-        if not data:
-            return None
-        return handler.serializer.deserialize(data)
-    except RedisError as e:
-        logger.error(
-            f"Redis error getting session {sessionid}: {str(e)}", exc_info=True
-        )
-        RequestErrorHandler.handle(e, context="Redis error getting session")
-
-
-async def remove_session_by_session_id(sessionid: str, request: Request):
-    try:
-        handler = get_session_handler(request)
-        if handler.session_id != sessionid:
-            logger.warning(
-                f"Session ID mismatch: handler session ID {handler.session_id} does not match provided session ID {sessionid}"
-            )
-            return
-        # use Redis delete session data key = "session:{sessionid}"
-        redis_key = f"session:{sessionid}"
-        redis_client = request.app.state.redis_client
-        await redis_client.delete(redis_key)
-    except RedisError as e:
-        logger.warning(
-            f"Redis error removing session by ID {sessionid}: {str(e)}", exc_info=True
-        )
-        RequestErrorHandler.handle(e, context="remove server session")
