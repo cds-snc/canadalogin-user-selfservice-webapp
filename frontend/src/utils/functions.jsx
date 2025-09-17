@@ -1,90 +1,83 @@
-import engJson from '../locales/en/en.json';
-import frJson from '../locales/fr/fr.json';
-import { AVAILABLE_LANGUAGES, FOOTERS } from './constants';
-
+import engJson from "../locales/en/en.json";
+import frJson from "../locales/fr/fr.json";
+import { AVAILABLE_LANGUAGES, FOOTERS } from "./constants";
 
 function getLangHref(currentLang, pathname) {
-    let newPathname = pathname.slice((1 + currentLang.length));
+  let newPathname = pathname.slice(1 + currentLang.length);
 
-    if (newPathname.length > 0)
-        newPathname = '/' + newPathname;
+  if (newPathname.length > 0) newPathname = "/" + newPathname;
 
-    if (currentLang === AVAILABLE_LANGUAGES.fr)
-        return '/' + AVAILABLE_LANGUAGES.en + newPathname.replaceAll('//', '/');
+  if (currentLang === AVAILABLE_LANGUAGES.fr)
+    return "/" + AVAILABLE_LANGUAGES.en + newPathname.replaceAll("//", "/");
 
-    return '/' + AVAILABLE_LANGUAGES.fr + newPathname.replaceAll('//', '/');
+  return "/" + AVAILABLE_LANGUAGES.fr + newPathname.replaceAll("//", "/");
 }
 
 export function getLanguage(language) {
+  const browserLanguage = navigator.languages[1];
 
-    const browserLanguage = navigator.languages[1];
+  if (
+    language === AVAILABLE_LANGUAGES.fr ||
+    language === AVAILABLE_LANGUAGES.en
+  )
+    return language;
+  else if (
+    browserLanguage === AVAILABLE_LANGUAGES.fr ||
+    language === AVAILABLE_LANGUAGES.en
+  )
+    return browserLanguage;
 
-    if (language === AVAILABLE_LANGUAGES.fr || language === AVAILABLE_LANGUAGES.en)
-        return language;
-    else if (browserLanguage === AVAILABLE_LANGUAGES.fr || language === AVAILABLE_LANGUAGES.en)
-        return browserLanguage;
-
-    return AVAILABLE_LANGUAGES.en;
-
+  return AVAILABLE_LANGUAGES.en;
 }
 
 export function getLangValues(language, pathname) {
-    const currentLang = getLanguage(language);
-    const langHref = getLangHref(currentLang, pathname);
+  const currentLang = getLanguage(language);
+  const langHref = getLangHref(currentLang, pathname);
 
-    return { langHref, currentLang };
+  return { langHref, currentLang };
 }
 
 export function getPageContent(language, pageName) {
+  if (language === AVAILABLE_LANGUAGES.fr) return frJson[pageName];
 
-    if (language === AVAILABLE_LANGUAGES.fr)
-        return frJson[pageName];
-
-    return engJson[pageName];
+  return engJson[pageName];
 }
 
 export function getFooter(language) {
+  if (language === AVAILABLE_LANGUAGES.fr) return FOOTERS.default.fr;
 
-    if (language === AVAILABLE_LANGUAGES.fr)
-        return FOOTERS.default.fr;
-
-    return FOOTERS.default.en;
+  return FOOTERS.default.en;
 }
 
 export function isEmailValid(email) {
+  const isValidEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-    const isValidEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
-    return (email != null && email.match(isValidEmail));
+  return email != null && email.match(isValidEmail);
 }
 
 export function isCodeValid(code) {
+  const isValidCode = /^[0-9]{6}$/;
 
-    const isValidCode = /^[0-9]{6}$/;
-
-    return (code != null && code.match(isValidCode));
+  return code != null && code.match(isValidCode);
 }
 
 export function isPasswordValid(password) {
-    return (password != null && password.length >= 12 && password.length <= 65);
+  return password != null && password.length >= 12 && password.length <= 65;
 }
 
 export function isNameValid(name, minLength) {
+  if (minLength === 0)
+    if (name !== null && name.length > 0) {
+      const isValidName = /^[a-zA-Z\-_ ’'‘ÀàÂâÆæÇçÉéÈèÊêËëÎîÏïÔôŒœÙùÛûÜüŸÿ]+$/;
+      return name.match(isValidName);
+    } else return true;
 
-    if (minLength === 0)
-        if (name !== null && name.length > 0) {
-            const isValidName = /^[a-zA-Z\-_ ’'‘ÀàÂâÆæÇçÉéÈèÊêËëÎîÏïÔôŒœÙùÛûÜüŸÿ]+$/
-            return (name.match(isValidName));
-        } else
-            return true;
+  const isValidName = /^[a-zA-Z\-_ ’'‘ÀàÂâÆæÇçÉéÈèÊêËëÎîÏïÔôŒœÙùÛûÜüŸÿ]{2,}$/;
 
-    const isValidName = /^[a-zA-Z\-_ ’'‘ÀàÂâÆæÇçÉéÈèÊêËëÎîÏïÔôŒœÙùÛûÜüŸÿ]{2,}$/
-
-    return (name !== null && name.match(isValidName));
-
+  return name !== null && name.match(isValidName);
 }
 
 export function capitalizeFirstLetter(str) {
-    if (!str) return "";
-    return str.charAt(0).toUpperCase() + str.slice(1);
+  if (!str) return "";
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }

@@ -1,12 +1,9 @@
 import logging
-import jwt
 from datetime import datetime
 from httpx import AsyncClient
 
 from fastapi import Request, HTTPException
 from authlib.integrations.starlette_client import OAuthError
-from starsessions.session import get_session_handler
-
 from app.config import get_configuration
 from app.constants.session_keys import SessionKeys
 from app.utils.access_token import get_admin_token, get_auth_request_headers
@@ -80,74 +77,58 @@ async def get_users_current_session(request: Request):
     return user_access_token
 
 
-def get_user_info(request: Request):
+async def ensure_user_token(request: Request):
     """
-    Get user info from session
+    Ensure the user token is valid and refresh if necessary.
     """
-    user_info = request.session.get(SessionKeys.SESSION_USER_INFO.value)
-    return user_info
+    user_token = request.session.get(SessionKeys.SESSION_USER_TOKEN.value)
+    if not user_token:
+        logger.info("Not authenticated - no user token found")
+        raise OAuthError("user token not found")
+    expire_time = user_token.get("expires_at")
+    if (
+        expire_time and datetime.now().timestamp() > expire_time - 120
+    ):  # 2 minutes buffer
+        refresh_token = user_token.get("refresh_token")
+        if not refresh_token:
+            raise OAuthError("user token has expired")
+        user_token = await refresh_token(refresh_token)
+        update_session_tokens(request, user_token)
+        userinfo = user_token.get("userinfo")
+        sid = userinfo.get("sid") if userinfo else None
+        logger.info(f"User token refreshed and session updated. sid: {sid}")
+    return user_token
+
+
+async def get_user_info(request: Request):
+    token = await ensure_user_token(request)
+    return token.get("userinfo")
+
+
+async def get_user_access_token(request: Request):
+    token = await ensure_user_token(request)
+    return token.get("access_token")
 
 
 async def get_user_id_token(request: Request):
-    """
-    Get the id_token from the session, refreshing it if necessary.
-    """
-    id_token = request.session.get(SessionKeys.SESSION_USER_ID_TOKEN_KEY.value)
+    token = await ensure_user_token(request)
+    return token.get("id_token")
 
-    if id_token is None:
-        return None
 
+async def get_user_refresh_token(request: Request):
+    token = await ensure_user_token(request)
+    return token.get("refresh_token")
+
+
+async def refresh_token(refresh_token: str):
     try:
-        decoded_token = jwt.decode(id_token, options={"verify_signature": False})
-        exp = decoded_token.get("exp")
-        if (
-            exp and exp < datetime.now().timestamp() + 60
-        ):  # If token expires in 1 minute
-            refresh_token = get_user_refresh_token(request)
-            if not refresh_token:
-                return None
-
-            new_tokens = await refresh_id_token(refresh_token)
-            if not new_tokens:
-                return None
-
-            if oauth.verify is None:
-                logger.error("OAuth verify client is not configured properly")
-                return None
-            userinfo = await oauth.verify.parse_id_token(new_tokens, None)
-            new_tokens["userinfo"] = userinfo
-
-            update_session_tokens(request, new_tokens)
-            return new_tokens.get("id_token")
-    except jwt.PyJWTError as e:
-        logger.error(f"Error decoding token: {e}")
-        return None
-
-    return id_token
-
-
-async def refresh_id_token(refresh_token: str):
-    """
-    Refreshes the id_token using the refresh_token.
-    """
-    try:
-        if oauth.verify is None:
-            logger.error("OAuth verify client is not configured properly")
-            return None
         new_tokens = await oauth.verify.fetch_access_token(
             refresh_token=refresh_token, grant_type="refresh_token"
         )
         return new_tokens
     except Exception as e:
-        logger.error(f"Error refreshing token: {e}")
-        return None
-
-
-def get_user_refresh_token(request: Request):
-    """
-    Get user refresh token from session
-    """
-    return request.session.get(SessionKeys.SESSION_USER_REFRESH_TOKEN_KEY.value)
+        logger.error(f"Error refreshing ID token: {str(e)}", exc_info=True)
+        raise OAuthError("get new token has failed")
 
 
 def update_session_tokens(request: Request, new_tokens: dict):
@@ -157,46 +138,4 @@ def update_session_tokens(request: Request, new_tokens: dict):
     request.session[SessionKeys.SESSION_USER_ACCESS_TOKEN_KEY.value] = new_tokens.get(
         "access_token"
     )
-    request.session[SessionKeys.SESSION_USER_ID_TOKEN_KEY.value] = new_tokens.get(
-        "id_token"
-    )
-    request.session[SessionKeys.SESSION_USER_REFRESH_TOKEN_KEY.value] = new_tokens.get(
-        "refresh_token"
-    )
-    request.session[SessionKeys.SESSION_USER_INFO.value] = new_tokens.get("userinfo")
-
-
-async def get_session_by_session_id(sessionid: str, request: Request):
-    try:
-        handler = get_session_handler(request)
-        # use Redis read session data key = "session:{sessionid}"
-        redis_key = f"session:{sessionid}"
-        redis_client = request.app.state.redis_client
-        data = await redis_client.get(redis_key)
-        if not data:
-            return None
-        return handler.serializer.deserialize(data)
-    except Exception as e:
-        logger.error(
-            f"Error getting session by ID {sessionid}: {str(e)}", exc_info=True
-        )
-        return None
-
-
-async def remove_session_by_session_id(sessionid: str, request: Request):
-    try:
-        handler = get_session_handler(request)
-        if handler.session_id != sessionid:
-            logger.warning(
-                f"Session ID mismatch: handler session ID {handler.session_id} does not match provided session ID {sessionid}"
-            )
-            return
-        # use Redis delete session data key = "session:{sessionid}"
-        redis_key = f"session:{sessionid}"
-        redis_client = request.app.state.redis_client
-        await redis_client.delete(redis_key)
-    except Exception as e:
-        logger.error(
-            f"Error removing session by ID {sessionid}: {str(e)}", exc_info=True
-        )
-        RequestErrorHandler.handle(e, context="remove server session")
+    request.session[SessionKeys.SESSION_USER_TOKEN.value] = new_tokens

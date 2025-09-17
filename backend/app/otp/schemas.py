@@ -51,7 +51,7 @@ class OtpDataResponse(BaseModel):
 
 
 class OtpRequestResponse(ResponseModel):
-    data: OtpDataResponse
+    data: Optional[OtpDataResponse] = None
 
 
 class UserOtpVerificationInfo(BaseModel):

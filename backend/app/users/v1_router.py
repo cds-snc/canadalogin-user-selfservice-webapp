@@ -5,7 +5,7 @@ from fastapi import Request, Depends
 
 from app.users.schemas import (
     ProfileResponse,
-    ProfilePUTData,
+    UserProfileUpdateRequest,
     RelyingPartyResponse,
     UserPhoneAuthFactorsResponse,
 )
@@ -28,14 +28,13 @@ logger = logging.getLogger(__name__)
 )
 async def user_profile(
     request: Request,
-    user_data: ProfilePUTData,
+    user_data: UserProfileUpdateRequest,
     user_access_token: str = Depends(get_users_current_session),
 ):
     return await update_profile(
-        request.app.state.request_client,
+        request,
         user_data,
         user_access_token,
-        profile_api_endpoint=request.app.state.config.profile_api_endpoint,
     )
 
 

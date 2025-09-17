@@ -4,17 +4,11 @@ from typing import AsyncGenerator
 from fastapi import Request
 from fastapi.responses import RedirectResponse, StreamingResponse
 from authlib.integrations.starlette_client import OAuthError
-from starsessions.session import get_session_handler, get_session_metadata
+from starsessions.session import get_session_handler
 from app.auth.services.oidc_config import oauth
 from app.config import get_configuration
 from app.constants.session_keys import SessionKeys
 from app.utils.request_error_handler import RequestErrorHandler
-from app.auth.services.auth_user_session import (
-    update_session_tokens,
-    get_user_info,
-)
-from app.auth.schemas import SSEventData
-
 logger = logging.getLogger(__name__)
 
 
@@ -53,9 +47,7 @@ async def redirect_user_to_idp_verify(request: Request):
         return await oauth.verify.authorize_redirect(request, callback_redirect_uri)
     except Exception as e:
         logger.exception("Unexpected error during redirect_to_verify", str(e))
-        raise RequestErrorHandler.handle(
-            e, context="Unexpected error during idp redirect"
-        )
+        RequestErrorHandler.handle(e, context="Unexpected error during idp redirect")
 
 
 async def callback_handler(request: Request):
@@ -83,7 +75,7 @@ async def callback_handler(request: Request):
             # redirect back to IBM Verify to retry authentication
             raise OAuthError("Invalid or expired token") from error
 
-        # Get the handler and set your sid as session id. sid is unique session id from GC Sign-In
+        # Get the handler and set your sid as session id. sid is uuid passed in id_token
         handler = get_session_handler(request)
         new_session_id = oidc_response.get("userinfo").get("sid")
         handler.session_id = new_session_id
@@ -98,9 +90,7 @@ async def callback_handler(request: Request):
         raise OAuthError("Invalid or expired token") from error
     except Exception as e:
         logger.error(f"Unexpected error: {e}")
-        raise RequestErrorHandler.handle(
-            e, context="Unexpected error during idp redirect"
-        )
+        RequestErrorHandler.handle(e, context="Unexpected error during idp redirect")
 
 
 async def reauthenticate_user(request: Request, returnToPage: str = "/"):
@@ -127,52 +117,4 @@ async def reauthenticate_user(request: Request, returnToPage: str = "/"):
         raise OAuthError("Invalid or expired token") from error
     except Exception as e:
         logger.exception("Unexpected error during redirect_to_verify")
-        raise RequestErrorHandler.handle(e, context="Unexpected error")
-
-
-async def session_event_sse_generator(request: Request):
-    async def event_stream(request: Request) -> AsyncGenerator[str, None]:
-        """
-        Generate Server-Sent Events (SSE) for a user session.
-        """
-        try:
-            config = get_configuration()
-            while True:
-                if request._is_disconnected:
-                    logger.info("Client disconnected from SSE stream")
-                    break
-                user_info = get_user_info(request)
-                if user_info is None:
-                    logger.info("User not logged in")
-                    message_data = SSEventData(status="non-authenticated")
-                    yield f"data: {message_data.model_dump_json()}\n\n"
-                    break
-                await asyncio.sleep(5)
-                # Get session metadata
-                session_metadata = get_session_metadata(request)
-                last_access_timestamp = session_metadata.get("last_access")
-                session_expire = (
-                    config.session_config.SESSION_LIFETIME + last_access_timestamp - 30
-                )
-
-                # Prepare message data with optional last_access info
-                message_data = SSEventData(status="active", expire=int(session_expire))
-                yield f"data: {message_data.model_dump_json()}\n\n"
-        except asyncio.CancelledError:
-            logger.info("SSE stream cancelled")
-        except Exception as e:
-            logger.error(f"Error in event stream: {str(e)}")
-            message_data = SSEventData(
-                status="error", error="An internal error has occurred."
-            )
-            yield f"data: {message_data.model_dump_json()}\n\n"
-
-    return StreamingResponse(
-        event_stream(request),
-        media_type="text/event-stream",
-        headers={
-            "Cache-Control": "no-cache",
-            "Connection": "keep-alive",
-            "X-Accel-Buffering": "no",  # Disable nginx buffering
-        },
-    )
+        RequestErrorHandler.handle(e, context="Unexpected error")
