@@ -106,8 +106,6 @@ export default function ChangePasswordIndex() {
         userSelectedMfaType={userSelectedMfaType}
         localLoading={localLoading}
         setLocalLoading={handleLoading}
-        step={2}
-        totalSteps={4}
         onNext={() => {
           setPasswordUpdateStep("otpValidation");
         }}
@@ -120,8 +118,6 @@ export default function ChangePasswordIndex() {
         localLoading={localLoading}
         setLocalLoading={handleLoading}
         onChangeUserMfaType={handleChangeUserMfaSelection}
-        step={3}
-        totalSteps={4}
         userOtpValue={userOtpValue}
         setUserOtpValue={handleSetUserOtpValue}
         otpSentResponse={otpSentResponse}
@@ -135,11 +131,9 @@ export default function ChangePasswordIndex() {
     passwordChange: (
       <Password
         userProfile={userProfile}
-        step={4}
         userSelectedMfaType={userSelectedMfaType}
         localLoading={localLoading}
         setLocalLoading={handleLoading}
-        totalSteps={4}
         otpSentResponse={otpSentResponse}
         userOtpValue={userOtpValue}
         onNext={() => {

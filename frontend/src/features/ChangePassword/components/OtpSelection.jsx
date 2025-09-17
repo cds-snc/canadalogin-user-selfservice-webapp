@@ -3,10 +3,10 @@ import {
   GcdsContainer,
   GcdsRadios,
   GcdsLink,
-  GcdsStepper,
   GcdsText,
   GcdsGrid,
   GcdsButton,
+  GcdsHeading,
 } from "@cdssnc/gcds-components-react";
 import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 
@@ -17,8 +17,6 @@ import { path } from "../../../utils/routeHelpers.js";
 import { FLOW_TYPES, PAGES } from "../../../utils/constants.jsx";
 
 export default function OtpSelection({
-  step,
-  totalSteps,
   onNext,
   userSelectedMfaType,
   onChangeUserMfaType,
@@ -76,14 +74,12 @@ export default function OtpSelection({
   return (
     <GcdsContainer>
       <GcdsContainer className="gcds-gap">
-        <GcdsStepper
-          currentStep={step}
-          totalSteps={totalSteps}
+        <GcdsHeading
           tag="h1"
           lang={language}
         >
           {pageContentJson["1"]}
-        </GcdsStepper>
+        </GcdsHeading>
       </GcdsContainer>
       <GcdsContainer>
         <GcdsContainer>

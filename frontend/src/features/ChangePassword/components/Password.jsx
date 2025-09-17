@@ -9,6 +9,7 @@ import {
   GcdsCheckboxes,
   GcdsGrid,
   GcdsButton,
+  GcdsHeading,
 } from "@cdssnc/gcds-components-react";
 import { getPageContent } from "../../../utils/functions.jsx";
 import { authService } from "../../../services/authService.jsx";
@@ -21,8 +22,6 @@ import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 import { path } from "../../../utils/routeHelpers.js";
 
 export default function Password({
-  step,
-  totalSteps,
   onNext,
   otpSentResponse,
   userOtpValue,
@@ -42,7 +41,6 @@ export default function Password({
     language: language,
   });
   const navigateHelper = useNavigateHelper();
-  console.log("passwordPolicy", passwordPolicy);
 
   useEffect(() => {
     async function loadMinMax() {
@@ -100,14 +98,12 @@ export default function Password({
 
   return (
     <GcdsContainer>
-      <GcdsStepper
-        currentStep={step}
-        totalSteps={totalSteps}
+      <GcdsHeading
         tag="h1"
         lang={language}
       >
         {pageContentJson["14"]}
-      </GcdsStepper>
+      </GcdsHeading>
 
       <>
         <GcdsText>
