@@ -4,16 +4,17 @@ from fastapi import Request, HTTPException
 from fastapi.responses import RedirectResponse
 from authlib.integrations.starlette_client import OAuthError
 from starsessions.session import get_session_handler
-from app.auth.services.oidc_config import oauth, validate_logout_token
+from app.auth.services.oidc_config import oauth
 from app.config import get_configuration
 from app.constants.session_keys import SessionKeys
 from app.utils.request_error_handler import RequestErrorHandler
 from app.auth.services.auth_user_session import update_session_tokens, get_user_info
 from app.utils.schemas import ResponseModel
 from app.auth.schemas import LogoutResponseModel
-from app.auth.services.auth_user_session import (
+from app.auth.services.auth_logout import (
     is_logout_token_processed,
     mark_logout_token_as_processed,
+    validate_logout_token,
 )
 
 logger = logging.getLogger(__name__)
