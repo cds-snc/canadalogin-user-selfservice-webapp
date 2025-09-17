@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch, Mock
 from fastapi import HTTPException
 from app.users.schemas import UserProfileUpdateRequest
 from app.users.services.profile import update_profile, my_profile
@@ -15,7 +15,7 @@ async def test_update_profile_success():
 
     mock_get_response = AsyncMock()
     mock_get_response.status_code = 200
-    mock_get_response.json = AsyncMock(
+    mock_get_response.json = Mock(
         return_value={
             "userName": "test@example.com",
             "id": "user123",
@@ -32,7 +32,7 @@ async def test_update_profile_success():
 
     mock_put_response = AsyncMock()
     mock_put_response.status_code = 200
-    mock_put_response.json = AsyncMock(return_value=await mock_get_response.json())
+    mock_put_response.json = Mock(return_value=mock_get_response.json())
 
     mock_request = MagicMock()
     mock_request.app.state.request_client.get = AsyncMock(
@@ -62,7 +62,7 @@ async def test_update_profile_username_mismatch():
 
     mock_get_response = AsyncMock()
     mock_get_response.status_code = 200
-    mock_get_response.json = AsyncMock(
+    mock_get_response.json = Mock(
         return_value={
             "userName": "original@example.com",
             "id": "user123",
@@ -103,7 +103,7 @@ async def test_update_profile_put_fails():
 
     mock_get_response = AsyncMock()
     mock_get_response.status_code = 200
-    mock_get_response.json = AsyncMock(
+    mock_get_response.json = Mock(
         return_value={
             "userName": "test@example.com",
             "id": "user123",
@@ -120,7 +120,7 @@ async def test_update_profile_put_fails():
 
     mock_put_response = AsyncMock()
     mock_put_response.status_code = 500
-    mock_put_response.json = AsyncMock(return_value={"detail": "Internal Server Error"})
+    mock_put_response.json = Mock(return_value={"detail": "Internal Server Error"})
 
     mock_request = MagicMock()
     mock_request.app.state.request_client.get = AsyncMock(
@@ -145,7 +145,7 @@ async def test_update_profile_put_fails():
 async def test_my_profile_success():
     mock_response = AsyncMock()
     mock_response.status_code = 200
-    mock_response.json = AsyncMock(
+    mock_response.json = Mock(
         return_value={
             "userName": "test@example.com",
             "id": "user123",
@@ -182,7 +182,7 @@ async def test_my_profile_success():
 async def test_my_profile_other_failure():
     mock_response = AsyncMock()
     mock_response.status_code = 500
-    mock_response.json = AsyncMock(return_value={"detail": "Server error"})
+    mock_response.json = Mock(return_value={"detail": "Server error"})
     mock_response.text = "Server error"
 
     mock_client = AsyncMock()
