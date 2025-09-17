@@ -1,7 +1,4 @@
-import {
-  GcdsContainer,
-  GcdsIcon,
-} from "@cdssnc/gcds-components-react";
+import { GcdsContainer, GcdsIcon } from "@cdssnc/gcds-components-react";
 
 export default function VerifiedBadge({ text }) {
   return (

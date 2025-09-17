@@ -1,6 +1,4 @@
-import {
-  GcdsContainer
-} from "@cdssnc/gcds-components-react";
+import { GcdsContainer } from "@cdssnc/gcds-components-react";
 
 export default function EnabledBadge({ text }) {
   return (
