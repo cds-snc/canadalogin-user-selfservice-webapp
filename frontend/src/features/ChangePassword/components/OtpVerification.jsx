@@ -142,10 +142,7 @@ export default function OtpVerification({
       )}
 
       <GcdsContainer>
-        <GcdsHeading
-          tag="h1"
-          lang={language}
-        >
+        <GcdsHeading tag="h1" lang={language}>
           {userMfaType === FLOW_TYPES.email
             ? pageContentJson["22"]
             : pageContentJson["1"]}

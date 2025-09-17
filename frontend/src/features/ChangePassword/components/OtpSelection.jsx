@@ -74,10 +74,7 @@ export default function OtpSelection({
   return (
     <GcdsContainer>
       <GcdsContainer className="gcds-gap">
-        <GcdsHeading
-          tag="h1"
-          lang={language}
-        >
+        <GcdsHeading tag="h1" lang={language}>
           {pageContentJson["1"]}
         </GcdsHeading>
       </GcdsContainer>

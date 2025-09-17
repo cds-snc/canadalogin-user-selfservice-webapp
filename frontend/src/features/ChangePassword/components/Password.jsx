@@ -21,11 +21,7 @@ import { useParams } from "react-router";
 import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 import { path } from "../../../utils/routeHelpers.js";
 
-export default function Password({
-  onNext,
-  otpSentResponse,
-  userOtpValue,
-}) {
+export default function Password({ onNext, otpSentResponse, userOtpValue }) {
   const { state } = useUser();
   const { language } = useParams();
   const { submit, cancel } = getPageContent(language, "Button");
@@ -98,10 +94,7 @@ export default function Password({
 
   return (
     <GcdsContainer>
-      <GcdsHeading
-        tag="h1"
-        lang={language}
-      >
+      <GcdsHeading tag="h1" lang={language}>
         {pageContentJson["14"]}
       </GcdsHeading>
 
