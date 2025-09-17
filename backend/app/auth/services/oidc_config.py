@@ -31,7 +31,7 @@ async def validate_logout_token(request: Request):
         raise ValueError("Missing logout_token parameter")
     form_dict = dict(form_data)
 
-    logout_token = form_dict["logout_token"]
+    logout_token = form_dict.get("logout_token")
     if logout_token is None or not isinstance(logout_token, str):
         raise ValueError("Missing logout_token parameter Or invalid type")
 
