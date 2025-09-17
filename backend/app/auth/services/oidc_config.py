@@ -64,8 +64,8 @@ async def validate_logout_token(request: Request):
 
 def _validate_logout_events(claims, events):
     """Validate the events claim contains logout event"""
-    logout_events = ["http://schemas.openid.net/event/backchannel-logout"]
-    return any(event in events for event in logout_events)
+    logout_event_uri = "http://schemas.openid.net/event/backchannel-logout"
+    return isinstance(events, dict) and logout_event_uri in events
 
 
 def _reject_nonce(claims, nonce):
