@@ -28,8 +28,7 @@ export const NAVIGATION_LINKS = {
   profileUpdateLanguage: "/profile/update-language",
   profileUpdateLanguageConfirmUpdate: "/profile/update-language/confirm-update",
   profileUpdateLanguageSuccess: "/profile/update-language/success",
-  updateContactPhoneNumber: "/profile/update-contact-phone-number"
-
+  updateContactPhoneNumber: "/profile/update-contact-phone-number",
 };
 
 export const EXTERNAL_NAVIGATION_LINKS = {
@@ -106,9 +105,10 @@ export const PAGES = {
   profileYouMayUpdateLanguage: "ProfileYouMayUpdateLanguage",
   passwordChangedConfirmation: "PasswordChangedConfirmation",
   ServicesWithAccessInfo: "ServicesWithAccessInfo",
-  updateContactPhoneNumber: 'UpdateContactPhoneNumber',
-  confirmContactPhoneNumberUpdate: 'ConfirmContactPhoneNumberUpdate',
-  successfullyUpdatedContactPhoneNumber: 'SuccessfullyUpdatedContactPhoneNumber'
+  updateContactPhoneNumber: "UpdateContactPhoneNumber",
+  confirmContactPhoneNumberUpdate: "ConfirmContactPhoneNumberUpdate",
+  successfullyUpdatedContactPhoneNumber:
+    "SuccessfullyUpdatedContactPhoneNumber",
 };
 
 export const FOOTERS = {
