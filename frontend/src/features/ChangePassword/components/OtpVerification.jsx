@@ -2,12 +2,10 @@ import { useEffect, useState, useRef } from "react";
 
 import {
   GcdsContainer,
-  GcdsErrorSummary,
   GcdsHeading,
   GcdsInput,
   GcdsLink,
   GcdsNotice,
-  GcdsStepper,
   GcdsText,
   GcdsButton,
   GcdsGrid,
@@ -26,8 +24,6 @@ import { useUser } from "../../../components/Providers/useUser.tsx";
 const initialTime = 10;
 
 export default function OtpVerification({
-  step,
-  totalSteps,
   onNext,
   userProfile,
   userSelectedMfaType,
@@ -146,16 +142,11 @@ export default function OtpVerification({
       )}
 
       <GcdsContainer>
-        <GcdsStepper
-          currentStep={step}
-          totalSteps={totalSteps}
-          tag="h1"
-          lang={language}
-        >
+        <GcdsHeading tag="h1" lang={language}>
           {userMfaType === FLOW_TYPES.email
             ? pageContentJson["22"]
             : pageContentJson["1"]}
-        </GcdsStepper>
+        </GcdsHeading>
 
         <GcdsText>
           {userMfaType === FLOW_TYPES.voice
