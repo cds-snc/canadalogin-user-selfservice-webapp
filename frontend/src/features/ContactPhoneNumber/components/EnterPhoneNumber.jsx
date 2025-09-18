@@ -1,9 +1,6 @@
 import { useState } from "react";
 import { useParams } from "react-router";
-import {
-  isValidPhoneNumber,
-  parsePhoneNumberFromString,
-} from "libphonenumber-js";
+import { isValidPhoneNumber } from "libphonenumber-js";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/material.css";
 
@@ -42,18 +39,14 @@ const ServicesAccessingPhoneNumber = ({ pageContentJson }) => {
   );
 };
 
-const StepperHeader = ({ step, totalSteps, language, pageContentJson }) => {
+const PageHeader = ({ language, pageContentJson }) => {
   return (
     <>
-      <GcdsStepper
-        currentStep={step}
-        totalSteps={totalSteps}
-        tag="h1"
-        lang={language}
-      >
+      <GcdsHeading tag="h1" lang={language}>
         {pageContentJson["1"]}
-      </GcdsStepper>
+      </GcdsHeading>
       <GcdsText>{pageContentJson["2"]}</GcdsText>
+      <ServicesAccessingPhoneNumber pageContentJson={pageContentJson} />
     </>
   );
 };
@@ -142,18 +135,7 @@ export default function EnterPhoneNumber({
     <GcdsContainer>
       <GcdsGrid columns="1" gap="500">
         <section>
-          <StepperHeader
-            step={step}
-            totalSteps={totalSteps}
-            language={language}
-            pageContentJson={pageContentJson}
-          />
-          <GcdsHeading tag="h1" lang={language}>
-            {userMfaType === FLOW_TYPES.email
-              ? pageContentJson["22"]
-              : pageContentJson["1"]}
-          </GcdsHeading>
-          <ServicesAccessingPhoneNumber pageContentJson={pageContentJson} />
+          <PageHeader language={language} pageContentJson={pageContentJson} />
         </section>
 
         <section>
@@ -215,12 +197,6 @@ export default function EnterPhoneNumber({
           style={{ width: "fit-content" }}
           onGcdsClick={(ev) => {
             ev.preventDefault();
-            // const parsedPhoneNumber = parsePhoneNumberFromString(phoneFormData.phoneNumber).formatInternational();
-            // if (parsedPhoneNumber) {
-            //     onChangePhoneForm('formattedPhoneNumber', parsedPhoneNumber);
-            // } else {
-            //     onChangePhoneForm('formattedPhoneNumber', phoneFormData.phoneNumber);
-            // }
             onNext();
           }}
         >
