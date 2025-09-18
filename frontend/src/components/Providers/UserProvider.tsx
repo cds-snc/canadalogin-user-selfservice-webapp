@@ -5,7 +5,11 @@ import {
   useEventSourceListener,
 } from "@react-nano/use-event-source";
 import config from "../../config";
-import { SERVICES, CONTEXT_ACTIONS, SUBMIT_END_POINTS } from "../../utils/constants.jsx";
+import {
+  SERVICES,
+  CONTEXT_ACTIONS,
+  SUBMIT_END_POINTS,
+} from "../../utils/constants.jsx";
 import UserContext from "./UserContext";
 import { authService } from "../../services/authService.jsx";
 import Loader from "../Layout/Loading.jsx";
@@ -179,11 +183,14 @@ export function UserProvider({
   const { language } = useParams();
   const pageContentJson = getPageContent(language, "SessionManagement");
 
-  const [eventSource, eventSourceStatus] = useEventSource(`${config.apiUrl}${SUBMIT_END_POINTS.sessionStatus}`, true);
+  const [eventSource, eventSourceStatus] = useEventSource(
+    `${config.apiUrl}${SUBMIT_END_POINTS.sessionStatus}`,
+    true,
+  );
 
   useEventSourceListener(
-     eventSource,
-    ["expired","error","notification","terminated"], // The name of the event from your server
+    eventSource,
+    ["expired", "error", "notification", "terminated"],
     (event) => {
       if (event.type === "expired" || event.type === "terminated") {
         console.log("SSE expired or terminated:", event.data);
@@ -194,13 +201,12 @@ export function UserProvider({
         });
       }
       if (event.type === "error") {
-        // do nothing. till client closes the connection
+        // for debugging purpose. No need to handle it.
         console.error("SSE error:", event.data);
-        if (eventSource) eventSource.close();
       }
       if (event.type === "notification") {
         // Handle notification event if needed
-        // placeholder for pop-up notification
+        // Placeholder for pop-up notification. To be implemented.
         // need to reset the two timers, one for warning, one for expiry
         // clearTimeout(warningTimer);
         // clearTimeout(expiryTimer);
@@ -281,7 +287,7 @@ export function UserProvider({
   }, []);
 
   if (state.isLoading && state.loadingText) {
-    return <Loader text={state.loadingText}/>;
+    return <Loader text={state.loadingText} />;
   }
 
   return (

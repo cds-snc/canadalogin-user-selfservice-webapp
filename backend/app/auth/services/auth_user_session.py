@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import json
 from datetime import datetime
 from httpx import AsyncClient
 from typing import AsyncGenerator
@@ -14,7 +15,7 @@ from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.request_error_handler import RequestErrorHandler
 from app.auth.services.oidc_config import oauth
 from app.auth.schemas import SSEventData
-import json
+
 
 logger = logging.getLogger(__name__)
 
@@ -167,6 +168,9 @@ async def get_session_data_by_id(request: Request, session_id: str):
 
 
 async def session_event_sse_generator(request: Request):
+    """
+    For code review. StreamingResponse, can't use regular Exception handling
+    """
     config = get_configuration()
     user_info = None
     try:
