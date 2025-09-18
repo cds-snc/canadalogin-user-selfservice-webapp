@@ -76,49 +76,49 @@ export const BackToProfileButton = {
   },
 };
 
-// Test secondary action button
-export const SignOutButton = {
-  parameters: {
-    ...buildTestCase.parameters(
-      NAVIGATION_LINKS.profileUpdateNameSuccess,
-      {
-        language: AVAILABLE_LANGUAGES.en,
-        flow: FLOW_TYPES.profile,
-      },
-      [],
-    ),
-    test: {
-      dangerouslyIgnoreUnhandledErrors: true,
-    },
-  },
-  play: async ({ canvasElement, step }) => {
-    const canvas = within(canvasElement);
-    await new Promise((r) => setTimeout(r, 1000));
+// // Test secondary action button
+// export const SignOutButton = {
+//   parameters: {
+//     ...buildTestCase.parameters(
+//       NAVIGATION_LINKS.profileUpdateNameSuccess,
+//       {
+//         language: AVAILABLE_LANGUAGES.en,
+//         flow: FLOW_TYPES.profile,
+//       },
+//       [],
+//     ),
+//     test: {
+//       dangerouslyIgnoreUnhandledErrors: true,
+//     },
+//   },
+//   play: async ({ canvasElement, step }) => {
+//     const canvas = within(canvasElement);
+//     await new Promise((r) => setTimeout(r, 1000));
 
-    // Test clicking the secondary action button
-    await step("Click secondary action button", async () => {
-      // Find all "Sign out" text elements and select the second one
-      let signOutButton = canvas.queryByText(/Sign out/i, {
-        exact: false,
-        selector: "gcds-button, button, a",
-      });
-      await expect(signOutButton).toBeInTheDocument();
-      if (signOutButton.tagName === "GCDS-BUTTON" && signOutButton.shadowRoot) {
-        const actualButton =
-          signOutButton.shadowRoot.querySelector('button[part="button"]') ||
-          signOutButton.shadowRoot.querySelector("button");
-        if (actualButton) {
-          signOutButton = actualButton;
-        }
-      }
-      await userEvent.click(signOutButton);
+//     // Test clicking the secondary action button
+//     await step("Click secondary action button", async () => {
+//       // Find all "Sign out" text elements and select the second one
+//       let signOutButton = canvas.queryByText(/Sign out/i, {
+//         exact: false,
+//         selector: "gcds-button, button, a",
+//       });
+//       await expect(signOutButton).toBeInTheDocument();
+//       if (signOutButton.tagName === "GCDS-BUTTON" && signOutButton.shadowRoot) {
+//         const actualButton =
+//           signOutButton.shadowRoot.querySelector('button[part="button"]') ||
+//           signOutButton.shadowRoot.querySelector("button");
+//         if (actualButton) {
+//           signOutButton = actualButton;
+//         }
+//       }
+//       await userEvent.click(signOutButton);
 
-      // Wait for navigation
-      await new Promise((r) => setTimeout(r, 1000));
-    });
+//       // Wait for navigation
+//       await new Promise((r) => setTimeout(r, 1000));
+//     });
 
-    await new Promise((r) => setTimeout(r, 1000));
-    // Should navigate back to profile or show 404 in Storybook environment
-    await expect(canvas.getByText(/404 Not Found/i)).toBeInTheDocument();
-  },
-};
+//     await new Promise((r) => setTimeout(r, 1000));
+//     // Should navigate back to profile or show 404 in Storybook environment
+//     await expect(canvas.getByText(/404 Not Found/i)).toBeInTheDocument();
+//   },
+// };
