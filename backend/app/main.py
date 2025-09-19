@@ -146,19 +146,6 @@ app.add_middleware(
     cookie_name=configuration.session_config.SESSION_COOKIE_NAME,
 )
 
-# Autoload session if cookie is present
-app.add_middleware(SessionAutoloadMiddleware)
-# SessionMiddleware
-app.add_middleware(
-    SessionMiddleware,
-    store=session_store,
-    rolling=True,
-    cookie_https_only=cookie_secure,
-    lifetime=configuration.session_config.SESSION_LIFETIME,
-    cookie_domain=configuration.ROOT_DOMAIN,
-    cookie_name=configuration.session_config.SESSION_COOKIE_NAME,
-)
-
 
 app.include_router(health.router, prefix="/health")
 
