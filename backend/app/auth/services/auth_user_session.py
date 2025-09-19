@@ -220,10 +220,6 @@ async def session_event_sse_generator(request: Request):
         """
         try:
             while True:
-                if request._is_disconnected:
-                    logger.debug("Client disconnected from SSE stream")
-                    break
-
                 await asyncio.sleep(5)
                 session_active = await get_session_data_by_id(request, session_id)
                 if session_active is None:
