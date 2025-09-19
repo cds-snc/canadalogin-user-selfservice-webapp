@@ -14,13 +14,11 @@
 - [ ] Clear summary of **what** is being changed
 - [ ] Explanation of **why** the change is necessary (if applicable)
 - [ ] Links to **relevant tickets**, issues, or design docs
-- [ ] Highlights any **tricky logic**, known issues, or areas to focus review
 - [ ] For UI changes, provide a screen capture for easier review (folks on the team have used Kap)
 
 ### 🧪 Testing
 
 - [ ] New code is covered by **unit, integration, or end-to-end tests**
-- [ ] All existing tests **pass locally and in CI**
 - [ ] Includes **manual testing steps** if applicable
 - [ ] Considers **edge cases** and failure modes
 
@@ -41,7 +39,10 @@ If so, ensure the following:
 - [ ] Impacts to performance, scalability, security, or maintainability were reviewed
 - [ ] The design has been communicated to relevant team members
 
-> ℹ️ **Note:** If the PR exceeds size guidelines or introduces architectural changes, please explain why and suggest how reviewers can approach it efficiently.
+> ℹ️ **Note:** If the PR exceeds size guidelines or introduces architectural changes, please explain why and suggest how reviewers can approach it efficiently.  
+> ℹ️ **Note:** Architectural or significant changes should go through the [RFC process](https://docs.google.com/document/d/1kRDswJZ9wCiI7D2K3GYWnGEDp2yPUGLQ9_yuNoYQCf0/edit?tab=t.0#heading=h.gwtmzfdyqc3h) and be logged in the [Product Decision Log](https://docs.google.com/document/d/1JN4a3ulfl3_NKD_eA2h4J17QdR3nN3JV680U087PeYE/edit?tab=t.0#heading=h.q8c85u2i9t5z) before beginning work on code and a PR.  
+> ℹ️ **Note:** Architectural changes that impact external clients should go through the [ADR process](https://github.com/cds-snc/ADR).  
+<br />
 
 ## ✅ Code Review Checklist for Reviewers
 
@@ -62,7 +63,6 @@ If so, ensure the following:
 ### 📐 System Design & Architecture
 
 - [ ] Does the implementation align with the **agreed design or architecture**?
-- [ ] Are **trade-offs explained** (performance, scalability, cost, maintainability)?
 - [ ] Is the code **extensible** and easy to evolve if requirements change?
 - [ ] Any risk of **tight coupling** or unnecessary complexity?
 
@@ -73,19 +73,10 @@ If so, ensure the following:
 - [ ] Are **failure modes** accounted for (timeouts, nulls, bad input)?
 - [ ] Is there any **dead code, duplication**, or unused paths?
 
-### 🧪 Tests & Coverage
-
-- [ ] Are there sufficient **unit and integration tests** for all new logic?
-- [ ] Are **edge cases and failure conditions** tested?
-- [ ] Are the tests readable, well-scoped, and reliable (non-flaky)?
-- [ ] Could a test be added for a high-risk or unclear area?
-
 ### 🔐 Security, Performance, and Other Concerns
 
 - [ ] Are there any potential **security risks** (e.g., injection, exposure, auth issues)?
-- [ ] Are **performance implications** considered (e.g. N+1 queries, loops, large payloads)?
 - [ ] Are **dependencies or APIs** used correctly and safely?
-- [ ] Are there any **data loss, migration**, or **backward compatibility** risks?
 
 ### 🧭 UX, Accessibility, and Frontend (if applicable)
 
