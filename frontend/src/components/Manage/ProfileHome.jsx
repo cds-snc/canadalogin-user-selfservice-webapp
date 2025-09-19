@@ -17,6 +17,7 @@ import { PAGES, LANGUAGE_DISPLAY_NAMES } from "../../utils/constants.jsx";
 import { path } from "../../utils/routeHelpers.js";
 import { useUser } from "../Providers/useUser.tsx";
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
+import VerifiedBadge from "../Badges/VerifiedBadge.jsx";
 
 const DisplayPhoneNumbers = ({ phoneNumbers }) => {
   console.log("phoneNumbers", phoneNumbers);
@@ -142,16 +143,8 @@ export default function ProfileHome() {
           </GcdsLink>
         </GcdsGrid>
 
-        <GcdsGrid columns="auto auto" className="verifiedBadge">
-          <GcdsIcon
-            name="checkmark-circle"
-            className="verifiedIcon"
-            size="text-small"
-          />
-          <GcdsText className="verifiedText" style={{ paddingTop: "0.25rem" }}>
-            {pageContent["9"]}
-          </GcdsText>
-        </GcdsGrid>
+        <VerifiedBadge text={pageContent["9"]} />
+
         {phoneNumbers != null ? (
           <>
             <div className="separator" />
