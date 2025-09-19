@@ -10,7 +10,6 @@ import {
   GcdsGrid,
   GcdsHeading,
   GcdsLink,
-  GcdsStepper,
   GcdsText,
   GcdsRadios,
   GcdsButton,
@@ -109,20 +108,16 @@ const RadioButtons = ({
 };
 
 export default function EnterPhoneNumber({
-  step,
-  totalSteps,
   onNext,
   onCancel,
   onChangePhoneForm,
   phoneFormData,
-  setLocalLoading,
 }) {
   const { language } = useParams();
   const [phoneNumberValid, setPhoneNumberValid] = useState(true);
   const pageContentJson = getPageContent(language, PAGES.enterNewPhoneNumber);
   const otpPageContentJson = getPageContent(language, PAGES.otpSelection);
 
-  const errorPageJson = getPageContent(language, PAGES.error);
   const { submit, cancel } = getPageContent(language, "Button");
 
   const isPhoneNumberValid = (phoneNumber, country) => {

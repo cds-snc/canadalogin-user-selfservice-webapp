@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useParams, useLocation } from "react-router";
+import { useParams } from "react-router";
+import { GcdsErrorMessage } from "@cdssnc/gcds-components-react";
 import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 import {
   NAVIGATION_LINKS,
@@ -15,7 +16,7 @@ import EnterPhoneNumber from "./EnterPhoneNumber.jsx";
 import OtpVerification from "./OtpVerification.jsx";
 import ConfirmUpdate from "./ConfirmUpdate.jsx";
 import SuccessfullyUpdated from "./SuccessfullyUpdated.jsx";
-import { transientOtp } from "../api/transientOtp.jsx";
+import { transientOtp } from "../api/transientOtp.js";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
 
 const STEPS = {
@@ -34,10 +35,30 @@ const serverMapping = {
   [FLOW_TYPES.voice]: "voice",
 };
 
+const StepContent = ({ errorCode, errorPageJson, StepComponent }) => {
+  let errorMessage = errorPageJson[errorCode] || "";
+
+  if (errorMessage === "" && errorCode === "Unexpected API request error") {
+    errorMessage = errorPageJson["7"];
+  }
+
+  return (
+    <>
+      {errorMessage && (
+        <GcdsErrorMessage messageId="message-props">
+          {errorMessage}
+        </GcdsErrorMessage>
+      )}
+      {StepComponent}
+    </>
+  );
+};
+
 export default function UpdateContactPhoneNumber() {
   const { language } = useParams();
   const { state, dispatch } = useUser();
   const [errorCode, setErrorCode] = useState("");
+  const errorPageJson = getPageContent(language, PAGES.error);
 
   const { userProfile } = state;
   const { userName } = userProfile ?? {};
@@ -57,7 +78,7 @@ export default function UpdateContactPhoneNumber() {
   });
 
   const navigateHelper = useNavigateHelper();
-  const backtoProfile = `/${language}${NAVIGATION_LINKS.profileHome}`;
+  const backtoProfile = `/${language}${NAVIGATION_LINKS.profile}`;
 
   const handleLoading = (bool) => {
     setLocalLoading(bool);
@@ -70,9 +91,11 @@ export default function UpdateContactPhoneNumber() {
     }));
   };
 
-  const sendOTP = async () => {
+  const sendOTP = async ({ reSendOtpCode = false } = {}) => {
+    if (!reSendOtpCode) setLocalLoading(true);
+    setErrorCode("");
+
     try {
-      setLocalLoading(true);
       const formdata = {
         phoneNumber: phoneFormData.phoneNumber,
         userName: userName,
@@ -82,7 +105,7 @@ export default function UpdateContactPhoneNumber() {
       const response = await transientOtp.sendOtp(formdata);
       if (response && response.data && response.data.trxnId) {
         handlePhoneForm("trxnId", response.data.trxnId);
-        setStep(STEPS.VERIFY);
+        if (!reSendOtpCode) setStep(STEPS.VERIFY);
       }
     } catch (error) {
       if (error && error.data && error.data.message) {
@@ -125,6 +148,7 @@ export default function UpdateContactPhoneNumber() {
 
       const response = await authService.update_my_user_profile(formdata);
       if (response && response.success && response.data) {
+        setErrorCode("");
         setStep(STEPS.SUCCESS);
         updateProfileSuccess(response.data);
       }
@@ -144,8 +168,6 @@ export default function UpdateContactPhoneNumber() {
         phoneFormData={phoneFormData}
         onChangePhoneForm={handlePhoneForm}
         setLocalLoading={handleLoading}
-        step={1}
-        totalSteps={3}
         errorCode={errorCode}
         onNext={() => {
           sendOTP();
@@ -161,8 +183,6 @@ export default function UpdateContactPhoneNumber() {
         phoneFormData={phoneFormData}
         onChangePhoneForm={handlePhoneForm}
         errorCode={errorCode}
-        step={2}
-        totalSteps={3}
         onNext={() => {
           verifyOtp();
         }}
@@ -170,7 +190,11 @@ export default function UpdateContactPhoneNumber() {
           navigateHelper(backtoProfile);
         }}
         onBack={() => {
+          setErrorCode("");
           setStep(STEPS.ENTER);
+        }}
+        requestNewOtpCode={() => {
+          sendOTP({ reSendOtpCode: true });
         }}
       />
     ),
@@ -179,8 +203,7 @@ export default function UpdateContactPhoneNumber() {
         userProfile={userProfile}
         phoneFormData={phoneFormData}
         onChangePhoneForm={handlePhoneForm}
-        step={3}
-        totalSteps={3}
+        errorCode={errorCode}
         onNext={() => {
           updateProfile();
         }}
@@ -203,8 +226,13 @@ export default function UpdateContactPhoneNumber() {
     ),
   };
 
-  console.log("phoneForm", phoneFormData);
-  console.log("localLoading", localLoading);
-
-  return localLoading ? <Loader text={loadingMessage["11"]} /> : steps[step];
+  return localLoading ? (
+    <Loader text={loadingMessage["11"]} />
+  ) : (
+    <StepContent
+      StepComponent={steps[step]}
+      errorCode={errorCode}
+      errorPageJson={errorPageJson}
+    />
+  );
 }

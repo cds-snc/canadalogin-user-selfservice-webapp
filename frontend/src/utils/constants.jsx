@@ -22,6 +22,7 @@ export const NAVIGATION_LINKS = {
   youMayUpdateEmailAtOtherPlaces: "/youMayUpdateEmailAtOtherPlaces",
   areYouSureUpdateYourEmail: "/areYouSureUpdateYourEmail",
   profileHome: "/profile-home",
+  profile: "/profile",
   profileUpdateName: "/profile/update-name",
   profileUpdateNameSuccess: "/profile/update-name/success",
   profileUpdateNameConfirmUpdate: "/profile/update-name/confirm-update",
