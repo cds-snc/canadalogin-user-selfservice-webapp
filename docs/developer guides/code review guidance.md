@@ -48,7 +48,7 @@ If so, ensure the following:
 
 ### ⏱️ Review Timing & Scope
 
-- [ ] **Spend \~30–60 minutes per review** for PRs under 300 LOC
+- [ ] **Block off dedicated time to do a review and avoid distractions**. Plan to spend \~30–60 minutes per review** for PRs under 300 LOC or more.  
 - [ ] For large PRs (>400 LOC), request it be split or set expectations for longer review time
 - [ ] If you're not the right reviewer (e.g. domain unfamiliar), **reassign or tag someone else**
 
