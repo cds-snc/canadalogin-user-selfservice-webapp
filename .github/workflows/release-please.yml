@@ -25,3 +25,4 @@ jobs:
         id: release
         with:
           token: ${{ steps.sre_app_token.outputs.token }}
+          target-branch: use-extra-files-in-release-please
