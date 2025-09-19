@@ -178,10 +178,9 @@ async def session_event_sse_generator(request: Request):
     except OAuthError as oe:
         logger.error(f"OAuth error while fetching user info: {str(oe)}")
         return StreamingResponse(
-            (
+            [
                 f"event: terminated\ndata: {SSEventData(status='error', error='Authentication error.').model_dump_json()}\n\n"
-                for _ in range(1)
-            ),
+            ],
             media_type="text/event-stream",
             headers={
                 "Access-Control-Allow-Origin": config.CORS_ORIGINS,
@@ -197,10 +196,9 @@ async def session_event_sse_generator(request: Request):
     if sid is None:
         logger.error("No sid found in user info")
         return StreamingResponse(
-            (
+            [
                 f"event: error\ndata: {SSEventData(status='error', error='No sid found').model_dump_json()}\n\n"
-                for _ in range(1)
-            ),
+            ],
             media_type="text/event-stream",
             headers={
                 "Access-Control-Allow-Origin": config.CORS_ORIGINS,
