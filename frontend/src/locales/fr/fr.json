@@ -319,6 +319,13 @@
     "6": "Répertoire des comptes GC"
   },
   "SessionManagement": {
-    "1": "Déconnexion en cours..."
+    "1": "Votre session est sur le point de se terminer en raison d'une inactivité",
+    "2": "Si vous ne poursuivez pas votre session, vous serez automatiquement déconnecté",
+    "3": "Souhaitez-vous poursuivre votre session ?",
+    "4": "Rester connecté",
+    "5": "Se déconnecter",
+    "6": "Extension en cours...",
+    "7": "Déconnexion en cours...",
+    "8": "Votre session expirera à {{time}}."
   }
 }

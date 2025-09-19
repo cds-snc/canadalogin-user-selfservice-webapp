@@ -340,6 +340,13 @@
     "6": "GC Account directory"
   },
   "SessionManagement": {
-    "1": "Signing you out..."
+    "1": "Your session is about to end due to inactivity ",
+    "2": "If you do not continue your session you will be signed out automatically",
+    "3": "Do you wish to continue your session?",
+    "4": "Stay signed in",
+    "5": "Sign out",
+    "6": "Extending...",
+    "7": "Signing you out...",
+    "8": "Your session will expire at {{time}}."
   }
 }

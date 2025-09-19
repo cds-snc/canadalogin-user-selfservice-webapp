@@ -81,3 +81,15 @@ export function capitalizeFirstLetter(str) {
   if (!str) return "";
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
+export function formatTime(expirationTime) {
+  if (!expirationTime) return "0:00";
+  
+  const now = Date.now();
+  const timeLeft = Math.max(0, expirationTime - now);
+  
+  const minutes = Math.floor(timeLeft / (1000 * 60));
+  const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+  
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+}

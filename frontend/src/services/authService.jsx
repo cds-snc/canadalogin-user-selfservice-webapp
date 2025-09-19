@@ -154,6 +154,19 @@ export const authService = {
       throw error;
     }
   },
+  keepAlive: async () => {
+    try {
+      const response = await axios.post(
+        `${config.apiUrl}${SUBMIT_END_POINTS.keepAlive}`,
+      );
+      return response.data;
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        redirectToLogin();
+      }
+      throw error;
+    }
+  },
 };
 
 function buildTestResponse(userData, type) {

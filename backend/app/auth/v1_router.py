@@ -73,23 +73,31 @@ async def logout(request: Request, id_token: str = Depends(get_user_id_token)):
     return await logout_user(request, id_token)
 
 
-@router.post("/backchannel-logout")
+@router.post(
+        "/backchannel-logout",
+        tags=["Auth"],
+        summary="Backchannel logout",
+        description="Allow GC Sign-In to call backchannel logout",
+)
 async def handle_backchannel_logout(request: Request):
     return await backchannel_logout(request)
 
 
-# Server Side Event send session status message
-# return stream Event
-@router.get("/session-status")
+@router.get(
+        "/session-status",
+        tags=["Auth"],
+        summary="Session status",
+        description="Get session status via Server-Sent Events (SSE)",
+)
 async def session_status(request: Request):
     return await session_event_sse_generator(request)
 
 
-@router.get(
+@router.post(
     "/keep-alive",
     tags=["Auth"],
     summary="Keep alive",
-    description="",
+    description="Keep the user session alive and return the updated session expire info",
 )
 async def keep_alive(request: Request):
     return await session_extend(request)
