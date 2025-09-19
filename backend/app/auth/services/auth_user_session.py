@@ -15,8 +15,7 @@ from app.constants.session_keys import SessionKeys
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.request_error_handler import RequestErrorHandler
 from app.auth.services.oidc_config import oauth
-from app.auth.schemas import SSEventData
-from app.auth.schemas import KeepAliveData
+from app.auth.schemas import SSEventData, KeepAliveData
 from app.utils.schemas import ResponseModel
 
 

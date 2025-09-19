@@ -112,7 +112,11 @@ logger.info(f"ROOT_DOMAIN: {session_domain}")
 # Determine session store
 session_store = InMemoryStore()
 if redis_client is not None:
-    session_store = RedisStore(connection=redis_client, prefix="session:", gc_ttl=600)
+    session_store = RedisStore(
+        connection=redis_client,
+        prefix="session:",
+        gc_ttl=configuration.session_config.SESSION_LIFETIME,
+    )
     logger.info("Using RedisStore for session management")
 
 # Determine if cookie should be secure

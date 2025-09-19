@@ -1,4 +1,5 @@
 import logging
+
 from fastapi import Request
 from fastapi.responses import RedirectResponse
 from authlib.integrations.starlette_client import OAuthError
@@ -7,9 +8,7 @@ from app.auth.services.oidc_config import oauth
 from app.config import get_configuration
 from app.constants.session_keys import SessionKeys
 from app.utils.request_error_handler import RequestErrorHandler
-from app.auth.services.auth_user_session import (
-    update_session_tokens,
-)
+from app.auth.services.auth_user_session import update_session_tokens
 
 logger = logging.getLogger(__name__)
 
@@ -20,8 +19,6 @@ def get_base_profile_management_url():
 
     if config.ENVIRONMENT != "local":
         redirectValue = f"https://{config.PROFILE_MANAGEMENT_DOMAIN}"
-    else:
-        redirectValue = f"http://{config.PROFILE_MANAGEMENT_DOMAIN}"
     return redirectValue
 
 
