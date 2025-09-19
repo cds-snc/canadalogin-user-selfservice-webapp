@@ -12,6 +12,9 @@ from authlib.integrations.starlette_client import OAuthError
 from starsessions import SessionMiddleware, SessionAutoloadMiddleware, InMemoryStore
 from redis.asyncio import Redis
 from starsessions.stores.redis import RedisStore
+from starsessions import SessionMiddleware, SessionAutoloadMiddleware, InMemoryStore
+from redis.asyncio import Redis
+from starsessions.stores.redis import RedisStore
 
 from app.config import get_configuration
 from app.utils.helpers import generate_error_response
@@ -51,6 +54,24 @@ CONTACT_INFO = {
     "email": configuration.app_info.email,
 }
 
+redis_url = configuration.session_config.SESSION_REDIS_URL
+if configuration.ENVIRONMENT != "local":
+    # Construct the Redis URL with TLS and authentication for non-local environments
+    redis_url = f"rediss://:{configuration.session_config.REDIS_AUTH_SECRET}@{configuration.session_config.REDIS_DOMAIN}:{configuration.session_config.REDIS_PORT}?ssl_cert_reqs=none"
+    logger.info(f"Connecting to Redis at {configuration.session_config.REDIS_DOMAIN}")
+else:
+    logger.info("Connecting to local Redis instance")
+redis_client = Redis.from_url(redis_url)
+
+redis_url = configuration.session_config.SESSION_REDIS_URL
+if configuration.ENVIRONMENT != "local":
+    # Construct the Redis URL with TLS and authentication for non-local environments
+    redis_url = f"rediss://:{configuration.session_config.REDIS_AUTH_SECRET}@{configuration.session_config.REDIS_DOMAIN}:{configuration.session_config.REDIS_PORT}?ssl_cert_reqs=none"
+    logger.info(f"Connecting to Redis at {configuration.session_config.REDIS_DOMAIN}")
+else:
+    logger.info("Connecting to local Redis instance")
+redis_client = Redis.from_url(redis_url)
+
 redis_client = None
 if (
     configuration.session_config.SESSION_STORE_TYPE.upper() == "REDISSTORE"
@@ -74,10 +95,7 @@ async def lifespan(app: FastAPI):
     logger.info("Application startup complete")
     app.state.request_client = httpx.AsyncClient()
 
-    if (
-        configuration.session_config.SESSION_STORE_TYPE.upper() == "REDISSTORE"
-        and redis_client is not None
-    ):
+    if redis_client is not None:
         pong = await redis_client.ping()
         if pong:
             logger.info("Connected to Redis server successfully")
@@ -92,10 +110,7 @@ async def lifespan(app: FastAPI):
     logger.info("Closing global HTTP client")
     await app.state.request_client.aclose()
     logger.info("Shutting down IBM Verify Integration API")
-    if (
-        configuration.session_config.SESSION_STORE_TYPE.upper() == "REDISSTORE"
-        and hasattr(app.state, "redis_client")
-    ):
+    if hasattr(app.state, "redis_client"):
         await app.state.redis_client.close()
         logger.info("Closing Redis client")
 
@@ -147,6 +162,19 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["*"],
+)
+
+# Autoload session if cookie is present
+app.add_middleware(SessionAutoloadMiddleware)
+# SessionMiddleware
+app.add_middleware(
+    SessionMiddleware,
+    store=session_store,
+    rolling=True,
+    cookie_https_only=cookie_secure,
+    lifetime=configuration.session_config.SESSION_LIFETIME,
+    cookie_domain=configuration.ROOT_DOMAIN,
+    cookie_name=configuration.session_config.SESSION_COOKIE_NAME,
 )
 
 

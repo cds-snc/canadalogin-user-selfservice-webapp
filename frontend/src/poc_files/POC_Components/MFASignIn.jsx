@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
@@ -9,59 +9,59 @@ import {
   TextField,
   Alert,
   CircularProgress,
-} from '@mui/material';
-import config from '../config';
+} from "@mui/material";
+import config from "../config";
 
 function MFASignIn() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
       const response = await fetch(`${config.apiUrl}/api/auth/signin`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           username: formData.email,
           password: formData.password,
-          factor: 'mfa'
+          factor: "mfa",
         }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.detail || 'Authentication failed');
+        throw new Error(data.detail || "Authentication failed");
       }
 
       // Redirect to MFA verification page with necessary data
-      navigate('/signin/mfa/verify', { 
-        state: { 
+      navigate("/signin/mfa/verify", {
+        state: {
           email: formData.email,
-          verificationToken: data.verification_token 
-        }
+          verificationToken: data.verification_token,
+        },
       });
     } catch (error) {
-      console.error('Sign-in failed:', error);
-      setError(error.message || 'Sign-in failed');
+      console.error("Sign-in failed:", error);
+      setError(error.message || "Sign-in failed");
     } finally {
       setLoading(false);
     }
@@ -69,12 +69,19 @@ function MFASignIn() {
 
   return (
     <Container component="main" maxWidth="sm">
-      <Box sx={{ marginTop: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <Box
+        sx={{
+          marginTop: 8,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
         <Typography component="h1" variant="h4" gutterBottom>
           Sign In with Password + MFA
         </Typography>
 
-        <Paper elevation={3} sx={{ mt: 4, p: 4, width: '100%' }}>
+        <Paper elevation={3} sx={{ mt: 4, p: 4, width: "100%" }}>
           {error && (
             <Alert severity="error" sx={{ mb: 2 }}>
               {error}
@@ -109,13 +116,9 @@ function MFASignIn() {
               disabled={loading}
               sx={{ mb: 2 }}
             >
-              {loading ? <CircularProgress size={24} /> : 'Continue'}
+              {loading ? <CircularProgress size={24} /> : "Continue"}
             </Button>
-            <Button
-              fullWidth
-              variant="outlined"
-              onClick={() => navigate('/')}
-            >
+            <Button fullWidth variant="outlined" onClick={() => navigate("/")}>
               Back to Home
             </Button>
           </form>
@@ -125,4 +128,4 @@ function MFASignIn() {
   );
 }
 
-export default MFASignIn; 
+export default MFASignIn;

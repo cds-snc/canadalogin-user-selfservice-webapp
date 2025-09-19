@@ -51,8 +51,8 @@ async def get_admin_token(global_http_client: AsyncClient) -> str:
         response = await request_access_token(global_http_client)
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(f"Token request completed in {duration:.2f} seconds")
-
-        access_token = response.json().get("access_token")
+        response_json = response.json()
+        access_token = response_json.get("access_token")
         if not access_token:
             logger.error(
                 "Failed to get access token. Status=%s, Body=%s",

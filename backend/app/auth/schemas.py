@@ -12,3 +12,8 @@ class SSEventData(BaseModel):
     status: str
     expire: Optional[int] = None
     error: Optional[str] = None
+
+
+class LogoutResponseModel(BaseModel):
+    redirect_url: Optional[str] = None
+    source: Optional[str] = None

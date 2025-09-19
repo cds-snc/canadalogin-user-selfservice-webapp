@@ -43,11 +43,13 @@ jobs:
           PROFILE_MANAGEMENT_DOMAIN: test.com
           IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID: a123456
           IBM_VERIFY_PROFILE_MANAGEMENT_SECRET: a123456
-          SESSION_STORE_TYPE: RedisStore
           SESSION_SECRET: your_secret_key_here
           SESSION_COOKIE_SECURE: False
           SESSION_REDIS_URL: redis://localhost:6379/0
           SESSION_LIFETIME: 90
+          REDIS_AUTH_SECRET: "test-secret"
+          REDIS_DOMAIN: "master.gc-signin-dev-redis.8pd6gb.cac1.cache.amazonaws.com"
+          REDIS_PORT: 6379
         run: make run-pytest
 
       - name: Build image

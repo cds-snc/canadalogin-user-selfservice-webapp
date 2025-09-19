@@ -10,154 +10,160 @@ import PasswordChangedConfirmation from "./PasswordChangedConfirmation.jsx";
 
 import { otpFactors } from "../api/otpFactors.jsx";
 import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
-import {
-    NAVIGATION_LINKS
-} from "../../../utils/constants.jsx";
+import { PAGES } from "../../../utils/constants.jsx";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
+
+import { getPageContent } from "../../../utils/functions.jsx";
+import { path } from "../../../utils/routeHelpers.js";
 
 const defaulPasswordUpdatetStep = "otpSelection";
 
 export default function ChangePasswordIndex() {
-    const { language } = useParams();
-    const { state, dispatch } = useUser();
-    const { removeAuthenticatedPage } = userProfileDispatch(dispatch);
-    const { pathname } = useLocation();
+  const { language } = useParams();
+  const { state, dispatch } = useUser();
+  const { removeAuthenticatedPage } = userProfileDispatch(dispatch);
+  const { pathname } = useLocation();
 
-    const [userPhoneFactors, setUserPhoneFactors] = useState([]);
+  const [userPhoneFactors, setUserPhoneFactors] = useState([]);
 
-    const [otpSentResponse, setOtpSentResponse] = useState(null);
-    const [userOtpValue, setUserOtpValue] = useState("");
+  const [otpSentResponse, setOtpSentResponse] = useState(null);
+  const [userOtpValue, setUserOtpValue] = useState("");
+  const pageContentJson = getPageContent(language, PAGES.otpSelection);
 
-    const [passwordUpdateStep, setPasswordUpdateStep] = useState(defaulPasswordUpdatetStep);
-    const [localLoading, setLocalLoading] = useState(false);
-    const { userProfile } = state;
-    const { id } = userProfile ?? {};
-    const [userSelectedMfaType, setUserSelectedMfaType] = useState(null);
-    const navigateHelper = useNavigateHelper();
-    const backToSecuritySettingsPage = `/${language}${NAVIGATION_LINKS.securitySettings}`;
+  const [passwordUpdateStep, setPasswordUpdateStep] = useState(
+    defaulPasswordUpdatetStep,
+  );
+  const [localLoading, setLocalLoading] = useState(false);
+  const { userProfile } = state;
+  const { id } = userProfile ?? {};
+  const [userSelectedMfaType, setUserSelectedMfaType] = useState(null);
+  const navigateHelper = useNavigateHelper();
+  const backToSecuritySettingsPage = path(PAGES.securitySettings, {
+    language: language,
+  });
 
-    const handleChangeUserMfaSelection = (mfaType) => {
-        const selectedMfaType = userPhoneFactors.find(factor => factor.type === mfaType);
+  const handleChangeUserMfaSelection = (mfaType) => {
+    const selectedMfaType = userPhoneFactors.find(
+      (factor) => factor.type === mfaType,
+    );
 
-        if (selectedMfaType.type && selectedMfaType.phoneNumber) {
-            setUserSelectedMfaType(selectedMfaType);
-        };
-    };
-
-    const handleLoading = (bool) => {
-        setLocalLoading(bool)
-    };
-
-    const handleOtpSentResponse = (otpResponse) => {
-        setOtpSentResponse(otpResponse);
-    };
-
-    const handleSetUserOtpValue = (userOtpValue) => {
-        setUserOtpValue(userOtpValue);
+    if (selectedMfaType.type && selectedMfaType.phoneNumber) {
+      setUserSelectedMfaType(selectedMfaType);
     }
+  };
 
-    useEffect(() => {
+  const handleLoading = (bool) => {
+    setLocalLoading(bool);
+  };
 
-        const fetchUserOtpPhoneFactors = async () => {
-            try {
-                const response = await otpFactors.getUserOtpPhoneFactors(id);
-                if (response && response.success && response.data.length > 0 && response.data[0].type) {
-                    setUserPhoneFactors(response.data);
-                    setUserSelectedMfaType(response.data[0]);
-                } else {
-                    navigateHelper(backToSecuritySettingsPage)
-                }
-            } catch (err) {
-                console.log('err', err)
-            }
-        };
+  const handleOtpSentResponse = (otpResponse) => {
+    setOtpSentResponse(otpResponse);
+  };
 
-        fetchUserOtpPhoneFactors();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+  const handleSetUserOtpValue = (userOtpValue) => {
+    setUserOtpValue(userOtpValue);
+  };
 
-    useEffect(() => {
-        return () => {
-            // when a user navigates away from this component, we remove the pathname from the array
-            // In the Private Route handler, we track the page to avoid a redirect loop to reautenticate the user
-            removeAuthenticatedPage(pathname);
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    const steps = {
-        otpSelection: (
-            <OtpSelection
-                userProfile={userProfile}
-                userPhoneFactors={userPhoneFactors}
-                onChangeUserMfaType={handleChangeUserMfaSelection}
-                userSelectedMfaType={userSelectedMfaType}
-                localLoading={localLoading}
-                setLocalLoading={handleLoading}
-                step={2}
-                totalSteps={4}
-                onNext={() => {
-                    setPasswordUpdateStep("otpValidation");
-                }}
-            />
-        ),
-        otpValidation: (
-            <OtpVerification
-                userProfile={userProfile}
-                userSelectedMfaType={userSelectedMfaType}
-                localLoading={localLoading}
-                setLocalLoading={handleLoading}
-                onChangeUserMfaType={handleChangeUserMfaSelection}
-                step={3}
-                totalSteps={4}
-                userOtpValue={userOtpValue}
-                setUserOtpValue={handleSetUserOtpValue}
-                otpSentResponse={otpSentResponse}
-                setOtpSentResponse={handleOtpSentResponse}
-                onNext={() => {
-                    setPasswordUpdateStep("passwordChange");
-                }}
-                onBack={() => setPasswordUpdateStep("otpSelection")}
-            />
-        ),
-        passwordChange: (
-            <Password
-                userProfile={userProfile}
-                step={4}
-                userSelectedMfaType={userSelectedMfaType}
-                localLoading={localLoading}
-                setLocalLoading={handleLoading}
-                totalSteps={4}
-                otpSentResponse={otpSentResponse}
-                userOtpValue={userOtpValue}
-                onNext={() => {
-                    setPasswordUpdateStep("passwordChangedConfirmation");
-                }}
-                onBack={() => setPasswordUpdateStep("otpValidation")}
-            />
-        ),
-        passwordChangedConfirmation: (
-            <PasswordChangedConfirmation
-                userProfile={userProfile}
-                step={4}
-                userSelectedMfaType={userSelectedMfaType}
-                localLoading={localLoading}
-                setLocalLoading={handleLoading}
-                totalSteps={4}
-                otpSentResponse={otpSentResponse}
-                userOtpValue={userOtpValue}
-                language={language}
-            />
-        ),
+  useEffect(() => {
+    const fetchUserOtpPhoneFactors = async () => {
+      try {
+        const response = await otpFactors.getUserOtpPhoneFactors(id);
+        if (
+          response &&
+          response.success &&
+          response.data.length > 0 &&
+          response.data[0].type
+        ) {
+          setUserPhoneFactors(response.data);
+          setUserSelectedMfaType(response.data[0]);
+        } else {
+          navigateHelper(backToSecuritySettingsPage);
+        }
+      } catch (err) {
+        console.log("err", err);
+      }
     };
 
+    fetchUserOtpPhoneFactors();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    return (
-        <>
-            {
-                (userSelectedMfaType) ? steps[passwordUpdateStep] : <Loader text="Retrieving your Authentication Factors ..." />
+  useEffect(() => {
+    return () => {
+      // when a user navigates away from this component, we remove the pathname from the array
+      // In the Private Route handler, we track the page to avoid a redirect loop to reautenticate the user
+      removeAuthenticatedPage(pathname);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-            }
-        </>
-    )
+  const steps = {
+    otpSelection: (
+      <OtpSelection
+        userProfile={userProfile}
+        userPhoneFactors={userPhoneFactors}
+        onChangeUserMfaType={handleChangeUserMfaSelection}
+        userSelectedMfaType={userSelectedMfaType}
+        localLoading={localLoading}
+        setLocalLoading={handleLoading}
+        onNext={() => {
+          setPasswordUpdateStep("otpValidation");
+        }}
+      />
+    ),
+    otpValidation: (
+      <OtpVerification
+        userProfile={userProfile}
+        userSelectedMfaType={userSelectedMfaType}
+        localLoading={localLoading}
+        setLocalLoading={handleLoading}
+        onChangeUserMfaType={handleChangeUserMfaSelection}
+        userOtpValue={userOtpValue}
+        setUserOtpValue={handleSetUserOtpValue}
+        otpSentResponse={otpSentResponse}
+        setOtpSentResponse={handleOtpSentResponse}
+        onNext={() => {
+          setPasswordUpdateStep("passwordChange");
+        }}
+        onBack={() => setPasswordUpdateStep("otpSelection")}
+      />
+    ),
+    passwordChange: (
+      <Password
+        userProfile={userProfile}
+        userSelectedMfaType={userSelectedMfaType}
+        localLoading={localLoading}
+        setLocalLoading={handleLoading}
+        otpSentResponse={otpSentResponse}
+        userOtpValue={userOtpValue}
+        onNext={() => {
+          setPasswordUpdateStep("passwordChangedConfirmation");
+        }}
+        onBack={() => setPasswordUpdateStep("otpValidation")}
+      />
+    ),
+    passwordChangedConfirmation: (
+      <PasswordChangedConfirmation
+        userProfile={userProfile}
+        step={4}
+        userSelectedMfaType={userSelectedMfaType}
+        localLoading={localLoading}
+        setLocalLoading={handleLoading}
+        totalSteps={4}
+        otpSentResponse={otpSentResponse}
+        userOtpValue={userOtpValue}
+        language={language}
+      />
+    ),
+  };
+
+  return (
+    <>
+      {userSelectedMfaType ? (
+        steps[passwordUpdateStep]
+      ) : (
+        <Loader text={pageContentJson["12"]} />
+      )}
+    </>
+  );
 }
