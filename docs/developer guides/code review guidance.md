@@ -85,6 +85,7 @@ If so, ensure the following:
 - [ ] UI states (loading, error, empty, etc.) are handled
 - [ ] Keyboard navigation and screen reader accessibility are preserved
 - [ ] No obvious layout or styling bugs
+- [ ] UI flows properly in both mobile and desktop viewport sizes
 
 ### 🗣️ Feedback Style
 
