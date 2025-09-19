@@ -77,6 +77,7 @@ If so, ensure the following:
 
 - [ ] Are there any potential **security risks** (e.g., injection, exposure, auth issues)?
 - [ ] Are **dependencies or APIs** used correctly and safely?
+- [ ] Are new dependencies actively maintained and trustworthy?
 
 ### 🧭 UX, Accessibility, and Frontend (if applicable)
 
