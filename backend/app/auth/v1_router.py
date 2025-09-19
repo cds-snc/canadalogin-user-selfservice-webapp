@@ -18,6 +18,7 @@ from app.auth.services.auth_logout import (
 from app.auth.services.auth_user_session import (
     get_users_current_session,
     get_user_id_token,
+    session_extend,
 )
 
 from app.constants.session_keys import SessionKeys
@@ -82,3 +83,13 @@ async def handle_backchannel_logout(request: Request):
 @router.get("/session-status")
 async def session_status(request: Request):
     return await session_event_sse_generator(request)
+
+
+@router.get(
+    "/keep-alive",
+    tags=["Auth"],
+    summary="Keep alive",
+    description="",
+)
+async def keep_alive(request: Request):
+    return await session_extend(request)

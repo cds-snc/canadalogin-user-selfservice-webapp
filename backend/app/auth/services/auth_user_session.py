@@ -9,12 +9,14 @@ from fastapi import Request, HTTPException
 from fastapi.responses import StreamingResponse
 from starsessions.session import get_session_metadata
 from authlib.integrations.starlette_client import OAuthError
+
 from app.config import get_configuration
 from app.constants.session_keys import SessionKeys
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.request_error_handler import RequestErrorHandler
 from app.auth.services.oidc_config import oauth
-from app.auth.schemas import SSEventData
+from app.auth.schemas import SSEventData, KeepAliveData
+from app.utils.schemas import ResponseModel
 
 
 logger = logging.getLogger(__name__)
@@ -256,3 +258,49 @@ async def session_event_sse_generator(request: Request):
             "X-Accel-Buffering": "no",  # Disable nginx buffering
         },
     )
+
+
+async def session_extend(request: Request):
+    """
+    Check session metadata for expiration. If session is older than 12 hours,
+    remove it and return termination status with login URL.
+    """
+    config = get_configuration()
+    # Get user info from current session
+    user_info = await get_user_info(request)
+    if user_info is None:
+        session_status = KeepAliveData(status="non-authenticated", login="re-login")
+        return ResponseModel(
+            success=False, message="User not authenticated", data=session_status
+        )
+    # Get session ID from user info
+    session_id = user_info.get("sid")
+    if not session_id:
+        session_status = KeepAliveData(status="non-authenticated", login="re-login")
+        return ResponseModel(
+            success=False, message="User not authenticated", data=session_status
+        )
+
+    # Get session metadata
+    session_metadata = get_session_metadata(request)
+    last_access_timestamp = session_metadata.get("last_access")
+    created_timestamp = session_metadata.get("created")
+
+    current_time = datetime.now().timestamp()
+    twelve_hours_in_seconds = 12 * 60 * 60  # 43200 seconds
+
+    session_expire = config.session_config.SESSION_LIFETIME + last_access_timestamp - 30
+
+    # Check if session is older than 12 hours
+    if current_time - created_timestamp > twelve_hours_in_seconds:
+        # Session expired, remove it
+        request.session.clear()
+
+        session_status = KeepAliveData(status="terminated", login="re-login")
+        return ResponseModel(
+            success=False, message="Session terminated", data=session_status
+        )
+
+    # Session is valid, auto extend last access time
+    session_status = KeepAliveData(status="active", expire=int(session_expire))
+    return ResponseModel(success=True, message="Session is active", data=session_status)

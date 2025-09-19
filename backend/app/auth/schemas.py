@@ -7,6 +7,12 @@ class LogoutResponseModel(BaseModel):
     source: Optional[str] = None
 
 
+class KeepAliveData(BaseModel):
+    status: str
+    login: Optional[str] = None
+    expire: Optional[int] = None
+
+
 class SSEventData(BaseModel):
     status: str
     expire: Optional[int] = None
