@@ -47,4 +47,4 @@ jobs:
           git add .deployed_versions/test
           git commit -m "chore: update .deployed_versions/test with next release version $VERSION"
 
-          git push https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }} HEAD:${{ github.ref }}
+          git push https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }} HEAD:${{ fromJson(steps.release.outputs.pr).headBranchName }}
