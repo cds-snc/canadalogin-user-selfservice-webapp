@@ -12,9 +12,6 @@ from authlib.integrations.starlette_client import OAuthError
 from starsessions import SessionMiddleware, SessionAutoloadMiddleware, InMemoryStore
 from redis.asyncio import Redis
 from starsessions.stores.redis import RedisStore
-from starsessions import SessionMiddleware, SessionAutoloadMiddleware, InMemoryStore
-from redis.asyncio import Redis
-from starsessions.stores.redis import RedisStore
 
 from app.config import get_configuration
 from app.utils.helpers import generate_error_response
@@ -62,22 +59,6 @@ if configuration.ENVIRONMENT != "local":
 else:
     logger.info("Connecting to local Redis instance")
 redis_client = Redis.from_url(redis_url)
-
-redis_url = configuration.session_config.SESSION_REDIS_URL
-if configuration.ENVIRONMENT != "local":
-    # Construct the Redis URL with TLS and authentication for non-local environments
-    redis_url = f"rediss://:{configuration.session_config.REDIS_AUTH_SECRET}@{configuration.session_config.REDIS_DOMAIN}:{configuration.session_config.REDIS_PORT}?ssl_cert_reqs=none"
-    logger.info(f"Connecting to Redis at {configuration.session_config.REDIS_DOMAIN}")
-else:
-    logger.info("Connecting to local Redis instance")
-redis_client = Redis.from_url(redis_url)
-
-redis_client = None
-if (
-    configuration.session_config.SESSION_STORE_TYPE.upper() == "REDISSTORE"
-    and configuration.session_config.SESSION_REDIS_URL
-):
-    redis_client = Redis.from_url(configuration.session_config.SESSION_REDIS_URL)
 
 
 @asynccontextmanager
@@ -130,16 +111,23 @@ logger.info(f"ROOT_DOMAIN: {session_domain}")
 
 # Determine session store
 session_store = InMemoryStore()
-if (
-    configuration.session_config.SESSION_STORE_TYPE.upper() == "REDISSTORE"
-    and redis_client is not None
-):
+if redis_client is not None:
     session_store = RedisStore(connection=redis_client, prefix="session:", gc_ttl=600)
     logger.info("Using RedisStore for session management")
 
 # Determine if cookie should be secure
 cookie_secure = False if configuration.ENVIRONMENT == "local" else True
 logger.info(f"Cookie Secure: {cookie_secure}")
+
+# CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=configuration.cors_origins_list,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["*"],
+)
 
 # Autoload session if cookie is present
 app.add_middleware(SessionAutoloadMiddleware)
@@ -152,16 +140,6 @@ app.add_middleware(
     lifetime=configuration.session_config.SESSION_LIFETIME,
     cookie_domain=configuration.ROOT_DOMAIN,
     cookie_name=configuration.session_config.SESSION_COOKIE_NAME,
-)
-
-# CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=configuration.cors_origins_list,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-    expose_headers=["*"],
 )
 
 # Autoload session if cookie is present

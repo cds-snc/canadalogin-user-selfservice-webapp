@@ -1,17 +1,24 @@
+import asyncio
 import logging
-import jwt
+import json
 from datetime import datetime
 from httpx import AsyncClient
+from typing import AsyncGenerator
 
 from fastapi import Request, HTTPException
+from fastapi.responses import StreamingResponse
+from starsessions.session import get_session_metadata
 from authlib.integrations.starlette_client import OAuthError
-from starsessions.session import get_session_handler
 
 from app.config import get_configuration
 from app.constants.session_keys import SessionKeys
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.request_error_handler import RequestErrorHandler
 from app.auth.services.oidc_config import oauth
+from app.auth.schemas import SSEventData
+from app.auth.schemas import KeepAliveData
+from app.utils.schemas import ResponseModel
+
 
 logger = logging.getLogger(__name__)
 
@@ -144,123 +151,157 @@ def update_session_tokens(request: Request, new_tokens: dict):
     request.session[SessionKeys.SESSION_USER_TOKEN.value] = new_tokens
 
 
-def get_user_info(request: Request):
-    """
-    Get user info from session
-    """
-    user_info = request.session.get(SessionKeys.SESSION_USER_INFO.value)
-    return user_info
-
-
-async def get_user_id_token(request: Request):
-    """
-    Get the id_token from the session, refreshing it if necessary.
-    """
-    id_token = request.session.get(SessionKeys.SESSION_USER_ID_TOKEN_KEY.value)
-
-    if id_token is None:
+async def get_session_data_by_id(request: Request, session_id: str):
+    # Try to get Redis client from the application state
+    session_data = None
+    redis_client = getattr(request.app.state, "redis_client", None)
+    logger.info(f"get session by sid: {session_id}")
+    if redis_client is not None:
+        # read the session from Redis for the given session_id
+        cache_key = f"session:{session_id}"
+        session = await redis_client.get(cache_key)
+        session_data = session if session else None
+    if session_data is None:
+        logger.info(f"No session found for session_id: {session_id}")
         return None
-
-    try:
-        decoded_token = jwt.decode(id_token, options={"verify_signature": False})
-        exp = decoded_token.get("exp")
-        if (
-            exp and exp < datetime.now().timestamp() + 60
-        ):  # If token expires in 1 minute
-            refresh_token = get_user_refresh_token(request)
-            if not refresh_token:
-                return None
-
-            new_tokens = await refresh_id_token(refresh_token)
-            if not new_tokens:
-                return None
-
-            if oauth.verify is None:
-                logger.error("OAuth verify client is not configured properly")
-                return None
-            userinfo = await oauth.verify.parse_id_token(new_tokens, None)
-            new_tokens["userinfo"] = userinfo
-
-            update_session_tokens(request, new_tokens)
-            return new_tokens.get("id_token")
-    except jwt.PyJWTError as e:
-        logger.error(f"Error decoding token: {e}")
-        return None
-
-    return id_token
+    # Convert bytes to dict if necessary
+    if isinstance(session_data, bytes):
+        session_data = dict(json.loads(session_data.decode("utf-8")))
+    return session_data
 
 
-async def refresh_id_token(refresh_token: str):
+async def session_event_sse_generator(request: Request):
     """
-    Refreshes the id_token using the refresh_token.
+    For code review. StreamingResponse, can't use regular Exception handling
     """
+    config = get_configuration()
+    user_info = None
     try:
-        if oauth.verify is None:
-            logger.error("OAuth verify client is not configured properly")
-            return None
-        new_tokens = await oauth.verify.fetch_access_token(
-            refresh_token=refresh_token, grant_type="refresh_token"
+        user_info = await get_user_info(request)
+    except OAuthError as oe:
+        logger.error(f"OAuth error while fetching user info: {str(oe)}")
+        return StreamingResponse(
+            [
+                f"event: terminated\ndata: {SSEventData(status='error', error='Authentication error.').model_dump_json()}\n\n"
+            ],
+            media_type="text/event-stream",
+            headers={
+                "Access-Control-Allow-Origin": config.CORS_ORIGINS,
+                "Access-Control-Allow-Credentials": "true",
+                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+                "X-Accel-Buffering": "no",  # Disable nginx buffering
+            },
         )
-        return new_tokens
-    except Exception as e:
-        logger.error(f"Error refreshing token: {e}")
-        return None
 
-
-def get_user_refresh_token(request: Request):
-    """
-    Get user refresh token from session
-    """
-    return request.session.get(SessionKeys.SESSION_USER_REFRESH_TOKEN_KEY.value)
-
-
-def update_session_tokens(request: Request, new_tokens: dict):
-    """
-    Update the session with new tokens.
-    """
-    request.session[SessionKeys.SESSION_USER_ACCESS_TOKEN_KEY.value] = new_tokens.get(
-        "access_token"
-    )
-    request.session[SessionKeys.SESSION_USER_ID_TOKEN_KEY.value] = new_tokens.get(
-        "id_token"
-    )
-    request.session[SessionKeys.SESSION_USER_REFRESH_TOKEN_KEY.value] = new_tokens.get(
-        "refresh_token"
-    )
-    request.session[SessionKeys.SESSION_USER_INFO.value] = new_tokens.get("userinfo")
-
-
-async def get_session_by_session_id(sessionid: str, request: Request):
-    try:
-        handler = get_session_handler(request)
-        # use Redis read session data key = "session:{sessionid}"
-        redis_key = f"session:{sessionid}"
-        redis_client = request.app.state.redis_client
-        data = await redis_client.get(redis_key)
-        if not data:
-            return None
-        return handler.serializer.deserialize(data)
-    except Exception as e:
-        logger.error(
-            f"Error getting session by ID {sessionid}: {str(e)}", exc_info=True
+    sid = user_info.get("sid") if user_info else None
+    if sid is None:
+        logger.error("No sid found in user info")
+        return StreamingResponse(
+            [
+                f"event: error\ndata: {SSEventData(status='error', error='No sid found').model_dump_json()}\n\n"
+            ],
+            media_type="text/event-stream",
+            headers={
+                "Access-Control-Allow-Origin": config.CORS_ORIGINS,
+                "Access-Control-Allow-Credentials": "true",
+                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+                "X-Accel-Buffering": "no",  # Disable nginx buffering
+            },
         )
-        return None
 
+    async def event_stream(
+        request: Request, session_id: str
+    ) -> AsyncGenerator[str, None]:
+        """
+        Generate Server-Sent Events (SSE) for a user session.
+        """
+        try:
+            while True:
+                await asyncio.sleep(5)
+                session_active = await get_session_data_by_id(request, session_id)
+                if session_active is None:
+                    logger.info("Session expired or not found")
+                    message_data = SSEventData(status="expired")
+                    yield f"event: expired\ndata: {message_data.model_dump_json()}\n\n"
+                    break
+                # Get session metadata
+                session_metadata = get_session_metadata(request)
+                last_access_timestamp = session_metadata.get("last_access")
+                session_expire = (
+                    config.session_config.SESSION_LIFETIME + last_access_timestamp - 30
+                )
 
-async def remove_session_by_session_id(sessionid: str, request: Request):
-    try:
-        handler = get_session_handler(request)
-        if handler.session_id != sessionid:
-            logger.warning(
-                f"Session ID mismatch: handler session ID {handler.session_id} does not match provided session ID {sessionid}"
+                # Prepare message data with optional last_access info
+                message_data = SSEventData(status="active", expire=int(session_expire))
+                yield f"event: notification\ndata: {message_data.model_dump_json()}\n\n"
+        except asyncio.CancelledError:
+            logger.info("SSE stream cancelled")
+        except Exception as e:
+            logger.error(f"Error in event stream: {str(e)}")
+            message_data = SSEventData(
+                status="error", error="An internal error has occurred."
             )
-            return
-        # use Redis delete session data key = "session:{sessionid}"
-        redis_key = f"session:{sessionid}"
-        redis_client = request.app.state.redis_client
-        await redis_client.delete(redis_key)
-    except Exception as e:
-        logger.error(
-            f"Error removing session by ID {sessionid}: {str(e)}", exc_info=True
+            yield f"event: error\ndata: {message_data.model_dump_json()}\n\n"
+
+    return StreamingResponse(
+        event_stream(request, sid),
+        media_type="text/event-stream",
+        headers={
+            "Access-Control-Allow-Origin": config.CORS_ORIGINS,
+            "Access-Control-Allow-Credentials": "true",
+            "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",  # Disable nginx buffering
+        },
+    )
+
+
+async def session_extend(request: Request):
+    """
+    Check session metadata for expiration. If session is older than 12 hours,
+    remove it and return termination status with login URL.
+    """
+    config = get_configuration()
+    # Get user info from current session
+    user_info = get_user_info(request)
+    if user_info is None:
+        session_status = KeepAliveData(status="non-authenticated", login="re-login")
+        return ResponseModel(
+            success=False, message="User not authenticated", data=session_status
         )
-        RequestErrorHandler.handle(e, context="remove server session")
+    # Get session ID from user info
+    session_id = user_info.get("sid")
+    if not session_id:
+        session_status = KeepAliveData(status="non-authenticated", login="re-login")
+        return ResponseModel(
+            success=False, message="User not authenticated", data=session_status
+        )
+
+    # Get session metadata
+    session_metadata = get_session_metadata(request)
+    last_access_timestamp = session_metadata.get("last_access")
+    created_timestamp = session_metadata.get("created")
+
+    current_time = datetime.now().timestamp()
+    twelve_hours_in_seconds = 12 * 60 * 60  # 43200 seconds
+
+    session_expire = config.session_config.SESSION_LIFETIME + last_access_timestamp - 30
+
+    # Check if session is older than 12 hours
+    if current_time - created_timestamp > twelve_hours_in_seconds:
+        # Session expired, remove it
+        request.session.clear()
+
+        session_status = KeepAliveData(status="terminated", login=login_url)
+        return ResponseModel(
+            success=False, message="Session terminated", data=session_status
+        )
+
+    # Session is valid, auto extend last access time
+    session_status = KeepAliveData(status="active", expire=int(session_expire))
+    return ResponseModel(success=True, message="Session is active", data=session_status)

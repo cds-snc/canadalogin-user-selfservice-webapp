@@ -1,9 +1,6 @@
-import asyncio
 import logging
-import time
-from typing import AsyncGenerator
 from fastapi import Request
-from fastapi.responses import RedirectResponse, StreamingResponse
+from fastapi.responses import RedirectResponse
 from authlib.integrations.starlette_client import OAuthError
 from starsessions.session import get_session_handler
 from app.auth.services.oidc_config import oauth
@@ -12,11 +9,7 @@ from app.constants.session_keys import SessionKeys
 from app.utils.request_error_handler import RequestErrorHandler
 from app.auth.services.auth_user_session import (
     update_session_tokens,
-    get_user_info,
-    remove_session_by_session_id,
 )
-from app.auth.schemas import KeepAliveData, SSEventData
-from app.utils.schemas import ResponseModel
 
 logger = logging.getLogger(__name__)
 

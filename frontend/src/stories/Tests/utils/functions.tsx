@@ -10,6 +10,7 @@ import {
 import PageRenderer from "./PageRenderer.jsx";
 import { UserProvider } from "../../../components/Providers/UserProvider";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider.tsx";
+import React from "react";
 
 const stepErrorMessage = "Verify error message is on Page.";
 const stepSuccessMessage = "Verify success message is on Page.";
@@ -50,6 +51,7 @@ interface Response {
   success: boolean;
   message: string;
   data: Data;
+  status?: number;
 }
 
 interface MSW {
@@ -223,9 +225,9 @@ export const buildTestCase = {
 
 function buildPath(pathParams: PathParams, navigationLink: string) {
   if (pathParams.type !== undefined)
-    return { path: "/:language" + "/:flow" + navigationLink + "/:type" };
+    return { path: "/:language" + navigationLink + "/:type" };
 
-  return { path: "/:language" + "/:flow" + navigationLink };
+  return { path: "/:language" + navigationLink };
 }
 
 function buildRoutingParams(
@@ -244,9 +246,59 @@ function buildRoutingParams(
 
 function buildMswMapping(mswArray: Array<MSW>) {
   let handlers: any[] = [];
+
+  // Add default handlers for EventSource endpoints that are always needed
+  handlers.push(
+    // Mock the session-status EventSource endpoint
+    http.get(`${config.apiUrl}/v1/auth/session-status`, async () => {
+      // Return a simple response for EventSource connection attempts
+      return new HttpResponse(
+        'event: notification\ndata: {"status":"active","data":"session active"}\n\n',
+        {
+          status: 200,
+          headers: {
+            "Content-Type": "text/event-stream",
+            "Cache-Control": "no-cache",
+            Connection: "keep-alive",
+          },
+        },
+      );
+    }),
+
+    // Mock the user profile endpoint that UserProvider calls
+    http.get(`${config.apiUrl}/v1/users/profile`, async () => {
+      return HttpResponse.json({
+        id: "test-user-123",
+        active: true,
+        details: {
+          emailVerified: true,
+          lastLogin: "2025-09-08T12:00:00Z",
+          lastMFA: "2025-09-08T12:00:00Z",
+          twoFactorAuthentication: true,
+          pwdChangedTime: "2025-09-08T12:00:00Z",
+        },
+        emails: [{ value: "test@example.com", type: "primary" }],
+        phoneNumbers: [{ value: "+1234567890", type: "primary" }],
+        meta: {
+          created: "2025-09-08T12:00:00Z",
+          location: "test",
+          lastModified: "2025-09-08T12:00:00Z",
+          resourceType: "User",
+        },
+        userName: "testuser",
+        preferredLanguage: "en",
+        name: {
+          givenName: "Test",
+          familyName: "User",
+          formatted: "Test User",
+        },
+      });
+    }),
+  );
+
   if (mswArray != null)
     Object.keys(mswArray).forEach((key) => {
-      const msw = mswArray[key];
+      const msw = mswArray[parseInt(key)];
       if (msw.type === "get")
         handlers.push(
           http.get(`${config.apiUrl}${msw.endpoint}`, async () => {
@@ -270,21 +322,22 @@ function buildMswMapping(mswArray: Array<MSW>) {
           );
     });
 
-  if (handlers.length) {
-    return {
-      msw: {
-        handlers: handlers,
-      },
-    };
-  }
-  return null;
+  return {
+    msw: {
+      handlers: handlers,
+    },
+  };
 }
 
 export const Template = (args: any) => {
-  TestDataUserProvider.userData.phone = args.phone;
-  TestDataUserProvider.userData.otpType = args.otpType;
+  const testData = {
+    ...TestDataUserProvider,
+    loadingText: null,
+  };
+  testData.userData.phone = args.phone;
+  testData.userData.otpType = args.otpType;
   return (
-    <UserProvider initial={TestDataUserProvider}>
+    <UserProvider initial={testData}>
       <LanguageProvider>
         <PageRenderer page={args.page} />
       </LanguageProvider>
@@ -293,20 +346,24 @@ export const Template = (args: any) => {
 };
 
 export const TestTemplate = (args: any) => {
-  TestDataUserProvider.userData.email = args.email;
-  TestDataUserProvider.userData.phone = args.phone;
-  TestDataUserProvider.userData.id = args.id;
-  TestDataUserProvider.userData.otpType = args.otpType;
-  TestDataUserProvider.userData.passwordValidated = args.passwordValidated;
+  const testData = {
+    ...TestDataUserProvider,
+    loadingText: null,
+  };
+  testData.userData.email = args.email;
+  testData.userData.phone = args.phone;
+  testData.userData.id = args.id;
+  testData.userData.otpType = args.otpType;
+  testData.userData.passwordValidated = args.passwordValidated;
 
-  TestDataUserProvider.testData.otp = args.otp;
-  TestDataUserProvider.testData.firstName = args.firstName;
-  TestDataUserProvider.testData.lastName = args.lastName;
-  TestDataUserProvider.testData.password = args.password;
-  TestDataUserProvider.testData.email = args.email;
+  testData.testData.otp = args.otp;
+  testData.testData.firstname = args.firstName; // Use 'firstname' as defined in constants
+  testData.testData.lastName = args.lastName;
+  testData.testData.password = args.password;
+  testData.testData.email = args.email;
 
   return (
-    <UserProvider initial={TestDataUserProvider}>
+    <UserProvider initial={testData}>
       <LanguageProvider>
         <PageRenderer page={args.page} />
         <button aria-label="test" type="submit" form="form"></button>

@@ -31,6 +31,7 @@ vi.mock("../../../utils/redirect.jsx", () => ({
 
 const mockUserState = {
   isLoading: false,
+  loadingText: null,
   userData: {
     service: "Test Service",
     language: "en",
