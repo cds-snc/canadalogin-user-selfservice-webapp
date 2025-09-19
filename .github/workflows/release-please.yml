@@ -1,0 +1,44 @@
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+name: release-please
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547 # v1.12.0
+        id: sre_app_token
+        with:
+          app-id: ${{ secrets.CDS_RELEASE_BOT_APP_ID }}
+          private-key: ${{ secrets.CDS_RELEASE_BOT_PRIVATE_KEY }}
+
+      - uses: googleapis/release-please-action@c2a5a2bd6a758a0937f1ddb1e8950609867ed15c # v4.3.0
+        id: release
+        with:
+          token: ${{ steps.sre_app_token.outputs.token }}
+          release-type: simple
+
+      # If a release PR was created, we need to update the .deployed_versions/test file with the tag to deploy.
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        if: ${{ steps.release.outputs.prs_created == 'true' }}
+        with:
+          ref: ${{ fromJson(steps.release.outputs.pr).headBranchName }}
+
+      - name: Update .deployed_versions/test with next release version
+        if: ${{ steps.release.outputs.prs_created == 'true' }}
+        run: |
+          VERSION=$(echo '${{ steps.release.outputs.pr }}' | jq -r '.title' | sed -E 's/.*release ([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
+          echo "$VERSION" > .deployed_versions/test
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .deployed_versions/test
+          git commit -m "chore: update .deployed_versions/test with next release version $VERSION"
+          git push
