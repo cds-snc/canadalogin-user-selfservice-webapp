@@ -1,15 +1,21 @@
+import asyncio
 import logging
+import json
 from datetime import datetime
 from httpx import AsyncClient
+from typing import AsyncGenerator
 
 from fastapi import Request, HTTPException
+from fastapi.responses import StreamingResponse
+from starsessions.session import get_session_metadata
 from authlib.integrations.starlette_client import OAuthError
-
 from app.config import get_configuration
 from app.constants.session_keys import SessionKeys
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.request_error_handler import RequestErrorHandler
 from app.auth.services.oidc_config import oauth
+from app.auth.schemas import SSEventData
+
 
 logger = logging.getLogger(__name__)
 
@@ -140,3 +146,113 @@ def update_session_tokens(request: Request, new_tokens: dict):
         "access_token"
     )
     request.session[SessionKeys.SESSION_USER_TOKEN.value] = new_tokens
+
+
+async def get_session_data_by_id(request: Request, session_id: str):
+    # Try to get Redis client from the application state
+    session_data = None
+    redis_client = getattr(request.app.state, "redis_client", None)
+    logger.info(f"get session by sid: {session_id}")
+    if redis_client is not None:
+        # read the session from Redis for the given session_id
+        cache_key = f"session:{session_id}"
+        session = await redis_client.get(cache_key)
+        session_data = session if session else None
+    if session_data is None:
+        logger.info(f"No session found for session_id: {session_id}")
+        return None
+    # Convert bytes to dict if necessary
+    if isinstance(session_data, bytes):
+        session_data = dict(json.loads(session_data.decode("utf-8")))
+    return session_data
+
+
+async def session_event_sse_generator(request: Request):
+    """
+    For code review. StreamingResponse, can't use regular Exception handling
+    """
+    config = get_configuration()
+    user_info = None
+    try:
+        user_info = await get_user_info(request)
+    except OAuthError as oe:
+        logger.error(f"OAuth error while fetching user info: {str(oe)}")
+        return StreamingResponse(
+            [
+                f"event: terminated\ndata: {SSEventData(status='error', error='Authentication error.').model_dump_json()}\n\n"
+            ],
+            media_type="text/event-stream",
+            headers={
+                "Access-Control-Allow-Origin": config.CORS_ORIGINS,
+                "Access-Control-Allow-Credentials": "true",
+                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+                "X-Accel-Buffering": "no",  # Disable nginx buffering
+            },
+        )
+
+    sid = user_info.get("sid") if user_info else None
+    if sid is None:
+        logger.error("No sid found in user info")
+        return StreamingResponse(
+            [
+                f"event: error\ndata: {SSEventData(status='error', error='No sid found').model_dump_json()}\n\n"
+            ],
+            media_type="text/event-stream",
+            headers={
+                "Access-Control-Allow-Origin": config.CORS_ORIGINS,
+                "Access-Control-Allow-Credentials": "true",
+                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+                "X-Accel-Buffering": "no",  # Disable nginx buffering
+            },
+        )
+
+    async def event_stream(
+        request: Request, session_id: str
+    ) -> AsyncGenerator[str, None]:
+        """
+        Generate Server-Sent Events (SSE) for a user session.
+        """
+        try:
+            while True:
+                await asyncio.sleep(5)
+                session_active = await get_session_data_by_id(request, session_id)
+                if session_active is None:
+                    logger.info("Session expired or not found")
+                    message_data = SSEventData(status="expired")
+                    yield f"event: expired\ndata: {message_data.model_dump_json()}\n\n"
+                    break
+                # Get session metadata
+                session_metadata = get_session_metadata(request)
+                last_access_timestamp = session_metadata.get("last_access")
+                session_expire = (
+                    config.session_config.SESSION_LIFETIME + last_access_timestamp - 30
+                )
+
+                # Prepare message data with optional last_access info
+                message_data = SSEventData(status="active", expire=int(session_expire))
+                yield f"event: notification\ndata: {message_data.model_dump_json()}\n\n"
+        except asyncio.CancelledError:
+            logger.info("SSE stream cancelled")
+        except Exception as e:
+            logger.error(f"Error in event stream: {str(e)}")
+            message_data = SSEventData(
+                status="error", error="An internal error has occurred."
+            )
+            yield f"event: error\ndata: {message_data.model_dump_json()}\n\n"
+
+    return StreamingResponse(
+        event_stream(request, sid),
+        media_type="text/event-stream",
+        headers={
+            "Access-Control-Allow-Origin": config.CORS_ORIGINS,
+            "Access-Control-Allow-Credentials": "true",
+            "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",  # Disable nginx buffering
+        },
+    )

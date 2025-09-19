@@ -29,6 +29,7 @@ vi.mock("../../../hooks/useNavigate.tsx", () => ({
 // Mock the user hooks
 const mockUserState = {
   isLoading: false,
+  loadingText: null,
   userData: {
     service: "Test Service",
     language: "en",

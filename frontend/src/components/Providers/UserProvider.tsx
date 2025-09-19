@@ -1,8 +1,19 @@
 import { useReducer, useEffect, ReactNode } from "react";
-import { useSearchParams } from "react-router";
-import { SERVICES, CONTEXT_ACTIONS } from "../../utils/constants.jsx";
+import { useSearchParams, useParams } from "react-router";
+import {
+  useEventSource,
+  useEventSourceListener,
+} from "@react-nano/use-event-source";
+import config from "../../config";
+import {
+  SERVICES,
+  CONTEXT_ACTIONS,
+  SUBMIT_END_POINTS,
+} from "../../utils/constants.jsx";
 import UserContext from "./UserContext";
 import { authService } from "../../services/authService.jsx";
+import Loader from "../Layout/Loading.jsx";
+import { getPageContent } from "../../utils/functions.jsx";
 
 interface Action {
   type: string;
@@ -169,6 +180,51 @@ export function UserProvider({
 }: UserProviderProps) {
   const [state, dispatch] = useReducer(userReducer, initial);
   const [searchParams] = useSearchParams();
+  const { language } = useParams();
+  const pageContentJson = getPageContent(language, "SessionManagement");
+
+  const [eventSource, eventSourceStatus] = useEventSource(
+    `${config.apiUrl}${SUBMIT_END_POINTS.sessionStatus}`,
+    true,
+  );
+
+  useEventSourceListener(
+    eventSource,
+    ["expired", "error", "notification", "terminated"],
+    (event) => {
+      if (event.type === "expired" || event.type === "terminated") {
+        console.log("SSE expired or terminated:", event.data);
+        if (eventSource) eventSource.close();
+        dispatch({
+          type: CONTEXT_ACTIONS.set_loading,
+          payload: { isLoading: true, text: pageContentJson["1"] },
+        });
+      }
+      if (event.type === "error") {
+        // for debugging purpose. No need to handle it.
+        console.error("SSE error:", event.data);
+      }
+      if (event.type === "notification") {
+        // Handle notification event if needed
+        // Placeholder for pop-up notification. To be implemented.
+        // need to reset the two timers, one for warning, one for expiry
+        // clearTimeout(warningTimer);
+        // clearTimeout(expiryTimer);
+        console.log("SSE notification:", event.data);
+      }
+    },
+    [dispatch], // Dependencies for the listener callback
+  );
+
+  useEffect(() => {
+    if (state.isLoading && state.loadingText) {
+      // After state is set to terminating, wait 2 seconds then redirect
+      const timer = setTimeout(() => {
+        window.location.href = "/";
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [state.isLoading, state.loadingText]);
 
   useEffect(() => {
     // Simple authentication check - if we're not loading and don't have a profile,
@@ -229,6 +285,10 @@ export function UserProvider({
     };
     setRelyingPartyInfo();
   }, []);
+
+  if (state.isLoading && state.loadingText) {
+    return <Loader text={state.loadingText} />;
+  }
 
   return (
     <UserContext.Provider value={{ state, dispatch }}>
