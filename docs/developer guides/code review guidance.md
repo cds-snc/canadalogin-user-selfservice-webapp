@@ -4,7 +4,7 @@
 
 ### 📦 Size Guidelines
 
-- [ ] PR changes are **under 300 lines** (additions + deletions)
+- [ ] PR changes are **under 300 lines** (additions + deletions, may not apply for changes that contain a lot of static content)
 - [ ] No more than **10 files changed**
 - [ ] PR represents a **single logical change** or concern
 - [ ] Larger changes have been split into **multiple smaller PRs** where possible
