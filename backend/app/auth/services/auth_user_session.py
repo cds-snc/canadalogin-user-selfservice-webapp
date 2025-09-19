@@ -268,7 +268,7 @@ async def session_extend(request: Request):
     """
     config = get_configuration()
     # Get user info from current session
-    user_info = get_user_info(request)
+    user_info = await get_user_info(request)
     if user_info is None:
         session_status = KeepAliveData(status="non-authenticated", login="re-login")
         return ResponseModel(
@@ -297,7 +297,7 @@ async def session_extend(request: Request):
         # Session expired, remove it
         request.session.clear()
 
-        session_status = KeepAliveData(status="terminated", login=login_url)
+        session_status = KeepAliveData(status="terminated", login="re-login")
         return ResponseModel(
             success=False, message="Session terminated", data=session_status
         )
