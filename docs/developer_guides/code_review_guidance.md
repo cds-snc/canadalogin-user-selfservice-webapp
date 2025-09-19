@@ -5,7 +5,7 @@
 ### 📦 Size Guidelines
 
 - [ ] PR changes are **under 300 lines** (additions + deletions)  
-      **NOTE**: may not apply for changes that contain a lot of static content. In some exceptional cases, a larger PR is required for a complex change but should be avoided whenever possible.
+      **NOTE**: In some exceptional cases, a larger PR is required for a complex change, updates to static content or refactoring but should be avoided whenever possible.
 - [ ] No more than **10 files changed**.  
       **NOTE**: This is a suggestion and may not apply if a feature requires small changes in various files, utility files, etc.
 - [ ] PR represents a **single logical change** or concern
