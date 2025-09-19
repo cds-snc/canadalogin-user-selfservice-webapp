@@ -44,7 +44,7 @@ If so, ensure the following:
 > ℹ️ **Note:** Architectural changes that impact external clients should go through the [ADR process](https://github.com/cds-snc/ADR).  
 <br />
 
-## ✅ Code Review Checklist for Reviewers
+## 🔍 Code Review Checklist for Reviewers
 
 ### ⏱️ Review Timing & Scope
 
@@ -52,7 +52,7 @@ If so, ensure the following:
 - [ ] For large PRs (>400 LOC), request it be split or set expectations for longer review time
 - [ ] If you're not the right reviewer (e.g. domain unfamiliar), **reassign or tag someone else**
 
-### General Review Flow
+### ✅ General Review Flow
 
 - [ ] Read the **PR description** to understand the goal and context
 - [ ] Check for **design documentation** if the change is architectural or complex
