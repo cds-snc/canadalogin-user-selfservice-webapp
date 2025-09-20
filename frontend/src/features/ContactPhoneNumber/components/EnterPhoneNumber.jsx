@@ -100,7 +100,6 @@ const RadioButtons = ({
       legend={pageContentJson["5"]}
       options={radioOptions}
       onGcdsChange={(e) => {
-        console.log("e.target.value", e.target.value);
         onChangePhoneForm("otpType", e.target.value);
       }}
     ></GcdsRadios>
