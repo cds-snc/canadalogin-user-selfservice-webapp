@@ -100,7 +100,6 @@ export default function OtpVerification({
 
   const userMfaType = phoneFormData.otpType;
   const errorMessage = errorPageJson[errorCode] || "";
-  console.log("codeRequested", codeRequested);
   return (
     <GcdsContainer>
       {codeRequested && (
