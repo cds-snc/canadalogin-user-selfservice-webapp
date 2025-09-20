@@ -1,8 +1,50 @@
 // Setup test environment without MSW server since no tests are making HTTP requests
 import { beforeAll } from "vitest";
 
+// Mock EventSource for tests since it's not available in Node.js/jsdom
+class MockEventSource {
+  constructor(url) {
+    this.url = url;
+    this.readyState = MockEventSource.CONNECTING;
+    this.onopen = null;
+    this.onmessage = null;
+    this.onerror = null;
+    this.addEventListener = () => {};
+    this.removeEventListener = () => {};
+    this.close = () => {
+      this.readyState = MockEventSource.CLOSED;
+    };
+    this.dispatchEvent = () => {};
+
+    // Simulate immediate connection
+    setTimeout(() => {
+      this.readyState = MockEventSource.OPEN;
+      if (this.onopen) {
+        this.onopen({ type: "open" });
+      }
+    }, 0);
+  }
+
+  static get CONNECTING() {
+    return 0;
+  }
+  static get OPEN() {
+    return 1;
+  }
+  static get CLOSED() {
+    return 2;
+  }
+}
+
 // Setup test environment and suppress GCDS component errors
 beforeAll(() => {
+  // Add EventSource to global scope for tests
+  if (typeof globalThis !== "undefined") {
+    globalThis.EventSource = MockEventSource;
+  }
+  if (typeof window !== "undefined") {
+    window.EventSource = MockEventSource;
+  }
   // Suppress console errors from third-party components in test environment
   const originalConsoleError = console.error;
   console.error = (...args) => {
@@ -27,6 +69,16 @@ beforeAll(() => {
       message.includes("createResponseListener")
     ) {
       return; // Suppress these MSW browser worker errors
+    }
+
+    // Suppress EventSource-related errors in test environment
+    if (
+      message.includes("EventSource") ||
+      message.includes("SSE error") ||
+      message.includes("server-sent events") ||
+      message.includes("text/event-stream")
+    ) {
+      return; // Suppress EventSource errors in tests
     }
 
     // Allow other errors to be logged

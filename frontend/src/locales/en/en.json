@@ -381,5 +381,8 @@
     "6": "GC Account directory.",
     "7": "Back to profile",
     "8": "Sign out"
+  },
+  "SessionManagement": {
+    "1": "Signing you out..."
   }
 }

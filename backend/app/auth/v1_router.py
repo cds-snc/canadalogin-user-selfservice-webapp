@@ -7,6 +7,9 @@ from app.auth.services.auth import (
     callback_handler,
     reauthenticate_user,
 )
+from app.auth.services.auth_user_session import (
+    session_event_sse_generator,
+)
 from app.auth.services.auth_logout import (
     logout_user,
     backchannel_logout,
@@ -15,6 +18,7 @@ from app.auth.services.auth_logout import (
 from app.auth.services.auth_user_session import (
     get_users_current_session,
     get_user_id_token,
+    session_extend,
 )
 
 from app.constants.session_keys import SessionKeys
@@ -72,3 +76,20 @@ async def logout(request: Request, id_token: str = Depends(get_user_id_token)):
 @router.post("/backchannel-logout")
 async def handle_backchannel_logout(request: Request):
     return await backchannel_logout(request)
+
+
+# Server Side Event send session status message
+# return stream Event
+@router.get("/session-status")
+async def session_status(request: Request):
+    return await session_event_sse_generator(request)
+
+
+@router.get(
+    "/keep-alive",
+    tags=["Auth"],
+    summary="Keep alive",
+    description="",
+)
+async def keep_alive(request: Request):
+    return await session_extend(request)

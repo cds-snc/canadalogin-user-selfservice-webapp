@@ -1,0 +1,7 @@
+{
+  "extra-files": [".deployed_versions/test.json"],
+  "release-type": "simple",
+  "packages": {
+    ".": {}
+  }
+}

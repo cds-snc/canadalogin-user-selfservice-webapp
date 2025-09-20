@@ -17,8 +17,8 @@ import { PAGES, LANGUAGE_DISPLAY_NAMES } from "../../utils/constants.jsx";
 import { path } from "../../utils/routeHelpers.js";
 import { useUser } from "../Providers/useUser.tsx";
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
-import ViewContactPhoneNumber from "../../features/ContactPhoneNumber/components/ViewContactPhoneNumber.jsx"
-
+import VerifiedBadge from "../Badges/VerifiedBadge.jsx";
+import ViewContactPhoneNumber from "../../features/ContactPhoneNumber/components/ViewContactPhoneNumber.jsx";
 
 export default function ProfileHome() {
   const { language } = useParams();
@@ -75,24 +75,13 @@ export default function ProfileHome() {
           </GcdsLink>
         </GcdsGrid>
 
-        <GcdsGrid columns="auto auto" className="verifiedBadge">
-          <GcdsIcon
-            name="checkmark-circle"
-            className="verifiedIcon"
-            size="text-small"
-          />
-          <GcdsText className="verifiedText" style={{ paddingTop: "0.25rem" }}>
-            {pageContent["9"]}
-          </GcdsText>
-        </GcdsGrid>
+        <VerifiedBadge text={pageContent["9"]} />
 
         <div className="separator" />
         <ViewContactPhoneNumber
           pageContent={pageContent}
           phoneNumbers={phoneNumbers}
         />
-
-
       </GcdsContainer>
 
       <GcdsHeading tag="h2">{pageContent["12"]}</GcdsHeading>

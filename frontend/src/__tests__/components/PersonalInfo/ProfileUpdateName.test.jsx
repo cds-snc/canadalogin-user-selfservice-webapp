@@ -31,6 +31,7 @@ vi.mock("../../../utils/apiErrorHandler.js", () => ({
 
 const mockUserState = {
   isLoading: false,
+  loadingText: null,
   userData: {
     service: "Test Service",
     language: "en",

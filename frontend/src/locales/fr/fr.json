@@ -312,7 +312,9 @@
     "4": "Renseignements personnels",
     "5": "Paramètres de sécurité",
     "6": "Retour à ",
-    "7": "Se déconnecter"
+    "7": "Se déconnecter",
+    "8": "Déconnexion en cours...",
+    "9": "Échec de la déconnexion. Redirection..."
   },
   "UpdateContactPhoneNumber": {
     "1": "Saisissez un nouveau numéro de téléphone",
@@ -367,5 +369,8 @@
     "6": "répertoire des comptes GC.",
     "7": "Retour au profil",
     "8": "Fermer la session"
+  },
+  "SessionManagement": {
+    "1": "Déconnexion en cours..."
   }
 }

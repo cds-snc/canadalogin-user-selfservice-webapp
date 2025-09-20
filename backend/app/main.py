@@ -117,6 +117,7 @@ if redis_client is not None:
         prefix="session:",
         gc_ttl=configuration.session_config.SESSION_LIFETIME,
     )
+    logger.info("Using RedisStore for session management")
 
 # Determine if cookie should be secure
 cookie_secure = False if configuration.ENVIRONMENT == "local" else True
