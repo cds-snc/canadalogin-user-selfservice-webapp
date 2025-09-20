@@ -54,7 +54,7 @@ const StepContent = ({ errorCode, errorPageJson, StepComponent }) => {
   );
 };
 
-export default function UpdateContactPhoneNumber() {
+export default function NewContactPhoneNumberContainer() {
   const { language } = useParams();
   const { state, dispatch } = useUser();
   const [errorCode, setErrorCode] = useState("");

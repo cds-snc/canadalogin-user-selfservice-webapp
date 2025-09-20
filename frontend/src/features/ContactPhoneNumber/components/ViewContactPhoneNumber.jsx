@@ -11,19 +11,8 @@ import parsePhoneNumberFromString from "libphonenumber-js";
 
 import { capitalizeFirstLetter } from "../../../utils/functions.jsx";
 import { NAVIGATION_LINKS } from "../../../utils/constants.jsx";
-import { useUser } from "../../../components/Providers/useUser.tsx";
 import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
-
-const DisplayVerifiedBadge = ({ pageContent }) => {
-  return (
-    <>
-      <gcds-grid columns="auto auto" className="verifiedBadge">
-        <gcds-icon name="check" className="verifiedIcon" size="sm" />
-        <gcds-text className="verifiedText">{pageContent["9"]}</gcds-text>
-      </gcds-grid>
-    </>
-  );
-};
+import VerifiedBadge from "../../../components/Badges/VerifiedBadge.jsx";
 
 const DisplayPhoneNumbers = ({ phoneNumbers }) => {
   return (
@@ -82,7 +71,7 @@ const AddPhoneNumber = (props) => {
 
 const ContactPhoneNumber = (props) => {
   const { pageContent, phoneNumbers, language } = props;
-  const updateContactPhoneNumber = `/${language}${NAVIGATION_LINKS.updateContactPhoneNumber}`;
+  const newContactPhoneNumber = `/${language}${NAVIGATION_LINKS.newContactPhoneNumber}`;
   const navigateHelper = useNavigateHelper();
 
   return (
@@ -92,7 +81,7 @@ const ContactPhoneNumber = (props) => {
       <GcdsGrid columns="1fr auto">
         <DisplayPhoneNumbers phoneNumbers={phoneNumbers} />
         <GcdsLink
-          href={updateContactPhoneNumber}
+          href={newContactPhoneNumber}
           size="regular"
           onGcdsClick={(ev) => {
             ev.preventDefault();
@@ -103,7 +92,7 @@ const ContactPhoneNumber = (props) => {
           {pageContent["5"]}
         </GcdsLink>
       </GcdsGrid>
-      <DisplayVerifiedBadge pageContent={pageContent} />
+      <VerifiedBadge text={pageContent["9"]} />
     </>
   );
 };

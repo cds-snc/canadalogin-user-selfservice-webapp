@@ -18,7 +18,6 @@ export const NAVIGATION_LINKS = {
   firstVerifyItsYou: "/firstverifyitsyou",
   enterNewEmail: "/enternewemail",
   areYouSureUpdateContactNumber: "/areYouSureUpdateContactNumber",
-  enterNewPhoneNumber: "/enterNewPhoneNumber",
   youMayUpdateEmailAtOtherPlaces: "/youMayUpdateEmailAtOtherPlaces",
   areYouSureUpdateYourEmail: "/areYouSureUpdateYourEmail",
   profileHome: "/profile-home",
@@ -29,7 +28,7 @@ export const NAVIGATION_LINKS = {
   profileUpdateLanguage: "/profile/update-language",
   profileUpdateLanguageConfirmUpdate: "/profile/update-language/confirm-update",
   profileUpdateLanguageSuccess: "/profile/update-language/success",
-  updateContactPhoneNumber: "/profile/update-contact-phone-number",
+  newContactPhoneNumber: "/profile/new-contact-phone-number",
 };
 
 export const EXTERNAL_NAVIGATION_LINKS = {
@@ -83,6 +82,7 @@ export const FORM_FIELDS = [
 ];
 
 export const PAGES = {
+  // this is used as key to get the language locales from json files, should probably be renamed in the future to reflect the usage
   verification: "Verification",
   otpSelection: "OtpSelection",
   password: "Password",
@@ -106,7 +106,6 @@ export const PAGES = {
   profileYouMayUpdateLanguage: "ProfileYouMayUpdateLanguage",
   passwordChangedConfirmation: "PasswordChangedConfirmation",
   ServicesWithAccessInfo: "ServicesWithAccessInfo",
-  updateContactPhoneNumber: "UpdateContactPhoneNumber",
   confirmContactPhoneNumberUpdate: "ConfirmContactPhoneNumberUpdate",
   successfullyUpdatedContactPhoneNumber:
     "SuccessfullyUpdatedContactPhoneNumber",

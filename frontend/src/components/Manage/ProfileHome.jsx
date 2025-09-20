@@ -7,12 +7,8 @@ import {
   GcdsLink,
   GcdsIcon,
 } from "@cdssnc/gcds-components-react";
-import parsePhoneNumberFromString from "libphonenumber-js";
 
-import {
-  getPageContent,
-  capitalizeFirstLetter,
-} from "../../utils/functions.jsx";
+import { getPageContent } from "../../utils/functions.jsx";
 import { PAGES, LANGUAGE_DISPLAY_NAMES } from "../../utils/constants.jsx";
 import { path } from "../../utils/routeHelpers.js";
 import { useUser } from "../Providers/useUser.tsx";

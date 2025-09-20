@@ -20,7 +20,6 @@ import FirstVerifyItsYou from "./components/Manage/FirstVerifyItsYou.jsx";
 import EnterNewEmail from "./components/Manage/EnterNewEmail.jsx";
 import ProfileUpdateNameSuccess from "./components/Manage/ProfileUpdateNameSuccess.jsx";
 import AreYouSureUpdateContactNumber from "./components/Manage/AreYouSureUpdateContactNumber.jsx";
-import EnterNewPhoneNumber from "./components/Manage/EnterNewPhoneNumber.jsx";
 import YouMayUpdateEmailAtOtherPlaces from "./components/Manage/YouMayUpdateEmailAtOtherPlaces.jsx";
 import AreYouSureUpdateYourEmail from "./components/Manage/AreYouSureUpdateYourEmail.jsx";
 import SecuritySettings from "./components/Manage/SecuritySettings.jsx";
@@ -29,7 +28,7 @@ import AreYouSureEditYourLanguage from "./components/Manage/AreYouSureEditYourLa
 import ProfileYouMayUpdateLanguage from "./components/Manage/ProfileYouMayUpdateLanguage.jsx";
 import { PAGES } from "./utils/constants.jsx";
 import ProfileUpdateNameConfirmUpdate from "./components/Manage/ProfileUpdateNameConfirmUpdate.jsx";
-import UpdateContactPhoneNumber from "./features/ContactPhoneNumber/components/IndexComponent.jsx";
+import NewContactPhoneNumber from "./features/ContactPhoneNumber/components/NewContactPhoneNumberContainer.jsx";
 
 export const appRoutes = [
   {
@@ -113,9 +112,9 @@ export const appRoutes = [
                     handle: { id: PAGES.areYouSureEditYourLanguage },
                   },
                   {
-                    path: "update-contact-phone-number",
-                    element: <UpdateContactPhoneNumber />,
-                    handle: { id: PAGES.updateContactPhoneNumber },
+                    path: "new-contact-phone-number",
+                    element: <NewContactPhoneNumber />,
+                    handle: { id: PAGES.enterNewPhoneNumber },
                   },
                 ],
               },
@@ -123,11 +122,6 @@ export const appRoutes = [
                 path: "areYouSureUpdateContactNumber",
                 element: <AreYouSureUpdateContactNumber />,
                 handle: { id: PAGES.areYouSureUpdateContactNumber },
-              },
-              {
-                path: "enterNewPhoneNumber",
-                element: <EnterNewPhoneNumber />,
-                handle: { id: PAGES.enterNewPhoneNumber },
               },
               {
                 path: "youMayUpdateEmailAtOtherPlaces",
