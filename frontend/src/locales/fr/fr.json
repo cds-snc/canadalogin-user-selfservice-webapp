@@ -316,6 +316,14 @@
     "8": "Déconnexion en cours...",
     "9": "Échec de la déconnexion. Redirection..."
   },
+  "ServicesWithAccessInfo": {
+    "1": "Quels services ont accès à votre nom ?",
+    "2": "Les services suivants ont accès à votre nom via Connexion GC :",
+    "3": "GEO.ca",
+    "4": "Si vous essayez de mettre à jour votre nom avec un service qui n'est pas connecté à Connexion GC, vous devrez accéder à ce compte.",
+    "5": "Pour rechercher un autre compte GC, consultez le",
+    "6": "Répertoire des comptes GC"
+  },
   "EnterNewPhoneNumber": {
     "1": "Entrez un nouveau numéro de téléphone",
     "2": "Cela mettra à jour le numéro de téléphone que GC CléGC utilise, et les services connectés à votre GC CléGC peuvent l’utiliser pour vous contacter.",
