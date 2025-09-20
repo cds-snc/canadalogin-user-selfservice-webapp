@@ -50,11 +50,14 @@ export default function ProfileYouMayUpdateLanguage() {
         {pageContentJson["11"]}
       </GcdsText>
 
-      <GcdsGrid columns="repeat(auto-fit, minmax(100px, 200px))" gap="1rem" align-items="center">
-        <GcdsButton style={{ width: 'fit-content' }} onGcdsClick={(ev) => {
-          ev.preventDefault();
-          navigateHelper(backtoProfile)
-        }}>
+      <GcdsGrid columns="auto auto" gap="1rem" align-items="center">
+        <GcdsButton
+          style={{ width: "fit-content" }}
+          onGcdsClick={(ev) => {
+            ev.preventDefault();
+            navigateHelper(backToProfile);
+          }}
+        >
           {pageContentJson["6"]}
         </GcdsButton>
         &nbsp;
