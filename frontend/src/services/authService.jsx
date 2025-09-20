@@ -26,9 +26,7 @@ export const authService = {
       );
       return response.data;
     } catch (error) {
-      if (error.response && error.response.status === 401) {
-        redirectToLogin();
-      }
+      handleApiError(error);
     }
   },
   create: async (userData) => {
