@@ -52,16 +52,14 @@ const DisplayPhoneNumbers = ({ phoneNumbers }) => {
 const AddPhoneNumber = (props) => {
   const { pageContent, language } = props;
   const navigateHelper = useNavigateHelper();
-  const updateContactPhoneNumber = `/${language}${NAVIGATION_LINKS.updateContactPhoneNumber}`;
+  const newContactPhoneNumber = `/${language}${NAVIGATION_LINKS.newContactPhoneNumber}`;
   return (
     <>
       <GcdsGrid columns="1fr auto">
         <section>
           <GcdsText>{pageContent["18"]}</GcdsText>
         </section>
-        <GcdsButton
-          onGcdsClick={() => navigateHelper(updateContactPhoneNumber)}
-        >
+        <GcdsButton onGcdsClick={() => navigateHelper(newContactPhoneNumber)}>
           + {pageContent["19"]}
         </GcdsButton>
       </GcdsGrid>
