@@ -48,7 +48,7 @@ export default function AreYouSureEditYourLanguage() {
       );
       if (response) {
         updateProfileSuccess(response.data);
-        // clearEditProfile();
+        clearEditProfile();
         return true;
       } else {
         // Todo: handle errors
@@ -95,10 +95,13 @@ export default function AreYouSureEditYourLanguage() {
         >
           {pageContentJson["8"]}
         </GcdsButton>
-        <GcdsButton buttonRole="secondary" onGcdsClick={(ev) => {
-          ev.preventDefault();
-          handleCancel();
-        }}>
+        <GcdsButton
+          buttonRole="secondary"
+          onGcdsClick={(ev) => {
+            ev.preventDefault();
+            handleCancel();
+          }}
+        >
           {pageContentJson["9"]}
         </GcdsButton>
       </GcdsGrid>
