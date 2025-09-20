@@ -137,7 +137,6 @@ async def dispatch_otp(global_http_client: AsyncClient, user_otp_info: UserOtpIn
         logger.error(f"HTTP Exception in {user_otp_info.otpType} send: {str(he)}")
         raise he
     except Exception as error:
-        ƒ
         logger.error(
             f"Request to: /v2.0/factors/{user_otp_info.otpType}otp/transient/verifications error: {str(error)}",
             exc_info=True,

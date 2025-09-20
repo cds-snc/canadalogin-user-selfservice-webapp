@@ -347,9 +347,9 @@
   },
   "ConfirmContactPhoneNumberUpdate": {
     "1": "Êtes-vous sûr de vouloir mettre à jour votre numéro de téléphone ?",
-    "2": "Vous avez demandé de mettre à jour votre numéro de téléphone de contact pour :",
+    "2": "Vous avez demandé de mettre à jour votre numéro de téléphone de contact pour:",
     "3": "Exemple Newname",
-    "4": "Cela mettra à jour votre numéro de téléphone de contact auprès des services suivants :",
+    "4": "Cela mettra à jour votre numéro de téléphone de contact auprès des services suivants:",
     "5": "GEO.ca",
     "6": "Cela modifie uniquement votre",
     "7": "numéro de téléphone de contact.",
