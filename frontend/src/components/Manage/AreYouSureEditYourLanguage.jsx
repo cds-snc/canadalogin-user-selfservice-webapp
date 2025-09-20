@@ -95,13 +95,7 @@ export default function AreYouSureEditYourLanguage() {
         >
           {pageContentJson["8"]}
         </GcdsButton>
-        <GcdsButton
-          buttonRole="secondary"
-          onGcdsClick={(ev) => {
-            ev.preventDefault();
-            handleCancel();
-          }}
-        >
+        <GcdsButton buttonRole="secondary" onGcdsClick={handleCancel}>
           {pageContentJson["9"]}
         </GcdsButton>
       </GcdsGrid>
