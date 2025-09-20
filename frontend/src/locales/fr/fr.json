@@ -316,20 +316,6 @@
     "8": "Déconnexion en cours...",
     "9": "Échec de la déconnexion. Redirection..."
   },
-  "UpdateContactPhoneNumber": {
-    "1": "Saisissez un nouveau numéro de téléphone",
-    "2": "La vérification en deux étapes ajoute une couche de sécurité supplémentaire à votre mot de passe.",
-    "3": "En savoir plus sur la vérification en deux étapes (s’ouvre dans un nouvel onglet)",
-    "4": "Saisissez votre numéro de téléphone",
-    "5": "Saisissez le numéro de téléphone sur lequel vous souhaitez recevoir les codes de sécurité à chaque connexion. Nous pourrons également utiliser ce numéro pour vous contacter concernant l’activité de votre compte.",
-    "6": "Lisez notre",
-    "7": "avis de confidentialité",
-    "8": "pour plus d’informations sur la façon dont nous utilisons vos données personnelles.",
-    "9": "Pays",
-    "10": "Numéro de téléphone",
-    "11": "Mon pays ne figure pas dans cette liste",
-    "12": "Certains pays ne sont pas pris en charge en raison de limitations techniques. Si votre pays ne figure pas dans la liste, vous ne pourrez pas créer de compte GC Sign in pour le moment. Nous nous excusons pour la gêne occasionnée."
-  },
   "EnterNewPhoneNumber": {
     "1": "Entrez un nouveau numéro de téléphone",
     "2": "Cela mettra à jour le numéro de téléphone que GC CléGC utilise, et les services connectés à votre GC CléGC peuvent l’utiliser pour vous contacter.",
