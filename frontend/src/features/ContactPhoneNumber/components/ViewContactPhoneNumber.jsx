@@ -83,7 +83,6 @@ const ContactPhoneNumber = (props) => {
           size="regular"
           onGcdsClick={(ev) => {
             ev.preventDefault();
-            console.log(ev);
             navigateHelper(ev.detail);
           }}
         >
