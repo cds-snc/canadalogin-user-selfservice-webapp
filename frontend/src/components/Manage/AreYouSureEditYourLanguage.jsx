@@ -47,8 +47,8 @@ export default function AreYouSureEditYourLanguage() {
         state.editProfile,
       );
       if (response) {
-        updateProfileSuccess(response.data);
         clearEditProfile();
+        updateProfileSuccess(response.data);
         return true;
       } else {
         // Todo: handle errors
