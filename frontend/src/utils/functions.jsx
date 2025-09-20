@@ -81,10 +81,3 @@ export function capitalizeFirstLetter(str) {
   if (!str) return "";
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
-
-export const handleApiError = (error) => {
-  if (error.response?.status === 401) {
-    redirectToLogin();
-  }
-  throw error.response || error;
-};
