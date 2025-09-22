@@ -226,7 +226,9 @@ async def session_event_sse_generator(request: Request):
                     message_data = SSEventData(status="expired")
                     yield f"event: expired\ndata: {message_data.model_dump_json()}\n\n"
                     break
-                last_access_timestamp = session_data.get("__metadata__", {}).get("last_access", 0)
+                last_access_timestamp = session_data.get("__metadata__", {}).get(
+                    "last_access", 0
+                )
                 session_expire = (
                     config.session_config.SESSION_LIFETIME + last_access_timestamp - 30
                 )
@@ -234,9 +236,9 @@ async def session_event_sse_generator(request: Request):
                 # Prepare message data with optional last_access info
                 message_data = SSEventData(status="active", expire=int(session_expire))
                 yield f"event: notification\ndata: {message_data.model_dump_json()}\n\n"
-                
+
                 await asyncio.sleep(5)
-                           
+
         except asyncio.CancelledError:
             logger.info("SSE stream cancelled")
         except Exception as e:
