@@ -9,7 +9,6 @@ import {
 } from "@cdssnc/gcds-components-react";
 import parsePhoneNumberFromString from "libphonenumber-js";
 
-import { capitalizeFirstLetter } from "../../../utils/functions.jsx";
 import { NAVIGATION_LINKS } from "../../../utils/constants.jsx";
 import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 import VerifiedBadge from "../../../components/Badges/VerifiedBadge.jsx";
@@ -20,7 +19,6 @@ const DisplayPhoneNumbers = ({ phoneNumbers }) => {
       <GcdsGrid columns="1fr">
         {phoneNumbers.map((phoneNumber, index) => {
           let profilePhoneNumber = `${phoneNumber.value}`;
-          let numberType = capitalizeFirstLetter(phoneNumber.type);
           const isLast = index === phoneNumbers.length - 1;
 
           try {
@@ -28,7 +26,7 @@ const DisplayPhoneNumbers = ({ phoneNumbers }) => {
               parsePhoneNumberFromString(profilePhoneNumber);
 
             if (parsedPhoneNumber) {
-              profilePhoneNumber = parsedPhoneNumber.formatInternational();
+              profilePhoneNumber = parsedPhoneNumber.formatNational();
             }
           } catch (error) {
             console.warn(`Failed to parse phone number: ${phoneNumber.value}`);
