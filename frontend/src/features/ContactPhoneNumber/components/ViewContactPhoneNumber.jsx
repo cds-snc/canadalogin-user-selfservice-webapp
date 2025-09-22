@@ -9,7 +9,7 @@ import {
 } from "@cdssnc/gcds-components-react";
 import parsePhoneNumberFromString from "libphonenumber-js";
 
-import { NAVIGATION_LINKS, PAGES } from "../../../utils/constants.jsx";
+import { PAGES } from "../../../utils/constants.jsx";
 import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 import VerifiedBadge from "../../../components/Badges/VerifiedBadge.jsx";
 import { path } from "../../../utils/routeHelpers.js";
