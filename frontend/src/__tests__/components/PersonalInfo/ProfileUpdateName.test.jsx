@@ -125,7 +125,7 @@ describe("ProfileUpdateName Component", () => {
         <LanguageProvider>
           <UserProvider
             initial={mockUserState}
-            initialSessionTimeoutState={{ mockSessionTimeoutState }}
+            initialSessionTimeoutState={mockSessionTimeoutState}
           >
             <ProfileUpdateName />
           </UserProvider>
