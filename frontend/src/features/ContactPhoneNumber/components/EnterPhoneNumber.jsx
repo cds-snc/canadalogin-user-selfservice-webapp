@@ -121,8 +121,8 @@ export default function EnterPhoneNumber({
 
   const isPhoneNumberValid = (phoneNumber, country) => {
     const capitalize = country.toUpperCase();
-    const validatedPhoneNUmber = isValidPhoneNumber(phoneNumber, capitalize);
-    return validatedPhoneNUmber;
+    const validatedPhoneNumber = isValidPhoneNumber(phoneNumber, capitalize);
+    return validatedPhoneNumber;
   };
 
   return (
