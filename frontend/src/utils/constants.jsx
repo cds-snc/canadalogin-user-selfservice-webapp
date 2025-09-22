@@ -18,6 +18,7 @@ export const NAVIGATION_LINKS = {
   firstVerifyItsYou: "/firstverifyitsyou",
   enterNewEmail: "/enternewemail",
   areYouSureUpdateContactNumber: "/areYouSureUpdateContactNumber",
+  enterNewPhoneNumber: "/enterNewPhoneNumber",
   youMayUpdateEmailAtOtherPlaces: "/youMayUpdateEmailAtOtherPlaces",
   areYouSureUpdateYourEmail: "/areYouSureUpdateYourEmail",
   profileHome: "/profile-home",
