@@ -26,3 +26,8 @@ def test_valid_ca_number():
     result = mask_phone_number(phone)
     assert result.endswith("4567")
     assert result == "(***) *** 4567"
+
+
+def test_invalid_input():
+    with pytest.raises(ValueError, match="Phone number must have at least 4 digits"):
+        mask_phone_number("abcedefg")
