@@ -300,8 +300,16 @@ async def test_dispatch_update_user_profile_failure(monkeypatch):
 
 @pytest.mark.asyncio
 @respx.mock
-async def test_my_profile_success():
-    respx.get(PROFILE_API_URL).mock(
+async def test_my_profile_success(monkeypatch):
+    test_url = "https://mocked-api.ibm.com/v2.0/Me"
+
+    # Patch the config used inside the my_profile function
+    monkeypatch.setattr(
+        "app.users.services.profile.get_configuration",
+        lambda: Mock(profile_api_endpoint=test_url),
+    )
+
+    respx.get(test_url).mock(
         return_value=Response(
             status_code=200,
             json={
@@ -329,8 +337,15 @@ async def test_my_profile_success():
 
 @pytest.mark.asyncio
 @respx.mock
-async def test_my_profile_unauthorized():
-    respx.get(PROFILE_API_URL).mock(return_value=Response(status_code=401))
+async def test_my_profile_unauthorized(monkeypatch):
+    test_url = "https://mocked-api.ibm.com/v2.0/Me"
+
+    monkeypatch.setattr(
+        "app.users.services.profile.get_configuration",
+        lambda: Mock(profile_api_endpoint=test_url),
+    )
+
+    respx.get(test_url).mock(return_value=Response(status_code=401))
 
     http_client = AsyncClient()
 
@@ -343,8 +358,15 @@ async def test_my_profile_unauthorized():
 
 @pytest.mark.asyncio
 @respx.mock
-async def test_my_profile_other_error():
-    respx.get(PROFILE_API_URL).mock(
+async def test_my_profile_other_error(monkeypatch):
+    test_url = "https://mocked-api.ibm.com/v2.0/Me"
+
+    monkeypatch.setattr(
+        "app.users.services.profile.get_configuration",
+        lambda: Mock(profile_api_endpoint=test_url),
+    )
+
+    respx.get(test_url).mock(
         return_value=Response(
             status_code=500,
             json={"detail": "Internal Server Error"},
