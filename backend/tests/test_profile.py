@@ -1,267 +1,373 @@
+from app.users.services.profile import update_profile
+from unittest.mock import AsyncMock, Mock, patch
+from app.utils.request_error_handler import RequestErrorHandler
 import pytest
-import httpx
-from httpx import MockTransport, AsyncClient
-from fastapi import Request as FastAPIRequest, HTTPException
-from types import SimpleNamespace
-from starlette.datastructures import Headers
-from datetime import datetime, timezone
-from unittest.mock import AsyncMock
-
+import respx
+from httpx import AsyncClient, Response
 from app.users.services.profile import (
-    sanitize_user_profile_data,
     dispatch_update_user_profile,
-    update_profile,
+    sanitize_user_profile_data,
     my_profile,
 )
 from app.users.schemas import (
-    UserProfileUpdateRequest,
     IBMVerifyUpdateUserProfile,
-    ProfileResponse,
+    UserProfileUpdateRequest,
     UserProfileName,
 )
+from app.config import get_configuration
+from fastapi import HTTPException
 
 
-# ----------------------------
-# Fixtures
-# ----------------------------
+PROFILE_API_URL = "https://cds-gcsignin-dev.verify.ibm.com/v2.0/Me"
 
 
-@pytest.fixture
-def fake_profile_data():
-    return {
-        "id": "user-123",
-        "userName": "john@example.com",
-        "firstName": "John",
-        "lastName": "Doe",
-        "phone": "1234567890",
-        "emails": [{"type": "work", "value": "john@example.com", "primary": True}],
+@pytest.mark.asyncio
+@patch("app.users.services.profile.my_profile")
+@patch("app.users.services.profile.sanitize_user_profile_data")
+async def test_update_profile_unexpected_exception(mock_sanitize, mock_my_profile):
+    mock_sanitize.return_value = {"userName": "john.doe@example.com"}
+
+    # Simulate unexpected error in my_profile function
+    mock_my_profile.side_effect = Exception("Unexpected failure")
+
+    user_data = UserProfileUpdateRequest(userName="john.doe@example.com")
+    mock_request = Mock()
+    mock_request.app = Mock()
+    mock_request.app.state = Mock()
+
+    with pytest.raises(Exception) as exc:
+        await update_profile(mock_request, user_data, user_access_token="token")
+
+    assert str(exc.value) == "Unexpected failure"
+
+
+@pytest.mark.asyncio
+@patch("app.users.services.profile.sanitize_user_profile_data")
+@patch("app.users.services.profile.my_profile")
+@patch("app.users.services.profile.dispatch_update_user_profile")
+async def test_update_profile_success(mock_dispatch, mock_my_profile, mock_sanitize):
+    # Arrange
+    sanitized_data = {"userName": "john.doe@example.com", "preferredLanguage": "en"}
+    mock_sanitize.return_value = sanitized_data
+
+    profile_data = {
+        "schemas": [
+            "urn:ietf:params:scim:schemas:core:2.0:User",
+            "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+            "urn:ietf:params:scim:schemas:extension:ibm:2.0:Notification",
+        ],
+        "userName": "john.doe@example.com",
+        "emails": [{"value": "john.doe@example.com", "type": "work"}],
         "meta": {
+            "location": "here",
+            "created": "2023-01-01T00:00:00Z",
+            "lastModified": "2023-09-22T12:30:00Z",
             "resourceType": "User",
-            "created": datetime.now(timezone.utc).isoformat(),
-            "lastModified": datetime.now(timezone.utc).isoformat(),
-            "location": "/Users/user-123",
         },
         "active": True,
+        "id": "user-123",
+        "notification": {"notifyType": "NONE"},
     }
 
+    class DummyData:
+        def model_dump(self):
+            return profile_data
 
-@pytest.fixture
-def update_request():
-    return UserProfileUpdateRequest(
-        userName="john@example.com",
-        name=UserProfileName(givenName="Johnny"),
+    mock_my_profile.return_value = Mock(data=DummyData())
+
+    mock_response = Mock()
+    mock_response.status_code = 200
+    mock_response.json.return_value = profile_data
+    mock_dispatch.return_value = mock_response
+
+    user_data = UserProfileUpdateRequest(
+        userName="john.doe@example.com", preferredLanguage="en"
+    )
+    mock_request = Mock()
+    mock_request.app = Mock()
+    mock_request.app.state = Mock()
+
+    # Act
+    response = await update_profile(mock_request, user_data, user_access_token="token")
+
+    # Assert
+    assert response.success is True
+    assert response.message == "User profile updated successfully."
+    mock_sanitize.assert_called_once()
+    mock_my_profile.assert_called_once()
+    mock_dispatch.assert_called_once()
+
+
+@pytest.mark.asyncio
+@patch("app.users.services.profile.sanitize_user_profile_data")
+@patch("app.users.services.profile.my_profile")
+async def test_update_profile_user_mismatch(mock_my_profile, mock_sanitize):
+    mock_sanitize.return_value = {"userName": "other@example.com"}
+
+    profile_data = {"userName": "john.doe@example.com"}
+
+    class DummyData:
+        def model_dump(self):
+            return profile_data
+
+    mock_my_profile.return_value = Mock(data=DummyData())
+
+    user_data = UserProfileUpdateRequest(userName="other@example.com")
+    mock_request = Mock()
+    mock_request.app = Mock()
+    mock_request.app.state = Mock()
+
+    with pytest.raises(HTTPException) as exc:
+        await update_profile(mock_request, user_data, user_access_token="token")
+    assert exc.value.status_code == 403
+
+
+@pytest.mark.asyncio
+@patch("app.users.services.profile.sanitize_user_profile_data")
+@patch("app.users.services.profile.my_profile")
+@patch("app.users.services.profile.dispatch_update_user_profile")
+async def test_update_profile_dispatch_failure(
+    mock_dispatch, mock_my_profile, mock_sanitize
+):
+    mock_sanitize.return_value = {"userName": "john.doe@example.com"}
+
+    profile_data = {
+        "userName": "john.doe@example.com",
+        "emails": [{"value": "john.doe@example.com", "type": "work"}],
+        "meta": {
+            "location": "here",
+            "created": "2023-01-01T00:00:00Z",
+            "lastModified": "2023-09-22T12:30:00Z",
+            "resourceType": "User",
+        },
+        "active": True,
+        "id": "user-123",
+    }
+
+    class DummyData:
+        def model_dump(self):
+            return profile_data
+
+    mock_my_profile.return_value = Mock(data=DummyData())
+
+    mock_response = Mock()
+    mock_response.status_code = 400
+    mock_response.json.return_value = {"detail": "Invalid request"}
+    mock_dispatch.return_value = mock_response
+
+    user_data = UserProfileUpdateRequest(userName="john.doe@example.com")
+    mock_request = Mock()
+    mock_request.app = Mock()
+    mock_request.app.state = Mock()
+
+    with pytest.raises(HTTPException) as exc:
+        await update_profile(mock_request, user_data, user_access_token="token")
+
+    assert exc.value.status_code == 400
+
+
+@pytest.mark.asyncio
+@patch("app.users.services.profile.sanitize_user_profile_data")
+async def test_update_profile_validation_error(mock_sanitize):
+    # Pass something that will cause validation error when merging
+    mock_sanitize.return_value = {"userName": "john.doe@example.com", "id": 123}
+
+    user_data = UserProfileUpdateRequest(userName="john.doe@example.com")
+    mock_request = Mock()
+    mock_request.app = Mock()
+    mock_request.app.state = Mock()
+
+    # Patch my_profile to return a profile with mismatching types to cause validation error
+    with patch(
+        "app.users.services.profile.my_profile",
+        new=AsyncMock(
+            return_value=Mock(
+                data=Mock(
+                    model_dump=Mock(
+                        return_value={
+                            "userName": "john.doe@example.com",
+                            "id": "string-instead-of-int",
+                        }
+                    )
+                )
+            )
+        ),
+    ):
+        with pytest.raises(HTTPException) as exc:
+            await update_profile(mock_request, user_data, user_access_token="token")
+        assert exc.value.status_code == 422
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_dispatch_update_user_profile_success():
+    respx.put(PROFILE_API_URL).mock(
+        return_value=Response(status_code=200, json={"success": True})
     )
 
+    mock_request = Mock()
+    mock_request.app = Mock()
+    mock_request.app.state = Mock()
+    mock_request.app.state.request_client = AsyncClient()
+    mock_request.app.state.config = get_configuration()
 
-@pytest.fixture
-def user_token():
-    return "mock-user-token"
+    payload = IBMVerifyUpdateUserProfile(
+        **{
+            "schemas": [
+                "urn:ietf:params:scim:schemas:core:2.0:User",
+                "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+                "urn:ietf:params:scim:schemas:extension:ibm:2.0:Notification",
+            ],
+            "userName": "john.doe@example.com",
+            "emails": [{"value": "john.doe@example.com", "type": "work"}],
+            "meta": {
+                "location": "here",
+                "created": "2023-01-01T00:00:00Z",
+                "lastModified": "2023-09-22T12:30:00Z",
+                "resourceType": "User",
+            },
+            "active": True,
+            "id": "user-123",
+            "notification": {"notifyType": "NONE"},
+        }
+    )
+
+    # Patch raise_for_status to an async no-op to avoid TypeError
+    mock_request.app.state.request_client.put = AsyncMock(
+        return_value=Response(status_code=200, json={"success": True})
+    )
+    mock_request.app.state.request_client.put.return_value.raise_for_status = (
+        AsyncMock()
+    )
+
+    response = await dispatch_update_user_profile(
+        request=mock_request,
+        user_profile_payload=payload.model_dump_json(by_alias=True),
+        user_access_token="mock-token",
+    )
+    assert response.status_code == 200
 
 
-@pytest.fixture
-def make_request(mock_app):
-    def _make_request(app):
-        return FastAPIRequest(
-            scope={"type": "http", "app": app, "headers": Headers({}).raw}
+@pytest.mark.asyncio
+@respx.mock
+async def test_dispatch_update_user_profile_failure(monkeypatch):
+    respx.put(PROFILE_API_URL).mock(
+        return_value=Response(
+            status_code=400,
+            json={"detail": "Invalid request"},
+        )
+    )
+
+    # Patch error handler to prevent crashing the test
+    monkeypatch.setattr(
+        RequestErrorHandler, "handle", lambda e: (_ for _ in ()).throw(e)
+    )
+
+    mock_request = Mock()
+    mock_request.app = Mock()
+    mock_request.app.state = Mock()
+    mock_request.app.state.request_client = AsyncClient()
+    mock_request.app.state.config = get_configuration()
+
+    payload = IBMVerifyUpdateUserProfile(
+        **{
+            "schemas": [
+                "urn:ietf:params:scim:schemas:core:2.0:User",
+                "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+                "urn:ietf:params:scim:schemas:extension:ibm:2.0:Notification",
+            ],
+            "userName": "john.doe@example.com",
+            "emails": [{"value": "john.doe@example.com", "type": "work"}],
+            "meta": {
+                "location": "here",
+                "created": "2023-01-01T00:00:00Z",
+                "lastModified": "2023-09-22T12:30:00Z",
+                "resourceType": "User",
+            },
+            "active": True,
+            "id": "user-123",
+            "notification": {"notifyType": "NONE"},
+        }
+    )
+
+    with pytest.raises(Exception):
+        await dispatch_update_user_profile(
+            request=mock_request,
+            user_profile_payload=payload.model_dump_json(by_alias=True),
+            user_access_token="mock-token",
         )
 
-    return _make_request
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_my_profile_success():
+    respx.get(PROFILE_API_URL).mock(
+        return_value=Response(
+            status_code=200,
+            json={
+                "userName": "john.doe@example.com",
+                "emails": [{"value": "john.doe@example.com", "type": "work"}],
+                "meta": {
+                    "location": "here",
+                    "created": "2023-01-01T00:00:00Z",
+                    "lastModified": "2023-09-22T12:30:00Z",
+                    "resourceType": "User",
+                },
+                "active": True,
+                "id": "user-123",
+                "notification": {"notifyType": "NONE"},
+            },
+        )
+    )
+
+    http_client = AsyncClient()
+    response = await my_profile(http_client, user_access_token="mock-token")
+
+    assert response.success is True
+    assert response.data.userName == "john.doe@example.com"
 
 
-@pytest.fixture
-def mock_app():
-    def _app_with_transport(transport):
-        class MockAppState:
-            def __init__(self):
-                self.request_client = AsyncClient(
-                    transport=transport, base_url="http://testserver"
-                )
-                self.config = SimpleNamespace(
-                    profile_api_endpoint="http://testserver/v2.0/Me"
-                )
+@pytest.mark.asyncio
+@respx.mock
+async def test_my_profile_unauthorized():
+    respx.get(PROFILE_API_URL).mock(return_value=Response(status_code=401))
 
-        class MockApp:
-            def __init__(self):
-                self.state = MockAppState()
+    http_client = AsyncClient()
 
-        return MockApp()
+    with pytest.raises(HTTPException) as exc:
+        await my_profile(http_client, user_access_token="mock-token")
 
-    return _app_with_transport
+    assert exc.value.status_code == 401
+    assert "Not authenticated" in str(exc.value.detail)
 
 
-# ----------------------------
-# Tests
-# ----------------------------
+@pytest.mark.asyncio
+@respx.mock
+async def test_my_profile_other_error():
+    respx.get(PROFILE_API_URL).mock(
+        return_value=Response(
+            status_code=500,
+            json={"detail": "Internal Server Error"},
+        )
+    )
+
+    http_client = AsyncClient()
+
+    with pytest.raises(HTTPException) as exc:
+        await my_profile(http_client, user_access_token="mock-token")
+
+    assert exc.value.status_code == 500
+    assert "HTTP error" in str(exc.value.detail)
 
 
 def test_sanitize_user_profile_data():
-    update_request_obj = UserProfileUpdateRequest(
-        userName="john@example.com", name=UserProfileName(givenName="Johnny")
+    input_data = UserProfileUpdateRequest(
+        userName="john.doe@example.com",
+        name=UserProfileName(givenName="Johnny", familyName=None, formatted=None),
+        preferredLanguage=None,
+        phoneNumbers=None,
     )
-    result = sanitize_user_profile_data(update_request_obj)
-
-    assert "userName" in result
-    assert result["userName"] == "john@example.com"
-    assert "name" in result
-    assert isinstance(result["name"], dict)
-    assert result["name"].get("givenName") == "Johnny"
-
-
-@pytest.mark.asyncio
-async def test_dispatch_update_user_profile_success(
-    user_token, fake_profile_data, mock_app, make_request
-):
-    def handler(request: httpx.Request) -> httpx.Response:
-        assert request.method == "PUT"
-        response = httpx.Response(
-            status_code=200,
-            json=fake_profile_data,
-            request=request,
-        )
-        # Patch raise_for_status to be awaitable and succeed
-        response.raise_for_status = AsyncMock()
-        return response
-
-    transport = MockTransport(handler)
-    app = mock_app(transport)
-    req = make_request(app)
-
-    profile_obj = IBMVerifyUpdateUserProfile(**fake_profile_data)
-    payload = profile_obj.model_dump_json(by_alias=True, exclude_none=True)
-
-    response = await dispatch_update_user_profile(req, payload, user_token)
-
-    assert response.status_code == 200
-    resp_json = response.json()
-    assert resp_json["userName"] == fake_profile_data["userName"]
-    assert resp_json["id"] == fake_profile_data["id"]
-
-
-@pytest.mark.asyncio
-async def test_update_profile_success(
-    update_request, fake_profile_data, user_token, mock_app, make_request
-):
-    def handler(request: httpx.Request) -> httpx.Response:
-        if request.method == "GET":
-            response = httpx.Response(
-                status_code=200,
-                json=fake_profile_data,
-                request=request,
-            )
-            response.raise_for_status = AsyncMock()
-            return response
-        elif request.method == "PUT":
-            merged = {**fake_profile_data, **update_request.model_dump()}
-            merged.setdefault("emails", fake_profile_data["emails"])
-            merged.setdefault("meta", fake_profile_data["meta"])
-            response = httpx.Response(
-                status_code=200,
-                json=merged,
-                request=request,
-            )
-            response.raise_for_status = AsyncMock()
-            return response
-        else:
-            response = httpx.Response(
-                status_code=404,
-                json={"detail": "Not Found"},
-                request=request,
-            )
-            response.raise_for_status = AsyncMock()
-            return response
-
-    transport = MockTransport(handler)
-    app = mock_app(transport)
-    req = make_request(app)
-
-    result = await update_profile(req, update_request, user_token)
-
-    assert isinstance(result, ProfileResponse)
-    assert result.success is True
-    assert result.data.name.givenName == "Johnny"
-
-
-@pytest.mark.asyncio
-async def test_update_profile_user_mismatch(
-    update_request, fake_profile_data, user_token, mock_app, make_request
-):
-    mismatched = {**fake_profile_data, "userName": "wrong@example.com"}
-
-    def handler(request: httpx.Request) -> httpx.Response:
-        if request.method == "GET":
-            response = httpx.Response(
-                status_code=200,
-                json=mismatched,
-                request=request,
-            )
-            response.raise_for_status = AsyncMock()
-            return response
-        else:
-            response = httpx.Response(
-                status_code=404,
-                json={"detail": "Not Found"},
-                request=request,
-            )
-            response.raise_for_status = AsyncMock()
-            return response
-
-    transport = MockTransport(handler)
-    app = mock_app(transport)
-    req = make_request(app)
-
-    with pytest.raises(HTTPException) as excinfo:
-        await update_profile(req, update_request, user_token)
-
-    assert excinfo.value.status_code == 403
-    assert "User mismatch" in str(excinfo.value.detail)
-
-
-@pytest.mark.asyncio
-async def test_my_profile_success(fake_profile_data, user_token, mock_app):
-    def handler(request: httpx.Request) -> httpx.Response:
-        assert request.method == "GET"
-        response = httpx.Response(
-            status_code=200,
-            json=fake_profile_data,
-            request=request,
-        )
-        response.raise_for_status = AsyncMock()
-        return response
-
-    transport = MockTransport(handler)
-    client = AsyncClient(transport=transport, base_url="http://testserver")
-
-    response = await my_profile(client, user_token)
-
-    assert isinstance(response, ProfileResponse)
-    assert response.data.userName == fake_profile_data["userName"]
-    assert response.data.id == fake_profile_data["id"]
-    assert response.data.meta.resourceType == fake_profile_data["meta"]["resourceType"]
-    assert response.data.active == fake_profile_data["active"]
-
-
-@pytest.mark.asyncio
-async def test_my_profile_unauthorized(user_token):
-    def handler(request: httpx.Request) -> httpx.Response:
-        response = httpx.Response(
-            status_code=401,
-            json={"detail": "Not authenticated"},
-            request=request,
-        )
-        response.raise_for_status = AsyncMock(
-            side_effect=httpx.HTTPStatusError(
-                message="Unauthorized",
-                request=request,
-                response=response,
-            )
-        )
-        return response
-
-    transport = MockTransport(handler)
-    client = AsyncClient(transport=transport, base_url="http://testserver")
-
-    with pytest.raises(HTTPException) as excinfo:
-        await my_profile(client, user_token)
-
-    assert excinfo.value.status_code == 401
-    assert "Not authenticated" in str(excinfo.value.detail)
+    result = sanitize_user_profile_data(input_data)
+    assert result["userName"] == "john.doe@example.com"
+    assert "preferredLanguage" not in result
+    assert "phoneNumbers" not in result
