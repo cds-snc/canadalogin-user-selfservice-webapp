@@ -20,6 +20,7 @@ import FirstVerifyItsYou from "./components/Manage/FirstVerifyItsYou.jsx";
 import EnterNewEmail from "./components/Manage/EnterNewEmail.jsx";
 import ProfileUpdateNameSuccess from "./components/Manage/ProfileUpdateNameSuccess.jsx";
 import AreYouSureUpdateContactNumber from "./components/Manage/AreYouSureUpdateContactNumber.jsx";
+import EnterNewPhoneNumber from "./components/Manage/EnterNewPhoneNumber.jsx";
 import YouMayUpdateEmailAtOtherPlaces from "./components/Manage/YouMayUpdateEmailAtOtherPlaces.jsx";
 import AreYouSureUpdateYourEmail from "./components/Manage/AreYouSureUpdateYourEmail.jsx";
 import SecuritySettings from "./components/Manage/SecuritySettings.jsx";
@@ -117,6 +118,11 @@ export const appRoutes = [
                     handle: { id: PAGES.enterNewPhoneNumber },
                   },
                 ],
+              },
+              {
+                path: "enterNewPhoneNumber",
+                element: <EnterNewPhoneNumber />,
+                handle: { id: PAGES.enterNewPhoneNumber },
               },
               {
                 path: "areYouSureUpdateContactNumber",
