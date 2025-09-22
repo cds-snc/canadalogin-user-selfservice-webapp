@@ -347,6 +347,8 @@
     "5": "Sign out",
     "6": "Extending...",
     "7": "Signing you out...",
-    "8": "Your session will expire at {{time}}."
+    "8": "Your session will expire at {{time}}.",
+    "9": "Loading...",
+    "10": "Failed to sign you out. Redirecting..."
   }
 }

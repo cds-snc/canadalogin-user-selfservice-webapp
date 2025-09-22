@@ -60,6 +60,7 @@ export interface UserState {
   userData: any;
   isLoading: boolean;
   loadingText: string | null;
+  isLoggingOut: boolean;
   editProfile: UserProfile | null;
   urlLanguageBeforeEdit: string | null;
   cancelProfileEditing: boolean;
@@ -71,6 +72,7 @@ export interface SessionTimeoutState {
   showModal: boolean;
   isLoading: boolean;
   expirationTime: number | null;
+  newServerSideExpirationTime: number | null;
 }
 
 interface UserProviderProps {
@@ -82,6 +84,7 @@ interface UserProviderProps {
 const initialState: UserState = {
   isLoading: true,
   loadingText: null,
+  isLoggingOut: false,
   userData: {
     service: SERVICES[0].title, //to be set later when url referrer is given, also need to refactor other pages to use this value
     language: "en", //to be set later when refactoring possibly
@@ -106,10 +109,11 @@ const initialState: UserState = {
   authenticatedPages: [],
 };
 
-const initialSessionTimeoutState: SessionTimeoutState = {
+const initialSessionState: SessionTimeoutState = {
   showModal: false,
   isLoading: false,
   expirationTime: null,
+  newServerSideExpirationTime: null,
 };
 
 function userReducer(
@@ -118,10 +122,26 @@ function userReducer(
 ): UserState {
   switch (action.type) {
     case CONTEXT_ACTIONS.set_loading:
+      if (typeof action.payload === "boolean") {
+        return {
+          ...state,
+          isLoading: action.payload,
+          loadingText: null,
+        };
+      }
       return {
         ...state,
         isLoading: action.payload.isLoading,
         loadingText: action.payload.text || null,
+      };
+    case CONTEXT_ACTIONS.logOut:
+      return {
+        ...state,
+        userProfile: null,
+        userData: { ...initialState.userData },
+        isLoading: action.payload ? action.payload.isLoading : false,
+        loadingText: action.payload ? action.payload.text : null,
+        isLoggingOut: true,
       };
     case CONTEXT_ACTIONS.clone_profile:
       return {
@@ -144,6 +164,11 @@ function userReducer(
       return {
         ...state,
         userProfile: action.payload,
+      };
+    case CONTEXT_ACTIONS.reset_logout_state:
+      return {
+        ...state,
+        isLoggingOut: false,
       };
     case CONTEXT_ACTIONS.clear_edit_profile:
       return {
@@ -178,18 +203,13 @@ function userReducer(
           (page) => page !== action.payload,
         ),
       };
-    case CONTEXT_ACTIONS.set_loading:
-      return {
-        ...state,
-        isLoading: action.payload,
-      };
     default:
       return state;
   }
 }
 
 function sessionTimeoutReducer(
-  state: SessionTimeoutState = initialSessionTimeoutState,
+  state: SessionTimeoutState = initialSessionState,
   action: Action,
 ): SessionTimeoutState {
   switch (action.type) {
@@ -203,12 +223,12 @@ function sessionTimeoutReducer(
       return {
         ...state,
         showModal: false,
-        isLoading: false,
+        expirationTime: null,
       };
-    case CONTEXT_ACTIONS.set_session_timeout_loading:
+    case CONTEXT_ACTIONS.reset_expire_time:
       return {
         ...state,
-        isLoading: action.payload,
+        newServerSideExpirationTime: action.payload,
       };
     default:
       return state;
@@ -218,10 +238,13 @@ function sessionTimeoutReducer(
 export function UserProvider({
   children,
   initial = initialState,
-  initialSessionTimeoutState,
+  initialSessionTimeoutState = initialSessionState,
 }: UserProviderProps) {
   const [userState, userDispatch] = useReducer(userReducer, initial);
-  const [sessionTimeoutState, sessionTimeoutDispatch] = useReducer(sessionTimeoutReducer, initialSessionTimeoutState);
+  const [sessionTimeoutState, sessionTimeoutDispatch] = useReducer(
+    sessionTimeoutReducer,
+    initialSessionTimeoutState,
+  );
   const [searchParams] = useSearchParams();
   const { language } = useParams();
   const pageContentJson = getPageContent(language, "SessionManagement");
@@ -251,7 +274,7 @@ export function UserProvider({
   };
 
   // Start session timers with specific expire time from SSE
-  const startSessionTimersWithExpireTime = (expireTimestamp: number) => {
+  const resetSessionTimers = (expireTimestamp: number) => {
     clearTimers();
 
     // Convert expire timestamp to milliseconds if it's in seconds
@@ -260,13 +283,15 @@ export function UserProvider({
     const timeUntilExpire = expireTimeMs - currentTime;
 
     // Only set timers if expire time is in the future
-    if (timeUntilExpire <= 0) {
+    if (userState.userProfile && timeUntilExpire <= 0) {
       console.warn("Session already expired based on provided expire time");
+      handleLogout();
       return;
     }
 
     // Set warning timer (5 minutes before expire time, but not if less than 5 minutes remain)
-    const timeUntilWarning = timeUntilExpire > WARNING_TIME ? timeUntilExpire - WARNING_TIME : 0;
+    const timeUntilWarning =
+      timeUntilExpire > WARNING_TIME ? timeUntilExpire - WARNING_TIME : 0;
     if (timeUntilWarning > 0) {
       warningTimerRef.current = setTimeout(() => {
         sessionTimeoutDispatch({
@@ -274,6 +299,12 @@ export function UserProvider({
           payload: expireTimeMs,
         });
       }, timeUntilWarning);
+    } else {
+      // If less than 5 minutes remain, show the modal immediately
+      sessionTimeoutDispatch({
+        type: CONTEXT_ACTIONS.show_session_timeout_modal,
+        payload: expireTimeMs,
+      });
     }
 
     // Set expire timer
@@ -281,21 +312,22 @@ export function UserProvider({
       await handleLogout();
     }, timeUntilExpire);
 
-    console.log(`Session timers set: warning in ${timeUntilWarning}ms, expire in ${timeUntilExpire}ms`);
+    console.log(
+      `Session timers set: warning in ${timeUntilWarning}ms, expire in ${timeUntilExpire}ms`,
+    );
   };
 
   // Handle keep session alive
   const handleKeepSession = async () => {
-    sessionTimeoutDispatch({
-      type: CONTEXT_ACTIONS.set_session_timeout_loading,
-      payload: true,
-    });
-
     try {
-      await authService.keepAlive();
+      const response = await authService.keepAlive();
       sessionTimeoutDispatch({
         type: CONTEXT_ACTIONS.hide_session_timeout_modal,
         payload: null,
+      });
+      sessionTimeoutDispatch({
+        type: CONTEXT_ACTIONS.reset_expire_time,
+        payload: response.data.expire,
       });
     } catch (error) {
       console.error("Error keeping session alive:", error);
@@ -306,12 +338,11 @@ export function UserProvider({
 
   // Handle logout
   const handleLogout = async () => {
+    userDispatch({
+      type: CONTEXT_ACTIONS.logOut,
+      payload: { isLoading: true, text: pageContentJson["7"] },
+    });
     try {
-      // Set loading state
-      userDispatch({
-        type: CONTEXT_ACTIONS.set_loading,
-        payload: { isLoading: true, text: pageContentJson["7"] },
-      });
       const response = await authService.logout();
       // Check if response has redirect_url and redirect
       if (response && response.data && response.data.redirect_url) {
@@ -325,15 +356,15 @@ export function UserProvider({
       // Update loading text to show error
       userDispatch({
         type: CONTEXT_ACTIONS.set_loading,
-        payload: { isLoading: true, text: pageContentJson["9"] },
+        payload: { isLoading: true, text: pageContentJson["10"] },
       });
+      clearTimers();
+      if (eventSource) eventSource.close();
+
       // Redirect after error
       setTimeout(() => {
         window.location.href = "/";
       }, 2000);
-    } finally {
-      clearTimers();
-      if (eventSource) eventSource.close();
     }
   };
 
@@ -343,12 +374,22 @@ export function UserProvider({
     (event) => {
       if (event.type === "expired" || event.type === "terminated") {
         console.log("SSE expired or terminated:", event.data);
+        if (userState.isLoggingOut) return; // Prevent multiple logout attempts
+
         if (eventSource) eventSource.close();
         clearTimers();
+
+        // Set loading state for visual feedback
         userDispatch({
           type: CONTEXT_ACTIONS.set_loading,
           payload: { isLoading: true, text: pageContentJson["7"] },
         });
+
+        // Redirect after error with a slight delay to show loading message
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 2000);
+        return;
       }
       if (event.type === "error") {
         // for debugging purpose. No need to handle it.
@@ -358,37 +399,35 @@ export function UserProvider({
         // Parse the event data and check status
         try {
           const eventData = JSON.parse(event.data);
-          console.log("SSE notification:", eventData);
-          
+          console.debug("SSE notification:", eventData);
+
           if (eventData.status === "active" && eventData.expire) {
             // Reset timers when receiving active status with new expire time
-            console.log("SSE notification: resetting session timers based on new expire time", eventData.expire);
-            startSessionTimersWithExpireTime(eventData.expire);
-            // Always dispatch hide modal action - the reducer will handle the state check
+            console.debug(
+              "SSE notification: resetting session timers based on new expire time",
+              eventData.expire,
+            );
             sessionTimeoutDispatch({
-              type: CONTEXT_ACTIONS.hide_session_timeout_modal,
-              payload: null,
+              type: CONTEXT_ACTIONS.reset_expire_time,
+              payload: eventData.expire,
             });
           } else {
-            console.log("SSE notification: status not active or missing expire time", eventData);
+            console.log(
+              "SSE notification: status not active or missing expire time",
+              eventData,
+            );
           }
         } catch (error) {
-          console.error("Error parsing SSE notification data:", error, event.data);
+          console.error(
+            "Error parsing SSE notification data:",
+            error,
+            event.data,
+          );
         }
       }
     },
     [userDispatch, sessionTimeoutDispatch], // Dependencies for the listener callback
   );
-
-  useEffect(() => {
-    if (userState.isLoading && userState.loadingText) {
-      // After state is set to terminating, wait 2 seconds then redirect
-      const timer = setTimeout(() => {
-        window.location.href = "/";
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [userState.isLoading, userState.loadingText]);
 
   useEffect(() => {
     // Simple authentication check - if we're not loading and don't have a profile,
@@ -403,13 +442,21 @@ export function UserProvider({
             type: CONTEXT_ACTIONS.updated_profile_success,
             payload: response.data,
           });
+          // Reset logout state in case user is returning from OIDC logout
+          userDispatch({
+            type: CONTEXT_ACTIONS.reset_logout_state,
+            payload: null,
+          });
         }
       } catch (err) {
         console.log("User not authenticated:", err);
         // User not authenticated - this will trigger OIDC redirect in PrivateRoute
       } finally {
-        // Always set loading to false so PrivateRoute can handle the logic
-        userDispatch({ type: CONTEXT_ACTIONS.set_loading, payload: false });
+        // Always set loading to false and reset loading text so PrivateRoute can handle the logic
+        userDispatch({
+          type: CONTEXT_ACTIONS.set_loading,
+          payload: { isLoading: false, text: null },
+        });
       }
     };
 
@@ -450,31 +497,34 @@ export function UserProvider({
     setRelyingPartyInfo();
   }, []);
 
-  // Start timers when user is authenticated
+  // Start timers when newServerSideExpirationTime is set/updated
   useEffect(() => {
-    if (userState.userProfile && !userState.isLoading) {
-      startSessionTimersWithExpireTime(Date.now() / 1000 + 20 * 60); // Assuming a 20 minute session for default, if not updates from SSE
+    if (sessionTimeoutState.newServerSideExpirationTime) {
+      resetSessionTimers(sessionTimeoutState.newServerSideExpirationTime);
     }
-    
-    // Cleanup timers on unmount
-    return () => {
-      clearTimers();
-    };
-  }, [userState.userProfile, userState.isLoading]);
 
-  if (userState.isLoading && userState.loadingText) {
-    return <Loader text={userState.loadingText} />;
+    return () => {};
+  }, [sessionTimeoutState.newServerSideExpirationTime]);
+
+  if (userState.isLoading) {
+    return (
+      <Loader
+        text={
+          userState.loadingText ? userState.loadingText : pageContentJson["9"]
+        }
+      />
+    );
   }
 
   return (
     <UserContext.Provider value={{ state: userState, dispatch: userDispatch }}>
       {children}
       <SessionTimeoutModal
-        isOpen={sessionTimeoutState?.showModal}
-        expirationTime={sessionTimeoutState?.expirationTime}
+        isOpen={sessionTimeoutState.showModal}
+        expirationTime={sessionTimeoutState.expirationTime}
         onKeepSession={handleKeepSession}
         onLogout={handleLogout}
-        isLoading={sessionTimeoutState?.isLoading}
+        isLoading={sessionTimeoutState.isLoading}
         currentLang={language}
       />
     </UserContext.Provider>

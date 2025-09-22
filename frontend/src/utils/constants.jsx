@@ -41,6 +41,7 @@ export const OIDC_REDIRECT = {
 
 export const CONTEXT_ACTIONS = {
   logOut: "LOG_OUT",
+  reset_logout_state: "RESET_LOGOUT_STATE",
   set_loading: "SET_LOADING",
   clone_profile: "CLONE_PROFILE",
   clear_edit_profile: "CLEAR_EDIT_PROFILE",
@@ -56,6 +57,7 @@ export const CONTEXT_ACTIONS = {
   show_session_timeout_modal: "SHOW_SESSION_TIMEOUT_MODAL",
   hide_session_timeout_modal: "HIDE_SESSION_TIMEOUT_MODAL",
   set_session_timeout_loading: "SET_SESSION_TIMEOUT_LOADING",
+  reset_expire_time: "RESET_EXPIRE_TIME",
 };
 
 export const FLOW_TYPES = {
@@ -138,7 +140,7 @@ export const SUBMIT_END_POINTS = {
   passwordUpdate: "/v1/password/update",
   logout: "/v1/auth/logout",
   sessionStatus: "/v1/auth/session-status",
-  keepAlive: '/v1/auth/keep-alive',
+  keepAlive: "/v1/auth/keep-alive",
 };
 
 export const GA_CATEGORIES = {

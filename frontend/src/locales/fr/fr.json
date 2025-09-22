@@ -326,6 +326,8 @@
     "5": "Se déconnecter",
     "6": "Extension en cours...",
     "7": "Déconnexion en cours...",
-    "8": "Votre session expirera à {{time}}."
+    "8": "Votre session expirera à {{time}}.",
+    "9": "Chargement...",
+    "10": "Échec de la déconnexion. Redirection..."
   }
 }

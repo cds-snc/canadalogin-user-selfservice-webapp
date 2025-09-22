@@ -8,6 +8,7 @@ import {
   GcdsText,
   GcdsTopNav,
 } from "@cdssnc/gcds-components-react";
+import { useNavigate } from "react-router-dom";
 import { useBreakpoints } from "../../hooks/useBreakpoints";
 import { getPageContent } from "../../utils/functions.jsx";
 import { path } from "../../utils/routeHelpers.js";
@@ -19,7 +20,8 @@ import { userProfileDispatch } from "../../utils/userProfileDispatch.jsx";
 export default function TopNav({ currentLang }) {
   const pageContentJson = getPageContent(currentLang, "TopNavBar");
   const { state, dispatch } = useUser();
-  const { setLoading } = userProfileDispatch(dispatch);
+  const { setLoading, loggingOut } = userProfileDispatch(dispatch);
+  const navigate = useNavigate();
 
   const relyingPartyLinkName = state.relyingPartyInfo?.linkName;
   const relyingPartyUrl = state.relyingPartyInfo?.url;
@@ -35,7 +37,7 @@ export default function TopNav({ currentLang }) {
 
   const handleLogout = async (e) => {
     e.preventDefault();
-    setLoading(true, pageContentJson["8"]); // Use logout loading text
+    loggingOut(true, pageContentJson["8"]); // Use logout loading text
 
     try {
       const response = await authService.logout();
@@ -45,7 +47,7 @@ export default function TopNav({ currentLang }) {
         window.location.href = response.data.redirect_url;
       } else {
         // Fallback redirect if no redirect_url provided
-        window.location.href = "/";
+        navigate("/");
       }
     } catch (error) {
       console.error("Logout failed:", error);
@@ -53,6 +55,7 @@ export default function TopNav({ currentLang }) {
       setLoading(true, pageContentJson["9"]);
       // Redirect after error
       setTimeout(() => {
+        setLoading(false, null);
         window.location.href = "/";
       }, 2000);
     }
