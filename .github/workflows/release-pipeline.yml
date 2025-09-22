@@ -53,16 +53,32 @@ jobs:
           role-session-name: GHPushAppS3
           aws-region: ${{ env.AWS_REGION }}
 
+      - name: Check if build already exists in S3
+        id: s3-check
+        run: |
+          if aws s3 ls "s3://${{ secrets.FRONTEND_APP_BUILD_ARTIFACTS_S3_BUCKET }}/${GITHUB_SHA}/" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Environment Variables for build
+        if: steps.s3-check.outputs.exists == 'false'
         run: |
           echo "VITE_BACKEND_API_URL=${{ secrets.VITE_BACKEND_API_URL }}" >> $GITHUB_ENV
           echo "VITE_GOOGLE_ANALYTICS_ID=${{ secrets.VITE_GOOGLE_ANALYTICS_ID }}" >> $GITHUB_ENV
 
       - name: Install dependencies
+        if: steps.s3-check.outputs.exists == 'false'
         working-directory: frontend
         run: |
           npm install
           npm run build
+
+      - name: Upload build artifacts to S3
+        if: steps.s3-check.outputs.exists == 'false'
+        run: |
+          aws s3 sync frontend/dist s3://${{ secrets.FRONTEND_APP_BUILD_ARTIFACTS_S3_BUCKET }}/${GITHUB_SHA}
 
   # Builds the backend application for the current SHA and stores the artifact in ECR.
   build-backend:
