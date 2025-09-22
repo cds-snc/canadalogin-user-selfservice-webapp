@@ -40,7 +40,7 @@ const DisplayPhoneNumbers = ({ phoneNumbers }) => {
               margin-bottom={isLast ? "400" : "0"}
               placeContent="center"
             >
-              {numberType}: {profilePhoneNumber}
+              {profilePhoneNumber}
             </GcdsText>
           );
         })}
