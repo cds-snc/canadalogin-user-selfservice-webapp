@@ -98,7 +98,6 @@ async def session_status(request: Request):
     tags=["Auth"],
     summary="Keep alive",
     description="Keep the user session alive and return the updated session expire info",
-
 )
 async def keep_alive(request: Request):
     return await session_extend(request)
