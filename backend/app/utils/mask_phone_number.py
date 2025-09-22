@@ -1,16 +1,16 @@
 def mask_phone_number(phone_number: str) -> str:
     """
     Mask the phone number except the last 4 digits.
+    Returns a masked string like (***) *** 1234.
     """
-    try:
 
-        # Extract phone number string only
-        digits = "".join(filter(str.isdigit, phone_number))
+    # Extract phone number string only
+    digits = "".join(filter(str.isdigit, phone_number))
+    if len(digits) < 4:
+        raise ValueError("Phone number must have at least 4 digits")
 
-        # Mask everything except the last 4
-        last4 = digits[-4:]
-        masked = f"(***) *** {last4}"
+    # Mask everything except the last 4
+    last4 = digits[-4:]
+    masked = f"(***) *** {last4}"
 
-        return masked
-    except Exception as e:
-        return f"Invalid phone number: {str(e)}"
+    return masked
