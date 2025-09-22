@@ -38,15 +38,15 @@ def mask_contact_phone_numbers(
     if phone_numbers is None:
         return None
 
-    formatted_numbers = []
+    masked_phone_numbers = []
     for phone in phone_numbers:
         value = phone.get("value")
         if not value:
             continue
         masked_phone = dict(phone)  # Create a copy of the original phone dict
         masked_phone["value"] = mask_phone_number(value)
-        formatted_numbers.append(masked_phone)
-    return formatted_numbers
+        masked_phone_numbers.append(masked_phone)
+    return masked_phone_numbers
 
 
 async def dispatch_update_user_profile(
