@@ -9,7 +9,7 @@ from app.users.schemas import (
     ProfileResponse,
     UserProfileUpdateRequest,
     IBMVerifyUpdateUserProfile,
-    MetaDataTypeValue
+    MetaDataTypeValue,
 )
 from app.utils.access_token import get_auth_request_headers
 from app.utils.mask_phone_number import mask_phone_number
@@ -28,7 +28,9 @@ def sanitize_user_profile_data(user_data: UserProfileUpdateRequest) -> dict:
     return updated_data_dict
 
 
-def mask_contact_phone_numbers(phone_numbers: list[MetaDataTypeValue]) -> list[MetaDataTypeValue]:
+def mask_contact_phone_numbers(
+    phone_numbers: list[MetaDataTypeValue],
+) -> list[MetaDataTypeValue]:
     """
     Loop through a list of profile contact phone numbers and mask each number except the last 4 digits.
     """
@@ -145,7 +147,9 @@ async def my_profile(global_http_client: AsyncClient, user_access_token: str):
         json_data = response.json()
         profile_contact_phone_numbers = json_data.get("phoneNumbers")
         if profile_contact_phone_numbers is not None:
-            masked_contact_phone_numbers = mask_contact_phone_numbers(profile_contact_phone_numbers)
+            masked_contact_phone_numbers = mask_contact_phone_numbers(
+                profile_contact_phone_numbers
+            )
             json_data["phoneNumbers"] = masked_contact_phone_numbers
 
         response_data = IBMVerifyUserProfileSchema(**json_data)
