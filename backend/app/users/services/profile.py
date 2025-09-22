@@ -9,8 +9,10 @@ from app.users.schemas import (
     ProfileResponse,
     UserProfileUpdateRequest,
     IBMVerifyUpdateUserProfile,
+    MetaDataTypeValue,
 )
 from app.utils.access_token import get_auth_request_headers
+from app.utils.mask_phone_number import mask_phone_number
 from app.config import get_configuration
 from app.utils.request_error_handler import RequestErrorHandler
 
@@ -24,6 +26,27 @@ def sanitize_user_profile_data(user_data: UserProfileUpdateRequest) -> dict:
         exclude_unset=True, exclude_none=True
     )
     return updated_data_dict
+
+
+def mask_contact_phone_numbers(
+    phone_numbers: list[MetaDataTypeValue],
+) -> list[MetaDataTypeValue]:
+    """
+    Loop through a list of profile contact phone numbers and mask each number except the last 4 digits.
+    """
+
+    if phone_numbers is None:
+        return None
+
+    masked_phone_numbers = []
+    for phone in phone_numbers:
+        value = phone.get("value")
+        if not value:
+            continue
+        masked_phone = dict(phone)  # Create a copy of the original phone dict
+        masked_phone["value"] = mask_phone_number(value)
+        masked_phone_numbers.append(masked_phone)
+    return masked_phone_numbers
 
 
 async def dispatch_update_user_profile(
@@ -122,6 +145,13 @@ async def my_profile(global_http_client: AsyncClient, user_access_token: str):
     if response.status_code == 200:
         logger.info("User profile retrieved successfully.")
         json_data = response.json()
+        profile_contact_phone_numbers = json_data.get("phoneNumbers")
+        if profile_contact_phone_numbers is not None:
+            masked_contact_phone_numbers = mask_contact_phone_numbers(
+                profile_contact_phone_numbers
+            )
+            json_data["phoneNumbers"] = masked_contact_phone_numbers
+
         response_data = IBMVerifyUserProfileSchema(**json_data)
         return ProfileResponse(
             success=True,
