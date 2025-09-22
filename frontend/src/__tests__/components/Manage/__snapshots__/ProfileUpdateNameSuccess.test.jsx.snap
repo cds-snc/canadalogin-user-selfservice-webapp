@@ -13,7 +13,7 @@ exports[`ProfileUpdateNameSuccess Component > matches snapshot 1`] = `
       </gcds-text>
     </gcds-notice>
     <gcds-heading>
-      You may need to update your name with other places.
+      You may need to update your name in other places.
     </gcds-heading>
     <gcds-heading>
       This only changes your name with services connected to your GC Sign in.

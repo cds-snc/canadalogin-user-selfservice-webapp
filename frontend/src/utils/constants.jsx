@@ -22,12 +22,14 @@ export const NAVIGATION_LINKS = {
   youMayUpdateEmailAtOtherPlaces: "/youMayUpdateEmailAtOtherPlaces",
   areYouSureUpdateYourEmail: "/areYouSureUpdateYourEmail",
   profileHome: "/profile-home",
+  profile: "/profile",
   profileUpdateName: "/profile/update-name",
   profileUpdateNameSuccess: "/profile/update-name/success",
   profileUpdateNameConfirmUpdate: "/profile/update-name/confirm-update",
-  profileUpdateLanguage: "/profile/update-language/",
+  profileUpdateLanguage: "/profile/update-language",
   profileUpdateLanguageConfirmUpdate: "/profile/update-language/confirm-update",
   profileUpdateLanguageSuccess: "/profile/update-language/success",
+  newContactPhoneNumber: "/profile/new-contact-phone-number",
 };
 
 export const EXTERNAL_NAVIGATION_LINKS = {
@@ -81,6 +83,7 @@ export const FORM_FIELDS = [
 ];
 
 export const PAGES = {
+  // this is used as key to get the language locales from json files, should probably be renamed in the future to reflect the usage
   verification: "Verification",
   otpSelection: "OtpSelection",
   password: "Password",
@@ -104,6 +107,9 @@ export const PAGES = {
   profileYouMayUpdateLanguage: "ProfileYouMayUpdateLanguage",
   passwordChangedConfirmation: "PasswordChangedConfirmation",
   ServicesWithAccessInfo: "ServicesWithAccessInfo",
+  confirmContactPhoneNumberUpdate: "ConfirmContactPhoneNumberUpdate",
+  successfullyUpdatedContactPhoneNumber:
+    "SuccessfullyUpdatedContactPhoneNumber",
 };
 
 export const FOOTERS = {
@@ -126,9 +132,9 @@ export const SUBMIT_END_POINTS = {
   requestPasswordPolicy: "/v1/password/policy",
   create: "/v1/users/create",
   createCoreProfile: "/v1/users/createcoreprofile",
-  login: "/v1/otp/users/login",
-  otpVerify: "/v1/otp/otp/verify",
-  otpSend: "/v1/otp/otp/send",
+  login: "/v1/auth/login",
+  transientOtpVerify: "/v1/otp/transient/verify",
+  transientOtpSend: "/v1/otp/transient/send",
   profile: "/v1/users/profile",
   rp_info: "/v1/users/rp_info",
   users: "/v1/users",
