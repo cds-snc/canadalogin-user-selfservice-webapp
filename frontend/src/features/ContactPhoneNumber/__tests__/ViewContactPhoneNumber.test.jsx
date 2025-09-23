@@ -276,27 +276,26 @@ describe("ViewContactPhoneNumber Component", () => {
 
   it("handles phone number parsing errors gracefully", () => {
     const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-    parsePhoneNumberFromString.mockImplementation(() => {
-      throw new Error("Invalid phone number");
-    });
-
-    const phoneNumbers = [{ value: "invalid-phone" }];
-
-    render(
-      <TestWrapper>
-        <ViewContactPhoneNumber
-          pageContent={defaultPageContent}
-          phoneNumbers={phoneNumbers}
-        />
-      </TestWrapper>,
-    );
-
-    expect(screen.getByText("invalid-phone")).toBeInTheDocument();
-    expect(consoleSpy).toHaveBeenCalledWith(
-      "Failed to parse phone number: invalid-phone",
-    );
-
-    consoleSpy.mockRestore();
+    try {
+      parsePhoneNumberFromString.mockImplementation(() => {
+        throw new Error("Invalid phone number");
+      });
+      const phoneNumbers = [{ value: "invalid-phone" }];
+      render(
+        <TestWrapper>
+          <ViewContactPhoneNumber
+            pageContent={defaultPageContent}
+            phoneNumbers={phoneNumbers}
+          />
+        </TestWrapper>,
+      );
+      expect(screen.getByText("invalid-phone")).toBeInTheDocument();
+      expect(consoleSpy).toHaveBeenCalledWith(
+        "Failed to parse phone number: invalid-phone",
+      );
+    } finally {
+      consoleSpy.mockRestore();
+    }
   });
 
   it("displays original phone number when parsing returns null", () => {
