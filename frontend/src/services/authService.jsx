@@ -5,7 +5,8 @@ import {
   SUBMIT_END_POINTS,
   OIDC_REDIRECT,
 } from "../utils/constants.jsx";
-import { redirectToLogin } from "../utils/redirect.jsx";
+import { handleApiError } from "../utils/apiErrorHandler.js";
+
 import {
   ERROR_RESPONSE,
   TEST_PROTOTYPES,
@@ -25,9 +26,7 @@ export const authService = {
       );
       return response.data;
     } catch (error) {
-      if (error.response && error.response.status === 401) {
-        redirectToLogin();
-      }
+      handleApiError(error);
     }
   },
   create: async (userData) => {
@@ -111,9 +110,7 @@ export const authService = {
       );
       return response.data;
     } catch (error) {
-      if (error.response && error.response.status === 401) {
-        redirectToLogin();
-      }
+      handleApiError(error);
     }
   },
   update_my_user_profile: async (editedProfile) => {
@@ -124,9 +121,7 @@ export const authService = {
       );
       return response.data;
     } catch (error) {
-      if (error.response && error.response.status === 401) {
-        redirectToLogin();
-      }
+      handleApiError(error);
     }
   },
   get_rp_info: async (rp) => {
@@ -136,9 +131,7 @@ export const authService = {
       );
       return response.data;
     } catch (error) {
-      if (error.response && error.response.status === 401) {
-        // redirectToLogin();
-      }
+      handleApiError(error);
     }
   },
   logout: async () => {
@@ -148,10 +141,7 @@ export const authService = {
       );
       return response.data;
     } catch (error) {
-      if (error.response && error.response.status === 401) {
-        redirectToLogin();
-      }
-      throw error;
+      handleApiError(error);
     }
   },
 };
