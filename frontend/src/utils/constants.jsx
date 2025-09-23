@@ -8,28 +8,6 @@ export const LANGUAGE_DISPLAY_NAMES = {
   "en-ca": "English",
   "fr-ca": "French",
 };
-export const NAVIGATION_LINKS = {
-  manage: "/",
-  securitySettings: "/security-settings",
-  securitySettingsUpdatePassword: `/security-settings/update-password`,
-  verification: "/verification",
-  checkYourEmail: "/checkyouremail",
-  completeTwoStepVerification: "/completetwostepverification",
-  firstVerifyItsYou: "/firstverifyitsyou",
-  enterNewEmail: "/enternewemail",
-  areYouSureUpdateContactNumber: "/areYouSureUpdateContactNumber",
-  enterNewPhoneNumber: "/enterNewPhoneNumber",
-  youMayUpdateEmailAtOtherPlaces: "/youMayUpdateEmailAtOtherPlaces",
-  areYouSureUpdateYourEmail: "/areYouSureUpdateYourEmail",
-  profileHome: "/profile-home",
-  profile: "/profile",
-  profileUpdateName: "/profile/update-name",
-  profileUpdateNameSuccess: "/profile/update-name/success",
-  profileUpdateNameConfirmUpdate: "/profile/update-name/confirm-update",
-  profileUpdateLanguage: "/profile/update-language",
-  profileUpdateLanguageConfirmUpdate: "/profile/update-language/confirm-update",
-  profileUpdateLanguageSuccess: "/profile/update-language/success",
-};
 
 export const EXTERNAL_NAVIGATION_LINKS = {
   gcAccountDirectory:
