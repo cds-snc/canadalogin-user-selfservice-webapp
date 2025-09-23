@@ -9,9 +9,10 @@ import {
 } from "@cdssnc/gcds-components-react";
 import parsePhoneNumberFromString from "libphonenumber-js";
 
-import { NAVIGATION_LINKS } from "../../../utils/constants.jsx";
+import { PAGES } from "../../../utils/constants.jsx";
 import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 import VerifiedBadge from "../../../components/Badges/VerifiedBadge.jsx";
+import { path } from "../../../utils/routeHelpers.js";
 
 const DisplayPhoneNumbers = ({ phoneNumbers }) => {
   return (
@@ -50,7 +51,10 @@ const DisplayPhoneNumbers = ({ phoneNumbers }) => {
 const AddPhoneNumber = (props) => {
   const { pageContent, language } = props;
   const navigateHelper = useNavigateHelper();
-  const newContactPhoneNumber = `/${language}${NAVIGATION_LINKS.newContactPhoneNumber}`;
+  const newContactPhoneNumber = path(PAGES.manageDashboard, {
+    language: language,
+  });
+
   return (
     <>
       <GcdsGrid columns="1fr auto">
@@ -67,7 +71,9 @@ const AddPhoneNumber = (props) => {
 
 const ContactPhoneNumber = (props) => {
   const { pageContent, phoneNumbers, language } = props;
-  const newContactPhoneNumber = `/${language}${NAVIGATION_LINKS.newContactPhoneNumber}`;
+  const newContactPhoneNumber = path(PAGES.manageDashboard, {
+    language: language,
+  });
   const navigateHelper = useNavigateHelper();
 
   return (
@@ -99,7 +105,7 @@ export default function ViewContactPhoneNumber({ pageContent, phoneNumbers }) {
       <GcdsHeading tag="h3" marginTop="300">
         {pageContent["10"]}
       </GcdsHeading>
-      {phoneNumbers != null ? (
+      {phoneNumbers !== null ? (
         <>
           <ContactPhoneNumber
             pageContent={pageContent}

@@ -1,0 +1,65 @@
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # Added for ease of debugging for now.
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+name: release-pipeline
+
+jobs:
+  # Runs the release-please action. This manages the open release PR and
+  # creates the release when the PR is merged.
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547 # v1.12.0
+        id: sre_app_token
+        with:
+          app-id: ${{ secrets.CDS_RELEASE_BOT_APP_ID }}
+          private-key: ${{ secrets.CDS_RELEASE_BOT_PRIVATE_KEY }}
+
+      - uses: googleapis/release-please-action@c2a5a2bd6a758a0937f1ddb1e8950609867ed15c # v4.3.0
+        id: release
+        with:
+          token: ${{ steps.sre_app_token.outputs.token }}
+
+  # Builds the frontend application for the current SHA and stores the artifact in S3.
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Building frontend..."
+
+  # Builds the backend application for the current SHA and stores the artifact in ECR.
+  build-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Building backend..."
+
+  # Deploys frontend application to necessary environments.
+  # We check the current SHA deployed to the environment to only deploy if necessary.
+  deploy-frontends:
+    needs: [release-please, build-frontend]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: [dev, test]
+    environment: ${{ matrix.environment }}
+    steps:
+      - run: echo "Deploying frontend to ${{ matrix.environment }} environment..."
+
+  # Deploys backend application to necessary environments.
+  # We check the current SHA deployed to the environment to only deploy if necessary.
+  deploy-backends:
+    needs: [release-please, build-backend]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: [dev, test]
+    environment: ${{ matrix.environment }}
+    steps:
+      - run: echo "Deploying backend to ${{ matrix.environment }} environment..."

@@ -100,6 +100,6 @@ async def verify_otp(
 
     except Exception as e:
         logger.error(
-            f"HTTP Exception in {user_verification_data.otpType} verification: {str(e)}"
+            f"Error Exception in {user_verification_data.otpType} verification: {str(e)}"
         )
         RequestErrorHandler.handle(e)
