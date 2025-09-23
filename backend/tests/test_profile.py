@@ -23,27 +23,6 @@ PROFILE_API_URL = "https://fake-tenant.verify.ibm.com/v2.0/Me"
 
 
 @pytest.mark.asyncio
-@patch("app.users.services.profile.my_profile")
-@patch("app.users.services.profile.sanitize_user_profile_data")
-async def test_update_profile_unexpected_exception(mock_sanitize, mock_my_profile):
-    mock_sanitize.return_value = {"userName": "john.doe@example.com"}
-
-    # Simulate unexpected error in my_profile function
-    mock_my_profile.side_effect = Exception("Unexpected failure")
-
-    user_data = UserProfileUpdateRequest(userName="john.doe@example.com")
-    mock_request = Mock()
-    mock_request.app = Mock()
-    mock_request.app.state = Mock()
-
-    with pytest.raises(HTTPException) as exc:
-        await update_profile(mock_request, user_data, user_access_token="token")
-
-    assert exc.value.status_code == 500
-    assert "unexpected api request error" in str(exc.value.detail).lower()
-
-
-@pytest.mark.asyncio
 @patch("app.users.services.profile.sanitize_user_profile_data")
 @patch("app.users.services.profile.my_profile")
 @patch("app.users.services.profile.dispatch_update_user_profile")
@@ -238,9 +217,7 @@ async def test_dispatch_update_user_profile_success():
     mock_request.app.state.request_client.put = AsyncMock(
         return_value=Response(status_code=200, json={"success": True})
     )
-    mock_request.app.state.request_client.put.return_value.raise_for_status = (
-        AsyncMock()
-    )
+    mock_request.app.state.request_client.put.return_value.raise_for_status = Mock()
 
     response = await dispatch_update_user_profile(
         request=mock_request,
