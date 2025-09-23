@@ -119,11 +119,11 @@ export const appRoutes = [
                   },
                 ],
               },
-              {
-                path: "enterNewPhoneNumber",
-                element: <EnterNewPhoneNumber />,
-                handle: { id: PAGES.enterNewPhoneNumber },
-              },
+              // {
+              //   path: "enterNewPhoneNumber",
+              //   element: <EnterNewPhoneNumber />,
+              //   handle: { id: PAGES.enterNewPhoneNumber },
+              // },
               {
                 path: "areYouSureUpdateContactNumber",
                 element: <AreYouSureUpdateContactNumber />,
