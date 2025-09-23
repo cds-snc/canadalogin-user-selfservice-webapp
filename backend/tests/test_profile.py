@@ -1,9 +1,10 @@
+from httpx import Response
 from app.users.services.profile import update_profile
 from unittest.mock import AsyncMock, Mock, patch
 from app.utils.request_error_handler import RequestErrorHandler
 import pytest
 import respx
-from httpx import AsyncClient, Response
+from httpx import AsyncClient
 from app.users.services.profile import (
     dispatch_update_user_profile,
     sanitize_user_profile_data,
@@ -35,10 +36,11 @@ async def test_update_profile_unexpected_exception(mock_sanitize, mock_my_profil
     mock_request.app = Mock()
     mock_request.app.state = Mock()
 
-    with pytest.raises(Exception) as exc:
+    with pytest.raises(HTTPException) as exc:
         await update_profile(mock_request, user_data, user_access_token="token")
 
-    assert str(exc.value) == "Unexpected failure"
+    assert exc.value.status_code == 500
+    assert "unexpected api request error" in str(exc.value.detail).lower()
 
 
 @pytest.mark.asyncio
