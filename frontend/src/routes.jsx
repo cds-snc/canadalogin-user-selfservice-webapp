@@ -29,6 +29,7 @@ import AreYouSureEditYourLanguage from "./components/Manage/AreYouSureEditYourLa
 import ProfileYouMayUpdateLanguage from "./components/Manage/ProfileYouMayUpdateLanguage.jsx";
 import { PAGES } from "./utils/constants.jsx";
 import ProfileUpdateNameConfirmUpdate from "./components/Manage/ProfileUpdateNameConfirmUpdate.jsx";
+import UpdateContactPhoneNumberContainer from "./features/ContactPhoneNumber/components/UpdateContactPhoneNumberContainer.jsx";
 
 export const appRoutes = [
   {
@@ -111,17 +112,17 @@ export const appRoutes = [
                     element: <AreYouSureEditYourLanguage />,
                     handle: { id: PAGES.areYouSureEditYourLanguage },
                   },
+                  {
+                    path: "update-contact-phone-number",
+                    element: <UpdateContactPhoneNumberContainer />,
+                    handle: { id: PAGES.enterNewPhoneNumber },
+                  },
                 ],
               },
               {
                 path: "areYouSureUpdateContactNumber",
                 element: <AreYouSureUpdateContactNumber />,
                 handle: { id: PAGES.areYouSureUpdateContactNumber },
-              },
-              {
-                path: "enterNewPhoneNumber",
-                element: <EnterNewPhoneNumber />,
-                handle: { id: PAGES.enterNewPhoneNumber },
               },
               {
                 path: "youMayUpdateEmailAtOtherPlaces",
