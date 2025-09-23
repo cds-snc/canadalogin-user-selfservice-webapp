@@ -1,0 +1,84 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ViewContactPhoneNumber Component > matches snapshot with no phone numbers 1`] = `
+<div>
+  <div
+    data-testid="gcds-container"
+  >
+    <h3
+      data-testid="gcds-heading"
+      margintop="300"
+      tag="h3"
+    >
+      Contact phone number
+    </h3>
+    <div
+      columns="1fr auto"
+      data-testid="gcds-grid"
+    >
+      <section>
+        <p
+          data-testid="gcds-text"
+        >
+          No phone number added
+        </p>
+      </section>
+      <button
+        data-testid="gcds-button"
+      >
+        + 
+        Add phone number
+      </button>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ViewContactPhoneNumber Component > matches snapshot with phone numbers 1`] = `
+<div>
+  <div
+    data-testid="gcds-container"
+  >
+    <h3
+      data-testid="gcds-heading"
+      margintop="300"
+      tag="h3"
+    >
+      Contact phone number
+    </h3>
+    <p
+      data-testid="gcds-text"
+    >
+      Your contact phone number is
+    </p>
+    <div
+      columns="1fr auto"
+      data-testid="gcds-grid"
+    >
+      <div
+        columns="1fr"
+        data-testid="gcds-grid"
+      >
+        <p
+          data-testid="gcds-text"
+          margin-bottom="400"
+          placecontent="center"
+        >
+          (555) 123-4567
+        </p>
+      </div>
+      <a
+        data-testid="gcds-link"
+        href="/en/manage-dashboard"
+      >
+        Edit
+      </a>
+    </div>
+    <div
+      data-testid="verified-badge"
+    >
+      Verified
+    </div>
+  </div>
+</div>
+`;
