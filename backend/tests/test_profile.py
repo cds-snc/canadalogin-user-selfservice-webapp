@@ -18,7 +18,7 @@ from app.config import get_configuration
 from fastapi import HTTPException
 
 
-PROFILE_API_URL = "https://cds-gcsignin-dev.verify.ibm.com/v2.0/Me"
+PROFILE_API_URL = "https://fake-tenant.verify.ibm.com/v2.0/Me"
 
 
 @pytest.mark.asyncio

@@ -39,7 +39,7 @@ async def dispatch_update_user_profile(
             content=user_profile_payload,
             headers=headers,
         )
-        await response.raise_for_status()
+        response.raise_for_status()
         logger.info("updating user profile changes returned successfully")
         return response
 
