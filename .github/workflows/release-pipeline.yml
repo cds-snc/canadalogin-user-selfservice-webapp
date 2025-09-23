@@ -58,7 +58,7 @@ jobs:
           echo "VITE_BACKEND_API_URL=${{ secrets.VITE_BACKEND_API_URL }}" >> $GITHUB_ENV
           echo "VITE_GOOGLE_ANALYTICS_ID=${{ secrets.VITE_GOOGLE_ANALYTICS_ID }}" >> $GITHUB_ENV
 
-      - name: Install dependencies
+      - name: Build application
         working-directory: frontend
         run: |
           npm install
