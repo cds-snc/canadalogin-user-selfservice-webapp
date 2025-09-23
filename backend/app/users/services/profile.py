@@ -29,17 +29,20 @@ def sanitize_user_profile_data(user_data: UserProfileUpdateRequest) -> dict:
 
 
 def mask_contact_phone_numbers(
-    phone_numbers: list[MetaDataTypeValue],
+    json_data: dict,
 ) -> list[MetaDataTypeValue]:
     """
+    Given a user profile JSON dict, replace `phoneNumbers` with masked values.
     Loop through a list of profile contact phone numbers and mask each number except the last 4 digits.
     """
 
-    if phone_numbers is None:
+    profile_contact_phone_numbers = json_data.get("phoneNumbers")
+
+    if profile_contact_phone_numbers is None:
         return None
 
     masked_phone_numbers = []
-    for phone in phone_numbers:
+    for phone in profile_contact_phone_numbers:
         value = phone.get("value")
         if not value:
             continue
@@ -118,6 +121,8 @@ async def update_profile(
 
         logger.info("User profile updated successfully.")
         json_data = response.json()
+        json_data["phoneNumbers"] = mask_contact_phone_numbers(json_data)
+
         response_data = IBMVerifyUserProfileSchema(**json_data)
         return ProfileResponse(
             success=True,
@@ -145,12 +150,7 @@ async def my_profile(global_http_client: AsyncClient, user_access_token: str):
     if response.status_code == 200:
         logger.info("User profile retrieved successfully.")
         json_data = response.json()
-        profile_contact_phone_numbers = json_data.get("phoneNumbers")
-        if profile_contact_phone_numbers is not None:
-            masked_contact_phone_numbers = mask_contact_phone_numbers(
-                profile_contact_phone_numbers
-            )
-            json_data["phoneNumbers"] = masked_contact_phone_numbers
+        json_data["phoneNumbers"] = mask_contact_phone_numbers(json_data)
 
         response_data = IBMVerifyUserProfileSchema(**json_data)
         return ProfileResponse(
