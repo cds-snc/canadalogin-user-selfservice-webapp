@@ -31,7 +31,7 @@ export default function ProfileUpdateNameSuccess() {
 
   const username = state?.userProfile?.name.formatted || "";
 
-  const handleLogout = async (e) => {
+  const handleSignout = async (e) => {
     e.preventDefault();
     setLoading(true, pageContentJson["12"]);
 
@@ -55,7 +55,6 @@ export default function ProfileUpdateNameSuccess() {
       }, 2000);
     }
   };
-  console.log("state", state);
   return (
     <GcdsContainer>
       <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle=" ">
@@ -92,7 +91,7 @@ export default function ProfileUpdateNameSuccess() {
         <GcdsButton
           buttonRole="secondary"
           style={{ width: "fit-content" }}
-          onGcdsClick={handleLogout}
+          onGcdsClick={handleSignout}
         >
           {pageContentJson["7"]}
         </GcdsButton>
