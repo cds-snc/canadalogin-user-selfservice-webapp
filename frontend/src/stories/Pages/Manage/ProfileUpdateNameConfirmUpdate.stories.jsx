@@ -3,10 +3,7 @@ import {
   FLOW_TYPES,
   PAGES,
 } from "../../../utils/constants.jsx";
-import {
-  buildTestCase,
-  Template,
-} from "../../Tests/utils/functions.tsx";
+import { buildTestCase, Template } from "../../Tests/utils/functions.tsx";
 
 export default {
   title: "GC Sign In/Pages/Manage/Profile Update Name Confirmation Page",
