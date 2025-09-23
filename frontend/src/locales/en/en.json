@@ -198,7 +198,8 @@
     "8": "GC Account directory.",
     "9": "To view what services are connected to your GC Sign in, go to ",
     "10": "Connected Services ",
-    "11": "in your GC Sign in dashboard."
+    "11": "in your GC Sign in dashboard.",
+    "12": "Signing you out..."
   },
   "AreYouSureUpdateContactNumber": {
     "1": "Are you sure you want to update your contact phone number?",
