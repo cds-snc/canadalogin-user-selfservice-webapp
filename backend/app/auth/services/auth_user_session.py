@@ -315,7 +315,7 @@ async def session_extend(request: Request):
 
 async def is_backchannel_logout(request: Request, sid: str) -> bool:
     """
-    Check if a logout token (identified by jti) has already been processed.
+    Check if a logout token (identified by sid) has already been processed.
 
     Args:
         request: FastAPI request object

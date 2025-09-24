@@ -176,7 +176,7 @@ async def backchannel_logout(request: Request):
         # Check if this logout token has already been processed
         if await is_logout_processed(request, sid):
             logger.info(
-                f"Logout token {jti} already processed, ignoring duplicate request"
+                f"Logout token {sid} already processed, ignoring duplicate request"
             )
             return ResponseModel(
                 success=True, data=None, message="Backchannel logout already processed"

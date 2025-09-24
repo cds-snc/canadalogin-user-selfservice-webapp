@@ -433,6 +433,12 @@ export function UserProvider({
     };
 
     checkAuth();
+
+    return () => {
+      // Cleanup on unmount
+      clearTimers();
+      if (eventSource) eventSource.close();
+    };
   }, []);
 
   useEffect(() => {
