@@ -67,13 +67,14 @@ jobs:
         uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
 
       - name: Build Docker image
-        working-directory: backend/
         run: |
+          cd backend
           docker build \
           --tag $DEV_ECR_REPOSITORY:$GITHUB_SHA
 
       - name: Push Container to Amazon ECR
         run: |
+          cd backend
           docker push $DEV_ECR_REPOSITORY:$GITHUB_SHA
 
       - name: Docker generate SBOM
