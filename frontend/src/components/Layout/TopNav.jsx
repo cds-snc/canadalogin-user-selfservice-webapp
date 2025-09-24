@@ -35,7 +35,7 @@ export default function TopNav({ currentLang }) {
 
   const handleLogout = async (e) => {
     e.preventDefault();
-    setLoading(false, pageContentJson["8"]); // Use logout loading text
+    setLoading(true, pageContentJson["8"]); // Use logout loading text
 
     try {
       const response = await authService.logout();
