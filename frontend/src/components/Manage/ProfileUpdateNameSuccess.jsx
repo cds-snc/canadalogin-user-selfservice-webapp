@@ -48,7 +48,7 @@ export default function ProfileUpdateNameSuccess() {
     } catch (error) {
       console.error("Logout failed:", error);
       // Update loading text to show error
-      setLoading(true, "Sign out failed. Redirecting...");
+      setLoading(true, pageContentJson["13"]);
       // Redirect after error
       setTimeout(() => {
         window.location.href = "/";
