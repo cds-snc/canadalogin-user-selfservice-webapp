@@ -73,7 +73,7 @@ jobs:
         working-directory: ./backend/
         run: |
           docker build \
-          --tag $DEV_ECR_REPOSITORY:$GITHUB_SHA
+          --tag $DEV_ECR_REPOSITORY:$GITHUB_SHA .
 
       - name: Push Container to Amazon ECR
         run: |
