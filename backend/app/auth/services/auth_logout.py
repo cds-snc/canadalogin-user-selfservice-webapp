@@ -63,18 +63,18 @@ def _reject_nonce(claims, nonce):
     return nonce is None
 
 
-async def is_logout_token_processed(request: Request, jti: str) -> bool:
+async def is_logout_processed(request: Request, sid: str) -> bool:
     """
-    Check if a logout token (identified by jti) has already been processed.
+    Check if a logout token (identified by sid) has already been processed.
 
     Args:
         request: FastAPI request object
-        jti: JWT ID from the logout token
+        sid: Session ID from the logout token
 
     Returns:
         bool: True if the token has already been processed, False otherwise
     """
-    if not jti:
+    if not sid:
         return False
 
     # Try to get Redis client from the application state
@@ -82,29 +82,24 @@ async def is_logout_token_processed(request: Request, jti: str) -> bool:
 
     if redis_client is not None:
         # Use Redis to check if token was processed
-        cache_key = f"processed_logout_token:{jti}"
+        cache_key = f"processed_logout_token:{sid}"
         result = await redis_client.get(cache_key)
         return result is not None
-    else:
-        # Fallback to in-memory storage (not recommended for production)
-        # This is for local development or when Redis is not available
-        if not hasattr(request.app.state, "processed_logout_tokens"):
-            request.app.state.processed_logout_tokens = set()
-        return jti in request.app.state.processed_logout_tokens
+    return False
 
 
-async def mark_logout_token_as_processed(
-    request: Request, jti: str, expiration_seconds: int = 1800
+async def mark_session_logout(
+    request: Request, sid: str, source: str, expiration_seconds: int = 1800
 ):
     """
-    Mark a logout token (identified by jti) as processed to prevent duplicate processing.
+    Mark a logout token (identified by sid) as processed to prevent duplicate processing.
 
     Args:
         request: FastAPI request object
-        jti: JWT ID from the logout token
+        sid: Session ID from the logout token
         expiration_seconds: How long to remember this token (default: 30 minutes)
     """
-    if not jti:
+    if not sid:
         return
 
     # Try to get Redis client from the application state
@@ -112,21 +107,11 @@ async def mark_logout_token_as_processed(
 
     if redis_client is not None:
         # Use Redis to store the processed token with expiration
-        cache_key = f"processed_logout_token:{jti}"
-        await redis_client.setex(cache_key, expiration_seconds, "processed")
+        cache_key = f"processed_logout_token:{sid}"
+        await redis_client.setex(cache_key, expiration_seconds, source)
         logger.debug(
-            f"Marked logout token {jti} as processed in Redis with {expiration_seconds}s expiration"
+            f"Marked logout token {sid} as processed in Redis with {expiration_seconds}s expiration"
         )
-    else:
-        # Fallback to in-memory storage (not recommended for production)
-        # This is for local development or when Redis is not available
-        if not hasattr(request.app.state, "processed_logout_tokens"):
-            request.app.state.processed_logout_tokens = set()
-        request.app.state.processed_logout_tokens.add(jti)
-        logger.debug(f"Marked logout token {jti} as processed in memory (fallback)")
-
-        # Note: In-memory storage doesn't have automatic expiration
-        # In production, always use Redis or another persistent cache
 
 
 async def logout_user(request: Request, id_token: str):
@@ -157,6 +142,10 @@ async def logout_user(request: Request, id_token: str):
         # Clear the session
         request.session.clear()
 
+        await mark_session_logout(
+            request, sid=user_info.get("sid"), source="logout_button"
+        )
+
         return ResponseModel(
             success=True,
             data=response_data,
@@ -185,7 +174,7 @@ async def backchannel_logout(request: Request):
             raise ValueError("Missing jti claim in logout token")
 
         # Check if this logout token has already been processed
-        if await is_logout_token_processed(request, jti):
+        if await is_logout_processed(request, sid):
             logger.info(
                 f"Logout token {jti} already processed, ignoring duplicate request"
             )
@@ -202,7 +191,7 @@ async def backchannel_logout(request: Request):
             await redis_client.delete(cache_key)
 
         # Mark this logout token as processed to prevent duplicate processing
-        await mark_logout_token_as_processed(request, jti)
+        await mark_session_logout(request, sid, source="backchannel_logout")
 
         return ResponseModel(
             success=True, data=None, message="Backchannel logout successful"

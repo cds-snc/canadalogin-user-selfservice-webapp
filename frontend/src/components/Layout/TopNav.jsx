@@ -19,7 +19,7 @@ import { userProfileDispatch } from "../../utils/userProfileDispatch.jsx";
 export default function TopNav({ currentLang }) {
   const pageContentJson = getPageContent(currentLang, "TopNavBar");
   const { state, dispatch } = useUser();
-  const { setLoading, loggingOut } = userProfileDispatch(dispatch);
+  const { setLoading } = userProfileDispatch(dispatch);
 
   const relyingPartyLinkName = state.relyingPartyInfo?.linkName;
   const relyingPartyUrl = state.relyingPartyInfo?.url;
@@ -35,12 +35,11 @@ export default function TopNav({ currentLang }) {
 
   const handleLogout = async (e) => {
     e.preventDefault();
-    loggingOut(true, pageContentJson["8"]); // Use logout loading text
+    setLoading(false, pageContentJson["8"]); // Use logout loading text
 
     try {
       const response = await authService.logout();
 
-      // Check if response has redirect_url and redirect
       if (response && response.data && response.data.redirect_url) {
         window.location.href = response.data.redirect_url;
       } else {
@@ -53,7 +52,6 @@ export default function TopNav({ currentLang }) {
       setLoading(true, pageContentJson["9"]);
       // Redirect after error
       setTimeout(() => {
-        setLoading(false, null);
         window.location.href = "/";
       }, 2000);
     }

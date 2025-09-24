@@ -42,7 +42,6 @@ export const OIDC_REDIRECT = {
 
 export const CONTEXT_ACTIONS = {
   logOut: "LOG_OUT",
-  reset_logout_state: "RESET_LOGOUT_STATE",
   set_loading: "SET_LOADING",
   clone_profile: "CLONE_PROFILE",
   clear_edit_profile: "CLEAR_EDIT_PROFILE",

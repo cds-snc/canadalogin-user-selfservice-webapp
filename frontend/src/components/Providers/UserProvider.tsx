@@ -60,7 +60,6 @@ export interface UserState {
   userData: any;
   isLoading: boolean;
   loadingText: string | null;
-  isLoggingOut: boolean;
   editProfile: UserProfile | null;
   urlLanguageBeforeEdit: string | null;
   cancelProfileEditing: boolean;
@@ -84,7 +83,6 @@ interface UserProviderProps {
 const initialState: UserState = {
   isLoading: true,
   loadingText: null,
-  isLoggingOut: false,
   userData: {
     service: SERVICES[0].title, //to be set later when url referrer is given, also need to refactor other pages to use this value
     language: "en", //to be set later when refactoring possibly
@@ -134,15 +132,6 @@ function userReducer(
         isLoading: action.payload.isLoading,
         loadingText: action.payload.text || null,
       };
-    case CONTEXT_ACTIONS.logOut:
-      return {
-        ...state,
-        userProfile: null,
-        userData: { ...initialState.userData },
-        isLoading: action.payload ? action.payload.isLoading : false,
-        loadingText: action.payload ? action.payload.text : null,
-        isLoggingOut: true,
-      };
     case CONTEXT_ACTIONS.clone_profile:
       return {
         ...state,
@@ -164,11 +153,6 @@ function userReducer(
       return {
         ...state,
         userProfile: action.payload,
-      };
-    case CONTEXT_ACTIONS.reset_logout_state:
-      return {
-        ...state,
-        isLoggingOut: false,
       };
     case CONTEXT_ACTIONS.clear_edit_profile:
       return {
@@ -335,13 +319,8 @@ export function UserProvider({
       handleLogout();
     }
   };
-
   // Handle logout
   const handleLogout = async () => {
-    userDispatch({
-      type: CONTEXT_ACTIONS.logOut,
-      payload: { isLoading: true, text: pageContentJson["7"] },
-    });
     try {
       const response = await authService.logout();
       // Check if response has redirect_url and redirect
@@ -372,24 +351,22 @@ export function UserProvider({
     eventSource,
     ["expired", "error", "notification", "terminated"],
     (event) => {
-      if (event.type === "expired" || event.type === "terminated") {
-        console.log("SSE expired or terminated:", event.data);
-        if (userState.isLoggingOut) return; // Prevent multiple logout attempts
-
+      if (event.type === "expired") {
+        // Session expired - proceed with logout button
         if (eventSource) eventSource.close();
         clearTimers();
-
-        // Set loading state for visual feedback
+      }
+      if (event.type === "terminated") {
+        // Handle backchannel logout
+        console.log("Session terminated by backchannel logout");
         userDispatch({
           type: CONTEXT_ACTIONS.set_loading,
           payload: { isLoading: true, text: pageContentJson["7"] },
         });
-
-        // Redirect after error with a slight delay to show loading message
+        // Redirect after backchannel logout with a slight delay to show loading message
         setTimeout(() => {
           window.location.href = "/";
         }, 2000);
-        return;
       }
       if (event.type === "error") {
         // for debugging purpose. No need to handle it.
@@ -426,7 +403,7 @@ export function UserProvider({
         }
       }
     },
-    [userDispatch, sessionTimeoutDispatch], // Dependencies for the listener callback
+    [sessionTimeoutDispatch], // Dependencies for the listener callback
   );
 
   useEffect(() => {
@@ -442,11 +419,6 @@ export function UserProvider({
             type: CONTEXT_ACTIONS.updated_profile_success,
             payload: response.data,
           });
-          // Reset logout state in case user is returning from OIDC logout
-          userDispatch({
-            type: CONTEXT_ACTIONS.reset_logout_state,
-            payload: null,
-          });
         }
       } catch (err) {
         console.log("User not authenticated:", err);
@@ -455,7 +427,7 @@ export function UserProvider({
         // Always set loading to false and reset loading text so PrivateRoute can handle the logic
         userDispatch({
           type: CONTEXT_ACTIONS.set_loading,
-          payload: { isLoading: false, text: null },
+          payload: { isLoading: false, text: pageContentJson["9"] },
         });
       }
     };
