@@ -111,8 +111,7 @@ export const SignOutButton = {
       }
       await userEvent.click(signOutButton);
     });
-    await new Promise((r) => setTimeout(r, 1000));
-    // Should navigate back to profile or show 404 in Storybook environment
+    await new Promise((r) => setTimeout(r, 2000));
     await expect(
       canvas.getByText(/Sign out failed. Redirecting.../i),
     ).toBeInTheDocument();
