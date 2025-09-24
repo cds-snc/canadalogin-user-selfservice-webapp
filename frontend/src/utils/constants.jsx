@@ -32,6 +32,10 @@ export const CONTEXT_ACTIONS = {
   set_relying_party_data: "SET_RELYING_PARTY_DATA",
   set_authenticated_pages: "SET_AUTHENTICATED_PAGES",
   remove_authenticated_page: "REMOVE_AUTHENTICATED_PAGE",
+  show_session_timeout_modal: "SHOW_SESSION_TIMEOUT_MODAL",
+  hide_session_timeout_modal: "HIDE_SESSION_TIMEOUT_MODAL",
+  set_session_timeout_loading: "SET_SESSION_TIMEOUT_LOADING",
+  reset_expire_time: "RESET_EXPIRE_TIME",
 };
 
 export const FLOW_TYPES = {
@@ -118,6 +122,7 @@ export const SUBMIT_END_POINTS = {
   passwordUpdate: "/v1/password/update",
   logout: "/v1/auth/logout",
   sessionStatus: "/v1/auth/session-status",
+  keepAlive: "/v1/auth/keep-alive",
 };
 
 export const GA_CATEGORIES = {

@@ -29,6 +29,13 @@ vi.mock("../../../utils/apiErrorHandler.js", () => ({
   redirectToLogin: vi.fn(),
 }));
 
+const mockSessionTimeoutState = {
+  showModal: false,
+  isLoading: false,
+  expirationTime: null,
+  newServerSideExpirationTime: null,
+};
+
 const mockUserState = {
   isLoading: false,
   loadingText: null,
@@ -116,7 +123,10 @@ describe("ProfileUpdateName Component", () => {
     render(
       <BrowserRouter>
         <LanguageProvider>
-          <UserProvider initial={mockUserState}>
+          <UserProvider
+            initial={mockUserState}
+            initialSessionTimeoutState={mockSessionTimeoutState}
+          >
             <ProfileUpdateName />
           </UserProvider>
         </LanguageProvider>
@@ -155,7 +165,10 @@ describe("ProfileUpdateName Component", () => {
     render(
       <BrowserRouter>
         <LanguageProvider>
-          <UserProvider initial={mockUserState}>
+          <UserProvider
+            initial={mockUserState}
+            initialSessionTimeoutState={mockSessionTimeoutState}
+          >
             <ProfileUpdateName />
             <StateCapture />
           </UserProvider>
@@ -198,7 +211,10 @@ describe("ProfileUpdateName Component", () => {
 
   const TestWrapper = ({ children }) => (
     <BrowserRouter>
-      <UserProvider initial={mockUserState}>
+      <UserProvider
+        initial={mockUserState}
+        initialSessionTimeoutState={mockSessionTimeoutState}
+      >
         <LanguageProvider>{children}</LanguageProvider>
       </UserProvider>
     </BrowserRouter>

@@ -40,7 +40,6 @@ export default function TopNav({ currentLang }) {
     try {
       const response = await authService.logout();
 
-      // Check if response has redirect_url and redirect
       if (response && response.data && response.data.redirect_url) {
         window.location.href = response.data.redirect_url;
       } else {
