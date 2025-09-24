@@ -1,7 +1,7 @@
 import axios from "axios";
 import config from "../../../config.jsx";
 import { SUBMIT_END_POINTS } from "../../../utils/constants.jsx";
-import { redirectToLogin } from "../../../utils/redirect.jsx";
+import { handleApiError } from "../../../utils/apiErrorHandler.js";
 
 axios.defaults.withCredentials = true;
 
@@ -13,9 +13,7 @@ export const otpFactors = {
       );
       return response.data;
     } catch (error) {
-      if (error.response && error.response.status === 401) {
-        redirectToLogin();
-      }
+      handleApiError(error);
     }
   },
 };

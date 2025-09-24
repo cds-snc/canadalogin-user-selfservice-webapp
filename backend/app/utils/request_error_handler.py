@@ -32,6 +32,7 @@ class RequestErrorHandler:
             if response_status_code in [
                 status.HTTP_429_TOO_MANY_REQUESTS,
                 status.HTTP_400_BAD_REQUEST,
+                status.HTTP_404_NOT_FOUND,
             ]:
                 body = RequestErrorHandler.extract_response_body(exc.response)
 

@@ -29,6 +29,7 @@ export const NAVIGATION_LINKS = {
   profileUpdateLanguage: "/profile/update-language",
   profileUpdateLanguageConfirmUpdate: "/profile/update-language/confirm-update",
   profileUpdateLanguageSuccess: "/profile/update-language/success",
+  newContactPhoneNumber: "/profile/new-contact-phone-number",
 };
 
 export const EXTERNAL_NAVIGATION_LINKS = {
@@ -110,6 +111,9 @@ export const PAGES = {
   profileYouMayUpdateLanguage: "ProfileYouMayUpdateLanguage",
   passwordChangedConfirmation: "PasswordChangedConfirmation",
   ServicesWithAccessInfo: "ServicesWithAccessInfo",
+  confirmContactPhoneNumberUpdate: "ConfirmContactPhoneNumberUpdate",
+  successfullyUpdatedContactPhoneNumber:
+    "SuccessfullyUpdatedContactPhoneNumber",
 };
 
 export const FOOTERS = {

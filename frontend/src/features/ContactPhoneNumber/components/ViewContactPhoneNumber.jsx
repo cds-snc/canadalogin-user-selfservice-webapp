@@ -51,7 +51,7 @@ const DisplayPhoneNumbers = ({ phoneNumbers }) => {
 const AddPhoneNumber = (props) => {
   const { pageContent, language } = props;
   const navigateHelper = useNavigateHelper();
-  const newContactPhoneNumber = path(PAGES.manageDashboard, {
+  const newContactPhoneNumber = path(PAGES.enterNewPhoneNumber, {
     language: language,
   });
 
@@ -71,7 +71,7 @@ const AddPhoneNumber = (props) => {
 
 const ContactPhoneNumber = (props) => {
   const { pageContent, phoneNumbers, language } = props;
-  const newContactPhoneNumber = path(PAGES.manageDashboard, {
+  const newContactPhoneNumber = path(PAGES.enterNewPhoneNumber, {
     language: language,
   });
   const navigateHelper = useNavigateHelper();
