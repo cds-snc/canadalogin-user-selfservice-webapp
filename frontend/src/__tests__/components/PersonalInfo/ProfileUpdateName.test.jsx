@@ -25,7 +25,7 @@ vi.mock("../../../hooks/useNavigate.tsx", () => ({
 }));
 
 // Mock the redirect function to prevent navigation errors
-vi.mock("../../../utils/redirect.jsx", () => ({
+vi.mock("../../../utils/apiErrorHandler.js", () => ({
   redirectToLogin: vi.fn(),
 }));
 

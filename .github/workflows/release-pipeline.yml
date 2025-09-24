@@ -8,6 +8,15 @@ permissions:
   contents: write
   issues: write
   pull-requests: write
+  id-token: write
+
+env:
+  AWS_REGION: ca-central-1
+  GITHUB_SHA: ${{ github.sha }}
+  SBOM_TAG_NAME: gc-signin-dev-backend-api
+  ECS_SERVICE: gc-signin-dev_ecs_cluster_service
+  ECS_CLUSTER: gc-signin-dev_ecs_cluster
+  DEV_ECR_REPOSITORY: ${{ vars.DEV_AWS_ACCOUNT_ID }}.dkr.ecr.ca-central-1.amazonaws.com/gc-signin-backend-api-deploy-artifacts
 
 name: release-pipeline
 
@@ -31,14 +40,80 @@ jobs:
   # Builds the frontend application for the current SHA and stores the artifact in S3.
   build-frontend:
     runs-on: ubuntu-latest
+    environment: dev
     steps:
-      - run: echo "Building frontend..."
+      - name: Checkout repository
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "latest"
+
+      - name: configure aws credentials using OIDC role
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+        with:
+          role-to-assume: arn:aws:iam::${{vars.AWS_ACCOUNT_ID}}:role/github_action_push_S3
+          role-session-name: GHPushAppS3
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Environment Variables for build
+        run: |
+          echo "VITE_BACKEND_API_URL=${{ secrets.VITE_BACKEND_API_URL }}" >> $GITHUB_ENV
+          echo "VITE_GOOGLE_ANALYTICS_ID=${{ secrets.VITE_GOOGLE_ANALYTICS_ID }}" >> $GITHUB_ENV
+
+      - name: Build application
+        working-directory: frontend
+        run: |
+          npm install
+          npm run build
+
+      - name: Upload build artifacts to S3
+        run: |
+          aws s3 sync frontend/dist s3://${{ secrets.FRONTEND_APP_BUILD_ARTIFACTS_S3_BUCKET }}/${GITHUB_SHA}
 
   # Builds the backend application for the current SHA and stores the artifact in ECR.
   build-backend:
     runs-on: ubuntu-latest
+    environment: dev
     steps:
-      - run: echo "Building backend..."
+      - name: Audit DNS requests
+        uses: cds-snc/dns-proxy-action@main
+        env:
+          DNS_PROXY_FORWARDTOSENTINEL: "true"
+          DNS_PROXY_LOGANALYTICSWORKSPACEID: ${{ secrets.LOG_ANALYTICS_WORKSPACE_ID }}
+          DNS_PROXY_LOGANALYTICSSHAREDKEY: ${{ secrets.LOG_ANALYTICS_WORKSPACE_KEY }}
+
+      - name: configure aws credentials using OIDC role
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/gc-signin-user-selfservice-webapp-apply
+          role-session-name: ECRPush
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
+
+      - name: Build Docker image
+        working-directory: ./backend/
+        run: |
+          docker build \
+          --tag $DEV_ECR_REPOSITORY:$GITHUB_SHA
+
+      - name: Push Container to Amazon ECR
+        run: |
+          docker push $DEV_ECR_REPOSITORY:$GITHUB_SHA
+
+      - name: Docker generate SBOM
+        uses: cds-snc/security-tools/.github/actions/generate-sbom@34794baf2af592913bb5b51d8df4f8d0acc49b6f # v3.2.0
+        env:
+          TRIVY_DB_REPOSITORY: ${{ vars.TRIVY_DB_REPOSITORY }}
+        with:
+          docker_image: "${{ env.DEV_ECR_REPOSITORY }}:${{ env.GITHUB_SHA }}"
+          dockerfile_path: backend/Dockerfile
+          sbom_name: ${{ env.SBOM_TAG_NAME }}
+          token: "${{ secrets.GITHUB_TOKEN }}"
 
   # Deploys frontend application to necessary environments.
   # We check the current SHA deployed to the environment to only deploy if necessary.

@@ -84,6 +84,9 @@ export const PAGES = {
   profileYouMayUpdateLanguage: "ProfileYouMayUpdateLanguage",
   passwordChangedConfirmation: "PasswordChangedConfirmation",
   ServicesWithAccessInfo: "ServicesWithAccessInfo",
+  confirmContactPhoneNumberUpdate: "ConfirmContactPhoneNumberUpdate",
+  successfullyUpdatedContactPhoneNumber:
+    "SuccessfullyUpdatedContactPhoneNumber",
 };
 
 export const FOOTERS = {
