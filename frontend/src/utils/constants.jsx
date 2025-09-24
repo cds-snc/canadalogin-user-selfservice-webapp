@@ -120,6 +120,8 @@ export const SUBMIT_END_POINTS = {
   sessionStatus: "/v1/auth/session-status",
 };
 
+export const RP_CLIENT_ID_KEY = "rp_client_id";
+
 export const GA_CATEGORIES = {
   pageView: "pageview",
 };

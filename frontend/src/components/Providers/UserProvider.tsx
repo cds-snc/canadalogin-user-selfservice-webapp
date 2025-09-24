@@ -9,6 +9,7 @@ import {
   SERVICES,
   CONTEXT_ACTIONS,
   SUBMIT_END_POINTS,
+  RP_CLIENT_ID_KEY,
 } from "../../utils/constants.jsx";
 import UserContext from "./UserContext";
 import { authService } from "../../services/authService.jsx";
@@ -227,50 +228,9 @@ export function UserProvider({
   }, [state.isLoading, state.loadingText]);
 
   useEffect(() => {
-    // Simple authentication check - if we're not loading and don't have a profile,
-    // we let PrivateRoute handle the OIDC redirect
-    const checkAuth = async () => {
+    const getRelyingPartyInfo = async () => {
       try {
-        // Try to get user profile to see if user is authenticated
-        const response = await authService.get_my_user_profile();
-        if (response && response.data) {
-          // User is authenticated, set the profile
-          dispatch({
-            type: CONTEXT_ACTIONS.updated_profile_success,
-            payload: response.data,
-          });
-        }
-      } catch (err) {
-        console.log("User not authenticated:", err);
-        // User not authenticated - this will trigger OIDC redirect in PrivateRoute
-      } finally {
-        // Always set loading to false so PrivateRoute can handle the logic
-        dispatch({ type: CONTEXT_ACTIONS.set_loading, payload: false });
-      }
-    };
-
-    checkAuth();
-  }, []);
-
-  useEffect(() => {
-    const setRelyingPartyInfo = async () => {
-      const rpKey = "rp";
-      if (
-        typeof window === "undefined" ||
-        typeof sessionStorage === "undefined"
-      )
-        return;
-      let relyingPartyId = sessionStorage.getItem(rpKey);
-
-      const urlRelyingPartyId = searchParams.get(rpKey);
-      if (!urlRelyingPartyId && !relyingPartyId) return;
-      try {
-        if (urlRelyingPartyId) {
-          sessionStorage.setItem(rpKey, urlRelyingPartyId);
-          relyingPartyId = urlRelyingPartyId;
-        }
-
-        const response = await authService.get_rp_info(relyingPartyId);
+        const response = await authService.get_rp_info();
         if (response && response.data && response.data.id) {
           dispatch({
             type: CONTEXT_ACTIONS.set_relying_party_data,
@@ -283,8 +243,43 @@ export function UserProvider({
         console.error("Error in getting relying party info:", err);
       }
     };
-    setRelyingPartyInfo();
+
+    // Simple authentication check - if we're not loading and don't have a profile,
+    // we let PrivateRoute handle the OIDC redirect
+    const fetchProfileAndRelyingPartyInfo = async () => {
+      try {
+        // This is the first request made after the OIDC redirect back to the app
+        // Try to get user profile to see if user is authenticated
+        // Relying party info (rp_client_id) is passed in the query param of the redirect URL
+        // but after the first request, subsequent requests do not have the rp_client_id
+        // as it's a session based authentication, the backend keeps track of the session
+        // and the relying party info associated with the session
+        // so we need to pass the rp_client_id to the backend to store in the session otherwise it will be lost
+        const rp_client_id = searchParams.get(RP_CLIENT_ID_KEY);
+
+        const response = await authService.get_my_user_profile(rp_client_id);
+        if (response && response.data) {
+          // User is authenticated, set the profile
+          dispatch({
+            type: CONTEXT_ACTIONS.updated_profile_success,
+            payload: response.data,
+          });
+          // Now that we have the profile, we can get the relying party info if not already set
+          await getRelyingPartyInfo();
+        }
+      } catch (err) {
+        console.log("User not authenticated:", err);
+        // User not authenticated - this will trigger OIDC redirect in PrivateRoute
+      } finally {
+        // Always set loading to false so PrivateRoute can handle the logic
+        dispatch({ type: CONTEXT_ACTIONS.set_loading, payload: false });
+      }
+    };
+
+    fetchProfileAndRelyingPartyInfo();
   }, []);
+
+  useEffect(() => {}, []);
 
   if (state.isLoading && state.loadingText) {
     return <Loader text={state.loadingText} />;

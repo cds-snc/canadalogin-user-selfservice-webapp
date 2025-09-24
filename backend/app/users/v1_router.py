@@ -55,7 +55,7 @@ async def profile(
 
 
 @router.get(
-    "/rp_info/{relying_party_id}",
+    "/rp_info",
     response_model=RelyingPartyResponse,
     tags=["Users"],
     summary="Get rp info",
@@ -63,13 +63,10 @@ async def profile(
 )
 async def rp_info(
     request: Request,
-    relying_party_id: str,
     user_access_token: None = Depends(get_users_current_session),
 ):
     return await get_relying_party_info(
-        request.app.state.request_client,
-        relying_party_id,
-        rp_user_applications_api_endpoint=request.app.state.config.rp_user_applications_api_endpoint,
+        request
     )
 
 
