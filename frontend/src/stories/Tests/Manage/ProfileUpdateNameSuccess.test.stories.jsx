@@ -2,7 +2,6 @@ import { expect, userEvent, within } from "@storybook/test";
 import {
   AVAILABLE_LANGUAGES,
   FLOW_TYPES,
-  NAVIGATION_LINKS,
   PAGES,
 } from "../../../utils/constants.jsx";
 import { buildTestCase, TestTemplate } from "../utils/functions.tsx";
@@ -27,7 +26,7 @@ export default {
 export const BackToProfileButton = {
   parameters: {
     ...buildTestCase.parameters(
-      NAVIGATION_LINKS.profileUpdateNameSuccess,
+      "",
       {
         language: AVAILABLE_LANGUAGES.en,
         flow: FLOW_TYPES.profile,
