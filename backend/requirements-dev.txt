@@ -1,7 +1,7 @@
 -r requirements.txt
-pytest==8.4.1
+pytest==8.4.2
 pytest-cov==4.1.0
-fastapi-cli==0.0.8
+fastapi-cli==0.0.12
 flake8==7.3.0
 black==25.1.0
 pytest-asyncio==0.26.0
