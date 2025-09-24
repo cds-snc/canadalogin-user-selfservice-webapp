@@ -105,8 +105,8 @@ jobs:
           --tag $DEV_ECR_REPOSITORY:$GITHUB_SHA .
 
       - name: Push Container to Amazon ECR
+        working-directory: ./backend/
         run: |
-          cd backend
           docker push $DEV_ECR_REPOSITORY:$GITHUB_SHA
 
       - name: Docker generate SBOM
