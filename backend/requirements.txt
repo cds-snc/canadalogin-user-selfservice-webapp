@@ -13,7 +13,7 @@ email-validator==2.3.0
 pydantic-extra-types==2.10.5
 phonenumbers==9.0.12
 cachetools==5.5.2
-authlib==1.6.2
+authlib==1.6.4
 itsdangerous==2.2.0
 starsessions==2.2.1
 PyJWT==2.8.0
