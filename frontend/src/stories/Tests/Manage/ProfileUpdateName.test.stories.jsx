@@ -2,7 +2,6 @@ import { expect, userEvent, within } from "@storybook/test";
 import {
   AVAILABLE_LANGUAGES,
   FLOW_TYPES,
-  NAVIGATION_LINKS,
   PAGES,
 } from "../../../utils/constants.jsx";
 import { buildTestCase, TestTemplate } from "../utils/functions.tsx";
@@ -28,7 +27,7 @@ export default {
 export const SubmitValidForm = {
   parameters: {
     ...buildTestCase.parameters(
-      NAVIGATION_LINKS.profileUpdateName,
+      "",
       {
         language: AVAILABLE_LANGUAGES.en,
         flow: FLOW_TYPES.profile,
@@ -194,7 +193,7 @@ export const SubmitValidForm = {
 export const CancelFormSubmission = {
   parameters: {
     ...buildTestCase.parameters(
-      NAVIGATION_LINKS.profileUpdateName,
+      "",
       {
         language: AVAILABLE_LANGUAGES.en,
         flow: FLOW_TYPES.profile,
@@ -260,7 +259,7 @@ export const CancelFormSubmission = {
 export const ValidateRequiredFields = {
   parameters: {
     ...buildTestCase.parameters(
-      NAVIGATION_LINKS.profileUpdateName,
+      "",
       {
         language: AVAILABLE_LANGUAGES.en,
         flow: FLOW_TYPES.profile,
