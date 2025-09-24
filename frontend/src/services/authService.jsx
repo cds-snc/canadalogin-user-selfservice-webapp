@@ -151,7 +151,6 @@ export const authService = {
       if (error.response && error.response.status === 401) {
         redirectToLogin();
       }
-      throw error;
     }
   },
   keepAlive: async () => {
@@ -164,7 +163,6 @@ export const authService = {
       if (error.response && error.response.status === 401) {
         redirectToLogin();
       }
-      throw error;
     }
   },
 };
