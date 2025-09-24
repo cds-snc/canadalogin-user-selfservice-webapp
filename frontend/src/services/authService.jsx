@@ -144,6 +144,16 @@ export const authService = {
       handleApiError(error);
     }
   },
+  keepAlive: async () => {
+    try {
+      const response = await axios.post(
+        `${config.apiUrl}${SUBMIT_END_POINTS.keepAlive}`,
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
 };
 
 function buildTestResponse(userData, type) {

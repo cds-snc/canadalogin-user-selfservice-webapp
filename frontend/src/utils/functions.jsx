@@ -81,3 +81,20 @@ export function capitalizeFirstLetter(str) {
   if (!str) return "";
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
+export function formatTime(expirationTime, currentLang = "en") {
+  if (!expirationTime) return "0:00";
+
+  // Normalize language
+  let lang = "en";
+  if (currentLang === "fr" || currentLang === "fr-ca") lang = "fr";
+  // Treat "en-ca" as English
+  else if (currentLang === "en-ca") lang = "en";
+
+  const date = new Date(expirationTime);
+  return date.toLocaleTimeString(lang, {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
+}

@@ -87,7 +87,7 @@ jobs:
       - name: configure aws credentials using OIDC role
         uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
         with:
-          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/gc-signin-user-selfservice-webapp-apply
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/github_action_manage_push_ecr_ecs
           role-session-name: ECRPush
           aws-region: ${{ env.AWS_REGION }}
 
@@ -95,13 +95,17 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
 
+      - name: Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+
       - name: Build Docker image
         working-directory: ./backend/
         run: |
           docker build \
-          --tag $DEV_ECR_REPOSITORY:$GITHUB_SHA
+          --tag $DEV_ECR_REPOSITORY:$GITHUB_SHA .
 
       - name: Push Container to Amazon ECR
+        working-directory: ./backend/
         run: |
           docker push $DEV_ECR_REPOSITORY:$GITHUB_SHA
 
