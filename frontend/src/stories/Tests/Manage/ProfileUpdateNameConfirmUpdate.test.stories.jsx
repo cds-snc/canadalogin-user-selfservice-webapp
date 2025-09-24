@@ -2,7 +2,6 @@ import { expect, userEvent, within } from "@storybook/test";
 import {
   AVAILABLE_LANGUAGES,
   FLOW_TYPES,
-  NAVIGATION_LINKS,
   PAGES,
 } from "../../../utils/constants.jsx";
 import { buildTestCase, TestTemplate } from "../utils/functions.tsx";
@@ -28,7 +27,7 @@ export default {
 export const ConfirmNameUpdate = {
   parameters: {
     ...buildTestCase.parameters(
-      NAVIGATION_LINKS.profileUpdateNameConfirmUpdate,
+      "",
       {
         language: AVAILABLE_LANGUAGES.en,
         flow: FLOW_TYPES.profile,
@@ -112,7 +111,7 @@ export const ConfirmNameUpdate = {
 export const CancelNameUpdate = {
   parameters: {
     ...buildTestCase.parameters(
-      NAVIGATION_LINKS.profileUpdateNameConfirmUpdate,
+      "",
       {
         language: AVAILABLE_LANGUAGES.en,
         flow: FLOW_TYPES.profile,

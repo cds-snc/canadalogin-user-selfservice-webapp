@@ -2,11 +2,7 @@ import { useState } from "react";
 import { useParams } from "react-router";
 import { GcdsErrorMessage } from "@cdssnc/gcds-components-react";
 import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
-import {
-  NAVIGATION_LINKS,
-  FLOW_TYPES,
-  PAGES,
-} from "../../../utils/constants.jsx";
+import { FLOW_TYPES, PAGES } from "../../../utils/constants.jsx";
 import { getPageContent } from "../../../utils/functions.jsx";
 import { authService } from "../../../services/authService.jsx";
 
@@ -18,6 +14,7 @@ import ConfirmUpdate from "./ConfirmUpdate.jsx";
 import SuccessfullyUpdated from "./SuccessfullyUpdated.jsx";
 import { transientOtp } from "../api/transientOtp.js";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
+import { path } from "../../../utils/routeHelpers.js";
 
 const STEPS = {
   ENTER: "enterPhoneNumber",
@@ -78,7 +75,9 @@ export default function UpdateContactPhoneNumberContainer() {
   });
 
   const navigateHelper = useNavigateHelper();
-  const backtoProfile = `/${language}${NAVIGATION_LINKS.profile}`;
+  const backtoProfile = path(PAGES.ProfileHome, {
+    language: language,
+  });
 
   const handleLoading = (bool) => {
     setLocalLoading(bool);
