@@ -127,8 +127,8 @@ jobs:
     strategy:
       matrix:
         environment: [dev, test]
-        # exclude:
-        #   - environment: test
+        exclude:
+          - environment: test
     environment: ${{ matrix.environment }}
     steps:
       - run: echo "Deploying frontend to ${{ matrix.environment }} environment..."
@@ -161,6 +161,16 @@ jobs:
           role-to-assume: arn:aws:iam::${{vars.AWS_ACCOUNT_ID}}:role/github_action_push_S3
           role-session-name: GHPushAppS3
           aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy build to app bucket
+        run: |
+          aws s3 sync \
+            s3://${{ secrets.FRONTEND_APP_BUILD_ARTIFACTS_S3_BUCKET }}/${DEPLOYMENT_SHA}/ \
+            s3://${{ secrets.FRONTEND_APP_S3_BUCKET }} --delete
+
+      - name: Invalidate FRONTEND_APP_CLOUDFRONT_DISTRIBUTION cache
+        run: |
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.FRONTEND_APP_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/index.html"
 
   # Deploys backend application to necessary environments.
   # We check the current SHA deployed to the environment to only deploy if necessary.
