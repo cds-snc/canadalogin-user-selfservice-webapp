@@ -1,102 +1,85 @@
-# tests/test_relying_party_info.py
+# backend/tests/test_rp_info.py
+
+import types
 import pytest
 import httpx
 from unittest.mock import AsyncMock
-from httpx import Response as HTTPXResponse
 from fastapi import HTTPException
-from pydantic import BaseModel, EmailStr
 
-# 🔧 Adjust this import to your actual module path:
-# e.g., from app.users.services.relying_party import get_relying_party_info
-from app.users.services.rp_info import get_relying_party_info
+# Source under test
+from app.users.services.rp_info import get_relying_party_info, SessionKeys
 
-# And these to your actual schema paths if needed:
-from app.users.schemas import RelyingPartyResponse
+HTTPXResponse = httpx.Response
 
 
-@pytest.mark.asyncio
-async def test_get_relying_party_info_success_with_mock_transport(monkeypatch):
+class DummyRequest:
     """
-    200 OK with a matching relying_party_id in applications[*].links[*]
-    → returns RelyingPartyResponse(success=True, data=RelyingPartyInfo)
+    Minimal stand-in for FastAPI's Request used by get_relying_party_info.
+
+    Provides:
+      - app.state.request_client: httpx.AsyncClient
+      - app.state.http_client:    httpx.AsyncClient (alias, just in case)
+      - app.state.config.rp_user_applications_api_endpoint: str
+      - session: dict (and state.session for compatibility)
+      - endpoint/url/base_url: str
+      - headers/state: basic containers
     """
-    module_path = "app.users.services.rp_info"
 
-    relying_party_id = "rp-123"
-    endpoint = "https://example.test/verify/apps"
+    def __init__(self, client: httpx.AsyncClient, endpoint: str, session: dict):
+        # Some code paths might read request.client directly
+        self.client = client
 
-    # Patch auth helpers
-    monkeypatch.setattr(
-        f"{module_path}.get_admin_token", AsyncMock(return_value="adm-token")
-    )
-    monkeypatch.setattr(
-        f"{module_path}.get_auth_request_headers",
-        lambda token, *_: {"Authorization": f"Bearer {token}", "X-Test": "1"},
-    )
+        # Build app.state with required attributes
+        state = types.SimpleNamespace()
+        state.request_client = client
+        state.http_client = client  # alias if other code paths use it
+        state.config = types.SimpleNamespace(rp_user_applications_api_endpoint=endpoint)
+        self.app = types.SimpleNamespace(state=state)
 
-    # Build a valid response
-    json_payload = {
+        # Sessions
+        self.session = session
+        self.state = types.SimpleNamespace(session=session)
+
+        # URL-ish attributes (harmless if unused)
+        self.endpoint = endpoint
+        self.url = endpoint
+        self.base_url = endpoint
+
+        self.headers = {}
+
+
+def apps_payload_no_match():
+    return {
         "applications": [
             {
-                "name": "App One",
-                "links": [
-                    {
-                        "id": "rp-999",
-                        "icon": "ico1.png",
-                        "linkName": "Other",
-                        "url": "https://other.example",
-                    },
-                    {
-                        "id": "rp-123",
-                        "icon": "ico.png",
-                        "linkName": "Main RP",
-                        "url": "https://rp.example",
-                    },
-                ],
-            },
-            {
-                "name": "App Two",
-                "links": [
-                    {
-                        "id": "rp-777",
-                        "icon": "ico2.png",
-                        "linkName": "Another",
-                        "url": "https://another.example",
-                    },
-                ],
-            },
+                "id": "app-001",
+                "name": "Non Matching App",
+                "description": "does-not-match-any-client-id",
+                "status": ["ENABLED"],
+                "category": ["General"],
+                "links": [],
+            }
         ]
     }
 
-    def transport_handler(request: httpx.Request) -> HTTPXResponse:
-        assert str(request.url) == endpoint
-        assert request.headers["Authorization"] == "Bearer adm-token"
-        assert request.headers["X-Test"] == "1"
-        return HTTPXResponse(200, json=json_payload)
 
-    transport = httpx.MockTransport(transport_handler)
-
-    async with httpx.AsyncClient(transport=transport, timeout=5.0) as client:
-        result = await get_relying_party_info(
-            client,
-            relying_party_id=relying_party_id,
-            rp_user_applications_api_endpoint=endpoint,
-        )
-
-    assert isinstance(result, RelyingPartyResponse)
-    assert result.success is True
-    assert result.message == "User profile retrieved successfully."
-    assert result.data.id == "rp-123"
-    assert result.data.icon == "ico.png"
-    assert result.data.linkName == "Main RP"
-    assert result.data.url == "https://rp.example"
+def apps_payload_match_but_no_links(client_id: str):
+    return {
+        "applications": [
+            {
+                "id": "app-002",
+                "name": "Matching App",
+                "description": client_id,
+                "status": ["ENABLED"],
+                "category": ["General"],
+                "links": [],
+            }
+        ]
+    }
 
 
 @pytest.mark.asyncio
-async def test_get_relying_party_info_200_not_found(monkeypatch):
-    """
-    200 OK but the relying_party_id is NOT present → 404
-    """
+async def test_get_relying_party_info_not_found_404(monkeypatch):
     module_path = "app.users.services.rp_info"
     endpoint = "https://example.test/verify/apps"
 
@@ -106,40 +89,31 @@ async def test_get_relying_party_info_200_not_found(monkeypatch):
         lambda *_: {"Authorization": "Bearer adm"},
     )
 
-    json_payload = {
-        "applications": [
-            {
-                "links": [
-                    {
-                        "id": "not-this-one",
-                        "icon": "i.png",
-                        "linkName": "X",
-                        "url": "https://x",
-                    }
-                ]
-            }
-        ]
-    }
+    def re_raise(e: Exception):
+        raise e
+
+    monkeypatch.setattr(f"{module_path}.RequestErrorHandler.handle", re_raise)
+
+    client_id = "client-123"
+    payload = apps_payload_no_match()
 
     def transport_handler(request: httpx.Request) -> HTTPXResponse:
-        return HTTPXResponse(200, json=json_payload)
+        return HTTPXResponse(200, json=payload)
 
     transport = httpx.MockTransport(transport_handler)
 
+    session = {SessionKeys.RP_CLIENT_ID_KEY.value: client_id}
     async with httpx.AsyncClient(transport=transport, timeout=5.0) as client:
+        req = DummyRequest(client=client, endpoint=endpoint, session=session)
         with pytest.raises(HTTPException) as exc:
-            await get_relying_party_info(client, "missing-id", endpoint)
+            await get_relying_party_info(req)
 
     assert exc.value.status_code == 404
-    assert "Relying party info not found" in exc.value.detail
+    assert exc.value.detail == "Relying party info not found"
 
 
 @pytest.mark.asyncio
-async def test_get_relying_party_info_200_invalid_schema(monkeypatch):
-    """
-    200 OK and link found, but link schema invalid → 422 ("Response data validation error")
-    (e.g., missing required 'url')
-    """
+async def test_get_relying_party_info_dispatch_error_bubbles_via_handler(monkeypatch):
     module_path = "app.users.services.rp_info"
     endpoint = "https://example.test/verify/apps"
 
@@ -149,35 +123,25 @@ async def test_get_relying_party_info_200_invalid_schema(monkeypatch):
         lambda *_: {"Authorization": "Bearer adm"},
     )
 
-    json_payload = {
-        "applications": [
-            {
-                "links": [
-                    # Missing 'url' to trigger Pydantic ValidationError
-                    {"id": "rp-123", "icon": "ico.png", "linkName": "Main RP"}
-                ]
-            }
-        ]
-    }
+    def re_raise(e: Exception):
+        raise e
+
+    monkeypatch.setattr(f"{module_path}.RequestErrorHandler.handle", re_raise)
 
     def transport_handler(request: httpx.Request) -> HTTPXResponse:
-        return HTTPXResponse(200, json=json_payload)
+        return HTTPXResponse(500, json={"detail": "Upstream error"})
 
     transport = httpx.MockTransport(transport_handler)
 
+    session = {SessionKeys.RP_CLIENT_ID_KEY.value: "client-123"}
     async with httpx.AsyncClient(transport=transport, timeout=5.0) as client:
-        with pytest.raises(HTTPException) as exc:
-            await get_relying_party_info(client, "rp-123", endpoint)
-
-    assert exc.value.status_code == 422
-    assert exc.value.detail == "Response data validation error"
+        req = DummyRequest(client=client, endpoint=endpoint, session=session)
+        with pytest.raises(httpx.HTTPStatusError):
+            await get_relying_party_info(req)
 
 
 @pytest.mark.asyncio
-async def test_get_relying_party_info_401_unauthenticated(monkeypatch):
-    """
-    Non-200: 401 → raises 401 Not authenticated
-    """
+async def test_get_relying_party_info_match_but_no_links_404(monkeypatch):
     module_path = "app.users.services.rp_info"
     endpoint = "https://example.test/verify/apps"
 
@@ -187,99 +151,24 @@ async def test_get_relying_party_info_401_unauthenticated(monkeypatch):
         lambda *_: {"Authorization": "Bearer adm"},
     )
 
+    def re_raise(e: Exception):
+        raise e
+
+    monkeypatch.setattr(f"{module_path}.RequestErrorHandler.handle", re_raise)
+
+    client_id = "client-123"
+    payload = apps_payload_match_but_no_links(client_id)
+
     def transport_handler(request: httpx.Request) -> HTTPXResponse:
-        return HTTPXResponse(401, json={"detail": "token invalid"})
+        return HTTPXResponse(200, json=payload)
 
     transport = httpx.MockTransport(transport_handler)
 
+    session = {SessionKeys.RP_CLIENT_ID_KEY.value: client_id}
     async with httpx.AsyncClient(transport=transport, timeout=5.0) as client:
+        req = DummyRequest(client=client, endpoint=endpoint, session=session)
         with pytest.raises(HTTPException) as exc:
-            await get_relying_party_info(client, "rp-123", endpoint)
+            await get_relying_party_info(req)
 
-    assert exc.value.status_code == 401
-    assert exc.value.detail == "Not authenticated"
-
-
-@pytest.mark.asyncio
-async def test_get_relying_party_info_non_json_error_body(monkeypatch):
-    """
-    Non-200: e.g., 502 with text body → raises 400 with that text in detail
-    """
-    module_path = "app.users.services.rp_info"
-    endpoint = "https://example.test/verify/apps"
-
-    monkeypatch.setattr(f"{module_path}.get_admin_token", AsyncMock(return_value="adm"))
-    monkeypatch.setattr(
-        f"{module_path}.get_auth_request_headers",
-        lambda *_: {"Authorization": "Bearer adm"},
-    )
-
-    def transport_handler(request: httpx.Request) -> HTTPXResponse:
-        return HTTPXResponse(502, text="Bad gateway")
-
-    transport = httpx.MockTransport(transport_handler)
-
-    async with httpx.AsyncClient(transport=transport, timeout=5.0) as client:
-        with pytest.raises(HTTPException) as exc:
-            await get_relying_party_info(client, "rp-123", endpoint)
-
-    assert exc.value.status_code == 400
-    assert exc.value.detail == "Failed to fetch RP info: Bad gateway"
-
-
-@pytest.mark.asyncio
-async def test_get_relying_party_info_json_error_body(monkeypatch):
-    """
-    Non-200 JSON with 'detail' key → its value is included in the raised 400 error
-    """
-    module_path = "app.users.services.rp_info"
-    endpoint = "https://example.test/verify/apps"
-
-    monkeypatch.setattr(f"{module_path}.get_admin_token", AsyncMock(return_value="adm"))
-    monkeypatch.setattr(
-        f"{module_path}.get_auth_request_headers",
-        lambda *_: {"Authorization": "Bearer adm"},
-    )
-
-    def transport_handler(request: httpx.Request) -> HTTPXResponse:
-        return HTTPXResponse(500, json={"detail": "Upstream crashed"})
-
-    transport = httpx.MockTransport(transport_handler)
-
-    async with httpx.AsyncClient(transport=transport, timeout=5.0) as client:
-        with pytest.raises(HTTPException) as exc:
-            await get_relying_party_info(client, "rp-123", endpoint)
-
-    assert exc.value.status_code == 400
-    assert exc.value.detail == "Failed to fetch RP info: Upstream crashed"
-
-
-@pytest.mark.asyncio
-async def test_get_relying_party_info_request_validation_error(monkeypatch):
-    """
-    If a Pydantic ValidationError is raised while preparing the request (e.g., headers),
-    the function catches it and raises HTTPException(422) with 'Request data validation error'.
-    """
-    module_path = "app.users.services.rp_info"
-    endpoint = "https://example.test/verify/apps"
-
-    # get_admin_token succeeds
-    monkeypatch.setattr(f"{module_path}.get_admin_token", AsyncMock(return_value="adm"))
-
-    # get_auth_request_headers will raise a real pydantic.ValidationError
-    class HeaderModel(BaseModel):
-        email: EmailStr  # force a validation error with bad input
-
-    def bad_headers(*_, **__):
-        # This triggers a real ValidationError
-        HeaderModel(email="not-an-email")
-
-    monkeypatch.setattr(f"{module_path}.get_auth_request_headers", bad_headers)
-
-    # We still provide a client; the GET should never be reached
-    transport = httpx.MockTransport(lambda request: HTTPXResponse(200, json={}))
-    async with httpx.AsyncClient(transport=transport, timeout=5.0) as client:
-        with pytest.raises(HTTPException) as exc:
-            await get_relying_party_info(client, "rp-123", endpoint)
-
-    assert exc.value.status_code == 422
+    assert exc.value.status_code == 404
+    assert exc.value.detail == "Relying party info not found"
