@@ -122,7 +122,7 @@ jobs:
   # Deploys frontend application to necessary environments.
   # We check the current SHA deployed to the environment to only deploy if necessary.
   deploy-frontends:
-    needs: [release-please, build-frontend]
+    # needs: [release-please, build-frontend]
     runs-on: ubuntu-latest
     strategy:
       matrix:
