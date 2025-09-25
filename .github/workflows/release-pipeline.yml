@@ -174,23 +174,23 @@ jobs:
             exit 1
           fi
 
-      - name: Check deployed SHA
-        id: check-deploy
+      - name: Set actively deployed SHA (merge tags)
         run: |
           BUCKET=${{ secrets.FRONTEND_APP_S3_BUCKET }}
-          DEPLOYED_SHA=$(aws s3api get-bucket-tagging --bucket "$BUCKET" \
-            --query 'TagSet[?Key==`DeploymentSHA`].Value' --output text 2>/dev/null || echo "")
 
-          echo "Currently deployed SHA: $DEPLOYED_SHA"
-          echo "Deployment candidate SHA: $DEPLOYMENT_SHA"
-
-          if [ "$DEPLOYED_SHA" = "$DEPLOYMENT_SHA" ]; then
-            echo "needs_deploy=false" >> $GITHUB_OUTPUT
-            echo "Skipping deployment, already at desired SHA."
-          else
-            echo "needs_deploy=true" >> $GITHUB_OUTPUT
-            echo "Deployment needed, SHAs differ."
+          # Fetch current tags (write to file or fallback to empty)
+          if ! aws s3api get-bucket-tagging --bucket "$BUCKET" > tags.json 2>/dev/null; then
+            echo '{"TagSet":[]}' > tags.json
           fi
+
+          # Merge or update DeploymentSHA
+          jq --arg sha "$DEPLOYMENT_SHA" '
+            .TagSet |=
+              (map(select(.Key != "DeploymentSHA")) + [{"Key":"DeploymentSHA","Value":$sha}])
+          ' tags.json > new-tags.json
+
+          # Apply the merged tags
+          aws s3api put-bucket-tagging --bucket "$BUCKET" --tagging file://new-tags.json
 
       - name: Deploy build to app bucket
         if: steps.check-deploy.outputs.needs_deploy == 'true'
