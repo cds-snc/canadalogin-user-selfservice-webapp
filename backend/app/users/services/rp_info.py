@@ -52,7 +52,7 @@ async def get_relying_party_info(request: Request):
             SessionKeys.RP_CLIENT_ID_KEY.value
         )
         if not relying_party_client_id:
-            logger.error("Relying party client ID not found in session")
+            logger.info("Relying party client ID not found in session")
             raise HTTPException(status_code=400, detail="RP Client ID not found")
         ibm_verify_oidc_applications_response = await dispatch_get_oidc_user_applications(
             request
