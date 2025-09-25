@@ -11,6 +11,7 @@ from app.utils.schemas import ResponseModel
 from app.auth.schemas import LogoutResponseModel
 from app.utils.request_error_handler import RequestErrorHandler
 from app.utils.redis import get_redis_client
+from app.constants.redis_keys import RedisKeys
 
 logger = logging.getLogger(__name__)
 
@@ -81,7 +82,7 @@ async def is_logout_processed(request: Request, sid: str) -> bool:
     # Try to get Redis client from the application state
     redis_client = get_redis_client(request)
     # Use Redis to check if token was processed
-    cache_key = f"logout_session:{sid}"
+    cache_key = f"{RedisKeys.REDIS_LOGOUT_SESSION_KEY.value}{sid}"
     result = await redis_client.get(cache_key)
     return result is not None
 
@@ -103,10 +104,10 @@ async def mark_session_logout(
     # Try to get Redis client from the application state
     redis_client = get_redis_client(request)
     # Use Redis to store the processed token with expiration
-    cache_key = f"logout_session:{sid}"
+    cache_key = f"{RedisKeys.REDIS_LOGOUT_SESSION_KEY.value}{sid}"
     await redis_client.setex(cache_key, expiration_seconds, source)
     logger.debug(
-        f"Marked logout token {sid} as processed in Redis with {expiration_seconds}s expiration"
+        f"Marked logout session {sid} as processed in Redis with {expiration_seconds}s expiration, and source from {source}"
     )
 
 
@@ -182,7 +183,7 @@ async def backchannel_logout(request: Request):
         redis_client = get_redis_client(request)
         logger.info(f"Processing backchannel logout for sid: {sid}")
         # Delete the session from Redis for the given sid
-        cache_key = f"session:{sid}"
+        cache_key = f"{RedisKeys.REDIS_SESSION_KEY.value}{sid}"
         await redis_client.delete(cache_key)
 
         # Mark this logout token as processed to prevent duplicate processing

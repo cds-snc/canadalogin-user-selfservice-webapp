@@ -16,6 +16,7 @@ from starsessions.stores.redis import RedisStore
 from app.config import get_configuration
 from app.utils.helpers import generate_error_response
 from app.auth.services.auth import redirect_user_to_idp_verify
+from app.constants.redis_keys import RedisKeys
 
 from .routers import health
 from app.users import v1_router as v1_users_router
@@ -110,7 +111,7 @@ logger.info(f"ROOT_DOMAIN: {session_domain}")
 
 session_store = RedisStore(
     connection=redis_client,
-    prefix="session:",
+    prefix=RedisKeys.REDIS_SESSION_KEY.value,
     gc_ttl=configuration.session_config.SESSION_LIFETIME,
 )
 logger.info("Using RedisStore for session management")

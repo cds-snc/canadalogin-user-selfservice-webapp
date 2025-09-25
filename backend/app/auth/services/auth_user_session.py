@@ -18,6 +18,7 @@ from app.auth.services.oidc_config import oauth
 from app.auth.schemas import SSEventData, KeepAliveData
 from app.utils.schemas import ResponseModel
 from app.utils.redis import get_redis_client
+from app.constants.redis_keys import RedisKeys
 
 
 logger = logging.getLogger(__name__)
@@ -157,7 +158,7 @@ async def get_session_data_by_id(request: Request, session_id: str):
     redis_client = get_redis_client(request)
     logger.debug(f"get session by sid: {session_id}")
     # read the session from Redis for the given session_id
-    cache_key = f"session:{session_id}"
+    cache_key = f"{RedisKeys.REDIS_SESSION_KEY.value}{session_id}"
     session = await redis_client.get(cache_key)
     session_data = session if session else None
     if session_data is None:
@@ -331,6 +332,6 @@ async def is_backchannel_logout(request: Request, sid: str) -> bool:
     redis_client = get_redis_client(request)
 
     # Use Redis to check if token was processed
-    cache_key = f"logout_session:{sid}"
+    cache_key = f"{RedisKeys.REDIS_LOGOUT_SESSION_KEY.value}{sid}"
     result = await redis_client.get(cache_key)
     return result is not None and result.decode("utf-8") == "backchannel_logout"
