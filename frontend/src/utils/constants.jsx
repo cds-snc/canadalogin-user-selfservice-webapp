@@ -8,27 +8,6 @@ export const LANGUAGE_DISPLAY_NAMES = {
   "en-ca": "English",
   "fr-ca": "French",
 };
-export const NAVIGATION_LINKS = {
-  manage: "/",
-  securitySettings: "/security-settings",
-  securitySettingsUpdatePassword: `/security-settings/update-password`,
-  verification: "/verification",
-  checkYourEmail: "/checkyouremail",
-  completeTwoStepVerification: "/completetwostepverification",
-  firstVerifyItsYou: "/firstverifyitsyou",
-  enterNewEmail: "/enternewemail",
-  areYouSureUpdateContactNumber: "/areYouSureUpdateContactNumber",
-  enterNewPhoneNumber: "/enterNewPhoneNumber",
-  youMayUpdateEmailAtOtherPlaces: "/youMayUpdateEmailAtOtherPlaces",
-  areYouSureUpdateYourEmail: "/areYouSureUpdateYourEmail",
-  profileHome: "/profile-home",
-  profileUpdateName: "/profile/update-name",
-  profileUpdateNameSuccess: "/profile/update-name/success",
-  profileUpdateNameConfirmUpdate: "/profile/update-name/confirm-update",
-  profileUpdateLanguage: "/profile/update-language/",
-  profileUpdateLanguageConfirmUpdate: "/profile/update-language/confirm-update",
-  profileUpdateLanguageSuccess: "/profile/update-language/success",
-};
 
 export const EXTERNAL_NAVIGATION_LINKS = {
   gcAccountDirectory:
@@ -53,6 +32,10 @@ export const CONTEXT_ACTIONS = {
   set_relying_party_data: "SET_RELYING_PARTY_DATA",
   set_authenticated_pages: "SET_AUTHENTICATED_PAGES",
   remove_authenticated_page: "REMOVE_AUTHENTICATED_PAGE",
+  show_session_timeout_modal: "SHOW_SESSION_TIMEOUT_MODAL",
+  hide_session_timeout_modal: "HIDE_SESSION_TIMEOUT_MODAL",
+  set_session_timeout_loading: "SET_SESSION_TIMEOUT_LOADING",
+  reset_expire_time: "RESET_EXPIRE_TIME",
 };
 
 export const FLOW_TYPES = {
@@ -81,6 +64,7 @@ export const FORM_FIELDS = [
 ];
 
 export const PAGES = {
+  // this is used as key to get the language locales from json files, should probably be renamed in the future to reflect the usage
   verification: "Verification",
   otpSelection: "OtpSelection",
   password: "Password",
@@ -104,6 +88,9 @@ export const PAGES = {
   profileYouMayUpdateLanguage: "ProfileYouMayUpdateLanguage",
   passwordChangedConfirmation: "PasswordChangedConfirmation",
   ServicesWithAccessInfo: "ServicesWithAccessInfo",
+  confirmContactPhoneNumberUpdate: "ConfirmContactPhoneNumberUpdate",
+  successfullyUpdatedContactPhoneNumber:
+    "SuccessfullyUpdatedContactPhoneNumber",
 };
 
 export const FOOTERS = {
@@ -126,14 +113,16 @@ export const SUBMIT_END_POINTS = {
   requestPasswordPolicy: "/v1/password/policy",
   create: "/v1/users/create",
   createCoreProfile: "/v1/users/createcoreprofile",
-  login: "/v1/otp/users/login",
-  otpVerify: "/v1/otp/otp/verify",
-  otpSend: "/v1/otp/otp/send",
+  login: "/v1/auth/login",
+  transientOtpVerify: "/v1/otp/transient/verify",
+  transientOtpSend: "/v1/otp/transient/send",
   profile: "/v1/users/profile",
   rp_info: "/v1/users/rp_info",
   users: "/v1/users",
   passwordUpdate: "/v1/password/update",
   logout: "/v1/auth/logout",
+  sessionStatus: "/v1/auth/session-status",
+  keepAlive: "/v1/auth/keep-alive",
 };
 
 export const GA_CATEGORIES = {

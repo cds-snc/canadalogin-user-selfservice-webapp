@@ -1,0 +1,144 @@
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # Added for ease of debugging for now.
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  id-token: write
+
+env:
+  AWS_REGION: ca-central-1
+  GITHUB_SHA: ${{ github.sha }}
+  SBOM_TAG_NAME: gc-signin-dev-backend-api
+  ECS_SERVICE: gc-signin-dev_ecs_cluster_service
+  ECS_CLUSTER: gc-signin-dev_ecs_cluster
+  DEV_ECR_REPOSITORY: ${{ vars.DEV_AWS_ACCOUNT_ID }}.dkr.ecr.ca-central-1.amazonaws.com/gc-signin-backend-api-deploy-artifacts
+
+name: release-pipeline
+
+jobs:
+  # Runs the release-please action. This manages the open release PR and
+  # creates the release when the PR is merged.
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547 # v1.12.0
+        id: sre_app_token
+        with:
+          app-id: ${{ secrets.CDS_RELEASE_BOT_APP_ID }}
+          private-key: ${{ secrets.CDS_RELEASE_BOT_PRIVATE_KEY }}
+
+      - uses: googleapis/release-please-action@c2a5a2bd6a758a0937f1ddb1e8950609867ed15c # v4.3.0
+        id: release
+        with:
+          token: ${{ steps.sre_app_token.outputs.token }}
+
+  # Builds the frontend application for the current SHA and stores the artifact in S3.
+  build-frontend:
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "latest"
+
+      - name: configure aws credentials using OIDC role
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+        with:
+          role-to-assume: arn:aws:iam::${{vars.AWS_ACCOUNT_ID}}:role/github_action_push_S3
+          role-session-name: GHPushAppS3
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Environment Variables for build
+        run: |
+          echo "VITE_BACKEND_API_URL=${{ secrets.VITE_BACKEND_API_URL }}" >> $GITHUB_ENV
+          echo "VITE_GOOGLE_ANALYTICS_ID=${{ secrets.VITE_GOOGLE_ANALYTICS_ID }}" >> $GITHUB_ENV
+
+      - name: Build application
+        working-directory: frontend
+        run: |
+          npm install
+          npm run build
+
+      - name: Upload build artifacts to S3
+        run: |
+          aws s3 sync frontend/dist s3://${{ secrets.FRONTEND_APP_BUILD_ARTIFACTS_S3_BUCKET }}/${GITHUB_SHA}
+
+  # Builds the backend application for the current SHA and stores the artifact in ECR.
+  build-backend:
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - name: Audit DNS requests
+        uses: cds-snc/dns-proxy-action@main
+        env:
+          DNS_PROXY_FORWARDTOSENTINEL: "true"
+          DNS_PROXY_LOGANALYTICSWORKSPACEID: ${{ secrets.LOG_ANALYTICS_WORKSPACE_ID }}
+          DNS_PROXY_LOGANALYTICSSHAREDKEY: ${{ secrets.LOG_ANALYTICS_WORKSPACE_KEY }}
+
+      - name: configure aws credentials using OIDC role
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/github_action_manage_push_ecr_ecs
+          role-session-name: ECRPush
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
+
+      - name: Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+
+      - name: Build Docker image
+        working-directory: ./backend/
+        run: |
+          docker build \
+          --tag $DEV_ECR_REPOSITORY:$GITHUB_SHA .
+
+      - name: Push Container to Amazon ECR
+        working-directory: ./backend/
+        run: |
+          docker push $DEV_ECR_REPOSITORY:$GITHUB_SHA
+
+      - name: Docker generate SBOM
+        uses: cds-snc/security-tools/.github/actions/generate-sbom@34794baf2af592913bb5b51d8df4f8d0acc49b6f # v3.2.0
+        env:
+          TRIVY_DB_REPOSITORY: ${{ vars.TRIVY_DB_REPOSITORY }}
+        with:
+          docker_image: "${{ env.DEV_ECR_REPOSITORY }}:${{ env.GITHUB_SHA }}"
+          dockerfile_path: backend/Dockerfile
+          sbom_name: ${{ env.SBOM_TAG_NAME }}
+          token: "${{ secrets.GITHUB_TOKEN }}"
+
+  # Deploys frontend application to necessary environments.
+  # We check the current SHA deployed to the environment to only deploy if necessary.
+  deploy-frontends:
+    needs: [release-please, build-frontend]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: [dev, test]
+    environment: ${{ matrix.environment }}
+    steps:
+      - run: echo "Deploying frontend to ${{ matrix.environment }} environment..."
+
+  # Deploys backend application to necessary environments.
+  # We check the current SHA deployed to the environment to only deploy if necessary.
+  deploy-backends:
+    needs: [release-please, build-backend]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: [dev, test]
+    environment: ${{ matrix.environment }}
+    steps:
+      - run: echo "Deploying backend to ${{ matrix.environment }} environment..."

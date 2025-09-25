@@ -25,12 +25,20 @@ vi.mock("../../../hooks/useNavigate.tsx", () => ({
 }));
 
 // Mock the redirect function to prevent navigation errors
-vi.mock("../../../utils/redirect.jsx", () => ({
+vi.mock("../../../utils/apiErrorHandler.js", () => ({
   redirectToLogin: vi.fn(),
 }));
 
+const mockSessionTimeoutState = {
+  showModal: false,
+  isLoading: false,
+  expirationTime: null,
+  newServerSideExpirationTime: null,
+};
+
 const mockUserState = {
   isLoading: false,
+  loadingText: null,
   userData: {
     service: "Test Service",
     language: "en",
@@ -115,7 +123,10 @@ describe("ProfileUpdateName Component", () => {
     render(
       <BrowserRouter>
         <LanguageProvider>
-          <UserProvider initial={mockUserState}>
+          <UserProvider
+            initial={mockUserState}
+            initialSessionTimeoutState={mockSessionTimeoutState}
+          >
             <ProfileUpdateName />
           </UserProvider>
         </LanguageProvider>
@@ -154,7 +165,10 @@ describe("ProfileUpdateName Component", () => {
     render(
       <BrowserRouter>
         <LanguageProvider>
-          <UserProvider initial={mockUserState}>
+          <UserProvider
+            initial={mockUserState}
+            initialSessionTimeoutState={mockSessionTimeoutState}
+          >
             <ProfileUpdateName />
             <StateCapture />
           </UserProvider>
@@ -197,7 +211,10 @@ describe("ProfileUpdateName Component", () => {
 
   const TestWrapper = ({ children }) => (
     <BrowserRouter>
-      <UserProvider initial={mockUserState}>
+      <UserProvider
+        initial={mockUserState}
+        initialSessionTimeoutState={mockSessionTimeoutState}
+      >
         <LanguageProvider>{children}</LanguageProvider>
       </UserProvider>
     </BrowserRouter>

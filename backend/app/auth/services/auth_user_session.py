@@ -1,8 +1,13 @@
+import asyncio
 import logging
+import json
 from datetime import datetime
 from httpx import AsyncClient
+from typing import AsyncGenerator
 
 from fastapi import Request, HTTPException
+from fastapi.responses import StreamingResponse
+from starsessions.session import get_session_metadata
 from authlib.integrations.starlette_client import OAuthError
 
 from app.config import get_configuration
@@ -10,6 +15,9 @@ from app.constants.session_keys import SessionKeys
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.request_error_handler import RequestErrorHandler
 from app.auth.services.oidc_config import oauth
+from app.auth.schemas import SSEventData, KeepAliveData
+from app.utils.schemas import ResponseModel
+
 
 logger = logging.getLogger(__name__)
 
@@ -140,3 +148,191 @@ def update_session_tokens(request: Request, new_tokens: dict):
         "access_token"
     )
     request.session[SessionKeys.SESSION_USER_TOKEN.value] = new_tokens
+
+
+async def get_session_data_by_id(request: Request, session_id: str):
+    # Try to get Redis client from the application state
+    session_data = None
+    redis_client = getattr(request.app.state, "redis_client", None)
+    logger.debug(f"get session by sid: {session_id}")
+    if redis_client is not None:
+        # read the session from Redis for the given session_id
+        cache_key = f"session:{session_id}"
+        session = await redis_client.get(cache_key)
+        session_data = session if session else None
+    if session_data is None:
+        logger.debug(f"No session found for session_id: {session_id}")
+        return None
+    # Convert bytes to dict if necessary
+    if isinstance(session_data, bytes):
+        session_data = dict(json.loads(session_data.decode("utf-8")))
+    return session_data
+
+
+async def session_event_sse_generator(request: Request):
+    """
+    For code review. StreamingResponse, can't use regular Exception handling
+    """
+    config = get_configuration()
+    user_info = None
+    try:
+        user_info = await get_user_info(request)
+    except OAuthError as oe:
+        logger.error(f"OAuth error while fetching user info: {str(oe)}")
+        return StreamingResponse(
+            [
+                f"event: error\ndata: {SSEventData(status='error', error='Authentication error.').model_dump_json()}\n\n"
+            ],
+            media_type="text/event-stream",
+            headers={
+                "Access-Control-Allow-Origin": config.CORS_ORIGINS,
+                "Access-Control-Allow-Credentials": "true",
+                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+                "X-Accel-Buffering": "no",  # Disable nginx buffering
+            },
+        )
+
+    sid = user_info.get("sid") if user_info else None
+    if sid is None:
+        logger.error("No sid found in user info")
+        return StreamingResponse(
+            [
+                f"event: error\ndata: {SSEventData(status='error', error='No sid found').model_dump_json()}\n\n"
+            ],
+            media_type="text/event-stream",
+            headers={
+                "Access-Control-Allow-Origin": config.CORS_ORIGINS,
+                "Access-Control-Allow-Credentials": "true",
+                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+                "X-Accel-Buffering": "no",  # Disable nginx buffering
+            },
+        )
+
+    async def event_stream(
+        request: Request, session_id: str
+    ) -> AsyncGenerator[str, None]:
+        """
+        Generate Server-Sent Events (SSE) for a user session.
+        """
+        try:
+            while True:
+                session_data = await get_session_data_by_id(request, session_id)
+                if session_data is None:
+                    logger.info("Session expired or terminated")
+                    backchannellogout = await is_backchannel_logout(request, session_id)
+                    if backchannellogout:
+                        message_data = SSEventData(status="terminated")
+                        yield f"event: terminated\ndata: {message_data.model_dump_json()}\n\n"
+                    else:
+                        message_data = SSEventData(status="expired")
+                        yield f"event: expired\ndata: {message_data.model_dump_json()}\n\n"
+                    break
+                last_access_timestamp = session_data.get("__metadata__", {}).get(
+                    "last_access", 0
+                )
+                session_expire = (
+                    config.session_config.SESSION_LIFETIME + last_access_timestamp - 30
+                )
+
+                # Prepare message data with optional last_access info
+                message_data = SSEventData(status="active", expire=int(session_expire))
+                yield f"event: notification\ndata: {message_data.model_dump_json()}\n\n"
+
+                await asyncio.sleep(5)
+
+        except asyncio.CancelledError:
+            logger.info("SSE stream cancelled")
+        except Exception as e:
+            logger.error(f"Error in event stream: {str(e)}")
+            message_data = SSEventData(
+                status="error", error="An internal error has occurred."
+            )
+            yield f"event: error\ndata: {message_data.model_dump_json()}\n\n"
+
+    return StreamingResponse(
+        event_stream(request, sid),
+        media_type="text/event-stream",
+        headers={
+            "Access-Control-Allow-Origin": config.CORS_ORIGINS,
+            "Access-Control-Allow-Credentials": "true",
+            "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",  # Disable nginx buffering
+        },
+    )
+
+
+async def session_extend(request: Request):
+    """
+    Check session metadata for expiration. If session is older than 12 hours,
+    remove it and return termination status with login URL.
+    """
+    config = get_configuration()
+    # Get user info from current session
+    user_info = await get_user_info(request)
+    if user_info is None:
+        session_status = KeepAliveData(status="non-authenticated", login="re-login")
+        return ResponseModel(
+            success=False, message="User not authenticated", data=session_status
+        )
+    # Get session ID from user info
+    session_id = user_info.get("sid")
+    if not session_id:
+        session_status = KeepAliveData(status="non-authenticated", login="re-login")
+        return ResponseModel(
+            success=False, message="User not authenticated", data=session_status
+        )
+
+    # Get session metadata
+    session_metadata = get_session_metadata(request)
+    last_access_timestamp = session_metadata.get("last_access")
+    created_timestamp = session_metadata.get("created")
+
+    current_time = datetime.now().timestamp()
+    twelve_hours_in_seconds = 12 * 60 * 60  # 43200 seconds
+
+    session_expire = config.session_config.SESSION_LIFETIME + last_access_timestamp - 30
+
+    # Check if session is older than 12 hours
+    if current_time - created_timestamp > twelve_hours_in_seconds:
+        # Session expired, remove it
+        request.session.clear()
+
+        session_status = KeepAliveData(status="terminated", login="re-login")
+        return ResponseModel(
+            success=False, message="Session terminated", data=session_status
+        )
+
+    # Session is valid, auto extend last access time
+    session_status = KeepAliveData(status="active", expire=int(session_expire))
+    return ResponseModel(success=True, message="Session is active", data=session_status)
+
+
+async def is_backchannel_logout(request: Request, sid: str) -> bool:
+    """
+    Check if a logout token (identified by sid) has already been processed.
+
+    Args:
+        request: FastAPI request object
+        sid: Session ID from the logout token
+
+    Returns:
+        bool: True if the token has already been processed, False otherwise
+    """
+    if not sid:
+        return False
+
+    # Try to get Redis client from the application state
+    redis_client = getattr(request.app.state, "redis_client", None)
+
+    if redis_client is not None:
+        # Use Redis to check if token was processed
+        cache_key = f"processed_logout_token:{sid}"
+        result = await redis_client.get(cache_key)
+        return result is not None and result.decode("utf-8") == "backchannel_logout"
+    return False

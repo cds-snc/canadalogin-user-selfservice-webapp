@@ -9,8 +9,10 @@ from app.users.schemas import (
     ProfileResponse,
     UserProfileUpdateRequest,
     IBMVerifyUpdateUserProfile,
+    MetaDataTypeValue,
 )
 from app.utils.access_token import get_auth_request_headers
+from app.utils.mask_phone_number import mask_phone_number
 from app.config import get_configuration
 from app.utils.request_error_handler import RequestErrorHandler
 
@@ -26,6 +28,30 @@ def sanitize_user_profile_data(user_data: UserProfileUpdateRequest) -> dict:
     return updated_data_dict
 
 
+def mask_contact_phone_numbers(
+    json_data: dict,
+) -> list[MetaDataTypeValue]:
+    """
+    Given a user profile JSON dict, replace `phoneNumbers` with masked values.
+    Loop through a list of profile contact phone numbers and mask each number except the last 4 digits.
+    """
+
+    profile_contact_phone_numbers = json_data.get("phoneNumbers")
+
+    if profile_contact_phone_numbers is None:
+        return None
+
+    masked_phone_numbers = []
+    for phone in profile_contact_phone_numbers:
+        value = phone.get("value")
+        if not value:
+            continue
+        masked_phone = dict(phone)  # Create a copy of the original phone dict
+        masked_phone["value"] = mask_phone_number(value)
+        masked_phone_numbers.append(masked_phone)
+    return masked_phone_numbers
+
+
 async def dispatch_update_user_profile(
     request: Request,
     user_profile_payload: IBMVerifyUpdateUserProfile,
@@ -39,7 +65,7 @@ async def dispatch_update_user_profile(
             content=user_profile_payload,
             headers=headers,
         )
-        await response.raise_for_status()
+        response.raise_for_status()
         logger.info("updating user profile changes returned successfully")
         return response
 
@@ -95,6 +121,8 @@ async def update_profile(
 
         logger.info("User profile updated successfully.")
         json_data = response.json()
+        json_data["phoneNumbers"] = mask_contact_phone_numbers(json_data)
+
         response_data = IBMVerifyUserProfileSchema(**json_data)
         return ProfileResponse(
             success=True,
@@ -122,6 +150,8 @@ async def my_profile(global_http_client: AsyncClient, user_access_token: str):
     if response.status_code == 200:
         logger.info("User profile retrieved successfully.")
         json_data = response.json()
+        json_data["phoneNumbers"] = mask_contact_phone_numbers(json_data)
+
         response_data = IBMVerifyUserProfileSchema(**json_data)
         return ProfileResponse(
             success=True,

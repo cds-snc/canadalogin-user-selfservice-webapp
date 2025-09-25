@@ -36,7 +36,10 @@
     "CSIAM0010E": "La tentative d'authentification a échoué",
     "CSIAM0011E": "Le code de vérification n'est pas valide ou a expiré.",
     "CSIAM0038E": "Trop de tentatives",
-    "CSIAI0021E": "Le mot de passe que vous avez spécifié a déjà été utilisé et ne peut pas être réutilisé."
+    "CSIAI0021E": "Le mot de passe que vous avez spécifié a déjà été utilisé et ne peut pas être réutilisé.",
+    "CSIBN0025E": "Le code de vérification n'est pas valide ou a expiré.",
+    "CSIBN0028E": "Le code de vérification n'est pas valide ou a expiré.",
+    "CSIBN0021E": "Le code de vérification n'est pas valide."
   },
   "RegisterVerification": {
     "1": "Protégez votre compte avec la vérification en deux étapes",
@@ -118,7 +121,9 @@
     "14": "Anglais",
     "15": "Notifications",
     "16": "Nous enverrons des notifications relatives à votre compte à l'adresse e-mail associée à votre compte.",
-    "17": "Vous pouvez également recevoir des notifications des services connectés à votre compte GC. Vous pouvez gérer ces préférences dans les paramètres de chaque service."
+    "17": "Vous pouvez également recevoir des notifications des services connectés à votre compte GC. Vous pouvez gérer ces préférences dans les paramètres de chaque service.",
+    "18": "Aucun numéro de téléphone de contact n'a été ajouté",
+    "19": "Ajouter un numéro de téléphone"
   },
   "EnterNewEmail": {
     "1": "Entrez une nouvelle adresse courriel",
@@ -176,7 +181,9 @@
     "8": "Répertoire des comptes GC.",
     "9": "Pour voir les services connectés à votre compte GC Sign in, accédez à ",
     "10": "Services connectés",
-    "11": "dans votre tableau de bord GC Sign in."
+    "11": "dans votre tableau de bord GC Sign in.",
+    "12": "Déconnexion en cours...",
+    "13": "Échec de la déconnexion. Redirection..."
   },
   "FirstVerifyItsYou": {
     "1": "Vérifiez d'abord qu'il s'agit bien de vous",
@@ -186,6 +193,7 @@
     "5": "Annuler"
   },
   "ProfileUpdateName": {
+    "1": "Quels services ont accès à votre nom ?",
     "2": "Prénom",
     "3": "Nom de famille",
     "4": "Annuler",
@@ -281,12 +289,12 @@
     "2": "La vérification en 2 étapes ajoute une seconde mesure de sécurité à votre mot de passe.",
     "3": "Apprenez-en plus sur la vérification en deux étapes (s’ouvre dans un nouvel onglet)",
     "4": "Sélectionnez une autre méthode de vérification à deux étapes",
-    "5": "How should we send you the code?",
-    "6": "You can change this the next time you sign in.",
-    "7": "Text message (SMS)",
-    "8": "Mobile only. Carrier charges may apply.",
-    "9": "Voice call",
-    "10": "Mobile or landline. Carrier charges may apply.",
+    "5": "Comment devons-nous vous envoyer le code ?",
+    "6": "Vous pourrez modifier ce paramètre lors de votre prochaine connexion.",
+    "7": "Message texte (SMS)",
+    "8": "Mobile uniquement. Des frais de l’opérateur peuvent s’appliquer.",
+    "9": "Appel vocal",
+    "10": "Mobile ou ligne fixe. Des frais de l’opérateur peuvent s’appliquer.",
     "11": "Chargement"
   },
   "PasswordChangedConfirmation": {
@@ -317,5 +325,57 @@
     "4": "Si vous essayez de mettre à jour votre nom avec un service qui n'est pas connecté à Connexion GC, vous devrez accéder à ce compte.",
     "5": "Pour rechercher un autre compte GC, consultez le",
     "6": "Répertoire des comptes GC"
+  },
+  "EnterNewPhoneNumber": {
+    "1": "Entrez un nouveau numéro de téléphone",
+    "2": "Cela mettra à jour le numéro de téléphone que GC CléGC utilise, et les services connectés à votre GC CléGC peuvent l’utiliser pour vous contacter.",
+    "3": "Quels services ont accès à votre numéro de téléphone de contact",
+    "4": "Les services suivants ont accès à votre numéro de téléphone de contact :",
+    "5": "GEO.ca",
+    "6": "Si vous tentez de mettre à jour votre numéro de téléphone de contact auprès d’un service qui n’est pas connecté à GC CléGC, vous devrez accéder à ce compte directement.",
+    "7": "Pour rechercher un autre compte GC, visitez le",
+    "8": "répertoire des comptes GC",
+    "9": "Pays",
+    "10": "Numéro de téléphone",
+    "11": "Mon pays ne figure pas dans la liste",
+    "12": "Certains pays ne sont pas pris en charge en raison de limitations techniques. Si votre pays ne figure pas dans la liste, vous ne pourrez pas créer un compte GC CléGC pour le moment. Nous nous excusons pour tout inconvénient.",
+    "13": "Vérifiez votre numéro",
+    "14": "Le numéro de téléphone est requis",
+    "15": "Nous allons vérifier votre numéro de téléphone en envoyant un code à 6 chiffres sur votre téléphone."
+  },
+  "ConfirmContactPhoneNumberUpdate": {
+    "1": "Êtes-vous sûr de vouloir mettre à jour votre numéro de téléphone ?",
+    "2": "Vous avez demandé de mettre à jour votre numéro de téléphone de contact pour:",
+    "3": "Exemple Newname",
+    "4": "Cela mettra à jour votre numéro de téléphone de contact auprès des services suivants:",
+    "5": "GEO.ca",
+    "6": "Cela modifie uniquement votre",
+    "7": "numéro de téléphone de contact.",
+    "8": "Pour changer votre numéro de vérification en 2 étapes, allez dans vos",
+    "9": "paramètres de sécurité.",
+    "10": "Oui, mettre à jour",
+    "11": "Annuler"
+  },
+  "SuccessfullyUpdatedContactPhoneNumber": {
+    "1": "Votre numéro de téléphone de contact a été mis à jour pour",
+    "2": "Vous pourriez avoir besoin de mettre à jour votre numéro de téléphone ailleurs",
+    "3": "Cela ne modifie que votre numéro de téléphone de contact auprès des services liés à votre compte CléGC.",
+    "4": "Si vous essayez de mettre à jour votre numéro de téléphone de contact auprès d’un service qui n’est pas lié à votre compte CléGC, vous devrez vous connecter à ce compte.",
+    "5": "Pour rechercher un autre compte GC, visitez le",
+    "6": "répertoire des comptes GC.",
+    "7": "Retour au profil",
+    "8": "Fermer la session"
+  },
+  "SessionManagement": {
+    "1": "Votre session est sur le point de se terminer en raison d'une inactivité",
+    "2": "Si vous ne poursuivez pas votre session, vous serez automatiquement déconnecté",
+    "3": "Souhaitez-vous poursuivre votre session ?",
+    "4": "Rester connecté",
+    "5": "Se déconnecter",
+    "6": "Extension en cours...",
+    "7": "Déconnexion en cours...",
+    "8": "Votre session expirera à {{time}}.",
+    "9": "Chargement...",
+    "10": "Échec de la déconnexion. Redirection..."
   }
 }

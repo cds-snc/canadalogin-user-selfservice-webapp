@@ -22,13 +22,15 @@
     "install-playwright": "npx playwright install-deps && npx playwright install"
   },
   "dependencies": {
-    "@cdssnc/gcds-components": "^0.41.0",
-    "@cdssnc/gcds-components-react": "^0.41.0",
+    "@cdssnc/gcds-components": "^0.42.0",
+    "@cdssnc/gcds-components-react": "^0.42.0",
+    "@react-nano/use-event-source": "^0.16.0",
     "date-fns": "^4.1.0",
     "libphonenumber-js": "^1.12.9",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-ga4": "^2.1.0",
+    "react-modal": "^3.16.3",
     "react-phone-input-2": "^2.15.1",
     "react-router": "^7.5.1"
   },

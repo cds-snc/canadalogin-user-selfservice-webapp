@@ -1,4 +1,5 @@
 import logging
+
 from fastapi import Request
 from fastapi.responses import RedirectResponse
 from authlib.integrations.starlette_client import OAuthError
@@ -8,7 +9,6 @@ from app.config import get_configuration
 from app.constants.session_keys import SessionKeys
 from app.utils.request_error_handler import RequestErrorHandler
 from app.auth.services.auth_user_session import update_session_tokens
-
 
 logger = logging.getLogger(__name__)
 

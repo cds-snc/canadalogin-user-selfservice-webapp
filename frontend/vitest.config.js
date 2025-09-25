@@ -29,7 +29,7 @@ export default defineConfig({
   },
   test: {
     globals: true,
-    setupFiles: ["./src/setup-msw.js"],
+    setupFiles: ["./src/setup-msw.js", "./src/setupTests.js"],
     include: [
       "src/__tests__/**/*.test.{js,jsx,ts,tsx}",
       "src/__tests__/**/*.spec.{js,jsx,ts,tsx}",

@@ -7,82 +7,22 @@ import {
   GcdsLink,
   GcdsIcon,
 } from "@cdssnc/gcds-components-react";
-import parsePhoneNumberFromString from "libphonenumber-js";
 
-import {
-  getPageContent,
-  capitalizeFirstLetter,
-} from "../../utils/functions.jsx";
+import { getPageContent } from "../../utils/functions.jsx";
 import { PAGES, LANGUAGE_DISPLAY_NAMES } from "../../utils/constants.jsx";
 import { path } from "../../utils/routeHelpers.js";
 import { useUser } from "../Providers/useUser.tsx";
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
+import VerifiedBadge from "../Badges/VerifiedBadge.jsx";
+import ViewContactPhoneNumber from "../../features/ContactPhoneNumber/components/ViewContactPhoneNumber.jsx";
 
-const DisplayPhoneNumbers = ({ phoneNumbers }) => {
-  console.log("phoneNumbers", phoneNumbers);
-
+const DisplayEmailInfo = ({ email, pageContent }) => {
   return (
     <>
-      <GcdsGrid columns="1fr">
-        {phoneNumbers.map((phoneNumber, index) => {
-          let profilePhoneNumber = `+${phoneNumber.value}`;
-          let numberType = capitalizeFirstLetter(phoneNumber.type);
-          const isLast = index === phoneNumbers.length - 1;
-
-          try {
-            const parsedPhoneNumber =
-              parsePhoneNumberFromString(profilePhoneNumber);
-
-            if (parsedPhoneNumber) {
-              profilePhoneNumber = parsedPhoneNumber.formatInternational();
-            }
-          } catch (error) {
-            console.warn(`Failed to parse phone number: ${phoneNumber.value}`);
-            console.warn(`Failed to parse phone number: ${error}`);
-          }
-          return (
-            <GcdsText
-              key={index}
-              margin-bottom={isLast ? "400" : "0"}
-              placeContent="center"
-            >
-              {numberType}: {profilePhoneNumber}
-            </GcdsText>
-          );
-        })}
-      </GcdsGrid>
-    </>
-  );
-};
-
-const ContactPhoneNumber = (props) => {
-  const { pageContent, phoneNumbers } = props;
-  return (
-    <>
-      <GcdsHeading tag="h3" marginTop="300">
-        {pageContent["10"]}
-      </GcdsHeading>
-      <GcdsText>{pageContent["11"]}</GcdsText>
-
       <GcdsGrid columns="1fr auto" className="gridInline">
-        <DisplayPhoneNumbers phoneNumbers={phoneNumbers} />
-
-        <GcdsLink href="#" size="regular">
-          {pageContent["5"]}
-        </GcdsLink>
+        <GcdsText>{email}</GcdsText>
       </GcdsGrid>
-
-      <GcdsGrid
-        columns="auto auto"
-        className="verifiedBadge verifiedBadgeBottom"
-      >
-        <GcdsIcon
-          name="checkmark-circle"
-          className="verifiedIcon"
-          size="text"
-        />
-        <GcdsText className="verifiedText">{pageContent["9"]}</GcdsText>
-      </GcdsGrid>
+      <VerifiedBadge text={pageContent["9"]} />
     </>
   );
 };
@@ -135,32 +75,13 @@ export default function ProfileHome() {
         </GcdsHeading>
         <GcdsText>{pageContent["8"]}</GcdsText>
 
-        <GcdsGrid columns="1fr auto" className="gridInline">
-          <GcdsText>{email}</GcdsText>
-          <GcdsLink href="#" size="regular">
-            {pageContent["5"]}
-          </GcdsLink>
-        </GcdsGrid>
+        <DisplayEmailInfo email={email} pageContent={pageContent} />
 
-        <GcdsGrid columns="auto auto" className="verifiedBadge">
-          <GcdsIcon
-            name="checkmark-circle"
-            className="verifiedIcon"
-            size="text-small"
-          />
-          <GcdsText className="verifiedText" style={{ paddingTop: "0.25rem" }}>
-            {pageContent["9"]}
-          </GcdsText>
-        </GcdsGrid>
-        {phoneNumbers != null ? (
-          <>
-            <div className="separator" />
-            <ContactPhoneNumber
-              pageContent={pageContent}
-              phoneNumbers={phoneNumbers}
-            />
-          </>
-        ) : null}
+        <div className="separator" />
+        <ViewContactPhoneNumber
+          pageContent={pageContent}
+          phoneNumbers={phoneNumbers}
+        />
       </GcdsContainer>
 
       <GcdsHeading tag="h2">{pageContent["12"]}</GcdsHeading>

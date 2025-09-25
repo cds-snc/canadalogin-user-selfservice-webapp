@@ -9,6 +9,7 @@ from app.otp.schemas import OtpType, UserOtpVerificationInfo
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.helpers import generate_error_response, format_error_response
 from app.utils.schemas import ResponseModel
+from app.utils.request_error_handler import RequestErrorHandler
 
 logger = logging.getLogger(__name__)
 
@@ -93,20 +94,12 @@ async def verify_otp(
         response = await global_http_client.post(
             verification_endpoint_url, json=otp, headers=headers
         )
-
+        response.raise_for_status()
+        logger.info("verify_otp returned successfully")
         return response
 
-    except HTTPException as he:
-        logger.error(
-            f"HTTP Exception in {user_verification_data.otpType} verification: {str(he)}"
-        )
-        raise he
     except Exception as e:
         logger.error(
-            f"{user_verification_data.otpType} verification error: {str(e)}",
-            exc_info=True,
+            f"Error Exception in {user_verification_data.otpType} verification: {str(e)}"
         )
-        raise HTTPException(
-            status_code=400,
-            detail=f"{user_verification_data.otpType} verification error: {str(e)}",
-        )
+        RequestErrorHandler.handle(e)

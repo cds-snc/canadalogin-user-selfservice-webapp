@@ -1,7 +1,7 @@
 import axios from "axios";
 import config from "../../../config.jsx";
 import { SUBMIT_END_POINTS } from "../../../utils/constants.jsx";
-import { redirectToLogin } from "../../../utils/redirect.jsx";
+import { handleApiError } from "../../../utils/apiErrorHandler.js";
 
 axios.defaults.withCredentials = true;
 const passwordUpdateApi = `${config.apiUrl}${SUBMIT_END_POINTS.passwordUpdate}`;
@@ -17,12 +17,7 @@ export const passwordUpdate = {
       const response = await axios.post(`${passwordUpdateApi}/initiate`, data);
       return response.data;
     } catch (error) {
-      if (error.response && error.response.status === 401) {
-        redirectToLogin();
-      }
-      if (error.response) {
-        throw error.response;
-      }
+      handleApiError(error);
     }
   },
   secondStep: async (userOtp, trxId) => {
@@ -35,12 +30,7 @@ export const passwordUpdate = {
       const response = await axios.post(`${passwordUpdateApi}/validate`, data);
       return response.data;
     } catch (error) {
-      if (error.response && error.response.status === 401) {
-        redirectToLogin();
-      }
-      if (error.response) {
-        throw error.response;
-      }
+      handleApiError(error);
     }
   },
   finalStep: async (userOtp, trxId, password) => {
@@ -54,12 +44,7 @@ export const passwordUpdate = {
       const response = await axios.put(`${passwordUpdateApi}/complete`, data);
       return response.data;
     } catch (error) {
-      if (error.response && error.response.status === 401) {
-        redirectToLogin();
-      }
-      if (error.response) {
-        throw error.response;
-      }
+      handleApiError(error);
     }
   },
 };

@@ -22,7 +22,7 @@ router = APIRouter()
 
 
 @router.post(
-    "/transient_otp/send",
+    "/transient/send",
     response_model=OtpRequestResponse,
     status_code=status.HTTP_200_OK,
     tags=["OTP"],
@@ -40,7 +40,7 @@ async def send_otp(
 
 
 @router.post(
-    "/transient_otp/verify",
+    "/transient/verify",
     response_model=ResponseModel,
     status_code=status.HTTP_200_OK,
     tags=["OTP"],
@@ -58,7 +58,7 @@ async def verify_otp(
 
 
 @router.get(
-    "/transient_otp/status/{otpType}/{trxnId}",
+    "/transient/status/{otpType}/{trxnId}",
     response_model=ResponseModel,
     status_code=status.HTTP_200_OK,
     tags=["OTP"],

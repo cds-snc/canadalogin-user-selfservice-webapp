@@ -46,14 +46,13 @@ export default function ProfileUpdateNameConfirmUpdate() {
         return true;
       } else {
         // Todo: handle errors
+        console.error(response);
       }
     } catch (err) {
       // Todo: handle errors
-      console.log(err);
+      console.error(err);
     }
   };
-
-  console.log("state", state);
 
   return (
     <GcdsContainer>
