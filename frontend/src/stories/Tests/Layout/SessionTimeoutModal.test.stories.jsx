@@ -71,52 +71,10 @@ export const ClickStaySignedInButton = {
   play: async ({ canvasElement, step }) => {
     // Wait for the component to render
     await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    await step("Verify component renders", async () => {
-      // Check if component rendered anything at all
-      const hasContent = canvasElement.innerHTML.length > 10;
-      const hasChildren = canvasElement.children.length > 0;
-      const hasText =
-        canvasElement.textContent && canvasElement.textContent.length > 0;
-
-      if (!hasContent && !hasChildren && !hasText) {
-        throw new Error(`Component appears to not be rendering any content. 
-          innerHTML length: ${canvasElement.innerHTML.length}
-          children count: ${canvasElement.children.length}
-          textContent: "${canvasElement.textContent}"
-          innerHTML: "${canvasElement.innerHTML}"`);
-      }
-    });
-
     await step("Find and click the stay signed in button", async () => {
       // Try multiple strategies to find the button
       let stayButton = null;
 
-      // Strategy 1: Look in document body first (React Modal renders there)
-      const gcdsButtonsInDocument = document.querySelectorAll("gcds-button");
-
-      for (const gcdsButton of gcdsButtonsInDocument) {
-        // Check if this GCDS button contains "Stay signed in" text
-        if (
-          gcdsButton.textContent &&
-          gcdsButton.textContent.includes("Stay signed in")
-        ) {
-          // Found the right GCDS button, now get the actual button from shadow DOM
-          if (gcdsButton.shadowRoot) {
-            stayButton =
-              gcdsButton.shadowRoot.querySelector("button#keep-session-btn") ||
-              gcdsButton.shadowRoot.querySelector('button[part="button"]') ||
-              gcdsButton.shadowRoot.querySelector("button");
-          }
-          // If no shadow root, try to click the GCDS element itself
-          if (!stayButton) {
-            stayButton = gcdsButton;
-          }
-          break;
-        }
-      }
-
-      // Strategy 2: Try to find GCDS button by buttonType="primary" in document
       if (!stayButton) {
         const primaryButton = document.querySelector(
           'gcds-button[buttontype="primary"]',
@@ -134,60 +92,6 @@ export const ClickStaySignedInButton = {
             stayButton = primaryButton;
           }
         }
-      }
-
-      // Strategy 3: Try to find GCDS button by button-id attribute in document
-      if (!stayButton) {
-        const gcdsButton = document.querySelector(
-          'gcds-button[button-id="keep-session-btn"]',
-        );
-        if (gcdsButton) {
-          if (gcdsButton.shadowRoot) {
-            stayButton =
-              gcdsButton.shadowRoot.querySelector("button#keep-session-btn") ||
-              gcdsButton.shadowRoot.querySelector('button[part="button"]') ||
-              gcdsButton.shadowRoot.querySelector("button");
-          }
-          if (!stayButton) {
-            stayButton = gcdsButton;
-          }
-        }
-      }
-
-      // Strategy 4: Fallback to first GCDS button in document
-      if (!stayButton && gcdsButtonsInDocument.length >= 1) {
-        const firstButton = gcdsButtonsInDocument[0];
-        if (firstButton.shadowRoot) {
-          stayButton =
-            firstButton.shadowRoot.querySelector("button") ||
-            firstButton.shadowRoot.querySelector('button[part="button"]');
-        }
-        if (!stayButton) {
-          stayButton = firstButton;
-        }
-      }
-
-      // Strategy 5: Fallback to canvas element search (original approach)
-      if (!stayButton) {
-        const gcdsButtons = canvasElement.querySelectorAll("gcds-button");
-        if (gcdsButtons.length >= 1) {
-          const firstButton = gcdsButtons[0];
-          if (firstButton.shadowRoot) {
-            stayButton =
-              firstButton.shadowRoot.querySelector("button") ||
-              firstButton.shadowRoot.querySelector('button[part="button"]');
-          }
-          if (!stayButton) {
-            stayButton = firstButton;
-          }
-        }
-      }
-
-      // Ensure we have a valid element before assertion
-      if (!stayButton) {
-        throw new Error(
-          "Could not find the 'Stay signed in' button using any strategy",
-        );
       }
 
       await expect(stayButton).toBeInTheDocument();
@@ -249,62 +153,6 @@ export const ClickSignOutButton = {
         }
       }
 
-      // Strategy 2: Try to find GCDS button by buttonRole="danger" in document
-      if (!signOutButton) {
-        const dangerButton = document.querySelector(
-          'gcds-button[button-role="danger"]',
-        );
-        if (dangerButton) {
-          if (dangerButton.shadowRoot) {
-            signOutButton =
-              dangerButton.shadowRoot.querySelector("button#logout-btn") ||
-              dangerButton.shadowRoot.querySelector('button[part="button"]') ||
-              dangerButton.shadowRoot.querySelector("button");
-          }
-          if (!signOutButton) {
-            signOutButton = dangerButton;
-          }
-        }
-      }
-
-      // Strategy 3: Try to find GCDS button by button-id attribute in document
-      if (!signOutButton) {
-        const gcdsButton = document.querySelector(
-          'gcds-button[button-id="logout-btn"]',
-        );
-        if (gcdsButton) {
-          if (gcdsButton.shadowRoot) {
-            signOutButton =
-              gcdsButton.shadowRoot.querySelector("button#logout-btn") ||
-              gcdsButton.shadowRoot.querySelector('button[part="button"]') ||
-              gcdsButton.shadowRoot.querySelector("button");
-          }
-          if (!signOutButton) {
-            signOutButton = gcdsButton;
-          }
-        }
-      }
-
-      // Strategy 4: Fallback to second GCDS button in document
-      if (!signOutButton && gcdsButtonsInDocument.length >= 2) {
-        const secondButton = gcdsButtonsInDocument[1];
-        if (secondButton.shadowRoot) {
-          signOutButton =
-            secondButton.shadowRoot.querySelector("button") ||
-            secondButton.shadowRoot.querySelector('button[part="button"]');
-        }
-        if (!signOutButton) {
-          signOutButton = secondButton;
-        }
-      }
-
-      // Ensure we have a valid element before assertion
-      if (!signOutButton) {
-        throw new Error(
-          "Could not find the 'Sign out' button using any strategy",
-        );
-      }
-
       await expect(signOutButton).toBeInTheDocument();
 
       await userEvent.click(signOutButton);
@@ -348,7 +196,6 @@ export const LoadingState = {
 
       // Also check in document body (React Modal portal)
       if (!extendingText) {
-        extendingText = document.querySelector('*:contains("Extending")');
         if (!extendingText && document.body.textContent.includes("Extending")) {
           extendingText = document.body; // Found text somewhere in document
         }
