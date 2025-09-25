@@ -179,3 +179,86 @@ body,
   background: rgba(255, 255, 255, 0.8);
   z-index: 9999;
 }
+
+/* Session Timeout Modal Styles */
+.session-timeout-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.session-timeout-modal {
+  position: relative;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow: auto;
+  padding: 2rem;
+  outline: none;
+}
+
+.session-timeout-modal .modal-header h2 {
+  margin: 0 0 1rem 0;
+  color: #333;
+}
+
+.session-timeout-modal .session-timeout-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.session-timeout-modal .d-flex {
+  display: flex;
+}
+
+.session-timeout-modal .gap-3 {
+  gap: 1rem;
+}
+
+.session-timeout-modal .mt-3 {
+  margin-top: 1rem;
+}
+
+.session-timeout-modal .mt-4 {
+  margin-top: 1.5rem;
+}
+
+/* Session Timeout Modal Styles */
+.session-timeout-modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.session-timeout-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+}
+
+.warning-icon {
+  color: var(--gcds-color-red-flag);
+}

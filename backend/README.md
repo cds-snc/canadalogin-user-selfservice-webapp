@@ -8,7 +8,38 @@ This is the FastAPI application for the GC Sign in back-end API.
 
 - Docker installed on your machine (use Colima if on a CDS MacBook)
 - Python 3.12 (if running locally without Docker)
+- Redis server running locally (required for session management)
 - `.env` file with required environment variables
+
+#### Setting up Redis
+
+The application requires Redis for session management. Install and start Redis:
+
+```bash
+# Install Redis using Homebrew (macOS)
+brew install redis
+
+# Start Redis as a background service
+brew services start redis
+
+# Verify Redis is running
+redis-cli ping
+# Should return: PONG
+```
+
+For other operating systems:
+- **Ubuntu/Debian**: `sudo apt-get install redis-server`
+- **CentOS/RHEL**: `sudo yum install redis` or `sudo dnf install redis`
+- **Windows**: Use Redis for Windows or run via Docker
+
+#### Docker Networking for Redis
+
+Since the application runs in a Docker container and Redis runs on your host machine, we need to configure Docker networking to allow the container to access the host's Redis instance:
+
+- `--add-host host.docker.internal:host-gateway`: Creates a network route from the container to the host
+- `SESSION_REDIS_URL=redis://host.docker.internal:6379/0`: Overrides the default Redis URL to use the Docker host gateway
+
+This approach works across different Docker platforms (Docker Desktop, Colima, etc.) and is more reliable than using `--network host`.
 
 ### Environment Variables
 
@@ -43,7 +74,9 @@ docker build -t gc-signin-backend .
 
 ```bash
 docker run -p 8000:8000 \
+  --add-host host.docker.internal:host-gateway \
   --env-file ./.env \
+  -e SESSION_REDIS_URL=redis://host.docker.internal:6379/0 \
   gc-signin-backend
 ```
 
@@ -55,6 +88,19 @@ fastapi run backend/app/main.py or uvicorn app.main:app --reload --app-dir backe
 ```
 
 The API will be available at `http://localhost:8000`
+
+### Verification
+
+After starting the container, verify the application is working:
+
+```bash
+# Test the health endpoint
+curl http://localhost:8000/health/health
+
+# Should return: {"status":"healthy","timestamp":"...","service":"gc-signin-backend"}
+```
+
+If you see a Redis connection error, ensure Redis is running and the Docker networking is configured correctly (see Troubleshooting section).
 
 ### API Documentation
 
@@ -69,14 +115,56 @@ For development with hot-reload:
 
 ```bash
 docker run -p 8000:8000 \
+  --add-host host.docker.internal:host-gateway \
   --env-file .env \
+  -e SESSION_REDIS_URL=redis://host.docker.internal:6379/0 \
+  -v $(pwd):/app \
+  gc-signin-backend \
+  uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+**Note**: The `--add-host host.docker.internal:host-gateway` flag allows the Docker container to access Redis running on your host machine. The environment variable `SESSION_REDIS_URL` overrides the default localhost Redis URL to use `host.docker.internal`.
+
+**Background Mode**: To run the container in the background (detached mode), add the `-d` flag:
+```bash
+docker run -d -p 8000:8000 \
+  --add-host host.docker.internal:host-gateway \
+  --env-file .env \
+  -e SESSION_REDIS_URL=redis://host.docker.internal:6379/0 \
   -v $(pwd):/app \
   gc-signin-backend \
   uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 ### Troubleshooting
 
-1. If you encounter permission issues:
+1. **Redis Connection Error** (`ConnectionError: Error connecting to localhost:6379`):
+   
+   This error occurs because Docker containers can't access `localhost` on the host machine by default.
+   
+   **Solution - Use host gateway** (recommended):
+   ```bash
+   docker run -p 8000:8000 \
+     --add-host host.docker.internal:host-gateway \
+     --env-file .env \
+     -e SESSION_REDIS_URL=redis://host.docker.internal:6379/0 \
+     -v $(pwd):/app \
+     gc-signin-backend \
+     uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+   ```
+   
+   **Check Redis status**:
+   ```bash
+   # Verify Redis is running
+   redis-cli ping
+   
+   # If not running, start Redis
+   brew services start redis
+   
+   # Check Redis status
+   brew services list | grep redis
+   ```
+
+2. If you encounter permission issues:
    ```bash
    docker run -p 8000:8000 \
      --env-file ./.env \
@@ -84,12 +172,12 @@ docker run -p 8000:8000 \
      gc-signin-backend
    ```
 
-2. To view logs:
+3. To view logs:
    ```bash
    docker logs <container_id>
    ```
 
-3. To access the container shell:
+4. To access the container shell:
    ```bash
    docker exec -it <container_id> /bin/bash
    ```
@@ -105,9 +193,8 @@ Expected response:
 ```json
 {
   "status": "healthy",
-  "timestamp": "2024-XX-XX:XX:XX:XXZ",
-  "service": "gc-signin-backend",
-  "version": "1.0.0"
+  "timestamp": "2025-09-23 15:32:33",
+  "service": "gc-signin-backend"
 }
 ```
 

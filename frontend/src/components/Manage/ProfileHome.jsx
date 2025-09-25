@@ -16,6 +16,17 @@ import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
 import VerifiedBadge from "../Badges/VerifiedBadge.jsx";
 import ViewContactPhoneNumber from "../../features/ContactPhoneNumber/components/ViewContactPhoneNumber.jsx";
 
+const DisplayEmailInfo = ({ email, pageContent }) => {
+  return (
+    <>
+      <GcdsGrid columns="1fr auto" className="gridInline">
+        <GcdsText>{email}</GcdsText>
+      </GcdsGrid>
+      <VerifiedBadge text={pageContent["9"]} />
+    </>
+  );
+};
+
 export default function ProfileHome() {
   const { language } = useParams();
   const pageContent = getPageContent(language, PAGES.ProfileHome);
@@ -64,14 +75,7 @@ export default function ProfileHome() {
         </GcdsHeading>
         <GcdsText>{pageContent["8"]}</GcdsText>
 
-        <GcdsGrid columns="1fr auto" className="gridInline">
-          <GcdsText>{email}</GcdsText>
-          <GcdsLink href="#" size="regular">
-            {pageContent["5"]}
-          </GcdsLink>
-        </GcdsGrid>
-
-        <VerifiedBadge text={pageContent["9"]} />
+        <DisplayEmailInfo email={email} pageContent={pageContent} />
 
         <div className="separator" />
         <ViewContactPhoneNumber

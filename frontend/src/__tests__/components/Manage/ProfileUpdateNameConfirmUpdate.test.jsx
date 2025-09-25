@@ -26,6 +26,13 @@ vi.mock("../../../hooks/useNavigate.tsx", () => ({
   useNavigateHelper: () => mockNavigateHelper,
 }));
 
+const mockSessionTimeoutState = {
+  showModal: false,
+  isLoading: false,
+  expirationTime: null,
+  newServerSideExpirationTime: null,
+};
+
 // Mock the user hooks
 const mockUserState = {
   isLoading: false,
@@ -152,7 +159,10 @@ vi.mock("../../../services/authService.jsx", () => ({
 
 const TestWrapper = ({ children }) => (
   <BrowserRouter>
-    <UserProvider initial={mockUserState}>
+    <UserProvider
+      initial={mockUserState}
+      initialSessionTimeoutState={mockSessionTimeoutState}
+    >
       <LanguageProvider>{children}</LanguageProvider>
     </UserProvider>
   </BrowserRouter>

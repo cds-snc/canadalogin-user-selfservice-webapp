@@ -15,19 +15,46 @@ import { path } from "../../utils/routeHelpers.js";
 import { PAGES } from "../../utils/constants";
 import { useUser } from "../Providers/useUser";
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
+import { authService } from "../../services/authService.jsx";
+import { userProfileDispatch } from "../../utils/userProfileDispatch.jsx";
 
 export default function ProfileUpdateNameSuccess() {
   const { language } = useParams();
-  const { state } = useUser();
+  const { state, dispatch } = useUser();
   const pageContentJson = getPageContent(
     language,
     PAGES.profileUpdateNameSuccess,
   );
   const navigateHelper = useNavigateHelper();
   const backToProfile = path(PAGES.ProfileHome, { language: language });
+  const { setLoading } = userProfileDispatch(dispatch);
 
   const username = state?.userProfile?.name.formatted || "";
-  console.log("state", state);
+
+  const handleSignout = async (e) => {
+    e.preventDefault();
+    setLoading(true, pageContentJson["12"]);
+
+    try {
+      const response = await authService.logout();
+
+      // Check if response has redirect_url and redirect
+      if (response && response.data && response.data.redirect_url) {
+        window.location.href = response.data.redirect_url;
+      } else {
+        // Fallback redirect if no redirect_url provided
+        window.location.href = "/";
+      }
+    } catch (error) {
+      console.error("Logout failed:", error);
+      // Update loading text to show error
+      setLoading(true, pageContentJson["13"]);
+      // Redirect after error
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 2000);
+    }
+  };
   return (
     <GcdsContainer>
       <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle=" ">
@@ -64,10 +91,7 @@ export default function ProfileUpdateNameSuccess() {
         <GcdsButton
           buttonRole="secondary"
           style={{ width: "fit-content" }}
-          onGcdsClick={(ev) => {
-            ev.preventDefault();
-            navigateHelper(backToProfile);
-          }}
+          onGcdsClick={handleSignout}
         >
           {pageContentJson["7"]}
         </GcdsButton>

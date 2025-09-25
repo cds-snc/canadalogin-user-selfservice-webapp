@@ -198,7 +198,9 @@
     "8": "GC Account directory.",
     "9": "To view what services are connected to your GC Sign in, go to ",
     "10": "Connected Services ",
-    "11": "in your GC Sign in dashboard."
+    "11": "in your GC Sign in dashboard.",
+    "12": "Signing you out...",
+    "13": "Failed to sign you out. Redirecting..."
   },
   "AreYouSureUpdateContactNumber": {
     "1": "Are you sure you want to update your contact phone number?",
@@ -368,6 +370,15 @@
     "8": "Sign out"
   },
   "SessionManagement": {
-    "1": "Signing you out..."
+    "1": "Your session is about to end due to inactivity ",
+    "2": "If you do not continue your session you will be signed out automatically",
+    "3": "Do you wish to continue your session?",
+    "4": "Stay signed in",
+    "5": "Sign out",
+    "6": "Extending...",
+    "7": "Signing you out...",
+    "8": "Your session will expire at {{time}}.",
+    "9": "Loading...",
+    "10": "Failed to sign you out. Redirecting..."
   }
 }
