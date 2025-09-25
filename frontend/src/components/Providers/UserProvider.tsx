@@ -415,7 +415,7 @@ export function UserProvider({
       }, 2000);
       return () => clearTimeout(timer);
     }
-  }, [state.isLoading, state.loadingText]);
+  }, [userState.isLoading, userState.loadingText]);
 
   useEffect(() => {
     const getRelyingPartyInfo = async () => {
