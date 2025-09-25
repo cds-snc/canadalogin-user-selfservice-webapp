@@ -130,9 +130,6 @@ jobs:
     environment: ${{ matrix.environment }}
     steps:
       - run: echo "Deploying frontend to ${{ matrix.environment }} environment..."
-      # Set the SHA to use for the deployment.
-      # In `dev`, we always use the main sha (the SHA this workflow is running for).
-      # In all other environments, we need to resolve the tag in ./deployed_versions/{env}.json["version"]
 
       - name: Checkout repository
         uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
@@ -140,6 +137,9 @@ jobs:
       - name: Fetch tags
         run: git fetch --prune --unshallow --tags
 
+      # Set the SHA to use for the deployment.
+      # In `dev`, we always use the main sha (the SHA this workflow is running for).
+      # In all other environments, we need to resolve the tag in ./deployed_versions/{env}.json["version"]
       - name: Set deployment SHA
         run: |
           if [ "${{ matrix.environment }}" = "dev" ]; then
@@ -159,6 +159,13 @@ jobs:
           role-to-assume: arn:aws:iam::${{vars.AWS_ACCOUNT_ID}}:role/github_action_push_S3
           role-session-name: GHPushAppS3
           aws-region: ${{ env.AWS_REGION }}
+
+      - name: Ensure deployment build exists
+        run: |
+          if ! aws s3 ls s3://${{ secrets.FRONTEND_APP_BUILD_ARTIFACTS_S3_BUCKET }}/${DEPLOYMENT_SHA}/ ; then
+            echo "No build artifacts found for SHA ${DEPLOYMENT_SHA} in bucket ${{ secrets.FRONTEND_APP_BUILD_ARTIFACTS_S3_BUCKET }}. Exiting."
+            exit 1
+          fi
 
       - name: Deploy build to app bucket
         run: |
