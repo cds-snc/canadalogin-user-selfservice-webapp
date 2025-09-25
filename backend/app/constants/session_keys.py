@@ -6,3 +6,4 @@ class SessionKeys(str, Enum):
     RETURN_TO_PAGE = "returnToPage"
     CALLBACK_ROUTE_NAME = "callback_route"
     SESSION_USER_TOKEN = "token"
+    RP_CLIENT_ID_KEY = "rp_client_id"

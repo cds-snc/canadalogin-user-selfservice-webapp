@@ -9,6 +9,7 @@ import {
   SERVICES,
   CONTEXT_ACTIONS,
   SUBMIT_END_POINTS,
+  RP_CLIENT_ID_KEY,
 } from "../../utils/constants.jsx";
 import UserContext from "./UserContext";
 import { authService } from "../../services/authService.jsx";
@@ -407,18 +408,44 @@ export function UserProvider({
   );
 
   useEffect(() => {
+    const getRelyingPartyInfo = async () => {
+      try {
+        const response = await authService.get_rp_info();
+        if (response && response.data && response.data.id) {
+          userDispatch({
+            type: CONTEXT_ACTIONS.set_relying_party_data,
+            payload: response.data,
+          });
+        } else {
+          console.error("Error in getting relying party info:", response);
+        }
+      } catch (err) {
+        console.error("Error in getting relying party info:", err);
+      }
+    };
+
     // Simple authentication check - if we're not loading and don't have a profile,
     // we let PrivateRoute handle the OIDC redirect
-    const checkAuth = async () => {
+    const fetchProfileAndRelyingPartyInfo = async () => {
       try {
+        // This is the first request made after the OIDC redirect back to the app
         // Try to get user profile to see if user is authenticated
-        const response = await authService.get_my_user_profile();
+        // Relying party info (rp_client_id) is passed in the query param of the redirect URL
+        // but after the first request, subsequent requests do not have the rp_client_id
+        // as it's a session based authentication, the backend keeps track of the session
+        // and the relying party info associated with the session
+        // so we need to pass the rp_client_id to the backend to store in the session otherwise it will be lost
+        const rp_client_id = searchParams.get(RP_CLIENT_ID_KEY);
+
+        const response = await authService.get_my_user_profile(rp_client_id);
         if (response && response.data) {
           // User is authenticated, set the profile
           userDispatch({
             type: CONTEXT_ACTIONS.updated_profile_success,
             payload: response.data,
           });
+          // Now that we have the profile, we can get the relying party info if not already set
+          await getRelyingPartyInfo();
         }
       } catch (err) {
         console.log("User not authenticated:", err);
@@ -432,47 +459,12 @@ export function UserProvider({
       }
     };
 
-    checkAuth();
-
+    fetchProfileAndRelyingPartyInfo();
     return () => {
       // Cleanup on unmount
       clearTimers();
       if (eventSource) eventSource.close();
     };
-  }, []);
-
-  useEffect(() => {
-    const setRelyingPartyInfo = async () => {
-      const rpKey = "rp";
-      if (
-        typeof window === "undefined" ||
-        typeof sessionStorage === "undefined"
-      )
-        return;
-      let relyingPartyId = sessionStorage.getItem(rpKey);
-
-      const urlRelyingPartyId = searchParams.get(rpKey);
-      if (!urlRelyingPartyId && !relyingPartyId) return;
-      try {
-        if (urlRelyingPartyId) {
-          sessionStorage.setItem(rpKey, urlRelyingPartyId);
-          relyingPartyId = urlRelyingPartyId;
-        }
-
-        const response = await authService.get_rp_info(relyingPartyId);
-        if (response && response.data && response.data.id) {
-          userDispatch({
-            type: CONTEXT_ACTIONS.set_relying_party_data,
-            payload: response.data,
-          });
-        } else {
-          console.error("Error in getting relying party info:", response);
-        }
-      } catch (err) {
-        console.error("Error in getting relying party info:", err);
-      }
-    };
-    setRelyingPartyInfo();
   }, []);
 
   // Start timers when newServerSideExpirationTime is set/updated
