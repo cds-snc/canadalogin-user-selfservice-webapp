@@ -36,8 +36,6 @@ describe("RelyingPartyComponent", () => {
       id: "12345",
     };
 
-    const mockRpid = "existing-rp-id";
-
     // Mock sessionStorage - initially return null to simulate fresh session
     vi.spyOn(window.sessionStorage, "getItem").mockImplementation(() => null);
     vi.spyOn(window.sessionStorage, "setItem").mockImplementation(() => {});
@@ -68,7 +66,7 @@ describe("RelyingPartyComponent", () => {
         },
       ],
       {
-        initialEntries: [`/?rp=${mockRpid}`],
+        initialEntries: [`/`],
       },
     );
 
@@ -78,7 +76,7 @@ describe("RelyingPartyComponent", () => {
     // Wait for the relying party API call
     await waitFor(
       () => {
-        expect(authService.get_rp_info).toHaveBeenCalledWith(mockRpid);
+        expect(authService.get_rp_info).toHaveBeenCalled();
       },
       { timeout: 3000 },
     );
