@@ -31,8 +31,8 @@ export default {
 export const ComponentRenders = {
   name: "Component renders successfully",
   play: async ({ canvasElement, step }) => {
-    // Wait for the component to render
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    // Wait for the modal dialog to appear in the document
+    await within(document.body).findByRole('dialog');
 
     await step("Verify component exists", async () => {
       // Look for the modal in the document body (React Modal portal)
@@ -196,7 +196,7 @@ export const LoadingState = {
 
       // Also check in document body (React Modal portal)
       if (!extendingText) {
-        if (!extendingText && document.body.textContent.includes("Extending")) {
+        if (document.body.textContent.includes("Extending")) {
           extendingText = document.body; // Found text somewhere in document
         }
       }
