@@ -144,7 +144,7 @@ jobs:
           if [ "${{ matrix.environment }}" = "dev" ]; then
             echo "DEPLOYMENT_SHA=${GITHUB_SHA}" >> $GITHUB_ENV
           else
-            DEPLOYMENT_TAG=$(cat ./deployed_versions/${{ matrix.environment }}.json | jq -r '.version')
+            DEPLOYMENT_TAG=$(cat .deployed_versions/${{ matrix.environment }}.json | jq -r '.version')
             DEPLOYMENT_SHA=$(git rev-list -n 1 $DEPLOYMENT_TAG)
             echo "DEPLOYMENT_SHA=${DEPLOYMENT_SHA}" >> $GITHUB_ENV
           fi
