@@ -123,6 +123,9 @@ jobs:
   # We check the current SHA deployed to the environment to only deploy if necessary.
   deploy-frontends:
     needs: [release-please, build-frontend]
+    # Temporarily disabled while I'm finishing this workflow. I will enable this
+    # once the old deploy workflow is removed.
+    if: false
     runs-on: ubuntu-latest
     strategy:
       matrix:
