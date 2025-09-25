@@ -166,7 +166,7 @@ jobs:
         run: |
           aws s3 sync \
             s3://${{ secrets.FRONTEND_APP_BUILD_ARTIFACTS_S3_BUCKET }}/${DEPLOYMENT_SHA}/ \
-            s3://${{ secrets.FRONTEND_APP_S3_BUCKET }} --delete
+            s3://${{ secrets.FRONTEND_APP_S3_BUCKET }}/
 
       - name: Invalidate FRONTEND_APP_CLOUDFRONT_DISTRIBUTION cache
         run: |
