@@ -174,13 +174,28 @@ jobs:
             exit 1
           fi
 
+      - name: Check if deployment is needed
+        id: check-deploy
+        run: |
+          echo "Checking if S3 buckets differ..."
+          if aws s3 sync \
+            s3://${{ secrets.FRONTEND_APP_BUILD_ARTIFACTS_S3_BUCKET }}/$DEPLOYMENT_SHA/ \
+            s3://${{ secrets.FRONTEND_APP_S3_BUCKET }}/ \
+            --exact-timestamps --dryrun | grep -q 'copy:'; then
+            echo "needs_deploy=true" >> $GITHUB_OUTPUT
+          else
+            echo "needs_deploy=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Deploy build to app bucket
+        if: steps.check-deploy.outputs.needs_deploy == 'true'
         run: |
           aws s3 sync \
             s3://${{ secrets.FRONTEND_APP_BUILD_ARTIFACTS_S3_BUCKET }}/$DEPLOYMENT_SHA \
             s3://${{ secrets.FRONTEND_APP_S3_BUCKET }}
 
       - name: Invalidate FRONTEND_APP_CLOUDFRONT_DISTRIBUTION cache
+        if: steps.check-deploy.outputs.needs_deploy == 'true'
         run: |
           aws cloudfront create-invalidation --distribution-id ${{ secrets.FRONTEND_APP_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/index.html"
 
