@@ -12,6 +12,7 @@ frontend/package-lock.json
 bin
 lib
 pyvenv.cfg
+.coverage
 # ACT GITHUB LOCAL Test Runner Environment
 .actrc
 
