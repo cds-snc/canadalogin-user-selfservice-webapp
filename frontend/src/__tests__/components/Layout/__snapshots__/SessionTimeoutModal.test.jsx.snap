@@ -1,0 +1,141 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`SessionTimeoutModal > Snapshot Tests > matches snapshot in loading state 1`] = `
+<div>
+  <div
+    aria-label="Your session is about to end due to inactivity"
+    class="session-timeout-modal"
+    data-overlay-class="session-timeout-modal-overlay"
+    data-testid="modal"
+  >
+    <div
+      style="display: flex; flex-direction: column; align-items: center;"
+    >
+      <div
+        class="warning-icon"
+        data-icon-name="warning-triangle"
+        data-icon-size="h1"
+        data-testid="warning-icon"
+      />
+    </div>
+    <div
+      class="modal-header"
+    >
+      <h2>
+        Your session is about to end due to inactivity
+      </h2>
+    </div>
+    <div
+      class="session-timeout-content"
+    >
+      <div
+        data-size="body"
+      >
+        If you do not continue your session you will be signed out automatically
+      </div>
+      <div
+        class="mt-3"
+        data-size="body"
+      >
+        Your session will expire at 12:34:56.
+      </div>
+      <div
+        class="mt-3"
+        data-size="body"
+      >
+        Do you wish to continue your session?
+      </div>
+      <div
+        class="d-flex gap-3 mt-4"
+      >
+        <button
+          data-button-type="primary"
+          data-testid="keep-session-btn"
+          disabled=""
+          type="button"
+        >
+          Extending...
+        </button>
+        <button
+          data-button-role="danger"
+          data-testid="logout-btn"
+          disabled=""
+          type="button"
+        >
+          Sign out
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`SessionTimeoutModal > Snapshot Tests > matches snapshot when modal is closed 1`] = `<div />`;
+
+exports[`SessionTimeoutModal > Snapshot Tests > matches snapshot when modal is open 1`] = `
+<div>
+  <div
+    aria-label="Your session is about to end due to inactivity"
+    class="session-timeout-modal"
+    data-overlay-class="session-timeout-modal-overlay"
+    data-testid="modal"
+  >
+    <div
+      style="display: flex; flex-direction: column; align-items: center;"
+    >
+      <div
+        class="warning-icon"
+        data-icon-name="warning-triangle"
+        data-icon-size="h1"
+        data-testid="warning-icon"
+      />
+    </div>
+    <div
+      class="modal-header"
+    >
+      <h2>
+        Your session is about to end due to inactivity
+      </h2>
+    </div>
+    <div
+      class="session-timeout-content"
+    >
+      <div
+        data-size="body"
+      >
+        If you do not continue your session you will be signed out automatically
+      </div>
+      <div
+        class="mt-3"
+        data-size="body"
+      >
+        Your session will expire at 12:34:56.
+      </div>
+      <div
+        class="mt-3"
+        data-size="body"
+      >
+        Do you wish to continue your session?
+      </div>
+      <div
+        class="d-flex gap-3 mt-4"
+      >
+        <button
+          data-button-type="primary"
+          data-testid="keep-session-btn"
+          type="button"
+        >
+          Stay signed in
+        </button>
+        <button
+          data-button-role="danger"
+          data-testid="logout-btn"
+          type="button"
+        >
+          Sign out
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+`;
