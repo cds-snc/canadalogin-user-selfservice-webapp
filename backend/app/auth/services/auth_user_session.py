@@ -60,12 +60,22 @@ async def introspect_user_token(
         RequestErrorHandler.handle(e, context="introspect_user_token")
 
 
+def set_rp_client_id_in_session(request: Request) -> None:
+    if SessionKeys.RP_CLIENT_ID_KEY.value in request.query_params:
+        rp_client_id = request.query_params[SessionKeys.RP_CLIENT_ID_KEY.value]
+        request.session[SessionKeys.RP_CLIENT_ID_KEY.value] = rp_client_id
+        logger.info(f"RP ClientID has been set: {rp_client_id}")
+
+
 async def get_users_current_session(request: Request):
     """
     Session cookie contains an identifier for the user session.
     The user access token is stored in memory on the server
     Authlib docs - https://docs.authlib.org/en/latest/client/fastapi.html
     """
+
+    set_rp_client_id_in_session(request)
+
     user_access_token = request.session.get(
         SessionKeys.SESSION_USER_ACCESS_TOKEN_KEY.value
     )
