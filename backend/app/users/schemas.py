@@ -134,6 +134,7 @@ class RelyingPartyInfo(BaseModel):
     linkName: str
     url: str
 
+
 # https://docs.verify.ibm.com/verify/reference/searchuserapplication
 
 
