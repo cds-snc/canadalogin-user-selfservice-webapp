@@ -1,7 +1,6 @@
 import logging
 from typing import Optional
 from fastapi import HTTPException, Request
-from httpx import Response
 
 from app.users.schemas import (
     IBMVerifyRelyingPartyUserApplicationsSchema,
