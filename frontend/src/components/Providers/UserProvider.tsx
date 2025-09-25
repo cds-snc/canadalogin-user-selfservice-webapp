@@ -408,16 +408,6 @@ export function UserProvider({
   );
 
   useEffect(() => {
-    if (userState.isLoading && userState.loadingText) {
-      // After state is set to terminating, wait 2 seconds then redirect
-      const timer = setTimeout(() => {
-        window.location.href = "/";
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [userState.isLoading, userState.loadingText]);
-
-  useEffect(() => {
     const getRelyingPartyInfo = async () => {
       try {
         const response = await authService.get_rp_info();
@@ -470,6 +460,11 @@ export function UserProvider({
     };
 
     fetchProfileAndRelyingPartyInfo();
+    return () => {
+      // Cleanup on unmount
+      clearTimers();
+      if (eventSource) eventSource.close();
+    };
   }, []);
 
   // Start timers when newServerSideExpirationTime is set/updated
