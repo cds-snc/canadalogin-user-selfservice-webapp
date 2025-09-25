@@ -162,10 +162,6 @@ jobs:
           role-session-name: GHPushAppS3
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: List artifacts in build bucket
-        run: |
-          aws s3 ls s3://${{ secrets.FRONTEND_APP_BUILD_ARTIFACTS_S3_BUCKET }}/$DEPLOYMENT_SHA --recursive
-
       - name: Deploy build to app bucket
         run: |
           aws s3 sync \
