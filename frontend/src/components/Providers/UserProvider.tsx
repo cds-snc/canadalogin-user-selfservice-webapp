@@ -279,8 +279,6 @@ export function UserProvider({
     fetchProfileAndRelyingPartyInfo();
   }, []);
 
-  useEffect(() => {}, []);
-
   if (state.isLoading && state.loadingText) {
     return <Loader text={state.loadingText} />;
   }

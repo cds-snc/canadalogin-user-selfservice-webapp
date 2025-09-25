@@ -80,5 +80,5 @@ async def get_relying_party_info(request: Request):
         )
 
     except Exception as e:
-        logger.error(f"Error dispatching update_user_profile: {str(e)}", exc_info=True)
+        logger.error(f"Error get_relying_party_info: {str(e)}", exc_info=True)
         RequestErrorHandler.handle(e)
