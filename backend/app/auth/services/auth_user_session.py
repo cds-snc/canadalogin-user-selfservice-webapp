@@ -17,6 +17,7 @@ from app.utils.request_error_handler import RequestErrorHandler
 from app.auth.services.oidc_config import oauth
 from app.auth.schemas import SSEventData, KeepAliveData
 from app.utils.schemas import ResponseModel
+from app.utils.redis import get_redis_client
 
 
 logger = logging.getLogger(__name__)
@@ -153,13 +154,12 @@ def update_session_tokens(request: Request, new_tokens: dict):
 async def get_session_data_by_id(request: Request, session_id: str):
     # Try to get Redis client from the application state
     session_data = None
-    redis_client = getattr(request.app.state, "redis_client", None)
+    redis_client = get_redis_client(request)
     logger.debug(f"get session by sid: {session_id}")
-    if redis_client is not None:
-        # read the session from Redis for the given session_id
-        cache_key = f"session:{session_id}"
-        session = await redis_client.get(cache_key)
-        session_data = session if session else None
+    # read the session from Redis for the given session_id
+    cache_key = f"session:{session_id}"
+    session = await redis_client.get(cache_key)
+    session_data = session if session else None
     if session_data is None:
         logger.debug(f"No session found for session_id: {session_id}")
         return None
@@ -328,11 +328,9 @@ async def is_backchannel_logout(request: Request, sid: str) -> bool:
         return False
 
     # Try to get Redis client from the application state
-    redis_client = getattr(request.app.state, "redis_client", None)
+    redis_client = get_redis_client(request)
 
-    if redis_client is not None:
-        # Use Redis to check if token was processed
-        cache_key = f"processed_logout_token:{sid}"
-        result = await redis_client.get(cache_key)
-        return result is not None and result.decode("utf-8") == "backchannel_logout"
-    return False
+    # Use Redis to check if token was processed
+    cache_key = f"logout_session:{sid}"
+    result = await redis_client.get(cache_key)
+    return result is not None and result.decode("utf-8") == "backchannel_logout"

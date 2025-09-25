@@ -9,7 +9,7 @@ from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from authlib.integrations.starlette_client import OAuthError
-from starsessions import SessionMiddleware, SessionAutoloadMiddleware, InMemoryStore
+from starsessions import SessionMiddleware, SessionAutoloadMiddleware
 from redis.asyncio import Redis
 from starsessions.stores.redis import RedisStore
 
@@ -55,9 +55,9 @@ redis_url = configuration.session_config.SESSION_REDIS_URL
 if configuration.ENVIRONMENT != "local":
     # Construct the Redis URL with TLS and authentication for non-local environments
     redis_url = f"rediss://:{configuration.session_config.REDIS_AUTH_SECRET}@{configuration.session_config.REDIS_DOMAIN}:{configuration.session_config.REDIS_PORT}?ssl_cert_reqs=none"
-    logger.info(f"Connecting to Redis at {configuration.session_config.REDIS_DOMAIN}")
+    logger.info(f"Redis instance {configuration.session_config.REDIS_DOMAIN}")
 else:
-    logger.info("Connecting to local Redis instance")
+    logger.info(f"Redis instance {redis_url}")
 redis_client = Redis.from_url(redis_url)
 
 
@@ -81,7 +81,6 @@ async def lifespan(app: FastAPI):
         if pong:
             logger.info("Connected to Redis server successfully")
             app.state.redis_client = redis_client
-            logger.info("Using RedisStore for session management")
 
     oidc_config.register_oidc(app.state.config)
     logger.info(f"CORS Origins: {app.state.config.cors_origins_list}")
@@ -109,15 +108,12 @@ if configuration.ENVIRONMENT != "local":
     session_domain = f".{configuration.ROOT_DOMAIN}"
 logger.info(f"ROOT_DOMAIN: {session_domain}")
 
-# Determine session store
-session_store = InMemoryStore()
-if redis_client is not None:
-    session_store = RedisStore(
-        connection=redis_client,
-        prefix="session:",
-        gc_ttl=configuration.session_config.SESSION_LIFETIME,
-    )
-    logger.info("Using RedisStore for session management")
+session_store = RedisStore(
+    connection=redis_client,
+    prefix="session:",
+    gc_ttl=configuration.session_config.SESSION_LIFETIME,
+)
+logger.info("Using RedisStore for session management")
 
 # Determine if cookie should be secure
 cookie_secure = False if configuration.ENVIRONMENT == "local" else True
