@@ -136,6 +136,9 @@ jobs:
       # In `dev`, we always use the main sha (the SHA this workflow is running for).
       # In all other environments, we need to resolve the tag in ./deployed_versions/{env}.json["version"]
 
+      - name: Checkout repository
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+
       - name: Set deployment SHA
         run: |
           if [ "${{ matrix.environment }}" = "dev" ]; then
