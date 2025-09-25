@@ -1,69 +1,84 @@
 import logging
-from fastapi import HTTPException
-from httpx import AsyncClient
-from pydantic import ValidationError
+from typing import Optional
+from fastapi import HTTPException, Request
 
-from app.users.schemas import RelyingPartyResponse, RelyingPartyInfo
+from app.users.schemas import (
+    IBMVerifyRelyingPartyUserApplicationsSchema,
+    RelyingPartyResponse,
+    RelyingPartyInfo,
+)
 from app.utils.access_token import get_admin_token, get_auth_request_headers
+from app.utils.request_error_handler import RequestErrorHandler
+from app.constants.session_keys import SessionKeys
 
 logger = logging.getLogger(__name__)
 
 
-async def get_relying_party_info(
-    global_http_client: AsyncClient,
-    relying_party_id,
-    rp_user_applications_api_endpoint: str,
-):
+def get_rp_info_from_applications(
+    oidc_user_applications_response: IBMVerifyRelyingPartyUserApplicationsSchema,
+    client_id: str,
+) -> Optional[RelyingPartyInfo]:
+    applications_list = oidc_user_applications_response.applications
+    for app in applications_list:
+        if app.description == client_id:
+            if hasattr(app, "links") and app.links and len(app.links) > 0:
+                return RelyingPartyInfo(**app.links[0].model_dump())
+    return None
+
+
+async def dispatch_get_oidc_user_applications(
+    request: Request,
+) -> IBMVerifyRelyingPartyUserApplicationsSchema:
+    try:
+        logger.info("dispatch_get_oidc_user_applications")
+        access_token = await get_admin_token(request.app.state.request_client)
+        headers = get_auth_request_headers(access_token, True)
+        response = await request.app.state.request_client.get(
+            request.app.state.config.rp_user_applications_api_endpoint, headers=headers
+        )
+
+        response.raise_for_status()
+        logger.info("rp info returned successfully")
+        response_data = response.json()
+        return IBMVerifyRelyingPartyUserApplicationsSchema(**response_data)
+
+    except Exception as e:
+        logger.error(
+            f"Error dispatching dispatch_get_oidc_user_applications: {str(e)}",
+            exc_info=True,
+        )
+        RequestErrorHandler.handle(e)
+
+
+async def get_relying_party_info(request: Request):
     try:
         logger.info("Get RP info")
-        access_token = await get_admin_token(global_http_client)
-        headers = get_auth_request_headers(access_token, True)
-        response = await global_http_client.get(
-            rp_user_applications_api_endpoint, headers=headers
+        relying_party_client_id = request.session.get(
+            SessionKeys.RP_CLIENT_ID_KEY.value
         )
-    except ValidationError as e:
-        logger.error(f"Validation Error: {e.json()}")
-        raise HTTPException(status_code=422, detail="Request data validation error")
+        if not relying_party_client_id:
+            logger.info("Relying party client ID not found in session")
+            raise HTTPException(status_code=400, detail="RP Client ID not found")
+        ibm_verify_oidc_applications_response = (
+            await dispatch_get_oidc_user_applications(request)
+        )
 
-    if response.status_code == 200:
-        logger.info("User profile retrieved successfully.")
-        response_data = response.json()
-        match = next(
-            (
-                link
-                for app in response_data.get("applications", [])
-                for link in app.get("links", [])
-                if link.get("id") == relying_party_id
-            ),
-            None,
+        logger.info("List of RP applications retrieved successfully.")
+        rp_info = get_rp_info_from_applications(
+            ibm_verify_oidc_applications_response, relying_party_client_id
         )
-        if not match:
-            logger.error(f"Relying party with ID {relying_party_id} not found")
+
+        if not rp_info:
+            logger.error(f"Relying party with ID {relying_party_client_id} not found")
             raise HTTPException(status_code=404, detail="Relying party info not found")
-        try:
-            response_data = RelyingPartyInfo(**match)
-            logger.info(f"Relying party profile: {response_data}")
-            return RelyingPartyResponse(
-                success=True,
-                message="User profile retrieved successfully.",
-                data=response_data,
-            )
-        except ValidationError as e:
-            logger.error(f"Validation Error: {e.json()}")
-            raise HTTPException(
-                status_code=422, detail="Response data validation error"
-            )
 
-    else:
-        logger.error(f"Failed to retrieve profile. Response: {response.text}")
-        if response.status_code == 401:
-            raise HTTPException(status_code=401, detail="Not authenticated")
-        else:
-            try:
-                error_details = response.json()
-            except ValueError:
-                error_details = {"detail": response.text or "Empty response"}
-            raise HTTPException(
-                status_code=400,
-                detail=f"Failed to fetch RP info: {error_details.get('detail', 'Unknown')}",
-            )
+        logger.info(f"Relying party profile: {rp_info}")
+        return RelyingPartyResponse(
+            success=True,
+            message="RP Info retrieved successfully.",
+            data=rp_info,
+        )
+
+    except Exception as e:
+        logger.error(f"Error get_relying_party_info: {str(e)}", exc_info=True)
+        RequestErrorHandler.handle(e)

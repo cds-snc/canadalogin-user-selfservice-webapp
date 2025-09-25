@@ -3,7 +3,7 @@ import config from "../config";
 import {
   FLOW_TYPES,
   SUBMIT_END_POINTS,
-  OIDC_REDIRECT,
+  RP_CLIENT_ID_KEY,
 } from "../utils/constants.jsx";
 import { handleApiError } from "../utils/apiErrorHandler.js";
 
@@ -103,11 +103,14 @@ export const authService = {
     return response.data;
   },
 
-  get_my_user_profile: async () => {
+  get_my_user_profile: async (rp_client_id) => {
+    let profileUrl = `${config.apiUrl}${SUBMIT_END_POINTS.profile}`;
+    if (rp_client_id) {
+      profileUrl += `?${RP_CLIENT_ID_KEY}=${encodeURIComponent(rp_client_id)}`;
+    }
+
     try {
-      const response = await axios.get(
-        `${config.apiUrl}${SUBMIT_END_POINTS.profile}`,
-      );
+      const response = await axios.get(profileUrl);
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -124,10 +127,10 @@ export const authService = {
       handleApiError(error);
     }
   },
-  get_rp_info: async (rp) => {
+  get_rp_info: async () => {
     try {
       const response = await axios.get(
-        `${config.apiUrl}${SUBMIT_END_POINTS.rp_info}/${rp}`,
+        `${config.apiUrl}${SUBMIT_END_POINTS.rp_info}`,
       );
       return response.data;
     } catch (error) {
