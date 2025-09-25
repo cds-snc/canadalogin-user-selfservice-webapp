@@ -122,13 +122,11 @@ jobs:
   # Deploys frontend application to necessary environments.
   # We check the current SHA deployed to the environment to only deploy if necessary.
   deploy-frontends:
-    # needs: [release-please, build-frontend]
+    needs: [release-please, build-frontend]
     runs-on: ubuntu-latest
     strategy:
       matrix:
         environment: [dev, test]
-        exclude:
-          - environment: test
     environment: ${{ matrix.environment }}
     steps:
       - run: echo "Deploying frontend to ${{ matrix.environment }} environment..."
@@ -176,50 +174,13 @@ jobs:
             exit 1
           fi
 
-      - name: Set actively deployed SHA (merge tags)
-        run: |
-          BUCKET=${{ secrets.FRONTEND_APP_S3_BUCKET }}
-
-          # Fetch current tags (write to file or fallback to empty)
-          if ! aws s3api get-bucket-tagging --bucket "$BUCKET" > tags.json 2>/dev/null; then
-            echo '{"TagSet":[]}' > tags.json
-          fi
-
-          # Merge or update DeploymentSHA
-          jq --arg sha "$DEPLOYMENT_SHA" '
-            .TagSet |=
-              (map(select(.Key != "DeploymentSHA")) + [{"Key":"DeploymentSHA","Value":$sha}])
-          ' tags.json > new-tags.json
-
-          # Apply the merged tags
-          aws s3api put-bucket-tagging --bucket "$BUCKET" --tagging file://new-tags.json
-
       - name: Deploy build to app bucket
-        if: steps.check-deploy.outputs.needs_deploy == 'true'
         run: |
           aws s3 sync \
             s3://${{ secrets.FRONTEND_APP_BUILD_ARTIFACTS_S3_BUCKET }}/$DEPLOYMENT_SHA \
             s3://${{ secrets.FRONTEND_APP_S3_BUCKET }}
 
-      - name: Set actively deployed SHA (merge tags)
-        if: steps.check-deploy.outputs.needs_deploy == 'true'
-        run: |
-          BUCKET=${{ secrets.FRONTEND_APP_S3_BUCKET }}
-          # Fetch current tags into a temp file
-          aws s3api get-bucket-tagging --bucket "$BUCKET" 2>/dev/null \
-            || echo '{"TagSet":[]}' > tags.json
-
-          # Merge or update DeploymentSHA
-          jq --arg sha "$DEPLOYMENT_SHA" '
-            .TagSet |=
-              (map(select(.Key != "DeploymentSHA")) + [{"Key":"DeploymentSHA","Value":$sha}])
-          ' tags.json > new-tags.json
-
-          # Apply the merged tags
-          aws s3api put-bucket-tagging --bucket "$BUCKET" --tagging file://new-tags.json
-
       - name: Invalidate FRONTEND_APP_CLOUDFRONT_DISTRIBUTION cache
-        if: steps.check-deploy.outputs.needs_deploy == 'true'
         run: |
           aws cloudfront create-invalidation --distribution-id ${{ secrets.FRONTEND_APP_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/index.html"
 
