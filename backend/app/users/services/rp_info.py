@@ -21,7 +21,8 @@ def get_rp_info_from_applications(
     applications_list = oidc_user_applications_response.applications
     for app in applications_list:
         if app.description == client_id:
-            return RelyingPartyInfo(**app.links[0].model_dump())
+            if hasattr(app, "links") and app.links and len(app.links) > 0:
+                return RelyingPartyInfo(**app.links[0].model_dump())
     return None
 
 
