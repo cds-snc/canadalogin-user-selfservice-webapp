@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
@@ -133,6 +133,21 @@ class RelyingPartyInfo(BaseModel):
     id: str
     linkName: str
     url: str
+
+# https://docs.verify.ibm.com/verify/reference/searchuserapplication
+
+
+class IBMVerifyRelyingPartyInfoSchema(BaseModel):
+    name: str
+    links: List[RelyingPartyInfo]
+    description: Optional[str]
+    status: List[str]
+    category: List[Any]
+    id: str
+
+
+class IBMVerifyRelyingPartyUserApplicationsSchema(BaseModel):
+    applications: List[IBMVerifyRelyingPartyInfoSchema]
 
 
 class RelyingPartyResponse(ResponseModel):

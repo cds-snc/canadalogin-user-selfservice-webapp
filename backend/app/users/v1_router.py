@@ -65,9 +65,7 @@ async def rp_info(
     request: Request,
     user_access_token: None = Depends(get_users_current_session),
 ):
-    return await get_relying_party_info(
-        request
-    )
+    return await get_relying_party_info(request)
 
 
 @router.get(
