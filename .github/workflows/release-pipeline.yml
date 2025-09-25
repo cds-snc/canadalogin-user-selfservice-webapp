@@ -162,11 +162,15 @@ jobs:
           role-session-name: GHPushAppS3
           aws-region: ${{ env.AWS_REGION }}
 
+      - name: List artifacts in build bucket
+        run: |
+          aws s3 ls s3://${{ secrets.FRONTEND_APP_BUILD_ARTIFACTS_S3_BUCKET }}/${DEPLOYMENT_SHA} --recursive
+
       - name: Deploy build to app bucket
         run: |
           aws s3 sync \
-            s3://${{ secrets.FRONTEND_APP_BUILD_ARTIFACTS_S3_BUCKET }}/${DEPLOYMENT_SHA}/ \
-            s3://${{ secrets.FRONTEND_APP_S3_BUCKET }}/
+            s3://${{ secrets.FRONTEND_APP_BUILD_ARTIFACTS_S3_BUCKET }}/${DEPLOYMENT_SHA} \
+            s3://${{ secrets.FRONTEND_APP_S3_BUCKET }}
 
       - name: Invalidate FRONTEND_APP_CLOUDFRONT_DISTRIBUTION cache
         run: |
