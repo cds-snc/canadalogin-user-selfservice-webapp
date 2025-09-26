@@ -123,6 +123,9 @@ jobs:
   # We check the current SHA deployed to the environment to only deploy if necessary.
   deploy-frontends:
     needs: [release-please, build-frontend]
+    # Temporarily disabled while I'm finishing this workflow. I will enable this
+    # once the old deploy workflow is removed.
+    if: false
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -130,6 +133,59 @@ jobs:
     environment: ${{ matrix.environment }}
     steps:
       - run: echo "Deploying frontend to ${{ matrix.environment }} environment..."
+
+      - name: Checkout repository
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+
+      - name: Fetch tags
+        run: git fetch --prune --unshallow --tags
+
+      # Set the SHA to use for the deployment.
+      # In `dev`, we always use the main sha (the SHA this workflow is running for).
+      # In all other environments, we need to resolve the tag in ./deployed_versions/{env}.json["version"]
+      - name: Set deployment SHA
+        run: |
+          if [ "${{ matrix.environment }}" = "dev" ]; then
+            echo "DEPLOYMENT_SHA=${GITHUB_SHA}" >> $GITHUB_ENV
+          else
+            DEPLOYMENT_TAG=$(cat .deployed_versions/${{ matrix.environment }}.json | jq -r '.version')
+            DEPLOYMENT_SHA=$(git rev-list -n 1 $DEPLOYMENT_TAG)
+            echo "DEPLOYMENT_SHA=${DEPLOYMENT_SHA}" >> $GITHUB_ENV
+          fi
+
+      - name: Output deployment SHA
+        run: echo "Deployment SHA is ${DEPLOYMENT_SHA}"
+
+      - name: Ensure deployment SHA is set
+        run: |
+          if [ -z "${DEPLOYMENT_SHA}" ]; then
+            echo "DEPLOYMENT_SHA is not set. Exiting."
+            exit 1
+          fi
+
+      - name: configure aws credentials using OIDC role
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+        with:
+          role-to-assume: arn:aws:iam::${{vars.AWS_ACCOUNT_ID}}:role/github_action_push_S3
+          role-session-name: GHPushAppS3
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Ensure deployment build exists
+        run: |
+          if ! aws s3 ls s3://${{ secrets.FRONTEND_APP_BUILD_ARTIFACTS_S3_BUCKET }}/${DEPLOYMENT_SHA}/ ; then
+            echo "No build artifacts found for SHA ${DEPLOYMENT_SHA} in bucket ${{ secrets.FRONTEND_APP_BUILD_ARTIFACTS_S3_BUCKET }}. Exiting."
+            exit 1
+          fi
+
+      - name: Deploy build to app bucket
+        run: |
+          aws s3 sync \
+            s3://${{ secrets.FRONTEND_APP_BUILD_ARTIFACTS_S3_BUCKET }}/$DEPLOYMENT_SHA \
+            s3://${{ secrets.FRONTEND_APP_S3_BUCKET }}
+
+      - name: Invalidate FRONTEND_APP_CLOUDFRONT_DISTRIBUTION cache
+        run: |
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.FRONTEND_APP_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/index.html"
 
   # Deploys backend application to necessary environments.
   # We check the current SHA deployed to the environment to only deploy if necessary.
