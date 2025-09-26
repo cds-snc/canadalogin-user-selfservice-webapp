@@ -84,7 +84,7 @@ async def lifespan(app: FastAPI):
             app.state.redis_client = redis_client
 
     oidc_config.register_oidc(app.state.config)
-    logger.info(f"CORS Origins list: {app.state.config.cors_origins_list}")
+    logger.info(f"CORS Origins: {app.state.config.cors_origins_list}")
     logger.info(f"oidc_well_known_config: {app.state.config.oidc_well_known_config}")
     logger.info(f"my_profile_endpoint: {app.state.config.profile_api_endpoint}")
     yield
@@ -104,7 +104,6 @@ app = FastAPI(
 )
 
 # Determine session domain
-# ROOT_DOMAIN is .<ROOT_DOMAIN> example: .signin-connexion.cdssandbox.xyz
 session_domain = None
 if configuration.ENVIRONMENT != "local":
     session_domain = f".{configuration.ROOT_DOMAIN}"
