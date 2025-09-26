@@ -280,3 +280,12 @@ jobs:
           task-definition: task-definition.json
           container-name: ${{ vars.ECS_SERVICE }}
           image: ${{ vars.ARTIFACT_ECR_REPOSITORY }}:${{ env.DEPLOYMENT_SHA }}
+
+      - name: Deploy updated ECS task
+        uses: aws-actions/amazon-ecs-deploy-task-definition@1beffbdddb3eb5f83c7a746c3e9bafeccdccbbaa # v2.4.0
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ vars.ECS_SERVICE }}
+          cluster: ${{ vars.ECS_CLUSTER }}
+          wait-for-service-stability: true
+          propagate-tags: SERVICE
