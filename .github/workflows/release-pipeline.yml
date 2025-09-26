@@ -285,6 +285,7 @@ jobs:
           image: ${{ vars.ARTIFACT_ECR_REPOSITORY }}:${{ env.DEPLOYMENT_SHA }}
 
       - name: Deploy updated ECS task
+        if: steps.check-deployment-needed.outputs.deployment_needed == 'true'
         uses: aws-actions/amazon-ecs-deploy-task-definition@1beffbdddb3eb5f83c7a746c3e9bafeccdccbbaa # v2.4.0
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
