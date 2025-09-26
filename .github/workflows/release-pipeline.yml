@@ -192,6 +192,8 @@ jobs:
     strategy:
       matrix:
         environment: [dev, test]
+        exclude:
+          - environment: test
     environment: ${{ matrix.environment }}
     steps:
       - run: echo "Deploying backend to ${{ matrix.environment }} environment..."
