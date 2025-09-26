@@ -14,9 +14,6 @@ env:
   AWS_REGION: ca-central-1
   GITHUB_SHA: ${{ github.sha }}
   SBOM_TAG_NAME: gc-signin-dev-backend-api
-  ECS_SERVICE: gc-signin-dev_ecs_cluster_service
-  ECS_CLUSTER: gc-signin-dev_ecs_cluster
-  DEV_ECR_REPOSITORY: ${{ vars.DEV_AWS_ACCOUNT_ID }}.dkr.ecr.ca-central-1.amazonaws.com/gc-signin-backend-api-deploy-artifacts
 
 name: release-pipeline
 
@@ -102,19 +99,19 @@ jobs:
         working-directory: ./backend/
         run: |
           docker build \
-          --tag $DEV_ECR_REPOSITORY:$GITHUB_SHA .
+          --tag ${{ vars.ARTIFACT_ECR_REPOSITORY }}:$GITHUB_SHA .
 
       - name: Push Container to Amazon ECR
         working-directory: ./backend/
         run: |
-          docker push $DEV_ECR_REPOSITORY:$GITHUB_SHA
+          docker push ${{ vars.ARTIFACT_ECR_REPOSITORY }}:$GITHUB_SHA
 
       - name: Docker generate SBOM
         uses: cds-snc/security-tools/.github/actions/generate-sbom@34794baf2af592913bb5b51d8df4f8d0acc49b6f # v3.2.0
         env:
           TRIVY_DB_REPOSITORY: ${{ vars.TRIVY_DB_REPOSITORY }}
         with:
-          docker_image: "${{ env.DEV_ECR_REPOSITORY }}:${{ env.GITHUB_SHA }}"
+          docker_image: "${{ vars.ARTIFACT_ECR_REPOSITORY }}:${{ env.GITHUB_SHA }}"
           dockerfile_path: backend/Dockerfile
           sbom_name: ${{ env.SBOM_TAG_NAME }}
           token: "${{ secrets.GITHUB_TOKEN }}"
