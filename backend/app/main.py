@@ -104,6 +104,7 @@ app = FastAPI(
 )
 
 # Determine session domain
+# ROOT_DOMAIN is .<ROOT_DOMAIN> example: .signin-connexion.cdssandbox.xyz
 session_domain = None
 if configuration.ENVIRONMENT != "local":
     session_domain = f".{configuration.ROOT_DOMAIN}"
