@@ -15,7 +15,7 @@ env:
   GITHUB_SHA: ${{ github.sha }}
   SBOM_TAG_NAME: gc-signin-dev-backend-api
 
-name: release-pipeline
+name: Release Pipeline - Frontend & Backend API
 
 jobs:
   # Runs the release-please action. This manages the open release PR and
