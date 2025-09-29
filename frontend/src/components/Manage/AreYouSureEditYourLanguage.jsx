@@ -67,14 +67,12 @@ export default function AreYouSureEditYourLanguage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  console.log("state", state);
-
   return (
     <GcdsContainer>
       <GcdsHeading tag="h1">{pageContentJson["1"]}</GcdsHeading>
       <GcdsText>
         {pageContentJson["2"]}{" "}
-        <strong>{LANGUAGE_DISPLAY_NAMES[selectedLanguage]}</strong>.
+        <strong>{LANGUAGE_DISPLAY_NAMES[language][selectedLanguage]}</strong>.
       </GcdsText>
       <GcdsText>{pageContentJson["4"]}</GcdsText>
       <ul>

@@ -99,11 +99,11 @@
     "4": "This will update your name with the following services:",
     "5": "GEO.ca",
     "6": "Heads up",
-    "7": "This ",
+    "7": "This",
     "8": "Yes, update",
     "9": "Cancel",
     "10": "Digital Talent",
-    "11": "does not ",
+    "11": "does not",
     "12": "legally change your name."
   },
   "ProfileUpdateName": {
@@ -111,7 +111,7 @@
     "3": "Last name",
     "4": "Cancel",
     "5": "Edit your name",
-    "6": "This will update your name with ",
+    "6": "This will update your name with",
     "7": "every service you have shared your name with through GC Sign in."
   },
   "ProfileHome": {
@@ -192,13 +192,10 @@
     "2": "You may need to update your name in other places.",
     "3": "This only changes your name with services connected to your GC Sign in.",
     "4": "If you are trying to update your name with a service that’s not connected to your GC Sign in, you’ll need to go to that account.",
-    "5": "To search for another GC Account, visit the ",
+    "5": "To search for another GC Account, visit the",
     "6": "Back to profile",
     "7": "Sign out",
     "8": "GC Account directory.",
-    "9": "To view what services are connected to your GC Sign in, go to ",
-    "10": "Connected Services ",
-    "11": "in your GC Sign in dashboard.",
     "12": "Signing you out...",
     "13": "Failed to sign you out. Redirecting..."
   },
@@ -344,7 +341,7 @@
     "3": "GEO.ca",
     "4": "If you are trying to update your name with a service that’s not connected to GC Sign in, you’ll need to go to that account.",
     "5": "To search for another GC Account, visit the",
-    "6": "GC Account directory"
+    "6": "GC Account directory."
   },
   "ConfirmContactPhoneNumberUpdate": {
     "1": "Are you sure you want to update your phone number?",

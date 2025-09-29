@@ -5,8 +5,8 @@ export const PROFILE_LANGUAGES = {
   fr: "fr-ca",
 };
 export const LANGUAGE_DISPLAY_NAMES = {
-  "en-ca": "English",
-  "fr-ca": "French",
+  en: { "en-ca": "English", "fr-ca": "French" },
+  fr: { "en-ca": "Anglais", "fr-ca": "Français" },
 };
 
 export const EXTERNAL_NAVIGATION_LINKS = {

@@ -2,12 +2,7 @@ import { useEffect } from "react";
 import { useLocation } from "react-router";
 import { useLanguage } from "./LanguageProvider.tsx";
 import { useUser } from "./useUser.tsx";
-import {
-  LANGUAGE_DISPLAY_NAMES,
-  AVAILABLE_LANGUAGES,
-  PROFILE_LANGUAGES,
-  CONTEXT_ACTIONS,
-} from "../../utils/constants.jsx";
+import { AVAILABLE_LANGUAGES } from "../../utils/constants.jsx";
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
 
 function validateSelectedLanguage(selectedLanguage) {

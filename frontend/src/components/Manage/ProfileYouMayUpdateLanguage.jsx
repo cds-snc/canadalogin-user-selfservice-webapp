@@ -33,7 +33,8 @@ export default function ProfileYouMayUpdateLanguage() {
       <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle=" ">
         <GcdsText>
           <strong>
-            {pageContentJson["1"]} {LANGUAGE_DISPLAY_NAMES[preferredLanguage]}
+            {pageContentJson["1"]}{" "}
+            {LANGUAGE_DISPLAY_NAMES[language][preferredLanguage]}
           </strong>
         </GcdsText>
       </GcdsNotice>

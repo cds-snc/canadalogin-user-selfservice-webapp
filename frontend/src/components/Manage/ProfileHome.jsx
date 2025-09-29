@@ -90,7 +90,9 @@ export default function ProfileHome() {
           {pageContent["13"]}
         </GcdsHeading>
         <GcdsGrid columns="1fr auto" className="gridInline">
-          <GcdsText>{LANGUAGE_DISPLAY_NAMES[preferredLanguage]}</GcdsText>
+          <GcdsText>
+            {LANGUAGE_DISPLAY_NAMES[language][preferredLanguage]}
+          </GcdsText>
           <GcdsLink
             href={editLanguagePreferences}
             size="regular"

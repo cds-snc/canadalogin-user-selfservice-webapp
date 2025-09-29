@@ -88,40 +88,41 @@
   "ManageDashboard": {
     "1": "Bienvenue,",
     "2": "Renseignements personnels",
-    "3": "Paramètres de sécurité"
+    "3": "Paramètres de sécurité",
+    "4": "Gérer Connexion GC"
   },
   "ProfileUpdateNameConfirmUpdate": {
-    "1": "Êtes-vous sûr de vouloir mettre à jour votre nom ?",
-    "2": "Vous avez demandé à mettre à jour votre nom :",
-    "3": "Exemple : Nouveau nom",
-    "4": "Votre nom sera mis à jour avec les services suivants :",
+    "1": "Voulez-vous vraiment modifier votre nom?",
+    "2": "Vous avez demandé à remplacer votre nom par le nom suivant:",
+    "3": "Exemple: Nouveau nom",
+    "4": "Cette action modifiera votre nom pour les services suivants:",
     "5": "GEO.ca",
     "6": "Attention",
-    "7": "Ceci",
-    "8": "Enregistrer les modifications",
+    "7": "Cette action",
+    "8": "Oui, mettre à jour",
     "9": "Annuler",
     "10": "Talent numérique",
     "11": "ne modifie pas",
-    "12": "légalement votre nom."
+    "12": "votre nom sur le plan légal."
   },
   "ProfileHome": {
-    "1": "Informations personnelles",
-    "2": "Informations de base",
+    "1": "Renseignements personnels",
+    "2": "Renseignements de base",
     "3": "Nom",
-    "4": "Exemple de nom",
+    "4": "Nom Exemple",
     "5": "Modifier",
     "6": "Coordonnées",
-    "7": "E-mail",
-    "8": "Cette adresse e-mail est utilisée pour vous connecter et vous contacter :",
-    "9": "Vérifié",
-    "10": "Numéro de téléphone",
-    "11": "Ce numéro est utilisé pour vous contacter :",
+    "7": "Adresse courriel",
+    "8": "Cette adresse courriel est utilisée pour la connexion et les communications :",
+    "9": "Vérification effectuée",
+    "10": "Numéro de téléphone de communication",
+    "11": "Le numéro de téléphone suivant est utilisé pour vous contacter :",
     "12": "Communication",
-    "13": "Préférence de langue",
+    "13": "Langue de communication",
     "14": "Anglais",
     "15": "Notifications",
-    "16": "Nous enverrons des notifications relatives à votre compte à l'adresse e-mail associée à votre compte.",
-    "17": "Vous pouvez également recevoir des notifications des services connectés à votre compte GC. Vous pouvez gérer ces préférences dans les paramètres de chaque service.",
+    "16": "Nous enverrons des notifications liées à votre compte à l’adresse courriel qui y est associée.",
+    "17": "Vous pourriez également recevoir des notifications provenant de services liés à votre compte Connexion GC. Vous pouvez gérer ces préférences dans les paramètres de chaque service.",
     "18": "Aucun numéro de téléphone de contact n'a été ajouté",
     "19": "Ajouter un numéro de téléphone"
   },
@@ -171,17 +172,14 @@
   },
   "ProfileUpdateNameSuccess": {
     "0": "Réussite",
-    "1": "Votre nom a été mis à jour vers",
-    "2": "Vous devrez peut-être mettre à jour votre nom à d'autres endroits.",
-    "3": "Ceci ne modifie votre nom que pour les services connectés à votre compte GC Sign in.",
-    "4": "Si vous essayez de mettre à jour votre nom pour un service qui n'est pas connecté à votre compte GC Sign in, vous devrez accéder à ce compte.",
-    "5": "Pour rechercher un autre compte GC, consultez la section ",
+    "1": "Votre nom est maintenant",
+    "2": "Vous devez peut-être mettre à jour votre nom ailleurs.",
+    "3": "Cette action ne modifie votre nom que pour les services liés à votre compte Connexion GC.",
+    "4": "Si vous cherchez à mettre à jour votre nom pour un service qui n’est pas lié à votre compte Connexion GC, vous devez le faire depuis le compte que vous possédez pour le service en question.",
+    "5": "Pour rechercher un autre compte du GC, consultez le",
     "6": "Retour au profil",
-    "7": "Déconnexion",
-    "8": "Répertoire des comptes GC.",
-    "9": "Pour voir les services connectés à votre compte GC Sign in, accédez à ",
-    "10": "Services connectés",
-    "11": "dans votre tableau de bord GC Sign in.",
+    "7": "Se déconnecter",
+    "8": "répertoire des comptes du GC.",
     "12": "Déconnexion en cours...",
     "13": "Échec de la déconnexion. Redirection..."
   },
@@ -193,13 +191,12 @@
     "5": "Annuler"
   },
   "ProfileUpdateName": {
-    "1": "Quels services ont accès à votre nom ?",
     "2": "Prénom",
     "3": "Nom de famille",
     "4": "Annuler",
     "5": "Modifier votre nom",
-    "6": "Votre nom sera mis à jour avec",
-    "7": "tous les services avec lesquels vous avez partagé votre nom via Connexion GC."
+    "6": "Cette action modifiera votre nom pour",
+    "7": "tous les services auxquels vous avez communiqué votre nom par le biais de Connexion GC."
   },
   "AreYouSureUpdateContactNumber": {
     "1": "Êtes-vous sûr de vouloir mettre à jour votre numéro de téléphone ?",
@@ -319,12 +316,12 @@
     "9": "Échec de la déconnexion. Redirection..."
   },
   "ServicesWithAccessInfo": {
-    "1": "Quels services ont accès à votre nom ?",
-    "2": "Les services suivants ont accès à votre nom via Connexion GC :",
+    "1": "Services ayant accès à votre nom",
+    "2": "Les services suivants ont accès à votre nom par le biais de Connexion GC:",
     "3": "GEO.ca",
-    "4": "Si vous essayez de mettre à jour votre nom avec un service qui n'est pas connecté à Connexion GC, vous devrez accéder à ce compte.",
-    "5": "Pour rechercher un autre compte GC, consultez le",
-    "6": "Répertoire des comptes GC"
+    "4": "Si vous cherchez à mettre à jour votre nom pour un service qui n’est pas lié à votre compte Connexion GC, vous devez le faire depuis le compte que vous possédez pour le service en question.",
+    "5": "Pour rechercher un autre compte du GC, consultez le",
+    "6": "répertoire des comptes du GC."
   },
   "EnterNewPhoneNumber": {
     "1": "Entrez un nouveau numéro de téléphone",

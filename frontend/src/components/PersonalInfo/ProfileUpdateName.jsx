@@ -59,8 +59,7 @@ export default function ProfileUpdateName() {
       <GcdsHeading tag="h1">{pageNameEditJson["5"]}</GcdsHeading>
 
       <GcdsText>
-        {pageNameEditJson["6"]}
-        <strong>{pageNameEditJson["7"]}</strong>
+        {pageNameEditJson["6"]} <strong>{pageNameEditJson["7"]}</strong>
       </GcdsText>
 
       <ServicesWithAccessInfoSection currentLang={language} />
