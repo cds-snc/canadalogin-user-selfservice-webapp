@@ -308,11 +308,12 @@
     "5": "How should we send you the code?",
     "6": "You can change this in 2-step verification - Security Settings.",
     "7": "Text message (SMS)",
-    "8": "Mobile only. Carrier charges may apply.",
+    "8": "Mobile only.",
     "9": "Voice call",
-    "10": "Mobile or landline. Carrier charges may apply.",
+    "10": "Mobile or landline.",
     "11": "Loading",
-    "12": "Loading your MFA methods ..."
+    "12": "Loading your MFA methods ...",
+    "13": "Carrier charges may apply."
   },
   "PasswordChangedConfirmation": {
     "1": "Your Password changed successfully.",

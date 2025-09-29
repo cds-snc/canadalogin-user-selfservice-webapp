@@ -53,8 +53,9 @@ export default function ConfirmContactPhoneNumberUpdate({
             </GcdsText>
           </GcdsText>
         </GcdsNotice>
-        <GcdsGrid columns="repeat(auto-fit, minmax(200px, 200px))">
+        <GcdsGrid columns="max-content max-content" gap="200">
           <GcdsButton
+            style={{ width: "fit-content" }}
             onGcdsClick={async (ev) => {
               ev.preventDefault();
               onNext();

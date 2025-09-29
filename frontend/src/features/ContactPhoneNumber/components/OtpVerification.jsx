@@ -140,10 +140,7 @@ export default function OtpVerification({
           minlength={6}
         ></GcdsInput>
 
-        <GcdsGrid
-          columns="repeat(auto-fit, minmax(200px, 200px))"
-          align-items="center"
-        >
+        <GcdsGrid columns="max-content max-content" gap="200">
           <GcdsButton
             disabled={phoneFormData.otp.length < 6}
             style={{ width: "fit-content" }}
@@ -170,17 +167,6 @@ export default function OtpVerification({
       <GcdsHeading tag="h2">{pageContentJson["10"]}</GcdsHeading>
 
       <GcdsText>
-        <GcdsLink
-          onGcdsClick={() => {
-            clearValues();
-            onBack();
-          }}
-        >
-          {pageContentJson["21"]}
-        </GcdsLink>
-      </GcdsText>
-
-      <GcdsText>
         {time > 0 ? (
           <span>
             {pageContentJson["14"]}
@@ -200,6 +186,17 @@ export default function OtpVerification({
               : pageContentJson["26"]}
           </GcdsLink>
         )}
+      </GcdsText>
+
+      <GcdsText>
+        <GcdsLink
+          onGcdsClick={() => {
+            clearValues();
+            onBack();
+          }}
+        >
+          {pageContentJson["21"]}
+        </GcdsLink>
       </GcdsText>
     </GcdsContainer>
   );

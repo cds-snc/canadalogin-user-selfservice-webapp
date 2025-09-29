@@ -98,6 +98,7 @@ const RadioButtons = ({
     <GcdsRadios
       name="radio"
       legend={pageContentJson["5"]}
+      hint={pageContentJson["13"]}
       options={radioOptions}
       onGcdsChange={(e) => {
         onChangePhoneForm("otpType", e.target.value);
@@ -181,11 +182,7 @@ export default function EnterPhoneNumber({
         </section>
       </GcdsGrid>
 
-      <GcdsGrid
-        columns="repeat(auto-fit, minmax(100px, 100px))"
-        gap="500"
-        align-items="center"
-      >
+      <GcdsGrid columns="max-content max-content" gap="200">
         <GcdsButton
           disabled={!phoneNumberValid}
           style={{ width: "fit-content" }}
