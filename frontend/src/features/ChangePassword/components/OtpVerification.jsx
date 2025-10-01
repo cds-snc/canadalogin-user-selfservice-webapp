@@ -119,11 +119,6 @@ export default function OtpVerification({
   const errorMessage = errorPageJson[errorCode] || "";
   return (
     <GcdsContainer>
-      {/* <GcdsErrorSummary
-                data-testid='errorSummary'
-                errorLinks={"Anohter "}
-                heading="Error Message"
-            /> */}
       {errorMessage != "" && (
         <GcdsErrorMessage messageId="message-props">
           {errorMessage}
@@ -207,11 +202,7 @@ export default function OtpVerification({
           ></GcdsInput>
         )}
 
-        <GcdsGrid
-          columns="repeat(auto-fit, minmax(100px, 100px))"
-          gap="10px"
-          align-items="center"
-        >
+        <GcdsGrid columns="max-content max-content" gap="200">
           <GcdsButton
             disabled={userOtpValue.length < 6}
             style={{ width: "fit-content" }}

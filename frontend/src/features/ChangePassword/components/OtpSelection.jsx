@@ -105,11 +105,7 @@ export default function OtpSelection({
           </>
         )}
 
-        <GcdsGrid
-          columns="repeat(auto-fit, minmax(100px, 100px))"
-          gap="10px"
-          align-items="center"
-        >
+        <GcdsGrid columns="max-content max-content" gap="200">
           <GcdsButton
             style={{ width: "fit-content" }}
             onGcdsClick={(ev) => {
