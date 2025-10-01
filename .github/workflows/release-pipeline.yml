@@ -37,7 +37,10 @@ jobs:
   # Builds the frontend application for the current SHA and stores the artifact in S3.
   build-frontend:
     runs-on: ubuntu-latest
-    environment: dev
+    strategy:
+      matrix:
+        environment: [dev, test]
+    environment: ${{ matrix.environment }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
