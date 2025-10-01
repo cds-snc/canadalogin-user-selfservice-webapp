@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import {
   GcdsButton,
   GcdsContainer,
+  GcdsGrid,
   GcdsHeading,
   GcdsInput,
   GcdsText,
@@ -59,8 +60,7 @@ export default function ProfileUpdateName() {
       <GcdsHeading tag="h1">{pageNameEditJson["5"]}</GcdsHeading>
 
       <GcdsText>
-        {pageNameEditJson["6"]}
-        <strong>{pageNameEditJson["7"]}</strong>
+        {pageNameEditJson["6"]} <strong>{pageNameEditJson["7"]}</strong>
       </GcdsText>
 
       <ServicesWithAccessInfoSection currentLang={language} />
@@ -88,11 +88,14 @@ export default function ProfileUpdateName() {
             required
             onChange={handleProfileChange}
           />
+        </GcdsContainer>
+
+        <GcdsGrid columns="max-content max-content" gap="200">
           <SubmitButton
             currentLang={language}
             disabled={false}
             onGcdsClick={useSubmitHandler}
-          />{" "}
+          />
           <GcdsButton
             buttonRole="secondary"
             onGcdsClick={(ev) => {
@@ -103,7 +106,7 @@ export default function ProfileUpdateName() {
           >
             {pageNameEditJson["4"]}
           </GcdsButton>
-        </GcdsContainer>
+        </GcdsGrid>
       </form>
     </GcdsContainer>
   );

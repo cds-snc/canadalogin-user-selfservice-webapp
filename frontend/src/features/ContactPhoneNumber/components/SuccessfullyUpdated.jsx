@@ -43,7 +43,7 @@ export default function SuccessfullyUpdatedContactPhoneNumber({
           {pageContentJson["5"]}{" "}
           <GcdsLink href="#">{pageContentJson["6"]}</GcdsLink>
         </GcdsText>
-        <GcdsGrid columns="repeat(auto-fit, minmax(100px, 200px))">
+        <GcdsGrid columns="max-content max-content" gap="200">
           <GcdsButton
             style={{ width: "fit-content" }}
             onGcdsClick={(ev) => {
@@ -66,8 +66,6 @@ export default function SuccessfullyUpdatedContactPhoneNumber({
           </GcdsButton>
         </GcdsGrid>
       </GcdsGrid>
-
-      <GcdsGrid columns="1" gap="150"></GcdsGrid>
     </GcdsContainer>
   );
 }

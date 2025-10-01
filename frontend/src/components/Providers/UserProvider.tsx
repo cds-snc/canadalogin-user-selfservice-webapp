@@ -159,7 +159,6 @@ function userReducer(
       return {
         ...state,
         editProfile: null,
-        cancelProfileEditing: true,
       };
     case CONTEXT_ACTIONS.set_original_language_before_edit:
       return {

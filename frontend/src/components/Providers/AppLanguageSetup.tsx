@@ -2,15 +2,10 @@ import { useEffect } from "react";
 import { useLocation } from "react-router";
 import { useLanguage } from "./LanguageProvider.tsx";
 import { useUser } from "./useUser.tsx";
-import {
-  LANGUAGE_DISPLAY_NAMES,
-  AVAILABLE_LANGUAGES,
-  PROFILE_LANGUAGES,
-  CONTEXT_ACTIONS,
-} from "../../utils/constants.jsx";
+import { AVAILABLE_LANGUAGES } from "../../utils/constants.jsx";
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
 
-function validateSelectedLanguage(selectedLanguage) {
+function validateSelectedLanguage(selectedLanguage: any) {
   if (!selectedLanguage) return undefined;
   const SUPPORTED_LANGUAGES = [AVAILABLE_LANGUAGES.en, AVAILABLE_LANGUAGES.fr];
   const languageValue = selectedLanguage.includes("-")

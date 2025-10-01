@@ -67,12 +67,11 @@ export default function ProfileUpdateNameConfirmUpdate() {
       </ul>
       <GcdsNotice type="info" noticeTitleTag="h2" noticeTitle=" ">
         <GcdsText>
-          {pageContentJson["7"]}
-          <strong>{pageContentJson["11"]}</strong>
+          {pageContentJson["7"]} <strong>{pageContentJson["11"]}</strong>{" "}
           {pageContentJson["12"]}
         </GcdsText>
       </GcdsNotice>
-      <GcdsGrid columns="auto auto" gap="1rem" align-items="center">
+      <GcdsGrid columns="max-content max-content" gap="200">
         <GcdsButton
           onGcdsClick={async (ev) => {
             ev.preventDefault();

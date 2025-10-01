@@ -55,7 +55,7 @@ export default function AreYouSureEditYourLanguage() {
       }
     } catch (err) {
       // Todo: handle errors
-      console.log(err);
+      console.error(err);
     }
   };
 
@@ -67,14 +67,12 @@ export default function AreYouSureEditYourLanguage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  console.log("state", state);
-
   return (
     <GcdsContainer>
       <GcdsHeading tag="h1">{pageContentJson["1"]}</GcdsHeading>
       <GcdsText>
         {pageContentJson["2"]}{" "}
-        <strong>{LANGUAGE_DISPLAY_NAMES[selectedLanguage]}</strong>.
+        <strong>{LANGUAGE_DISPLAY_NAMES[language][selectedLanguage]}</strong>.
       </GcdsText>
       <GcdsText>{pageContentJson["4"]}</GcdsText>
       <ul>
@@ -82,7 +80,7 @@ export default function AreYouSureEditYourLanguage() {
         <li>{pageContentJson["10"]}</li>
       </ul>
 
-      <GcdsGrid columns="auto auto" gap="1rem" align-items="center">
+      <GcdsGrid columns="max-content max-content" gap="200">
         <GcdsButton
           onGcdsClick={async (ev) => {
             ev.preventDefault();
@@ -90,7 +88,6 @@ export default function AreYouSureEditYourLanguage() {
             if (success) {
               navigateHelper(successPage);
             }
-            navigateHelper(successPage);
           }}
         >
           {pageContentJson["8"]}

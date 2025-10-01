@@ -153,11 +153,7 @@ export default function Password({ onNext, otpSentResponse, userOtpValue }) {
           <span>{pageContentJson["13"]}</span>
         </GcdsText>
 
-        <GcdsGrid
-          columns="repeat(auto-fit, minmax(100px, 100px))"
-          gap="10px"
-          align-items="center"
-        >
+        <GcdsGrid columns="max-content max-content" gap="200">
           <GcdsButton
             disabled={password.length < passwordPolicy.min}
             style={{ width: "fit-content" }}

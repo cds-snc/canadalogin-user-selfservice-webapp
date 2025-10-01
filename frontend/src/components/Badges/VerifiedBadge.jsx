@@ -29,6 +29,7 @@ export default function VerifiedBadge({ text }) {
             lineHeight: "1.5rem",
             margin: 0,
             padding: 0,
+            width: "fit-content",
           }}
         >
           {text}

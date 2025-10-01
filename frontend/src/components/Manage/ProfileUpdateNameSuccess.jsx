@@ -71,13 +71,8 @@ export default function ProfileUpdateNameSuccess() {
         {pageContentJson["5"]}{" "}
         <GcdsLink href="#">{pageContentJson["8"]}</GcdsLink>
       </GcdsText>
-      <GcdsText>
-        {pageContentJson["9"]}{" "}
-        <GcdsLink href="#">{pageContentJson["10"]}</GcdsLink>
-        {pageContentJson["11"]}
-      </GcdsText>
 
-      <GcdsGrid columns="auto auto" gap="1rem" align-items="center">
+      <GcdsGrid columns="max-content max-content" gap="200">
         <GcdsButton
           style={{ width: "fit-content" }}
           onGcdsClick={(ev) => {
