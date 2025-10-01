@@ -27,16 +27,16 @@ exports[`ProfileUpdateNameConfirmUpdate Component > matches snapshot 1`] = `
     </ul>
     <gcds-notice>
       <gcds-text>
-        This 
+        This
+         
         <strong>
-          does not 
+          does not
         </strong>
+         
         legally change your name.
       </gcds-text>
     </gcds-notice>
-    <gcds-grid
-      align-items="center"
-    >
+    <gcds-grid>
       <gcds-button>
         Yes, update
       </gcds-button>

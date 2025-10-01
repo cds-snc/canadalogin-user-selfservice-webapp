@@ -22,23 +22,13 @@ exports[`ProfileUpdateNameSuccess Component > matches snapshot 1`] = `
       If you are trying to update your name with a service that’s not connected to your GC Sign in, you’ll need to go to that account.
     </gcds-text>
     <gcds-text>
-      To search for another GC Account, visit the 
+      To search for another GC Account, visit the
        
       <gcds-link>
         GC Account directory.
       </gcds-link>
     </gcds-text>
-    <gcds-text>
-      To view what services are connected to your GC Sign in, go to 
-       
-      <gcds-link>
-        Connected Services 
-      </gcds-link>
-      in your GC Sign in dashboard.
-    </gcds-text>
-    <gcds-grid
-      align-items="center"
-    >
+    <gcds-grid>
       <gcds-button
         style="width: fit-content;"
       >

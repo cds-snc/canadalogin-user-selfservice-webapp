@@ -7,7 +7,8 @@ exports[`ProfileUpdateName Component > matches snapshot 1`] = `
       Edit your name
     </gcds-heading>
     <gcds-text>
-      This will update your name with 
+      This will update your name with
+       
       <strong>
         every service you have shared your name with through GC Sign in.
       </strong>
@@ -32,7 +33,7 @@ exports[`ProfileUpdateName Component > matches snapshot 1`] = `
         To search for another GC Account, visit the
          
         <gcds-link>
-          GC Account directory
+          GC Account directory.
         </gcds-link>
         .
       </gcds-text>
@@ -51,14 +52,15 @@ exports[`ProfileUpdateName Component > matches snapshot 1`] = `
         <gcds-input
           data-testid="familyName"
         />
+      </gcds-container>
+      <gcds-grid>
         <gcds-button>
           Continue
         </gcds-button>
-         
         <gcds-button>
           Cancel
         </gcds-button>
-      </gcds-container>
+      </gcds-grid>
     </form>
   </gcds-container>
 </div>
