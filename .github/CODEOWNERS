@@ -1,0 +1,3 @@
+.deployed_versions/test.json @cds-snc/gc-signin-manage-test-deploy-approvers
+.deployed_versions/staging.json @cds-snc/gc-signin-manage-staging-deploy-approvers
+.deployed_versions/production.json @cds-snc/gc-signin-manage-production-deploy-approvers
