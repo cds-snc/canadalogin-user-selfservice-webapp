@@ -27,7 +27,6 @@ export default function ProfileYouMayUpdateLanguage() {
   const backToProfile = path(PAGES.ProfileHome, { language: language });
 
   const preferredLanguage = state?.userProfile?.preferredLanguage || "";
-  console.log("state", state);
   return (
     <GcdsContainer>
       <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle=" ">
@@ -44,11 +43,6 @@ export default function ProfileYouMayUpdateLanguage() {
       <GcdsText>
         {pageContentJson["5"]}{" "}
         <GcdsLink href="#">{pageContentJson["8"]}</GcdsLink>
-      </GcdsText>
-      <GcdsText>
-        {pageContentJson["9"]}{" "}
-        <GcdsLink href="#">{pageContentJson["10"]}</GcdsLink>
-        {pageContentJson["11"]}
       </GcdsText>
 
       <GcdsGrid columns="auto auto" gap="1rem" align-items="center">

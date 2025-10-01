@@ -90,7 +90,7 @@ export default function EditLanguagePreferences() {
       <GcdsText>{pageContentJson["2"]}</GcdsText>
 
       <GcdsGrid columns="1fr">
-        <ServicesWithAccessInfoSection language={language} />
+        <ServicesWithAccessInfoSection currentLang={language} />
       </GcdsGrid>
 
       <GcdsContainer marginTop="100">
@@ -103,7 +103,7 @@ export default function EditLanguagePreferences() {
         ></GcdsRadios>
       </GcdsContainer>
 
-      <GcdsGrid columns="auto auto" gap="1rem" align-items="center">
+      <GcdsGrid columns="max-content max-content" gap="200">
         <GcdsButton
           onGcdsClick={(ev) => {
             ev.preventDefault();

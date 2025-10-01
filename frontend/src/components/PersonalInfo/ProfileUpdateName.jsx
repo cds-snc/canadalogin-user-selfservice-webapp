@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import {
   GcdsButton,
   GcdsContainer,
+  GcdsGrid,
   GcdsHeading,
   GcdsInput,
   GcdsText,
@@ -87,11 +88,14 @@ export default function ProfileUpdateName() {
             required
             onChange={handleProfileChange}
           />
+        </GcdsContainer>
+
+        <GcdsGrid columns="max-content max-content" gap="200">
           <SubmitButton
             currentLang={language}
             disabled={false}
             onGcdsClick={useSubmitHandler}
-          />{" "}
+          />
           <GcdsButton
             buttonRole="secondary"
             onGcdsClick={(ev) => {
@@ -102,7 +106,7 @@ export default function ProfileUpdateName() {
           >
             {pageNameEditJson["4"]}
           </GcdsButton>
-        </GcdsContainer>
+        </GcdsGrid>
       </form>
     </GcdsContainer>
   );

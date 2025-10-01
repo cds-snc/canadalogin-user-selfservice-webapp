@@ -21,6 +21,7 @@ export default function ServicesWithAccessInfoSection({ currentLang }) {
         <GcdsLink href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}>
           {pageContentJson["6"]}
         </GcdsLink>
+        .
       </GcdsText>
     </GcdsDetails>
   );

@@ -5,7 +5,7 @@ import { useUser } from "./useUser.tsx";
 import { AVAILABLE_LANGUAGES } from "../../utils/constants.jsx";
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
 
-function validateSelectedLanguage(selectedLanguage) {
+function validateSelectedLanguage(selectedLanguage: any) {
   if (!selectedLanguage) return undefined;
   const SUPPORTED_LANGUAGES = [AVAILABLE_LANGUAGES.en, AVAILABLE_LANGUAGES.fr];
   const languageValue = selectedLanguage.includes("-")

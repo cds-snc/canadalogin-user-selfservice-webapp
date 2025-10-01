@@ -55,7 +55,7 @@ export default function AreYouSureEditYourLanguage() {
       }
     } catch (err) {
       // Todo: handle errors
-      console.log(err);
+      console.error(err);
     }
   };
 
@@ -80,7 +80,7 @@ export default function AreYouSureEditYourLanguage() {
         <li>{pageContentJson["10"]}</li>
       </ul>
 
-      <GcdsGrid columns="auto auto" gap="1rem" align-items="center">
+      <GcdsGrid columns="max-content max-content" gap="200">
         <GcdsButton
           onGcdsClick={async (ev) => {
             ev.preventDefault();
@@ -88,7 +88,6 @@ export default function AreYouSureEditYourLanguage() {
             if (success) {
               navigateHelper(successPage);
             }
-            navigateHelper(successPage);
           }}
         >
           {pageContentJson["8"]}

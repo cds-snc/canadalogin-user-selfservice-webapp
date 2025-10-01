@@ -67,14 +67,14 @@ export const useCancelLanguageEditing = (backtoProfile) => {
     (event) => {
       event.preventDefault();
 
+      // Set cancel flag first
+      setCancelProfileEditing(true);
+
       // Clear the edit profile state
       clearEditProfile();
 
       // Reset language to original
       resetLanguage();
-
-      // Set cancel flag to trigger navigation effect
-      setCancelProfileEditing(true);
     },
     [clearEditProfile, resetLanguage, setCancelProfileEditing],
   );
