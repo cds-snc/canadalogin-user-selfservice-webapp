@@ -45,7 +45,7 @@ export default function ProfileYouMayUpdateLanguage() {
         <GcdsLink href="#">{pageContentJson["8"]}</GcdsLink>
       </GcdsText>
 
-      <GcdsGrid columns="auto auto" gap="1rem" align-items="center">
+      <GcdsGrid columns="max-content max-content" gap="200">
         <GcdsButton
           style={{ width: "fit-content" }}
           onGcdsClick={(ev) => {
