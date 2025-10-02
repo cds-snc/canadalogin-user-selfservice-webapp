@@ -375,5 +375,18 @@
     "8": "Votre session expirera à {{time}}.",
     "9": "Chargement...",
     "10": "Échec de la déconnexion. Redirection..."
+  },
+  "Manage2FAVerifications": {
+    "1": "Gérer la vérification en deux étapes",
+    "2": "L’ajout d’une étape supplémentaire à la vérification de votre mot de passe permet de confirmer votre identité.",
+    "3": "Secondes étapes possibles",
+    "4": "Vous pouvez recevoir des codes de vérification à usage unique aux numéros suivants.",
+    "5": "Téléphone",
+    "6": "Les codes de vérification sont envoyés par:",
+    "7": "Message texte",
+    "8": "Appel vocal",
+    "9": "Supprimer",
+    "10": "+ Ajouter un numéro de téléphone",
+    "11": "Chargement..."
   }
 }

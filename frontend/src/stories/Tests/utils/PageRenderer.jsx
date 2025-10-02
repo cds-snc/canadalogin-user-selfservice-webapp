@@ -14,7 +14,7 @@ import AreYouSureUpdateContactNumber from "../../../components/Manage/AreYouSure
 import EnterNewPhoneNumber from "../../../components/Manage/EnterNewPhoneNumber.jsx";
 import YouMayUpdateEmailAtOtherPlaces from "../../../components/Manage/YouMayUpdateEmailAtOtherPlaces.jsx";
 import AreYouSureUpdateYourEmail from "../../../components/Manage/AreYouSureUpdateYourEmail.jsx";
-import SecuritySettings from "../../../components/Manage/SecuritySettings.jsx";
+import SecuritySettings from "../../../components/Manage/SecuritySettings/SecuritySettings.jsx";
 import EditLanguagePreferences from "../../../components/Manage/EditLanguagePreferences.jsx";
 import AreYouSureEditYourLanguage from "../../../components/Manage/AreYouSureEditYourLanguage.jsx";
 import ProfileYouMayUpdateLanguage from "../../../components/Manage/ProfileYouMayUpdateLanguage.jsx";

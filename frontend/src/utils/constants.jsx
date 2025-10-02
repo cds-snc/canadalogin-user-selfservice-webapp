@@ -91,6 +91,7 @@ export const PAGES = {
   confirmContactPhoneNumberUpdate: "ConfirmContactPhoneNumberUpdate",
   successfullyUpdatedContactPhoneNumber:
     "SuccessfullyUpdatedContactPhoneNumber",
+  manage2FAVerifications: "Manage2FAVerifications",
 };
 
 export const FOOTERS = {

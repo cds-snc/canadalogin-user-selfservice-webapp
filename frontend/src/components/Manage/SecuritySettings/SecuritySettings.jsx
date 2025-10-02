@@ -7,12 +7,12 @@ import {
   GcdsText,
   GcdsLink,
 } from "@cdssnc/gcds-components-react";
-import { getPageContent } from "../../utils/functions.jsx";
-import { path } from "../../utils/routeHelpers.js";
-import { PAGES } from "../../utils/constants.jsx";
+import { getPageContent } from "../../../utils/functions.jsx";
+import { path } from "../../../utils/routeHelpers.js";
+import { PAGES } from "../../../utils/constants.jsx";
 
-import { useUser } from "../Providers/useUser.tsx";
-import EnabledBadge from "../Badges/EnabledBadge.jsx";
+import { useUser } from "../../Providers/useUser.js";
+import EnabledBadge from "../../Badges/EnabledBadge.jsx";
 
 export default function SecuritySettings() {
   const { language } = useParams();
@@ -26,6 +26,9 @@ export default function SecuritySettings() {
   );
 
   const passwordPage = path(PAGES.password, { language: language });
+  const manage2FAVerificationsPage = path(PAGES.manage2FAVerifications, {
+    language: language,
+  });
 
   return (
     <GcdsContainer>
@@ -52,7 +55,7 @@ export default function SecuritySettings() {
 
         <GcdsGrid columns="1fr" gap="1rem" align-items="center">
           <EnabledBadge text={pageContent["9"]} />
-          <GcdsLink href="#" size="regular">
+          <GcdsLink href={manage2FAVerificationsPage} size="regular">
             {pageContent["10"]}
           </GcdsLink>
         </GcdsGrid>
