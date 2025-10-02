@@ -15,6 +15,7 @@ import EnterNewPhoneNumber from "../../../components/Manage/EnterNewPhoneNumber.
 import YouMayUpdateEmailAtOtherPlaces from "../../../components/Manage/YouMayUpdateEmailAtOtherPlaces.jsx";
 import AreYouSureUpdateYourEmail from "../../../components/Manage/AreYouSureUpdateYourEmail.jsx";
 import SecuritySettings from "../../../components/Manage/SecuritySettings/SecuritySettings.jsx";
+import Manage2FAVerifications from "../../../components/Manage/SecuritySettings/Manage2FAVerifications.jsx";
 import EditLanguagePreferences from "../../../components/Manage/EditLanguagePreferences.jsx";
 import AreYouSureEditYourLanguage from "../../../components/Manage/AreYouSureEditYourLanguage.jsx";
 import ProfileYouMayUpdateLanguage from "../../../components/Manage/ProfileYouMayUpdateLanguage.jsx";
@@ -52,6 +53,8 @@ const PageRenderer = ({ page }) => {
       return <AreYouSureUpdateYourEmail />;
     case PAGES.securitySettings:
       return <SecuritySettings />;
+    case PAGES.manage2FAVerifications:
+      return <Manage2FAVerifications />;
     case PAGES.editLanguagePreferences:
       return <EditLanguagePreferences />;
     case PAGES.areYouSureEditYourLanguage:

@@ -1,0 +1,772 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Manage2FAVerifications Component Snapshots > matches snapshot in loading state 1`] = `
+<div
+  data-testid="loading"
+>
+  Loading verification methods...
+</div>
+`;
+
+exports[`Manage2FAVerifications Component Snapshots > matches snapshot when API returns empty data (should navigate away) 1`] = `
+<gcds-container>
+  <gcds-heading>
+    Manage 2-step verification methods
+  </gcds-heading>
+  <gcds-text>
+    Choose how you would like to receive verification codes when signing in to your GC Account.
+  </gcds-text>
+  <gcds-heading>
+    Phone numbers
+  </gcds-heading>
+  <gcds-text>
+    Your phone numbers for 2-step verification.
+  </gcds-text>
+  <gcds-container
+    class="sectionCard"
+  >
+    <gcds-heading
+      style="display: flex; align-items: center; gap: 0.5rem;"
+    >
+      <div
+        style="display: flex; height: 1.875rem; padding: 0px 0.625rem; justify-content: center; align-items: center; gap: 0.3125rem; border-radius: 0.3125rem; width: fit-content;"
+      >
+        <svg
+          fill="none"
+          height="25"
+          viewBox="0 0 16 25"
+          width="16"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M2.18182 24.5464C1.58182 24.5464 1.06818 24.3328 0.640909 23.9055C0.213636 23.4782 0 22.9646 0 22.3646V2.7282C0 2.1282 0.213636 1.61457 0.640909 1.1873C1.06818 0.760023 1.58182 0.546387 2.18182 0.546387H13.0909C13.6909 0.546387 14.2045 0.760023 14.6318 1.1873C15.0591 1.61457 15.2727 2.1282 15.2727 2.7282V22.3646C15.2727 22.9646 15.0591 23.4782 14.6318 23.9055C14.2045 24.3328 13.6909 24.5464 13.0909 24.5464H2.18182ZM2.18182 21.2737V22.3646H13.0909V21.2737H2.18182ZM2.18182 19.0918H13.0909V6.00093H2.18182V19.0918ZM2.18182 3.81911H13.0909V2.7282H2.18182V3.81911Z"
+            fill="#333333"
+          />
+        </svg>
+        Phone
+      </div>
+    </gcds-heading>
+    <gcds-button>
+      Add phone number
+    </gcds-button>
+  </gcds-container>
+</gcds-container>
+`;
+
+exports[`Manage2FAVerifications Component Snapshots > matches snapshot when API returns unsuccessful response 1`] = `
+<gcds-container
+  class="hydrated"
+>
+  <gcds-heading
+    class="hydrated"
+  >
+    Manage 2-step verification methods
+  </gcds-heading>
+  <gcds-text
+    class="hydrated"
+  >
+    Choose how you would like to receive verification codes when signing in to your GC Account.
+  </gcds-text>
+  <gcds-heading
+    class="hydrated"
+  >
+    Phone numbers
+  </gcds-heading>
+  <gcds-text
+    class="hydrated"
+  >
+    Your phone numbers for 2-step verification.
+  </gcds-text>
+  <gcds-container
+    class="sectionCard hydrated"
+  >
+    <gcds-heading
+      class="hydrated"
+      style="display: flex; align-items: center; gap: 0.5rem;"
+    >
+      <div
+        style="display: flex; height: 1.875rem; padding: 0px 0.625rem; justify-content: center; align-items: center; gap: 0.3125rem; border-radius: 0.3125rem; width: fit-content;"
+      >
+        <svg
+          fill="none"
+          height="25"
+          viewBox="0 0 16 25"
+          width="16"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M2.18182 24.5464C1.58182 24.5464 1.06818 24.3328 0.640909 23.9055C0.213636 23.4782 0 22.9646 0 22.3646V2.7282C0 2.1282 0.213636 1.61457 0.640909 1.1873C1.06818 0.760023 1.58182 0.546387 2.18182 0.546387H13.0909C13.6909 0.546387 14.2045 0.760023 14.6318 1.1873C15.0591 1.61457 15.2727 2.1282 15.2727 2.7282V22.3646C15.2727 22.9646 15.0591 23.4782 14.6318 23.9055C14.2045 24.3328 13.6909 24.5464 13.0909 24.5464H2.18182ZM2.18182 21.2737V22.3646H13.0909V21.2737H2.18182ZM2.18182 19.0918H13.0909V6.00093H2.18182V19.0918ZM2.18182 3.81911H13.0909V2.7282H2.18182V3.81911Z"
+            fill="#333333"
+          />
+        </svg>
+        Phone
+      </div>
+    </gcds-heading>
+    <gcds-button
+      class="hydrated"
+    >
+      Add phone number
+    </gcds-button>
+  </gcds-container>
+</gcds-container>
+`;
+
+exports[`Manage2FAVerifications Component Snapshots > matches snapshot when API throws error 1`] = `
+<gcds-container>
+  <gcds-heading>
+    Manage 2-step verification methods
+  </gcds-heading>
+  <gcds-text>
+    Choose how you would like to receive verification codes when signing in to your GC Account.
+  </gcds-text>
+  <gcds-heading>
+    Phone numbers
+  </gcds-heading>
+  <gcds-text>
+    Your phone numbers for 2-step verification.
+  </gcds-text>
+  <gcds-container
+    class="sectionCard"
+  >
+    <gcds-heading
+      style="display: flex; align-items: center; gap: 0.5rem;"
+    >
+      <div
+        style="display: flex; height: 1.875rem; padding: 0px 0.625rem; justify-content: center; align-items: center; gap: 0.3125rem; border-radius: 0.3125rem; width: fit-content;"
+      >
+        <svg
+          fill="none"
+          height="25"
+          viewBox="0 0 16 25"
+          width="16"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M2.18182 24.5464C1.58182 24.5464 1.06818 24.3328 0.640909 23.9055C0.213636 23.4782 0 22.9646 0 22.3646V2.7282C0 2.1282 0.213636 1.61457 0.640909 1.1873C1.06818 0.760023 1.58182 0.546387 2.18182 0.546387H13.0909C13.6909 0.546387 14.2045 0.760023 14.6318 1.1873C15.0591 1.61457 15.2727 2.1282 15.2727 2.7282V22.3646C15.2727 22.9646 15.0591 23.4782 14.6318 23.9055C14.2045 24.3328 13.6909 24.5464 13.0909 24.5464H2.18182ZM2.18182 21.2737V22.3646H13.0909V21.2737H2.18182ZM2.18182 19.0918H13.0909V6.00093H2.18182V19.0918ZM2.18182 3.81911H13.0909V2.7282H2.18182V3.81911Z"
+            fill="#333333"
+          />
+        </svg>
+        Phone
+      </div>
+    </gcds-heading>
+    <gcds-button>
+      Add phone number
+    </gcds-button>
+  </gcds-container>
+</gcds-container>
+`;
+
+exports[`Manage2FAVerifications Component Snapshots > matches snapshot with default state 1`] = `
+<div
+  data-testid="loading"
+>
+  Loading verification methods...
+</div>
+`;
+
+exports[`Manage2FAVerifications Component Snapshots > matches snapshot with long phone number 1`] = `
+<gcds-container>
+  <gcds-heading>
+    Manage 2-step verification methods
+  </gcds-heading>
+  <gcds-text>
+    Choose how you would like to receive verification codes when signing in to your GC Account.
+  </gcds-text>
+  <gcds-heading>
+    Phone numbers
+  </gcds-heading>
+  <gcds-text>
+    Your phone numbers for 2-step verification.
+  </gcds-text>
+  <gcds-container
+    class="sectionCard"
+  >
+    <gcds-heading
+      style="display: flex; align-items: center; gap: 0.5rem;"
+    >
+      <div
+        style="display: flex; height: 1.875rem; padding: 0px 0.625rem; justify-content: center; align-items: center; gap: 0.3125rem; border-radius: 0.3125rem; width: fit-content;"
+      >
+        <svg
+          fill="none"
+          height="25"
+          viewBox="0 0 16 25"
+          width="16"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M2.18182 24.5464C1.58182 24.5464 1.06818 24.3328 0.640909 23.9055C0.213636 23.4782 0 22.9646 0 22.3646V2.7282C0 2.1282 0.213636 1.61457 0.640909 1.1873C1.06818 0.760023 1.58182 0.546387 2.18182 0.546387H13.0909C13.6909 0.546387 14.2045 0.760023 14.6318 1.1873C15.0591 1.61457 15.2727 2.1282 15.2727 2.7282V22.3646C15.2727 22.9646 15.0591 23.4782 14.6318 23.9055C14.2045 24.3328 13.6909 24.5464 13.0909 24.5464H2.18182ZM2.18182 21.2737V22.3646H13.0909V21.2737H2.18182ZM2.18182 19.0918H13.0909V6.00093H2.18182V19.0918ZM2.18182 3.81911H13.0909V2.7282H2.18182V3.81911Z"
+            fill="#333333"
+          />
+        </svg>
+        Phone
+      </div>
+    </gcds-heading>
+    <gcds-container>
+      <gcds-text>
+        <strong>
+          +1 15551234567890
+        </strong>
+      </gcds-text>
+      <gcds-text>
+        Available methods:
+      </gcds-text>
+      <ul>
+        <li>
+          <gcds-text>
+            Text message (SMS)
+          </gcds-text>
+        </li>
+      </ul>
+      <div
+        class="separator"
+      />
+    </gcds-container>
+    <gcds-button>
+      Add phone number
+    </gcds-button>
+  </gcds-container>
+</gcds-container>
+`;
+
+exports[`Manage2FAVerifications Component Snapshots > matches snapshot with multiple phone numbers 1`] = `
+<gcds-container>
+  <gcds-heading>
+    Manage 2-step verification methods
+  </gcds-heading>
+  <gcds-text>
+    Choose how you would like to receive verification codes when signing in to your GC Account.
+  </gcds-text>
+  <gcds-heading>
+    Phone numbers
+  </gcds-heading>
+  <gcds-text>
+    Your phone numbers for 2-step verification.
+  </gcds-text>
+  <gcds-container
+    class="sectionCard"
+  >
+    <gcds-heading
+      style="display: flex; align-items: center; gap: 0.5rem;"
+    >
+      <div
+        style="display: flex; height: 1.875rem; padding: 0px 0.625rem; justify-content: center; align-items: center; gap: 0.3125rem; border-radius: 0.3125rem; width: fit-content;"
+      >
+        <svg
+          fill="none"
+          height="25"
+          viewBox="0 0 16 25"
+          width="16"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M2.18182 24.5464C1.58182 24.5464 1.06818 24.3328 0.640909 23.9055C0.213636 23.4782 0 22.9646 0 22.3646V2.7282C0 2.1282 0.213636 1.61457 0.640909 1.1873C1.06818 0.760023 1.58182 0.546387 2.18182 0.546387H13.0909C13.6909 0.546387 14.2045 0.760023 14.6318 1.1873C15.0591 1.61457 15.2727 2.1282 15.2727 2.7282V22.3646C15.2727 22.9646 15.0591 23.4782 14.6318 23.9055C14.2045 24.3328 13.6909 24.5464 13.0909 24.5464H2.18182ZM2.18182 21.2737V22.3646H13.0909V21.2737H2.18182ZM2.18182 19.0918H13.0909V6.00093H2.18182V19.0918ZM2.18182 3.81911H13.0909V2.7282H2.18182V3.81911Z"
+            fill="#333333"
+          />
+        </svg>
+        Phone
+      </div>
+    </gcds-heading>
+    <gcds-container>
+      <gcds-text>
+        <strong>
+          +1 5551234567
+        </strong>
+      </gcds-text>
+      <gcds-text>
+        Available methods:
+      </gcds-text>
+      <ul>
+        <li>
+          <gcds-text>
+            Text message (SMS)
+          </gcds-text>
+        </li>
+        <li>
+          <gcds-text>
+            Voice call
+          </gcds-text>
+        </li>
+      </ul>
+      <gcds-link>
+        Remove
+      </gcds-link>
+      <div
+        class="separator"
+      />
+    </gcds-container>
+    <gcds-container>
+      <gcds-text>
+        <strong>
+          +1 5559876543
+        </strong>
+      </gcds-text>
+      <gcds-text>
+        Available methods:
+      </gcds-text>
+      <ul>
+        <li>
+          <gcds-text>
+            Text message (SMS)
+          </gcds-text>
+        </li>
+      </ul>
+      <gcds-link>
+        Remove
+      </gcds-link>
+      <div
+        class="separator"
+      />
+    </gcds-container>
+    <gcds-container>
+      <gcds-text>
+        <strong>
+          +1 5555555555
+        </strong>
+      </gcds-text>
+      <gcds-text>
+        Available methods:
+      </gcds-text>
+      <ul>
+        <li>
+          <gcds-text>
+            Voice call
+          </gcds-text>
+        </li>
+      </ul>
+      <gcds-link>
+        Remove
+      </gcds-link>
+      <div
+        class="separator"
+      />
+    </gcds-container>
+    <gcds-button>
+      Add phone number
+    </gcds-button>
+  </gcds-container>
+</gcds-container>
+`;
+
+exports[`Manage2FAVerifications Component Snapshots > matches snapshot with single phone SMS only 1`] = `
+<gcds-container>
+  <gcds-heading>
+    Manage 2-step verification methods
+  </gcds-heading>
+  <gcds-text>
+    Choose how you would like to receive verification codes when signing in to your GC Account.
+  </gcds-text>
+  <gcds-heading>
+    Phone numbers
+  </gcds-heading>
+  <gcds-text>
+    Your phone numbers for 2-step verification.
+  </gcds-text>
+  <gcds-container
+    class="sectionCard"
+  >
+    <gcds-heading
+      style="display: flex; align-items: center; gap: 0.5rem;"
+    >
+      <div
+        style="display: flex; height: 1.875rem; padding: 0px 0.625rem; justify-content: center; align-items: center; gap: 0.3125rem; border-radius: 0.3125rem; width: fit-content;"
+      >
+        <svg
+          fill="none"
+          height="25"
+          viewBox="0 0 16 25"
+          width="16"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M2.18182 24.5464C1.58182 24.5464 1.06818 24.3328 0.640909 23.9055C0.213636 23.4782 0 22.9646 0 22.3646V2.7282C0 2.1282 0.213636 1.61457 0.640909 1.1873C1.06818 0.760023 1.58182 0.546387 2.18182 0.546387H13.0909C13.6909 0.546387 14.2045 0.760023 14.6318 1.1873C15.0591 1.61457 15.2727 2.1282 15.2727 2.7282V22.3646C15.2727 22.9646 15.0591 23.4782 14.6318 23.9055C14.2045 24.3328 13.6909 24.5464 13.0909 24.5464H2.18182ZM2.18182 21.2737V22.3646H13.0909V21.2737H2.18182ZM2.18182 19.0918H13.0909V6.00093H2.18182V19.0918ZM2.18182 3.81911H13.0909V2.7282H2.18182V3.81911Z"
+            fill="#333333"
+          />
+        </svg>
+        Phone
+      </div>
+    </gcds-heading>
+    <gcds-container>
+      <gcds-text>
+        <strong>
+          +1 5551234567
+        </strong>
+      </gcds-text>
+      <gcds-text>
+        Available methods:
+      </gcds-text>
+      <ul>
+        <li>
+          <gcds-text>
+            Text message (SMS)
+          </gcds-text>
+        </li>
+      </ul>
+      <div
+        class="separator"
+      />
+    </gcds-container>
+    <gcds-button>
+      Add phone number
+    </gcds-button>
+  </gcds-container>
+</gcds-container>
+`;
+
+exports[`Manage2FAVerifications Component Snapshots > matches snapshot with single phone both SMS and Voice 1`] = `
+<gcds-container
+  class="hydrated"
+>
+  <gcds-heading
+    class="hydrated"
+  >
+    Manage 2-step verification methods
+  </gcds-heading>
+  <gcds-text
+    class="hydrated"
+  >
+    Choose how you would like to receive verification codes when signing in to your GC Account.
+  </gcds-text>
+  <gcds-heading
+    class="hydrated"
+  >
+    Phone numbers
+  </gcds-heading>
+  <gcds-text
+    class="hydrated"
+  >
+    Your phone numbers for 2-step verification.
+  </gcds-text>
+  <gcds-container
+    class="sectionCard hydrated"
+  >
+    <gcds-heading
+      class="hydrated"
+      style="display: flex; align-items: center; gap: 0.5rem;"
+    >
+      <div
+        style="display: flex; height: 1.875rem; padding: 0px 0.625rem; justify-content: center; align-items: center; gap: 0.3125rem; border-radius: 0.3125rem; width: fit-content;"
+      >
+        <svg
+          fill="none"
+          height="25"
+          viewBox="0 0 16 25"
+          width="16"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M2.18182 24.5464C1.58182 24.5464 1.06818 24.3328 0.640909 23.9055C0.213636 23.4782 0 22.9646 0 22.3646V2.7282C0 2.1282 0.213636 1.61457 0.640909 1.1873C1.06818 0.760023 1.58182 0.546387 2.18182 0.546387H13.0909C13.6909 0.546387 14.2045 0.760023 14.6318 1.1873C15.0591 1.61457 15.2727 2.1282 15.2727 2.7282V22.3646C15.2727 22.9646 15.0591 23.4782 14.6318 23.9055C14.2045 24.3328 13.6909 24.5464 13.0909 24.5464H2.18182ZM2.18182 21.2737V22.3646H13.0909V21.2737H2.18182ZM2.18182 19.0918H13.0909V6.00093H2.18182V19.0918ZM2.18182 3.81911H13.0909V2.7282H2.18182V3.81911Z"
+            fill="#333333"
+          />
+        </svg>
+        Phone
+      </div>
+    </gcds-heading>
+    <gcds-container
+      class="hydrated"
+    >
+      <gcds-text
+        class="hydrated"
+      >
+        <strong>
+          +1 5551234567
+        </strong>
+      </gcds-text>
+      <gcds-text
+        class="hydrated"
+      >
+        Available methods:
+      </gcds-text>
+      <ul>
+        <li>
+          <gcds-text
+            class="hydrated"
+          >
+            Text message (SMS)
+          </gcds-text>
+        </li>
+        <li>
+          <gcds-text
+            class="hydrated"
+          >
+            Voice call
+          </gcds-text>
+        </li>
+      </ul>
+      <div
+        class="separator"
+      />
+    </gcds-container>
+    <gcds-button
+      class="hydrated"
+    >
+      Add phone number
+    </gcds-button>
+  </gcds-container>
+</gcds-container>
+`;
+
+exports[`Manage2FAVerifications Component Snapshots > matches snapshot with three different phone numbers (shows remove links) 1`] = `
+<gcds-container>
+  <gcds-heading>
+    Manage 2-step verification methods
+  </gcds-heading>
+  <gcds-text>
+    Choose how you would like to receive verification codes when signing in to your GC Account.
+  </gcds-text>
+  <gcds-heading>
+    Phone numbers
+  </gcds-heading>
+  <gcds-text>
+    Your phone numbers for 2-step verification.
+  </gcds-text>
+  <gcds-container
+    class="sectionCard"
+  >
+    <gcds-heading
+      style="display: flex; align-items: center; gap: 0.5rem;"
+    >
+      <div
+        style="display: flex; height: 1.875rem; padding: 0px 0.625rem; justify-content: center; align-items: center; gap: 0.3125rem; border-radius: 0.3125rem; width: fit-content;"
+      >
+        <svg
+          fill="none"
+          height="25"
+          viewBox="0 0 16 25"
+          width="16"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M2.18182 24.5464C1.58182 24.5464 1.06818 24.3328 0.640909 23.9055C0.213636 23.4782 0 22.9646 0 22.3646V2.7282C0 2.1282 0.213636 1.61457 0.640909 1.1873C1.06818 0.760023 1.58182 0.546387 2.18182 0.546387H13.0909C13.6909 0.546387 14.2045 0.760023 14.6318 1.1873C15.0591 1.61457 15.2727 2.1282 15.2727 2.7282V22.3646C15.2727 22.9646 15.0591 23.4782 14.6318 23.9055C14.2045 24.3328 13.6909 24.5464 13.0909 24.5464H2.18182ZM2.18182 21.2737V22.3646H13.0909V21.2737H2.18182ZM2.18182 19.0918H13.0909V6.00093H2.18182V19.0918ZM2.18182 3.81911H13.0909V2.7282H2.18182V3.81911Z"
+            fill="#333333"
+          />
+        </svg>
+        Phone
+      </div>
+    </gcds-heading>
+    <gcds-container>
+      <gcds-text>
+        <strong>
+          +1 5551111111
+        </strong>
+      </gcds-text>
+      <gcds-text>
+        Available methods:
+      </gcds-text>
+      <ul>
+        <li>
+          <gcds-text>
+            Text message (SMS)
+          </gcds-text>
+        </li>
+      </ul>
+      <gcds-link>
+        Remove
+      </gcds-link>
+      <div
+        class="separator"
+      />
+    </gcds-container>
+    <gcds-container>
+      <gcds-text>
+        <strong>
+          +1 5552222222
+        </strong>
+      </gcds-text>
+      <gcds-text>
+        Available methods:
+      </gcds-text>
+      <ul>
+        <li>
+          <gcds-text>
+            Voice call
+          </gcds-text>
+        </li>
+      </ul>
+      <gcds-link>
+        Remove
+      </gcds-link>
+      <div
+        class="separator"
+      />
+    </gcds-container>
+    <gcds-container>
+      <gcds-text>
+        <strong>
+          +1 5553333333
+        </strong>
+      </gcds-text>
+      <gcds-text>
+        Available methods:
+      </gcds-text>
+      <ul>
+        <li>
+          <gcds-text>
+            Text message (SMS)
+          </gcds-text>
+        </li>
+      </ul>
+      <gcds-link>
+        Remove
+      </gcds-link>
+      <div
+        class="separator"
+      />
+    </gcds-container>
+    <gcds-button>
+      Add phone number
+    </gcds-button>
+  </gcds-container>
+</gcds-container>
+`;
+
+exports[`Manage2FAVerifications Component Snapshots > matches snapshot with unknown factor type 1`] = `
+<gcds-container
+  class="hydrated"
+>
+  <gcds-heading
+    class="hydrated"
+  >
+    Manage 2-step verification methods
+  </gcds-heading>
+  <gcds-text
+    class="hydrated"
+  >
+    Choose how you would like to receive verification codes when signing in to your GC Account.
+  </gcds-text>
+  <gcds-heading
+    class="hydrated"
+  >
+    Phone numbers
+  </gcds-heading>
+  <gcds-text
+    class="hydrated"
+  >
+    Your phone numbers for 2-step verification.
+  </gcds-text>
+  <gcds-container
+    class="sectionCard hydrated"
+  >
+    <gcds-heading
+      class="hydrated"
+      style="display: flex; align-items: center; gap: 0.5rem;"
+    >
+      <div
+        style="display: flex; height: 1.875rem; padding: 0px 0.625rem; justify-content: center; align-items: center; gap: 0.3125rem; border-radius: 0.3125rem; width: fit-content;"
+      >
+        <svg
+          fill="none"
+          height="25"
+          viewBox="0 0 16 25"
+          width="16"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M2.18182 24.5464C1.58182 24.5464 1.06818 24.3328 0.640909 23.9055C0.213636 23.4782 0 22.9646 0 22.3646V2.7282C0 2.1282 0.213636 1.61457 0.640909 1.1873C1.06818 0.760023 1.58182 0.546387 2.18182 0.546387H13.0909C13.6909 0.546387 14.2045 0.760023 14.6318 1.1873C15.0591 1.61457 15.2727 2.1282 15.2727 2.7282V22.3646C15.2727 22.9646 15.0591 23.4782 14.6318 23.9055C14.2045 24.3328 13.6909 24.5464 13.0909 24.5464H2.18182ZM2.18182 21.2737V22.3646H13.0909V21.2737H2.18182ZM2.18182 19.0918H13.0909V6.00093H2.18182V19.0918ZM2.18182 3.81911H13.0909V2.7282H2.18182V3.81911Z"
+            fill="#333333"
+          />
+        </svg>
+        Phone
+      </div>
+    </gcds-heading>
+    <gcds-container
+      class="hydrated"
+    >
+      <gcds-text
+        class="hydrated"
+      >
+        <strong>
+          +1 5551234567
+        </strong>
+      </gcds-text>
+      <gcds-text
+        class="hydrated"
+      >
+        Available methods:
+      </gcds-text>
+      <ul>
+        <li>
+          <gcds-text
+            class="hydrated"
+          >
+            unknown_type
+          </gcds-text>
+        </li>
+      </ul>
+      <div
+        class="separator"
+      />
+    </gcds-container>
+    <gcds-button
+      class="hydrated"
+    >
+      Add phone number
+    </gcds-button>
+  </gcds-container>
+</gcds-container>
+`;
+
+exports[`Manage2FAVerifications Component Snapshots > matches snapshot with voice call only 1`] = `
+<gcds-container>
+  <gcds-heading>
+    Manage 2-step verification methods
+  </gcds-heading>
+  <gcds-text>
+    Choose how you would like to receive verification codes when signing in to your GC Account.
+  </gcds-text>
+  <gcds-heading>
+    Phone numbers
+  </gcds-heading>
+  <gcds-text>
+    Your phone numbers for 2-step verification.
+  </gcds-text>
+  <gcds-container
+    class="sectionCard"
+  >
+    <gcds-heading
+      style="display: flex; align-items: center; gap: 0.5rem;"
+    >
+      <div
+        style="display: flex; height: 1.875rem; padding: 0px 0.625rem; justify-content: center; align-items: center; gap: 0.3125rem; border-radius: 0.3125rem; width: fit-content;"
+      >
+        <svg
+          fill="none"
+          height="25"
+          viewBox="0 0 16 25"
+          width="16"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M2.18182 24.5464C1.58182 24.5464 1.06818 24.3328 0.640909 23.9055C0.213636 23.4782 0 22.9646 0 22.3646V2.7282C0 2.1282 0.213636 1.61457 0.640909 1.1873C1.06818 0.760023 1.58182 0.546387 2.18182 0.546387H13.0909C13.6909 0.546387 14.2045 0.760023 14.6318 1.1873C15.0591 1.61457 15.2727 2.1282 15.2727 2.7282V22.3646C15.2727 22.9646 15.0591 23.4782 14.6318 23.9055C14.2045 24.3328 13.6909 24.5464 13.0909 24.5464H2.18182ZM2.18182 21.2737V22.3646H13.0909V21.2737H2.18182ZM2.18182 19.0918H13.0909V6.00093H2.18182V19.0918ZM2.18182 3.81911H13.0909V2.7282H2.18182V3.81911Z"
+            fill="#333333"
+          />
+        </svg>
+        Phone
+      </div>
+    </gcds-heading>
+    <gcds-container>
+      <gcds-text>
+        <strong>
+          +1 5551234567
+        </strong>
+      </gcds-text>
+      <gcds-text>
+        Available methods:
+      </gcds-text>
+      <ul>
+        <li>
+          <gcds-text>
+            Voice call
+          </gcds-text>
+        </li>
+      </ul>
+      <div
+        class="separator"
+      />
+    </gcds-container>
+    <gcds-button>
+      Add phone number
+    </gcds-button>
+  </gcds-container>
+</gcds-container>
+`;
