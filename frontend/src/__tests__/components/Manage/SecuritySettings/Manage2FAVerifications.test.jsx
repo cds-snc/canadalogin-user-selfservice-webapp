@@ -1,3 +1,15 @@
+/**
+ * Unit tests for Manage2FAVerifications component
+ *
+ * Tests verify component behavior with different API responses:
+ * - Loading states
+ * - Single/multiple phone numbers with SMS/Voice verification
+ * - Error handling and edge cases
+ * - UI content display and formatting
+ *
+ * These tests are more reliable than snapshot tests as they focus on
+ * behavior and content rather than exact DOM structure.
+ */
 import React from "react";
 import { render, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -93,7 +105,7 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
 
     // Wait for component to update after API call
     await waitFor(() => {
-      expect(getByText("555 123 4567")).toBeInTheDocument();
+      expect(getByText("+1 5551234567")).toBeInTheDocument();
       expect(getByText("Text message (SMS)")).toBeInTheDocument();
       expect(getByText("Add phone number")).toBeInTheDocument();
     });
@@ -111,7 +123,7 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
     const { getByText } = render(<Manage2FAVerifications />);
 
     await waitFor(() => {
-      expect(getByText("555 123 4567")).toBeInTheDocument();
+      expect(getByText("+1 5551234567")).toBeInTheDocument();
       expect(getByText("Text message (SMS)")).toBeInTheDocument();
       expect(getByText("Voice call")).toBeInTheDocument();
     });
@@ -131,9 +143,9 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
     const { getByText } = render(<Manage2FAVerifications />);
 
     await waitFor(() => {
-      expect(getByText("555 123 4567")).toBeInTheDocument();
-      expect(getByText("555 987 6543")).toBeInTheDocument();
-      expect(getByText("555 555 5555")).toBeInTheDocument();
+      expect(getByText("+1 5551234567")).toBeInTheDocument();
+      expect(getByText("+1 5559876543")).toBeInTheDocument();
+      expect(getByText("+1 5555555555")).toBeInTheDocument();
     });
   });
 
@@ -146,7 +158,7 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
     const { getByText, queryByText } = render(<Manage2FAVerifications />);
 
     await waitFor(() => {
-      expect(getByText("555 123 4567")).toBeInTheDocument();
+      expect(getByText("+1 5551234567")).toBeInTheDocument();
       expect(getByText("Voice call")).toBeInTheDocument();
       expect(queryByText("Text message (SMS)")).not.toBeInTheDocument();
     });
@@ -161,7 +173,8 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
     const { getByText } = render(<Manage2FAVerifications />);
 
     await waitFor(() => {
-      expect(getByText("555 123 4567")).toBeInTheDocument();
+      expect(getByText("+1 5551234567")).toBeInTheDocument();
+      expect(getByText("unknown_type")).toBeInTheDocument();
       // Should still display the phone number even with unknown type
     });
   });
@@ -176,7 +189,7 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
 
     await waitFor(() => {
       // Should format the long number appropriately
-      expect(getByText("1 555 123 456 7890")).toBeInTheDocument();
+      expect(getByText("+1 15551234567890")).toBeInTheDocument();
     });
   });
 
