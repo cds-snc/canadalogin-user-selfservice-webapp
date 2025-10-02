@@ -1,5 +1,4 @@
 # tests/test_retrieve_transient_otp.py
-import json
 import pytest
 from httpx import AsyncClient, MockTransport, Response, Request
 from fastapi import HTTPException
