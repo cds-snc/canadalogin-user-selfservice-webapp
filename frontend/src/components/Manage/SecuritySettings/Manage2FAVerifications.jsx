@@ -57,7 +57,7 @@ export default function Manage2FAVerifications() {
           navigateHelper(backToSecuritySettingsPage);
         }
       } catch (err) {
-        console.log("err", err);
+        console.error("err", err);
       } finally {
         setLoading(false);
       }
