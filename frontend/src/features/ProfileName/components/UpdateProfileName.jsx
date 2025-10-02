@@ -8,14 +8,14 @@ import {
   GcdsText,
 } from "@cdssnc/gcds-components-react";
 import { useParams } from "react-router";
-import { getPageContent } from "../../utils/functions.jsx";
-import { userProfileDispatch } from "../../utils/userProfileDispatch.jsx";
-import { path } from "../../utils/routeHelpers.js";
-import { PAGES } from "../../utils/constants";
-import SubmitButton from "../Layout/SubmitButton";
-import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
-import { useUser } from "../Providers/useUser.tsx";
-import ServicesWithAccessInfoSection from "../InfoBlocks/ServicesWithAccessInfoSection.jsx";
+import { getPageContent } from "../../../utils/functions.jsx";
+import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
+import { path } from "../../../utils/routeHelpers.js";
+import { PAGES } from "../../../utils/constants.jsx";
+import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
+import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
+import { useUser } from "../../../components/Providers/useUser.tsx";
+import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx";
 
 export default function ProfileUpdateName() {
   const { language } = useParams();
