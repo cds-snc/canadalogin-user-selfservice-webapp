@@ -15,10 +15,15 @@ import { useUser } from "../Providers/useUser.tsx";
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
 import VerifiedBadge from "../Badges/VerifiedBadge.jsx";
 import ViewContactPhoneNumber from "../../features/ContactPhoneNumber/components/ViewContactPhoneNumber.jsx";
+import ViewNameCard from "../../features/ProfileName/components/ViewProfileNameCard.jsx";
 
 const DisplayEmailInfo = ({ email, pageContent }) => {
   return (
     <>
+      <GcdsHeading tag="h3" marginTop="300">
+        {pageContent["7"]}
+      </GcdsHeading>
+      <GcdsText>{pageContent["8"]}</GcdsText>
       <GcdsGrid columns="1fr auto" className="gridInline">
         <GcdsText>{email}</GcdsText>
       </GcdsGrid>
@@ -47,34 +52,12 @@ export default function ProfileHome() {
       <GcdsHeading tag="h1">{pageContent["1"]}</GcdsHeading>
       <GcdsHeading tag="h2">{pageContent["2"]}</GcdsHeading>
 
-      <GcdsContainer className="sectionCard">
-        <GcdsHeading tag="h6" marginTop="300">
-          {pageContent["3"]}
-        </GcdsHeading>
-        <GcdsGrid columns="1fr auto" className="gridInline">
-          <GcdsText>{name}</GcdsText>
-          <GcdsLink
-            href={editProfile}
-            size="regular"
-            onGcdsClick={(ev) => {
-              ev.preventDefault();
-              navigateHelper(ev.detail);
-            }}
-          >
-            {pageContent["5"]}
-          </GcdsLink>
-        </GcdsGrid>
-      </GcdsContainer>
+      <ViewNameCard pageContent={pageContent} />
 
       <GcdsHeading tag="h2" marginTop="300">
         {pageContent["6"]}
       </GcdsHeading>
       <GcdsContainer className="sectionCard">
-        <GcdsHeading tag="h3" marginTop="300">
-          {pageContent["7"]}
-        </GcdsHeading>
-        <GcdsText>{pageContent["8"]}</GcdsText>
-
         <DisplayEmailInfo email={email} pageContent={pageContent} />
 
         <div className="separator" />
