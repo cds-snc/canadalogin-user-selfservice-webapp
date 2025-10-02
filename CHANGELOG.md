@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.2.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.1.0...v1.2.0) (2025-10-02)
+
+
+### Features
+
+* **CI/CD:** Setup codeowners for our deploys ([#771](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/771)) ([a7e451c](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/a7e451cf40779868c83637989e385752bfd24d89))
+
+
+### Bug Fixes
+
+* **CI/CD:** Build per-enironment and re-enable deployment pipeline ([#783](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/783)) ([d0d58e6](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/d0d58e617a10da44d39f34a73c0c29af32c9fc29))
+* **CI/CD:** Update release pipeline to account for the `v` in created tags ([#774](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/774)) ([80ba645](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/80ba6458585e81a2185bbe6189583eed59447fa2))
+* **frontend:** update manage french translation to match figma ([#782](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/782)) ([31396b8](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/31396b88444459b5bf6e72b06c17c47e33798e40))
+
 ## [1.1.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.0.0...v1.1.0) (2025-09-29)
 
 
