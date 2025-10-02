@@ -156,14 +156,6 @@ exports[`Manage2FAVerifications Component Snapshots > matches snapshot when API 
 </gcds-container>
 `;
 
-exports[`Manage2FAVerifications Component Snapshots > matches snapshot with default state 1`] = `
-<div
-  data-testid="loading"
->
-  Loading verification methods...
-</div>
-`;
-
 exports[`Manage2FAVerifications Component Snapshots > matches snapshot with long phone number 1`] = `
 <gcds-container>
   <gcds-heading>
