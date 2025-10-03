@@ -92,6 +92,7 @@ export const PAGES = {
   successfullyUpdatedContactPhoneNumber:
     "SuccessfullyUpdatedContactPhoneNumber",
   manage2FAVerifications: "Manage2FAVerifications",
+  add2FA: "Add2FA",
 };
 
 export const FOOTERS = {

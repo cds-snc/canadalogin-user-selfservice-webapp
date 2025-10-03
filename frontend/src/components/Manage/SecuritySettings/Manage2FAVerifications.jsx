@@ -1,19 +1,19 @@
-import { useParams } from "react-router";
-import { getPageContent } from "../../../utils/functions.jsx";
-import { PAGES } from "../../../utils/constants.jsx";
-import { useNavigateHelper } from "../../../hooks/useNavigate.js";
 import {
+  GcdsButton,
   GcdsContainer,
   GcdsHeading,
-  GcdsText,
   GcdsLink,
-  GcdsButton,
+  GcdsText,
 } from "@cdssnc/gcds-components-react";
-import { useUser } from "../../Providers/useUser.js";
-import { otpFactors } from "../../../features/ChangePassword/api/otpFactors.jsx";
 import { useEffect, useState } from "react";
+import { useParams } from "react-router";
+import { otpFactors } from "../../../features/ChangePassword/api/otpFactors.jsx";
+import { useNavigateHelper } from "../../../hooks/useNavigate.js";
+import { PAGES } from "../../../utils/constants.jsx";
+import { getPageContent } from "../../../utils/functions.jsx";
 import { path } from "../../../utils/routeHelpers.js";
 import Loader from "../../Layout/Loading.jsx";
+import { useUser } from "../../Providers/useUser.js";
 
 export default function Manage2FAVerifications() {
   const { language } = useParams();
@@ -141,8 +141,10 @@ export default function Manage2FAVerifications() {
         </GcdsHeading>
         {phoneFactorsComponent}
         <GcdsButton
+          id="add-2fa-button"
           onGcdsClick={(ev) => {
             ev.preventDefault();
+            navigateHelper(path(PAGES.add2FA, { language }));
           }}
         >
           {pageContent["10"]}
