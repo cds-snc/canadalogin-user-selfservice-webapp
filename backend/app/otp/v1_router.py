@@ -10,7 +10,6 @@ from app.otp.schemas import (
     RetrievalData,
     OtpType,
     OtpEnrollmentRequest,
-    EnrollmentResponse,
 )
 from app.otp.services.retrieve_transient_otp import handle_otp_status_retrieval
 from app.otp.services.send_transient_otp import handle_otp_send

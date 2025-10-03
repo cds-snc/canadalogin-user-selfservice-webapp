@@ -7,10 +7,8 @@ from pydantic import ValidationError
 
 from app.config import get_configuration
 from app.otp.schemas import (
-    OtpEnrollmentRequest, 
-    EnrollmentResponse, 
-    EnrollmentResponseData,
-    OtpType
+    OtpEnrollmentRequest,
+    EnrollmentResponseData
 )
 from app.users.services.profile import my_profile
 from app.utils.access_token import get_admin_token, get_auth_request_headers
@@ -24,15 +22,15 @@ logger = logging.getLogger(__name__)
 
 
 async def handle_sms_otp_enrollment(
-    global_http_client: AsyncClient, 
-    enrollment_request: OtpEnrollmentRequest, 
+    global_http_client: AsyncClient,
+    enrollment_request: OtpEnrollmentRequest,
     user_access_token: str
 ):
     """Enroll a phone number for SMS OTP authentication"""
     try:
         logger.info("Attempting to enroll SMS OTP factor")
         start_time = datetime.now()
-        
+
         # Verify user profile
         my_profile_response = await my_profile(global_http_client, user_access_token)
         if not my_profile_response.success:
@@ -42,10 +40,10 @@ async def handle_sms_otp_enrollment(
                 data=None,
                 message="User verification failed"
             )
-        
+
         user_id = my_profile_response.data.id
         logger.info(f"Enrolling SMS OTP for user: {user_id}")
-        
+
         http_client_response = await dispatch_sms_enrollment(
             global_http_client, enrollment_request, user_id
         )
@@ -66,7 +64,7 @@ async def handle_sms_otp_enrollment(
             )
 
         response_json = http_client_response.json()
-        
+
         try:
             # Parse the enrollment response
             enrollment_data = EnrollmentResponseData(
@@ -79,13 +77,13 @@ async def handle_sms_otp_enrollment(
                 enabled=response_json.get("enabled", True),
                 validated=response_json.get("validated", False)
             )
-            
+
             return ResponseModel(
                 success=True,
                 data=enrollment_data,
                 message="SMS OTP factor enrolled successfully"
             )
-            
+
         except ValidationError as e:
             logger.error(f"Validation Error: {e.json()}")
             return generate_error_response(422, "Server Error")
@@ -99,15 +97,15 @@ async def handle_sms_otp_enrollment(
 
 
 async def handle_voice_otp_enrollment(
-    global_http_client: AsyncClient, 
-    enrollment_request: OtpEnrollmentRequest, 
+    global_http_client: AsyncClient,
+    enrollment_request: OtpEnrollmentRequest,
     user_access_token: str
 ):
     """Enroll a phone number for Voice OTP authentication"""
     try:
         logger.info("Attempting to enroll Voice OTP factor")
         start_time = datetime.now()
-        
+
         # Verify user profile
         my_profile_response = await my_profile(global_http_client, user_access_token)
         if not my_profile_response.success:
@@ -117,10 +115,10 @@ async def handle_voice_otp_enrollment(
                 data=None,
                 message="User verification failed"
             )
-        
+
         user_id = my_profile_response.data.id
         logger.info(f"Enrolling Voice OTP for user: {user_id}")
-        
+
         http_client_response = await dispatch_voice_enrollment(
             global_http_client, enrollment_request, user_id
         )
@@ -141,7 +139,7 @@ async def handle_voice_otp_enrollment(
             )
 
         response_json = http_client_response.json()
-        
+
         try:
             # Parse the enrollment response
             enrollment_data = EnrollmentResponseData(
@@ -154,13 +152,13 @@ async def handle_voice_otp_enrollment(
                 enabled=response_json.get("enabled", True),
                 validated=response_json.get("validated", False)
             )
-            
+
             return ResponseModel(
                 success=True,
                 data=enrollment_data,
                 message="Voice OTP factor enrolled successfully"
             )
-            
+
         except ValidationError as e:
             logger.error(f"Validation Error: {e.json()}")
             return generate_error_response(422, "Server Error")
@@ -174,7 +172,7 @@ async def handle_voice_otp_enrollment(
 
 
 async def dispatch_sms_enrollment(
-    global_http_client: AsyncClient, 
+    global_http_client: AsyncClient,
     enrollment_request: OtpEnrollmentRequest,
     user_id: str
 ):
@@ -188,7 +186,7 @@ async def dispatch_sms_enrollment(
         formatted_phone = prepare_pydantic_phone_number_for_verify(
             enrollment_request.phoneNumber
         )
-        
+
         enrollment_data = {
             "userId": user_id,
             "phoneNumber": formatted_phone
@@ -205,14 +203,14 @@ async def dispatch_sms_enrollment(
         raise he
     except Exception as error:
         logger.error(
-            f"Request to /v2.0/factors/smsotp error: {str(error)}", 
+            f"Request to /v2.0/factors/smsotp error: {str(error)}",
             exc_info=True
         )
         raise error
 
 
 async def dispatch_voice_enrollment(
-    global_http_client: AsyncClient, 
+    global_http_client: AsyncClient,
     enrollment_request: OtpEnrollmentRequest,
     user_id: str
 ):
@@ -226,7 +224,7 @@ async def dispatch_voice_enrollment(
         formatted_phone = prepare_pydantic_phone_number_for_verify(
             enrollment_request.phoneNumber
         )
-        
+
         enrollment_data = {
             "userId": user_id,
             "phoneNumber": formatted_phone
@@ -243,7 +241,7 @@ async def dispatch_voice_enrollment(
         raise he
     except Exception as error:
         logger.error(
-            f"Request to /v2.0/factors/voiceotp error: {str(error)}", 
+            f"Request to /v2.0/factors/voiceotp error: {str(error)}",
             exc_info=True
         )
         raise error
