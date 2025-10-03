@@ -1,23 +1,23 @@
 import logging
 
-from fastapi import APIRouter, status
-from fastapi import Request, Depends
-
+from app.auth.services.auth_user_session import get_users_current_session
 from app.otp.schemas import (
-    UserOtpInfo,
-    OtpRequestResponse,
-    UserOtpVerificationInfo,
-    RetrievalData,
-    OtpType,
     OtpEnrollmentRequest,
+    OtpRequestResponse,
+    OtpType,
+    RetrievalData,
+    UserOtpInfo,
+    UserOtpVerificationInfo,
+)
+from app.otp.services.enroll_otp import (
+    handle_sms_otp_enrollment,
+    handle_voice_otp_enrollment,
 )
 from app.otp.services.retrieve_transient_otp import handle_otp_status_retrieval
 from app.otp.services.send_transient_otp import handle_otp_send
 from app.otp.services.verify_transient_otp import handle_otp_verification
-from app.otp.services.enroll_otp import handle_sms_otp_enrollment, handle_voice_otp_enrollment
 from app.utils.schemas import ResponseModel
-
-from app.auth.services.auth_user_session import get_users_current_session
+from fastapi import APIRouter, Depends, Request, status
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
