@@ -378,5 +378,18 @@
     "8": "Your session will expire at {{time}}.",
     "9": "Loading...",
     "10": "Failed to sign you out. Redirecting..."
+  },
+  "Manage2FAVerifications": {
+    "1": "Manage 2-step verification",
+    "2": "A second step after your password helps verify it’s you signing in.",
+    "3": "Available second steps",
+    "4": "You can receive one-time verification codes at these numbers.",
+    "5": "Phones",
+    "6": "Verification codes are sent by:",
+    "7": "Text message (SMS)",
+    "8": "Voice call",
+    "9": "Delete",
+    "10": "+ Add a phone number",
+    "11": "Loading..."
   }
 }
