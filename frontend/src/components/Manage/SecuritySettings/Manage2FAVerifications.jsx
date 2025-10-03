@@ -144,7 +144,7 @@ export default function Manage2FAVerifications() {
           id="add-2fa-button"
           onGcdsClick={(ev) => {
             ev.preventDefault();
-            navigateHelper(path(PAGES.add2FA, { language }));
+            navigateHelper(path(PAGES.add2FAPage, { language }));
           }}
         >
           {pageContent["10"]}

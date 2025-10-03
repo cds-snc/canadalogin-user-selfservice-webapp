@@ -161,7 +161,7 @@ export const appRoutes = [
                   {
                     path: "add-2fa",
                     element: <Add2FAPage />,
-                    handle: { id: PAGES.add2FA },
+                    handle: { id: PAGES.add2FAPage },
                   },
                 ],
               },
