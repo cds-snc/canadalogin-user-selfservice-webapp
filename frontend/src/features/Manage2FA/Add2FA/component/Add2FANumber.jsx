@@ -102,9 +102,7 @@ export default function Add2FANumber({
           <br />
           <GcdsText>
             {pageContentJson["3"]}{" "}
-            <GcdsLink href={backtoProfilePage}>
-              {pageContentJson["4"]}{" "}
-            </GcdsLink>
+            <GcdsLink href={backtoProfilePage}>{pageContentJson["4"]}</GcdsLink>{" "}
             {pageContentJson["5"]}
           </GcdsText>
         </GcdsContainer>

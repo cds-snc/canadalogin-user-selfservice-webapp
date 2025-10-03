@@ -391,5 +391,22 @@
     "9": "Delete",
     "10": "+ Add a phone number",
     "11": "Loading..."
+  },
+  "Add2FANumber": {
+    "1": "Enter your new phone number",
+    "2": "Enter the new phone number you want to receive security codes at each time you sign in.",
+    "3": "This number will only be used for 2-step verification. To mange your contact phone number, go to your",
+    "4": "Personal Information",
+    "5": "page.",
+    "6": "Country",
+    "7": "Phone number",
+    "8": "My counttry is not listed here",
+    "9": "Some countries are not supported due to technical limitations. If your country is not listed, you will be unable to create a GC Sign in account at this time. We apologize for the inconvenience.",
+    "10": "How should we send you the code?",
+    "11": "Text message (SMS)",
+    "12": "Mobile only. Carrier charges may apply.",
+    "13": "Voice call",
+    "14": "Mobile or landline. Carrier charges may apply.",
+    "15": "You can change this the next time you sign in."
   }
 }
