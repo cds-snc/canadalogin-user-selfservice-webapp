@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useParams, useNavigate } from "react-router";
 import {
   GcdsButton,
   GcdsContainer,
@@ -7,24 +8,21 @@ import {
   GcdsInput,
   GcdsText,
 } from "@cdssnc/gcds-components-react";
-import { useParams } from "react-router";
 import { getPageContent } from "../../../utils/functions.jsx";
-import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
 import { path } from "../../../utils/routeHelpers.js";
 import { PAGES } from "../../../utils/constants.jsx";
 import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
-import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
-import { useUser } from "../../../components/Providers/useUser.tsx";
 import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx";
 
 export default function ProfileUpdateName() {
   const { language } = useParams();
-  const { state, dispatch } = useUser();
   const pageNameEditJson = getPageContent(language, PAGES.profileUpdateName);
-  const navigateHelper = useNavigateHelper();
-  const { cloneUserProfile, updateClonedProfile } =
-    userProfileDispatch(dispatch);
-  const [editProfile, setEditProfile] = useState({ ...state.editProfile });
+  const navigate = useNavigate();
+  const [editProfile, setEditProfile] = useState({
+    givenName: "",
+    familyName: "",
+    formatted: "",
+  });
 
   const confirmation = path(PAGES.profileUpdateNameConfirmUpdate, {
     language: language,
@@ -46,14 +44,8 @@ export default function ProfileUpdateName() {
       familyName: editProfile.familyName,
       formatted: `${editProfile.givenName} ${editProfile.familyName}`,
     };
-    updateClonedProfile({ name: updatedName });
-    navigateHelper(confirmation);
+    navigate(confirmation, { state: { name: updatedName } });
   };
-
-  useEffect(() => {
-    cloneUserProfile();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <GcdsContainer>
@@ -101,7 +93,7 @@ export default function ProfileUpdateName() {
             onGcdsClick={(ev) => {
               console.log(ev);
               ev.preventDefault();
-              navigateHelper(backToProfile);
+              navigate(backToProfile);
             }}
           >
             {pageNameEditJson["4"]}

@@ -1,5 +1,5 @@
-import React from "react";
-import { useParams } from "react-router";
+import { useEffect } from "react";
+import { useParams, useLocation } from "react-router";
 
 import {
   GcdsContainer,
@@ -10,16 +10,18 @@ import {
   GcdsGrid,
   GcdsLink,
 } from "@cdssnc/gcds-components-react";
-import { getPageContent } from "../../utils/functions";
-import { path } from "../../utils/routeHelpers.js";
-import { PAGES } from "../../utils/constants";
-import { useUser } from "../Providers/useUser";
-import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
-import { authService } from "../../services/authService.jsx";
-import { userProfileDispatch } from "../../utils/userProfileDispatch.jsx";
+import { getPageContent } from "../../../utils/functions.jsx";
+import { path } from "../../../utils/routeHelpers.js";
+import { PAGES } from "../../../utils/constants.jsx";
+import { useUser } from "../../../components/Providers/useUser.tsx";
+import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
+import { authService } from "../../../services/authService.jsx";
+import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
 
-export default function ProfileUpdateNameSuccess() {
+export default function SuccessfullyUpdatedName() {
   const { language } = useParams();
+  const location = useLocation();
+
   const { state, dispatch } = useUser();
   const pageContentJson = getPageContent(
     language,
@@ -30,6 +32,17 @@ export default function ProfileUpdateNameSuccess() {
   const { setLoading } = userProfileDispatch(dispatch);
 
   const username = state?.userProfile?.name.formatted || "";
+  const editProfile = path(PAGES.profileUpdateName, { language: language });
+
+  // state comes from the navigate call in UpdateProfileName.jsx
+  // If user directly navigates directly to this page, there will be no state and will redirected back to edit page
+  const { name } = location.state ?? {};
+
+  useEffect(() => {
+    // If no name data, redirect to edit page
+    if (!name) navigateHelper(editProfile);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSignout = async (e) => {
     e.preventDefault();
@@ -71,7 +84,6 @@ export default function ProfileUpdateNameSuccess() {
         {pageContentJson["5"]}{" "}
         <GcdsLink href="#">{pageContentJson["8"]}</GcdsLink>
       </GcdsText>
-
       <GcdsGrid columns="max-content max-content" gap="200">
         <GcdsButton
           style={{ width: "fit-content" }}
