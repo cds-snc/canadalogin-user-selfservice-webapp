@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`ProfileUpdateName Component > matches snapshot 1`] = `
+exports[`UpdateProfileName Component > matches snapshot 1`] = `
 <div>
   <gcds-container>
     <gcds-heading>

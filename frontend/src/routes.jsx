@@ -12,7 +12,7 @@ import { AppLanguageSetup } from "./components/Providers/AppLanguageSetup";
 import ManageDashboard from "./components/Manage/ManageDashboard.jsx";
 import Verification from "./components/Verification/Verification.jsx";
 import ChangePasswordIndex from "./features/ChangePassword/components/ChangePasswordIndex.jsx";
-import ProfileUpdateName from "./features/ProfileName/components/UpdateProfileName.jsx";
+import ProfileUpdateName from "./features/ProfileName/components/ProfileUpdateName.jsx";
 import ProfileHome from "./components/Manage/ProfileHome.jsx";
 import CheckYourEmail from "./components/Manage/CheckYourEmail.jsx";
 import CompleteTwoStepVerification from "./components/Manage/CompleteTwoStepVerification.jsx";
