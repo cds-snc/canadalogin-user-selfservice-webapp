@@ -15,7 +15,7 @@ env:
   GITHUB_SHA: ${{ github.sha }}
   SBOM_TAG_NAME: gc-signin-dev-backend-api
 
-name: release-pipeline
+name: Release Pipeline - Frontend & Backend API
 
 jobs:
   # Runs the release-please action. This manages the open release PR and
@@ -37,7 +37,10 @@ jobs:
   # Builds the frontend application for the current SHA and stores the artifact in S3.
   build-frontend:
     runs-on: ubuntu-latest
-    environment: dev
+    strategy:
+      matrix:
+        environment: [dev, test]
+    environment: ${{ matrix.environment }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
@@ -120,9 +123,6 @@ jobs:
   # We check the current SHA deployed to the environment to only deploy if necessary.
   deploy-frontends:
     needs: [release-please, build-frontend]
-    # Temporarily disabled while I'm finishing this workflow. I will enable this
-    # once the old deploy workflow is removed.
-    if: false
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -188,9 +188,6 @@ jobs:
   # We check the current SHA deployed to the environment to only deploy if necessary.
   deploy-backends:
     needs: [release-please, build-backend]
-    # Temporarily disabled while I'm finishing this workflow. I will enable this
-    # once the old deploy workflow is removed.
-    if: false
     runs-on: ubuntu-latest
     strategy:
       matrix:

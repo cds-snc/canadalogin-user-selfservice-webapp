@@ -22,13 +22,14 @@ import ProfileUpdateNameSuccess from "./features/ProfileName/components/Successf
 import AreYouSureUpdateContactNumber from "./components/Manage/AreYouSureUpdateContactNumber.jsx";
 import YouMayUpdateEmailAtOtherPlaces from "./components/Manage/YouMayUpdateEmailAtOtherPlaces.jsx";
 import AreYouSureUpdateYourEmail from "./components/Manage/AreYouSureUpdateYourEmail.jsx";
-import SecuritySettings from "./components/Manage/SecuritySettings.jsx";
+import SecuritySettings from "./components/Manage/SecuritySettings/SecuritySettings.jsx";
 import EditLanguagePreferences from "./components/Manage/EditLanguagePreferences.jsx";
 import AreYouSureEditYourLanguage from "./components/Manage/AreYouSureEditYourLanguage.jsx";
 import ProfileYouMayUpdateLanguage from "./components/Manage/ProfileYouMayUpdateLanguage.jsx";
 import { PAGES } from "./utils/constants.jsx";
 import ProfileUpdateNameConfirmUpdate from "./features/ProfileName/components/ConfirmUpdate.jsx";
 import UpdateContactPhoneNumberContainer from "./features/ContactPhoneNumber/components/UpdateContactPhoneNumberContainer.jsx";
+import Manage2FAVerifications from "./components/Manage/SecuritySettings/Manage2FAVerifications.jsx";
 
 export const appRoutes = [
   {
@@ -150,6 +151,11 @@ export const appRoutes = [
                         handle: { id: PAGES.password },
                       },
                     ],
+                  },
+                  {
+                    path: "manage-2fa-verifications",
+                    element: <Manage2FAVerifications />,
+                    handle: { id: PAGES.manage2FAVerifications },
                   },
                 ],
               },
