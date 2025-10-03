@@ -63,3 +63,23 @@ class UserOtpVerificationInfo(BaseModel):
 class RetrievalData(BaseModel):
     trxnId: str
     otpType: OtpType
+
+
+class OtpEnrollmentRequest(BaseModel):
+    phoneNumber: PhoneNumber
+
+
+class EnrollmentResponseData(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+    id: str
+    userId: str
+    type: str
+    phoneNumber: str
+    created: str
+    updated: str
+    enabled: bool
+    validated: bool
+
+
+class EnrollmentResponse(ResponseModel):
+    data: Optional[EnrollmentResponseData] = None
