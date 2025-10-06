@@ -91,6 +91,7 @@ class OtpVerificationCreateRequest(BaseModel):
     """Request schema for creating OTP verification"""
 
     id: str
+    otpType: OtpType
 
 
 class VerificationCreateResponseData(BaseModel):
