@@ -1,0 +1,576 @@
+from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
+from app.otp.schemas import OtpVerificationAttemptRequest, OtpVerificationCreateRequest
+from app.otp.services.verify_otp import (
+    dispatch_sms_verification_attempt,
+    dispatch_sms_verification_create,
+    dispatch_voice_verification_attempt,
+    dispatch_voice_verification_create,
+    handle_sms_otp_verification_attempt,
+    handle_sms_otp_verification_create,
+    handle_voice_otp_verification_attempt,
+    handle_voice_otp_verification_create,
+)
+from app.users.schemas import IBMVerifyUserProfileSchema, ProfileResponse
+
+
+@pytest.fixture
+def mock_verification_create_request():
+    return OtpVerificationCreateRequest(factorId="factor123")
+
+
+@pytest.fixture
+def mock_verification_attempt_request():
+    return OtpVerificationAttemptRequest(verificationId="verification123", otp="123456")
+
+
+@pytest.fixture
+def mock_user_profile_response():
+    from datetime import datetime
+
+    from app.users.schemas import Meta, UserProfileName
+
+    user_profile = IBMVerifyUserProfileSchema(
+        id="user123",
+        userName="test@example.com",
+        name=UserProfileName(givenName="Test", familyName="User"),
+        phoneNumbers=[],
+        emails=[],
+        active=True,
+        meta=Meta(
+            created=datetime.now(),
+            location="test",
+            lastModified=datetime.now(),
+            resourceType="User",
+        ),
+    )
+    return ProfileResponse(
+        success=True, data=user_profile, message="Profile retrieved successfully"
+    )
+
+
+@pytest.fixture
+def mock_ibm_verification_create_response():
+    return {
+        "id": "verification123",
+        "factorId": "factor123",
+        "userId": "user123",
+        "created": "2023-10-03T10:00:00Z",
+        "updated": "2023-10-03T10:00:00Z",
+        "expiry": "2023-10-03T10:05:00Z",
+        "state": "PENDING",
+        "otpDeliveryStatus": "SUCCESS",
+    }
+
+
+@pytest.fixture
+def mock_ibm_verification_attempt_response():
+    return {
+        "id": "verification123",
+        "factorId": "factor123",
+        "userId": "user123",
+        "created": "2023-10-03T10:00:00Z",
+        "updated": "2023-10-03T10:02:00Z",
+        "expiry": "2023-10-03T10:05:00Z",
+        "state": "VERIFIED",
+        "verified": True,
+    }
+
+
+class TestSMSVerificationCreate:
+    @pytest.mark.asyncio
+    async def test_handle_sms_otp_verification_create_success(
+        self,
+        mock_verification_create_request,
+        mock_user_profile_response,
+        mock_ibm_verification_create_response,
+    ):
+        # Mock dependencies
+        mock_http_client = AsyncMock()
+        mock_user_access_token = "user_token_123"
+
+        # Mock the profile service
+        with patch("app.otp.services.verify_otp.my_profile") as mock_my_profile:
+            mock_my_profile.return_value = mock_user_profile_response
+
+            # Mock the dispatch function
+            with patch(
+                "app.otp.services.verify_otp.dispatch_sms_verification_create"
+            ) as mock_dispatch:
+                mock_response = MagicMock()
+                mock_response.status_code = 201
+                mock_response.json.return_value = mock_ibm_verification_create_response
+                mock_dispatch.return_value = mock_response
+
+                result = await handle_sms_otp_verification_create(
+                    mock_http_client,
+                    mock_verification_create_request,
+                    mock_user_access_token,
+                )
+
+                assert result.success is True
+                assert result.data.id == "verification123"
+                assert result.data.factorId == "factor123"
+                assert result.data.state == "PENDING"
+                assert result.message == "SMS OTP verification created successfully"
+
+    @pytest.mark.asyncio
+    async def test_handle_sms_otp_verification_create_profile_failure(
+        self, mock_verification_create_request
+    ):
+        mock_http_client = AsyncMock()
+        mock_user_access_token = "user_token_123"
+
+        # Mock profile failure
+        failed_profile_response = ProfileResponse(
+            success=False, data=None, message="Profile retrieval failed"
+        )
+
+        with patch("app.otp.services.verify_otp.my_profile") as mock_my_profile:
+            mock_my_profile.return_value = failed_profile_response
+
+            result = await handle_sms_otp_verification_create(
+                mock_http_client,
+                mock_verification_create_request,
+                mock_user_access_token,
+            )
+
+            assert result.success is False
+            assert "User verification failed" in result.message
+
+    @pytest.mark.asyncio
+    async def test_handle_sms_otp_verification_create_ibm_error(
+        self, mock_verification_create_request, mock_user_profile_response
+    ):
+        mock_http_client = AsyncMock()
+        mock_user_access_token = "user_token_123"
+
+        with patch("app.otp.services.verify_otp.my_profile") as mock_my_profile:
+            mock_my_profile.return_value = mock_user_profile_response
+
+            with patch(
+                "app.otp.services.verify_otp.dispatch_sms_verification_create"
+            ) as mock_dispatch:
+                mock_response = MagicMock()
+                mock_response.status_code = 400
+                mock_response.json.return_value = {"error": "Invalid factor ID"}
+                mock_dispatch.return_value = mock_response
+
+                result = await handle_sms_otp_verification_create(
+                    mock_http_client,
+                    mock_verification_create_request,
+                    mock_user_access_token,
+                )
+
+                assert result.success is False
+                assert "Invalid factor ID" in result.message
+
+
+class TestVoiceVerificationCreate:
+    @pytest.mark.asyncio
+    async def test_handle_voice_otp_verification_create_success(
+        self,
+        mock_verification_create_request,
+        mock_user_profile_response,
+        mock_ibm_verification_create_response,
+    ):
+        # Mock dependencies
+        mock_http_client = AsyncMock()
+        mock_user_access_token = "user_token_123"
+
+        # Mock the profile service
+        with patch("app.otp.services.verify_otp.my_profile") as mock_my_profile:
+            mock_my_profile.return_value = mock_user_profile_response
+
+            # Mock the dispatch function
+            with patch(
+                "app.otp.services.verify_otp.dispatch_voice_verification_create"
+            ) as mock_dispatch:
+                mock_response = MagicMock()
+                mock_response.status_code = 201
+                mock_response.json.return_value = mock_ibm_verification_create_response
+                mock_dispatch.return_value = mock_response
+
+                result = await handle_voice_otp_verification_create(
+                    mock_http_client,
+                    mock_verification_create_request,
+                    mock_user_access_token,
+                )
+
+                assert result.success is True
+                assert result.data.id == "verification123"
+                assert result.data.factorId == "factor123"
+                assert result.data.state == "PENDING"
+                assert result.message == "Voice OTP verification created successfully"
+
+    @pytest.mark.asyncio
+    async def test_handle_voice_otp_verification_create_profile_failure(
+        self, mock_verification_create_request
+    ):
+        mock_http_client = AsyncMock()
+        mock_user_access_token = "user_token_123"
+
+        # Mock profile failure
+        failed_profile_response = ProfileResponse(
+            success=False, data=None, message="Profile retrieval failed"
+        )
+
+        with patch("app.otp.services.verify_otp.my_profile") as mock_my_profile:
+            mock_my_profile.return_value = failed_profile_response
+
+            result = await handle_voice_otp_verification_create(
+                mock_http_client,
+                mock_verification_create_request,
+                mock_user_access_token,
+            )
+
+            assert result.success is False
+            assert "User verification failed" in result.message
+
+    @pytest.mark.asyncio
+    async def test_handle_voice_otp_verification_create_ibm_error(
+        self, mock_verification_create_request, mock_user_profile_response
+    ):
+        mock_http_client = AsyncMock()
+        mock_user_access_token = "user_token_123"
+
+        with patch("app.otp.services.verify_otp.my_profile") as mock_my_profile:
+            mock_my_profile.return_value = mock_user_profile_response
+
+            with patch(
+                "app.otp.services.verify_otp.dispatch_voice_verification_create"
+            ) as mock_dispatch:
+                mock_response = MagicMock()
+                mock_response.status_code = 400
+                mock_response.json.return_value = {"error": "Invalid factor ID"}
+                mock_dispatch.return_value = mock_response
+
+                result = await handle_voice_otp_verification_create(
+                    mock_http_client,
+                    mock_verification_create_request,
+                    mock_user_access_token,
+                )
+
+                assert result.success is False
+                assert "Invalid factor ID" in result.message
+
+
+class TestSMSVerificationAttempt:
+    @pytest.mark.asyncio
+    async def test_handle_sms_otp_verification_attempt_success(
+        self,
+        mock_verification_attempt_request,
+        mock_user_profile_response,
+        mock_ibm_verification_attempt_response,
+    ):
+        # Mock dependencies
+        mock_http_client = AsyncMock()
+        mock_user_access_token = "user_token_123"
+
+        # Mock the profile service
+        with patch("app.otp.services.verify_otp.my_profile") as mock_my_profile:
+            mock_my_profile.return_value = mock_user_profile_response
+
+            # Mock the dispatch function
+            with patch(
+                "app.otp.services.verify_otp.dispatch_sms_verification_attempt"
+            ) as mock_dispatch:
+                mock_response = MagicMock()
+                mock_response.status_code = 200
+                mock_response.json.return_value = mock_ibm_verification_attempt_response
+                mock_dispatch.return_value = mock_response
+
+                result = await handle_sms_otp_verification_attempt(
+                    mock_http_client,
+                    mock_verification_attempt_request,
+                    mock_user_access_token,
+                )
+
+                assert result.success is True
+                assert result.data.id == "verification123"
+                assert result.data.verified is True
+                assert result.data.state == "VERIFIED"
+                assert result.message == "SMS OTP verification completed successfully"
+
+    @pytest.mark.asyncio
+    async def test_handle_sms_otp_verification_attempt_profile_failure(
+        self, mock_verification_attempt_request
+    ):
+        mock_http_client = AsyncMock()
+        mock_user_access_token = "user_token_123"
+
+        # Mock profile failure
+        failed_profile_response = ProfileResponse(
+            success=False, data=None, message="Profile retrieval failed"
+        )
+
+        with patch("app.otp.services.verify_otp.my_profile") as mock_my_profile:
+            mock_my_profile.return_value = failed_profile_response
+
+            result = await handle_sms_otp_verification_attempt(
+                mock_http_client,
+                mock_verification_attempt_request,
+                mock_user_access_token,
+            )
+
+            assert result.success is False
+            assert "User verification failed" in result.message
+
+    @pytest.mark.asyncio
+    async def test_handle_sms_otp_verification_attempt_ibm_error(
+        self, mock_verification_attempt_request, mock_user_profile_response
+    ):
+        mock_http_client = AsyncMock()
+        mock_user_access_token = "user_token_123"
+
+        with patch("app.otp.services.verify_otp.my_profile") as mock_my_profile:
+            mock_my_profile.return_value = mock_user_profile_response
+
+            with patch(
+                "app.otp.services.verify_otp.dispatch_sms_verification_attempt"
+            ) as mock_dispatch:
+                mock_response = MagicMock()
+                mock_response.status_code = 400
+                mock_response.json.return_value = {"error": "Invalid OTP"}
+                mock_dispatch.return_value = mock_response
+
+                result = await handle_sms_otp_verification_attempt(
+                    mock_http_client,
+                    mock_verification_attempt_request,
+                    mock_user_access_token,
+                )
+
+                assert result.success is False
+                assert "Invalid OTP" in result.message
+
+
+class TestVoiceVerificationAttempt:
+    @pytest.mark.asyncio
+    async def test_handle_voice_otp_verification_attempt_success(
+        self,
+        mock_verification_attempt_request,
+        mock_user_profile_response,
+        mock_ibm_verification_attempt_response,
+    ):
+        # Mock dependencies
+        mock_http_client = AsyncMock()
+        mock_user_access_token = "user_token_123"
+
+        # Mock the profile service
+        with patch("app.otp.services.verify_otp.my_profile") as mock_my_profile:
+            mock_my_profile.return_value = mock_user_profile_response
+
+            # Mock the dispatch function
+            with patch(
+                "app.otp.services.verify_otp.dispatch_voice_verification_attempt"
+            ) as mock_dispatch:
+                mock_response = MagicMock()
+                mock_response.status_code = 200
+                mock_response.json.return_value = mock_ibm_verification_attempt_response
+                mock_dispatch.return_value = mock_response
+
+                result = await handle_voice_otp_verification_attempt(
+                    mock_http_client,
+                    mock_verification_attempt_request,
+                    mock_user_access_token,
+                )
+
+                assert result.success is True
+                assert result.data.id == "verification123"
+                assert result.data.verified is True
+                assert result.data.state == "VERIFIED"
+                assert result.message == "Voice OTP verification completed successfully"
+
+    @pytest.mark.asyncio
+    async def test_handle_voice_otp_verification_attempt_profile_failure(
+        self, mock_verification_attempt_request
+    ):
+        mock_http_client = AsyncMock()
+        mock_user_access_token = "user_token_123"
+
+        # Mock profile failure
+        failed_profile_response = ProfileResponse(
+            success=False, data=None, message="Profile retrieval failed"
+        )
+
+        with patch("app.otp.services.verify_otp.my_profile") as mock_my_profile:
+            mock_my_profile.return_value = failed_profile_response
+
+            result = await handle_voice_otp_verification_attempt(
+                mock_http_client,
+                mock_verification_attempt_request,
+                mock_user_access_token,
+            )
+
+            assert result.success is False
+            assert "User verification failed" in result.message
+
+    @pytest.mark.asyncio
+    async def test_handle_voice_otp_verification_attempt_ibm_error(
+        self, mock_verification_attempt_request, mock_user_profile_response
+    ):
+        mock_http_client = AsyncMock()
+        mock_user_access_token = "user_token_123"
+
+        with patch("app.otp.services.verify_otp.my_profile") as mock_my_profile:
+            mock_my_profile.return_value = mock_user_profile_response
+
+            with patch(
+                "app.otp.services.verify_otp.dispatch_voice_verification_attempt"
+            ) as mock_dispatch:
+                mock_response = MagicMock()
+                mock_response.status_code = 400
+                mock_response.json.return_value = {"error": "Invalid OTP"}
+                mock_dispatch.return_value = mock_response
+
+                result = await handle_voice_otp_verification_attempt(
+                    mock_http_client,
+                    mock_verification_attempt_request,
+                    mock_user_access_token,
+                )
+
+                assert result.success is False
+                assert "Invalid OTP" in result.message
+
+
+class TestDispatchFunctions:
+    @pytest.mark.asyncio
+    async def test_dispatch_sms_verification_create(
+        self, mock_verification_create_request
+    ):
+        mock_http_client = AsyncMock()
+
+        mock_response = MagicMock()
+        mock_response.status_code = 201
+        mock_http_client.post.return_value = mock_response
+
+        with patch("app.otp.services.verify_otp.get_admin_token") as mock_get_token:
+            mock_get_token.return_value = "admin_token_123"
+
+            with patch(
+                "app.otp.services.verify_otp.get_auth_request_headers"
+            ) as mock_headers:
+                mock_headers.return_value = {"Authorization": "Bearer admin_token_123"}
+
+                with patch(
+                    "app.otp.services.verify_otp.get_configuration"
+                ) as mock_config:
+                    mock_config.return_value.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
+                        "https://test.verify.ibm.com"
+                    )
+
+                    result = await dispatch_sms_verification_create(
+                        mock_http_client, mock_verification_create_request
+                    )
+
+                    assert result == mock_response
+                    mock_http_client.post.assert_called_once()
+                    call_args = mock_http_client.post.call_args
+                    assert "smsotp/verifications" in call_args[0][0]
+                    assert call_args[1]["json"]["factorId"] == "factor123"
+
+    @pytest.mark.asyncio
+    async def test_dispatch_voice_verification_create(
+        self, mock_verification_create_request
+    ):
+        mock_http_client = AsyncMock()
+
+        mock_response = MagicMock()
+        mock_response.status_code = 201
+        mock_http_client.post.return_value = mock_response
+
+        with patch("app.otp.services.verify_otp.get_admin_token") as mock_get_token:
+            mock_get_token.return_value = "admin_token_123"
+
+            with patch(
+                "app.otp.services.verify_otp.get_auth_request_headers"
+            ) as mock_headers:
+                mock_headers.return_value = {"Authorization": "Bearer admin_token_123"}
+
+                with patch(
+                    "app.otp.services.verify_otp.get_configuration"
+                ) as mock_config:
+                    mock_config.return_value.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
+                        "https://test.verify.ibm.com"
+                    )
+
+                    result = await dispatch_voice_verification_create(
+                        mock_http_client, mock_verification_create_request
+                    )
+
+                    assert result == mock_response
+                    mock_http_client.post.assert_called_once()
+                    call_args = mock_http_client.post.call_args
+                    assert "voiceotp/verifications" in call_args[0][0]
+                    assert call_args[1]["json"]["factorId"] == "factor123"
+
+    @pytest.mark.asyncio
+    async def test_dispatch_sms_verification_attempt(
+        self, mock_verification_attempt_request
+    ):
+        mock_http_client = AsyncMock()
+
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_http_client.put.return_value = mock_response
+
+        with patch("app.otp.services.verify_otp.get_admin_token") as mock_get_token:
+            mock_get_token.return_value = "admin_token_123"
+
+            with patch(
+                "app.otp.services.verify_otp.get_auth_request_headers"
+            ) as mock_headers:
+                mock_headers.return_value = {"Authorization": "Bearer admin_token_123"}
+
+                with patch(
+                    "app.otp.services.verify_otp.get_configuration"
+                ) as mock_config:
+                    mock_config.return_value.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
+                        "https://test.verify.ibm.com"
+                    )
+
+                    result = await dispatch_sms_verification_attempt(
+                        mock_http_client, mock_verification_attempt_request
+                    )
+
+                    assert result == mock_response
+                    mock_http_client.put.assert_called_once()
+                    call_args = mock_http_client.put.call_args
+                    assert "smsotp/verifications/verification123" in call_args[0][0]
+                    assert call_args[1]["json"]["otp"] == "123456"
+
+    @pytest.mark.asyncio
+    async def test_dispatch_voice_verification_attempt(
+        self, mock_verification_attempt_request
+    ):
+        mock_http_client = AsyncMock()
+
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_http_client.put.return_value = mock_response
+
+        with patch("app.otp.services.verify_otp.get_admin_token") as mock_get_token:
+            mock_get_token.return_value = "admin_token_123"
+
+            with patch(
+                "app.otp.services.verify_otp.get_auth_request_headers"
+            ) as mock_headers:
+                mock_headers.return_value = {"Authorization": "Bearer admin_token_123"}
+
+                with patch(
+                    "app.otp.services.verify_otp.get_configuration"
+                ) as mock_config:
+                    mock_config.return_value.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
+                        "https://test.verify.ibm.com"
+                    )
+
+                    result = await dispatch_voice_verification_attempt(
+                        mock_http_client, mock_verification_attempt_request
+                    )
+
+                    assert result == mock_response
+                    mock_http_client.put.assert_called_once()
+                    call_args = mock_http_client.put.call_args
+                    assert "voiceotp/verifications/verification123" in call_args[0][0]
+                    assert call_args[1]["json"]["otp"] == "123456"
