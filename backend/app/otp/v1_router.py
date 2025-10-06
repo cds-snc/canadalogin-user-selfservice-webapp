@@ -83,7 +83,7 @@ async def check_otp(
 
 
 @router.post(
-    "/enroll/mfa",
+    "mfa/enroll",
     response_model=ResponseModel,
     status_code=status.HTTP_201_CREATED,
     tags=["OTP"],
@@ -101,12 +101,12 @@ async def enroll_otp(
 
 
 @router.post(
-    "/verify/mfa/create",
+    "mfa/send",
     response_model=ResponseModel,
     status_code=status.HTTP_201_CREATED,
     tags=["OTP"],
-    summary="Create MFA OTP verification",
-    description="Creates a new MFA OTP verification and sends the OTP via SMS or initiates a voice call based on otpType",
+    summary="Send MFA OTP",
+    description="Sends an MFA OTP via SMS or initiates a voice call based on otpType",
 )
 async def create_mfa_otp_verification(
     request: Request,
@@ -122,12 +122,12 @@ async def create_mfa_otp_verification(
 
 
 @router.post(
-    "/verify/mfa/attempt",
+    "mfa/verify",
     response_model=ResponseModel,
     status_code=status.HTTP_200_OK,
     tags=["OTP"],
-    summary="Attempt MFA OTP verification",
-    description="Attempts to verify the user-provided OTP for MFA verification (SMS or Voice based on otpType)",
+    summary="Verify MFA OTP",
+    description="Verifies the user-provided OTP for MFA authentication (SMS or Voice based on otpType)",
 )
 async def attempt_mfa_otp_verification(
     request: Request,
