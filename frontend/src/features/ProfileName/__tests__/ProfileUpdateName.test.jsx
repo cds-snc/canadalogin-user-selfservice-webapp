@@ -1,7 +1,6 @@
-import React from "react";
+import { BrowserRouter } from "react-router";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { BrowserRouter } from "react-router";
 import UpdateProfileName from "../components/ProfileUpdateName.jsx";
 import { UserProvider } from "../../../components/Providers/UserProvider.tsx";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider.tsx";
