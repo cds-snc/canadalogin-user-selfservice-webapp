@@ -9,8 +9,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from app.otp.schemas import OtpType, OtpVerificationCreateRequest
-
-from backend.app.otp.services.verify_mfa_otp import dispatch_mfa_verification_create
+from app.otp.services.verify_mfa_otp import dispatch_mfa_verification_create
 
 
 @pytest.fixture
