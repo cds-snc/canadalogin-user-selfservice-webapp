@@ -159,7 +159,7 @@ async def create_voice_otp_verification(
     )
 
 
-@router.put(
+@router.post(
     "/verify/sms/attempt",
     response_model=ResponseModel,
     status_code=status.HTTP_200_OK,
@@ -177,7 +177,7 @@ async def attempt_sms_otp_verification(
     )
 
 
-@router.put(
+@router.post(
     "/verify/voice/attempt",
     response_model=ResponseModel,
     status_code=status.HTTP_200_OK,

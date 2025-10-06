@@ -89,7 +89,7 @@ class EnrollmentResponse(ResponseModel):
 class OtpVerificationCreateRequest(BaseModel):
     """Request schema for creating OTP verification"""
 
-    factorId: str
+    id: str
 
 
 class VerificationCreateResponseData(BaseModel):
@@ -97,19 +97,24 @@ class VerificationCreateResponseData(BaseModel):
 
     model_config = ConfigDict(populate_by_name=True)
     id: str
-    factorId: str
     userId: str
+    type: str
     created: str
     updated: str
     expiry: str
     state: str
-    otpDeliveryStatus: str
+    updatedBy: str
+    correlation: str
+    phoneNumber: str
+    attempts: int
+    retries: int
 
 
 class OtpVerificationAttemptRequest(BaseModel):
     """Request schema for attempting OTP verification"""
 
-    verificationId: str
+    id: str
+    trxnId: str
     otp: str
 
 
@@ -118,7 +123,6 @@ class VerificationAttemptResponseData(BaseModel):
 
     model_config = ConfigDict(populate_by_name=True)
     id: str
-    factorId: str
     userId: str
     created: str
     updated: str

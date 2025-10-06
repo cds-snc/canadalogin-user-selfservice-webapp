@@ -17,12 +17,14 @@ from app.users.schemas import IBMVerifyUserProfileSchema, ProfileResponse
 
 @pytest.fixture
 def mock_verification_create_request():
-    return OtpVerificationCreateRequest(factorId="factor123")
+    return OtpVerificationCreateRequest(id="factor123")
 
 
 @pytest.fixture
 def mock_verification_attempt_request():
-    return OtpVerificationAttemptRequest(verificationId="verification123", otp="123456")
+    return OtpVerificationAttemptRequest(
+        id="factor123", trxnId="verification123", otp="123456"
+    )
 
 
 @pytest.fixture
@@ -54,13 +56,17 @@ def mock_user_profile_response():
 def mock_ibm_verification_create_response():
     return {
         "id": "verification123",
-        "factorId": "factor123",
         "userId": "user123",
+        "type": "smsotp",
         "created": "2023-10-03T10:00:00Z",
         "updated": "2023-10-03T10:00:00Z",
         "expiry": "2023-10-03T10:05:00Z",
         "state": "PENDING",
-        "otpDeliveryStatus": "SUCCESS",
+        "updatedBy": "user123",
+        "correlation": "4567",
+        "phoneNumber": "+15345678911",
+        "attempts": 0,
+        "retries": 4,
     }
 
 
@@ -68,7 +74,6 @@ def mock_ibm_verification_create_response():
 def mock_ibm_verification_attempt_response():
     return {
         "id": "verification123",
-        "factorId": "factor123",
         "userId": "user123",
         "created": "2023-10-03T10:00:00Z",
         "updated": "2023-10-03T10:02:00Z",
@@ -111,7 +116,7 @@ class TestSMSVerificationCreate:
 
                 assert result.success is True
                 assert result.data.id == "verification123"
-                assert result.data.factorId == "factor123"
+                assert result.data.userId == "user123"
                 assert result.data.state == "PENDING"
                 assert result.message == "SMS OTP verification created successfully"
 
@@ -200,7 +205,7 @@ class TestVoiceVerificationCreate:
 
                 assert result.success is True
                 assert result.data.id == "verification123"
-                assert result.data.factorId == "factor123"
+                assert result.data.userId == "user123"
                 assert result.data.state == "PENDING"
                 assert result.message == "Voice OTP verification created successfully"
 
@@ -467,8 +472,8 @@ class TestDispatchFunctions:
                     assert result == mock_response
                     mock_http_client.post.assert_called_once()
                     call_args = mock_http_client.post.call_args
-                    assert "smsotp/verifications" in call_args[0][0]
-                    assert call_args[1]["json"]["factorId"] == "factor123"
+                    assert "smsotp/factor123/verifications" in call_args[0][0]
+                    assert call_args[1]["json"] == {}
 
     @pytest.mark.asyncio
     async def test_dispatch_voice_verification_create(
@@ -502,8 +507,8 @@ class TestDispatchFunctions:
                     assert result == mock_response
                     mock_http_client.post.assert_called_once()
                     call_args = mock_http_client.post.call_args
-                    assert "voiceotp/verifications" in call_args[0][0]
-                    assert call_args[1]["json"]["factorId"] == "factor123"
+                    assert "voiceotp/factor123/verifications" in call_args[0][0]
+                    assert call_args[1]["json"] == {}
 
     @pytest.mark.asyncio
     async def test_dispatch_sms_verification_attempt(
@@ -513,7 +518,7 @@ class TestDispatchFunctions:
 
         mock_response = MagicMock()
         mock_response.status_code = 200
-        mock_http_client.put.return_value = mock_response
+        mock_http_client.post.return_value = mock_response
 
         with patch("app.otp.services.verify_otp.get_admin_token") as mock_get_token:
             mock_get_token.return_value = "admin_token_123"
@@ -535,9 +540,12 @@ class TestDispatchFunctions:
                     )
 
                     assert result == mock_response
-                    mock_http_client.put.assert_called_once()
-                    call_args = mock_http_client.put.call_args
-                    assert "smsotp/verifications/verification123" in call_args[0][0]
+                    mock_http_client.post.assert_called_once()
+                    call_args = mock_http_client.post.call_args
+                    assert (
+                        "smsotp/factor123/verifications/verification123"
+                        in call_args[0][0]
+                    )
                     assert call_args[1]["json"]["otp"] == "123456"
 
     @pytest.mark.asyncio
@@ -548,7 +556,7 @@ class TestDispatchFunctions:
 
         mock_response = MagicMock()
         mock_response.status_code = 200
-        mock_http_client.put.return_value = mock_response
+        mock_http_client.post.return_value = mock_response
 
         with patch("app.otp.services.verify_otp.get_admin_token") as mock_get_token:
             mock_get_token.return_value = "admin_token_123"
@@ -570,9 +578,12 @@ class TestDispatchFunctions:
                     )
 
                     assert result == mock_response
-                    mock_http_client.put.assert_called_once()
-                    call_args = mock_http_client.put.call_args
-                    assert "voiceotp/verifications/verification123" in call_args[0][0]
+                    mock_http_client.post.assert_called_once()
+                    call_args = mock_http_client.post.call_args
+                    assert (
+                        "voiceotp/factor123/verifications/verification123"
+                        in call_args[0][0]
+                    )
                     assert call_args[1]["json"]["otp"] == "123456"
 
 

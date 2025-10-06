@@ -67,13 +67,17 @@ async def handle_sms_otp_verification_create(
             # Parse the verification response
             verification_data = VerificationCreateResponseData(
                 id=response_json.get("id"),
-                factorId=response_json.get("factorId"),
                 userId=response_json.get("userId"),
+                type=response_json.get("type"),
                 created=response_json.get("created"),
                 updated=response_json.get("updated"),
                 expiry=response_json.get("expiry"),
                 state=response_json.get("state"),
-                otpDeliveryStatus=response_json.get("otpDeliveryStatus"),
+                updatedBy=response_json.get("updatedBy"),
+                correlation=response_json.get("correlation"),
+                phoneNumber=response_json.get("phoneNumber"),
+                attempts=response_json.get("attempts"),
+                retries=response_json.get("retries"),
             )
 
             return ResponseModel(
@@ -138,16 +142,20 @@ async def handle_voice_otp_verification_create(
         response_json = http_client_response.json()
 
         try:
-            # Parse the verification response
+            # Parse the verification response using IBM Verify field structure
             verification_data = VerificationCreateResponseData(
                 id=response_json.get("id"),
-                factorId=response_json.get("factorId"),
                 userId=response_json.get("userId"),
+                type=response_json.get("type"),
                 created=response_json.get("created"),
                 updated=response_json.get("updated"),
                 expiry=response_json.get("expiry"),
                 state=response_json.get("state"),
-                otpDeliveryStatus=response_json.get("otpDeliveryStatus"),
+                updatedBy=response_json.get("updatedBy"),
+                correlation=response_json.get("correlation"),
+                phoneNumber=response_json.get("phoneNumber"),
+                attempts=response_json.get("attempts"),
+                retries=response_json.get("retries"),
             )
 
             return ResponseModel(
@@ -319,13 +327,9 @@ async def dispatch_sms_verification_create(
         headers = get_auth_request_headers(access_token, True)
         settings = get_configuration().ibm_verify_config
 
-        verification_data = {"factorId": verification_request.factorId}
-
-        verification_url = (
-            f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/smsotp/verifications"
-        )
+        verification_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/smsotp/{verification_request.id}/verifications"
         response = await global_http_client.post(
-            verification_url, json=verification_data, headers=headers
+            verification_url, json={}, headers=headers
         )
         return response
 
@@ -350,13 +354,9 @@ async def dispatch_voice_verification_create(
         headers = get_auth_request_headers(access_token, True)
         settings = get_configuration().ibm_verify_config
 
-        verification_data = {"factorId": verification_request.factorId}
-
-        verification_url = (
-            f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/voiceotp/verifications"
-        )
+        verification_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/voiceotp/{verification_request.id}/verifications"
         response = await global_http_client.post(
-            verification_url, json=verification_data, headers=headers
+            verification_url, json={}, headers=headers
         )
         return response
 
@@ -383,8 +383,8 @@ async def dispatch_sms_verification_attempt(
 
         attempt_data = {"otp": attempt_request.otp}
 
-        verification_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/smsotp/verifications/{attempt_request.verificationId}"
-        response = await global_http_client.put(
+        verification_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/smsotp/{attempt_request.id}/verifications/{attempt_request.trxnId}"
+        response = await global_http_client.post(
             verification_url, json=attempt_data, headers=headers
         )
         return response
@@ -394,7 +394,7 @@ async def dispatch_sms_verification_attempt(
         raise he
     except Exception as error:
         logger.error(
-            f"Request to /v2.0/factors/smsotp/verifications/{attempt_request.verificationId} error: {str(error)}",
+            f"Request to /v2.0/factors/smsotp/{attempt_request.id}/verifications/{attempt_request.trxnId} error: {str(error)}",
             exc_info=True,
         )
         raise error
@@ -412,8 +412,8 @@ async def dispatch_voice_verification_attempt(
 
         attempt_data = {"otp": attempt_request.otp}
 
-        verification_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/voiceotp/verifications/{attempt_request.verificationId}"
-        response = await global_http_client.put(
+        verification_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/voiceotp/{attempt_request.id}/verifications/{attempt_request.trxnId}"
+        response = await global_http_client.post(
             verification_url, json=attempt_data, headers=headers
         )
         return response
@@ -423,7 +423,7 @@ async def dispatch_voice_verification_attempt(
         raise he
     except Exception as error:
         logger.error(
-            f"Request to /v2.0/factors/voiceotp/verifications/{attempt_request.verificationId} error: {str(error)}",
+            f"Request to /v2.0/factors/voiceotp/{attempt_request.id}/verifications/{attempt_request.trxnId} error: {str(error)}",
             exc_info=True,
         )
         raise error
