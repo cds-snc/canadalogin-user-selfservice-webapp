@@ -2,7 +2,9 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from app.otp.schemas import OtpVerificationAttemptRequest, OtpVerificationCreateRequest
-from app.otp.services.verify_otp import (
+from app.users.schemas import IBMVerifyUserProfileSchema, ProfileResponse
+
+from backend.app.otp.services.verify_mfa_otp import (
     dispatch_sms_verification_attempt,
     dispatch_sms_verification_create,
     dispatch_voice_verification_attempt,
@@ -12,7 +14,6 @@ from app.otp.services.verify_otp import (
     handle_voice_otp_verification_attempt,
     handle_voice_otp_verification_create,
 )
-from app.users.schemas import IBMVerifyUserProfileSchema, ProfileResponse
 
 
 @pytest.fixture
