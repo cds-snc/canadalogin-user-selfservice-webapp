@@ -574,3 +574,547 @@ class TestDispatchFunctions:
                     call_args = mock_http_client.put.call_args
                     assert "voiceotp/verifications/verification123" in call_args[0][0]
                     assert call_args[1]["json"]["otp"] == "123456"
+
+
+class TestErrorHandling:
+    """Test error handling scenarios to increase code coverage"""
+
+    @pytest.mark.asyncio
+    async def test_sms_verification_create_validation_error(
+        self, mock_verification_create_request, mock_user_profile_response
+    ):
+        """Test ValidationError handling in SMS verification create"""
+        mock_http_client = AsyncMock()
+        mock_user_access_token = "user_token_123"
+
+        with patch("app.otp.services.verify_otp.my_profile") as mock_my_profile:
+            mock_my_profile.return_value = mock_user_profile_response
+
+            with patch(
+                "app.otp.services.verify_otp.dispatch_sms_verification_create"
+            ) as mock_dispatch:
+                mock_response = MagicMock()
+                mock_response.status_code = 201
+                # Create malformed response that will cause ValidationError
+                mock_response.json.return_value = {"invalid": "data"}
+                mock_dispatch.return_value = mock_response
+
+                result = await handle_sms_otp_verification_create(
+                    mock_http_client,
+                    mock_verification_create_request,
+                    mock_user_access_token,
+                )
+
+                # ValidationError returns JSONResponse
+                assert result.status_code == 422
+                import json
+
+                content = json.loads(result.body.decode())
+                assert content["success"] is False
+                assert content["message"] == "Server Error"
+
+    @pytest.mark.asyncio
+    async def test_sms_verification_create_general_exception(
+        self, mock_verification_create_request, mock_user_profile_response
+    ):
+        """Test general Exception handling in SMS verification create"""
+        from fastapi import HTTPException
+
+        mock_http_client = AsyncMock()
+        mock_user_access_token = "user_token_123"
+
+        with patch("app.otp.services.verify_otp.my_profile") as mock_my_profile:
+            mock_my_profile.return_value = mock_user_profile_response
+
+            with patch(
+                "app.otp.services.verify_otp.dispatch_sms_verification_create"
+            ) as mock_dispatch:
+                # Simulate unexpected exception
+                mock_dispatch.side_effect = Exception("Network error")
+
+                with pytest.raises(HTTPException) as exc_info:
+                    await handle_sms_otp_verification_create(
+                        mock_http_client,
+                        mock_verification_create_request,
+                        mock_user_access_token,
+                    )
+
+                assert exc_info.value.status_code == 500
+                assert "SMS OTP verification creation error" in str(
+                    exc_info.value.detail
+                )
+
+    @pytest.mark.asyncio
+    async def test_voice_verification_create_validation_error(
+        self, mock_verification_create_request, mock_user_profile_response
+    ):
+        """Test ValidationError handling in Voice verification create"""
+        mock_http_client = AsyncMock()
+        mock_user_access_token = "user_token_123"
+
+        with patch("app.otp.services.verify_otp.my_profile") as mock_my_profile:
+            mock_my_profile.return_value = mock_user_profile_response
+
+            with patch(
+                "app.otp.services.verify_otp.dispatch_voice_verification_create"
+            ) as mock_dispatch:
+                mock_response = MagicMock()
+                mock_response.status_code = 201
+                # Create malformed response that will cause ValidationError
+                mock_response.json.return_value = {"invalid": "data"}
+                mock_dispatch.return_value = mock_response
+
+                result = await handle_voice_otp_verification_create(
+                    mock_http_client,
+                    mock_verification_create_request,
+                    mock_user_access_token,
+                )
+
+                # ValidationError returns JSONResponse
+                assert result.status_code == 422
+                import json
+
+                content = json.loads(result.body.decode())
+                assert content["success"] is False
+                assert content["message"] == "Server Error"
+
+    @pytest.mark.asyncio
+    async def test_voice_verification_create_general_exception(
+        self, mock_verification_create_request, mock_user_profile_response
+    ):
+        """Test general Exception handling in Voice verification create"""
+        from fastapi import HTTPException
+
+        mock_http_client = AsyncMock()
+        mock_user_access_token = "user_token_123"
+
+        with patch("app.otp.services.verify_otp.my_profile") as mock_my_profile:
+            mock_my_profile.return_value = mock_user_profile_response
+
+            with patch(
+                "app.otp.services.verify_otp.dispatch_voice_verification_create"
+            ) as mock_dispatch:
+                # Simulate unexpected exception
+                mock_dispatch.side_effect = Exception("Network error")
+
+                with pytest.raises(HTTPException) as exc_info:
+                    await handle_voice_otp_verification_create(
+                        mock_http_client,
+                        mock_verification_create_request,
+                        mock_user_access_token,
+                    )
+
+                assert exc_info.value.status_code == 500
+                assert "Voice OTP verification creation error" in str(
+                    exc_info.value.detail
+                )
+
+    @pytest.mark.asyncio
+    async def test_sms_verification_attempt_validation_error(
+        self, mock_verification_attempt_request, mock_user_profile_response
+    ):
+        """Test ValidationError handling in SMS verification attempt"""
+        mock_http_client = AsyncMock()
+        mock_user_access_token = "user_token_123"
+
+        with patch("app.otp.services.verify_otp.my_profile") as mock_my_profile:
+            mock_my_profile.return_value = mock_user_profile_response
+
+            with patch(
+                "app.otp.services.verify_otp.dispatch_sms_verification_attempt"
+            ) as mock_dispatch:
+                mock_response = MagicMock()
+                mock_response.status_code = 200
+                # Create malformed response that will cause ValidationError
+                mock_response.json.return_value = {"invalid": "data"}
+                mock_dispatch.return_value = mock_response
+
+                result = await handle_sms_otp_verification_attempt(
+                    mock_http_client,
+                    mock_verification_attempt_request,
+                    mock_user_access_token,
+                )
+
+                # ValidationError returns JSONResponse
+                assert result.status_code == 422
+                import json
+
+                content = json.loads(result.body.decode())
+                assert content["success"] is False
+                assert content["message"] == "Server Error"
+
+    @pytest.mark.asyncio
+    async def test_sms_verification_attempt_general_exception(
+        self, mock_verification_attempt_request, mock_user_profile_response
+    ):
+        """Test general Exception handling in SMS verification attempt"""
+        from fastapi import HTTPException
+
+        mock_http_client = AsyncMock()
+        mock_user_access_token = "user_token_123"
+
+        with patch("app.otp.services.verify_otp.my_profile") as mock_my_profile:
+            mock_my_profile.return_value = mock_user_profile_response
+
+            with patch(
+                "app.otp.services.verify_otp.dispatch_sms_verification_attempt"
+            ) as mock_dispatch:
+                # Simulate unexpected exception
+                mock_dispatch.side_effect = Exception("Network error")
+
+                with pytest.raises(HTTPException) as exc_info:
+                    await handle_sms_otp_verification_attempt(
+                        mock_http_client,
+                        mock_verification_attempt_request,
+                        mock_user_access_token,
+                    )
+
+                assert exc_info.value.status_code == 500
+                assert "SMS OTP verification attempt error" in str(
+                    exc_info.value.detail
+                )
+
+    @pytest.mark.asyncio
+    async def test_voice_verification_attempt_validation_error(
+        self, mock_verification_attempt_request, mock_user_profile_response
+    ):
+        """Test ValidationError handling in Voice verification attempt"""
+        mock_http_client = AsyncMock()
+        mock_user_access_token = "user_token_123"
+
+        with patch("app.otp.services.verify_otp.my_profile") as mock_my_profile:
+            mock_my_profile.return_value = mock_user_profile_response
+
+            with patch(
+                "app.otp.services.verify_otp.dispatch_voice_verification_attempt"
+            ) as mock_dispatch:
+                mock_response = MagicMock()
+                mock_response.status_code = 200
+                # Create malformed response that will cause ValidationError
+                mock_response.json.return_value = {"invalid": "data"}
+                mock_dispatch.return_value = mock_response
+
+                result = await handle_voice_otp_verification_attempt(
+                    mock_http_client,
+                    mock_verification_attempt_request,
+                    mock_user_access_token,
+                )
+
+                # ValidationError returns JSONResponse
+                assert result.status_code == 422
+                import json
+
+                content = json.loads(result.body.decode())
+                assert content["success"] is False
+                assert content["message"] == "Server Error"
+
+    @pytest.mark.asyncio
+    async def test_voice_verification_attempt_general_exception(
+        self, mock_verification_attempt_request, mock_user_profile_response
+    ):
+        """Test general Exception handling in Voice verification attempt"""
+        from fastapi import HTTPException
+
+        mock_http_client = AsyncMock()
+        mock_user_access_token = "user_token_123"
+
+        with patch("app.otp.services.verify_otp.my_profile") as mock_my_profile:
+            mock_my_profile.return_value = mock_user_profile_response
+
+            with patch(
+                "app.otp.services.verify_otp.dispatch_voice_verification_attempt"
+            ) as mock_dispatch:
+                # Simulate unexpected exception
+                mock_dispatch.side_effect = Exception("Network error")
+
+                with pytest.raises(HTTPException) as exc_info:
+                    await handle_voice_otp_verification_attempt(
+                        mock_http_client,
+                        mock_verification_attempt_request,
+                        mock_user_access_token,
+                    )
+
+                assert exc_info.value.status_code == 500
+                assert "Voice OTP verification attempt error" in str(
+                    exc_info.value.detail
+                )
+
+    @pytest.mark.asyncio
+    async def test_dispatch_sms_verification_create_http_exception(
+        self, mock_verification_create_request
+    ):
+        """Test HTTPException handling in dispatch SMS verification create"""
+        from fastapi import HTTPException
+
+        mock_http_client = AsyncMock()
+
+        with patch("app.otp.services.verify_otp.get_admin_token") as mock_get_token:
+            mock_get_token.side_effect = HTTPException(
+                status_code=401, detail="Unauthorized"
+            )
+
+            with pytest.raises(HTTPException) as exc_info:
+                await dispatch_sms_verification_create(
+                    mock_http_client, mock_verification_create_request
+                )
+
+            assert exc_info.value.status_code == 401
+
+    @pytest.mark.asyncio
+    async def test_dispatch_sms_verification_create_general_exception(
+        self, mock_verification_create_request
+    ):
+        """Test general Exception handling in dispatch SMS verification create"""
+        mock_http_client = AsyncMock()
+
+        with patch("app.otp.services.verify_otp.get_admin_token") as mock_get_token:
+            mock_get_token.side_effect = Exception("Token service error")
+
+            with pytest.raises(Exception) as exc_info:
+                await dispatch_sms_verification_create(
+                    mock_http_client, mock_verification_create_request
+                )
+
+            assert "Token service error" in str(exc_info.value)
+
+    @pytest.mark.asyncio
+    async def test_dispatch_voice_verification_create_http_exception(
+        self, mock_verification_create_request
+    ):
+        """Test HTTPException handling in dispatch Voice verification create"""
+        from fastapi import HTTPException
+
+        mock_http_client = AsyncMock()
+
+        with patch("app.otp.services.verify_otp.get_admin_token") as mock_get_token:
+            mock_get_token.side_effect = HTTPException(
+                status_code=401, detail="Unauthorized"
+            )
+
+            with pytest.raises(HTTPException) as exc_info:
+                await dispatch_voice_verification_create(
+                    mock_http_client, mock_verification_create_request
+                )
+
+            assert exc_info.value.status_code == 401
+
+    @pytest.mark.asyncio
+    async def test_dispatch_voice_verification_create_general_exception(
+        self, mock_verification_create_request
+    ):
+        """Test general Exception handling in dispatch Voice verification create"""
+        mock_http_client = AsyncMock()
+
+        with patch("app.otp.services.verify_otp.get_admin_token") as mock_get_token:
+            mock_get_token.side_effect = Exception("Token service error")
+
+            with pytest.raises(Exception) as exc_info:
+                await dispatch_voice_verification_create(
+                    mock_http_client, mock_verification_create_request
+                )
+
+            assert "Token service error" in str(exc_info.value)
+
+    @pytest.mark.asyncio
+    async def test_dispatch_sms_verification_attempt_http_exception(
+        self, mock_verification_attempt_request
+    ):
+        """Test HTTPException handling in dispatch SMS verification attempt"""
+        from fastapi import HTTPException
+
+        mock_http_client = AsyncMock()
+
+        with patch("app.otp.services.verify_otp.get_admin_token") as mock_get_token:
+            mock_get_token.side_effect = HTTPException(
+                status_code=401, detail="Unauthorized"
+            )
+
+            with pytest.raises(HTTPException) as exc_info:
+                await dispatch_sms_verification_attempt(
+                    mock_http_client, mock_verification_attempt_request
+                )
+
+            assert exc_info.value.status_code == 401
+
+    @pytest.mark.asyncio
+    async def test_dispatch_sms_verification_attempt_general_exception(
+        self, mock_verification_attempt_request
+    ):
+        """Test general Exception handling in dispatch SMS verification attempt"""
+        mock_http_client = AsyncMock()
+
+        with patch("app.otp.services.verify_otp.get_admin_token") as mock_get_token:
+            mock_get_token.side_effect = Exception("Token service error")
+
+            with pytest.raises(Exception) as exc_info:
+                await dispatch_sms_verification_attempt(
+                    mock_http_client, mock_verification_attempt_request
+                )
+
+            assert "Token service error" in str(exc_info.value)
+
+    @pytest.mark.asyncio
+    async def test_dispatch_voice_verification_attempt_http_exception(
+        self, mock_verification_attempt_request
+    ):
+        """Test HTTPException handling in dispatch Voice verification attempt"""
+        from fastapi import HTTPException
+
+        mock_http_client = AsyncMock()
+
+        with patch("app.otp.services.verify_otp.get_admin_token") as mock_get_token:
+            mock_get_token.side_effect = HTTPException(
+                status_code=401, detail="Unauthorized"
+            )
+
+            with pytest.raises(HTTPException) as exc_info:
+                await dispatch_voice_verification_attempt(
+                    mock_http_client, mock_verification_attempt_request
+                )
+
+            assert exc_info.value.status_code == 401
+
+    @pytest.mark.asyncio
+    async def test_dispatch_voice_verification_attempt_general_exception(
+        self, mock_verification_attempt_request
+    ):
+        """Test general Exception handling in dispatch Voice verification attempt"""
+        mock_http_client = AsyncMock()
+
+        with patch("app.otp.services.verify_otp.get_admin_token") as mock_get_token:
+            mock_get_token.side_effect = Exception("Token service error")
+
+            with pytest.raises(Exception) as exc_info:
+                await dispatch_voice_verification_attempt(
+                    mock_http_client, mock_verification_attempt_request
+                )
+
+            assert "Token service error" in str(exc_info.value)
+
+    @pytest.mark.asyncio
+    async def test_verification_create_status_code_none(
+        self, mock_verification_create_request, mock_user_profile_response
+    ):
+        """Test handling when HTTP response status_code is None"""
+        mock_http_client = AsyncMock()
+        mock_user_access_token = "user_token_123"
+
+        with patch("app.otp.services.verify_otp.my_profile") as mock_my_profile:
+            mock_my_profile.return_value = mock_user_profile_response
+
+            with patch(
+                "app.otp.services.verify_otp.dispatch_sms_verification_create"
+            ) as mock_dispatch:
+                mock_response = MagicMock()
+                mock_response.status_code = None  # Simulate None status code
+                mock_dispatch.return_value = mock_response
+
+                result = await handle_sms_otp_verification_create(
+                    mock_http_client,
+                    mock_verification_create_request,
+                    mock_user_access_token,
+                )
+
+                # Status code None returns JSONResponse
+                assert result.status_code == 400
+                import json
+
+                content = json.loads(result.body.decode())
+                assert content["success"] is False
+                assert content["message"] == "Unknown error"
+
+    @pytest.mark.asyncio
+    async def test_verification_attempt_status_code_none(
+        self, mock_verification_attempt_request, mock_user_profile_response
+    ):
+        """Test handling when HTTP response status_code is None in attempt"""
+        mock_http_client = AsyncMock()
+        mock_user_access_token = "user_token_123"
+
+        with patch("app.otp.services.verify_otp.my_profile") as mock_my_profile:
+            mock_my_profile.return_value = mock_user_profile_response
+
+            with patch(
+                "app.otp.services.verify_otp.dispatch_sms_verification_attempt"
+            ) as mock_dispatch:
+                mock_response = MagicMock()
+                mock_response.status_code = None  # Simulate None status code
+                mock_dispatch.return_value = mock_response
+
+                result = await handle_sms_otp_verification_attempt(
+                    mock_http_client,
+                    mock_verification_attempt_request,
+                    mock_user_access_token,
+                )
+
+                # Status code None returns JSONResponse
+                assert result.status_code == 400
+                import json
+
+                content = json.loads(result.body.decode())
+                assert content["success"] is False
+                assert content["message"] == "Unknown error"
+
+    @pytest.mark.asyncio
+    async def test_voice_verification_create_status_code_none(
+        self, mock_verification_create_request, mock_user_profile_response
+    ):
+        """Test handling when HTTP response status_code is None for Voice OTP create"""
+        mock_http_client = AsyncMock()
+        mock_user_access_token = "user_token_123"
+
+        with patch("app.otp.services.verify_otp.my_profile") as mock_my_profile:
+            mock_my_profile.return_value = mock_user_profile_response
+
+            with patch(
+                "app.otp.services.verify_otp.dispatch_voice_verification_create"
+            ) as mock_dispatch:
+                mock_response = MagicMock()
+                mock_response.status_code = None  # Simulate None status code
+                mock_dispatch.return_value = mock_response
+
+                result = await handle_voice_otp_verification_create(
+                    mock_http_client,
+                    mock_verification_create_request,
+                    mock_user_access_token,
+                )
+
+                # Status code None returns JSONResponse
+                assert result.status_code == 400
+                import json
+
+                content = json.loads(result.body.decode())
+                assert content["success"] is False
+                assert content["message"] == "Unknown error"
+
+    @pytest.mark.asyncio
+    async def test_voice_verification_attempt_status_code_none(
+        self, mock_verification_attempt_request, mock_user_profile_response
+    ):
+        """Test handling when HTTP response status_code is None for Voice OTP attempt"""
+        mock_http_client = AsyncMock()
+        mock_user_access_token = "user_token_123"
+
+        with patch("app.otp.services.verify_otp.my_profile") as mock_my_profile:
+            mock_my_profile.return_value = mock_user_profile_response
+
+            with patch(
+                "app.otp.services.verify_otp.dispatch_voice_verification_attempt"
+            ) as mock_dispatch:
+                mock_response = MagicMock()
+                mock_response.status_code = None  # Simulate None status code
+                mock_dispatch.return_value = mock_response
+
+                result = await handle_voice_otp_verification_attempt(
+                    mock_http_client,
+                    mock_verification_attempt_request,
+                    mock_user_access_token,
+                )
+
+                # Status code None returns JSONResponse
+                assert result.status_code == 400
+                import json
+
+                content = json.loads(result.body.decode())
+                assert content["success"] is False
+                assert content["message"] == "Unknown error"
