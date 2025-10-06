@@ -6,6 +6,141 @@ import { UserProvider } from "../../../components/Providers/UserProvider.tsx";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider.tsx";
 import "@testing-library/jest-dom/vitest";
 
+vi.mock("@cdssnc/gcds-components-react", () => ({
+  GcdsInput: ({ inputId, validateOn, ...props }) => (
+    <input {...props} id={inputId} data-testid={props["data-testid"]} />
+  ),
+  GcdsButton: ({ buttonRole, onGcdsClick, ...props }) => (
+    <button {...props} onClick={onGcdsClick} role={buttonRole} />
+  ),
+  GcdsContainer: ({ children, ...props }) => <div {...props}>{children}</div>,
+  GcdsGrid: ({ children, ...props }) => <div {...props}>{children}</div>,
+  GcdsHeading: ({ marginTop, marginBottom, children, ...props }) => (
+    <h1
+      {...props}
+      style={{
+        marginTop: marginTop,
+        marginBottom: marginBottom,
+        ...props.style,
+      }}
+    >
+      {children}
+    </h1>
+  ),
+  GcdsText: ({ marginTop, marginBottom, children, ...props }) => (
+    <p
+      {...props}
+      style={{
+        marginTop: marginTop,
+        marginBottom: marginBottom,
+        ...props.style,
+      }}
+    >
+      {children}
+    </p>
+  ),
+  GcdsDetails: ({ children, ...props }) => (
+    <details {...props}>{children}</details>
+  ),
+}));
+
+vi.mock("@cdssnc/gcds-components-react", () => ({
+  GcdsButton: ({
+    children,
+    buttonId,
+    onClick,
+    disabled,
+    buttonType,
+    buttonRole,
+    ...props
+  }) => (
+    <button
+      data-testid={buttonId}
+      onClick={onClick}
+      disabled={disabled}
+      data-button-type={buttonType}
+      data-button-role={buttonRole}
+      {...props}
+    >
+      {children}
+    </button>
+  ),
+  GcdsText: ({ marginTop, marginBottom, children, ...props }) => (
+    <p
+      {...props}
+      style={{
+        marginTop: marginTop,
+        marginBottom: marginBottom,
+        ...props.style,
+      }}
+    >
+      {children}
+    </p>
+  ),
+  GcdsIcon: ({ name, size, className }) => (
+    <div
+      data-testid="warning-icon"
+      data-icon-name={name}
+      data-icon-size={size}
+      className={className}
+    />
+  ),
+  GcdsInput: ({ inputId, validateOn, ...props }) => (
+    <input {...props} id={inputId} data-testid={props["data-testid"]} />
+  ),
+  // GcdsButton: ({ buttonRole, onGcdsClick, ...props }) => (
+  //   <button {...props} onClick={onGcdsClick} role={buttonRole} />
+  // ),
+  GcdsContainer: ({ children, ...props }) => <div {...props}>{children}</div>,
+  GcdsGrid: ({ children, ...props }) => <div {...props}>{children}</div>,
+  GcdsHeading: ({ marginTop, marginBottom, children, ...props }) => (
+    <h1
+      {...props}
+      style={{
+        marginTop: marginTop,
+        marginBottom: marginBottom,
+        ...props.style,
+      }}
+    >
+      {children}
+    </h1>
+  ),
+  GcdsDetails: ({ children, ...props }) => (
+    <details {...props}>{children}</details>
+  ),
+}));
+
+vi.mock("../../../../utils/functions.jsx", () => ({
+  getPageContent: () => ({
+    1: "Are you sure you want to update your name?",
+    2: "You’ve requested to update your name to:",
+    3: "Example Newname",
+    4: "This will update your name with the following services:",
+    5: "GEO.ca",
+    6: "Heads up",
+    7: "This",
+    8: "Yes, update",
+    9: "Cancel",
+    10: "Digital Talent",
+    11: "does not",
+    12: "legally change your name.",
+  }),
+}));
+
+vi.mock(
+  "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx",
+  () => ({
+    default: () => (
+      <div data-testid="services-with-access-info">
+        <p>Mocked Services Info Section</p>
+        <ul>
+          <li>Test content for item 3</li>
+        </ul>
+      </div>
+    ),
+  }),
+);
+
 // Mock the navigation hook
 const mockNavigate = vi.fn();
 vi.mock("react-router", async () => {
@@ -26,6 +161,7 @@ vi.mock("useNavigate", () => ({
 // Mock the redirect function to prevent navigation errors
 vi.mock("../../../utils/apiErrorHandler.js", () => ({
   redirectToLogin: vi.fn(),
+  handleApiError: vi.fn(),
 }));
 
 const mockSessionTimeoutState = {
