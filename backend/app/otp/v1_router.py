@@ -17,14 +17,13 @@ from app.otp.services.enroll_otp import (
 )
 from app.otp.services.retrieve_transient_otp import handle_otp_status_retrieval
 from app.otp.services.send_transient_otp import handle_otp_send
-from app.otp.services.verify_transient_otp import handle_otp_verification
-from app.utils.schemas import ResponseModel
-from fastapi import APIRouter, Depends, Request, status
-
-from backend.app.otp.services.verify_mfa_otp import (
+from app.otp.services.verify_mfa_otp import (
     handle_mfa_otp_verification_attempt,
     handle_mfa_otp_verification_create,
 )
+from app.otp.services.verify_transient_otp import handle_otp_verification
+from app.utils.schemas import ResponseModel
+from fastapi import APIRouter, Depends, Request, status
 
 logger = logging.getLogger(__name__)
 router = APIRouter()

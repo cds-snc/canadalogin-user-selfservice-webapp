@@ -102,7 +102,7 @@ class TestIntegrationBasics:
 
     def test_unified_functions_exist(self):
         """Test that the unified functions can be imported."""
-        from backend.app.otp.services.verify_mfa_otp import (
+        from app.otp.services.verify_mfa_otp import (
             dispatch_mfa_verification_attempt,
             dispatch_mfa_verification_create,
             handle_mfa_otp_verification_attempt,
