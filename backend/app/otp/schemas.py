@@ -118,3 +118,4 @@ class OtpVerificationAttemptRequest(BaseModel):
     id: str
     trxnId: str
     otp: str
+    otpType: OtpType

@@ -122,14 +122,14 @@ async def create_mfa_otp_verification(
 
 
 @router.post(
-    "/verify/sms/attempt",
+    "/verify/mfa/attempt",
     response_model=ResponseModel,
     status_code=status.HTTP_200_OK,
     tags=["OTP"],
-    summary="Attempt SMS OTP verification",
-    description="Attempts to verify the user-provided OTP for SMS verification",
+    summary="Attempt MFA OTP verification",
+    description="Attempts to verify the user-provided OTP for MFA verification (SMS or Voice based on otpType)",
 )
-async def attempt_sms_otp_verification(
+async def attempt_mfa_otp_verification(
     request: Request,
     attempt_request: OtpVerificationAttemptRequest,
     user_access_token: str = Depends(get_users_current_session),
@@ -138,26 +138,5 @@ async def attempt_sms_otp_verification(
         request.app.state.request_client,
         attempt_request,
         user_access_token,
-        OtpType.SMS,
-    )
-
-
-@router.post(
-    "/verify/voice/attempt",
-    response_model=ResponseModel,
-    status_code=status.HTTP_200_OK,
-    tags=["OTP"],
-    summary="Attempt Voice OTP verification",
-    description="Attempts to verify the user-provided OTP for Voice verification",
-)
-async def attempt_voice_otp_verification(
-    request: Request,
-    attempt_request: OtpVerificationAttemptRequest,
-    user_access_token: str = Depends(get_users_current_session),
-):
-    return await handle_mfa_otp_verification_attempt(
-        request.app.state.request_client,
-        attempt_request,
-        user_access_token,
-        OtpType.VOICE,
+        attempt_request.otpType,
     )

@@ -33,8 +33,17 @@ def mock_voice_verification_create_request():
 
 
 @pytest.fixture
-def mock_verification_attempt_request():
-    return OtpVerificationAttemptRequest(id="factor123", trxnId="trxn456", otp="123456")
+def mock_sms_verification_attempt_request():
+    return OtpVerificationAttemptRequest(
+        id="factor123", trxnId="trxn456", otp="123456", otpType=OtpType.SMS
+    )
+
+
+@pytest.fixture
+def mock_voice_verification_attempt_request():
+    return OtpVerificationAttemptRequest(
+        id="factor123", trxnId="trxn456", otp="123456", otpType=OtpType.VOICE
+    )
 
 
 @pytest.fixture
@@ -334,7 +343,7 @@ class TestHandleMFAOTPVerificationAttempt:
 
     @pytest.mark.asyncio
     async def test_verification_attempt_success_sms(
-        self, mock_verification_attempt_request, mock_profile_success_response
+        self, mock_sms_verification_attempt_request, mock_profile_success_response
     ):
         """Test successful SMS verification attempt."""
         mock_http_client = AsyncMock()
@@ -349,7 +358,7 @@ class TestHandleMFAOTPVerificationAttempt:
 
                 result = await handle_mfa_otp_verification_attempt(
                     mock_http_client,
-                    mock_verification_attempt_request,
+                    mock_sms_verification_attempt_request,
                     "user_token",
                     OtpType.SMS,
                 )
@@ -362,7 +371,7 @@ class TestHandleMFAOTPVerificationAttempt:
 
     @pytest.mark.asyncio
     async def test_verification_attempt_success_voice(
-        self, mock_verification_attempt_request, mock_profile_success_response
+        self, mock_voice_verification_attempt_request, mock_profile_success_response
     ):
         """Test successful Voice verification attempt."""
         mock_http_client = AsyncMock()
@@ -377,7 +386,7 @@ class TestHandleMFAOTPVerificationAttempt:
 
                 result = await handle_mfa_otp_verification_attempt(
                     mock_http_client,
-                    mock_verification_attempt_request,
+                    mock_voice_verification_attempt_request,
                     "user_token",
                     OtpType.VOICE,
                 )
@@ -391,7 +400,7 @@ class TestHandleMFAOTPVerificationAttempt:
 
     @pytest.mark.asyncio
     async def test_verification_attempt_profile_failure(
-        self, mock_verification_attempt_request, mock_profile_failure_response
+        self, mock_sms_verification_attempt_request, mock_profile_failure_response
     ):
         """Test verification attempt when profile check fails."""
         mock_http_client = AsyncMock()
@@ -401,7 +410,7 @@ class TestHandleMFAOTPVerificationAttempt:
 
             result = await handle_mfa_otp_verification_attempt(
                 mock_http_client,
-                mock_verification_attempt_request,
+                mock_sms_verification_attempt_request,
                 "user_token",
                 OtpType.SMS,
             )
@@ -411,7 +420,7 @@ class TestHandleMFAOTPVerificationAttempt:
 
     @pytest.mark.asyncio
     async def test_verification_attempt_general_exception(
-        self, mock_verification_attempt_request, mock_profile_success_response
+        self, mock_sms_verification_attempt_request, mock_profile_success_response
     ):
         """Test verification attempt with general exception handling."""
         mock_http_client = AsyncMock()
@@ -431,7 +440,7 @@ class TestHandleMFAOTPVerificationAttempt:
 
                     result = await handle_mfa_otp_verification_attempt(
                         mock_http_client,
-                        mock_verification_attempt_request,
+                        mock_sms_verification_attempt_request,
                         "user_token",
                         OtpType.SMS,
                     )
@@ -518,7 +527,7 @@ class TestDispatchMFAVerificationAttempt:
 
     @pytest.mark.asyncio
     async def test_dispatch_verification_attempt_success_sms(
-        self, mock_verification_attempt_request
+        self, mock_sms_verification_attempt_request
     ):
         """Test successful SMS verification attempt dispatch."""
         mock_http_client = AsyncMock()
@@ -543,7 +552,9 @@ class TestDispatchMFAVerificationAttempt:
                     mock_http_client.post.return_value = mock_response
 
                     result = await dispatch_mfa_verification_attempt(
-                        mock_http_client, mock_verification_attempt_request, OtpType.SMS
+                        mock_http_client,
+                        mock_sms_verification_attempt_request,
+                        OtpType.SMS,
                     )
 
                     assert result == mock_response
@@ -556,7 +567,7 @@ class TestDispatchMFAVerificationAttempt:
 
     @pytest.mark.asyncio
     async def test_dispatch_verification_attempt_success_voice(
-        self, mock_verification_attempt_request
+        self, mock_voice_verification_attempt_request
     ):
         """Test successful Voice verification attempt dispatch."""
         mock_http_client = AsyncMock()
@@ -582,7 +593,7 @@ class TestDispatchMFAVerificationAttempt:
 
                     result = await dispatch_mfa_verification_attempt(
                         mock_http_client,
-                        mock_verification_attempt_request,
+                        mock_voice_verification_attempt_request,
                         OtpType.VOICE,
                     )
 
@@ -594,7 +605,7 @@ class TestDispatchMFAVerificationAttempt:
 
     @pytest.mark.asyncio
     async def test_dispatch_verification_attempt_unsupported_otp_type(
-        self, mock_verification_attempt_request
+        self, mock_sms_verification_attempt_request
     ):
         """Test dispatch attempt with unsupported OTP type."""
         mock_http_client = AsyncMock()
@@ -609,7 +620,7 @@ class TestDispatchMFAVerificationAttempt:
 
                 result = await dispatch_mfa_verification_attempt(
                     mock_http_client,
-                    mock_verification_attempt_request,
+                    mock_sms_verification_attempt_request,
                     "INVALID_TYPE",  # This will cause ValueError
                 )
 
@@ -618,7 +629,7 @@ class TestDispatchMFAVerificationAttempt:
 
     @pytest.mark.asyncio
     async def test_dispatch_verification_attempt_http_error(
-        self, mock_verification_attempt_request
+        self, mock_sms_verification_attempt_request
     ):
         """Test dispatch attempt with HTTP error."""
         mock_http_client = AsyncMock()
@@ -653,7 +664,7 @@ class TestDispatchMFAVerificationAttempt:
 
                         result = await dispatch_mfa_verification_attempt(
                             mock_http_client,
-                            mock_verification_attempt_request,
+                            mock_sms_verification_attempt_request,
                             OtpType.SMS,
                         )
 
