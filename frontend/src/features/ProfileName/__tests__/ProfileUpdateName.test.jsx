@@ -135,12 +135,6 @@ vi.mock("react-router", async () => {
   };
 });
 
-// Mock the navigate helper
-const mockNavigateHelper = vi.fn();
-vi.mock("useNavigate", () => ({
-  navigate: () => mockNavigateHelper,
-}));
-
 // Mock the redirect function to prevent navigation errors
 vi.mock("../../../utils/apiErrorHandler.js", () => ({
   redirectToLogin: vi.fn(),
@@ -251,7 +245,7 @@ const TestWrapper = ({ children }) => (
 describe("UpdateProfileName Component", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockNavigateHelper.mockClear();
+    mockNavigate.mockClear();
   });
 
   it("updates local state when user types in inputs", () => {
@@ -281,110 +275,51 @@ describe("UpdateProfileName Component", () => {
     expect(lastNameInput).toHaveValue(mockUpdateUserName.lastName);
   });
 
-  // it("clicking Continue button goes to confirmation page", async () => {
-  //   render(
-  //     <BrowserRouter>
-  //       <LanguageProvider>
-  //         <UserProvider
-  //           initial={mockUserState}
-  //           initialSessionTimeoutState={mockSessionTimeoutState}
-  //         >
-  //           <UpdateProfileName />
-  //         </UserProvider>
-  //       </LanguageProvider>
-  //     </BrowserRouter>,
-  //   );
+  it("clicking Continue button goes to confirmation page", async () => {
+    render(
+      <BrowserRouter>
+        <LanguageProvider>
+          <UserProvider
+            initial={mockUserState}
+            initialSessionTimeoutState={mockSessionTimeoutState}
+          >
+            <UpdateProfileName />
+          </UserProvider>
+        </LanguageProvider>
+      </BrowserRouter>,
+    );
 
-  //   // Fill in the form with some data first
-  //   const firstNameInput = screen.getByTestId("givenName");
-  //   const lastNameInput = screen.getByTestId("familyName");
+    const firstNameInput = screen.getByTestId("givenName");
+    const lastNameInput = screen.getByTestId("familyName");
 
-  //   // expect(firstNameInput.value).toBe(mockUpdateUserName.firstName);
-  //   // expect(lastNameInput.value).toBe(mockUpdateUserName.lastName);
+    fireEvent.change(firstNameInput, {
+      target: { name: "givenName", value: mockUpdateUserName.firstName },
+    });
+    fireEvent.change(lastNameInput, {
+      target: { name: "familyName", value: mockUpdateUserName.lastName },
+    });
 
-  //   fireEvent.change(firstNameInput, {
-  //     target: { value: mockUpdateUserName.firstName },
-  //   });
-  //   fireEvent.change(lastNameInput, {
-  //     target: { value: mockUpdateUserName.lastName },
-  //   });
+    expect(firstNameInput.value).toBe(mockUpdateUserName.firstName);
+    expect(lastNameInput.value).toBe(mockUpdateUserName.lastName);
 
-  //   // Find the form by its ID and trigger submit
-  //   const form = document.getElementById("form");
-  //   fireEvent.submit(form);
+    const form = document.getElementById("form");
+    fireEvent.submit(form);
 
-  //   // Verify it navigates to the confirmation page
-  //   await waitFor(() => {
-  //     expect(mockNavigateHelper).toHaveBeenCalledWith(
-  //       "/en/profile/update-name/confirm-update",
-  //       {
-  //         state: {
-  //           name: {
-  //             givenName: mockUpdateUserName.firstName,
-  //             familyName: mockUpdateUserName.lastName,
-  //             formatted: mockUpdateUserName.formatted,
-  //           },
-  //         },
-  //       },
-  //     );
-  //   });
-  // });
-
-  // it("updates local state state when form is submitted", async () => {
-  //   // let capturedState;
-
-  //   // // Create a component that captures the state for testing
-  //   // const StateCapture = () => {
-  //   //   const { state } = useUser();
-  //   //   capturedState = state;
-  //   //   return null;
-  //   // };
-
-  //   render(
-  //     <BrowserRouter>
-  //       <LanguageProvider>
-  //         <UserProvider
-  //           initial={mockUserState}
-  //           initialSessionTimeoutState={mockSessionTimeoutState}
-  //         >
-  //           <UpdateProfileName />
-  //         </UserProvider>
-  //       </LanguageProvider>
-  //     </BrowserRouter>,
-  //   );
-
-  //   // Wait for the component to mount and cloneUserProfile to be called
-  //   // await waitFor(() => {
-  //   //   expect(capturedState?.editProfile).toBeTruthy();
-  //   // });
-
-  //   // Fill in the form with new data
-  //   const firstNameInput = screen.getByTestId("givenName");
-  //   const lastNameInput = screen.getByTestId("familyName");
-  //   const formattedNameInput = screen.getByTestId("New User");
-
-  //   fireEvent.change(firstNameInput, {
-  //     target: { name: "givenName", value: "New" },
-  //   });
-  //   fireEvent.change(lastNameInput, {
-  //     target: { name: "familyName", value: "User" },
-  //   });
-
-  //   // Submit the form
-  //   const form = document.getElementById("form");
-  //   fireEvent.submit(form);
-
-  //   // Verify navigation happens first
-  //   await waitFor(() => {
-  //     expect(mockNavigateHelper).toHaveBeenCalledWith(
-  //       "/en/profile/update-name/confirm-update",
-  //     );
-  //   });
-
-  //   expect(firstNameInput.value).toBe("New");
-  //   expect(lastNameInput.value).toBe("User");
-  //   expect(formattedNameInput.value).toBe("New User");
-  // });
+    await waitFor(() => {
+      expect(mockNavigate).toHaveBeenCalledWith(
+        "/en/profile/update-name/confirm-update",
+        {
+          state: {
+            name: {
+              givenName: mockUpdateUserName.firstName,
+              familyName: mockUpdateUserName.lastName,
+              formatted: mockUpdateUserName.formatted,
+            },
+          },
+        },
+      );
+    });
+  });
 
   it("matches snapshot", () => {
     const { container } = render(
