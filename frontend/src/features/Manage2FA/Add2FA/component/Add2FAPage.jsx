@@ -11,6 +11,7 @@ import { otpFactors } from "../../../ChangePassword/api/otpFactors";
 import OtpSelection from "../../../ChangePassword/components/OtpSelection";
 import OtpVerification from "../../../ChangePassword/components/OtpVerification";
 import Add2FANumber from "./Add2FANumber";
+import AddSecond2FA from "./AddSecond2FA";
 
 export default function Add2FAPage() {
   const { language } = useParams();
@@ -19,6 +20,7 @@ export default function Add2FAPage() {
   const { pathname } = useLocation();
 
   const [userPhoneFactors, setUserPhoneFactors] = useState([]);
+  const [secondMfaType, setSecondMfaType] = useState("voiceotp");
 
   const [otpSentResponse, setOtpSentResponse] = useState(null);
   const [userOtpValue, setUserOtpValue] = useState("");
@@ -137,12 +139,33 @@ export default function Add2FAPage() {
     ),
     add2FANumber: (
       <Add2FANumber
-        onNext={() => setWizardStep("otpSelection")}
+        onNext={(secondMfaType) => {
+          setWizardStep("otpSelection");
+          setSecondMfaType(secondMfaType);
+        }}
         onCancel={() => navigateHelper(backToSecuritySettingsPage)}
         onChangePhoneForm={handlePhoneForm}
         phoneFormData={phoneFormData}
       />
     ),
+    add2FAValidation: (
+      <OtpVerification
+        userProfile={userProfile}
+        userSelectedMfaType={userSelectedMfaType}
+        localLoading={localLoading}
+        setLocalLoading={handleLoading}
+        onChangeUserMfaType={handleChangeUserMfaSelection}
+        userOtpValue={userOtpValue}
+        setUserOtpValue={handleSetUserOtpValue}
+        otpSentResponse={otpSentResponse}
+        setOtpSentResponse={handleOtpSentResponse}
+        onNext={() => {
+          setWizardStep("add2FANumber");
+        }}
+        onBack={() => setWizardStep("addSecond2FA")}
+      />
+    ),
+    addSecond2FA: <AddSecond2FA secondMfaType={secondMfaType} />,
   };
 
   return (
