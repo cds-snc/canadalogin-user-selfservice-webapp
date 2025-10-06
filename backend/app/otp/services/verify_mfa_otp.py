@@ -62,7 +62,7 @@ async def handle_mfa_otp_verification_create(
             return ResponseModel(
                 success=True,
                 data=verification_data,
-                message=f"{otp_type} MFA OTP verification created successfully",
+                message=f"{otp_type.value} MFA OTP verification created successfully",
             )
 
         except ValidationError as e:
@@ -100,7 +100,7 @@ async def handle_mfa_otp_verification_attempt(
         return ResponseModel(
             success=True,
             data=None,
-            message=f"{otp_type} MFA OTP verification completed successfully",
+            message=f"{otp_type.value} MFA OTP verification completed successfully",
         )
 
     except Exception as e:

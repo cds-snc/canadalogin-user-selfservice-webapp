@@ -77,7 +77,7 @@ async def handle_otp_enrollment(
             return ResponseModel(
                 success=True,
                 data=enrollment_data,
-                message=f"{otp_type} OTP factor enrolled successfully",
+                message=f"{otp_type.value} OTP factor enrolled successfully",
             )
 
         except ValidationError as e:
