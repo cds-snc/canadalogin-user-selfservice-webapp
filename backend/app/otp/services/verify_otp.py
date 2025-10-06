@@ -5,7 +5,6 @@ from app.config import get_configuration
 from app.otp.schemas import (
     OtpVerificationAttemptRequest,
     OtpVerificationCreateRequest,
-    VerificationAttemptResponseData,
     VerificationCreateResponseData,
 )
 from app.users.services.profile import my_profile
@@ -205,38 +204,25 @@ async def handle_sms_otp_verification_attempt(
         if http_client_response.status_code is None:
             return generate_error_response(400, "Unknown error")
 
-        if http_client_response.status_code != 200:
-            logger.error(
-                f"Error attempting SMS OTP verification: {http_client_response.json()}"
-            )
-            error_data = http_client_response.json()
-            error_message = error_data.get("error", "SMS OTP verification failed")
-            return ResponseModel(success=False, data=None, message=error_message)
-
-        response_json = http_client_response.json()
-
-        try:
-            # Parse the verification attempt response
-            attempt_data = VerificationAttemptResponseData(
-                id=response_json.get("id"),
-                factorId=response_json.get("factorId"),
-                userId=response_json.get("userId"),
-                created=response_json.get("created"),
-                updated=response_json.get("updated"),
-                expiry=response_json.get("expiry"),
-                state=response_json.get("state"),
-                verified=response_json.get("verified", False),
-            )
-
+        # IBM Verify API returns 204 No Content on successful verification attempt
+        if http_client_response.status_code == 204:
             return ResponseModel(
                 success=True,
-                data=attempt_data,
+                data=None,
                 message="SMS OTP verification completed successfully",
             )
 
-        except ValidationError as e:
-            logger.error(f"Validation Error: {e.json()}")
-            return generate_error_response(422, "Server Error")
+        # Handle error responses
+        if http_client_response.status_code != 204:
+            logger.error(
+                f"Error attempting SMS OTP verification: Status {http_client_response.status_code}"
+            )
+            try:
+                error_data = http_client_response.json()
+                error_message = error_data.get("error", "SMS OTP verification failed")
+            except Exception:
+                error_message = "SMS OTP verification failed"
+            return ResponseModel(success=False, data=None, message=error_message)
 
     except Exception as e:
         logger.error(f"SMS OTP verification attempt error: {str(e)}", exc_info=True)
@@ -277,38 +263,25 @@ async def handle_voice_otp_verification_attempt(
         if http_client_response.status_code is None:
             return generate_error_response(400, "Unknown error")
 
-        if http_client_response.status_code != 200:
-            logger.error(
-                f"Error attempting Voice OTP verification: {http_client_response.json()}"
-            )
-            error_data = http_client_response.json()
-            error_message = error_data.get("error", "Voice OTP verification failed")
-            return ResponseModel(success=False, data=None, message=error_message)
-
-        response_json = http_client_response.json()
-
-        try:
-            # Parse the verification attempt response
-            attempt_data = VerificationAttemptResponseData(
-                id=response_json.get("id"),
-                factorId=response_json.get("factorId"),
-                userId=response_json.get("userId"),
-                created=response_json.get("created"),
-                updated=response_json.get("updated"),
-                expiry=response_json.get("expiry"),
-                state=response_json.get("state"),
-                verified=response_json.get("verified", False),
-            )
-
+        # IBM Verify API returns 204 No Content on successful verification attempt
+        if http_client_response.status_code == 204:
             return ResponseModel(
                 success=True,
-                data=attempt_data,
+                data=None,
                 message="Voice OTP verification completed successfully",
             )
 
-        except ValidationError as e:
-            logger.error(f"Validation Error: {e.json()}")
-            return generate_error_response(422, "Server Error")
+        # Handle error responses
+        if http_client_response.status_code != 204:
+            logger.error(
+                f"Error attempting Voice OTP verification: Status {http_client_response.status_code}"
+            )
+            try:
+                error_data = http_client_response.json()
+                error_message = error_data.get("error", "Voice OTP verification failed")
+            except Exception:
+                error_message = "Voice OTP verification failed"
+            return ResponseModel(success=False, data=None, message=error_message)
 
     except Exception as e:
         logger.error(f"Voice OTP verification attempt error: {str(e)}", exc_info=True)

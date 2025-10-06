@@ -70,17 +70,8 @@ def mock_ibm_verification_create_response():
     }
 
 
-@pytest.fixture
-def mock_ibm_verification_attempt_response():
-    return {
-        "id": "verification123",
-        "userId": "user123",
-        "created": "2023-10-03T10:00:00Z",
-        "updated": "2023-10-03T10:02:00Z",
-        "expiry": "2023-10-03T10:05:00Z",
-        "state": "VERIFIED",
-        "verified": True,
-    }
+# Removed: mock_ibm_verification_attempt_response fixture no longer needed
+# as IBM Verify API returns 204 No Content for attempt operations
 
 
 class TestSMSVerificationCreate:
@@ -267,7 +258,6 @@ class TestSMSVerificationAttempt:
         self,
         mock_verification_attempt_request,
         mock_user_profile_response,
-        mock_ibm_verification_attempt_response,
     ):
         # Mock dependencies
         mock_http_client = AsyncMock()
@@ -282,8 +272,7 @@ class TestSMSVerificationAttempt:
                 "app.otp.services.verify_otp.dispatch_sms_verification_attempt"
             ) as mock_dispatch:
                 mock_response = MagicMock()
-                mock_response.status_code = 200
-                mock_response.json.return_value = mock_ibm_verification_attempt_response
+                mock_response.status_code = 204  # IBM Verify returns 204 No Content
                 mock_dispatch.return_value = mock_response
 
                 result = await handle_sms_otp_verification_attempt(
@@ -293,9 +282,7 @@ class TestSMSVerificationAttempt:
                 )
 
                 assert result.success is True
-                assert result.data.id == "verification123"
-                assert result.data.verified is True
-                assert result.data.state == "VERIFIED"
+                assert result.data is None  # No response body for 204
                 assert result.message == "SMS OTP verification completed successfully"
 
     @pytest.mark.asyncio
@@ -356,7 +343,6 @@ class TestVoiceVerificationAttempt:
         self,
         mock_verification_attempt_request,
         mock_user_profile_response,
-        mock_ibm_verification_attempt_response,
     ):
         # Mock dependencies
         mock_http_client = AsyncMock()
@@ -371,8 +357,7 @@ class TestVoiceVerificationAttempt:
                 "app.otp.services.verify_otp.dispatch_voice_verification_attempt"
             ) as mock_dispatch:
                 mock_response = MagicMock()
-                mock_response.status_code = 200
-                mock_response.json.return_value = mock_ibm_verification_attempt_response
+                mock_response.status_code = 204  # IBM Verify returns 204 No Content
                 mock_dispatch.return_value = mock_response
 
                 result = await handle_voice_otp_verification_attempt(
@@ -382,9 +367,7 @@ class TestVoiceVerificationAttempt:
                 )
 
                 assert result.success is True
-                assert result.data.id == "verification123"
-                assert result.data.verified is True
-                assert result.data.state == "VERIFIED"
+                assert result.data is None  # No response body for 204
                 assert result.message == "Voice OTP verification completed successfully"
 
     @pytest.mark.asyncio
@@ -735,9 +718,9 @@ class TestErrorHandling:
                 "app.otp.services.verify_otp.dispatch_sms_verification_attempt"
             ) as mock_dispatch:
                 mock_response = MagicMock()
-                mock_response.status_code = 200
-                # Create malformed response that will cause ValidationError
-                mock_response.json.return_value = {"invalid": "data"}
+                # Test non-204 status code (error case)
+                mock_response.status_code = 400
+                mock_response.json.return_value = {"error": "Invalid OTP"}
                 mock_dispatch.return_value = mock_response
 
                 result = await handle_sms_otp_verification_attempt(
@@ -746,13 +729,10 @@ class TestErrorHandling:
                     mock_user_access_token,
                 )
 
-                # ValidationError returns JSONResponse
-                assert result.status_code == 422
-                import json
-
-                content = json.loads(result.body.decode())
-                assert content["success"] is False
-                assert content["message"] == "Server Error"
+                # Error response should return ResponseModel
+                assert result.success is False
+                assert result.data is None
+                assert "Invalid OTP" in result.message
 
     @pytest.mark.asyncio
     async def test_sms_verification_attempt_general_exception(
@@ -800,9 +780,9 @@ class TestErrorHandling:
                 "app.otp.services.verify_otp.dispatch_voice_verification_attempt"
             ) as mock_dispatch:
                 mock_response = MagicMock()
-                mock_response.status_code = 200
-                # Create malformed response that will cause ValidationError
-                mock_response.json.return_value = {"invalid": "data"}
+                # Test non-204 status code (error case)
+                mock_response.status_code = 400
+                mock_response.json.return_value = {"error": "Invalid OTP"}
                 mock_dispatch.return_value = mock_response
 
                 result = await handle_voice_otp_verification_attempt(
@@ -811,13 +791,10 @@ class TestErrorHandling:
                     mock_user_access_token,
                 )
 
-                # ValidationError returns JSONResponse
-                assert result.status_code == 422
-                import json
-
-                content = json.loads(result.body.decode())
-                assert content["success"] is False
-                assert content["message"] == "Server Error"
+                # Error response should return ResponseModel
+                assert result.success is False
+                assert result.data is None
+                assert "Invalid OTP" in result.message
 
     @pytest.mark.asyncio
     async def test_voice_verification_attempt_general_exception(

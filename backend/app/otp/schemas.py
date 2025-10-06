@@ -116,16 +116,3 @@ class OtpVerificationAttemptRequest(BaseModel):
     id: str
     trxnId: str
     otp: str
-
-
-class VerificationAttemptResponseData(BaseModel):
-    """Response data for OTP verification attempt"""
-
-    model_config = ConfigDict(populate_by_name=True)
-    id: str
-    userId: str
-    created: str
-    updated: str
-    expiry: str
-    state: str
-    verified: bool
