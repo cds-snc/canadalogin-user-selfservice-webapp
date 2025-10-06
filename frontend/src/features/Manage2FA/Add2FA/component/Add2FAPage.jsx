@@ -165,7 +165,12 @@ export default function Add2FAPage() {
         onBack={() => setWizardStep("addSecond2FA")}
       />
     ),
-    addSecond2FA: <AddSecond2FA secondMfaType={secondMfaType} />,
+    addSecond2FA: (
+      <AddSecond2FA
+        secondMfaType={secondMfaType}
+        newPhoneNumber={phoneFormData.phoneNumber}
+      />
+    ),
   };
 
   return (

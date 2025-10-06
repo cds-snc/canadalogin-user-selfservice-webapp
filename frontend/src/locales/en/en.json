@@ -408,5 +408,29 @@
     "13": "Voice call",
     "14": "Mobile or landline. Carrier charges may apply.",
     "15": "You can change this the next time you sign in."
+  },
+  "AddSecond2FAVoiceCall": {
+    "1": "You have added",
+    "2": "as a 2-step verification phone number",
+    "3": "Set up voice call verification (optional)",
+    "4": "Setting up voice call verification allows you to also receive verification codes by",
+    "5": "phone call",
+    "6": "when signing in.",
+    "7": "We recommend setting up this option if you might not be able to receive text messages at any point. Having both methods set up helps make sure you do not get locked out.",
+    "8": "Would you like to set up voice call verification?",
+    "9": "Yes, set up voice call verification",
+    "10": "No, skip for now"
+  },
+  "AddSecond2FATextMessage": {
+    "1": "You have added",
+    "2": "as a 2-step verification phone number",
+    "3": "Set up text (SMS) verification (optional)",
+    "4": "Setting up text message verification allows you to also receive verification codes by",
+    "5": "text message (SMS)",
+    "6": "when signing in.",
+    "7": "We recommend setting up this option if you might not be able to receive phone calls at any point. Having both methods set up helps make sure you do not get locked out.",
+    "8": "Would you like to set up text message verification?",
+    "9": "Yes, set up text message verification",
+    "10": "No, skip for now"
   }
 }
