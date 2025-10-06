@@ -63,16 +63,9 @@ async def handle_otp_enrollment(
 
         try:
             # Parse the enrollment response
-            enrollment_data = EnrollmentResponseData(
-                id=response_json.get("id"),
-                userId=response_json.get("userId"),
-                type=response_json.get("type"),
-                phoneNumber=enrollment_request.phoneNumber,
-                created=response_json.get("created"),
-                updated=response_json.get("updated"),
-                enabled=response_json.get("enabled", True),
-                validated=response_json.get("validated", False),
-            )
+            # Add phoneNumber from request since it may not be in IBM response
+            response_json["phoneNumber"] = enrollment_request.phoneNumber
+            enrollment_data = EnrollmentResponseData(**response_json)
 
             return ResponseModel(
                 success=True,

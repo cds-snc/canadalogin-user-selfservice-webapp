@@ -44,20 +44,7 @@ async def handle_mfa_otp_verification_create(
 
         try:
             # Parse the verification response
-            verification_data = VerificationCreateResponseData(
-                id=response_json.get("id"),
-                userId=response_json.get("userId"),
-                type=response_json.get("type"),
-                created=response_json.get("created"),
-                updated=response_json.get("updated"),
-                expiry=response_json.get("expiry"),
-                state=response_json.get("state"),
-                updatedBy=response_json.get("updatedBy"),
-                correlation=response_json.get("correlation"),
-                phoneNumber=response_json.get("phoneNumber"),
-                attempts=response_json.get("attempts"),
-                retries=response_json.get("retries"),
-            )
+            verification_data = VerificationCreateResponseData(**response_json)
 
             return ResponseModel(
                 success=True,
