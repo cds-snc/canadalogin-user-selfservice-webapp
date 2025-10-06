@@ -174,6 +174,53 @@ class TestVoiceEnrollment:
                 assert result.data.type == "voiceotp"
                 assert result.message == "Voice OTP factor enrolled successfully"
 
+    @pytest.mark.asyncio
+    async def test_handle_voice_otp_enrollment_profile_failure(
+        self, mock_enrollment_request
+    ):
+        mock_http_client = AsyncMock()
+        mock_user_access_token = "user_token_123"
+
+        # Mock profile failure
+        failed_profile_response = ProfileResponse(
+            success=False, data=None, message="Profile retrieval failed"
+        )
+
+        with patch("app.otp.services.enroll_otp.my_profile") as mock_my_profile:
+            mock_my_profile.return_value = failed_profile_response
+
+            result = await handle_voice_otp_enrollment(
+                mock_http_client, mock_enrollment_request, mock_user_access_token
+            )
+
+            assert result.success is False
+            assert "User verification failed" in result.message
+
+    @pytest.mark.asyncio
+    async def test_handle_voice_otp_enrollment_ibm_error(
+        self, mock_enrollment_request, mock_user_profile_response
+    ):
+        mock_http_client = AsyncMock()
+        mock_user_access_token = "user_token_123"
+
+        with patch("app.otp.services.enroll_otp.my_profile") as mock_my_profile:
+            mock_my_profile.return_value = mock_user_profile_response
+
+            with patch(
+                "app.otp.services.enroll_otp.dispatch_voice_enrollment"
+            ) as mock_dispatch:
+                mock_response = MagicMock()
+                mock_response.status_code = 400
+                mock_response.json.return_value = {"error": "Invalid phone number"}
+                mock_dispatch.return_value = mock_response
+
+                result = await handle_voice_otp_enrollment(
+                    mock_http_client, mock_enrollment_request, mock_user_access_token
+                )
+
+                assert result.success is False
+                assert "Invalid phone number" in result.message
+
 
 class TestDispatchFunctions:
     @pytest.mark.asyncio
