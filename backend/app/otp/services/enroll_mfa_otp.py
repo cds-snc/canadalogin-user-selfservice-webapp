@@ -9,9 +9,10 @@ from app.utils.helpers import (
     generate_error_response,
     prepare_pydantic_phone_number_for_verify,
 )
+from app.utils.request_error_handler import RequestErrorHandler
 from app.utils.schemas import ResponseModel
 from fastapi import HTTPException
-from httpx import AsyncClient
+from httpx import AsyncClient, HTTPStatusError
 from pydantic import ValidationError
 
 logger = logging.getLogger(__name__)
@@ -124,13 +125,11 @@ async def dispatch_otp_enrollment(
         response = await global_http_client.post(
             enrollment_url, json=enrollment_data, headers=headers
         )
+        response.raise_for_status()
         return response
 
-    except HTTPException as he:
-        logger.error(
-            f"HTTP Exception in {enrollment_request.otpType} OTP enrollment: {str(he)}"
-        )
-        raise he
+    except HTTPStatusError as e:
+        return RequestErrorHandler.handle(e)
     except Exception as error:
         logger.error(
             f"Request to /v2.0/factors/{endpoint if 'endpoint' in locals() else 'unknown'} error: {str(error)}",
