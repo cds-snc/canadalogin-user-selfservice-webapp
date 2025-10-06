@@ -10,8 +10,8 @@ from app.otp.schemas import (
 from app.users.services.profile import my_profile
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.helpers import generate_error_response
+from app.utils.request_error_handler import RequestErrorHandler
 from app.utils.schemas import ResponseModel
-from fastapi import HTTPException
 from httpx import AsyncClient
 from pydantic import ValidationError
 
@@ -47,19 +47,6 @@ async def handle_sms_otp_verification_create(
             f"SMS OTP verification creation completed in {duration:.2f} seconds"
         )
 
-        if http_client_response.status_code is None:
-            return generate_error_response(400, "Unknown error")
-
-        if http_client_response.status_code != 201:
-            logger.error(
-                f"Error creating SMS OTP verification: {http_client_response.json()}"
-            )
-            error_data = http_client_response.json()
-            error_message = error_data.get(
-                "error", "SMS OTP verification creation failed"
-            )
-            return ResponseModel(success=False, data=None, message=error_message)
-
         response_json = http_client_response.json()
 
         try:
@@ -90,10 +77,8 @@ async def handle_sms_otp_verification_create(
             return generate_error_response(422, "Server Error")
 
     except Exception as e:
-        logger.error(f"SMS OTP verification creation error: {str(e)}", exc_info=True)
-        raise HTTPException(
-            status_code=500, detail=f"SMS OTP verification creation error: {str(e)}"
-        )
+        logger.error(f"SMS OTP verification creation error: {str(e)}")
+        RequestErrorHandler.handle(e, "SMS OTP verification creation")
 
 
 async def handle_voice_otp_verification_create(
@@ -125,19 +110,6 @@ async def handle_voice_otp_verification_create(
             f"Voice OTP verification creation completed in {duration:.2f} seconds"
         )
 
-        if http_client_response.status_code is None:
-            return generate_error_response(400, "Unknown error")
-
-        if http_client_response.status_code != 201:
-            logger.error(
-                f"Error creating Voice OTP verification: {http_client_response.json()}"
-            )
-            error_data = http_client_response.json()
-            error_message = error_data.get(
-                "error", "Voice OTP verification creation failed"
-            )
-            return ResponseModel(success=False, data=None, message=error_message)
-
         response_json = http_client_response.json()
 
         try:
@@ -168,10 +140,8 @@ async def handle_voice_otp_verification_create(
             return generate_error_response(422, "Server Error")
 
     except Exception as e:
-        logger.error(f"Voice OTP verification creation error: {str(e)}", exc_info=True)
-        raise HTTPException(
-            status_code=500, detail=f"Voice OTP verification creation error: {str(e)}"
-        )
+        logger.error(f"Voice OTP verification creation error: {str(e)}")
+        RequestErrorHandler.handle(e, "Voice OTP verification creation")
 
 
 async def handle_sms_otp_verification_attempt(
@@ -195,40 +165,20 @@ async def handle_sms_otp_verification_attempt(
         user_id = my_profile_response.data.id
         logger.info(f"Attempting SMS OTP verification for user: {user_id}")
 
-        http_client_response = await dispatch_sms_verification_attempt(
-            global_http_client, attempt_request
-        )
+        await dispatch_sms_verification_attempt(global_http_client, attempt_request)
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(f"SMS OTP verification attempt completed in {duration:.2f} seconds")
 
-        if http_client_response.status_code is None:
-            return generate_error_response(400, "Unknown error")
-
         # IBM Verify API returns 204 No Content on successful verification attempt
-        if http_client_response.status_code == 204:
-            return ResponseModel(
-                success=True,
-                data=None,
-                message="SMS OTP verification completed successfully",
-            )
-
-        # Handle error responses
-        if http_client_response.status_code != 204:
-            logger.error(
-                f"Error attempting SMS OTP verification: Status {http_client_response.status_code}"
-            )
-            try:
-                error_data = http_client_response.json()
-                error_message = error_data.get("error", "SMS OTP verification failed")
-            except Exception:
-                error_message = "SMS OTP verification failed"
-            return ResponseModel(success=False, data=None, message=error_message)
+        return ResponseModel(
+            success=True,
+            data=None,
+            message="SMS OTP verification completed successfully",
+        )
 
     except Exception as e:
-        logger.error(f"SMS OTP verification attempt error: {str(e)}", exc_info=True)
-        raise HTTPException(
-            status_code=500, detail=f"SMS OTP verification attempt error: {str(e)}"
-        )
+        logger.error(f"SMS OTP verification attempt error: {str(e)}")
+        RequestErrorHandler.handle(e, "SMS OTP verification attempt")
 
 
 async def handle_voice_otp_verification_attempt(
@@ -252,42 +202,22 @@ async def handle_voice_otp_verification_attempt(
         user_id = my_profile_response.data.id
         logger.info(f"Attempting Voice OTP verification for user: {user_id}")
 
-        http_client_response = await dispatch_voice_verification_attempt(
-            global_http_client, attempt_request
-        )
+        await dispatch_voice_verification_attempt(global_http_client, attempt_request)
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(
             f"Voice OTP verification attempt completed in {duration:.2f} seconds"
         )
 
-        if http_client_response.status_code is None:
-            return generate_error_response(400, "Unknown error")
-
         # IBM Verify API returns 204 No Content on successful verification attempt
-        if http_client_response.status_code == 204:
-            return ResponseModel(
-                success=True,
-                data=None,
-                message="Voice OTP verification completed successfully",
-            )
-
-        # Handle error responses
-        if http_client_response.status_code != 204:
-            logger.error(
-                f"Error attempting Voice OTP verification: Status {http_client_response.status_code}"
-            )
-            try:
-                error_data = http_client_response.json()
-                error_message = error_data.get("error", "Voice OTP verification failed")
-            except Exception:
-                error_message = "Voice OTP verification failed"
-            return ResponseModel(success=False, data=None, message=error_message)
+        return ResponseModel(
+            success=True,
+            data=None,
+            message="Voice OTP verification completed successfully",
+        )
 
     except Exception as e:
-        logger.error(f"Voice OTP verification attempt error: {str(e)}", exc_info=True)
-        raise HTTPException(
-            status_code=500, detail=f"Voice OTP verification attempt error: {str(e)}"
-        )
+        logger.error(f"Voice OTP verification attempt error: {str(e)}")
+        RequestErrorHandler.handle(e, "Voice OTP verification attempt")
 
 
 async def dispatch_sms_verification_create(
@@ -304,17 +234,12 @@ async def dispatch_sms_verification_create(
         response = await global_http_client.post(
             verification_url, json={}, headers=headers
         )
+        response.raise_for_status()
         return response
 
-    except HTTPException as he:
-        logger.error(f"HTTP Exception in SMS OTP verification creation: {str(he)}")
-        raise he
-    except Exception as error:
-        logger.error(
-            f"Request to /v2.0/factors/smsotp/verifications error: {str(error)}",
-            exc_info=True,
-        )
-        raise error
+    except Exception as e:
+        logger.error(f"SMS OTP verification creation dispatch error: {str(e)}")
+        RequestErrorHandler.handle(e, "SMS OTP verification creation dispatch")
 
 
 async def dispatch_voice_verification_create(
@@ -331,17 +256,12 @@ async def dispatch_voice_verification_create(
         response = await global_http_client.post(
             verification_url, json={}, headers=headers
         )
+        response.raise_for_status()
         return response
 
-    except HTTPException as he:
-        logger.error(f"HTTP Exception in Voice OTP verification creation: {str(he)}")
-        raise he
-    except Exception as error:
-        logger.error(
-            f"Request to /v2.0/factors/voiceotp/verifications error: {str(error)}",
-            exc_info=True,
-        )
-        raise error
+    except Exception as e:
+        logger.error(f"Voice OTP verification creation dispatch error: {str(e)}")
+        RequestErrorHandler.handle(e, "Voice OTP verification creation dispatch")
 
 
 async def dispatch_sms_verification_attempt(
@@ -360,17 +280,12 @@ async def dispatch_sms_verification_attempt(
         response = await global_http_client.post(
             verification_url, json=attempt_data, headers=headers
         )
+        response.raise_for_status()
         return response
 
-    except HTTPException as he:
-        logger.error(f"HTTP Exception in SMS OTP verification attempt: {str(he)}")
-        raise he
-    except Exception as error:
-        logger.error(
-            f"Request to /v2.0/factors/smsotp/{attempt_request.id}/verifications/{attempt_request.trxnId} error: {str(error)}",
-            exc_info=True,
-        )
-        raise error
+    except Exception as e:
+        logger.error(f"SMS OTP verification attempt dispatch error: {str(e)}")
+        RequestErrorHandler.handle(e, "SMS OTP verification attempt dispatch")
 
 
 async def dispatch_voice_verification_attempt(
@@ -389,14 +304,9 @@ async def dispatch_voice_verification_attempt(
         response = await global_http_client.post(
             verification_url, json=attempt_data, headers=headers
         )
+        response.raise_for_status()
         return response
 
-    except HTTPException as he:
-        logger.error(f"HTTP Exception in Voice OTP verification attempt: {str(he)}")
-        raise he
-    except Exception as error:
-        logger.error(
-            f"Request to /v2.0/factors/voiceotp/{attempt_request.id}/verifications/{attempt_request.trxnId} error: {str(error)}",
-            exc_info=True,
-        )
-        raise error
+    except Exception as e:
+        logger.error(f"Voice OTP verification attempt dispatch error: {str(e)}")
+        RequestErrorHandler.handle(e, "Voice OTP verification attempt dispatch")
