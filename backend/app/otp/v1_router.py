@@ -11,10 +11,7 @@ from app.otp.schemas import (
     UserOtpInfo,
     UserOtpVerificationInfo,
 )
-from app.otp.services.enroll_otp import (
-    handle_sms_otp_enrollment,
-    handle_voice_otp_enrollment,
-)
+from app.otp.services.enroll_mfa_otp import handle_otp_enrollment
 from app.otp.services.retrieve_transient_otp import handle_otp_status_retrieval
 from app.otp.services.send_transient_otp import handle_otp_send
 from app.otp.services.verify_mfa_otp import (
@@ -86,37 +83,19 @@ async def check_otp(
 
 
 @router.post(
-    "/enroll/sms",
+    "/enroll/mfa",
     response_model=ResponseModel,
     status_code=status.HTTP_201_CREATED,
     tags=["OTP"],
-    summary="Enroll SMS OTP factor",
-    description="Enrolls a phone number for SMS-based two-factor authentication",
+    summary="Enroll MFA OTP factor",
+    description="Enrolls a phone number for MFA OTP-based two-factor authentication (SMS or Voice based on otpType)",
 )
-async def enroll_sms_otp(
+async def enroll_otp(
     request: Request,
     enrollment_request: OtpEnrollmentRequest,
     user_access_token: str = Depends(get_users_current_session),
 ):
-    return await handle_sms_otp_enrollment(
-        request.app.state.request_client, enrollment_request, user_access_token
-    )
-
-
-@router.post(
-    "/enroll/voice",
-    response_model=ResponseModel,
-    status_code=status.HTTP_201_CREATED,
-    tags=["OTP"],
-    summary="Enroll Voice OTP factor",
-    description="Enrolls a phone number for voice call-based two-factor authentication",
-)
-async def enroll_voice_otp(
-    request: Request,
-    enrollment_request: OtpEnrollmentRequest,
-    user_access_token: str = Depends(get_users_current_session),
-):
-    return await handle_voice_otp_enrollment(
+    return await handle_otp_enrollment(
         request.app.state.request_client, enrollment_request, user_access_token
     )
 

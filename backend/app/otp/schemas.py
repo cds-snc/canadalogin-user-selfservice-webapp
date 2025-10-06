@@ -68,6 +68,7 @@ class RetrievalData(BaseModel):
 
 class OtpEnrollmentRequest(BaseModel):
     phoneNumber: PhoneNumber
+    otpType: OtpType
 
 
 class EnrollmentResponseData(BaseModel):
