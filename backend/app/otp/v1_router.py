@@ -22,10 +22,8 @@ from app.utils.schemas import ResponseModel
 from fastapi import APIRouter, Depends, Request, status
 
 from backend.app.otp.services.verify_mfa_otp import (
-    handle_sms_otp_verification_attempt,
-    handle_sms_otp_verification_create,
-    handle_voice_otp_verification_attempt,
-    handle_voice_otp_verification_create,
+    handle_mfa_otp_verification_attempt,
+    handle_mfa_otp_verification_create,
 )
 
 logger = logging.getLogger(__name__)
@@ -137,8 +135,11 @@ async def create_sms_otp_verification(
     verification_request: OtpVerificationCreateRequest,
     user_access_token: str = Depends(get_users_current_session),
 ):
-    return await handle_sms_otp_verification_create(
-        request.app.state.request_client, verification_request, user_access_token
+    return await handle_mfa_otp_verification_create(
+        request.app.state.request_client,
+        verification_request,
+        user_access_token,
+        OtpType.SMS,
     )
 
 
@@ -155,8 +156,11 @@ async def create_voice_otp_verification(
     verification_request: OtpVerificationCreateRequest,
     user_access_token: str = Depends(get_users_current_session),
 ):
-    return await handle_voice_otp_verification_create(
-        request.app.state.request_client, verification_request, user_access_token
+    return await handle_mfa_otp_verification_create(
+        request.app.state.request_client,
+        verification_request,
+        user_access_token,
+        OtpType.VOICE,
     )
 
 
@@ -173,8 +177,11 @@ async def attempt_sms_otp_verification(
     attempt_request: OtpVerificationAttemptRequest,
     user_access_token: str = Depends(get_users_current_session),
 ):
-    return await handle_sms_otp_verification_attempt(
-        request.app.state.request_client, attempt_request, user_access_token
+    return await handle_mfa_otp_verification_attempt(
+        request.app.state.request_client,
+        attempt_request,
+        user_access_token,
+        OtpType.SMS,
     )
 
 
@@ -191,6 +198,9 @@ async def attempt_voice_otp_verification(
     attempt_request: OtpVerificationAttemptRequest,
     user_access_token: str = Depends(get_users_current_session),
 ):
-    return await handle_voice_otp_verification_attempt(
-        request.app.state.request_client, attempt_request, user_access_token
+    return await handle_mfa_otp_verification_attempt(
+        request.app.state.request_client,
+        attempt_request,
+        user_access_token,
+        OtpType.VOICE,
     )
