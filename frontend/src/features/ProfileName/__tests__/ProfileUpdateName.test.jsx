@@ -1,3 +1,4 @@
+import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { BrowserRouter } from "react-router";
@@ -5,44 +6,6 @@ import UpdateProfileName from "../components/ProfileUpdateName.jsx";
 import { UserProvider } from "../../../components/Providers/UserProvider.tsx";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider.tsx";
 import "@testing-library/jest-dom/vitest";
-
-vi.mock("@cdssnc/gcds-components-react", () => ({
-  GcdsInput: ({ inputId, validateOn, ...props }) => (
-    <input {...props} id={inputId} data-testid={props["data-testid"]} />
-  ),
-  GcdsButton: ({ buttonRole, onGcdsClick, ...props }) => (
-    <button {...props} onClick={onGcdsClick} role={buttonRole} />
-  ),
-  GcdsContainer: ({ children, ...props }) => <div {...props}>{children}</div>,
-  GcdsGrid: ({ children, ...props }) => <div {...props}>{children}</div>,
-  GcdsHeading: ({ marginTop, marginBottom, children, ...props }) => (
-    <h1
-      {...props}
-      style={{
-        marginTop: marginTop,
-        marginBottom: marginBottom,
-        ...props.style,
-      }}
-    >
-      {children}
-    </h1>
-  ),
-  GcdsText: ({ marginTop, marginBottom, children, ...props }) => (
-    <p
-      {...props}
-      style={{
-        marginTop: marginTop,
-        marginBottom: marginBottom,
-        ...props.style,
-      }}
-    >
-      {children}
-    </p>
-  ),
-  GcdsDetails: ({ children, ...props }) => (
-    <details {...props}>{children}</details>
-  ),
-}));
 
 vi.mock("@cdssnc/gcds-components-react", () => ({
   GcdsButton: ({
@@ -85,13 +48,33 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
       className={className}
     />
   ),
-  GcdsInput: ({ inputId, validateOn, ...props }) => (
-    <input {...props} id={inputId} data-testid={props["data-testid"]} />
-  ),
-  // GcdsButton: ({ buttonRole, onGcdsClick, ...props }) => (
-  //   <button {...props} onClick={onGcdsClick} role={buttonRole} />
-  // ),
-  GcdsContainer: ({ children, ...props }) => <div {...props}>{children}</div>,
+  GcdsInput: ({ inputId, validateOn, label, lang, required, ...props }) => {
+    const { name, type, value, onChange, ...domProps } = props;
+    return (
+      <input
+        {...domProps}
+        id={inputId}
+        name={name}
+        type={type}
+        value={value}
+        onChange={onChange}
+        data-testid={props["data-testid"]}
+      />
+    );
+  },
+
+  GcdsContainer: ({ children, marginTop, marginBottom, ...props }) => {
+    const style = {
+      ...(marginTop && { marginTop }),
+      ...(marginBottom && { marginBottom }),
+      ...props.style,
+    };
+    return (
+      <div {...props} style={style}>
+        {children}
+      </div>
+    );
+  },
   GcdsGrid: ({ children, ...props }) => <div {...props}>{children}</div>,
   GcdsHeading: ({ marginTop, marginBottom, children, ...props }) => (
     <h1
@@ -254,6 +237,17 @@ const mockUserState = {
   authenticatedPages: [],
 };
 
+const TestWrapper = ({ children }) => (
+  <BrowserRouter>
+    <UserProvider
+      initial={mockUserState}
+      initialSessionTimeoutState={mockSessionTimeoutState}
+    >
+      <LanguageProvider>{children}</LanguageProvider>
+    </UserProvider>
+  </BrowserRouter>
+);
+
 describe("UpdateProfileName Component", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -392,16 +386,6 @@ describe("UpdateProfileName Component", () => {
   //   expect(formattedNameInput.value).toBe("New User");
   // });
 
-  const TestWrapper = ({ children }) => (
-    <BrowserRouter>
-      <UserProvider
-        initial={mockUserState}
-        initialSessionTimeoutState={mockSessionTimeoutState}
-      >
-        <LanguageProvider>{children}</LanguageProvider>
-      </UserProvider>
-    </BrowserRouter>
-  );
   it("matches snapshot", () => {
     const { container } = render(
       <TestWrapper>
