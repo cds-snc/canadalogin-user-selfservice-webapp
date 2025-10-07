@@ -54,6 +54,10 @@ export default function Add2FAPage() {
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
     language: language,
   });
+  const backToManage2FAVerificationsPage = path(PAGES.manage2FAVerifications, {
+    language: language,
+  });
+
   const [userPhoneFactorsMap, setUserPhoneFactorsMap] = useState({});
   const [phoneFormData, setPhoneFormData] = useState({
     phoneNumber: "",
@@ -157,7 +161,7 @@ export default function Add2FAPage() {
           visibleDigits in userPhoneFactorsMap &&
           userPhoneFactorsMap[visibleDigits].length >= 2
         ) {
-          navigateHelper(backToSecuritySettingsPage);
+          navigateHelper(backToManage2FAVerificationsPage);
         } else {
           setWizardStep("addSecond2FA");
         }
