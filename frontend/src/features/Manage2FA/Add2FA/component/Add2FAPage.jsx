@@ -10,8 +10,28 @@ import { userProfileDispatch } from "../../../../utils/userProfileDispatch";
 import { otpFactors } from "../../../ChangePassword/api/otpFactors";
 import OtpSelection from "../../../ChangePassword/components/OtpSelection";
 import OtpVerification from "../../../ChangePassword/components/OtpVerification";
+import { add2FA } from "../api/add2FA";
 import Add2FANumber from "./Add2FANumber";
 import AddSecond2FA from "./AddSecond2FA";
+
+const StepContent = ({ errorCode, errorPageJson, StepComponent }) => {
+  let errorMessage = errorPageJson[errorCode] || "";
+
+  if (errorMessage === "" && errorCode === "Unexpected API request error") {
+    errorMessage = errorPageJson["7"];
+  }
+
+  return (
+    <>
+      {errorMessage && (
+        <GcdsErrorMessage messageId="message-props">
+          {errorMessage}
+        </GcdsErrorMessage>
+      )}
+      {StepComponent}
+    </>
+  );
+};
 
 export default function Add2FAPage() {
   const { language } = useParams();
@@ -23,6 +43,9 @@ export default function Add2FAPage() {
   const [otpSentResponse, setOtpSentResponse] = useState(null);
   const [userOtpValue, setUserOtpValue] = useState("");
   const pageContentJson = getPageContent(language, PAGES.otpSelection);
+
+  const [errorCode, setErrorCode] = useState("");
+  const errorPageJson = getPageContent(language, PAGES.error);
 
   const [wizardStep, setWizardStep] = useState("add2FANumber");
   const [localLoading, setLocalLoading] = useState(false);
@@ -59,16 +82,47 @@ export default function Add2FAPage() {
     }
   };
 
-  const handleLoading = (bool) => {
-    setLocalLoading(bool);
-  };
-
   const handleOtpSentResponse = (otpResponse) => {
     setOtpSentResponse(otpResponse);
   };
 
   const handleSetUserOtpValue = (userOtpValue) => {
     setUserOtpValue(userOtpValue);
+  };
+
+  // Map frontend FLOW_TYPES to backend otpType
+  // Backend: sms | voice
+  // Frontend: smsotp | voiceotp
+  const serverMapping = {
+    [FLOW_TYPES.sms]: "sms",
+    [FLOW_TYPES.voice]: "voice",
+  };
+
+  const enrollMFA = async () => {
+    setLocalLoading(true);
+    setErrorCode("");
+
+    try {
+      const formdata = {
+        phoneNumber: phoneFormData.phoneNumber,
+        otpType: serverMapping[phoneFormData.otpType],
+      };
+
+      const response = await add2FA.enrollMFA(
+        formdata.phoneNumber,
+        formdata.otpType,
+      );
+      if (response && response.data && response.data.id) {
+        handlePhoneForm("mfaId", response.data.id);
+        setWizardStep("add2FAValidation");
+      }
+    } catch (error) {
+      if (error && error.data && error.data.message) {
+        setErrorCode(error.data.message);
+      }
+    } finally {
+      setLocalLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -111,8 +165,6 @@ export default function Add2FAPage() {
         userPhoneFactors={userPhoneFactors}
         onChangeUserMfaType={handleChangeUserMfaSelection}
         userSelectedMfaType={userSelectedMfaType}
-        localLoading={localLoading}
-        setLocalLoading={handleLoading}
         onNext={() => {
           setWizardStep("otpValidation");
         }}
@@ -122,8 +174,6 @@ export default function Add2FAPage() {
       <OtpVerification
         userProfile={userProfile}
         userSelectedMfaType={userSelectedMfaType}
-        localLoading={localLoading}
-        setLocalLoading={handleLoading}
         onChangeUserMfaType={handleChangeUserMfaSelection}
         userOtpValue={userOtpValue}
         setUserOtpValue={handleSetUserOtpValue}
@@ -137,8 +187,8 @@ export default function Add2FAPage() {
     ),
     add2FANumber: (
       <Add2FANumber
-        onNext={() => {
-          setWizardStep("addSecond2FA");
+        onNext={async () => {
+          await enrollMFA();
         }}
         onCancel={() => navigateHelper(backToSecuritySettingsPage)}
         onChangePhoneForm={handlePhoneForm}
@@ -149,9 +199,6 @@ export default function Add2FAPage() {
       <OtpVerification
         userProfile={userProfile}
         userSelectedMfaType={userSelectedMfaType}
-        localLoading={localLoading}
-        setLocalLoading={handleLoading}
-        onChangeUserMfaType={handleChangeUserMfaSelection}
         userOtpValue={userOtpValue}
         setUserOtpValue={handleSetUserOtpValue}
         otpSentResponse={otpSentResponse}
@@ -165,13 +212,13 @@ export default function Add2FAPage() {
     addSecond2FA: <AddSecond2FA phoneFormData={phoneFormData} />,
   };
 
-  return (
-    <>
-      {userSelectedMfaType ? (
-        steps[wizardStep]
-      ) : (
-        <Loader text={pageContentJson["12"]} />
-      )}
-    </>
+  return localLoading ? (
+    <Loader text={pageContentJson["11"]} />
+  ) : (
+    <StepContent
+      StepComponent={steps[wizardStep]}
+      errorCode={errorCode}
+      errorPageJson={errorPageJson}
+    />
   );
 }

@@ -114,7 +114,7 @@ export default function Add2FANumber({
               required: true,
               autoFocus: true,
             }}
-            specialLabel={pageContentJson["10"]}
+            specialLabel={pageContentJson["7"]}
             country={"ca"}
             preferredCountries={["ca"]}
             onlyCountries={countryMapping.countries}
@@ -158,9 +158,9 @@ export default function Add2FANumber({
         <GcdsButton
           disabled={!phoneNumberValid}
           style={{ width: "fit-content" }}
-          onGcdsClick={(ev) => {
+          onGcdsClick={async (ev) => {
             ev.preventDefault();
-            onNext();
+            await onNext();
           }}
         >
           {submit}
