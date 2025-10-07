@@ -206,6 +206,16 @@ vi.mock("../../../services/authService.jsx", () => ({
         },
       }),
     ),
+    get_rp_info: vi.fn(() =>
+      Promise.resolve({
+        data: {
+          url: "https://example.com",
+          linkName: "Example Service",
+          icon: "https://example.com/icon.png",
+          id: "test-service-id",
+        },
+      }),
+    ),
   },
 }));
 
