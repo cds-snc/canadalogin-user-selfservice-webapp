@@ -104,7 +104,11 @@ async def dispatch_otp_enrollment(
             enrollment_request.phoneNumber
         )
 
-        enrollment_data = {"userId": user_id, "phoneNumber": formatted_phone}
+        enrollment_data = {
+            "userId": user_id,
+            "phoneNumber": formatted_phone,
+            "enabled": True,  # Enable the factor immediately upon enrollment
+        }
 
         # Determine the endpoint based on OTP type
         if enrollment_request.otpType == OtpType.SMS:

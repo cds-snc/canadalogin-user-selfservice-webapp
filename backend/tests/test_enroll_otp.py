@@ -273,6 +273,7 @@ class TestDispatchFunctions:
                         assert "smsotp" in call_args[0][0]
                         assert call_args[1]["json"]["userId"] == user_id
                         assert call_args[1]["json"]["phoneNumber"] == "+19025555555"
+                        assert call_args[1]["json"]["enabled"] is True
 
     @pytest.mark.asyncio
     async def test_dispatch_voice_otp_enrollment(self, mock_voice_enrollment_request):
@@ -313,3 +314,4 @@ class TestDispatchFunctions:
                         assert "voiceotp" in call_args[0][0]
                         assert call_args[1]["json"]["userId"] == user_id
                         assert call_args[1]["json"]["phoneNumber"] == "+19025555555"
+                        assert call_args[1]["json"]["enabled"] is True

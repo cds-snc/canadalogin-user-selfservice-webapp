@@ -80,7 +80,7 @@ async def check_otp(
 
 
 @router.post(
-    "mfa/enroll",
+    "/mfa/enroll",
     response_model=ResponseModel,
     status_code=status.HTTP_201_CREATED,
     tags=["OTP"],
@@ -98,7 +98,7 @@ async def enroll_otp(
 
 
 @router.post(
-    "mfa/send",
+    "/mfa/send",
     response_model=ResponseModel,
     status_code=status.HTTP_201_CREATED,
     tags=["OTP"],
@@ -119,7 +119,7 @@ async def create_mfa_otp_verification(
 
 
 @router.post(
-    "mfa/verify",
+    "/mfa/verify",
     response_model=ResponseModel,
     status_code=status.HTTP_200_OK,
     tags=["OTP"],
