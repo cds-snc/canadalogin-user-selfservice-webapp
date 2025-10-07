@@ -14,10 +14,10 @@ from app.otp.schemas import (
     OtpVerificationCreateRequest,
 )
 from app.otp.services.verify_mfa_otp import (
-    dispatch_mfa_verification_attempt,
-    dispatch_mfa_verification_create,
-    handle_mfa_otp_verification_attempt,
-    handle_mfa_otp_verification_create,
+    dispatch_send_mfa_otp,
+    dispatch_verify_mfa_otp,
+    handle_send_mfa_otp,
+    handle_verify_mfa_otp,
 )
 from httpx import HTTPStatusError, Request, Response
 
@@ -107,7 +107,7 @@ class TestUnifiedMFAOTPDispatchFunctions:
                     mock_response.raise_for_status = MagicMock()
                     mock_http_client.post.return_value = mock_response
 
-                    result = await dispatch_mfa_verification_create(
+                    result = await dispatch_send_mfa_otp(
                         mock_http_client,
                         mock_sms_verification_create_request,
                         OtpType.SMS,
@@ -146,7 +146,7 @@ class TestUnifiedMFAOTPDispatchFunctions:
                     mock_response.raise_for_status = MagicMock()
                     mock_http_client.post.return_value = mock_response
 
-                    result = await dispatch_mfa_verification_create(
+                    result = await dispatch_send_mfa_otp(
                         mock_http_client,
                         mock_voice_verification_create_request,
                         OtpType.VOICE,
@@ -166,17 +166,17 @@ class TestIntegrationBasics:
     def test_unified_functions_exist(self):
         """Test that the unified functions can be imported."""
         from app.otp.services.verify_mfa_otp import (
-            dispatch_mfa_verification_attempt,
-            dispatch_mfa_verification_create,
-            handle_mfa_otp_verification_attempt,
-            handle_mfa_otp_verification_create,
+            dispatch_send_mfa_otp,
+            dispatch_verify_mfa_otp,
+            handle_send_mfa_otp,
+            handle_verify_mfa_otp,
         )
 
         # Verify functions are callable
-        assert callable(handle_mfa_otp_verification_create)
-        assert callable(handle_mfa_otp_verification_attempt)
-        assert callable(dispatch_mfa_verification_create)
-        assert callable(dispatch_mfa_verification_attempt)
+        assert callable(handle_send_mfa_otp)
+        assert callable(handle_verify_mfa_otp)
+        assert callable(dispatch_send_mfa_otp)
+        assert callable(dispatch_verify_mfa_otp)
 
     def test_otp_type_routing(self):
         """Test that OTP types are correctly mapped to endpoints."""
@@ -205,13 +205,13 @@ class TestHandleMFAOTPVerificationCreate:
             mock_profile.return_value = mock_profile_success_response
 
             with patch(
-                "app.otp.services.verify_mfa_otp.dispatch_mfa_verification_create"
+                "app.otp.services.verify_mfa_otp.dispatch_send_mfa_otp"
             ) as mock_dispatch:
                 mock_response = MagicMock()
                 mock_response.json.return_value = mock_successful_verification_response
                 mock_dispatch.return_value = mock_response
 
-                result = await handle_mfa_otp_verification_create(
+                result = await handle_send_mfa_otp(
                     mock_http_client,
                     mock_sms_verification_create_request,
                     "user_token",
@@ -236,7 +236,7 @@ class TestHandleMFAOTPVerificationCreate:
             mock_profile.return_value = mock_profile_success_response
 
             with patch(
-                "app.otp.services.verify_mfa_otp.dispatch_mfa_verification_create"
+                "app.otp.services.verify_mfa_otp.dispatch_send_mfa_otp"
             ) as mock_dispatch:
                 mock_response = MagicMock()
                 voice_response = mock_successful_verification_response.copy()
@@ -244,7 +244,7 @@ class TestHandleMFAOTPVerificationCreate:
                 mock_response.json.return_value = voice_response
                 mock_dispatch.return_value = mock_response
 
-                result = await handle_mfa_otp_verification_create(
+                result = await handle_send_mfa_otp(
                     mock_http_client,
                     mock_voice_verification_create_request,
                     "user_token",
@@ -267,7 +267,7 @@ class TestHandleMFAOTPVerificationCreate:
         with patch("app.otp.services.verify_mfa_otp.my_profile") as mock_profile:
             mock_profile.return_value = mock_profile_failure_response
 
-            result = await handle_mfa_otp_verification_create(
+            result = await handle_send_mfa_otp(
                 mock_http_client,
                 mock_sms_verification_create_request,
                 "user_token",
@@ -288,14 +288,14 @@ class TestHandleMFAOTPVerificationCreate:
             mock_profile.return_value = mock_profile_success_response
 
             with patch(
-                "app.otp.services.verify_mfa_otp.dispatch_mfa_verification_create"
+                "app.otp.services.verify_mfa_otp.dispatch_send_mfa_otp"
             ) as mock_dispatch:
                 mock_response = MagicMock()
                 # Invalid response that will cause ValidationError
                 mock_response.json.return_value = {"invalid": "data"}
                 mock_dispatch.return_value = mock_response
 
-                result = await handle_mfa_otp_verification_create(
+                result = await handle_send_mfa_otp(
                     mock_http_client,
                     mock_sms_verification_create_request,
                     "user_token",
@@ -317,7 +317,7 @@ class TestHandleMFAOTPVerificationCreate:
             mock_profile.return_value = mock_profile_success_response
 
             with patch(
-                "app.otp.services.verify_mfa_otp.dispatch_mfa_verification_create"
+                "app.otp.services.verify_mfa_otp.dispatch_send_mfa_otp"
             ) as mock_dispatch:
                 mock_dispatch.side_effect = Exception("Network error")
 
@@ -326,7 +326,7 @@ class TestHandleMFAOTPVerificationCreate:
                 ) as mock_error_handler:
                     mock_error_handler.return_value = None
 
-                    result = await handle_mfa_otp_verification_create(
+                    result = await handle_send_mfa_otp(
                         mock_http_client,
                         mock_sms_verification_create_request,
                         "user_token",
@@ -352,11 +352,11 @@ class TestHandleMFAOTPVerificationAttempt:
             mock_profile.return_value = mock_profile_success_response
 
             with patch(
-                "app.otp.services.verify_mfa_otp.dispatch_mfa_verification_attempt"
+                "app.otp.services.verify_mfa_otp.dispatch_verify_mfa_otp"
             ) as mock_dispatch:
                 mock_dispatch.return_value = None  # 204 No Content
 
-                result = await handle_mfa_otp_verification_attempt(
+                result = await handle_verify_mfa_otp(
                     mock_http_client,
                     mock_sms_verification_attempt_request,
                     "user_token",
@@ -380,11 +380,11 @@ class TestHandleMFAOTPVerificationAttempt:
             mock_profile.return_value = mock_profile_success_response
 
             with patch(
-                "app.otp.services.verify_mfa_otp.dispatch_mfa_verification_attempt"
+                "app.otp.services.verify_mfa_otp.dispatch_verify_mfa_otp"
             ) as mock_dispatch:
                 mock_dispatch.return_value = None  # 204 No Content
 
-                result = await handle_mfa_otp_verification_attempt(
+                result = await handle_verify_mfa_otp(
                     mock_http_client,
                     mock_voice_verification_attempt_request,
                     "user_token",
@@ -408,7 +408,7 @@ class TestHandleMFAOTPVerificationAttempt:
         with patch("app.otp.services.verify_mfa_otp.my_profile") as mock_profile:
             mock_profile.return_value = mock_profile_failure_response
 
-            result = await handle_mfa_otp_verification_attempt(
+            result = await handle_verify_mfa_otp(
                 mock_http_client,
                 mock_sms_verification_attempt_request,
                 "user_token",
@@ -429,7 +429,7 @@ class TestHandleMFAOTPVerificationAttempt:
             mock_profile.return_value = mock_profile_success_response
 
             with patch(
-                "app.otp.services.verify_mfa_otp.dispatch_mfa_verification_attempt"
+                "app.otp.services.verify_mfa_otp.dispatch_verify_mfa_otp"
             ) as mock_dispatch:
                 mock_dispatch.side_effect = Exception("Network error")
 
@@ -438,7 +438,7 @@ class TestHandleMFAOTPVerificationAttempt:
                 ) as mock_error_handler:
                     mock_error_handler.return_value = None
 
-                    result = await handle_mfa_otp_verification_attempt(
+                    result = await handle_verify_mfa_otp(
                         mock_http_client,
                         mock_sms_verification_attempt_request,
                         "user_token",
@@ -468,7 +468,7 @@ class TestDispatchMFAVerificationCreate:
             ) as mock_error_handler:
                 mock_error_handler.return_value = None
 
-                result = await dispatch_mfa_verification_create(
+                result = await dispatch_send_mfa_otp(
                     mock_http_client,
                     mock_sms_verification_create_request,
                     "INVALID_TYPE",  # This will cause ValueError
@@ -512,7 +512,7 @@ class TestDispatchMFAVerificationCreate:
                     ) as mock_error_handler:
                         mock_error_handler.return_value = None
 
-                        result = await dispatch_mfa_verification_create(
+                        result = await dispatch_send_mfa_otp(
                             mock_http_client,
                             mock_sms_verification_create_request,
                             OtpType.SMS,
@@ -551,7 +551,7 @@ class TestDispatchMFAVerificationAttempt:
                     mock_response.raise_for_status = MagicMock()
                     mock_http_client.post.return_value = mock_response
 
-                    result = await dispatch_mfa_verification_attempt(
+                    result = await dispatch_verify_mfa_otp(
                         mock_http_client,
                         mock_sms_verification_attempt_request,
                         OtpType.SMS,
@@ -591,7 +591,7 @@ class TestDispatchMFAVerificationAttempt:
                     mock_response.raise_for_status = MagicMock()
                     mock_http_client.post.return_value = mock_response
 
-                    result = await dispatch_mfa_verification_attempt(
+                    result = await dispatch_verify_mfa_otp(
                         mock_http_client,
                         mock_voice_verification_attempt_request,
                         OtpType.VOICE,
@@ -618,7 +618,7 @@ class TestDispatchMFAVerificationAttempt:
             ) as mock_error_handler:
                 mock_error_handler.return_value = None
 
-                result = await dispatch_mfa_verification_attempt(
+                result = await dispatch_verify_mfa_otp(
                     mock_http_client,
                     mock_sms_verification_attempt_request,
                     "INVALID_TYPE",  # This will cause ValueError
@@ -662,7 +662,7 @@ class TestDispatchMFAVerificationAttempt:
                     ) as mock_error_handler:
                         mock_error_handler.return_value = None
 
-                        result = await dispatch_mfa_verification_attempt(
+                        result = await dispatch_verify_mfa_otp(
                             mock_http_client,
                             mock_sms_verification_attempt_request,
                             OtpType.SMS,

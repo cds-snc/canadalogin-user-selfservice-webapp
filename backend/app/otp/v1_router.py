@@ -14,10 +14,7 @@ from app.otp.schemas import (
 from app.otp.services.enroll_mfa_otp import handle_otp_enrollment
 from app.otp.services.retrieve_transient_otp import handle_otp_status_retrieval
 from app.otp.services.send_transient_otp import handle_otp_send
-from app.otp.services.verify_mfa_otp import (
-    handle_mfa_otp_verification_attempt,
-    handle_mfa_otp_verification_create,
-)
+from app.otp.services.verify_mfa_otp import handle_send_mfa_otp, handle_verify_mfa_otp
 from app.otp.services.verify_transient_otp import handle_otp_verification
 from app.utils.schemas import ResponseModel
 from fastapi import APIRouter, Depends, Request, status
@@ -113,7 +110,7 @@ async def create_mfa_otp_verification(
     verification_request: OtpVerificationCreateRequest,
     user_access_token: str = Depends(get_users_current_session),
 ):
-    return await handle_mfa_otp_verification_create(
+    return await handle_send_mfa_otp(
         request.app.state.request_client,
         verification_request,
         user_access_token,
@@ -134,7 +131,7 @@ async def attempt_mfa_otp_verification(
     attempt_request: OtpVerificationAttemptRequest,
     user_access_token: str = Depends(get_users_current_session),
 ):
-    return await handle_mfa_otp_verification_attempt(
+    return await handle_verify_mfa_otp(
         request.app.state.request_client,
         attempt_request,
         user_access_token,

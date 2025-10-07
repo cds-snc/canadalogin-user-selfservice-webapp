@@ -18,13 +18,13 @@ from pydantic import ValidationError
 logger = logging.getLogger(__name__)
 
 
-async def handle_mfa_otp_verification_create(
+async def handle_send_mfa_otp(
     global_http_client: AsyncClient,
     verification_request: OtpVerificationCreateRequest,
     user_access_token: str,
     otp_type: OtpType,
 ):
-    """Create an MFA OTP verification for SMS or Voice"""
+    """Send an MFA OTP for SMS or Voice"""
     try:
         # Verify user profile
         my_profile_response = await my_profile(global_http_client, user_access_token)
@@ -36,7 +36,7 @@ async def handle_mfa_otp_verification_create(
                 success=False, data=None, message="User verification failed"
             )
 
-        http_client_response = await dispatch_mfa_verification_create(
+        http_client_response = await dispatch_send_mfa_otp(
             global_http_client, verification_request, otp_type
         )
 
@@ -61,13 +61,13 @@ async def handle_mfa_otp_verification_create(
         RequestErrorHandler.handle(e, f"{otp_type} MFA OTP verification creation")
 
 
-async def handle_mfa_otp_verification_attempt(
+async def handle_verify_mfa_otp(
     global_http_client: AsyncClient,
     attempt_request: OtpVerificationAttemptRequest,
     user_access_token: str,
     otp_type: OtpType,
 ):
-    """Attempt MFA OTP verification for SMS or Voice"""
+    """Verify MFA OTP for SMS or Voice"""
     try:
         # Verify user profile
         my_profile_response = await my_profile(global_http_client, user_access_token)
@@ -79,9 +79,7 @@ async def handle_mfa_otp_verification_attempt(
                 success=False, data=None, message="User verification failed"
             )
 
-        await dispatch_mfa_verification_attempt(
-            global_http_client, attempt_request, otp_type
-        )
+        await dispatch_verify_mfa_otp(global_http_client, attempt_request, otp_type)
 
         # IBM Verify API returns 204 No Content on successful verification attempt
         return ResponseModel(
@@ -95,12 +93,12 @@ async def handle_mfa_otp_verification_attempt(
         RequestErrorHandler.handle(e, f"{otp_type} MFA OTP verification attempt")
 
 
-async def dispatch_mfa_verification_create(
+async def dispatch_send_mfa_otp(
     global_http_client: AsyncClient,
     verification_request: OtpVerificationCreateRequest,
     otp_type: OtpType,
 ):
-    """Dispatch MFA OTP verification creation to IBM Verify"""
+    """Dispatch Send MFA OTP verification to IBM Verify"""
     try:
         access_token = await get_admin_token(global_http_client)
         headers = get_auth_request_headers(access_token, True)
@@ -128,7 +126,7 @@ async def dispatch_mfa_verification_create(
         )
 
 
-async def dispatch_mfa_verification_attempt(
+async def dispatch_verify_mfa_otp(
     global_http_client: AsyncClient,
     attempt_request: OtpVerificationAttemptRequest,
     otp_type: OtpType,
