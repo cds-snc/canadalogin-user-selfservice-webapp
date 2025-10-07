@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useParams, useLocation } from "react-router";
+import { useParams, useLocation, useNavigate } from "react-router";
 
 import {
   GcdsContainer,
@@ -14,7 +14,6 @@ import { getPageContent } from "../../../utils/functions.jsx";
 import { path } from "../../../utils/routeHelpers.js";
 import { PAGES } from "../../../utils/constants.jsx";
 import { useUser } from "../../../components/Providers/useUser.tsx";
-import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 import { authService } from "../../../services/authService.jsx";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
 
@@ -27,7 +26,8 @@ export default function SuccessfullyUpdatedName() {
     language,
     PAGES.profileUpdateNameSuccess,
   );
-  const navigateHelper = useNavigateHelper();
+  const navigate = useNavigate();
+
   const backToProfile = path(PAGES.ProfileHome, { language: language });
   const { setLoading } = userProfileDispatch(dispatch);
 
@@ -40,7 +40,7 @@ export default function SuccessfullyUpdatedName() {
 
   useEffect(() => {
     // If no name data, redirect to edit page
-    if (!name) navigateHelper(editProfile);
+    if (!name) navigate(editProfile);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -89,7 +89,7 @@ export default function SuccessfullyUpdatedName() {
           style={{ width: "fit-content" }}
           onGcdsClick={(ev) => {
             ev.preventDefault();
-            navigateHelper(backToProfile);
+            navigate(backToProfile);
           }}
         >
           {pageContentJson["6"]}

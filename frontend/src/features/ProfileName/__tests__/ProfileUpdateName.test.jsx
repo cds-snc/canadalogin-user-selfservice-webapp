@@ -10,7 +10,7 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
   GcdsButton: ({
     children,
     buttonId,
-    onClick,
+    onGcdsClick,
     disabled,
     buttonType,
     buttonRole,
@@ -18,7 +18,7 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
   }) => (
     <button
       data-testid={buttonId}
-      onClick={onClick}
+      onClick={onGcdsClick}
       disabled={disabled}
       data-button-type={buttonType}
       data-button-role={buttonRole}
