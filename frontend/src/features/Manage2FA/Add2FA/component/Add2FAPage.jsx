@@ -20,8 +20,6 @@ export default function Add2FAPage() {
   const { pathname } = useLocation();
 
   const [userPhoneFactors, setUserPhoneFactors] = useState([]);
-  const [secondMfaType, setSecondMfaType] = useState("voiceotp");
-
   const [otpSentResponse, setOtpSentResponse] = useState(null);
   const [userOtpValue, setUserOtpValue] = useState("");
   const pageContentJson = getPageContent(language, PAGES.otpSelection);
@@ -139,9 +137,8 @@ export default function Add2FAPage() {
     ),
     add2FANumber: (
       <Add2FANumber
-        onNext={(secondMfaType) => {
-          setWizardStep("otpSelection");
-          setSecondMfaType(secondMfaType);
+        onNext={() => {
+          setWizardStep("addSecond2FA");
         }}
         onCancel={() => navigateHelper(backToSecuritySettingsPage)}
         onChangePhoneForm={handlePhoneForm}
@@ -160,17 +157,12 @@ export default function Add2FAPage() {
         otpSentResponse={otpSentResponse}
         setOtpSentResponse={handleOtpSentResponse}
         onNext={() => {
-          setWizardStep("add2FANumber");
+          setWizardStep("addSecond2FA");
         }}
         onBack={() => setWizardStep("addSecond2FA")}
       />
     ),
-    addSecond2FA: (
-      <AddSecond2FA
-        secondMfaType={secondMfaType}
-        newPhoneNumber={phoneFormData.phoneNumber}
-      />
-    ),
+    addSecond2FA: <AddSecond2FA phoneFormData={phoneFormData} />,
   };
 
   return (
