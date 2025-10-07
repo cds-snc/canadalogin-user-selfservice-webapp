@@ -86,6 +86,12 @@ export default function Add2FAOtpVerification({
     setCodeRequested(false);
   };
 
+  // Clear OTP field on mount
+  useEffect(() => {
+    onChangePhoneForm("otp", "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     if (time <= 0) return;
 

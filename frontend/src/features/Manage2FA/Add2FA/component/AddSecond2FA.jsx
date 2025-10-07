@@ -11,7 +11,11 @@ import { useParams } from "react-router";
 import { FLOW_TYPES, PAGES } from "../../../../utils/constants";
 import { getPageContent } from "../../../../utils/functions";
 
-export default function AddSecond2FA({ phoneFormData }) {
+export default function AddSecond2FA({
+  phoneFormData,
+  onSkipForNowLink,
+  onAddSecond2FA,
+}) {
   const { language } = useParams();
   const pageContentJson = getPageContent(
     language,
@@ -51,19 +55,14 @@ export default function AddSecond2FA({ phoneFormData }) {
             style={{ width: "fit-content" }}
             onGcdsClick={async (ev) => {
               ev.preventDefault();
+              await onAddSecond2FA();
             }}
           >
             {pageContentJson["9"]}
           </GcdsButton>
         </GcdsText>
         &nbsp;
-        <GcdsLink
-          onGcdsClick={(ev) => {
-            ev.preventDefault();
-          }}
-        >
-          {pageContentJson["10"]}
-        </GcdsLink>
+        <GcdsLink href={onSkipForNowLink}>{pageContentJson["10"]}</GcdsLink>
       </GcdsGrid>
     </GcdsContainer>
   );
