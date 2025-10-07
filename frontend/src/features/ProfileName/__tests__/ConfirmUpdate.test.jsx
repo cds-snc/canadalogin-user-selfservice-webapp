@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { BrowserRouter } from "react-router";
 import ConfirmUpdate from "../components/ConfirmUpdate.jsx";
@@ -130,7 +130,6 @@ vi.mock("../../../utils/constants.jsx", async (importOriginal) => {
   };
 });
 
-// Mock GCDS components
 vi.mock("@cdssnc/gcds-components-react", () => ({
   GcdsContainer: ({ children, ...props }) => <div {...props}>{children}</div>,
   GcdsGrid: ({ children, columns, gap, ...props }) => (
@@ -145,12 +144,15 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
       {children}
     </p>
   ),
-  GcdsNotice: ({ children, type, noticeTitle, ...props }) => (
-    <div {...props} data-notice-type={type}>
-      {noticeTitle && <h2>{noticeTitle}</h2>}
-      {children}
-    </div>
-  ),
+  GcdsNotice: ({ children, type, noticeTitle, noticeTitleTag, ...props }) => {
+    const TitleComponent = noticeTitleTag || "h2";
+    return (
+      <div {...props} data-notice-type={type}>
+        {noticeTitle && React.createElement(TitleComponent, {}, noticeTitle)}
+        {children}
+      </div>
+    );
+  },
   GcdsButton: ({ children, buttonRole, onGcdsClick, ...props }) => (
     <button {...props} onClick={onGcdsClick} data-button-role={buttonRole}>
       {children}
@@ -186,7 +188,6 @@ vi.mock("../../../utils/routeHelpers.js", () => ({
   }),
 }));
 
-// Mock auth service
 vi.mock("../../../services/authService.jsx", () => ({
   authService: {
     get_my_user_profile: vi.fn(() =>
@@ -273,23 +274,27 @@ describe("ConfirmUpdate Component - Location State Tests", () => {
       });
     });
 
-    it("extracts name from location.state correctly", () => {
-      render(
-        <TestWrapper>
-          <ConfirmUpdate />
-        </TestWrapper>,
-      );
+    it("extracts name from location.state correctly", async () => {
+      await act(async () => {
+        render(
+          <TestWrapper>
+            <ConfirmUpdate />
+          </TestWrapper>,
+        );
+      });
 
       // Should display the formatted name
       expect(screen.getByText(/John Doe/)).toBeInTheDocument();
     });
 
     it("does not redirect when name data is present", async () => {
-      render(
-        <TestWrapper>
-          <ConfirmUpdate />
-        </TestWrapper>,
-      );
+      await act(async () => {
+        render(
+          <TestWrapper>
+            <ConfirmUpdate />
+          </TestWrapper>,
+        );
+      });
 
       // Wait a bit to ensure useEffect has run
       await waitFor(() => {
@@ -307,11 +312,13 @@ describe("ConfirmUpdate Component - Location State Tests", () => {
     });
 
     it("redirects to edit page when location.state is null", async () => {
-      render(
-        <TestWrapper>
-          <ConfirmUpdate />
-        </TestWrapper>,
-      );
+      await act(async () => {
+        render(
+          <TestWrapper>
+            <ConfirmUpdate />
+          </TestWrapper>,
+        );
+      });
 
       await waitFor(() => {
         expect(mockNavigate).toHaveBeenCalledWith("/en/profile/update-name");
@@ -330,11 +337,13 @@ describe("ConfirmUpdate Component - Location State Tests", () => {
     });
 
     it("redirects to edit page when name is missing from state", async () => {
-      render(
-        <TestWrapper>
-          <ConfirmUpdate />
-        </TestWrapper>,
-      );
+      await act(async () => {
+        render(
+          <TestWrapper>
+            <ConfirmUpdate />
+          </TestWrapper>,
+        );
+      });
 
       await waitFor(() => {
         expect(mockNavigate).toHaveBeenCalledWith("/en/profile/update-name");
