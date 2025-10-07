@@ -41,6 +41,7 @@ async def handle_send_mfa_otp(
         )
 
         response_json = http_client_response.json()
+        logger.info(f"IBM Verify MFA OTP response: {response_json}")
 
         try:
             # Parse the verification response
@@ -54,6 +55,7 @@ async def handle_send_mfa_otp(
 
         except ValidationError as e:
             logger.error(f"Validation Error: {e.json()}")
+            logger.error(f"IBM Verify response that failed validation: {response_json}")
             return generate_error_response(422, "Server Error")
 
     except Exception as e:

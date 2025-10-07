@@ -115,6 +115,14 @@ export const SERVICES = [
   },
 ];
 
+// Map frontend FLOW_TYPES to backend otpType
+// Backend: sms | voice
+// Frontend: smsotp | voiceotp
+export const serverMapping = {
+  [FLOW_TYPES.sms]: "sms",
+  [FLOW_TYPES.voice]: "voice",
+};
+
 export const SUBMIT_END_POINTS = {
   requestPasswordPolicy: "/v1/password/policy",
   create: "/v1/users/create",

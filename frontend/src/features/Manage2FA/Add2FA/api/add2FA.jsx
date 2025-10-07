@@ -7,7 +7,7 @@ axios.defaults.withCredentials = true;
 
 export const add2FA = {
   // Enroll a phone number for MFA OTP authentication
-  enrollMFA: async (phoneNumber, otpType) => {
+  enrollMFA: async ({ phoneNumber, otpType }) => {
     try {
       const response = await axios.post(
         `${config.apiUrl}${SUBMIT_END_POINTS.mfaEnroll}`,
@@ -23,7 +23,7 @@ export const add2FA = {
   },
 
   // Send MFA OTP code via SMS or Voice
-  sendMFAOTP: async (id, otpType) => {
+  sendMFAOTP: async ({ id, otpType }) => {
     try {
       const response = await axios.post(
         `${config.apiUrl}${SUBMIT_END_POINTS.mfaSend}`,
@@ -39,7 +39,7 @@ export const add2FA = {
   },
 
   // Verify MFA OTP code
-  verifyMFAOTP: async (id, trxnId, otp, otpType) => {
+  verifyMFAOTP: async ({ id, trxnId, otp, otpType }) => {
     try {
       const response = await axios.post(
         `${config.apiUrl}${SUBMIT_END_POINTS.mfaVerify}`,

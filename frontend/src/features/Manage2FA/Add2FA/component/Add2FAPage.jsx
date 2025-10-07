@@ -3,7 +3,7 @@ import { useLocation, useParams } from "react-router";
 import Loader from "../../../../components/Layout/Loading";
 import { useUser } from "../../../../components/Providers/useUser";
 import { useNavigateHelper } from "../../../../hooks/useNavigate";
-import { FLOW_TYPES, PAGES } from "../../../../utils/constants";
+import { FLOW_TYPES, PAGES, serverMapping } from "../../../../utils/constants";
 import { getPageContent } from "../../../../utils/functions";
 import { path } from "../../../../utils/routeHelpers";
 import { userProfileDispatch } from "../../../../utils/userProfileDispatch";
@@ -12,6 +12,7 @@ import OtpSelection from "../../../ChangePassword/components/OtpSelection";
 import OtpVerification from "../../../ChangePassword/components/OtpVerification";
 import { add2FA } from "../api/add2FA";
 import Add2FANumber from "./Add2FANumber";
+import Add2FAOtpVerification from "./Add2FAOtpVerification";
 import AddSecond2FA from "./AddSecond2FA";
 
 const StepContent = ({ errorCode, errorPageJson, StepComponent }) => {
@@ -60,6 +61,7 @@ export default function Add2FAPage() {
   const [phoneFormData, setPhoneFormData] = useState({
     phoneNumber: "",
     otp: "",
+    mfaId: "",
     trxid: "",
     otpType: FLOW_TYPES.sms,
     formattedPhoneNumber: "",
@@ -90,31 +92,71 @@ export default function Add2FAPage() {
     setUserOtpValue(userOtpValue);
   };
 
-  // Map frontend FLOW_TYPES to backend otpType
-  // Backend: sms | voice
-  // Frontend: smsotp | voiceotp
-  const serverMapping = {
-    [FLOW_TYPES.sms]: "sms",
-    [FLOW_TYPES.voice]: "voice",
-  };
-
   const enrollMFA = async () => {
     setLocalLoading(true);
     setErrorCode("");
 
     try {
-      const formdata = {
+      const payload = {
         phoneNumber: phoneFormData.phoneNumber,
         otpType: serverMapping[phoneFormData.otpType],
       };
 
-      const response = await add2FA.enrollMFA(
-        formdata.phoneNumber,
-        formdata.otpType,
-      );
+      const response = await add2FA.enrollMFA(payload);
       if (response && response.data && response.data.id) {
         handlePhoneForm("mfaId", response.data.id);
-        setWizardStep("add2FAValidation");
+      }
+      return response;
+    } catch (error) {
+      if (error && error.data && error.data.message) {
+        setErrorCode(error.data.message);
+      }
+    } finally {
+      setLocalLoading(false);
+    }
+  };
+
+  const sendMFAOtp = async ({ reSendOtpCode = false, mfaId = null } = {}) => {
+    if (!reSendOtpCode) {
+      setLocalLoading(true);
+    }
+    setErrorCode("");
+
+    try {
+      const payload = {
+        id: mfaId ?? phoneFormData.mfaId,
+        otpType: serverMapping[phoneFormData.otpType],
+      };
+
+      const response = await add2FA.sendMFAOTP(payload);
+      if (response && response.data && response.data.id) {
+        handlePhoneForm("trxnId", response.data.id);
+        if (!reSendOtpCode) {
+          setWizardStep("add2FAValidation");
+        }
+      }
+    } catch (error) {
+      if (error && error.data && error.data.message) {
+        setErrorCode(error.data.message);
+      }
+    } finally {
+      setLocalLoading(false);
+    }
+  };
+
+  const verifyMFAOtp = async () => {
+    try {
+      setLocalLoading(true);
+      const payload = {
+        id: phoneFormData.mfaId,
+        otp: phoneFormData.otp,
+        trxnId: phoneFormData.trxnId,
+        otpType: serverMapping[phoneFormData.otpType],
+      };
+
+      const response = await add2FA.verifyMFAOTP(payload);
+      if (response && response.success) {
+        setWizardStep("addSecond2FA");
       }
     } catch (error) {
       if (error && error.data && error.data.message) {
@@ -188,7 +230,11 @@ export default function Add2FAPage() {
     add2FANumber: (
       <Add2FANumber
         onNext={async () => {
-          await enrollMFA();
+          const enrollMfaResponse = await enrollMFA();
+          await sendMFAOtp({
+            reSendOtpCode: false,
+            mfaId: enrollMfaResponse?.data?.id,
+          });
         }}
         onCancel={() => navigateHelper(backToSecuritySettingsPage)}
         onChangePhoneForm={handlePhoneForm}
@@ -196,17 +242,24 @@ export default function Add2FAPage() {
       />
     ),
     add2FAValidation: (
-      <OtpVerification
+      <Add2FAOtpVerification
         userProfile={userProfile}
-        userSelectedMfaType={userSelectedMfaType}
-        userOtpValue={userOtpValue}
-        setUserOtpValue={handleSetUserOtpValue}
-        otpSentResponse={otpSentResponse}
-        setOtpSentResponse={handleOtpSentResponse}
+        phoneFormData={phoneFormData}
+        onChangePhoneForm={handlePhoneForm}
+        errorCode={errorCode}
         onNext={() => {
+          verifyMFAOtp();
+        }}
+        onCancel={() => {
+          navigateHelper(backToSecuritySettingsPage);
+        }}
+        requestNewOtpCode={() => {
+          sendMFAOtp({ reSendOtpCode: true });
+        }}
+        onBack={() => {
+          setErrorCode("");
           setWizardStep("addSecond2FA");
         }}
-        onBack={() => setWizardStep("addSecond2FA")}
       />
     ),
     addSecond2FA: <AddSecond2FA phoneFormData={phoneFormData} />,

@@ -97,19 +97,19 @@ class OtpVerificationCreateRequest(BaseModel):
 class VerificationCreateResponseData(BaseModel):
     """Response data for OTP verification creation"""
 
-    model_config = ConfigDict(populate_by_name=True)
+    model_config = ConfigDict(populate_by_name=True, extra="allow")
     id: str
-    userId: str
-    type: str
-    created: str
-    updated: str
-    expiry: str
-    state: str
-    updatedBy: str
-    correlation: str
-    phoneNumber: str
-    attempts: int
-    retries: int
+    # Make all other fields optional to match IBM Verify's actual response
+    userId: Optional[str] = None
+    type: Optional[str] = None
+    created: Optional[str] = None
+    updated: Optional[str] = None
+    expiry: Optional[str] = None
+    state: Optional[str] = None
+    correlation: Optional[str] = None
+    phoneNumber: Optional[str] = None
+    attempts: Optional[int] = 0
+    retries: Optional[int] = 0
 
 
 class OtpVerificationAttemptRequest(BaseModel):
