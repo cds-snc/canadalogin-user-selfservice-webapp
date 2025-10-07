@@ -11,17 +11,12 @@ from app.otp.schemas import (
     UserOtpInfo,
     UserOtpVerificationInfo,
 )
-from app.otp.services.enroll_otp import (
-    handle_sms_otp_enrollment,
-    handle_voice_otp_enrollment,
-)
+from app.otp.services.enroll_mfa_otp import handle_otp_enrollment
 from app.otp.services.retrieve_transient_otp import handle_otp_status_retrieval
 from app.otp.services.send_transient_otp import handle_otp_send
-from app.otp.services.verify_otp import (
-    handle_sms_otp_verification_attempt,
-    handle_sms_otp_verification_create,
-    handle_voice_otp_verification_attempt,
-    handle_voice_otp_verification_create,
+from app.otp.services.verify_mfa_otp import (
+    handle_mfa_otp_verification_attempt,
+    handle_mfa_otp_verification_create,
 )
 from app.otp.services.verify_transient_otp import handle_otp_verification
 from app.utils.schemas import ResponseModel
@@ -88,108 +83,60 @@ async def check_otp(
 
 
 @router.post(
-    "/enroll/sms",
+    "mfa/enroll",
     response_model=ResponseModel,
     status_code=status.HTTP_201_CREATED,
     tags=["OTP"],
-    summary="Enroll SMS OTP factor",
-    description="Enrolls a phone number for SMS-based two-factor authentication",
+    summary="Enroll MFA OTP factor",
+    description="Enrolls a phone number for MFA OTP-based two-factor authentication (SMS or Voice based on otpType)",
 )
-async def enroll_sms_otp(
+async def enroll_otp(
     request: Request,
     enrollment_request: OtpEnrollmentRequest,
     user_access_token: str = Depends(get_users_current_session),
 ):
-    return await handle_sms_otp_enrollment(
+    return await handle_otp_enrollment(
         request.app.state.request_client, enrollment_request, user_access_token
     )
 
 
 @router.post(
-    "/enroll/voice",
+    "mfa/send",
     response_model=ResponseModel,
     status_code=status.HTTP_201_CREATED,
     tags=["OTP"],
-    summary="Enroll Voice OTP factor",
-    description="Enrolls a phone number for voice call-based two-factor authentication",
+    summary="Send MFA OTP",
+    description="Sends an MFA OTP via SMS or initiates a voice call based on otpType",
 )
-async def enroll_voice_otp(
-    request: Request,
-    enrollment_request: OtpEnrollmentRequest,
-    user_access_token: str = Depends(get_users_current_session),
-):
-    return await handle_voice_otp_enrollment(
-        request.app.state.request_client, enrollment_request, user_access_token
-    )
-
-
-@router.post(
-    "/verify/sms/create",
-    response_model=ResponseModel,
-    status_code=status.HTTP_201_CREATED,
-    tags=["OTP"],
-    summary="Create SMS OTP verification",
-    description="Creates a new SMS OTP verification and sends the OTP to the enrolled phone number",
-)
-async def create_sms_otp_verification(
+async def create_mfa_otp_verification(
     request: Request,
     verification_request: OtpVerificationCreateRequest,
     user_access_token: str = Depends(get_users_current_session),
 ):
-    return await handle_sms_otp_verification_create(
-        request.app.state.request_client, verification_request, user_access_token
+    return await handle_mfa_otp_verification_create(
+        request.app.state.request_client,
+        verification_request,
+        user_access_token,
+        verification_request.otpType,
     )
 
 
 @router.post(
-    "/verify/voice/create",
-    response_model=ResponseModel,
-    status_code=status.HTTP_201_CREATED,
-    tags=["OTP"],
-    summary="Create Voice OTP verification",
-    description="Creates a new Voice OTP verification and initiates a voice call with the OTP",
-)
-async def create_voice_otp_verification(
-    request: Request,
-    verification_request: OtpVerificationCreateRequest,
-    user_access_token: str = Depends(get_users_current_session),
-):
-    return await handle_voice_otp_verification_create(
-        request.app.state.request_client, verification_request, user_access_token
-    )
-
-
-@router.post(
-    "/verify/sms/attempt",
+    "mfa/verify",
     response_model=ResponseModel,
     status_code=status.HTTP_200_OK,
     tags=["OTP"],
-    summary="Attempt SMS OTP verification",
-    description="Attempts to verify the user-provided OTP for SMS verification",
+    summary="Verify MFA OTP",
+    description="Verifies the user-provided OTP for MFA authentication (SMS or Voice based on otpType)",
 )
-async def attempt_sms_otp_verification(
+async def attempt_mfa_otp_verification(
     request: Request,
     attempt_request: OtpVerificationAttemptRequest,
     user_access_token: str = Depends(get_users_current_session),
 ):
-    return await handle_sms_otp_verification_attempt(
-        request.app.state.request_client, attempt_request, user_access_token
-    )
-
-
-@router.post(
-    "/verify/voice/attempt",
-    response_model=ResponseModel,
-    status_code=status.HTTP_200_OK,
-    tags=["OTP"],
-    summary="Attempt Voice OTP verification",
-    description="Attempts to verify the user-provided OTP for Voice verification",
-)
-async def attempt_voice_otp_verification(
-    request: Request,
-    attempt_request: OtpVerificationAttemptRequest,
-    user_access_token: str = Depends(get_users_current_session),
-):
-    return await handle_voice_otp_verification_attempt(
-        request.app.state.request_client, attempt_request, user_access_token
+    return await handle_mfa_otp_verification_attempt(
+        request.app.state.request_client,
+        attempt_request,
+        user_access_token,
+        attempt_request.otpType,
     )

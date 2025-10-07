@@ -68,6 +68,7 @@ class RetrievalData(BaseModel):
 
 class OtpEnrollmentRequest(BaseModel):
     phoneNumber: PhoneNumber
+    otpType: OtpType
 
 
 class EnrollmentResponseData(BaseModel):
@@ -90,6 +91,7 @@ class OtpVerificationCreateRequest(BaseModel):
     """Request schema for creating OTP verification"""
 
     id: str
+    otpType: OtpType
 
 
 class VerificationCreateResponseData(BaseModel):
@@ -116,3 +118,4 @@ class OtpVerificationAttemptRequest(BaseModel):
     id: str
     trxnId: str
     otp: str
+    otpType: OtpType
