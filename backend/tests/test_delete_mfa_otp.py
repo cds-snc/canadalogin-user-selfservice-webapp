@@ -23,7 +23,9 @@ def create_mock_user_factors(num_factors=2):
         # Use PasswordOtpType for UserPhoneOTP which expects "smsotp"/"voiceotp"
         factor_type = PasswordOtpType.SMSOTP if i % 2 == 0 else PasswordOtpType.VOICEOTP
         factors.append(
-            UserPhoneOTP(id=f"factor{i+1}", type=factor_type, phoneNumber="5551234567")
+            UserPhoneOTP(
+                id=f"factor{i + 1}", type=factor_type, phoneNumber="5551234567"
+            )
         )
 
     return UserPhoneAuthFactorsResponse(
