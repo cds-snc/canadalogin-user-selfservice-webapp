@@ -2,7 +2,7 @@ name: GitHub repository metadata exporter
 permissions:
   contents: read
   actions: read
-  isues: read
+  issues: read
   pull-requests: read
 on:
   workflow_dispatch:
