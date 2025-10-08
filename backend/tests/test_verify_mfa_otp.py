@@ -19,6 +19,7 @@ from app.otp.services.verify_mfa_otp import (
     handle_send_mfa_otp,
     handle_verify_mfa_otp,
 )
+from fastapi import HTTPException
 from httpx import HTTPStatusError, Request, Response
 
 
@@ -463,19 +464,15 @@ class TestDispatchMFAVerificationCreate:
         with patch("app.otp.services.verify_mfa_otp.get_admin_token") as mock_get_token:
             mock_get_token.return_value = "admin_token"
 
-            with patch(
-                "app.otp.services.verify_mfa_otp.RequestErrorHandler.handle"
-            ) as mock_error_handler:
-                mock_error_handler.return_value = None
-
-                result = await dispatch_send_mfa_otp(
+            with pytest.raises(HTTPException) as exc_info:
+                await dispatch_send_mfa_otp(
                     mock_http_client,
                     mock_sms_verification_create_request,
                     "INVALID_TYPE",  # This will cause ValueError
                 )
 
-                assert result is None
-                mock_error_handler.assert_called_once()
+            assert exc_info.value.status_code == 500
+            assert "Unable to send MFA verification code" in str(exc_info.value.detail)
 
     @pytest.mark.asyncio
     async def test_dispatch_verification_create_http_error(
@@ -613,19 +610,15 @@ class TestDispatchMFAVerificationAttempt:
         with patch("app.otp.services.verify_mfa_otp.get_admin_token") as mock_get_token:
             mock_get_token.return_value = "admin_token"
 
-            with patch(
-                "app.otp.services.verify_mfa_otp.RequestErrorHandler.handle"
-            ) as mock_error_handler:
-                mock_error_handler.return_value = None
-
-                result = await dispatch_verify_mfa_otp(
+            with pytest.raises(HTTPException) as exc_info:
+                await dispatch_verify_mfa_otp(
                     mock_http_client,
                     mock_sms_verification_attempt_request,
                     "INVALID_TYPE",  # This will cause ValueError
                 )
 
-                assert result is None
-                mock_error_handler.assert_called_once()
+            assert exc_info.value.status_code == 500
+            assert "Unable to verify MFA code" in str(exc_info.value.detail)
 
     @pytest.mark.asyncio
     async def test_dispatch_verification_attempt_http_error(

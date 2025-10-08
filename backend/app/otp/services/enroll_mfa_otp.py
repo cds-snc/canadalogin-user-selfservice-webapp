@@ -84,7 +84,7 @@ async def handle_otp_enrollment(
         )
         raise HTTPException(
             status_code=500,
-            detail=f"{enrollment_request.otpType} OTP enrollment error: {str(e)}",
+            detail="Unable to enroll MFA phone number",
         )
 
 
@@ -132,4 +132,5 @@ async def dispatch_otp_enrollment(
             f"Request to /v2.0/factors/{endpoint if 'endpoint' in locals() else 'unknown'} error: {str(error)}",
             exc_info=True,
         )
-        raise error
+        # Don't expose server errors to client
+        raise HTTPException(status_code=500, detail="Unable to enroll MFA phone number")
