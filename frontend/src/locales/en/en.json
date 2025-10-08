@@ -392,7 +392,7 @@
     "10": "+ Add a phone number",
     "11": "Loading..."
   },
-  "Add2FANumber": {
+  "AddMFANumber": {
     "1": "Enter your new phone number",
     "2": "Enter the new phone number you want to receive security codes at each time you sign in.",
     "3": "This number will only be used for 2-step verification. To mange your contact phone number, go to your",
@@ -409,7 +409,7 @@
     "14": "Mobile or landline. Carrier charges may apply.",
     "15": "You can change this the next time you sign in."
   },
-  "AddSecond2FAVoiceCall": {
+  "AddSecondMFAVoiceCall": {
     "1": "You have added",
     "2": "as a 2-step verification phone number",
     "3": "Set up voice call verification (optional)",
@@ -421,7 +421,7 @@
     "9": "Yes, set up voice call verification",
     "10": "No, skip for now"
   },
-  "AddSecond2FATextMessage": {
+  "AddSecondMFATextMessage": {
     "1": "You have added",
     "2": "as a 2-step verification phone number",
     "3": "Set up text (SMS) verification (optional)",

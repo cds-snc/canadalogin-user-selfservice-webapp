@@ -5,7 +5,7 @@ import { SUBMIT_END_POINTS } from "../../../../utils/constants.jsx";
 
 axios.defaults.withCredentials = true;
 
-export const add2FA = {
+export const addMFAPhoneNumberApi = {
   // Enroll a phone number for MFA OTP authentication
   enrollMFA: async ({ phoneNumber, otpType }) => {
     try {

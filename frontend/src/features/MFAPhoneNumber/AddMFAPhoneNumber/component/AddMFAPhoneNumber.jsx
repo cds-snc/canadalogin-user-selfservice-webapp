@@ -73,7 +73,7 @@ const MyCountryIsNotListed = ({ pageContentJson }) => {
   );
 };
 
-export default function Add2FANumber({
+export default function AddMFAPhoneNumber({
   onNext,
   onCancel,
   onChangePhoneForm,
@@ -81,7 +81,7 @@ export default function Add2FANumber({
 }) {
   const { language } = useParams();
   const [phoneNumberValid, setPhoneNumberValid] = useState(true);
-  const pageContentJson = getPageContent(language, PAGES.add2FANumber);
+  const pageContentJson = getPageContent(language, PAGES.addMFANumber);
   const { submit, cancel } = getPageContent(language, "Button");
   const backtoProfilePage = path(PAGES.ProfileHome, { language: language });
 

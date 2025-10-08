@@ -9,10 +9,10 @@ import { path } from "../../../../utils/routeHelpers";
 import { otpFactors } from "../../../ChangePassword/api/otpFactors";
 import OtpSelection from "../../../ChangePassword/components/OtpSelection";
 import OtpVerification from "../../../ChangePassword/components/OtpVerification";
-import { add2FA } from "../api/add2FA";
-import Add2FANumber from "./Add2FANumber";
-import Add2FAOtpVerification from "./Add2FAOtpVerification";
-import AddSecond2FA from "./AddSecond2FA";
+import { addMFAPhoneNumberApi } from "../api/AddMFAPhoneNumberAPI";
+import AddMFAOtpVerification from "./AddMFAOtpVerification";
+import AddMFAPhoneNumber from "./AddMFAPhoneNumber";
+import AddSecondMFA from "./AddSecondMFA";
 
 const StepContent = ({ errorCode, errorPageJson, StepComponent }) => {
   let errorMessage = errorPageJson[errorCode] || "";
@@ -33,7 +33,7 @@ const StepContent = ({ errorCode, errorPageJson, StepComponent }) => {
   );
 };
 
-export default function Add2FAPage() {
+export default function AddMFAPage() {
   const { language } = useParams();
   const { state } = useUser();
 
@@ -45,7 +45,7 @@ export default function Add2FAPage() {
   const [errorCode, setErrorCode] = useState("");
   const errorPageJson = getPageContent(language, PAGES.error);
 
-  const [wizardStep, setWizardStep] = useState("add2FANumber");
+  const [wizardStep, setWizardStep] = useState("addMFANumber");
   const [localLoading, setLocalLoading] = useState(false);
   const { userProfile } = state;
   const { id } = userProfile ?? {};
@@ -102,7 +102,7 @@ export default function Add2FAPage() {
         otpType: serverMapping[otpType ?? phoneFormData.otpType],
       };
 
-      const response = await add2FA.enrollMFA(payload);
+      const response = await addMFAPhoneNumberApi.enrollMFA(payload);
       if (response && response.data && response.data.id) {
         handlePhoneForm("mfaId", response.data.id);
       }
@@ -128,11 +128,11 @@ export default function Add2FAPage() {
         otpType: serverMapping[otpType ?? phoneFormData.otpType],
       };
 
-      const response = await add2FA.sendMFAOTP(payload);
+      const response = await addMFAPhoneNumberApi.sendMFAOTP(payload);
       if (response && response.data && response.data.id) {
         handlePhoneForm("trxnId", response.data.id);
         if (!reSendOtpCode) {
-          setWizardStep("add2FAValidation");
+          setWizardStep("addMFAValidation");
         }
       }
     } catch (error) {
@@ -154,7 +154,7 @@ export default function Add2FAPage() {
         otpType: serverMapping[phoneFormData.otpType],
       };
 
-      const response = await add2FA.verifyMFAOTP(payload);
+      const response = await addMFAPhoneNumberApi.verifyMFAOTP(payload);
       if (response && response.success) {
         const visibleDigits = phoneFormData.phoneNumber.slice(-4);
         if (
@@ -163,7 +163,7 @@ export default function Add2FAPage() {
         ) {
           navigateHelper(backToManage2FAVerificationsPage);
         } else {
-          setWizardStep("addSecond2FA");
+          setWizardStep("addSecondMFA");
         }
       }
     } catch (error) {
@@ -230,13 +230,13 @@ export default function Add2FAPage() {
         otpSentResponse={otpSentResponse}
         setOtpSentResponse={handleOtpSentResponse}
         onNext={() => {
-          setWizardStep("add2FANumber");
+          setWizardStep("addMFANumber");
         }}
         onBack={() => setWizardStep("otpSelection")}
       />
     ),
-    add2FANumber: (
-      <Add2FANumber
+    addMFANumber: (
+      <AddMFAPhoneNumber
         onNext={async () => {
           const enrollMfaResponse = await enrollMFA();
           await sendMFAOtp({
@@ -244,13 +244,13 @@ export default function Add2FAPage() {
             mfaId: enrollMfaResponse?.data?.id,
           });
         }}
-        onCancel={() => navigateHelper(backToSecuritySettingsPage)}
+        onCancel={() => navigateHelper(backToManage2FAVerificationsPage)}
         onChangePhoneForm={handlePhoneForm}
         phoneFormData={phoneFormData}
       />
     ),
-    add2FAValidation: (
-      <Add2FAOtpVerification
+    addMFAValidation: (
+      <AddMFAOtpVerification
         userProfile={userProfile}
         phoneFormData={phoneFormData}
         onChangePhoneForm={handlePhoneForm}
@@ -259,22 +259,22 @@ export default function Add2FAPage() {
           verifyMFAOtp();
         }}
         onCancel={() => {
-          navigateHelper(backToSecuritySettingsPage);
+          navigateHelper(backToManage2FAVerificationsPage);
         }}
         requestNewOtpCode={() => {
           sendMFAOtp({ reSendOtpCode: true });
         }}
         onBack={() => {
           setErrorCode("");
-          setWizardStep("addSecond2FA");
+          setWizardStep("addSecondMFA");
         }}
       />
     ),
-    addSecond2FA: (
-      <AddSecond2FA
+    addSecondMFA: (
+      <AddSecondMFA
         phoneFormData={phoneFormData}
-        onSkipForNowLink={backToSecuritySettingsPage}
-        onAddSecond2FA={async () => {
+        onSkipForNowLink={backToManage2FAVerificationsPage}
+        onAddSecondMFA={async () => {
           const secondMFAOtpType =
             phoneFormData.otpType === FLOW_TYPES.voice
               ? FLOW_TYPES.sms

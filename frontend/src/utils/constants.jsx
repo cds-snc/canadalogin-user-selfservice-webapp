@@ -92,11 +92,11 @@ export const PAGES = {
   successfullyUpdatedContactPhoneNumber:
     "SuccessfullyUpdatedContactPhoneNumber",
   manage2FAVerifications: "Manage2FAVerifications",
-  add2FAPage: "Add2FAPage",
-  add2FANumber: "Add2FANumber",
-  addSecond2FA: "AddSecond2FA",
-  addSecond2FAVoiceCall: "AddSecond2FAVoiceCall",
-  addSecond2FATextMessage: "AddSecond2FATextMessage",
+  addMFAPage: "AddMFAPage",
+  addMFANumber: "AddMFANumber",
+  addSecondMFA: "AddSecondMFA",
+  addSecondMFAVoiceCall: "AddSecondMFAVoiceCall",
+  addSecondMFATextMessage: "AddSecondMFATextMessage",
 };
 
 export const FOOTERS = {

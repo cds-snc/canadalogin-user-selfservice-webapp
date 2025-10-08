@@ -29,7 +29,7 @@ import ProfileUpdateName from "./components/PersonalInfo/ProfileUpdateName.jsx";
 import Verification from "./components/Verification/Verification.jsx";
 import ChangePasswordIndex from "./features/ChangePassword/components/ChangePasswordIndex.jsx";
 import UpdateContactPhoneNumberContainer from "./features/ContactPhoneNumber/components/UpdateContactPhoneNumberContainer.jsx";
-import Add2FAPage from "./features/Manage2FA/Add2FA/component/Add2FAPage.jsx";
+import AddMFAPage from "./features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPage.jsx";
 import { PAGES } from "./utils/constants.jsx";
 
 export const appRoutes = [
@@ -159,9 +159,9 @@ export const appRoutes = [
                     handle: { id: PAGES.manage2FAVerifications },
                   },
                   {
-                    path: "add-2fa",
-                    element: <Add2FAPage />,
-                    handle: { id: PAGES.add2FAPage },
+                    path: "add-mfa-phone-number",
+                    element: <AddMFAPage />,
+                    handle: { id: PAGES.addMFAPage },
                   },
                 ],
               },

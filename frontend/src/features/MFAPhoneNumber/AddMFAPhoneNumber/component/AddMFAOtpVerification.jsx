@@ -49,7 +49,7 @@ const PageHeader = ({
   );
 };
 
-export default function Add2FAOtpVerification({
+export default function AddMFAOtpVerification({
   onNext,
   onCancel,
   onBack,

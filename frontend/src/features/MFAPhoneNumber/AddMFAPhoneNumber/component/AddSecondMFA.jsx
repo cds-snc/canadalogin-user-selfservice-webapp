@@ -11,17 +11,17 @@ import { useParams } from "react-router";
 import { FLOW_TYPES, PAGES } from "../../../../utils/constants";
 import { getPageContent } from "../../../../utils/functions";
 
-export default function AddSecond2FA({
+export default function AddSecondMFA({
   phoneFormData,
   onSkipForNowLink,
-  onAddSecond2FA,
+  onAddSecondMFA,
 }) {
   const { language } = useParams();
   const pageContentJson = getPageContent(
     language,
     phoneFormData.otpType === FLOW_TYPES.voice
-      ? PAGES.addSecond2FATextMessage
-      : PAGES.addSecond2FAVoiceCall,
+      ? PAGES.addSecondMFATextMessage
+      : PAGES.addSecondMFAVoiceCall,
   );
 
   return (
@@ -55,7 +55,7 @@ export default function AddSecond2FA({
             style={{ width: "fit-content" }}
             onGcdsClick={async (ev) => {
               ev.preventDefault();
-              await onAddSecond2FA();
+              await onAddSecondMFA();
             }}
           >
             {pageContentJson["9"]}

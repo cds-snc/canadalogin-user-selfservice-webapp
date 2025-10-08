@@ -21,7 +21,7 @@ export default function Manage2FAVerifications() {
   const navigateHelper = useNavigateHelper();
   const { state, _dispatch } = useUser();
   const [userPhoneFactorsMap, setUserPhoneFactorsMap] = useState({});
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
     language: language,
   });
@@ -141,10 +141,10 @@ export default function Manage2FAVerifications() {
         </GcdsHeading>
         {phoneFactorsComponent}
         <GcdsButton
-          id="add-2fa-button"
+          id="add-mfa-button"
           onGcdsClick={(ev) => {
             ev.preventDefault();
-            navigateHelper(path(PAGES.add2FAPage, { language }));
+            navigateHelper(path(PAGES.addMFAPage, { language }));
           }}
         >
           {pageContent["10"]}
