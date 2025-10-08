@@ -1,3 +1,4 @@
+import { GcdsErrorMessage } from "@cdssnc/gcds-components-react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import Loader from "../../../../components/Layout/Loading";
@@ -45,7 +46,7 @@ export default function AddMFAPage() {
   const [errorCode, setErrorCode] = useState("");
   const errorPageJson = getPageContent(language, PAGES.error);
 
-  const [wizardStep, setWizardStep] = useState("addMFANumber");
+  const [wizardStep, setWizardStep] = useState("otpSelection");
   const [localLoading, setLocalLoading] = useState(false);
   const { userProfile } = state;
   const { id } = userProfile ?? {};
@@ -266,7 +267,7 @@ export default function AddMFAPage() {
         }}
         onBack={() => {
           setErrorCode("");
-          setWizardStep("addSecondMFA");
+          setWizardStep("addMFANumber");
         }}
       />
     ),
