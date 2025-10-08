@@ -1,4 +1,6 @@
 name: GitHub repository metadata exporter
+permissions:
+  contents: read
 on:
   workflow_dispatch:
   schedule:
