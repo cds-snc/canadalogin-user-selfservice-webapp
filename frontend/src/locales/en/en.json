@@ -411,7 +411,7 @@
   },
   "AddSecondMFAVoiceCall": {
     "1": "You have added",
-    "2": "as a 2-step verification phone number",
+    "2": "as a 2-step verification phone number.",
     "3": "Set up voice call verification (optional)",
     "4": "Setting up voice call verification allows you to also receive verification codes by",
     "5": "phone call",
@@ -423,7 +423,7 @@
   },
   "AddSecondMFATextMessage": {
     "1": "You have added",
-    "2": "as a 2-step verification phone number",
+    "2": "as a 2-step verification phone number.",
     "3": "Set up text (SMS) verification (optional)",
     "4": "Setting up text message verification allows you to also receive verification codes by",
     "5": "text message (SMS)",
