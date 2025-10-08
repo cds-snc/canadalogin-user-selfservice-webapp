@@ -182,6 +182,7 @@ class UserAuthFactorsIbmResponse(BaseModel):
 
 
 class UserPhoneOTP(BaseModel):
+    id: str
     type: OtpType
     phoneNumber: str
 
