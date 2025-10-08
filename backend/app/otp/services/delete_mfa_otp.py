@@ -13,6 +13,16 @@ from httpx import AsyncClient, HTTPStatusError
 logger = logging.getLogger(__name__)
 
 
+def _get_endpoint_for_otp_type(otp_type: OtpType) -> str:
+    """Helper function to determine the endpoint based on OTP type"""
+    if otp_type == OtpType.SMS:
+        return "smsotp"
+    elif otp_type == OtpType.VOICE:
+        return "voiceotp"
+    else:
+        return "unknown"
+
+
 async def handle_otp_deletion(
     global_http_client: AsyncClient,
     deletion_request: OtpDeletionRequest,
@@ -79,11 +89,8 @@ async def dispatch_otp_deletion(
     """Dispatch OTP deletion to IBM Verify (SMS or Voice)"""
     try:
         # Determine the endpoint based on OTP type first to validate
-        if deletion_request.otpType == OtpType.SMS:
-            endpoint = "smsotp"
-        elif deletion_request.otpType == OtpType.VOICE:
-            endpoint = "voiceotp"
-        else:
+        endpoint = _get_endpoint_for_otp_type(deletion_request.otpType)
+        if endpoint == "unknown":
             raise ValueError(f"Unsupported OTP type: {deletion_request.otpType}")
 
         access_token = await get_admin_token(global_http_client)
@@ -101,16 +108,8 @@ async def dispatch_otp_deletion(
         logger.error(f"HTTP error during {deletion_request.otpType} deletion: {e}")
         return RequestErrorHandler.handle(e)
     except Exception as error:
-        try:
-            # Determine endpoint for error logging
-            if deletion_request.otpType == OtpType.SMS:
-                endpoint = "smsotp"
-            elif deletion_request.otpType == OtpType.VOICE:
-                endpoint = "voiceotp"
-            else:
-                endpoint = "unknown"
-        except Exception:
-            endpoint = "unknown"
+        # Determine endpoint for error logging
+        endpoint = _get_endpoint_for_otp_type(deletion_request.otpType)
 
         logger.error(
             f"Request to /v2.0/factors/{endpoint}/{deletion_request.id} error: {str(error)}",
