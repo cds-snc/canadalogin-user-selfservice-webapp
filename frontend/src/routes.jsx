@@ -1,36 +1,36 @@
 import { Navigate } from "react-router";
 
 import RootLayout from "./components/Layout/RootLayout.jsx";
+import { AppLanguageSetup } from "./components/Providers/AppLanguageSetup";
+import { LanguageProvider } from "./components/Providers/LanguageProvider";
 import {
   PrivateRoute,
   StepupPrivateRoute,
 } from "./components/Providers/PrivateRoute.jsx";
 import { UserProvider } from "./components/Providers/UserProvider";
-import { LanguageProvider } from "./components/Providers/LanguageProvider";
-import { AppLanguageSetup } from "./components/Providers/AppLanguageSetup";
 
-import ManageDashboard from "./components/Manage/ManageDashboard.jsx";
-import Verification from "./components/Verification/Verification.jsx";
-import ChangePasswordIndex from "./features/ChangePassword/components/ChangePasswordIndex.jsx";
-import ProfileUpdateName from "./components/PersonalInfo/ProfileUpdateName.jsx";
-import ProfileHome from "./components/Manage/ProfileHome.jsx";
+import AreYouSureEditYourLanguage from "./components/Manage/AreYouSureEditYourLanguage.jsx";
+import AreYouSureUpdateContactNumber from "./components/Manage/AreYouSureUpdateContactNumber.jsx";
+import AreYouSureUpdateYourEmail from "./components/Manage/AreYouSureUpdateYourEmail.jsx";
 import CheckYourEmail from "./components/Manage/CheckYourEmail.jsx";
 import CompleteTwoStepVerification from "./components/Manage/CompleteTwoStepVerification.jsx";
-import FirstVerifyItsYou from "./components/Manage/FirstVerifyItsYou.jsx";
-import EnterNewEmail from "./components/Manage/EnterNewEmail.jsx";
-import ProfileUpdateNameSuccess from "./components/Manage/ProfileUpdateNameSuccess.jsx";
-import AreYouSureUpdateContactNumber from "./components/Manage/AreYouSureUpdateContactNumber.jsx";
-import EnterNewPhoneNumber from "./components/Manage/EnterNewPhoneNumber.jsx";
-import YouMayUpdateEmailAtOtherPlaces from "./components/Manage/YouMayUpdateEmailAtOtherPlaces.jsx";
-import AreYouSureUpdateYourEmail from "./components/Manage/AreYouSureUpdateYourEmail.jsx";
-import SecuritySettings from "./components/Manage/SecuritySettings/SecuritySettings.jsx";
 import EditLanguagePreferences from "./components/Manage/EditLanguagePreferences.jsx";
-import AreYouSureEditYourLanguage from "./components/Manage/AreYouSureEditYourLanguage.jsx";
-import ProfileYouMayUpdateLanguage from "./components/Manage/ProfileYouMayUpdateLanguage.jsx";
-import { PAGES } from "./utils/constants.jsx";
+import EnterNewEmail from "./components/Manage/EnterNewEmail.jsx";
+import FirstVerifyItsYou from "./components/Manage/FirstVerifyItsYou.jsx";
+import ManageDashboard from "./components/Manage/ManageDashboard.jsx";
+import ProfileHome from "./components/Manage/ProfileHome.jsx";
 import ProfileUpdateNameConfirmUpdate from "./components/Manage/ProfileUpdateNameConfirmUpdate.jsx";
-import UpdateContactPhoneNumberContainer from "./features/ContactPhoneNumber/components/UpdateContactPhoneNumberContainer.jsx";
+import ProfileUpdateNameSuccess from "./components/Manage/ProfileUpdateNameSuccess.jsx";
+import ProfileYouMayUpdateLanguage from "./components/Manage/ProfileYouMayUpdateLanguage.jsx";
 import Manage2FAVerifications from "./components/Manage/SecuritySettings/Manage2FAVerifications.jsx";
+import SecuritySettings from "./components/Manage/SecuritySettings/SecuritySettings.jsx";
+import YouMayUpdateEmailAtOtherPlaces from "./components/Manage/YouMayUpdateEmailAtOtherPlaces.jsx";
+import ProfileUpdateName from "./components/PersonalInfo/ProfileUpdateName.jsx";
+import Verification from "./components/Verification/Verification.jsx";
+import ChangePasswordIndex from "./features/ChangePassword/components/ChangePasswordIndex.jsx";
+import UpdateContactPhoneNumberContainer from "./features/ContactPhoneNumber/components/UpdateContactPhoneNumberContainer.jsx";
+import AddMFAPage from "./features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPage.jsx";
+import { PAGES } from "./utils/constants.jsx";
 
 export const appRoutes = [
   {
@@ -157,6 +157,11 @@ export const appRoutes = [
                     path: "manage-2fa-verifications",
                     element: <Manage2FAVerifications />,
                     handle: { id: PAGES.manage2FAVerifications },
+                  },
+                  {
+                    path: "add-mfa-phone-number",
+                    element: <AddMFAPage />,
+                    handle: { id: PAGES.addMFAPage },
                   },
                 ],
               },

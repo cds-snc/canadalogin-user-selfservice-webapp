@@ -1,13 +1,13 @@
-import { useParams } from "react-router";
 import {
-  GcdsContainer,
-  GcdsRadios,
-  GcdsLink,
-  GcdsText,
-  GcdsGrid,
   GcdsButton,
+  GcdsContainer,
+  GcdsGrid,
   GcdsHeading,
+  GcdsLink,
+  GcdsRadios,
+  GcdsText,
 } from "@cdssnc/gcds-components-react";
+import { useParams } from "react-router";
 import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 
 import { getPageContent } from "../../../utils/functions.jsx";
@@ -100,8 +100,8 @@ export default function OtpSelection({
           ></GcdsRadios>
         ) : (
           <>
-            <GcdsText>{radioOptions[0].label}</GcdsText>
-            <GcdsText>{radioOptions[0].hint}</GcdsText>
+            <GcdsText>{radioOptions[0]?.label}</GcdsText>
+            <GcdsText>{radioOptions[0]?.hint}</GcdsText>
           </>
         )}
 

@@ -388,5 +388,46 @@
     "9": "Supprimer",
     "10": "+ Ajouter un numéro de téléphone",
     "11": "Chargement..."
+  },
+  "AddMFANumber": {
+    "1": "Entrez votre nouveau numéro de téléphone",
+    "2": "Entrez le nouveau numéro de téléphone auquel vous souhaitez recevoir vos codes de sécurité à chaque fois que vous vous connectez.",
+    "3": "Ce numéro de téléphone ne sera utilisé que pour la vérification en deux étapes. Pour gérer votre numéro de téléphone de communication, rendez-vous sur la page",
+    "4": "Renseignements personnels",
+    "5": ".",
+    "6": "Pays",
+    "7": "Numéro de téléphone",
+    "8": "Mon pays n’apparaît pas dans la liste.",
+    "9": "Certains pays ne sont pas pris en charge en raison de limitations techniques. Si votre pays n’apparaît pas dans la liste, vous ne pouvez pas créer de compte Connexion GC à l’heure actuelle. Nous nous excusons des désagréments que cela pourrait causer.",
+    "10": "Comment souhaitez-vous recevoir le code?",
+    "11": "Message texte (SMS)",
+    "12": "Numéro de téléphone cellulaire seulement. Des frais d’opérateur peuvent s’appliquer.",
+    "13": "Appel vocal",
+    "14": "Numéro de téléphone cellulaire ou fixe. Des frais d’opérateur peuvent s’appliquer.",
+    "15": "Vous pourrez modifier ce choix lors de votre prochaine connexion."
+  },
+  "AddSecondMFAVoiceCall": {
+    "1": "Vous avez ajouté le",
+    "2": "comme numéro de téléphone pour la vérification en deux étapes.",
+    "3": "Configurez la vérification par appel vocal (facultatif)",
+    "4": "La vérification par appel vocal vous permet de recevoir également vos codes de vérification par",
+    "5": "appel téléphonique",
+    "6": "lors de la connexion.",
+    "7": "Nous vous recommandons de configurer cette option si vous risquez à tout moment de ne pas pouvoir recevoir de messages texte. Vous pouvez combiner les deux méthodes pour vous assurer de ne pas perdre l’accès à votre compte.",
+    "8": "Souhaitez-vous configurer la vérification par appel vocal?",
+    "9": "Oui, configurer",
+    "10": "Ignorer pour l’instant"
+  },
+  "AddSecondMFATextMessage": {
+    "1": "Vous avez ajouté le",
+    "2": "comme numéro de téléphone pour la vérification en deux étapes.",
+    "3": "Configurer la vérification par message texte (SMS) (facultatif)",
+    "4": "La vérification par message texte vous permet de recevoir également vos codes de vérification par",
+    "5": "message texte (SMS)",
+    "6": "lors de la connexion.",
+    "7": "Nous vous recommandons de configurer cette option si vous risquez à tout moment de ne pas pouvoir recevoir d’appels vocaux. Vous pouvez combiner les deux méthodes pour vous assurer de ne pas perdre l’accès à votre compte.",
+    "8": "Souhaitez-vous configurer la vérification par message texte (SMS)?",
+    "9": "Oui, configurer",
+    "10": "Ignorer pour l’instant"
   }
 }

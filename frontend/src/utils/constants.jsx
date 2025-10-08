@@ -92,6 +92,11 @@ export const PAGES = {
   successfullyUpdatedContactPhoneNumber:
     "SuccessfullyUpdatedContactPhoneNumber",
   manage2FAVerifications: "Manage2FAVerifications",
+  addMFAPage: "AddMFAPage",
+  addMFANumber: "AddMFANumber",
+  addSecondMFA: "AddSecondMFA",
+  addSecondMFAVoiceCall: "AddSecondMFAVoiceCall",
+  addSecondMFATextMessage: "AddSecondMFATextMessage",
 };
 
 export const FOOTERS = {
@@ -110,6 +115,14 @@ export const SERVICES = [
   },
 ];
 
+// Map frontend FLOW_TYPES to backend otpType
+// Backend: sms | voice
+// Frontend: smsotp | voiceotp
+export const serverMapping = {
+  [FLOW_TYPES.sms]: "sms",
+  [FLOW_TYPES.voice]: "voice",
+};
+
 export const SUBMIT_END_POINTS = {
   requestPasswordPolicy: "/v1/password/policy",
   create: "/v1/users/create",
@@ -117,6 +130,9 @@ export const SUBMIT_END_POINTS = {
   login: "/v1/auth/login",
   transientOtpVerify: "/v1/otp/transient/verify",
   transientOtpSend: "/v1/otp/transient/send",
+  mfaEnroll: "/v1/otp/mfa/enroll",
+  mfaSend: "/v1/otp/mfa/send",
+  mfaVerify: "/v1/otp/mfa/verify",
   profile: "/v1/users/profile",
   rp_info: "/v1/users/rp_info",
   users: "/v1/users",

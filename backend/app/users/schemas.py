@@ -2,10 +2,9 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, List, Optional
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
-
-from app.utils.schemas import ResponseModel
 from app.password.schemas import OtpType
+from app.utils.schemas import ResponseModel
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 SCIM_CORE_USER = "urn:ietf:params:scim:schemas:core:2.0:User"
 SCIM_IBM_USER_EXT = "urn:ietf:params:scim:schemas:extension:ibm:2.0:User"
@@ -168,7 +167,7 @@ class Factor(BaseModel):
     type: str
     created: datetime
     updated: datetime
-    attempted: datetime
+    attempted: Optional[datetime] = None
     enabled: bool
     validated: bool
     attributes: Attributes
