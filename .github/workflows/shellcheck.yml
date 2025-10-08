@@ -1,4 +1,6 @@
 name: Shellcheck
+permissions:
+  contents: read
 on:
   push:
     paths:
