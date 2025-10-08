@@ -3,6 +3,7 @@ from datetime import datetime
 
 from app.config import get_configuration
 from app.otp.schemas import OtpDeletionRequest, OtpType
+from app.users.services.otp_factors import get_user_otp_factors
 from app.users.services.profile import my_profile
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.request_error_handler import RequestErrorHandler
@@ -47,6 +48,18 @@ async def handle_otp_deletion(
             f"Deleting {otp_type} OTP factor {deletion_request.id} for user: {user_id}"
         )
 
+        # Check if user has multiple factors before allowing deletion
+        user_factors_response = await get_user_otp_factors(
+            global_http_client, user_id, user_access_token
+        )
+        if not user_factors_response.success or len(user_factors_response.data) <= 1:
+            logger.warning(f"User {user_id} cannot delete last remaining MFA factor")
+            return ResponseModel(
+                success=False,
+                data=None,
+                message="Cannot delete last remaining MFA factor",
+            )
+
         http_client_response = await dispatch_otp_deletion(
             global_http_client, deletion_request
         )
@@ -68,7 +81,7 @@ async def handle_otp_deletion(
                 f"Unexpected response status: {http_client_response.status_code}"
             )
             return ResponseModel(
-                success=False, data=None, message="Unexpected response from server"
+                success=False, data=None, message="Unable to delete MFA phone number"
             )
 
     except Exception as e:
@@ -78,7 +91,7 @@ async def handle_otp_deletion(
         )
         raise HTTPException(
             status_code=500,
-            detail=f"{deletion_request.otpType} OTP deletion error: {str(e)}",
+            detail="Unable to delete MFA phone number",
         )
 
 
@@ -115,4 +128,5 @@ async def dispatch_otp_deletion(
             f"Request to /v2.0/factors/{endpoint}/{deletion_request.id} error: {str(error)}",
             exc_info=True,
         )
-        raise error
+        # Don't expose server errors to client
+        raise HTTPException(status_code=500, detail="Unable to delete MFA phone number")
