@@ -41,6 +41,7 @@ export default function SuccessfullyUpdatedName() {
   useEffect(() => {
     // If no name data, redirect to edit page
     if (!name) navigate(editProfile);
+    if (name.formatted !== username) navigate(editProfile);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

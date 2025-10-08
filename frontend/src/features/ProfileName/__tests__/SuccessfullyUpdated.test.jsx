@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach, act } from "vitest";
 import "@testing-library/jest-dom";
 import SuccessfullyUpdatedName from "../components/SuccessfullyUpdated.jsx";
 
@@ -144,14 +144,19 @@ vi.mock("../../../components/Providers/useUser.tsx", () => ({
 }));
 
 vi.mock("../../../services/authService.jsx", () => ({
-  authService: { logout: vi.fn() },
+  authService: {
+    logout: vi.fn(() =>
+      Promise.resolve({
+        data: { redirect_url: "https://mock-logout-success.example.com" },
+      }),
+    ),
+  },
 }));
 
 vi.mock("../../../utils/userProfileDispatch.jsx", () => ({
   userProfileDispatch: () => ({ setLoading: mockSetLoading }),
 }));
 
-// 🧪 ---- Tests ----
 describe("SuccessfullyUpdatedName", () => {
   let useLocation;
 
@@ -199,5 +204,195 @@ describe("SuccessfullyUpdatedName", () => {
     useLocation.mockReturnValue({ state: {} });
     render(<SuccessfullyUpdatedName />);
     expect(mockNavigate).toHaveBeenCalledWith("/en/profile-update-name");
+  });
+  // Add these test cases to your existing test file
+
+  it("redirects to edit page when name.formatted does not match username", async () => {
+    const userStateName = "John Doe";
+    const locationStateName = "Jane Smith";
+
+    const mockStateWithDifferentName = {
+      userProfile: {
+        name: {
+          formatted: userStateName,
+        },
+      },
+    };
+
+    // Mock the useUser to return different name than location state
+    vi.mocked(useUser).mockReturnValue({
+      state: mockStateWithDifferentName,
+      dispatch: mockDispatch,
+    });
+
+    useLocation.mockReturnValue({
+      state: { name: { formatted: locationStateName } },
+    });
+
+    await act(async () => {
+      render(
+        <TestWrapper userState={mockStateWithDifferentName}>
+          <SuccessfullyUpdatedName />
+        </TestWrapper>,
+      );
+    });
+
+    // Should redirect to edit page due to mismatch
+    expect(mockNavigate).toHaveBeenCalledWith("/en/profile-update-name");
+  });
+
+  it("redirects to edit page when username is empty but location state has name", async () => {
+    const mockStateWithEmptyName = {
+      userProfile: {
+        name: {
+          formatted: "",
+        },
+      },
+    };
+
+    vi.mocked(useUser).mockReturnValue({
+      state: mockStateWithEmptyName,
+      dispatch: mockDispatch,
+    });
+
+    useLocation.mockReturnValue({
+      state: { name: { formatted: "Jane Smith" } },
+    });
+
+    await act(async () => {
+      render(
+        <TestWrapper userState={mockStateWithEmptyName}>
+          <SuccessfullyUpdatedName />
+        </TestWrapper>,
+      );
+    });
+
+    // Should redirect to edit page due to mismatch (empty vs non-empty)
+    expect(mockNavigate).toHaveBeenCalledWith("/en/profile-update-name");
+  });
+
+  it("redirects to edit page when location state name is undefined but username exists", async () => {
+    const mockStateWithName = {
+      userProfile: {
+        name: {
+          formatted: "John Doe",
+        },
+      },
+    };
+
+    vi.mocked(useUser).mockReturnValue({
+      state: mockStateWithName,
+      dispatch: mockDispatch,
+    });
+
+    useLocation.mockReturnValue({
+      state: { name: { formatted: undefined } },
+    });
+
+    await act(async () => {
+      render(
+        <TestWrapper userState={mockStateWithName}>
+          <SuccessfullyUpdatedName />
+        </TestWrapper>,
+      );
+    });
+
+    // Should redirect to edit page due to mismatch
+    expect(mockNavigate).toHaveBeenCalledWith("/en/profile-update-name");
+  });
+
+  it("does not redirect when name.formatted matches username exactly", async () => {
+    const matchingName = "John Doe";
+
+    const mockStateWithMatchingName = {
+      userProfile: {
+        name: {
+          formatted: matchingName,
+        },
+      },
+    };
+
+    vi.mocked(useUser).mockReturnValue({
+      state: mockStateWithMatchingName,
+      dispatch: mockDispatch,
+    });
+
+    useLocation.mockReturnValue({
+      state: { name: { formatted: matchingName } },
+    });
+
+    await act(async () => {
+      render(
+        <TestWrapper userState={mockStateWithMatchingName}>
+          <SuccessfullyUpdatedName />
+        </TestWrapper>,
+      );
+    });
+
+    // Should NOT redirect - both conditions pass
+    expect(mockNavigate).not.toHaveBeenCalled();
+
+    // Should render the success page
+    expect(screen.getByText(`Hello ${matchingName}`)).toBeInTheDocument();
+    expect(
+      screen.getByText("Profile Updated Successfully"),
+    ).toBeInTheDocument();
+  });
+
+  it("handles null or undefined user state gracefully", async () => {
+    const mockStateWithNullProfile = {
+      userProfile: null,
+    };
+
+    vi.mocked(useUser).mockReturnValue({
+      state: mockStateWithNullProfile,
+      dispatch: mockDispatch,
+    });
+
+    useLocation.mockReturnValue({
+      state: { name: { formatted: "Jane Smith" } },
+    });
+
+    await act(async () => {
+      render(
+        <TestWrapper userState={mockStateWithNullProfile}>
+          <SuccessfullyUpdatedName />
+        </TestWrapper>,
+      );
+    });
+
+    // Should redirect to edit page because username will be empty string
+    expect(mockNavigate).toHaveBeenCalledWith("/en/profile-update-name");
+  });
+
+  it("verifies the exact comparison logic in useEffect", async () => {
+    // Test case where both are empty strings - should not redirect
+    const mockStateWithEmptyName = {
+      userProfile: {
+        name: {
+          formatted: "",
+        },
+      },
+    };
+
+    vi.mocked(useUser).mockReturnValue({
+      state: mockStateWithEmptyName,
+      dispatch: mockDispatch,
+    });
+
+    useLocation.mockReturnValue({
+      state: { name: { formatted: "" } },
+    });
+
+    await act(async () => {
+      render(
+        <TestWrapper userState={mockStateWithEmptyName}>
+          <SuccessfullyUpdatedName />
+        </TestWrapper>,
+      );
+    });
+
+    // Should NOT redirect because both are empty strings (match)
+    expect(mockNavigate).not.toHaveBeenCalled();
   });
 });
