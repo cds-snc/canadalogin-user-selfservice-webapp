@@ -1,4 +1,11 @@
-import { useReducer, useEffect, ReactNode, useRef, useState } from "react";
+import {
+  useReducer,
+  useEffect,
+  ReactNode,
+  useRef,
+  useState,
+  useMemo,
+} from "react";
 import { useSearchParams, useParams } from "react-router";
 import {
   useEventSource,
@@ -210,6 +217,10 @@ function sessionTimeoutReducer(
         expirationTime: null,
       };
     case CONTEXT_ACTIONS.reset_expire_time:
+      // Avoid no-op updates that cause re-renders when the expire time didn't actually change
+      if (state.newServerSideExpirationTime === action.payload) {
+        return state;
+      }
       return {
         ...state,
         newServerSideExpirationTime: action.payload,
@@ -232,6 +243,17 @@ export function UserProvider({
   const [searchParams] = useSearchParams();
   const { language } = useParams();
   const pageContentJson = getPageContent(language, "SessionManagement");
+
+  // keep latest expire in a ref so SSE handler can compare without capturing stale closure state
+  const latestExpireRef = useRef<number | null>(
+    sessionTimeoutState.newServerSideExpirationTime,
+  );
+
+  // Memoize provider value so consumers only re-render when userState or userDispatch change
+  const contextValue = useMemo(
+    () => ({ state: userState, dispatch: userDispatch }),
+    [userState, userDispatch],
+  );
 
   // Timer refs for session management
   const warningTimerRef = useRef<number | null>(null);
@@ -379,15 +401,22 @@ export function UserProvider({
           console.debug("SSE notification:", eventData);
 
           if (eventData.status === "active" && eventData.expire) {
-            // Reset timers when receiving active status with new expire time
-            console.debug(
-              "SSE notification: resetting session timers based on new expire time",
-              eventData.expire,
-            );
-            sessionTimeoutDispatch({
-              type: CONTEXT_ACTIONS.reset_expire_time,
-              payload: eventData.expire,
-            });
+            // Only dispatch if expire changed to avoid unnecessary re-renders
+            if (latestExpireRef.current !== eventData.expire) {
+              console.debug(
+                "SSE notification: resetting session timers based on new expire time",
+                eventData.expire,
+              );
+              sessionTimeoutDispatch({
+                type: CONTEXT_ACTIONS.reset_expire_time,
+                payload: eventData.expire,
+              });
+            } else {
+              console.debug(
+                "SSE notification: expire time unchanged, no action taken",
+                eventData.expire,
+              );
+            }
           } else {
             console.log(
               "SSE notification: status not active or missing expire time",
@@ -468,6 +497,7 @@ export function UserProvider({
 
   // Start timers when newServerSideExpirationTime is set/updated
   useEffect(() => {
+    latestExpireRef.current = sessionTimeoutState.newServerSideExpirationTime;
     if (sessionTimeoutState.newServerSideExpirationTime) {
       resetSessionTimers(sessionTimeoutState.newServerSideExpirationTime);
     }
@@ -486,7 +516,7 @@ export function UserProvider({
   }
 
   return (
-    <UserContext.Provider value={{ state: userState, dispatch: userDispatch }}>
+    <UserContext.Provider value={contextValue}>
       {children}
       <SessionTimeoutModal
         isOpen={sessionTimeoutState.showModal}
