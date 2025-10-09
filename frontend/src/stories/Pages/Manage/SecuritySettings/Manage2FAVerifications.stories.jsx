@@ -57,6 +57,7 @@ const MSW_MOCKS = {
     "test-user-123",
     createOtpFactorsResponse([
       {
+        id: "factor-sms-1",
         phoneNumber: "5551234567",
         type: "smsotp",
       },
@@ -66,10 +67,12 @@ const MSW_MOCKS = {
     "test-user-123",
     createOtpFactorsResponse([
       {
+        id: "factor-sms-1",
         phoneNumber: "5551234567",
         type: "smsotp",
       },
       {
+        id: "factor-voice-1",
         phoneNumber: "5551234567",
         type: "voiceotp",
       },
@@ -79,14 +82,17 @@ const MSW_MOCKS = {
     "test-user-123",
     createOtpFactorsResponse([
       {
+        id: "factor-sms-1",
         phoneNumber: "5551234567",
         type: "smsotp",
       },
       {
+        id: "factor-voice-1",
         phoneNumber: "5551234567",
         type: "voiceotp",
       },
       {
+        id: "factor-sms-2",
         phoneNumber: "5559876543",
         type: "smsotp",
       },

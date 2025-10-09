@@ -1,22 +1,20 @@
 import logging
-import phonenumbers
 from datetime import datetime
 
-from fastapi import HTTPException
-from httpx import AsyncClient
-from pydantic import ValidationError
-
+import phonenumbers
 from app.config import get_configuration
+from app.password.schemas import OtpType
 from app.users.schemas import (
     UserAuthFactorsIbmResponse,
     UserPhoneAuthFactorsResponse,
     UserPhoneOTPFactors,
 )
-from app.password.schemas import OtpType
-from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.users.services.profile import my_profile
-
+from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.request_error_handler import RequestErrorHandler
+from fastapi import HTTPException
+from httpx import AsyncClient
+from pydantic import ValidationError
 
 logger = logging.getLogger(__name__)
 
@@ -72,6 +70,7 @@ async def parse_phone_auth_factors_response(
             masked_phonenumber = await mask_phone_last4(phone_number)
             phone_factors.append(
                 {
+                    "id": factor.id,
                     "type": factor.type,
                     "phoneNumber": masked_phonenumber,
                 }

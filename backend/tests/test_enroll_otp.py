@@ -1,19 +1,22 @@
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from app.otp.schemas import OtpEnrollmentRequest
-from app.otp.services.enroll_otp import (
-    dispatch_sms_enrollment,
-    dispatch_voice_enrollment,
-    handle_sms_otp_enrollment,
-    handle_voice_otp_enrollment,
+from app.otp.schemas import OtpEnrollmentRequest, OtpType
+from app.otp.services.enroll_mfa_otp import (
+    dispatch_otp_enrollment,
+    handle_otp_enrollment,
 )
 from app.users.schemas import IBMVerifyUserProfileSchema, ProfileResponse
 
 
 @pytest.fixture
-def mock_enrollment_request():
-    return OtpEnrollmentRequest(phoneNumber="+19025555555")
+def mock_sms_enrollment_request():
+    return OtpEnrollmentRequest(phoneNumber="+19025555555", otpType=OtpType.SMS)
+
+
+@pytest.fixture
+def mock_voice_enrollment_request():
+    return OtpEnrollmentRequest(phoneNumber="+19025555555", otpType=OtpType.VOICE)
 
 
 @pytest.fixture
@@ -58,7 +61,7 @@ class TestSMSEnrollment:
     @pytest.mark.asyncio
     async def test_handle_sms_otp_enrollment_success(
         self,
-        mock_enrollment_request,
+        mock_sms_enrollment_request,
         mock_user_profile_response,
         mock_ibm_enrollment_response,
     ):
@@ -67,30 +70,32 @@ class TestSMSEnrollment:
         mock_user_access_token = "user_token_123"
 
         # Mock the profile service
-        with patch("app.otp.services.enroll_otp.my_profile") as mock_my_profile:
+        with patch("app.otp.services.enroll_mfa_otp.my_profile") as mock_my_profile:
             mock_my_profile.return_value = mock_user_profile_response
 
             # Mock the dispatch function
             with patch(
-                "app.otp.services.enroll_otp.dispatch_sms_enrollment"
+                "app.otp.services.enroll_mfa_otp.dispatch_otp_enrollment"
             ) as mock_dispatch:
                 mock_response = MagicMock()
                 mock_response.status_code = 201
                 mock_response.json.return_value = mock_ibm_enrollment_response
                 mock_dispatch.return_value = mock_response
 
-                result = await handle_sms_otp_enrollment(
-                    mock_http_client, mock_enrollment_request, mock_user_access_token
+                result = await handle_otp_enrollment(
+                    mock_http_client,
+                    mock_sms_enrollment_request,
+                    mock_user_access_token,
                 )
 
                 assert result.success is True
                 assert result.data.id == "factor123"
                 assert result.data.type == "smsotp"
-                assert result.message == "SMS OTP factor enrolled successfully"
+                assert result.message == "sms OTP factor enrolled successfully"
 
     @pytest.mark.asyncio
     async def test_handle_sms_otp_enrollment_profile_failure(
-        self, mock_enrollment_request
+        self, mock_sms_enrollment_request
     ):
         mock_http_client = AsyncMock()
         mock_user_access_token = "user_token_123"
@@ -100,11 +105,11 @@ class TestSMSEnrollment:
             success=False, data=None, message="Profile retrieval failed"
         )
 
-        with patch("app.otp.services.enroll_otp.my_profile") as mock_my_profile:
+        with patch("app.otp.services.enroll_mfa_otp.my_profile") as mock_my_profile:
             mock_my_profile.return_value = failed_profile_response
 
-            result = await handle_sms_otp_enrollment(
-                mock_http_client, mock_enrollment_request, mock_user_access_token
+            result = await handle_otp_enrollment(
+                mock_http_client, mock_sms_enrollment_request, mock_user_access_token
             )
 
             assert result.success is False
@@ -112,24 +117,26 @@ class TestSMSEnrollment:
 
     @pytest.mark.asyncio
     async def test_handle_sms_otp_enrollment_ibm_error(
-        self, mock_enrollment_request, mock_user_profile_response
+        self, mock_sms_enrollment_request, mock_user_profile_response
     ):
         mock_http_client = AsyncMock()
         mock_user_access_token = "user_token_123"
 
-        with patch("app.otp.services.enroll_otp.my_profile") as mock_my_profile:
+        with patch("app.otp.services.enroll_mfa_otp.my_profile") as mock_my_profile:
             mock_my_profile.return_value = mock_user_profile_response
 
             with patch(
-                "app.otp.services.enroll_otp.dispatch_sms_enrollment"
+                "app.otp.services.enroll_mfa_otp.dispatch_otp_enrollment"
             ) as mock_dispatch:
                 mock_response = MagicMock()
                 mock_response.status_code = 400
                 mock_response.json.return_value = {"error": "Invalid phone number"}
                 mock_dispatch.return_value = mock_response
 
-                result = await handle_sms_otp_enrollment(
-                    mock_http_client, mock_enrollment_request, mock_user_access_token
+                result = await handle_otp_enrollment(
+                    mock_http_client,
+                    mock_sms_enrollment_request,
+                    mock_user_access_token,
                 )
 
                 assert result.success is False
@@ -139,7 +146,7 @@ class TestSMSEnrollment:
 class TestVoiceEnrollment:
     @pytest.mark.asyncio
     async def test_handle_voice_otp_enrollment_success(
-        self, mock_enrollment_request, mock_user_profile_response
+        self, mock_voice_enrollment_request, mock_user_profile_response
     ):
         mock_http_client = AsyncMock()
         mock_user_access_token = "user_token_123"
@@ -154,29 +161,31 @@ class TestVoiceEnrollment:
             "validated": False,
         }
 
-        with patch("app.otp.services.enroll_otp.my_profile") as mock_my_profile:
+        with patch("app.otp.services.enroll_mfa_otp.my_profile") as mock_my_profile:
             mock_my_profile.return_value = mock_user_profile_response
 
             with patch(
-                "app.otp.services.enroll_otp.dispatch_voice_enrollment"
+                "app.otp.services.enroll_mfa_otp.dispatch_otp_enrollment"
             ) as mock_dispatch:
                 mock_response = MagicMock()
                 mock_response.status_code = 201
                 mock_response.json.return_value = mock_ibm_response
                 mock_dispatch.return_value = mock_response
 
-                result = await handle_voice_otp_enrollment(
-                    mock_http_client, mock_enrollment_request, mock_user_access_token
+                result = await handle_otp_enrollment(
+                    mock_http_client,
+                    mock_voice_enrollment_request,
+                    mock_user_access_token,
                 )
 
                 assert result.success is True
                 assert result.data.id == "factor456"
                 assert result.data.type == "voiceotp"
-                assert result.message == "Voice OTP factor enrolled successfully"
+                assert result.message == "voice OTP factor enrolled successfully"
 
     @pytest.mark.asyncio
     async def test_handle_voice_otp_enrollment_profile_failure(
-        self, mock_enrollment_request
+        self, mock_voice_enrollment_request
     ):
         mock_http_client = AsyncMock()
         mock_user_access_token = "user_token_123"
@@ -186,11 +195,11 @@ class TestVoiceEnrollment:
             success=False, data=None, message="Profile retrieval failed"
         )
 
-        with patch("app.otp.services.enroll_otp.my_profile") as mock_my_profile:
+        with patch("app.otp.services.enroll_mfa_otp.my_profile") as mock_my_profile:
             mock_my_profile.return_value = failed_profile_response
 
-            result = await handle_voice_otp_enrollment(
-                mock_http_client, mock_enrollment_request, mock_user_access_token
+            result = await handle_otp_enrollment(
+                mock_http_client, mock_voice_enrollment_request, mock_user_access_token
             )
 
             assert result.success is False
@@ -198,24 +207,26 @@ class TestVoiceEnrollment:
 
     @pytest.mark.asyncio
     async def test_handle_voice_otp_enrollment_ibm_error(
-        self, mock_enrollment_request, mock_user_profile_response
+        self, mock_voice_enrollment_request, mock_user_profile_response
     ):
         mock_http_client = AsyncMock()
         mock_user_access_token = "user_token_123"
 
-        with patch("app.otp.services.enroll_otp.my_profile") as mock_my_profile:
+        with patch("app.otp.services.enroll_mfa_otp.my_profile") as mock_my_profile:
             mock_my_profile.return_value = mock_user_profile_response
 
             with patch(
-                "app.otp.services.enroll_otp.dispatch_voice_enrollment"
+                "app.otp.services.enroll_mfa_otp.dispatch_otp_enrollment"
             ) as mock_dispatch:
                 mock_response = MagicMock()
                 mock_response.status_code = 400
                 mock_response.json.return_value = {"error": "Invalid phone number"}
                 mock_dispatch.return_value = mock_response
 
-                result = await handle_voice_otp_enrollment(
-                    mock_http_client, mock_enrollment_request, mock_user_access_token
+                result = await handle_otp_enrollment(
+                    mock_http_client,
+                    mock_voice_enrollment_request,
+                    mock_user_access_token,
                 )
 
                 assert result.success is False
@@ -224,7 +235,7 @@ class TestVoiceEnrollment:
 
 class TestDispatchFunctions:
     @pytest.mark.asyncio
-    async def test_dispatch_sms_enrollment(self, mock_enrollment_request):
+    async def test_dispatch_sms_otp_enrollment(self, mock_sms_enrollment_request):
         mock_http_client = AsyncMock()
         user_id = "user123"
 
@@ -232,28 +243,28 @@ class TestDispatchFunctions:
         mock_response.status_code = 201
         mock_http_client.post.return_value = mock_response
 
-        with patch("app.otp.services.enroll_otp.get_admin_token") as mock_get_token:
+        with patch("app.otp.services.enroll_mfa_otp.get_admin_token") as mock_get_token:
             mock_get_token.return_value = "admin_token_123"
 
             with patch(
-                "app.otp.services.enroll_otp.get_auth_request_headers"
+                "app.otp.services.enroll_mfa_otp.get_auth_request_headers"
             ) as mock_headers:
                 mock_headers.return_value = {"Authorization": "Bearer admin_token_123"}
 
                 with patch(
-                    "app.otp.services.enroll_otp.get_configuration"
+                    "app.otp.services.enroll_mfa_otp.get_configuration"
                 ) as mock_config:
                     mock_config.return_value.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
                         "https://test.verify.ibm.com"
                     )
 
                     with patch(
-                        "app.otp.services.enroll_otp.prepare_pydantic_phone_number_for_verify"
+                        "app.otp.services.enroll_mfa_otp.prepare_pydantic_phone_number_for_verify"
                     ) as mock_format:
                         mock_format.return_value = "+19025555555"
 
-                        result = await dispatch_sms_enrollment(
-                            mock_http_client, mock_enrollment_request, user_id
+                        result = await dispatch_otp_enrollment(
+                            mock_http_client, mock_sms_enrollment_request, user_id
                         )
 
                         assert result == mock_response
@@ -262,9 +273,10 @@ class TestDispatchFunctions:
                         assert "smsotp" in call_args[0][0]
                         assert call_args[1]["json"]["userId"] == user_id
                         assert call_args[1]["json"]["phoneNumber"] == "+19025555555"
+                        assert call_args[1]["json"]["enabled"] is True
 
     @pytest.mark.asyncio
-    async def test_dispatch_voice_enrollment(self, mock_enrollment_request):
+    async def test_dispatch_voice_otp_enrollment(self, mock_voice_enrollment_request):
         mock_http_client = AsyncMock()
         user_id = "user123"
 
@@ -272,28 +284,28 @@ class TestDispatchFunctions:
         mock_response.status_code = 201
         mock_http_client.post.return_value = mock_response
 
-        with patch("app.otp.services.enroll_otp.get_admin_token") as mock_get_token:
+        with patch("app.otp.services.enroll_mfa_otp.get_admin_token") as mock_get_token:
             mock_get_token.return_value = "admin_token_123"
 
             with patch(
-                "app.otp.services.enroll_otp.get_auth_request_headers"
+                "app.otp.services.enroll_mfa_otp.get_auth_request_headers"
             ) as mock_headers:
                 mock_headers.return_value = {"Authorization": "Bearer admin_token_123"}
 
                 with patch(
-                    "app.otp.services.enroll_otp.get_configuration"
+                    "app.otp.services.enroll_mfa_otp.get_configuration"
                 ) as mock_config:
                     mock_config.return_value.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
                         "https://test.verify.ibm.com"
                     )
 
                     with patch(
-                        "app.otp.services.enroll_otp.prepare_pydantic_phone_number_for_verify"
+                        "app.otp.services.enroll_mfa_otp.prepare_pydantic_phone_number_for_verify"
                     ) as mock_format:
                         mock_format.return_value = "+19025555555"
 
-                        result = await dispatch_voice_enrollment(
-                            mock_http_client, mock_enrollment_request, user_id
+                        result = await dispatch_otp_enrollment(
+                            mock_http_client, mock_voice_enrollment_request, user_id
                         )
 
                         assert result == mock_response
@@ -302,3 +314,4 @@ class TestDispatchFunctions:
                         assert "voiceotp" in call_args[0][0]
                         assert call_args[1]["json"]["userId"] == user_id
                         assert call_args[1]["json"]["phoneNumber"] == "+19025555555"
+                        assert call_args[1]["json"]["enabled"] is True

@@ -1,14 +1,14 @@
 import {
-  GcdsContainer,
-  GcdsHeading,
-  GcdsErrorSummary,
   GcdsCard,
+  GcdsContainer,
+  GcdsErrorSummary,
   GcdsGrid,
+  GcdsHeading,
 } from "@cdssnc/gcds-components-react";
-import { PAGES } from "../../utils/constants";
 import { useParams } from "react-router";
 import { useError } from "../../hooks/useError";
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
+import { PAGES } from "../../utils/constants";
 import { getPageContent } from "../../utils/functions.jsx";
 import { path } from "../../utils/routeHelpers.js";
 import { useUser } from "../Providers/useUser.tsx";
@@ -22,7 +22,6 @@ export default function ManageDashboard() {
   const pageContent = getPageContent(language, PAGES.manageDashboard);
   const navigateHelper = useNavigateHelper();
 
-  console.log(state);
   const personalInformationLink = path(PAGES.ProfileHome, {
     language: language,
   });

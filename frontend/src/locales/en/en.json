@@ -391,5 +391,46 @@
     "9": "Delete",
     "10": "+ Add a phone number",
     "11": "Loading..."
+  },
+  "AddMFANumber": {
+    "1": "Enter your new phone number",
+    "2": "Enter the new phone number you want to receive security codes at each time you sign in.",
+    "3": "This number will only be used for 2-step verification. To manage your contact phone number, go to your",
+    "4": "Personal Information",
+    "5": "page.",
+    "6": "Country",
+    "7": "Phone number",
+    "8": "My country is not listed here",
+    "9": "Some countries are not supported due to technical limitations. If your country is not listed, you will be unable to create a GC Sign in account at this time. We apologize for the inconvenience.",
+    "10": "How should we send you the code?",
+    "11": "Text message (SMS)",
+    "12": "Mobile only. Carrier charges may apply.",
+    "13": "Voice call",
+    "14": "Mobile or landline. Carrier charges may apply.",
+    "15": "You can change this the next time you sign in."
+  },
+  "AddSecondMFAVoiceCall": {
+    "1": "You have added",
+    "2": "as a 2-step verification phone number.",
+    "3": "Set up voice call verification (optional)",
+    "4": "Setting up voice call verification allows you to also receive verification codes by",
+    "5": "phone call",
+    "6": "when signing in.",
+    "7": "We recommend setting up this option if you might not be able to receive text messages at any point. Having both methods set up helps make sure you do not get locked out.",
+    "8": "Would you like to set up voice call verification?",
+    "9": "Yes, set up voice call verification",
+    "10": "No, skip for now"
+  },
+  "AddSecondMFATextMessage": {
+    "1": "You have added",
+    "2": "as a 2-step verification phone number.",
+    "3": "Set up text (SMS) verification (optional)",
+    "4": "Setting up text message verification allows you to also receive verification codes by",
+    "5": "text message (SMS)",
+    "6": "when signing in.",
+    "7": "We recommend setting up this option if you might not be able to receive phone calls at any point. Having both methods set up helps make sure you do not get locked out.",
+    "8": "Would you like to set up text message verification?",
+    "9": "Yes, set up text message verification",
+    "10": "No, skip for now"
   }
 }

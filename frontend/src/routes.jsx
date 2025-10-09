@@ -1,6 +1,8 @@
 import { Navigate } from "react-router";
 
 import RootLayout from "./components/Layout/RootLayout.jsx";
+import { AppLanguageSetup } from "./components/Providers/AppLanguageSetup";
+import { LanguageProvider } from "./components/Providers/LanguageProvider";
 import {
   PrivateRoute,
   StepupPrivateRoute,
@@ -16,6 +18,8 @@ import ProfileUpdateName from "./features/ProfileName/components/ProfileUpdateNa
 import ProfileHome from "./components/Manage/ProfileHome.jsx";
 import CheckYourEmail from "./components/Manage/CheckYourEmail.jsx";
 import CompleteTwoStepVerification from "./components/Manage/CompleteTwoStepVerification.jsx";
+import EditLanguagePreferences from "./components/Manage/EditLanguagePreferences.jsx";
+import EnterNewEmail from "./components/Manage/EnterNewEmail.jsx";
 import FirstVerifyItsYou from "./components/Manage/FirstVerifyItsYou.jsx";
 import EnterNewEmail from "./components/Manage/EnterNewEmail.jsx";
 import ProfileUpdateNameSuccess from "./features/ProfileName/components/SuccessfullyUpdated.jsx";
@@ -29,7 +33,8 @@ import ProfileYouMayUpdateLanguage from "./components/Manage/ProfileYouMayUpdate
 import { PAGES } from "./utils/constants.jsx";
 import ProfileUpdateNameConfirmUpdate from "./features/ProfileName/components/ConfirmUpdate.jsx";
 import UpdateContactPhoneNumberContainer from "./features/ContactPhoneNumber/components/UpdateContactPhoneNumberContainer.jsx";
-import Manage2FAVerifications from "./components/Manage/SecuritySettings/Manage2FAVerifications.jsx";
+import AddMFAPage from "./features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPage.jsx";
+import { PAGES } from "./utils/constants.jsx";
 
 export const appRoutes = [
   {
@@ -156,6 +161,11 @@ export const appRoutes = [
                     path: "manage-2fa-verifications",
                     element: <Manage2FAVerifications />,
                     handle: { id: PAGES.manage2FAVerifications },
+                  },
+                  {
+                    path: "add-mfa-phone-number",
+                    element: <AddMFAPage />,
+                    handle: { id: PAGES.addMFAPage },
                   },
                 ],
               },

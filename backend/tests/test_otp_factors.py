@@ -1,22 +1,23 @@
-import pytest
 from datetime import datetime
-from httpx import AsyncClient
-from fastapi import HTTPException
-from app.users.schemas import IBMVerifyUserProfileSchema, ProfileResponse
 
+import pytest
+from app.password.schemas import OtpType
+from app.users.schemas import (
+    Attributes,
+    Factor,
+    IBMVerifyUserProfileSchema,
+    ProfileResponse,
+    UserAuthFactorsIbmResponse,
+    UserPhoneAuthFactorsResponse,
+    UserPhoneOTP,
+)
 from app.users.services.otp_factors import (
     get_user_otp_factors,
-    parse_phone_auth_factors_response,
     mask_phone_last4,
+    parse_phone_auth_factors_response,
 )
-from app.users.schemas import (
-    UserAuthFactorsIbmResponse,
-    UserPhoneOTP,
-    UserPhoneAuthFactorsResponse,
-    Factor,
-    Attributes,
-)
-from app.password.schemas import OtpType
+from fastapi import HTTPException
+from httpx import AsyncClient
 
 
 @pytest.mark.asyncio
@@ -57,6 +58,8 @@ async def test_parse_phone_auth_factors_response_valid():
 
     result = await parse_phone_auth_factors_response(data)
     assert isinstance(result, list)
+    assert result[0]["id"] == "factor1"
+    assert result[0]["type"] == OtpType.SMSOTP.value
     assert result[0]["phoneNumber"].endswith("8901")
 
 
@@ -139,6 +142,9 @@ async def test_get_user_otp_factors_mocked(monkeypatch):
         assert result.success is True
         assert isinstance(result.data, list)
         assert all(isinstance(factor, UserPhoneOTP) for factor in result.data)
+        assert result.data[0].id == "factor1"
+        assert result.data[0].type == OtpType.SMSOTP
+        assert result.data[0].phoneNumber.endswith("8901")
 
 
 @pytest.mark.asyncio
