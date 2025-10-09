@@ -1,5 +1,44 @@
 # Changelog
 
+## [1.3.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.2.0...v1.3.0) (2025-10-09)
+
+
+### Features
+
+* **backend:** implement 2fa enrolment endpoints ([#795](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/795)) ([ff81ddd](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/ff81ddd4b29a7e34963afad73894f725e386d2cf))
+* **backend:** implement 2fa otp and validation endpoints ([#800](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/800)) ([7185335](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/7185335a8162933f276b0e77e66d16d1f003fcc5))
+* **CI/CD:** Slack notifications for manage deploys ([#814](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/814)) ([87b84d1](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/87b84d11d60f390781d35abd1a0b40d6c64c8525))
+* **frontend:** 2 step verification settings landing page ([#788](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/788)) ([354beed](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/354beed365a337787d572eec73a8b5d66e7762a5))
+* **frontend:** add a 2fa phone number manage security settings ([#802](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/802)) ([be12178](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/be121784a8eb6486dd0f4894b41990e0527430bf))
+
+
+### Bug Fixes
+
+* **CI/CD:** Add more sections to the release-please changelog ([#791](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/791)) ([1e97b6d](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/1e97b6dc96845de96d75da8ba69a938b141200eb))
+* **security:** Potential fix for code scanning alert no. 3: Workflow does not contain permissions ([#808](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/808)) ([edbd302](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/edbd302c30452def0f1721152e9f991218401ea0))
+* **security:** Potential fix for code scanning alert no. 37: Workflow does not contain permissions ([#803](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/803)) ([6223354](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/6223354ed9bb24d74809dcde77cc1bc2288d8d6f))
+* **security:** Potential fix for code scanning alert no. 4: Workflow does not contain permissions ([#807](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/807)) ([92d9967](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/92d99674b585655e403aeaaf2faf59946c05329d))
+* **security:** Potential fix for code scanning alert no. 6: Workflow does not contain permissions ([#806](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/806)) ([9f2efa4](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/9f2efa423331647a2abba11d7ae4297fa2d8972c))
+* **security:** Potential fix for code scanning alert no. 7: Workflow does not contain permissions ([#805](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/805)) ([59cccdf](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/59cccdfe83b41c940635150ef6b95279e6e94295))
+* **security:** Remove dependency on python-jose ([#809](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/809)) ([adc932e](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/adc932e16739dbf09f75a613123030316062560f))
+
+
+### Tests
+
+* **backend:** apply best practice to send transient unit test ([#796](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/796)) ([d7db669](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/d7db6692ecefa5966a92605dc21433501ffdfa42))
+* **backend:** Apply best practice to verify transient module ([#801](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/801)) ([92ad6d0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/92ad6d0f583e47bb73a9391737cb44d0c2b38e83))
+* **backend:** Update unit test for OTP retrieve transient ([#789](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/789)) ([ba27d82](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/ba27d821caa3ae12800861a09e0bfe9430dab34f))
+* **frontend:** Implemented unit test for display phone numbers ([#738](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/738)) ([e1a1647](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/e1a16473828870e14233e38be6fbb79faca96612))
+
+
+### Miscellaneous Chores
+
+* **deps:** update all minor dependencies ([#768](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/768)) ([dfcce8a](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/dfcce8a676b1042502b9e73a9a0c00646e97bd9a))
+* **deps:** update dependency fastapi-cli to v0.0.13 ([#769](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/769)) ([f83d591](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/f83d5912b87818eff890e7c08509754046964e6b))
+* **deps:** update dependency phonenumbers to v9.0.15 ([#797](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/797)) ([bf107f4](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/bf107f497e5df81b4e831dc9fe0a70d9dc7a48d6))
+* **deps:** update github/codeql-action action to v3.30.4 ([#767](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/767)) ([ff43fb8](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/ff43fb8978e689e2b891a7804216ccec42538fcb))
+* **deps:** update github/codeql-action action to v3.30.5 ([#798](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/798)) ([5b3b55e](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/5b3b55e62e70a513e92b9f7620b50653146b9727))
+
 ## [1.2.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.1.0...v1.2.0) (2025-10-02)
 
 
