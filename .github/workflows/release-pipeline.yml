@@ -65,7 +65,7 @@ jobs:
         if: steps.check-envs.outputs.envs != ''
         run: |
           workflow_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          json="{\"text\":\"Deployments are beginning to the environments: ${{ steps.check-envs.outputs.envs }}\n\nSee details at: $workflow_url\"}"
+          json="{\"text\":\":hourglass: Deployments are beginning to the environments: ${{ steps.check-envs.outputs.envs }}\n\nSee details at: $workflow_url\"}"
 
           curl -X POST -H 'Content-type: application/json' --data "$json" ${{ secrets.GC_SIGNIN_OPS_SLACK_WEBHOOK }}
 
@@ -336,7 +336,7 @@ jobs:
       - name: Notify slack about successful Deployments
         run: |
           workflow_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          json="{\"text\":\"The deployment to the environments ${{ needs.notify-slack-about-deploy.outputs.envs }} was successful!\n\nSee details at: $workflow_url\"}"
+          json="{\"text\":\":white_check_mark: The deployment to the environments ${{ needs.notify-slack-about-deploy.outputs.envs }} was successful!\n\nSee details at: $workflow_url\"}"
 
           curl -X POST -H 'Content-type: application/json' --data "$json" ${{ secrets.GC_SIGNIN_OPS_SLACK_WEBHOOK }}
 
