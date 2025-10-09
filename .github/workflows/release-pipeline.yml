@@ -18,17 +18,6 @@ env:
 name: Release Pipeline - Frontend & Backend API
 
 jobs:
-  test-job:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Test step
-        run: |
-          echo "This test step checks to see if our Slack config is working."
-          workflow_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          json="{\"text\":\"This is a test message from the release-pipeline workflow.\n\nSee details at: $workflow_url\"}"
-
-          curl -X POST -H 'Content-type: application/json' --data "$json" ${{ secrets.GC_SIGNIN_OPS_SLACK_WEBHOOK }}
-
   # Runs the release-please action. This manages the open release PR and
   # creates the release when the PR is merged.
   release-please:
