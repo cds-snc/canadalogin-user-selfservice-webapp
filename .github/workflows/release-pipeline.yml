@@ -34,6 +34,31 @@ jobs:
         with:
           token: ${{ steps.sre_app_token.outputs.token }}
 
+  notify-slack-about-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check what environments are being deployed to
+        id: check-envs
+        if: github.event_name != 'workflow_dispatch'
+        run: |
+          ENVS_TO_DEPLOY=""
+          for file in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
+            if [[ "$file" == .deployed_versions/*.json ]]; then
+              ENV_NAME=$(basename $file .json)
+              if [ -z "$ENVS_TO_DEPLOY" ]; then
+                ENVS_TO_DEPLOY="$ENV_NAME"
+              else
+                ENVS_TO_DEPLOY="$ENVS_TO_DEPLOY,$ENV_NAME"
+              fi
+            fi
+          done
+          echo "envs=$ENVS_TO_DEPLOY" >> $GITHUB_OUTPUT
+
+      - name: Notify slack
+        if: steps.check-envs.outputs.envs != ''
+        run: |
+          echo "Would have notified slack about deployment to the following environments: ${{ steps.check-envs.outputs.envs }}"
+
   # Builds the frontend application for the current SHA and stores the artifact in S3.
   build-frontend:
     runs-on: ubuntu-latest
