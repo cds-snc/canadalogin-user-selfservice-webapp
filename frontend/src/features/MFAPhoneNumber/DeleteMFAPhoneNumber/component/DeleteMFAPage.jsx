@@ -1,6 +1,6 @@
 import { GcdsErrorMessage } from "@cdssnc/gcds-components-react";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useLocation, useParams } from "react-router";
 import Loader from "../../../../components/Layout/Loading";
 import { useUser } from "../../../../components/Providers/useUser";
 import { useNavigateHelper } from "../../../../hooks/useNavigate";
@@ -33,7 +33,9 @@ const StepContent = ({ errorCode, errorPageJson, StepComponent }) => {
 };
 
 export default function DeleteMFAPage() {
-  const { language, mfaId } = useParams();
+  const { language } = useParams();
+  const location = useLocation();
+  const { factorIds } = location.state || {};
   const { state } = useUser();
   const [userPhoneFactors, setUserPhoneFactors] = useState([]);
 
@@ -60,9 +62,8 @@ export default function DeleteMFAPage() {
   const [phoneFormData, setPhoneFormData] = useState({
     phoneNumber: "",
     otp: "",
-    mfaId: "",
-    otpTypes: [],
     formattedPhoneNumber: "",
+    mfaFactorsToDelete: [],
   });
 
   const handlePhoneForm = (field, value) => {
@@ -91,14 +92,13 @@ export default function DeleteMFAPage() {
   };
 
   const deleteMFA = async () => {
-    setLocalLoading(true);
     setErrorCode("");
 
     try {
-      for (const otpType of phoneFormData.otpTypes) {
+      for (const mfaFactor of phoneFormData.mfaFactorsToDelete) {
         const payload = {
-          id: phoneFormData.mfaId,
-          otpType: serverMapping[otpType],
+          id: mfaFactor.id,
+          otpType: serverMapping[mfaFactor.type],
         };
 
         await deleteMFAPhoneNumberApi.deleteMFA(payload);
@@ -107,13 +107,12 @@ export default function DeleteMFAPage() {
       if (error && error.data && error.data.message) {
         setErrorCode(error.data.message);
       }
-    } finally {
-      setLocalLoading(false);
     }
   };
 
   useEffect(() => {
     const fetchUserOtpPhoneFactors = async () => {
+      setLocalLoading(true);
       try {
         const response = await otpFactors.getUserOtpPhoneFactors(id);
         if (
@@ -125,43 +124,43 @@ export default function DeleteMFAPage() {
           const userPhoneFactors = response.data;
           setUserPhoneFactors(userPhoneFactors);
 
-          // If phoneNumber and factorId are provided via URL params, pre-select the factor
-          if (mfaId) {
-            const selectedFactors = userPhoneFactors.filter(
-              (factor) => factor.id === mfaId,
+          // If factor data is provided via location state, pre-select the factors
+          if (factorIds && factorIds.length > 0) {
+            const mfaFactorsToDelete = userPhoneFactors.filter((factor) =>
+              factorIds.includes(factor.id),
             );
-            if (selectedFactors.length > 0) {
+            if (mfaFactorsToDelete.length > 0) {
               // Use the first matching factor for display, but collect all types for deletion
-              const firstFactor = selectedFactors[0];
-              const allTypes = selectedFactors.map((factor) => factor.type);
+              const firstFactor = mfaFactorsToDelete[0];
 
-              // Set the mfaId in phoneFormData for deletion
-              handlePhoneForm("mfaId", mfaId);
+              // Set the data in phoneFormData for deletion
+              handlePhoneForm("mfaFactorsToDelete", mfaFactorsToDelete); // Use first ID for backward compatibility
               handlePhoneForm("phoneNumber", firstFactor.phoneNumber);
-              handlePhoneForm("otpTypes", allTypes);
               handlePhoneForm(
                 "formattedPhoneNumber",
-                `+1 ${firstFactor.phoneNumber}`,
+                `${firstFactor.phoneNumber}`,
               );
             } else {
               // Factor not found, go back to manage page
-              navigateHelper(backToManage2FAVerificationsPage);
+              await navigateHelper(backToManage2FAVerificationsPage);
             }
           } else {
-            // No specific factor selected, use the first one
-            setUserSelectedMfaType(userPhoneFactors[0]);
+            // No specific factor selected, go back to manage page (shouldn't happen in normal flow)
+            await navigateHelper(backToManage2FAVerificationsPage);
           }
         } else {
-          navigateHelper(backToSecuritySettingsPage);
+          await navigateHelper(backToSecuritySettingsPage);
         }
       } catch (err) {
         console.error("Error fetching user OTP phone factors:", err);
+      } finally {
+        setLocalLoading(false);
       }
     };
 
     fetchUserOtpPhoneFactors();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phoneFormData.trxnId, mfaId]);
+  }, [phoneFormData.trxnId, factorIds]);
 
   const steps = {
     otpSelection: (
@@ -194,9 +193,11 @@ export default function DeleteMFAPage() {
       <DeleteMFAPhoneNumberConfirm
         onNext={async () => {
           await deleteMFA();
-          navigateHelper(backToManage2FAVerificationsPage);
+          await navigateHelper(backToManage2FAVerificationsPage);
         }}
-        onCancel={() => navigateHelper(backToManage2FAVerificationsPage)}
+        onCancel={async () =>
+          await navigateHelper(backToManage2FAVerificationsPage)
+        }
         phoneFormData={phoneFormData}
       />
     ),

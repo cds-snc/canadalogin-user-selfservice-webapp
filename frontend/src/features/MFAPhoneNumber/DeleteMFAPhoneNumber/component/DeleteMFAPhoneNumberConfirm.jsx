@@ -22,7 +22,6 @@ export default function DeleteMFAPhoneNumberConfirm({
     language,
     PAGES.deleteMFAPhoneNumberConfirm,
   );
-  console.log(phoneFormData);
   return (
     <GcdsContainer>
       <GcdsGrid columns="1" gap="500">

@@ -148,7 +148,6 @@ export default function AddMFAPage() {
 
   const verifyMFAOtp = async () => {
     try {
-      setLocalLoading(true);
       const payload = {
         id: phoneFormData.mfaId,
         otp: phoneFormData.otp,
@@ -163,7 +162,7 @@ export default function AddMFAPage() {
           visibleDigits in userPhoneFactorsMap &&
           userPhoneFactorsMap[visibleDigits].length >= 2
         ) {
-          navigateHelper(backToManage2FAVerificationsPage);
+          await navigateHelper(backToManage2FAVerificationsPage);
         } else {
           setWizardStep("addSecondMFA");
         }
@@ -172,8 +171,6 @@ export default function AddMFAPage() {
       if (error && error.data && error.data.message) {
         setErrorCode(error.data.message);
       }
-    } finally {
-      setLocalLoading(false);
     }
   };
 
@@ -219,7 +216,7 @@ export default function AddMFAPage() {
           }, {});
           setUserPhoneFactorsMap(userPhoneFactorsMap);
         } else {
-          navigateHelper(backToSecuritySettingsPage);
+          await navigateHelper(backToSecuritySettingsPage);
         }
       } catch (err) {
         console.error("Error fetching user OTP phone factors:", err);
@@ -266,7 +263,9 @@ export default function AddMFAPage() {
             mfaId: enrollMfaResponse?.data?.id,
           });
         }}
-        onCancel={() => navigateHelper(backToManage2FAVerificationsPage)}
+        onCancel={async () =>
+          await navigateHelper(backToManage2FAVerificationsPage)
+        }
         onChangePhoneForm={handlePhoneForm}
         phoneFormData={phoneFormData}
       />
@@ -280,8 +279,8 @@ export default function AddMFAPage() {
         onNext={() => {
           verifyMFAOtp();
         }}
-        onCancel={() => {
-          navigateHelper(backToManage2FAVerificationsPage);
+        onCancel={async () => {
+          await navigateHelper(backToManage2FAVerificationsPage);
         }}
         requestNewOtpCode={() => {
           sendMFAOtp({ reSendOtpCode: true });

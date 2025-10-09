@@ -171,7 +171,7 @@ export const appRoutes = [
                         handle: { id: PAGES.addMFAPage },
                       },
                       {
-                        path: "delete-mfa-phone-number/:mfaId",
+                        path: "delete-mfa-phone-number",
                         element: <DeleteMFAPage />,
                         handle: { id: PAGES.deleteMFAPage },
                       },
