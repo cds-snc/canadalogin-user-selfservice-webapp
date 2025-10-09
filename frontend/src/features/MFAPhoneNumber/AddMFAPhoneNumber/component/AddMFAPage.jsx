@@ -10,6 +10,7 @@ import { path } from "../../../../utils/routeHelpers";
 import { otpFactors } from "../../../ChangePassword/api/otpFactors";
 import OtpSelection from "../../../ChangePassword/components/OtpSelection";
 import OtpVerification from "../../../ChangePassword/components/OtpVerification";
+import { deleteMFAPhoneNumberApi } from "../../DeleteMFAPhoneNumber/api/DeleteMFAPhoneNumberAPI";
 import { addMFAPhoneNumberApi } from "../api/AddMFAPhoneNumberAPI";
 import AddMFAOtpVerification from "./AddMFAOtpVerification";
 import AddMFAPhoneNumber from "./AddMFAPhoneNumber";
@@ -176,6 +177,26 @@ export default function AddMFAPage() {
     }
   };
 
+  const deleteMFA = async () => {
+    setLocalLoading(true);
+    setErrorCode("");
+
+    try {
+      const payload = {
+        id: phoneFormData.mfaId,
+        otpType: serverMapping[phoneFormData.otpType],
+      };
+
+      await deleteMFAPhoneNumberApi.deleteMFA(payload);
+    } catch (error) {
+      if (error && error.data && error.data.message) {
+        setErrorCode(error.data.message);
+      }
+    } finally {
+      setLocalLoading(false);
+    }
+  };
+
   useEffect(() => {
     const fetchUserOtpPhoneFactors = async () => {
       try {
@@ -268,6 +289,9 @@ export default function AddMFAPage() {
         onBack={() => {
           setErrorCode("");
           setWizardStep("addMFANumber");
+        }}
+        onUseDifferentPhoneNumber={() => {
+          deleteMFA();
         }}
       />
     ),

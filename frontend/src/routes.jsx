@@ -30,6 +30,7 @@ import Verification from "./components/Verification/Verification.jsx";
 import ChangePasswordIndex from "./features/ChangePassword/components/ChangePasswordIndex.jsx";
 import UpdateContactPhoneNumberContainer from "./features/ContactPhoneNumber/components/UpdateContactPhoneNumberContainer.jsx";
 import AddMFAPage from "./features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPage.jsx";
+import DeleteMFAPage from "./features/MFAPhoneNumber/DeleteMFAPhoneNumber/component/DeleteMFAPage.jsx";
 import { PAGES } from "./utils/constants.jsx";
 
 export const appRoutes = [
@@ -155,13 +156,26 @@ export const appRoutes = [
                   },
                   {
                     path: "manage-2fa-verifications",
-                    element: <Manage2FAVerifications />,
-                    handle: { id: PAGES.manage2FAVerifications },
-                  },
-                  {
-                    path: "add-mfa-phone-number",
-                    element: <AddMFAPage />,
-                    handle: { id: PAGES.addMFAPage },
+                    handle: {
+                      id: PAGES.manage2FAVerifications,
+                      breadcrumbId: "1",
+                    },
+                    children: [
+                      {
+                        index: true,
+                        element: <Manage2FAVerifications />,
+                      },
+                      {
+                        path: "add-mfa-phone-number",
+                        element: <AddMFAPage />,
+                        handle: { id: PAGES.addMFAPage },
+                      },
+                      {
+                        path: "delete-mfa-phone-number/:mfaId",
+                        element: <DeleteMFAPage />,
+                        handle: { id: PAGES.deleteMFAPage },
+                      },
+                    ],
                   },
                 ],
               },

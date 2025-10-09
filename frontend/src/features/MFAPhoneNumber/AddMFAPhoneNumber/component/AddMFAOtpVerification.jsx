@@ -57,6 +57,7 @@ export default function AddMFAOtpVerification({
   phoneFormData,
   errorCode,
   requestNewOtpCode,
+  onUseDifferentPhoneNumber,
 }) {
   const { language } = useParams();
 
@@ -194,8 +195,9 @@ export default function AddMFAOtpVerification({
 
       <GcdsText>
         <GcdsLink
-          onGcdsClick={() => {
+          onGcdsClick={async () => {
             clearValues();
+            await onUseDifferentPhoneNumber();
             onBack();
           }}
         >

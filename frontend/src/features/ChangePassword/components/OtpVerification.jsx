@@ -1,23 +1,23 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import {
+  GcdsButton,
   GcdsContainer,
+  GcdsErrorMessage,
+  GcdsGrid,
   GcdsHeading,
   GcdsInput,
   GcdsLink,
   GcdsNotice,
   GcdsText,
-  GcdsButton,
-  GcdsGrid,
-  GcdsErrorMessage,
 } from "@cdssnc/gcds-components-react";
-import { passwordUpdate } from "../api/passwordUpdate.jsx";
+import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 import { getPageContent } from "../../../utils/functions.jsx";
 import { path } from "../../../utils/routeHelpers.js";
-import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
+import { passwordUpdate } from "../api/passwordUpdate.jsx";
 
-import { FLOW_TYPES, PAGES } from "../../../utils/constants.jsx";
 import { useParams } from "react-router";
+import { FLOW_TYPES, PAGES } from "../../../utils/constants.jsx";
 
 import { useUser } from "../../../components/Providers/useUser.tsx";
 
@@ -115,7 +115,7 @@ export default function OtpVerification({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  const userMfaType = userSelectedMfaType.type;
+  const userMfaType = userSelectedMfaType?.type;
   const errorMessage = errorPageJson[errorCode] || "";
   return (
     <GcdsContainer>

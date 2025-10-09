@@ -48,8 +48,11 @@ export default function Manage2FAVerifications() {
           const userPhoneFactors = response.data;
           const userPhoneFactorsMap = userPhoneFactors.reduce((acc, factor) => {
             acc[factor.phoneNumber] = acc[factor.phoneNumber]
-              ? [...acc[factor.phoneNumber], factor.type]
-              : [factor.type];
+              ? {
+                  type: [...acc[factor.phoneNumber].type, factor.type],
+                  id: factor.id,
+                }
+              : { type: [factor.type], id: factor.id };
             return acc;
           }, {});
           setUserPhoneFactorsMap(userPhoneFactorsMap);
@@ -67,12 +70,14 @@ export default function Manage2FAVerifications() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const phoneFactorsComponent = Object.entries(userPhoneFactorsMap).map(
-    ([phoneNumber, factors], index) => {
-      const availableFactorsComponent = factors.map((factor, idx) => (
-        <li key={idx}>
-          <GcdsText>{availableFactorsUIContent(factor)}</GcdsText>
-        </li>
-      ));
+    ([phoneNumber, factor], index) => {
+      const availableFactorsComponent = factor?.type?.map((type, idx) => {
+        return (
+          <li key={idx}>
+            <GcdsText>{availableFactorsUIContent(type)}</GcdsText>
+          </li>
+        );
+      });
       return (
         <GcdsContainer key={index}>
           <GcdsText>
@@ -82,11 +87,11 @@ export default function Manage2FAVerifications() {
           <ul>{availableFactorsComponent}</ul>
           {Object.keys(userPhoneFactorsMap).length > 1 && (
             <GcdsLink
-              href={"#"}
+              href={path(PAGES.deleteMFAPage, {
+                language,
+                mfaId: factor.id,
+              })}
               size="regular"
-              onGcdsClick={(ev) => {
-                ev.preventDefault();
-              }}
             >
               {pageContent["9"]}
             </GcdsLink>

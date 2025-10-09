@@ -429,5 +429,17 @@
     "8": "Souhaitez-vous configurer la vérification par message texte (SMS)?",
     "9": "Oui, configurer",
     "10": "Ignorer pour l’instant"
+  },
+  "DeleteMFAPhoneNumberConfirm": {
+    "1": "Voulez-vous vraiment supprimer ce numéro?",
+    "2": "Vous ne pourrez plus utiliser le",
+    "3": "pour vous connecter.",
+    "4": "Cette action",
+    "5": "ne supprimera pas",
+    "6": "ce numéro de téléphone de vos coordonnées. Pour gérer votre numéro de téléphone de communication, rendez-vous sur la page",
+    "7": "Renseignements personnels",
+    "8": ".",
+    "9": "Oui, supprimer",
+    "10": "Annuler"
   }
 }
