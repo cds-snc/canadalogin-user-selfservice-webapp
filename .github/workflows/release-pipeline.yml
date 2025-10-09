@@ -67,7 +67,7 @@ jobs:
           workflow_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           json="{\"text\":\":hourglass: Deployments are beginning to the environments: ${{ steps.check-envs.outputs.envs }}\n\nSee details at: $workflow_url\"}"
 
-          curl -X POST -H 'Content-type: application/json' --data "$json" ${{ secrets.GC_SIGNIN_OPS_SLACK_WEBHOOK }}
+          curl -X POST -H 'Content-type: application/json' --data "$json" ${{ secrets.GC_SIGNIN_OPS_SLACK_INFO_WEBHOOK }}
 
   # Builds the frontend application for the current SHA and stores the artifact in S3.
   build-frontend:
@@ -338,7 +338,7 @@ jobs:
           workflow_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           json="{\"text\":\":white_check_mark: The deployment to the environments ${{ needs.notify-slack-about-deploy.outputs.envs }} was successful!\n\nSee details at: $workflow_url\"}"
 
-          curl -X POST -H 'Content-type: application/json' --data "$json" ${{ secrets.GC_SIGNIN_OPS_SLACK_WEBHOOK }}
+          curl -X POST -H 'Content-type: application/json' --data "$json" ${{ secrets.GC_SIGNIN_OPS_SLACK_INFO_WEBHOOK }}
 
   notify-slack-about-deploy-failure:
     runs-on: ubuntu-latest
@@ -349,4 +349,4 @@ jobs:
         run: |
           workflow_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           json="{\"text\":\":x: The deployment to the environments ${{ needs.notify-slack-about-deploy.outputs.envs }} has failed!\n\nSee details at: $workflow_url\"}"
-          curl -X POST -H 'Content-type: application/json' --data "$json" ${{ secrets.GC_SIGNIN_OPS_SLACK_WEBHOOK }}
+          curl -X POST -H 'Content-type: application/json' --data "$json" ${{ secrets.GC_SIGNIN_OPS_SLACK_ALERT_WEBHOOK }}
