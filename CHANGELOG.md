@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.3.0...v1.3.1) (2025-10-09)
+
+
+### Bug Fixes
+
+* **CI/CD:** Include application name in deployment slack notification ([#816](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/816)) ([c01a686](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/c01a6865ca5c163adfe4bc2d7aff18e64563be1a))
+
 ## [1.3.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.2.0...v1.3.0) (2025-10-09)
 
 
