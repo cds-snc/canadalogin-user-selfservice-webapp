@@ -44,7 +44,7 @@ export default function DeleteMFAPage() {
   const [errorCode, setErrorCode] = useState("");
   const errorPageJson = getPageContent(language, PAGES.error);
 
-  const [wizardStep, setWizardStep] = useState("otpSelection");
+  const [wizardStep, setWizardStep] = useState("deleteMFAPhoneNumberConfirm");
   const [localLoading, setLocalLoading] = useState(false);
   const { userProfile } = state;
   const { id } = userProfile ?? {};
