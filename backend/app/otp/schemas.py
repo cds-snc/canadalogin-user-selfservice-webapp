@@ -119,3 +119,10 @@ class OtpVerificationAttemptRequest(BaseModel):
     trxnId: str
     otp: str
     otpType: OtpType
+
+
+class OtpDeletionRequest(BaseModel):
+    """Request schema for deleting OTP enrollment"""
+
+    id: str
+    otpType: OtpType

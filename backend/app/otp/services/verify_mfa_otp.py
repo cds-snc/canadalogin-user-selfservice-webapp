@@ -12,7 +12,8 @@ from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.helpers import generate_error_response
 from app.utils.request_error_handler import RequestErrorHandler
 from app.utils.schemas import ResponseModel
-from httpx import AsyncClient
+from fastapi import HTTPException
+from httpx import AsyncClient, HTTPStatusError
 from pydantic import ValidationError
 
 logger = logging.getLogger(__name__)
@@ -119,12 +120,17 @@ async def dispatch_send_mfa_otp(
         response.raise_for_status()
         return response
 
+    except HTTPStatusError as e:
+        logger.error(f"HTTP error during {otp_type} MFA OTP verification creation: {e}")
+        return RequestErrorHandler.handle(e)
     except Exception as e:
         logger.error(
-            f"{otp_type} MFA OTP verification creation dispatch error: {str(e)}"
+            f"{otp_type} MFA OTP verification creation dispatch error: {str(e)}",
+            exc_info=True,
         )
-        RequestErrorHandler.handle(
-            e, f"{otp_type} MFA OTP verification creation dispatch"
+        # Don't expose server errors to client
+        raise HTTPException(
+            status_code=500, detail="Unable to send MFA verification code"
         )
 
 
@@ -154,10 +160,13 @@ async def dispatch_verify_mfa_otp(
         response.raise_for_status()
         return response
 
+    except HTTPStatusError as e:
+        logger.error(f"HTTP error during {otp_type} MFA OTP verification attempt: {e}")
+        return RequestErrorHandler.handle(e)
     except Exception as e:
         logger.error(
-            f"{otp_type} MFA OTP verification attempt dispatch error: {str(e)}"
+            f"{otp_type} MFA OTP verification attempt dispatch error: {str(e)}",
+            exc_info=True,
         )
-        RequestErrorHandler.handle(
-            e, f"{otp_type} MFA OTP verification attempt dispatch"
-        )
+        # Don't expose server errors to client
+        raise HTTPException(status_code=500, detail="Unable to verify MFA code")
