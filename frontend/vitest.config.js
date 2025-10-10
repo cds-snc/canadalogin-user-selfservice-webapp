@@ -43,7 +43,6 @@ export default defineConfig({
       "src/**/*.test.{js,jsx,ts,tsx}",
       "src/**/*.spec.{js,jsx,ts,tsx}",
       "src/**/__tests__/**/*.{js,jsx,ts,tsx}",
-      // "!src/__tests__/testSuite.tsx",
     ],
     exclude: [
       ...filesToExclude,
