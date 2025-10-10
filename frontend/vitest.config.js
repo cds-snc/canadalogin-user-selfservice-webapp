@@ -36,6 +36,7 @@ export default defineConfig({
       "src/__tests__/**/*.spec.{js,jsx,ts,tsx}",
       "src/**/*.test.{js,jsx,ts,tsx}",
       "src/**/*.spec.{js,jsx,ts,tsx}",
+      "src/**/__tests__/**/*.{js,jsx,ts,tsx}",
     ],
     exclude: [
       ...filesToExclude,
@@ -43,12 +44,6 @@ export default defineConfig({
       "**/dist/**",
       "**/.{idea,git,cache,output,temp}/**",
       "**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*",
-      // Additional explicit exclusions for story files
-      "**/src/stories/**/*",
-      "**/*.stories.js",
-      "**/*.stories.jsx",
-      "**/*.stories.ts",
-      "**/*.stories.tsx",
     ],
     coverage: {
       reporter: ["text", "json-summary", "json", "html"],
