@@ -18,6 +18,9 @@ const filesToExclude = [
   "**/*.test.stories.*",
   "**/*.spec.stories.*",
   "**/node_modules/**",
+  "**/src/stories/Tests/Manage/ProfileUpdateName.test.stories.jsx",
+  "**/src/stories/Tests/Manage/ProfileUpdateNameConfirmUpdate.test.stories.jsx",
+  "**/src/stories/Tests/Manage/ProfileUpdateNameSuccess.test.stories.jsx",
 ];
 export default defineConfig({
   plugins: [react()],
