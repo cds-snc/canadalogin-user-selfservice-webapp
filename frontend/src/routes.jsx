@@ -19,13 +19,14 @@ import EnterNewEmail from "./components/Manage/EnterNewEmail.jsx";
 import FirstVerifyItsYou from "./components/Manage/FirstVerifyItsYou.jsx";
 import ManageDashboard from "./components/Manage/ManageDashboard.jsx";
 import ProfileHome from "./components/Manage/ProfileHome.jsx";
-import ProfileUpdateNameConfirmUpdate from "./components/Manage/ProfileUpdateNameConfirmUpdate.jsx";
-import ProfileUpdateNameSuccess from "./components/Manage/ProfileUpdateNameSuccess.jsx";
+
+import ProfileUpdateNameConfirmUpdate from "./features/ProfileName/components/ConfirmUpdate.jsx";
+import ProfileUpdateNameSuccess from "./features/ProfileName/components/SuccessfullyUpdated.jsx";
 import ProfileYouMayUpdateLanguage from "./components/Manage/ProfileYouMayUpdateLanguage.jsx";
 import Manage2FAVerifications from "./components/Manage/SecuritySettings/Manage2FAVerifications.jsx";
 import SecuritySettings from "./components/Manage/SecuritySettings/SecuritySettings.jsx";
 import YouMayUpdateEmailAtOtherPlaces from "./components/Manage/YouMayUpdateEmailAtOtherPlaces.jsx";
-import ProfileUpdateName from "./components/PersonalInfo/ProfileUpdateName.jsx";
+import ProfileUpdateName from "./features/ProfileName/components/ProfileUpdateName.jsx";
 import Verification from "./components/Verification/Verification.jsx";
 import ChangePasswordIndex from "./features/ChangePassword/components/ChangePasswordIndex.jsx";
 import UpdateContactPhoneNumberContainer from "./features/ContactPhoneNumber/components/UpdateContactPhoneNumberContainer.jsx";

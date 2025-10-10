@@ -1,0 +1,75 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`UpdateProfileName Component > matches snapshot 1`] = `
+<div>
+  <div>
+    <h1
+      tag="h1"
+    >
+      Edit your name
+    </h1>
+    <p>
+      This will update your name with
+       
+      <strong>
+        every service you have shared your name with through GC Sign in.
+      </strong>
+    </p>
+    <div
+      data-testid="services-with-access-info"
+    >
+      <p>
+        Mocked Services Info Section
+      </p>
+      <ul>
+        <li>
+          Test content for item 3
+        </li>
+      </ul>
+    </div>
+    <form
+      id="form"
+      style="margin-top: 38px;"
+    >
+      <div
+        style="margin-bottom: 0px;"
+      >
+        <input
+          data-testid="givenName"
+          id="givenName"
+          label="First name"
+          lang="en"
+          name="givenName"
+          type="text"
+          validateon="other"
+        />
+        <input
+          data-testid="familyName"
+          id="familyName"
+          label="Last name"
+          lang="en"
+          name="familyName"
+          required=""
+          type="text"
+          validateon="other"
+        />
+      </div>
+      <div
+        columns="max-content max-content"
+        gap="200"
+      >
+        <button
+          type="submit"
+        >
+          Continue
+        </button>
+        <button
+          data-button-role="secondary"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+`;

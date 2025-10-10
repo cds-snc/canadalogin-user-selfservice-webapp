@@ -18,6 +18,13 @@ const filesToExclude = [
   "**/*.test.stories.*",
   "**/*.spec.stories.*",
   "**/node_modules/**",
+  // Specifically exclude only the Tests/Manage directory
+  "**/src/stories/Tests/Manage/**",
+  "**/src/stories/Tests/Manage/*.jsx",
+  "**/src/stories/Tests/Manage/*.js",
+  "**/src/stories/Tests/Manage/*.ts",
+  "**/src/stories/Tests/Manage/*.tsx",
+  "**/src/__tests__/testSuite.tsx",
 ];
 export default defineConfig({
   plugins: [react()],
@@ -35,6 +42,7 @@ export default defineConfig({
       "src/__tests__/**/*.spec.{js,jsx,ts,tsx}",
       "src/**/*.test.{js,jsx,ts,tsx}",
       "src/**/*.spec.{js,jsx,ts,tsx}",
+      "src/**/__tests__/**/*.{js,jsx,ts,tsx}",
     ],
     exclude: [
       ...filesToExclude,

@@ -18,7 +18,11 @@ export default defineWorkspace([
     plugins: [
       // The plugin will run tests for the stories defined in your Storybook config
       // See options at: https://storybook.js.org/docs/writing-tests/test-addon#storybooktest
-      storybookTest({ configDir: path.join(dirname, ".storybook") }),
+      storybookTest({
+        configDir: path.join(dirname, ".storybook"),
+        // Exclude the Tests/Manage directory from being processed by the plugin
+        exclude: ["**/src/stories/Tests/Manage/**", "**/Tests/Manage/**"],
+      }),
     ],
     test: {
       name: "storybook",
@@ -29,6 +33,7 @@ export default defineWorkspace([
         instances: [{ browser: "chromium" }],
       },
       setupFiles: [".storybook/vitest.setup.js"],
+      exclude: ["src/stories/Tests/Manage/**"],
     },
   },
 ]);

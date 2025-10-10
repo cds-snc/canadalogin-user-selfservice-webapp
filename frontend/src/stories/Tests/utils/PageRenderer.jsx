@@ -8,8 +8,8 @@ import CheckYourEmail from "../../../components/Manage/CheckYourEmail.jsx";
 import CompleteTwoStepVerification from "../../../components/Manage/CompleteTwoStepVerification.jsx";
 import FirstVerifyItsYou from "../../../components/Manage/FirstVerifyItsYou.jsx";
 import EnterNewEmail from "../../../components/Manage/EnterNewEmail.jsx";
-import ProfileUpdateNameSuccess from "../../../components/Manage/ProfileUpdateNameSuccess.jsx";
-import ProfileUpdateNameConfirmUpdate from "../../../components/Manage/ProfileUpdateNameConfirmUpdate.jsx";
+import ProfileUpdateNameSuccess from "../../../features/ProfileName/components/SuccessfullyUpdated.jsx";
+import ProfileUpdateNameConfirmUpdate from "../../../features/ProfileName/components/ConfirmUpdate.jsx";
 import AreYouSureUpdateContactNumber from "../../../components/Manage/AreYouSureUpdateContactNumber.jsx";
 import EnterNewPhoneNumber from "../../../components/Manage/EnterNewPhoneNumber.jsx";
 import YouMayUpdateEmailAtOtherPlaces from "../../../components/Manage/YouMayUpdateEmailAtOtherPlaces.jsx";
@@ -19,7 +19,7 @@ import Manage2FAVerifications from "../../../components/Manage/SecuritySettings/
 import EditLanguagePreferences from "../../../components/Manage/EditLanguagePreferences.jsx";
 import AreYouSureEditYourLanguage from "../../../components/Manage/AreYouSureEditYourLanguage.jsx";
 import ProfileYouMayUpdateLanguage from "../../../components/Manage/ProfileYouMayUpdateLanguage.jsx";
-import ProfileUpdateName from "../../../components/PersonalInfo/ProfileUpdateName.jsx";
+import ProfileUpdateName from "../../../features/ProfileName/components/ProfileUpdateName.jsx";
 import Verification from "../../../components/Verification/Verification.jsx";
 
 // Storybook Page Renderer - maps page names to components for testing
@@ -37,12 +37,12 @@ const PageRenderer = ({ page }) => {
       return <FirstVerifyItsYou />;
     case PAGES.EnterNewEmail:
       return <EnterNewEmail />;
-    case PAGES.profileUpdateNameSuccess:
-      return <ProfileUpdateNameSuccess />;
-    case PAGES.profileUpdateNameConfirmUpdate:
-      return <ProfileUpdateNameConfirmUpdate />;
-    case PAGES.profileUpdateName:
-      return <ProfileUpdateName />;
+    // case PAGES.profileUpdateNameSuccess:
+    //   return <ProfileUpdateNameSuccess />;
+    // case PAGES.profileUpdateNameConfirmUpdate:
+    //   return <ProfileUpdateNameConfirmUpdate />;
+    // case PAGES.profileUpdateName:
+    //   return <ProfileUpdateName />;
     case PAGES.areYouSureUpdateContactNumber:
       return <AreYouSureUpdateContactNumber />;
     case PAGES.enterNewPhoneNumber:
