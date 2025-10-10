@@ -1,4 +1,4 @@
-import { useParams } from "react-router";
+import React, { useParams } from "react-router";
 import {
   GcdsContainer,
   GcdsHeading,
