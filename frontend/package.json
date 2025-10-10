@@ -54,7 +54,6 @@
     "@vitejs/plugin-react": "^4.4.1",
     "@vitest/browser": "^3.1.2",
     "@vitest/coverage-istanbul": "^3.1.2",
-    "@vitest/ui": "^3.2.4",
     "axios": "^1.8.4",
     "eslint": "^9.25.1",
     "eslint-config-prettier": "^10.1.8",
