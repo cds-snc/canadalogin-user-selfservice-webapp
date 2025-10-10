@@ -276,21 +276,21 @@ export default function AddMFAPage() {
         phoneFormData={phoneFormData}
         onChangePhoneForm={handlePhoneForm}
         errorCode={errorCode}
-        onNext={() => {
-          verifyMFAOtp();
+        onNext={async () => {
+          await verifyMFAOtp();
         }}
         onCancel={async () => {
           await navigateHelper(backToManage2FAVerificationsPage);
         }}
-        requestNewOtpCode={() => {
-          sendMFAOtp({ reSendOtpCode: true });
+        requestNewOtpCode={async () => {
+          await sendMFAOtp({ reSendOtpCode: true });
         }}
         onBack={() => {
           setErrorCode("");
           setWizardStep("addMFANumber");
         }}
-        onUseDifferentPhoneNumber={() => {
-          deleteMFA();
+        onUseDifferentPhoneNumber={async () => {
+          await deleteMFA();
         }}
       />
     ),

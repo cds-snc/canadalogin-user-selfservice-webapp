@@ -52,7 +52,7 @@ export default function Manage2FAVerifications() {
                   ...acc[factor.phoneNumber],
                   { type: factor.type, id: factor.id },
                 ]
-              : [{ type: [factor.type], id: factor.id }];
+              : [{ type: factor.type, id: factor.id }];
             return acc;
           }, {});
           setUserPhoneFactorsMap(userPhoneFactorsMap);

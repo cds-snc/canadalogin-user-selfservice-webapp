@@ -6,7 +6,7 @@ import { SUBMIT_END_POINTS } from "../../../../utils/constants.jsx";
 axios.defaults.withCredentials = true;
 
 export const deleteMFAPhoneNumberApi = {
-  // Delete an MFA OTP  phone number
+  // Delete an MFA OTP phone number
   deleteMFA: async ({ id, otpType }) => {
     try {
       const response = await axios.delete(

@@ -78,7 +78,11 @@ export default function DeleteMFAPage() {
       (factor) => factor.type === mfaType,
     );
 
-    if (selectedMfaType.type && selectedMfaType.phoneNumber) {
+    if (
+      selectedMfaType &&
+      selectedMfaType.type &&
+      selectedMfaType.phoneNumber
+    ) {
       setUserSelectedMfaType(selectedMfaType);
     }
   };
@@ -95,14 +99,14 @@ export default function DeleteMFAPage() {
     setErrorCode("");
 
     try {
-      for (const mfaFactor of phoneFormData.mfaFactorsToDelete) {
-        const payload = {
-          id: mfaFactor.id,
-          otpType: serverMapping[mfaFactor.type],
-        };
-
-        await deleteMFAPhoneNumberApi.deleteMFA(payload);
-      }
+      await Promise.all(
+        phoneFormData.mfaFactorsToDelete.map((mfaFactor) =>
+          deleteMFAPhoneNumberApi.deleteMFA({
+            id: mfaFactor.id,
+            otpType: serverMapping[mfaFactor.type],
+          }),
+        ),
+      );
     } catch (error) {
       if (error && error.data && error.data.message) {
         setErrorCode(error.data.message);
@@ -160,7 +164,7 @@ export default function DeleteMFAPage() {
 
     fetchUserOtpPhoneFactors();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phoneFormData.trxnId, factorIds]);
+  }, [factorIds]);
 
   const steps = {
     otpSelection: (
@@ -192,8 +196,12 @@ export default function DeleteMFAPage() {
     deleteMFAPhoneNumberConfirm: (
       <DeleteMFAPhoneNumberConfirm
         onNext={async () => {
-          await deleteMFA();
-          await navigateHelper(backToManage2FAVerificationsPage);
+          try {
+            await deleteMFA();
+            await navigateHelper(backToManage2FAVerificationsPage);
+          } catch (error) {
+            setErrorCode(error?.message || "Unexpected API request error");
+          }
         }}
         onCancel={async () =>
           await navigateHelper(backToManage2FAVerificationsPage)
