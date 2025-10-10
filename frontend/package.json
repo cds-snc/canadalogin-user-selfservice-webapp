@@ -17,8 +17,6 @@
     "pre-push": "./.githooks/pre-push",
     "prepare": "husky",
     "test": "npm run install-playwright && vitest --coverage",
-    "test:coverage": "vitest --coverage",
-    "vitest": "vitest",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "install-playwright": "npx playwright install-deps && npx playwright install"
