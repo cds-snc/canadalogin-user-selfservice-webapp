@@ -347,64 +347,64 @@ export function UserProvider({
     }
   };
 
-  // useEventSourceListener(
-  //   eventSource,
-  //   ["expired", "error", "notification", "terminated"],
-  //   (event) => {
-  //     if (event.type === "expired") {
-  //       // Session expired - proceed with logout button
-  //       if (eventSource) eventSource.close();
-  //       clearTimers();
-  //     }
-  //     if (event.type === "terminated") {
-  //       // Handle backchannel logout
-  //       console.log("Session terminated by backchannel logout");
-  //       userDispatch({
-  //         type: CONTEXT_ACTIONS.set_loading,
-  //         payload: { isLoading: true, text: pageContentJson["7"] },
-  //       });
-  //       // Redirect after backchannel logout with a slight delay to show loading message
-  //       setTimeout(() => {
-  //         window.location.href = "/";
-  //       }, 2000);
-  //     }
-  //     if (event.type === "error") {
-  //       // for debugging purpose. No need to handle it.
-  //       console.error("SSE error:", event.data);
-  //     }
-  //     if (event.type === "notification") {
-  //       // Parse the event data and check status
-  //       try {
-  //         const eventData = JSON.parse(event.data);
-  //         console.debug("SSE notification:", eventData);
+  useEventSourceListener(
+    eventSource,
+    ["expired", "error", "notification", "terminated"],
+    (event) => {
+      if (event.type === "expired") {
+        // Session expired - proceed with logout button
+        if (eventSource) eventSource.close();
+        clearTimers();
+      }
+      if (event.type === "terminated") {
+        // Handle backchannel logout
+        console.log("Session terminated by backchannel logout");
+        userDispatch({
+          type: CONTEXT_ACTIONS.set_loading,
+          payload: { isLoading: true, text: pageContentJson["7"] },
+        });
+        // Redirect after backchannel logout with a slight delay to show loading message
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 2000);
+      }
+      if (event.type === "error") {
+        // for debugging purpose. No need to handle it.
+        console.error("SSE error:", event.data);
+      }
+      if (event.type === "notification") {
+        // Parse the event data and check status
+        try {
+          const eventData = JSON.parse(event.data);
+          console.debug("SSE notification:", eventData);
 
-  //         if (eventData.status === "active" && eventData.expire) {
-  //           // Reset timers when receiving active status with new expire time
-  //           console.debug(
-  //             "SSE notification: resetting session timers based on new expire time",
-  //             eventData.expire,
-  //           );
-  //           sessionTimeoutDispatch({
-  //             type: CONTEXT_ACTIONS.reset_expire_time,
-  //             payload: eventData.expire,
-  //           });
-  //         } else {
-  //           console.log(
-  //             "SSE notification: status not active or missing expire time",
-  //             eventData,
-  //           );
-  //         }
-  //       } catch (error) {
-  //         console.error(
-  //           "Error parsing SSE notification data:",
-  //           error,
-  //           event.data,
-  //         );
-  //       }
-  //     }
-  //   },
-  //   [sessionTimeoutDispatch], // Dependencies for the listener callback
-  // );
+          if (eventData.status === "active" && eventData.expire) {
+            // Reset timers when receiving active status with new expire time
+            console.debug(
+              "SSE notification: resetting session timers based on new expire time",
+              eventData.expire,
+            );
+            sessionTimeoutDispatch({
+              type: CONTEXT_ACTIONS.reset_expire_time,
+              payload: eventData.expire,
+            });
+          } else {
+            console.log(
+              "SSE notification: status not active or missing expire time",
+              eventData,
+            );
+          }
+        } catch (error) {
+          console.error(
+            "Error parsing SSE notification data:",
+            error,
+            event.data,
+          );
+        }
+      }
+    },
+    [sessionTimeoutDispatch], // Dependencies for the listener callback
+  );
 
   useEffect(() => {
     const getRelyingPartyInfo = async () => {
