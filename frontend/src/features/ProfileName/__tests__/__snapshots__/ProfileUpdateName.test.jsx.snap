@@ -37,14 +37,21 @@ exports[`UpdateProfileName Component > matches snapshot 1`] = `
         <input
           data-testid="givenName"
           id="givenName"
+          label="First name"
+          lang="en"
           name="givenName"
           type="text"
+          validateon="other"
         />
         <input
           data-testid="familyName"
           id="familyName"
+          label="Last name"
+          lang="en"
           name="familyName"
+          required=""
           type="text"
+          validateon="other"
         />
       </div>
       <div

@@ -47,7 +47,7 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
       className={className}
     />
   ),
-  GcdsInput: ({ inputId, validateOn, label, lang, required, ...props }) => {
+  GcdsInput: ({ inputId, ...props }) => {
     const { name, type, value, onChange, ...domProps } = props;
     return (
       <input

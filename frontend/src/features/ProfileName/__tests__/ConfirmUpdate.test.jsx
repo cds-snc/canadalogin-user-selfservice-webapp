@@ -132,9 +132,7 @@ vi.mock("../../../utils/constants.jsx", async (importOriginal) => {
 
 vi.mock("@cdssnc/gcds-components-react", () => ({
   GcdsContainer: ({ children, ...props }) => <div {...props}>{children}</div>,
-  GcdsGrid: ({ children, columns, gap, ...props }) => (
-    <div {...props}>{children}</div>
-  ),
+  GcdsGrid: ({ children, ...props }) => <div {...props}>{children}</div>,
   GcdsHeading: ({ children, tag, ...props }) => {
     const Component = tag || "h1";
     return React.createElement(Component, props, children);
