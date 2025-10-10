@@ -19,6 +19,7 @@ const filesToExclude = [
   "**/*.spec.stories.*",
   "**/node_modules/**",
 ];
+
 export default defineConfig({
   plugins: [react()],
   preview: {
@@ -42,6 +43,12 @@ export default defineConfig({
       "**/dist/**",
       "**/.{idea,git,cache,output,temp}/**",
       "**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*",
+      // Additional explicit exclusions for story files
+      "**/src/stories/**/*",
+      "**/*.stories.js",
+      "**/*.stories.jsx",
+      "**/*.stories.ts",
+      "**/*.stories.tsx",
     ],
     coverage: {
       reporter: ["text", "json-summary", "json", "html"],
