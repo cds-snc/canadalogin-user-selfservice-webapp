@@ -8,30 +8,27 @@ import {
   StepupPrivateRoute,
 } from "./components/Providers/PrivateRoute.jsx";
 import { UserProvider } from "./components/Providers/UserProvider";
-import { LanguageProvider } from "./components/Providers/LanguageProvider";
-import { AppLanguageSetup } from "./components/Providers/AppLanguageSetup";
 
-import ManageDashboard from "./components/Manage/ManageDashboard.jsx";
-import Verification from "./components/Verification/Verification.jsx";
-import ChangePasswordIndex from "./features/ChangePassword/components/ChangePasswordIndex.jsx";
-import ProfileUpdateName from "./features/ProfileName/components/ProfileUpdateName.jsx";
-import ProfileHome from "./components/Manage/ProfileHome.jsx";
+import AreYouSureEditYourLanguage from "./components/Manage/AreYouSureEditYourLanguage.jsx";
+import AreYouSureUpdateContactNumber from "./components/Manage/AreYouSureUpdateContactNumber.jsx";
+import AreYouSureUpdateYourEmail from "./components/Manage/AreYouSureUpdateYourEmail.jsx";
 import CheckYourEmail from "./components/Manage/CheckYourEmail.jsx";
 import CompleteTwoStepVerification from "./components/Manage/CompleteTwoStepVerification.jsx";
 import EditLanguagePreferences from "./components/Manage/EditLanguagePreferences.jsx";
 import EnterNewEmail from "./components/Manage/EnterNewEmail.jsx";
 import FirstVerifyItsYou from "./components/Manage/FirstVerifyItsYou.jsx";
-import EnterNewEmail from "./components/Manage/EnterNewEmail.jsx";
-import ProfileUpdateNameSuccess from "./features/ProfileName/components/SuccessfullyUpdated.jsx";
-import AreYouSureUpdateContactNumber from "./components/Manage/AreYouSureUpdateContactNumber.jsx";
-import YouMayUpdateEmailAtOtherPlaces from "./components/Manage/YouMayUpdateEmailAtOtherPlaces.jsx";
-import AreYouSureUpdateYourEmail from "./components/Manage/AreYouSureUpdateYourEmail.jsx";
-import SecuritySettings from "./components/Manage/SecuritySettings/SecuritySettings.jsx";
-import EditLanguagePreferences from "./components/Manage/EditLanguagePreferences.jsx";
-import AreYouSureEditYourLanguage from "./components/Manage/AreYouSureEditYourLanguage.jsx";
-import ProfileYouMayUpdateLanguage from "./components/Manage/ProfileYouMayUpdateLanguage.jsx";
-import { PAGES } from "./utils/constants.jsx";
+import ManageDashboard from "./components/Manage/ManageDashboard.jsx";
+import ProfileHome from "./components/Manage/ProfileHome.jsx";
+
 import ProfileUpdateNameConfirmUpdate from "./features/ProfileName/components/ConfirmUpdate.jsx";
+import ProfileUpdateNameSuccess from "./features/ProfileName/components/SuccessfullyUpdated.jsx";
+import ProfileYouMayUpdateLanguage from "./components/Manage/ProfileYouMayUpdateLanguage.jsx";
+import Manage2FAVerifications from "./components/Manage/SecuritySettings/Manage2FAVerifications.jsx";
+import SecuritySettings from "./components/Manage/SecuritySettings/SecuritySettings.jsx";
+import YouMayUpdateEmailAtOtherPlaces from "./components/Manage/YouMayUpdateEmailAtOtherPlaces.jsx";
+import ProfileUpdateName from "./features/ProfileName/components/ProfileUpdateName.jsx";
+import Verification from "./components/Verification/Verification.jsx";
+import ChangePasswordIndex from "./features/ChangePassword/components/ChangePasswordIndex.jsx";
 import UpdateContactPhoneNumberContainer from "./features/ContactPhoneNumber/components/UpdateContactPhoneNumberContainer.jsx";
 import AddMFAPage from "./features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPage.jsx";
 import { PAGES } from "./utils/constants.jsx";
