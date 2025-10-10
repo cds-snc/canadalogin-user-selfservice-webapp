@@ -37,12 +37,12 @@ const PageRenderer = ({ page }) => {
       return <FirstVerifyItsYou />;
     case PAGES.EnterNewEmail:
       return <EnterNewEmail />;
-    case PAGES.profileUpdateNameSuccess:
-      return <ProfileUpdateNameSuccess />;
-    case PAGES.profileUpdateNameConfirmUpdate:
-      return <ProfileUpdateNameConfirmUpdate />;
-    case PAGES.profileUpdateName:
-      return <ProfileUpdateName />;
+    // case PAGES.profileUpdateNameSuccess:
+    //   return <ProfileUpdateNameSuccess />;
+    // case PAGES.profileUpdateNameConfirmUpdate:
+    //   return <ProfileUpdateNameConfirmUpdate />;
+    // case PAGES.profileUpdateName:
+    //   return <ProfileUpdateName />;
     case PAGES.areYouSureUpdateContactNumber:
       return <AreYouSureUpdateContactNumber />;
     case PAGES.enterNewPhoneNumber:
