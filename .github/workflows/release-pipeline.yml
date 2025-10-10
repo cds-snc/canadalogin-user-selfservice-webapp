@@ -68,7 +68,7 @@ jobs:
           workflow_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           json='{"text":":hourglass: '"${{ env.SLACK_NOTIFICATION_APPLICATION_NAME }}"' is being deployed to the following environments: `'"${{ needs.notify-slack-about-deploy.outputs.envs }}"'`\n\n<'"$workflow_url"'|Click for more details>"}'
 
-          curl -X POST -H 'Content-type: application/json' --data "$json" ${{ secrets.GC_SIGNIN_OPS_SLACK_INFO_WEBHOOK }} -v
+          curl -X POST -H 'Content-type: application/json' --data "$json" ${{ secrets.GC_SIGNIN_OPS_SLACK_INFO_WEBHOOK }}
 
   # Builds the frontend application for the current SHA and stores the artifact in S3.
   build-frontend:
