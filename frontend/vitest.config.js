@@ -18,6 +18,12 @@ const filesToExclude = [
   "**/*.test.stories.*",
   "**/*.spec.stories.*",
   "**/node_modules/**",
+  // Specifically exclude only the Tests/Manage directory
+  "**/src/stories/Tests/Manage/**",
+  "**/src/stories/Tests/Manage/*.jsx",
+  "**/src/stories/Tests/Manage/*.js",
+  "**/src/stories/Tests/Manage/*.ts",
+  "**/src/stories/Tests/Manage/*.tsx",
   "**/ProfileUpdateName.test.stories.jsx",
   "**/ProfileUpdateNameConfirmUpdate.test.stories.jsx",
   "**/ProfileUpdateNameSuccess.test.stories.jsx",
