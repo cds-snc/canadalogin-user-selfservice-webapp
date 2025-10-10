@@ -66,7 +66,7 @@ jobs:
         if: steps.check-envs.outputs.envs != ''
         run: |
           workflow_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          json="{\"text\":\":hourglass: $SLACK_NOTIFICATION_APPLICATION_NAME is being deployed to the following environments: `${{ steps.check-envs.outputs.envs }}`\n\n<$workflow_url|Click for more details>\"}"
+          json="{\"text\":\":hourglass: ${{ env.SLACK_NOTIFICATION_APPLICATION_NAME }} is being deployed to the following environments: `${{ steps.check-envs.outputs.envs }}`\n\n<$workflow_url|Click for more details>\"}"
 
           curl -X POST -H 'Content-type: application/json' --data "$json" ${{ secrets.GC_SIGNIN_OPS_SLACK_INFO_WEBHOOK }}
 
@@ -337,7 +337,7 @@ jobs:
       - name: Notify slack about successful Deployments
         run: |
           workflow_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          json="{\"text\":\":white_check_mark: $SLACK_NOTIFICATION_APPLICATION_NAME has been successfully deployed to the following environments: `${{ needs.notify-slack-about-deploy.outputs.envs }}`!\n\n<$workflow_url|Click for more details>\"}"
+          json="{\"text\":\":white_check_mark: ${{ env.SLACK_NOTIFICATION_APPLICATION_NAME }} has been successfully deployed to the following environments: `${{ needs.notify-slack-about-deploy.outputs.envs }}`!\n\n<$workflow_url|Click for more details>\"}"
 
           curl -X POST -H 'Content-type: application/json' --data "$json" ${{ secrets.GC_SIGNIN_OPS_SLACK_INFO_WEBHOOK }}
 
@@ -349,5 +349,5 @@ jobs:
       - name: Notify slack about failed Deployments
         run: |
           workflow_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          json="{\"text\":\":x: $SLACK_NOTIFICATION_APPLICATION_NAME FAILED to deploy to the following environments: `${{ needs.notify-slack-about-deploy.outputs.envs }}`!\n\n<$workflow_url|Click for more details>\"}"
+          json="{\"text\":\":x: ${{ env.SLACK_NOTIFICATION_APPLICATION_NAME }} FAILED to deploy to the following environments: `${{ needs.notify-slack-about-deploy.outputs.envs }}`!\n\n<$workflow_url|Click for more details>\"}"
           curl -X POST -H 'Content-type: application/json' --data "$json" ${{ secrets.GC_SIGNIN_OPS_SLACK_ALERT_WEBHOOK }}
