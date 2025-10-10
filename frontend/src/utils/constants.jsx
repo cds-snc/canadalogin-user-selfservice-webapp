@@ -97,6 +97,8 @@ export const PAGES = {
   addSecondMFA: "AddSecondMFA",
   addSecondMFAVoiceCall: "AddSecondMFAVoiceCall",
   addSecondMFATextMessage: "AddSecondMFATextMessage",
+  deleteMFAPage: "DeleteMFAPage",
+  deleteMFAPhoneNumberConfirm: "DeleteMFAPhoneNumberConfirm",
 };
 
 export const FOOTERS = {
@@ -133,6 +135,7 @@ export const SUBMIT_END_POINTS = {
   mfaEnroll: "/v1/otp/mfa/enroll",
   mfaSend: "/v1/otp/mfa/send",
   mfaVerify: "/v1/otp/mfa/verify",
+  mfaDelete: "/v1/otp/mfa/delete",
   profile: "/v1/users/profile",
   rp_info: "/v1/users/rp_info",
   users: "/v1/users",

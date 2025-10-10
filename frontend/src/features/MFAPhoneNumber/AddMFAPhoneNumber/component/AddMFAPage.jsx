@@ -10,6 +10,7 @@ import { path } from "../../../../utils/routeHelpers";
 import { otpFactors } from "../../../ChangePassword/api/otpFactors";
 import OtpSelection from "../../../ChangePassword/components/OtpSelection";
 import OtpVerification from "../../../ChangePassword/components/OtpVerification";
+import { deleteMFAPhoneNumberApi } from "../../DeleteMFAPhoneNumber/api/DeleteMFAPhoneNumberAPI";
 import { addMFAPhoneNumberApi } from "../api/AddMFAPhoneNumberAPI";
 import AddMFAOtpVerification from "./AddMFAOtpVerification";
 import AddMFAPhoneNumber from "./AddMFAPhoneNumber";
@@ -46,7 +47,7 @@ export default function AddMFAPage() {
   const [errorCode, setErrorCode] = useState("");
   const errorPageJson = getPageContent(language, PAGES.error);
 
-  const [wizardStep, setWizardStep] = useState("otpSelection");
+  const [wizardStep, setWizardStep] = useState("addMFANumber");
   const [localLoading, setLocalLoading] = useState(false);
   const { userProfile } = state;
   const { id } = userProfile ?? {};
@@ -147,7 +148,6 @@ export default function AddMFAPage() {
 
   const verifyMFAOtp = async () => {
     try {
-      setLocalLoading(true);
       const payload = {
         id: phoneFormData.mfaId,
         otp: phoneFormData.otp,
@@ -162,11 +162,29 @@ export default function AddMFAPage() {
           visibleDigits in userPhoneFactorsMap &&
           userPhoneFactorsMap[visibleDigits].length >= 2
         ) {
-          navigateHelper(backToManage2FAVerificationsPage);
+          await navigateHelper(backToManage2FAVerificationsPage);
         } else {
           setWizardStep("addSecondMFA");
         }
       }
+    } catch (error) {
+      if (error && error.data && error.data.message) {
+        setErrorCode(error.data.message);
+      }
+    }
+  };
+
+  const deleteMFA = async () => {
+    setLocalLoading(true);
+    setErrorCode("");
+
+    try {
+      const payload = {
+        id: phoneFormData.mfaId,
+        otpType: serverMapping[phoneFormData.otpType],
+      };
+
+      await deleteMFAPhoneNumberApi.deleteMFA(payload);
     } catch (error) {
       if (error && error.data && error.data.message) {
         setErrorCode(error.data.message);
@@ -198,7 +216,7 @@ export default function AddMFAPage() {
           }, {});
           setUserPhoneFactorsMap(userPhoneFactorsMap);
         } else {
-          navigateHelper(backToSecuritySettingsPage);
+          await navigateHelper(backToSecuritySettingsPage);
         }
       } catch (err) {
         console.error("Error fetching user OTP phone factors:", err);
@@ -245,7 +263,9 @@ export default function AddMFAPage() {
             mfaId: enrollMfaResponse?.data?.id,
           });
         }}
-        onCancel={() => navigateHelper(backToManage2FAVerificationsPage)}
+        onCancel={async () =>
+          await navigateHelper(backToManage2FAVerificationsPage)
+        }
         onChangePhoneForm={handlePhoneForm}
         phoneFormData={phoneFormData}
       />
@@ -256,18 +276,21 @@ export default function AddMFAPage() {
         phoneFormData={phoneFormData}
         onChangePhoneForm={handlePhoneForm}
         errorCode={errorCode}
-        onNext={() => {
-          verifyMFAOtp();
+        onNext={async () => {
+          await verifyMFAOtp();
         }}
-        onCancel={() => {
-          navigateHelper(backToManage2FAVerificationsPage);
+        onCancel={async () => {
+          await navigateHelper(backToManage2FAVerificationsPage);
         }}
-        requestNewOtpCode={() => {
-          sendMFAOtp({ reSendOtpCode: true });
+        requestNewOtpCode={async () => {
+          await sendMFAOtp({ reSendOtpCode: true });
         }}
         onBack={() => {
           setErrorCode("");
           setWizardStep("addMFANumber");
+        }}
+        onUseDifferentPhoneNumber={async () => {
+          await deleteMFA();
         }}
       />
     ),

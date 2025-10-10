@@ -105,7 +105,7 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
 
     // Wait for component to update after API call
     await waitFor(() => {
-      expect(getByText("+1 5551234567")).toBeInTheDocument();
+      expect(getByText("5551234567")).toBeInTheDocument();
       expect(getByText("Text message (SMS)")).toBeInTheDocument();
       expect(getByText("Add phone number")).toBeInTheDocument();
     });
@@ -123,7 +123,7 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
     const { getByText } = render(<Manage2FAVerifications />);
 
     await waitFor(() => {
-      expect(getByText("+1 5551234567")).toBeInTheDocument();
+      expect(getByText("5551234567")).toBeInTheDocument();
       expect(getByText("Text message (SMS)")).toBeInTheDocument();
       expect(getByText("Voice call")).toBeInTheDocument();
     });
@@ -143,9 +143,9 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
     const { getByText } = render(<Manage2FAVerifications />);
 
     await waitFor(() => {
-      expect(getByText("+1 5551234567")).toBeInTheDocument();
-      expect(getByText("+1 5559876543")).toBeInTheDocument();
-      expect(getByText("+1 5555555555")).toBeInTheDocument();
+      expect(getByText("5551234567")).toBeInTheDocument();
+      expect(getByText("5559876543")).toBeInTheDocument();
+      expect(getByText("5555555555")).toBeInTheDocument();
     });
   });
 
@@ -158,7 +158,7 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
     const { getByText, queryByText } = render(<Manage2FAVerifications />);
 
     await waitFor(() => {
-      expect(getByText("+1 5551234567")).toBeInTheDocument();
+      expect(getByText("5551234567")).toBeInTheDocument();
       expect(getByText("Voice call")).toBeInTheDocument();
       expect(queryByText("Text message (SMS)")).not.toBeInTheDocument();
     });
@@ -173,7 +173,7 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
     const { getByText } = render(<Manage2FAVerifications />);
 
     await waitFor(() => {
-      expect(getByText("+1 5551234567")).toBeInTheDocument();
+      expect(getByText("5551234567")).toBeInTheDocument();
       expect(getByText("unknown_type")).toBeInTheDocument();
       // Should still display the phone number even with unknown type
     });
@@ -188,8 +188,8 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
     const { getByText } = render(<Manage2FAVerifications />);
 
     await waitFor(() => {
-      // Should format the long number appropriately
-      expect(getByText("+1 15551234567890")).toBeInTheDocument();
+      // Should display the long number as-is
+      expect(getByText("15551234567890")).toBeInTheDocument();
     });
   });
 

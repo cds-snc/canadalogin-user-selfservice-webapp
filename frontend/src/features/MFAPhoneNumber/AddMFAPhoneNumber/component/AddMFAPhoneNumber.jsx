@@ -99,7 +99,6 @@ export default function AddMFAPhoneNumber({
             {pageContentJson["1"]}
           </GcdsHeading>
           <GcdsText>{pageContentJson["2"]}</GcdsText>
-          <br />
           <GcdsText>
             {pageContentJson["3"]}{" "}
             <GcdsLink href={backtoProfilePage}>{pageContentJson["4"]}</GcdsLink>{" "}

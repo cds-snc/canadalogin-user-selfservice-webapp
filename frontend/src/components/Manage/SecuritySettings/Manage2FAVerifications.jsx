@@ -48,8 +48,11 @@ export default function Manage2FAVerifications() {
           const userPhoneFactors = response.data;
           const userPhoneFactorsMap = userPhoneFactors.reduce((acc, factor) => {
             acc[factor.phoneNumber] = acc[factor.phoneNumber]
-              ? [...acc[factor.phoneNumber], factor.type]
-              : [factor.type];
+              ? [
+                  ...acc[factor.phoneNumber],
+                  { type: factor.type, id: factor.id },
+                ]
+              : [{ type: factor.type, id: factor.id }];
             return acc;
           }, {});
           setUserPhoneFactorsMap(userPhoneFactorsMap);
@@ -68,24 +71,31 @@ export default function Manage2FAVerifications() {
   }, []);
   const phoneFactorsComponent = Object.entries(userPhoneFactorsMap).map(
     ([phoneNumber, factors], index) => {
-      const availableFactorsComponent = factors.map((factor, idx) => (
-        <li key={idx}>
-          <GcdsText>{availableFactorsUIContent(factor)}</GcdsText>
-        </li>
-      ));
+      const availableFactorsComponent = factors?.map((factor, idx) => {
+        return (
+          <li key={idx}>
+            <GcdsText>{availableFactorsUIContent(factor.type)}</GcdsText>
+          </li>
+        );
+      });
       return (
         <GcdsContainer key={index}>
           <GcdsText>
-            <strong>{`+1 ${phoneNumber}`}</strong>
+            <strong>{`${phoneNumber}`}</strong>
           </GcdsText>
           <GcdsText>{pageContent["6"]}</GcdsText>
           <ul>{availableFactorsComponent}</ul>
           {Object.keys(userPhoneFactorsMap).length > 1 && (
             <GcdsLink
-              href={"#"}
+              href={path(PAGES.deleteMFAPage, { language })}
               size="regular"
               onGcdsClick={(ev) => {
                 ev.preventDefault();
+                navigateHelper(path(PAGES.deleteMFAPage, { language }), false, {
+                  phoneNumber: phoneNumber,
+                  factorIds: factors.map((factor) => factor.id),
+                  formattedPhoneNumber: `+1 ${phoneNumber}`,
+                });
               }}
             >
               {pageContent["9"]}

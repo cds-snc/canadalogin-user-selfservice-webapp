@@ -395,9 +395,9 @@
   "AddMFANumber": {
     "1": "Enter your new phone number",
     "2": "Enter the new phone number you want to receive security codes at each time you sign in.",
-    "3": "This number will only be used for 2-step verification. To manage your contact phone number, go to your",
+    "3": "This number will only be used for 2-step verification. To manage your contact phone number, go to",
     "4": "Personal Information",
-    "5": "page.",
+    "5": ".",
     "6": "Country",
     "7": "Phone number",
     "8": "My country is not listed here",
@@ -432,5 +432,17 @@
     "8": "Would you like to set up text message verification?",
     "9": "Yes, set up text message verification",
     "10": "No, skip for now"
+  },
+  "DeleteMFAPhoneNumberConfirm": {
+    "1": "Are you sure you want to delete this phone number?",
+    "2": "You will no longer be able to use",
+    "3": "to sign in.",
+    "4": "This",
+    "5": "will not",
+    "6": "delete this number from your contact information. To manage your contact phone number, go to",
+    "7": "Personal Information",
+    "8": ".",
+    "9": "Yes, delete",
+    "10": "Cancel"
   }
 }

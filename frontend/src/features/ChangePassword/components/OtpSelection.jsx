@@ -49,7 +49,7 @@ export default function OtpSelection({
         id: FLOW_TYPES.sms,
         value: FLOW_TYPES.sms,
         hint: pageContentJson["8"],
-        checked: userSelectedMfaType.type == FLOW_TYPES.sms,
+        checked: userSelectedMfaType?.type == FLOW_TYPES.sms,
       };
       radioOptionsValues.push(smsOtpRadioOption);
     }
@@ -61,7 +61,7 @@ export default function OtpSelection({
         id: FLOW_TYPES.voice,
         value: FLOW_TYPES.voice,
         hint: pageContentJson["10"],
-        checked: userSelectedMfaType.type == FLOW_TYPES.voice,
+        checked: userSelectedMfaType?.type == FLOW_TYPES.voice,
       };
       radioOptionsValues.push(voiceOtpRadioOption);
     }
