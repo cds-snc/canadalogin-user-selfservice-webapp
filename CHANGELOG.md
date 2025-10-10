@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.2](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.3.1...v1.3.2) (2025-10-10)
+
+
+### Bug Fixes
+
+* **CI/CD:** Fix env reference in deploy notifications ([#818](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/818)) ([0bfa22f](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/0bfa22f548f51004395eaf9ab0b2f8477624c56e))
+* **frontend:** reduce re-render when new SSE ([#820](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/820)) ([d274d90](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/d274d90a88ce2ed707dfb257c85ffd317dbe4f35))
+
 ## [1.3.1](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.3.0...v1.3.1) (2025-10-09)
 
 
