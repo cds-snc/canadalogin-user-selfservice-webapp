@@ -1,5 +1,12 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach, afterEach, act } from "vitest";
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { BrowserRouter } from "react-router";
 import "@testing-library/jest-dom";
 import SuccessfullyUpdatedName from "../components/SuccessfullyUpdated.jsx";
 
@@ -11,6 +18,9 @@ const mockUserState = {
   userProfile: { name: { formatted: "John Doe" } },
 };
 
+// Create TestWrapper component
+const TestWrapper = ({ children }) => <BrowserRouter>{children}</BrowserRouter>;
+
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
   return {
@@ -20,6 +30,14 @@ vi.mock("react-router", async () => {
     useLocation: vi.fn(),
   };
 });
+
+// Remove the duplicate mock and keep only this one with vi.fn()
+vi.mock("../../../components/Providers/useUser.tsx", () => ({
+  useUser: vi.fn(() => ({
+    state: mockUserState,
+    dispatch: mockDispatch,
+  })),
+}));
 
 vi.mock("@cdssnc/gcds-components-react", () => ({
   GcdsButton: ({
@@ -76,7 +94,6 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
       />
     );
   },
-
   GcdsContainer: ({ children, marginTop, marginBottom, ...props }) => {
     const style = {
       ...(marginTop && { marginTop }),
@@ -136,13 +153,6 @@ vi.mock("../../../utils/routeHelpers.js", () => ({
   path: (page, params) => `/${params.language}/${page}`,
 }));
 
-vi.mock("../../../components/Providers/useUser.tsx", () => ({
-  useUser: () => ({
-    state: mockUserState,
-    dispatch: mockDispatch,
-  }),
-}));
-
 vi.mock("../../../services/authService.jsx", () => ({
   authService: {
     logout: vi.fn(() =>
@@ -157,12 +167,21 @@ vi.mock("../../../utils/userProfileDispatch.jsx", () => ({
   userProfileDispatch: () => ({ setLoading: mockSetLoading }),
 }));
 
+// Import useUser after the mock is defined
+import { useUser } from "../../../components/Providers/useUser.tsx";
+
 describe("SuccessfullyUpdatedName", () => {
   let useLocation;
 
   beforeEach(async () => {
     vi.clearAllMocks();
     vi.useFakeTimers();
+
+    // Reset the useUser mock to default state
+    vi.mocked(useUser).mockReturnValue({
+      state: mockUserState,
+      dispatch: mockDispatch,
+    });
 
     delete window.location;
     window.location = {
@@ -184,7 +203,7 @@ describe("SuccessfullyUpdatedName", () => {
   });
 
   it("renders correctly when location.state.name exists", () => {
-    useLocation.mockReturnValue({ state: { name: "John Doe" } });
+    useLocation.mockReturnValue({ state: { name: { formatted: "John Doe" } } });
     render(<SuccessfullyUpdatedName />);
 
     expect(screen.getByText("Hello John Doe")).toBeInTheDocument();
@@ -205,7 +224,6 @@ describe("SuccessfullyUpdatedName", () => {
     render(<SuccessfullyUpdatedName />);
     expect(mockNavigate).toHaveBeenCalledWith("/en/profile-update-name");
   });
-  // Add these test cases to your existing test file
 
   it("redirects to edit page when name.formatted does not match username", async () => {
     const userStateName = "John Doe";
@@ -231,7 +249,7 @@ describe("SuccessfullyUpdatedName", () => {
 
     await act(async () => {
       render(
-        <TestWrapper userState={mockStateWithDifferentName}>
+        <TestWrapper>
           <SuccessfullyUpdatedName />
         </TestWrapper>,
       );
@@ -261,7 +279,7 @@ describe("SuccessfullyUpdatedName", () => {
 
     await act(async () => {
       render(
-        <TestWrapper userState={mockStateWithEmptyName}>
+        <TestWrapper>
           <SuccessfullyUpdatedName />
         </TestWrapper>,
       );
@@ -291,7 +309,7 @@ describe("SuccessfullyUpdatedName", () => {
 
     await act(async () => {
       render(
-        <TestWrapper userState={mockStateWithName}>
+        <TestWrapper>
           <SuccessfullyUpdatedName />
         </TestWrapper>,
       );
@@ -323,7 +341,7 @@ describe("SuccessfullyUpdatedName", () => {
 
     await act(async () => {
       render(
-        <TestWrapper userState={mockStateWithMatchingName}>
+        <TestWrapper>
           <SuccessfullyUpdatedName />
         </TestWrapper>,
       );
@@ -355,7 +373,7 @@ describe("SuccessfullyUpdatedName", () => {
 
     await act(async () => {
       render(
-        <TestWrapper userState={mockStateWithNullProfile}>
+        <TestWrapper>
           <SuccessfullyUpdatedName />
         </TestWrapper>,
       );
@@ -386,7 +404,7 @@ describe("SuccessfullyUpdatedName", () => {
 
     await act(async () => {
       render(
-        <TestWrapper userState={mockStateWithEmptyName}>
+        <TestWrapper>
           <SuccessfullyUpdatedName />
         </TestWrapper>,
       );
