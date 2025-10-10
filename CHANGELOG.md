@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.3.2...v1.4.0) (2025-10-10)
+
+
+### Features
+
+* **frontend:** delete a mfa phone number manage security settings ([#824](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/824)) ([b1f22fa](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/b1f22fa7709cf846f59f7c0b9a6584115e804928))
+
 ## [1.3.2](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.3.1...v1.3.2) (2025-10-10)
 
 
