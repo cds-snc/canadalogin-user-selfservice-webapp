@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useState } from "react";
 import {
   GcdsContainer,
   GcdsHeading,
@@ -8,45 +8,46 @@ import {
   GcdsRadios,
 } from "@cdssnc/gcds-components-react";
 
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 
 import { getPageContent } from "../../../utils/functions.jsx";
-import {
-  userProfileDispatch,
-  useCancelLanguageEditing,
-} from "../../../utils/userProfileDispatch.jsx";
 
 import { PAGES, PROFILE_LANGUAGES } from "../../../utils/constants.jsx";
 import { path } from "../../../utils/routeHelpers.js";
-import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 import { useUser } from "../../../components/Providers/useUser.tsx";
 import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx";
+const languageKeys = Object.keys(PROFILE_LANGUAGES);
+
+const convertLanguageToLanguageCode = (updatedLanguage) => {
+  return (
+    languageKeys.find((lang) =>
+      updatedLanguage.toLowerCase().startsWith(lang),
+    ) || "en"
+  );
+};
 
 export default function EditLanguagePreferences() {
   const { language } = useParams();
-  const navigateHelper = useNavigateHelper();
+  const navigate = useNavigate();
 
-  const { state, dispatch } = useUser();
+  const { state } = useUser();
   const { userProfile } = state;
-  const {
-    cloneUserProfile,
-    updateClonedProfile,
-    setOriginalLanguageBeforeEdit,
-    setCancelProfileEditing,
-  } = userProfileDispatch(dispatch);
+  const profilePreferredLanguage = userProfile?.preferredLanguage;
+
+  const [updatedLanguage, setUpdatedLanguage] = useState({
+    updatedPreferredLanguage: profilePreferredLanguage,
+    languageCode: language,
+  });
 
   const backToProfile = path(PAGES.ProfileHome, { language: language });
   const areYouSureEditYourLanguage = path(PAGES.areYouSureEditYourLanguage, {
     language: language,
   });
 
-  const { handleCancel } = useCancelLanguageEditing(backToProfile);
   const pageContentJson = getPageContent(
-    language,
+    updatedLanguage.languageCode,
     PAGES.editLanguagePreferences,
   );
-
-  const profilePreferredLanguage = userProfile?.preferredLanguage;
 
   const englistSelection = {
     label: pageContentJson["13"],
@@ -64,25 +65,21 @@ export default function EditLanguagePreferences() {
   const languageOptions = [englistSelection, frenchSelection];
 
   const handleProfileChange = (e) => {
-    const { name, value } = e.target;
-    console.log(name);
-    console.log(value);
-    updateClonedProfile({ preferredLanguage: value });
+    const { value } = e.target;
+    const languageCode = convertLanguageToLanguageCode(value);
+    const data = {
+      updatedPreferredLanguage: value,
+      languageCode: languageCode,
+    };
+    setUpdatedLanguage(data);
   };
 
   const onSubmitHandler = (event) => {
     event.preventDefault();
-    navigateHelper(areYouSureEditYourLanguage);
+    navigate(areYouSureEditYourLanguage, {
+      state: { updatedLanguage: updatedLanguage },
+    });
   };
-
-  useEffect(() => {
-    cloneUserProfile();
-    setOriginalLanguageBeforeEdit(language);
-    return () => {
-      setCancelProfileEditing(false);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <GcdsContainer>
@@ -90,7 +87,9 @@ export default function EditLanguagePreferences() {
       <GcdsText>{pageContentJson["2"]}</GcdsText>
 
       <GcdsGrid columns="1fr">
-        <ServicesWithAccessInfoSection currentLang={language} />
+        <ServicesWithAccessInfoSection
+          currentLang={updatedLanguage.languageCode}
+        />
       </GcdsGrid>
 
       <GcdsContainer marginTop="100">
@@ -98,7 +97,7 @@ export default function EditLanguagePreferences() {
           name="radio"
           legend={pageContentJson["3"]}
           options={languageOptions}
-          lang={language}
+          lang={updatedLanguage.languageCode}
           onChange={handleProfileChange}
         ></GcdsRadios>
       </GcdsContainer>
@@ -112,7 +111,15 @@ export default function EditLanguagePreferences() {
         >
           {pageContentJson["15"]}
         </GcdsButton>
-        <GcdsButton buttonRole="secondary" onGcdsClick={handleCancel}>
+
+        <GcdsButton
+          buttonRole="secondary"
+          onGcdsClick={(ev) => {
+            console.log(ev);
+            ev.preventDefault();
+            navigate(backToProfile);
+          }}
+        >
           {pageContentJson["16"]}
         </GcdsButton>
       </GcdsGrid>
