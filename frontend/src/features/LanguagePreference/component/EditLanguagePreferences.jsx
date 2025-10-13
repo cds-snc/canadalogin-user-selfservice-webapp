@@ -10,17 +10,17 @@ import {
 
 import { useParams } from "react-router";
 
-import { getPageContent } from "../../utils/functions";
+import { getPageContent } from "../../../utils/functions.jsx";
 import {
   userProfileDispatch,
   useCancelLanguageEditing,
-} from "../../utils/userProfileDispatch.jsx";
+} from "../../../utils/userProfileDispatch.jsx";
 
-import { PAGES, PROFILE_LANGUAGES } from "../../utils/constants";
-import { path } from "../../utils/routeHelpers.js";
-import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
-import { useUser } from "../Providers/useUser";
-import ServicesWithAccessInfoSection from "../InfoBlocks/ServicesWithAccessInfoSection";
+import { PAGES, PROFILE_LANGUAGES } from "../../../utils/constants.jsx";
+import { path } from "../../../utils/routeHelpers.js";
+import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
+import { useUser } from "../../../components/Providers/useUser.tsx";
+import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx";
 
 export default function EditLanguagePreferences() {
   const { language } = useParams();

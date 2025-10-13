@@ -14,7 +14,7 @@ import AreYouSureUpdateContactNumber from "./components/Manage/AreYouSureUpdateC
 import AreYouSureUpdateYourEmail from "./components/Manage/AreYouSureUpdateYourEmail.jsx";
 import CheckYourEmail from "./components/Manage/CheckYourEmail.jsx";
 import CompleteTwoStepVerification from "./components/Manage/CompleteTwoStepVerification.jsx";
-import EditLanguagePreferences from "./components/Manage/EditLanguagePreferences.jsx";
+import EditLanguagePreferences from "./features/LanguagePreference/component/EditLanguagePreferences.jsx";
 import EnterNewEmail from "./components/Manage/EnterNewEmail.jsx";
 import FirstVerifyItsYou from "./components/Manage/FirstVerifyItsYou.jsx";
 import ManageDashboard from "./components/Manage/ManageDashboard.jsx";
