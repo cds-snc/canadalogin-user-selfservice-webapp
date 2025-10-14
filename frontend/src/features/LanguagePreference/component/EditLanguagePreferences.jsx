@@ -10,21 +10,15 @@ import {
 
 import { useParams, useNavigate } from "react-router";
 
-import { getPageContent } from "../../../utils/functions.jsx";
+import {
+  getPageContent,
+  convertLanguageToLanguageCode,
+} from "../../../utils/functions.jsx";
 
 import { PAGES, PROFILE_LANGUAGES } from "../../../utils/constants.jsx";
 import { path } from "../../../utils/routeHelpers.js";
 import { useUser } from "../../../components/Providers/useUser.tsx";
 import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx";
-const languageKeys = Object.keys(PROFILE_LANGUAGES);
-
-const convertLanguageToLanguageCode = (updatedLanguage) => {
-  return (
-    languageKeys.find((lang) =>
-      updatedLanguage.toLowerCase().startsWith(lang),
-    ) || "en"
-  );
-};
 
 export default function EditLanguagePreferences() {
   const { language } = useParams();

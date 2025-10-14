@@ -1,5 +1,5 @@
-import React from "react";
-import { useParams } from "react-router";
+import React, { useEffect } from "react";
+import { useParams, useLocation, useNavigate } from "react-router";
 
 import {
   GcdsContainer,
@@ -10,23 +10,32 @@ import {
   GcdsGrid,
   GcdsLink,
 } from "@cdssnc/gcds-components-react";
-import { getPageContent } from "../../utils/functions.jsx";
-import { path } from "../../utils/routeHelpers.js";
-import { PAGES, LANGUAGE_DISPLAY_NAMES } from "../../utils/constants.jsx";
-import { useUser } from "../Providers/useUser.tsx";
-import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
+import { getPageContent } from "../../../utils/functions.jsx";
+import { path } from "../../../utils/routeHelpers.js";
+import { PAGES, LANGUAGE_DISPLAY_NAMES } from "../../../utils/constants.jsx";
+import { useUser } from "../../../components/Providers/useUser.tsx";
 
-export default function ProfileYouMayUpdateLanguage() {
+export default function SuccesfullyUpdatedLanguage() {
   const { language } = useParams();
   const { state } = useUser();
   const pageContentJson = getPageContent(
     language,
     PAGES.profileYouMayUpdateLanguage,
   );
-  const navigateHelper = useNavigateHelper();
   const backToProfile = path(PAGES.ProfileHome, { language: language });
-
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { updatedLanguage } = location.state ?? {};
   const preferredLanguage = state?.userProfile?.preferredLanguage || "";
+  const editLanguagePreferences = path(PAGES.editLanguagePreferences, {
+    language: language,
+  });
+  useEffect(() => {
+    if (!updatedLanguage) navigate(editLanguagePreferences);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  if (!updatedLanguage?.languageCode) return null;
+
   return (
     <GcdsContainer>
       <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle=" ">
@@ -50,7 +59,7 @@ export default function ProfileYouMayUpdateLanguage() {
           style={{ width: "fit-content" }}
           onGcdsClick={(ev) => {
             ev.preventDefault();
-            navigateHelper(backToProfile);
+            navigate(backToProfile);
           }}
         >
           {pageContentJson["6"]}
@@ -61,7 +70,7 @@ export default function ProfileYouMayUpdateLanguage() {
           style={{ width: "fit-content" }}
           onGcdsClick={(ev) => {
             ev.preventDefault();
-            navigateHelper(backToProfile);
+            navigate(backToProfile);
           }}
         >
           {pageContentJson["7"]}

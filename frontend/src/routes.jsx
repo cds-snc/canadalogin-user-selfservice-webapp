@@ -9,7 +9,7 @@ import {
 } from "./components/Providers/PrivateRoute.jsx";
 import { UserProvider } from "./components/Providers/UserProvider";
 
-import AreYouSureEditYourLanguage from "./components/Manage/AreYouSureEditYourLanguage.jsx";
+import AreYouSureEditYourLanguage from "./features/LanguagePreference/component/ConfirmUpdate.jsx";
 import AreYouSureUpdateContactNumber from "./components/Manage/AreYouSureUpdateContactNumber.jsx";
 import AreYouSureUpdateYourEmail from "./components/Manage/AreYouSureUpdateYourEmail.jsx";
 import CheckYourEmail from "./components/Manage/CheckYourEmail.jsx";
@@ -22,7 +22,7 @@ import ProfileHome from "./components/Manage/ProfileHome.jsx";
 
 import ProfileUpdateNameConfirmUpdate from "./features/ProfileName/components/ConfirmUpdate.jsx";
 import ProfileUpdateNameSuccess from "./features/ProfileName/components/SuccessfullyUpdated.jsx";
-import ProfileYouMayUpdateLanguage from "./components/Manage/ProfileYouMayUpdateLanguage.jsx";
+import ProfileYouMayUpdateLanguage from "./features/LanguagePreference/component/SuccessfullyUpdated.jsx";
 import Manage2FAVerifications from "./components/Manage/SecuritySettings/Manage2FAVerifications.jsx";
 import SecuritySettings from "./components/Manage/SecuritySettings/SecuritySettings.jsx";
 import YouMayUpdateEmailAtOtherPlaces from "./components/Manage/YouMayUpdateEmailAtOtherPlaces.jsx";
