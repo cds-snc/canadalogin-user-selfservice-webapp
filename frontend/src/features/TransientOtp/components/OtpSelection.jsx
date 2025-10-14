@@ -22,17 +22,15 @@ export default function OtpSelection({
   onChangeUserSelectedMfaFactor,
   userPhoneFactors,
 }) {
-  console.log(userPhoneFactors);
   const { language } = useParams();
   const navigateHelper = useNavigateHelper();
 
   const pageContentJson = getPageContent(language, PAGES.transientOtpSelection);
 
   const { submit, cancel } = getPageContent(language, "Button");
-  const backToSecuritySettingsPage = path(PAGES.securitySettings, {
+  const backToManage2FAVerificationsPage = path(PAGES.manage2FAVerifications, {
     language: language,
   });
-
   const configureRadioOptions = () => {
     let radioOptionsValues = [];
 
@@ -122,7 +120,7 @@ export default function OtpSelection({
             style={{ width: "fit-content" }}
             onGcdsClick={(ev) => {
               ev.preventDefault();
-              navigateHelper(backToSecuritySettingsPage);
+              navigateHelper(backToManage2FAVerificationsPage);
             }}
           >
             {cancel}
