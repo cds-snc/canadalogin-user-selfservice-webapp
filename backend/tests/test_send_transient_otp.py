@@ -2,19 +2,16 @@
 import json
 from types import SimpleNamespace
 
-import pytest
-from httpx import AsyncClient, MockTransport, Response, Request
-
-# Feature under test
-from app.otp.services.send_transient_otp import (
-    handle_otp_send,
-    dispatch_otp,
-)
 import app.otp.services.send_transient_otp as feature_module
+import pytest
 
 # Schemas
-from app.otp.schemas import UserOtpInfo, OtpType, OtpDataResponse
+from app.otp.schemas import OtpDataResponse, OtpType, UserOtpInfo
 
+# Feature under test
+from app.otp.services.send_transient_otp import dispatch_otp, handle_otp_send
+from fastapi import HTTPException
+from httpx import AsyncClient, MockTransport, Request, Response
 
 # -----------------------
 # Helpers for assertions
@@ -356,8 +353,8 @@ async def test_handle_transport_exception_is_captured_in_message():
 
     result_dict = try_to_dict(result)
     assert result_dict.get("success") is False
-    # Implementation uses Enum object in the message (e.g., "OtpType.SMS")
-    assert "Send transient OtpType.SMS error: simulated network failure" in (
+    # Implementation uses enum value in the message (e.g., "sms")
+    assert "Send transient sms error: simulated network failure" in (
         result_dict.get("message") or ""
     )
 
@@ -391,3 +388,287 @@ async def test_handle_status_code_none_branch(monkeypatch):
     result_dict = try_to_dict(result)
     assert result_dict.get("success") is False
     assert (result_dict.get("message") or "").lower() == "unknown error"
+
+
+# Tests for masked phone number functionality
+@pytest.mark.asyncio
+async def test_resolve_masked_phone_number_success(monkeypatch):
+    """Test successful resolution of masked phone number"""
+    from app.otp.services.send_transient_otp import resolve_masked_phone_number
+
+    # Mock get_user_otp_factors_unmasked to return factors
+    async def mock_get_user_otp_factors_unmasked(client, user_profile_id):
+        return [
+            {
+                "id": "factor1",
+                "type": "smsotp",
+                "phoneNumber": "+14165556499",
+            },
+            {
+                "id": "factor2",
+                "type": "voiceotp",
+                "phoneNumber": "+14165551234",
+            },
+        ]
+
+    monkeypatch.setattr(
+        "app.otp.services.send_transient_otp.get_user_otp_factors_unmasked",
+        mock_get_user_otp_factors_unmasked,
+    )
+
+    async with AsyncClient() as client:
+        # Test SMS matching
+        result = await resolve_masked_phone_number(
+            client, "user123", "*** *** 6499", "sms"
+        )
+        assert result == "+14165556499"
+
+        # Test Voice matching
+        result = await resolve_masked_phone_number(
+            client, "user123", "*** *** 1234", "voice"
+        )
+        assert result == "+14165551234"
+
+
+@pytest.mark.asyncio
+async def test_resolve_masked_phone_number_no_match(monkeypatch):
+    """Test resolution fails when no matching factor is found"""
+    from app.otp.services.send_transient_otp import resolve_masked_phone_number
+
+    async def mock_get_user_otp_factors_unmasked(client, user_profile_id):
+        return [
+            {
+                "id": "factor1",
+                "type": "smsotp",
+                "phoneNumber": "+14165556499",
+            }
+        ]
+
+    monkeypatch.setattr(
+        "app.otp.services.send_transient_otp.get_user_otp_factors_unmasked",
+        mock_get_user_otp_factors_unmasked,
+    )
+
+    async with AsyncClient() as client:
+        # Test with non-matching last 4 digits
+        with pytest.raises(HTTPException) as exc_info:
+            await resolve_masked_phone_number(client, "user123", "*** *** 1111", "sms")
+        assert exc_info.value.status_code == 400
+        assert "No matching phone factor found" in str(exc_info.value.detail)
+
+
+@pytest.mark.asyncio
+async def test_resolve_masked_phone_number_wrong_type(monkeypatch):
+    """Test resolution fails when type doesn't match"""
+    from app.otp.services.send_transient_otp import resolve_masked_phone_number
+
+    async def mock_get_user_otp_factors_unmasked(client, user_profile_id):
+        return [
+            {
+                "id": "factor1",
+                "type": "smsotp",
+                "phoneNumber": "+14165556499",
+            }
+        ]
+
+    monkeypatch.setattr(
+        "app.otp.services.send_transient_otp.get_user_otp_factors_unmasked",
+        mock_get_user_otp_factors_unmasked,
+    )
+
+    async with AsyncClient() as client:
+        # Test with matching digits but wrong type
+        with pytest.raises(HTTPException) as exc_info:
+            await resolve_masked_phone_number(
+                client, "user123", "*** *** 6499", "voice"
+            )
+        assert exc_info.value.status_code == 400
+        assert "No matching phone factor found" in str(exc_info.value.detail)
+
+
+@pytest.mark.asyncio
+async def test_handle_otp_send_with_masked_phone_success(monkeypatch):
+    """Test successful OTP send with masked phone number resolution"""
+
+    # Mock my_profile
+    class MockProfileResponse:
+        class MockData:
+            userName = "user@example.com"
+            id = "user123"
+
+        data = MockData()
+        success = True
+
+    async def mock_my_profile(client, token):
+        return MockProfileResponse()
+
+    # Mock get_user_otp_factors_unmasked
+    async def mock_get_user_otp_factors_unmasked(client, user_profile_id):
+        return [
+            {
+                "id": "factor1",
+                "type": "smsotp",
+                "phoneNumber": "+1 416-555-6499",  # Match IBM API format
+            }
+        ]
+
+    # Mock dispatch_otp
+    class MockResponse:
+        status_code = 201
+
+        def json(self):
+            return {
+                "trxnId": "test123",
+                "type": "smsotp",
+                "created": "2023-01-01T00:00:00Z",
+                "updated": "2023-01-01T00:00:00Z",
+                "expiry": "2023-01-01T00:05:00Z",
+                "state": "DELIVERED",
+                "correlationID": "corr123",
+                "phoneNumber": "+14165556499",
+                "attempts": 0,
+                "retries": 0,
+            }
+
+    async def mock_dispatch_otp(client, user_otp_info):
+        # Verify the phone number was resolved - PhoneNumber type converts to tel: format
+        assert user_otp_info.phoneNumber == "tel:+1-416-555-6499"
+        return MockResponse()
+
+    monkeypatch.setattr(
+        "app.otp.services.send_transient_otp.my_profile", mock_my_profile
+    )
+    monkeypatch.setattr(
+        "app.otp.services.send_transient_otp.get_user_otp_factors_unmasked",
+        mock_get_user_otp_factors_unmasked,
+    )
+    monkeypatch.setattr(
+        "app.otp.services.send_transient_otp.dispatch_otp", mock_dispatch_otp
+    )
+
+    async with AsyncClient() as client:
+        # Test with masked phone number - create UserOtpInfo with bypass validation
+        info = UserOtpInfo.model_construct(
+            otpType=OtpType.SMS,
+            userName="user@example.com",
+            phoneNumber="*** *** 6499",  # Masked phone - bypasses validation
+        )
+        result = await handle_otp_send(client, info, user_access_token="USER_TOKEN")
+
+    result_dict = try_to_dict(result)
+    assert result_dict.get("success") is True
+    assert "sms OTP sent successfully" in result_dict.get("message", "")
+
+
+@pytest.mark.asyncio
+async def test_handle_otp_send_with_unmasked_phone_unchanged(monkeypatch):
+    """Test that unmasked phone numbers are processed normally"""
+
+    # Mock my_profile
+    class MockProfileResponse:
+        class MockData:
+            userName = "user@example.com"
+            id = "user123"
+
+        data = MockData()
+        success = True
+
+    async def mock_my_profile(client, token):
+        return MockProfileResponse()
+
+    # Mock dispatch_otp
+    class MockResponse:
+        status_code = 201
+
+        def json(self):
+            return {
+                "trxnId": "test123",
+                "type": "smsotp",
+                "created": "2023-01-01T00:00:00Z",
+                "updated": "2023-01-01T00:00:00Z",
+                "expiry": "2023-01-01T00:05:00Z",
+                "state": "DELIVERED",
+                "correlationID": "corr123",
+                "phoneNumber": "+14165556499",
+                "attempts": 0,
+                "retries": 0,
+            }
+
+        async def mock_dispatch_otp(client, user_otp_info):
+            # Verify the phone number was processed by PhoneNumber type (converts to tel: format)
+            assert user_otp_info.phoneNumber == "tel:+1-416-555-6499"
+            return MockResponse()
+
+        monkeypatch.setattr(
+            "app.otp.services.send_transient_otp.my_profile", mock_my_profile
+        )
+        monkeypatch.setattr(
+            "app.otp.services.send_transient_otp.dispatch_otp", mock_dispatch_otp
+        )
+
+    async with AsyncClient() as client:
+        # Test with regular (unmasked) phone number
+        info = UserOtpInfo(
+            otpType=OtpType.SMS,
+            userName="user@example.com",
+            phoneNumber="+14165556499",  # Unmasked phone
+        )
+        result = await handle_otp_send(client, info, user_access_token="USER_TOKEN")
+
+    result_dict = try_to_dict(result)
+    assert result_dict.get("success") is True
+    assert "sms OTP sent successfully" in result_dict.get("message", "")
+
+
+@pytest.mark.asyncio
+async def test_handle_otp_send_masked_phone_resolution_failure(monkeypatch):
+    """Test failure when masked phone resolution fails"""
+
+    # Mock my_profile
+    class MockProfileResponse:
+        class MockData:
+            userName = "user@example.com"
+            id = "user123"
+
+        data = MockData()
+        success = True
+
+    async def mock_my_profile(client, token):
+        return MockProfileResponse()
+
+    # Mock get_user_otp_factors_unmasked to return no matching factors
+    async def mock_get_user_otp_factors_unmasked(client, user_profile_id):
+        return [
+            {
+                "id": "factor1",
+                "type": "smsotp",
+                "phoneNumber": "+1 416-555-1111",  # Different last 4 digits, IBM API format
+            }
+        ]
+
+    monkeypatch.setattr(
+        "app.otp.services.send_transient_otp.my_profile", mock_my_profile
+    )
+    monkeypatch.setattr(
+        "app.otp.services.send_transient_otp.get_user_otp_factors_unmasked",
+        mock_get_user_otp_factors_unmasked,
+    )
+
+    async with AsyncClient() as client:
+        # Test with masked phone that can't be resolved
+        info = UserOtpInfo.model_construct(
+            otpType=OtpType.SMS,
+            userName="user@example.com",
+            phoneNumber="*** *** 6499",  # Won't match the mocked factor - bypasses validation
+        )
+        result = await handle_otp_send(client, info, user_access_token="USER_TOKEN")
+
+    # Handle JSONResponse object from generate_error_response
+    if hasattr(result, "body"):
+        import json
+
+        result_dict = json.loads(result.body.decode())
+    else:
+        result_dict = try_to_dict(result)
+    assert result_dict.get("success") is False
+    assert "No matching phone factor found" in result_dict.get("message", "")

@@ -1,20 +1,16 @@
 # backend/tests/test_otp_verified_check.py
 import json
 
-import pytest
-from fastapi import HTTPException
-from httpx import AsyncClient, MockTransport, Response, Request
-
-# Feature under test
-from app.otp.services.verify_transient_otp import (
-    handle_otp_verification,
-    verify_otp,
-)
 import app.otp.services.verify_transient_otp as feature_module
+import pytest
 
 # Schemas
 from app.otp.schemas import OtpType, UserOtpVerificationInfo
 
+# Feature under test
+from app.otp.services.verify_transient_otp import handle_otp_verification, verify_otp
+from fastapi import HTTPException
+from httpx import AsyncClient, MockTransport, Request, Response
 
 # -----------------------
 # Helpers for assertions
@@ -275,6 +271,6 @@ async def test_handle_otp_verification_transport_exception_translates_to_http_ex
 
     exc: HTTPException = excinfo.value
     assert exc.status_code == 400
-    # Implementation uses the Enum object (not .value) in the error detail:
-    # f"{user_verification_data.otpType} verification error: ..."
-    assert "OtpType.VOICE verification error: simulated network failure" in exc.detail
+    # Implementation uses the enum value (not the full enum representation) in the error detail:
+    # f"{user_verification_data.otpType.value} verification error: ..."
+    assert "voice verification error: simulated network failure" in exc.detail
