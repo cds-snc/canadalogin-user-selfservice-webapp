@@ -58,6 +58,15 @@ async def resolve_masked_phone_number(
 
             if actual_last_4 == masked_last_4 and type_match:
                 logger.info(f"Resolved masked phone number. Last 4: {masked_last_4}")
+                # Ensure phone number has proper format for PhoneNumber validation
+                # Add + prefix if it's missing (needed for international format)
+                if factor_phone.isdigit():
+                    if len(factor_phone) == 11 and factor_phone.startswith("1"):
+                        # 11-digit number starting with 1 (North American with country code)
+                        factor_phone = f"+{factor_phone}"
+                    elif len(factor_phone) == 10:
+                        # 10-digit number (North American without country code)
+                        factor_phone = f"+1{factor_phone}"
                 return factor_phone
 
         # If no match found, raise an error
@@ -100,7 +109,9 @@ async def handle_otp_send(
                     user_otp_info.phoneNumber,
                     user_otp_info.otpType,
                 )
+
                 # Create a new UserOtpInfo with the resolved phone number
+                # The field validator will automatically format it using PhoneNumber
                 resolved_user_otp_info = UserOtpInfo(
                     phoneNumber=actual_phone,
                     userName=user_otp_info.userName,

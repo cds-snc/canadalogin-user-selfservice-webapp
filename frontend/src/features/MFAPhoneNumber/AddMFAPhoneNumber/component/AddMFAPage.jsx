@@ -251,7 +251,7 @@ export default function AddMFAPage() {
         otpSentResponse={otpSentResponse}
         setOtpSentResponse={handleOtpSentResponse}
         onNext={() => {
-          setWizardStep("deleteMFAPhoneNumberConfirm");
+          setWizardStep("addMFANumber");
         }}
         onBack={() => setWizardStep("otpSelection")}
       />

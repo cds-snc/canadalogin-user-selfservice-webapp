@@ -16,7 +16,7 @@ import { getPageContent } from "../../../utils/functions.jsx";
 import { path } from "../../../utils/routeHelpers.js";
 
 import { useParams } from "react-router";
-import { FLOW_TYPES, PAGES } from "../../../utils/constants.jsx";
+import { FLOW_TYPES, PAGES, serverMapping } from "../../../utils/constants.jsx";
 
 import { useUser } from "../../../components/Providers/useUser.tsx";
 import { authService } from "../../../services/authService.jsx";
@@ -60,7 +60,7 @@ export default function OtpVerification({
   const requestOtpCode = async () => {
     const userData = {
       userName,
-      otpType: userSelectedMfaFactor.type,
+      otpType: serverMapping[userSelectedMfaFactor.type],
       phoneNumber: userSelectedMfaFactor.phoneNumber,
     };
     try {
@@ -82,7 +82,7 @@ export default function OtpVerification({
     const userData = {
       otp: userOtpValue,
       trxnId: otpSentResponse.trxnId,
-      otpType: userSelectedMfaFactor.type,
+      otpType: serverMapping[userSelectedMfaFactor.type],
     };
     try {
       const response = await authService.transientOtpVerify(userData);
