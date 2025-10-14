@@ -34,34 +34,36 @@ export default function OtpSelection({
   const configureRadioOptions = () => {
     let radioOptionsValues = [];
 
-    const smsPhoneFactorValue = userPhoneFactors.find(
+    const smsPhoneFactors = userPhoneFactors.filter(
       (factor) => factor.type === FLOW_TYPES.sms,
     );
-    const voicePhoneFactorValue = userPhoneFactors.find(
+    const voicePhoneFactors = userPhoneFactors.filter(
       (factor) => factor.type === FLOW_TYPES.voice,
     );
 
-    if (smsPhoneFactorValue) {
-      const smsLabel = `${pageContentJson["8"]} ${smsPhoneFactorValue.phoneNumber}`;
+    // Add all SMS factors as radio options
+    smsPhoneFactors.forEach((smsPhoneFactor) => {
+      const smsLabel = `${pageContentJson["8"]} ${smsPhoneFactor.phoneNumber}`;
       const smsOtpRadioOption = {
         label: smsLabel,
-        id: FLOW_TYPES.sms,
-        value: smsPhoneFactorValue.id,
-        checked: userSelectedMfaFactor?.id == smsPhoneFactorValue.id,
+        id: `${FLOW_TYPES.sms}-${smsPhoneFactor.id}`,
+        value: smsPhoneFactor.id,
+        checked: userSelectedMfaFactor?.id == smsPhoneFactor.id,
       };
       radioOptionsValues.push(smsOtpRadioOption);
-    }
+    });
 
-    if (voicePhoneFactorValue) {
-      const voiceLabel = `${pageContentJson["9"]} ${voicePhoneFactorValue.phoneNumber}`;
+    // Add all Voice factors as radio options
+    voicePhoneFactors.forEach((voicePhoneFactor) => {
+      const voiceLabel = `${pageContentJson["9"]} ${voicePhoneFactor.phoneNumber}`;
       const voiceOtpRadioOption = {
         label: voiceLabel,
-        id: FLOW_TYPES.voice,
-        value: voicePhoneFactorValue.id,
-        checked: userSelectedMfaFactor?.id == voicePhoneFactorValue.id,
+        id: `${FLOW_TYPES.voice}-${voicePhoneFactor.id}`,
+        value: voicePhoneFactor.id,
+        checked: userSelectedMfaFactor?.id == voicePhoneFactor.id,
       };
       radioOptionsValues.push(voiceOtpRadioOption);
-    }
+    });
 
     return radioOptionsValues;
   };
@@ -79,14 +81,6 @@ export default function OtpSelection({
         <GcdsContainer>
           <GcdsText>
             {pageContentJson["2"]} {pageContentJson["3"]}
-          </GcdsText>
-          <GcdsText>
-            <GcdsLink
-              href={gcHelpCentreLinks.twoStepVerification}
-              target="_blank"
-            >
-              {pageContentJson["3"]}
-            </GcdsLink>
           </GcdsText>
         </GcdsContainer>
         {radioOptions.length > 1 ? (
@@ -126,6 +120,23 @@ export default function OtpSelection({
             {cancel}
           </GcdsButton>
         </GcdsGrid>
+      </GcdsContainer>
+
+      <GcdsContainer>
+        <GcdsHeading tag="h2">{pageContentJson["10"]}</GcdsHeading>
+        <GcdsText>
+          <GcdsLink
+            href={gcHelpCentreLinks.twoStepVerification}
+            target="_blank"
+          >
+            {pageContentJson["12"]}
+          </GcdsLink>
+        </GcdsText>
+        <GcdsText>
+          <GcdsLink href={gcHelpCentreLinks.cannotAccessPhone} target="_blank">
+            {pageContentJson["13"]}
+          </GcdsLink>
+        </GcdsText>
       </GcdsContainer>
     </GcdsContainer>
   );
