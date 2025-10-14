@@ -8,7 +8,6 @@ import {
 
 import { getPageContent } from "../../utils/functions.jsx";
 import { PAGES } from "../../utils/constants.jsx";
-import { path } from "../../utils/routeHelpers.js";
 import { useUser } from "../Providers/useUser.tsx";
 import VerifiedBadge from "../Badges/VerifiedBadge.jsx";
 import ViewContactPhoneNumber from "../../features/ContactPhoneNumber/components/ViewContactPhoneNumber.jsx";
