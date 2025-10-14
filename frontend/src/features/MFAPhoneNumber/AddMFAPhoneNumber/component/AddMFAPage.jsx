@@ -196,6 +196,7 @@ export default function AddMFAPage() {
 
   useEffect(() => {
     const fetchUserOtpPhoneFactors = async () => {
+      setLocalLoading(true);
       try {
         const response = await otpFactors.getUserOtpPhoneFactors(id);
         if (
@@ -220,6 +221,8 @@ export default function AddMFAPage() {
         }
       } catch (err) {
         console.error("Error fetching user OTP phone factors:", err);
+      } finally {
+        setLocalLoading(false);
       }
     };
 
