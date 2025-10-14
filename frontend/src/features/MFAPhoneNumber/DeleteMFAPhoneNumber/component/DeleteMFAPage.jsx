@@ -7,9 +7,9 @@ import { useNavigateHelper } from "../../../../hooks/useNavigate";
 import { PAGES, serverMapping } from "../../../../utils/constants";
 import { getPageContent } from "../../../../utils/functions";
 import { path } from "../../../../utils/routeHelpers";
-import { otpFactors } from "../../../ChangePassword/api/otpFactors";
-import OtpSelection from "../../../ChangePassword/components/OtpSelection";
-import OtpVerification from "../../../ChangePassword/components/OtpVerification";
+import { otpFactors } from "../../../TransientOtp/api/otpFactors";
+import OtpSelection from "../../../TransientOtp/components/OtpSelection";
+import OtpVerification from "../../../TransientOtp/components/OtpVerification";
 import { deleteMFAPhoneNumberApi } from "../api/DeleteMFAPhoneNumberAPI";
 import DeleteMFAPhoneNumberConfirm from "./DeleteMFAPhoneNumberConfirm";
 
@@ -46,11 +46,11 @@ export default function DeleteMFAPage() {
   const [errorCode, setErrorCode] = useState("");
   const errorPageJson = getPageContent(language, PAGES.error);
 
-  const [wizardStep, setWizardStep] = useState("deleteMFAPhoneNumberConfirm");
+  const [wizardStep, setWizardStep] = useState("otpSelection");
   const [localLoading, setLocalLoading] = useState(false);
   const { userProfile } = state;
   const { id } = userProfile ?? {};
-  const [userSelectedMfaType, setUserSelectedMfaType] = useState(null);
+  const [userSelectedMfaFactor, setUserSelectedMfaFactor] = useState(null);
   const navigateHelper = useNavigateHelper();
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
     language: language,
@@ -73,17 +73,13 @@ export default function DeleteMFAPage() {
     }));
   };
 
-  const handleChangeUserMfaSelection = (mfaType) => {
-    const selectedMfaType = userPhoneFactors.find(
-      (factor) => factor.type === mfaType,
+  const handleChangeUserMfaSelection = (id) => {
+    const selectedMfaFactor = userPhoneFactors.find(
+      (factor) => factor.id === id,
     );
 
-    if (
-      selectedMfaType &&
-      selectedMfaType.type &&
-      selectedMfaType.phoneNumber
-    ) {
-      setUserSelectedMfaType(selectedMfaType);
+    if (selectedMfaFactor) {
+      setUserSelectedMfaFactor(selectedMfaFactor);
     }
   };
 
@@ -127,7 +123,7 @@ export default function DeleteMFAPage() {
         ) {
           const userPhoneFactors = response.data;
           setUserPhoneFactors(userPhoneFactors);
-
+          setUserSelectedMfaFactor(userPhoneFactors[0]);
           // If factor data is provided via location state, pre-select the factors
           if (factorIds && factorIds.length > 0) {
             const mfaFactorsToDelete = userPhoneFactors.filter((factor) =>
@@ -171,8 +167,8 @@ export default function DeleteMFAPage() {
       <OtpSelection
         userProfile={userProfile}
         userPhoneFactors={userPhoneFactors}
-        onChangeUserMfaType={handleChangeUserMfaSelection}
-        userSelectedMfaType={userSelectedMfaType}
+        onChangeUserSelectedMfaFactor={handleChangeUserMfaSelection}
+        userSelectedMfaFactor={userSelectedMfaFactor}
         onNext={() => {
           setWizardStep("otpValidation");
         }}
@@ -181,8 +177,7 @@ export default function DeleteMFAPage() {
     otpValidation: (
       <OtpVerification
         userProfile={userProfile}
-        userSelectedMfaType={userSelectedMfaType}
-        onChangeUserMfaType={handleChangeUserMfaSelection}
+        userSelectedMfaFactor={userSelectedMfaFactor}
         userOtpValue={userOtpValue}
         setUserOtpValue={handleSetUserOtpValue}
         otpSentResponse={otpSentResponse}

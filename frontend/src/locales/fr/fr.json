@@ -292,7 +292,7 @@
     "8": "Numéro de téléphone cellulaire seulement.",
     "9": "Appel vocal",
     "10": "Numéro de téléphone cellulaire ou fixe.",
-    "11": "Chargement",
+    "11": "Chargement...",
     "12": "Des frais d’opérateur peuvent s’appliquer."
   },
   "PasswordChangedConfirmation": {
@@ -441,5 +441,21 @@
     "8": ".",
     "9": "Oui, supprimer",
     "10": "Annuler"
+  },
+  "TransientOtpSelection": {
+    "1": "Procédez à la vérification en deux étapes",
+    "2": "Pour modifier votre mot de passe,",
+    "3": "procédez d’abord à la vérification en deux étapes.",
+    "4": "Choisissez comment recevoir votre code de vérification",
+    "5": "Le code expire",
+    "6": "10 minutes",
+    "7": "après l’envoi. Des frais d’opérateur peuvent s’appliquer.",
+    "8": "Message texte",
+    "9": "Appel vocal",
+    "10": "Besoin d’aide?",
+    "11": "Chargement...",
+    "12": "Des frais d’opérateur peuvent s’appliquer.",
+    "13": "Obtenir de l’aide concernant la vérification en deux étapes",
+    "14": "Je n’ai pas accès à mon téléphone"
   }
 }

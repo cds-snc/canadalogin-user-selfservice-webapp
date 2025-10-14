@@ -311,7 +311,7 @@
     "8": "Mobile only.",
     "9": "Voice call",
     "10": "Mobile or landline.",
-    "11": "Loading",
+    "11": "Loading...",
     "12": "Loading your MFA methods ...",
     "13": "Carrier charges may apply."
   },
@@ -444,5 +444,20 @@
     "8": ".",
     "9": "Yes, delete",
     "10": "Cancel"
+  },
+  "TransientOtpSelection": {
+    "1": "Complete 2-step verification",
+    "2": "To change your password,",
+    "3": "first complete 2-step verification.",
+    "4": "Choose how you want to receive a verification code",
+    "5": "Once the code is sent it will expire in",
+    "6": "10 minutes.",
+    "7": "Carrier charges may apply.",
+    "8": "Text message",
+    "9": "Voice call",
+    "10": "Need help?",
+    "11": "Loading...",
+    "12": "Get help with 2-step verification",
+    "13": "I cannot access my phone"
   }
 }
