@@ -531,7 +531,7 @@ async def test_handle_otp_send_with_masked_phone_success(monkeypatch):
             }
 
     async def mock_dispatch_otp(client, user_otp_info):
-        # Verify the phone number was resolved - PhoneNumber type converts to tel: format
+        # Verify the phone number was resolved - should now be tel: format after validation
         assert user_otp_info.phoneNumber == "tel:+1-416-555-6499"
         return MockResponse()
 
@@ -595,8 +595,10 @@ async def test_handle_otp_send_with_unmasked_phone_unchanged(monkeypatch):
             }
 
         async def mock_dispatch_otp(client, user_otp_info):
-            # Verify the phone number was processed by PhoneNumber type (converts to tel: format)
-            assert user_otp_info.phoneNumber == "tel:+1-416-555-6499"
+            # Verify the phone number was processed normally (string format from validator)
+            assert (
+                user_otp_info.phoneNumber == "tel:+1-416-555-6499"
+            )  # This will be the tel: format for valid numbers
             return MockResponse()
 
         monkeypatch.setattr(
@@ -665,8 +667,6 @@ async def test_handle_otp_send_masked_phone_resolution_failure(monkeypatch):
 
     # Handle JSONResponse object from generate_error_response
     if hasattr(result, "body"):
-        import json
-
         result_dict = json.loads(result.body.decode())
     else:
         result_dict = try_to_dict(result)

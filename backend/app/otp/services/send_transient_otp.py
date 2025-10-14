@@ -90,14 +90,14 @@ async def handle_otp_send(
         # Handle masked phone numbers
         resolved_user_otp_info = user_otp_info
         if user_otp_info.phoneNumber and is_masked_phone_number(
-            str(user_otp_info.phoneNumber)
+            user_otp_info.phoneNumber
         ):
             logger.info("Detected masked phone number, resolving to actual number")
             try:
                 actual_phone = await resolve_masked_phone_number(
                     global_http_client,
                     my_profile_response.data.id,
-                    str(user_otp_info.phoneNumber),
+                    user_otp_info.phoneNumber,
                     user_otp_info.otpType,
                 )
                 # Create a new UserOtpInfo with the resolved phone number
