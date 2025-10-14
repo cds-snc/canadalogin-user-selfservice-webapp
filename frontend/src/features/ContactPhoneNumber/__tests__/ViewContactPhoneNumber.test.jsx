@@ -33,6 +33,12 @@ vi.mock("../../../utils/routeHelpers.js", () => ({
   path: vi.fn(() => "/en/manage-dashboard"),
 }));
 
+// In your test file (e.g., ViewContactPhoneNumber.test.jsx)
+vi.mock("../../../utils/apiErrorHandler.js", () => ({
+  handleApiError: vi.fn(),
+  redirectToLogin: vi.fn(),
+}));
+
 // Mock VerifiedBadge component
 vi.mock("../../../components/Badges/VerifiedBadge.jsx", () => ({
   default: ({ text }) => <div data-testid="verified-badge">{text}</div>,
@@ -45,18 +51,22 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
       {children}
     </div>
   ),
-  GcdsHeading: ({ children, ...props }) => (
-    <h3 data-testid="gcds-heading" {...props}>
+  GcdsHeading: ({ children, marginTop, style, ...props }) => (
+    <h3 data-testid="gcds-heading" style={{ marginTop, ...style }} {...props}>
       {children}
     </h3>
   ),
-  GcdsGrid: ({ children, ...props }) => (
-    <div data-testid="gcds-grid" {...props}>
+  GcdsGrid: ({ children, placeContent, marginTop, style, ...props }) => (
+    <div
+      data-testid="gcds-grid"
+      style={{ placeContent, marginTop, ...style }}
+      {...props}
+    >
       {children}
     </div>
   ),
-  GcdsText: ({ children, ...props }) => (
-    <p data-testid="gcds-text" {...props}>
+  GcdsText: ({ children, placeContent, style, ...props }) => (
+    <p data-testid="gcds-text" style={{ placeContent, ...style }} {...props}>
       {children}
     </p>
   ),
@@ -64,9 +74,10 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
     <a
       data-testid="gcds-link"
       href={href}
-      onClick={(e) =>
-        onGcdsClick?.({ detail: href, preventDefault: e.preventDefault })
-      }
+      onClick={(e) => {
+        e.preventDefault();
+        onGcdsClick?.({ detail: href, preventDefault: e.preventDefault });
+      }}
       {...props}
     >
       {children}

@@ -241,7 +241,7 @@
     "18": "Cela mettra à jour votre langue auprès des services suivants :",
     "19": "GEO.ca"
   },
-  "ProfileYouMayUpdateLanguage": {
+  "SuccessfullyUpdatedLanguage": {
     "0": "Réussite",
     "1": "Votre langue de communication est maintenant le",
     "2": "Vous devez peut-être mettre à jour votre langue de communication ailleurs.",
@@ -255,7 +255,7 @@
     "10": "Services connectés",
     "11": "dans votre tableau de bord GC Sign in."
   },
-  "AreYouSureEditYourLanguage": {
+  "ConfirmLanguageUpdate": {
     "1": "Voulez-vous vraiment mettre à jour votre langue de communication?",
     "2": "Vous avez demandé à changer votre langue de communication pour la langue suivante:",
     "3": "Exemple : Nouveau nom",

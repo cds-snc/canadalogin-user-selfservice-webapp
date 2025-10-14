@@ -272,7 +272,7 @@
     "18": "This will update your language with the following services:",
     "19": "GEO.ca"
   },
-  "AreYouSureEditYourLanguage": {
+  "ConfirmLanguageUpdate": {
     "1": "Are you sure you want to update your language preference?",
     "2": "You’ve requested to update your language to:",
     "3": "Example Newname",
@@ -286,7 +286,7 @@
     "11": "does not ",
     "12": "legally change your name."
   },
-  "ProfileYouMayUpdateLanguage": {
+  "SuccessfullyUpdatedLanguage": {
     "0": "Success",
     "1": "Your language preference has been updated to",
     "2": "You may need to update your language preferences in other places",

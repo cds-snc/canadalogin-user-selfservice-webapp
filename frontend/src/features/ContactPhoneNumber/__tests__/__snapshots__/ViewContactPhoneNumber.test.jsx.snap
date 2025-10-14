@@ -7,7 +7,6 @@ exports[`ViewContactPhoneNumber Component > matches snapshot with no phone numbe
   >
     <h3
       data-testid="gcds-heading"
-      margintop="300"
       tag="h3"
     >
       Contact phone number
@@ -41,7 +40,6 @@ exports[`ViewContactPhoneNumber Component > matches snapshot with phone numbers 
   >
     <h3
       data-testid="gcds-heading"
-      margintop="300"
       tag="h3"
     >
       Contact phone number
@@ -62,7 +60,7 @@ exports[`ViewContactPhoneNumber Component > matches snapshot with phone numbers 
         <p
           data-testid="gcds-text"
           margin-bottom="400"
-          placecontent="center"
+          style="place-content: center;"
         >
           (555) 123-4567
         </p>
