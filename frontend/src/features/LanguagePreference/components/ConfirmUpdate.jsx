@@ -70,7 +70,7 @@ export default function ConfirmLanguageUpdate() {
         userName: state.userProfile.userName,
       });
       updateProfileSuccess(response.data);
-      const successPage = path(PAGES.profileYouMayUpdateLanguage, {
+      const successPage = path(PAGES.successfullyUpdatedLanguage, {
         language: convertLanguageToLanguageCode(
           response.data.preferredLanguage,
         ),

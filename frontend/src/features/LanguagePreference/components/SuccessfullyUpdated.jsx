@@ -20,7 +20,7 @@ export default function SuccessfullyUpdatedLanguage() {
   const { state } = useUser();
   const pageContentJson = getPageContent(
     language,
-    PAGES.profileYouMayUpdateLanguage,
+    PAGES.successfullyUpdatedLanguage,
   );
   const backToProfile = path(PAGES.ProfileHome, { language: language });
   const location = useLocation();

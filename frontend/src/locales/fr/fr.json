@@ -241,7 +241,7 @@
     "18": "Cela mettra à jour votre langue auprès des services suivants :",
     "19": "GEO.ca"
   },
-  "ProfileYouMayUpdateLanguage": {
+  "SuccessfullyUpdatedLanguage": {
     "0": "Réussite",
     "1": "Votre langue de communication est maintenant le",
     "2": "Vous devez peut-être mettre à jour votre langue de communication ailleurs.",

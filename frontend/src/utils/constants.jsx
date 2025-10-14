@@ -85,7 +85,7 @@ export const PAGES = {
   securitySettings: "SecuritySettings",
   editLanguagePreferences: "EditLanguagePreferences",
   confirmLanguageUpdate: "ConfirmLanguageUpdate",
-  profileYouMayUpdateLanguage: "ProfileYouMayUpdateLanguage",
+  successfullyUpdatedLanguage: "SuccessfullyUpdatedLanguage",
   passwordChangedConfirmation: "PasswordChangedConfirmation",
   ServicesWithAccessInfo: "ServicesWithAccessInfo",
   confirmContactPhoneNumberUpdate: "ConfirmContactPhoneNumberUpdate",

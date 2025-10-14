@@ -22,7 +22,7 @@ import ProfileHome from "./components/Manage/ProfileHome.jsx";
 
 import ProfileUpdateNameConfirmUpdate from "./features/ProfileName/components/ConfirmUpdate.jsx";
 import ProfileUpdateNameSuccess from "./features/ProfileName/components/SuccessfullyUpdated.jsx";
-import ProfileYouMayUpdateLanguage from "./features/LanguagePreference/components/SuccessfullyUpdated.jsx";
+import SuccessfullyUpdatedLanguage from "./features/LanguagePreference/components/SuccessfullyUpdated.jsx";
 import Manage2FAVerifications from "./components/Manage/SecuritySettings/Manage2FAVerifications.jsx";
 import SecuritySettings from "./components/Manage/SecuritySettings/SecuritySettings.jsx";
 import YouMayUpdateEmailAtOtherPlaces from "./components/Manage/YouMayUpdateEmailAtOtherPlaces.jsx";
@@ -107,8 +107,8 @@ export const appRoutes = [
                   },
                   {
                     path: "update-language/success",
-                    element: <ProfileYouMayUpdateLanguage />,
-                    handle: { id: PAGES.profileYouMayUpdateLanguage },
+                    element: <SuccessfullyUpdatedLanguage />,
+                    handle: { id: PAGES.successfullyUpdatedLanguage },
                   },
                   {
                     path: "update-language/confirm-update",

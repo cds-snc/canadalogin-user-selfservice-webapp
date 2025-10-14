@@ -18,7 +18,7 @@ import SecuritySettings from "../../../components/Manage/SecuritySettings/Securi
 import Manage2FAVerifications from "../../../components/Manage/SecuritySettings/Manage2FAVerifications.jsx";
 import EditLanguagePreferences from "../../../features/LanguagePreference/components/EditLanguagePreferences.jsx";
 import ConfirmLanguageUpdate from "../../../features/LanguagePreference/components/ConfirmUpdate.jsx";
-import ProfileYouMayUpdateLanguage from "../../../features/LanguagePreference/components/SuccessfullyUpdated.jsx";
+import SuccessfullyUpdatedLanguage from "../../../features/LanguagePreference/components/SuccessfullyUpdated.jsx";
 import ProfileUpdateName from "../../../features/ProfileName/components/ProfileUpdateName.jsx";
 import Verification from "../../../components/Verification/Verification.jsx";
 
@@ -59,8 +59,8 @@ const PageRenderer = ({ page }) => {
       return <EditLanguagePreferences />;
     case PAGES.confirmLanguageUpdate:
       return <ConfirmLanguageUpdate />;
-    case PAGES.profileYouMayUpdateLanguage:
-      return <ProfileYouMayUpdateLanguage />;
+    case PAGES.successfullyUpdatedLanguage:
+      return <SuccessfullyUpdatedLanguage />;
     case PAGES.verification:
       return <Verification />;
     default:
