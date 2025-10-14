@@ -12,7 +12,7 @@ import { useUser } from "../Providers/useUser.tsx";
 import VerifiedBadge from "../Badges/VerifiedBadge.jsx";
 import ViewContactPhoneNumber from "../../features/ContactPhoneNumber/components/ViewContactPhoneNumber.jsx";
 import ViewNameCard from "../../features/ProfileName/components/ViewProfileNameCard.jsx";
-import ViewLanguagePreferences from "../../features/LanguagePreference/component/ViewLanguagePreference.jsx";
+import ViewLanguagePreferences from "../../features/LanguagePreference/components/ViewLanguagePreference.jsx";
 
 const DisplayEmailInfo = ({ email, pageContent }) => {
   return (

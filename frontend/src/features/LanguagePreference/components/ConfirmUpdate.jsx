@@ -132,7 +132,6 @@ export default function ConfirmLanguageUpdate() {
           <GcdsButton
             buttonRole="secondary"
             onGcdsClick={(ev) => {
-              console.log(ev);
               ev.preventDefault();
               navigate(backToProfile);
             }}

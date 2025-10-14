@@ -15,7 +15,7 @@ import { path } from "../../../utils/routeHelpers.js";
 import { PAGES, LANGUAGE_DISPLAY_NAMES } from "../../../utils/constants.jsx";
 import { useUser } from "../../../components/Providers/useUser.tsx";
 
-export default function SuccesfullyUpdatedLanguage() {
+export default function SuccessfullyUpdatedLanguage() {
   const { language } = useParams();
   const { state } = useUser();
   const pageContentJson = getPageContent(
