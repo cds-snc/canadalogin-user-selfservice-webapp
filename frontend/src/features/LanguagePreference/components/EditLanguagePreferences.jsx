@@ -34,7 +34,7 @@ export default function EditLanguagePreferences() {
   });
 
   const backToProfile = path(PAGES.ProfileHome, { language: language });
-  const areYouSureEditYourLanguage = path(PAGES.areYouSureEditYourLanguage, {
+  const confirmLanguageUpdate = path(PAGES.confirmLanguageUpdate, {
     language: language,
   });
 
@@ -70,7 +70,7 @@ export default function EditLanguagePreferences() {
 
   const onSubmitHandler = (event) => {
     event.preventDefault();
-    navigate(areYouSureEditYourLanguage, {
+    navigate(confirmLanguageUpdate, {
       state: { updatedLanguage: updatedLanguage },
     });
   };
@@ -109,7 +109,6 @@ export default function EditLanguagePreferences() {
         <GcdsButton
           buttonRole="secondary"
           onGcdsClick={(ev) => {
-            console.log(ev);
             ev.preventDefault();
             navigate(backToProfile);
           }}

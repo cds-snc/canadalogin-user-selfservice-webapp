@@ -17,7 +17,7 @@ import AreYouSureUpdateYourEmail from "../../../components/Manage/AreYouSureUpda
 import SecuritySettings from "../../../components/Manage/SecuritySettings/SecuritySettings.jsx";
 import Manage2FAVerifications from "../../../components/Manage/SecuritySettings/Manage2FAVerifications.jsx";
 import EditLanguagePreferences from "../../../features/LanguagePreference/components/EditLanguagePreferences.jsx";
-import AreYouSureEditYourLanguage from "../../../features/LanguagePreference/components/ConfirmUpdate.jsx";
+import ConfirmLanguageUpdate from "../../../features/LanguagePreference/components/ConfirmUpdate.jsx";
 import ProfileYouMayUpdateLanguage from "../../../features/LanguagePreference/components/SuccessfullyUpdated.jsx";
 import ProfileUpdateName from "../../../features/ProfileName/components/ProfileUpdateName.jsx";
 import Verification from "../../../components/Verification/Verification.jsx";
@@ -57,8 +57,8 @@ const PageRenderer = ({ page }) => {
       return <Manage2FAVerifications />;
     case PAGES.editLanguagePreferences:
       return <EditLanguagePreferences />;
-    case PAGES.areYouSureEditYourLanguage:
-      return <AreYouSureEditYourLanguage />;
+    case PAGES.confirmLanguageUpdate:
+      return <ConfirmLanguageUpdate />;
     case PAGES.profileYouMayUpdateLanguage:
       return <ProfileYouMayUpdateLanguage />;
     case PAGES.verification:

@@ -49,7 +49,7 @@ export default function ConfirmLanguageUpdate() {
 
   const pageContentJson = getPageContent(
     languageCode,
-    PAGES.areYouSureEditYourLanguage,
+    PAGES.confirmLanguageUpdate,
   );
   const loaderPageContentJson = getPageContent(
     languageCode,

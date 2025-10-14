@@ -255,7 +255,7 @@
     "10": "Services connectés",
     "11": "dans votre tableau de bord GC Sign in."
   },
-  "AreYouSureEditYourLanguage": {
+  "ConfirmLanguageUpdate": {
     "1": "Voulez-vous vraiment mettre à jour votre langue de communication?",
     "2": "Vous avez demandé à changer votre langue de communication pour la langue suivante:",
     "3": "Exemple : Nouveau nom",
