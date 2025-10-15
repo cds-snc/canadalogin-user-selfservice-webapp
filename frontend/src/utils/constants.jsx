@@ -99,6 +99,9 @@ export const PAGES = {
   addSecondMFATextMessage: "AddSecondMFATextMessage",
   deleteMFAPage: "DeleteMFAPage",
   deleteMFAPhoneNumberConfirm: "DeleteMFAPhoneNumberConfirm",
+  LinkPrompt: "LinkPrompt",
+  SkipLink: "SkipLink",
+  LinkSuccess: "LinkSuccess",
 };
 
 export const FOOTERS = {

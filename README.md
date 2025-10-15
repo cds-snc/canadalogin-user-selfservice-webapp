@@ -1,7 +1,7 @@
 # GC Sign in - User self-service web application
 
 A modern and accessible web application that allows users to make changes to their GC Sign in account.  Built with a React front-end using the [GC Design System](https://github.com/cds-snc/gcds-components), and a supporting FastAPI back-end API that integrates with the IBM Verify SaaS (IdP) to handle login, logout and profile updates.
-
+∏
 ## Architecture
 This solution follows a BFF (backend for frontend) architectural pattern:
 - Frontend: React-based SPA
