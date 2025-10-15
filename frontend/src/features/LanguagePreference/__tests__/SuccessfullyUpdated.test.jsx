@@ -88,8 +88,13 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
       {children}
     </p>
   ),
-  GcdsNotice: ({ children, type, noticeTitle, ...props }) => (
-    <div data-testid="gcds-notice" data-type={type} {...props}>
+  GcdsNotice: ({ children, type, noticeTitle, noticeTitleTag, ...props }) => (
+    <div
+      data-testid="gcds-notice"
+      data-type={type}
+      style={{ noticeTitle: noticeTitle, noticeTitleTag: noticeTitleTag }}
+      {...props}
+    >
       {noticeTitle && <div data-testid="notice-title">{noticeTitle}</div>}
       {children}
     </div>

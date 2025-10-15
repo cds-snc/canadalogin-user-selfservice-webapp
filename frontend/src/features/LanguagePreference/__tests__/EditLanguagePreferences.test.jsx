@@ -71,8 +71,8 @@ vi.mock(
 );
 
 vi.mock("@cdssnc/gcds-components-react", () => ({
-  GcdsContainer: ({ children, ...props }) => (
-    <div data-testid="gcds-container" {...props}>
+  GcdsContainer: ({ children, marginTop, ...props }) => (
+    <div data-testid="gcds-container" style={{ marginTop }} {...props}>
       {children}
     </div>
   ),
