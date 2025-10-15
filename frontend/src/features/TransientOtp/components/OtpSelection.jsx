@@ -21,6 +21,7 @@ export default function OtpSelection({
   userSelectedMfaFactor,
   onChangeUserSelectedMfaFactor,
   userPhoneFactors,
+  parentPage,
 }) {
   const { language } = useParams();
   const navigateHelper = useNavigateHelper();
@@ -31,14 +32,11 @@ export default function OtpSelection({
   const backToManage2FAVerificationsPage = path(PAGES.manage2FAVerifications, {
     language: language,
   });
-  const configureRadioOptions = () => {
+  const configureRadioSMSOptions = () => {
     let radioOptionsValues = [];
 
     const smsPhoneFactors = userPhoneFactors.filter(
       (factor) => factor.type === FLOW_TYPES.sms,
-    );
-    const voicePhoneFactors = userPhoneFactors.filter(
-      (factor) => factor.type === FLOW_TYPES.voice,
     );
 
     // Add all SMS factors as radio options
@@ -52,6 +50,16 @@ export default function OtpSelection({
       };
       radioOptionsValues.push(smsOtpRadioOption);
     });
+
+    return radioOptionsValues;
+  };
+
+  const configureRadioVoiceOptions = () => {
+    let radioOptionsValues = [];
+
+    const voicePhoneFactors = userPhoneFactors.filter(
+      (factor) => factor.type === FLOW_TYPES.voice,
+    );
 
     // Add all Voice factors as radio options
     voicePhoneFactors.forEach((voicePhoneFactor) => {
@@ -68,7 +76,15 @@ export default function OtpSelection({
     return radioOptionsValues;
   };
 
-  const radioOptions = configureRadioOptions();
+  const radioSMSOptions = configureRadioSMSOptions();
+  const radioVoiceOptions = configureRadioVoiceOptions();
+
+  const parentPageContent =
+    parentPage === PAGES.deleteMFAPage
+      ? pageContentJson["15"]
+      : parentPage === PAGES.addMFAPage
+        ? pageContentJson["14"]
+        : pageContentJson["2"];
 
   return (
     <GcdsContainer>
@@ -80,22 +96,31 @@ export default function OtpSelection({
       <GcdsContainer>
         <GcdsContainer>
           <GcdsText>
-            {pageContentJson["2"]} {pageContentJson["3"]}
+            {parentPageContent} {pageContentJson["3"]}
           </GcdsText>
         </GcdsContainer>
-        {radioOptions.length > 1 ? (
+        <GcdsContainer>
+          <GcdsHeading tag="h2">{pageContentJson["4"]}</GcdsHeading>
+          <GcdsText>
+            {pageContentJson["5"]} {pageContentJson["6"]} {pageContentJson["7"]}
+          </GcdsText>
+        </GcdsContainer>
+        {radioSMSOptions.length > 0 && (
           <GcdsRadios
-            name="radio"
-            legend={pageContentJson["4"]}
-            hint={`${pageContentJson["5"]} ${pageContentJson["6"]} ${pageContentJson["7"]}`}
-            options={radioOptions}
+            name="smsRadio"
+            legend={pageContentJson["8"]}
+            options={radioSMSOptions}
             onGcdsChange={(e) => onChangeUserSelectedMfaFactor(e.target.value)}
           ></GcdsRadios>
-        ) : (
-          <>
-            <GcdsText>{radioOptions[0]?.label}</GcdsText>
-            <GcdsText>{radioOptions[0]?.hint}</GcdsText>
-          </>
+        )}
+
+        {radioVoiceOptions.length > 0 && (
+          <GcdsRadios
+            name="voiceRadio"
+            legend={pageContentJson["9"]}
+            options={radioVoiceOptions}
+            onGcdsChange={(e) => onChangeUserSelectedMfaFactor(e.target.value)}
+          ></GcdsRadios>
         )}
 
         <GcdsGrid columns="max-content max-content" gap="200">

@@ -240,6 +240,7 @@ export default function AddMFAPage() {
         onNext={() => {
           setWizardStep("otpValidation");
         }}
+        parentPage={PAGES.addMFAPage}
       />
     ),
     otpValidation: (

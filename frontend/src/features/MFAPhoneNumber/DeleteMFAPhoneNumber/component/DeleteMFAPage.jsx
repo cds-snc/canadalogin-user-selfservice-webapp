@@ -172,6 +172,7 @@ export default function DeleteMFAPage() {
         onNext={() => {
           setWizardStep("otpValidation");
         }}
+        parentPage={PAGES.deleteMFAPage}
       />
     ),
     otpValidation: (
