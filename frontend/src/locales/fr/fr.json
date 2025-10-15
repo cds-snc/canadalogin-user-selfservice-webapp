@@ -454,8 +454,9 @@
     "9": "Appel vocal",
     "10": "Besoin d’aide?",
     "11": "Chargement...",
-    "12": "Des frais d’opérateur peuvent s’appliquer.",
-    "13": "Obtenir de l’aide concernant la vérification en deux étapes",
-    "14": "Je n’ai pas accès à mon téléphone"
+    "12": "Obtenir de l’aide concernant la vérification en deux étapes",
+    "13": "Je n’ai pas accès à mon téléphone",
+    "14": "Pour ajouter un numéro de téléphone,",
+    "15": "Pour supprimer un numéro de téléphone,"
   }
 }
