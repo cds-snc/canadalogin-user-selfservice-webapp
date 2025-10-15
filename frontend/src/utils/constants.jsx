@@ -99,6 +99,7 @@ export const PAGES = {
   addSecondMFATextMessage: "AddSecondMFATextMessage",
   deleteMFAPage: "DeleteMFAPage",
   deleteMFAPhoneNumberConfirm: "DeleteMFAPhoneNumberConfirm",
+  transientOtpSelection: "TransientOtpSelection",
 };
 
 export const FOOTERS = {

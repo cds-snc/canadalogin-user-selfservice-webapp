@@ -68,14 +68,14 @@ vi.mock("../../../../components/Layout/Loading.jsx", () => ({
 }));
 
 // Mock the API with different responses for each test
-vi.mock("../../../../features/ChangePassword/api/otpFactors.jsx", () => ({
+vi.mock("../../../../features/TransientOtp/api/otpFactors.jsx", () => ({
   otpFactors: {
     getUserOtpPhoneFactors: vi.fn(),
   },
 }));
 
 // Import the mocked module
-import { otpFactors } from "../../../../features/ChangePassword/api/otpFactors.jsx";
+import { otpFactors } from "../../../../features/TransientOtp/api/otpFactors.jsx";
 
 describe("Manage2FAVerifications Component Unit Tests", () => {
   beforeEach(() => {

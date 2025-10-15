@@ -7,7 +7,7 @@ import {
 } from "@cdssnc/gcds-components-react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
-import { otpFactors } from "../../../features/ChangePassword/api/otpFactors.jsx";
+import { otpFactors } from "../../../features/TransientOtp/api/otpFactors.jsx";
 import { useNavigateHelper } from "../../../hooks/useNavigate.js";
 import { PAGES } from "../../../utils/constants.jsx";
 import { getPageContent } from "../../../utils/functions.jsx";
