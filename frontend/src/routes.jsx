@@ -32,9 +32,10 @@ import ChangePasswordIndex from "./features/ChangePassword/components/ChangePass
 import UpdateContactPhoneNumberContainer from "./features/ContactPhoneNumber/components/UpdateContactPhoneNumberContainer.jsx";
 import AddMFAPage from "./features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPage.jsx";
 import DeleteMFAPage from "./features/MFAPhoneNumber/DeleteMFAPhoneNumber/component/DeleteMFAPage.jsx";
-import { PAGES } from "./utils/constants.jsx";
 import SkipLink from "./features/DoubleSignIn/components/SkipLink.jsx";
+import LinkPrompt from "./features/DoubleSignIn/components/LinkPrompt.jsx";
 import LinkSuccess from "./features/DoubleSignIn/components/LinkSuccess.jsx";
+import { PAGES } from "./utils/constants.jsx";
 
 export const appRoutes = [
   {
@@ -184,7 +185,7 @@ export const appRoutes = [
               },
               {
                 path: "LinkPrompt",
-                handle: { id: PAGES.LinkPrompt, breadcrumbId: "12" },
+                handle: { id: PAGES.LinkPrompt },
                 children: [
                   {
                     index: true,
