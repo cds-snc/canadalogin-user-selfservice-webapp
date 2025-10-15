@@ -71,12 +71,12 @@ vi.mock(
 );
 
 vi.mock("@cdssnc/gcds-components-react", () => ({
-  GcdsContainer: ({ children, marginTop, ...props }) => (
+  GcdsContainer: ({ children, ...props }) => (
     <div data-testid="gcds-container" {...props}>
       {children}
     </div>
   ),
-  GcdsHeading: ({ children, tag, ...props }) => (
+  GcdsHeading: ({ children, ...props }) => (
     <h1 data-testid="gcds-heading" {...props}>
       {children}
     </h1>
@@ -106,12 +106,12 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
       </button>
     );
   },
-  GcdsGrid: ({ children, columns, gap, ...props }) => (
+  GcdsGrid: ({ children, ...props }) => (
     <div data-testid="gcds-grid" {...props}>
       {children}
     </div>
   ),
-  GcdsRadios: ({ name, legend, options, lang, onChange, ...props }) => (
+  GcdsRadios: ({ name, legend, options, onChange, ...props }) => (
     <div data-testid="gcds-radios" {...props}>
       <fieldset>
         <legend>{legend}</legend>
