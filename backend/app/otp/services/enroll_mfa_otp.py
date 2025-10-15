@@ -3,7 +3,7 @@ from datetime import datetime
 
 from app.config import get_configuration
 from app.otp.schemas import EnrollmentResponseData, OtpEnrollmentRequest, OtpType
-from app.users.services.profile import my_profile
+from app.users.services.get_my_profile import get_my_profile
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.helpers import (
     generate_error_response,
@@ -30,7 +30,7 @@ async def handle_otp_enrollment(
         start_time = datetime.now()
 
         # Verify user profile
-        my_profile_response = await my_profile(global_http_client, user_access_token)
+        my_profile_response = await get_my_profile(global_http_client, user_access_token)
         if not my_profile_response.success:
             logger.error(f"Failed to get user profile for {otp_type} enrollment")
             return ResponseModel(

@@ -1,14 +1,13 @@
 from httpx import Response
-from app.users.services.profile import update_profile
+from backend.app.users.services.update_my_profile import update_profile
 from unittest.mock import AsyncMock, Mock, patch
 from app.utils.request_error_handler import RequestErrorHandler
 import pytest
 import respx
 from httpx import AsyncClient
-from app.users.services.profile import (
+from app.users.services.update_my_profile import (
     dispatch_update_user_profile,
     sanitize_user_profile_data,
-    my_profile,
 )
 from app.users.schemas import (
     IBMVerifyUpdateUserProfile,

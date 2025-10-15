@@ -15,6 +15,7 @@ from app.utils.access_token import get_auth_request_headers
 from app.utils.mask_phone_number import mask_phone_number
 from app.config import get_configuration
 from app.utils.request_error_handler import RequestErrorHandler
+from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
 
 logger = logging.getLogger(__name__)
 
@@ -74,7 +75,7 @@ async def dispatch_update_user_profile(
         RequestErrorHandler.handle(e)
 
 
-async def update_profile(
+async def update_my_profile(
     request: Request,
     user_data: UserProfileUpdateRequest,
     user_access_token,
@@ -83,7 +84,7 @@ async def update_profile(
 
         updated_user_data_dict = sanitize_user_profile_data(user_data)
 
-        user_profile = await my_profile(
+        user_profile = await dispatch_get_my_profile_from_ibm(
             request.app.state.request_client, user_access_token
         )
         user_profile_data = user_profile.data.model_dump()
