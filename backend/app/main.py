@@ -25,6 +25,8 @@ from app.password import v1_router as v1_password_router
 from app.otp import v1_router as v1_otp_router
 from app.auth.services import oidc_config
 
+from Secweb import SecWeb
+
 configuration = get_configuration()
 
 logging.basicConfig(
@@ -103,6 +105,7 @@ app = FastAPI(
     contact=CONTACT_INFO,
 )
 
+SecWeb(app=app)
 # Determine session domain
 # ROOT_DOMAIN is .<ROOT_DOMAIN> example: .signin-connexion.cdssandbox.xyz
 session_domain = None

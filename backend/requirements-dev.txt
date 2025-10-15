@@ -6,3 +6,4 @@ flake8==7.3.0
 black==25.9.0
 pytest-asyncio==0.26.0
 respx==0.22.0
+Secweb==1.25.2
