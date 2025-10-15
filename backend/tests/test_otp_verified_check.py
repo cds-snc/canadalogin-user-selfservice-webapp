@@ -271,6 +271,6 @@ async def test_handle_otp_verification_transport_exception_translates_to_http_ex
 
     exc: HTTPException = excinfo.value
     assert exc.status_code == 400
-    # Implementation uses the enum value (not the full enum representation) in the error detail:
-    # f"{user_verification_data.otpType.value} verification error: ..."
-    assert "voice verification error: simulated network failure" in exc.detail
+    # Implementation uses the Enum object (not .value) in the error detail:
+    # f"{user_verification_data.otpType} verification error: ..."
+    assert "OtpType.VOICE verification error: simulated network failure" in exc.detail
