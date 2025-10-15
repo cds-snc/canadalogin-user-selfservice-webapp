@@ -68,7 +68,7 @@ vi.mock("../../../../components/Layout/Loading.jsx", () => ({
 }));
 
 // Mock the API with different responses for each test
-vi.mock("../../../../features/ChangePassword/api/otpFactors.jsx", () => ({
+vi.mock("../../../../features/TransientOtp/api/otpFactors.jsx", () => ({
   otpFactors: {
     getUserOtpPhoneFactors: vi.fn(),
   },

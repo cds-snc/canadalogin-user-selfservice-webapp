@@ -32,9 +32,9 @@ class AuthenticatedUserResponse(ResponseModel):
 
 
 class UserOtpInfo(BaseModel):
-    phoneNumber: Optional[
-        str
-    ] = None  # Changed from PhoneNumber to str to handle masked numbers
+    phoneNumber: Optional[str] = (
+        None  # Changed from PhoneNumber to str to handle masked numbers
+    )
     userName: EmailStr
     otpType: OtpType
 
