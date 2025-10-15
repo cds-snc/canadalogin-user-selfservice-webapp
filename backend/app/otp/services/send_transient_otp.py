@@ -24,10 +24,19 @@ async def resolve_masked_phone_number(
     global_http_client: AsyncClient,
     user_profile_id: str,
     masked_phone: str,
-    otp_type: str,
+    otp_type: OtpType,
 ) -> str:
     """
     Resolve a masked phone number to the actual phone number by matching last 4 digits.
+
+    Args:
+        global_http_client: HTTP client for API calls
+        user_profile_id: User's profile ID
+        masked_phone: Masked phone number (e.g., "***-***-1234")
+        otp_type: OTP type enum (OtpType.SMS or OtpType.VOICE)
+
+    Returns:
+        The resolved actual phone number
     """
     try:
         # Get unmasked user OTP factors
@@ -48,9 +57,9 @@ async def resolve_masked_phone_number(
 
             # Match by last 4 digits and compatible type
             type_match = False
-            if otp_type.lower() == "sms" and factor_type.lower() in ["smsotp", "sms"]:
+            if otp_type == OtpType.SMS and factor_type.lower() in ["smsotp", "sms"]:
                 type_match = True
-            elif otp_type.lower() == "voice" and factor_type.lower() in [
+            elif otp_type == OtpType.VOICE and factor_type.lower() in [
                 "voiceotp",
                 "voice",
             ]:
