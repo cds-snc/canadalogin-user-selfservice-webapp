@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   GcdsContainer,
   GcdsText,
@@ -27,11 +27,13 @@ export default function LinkSuccess() {
   const pageContentJson = getPageContent(language, PAGES.password);
   const errorPageJson = getPageContent(language, PAGES.error);
 
-  async function submitLegacyPAI() {
-    await updateLinkStateAPI.submitLegacyPAI(1);
-  }
+  useEffect(() => {
+    async function submitLegacyPAI() {
+      await updateLinkStateAPI.submitLegacyPAI(1);
+    }
 
-  submitLegacyPAI();
+    submitLegacyPAI();
+  }, []);
 
   const continueToRP = async () => {
     try {

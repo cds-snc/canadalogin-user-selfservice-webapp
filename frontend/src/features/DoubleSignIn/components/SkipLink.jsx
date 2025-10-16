@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   GcdsContainer,
   GcdsText,
@@ -26,11 +26,13 @@ export default function SkipLink() {
   const pageContentJson = getPageContent(language, PAGES.password);
   const errorPageJson = getPageContent(language, PAGES.error);
 
-  async function submitLegacyPAI() {
-    await updateLinkStateAPI.submitSkipLinking(1);
-  }
+  useEffect(() => {
+    async function submitSkipLinking() {
+      await updateLinkStateAPI.submitSkipLinking(1);
+    }
 
-  submitLegacyPAI();
+    submitSkipLinking();
+  }, []);
 
   const startLinking = async () => {
     try {
