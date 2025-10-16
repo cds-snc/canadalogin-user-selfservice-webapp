@@ -62,7 +62,14 @@ export default function AddSecondMFA({
           </GcdsButton>
         </GcdsText>
         &nbsp;
-        <GcdsLink href={onSkipForNowLink}>{pageContentJson["10"]}</GcdsLink>
+        <GcdsLink
+          onGcdsClick={async (ev) => {
+            ev.preventDefault();
+            await onSkipForNowLink();
+          }}
+        >
+          {pageContentJson["10"]}
+        </GcdsLink>
       </GcdsGrid>
     </GcdsContainer>
   );

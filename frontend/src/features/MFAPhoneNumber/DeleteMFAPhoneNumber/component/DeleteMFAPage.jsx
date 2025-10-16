@@ -194,7 +194,10 @@ export default function DeleteMFAPage() {
         onNext={async () => {
           try {
             await deleteMFA();
-            await navigateHelper(backToManage2FAVerificationsPage);
+            await navigateHelper(backToManage2FAVerificationsPage, false, {
+              noticeType: "mfaDeleted",
+              phoneNumber: phoneFormData.formattedPhoneNumber,
+            });
           } catch (error) {
             setErrorCode(error?.message || "Unexpected API request error");
           }

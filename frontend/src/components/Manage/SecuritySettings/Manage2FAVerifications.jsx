@@ -3,10 +3,11 @@ import {
   GcdsContainer,
   GcdsHeading,
   GcdsLink,
+  GcdsNotice,
   GcdsText,
 } from "@cdssnc/gcds-components-react";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useLocation, useParams } from "react-router";
 import { otpFactors } from "../../../features/TransientOtp/api/otpFactors.jsx";
 import { useNavigateHelper } from "../../../hooks/useNavigate.js";
 import { PAGES } from "../../../utils/constants.jsx";
@@ -14,17 +15,23 @@ import { getPageContent } from "../../../utils/functions.jsx";
 import { path } from "../../../utils/routeHelpers.js";
 import Loader from "../../Layout/Loading.jsx";
 import { useUser } from "../../Providers/useUser.js";
+import NoticeFactory from "../../InfoBlocks/NoticeFactory.jsx";
 
 export default function Manage2FAVerifications() {
   const { language } = useParams();
+  const location = useLocation();
   const pageContent = getPageContent(language, PAGES.manage2FAVerifications);
   const navigateHelper = useNavigateHelper();
   const { state, _dispatch } = useUser();
   const [userPhoneFactorsMap, setUserPhoneFactorsMap] = useState({});
   const [loading, setLoading] = useState(true);
+
+  // Check if we came from another page and need to render success notice
+  const { noticeType, phoneNumber, otpType } = location.state || {};
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
     language: language,
   });
+
   const availableFactorsUIContentMap = {
     smsotp: pageContent["7"],
     voiceotp: pageContent["8"],
@@ -111,6 +118,14 @@ export default function Manage2FAVerifications() {
     <Loader text={pageContent["11"]} />
   ) : (
     <GcdsContainer>
+      {noticeType && (
+        <NoticeFactory
+          noticeType={noticeType}
+          phoneNumber={phoneNumber}
+          otpType={otpType}
+        />
+      )}
+
       <GcdsHeading tag="h1">{pageContent["1"]}</GcdsHeading>
       <GcdsText>{pageContent["2"]}</GcdsText>
 
