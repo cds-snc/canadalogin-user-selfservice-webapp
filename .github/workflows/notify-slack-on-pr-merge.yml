@@ -26,7 +26,7 @@ jobs:
               text: ":merged: A pull request has been merged.",
               attachments: [
                 {
-                  color: "#36a64f",
+                  color: "#6f43c0",
                   fields: [
                     { title: "Repository", value: $repo, short: true },
                     { title: "Author", value: $author, short: true },
