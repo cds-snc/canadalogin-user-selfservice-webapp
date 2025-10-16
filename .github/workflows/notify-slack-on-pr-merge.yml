@@ -1,4 +1,7 @@
 name: Notify Slack on PR Merge
+permissions:
+  contents: read
+  pull-requests: read
 
 on:
   pull_request:
