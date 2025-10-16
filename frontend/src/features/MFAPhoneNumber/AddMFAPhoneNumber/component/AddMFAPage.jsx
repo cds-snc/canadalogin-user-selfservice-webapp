@@ -310,7 +310,7 @@ export default function AddMFAPage() {
     addSecondMFA: (
       <AddSecondMFA
         phoneFormData={phoneFormData}
-        onSkipForNowLink={async () => {
+        onSkipForNow={async () => {
           const otpType =
             phoneFormData.otpType === FLOW_TYPES.voice
               ? successBannerJson["5"]
