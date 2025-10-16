@@ -9,20 +9,34 @@ export const updateLinkStateAPI = {
   // not sure we need user_id, just the legacy PAI. Or send the token back to API to ensure no tampering (validate token then pull sub from it)
   submitLegacyPAI: async (user_id) => {
     try {
-      const response = await axios.get(
-        `${config.apiUrl}${SUBMIT_END_POINTS.users}/${user_id}/otp_factors`,
-      );
-      return response.data;
+      console.log("====== start submitLegacyPAI ======");
+      console.log("====== " + user_id + " ======");
+      console.log("====== " + config.apiUrl + " ======");
+      console.log("====== " + SUBMIT_END_POINTS.users + " ======");
+      console.log("====== end submitLegacyPAI ======");
+      //const response = await axios.get(
+      //  `${config.apiUrl}${SUBMIT_END_POINTS.users}/${user_id}/otp_factors`,
+      //);
+
+      return null;
+      //return response.data;
     } catch (error) {
       handleApiError(error);
     }
   },
   submitSkipLinking: async (user_id) => {
     try {
-      const response = await axios.get(
-        `${config.apiUrl}${SUBMIT_END_POINTS.users}/${user_id}/otp_factors`,
-      );
-      return response.data;
+      console.log("====== start submitLegacyPAI ======");
+      console.log("====== " + user_id + " ======");
+      console.log("====== " + config.apiUrl + " ======");
+      console.log("====== " + SUBMIT_END_POINTS.users + " ======");
+      console.log("====== end submitLegacyPAI ======");
+      //const response = await axios.get(
+      //  `${config.apiUrl}${SUBMIT_END_POINTS.users}/${user_id}/otp_factors`,
+      //);
+
+      return null;
+      //return response.data;
     } catch (error) {
       handleApiError(error);
     }
