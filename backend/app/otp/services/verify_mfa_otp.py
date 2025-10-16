@@ -28,7 +28,9 @@ async def handle_send_mfa_otp(
     """Send an MFA OTP for SMS or Voice"""
     try:
         # Verify user profile
-        my_profile_response = await get_my_profile(global_http_client, user_access_token)
+        my_profile_response = await get_my_profile(
+            global_http_client, user_access_token
+        )
         if not my_profile_response.success:
             logger.error(
                 f"Failed to get user profile for {otp_type} verification creation"
@@ -73,7 +75,9 @@ async def handle_verify_mfa_otp(
     """Verify MFA OTP for SMS or Voice"""
     try:
         # Verify user profile
-        my_profile_response = await get_my_profile(global_http_client, user_access_token)
+        my_profile_response = await get_my_profile(
+            global_http_client, user_access_token
+        )
         if not my_profile_response.success:
             logger.error(
                 f"Failed to get user profile for {otp_type} verification attempt"

@@ -99,7 +99,9 @@ async def handle_otp_send(
     try:
         logger.info(f"Attempting to send {user_otp_info.otpType} OTP")
         start_time = datetime.now()
-        my_profile_response = await get_my_profile(global_http_client, user_access_token)
+        my_profile_response = await get_my_profile(
+            global_http_client, user_access_token
+        )
         if my_profile_response.data.userName != user_otp_info.userName:
             logger.error("User mismatch - cannot send OTP")
             return generate_error_response(403, "User mismatch - cannot send OTP")

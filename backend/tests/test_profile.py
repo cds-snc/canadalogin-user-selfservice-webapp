@@ -9,6 +9,9 @@ from app.users.services.update_my_profile import (
     dispatch_update_user_profile,
     sanitize_user_profile_data,
 )
+from app.users.services.get_my_profile import (
+    get_my_profile,
+)
 from app.users.schemas import (
     IBMVerifyUpdateUserProfile,
     UserProfileUpdateRequest,
@@ -307,7 +310,7 @@ async def test_my_profile_success(monkeypatch):
     )
 
     http_client = AsyncClient()
-    response = await my_profile(http_client, user_access_token="mock-token")
+    response = await get_my_profile(http_client, user_access_token="mock-token")
 
     assert response.success is True
     assert response.data.userName == "john.doe@example.com"
@@ -328,7 +331,7 @@ async def test_my_profile_unauthorized(monkeypatch):
     http_client = AsyncClient()
 
     with pytest.raises(HTTPException) as exc:
-        await my_profile(http_client, user_access_token="mock-token")
+        await get_my_profile(http_client, user_access_token="mock-token")
 
     assert exc.value.status_code == 401
     assert "Not authenticated" in str(exc.value.detail)
@@ -354,7 +357,7 @@ async def test_my_profile_other_error(monkeypatch):
     http_client = AsyncClient()
 
     with pytest.raises(HTTPException) as exc:
-        await my_profile(http_client, user_access_token="mock-token")
+        await get_my_profile(http_client, user_access_token="mock-token")
 
     assert exc.value.status_code == 500
     assert "HTTP error" in str(exc.value.detail)

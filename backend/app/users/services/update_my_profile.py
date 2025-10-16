@@ -1,7 +1,7 @@
 import logging
 
 from fastapi import HTTPException, Request
-from httpx import AsyncClient, Response
+from httpx import Response
 from pydantic import ValidationError
 
 from app.users.schemas import (
@@ -9,11 +9,9 @@ from app.users.schemas import (
     ProfileResponse,
     UserProfileUpdateRequest,
     IBMVerifyUpdateUserProfile,
-    MetaDataTypeValue,
 )
 from app.utils.access_token import get_auth_request_headers
-from app.utils.mask_phone_number import mask_phone_number
-from app.config import get_configuration
+from app.utils.mask_phone_number import mask_contact_phone_numbers
 from app.utils.request_error_handler import RequestErrorHandler
 from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
 
@@ -22,42 +20,38 @@ logger = logging.getLogger(__name__)
 
 def sanitize_user_profile_data(user_data: UserProfileUpdateRequest) -> dict:
     # validation and then turns it into a UserProfileUpdateRequest dict
-    validate_updated_data = UserProfileUpdateRequest(**user_data.model_dump())
-    updated_data_dict = validate_updated_data.model_dump(
-        exclude_unset=True, exclude_none=True
-    )
+    """
+    Validate and sanitize user profile update data.
+
+    Args:
+        user_data: User profile update request
+
+    Returns:
+        dict: Sanitized data with unset and None values excluded
+    """
+    updated_data_dict = user_data.model_dump(exclude_unset=True, exclude_none=True)
     return updated_data_dict
-
-
-def mask_contact_phone_numbers(
-    json_data: dict,
-) -> list[MetaDataTypeValue]:
-    """
-    Given a user profile JSON dict, replace `phoneNumbers` with masked values.
-    Loop through a list of profile contact phone numbers and mask each number except the last 4 digits.
-    """
-
-    profile_contact_phone_numbers = json_data.get("phoneNumbers")
-
-    if profile_contact_phone_numbers is None:
-        return None
-
-    masked_phone_numbers = []
-    for phone in profile_contact_phone_numbers:
-        value = phone.get("value")
-        if not value:
-            continue
-        masked_phone = dict(phone)  # Create a copy of the original phone dict
-        masked_phone["value"] = mask_phone_number(value)
-        masked_phone_numbers.append(masked_phone)
-    return masked_phone_numbers
 
 
 async def dispatch_update_user_profile(
     request: Request,
-    user_profile_payload: IBMVerifyUpdateUserProfile,
+    user_profile_payload: str,
     user_access_token: str,
 ) -> Response:
+    """
+    Send user profile update to IBM Verify API.
+
+    Args:
+        request: FastAPI request object
+        user_profile_payload: JSON string of profile data
+        user_access_token: User's authentication token
+
+    Returns:
+        Response: Raw HTTP response from IBM Verify
+
+    Raises:
+        HTTPException: Via RequestErrorHandler for any request failures
+    """
     try:
         logger.info("dispatch_update_user_profile")
         headers = get_auth_request_headers(user_access_token)
@@ -79,93 +73,73 @@ async def update_my_profile(
     request: Request,
     user_data: UserProfileUpdateRequest,
     user_access_token,
-):
+) -> ProfileResponse:
+    """
+    Update the authenticated user's profile.
+
+    Validates user identity, merges updates with existing profile data,
+    and returns the updated profile with masked phone numbers.
+
+    Args:
+        request: FastAPI request object
+        user_data: Profile update request data
+        user_access_token: User's authentication token
+
+    Returns:
+        ProfileResponse: Updated profile data with masked phone numbers
+
+    Raises:
+        HTTPException: For authentication, authorization, or validation errors
+    """
+    logger.info("Starting user profile update")
+
+    updated_user_data_dict = sanitize_user_profile_data(user_data)
+
+    ibm_user_profile_response = await dispatch_get_my_profile_from_ibm(
+        request, user_access_token
+    )
+    ibm_user_profile = ibm_user_profile_response.model_dump()
+
+    ibm_user_profile_username = ibm_user_profile.get("userName")
+    current_users_username = updated_user_data_dict.get("userName")
+    username_match = ibm_user_profile_username == current_users_username
+
+    if not username_match:
+        logger.error("User mismatch - cannot update profile")
+        raise HTTPException(
+            status_code=403, detail="User mismatch - cannot update profile"
+        )
+
+    # Prevent changing the userName
+    updated_user_data_dict.pop("userName", None)
+
+    merged_profile = {**ibm_user_profile, **updated_user_data_dict}
+
+    validate_merged_profile = IBMVerifyUpdateUserProfile(**merged_profile)
+
+    user_profile_payload = validate_merged_profile.model_dump_json(
+        by_alias=True, exclude_none=True
+    )
+
+    response = await dispatch_update_user_profile(
+        request, user_profile_payload, user_access_token
+    )
     try:
-
-        updated_user_data_dict = sanitize_user_profile_data(user_data)
-
-        user_profile = await dispatch_get_my_profile_from_ibm(
-            request.app.state.request_client, user_access_token
-        )
-        user_profile_data = user_profile.data.model_dump()
-
-        does_username_match = user_profile_data.get(
-            "userName"
-        ) == updated_user_data_dict.get("userName")
-
-        if not does_username_match:
-            logger.error("User mismatch - cannot update profile")
-            raise HTTPException(
-                status_code=403, detail="User mismatch - cannot update profile"
-            )
-
-        updated_user_data_dict.pop(
-            "userName", None
-        )  # Prevent changing the userName (email)
-
-        merged_profile = {**user_profile_data, **updated_user_data_dict}
-
-        validate_merged_profile = IBMVerifyUpdateUserProfile(**merged_profile)
-
-        user_profile_payload = validate_merged_profile.model_dump_json(
-            by_alias=True, exclude_none=True
-        )
-
-        response = await dispatch_update_user_profile(
-            request, user_profile_payload, user_access_token
-        )
-        if response.status_code != 200:
-            # parse error details safely
-            json_data = response.json()
-            error_detail = json_data.get("detail", "Unknown error")
-            raise HTTPException(status_code=response.status_code, detail=error_detail)
-
-        logger.info("User profile updated successfully.")
         json_data = response.json()
-        json_data["phoneNumbers"] = mask_contact_phone_numbers(json_data)
-
-        response_data = IBMVerifyUserProfileSchema(**json_data)
-        return ProfileResponse(
-            success=True,
-            message="User profile updated successfully.",
-            data=response_data,
-        )
-
-    except ValidationError as e:
-        logger.error(f"Validation Error: {e.json()}")
+    except Exception as e:
+        logger.error(f"Failed to parse profile response: {str(e)}")
         raise HTTPException(status_code=422, detail="Request data validation error")
 
+    json_data["phoneNumbers"] = mask_contact_phone_numbers(json_data)
 
-async def my_profile(global_http_client: AsyncClient, user_access_token: str):
     try:
-        settings = get_configuration()
-
-        profile_api_endpoint = settings.profile_api_endpoint
-        logger.info("Get my profile")
-        headers = get_auth_request_headers(user_access_token)
-        response = await global_http_client.get(profile_api_endpoint, headers=headers)
+        response_data = IBMVerifyUserProfileSchema(**json_data)
     except ValidationError as e:
-        logger.error(f"Validation Error: {e.json()}")
+        logger.error(f"Profile Validation Error: {e.json()}")
         raise HTTPException(status_code=422, detail="Request data validation error")
 
-    if response.status_code == 200:
-        logger.info("User profile retrieved successfully.")
-        json_data = response.json()
-        json_data["phoneNumbers"] = mask_contact_phone_numbers(json_data)
-
-        response_data = IBMVerifyUserProfileSchema(**json_data)
-        return ProfileResponse(
-            success=True,
-            message="User profile retrieved successfully.",
-            data=response_data,
-        )
-    else:
-        logger.error(f"Failed to retrieve profile. Response: {response.text}")
-        if response.status_code == 401:
-            raise HTTPException(status_code=401, detail="Not authenticated")
-        else:
-            json_data = response.json()
-            error_details = json_data.get("detail")
-            raise HTTPException(
-                status_code=response.status_code, detail=f"HTTP error, {error_details}"
-            )
+    return ProfileResponse(
+        success=True,
+        message="User profile updated successfully.",
+        data=response_data,
+    )
