@@ -70,6 +70,8 @@ export default function AddMFAPage() {
     formattedPhoneNumber: "",
   });
 
+  const successBannerJson = getPageContent(language, PAGES.successBanner);
+
   const handlePhoneForm = (field, value) => {
     setPhoneFormData((prev) => ({
       ...prev,
@@ -162,7 +164,15 @@ export default function AddMFAPage() {
           visibleDigits in userPhoneFactorsMap &&
           userPhoneFactorsMap[visibleDigits].length >= 2
         ) {
-          await navigateHelper(backToManage2FAVerificationsPage);
+          const otpType =
+            phoneFormData.otpType === FLOW_TYPES.voice
+              ? successBannerJson["5"]
+              : successBannerJson["6"];
+          await navigateHelper(backToManage2FAVerificationsPage, false, {
+            noticeType: "mfaAdded",
+            phoneNumber: phoneFormData.formattedPhoneNumber,
+            otpType: otpType,
+          });
         } else {
           setWizardStep("addSecondMFA");
         }
@@ -300,7 +310,17 @@ export default function AddMFAPage() {
     addSecondMFA: (
       <AddSecondMFA
         phoneFormData={phoneFormData}
-        onSkipForNowLink={backToManage2FAVerificationsPage}
+        onSkipForNow={async () => {
+          const otpType =
+            phoneFormData.otpType === FLOW_TYPES.voice
+              ? successBannerJson["5"]
+              : successBannerJson["6"];
+          await navigateHelper(backToManage2FAVerificationsPage, false, {
+            noticeType: "mfaAdded",
+            phoneNumber: phoneFormData.formattedPhoneNumber,
+            otpType: otpType,
+          });
+        }}
         onAddSecondMFA={async () => {
           const secondMFAOtpType =
             phoneFormData.otpType === FLOW_TYPES.voice
