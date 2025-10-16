@@ -480,3 +480,37 @@ export const NullPhoneNumberHandling = {
     });
   },
 };
+
+// Test invalid noticeType returns null
+export const InvalidNoticeType = {
+  parameters: {
+    ...buildTestCase.parameters(
+      "",
+      {
+        language: AVAILABLE_LANGUAGES.en,
+      },
+      [],
+    ),
+    test: {
+      dangerouslyIgnoreUnhandledErrors: true,
+    },
+  },
+  render: () => (
+    <NoticeFactory noticeType="invalidType" phoneNumber="+1 (555) 000-0000" />
+  ),
+  play: async ({ canvasElement, step }) => {
+    await new Promise((r) => setTimeout(r, 1000));
+
+    await step(
+      "Verify component returns null for invalid noticeType",
+      async () => {
+        // The component should return null, so nothing should be rendered
+        const gcdsNotice = canvasElement.querySelector("gcds-notice");
+        await expect(gcdsNotice).not.toBeInTheDocument();
+
+        const gcdsText = canvasElement.querySelector("gcds-text");
+        await expect(gcdsText).not.toBeInTheDocument();
+      },
+    );
+  },
+};

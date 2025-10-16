@@ -146,30 +146,24 @@ describe("NoticeFactory", () => {
   });
 
   describe("Edge Cases and Error Handling", () => {
-    it("handles undefined noticeType (causes TypeError)", () => {
-      // The component currently throws an error for undefined noticeType
-      expect(() => render(<NoticeFactory noticeType={undefined} />)).toThrow(
-        TypeError,
-      );
+    it("returns null for undefined noticeType", () => {
+      const { container } = render(<NoticeFactory noticeType={undefined} />);
+      expect(container.firstChild).toBeNull();
     });
 
-    it("handles null noticeType (causes TypeError)", () => {
-      // The component currently throws an error for null noticeType
-      expect(() => render(<NoticeFactory noticeType={null} />)).toThrow(
-        TypeError,
-      );
+    it("returns null for null noticeType", () => {
+      const { container } = render(<NoticeFactory noticeType={null} />);
+      expect(container.firstChild).toBeNull();
     });
 
-    it("handles empty string noticeType (causes TypeError)", () => {
-      // The component currently throws an error for empty string noticeType
-      expect(() => render(<NoticeFactory noticeType="" />)).toThrow(TypeError);
+    it("returns null for empty noticeType", () => {
+      const { container } = render(<NoticeFactory noticeType="" />);
+      expect(container.firstChild).toBeNull();
     });
 
-    it("handles invalid noticeType (causes TypeError)", () => {
-      // The component currently throws an error for invalid noticeType
-      expect(() => render(<NoticeFactory noticeType="invalidType" />)).toThrow(
-        TypeError,
-      );
+    it("returns null for invalid noticeType", () => {
+      const { container } = render(<NoticeFactory noticeType="invalidType" />);
+      expect(container.firstChild).toBeNull();
     });
     it("handles empty phoneNumber gracefully", () => {
       render(<NoticeFactory noticeType="mfaDeleted" phoneNumber="" />);

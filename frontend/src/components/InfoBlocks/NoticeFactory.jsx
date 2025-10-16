@@ -34,5 +34,12 @@ export default function NoticeFactory({ noticeType, phoneNumber, otpType }) {
       </GcdsText>
     ),
   };
-  return NoticeComponents[noticeType]({ phoneNumber, otpType });
+
+  // Handle invalid noticeType gracefully
+  const NoticeComponent = NoticeComponents[noticeType];
+  if (!NoticeComponent) {
+    return null;
+  }
+
+  return NoticeComponent({ phoneNumber, otpType });
 }
