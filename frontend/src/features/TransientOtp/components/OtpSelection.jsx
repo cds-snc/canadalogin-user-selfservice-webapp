@@ -88,23 +88,7 @@ export default function OtpSelection({
         : pageContentJson["2"];
 
   const radioComponent =
-    radioSMSOptions.length >= 2 && radioVoiceOptions.length >= 2 ? (
-      <GcdsContainer>
-        {" "}
-        <GcdsRadios
-          name="smsRadio"
-          legend={pageContentJson["8"]}
-          options={radioSMSOptions}
-          onGcdsChange={(e) => onChangeUserSelectedMfaFactor(e.target.value)}
-        ></GcdsRadios>
-        <GcdsRadios
-          name="voiceRadio"
-          legend={pageContentJson["9"]}
-          options={radioVoiceOptions}
-          onGcdsChange={(e) => onChangeUserSelectedMfaFactor(e.target.value)}
-        ></GcdsRadios>
-      </GcdsContainer>
-    ) : combinedOptions.length >= 2 ? (
+    combinedOptions.length >= 2 ? (
       <GcdsRadios
         name="combinedRadio"
         legend={pageContentJson["16"]}
