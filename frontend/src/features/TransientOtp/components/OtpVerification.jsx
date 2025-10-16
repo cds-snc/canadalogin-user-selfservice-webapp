@@ -43,7 +43,6 @@ export default function OtpVerification({
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
     language: language,
   });
-  // const { setError, clearAllErrors, getError, hasErrors } = useError(language);
   const [time, setTime] = useState(initialTime);
   const pageContentJson = getPageContent(language, PAGES.verification);
   const errorPageJson = getPageContent(language, PAGES.error);
@@ -51,11 +50,6 @@ export default function OtpVerification({
 
   const { id, userName } = userProfile ?? {};
   const didFetch = useRef(false);
-  const fetchInProgress = (bool) => {
-    // in dev the component makes two requests
-    // this might not be needed when its built in a production environment
-    didFetch.current = bool;
-  };
 
   const requestOtpCode = async () => {
     const userData = {
@@ -74,7 +68,7 @@ export default function OtpVerification({
       }
       setCodeRequested(false);
     } finally {
-      fetchInProgress(false);
+      didFetch.current = false;
     }
   };
 
@@ -113,7 +107,7 @@ export default function OtpVerification({
 
   useEffect(() => {
     if (!id || didFetch.current) return;
-    fetchInProgress(true);
+    didFetch.current = true;
     requestOtpCode();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
@@ -178,7 +172,6 @@ export default function OtpVerification({
             type="text"
             autofocus
             validateOn="other"
-            // errorMessage={error.errorMsg}
             lang={language}
             size="6"
             maxlength={6}

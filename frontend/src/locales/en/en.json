@@ -460,6 +460,15 @@
     "12": "Get help with 2-step verification",
     "13": "I cannot access my phone",
     "14": "To add a phone number,",
-    "15": "To delete this number,"
+    "15": "To delete this number,",
+    "16": "How should we send you the code?"
+  },
+  "SuccessBanner": {
+    "1": "You have successfully deleted",
+    "2": "from your 2-step verification phone numbers",
+    "3": "You have successfully added",
+    "4": "verification for",
+    "5": "voice call",
+    "6": "text (SMS)"
   }
 }
