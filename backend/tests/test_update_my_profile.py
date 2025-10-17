@@ -7,7 +7,7 @@ from app.utils.request_error_handler import RequestErrorHandler
 from app.users.services.update_my_profile import (
     update_my_profile as update_profile,
     dispatch_update_my_profile as dispatch_update_user_profile,
-    sanitize_user_profile_data
+    sanitize_user_profile_data,
 )
 
 from app.users.schemas import (
@@ -21,12 +21,20 @@ from fastapi import HTTPException
 
 
 PROFILE_API_URL = "https://fake-tenant.verify.ibm.com/v2.0/Me"
-SANITIZE_PROFILE_IMPORT_PATH = "app.users.services.update_my_profile.sanitize_user_profile_data"
+SANITIZE_PROFILE_IMPORT_PATH = (
+    "app.users.services.update_my_profile.sanitize_user_profile_data"
+)
 MY_PROFILE_IMPORT_PATH = "app.users.services.get_my_profile.get_my_profile"
-DISPATCH_UPDATE_PROFILE_IMPORT_PATH = "app.users.services.update_my_profile.dispatch_update_my_profile"
+DISPATCH_UPDATE_PROFILE_IMPORT_PATH = (
+    "app.users.services.update_my_profile.dispatch_update_my_profile"
+)
 CONFIGURATION_IMPORT_PATH = "app.users.services.get_my_profile.get_configuration"
-MASK_PHONE_IMPORT_PATH = "app.users.services.update_my_profile.mask_contact_phone_numbers"
-DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH = "app.users.services.update_my_profile.dispatch_get_my_profile_from_ibm"
+MASK_PHONE_IMPORT_PATH = (
+    "app.users.services.update_my_profile.mask_contact_phone_numbers"
+)
+DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH = (
+    "app.users.services.update_my_profile.dispatch_get_my_profile_from_ibm"
+)
 
 
 @pytest.mark.asyncio
@@ -34,7 +42,9 @@ DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH = "app.users.services.update_my_profil
 @patch(DISPATCH_UPDATE_PROFILE_IMPORT_PATH)
 @patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
 @patch(SANITIZE_PROFILE_IMPORT_PATH)
-async def test_update_profile_success(mock_sanitize, mock_dispatch_get, mock_dispatch_update, mock_mask):
+async def test_update_profile_success(
+    mock_sanitize, mock_dispatch_get, mock_dispatch_update, mock_mask
+):
     # Arrange
     sanitized_data = {"userName": "john.doe@example.com", "preferredLanguage": "en"}
     mock_sanitize.return_value = sanitized_data
@@ -152,7 +162,9 @@ async def test_update_profile_dispatch_failure(
     mock_dispatch_get.return_value = mock_profile
 
     # Mock dispatch_update_user_profile to raise HTTPException
-    mock_dispatch_update.side_effect = HTTPException(status_code=400, detail="Invalid request")
+    mock_dispatch_update.side_effect = HTTPException(
+        status_code=400, detail="Invalid request"
+    )
     mock_mask.return_value = []
 
     user_data = UserProfileUpdateRequest(userName="john.doe@example.com")

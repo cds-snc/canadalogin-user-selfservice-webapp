@@ -9,13 +9,13 @@ from app.users.services.get_my_profile import (
     dispatch_get_my_profile_from_ibm,
 )
 
-from app.users.schemas import (
-    IBMVerifyUserProfileSchema
-)
+from app.users.schemas import IBMVerifyUserProfileSchema
 
 
 PROFILE_API_URL = "https://fake-tenant.verify.ibm.com/v2.0/Me"
-GET_PROFILE_DISPATCH_FROM_IBM_IMPORT_PATH = "app.users.services.get_my_profile.dispatch_get_my_profile_from_ibm"
+GET_PROFILE_DISPATCH_FROM_IBM_IMPORT_PATH = (
+    "app.users.services.get_my_profile.dispatch_get_my_profile_from_ibm"
+)
 
 
 @pytest.mark.asyncio
@@ -60,8 +60,7 @@ async def test_my_profile_success(mock_dispatch_get):
 async def test_my_profile_unauthorized(mock_dispatch_get):
     # Arrange - mock dispatch_get_my_profile_from_ibm to raise HTTPException with 401
     mock_dispatch_get.side_effect = HTTPException(
-        status_code=401,
-        detail="Not authenticated"
+        status_code=401, detail="Not authenticated"
     )
 
     http_client = AsyncClient()
@@ -80,8 +79,7 @@ async def test_my_profile_unauthorized(mock_dispatch_get):
 async def test_my_profile_other_error(mock_dispatch_get):
     # Arrange - mock dispatch_get_my_profile_from_ibm to raise HTTPException with 500
     mock_dispatch_get.side_effect = HTTPException(
-        status_code=500,
-        detail="HTTP error occurred"
+        status_code=500, detail="HTTP error occurred"
     )
 
     http_client = AsyncClient()
@@ -116,7 +114,7 @@ async def test_dispatch_get_my_profile_from_ibm_success(monkeypatch):
         "emails": [{"value": "john.doe@example.com", "type": "work"}],
         "phoneNumbers": [
             {"value": "+1-613-555-1234", "type": "mobile"},
-            {"value": "+1-613-555-5678", "type": "work"}
+            {"value": "+1-613-555-5678", "type": "work"},
         ],
         "meta": {
             "location": "here",
@@ -128,9 +126,7 @@ async def test_dispatch_get_my_profile_from_ibm_success(monkeypatch):
         "id": "user-123",
     }
 
-    respx.get(test_url).mock(
-        return_value=Response(status_code=200, json=profile_data)
-    )
+    respx.get(test_url).mock(return_value=Response(status_code=200, json=profile_data))
 
     http_client = AsyncClient()
 
@@ -170,10 +166,7 @@ async def test_dispatch_get_my_profile_from_ibm_http_error(monkeypatch):
     )
 
     respx.get(test_url).mock(
-        return_value=Response(
-            status_code=500,
-            json={"detail": "Internal Server Error"}
-        )
+        return_value=Response(status_code=500, json={"detail": "Internal Server Error"})
     )
 
     http_client = AsyncClient()
@@ -205,9 +198,7 @@ async def test_dispatch_get_my_profile_from_ibm_validation_error(monkeypatch):
         # Missing: schemas, emails, meta, active, id
     }
 
-    respx.get(test_url).mock(
-        return_value=Response(status_code=200, json=invalid_data)
-    )
+    respx.get(test_url).mock(return_value=Response(status_code=200, json=invalid_data))
 
     http_client = AsyncClient()
 
@@ -233,7 +224,7 @@ async def test_my_profile_with_masked_phone_numbers(mock_dispatch_get, mock_mask
         "emails": [{"value": "john.doe@example.com", "type": "work"}],
         "phoneNumbers": [
             {"value": "+1-613-555-1234", "type": "mobile"},
-            {"value": "+1-613-555-5678", "type": "work"}
+            {"value": "+1-613-555-5678", "type": "work"},
         ],
         "meta": {
             "location": "here",
@@ -252,7 +243,7 @@ async def test_my_profile_with_masked_phone_numbers(mock_dispatch_get, mock_mask
     # Mock mask_contact_phone_numbers to return masked phone numbers
     masked_phones = [
         {"value": "+1-613-XXX-XX34", "type": "mobile"},
-        {"value": "+1-613-XXX-XX78", "type": "work"}
+        {"value": "+1-613-XXX-XX78", "type": "work"},
     ]
     mock_mask_phone.return_value = masked_phones
 
@@ -330,7 +321,9 @@ async def test_my_profile_with_no_phone_numbers(mock_dispatch_get, mock_mask_pho
 @pytest.mark.asyncio
 @patch("app.users.services.get_my_profile.mask_contact_phone_numbers")
 @patch(GET_PROFILE_DISPATCH_FROM_IBM_IMPORT_PATH)
-async def test_my_profile_validation_error_after_masking(mock_dispatch_get, mock_mask_phone):
+async def test_my_profile_validation_error_after_masking(
+    mock_dispatch_get, mock_mask_phone
+):
     """Test that get_my_profile handles validation errors after phone masking."""
     # Arrange
     profile_data = {
