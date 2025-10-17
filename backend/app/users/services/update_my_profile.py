@@ -19,7 +19,6 @@ logger = logging.getLogger(__name__)
 
 
 def sanitize_user_profile_data(user_data: UserProfileUpdateRequest) -> dict:
-    # validation and then turns it into a UserProfileUpdateRequest dict
     """
     Validate and sanitize user profile update data.
 

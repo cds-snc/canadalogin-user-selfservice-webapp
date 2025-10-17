@@ -37,12 +37,10 @@ async def dispatch_get_my_profile_from_ibm(
         logger.info("Get my profile")
         settings = get_configuration()
         profile_api_endpoint = settings.profile_api_endpoint
-        headers = get_auth_request_headers(user_access_token)
         logger.info("Fetching user profile from IBM Verify")
-        headers = get_auth_request_headers(user_access_token)
         response = await global_http_client.get(
             profile_api_endpoint,
-            headers=headers,
+            headers=get_auth_request_headers(user_access_token),
         )
         response.raise_for_status()
         logger.info("User profile fetched successfully from IBM Verify")

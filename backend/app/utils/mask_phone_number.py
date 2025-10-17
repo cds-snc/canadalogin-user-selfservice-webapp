@@ -29,7 +29,7 @@ def mask_contact_phone_numbers(
         json_data: User profile JSON data containing phoneNumbers
 
     Returns:
-        list[MetaDataTypeValue] | None: List of phone number objects with masked values
+        list[MetaDataTypeValue]: List of phone number objects with masked values
     """
 
     profile_contact_phone_numbers = json_data.get("phoneNumbers")
