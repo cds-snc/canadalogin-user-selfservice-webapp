@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   GcdsContainer,
   GcdsText,
@@ -20,18 +20,25 @@ import { updateLinkStateAPI } from "../api/UpdateLinkState.jsx";
 import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 export default function LinkSuccess() {
   const { language } = useParams();
-  const { submit } = getPageContent(language, "Button");
 
   const [serverErrorMessage, setServerErrorMessage] = useState("");
 
   const pageContentJson = getPageContent(language, PAGES.password);
   const errorPageJson = getPageContent(language, PAGES.error);
 
+  const configRef = useRef(null);
+
   useEffect(() => {
     async function submitLegacyPAI() {
       await updateLinkStateAPI.submitLegacyPAI(1);
     }
+    async function loadClientDetails() {
+      configRef.current.clientId = "12341";
+      configRef.current.legacyIDPUrl =
+        "https://www.google.ca/" + configRef.current.clientId;
+    }
 
+    loadClientDetails();
     submitLegacyPAI();
   }, []);
 
@@ -53,23 +60,30 @@ export default function LinkSuccess() {
       <GcdsHeading tag="h1" lang={language}>
         {pageContentJson["14"]}
       </GcdsHeading>
-
-      <GcdsText>Link Success</GcdsText>
       <GcdsText>{errorMessage}</GcdsText>
-      <GcdsContainer>
-        <GcdsGrid columns="max-content max-content" gap="200">
-          <GcdsButton
-            buttonRole="primary"
-            style={{ width: "fit-content" }}
-            onGcdsClick={(ev) => {
-              ev.preventDefault();
-              continueToRP();
-            }}
-          >
-            {submit}
-          </GcdsButton>
-        </GcdsGrid>
-      </GcdsContainer>
+      <section>
+        <gcds-heading tag="h1">
+          Your sign-in method has been updated
+        </gcds-heading>
+        <gcds-text>
+          You can now use GC Sign in to access your Canada Dental Care Plan
+          Account.
+        </gcds-text>
+        <gcds-text>
+          If you use your bank or GCKey to access other accounts, you will need
+          to complete this process for each one.
+        </gcds-text>
+        <GcdsButton
+          buttonRole="primary"
+          style={{ width: "fit-content" }}
+          onGcdsClick={(ev) => {
+            ev.preventDefault();
+            continueToRP();
+          }}
+        >
+          Finish
+        </GcdsButton>
+      </section>
     </GcdsContainer>
   );
 }

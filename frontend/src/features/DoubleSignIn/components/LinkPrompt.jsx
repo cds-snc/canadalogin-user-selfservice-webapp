@@ -20,7 +20,6 @@ import { path } from "../../../utils/routeHelpers.js";
 
 export default function LinkPrompt() {
   const { language } = useParams();
-  const { submit, cancel } = getPageContent(language, "Button");
 
   const [serverErrorMessage, setServerErrorMessage] = useState("");
 
@@ -80,7 +79,6 @@ export default function LinkPrompt() {
       <GcdsHeading tag="h1" lang={language}>
         {pageContentJson["14"]}
       </GcdsHeading>
-      <GcdsText>Link Prompt</GcdsText>
       <GcdsText>{errorMessage}</GcdsText>
       <section>
         <gcds-text>
@@ -105,14 +103,16 @@ export default function LinkPrompt() {
           service.
         </gcds-text>
         <div class="pb-300">
-          <gcds-button href={configRef.current.legacyIDPUrl} type="link">
-            <a
-              class="gcds-button"
-              id="client3"
-              href={configRef.current.legacyIDPUrl}
-            ></a>
+          <GcdsButton
+            buttonRole="primary"
+            style={{ width: "fit-content" }}
+            onGcdsClick={(ev) => {
+              ev.preventDefault();
+              startLinking();
+            }}
+          >
             Sign in with your bank or GCKey
-          </gcds-button>
+          </GcdsButton>
         </div>
       </section>
       <gcds-details details-title="Learn more about this topic">
@@ -127,34 +127,16 @@ export default function LinkPrompt() {
           If you have not signed in to this portal with your bank or GCKey in
           the past, you can skip this step.
         </gcds-text>
-        <gcds-link href="#">Skip linking my account</gcds-link>
+        <gcds-link
+          href="#"
+          onGcdsClick={(ev) => {
+            ev.preventDefault();
+            skipLinking();
+          }}
+        >
+          Skip linking my account
+        </gcds-link>
       </section>
-
-      <GcdsContainer>
-        <GcdsGrid columns="max-content max-content" gap="200">
-          <GcdsButton
-            buttonRole="primary"
-            style={{ width: "fit-content" }}
-            onGcdsClick={(ev) => {
-              ev.preventDefault();
-              startLinking();
-            }}
-          >
-            {submit}
-          </GcdsButton>
-
-          <GcdsButton
-            buttonRole="secondary"
-            style={{ width: "fit-content" }}
-            onGcdsClick={(ev) => {
-              ev.preventDefault();
-              skipLinking();
-            }}
-          >
-            {cancel}
-          </GcdsButton>
-        </GcdsGrid>
-      </GcdsContainer>
     </GcdsContainer>
   );
 }

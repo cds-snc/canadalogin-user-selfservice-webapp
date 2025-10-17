@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   GcdsContainer,
   GcdsText,
@@ -26,11 +26,19 @@ export default function SkipLink() {
   const pageContentJson = getPageContent(language, PAGES.password);
   const errorPageJson = getPageContent(language, PAGES.error);
 
+  const configRef = useRef(null);
+
   useEffect(() => {
     async function submitSkipLinking() {
       await updateLinkStateAPI.submitSkipLinking(1);
     }
+    async function loadClientDetails() {
+      configRef.current.clientId = "12341";
+      configRef.current.legacyIDPUrl =
+        "https://www.google.ca/" + configRef.current.clientId;
+    }
 
+    loadClientDetails();
     submitSkipLinking();
   }, []);
 
