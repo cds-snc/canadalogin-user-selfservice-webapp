@@ -1,5 +1,30 @@
 # Changelog
 
+## [1.5.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.4.0...v1.5.0) (2025-10-16)
+
+
+### Features
+
+* **backend:** enable PKCE ([#842](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/842)) ([9530474](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/95304740a732fccb16bb385ef117a02a413738ab))
+* **CI/CD:** Notify Slack when PR's merge ([#845](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/845)) ([51825c3](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/51825c3e4e53d2738a87fe9925fb3bc399eedf67))
+
+
+### Bug Fixes
+
+* **deps:** update all minor dependencies ([#832](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/832)) ([2d2a243](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/2d2a243ec8ff2f26132a57f17d00e7f5c0ad1e3f))
+
+
+### Tests
+
+* **backend:** Create unit test for auth module ([#828](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/828)) ([ae2673a](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/ae2673aa47a4e4bb1ea68b640617f4c8aa74d818))
+* **frontend:** create unit tests for the language components ([#839](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/839)) ([35a7cf7](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/35a7cf721a96075194fc482f1ff6d006197c6767))
+
+
+### Miscellaneous Chores
+
+* **deps:** update all patch dependencies ([#833](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/833)) ([feb38f2](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/feb38f2bd56dcaf58ddc2c529d894692462512fe))
+* **deps:** update dependency authlib to v1.6.5 [security] ([#830](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/830)) ([6b4727e](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/6b4727e6c997d912a28fa20f57f72d24d15ed223))
+
 ## [1.4.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.3.2...v1.4.0) (2025-10-10)
 
 
