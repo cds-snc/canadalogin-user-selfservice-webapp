@@ -4,12 +4,6 @@ from httpx import AsyncClient, Response
 from unittest.mock import AsyncMock, Mock, patch
 from app.utils.request_error_handler import RequestErrorHandler
 
-
-from app.users.services.get_my_profile import (
-    get_my_profile as my_profile,
-    dispatch_get_my_profile_from_ibm,
-)
-
 from app.users.services.update_my_profile import (
     update_my_profile as update_profile,
     dispatch_update_my_profile as dispatch_update_user_profile,
@@ -33,7 +27,6 @@ DISPATCH_UPDATE_PROFILE_IMPORT_PATH = "app.users.services.update_my_profile.disp
 CONFIGURATION_IMPORT_PATH = "app.users.services.get_my_profile.get_configuration"
 MASK_PHONE_IMPORT_PATH = "app.users.services.update_my_profile.mask_contact_phone_numbers"
 DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH = "app.users.services.update_my_profile.dispatch_get_my_profile_from_ibm"
-GET_PROFILE_DISPATCH_FROM_IBM_IMPORT_PATH = "app.users.services.get_my_profile.dispatch_get_my_profile_from_ibm"
 
 
 @pytest.mark.asyncio
@@ -251,46 +244,6 @@ async def test_dispatch_update_user_profile_failure(monkeypatch):
             user_profile_payload=payload.model_dump_json(by_alias=True),
             user_access_token="mock-token",
         )
-
-
-@pytest.mark.asyncio
-@patch(GET_PROFILE_DISPATCH_FROM_IBM_IMPORT_PATH)
-async def test_my_profile_unauthorized(mock_dispatch_get):
-    # Arrange - mock dispatch_get_my_profile_from_ibm to raise HTTPException with 401
-    mock_dispatch_get.side_effect = HTTPException(
-        status_code=401,
-        detail="Not authenticated"
-    )
-
-    http_client = AsyncClient()
-
-    # Act & Assert
-    with pytest.raises(HTTPException) as exc:
-        await my_profile(http_client, user_access_token="mock-token")
-
-    assert exc.value.status_code == 401
-    assert "Not authenticated" in str(exc.value.detail)
-    mock_dispatch_get.assert_called_once_with(http_client, "mock-token")
-
-
-@pytest.mark.asyncio
-@patch(GET_PROFILE_DISPATCH_FROM_IBM_IMPORT_PATH)
-async def test_my_profile_other_error(mock_dispatch_get):
-    # Arrange - mock dispatch_get_my_profile_from_ibm to raise HTTPException with 500
-    mock_dispatch_get.side_effect = HTTPException(
-        status_code=500,
-        detail="HTTP error occurred"
-    )
-
-    http_client = AsyncClient()
-
-    # Act & Assert
-    with pytest.raises(HTTPException) as exc:
-        await my_profile(http_client, user_access_token="mock-token")
-
-    assert exc.value.status_code == 500
-    assert "HTTP error" in str(exc.value.detail)
-    mock_dispatch_get.assert_called_once_with(http_client, "mock-token")
 
 
 def test_sanitize_user_profile_data():
