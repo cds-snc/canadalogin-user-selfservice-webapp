@@ -1,7 +1,8 @@
 import logging
 
-from fastapi import HTTPException, Request
+from fastapi import HTTPException
 from pydantic import ValidationError
+from httpx import AsyncClient
 
 from app.users.schemas import (
     IBMVerifyUserProfileSchema,
@@ -10,12 +11,13 @@ from app.users.schemas import (
 from app.utils.access_token import get_auth_request_headers
 from app.utils.mask_phone_number import mask_contact_phone_numbers
 from app.utils.request_error_handler import RequestErrorHandler
+from app.config import get_configuration
 
 logger = logging.getLogger(__name__)
 
 
 async def dispatch_get_my_profile_from_ibm(
-    request: Request,
+    global_http_client: AsyncClient,
     user_access_token: str,
 ) -> IBMVerifyUserProfileSchema:
     """
@@ -32,10 +34,14 @@ async def dispatch_get_my_profile_from_ibm(
         HTTPException: Via RequestErrorHandler for any request failures
     """
     try:
+        logger.info("Get my profile")
+        settings = get_configuration()
+        profile_api_endpoint = settings.profile_api_endpoint
+        headers = get_auth_request_headers(user_access_token)
         logger.info("Fetching user profile from IBM Verify")
         headers = get_auth_request_headers(user_access_token)
-        response = await request.app.state.request_client.get(
-            request.app.state.config.profile_api_endpoint,
+        response = await global_http_client.get(
+            profile_api_endpoint,
             headers=headers,
         )
         response.raise_for_status()
@@ -49,7 +55,9 @@ async def dispatch_get_my_profile_from_ibm(
         RequestErrorHandler.handle(e)
 
 
-async def get_my_profile(request: Request, user_access_token: str) -> ProfileResponse:
+async def get_my_profile(
+    global_http_client: AsyncClient, user_access_token: str
+) -> ProfileResponse:
     """
     Retrieve and return the authenticated user's profile with masked phone numbers.
 
@@ -66,7 +74,7 @@ async def get_my_profile(request: Request, user_access_token: str) -> ProfileRes
     logger.info("Get my profile")
 
     profile_response = await dispatch_get_my_profile_from_ibm(
-        request, user_access_token
+        global_http_client, user_access_token
     )
     logger.info("User profile retrieved successfully.")
 

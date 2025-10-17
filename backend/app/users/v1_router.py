@@ -50,7 +50,7 @@ async def profile(
     request: Request, user_access_token: str = Depends(get_users_current_session)
 ):
     return await get_my_profile(
-        request,
+        request.app.state.request_client,
         user_access_token,
     )
 

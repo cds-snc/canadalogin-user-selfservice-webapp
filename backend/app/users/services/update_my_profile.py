@@ -33,7 +33,7 @@ def sanitize_user_profile_data(user_data: UserProfileUpdateRequest) -> dict:
     return updated_data_dict
 
 
-async def dispatch_update_user_profile(
+async def dispatch_update_my_profile(
     request: Request,
     user_profile_payload: str,
     user_access_token: str,
@@ -96,7 +96,7 @@ async def update_my_profile(
     updated_user_data_dict = sanitize_user_profile_data(user_data)
 
     ibm_user_profile_response = await dispatch_get_my_profile_from_ibm(
-        request, user_access_token
+        request.app.state.request_client, user_access_token
     )
     ibm_user_profile = ibm_user_profile_response.model_dump()
 
@@ -115,13 +115,17 @@ async def update_my_profile(
 
     merged_profile = {**ibm_user_profile, **updated_user_data_dict}
 
-    validate_merged_profile = IBMVerifyUpdateUserProfile(**merged_profile)
+    try:
+        validate_merged_profile = IBMVerifyUpdateUserProfile(**merged_profile)
+    except ValidationError as e:
+        logger.error(f"Merged Profile Validation Error: {e.json()}")
+        raise HTTPException(status_code=422, detail="Request data validation error")
 
     user_profile_payload = validate_merged_profile.model_dump_json(
         by_alias=True, exclude_none=True
     )
 
-    response = await dispatch_update_user_profile(
+    response = await dispatch_update_my_profile(
         request, user_profile_payload, user_access_token
     )
     try:

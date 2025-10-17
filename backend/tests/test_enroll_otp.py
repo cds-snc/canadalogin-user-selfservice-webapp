@@ -70,7 +70,7 @@ class TestSMSEnrollment:
         mock_user_access_token = "user_token_123"
 
         # Mock the profile service
-        with patch("app.otp.services.enroll_mfa_otp.my_profile") as mock_my_profile:
+        with patch("app.otp.services.enroll_mfa_otp.get_my_profile") as mock_my_profile:
             mock_my_profile.return_value = mock_user_profile_response
 
             # Mock the dispatch function
@@ -105,7 +105,7 @@ class TestSMSEnrollment:
             success=False, data=None, message="Profile retrieval failed"
         )
 
-        with patch("app.otp.services.enroll_mfa_otp.my_profile") as mock_my_profile:
+        with patch("app.otp.services.enroll_mfa_otp.get_my_profile") as mock_my_profile:
             mock_my_profile.return_value = failed_profile_response
 
             result = await handle_otp_enrollment(
@@ -122,7 +122,7 @@ class TestSMSEnrollment:
         mock_http_client = AsyncMock()
         mock_user_access_token = "user_token_123"
 
-        with patch("app.otp.services.enroll_mfa_otp.my_profile") as mock_my_profile:
+        with patch("app.otp.services.enroll_mfa_otp.get_my_profile") as mock_my_profile:
             mock_my_profile.return_value = mock_user_profile_response
 
             with patch(
@@ -161,7 +161,7 @@ class TestVoiceEnrollment:
             "validated": False,
         }
 
-        with patch("app.otp.services.enroll_mfa_otp.my_profile") as mock_my_profile:
+        with patch("app.otp.services.enroll_mfa_otp.get_my_profile") as mock_my_profile:
             mock_my_profile.return_value = mock_user_profile_response
 
             with patch(
@@ -195,7 +195,7 @@ class TestVoiceEnrollment:
             success=False, data=None, message="Profile retrieval failed"
         )
 
-        with patch("app.otp.services.enroll_mfa_otp.my_profile") as mock_my_profile:
+        with patch("app.otp.services.enroll_mfa_otp.get_my_profile") as mock_my_profile:
             mock_my_profile.return_value = failed_profile_response
 
             result = await handle_otp_enrollment(
@@ -212,7 +212,7 @@ class TestVoiceEnrollment:
         mock_http_client = AsyncMock()
         mock_user_access_token = "user_token_123"
 
-        with patch("app.otp.services.enroll_mfa_otp.my_profile") as mock_my_profile:
+        with patch("app.otp.services.enroll_mfa_otp.get_my_profile") as mock_my_profile:
             mock_my_profile.return_value = mock_user_profile_response
 
             with patch(

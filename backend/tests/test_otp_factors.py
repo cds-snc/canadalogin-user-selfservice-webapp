@@ -19,6 +19,8 @@ from app.users.services.otp_factors import (
 from fastapi import HTTPException
 from httpx import AsyncClient
 
+profile_import_path = "app.users.services.otp_factors.get_my_profile"
+
 
 @pytest.mark.asyncio
 async def test_mask_phone_last4_valid():
@@ -130,7 +132,7 @@ async def test_get_user_otp_factors_mocked(monkeypatch):
             "total": 1,
         }
 
-    monkeypatch.setattr("app.users.services.otp_factors.my_profile", mock_my_profile)
+    monkeypatch.setattr(profile_import_path, mock_my_profile)
     monkeypatch.setattr(
         "app.users.services.otp_factors.dispatch_user_auth_factors",
         mock_dispatch_user_auth_factors,
@@ -185,7 +187,7 @@ async def test_get_user_otp_factors_invalid_schema(monkeypatch):
             "total": 1,
         }
 
-    monkeypatch.setattr("app.users.services.otp_factors.my_profile", mock_my_profile)
+    monkeypatch.setattr(profile_import_path, mock_my_profile)
     monkeypatch.setattr(
         "app.users.services.otp_factors.dispatch_user_auth_factors",
         mock_dispatch_user_auth_factors,
@@ -247,7 +249,7 @@ async def test_get_user_otp_factors_no_otp_factors(monkeypatch):
             "total": 1,
         }
 
-    monkeypatch.setattr("app.users.services.otp_factors.my_profile", mock_my_profile)
+    monkeypatch.setattr(profile_import_path, mock_my_profile)
     monkeypatch.setattr(
         "app.users.services.otp_factors.dispatch_user_auth_factors",
         mock_dispatch_user_auth_factors,
