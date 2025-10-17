@@ -103,6 +103,7 @@ class Configuration(BaseSettings):
     def users_api_endpoint(self) -> str:
         return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.USERS.value}"
 
+
 @lru_cache
 def get_configuration():
     return Configuration()
