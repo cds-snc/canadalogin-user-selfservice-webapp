@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 async def get_ibm_id(
-        user_token: str,
+    user_token: str,
 ):
     try:
 

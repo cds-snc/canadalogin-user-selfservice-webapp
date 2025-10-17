@@ -18,7 +18,9 @@ from app.migration.schemas import (
 logger = logging.getLogger(__name__)
 
 
-def get_attribute_value(attributes: List[CustomAttribute], key: str) -> List[str] | None:
+def get_attribute_value(
+    attributes: List[CustomAttribute], key: str
+) -> List[str] | None:
     for attr in attributes:
         if attr.name == key:
             return attr.values
@@ -26,8 +28,7 @@ def get_attribute_value(attributes: List[CustomAttribute], key: str) -> List[str
 
 
 async def get_custom_attribute_List(
-        global_http_client: AsyncClient,
-        user_access_token: str
+    global_http_client: AsyncClient, user_access_token: str
 ):
     try:
 
@@ -59,17 +60,23 @@ async def get_custom_attribute_List(
 
 
 async def get_custom_attribute(
-        global_http_client: AsyncClient,
-        user_access_token: str,
-        custom_attribute: str,
+    global_http_client: AsyncClient,
+    user_access_token: str,
+    custom_attribute: str,
 ):
     try:
 
-        custom_attribute_List = await get_custom_attribute_List(global_http_client, user_access_token)
+        custom_attribute_List = await get_custom_attribute_List(
+            global_http_client, user_access_token
+        )
         logger.info(f"Custom Attributes List: {custom_attribute_List}")
 
-        custom_attribute_value = get_attribute_value(custom_attribute_List, custom_attribute)
-        logger.info(f"Custom Attribute {custom_attribute} value: {custom_attribute_value}")
+        custom_attribute_value = get_attribute_value(
+            custom_attribute_List, custom_attribute
+        )
+        logger.info(
+            f"Custom Attribute {custom_attribute} value: {custom_attribute_value}"
+        )
 
         return custom_attribute_value
 
@@ -79,9 +86,9 @@ async def get_custom_attribute(
 
 
 async def patch_custom_attribute(
-        global_http_client: AsyncClient,
-        custom_attribute: str,
-        user_token: str,
+    global_http_client: AsyncClient,
+    custom_attribute: str,
+    user_token: str,
 ):
     try:
 
@@ -104,14 +111,9 @@ async def patch_custom_attribute(
                 {
                     "op": "add",
                     "path": "urn:ietf:params:scim:schemas:extension:ibm:2.0:User:customAttributes",
-                    "value": [
-                        {
-                            "name": custom_attribute,
-                            "values": ["CUSTOM_VALUE"]
-                        }
-                    ]
+                    "value": [{"name": custom_attribute, "values": ["CUSTOM_VALUE"]}],
                 }
-            ]
+            ],
         }
 
         logger.info(f"Json Payload: {payload}")

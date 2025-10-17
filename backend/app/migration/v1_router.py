@@ -5,7 +5,10 @@ from fastapi import Request, Depends
 
 from app.constants.session_keys import SessionKeys
 from app.auth.services.auth_user_session import get_users_current_session
-from app.migration.services.custom_attributes import (get_custom_attribute, patch_custom_attribute)
+from app.migration.services.custom_attributes import (
+    get_custom_attribute,
+    patch_custom_attribute,
+)
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -20,7 +23,7 @@ logger = logging.getLogger(__name__)
 async def handle_get_custom_attribute(
     request: Request,
     custom_attribute: str,
-    user_access_token: str = Depends(get_users_current_session)
+    user_access_token: str = Depends(get_users_current_session),
 ):
     return await get_custom_attribute(
         request.app.state.request_client,
@@ -43,5 +46,5 @@ async def handle_patch_custom_attribute(
     return await patch_custom_attribute(
         request.app.state.request_client,
         custom_attribute,
-        request.session[SessionKeys.SESSION_USER_TOKEN.value]
+        request.session[SessionKeys.SESSION_USER_TOKEN.value],
     )
