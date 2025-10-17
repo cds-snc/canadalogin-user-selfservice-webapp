@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   GcdsContainer,
   GcdsText,
@@ -27,12 +27,26 @@ export default function LinkPrompt() {
   const pageContentJson = getPageContent(language, PAGES.password);
   const errorPageJson = getPageContent(language, PAGES.error);
 
+  const configRef = useRef(null);
+
+  useEffect(() => {
+    async function loadClientDetails() {
+      configRef.current.clientId = "12341";
+      configRef.current.legacyIDPUrl =
+        "https://www.google.ca/" + configRef.current.clientId;
+    }
+
+    loadClientDetails();
+  }, []);
+
   const toLinkSucessPage = path(PAGES.LinkSuccess, {
     language: language,
   });
+
   const toSkipLinkPage = path(PAGES.SkipLink, {
     language: language,
   });
+
   const navigateHelper = useNavigateHelper();
 
   const startLinking = async () => {
@@ -68,6 +82,54 @@ export default function LinkPrompt() {
       </GcdsHeading>
       <GcdsText>Link Prompt</GcdsText>
       <GcdsText>{errorMessage}</GcdsText>
+      <section>
+        <gcds-text>
+          <gcds-icon name="checkmark-circle"></gcds-icon>
+          Completed: Use the new sign-in method
+        </gcds-text>
+        <gcds-text>
+          <strong>
+            Your Canada Dental Care Plan Account is still linked to your bank or
+            GCKey.
+          </strong>{" "}
+          To keep your account, you’ll need to sign in with your old method one
+          last time.
+        </gcds-text>
+        <div class="pb-300">
+          <gcds-link href="#" external>
+            More information about account migration
+          </gcds-link>
+        </div>
+        <gcds-text>
+          Use the sign-in method you used the last time you signed into this
+          service.
+        </gcds-text>
+        <div class="pb-300">
+          <gcds-button href={configRef.current.legacyIDPUrl} type="link">
+            <a
+              class="gcds-button"
+              id="client3"
+              href={configRef.current.legacyIDPUrl}
+            ></a>
+            Sign in with your bank or GCKey
+          </gcds-button>
+        </div>
+      </section>
+      <gcds-details details-title="Learn more about this topic">
+        If you’ve completed this step on another online service,you’ll need to
+        do it again so we can link your account for this service.
+      </gcds-details>
+      <section>
+        <gcds-heading tag="h2">
+          First time on Canada Dental Care Plan Account?
+        </gcds-heading>
+        <gcds-text>
+          If you have not signed in to this portal with your bank or GCKey in
+          the past, you can skip this step.
+        </gcds-text>
+        <gcds-link href="#">Skip linking my account</gcds-link>
+      </section>
+
       <GcdsContainer>
         <GcdsGrid columns="max-content max-content" gap="200">
           <GcdsButton
