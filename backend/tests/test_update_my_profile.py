@@ -120,6 +120,60 @@ async def test_update_profile_user_mismatch(mock_dispatch_get, mock_sanitize):
 
 
 @pytest.mark.asyncio
+@patch(MASK_PHONE_IMPORT_PATH)
+@patch(DISPATCH_UPDATE_PROFILE_IMPORT_PATH)
+@patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
+@patch(SANITIZE_PROFILE_IMPORT_PATH)
+async def test_update_profile_dispatch_failure(
+    mock_sanitize, mock_dispatch_get, mock_dispatch_update, mock_mask
+):
+    # Arrange
+    mock_sanitize.return_value = {"userName": "john.doe@example.com"}
+
+    profile_data = {
+        "schemas": [
+            "urn:ietf:params:scim:schemas:core:2.0:User",
+            "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+        ],
+        "userName": "john.doe@example.com",
+        "emails": [{"value": "john.doe@example.com", "type": "work"}],
+        "meta": {
+            "location": "here",
+            "created": "2023-01-01T00:00:00Z",
+            "lastModified": "2023-09-22T12:30:00Z",
+            "resourceType": "User",
+        },
+        "active": True,
+        "id": "user-123",
+    }
+
+    # Mock dispatch_get_my_profile_from_ibm to return IBMVerifyUserProfileSchema
+    mock_profile = IBMVerifyUserProfileSchema(**profile_data)
+    mock_dispatch_get.return_value = mock_profile
+
+    # Mock dispatch_update_user_profile to raise HTTPException
+    mock_dispatch_update.side_effect = HTTPException(status_code=400, detail="Invalid request")
+    mock_mask.return_value = []
+
+    user_data = UserProfileUpdateRequest(userName="john.doe@example.com")
+
+    mock_request = Mock()
+    mock_request.app = Mock()
+    mock_request.app.state = Mock()
+    mock_request.app.state.request_client = AsyncClient()
+    mock_request.app.state.config = Mock()
+    mock_request.app.state.config.profile_api_endpoint = PROFILE_API_URL
+
+    # Act & Assert
+    with pytest.raises(HTTPException) as exc:
+        await update_profile(mock_request, user_data, user_access_token="token")
+
+    assert exc.value.status_code == 400
+    mock_dispatch_get.assert_called_once()
+    mock_dispatch_update.assert_called_once()
+
+
+@pytest.mark.asyncio
 @patch(SANITIZE_PROFILE_IMPORT_PATH)
 @patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
 async def test_update_profile_validation_error(mock_dispatch_get, mock_sanitize):
