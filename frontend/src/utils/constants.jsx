@@ -100,6 +100,7 @@ export const PAGES = {
   deleteMFAPage: "DeleteMFAPage",
   deleteMFAPhoneNumberConfirm: "DeleteMFAPhoneNumberConfirm",
   transientOtpSelection: "TransientOtpSelection",
+  successBanner: "SuccessBanner",
 };
 
 export const FOOTERS = {

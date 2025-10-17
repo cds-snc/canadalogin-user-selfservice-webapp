@@ -457,6 +457,15 @@
     "12": "Obtenir de l’aide concernant la vérification en deux étapes",
     "13": "Je n’ai pas accès à mon téléphone",
     "14": "Pour ajouter un numéro de téléphone,",
-    "15": "Pour supprimer un numéro de téléphone,"
+    "15": "Pour supprimer un numéro de téléphone,",
+    "16": "Comment souhaitez-vous recevoir le code?"
+  },
+  "SuccessBanner": {
+    "1": "Vous avez supprimé le",
+    "2": "des numéros de téléphone associés à la vérification en deux étapes",
+    "3": "Vous avez ajouté l’option de vérification par",
+    "4": "pour le numéro",
+    "5": "appel vocal",
+    "6": "message texte"
   }
 }

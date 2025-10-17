@@ -78,6 +78,7 @@ export default function OtpSelection({
 
   const radioSMSOptions = configureRadioSMSOptions();
   const radioVoiceOptions = configureRadioVoiceOptions();
+  const combinedOptions = [...radioSMSOptions, ...radioVoiceOptions];
 
   const parentPageContent =
     parentPage === PAGES.deleteMFAPage
@@ -85,6 +86,21 @@ export default function OtpSelection({
       : parentPage === PAGES.addMFAPage
         ? pageContentJson["14"]
         : pageContentJson["2"];
+
+  const radioComponent =
+    combinedOptions.length >= 2 ? (
+      <GcdsRadios
+        name="combinedRadio"
+        legend={pageContentJson["16"]}
+        options={combinedOptions}
+        onGcdsChange={(e) => onChangeUserSelectedMfaFactor(e.target.value)}
+      ></GcdsRadios>
+    ) : (
+      <>
+        <GcdsText>{combinedOptions[0]?.label}</GcdsText>
+        <GcdsText>{combinedOptions[0]?.hint}</GcdsText>
+      </>
+    );
 
   return (
     <GcdsContainer>
@@ -105,24 +121,7 @@ export default function OtpSelection({
             {pageContentJson["5"]} {pageContentJson["6"]} {pageContentJson["7"]}
           </GcdsText>
         </GcdsContainer>
-        {radioSMSOptions.length > 0 && (
-          <GcdsRadios
-            name="smsRadio"
-            legend={pageContentJson["8"]}
-            options={radioSMSOptions}
-            onGcdsChange={(e) => onChangeUserSelectedMfaFactor(e.target.value)}
-          ></GcdsRadios>
-        )}
-
-        {radioVoiceOptions.length > 0 && (
-          <GcdsRadios
-            name="voiceRadio"
-            legend={pageContentJson["9"]}
-            options={radioVoiceOptions}
-            onGcdsChange={(e) => onChangeUserSelectedMfaFactor(e.target.value)}
-          ></GcdsRadios>
-        )}
-
+        {radioComponent}
         <GcdsGrid columns="max-content max-content" gap="200">
           <GcdsButton
             style={{ width: "fit-content" }}

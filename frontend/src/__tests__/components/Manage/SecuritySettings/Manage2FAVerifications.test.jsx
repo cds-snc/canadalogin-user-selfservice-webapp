@@ -19,6 +19,7 @@ import Manage2FAVerifications from "../../../../components/Manage/SecuritySettin
 // Simple mocks for dependencies
 vi.mock("react-router", () => ({
   useParams: () => ({ language: "en" }),
+  useLocation: () => ({ state: null }),
 }));
 
 vi.mock("../../../../hooks/useNavigate.js", () => ({
