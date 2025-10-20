@@ -1,4 +1,4 @@
-name: "Backend Code Coverage"
+name: Backend Tests & Code Coverage
 permissions:
   contents: read
   pull-requests: write
@@ -6,11 +6,8 @@ on:
   pull_request:
     branches:
       - main
-    paths:
-      - "backend/**"
-      - ".github/workflows/backend-code-coverage.yml"
 jobs:
-  backend-code-coverage:
+  backend-tests-and-code-coverage:
     runs-on: ubuntu-latest
 
     steps:
