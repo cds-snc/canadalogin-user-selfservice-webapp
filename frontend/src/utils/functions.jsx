@@ -1,6 +1,6 @@
 import engJson from "../locales/en/en.json";
 import frJson from "../locales/fr/fr.json";
-import { AVAILABLE_LANGUAGES, FOOTERS } from "./constants";
+import { AVAILABLE_LANGUAGES, FOOTERS, PROFILE_LANGUAGES } from "./constants";
 
 function getLangHref(currentLang, pathname) {
   let newPathname = pathname.slice(1 + currentLang.length);
@@ -97,4 +97,14 @@ export function formatTime(expirationTime, currentLang = "en") {
     minute: "2-digit",
     second: "2-digit",
   });
+}
+
+export function convertLanguageToLanguageCode(updatedLanguage) {
+  const languageKeys = Object.keys(PROFILE_LANGUAGES);
+
+  return (
+    languageKeys.find((lang) =>
+      updatedLanguage.toLowerCase().startsWith(lang),
+    ) || "en"
+  );
 }

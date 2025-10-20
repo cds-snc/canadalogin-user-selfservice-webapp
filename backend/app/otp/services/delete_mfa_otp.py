@@ -4,7 +4,7 @@ from datetime import datetime
 from app.config import get_configuration
 from app.otp.schemas import OtpDeletionRequest, OtpType
 from app.users.services.otp_factors import get_user_otp_factors
-from app.users.services.profile import my_profile
+from app.users.services.get_my_profile import get_my_profile
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.request_error_handler import RequestErrorHandler
 from app.utils.schemas import ResponseModel
@@ -36,7 +36,9 @@ async def handle_otp_deletion(
         start_time = datetime.now()
 
         # Verify user profile
-        my_profile_response = await my_profile(global_http_client, user_access_token)
+        my_profile_response = await get_my_profile(
+            global_http_client, user_access_token
+        )
         if not my_profile_response.success:
             logger.error(f"Failed to get user profile for {otp_type} deletion")
             return ResponseModel(

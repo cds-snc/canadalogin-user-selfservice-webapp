@@ -2,19 +2,15 @@
 import json
 from types import SimpleNamespace
 
-import pytest
-from httpx import AsyncClient, MockTransport, Response, Request
-
-# Feature under test
-from app.otp.services.send_transient_otp import (
-    handle_otp_send,
-    dispatch_otp,
-)
 import app.otp.services.send_transient_otp as feature_module
+import pytest
 
 # Schemas
-from app.otp.schemas import UserOtpInfo, OtpType, OtpDataResponse
+from app.otp.schemas import OtpDataResponse, OtpType, UserOtpInfo
 
+# Feature under test
+from app.otp.services.send_transient_otp import dispatch_otp, handle_otp_send
+from httpx import AsyncClient, MockTransport, Request, Response
 
 # -----------------------
 # Helpers for assertions
@@ -59,7 +55,7 @@ def patch_config_and_auth(monkeypatch, fake_settings):
       - get_admin_token (awaitable, accepts the AsyncClient)
       - get_auth_request_headers
       - prepare_pydantic_phone_number_for_verify (normalize to E.164)
-      - my_profile (awaitable; returns data.userName)
+      - get_my_profile (awaitable; returns data.userName)
     """
     # Config
     monkeypatch.setattr(feature_module, "get_configuration", lambda: fake_settings)
@@ -109,7 +105,7 @@ def patch_config_and_auth(monkeypatch, fake_settings):
     async def _ok_profile(_client, user_access_token: str):
         return SimpleNamespace(data=SimpleNamespace(userName="user@example.com"))
 
-    monkeypatch.setattr(feature_module, "my_profile", _ok_profile)
+    monkeypatch.setattr(feature_module, "get_my_profile", _ok_profile)
 
 
 def build_transport(handler):
@@ -314,7 +310,7 @@ async def test_handle_user_mismatch_returns_403(monkeypatch):
     async def _bad_profile(_client, token):
         return SimpleNamespace(data=SimpleNamespace(userName="intruder@example.com"))
 
-    monkeypatch.setattr(feature_module, "my_profile", _bad_profile)
+    monkeypatch.setattr(feature_module, "get_my_profile", _bad_profile)
 
     # Transport should not even be called; still provide a handler
     def handler(request: Request) -> Response:

@@ -1,20 +1,16 @@
 # backend/tests/test_otp_verified_check.py
 import json
 
-import pytest
-from fastapi import HTTPException
-from httpx import AsyncClient, MockTransport, Response, Request
-
-# Feature under test
-from app.otp.services.verify_transient_otp import (
-    handle_otp_verification,
-    verify_otp,
-)
 import app.otp.services.verify_transient_otp as feature_module
+import pytest
 
 # Schemas
 from app.otp.schemas import OtpType, UserOtpVerificationInfo
 
+# Feature under test
+from app.otp.services.verify_transient_otp import handle_otp_verification, verify_otp
+from fastapi import HTTPException
+from httpx import AsyncClient, MockTransport, Request, Response
 
 # -----------------------
 # Helpers for assertions

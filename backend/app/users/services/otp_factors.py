@@ -9,7 +9,7 @@ from app.users.schemas import (
     UserPhoneAuthFactorsResponse,
     UserPhoneOTPFactors,
 )
-from app.users.services.profile import my_profile
+from app.users.services.get_my_profile import get_my_profile
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.request_error_handler import RequestErrorHandler
 from fastapi import HTTPException
@@ -83,6 +83,44 @@ async def parse_phone_auth_factors_response(
     return phone_factors
 
 
+async def parse_phone_auth_factors_response_unmasked(
+    data: UserAuthFactorsIbmResponse,
+) -> UserPhoneOTPFactors:
+    """Parse phone auth factors response without masking phone numbers."""
+    logger.info("parse_auth_factors_response_unmasked")
+    factors = data.factors
+    if not factors:
+        logger.warning("No OTP factors found for user")
+        raise HTTPException(status_code=404, detail="No OTP factors found for user")
+    first_factor = factors[0]
+    if not first_factor:
+        logger.warning("No OTP factors found for user")
+        raise HTTPException(status_code=404, detail="No OTP factors found for user")
+
+    phone_factors = []
+    ALLOWED_TYPES = {OtpType.SMSOTP.value, OtpType.VOICEOTP.value}
+
+    for factor in factors:
+        if factor.type in ALLOWED_TYPES:
+            phone_number = getattr(factor.attributes, "phoneNumber", None)
+            if not phone_number:
+                logger.warning("Factor %s has no phoneNumber", factor.id)
+                continue
+            phone_factors.append(
+                {
+                    "id": factor.id,
+                    "type": factor.type,
+                    "phoneNumber": phone_number,  # Unmasked phone number
+                }
+            )
+
+    if not phone_factors:
+        logger.warning("No OTP factors found for user")
+        raise HTTPException(status_code=404, detail="No OTP factors found for user")
+
+    return phone_factors
+
+
 async def dispatch_user_auth_factors(
     global_http_client: AsyncClient, user_profile_id: str
 ):
@@ -116,6 +154,46 @@ async def dispatch_user_auth_factors(
         RequestErrorHandler.handle(e)
 
 
+async def get_user_otp_factors_unmasked(
+    global_http_client: AsyncClient,
+    user_profile_id: str,
+):
+    """
+    Get user OTP factors with unmasked phone numbers for internal use.
+    The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
+    Use it for ALL API calls.
+    """
+    try:
+        logger.info(f"get_user_otp_factors_unmasked for profile_id: {user_profile_id}")
+
+        start_time = datetime.now()
+        user_otp_factors_response = await dispatch_user_auth_factors(
+            global_http_client, user_profile_id
+        )
+        duration = (datetime.now() - start_time).total_seconds()
+        logger.info(f"user_otp_factors returned in {duration:.2f} seconds")
+
+        try:
+            validated_data = UserAuthFactorsIbmResponse(**user_otp_factors_response)
+        except ValidationError as validation_error:
+            logger.warning("Invalid API response schema: %s", validation_error.errors())
+            raise HTTPException(status_code=422, detail="Invalid response")
+
+        phone_number_otp_factors = await parse_phone_auth_factors_response_unmasked(
+            validated_data
+        )
+        logger.info(
+            "success response and data validation for user auth factors (unmasked)"
+        )
+        return phone_number_otp_factors
+
+    except Exception as e:
+        logger.error(
+            f"Error getting user auth factors (unmasked): {str(e)}", exc_info=True
+        )
+        RequestErrorHandler.handle(e)
+
+
 async def get_user_otp_factors(
     global_http_client: AsyncClient,
     user_id: str,
@@ -125,7 +203,7 @@ async def get_user_otp_factors(
     Use it for ALL API calls."""
 
     try:
-        user_profile = await my_profile(global_http_client, user_access_token)
+        user_profile = await get_my_profile(global_http_client, user_access_token)
         logger.info(f"get_user_otp_factors for: {user_id}")
 
         if user_profile.success:

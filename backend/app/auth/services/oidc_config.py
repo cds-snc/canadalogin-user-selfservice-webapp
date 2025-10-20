@@ -16,5 +16,9 @@ def register_oidc(config):
         client_id=verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID,
         client_secret=verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_SECRET,
         server_metadata_url=config.oidc_well_known_config,
-        client_kwargs={"scope": "openid email profile phone"},
+        client_kwargs={
+            "scope": "openid email profile phone",
+            # Enable PKCE support - Authlib will automatically generate and handle PKCE
+            "code_challenge_method": "S256",
+        },
     )

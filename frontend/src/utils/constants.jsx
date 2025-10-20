@@ -84,8 +84,8 @@ export const PAGES = {
   areYouSureUpdateYourEmail: "AreYouSureUpdateYourEmail",
   securitySettings: "SecuritySettings",
   editLanguagePreferences: "EditLanguagePreferences",
-  areYouSureEditYourLanguage: "AreYouSureEditYourLanguage",
-  profileYouMayUpdateLanguage: "ProfileYouMayUpdateLanguage",
+  confirmLanguageUpdate: "ConfirmLanguageUpdate",
+  successfullyUpdatedLanguage: "SuccessfullyUpdatedLanguage",
   passwordChangedConfirmation: "PasswordChangedConfirmation",
   ServicesWithAccessInfo: "ServicesWithAccessInfo",
   confirmContactPhoneNumberUpdate: "ConfirmContactPhoneNumberUpdate",
@@ -99,6 +99,8 @@ export const PAGES = {
   addSecondMFATextMessage: "AddSecondMFATextMessage",
   deleteMFAPage: "DeleteMFAPage",
   deleteMFAPhoneNumberConfirm: "DeleteMFAPhoneNumberConfirm",
+  transientOtpSelection: "TransientOtpSelection",
+  successBanner: "SuccessBanner",
 };
 
 export const FOOTERS = {

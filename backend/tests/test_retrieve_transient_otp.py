@@ -1,19 +1,18 @@
 # tests/test_retrieve_transient_otp.py
+# Also import the module so we can monkeypatch its names directly
+import app.otp.services.retrieve_transient_otp as feature_module
 import pytest
-from httpx import AsyncClient, MockTransport, Response, Request
-from fastapi import HTTPException
+
+# Import schemas you provided
+from app.otp.schemas import OtpDataResponse, OtpType, RetrievalData
 
 # ⬇️ UPDATE this import to the actual module where your feature functions live
 from app.otp.services.retrieve_transient_otp import (
-    handle_otp_status_retrieval,
     dispatch_otp_status_retrieval,
+    handle_otp_status_retrieval,
 )
-
-# Also import the module so we can monkeypatch its names directly
-import app.otp.services.retrieve_transient_otp as feature_module
-
-# Import schemas you provided
-from app.otp.schemas import RetrievalData, OtpType, OtpDataResponse
+from fastapi import HTTPException
+from httpx import AsyncClient, MockTransport, Request, Response
 
 
 @pytest.fixture

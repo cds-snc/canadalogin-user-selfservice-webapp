@@ -9,7 +9,8 @@ from app.users.schemas import (
     RelyingPartyResponse,
     UserPhoneAuthFactorsResponse,
 )
-from app.users.services.profile import update_profile, my_profile
+from app.users.services.get_my_profile import get_my_profile
+from app.users.services.update_my_profile import update_my_profile
 from app.users.services.rp_info import get_relying_party_info
 from app.users.services.otp_factors import get_user_otp_factors
 
@@ -31,7 +32,7 @@ async def user_profile(
     user_data: UserProfileUpdateRequest,
     user_access_token: str = Depends(get_users_current_session),
 ):
-    return await update_profile(
+    return await update_my_profile(
         request,
         user_data,
         user_access_token,
@@ -48,7 +49,7 @@ async def user_profile(
 async def profile(
     request: Request, user_access_token: str = Depends(get_users_current_session)
 ):
-    return await my_profile(
+    return await get_my_profile(
         request.app.state.request_client,
         user_access_token,
     )
