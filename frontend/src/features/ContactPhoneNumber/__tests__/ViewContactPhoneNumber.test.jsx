@@ -142,7 +142,6 @@ const mockUserState = {
       formatted: "John Doe",
     },
   },
-  editProfile: null,
   urlLanguageBeforeEdit: null,
   cancelProfileEditing: false,
   relyingPartyInfo: null,

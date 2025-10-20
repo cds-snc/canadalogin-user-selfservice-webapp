@@ -21,13 +21,8 @@ export const OIDC_REDIRECT = {
 export const CONTEXT_ACTIONS = {
   logOut: "LOG_OUT",
   set_loading: "SET_LOADING",
-  clone_profile: "CLONE_PROFILE",
-  clear_edit_profile: "CLEAR_EDIT_PROFILE",
-  update_cloned_profile: "UPDATED_CLONE_PROFILE",
   update_profile: "UPDATE_PROFILE",
   updated_profile_success: "UPDATE_PROFILE_SUCCESS",
-  set_original_language_before_edit: "SET_ORIGINAL_LANGUAGE_BEFORE_EDIT",
-  cancel_profile_editing: "CANCEL_PROFILE_EDITING",
   set_language: "SET_LANGUAGE",
   set_relying_party_data: "SET_RELYING_PARTY_DATA",
   set_authenticated_pages: "SET_AUTHENTICATED_PAGES",

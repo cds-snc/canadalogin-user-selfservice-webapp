@@ -1,11 +1,4 @@
-import {
-  useReducer,
-  useEffect,
-  ReactNode,
-  useRef,
-  useState,
-  useMemo,
-} from "react";
+import { useReducer, useEffect, ReactNode, useRef, useMemo } from "react";
 import { useSearchParams, useParams } from "react-router";
 import {
   useEventSource,
@@ -68,7 +61,6 @@ export interface UserState {
   userData: any;
   isLoading: boolean;
   loadingText: string | null;
-  editProfile: UserProfile | null;
   urlLanguageBeforeEdit: string | null;
   cancelProfileEditing: boolean;
   relyingPartyInfo: RelyingPartyInfo | null;
@@ -108,7 +100,6 @@ const initialState: UserState = {
     passwordValidated: false,
   },
   userProfile: null,
-  editProfile: null,
   urlLanguageBeforeEdit: null,
   cancelProfileEditing: false,
   relyingPartyInfo: null,
@@ -140,42 +131,10 @@ function userReducer(
         isLoading: action.payload.isLoading,
         loadingText: action.payload.text || null,
       };
-    case CONTEXT_ACTIONS.clone_profile:
-      return {
-        ...state,
-        editProfile: state.userProfile ? { ...state.userProfile } : null,
-        cancelProfileEditing: false,
-        urlLanguageBeforeEdit: null,
-      };
-    case CONTEXT_ACTIONS.update_cloned_profile:
-      return {
-        ...state,
-        editProfile: state.editProfile
-          ? {
-              ...state.editProfile,
-              ...action.payload,
-            }
-          : null,
-      };
     case CONTEXT_ACTIONS.updated_profile_success:
       return {
         ...state,
         userProfile: action.payload,
-      };
-    case CONTEXT_ACTIONS.clear_edit_profile:
-      return {
-        ...state,
-        editProfile: null,
-      };
-    case CONTEXT_ACTIONS.set_original_language_before_edit:
-      return {
-        ...state,
-        urlLanguageBeforeEdit: action.payload,
-      };
-    case CONTEXT_ACTIONS.cancel_profile_editing:
-      return {
-        ...state,
-        cancelProfileEditing: action.payload,
       };
     case CONTEXT_ACTIONS.set_relying_party_data:
       return {
