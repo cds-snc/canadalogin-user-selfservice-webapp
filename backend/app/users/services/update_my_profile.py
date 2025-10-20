@@ -9,7 +9,7 @@ from app.users.schemas import (
     ProfileResponse,
     UserProfileUpdateRequest,
     IBMVerifyUpdateUserProfile,
-    NotifyType
+    NotifyType,
 )
 from app.utils.access_token import get_auth_request_headers
 from app.utils.mask_phone_number import mask_contact_phone_numbers
@@ -63,7 +63,9 @@ def set_notification_type_for_phone_update(
 
     if profile.notification is None:
         logger.error("Cannot set notification type: notification object is None")
-        raise ValueError("Profile notification object cannot be None when updating phone numbers")
+        raise ValueError(
+            "Profile notification object cannot be None when updating phone numbers"
+        )
 
     logger.info("Phone numbers are being updated, setting notification type to EMAIL")
 

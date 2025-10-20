@@ -8,7 +8,7 @@ from app.users.services.update_my_profile import (
     update_my_profile as update_profile,
     dispatch_update_my_profile as dispatch_update_user_profile,
     sanitize_user_profile_data,
-    set_notification_type_for_phone_update
+    set_notification_type_for_phone_update,
 )
 
 from app.users.schemas import (
@@ -570,11 +570,7 @@ def test_set_notification_type_when_phone_numbers_updated():
     }
 
     profile = IBMVerifyUpdateUserProfile(**profile_data)
-    updated_data = {
-        "phoneNumbers": [
-            {"value": "+1-613-555-9999", "type": "mobile"}
-        ]
-    }
+    updated_data = {"phoneNumbers": [{"value": "+1-613-555-9999", "type": "mobile"}]}
 
     # Act
     result = set_notification_type_for_phone_update(profile, updated_data)
@@ -683,16 +679,15 @@ def test_set_notification_type_raises_error_when_notification_is_none():
 
     profile = IBMVerifyUpdateUserProfile(**profile_data)
     profile.notification = None
-    updated_data = {
-        "phoneNumbers": [{"value": "+1-613-555-9999", "type": "mobile"}]
-    }
+    updated_data = {"phoneNumbers": [{"value": "+1-613-555-9999", "type": "mobile"}]}
 
     # Act & Assert
     with pytest.raises(ValueError) as exc_info:
         set_notification_type_for_phone_update(profile, updated_data)
 
-    assert "Profile notification object cannot be None when updating phone numbers" in str(
-        exc_info.value
+    assert (
+        "Profile notification object cannot be None when updating phone numbers"
+        in str(exc_info.value)
     )
 
 
@@ -719,9 +714,7 @@ def test_set_notification_type_logs_info_when_updating():
     }
 
     profile = IBMVerifyUpdateUserProfile(**profile_data)
-    updated_data = {
-        "phoneNumbers": [{"value": "+1-613-555-9999", "type": "mobile"}]
-    }
+    updated_data = {"phoneNumbers": [{"value": "+1-613-555-9999", "type": "mobile"}]}
 
     # Act
     with patch("app.users.services.update_my_profile.logger") as mock_logger:
@@ -758,9 +751,7 @@ def test_set_notification_type_preserves_immutability():
 
     profile = IBMVerifyUpdateUserProfile(**profile_data)
     original_notify_type = profile.notification.notifyType
-    updated_data = {
-        "phoneNumbers": [{"value": "+1-613-555-9999", "type": "mobile"}]
-    }
+    updated_data = {"phoneNumbers": [{"value": "+1-613-555-9999", "type": "mobile"}]}
 
     # Act
     result = set_notification_type_for_phone_update(profile, updated_data)
