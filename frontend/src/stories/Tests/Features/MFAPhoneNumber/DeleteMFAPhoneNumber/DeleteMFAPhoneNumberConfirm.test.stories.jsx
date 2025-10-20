@@ -7,7 +7,8 @@ import {
 import { buildTestCase, TestTemplate } from "../../../utils/functions.tsx";
 
 export default {
-  title: "GC Sign In/Tests/Manage/Delete MFA Phone Number Confirm",
+  title:
+    "GC Sign In/Tests/Features/MFAPhoneNumber/DeleteMFAPhoneNumber/Delete MFA Phone Number Confirm",
   component: TestTemplate,
   args: {
     page: PAGES.deleteMFAPhoneNumberConfirm,
