@@ -9,7 +9,7 @@ import {
 } from "./constants.jsx";
 import PageRenderer from "./PageRenderer.jsx";
 import { UserProvider } from "../../../components/Providers/UserProvider";
-import { LanguageProvider } from "../../../components/Providers/LanguageProvider.tsx";
+import { LanguageProvider } from "../../../components/Providers/LanguageProvider";
 import React from "react";
 
 const stepErrorMessage = "Verify error message is on Page.";
@@ -365,7 +365,12 @@ export const TestTemplate = (args: any) => {
   return (
     <UserProvider initial={testData}>
       <LanguageProvider>
-        <PageRenderer page={args.page} />
+        <PageRenderer
+          page={args.page}
+          phoneFormData={args.phoneFormData}
+          onNext={args.onNext}
+          onCancel={args.onCancel}
+        />
         <button aria-label="test" type="submit" form="form"></button>
       </LanguageProvider>
     </UserProvider>
