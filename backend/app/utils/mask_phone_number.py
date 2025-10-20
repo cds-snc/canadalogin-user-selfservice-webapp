@@ -35,7 +35,7 @@ def mask_contact_phone_numbers(
     profile_contact_phone_numbers = json_data.get("phoneNumbers")
 
     if profile_contact_phone_numbers is None:
-        return None
+        return []
 
     masked_phone_numbers = []
     for phone in profile_contact_phone_numbers:

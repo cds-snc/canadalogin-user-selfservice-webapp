@@ -312,6 +312,237 @@ async def test_dispatch_update_user_profile_failure(monkeypatch):
         )
 
 
+@pytest.mark.asyncio
+@patch("app.users.services.update_my_profile.mask_contact_phone_numbers")
+@patch(DISPATCH_UPDATE_PROFILE_IMPORT_PATH)
+@patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
+@patch(SANITIZE_PROFILE_IMPORT_PATH)
+async def test_update_profile_masks_phone_numbers(
+    mock_sanitize, mock_dispatch_get, mock_dispatch_update, mock_mask
+):
+    """Test that update_my_profile returns masked phone numbers in response."""
+    # Arrange
+    sanitized_data = {
+        "userName": "john.doe@example.com",
+        "preferredLanguage": "fr",
+    }
+    mock_sanitize.return_value = sanitized_data
+
+    # Profile from IBM with unmasked phone numbers
+    profile_data = {
+        "schemas": [
+            "urn:ietf:params:scim:schemas:core:2.0:User",
+            "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+        ],
+        "userName": "john.doe@example.com",
+        "emails": [{"value": "john.doe@example.com", "type": "work"}],
+        "phoneNumbers": [
+            {"value": "+1-613-555-1234", "type": "mobile"},
+            {"value": "+1-613-555-5678", "type": "work"},
+        ],
+        "meta": {
+            "location": "here",
+            "created": "2023-01-01T00:00:00Z",
+            "lastModified": "2023-09-22T12:30:00Z",
+            "resourceType": "User",
+        },
+        "active": True,
+        "id": "user-123",
+        "preferredLanguage": "en",
+    }
+
+    mock_profile = IBMVerifyUserProfileSchema(**profile_data)
+    mock_dispatch_get.return_value = mock_profile
+
+    # Updated profile response from IBM (after PUT)
+    updated_profile_data = {**profile_data, "preferredLanguage": "fr"}
+    mock_response = Mock()
+    mock_response.json.return_value = updated_profile_data
+    mock_dispatch_update.return_value = mock_response
+
+    # Mock masked phone numbers
+    masked_phones = [
+        {"value": "+1-613-XXX-XX34", "type": "mobile"},
+        {"value": "+1-613-XXX-XX78", "type": "work"},
+    ]
+    mock_mask.return_value = masked_phones
+
+    user_data = UserProfileUpdateRequest(
+        userName="john.doe@example.com", preferredLanguage="fr"
+    )
+    mock_request = Mock()
+    mock_request.app = Mock()
+    mock_request.app.state = Mock()
+    mock_request.app.state.request_client = AsyncClient()
+    mock_request.app.state.config = Mock()
+    mock_request.app.state.config.profile_api_endpoint = PROFILE_API_URL
+
+    # Act
+    response = await update_profile(mock_request, user_data, user_access_token="token")
+
+    # Assert
+    assert response.success is True
+    assert response.message == "User profile updated successfully."
+    assert response.data.preferredLanguage == "fr"
+
+    # Verify phone numbers are masked in response
+    assert len(response.data.phoneNumbers) == 2
+    assert response.data.phoneNumbers[0].value == "+1-613-XXX-XX34"
+    assert response.data.phoneNumbers[0].type == "mobile"
+    assert response.data.phoneNumbers[1].value == "+1-613-XXX-XX78"
+    assert response.data.phoneNumbers[1].type == "work"
+
+    # Verify masking was called with updated profile data
+    mock_mask.assert_called_once()
+    mask_call_data = mock_mask.call_args[0][0]
+    assert mask_call_data["userName"] == "john.doe@example.com"
+    assert mask_call_data["preferredLanguage"] == "fr"
+
+    mock_sanitize.assert_called_once()
+    mock_dispatch_get.assert_called_once()
+    mock_dispatch_update.assert_called_once()
+
+
+@pytest.mark.asyncio
+@patch("app.users.services.update_my_profile.mask_contact_phone_numbers")
+@patch(DISPATCH_UPDATE_PROFILE_IMPORT_PATH)
+@patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
+@patch(SANITIZE_PROFILE_IMPORT_PATH)
+async def test_update_profile_prevents_username_change(
+    mock_sanitize, mock_dispatch_get, mock_dispatch_update, mock_mask
+):
+    """Test that update_my_profile prevents userName from being changed."""
+    # Arrange
+    # User attempts to change userName from john.doe to jane.smith
+    sanitized_data = {
+        "userName": "john.doe@example.com",
+        "name": {"givenName": "Jane", "familyName": "Smith"},
+    }
+    mock_sanitize.return_value = sanitized_data
+
+    profile_data = {
+        "schemas": [
+            "urn:ietf:params:scim:schemas:core:2.0:User",
+            "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+        ],
+        "userName": "john.doe@example.com",
+        "emails": [{"value": "john.doe@example.com", "type": "work"}],
+        "name": {"givenName": "John", "familyName": "Doe"},
+        "phoneNumbers": [],
+        "meta": {
+            "location": "here",
+            "created": "2023-01-01T00:00:00Z",
+            "lastModified": "2023-09-22T12:30:00Z",
+            "resourceType": "User",
+        },
+        "active": True,
+        "id": "user-123",
+    }
+
+    mock_profile = IBMVerifyUserProfileSchema(**profile_data)
+    mock_dispatch_get.return_value = mock_profile
+
+    # Updated profile response - userName should remain unchanged
+    updated_profile_data = {
+        **profile_data,
+        "name": {"givenName": "Jane", "familyName": "Smith"},
+    }
+    mock_response = Mock()
+    mock_response.json.return_value = updated_profile_data
+    mock_dispatch_update.return_value = mock_response
+    mock_mask.return_value = []
+
+    user_data = UserProfileUpdateRequest(
+        userName="john.doe@example.com",
+        name=UserProfileName(givenName="Jane", familyName="Smith"),
+    )
+    mock_request = Mock()
+    mock_request.app = Mock()
+    mock_request.app.state = Mock()
+    mock_request.app.state.request_client = AsyncClient()
+    mock_request.app.state.config = Mock()
+    mock_request.app.state.config.profile_api_endpoint = PROFILE_API_URL
+
+    # Act
+    response = await update_profile(mock_request, user_data, user_access_token="token")
+
+    # Assert
+    assert response.success is True
+    assert response.data.userName == "john.doe@example.com"  # Username unchanged
+    assert response.data.name.givenName == "Jane"  # Name updated
+    assert response.data.name.familyName == "Smith"
+
+    # Verify that userName was NOT included in the update payload
+    mock_dispatch_update.assert_called_once()
+    update_call_args = mock_dispatch_update.call_args[0]
+    payload_json = update_call_args[1]  # user_profile_payload argument
+    import json
+    payload_dict = json.loads(payload_json)
+
+    # userName should be in payload (from IBM profile), but the update didn't change it
+    assert payload_dict["userName"] == "john.doe@example.com"
+    assert payload_dict["name"]["givenName"] == "Jane"
+
+
+@pytest.mark.asyncio
+@patch("app.users.services.update_my_profile.mask_contact_phone_numbers")
+@patch(DISPATCH_UPDATE_PROFILE_IMPORT_PATH)
+@patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
+@patch(SANITIZE_PROFILE_IMPORT_PATH)
+async def test_update_profile_with_no_phone_numbers_to_mask(
+    mock_sanitize, mock_dispatch_get, mock_dispatch_update, mock_mask
+):
+    """Test that update_my_profile handles profiles with no phone numbers."""
+    # Arrange
+    sanitized_data = {"userName": "john.doe@example.com", "preferredLanguage": "fr"}
+    mock_sanitize.return_value = sanitized_data
+
+    profile_data = {
+        "schemas": [
+            "urn:ietf:params:scim:schemas:core:2.0:User",
+            "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+        ],
+        "userName": "john.doe@example.com",
+        "emails": [{"value": "john.doe@example.com", "type": "work"}],
+        "phoneNumbers": [],  # No phone numbers
+        "meta": {
+            "location": "here",
+            "created": "2023-01-01T00:00:00Z",
+            "lastModified": "2023-09-22T12:30:00Z",
+            "resourceType": "User",
+        },
+        "active": True,
+        "id": "user-123",
+    }
+
+    mock_profile = IBMVerifyUserProfileSchema(**profile_data)
+    mock_dispatch_get.return_value = mock_profile
+
+    updated_profile_data = {**profile_data, "preferredLanguage": "fr"}
+    mock_response = Mock()
+    mock_response.json.return_value = updated_profile_data
+    mock_dispatch_update.return_value = mock_response
+    mock_mask.return_value = []  # No phone numbers to mask
+
+    user_data = UserProfileUpdateRequest(
+        userName="john.doe@example.com", preferredLanguage="fr"
+    )
+    mock_request = Mock()
+    mock_request.app = Mock()
+    mock_request.app.state = Mock()
+    mock_request.app.state.request_client = AsyncClient()
+    mock_request.app.state.config = Mock()
+    mock_request.app.state.config.profile_api_endpoint = PROFILE_API_URL
+
+    # Act
+    response = await update_profile(mock_request, user_data, user_access_token="token")
+
+    # Assert
+    assert response.success is True
+    assert len(response.data.phoneNumbers) == 0
+    mock_mask.assert_called_once()  # Masking function still called
+
+
 def test_sanitize_user_profile_data():
     input_data = UserProfileUpdateRequest(
         userName="john.doe@example.com",
