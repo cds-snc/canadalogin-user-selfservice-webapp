@@ -477,6 +477,7 @@ async def test_update_profile_prevents_username_change(
     update_call_args = mock_dispatch_update.call_args[0]
     payload_json = update_call_args[1]  # user_profile_payload argument
     import json
+
     payload_dict = json.loads(payload_json)
 
     # userName should be in payload (from IBM profile), but the update didn't change it
