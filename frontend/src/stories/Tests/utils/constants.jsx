@@ -90,7 +90,6 @@ export const TestDataUserProvider = {
       formatted: "Test User",
     },
   },
-  urlLanguageBeforeEdit: null,
   cancelProfileEditing: false,
   relyingPartyInfo: null,
   authenticatedPages: [],

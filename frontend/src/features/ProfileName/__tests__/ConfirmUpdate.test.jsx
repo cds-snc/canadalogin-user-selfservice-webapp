@@ -57,7 +57,6 @@ const mockUserState = {
       formatted: "Test User",
     },
   },
-  urlLanguageBeforeEdit: null,
   cancelProfileEditing: false,
   relyingPartyInfo: null,
   authenticatedPages: [],
