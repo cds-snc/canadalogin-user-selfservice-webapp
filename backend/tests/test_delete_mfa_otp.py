@@ -15,6 +15,8 @@ from app.utils.schemas import ResponseModel
 from fastapi import HTTPException
 from httpx import AsyncClient, Response
 
+profile_import_path = "app.otp.services.delete_mfa_otp.get_my_profile"
+
 
 def create_mock_user_factors(num_factors=2):
     """Helper function to create mock user factors response"""
@@ -74,7 +76,7 @@ async def test_handle_otp_deletion_sms_success(monkeypatch):
         mock_response.status_code = 204  # No Content for successful deletion
         return mock_response
 
-    monkeypatch.setattr("app.otp.services.delete_mfa_otp.my_profile", mock_my_profile)
+    monkeypatch.setattr(profile_import_path, mock_my_profile)
     monkeypatch.setattr(
         "app.otp.services.delete_mfa_otp.get_user_otp_factors",
         mock_get_user_otp_factors,
@@ -137,7 +139,7 @@ async def test_handle_otp_deletion_voice_success(monkeypatch):
         mock_response.status_code = 204  # No Content for successful deletion
         return mock_response
 
-    monkeypatch.setattr("app.otp.services.delete_mfa_otp.my_profile", mock_my_profile)
+    monkeypatch.setattr(profile_import_path, mock_my_profile)
     monkeypatch.setattr(
         "app.otp.services.delete_mfa_otp.get_user_otp_factors",
         mock_get_user_otp_factors,
@@ -171,7 +173,7 @@ async def test_handle_otp_deletion_profile_failure(monkeypatch):
             data=None,
         )
 
-    monkeypatch.setattr("app.otp.services.delete_mfa_otp.my_profile", mock_my_profile)
+    monkeypatch.setattr(profile_import_path, mock_my_profile)
 
     deletion_request = OtpDeletionRequest(id="factor123", otpType=OtpType.SMS)
 
@@ -218,7 +220,7 @@ async def test_handle_otp_deletion_last_factor_protection(monkeypatch):
     async def mock_get_user_otp_factors(client, user_id, token):
         return create_mock_user_factors(num_factors=1)
 
-    monkeypatch.setattr("app.otp.services.delete_mfa_otp.my_profile", mock_my_profile)
+    monkeypatch.setattr(profile_import_path, mock_my_profile)
     monkeypatch.setattr(
         "app.otp.services.delete_mfa_otp.get_user_otp_factors",
         mock_get_user_otp_factors,
@@ -275,7 +277,7 @@ async def test_handle_otp_deletion_unexpected_status(monkeypatch):
         mock_response.status_code = 200  # Unexpected status for deletion
         return mock_response
 
-    monkeypatch.setattr("app.otp.services.delete_mfa_otp.my_profile", mock_my_profile)
+    monkeypatch.setattr(profile_import_path, mock_my_profile)
     monkeypatch.setattr(
         "app.otp.services.delete_mfa_otp.get_user_otp_factors",
         mock_get_user_otp_factors,
@@ -334,7 +336,7 @@ async def test_handle_otp_deletion_exception(monkeypatch):
     async def mock_dispatch_otp_deletion(client, deletion_request):
         raise Exception("Network error")
 
-    monkeypatch.setattr("app.otp.services.delete_mfa_otp.my_profile", mock_my_profile)
+    monkeypatch.setattr(profile_import_path, mock_my_profile)
     monkeypatch.setattr(
         "app.otp.services.delete_mfa_otp.get_user_otp_factors",
         mock_get_user_otp_factors,

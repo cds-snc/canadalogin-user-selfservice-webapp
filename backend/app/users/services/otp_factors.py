@@ -9,7 +9,7 @@ from app.users.schemas import (
     UserPhoneAuthFactorsResponse,
     UserPhoneOTPFactors,
 )
-from app.users.services.profile import my_profile
+from app.users.services.get_my_profile import get_my_profile
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.request_error_handler import RequestErrorHandler
 from fastapi import HTTPException
@@ -203,7 +203,7 @@ async def get_user_otp_factors(
     Use it for ALL API calls."""
 
     try:
-        user_profile = await my_profile(global_http_client, user_access_token)
+        user_profile = await get_my_profile(global_http_client, user_access_token)
         logger.info(f"get_user_otp_factors for: {user_id}")
 
         if user_profile.success:

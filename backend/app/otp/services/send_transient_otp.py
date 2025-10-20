@@ -4,7 +4,7 @@ from datetime import datetime
 from app.config import get_configuration
 from app.otp.schemas import OtpDataResponse, OtpType, UserOtpInfo
 from app.users.services.otp_factors import get_user_otp_factors_unmasked
-from app.users.services.profile import my_profile
+from app.users.services.get_my_profile import get_my_profile
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.helpers import (
     extract_last_4_digits,
@@ -99,7 +99,9 @@ async def handle_otp_send(
     try:
         logger.info(f"Attempting to send {user_otp_info.otpType} OTP")
         start_time = datetime.now()
-        my_profile_response = await my_profile(global_http_client, user_access_token)
+        my_profile_response = await get_my_profile(
+            global_http_client, user_access_token
+        )
         if my_profile_response.data.userName != user_otp_info.userName:
             logger.error("User mismatch - cannot send OTP")
             return generate_error_response(403, "User mismatch - cannot send OTP")
