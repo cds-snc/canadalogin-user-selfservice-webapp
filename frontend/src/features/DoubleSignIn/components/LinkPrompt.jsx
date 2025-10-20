@@ -35,7 +35,12 @@ export default function LinkPrompt() {
       configRef.current.legacyIDPAuthUrl =
         await updateLinkStateAPI.getLegacyIDPAuthUrl(clientId);
 
-      configRef.current.toLinkSucessPage = configRef.current.legacyIDPAuthUrl;
+      //until the api returns data
+      const toLinkSuccess = path(PAGES.LinkSuccess, {
+        language: language,
+      });
+
+      configRef.current.toLinkSucessPage = toLinkSuccess;
     }
 
     getLegacyIDPAuthUrl();

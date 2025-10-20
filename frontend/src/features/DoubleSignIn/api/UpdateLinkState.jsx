@@ -17,6 +17,7 @@ export const updateLinkStateAPI = {
       console.log(
         "====== " + MIGRATION_END_POINTS.requestLegacyIDPAuthUrl + " ======",
       );
+      console.log("====== legacyIDPAuthUrl: " + legacyIDPAuthUrl + " ======");
       console.log("====== end getLegacyIDPAuthUrl ======");
 
       //const response = await axios.get(
@@ -39,6 +40,7 @@ export const updateLinkStateAPI = {
       console.log(
         "====== " + MIGRATION_END_POINTS.requestRPAuthUrl + " ======",
       );
+      console.log("====== legacyIDPAuthUrl: " + rpAuthUrl + " ======");
       console.log("====== end getRPAuthUrl ======");
 
       //const response = await axios.get(

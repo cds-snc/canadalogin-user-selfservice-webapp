@@ -15,6 +15,7 @@ import { getPageContent } from "../../../utils/functions.jsx";
 
 import { PAGES } from "../../../utils/constants.jsx";
 import { useParams } from "react-router";
+import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 
 import { updateLinkStateAPI } from "../api/UpdateLinkState.jsx";
 import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
@@ -28,23 +29,23 @@ export default function LinkSuccess() {
 
   const configRef = useRef(null);
 
+  const navigateHelper = useNavigateHelper();
+
   useEffect(() => {
-    async function submitLegacyPAI() {
-      await updateLinkStateAPI.getLegacyIDPAuthUrl(1);
-    }
-    async function loadClientDetails() {
-      configRef.current.clientId = "12341";
-      configRef.current.legacyIDPUrl =
-        "https://www.google.ca/" + configRef.current.clientId;
+    var clientId = "";
+
+    async function getRPAuthUrl() {
+      configRef.current.rpAuthUrl =
+        await updateLinkStateAPI.rpAuthUrl(clientId);
     }
 
-    loadClientDetails();
-    submitLegacyPAI();
+    getRPAuthUrl();
   }, []);
 
   const continueToRP = async () => {
     try {
       console.log("info", "clicked start linking");
+      navigateHelper(configRef.current.rpAuthUrl);
     } catch (err) {
       if (err && err.data && err.data.message) {
         setServerErrorMessage(err.data.message);
