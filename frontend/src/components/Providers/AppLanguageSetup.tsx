@@ -21,7 +21,7 @@ export const AppLanguageSetup = () => {
   const { pathname } = useLocation();
   const { state } = useUser();
   const { state: languageState, setAppLanguage } = useLanguage();
-  const { userProfile, isLoading, editProfile } = state;
+  const { userProfile, isLoading } = state;
   const { language } = languageState;
 
   const navigateHelper = useNavigateHelper();
@@ -35,13 +35,11 @@ export const AppLanguageSetup = () => {
     const urlLanguage = urlPath[0]?.toLowerCase();
     const normalizedUrlLanguage = validateSelectedLanguage(urlLanguage);
 
-    const editPreferredLanguage = editProfile?.preferredLanguage?.toLowerCase();
     const profilePreferredLanguage =
       userProfile?.preferredLanguage?.toLowerCase();
 
     const possibleLanguages =
       normalizedUrlLanguage ||
-      editPreferredLanguage ||
       language ||
       profilePreferredLanguage ||
       browserLanguage ||
@@ -62,13 +60,7 @@ export const AppLanguageSetup = () => {
         navigateHelper(languageToDisplay, true);
       }
     }
-  }, [
-    pathname,
-    isLoading,
-    userProfile?.preferredLanguage,
-    editProfile?.preferredLanguage,
-    language,
-  ]);
+  }, [pathname, isLoading, userProfile?.preferredLanguage, language]);
 
   return null;
 };
