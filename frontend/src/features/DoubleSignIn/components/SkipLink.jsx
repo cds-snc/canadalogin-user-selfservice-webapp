@@ -30,7 +30,7 @@ export default function SkipLink() {
 
   useEffect(() => {
     async function submitSkipLinking() {
-      await updateLinkStateAPI.submitSkipLinking(1);
+      await updateLinkStateAPI.getRPAuthUrl(1);
     }
     async function loadClientDetails() {
       configRef.current.clientId = "12341";

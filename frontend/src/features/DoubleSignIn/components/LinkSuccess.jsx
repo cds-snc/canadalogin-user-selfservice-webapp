@@ -30,7 +30,7 @@ export default function LinkSuccess() {
 
   useEffect(() => {
     async function submitLegacyPAI() {
-      await updateLinkStateAPI.submitLegacyPAI(1);
+      await updateLinkStateAPI.getLegacyIDPAuthUrl(1);
     }
     async function loadClientDetails() {
       configRef.current.clientId = "12341";

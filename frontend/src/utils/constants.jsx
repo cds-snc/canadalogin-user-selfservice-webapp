@@ -148,6 +148,10 @@ export const SUBMIT_END_POINTS = {
   keepAlive: "/v1/auth/keep-alive",
 };
 
+export const MIGRATION_END_POINTS = {
+  requestLegacyIDPAuthUrl: "",
+  requestRPAuthUrl: "",
+};
 export const RP_CLIENT_ID_KEY = "rp_client_id";
 
 export const GA_CATEGORIES = {

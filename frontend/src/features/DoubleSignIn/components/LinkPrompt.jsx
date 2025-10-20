@@ -12,7 +12,7 @@ import {
   GcdsHeading,
 } from "@cdssnc/gcds-components-react";
 import { getPageContent } from "../../../utils/functions.jsx";
-
+import { updateLinkStateAPI } from "../api/UpdateLinkState.jsx";
 import { PAGES } from "../../../utils/constants.jsx";
 import { useParams } from "react-router";
 import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
@@ -29,18 +29,17 @@ export default function LinkPrompt() {
   const configRef = useRef(null);
 
   useEffect(() => {
-    async function loadClientDetails() {
-      configRef.current.clientId = "12341";
-      configRef.current.legacyIDPUrl =
-        "https://www.google.ca/" + configRef.current.clientId;
+    var clientId = "";
+
+    async function getLegacyIDPAuthUrl() {
+      configRef.current.legacyIDPAuthUrl =
+        await updateLinkStateAPI.getLegacyIDPAuthUrl(clientId);
+
+      configRef.current.toLinkSucessPage = configRef.current.legacyIDPAuthUrl;
     }
 
-    loadClientDetails();
+    getLegacyIDPAuthUrl();
   }, []);
-
-  const toLinkSucessPage = path(PAGES.LinkSuccess, {
-    language: language,
-  });
 
   const toSkipLinkPage = path(PAGES.SkipLink, {
     language: language,
@@ -51,7 +50,7 @@ export default function LinkPrompt() {
   const startLinking = async () => {
     try {
       console.log("info", "clicked start linking");
-      navigateHelper(toLinkSucessPage);
+      navigateHelper(configRef.current.toLinkSucessPage);
     } catch (err) {
       if (err && err.data && err.data.message) {
         setServerErrorMessage(err.data.message);

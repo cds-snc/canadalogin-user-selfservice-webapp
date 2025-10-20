@@ -1,41 +1,51 @@
 import axios from "axios";
 import config from "../../../config.jsx";
-import { SUBMIT_END_POINTS } from "../../../utils/constants.jsx";
+import { MIGRATION_END_POINTS } from "../../../utils/constants.jsx";
 import { handleApiError } from "../../../utils/apiErrorHandler.js";
 
 axios.defaults.withCredentials = true;
 
 export const updateLinkStateAPI = {
   // not sure we need user_id, just the legacy PAI. Or send the token back to API to ensure no tampering (validate token then pull sub from it)
-  submitLegacyPAI: async (user_id) => {
+  getLegacyIDPAuthUrl: async (clientId) => {
     try {
-      console.log("====== start submitLegacyPAI ======");
-      console.log("====== " + user_id + " ======");
+      var legacyIDPAuthUrl = "";
+
+      console.log("====== start getLegacyIDPAuthUrl ======");
+      console.log("====== " + clientId + " ======");
       console.log("====== " + config.apiUrl + " ======");
-      console.log("====== " + SUBMIT_END_POINTS.users + " ======");
-      console.log("====== end submitLegacyPAI ======");
+      console.log(
+        "====== " + MIGRATION_END_POINTS.requestLegacyIDPAuthUrl + " ======",
+      );
+      console.log("====== end getLegacyIDPAuthUrl ======");
+
       //const response = await axios.get(
       //  `${config.apiUrl}${SUBMIT_END_POINTS.users}/${user_id}/otp_factors`,
       //);
 
-      return null;
+      return legacyIDPAuthUrl;
       //return response.data;
     } catch (error) {
       handleApiError(error);
     }
   },
-  submitSkipLinking: async (user_id) => {
+  getRPAuthUrl: async (clientId) => {
     try {
-      console.log("====== start skip linking ======");
-      console.log("====== " + user_id + " ======");
+      var rpAuthUrl = "";
+
+      console.log("====== start getRPAuthUrl ======");
+      console.log("====== " + clientId + " ======");
       console.log("====== " + config.apiUrl + " ======");
-      console.log("====== " + SUBMIT_END_POINTS.users + " ======");
-      console.log("====== end skip linking ======");
+      console.log(
+        "====== " + MIGRATION_END_POINTS.requestRPAuthUrl + " ======",
+      );
+      console.log("====== end getRPAuthUrl ======");
+
       //const response = await axios.get(
       //  `${config.apiUrl}${SUBMIT_END_POINTS.users}/${user_id}/otp_factors`,
       //);
 
-      return null;
+      return rpAuthUrl;
       //return response.data;
     } catch (error) {
       handleApiError(error);
