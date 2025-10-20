@@ -21,6 +21,7 @@ import ConfirmLanguageUpdate from "../../../features/LanguagePreference/componen
 import SuccessfullyUpdatedLanguage from "../../../features/LanguagePreference/components/SuccessfullyUpdated.jsx";
 import ProfileUpdateName from "../../../features/ProfileName/components/ProfileUpdateName.jsx";
 import Verification from "../../../components/Verification/Verification.jsx";
+import DeleteMFAPage from "../../../features/MFAPhoneNumber/DeleteMFAPhoneNumber/component/DeleteMFAPage.jsx";
 
 // Storybook Page Renderer - maps page names to components for testing
 const PageRenderer = ({ page }) => {
@@ -63,6 +64,8 @@ const PageRenderer = ({ page }) => {
       return <SuccessfullyUpdatedLanguage />;
     case PAGES.verification:
       return <Verification />;
+    case PAGES.deleteMFAPage:
+      return <DeleteMFAPage />;
     default:
       console.warn(`Unknown page in Storybook: ${page}`);
       return <div>Storybook: Page not found: {page}</div>;
