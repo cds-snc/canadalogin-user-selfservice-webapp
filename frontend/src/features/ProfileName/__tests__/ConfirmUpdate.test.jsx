@@ -57,7 +57,6 @@ const mockUserState = {
       formatted: "Test User",
     },
   },
-  cancelProfileEditing: false,
   relyingPartyInfo: null,
   authenticatedPages: [],
 };

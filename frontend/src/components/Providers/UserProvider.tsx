@@ -61,7 +61,6 @@ export interface UserState {
   userData: any;
   isLoading: boolean;
   loadingText: string | null;
-  cancelProfileEditing: boolean;
   relyingPartyInfo: RelyingPartyInfo | null;
   authenticatedPages: string[];
 }
@@ -99,7 +98,6 @@ const initialState: UserState = {
     passwordValidated: false,
   },
   userProfile: null,
-  cancelProfileEditing: false,
   relyingPartyInfo: null,
   authenticatedPages: [],
 };
