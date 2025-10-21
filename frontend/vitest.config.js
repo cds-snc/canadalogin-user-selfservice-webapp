@@ -7,6 +7,7 @@ const filesToInclude = [
   "**/src/hooks/*",
   "**/src/views/**/*",
   "**/src/components/**/*",
+  "**/src/features/**/*",
   "**/src/services/*",
   "**/src/locales/**/*",
 ];
