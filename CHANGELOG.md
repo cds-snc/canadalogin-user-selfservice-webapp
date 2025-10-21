@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.6.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.5.0...v1.6.0) (2025-10-21)
+
+
+### Features
+
+* **frontend:** add tests for delete mfa phone number pages ([#862](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/862)) ([35672ea](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/35672ead3e1a0a596229e1b141adcb9c38879cf9))
+
+
+### Code Refactoring
+
+* **backend:** updated the mask phone number return type  and upd… ([#856](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/856)) ([82fe70c](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/82fe70cf1d5b2555605408f3c60d8f7639e770ee))
+* **CI/CD:** Clarify name of backend code coverage job ([#854](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/854)) ([1f7d59d](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/1f7d59daeba2497513c01a94617e39560ecf19b9))
+* **frontend:** removed edit profile from reducer ([#858](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/858)) ([fd8ddbe](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/fd8ddbe6d670db5acaf2464f14ce569a991ed332))
+
+
+### Miscellaneous Chores
+
+* **deps:** update all minor dependencies ([#852](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/852)) ([0e40470](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/0e40470f8940a2be0eba0aa4116c351b282ca051))
+* **deps:** update dependency phonenumbers to v9.0.16 ([#851](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/851)) ([1a236db](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/1a236dbf4c69a8f9552071ee3484d62b7888790d))
+* **deps:** update mcr.microsoft.com/devcontainers/go:bullseye docker digest to 80c933b ([#850](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/850)) ([85426be](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/85426be297cc6759d8080c95ebe7b7bac831f5f6))
+
 ## [1.5.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.4.0...v1.5.0) (2025-10-16)
 
 
