@@ -4,18 +4,15 @@ import {
   GcdsHeading,
   GcdsGrid,
   GcdsText,
-  GcdsLink,
-  GcdsIcon,
 } from "@cdssnc/gcds-components-react";
 
 import { getPageContent } from "../../utils/functions.jsx";
-import { PAGES, LANGUAGE_DISPLAY_NAMES } from "../../utils/constants.jsx";
-import { path } from "../../utils/routeHelpers.js";
+import { PAGES } from "../../utils/constants.jsx";
 import { useUser } from "../Providers/useUser.tsx";
-import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
 import VerifiedBadge from "../Badges/VerifiedBadge.jsx";
 import ViewContactPhoneNumber from "../../features/ContactPhoneNumber/components/ViewContactPhoneNumber.jsx";
 import ViewNameCard from "../../features/ProfileName/components/ViewProfileNameCard.jsx";
+import ViewLanguagePreferences from "../../features/LanguagePreference/components/ViewLanguagePreference.jsx";
 
 const DisplayEmailInfo = ({ email, pageContent }) => {
   return (
@@ -36,14 +33,8 @@ export default function ProfileHome() {
   const { language } = useParams();
   const pageContent = getPageContent(language, PAGES.ProfileHome);
   const { state } = useUser();
-  const navigateHelper = useNavigateHelper();
   const email = state?.userProfile?.userName || "";
   const phoneNumbers = state?.userProfile?.phoneNumbers;
-  const preferredLanguage = state?.userProfile?.preferredLanguage || "";
-
-  const editLanguagePreferences = path(PAGES.editLanguagePreferences, {
-    language: language,
-  });
 
   return (
     <GcdsContainer>
@@ -67,27 +58,8 @@ export default function ProfileHome() {
 
       <GcdsHeading tag="h2">{pageContent["12"]}</GcdsHeading>
       <GcdsContainer className="sectionCard">
-        <GcdsHeading tag="h3" marginTop="300">
-          {pageContent["13"]}
-        </GcdsHeading>
-        <GcdsGrid columns="1fr auto" className="gridInline">
-          <GcdsText>
-            {LANGUAGE_DISPLAY_NAMES[language][preferredLanguage]}
-          </GcdsText>
-          <GcdsLink
-            href={editLanguagePreferences}
-            size="regular"
-            onGcdsClick={(ev) => {
-              ev.preventDefault();
-              navigateHelper(ev.detail);
-            }}
-          >
-            {pageContent["5"]}
-          </GcdsLink>
-        </GcdsGrid>
-
+        <ViewLanguagePreferences pageContent={pageContent} />
         <div className="separator" />
-
         <GcdsHeading tag="h3" marginTop="300">
           {pageContent["15"]}
         </GcdsHeading>

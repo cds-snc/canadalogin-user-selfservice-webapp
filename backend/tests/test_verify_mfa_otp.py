@@ -202,7 +202,7 @@ class TestHandleMFAOTPVerificationCreate:
         """Test successful SMS verification creation."""
         mock_http_client = AsyncMock()
 
-        with patch("app.otp.services.verify_mfa_otp.my_profile") as mock_profile:
+        with patch("app.otp.services.verify_mfa_otp.get_my_profile") as mock_profile:
             mock_profile.return_value = mock_profile_success_response
 
             with patch(
@@ -233,7 +233,7 @@ class TestHandleMFAOTPVerificationCreate:
         """Test successful Voice verification creation."""
         mock_http_client = AsyncMock()
 
-        with patch("app.otp.services.verify_mfa_otp.my_profile") as mock_profile:
+        with patch("app.otp.services.verify_mfa_otp.get_my_profile") as mock_profile:
             mock_profile.return_value = mock_profile_success_response
 
             with patch(
@@ -265,7 +265,7 @@ class TestHandleMFAOTPVerificationCreate:
         """Test verification creation when profile check fails."""
         mock_http_client = AsyncMock()
 
-        with patch("app.otp.services.verify_mfa_otp.my_profile") as mock_profile:
+        with patch("app.otp.services.verify_mfa_otp.get_my_profile") as mock_profile:
             mock_profile.return_value = mock_profile_failure_response
 
             result = await handle_send_mfa_otp(
@@ -285,7 +285,7 @@ class TestHandleMFAOTPVerificationCreate:
         """Test verification creation with malformed response causing validation error."""
         mock_http_client = AsyncMock()
 
-        with patch("app.otp.services.verify_mfa_otp.my_profile") as mock_profile:
+        with patch("app.otp.services.verify_mfa_otp.get_my_profile") as mock_profile:
             mock_profile.return_value = mock_profile_success_response
 
             with patch(
@@ -314,7 +314,7 @@ class TestHandleMFAOTPVerificationCreate:
         """Test verification creation with general exception handling."""
         mock_http_client = AsyncMock()
 
-        with patch("app.otp.services.verify_mfa_otp.my_profile") as mock_profile:
+        with patch("app.otp.services.verify_mfa_otp.get_my_profile") as mock_profile:
             mock_profile.return_value = mock_profile_success_response
 
             with patch(
@@ -349,7 +349,7 @@ class TestHandleMFAOTPVerificationAttempt:
         """Test successful SMS verification attempt."""
         mock_http_client = AsyncMock()
 
-        with patch("app.otp.services.verify_mfa_otp.my_profile") as mock_profile:
+        with patch("app.otp.services.verify_mfa_otp.get_my_profile") as mock_profile:
             mock_profile.return_value = mock_profile_success_response
 
             with patch(
@@ -377,7 +377,7 @@ class TestHandleMFAOTPVerificationAttempt:
         """Test successful Voice verification attempt."""
         mock_http_client = AsyncMock()
 
-        with patch("app.otp.services.verify_mfa_otp.my_profile") as mock_profile:
+        with patch("app.otp.services.verify_mfa_otp.get_my_profile") as mock_profile:
             mock_profile.return_value = mock_profile_success_response
 
             with patch(
@@ -406,7 +406,7 @@ class TestHandleMFAOTPVerificationAttempt:
         """Test verification attempt when profile check fails."""
         mock_http_client = AsyncMock()
 
-        with patch("app.otp.services.verify_mfa_otp.my_profile") as mock_profile:
+        with patch("app.otp.services.verify_mfa_otp.get_my_profile") as mock_profile:
             mock_profile.return_value = mock_profile_failure_response
 
             result = await handle_verify_mfa_otp(
@@ -426,7 +426,7 @@ class TestHandleMFAOTPVerificationAttempt:
         """Test verification attempt with general exception handling."""
         mock_http_client = AsyncMock()
 
-        with patch("app.otp.services.verify_mfa_otp.my_profile") as mock_profile:
+        with patch("app.otp.services.verify_mfa_otp.get_my_profile") as mock_profile:
             mock_profile.return_value = mock_profile_success_response
 
             with patch(

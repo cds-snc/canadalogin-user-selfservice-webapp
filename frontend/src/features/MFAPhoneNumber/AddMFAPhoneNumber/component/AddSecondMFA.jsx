@@ -13,7 +13,7 @@ import { getPageContent } from "../../../../utils/functions";
 
 export default function AddSecondMFA({
   phoneFormData,
-  onSkipForNowLink,
+  onSkipForNow,
   onAddSecondMFA,
 }) {
   const { language } = useParams();
@@ -62,7 +62,14 @@ export default function AddSecondMFA({
           </GcdsButton>
         </GcdsText>
         &nbsp;
-        <GcdsLink href={onSkipForNowLink}>{pageContentJson["10"]}</GcdsLink>
+        <GcdsLink
+          onGcdsClick={async (ev) => {
+            ev.preventDefault();
+            await onSkipForNow();
+          }}
+        >
+          {pageContentJson["10"]}
+        </GcdsLink>
       </GcdsGrid>
     </GcdsContainer>
   );

@@ -7,9 +7,9 @@ import { useNavigateHelper } from "../../../../hooks/useNavigate";
 import { FLOW_TYPES, PAGES, serverMapping } from "../../../../utils/constants";
 import { getPageContent } from "../../../../utils/functions";
 import { path } from "../../../../utils/routeHelpers";
-import { otpFactors } from "../../../ChangePassword/api/otpFactors";
-import OtpSelection from "../../../ChangePassword/components/OtpSelection";
-import OtpVerification from "../../../ChangePassword/components/OtpVerification";
+import { otpFactors } from "../../../TransientOtp/api/otpFactors";
+import OtpSelection from "../../../TransientOtp/components/OtpSelection";
+import OtpVerification from "../../../TransientOtp/components/OtpVerification";
 import { deleteMFAPhoneNumberApi } from "../../DeleteMFAPhoneNumber/api/DeleteMFAPhoneNumberAPI";
 import { addMFAPhoneNumberApi } from "../api/AddMFAPhoneNumberAPI";
 import AddMFAOtpVerification from "./AddMFAOtpVerification";
@@ -47,11 +47,11 @@ export default function AddMFAPage() {
   const [errorCode, setErrorCode] = useState("");
   const errorPageJson = getPageContent(language, PAGES.error);
 
-  const [wizardStep, setWizardStep] = useState("addMFANumber");
+  const [wizardStep, setWizardStep] = useState("otpSelection");
   const [localLoading, setLocalLoading] = useState(false);
   const { userProfile } = state;
   const { id } = userProfile ?? {};
-  const [userSelectedMfaType, setUserSelectedMfaType] = useState(null);
+  const [userSelectedMfaFactor, setUserSelectedMfaFactor] = useState(null);
   const navigateHelper = useNavigateHelper();
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
     language: language,
@@ -70,6 +70,8 @@ export default function AddMFAPage() {
     formattedPhoneNumber: "",
   });
 
+  const successBannerJson = getPageContent(language, PAGES.successBanner);
+
   const handlePhoneForm = (field, value) => {
     setPhoneFormData((prev) => ({
       ...prev,
@@ -77,13 +79,13 @@ export default function AddMFAPage() {
     }));
   };
 
-  const handleChangeUserMfaSelection = (mfaType) => {
-    const selectedMfaType = userPhoneFactors.find(
-      (factor) => factor.type === mfaType,
+  const handleChangeUserMfaSelection = (id) => {
+    const selectedMfaFactor = userPhoneFactors.find(
+      (factor) => factor.id === id,
     );
 
-    if (selectedMfaType.type && selectedMfaType.phoneNumber) {
-      setUserSelectedMfaType(selectedMfaType);
+    if (selectedMfaFactor) {
+      setUserSelectedMfaFactor(selectedMfaFactor);
     }
   };
 
@@ -162,7 +164,15 @@ export default function AddMFAPage() {
           visibleDigits in userPhoneFactorsMap &&
           userPhoneFactorsMap[visibleDigits].length >= 2
         ) {
-          await navigateHelper(backToManage2FAVerificationsPage);
+          const otpType =
+            phoneFormData.otpType === FLOW_TYPES.voice
+              ? successBannerJson["5"]
+              : successBannerJson["6"];
+          await navigateHelper(backToManage2FAVerificationsPage, false, {
+            noticeType: "mfaAdded",
+            phoneNumber: phoneFormData.formattedPhoneNumber,
+            otpType: otpType,
+          });
         } else {
           setWizardStep("addSecondMFA");
         }
@@ -196,6 +206,7 @@ export default function AddMFAPage() {
 
   useEffect(() => {
     const fetchUserOtpPhoneFactors = async () => {
+      setLocalLoading(true);
       try {
         const response = await otpFactors.getUserOtpPhoneFactors(id);
         if (
@@ -206,7 +217,7 @@ export default function AddMFAPage() {
         ) {
           const userPhoneFactors = response.data;
           setUserPhoneFactors(userPhoneFactors);
-          setUserSelectedMfaType(userPhoneFactors[0]);
+          setUserSelectedMfaFactor(userPhoneFactors[0]);
           const userPhoneFactorsMap = userPhoneFactors.reduce((acc, factor) => {
             const visibleDigits = factor.phoneNumber.replace(/\D/g, "");
             acc[visibleDigits] = acc[visibleDigits]
@@ -220,6 +231,8 @@ export default function AddMFAPage() {
         }
       } catch (err) {
         console.error("Error fetching user OTP phone factors:", err);
+      } finally {
+        setLocalLoading(false);
       }
     };
 
@@ -232,18 +245,18 @@ export default function AddMFAPage() {
       <OtpSelection
         userProfile={userProfile}
         userPhoneFactors={userPhoneFactors}
-        onChangeUserMfaType={handleChangeUserMfaSelection}
-        userSelectedMfaType={userSelectedMfaType}
+        onChangeUserSelectedMfaFactor={handleChangeUserMfaSelection}
+        userSelectedMfaFactor={userSelectedMfaFactor}
         onNext={() => {
           setWizardStep("otpValidation");
         }}
+        parentPage={PAGES.addMFAPage}
       />
     ),
     otpValidation: (
       <OtpVerification
         userProfile={userProfile}
-        userSelectedMfaType={userSelectedMfaType}
-        onChangeUserMfaType={handleChangeUserMfaSelection}
+        userSelectedMfaFactor={userSelectedMfaFactor}
         userOtpValue={userOtpValue}
         setUserOtpValue={handleSetUserOtpValue}
         otpSentResponse={otpSentResponse}
@@ -297,7 +310,17 @@ export default function AddMFAPage() {
     addSecondMFA: (
       <AddSecondMFA
         phoneFormData={phoneFormData}
-        onSkipForNowLink={backToManage2FAVerificationsPage}
+        onSkipForNow={async () => {
+          const otpType =
+            phoneFormData.otpType === FLOW_TYPES.voice
+              ? successBannerJson["5"]
+              : successBannerJson["6"];
+          await navigateHelper(backToManage2FAVerificationsPage, false, {
+            noticeType: "mfaAdded",
+            phoneNumber: phoneFormData.formattedPhoneNumber,
+            otpType: otpType,
+          });
+        }}
         onAddSecondMFA={async () => {
           const secondMFAOtpType =
             phoneFormData.otpType === FLOW_TYPES.voice

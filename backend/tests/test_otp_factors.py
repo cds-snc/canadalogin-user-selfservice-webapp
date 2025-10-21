@@ -19,6 +19,8 @@ from app.users.services.otp_factors import (
 from fastapi import HTTPException
 from httpx import AsyncClient
 
+profile_import_path = "app.users.services.otp_factors.get_my_profile"
+
 
 @pytest.mark.asyncio
 async def test_mask_phone_last4_valid():
@@ -130,7 +132,7 @@ async def test_get_user_otp_factors_mocked(monkeypatch):
             "total": 1,
         }
 
-    monkeypatch.setattr("app.users.services.otp_factors.my_profile", mock_my_profile)
+    monkeypatch.setattr(profile_import_path, mock_my_profile)
     monkeypatch.setattr(
         "app.users.services.otp_factors.dispatch_user_auth_factors",
         mock_dispatch_user_auth_factors,
@@ -185,7 +187,7 @@ async def test_get_user_otp_factors_invalid_schema(monkeypatch):
             "total": 1,
         }
 
-    monkeypatch.setattr("app.users.services.otp_factors.my_profile", mock_my_profile)
+    monkeypatch.setattr(profile_import_path, mock_my_profile)
     monkeypatch.setattr(
         "app.users.services.otp_factors.dispatch_user_auth_factors",
         mock_dispatch_user_auth_factors,
@@ -247,7 +249,7 @@ async def test_get_user_otp_factors_no_otp_factors(monkeypatch):
             "total": 1,
         }
 
-    monkeypatch.setattr("app.users.services.otp_factors.my_profile", mock_my_profile)
+    monkeypatch.setattr(profile_import_path, mock_my_profile)
     monkeypatch.setattr(
         "app.users.services.otp_factors.dispatch_user_auth_factors",
         mock_dispatch_user_auth_factors,
@@ -256,3 +258,81 @@ async def test_get_user_otp_factors_no_otp_factors(monkeypatch):
     async with AsyncClient(base_url="http://localhost") as client:
         with pytest.raises(HTTPException):
             await get_user_otp_factors(client, "user123", "fake-token")
+
+
+# Tests for unmasked phone number functionality
+@pytest.mark.asyncio
+async def test_parse_phone_auth_factors_response_unmasked():
+    """Test that unmasked parsing returns actual phone numbers"""
+    from app.users.services.otp_factors import (
+        parse_phone_auth_factors_response_unmasked,
+    )
+
+    factor = Factor(
+        id="factor1",
+        userId="user1",
+        type=OtpType.SMSOTP.value,
+        created=datetime.now(),
+        updated=datetime.now(),
+        attempted=datetime.now(),
+        enabled=True,
+        validated=True,
+        attributes=Attributes(phoneNumber="+1 234-567-8901"),
+    )
+
+    data = UserAuthFactorsIbmResponse(
+        factors=[factor],
+        count=1,
+        limit=10,
+        page=1,
+        total=1,
+    )
+
+    result = await parse_phone_auth_factors_response_unmasked(data)
+    assert isinstance(result, list)
+    assert result[0]["id"] == "factor1"
+    assert result[0]["type"] == OtpType.SMSOTP.value
+    # Should return the actual phone number, not masked
+    assert result[0]["phoneNumber"] == "+1 234-567-8901"
+
+
+@pytest.mark.asyncio
+async def test_get_user_otp_factors_unmasked(monkeypatch):
+    """Test getting unmasked user OTP factors"""
+    from app.users.services.otp_factors import get_user_otp_factors_unmasked
+
+    async def mock_dispatch_user_auth_factors(client, user_id):
+        return {
+            "factors": [
+                {
+                    "id": "factor1",
+                    "userId": "user123",
+                    "type": OtpType.SMSOTP.value,
+                    "created": datetime.now().isoformat(),
+                    "updated": datetime.now().isoformat(),
+                    "attempted": datetime.now().isoformat(),
+                    "enabled": True,
+                    "validated": True,
+                    "attributes": {"phoneNumber": "+1 234-567-8901"},
+                }
+            ],
+            "count": 1,
+            "limit": 10,
+            "page": 1,
+            "total": 1,
+        }
+
+    monkeypatch.setattr(
+        "app.users.services.otp_factors.dispatch_user_auth_factors",
+        mock_dispatch_user_auth_factors,
+    )
+
+    async with AsyncClient(base_url="http://localhost") as client:
+        result = await get_user_otp_factors_unmasked(client, "user123")
+
+        assert isinstance(result, list)
+        assert len(result) == 1
+        assert result[0]["id"] == "factor1"
+        assert result[0]["type"] == OtpType.SMSOTP.value
+        # Should return unmasked phone number
+        assert result[0]["phoneNumber"] == "+1 234-567-8901"
