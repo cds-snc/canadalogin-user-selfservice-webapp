@@ -5,7 +5,7 @@ import logging
 import json
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -118,18 +118,21 @@ app = FastAPI()
 
 app = FastAPI()
 
-SecWeb(app=app, Option={
-    "csp": {
-        "default-src": ["'self'"],
-        "img-src": ["'self'", "data:", "https://fastapi.tiangolo.com"],
-        "font-src": ["'self'", "data:", "https://cdn.jsdelivr.net"],
-        "style-src": ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
-        "script-src": ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
+SecWeb(
+    app=app,
+    Option={
+        "csp": {
+            "default-src": ["'self'"],
+            "img-src": ["'self'", "data:", "https://fastapi.tiangolo.com"],
+            "font-src": ["'self'", "data:", "https://cdn.jsdelivr.net"],
+            "style-src": ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
+            "script-src": ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
+        },
+        "coep": "unsafe-none",
+        "coop": "unsafe-none",
+        "hsts": False,
     },
-    "coep": "unsafe-none",
-    "coop": "unsafe-none",
-    "hsts": False,
-})
+)
 
 # Determine session domain
 # ROOT_DOMAIN is .<ROOT_DOMAIN> example: .signin-connexion.cdssandbox.xyz
