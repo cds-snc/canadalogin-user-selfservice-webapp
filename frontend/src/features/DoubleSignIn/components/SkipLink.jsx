@@ -19,7 +19,6 @@ import { useParams } from "react-router";
 
 export default function SkipLink() {
   const { language } = useParams();
-  const { submit } = getPageContent(language, "Button");
 
   const [serverErrorMessage, setServerErrorMessage] = useState("");
 
@@ -42,7 +41,7 @@ export default function SkipLink() {
     submitSkipLinking();
   }, []);
 
-  const startLinking = async () => {
+  const skipLinking = async () => {
     try {
       console.log("info", "clicked start linking");
     } catch (err) {
@@ -63,16 +62,17 @@ export default function SkipLink() {
       <GcdsText>Skip Link</GcdsText>
       <GcdsText>{errorMessage}</GcdsText>
       <GcdsContainer>
+        Are you sure you want to skip linking?
         <GcdsGrid columns="max-content max-content" gap="200">
           <GcdsButton
             buttonRole="primary"
             style={{ width: "fit-content" }}
             onGcdsClick={(ev) => {
               ev.preventDefault();
-              startLinking();
+              skipLinking();
             }}
           >
-            {submit}
+            Continue
           </GcdsButton>
         </GcdsGrid>
       </GcdsContainer>
