@@ -1,3 +1,4 @@
+from fastapi import FastAPI
 import httpx
 import requests
 import logging
@@ -105,7 +106,31 @@ app = FastAPI(
     contact=CONTACT_INFO,
 )
 
-SecWeb(app=app)
+
+app = FastAPI()
+
+
+app = FastAPI()
+
+
+app = FastAPI()
+
+
+app = FastAPI()
+
+SecWeb(app=app, Option={
+    "csp": {
+        "default-src": ["'self'"],
+        "img-src": ["'self'", "data:", "https://fastapi.tiangolo.com"],
+        "font-src": ["'self'", "data:", "https://cdn.jsdelivr.net"],
+        "style-src": ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
+        "script-src": ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
+    },
+    "coep": "unsafe-none",
+    "coop": "unsafe-none",
+    "hsts": False,
+})
+
 # Determine session domain
 # ROOT_DOMAIN is .<ROOT_DOMAIN> example: .signin-connexion.cdssandbox.xyz
 session_domain = None
