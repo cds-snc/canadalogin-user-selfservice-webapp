@@ -28,22 +28,25 @@ export default function SkipLink() {
   const configRef = useRef(null);
 
   useEffect(() => {
-    async function submitSkipLinking() {
-      await updateLinkStateAPI.getRPAuthUrl(1);
-    }
-    async function loadClientDetails() {
-      configRef.current.clientId = "12341";
-      configRef.current.legacyIDPUrl =
-        "https://www.google.ca/" + configRef.current.clientId;
+    var clientId = "";
+
+    async function getRPAuthUrl() {
+      configRef.current.rpAuthUrl =
+        await updateLinkStateAPI.getRPAuthUrl(clientId);
     }
 
-    loadClientDetails();
-    submitSkipLinking();
+    getRPAuthUrl();
   }, []);
 
   const skipLinking = async () => {
     try {
-      console.log("info", "clicked start linking");
+      console.log("info", "clicked skip linking");
+
+      await updateLinkStateAPI.postSkipLinking(1);
+
+      window.open(configRef.current.rpAuthUrl);
+
+      //return to RP
     } catch (err) {
       if (err && err.data && err.data.message) {
         setServerErrorMessage(err.data.message);

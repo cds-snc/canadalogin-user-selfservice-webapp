@@ -15,7 +15,6 @@ import { getPageContent } from "../../../utils/functions.jsx";
 
 import { PAGES } from "../../../utils/constants.jsx";
 import { useParams } from "react-router";
-import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 
 import { updateLinkStateAPI } from "../api/UpdateLinkState.jsx";
 import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
@@ -28,8 +27,6 @@ export default function LinkSuccess() {
   const errorPageJson = getPageContent(language, PAGES.error);
 
   const configRef = useRef(null);
-
-  const navigateHelper = useNavigateHelper();
 
   useEffect(() => {
     var clientId = "";
@@ -45,7 +42,8 @@ export default function LinkSuccess() {
   const continueToRP = async () => {
     try {
       console.log("info", "clicked start linking");
-      navigateHelper(configRef.current.rpAuthUrl);
+
+      window.open(configRef.current.rpAuthUrl);
     } catch (err) {
       if (err && err.data && err.data.message) {
         setServerErrorMessage(err.data.message);

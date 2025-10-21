@@ -14,9 +14,7 @@ export const updateLinkStateAPI = {
       console.log("====== start getLegacyIDPAuthUrl ======");
       console.log("====== " + clientId + " ======");
       console.log("====== " + config.apiUrl + " ======");
-      console.log(
-        "====== " + MIGRATION_END_POINTS.requestLegacyIDPAuthUrl + " ======",
-      );
+      console.log("====== " + MIGRATION_END_POINTS.legacyIDP + " ======");
       console.log("====== legacyIDPAuthUrl: " + legacyIDPAuthUrl + " ======");
       console.log("====== end getLegacyIDPAuthUrl ======");
 
@@ -32,14 +30,12 @@ export const updateLinkStateAPI = {
   },
   getRPAuthUrl: async (clientId) => {
     try {
-      var rpAuthUrl = "";
+      var rpAuthUrl = "www.google.ca";
 
       console.log("====== start getRPAuthUrl ======");
       console.log("====== " + clientId + " ======");
       console.log("====== " + config.apiUrl + " ======");
-      console.log(
-        "====== " + MIGRATION_END_POINTS.requestRPAuthUrl + " ======",
-      );
+      console.log("====== " + MIGRATION_END_POINTS.relyingParty + " ======");
       console.log("====== legacyIDPAuthUrl: " + rpAuthUrl + " ======");
       console.log("====== end getRPAuthUrl ======");
 
@@ -48,6 +44,27 @@ export const updateLinkStateAPI = {
       //);
 
       return rpAuthUrl;
+      //return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+  postSkipLinking: async (clientId) => {
+    try {
+      var success = false;
+
+      console.log("====== start getRPAuthUrl ======");
+      console.log("====== " + clientId + " ======");
+      console.log("====== " + config.apiUrl + " ======");
+      console.log("====== " + MIGRATION_END_POINTS.relyingParty + " ======");
+      console.log("====== legacyIDPAuthUrl: " + success + " ======");
+      console.log("====== end getRPAuthUrl ======");
+
+      //const response = await axios.get(
+      //  `${config.apiUrl}${SUBMIT_END_POINTS.users}/${user_id}/otp_factors`,
+      //);
+
+      return success;
       //return response.data;
     } catch (error) {
       handleApiError(error);

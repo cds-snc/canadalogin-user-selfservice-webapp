@@ -149,8 +149,9 @@ export const SUBMIT_END_POINTS = {
 };
 
 export const MIGRATION_END_POINTS = {
-  requestLegacyIDPAuthUrl: "",
-  requestRPAuthUrl: "",
+  legacyIDP: "",
+  relyingParty: "",
+  skipLinking: "",
 };
 export const RP_CLIENT_ID_KEY = "rp_client_id";
 
