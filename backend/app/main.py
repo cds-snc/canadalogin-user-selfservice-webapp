@@ -24,6 +24,7 @@ from app.auth import v1_router as v1_auth_router
 from app.password import v1_router as v1_password_router
 from app.otp import v1_router as v1_otp_router
 from app.auth.services import oidc_config
+from app.migration import v1_router as v1_migration_router
 
 configuration = get_configuration()
 
@@ -169,6 +170,12 @@ app.include_router(
     v1_otp_router.router,
     prefix=f"{configuration.V1_API_VERSION}/otp",
     tags=["OTP"],
+)
+
+app.include_router(
+    v1_migration_router.router,
+    prefix=f"{configuration.V1_API_VERSION}/migration",
+    tags=["Migration"],
 )
 
 

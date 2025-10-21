@@ -99,6 +99,8 @@ export const PAGES = {
   addSecondMFATextMessage: "AddSecondMFATextMessage",
   deleteMFAPage: "DeleteMFAPage",
   deleteMFAPhoneNumberConfirm: "DeleteMFAPhoneNumberConfirm",
+  transientOtpSelection: "TransientOtpSelection",
+  successBanner: "SuccessBanner",
   LinkPrompt: "LinkPrompt",
   SkipLink: "SkipLink",
   LinkSuccess: "LinkSuccess",

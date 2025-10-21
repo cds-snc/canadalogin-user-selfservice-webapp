@@ -2,19 +2,15 @@
 import json
 from types import SimpleNamespace
 
-import pytest
-from httpx import AsyncClient, MockTransport, Response, Request
-
-# Feature under test
-from app.otp.services.send_transient_otp import (
-    handle_otp_send,
-    dispatch_otp,
-)
 import app.otp.services.send_transient_otp as feature_module
+import pytest
 
 # Schemas
-from app.otp.schemas import UserOtpInfo, OtpType, OtpDataResponse
+from app.otp.schemas import OtpDataResponse, OtpType, UserOtpInfo
 
+# Feature under test
+from app.otp.services.send_transient_otp import dispatch_otp, handle_otp_send
+from httpx import AsyncClient, MockTransport, Request, Response
 
 # -----------------------
 # Helpers for assertions
