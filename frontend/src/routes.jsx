@@ -192,12 +192,12 @@ export const appRoutes = [
                     element: <LinkPrompt />,
                   },
                   {
-                    path: "skip-link",
+                    path: "SkipLink",
                     element: <SkipLink />,
                     handle: { id: PAGES.SkipLink },
                   },
                   {
-                    path: "link-success",
+                    path: "LinkSuccess",
                     element: <LinkSuccess />,
                     handle: { id: PAGES.LinkSuccess },
                   },

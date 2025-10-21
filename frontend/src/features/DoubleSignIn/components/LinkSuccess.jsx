@@ -32,8 +32,7 @@ export default function LinkSuccess() {
     var clientId = "";
 
     async function getRPAuthUrl() {
-      configRef.current.rpAuthUrl =
-        await updateLinkStateAPI.rpAuthUrl(clientId);
+      configRef.rpAuthUrl = await updateLinkStateAPI.getRPAuthUrl(clientId);
     }
 
     getRPAuthUrl();
@@ -41,9 +40,9 @@ export default function LinkSuccess() {
 
   const continueToRP = async () => {
     try {
-      console.log("info", "clicked start linking");
+      console.log("info", "clicked start linking and continue back to rp");
 
-      window.open(configRef.current.rpAuthUrl);
+      window.location.replace(configRef.rpAuthUrl);
     } catch (err) {
       if (err && err.data && err.data.message) {
         setServerErrorMessage(err.data.message);

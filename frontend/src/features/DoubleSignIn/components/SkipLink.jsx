@@ -22,7 +22,6 @@ export default function SkipLink() {
 
   const [serverErrorMessage, setServerErrorMessage] = useState("");
 
-  const pageContentJson = getPageContent(language, PAGES.password);
   const errorPageJson = getPageContent(language, PAGES.error);
 
   const configRef = useRef(null);
@@ -31,8 +30,7 @@ export default function SkipLink() {
     var clientId = "";
 
     async function getRPAuthUrl() {
-      configRef.current.rpAuthUrl =
-        await updateLinkStateAPI.getRPAuthUrl(clientId);
+      configRef.rpAuthUrl = await updateLinkStateAPI.getRPAuthUrl(clientId);
     }
 
     getRPAuthUrl();
@@ -44,7 +42,7 @@ export default function SkipLink() {
 
       await updateLinkStateAPI.postSkipLinking(1);
 
-      window.open(configRef.current.rpAuthUrl);
+      window.location.replace(configRef.rpAuthUrl);
 
       //return to RP
     } catch (err) {
@@ -60,12 +58,12 @@ export default function SkipLink() {
   return (
     <GcdsContainer>
       <GcdsHeading tag="h1" lang={language}>
-        {pageContentJson["14"]}
+        Skip Linking
       </GcdsHeading>
       <GcdsText>Skip Link</GcdsText>
       <GcdsText>{errorMessage}</GcdsText>
       <GcdsContainer>
-        Are you sure you want to skip linking?
+        <p>Are you sure you want to skip linking?</p>
         <GcdsGrid columns="max-content max-content" gap="200">
           <GcdsButton
             buttonRole="primary"

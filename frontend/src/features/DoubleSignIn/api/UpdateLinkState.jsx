@@ -30,7 +30,7 @@ export const updateLinkStateAPI = {
   },
   getRPAuthUrl: async (clientId) => {
     try {
-      var rpAuthUrl = "www.google.ca";
+      var rpAuthUrl = "https://www.google.ca";
 
       console.log("====== start getRPAuthUrl ======");
       console.log("====== " + clientId + " ======");

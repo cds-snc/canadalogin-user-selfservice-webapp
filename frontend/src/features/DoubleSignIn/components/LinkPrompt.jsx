@@ -32,15 +32,15 @@ export default function LinkPrompt() {
     var clientId = "";
 
     async function getLegacyIDPAuthUrl() {
-      configRef.current.legacyIDPAuthUrl =
+      configRef.legacyIDPAuthUrl =
         await updateLinkStateAPI.getLegacyIDPAuthUrl(clientId);
 
       //until the api returns data
       const toLinkSuccess = path(PAGES.LinkSuccess, {
         language: language,
       });
-
-      configRef.current.toLinkSucessPage = toLinkSuccess;
+      console.log(toLinkSuccess);
+      configRef.toLinkSucessPage = toLinkSuccess;
     }
 
     getLegacyIDPAuthUrl();
@@ -55,19 +55,7 @@ export default function LinkPrompt() {
   const startLinking = async () => {
     try {
       console.log("info", "clicked start linking");
-      navigateHelper(configRef.current.toLinkSucessPage);
-    } catch (err) {
-      if (err && err.data && err.data.message) {
-        setServerErrorMessage(err.data.message);
-      }
-      console.log("err", err);
-    }
-  };
-
-  const skipLinking = async () => {
-    try {
-      console.log("info", "clicked skip linking");
-      navigateHelper(toSkipLinkPage);
+      navigateHelper(configRef.toLinkSucessPage);
     } catch (err) {
       if (err && err.data && err.data.message) {
         setServerErrorMessage(err.data.message);
@@ -131,15 +119,7 @@ export default function LinkPrompt() {
           If you have not signed in to this portal with your bank or GCKey in
           the past, you can skip this step.
         </gcds-text>
-        <gcds-link
-          href="#"
-          onGcdsClick={(ev) => {
-            ev.preventDefault();
-            skipLinking();
-          }}
-        >
-          Skip linking my account
-        </gcds-link>
+        <gcds-link href={toSkipLinkPage}>Skip linking my account</gcds-link>
       </section>
     </GcdsContainer>
   );
