@@ -107,17 +107,6 @@ app = FastAPI(
 )
 
 
-app = FastAPI()
-
-
-app = FastAPI()
-
-
-app = FastAPI()
-
-
-app = FastAPI()
-
 SecWeb(
     app=app,
     Option={
