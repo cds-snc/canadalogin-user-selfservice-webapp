@@ -36,3 +36,32 @@ class UserInfo(BaseModel):
 
 class UserToken(BaseModel):
     userinfo: UserInfo
+
+
+class LegacyPaiDataSchema(BaseModel):
+    client_id: str
+    pai: str
+
+
+class AuditDataSchema(BaseModel):
+    client_id: str
+    legacy_idp: str
+    completed_time: str
+    status: str
+
+
+class ProcessDataSchema(BaseModel):
+    client_id: str
+    retry_count: int
+    start_time: str
+
+
+class LegacyIdpOidcSchema(BaseModel):
+    client_id: str
+    client_name: str
+    authorization_endpoint: str
+    redirect_uri: str
+    response_types: List[str]
+    scope: str
+    max_age: int
+    code_challenge_method: str
