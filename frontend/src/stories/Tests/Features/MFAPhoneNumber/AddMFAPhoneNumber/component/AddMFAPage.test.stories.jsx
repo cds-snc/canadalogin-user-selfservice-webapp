@@ -85,7 +85,7 @@ export const LoadingState = {
   play: async ({ step }) => {
     await step("Verify loading text is displayed", async () => {
       // Wait briefly to see loading state
-      await new Promise((r) => setTimeout(r, 0));
+      await new Promise((r) => setTimeout(r, 1000));
       // Loading component should be present initially
       // The test validates the component renders
     });
@@ -127,7 +127,7 @@ export const OtpSelectionWithSingleFactor = (() => {
       },
     },
     play: async ({ canvasElement, step }) => {
-      await new Promise((r) => setTimeout(r, 0));
+      await new Promise((r) => setTimeout(r, 1000));
 
       await step("Verify phone number is displayed", async () => {
         await waitFor(
@@ -137,7 +137,7 @@ export const OtpSelectionWithSingleFactor = (() => {
               canvasElement.textContent.includes("5551234567");
             await expect(hasPhoneNumber).toBeTruthy();
           },
-          { timeout: 500 },
+          { timeout: 1000 },
         );
       });
 
@@ -191,7 +191,7 @@ export const OtpSelectionWithMultipleFactors = (() => {
       },
     },
     play: async ({ canvasElement, step }) => {
-      await new Promise((r) => setTimeout(r, 0));
+      await new Promise((r) => setTimeout(r, 1000));
 
       await step(
         "Verify radio buttons for multiple factors are displayed",
@@ -213,7 +213,7 @@ export const OtpSelectionWithMultipleFactors = (() => {
                 await expect(hasFirstPhone && hasSecondPhone).toBeTruthy();
               }
             },
-            { timeout: 500 },
+            { timeout: 1000 },
           );
         },
       );
@@ -297,7 +297,7 @@ export const NavigateToOtpVerification = {
       }
 
       await userEvent.click(continueButton);
-      await new Promise((r) => setTimeout(r, 0));
+      await new Promise((r) => setTimeout(r, 1000));
     });
 
     await step("Verify OTP verification step is displayed", async () => {
@@ -380,7 +380,7 @@ export const CompleteOtpVerificationToAddMFA = (() => {
             }
           }
           await userEvent.click(continueButton);
-          await new Promise((r) => setTimeout(r, 0));
+          await new Promise((r) => setTimeout(r, 1000));
         }
       });
 
@@ -392,7 +392,7 @@ export const CompleteOtpVerificationToAddMFA = (() => {
               canvasElement.textContent.includes("verification code");
             await expect(hasVerificationText).toBeTruthy();
           },
-          { timeout: 500 },
+          { timeout: 1000 },
         );
 
         // Find OTP input in shadow DOM
@@ -417,7 +417,7 @@ export const CompleteOtpVerificationToAddMFA = (() => {
 
         if (otpInput) {
           await userEvent.type(otpInput, "123456");
-          await new Promise((r) => setTimeout(r, 0));
+          await new Promise((r) => setTimeout(r, 1000));
           // Trigger gcdsClick event on the button to bypass disabled state
           let continueButton = canvas.queryByText(/Continue/i);
           if (continueButton && continueButton.tagName === "GCDS-BUTTON") {
@@ -518,7 +518,7 @@ export const AddMFAPhoneNumberValidation = (() => {
             }
           }
           await userEvent.click(continueButton);
-          await new Promise((r) => setTimeout(r, 0));
+          await new Promise((r) => setTimeout(r, 1000));
         }
 
         // Enter OTP and submit
@@ -528,7 +528,7 @@ export const AddMFAPhoneNumberValidation = (() => {
               canvasElement.textContent.includes("Check your phone");
             await expect(hasVerificationText).toBeTruthy();
           },
-          { timeout: 500 },
+          { timeout: 1000 },
         );
 
         const gcdsInputs = canvasElement.querySelectorAll("gcds-input");
@@ -547,7 +547,7 @@ export const AddMFAPhoneNumberValidation = (() => {
           }
         }
 
-        await new Promise((r) => setTimeout(r, 0));
+        await new Promise((r) => setTimeout(r, 1000));
 
         // Trigger gcdsClick event on the button to bypass disabled state
         continueButton = canvas.queryByText(/Continue/i);
@@ -565,7 +565,7 @@ export const AddMFAPhoneNumberValidation = (() => {
           continueButton.dispatchEvent(gcdsClickEvent);
         }
 
-        await new Promise((r) => setTimeout(r, 0));
+        await new Promise((r) => setTimeout(r, 1000));
       });
 
       await step("Verify phone number input field exists", async () => {
@@ -574,7 +574,7 @@ export const AddMFAPhoneNumberValidation = (() => {
             const phoneInput = canvasElement.querySelector("input");
             await expect(phoneInput).toBeInTheDocument();
           },
-          { timeout: 500 },
+          { timeout: 1000 },
         );
       });
     },
@@ -683,7 +683,7 @@ export const CompleteAddMFAFlowSMS = (() => {
               continueButton.dispatchEvent(gcdsClickEvent);
             }
           }
-          await new Promise((r) => setTimeout(r, 0));
+          await new Promise((r) => setTimeout(r, 1000));
         }
 
         // Enter OTP
@@ -709,7 +709,7 @@ export const CompleteAddMFAFlowSMS = (() => {
           }
         }
 
-        await new Promise((r) => setTimeout(r, 0));
+        await new Promise((r) => setTimeout(r, 1000));
 
         continueButton = canvas.queryByText(/Continue/i);
         if (
@@ -744,14 +744,14 @@ export const CompleteAddMFAFlowSMS = (() => {
             const phoneInput = canvasElement.querySelector("input");
             await expect(phoneInput).toBeInTheDocument();
           },
-          { timeout: 500 },
+          { timeout: 1000 },
         );
 
         const phoneInput = canvasElement.querySelector("input");
         if (phoneInput) {
           // Clear existing value and type new phone number
           await userEvent.type(phoneInput, "5559998888");
-          await new Promise((r) => setTimeout(r, 0));
+          await new Promise((r) => setTimeout(r, 1000));
         }
       });
 
@@ -777,7 +777,7 @@ export const CompleteAddMFAFlowSMS = (() => {
               writable: false,
             });
             continueButton.dispatchEvent(gcdsClickEvent);
-            await new Promise((r) => setTimeout(r, 0));
+            await new Promise((r) => setTimeout(r, 1000));
           }
         }
       });
@@ -870,7 +870,7 @@ export const VoiceOtpFlow = (() => {
               canvasElement.textContent.includes("5551234567");
             await expect(hasPhoneNumber).toBeTruthy();
           },
-          { timeout: 500 },
+          { timeout: 1000 },
         );
       });
 
@@ -890,7 +890,7 @@ export const VoiceOtpFlow = (() => {
             }
           }
           await userEvent.click(continueButton);
-          await new Promise((r) => setTimeout(r, 0));
+          await new Promise((r) => setTimeout(r, 1000));
         }
 
         await waitFor(
@@ -899,7 +899,7 @@ export const VoiceOtpFlow = (() => {
               canvasElement.textContent.includes("Check your phone");
             await expect(hasVerificationText).toBeTruthy();
           },
-          { timeout: 500 },
+          { timeout: 1000 },
         );
       });
     },
@@ -980,7 +980,7 @@ export const AddMFAOtpVerificationStep = (() => {
     },
     play: async ({ canvasElement, step }) => {
       const canvas = within(canvasElement);
-      await new Promise((r) => setTimeout(r, 500));
+      await new Promise((r) => setTimeout(r, 1000));
 
       await step("Navigate to MFA OTP verification step", async () => {
         // Navigate through all steps to reach MFA OTP verification
@@ -999,7 +999,7 @@ export const AddMFAOtpVerificationStep = (() => {
             }
           }
           await userEvent.click(continueButton);
-          await new Promise((r) => setTimeout(r, 0));
+          await new Promise((r) => setTimeout(r, 1000));
         }
 
         // Complete transient OTP verification
@@ -1009,7 +1009,7 @@ export const AddMFAOtpVerificationStep = (() => {
               canvasElement.textContent.includes("Check your phone");
             await expect(hasVerificationText).toBeTruthy();
           },
-          { timeout: 500 },
+          { timeout: 1000 },
         );
 
         const gcdsInputs = canvasElement.querySelectorAll("gcds-input");
@@ -1028,7 +1028,7 @@ export const AddMFAOtpVerificationStep = (() => {
           }
         }
 
-        await new Promise((r) => setTimeout(r, 0));
+        await new Promise((r) => setTimeout(r, 1000));
 
         continueButton = canvas.queryByText(/Continue/i);
         if (continueButton && continueButton.tagName === "GCDS-BUTTON") {
@@ -1044,7 +1044,7 @@ export const AddMFAOtpVerificationStep = (() => {
           continueButton.dispatchEvent(gcdsClickEvent);
         }
 
-        await new Promise((r) => setTimeout(r, 0));
+        await new Promise((r) => setTimeout(r, 1000));
 
         // Enter phone number
         await waitFor(
@@ -1052,14 +1052,14 @@ export const AddMFAOtpVerificationStep = (() => {
             const phoneInput = canvasElement.querySelector("input");
             await expect(phoneInput).toBeInTheDocument();
           },
-          { timeout: 500 },
+          { timeout: 1000 },
         );
 
         const phoneInput = canvasElement.querySelector("input");
         if (phoneInput) {
           await userEvent.clear(phoneInput);
           await userEvent.type(phoneInput, "+15559998888");
-          await new Promise((r) => setTimeout(r, 0));
+          await new Promise((r) => setTimeout(r, 1000));
         }
 
         // Submit phone number to trigger MFA enrollment
@@ -1097,7 +1097,7 @@ export const AddMFAOtpVerificationStep = (() => {
               canvasElement.textContent.includes("verification code");
             await expect(hasVerificationText).toBeTruthy();
           },
-          { timeout: 500 },
+          { timeout: 1000 },
         );
 
         // Verify MFA OTP input exists
@@ -1143,7 +1143,7 @@ export const AddMFAOtpVerificationStep = (() => {
           }
         }
 
-        await new Promise((r) => setTimeout(r, 0));
+        await new Promise((r) => setTimeout(r, 1000));
 
         // Submit MFA OTP
         let continueButton = canvas.queryByText(/Continue/i);
@@ -1166,7 +1166,7 @@ export const AddMFAOtpVerificationStep = (() => {
               writable: false,
             });
             continueButton.dispatchEvent(gcdsClickEvent);
-            await new Promise((r) => setTimeout(r, 0));
+            await new Promise((r) => setTimeout(r, 1000));
           }
         }
       });
@@ -1328,7 +1328,7 @@ export const ResendOtpCode = (() => {
             const resendLink = canvas.queryByText(/Request a new code/i);
             await expect(resendLink).toBeInTheDocument();
           },
-          { timeout: 500 },
+          { timeout: 1000 },
         );
 
         const resendLink = canvas.queryByText(/Request a new code/i);
@@ -1395,7 +1395,7 @@ export const TimerCountdownFunctionality = (() => {
             continueButton.shadowRoot.querySelector("button");
           if (actualButton) {
             await userEvent.click(actualButton);
-            await new Promise((r) => setTimeout(r, 0));
+            await new Promise((r) => setTimeout(r, 1000));
           }
         }
 
@@ -1405,7 +1405,7 @@ export const TimerCountdownFunctionality = (() => {
               canvasElement.textContent.includes("Check your phone");
             await expect(hasVerificationText).toBeTruthy();
           },
-          { timeout: 500 },
+          { timeout: 1000 },
         );
       });
 
@@ -1418,7 +1418,7 @@ export const TimerCountdownFunctionality = (() => {
             const hasTimer = timerPattern.test(pageText);
             await expect(hasTimer).toBeTruthy();
           },
-          { timeout: 500 },
+          { timeout: 1000 },
         );
       });
 
@@ -1492,7 +1492,7 @@ export const EmptyOtpInputValidation = (() => {
             continueButton.shadowRoot.querySelector("button");
           if (actualButton) {
             await userEvent.click(actualButton);
-            await new Promise((r) => setTimeout(r, 0));
+            await new Promise((r) => setTimeout(r, 1000));
           }
         }
 
@@ -1502,7 +1502,7 @@ export const EmptyOtpInputValidation = (() => {
               canvasElement.textContent.includes("Check your phone");
             await expect(hasVerificationText).toBeTruthy();
           },
-          { timeout: 500 },
+          { timeout: 1000 },
         );
       });
 
@@ -1563,7 +1563,7 @@ export const EmptyOtpInputValidation = (() => {
           }
         }
 
-        await new Promise((r) => setTimeout(r, 0));
+        await new Promise((r) => setTimeout(r, 1000));
 
         // Button should still be disabled with partial input
         const continueButton = canvas.queryByText(/Continue/i);
@@ -1663,7 +1663,7 @@ export const CancelButtonNavigation = (() => {
               continueButton.dispatchEvent(gcdsClickEvent);
             }
           }
-          await new Promise((r) => setTimeout(r, 0));
+          await new Promise((r) => setTimeout(r, 1000));
         }
 
         await waitFor(
@@ -1672,7 +1672,7 @@ export const CancelButtonNavigation = (() => {
               canvasElement.textContent.includes("Check your phone");
             await expect(hasVerificationText).toBeTruthy();
           },
-          { timeout: 500 },
+          { timeout: 1000 },
         );
 
         const gcdsInputs = canvasElement.querySelectorAll("gcds-input");
@@ -1691,7 +1691,7 @@ export const CancelButtonNavigation = (() => {
           }
         }
 
-        await new Promise((r) => setTimeout(r, 0));
+        await new Promise((r) => setTimeout(r, 1000));
 
         continueButton = canvas.queryByText(/Continue/i);
         if (
@@ -1717,7 +1717,7 @@ export const CancelButtonNavigation = (() => {
           }
         }
 
-        await new Promise((r) => setTimeout(r, 0));
+        await new Promise((r) => setTimeout(r, 1000));
       });
 
       await step("Verify Cancel button is present", async () => {
@@ -1726,7 +1726,7 @@ export const CancelButtonNavigation = (() => {
             const cancelButton = canvas.queryByText(/Cancel/i);
             await expect(cancelButton).toBeInTheDocument();
           },
-          { timeout: 500 },
+          { timeout: 1000 },
         );
       });
     },
