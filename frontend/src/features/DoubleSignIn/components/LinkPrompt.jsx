@@ -15,6 +15,7 @@ import { getPageContent } from "../../../utils/functions.jsx";
 import { updateLinkStateAPI } from "../api/UpdateLinkState.jsx";
 import { PAGES } from "../../../utils/constants.jsx";
 import { useParams } from "react-router";
+import { useSearchParams } from "react-router-dom";
 import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 import { path } from "../../../utils/routeHelpers.js";
 
@@ -22,6 +23,7 @@ export default function LinkPrompt() {
   const { language } = useParams();
 
   const [serverErrorMessage, setServerErrorMessage] = useState("");
+  const [searchParams] = useSearchParams();
 
   const pageContentJson = getPageContent(language, PAGES.password);
   const errorPageJson = getPageContent(language, PAGES.error);
@@ -29,7 +31,9 @@ export default function LinkPrompt() {
   const configRef = useRef(null);
 
   useEffect(() => {
-    var clientId = "";
+    var clientId = searchParams.get("clientId");
+
+    console.log("====== clientid: " + clientId);
 
     async function getLegacyIDPAuthUrl() {
       configRef.legacyIDPAuthUrl =
@@ -39,16 +43,21 @@ export default function LinkPrompt() {
       const toLinkSuccess = path(PAGES.LinkSuccess, {
         language: language,
       });
-      console.log(toLinkSuccess);
-      configRef.toLinkSucessPage = toLinkSuccess;
+
+      const toSkipLinkPage = path(PAGES.SkipLink, {
+        language: language,
+      });
+
+      configRef.toLinkSucessPage = toLinkSuccess + "?clientId=" + clientId;
+
+      configRef.toSkipLinkPage = toSkipLinkPage + "?clientId=" + clientId;
+
+      console.log(configRef.toLinkSucessPage);
+      console.log(configRef.toSkipLinkPage);
     }
 
     getLegacyIDPAuthUrl();
   }, []);
-
-  const toSkipLinkPage = path(PAGES.SkipLink, {
-    language: language,
-  });
 
   const navigateHelper = useNavigateHelper();
 
@@ -119,7 +128,9 @@ export default function LinkPrompt() {
           If you have not signed in to this portal with your bank or GCKey in
           the past, you can skip this step.
         </gcds-text>
-        <gcds-link href={toSkipLinkPage}>Skip linking my account</gcds-link>
+        <gcds-link href={configRef.toSkipLinkPage}>
+          Skip linking my account
+        </gcds-link>
       </section>
     </GcdsContainer>
   );

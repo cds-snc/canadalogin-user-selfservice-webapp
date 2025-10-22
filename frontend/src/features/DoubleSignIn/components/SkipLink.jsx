@@ -16,18 +16,20 @@ import { getPageContent } from "../../../utils/functions.jsx";
 import { updateLinkStateAPI } from "../api/UpdateLinkState.jsx";
 import { PAGES } from "../../../utils/constants.jsx";
 import { useParams } from "react-router";
+import { useSearchParams } from "react-router-dom";
 
 export default function SkipLink() {
   const { language } = useParams();
 
   const [serverErrorMessage, setServerErrorMessage] = useState("");
+  const [searchParams] = useSearchParams();
 
   const errorPageJson = getPageContent(language, PAGES.error);
 
   const configRef = useRef(null);
 
   useEffect(() => {
-    var clientId = "";
+    var clientId = searchParams.get("clientId");
 
     async function getRPAuthUrl() {
       configRef.rpAuthUrl = await updateLinkStateAPI.getRPAuthUrl(clientId);

@@ -15,6 +15,7 @@ import { getPageContent } from "../../../utils/functions.jsx";
 
 import { PAGES } from "../../../utils/constants.jsx";
 import { useParams } from "react-router";
+import { useSearchParams } from "react-router-dom";
 
 import { updateLinkStateAPI } from "../api/UpdateLinkState.jsx";
 import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
@@ -22,6 +23,7 @@ export default function LinkSuccess() {
   const { language } = useParams();
 
   const [serverErrorMessage, setServerErrorMessage] = useState("");
+  const [searchParams] = useSearchParams();
 
   const pageContentJson = getPageContent(language, PAGES.password);
   const errorPageJson = getPageContent(language, PAGES.error);
@@ -29,7 +31,7 @@ export default function LinkSuccess() {
   const configRef = useRef(null);
 
   useEffect(() => {
-    var clientId = "";
+    var clientId = searchParams.get("clientId");
 
     async function getRPAuthUrl() {
       configRef.rpAuthUrl = await updateLinkStateAPI.getRPAuthUrl(clientId);
