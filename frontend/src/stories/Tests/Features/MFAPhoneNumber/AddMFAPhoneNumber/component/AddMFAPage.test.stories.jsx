@@ -1133,7 +1133,7 @@ export const AddMFAOtpVerificationStep = (() => {
               input.shadowRoot.querySelector('input[maxlength="6"]');
             if (shadowInput) {
               // Wait for the input to be ready and clear it if it has content
-              await new Promise((r) => setTimeout(r, 100));
+              await new Promise((r) => setTimeout(r, 1000));
               if (shadowInput.value) {
                 await userEvent.clear(shadowInput);
               }
