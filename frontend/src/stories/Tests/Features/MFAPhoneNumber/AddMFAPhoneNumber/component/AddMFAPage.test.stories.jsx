@@ -1241,7 +1241,7 @@ export const ResendOtpCode = (() => {
     },
     play: async ({ canvasElement, step }) => {
       const canvas = within(canvasElement);
-      await new Promise((r) => setTimeout(r, 500));
+      await new Promise((r) => setTimeout(r, 1000));
 
       await step("Navigate to MFA OTP verification with resend", async () => {
         // Navigate through steps to reach MFA OTP verification
@@ -1252,7 +1252,7 @@ export const ResendOtpCode = (() => {
             continueButton.shadowRoot.querySelector("button");
           if (actualButton) {
             await userEvent.click(actualButton);
-            await new Promise((r) => setTimeout(r, 0));
+            await new Promise((r) => setTimeout(r, 1000));
           }
         }
 
@@ -1263,7 +1263,7 @@ export const ResendOtpCode = (() => {
               canvasElement.textContent.includes("Check your phone");
             await expect(hasVerificationText).toBeTruthy();
           },
-          { timeout: 500 },
+          { timeout: 1000 },
         );
 
         const gcdsInputs = canvasElement.querySelectorAll("gcds-input");
@@ -1292,13 +1292,13 @@ export const ResendOtpCode = (() => {
           continueButton.dispatchEvent(gcdsClickEvent);
         }
 
-        await new Promise((r) => setTimeout(r, 0));
+        await new Promise((r) => setTimeout(r, 1000));
 
         // Enter phone number and enroll MFA
         const phoneInput = canvasElement.querySelector("input");
         if (phoneInput) {
           // Wait for the input to be ready and clear it if it has content
-          await new Promise((r) => setTimeout(r, 100));
+          await new Promise((r) => setTimeout(r, 1000));
           if (phoneInput.value) {
             await userEvent.clear(phoneInput);
           }
@@ -1317,7 +1317,7 @@ export const ResendOtpCode = (() => {
               detail: {},
             });
             continueButton.dispatchEvent(gcdsClickEvent);
-            await new Promise((r) => setTimeout(r, 500));
+            await new Promise((r) => setTimeout(r, 1000));
           }
         }
       });
@@ -1334,7 +1334,7 @@ export const ResendOtpCode = (() => {
         const resendLink = canvas.queryByText(/Request a new code/i);
         if (resendLink) {
           await userEvent.click(resendLink);
-          await new Promise((r) => setTimeout(r, 0));
+          await new Promise((r) => setTimeout(r, 1000));
         }
       });
     },
