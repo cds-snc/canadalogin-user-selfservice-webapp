@@ -270,7 +270,7 @@ export const NavigateToOtpVerification = {
   },
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
-    await new Promise((r) => setTimeout(r, 500));
+    await new Promise((r) => setTimeout(r, 1000));
 
     await step("Click Continue to proceed to OTP verification", async () => {
       let continueButton = canvas.queryByText(/Continue/i);
@@ -362,7 +362,7 @@ export const CompleteOtpVerificationToAddMFA = (() => {
     },
     play: async ({ canvasElement, step }) => {
       const canvas = within(canvasElement);
-      await new Promise((r) => setTimeout(r, 500));
+      await new Promise((r) => setTimeout(r, 1000));
 
       await step("Navigate to OTP verification step", async () => {
         let continueButton = canvas.queryByText(/Continue/i);
@@ -499,7 +499,7 @@ export const AddMFAPhoneNumberValidation = (() => {
     },
     play: async ({ canvasElement, step }) => {
       const canvas = within(canvasElement);
-      await new Promise((r) => setTimeout(r, 500));
+      await new Promise((r) => setTimeout(r, 1000));
 
       await step("Navigate through OTP steps to Add Phone Number", async () => {
         // Click Continue on OTP selection
@@ -655,7 +655,7 @@ export const CompleteAddMFAFlowSMS = (() => {
     },
     play: async ({ canvasElement, step }) => {
       const canvas = within(canvasElement);
-      await new Promise((r) => setTimeout(r, 500));
+      await new Promise((r) => setTimeout(r, 1000));
 
       await step("Complete OTP selection and verification", async () => {
         // Navigate through initial OTP steps (selection + verification)
@@ -735,7 +735,7 @@ export const CompleteAddMFAFlowSMS = (() => {
           }
         }
 
-        await new Promise((r) => setTimeout(r, 500));
+        await new Promise((r) => setTimeout(r, 1000));
       });
 
       await step("Enter new MFA phone number", async () => {
@@ -860,7 +860,7 @@ export const VoiceOtpFlow = (() => {
     },
     play: async ({ canvasElement, step }) => {
       const canvas = within(canvasElement);
-      await new Promise((r) => setTimeout(r, 500));
+      await new Promise((r) => setTimeout(r, 1000));
 
       await step("Verify voice OTP selection is displayed", async () => {
         await waitFor(
@@ -1083,7 +1083,7 @@ export const AddMFAOtpVerificationStep = (() => {
               writable: false,
             });
             continueButton.dispatchEvent(gcdsClickEvent);
-            await new Promise((r) => setTimeout(r, 500));
+            await new Promise((r) => setTimeout(r, 1000));
           }
         }
       });
@@ -1385,7 +1385,7 @@ export const TimerCountdownFunctionality = (() => {
     },
     play: async ({ canvasElement, step }) => {
       const canvas = within(canvasElement);
-      await new Promise((r) => setTimeout(r, 500));
+      await new Promise((r) => setTimeout(r, 1000));
 
       await step("Navigate to OTP verification to test timer", async () => {
         let continueButton = canvas.queryByText(/Continue/i);
@@ -1482,7 +1482,7 @@ export const EmptyOtpInputValidation = (() => {
     },
     play: async ({ canvasElement, step }) => {
       const canvas = within(canvasElement);
-      await new Promise((r) => setTimeout(r, 500));
+      await new Promise((r) => setTimeout(r, 1000));
 
       await step("Navigate to OTP verification", async () => {
         let continueButton = canvas.queryByText(/Continue/i);
@@ -1636,7 +1636,7 @@ export const CancelButtonNavigation = (() => {
     },
     play: async ({ canvasElement, step }) => {
       const canvas = within(canvasElement);
-      await new Promise((r) => setTimeout(r, 500));
+      await new Promise((r) => setTimeout(r, 1000));
 
       await step("Navigate to Add Phone Number step", async () => {
         let continueButton = canvas.queryByText(/Continue/i);
