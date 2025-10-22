@@ -1,0 +1,38 @@
+[
+    {
+        "client_id": "c1",
+        "client_name": "Client1",
+        "authorization_endpoint": "https://example.com/auth",
+        "redirect_uri": "https://client1.example.com/callback",
+        "response_types": [
+            "code"
+        ],
+        "scope": "openid profile email",
+        "max_age": 3600,
+        "code_challenge_method": "S256"
+    },
+    {
+        "client_id": "c2",
+        "client_name": "Client1",
+        "authorization_endpoint": "https://example.com/auth",
+        "redirect_uri": "https://client1.example.com/callback",
+        "response_types": [
+            "code"
+        ],
+        "scope": "openid profile email",
+        "max_age": 3600,
+        "code_challenge_method": "S256"
+    },
+    {
+        "client_id": "c3",
+        "client_name": "Client1",
+        "authorization_endpoint": "https://example.com/auth",
+        "redirect_uri": "https://client1.example.com/callback",
+        "response_types": [
+            "code"
+        ],
+        "scope": "openid profile email",
+        "max_age": 3600,
+        "code_challenge_method": "S256"
+    }
+]
