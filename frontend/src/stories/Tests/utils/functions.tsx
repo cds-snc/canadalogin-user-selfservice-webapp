@@ -370,6 +370,7 @@ export const TestTemplate = (args: any) => {
           phoneFormData={args.phoneFormData}
           onNext={args.onNext}
           onCancel={args.onCancel}
+          onChangePhoneForm={args.onChangePhoneForm}
         />
         <button aria-label="test" type="submit" form="form"></button>
       </LanguageProvider>

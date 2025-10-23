@@ -47,7 +47,7 @@ export default function DeleteMFAPage() {
   const errorPageJson = getPageContent(language, PAGES.error);
 
   const [wizardStep, setWizardStep] = useState("otpSelection");
-  const [localLoading, setLocalLoading] = useState(false);
+  const [localLoading, setLocalLoading] = useState(true);
   const { userProfile } = state;
   const { id } = userProfile ?? {};
   const [userSelectedMfaFactor, setUserSelectedMfaFactor] = useState(null);

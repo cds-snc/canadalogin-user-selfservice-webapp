@@ -23,6 +23,8 @@ import ProfileUpdateName from "../../../features/ProfileName/components/ProfileU
 import Verification from "../../../components/Verification/Verification.jsx";
 import DeleteMFAPage from "../../../features/MFAPhoneNumber/DeleteMFAPhoneNumber/component/DeleteMFAPage.jsx";
 import DeleteMFAPhoneNumberConfirm from "../../../features/MFAPhoneNumber/DeleteMFAPhoneNumber/component/DeleteMFAPhoneNumberConfirm.jsx";
+import AddMFAPage from "../../../features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPage.jsx";
+import AddMFAPhoneNumber from "../../../features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPhoneNumber.jsx";
 
 // Storybook Page Renderer - maps page names to components for testing
 const PageRenderer = ({ page, ...props }) => {
@@ -69,6 +71,17 @@ const PageRenderer = ({ page, ...props }) => {
       return <DeleteMFAPage />;
     case PAGES.deleteMFAPhoneNumberConfirm:
       return <DeleteMFAPhoneNumberConfirm {...props} />;
+    case PAGES.addMFAPage:
+      return <AddMFAPage />;
+    case PAGES.addMFANumber:
+      return (
+        <AddMFAPhoneNumber
+          phoneFormData={props.phoneFormData}
+          onNext={props.onNext}
+          onCancel={props.onCancel}
+          onChangePhoneForm={props.onChangePhoneForm}
+        />
+      );
     default:
       console.warn(`Unknown page in Storybook: ${page}`);
       return <div>Storybook: Page not found: {page}</div>;
