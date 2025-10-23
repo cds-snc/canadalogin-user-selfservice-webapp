@@ -67,7 +67,19 @@ export default function OtpVerification({
   useEffect(() => {
     if (!id || didFetch.current) return;
     didFetch.current = true;
-    requestOtpCode();
+
+    const sendOtpRequest = async () => {
+      try {
+        await requestOtpCode();
+      } catch (error) {
+        // Handle OTP request errors
+        if (error?.data?.message) {
+          setErrorCode(error.data.message);
+        }
+      }
+    };
+
+    sendOtpRequest();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
@@ -150,10 +162,17 @@ export default function OtpVerification({
           <GcdsButton
             disabled={userOtpValue.length < 6}
             style={{ width: "fit-content" }}
-            onGcdsClick={(ev) => {
+            onGcdsClick={async (ev) => {
               ev.preventDefault();
-              validateOtpCode(userOtpValue);
-              setErrorCode("");
+              setErrorCode(""); // Clear any previous errors
+              try {
+                await validateOtpCode(userOtpValue);
+              } catch (error) {
+                // Handle validation errors
+                if (error?.data?.message) {
+                  setErrorCode(error.data.message);
+                }
+              }
             }}
           >
             {submit}

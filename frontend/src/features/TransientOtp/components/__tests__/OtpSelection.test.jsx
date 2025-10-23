@@ -131,6 +131,7 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
 
 const mockOnNext = vi.fn();
 const mockOnChangeUserSelectedMfaFactor = vi.fn();
+const mockOnCancel = vi.fn();
 
 const defaultProps = {
   onNext: mockOnNext,
@@ -138,6 +139,7 @@ const defaultProps = {
   onChangeUserSelectedMfaFactor: mockOnChangeUserSelectedMfaFactor,
   userPhoneFactors: [],
   parentPage: "password",
+  onCancel: mockOnCancel,
 };
 
 const renderComponent = (props = {}) => {
@@ -541,9 +543,7 @@ describe("OtpSelection Component", () => {
       const cancelButton = screen.getByTestId("cancel-button");
       await user.click(cancelButton);
 
-      expect(mockNavigateHelper).toHaveBeenCalledWith(
-        "/en/security-settings/manage-2fa-verifications",
-      );
+      expect(mockOnCancel).toHaveBeenCalledTimes(1);
     });
 
     it("calls onChangeUserSelectedMfaFactor when radio option is selected", async () => {
@@ -894,9 +894,7 @@ describe("OtpSelection Component", () => {
       const cancelButton = screen.getByTestId("cancel-button");
       await user.click(cancelButton);
 
-      expect(mockNavigateHelper).toHaveBeenCalledWith(
-        "/en/security-settings/manage-2fa-verifications",
-      );
+      expect(mockOnCancel).toHaveBeenCalledTimes(1);
       expect(mockOnNext).not.toHaveBeenCalled();
     });
   });

@@ -9,6 +9,7 @@ import { otpFactors } from "../../../../TransientOtp/api/otpFactors";
 import { addMFAPhoneNumberApi } from "../../api/AddMFAPhoneNumberAPI";
 import { deleteMFAPhoneNumberApi } from "../../../DeleteMFAPhoneNumber/api/DeleteMFAPhoneNumberAPI";
 import * as functions from "../../../../../utils/functions";
+import { authService } from "../../../../../services/authService";
 
 // Mock dependencies
 vi.mock("../../../../../components/Providers/useUser");
@@ -17,6 +18,7 @@ vi.mock("../../../../TransientOtp/api/otpFactors");
 vi.mock("../../api/AddMFAPhoneNumberAPI");
 vi.mock("../../../DeleteMFAPhoneNumber/api/DeleteMFAPhoneNumberAPI");
 vi.mock("../../../../../utils/functions");
+vi.mock("../../../../../services/authService");
 
 // Mock child components
 vi.mock("../../../../TransientOtp/components/OtpSelection", () => ({
@@ -29,18 +31,37 @@ vi.mock("../../../../TransientOtp/components/OtpSelection", () => ({
   ),
 }));
 
-vi.mock("../../../../TransientOtp/components/OtpVerification", () => ({
-  default: ({ onNext, onBack }) => (
-    <div data-testid="otp-verification">
-      <button onClick={onNext} data-testid="otp-verification-next">
-        Next
-      </button>
-      <button onClick={onBack} data-testid="otp-verification-back">
-        Back
-      </button>
-    </div>
-  ),
-}));
+vi.mock("../../../../TransientOtp/components/OtpVerification", async () => {
+  const React = await import("react");
+  return {
+    default: function MockOtpVerification({
+      validateOtpCode,
+      requestOtpCode,
+      onBack,
+    }) {
+      // Call requestOtpCode when component mounts to simulate the real behavior
+      React.useEffect(() => {
+        if (requestOtpCode) {
+          requestOtpCode();
+        }
+      }, [requestOtpCode]);
+
+      return (
+        <div data-testid="otp-verification">
+          <button
+            onClick={() => validateOtpCode && validateOtpCode("123456")}
+            data-testid="otp-verification-next"
+          >
+            Next
+          </button>
+          <button onClick={onBack} data-testid="otp-verification-back">
+            Back
+          </button>
+        </div>
+      );
+    },
+  };
+});
 
 vi.mock("../AddMFAPhoneNumber", () => ({
   default: ({ onNext, onCancel }) => (
@@ -138,6 +159,16 @@ describe("AddMFAPage Unit Tests", () => {
     });
 
     useNavigateHelper.mockReturnValue(mockNavigateHelper);
+
+    // Mock authService
+    authService.transientOtpSend = vi.fn().mockResolvedValue({
+      success: true,
+      data: { trxnId: "trxn-123" },
+    });
+
+    authService.transientOtpVerify = vi.fn().mockResolvedValue({
+      success: true,
+    });
 
     functions.getPageContent.mockImplementation((language, page) => {
       if (page === "otpSelection") return { 11: "Loading..." };

@@ -184,10 +184,14 @@ const mockOnNext = vi.fn();
 const mockOnBack = vi.fn();
 const mockSetOtpSentResponse = vi.fn();
 const mockSetUserOtpValue = vi.fn();
+const mockRequestOtpCode = vi.fn();
+const mockValidateOtpCode = vi.fn();
 
 const defaultProps = {
   onNext: mockOnNext,
   onBack: mockOnBack,
+  requestOtpCode: mockRequestOtpCode,
+  validateOtpCode: mockValidateOtpCode,
   userProfile: {
     id: "user-123",
     userName: "testuser@example.com",
@@ -218,12 +222,40 @@ describe("OtpVerification Component", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockUserState.testData = undefined;
+
+    // Setup default mock implementations
     mockTransientOtpSend.mockResolvedValue({
       success: true,
       data: { trxnId: "txn-123" },
     });
     mockTransientOtpVerify.mockResolvedValue({
       success: true,
+    });
+
+    // Make mockRequestOtpCode call the mocked authService and update state
+    mockRequestOtpCode.mockImplementation(async () => {
+      const response = await mockTransientOtpSend({
+        userName: defaultProps.userProfile.userName,
+        otpType: "sms",
+        phoneNumber: defaultProps.userSelectedMfaFactor.phoneNumber,
+      });
+      if (response.success && response.data) {
+        mockSetOtpSentResponse({ trxnId: response.data.trxnId });
+      }
+      return response;
+    });
+
+    // Make mockValidateOtpCode call the mocked authService and trigger onNext on success
+    mockValidateOtpCode.mockImplementation(async (otp) => {
+      const response = await mockTransientOtpVerify({
+        otp,
+        trxnId: defaultProps.otpSentResponse.trxnId,
+        otpType: "sms",
+      });
+      if (response.success) {
+        mockOnNext();
+      }
+      return response;
     });
   });
 
