@@ -16,28 +16,26 @@ import { getPageContent } from "../../../utils/functions.jsx";
 import { path } from "../../../utils/routeHelpers.js";
 
 import { useParams } from "react-router";
-import { FLOW_TYPES, PAGES, serverMapping } from "../../../utils/constants.jsx";
+import { FLOW_TYPES, PAGES } from "../../../utils/constants.jsx";
 
 import { useUser } from "../../../components/Providers/useUser.tsx";
-import { authService } from "../../../services/authService.jsx";
 
 const initialTime = 10;
 
 export default function OtpVerification({
-  onNext,
   userProfile,
   userSelectedMfaFactor,
-  otpSentResponse,
-  setOtpSentResponse,
   setUserOtpValue,
   userOtpValue,
   onBack,
+  requestOtpCode,
+  validateOtpCode,
+  errorCode: errorCodeExternal,
 }) {
   const { language } = useParams();
   const { state } = useUser();
 
-  const [codeRequested, setCodeRequested] = useState(false);
-  const [errorCode, setErrorCode] = useState("");
+  const [errorCode, setErrorCode] = useState(errorCodeExternal);
 
   const navigateHelper = useNavigateHelper();
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
@@ -48,47 +46,8 @@ export default function OtpVerification({
   const errorPageJson = getPageContent(language, PAGES.error);
   const { submit, cancel } = getPageContent(language, "Button");
 
-  const { id, userName } = userProfile ?? {};
+  const { id } = userProfile ?? {};
   const didFetch = useRef(false);
-
-  const requestOtpCode = async () => {
-    const userData = {
-      userName,
-      otpType: serverMapping[userSelectedMfaFactor.type],
-      phoneNumber: userSelectedMfaFactor.phoneNumber,
-    };
-    try {
-      const response = await authService.transientOtpSend(userData);
-      if (response && response.success) {
-        setOtpSentResponse(response.data);
-      }
-    } catch (err) {
-      if (err && err.data && err.data.message) {
-        setErrorCode(err.data.message);
-      }
-      setCodeRequested(false);
-    } finally {
-      didFetch.current = false;
-    }
-  };
-
-  const validateOtpCode = async (userOtpValue) => {
-    const userData = {
-      otp: userOtpValue,
-      trxnId: otpSentResponse.trxnId,
-      otpType: serverMapping[userSelectedMfaFactor.type],
-    };
-    try {
-      const response = await authService.transientOtpVerify(userData);
-      if (response && response.success) {
-        onNext();
-      }
-    } catch (err) {
-      if (err && err.data && err.data.message) {
-        setErrorCode(err.data.message);
-      }
-    }
-  };
 
   const handleChange = (e) => {
     const value = e.target.value;
@@ -108,7 +67,19 @@ export default function OtpVerification({
   useEffect(() => {
     if (!id || didFetch.current) return;
     didFetch.current = true;
-    requestOtpCode();
+
+    const sendOtpRequest = async () => {
+      try {
+        await requestOtpCode();
+      } catch (error) {
+        // Handle OTP request errors
+        if (error?.data?.message) {
+          setErrorCode(error.data.message);
+        }
+      }
+    };
+
+    sendOtpRequest();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
@@ -120,17 +91,6 @@ export default function OtpVerification({
         <GcdsErrorMessage messageId="message-props">
           {errorMessage}
         </GcdsErrorMessage>
-      )}
-
-      {codeRequested && (
-        <GcdsNotice
-          type="success"
-          noticeTitleTag="h2"
-          noticeTitle={pageContentJson["17"]}
-          data-testid="linkSuccess"
-        >
-          &nbsp;
-        </GcdsNotice>
       )}
 
       <GcdsContainer>
@@ -202,10 +162,17 @@ export default function OtpVerification({
           <GcdsButton
             disabled={userOtpValue.length < 6}
             style={{ width: "fit-content" }}
-            onGcdsClick={(ev) => {
+            onGcdsClick={async (ev) => {
               ev.preventDefault();
-              validateOtpCode(userOtpValue);
-              setErrorCode("");
+              setErrorCode(""); // Clear any previous errors
+              try {
+                await validateOtpCode(userOtpValue);
+              } catch (error) {
+                // Handle validation errors
+                if (error?.data?.message) {
+                  setErrorCode(error.data.message);
+                }
+              }
             }}
           >
             {submit}
@@ -252,7 +219,6 @@ export default function OtpVerification({
           <GcdsLink
             onGcdsClick={() => {
               requestOtpCode();
-              setCodeRequested(true);
               setTime(initialTime);
               setErrorCode("");
               setUserOtpValue("");

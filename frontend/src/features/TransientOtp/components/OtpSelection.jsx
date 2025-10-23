@@ -8,11 +8,9 @@ import {
   GcdsText,
 } from "@cdssnc/gcds-components-react";
 import { useParams } from "react-router";
-import { useNavigateHelper } from "../../../hooks/useNavigate.js";
 
 import { getPageContent } from "../../../utils/functions.jsx";
 import { gcHelpCentreLinks } from "../../../utils/gcHelpCentreLinks.jsx";
-import { path } from "../../../utils/routeHelpers.js";
 
 import { FLOW_TYPES, PAGES } from "../../../utils/constants.jsx";
 
@@ -22,16 +20,14 @@ export default function OtpSelection({
   onChangeUserSelectedMfaFactor,
   userPhoneFactors,
   parentPage,
+  onCancel,
 }) {
   const { language } = useParams();
-  const navigateHelper = useNavigateHelper();
 
   const pageContentJson = getPageContent(language, PAGES.transientOtpSelection);
 
   const { submit, cancel } = getPageContent(language, "Button");
-  const backToManage2FAVerificationsPage = path(PAGES.manage2FAVerifications, {
-    language: language,
-  });
+
   const configureRadioSMSOptions = () => {
     let radioOptionsValues = [];
 
@@ -138,7 +134,7 @@ export default function OtpSelection({
             style={{ width: "fit-content" }}
             onGcdsClick={(ev) => {
               ev.preventDefault();
-              navigateHelper(backToManage2FAVerificationsPage);
+              onCancel();
             }}
           >
             {cancel}
