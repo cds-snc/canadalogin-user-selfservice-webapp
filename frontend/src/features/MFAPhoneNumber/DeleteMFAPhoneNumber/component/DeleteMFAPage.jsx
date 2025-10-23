@@ -1,8 +1,9 @@
 import { GcdsErrorMessage } from "@cdssnc/gcds-components-react";
 import { useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router";
+import { useLocation, useParams } from "react-router";
 import Loader from "../../../../components/Layout/Loading";
 import { useUser } from "../../../../components/Providers/useUser";
+import { useNavigateHelper } from "../../../../hooks/useNavigate";
 import { PAGES, serverMapping } from "../../../../utils/constants";
 import { getPageContent } from "../../../../utils/functions";
 import { path } from "../../../../utils/routeHelpers";
@@ -51,7 +52,7 @@ export default function DeleteMFAPage() {
   const { userProfile } = state;
   const { id, userName } = userProfile ?? {};
   const [userSelectedMfaFactor, setUserSelectedMfaFactor] = useState(null);
-  const navigate = useNavigate();
+  const navigateHelper = useNavigateHelper();
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
     language: language,
   });
@@ -178,14 +179,14 @@ export default function DeleteMFAPage() {
               );
             } else {
               // Factor not found, go back to manage page
-              await navigate(backToManage2FAVerificationsPage);
+              await navigateHelper(backToManage2FAVerificationsPage);
             }
           } else {
             // No specific factor selected, go back to manage page (shouldn't happen in normal flow)
-            await navigate(backToManage2FAVerificationsPage);
+            await navigateHelper(backToManage2FAVerificationsPage);
           }
         } else {
-          await navigate(backToSecuritySettingsPage);
+          await navigateHelper(backToSecuritySettingsPage);
         }
       } catch (err) {
         console.error("Error fetching user OTP phone factors:", err);
@@ -209,7 +210,9 @@ export default function DeleteMFAPage() {
           setWizardStep("otpValidation");
         }}
         parentPage={PAGES.deleteMFAPage}
-        onCancel={async () => await navigate(backToManage2FAVerificationsPage)}
+        onCancel={async () =>
+          await navigateHelper(backToManage2FAVerificationsPage)
+        }
       />
     ),
     otpValidation: (
@@ -229,18 +232,17 @@ export default function DeleteMFAPage() {
         onNext={async () => {
           try {
             await deleteMFA();
-            await navigate(backToManage2FAVerificationsPage, {
-              replace: false,
-              state: {
-                noticeType: "mfaDeleted",
-                phoneNumber: phoneFormData.formattedPhoneNumber,
-              },
+            await navigateHelper(backToManage2FAVerificationsPage, false, {
+              noticeType: "mfaDeleted",
+              phoneNumber: phoneFormData.formattedPhoneNumber,
             });
           } catch (error) {
             setErrorCode(error?.message || "Unexpected API request error");
           }
         }}
-        onCancel={async () => await navigate(backToManage2FAVerificationsPage)}
+        onCancel={async () =>
+          await navigateHelper(backToManage2FAVerificationsPage)
+        }
         phoneFormData={phoneFormData}
       />
     ),
