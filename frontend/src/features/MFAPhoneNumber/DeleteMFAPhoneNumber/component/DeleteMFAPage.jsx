@@ -210,6 +210,9 @@ export default function DeleteMFAPage() {
           setWizardStep("otpValidation");
         }}
         parentPage={PAGES.addMFAPage}
+        onCancel={async () =>
+          await navigateHelper(backToManage2FAVerificationsPage)
+        }
       />
     ),
     otpValidation: (

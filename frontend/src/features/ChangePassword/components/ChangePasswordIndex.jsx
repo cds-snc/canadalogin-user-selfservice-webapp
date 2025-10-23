@@ -141,6 +141,7 @@ export default function ChangePasswordIndex() {
         onNext={() => {
           setPasswordUpdateStep("otpValidation");
         }}
+        onCancel={async () => await navigateHelper(backToSecuritySettingsPage)}
       />
     ),
     otpValidation: (
