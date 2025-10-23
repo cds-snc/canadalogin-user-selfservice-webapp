@@ -17,7 +17,7 @@ class MeResponse(BaseModel):
     )
 
 
-class Operations(BaseModel):
+class Operation(BaseModel):
     op: str
     path: str
     value: List[CustomAttribute]
@@ -25,7 +25,7 @@ class Operations(BaseModel):
 
 class PatchRequest(BaseModel):
     schemas: List[str] = ["urn:ietf:params:scim:api:messages:2.0:PatchOp"]
-    operations: List[Operations]
+    operations: List[Operation]
 
 
 class UserInfo(BaseModel):
@@ -50,7 +50,7 @@ class AuditDataSchema(BaseModel):
     status: str
 
 
-class ProcessDataSchema(BaseModel):
+class ProcessingDataSchema(BaseModel):
     client_id: str
     retry_count: int
     start_time: str
