@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useParams, useLocation } from "react-router";
+import { useParams, useLocation, useNavigate } from "react-router";
 import { useUser } from "../../../components/Providers/useUser.tsx";
 import Loader from "../../../components/Layout/Loading.jsx";
 
@@ -7,7 +7,6 @@ import Password from "./Password.jsx";
 import PasswordChangedConfirmation from "./PasswordChangedConfirmation.jsx";
 
 import { otpFactors } from "../api/otpFactors.jsx";
-import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 import { PAGES } from "../../../utils/constants.jsx";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
 
@@ -39,7 +38,7 @@ export default function ChangePasswordIndex() {
   const [localLoading, setLocalLoading] = useState(false);
   const { userProfile } = state;
   const { id, userName } = userProfile ?? {};
-  const navigateHelper = useNavigateHelper();
+  const navigate = useNavigate();
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
     language: language,
   });
@@ -111,7 +110,7 @@ export default function ChangePasswordIndex() {
           setUserPhoneFactors(response.data);
           setUserSelectedMfaFactor(response.data[0]);
         } else {
-          navigateHelper(backToSecuritySettingsPage);
+          navigate(backToSecuritySettingsPage);
         }
       } catch (err) {
         console.log("err", err);
@@ -141,7 +140,7 @@ export default function ChangePasswordIndex() {
         onNext={() => {
           setPasswordUpdateStep("otpValidation");
         }}
-        onCancel={async () => await navigateHelper(backToSecuritySettingsPage)}
+        onCancel={async () => await navigate(backToSecuritySettingsPage)}
       />
     ),
     otpValidation: (
