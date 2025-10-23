@@ -1,10 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useLocation } from "react-router";
 import { useUser } from "../../../components/Providers/useUser.tsx";
 import Loader from "../../../components/Layout/Loading.jsx";
 
-import OtpSelection from "./OtpSelection.jsx";
-import OtpVerification from "./OtpVerification.jsx";
 import Password from "./Password.jsx";
 import PasswordChangedConfirmation from "./PasswordChangedConfirmation.jsx";
 
@@ -15,6 +13,9 @@ import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
 
 import { getPageContent } from "../../../utils/functions.jsx";
 import { path } from "../../../utils/routeHelpers.js";
+import OtpSelection from "../../TransientOtp/components/OtpSelection.jsx";
+import OtpVerification from "../../TransientOtp/components/OtpVerification.jsx";
+import { passwordUpdate } from "../api/passwordUpdate.jsx";
 
 const defaulPasswordUpdatetStep = "otpSelection";
 
@@ -23,10 +24,12 @@ export default function ChangePasswordIndex() {
   const { state, dispatch } = useUser();
   const { removeAuthenticatedPage } = userProfileDispatch(dispatch);
   const { pathname } = useLocation();
+  const [userSelectedMfaFactor, setUserSelectedMfaFactor] = useState(null);
+  const [otpSentResponse, setOtpSentResponse] = useState(null);
+  const [errorCode, setErrorCode] = useState("");
 
   const [userPhoneFactors, setUserPhoneFactors] = useState([]);
 
-  const [otpSentResponse, setOtpSentResponse] = useState(null);
   const [userOtpValue, setUserOtpValue] = useState("");
   const pageContentJson = getPageContent(language, PAGES.otpSelection);
 
@@ -35,20 +38,19 @@ export default function ChangePasswordIndex() {
   );
   const [localLoading, setLocalLoading] = useState(false);
   const { userProfile } = state;
-  const { id } = userProfile ?? {};
-  const [userSelectedMfaType, setUserSelectedMfaType] = useState(null);
+  const { id, userName } = userProfile ?? {};
   const navigateHelper = useNavigateHelper();
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
     language: language,
   });
 
-  const handleChangeUserMfaSelection = (mfaType) => {
-    const selectedMfaType = userPhoneFactors.find(
-      (factor) => factor.type === mfaType,
+  const handleChangeUserMfaSelection = (id) => {
+    const selectedMfaFactor = userPhoneFactors.find(
+      (factor) => factor.id === id,
     );
 
-    if (selectedMfaType.type && selectedMfaType.phoneNumber) {
-      setUserSelectedMfaType(selectedMfaType);
+    if (selectedMfaFactor) {
+      setUserSelectedMfaFactor(selectedMfaFactor);
     }
   };
 
@@ -56,12 +58,44 @@ export default function ChangePasswordIndex() {
     setLocalLoading(bool);
   };
 
-  const handleOtpSentResponse = (otpResponse) => {
-    setOtpSentResponse(otpResponse);
-  };
-
   const handleSetUserOtpValue = (userOtpValue) => {
     setUserOtpValue(userOtpValue);
+  };
+
+  const didFetch = useRef(false);
+
+  const requestOtpCode = async () => {
+    try {
+      const response = await passwordUpdate.firstStep(
+        userName,
+        userSelectedMfaFactor.type,
+      );
+      if (response && response.success) {
+        setOtpSentResponse(response.data);
+      }
+    } catch (err) {
+      if (err && err.data && err.data.message) {
+        setErrorCode(err.data.message);
+      }
+    } finally {
+      didFetch.current = false;
+    }
+  };
+
+  const validateOtpCode = async (userOtpValue) => {
+    try {
+      const response = await passwordUpdate.secondStep(
+        userOtpValue,
+        otpSentResponse.trxId,
+      );
+      if (response && response.success) {
+        setPasswordUpdateStep("passwordChange");
+      }
+    } catch (err) {
+      if (err && err.data && err.data.message) {
+        setErrorCode(err.data.message);
+      }
+    }
   };
 
   useEffect(() => {
@@ -75,7 +109,7 @@ export default function ChangePasswordIndex() {
           response.data[0].type
         ) {
           setUserPhoneFactors(response.data);
-          setUserSelectedMfaType(response.data[0]);
+          setUserSelectedMfaFactor(response.data[0]);
         } else {
           navigateHelper(backToSecuritySettingsPage);
         }
@@ -102,36 +136,30 @@ export default function ChangePasswordIndex() {
       <OtpSelection
         userProfile={userProfile}
         userPhoneFactors={userPhoneFactors}
-        onChangeUserMfaType={handleChangeUserMfaSelection}
-        userSelectedMfaType={userSelectedMfaType}
-        localLoading={localLoading}
-        setLocalLoading={handleLoading}
+        onChangeUserSelectedMfaFactor={handleChangeUserMfaSelection}
+        userSelectedMfaFactor={userSelectedMfaFactor}
         onNext={() => {
           setPasswordUpdateStep("otpValidation");
         }}
+        parentPage={PAGES.addMFAPage}
       />
     ),
     otpValidation: (
       <OtpVerification
         userProfile={userProfile}
-        userSelectedMfaType={userSelectedMfaType}
-        localLoading={localLoading}
-        setLocalLoading={handleLoading}
-        onChangeUserMfaType={handleChangeUserMfaSelection}
+        userSelectedMfaFactor={userSelectedMfaFactor}
         userOtpValue={userOtpValue}
         setUserOtpValue={handleSetUserOtpValue}
-        otpSentResponse={otpSentResponse}
-        setOtpSentResponse={handleOtpSentResponse}
-        onNext={() => {
-          setPasswordUpdateStep("passwordChange");
-        }}
+        requestOtpCode={requestOtpCode}
+        validateOtpCode={validateOtpCode}
         onBack={() => setPasswordUpdateStep("otpSelection")}
+        errorCode={errorCode}
       />
     ),
     passwordChange: (
       <Password
         userProfile={userProfile}
-        userSelectedMfaType={userSelectedMfaType}
+        userSelectedMfaType={userSelectedMfaFactor?.type}
         localLoading={localLoading}
         setLocalLoading={handleLoading}
         otpSentResponse={otpSentResponse}
@@ -146,7 +174,7 @@ export default function ChangePasswordIndex() {
       <PasswordChangedConfirmation
         userProfile={userProfile}
         step={4}
-        userSelectedMfaType={userSelectedMfaType}
+        userSelectedMfaType={userSelectedMfaFactor?.type}
         localLoading={localLoading}
         setLocalLoading={handleLoading}
         totalSteps={4}
@@ -159,7 +187,7 @@ export default function ChangePasswordIndex() {
 
   return (
     <>
-      {userSelectedMfaType ? (
+      {userSelectedMfaFactor ? (
         steps[passwordUpdateStep]
       ) : (
         <Loader text={pageContentJson["12"]} />

@@ -1,5 +1,5 @@
 import { GcdsErrorMessage } from "@cdssnc/gcds-components-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation, useParams } from "react-router";
 import Loader from "../../../../components/Layout/Loading";
 import { useUser } from "../../../../components/Providers/useUser";
@@ -12,6 +12,7 @@ import OtpSelection from "../../../TransientOtp/components/OtpSelection";
 import OtpVerification from "../../../TransientOtp/components/OtpVerification";
 import { deleteMFAPhoneNumberApi } from "../api/DeleteMFAPhoneNumberAPI";
 import DeleteMFAPhoneNumberConfirm from "./DeleteMFAPhoneNumberConfirm";
+import { authService } from "../../../../services/authService";
 
 const StepContent = ({ errorCode, errorPageJson, StepComponent }) => {
   let errorMessage = errorPageJson[errorCode] || "";
@@ -49,7 +50,7 @@ export default function DeleteMFAPage() {
   const [wizardStep, setWizardStep] = useState("otpSelection");
   const [localLoading, setLocalLoading] = useState(true);
   const { userProfile } = state;
-  const { id } = userProfile ?? {};
+  const { id, userName } = userProfile ?? {};
   const [userSelectedMfaFactor, setUserSelectedMfaFactor] = useState(null);
   const navigateHelper = useNavigateHelper();
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
@@ -83,10 +84,6 @@ export default function DeleteMFAPage() {
     }
   };
 
-  const handleOtpSentResponse = (otpResponse) => {
-    setOtpSentResponse(otpResponse);
-  };
-
   const handleSetUserOtpValue = (userOtpValue) => {
     setUserOtpValue(userOtpValue);
   };
@@ -106,6 +103,46 @@ export default function DeleteMFAPage() {
     } catch (error) {
       if (error && error.data && error.data.message) {
         setErrorCode(error.data.message);
+      }
+    }
+  };
+
+  const didFetch = useRef(false);
+
+  const requestOtpCode = async () => {
+    const userData = {
+      userName,
+      otpType: serverMapping[userSelectedMfaFactor.type],
+      phoneNumber: userSelectedMfaFactor.phoneNumber,
+    };
+    try {
+      const response = await authService.transientOtpSend(userData);
+      if (response && response.success) {
+        setOtpSentResponse(response.data);
+      }
+    } catch (err) {
+      if (err && err.data && err.data.message) {
+        setErrorCode(err.data.message);
+      }
+    } finally {
+      didFetch.current = false;
+    }
+  };
+
+  const validateOtpCode = async (userOtpValue) => {
+    const userData = {
+      otp: userOtpValue,
+      trxnId: otpSentResponse.trxnId,
+      otpType: serverMapping[userSelectedMfaFactor.type],
+    };
+    try {
+      const response = await authService.transientOtpVerify(userData);
+      if (response && response.success) {
+        setWizardStep("deleteMFAPhoneNumberConfirm");
+      }
+    } catch (err) {
+      if (err && err.data && err.data.message) {
+        setErrorCode(err.data.message);
       }
     }
   };
@@ -172,7 +209,7 @@ export default function DeleteMFAPage() {
         onNext={() => {
           setWizardStep("otpValidation");
         }}
-        parentPage={PAGES.deleteMFAPage}
+        parentPage={PAGES.addMFAPage}
       />
     ),
     otpValidation: (
@@ -181,12 +218,10 @@ export default function DeleteMFAPage() {
         userSelectedMfaFactor={userSelectedMfaFactor}
         userOtpValue={userOtpValue}
         setUserOtpValue={handleSetUserOtpValue}
-        otpSentResponse={otpSentResponse}
-        setOtpSentResponse={handleOtpSentResponse}
-        onNext={() => {
-          setWizardStep("deleteMFAPhoneNumberConfirm");
-        }}
+        requestOtpCode={requestOtpCode}
+        validateOtpCode={validateOtpCode}
         onBack={() => setWizardStep("otpSelection")}
+        errorCode={errorCode}
       />
     ),
     deleteMFAPhoneNumberConfirm: (
