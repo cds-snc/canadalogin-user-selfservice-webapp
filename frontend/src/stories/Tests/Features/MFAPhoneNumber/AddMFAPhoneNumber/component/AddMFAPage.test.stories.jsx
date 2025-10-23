@@ -72,26 +72,24 @@ export const SelectVoiceCallRadioButton = (() => {
       });
 
       await step("Select the Voice Call radio button", async () => {
-        const gcdsRadios = canvasElement.querySelector("gcds-radios");
         await waitFor(async () => {
+          const gcdsRadios = canvasElement.querySelector("gcds-radios");
           await expect(gcdsRadios).toBeInTheDocument();
-        });
 
-        if (gcdsRadios && gcdsRadios.shadowRoot) {
-          // Find the voice call radio button (factor-2)
-          const voiceRadioButton = gcdsRadios.shadowRoot.querySelector(
-            'input[value="factor-2"]',
-          );
+          if (gcdsRadios && gcdsRadios.shadowRoot) {
+            // Find the voice call radio button (factor-2)
+            const voiceRadioButton = gcdsRadios.shadowRoot.querySelector(
+              'input[value="factor-2"]',
+            );
 
-          await waitFor(async () => {
             await expect(voiceRadioButton).toBeInTheDocument();
 
             // Click the voice call radio button
             await userEvent.click(voiceRadioButton);
             // Verify the voice call radio button is selected
             await expect(voiceRadioButton.checked).toBe(true);
-          });
-        }
+          }
+        });
       });
 
       await step("Verify Voice Call option content is displayed", async () => {
@@ -125,7 +123,7 @@ export const SelectVoiceCallRadioButton = (() => {
 
       await step("Verify Continue button remains enabled", async () => {
         const canvas = within(canvasElement);
-        const continueButton = canvas.queryByText(/Continue/i);
+        const continueButton = canvas.getByText(/Continue/i);
         await waitFor(async () => {
           await expect(continueButton).toBeInTheDocument();
         });
@@ -168,7 +166,7 @@ export const SelectVoiceCallRadioButton = (() => {
       await step("Verify digit verification text is displayed", async () => {
         const canvas = within(canvasElement);
         await waitFor(async () => {
-          const hasAddPhoneText = canvas.queryByText(
+          const hasAddPhoneText = canvas.getByText(
             /We have sent a 6-digit verification code via voice call to/i,
           );
           await expect(hasAddPhoneText).toBeTruthy();
@@ -226,26 +224,24 @@ export const SelectTextMessageRadioButton = (() => {
       });
 
       await step("Select the Text Message radio button", async () => {
-        const gcdsRadios = canvasElement.querySelector("gcds-radios");
         await waitFor(async () => {
+          const gcdsRadios = canvasElement.querySelector("gcds-radios");
           await expect(gcdsRadios).toBeInTheDocument();
-        });
 
-        if (gcdsRadios && gcdsRadios.shadowRoot) {
-          // Find the text message radio button (factor-1)
-          const textMessageRadioButton = gcdsRadios.shadowRoot.querySelector(
-            'input[value="factor-1"]',
-          );
+          if (gcdsRadios && gcdsRadios.shadowRoot) {
+            // Find the text message radio button (factor-1)
+            const textMessageRadioButton = gcdsRadios.shadowRoot.querySelector(
+              'input[value="factor-1"]',
+            );
 
-          await waitFor(async () => {
             await expect(textMessageRadioButton).toBeInTheDocument();
 
             // Click the text message radio button
             await userEvent.click(textMessageRadioButton);
             // Verify the text message radio button is selected
             await expect(textMessageRadioButton.checked).toBe(true);
-          });
-        }
+          }
+        });
       });
 
       await step(
@@ -282,7 +278,7 @@ export const SelectTextMessageRadioButton = (() => {
 
       await step("Verify Continue button remains enabled", async () => {
         const canvas = within(canvasElement);
-        const continueButton = canvas.queryByText(/Continue/i);
+        const continueButton = canvas.getByText(/Continue/i);
         await waitFor(async () => {
           await expect(continueButton).toBeInTheDocument();
         });
@@ -325,7 +321,7 @@ export const SelectTextMessageRadioButton = (() => {
       await step("Verify digit verification text is displayed", async () => {
         const canvas = within(canvasElement);
         await waitFor(async () => {
-          const hasAddPhoneText = canvas.queryByText(
+          const hasAddPhoneText = canvas.getByText(
             /We have sent a text message with a 6-digit verification code to/i,
           );
           await expect(hasAddPhoneText).toBeTruthy();
@@ -425,29 +421,26 @@ export const CompleteAddMFAFlowSMS = (() => {
         });
 
         // Navigate through initial OTP steps (selection + verification)
-        let continueButton = canvas.queryByText(/Continue/i);
+        let continueButton = canvas.getByText(/Continue/i);
 
         await step("Select the Text Message radio button", async () => {
-          const gcdsRadios = canvasElement.querySelector("gcds-radios");
           await waitFor(async () => {
+            const gcdsRadios = canvasElement.querySelector("gcds-radios");
             await expect(gcdsRadios).toBeInTheDocument();
-          });
 
-          if (gcdsRadios && gcdsRadios.shadowRoot) {
-            // Find the text message radio button (factor-1)
-            const textMessageRadioButton = gcdsRadios.shadowRoot.querySelector(
-              'input[value="factor-1"]',
-            );
+            if (gcdsRadios && gcdsRadios.shadowRoot) {
+              // Find the text message radio button (factor-1)
+              const textMessageRadioButton =
+                gcdsRadios.shadowRoot.querySelector('input[value="factor-1"]');
 
-            await waitFor(async () => {
               await expect(textMessageRadioButton).toBeInTheDocument();
 
               // Click the text message radio button
               await userEvent.click(textMessageRadioButton);
               // Verify the text message radio button is selected
               await expect(textMessageRadioButton.checked).toBe(true);
-            });
-          }
+            }
+          });
         });
 
         await step(
@@ -484,7 +477,7 @@ export const CompleteAddMFAFlowSMS = (() => {
 
         await step("Verify Continue button remains enabled", async () => {
           const canvas = within(canvasElement);
-          const continueButton = canvas.queryByText(/Continue/i);
+          const continueButton = canvas.getByText(/Continue/i);
           await waitFor(async () => {
             await expect(continueButton).toBeInTheDocument();
           });
@@ -559,7 +552,7 @@ export const CompleteAddMFAFlowSMS = (() => {
           }
         }
 
-        continueButton = canvas.queryByText(/Continue/i);
+        continueButton = canvas.getByText(/Continue/i);
         // Wait for the input to be ready
         await waitFor(async () => {
           await expect(continueButton).toBeInTheDocument();
@@ -606,7 +599,7 @@ export const CompleteAddMFAFlowSMS = (() => {
       });
 
       await step("Submit phone number to enroll MFA", async () => {
-        let continueButton = canvas.queryByText(/Continue/i);
+        let continueButton = canvas.getByText(/Continue/i);
         if (
           continueButton &&
           continueButton.tagName === "GCDS-BUTTON" &&
@@ -633,85 +626,89 @@ export const CompleteAddMFAFlowSMS = (() => {
 
       await step("Verify Add MFA Phone Number step is displayed", async () => {
         await waitFor(async () => {
-          const hasAddPhoneText = canvas.queryByText(/Check your phone/i);
+          const hasAddPhoneText = canvas.getByText(/Check your phone/i);
           await expect(hasAddPhoneText).toBeTruthy();
         });
       });
 
       await step("Complete MFA OTP verification", async () => {
         // Enter MFA OTP code
-        const gcdsInputs = canvasElement.querySelectorAll("gcds-input");
-        for (const input of gcdsInputs) {
-          if (input.shadowRoot) {
-            const shadowInput =
-              input.shadowRoot.querySelector("input#verificationCode") ||
-              input.shadowRoot.querySelector(
-                'input[name="verificationCode"]',
-              ) ||
-              input.shadowRoot.querySelector('input[maxlength="6"]');
-            if (shadowInput) {
-              // Clear the field by setting value directly (avoid userEvent.clear which can fail)
-              shadowInput.value = "";
-              shadowInput.dispatchEvent(new Event("input", { bubbles: true }));
+        await waitFor(async () => {
+          const gcdsInputs = canvasElement.querySelectorAll("gcds-input");
+          await expect(gcdsInputs.length).toBeGreaterThan(0);
 
-              // Type the OTP code
-              await userEvent.type(shadowInput, "654321");
+          for (const input of gcdsInputs) {
+            if (input.shadowRoot) {
+              const shadowInput =
+                input.shadowRoot.querySelector("input#verificationCode") ||
+                input.shadowRoot.querySelector(
+                  'input[name="verificationCode"]',
+                ) ||
+                input.shadowRoot.querySelector('input[maxlength="6"]');
+              if (shadowInput) {
+                // Clear the field by setting value directly
+                shadowInput.value = "";
+                shadowInput.dispatchEvent(
+                  new Event("input", { bubbles: true }),
+                );
 
-              // For AddMFAOtpVerification component, trigger change event to update phoneFormData.otp
-              const changeEvent = new Event("input", { bubbles: true });
-              Object.defineProperty(changeEvent, "target", {
-                value: { value: "654321" },
-                enumerable: true,
-              });
-              shadowInput.dispatchEvent(changeEvent);
+                // Type the OTP code
+                await userEvent.type(shadowInput, "654321");
 
-              // Also trigger the gcdsInput event on the gcds-input component
-              const gcdsInputEvent = new CustomEvent("gcdsInput", {
-                bubbles: true,
-                detail: { value: "654321" },
-              });
-              input.dispatchEvent(gcdsInputEvent);
+                // For AddMFAOtpVerification component, trigger change event to update phoneFormData.otp
+                const changeEvent = new Event("input", { bubbles: true });
+                Object.defineProperty(changeEvent, "target", {
+                  value: { value: "654321" },
+                  enumerable: true,
+                });
+                shadowInput.dispatchEvent(changeEvent);
 
-              break;
+                // Also trigger the gcdsInput event on the gcds-input component
+                const gcdsInputEvent = new CustomEvent("gcdsInput", {
+                  bubbles: true,
+                  detail: { value: "654321" },
+                });
+                input.dispatchEvent(gcdsInputEvent);
+
+                break;
+              }
             }
           }
-        }
+        });
 
         // Submit MFA OTP
-        let continueButton = canvas.queryByText(/Continue/i);
         await waitFor(async () => {
+          const continueButton = canvas.getByText(/Continue/i);
           await expect(continueButton).toBeInTheDocument();
-        });
-        if (
-          continueButton &&
-          continueButton.tagName === "GCDS-BUTTON" &&
-          continueButton.shadowRoot
-        ) {
+          await expect(continueButton.tagName).toBe("GCDS-BUTTON");
+          await expect(continueButton.shadowRoot).toBeTruthy();
+
           const actualButton =
             continueButton.shadowRoot.querySelector('button[part="button"]') ||
             continueButton.shadowRoot.querySelector("button");
-          if (actualButton && !actualButton.disabled) {
-            const gcdsClickEvent = new CustomEvent("gcdsClick", {
-              bubbles: true,
-              cancelable: true,
-              detail: {},
-            });
-            Object.defineProperty(gcdsClickEvent, "preventDefault", {
-              value: () => {},
-              writable: false,
-            });
-            continueButton.dispatchEvent(gcdsClickEvent);
+          await expect(actualButton).toBeInTheDocument();
+          await expect(actualButton.disabled).toBe(false);
 
-            // Wait for navigation/state change
-            await waitFor(async () => {
-              const hasVerificationText =
-                canvasElement.textContent.includes(
-                  "Set up voice call verification",
-                ) || canvasElement.textContent.includes("Check your phone");
-              await expect(hasVerificationText).toBeTruthy();
-            });
-          }
-        }
+          const gcdsClickEvent = new CustomEvent("gcdsClick", {
+            bubbles: true,
+            cancelable: true,
+            detail: {},
+          });
+          Object.defineProperty(gcdsClickEvent, "preventDefault", {
+            value: () => {},
+            writable: false,
+          });
+          continueButton.dispatchEvent(gcdsClickEvent);
+        });
+
+        // Wait for navigation/state change
+        await waitFor(async () => {
+          const hasVerificationText =
+            canvasElement.textContent.includes(
+              "Set up voice call verification",
+            ) || canvasElement.textContent.includes("Check your phone");
+          await expect(hasVerificationText).toBeTruthy();
+        });
       });
 
       await step("Verify set up second MFA is displayed", async () => {
@@ -724,7 +721,7 @@ export const CompleteAddMFAFlowSMS = (() => {
       });
 
       await step("Set up voice second MFA", async () => {
-        let continueButton = canvas.queryByText(
+        let continueButton = canvas.getByText(
           /Yes, set up voice call verification/i,
         );
         if (
@@ -749,7 +746,7 @@ export const CompleteAddMFAFlowSMS = (() => {
 
             // Wait for navigation to voice call verification
             await waitFor(async () => {
-              const hasVoiceText = canvas.queryByText(
+              const hasVoiceText = canvas.getByText(
                 /We have sent a 6-digit verification code via voice call to/i,
               );
               await expect(hasVoiceText).toBeInTheDocument();
@@ -830,34 +827,30 @@ export const ResendOtpCode = (() => {
 
       // Wait for component to be ready
       await waitFor(async () => {
-        const continueButton = canvas.queryByText(/Continue/i);
+        const continueButton = canvas.getByText(/Continue/i);
         await expect(continueButton).toBeInTheDocument();
       });
 
       await step("Navigate to MFA OTP verification with resend", async () => {
         // Navigate through steps to reach MFA OTP verification
-        let continueButton = canvas.queryByText(/Continue/i);
-        if (continueButton && continueButton.shadowRoot) {
+
+        await waitFor(async () => {
+          const continueButton = canvas.getByText(/Continue/i);
+          await expect(continueButton).toBeInTheDocument();
+          await expect(continueButton.shadowRoot).toBeTruthy();
+
           const actualButton =
             continueButton.shadowRoot.querySelector('button[part="button"]') ||
             continueButton.shadowRoot.querySelector("button");
-          if (actualButton) {
-            await userEvent.click(actualButton);
+          await expect(actualButton).toBeInTheDocument();
 
-            // Wait for navigation to OTP verification
-            await waitFor(async () => {
-              const hasVerificationText =
-                canvasElement.textContent.includes("Check your phone");
-              await expect(hasVerificationText).toBeTruthy();
-            });
-          }
-        }
+          await userEvent.click(actualButton);
+        });
 
-        // Complete transient OTP
+        // Wait for navigation to OTP verification
         await waitFor(async () => {
-          const hasVerificationText =
-            canvasElement.textContent.includes("Check your phone");
-          await expect(hasVerificationText).toBeTruthy();
+          const hasVerificationText = canvas.getByText(/Check your phone/i);
+          await expect(hasVerificationText).toBeInTheDocument();
         });
 
         const gcdsInputs = canvasElement.querySelectorAll("gcds-input");
@@ -876,15 +869,18 @@ export const ResendOtpCode = (() => {
           }
         }
 
-        continueButton = canvas.queryByText(/Continue/i);
-        if (continueButton && continueButton.tagName === "GCDS-BUTTON") {
-          const gcdsClickEvent = new CustomEvent("gcdsClick", {
-            bubbles: true,
-            cancelable: true,
-            detail: {},
-          });
-          continueButton.dispatchEvent(gcdsClickEvent);
-        }
+        await waitFor(async () => {
+          let continueButton = canvas.getByText(/Continue/i);
+          await expect(continueButton).toBeInTheDocument();
+          if (continueButton && continueButton.tagName === "GCDS-BUTTON") {
+            const gcdsClickEvent = new CustomEvent("gcdsClick", {
+              bubbles: true,
+              cancelable: true,
+              detail: {},
+            });
+            continueButton.dispatchEvent(gcdsClickEvent);
+          }
+        });
 
         // Wait for navigation to phone input
         await waitFor(async () => {
@@ -908,27 +904,31 @@ export const ResendOtpCode = (() => {
           await userEvent.type(phoneInput, "+15559998888");
         }
 
-        continueButton = canvas.queryByText(/Continue/i);
-        if (continueButton && continueButton.shadowRoot) {
-          const actualButton =
-            continueButton.shadowRoot.querySelector('button[part="button"]') ||
-            continueButton.shadowRoot.querySelector("button");
-          if (actualButton && !actualButton.disabled) {
-            const gcdsClickEvent = new CustomEvent("gcdsClick", {
-              bubbles: true,
-              cancelable: true,
-              detail: {},
-            });
-            continueButton.dispatchEvent(gcdsClickEvent);
-
-            // Wait for navigation to resend OTP screen
-            await waitFor(async () => {
-              await expect(
-                canvas.queryByText(/Request a new code in/i),
-              ).toBeInTheDocument();
-            });
+        await waitFor(async () => {
+          let continueButton = canvas.getByText(/Continue/i);
+          await expect(continueButton).toBeInTheDocument();
+          if (continueButton && continueButton.shadowRoot) {
+            const actualButton =
+              continueButton.shadowRoot.querySelector(
+                'button[part="button"]',
+              ) || continueButton.shadowRoot.querySelector("button");
+            if (actualButton && !actualButton.disabled) {
+              const gcdsClickEvent = new CustomEvent("gcdsClick", {
+                bubbles: true,
+                cancelable: true,
+                detail: {},
+              });
+              continueButton.dispatchEvent(gcdsClickEvent);
+            }
           }
-        }
+        });
+
+        // Wait for navigation to resend OTP screen
+        await waitFor(async () => {
+          await expect(
+            canvas.getByText(/Request a new code in/i),
+          ).toBeInTheDocument();
+        });
       });
 
       await step("Test resend OTP functionality", async () => {
@@ -939,32 +939,25 @@ export const ResendOtpCode = (() => {
               link.textContent.includes("Request a new code"),
             );
             await expect(resendLink).toBeInTheDocument();
-          },
-          { timeout: 12000 },
-        );
 
-        const resendLinks = canvasElement.querySelectorAll("gcds-link");
-        const resendLink = Array.from(resendLinks).find((link) =>
-          link.textContent.includes("Request a new code"),
-        );
-        if (resendLink) {
-          // Click the gcds-link element directly or find the actual link in shadow DOM
-          if (resendLink.shadowRoot) {
-            const actualLink = resendLink.shadowRoot.querySelector("a");
-            if (actualLink) {
+            // Click the gcds-link element directly or find the actual link in shadow DOM
+            if (resendLink.shadowRoot) {
+              const actualLink = resendLink.shadowRoot.querySelector("a");
+              await expect(actualLink).toBeInTheDocument();
               await userEvent.click(actualLink);
+            } else {
+              await userEvent.click(resendLink);
             }
-          } else {
-            await userEvent.click(resendLink);
-          }
+          },
+          { timeout: 11000 },
+        );
 
-          // Wait for resend request to process
-          await waitFor(async () => {
-            await expect(
-              canvas.queryByText(/Request a new code in/i),
-            ).toBeInTheDocument();
-          });
-        }
+        // Wait for resend request to process
+        await waitFor(async () => {
+          await expect(
+            canvas.getByText(/Request a new code in/i),
+          ).toBeInTheDocument();
+        });
       });
     },
   };
@@ -1039,34 +1032,30 @@ export const UseDifferentPhoneNumber = (() => {
 
       // Wait for component to be ready
       await waitFor(async () => {
-        const continueButton = canvas.queryByText(/Continue/i);
+        const continueButton = canvas.getByText(/Continue/i);
         await expect(continueButton).toBeInTheDocument();
       });
 
       await step("Navigate to MFA OTP verification with resend", async () => {
         // Navigate through steps to reach MFA OTP verification
-        let continueButton = canvas.queryByText(/Continue/i);
-        if (continueButton && continueButton.shadowRoot) {
+
+        await waitFor(async () => {
+          const continueButton = canvas.getByText(/Continue/i);
+          await expect(continueButton).toBeInTheDocument();
+          await expect(continueButton.shadowRoot).toBeTruthy();
+
           const actualButton =
             continueButton.shadowRoot.querySelector('button[part="button"]') ||
             continueButton.shadowRoot.querySelector("button");
-          if (actualButton) {
-            await userEvent.click(actualButton);
+          await expect(actualButton).toBeInTheDocument();
 
-            // Wait for navigation to OTP verification
-            await waitFor(async () => {
-              const hasVerificationText =
-                canvasElement.textContent.includes("Check your phone");
-              await expect(hasVerificationText).toBeTruthy();
-            });
-          }
-        }
+          await userEvent.click(actualButton);
+        });
 
-        // Complete transient OTP
+        // Wait for navigation to OTP verification
         await waitFor(async () => {
-          const hasVerificationText =
-            canvasElement.textContent.includes("Check your phone");
-          await expect(hasVerificationText).toBeTruthy();
+          const hasVerificationText = canvas.getByText(/Check your phone/i);
+          await expect(hasVerificationText).toBeInTheDocument();
         });
 
         const gcdsInputs = canvasElement.querySelectorAll("gcds-input");
@@ -1085,7 +1074,7 @@ export const UseDifferentPhoneNumber = (() => {
           }
         }
 
-        continueButton = canvas.queryByText(/Continue/i);
+        let continueButton = canvas.getByText(/Continue/i);
         if (continueButton && continueButton.tagName === "GCDS-BUTTON") {
           const gcdsClickEvent = new CustomEvent("gcdsClick", {
             bubbles: true,
@@ -1117,7 +1106,7 @@ export const UseDifferentPhoneNumber = (() => {
           await userEvent.type(phoneInput, "+15559998888");
         }
 
-        continueButton = canvas.queryByText(/Continue/i);
+        continueButton = canvas.getByText(/Continue/i);
         if (continueButton && continueButton.shadowRoot) {
           const actualButton =
             continueButton.shadowRoot.querySelector('button[part="button"]') ||
@@ -1133,7 +1122,7 @@ export const UseDifferentPhoneNumber = (() => {
             // Wait for navigation to resend OTP screen
             await waitFor(async () => {
               await expect(
-                canvas.queryByText(/Use a different phone number/i),
+                canvas.getByText(/Use a different phone number/i),
               ).toBeInTheDocument();
             });
           }
@@ -1141,43 +1130,40 @@ export const UseDifferentPhoneNumber = (() => {
       });
 
       await step("Test use different phone number link", async () => {
-        // First wait for the specific link to be available using canvas.queryByText
-        let differentPhoneNumberLink;
         await waitFor(async () => {
-          // Use canvas.queryByText to directly find the link by its text content
-          differentPhoneNumberLink = canvas.queryByText(
+          // Use canvas.getByText to directly find the link by its text content
+          let differentPhoneNumberLink = canvas.getByText(
             "Use a different phone number",
           );
           await expect(differentPhoneNumberLink).toBeInTheDocument();
-        });
 
-        // Verify we found the correct gcds-link element
-        if (
-          differentPhoneNumberLink &&
-          differentPhoneNumberLink.tagName !== "GCDS-LINK"
-        ) {
-          // If canvas.queryByText found a text node or different element, find the parent gcds-link
-          differentPhoneNumberLink =
-            differentPhoneNumberLink.closest("gcds-link");
-        }
+          // Verify we found the correct gcds-link element
+          if (
+            differentPhoneNumberLink &&
+            differentPhoneNumberLink.tagName !== "GCDS-LINK"
+          ) {
+            // If canvas.getByText found a text node or different element, find the parent gcds-link
+            differentPhoneNumberLink =
+              differentPhoneNumberLink.closest("gcds-link");
+          }
 
-        if (differentPhoneNumberLink) {
+          await expect(differentPhoneNumberLink).toBeInTheDocument();
+
           // Click the gcds-link element directly or find the actual link in shadow DOM
           if (differentPhoneNumberLink.shadowRoot) {
             const actualLink =
               differentPhoneNumberLink.shadowRoot.querySelector("a");
-            if (actualLink) {
-              await userEvent.click(actualLink);
-            }
+            await expect(actualLink).toBeInTheDocument();
+            await userEvent.click(actualLink);
           } else {
             await userEvent.click(differentPhoneNumberLink);
           }
-        }
+        });
 
         // Wait for navigation to complete
         await waitFor(async () => {
           await expect(
-            canvas.queryByText(/Enter your new phone number/i),
+            canvas.getByText(/Enter your new phone number/i),
           ).toBeInTheDocument();
         });
       });
