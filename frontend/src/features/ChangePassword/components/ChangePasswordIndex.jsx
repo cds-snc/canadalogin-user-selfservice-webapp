@@ -141,7 +141,6 @@ export default function ChangePasswordIndex() {
         onNext={() => {
           setPasswordUpdateStep("otpValidation");
         }}
-        parentPage={PAGES.addMFAPage}
       />
     ),
     otpValidation: (
