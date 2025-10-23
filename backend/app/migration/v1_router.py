@@ -9,6 +9,7 @@ from app.auth.services.auth_user_session import get_users_current_session
 from app.migration.services.link import callback
 from app.migration.services.skip import skip_migration
 from app.migration.services.utils import legacy_idp_auth_url, rp_auth_url
+from app.migration.services.auth import migration_auth
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -80,3 +81,13 @@ async def handle_skip_migration(
 ):
 
     return await skip_migration()
+
+
+@router.get(
+    "/auth",
+    tags=["Auth"],
+    summary="Authenticate user via IBM Verify",
+    description="",
+)
+async def handle_migration_auth(request: Request, client_id: str):
+    return await migration_auth(request, client_id)
