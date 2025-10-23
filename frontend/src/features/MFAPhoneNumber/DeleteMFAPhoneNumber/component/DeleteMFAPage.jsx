@@ -208,7 +208,7 @@ export default function DeleteMFAPage() {
         onNext={() => {
           setWizardStep("otpValidation");
         }}
-        parentPage={PAGES.addMFAPage}
+        parentPage={PAGES.deleteMFAPage}
         onCancel={async () => await navigate(backToManage2FAVerificationsPage)}
       />
     ),
