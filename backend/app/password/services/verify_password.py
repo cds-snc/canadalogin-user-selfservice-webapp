@@ -42,12 +42,12 @@ async def dispatch_verify_password(
         access_token = await get_admin_token(http_client)
         headers = get_auth_request_headers(access_token, True)
 
-        ibm_verify_password_api_endpoint = f"{verify_password_endpoint}/{cloud_directory_id}"
+        ibm_verify_password_api_endpoint = (
+            f"{verify_password_endpoint}/{cloud_directory_id}"
+        )
 
         response = await http_client.post(
-            ibm_verify_password_api_endpoint,
-            json=payload,
-            headers=headers
+            ibm_verify_password_api_endpoint, json=payload, headers=headers
         )
         response.raise_for_status()
 
@@ -108,8 +108,7 @@ async def verify_user_password(
         if not user_id:
             logger.error("IBM Verify response missing user ID")
             raise HTTPException(
-                status_code=422,
-                detail="Invalid response from verification service"
+                status_code=422, detail="Invalid response from verification service"
             )
 
         logger.info(f"User verified successfully: {user_id}")
@@ -117,9 +116,11 @@ async def verify_user_password(
         return ResponseModel(
             success=True,
             data=VerifiedUserPassword(id=user_id),
-            message="User verified successfully"
+            message="User verified successfully",
         )
 
     except Exception as e:
-        logger.error(f"Unexpected error during user verification: {str(e)}", exc_info=True)
+        logger.error(
+            f"Unexpected error during user verification: {str(e)}", exc_info=True
+        )
         RequestErrorHandler.handle(e, context="User verification failed")

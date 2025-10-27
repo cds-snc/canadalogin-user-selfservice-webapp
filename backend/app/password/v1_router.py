@@ -22,7 +22,7 @@ from app.password.schemas import (
     ThirdStepPasswordUpdatePayload,
     CompleteUpdatePasswordClientResponse,
     UserPassword,
-    VerifiedUserPasswordResponse
+    VerifiedUserPasswordResponse,
 )
 
 router = APIRouter()

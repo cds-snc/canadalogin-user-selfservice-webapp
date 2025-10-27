@@ -16,7 +16,9 @@ async def test_dispatch_verify_password_success():
     """Test successful password verification dispatch to IBM Verify."""
     # Arrange
     mock_http_client = AsyncMock(spec=AsyncClient)
-    verify_password_endpoint = "https://verify.ibm.com/v2.0/factors/cloudDirectory/authnmethods/password"
+    verify_password_endpoint = (
+        "https://verify.ibm.com/v2.0/factors/cloudDirectory/authnmethods/password"
+    )
     cloud_directory_id = "test-directory-123"
     payload = {
         "username": "john.doe@example.com",
@@ -24,11 +26,15 @@ async def test_dispatch_verify_password_success():
     }
 
     # Mock get_admin_token as AsyncMock
-    with patch("app.password.services.verify_password.get_admin_token", new_callable=AsyncMock) as mock_get_admin:
+    with patch(
+        "app.password.services.verify_password.get_admin_token", new_callable=AsyncMock
+    ) as mock_get_admin:
         mock_get_admin.return_value = "admin-token-123"
 
         # Mock get_auth_request_headers
-        with patch("app.password.services.verify_password.get_auth_request_headers") as mock_get_headers:
+        with patch(
+            "app.password.services.verify_password.get_auth_request_headers"
+        ) as mock_get_headers:
             mock_get_headers.return_value = {
                 "Authorization": "Bearer admin-token-123",
                 "Content-Type": "application/json",
@@ -68,7 +74,9 @@ async def test_dispatch_verify_password_http_error():
     """Test dispatch_verify_password handles HTTP errors correctly."""
     # Arrange
     mock_http_client = AsyncMock(spec=AsyncClient)
-    verify_password_endpoint = "https://verify.ibm.com/v2.0/factors/cloudDirectory/authnmethods/password"
+    verify_password_endpoint = (
+        "https://verify.ibm.com/v2.0/factors/cloudDirectory/authnmethods/password"
+    )
     cloud_directory_id = "test-directory-123"
     payload = {
         "username": "john.doe@example.com",
@@ -76,10 +84,14 @@ async def test_dispatch_verify_password_http_error():
     }
 
     # Mock get_admin_token first, before other patches
-    with patch("app.password.services.verify_password.get_admin_token", new_callable=AsyncMock) as mock_get_admin:
+    with patch(
+        "app.password.services.verify_password.get_admin_token", new_callable=AsyncMock
+    ) as mock_get_admin:
         mock_get_admin.return_value = "admin-token-123"
 
-        with patch("app.password.services.verify_password.get_auth_request_headers") as mock_get_headers:
+        with patch(
+            "app.password.services.verify_password.get_auth_request_headers"
+        ) as mock_get_headers:
             mock_get_headers.return_value = {
                 "Authorization": "Bearer admin-token-123",
                 "Content-Type": "application/json",
@@ -108,8 +120,12 @@ async def test_dispatch_verify_password_http_error():
             mock_http_client.post.return_value = mock_response
 
             # Mock RequestErrorHandler to convert the error to HTTPException
-            with patch("app.password.services.verify_password.RequestErrorHandler.handle") as mock_handler:
-                mock_handler.side_effect = HTTPException(status_code=401, detail="Unauthorized")
+            with patch(
+                "app.password.services.verify_password.RequestErrorHandler.handle"
+            ) as mock_handler:
+                mock_handler.side_effect = HTTPException(
+                    status_code=401, detail="Unauthorized"
+                )
 
                 # Act & Assert
                 with pytest.raises(HTTPException) as exc_info:
@@ -128,17 +144,23 @@ async def test_dispatch_verify_password_network_error():
     """Test dispatch_verify_password handles network errors correctly."""
     # Arrange
     mock_http_client = AsyncMock(spec=AsyncClient)
-    verify_password_endpoint = "https://verify.ibm.com/v2.0/factors/cloudDirectory/authnmethods/password"
+    verify_password_endpoint = (
+        "https://verify.ibm.com/v2.0/factors/cloudDirectory/authnmethods/password"
+    )
     cloud_directory_id = "test-directory-123"
     payload = {
         "username": "john.doe@example.com",
         "password": "SecurePass123!",
     }
 
-    with patch("app.password.services.verify_password.get_admin_token", new_callable=AsyncMock) as mock_get_admin:
+    with patch(
+        "app.password.services.verify_password.get_admin_token", new_callable=AsyncMock
+    ) as mock_get_admin:
         mock_get_admin.return_value = "admin-token-123"
 
-        with patch("app.password.services.verify_password.get_auth_request_headers") as mock_get_headers:
+        with patch(
+            "app.password.services.verify_password.get_auth_request_headers"
+        ) as mock_get_headers:
             mock_get_headers.return_value = {
                 "Authorization": "Bearer admin-token-123",
                 "Content-Type": "application/json",
@@ -150,10 +172,11 @@ async def test_dispatch_verify_password_network_error():
             mock_http_client.post.side_effect = NetworkError("Connection timeout")
 
             # Mock RequestErrorHandler to convert the error to HTTPException
-            with patch("app.password.services.verify_password.RequestErrorHandler.handle") as mock_handler:
+            with patch(
+                "app.password.services.verify_password.RequestErrorHandler.handle"
+            ) as mock_handler:
                 mock_handler.side_effect = HTTPException(
-                    status_code=503,
-                    detail="Service unavailable"
+                    status_code=503, detail="Service unavailable"
                 )
 
                 # Act & Assert
@@ -184,7 +207,9 @@ async def test_verify_user_password_success():
     user_password = UserPassword(password="SecurePass123!")
 
     # Mock get_user_info
-    with patch("app.password.services.verify_password.get_user_info") as mock_get_user_info:
+    with patch(
+        "app.password.services.verify_password.get_user_info"
+    ) as mock_get_user_info:
         mock_get_user_info.return_value = {
             "preferred_username": "john.doe@example.com",
             "sub": "user-123",
@@ -238,7 +263,9 @@ async def test_verify_user_password_missing_user_id_in_response():
 
     user_password = UserPassword(password="SecurePass123!")
 
-    with patch("app.password.services.verify_password.get_user_info") as mock_get_user_info:
+    with patch(
+        "app.password.services.verify_password.get_user_info"
+    ) as mock_get_user_info:
         mock_get_user_info.return_value = {
             "preferred_username": "john.doe@example.com",
         }
@@ -277,7 +304,9 @@ async def test_verify_user_password_get_user_info_fails():
 
     user_password = UserPassword(password="SecurePass123!")
 
-    with patch("app.password.services.verify_password.get_user_info") as mock_get_user_info:
+    with patch(
+        "app.password.services.verify_password.get_user_info"
+    ) as mock_get_user_info:
         # Simulate session error
         mock_get_user_info.side_effect = HTTPException(
             status_code=401,
@@ -310,7 +339,9 @@ async def test_verify_user_password_dispatch_fails():
 
     user_password = UserPassword(password="WrongPassword!")
 
-    with patch("app.password.services.verify_password.get_user_info") as mock_get_user_info:
+    with patch(
+        "app.password.services.verify_password.get_user_info"
+    ) as mock_get_user_info:
         mock_get_user_info.return_value = {
             "preferred_username": "john.doe@example.com",
         }
@@ -350,7 +381,9 @@ async def test_verify_user_password_with_logging():
 
     user_password = UserPassword(password="SecurePass123!")
 
-    with patch("app.password.services.verify_password.get_user_info") as mock_get_user_info:
+    with patch(
+        "app.password.services.verify_password.get_user_info"
+    ) as mock_get_user_info:
         mock_get_user_info.return_value = {
             "preferred_username": "john.doe@example.com",
         }
