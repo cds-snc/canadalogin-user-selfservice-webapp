@@ -29,7 +29,7 @@ jobs:
           PROFILE_MANAGEMENT_DOMAIN: test.com
           IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID: a123456
           IBM_VERIFY_PROFILE_MANAGEMENT_SECRET: a123456
-          IBM_VERIFY_CLOUD_DIRECTORY_ID: cloud-directory-id
+          IBM_VERIFY_CLOUD_DIRECTORY_ID_SECRET: cloud-directory-id
           SESSION_SECRET: your_secret_key_here
           SESSION_COOKIE_SECURE: False
           SESSION_REDIS_URL: redis://localhost:6379/0
