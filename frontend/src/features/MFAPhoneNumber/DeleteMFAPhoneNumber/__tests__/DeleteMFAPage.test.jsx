@@ -92,6 +92,25 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
       {children}
     </div>
   ),
+  GcdsContainer: ({ children, className }) => (
+    <div data-testid="gcds-container" className={className}>
+      {children}
+    </div>
+  ),
+  GcdsHeading: ({ tag, lang, children }) => (
+    <div data-testid="gcds-heading" data-tag={tag} data-lang={lang}>
+      {children}
+    </div>
+  ),
+  GcdsText: ({ children }) => (
+    <div data-testid="gcds-text">
+      {children}
+    </div>
+  ),
+  GcdsInput: () => <input data-testid="mock-gcds-input" />,
+  GcdsGrid: () => <div data-testid="mock-gcds-grid" />,
+  GcdsButton: () => <button>Mocked GcdsButton</button>, // Mocking GcdsButton
+  GcdsLink: () => <a>Mocked GcdsLink</a>, // Mocking GcdsLink
 }));
 
 // Mock utilities
