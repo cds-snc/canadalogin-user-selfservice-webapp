@@ -114,25 +114,49 @@ export const CompleteDeleteFactor = (() => {
 
       await step("Complete OTP selection and verification", async () => {
         await step("Verify password input is displayed", async () => {
-          const canvas = within(canvasElement);
           await waitFor(async () => {
+            const canvas = within(canvasElement);
             const gcdsInput = canvasElement.querySelector("gcds-input");
             await expect(gcdsInput).toBeInTheDocument();
 
             await expect(
               canvas.getByText(/first enter your current password/i),
             ).toBeInTheDocument();
+
+            const continueButton = canvasElement.querySelector("gcds-button");
+            await expect(continueButton).toBeInTheDocument();
           });
 
-          const input = canvasElement.querySelector("gcds-input");
-          if (input && input.shadowRoot) {
-            const innerInput = input.shadowRoot.querySelector("input");
-            if (innerInput) {
-              await userEvent.type(innerInput, "123123123123");
+          const gcdsInputs = canvasElement.querySelectorAll("gcds-input");
+          for (const input of gcdsInputs) {
+            if (input.shadowRoot) {
+              const shadowInput =
+                input.shadowRoot.querySelector("input#passwordVerification") ||
+                input.shadowRoot.querySelector(
+                  'input[name="passwordVerification"]',
+                );
+              if (shadowInput) {
+                // Clear the field by setting value directly (avoid userEvent.clear which can fail)
+                shadowInput.value = "";
+                shadowInput.dispatchEvent(
+                  new Event("input", { bubbles: true }),
+                );
+
+                // Type the OTP code
+                await userEvent.type(shadowInput, "123123123123");
+
+                // Trigger the gcdsInput event on the gcds-input component to update parent state
+                const gcdsInputEvent = new CustomEvent("gcdsInput", {
+                  bubbles: true,
+                  detail: { value: "123123123123" },
+                });
+                input.dispatchEvent(gcdsInputEvent);
+              }
             }
           }
 
           const continueButton = canvasElement.querySelector("gcds-button");
+
           if (continueButton) {
             if (
               continueButton.tagName === "GCDS-BUTTON" &&
