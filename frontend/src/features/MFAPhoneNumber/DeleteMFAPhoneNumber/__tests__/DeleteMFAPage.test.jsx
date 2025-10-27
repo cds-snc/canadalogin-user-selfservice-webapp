@@ -102,11 +102,7 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
       {children}
     </div>
   ),
-  GcdsText: ({ children }) => (
-    <div data-testid="gcds-text">
-      {children}
-    </div>
-  ),
+  GcdsText: ({ children }) => <div data-testid="gcds-text">{children}</div>,
   GcdsInput: () => <input data-testid="mock-gcds-input" />,
   GcdsGrid: () => <div data-testid="mock-gcds-grid" />,
   GcdsButton: () => <button>Mocked GcdsButton</button>, // Mocking GcdsButton
