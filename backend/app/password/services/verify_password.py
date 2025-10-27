@@ -7,8 +7,8 @@ from httpx import AsyncClient, Response
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.password.schemas import UserPassword, VerifiedUserPassword
 from app.utils.schemas import ResponseModel
-from app.users.services.get_my_profile import get_user_username
 from app.utils.request_error_handler import RequestErrorHandler
+from app.auth.services.auth_user_session import get_user_info
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +63,7 @@ async def verify_user_password(
     request: Request,
     payload: UserPassword,
     user_access_token: str
-) -> ResponseModel[VerifiedUserPassword]:
+) -> ResponseModel:
     """
     Verify user against IBM Verify.
 
@@ -87,12 +87,12 @@ async def verify_user_password(
         http_client: AsyncClient = request.app.state.request_client
         config = request.app.state.config
 
-        # Get username from user's access token
-        username = await get_user_username(http_client, user_access_token)
-
+        # Get username from the session
+        user_info_from_session = await get_user_info(request)
+        session_username = user_info_from_session.get("preferred_username")
         # Prepare verification payload
         verification_data = {
-            "username": username,
+            "username": session_username,
             "password": payload.password,
         }
 

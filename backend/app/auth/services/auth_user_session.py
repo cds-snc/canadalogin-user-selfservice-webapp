@@ -110,10 +110,10 @@ async def ensure_user_token(request: Request):
     if (
         expire_time and datetime.now().timestamp() > expire_time - 120
     ):  # 2 minutes buffer
-        refresh_token = user_token.get("refresh_token")
-        if not refresh_token:
+        refresh_token_value = user_token.get("refresh_token")
+        if not refresh_token_value:
             raise OAuthError("user token has expired")
-        user_token = await refresh_token(refresh_token)
+        user_token = await refresh_token(refresh_token_value)
         update_session_tokens(request, user_token)
         userinfo = user_token.get("userinfo")
         sid = userinfo.get("sid") if userinfo else None

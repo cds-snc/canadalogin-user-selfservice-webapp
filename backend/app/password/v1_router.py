@@ -8,7 +8,7 @@ from app.password.services.first_step_update_password import first_step_update_p
 from app.password.services.second_step_update_password import (
     second_step_update_password,
 )
-from app.password.services.verify_password import verify_password
+from app.password.services.verify_password import verify_user_password
 
 from app.password.services.third_step_update_password import third_step_update_password
 from app.password.services.password_policy import get_password_policy
@@ -108,12 +108,12 @@ async def password_policy(
     summary="Verify the users password",
     response_model=VerifiedUserPasswordResponse,
 )
-async def verify_user_password(
+async def verify_user(
     request: Request,
     payload: UserPassword,
     user_access_token: str = Depends(get_users_current_session),
 ):
-    return await verify_password(
+    return await verify_user_password(
         request,
         payload,
         user_access_token
