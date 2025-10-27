@@ -25,7 +25,7 @@
     "2": "Invalid email. Email must contain an ‘@’ symbol followed by a domain.",
     "3": "Codes must be six digits. Try again.",
     "4": "Password must be 12 characters",
-    "5": "Invalid password. Password must be at least 12 characters and maximum 65 characters.",
+    "5": "Passwords are 12 to 65 characters long. Please try again.",
     "6": "Code sent does not match. Try again.",
     "7": "Server Error. Please try again later.",
     "8": "Invalid phone number. Phone numbers for the country you selected should be ",
@@ -470,5 +470,15 @@
     "4": "verification for",
     "5": "voice call",
     "6": "text (SMS)"
+  },
+  "PasswordVerification": {
+    "1": "First, verify it’s you",
+    "2": "To change your password,",
+    "3": "first enter your current password.",
+    "4": "Password",
+    "5": "Forgot your password?",
+    "6": "Reset your password",
+    "7": "To add a phone number,",
+    "8": "To delete this number,"
   }
 }

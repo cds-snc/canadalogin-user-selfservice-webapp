@@ -96,6 +96,7 @@ export const PAGES = {
   deleteMFAPhoneNumberConfirm: "DeleteMFAPhoneNumberConfirm",
   transientOtpSelection: "TransientOtpSelection",
   successBanner: "SuccessBanner",
+  passwordVerification: "PasswordVerification",
 };
 
 export const FOOTERS = {
