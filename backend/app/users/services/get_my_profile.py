@@ -89,3 +89,10 @@ async def get_my_profile(
         message="User profile retrieved successfully.",
         data=response_data,
     )
+
+
+async def get_user_username(global_http_client: AsyncClient, user_access_token: str):
+    user_profile_response = await get_my_profile(global_http_client, user_access_token)
+    user_model = user_profile_response.model_dump()
+    user_data = user_model.get("data")
+    return user_data.get("userName")

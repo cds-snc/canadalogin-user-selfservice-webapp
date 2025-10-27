@@ -3,7 +3,7 @@ on:
   push:
     paths:
       - "backend/**"
-      - ".github/workflows/backend-lint.yml"  
+      - ".github/workflows/backend-lint.yml"
   pull_request:
     paths:
       - "backend/**"
@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      
+
     steps:
       - name: Checkout
         uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
@@ -32,7 +32,7 @@ jobs:
 
       - name: Format Check
         run: make fmt-ci-python
-      
+
       - name: Test with pytest
         env:
           ROOT_DOMAIN: test.com
@@ -43,6 +43,7 @@ jobs:
           PROFILE_MANAGEMENT_DOMAIN: test.com
           IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID: a123456
           IBM_VERIFY_PROFILE_MANAGEMENT_SECRET: a123456
+          IBM_VERIFY_CLOUD_DIRECTORY_ID: cloud-directory-id
           SESSION_SECRET: your_secret_key_here
           SESSION_COOKIE_SECURE: False
           SESSION_REDIS_URL: redis://localhost:6379/0

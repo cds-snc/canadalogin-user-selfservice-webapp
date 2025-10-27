@@ -8,6 +8,7 @@ from app.password.services.first_step_update_password import first_step_update_p
 from app.password.services.second_step_update_password import (
     second_step_update_password,
 )
+from app.password.services.verify_password import verify_password
 
 from app.password.services.third_step_update_password import third_step_update_password
 from app.password.services.password_policy import get_password_policy
@@ -20,6 +21,8 @@ from app.password.schemas import (
     UpdatePasswordClientResponse,
     ThirdStepPasswordUpdatePayload,
     CompleteUpdatePasswordClientResponse,
+    UserPassword,
+    VerifiedUserPasswordResponse
 )
 
 router = APIRouter()
@@ -97,3 +100,21 @@ async def password_policy(
     Returns: The password policy for the tenant
     """
     return await get_password_policy(request.app.state.request_client)
+
+
+@router.post(
+    "/verify",
+    tags=["Password"],
+    summary="Verify the users password",
+    response_model=VerifiedUserPasswordResponse,
+)
+async def verify_user_password(
+    request: Request,
+    payload: UserPassword,
+    user_access_token: str = Depends(get_users_current_session),
+):
+    return await verify_password(
+        request,
+        payload,
+        user_access_token
+    )

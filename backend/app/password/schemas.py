@@ -110,3 +110,15 @@ class PasswordPolicyResponse(BaseModel):
 
 class PasswordPolicyResponse(ResponseModel):
     data: Optional[PasswordPolicyResponse] = None
+
+
+class UserPassword(BaseModel):
+    password: str = Field(..., min_length=12)
+
+
+class VerifiedUserPassword(BaseModel):
+    id: str
+
+
+class VerifiedUserPasswordResponse(ResponseModel):
+    data: VerifiedUserPassword

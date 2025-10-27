@@ -40,7 +40,8 @@
     "CSIAI0021E": "The password that you specified was used previously, and it cannot be reused.",
     "CSIBN0025E": "The verification code is invalid or has expired.",
     "CSIBN0028E": "The verification code is invalid or has expired.",
-    "CSIBN0021E": "The verification code is invalid."
+    "CSIBN0021E": "The verification code is invalid.",
+    "CSIBH0044E": "The email and password combination do not match."
   },
   "RegisterVerification": {
     "1": "Protect your account with 2-step verification",
