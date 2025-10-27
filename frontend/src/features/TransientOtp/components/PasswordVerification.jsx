@@ -50,7 +50,7 @@ export default function PasswordVerification({
         autofocus
         autocomplete="one-time-code"
         name="passwordVerification"
-        type="text"
+        type="password"
         validateOn="other"
         errorMessage={errorMessage}
         value={userPasswordValue}
