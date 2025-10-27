@@ -1,8 +1,10 @@
 import logging
+from typing import Dict
+
 from fastapi import HTTPException, Request
-from httpx import AsyncClient
-from app.utils.access_token import get_admin_token
-from app.utils.access_token import get_auth_request_headers
+from httpx import AsyncClient, Response
+
+from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.password.schemas import UserPassword, VerifiedUserPassword
 from app.utils.schemas import ResponseModel
 from app.users.services.get_my_profile import get_user_username
@@ -10,58 +12,116 @@ from app.utils.request_error_handler import RequestErrorHandler
 
 logger = logging.getLogger(__name__)
 
-# Documentation to authenticate a user https://docs.verify.ibm.com/verify/docs/first-factor-authentication-password-auth
-# https://cds-gcsignin-dev.verify.ibm.com/v1.0/authnmethods/password/login?returnJwt=true
-
 
 async def dispatch_verify_password(
-    request: Request,
-    payload: str,
-):
+    http_client: AsyncClient,
+    verify_password_endpoint: str,
+    cloud_directory_id: str,
+    payload: Dict[str, str],
+) -> Response:
+    """
+    Dispatch password verification request to IBM Verify API.
 
+    Documentation: https://docs.verify.ibm.com/verify/docs/first-factor-authentication-password-auth
+
+    Args:
+        http_client: Async HTTP client
+        verify_password_endpoint: Base URL for password verification API
+        cloud_directory_id: IBM Verify Cloud Directory ID
+        payload: Dict containing username and password
+
+    Returns:
+        Response: HTTP response from IBM Verify API
+
+    Raises:
+        HTTPException: Via RequestErrorHandler for any request failures
+    """
     try:
-        http_client: AsyncClient = request.app.state.request_client
+        logger.info("Verifying user with IBM Verify")
+
         access_token = await get_admin_token(http_client)
         headers = get_auth_request_headers(access_token, True)
-        verify_password = request.app.state.config.verify_password_api_endpoint
-        cloud_directory_id = request.app.state.config.ibm_verify_config.IBM_VERIFY_CLOUD_DIRECTORY_ID_SECRET
-        verify_password_api_endpoint = f"{verify_password}/{cloud_directory_id}"
+
+        verify_password_api_endpoint = f"{verify_password_endpoint}/{cloud_directory_id}"
+
         response = await http_client.post(
-            verify_password_api_endpoint, json=payload, headers=headers
+            verify_password_api_endpoint,
+            json=payload,
+            headers=headers
         )
-        logger.info("Request returned")
         response.raise_for_status()
-        logger.info("verified successfully")
+
+        logger.info("Verified successfully with IBM Verify")
         return response
 
     except Exception as e:
-        logger.error("Failed dispatch verify user", exc_info=True)
-        if isinstance(e, HTTPException):
-            raise
-        RequestErrorHandler.handle(e, context="unable to verify")
+        logger.error(f"Failed to verify with IBM Verify: {str(e)}", exc_info=True)
+        RequestErrorHandler.handle(e, context="User verification failed")
 
 
-async def verify_password(
-    request: Request, payload: UserPassword, user_access_token: str
-):
+async def verify_user_password(
+    request: Request,
+    payload: UserPassword,
+    user_access_token: str
+) -> ResponseModel[VerifiedUserPassword]:
+    """
+    Verify user against IBM Verify.
 
+    Retrieves the user's username from their access token, then verifies
+    the provided password against IBM Verify's authentication API.
+
+    Args:
+        request: FastAPI request object containing app state
+        payload: User password
+        user_access_token: User's authentication token
+
+    Returns:
+        ResponseModel[VerifiedUserPassword]: Success response with user ID
+
+    Raises:
+        HTTPException: For authentication or verification errors
+    """
     try:
+        logger.info("Starting verification for user")
+
         http_client: AsyncClient = request.app.state.request_client
-        user_name = await get_user_username(http_client, user_access_token)
-        user_data = {
-            "username": user_name,
+        config = request.app.state.config
+
+        # Get username from user's access token
+        username = await get_user_username(http_client, user_access_token)
+
+        # Prepare verification payload
+        verification_data = {
+            "username": username,
             "password": payload.password,
         }
 
-        response = await dispatch_verify_password(request, user_data)
+        # Verify password with IBM Verify
+        response = await dispatch_verify_password(
+            http_client=http_client,
+            verify_password_endpoint=config.verify_password_api_endpoint,
+            cloud_directory_id=config.ibm_verify_config.IBM_VERIFY_CLOUD_DIRECTORY_ID_SECRET,
+            payload=verification_data,
+        )
+
         response_json = response.json()
         user_id = response_json.get("id")
 
+        if not user_id:
+            logger.error("IBM Verify response missing user ID")
+            raise HTTPException(
+                status_code=422,
+                detail="Invalid response from verification service"
+            )
+
+        logger.info(f"User verified successfully: {user_id}")
+
         return ResponseModel(
-            success=True, data=VerifiedUserPassword(id=user_id), message="Successfully verified user"
+            success=True,
+            data=VerifiedUserPassword(id=user_id),
+            message="User verified successfully"
         )
+
     except Exception as e:
-        logger.error("Failed dispatch verify user", exc_info=True)
-        if isinstance(e, HTTPException):
-            raise
-        RequestErrorHandler.handle(e, context="unable to verify ")
+        logger.error(f"Unexpected error during user verification: {str(e)}", exc_info=True)
+        RequestErrorHandler.handle(e, context="User verification failed")
