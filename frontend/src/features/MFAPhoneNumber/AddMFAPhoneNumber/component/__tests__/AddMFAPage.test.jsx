@@ -20,6 +20,30 @@ vi.mock("../../../DeleteMFAPhoneNumber/api/DeleteMFAPhoneNumberAPI");
 vi.mock("../../../../../utils/functions");
 vi.mock("../../../../../services/authService");
 
+// Mock GCDS components
+vi.mock("@cdssnc/gcds-components-react", () => ({
+  GcdsErrorMessage: ({ children, messageId }) => (
+    <div data-testid="error-message" data-message-id={messageId}>
+      {children}
+    </div>
+  ),
+  GcdsContainer: ({ children, className }) => (
+    <div data-testid="gcds-container" className={className}>
+      {children}
+    </div>
+  ),
+  GcdsHeading: ({ tag, lang, children }) => (
+    <div data-testid="gcds-heading" data-tag={tag} data-lang={lang}>
+      {children}
+    </div>
+  ),
+  GcdsText: ({ children }) => <div data-testid="gcds-text">{children}</div>,
+  GcdsInput: () => <input data-testid="mock-gcds-input" />,
+  GcdsGrid: () => <div data-testid="mock-gcds-grid" />,
+  GcdsButton: () => <button>Mocked GcdsButton</button>, // Mocking GcdsButton
+  GcdsLink: () => <a>Mocked GcdsLink</a>, // Mocking GcdsLink
+}));
+
 // Mock child components
 vi.mock("../../../../TransientOtp/components/OtpSelection", () => ({
   default: ({ onNext }) => (
@@ -124,6 +148,22 @@ vi.mock("../../../../components/Layout/Loading", () => ({
   default: ({ text }) => <div data-testid="loader">{text || "Loading..."}</div>,
 }));
 
+vi.mock("../../../../TransientOtp/components/PasswordVerification", () => ({
+  default: ({ validatePassword, onCancel }) => (
+    <div data-testid="password-verification">
+      <button
+        onClick={() => validatePassword && validatePassword("mock-password")}
+        data-testid="password-verification-next"
+      >
+        Next
+      </button>
+      <button onClick={onCancel} data-testid="password-verification-cancel">
+        Cancel
+      </button>
+    </div>
+  ),
+}));
+
 const mockUserProfile = {
   id: "test-user-123",
   userName: "testuser",
@@ -207,6 +247,14 @@ describe("AddMFAPage Unit Tests", () => {
       );
 
       await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      // Navigate to add otp selection number step
+      const button = screen.getByTestId("password-verification-next");
+      button.click();
+
+      await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
       });
     });
@@ -233,7 +281,7 @@ describe("AddMFAPage Unit Tests", () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
       });
     });
   });
@@ -255,6 +303,14 @@ describe("AddMFAPage Unit Tests", () => {
           <AddMFAPage />
         </TestWrapper>,
       );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      // Navigate to add otp selection number step
+      const button = screen.getByTestId("password-verification-next");
+      button.click();
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
@@ -298,6 +354,14 @@ describe("AddMFAPage Unit Tests", () => {
           <AddMFAPage />
         </TestWrapper>,
       );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      // Navigate to add otp selection number step
+      const button = screen.getByTestId("password-verification-next");
+      button.click();
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
@@ -347,6 +411,14 @@ describe("AddMFAPage Unit Tests", () => {
           <AddMFAPage />
         </TestWrapper>,
       );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      // Navigate to add otp selection number step
+      const button = screen.getByTestId("password-verification-next");
+      button.click();
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
@@ -400,6 +472,14 @@ describe("AddMFAPage Unit Tests", () => {
           <AddMFAPage />
         </TestWrapper>,
       );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      // Navigate to add otp selection number step
+      const button = screen.getByTestId("password-verification-next");
+      button.click();
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
@@ -466,6 +546,14 @@ describe("AddMFAPage Unit Tests", () => {
       );
 
       await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      // Navigate to add otp selection number step
+      const button = screen.getByTestId("password-verification-next");
+      button.click();
+
+      await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
       });
 
@@ -529,6 +617,14 @@ describe("AddMFAPage Unit Tests", () => {
           <AddMFAPage />
         </TestWrapper>,
       );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      // Navigate to add otp selection number step
+      const button = screen.getByTestId("password-verification-next");
+      button.click();
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
@@ -631,6 +727,14 @@ describe("AddMFAPage Unit Tests", () => {
       );
 
       await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      // Navigate to add otp selection number step
+      const button = screen.getByTestId("password-verification-next");
+      button.click();
+
+      await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
       });
 
@@ -659,6 +763,14 @@ describe("AddMFAPage Unit Tests", () => {
           <AddMFAPage />
         </TestWrapper>,
       );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      // Navigate to add otp selection number step
+      const button = screen.getByTestId("password-verification-next");
+      button.click();
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
@@ -703,6 +815,14 @@ describe("AddMFAPage Unit Tests", () => {
       );
 
       await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      // Navigate to add otp selection number step
+      const button = screen.getByTestId("password-verification-next");
+      button.click();
+
+      await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
       });
 
@@ -732,6 +852,14 @@ describe("AddMFAPage Unit Tests", () => {
           <AddMFAPage />
         </TestWrapper>,
       );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      // Navigate to add otp selection number step
+      const button = screen.getByTestId("password-verification-next");
+      button.click();
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
@@ -773,6 +901,14 @@ describe("AddMFAPage Unit Tests", () => {
           <AddMFAPage />
         </TestWrapper>,
       );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      // Navigate to add otp selection number step
+      const button = screen.getByTestId("password-verification-next");
+      button.click();
 
       // Navigate through steps to reach addMFAValidation
       await waitFor(() => {
@@ -841,6 +977,14 @@ describe("AddMFAPage Unit Tests", () => {
           <AddMFAPage />
         </TestWrapper>,
       );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      // Navigate to add otp selection number step
+      const button = screen.getByTestId("password-verification-next");
+      button.click();
 
       // Navigate through steps to reach verifyMFAOtp which leads to addSecondMFA
       await waitFor(() => {
@@ -918,6 +1062,14 @@ describe("AddMFAPage Unit Tests", () => {
         </TestWrapper>,
       );
 
+      await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      // Navigate to add otp selection number step
+      const button = screen.getByTestId("password-verification-next");
+      button.click();
+
       // Navigate to addMFAValidation step
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
@@ -983,6 +1135,14 @@ describe("AddMFAPage Unit Tests", () => {
           <AddMFAPage />
         </TestWrapper>,
       );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      // Navigate to add otp selection number step
+      const button = screen.getByTestId("password-verification-next");
+      button.click();
 
       // Navigate to addSecondMFA step
       await waitFor(() => {
@@ -1056,6 +1216,14 @@ describe("AddMFAPage Unit Tests", () => {
       );
 
       await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      // Navigate to add otp selection number step
+      const button = screen.getByTestId("password-verification-next");
+      button.click();
+
+      await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
       });
 
@@ -1118,6 +1286,14 @@ describe("AddMFAPage Unit Tests", () => {
           <AddMFAPage />
         </TestWrapper>,
       );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      // Navigate to add otp selection number step
+      const button = screen.getByTestId("password-verification-next");
+      button.click();
 
       // Navigate through the complete flow to reach addSecondMFA step
       await waitFor(() => {
