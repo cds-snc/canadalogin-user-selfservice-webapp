@@ -42,10 +42,10 @@ async def dispatch_verify_password(
         access_token = await get_admin_token(http_client)
         headers = get_auth_request_headers(access_token, True)
 
-        verify_password_api_endpoint = f"{verify_password_endpoint}/{cloud_directory_id}"
+        ibm_verify_password_api_endpoint = f"{verify_password_endpoint}/{cloud_directory_id}"
 
         response = await http_client.post(
-            verify_password_api_endpoint,
+            ibm_verify_password_api_endpoint,
             json=payload,
             headers=headers
         )
@@ -62,21 +62,19 @@ async def dispatch_verify_password(
 async def verify_user_password(
     request: Request,
     payload: UserPassword,
-    user_access_token: str
 ) -> ResponseModel:
     """
     Verify user against IBM Verify.
 
-    Retrieves the user's username from their access token, then verifies
-    the provided password against IBM Verify's authentication API.
+    Retrieves the user's username from the session and verify
+    the provided password.
 
     Args:
         request: FastAPI request object containing app state
         payload: User password
-        user_access_token: User's authentication token
 
     Returns:
-        ResponseModel[VerifiedUserPassword]: Success response with user ID
+        VerifiedUserPassword: Success response with user ID
 
     Raises:
         HTTPException: For authentication or verification errors
