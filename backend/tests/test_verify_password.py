@@ -40,33 +40,42 @@ async def test_dispatch_verify_password_success():
                 "Content-Type": "application/json",
             }
 
-            # Mock HTTP response
-            mock_response = Mock(spec=Response)
-            mock_response.json.return_value = {"id": "user-456"}
-            mock_response.raise_for_status = Mock()
-            mock_http_client.post.return_value = mock_response
+            # Mock get_cloud_directory_id to return the cloud directory ID
+            with patch(
+                "app.password.services.verify_password.get_cloud_directory_id",
+                new_callable=AsyncMock
+            ) as mock_get_cloud_dir:
+                mock_get_cloud_dir.return_value = cloud_directory_id
 
-            # Act
-            response = await dispatch_verify_password(
-                http_client=mock_http_client,
-                verify_password_endpoint=verify_password_endpoint,
-                cloud_directory_id=cloud_directory_id,
-                payload=payload,
-            )
+                # Mock HTTP response
+                mock_response = Mock(spec=Response)
+                mock_response.json.return_value = {"id": "user-456"}
+                mock_response.raise_for_status = Mock()
+                mock_http_client.post.return_value = mock_response
 
-            # Assert
-            assert response == mock_response
-            mock_get_admin.assert_called_once_with(mock_http_client)
-            mock_get_headers.assert_called_once_with("admin-token-123", True)
-            mock_http_client.post.assert_called_once_with(
-                f"{verify_password_endpoint}/{cloud_directory_id}",
-                json=payload,
-                headers={
-                    "Authorization": "Bearer admin-token-123",
-                    "Content-Type": "application/json",
-                },
-            )
-            mock_response.raise_for_status.assert_called_once()
+                # Act
+                response = await dispatch_verify_password(
+                    http_client=mock_http_client,
+                    verify_password_endpoint=verify_password_endpoint,
+                    payload=payload,
+                )
+
+                # Assert
+                assert response == mock_response
+                mock_get_admin.assert_called_once_with(mock_http_client)
+                mock_get_headers.assert_called_once_with("admin-token-123", True)
+                mock_get_cloud_dir.assert_called_once_with(
+                    mock_http_client, verify_password_endpoint
+                )
+                mock_http_client.post.assert_called_once_with(
+                    f"{verify_password_endpoint}/{cloud_directory_id}",
+                    json=payload,
+                    headers={
+                        "Authorization": "Bearer admin-token-123",
+                        "Content-Type": "application/json",
+                    },
+                )
+                mock_response.raise_for_status.assert_called_once()
 
 
 @pytest.mark.asyncio
@@ -96,6 +105,12 @@ async def test_dispatch_verify_password_http_error():
                 "Authorization": "Bearer admin-token-123",
                 "Content-Type": "application/json",
             }
+            # Mock get_cloud_directory_id to return the cloud directory ID
+            with patch(
+                "app.password.services.verify_password.get_cloud_directory_id",
+                new_callable=AsyncMock
+            ) as mock_get_cloud_dir:
+                mock_get_cloud_dir.return_value = cloud_directory_id
 
             # Mock HTTP error response with proper request object
             from httpx import HTTPStatusError, Request as HttpxRequest
@@ -132,7 +147,6 @@ async def test_dispatch_verify_password_http_error():
                     await dispatch_verify_password(
                         http_client=mock_http_client,
                         verify_password_endpoint=verify_password_endpoint,
-                        cloud_directory_id=cloud_directory_id,
                         payload=payload,
                     )
 
@@ -166,6 +180,13 @@ async def test_dispatch_verify_password_network_error():
                 "Content-Type": "application/json",
             }
 
+            # Mock get_cloud_directory_id to return the cloud directory ID
+            with patch(
+                "app.password.services.verify_password.get_cloud_directory_id",
+                new_callable=AsyncMock
+            ) as mock_get_cloud_dir:
+                mock_get_cloud_dir.return_value = cloud_directory_id
+
             # Mock network error
             from httpx import NetworkError
 
@@ -184,7 +205,6 @@ async def test_dispatch_verify_password_network_error():
                     await dispatch_verify_password(
                         http_client=mock_http_client,
                         verify_password_endpoint=verify_password_endpoint,
-                        cloud_directory_id=cloud_directory_id,
                         payload=payload,
                     )
 
@@ -200,9 +220,6 @@ async def test_verify_user_password_success():
     mock_request.app.state.config.verify_password_api_endpoint = (
         "https://verify.ibm.com/v2.0/factors/cloudDirectory/authnmethods/password"
     )
-    mock_request.app.state.config.ibm_verify_config.IBM_VERIFY_CLOUD_DIRECTORY_ID_SECRET = (
-        "directory-123"
-    )
 
     user_password = UserPassword(password="SecurePass123!")
 
@@ -217,7 +234,8 @@ async def test_verify_user_password_success():
 
         # Mock dispatch_verify_password
         with patch(
-            "app.password.services.verify_password.dispatch_verify_password"
+            "app.password.services.verify_password.dispatch_verify_password",
+            new_callable=AsyncMock
         ) as mock_dispatch:
             mock_response = Mock(spec=Response)
             mock_response.json.return_value = {"id": "user-456"}
@@ -240,7 +258,6 @@ async def test_verify_user_password_success():
             mock_dispatch.assert_called_once_with(
                 http_client=mock_request.app.state.request_client,
                 verify_password_endpoint="https://verify.ibm.com/v2.0/factors/cloudDirectory/authnmethods/password",
-                cloud_directory_id="directory-123",
                 payload={
                     "username": "john.doe@example.com",
                     "password": "SecurePass123!",
@@ -257,9 +274,6 @@ async def test_verify_user_password_missing_user_id_in_response():
     mock_request.app.state.config.verify_password_api_endpoint = (
         "https://verify.ibm.com/v2.0/factors/cloudDirectory/authnmethods/password"
     )
-    mock_request.app.state.config.ibm_verify_config.IBM_VERIFY_CLOUD_DIRECTORY_ID_SECRET = (
-        "directory-123"
-    )
 
     user_password = UserPassword(password="SecurePass123!")
 
@@ -271,7 +285,8 @@ async def test_verify_user_password_missing_user_id_in_response():
         }
 
         with patch(
-            "app.password.services.verify_password.dispatch_verify_password"
+            "app.password.services.verify_password.dispatch_verify_password",
+            new_callable=AsyncMock
         ) as mock_dispatch:
             # Mock response with missing 'id' field
             mock_response = Mock(spec=Response)
@@ -285,8 +300,8 @@ async def test_verify_user_password_missing_user_id_in_response():
                     payload=user_password,
                 )
 
-            assert exc_info.value.status_code == 422
-            assert "Invalid response from verification service" in exc_info.value.detail
+            assert exc_info.value.status_code == 404
+            assert "Bad Request" in exc_info.value.detail
 
 
 @pytest.mark.asyncio
