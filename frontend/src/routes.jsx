@@ -146,14 +146,9 @@ export const appRoutes = [
                     element: <SecuritySettings />,
                   },
                   {
-                    element: <StepupPrivateRoute />,
-                    children: [
-                      {
-                        path: "update-password",
-                        element: <ChangePasswordIndex />,
-                        handle: { id: PAGES.password },
-                      },
-                    ],
+                    path: "update-password",
+                    element: <ChangePasswordIndex />,
+                    handle: { id: PAGES.password },
                   },
                   {
                     path: "manage-2fa-verifications",

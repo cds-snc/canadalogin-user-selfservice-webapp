@@ -174,7 +174,6 @@ export default function ChangePasswordIndex() {
         onCancel={async () => await navigate(backToSecuritySettingsPage)}
         validatePassword={validatePassword}
         errorCode={errorCode}
-        parentPage={PAGES.addMFAPage}
       />
     ),
     otpSelection: (
