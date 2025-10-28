@@ -32,7 +32,8 @@ export default function PasswordVerification({
         ? pageContentJson["7"]
         : pageContentJson["2"];
 
-  const errorMessage = errorPageJson[errorCode] || "";
+  const errorMessage =
+    errorPageJson[errorCode] || errorPageJson[errorCodeExternal] || "";
   return (
     <GcdsContainer>
       <GcdsContainer className="gcds-gap">
