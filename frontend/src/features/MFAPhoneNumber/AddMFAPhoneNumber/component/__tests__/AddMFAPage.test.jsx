@@ -210,6 +210,15 @@ describe("AddMFAPage Unit Tests", () => {
       success: true,
     });
 
+    authService.verifyPassword = vi.fn().mockResolvedValue({
+      success: true,
+    });
+
+    authService.requestPasswordPolicy = vi.fn().mockResolvedValue({
+      success: true,
+      data: { pwdMinLength: 12, pwdMaxLength: 65 },
+    });
+
     functions.getPageContent.mockImplementation((language, page) => {
       if (page === "otpSelection") return { 11: "Loading..." };
       if (page === "error")

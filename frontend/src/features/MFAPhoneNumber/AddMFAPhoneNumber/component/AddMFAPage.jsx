@@ -248,15 +248,22 @@ export default function AddMFAPage() {
   };
 
   const validatePassword = async (userPasswordValue) => {
-    if (
-      !userPasswordValue ||
-      userPasswordValue.length < 12 ||
-      userPasswordValue.length > 65
-    ) {
-      setErrorCode("5");
-      return;
-    }
     try {
+      const passwordPolicyResponse = await authService.requestPasswordPolicy();
+      if (passwordPolicyResponse.success) {
+        const passwordPolicy = {
+          min: passwordPolicyResponse.data.pwdMinLength,
+          max: passwordPolicyResponse.data.pwdMaxLength,
+        };
+        if (
+          !userPasswordValue ||
+          userPasswordValue.length < passwordPolicy.min ||
+          userPasswordValue.length > passwordPolicy.max
+        ) {
+          setErrorCode("5");
+          return;
+        }
+      }
       const response = await authService.verifyPassword({
         password: userPasswordValue,
       });
