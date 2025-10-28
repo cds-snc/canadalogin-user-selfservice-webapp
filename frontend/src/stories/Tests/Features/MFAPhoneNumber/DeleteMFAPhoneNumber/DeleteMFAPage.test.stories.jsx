@@ -3,6 +3,7 @@ import {
   AVAILABLE_LANGUAGES,
   FLOW_TYPES,
   PAGES,
+  SUBMIT_END_POINTS,
 } from "../../../../../utils/constants.jsx";
 import { buildTestCase, TestTemplate } from "../../../utils/functions.tsx";
 
@@ -90,6 +91,22 @@ export const CompleteDeleteFactor = (() => {
           success: true,
         },
       },
+      {
+        type: "post",
+        endpoint: `${SUBMIT_END_POINTS.passwordVerify}`,
+        response: {
+          success: true,
+          data: [],
+        },
+      },
+      {
+        type: "get",
+        endpoint: `${SUBMIT_END_POINTS.requestPasswordPolicy}`,
+        response: {
+          success: true,
+          data: { pwdMinLength: 12, pwdMaxLength: 65 },
+        },
+      },
     ],
   );
 
@@ -118,6 +135,12 @@ export const CompleteDeleteFactor = (() => {
             const canvas = within(canvasElement);
             const gcdsInput = canvasElement.querySelector("gcds-input");
             await expect(gcdsInput).toBeInTheDocument();
+            if (gcdsInput && gcdsInput.shadowRoot) {
+              const input = gcdsInput.shadowRoot.querySelector(
+                'input[name="passwordVerification"]',
+              );
+              await expect(input).toBeInTheDocument();
+            }
 
             await expect(
               canvas.getByText(/first enter your current password/i),
