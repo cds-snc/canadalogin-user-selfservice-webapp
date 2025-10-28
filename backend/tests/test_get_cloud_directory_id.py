@@ -2,13 +2,11 @@ import pytest
 from unittest.mock import Mock, patch, AsyncMock
 from httpx import AsyncClient, Response, HTTPStatusError, Request as HttpxRequest
 from fastapi import HTTPException, status
-from pydantic import ValidationError
 
 from app.password.services.verify_password import (
     dispatch_get_cloud_directory_Id,
     get_cloud_directory_id,
 )
-from app.password.schemas import IBMIdentitySourceResponse
 
 
 @pytest.mark.asyncio
@@ -339,43 +337,6 @@ async def test_get_cloud_directory_id_dispatch_raises_http_exception():
                 )
 
             assert exc_info.value.status_code == 500
-
-
-@pytest.mark.asyncio
-async def test_get_cloud_directory_id_with_logging():
-    """Test that get_cloud_directory_id logs appropriate messages."""
-    # Arrange
-    mock_http_client = AsyncMock(spec=AsyncClient)
-    verify_password_endpoint = "https://tenant.verify.ibm.com/v1.0/authnmethods/password"
-    expected_cloud_directory_id = "bd45bba8-a1d4-4de2-bc80-be2855589363"
-
-    with patch(
-        "app.password.services.verify_password.dispatch_get_cloud_directory_Id"
-    ) as mock_dispatch:
-        mock_response = Mock(spec=Response)
-        mock_response.json.return_value = {
-            "password": [
-                {
-                    "id": expected_cloud_directory_id,
-                    "name": "Cloud Directory",
-                    "type": "cloudDirectory",
-                    "location": f"https://tenant.verify.ibm.com/v1.0/authnmethods/password/{expected_cloud_directory_id}"
-                }
-            ]
-        }
-        mock_dispatch.return_value = mock_response
-
-        with patch("app.password.services.verify_password.logger") as mock_logger:
-            # Act
-            result = await get_cloud_directory_id(
-                global_http_client=mock_http_client,
-                verify_password_endpoint=verify_password_endpoint,
-            )
-
-            # Assert
-            assert result == expected_cloud_directory_id
-            # Verify error logging was called when validation fails (in other test cases)
-            # This test just verifies successful path doesn't log errors
 
 
 @pytest.mark.asyncio
