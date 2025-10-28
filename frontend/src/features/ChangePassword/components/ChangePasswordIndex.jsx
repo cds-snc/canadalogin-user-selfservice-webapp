@@ -15,6 +15,8 @@ import { path } from "../../../utils/routeHelpers.js";
 import OtpSelection from "../../TransientOtp/components/OtpSelection.jsx";
 import OtpVerification from "../../TransientOtp/components/OtpVerification.jsx";
 import { passwordUpdate } from "../api/passwordUpdate.jsx";
+import { authService } from "../../../services/authService.jsx";
+import PasswordVerification from "../../TransientOtp/components/PasswordVerification.jsx";
 
 const defaulPasswordUpdatetStep = "passwordVerification";
 
@@ -109,14 +111,10 @@ export default function ChangePasswordIndex() {
       setErrorCode("5");
       return;
     }
-    const userData = {
-      id: "id",
-      password: userPasswordValue,
-      username: userName,
-    };
     try {
-      // const response = await authService.transientOtpVerify(userData);
-      const response = { success: true, data: userData }; // Mocking success response for password validation
+      const response = await authService.verifyPassword({
+        password: userPasswordValue,
+      });
       if (response && response.success) {
         setPasswordUpdateStep("otpSelection");
         setErrorCode("");

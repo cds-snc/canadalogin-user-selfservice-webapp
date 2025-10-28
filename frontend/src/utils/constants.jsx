@@ -141,6 +141,7 @@ export const SUBMIT_END_POINTS = {
   logout: "/v1/auth/logout",
   sessionStatus: "/v1/auth/session-status",
   keepAlive: "/v1/auth/keep-alive",
+  passwordVerify: "/v1/password/verify",
 };
 
 export const RP_CLIENT_ID_KEY = "rp_client_id";

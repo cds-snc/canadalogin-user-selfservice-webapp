@@ -159,14 +159,10 @@ export default function DeleteMFAPage() {
       setErrorCode("5");
       return;
     }
-    const userData = {
-      id: "id",
-      password: userPasswordValue,
-      username: userName,
-    };
     try {
-      // const response = await authService.transientOtpVerify(userData);
-      const response = { success: true, data: userData }; // Mocking success response for password validation
+      const response = await authService.verifyPassword({
+        password: userPasswordValue,
+      });
       if (response && response.success) {
         setWizardStep("otpSelection");
         setErrorCode("");
