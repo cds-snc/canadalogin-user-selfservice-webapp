@@ -5,7 +5,11 @@ from fastapi import HTTPException, Request, status
 from httpx import AsyncClient, Response
 
 from app.utils.access_token import get_admin_token, get_auth_request_headers
-from app.password.schemas import UserPassword, VerifiedUserPassword, IBMIdentitySourceResponse
+from app.password.schemas import (
+    UserPassword,
+    VerifiedUserPassword,
+    IBMIdentitySourceResponse,
+)
 from app.utils.schemas import ResponseModel
 from app.utils.request_error_handler import RequestErrorHandler
 from app.auth.services.auth_user_session import get_user_info
@@ -14,7 +18,9 @@ from urllib.parse import quote
 logger = logging.getLogger(__name__)
 
 
-async def dispatch_get_cloud_directory_Id(global_http_client: AsyncClient, verify_password_endpoint: str) -> Response:
+async def dispatch_get_cloud_directory_Id(
+    global_http_client: AsyncClient, verify_password_endpoint: str
+) -> Response:
     """
     The Cloud Directory ID is required to verify user password against IBM Verify.
 
@@ -35,10 +41,14 @@ async def dispatch_get_cloud_directory_Id(global_http_client: AsyncClient, verif
         headers = get_auth_request_headers(access_token, True)
         cloud_directory_name = "Cloud Directory"
         search_value = f'name="{cloud_directory_name}"'
-        encoded_search = quote(search_value, safe='')
+        encoded_search = quote(search_value, safe="")
 
-        search_identity_source_endpoint = f"{verify_password_endpoint}?search={encoded_search}"
-        response = await global_http_client.get(search_identity_source_endpoint, headers=headers)
+        search_identity_source_endpoint = (
+            f"{verify_password_endpoint}?search={encoded_search}"
+        )
+        response = await global_http_client.get(
+            search_identity_source_endpoint, headers=headers
+        )
 
         logger.info("Request returned")
         response.raise_for_status()
@@ -50,7 +60,9 @@ async def dispatch_get_cloud_directory_Id(global_http_client: AsyncClient, verif
         RequestErrorHandler.handle(e, context="Failed to get cloud directory id")
 
 
-async def get_cloud_directory_id(global_http_client: AsyncClient, verify_password_endpoint: str) -> str:
+async def get_cloud_directory_id(
+    global_http_client: AsyncClient, verify_password_endpoint: str
+) -> str:
     """
     The Cloud Directory ID is required to verify user password against IBM Verify.
 
@@ -68,15 +80,16 @@ async def get_cloud_directory_id(global_http_client: AsyncClient, verify_passwor
     """
     try:
 
-        response = await dispatch_get_cloud_directory_Id(global_http_client, verify_password_endpoint)
+        response = await dispatch_get_cloud_directory_Id(
+            global_http_client, verify_password_endpoint
+        )
         response_json = response.json()
         data_validation = IBMIdentitySourceResponse(**response_json)
 
         if not data_validation.password or len(data_validation.password) == 0:
             logger.error("Cloud Directory ID not found in IBM Verify response")
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Bad Request"
+                status_code=status.HTTP_404_NOT_FOUND, detail="Bad Request"
             )
 
         cloud_directory_id = data_validation.password[0].id
@@ -84,8 +97,7 @@ async def get_cloud_directory_id(global_http_client: AsyncClient, verify_passwor
         if not cloud_directory_id:
             logger.error("Cloud Directory ID not found in IBM Verify response")
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Bad Request"
+                status_code=status.HTTP_404_NOT_FOUND, detail="Bad Request"
             )
 
         return cloud_directory_id
@@ -121,7 +133,9 @@ async def dispatch_verify_password(
 
         access_token = await get_admin_token(http_client)
         headers = get_auth_request_headers(access_token, True)
-        cloud_directory_id = await get_cloud_directory_id(http_client, verify_password_endpoint)
+        cloud_directory_id = await get_cloud_directory_id(
+            http_client, verify_password_endpoint
+        )
         ibm_verify_password_api_endpoint = (
             f"{verify_password_endpoint}/{cloud_directory_id}"
         )
@@ -187,8 +201,7 @@ async def verify_user_password(
         if not user_id:
             logger.error("IBM Verify response missing user ID")
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Bad Request"
+                status_code=status.HTTP_404_NOT_FOUND, detail="Bad Request"
             )
 
         logger.info(f"User verified successfully: {user_id}")

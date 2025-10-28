@@ -43,7 +43,7 @@ async def test_dispatch_verify_password_success():
             # Mock get_cloud_directory_id to return the cloud directory ID
             with patch(
                 "app.password.services.verify_password.get_cloud_directory_id",
-                new_callable=AsyncMock
+                new_callable=AsyncMock,
             ) as mock_get_cloud_dir:
                 mock_get_cloud_dir.return_value = cloud_directory_id
 
@@ -108,7 +108,7 @@ async def test_dispatch_verify_password_http_error():
             # Mock get_cloud_directory_id to return the cloud directory ID
             with patch(
                 "app.password.services.verify_password.get_cloud_directory_id",
-                new_callable=AsyncMock
+                new_callable=AsyncMock,
             ) as mock_get_cloud_dir:
                 mock_get_cloud_dir.return_value = cloud_directory_id
 
@@ -183,7 +183,7 @@ async def test_dispatch_verify_password_network_error():
             # Mock get_cloud_directory_id to return the cloud directory ID
             with patch(
                 "app.password.services.verify_password.get_cloud_directory_id",
-                new_callable=AsyncMock
+                new_callable=AsyncMock,
             ) as mock_get_cloud_dir:
                 mock_get_cloud_dir.return_value = cloud_directory_id
 
@@ -235,7 +235,7 @@ async def test_verify_user_password_success():
         # Mock dispatch_verify_password
         with patch(
             "app.password.services.verify_password.dispatch_verify_password",
-            new_callable=AsyncMock
+            new_callable=AsyncMock,
         ) as mock_dispatch:
             mock_response = Mock(spec=Response)
             mock_response.json.return_value = {"id": "user-456"}
@@ -286,7 +286,7 @@ async def test_verify_user_password_missing_user_id_in_response():
 
         with patch(
             "app.password.services.verify_password.dispatch_verify_password",
-            new_callable=AsyncMock
+            new_callable=AsyncMock,
         ) as mock_dispatch:
             # Mock response with missing 'id' field
             mock_response = Mock(spec=Response)
