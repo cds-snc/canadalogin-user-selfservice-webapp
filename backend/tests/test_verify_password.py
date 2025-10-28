@@ -313,9 +313,6 @@ async def test_verify_user_password_get_user_info_fails():
     mock_request.app.state.config.verify_password_api_endpoint = (
         "https://verify.ibm.com/v2.0/factors/cloudDirectory/authnmethods/password"
     )
-    mock_request.app.state.config.ibm_verify_config.IBM_VERIFY_CLOUD_DIRECTORY_ID_SECRET = (
-        "directory-123"
-    )
 
     user_password = UserPassword(password="SecurePass123!")
 
@@ -347,9 +344,6 @@ async def test_verify_user_password_dispatch_fails():
     mock_request.app.state.request_client = AsyncMock(spec=AsyncClient)
     mock_request.app.state.config.verify_password_api_endpoint = (
         "https://verify.ibm.com/v2.0/factors/cloudDirectory/authnmethods/password"
-    )
-    mock_request.app.state.config.ibm_verify_config.IBM_VERIFY_CLOUD_DIRECTORY_ID_SECRET = (
-        "directory-123"
     )
 
     user_password = UserPassword(password="WrongPassword!")
@@ -389,9 +383,6 @@ async def test_verify_user_password_with_logging():
     mock_request.app.state.request_client = AsyncMock(spec=AsyncClient)
     mock_request.app.state.config.verify_password_api_endpoint = (
         "https://verify.ibm.com/v2.0/factors/cloudDirectory/authnmethods/password"
-    )
-    mock_request.app.state.config.ibm_verify_config.IBM_VERIFY_CLOUD_DIRECTORY_ID_SECRET = (
-        "directory-123"
     )
 
     user_password = UserPassword(password="SecurePass123!")
