@@ -110,3 +110,26 @@ class PasswordPolicyResponse(BaseModel):
 
 class PasswordPolicyResponse(ResponseModel):
     data: Optional[PasswordPolicyResponse] = None
+
+
+class UserPassword(BaseModel):
+    password: str = Field(..., min_length=12)
+
+
+class VerifiedUserPassword(BaseModel):
+    id: str
+
+
+class VerifiedUserPasswordResponse(ResponseModel):
+    data: VerifiedUserPassword
+
+
+class IBMIdentitySourceData(BaseModel):
+    id: str
+    name: str
+    type: str
+    location: str
+
+
+class IBMIdentitySourceResponse(BaseModel):
+    password: List[IBMIdentitySourceData]

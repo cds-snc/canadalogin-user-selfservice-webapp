@@ -39,7 +39,8 @@
     "CSIAI0021E": "Le mot de passe que vous avez spécifié a déjà été utilisé et ne peut pas être réutilisé.",
     "CSIBN0025E": "Le code de vérification n'est pas valide ou a expiré.",
     "CSIBN0028E": "Le code de vérification n'est pas valide ou a expiré.",
-    "CSIBN0021E": "Le code de vérification n'est pas valide."
+    "CSIBN0021E": "Le code de vérification n'est pas valide.",
+    "CSIBH0044E": "L’adresse courriel et le mot de passe ne correspondent pas."
   },
   "RegisterVerification": {
     "1": "Protégez votre compte avec la vérification en deux étapes",
