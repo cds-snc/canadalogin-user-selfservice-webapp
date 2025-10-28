@@ -124,7 +124,7 @@ class VerifiedUserPasswordResponse(ResponseModel):
     data: VerifiedUserPassword
 
 
-class IBMIdentitySourceItemsResponse(BaseModel):
+class IBMIdentitySourceData(BaseModel):
     id: str
     name: str
     type: str
@@ -132,4 +132,4 @@ class IBMIdentitySourceItemsResponse(BaseModel):
 
 
 class IBMIdentitySourceResponse(BaseModel):
-    password: List[IBMIdentitySourceItemsResponse]
+    password: List[IBMIdentitySourceData]
