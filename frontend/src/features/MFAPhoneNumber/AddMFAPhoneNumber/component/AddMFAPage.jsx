@@ -16,6 +16,7 @@ import AddMFAOtpVerification from "./AddMFAOtpVerification";
 import AddMFAPhoneNumber from "./AddMFAPhoneNumber";
 import AddSecondMFA from "./AddSecondMFA";
 import { authService } from "../../../../services/authService";
+import PasswordVerification from "../../../TransientOtp/components/PasswordVerification";
 
 const StepContent = ({ errorCode, errorPageJson, StepComponent }) => {
   let errorMessage = errorPageJson[errorCode] || "";
@@ -43,12 +44,13 @@ export default function AddMFAPage() {
   const [userPhoneFactors, setUserPhoneFactors] = useState([]);
   const [otpSentResponse, setOtpSentResponse] = useState(null);
   const [userOtpValue, setUserOtpValue] = useState("");
+  const [userPasswordValue, setUserPasswordValue] = useState("");
   const pageContentJson = getPageContent(language, PAGES.otpSelection);
 
   const [errorCode, setErrorCode] = useState("");
   const errorPageJson = getPageContent(language, PAGES.error);
 
-  const [wizardStep, setWizardStep] = useState("otpSelection");
+  const [wizardStep, setWizardStep] = useState("passwordVerification");
   const [localLoading, setLocalLoading] = useState(true);
   const { userProfile } = state;
   const { id, userName } = userProfile ?? {};
@@ -107,6 +109,7 @@ export default function AddMFAPage() {
       if (response && response.data && response.data.id) {
         handlePhoneForm("mfaId", response.data.id);
       }
+      setErrorCode("");
       return response;
     } catch (error) {
       if (error && error.data && error.data.message) {
@@ -136,6 +139,7 @@ export default function AddMFAPage() {
           setWizardStep("addMFAValidation");
         }
       }
+      setErrorCode("");
     } catch (error) {
       if (error && error.data && error.data.message) {
         setErrorCode(error.data.message);
@@ -173,6 +177,7 @@ export default function AddMFAPage() {
         } else {
           setWizardStep("addSecondMFA");
         }
+        setErrorCode("");
       }
     } catch (error) {
       if (error && error.data && error.data.message) {
@@ -183,8 +188,6 @@ export default function AddMFAPage() {
 
   const deleteMFA = async () => {
     setLocalLoading(true);
-    setErrorCode("");
-
     try {
       const payload = {
         id: phoneFormData.mfaId,
@@ -195,6 +198,7 @@ export default function AddMFAPage() {
     } catch (error) {
       if (error && error.data && error.data.message) {
         setErrorCode(error.data.message);
+        setErrorCode("");
       }
     } finally {
       setLocalLoading(false);
@@ -213,6 +217,7 @@ export default function AddMFAPage() {
       const response = await authService.transientOtpSend(userData);
       if (response && response.success) {
         setOtpSentResponse(response.data);
+        setErrorCode("");
       }
     } catch (err) {
       if (err && err.data && err.data.message) {
@@ -233,6 +238,38 @@ export default function AddMFAPage() {
       const response = await authService.transientOtpVerify(userData);
       if (response && response.success) {
         setWizardStep("addMFANumber");
+        setErrorCode("");
+      }
+    } catch (err) {
+      if (err && err.data && err.data.message) {
+        setErrorCode(err.data.message);
+      }
+    }
+  };
+
+  const validatePassword = async (userPasswordValue) => {
+    try {
+      const passwordPolicyResponse = await authService.requestPasswordPolicy();
+      if (passwordPolicyResponse.success) {
+        const passwordPolicy = {
+          min: passwordPolicyResponse.data.pwdMinLength,
+          max: passwordPolicyResponse.data.pwdMaxLength,
+        };
+        if (
+          !userPasswordValue ||
+          userPasswordValue.length < passwordPolicy.min ||
+          userPasswordValue.length > passwordPolicy.max
+        ) {
+          setErrorCode("5");
+          return;
+        }
+      }
+      const response = await authService.verifyPassword({
+        password: userPasswordValue,
+      });
+      if (response && response.success) {
+        setWizardStep("otpSelection");
+        setErrorCode("");
       }
     } catch (err) {
       if (err && err.data && err.data.message) {
@@ -278,6 +315,18 @@ export default function AddMFAPage() {
   }, [phoneFormData.trxnId]);
 
   const steps = {
+    passwordVerification: (
+      <PasswordVerification
+        userPasswordValue={userPasswordValue}
+        setUserPasswordValue={setUserPasswordValue}
+        onCancel={async () =>
+          await navigateHelper(backToManage2FAVerificationsPage)
+        }
+        validatePassword={validatePassword}
+        errorCode={errorCode}
+        parentPage={PAGES.addMFAPage}
+      />
+    ),
     otpSelection: (
       <OtpSelection
         userProfile={userProfile}

@@ -13,6 +13,7 @@ import OtpVerification from "../../../TransientOtp/components/OtpVerification";
 import { deleteMFAPhoneNumberApi } from "../api/DeleteMFAPhoneNumberAPI";
 import DeleteMFAPhoneNumberConfirm from "./DeleteMFAPhoneNumberConfirm";
 import { authService } from "../../../../services/authService";
+import PasswordVerification from "../../../TransientOtp/components/PasswordVerification";
 
 const StepContent = ({ errorCode, errorPageJson, StepComponent }) => {
   let errorMessage = errorPageJson[errorCode] || "";
@@ -41,13 +42,14 @@ export default function DeleteMFAPage() {
   const [userPhoneFactors, setUserPhoneFactors] = useState([]);
 
   const [otpSentResponse, setOtpSentResponse] = useState(null);
+  const [userPasswordValue, setUserPasswordValue] = useState("");
   const [userOtpValue, setUserOtpValue] = useState("");
   const pageContentJson = getPageContent(language, PAGES.otpSelection);
 
   const [errorCode, setErrorCode] = useState("");
   const errorPageJson = getPageContent(language, PAGES.error);
 
-  const [wizardStep, setWizardStep] = useState("otpSelection");
+  const [wizardStep, setWizardStep] = useState("passwordVerification");
   const [localLoading, setLocalLoading] = useState(true);
   const { userProfile } = state;
   const { id, userName } = userProfile ?? {};
@@ -89,8 +91,6 @@ export default function DeleteMFAPage() {
   };
 
   const deleteMFA = async () => {
-    setErrorCode("");
-
     try {
       await Promise.all(
         phoneFormData.mfaFactorsToDelete.map((mfaFactor) =>
@@ -100,6 +100,7 @@ export default function DeleteMFAPage() {
           }),
         ),
       );
+      setErrorCode("");
     } catch (error) {
       if (error && error.data && error.data.message) {
         setErrorCode(error.data.message);
@@ -120,6 +121,7 @@ export default function DeleteMFAPage() {
       if (response && response.success) {
         setOtpSentResponse(response.data);
       }
+      setErrorCode("");
     } catch (err) {
       if (err && err.data && err.data.message) {
         setErrorCode(err.data.message);
@@ -139,6 +141,38 @@ export default function DeleteMFAPage() {
       const response = await authService.transientOtpVerify(userData);
       if (response && response.success) {
         setWizardStep("deleteMFAPhoneNumberConfirm");
+      }
+      setErrorCode("");
+    } catch (err) {
+      if (err && err.data && err.data.message) {
+        setErrorCode(err.data.message);
+      }
+    }
+  };
+
+  const validatePassword = async (userPasswordValue) => {
+    try {
+      const passwordPolicyResponse = await authService.requestPasswordPolicy();
+      if (passwordPolicyResponse.success) {
+        const passwordPolicy = {
+          min: passwordPolicyResponse.data.pwdMinLength,
+          max: passwordPolicyResponse.data.pwdMaxLength,
+        };
+        if (
+          !userPasswordValue ||
+          userPasswordValue.length < passwordPolicy.min ||
+          userPasswordValue.length > passwordPolicy.max
+        ) {
+          setErrorCode("5");
+          return;
+        }
+      }
+      const response = await authService.verifyPassword({
+        password: userPasswordValue,
+      });
+      if (response && response.success) {
+        setWizardStep("otpSelection");
+        setErrorCode("");
       }
     } catch (err) {
       if (err && err.data && err.data.message) {
@@ -200,6 +234,18 @@ export default function DeleteMFAPage() {
   }, [factorIds]);
 
   const steps = {
+    passwordVerification: (
+      <PasswordVerification
+        userPasswordValue={userPasswordValue}
+        setUserPasswordValue={setUserPasswordValue}
+        onCancel={async () =>
+          await navigateHelper(backToManage2FAVerificationsPage)
+        }
+        validatePassword={validatePassword}
+        errorCode={errorCode}
+        parentPage={PAGES.addMFAPage}
+      />
+    ),
     otpSelection: (
       <OtpSelection
         userProfile={userProfile}

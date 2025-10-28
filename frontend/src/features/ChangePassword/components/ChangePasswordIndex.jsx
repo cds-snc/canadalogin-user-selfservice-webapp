@@ -15,8 +15,10 @@ import { path } from "../../../utils/routeHelpers.js";
 import OtpSelection from "../../TransientOtp/components/OtpSelection.jsx";
 import OtpVerification from "../../TransientOtp/components/OtpVerification.jsx";
 import { passwordUpdate } from "../api/passwordUpdate.jsx";
+import { authService } from "../../../services/authService.jsx";
+import PasswordVerification from "../../TransientOtp/components/PasswordVerification.jsx";
 
-const defaulPasswordUpdatetStep = "otpSelection";
+const defaulPasswordUpdatetStep = "passwordVerification";
 
 export default function ChangePasswordIndex() {
   const { language } = useParams();
@@ -30,6 +32,7 @@ export default function ChangePasswordIndex() {
   const [userPhoneFactors, setUserPhoneFactors] = useState([]);
 
   const [userOtpValue, setUserOtpValue] = useState("");
+  const [userPasswordValue, setUserPasswordValue] = useState("");
   const pageContentJson = getPageContent(language, PAGES.otpSelection);
 
   const [passwordUpdateStep, setPasswordUpdateStep] = useState(
@@ -72,6 +75,7 @@ export default function ChangePasswordIndex() {
       if (response && response.success) {
         setOtpSentResponse(response.data);
       }
+      setErrorCode("");
     } catch (err) {
       if (err && err.data && err.data.message) {
         setErrorCode(err.data.message);
@@ -89,6 +93,38 @@ export default function ChangePasswordIndex() {
       );
       if (response && response.success) {
         setPasswordUpdateStep("passwordChange");
+      }
+      setErrorCode("");
+    } catch (err) {
+      if (err && err.data && err.data.message) {
+        setErrorCode(err.data.message);
+      }
+    }
+  };
+
+  const validatePassword = async (userPasswordValue) => {
+    try {
+      const passwordPolicyResponse = await authService.requestPasswordPolicy();
+      if (passwordPolicyResponse.success) {
+        const passwordPolicy = {
+          min: passwordPolicyResponse.data.pwdMinLength,
+          max: passwordPolicyResponse.data.pwdMaxLength,
+        };
+        if (
+          !userPasswordValue ||
+          userPasswordValue.length < passwordPolicy.min ||
+          userPasswordValue.length > passwordPolicy.max
+        ) {
+          setErrorCode("5");
+          return;
+        }
+      }
+      const response = await authService.verifyPassword({
+        password: userPasswordValue,
+      });
+      if (response && response.success) {
+        setPasswordUpdateStep("otpSelection");
+        setErrorCode("");
       }
     } catch (err) {
       if (err && err.data && err.data.message) {
@@ -113,7 +149,7 @@ export default function ChangePasswordIndex() {
           navigate(backToSecuritySettingsPage);
         }
       } catch (err) {
-        console.log("err", err);
+        console.error("err", err);
       }
     };
 
@@ -131,6 +167,15 @@ export default function ChangePasswordIndex() {
   }, []);
 
   const steps = {
+    passwordVerification: (
+      <PasswordVerification
+        userPasswordValue={userPasswordValue}
+        setUserPasswordValue={setUserPasswordValue}
+        onCancel={async () => await navigate(backToSecuritySettingsPage)}
+        validatePassword={validatePassword}
+        errorCode={errorCode}
+      />
+    ),
     otpSelection: (
       <OtpSelection
         userProfile={userProfile}

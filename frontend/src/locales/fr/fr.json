@@ -468,5 +468,15 @@
     "4": "pour le numéro",
     "5": "appel vocal",
     "6": "message texte"
+  },
+  "PasswordVerification": {
+    "1": "Veuillez vous authentifier",
+    "2": "Pour modifier votre mot de passe,",
+    "3": "entrez d’abord votre mot de passe actuel.",
+    "4": "Mot de passe",
+    "5": "Mot de passe oublié?",
+    "6": "Réinitialiser le mot de passe",
+    "7": "Pour ajouter un numéro de téléphone,",
+    "8": "Pour supprimer un numéro de téléphone,"
   }
 }
