@@ -24,7 +24,7 @@ async def dispatch_get_cloud_directory_Id(
     """
     The Cloud Directory ID is required to verify user password against IBM Verify.
 
-    Documentation: hhttps://docs.verify.ibm.com/verify/reference/getpasswordmethods
+    Documentation: https://docs.verify.ibm.com/verify/reference/getpasswordmethods
 
     Args:
         http_client: Async HTTP client
