@@ -17,3 +17,4 @@ itsdangerous==2.2.0
 starsessions==2.2.1
 PyJWT==2.10.1
 redis==6.4.0
+Secweb==1.25.2
