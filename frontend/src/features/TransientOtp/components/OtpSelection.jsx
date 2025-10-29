@@ -9,7 +9,10 @@ import {
 } from "@cdssnc/gcds-components-react";
 import { useParams } from "react-router";
 
-import { getPageContent } from "../../../utils/functions.jsx";
+import {
+  formatPhoneNumber,
+  getPageContent,
+} from "../../../utils/functions.jsx";
 import { gcHelpCentreLinks } from "../../../utils/gcHelpCentreLinks.jsx";
 
 import { FLOW_TYPES, PAGES } from "../../../utils/constants.jsx";
@@ -34,10 +37,11 @@ export default function OtpSelection({
     const smsPhoneFactors = userPhoneFactors?.filter(
       (factor) => factor.type === FLOW_TYPES.sms,
     );
+    console.log("smsPhoneFactors", smsPhoneFactors);
 
     // Add all SMS factors as radio options
     smsPhoneFactors?.forEach((smsPhoneFactor) => {
-      const smsLabel = `${pageContentJson["8"]} ${smsPhoneFactor.phoneNumber}`;
+      const smsLabel = `${pageContentJson["8"]} ${formatPhoneNumber(smsPhoneFactor.phoneNumber)}`;
       const smsOtpRadioOption = {
         label: smsLabel,
         id: `${FLOW_TYPES.sms}-${smsPhoneFactor.id}`,
@@ -59,7 +63,7 @@ export default function OtpSelection({
 
     // Add all Voice factors as radio options
     voicePhoneFactors?.forEach((voicePhoneFactor) => {
-      const voiceLabel = `${pageContentJson["9"]} ${voicePhoneFactor.phoneNumber}`;
+      const voiceLabel = `${pageContentJson["9"]} ${formatPhoneNumber(voicePhoneFactor.phoneNumber)}`;
       const voiceOtpRadioOption = {
         label: voiceLabel,
         id: `${FLOW_TYPES.voice}-${voicePhoneFactor.id}`,

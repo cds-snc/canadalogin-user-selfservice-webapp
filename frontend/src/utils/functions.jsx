@@ -108,3 +108,16 @@ export function convertLanguageToLanguageCode(updatedLanguage) {
     ) || "en"
   );
 }
+
+export function formatPhoneNumber(phoneNumber) {
+  // First, handle format: XXX XXX XXXX -> (XXX) XXX-XXXX
+  if (/^[*\d]{3}\s[*\d]{3}\s[*\d]{4}$/.test(phoneNumber)) {
+    return phoneNumber.replace(
+      /^([*\d]{3})\s([*\d]{3})\s([*\d]{4})$/,
+      "($1) $2-$3",
+    );
+  }
+
+  // Then, handle format: (XXX) XXX XXXX -> (XXX) XXX-XXXX
+  return phoneNumber.replace(/(\([*\d]{3}\)\s[*\d]{3})\s([*\d]{4})/, "$1-$2");
+}
