@@ -13,15 +13,13 @@ import { PAGES } from "../../../utils/constants.jsx";
 import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 import VerifiedBadge from "../../../components/Badges/VerifiedBadge.jsx";
 import { path } from "../../../utils/routeHelpers.js";
-import { formatPhoneNumber } from "../../../utils/functions.jsx";
 
 const DisplayPhoneNumbers = ({ phoneNumbers }) => {
   return (
     <>
       <GcdsGrid columns="1fr">
         {phoneNumbers.map((phoneNumber, index) => {
-          let profilePhoneNumber = formatPhoneNumber(phoneNumber.value);
-          console.log(profilePhoneNumber);
+          let profilePhoneNumber = phoneNumber.value;
           const isLast = index === phoneNumbers.length - 1;
 
           try {

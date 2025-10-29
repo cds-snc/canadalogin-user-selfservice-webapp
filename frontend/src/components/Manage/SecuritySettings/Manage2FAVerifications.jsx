@@ -11,10 +11,7 @@ import { useLocation, useParams } from "react-router";
 import { otpFactors } from "../../../features/TransientOtp/api/otpFactors.jsx";
 import { useNavigateHelper } from "../../../hooks/useNavigate.js";
 import { PAGES } from "../../../utils/constants.jsx";
-import {
-  formatPhoneNumber,
-  getPageContent,
-} from "../../../utils/functions.jsx";
+import { getPageContent } from "../../../utils/functions.jsx";
 import { path } from "../../../utils/routeHelpers.js";
 import Loader from "../../Layout/Loading.jsx";
 import { useUser } from "../../Providers/useUser.js";
@@ -82,7 +79,6 @@ export default function Manage2FAVerifications() {
   }, []);
   const phoneFactorsComponent = Object.entries(userPhoneFactorsMap).map(
     ([phoneNumber, factors], index) => {
-      const formattedPhoneNumber = formatPhoneNumber(phoneNumber);
       const availableFactorsComponent = factors?.map((factor, idx) => {
         return (
           <li key={idx}>
@@ -93,7 +89,7 @@ export default function Manage2FAVerifications() {
       return (
         <GcdsContainer key={index}>
           <GcdsText>
-            <strong>{`${formattedPhoneNumber}`}</strong>
+            <strong>{`${phoneNumber}`}</strong>
           </GcdsText>
           <GcdsText>{pageContent["6"]}</GcdsText>
           <ul>{availableFactorsComponent}</ul>
@@ -106,7 +102,7 @@ export default function Manage2FAVerifications() {
                 navigateHelper(path(PAGES.deleteMFAPage, { language }), false, {
                   phoneNumber: phoneNumber,
                   factorIds: factors.map((factor) => factor.id),
-                  formattedPhoneNumber: `+1 ${formattedPhoneNumber}`,
+                  formattedPhoneNumber: `+1 ${phoneNumber}`,
                 });
               }}
             >

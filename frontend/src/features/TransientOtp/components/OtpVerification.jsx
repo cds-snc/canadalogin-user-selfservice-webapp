@@ -8,14 +8,10 @@ import {
   GcdsHeading,
   GcdsInput,
   GcdsLink,
-  GcdsNotice,
   GcdsText,
 } from "@cdssnc/gcds-components-react";
 import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
-import {
-  formatPhoneNumber,
-  getPageContent,
-} from "../../../utils/functions.jsx";
+import { getPageContent } from "../../../utils/functions.jsx";
 import { path } from "../../../utils/routeHelpers.js";
 
 import { useParams } from "react-router";
@@ -110,9 +106,7 @@ export default function OtpVerification({
               ? pageContentJson["2"]
               : pageContentJson["23"]}
           &nbsp;
-          <strong>
-            {formatPhoneNumber(userSelectedMfaFactor.phoneNumber)}
-          </strong>
+          <strong>{userSelectedMfaFactor.phoneNumber}</strong>
         </GcdsText>
         <GcdsText>
           {userMfaType === FLOW_TYPES.voice
