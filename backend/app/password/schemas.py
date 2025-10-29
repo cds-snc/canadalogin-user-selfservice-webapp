@@ -93,7 +93,7 @@ class IBMVerifyPasswordPolicy(BaseModel):
     ibm_pwdPolicy: Optional[bool] = None
 
 
-class PasswordPolicyResponse(BaseModel):
+class PasswordPolicy(BaseModel):
     passwordMinAlphaChars: int
     passwordMinOtherChars: int
     pwdMinAge: int
@@ -109,7 +109,7 @@ class PasswordPolicyResponse(BaseModel):
 
 
 class PasswordPolicyResponse(ResponseModel):
-    data: Optional[PasswordPolicyResponse] = None
+    data: Optional[PasswordPolicy] = None
 
 
 class UserPassword(BaseModel):
