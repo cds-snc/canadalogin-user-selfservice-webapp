@@ -1,22 +1,31 @@
+import phonenumbers
 from app.users.schemas import MetaDataTypeValue
 
 
-def mask_phone_number(phone_number: str) -> str:
-    """
-    Mask the phone number except the last 4 digits.
-    Returns a masked string like (***) *** 1234.
-    """
-
-    # Extract phone number string only
-    digits = "".join(filter(str.isdigit, phone_number))
+def mask_phone_number(phone_number: str, region: str = "US") -> str:
+    parsed = phonenumbers.parse(phone_number, region)
+    country_code = f"+{parsed.country_code}"
+    formatted_national = phonenumbers.format_number(
+        parsed, phonenumbers.PhoneNumberFormat.NATIONAL
+    )
+    # Mask all digits except the last 4
+    digits = [c for c in formatted_national if c.isdigit()]
     if len(digits) < 4:
         raise ValueError("Phone number must have at least 4 digits")
 
-    # Mask everything except the last 4
     last4 = digits[-4:]
-    masked = f"(***) *** {last4}"
-
-    return masked
+    masked = ""
+    digit_count = 0
+    for c in formatted_national:
+        if c.isdigit():
+            if digit_count < len(digits) - 4:
+                masked += "*"
+            else:
+                masked += last4[digit_count - (len(digits) - 4)]
+            digit_count += 1
+        else:
+            masked += c
+    return f"{country_code} {masked}"
 
 
 def mask_contact_phone_numbers(

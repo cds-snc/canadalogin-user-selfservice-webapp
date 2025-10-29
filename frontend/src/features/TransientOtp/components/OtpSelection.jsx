@@ -37,7 +37,6 @@ export default function OtpSelection({
     const smsPhoneFactors = userPhoneFactors?.filter(
       (factor) => factor.type === FLOW_TYPES.sms,
     );
-    console.log("smsPhoneFactors", smsPhoneFactors);
 
     // Add all SMS factors as radio options
     smsPhoneFactors?.forEach((smsPhoneFactor) => {

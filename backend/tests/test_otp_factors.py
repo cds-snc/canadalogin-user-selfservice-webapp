@@ -13,9 +13,9 @@ from app.users.schemas import (
 )
 from app.users.services.otp_factors import (
     get_user_otp_factors,
-    mask_phone_last4,
     parse_phone_auth_factors_response,
 )
+from app.utils.mask_phone_number import mask_phone_number
 from fastapi import HTTPException
 from httpx import AsyncClient
 
@@ -23,17 +23,22 @@ profile_import_path = "app.users.services.otp_factors.get_my_profile"
 
 
 @pytest.mark.asyncio
-async def test_mask_phone_last4_valid():
+async def test_mask_phone_number_valid():
     phone = "+1 234-567-8901"
-    masked = await mask_phone_last4(phone)
-    assert masked == "*** *** 8901"
+    masked = mask_phone_number(phone)
+    assert masked == "+1 (***) ***-8901"
 
 
 @pytest.mark.asyncio
-async def test_mask_phone_last4_invalid():
+async def test_mask_phone_number_invalid():
+    import phonenumbers
+
     phone = "invalid-phone"
-    masked = await mask_phone_last4(phone)
-    assert masked.startswith("Invalid phone number")
+    with pytest.raises(
+        phonenumbers.NumberParseException,
+        match="The string supplied did not seem to be a phone number.",
+    ):
+        mask_phone_number(phone)
 
 
 @pytest.mark.asyncio
