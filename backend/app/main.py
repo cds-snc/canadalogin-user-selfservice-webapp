@@ -26,7 +26,7 @@ from app.password import v1_router as v1_password_router
 from app.otp import v1_router as v1_otp_router
 from app.auth.services import oidc_config
 
-from Secweb import SecWeb
+# from Secweb import SecWeb
 
 configuration = get_configuration()
 
@@ -106,24 +106,24 @@ app = FastAPI(
     contact=CONTACT_INFO,
 )
 
-if configuration.ENVIRONMENT != "local":
-    SecWeb(app=app)
-else:
-    SecWeb(
-        app=app,
-        Option={
-            "csp": {
-                "default-src": ["'self'"],
-                "img-src": ["'self'", "data:", "https://fastapi.tiangolo.com"],
-                "font-src": ["'self'", "data:", "https://cdn.jsdelivr.net"],
-                "style-src": ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
-                "script-src": ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
-            },
-            "coep": "unsafe-none",
-            "coop": "unsafe-none",
-            "hsts": False,
-        },
-    )
+# if configuration.ENVIRONMENT != "local":
+#     SecWeb(app=app)
+# else:
+#     SecWeb(
+#         app=app,
+#         Option={
+#             "csp": {
+#                 "default-src": ["'self'"],
+#                 "img-src": ["'self'", "data:", "https://fastapi.tiangolo.com"],
+#                 "font-src": ["'self'", "data:", "https://cdn.jsdelivr.net"],
+#                 "style-src": ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
+#                 "script-src": ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
+#             },
+#             "coep": "unsafe-none",
+#             "coop": "unsafe-none",
+#             "hsts": False,
+#         },
+#     )
 
 # Determine session domain
 # ROOT_DOMAIN is .<ROOT_DOMAIN> example: .signin-connexion.cdssandbox.xyz
