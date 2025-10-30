@@ -160,6 +160,7 @@ export default function AddMFAPage() {
 
       const response = await addMFAPhoneNumberApi.verifyMFAOTP(payload);
       if (response && response.success) {
+        console.log(userPhoneFactorsMap);
         const visibleDigits = phoneFormData.phoneNumber.slice(-4);
         if (
           visibleDigits in userPhoneFactorsMap &&
@@ -293,7 +294,7 @@ export default function AddMFAPage() {
           setUserPhoneFactors(userPhoneFactors);
           setUserSelectedMfaFactor(userPhoneFactors[0]);
           const userPhoneFactorsMap = userPhoneFactors.reduce((acc, factor) => {
-            const visibleDigits = factor.phoneNumber.replace(/\D/g, "");
+            const visibleDigits = factor.phoneNumber.slice(-4);
             acc[visibleDigits] = acc[visibleDigits]
               ? [...acc[visibleDigits], factor.type]
               : [factor.type];
@@ -385,8 +386,9 @@ export default function AddMFAPage() {
         requestNewOtpCode={async () => {
           await sendMFAOtp({ reSendOtpCode: true });
         }}
-        onBack={() => {
+        onBack={async () => {
           setErrorCode("");
+          await deleteMFA();
           setWizardStep("addMFANumber");
         }}
         onUseDifferentPhoneNumber={async () => {

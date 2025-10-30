@@ -1,7 +1,6 @@
 import logging
 from datetime import datetime
 
-import phonenumbers
 from app.config import get_configuration
 from app.password.schemas import OtpType
 from app.users.schemas import (
@@ -11,38 +10,13 @@ from app.users.schemas import (
 )
 from app.users.services.get_my_profile import get_my_profile
 from app.utils.access_token import get_admin_token, get_auth_request_headers
+from app.utils.mask_phone_number import mask_phone_number
 from app.utils.request_error_handler import RequestErrorHandler
 from fastapi import HTTPException
 from httpx import AsyncClient
 from pydantic import ValidationError
 
 logger = logging.getLogger(__name__)
-
-
-async def mask_phone_last4(phone: str, region: str = "US") -> str:
-    """
-    Parse and format a phone number with phonenumbers,
-    but mask all except the last 4 digits.
-    """
-    try:
-        # Parse the phone number
-        parsed = phonenumbers.parse(phone, region)
-
-        # Format ((123) 456-7890) - also removes the country code
-        formatted_to_string = phonenumbers.format_number(
-            parsed, phonenumbers.PhoneNumberFormat.NATIONAL
-        )
-
-        # Extract phone number string only
-        digits = "".join(filter(str.isdigit, formatted_to_string))
-
-        # Mask everything except the last 4
-        last4 = digits[-4:]
-        masked = f"*** *** {last4}"
-
-        return masked
-    except Exception as e:
-        return f"Invalid phone number: {str(e)}"
 
 
 async def parse_phone_auth_factors_response(
@@ -67,7 +41,7 @@ async def parse_phone_auth_factors_response(
             if not phone_number:
                 logger.warning("Factor %s has no phoneNumber", factor.id)
                 continue
-            masked_phonenumber = await mask_phone_last4(phone_number)
+            masked_phonenumber = mask_phone_number(phone_number)
             phone_factors.append(
                 {
                     "id": factor.id,

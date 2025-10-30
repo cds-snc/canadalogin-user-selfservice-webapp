@@ -19,7 +19,7 @@ const DisplayPhoneNumbers = ({ phoneNumbers }) => {
     <>
       <GcdsGrid columns="1fr">
         {phoneNumbers.map((phoneNumber, index) => {
-          let profilePhoneNumber = `${phoneNumber.value}`;
+          let profilePhoneNumber = phoneNumber.value;
           const isLast = index === phoneNumbers.length - 1;
 
           try {
