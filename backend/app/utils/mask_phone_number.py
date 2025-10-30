@@ -3,6 +3,16 @@ from app.users.schemas import MetaDataTypeValue
 
 
 def mask_phone_number(phone_number: str, region: str = "US") -> str:
+    """
+    Masks and formats the given phone_number according to the region, showing only the country code and last 4 digits.
+
+    Args:
+        phone_number: a phone number string in any format, "+19876541234" or "+1 (613) 123-4567"
+        region: the localization of the phone number, used for formatting
+
+    Returns:
+        str: masked and formatted phone number string "+1 (***) ***-1234"
+    """
     parsed = phonenumbers.parse(phone_number, region)
     country_code = f"+{parsed.country_code}"
     formatted_national = phonenumbers.format_number(
