@@ -46,7 +46,6 @@ export default function Manage2FAVerifications() {
         const response = await otpFactors.getUserOtpPhoneFactors(
           state.userProfile.id,
         );
-        console.log("response", response);
         if (
           response &&
           response.success &&
