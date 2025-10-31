@@ -43,6 +43,17 @@ export function getPageContent(language, pageName) {
   return engJson[pageName];
 }
 
+export function getContentWithVariables(content, variables) {
+  let updatedContent = content;
+
+  Object.keys(variables).forEach((key) => {
+    const regex = new RegExp(`{${key}}`, "g");
+    updatedContent = updatedContent.replace(regex, variables[key]);
+  });
+
+  return updatedContent;
+}
+
 export function getFooter(language) {
   if (language === AVAILABLE_LANGUAGES.fr) return FOOTERS.default.fr;
 

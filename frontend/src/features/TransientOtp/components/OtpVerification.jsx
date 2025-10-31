@@ -83,15 +83,9 @@ export default function OtpVerification({
   }, [id]);
 
   const userMfaType = userSelectedMfaFactor?.type;
-  const errorMessage = errorPageJson[errorCode] || "";
+  const errorMessage = errorPageJson[errorCode] || errorPageJson[errorCodeExternal] || "";
   return (
     <GcdsContainer>
-      {errorMessage != "" && (
-        <GcdsErrorMessage messageId="message-props">
-          {errorMessage}
-        </GcdsErrorMessage>
-      )}
-
       <GcdsContainer>
         <GcdsHeading tag="h1" lang={language}>
           {userMfaType === FLOW_TYPES.email
