@@ -108,11 +108,10 @@ async def dispatch_user_auth_factors(
 
         user_otp_factors_api_endpoint = settings.user_otp_factors_api_endpoint
 
-        search_params = {
-            "enabled": True,
-            "validated": True,
-            "search": f'userId="{user_profile_id}"',
-        }
+        # Combine all search parameters into a single 'search' parameter, URL-encoded following the specs of IBM Verify docs
+        # https://docs.verify.ibm.com/verify/reference/listfactorenrollments_20
+        search_value = f'userId="{user_profile_id}"&enabled=true&validated=true'
+        search_params = {"search": search_value}
         logger.info(f"get user auth factors, userid: {user_profile_id}")
 
         otp_factor_response = await global_http_client.get(
