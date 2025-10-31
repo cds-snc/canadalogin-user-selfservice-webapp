@@ -583,6 +583,12 @@ describe("AddMFAPage Unit Tests", () => {
       const addMfaNextButton = screen.getByTestId("add-mfa-phone-number-next");
       addMfaNextButton.click();
 
+      // Wait for sendMFAOTP to have been called (ensures trxnId is set)
+      await waitFor(() => {
+        expect(addMFAPhoneNumberApi.sendMFAOTP).toHaveBeenCalled();
+      });
+
+      // Wait for the next step to be rendered
       await waitFor(() => {
         expect(
           screen.getByTestId("add-mfa-otp-verification"),

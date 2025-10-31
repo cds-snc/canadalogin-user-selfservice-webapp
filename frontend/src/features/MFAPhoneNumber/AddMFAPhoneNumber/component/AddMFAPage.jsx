@@ -160,7 +160,6 @@ export default function AddMFAPage() {
 
       const response = await addMFAPhoneNumberApi.verifyMFAOTP(payload);
       if (response && response.success) {
-        console.log(userPhoneFactorsMap);
         const visibleDigits = phoneFormData.phoneNumber.slice(-4);
         if (
           visibleDigits in userPhoneFactorsMap &&
