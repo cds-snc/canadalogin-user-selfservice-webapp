@@ -796,15 +796,17 @@ export const CompleteAddMFAFlowSMS = (() => {
           await expect(hasVerificationText).toBeTruthy();
         });
 
-        const gcdsInputs = canvasElement.querySelectorAll("gcds-input");
-        for (const input of gcdsInputs) {
-          if (input.shadowRoot) {
+        await waitFor(async () => {
+          const gcdsInputs = canvasElement.querySelector("gcds-input");
+          await expect(gcdsInputs).toBeInTheDocument();
+          if (gcdsInputs.shadowRoot) {
             const shadowInput =
-              input.shadowRoot.querySelector("input#verificationCode") ||
-              input.shadowRoot.querySelector(
+              gcdsInputs.shadowRoot.querySelector("input#verificationCode") ||
+              gcdsInputs.shadowRoot.querySelector(
                 'input[name="verificationCode"]',
               ) ||
-              input.shadowRoot.querySelector('input[maxlength="6"]');
+              gcdsInputs.shadowRoot.querySelector('input[maxlength="6"]');
+            await expect(shadowInput).toBeInTheDocument();
             if (shadowInput) {
               // Clear the field by setting value directly (avoid userEvent.clear which can fail)
               shadowInput.value = "";
@@ -812,45 +814,25 @@ export const CompleteAddMFAFlowSMS = (() => {
 
               // Type the OTP code
               await userEvent.type(shadowInput, "654321");
-
-              // Trigger the gcdsInput event on the gcds-input component to update parent state
-              const gcdsInputEvent = new CustomEvent("gcdsInput", {
-                bubbles: true,
-                detail: { value: "654321" },
-              });
-              input.dispatchEvent(gcdsInputEvent);
             }
           }
-        }
+        });
 
-        continueButton = canvas.getByText(/Continue/i);
         // Wait for the input to be ready
         await waitFor(async () => {
+          continueButton = canvas.getByText(/Continue/i);
           await expect(continueButton).toBeInTheDocument();
-        });
-        if (
-          continueButton &&
-          continueButton.tagName === "GCDS-BUTTON" &&
-          continueButton.shadowRoot
-        ) {
-          const actualButton =
-            continueButton.shadowRoot.querySelector('button[part="button"]') ||
-            continueButton.shadowRoot.querySelector("button");
-          if (actualButton) {
-            // Now the button should be enabled since userOtpValue should be "654321"
-            // Dispatch gcdsClick event to continue
-            const gcdsClickEvent = new CustomEvent("gcdsClick", {
-              bubbles: true,
-              cancelable: true,
-              detail: {},
-            });
-            Object.defineProperty(gcdsClickEvent, "preventDefault", {
-              value: () => {},
-              writable: false,
-            });
-            continueButton.dispatchEvent(gcdsClickEvent);
+          if (continueButton && continueButton.shadowRoot) {
+            const actualButton =
+              continueButton.shadowRoot.querySelector(
+                'button[part="button"]',
+              ) || continueButton.shadowRoot.querySelector("button");
+            if (actualButton) {
+              await expect(actualButton).toBeInTheDocument();
+              await userEvent.click(actualButton);
+            }
           }
-        }
+        });
       });
 
       await step("Enter new MFA phone number", async () => {
@@ -1624,13 +1606,17 @@ export const UseDifferentPhoneNumber = (() => {
         await expect(hasVerificationText).toBeTruthy();
       });
 
-      const gcdsInputs = canvasElement.querySelectorAll("gcds-input");
-      for (const input of gcdsInputs) {
-        if (input.shadowRoot) {
+      await waitFor(async () => {
+        const gcdsInputs = canvasElement.querySelector("gcds-input");
+        await expect(gcdsInputs).toBeInTheDocument();
+        if (gcdsInputs.shadowRoot) {
           const shadowInput =
-            input.shadowRoot.querySelector("input#verificationCode") ||
-            input.shadowRoot.querySelector('input[name="verificationCode"]') ||
-            input.shadowRoot.querySelector('input[maxlength="6"]');
+            gcdsInputs.shadowRoot.querySelector("input#verificationCode") ||
+            gcdsInputs.shadowRoot.querySelector(
+              'input[name="verificationCode"]',
+            ) ||
+            gcdsInputs.shadowRoot.querySelector('input[maxlength="6"]');
+          await expect(shadowInput).toBeInTheDocument();
           if (shadowInput) {
             // Clear the field by setting value directly (avoid userEvent.clear which can fail)
             shadowInput.value = "";
@@ -1638,45 +1624,25 @@ export const UseDifferentPhoneNumber = (() => {
 
             // Type the OTP code
             await userEvent.type(shadowInput, "654321");
-
-            // Trigger the gcdsInput event on the gcds-input component to update parent state
-            const gcdsInputEvent = new CustomEvent("gcdsInput", {
-              bubbles: true,
-              detail: { value: "654321" },
-            });
-            input.dispatchEvent(gcdsInputEvent);
           }
         }
-      }
+      });
 
-      let continueButton = canvas.getByText(/Continue/i);
       // Wait for the input to be ready
       await waitFor(async () => {
+        let continueButton = canvas.getByText(/Continue/i);
+        continueButton = canvas.getByText(/Continue/i);
         await expect(continueButton).toBeInTheDocument();
-      });
-      if (
-        continueButton &&
-        continueButton.tagName === "GCDS-BUTTON" &&
-        continueButton.shadowRoot
-      ) {
-        const actualButton =
-          continueButton.shadowRoot.querySelector('button[part="button"]') ||
-          continueButton.shadowRoot.querySelector("button");
-        if (actualButton) {
-          // Now the button should be enabled since userOtpValue should be "654321"
-          // Dispatch gcdsClick event to continue
-          const gcdsClickEvent = new CustomEvent("gcdsClick", {
-            bubbles: true,
-            cancelable: true,
-            detail: {},
-          });
-          Object.defineProperty(gcdsClickEvent, "preventDefault", {
-            value: () => {},
-            writable: false,
-          });
-          continueButton.dispatchEvent(gcdsClickEvent);
+        if (continueButton && continueButton.shadowRoot) {
+          const actualButton =
+            continueButton.shadowRoot.querySelector('button[part="button"]') ||
+            continueButton.shadowRoot.querySelector("button");
+          if (actualButton) {
+            await expect(actualButton).toBeInTheDocument();
+            await userEvent.click(actualButton);
+          }
         }
-      }
+      });
 
       await step("Enter new MFA phone number", async () => {
         await waitFor(async () => {
