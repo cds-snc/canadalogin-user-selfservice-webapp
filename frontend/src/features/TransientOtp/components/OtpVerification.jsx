@@ -83,7 +83,8 @@ export default function OtpVerification({
   }, [id]);
 
   const userMfaType = userSelectedMfaFactor?.type;
-  const errorMessage = errorPageJson[errorCode] || errorPageJson[errorCodeExternal] || "";
+  const errorMessage =
+    errorPageJson[errorCode] || errorPageJson[errorCodeExternal] || errorCodeExternal || "";
   return (
     <GcdsContainer>
       <GcdsContainer>
