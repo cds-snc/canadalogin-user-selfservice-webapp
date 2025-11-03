@@ -442,7 +442,10 @@ describe("OtpVerification Component", () => {
 
       await waitFor(() => {
         const input = screen.getByTestId("verificationCode");
-        expect(input).toHaveAttribute("data-error-message", "Too Many Attempts");
+        expect(input).toHaveAttribute(
+          "data-error-message",
+          "Too Many Attempts",
+        );
       });
 
       consoleErrorSpy.mockRestore();
