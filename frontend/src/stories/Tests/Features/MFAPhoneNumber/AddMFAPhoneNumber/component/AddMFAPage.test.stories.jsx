@@ -857,7 +857,9 @@ export const CompleteAddMFAFlowSMS = (() => {
 
       await step("Enter new MFA phone number", async () => {
         await waitFor(async () => {
-          await expect(canvasElement.querySelector("input")).toBeInTheDocument();
+          await expect(
+            canvasElement.querySelector("input"),
+          ).toBeInTheDocument();
         });
 
         const phoneInput = canvasElement.querySelector("input");

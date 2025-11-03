@@ -147,7 +147,7 @@ export default function AddMFAPage() {
         const visibleDigits = phoneFormData.phoneNumber.slice(-4);
         if (
           visibleDigits in userPhoneFactorsMap &&
-          userPhoneFactorsMap[visibleDigits].length >= 2
+          userPhoneFactorsMap[visibleDigits].length >= 1
         ) {
           const otpType =
             phoneFormData.otpType === FLOW_TYPES.voice

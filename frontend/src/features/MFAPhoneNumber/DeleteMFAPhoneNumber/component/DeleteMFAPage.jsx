@@ -16,11 +16,7 @@ import { authService } from "../../../../services/authService";
 import PasswordVerification from "../../../TransientOtp/components/PasswordVerification";
 
 const StepContent = ({ StepComponent }) => {
-  return (
-    <>
-      {StepComponent}
-    </>
-  );
+  return <>{StepComponent}</>;
 };
 
 export default function DeleteMFAPage() {
@@ -290,8 +286,6 @@ export default function DeleteMFAPage() {
   return localLoading ? (
     <Loader text={pageContentJson["11"]} />
   ) : (
-    <StepContent
-      StepComponent={steps[wizardStep]}
-    />
+    <StepContent StepComponent={steps[wizardStep]} />
   );
 }
