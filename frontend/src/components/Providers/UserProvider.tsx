@@ -335,7 +335,6 @@ export function UserProvider({
       }
       if (event.type === "terminated") {
         // Handle backchannel logout
-        console.log("Session terminated by backchannel logout");
         userDispatch({
           type: CONTEXT_ACTIONS.set_loading,
           payload: { isLoading: true, text: pageContentJson["7"] },
@@ -353,30 +352,15 @@ export function UserProvider({
         // Parse the event data and check status
         try {
           const eventData = JSON.parse(event.data);
-          console.debug("SSE notification:", eventData);
 
           if (eventData.status === "active" && eventData.expire) {
             // Only dispatch if expire changed to avoid unnecessary re-renders
             if (latestExpireRef.current !== eventData.expire) {
-              console.debug(
-                "SSE notification: resetting session timers based on new expire time",
-                eventData.expire,
-              );
               sessionTimeoutDispatch({
                 type: CONTEXT_ACTIONS.reset_expire_time,
                 payload: eventData.expire,
               });
-            } else {
-              console.debug(
-                "SSE notification: expire time unchanged, no action taken",
-                eventData.expire,
-              );
             }
-          } else {
-            console.log(
-              "SSE notification: status not active or missing expire time",
-              eventData,
-            );
           }
         } catch (error) {
           console.error(

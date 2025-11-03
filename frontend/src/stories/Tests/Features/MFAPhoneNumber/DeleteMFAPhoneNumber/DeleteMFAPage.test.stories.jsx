@@ -239,20 +239,16 @@ export const CompleteDeleteFactor = (() => {
         await step(
           "Verify Text Message option content is displayed",
           async () => {
-            const gcdsRadios = canvasElement.querySelector("gcds-radios");
-            if (gcdsRadios && gcdsRadios.shadowRoot) {
-              // Verify the text message label content
+            await waitFor(async () => {
+              const gcdsRadios = canvasElement.querySelector("gcds-radios");
               const textLabel = gcdsRadios.shadowRoot.querySelector(
                 'label[for="smsotp-factor-1"]',
               );
-              await waitFor(async () => {
-                await expect(textLabel).toBeInTheDocument();
-              });
-
+              await expect(textLabel).toBeInTheDocument();
               const labelText = textLabel.textContent;
               await expect(labelText).toContain("Text message");
               await expect(labelText).toContain("+15551234567");
-            }
+            });
           },
         );
 
@@ -318,15 +314,17 @@ export const CompleteDeleteFactor = (() => {
           await expect(hasVerificationText).toBeTruthy();
         });
 
-        const gcdsInputs = canvasElement.querySelectorAll("gcds-input");
-        for (const input of gcdsInputs) {
-          if (input.shadowRoot) {
+        await waitFor(async () => {
+          const gcdsInputs = canvasElement.querySelector("gcds-input");
+          await expect(gcdsInputs).toBeInTheDocument();
+          if (gcdsInputs.shadowRoot) {
             const shadowInput =
-              input.shadowRoot.querySelector("input#verificationCode") ||
-              input.shadowRoot.querySelector(
+              gcdsInputs.shadowRoot.querySelector("input#verificationCode") ||
+              gcdsInputs.shadowRoot.querySelector(
                 'input[name="verificationCode"]',
               ) ||
-              input.shadowRoot.querySelector('input[maxlength="6"]');
+              gcdsInputs.shadowRoot.querySelector('input[maxlength="6"]');
+            await expect(shadowInput).toBeInTheDocument();
             if (shadowInput) {
               // Clear the field by setting value directly (avoid userEvent.clear which can fail)
               shadowInput.value = "";
@@ -334,45 +332,25 @@ export const CompleteDeleteFactor = (() => {
 
               // Type the OTP code
               await userEvent.type(shadowInput, "654321");
-
-              // Trigger the gcdsInput event on the gcds-input component to update parent state
-              const gcdsInputEvent = new CustomEvent("gcdsInput", {
-                bubbles: true,
-                detail: { value: "654321" },
-              });
-              input.dispatchEvent(gcdsInputEvent);
             }
           }
-        }
+        });
 
-        continueButton = canvas.getByText(/Continue/i);
         // Wait for the input to be ready
         await waitFor(async () => {
+          continueButton = canvas.getByText(/Continue/i);
           await expect(continueButton).toBeInTheDocument();
-        });
-        if (
-          continueButton &&
-          continueButton.tagName === "GCDS-BUTTON" &&
-          continueButton.shadowRoot
-        ) {
-          const actualButton =
-            continueButton.shadowRoot.querySelector('button[part="button"]') ||
-            continueButton.shadowRoot.querySelector("button");
-          if (actualButton) {
-            // Now the button should be enabled since userOtpValue should be "654321"
-            // Dispatch gcdsClick event to continue
-            const gcdsClickEvent = new CustomEvent("gcdsClick", {
-              bubbles: true,
-              cancelable: true,
-              detail: {},
-            });
-            Object.defineProperty(gcdsClickEvent, "preventDefault", {
-              value: () => {},
-              writable: false,
-            });
-            continueButton.dispatchEvent(gcdsClickEvent);
+          if (continueButton && continueButton.shadowRoot) {
+            const actualButton =
+              continueButton.shadowRoot.querySelector(
+                'button[part="button"]',
+              ) || continueButton.shadowRoot.querySelector("button");
+            if (actualButton) {
+              await expect(actualButton).toBeInTheDocument();
+              await userEvent.click(actualButton);
+            }
           }
-        }
+        });
 
         await step("Verify delete number page displayed", async () => {
           await waitFor(async () => {

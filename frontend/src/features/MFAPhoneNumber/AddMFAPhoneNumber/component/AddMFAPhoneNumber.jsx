@@ -2,6 +2,7 @@ import {
   GcdsButton,
   GcdsContainer,
   GcdsDetails,
+  GcdsErrorMessage,
   GcdsGrid,
   GcdsHeading,
   GcdsLink,
@@ -78,18 +79,27 @@ export default function AddMFAPhoneNumber({
   onCancel,
   onChangePhoneForm,
   phoneFormData,
+  errorCode: errorCodeExternal,
 }) {
   const { language } = useParams();
   const [phoneNumberValid, setPhoneNumberValid] = useState(true);
   const pageContentJson = getPageContent(language, PAGES.addMFANumber);
   const { submit, cancel } = getPageContent(language, "Button");
   const backtoProfilePage = path(PAGES.ProfileHome, { language: language });
+  const [errorCode, setErrorCode] = useState(errorCodeExternal);
+  const errorPageJson = getPageContent(language, PAGES.error);
 
   const isPhoneNumberValid = (phoneNumber, country) => {
     const capitalize = country.toUpperCase();
     const validatedPhoneNumber = isValidPhoneNumber(phoneNumber, capitalize);
     return validatedPhoneNumber;
   };
+
+  const errorMessage =
+    errorPageJson[errorCode] ||
+    errorPageJson[errorCodeExternal] ||
+    errorCodeExternal ||
+    "";
 
   return (
     <GcdsContainer>
@@ -107,6 +117,11 @@ export default function AddMFAPhoneNumber({
         </GcdsContainer>
 
         <section>
+          {errorMessage && (
+            <GcdsErrorMessage messageId="message-props">
+              {errorMessage}
+            </GcdsErrorMessage>
+          )}
           <PhoneInput
             inputProps={{
               name: "phone",
@@ -159,7 +174,15 @@ export default function AddMFAPhoneNumber({
           style={{ width: "fit-content" }}
           onGcdsClick={async (ev) => {
             ev.preventDefault();
-            await onNext();
+            try {
+              setErrorCode("");
+              await onNext();
+            } catch (error) {
+              // Handle validation errors
+              if (error?.data?.message) {
+                setErrorCode(error.data.message);
+              }
+            }
           }}
         >
           {submit}

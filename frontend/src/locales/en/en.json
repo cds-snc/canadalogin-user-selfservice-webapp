@@ -25,7 +25,7 @@
     "2": "Invalid email. Email must contain an ‘@’ symbol followed by a domain.",
     "3": "Codes must be six digits. Try again.",
     "4": "Password must be 12 characters",
-    "5": "Passwords are 12 to 65 characters long. Please try again.",
+    "5": "Passwords are a minimum of 12 characters and a maximum of 65. Try again.",
     "6": "Code sent does not match. Try again.",
     "7": "Server Error. Please try again later.",
     "8": "Invalid phone number. Phone numbers for the country you selected should be ",

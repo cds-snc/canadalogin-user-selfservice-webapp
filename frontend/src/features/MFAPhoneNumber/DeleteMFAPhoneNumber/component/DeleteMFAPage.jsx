@@ -15,23 +15,8 @@ import DeleteMFAPhoneNumberConfirm from "./DeleteMFAPhoneNumberConfirm";
 import { authService } from "../../../../services/authService";
 import PasswordVerification from "../../../TransientOtp/components/PasswordVerification";
 
-const StepContent = ({ errorCode, errorPageJson, StepComponent }) => {
-  let errorMessage = errorPageJson[errorCode] || "";
-
-  if (errorMessage === "" && errorCode === "Unexpected API request error") {
-    errorMessage = errorPageJson["7"];
-  }
-
-  return (
-    <>
-      {errorMessage && (
-        <GcdsErrorMessage messageId="message-props">
-          {errorMessage}
-        </GcdsErrorMessage>
-      )}
-      {StepComponent}
-    </>
-  );
+const StepContent = ({ StepComponent }) => {
+  return <>{StepComponent}</>;
 };
 
 export default function DeleteMFAPage() {
@@ -47,7 +32,6 @@ export default function DeleteMFAPage() {
   const pageContentJson = getPageContent(language, PAGES.otpSelection);
 
   const [errorCode, setErrorCode] = useState("");
-  const errorPageJson = getPageContent(language, PAGES.error);
 
   const [wizardStep, setWizardStep] = useState("passwordVerification");
   const [localLoading, setLocalLoading] = useState(true);
@@ -144,8 +128,13 @@ export default function DeleteMFAPage() {
       }
       setErrorCode("");
     } catch (err) {
-      if (err && err.data && err.data.message) {
-        setErrorCode(err.data.message);
+      if (
+        err &&
+        err.response &&
+        err.response.data &&
+        err.response.data.message
+      ) {
+        setErrorCode(err.response.data.message);
       }
     }
   };
@@ -297,10 +286,6 @@ export default function DeleteMFAPage() {
   return localLoading ? (
     <Loader text={pageContentJson["11"]} />
   ) : (
-    <StepContent
-      StepComponent={steps[wizardStep]}
-      errorCode={errorCode}
-      errorPageJson={errorPageJson}
-    />
+    <StepContent StepComponent={steps[wizardStep]} />
   );
 }

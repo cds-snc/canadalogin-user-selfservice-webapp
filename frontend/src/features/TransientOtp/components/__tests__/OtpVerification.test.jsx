@@ -441,8 +441,11 @@ describe("OtpVerification Component", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByTestId("error-message")).toBeInTheDocument();
-        expect(screen.getByText("Too Many Attempts")).toBeInTheDocument();
+        const input = screen.getByTestId("verificationCode");
+        expect(input).toHaveAttribute(
+          "data-error-message",
+          "Too Many Attempts",
+        );
       });
 
       consoleErrorSpy.mockRestore();
@@ -547,10 +550,11 @@ describe("OtpVerification Component", () => {
       await user.click(submitButton);
 
       await waitFor(() => {
-        expect(screen.getByTestId("error-message")).toBeInTheDocument();
-        expect(
-          screen.getByText("The verification code is invalid or has expired."),
-        ).toBeInTheDocument();
+        const input = screen.getByTestId("verificationCode");
+        expect(input).toHaveAttribute(
+          "data-error-message",
+          "The verification code is invalid or has expired.",
+        );
       });
     });
 
@@ -566,7 +570,11 @@ describe("OtpVerification Component", () => {
       await user.click(submitButton);
 
       await waitFor(() => {
-        expect(screen.getByTestId("error-message")).toBeInTheDocument();
+        const input = screen.getByTestId("verificationCode");
+        expect(input).toHaveAttribute(
+          "data-error-message",
+          "The verification code is invalid or has expired.",
+        );
       });
 
       // Clear the mock to simulate successful verification
@@ -575,7 +583,8 @@ describe("OtpVerification Component", () => {
       await user.click(submitButton);
 
       await waitFor(() => {
-        expect(screen.queryByTestId("error-message")).not.toBeInTheDocument();
+        const input = screen.getByTestId("verificationCode");
+        expect(input).toHaveAttribute("data-error-message", "");
       });
     });
   });
@@ -596,7 +605,8 @@ describe("OtpVerification Component", () => {
     it("does not display error message initially", () => {
       renderComponent();
 
-      expect(screen.queryByTestId("error-message")).not.toBeInTheDocument();
+      const input = screen.getByTestId("verificationCode");
+      expect(input).toHaveAttribute("data-error-message", "");
     });
 
     it("displays error message when errorCode is set", async () => {
@@ -611,10 +621,11 @@ describe("OtpVerification Component", () => {
       await user.click(submitButton);
 
       await waitFor(() => {
-        expect(screen.getByTestId("error-message")).toBeInTheDocument();
-        expect(
-          screen.getByText("The verification code is invalid or has expired."),
-        ).toBeInTheDocument();
+        const input = screen.getByTestId("verificationCode");
+        expect(input).toHaveAttribute(
+          "data-error-message",
+          "The verification code is invalid or has expired.",
+        );
       });
     });
 
@@ -651,28 +662,9 @@ describe("OtpVerification Component", () => {
 
       await waitFor(() => {
         // Should not crash, error message will be empty
-        expect(screen.queryByTestId("error-message")).not.toBeInTheDocument();
+        const input = screen.getByTestId("verificationCode");
+        expect(input).toHaveAttribute("data-error-message", "");
       });
-    });
-  });
-
-  describe("Test Data Mode", () => {
-    it("renders pre-filled input in test mode", () => {
-      mockUserState.testData = { otp: "999999" };
-
-      renderComponent();
-
-      const input = screen.getByTestId("verificationCode");
-      expect(input).toHaveValue("999999");
-    });
-
-    it("does not use onGcdsInput in test mode", () => {
-      mockUserState.testData = { otp: "999999" };
-
-      renderComponent();
-
-      const input = screen.getByTestId("verificationCode");
-      expect(input).not.toHaveAttribute("onChange");
     });
   });
 
@@ -710,7 +702,8 @@ describe("OtpVerification Component", () => {
       });
 
       // Should not display error
-      expect(screen.queryByTestId("error-message")).not.toBeInTheDocument();
+      const input = screen.getByTestId("verificationCode");
+      expect(input).toHaveAttribute("data-error-message", "");
     });
 
     it("handles OTP verify error without message", async () => {
@@ -727,7 +720,8 @@ describe("OtpVerification Component", () => {
       });
 
       // Should not display error
-      expect(screen.queryByTestId("error-message")).not.toBeInTheDocument();
+      const input = screen.getByTestId("verificationCode");
+      expect(input).toHaveAttribute("data-error-message", "");
     });
   });
 
@@ -784,9 +778,11 @@ describe("OtpVerification Component", () => {
 
       // Wait for error to appear
       await waitFor(() => {
-        expect(
-          screen.getByText("The verification code is invalid or has expired."),
-        ).toBeInTheDocument();
+        const input = screen.getByTestId("verificationCode");
+        expect(input).toHaveAttribute(
+          "data-error-message",
+          "The verification code is invalid or has expired.",
+        );
       });
 
       // Now submit again with success

@@ -17,8 +17,6 @@ import { path } from "../../../utils/routeHelpers.js";
 import { useParams } from "react-router";
 import { FLOW_TYPES, PAGES } from "../../../utils/constants.jsx";
 
-import { useUser } from "../../../components/Providers/useUser.tsx";
-
 const initialTime = 10;
 
 export default function OtpVerification({
@@ -32,7 +30,6 @@ export default function OtpVerification({
   errorCode: errorCodeExternal,
 }) {
   const { language } = useParams();
-  const { state } = useUser();
 
   const [errorCode, setErrorCode] = useState(errorCodeExternal);
 
@@ -83,15 +80,13 @@ export default function OtpVerification({
   }, [id]);
 
   const userMfaType = userSelectedMfaFactor?.type;
-  const errorMessage = errorPageJson[errorCode] || "";
+  const errorMessage =
+    errorPageJson[errorCode] ||
+    errorPageJson[errorCodeExternal] ||
+    errorCodeExternal ||
+    "";
   return (
     <GcdsContainer>
-      {errorMessage != "" && (
-        <GcdsErrorMessage messageId="message-props">
-          {errorMessage}
-        </GcdsErrorMessage>
-      )}
-
       <GcdsContainer>
         <GcdsHeading tag="h1" lang={language}>
           {userMfaType === FLOW_TYPES.email
@@ -122,40 +117,23 @@ export default function OtpVerification({
           <GcdsHeading tag="h2">{pageContentJson["8"]}</GcdsHeading>
         )}
 
-        {state.testData !== undefined && (
-          <GcdsInput
-            inputId="verificationCode"
-            label={pageContentJson["9"]}
-            name="verificationCode"
-            value={state.testData.otp}
-            type="text"
-            autofocus
-            validateOn="other"
-            lang={language}
-            size="6"
-            maxlength={6}
-            required
-          ></GcdsInput>
-        )}
-        {state.testData === undefined && (
-          <GcdsInput
-            inputId="verificationCode"
-            label={pageContentJson["9"]}
-            autofocus
-            autocomplete="one-time-code"
-            name="verificationCode"
-            type="text"
-            validateOn="other"
-            errorMessage={errorMessage}
-            value={userOtpValue}
-            onGcdsInput={handleChange}
-            lang={language}
-            size="6"
-            maxlength={6}
-            minlength={6}
-            required={errorMessage == ""}
-          ></GcdsInput>
-        )}
+        <GcdsInput
+          inputId="verificationCode"
+          label={pageContentJson["9"]}
+          autofocus
+          autocomplete="one-time-code"
+          name="verificationCode"
+          type="text"
+          validateOn="other"
+          errorMessage={errorMessage}
+          value={userOtpValue}
+          onGcdsInput={handleChange}
+          lang={language}
+          size="6"
+          maxlength={6}
+          minlength={6}
+          required={errorMessage == ""}
+        ></GcdsInput>
 
         <GcdsGrid columns="max-content max-content" gap="200">
           <GcdsButton

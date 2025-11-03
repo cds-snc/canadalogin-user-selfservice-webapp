@@ -18,23 +18,8 @@ import AddSecondMFA from "./AddSecondMFA";
 import { authService } from "../../../../services/authService";
 import PasswordVerification from "../../../TransientOtp/components/PasswordVerification";
 
-const StepContent = ({ errorCode, errorPageJson, StepComponent }) => {
-  let errorMessage = errorPageJson[errorCode] || "";
-
-  if (errorMessage === "" && errorCode === "Unexpected API request error") {
-    errorMessage = errorPageJson["7"];
-  }
-
-  return (
-    <>
-      {errorMessage && (
-        <GcdsErrorMessage messageId="message-props">
-          {errorMessage}
-        </GcdsErrorMessage>
-      )}
-      {StepComponent}
-    </>
-  );
+const StepContent = ({ StepComponent }) => {
+  return <>{StepComponent}</>;
 };
 
 export default function AddMFAPage() {
@@ -48,7 +33,6 @@ export default function AddMFAPage() {
   const pageContentJson = getPageContent(language, PAGES.otpSelection);
 
   const [errorCode, setErrorCode] = useState("");
-  const errorPageJson = getPageContent(language, PAGES.error);
 
   const [wizardStep, setWizardStep] = useState("passwordVerification");
   const [localLoading, setLocalLoading] = useState(true);
@@ -163,7 +147,7 @@ export default function AddMFAPage() {
         const visibleDigits = phoneFormData.phoneNumber.slice(-4);
         if (
           visibleDigits in userPhoneFactorsMap &&
-          userPhoneFactorsMap[visibleDigits].length >= 2
+          userPhoneFactorsMap[visibleDigits].length >= 1
         ) {
           const otpType =
             phoneFormData.otpType === FLOW_TYPES.voice
@@ -241,8 +225,13 @@ export default function AddMFAPage() {
         setErrorCode("");
       }
     } catch (err) {
-      if (err && err.data && err.data.message) {
-        setErrorCode(err.data.message);
+      if (
+        err &&
+        err.response &&
+        err.response.data &&
+        err.response.data.message
+      ) {
+        setErrorCode(err.response.data.message);
       }
     }
   };
@@ -358,16 +347,23 @@ export default function AddMFAPage() {
       <AddMFAPhoneNumber
         onNext={async () => {
           const enrollMfaResponse = await enrollMFA();
-          await sendMFAOtp({
-            reSendOtpCode: false,
-            mfaId: enrollMfaResponse?.data?.id,
-          });
+          if (
+            enrollMfaResponse &&
+            enrollMfaResponse.data &&
+            enrollMfaResponse.data.id
+          ) {
+            await sendMFAOtp({
+              reSendOtpCode: false,
+              mfaId: enrollMfaResponse?.data?.id,
+            });
+          }
         }}
         onCancel={async () =>
           await navigateHelper(backToManage2FAVerificationsPage)
         }
         onChangePhoneForm={handlePhoneForm}
         phoneFormData={phoneFormData}
+        errorCode={errorCode}
       />
     ),
     addMFAValidation: (
@@ -432,10 +428,6 @@ export default function AddMFAPage() {
   return localLoading ? (
     <Loader text={pageContentJson["11"]} />
   ) : (
-    <StepContent
-      StepComponent={steps[wizardStep]}
-      errorCode={errorCode}
-      errorPageJson={errorPageJson}
-    />
+    <StepContent StepComponent={steps[wizardStep]} />
   );
 }
