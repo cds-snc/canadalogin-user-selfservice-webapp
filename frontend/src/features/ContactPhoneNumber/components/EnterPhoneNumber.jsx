@@ -13,6 +13,7 @@ import {
   GcdsText,
   GcdsRadios,
   GcdsButton,
+  GcdsErrorMessage,
 } from "@cdssnc/gcds-components-react";
 import { getPageContent } from "../../../utils/functions.jsx";
 import {
@@ -112,6 +113,7 @@ export default function EnterPhoneNumber({
   onCancel,
   onChangePhoneForm,
   phoneFormData,
+  errorCode,
 }) {
   const { language } = useParams();
   const [phoneNumberValid, setPhoneNumberValid] = useState(true);
@@ -134,6 +136,11 @@ export default function EnterPhoneNumber({
         </section>
 
         <section>
+          {errorCode && (
+            <GcdsErrorMessage messageId="message-props">
+              {errorCode}
+            </GcdsErrorMessage>
+          )}
           <PhoneInput
             inputProps={{
               name: "phone",
