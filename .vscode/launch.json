@@ -9,14 +9,8 @@
       "type": "debugpy",
       "request": "launch",
       "module": "uvicorn",
-      "args": [
-        "app.main:app",
-        "--reload",
-        "--port",
-        "8000",
-        "--host",
-        "127.0.0.1"
-      ],
+      "args": ["app.main:app", "--reload", "--port", "8000", "--host", "127.0.0.1"],
+      "envFile": "${workspaceFolder}/backend/.env",
       "env": {
         "PYTHONPATH": "backend"
       },
