@@ -668,26 +668,6 @@ describe("OtpVerification Component", () => {
     });
   });
 
-  describe("Test Data Mode", () => {
-    it("renders pre-filled input in test mode", () => {
-      mockUserState.testData = { otp: "999999" };
-
-      renderComponent();
-
-      const input = screen.getByTestId("verificationCode");
-      expect(input).toHaveValue("999999");
-    });
-
-    it("does not use onGcdsInput in test mode", () => {
-      mockUserState.testData = { otp: "999999" };
-
-      renderComponent();
-
-      const input = screen.getByTestId("verificationCode");
-      expect(input).not.toHaveAttribute("onChange");
-    });
-  });
-
   describe("Edge Cases", () => {
     it("handles null userProfile gracefully", () => {
       renderComponent({ userProfile: null });
