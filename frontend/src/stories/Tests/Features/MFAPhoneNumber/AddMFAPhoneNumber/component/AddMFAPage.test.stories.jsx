@@ -1342,7 +1342,7 @@ export const ResendOtpCode = (() => {
   };
 })();
 
-export const UseDifferentPhoneNumber2 = (() => {
+export const UseDifferentPhoneNumber = (() => {
   const baseParams = buildTestCase.parameters(
     "",
     {
