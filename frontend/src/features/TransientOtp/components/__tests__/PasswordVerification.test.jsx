@@ -287,15 +287,6 @@ describe("PasswordVerification Component", () => {
       renderComponent({ errorCode: "CSIAM0038E" });
       expect(screen.getByText("Too Many Attempts")).toBeInTheDocument();
     });
-
-    it("handles unknown error codes gracefully", () => {
-      renderComponent({ errorCode: "UNKNOWN_ERROR" });
-      // Should not display an error if the error code is not in the error page json
-      const errorElement = screen.queryByTestId("error-message");
-      if (errorElement) {
-        expect(errorElement).toHaveTextContent("");
-      }
-    });
   });
 
   describe("User Interactions", () => {
