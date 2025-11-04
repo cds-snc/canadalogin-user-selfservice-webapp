@@ -170,12 +170,14 @@ export default function AddMFAPage() {
     }
   };
 
-  const deleteMFA = async () => {
+  const deleteMFA = async ({ id, otpType }) => {
     setLocalLoading(true);
     try {
       const payload = {
-        id: phoneFormData.mfaId,
-        otpType: serverMapping[phoneFormData.otpType],
+        id: id ?? phoneFormData.mfaId,
+        otpType: otpType
+          ? serverMapping[otpType]
+          : serverMapping[phoneFormData.otpType],
       };
 
       await deleteMFAPhoneNumberApi.deleteMFA(payload);
@@ -346,16 +348,38 @@ export default function AddMFAPage() {
     addMFANumber: (
       <AddMFAPhoneNumber
         onNext={async () => {
-          const enrollMfaResponse = await enrollMFA();
-          if (
-            enrollMfaResponse &&
-            enrollMfaResponse.data &&
-            enrollMfaResponse.data.id
-          ) {
-            await sendMFAOtp({
-              reSendOtpCode: false,
-              mfaId: enrollMfaResponse?.data?.id,
-            });
+          try {
+            const response = await otpFactors.getUserOtpPhoneFactors(id, false);
+            if (response && response.success && response.data.length > 0) {
+              await deleteMFA({
+                id: response.data[0].id,
+                otpType: response.data[0].type,
+              });
+              const enrollMfaResponse = await enrollMFA();
+              if (
+                enrollMfaResponse &&
+                enrollMfaResponse.data &&
+                enrollMfaResponse.data.id
+              ) {
+                await sendMFAOtp({
+                  reSendOtpCode: false,
+                  mfaId: enrollMfaResponse?.data?.id,
+                });
+              }
+            }
+          } catch {
+            // If no existing MFA found, proceed to enroll new MFA
+            const enrollMfaResponse = await enrollMFA();
+            if (
+              enrollMfaResponse &&
+              enrollMfaResponse.data &&
+              enrollMfaResponse.data.id
+            ) {
+              await sendMFAOtp({
+                reSendOtpCode: false,
+                mfaId: enrollMfaResponse?.data?.id,
+              });
+            }
           }
         }}
         onCancel={async () =>
