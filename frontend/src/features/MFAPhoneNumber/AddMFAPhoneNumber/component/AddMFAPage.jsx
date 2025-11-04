@@ -170,7 +170,7 @@ export default function AddMFAPage() {
     }
   };
 
-  const deleteMFA = async ({ id, otpType }) => {
+  const deleteMFA = async ({ id, otpType } = {}) => {
     setLocalLoading(true);
     try {
       const payload = {
