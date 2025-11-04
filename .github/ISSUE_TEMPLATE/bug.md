@@ -1,7 +1,7 @@
 ---
 name: Bug
-about: 'Use this when logging a bug with dev '
-title: ''
+about: 'To place bugs for the development team to action '
+title: "[Descriptive name of bug]"
 labels: ''
 assignees: ''
 
@@ -17,7 +17,6 @@ assignees: ''
 ## 🚧 Test instructions | Instructions pour tester la modification
 
 ### [Test number] [Test name]
-[Link to test cell from testing spreadsheet]	
 
 **Pre-conditions**
 - [List preconditions from the test]
@@ -37,3 +36,7 @@ assignees: ''
 
 ## ℹ️ Contact 
 - [List who can be contacted for any questions about the bug]
+
+## ☑️ Bug is fixed when
+- [ ] [definition of done]
+- [ ] Fix is applied in both French and English.
