@@ -111,9 +111,13 @@ async def dispatch_user_auth_factors(
         # Combine all search parameters into a single 'search' parameter, URL-encoded following the specs of IBM Verify docs
         # https://docs.verify.ibm.com/verify/reference/listfactorenrollments_20
         validated_str = "true" if validated else "false"
-        search_value = f'userId="{user_profile_id}"&enabled=true&validated={validated_str}'
+        search_value = (
+            f'userId="{user_profile_id}"&enabled=true&validated={validated_str}'
+        )
         search_params = {"search": search_value}
-        logger.info(f"get user auth factors, userid: {user_profile_id}, validated: {validated}")
+        logger.info(
+            f"get user auth factors, userid: {user_profile_id}, validated: {validated}"
+        )
 
         otp_factor_response = await global_http_client.get(
             user_otp_factors_api_endpoint, params=search_params, headers=headers
@@ -139,7 +143,9 @@ async def get_user_otp_factors_unmasked(
     Use it for ALL API calls.
     """
     try:
-        logger.info(f"get_user_otp_factors_unmasked for profile_id: {user_profile_id}, validated: {validated}")
+        logger.info(
+            f"get_user_otp_factors_unmasked for profile_id: {user_profile_id}, validated: {validated}"
+        )
 
         start_time = datetime.now()
         user_otp_factors_response = await dispatch_user_auth_factors(
