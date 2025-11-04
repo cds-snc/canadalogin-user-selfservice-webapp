@@ -1123,7 +1123,7 @@ describe("AddMFAPage Unit Tests", () => {
       await waitFor(() => {
         expect(deleteMFAPhoneNumberApi.deleteMFA).toHaveBeenCalledWith(
           expect.objectContaining({
-            id: "factor1",
+            id: "mfa-id-123",
             otpType: "sms",
           }),
         );
