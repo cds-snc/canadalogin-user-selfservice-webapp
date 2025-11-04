@@ -180,7 +180,6 @@ export default function AddMFAPhoneNumber({
               await onNext();
             } catch (error) {
               // Handle validation errors
-              console.log("error", error);
               if (error?.data?.message) {
                 setErrorCode(error.data.message);
               }
