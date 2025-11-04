@@ -104,7 +104,7 @@ export default function AddMFAOtpVerification({
   }, [time]);
 
   const userMfaType = phoneFormData.otpType;
-  const errorMessage = errorCode || errorPageJson[errorCode] || "";
+  const errorMessage = errorPageJson[errorCode] || errorCode || "";
   return (
     <GcdsContainer>
       {codeRequested && (
