@@ -1,18 +1,16 @@
+import { useNavigate } from "react-router";
 import {
-  GcdsBreadcrumbs,
-  GcdsBreadcrumbsItem,
   GcdsContainer,
   GcdsHeader,
-  GcdsNavGroup,
-  GcdsNavLink,
-  GcdsText,
-  GcdsTopNav,
+  GcdsLangToggle,
 } from "@cdssnc/gcds-components-react";
 
 import TopNav from "./TopNav";
 import Breadcrumbs from "./Breadcrumbs";
 
 export default function Header({ langHref, currentLang }) {
+  const navigate = useNavigate();
+
   return (
     <GcdsContainer className="gcds-header">
       <GcdsHeader
@@ -22,6 +20,14 @@ export default function Header({ langHref, currentLang }) {
         lang={currentLang}
       >
         <TopNav currentLang={currentLang} />
+        <GcdsLangToggle
+          slot="toggle"
+          onGcdsClick={(ev) => {
+            ev.preventDefault();
+            navigate(ev.detail);
+          }}
+          href={langHref}
+        />
         <Breadcrumbs />
       </GcdsHeader>
     </GcdsContainer>
