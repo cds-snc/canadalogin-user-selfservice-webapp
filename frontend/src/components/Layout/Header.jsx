@@ -17,7 +17,7 @@ export default function Header({ langHref, currentLang }) {
     <GcdsContainer className="gcds-header">
       <GcdsHeader
         langHref={langHref}
-        skipToHref="#"
+        skipToHref="#main-content"
         signature-variant={"colour"}
         lang={currentLang}
       >
