@@ -185,11 +185,11 @@ async def handle_otp_send(
             )
 
     except Exception as e:
-        logger.error(f"Send transient {user_otp_info.otpType} error: {str(e)}")
+        logger.error(f"Send transient {user_otp_info.otpType.value} error: {str(e)}")
         return ResponseModel(
             success=False,
             data=None,
-            message=f"Send transient {user_otp_info.otpType} error: {str(e)}",
+            message=f"Send transient {user_otp_info.otpType.value} error: {str(e)}",
         )
 
 

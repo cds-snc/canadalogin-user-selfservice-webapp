@@ -207,7 +207,7 @@ class TestHandleMFAOTPVerificationCreate:
             mock_profile.return_value = mock_profile_success_response
 
             with patch(
-                "app.otp.services.verify_mfa_otp.dispatch_send_mfa_otp"
+                "app.otp.services.send_mfa_otp.dispatch_send_mfa_otp"
             ) as mock_dispatch:
                 mock_response = MagicMock()
                 mock_response.json.return_value = mock_successful_verification_response
@@ -238,7 +238,7 @@ class TestHandleMFAOTPVerificationCreate:
             mock_profile.return_value = mock_profile_success_response
 
             with patch(
-                "app.otp.services.verify_mfa_otp.dispatch_send_mfa_otp"
+                "app.otp.services.send_mfa_otp.dispatch_send_mfa_otp"
             ) as mock_dispatch:
                 mock_response = MagicMock()
                 voice_response = mock_successful_verification_response.copy()
@@ -290,7 +290,7 @@ class TestHandleMFAOTPVerificationCreate:
             mock_profile.return_value = mock_profile_success_response
 
             with patch(
-                "app.otp.services.verify_mfa_otp.dispatch_send_mfa_otp"
+                "app.otp.services.send_mfa_otp.dispatch_send_mfa_otp"
             ) as mock_dispatch:
                 mock_response = MagicMock()
                 # Invalid response that will cause ValidationError
@@ -319,7 +319,7 @@ class TestHandleMFAOTPVerificationCreate:
             mock_profile.return_value = mock_profile_success_response
 
             with patch(
-                "app.otp.services.verify_mfa_otp.dispatch_send_mfa_otp"
+                "app.otp.services.send_mfa_otp.dispatch_send_mfa_otp"
             ) as mock_dispatch:
                 mock_dispatch.side_effect = Exception("Network error")
 
