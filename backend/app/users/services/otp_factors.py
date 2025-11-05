@@ -96,7 +96,7 @@ async def parse_phone_auth_factors_response_unmasked(
 
 
 async def dispatch_user_auth_factors(
-    global_http_client: AsyncClient, user_profile_id: str
+    global_http_client: AsyncClient, user_profile_id: str, validated: bool = True
 ):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
@@ -110,9 +110,14 @@ async def dispatch_user_auth_factors(
 
         # Combine all search parameters into a single 'search' parameter, URL-encoded following the specs of IBM Verify docs
         # https://docs.verify.ibm.com/verify/reference/listfactorenrollments_20
-        search_value = f'userId="{user_profile_id}"&enabled=true&validated=true'
+        validated_str = "true" if validated else "false"
+        search_value = (
+            f'userId="{user_profile_id}"&enabled=true&validated={validated_str}'
+        )
         search_params = {"search": search_value}
-        logger.info(f"get user auth factors, userid: {user_profile_id}")
+        logger.info(
+            f"get user auth factors, userid: {user_profile_id}, validated: {validated}"
+        )
 
         otp_factor_response = await global_http_client.get(
             user_otp_factors_api_endpoint, params=search_params, headers=headers
@@ -130,6 +135,7 @@ async def dispatch_user_auth_factors(
 async def get_user_otp_factors_unmasked(
     global_http_client: AsyncClient,
     user_profile_id: str,
+    validated: bool = True,
 ):
     """
     Get user OTP factors with unmasked phone numbers for internal use.
@@ -137,11 +143,13 @@ async def get_user_otp_factors_unmasked(
     Use it for ALL API calls.
     """
     try:
-        logger.info(f"get_user_otp_factors_unmasked for profile_id: {user_profile_id}")
+        logger.info(
+            f"get_user_otp_factors_unmasked for profile_id: {user_profile_id}, validated: {validated}"
+        )
 
         start_time = datetime.now()
         user_otp_factors_response = await dispatch_user_auth_factors(
-            global_http_client, user_profile_id
+            global_http_client, user_profile_id, validated
         )
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(f"user_otp_factors returned in {duration:.2f} seconds")
@@ -171,13 +179,14 @@ async def get_user_otp_factors(
     global_http_client: AsyncClient,
     user_id: str,
     user_access_token: str,
+    validated: bool = True,
 ):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
 
     try:
         user_profile = await get_my_profile(global_http_client, user_access_token)
-        logger.info(f"get_user_otp_factors for: {user_id}")
+        logger.info(f"get_user_otp_factors for: {user_id}, validated: {validated}")
 
         if user_profile.success:
             user_profile_id = user_profile.data.id
@@ -187,7 +196,7 @@ async def get_user_otp_factors(
                 logger.info(f"user_otp_factors: {user_id}")
                 start_time = datetime.now()
                 user_otp_factors_response = await dispatch_user_auth_factors(
-                    global_http_client, user_profile_id
+                    global_http_client, user_profile_id, validated
                 )
                 duration = (datetime.now() - start_time).total_seconds()
                 logger.info(f"user_otp_factors returned in {duration:.2f} seconds")

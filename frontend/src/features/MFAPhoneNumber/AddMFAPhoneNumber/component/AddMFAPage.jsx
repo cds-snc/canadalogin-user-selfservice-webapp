@@ -172,12 +172,14 @@ export default function AddMFAPage() {
     }
   };
 
-  const deleteMFA = async () => {
+  const deleteMFA = async ({ id, otpType } = {}) => {
     setLocalLoading(true);
     try {
       const payload = {
-        id: phoneFormData.mfaId,
-        otpType: serverMapping[phoneFormData.otpType],
+        id: id ?? phoneFormData.mfaId,
+        otpType: otpType
+          ? serverMapping[otpType]
+          : serverMapping[phoneFormData.otpType],
       };
 
       await deleteMFAPhoneNumberApi.deleteMFA(payload);
@@ -269,6 +271,55 @@ export default function AddMFAPage() {
     }
   };
 
+  const handleMFAEnrollment = async () => {
+    try {
+      // Get unvalidated OTP phone factors
+      const response = await otpFactors.getUserOtpPhoneFactors(id, false);
+
+      // If existing unvalidated OTP found, delete it first
+      if (response && response.success && response.data.length > 0) {
+        const existingMfa = response.data.find(
+          (factor) =>
+            factor.phoneNumber.slice(-4) ===
+              phoneFormData.phoneNumber.slice(-4) &&
+            factor.type === phoneFormData.otpType,
+        );
+        if (existingMfa) {
+          await deleteMFA({
+            id: existingMfa.id,
+            otpType: existingMfa.type,
+          });
+        }
+
+        // Enroll new MFA after deletion
+        const enrollMfaResponse = await enrollMFA();
+        if (
+          enrollMfaResponse &&
+          enrollMfaResponse.data &&
+          enrollMfaResponse.data.id
+        ) {
+          await sendMFAOtp({
+            reSendOtpCode: false,
+            mfaId: enrollMfaResponse?.data?.id,
+          });
+        }
+      }
+    } catch {
+      // If no existing MFA found, proceed to enroll new MFA
+      const enrollMfaResponse = await enrollMFA();
+      if (
+        enrollMfaResponse &&
+        enrollMfaResponse.data &&
+        enrollMfaResponse.data.id
+      ) {
+        await sendMFAOtp({
+          reSendOtpCode: false,
+          mfaId: enrollMfaResponse?.data?.id,
+        });
+      }
+    }
+  };
+
   useEffect(() => {
     const fetchUserOtpPhoneFactors = async () => {
       setLocalLoading(true);
@@ -347,19 +398,7 @@ export default function AddMFAPage() {
     ),
     addMFANumber: (
       <AddMFAPhoneNumber
-        onNext={async () => {
-          const enrollMfaResponse = await enrollMFA();
-          if (
-            enrollMfaResponse &&
-            enrollMfaResponse.data &&
-            enrollMfaResponse.data.id
-          ) {
-            await sendMFAOtp({
-              reSendOtpCode: false,
-              mfaId: enrollMfaResponse?.data?.id,
-            });
-          }
-        }}
+        onNext={handleMFAEnrollment}
         onCancel={async () =>
           await navigateHelper(backToManage2FAVerificationsPage)
         }

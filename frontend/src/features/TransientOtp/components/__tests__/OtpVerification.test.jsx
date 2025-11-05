@@ -663,7 +663,7 @@ describe("OtpVerification Component", () => {
       await waitFor(() => {
         // Should not crash, error message will be empty
         const input = screen.getByTestId("verificationCode");
-        expect(input).toHaveAttribute("data-error-message", "");
+        expect(input).toHaveAttribute("data-error-message", "UNKNOWN_ERROR");
       });
     });
   });

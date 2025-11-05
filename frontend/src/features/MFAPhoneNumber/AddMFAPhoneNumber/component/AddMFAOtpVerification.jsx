@@ -58,7 +58,6 @@ export default function AddMFAOtpVerification({
   errorCode,
   requestNewOtpCode,
   onUseDifferentPhoneNumber,
-  errorCode: errorCodeExternal,
 }) {
   const { language } = useParams();
 
@@ -105,11 +104,7 @@ export default function AddMFAOtpVerification({
   }, [time]);
 
   const userMfaType = phoneFormData.otpType;
-  const errorMessage =
-    errorPageJson[errorCode] ||
-    errorPageJson[errorCodeExternal] ||
-    errorCodeExternal ||
-    "";
+  const errorMessage = errorPageJson[errorCode] || errorCode || "";
   return (
     <GcdsContainer>
       {codeRequested && (

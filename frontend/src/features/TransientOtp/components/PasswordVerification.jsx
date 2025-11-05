@@ -36,6 +36,7 @@ export default function PasswordVerification({
     errorPageJson[errorCode] ||
     errorPageJson[errorCodeExternal] ||
     errorCodeExternal ||
+    errorCode ||
     "";
   return (
     <GcdsContainer>

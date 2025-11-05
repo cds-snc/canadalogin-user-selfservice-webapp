@@ -116,7 +116,7 @@ async def test_get_user_otp_factors_mocked(monkeypatch):
 
     # Mock dispatch_user_auth_factors to return a valid response
 
-    async def mock_dispatch_user_auth_factors(client, user_profile_id):
+    async def mock_dispatch_user_auth_factors(client, user_profile_id, validated=True):
         return {
             "factors": [
                 {
@@ -182,7 +182,7 @@ async def test_get_user_otp_factors_invalid_schema(monkeypatch):
             ),
         )
 
-    async def mock_dispatch_user_auth_factors(client, user_profile_id):
+    async def mock_dispatch_user_auth_factors(client, user_profile_id, validated=True):
         # Missing required fields for Factor → will cause ValidationError
         return {
             "factors": [{"invalid": "data"}],
@@ -232,7 +232,7 @@ async def test_get_user_otp_factors_no_otp_factors(monkeypatch):
             ),
         )
 
-    async def mock_dispatch_user_auth_factors(client, user_profile_id):
+    async def mock_dispatch_user_auth_factors(client, user_profile_id, validated=True):
         # Valid schema but no SMSOTP or VOICEOTP types
         return {
             "factors": [
@@ -306,7 +306,7 @@ async def test_get_user_otp_factors_unmasked(monkeypatch):
     """Test getting unmasked user OTP factors"""
     from app.users.services.otp_factors import get_user_otp_factors_unmasked
 
-    async def mock_dispatch_user_auth_factors(client, user_id):
+    async def mock_dispatch_user_auth_factors(client, user_id, validated=True):
         return {
             "factors": [
                 {
