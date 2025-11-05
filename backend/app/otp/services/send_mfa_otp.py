@@ -43,11 +43,15 @@ async def dispatch_send_mfa_otp(
         return response
 
     except HTTPStatusError as e:
-        logger.error(f"HTTP error during {otp_type} MFA OTP verification creation: {e}")
+        otp_type_str = otp_type.value if hasattr(otp_type, "value") else str(otp_type)
+        logger.error(
+            f"HTTP error during {otp_type_str} MFA OTP verification creation: {e}"
+        )
         return RequestErrorHandler.handle(e)
     except Exception as e:
+        otp_type_str = otp_type.value if hasattr(otp_type, "value") else str(otp_type)
         logger.error(
-            f"{otp_type} MFA OTP verification creation dispatch error: {str(e)}",
+            f"{otp_type_str} MFA OTP verification creation dispatch error: {str(e)}",
             exc_info=True,
         )
         # Don't expose server errors to client
@@ -70,8 +74,11 @@ async def handle_send_mfa_otp(
             global_http_client, user_access_token
         )
         if not my_profile_response.success:
+            otp_type_str = (
+                otp_type.value if hasattr(otp_type, "value") else str(otp_type)
+            )
             logger.error(
-                f"Failed to get user profile for {otp_type} verification creation"
+                f"Failed to get user profile for {otp_type_str} verification creation"
             )
             return ResponseModel(
                 success=False, data=None, message="User verification failed"
@@ -100,5 +107,6 @@ async def handle_send_mfa_otp(
             return generate_error_response(422, "Server Error")
 
     except Exception as e:
-        logger.error(f"{otp_type} MFA OTP verification creation error: {str(e)}")
-        RequestErrorHandler.handle(e, f"{otp_type} MFA OTP verification creation")
+        otp_type_str = otp_type.value if hasattr(otp_type, "value") else str(otp_type)
+        logger.error(f"{otp_type_str} MFA OTP verification creation error: {str(e)}")
+        RequestErrorHandler.handle(e, f"{otp_type_str} MFA OTP verification creation")
