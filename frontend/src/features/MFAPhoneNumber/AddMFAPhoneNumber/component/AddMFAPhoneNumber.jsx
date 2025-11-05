@@ -99,7 +99,8 @@ export default function AddMFAPhoneNumber({
     errorPageJson[errorCode] ||
     errorPageJson[errorCodeExternal] ||
     errorCodeExternal ||
-    "";
+    errorCode;
+  ("");
 
   return (
     <GcdsContainer>

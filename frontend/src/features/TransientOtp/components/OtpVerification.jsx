@@ -84,6 +84,7 @@ export default function OtpVerification({
     errorPageJson[errorCode] ||
     errorPageJson[errorCodeExternal] ||
     errorCodeExternal ||
+    errorCode ||
     "";
   return (
     <GcdsContainer>
