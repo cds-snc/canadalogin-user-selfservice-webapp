@@ -67,14 +67,13 @@ async def second_step_update_password(
 async def dispatch_password_otp_validator(
     global_http_client: AsyncClient,
     payload: SecondStepPasswordUpdatePayload,
-    language: str = None,
 ):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
 
     try:
         access_token = await get_admin_token(global_http_client)
-        headers = get_auth_request_headers(access_token, True, language)
+        headers = get_auth_request_headers(access_token, True)
         settings = get_configuration()
 
         resetter_otp_validator_api_endpoint = (

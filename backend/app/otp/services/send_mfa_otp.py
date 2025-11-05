@@ -5,7 +5,6 @@ from app.otp.schemas import (
     OtpVerificationCreateRequest,
     VerificationCreateResponseData,
 )
-from app.otp.services.verify_mfa_otp import logger
 from app.users.services.get_my_profile import get_my_profile
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.helpers import generate_error_response
@@ -15,6 +14,10 @@ from app.utils.schemas import ResponseModel
 
 from httpx import AsyncClient, HTTPStatusError
 from pydantic import ValidationError
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 async def dispatch_send_mfa_otp(
