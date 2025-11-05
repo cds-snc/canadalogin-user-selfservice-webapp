@@ -37,6 +37,7 @@ export default function AddMFAPage() {
   const [wizardStep, setWizardStep] = useState("passwordVerification");
   const [localLoading, setLocalLoading] = useState(true);
   const { userProfile } = state;
+
   const { id, userName } = userProfile ?? {};
   const [userSelectedMfaFactor, setUserSelectedMfaFactor] = useState(null);
   const navigateHelper = useNavigateHelper();
@@ -114,6 +115,7 @@ export default function AddMFAPage() {
       const payload = {
         id: mfaId ?? phoneFormData.mfaId,
         otpType: serverMapping[otpType ?? phoneFormData.otpType],
+        language: language,
       };
 
       const response = await addMFAPhoneNumberApi.sendMFAOTP(payload);
@@ -198,7 +200,7 @@ export default function AddMFAPage() {
       phoneNumber: userSelectedMfaFactor.phoneNumber,
     };
     try {
-      const response = await authService.transientOtpSend(userData);
+      const response = await authService.transientOtpSend(userData, language);
       if (response && response.success) {
         setOtpSentResponse(response.data);
         setErrorCode("");

@@ -69,19 +69,21 @@ async def get_admin_token(global_http_client: AsyncClient) -> str:
 
 
 def get_auth_request_headers(
-    access_token: str, json_content_type: bool = False
+    access_token: str, json_content_type: bool = False, language: str = None
 ) -> dict:
     """Headers and access token to be included in the Authorization header
 
     Args:
       access_token (str): The access token to be included in the Authorization header.
       json_content_type (bool): If True, the Content-Type and Accept headers will be set to "application/json".
+      language (str): Optional language code ("en" or "fr") to include in Accept-Language header.
 
       Returns:
           dict: A dictionary containing the authentication headers, including:
               - "Authorization": "Bearer <access_token>"
-              - "Content-Type": "application/scim+json"
-              - "Accept": "application/scim+json"
+              - "Content-Type": "application/scim+json" or "application/json"
+              - "Accept": "application/scim+json" or "application/json"
+              - "Accept-Language": language (if provided)
 
     """
     headers = {}
@@ -92,11 +94,15 @@ def get_auth_request_headers(
             "Content-Type": "application/json",
             "Accept": "application/json",
         }
-        return headers
+    else:
+        headers = {
+            "Authorization": f"Bearer {access_token}",
+            "Content-Type": "application/scim+json",
+            "Accept": "application/scim+json",
+        }
 
-    headers = {
-        "Authorization": f"Bearer {access_token}",
-        "Content-Type": "application/scim+json",
-        "Accept": "application/scim+json",
-    }
+    # Add Accept-Language header if language is provided
+    if language:
+        headers["Accept-Language"] = language
+
     return headers

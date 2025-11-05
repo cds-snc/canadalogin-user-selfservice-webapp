@@ -14,13 +14,16 @@ from app.otp.schemas import (
     OtpVerificationCreateRequest,
 )
 from app.otp.services.verify_mfa_otp import (
-    dispatch_send_mfa_otp,
     dispatch_verify_mfa_otp,
-    handle_send_mfa_otp,
     handle_verify_mfa_otp,
 )
 from fastapi import HTTPException
 from httpx import HTTPStatusError, Request, Response
+
+from app.otp.services.send_mfa_otp import (
+    dispatch_send_mfa_otp,
+    handle_send_mfa_otp,
+)
 
 
 @pytest.fixture
@@ -167,9 +170,7 @@ class TestIntegrationBasics:
     def test_unified_functions_exist(self):
         """Test that the unified functions can be imported."""
         from app.otp.services.verify_mfa_otp import (
-            dispatch_send_mfa_otp,
             dispatch_verify_mfa_otp,
-            handle_send_mfa_otp,
             handle_verify_mfa_otp,
         )
 

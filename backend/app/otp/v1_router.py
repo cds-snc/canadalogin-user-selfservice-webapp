@@ -16,10 +16,12 @@ from app.otp.services.delete_mfa_otp import handle_otp_deletion
 from app.otp.services.enroll_mfa_otp import handle_otp_enrollment
 from app.otp.services.retrieve_transient_otp import handle_otp_status_retrieval
 from app.otp.services.send_transient_otp import handle_otp_send
-from app.otp.services.verify_mfa_otp import handle_send_mfa_otp, handle_verify_mfa_otp
+from app.otp.services.verify_mfa_otp import handle_verify_mfa_otp
 from app.otp.services.verify_transient_otp import handle_otp_verification
 from app.utils.schemas import ResponseModel
 from fastapi import APIRouter, Depends, Request, status
+
+from app.otp.services.send_mfa_otp import handle_send_mfa_otp
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -38,8 +40,12 @@ async def send_otp(
     user_otp_info: UserOtpInfo,
     user_access_token: str = Depends(get_users_current_session),
 ):
+    # Extract language from payload instead of headers
     return await handle_otp_send(
-        request.app.state.request_client, user_otp_info, user_access_token
+        request.app.state.request_client,
+        user_otp_info,
+        user_access_token,
+        user_otp_info.language,
     )
 
 
@@ -112,11 +118,13 @@ async def create_mfa_otp_verification(
     verification_request: OtpVerificationCreateRequest,
     user_access_token: str = Depends(get_users_current_session),
 ):
+    # Extract language from payload instead of headers
     return await handle_send_mfa_otp(
         request.app.state.request_client,
         verification_request,
         user_access_token,
         verification_request.otpType,
+        verification_request.language,
     )
 
 

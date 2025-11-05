@@ -51,6 +51,7 @@ class UpdatePasswordClientResponse(ResponseModel):
 class SecondStepPasswordUpdatePayload(BaseModel):
     otp: UserProvidedOtpValue
     trxId: str
+    language: Optional[str] = None
 
 
 class ThirdStepPasswordUpdatePayload(BaseModel):

@@ -23,14 +23,21 @@ export const addMFAPhoneNumberApi = {
   },
 
   // Send MFA OTP code via SMS or Voice
-  sendMFAOTP: async ({ id, otpType }) => {
+  sendMFAOTP: async ({ id, otpType, language = null }) => {
     try {
+      const payload = {
+        id,
+        otpType,
+      };
+
+      // Add language to payload if provided
+      if (language) {
+        payload.language = language;
+      }
+
       const response = await axios.post(
         `${config.apiUrl}${SUBMIT_END_POINTS.mfaSend}`,
-        {
-          id,
-          otpType,
-        },
+        payload,
       );
       return response.data;
     } catch (error) {

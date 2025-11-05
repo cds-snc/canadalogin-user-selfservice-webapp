@@ -19,7 +19,9 @@ logger = logging.getLogger(__name__)
 
 
 async def second_step_update_password(
-    global_http_client: AsyncClient, payload: SecondStepPasswordUpdatePayload
+    global_http_client: AsyncClient,
+    payload: SecondStepPasswordUpdatePayload,
+    language: str = None,
 ):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
@@ -28,7 +30,7 @@ async def second_step_update_password(
         logger.info(f"Second step - attempting update password for: {payload}")
         start_time = datetime.now()
         password_otp_response = await dispatch_password_otp_validator(
-            global_http_client, payload
+            global_http_client, payload, language
         )
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(
@@ -64,14 +66,16 @@ async def second_step_update_password(
 
 
 async def dispatch_password_otp_validator(
-    global_http_client: AsyncClient, payload: SecondStepPasswordUpdatePayload
+    global_http_client: AsyncClient,
+    payload: SecondStepPasswordUpdatePayload,
+    language: str = None,
 ):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
 
     try:
         access_token = await get_admin_token(global_http_client)
-        headers = get_auth_request_headers(access_token, True)
+        headers = get_auth_request_headers(access_token, True, language)
         settings = get_configuration()
 
         resetter_otp_validator_api_endpoint = (

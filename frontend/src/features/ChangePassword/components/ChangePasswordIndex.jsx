@@ -90,6 +90,7 @@ export default function ChangePasswordIndex() {
       const response = await passwordUpdate.secondStep(
         userOtpValue,
         otpSentResponse.trxId,
+        language,
       );
       if (response && response.success) {
         setPasswordUpdateStep("passwordChange");

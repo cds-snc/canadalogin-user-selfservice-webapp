@@ -43,7 +43,7 @@ def patch_config_and_auth(monkeypatch, fake_settings):
     monkeypatch.setattr(
         feature_module,
         "get_auth_request_headers",
-        lambda token, is_json=True: {"Authorization": f"Bearer {token}"},
+        lambda token, is_json=True, language=None: {"Authorization": f"Bearer {token}"},
     )
 
 

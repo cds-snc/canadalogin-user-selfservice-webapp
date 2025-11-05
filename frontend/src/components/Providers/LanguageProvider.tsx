@@ -28,7 +28,6 @@ interface LanguageState {
 function languageReducer(state = initialState, action: Action) {
   switch (action.type) {
     case CONTEXT_ACTIONS.set_language:
-      console.log("Setting language to:", action.payload);
       return { ...state, language: action.payload };
     default:
       return state;

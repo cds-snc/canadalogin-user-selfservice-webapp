@@ -20,12 +20,16 @@ export const passwordUpdate = {
       handleApiError(error);
     }
   },
-  secondStep: async (userOtp, trxId) => {
+  secondStep: async (userOtp, trxId, language = null) => {
     try {
       const data = {
         otp: userOtp,
         trxId: trxId,
       };
+
+      if (language) {
+        data.language = language;
+      }
 
       const response = await axios.post(`${passwordUpdateApi}/validate`, data);
       return response.data;

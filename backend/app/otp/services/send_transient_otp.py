@@ -91,7 +91,10 @@ async def resolve_masked_phone_number(
 
 
 async def handle_otp_send(
-    global_http_client: AsyncClient, user_otp_info: UserOtpInfo, user_access_token: str
+    global_http_client: AsyncClient,
+    user_otp_info: UserOtpInfo,
+    user_access_token: str,
+    language: str = None,
 ):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
@@ -134,7 +137,7 @@ async def handle_otp_send(
                 return generate_error_response(400, str(e))
 
         http_client_response = await dispatch_otp(
-            global_http_client, resolved_user_otp_info
+            global_http_client, resolved_user_otp_info, language
         )
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(
@@ -190,7 +193,9 @@ async def handle_otp_send(
         )
 
 
-async def dispatch_otp(global_http_client: AsyncClient, user_otp_info: UserOtpInfo):
+async def dispatch_otp(
+    global_http_client: AsyncClient, user_otp_info: UserOtpInfo, language: str = None
+):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
 
@@ -198,7 +203,7 @@ async def dispatch_otp(global_http_client: AsyncClient, user_otp_info: UserOtpIn
         access_token = await get_admin_token(
             global_http_client
         )  # Pass global_http_client here
-        headers = get_auth_request_headers(access_token, True)
+        headers = get_auth_request_headers(access_token, True, language)
         settings = get_configuration().ibm_verify_config
 
         if user_otp_info.phoneNumber:

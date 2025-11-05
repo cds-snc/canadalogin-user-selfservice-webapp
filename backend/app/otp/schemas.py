@@ -37,6 +37,7 @@ class UserOtpInfo(BaseModel):
     )
     userName: EmailStr
     otpType: OtpType
+    language: Optional[str] = None
 
     @field_validator("phoneNumber")
     @classmethod
@@ -116,6 +117,7 @@ class OtpVerificationCreateRequest(BaseModel):
 
     id: str
     otpType: OtpType
+    language: Optional[str] = None
 
 
 class VerificationCreateResponseData(BaseModel):
