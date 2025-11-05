@@ -7,12 +7,15 @@ axios.defaults.withCredentials = true;
 const passwordUpdateApi = `${config.apiUrl}${SUBMIT_END_POINTS.passwordUpdate}`;
 
 export const passwordUpdate = {
-  firstStep: async (userName, otpMethod) => {
+  firstStep: async (userName, otpMethod, language = null) => {
     try {
       const data = {
         userName: userName,
         otpMethod: otpMethod,
       };
+      if (language) {
+        data.language = language;
+      }
 
       const response = await axios.post(`${passwordUpdateApi}/initiate`, data);
       return response.data;
@@ -20,17 +23,12 @@ export const passwordUpdate = {
       handleApiError(error);
     }
   },
-  secondStep: async (userOtp, trxId, language = null) => {
+  secondStep: async (userOtp, trxId) => {
     try {
       const data = {
         otp: userOtp,
         trxId: trxId,
       };
-
-      if (language) {
-        data.language = language;
-      }
-
       const response = await axios.post(`${passwordUpdateApi}/validate`, data);
       return response.data;
     } catch (error) {

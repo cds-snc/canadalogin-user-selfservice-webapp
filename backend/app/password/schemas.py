@@ -19,6 +19,7 @@ class OtpType(str, Enum):
 class FirstStepPasswordUpdatePayload(BaseModel):
     userName: EmailStr
     otpMethod: OtpType
+    language: Optional[str] = None
 
 
 class NextStep(BaseModel):
@@ -51,7 +52,6 @@ class UpdatePasswordClientResponse(ResponseModel):
 class SecondStepPasswordUpdatePayload(BaseModel):
     otp: UserProvidedOtpValue
     trxId: str
-    language: Optional[str] = None
 
 
 class ThirdStepPasswordUpdatePayload(BaseModel):

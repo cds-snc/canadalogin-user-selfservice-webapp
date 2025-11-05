@@ -44,6 +44,7 @@ async def password_update(
     return await first_step_update_password(
         request.app.state.request_client,
         payload,
+        payload.language,
     )
 
 
@@ -59,11 +60,9 @@ async def password_validate_otp(
     payload: SecondStepPasswordUpdatePayload,
     user_access_token: None = Depends(get_users_current_session),
 ):
-    # Extract language from payload instead of headers
     return await second_step_update_password(
         request.app.state.request_client,
         payload,
-        payload.language,
     )
 
 
