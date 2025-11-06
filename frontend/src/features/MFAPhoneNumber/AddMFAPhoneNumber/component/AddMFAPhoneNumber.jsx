@@ -16,6 +16,7 @@ import { useParams } from "react-router";
 import { countryMapping, FLOW_TYPES, PAGES } from "../../../../utils/constants";
 import { getPageContent } from "../../../../utils/functions";
 import { path } from "../../../../utils/routeHelpers";
+import ErrorSummaryWithFocus from "../../../../components/ErrorSummaryWithFocus/ErrorSummaryWithFocus";
 
 const RadioButtons = ({
   onChangePhoneForm,
@@ -79,28 +80,20 @@ export default function AddMFAPhoneNumber({
   onCancel,
   onChangePhoneForm,
   phoneFormData,
-  errorCode: errorCodeExternal,
+  setErrorCode,
+  errorMessage,
 }) {
   const { language } = useParams();
   const [phoneNumberValid, setPhoneNumberValid] = useState(true);
   const pageContentJson = getPageContent(language, PAGES.addMFANumber);
   const { submit, cancel } = getPageContent(language, "Button");
   const backtoProfilePage = path(PAGES.ProfileHome, { language: language });
-  const [errorCode, setErrorCode] = useState(errorCodeExternal);
-  const errorPageJson = getPageContent(language, PAGES.error);
 
   const isPhoneNumberValid = (phoneNumber, country) => {
     const capitalize = country.toUpperCase();
     const validatedPhoneNumber = isValidPhoneNumber(phoneNumber, capitalize);
     return validatedPhoneNumber;
   };
-
-  const errorMessage =
-    errorPageJson[errorCode] ||
-    errorPageJson[errorCodeExternal] ||
-    errorCodeExternal ||
-    errorCode;
-  ("");
 
   return (
     <GcdsContainer>

@@ -17,10 +17,7 @@ import AddMFAPhoneNumber from "./AddMFAPhoneNumber";
 import AddSecondMFA from "./AddSecondMFA";
 import { authService } from "../../../../services/authService";
 import PasswordVerification from "../../../TransientOtp/components/PasswordVerification";
-
-const StepContent = ({ StepComponent }) => {
-  return <>{StepComponent}</>;
-};
+import StepContent from "../../../../components/Wizard/StepContent";
 
 export default function AddMFAPage() {
   const { language } = useParams();
@@ -31,6 +28,7 @@ export default function AddMFAPage() {
   const [userOtpValue, setUserOtpValue] = useState("");
   const [userPasswordValue, setUserPasswordValue] = useState("");
   const pageContentJson = getPageContent(language, PAGES.otpSelection);
+  const errorPageJson = getPageContent(language, PAGES.error);
 
   const [errorCode, setErrorCode] = useState("");
 
@@ -59,6 +57,9 @@ export default function AddMFAPage() {
   });
 
   const successBannerJson = getPageContent(language, PAGES.successBanner);
+  const errorMessage = errorCode
+    ? errorPageJson[errorCode] || errorPageJson["7"]
+    : "";
 
   const handlePhoneForm = (field, value) => {
     setPhoneFormData((prev) => ({
@@ -125,7 +126,6 @@ export default function AddMFAPage() {
           setWizardStep("addMFAValidation");
         }
       }
-      setErrorCode("");
     } catch (error) {
       if (error && error.data && error.data.message) {
         setErrorCode(error.data.message);
@@ -365,7 +365,8 @@ export default function AddMFAPage() {
           await navigateHelper(backToManage2FAVerificationsPage)
         }
         validatePassword={validatePassword}
-        errorCode={errorCode}
+        setErrorCode={setErrorCode}
+        errorMessage={errorMessage}
         parentPage={PAGES.addMFAPage}
       />
     ),
@@ -393,7 +394,8 @@ export default function AddMFAPage() {
         requestOtpCode={requestOtpCode}
         validateOtpCode={validateOtpCode}
         onBack={() => setWizardStep("otpSelection")}
-        errorCode={errorCode}
+        setErrorCode={setErrorCode}
+        errorMessage={errorMessage}
       />
     ),
     addMFANumber: (
@@ -404,7 +406,8 @@ export default function AddMFAPage() {
         }
         onChangePhoneForm={handlePhoneForm}
         phoneFormData={phoneFormData}
-        errorCode={errorCode}
+        setErrorCode={setErrorCode}
+        errorMessage={errorMessage}
       />
     ),
     addMFAValidation: (
@@ -412,7 +415,7 @@ export default function AddMFAPage() {
         userProfile={userProfile}
         phoneFormData={phoneFormData}
         onChangePhoneForm={handlePhoneForm}
-        errorCode={errorCode}
+        errorMessage={errorMessage}
         onNext={async () => {
           await verifyMFAOtp();
         }}
@@ -469,6 +472,10 @@ export default function AddMFAPage() {
   return localLoading ? (
     <Loader text={pageContentJson["11"]} />
   ) : (
-    <StepContent StepComponent={steps[wizardStep]} />
+    <StepContent
+      StepComponent={steps[wizardStep]}
+      errorCode={errorCode}
+      language={language}
+    />
   );
 }

@@ -14,10 +14,7 @@ import { deleteMFAPhoneNumberApi } from "../api/DeleteMFAPhoneNumberAPI";
 import DeleteMFAPhoneNumberConfirm from "./DeleteMFAPhoneNumberConfirm";
 import { authService } from "../../../../services/authService";
 import PasswordVerification from "../../../TransientOtp/components/PasswordVerification";
-
-const StepContent = ({ StepComponent }) => {
-  return <>{StepComponent}</>;
-};
+import StepContent from "../../../../components/Wizard/StepContent";
 
 export default function DeleteMFAPage() {
   const { language } = useParams();
@@ -30,9 +27,12 @@ export default function DeleteMFAPage() {
   const [userPasswordValue, setUserPasswordValue] = useState("");
   const [userOtpValue, setUserOtpValue] = useState("");
   const pageContentJson = getPageContent(language, PAGES.otpSelection);
+  const errorPageJson = getPageContent(language, PAGES.error);
 
   const [errorCode, setErrorCode] = useState("");
-
+  const errorMessage = errorCode
+    ? errorPageJson[errorCode] || errorPageJson["7"]
+    : "";
   const [wizardStep, setWizardStep] = useState("passwordVerification");
   const [localLoading, setLocalLoading] = useState(true);
   const { userProfile } = state;
@@ -231,7 +231,8 @@ export default function DeleteMFAPage() {
           await navigateHelper(backToManage2FAVerificationsPage)
         }
         validatePassword={validatePassword}
-        errorCode={errorCode}
+        setErrorCode={setErrorCode}
+        errorMessage={errorMessage}
         parentPage={PAGES.addMFAPage}
       />
     ),
@@ -259,7 +260,8 @@ export default function DeleteMFAPage() {
         requestOtpCode={requestOtpCode}
         validateOtpCode={validateOtpCode}
         onBack={() => setWizardStep("otpSelection")}
-        errorCode={errorCode}
+        setErrorCode={setErrorCode}
+        errorMessage={errorMessage}
       />
     ),
     deleteMFAPhoneNumberConfirm: (
@@ -286,6 +288,10 @@ export default function DeleteMFAPage() {
   return localLoading ? (
     <Loader text={pageContentJson["11"]} />
   ) : (
-    <StepContent StepComponent={steps[wizardStep]} />
+    <StepContent
+      StepComponent={steps[wizardStep]}
+      errorCode={errorCode}
+      language={language}
+    />
   );
 }

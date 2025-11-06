@@ -10,20 +10,18 @@ import {
 import { getPageContent } from "../../../utils/functions";
 import { PAGES } from "../../../utils/constants";
 import { useParams } from "react-router";
-import { useState } from "react";
 
 export default function PasswordVerification({
-  errorCode: errorCodeExternal,
   userPasswordValue,
   setUserPasswordValue,
   onCancel,
   validatePassword,
   parentPage,
+  setErrorCode,
+  errorMessage,
 }) {
-  const [errorCode, setErrorCode] = useState(errorCodeExternal);
   const { language } = useParams();
   const pageContentJson = getPageContent(language, PAGES.passwordVerification);
-  const errorPageJson = getPageContent(language, PAGES.error);
   const { submit, cancel } = getPageContent(language, "Button");
   const parentPageContent =
     parentPage === PAGES.deleteMFAPage
@@ -32,12 +30,6 @@ export default function PasswordVerification({
         ? pageContentJson["7"]
         : pageContentJson["2"];
 
-  const errorMessage =
-    errorPageJson[errorCode] ||
-    errorPageJson[errorCodeExternal] ||
-    errorCodeExternal ||
-    errorCode ||
-    "";
   return (
     <GcdsContainer>
       <GcdsContainer className="gcds-gap">

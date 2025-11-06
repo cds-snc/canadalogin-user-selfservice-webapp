@@ -13,6 +13,7 @@ import {
 import { useParams } from "react-router";
 import { FLOW_TYPES, PAGES } from "../../../../utils/constants";
 import { getPageContent } from "../../../../utils/functions";
+import ErrorSummaryWithFocus from "../../../../components/ErrorSummaryWithFocus/ErrorSummaryWithFocus";
 
 const initialTime = 10;
 
@@ -55,7 +56,7 @@ export default function AddMFAOtpVerification({
   onBack,
   onChangePhoneForm,
   phoneFormData,
-  errorCode,
+  errorMessage,
   requestNewOtpCode,
   onUseDifferentPhoneNumber,
 }) {
@@ -64,7 +65,6 @@ export default function AddMFAOtpVerification({
   const [codeRequested, setCodeRequested] = useState(false);
   const [time, setTime] = useState(initialTime);
   const pageContentJson = getPageContent(language, PAGES.verification);
-  const errorPageJson = getPageContent(language, PAGES.error);
   const { submit, cancel } = getPageContent(language, "Button");
 
   const clearValues = () => {
@@ -104,7 +104,6 @@ export default function AddMFAOtpVerification({
   }, [time]);
 
   const userMfaType = phoneFormData.otpType;
-  const errorMessage = errorPageJson[errorCode] || errorCode || "";
   return (
     <GcdsContainer>
       {codeRequested && (

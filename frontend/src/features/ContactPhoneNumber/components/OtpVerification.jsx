@@ -15,6 +15,7 @@ import { getPageContent } from "../../../utils/functions.jsx";
 
 import { FLOW_TYPES, PAGES } from "../../../utils/constants.jsx";
 import { useParams } from "react-router";
+import ErrorSummaryWithFocus from "../../../components/ErrorSummaryWithFocus/ErrorSummaryWithFocus.jsx";
 
 const initialTime = 10;
 
@@ -57,7 +58,7 @@ export default function OtpVerification({
   onBack,
   onChangePhoneForm,
   phoneFormData,
-  errorCode,
+  errorMessage,
   requestNewOtpCode,
 }) {
   const { language } = useParams();
@@ -65,7 +66,6 @@ export default function OtpVerification({
   const [codeRequested, setCodeRequested] = useState(false);
   const [time, setTime] = useState(initialTime);
   const pageContentJson = getPageContent(language, PAGES.verification);
-  const errorPageJson = getPageContent(language, PAGES.error);
   const { submit, cancel } = getPageContent(language, "Button");
 
   const clearValues = () => {
@@ -99,7 +99,7 @@ export default function OtpVerification({
   }, [time]);
 
   const userMfaType = phoneFormData.otpType;
-  const errorMessage = errorPageJson[errorCode] || "";
+
   return (
     <GcdsContainer>
       {codeRequested && (
