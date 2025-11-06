@@ -36,13 +36,13 @@ export default function ConfirmLanguageUpdate() {
   const { language } = useParams();
   const { state, dispatch } = useUser();
   const [errorCode, setErrorCode] = useState("");
-
   const location = useLocation();
   const navigate = useNavigate();
   const { updateProfileSuccess } = userProfileDispatch(dispatch);
   const [localLoading, setLocalLoading] = useState(false);
+  const [savedLocationState, setSavedLocationState] = useState(null);
+  const updatedLanguage = savedLocationState?.updatedLanguage;
 
-  const { updatedLanguage } = location.state ?? {};
   // if user navigates directly to this page, there will be no updatedLanguage data and will be redirected back to edit page
   // fallback to url param to avoid undefined
   const languageCode = updatedLanguage?.languageCode ?? language;
@@ -90,9 +90,15 @@ export default function ConfirmLanguageUpdate() {
 
   useEffect(() => {
     // redirect to edit page if no updatedLanguage data
-    if (!updatedLanguage) navigate(editLanguagePreferences);
+    if (location.state === null) {
+      navigate(editLanguagePreferences);
+    } else {
+      // save location state to local state, when the language is toggled the location.state is null
+      setSavedLocationState(location.state);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   if (!updatedLanguage?.languageCode) return null;
   const errorMessage = errorPageJson[errorCode] || "";
 
