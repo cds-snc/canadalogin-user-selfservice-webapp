@@ -79,10 +79,12 @@ async def rp_info(
 async def user_factors(
     request: Request,
     user_id: str,
+    validated: bool = True,
     user_access_token: str = Depends(get_users_current_session),
 ):
     return await get_user_otp_factors(
         request.app.state.request_client,
         user_id,
         user_access_token,
+        validated,
     )

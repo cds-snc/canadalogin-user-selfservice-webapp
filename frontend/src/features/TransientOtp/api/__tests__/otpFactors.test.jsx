@@ -56,6 +56,11 @@ describe("otpFactors API", () => {
 
       expect(axios.get).toHaveBeenCalledWith(
         `http://localhost:8000/v1/users/${mockUserId}/otp_factors`,
+        {
+          params: {
+            validated: true,
+          },
+        },
       );
       expect(result).toEqual(mockResponseData);
       expect(handleApiError).not.toHaveBeenCalled();
@@ -83,6 +88,11 @@ describe("otpFactors API", () => {
 
       expect(axios.get).toHaveBeenCalledWith(
         "http://localhost:8000/v1/users/user-456/otp_factors",
+        {
+          params: {
+            validated: true,
+          },
+        },
       );
       expect(result).toEqual(mockResponseData);
       expect(result.data).toHaveLength(1);
@@ -103,6 +113,11 @@ describe("otpFactors API", () => {
 
       expect(axios.get).toHaveBeenCalledWith(
         "http://localhost:8000/v1/users/user-789/otp_factors",
+        {
+          params: {
+            validated: true,
+          },
+        },
       );
       expect(result).toEqual(mockResponseData);
       expect(result.data).toHaveLength(0);
@@ -155,6 +170,11 @@ describe("otpFactors API", () => {
 
       expect(axios.get).toHaveBeenCalledWith(
         "http://localhost:8000/v1/users/user-error/otp_factors",
+        {
+          params: {
+            validated: true,
+          },
+        },
       );
       expect(handleApiError).toHaveBeenCalledWith(networkError);
       expect(result).toBeUndefined();
@@ -247,6 +267,11 @@ describe("otpFactors API", () => {
 
       expect(axios.get).toHaveBeenCalledWith(
         "http://localhost:8000/v1/users/user-with-dashes-123/otp_factors",
+        {
+          params: {
+            validated: true,
+          },
+        },
       );
     });
 
