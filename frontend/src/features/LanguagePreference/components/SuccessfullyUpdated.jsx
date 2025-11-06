@@ -27,7 +27,6 @@ export default function SuccessfullyUpdatedLanguage() {
   const navigate = useNavigate();
   const [savedLocationState, setSavedLocationState] = useState(null);
   const updatedLanguage = savedLocationState?.updatedLanguage;
-
   const preferredLanguage = state?.userProfile?.preferredLanguage || "";
   const editLanguagePreferences = path(PAGES.editLanguagePreferences, {
     language: language,
@@ -35,11 +34,11 @@ export default function SuccessfullyUpdatedLanguage() {
 
   useEffect(() => {
     // redirect to edit page if no updatedLanguage data
-    if (location.state === null) {
-      navigate(editLanguagePreferences);
-    } else {
+    if (location?.state?.updatedLanguage) {
       // save location state to local state, when the language is toggled the location.state is null
       setSavedLocationState(location.state);
+    } else {
+      navigate(editLanguagePreferences);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

@@ -89,12 +89,12 @@ export default function ConfirmLanguageUpdate() {
   };
 
   useEffect(() => {
-    // redirect to edit page if no updatedLanguage data
-    if (location.state === null) {
-      navigate(editLanguagePreferences);
-    } else {
+    if (location?.state?.updatedLanguage) {
       // save location state to local state, when the language is toggled the location.state is null
       setSavedLocationState(location.state);
+    } else {
+      // redirect to edit page if no updatedLanguage data
+      navigate(editLanguagePreferences);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
