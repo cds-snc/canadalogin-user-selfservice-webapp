@@ -19,7 +19,6 @@ class OtpType(str, Enum):
 class FirstStepPasswordUpdatePayload(BaseModel):
     userName: EmailStr
     otpMethod: OtpType
-    language: Optional[str] = None
 
 
 class NextStep(BaseModel):
