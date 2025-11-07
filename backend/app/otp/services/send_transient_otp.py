@@ -94,7 +94,6 @@ async def handle_otp_send(
     global_http_client: AsyncClient,
     user_otp_info: UserOtpInfo,
     user_access_token: str,
-    language: str = None,
 ):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
@@ -109,6 +108,10 @@ async def handle_otp_send(
             logger.error("User mismatch - cannot send OTP")
             return generate_error_response(403, "User mismatch - cannot send OTP")
         logger.info("User verified to send OTP")
+
+        # Get user's preferred language from profile
+        user_language = my_profile_response.data.preferredLanguage or "en"
+        logger.info(f"Using user's preferred language: {user_language}")
 
         # Handle masked phone numbers
         resolved_user_otp_info = user_otp_info
@@ -137,7 +140,7 @@ async def handle_otp_send(
                 return generate_error_response(400, str(e))
 
         http_client_response = await dispatch_otp(
-            global_http_client, resolved_user_otp_info, language
+            global_http_client, resolved_user_otp_info, user_language
         )
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(

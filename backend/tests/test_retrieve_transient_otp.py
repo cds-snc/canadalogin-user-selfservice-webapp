@@ -129,8 +129,8 @@ async def test_handle_success_validates_into_OtpDataResponse(otp_type, monkeypat
         rd = RetrievalData(otpType=otp_type, trxnId=trxn_id)
         result = await handle_otp_status_retrieval(client, rd)
 
-    # Expect 'OtpType.SMS' style in message because implementation uses the Enum object
-    expected_msg_fragment = f"{str(otp_type)} OTP status checked successfully"
+    # Expect enum value in message because implementation uses the Enum directly
+    expected_msg_fragment = f"{otp_type} OTP status checked successfully"
 
     # Assert ResponseModel-like contract defensively (dict or model)
     if isinstance(result, dict):
@@ -257,5 +257,5 @@ async def test_handle_transport_exception_translates_to_405_http_exception(monke
 
     exc: HTTPException = excinfo.value
     assert exc.status_code == 405
-    # Implementation uses Enum object in string form -> "OtpType.VOICE"
-    assert "Verify transient OtpType.VOICE error: " in exc.detail
+    # Implementation uses Enum value in string form -> "voice"
+    assert "Verify transient voice error: " in exc.detail

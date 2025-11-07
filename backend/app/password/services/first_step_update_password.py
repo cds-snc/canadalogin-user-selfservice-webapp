@@ -11,6 +11,7 @@ from app.password.schemas import (
     UpdatePasswordIbmApiResponse,
     UpdatePasswordClientResponsePayload,
 )
+from app.users.services.get_my_profile import get_my_profile
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.request_error_handler import RequestErrorHandler
 from app.utils.schemas import ResponseModel
@@ -21,7 +22,7 @@ logger = logging.getLogger(__name__)
 async def first_step_update_password(
     global_http_client: AsyncClient,
     payload: FirstStepPasswordUpdatePayload,
-    language: str = None,
+    user_access_token,
 ):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
@@ -29,8 +30,16 @@ async def first_step_update_password(
     try:
         logger.info(f"First step - attempting update password for: {payload}")
         start_time = datetime.now()
+
+        # Get user's preferred language from their profile
+        user_profile_response = await get_my_profile(
+            global_http_client, user_access_token
+        )
+        user_language = user_profile_response.data.preferredLanguage or "en"
+        logger.info(f"Using user's preferred language: {user_language}")
+
         password_otp_response = await dispatch_password_otp(
-            global_http_client, payload, language
+            global_http_client, payload, user_language
         )
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(

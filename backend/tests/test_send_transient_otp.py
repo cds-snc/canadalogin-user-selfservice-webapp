@@ -103,7 +103,9 @@ def patch_config_and_auth(monkeypatch, fake_settings):
 
     # Async my_profile returning the same username by default
     async def _ok_profile(_client, user_access_token: str):
-        return SimpleNamespace(data=SimpleNamespace(userName="user@example.com"))
+        return SimpleNamespace(
+            data=SimpleNamespace(userName="user@example.com", preferredLanguage="en")
+        )
 
     monkeypatch.setattr(feature_module, "get_my_profile", _ok_profile)
 
@@ -308,7 +310,11 @@ async def test_handle_validation_error_due_to_incomplete_payload():
 async def test_handle_user_mismatch_returns_403(monkeypatch):
     # Override my_profile to return a different userName → expect 403 error response model
     async def _bad_profile(_client, token):
-        return SimpleNamespace(data=SimpleNamespace(userName="intruder@example.com"))
+        return SimpleNamespace(
+            data=SimpleNamespace(
+                userName="intruder@example.com", preferredLanguage="en"
+            )
+        )
 
     monkeypatch.setattr(feature_module, "get_my_profile", _bad_profile)
 

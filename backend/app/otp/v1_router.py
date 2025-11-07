@@ -40,12 +40,11 @@ async def send_otp(
     user_otp_info: UserOtpInfo,
     user_access_token: str = Depends(get_users_current_session),
 ):
-    # Extract language from payload instead of headers
+    # Get user's preferred language from their profile instead of payload
     return await handle_otp_send(
         request.app.state.request_client,
         user_otp_info,
         user_access_token,
-        user_otp_info.language,
     )
 
 
@@ -118,13 +117,12 @@ async def create_mfa_otp_verification(
     verification_request: OtpVerificationCreateRequest,
     user_access_token: str = Depends(get_users_current_session),
 ):
-    # Extract language from payload instead of headers
+    # Get user's preferred language from their profile instead of payload
     return await handle_send_mfa_otp(
         request.app.state.request_client,
         verification_request,
         user_access_token,
         verification_request.otpType,
-        verification_request.language,
     )
 
 

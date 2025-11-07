@@ -76,7 +76,8 @@ def get_auth_request_headers(
     Args:
       access_token (str): The access token to be included in the Authorization header.
       json_content_type (bool): If True, the Content-Type and Accept headers will be set to "application/json".
-      language (str): Optional language code ("en" or "fr") to include in Accept-Language header.
+      language (str): Optional language code ("en", "fr", "en-ca", "fr-ca") to include in Accept-Language header.
+                     Locale codes like "en-ca" or "fr-ca" will be converted to just "en" or "fr".
 
       Returns:
           dict: A dictionary containing the authentication headers, including:
@@ -103,6 +104,8 @@ def get_auth_request_headers(
 
     # Add Accept-Language header if language is provided
     if language:
-        headers["Accept-Language"] = language
+        # Extract just the language code (e.g., "en-ca" -> "en", "fr-ca" -> "fr")
+        language_code = language.split("-")[0] if "-" in language else language
+        headers["Accept-Language"] = language_code
 
     return headers

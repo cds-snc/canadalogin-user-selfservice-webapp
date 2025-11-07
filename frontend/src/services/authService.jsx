@@ -39,18 +39,13 @@ export const authService = {
     );
     return response.data;
   },
-  transientOtpSend: async (userData, language = null) => {
+  transientOtpSend: async (userData) => {
     if (TEST_USERS.has(userData.userName))
       return buildTestResponse(userData, "transientOtpSend");
 
-    const payload = { ...userData };
-    if (language) {
-      payload.language = language;
-    }
-
     const response = await axios.post(
       `${config.apiUrl}${SUBMIT_END_POINTS.transientOtpSend}`,
-      payload,
+      userData,
     );
     return response.data;
   },

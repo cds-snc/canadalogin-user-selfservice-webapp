@@ -100,7 +100,7 @@ export default function UpdateContactPhoneNumberContainer() {
         otpType: serverMapping[phoneFormData.otpType],
       };
 
-      const response = await authService.transientOtpSend(formdata, language);
+      const response = await authService.transientOtpSend(formdata);
       if (response && response.data && response.data.trxnId) {
         handlePhoneForm("trxnId", response.data.trxnId);
         if (!reSendOtpCode) setStep(STEPS.VERIFY);

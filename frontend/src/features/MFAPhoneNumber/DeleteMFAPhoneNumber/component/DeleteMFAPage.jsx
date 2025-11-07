@@ -101,7 +101,7 @@ export default function DeleteMFAPage() {
       phoneNumber: userSelectedMfaFactor.phoneNumber,
     };
     try {
-      const response = await authService.transientOtpSend(userData, language);
+      const response = await authService.transientOtpSend(userData);
       if (response && response.success) {
         setOtpSentResponse(response.data);
       }

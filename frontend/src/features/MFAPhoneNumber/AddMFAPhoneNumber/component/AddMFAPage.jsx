@@ -115,7 +115,6 @@ export default function AddMFAPage() {
       const payload = {
         id: mfaId ?? phoneFormData.mfaId,
         otpType: serverMapping[otpType ?? phoneFormData.otpType],
-        language: language,
       };
 
       const response = await addMFAPhoneNumberApi.sendMFAOTP(payload);
@@ -202,7 +201,7 @@ export default function AddMFAPage() {
       phoneNumber: userSelectedMfaFactor.phoneNumber,
     };
     try {
-      const response = await authService.transientOtpSend(userData, language);
+      const response = await authService.transientOtpSend(userData);
       if (response && response.success) {
         setOtpSentResponse(response.data);
         setErrorCode("");

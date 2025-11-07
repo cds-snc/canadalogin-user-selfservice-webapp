@@ -71,7 +71,6 @@ export default function ChangePasswordIndex() {
       const response = await passwordUpdate.firstStep(
         userName,
         userSelectedMfaFactor.type,
-        language,
       );
       if (response && response.success) {
         setOtpSentResponse(response.data);

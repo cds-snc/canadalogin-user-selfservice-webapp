@@ -68,7 +68,6 @@ async def handle_send_mfa_otp(
     verification_request: OtpVerificationCreateRequest,
     user_access_token: str,
     otp_type: OtpType,
-    language: str = None,
 ):
     """Send an MFA OTP for SMS or Voice"""
     try:
@@ -87,8 +86,12 @@ async def handle_send_mfa_otp(
                 success=False, data=None, message="User verification failed"
             )
 
+        # Get user's preferred language from profile
+        user_language = my_profile_response.data.preferredLanguage or "en"
+        logger.info(f"Using user's preferred language: {user_language}")
+
         http_client_response = await dispatch_send_mfa_otp(
-            global_http_client, verification_request, otp_type, language
+            global_http_client, verification_request, otp_type, user_language
         )
 
         response_json = http_client_response.json()
