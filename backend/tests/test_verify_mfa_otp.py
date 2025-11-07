@@ -14,13 +14,16 @@ from app.otp.schemas import (
     OtpVerificationCreateRequest,
 )
 from app.otp.services.verify_mfa_otp import (
-    dispatch_send_mfa_otp,
     dispatch_verify_mfa_otp,
-    handle_send_mfa_otp,
     handle_verify_mfa_otp,
 )
 from fastapi import HTTPException
 from httpx import HTTPStatusError, Request, Response
+
+from app.otp.services.send_mfa_otp import (
+    dispatch_send_mfa_otp,
+    handle_send_mfa_otp,
+)
 
 
 @pytest.fixture
@@ -89,16 +92,16 @@ class TestUnifiedMFAOTPDispatchFunctions:
         """Test SMS dispatch verification create."""
         mock_http_client = AsyncMock()
 
-        with patch("app.otp.services.verify_mfa_otp.get_admin_token") as mock_get_token:
+        with patch("app.otp.services.send_mfa_otp.get_admin_token") as mock_get_token:
             mock_get_token.return_value = "admin_token"
 
             with patch(
-                "app.otp.services.verify_mfa_otp.get_auth_request_headers"
+                "app.otp.services.send_mfa_otp.get_auth_request_headers"
             ) as mock_headers:
                 mock_headers.return_value = {"Authorization": "Bearer admin_token"}
 
                 with patch(
-                    "app.otp.services.verify_mfa_otp.get_configuration"
+                    "app.otp.services.send_mfa_otp.get_configuration"
                 ) as mock_config:
                     mock_config.return_value.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
                         "https://test.ibm.com"
@@ -128,16 +131,16 @@ class TestUnifiedMFAOTPDispatchFunctions:
         """Test Voice dispatch verification create."""
         mock_http_client = AsyncMock()
 
-        with patch("app.otp.services.verify_mfa_otp.get_admin_token") as mock_get_token:
+        with patch("app.otp.services.send_mfa_otp.get_admin_token") as mock_get_token:
             mock_get_token.return_value = "admin_token"
 
             with patch(
-                "app.otp.services.verify_mfa_otp.get_auth_request_headers"
+                "app.otp.services.send_mfa_otp.get_auth_request_headers"
             ) as mock_headers:
                 mock_headers.return_value = {"Authorization": "Bearer admin_token"}
 
                 with patch(
-                    "app.otp.services.verify_mfa_otp.get_configuration"
+                    "app.otp.services.send_mfa_otp.get_configuration"
                 ) as mock_config:
                     mock_config.return_value.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
                         "https://test.ibm.com"
@@ -167,9 +170,7 @@ class TestIntegrationBasics:
     def test_unified_functions_exist(self):
         """Test that the unified functions can be imported."""
         from app.otp.services.verify_mfa_otp import (
-            dispatch_send_mfa_otp,
             dispatch_verify_mfa_otp,
-            handle_send_mfa_otp,
             handle_verify_mfa_otp,
         )
 
@@ -202,11 +203,11 @@ class TestHandleMFAOTPVerificationCreate:
         """Test successful SMS verification creation."""
         mock_http_client = AsyncMock()
 
-        with patch("app.otp.services.verify_mfa_otp.get_my_profile") as mock_profile:
+        with patch("app.otp.services.send_mfa_otp.get_my_profile") as mock_profile:
             mock_profile.return_value = mock_profile_success_response
 
             with patch(
-                "app.otp.services.verify_mfa_otp.dispatch_send_mfa_otp"
+                "app.otp.services.send_mfa_otp.dispatch_send_mfa_otp"
             ) as mock_dispatch:
                 mock_response = MagicMock()
                 mock_response.json.return_value = mock_successful_verification_response
@@ -233,11 +234,11 @@ class TestHandleMFAOTPVerificationCreate:
         """Test successful Voice verification creation."""
         mock_http_client = AsyncMock()
 
-        with patch("app.otp.services.verify_mfa_otp.get_my_profile") as mock_profile:
+        with patch("app.otp.services.send_mfa_otp.get_my_profile") as mock_profile:
             mock_profile.return_value = mock_profile_success_response
 
             with patch(
-                "app.otp.services.verify_mfa_otp.dispatch_send_mfa_otp"
+                "app.otp.services.send_mfa_otp.dispatch_send_mfa_otp"
             ) as mock_dispatch:
                 mock_response = MagicMock()
                 voice_response = mock_successful_verification_response.copy()
@@ -265,7 +266,7 @@ class TestHandleMFAOTPVerificationCreate:
         """Test verification creation when profile check fails."""
         mock_http_client = AsyncMock()
 
-        with patch("app.otp.services.verify_mfa_otp.get_my_profile") as mock_profile:
+        with patch("app.otp.services.send_mfa_otp.get_my_profile") as mock_profile:
             mock_profile.return_value = mock_profile_failure_response
 
             result = await handle_send_mfa_otp(
@@ -285,11 +286,11 @@ class TestHandleMFAOTPVerificationCreate:
         """Test verification creation with malformed response causing validation error."""
         mock_http_client = AsyncMock()
 
-        with patch("app.otp.services.verify_mfa_otp.get_my_profile") as mock_profile:
+        with patch("app.otp.services.send_mfa_otp.get_my_profile") as mock_profile:
             mock_profile.return_value = mock_profile_success_response
 
             with patch(
-                "app.otp.services.verify_mfa_otp.dispatch_send_mfa_otp"
+                "app.otp.services.send_mfa_otp.dispatch_send_mfa_otp"
             ) as mock_dispatch:
                 mock_response = MagicMock()
                 # Invalid response that will cause ValidationError
@@ -314,16 +315,16 @@ class TestHandleMFAOTPVerificationCreate:
         """Test verification creation with general exception handling."""
         mock_http_client = AsyncMock()
 
-        with patch("app.otp.services.verify_mfa_otp.get_my_profile") as mock_profile:
+        with patch("app.otp.services.send_mfa_otp.get_my_profile") as mock_profile:
             mock_profile.return_value = mock_profile_success_response
 
             with patch(
-                "app.otp.services.verify_mfa_otp.dispatch_send_mfa_otp"
+                "app.otp.services.send_mfa_otp.dispatch_send_mfa_otp"
             ) as mock_dispatch:
                 mock_dispatch.side_effect = Exception("Network error")
 
                 with patch(
-                    "app.otp.services.verify_mfa_otp.RequestErrorHandler.handle"
+                    "app.otp.services.send_mfa_otp.RequestErrorHandler.handle"
                 ) as mock_error_handler:
                     mock_error_handler.return_value = None
 
@@ -461,7 +462,7 @@ class TestDispatchMFAVerificationCreate:
         """Test dispatch with unsupported OTP type."""
         mock_http_client = AsyncMock()
 
-        with patch("app.otp.services.verify_mfa_otp.get_admin_token") as mock_get_token:
+        with patch("app.otp.services.send_mfa_otp.get_admin_token") as mock_get_token:
             mock_get_token.return_value = "admin_token"
 
             with pytest.raises(HTTPException) as exc_info:
@@ -481,16 +482,16 @@ class TestDispatchMFAVerificationCreate:
         """Test dispatch with HTTP error."""
         mock_http_client = AsyncMock()
 
-        with patch("app.otp.services.verify_mfa_otp.get_admin_token") as mock_get_token:
+        with patch("app.otp.services.send_mfa_otp.get_admin_token") as mock_get_token:
             mock_get_token.return_value = "admin_token"
 
             with patch(
-                "app.otp.services.verify_mfa_otp.get_auth_request_headers"
+                "app.otp.services.send_mfa_otp.get_auth_request_headers"
             ) as mock_headers:
                 mock_headers.return_value = {"Authorization": "Bearer admin_token"}
 
                 with patch(
-                    "app.otp.services.verify_mfa_otp.get_configuration"
+                    "app.otp.services.send_mfa_otp.get_configuration"
                 ) as mock_config:
                     mock_config.return_value.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
                         "https://test.ibm.com"
@@ -505,7 +506,7 @@ class TestDispatchMFAVerificationCreate:
                     mock_http_client.post.side_effect = http_error
 
                     with patch(
-                        "app.otp.services.verify_mfa_otp.RequestErrorHandler.handle"
+                        "app.otp.services.send_mfa_otp.RequestErrorHandler.handle"
                     ) as mock_error_handler:
                         mock_error_handler.return_value = None
 

@@ -70,7 +70,7 @@ def patch_config_and_auth(monkeypatch, fake_settings):
     monkeypatch.setattr(
         feature_module,
         "get_auth_request_headers",
-        lambda token, is_json=True: {"Authorization": f"Bearer {token}"},
+        lambda token, is_json=True, language=None: {"Authorization": f"Bearer {token}"},
     )
 
     # Robust E.164 formatter: handles str or PhoneNumber-like objects.
@@ -103,7 +103,9 @@ def patch_config_and_auth(monkeypatch, fake_settings):
 
     # Async my_profile returning the same username by default
     async def _ok_profile(_client, user_access_token: str):
-        return SimpleNamespace(data=SimpleNamespace(userName="user@example.com"))
+        return SimpleNamespace(
+            data=SimpleNamespace(userName="user@example.com", preferredLanguage="en")
+        )
 
     monkeypatch.setattr(feature_module, "get_my_profile", _ok_profile)
 
@@ -308,7 +310,11 @@ async def test_handle_validation_error_due_to_incomplete_payload():
 async def test_handle_user_mismatch_returns_403(monkeypatch):
     # Override my_profile to return a different userName → expect 403 error response model
     async def _bad_profile(_client, token):
-        return SimpleNamespace(data=SimpleNamespace(userName="intruder@example.com"))
+        return SimpleNamespace(
+            data=SimpleNamespace(
+                userName="intruder@example.com", preferredLanguage="en"
+            )
+        )
 
     monkeypatch.setattr(feature_module, "get_my_profile", _bad_profile)
 
@@ -352,8 +358,8 @@ async def test_handle_transport_exception_is_captured_in_message():
 
     result_dict = try_to_dict(result)
     assert result_dict.get("success") is False
-    # Implementation uses Enum object in the message (e.g., "OtpType.SMS")
-    assert "Send transient OtpType.SMS error: simulated network failure" in (
+    # Implementation uses Enum value in the message (e.g., "sms")
+    assert "Send transient sms error: simulated network failure" in (
         result_dict.get("message") or ""
     )
 
@@ -371,7 +377,7 @@ async def test_handle_status_code_none_branch(monkeypatch):
         def json(self):
             return {}
 
-    async def _fake_dispatch(_client, _info):
+    async def _fake_dispatch(_client, _info, _language=None):
         return _Dummy()
 
     monkeypatch.setattr(feature_module, "dispatch_otp", _fake_dispatch)

@@ -1401,6 +1401,13 @@ export const UseDifferentPhoneNumber = (() => {
           data: { pwdMinLength: 12, pwdMaxLength: 65 },
         },
       },
+      {
+        type: "delete",
+        endpoint: "/v1/otp/mfa/delete",
+        response: {
+          success: true,
+        },
+      },
     ],
   );
 

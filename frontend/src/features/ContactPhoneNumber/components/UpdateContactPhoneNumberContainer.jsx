@@ -12,7 +12,6 @@ import EnterPhoneNumber from "./EnterPhoneNumber.jsx";
 import OtpVerification from "./OtpVerification.jsx";
 import ConfirmUpdate from "./ConfirmUpdate.jsx";
 import SuccessfullyUpdated from "./SuccessfullyUpdated.jsx";
-import { transientOtp } from "../api/transientOtp.js";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
 import { path } from "../../../utils/routeHelpers.js";
 
@@ -101,7 +100,7 @@ export default function UpdateContactPhoneNumberContainer() {
         otpType: serverMapping[phoneFormData.otpType],
       };
 
-      const response = await transientOtp.sendOtp(formdata);
+      const response = await authService.transientOtpSend(formdata);
       if (response && response.data && response.data.trxnId) {
         handlePhoneForm("trxnId", response.data.trxnId);
         if (!reSendOtpCode) setStep(STEPS.VERIFY);
@@ -124,7 +123,7 @@ export default function UpdateContactPhoneNumberContainer() {
         otpType: serverMapping[phoneFormData.otpType],
       };
 
-      const response = await transientOtp.verifyOtp(formdata);
+      const response = await authService.transientOtpVerify(formdata);
       if (response && response.success) {
         setStep(STEPS.CONFIRM);
       }

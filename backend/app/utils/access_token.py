@@ -69,19 +69,22 @@ async def get_admin_token(global_http_client: AsyncClient) -> str:
 
 
 def get_auth_request_headers(
-    access_token: str, json_content_type: bool = False
+    access_token: str, json_content_type: bool = False, language: str = None
 ) -> dict:
     """Headers and access token to be included in the Authorization header
 
     Args:
       access_token (str): The access token to be included in the Authorization header.
       json_content_type (bool): If True, the Content-Type and Accept headers will be set to "application/json".
+      language (str): Optional language code ("en", "fr", "en-ca", "fr-ca") to include in Accept-Language header.
+                     Locale codes like "en-ca" or "fr-ca" will be converted to just "en" or "fr".
 
       Returns:
           dict: A dictionary containing the authentication headers, including:
               - "Authorization": "Bearer <access_token>"
-              - "Content-Type": "application/scim+json"
-              - "Accept": "application/scim+json"
+              - "Content-Type": "application/scim+json" or "application/json"
+              - "Accept": "application/scim+json" or "application/json"
+              - "Accept-Language": language (if provided)
 
     """
     headers = {}
@@ -92,11 +95,17 @@ def get_auth_request_headers(
             "Content-Type": "application/json",
             "Accept": "application/json",
         }
-        return headers
+    else:
+        headers = {
+            "Authorization": f"Bearer {access_token}",
+            "Content-Type": "application/scim+json",
+            "Accept": "application/scim+json",
+        }
 
-    headers = {
-        "Authorization": f"Bearer {access_token}",
-        "Content-Type": "application/scim+json",
-        "Accept": "application/scim+json",
-    }
+    # Add Accept-Language header if language is provided
+    if language:
+        # Extract just the language code (e.g., "en-ca" -> "en", "fr-ca" -> "fr")
+        language_code = language.split("-")[0] if "-" in language else language
+        headers["Accept-Language"] = language_code
+
     return headers

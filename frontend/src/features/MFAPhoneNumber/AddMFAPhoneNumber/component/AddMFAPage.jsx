@@ -37,6 +37,7 @@ export default function AddMFAPage() {
   const [wizardStep, setWizardStep] = useState("passwordVerification");
   const [localLoading, setLocalLoading] = useState(true);
   const { userProfile } = state;
+
   const { id, userName } = userProfile ?? {};
   const [userSelectedMfaFactor, setUserSelectedMfaFactor] = useState(null);
   const navigateHelper = useNavigateHelper();

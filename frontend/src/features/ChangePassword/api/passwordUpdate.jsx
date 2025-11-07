@@ -26,7 +26,6 @@ export const passwordUpdate = {
         otp: userOtp,
         trxId: trxId,
       };
-
       const response = await axios.post(`${passwordUpdateApi}/validate`, data);
       return response.data;
     } catch (error) {

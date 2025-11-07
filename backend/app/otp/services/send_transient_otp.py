@@ -91,7 +91,9 @@ async def resolve_masked_phone_number(
 
 
 async def handle_otp_send(
-    global_http_client: AsyncClient, user_otp_info: UserOtpInfo, user_access_token: str
+    global_http_client: AsyncClient,
+    user_otp_info: UserOtpInfo,
+    user_access_token: str,
 ):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
@@ -106,6 +108,10 @@ async def handle_otp_send(
             logger.error("User mismatch - cannot send OTP")
             return generate_error_response(403, "User mismatch - cannot send OTP")
         logger.info("User verified to send OTP")
+
+        # Get user's preferred language from profile
+        user_language = my_profile_response.data.preferredLanguage or "en"
+        logger.info(f"Using user's preferred language: {user_language}")
 
         # Handle masked phone numbers
         resolved_user_otp_info = user_otp_info
@@ -134,7 +140,7 @@ async def handle_otp_send(
                 return generate_error_response(400, str(e))
 
         http_client_response = await dispatch_otp(
-            global_http_client, resolved_user_otp_info
+            global_http_client, resolved_user_otp_info, user_language
         )
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(
@@ -182,15 +188,17 @@ async def handle_otp_send(
             )
 
     except Exception as e:
-        logger.error(f"Send transient {user_otp_info.otpType} error: {str(e)}")
+        logger.error(f"Send transient {user_otp_info.otpType.value} error: {str(e)}")
         return ResponseModel(
             success=False,
             data=None,
-            message=f"Send transient {user_otp_info.otpType} error: {str(e)}",
+            message=f"Send transient {user_otp_info.otpType.value} error: {str(e)}",
         )
 
 
-async def dispatch_otp(global_http_client: AsyncClient, user_otp_info: UserOtpInfo):
+async def dispatch_otp(
+    global_http_client: AsyncClient, user_otp_info: UserOtpInfo, language: str = None
+):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
 
@@ -198,7 +206,7 @@ async def dispatch_otp(global_http_client: AsyncClient, user_otp_info: UserOtpIn
         access_token = await get_admin_token(
             global_http_client
         )  # Pass global_http_client here
-        headers = get_auth_request_headers(access_token, True)
+        headers = get_auth_request_headers(access_token, True, language)
         settings = get_configuration().ibm_verify_config
 
         if user_otp_info.phoneNumber:

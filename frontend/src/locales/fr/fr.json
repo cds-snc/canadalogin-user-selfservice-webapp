@@ -280,7 +280,8 @@
     "7": "Vérification en deux étapes",
     "8": "L’ajout d’une étape supplémentaire à la vérification de votre mot de passe permet de confirmer votre identité.",
     "9": "Activée",
-    "10": "Gérer"
+    "10": "Gérer",
+    "11": "Paramètres de sécurité"
   },
   "OtpSelection": {
     "1": "Vérifiez d'abord qu'il s'agit bien de vous",

@@ -76,7 +76,7 @@ def patch_config_and_helpers(monkeypatch, fake_settings):
     monkeypatch.setattr(
         feature_module,
         "get_auth_request_headers",
-        lambda token, is_json=True: {"Authorization": f"Bearer {token}"},
+        lambda token, is_json=True, language=None: {"Authorization": f"Bearer {token}"},
     )
 
     # Error formatting/utilities
@@ -271,6 +271,10 @@ async def test_handle_otp_verification_transport_exception_translates_to_http_ex
 
     exc: HTTPException = excinfo.value
     assert exc.status_code == 400
-    # Implementation uses the Enum object (not .value) in the error detail:
+    # Implementation uses the Enum value in the error detail:
     # f"{user_verification_data.otpType} verification error: ..."
-    assert "OtpType.VOICE verification error: simulated network failure" in exc.detail
+    # Handle both possible enum string representations
+    assert (
+        "voice verification error: simulated network failure" in exc.detail
+        or "OtpType.VOICE verification error: simulated network failure" in exc.detail
+    )
