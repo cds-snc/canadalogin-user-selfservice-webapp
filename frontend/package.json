@@ -66,6 +66,7 @@
     "lint-staged": "^16.1.6",
     "msw": "^2.7.5",
     "msw-storybook-addon": "^2.0.4",
+    "patch-package": "^8.0.0",
     "playwright": "^1.52.0",
     "prettier": "3.6.2",
     "prop-types": "^15.8.1",
