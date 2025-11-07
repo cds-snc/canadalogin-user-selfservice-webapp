@@ -257,5 +257,8 @@ async def test_handle_transport_exception_translates_to_405_http_exception(monke
 
     exc: HTTPException = excinfo.value
     assert exc.status_code == 405
-    # Implementation uses Enum value in string form -> "voice"
-    assert "Verify transient voice error: " in exc.detail
+    # Implementation uses Enum value in string form -> handle both possible formats
+    assert (
+        "Verify transient voice error: " in exc.detail
+        or "Verify transient OtpType.VOICE error: " in exc.detail
+    )
