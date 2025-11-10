@@ -15,7 +15,6 @@ import { getPageContent } from "../../../utils/functions.jsx";
 
 import { FLOW_TYPES, PAGES } from "../../../utils/constants.jsx";
 import { useParams } from "react-router";
-import ErrorSummaryWithFocus from "../../../components/ErrorSummaryWithFocus/ErrorSummaryWithFocus.jsx";
 
 const initialTime = 10;
 
