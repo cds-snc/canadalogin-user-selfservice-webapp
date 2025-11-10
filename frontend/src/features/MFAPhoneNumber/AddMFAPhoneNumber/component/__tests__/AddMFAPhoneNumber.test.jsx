@@ -142,6 +142,7 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
   const mockOnNext = vi.fn();
   const mockOnCancel = vi.fn();
   const mockOnChangePhoneForm = vi.fn();
+  const mockSetErrorCode = vi.fn();
 
   const defaultPhoneFormData = {
     phoneNumber: "+1",
@@ -161,6 +162,8 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
             onCancel={mockOnCancel}
             onChangePhoneForm={mockOnChangePhoneForm}
             phoneFormData={defaultPhoneFormData}
+            setErrorCode={mockSetErrorCode}
+            errorMessage=""
           />
         </TestWrapper>,
       );
@@ -178,6 +181,8 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
             onCancel={mockOnCancel}
             onChangePhoneForm={mockOnChangePhoneForm}
             phoneFormData={defaultPhoneFormData}
+            setErrorCode={mockSetErrorCode}
+            errorMessage=""
           />
         </TestWrapper>,
       );
@@ -716,6 +721,8 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
             onCancel={mockOnCancel}
             onChangePhoneForm={mockOnChangePhoneForm}
             phoneFormData={minimalPhoneData}
+            setErrorCode={mockSetErrorCode}
+            errorMessage=""
           />
         </TestWrapper>,
       );
@@ -834,6 +841,7 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
   describe("Event Handler Coverage Tests", () => {
     it("should trigger onNext when Continue button is clicked", async () => {
       vi.mocked(ReactRouter.useParams).mockReturnValue({ language: "en" });
+      const mockSetErrorCode = vi.fn();
 
       render(
         <TestWrapper>
@@ -842,6 +850,8 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
             onCancel={mockOnCancel}
             onChangePhoneForm={mockOnChangePhoneForm}
             phoneFormData={{ phoneNumber: "+16135551234", otpType: "smsotp" }}
+            setErrorCode={mockSetErrorCode}
+            errorMessage=""
           />
         </TestWrapper>,
       );

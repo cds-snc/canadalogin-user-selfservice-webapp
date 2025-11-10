@@ -218,20 +218,22 @@ describe("AddMFAOtpVerification Unit Tests", () => {
 
   describe("Component Rendering", () => {
     it("should render the component without crashing", () => {
-      render(
-        <TestWrapper>
-          <AddMFAOtpVerification
-            onNext={mockOnNext}
-            onCancel={mockOnCancel}
-            onBack={mockOnBack}
-            onChangePhoneForm={mockOnChangePhoneForm}
-            phoneFormData={defaultPhoneFormData}
-            errorCode=""
-            requestNewOtpCode={mockRequestNewOtpCode}
-            onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
-          />
-        </TestWrapper>,
-      );
+      act(() => {
+        render(
+          <TestWrapper>
+            <AddMFAOtpVerification
+              onNext={mockOnNext}
+              onCancel={mockOnCancel}
+              onBack={mockOnBack}
+              onChangePhoneForm={mockOnChangePhoneForm}
+              phoneFormData={defaultPhoneFormData}
+              errorMessage=""
+              requestNewOtpCode={mockRequestNewOtpCode}
+              onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
+            />
+          </TestWrapper>,
+        );
+      });
 
       expect(screen.getByText("Enter the code")).toBeInTheDocument();
       expect(screen.getByText("Continue")).toBeInTheDocument();
@@ -239,20 +241,22 @@ describe("AddMFAOtpVerification Unit Tests", () => {
     });
 
     it("should render GCDS components", () => {
-      render(
-        <TestWrapper>
-          <AddMFAOtpVerification
-            onNext={mockOnNext}
-            onCancel={mockOnCancel}
-            onBack={mockOnBack}
-            onChangePhoneForm={mockOnChangePhoneForm}
-            phoneFormData={defaultPhoneFormData}
-            errorCode=""
-            requestNewOtpCode={mockRequestNewOtpCode}
-            onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
-          />
-        </TestWrapper>,
-      );
+      act(() => {
+        render(
+          <TestWrapper>
+            <AddMFAOtpVerification
+              onNext={mockOnNext}
+              onCancel={mockOnCancel}
+              onBack={mockOnBack}
+              onChangePhoneForm={mockOnChangePhoneForm}
+              phoneFormData={defaultPhoneFormData}
+              errorMessage=""
+              requestNewOtpCode={mockRequestNewOtpCode}
+              onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
+            />
+          </TestWrapper>,
+        );
+      });
 
       expect(screen.getAllByTestId("gcds-container")[0]).toBeInTheDocument();
       expect(screen.getByTestId("gcds-input")).toBeInTheDocument();
@@ -269,7 +273,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
             onBack={mockOnBack}
             onChangePhoneForm={mockOnChangePhoneForm}
             phoneFormData={defaultPhoneFormData}
-            errorCode=""
+            errorMessage=""
             requestNewOtpCode={mockRequestNewOtpCode}
             onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
           />
@@ -296,7 +300,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
             onBack={mockOnBack}
             onChangePhoneForm={mockOnChangePhoneForm}
             phoneFormData={defaultPhoneFormData}
-            errorCode=""
+            errorMessage=""
             requestNewOtpCode={mockRequestNewOtpCode}
             onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
           />
@@ -315,7 +319,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
             onBack={mockOnBack}
             onChangePhoneForm={mockOnChangePhoneForm}
             phoneFormData={{ ...defaultPhoneFormData, otpType: "smsotp" }}
-            errorCode=""
+            errorMessage=""
             requestNewOtpCode={mockRequestNewOtpCode}
             onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
           />
@@ -341,7 +345,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
             onBack={mockOnBack}
             onChangePhoneForm={mockOnChangePhoneForm}
             phoneFormData={{ ...defaultPhoneFormData, otpType: "voiceotp" }}
-            errorCode=""
+            errorMessage=""
             requestNewOtpCode={mockRequestNewOtpCode}
             onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
           />
@@ -369,7 +373,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
             onBack={mockOnBack}
             onChangePhoneForm={mockOnChangePhoneForm}
             phoneFormData={defaultPhoneFormData}
-            errorCode=""
+            errorMessage=""
             requestNewOtpCode={mockRequestNewOtpCode}
             onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
           />
@@ -406,7 +410,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
             onBack={mockOnBack}
             onChangePhoneForm={mockOnChangePhoneForm}
             phoneFormData={phoneFormDataWithOtp}
-            errorCode=""
+            errorMessage=""
             requestNewOtpCode={mockRequestNewOtpCode}
             onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
           />
@@ -426,7 +430,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
             onBack={mockOnBack}
             onChangePhoneForm={mockOnChangePhoneForm}
             phoneFormData={defaultPhoneFormData}
-            errorCode=""
+            errorMessage=""
             requestNewOtpCode={mockRequestNewOtpCode}
             onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
           />
@@ -452,7 +456,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
             onBack={mockOnBack}
             onChangePhoneForm={mockOnChangePhoneForm}
             phoneFormData={phoneFormDataShortOtp}
-            errorCode=""
+            errorMessage=""
             requestNewOtpCode={mockRequestNewOtpCode}
             onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
           />
@@ -477,7 +481,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
             onBack={mockOnBack}
             onChangePhoneForm={mockOnChangePhoneForm}
             phoneFormData={phoneFormDataValidOtp}
-            errorCode=""
+            errorMessage=""
             requestNewOtpCode={mockRequestNewOtpCode}
             onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
           />
@@ -502,7 +506,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
             onBack={mockOnBack}
             onChangePhoneForm={mockOnChangePhoneForm}
             phoneFormData={phoneFormDataValidOtp}
-            errorCode=""
+            errorMessage=""
             requestNewOtpCode={mockRequestNewOtpCode}
             onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
           />
@@ -524,7 +528,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
             onBack={mockOnBack}
             onChangePhoneForm={mockOnChangePhoneForm}
             phoneFormData={defaultPhoneFormData}
-            errorCode=""
+            errorMessage=""
             requestNewOtpCode={mockRequestNewOtpCode}
             onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
           />
@@ -548,7 +552,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
             onBack={mockOnBack}
             onChangePhoneForm={mockOnChangePhoneForm}
             phoneFormData={defaultPhoneFormData}
-            errorCode=""
+            errorMessage=""
             requestNewOtpCode={mockRequestNewOtpCode}
             onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
           />
@@ -577,21 +581,23 @@ describe("AddMFAOtpVerification Unit Tests", () => {
   });
 
   describe("Error Handling", () => {
-    it("should display error message when errorCode is provided", () => {
-      render(
-        <TestWrapper>
-          <AddMFAOtpVerification
-            onNext={mockOnNext}
-            onCancel={mockOnCancel}
-            onBack={mockOnBack}
-            onChangePhoneForm={mockOnChangePhoneForm}
-            phoneFormData={defaultPhoneFormData}
-            errorCode="CSIAM0011E"
-            requestNewOtpCode={mockRequestNewOtpCode}
-            onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
-          />
-        </TestWrapper>,
-      );
+    it("should display error message when errorMessage is provided", () => {
+      act(() => {
+        render(
+          <TestWrapper>
+            <AddMFAOtpVerification
+              onNext={mockOnNext}
+              onCancel={mockOnCancel}
+              onBack={mockOnBack}
+              onChangePhoneForm={mockOnChangePhoneForm}
+              phoneFormData={defaultPhoneFormData}
+              errorMessage="Invalid verification code. Please try again."
+              requestNewOtpCode={mockRequestNewOtpCode}
+              onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
+            />
+          </TestWrapper>,
+        );
+      });
 
       expect(screen.getByTestId("gcds-input-error")).toBeInTheDocument();
       expect(
@@ -599,21 +605,23 @@ describe("AddMFAOtpVerification Unit Tests", () => {
       ).toBeInTheDocument();
     });
 
-    it("should not display error message when errorCode is empty", () => {
-      render(
-        <TestWrapper>
-          <AddMFAOtpVerification
-            onNext={mockOnNext}
-            onCancel={mockOnCancel}
-            onBack={mockOnBack}
-            onChangePhoneForm={mockOnChangePhoneForm}
-            phoneFormData={defaultPhoneFormData}
-            errorCode=""
-            requestNewOtpCode={mockRequestNewOtpCode}
-            onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
-          />
-        </TestWrapper>,
-      );
+    it("should not display error message when errorMessage is empty", () => {
+      act(() => {
+        render(
+          <TestWrapper>
+            <AddMFAOtpVerification
+              onNext={mockOnNext}
+              onCancel={mockOnCancel}
+              onBack={mockOnBack}
+              onChangePhoneForm={mockOnChangePhoneForm}
+              phoneFormData={defaultPhoneFormData}
+              errorMessage=""
+              requestNewOtpCode={mockRequestNewOtpCode}
+              onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
+            />
+          </TestWrapper>,
+        );
+      });
 
       expect(screen.queryByTestId("gcds-input-error")).not.toBeInTheDocument();
     });
@@ -637,7 +645,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
             onBack={mockOnBack}
             onChangePhoneForm={mockOnChangePhoneForm}
             phoneFormData={defaultPhoneFormData}
-            errorCode=""
+            errorMessage=""
             requestNewOtpCode={mockRequestNewOtpCode}
             onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
           />
@@ -658,7 +666,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
             onBack={mockOnBack}
             onChangePhoneForm={mockOnChangePhoneForm}
             phoneFormData={{ ...defaultPhoneFormData, otpType: "smsotp" }}
-            errorCode=""
+            errorMessage=""
             requestNewOtpCode={mockRequestNewOtpCode}
             onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
           />
@@ -683,7 +691,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
             onBack={mockOnBack}
             onChangePhoneForm={mockOnChangePhoneForm}
             phoneFormData={{ ...defaultPhoneFormData, otpType: "email" }}
-            errorCode=""
+            errorMessage=""
             requestNewOtpCode={mockRequestNewOtpCode}
             onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
           />
@@ -708,7 +716,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
             onBack={mockOnBack}
             onChangePhoneForm={mockOnChangePhoneForm}
             phoneFormData={defaultPhoneFormData}
-            errorCode=""
+            errorMessage=""
             requestNewOtpCode={mockRequestNewOtpCode}
             onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
           />
@@ -729,7 +737,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
             onBack={mockOnBack}
             onChangePhoneForm={mockOnChangePhoneForm}
             phoneFormData={updatedPhoneFormData}
-            errorCode=""
+            errorMessage=""
             requestNewOtpCode={mockRequestNewOtpCode}
             onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
           />
@@ -755,7 +763,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
             onBack={mockOnBack}
             onChangePhoneForm={mockOnChangePhoneForm}
             phoneFormData={defaultPhoneFormData}
-            errorCode=""
+            errorMessage=""
             requestNewOtpCode={mockRequestNewOtpCode}
             onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
           />
@@ -782,7 +790,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
             onBack={mockOnBack}
             onChangePhoneForm={mockOnChangePhoneForm}
             phoneFormData={defaultPhoneFormData}
-            errorCode=""
+            errorMessage=""
             requestNewOtpCode={mockRequestNewOtpCode}
             onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
           />
@@ -806,7 +814,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
             onBack={mockOnBack}
             onChangePhoneForm={mockOnChangePhoneForm}
             phoneFormData={defaultPhoneFormData}
-            errorCode=""
+            errorMessage=""
             requestNewOtpCode={mockRequestNewOtpCode}
             onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
           />

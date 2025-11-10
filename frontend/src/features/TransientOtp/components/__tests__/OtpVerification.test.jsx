@@ -102,7 +102,7 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
       data-testid={
         buttonRole === "secondary" ? "cancel-button" : "submit-button"
       }
-      onClick={onGcdsClick}
+      onClick={(e) => onGcdsClick && onGcdsClick(e)}
       disabled={disabled}
       style={style}
     >
@@ -157,17 +157,23 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
         maxLength={maxlength}
         minLength={minlength}
         size={size}
-        required={required}
+        required={
+          required === true || (required !== false && errorMessage === "")
+        }
         autoFocus={autofocus}
         autoComplete={autocomplete}
         data-validate-on={validateOn}
         data-lang={lang}
-        data-error-message={errorMessage}
+        data-error-message={errorMessage || ""}
       />
     </div>
   ),
   GcdsLink: ({ children, onGcdsClick, href }) => (
-    <a data-testid="gcds-link" onClick={onGcdsClick} href={href}>
+    <a
+      data-testid="gcds-link"
+      onClick={(e) => onGcdsClick && onGcdsClick(e)}
+      href={href}
+    >
       {children}
     </a>
   ),
@@ -186,12 +192,15 @@ const mockSetOtpSentResponse = vi.fn();
 const mockSetUserOtpValue = vi.fn();
 const mockRequestOtpCode = vi.fn();
 const mockValidateOtpCode = vi.fn();
+const mockSetErrorCode = vi.fn();
 
 const defaultProps = {
   onNext: mockOnNext,
   onBack: mockOnBack,
   requestOtpCode: mockRequestOtpCode,
   validateOtpCode: mockValidateOtpCode,
+  setErrorCode: mockSetErrorCode,
+  errorMessage: "",
   userProfile: {
     id: "user-123",
     userName: "testuser@example.com",
@@ -245,7 +254,7 @@ describe("OtpVerification Component", () => {
       return response;
     });
 
-    // Make mockValidateOtpCode call the mocked authService and trigger onNext on success
+    // Make mockValidateOtpCode just return success/failure based on mockTransientOtpVerify
     mockValidateOtpCode.mockImplementation(async (otp) => {
       const response = await mockTransientOtpVerify({
         otp,
@@ -401,20 +410,16 @@ describe("OtpVerification Component", () => {
       renderComponent();
 
       await waitFor(() => {
-        expect(mockTransientOtpSend).toHaveBeenCalledTimes(1);
-      });
-
-      expect(mockTransientOtpSend).toHaveBeenCalledWith({
-        userName: "testuser@example.com",
-        otpType: "sms",
-        phoneNumber: "+15551234567",
+        expect(mockRequestOtpCode).toHaveBeenCalledTimes(1);
       });
     });
 
     it("updates otpSentResponse on successful send", async () => {
-      mockTransientOtpSend.mockResolvedValue({
-        success: true,
-        data: { trxnId: "new-txn-456" },
+      // Override the mock to return specific response
+      mockRequestOtpCode.mockImplementation(async () => {
+        const response = { success: true, data: { trxnId: "new-txn-456" } };
+        mockSetOtpSentResponse({ trxnId: response.data.trxnId });
+        return response;
       });
 
       renderComponent();
@@ -427,40 +432,31 @@ describe("OtpVerification Component", () => {
     });
 
     it("handles send OTP error", async () => {
-      const consoleErrorSpy = vi
-        .spyOn(console, "error")
-        .mockImplementation(() => {});
-      mockTransientOtpSend.mockRejectedValue({
+      mockRequestOtpCode.mockRejectedValue({
         data: { message: "CSIAM0038E" },
       });
 
       renderComponent();
 
       await waitFor(() => {
-        expect(mockTransientOtpSend).toHaveBeenCalled();
+        expect(mockRequestOtpCode).toHaveBeenCalled();
       });
 
       await waitFor(() => {
-        const input = screen.getByTestId("verificationCode");
-        expect(input).toHaveAttribute(
-          "data-error-message",
-          "Too Many Attempts",
-        );
+        expect(mockSetErrorCode).toHaveBeenCalledWith("CSIAM0038E");
       });
-
-      consoleErrorSpy.mockRestore();
     });
 
     it("does not send OTP if userProfile is null", () => {
       renderComponent({ userProfile: null });
 
-      expect(mockTransientOtpSend).not.toHaveBeenCalled();
+      expect(mockRequestOtpCode).not.toHaveBeenCalled();
     });
 
     it("does not send OTP if userProfile.id is undefined", () => {
       renderComponent({ userProfile: { userName: "test@example.com" } });
 
-      expect(mockTransientOtpSend).not.toHaveBeenCalled();
+      expect(mockRequestOtpCode).not.toHaveBeenCalled();
     });
   });
 
@@ -516,22 +512,25 @@ describe("OtpVerification Component", () => {
       await user.click(submitButton);
 
       await waitFor(() => {
-        expect(mockTransientOtpVerify).toHaveBeenCalledWith({
-          otp: "123456",
-          trxnId: "txn-123",
-          otpType: "sms",
-        });
+        expect(mockValidateOtpCode).toHaveBeenCalledWith("123456");
       });
     });
 
     it("calls onNext when verification is successful", async () => {
       const user = userEvent.setup({ delay: null });
-      mockTransientOtpVerify.mockResolvedValue({ success: true });
+      mockValidateOtpCode.mockImplementation(async () => {
+        mockOnNext();
+        return { success: true };
+      });
 
       renderComponent({ userOtpValue: "123456" });
 
       const submitButton = screen.getByTestId("submit-button");
       await user.click(submitButton);
+
+      await waitFor(() => {
+        expect(mockValidateOtpCode).toHaveBeenCalledWith("123456");
+      });
 
       await waitFor(() => {
         expect(mockOnNext).toHaveBeenCalled();
@@ -540,7 +539,7 @@ describe("OtpVerification Component", () => {
 
     it("displays error when verification fails", async () => {
       const user = userEvent.setup({ delay: null });
-      mockTransientOtpVerify.mockRejectedValue({
+      mockValidateOtpCode.mockRejectedValue({
         data: { message: "CSIAM0011E" },
       });
 
@@ -550,17 +549,17 @@ describe("OtpVerification Component", () => {
       await user.click(submitButton);
 
       await waitFor(() => {
-        const input = screen.getByTestId("verificationCode");
-        expect(input).toHaveAttribute(
-          "data-error-message",
-          "The verification code is invalid or has expired.",
-        );
+        expect(mockValidateOtpCode).toHaveBeenCalledWith("123456");
+      });
+
+      await waitFor(() => {
+        expect(mockSetErrorCode).toHaveBeenCalledWith("CSIAM0011E");
       });
     });
 
     it("clears error code when submitting again", async () => {
       const user = userEvent.setup({ delay: null });
-      mockTransientOtpVerify.mockRejectedValueOnce({
+      mockValidateOtpCode.mockRejectedValueOnce({
         data: { message: "CSIAM0011E" },
       });
 
@@ -570,21 +569,17 @@ describe("OtpVerification Component", () => {
       await user.click(submitButton);
 
       await waitFor(() => {
-        const input = screen.getByTestId("verificationCode");
-        expect(input).toHaveAttribute(
-          "data-error-message",
-          "The verification code is invalid or has expired.",
-        );
+        expect(mockSetErrorCode).toHaveBeenCalledWith("CSIAM0011E");
       });
 
       // Clear the mock to simulate successful verification
-      mockTransientOtpVerify.mockResolvedValue({ success: true });
+      mockValidateOtpCode.mockResolvedValue({ success: true });
+      mockSetErrorCode.mockClear();
 
       await user.click(submitButton);
 
       await waitFor(() => {
-        const input = screen.getByTestId("verificationCode");
-        expect(input).toHaveAttribute("data-error-message", "");
+        expect(mockSetErrorCode).toHaveBeenCalledWith(""); // Clear error first
       });
     });
   });
@@ -609,49 +604,28 @@ describe("OtpVerification Component", () => {
       expect(input).toHaveAttribute("data-error-message", "");
     });
 
-    it("displays error message when errorCode is set", async () => {
-      const user = userEvent.setup({ delay: null });
-      mockTransientOtpVerify.mockRejectedValue({
-        data: { message: "CSIAM0011E" },
-      });
+    it("displays error message when errorMessage is provided", () => {
+      renderComponent({ errorMessage: "Test error message" });
 
-      renderComponent({ userOtpValue: "123456" });
-
-      const submitButton = screen.getByTestId("submit-button");
-      await user.click(submitButton);
-
-      await waitFor(() => {
-        const input = screen.getByTestId("verificationCode");
-        expect(input).toHaveAttribute(
-          "data-error-message",
-          "The verification code is invalid or has expired.",
-        );
-      });
+      const input = screen.getByTestId("verificationCode");
+      expect(input).toHaveAttribute("data-error-message", "Test error message");
     });
 
-    it("passes error message to input field", async () => {
-      const user = userEvent.setup({ delay: null });
-      mockTransientOtpVerify.mockRejectedValue({
-        data: { message: "CSIAM0011E" },
+    it("passes error message to input field", () => {
+      renderComponent({
+        errorMessage: "The verification code is invalid or has expired.",
       });
 
-      renderComponent({ userOtpValue: "123456" });
-
-      const submitButton = screen.getByTestId("submit-button");
-      await user.click(submitButton);
-
-      await waitFor(() => {
-        const input = screen.getByTestId("verificationCode");
-        expect(input).toHaveAttribute(
-          "data-error-message",
-          "The verification code is invalid or has expired.",
-        );
-      });
+      const input = screen.getByTestId("verificationCode");
+      expect(input).toHaveAttribute(
+        "data-error-message",
+        "The verification code is invalid or has expired.",
+      );
     });
 
     it("handles unknown error codes gracefully", async () => {
       const user = userEvent.setup({ delay: null });
-      mockTransientOtpVerify.mockRejectedValue({
+      mockValidateOtpCode.mockRejectedValue({
         data: { message: "UNKNOWN_ERROR" },
       });
 
@@ -661,9 +635,7 @@ describe("OtpVerification Component", () => {
       await user.click(submitButton);
 
       await waitFor(() => {
-        // Should not crash, error message will be empty
-        const input = screen.getByTestId("verificationCode");
-        expect(input).toHaveAttribute("data-error-message", "UNKNOWN_ERROR");
+        expect(mockSetErrorCode).toHaveBeenCalledWith("UNKNOWN_ERROR");
       });
     });
   });
@@ -673,7 +645,7 @@ describe("OtpVerification Component", () => {
       renderComponent({ userProfile: null });
 
       expect(screen.getByText("Check your phone")).toBeInTheDocument();
-      expect(mockTransientOtpSend).not.toHaveBeenCalled();
+      expect(mockRequestOtpCode).not.toHaveBeenCalled();
     });
 
     it("handles missing otpSentResponse", () => {
@@ -693,22 +665,21 @@ describe("OtpVerification Component", () => {
     });
 
     it("handles OTP send error without message", async () => {
-      mockTransientOtpSend.mockRejectedValue({});
+      mockRequestOtpCode.mockRejectedValue({});
 
       renderComponent();
 
       await waitFor(() => {
-        expect(mockTransientOtpSend).toHaveBeenCalled();
+        expect(mockRequestOtpCode).toHaveBeenCalled();
       });
 
-      // Should not display error
-      const input = screen.getByTestId("verificationCode");
-      expect(input).toHaveAttribute("data-error-message", "");
+      // Should not call setErrorCode if no message
+      expect(mockSetErrorCode).not.toHaveBeenCalled();
     });
 
     it("handles OTP verify error without message", async () => {
       const user = userEvent.setup({ delay: null });
-      mockTransientOtpVerify.mockRejectedValue({});
+      mockValidateOtpCode.mockRejectedValue({});
 
       renderComponent({ userOtpValue: "123456" });
 
@@ -716,29 +687,33 @@ describe("OtpVerification Component", () => {
       await user.click(submitButton);
 
       await waitFor(() => {
-        expect(mockTransientOtpVerify).toHaveBeenCalled();
+        expect(mockValidateOtpCode).toHaveBeenCalledWith("123456");
       });
 
-      // Should not display error
-      const input = screen.getByTestId("verificationCode");
-      expect(input).toHaveAttribute("data-error-message", "");
+      // Should clear error first, but not set any new error
+      await waitFor(() => {
+        expect(mockSetErrorCode).toHaveBeenCalledWith("");
+      });
     });
   });
 
   describe("Integration Tests", () => {
     it("complete workflow: mount, type code, submit, success", async () => {
       const user = userEvent.setup({ delay: null });
-      mockTransientOtpSend.mockResolvedValue({
-        success: true,
-        data: { trxnId: "txn-123" },
+      mockRequestOtpCode.mockImplementation(async () => {
+        mockSetOtpSentResponse({ trxnId: "txn-123" });
+        return { success: true, data: { trxnId: "txn-123" } };
       });
-      mockTransientOtpVerify.mockResolvedValue({ success: true });
+      mockValidateOtpCode.mockImplementation(async () => {
+        mockOnNext();
+        return { success: true };
+      });
 
       renderComponent({ userOtpValue: "123456" });
 
       // Wait for OTP to be sent
       await waitFor(() => {
-        expect(mockTransientOtpSend).toHaveBeenCalled();
+        expect(mockRequestOtpCode).toHaveBeenCalled();
       });
 
       // Submit button should be enabled with 6-digit code
@@ -749,74 +724,68 @@ describe("OtpVerification Component", () => {
 
       // Verify success
       await waitFor(() => {
-        expect(mockTransientOtpVerify).toHaveBeenCalled();
+        expect(mockValidateOtpCode).toHaveBeenCalled();
         expect(mockOnNext).toHaveBeenCalled();
       });
     });
 
     it("clears error when submitting valid code after error", async () => {
       const user = userEvent.setup({ delay: null });
-      mockTransientOtpSend.mockResolvedValue({
-        success: true,
-        data: { trxnId: "txn-123" },
+      mockRequestOtpCode.mockImplementation(async () => {
+        mockSetOtpSentResponse({ trxnId: "txn-123" });
+        return { success: true, data: { trxnId: "txn-123" } };
       });
-      mockTransientOtpVerify.mockResolvedValue({ success: true });
 
       renderComponent({ userOtpValue: "123456" });
 
       await waitFor(() => {
-        expect(mockTransientOtpSend).toHaveBeenCalled();
+        expect(mockRequestOtpCode).toHaveBeenCalled();
       });
 
       // Simulate an error first
-      mockTransientOtpVerify.mockRejectedValueOnce({
+      mockValidateOtpCode.mockRejectedValueOnce({
         data: { message: "CSIAM0011E" },
       });
 
       const submitButton = screen.getByTestId("submit-button");
       await user.click(submitButton);
 
-      // Wait for error to appear
+      // Wait for error to be set
       await waitFor(() => {
-        const input = screen.getByTestId("verificationCode");
-        expect(input).toHaveAttribute(
-          "data-error-message",
-          "The verification code is invalid or has expired.",
-        );
+        expect(mockSetErrorCode).toHaveBeenCalledWith("CSIAM0011E");
       });
 
-      // Now submit again with success
-      mockTransientOtpVerify.mockResolvedValue({ success: true });
+      // Clear mocks and setup success
+      mockSetErrorCode.mockClear();
+      mockValidateOtpCode.mockImplementation(async () => {
+        mockOnNext();
+        return { success: true };
+      });
+
       await user.click(submitButton);
 
-      // Error should be cleared and onNext called
+      // Error should be cleared first, then onNext called
       await waitFor(() => {
+        expect(mockSetErrorCode).toHaveBeenCalledWith(""); // Clear error
         expect(mockOnNext).toHaveBeenCalled();
       });
     });
-
     it("handles submit button preventDefault", async () => {
       const user = userEvent.setup({ delay: null });
-      const preventDefaultSpy = vi.fn();
 
       renderComponent({ userOtpValue: "123456" });
 
       await waitFor(() => {
-        expect(mockTransientOtpSend).toHaveBeenCalled();
+        expect(mockRequestOtpCode).toHaveBeenCalled();
       });
 
       const submitButton = screen.getByTestId("submit-button");
-
-      // Add event listener to check preventDefault is called
-      submitButton.addEventListener("click", (e) => {
-        preventDefaultSpy(e.defaultPrevented);
-      });
 
       await user.click(submitButton);
 
       // Verify submit was processed
       await waitFor(() => {
-        expect(mockTransientOtpVerify).toHaveBeenCalled();
+        expect(mockValidateOtpCode).toHaveBeenCalled();
       });
     });
 
