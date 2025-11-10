@@ -20,6 +20,15 @@ vi.mock("../../../DeleteMFAPhoneNumber/api/DeleteMFAPhoneNumberAPI");
 vi.mock("../../../../../utils/functions");
 vi.mock("../../../../../services/authService");
 
+// Mock react-router
+vi.mock("react-router", async () => {
+  const actual = await vi.importActual("react-router");
+  return {
+    ...actual,
+    useParams: vi.fn(() => ({ language: "en" })),
+  };
+});
+
 // Mock GCDS components
 vi.mock("@cdssnc/gcds-components-react", () => ({
   GcdsErrorMessage: ({ children, messageId }) => (
@@ -42,6 +51,37 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
   GcdsGrid: () => <div data-testid="mock-gcds-grid" />,
   GcdsButton: () => <button>Mocked GcdsButton</button>, // Mocking GcdsButton
   GcdsLink: () => <a>Mocked GcdsLink</a>, // Mocking GcdsLink
+  GcdsErrorSummary: ({
+    children,
+    id,
+    errorLinks,
+    heading,
+    lang,
+    className,
+    ...otherProps
+  }) => (
+    <div
+      id={id}
+      className={className}
+      data-testid="gcds-error-summary"
+      data-heading={heading}
+      data-lang={lang}
+      tabIndex="-1"
+      {...otherProps}
+    >
+      <h2 data-testid="error-summary-heading">{heading}</h2>
+      <ul data-testid="error-summary-links">
+        {Object.entries(errorLinks || {}).map(([href, text], index) => (
+          <li key={index}>
+            <a href={href} data-testid={`error-link-${index}`}>
+              {text}
+            </a>
+          </li>
+        ))}
+      </ul>
+      {children}
+    </div>
+  ),
 }));
 
 // Mock child components
@@ -147,6 +187,22 @@ vi.mock("../AddSecondMFA", () => ({
 vi.mock("../../../../components/Layout/Loading", () => ({
   default: ({ text }) => <div data-testid="loader">{text || "Loading..."}</div>,
 }));
+
+vi.mock(
+  "../../../../../components/ErrorSummaryWithFocus/ErrorSummaryWithFocus",
+  () => ({
+    default: ({ errorCode, language }) =>
+      errorCode ? (
+        <div
+          data-testid="error-summary-with-focus"
+          data-error-code={errorCode}
+          data-language={language}
+        >
+          Error Summary: {errorCode}
+        </div>
+      ) : null,
+  }),
+);
 
 vi.mock("../../../../TransientOtp/components/PasswordVerification", () => ({
   default: ({ validatePassword, onCancel }) => (
@@ -1359,6 +1415,471 @@ describe("AddMFAPage Unit Tests", () => {
           phoneNumber: "",
           otpType: "voice",
         });
+      });
+    });
+  });
+
+  describe("ErrorSummaryWithFocus Rendering Tests", () => {
+    it("should not render error summary when no error code is present", async () => {
+      otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
+        success: true,
+        data: [{ id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" }],
+      });
+
+      render(
+        <TestWrapper>
+          <AddMFAPage />
+        </TestWrapper>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      expect(
+        screen.queryByTestId("error-summary-with-focus"),
+      ).not.toBeInTheDocument();
+    });
+
+    it("should render error summary when errorCode is set during enrollMFA failure", async () => {
+      otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
+        success: true,
+        data: [{ id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" }],
+      });
+
+      const apiError = {
+        data: { message: "CSIAM0011E" },
+      };
+      addMFAPhoneNumberApi.enrollMFA.mockRejectedValue(apiError);
+
+      functions.getPageContent.mockImplementation((language, page) => {
+        if (page === "error") {
+          return {
+            CSIAM0011E: "Invalid verification code. Please try again.",
+            7: "An unexpected error occurred. Please try again later.",
+          };
+        }
+        if (page === "otpSelection") {
+          return { 11: "Loading..." };
+        }
+        return {};
+      });
+
+      render(
+        <TestWrapper>
+          <AddMFAPage />
+        </TestWrapper>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      // Navigate through steps to trigger enrollMFA error
+      const button = screen.getByTestId("password-verification-next");
+      button.click();
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
+      });
+
+      const nextButton = screen.getByTestId("otp-selection-next");
+      nextButton.click();
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
+      });
+
+      const otpNextButton = screen.getByTestId("otp-verification-next");
+      otpNextButton.click();
+
+      await waitFor(() => {
+        expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
+      });
+
+      const addMfaNextButton = screen.getByTestId("add-mfa-phone-number-next");
+      addMfaNextButton.click();
+
+      // This should trigger enrollMFA error and display error summary
+      await waitFor(() => {
+        expect(
+          screen.getByTestId("error-summary-with-focus"),
+        ).toBeInTheDocument();
+      });
+
+      const errorSummary = screen.getByTestId("error-summary-with-focus");
+      expect(errorSummary).toHaveAttribute("data-error-code", "CSIAM0011E");
+      expect(errorSummary).toHaveAttribute("data-language", "en");
+      expect(errorSummary).toHaveTextContent("Error Summary: CSIAM0011E");
+    });
+
+    it("should render error summary with correct language when language is French", async () => {
+      // Mock French language parameter
+      const mockUseParams = await import("react-router");
+      vi.mocked(mockUseParams.useParams).mockReturnValue({ language: "fr" });
+
+      otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
+        success: true,
+        data: [{ id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" }],
+      });
+
+      const apiError = {
+        data: { message: "CSIAM0002E" },
+      };
+      addMFAPhoneNumberApi.enrollMFA.mockRejectedValue(apiError);
+
+      functions.getPageContent.mockImplementation((language, page) => {
+        if (page === "error") {
+          if (language === "fr") {
+            return {
+              CSIAM0002E: "Votre compte a été verrouillé.",
+              7: "Une erreur inattendue s'est produite. Veuillez réessayer plus tard.",
+            };
+          }
+          return {
+            CSIAM0002E: "Your account has been locked.",
+            7: "An unexpected error occurred. Please try again later.",
+          };
+        }
+        if (page === "otpSelection") {
+          return { 11: "Chargement..." };
+        }
+        return {};
+      });
+
+      render(
+        <TestWrapper>
+          <AddMFAPage />
+        </TestWrapper>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      // Navigate through steps to trigger enrollMFA error
+      const button = screen.getByTestId("password-verification-next");
+      button.click();
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
+      });
+
+      const nextButton = screen.getByTestId("otp-selection-next");
+      nextButton.click();
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
+      });
+
+      const otpNextButton = screen.getByTestId("otp-verification-next");
+      otpNextButton.click();
+
+      await waitFor(() => {
+        expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
+      });
+
+      const addMfaNextButton = screen.getByTestId("add-mfa-phone-number-next");
+      addMfaNextButton.click();
+
+      // This should trigger enrollMFA error and display error summary in French
+      await waitFor(() => {
+        expect(
+          screen.getByTestId("error-summary-with-focus"),
+        ).toBeInTheDocument();
+      });
+
+      const errorSummary = screen.getByTestId("error-summary-with-focus");
+      expect(errorSummary).toHaveAttribute("data-error-code", "CSIAM0002E");
+      expect(errorSummary).toHaveAttribute("data-language", "fr");
+      expect(errorSummary).toHaveTextContent("Error Summary: CSIAM0002E");
+
+      // Reset useParams mock
+      const mockUseParams2 = await import("react-router");
+      vi.mocked(mockUseParams2.useParams).mockReturnValue({ language: "en" });
+    });
+
+    it("should render error summary when sendMFAOtp fails", async () => {
+      otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
+        success: true,
+        data: [{ id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" }],
+      });
+
+      addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
+        data: { id: "mfa-123" },
+      });
+
+      const apiError = {
+        data: { message: "OTP_SEND_ERROR" },
+      };
+      addMFAPhoneNumberApi.sendMFAOTP.mockRejectedValue(apiError);
+
+      functions.getPageContent.mockImplementation((language, page) => {
+        if (page === "error") {
+          return {
+            OTP_SEND_ERROR: "Failed to send OTP. Please try again.",
+            7: "An unexpected error occurred. Please try again later.",
+          };
+        }
+        if (page === "otpSelection") {
+          return { 11: "Loading..." };
+        }
+        return {};
+      });
+
+      render(
+        <TestWrapper>
+          <AddMFAPage />
+        </TestWrapper>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      // Navigate through steps to trigger sendMFAOtp error
+      const button = screen.getByTestId("password-verification-next");
+      button.click();
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
+      });
+
+      const nextButton = screen.getByTestId("otp-selection-next");
+      nextButton.click();
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
+      });
+
+      const otpNextButton = screen.getByTestId("otp-verification-next");
+      otpNextButton.click();
+
+      await waitFor(() => {
+        expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
+      });
+
+      const addMfaNextButton = screen.getByTestId("add-mfa-phone-number-next");
+      addMfaNextButton.click();
+
+      // This should trigger sendMFAOtp error and display error summary
+      await waitFor(() => {
+        expect(
+          screen.getByTestId("error-summary-with-focus"),
+        ).toBeInTheDocument();
+      });
+
+      const errorSummary = screen.getByTestId("error-summary-with-focus");
+      expect(errorSummary).toHaveAttribute("data-error-code", "OTP_SEND_ERROR");
+      expect(errorSummary).toHaveTextContent("Error Summary: OTP_SEND_ERROR");
+    });
+
+    it("should render error summary when verifyMFAOtp fails", async () => {
+      otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
+        success: true,
+        data: [{ id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" }],
+      });
+
+      addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
+        data: { id: "mfa-123" },
+      });
+
+      addMFAPhoneNumberApi.sendMFAOTP.mockResolvedValue({
+        data: { id: "txn-456" },
+      });
+
+      const apiError = {
+        data: { message: "VERIFICATION_FAILED" },
+      };
+      addMFAPhoneNumberApi.verifyMFAOTP.mockRejectedValue(apiError);
+
+      functions.getPageContent.mockImplementation((language, page) => {
+        if (page === "error") {
+          return {
+            VERIFICATION_FAILED: "OTP verification failed. Please try again.",
+            7: "An unexpected error occurred. Please try again later.",
+          };
+        }
+        if (page === "otpSelection") {
+          return { 11: "Loading..." };
+        }
+        return {};
+      });
+
+      render(
+        <TestWrapper>
+          <AddMFAPage />
+        </TestWrapper>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      // Navigate through steps to trigger verifyMFAOtp error
+      const button = screen.getByTestId("password-verification-next");
+      button.click();
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
+      });
+
+      const nextButton = screen.getByTestId("otp-selection-next");
+      nextButton.click();
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
+      });
+
+      const otpNextButton = screen.getByTestId("otp-verification-next");
+      otpNextButton.click();
+
+      await waitFor(() => {
+        expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
+      });
+
+      const addMfaNextButton = screen.getByTestId("add-mfa-phone-number-next");
+      addMfaNextButton.click();
+
+      await waitFor(() => {
+        expect(
+          screen.getByTestId("add-mfa-otp-verification"),
+        ).toBeInTheDocument();
+      });
+
+      const verifyNextButton = screen.getByTestId(
+        "add-mfa-otp-verification-next",
+      );
+      verifyNextButton.click();
+
+      // This should trigger verifyMFAOtp error and display error summary
+      await waitFor(() => {
+        expect(
+          screen.getByTestId("error-summary-with-focus"),
+        ).toBeInTheDocument();
+      });
+
+      const errorSummary = screen.getByTestId("error-summary-with-focus");
+      expect(errorSummary).toHaveAttribute(
+        "data-error-code",
+        "VERIFICATION_FAILED",
+      );
+      expect(errorSummary).toHaveTextContent(
+        "Error Summary: VERIFICATION_FAILED",
+      );
+    });
+
+    it("should render error summary when password verification fails", async () => {
+      otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
+        success: true,
+        data: [{ id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" }],
+      });
+
+      const apiError = {
+        data: { message: "INVALID_PASSWORD" },
+      };
+      authService.verifyPassword.mockRejectedValue(apiError);
+
+      functions.getPageContent.mockImplementation((language, page) => {
+        if (page === "error") {
+          return {
+            INVALID_PASSWORD: "Invalid password. Please try again.",
+            7: "An unexpected error occurred. Please try again later.",
+          };
+        }
+        if (page === "otpSelection") {
+          return { 11: "Loading..." };
+        }
+        return {};
+      });
+
+      render(
+        <TestWrapper>
+          <AddMFAPage />
+        </TestWrapper>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      // Trigger password verification error
+      const button = screen.getByTestId("password-verification-next");
+      button.click();
+
+      // This should trigger password verification error and display error summary
+      await waitFor(() => {
+        expect(
+          screen.getByTestId("error-summary-with-focus"),
+        ).toBeInTheDocument();
+      });
+
+      const errorSummary = screen.getByTestId("error-summary-with-focus");
+      expect(errorSummary).toHaveAttribute(
+        "data-error-code",
+        "INVALID_PASSWORD",
+      );
+      expect(errorSummary).toHaveTextContent("Error Summary: INVALID_PASSWORD");
+    });
+
+    it("should clear error summary when error is resolved", async () => {
+      otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
+        success: true,
+        data: [{ id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" }],
+      });
+
+      // First call fails, second succeeds
+      authService.verifyPassword
+        .mockRejectedValueOnce({
+          data: { message: "INVALID_PASSWORD" },
+        })
+        .mockResolvedValueOnce({
+          success: true,
+        });
+
+      functions.getPageContent.mockImplementation((language, page) => {
+        if (page === "error") {
+          return {
+            INVALID_PASSWORD: "Invalid password. Please try again.",
+            7: "An unexpected error occurred. Please try again later.",
+          };
+        }
+        if (page === "otpSelection") {
+          return { 11: "Loading..." };
+        }
+        return {};
+      });
+
+      render(
+        <TestWrapper>
+          <AddMFAPage />
+        </TestWrapper>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      // Trigger password verification error first
+      const button = screen.getByTestId("password-verification-next");
+      button.click();
+
+      // Should show error summary
+      await waitFor(() => {
+        expect(
+          screen.getByTestId("error-summary-with-focus"),
+        ).toBeInTheDocument();
+      });
+
+      // Try again - this should succeed and clear the error
+      button.click();
+
+      // Error summary should be cleared and we should move to next step
+      await waitFor(() => {
+        expect(
+          screen.queryByTestId("error-summary-with-focus"),
+        ).not.toBeInTheDocument();
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
       });
     });
   });

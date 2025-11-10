@@ -32,23 +32,34 @@ export default function ErrorSummaryWithFocus({
   const errorMessage = errorCode
     ? errorPageJson[errorCode] || errorPageJson["7"]
     : "";
-  console.log(errorCode);
 
   // Effect to scroll to and focus error summary when error message changes
   useEffect(() => {
+    let timeoutId;
+
     if (errorMessage && errorSummaryRef.current && autoFocus) {
       // Small delay to ensure the component is fully rendered
-      setTimeout(() => {
-        // Scroll the error summary into view
-        errorSummaryRef.current.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
+      timeoutId = setTimeout(() => {
+        // Check if ref is still available (component not unmounted)
+        if (errorSummaryRef.current) {
+          // Scroll the error summary into view
+          errorSummaryRef.current.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
 
-        // Focus the error summary for accessibility
-        errorSummaryRef.current.focus();
+          // Focus the error summary for accessibility
+          errorSummaryRef.current.focus();
+        }
       }, 100);
     }
+
+    // Cleanup function to clear timeout
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   }, [errorMessage, autoFocus]);
 
   // Don't render if there's no error message
