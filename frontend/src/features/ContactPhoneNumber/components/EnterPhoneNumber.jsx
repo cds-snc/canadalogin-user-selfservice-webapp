@@ -21,7 +21,6 @@ import {
   FLOW_TYPES,
   PAGES,
 } from "../../../utils/constants.jsx";
-import ErrorSummaryWithFocus from "../../../components/ErrorSummaryWithFocus/ErrorSummaryWithFocus.jsx";
 
 const ServicesAccessingPhoneNumber = ({ pageContentJson }) => {
   return (
