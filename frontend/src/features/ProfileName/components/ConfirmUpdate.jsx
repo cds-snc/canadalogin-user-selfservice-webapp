@@ -49,7 +49,9 @@ export default function ConfirmNameUpdated() {
   const location = useLocation();
   // state comes from the navigate call in UpdateProfileName.jsx
   // If user directly navigates directly to this page, there will be no state and will redirected back to edit page
-  const { name } = location.state ?? {};
+  const [savedLocationState, setSavedLocationState] = useState(null);
+  const name = savedLocationState?.name;
+
   const formattedName = name?.formatted;
 
   const successPage = path(PAGES.profileUpdateNameSuccess, {
@@ -59,8 +61,13 @@ export default function ConfirmNameUpdated() {
   const editProfile = path(PAGES.profileUpdateName, { language: language });
 
   useEffect(() => {
-    // If no name data, redirect to edit page
-    if (!name) navigate(editProfile);
+    if (location?.state?.name) {
+      // save location state to local state, when the language is toggled the location.state is null
+      setSavedLocationState(location.state);
+    } else {
+      // redirect to edit page if no name data
+      navigate(editProfile);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -87,6 +94,8 @@ export default function ConfirmNameUpdated() {
       setLocalLoading(false);
     }
   };
+
+  if (!name?.formatted) return null;
 
   return localLoading ? (
     <Loader text={loaderPageContentJson["11"]} />

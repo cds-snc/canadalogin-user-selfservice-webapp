@@ -14,19 +14,20 @@ export default function Header({ langHref, currentLang }) {
   return (
     <GcdsContainer className="gcds-header">
       <GcdsHeader
+        lang={currentLang}
         langHref={langHref}
         skipToHref="#main-content"
         signature-variant={"colour"}
-        lang={currentLang}
       >
         <TopNav currentLang={currentLang} />
         <GcdsLangToggle
           slot="toggle"
+          href={langHref}
+          lang={currentLang}
           onGcdsClick={(ev) => {
             ev.preventDefault();
             navigate(ev.detail);
           }}
-          href={langHref}
         />
         <Breadcrumbs />
       </GcdsHeader>

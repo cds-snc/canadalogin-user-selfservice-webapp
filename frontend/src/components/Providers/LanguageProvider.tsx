@@ -5,10 +5,13 @@ import {
   ReactNode,
   Dispatch,
 } from "react";
-import { CONTEXT_ACTIONS } from "../../utils/constants.jsx";
+import {
+  CONTEXT_ACTIONS,
+  AVAILABLE_LANGUAGES,
+} from "../../utils/constants.jsx";
 
 const initialState = {
-  language: null,
+  language: AVAILABLE_LANGUAGES.en,
 };
 
 interface Action {
