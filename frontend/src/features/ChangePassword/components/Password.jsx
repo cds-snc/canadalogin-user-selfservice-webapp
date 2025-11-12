@@ -131,6 +131,7 @@ export default function Password({
           <GcdsInput
             inputId="input-password"
             label={pageContentJson["9"]}
+            aria-label={pageContentJson["9"]}
             name="password"
             hint={pageContentJson["10"]}
             type={checkedValue ? "text" : "password"}
@@ -145,6 +146,7 @@ export default function Password({
         <GcdsCheckboxes
           checkboxId="checkbox-default"
           legend={pageContentJson["11"]}
+          aria-label={pageContentJson["11"]}
           name="checkbox"
           options={optionsValues}
           onGcdsChange={() => setCheckedValue(!checkedValue)}

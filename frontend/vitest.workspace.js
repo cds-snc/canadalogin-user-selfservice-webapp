@@ -34,6 +34,8 @@ export default defineWorkspace([
       },
       setupFiles: [".storybook/vitest.setup.js"],
       exclude: ["src/stories/Tests/Manage/**"],
+      silent: true,
+      reporter: ["basic"],
     },
   },
 ]);

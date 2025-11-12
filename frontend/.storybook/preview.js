@@ -3,7 +3,11 @@ import "../src/index.css";
 import { initialize, mswLoader } from "msw-storybook-addon";
 import { withRouter } from "storybook-addon-remix-react-router";
 
-initialize();
+// Initialize MSW with quiet mode to suppress request/response logging
+initialize({
+  onUnhandledRequest: "bypass",
+  quiet: true,
+});
 
 const preview = {
   loaders: [mswLoader],
@@ -21,7 +25,7 @@ const preview = {
       // 'todo' - show a11y violations in the test UI only
       // 'error' - fail CI on a11y violations
       // 'off' - skip a11y checks entirely
-      test: "todo",
+      test: "error",
     },
   },
 };

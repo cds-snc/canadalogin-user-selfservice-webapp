@@ -49,6 +49,7 @@ export default function EnterNewEmail() {
           name="EmailId"
           type="text"
           validateOn="other"
+          aria-label={pageContent["12"]}
         ></GcdsInput>
         <GcdsGrid
           columns="repeat(auto-fit, minmax(100px, 100px))"

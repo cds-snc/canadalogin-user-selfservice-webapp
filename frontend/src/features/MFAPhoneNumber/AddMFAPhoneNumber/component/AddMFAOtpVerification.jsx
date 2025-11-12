@@ -141,6 +141,7 @@ export default function AddMFAOtpVerification({
           size="6"
           maxlength={6}
           minlength={6}
+          aria-label={pageContentJson["9"]}
         ></GcdsInput>
 
         <GcdsGrid columns="max-content max-content" gap="200">

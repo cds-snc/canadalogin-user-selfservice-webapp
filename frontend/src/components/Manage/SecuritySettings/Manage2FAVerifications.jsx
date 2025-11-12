@@ -133,7 +133,7 @@ export default function Manage2FAVerifications() {
       <GcdsText>{pageContent["4"]}</GcdsText>
       <GcdsContainer className="sectionCard">
         <GcdsHeading
-          tag="h6"
+          tag="h3"
           marginTop="300"
           style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
         >
