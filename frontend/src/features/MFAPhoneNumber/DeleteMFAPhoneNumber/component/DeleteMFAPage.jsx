@@ -22,8 +22,8 @@ const StepContent = ({ StepComponent }) => {
 export default function DeleteMFAPage() {
   const { language } = useParams();
   const location = useLocation();
-  const [savedLocationState, setSavedLocationState] = useState({});
-  const { factorIds } = savedLocationState;
+  const [savedLocationState, setSavedLocationState] = useState(null);
+  const { factorIds } = savedLocationState || {};
 
   const { state } = useUser();
   const [userPhoneFactors, setUserPhoneFactors] = useState([]);
