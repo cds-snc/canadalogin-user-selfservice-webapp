@@ -8,7 +8,7 @@ import {
 import { CONTEXT_ACTIONS } from "../../utils/constants.jsx";
 
 const initialState = {
-  language: "",
+  language: null,
 };
 
 interface Action {
