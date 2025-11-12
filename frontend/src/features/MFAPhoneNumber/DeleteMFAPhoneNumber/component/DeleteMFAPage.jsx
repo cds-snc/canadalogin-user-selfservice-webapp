@@ -19,7 +19,9 @@ import StepContent from "../../../../components/Wizard/StepContent";
 export default function DeleteMFAPage() {
   const { language } = useParams();
   const location = useLocation();
-  const { factorIds } = location.state || {};
+  const [savedLocationState, setSavedLocationState] = useState(null);
+  const { factorIds } = savedLocationState || {};
+
   const { state } = useUser();
   const [userPhoneFactors, setUserPhoneFactors] = useState([]);
 
@@ -171,6 +173,20 @@ export default function DeleteMFAPage() {
   };
 
   useEffect(() => {
+    if (location?.state?.factorIds && location?.state?.factorIds.length > 0) {
+      // save location state to local state, when the language is toggled the location.state is null
+      setSavedLocationState(location.state);
+    } else {
+      // redirect to edit page if no factor data exists
+      navigateHelper(backToManage2FAVerificationsPage);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    // Check if factorIds exist in savedLocationState
+    if (!savedLocationState?.factorIds) return;
+
     const fetchUserOtpPhoneFactors = async () => {
       setLocalLoading(true);
       try {

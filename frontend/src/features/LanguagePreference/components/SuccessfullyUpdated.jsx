@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router";
 
 import {
@@ -25,15 +25,24 @@ export default function SuccessfullyUpdatedLanguage() {
   const backToProfile = path(PAGES.ProfileHome, { language: language });
   const location = useLocation();
   const navigate = useNavigate();
-  const { updatedLanguage } = location.state ?? {};
+  const [savedLocationState, setSavedLocationState] = useState(null);
+  const updatedLanguage = savedLocationState?.updatedLanguage;
   const preferredLanguage = state?.userProfile?.preferredLanguage || "";
   const editLanguagePreferences = path(PAGES.editLanguagePreferences, {
     language: language,
   });
+
   useEffect(() => {
-    if (!updatedLanguage) navigate(editLanguagePreferences);
+    // redirect to edit page if no updatedLanguage data
+    if (location?.state?.updatedLanguage) {
+      // save location state to local state, when the language is toggled the location.state is null
+      setSavedLocationState(location.state);
+    } else {
+      navigate(editLanguagePreferences);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   if (!updatedLanguage?.languageCode) return null;
 
   return (
