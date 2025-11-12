@@ -57,7 +57,7 @@ export default function OtpVerification({
   onBack,
   onChangePhoneForm,
   phoneFormData,
-  errorCode,
+  errorMessage,
   requestNewOtpCode,
 }) {
   const { language } = useParams();
@@ -65,7 +65,6 @@ export default function OtpVerification({
   const [codeRequested, setCodeRequested] = useState(false);
   const [time, setTime] = useState(initialTime);
   const pageContentJson = getPageContent(language, PAGES.verification);
-  const errorPageJson = getPageContent(language, PAGES.error);
   const { submit, cancel } = getPageContent(language, "Button");
 
   const clearValues = () => {
@@ -99,7 +98,7 @@ export default function OtpVerification({
   }, [time]);
 
   const userMfaType = phoneFormData.otpType;
-  const errorMessage = errorPageJson[errorCode] || "";
+
   return (
     <GcdsContainer>
       {codeRequested && (

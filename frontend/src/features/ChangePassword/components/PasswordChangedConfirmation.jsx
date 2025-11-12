@@ -12,7 +12,7 @@ import {
 import { getPageContent } from "../../../utils/functions";
 import { PAGES } from "../../../utils/constants";
 
-export default function YouMayUpdateEmailAtOtherPlaces() {
+export default function PasswordChangedConfirmation() {
   const { language } = useParams();
   const [time, setTime] = useState(5);
   const pageContentJson = getPageContent(

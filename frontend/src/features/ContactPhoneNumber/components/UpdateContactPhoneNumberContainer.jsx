@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams } from "react-router";
-import { GcdsErrorMessage } from "@cdssnc/gcds-components-react";
+import { GcdsContainer, GcdsErrorMessage } from "@cdssnc/gcds-components-react";
 import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 import { FLOW_TYPES, PAGES } from "../../../utils/constants.jsx";
 import { getPageContent } from "../../../utils/functions.jsx";
@@ -14,6 +14,8 @@ import ConfirmUpdate from "./ConfirmUpdate.jsx";
 import SuccessfullyUpdated from "./SuccessfullyUpdated.jsx";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
 import { path } from "../../../utils/routeHelpers.js";
+import ErrorSummaryWithFocus from "../../../components/ErrorSummaryWithFocus/ErrorSummaryWithFocus.jsx";
+import StepContent from "../../../components/Wizard/StepContent.jsx";
 
 const STEPS = {
   ENTER: "enterPhoneNumber",
@@ -31,30 +33,14 @@ const serverMapping = {
   [FLOW_TYPES.voice]: "voice",
 };
 
-const StepContent = ({ errorCode, errorPageJson, StepComponent }) => {
-  let errorMessage = errorPageJson[errorCode] || "";
-
-  if (errorMessage === "" && errorCode === "Unexpected API request error") {
-    errorMessage = errorPageJson["7"];
-  }
-
-  return (
-    <>
-      {errorMessage && (
-        <GcdsErrorMessage messageId="message-props">
-          {errorMessage}
-        </GcdsErrorMessage>
-      )}
-      {StepComponent}
-    </>
-  );
-};
-
 export default function UpdateContactPhoneNumberContainer() {
   const { language } = useParams();
   const { state, dispatch } = useUser();
   const [errorCode, setErrorCode] = useState("");
   const errorPageJson = getPageContent(language, PAGES.error);
+  const errorMessage = errorCode
+    ? errorPageJson[errorCode] || errorPageJson["7"]
+    : "";
 
   const { userProfile } = state;
   const { userName } = userProfile ?? {};
@@ -166,7 +152,7 @@ export default function UpdateContactPhoneNumberContainer() {
         phoneFormData={phoneFormData}
         onChangePhoneForm={handlePhoneForm}
         setLocalLoading={handleLoading}
-        errorCode={errorCode}
+        errorMessage={errorMessage}
         onNext={() => {
           sendOTP();
         }}
@@ -180,7 +166,7 @@ export default function UpdateContactPhoneNumberContainer() {
         userProfile={userProfile}
         phoneFormData={phoneFormData}
         onChangePhoneForm={handlePhoneForm}
-        errorCode={errorCode}
+        errorMessage={errorMessage}
         onNext={() => {
           verifyOtp();
         }}
@@ -201,7 +187,6 @@ export default function UpdateContactPhoneNumberContainer() {
         userProfile={userProfile}
         phoneFormData={phoneFormData}
         onChangePhoneForm={handlePhoneForm}
-        errorCode={errorCode}
         onNext={() => {
           updateProfile();
         }}
@@ -230,7 +215,7 @@ export default function UpdateContactPhoneNumberContainer() {
     <StepContent
       StepComponent={steps[step]}
       errorCode={errorCode}
-      errorPageJson={errorPageJson}
+      language={language}
     />
   );
 }

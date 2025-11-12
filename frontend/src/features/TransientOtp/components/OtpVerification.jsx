@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from "react";
 import {
   GcdsButton,
   GcdsContainer,
-  GcdsErrorMessage,
   GcdsGrid,
   GcdsHeading,
   GcdsInput,
@@ -27,11 +26,10 @@ export default function OtpVerification({
   onBack,
   requestOtpCode,
   validateOtpCode,
-  errorCode: errorCodeExternal,
+  setErrorCode,
+  errorMessage,
 }) {
   const { language } = useParams();
-
-  const [errorCode, setErrorCode] = useState(errorCodeExternal);
 
   const navigateHelper = useNavigateHelper();
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
@@ -39,7 +37,6 @@ export default function OtpVerification({
   });
   const [time, setTime] = useState(initialTime);
   const pageContentJson = getPageContent(language, PAGES.verification);
-  const errorPageJson = getPageContent(language, PAGES.error);
   const { submit, cancel } = getPageContent(language, "Button");
 
   const { id } = userProfile ?? {};
@@ -80,12 +77,6 @@ export default function OtpVerification({
   }, [id]);
 
   const userMfaType = userSelectedMfaFactor?.type;
-  const errorMessage =
-    errorPageJson[errorCode] ||
-    errorPageJson[errorCodeExternal] ||
-    errorCodeExternal ||
-    errorCode ||
-    "";
   return (
     <GcdsContainer>
       <GcdsContainer>

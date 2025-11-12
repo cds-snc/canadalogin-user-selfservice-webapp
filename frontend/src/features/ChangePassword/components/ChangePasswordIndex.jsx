@@ -17,6 +17,7 @@ import OtpVerification from "../../TransientOtp/components/OtpVerification.jsx";
 import { passwordUpdate } from "../api/passwordUpdate.jsx";
 import { authService } from "../../../services/authService.jsx";
 import PasswordVerification from "../../TransientOtp/components/PasswordVerification.jsx";
+import StepContent from "../../../components/Wizard/StepContent.jsx";
 
 const defaulPasswordUpdatetStep = "passwordVerification";
 
@@ -28,6 +29,11 @@ export default function ChangePasswordIndex() {
   const [userSelectedMfaFactor, setUserSelectedMfaFactor] = useState(null);
   const [otpSentResponse, setOtpSentResponse] = useState(null);
   const [errorCode, setErrorCode] = useState("");
+  const errorPageJson = getPageContent(language, PAGES.error);
+
+  const errorMessage = errorCode
+    ? errorPageJson[errorCode] || errorPageJson["7"]
+    : "";
 
   const [userPhoneFactors, setUserPhoneFactors] = useState([]);
 
@@ -173,7 +179,8 @@ export default function ChangePasswordIndex() {
         setUserPasswordValue={setUserPasswordValue}
         onCancel={async () => await navigate(backToSecuritySettingsPage)}
         validatePassword={validatePassword}
-        errorCode={errorCode}
+        setErrorCode={setErrorCode}
+        errorMessage={errorMessage}
       />
     ),
     otpSelection: (
@@ -197,11 +204,14 @@ export default function ChangePasswordIndex() {
         requestOtpCode={requestOtpCode}
         validateOtpCode={validateOtpCode}
         onBack={() => setPasswordUpdateStep("otpSelection")}
-        errorCode={errorCode}
+        setErrorCode={setErrorCode}
+        errorMessage={errorMessage}
       />
     ),
     passwordChange: (
       <Password
+        setErrorCode={setErrorCode}
+        errorMessage={errorMessage}
         userProfile={userProfile}
         userSelectedMfaType={userSelectedMfaFactor?.type}
         localLoading={localLoading}
@@ -214,28 +224,16 @@ export default function ChangePasswordIndex() {
         onBack={() => setPasswordUpdateStep("otpValidation")}
       />
     ),
-    passwordChangedConfirmation: (
-      <PasswordChangedConfirmation
-        userProfile={userProfile}
-        step={4}
-        userSelectedMfaType={userSelectedMfaFactor?.type}
-        localLoading={localLoading}
-        setLocalLoading={handleLoading}
-        totalSteps={4}
-        otpSentResponse={otpSentResponse}
-        userOtpValue={userOtpValue}
-        language={language}
-      />
-    ),
+    passwordChangedConfirmation: <PasswordChangedConfirmation />,
   };
 
-  return (
-    <>
-      {userSelectedMfaFactor ? (
-        steps[passwordUpdateStep]
-      ) : (
-        <Loader text={pageContentJson["12"]} />
-      )}
-    </>
+  return localLoading ? (
+    <Loader text={pageContentJson["12"]} />
+  ) : (
+    <StepContent
+      StepComponent={steps[passwordUpdateStep]}
+      errorCode={errorCode}
+      language={language}
+    />
   );
 }

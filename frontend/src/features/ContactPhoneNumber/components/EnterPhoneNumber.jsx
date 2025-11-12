@@ -113,7 +113,7 @@ export default function EnterPhoneNumber({
   onCancel,
   onChangePhoneForm,
   phoneFormData,
-  errorCode,
+  errorMessage,
 }) {
   const { language } = useParams();
   const [phoneNumberValid, setPhoneNumberValid] = useState(true);
@@ -136,9 +136,9 @@ export default function EnterPhoneNumber({
         </section>
 
         <section>
-          {errorCode && (
+          {errorMessage && (
             <GcdsErrorMessage messageId="message-props">
-              {errorCode}
+              {errorMessage}
             </GcdsErrorMessage>
           )}
           <PhoneInput

@@ -72,7 +72,11 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
       data-testid={
         buttonRole === "secondary" ? "cancel-button" : "submit-button"
       }
-      onClick={onGcdsClick}
+      onClick={(ev) => {
+        if (onGcdsClick) {
+          onGcdsClick(ev);
+        }
+      }}
       style={style}
     >
       {children}
@@ -141,13 +145,15 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
 const mockSetUserPasswordValue = vi.fn();
 const mockOnCancel = vi.fn();
 const mockValidatePassword = vi.fn();
+const mockSetErrorCode = vi.fn();
 
 const defaultProps = {
-  errorCode: "",
   userPasswordValue: "",
   setUserPasswordValue: mockSetUserPasswordValue,
   onCancel: mockOnCancel,
   validatePassword: mockValidatePassword,
+  setErrorCode: mockSetErrorCode,
+  errorMessage: "",
   parentPage: "password",
 };
 
@@ -163,6 +169,10 @@ const renderComponent = (props = {}) => {
 describe("PasswordVerification Component", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockSetErrorCode.mockClear();
+    mockSetUserPasswordValue.mockClear();
+    mockOnCancel.mockClear();
+    mockValidatePassword.mockClear();
   });
 
   afterEach(() => {
@@ -255,20 +265,23 @@ describe("PasswordVerification Component", () => {
   });
 
   describe("Error Handling", () => {
-    it("displays error message when errorCode is provided externally", () => {
-      renderComponent({ errorCode: "CSIAM0010E" });
+    it("displays error message when errorMessage is provided", () => {
+      renderComponent({ errorMessage: "The authentication attempt failed" });
       expect(
         screen.getByText("The authentication attempt failed"),
       ).toBeInTheDocument();
     });
 
-    it("does not display error message when errorCode is empty", () => {
-      renderComponent({ errorCode: "" });
+    it("does not display error message when errorMessage is empty", () => {
+      renderComponent({ errorMessage: "" });
       expect(screen.queryByTestId("error-message")).not.toBeInTheDocument();
     });
 
     it("displays password reuse error message", () => {
-      renderComponent({ errorCode: "CSIAI0021E" });
+      renderComponent({
+        errorMessage:
+          "The password that you specified was used previously, and it cannot be reused.",
+      });
       expect(
         screen.getByText(
           "The password that you specified was used previously, and it cannot be reused.",
@@ -277,14 +290,16 @@ describe("PasswordVerification Component", () => {
     });
 
     it("displays verification code expired error message", () => {
-      renderComponent({ errorCode: "CSIAM0011E" });
+      renderComponent({
+        errorMessage: "The verification code is invalid or has expired.",
+      });
       expect(
         screen.getByText("The verification code is invalid or has expired."),
       ).toBeInTheDocument();
     });
 
     it("displays too many attempts error message", () => {
-      renderComponent({ errorCode: "CSIAM0038E" });
+      renderComponent({ errorMessage: "Too Many Attempts" });
       expect(screen.getByText("Too Many Attempts")).toBeInTheDocument();
     });
   });
@@ -349,7 +364,7 @@ describe("PasswordVerification Component", () => {
   });
 
   describe("Validation Error Handling", () => {
-    it("displays error when validatePassword throws an error", async () => {
+    it("calls setErrorCode when validatePassword throws an error", async () => {
       const user = userEvent.setup();
       const error = {
         data: {
@@ -365,9 +380,7 @@ describe("PasswordVerification Component", () => {
 
       // Wait for the error to be processed
       await vi.waitFor(() => {
-        expect(
-          screen.getByText("The authentication attempt failed"),
-        ).toBeInTheDocument();
+        expect(mockSetErrorCode).toHaveBeenCalledWith("CSIAM0010E");
       });
     });
 
@@ -376,7 +389,7 @@ describe("PasswordVerification Component", () => {
       mockValidatePassword.mockResolvedValue(undefined);
 
       renderComponent({
-        errorCode: "CSIAM0010E",
+        errorMessage: "The authentication attempt failed",
         userPasswordValue: "newPassword",
       });
 
@@ -389,6 +402,7 @@ describe("PasswordVerification Component", () => {
       await user.click(submitButton);
 
       // Error should be cleared during submission
+      expect(mockSetErrorCode).toHaveBeenCalledWith("");
       expect(mockValidatePassword).toHaveBeenCalledWith("newPassword");
     });
 
@@ -402,8 +416,10 @@ describe("PasswordVerification Component", () => {
       const submitButton = screen.getByTestId("submit-button");
       await user.click(submitButton);
 
-      // Should not crash, error won't be displayed if message is not in expected format
+      // Should not crash, setErrorCode won't be called if message is not in expected format
       expect(mockValidatePassword).toHaveBeenCalled();
+      expect(mockSetErrorCode).toHaveBeenCalledWith(""); // Clear error call
+      expect(mockSetErrorCode).toHaveBeenCalledTimes(1); // Only the clear call
     });
 
     it("handles validation error with null data", async () => {
@@ -417,6 +433,8 @@ describe("PasswordVerification Component", () => {
       await user.click(submitButton);
 
       expect(mockValidatePassword).toHaveBeenCalled();
+      expect(mockSetErrorCode).toHaveBeenCalledWith(""); // Clear error call
+      expect(mockSetErrorCode).toHaveBeenCalledTimes(1); // Only the clear call
     });
   });
 
@@ -575,9 +593,7 @@ describe("PasswordVerification Component", () => {
       await user.click(submitButton);
 
       await vi.waitFor(() => {
-        expect(
-          screen.getByText("The authentication attempt failed"),
-        ).toBeInTheDocument();
+        expect(mockSetErrorCode).toHaveBeenCalledWith("CSIAM0010E");
       });
     });
 
@@ -610,15 +626,15 @@ describe("PasswordVerification Component", () => {
       await user.click(submitButton);
 
       await vi.waitFor(() => {
-        expect(
-          screen.getByText("The authentication attempt failed"),
-        ).toBeInTheDocument();
+        expect(mockSetErrorCode).toHaveBeenCalledWith("CSIAM0010E");
       });
 
       // Second attempt succeeds
       await user.click(submitButton);
 
       expect(mockValidatePassword).toHaveBeenCalledTimes(2);
+      // Should have cleared error on second attempt
+      expect(mockSetErrorCode).toHaveBeenLastCalledWith("");
     });
   });
 
@@ -634,7 +650,7 @@ describe("PasswordVerification Component", () => {
     });
 
     it("provides error message for screen readers", () => {
-      renderComponent({ errorCode: "CSIAM0010E" });
+      renderComponent({ errorMessage: "The authentication attempt failed" });
 
       const errorMessage = screen.getByTestId("error-message");
       expect(errorMessage).toBeInTheDocument();

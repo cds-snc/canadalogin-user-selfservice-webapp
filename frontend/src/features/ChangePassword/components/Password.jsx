@@ -21,18 +21,22 @@ import { useParams } from "react-router";
 import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 import { path } from "../../../utils/routeHelpers.js";
 
-export default function Password({ onNext, otpSentResponse, userOtpValue }) {
+export default function Password({
+  onNext,
+  otpSentResponse,
+  userOtpValue,
+  setErrorCode,
+  errorMessage,
+}) {
   const { state } = useUser();
   const { language } = useParams();
   const { submit, cancel } = getPageContent(language, "Button");
   const [passwordPolicy, setPasswordPolicy] = useState({ min: 12, max: 110 });
-  const [serverErrorMessage, setServerErrorMessage] = useState("");
   const [checkedValue, setCheckedValue] = useState(false);
   const [password, setPassword] = useState("");
 
   const [passwordStrength, setPasswordStrength] = useState(0);
   const pageContentJson = getPageContent(language, PAGES.password);
-  const errorPageJson = getPageContent(language, PAGES.error);
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
     language: language,
   });
@@ -50,7 +54,7 @@ export default function Password({ onNext, otpSentResponse, userOtpValue }) {
           setPasswordPolicy(policy);
         }
       } catch (err) {
-        console.log(err);
+        console.error(err);
       }
     }
 
@@ -60,12 +64,12 @@ export default function Password({ onNext, otpSentResponse, userOtpValue }) {
   function handlePasswordChange(event) {
     setPasswordStrength(event.target.value.length);
     setPassword(event.target.value);
-    setServerErrorMessage("");
+    setErrorCode("");
   }
 
   const completePasswordUpdate = async () => {
     try {
-      setServerErrorMessage("");
+      setErrorCode("");
       const response = await passwordUpdate.finalStep(
         userOtpValue,
         otpSentResponse.trxId,
@@ -76,9 +80,9 @@ export default function Password({ onNext, otpSentResponse, userOtpValue }) {
       }
     } catch (err) {
       if (err && err.data && err.data.message) {
-        setServerErrorMessage(err.data.message);
+        setErrorCode(err.data.message);
       }
-      console.log("err", err);
+      console.error("err", err);
     }
   };
 
@@ -90,7 +94,6 @@ export default function Password({ onNext, otpSentResponse, userOtpValue }) {
       checked: checkedValue,
     },
   ];
-  const errorMessage = errorPageJson[serverErrorMessage] || "";
 
   return (
     <GcdsContainer>
