@@ -51,7 +51,6 @@ const RadioButtons = ({
   const radioOptions = configureRadioOptions();
   return (
     <GcdsRadios
-      aria-label={pageContentJson["10"]}
       name="radio"
       legend={pageContentJson["10"]}
       hint={pageContentJson["15"]}

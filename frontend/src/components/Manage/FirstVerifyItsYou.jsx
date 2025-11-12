@@ -25,7 +25,6 @@ export default function FirstVerifyItsYou() {
           inputId="input-password"
           label={pageContent["3"]}
           name="password"
-          aria-label={pageContent["3"]}
         ></GcdsInput>
         <GcdsGrid
           columns="repeat(auto-fit, minmax(100px, 100px))"

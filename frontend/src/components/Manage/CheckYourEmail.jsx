@@ -33,7 +33,6 @@ export default function CheckYourEmail() {
           label={pageContent["7"]}
           name="verificationCode"
           type="text"
-          aria-label={pageContent["7"]}
           validateOn="other"
         />
         <GcdsGrid

@@ -125,7 +125,6 @@ export default function OtpVerification({
           maxlength={6}
           minlength={6}
           required={errorMessage === ""}
-          aria-label={pageContentJson["9"]}
         ></GcdsInput>
 
         <GcdsGrid columns="max-content max-content" gap="200">

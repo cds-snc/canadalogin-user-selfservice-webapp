@@ -46,7 +46,7 @@ export default function ManageDashboard() {
         <GcdsCard
           className="dashboard-card"
           cardTitle={pageContent["2"]}
-          cardTitleTag="h3"
+          cardTitleTag="h2"
           href={personalInformationLink}
           onGcdsClick={(ev) => {
             ev.preventDefault();
@@ -80,11 +80,10 @@ export default function ManageDashboard() {
             />
           </svg>
         </GcdsCard>
-
         <GcdsCard
           className="dashboard-card"
           cardTitle={pageContent["3"]}
-          cardTitleTag="h3"
+          cardTitleTag="h2"
           href={securitySettingsLink}
           onGcdsClick={(ev) => {
             ev.preventDefault();
