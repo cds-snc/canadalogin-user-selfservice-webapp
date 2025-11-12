@@ -11,7 +11,7 @@ import {
 } from "../../utils/constants.jsx";
 
 const initialState = {
-  language: AVAILABLE_LANGUAGES.en,
+  language: "",
 };
 
 interface Action {
