@@ -124,7 +124,7 @@ export default function OtpVerification({
           size="6"
           maxlength={6}
           minlength={6}
-          required={errorMessage == ""}
+          required={errorMessage === ""}
         ></GcdsInput>
 
         <GcdsGrid columns="max-content max-content" gap="200">

@@ -27,7 +27,7 @@ export default function YouMayUpdateEmailAtOtherPlaces() {
       <br />
       &nbsp;
       <GcdsHeading tag="h1">{pageContentJson["2"]}</GcdsHeading>
-      <GcdsHeading tag="h3">{pageContentJson["3"]}</GcdsHeading>
+      <GcdsHeading tag="h2">{pageContentJson["3"]}</GcdsHeading>
       <GcdsText>{pageContentJson["4"]}</GcdsText>
       <GcdsText>
         {pageContentJson["5"]}{" "}

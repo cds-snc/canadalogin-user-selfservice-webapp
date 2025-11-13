@@ -28,7 +28,7 @@ const RadioButtons = ({
     const smsLabel = `${pageContentJson["11"]}`;
     const smsOtpRadioOption = {
       label: smsLabel,
-      id: FLOW_TYPES.sms,
+      id: `sms-radio-${FLOW_TYPES.sms}`,
       value: FLOW_TYPES.sms,
       hint: pageContentJson["12"],
       checked: phoneFormData.otpType === FLOW_TYPES.sms,
@@ -38,7 +38,7 @@ const RadioButtons = ({
     const voiceLabel = `${pageContentJson["13"]}`;
     const voiceOtpRadioOption = {
       label: voiceLabel,
-      id: FLOW_TYPES.voice,
+      id: `voice-radio-${FLOW_TYPES.voice}`,
       value: FLOW_TYPES.voice,
       hint: pageContentJson["14"],
       checked: phoneFormData.otpType === FLOW_TYPES.voice,
@@ -55,6 +55,7 @@ const RadioButtons = ({
       legend={pageContentJson["10"]}
       hint={pageContentJson["15"]}
       options={radioOptions}
+      required={true}
       onGcdsChange={(e) => {
         onChangePhoneForm("otpType", e.target.value);
       }}

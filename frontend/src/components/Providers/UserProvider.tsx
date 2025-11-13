@@ -344,10 +344,6 @@ export function UserProvider({
           window.location.href = "/";
         }, 2000);
       }
-      if (event.type === "error") {
-        // for debugging purpose. No need to handle it.
-        console.error("SSE error:", event.data);
-      }
       if (event.type === "notification") {
         // Parse the event data and check status
         try {

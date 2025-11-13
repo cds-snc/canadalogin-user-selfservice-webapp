@@ -22,7 +22,7 @@ export default function ViewProfileNameSectionCard({ pageContent }) {
 
   return (
     <GcdsContainer className="sectionCard">
-      <GcdsHeading tag="h6" marginTop="300">
+      <GcdsHeading tag="h3" marginTop="300">
         {pageContent["3"]}
       </GcdsHeading>
       <GcdsGrid columns="1fr auto" className="gridInline">

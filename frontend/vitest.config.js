@@ -72,5 +72,8 @@ export default defineConfig({
     // Don't fail on unhandled errors from third-party components (GCDS)
     onUnhandledRejection: "ignore",
     dangerouslyIgnoreUnhandledErrors: true,
+    // Reduce test output verbosity
+    reporter: ["verbose"],
+    silent: false,
   },
 });
