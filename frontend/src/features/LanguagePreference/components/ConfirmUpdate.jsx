@@ -123,7 +123,6 @@ export default function ConfirmLanguageUpdate() {
         <GcdsText>{pageContentJson["4"]}</GcdsText>
         <ul>
           <li>{pageContentJson["5"]}</li>
-          <li>{pageContentJson["10"]}</li>
         </ul>
 
         <GcdsGrid columns="max-content max-content" gap="200">

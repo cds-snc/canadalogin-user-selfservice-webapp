@@ -102,7 +102,6 @@
     "7": "Cette action",
     "8": "Oui, mettre à jour",
     "9": "Annuler",
-    "10": "Talent numérique",
     "11": "ne modifie pas",
     "12": "votre nom sur le plan légal."
   },
@@ -266,7 +265,6 @@
     "7": "Ceci",
     "8": "Oui, mettre à jour",
     "9": "Annuler",
-    "10": "Talent numérique",
     "11": "ne modifie pas",
     "12": "légalement votre nom."
   },
@@ -329,11 +327,11 @@
   "EnterNewPhoneNumber": {
     "1": "Entrez un nouveau numéro de téléphone",
     "2": "Cette action modifiera le numéro de téléphone que Connexion GC et les services liés à votre compte Connexion GC peuvent utiliser pour vous contacter.",
-    "3": "Quels services ont accès à votre numéro de téléphone de contact",
-    "4": "Les services suivants ont accès à votre numéro de téléphone de contact :",
+    "3": "Services ayant accès à votre numéro de téléphone de communication",
+    "4": "Les services suivants ont accès à votre numéro de téléphone de communication par le biais de Connexion GC:",
     "5": "GEO.ca",
-    "6": "Si vous tentez de mettre à jour votre numéro de téléphone de contact auprès d’un service qui n’est pas connecté à GC CléGC, vous devrez accéder à ce compte directement.",
-    "7": "Pour rechercher un autre compte GC, visitez le",
+    "6": "Si vous cherchez à mettre à jour votre numéro de téléphone de communication pour un service qui n’est pas lié à votre compte Connexion GC, vous devez le faire depuis le compte que vous possédez pour le service en question.",
+    "7": "Pour rechercher un autre compte du GC, consultez le",
     "8": "répertoire des comptes GC",
     "9": "Pays",
     "10": "Numéro de téléphone",
