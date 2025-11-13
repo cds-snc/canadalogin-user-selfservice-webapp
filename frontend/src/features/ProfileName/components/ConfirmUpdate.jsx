@@ -112,7 +112,6 @@ export default function ConfirmNameUpdated() {
             <GcdsText marginBottom="0">{pageContentJson["4"]}</GcdsText>
             <ul>
               <li>{pageContentJson["5"]}</li>
-              <li>{pageContentJson["10"]}</li>
             </ul>
           </div>
 
