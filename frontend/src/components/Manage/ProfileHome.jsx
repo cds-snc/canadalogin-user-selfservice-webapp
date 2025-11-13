@@ -34,7 +34,7 @@ export default function ProfileHome() {
   const pageContent = getPageContent(language, PAGES.ProfileHome);
   const { state } = useUser();
   const email = state?.userProfile?.userName || "";
-  const phoneNumbers = state?.userProfile?.phoneNumbers;
+  const phoneNumbers = state?.userProfile?.phoneNumbers || [];
 
   return (
     <GcdsContainer>
