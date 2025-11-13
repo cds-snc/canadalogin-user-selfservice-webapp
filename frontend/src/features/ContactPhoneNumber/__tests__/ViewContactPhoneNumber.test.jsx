@@ -333,9 +333,7 @@ describe("ViewContactPhoneNumber Component", () => {
       </TestWrapper>,
     );
 
-    expect(
-      screen.getByText("Your contact phone number is"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("No phone number added")).toBeInTheDocument();
   });
 
   it("matches snapshot with no phone numbers", () => {

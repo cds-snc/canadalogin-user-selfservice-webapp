@@ -105,7 +105,7 @@ export default function ViewContactPhoneNumber({ pageContent, phoneNumbers }) {
       <GcdsHeading tag="h3" marginTop="300">
         {pageContent["10"]}
       </GcdsHeading>
-      {phoneNumbers !== null ? (
+      {phoneNumbers !== null && phoneNumbers.length > 0 ? (
         <>
           <ContactPhoneNumber
             pageContent={pageContent}
