@@ -965,7 +965,7 @@ export const CompleteAddMFAFlowSMS = (() => {
       await step("Verify set up second MFA is displayed", async () => {
         await waitFor(async () => {
           const hasAddPhoneText = canvasElement.textContent.includes(
-            "Set up voice call verification",
+            "Yes, set up voice call verification",
           );
           await expect(hasAddPhoneText).toBeTruthy();
         });
