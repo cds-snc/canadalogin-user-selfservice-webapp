@@ -319,6 +319,23 @@ export default function AddMFAPage() {
     }
   };
 
+  async function handleSetupAlternateMFAMethod() {
+    const secondMFAOtpType =
+      phoneFormData.otpType === FLOW_TYPES.voice
+        ? FLOW_TYPES.sms
+        : FLOW_TYPES.voice;
+    handlePhoneForm("otpType", secondMFAOtpType);
+    const enrollMfaResponse = await enrollMFA({
+      phoneNumber: phoneFormData.phoneNumber,
+      otpType: secondMFAOtpType,
+    });
+    await sendMFAOtp({
+      reSendOtpCode: false,
+      mfaId: enrollMfaResponse?.data?.id,
+      otpType: secondMFAOtpType,
+    });
+  }
+
   useEffect(() => {
     const fetchUserOtpPhoneFactors = async () => {
       setLocalLoading(true);
@@ -432,6 +449,10 @@ export default function AddMFAPage() {
         onUseDifferentPhoneNumber={async () => {
           await deleteMFA();
         }}
+        onSetupAlternateMFAMethod={async () => {
+          await deleteMFA();
+          await handleSetupAlternateMFAMethod();
+        }}
       />
     ),
     addSecondMFA: (
@@ -449,20 +470,7 @@ export default function AddMFAPage() {
           });
         }}
         onAddSecondMFA={async () => {
-          const secondMFAOtpType =
-            phoneFormData.otpType === FLOW_TYPES.voice
-              ? FLOW_TYPES.sms
-              : FLOW_TYPES.voice;
-          handlePhoneForm("otpType", secondMFAOtpType);
-          const enrollMfaResponse = await enrollMFA({
-            phoneNumber: phoneFormData.phoneNumber,
-            otpType: secondMFAOtpType,
-          });
-          await sendMFAOtp({
-            reSendOtpCode: false,
-            mfaId: enrollMfaResponse?.data?.id,
-            otpType: secondMFAOtpType,
-          });
+          await handleSetupAlternateMFAMethod();
         }}
       />
     ),

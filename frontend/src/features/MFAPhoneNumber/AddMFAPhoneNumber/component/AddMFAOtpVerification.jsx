@@ -58,6 +58,7 @@ export default function AddMFAOtpVerification({
   errorMessage,
   requestNewOtpCode,
   onUseDifferentPhoneNumber,
+  onSetupAlternateMFAMethod,
 }) {
   const { language } = useParams();
 
@@ -168,6 +169,18 @@ export default function AddMFAOtpVerification({
         </GcdsGrid>
       </GcdsContainer>
       <GcdsHeading tag="h2">{pageContentJson["10"]}</GcdsHeading>
+
+      <GcdsText>
+        <GcdsLink
+          onGcdsClick={async () => {
+            await onSetupAlternateMFAMethod();
+          }}
+        >
+          {userMfaType === FLOW_TYPES.sms
+            ? pageContentJson["29"]
+            : pageContentJson["28"]}
+        </GcdsLink>
+      </GcdsText>
 
       <GcdsText>
         {time > 0 ? (

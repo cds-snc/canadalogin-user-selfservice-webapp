@@ -80,7 +80,9 @@
     "24": "Le courriel pourrait prendre quelques minutes à arriver. Si vous ne voyez pas le courriel, vérifiez s’il se trouve dans votre dossier de pourriels.",
     "25": "Utiliser une autre adresse courriel",
     "26": "Demander un nouveau code",
-    "27": "Annuler"
+    "27": "Annuler",
+    "28": "Configurer la vérification par message texte (SMS)",
+    "29": "Configurez la vérification par appel vocal"
   },
   "Button": {
     "submit": "Continuer",
