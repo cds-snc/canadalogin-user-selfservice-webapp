@@ -329,11 +329,17 @@ export default function AddMFAPage() {
       phoneNumber: phoneFormData.phoneNumber,
       otpType: secondMFAOtpType,
     });
-    await sendMFAOtp({
-      reSendOtpCode: false,
-      mfaId: enrollMfaResponse?.data?.id,
-      otpType: secondMFAOtpType,
-    });
+    if (
+      enrollMfaResponse &&
+      enrollMfaResponse.data &&
+      enrollMfaResponse.data.id
+    ) {
+      await sendMFAOtp({
+        reSendOtpCode: false,
+        mfaId: enrollMfaResponse.data.id,
+        otpType: secondMFAOtpType,
+      });
+    }
   }
 
   useEffect(() => {
