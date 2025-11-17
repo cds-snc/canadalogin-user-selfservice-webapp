@@ -81,7 +81,9 @@
     "24": "Your email might take a few minutes to arrive. If you do not get an email, check your spam folder.",
     "25": "Use a different email",
     "26": "Send the code again",
-    "27": "Cancel"
+    "27": "Cancel",
+    "28": "Set up text (SMS) verification instead",
+    "29": "Set up voice call verification instead"
   },
   "Button": {
     "submit": "Continue",

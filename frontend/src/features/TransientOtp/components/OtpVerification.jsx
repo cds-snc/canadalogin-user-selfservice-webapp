@@ -162,17 +162,13 @@ export default function OtpVerification({
       <GcdsHeading tag="h2">{pageContentJson["10"]}</GcdsHeading>
 
       <GcdsText>
-        {time <= 0 ? (
-          <GcdsLink
-            onGcdsClick={() => {
-              onBack();
-            }}
-          >
-            {pageContentJson["21"]}
-          </GcdsLink>
-        ) : (
-          ""
-        )}
+        <GcdsLink
+          onGcdsClick={() => {
+            onBack();
+          }}
+        >
+          {pageContentJson["21"]}
+        </GcdsLink>
       </GcdsText>
 
       <GcdsText>
