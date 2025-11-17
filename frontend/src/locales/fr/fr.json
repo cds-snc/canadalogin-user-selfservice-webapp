@@ -253,7 +253,9 @@
     "8": "répertoire des comptes du GC.",
     "9": "Pour voir les services connectés à votre compte GC Sign in, accédez à ",
     "10": "Services connectés",
-    "11": "dans votre tableau de bord GC Sign in."
+    "11": "dans votre tableau de bord GC Sign in.",
+    "12": "Déconnexion en cours...",
+    "13": "Échec de la déconnexion. Redirection..."
   },
   "ConfirmLanguageUpdate": {
     "1": "Voulez-vous vraiment mettre à jour votre langue de communication?",
