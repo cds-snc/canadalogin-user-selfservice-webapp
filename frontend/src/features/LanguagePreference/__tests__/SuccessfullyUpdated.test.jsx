@@ -4,6 +4,7 @@ import { render, screen, fireEvent, within } from "@testing-library/react";
 import { useParams, useLocation, useNavigate } from "react-router";
 import SuccessfullyUpdatedLanguage from "../components/SuccessfullyUpdated.jsx";
 import { useUser } from "../../../components/Providers/useUser.tsx";
+import { authService } from "../../../services/authService.jsx";
 
 // ────────────────────────────────────────────────
 // Mocks
@@ -22,6 +23,18 @@ vi.mock("react-router", async () => {
 
 vi.mock("../../../components/Providers/useUser.tsx", () => ({
   useUser: vi.fn(),
+}));
+
+vi.mock("../../../utils/userProfileDispatch.jsx", () => ({
+  userProfileDispatch: vi.fn(() => ({
+    setLoading: vi.fn(),
+  })),
+}));
+
+vi.mock("../../../services/authService.jsx", () => ({
+  authService: {
+    logout: vi.fn(),
+  },
 }));
 
 vi.mock("../../../utils/functions.jsx", () => ({
@@ -51,23 +64,28 @@ vi.mock("../../../utils/routeHelpers.js", () => ({
   }),
 }));
 
-vi.mock("../../../utils/constants.jsx", () => ({
-  PAGES: {
-    successfullyUpdatedLanguage: "success",
-    ProfileHome: "profile-home",
-    editLanguagePreferences: "edit-language-preferences",
-  },
-  LANGUAGE_DISPLAY_NAMES: {
-    en: {
-      "en-ca": "English",
-      "fr-ca": "French",
+vi.mock("../../../utils/constants.jsx", async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    PAGES: {
+      ...actual.PAGES,
+      successfullyUpdatedLanguage: "success",
+      ProfileHome: "profile-home",
+      editLanguagePreferences: "edit-language-preferences",
     },
-    fr: {
-      "en-ca": "Anglais",
-      "fr-ca": "Français",
+    LANGUAGE_DISPLAY_NAMES: {
+      en: {
+        "en-ca": "English",
+        "fr-ca": "French",
+      },
+      fr: {
+        "en-ca": "Anglais",
+        "fr-ca": "Français",
+      },
     },
-  },
-}));
+  };
+});
 
 vi.mock("@cdssnc/gcds-components-react", () => ({
   GcdsContainer: ({ children, ...props }) => (
@@ -165,6 +183,7 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
           preferredLanguage,
         },
       },
+      dispatch: vi.fn(),
     });
 
     return render(<SuccessfullyUpdatedLanguage />);
@@ -265,13 +284,27 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
       expect(mockNavigate).toHaveBeenCalledWith("/en/profile");
     });
 
-    it("navigates to profile when 'Sign out' is clicked", () => {
+    it("calls logout service when 'Sign out' is clicked", async () => {
+      // Mock successful logout response
+      vi.mocked(authService.logout).mockResolvedValue({
+        data: { redirect_url: "https://example.com/logout" },
+      });
+
+      // Mock window.location.href
+      const originalLocation = window.location;
+      delete window.location;
+      window.location = { href: "" };
+
       setup();
 
       const secondaryButton = screen.getByTestId("gcds-button-secondary");
       fireEvent.click(secondaryButton);
 
-      expect(mockNavigate).toHaveBeenCalledWith("/en/profile");
+      // Restore window.location
+      window.location = originalLocation;
+
+      expect(authService.logout).toHaveBeenCalled();
+      expect(mockNavigate).not.toHaveBeenCalled();
     });
 
     it("uses correct language code in navigation path", () => {
@@ -359,6 +392,7 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
             preferredLanguage: "en-ca",
           },
         },
+        dispatch: vi.fn(),
       });
 
       render(<SuccessfullyUpdatedLanguage />);
@@ -393,6 +427,7 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
         state: {
           userProfile: null,
         },
+        dispatch: vi.fn(),
       });
 
       render(<SuccessfullyUpdatedLanguage />);
@@ -412,6 +447,7 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
       });
       useUser.mockReturnValue({
         state: null,
+        dispatch: vi.fn(),
       });
 
       render(<SuccessfullyUpdatedLanguage />);
@@ -435,6 +471,7 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
             preferredLanguage: undefined,
           },
         },
+        dispatch: vi.fn(),
       });
 
       render(<SuccessfullyUpdatedLanguage />);
@@ -458,6 +495,7 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
             preferredLanguage: "",
           },
         },
+        dispatch: vi.fn(),
       });
 
       render(<SuccessfullyUpdatedLanguage />);
