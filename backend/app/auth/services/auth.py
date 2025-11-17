@@ -43,18 +43,30 @@ async def redirect_user_to_idp_verify(request: Request):
     """
     try:
         callback_redirect_uri = get_callback_redirect_uri(request)
-        return await oauth.verify.authorize_redirect(request, callback_redirect_uri)
+        for k, v in request.session.items():
+            logger.info(f"Login Request Session Items: {k}: {v}")
+
+        logger.info("Redirecting user to IBM Verify for authentication")
+        response = await oauth.verify.authorize_redirect(request, callback_redirect_uri)
+        # After the redirect to the login page, request.session should have a code_verifier
+        for k, v in request.session.items():
+            logger.info(f"After Redirected user Login Request Session Items: {k}: {v}")
+        return response
     except Exception as e:
-        logger.exception("Unexpected error during redirect_to_verify", str(e))
+        logger.exception("Unexpected error during redirect_to_verify: %s", str(e))
         RequestErrorHandler.handle(e, context="Unexpected error during idp redirect")
 
 
 async def callback_handler(request: Request):
     """
-    Get the redirect URL for the OAuth login flow.
-    This function is used to initiate the login process with IBM Verify.
+    Handle the OAuth callback from IBM Verify.
+    This function processes the response from IBM Verify after user authentication.
     """
     try:
+        logger.info("OIDC Callback Handler")
+        for k, v in request.session.items():
+            logger.info(f"Callback Handler: Request Session Items: {k}: {v}")
+
         redirectValue = get_base_profile_management_url()
         returnToPageValue = request.session.get(SessionKeys.RETURN_TO_PAGE.value)
 
@@ -81,7 +93,6 @@ async def callback_handler(request: Request):
 
         update_session_tokens(request, oidc_response)
 
-        logger.info("OIDC Callback Handler")
         logger.info(f"Redirect to PROFILE_MANAGEMENT_DOMAIN: {redirectValue}")
         return RedirectResponse(url=redirectValue)
     except OAuthError as error:

@@ -216,9 +216,15 @@ export function UserProvider({
 
   // Session timeout configuration (in milliseconds)
   const WARNING_TIME = 5 * 60 * 1000; // 5 minutes before expiry
+  const shouldConnectSSE = Boolean(
+    userState.userProfile && !userState.isLoading,
+  );
+  const sseUrl = shouldConnectSSE
+    ? `${config.apiUrl}${SUBMIT_END_POINTS.sessionStatus}`
+    : ""; // Empty string prevents connection
 
   const [eventSource, eventSourceStatus] = useEventSource(
-    `${config.apiUrl}${SUBMIT_END_POINTS.sessionStatus}`,
+    sseUrl, // Connects after user authentication
     true,
   );
 
