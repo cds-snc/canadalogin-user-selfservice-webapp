@@ -46,7 +46,7 @@ async def redirect_user_to_idp_verify(request: Request):
         for k, v in request.session.items():
             logger.info(f"Login Request Session Items: {k}: {v}")
 
-        logger.info(f"Redirecting user to IBM Verify for authentication")
+        logger.info("Redirecting user to IBM Verify for authentication")
         response = await oauth.verify.authorize_redirect(request, callback_redirect_uri)
         for k, v in request.session.items():
             logger.info(f"After Redirected user Login Request Session Items: {k}: {v}")
