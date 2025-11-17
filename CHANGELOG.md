@@ -1,5 +1,42 @@
 # Changelog
 
+## [1.7.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.6.0...v1.7.0) (2025-11-13)
+
+
+### Features
+
+* add accept language header for otp endpoints ([#905](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/905)) ([a5059a9](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/a5059a95e4a52f55c52d523a937ad28e7abdce55))
+* **backend:** implement the password verification endpoint ([#882](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/882)) ([a8254a3](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/a8254a31d30e728367621588de61c108a7c6ceed))
+* **ci/cd:** Deploy manage to staging ([#864](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/864)) ([e83ac3b](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/e83ac3b03d551e7bf5287381be2015425638ff90))
+* **frontend:** add tests for add mfa phone number pages ([#868](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/868)) ([c935135](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/c935135b060bfb6a733e0c0b7a00384ccd54c93a))
+* **frontend:** change password revise otp verification page to align with figma ([#872](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/872)) ([e2c0c7d](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/e2c0c7d159de9707081e9974d57e8c0a092d7001))
+* **frontend:** implement password verification step ([#880](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/880)) ([9106987](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/9106987599027a9f00547819c27cf67b9ae2ca1a))
+* Improve accessibility attributes across components. Enable testing to throw errors on a11y violations ([#914](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/914)) ([7ef43d9](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/7ef43d9d7b744202547d66542e9f943af066eeed))
+
+
+### Bug Fixes
+
+* **backend:** Adding the SecWeb middleware in default setting ([#844](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/844)) ([8bbbdee](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/8bbbdee4750ad7afdf2cabb1600177afb940d5c2))
+* **backend:** Comment out secweb integration ([#891](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/891)) ([3e0a107](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/3e0a107a7b219af9bcc3eb8994dad78aff403287))
+* **backend:** duplicate schema name ([#885](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/885)) ([e558531](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/e55853143e55e8f8bcada5a54262ba2b54c8f5be))
+* **backend:** streamline search parameters for user OTP factors API call ([#893](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/893)) ([45cb2b7](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/45cb2b7046d1bf15b31d97cee1ab81446236f5f1))
+* Empty contact phone number displayed as verified ([#916](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/916)) ([2fe06df](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/2fe06df5d575dd7a1b28547adc0b77c4960cbe44))
+* **frontend:** Add MFA tests sometimes failing ([#871](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/871)) ([96ce13f](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/96ce13f6c3d0c277601d2f8f0f5b31869b4ebbfd))
+* **frontend:** enhance error message handling ([#896](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/896)) ([a576de8](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/a576de8b560cb82a315611727f077f3ef783ce7f))
+* **frontend:** update password guidelines for clarity in English and French translations ([#894](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/894)) ([5d0fa32](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/5d0fa3205acf90a00da6d5a323225adeecc2aaea))
+* **frontend:** updated content to match figma ([#918](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/918)) ([27fdd36](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/27fdd362fe398b8d5ed2e207c9f69826c32cba85))
+* **tests:** update radio button selection and continue button queries in MFA tests ([96ce13f](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/96ce13f6c3d0c277601d2f8f0f5b31869b4ebbfd))
+
+
+### Miscellaneous Chores
+
+* **deps:** update all minor dependencies ([#899](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/899)) ([030bb59](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/030bb5907370152a47b5a591d46c1c34ef283630))
+* **deps:** update all non-major github action dependencies ([#831](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/831)) ([ab403cd](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/ab403cd6a46b615d1403353f9d281ab933672648))
+* **deps:** update all non-major github action dependencies ([#898](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/898)) ([01fa864](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/01fa864ceeccc57e2f55f11bcc7b7dd0c427e023))
+* **deps:** update all patch dependencies ([#878](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/878)) ([b82f1c5](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/b82f1c53a812bfe29e5b78b409ef2c93e1c0cfb7))
+* **deps:** update dependency phonenumbers to v9.0.17 ([#897](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/897)) ([7fde972](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/7fde972bab343dad502c0d58cb8391cacff39d7d))
+* **deps:** update dependency uvicorn to v0.38.0 ([#879](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/879)) ([31889d2](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/31889d23fa1f57f3854c8a17ab9eec86a69f00e4))
+
 ## [1.6.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.5.0...v1.6.0) (2025-10-21)
 
 
