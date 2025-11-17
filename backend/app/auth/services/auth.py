@@ -48,6 +48,7 @@ async def redirect_user_to_idp_verify(request: Request):
 
         logger.info("Redirecting user to IBM Verify for authentication")
         response = await oauth.verify.authorize_redirect(request, callback_redirect_uri)
+        # After the redirect to the login page, request.session should have a code_verifier
         for k, v in request.session.items():
             logger.info(f"After Redirected user Login Request Session Items: {k}: {v}")
         return response
@@ -58,8 +59,8 @@ async def redirect_user_to_idp_verify(request: Request):
 
 async def callback_handler(request: Request):
     """
-    Get the redirect URL for the OAuth login flow.
-    This function is used to initiate the login process with IBM Verify.
+    Handle the OAuth callback from IBM Verify.
+    This function processes the response from IBM Verify after user authentication.
     """
     try:
         logger.info("OIDC Callback Handler")
