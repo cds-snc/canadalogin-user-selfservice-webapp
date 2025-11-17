@@ -7,11 +7,12 @@ axios.defaults.withCredentials = true;
 const passwordUpdateApi = `${config.apiUrl}${SUBMIT_END_POINTS.passwordUpdate}`;
 
 export const passwordUpdate = {
-  firstStep: async (userName, otpMethod) => {
+  firstStep: async (userName, userSelectedMfaFactor) => {
     try {
       const data = {
         userName: userName,
-        otpMethod: otpMethod,
+        otpType: userSelectedMfaFactor.type,
+        enrollmentId: userSelectedMfaFactor.id,
       };
 
       const response = await axios.post(`${passwordUpdateApi}/initiate`, data);

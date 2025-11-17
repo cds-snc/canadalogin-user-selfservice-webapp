@@ -41,7 +41,9 @@
     "CSIBN0025E": "The verification code is invalid or has expired.",
     "CSIBN0028E": "The verification code is invalid or has expired.",
     "CSIBN0021E": "The verification code is invalid.",
-    "CSIBH0044E": "The email and password combination do not match."
+    "CSIBH0044E": "The email and password combination do not match.",
+    "CSIAI0369E": "Invalid password. Password cannot be the example password. Try again",
+    "CSIAI0370E": "The password has been found in security breach lists. Please choose a different, stronger password."
   },
   "RegisterVerification": {
     "1": "Protect your account with 2-step verification",
