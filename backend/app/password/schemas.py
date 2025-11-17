@@ -18,7 +18,8 @@ class OtpType(str, Enum):
 
 class FirstStepPasswordUpdatePayload(BaseModel):
     userName: EmailStr
-    otpMethod: OtpType
+    otpType: OtpType
+    enrollmentId: str
 
 
 class NextStep(BaseModel):

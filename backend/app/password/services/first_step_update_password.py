@@ -91,7 +91,12 @@ async def dispatch_password_otp(
 
         form_data = {
             "userName": payload.userName,
-            "steps": [{"method": payload.otpMethod.value}],
+            "steps": [
+                {
+                    "method": payload.otpType.value,
+                    "data": {"enrollmentId": payload.enrollmentId},
+                }
+            ],
         }
         logger.info(f"api endpoint for reset: {first_step_resetter_api_endpoint}")
         response = await global_http_client.post(

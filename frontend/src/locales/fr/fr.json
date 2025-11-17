@@ -40,7 +40,9 @@
     "CSIBN0025E": "Le code de vérification n'est pas valide ou a expiré.",
     "CSIBN0028E": "Le code de vérification n'est pas valide ou a expiré.",
     "CSIBN0021E": "Le code de vérification n'est pas valide.",
-    "CSIBH0044E": "L’adresse courriel et le mot de passe ne correspondent pas."
+    "CSIBH0044E": "L’adresse courriel et le mot de passe ne correspondent pas.",
+    "CSIAI0369E": "Invalid password. Password cannot be the example password. Try again",
+    "CSIAI0370E": "The password has been found in security breach lists. Please choose a different, stronger password."
   },
   "RegisterVerification": {
     "1": "Protégez votre compte avec la vérification en deux étapes",
