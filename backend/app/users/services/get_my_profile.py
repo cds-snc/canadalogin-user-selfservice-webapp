@@ -10,6 +10,7 @@ from app.users.schemas import (
 )
 from app.utils.access_token import get_auth_request_headers
 from app.utils.mask_phone_number import mask_contact_phone_numbers
+from app.utils.mask_email_address import mask_profile_email_addresses, mask_individual_email_address
 from app.utils.request_error_handler import RequestErrorHandler
 from app.config import get_configuration
 
@@ -78,6 +79,8 @@ async def get_my_profile(
 
     profile_data = profile_response.model_dump()
     profile_data["phoneNumbers"] = mask_contact_phone_numbers(profile_data)
+    profile_data["emails"] = mask_profile_email_addresses(profile_data)
+    profile_data["userName"] = mask_individual_email_address(profile_data.get("userName", ""))
 
     try:
         response_data = IBMVerifyUserProfileSchema(**profile_data)
