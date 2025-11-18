@@ -27,8 +27,8 @@ async def test_my_profile_success(mock_dispatch_get):
             "urn:ietf:params:scim:schemas:core:2.0:User",
             "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
         ],
-        "userName": "john.doe@example.com",
-        "emails": [{"value": "john.doe@example.com", "type": "work"}],
+        "userName": "jo****@example.com",
+        "emails": [{"value": "jo****@example.com", "type": "work"}],
         "meta": {
             "location": "here",
             "created": "2023-01-01T00:00:00Z",
@@ -50,7 +50,7 @@ async def test_my_profile_success(mock_dispatch_get):
 
     # Assert
     assert response.success is True
-    assert response.data.userName == "john.doe@example.com"
+    assert response.data.userName == "jo****@example.com"
     assert response.data.id == "user-123"
     mock_dispatch_get.assert_called_once_with(http_client, "mock-token")
 
@@ -110,8 +110,8 @@ async def test_dispatch_get_my_profile_from_ibm_success(monkeypatch):
             "urn:ietf:params:scim:schemas:core:2.0:User",
             "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
         ],
-        "userName": "john.doe@example.com",
-        "emails": [{"value": "john.doe@example.com", "type": "work"}],
+        "userName": "jo****@example.com",
+        "emails": [{"value": "jo****@example.com", "type": "work"}],
         "phoneNumbers": [
             {"value": "+1-613-555-1234", "type": "mobile"},
             {"value": "+1-613-555-5678", "type": "work"},
@@ -137,7 +137,7 @@ async def test_dispatch_get_my_profile_from_ibm_success(monkeypatch):
 
     # Assert
     assert isinstance(response, IBMVerifyUserProfileSchema)
-    assert response.userName == "john.doe@example.com"
+    assert response.userName == "jo****@example.com"
     assert response.id == "user-123"
 
     # Verify phone numbers are NOT masked
@@ -194,7 +194,7 @@ async def test_dispatch_get_my_profile_from_ibm_validation_error(monkeypatch):
 
     # Invalid profile data - missing required fields
     invalid_data = {
-        "userName": "john.doe@example.com",
+        "userName": "jo****@example.com",
         # Missing: schemas, emails, meta, active, id
     }
 
@@ -220,8 +220,8 @@ async def test_my_profile_with_masked_phone_numbers(mock_dispatch_get, mock_mask
             "urn:ietf:params:scim:schemas:core:2.0:User",
             "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
         ],
-        "userName": "john.doe@example.com",
-        "emails": [{"value": "john.doe@example.com", "type": "work"}],
+        "userName": "jo****@example.com",
+        "emails": [{"value": "jo****@example.com", "type": "work"}],
         "phoneNumbers": [
             {"value": "+1-613-555-1234", "type": "mobile"},
             {"value": "+1-613-555-5678", "type": "work"},
@@ -255,7 +255,7 @@ async def test_my_profile_with_masked_phone_numbers(mock_dispatch_get, mock_mask
     # Assert
     assert response.success is True
     assert response.message == "User profile retrieved successfully."
-    assert response.data.userName == "john.doe@example.com"
+    assert response.data.userName == "jo****@example.com"
     assert response.data.id == "user-123"
 
     # Verify phone numbers are masked
@@ -268,7 +268,7 @@ async def test_my_profile_with_masked_phone_numbers(mock_dispatch_get, mock_mask
     # Verify masking function was called with correct data
     mock_mask_phone.assert_called_once()
     call_args = mock_mask_phone.call_args[0][0]
-    assert call_args["userName"] == "john.doe@example.com"
+    assert call_args["userName"] == "jo****@example.com"
     assert len(call_args["phoneNumbers"]) == 2
 
     # Verify dispatch was called
@@ -310,7 +310,7 @@ async def test_my_profile_with_no_phone_numbers(mock_dispatch_get, mock_mask_pho
 
     # Assert
     assert response.success is True
-    assert response.data.userName == "jane.doe@example.com"
+    assert response.data.userName == "ja****@example.com"
     assert len(response.data.phoneNumbers) == 0
 
     # Verify masking was still called (even with empty list)
@@ -331,8 +331,8 @@ async def test_my_profile_validation_error_after_masking(
             "urn:ietf:params:scim:schemas:core:2.0:User",
             "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
         ],
-        "userName": "john.doe@example.com",
-        "emails": [{"value": "john.doe@example.com", "type": "work"}],
+        "userName": "jo****@example.com",
+        "emails": [{"value": "jo****@example.com", "type": "work"}],
         "phoneNumbers": [{"value": "+1-613-555-1234", "type": "mobile"}],
         "meta": {
             "location": "here",

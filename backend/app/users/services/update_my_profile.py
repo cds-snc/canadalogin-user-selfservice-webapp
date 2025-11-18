@@ -148,18 +148,18 @@ async def update_my_profile(
     )
     ibm_user_profile = ibm_user_profile_response.model_dump()
 
-    ibm_user_profile_username = ibm_user_profile.get("userName")
-    current_users_username = updated_user_data_dict.get("userName")
-    username_match = ibm_user_profile_username == current_users_username
+    ibm_user_profile_id = ibm_user_profile.get("id")
+    current_users_id = updated_user_data_dict.get("userId")
+    id_match = ibm_user_profile_id == current_users_id
 
-    if not username_match:
+    if not id_match:
         logger.error("User mismatch - cannot update profile")
         raise HTTPException(
             status_code=403, detail="User mismatch - cannot update profile"
         )
 
-    # Prevent changing the userName
-    updated_user_data_dict.pop("userName", None)
+    # Prevent changing the userId
+    updated_user_data_dict.pop("userId", None)
 
     merged_profile = {**ibm_user_profile, **updated_user_data_dict}
 

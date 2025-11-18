@@ -81,7 +81,7 @@ export default function ConfirmNameUpdated() {
       setLocalLoading(true);
       const response = await authService.update_my_user_profile({
         name: name,
-        userName: state.userProfile.userName,
+        userId: state.userProfile.id,
       });
       updateProfileSuccess(response.data);
       navigate(successPage, { state: { name: name } });
