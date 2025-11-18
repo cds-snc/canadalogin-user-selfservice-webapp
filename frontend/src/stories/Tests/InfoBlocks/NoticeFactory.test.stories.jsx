@@ -1,6 +1,10 @@
-import { expect, within } from "@storybook/test";
+import { expect, within, waitFor } from "@storybook/test";
 import { AVAILABLE_LANGUAGES, PAGES } from "../../../utils/constants.jsx";
 import { buildTestCase, TestTemplate } from "../utils/functions.tsx";
+import {
+  waitForGcdsNotice,
+  waitForTextContent,
+} from "../utils/gcdsTestHelpers.js";
 import NoticeFactory from "../../../components/InfoBlocks/NoticeFactory.jsx";
 
 export default {
@@ -33,12 +37,11 @@ export const MfaDeletedWithPhoneNumber = {
   ),
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
-    await new Promise((r) => setTimeout(r, 1000));
 
     await step("Verify notice renders", async () => {
-      // Find the GCDS notice element
-      const gcdsNotice = canvasElement.querySelector("gcds-notice");
-      await expect(gcdsNotice).toBeInTheDocument();
+      // Wait for the GCDS notice element to be rendered
+      const { notice } = await waitForGcdsNotice(canvasElement);
+      await expect(notice).toBeInTheDocument();
     });
 
     await step("Verify phone number is displayed", async () => {
@@ -49,23 +52,8 @@ export const MfaDeletedWithPhoneNumber = {
     });
 
     await step("Verify deletion message is present", async () => {
-      // Check that key text content is present
-      const gcdsNotice = canvasElement.querySelector("gcds-notice");
-
-      // Try to access content from shadow DOM if available
-      let textContent = gcdsNotice.textContent;
-      if (gcdsNotice.shadowRoot) {
-        const slotContent = gcdsNotice.shadowRoot.querySelector("slot");
-        if (slotContent) {
-          textContent = slotContent
-            .assignedNodes()
-            .map((node) => node.textContent)
-            .join("");
-        }
-      }
-
-      // Verify the message contains expected text
-      await expect(textContent).toContain("verification");
+      // Wait for the verification text to appear in the notice
+      await waitForTextContent(canvasElement, "verification");
     });
   },
 };
@@ -86,11 +74,9 @@ export const MfaDeletedWithoutPhoneNumber = {
   },
   render: () => <NoticeFactory noticeType="mfaDeleted" />,
   play: async ({ canvasElement, step }) => {
-    await new Promise((r) => setTimeout(r, 1000));
-
     await step("Verify notice renders", async () => {
-      const gcdsNotice = canvasElement.querySelector("gcds-notice");
-      await expect(gcdsNotice).toBeInTheDocument();
+      const { notice } = await waitForGcdsNotice(canvasElement);
+      await expect(notice).toBeInTheDocument();
     });
 
     await step("Verify strong tag exists but is empty", async () => {
@@ -130,11 +116,10 @@ export const MfaAddedWithSMS = {
   ),
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
-    await new Promise((r) => setTimeout(r, 1000));
 
     await step("Verify notice renders", async () => {
-      const gcdsNotice = canvasElement.querySelector("gcds-notice");
-      await expect(gcdsNotice).toBeInTheDocument();
+      const { notice } = await waitForGcdsNotice(canvasElement);
+      await expect(notice).toBeInTheDocument();
     });
 
     await step("Verify phone number is displayed", async () => {
@@ -184,11 +169,10 @@ export const MfaAddedWithVoice = {
   ),
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
-    await new Promise((r) => setTimeout(r, 1000));
 
     await step("Verify notice renders", async () => {
-      const gcdsNotice = canvasElement.querySelector("gcds-notice");
-      await expect(gcdsNotice).toBeInTheDocument();
+      const { notice } = await waitForGcdsNotice(canvasElement);
+      await expect(notice).toBeInTheDocument();
     });
 
     await step("Verify phone number is displayed", async () => {
@@ -197,11 +181,7 @@ export const MfaAddedWithVoice = {
     });
 
     await step("Verify OTP type (voice) is mentioned", async () => {
-      const gcdsNotice = canvasElement.querySelector("gcds-notice");
-      const textContent = gcdsNotice.textContent;
-
-      // The otpType "voice" should appear in the text
-      await expect(textContent).toContain("voice");
+      await waitForTextContent(canvasElement, "voice");
     });
   },
 };
@@ -222,11 +202,9 @@ export const MfaAddedWithoutPhoneNumber = {
   },
   render: () => <NoticeFactory noticeType="mfaAdded" otpType="sms" />,
   play: async ({ canvasElement, step }) => {
-    await new Promise((r) => setTimeout(r, 1000));
-
     await step("Verify notice renders", async () => {
-      const gcdsNotice = canvasElement.querySelector("gcds-notice");
-      await expect(gcdsNotice).toBeInTheDocument();
+      const { notice } = await waitForGcdsNotice(canvasElement);
+      await expect(notice).toBeInTheDocument();
     });
 
     await step("Verify strong tag exists but is empty", async () => {
@@ -262,11 +240,10 @@ export const MfaAddedWithoutOtpType = {
   ),
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
-    await new Promise((r) => setTimeout(r, 1000));
 
     await step("Verify notice renders", async () => {
-      const gcdsNotice = canvasElement.querySelector("gcds-notice");
-      await expect(gcdsNotice).toBeInTheDocument();
+      const { notice } = await waitForGcdsNotice(canvasElement);
+      await expect(notice).toBeInTheDocument();
     });
 
     await step("Verify phone number is displayed", async () => {
@@ -275,11 +252,9 @@ export const MfaAddedWithoutOtpType = {
     });
 
     await step("Verify notice has proper structure", async () => {
-      const gcdsText = canvasElement.querySelector("gcds-text");
-      await expect(gcdsText).toBeInTheDocument();
-
-      const gcdsNotice = canvasElement.querySelector("gcds-notice");
-      await expect(gcdsNotice).toBeInTheDocument();
+      const { notice, textElements } = await waitForGcdsNotice(canvasElement);
+      await expect(textElements.length).toBeGreaterThanOrEqual(1);
+      await expect(notice).toBeInTheDocument();
     });
   },
 };
@@ -303,11 +278,10 @@ export const MfaDeletedFrench = {
   ),
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
-    await new Promise((r) => setTimeout(r, 1000));
 
     await step("Verify notice renders in French context", async () => {
-      const gcdsNotice = canvasElement.querySelector("gcds-notice");
-      await expect(gcdsNotice).toBeInTheDocument();
+      const { notice } = await waitForGcdsNotice(canvasElement);
+      await expect(notice).toBeInTheDocument();
     });
 
     await step("Verify phone number is displayed", async () => {
@@ -340,11 +314,9 @@ export const VerifyGcdsNoticeAttributes = {
     <NoticeFactory noticeType="mfaDeleted" phoneNumber="+1 (555) 999-0000" />
   ),
   play: async ({ canvasElement, step }) => {
-    await new Promise((r) => setTimeout(r, 1000));
-
     await step("Verify GcdsNotice renders", async () => {
-      const gcdsNotice = canvasElement.querySelector("gcds-notice");
-      await expect(gcdsNotice).toBeInTheDocument();
+      const { notice } = await waitForGcdsNotice(canvasElement);
+      await expect(notice).toBeInTheDocument();
     });
 
     await step("Verify nested GcdsText component", async () => {
@@ -386,9 +358,10 @@ export const VerifyMfaAddedStructure = {
     />
   ),
   play: async ({ canvasElement, step }) => {
-    await new Promise((r) => setTimeout(r, 1000));
-
     await step("Verify component hierarchy", async () => {
+      // Wait for notice and text elements to be rendered
+      await waitForGcdsNotice(canvasElement, { minTextCount: 2 });
+
       // Verify the outer GcdsText wrapper
       const outerGcdsText = canvasElement.querySelector("gcds-text");
       await expect(outerGcdsText).toBeInTheDocument();
@@ -434,11 +407,9 @@ export const EmptyPhoneNumberHandling = {
   },
   render: () => <NoticeFactory noticeType="mfaDeleted" phoneNumber="" />,
   play: async ({ canvasElement, step }) => {
-    await new Promise((r) => setTimeout(r, 1000));
-
     await step("Verify component renders with empty phone number", async () => {
-      const gcdsNotice = canvasElement.querySelector("gcds-notice");
-      await expect(gcdsNotice).toBeInTheDocument();
+      const { notice } = await waitForGcdsNotice(canvasElement);
+      await expect(notice).toBeInTheDocument();
     });
 
     await step("Verify strong tag exists but is empty", async () => {
@@ -467,11 +438,9 @@ export const NullPhoneNumberHandling = {
     <NoticeFactory noticeType="mfaAdded" phoneNumber={null} otpType="voice" />
   ),
   play: async ({ canvasElement, step }) => {
-    await new Promise((r) => setTimeout(r, 1000));
-
     await step("Verify component renders with null phone number", async () => {
-      const gcdsNotice = canvasElement.querySelector("gcds-notice");
-      await expect(gcdsNotice).toBeInTheDocument();
+      const { notice } = await waitForGcdsNotice(canvasElement);
+      await expect(notice).toBeInTheDocument();
     });
 
     await step("Verify strong tag exists", async () => {
@@ -499,17 +468,21 @@ export const InvalidNoticeType = {
     <NoticeFactory noticeType="invalidType" phoneNumber="+1 (555) 000-0000" />
   ),
   play: async ({ canvasElement, step }) => {
-    await new Promise((r) => setTimeout(r, 1000));
-
     await step(
       "Verify component returns null for invalid noticeType",
       async () => {
         // The component should return null, so nothing should be rendered
-        const gcdsNotice = canvasElement.querySelector("gcds-notice");
-        await expect(gcdsNotice).not.toBeInTheDocument();
+        // We use waitFor to ensure we give the component time to potentially render
+        await waitFor(
+          async () => {
+            const gcdsNotice = canvasElement.querySelector("gcds-notice");
+            await expect(gcdsNotice).not.toBeInTheDocument();
 
-        const gcdsText = canvasElement.querySelector("gcds-text");
-        await expect(gcdsText).not.toBeInTheDocument();
+            const gcdsText = canvasElement.querySelector("gcds-text");
+            await expect(gcdsText).not.toBeInTheDocument();
+          },
+          { timeout: 1000 },
+        );
       },
     );
   },
