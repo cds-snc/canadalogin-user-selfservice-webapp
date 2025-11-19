@@ -16,15 +16,9 @@ const filesToExclude = [
   "**/stories/**",
   "**/*.stories.*",
   "**/*.story.*",
-  "**/*.test.stories.*",
+  // Note: Removed **/*.test.stories.* exclusion to allow setTimeout refactoring tests
   "**/*.spec.stories.*",
   "**/node_modules/**",
-  // Specifically exclude only the Tests/Manage directory
-  "**/src/stories/Tests/Manage/**",
-  "**/src/stories/Tests/Manage/*.jsx",
-  "**/src/stories/Tests/Manage/*.js",
-  "**/src/stories/Tests/Manage/*.ts",
-  "**/src/stories/Tests/Manage/*.tsx",
   "**/src/__tests__/testSuite.tsx",
 ];
 export default defineConfig({
@@ -44,6 +38,8 @@ export default defineConfig({
       "src/**/*.test.{js,jsx,ts,tsx}",
       "src/**/*.spec.{js,jsx,ts,tsx}",
       "src/**/__tests__/**/*.{js,jsx,ts,tsx}",
+      // Include test story files for setTimeout refactoring
+      "src/**/*.test.stories.{js,jsx,ts,tsx}",
     ],
     exclude: [
       ...filesToExclude,

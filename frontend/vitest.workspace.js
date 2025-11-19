@@ -20,8 +20,7 @@ export default defineWorkspace([
       // See options at: https://storybook.js.org/docs/writing-tests/test-addon#storybooktest
       storybookTest({
         configDir: path.join(dirname, ".storybook"),
-        // Exclude the Tests/Manage directory from being processed by the plugin
-        exclude: ["**/src/stories/Tests/Manage/**", "**/Tests/Manage/**"],
+        // Note: Removed Tests/Manage exclusion to allow setTimeout refactoring tests
       }),
     ],
     test: {
@@ -33,7 +32,7 @@ export default defineWorkspace([
         instances: [{ browser: "chromium" }],
       },
       setupFiles: [".storybook/vitest.setup.js"],
-      exclude: ["src/stories/Tests/Manage/**"],
+      // Note: Removed Tests/Manage exclusion to allow setTimeout refactoring tests
       silent: true,
       reporter: ["basic"],
     },
