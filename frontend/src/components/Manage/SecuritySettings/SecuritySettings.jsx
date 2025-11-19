@@ -1,5 +1,6 @@
 import { useParams } from "react-router";
 import { format } from "date-fns";
+import { enCA, frCA } from "date-fns/locale";
 import {
   GcdsContainer,
   GcdsHeading,
@@ -23,6 +24,7 @@ export default function SecuritySettings() {
   const formattedPasswordChangeDate = format(
     new Date(lastPasswordChange),
     "MMMM d, yyyy",
+    { locale: language === "fr" ? frCA : enCA },
   );
 
   const passwordPage = path(PAGES.password, { language: language });
