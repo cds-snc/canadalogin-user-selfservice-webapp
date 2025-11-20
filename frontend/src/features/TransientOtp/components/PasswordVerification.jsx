@@ -1,11 +1,13 @@
+import { useState } from "react";
+
 import {
   GcdsButton,
   GcdsContainer,
   GcdsGrid,
   GcdsHeading,
   GcdsInput,
-  GcdsLink,
   GcdsText,
+  GcdsCheckboxes,
 } from "@cdssnc/gcds-components-react";
 import { getPageContent } from "../../../utils/functions";
 import { PAGES } from "../../../utils/constants";
@@ -21,7 +23,11 @@ export default function PasswordVerification({
   errorMessage,
 }) {
   const { language } = useParams();
+  const [checkedValue, setCheckedValue] = useState(false);
+
   const pageContentJson = getPageContent(language, PAGES.passwordVerification);
+  const passwordPageContentJson = getPageContent(language, PAGES.password);
+
   const { submit, cancel } = getPageContent(language, "Button");
   const parentPageContent =
     parentPage === PAGES.deleteMFAPage
@@ -29,6 +35,15 @@ export default function PasswordVerification({
       : parentPage === PAGES.addMFAPage
         ? pageContentJson["7"]
         : pageContentJson["2"];
+
+  const optionsValues = [
+    {
+      label: passwordPageContentJson["11"],
+      id: "show-password-checkbox",
+      value: "show-password-checkbox",
+      checked: checkedValue,
+    },
+  ];
 
   return (
     <GcdsContainer>
@@ -47,7 +62,7 @@ export default function PasswordVerification({
         autofocus
         autocomplete="one-time-code"
         name="passwordVerification"
-        type="password"
+        type={checkedValue ? "text" : "password"}
         validateOn="other"
         errorMessage={errorMessage}
         value={userPasswordValue}
@@ -57,6 +72,14 @@ export default function PasswordVerification({
         lang={language}
         size="12"
       ></GcdsInput>
+
+      <GcdsCheckboxes
+        checkboxId="password-checkbox"
+        legend={passwordPageContentJson["11"]}
+        name="show-password-checkbox"
+        options={optionsValues}
+        onGcdsChange={() => setCheckedValue(!checkedValue)}
+      ></GcdsCheckboxes>
 
       <GcdsGrid columns="max-content max-content" gap="200">
         <GcdsButton
@@ -88,12 +111,6 @@ export default function PasswordVerification({
           {cancel}
         </GcdsButton>
       </GcdsGrid>
-
-      <GcdsHeading tag="h2">{pageContentJson["5"]}</GcdsHeading>
-
-      <GcdsText>
-        <GcdsLink>{pageContentJson["6"]}</GcdsLink>
-      </GcdsText>
     </GcdsContainer>
   );
 }
