@@ -134,12 +134,24 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
       {errorMessage && <span data-testid="error-message">{errorMessage}</span>}
     </div>
   ),
-  GcdsLink: ({ children, href }) => (
-    <a data-testid="gcds-link" href={href}>
-      {children}
-    </a>
-  ),
   GcdsText: ({ children }) => <p data-testid="text">{children}</p>,
+  GcdsCheckboxes: vi.fn(({ options, onGcdsChange, legend, ...props }) => (
+    <fieldset {...props}>
+      <legend>{legend}</legend>
+      {options?.map((option) => (
+        <label key={option.id}>
+          <input
+            type="checkbox"
+            id={option.id}
+            value={option.value}
+            checked={option.checked}
+            onChange={onGcdsChange}
+          />
+          {option.label}
+        </label>
+      ))}
+    </fieldset>
+  )),
 }));
 
 const mockSetUserPasswordValue = vi.fn();
@@ -221,19 +233,6 @@ describe("PasswordVerification Component", () => {
       expect(screen.getByTestId("cancel-button")).toBeInTheDocument();
       expect(screen.getByText("Submit")).toBeInTheDocument();
       expect(screen.getByText("Cancel")).toBeInTheDocument();
-    });
-
-    it("renders the help section", () => {
-      renderComponent();
-      expect(screen.getByText("Forgot your password?")).toBeInTheDocument();
-      expect(screen.getByText("Reset your password")).toBeInTheDocument();
-    });
-
-    it("renders help link", () => {
-      renderComponent();
-      const link = screen.getByTestId("gcds-link");
-      expect(link).toBeInTheDocument();
-      expect(link).toHaveTextContent("Reset your password");
     });
   });
 
@@ -554,10 +553,6 @@ describe("PasswordVerification Component", () => {
       // Buttons
       expect(screen.getByTestId("submit-button")).toBeInTheDocument();
       expect(screen.getByTestId("cancel-button")).toBeInTheDocument();
-
-      // Help section
-      expect(screen.getByText("Forgot your password?")).toBeInTheDocument();
-      expect(screen.getByText("Reset your password")).toBeInTheDocument();
     });
 
     it("handles full user workflow from input to submission", async () => {
