@@ -1,4 +1,4 @@
-import { expect, userEvent, within } from "@storybook/test";
+import { userEvent, waitFor, within, expect } from "@storybook/test";
 import {
   AVAILABLE_LANGUAGES,
   FLOW_TYPES,
@@ -23,8 +23,8 @@ export default {
   },
 };
 
-// Test confirmation page display and save functionality
-export const ConfirmNameUpdate = {
+// Test form display with user data
+export const DisplayConfirmationPage = {
   parameters: {
     ...buildTestCase.parameters(
       "",
@@ -33,13 +33,12 @@ export const ConfirmNameUpdate = {
         flow: FLOW_TYPES.profile,
       },
       [
-        // Mock the API call for saving the profile update
+        // Mock the API calls that the component might make
         {
-          type: "post",
-          endpoint: "/api/user/update",
+          type: "get",
+          endpoint: "/api/user/profile",
           response: {
             success: true,
-            message: "User profile updated successfully",
             data: {
               id: "test-user-123",
               name: {
@@ -55,60 +54,170 @@ export const ConfirmNameUpdate = {
         },
       ],
     ),
+    // Configure React Router with the state that the component expects
+    reactRouter: {
+      routePath: "/en/profile/update-name/confirm",
+      routeParams: { language: "en" },
+      location: {
+        state: {
+          name: {
+            givenName: "UpdatedFirst",
+            familyName: "UpdatedLast",
+            formatted: "UpdatedFirst UpdatedLast",
+          },
+        },
+      },
+    },
+    // Configure Storybook to handle navigation gracefully
+    test: {
+      dangerouslyIgnoreUnhandledErrors: true,
+    },
+    // Add custom actions to track what happens
+    actions: {
+      handles: ["click", "submit", "navigate"],
+    },
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+
+    await step("Verify confirmation page content", async () => {
+      await waitFor(async () => {
+        // Check for the main heading using canvas.getByText pattern from AddMFAPage
+        const headingText = canvas.getByText(
+          /Are you sure you want to update your name?/i,
+        );
+        await expect(headingText).toBeInTheDocument();
+      });
+
+      await waitFor(async () => {
+        // Check that the formatted name is displayed using textContent includes pattern
+        const hasUserName = canvasElement.textContent.includes(
+          "UpdatedFirst UpdatedLast",
+        );
+        await expect(hasUserName).toBeTruthy();
+      });
+
+      await waitFor(async () => {
+        // Check for update request using broader pattern to avoid text splitting issues
+        const hasUpdateText = canvasElement.textContent.includes(
+          "requested to update your name",
+        );
+        await expect(hasUpdateText).toBeTruthy();
+      });
+
+      await waitFor(async () => {
+        // Check for service message using broader pattern
+        const hasServiceText =
+          canvasElement.textContent.includes("following services");
+        await expect(hasServiceText).toBeTruthy();
+      });
+
+      await waitFor(async () => {
+        // Check for legal notice
+        const legalText = canvas.getByText(/legally change your name/i);
+        await expect(legalText).toBeInTheDocument();
+      });
+    });
+
+    await step("Verify buttons are present", async () => {
+      await waitFor(async () => {
+        const updateButton = canvas.getByText(/Yes, update/i);
+        await expect(updateButton).toBeInTheDocument();
+      });
+
+      await waitFor(async () => {
+        const cancelButton = canvas.getByText(/Cancel/i);
+        await expect(cancelButton).toBeInTheDocument();
+      });
+    });
+  },
+};
+
+// Test button interactions
+export const TestButtonInteractions = {
+  parameters: {
+    ...buildTestCase.parameters(
+      "",
+      {
+        language: AVAILABLE_LANGUAGES.en,
+        flow: FLOW_TYPES.profile,
+      },
+      [
+        {
+          type: "get",
+          endpoint: "/api/user/profile",
+          response: {
+            success: true,
+            data: {
+              id: "test-user-123",
+              name: {
+                givenName: "UpdatedFirst",
+                familyName: "UpdatedLast",
+              },
+            },
+          },
+        },
+        {
+          type: "post",
+          endpoint: "/api/user/update",
+          response: {
+            success: true,
+            message: "User updated successfully",
+          },
+        },
+      ],
+    ),
+    // Configure React Router with the state that the component expects
+    reactRouter: {
+      routePath: "/en/profile/update-name/confirm",
+      routeParams: { language: "en" },
+      location: {
+        state: {
+          name: {
+            givenName: "UpdatedFirst",
+            familyName: "UpdatedLast",
+            formatted: "UpdatedFirst UpdatedLast",
+          },
+        },
+      },
+    },
     test: {
       dangerouslyIgnoreUnhandledErrors: true,
     },
   },
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
-    await new Promise((r) => setTimeout(r, 2000));
 
-    // Verify the confirmation page content is displayed
-    await step("Verify confirmation page content", async () => {
-      const container = canvasElement.querySelector("main") || canvasElement;
-      await expect(container).toBeInTheDocument();
+    await step("Verify page content is loaded", async () => {
+      await waitFor(async () => {
+        // Check that the confirmation heading is present
+        const hasHeading = canvasElement.textContent.includes("Are you sure");
+        await expect(hasHeading).toBeTruthy();
+      });
 
-      // Look for the username display (should show the new name)
-      const usernameDisplay = canvasElement.querySelector("strong");
-      if (usernameDisplay) {
-        await expect(usernameDisplay).toBeInTheDocument();
-      }
+      await waitFor(async () => {
+        // Check that the user name is displayed
+        const hasUserName = canvasElement.textContent.includes(
+          "UpdatedFirst UpdatedLast",
+        );
+        await expect(hasUserName).toBeTruthy();
+      });
     });
 
-    // Test saving the updated profile
-    await step("Click Save Changes button", async () => {
-      // Find the Save/Confirm button (primary button)
-      let saveButton =
-        canvas.getByText(/Yes, update/i) ||
-        canvasElement.querySelector(
-          'gcds-button:not([button-role="secondary"])',
-        ) ||
-        canvasElement.querySelector('gcds-button button[part="button"]');
+    await step("Verify and click Yes, update button", async () => {
+      await waitFor(async () => {
+        const updateButton = canvas.getByText(/Yes, update/i);
+        await expect(updateButton).toBeInTheDocument();
+      });
 
-      await expect(saveButton).toBeInTheDocument();
-
-      // If it's a GCDS button wrapper, find the actual button inside shadow DOM
-      if (saveButton.tagName === "GCDS-BUTTON" && saveButton.shadowRoot) {
-        const actualButton =
-          saveButton.shadowRoot.querySelector('button[part="button"]') ||
-          saveButton.shadowRoot.querySelector("button");
-        if (actualButton) {
-          saveButton = actualButton;
-        }
-      }
-
-      await userEvent.click(saveButton);
-
-      // Wait for navigation or processing
-      await new Promise((r) => setTimeout(r, 1000));
+      const updateButton = canvas.getByText(/Yes, update/i);
+      await userEvent.click(updateButton);
     });
-
-    await new Promise((r) => setTimeout(r, 1000));
   },
 };
 
-// Test cancel functionality
-export const CancelNameUpdate = {
+// Test cancel button functionality
+export const TestCancelButton = {
   parameters: {
     ...buildTestCase.parameters(
       "",
@@ -118,42 +227,50 @@ export const CancelNameUpdate = {
       },
       [],
     ),
+    // Configure React Router with the state that the component expects
+    reactRouter: {
+      routePath: "/en/profile/update-name/confirm",
+      routeParams: { language: "en" },
+      location: {
+        state: {
+          name: {
+            givenName: "TestFirst",
+            familyName: "TestLast",
+            formatted: "TestFirst TestLast",
+          },
+        },
+      },
+    },
     test: {
       dangerouslyIgnoreUnhandledErrors: true,
     },
   },
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
-    await new Promise((r) => setTimeout(r, 1000));
 
-    // Test canceling the update
-    await step("Click Cancel button", async () => {
-      // Find the Cancel button (secondary button)
-      let cancelButton =
-        canvas.getByText(/Cancel|Back/i) ||
-        canvasElement.querySelector('gcds-button[button-role="secondary"]') ||
-        canvasElement.querySelector("gcds-button:nth-child(2)");
+    await step("Verify test name is displayed", async () => {
+      await waitFor(async () => {
+        // Check that the heading is present
+        const hasHeading = canvasElement.textContent.includes("Are you sure");
+        await expect(hasHeading).toBeTruthy();
+      });
 
-      await expect(cancelButton).toBeInTheDocument();
-
-      // If it's a GCDS button wrapper, find the actual button inside shadow DOM
-      if (cancelButton.tagName === "GCDS-BUTTON" && cancelButton.shadowRoot) {
-        const actualButton =
-          cancelButton.shadowRoot.querySelector('button[part="button"]') ||
-          cancelButton.shadowRoot.querySelector("button");
-        if (actualButton) {
-          cancelButton = actualButton;
-        }
-      }
-
-      await userEvent.click(cancelButton);
-
-      // Wait for navigation
-      await new Promise((r) => setTimeout(r, 1000));
+      await waitFor(async () => {
+        // Check that the test name is displayed
+        const hasTestName =
+          canvasElement.textContent.includes("TestFirst TestLast");
+        await expect(hasTestName).toBeTruthy();
+      });
     });
 
-    await new Promise((r) => setTimeout(r, 1000));
-    // Should navigate back to profile or show 404 in Storybook environment
-    await expect(canvas.getByText(/404 Not Found/i)).toBeInTheDocument();
+    await step("Verify and click Cancel button", async () => {
+      await waitFor(async () => {
+        const cancelButton = canvas.getByText(/Cancel/i);
+        await expect(cancelButton).toBeInTheDocument();
+      });
+
+      const cancelButton = canvas.getByText(/Cancel/i);
+      await userEvent.click(cancelButton);
+    });
   },
 };

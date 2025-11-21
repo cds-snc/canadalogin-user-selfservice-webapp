@@ -83,7 +83,7 @@ class UserProfileName(BaseModel):
 
 
 class IBMVerifyUserProfileSchema(BaseModel):
-    emails: List[EmailItem] = None
+    emails: Optional[List[EmailItem]] = None
     preferredLanguage: Optional[str] = None
     meta: Meta
     name: Optional[UserProfileName] = None

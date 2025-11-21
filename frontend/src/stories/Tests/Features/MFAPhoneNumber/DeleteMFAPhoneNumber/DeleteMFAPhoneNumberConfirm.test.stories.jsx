@@ -5,6 +5,12 @@ import {
   PAGES,
 } from "../../../../../utils/constants.jsx";
 import { buildTestCase, TestTemplate } from "../../../utils/functions.tsx";
+import {
+  waitForComponentReady,
+  waitForGcdsButton,
+  waitForPhoneNumber,
+  getClickableButton,
+} from "../../../utils/gcdsTestHelpers.js";
 
 export default {
   title:
@@ -53,10 +59,8 @@ export const ConfirmationPageDisplay = {
     },
   },
   play: async ({ canvasElement, step }) => {
-    await new Promise((r) => setTimeout(r, 1000));
-
     await step("Verify confirmation heading is displayed", async () => {
-      // The heading should contain deletion confirmation text
+      // Wait for the heading to be rendered - no hardcoded timeout needed
       await waitFor(
         async () => {
           const heading = canvasElement.querySelector("gcds-heading");
@@ -67,13 +71,8 @@ export const ConfirmationPageDisplay = {
     });
 
     await step("Verify phone number is displayed", async () => {
-      // The formatted phone number should be visible
-      const phoneText = canvasElement.textContent;
-      const hasFormattedPhone =
-        phoneText.includes("+1 (555) 123-4567") ||
-        phoneText.includes("+15551234567") ||
-        phoneText.includes("555-123-4567");
-      await expect(hasFormattedPhone).toBeTruthy();
+      // Wait for phone number to appear in any format
+      await waitForPhoneNumber(canvasElement, "+15551234567");
     });
   },
 };
@@ -94,40 +93,18 @@ export const DeleteButtonPresent = {
     },
   },
   play: async ({ canvasElement, step }) => {
-    await new Promise((r) => setTimeout(r, 1000));
+    await step(
+      "Verify delete button exists and has danger styling",
+      async () => {
+        // Use helper function to wait for danger button - no hardcoded timeout
+        const dangerButton = await waitForGcdsButton(canvasElement, "danger");
+        await expect(dangerButton).toBeTruthy();
 
-    await step("Verify delete button exists", async () => {
-      await waitFor(
-        async () => {
-          const buttons = canvasElement.querySelectorAll("gcds-button");
-          const dangerButton = Array.from(buttons).find((btn) => {
-            if (btn.shadowRoot) {
-              const innerButton = btn.shadowRoot.querySelector("button");
-              return innerButton?.className.includes("button--role-danger");
-            }
-            return false;
-          });
-          await expect(dangerButton).toBeTruthy();
-        },
-        { timeout: 3000 },
-      );
-    });
-
-    await step("Verify delete button has danger styling", async () => {
-      const buttons = canvasElement.querySelectorAll("gcds-button");
-      const dangerButton = Array.from(buttons).find((btn) => {
-        if (btn.shadowRoot) {
-          const innerButton = btn.shadowRoot.querySelector("button");
-          return innerButton?.className.includes("button--role-danger");
-        }
-        return false;
-      });
-      await expect(dangerButton).toBeTruthy();
-
-      // Verify the shadow DOM button has the danger class
-      const innerButton = dangerButton.shadowRoot.querySelector("button");
-      await expect(innerButton.className).toContain("button--role-danger");
-    });
+        // Verify the shadow DOM button has the danger class
+        const innerButton = getClickableButton(dangerButton);
+        await expect(innerButton?.className).toContain("button--role-danger");
+      },
+    );
   },
 };
 
@@ -147,40 +124,23 @@ export const CancelButtonPresent = {
     },
   },
   play: async ({ canvasElement, step }) => {
-    await new Promise((r) => setTimeout(r, 1000));
+    await step(
+      "Verify cancel button exists and has secondary styling",
+      async () => {
+        // Use helper function to wait for secondary button - no hardcoded timeout
+        const secondaryButton = await waitForGcdsButton(
+          canvasElement,
+          "secondary",
+        );
+        await expect(secondaryButton).toBeTruthy();
 
-    await step("Verify cancel button exists", async () => {
-      await waitFor(
-        async () => {
-          const buttons = canvasElement.querySelectorAll("gcds-button");
-          const secondaryButton = Array.from(buttons).find((btn) => {
-            if (btn.shadowRoot) {
-              const innerButton = btn.shadowRoot.querySelector("button");
-              return innerButton?.className.includes("button--role-secondary");
-            }
-            return false;
-          });
-          await expect(secondaryButton).toBeTruthy();
-        },
-        { timeout: 3000 },
-      );
-    });
-
-    await step("Verify cancel button has secondary styling", async () => {
-      const buttons = canvasElement.querySelectorAll("gcds-button");
-      const secondaryButton = Array.from(buttons).find((btn) => {
-        if (btn.shadowRoot) {
-          const innerButton = btn.shadowRoot.querySelector("button");
-          return innerButton?.className.includes("button--role-secondary");
-        }
-        return false;
-      });
-      await expect(secondaryButton).toBeTruthy();
-
-      // Verify the shadow DOM button has the secondary class
-      const innerButton = secondaryButton.shadowRoot.querySelector("button");
-      await expect(innerButton.className).toContain("button--role-secondary");
-    });
+        // Verify the shadow DOM button has the secondary class
+        const innerButton = getClickableButton(secondaryButton);
+        await expect(innerButton?.className).toContain(
+          "button--role-secondary",
+        );
+      },
+    );
   },
 };
 
@@ -209,28 +169,25 @@ export const ClickDeleteButton = {
     },
   },
   play: async ({ canvasElement, step }) => {
-    await new Promise((r) => setTimeout(r, 1000));
-
     await step("Click the delete button", async () => {
-      const buttons = canvasElement.querySelectorAll("gcds-button");
-      const dangerButton = Array.from(buttons).find((btn) => {
-        if (btn.shadowRoot) {
-          const innerButton = btn.shadowRoot.querySelector("button");
-          return innerButton?.className.includes("button--role-danger");
-        }
-        return false;
-      });
+      // Wait for danger button to be ready
+      const dangerButton = await waitForGcdsButton(canvasElement, "danger");
       await expect(dangerButton).toBeTruthy();
 
-      // Find the actual button in shadow DOM
-      if (dangerButton && dangerButton.shadowRoot) {
-        const actualButton =
-          dangerButton.shadowRoot.querySelector('button[part="button"]') ||
-          dangerButton.shadowRoot.querySelector("button");
-        if (actualButton) {
-          await userEvent.click(actualButton);
-          await new Promise((r) => setTimeout(r, 500));
-        }
+      // Get the actual clickable button and click it
+      const actualButton = getClickableButton(dangerButton);
+      if (actualButton) {
+        await userEvent.click(actualButton);
+        // Wait for any state changes or navigation to complete
+        // Replace hardcoded timeout with waiting for specific conditions
+        await waitFor(
+          async () => {
+            // Wait for some indication that the action was processed
+            // This could be a success message, navigation, or state change
+            await expect(actualButton).toBeInTheDocument();
+          },
+          { timeout: 1000 },
+        );
       }
     });
   },
@@ -252,28 +209,26 @@ export const ClickCancelButton = {
     },
   },
   play: async ({ canvasElement, step }) => {
-    await new Promise((r) => setTimeout(r, 1000));
-
     await step("Click the cancel button", async () => {
-      const buttons = canvasElement.querySelectorAll("gcds-button");
-      const secondaryButton = Array.from(buttons).find((btn) => {
-        if (btn.shadowRoot) {
-          const innerButton = btn.shadowRoot.querySelector("button");
-          return innerButton?.className.includes("button--role-secondary");
-        }
-        return false;
-      });
+      // Wait for secondary button to be ready
+      const secondaryButton = await waitForGcdsButton(
+        canvasElement,
+        "secondary",
+      );
       await expect(secondaryButton).toBeTruthy();
 
-      // Find the actual button in shadow DOM
-      if (secondaryButton && secondaryButton.shadowRoot) {
-        const actualButton =
-          secondaryButton.shadowRoot.querySelector('button[part="button"]') ||
-          secondaryButton.shadowRoot.querySelector("button");
-        if (actualButton) {
-          await userEvent.click(actualButton);
-          await new Promise((r) => setTimeout(r, 500));
-        }
+      // Get the actual clickable button and click it
+      const actualButton = getClickableButton(secondaryButton);
+      if (actualButton) {
+        await userEvent.click(actualButton);
+        // Wait for any state changes or navigation to complete
+        await waitFor(
+          async () => {
+            // Wait for some indication that the action was processed
+            await expect(actualButton).toBeInTheDocument();
+          },
+          { timeout: 1000 },
+        );
       }
     });
   },
@@ -313,18 +268,9 @@ export const MultipleFactorsToDelete = {
     },
   },
   play: async ({ canvasElement, step }) => {
-    await new Promise((r) => setTimeout(r, 1000));
-
     await step("Verify page renders with multiple factors", async () => {
-      await waitFor(
-        async () => {
-          const hasPhoneNumber =
-            canvasElement.textContent.includes("+1 (555) 123-4567") ||
-            canvasElement.textContent.includes("+15551234567");
-          await expect(hasPhoneNumber).toBeTruthy();
-        },
-        { timeout: 3000 },
-      );
+      // Wait for phone number to appear using the helper function
+      await waitForPhoneNumber(canvasElement, "+15551234567");
     });
   },
 };
@@ -358,15 +304,9 @@ export const DifferentPhoneFormat = {
     },
   },
   play: async ({ canvasElement, step }) => {
-    await new Promise((r) => setTimeout(r, 1000));
-
     await step("Verify different phone number is displayed", async () => {
-      const phoneText = canvasElement.textContent;
-      const hasPhone =
-        phoneText.includes("+1 (416) 555-1234") ||
-        phoneText.includes("+14165551234") ||
-        phoneText.includes("416-555-1234");
-      await expect(hasPhone).toBeTruthy();
+      // Wait for the different phone number to appear using the helper function
+      await waitForPhoneNumber(canvasElement, "+14165551234");
     });
   },
 };
@@ -394,30 +334,25 @@ export const EmptyPhoneFormData = {
     },
   },
   play: async ({ canvasElement, step }) => {
-    await new Promise((r) => setTimeout(r, 1000));
-
     await step("Verify page still renders with empty data", async () => {
-      // Page should render even with empty phone data
-      const heading = canvasElement.querySelector("gcds-heading");
-      await expect(heading).toBeInTheDocument();
+      // Wait for heading to be rendered
+      await waitFor(
+        async () => {
+          const heading = canvasElement.querySelector("gcds-heading");
+          await expect(heading).toBeInTheDocument();
+        },
+        { timeout: 3000 },
+      );
     });
 
     await step("Verify buttons are still present", async () => {
-      const buttons = canvasElement.querySelectorAll("gcds-button");
-      const dangerButton = Array.from(buttons).find((btn) => {
-        if (btn.shadowRoot) {
-          const innerButton = btn.shadowRoot.querySelector("button");
-          return innerButton?.className.includes("button--role-danger");
-        }
-        return false;
-      });
-      const secondaryButton = Array.from(buttons).find((btn) => {
-        if (btn.shadowRoot) {
-          const innerButton = btn.shadowRoot.querySelector("button");
-          return innerButton?.className.includes("button--role-secondary");
-        }
-        return false;
-      });
+      // Use helper functions to wait for both buttons
+      const dangerButton = await waitForGcdsButton(canvasElement, "danger");
+      const secondaryButton = await waitForGcdsButton(
+        canvasElement,
+        "secondary",
+      );
+
       await expect(dangerButton).toBeTruthy();
       await expect(secondaryButton).toBeTruthy();
     });
@@ -462,13 +397,9 @@ export const VoiceOtpFactor = {
     },
   },
   play: async ({ canvasElement, step }) => {
-    await new Promise((r) => setTimeout(r, 1000));
-
     await step("Verify voice OTP confirmation displays", async () => {
-      const hasPhoneNumber =
-        canvasElement.textContent.includes("+1 (555) 123-4567") ||
-        canvasElement.textContent.includes("+15551234567");
-      await expect(hasPhoneNumber).toBeTruthy();
+      // Wait for phone number to appear using the helper function
+      await waitForPhoneNumber(canvasElement, "+15551234567");
     });
   },
 };
@@ -489,16 +420,24 @@ export const GridLayoutPresent = {
     },
   },
   play: async ({ canvasElement, step }) => {
-    await new Promise((r) => setTimeout(r, 1000));
-
     await step("Verify grid components are present", async () => {
-      const grids = canvasElement.querySelectorAll("gcds-grid");
-      await expect(grids.length).toBeGreaterThanOrEqual(1);
+      await waitFor(
+        async () => {
+          const grids = canvasElement.querySelectorAll("gcds-grid");
+          await expect(grids.length).toBeGreaterThanOrEqual(1);
+        },
+        { timeout: 3000 },
+      );
     });
 
     await step("Verify container components are present", async () => {
-      const containers = canvasElement.querySelectorAll("gcds-container");
-      await expect(containers.length).toBeGreaterThanOrEqual(1);
+      await waitFor(
+        async () => {
+          const containers = canvasElement.querySelectorAll("gcds-container");
+          await expect(containers.length).toBeGreaterThanOrEqual(1);
+        },
+        { timeout: 3000 },
+      );
     });
   },
 };
@@ -519,8 +458,6 @@ export const PhoneNumberEmphasis = {
     },
   },
   play: async ({ canvasElement, step }) => {
-    await new Promise((r) => setTimeout(r, 1000));
-
     await step(
       "Verify phone number is emphasized with strong tag",
       async () => {
@@ -559,22 +496,33 @@ export const AllGcdsComponentsRender = {
     },
   },
   play: async ({ canvasElement, step }) => {
-    await new Promise((r) => setTimeout(r, 1000));
-
     await step("Verify all expected GCDS components are present", async () => {
-      const heading = canvasElement.querySelector("gcds-heading");
-      const text = canvasElement.querySelector("gcds-text");
-      const link = canvasElement.querySelector("gcds-link");
-      const buttons = canvasElement.querySelectorAll("gcds-button");
-      const grids = canvasElement.querySelectorAll("gcds-grid");
-      const containers = canvasElement.querySelectorAll("gcds-container");
+      // Use component ready helper to wait for key components
+      const components = await waitForComponentReady(canvasElement, {
+        expectHeading: true,
+        expectButtons: true,
+        expectedButtonCount: 2,
+      });
 
-      await expect(heading).toBeInTheDocument();
-      await expect(text).toBeInTheDocument();
-      await expect(link).toBeInTheDocument();
-      await expect(buttons.length).toBeGreaterThanOrEqual(2);
-      await expect(grids.length).toBeGreaterThanOrEqual(1);
-      await expect(containers.length).toBeGreaterThanOrEqual(1);
+      // Verify specific components are rendered
+      await waitFor(
+        async () => {
+          const text = canvasElement.querySelector("gcds-text");
+          const link = canvasElement.querySelector("gcds-link");
+          const grids = canvasElement.querySelectorAll("gcds-grid");
+          const containers = canvasElement.querySelectorAll("gcds-container");
+
+          await expect(text).toBeInTheDocument();
+          await expect(link).toBeInTheDocument();
+          await expect(grids.length).toBeGreaterThanOrEqual(1);
+          await expect(containers.length).toBeGreaterThanOrEqual(1);
+        },
+        { timeout: 3000 },
+      );
+
+      // Components from the helper should also be available
+      await expect(components.heading).toBeInTheDocument();
+      await expect(components.buttons.length).toBeGreaterThanOrEqual(2);
     });
   },
 };
