@@ -15,6 +15,7 @@ from app.utils.access_token import get_auth_request_headers
 from app.utils.mask_phone_number import mask_contact_phone_numbers
 from app.utils.request_error_handler import RequestErrorHandler
 from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
+from app.utils.validate_user_request_match import validate_user_request_match
 
 logger = logging.getLogger(__name__)
 
@@ -147,16 +148,9 @@ async def update_my_profile(
         request.app.state.request_client, user_access_token
     )
     ibm_user_profile = ibm_user_profile_response.model_dump()
-
-    ibm_user_profile_id = ibm_user_profile.get("id")
     current_users_id = updated_user_data_dict.get("userId")
-    id_match = ibm_user_profile_id == current_users_id
 
-    if not id_match:
-        logger.error("User mismatch - cannot update profile")
-        raise HTTPException(
-            status_code=403, detail="User mismatch - cannot update profile"
-        )
+    validate_user_request_match(ibm_user_profile, current_users_id)
 
     # Prevent changing the userId
     updated_user_data_dict.pop("userId", None)
