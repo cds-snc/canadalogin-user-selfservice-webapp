@@ -141,6 +141,10 @@ vi.mock("../../../utils/constants.jsx", () => ({
     profileUpdateName: "profile-update-name",
     profileUpdateNameSuccess: "profile-update-name-success",
   },
+  EXTERNAL_NAVIGATION_LINKS: {
+    gcAccountDirectory:
+      "https://www.canada.ca/en/government/sign-in-online-account.html",
+  },
 }));
 
 vi.mock("../../../utils/routeHelpers.js", () => ({

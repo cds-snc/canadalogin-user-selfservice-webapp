@@ -12,7 +12,7 @@ import {
 } from "@cdssnc/gcds-components-react";
 import { getPageContent } from "../../../utils/functions.jsx";
 import { path } from "../../../utils/routeHelpers.js";
-import { PAGES } from "../../../utils/constants.jsx";
+import { EXTERNAL_NAVIGATION_LINKS, PAGES } from "../../../utils/constants.jsx";
 import { useUser } from "../../../components/Providers/useUser.tsx";
 import { authService } from "../../../services/authService.jsx";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
@@ -71,19 +71,24 @@ export default function SuccessfullyUpdatedName() {
   };
   return (
     <GcdsContainer>
-      <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle=" ">
-        <GcdsText>
-          <strong>
-            {pageContentJson["1"]} {username}
-          </strong>
-        </GcdsText>
-      </GcdsNotice>
+      <GcdsText>
+        {" "}
+        <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle=" ">
+          <GcdsText>
+            <strong>
+              {pageContentJson["1"]} {username}
+            </strong>
+          </GcdsText>
+        </GcdsNotice>
+      </GcdsText>
       <GcdsHeading tag="h1">{pageContentJson["2"]}</GcdsHeading>
       <GcdsHeading tag="h4">{pageContentJson["3"]}</GcdsHeading>
       <GcdsText>{pageContentJson["4"]}</GcdsText>
       <GcdsText>
         {pageContentJson["5"]}{" "}
-        <GcdsLink href="#">{pageContentJson["8"]}</GcdsLink>
+        <GcdsLink href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}>
+          {pageContentJson["8"]}
+        </GcdsLink>
       </GcdsText>
       <GcdsGrid columns="max-content max-content" gap="200">
         <GcdsButton
