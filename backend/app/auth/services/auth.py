@@ -49,8 +49,14 @@ async def redirect_user_to_idp_verify(request: Request):
         logger.info("Redirecting user to IBM Verify for authentication")
         response = await oauth.verify.authorize_redirect(request, callback_redirect_uri)
         # After the redirect to the login page, request.session should have a code_verifier
-        for k, v in request.session.items():
-            logger.info(f"After Redirected user Login Request Session Items: {k}: {v}")
+        logger.info("User redirected to IBM Verify for authentication")
+
+        if request.session:
+            for k, v in request.session.items():
+                logger.info(f"After Redirected user - Request Session Items: {k}: {v}")
+        else:
+            logger.warning("redirect_user_to_idp_verify - Session is empty.")
+
         return response
     except Exception as e:
         logger.exception("Unexpected error during redirect_to_verify: %s", str(e))
@@ -64,8 +70,11 @@ async def callback_handler(request: Request):
     """
     try:
         logger.info("OIDC Callback Handler")
-        for k, v in request.session.items():
-            logger.info(f"Callback Handler: Request Session Items: {k}: {v}")
+        if request.session:
+            for k, v in request.session.items():
+                logger.info(f"Callback Handler: Request Session Items: {k}: {v}")
+        else:
+            logger.warning("callback_handler - Session is empty.")
 
         redirectValue = get_base_profile_management_url()
         returnToPageValue = request.session.get(SessionKeys.RETURN_TO_PAGE.value)
