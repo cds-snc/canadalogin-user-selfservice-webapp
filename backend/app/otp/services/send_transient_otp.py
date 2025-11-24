@@ -17,6 +17,8 @@ from fastapi import HTTPException
 from httpx import AsyncClient
 from pydantic import ValidationError
 
+from app.utils.validate_user_request_match import validate_user_request_match
+
 logger = logging.getLogger(__name__)
 
 
@@ -104,6 +106,8 @@ async def handle_otp_send(
         my_profile_response = await get_my_profile(
             global_http_client, user_access_token
         )
+        validate_user_request_match(my_profile_response.data.dict(), user_otp_info.userName)
+
         if my_profile_response.data.userName != user_otp_info.userName:
             logger.error("User mismatch - cannot send OTP")
             return generate_error_response(403, "User mismatch - cannot send OTP")
