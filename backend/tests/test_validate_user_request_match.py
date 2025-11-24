@@ -13,7 +13,7 @@ class TestValidateUserRequestMatch:
         current_user_profile = {
             "id": "user123",
             "userName": "john.doe@example.com",
-            "emails": [{"value": "john.doe@example.com", "type": "work"}]
+            "emails": [{"value": "john.doe@example.com", "type": "work"}],
         }
         request_user_id = "user123"
 
@@ -22,10 +22,7 @@ class TestValidateUserRequestMatch:
 
     def test_user_mismatch_raises_403(self):
         """Test that mismatched user IDs raise 403 Forbidden."""
-        current_user_profile = {
-            "id": "user123",
-            "userName": "john.doe@example.com"
-        }
+        current_user_profile = {"id": "user123", "userName": "john.doe@example.com"}
         request_user_id = "user456"
 
         with pytest.raises(HTTPException) as exc_info:
@@ -38,7 +35,7 @@ class TestValidateUserRequestMatch:
         """Test that missing profile ID raises 400 Bad Request."""
         current_user_profile = {
             "userName": "john.doe@example.com",
-            "emails": [{"value": "john.doe@example.com", "type": "work"}]
+            "emails": [{"value": "john.doe@example.com", "type": "work"}],
             # Missing 'id' field
         }
         request_user_id = "user123"
@@ -53,7 +50,7 @@ class TestValidateUserRequestMatch:
         """Test that empty profile ID raises 400 Bad Request."""
         current_user_profile = {
             "id": "",  # Empty string
-            "userName": "john.doe@example.com"
+            "userName": "john.doe@example.com",
         }
         request_user_id = "user123"
 
@@ -65,10 +62,7 @@ class TestValidateUserRequestMatch:
 
     def test_none_profile_id_raises_400(self):
         """Test that None profile ID raises 400 Bad Request."""
-        current_user_profile = {
-            "id": None,
-            "userName": "john.doe@example.com"
-        }
+        current_user_profile = {"id": None, "userName": "john.doe@example.com"}
         request_user_id = "user123"
 
         with pytest.raises(HTTPException) as exc_info:
@@ -79,10 +73,7 @@ class TestValidateUserRequestMatch:
 
     def test_missing_request_user_id_raises_400(self):
         """Test that missing request user ID raises 400 Bad Request."""
-        current_user_profile = {
-            "id": "user123",
-            "userName": "john.doe@example.com"
-        }
+        current_user_profile = {"id": "user123", "userName": "john.doe@example.com"}
         request_user_id = None
 
         with pytest.raises(HTTPException) as exc_info:
@@ -93,10 +84,7 @@ class TestValidateUserRequestMatch:
 
     def test_empty_request_user_id_raises_400(self):
         """Test that empty request user ID raises 400 Bad Request."""
-        current_user_profile = {
-            "id": "user123",
-            "userName": "john.doe@example.com"
-        }
+        current_user_profile = {"id": "user123", "userName": "john.doe@example.com"}
         request_user_id = ""
 
         with pytest.raises(HTTPException) as exc_info:
@@ -107,13 +95,7 @@ class TestValidateUserRequestMatch:
 
     def test_invalid_profile_type_raises_400(self):
         """Test that invalid profile type raises 400 Bad Request."""
-        invalid_profiles = [
-            "invalid_string",
-            123,
-            ["list", "not", "dict"],
-            None,
-            True
-        ]
+        invalid_profiles = ["invalid_string", 123, ["list", "not", "dict"], None, True]
         request_user_id = "user123"
 
         for invalid_profile in invalid_profiles:
@@ -159,7 +141,10 @@ class TestValidateUserRequestMatch:
     def test_special_characters_in_user_ids(self):
         """Test that special characters in user IDs are handled correctly."""
         special_user_id = "user@domain.com-123_456"
-        current_user_profile = {"id": special_user_id, "userName": "john.doe@example.com"}
+        current_user_profile = {
+            "id": special_user_id,
+            "userName": "john.doe@example.com",
+        }
         request_user_id = special_user_id
 
         # Should not raise any exception

@@ -26,37 +26,35 @@ def validate_user_request_match(
     generic_msg_id = "7"
     # Validate input parameters
     if not isinstance(current_user_profile, dict):
-        logger.error(f"Invalid user profile type for validation")
+        logger.error("Invalid user profile type for validation")
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=generic_msg_id
+            status_code=status.HTTP_400_BAD_REQUEST, detail=generic_msg_id
         )
 
     # Extract user ID from profile
     current_user_id = current_user_profile.get("id")
     if not current_user_id:
-        logger.error(f"Missing user ID in profile for validation")
+        logger.error("Missing user ID in profile for validation")
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=generic_msg_id
+            status_code=status.HTTP_400_BAD_REQUEST, detail=generic_msg_id
         )
 
     # Check if request user ID is provided
     if not request_user_id:
-        logger.error(f"Missing user ID in request for validation")
+        logger.error("Missing user ID in request for validation")
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=generic_msg_id
+            status_code=status.HTTP_400_BAD_REQUEST, detail=generic_msg_id
         )
 
     id_match = request_user_id == current_user_id
 
     # Perform the validation
     if not id_match:
-        logger.warning(f"User mismatch - cannot update profile - {request_user_id} != {current_user_id}")
+        logger.warning(
+            f"User mismatch - cannot update profile - {request_user_id} != {current_user_id}"
+        )
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=generic_msg_id
+            status_code=status.HTTP_403_FORBIDDEN, detail=generic_msg_id
         )
 
-    logger.debug(f"User identity validation passed")
+    logger.debug("User identity validation passed")

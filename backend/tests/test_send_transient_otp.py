@@ -101,10 +101,21 @@ def patch_config_and_auth(monkeypatch, fake_settings):
         _prep_pn,
     )
 
+    class MockProfileData:
+        def __init__(self, user_id="user@example.com", preferred_language="en"):
+            self.userId = user_id
+            self.preferredLanguage = preferred_language
+
+        def model_dump(self):
+            return {
+                "id": self.userId,
+                "preferredLanguage": self.preferredLanguage
+            }
+
     # Async my_profile returning the same username by default
     async def _ok_profile(_client, user_access_token: str):
         return SimpleNamespace(
-            data=SimpleNamespace(userName="user@example.com", preferredLanguage="en")
+            data=MockProfileData()
         )
 
     monkeypatch.setattr(feature_module, "get_my_profile", _ok_profile)
@@ -176,37 +187,8 @@ async def test_dispatch_posts_correct_request_for_phone_otp(otp_type, path_segme
     async with AsyncClient(transport=transport) as client:
         info = UserOtpInfo(
             otpType=otp_type,
-            userName="user@example.com",
+            userId="user@example.com",
             phoneNumber="+14165551234",  # ✅ E.164 valid input for Pydantic PhoneNumber
-        )
-        resp = await dispatch_otp(client, info)
-    assert resp.status_code == 201
-
-
-@pytest.mark.asyncio
-async def test_dispatch_posts_correct_request_for_email():
-    """
-    EMAIL path uses userName.lower() -> user@example.com in body.
-    """
-
-    def handler(request: Request) -> Response:
-        assert request.method == "POST"
-        assert request.url.scheme == "https"
-        assert request.url.host == "tenant.verify.ibm.com"
-        assert request.url.path == "/v2.0/factors/emailotp/transient/verifications"
-        assert request.headers.get("Authorization") == "Bearer FAKE_ADMIN_TOKEN"
-        payload = json.loads(request.content.decode() or "{}")
-        assert payload == {"emailAddress": "user@example.com"}
-        return Response(
-            201, json=make_valid_payload(OtpType.EMAIL, trxn_id="tx-email-1")
-        )
-
-    transport = build_transport(handler)
-    async with AsyncClient(transport=transport) as client:
-        info = UserOtpInfo(
-            otpType=OtpType.EMAIL,
-            userName="User@Example.com",  # ensure lower-casing is applied by impl
-            phoneNumber=None,
         )
         resp = await dispatch_otp(client, info)
     assert resp.status_code == 201
@@ -218,7 +200,7 @@ async def test_dispatch_posts_correct_request_for_email():
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("otp_type", [OtpType.SMS, OtpType.VOICE, OtpType.EMAIL])
+@pytest.mark.parametrize("otp_type", [OtpType.SMS, OtpType.VOICE])
 async def test_handle_success_returns_data_and_message(otp_type):
     payload = make_valid_payload(
         otp_type, correlation_id="corr-xyz", trxn_id=f"ok-{otp_type.value}-123"
@@ -231,7 +213,7 @@ async def test_handle_success_returns_data_and_message(otp_type):
     async with AsyncClient(transport=transport) as client:
         info = UserOtpInfo(
             otpType=otp_type,
-            userName="user@example.com",
+            userId="user@example.com",
             phoneNumber=(
                 "+14165551234" if otp_type != OtpType.EMAIL else None
             ),  # ✅ E.164
@@ -261,26 +243,6 @@ async def test_handle_success_returns_data_and_message(otp_type):
 
 
 @pytest.mark.asyncio
-async def test_handle_non_201_returns_error_model():
-    def handler(request: Request) -> Response:
-        return Response(400, json={"error": "Bad Request"})
-
-    transport = build_transport(handler)
-
-    async with AsyncClient(transport=transport) as client:
-        info = UserOtpInfo(
-            otpType=OtpType.EMAIL,
-            userName="user@example.com",
-            phoneNumber=None,
-        )
-        result = await handle_otp_send(client, info, user_access_token="USER_TOKEN")
-
-    result_dict = try_to_dict(result)
-    assert result_dict.get("success") is False
-    assert "bad request" in (result_dict.get("message") or "").lower()
-
-
-@pytest.mark.asyncio
 async def test_handle_validation_error_due_to_incomplete_payload():
     """
     Return 201 but missing required fields to trigger ValidationError -> "Server Error"
@@ -296,7 +258,7 @@ async def test_handle_validation_error_due_to_incomplete_payload():
     async with AsyncClient(transport=transport) as client:
         info = UserOtpInfo(
             otpType=OtpType.SMS,
-            userName="user@example.com",
+            userId="user@example.com",
             phoneNumber="+14165551234",  # ✅ E.164
         )
         result = await handle_otp_send(client, info, user_access_token="USER_TOKEN")
@@ -312,7 +274,7 @@ async def test_handle_user_mismatch_returns_403(monkeypatch):
     async def _bad_profile(_client, token):
         return SimpleNamespace(
             data=SimpleNamespace(
-                userName="intruder@example.com", preferredLanguage="en"
+                userId="intruder@example.com", preferredLanguage="en"
             )
         )
 
@@ -327,7 +289,7 @@ async def test_handle_user_mismatch_returns_403(monkeypatch):
     async with AsyncClient(transport=transport) as client:
         info = UserOtpInfo(
             otpType=OtpType.SMS,
-            userName="user@example.com",
+            userId="user@example.com",
             phoneNumber="+14165551234",  # ✅ E.164
         )
         result = await handle_otp_send(client, info, user_access_token="USER_TOKEN")
@@ -351,7 +313,7 @@ async def test_handle_transport_exception_is_captured_in_message():
     async with AsyncClient(transport=transport) as client:
         info = UserOtpInfo(
             otpType=OtpType.SMS,
-            userName="user@example.com",
+            userId="user@example.com",
             phoneNumber="+14165551234",  # ✅ E.164
         )
         result = await handle_otp_send(client, info, user_access_token="USER_TOKEN")
@@ -385,7 +347,7 @@ async def test_handle_status_code_none_branch(monkeypatch):
     async with AsyncClient() as client:
         info = UserOtpInfo(
             otpType=OtpType.EMAIL,
-            userName="user@example.com",
+            userId="user@example.com",
             phoneNumber=None,
         )
         result = await handle_otp_send(client, info, user_access_token="USER_TOKEN")

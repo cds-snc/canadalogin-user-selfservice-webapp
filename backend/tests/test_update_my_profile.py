@@ -197,6 +197,7 @@ async def test_update_profile_dispatch_failure(
     get_call_args = mock_dispatch_get.call_args
     assert get_call_args[0][1] == "token"  # user_access_token parameter
 
+
 # @pytest.mark.asyncio
 # @patch(SANITIZE_PROFILE_IMPORT_PATH)
 # @patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)

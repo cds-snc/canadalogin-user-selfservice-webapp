@@ -107,7 +107,9 @@ async def handle_otp_send(
             global_http_client, user_access_token
         )
 
-        validate_user_request_match(my_profile_response.data.model_dump(), user_otp_info.userId)
+        validate_user_request_match(
+            my_profile_response.data.model_dump(), user_otp_info.userId
+        )
 
         # Get user's preferred language from profile
         user_language = my_profile_response.data.preferredLanguage or "en"
@@ -227,16 +229,6 @@ async def dispatch_otp(
             send_transient_otp_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/voiceotp/transient/verifications"
             response = await global_http_client.post(
                 send_transient_otp_url, json=user_phone_number, headers=headers
-            )
-            return response
-
-        elif user_otp_info.userName and user_otp_info.otpType == OtpType.EMAIL:
-            user_email_address = {
-                "emailAddress": user_otp_info.userName.lower()
-            }  # Ensure consistent email formatting
-            send_transient_otp_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/emailotp/transient/verifications"
-            response = await global_http_client.post(
-                send_transient_otp_url, json=user_email_address, headers=headers
             )
             return response
 
