@@ -21,7 +21,6 @@ vi.mock("react-router", async () => {
     ...actual,
     useNavigate: () => mockNavigate,
     useParams: () => ({ language: "en" }),
-    useLocation: vi.fn(),
   };
 });
 
@@ -169,7 +168,7 @@ vi.mock("../../../utils/userProfileDispatch.jsx", () => ({
 import { useUser } from "../../../components/Providers/useUser.tsx";
 
 describe("SuccessfullyUpdatedName", () => {
-  let useLocation;
+  const mockOnBackToProfile = vi.fn();
 
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -191,224 +190,188 @@ describe("SuccessfullyUpdatedName", () => {
         return this._href;
       },
     };
-
-    const reactRouter = await import("react-router");
-    useLocation = reactRouter.useLocation;
   });
 
   afterEach(() => {
     vi.useRealTimers();
   });
 
-  it("renders correctly when location.state.name exists", () => {
-    useLocation.mockReturnValue({ state: { name: { formatted: "John Doe" } } });
-    render(<SuccessfullyUpdatedName />);
+  it("renders correctly with nameFormData prop", () => {
+    const props = {
+      nameFormData: { formatted: "John Doe" },
+      onBackToProfile: mockOnBackToProfile,
+    };
 
-    expect(screen.getByText("Hello John Doe")).toBeInTheDocument();
+    render(
+      <TestWrapper>
+        <SuccessfullyUpdatedName {...props} />
+      </TestWrapper>,
+    );
+
+    // Check for the name in the success message (rendered together in strong tag)
+    expect(screen.getByText(/Hello\s+John Doe/)).toBeInTheDocument();
     expect(
       screen.getByText("Profile Updated Successfully"),
     ).toBeInTheDocument();
     expect(screen.getByText("Sign Out")).toBeInTheDocument();
+    expect(screen.getByText("Back to Profile")).toBeInTheDocument();
   });
 
-  it("redirects to edit page when no state name", () => {
-    useLocation.mockReturnValue({ state: null });
-    render(<SuccessfullyUpdatedName />);
-    expect(mockNavigate).toHaveBeenCalledWith("/en/profile-update-name");
-  });
-
-  it("redirects to edit page when empty state", () => {
-    useLocation.mockReturnValue({ state: {} });
-    render(<SuccessfullyUpdatedName />);
-    expect(mockNavigate).toHaveBeenCalledWith("/en/profile-update-name");
-  });
-
-  it("redirects to edit page when name.formatted does not match username", async () => {
-    const userStateName = "John Doe";
-    const locationStateName = "Jane Smith";
-
-    const mockStateWithDifferentName = {
-      userProfile: {
-        name: {
-          formatted: userStateName,
-        },
-      },
+  it("renders with empty name when nameFormData is null", () => {
+    const props = {
+      nameFormData: null,
+      onBackToProfile: mockOnBackToProfile,
     };
 
-    // Mock the useUser to return different name than location state
-    vi.mocked(useUser).mockReturnValue({
-      state: mockStateWithDifferentName,
-      dispatch: mockDispatch,
-    });
+    render(
+      <TestWrapper>
+        <SuccessfullyUpdatedName {...props} />
+      </TestWrapper>,
+    );
 
-    useLocation.mockReturnValue({
-      state: { name: { formatted: locationStateName } },
-    });
-
-    await act(async () => {
-      render(
-        <TestWrapper>
-          <SuccessfullyUpdatedName />
-        </TestWrapper>,
-      );
-    });
-
-    // Should redirect to edit page due to mismatch
-    expect(mockNavigate).toHaveBeenCalledWith("/en/profile-update-name");
-  });
-
-  it("redirects to edit page when username is empty but location state has name", async () => {
-    const mockStateWithEmptyName = {
-      userProfile: {
-        name: {
-          formatted: "",
-        },
-      },
-    };
-
-    vi.mocked(useUser).mockReturnValue({
-      state: mockStateWithEmptyName,
-      dispatch: mockDispatch,
-    });
-
-    useLocation.mockReturnValue({
-      state: { name: { formatted: "Jane Smith" } },
-    });
-
-    await act(async () => {
-      render(
-        <TestWrapper>
-          <SuccessfullyUpdatedName />
-        </TestWrapper>,
-      );
-    });
-
-    // Should redirect to edit page due to mismatch (empty vs non-empty)
-    expect(mockNavigate).toHaveBeenCalledWith("/en/profile-update-name");
-  });
-
-  it("redirects to edit page when location state name is undefined but username exists", async () => {
-    const mockStateWithName = {
-      userProfile: {
-        name: {
-          formatted: "John Doe",
-        },
-      },
-    };
-
-    vi.mocked(useUser).mockReturnValue({
-      state: mockStateWithName,
-      dispatch: mockDispatch,
-    });
-
-    useLocation.mockReturnValue({
-      state: { name: { formatted: undefined } },
-    });
-
-    await act(async () => {
-      render(
-        <TestWrapper>
-          <SuccessfullyUpdatedName />
-        </TestWrapper>,
-      );
-    });
-
-    // Should redirect to edit page due to mismatch
-    expect(mockNavigate).toHaveBeenCalledWith("/en/profile-update-name");
-  });
-
-  it("does not redirect when name.formatted matches username exactly", async () => {
-    const matchingName = "John Doe";
-
-    const mockStateWithMatchingName = {
-      userProfile: {
-        name: {
-          formatted: matchingName,
-        },
-      },
-    };
-
-    vi.mocked(useUser).mockReturnValue({
-      state: mockStateWithMatchingName,
-      dispatch: mockDispatch,
-    });
-
-    useLocation.mockReturnValue({
-      state: { name: { formatted: matchingName } },
-    });
-
-    await act(async () => {
-      render(
-        <TestWrapper>
-          <SuccessfullyUpdatedName />
-        </TestWrapper>,
-      );
-    });
-
-    // Should NOT redirect - both conditions pass
-    expect(mockNavigate).not.toHaveBeenCalled();
-
-    // Should render the success page
-    expect(screen.getByText(`Hello ${matchingName}`)).toBeInTheDocument();
+    // Should render with "Hello " (empty username)
+    expect(screen.getByText("Hello")).toBeInTheDocument();
     expect(
       screen.getByText("Profile Updated Successfully"),
     ).toBeInTheDocument();
   });
 
-  it("handles null or undefined user state gracefully", async () => {
-    const mockStateWithNullProfile = {
-      userProfile: null,
+  it("renders with empty name when nameFormData.formatted is undefined", () => {
+    const props = {
+      nameFormData: { formatted: undefined },
+      onBackToProfile: mockOnBackToProfile,
     };
 
-    vi.mocked(useUser).mockReturnValue({
-      state: mockStateWithNullProfile,
-      dispatch: mockDispatch,
-    });
+    render(
+      <TestWrapper>
+        <SuccessfullyUpdatedName {...props} />
+      </TestWrapper>,
+    );
 
-    useLocation.mockReturnValue({
-      state: { name: { formatted: "Jane Smith" } },
-    });
-
-    await act(async () => {
-      render(
-        <TestWrapper>
-          <SuccessfullyUpdatedName />
-        </TestWrapper>,
-      );
-    });
-
-    // Should redirect to edit page because username will be empty string
-    expect(mockNavigate).toHaveBeenCalledWith("/en/profile-update-name");
+    // Should render with "Hello " (empty username)
+    expect(screen.getByText("Hello")).toBeInTheDocument();
+    expect(
+      screen.getByText("Profile Updated Successfully"),
+    ).toBeInTheDocument();
   });
 
-  it("verifies the exact comparison logic in useEffect", async () => {
-    // Test case where both are empty strings - should not redirect
-    const mockStateWithEmptyName = {
-      userProfile: {
-        name: {
-          formatted: "",
-        },
-      },
+  it("calls onBackToProfile when Back to Profile button is clicked", async () => {
+    const props = {
+      nameFormData: { formatted: "John Doe" },
+      onBackToProfile: mockOnBackToProfile,
     };
 
-    vi.mocked(useUser).mockReturnValue({
-      state: mockStateWithEmptyName,
-      dispatch: mockDispatch,
-    });
+    render(
+      <TestWrapper>
+        <SuccessfullyUpdatedName {...props} />
+      </TestWrapper>,
+    );
 
-    useLocation.mockReturnValue({
-      state: { name: { formatted: "" } },
-    });
+    const backButton = screen.getByText("Back to Profile");
 
     await act(async () => {
-      render(
-        <TestWrapper>
-          <SuccessfullyUpdatedName />
-        </TestWrapper>,
-      );
+      backButton.click();
     });
 
-    // Should NOT redirect because both are empty strings (match)
-    expect(mockNavigate).not.toHaveBeenCalled();
+    expect(mockOnBackToProfile).toHaveBeenCalledTimes(1);
+  });
+
+  it("calls authService.logout when Sign Out button is clicked", async () => {
+    const props = {
+      nameFormData: { formatted: "John Doe" },
+      onBackToProfile: mockOnBackToProfile,
+    };
+
+    render(
+      <TestWrapper>
+        <SuccessfullyUpdatedName {...props} />
+      </TestWrapper>,
+    );
+
+    const signOutButton = screen.getByText("Sign Out");
+
+    await act(async () => {
+      signOutButton.click();
+    });
+
+    expect(mockSetLoading).toHaveBeenCalledWith(true, "Signing out...");
+  });
+
+  it("handles logout success and redirects", async () => {
+    const props = {
+      nameFormData: { formatted: "John Doe" },
+      onBackToProfile: mockOnBackToProfile,
+    };
+
+    render(
+      <TestWrapper>
+        <SuccessfullyUpdatedName {...props} />
+      </TestWrapper>,
+    );
+
+    const signOutButton = screen.getByText("Sign Out");
+
+    await act(async () => {
+      signOutButton.click();
+    });
+
+    // Wait for the logout to complete
+    await act(async () => {
+      vi.runAllTimers();
+    });
+
+    expect(window.location.href).toBe(
+      "https://mock-logout-success.example.com",
+    );
+  });
+
+  it("handles logout error gracefully", async () => {
+    // Mock authService.logout to throw an error
+    const mockAuthService = await import("../../../services/authService.jsx");
+    vi.mocked(mockAuthService.authService.logout).mockRejectedValueOnce(
+      new Error("Network error"),
+    );
+
+    const props = {
+      nameFormData: { formatted: "John Doe" },
+      onBackToProfile: mockOnBackToProfile,
+    };
+
+    render(
+      <TestWrapper>
+        <SuccessfullyUpdatedName {...props} />
+      </TestWrapper>,
+    );
+
+    const signOutButton = screen.getByText("Sign Out");
+
+    await act(async () => {
+      signOutButton.click();
+    });
+
+    // Wait for error handling
+    await act(async () => {
+      vi.runAllTimers();
+    });
+
+    expect(mockSetLoading).toHaveBeenCalledWith(
+      true,
+      "Error signing out. Redirecting...",
+    );
+  });
+
+  it("renders with different name formats correctly", () => {
+    const props = {
+      nameFormData: { formatted: "Jane Marie Smith" },
+      onBackToProfile: mockOnBackToProfile,
+    };
+
+    render(
+      <TestWrapper>
+        <SuccessfullyUpdatedName {...props} />
+      </TestWrapper>,
+    );
+
+    expect(screen.getByText(/Hello\s+Jane Marie Smith/)).toBeInTheDocument();
   });
 });

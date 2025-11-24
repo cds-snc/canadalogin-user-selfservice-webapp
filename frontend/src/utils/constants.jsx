@@ -73,6 +73,7 @@ export const PAGES = {
   profileUpdateNameSuccess: "ProfileUpdateNameSuccess",
   profileUpdateNameConfirmUpdate: "ProfileUpdateNameConfirmUpdate",
   profileUpdateName: "ProfileUpdateName",
+  editProfileNamePage: "EditProfileNamePage",
   areYouSureUpdateContactNumber: "AreYouSureUpdateContactNumber",
   enterNewPhoneNumber: "EnterNewPhoneNumber",
   youMayUpdateEmailAtOtherPlaces: "YouMayUpdateEmailAtOtherPlaces",

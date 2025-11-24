@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, waitFor, act } from "@testing-library/react";
+import { render, screen, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { BrowserRouter } from "react-router";
 import ConfirmUpdate from "../components/ConfirmUpdate.jsx";
@@ -61,19 +61,15 @@ const mockUserState = {
   authenticatedPages: [],
 };
 
-// Mock react-router with useLocation
+// Mock react-router
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
   return {
     ...actual,
     useNavigate: () => mockNavigate,
     useParams: () => ({ language: "en" }),
-    useLocation: vi.fn(),
   };
 });
-
-// Import the mocked useLocation
-import { useLocation } from "react-router";
 
 // Mock constants - CORRECTED
 vi.mock("../../../utils/constants.jsx", async (importOriginal) => {
@@ -127,6 +123,11 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
     <button {...props} onClick={onGcdsClick} data-button-role={buttonRole}>
       {children}
     </button>
+  ),
+  GcdsErrorMessage: ({ children, messageId, ...props }) => (
+    <div {...props} data-testid="error-message" id={messageId}>
+      {children}
+    </div>
   ),
 }));
 
@@ -223,101 +224,154 @@ const TestWrapper = ({ children }) => (
   </BrowserRouter>
 );
 
-describe("ConfirmUpdate Component - Location State Tests", () => {
+describe("ConfirmUpdate Component Tests", () => {
+  const mockOnConfirm = vi.fn();
+  const mockOnCancel = vi.fn();
+
+  const defaultProps = {
+    nameFormData: {
+      givenName: "John",
+      familyName: "Doe",
+      formatted: "John Doe",
+    },
+    onConfirm: mockOnConfirm,
+    onCancel: mockOnCancel,
+    errorMessage: "",
+    localLoading: false,
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
     mockNavigate.mockClear();
     mockDispatch.mockClear();
   });
 
-  describe("when location.state contains valid name data", () => {
-    beforeEach(() => {
-      useLocation.mockReturnValue({
-        state: {
-          name: {
-            givenName: "John",
-            familyName: "Doe",
-            formatted: "John Doe",
-          },
-        },
-        pathname: "/en/profile/update-name/confirm-update",
-      });
+  it("displays formatted name correctly", async () => {
+    await act(async () => {
+      render(
+        <TestWrapper>
+          <ConfirmUpdate {...defaultProps} />
+        </TestWrapper>,
+      );
     });
 
-    it("extracts name from location.state correctly", async () => {
-      await act(async () => {
-        render(
-          <TestWrapper>
-            <ConfirmUpdate />
-          </TestWrapper>,
-        );
-      });
-
-      // Should display the formatted name
-      expect(screen.getByText(/John Doe/)).toBeInTheDocument();
-    });
-
-    it("does not redirect when name data is present", async () => {
-      await act(async () => {
-        render(
-          <TestWrapper>
-            <ConfirmUpdate />
-          </TestWrapper>,
-        );
-      });
-
-      // Wait a bit to ensure useEffect has run
-      await waitFor(() => {
-        expect(mockNavigate).not.toHaveBeenCalled();
-      });
-    });
+    // Should display the formatted name
+    expect(screen.getByText(/John Doe/)).toBeInTheDocument();
   });
 
-  describe("when location.state is null or undefined", () => {
-    beforeEach(() => {
-      useLocation.mockReturnValue({
-        state: null,
-        pathname: "/en/profile/update-name/confirm-update",
-      });
+  it("calls onConfirm when Yes, update button is clicked", async () => {
+    await act(async () => {
+      render(
+        <TestWrapper>
+          <ConfirmUpdate {...defaultProps} />
+        </TestWrapper>,
+      );
     });
 
-    it("redirects to edit page when location.state is null", async () => {
-      await act(async () => {
-        render(
-          <TestWrapper>
-            <ConfirmUpdate />
-          </TestWrapper>,
-        );
-      });
+    const confirmButton = screen.getByText("Yes, update");
+    confirmButton.click();
 
-      await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith("/en/profile/update-name");
-      });
-    });
+    expect(mockOnConfirm).toHaveBeenCalledTimes(1);
   });
 
-  describe("when location.state exists but name is missing", () => {
-    beforeEach(() => {
-      useLocation.mockReturnValue({
-        state: {
-          someOtherData: "value",
-        },
-        pathname: "/en/profile/update-name/confirm-update",
-      });
+  it("calls onCancel when Cancel button is clicked", async () => {
+    await act(async () => {
+      render(
+        <TestWrapper>
+          <ConfirmUpdate {...defaultProps} />
+        </TestWrapper>,
+      );
     });
 
-    it("redirects to edit page when name is missing from state", async () => {
-      await act(async () => {
-        render(
-          <TestWrapper>
-            <ConfirmUpdate />
-          </TestWrapper>,
-        );
-      });
+    const cancelButton = screen.getByText("Cancel");
+    cancelButton.click();
 
-      await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith("/en/profile/update-name");
-      });
+    expect(mockOnCancel).toHaveBeenCalledTimes(1);
+  });
+
+  it("displays error message when provided", async () => {
+    const propsWithError = {
+      ...defaultProps,
+      errorMessage: "Test error message",
+    };
+
+    await act(async () => {
+      render(
+        <TestWrapper>
+          <ConfirmUpdate {...propsWithError} />
+        </TestWrapper>,
+      );
     });
+
+    expect(screen.getByText("Test error message")).toBeInTheDocument();
+  });
+
+  it("shows loader when localLoading is true", async () => {
+    const loadingProps = {
+      ...defaultProps,
+      localLoading: true,
+    };
+
+    await act(async () => {
+      render(
+        <TestWrapper>
+          <ConfirmUpdate {...loadingProps} />
+        </TestWrapper>,
+      );
+    });
+
+    // Should show loader instead of form content
+    expect(screen.queryByText(/John Doe/)).not.toBeInTheDocument();
+  });
+
+  it("returns null when nameFormData.formatted is missing", async () => {
+    const propsWithoutName = {
+      ...defaultProps,
+      nameFormData: {
+        givenName: "John",
+        familyName: "Doe",
+        formatted: "",
+      },
+    };
+
+    const { container } = render(
+      <TestWrapper>
+        <ConfirmUpdate {...propsWithoutName} />
+      </TestWrapper>,
+    );
+
+    expect(container.firstChild).toBeNull();
+  });
+
+  it("renders all expected content sections", async () => {
+    await act(async () => {
+      render(
+        <TestWrapper>
+          <ConfirmUpdate {...defaultProps} />
+        </TestWrapper>,
+      );
+    });
+
+    // Check for heading
+    expect(screen.getByText("Confirm name update")).toBeInTheDocument();
+
+    // Check for confirmation text
+    expect(
+      screen.getByText(/You've requested to update your name to:/),
+    ).toBeInTheDocument();
+
+    // Check for service info
+    expect(
+      screen.getByText(
+        /This will update your name with the following services:/,
+      ),
+    ).toBeInTheDocument();
+
+    // Check for notice section
+    expect(screen.getByText(/Heads up/)).toBeInTheDocument();
+
+    // Check for buttons
+    expect(screen.getByText("Yes, update")).toBeInTheDocument();
+    expect(screen.getByText("Cancel")).toBeInTheDocument();
   });
 });

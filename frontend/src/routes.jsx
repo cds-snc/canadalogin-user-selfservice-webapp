@@ -20,13 +20,11 @@ import FirstVerifyItsYou from "./components/Manage/FirstVerifyItsYou.jsx";
 import ManageDashboard from "./components/Manage/ManageDashboard.jsx";
 import ProfileHome from "./components/Manage/ProfileHome.jsx";
 
-import ProfileUpdateNameConfirmUpdate from "./features/ProfileName/components/ConfirmUpdate.jsx";
-import ProfileUpdateNameSuccess from "./features/ProfileName/components/SuccessfullyUpdated.jsx";
 import SuccessfullyUpdatedLanguage from "./features/LanguagePreference/components/SuccessfullyUpdated.jsx";
 import Manage2FAVerifications from "./components/Manage/SecuritySettings/Manage2FAVerifications.jsx";
 import SecuritySettings from "./components/Manage/SecuritySettings/SecuritySettings.jsx";
 import YouMayUpdateEmailAtOtherPlaces from "./components/Manage/YouMayUpdateEmailAtOtherPlaces.jsx";
-import ProfileUpdateName from "./features/ProfileName/components/ProfileUpdateName.jsx";
+import EditProfileNamePage from "./features/ProfileName/components/EditProfileNamePage.jsx";
 import Verification from "./components/Verification/Verification.jsx";
 import ChangePasswordIndex from "./features/ChangePassword/components/ChangePasswordIndex.jsx";
 import UpdateContactPhoneNumberContainer from "./features/ContactPhoneNumber/components/UpdateContactPhoneNumberContainer.jsx";
@@ -87,18 +85,8 @@ export const appRoutes = [
                   },
                   {
                     path: "update-name",
-                    element: <ProfileUpdateName />,
-                    handle: { id: PAGES.profileUpdateName },
-                  },
-                  {
-                    path: "update-name/success",
-                    element: <ProfileUpdateNameSuccess />,
-                    handle: { id: PAGES.profileUpdateNameSuccess },
-                  },
-                  {
-                    path: "update-name/confirm-update",
-                    element: <ProfileUpdateNameConfirmUpdate />,
-                    handle: { id: PAGES.profileUpdateNameConfirmUpdate },
+                    element: <EditProfileNamePage />,
+                    handle: { id: PAGES.editProfileNamePage },
                   },
                   {
                     path: "update-language",

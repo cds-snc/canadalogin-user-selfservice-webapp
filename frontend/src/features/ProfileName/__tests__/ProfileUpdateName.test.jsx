@@ -1,5 +1,5 @@
 import { BrowserRouter } from "react-router";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import UpdateProfileName from "../components/ProfileUpdateName.jsx";
 import { UserProvider } from "../../../components/Providers/UserProvider.tsx";
@@ -61,6 +61,11 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
       />
     );
   },
+  GcdsErrorMessage: ({ children, messageId, ...props }) => (
+    <div {...props} data-testid="error-message" id={messageId}>
+      {children}
+    </div>
+  ),
 
   GcdsContainer: ({ children, marginTop, marginBottom, ...props }) => {
     const style = {
@@ -214,16 +219,33 @@ const TestWrapper = ({ children }) => (
 );
 
 describe("UpdateProfileName Component", () => {
+  const mockOnNameFormChange = vi.fn();
+  const mockOnNext = vi.fn();
+  const mockOnCancel = vi.fn();
+  const mockSetErrorCode = vi.fn();
+
+  const defaultProps = {
+    nameFormData: {
+      givenName: "",
+      familyName: "",
+    },
+    onNameFormChange: mockOnNameFormChange,
+    onNext: mockOnNext,
+    onCancel: mockOnCancel,
+    setErrorCode: mockSetErrorCode,
+    errorMessage: "",
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
     mockNavigate.mockClear();
   });
 
-  it("updates local state when user types in inputs", () => {
+  it("calls onNameFormChange when user types in inputs", () => {
     render(
-      <BrowserRouter>
-        <UpdateProfileName />
-      </BrowserRouter>,
+      <TestWrapper>
+        <UpdateProfileName {...defaultProps} />
+      </TestWrapper>,
     );
 
     const firstNameInput = screen.getByTestId("givenName");
@@ -233,69 +255,115 @@ describe("UpdateProfileName Component", () => {
     expect(firstNameInput).toHaveValue("");
     expect(lastNameInput).toHaveValue("");
 
-    // Simulate typing
+    // Simulate typing in first name
     fireEvent.change(firstNameInput, {
       target: { name: "givenName", value: mockUpdateUserName.firstName },
     });
+
+    expect(mockOnNameFormChange).toHaveBeenCalledWith(
+      "givenName",
+      mockUpdateUserName.firstName,
+    );
+
+    // Simulate typing in last name
     fireEvent.change(lastNameInput, {
       target: { name: "familyName", value: mockUpdateUserName.lastName },
     });
 
-    // Assert UI reflects updated state (which proves local state updated)
-    expect(firstNameInput).toHaveValue(mockUpdateUserName.firstName);
-    expect(lastNameInput).toHaveValue(mockUpdateUserName.lastName);
+    expect(mockOnNameFormChange).toHaveBeenCalledWith(
+      "familyName",
+      mockUpdateUserName.lastName,
+    );
   });
 
-  it("clicking Continue button goes to confirmation page", async () => {
+  it("calls onNext when Continue button is clicked", async () => {
     render(
-      <BrowserRouter>
-        <LanguageProvider>
-          <UserProvider
-            initial={mockUserState}
-            initialSessionTimeoutState={mockSessionTimeoutState}
-          >
-            <UpdateProfileName />
-          </UserProvider>
-        </LanguageProvider>
-      </BrowserRouter>,
+      <TestWrapper>
+        <UpdateProfileName {...defaultProps} />
+      </TestWrapper>,
+    );
+
+    const form = document.getElementById("form");
+    fireEvent.submit(form);
+
+    expect(mockOnNext).toHaveBeenCalledTimes(1);
+  });
+
+  it("calls onCancel when Cancel button is clicked", async () => {
+    render(
+      <TestWrapper>
+        <UpdateProfileName {...defaultProps} />
+      </TestWrapper>,
+    );
+
+    const cancelButton = screen.getByRole("button", { name: /cancel/i });
+    fireEvent.click(cancelButton);
+
+    expect(mockOnCancel).toHaveBeenCalledTimes(1);
+  });
+
+  it("displays error message when provided", () => {
+    const propsWithError = {
+      ...defaultProps,
+      errorMessage: "Test error message",
+    };
+
+    render(
+      <TestWrapper>
+        <UpdateProfileName {...propsWithError} />
+      </TestWrapper>,
+    );
+
+    expect(screen.getByText("Test error message")).toBeInTheDocument();
+  });
+
+  it("clears error when user starts typing", () => {
+    const propsWithError = {
+      ...defaultProps,
+      errorMessage: "Test error message",
+    };
+
+    render(
+      <TestWrapper>
+        <UpdateProfileName {...propsWithError} />
+      </TestWrapper>,
+    );
+
+    const firstNameInput = screen.getByTestId("givenName");
+
+    fireEvent.change(firstNameInput, {
+      target: { name: "givenName", value: "New" },
+    });
+
+    expect(mockSetErrorCode).toHaveBeenCalledWith("");
+  });
+
+  it("displays form values from props", () => {
+    const propsWithData = {
+      ...defaultProps,
+      nameFormData: {
+        givenName: "John",
+        familyName: "Doe",
+      },
+    };
+
+    render(
+      <TestWrapper>
+        <UpdateProfileName {...propsWithData} />
+      </TestWrapper>,
     );
 
     const firstNameInput = screen.getByTestId("givenName");
     const lastNameInput = screen.getByTestId("familyName");
 
-    fireEvent.change(firstNameInput, {
-      target: { name: "givenName", value: mockUpdateUserName.firstName },
-    });
-    fireEvent.change(lastNameInput, {
-      target: { name: "familyName", value: mockUpdateUserName.lastName },
-    });
-
-    expect(firstNameInput.value).toBe(mockUpdateUserName.firstName);
-    expect(lastNameInput.value).toBe(mockUpdateUserName.lastName);
-
-    const form = document.getElementById("form");
-    fireEvent.submit(form);
-
-    await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith(
-        "/en/profile/update-name/confirm-update",
-        {
-          state: {
-            name: {
-              givenName: mockUpdateUserName.firstName,
-              familyName: mockUpdateUserName.lastName,
-              formatted: mockUpdateUserName.formatted,
-            },
-          },
-        },
-      );
-    });
+    expect(firstNameInput).toHaveValue("John");
+    expect(lastNameInput).toHaveValue("Doe");
   });
 
   it("matches snapshot", () => {
     const { container } = render(
       <TestWrapper>
-        <UpdateProfileName />
+        <UpdateProfileName {...defaultProps} />
       </TestWrapper>,
     );
     expect(container).toMatchSnapshot();

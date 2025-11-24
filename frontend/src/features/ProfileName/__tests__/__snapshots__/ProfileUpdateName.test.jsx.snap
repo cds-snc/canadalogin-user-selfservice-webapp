@@ -42,6 +42,7 @@ exports[`UpdateProfileName Component > matches snapshot 1`] = `
           name="givenName"
           type="text"
           validateon="other"
+          value=""
         />
         <input
           data-testid="familyName"
@@ -52,6 +53,7 @@ exports[`UpdateProfileName Component > matches snapshot 1`] = `
           required=""
           type="text"
           validateon="other"
+          value=""
         />
       </div>
       <div
