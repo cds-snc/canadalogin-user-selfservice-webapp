@@ -55,7 +55,7 @@ async def redirect_user_to_idp_verify(request: Request):
             for k, v in request.session.items():
                 logger.info(f"After Redirected user - Request Session Items: {k}: {v}")
         else:
-            logger.warning("Session is empty.")
+            logger.warning("redirect_user_to_idp_verify - Session is empty.")
 
         return response
     except Exception as e:
@@ -74,7 +74,7 @@ async def callback_handler(request: Request):
             for k, v in request.session.items():
                 logger.info(f"Callback Handler: Request Session Items: {k}: {v}")
         else:
-            logger.warning("Session is empty.")
+            logger.warning("callback_handler - Session is empty.")
 
         redirectValue = get_base_profile_management_url()
         returnToPageValue = request.session.get(SessionKeys.RETURN_TO_PAGE.value)
