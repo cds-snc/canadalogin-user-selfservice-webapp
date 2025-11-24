@@ -67,7 +67,7 @@ export default function ConfirmLanguageUpdate() {
       setLocalLoading(true);
       const response = await authService.update_my_user_profile({
         preferredLanguage: updatedLanguage.updatedPreferredLanguage,
-        userName: state.userProfile.userName,
+        userId: state.userProfile.id,
       });
       updateProfileSuccess(response.data);
       const successPage = path(PAGES.successfullyUpdatedLanguage, {

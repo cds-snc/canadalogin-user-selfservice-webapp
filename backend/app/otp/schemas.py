@@ -35,7 +35,7 @@ class UserOtpInfo(BaseModel):
     phoneNumber: Optional[str] = (
         None  # Changed from PhoneNumber to str to handle masked numbers
     )
-    userName: EmailStr
+    userId: str
     otpType: OtpType
 
     @field_validator("phoneNumber")

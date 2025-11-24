@@ -43,7 +43,7 @@ export default function UpdateContactPhoneNumberContainer() {
     : "";
 
   const { userProfile } = state;
-  const { userName } = userProfile ?? {};
+  const { id } = userProfile ?? {};
 
   const [localLoading, setLocalLoading] = useState(false);
 
@@ -82,7 +82,7 @@ export default function UpdateContactPhoneNumberContainer() {
     try {
       const formdata = {
         phoneNumber: phoneFormData.phoneNumber,
-        userName: userName,
+        userId: id,
         otpType: serverMapping[phoneFormData.otpType],
       };
 
@@ -126,7 +126,7 @@ export default function UpdateContactPhoneNumberContainer() {
     try {
       setLocalLoading(true);
       const formdata = {
-        userName: userName,
+        userId: id,
         phoneNumbers: [{ value: phoneFormData.phoneNumber, type: "mobile" }],
       };
 

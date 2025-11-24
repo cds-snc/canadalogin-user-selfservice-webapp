@@ -191,7 +191,7 @@ export default function EnterPhoneNumber({
 
       <GcdsGrid columns="max-content max-content" gap="200">
         <GcdsButton
-          disabled={!phoneNumberValid}
+          disabled={!phoneNumberValid || !phoneFormData.phoneNumber}
           style={{ width: "fit-content" }}
           onGcdsClick={(ev) => {
             ev.preventDefault();
