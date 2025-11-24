@@ -69,7 +69,6 @@ export default function EditProfileNamePage() {
       setWizardStep("success");
       setErrorCode("");
     } catch (err) {
-      console.log(err.data.message);
       if (err && err.data && err.data.message) {
         setErrorCode(err.data.message);
       }
