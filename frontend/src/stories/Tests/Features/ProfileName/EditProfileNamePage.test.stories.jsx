@@ -51,6 +51,26 @@ export const EditProfileName = (() => {
   return {
     parameters: {
       ...baseParams,
+      // Override the router configuration to handle the profile update name routes
+      reactRouter: {
+        routePath: "/en/profile/update-name",
+        routeParams: { language: "en" },
+        routing: {
+          path: "/:language/profile/update-name/:step?",
+          routes: [
+            {
+              path: "/:language/profile/update-name",
+              children: [
+                { path: "", element: null },
+                { path: ":step", element: null },
+              ],
+            },
+          ],
+        },
+        location: {
+          pathParams: { language: "en" },
+        },
+      },
       test: {
         dangerouslyIgnoreUnhandledErrors: true,
       },
