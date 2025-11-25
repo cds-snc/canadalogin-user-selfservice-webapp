@@ -56,6 +56,8 @@ CONTACT_INFO = {
 }
 
 redis_url = configuration.session_config.SESSION_REDIS_URL
+is_local_environment = configuration.ENVIRONMENT == "local"
+
 if configuration.ENVIRONMENT != "local":
     # Construct the Redis URL with TLS and authentication for non-local environments
     redis_url = f"rediss://:{configuration.session_config.REDIS_AUTH_SECRET}@{configuration.session_config.REDIS_DOMAIN}:{configuration.session_config.REDIS_PORT}?ssl_cert_reqs=none"
@@ -104,6 +106,9 @@ app = FastAPI(
     title=configuration.app_info.app_name,
     description=API_DESCRIPTION,
     contact=CONTACT_INFO,
+    docs_url="/docs" if is_local_environment else None,
+    redoc_url="/redoc" if is_local_environment else None,
+    openapi_url="/openapi.json" if is_local_environment else None,
 )
 
 # if configuration.ENVIRONMENT != "local":
