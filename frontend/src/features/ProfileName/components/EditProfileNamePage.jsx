@@ -13,12 +13,24 @@ import ConfirmUpdate from "./ConfirmUpdate.jsx";
 import SuccessfullyUpdated from "./SuccessfullyUpdated.jsx";
 
 export default function EditProfileNamePage() {
-  const { language } = useParams();
+  const { language, step } = useParams();
   const { state, dispatch } = useUser();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [wizardStep, setWizardStep] = useState("editName");
+  // Map URL step parameter to internal wizard steps
+  const getWizardStepFromUrl = (urlStep) => {
+    switch (urlStep) {
+      case "confirm-update":
+        return "confirmUpdate";
+      case "success":
+        return "success";
+      default:
+        return "editName";
+    }
+  };
+
+  const [wizardStep, setWizardStep] = useState(getWizardStepFromUrl(step));
   const [errorCode, setErrorCode] = useState("");
   const [localLoading, setLocalLoading] = useState(false);
   const [nameFormData, setNameFormData] = useState({
@@ -32,6 +44,14 @@ export default function EditProfileNamePage() {
 
   const { updateProfileSuccess } = userProfileDispatch(dispatch);
   const backToProfile = path(PAGES.ProfileHome, { language: language });
+
+  // Sync wizard step with URL parameter changes
+  useEffect(() => {
+    const newWizardStep = getWizardStepFromUrl(step);
+    if (newWizardStep !== wizardStep) {
+      setWizardStep(newWizardStep);
+    }
+  }, [step, wizardStep]);
 
   // Check if we're coming from a redirect with state data
   useEffect(() => {
@@ -56,6 +76,10 @@ export default function EditProfileNamePage() {
     };
     setNameFormData(updatedName);
     setWizardStep("confirmUpdate");
+    // Navigate to confirmation URL while preserving state
+    navigate(`/${language}/profile/update-name/confirm-update`, {
+      replace: true,
+    });
   };
 
   const saveUpdatedProfileData = async () => {
@@ -68,6 +92,8 @@ export default function EditProfileNamePage() {
       updateProfileSuccess(response.data);
       setWizardStep("success");
       setErrorCode("");
+      // Navigate to success URL while preserving state
+      navigate(`/${language}/profile/update-name/success`, { replace: true });
     } catch (err) {
       if (err && err.data && err.data.message) {
         setErrorCode(err.data.message);
@@ -102,7 +128,10 @@ export default function EditProfileNamePage() {
         nameFormData={nameFormData}
         onConfirm={saveUpdatedProfileData}
         onCancel={handleBackToProfile}
-        onBack={() => setWizardStep("editName")}
+        onBack={() => {
+          setWizardStep("editName");
+          navigate(`/${language}/profile/update-name`, { replace: true });
+        }}
         errorMessage={errorMessage}
         setErrorCode={setErrorCode}
         localLoading={localLoading}

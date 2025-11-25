@@ -84,7 +84,7 @@ export const appRoutes = [
                     element: <ProfileHome />,
                   },
                   {
-                    path: "update-name",
+                    path: "update-name/:step?",
                     element: <EditProfileNamePage />,
                     handle: { id: PAGES.editProfileNamePage },
                   },
