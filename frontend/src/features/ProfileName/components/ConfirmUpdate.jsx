@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   GcdsContainer,
   GcdsHeading,
@@ -8,14 +8,10 @@ import {
   GcdsGrid,
   GcdsErrorMessage,
 } from "@cdssnc/gcds-components-react";
-import { useParams, useLocation, useNavigate } from "react-router";
+import { useParams } from "react-router";
 
 import { getPageContent } from "../../../utils/functions.jsx";
 import { PAGES } from "../../../utils/constants.jsx";
-import { path } from "../../../utils/routeHelpers.js";
-import { useUser } from "../../../components/Providers/useUser.tsx";
-import { authService } from "../../../services/authService.jsx";
-import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
 import Loader from "../../../components/Layout/Loading";
 
 const ErrorMessage = ({ errorMessage }) => {
@@ -30,72 +26,24 @@ const ErrorMessage = ({ errorMessage }) => {
   );
 };
 
-export default function ConfirmNameUpdated() {
+export default function ConfirmUpdate({
+  nameFormData,
+  onConfirm,
+  onCancel,
+  errorMessage,
+  localLoading,
+}) {
   const { language } = useParams();
-  const { state, dispatch } = useUser();
-  const navigate = useNavigate();
-  const [errorCode, setErrorCode] = useState("");
-
-  const { updateProfileSuccess } = userProfileDispatch(dispatch);
-  const [localLoading, setLocalLoading] = useState(false);
 
   const pageContentJson = getPageContent(
     language,
     PAGES.profileUpdateNameConfirmUpdate,
   );
   const loaderPageContentJson = getPageContent(language, PAGES.otpSelection);
-  const errorPageJson = getPageContent(language, PAGES.error);
 
-  const location = useLocation();
-  // state comes from the navigate call in UpdateProfileName.jsx
-  // If user directly navigates directly to this page, there will be no state and will redirected back to edit page
-  const [savedLocationState, setSavedLocationState] = useState(null);
-  const name = savedLocationState?.name;
+  const formattedName = nameFormData?.formatted;
 
-  const formattedName = name?.formatted;
-
-  const successPage = path(PAGES.profileUpdateNameSuccess, {
-    language: language,
-  });
-  const backToProfile = path(PAGES.ProfileHome, { language: language });
-  const editProfile = path(PAGES.profileUpdateName, { language: language });
-
-  useEffect(() => {
-    if (location?.state?.name) {
-      // save location state to local state, when the language is toggled the location.state is null
-      setSavedLocationState(location.state);
-    } else {
-      // redirect to edit page if no name data
-      navigate(editProfile);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  let errorMessage = errorPageJson[errorCode] || "";
-  if (errorCode && errorMessage === "") {
-    errorMessage = errorCode;
-  }
-
-  const saveUpdatedProfileData = async () => {
-    try {
-      setLocalLoading(true);
-      const response = await authService.update_my_user_profile({
-        name: name,
-        userName: state.userProfile.userName,
-      });
-      updateProfileSuccess(response.data);
-      navigate(successPage, { state: { name: name } });
-    } catch (err) {
-      console.log(err.data.message);
-      if (err && err.data && err.data.message) {
-        setErrorCode(err.data.message);
-      }
-    } finally {
-      setLocalLoading(false);
-    }
-  };
-
-  if (!name?.formatted) return null;
+  if (!nameFormData?.formatted) return null;
 
   return localLoading ? (
     <Loader text={loaderPageContentJson["11"]} />
@@ -125,7 +73,7 @@ export default function ConfirmNameUpdated() {
             <GcdsButton
               onGcdsClick={async (ev) => {
                 ev.preventDefault();
-                await saveUpdatedProfileData();
+                await onConfirm();
               }}
             >
               {pageContentJson["8"]}
@@ -134,7 +82,7 @@ export default function ConfirmNameUpdated() {
               buttonRole="secondary"
               onGcdsClick={(ev) => {
                 ev.preventDefault();
-                navigate(backToProfile);
+                onCancel();
               }}
             >
               {pageContentJson["9"]}

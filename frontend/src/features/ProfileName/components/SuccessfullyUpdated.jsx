@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { useParams, useLocation, useNavigate } from "react-router";
+import React from "react";
+import { useParams } from "react-router";
 
 import {
   GcdsContainer,
@@ -11,39 +11,23 @@ import {
   GcdsLink,
 } from "@cdssnc/gcds-components-react";
 import { getPageContent } from "../../../utils/functions.jsx";
-import { path } from "../../../utils/routeHelpers.js";
 import { EXTERNAL_NAVIGATION_LINKS, PAGES } from "../../../utils/constants.jsx";
 import { useUser } from "../../../components/Providers/useUser.tsx";
 import { authService } from "../../../services/authService.jsx";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
 
-export default function SuccessfullyUpdatedName() {
+export default function SuccessfullyUpdated({ nameFormData, onBackToProfile }) {
   const { language } = useParams();
-  const location = useLocation();
 
-  const { state, dispatch } = useUser();
+  const { dispatch } = useUser();
   const pageContentJson = getPageContent(
     language,
     PAGES.profileUpdateNameSuccess,
   );
-  const navigate = useNavigate();
 
-  const backToProfile = path(PAGES.ProfileHome, { language: language });
   const { setLoading } = userProfileDispatch(dispatch);
 
-  const username = state?.userProfile?.name.formatted || "";
-  const editProfile = path(PAGES.profileUpdateName, { language: language });
-
-  // state comes from the navigate call in UpdateProfileName.jsx
-  // If user directly navigates directly to this page, there will be no state and will redirected back to edit page
-  const { name } = location.state ?? {};
-
-  useEffect(() => {
-    // If no name data, redirect to edit page
-    if (!name) navigate(editProfile);
-    if (name && name.formatted !== username) navigate(editProfile);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const username = nameFormData?.formatted || "";
 
   const handleSignout = async (e) => {
     e.preventDefault();
@@ -95,7 +79,7 @@ export default function SuccessfullyUpdatedName() {
           style={{ width: "fit-content" }}
           onGcdsClick={(ev) => {
             ev.preventDefault();
-            navigate(backToProfile);
+            onBackToProfile();
           }}
         >
           {pageContentJson["6"]}

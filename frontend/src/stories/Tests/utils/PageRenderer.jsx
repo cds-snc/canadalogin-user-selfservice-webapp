@@ -8,8 +8,7 @@ import CheckYourEmail from "../../../components/Manage/CheckYourEmail.jsx";
 import CompleteTwoStepVerification from "../../../components/Manage/CompleteTwoStepVerification.jsx";
 import FirstVerifyItsYou from "../../../components/Manage/FirstVerifyItsYou.jsx";
 import EnterNewEmail from "../../../components/Manage/EnterNewEmail.jsx";
-import ProfileUpdateNameSuccess from "../../../features/ProfileName/components/SuccessfullyUpdated.jsx";
-import ProfileUpdateNameConfirmUpdate from "../../../features/ProfileName/components/ConfirmUpdate.jsx";
+import EditProfileNamePage from "../../../features/ProfileName/components/EditProfileNamePage.jsx";
 import AreYouSureUpdateContactNumber from "../../../components/Manage/AreYouSureUpdateContactNumber.jsx";
 import EnterNewPhoneNumber from "../../../components/Manage/EnterNewPhoneNumber.jsx";
 import YouMayUpdateEmailAtOtherPlaces from "../../../components/Manage/YouMayUpdateEmailAtOtherPlaces.jsx";
@@ -19,7 +18,6 @@ import Manage2FAVerifications from "../../../components/Manage/SecuritySettings/
 import EditLanguagePreferences from "../../../features/LanguagePreference/components/EditLanguagePreferences.jsx";
 import ConfirmLanguageUpdate from "../../../features/LanguagePreference/components/ConfirmUpdate.jsx";
 import SuccessfullyUpdatedLanguage from "../../../features/LanguagePreference/components/SuccessfullyUpdated.jsx";
-import ProfileUpdateName from "../../../features/ProfileName/components/ProfileUpdateName.jsx";
 import Verification from "../../../components/Verification/Verification.jsx";
 import DeleteMFAPage from "../../../features/MFAPhoneNumber/DeleteMFAPhoneNumber/component/DeleteMFAPage.jsx";
 import DeleteMFAPhoneNumberConfirm from "../../../features/MFAPhoneNumber/DeleteMFAPhoneNumber/component/DeleteMFAPhoneNumberConfirm.jsx";
@@ -41,12 +39,8 @@ const PageRenderer = ({ page, ...props }) => {
       return <FirstVerifyItsYou />;
     case PAGES.EnterNewEmail:
       return <EnterNewEmail />;
-    case PAGES.profileUpdateNameSuccess:
-      return <ProfileUpdateNameSuccess />;
-    case PAGES.profileUpdateNameConfirmUpdate:
-      return <ProfileUpdateNameConfirmUpdate />;
-    case PAGES.profileUpdateName:
-      return <ProfileUpdateName />;
+    case PAGES.editProfileNamePage:
+      return <EditProfileNamePage />;
     case PAGES.areYouSureUpdateContactNumber:
       return <AreYouSureUpdateContactNumber />;
     case PAGES.enterNewPhoneNumber:

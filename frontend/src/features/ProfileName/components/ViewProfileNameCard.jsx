@@ -18,7 +18,7 @@ export default function ViewProfileNameSectionCard({ pageContent }) {
   const { state } = useUser();
   const navigateHelper = useNavigateHelper();
   const name = state?.userProfile?.name?.formatted || "";
-  const editProfile = path(PAGES.profileUpdateName, { language: language });
+  const editProfile = path(PAGES.editProfileNamePage, { language: language });
 
   return (
     <GcdsContainer className="sectionCard">
