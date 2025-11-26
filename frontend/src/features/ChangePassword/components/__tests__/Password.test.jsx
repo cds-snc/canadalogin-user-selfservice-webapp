@@ -9,7 +9,6 @@ vi.mock("../../../../../services/authService");
 vi.mock("../../../../../utils/constants");
 vi.mock("../../../../../utils/routeHelpers");
 vi.mock("../../api/passwordUpdate");
-const mockPasswordUpdate = vi.fn();
 
 // Mock the GCDS components
 vi.mock("@cdssnc/gcds-components-react", () => ({
