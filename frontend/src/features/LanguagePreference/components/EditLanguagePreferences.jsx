@@ -1,5 +1,4 @@
 import React from "react";
-import { useParams } from "react-router";
 import {
   GcdsContainer,
   GcdsHeading,
@@ -13,7 +12,6 @@ import {
 import { getPageContent } from "../../../utils/functions.jsx";
 
 import { PAGES, PROFILE_LANGUAGES } from "../../../utils/constants.jsx";
-import { useUser } from "../../../components/Providers/useUser.tsx";
 import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx";
 
 export default function EditLanguagePreferences({
@@ -24,11 +22,6 @@ export default function EditLanguagePreferences({
   errorMessage,
   setErrorCode,
 }) {
-  const { language } = useParams();
-  const { state } = useUser();
-  const { userProfile } = state;
-  const profilePreferredLanguage = userProfile?.preferredLanguage;
-
   const pageContentJson = getPageContent(
     languageFormData.languageCode,
     PAGES.editLanguagePreferences,
