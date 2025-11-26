@@ -375,19 +375,6 @@ describe("Password Component", () => {
       expect(setErrorCode).toHaveBeenCalledWith("example_password_used");
     });
 
-    // it("handles Unicode characters correctly", async () => {
-    //   renderComponent();
-
-    //   const passwordInput = screen.getByTestId("password-input");
-    //   const unicodePassword = "pássw🔐rd123";
-
-    //   fireEvent.change(passwordInput, { target: { value: unicodePassword } });
-
-    //   await waitFor(() => {
-    //     expect(screen.getByText("12")).toBeInTheDocument();
-    //   });
-    // });
-
     it("handles empty password gracefully", async () => {
       renderComponent();
 
