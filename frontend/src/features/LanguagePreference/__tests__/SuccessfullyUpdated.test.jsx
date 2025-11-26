@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom/vitest";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, within } from "@testing-library/react";
-import { useParams, useLocation, useNavigate } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import SuccessfullyUpdatedLanguage from "../components/SuccessfullyUpdated.jsx";
 import { useUser } from "../../../components/Providers/useUser.tsx";
 import { authService } from "../../../services/authService.jsx";
@@ -16,7 +16,6 @@ vi.mock("react-router", async () => {
   return {
     ...actual,
     useParams: vi.fn(),
-    useLocation: vi.fn(),
     useNavigate: vi.fn(),
   };
 });
@@ -168,15 +167,12 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
   const setup = (
     language = "en",
     preferredLanguage = "fr-ca",
-    locationState = {
-      updatedLanguage: {
-        languageCode: "fr",
-        updatedPreferredLanguage: "fr-ca",
-      },
+    languageFormData = {
+      languageCode: "fr",
+      updatedPreferredLanguage: "fr-ca",
     },
   ) => {
     useParams.mockReturnValue({ language });
-    useLocation.mockReturnValue({ state: locationState });
     useUser.mockReturnValue({
       state: {
         userProfile: {
@@ -186,7 +182,16 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
       dispatch: vi.fn(),
     });
 
-    return render(<SuccessfullyUpdatedLanguage />);
+    const mockOnBackToProfile = vi.fn();
+
+    const renderResult = render(
+      <SuccessfullyUpdatedLanguage
+        languageFormData={languageFormData}
+        onBackToProfile={mockOnBackToProfile}
+      />,
+    );
+
+    return { ...renderResult, mockOnBackToProfile };
   };
 
   describe("Component Rendering", () => {
@@ -276,12 +281,12 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
 
   describe("Navigation Functionality", () => {
     it("navigates to profile when 'Return to profile' is clicked", () => {
-      setup();
+      const { mockOnBackToProfile } = setup();
 
       const primaryButton = screen.getByTestId("gcds-button-primary");
       fireEvent.click(primaryButton);
 
-      expect(mockNavigate).toHaveBeenCalledWith("/en/profile");
+      expect(mockOnBackToProfile).toHaveBeenCalledTimes(1);
     });
 
     it("calls logout service when 'Sign out' is clicked", async () => {
@@ -308,34 +313,24 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
     });
 
     it("uses correct language code in navigation path", () => {
-      setup("fr", "fr-ca");
+      const { mockOnBackToProfile } = setup("fr", "fr-ca");
 
       const primaryButton = screen.getByTestId("gcds-button-primary");
       fireEvent.click(primaryButton);
 
-      expect(mockNavigate).toHaveBeenCalledWith("/fr/profile");
+      expect(mockOnBackToProfile).toHaveBeenCalledTimes(1);
     });
 
     it("redirects to edit page when updatedLanguage is missing", () => {
       setup("en", "en-ca", null);
 
-      expect(mockNavigate).toHaveBeenCalledWith("/en/edit-language");
+      // Component returns null, so container should not be present
+      expect(screen.queryByTestId("gcds-container")).not.toBeInTheDocument();
     });
 
-    it("redirects to edit page when location state is undefined", () => {
-      useParams.mockReturnValue({ language: "en" });
-      useLocation.mockReturnValue({ state: undefined });
-      useUser.mockReturnValue({
-        state: {
-          userProfile: {
-            preferredLanguage: "en-ca",
-          },
-        },
-      });
-
-      render(<SuccessfullyUpdatedLanguage />);
-
-      expect(mockNavigate).toHaveBeenCalledWith("/en/edit-language");
+    it("returns null when languageFormData is null", () => {
+      const { container } = setup("en", "en-ca", null);
+      expect(container.firstChild).toBeNull();
     });
 
     it("redirects to edit page when updatedLanguage.languageCode is missing", () => {
@@ -366,10 +361,8 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
 
     it("displays English when preferred language is en-ca in English interface", () => {
       setup("en", "en-ca", {
-        updatedLanguage: {
-          languageCode: "en",
-          updatedPreferredLanguage: "en-ca",
-        },
+        languageCode: "en",
+        updatedPreferredLanguage: "en-ca",
       });
 
       const notice = screen.getByTestId("gcds-notice");
@@ -377,25 +370,10 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
     });
 
     it("displays Anglais when preferred language is en-ca in French interface", () => {
-      useParams.mockReturnValue({ language: "fr" });
-      useLocation.mockReturnValue({
-        state: {
-          updatedLanguage: {
-            languageCode: "en",
-            updatedPreferredLanguage: "en-ca",
-          },
-        },
+      setup("fr", "en-ca", {
+        languageCode: "en",
+        updatedPreferredLanguage: "en-ca",
       });
-      useUser.mockReturnValue({
-        state: {
-          userProfile: {
-            preferredLanguage: "en-ca",
-          },
-        },
-        dispatch: vi.fn(),
-      });
-
-      render(<SuccessfullyUpdatedLanguage />);
 
       const notice = screen.getByTestId("gcds-notice");
       expect(notice).toHaveTextContent("Anglais");
@@ -414,57 +392,33 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
     });
 
     it("handles missing userProfile gracefully", () => {
-      useParams.mockReturnValue({ language: "en" });
-      useLocation.mockReturnValue({
-        state: {
-          updatedLanguage: {
-            languageCode: "fr",
-            updatedPreferredLanguage: "fr-ca",
-          },
-        },
+      setup("en", "", {
+        languageCode: "fr",
+        updatedPreferredLanguage: "fr-ca",
       });
-      useUser.mockReturnValue({
-        state: {
-          userProfile: null,
-        },
-        dispatch: vi.fn(),
-      });
-
-      render(<SuccessfullyUpdatedLanguage />);
 
       expect(screen.getByTestId("gcds-container")).toBeInTheDocument();
     });
 
     it("handles missing user state gracefully", () => {
       useParams.mockReturnValue({ language: "en" });
-      useLocation.mockReturnValue({
-        state: {
-          updatedLanguage: {
-            languageCode: "fr",
-            updatedPreferredLanguage: "fr-ca",
-          },
-        },
-      });
       useUser.mockReturnValue({
         state: null,
         dispatch: vi.fn(),
       });
 
-      render(<SuccessfullyUpdatedLanguage />);
+      setup({
+        languageFormData: {
+          languageCode: "fr",
+          updatedPreferredLanguage: "fr-ca",
+        },
+      });
 
       expect(screen.getByTestId("gcds-container")).toBeInTheDocument();
     });
 
     it("handles undefined preferredLanguage gracefully", () => {
       useParams.mockReturnValue({ language: "en" });
-      useLocation.mockReturnValue({
-        state: {
-          updatedLanguage: {
-            languageCode: "fr",
-            updatedPreferredLanguage: "fr-ca",
-          },
-        },
-      });
       useUser.mockReturnValue({
         state: {
           userProfile: {
@@ -474,21 +428,18 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
         dispatch: vi.fn(),
       });
 
-      render(<SuccessfullyUpdatedLanguage />);
+      setup({
+        languageFormData: {
+          languageCode: "fr",
+          updatedPreferredLanguage: "fr-ca",
+        },
+      });
 
       expect(screen.getByTestId("gcds-container")).toBeInTheDocument();
     });
 
     it("handles empty string preferredLanguage", () => {
       useParams.mockReturnValue({ language: "en" });
-      useLocation.mockReturnValue({
-        state: {
-          updatedLanguage: {
-            languageCode: "fr",
-            updatedPreferredLanguage: "fr-ca",
-          },
-        },
-      });
       useUser.mockReturnValue({
         state: {
           userProfile: {
@@ -498,7 +449,12 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
         dispatch: vi.fn(),
       });
 
-      render(<SuccessfullyUpdatedLanguage />);
+      setup({
+        languageFormData: {
+          languageCode: "fr",
+          updatedPreferredLanguage: "fr-ca",
+        },
+      });
 
       expect(screen.getByTestId("gcds-container")).toBeInTheDocument();
     });
@@ -562,8 +518,8 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
     it("redirects on mount when updatedLanguage is missing", () => {
       setup("en", "en-ca", null);
 
-      expect(mockNavigate).toHaveBeenCalledTimes(1);
-      expect(mockNavigate).toHaveBeenCalledWith("/en/edit-language");
+      // Component returns null, so container should not be present
+      expect(screen.queryByTestId("gcds-container")).not.toBeInTheDocument();
     });
 
     it("does not redirect on mount when updatedLanguage is present", () => {
@@ -581,7 +537,7 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
       expect(screen.getByTestId("gcds-notice")).toBeInTheDocument();
       expect(screen.getByTestId("gcds-heading-h1")).toBeInTheDocument();
       expect(screen.getByTestId("gcds-heading-h4")).toBeInTheDocument();
-      expect(screen.getAllByTestId("gcds-text")).toHaveLength(3);
+      expect(screen.getAllByTestId("gcds-text")).toHaveLength(4);
       expect(screen.getByTestId("gcds-link")).toBeInTheDocument();
       expect(screen.getByTestId("gcds-grid")).toBeInTheDocument();
       expect(screen.getByTestId("gcds-button-primary")).toBeInTheDocument();
@@ -637,10 +593,8 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
       combinations.forEach(({ lang, pref, expected }) => {
         vi.clearAllMocks();
         const { unmount } = setup(lang, pref, {
-          updatedLanguage: {
-            languageCode: pref.split("-")[0],
-            updatedPreferredLanguage: pref,
-          },
+          languageCode: pref.split("-")[0],
+          updatedPreferredLanguage: pref,
         });
 
         const notice = screen.getByTestId("gcds-notice");

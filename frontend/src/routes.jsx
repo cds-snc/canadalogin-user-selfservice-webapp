@@ -9,18 +9,15 @@ import {
 } from "./components/Providers/PrivateRoute.jsx";
 import { UserProvider } from "./components/Providers/UserProvider";
 
-import ConfirmLanguageUpdate from "./features/LanguagePreference/components/ConfirmUpdate.jsx";
 import AreYouSureUpdateContactNumber from "./components/Manage/AreYouSureUpdateContactNumber.jsx";
 import AreYouSureUpdateYourEmail from "./components/Manage/AreYouSureUpdateYourEmail.jsx";
 import CheckYourEmail from "./components/Manage/CheckYourEmail.jsx";
 import CompleteTwoStepVerification from "./components/Manage/CompleteTwoStepVerification.jsx";
-import EditLanguagePreferences from "./features/LanguagePreference/components/EditLanguagePreferences.jsx";
+import EditLanguagePreferencePage from "./features/LanguagePreference/components/EditLanguagePreferencePage.jsx";
 import EnterNewEmail from "./components/Manage/EnterNewEmail.jsx";
 import FirstVerifyItsYou from "./components/Manage/FirstVerifyItsYou.jsx";
 import ManageDashboard from "./components/Manage/ManageDashboard.jsx";
 import ProfileHome from "./components/Manage/ProfileHome.jsx";
-
-import SuccessfullyUpdatedLanguage from "./features/LanguagePreference/components/SuccessfullyUpdated.jsx";
 import Manage2FAVerifications from "./components/Manage/SecuritySettings/Manage2FAVerifications.jsx";
 import SecuritySettings from "./components/Manage/SecuritySettings/SecuritySettings.jsx";
 import YouMayUpdateEmailAtOtherPlaces from "./components/Manage/YouMayUpdateEmailAtOtherPlaces.jsx";
@@ -89,19 +86,9 @@ export const appRoutes = [
                     handle: { id: PAGES.editProfileNamePage },
                   },
                   {
-                    path: "update-language",
-                    element: <EditLanguagePreferences />,
+                    path: "update-language/:step?",
+                    element: <EditLanguagePreferencePage />,
                     handle: { id: PAGES.editLanguagePreferences },
-                  },
-                  {
-                    path: "update-language/success",
-                    element: <SuccessfullyUpdatedLanguage />,
-                    handle: { id: PAGES.successfullyUpdatedLanguage },
-                  },
-                  {
-                    path: "update-language/confirm-update",
-                    element: <ConfirmLanguageUpdate />,
-                    handle: { id: PAGES.confirmLanguageUpdate },
                   },
                   {
                     path: "update-contact-phone-number",

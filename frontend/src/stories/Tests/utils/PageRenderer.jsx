@@ -9,6 +9,7 @@ import CompleteTwoStepVerification from "../../../components/Manage/CompleteTwoS
 import FirstVerifyItsYou from "../../../components/Manage/FirstVerifyItsYou.jsx";
 import EnterNewEmail from "../../../components/Manage/EnterNewEmail.jsx";
 import EditProfileNamePage from "../../../features/ProfileName/components/EditProfileNamePage.jsx";
+import EditLanguagePreferencePage from "../../../features/LanguagePreference/components/EditLanguagePreferencePage.jsx";
 import AreYouSureUpdateContactNumber from "../../../components/Manage/AreYouSureUpdateContactNumber.jsx";
 import EnterNewPhoneNumber from "../../../components/Manage/EnterNewPhoneNumber.jsx";
 import YouMayUpdateEmailAtOtherPlaces from "../../../components/Manage/YouMayUpdateEmailAtOtherPlaces.jsx";
@@ -41,6 +42,8 @@ const PageRenderer = ({ page, ...props }) => {
       return <EnterNewEmail />;
     case PAGES.editProfileNamePage:
       return <EditProfileNamePage />;
+    case PAGES.editLanguagePreferencePage:
+      return <EditLanguagePreferencePage />;
     case PAGES.areYouSureUpdateContactNumber:
       return <AreYouSureUpdateContactNumber />;
     case PAGES.enterNewPhoneNumber:
