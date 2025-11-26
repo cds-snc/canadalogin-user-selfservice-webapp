@@ -4,12 +4,6 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { BrowserRouter } from "react-router";
 import Password from "../Password.jsx";
 
-vi.mock("../../../../../utils/functions");
-vi.mock("../../../../../services/authService");
-vi.mock("../../../../../utils/constants");
-vi.mock("../../../../../utils/routeHelpers");
-vi.mock("../../api/passwordUpdate");
-
 // Mock the GCDS components
 vi.mock("@cdssnc/gcds-components-react", () => ({
   GcdsContainer: ({ children, ...props }) => (
@@ -156,15 +150,17 @@ vi.mock("../../../../utils/functions.jsx", () => ({
   }),
 }));
 
-// Mock auth service
+const mockRequestPasswordPolicy = vi.fn();
+const mockTransientOtpSend = vi.fn();
+const mockTransientOtpVerify = vi.fn();
+const mockFinalStep = vi.fn();
+
 vi.mock("../../../../services/authService.jsx", () => ({
   authService: {
-    requestPasswordPolicy: vi.fn(() =>
-      Promise.resolve({
-        success: true,
-        data: { pwdMinLength: 12, pwdMaxLength: 110 },
-      }),
-    ),
+    requestPasswordPolicy: (...args) => mockRequestPasswordPolicy(...args),
+    transientOtpSend: (...args) => mockTransientOtpSend(...args),
+    transientOtpVerify: (...args) => mockTransientOtpVerify(...args),
+    finalStep: (...args) => mockFinalStep(...args),
   },
 }));
 
@@ -415,39 +411,29 @@ describe("Password Component", () => {
       expect(setErrorCode).toHaveBeenCalledWith("");
     });
 
-    // it("loads password policy on mount", async () => {
-    //   renderComponent();
+    it("loads password policy on mount", async () => {
+      renderComponent();
 
-    //   await waitFor(() => {
-    //     expect(
-    //       vi.mocked(
-    //         require("../../../../services/authService.jsx").authService
-    //           .requestPasswordPolicy,
-    //       ),
-    //     ).toHaveBeenCalled();
-    //   });
-    // });
+      await waitFor(() => {
+        expect(mockRequestPasswordPolicy).toHaveBeenCalled();
+      });
+    });
 
-    // it("handles policy loading errors gracefully", async () => {
-    //   const authServiceMock = vi.mocked(
-    //     require("../../../../services/authService.jsx").authService,
-    //   );
-    //   authServiceMock.requestPasswordPolicy.mockRejectedValue(
-    //     new Error("API Error"),
-    //   );
+    it("handles policy loading errors gracefully", async () => {
+      mockRequestPasswordPolicy.mockRejectedValue(new Error("API Error"));
 
-    //   const consoleSpy = vi
-    //     .spyOn(console, "error")
-    //     .mockImplementation(() => {});
+      const consoleSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
 
-    //   renderComponent();
+      renderComponent();
 
-    //   await waitFor(() => {
-    //     expect(consoleSpy).toHaveBeenCalledWith(expect.any(Error));
-    //   });
+      await waitFor(() => {
+        expect(consoleSpy).toHaveBeenCalledWith(expect.any(Error));
+      });
 
-    //   consoleSpy.mockRestore();
-    // });
+      consoleSpy.mockRestore();
+    });
 
     it("sets language attributes correctly", async () => {
       renderComponent();
@@ -459,36 +445,36 @@ describe("Password Component", () => {
       expect(passwordInput).toHaveAttribute("lang", "en");
     });
 
-    // it("maintains password content during visibility toggle", async () => {
-    //   renderComponent();
+    it("maintains password content during visibility toggle", async () => {
+      renderComponent();
 
-    //   const passwordInput = screen.getByTestId("password-input");
-    //   const checkbox = screen.getByTestId("checkbox-checkbox1");
-    //   const testPassword = "MySecurePassword123!";
+      const passwordInput = screen.getByTestId("password-input");
+      const checkbox = screen.getByTestId("checkbox-checkbox1");
+      const testPassword = "MySecurePassword123!";
 
-    //   fireEvent.change(passwordInput, { target: { value: testPassword } });
-    //   expect(passwordInput.value).toBe(testPassword);
+      fireEvent.change(passwordInput, { target: { value: testPassword } });
+      expect(passwordInput.value).toBe(testPassword);
 
-    //   fireEvent.change(checkbox, { target: { checked: true } });
-    //   await waitFor(() => {
-    //     expect(passwordInput.type).toBe("text");
-    //   });
-    //   expect(passwordInput.value).toBe(testPassword);
-    // });
+      fireEvent.click(checkbox, { target: { checked: true } });
+      await waitFor(() => {
+        expect(passwordInput.type).toBe("text");
+      });
+      expect(passwordInput.value).toBe(testPassword);
+    });
 
-    // it("handles paste events", async () => {
-    //   renderComponent();
+    it("handles paste events", async () => {
+      renderComponent();
 
-    //   const passwordInput = screen.getByTestId("password-input");
+      const passwordInput = screen.getByTestId("password-input");
 
-    //   fireEvent.change(passwordInput, {
-    //     target: { value: "pastedPassword123" },
-    //   });
+      fireEvent.change(passwordInput, {
+        target: { value: "pastedPassword123" },
+      });
 
-    //   await waitFor(() => {
-    //     expect(screen.getByText("16")).toBeInTheDocument();
-    //   });
-    // });
+      await waitFor(() => {
+        expect(screen.getByText("17")).toBeInTheDocument();
+      });
+    });
 
     it("handles rapid input changes", async () => {
       renderComponent();
