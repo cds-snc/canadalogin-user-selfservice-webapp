@@ -33,6 +33,7 @@
     "11": "Veuillez entrer un nom de famille pour continuer. Si vous n’avez qu’un seul nom, entrez-le dans le champ destiné au nom de famille.",
     "12": "and a maximum of",
     "13": "caractères.",
+    "example_password_used": "Invalid password. Password cannot be the example password. Try again.",
     "CSIAM0010E": "La tentative d'authentification a échoué",
     "CSIAM0011E": "Le code de vérification n'est pas valide ou a expiré.",
     "CSIAM0038E": "Trop de tentatives",
@@ -41,8 +42,8 @@
     "CSIBN0028E": "Le code de vérification n'est pas valide ou a expiré.",
     "CSIBN0021E": "Le code de vérification n'est pas valide.",
     "CSIBH0044E": "L’adresse courriel et le mot de passe ne correspondent pas.",
-    "CSIAI0369E": "Invalid password. Password cannot be the example password. Try again",
-    "CSIAI0370E": "The password has been found in security breach lists. Please choose a different, stronger password."
+    "CSIAI0369E": "We could not validate this password. Try again.",
+    "CSIAI0370E": "This password is too easy to guess. Choose a stronger password."
   },
   "RegisterVerification": {
     "1": "Protégez votre compte avec la vérification en deux étapes",

@@ -34,6 +34,7 @@
     "11": "Enter a last name to continue. If you have a single name, enter it in the last name field.",
     "12": "and a maximum of",
     "13": "characters.",
+    "example_password_used": "Invalid password. Password cannot be the example password. Try again.",
     "CSIAM0010E": "The authentication attempt failed",
     "CSIAM0011E": "The verification code is invalid or has expired.",
     "CSIAM0038E": "Too Many Attempts",
@@ -42,8 +43,8 @@
     "CSIBN0028E": "The verification code is invalid or has expired.",
     "CSIBN0021E": "The verification code is invalid.",
     "CSIBH0044E": "The email and password combination do not match.",
-    "CSIAI0369E": "Invalid password. Password cannot be the example password. Try again",
-    "CSIAI0370E": "The password has been found in security breach lists. Please choose a different, stronger password."
+    "CSIAI0369E": "We could not validate this password. Try again.",
+    "CSIAI0370E": "This password is too easy to guess. Choose a stronger password."
   },
   "RegisterVerification": {
     "1": "Protect your account with 2-step verification",
