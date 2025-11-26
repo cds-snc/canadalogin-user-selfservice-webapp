@@ -80,6 +80,7 @@ export const PAGES = {
   areYouSureUpdateYourEmail: "AreYouSureUpdateYourEmail",
   securitySettings: "SecuritySettings",
   editLanguagePreferences: "EditLanguagePreferences",
+  editLanguagePreferencePage: "EditLanguagePreferencePage",
   confirmLanguageUpdate: "ConfirmLanguageUpdate",
   successfullyUpdatedLanguage: "SuccessfullyUpdatedLanguage",
   passwordChangedConfirmation: "PasswordChangedConfirmation",

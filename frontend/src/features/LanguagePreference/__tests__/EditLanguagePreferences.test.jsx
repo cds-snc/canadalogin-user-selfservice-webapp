@@ -1,3 +1,4 @@
+import React from "react";
 import "@testing-library/jest-dom/vitest";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
@@ -111,27 +112,38 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
       {children}
     </div>
   ),
-  GcdsRadios: ({ name, legend, options, onChange, ...props }) => (
-    <div data-testid="gcds-radios" {...props}>
-      <fieldset>
-        <legend>{legend}</legend>
-        {options.map((option) => (
-          <label key={option.id}>
-            <input
-              type="radio"
-              name={name}
-              id={option.id}
-              value={option.value}
-              defaultChecked={option.checked}
-              onChange={onChange}
-              data-testid={`radio-${option.id}`}
-            />
-            {option.label}
-          </label>
-        ))}
-      </fieldset>
-    </div>
-  ),
+  GcdsRadios: ({ name, legend, options, onChange, ...props }) => {
+    const [selectedValue, setSelectedValue] = React.useState(
+      options.find((option) => option.checked)?.value || "",
+    );
+
+    const handleChange = (e) => {
+      setSelectedValue(e.target.value);
+      if (onChange) onChange(e);
+    };
+
+    return (
+      <div data-testid="gcds-radios" {...props}>
+        <fieldset>
+          <legend>{legend}</legend>
+          {options.map((option) => (
+            <label key={option.id}>
+              <input
+                type="radio"
+                name={name}
+                id={option.id}
+                value={option.value}
+                checked={selectedValue === option.value}
+                onChange={handleChange}
+                data-testid={`radio-${option.id}`}
+              />
+              {option.label}
+            </label>
+          ))}
+        </fieldset>
+      </div>
+    );
+  },
 }));
 
 // ────────────────────────────────────────────────
@@ -143,7 +155,11 @@ describe("EditLanguagePreferences Component", () => {
     useNavigate.mockReturnValue(mockNavigate);
   });
 
-  const setup = (language = "en", preferredLanguage = "en-ca") => {
+  const setup = (
+    language = "en",
+    preferredLanguage = "en-ca",
+    overrideProps = {},
+  ) => {
     useParams.mockReturnValue({ language });
     useUser.mockReturnValue({
       state: {
@@ -153,7 +169,20 @@ describe("EditLanguagePreferences Component", () => {
       },
     });
 
-    return render(<EditLanguagePreferences />);
+    const defaultProps = {
+      languageFormData: {
+        languageCode: language,
+        updatedPreferredLanguage: preferredLanguage,
+      },
+      onLanguageFormChange: vi.fn(),
+      onNext: vi.fn(),
+      onCancel: vi.fn(),
+      errorMessage: "",
+      setErrorCode: vi.fn(),
+      ...overrideProps,
+    };
+
+    return render(<EditLanguagePreferences {...defaultProps} />);
   };
 
   describe("Component Rendering", () => {
@@ -237,65 +266,44 @@ describe("EditLanguagePreferences Component", () => {
   });
 
   describe("Navigation Functionality", () => {
-    it("navigates to confirm page when continue button is clicked", () => {
-      setup();
+    it("calls onNext when continue button is clicked", () => {
+      const mockOnNext = vi.fn();
+      setup("en", "en-ca", { onNext: mockOnNext });
 
       const continueButton = screen.getByTestId("gcds-button");
       fireEvent.click(continueButton);
 
-      expect(mockNavigate).toHaveBeenCalledWith(
-        "/en/confirm-language",
-        expect.objectContaining({
-          state: expect.objectContaining({
-            updatedLanguage: expect.objectContaining({
-              updatedPreferredLanguage: "en-ca",
-              languageCode: "en",
-            }),
-          }),
-        }),
-      );
+      expect(mockOnNext).toHaveBeenCalled();
     });
 
-    it("navigates to profile home when cancel button is clicked", () => {
-      setup();
+    it("calls onCancel when cancel button is clicked", () => {
+      const mockOnCancel = vi.fn();
+      setup("en", "en-ca", { onCancel: mockOnCancel });
 
       const cancelButton = screen.getByTestId("gcds-button-secondary");
       fireEvent.click(cancelButton);
 
-      expect(mockNavigate).toHaveBeenCalledWith("/en/profile");
+      expect(mockOnCancel).toHaveBeenCalled();
     });
 
-    it("passes updated language state when navigating to confirm page", () => {
-      setup("en", "en-ca");
+    it("calls onLanguageFormChange when radio button is changed", () => {
+      const mockOnLanguageFormChange = vi.fn();
+      setup("en", "en-ca", { onLanguageFormChange: mockOnLanguageFormChange });
 
       const frenchRadio = screen.getByTestId("radio-fr-ca");
       fireEvent.click(frenchRadio);
 
-      const continueButton = screen.getByTestId("gcds-button");
-      fireEvent.click(continueButton);
-
-      expect(mockNavigate).toHaveBeenCalledWith(
-        "/en/confirm-language",
-        expect.objectContaining({
-          state: expect.objectContaining({
-            updatedLanguage: expect.objectContaining({
-              updatedPreferredLanguage: "fr-ca",
-            }),
-          }),
-        }),
-      );
+      expect(mockOnLanguageFormChange).toHaveBeenCalledWith("fr-ca");
     });
 
-    it("uses French language code in navigation when current language is French", () => {
-      setup("fr", "fr-ca");
+    it("calls onNext when French interface is used", () => {
+      const mockOnNext = vi.fn();
+      setup("fr", "fr-ca", { onNext: mockOnNext });
 
       const continueButton = screen.getByTestId("gcds-button");
       fireEvent.click(continueButton);
 
-      expect(mockNavigate).toHaveBeenCalledWith(
-        "/fr/confirm-language",
-        expect.any(Object),
-      );
+      expect(mockOnNext).toHaveBeenCalled();
     });
   });
 
@@ -350,7 +358,19 @@ describe("EditLanguagePreferences Component", () => {
         },
       });
 
-      render(<EditLanguagePreferences />);
+      const props = {
+        languageFormData: {
+          languageCode: "en",
+          updatedPreferredLanguage: "",
+        },
+        onLanguageFormChange: vi.fn(),
+        onNext: vi.fn(),
+        onCancel: vi.fn(),
+        errorMessage: "",
+        setErrorCode: vi.fn(),
+      };
+
+      render(<EditLanguagePreferences {...props} />);
 
       expect(screen.getByTestId("gcds-heading")).toBeInTheDocument();
     });
@@ -365,7 +385,19 @@ describe("EditLanguagePreferences Component", () => {
         },
       });
 
-      render(<EditLanguagePreferences />);
+      const props = {
+        languageFormData: {
+          languageCode: "en",
+          updatedPreferredLanguage: "",
+        },
+        onLanguageFormChange: vi.fn(),
+        onNext: vi.fn(),
+        onCancel: vi.fn(),
+        errorMessage: "",
+        setErrorCode: vi.fn(),
+      };
+
+      render(<EditLanguagePreferences {...props} />);
 
       expect(screen.getByTestId("gcds-heading")).toBeInTheDocument();
     });
@@ -380,7 +412,19 @@ describe("EditLanguagePreferences Component", () => {
         },
       });
 
-      render(<EditLanguagePreferences />);
+      const props = {
+        languageFormData: {
+          languageCode: "en",
+          updatedPreferredLanguage: "en-ca",
+        },
+        onLanguageFormChange: vi.fn(),
+        onNext: vi.fn(),
+        onCancel: vi.fn(),
+        errorMessage: "",
+        setErrorCode: vi.fn(),
+      };
+
+      render(<EditLanguagePreferences {...props} />);
 
       expect(screen.getByTestId("gcds-heading")).toBeInTheDocument();
     });
@@ -438,8 +482,13 @@ describe("EditLanguagePreferences Component", () => {
       expect(frenchRadio).toBeChecked();
     });
 
-    it("preserves language code in state after selection change", () => {
-      setup("en", "en-ca");
+    it("calls onLanguageFormChange and onNext correctly", () => {
+      const mockOnLanguageFormChange = vi.fn();
+      const mockOnNext = vi.fn();
+      setup("en", "en-ca", {
+        onLanguageFormChange: mockOnLanguageFormChange,
+        onNext: mockOnNext,
+      });
 
       const frenchRadio = screen.getByTestId("radio-fr-ca");
       fireEvent.click(frenchRadio);
@@ -447,16 +496,8 @@ describe("EditLanguagePreferences Component", () => {
       const continueButton = screen.getByTestId("gcds-button");
       fireEvent.click(continueButton);
 
-      expect(mockNavigate).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.objectContaining({
-          state: expect.objectContaining({
-            updatedLanguage: expect.objectContaining({
-              languageCode: "fr",
-            }),
-          }),
-        }),
-      );
+      expect(mockOnLanguageFormChange).toHaveBeenCalledWith("fr-ca");
+      expect(mockOnNext).toHaveBeenCalled();
     });
   });
 });
