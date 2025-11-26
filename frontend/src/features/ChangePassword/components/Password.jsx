@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router";
 import {
   GcdsContainer,
   GcdsText,
   GcdsDetails,
   GcdsInput,
-  GcdsStepper,
-  GcdsLink,
   GcdsCheckboxes,
   GcdsGrid,
   GcdsButton,
@@ -16,9 +15,6 @@ import { authService } from "../../../services/authService.jsx";
 import { passwordUpdate } from "../api/passwordUpdate.jsx";
 
 import { PAGES } from "../../../utils/constants.jsx";
-import { useUser } from "../../../components/Providers/useUser.tsx";
-import { useParams } from "react-router";
-import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 import { path } from "../../../utils/routeHelpers.js";
 
 export default function Password({
@@ -28,7 +24,6 @@ export default function Password({
   setErrorCode,
   errorMessage,
 }) {
-  const { state } = useUser();
   const { language } = useParams();
   const { submit, cancel } = getPageContent(language, "Button");
   const [passwordPolicy, setPasswordPolicy] = useState({ min: 12, max: 110 });
@@ -40,7 +35,8 @@ export default function Password({
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
     language: language,
   });
-  const navigateHelper = useNavigateHelper();
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function loadMinMax() {
@@ -67,9 +63,27 @@ export default function Password({
     setErrorCode("");
   }
 
+  function isExamplePasswordUsed(pwd) {
+    const examplePassword = ["pillow", "moose", "dish"];
+
+    const passwordContainsForbiddenWord = examplePassword.some((word) =>
+      pwd.toLowerCase().includes(word.toLowerCase()),
+    );
+
+    if (passwordContainsForbiddenWord) {
+      return true;
+    }
+    return false;
+  }
+
   const completePasswordUpdate = async () => {
     try {
       setErrorCode("");
+      if (isExamplePasswordUsed(password)) {
+        setErrorCode("example_password_used");
+        return;
+      }
+
       const response = await passwordUpdate.finalStep(
         userOtpValue,
         otpSentResponse.trxId,
@@ -115,33 +129,20 @@ export default function Password({
       </>
 
       <GcdsContainer>
-        {state.testData !== undefined && (
-          <GcdsInput
-            inputId="input-password"
-            label={pageContentJson["9"]}
-            name="password"
-            value={state.testData.password}
-            hint={pageContentJson["10"]}
-            type="password"
-            onGcdsInput={handlePasswordChange}
-            // errorMessage={error.errorMsg}
-          ></GcdsInput>
-        )}
-        {state.testData === undefined && (
-          <GcdsInput
-            inputId="input-password"
-            label={pageContentJson["9"]}
-            name="password"
-            hint={pageContentJson["10"]}
-            type={checkedValue ? "text" : "password"}
-            onGcdsInput={handlePasswordChange}
-            errorMessage={errorMessage}
-            minlength={passwordPolicy.min}
-            maxlength={passwordPolicy.max}
-            lang={language}
-            autofocus
-          ></GcdsInput>
-        )}
+        <GcdsInput
+          inputId="input-password"
+          label={pageContentJson["9"]}
+          name="password"
+          hint={pageContentJson["10"]}
+          type={checkedValue ? "text" : "password"}
+          onGcdsInput={handlePasswordChange}
+          errorMessage={errorMessage}
+          minlength={passwordPolicy.min}
+          maxlength={passwordPolicy.max}
+          lang={language}
+          autofocus
+        ></GcdsInput>
+
         <GcdsCheckboxes
           checkboxId="checkbox-default"
           legend={pageContentJson["11"]}
@@ -173,7 +174,7 @@ export default function Password({
             style={{ width: "fit-content" }}
             onGcdsClick={(ev) => {
               ev.preventDefault();
-              navigateHelper(backToSecuritySettingsPage);
+              navigate(backToSecuritySettingsPage);
             }}
           >
             {cancel}
