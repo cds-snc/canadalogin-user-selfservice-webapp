@@ -140,7 +140,7 @@ export default function Password({
           minlength={passwordPolicy.min}
           maxlength={passwordPolicy.max}
           lang={language}
-          required
+          autofocus
         ></GcdsInput>
 
         <GcdsCheckboxes
