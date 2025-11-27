@@ -59,6 +59,7 @@ export default function OtpVerification({
   phoneFormData,
   errorMessage,
   requestNewOtpCode,
+  setErrorCode,
 }) {
   const { language } = useParams();
 
@@ -85,6 +86,10 @@ export default function OtpVerification({
     const value = e.target.value;
     onChangePhoneForm("otp", value);
     setCodeRequested(false);
+    // Clear error when user types
+    if (setErrorCode) {
+      setErrorCode("");
+    }
   };
 
   useEffect(() => {

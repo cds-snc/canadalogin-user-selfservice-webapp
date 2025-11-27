@@ -67,6 +67,7 @@ const RadioButtons = ({
   onChangePhoneForm,
   pageContentJson,
   phoneFormData,
+  setErrorCode,
 }) => {
   const configureRadioOptions = () => {
     let radioOptionsValues = [];
@@ -103,6 +104,10 @@ const RadioButtons = ({
       options={radioOptions}
       onGcdsChange={(e) => {
         onChangePhoneForm("otpType", e.target.value);
+        // Clear error when user makes selection
+        if (setErrorCode) {
+          setErrorCode("");
+        }
       }}
     ></GcdsRadios>
   );
@@ -114,6 +119,7 @@ export default function EnterPhoneNumber({
   onChangePhoneForm,
   phoneFormData,
   errorMessage,
+  setErrorCode,
 }) {
   const { language } = useParams();
   const [phoneNumberValid, setPhoneNumberValid] = useState(true);
@@ -170,6 +176,10 @@ export default function EnterPhoneNumber({
                 country.countryCode,
               );
               setPhoneNumberValid(isNumberValid);
+              // Clear error when user makes changes
+              if (setErrorCode) {
+                setErrorCode("");
+              }
             }}
             isValid={(inputNumber, country) => {
               return isPhoneNumberValid(inputNumber, country.iso2);
@@ -185,6 +195,7 @@ export default function EnterPhoneNumber({
             onChangePhoneForm={onChangePhoneForm}
             pageContentJson={otpPageContentJson}
             phoneFormData={phoneFormData}
+            setErrorCode={setErrorCode}
           />
         </section>
       </GcdsGrid>

@@ -11,8 +11,9 @@ import {
 import { getPageContent } from "../../../utils/functions.jsx";
 import { PAGES } from "../../../utils/constants";
 
-export default function SuccessfullyUpdatedContactPhoneNumber({
+export default function SuccessfullyUpdated({
   onNext,
+  onCancel,
   phoneFormData,
 }) {
   const { language } = useParams();
@@ -26,7 +27,7 @@ export default function SuccessfullyUpdatedContactPhoneNumber({
         <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle=" ">
           <GcdsText>
             <strong>
-              {pageContentJson["1"]} {phoneFormData.formattedPhoneNumber}
+              {pageContentJson["1"]} {phoneFormData?.formattedPhoneNumber || ""}
             </strong>
           </GcdsText>
         </GcdsNotice>
@@ -59,7 +60,7 @@ export default function SuccessfullyUpdatedContactPhoneNumber({
             style={{ width: "fit-content" }}
             onGcdsClick={(ev) => {
               ev.preventDefault();
-              onNext();
+              onCancel();
             }}
           >
             {pageContentJson["8"]}
