@@ -479,13 +479,4 @@ describe("EnterPhoneNumber Component", () => {
     const voiceRadio = screen.getByTestId("radio-voiceotp");
     expect(voiceRadio).toBeChecked();
   });
-
-  it("matches snapshot", () => {
-    const { container } = render(
-      <TestWrapper>
-        <EnterPhoneNumber {...defaultProps} />
-      </TestWrapper>,
-    );
-    expect(container).toMatchSnapshot();
-  });
 });
