@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 def flush_logs():
     """Helper function to force flush all log handlers to CloudWatch"""
     for handler in logger.handlers:
-        if hasattr(handler, 'flush'):
+        if hasattr(handler, "flush"):
             handler.flush()
     sys.stdout.flush()
     sys.stderr.flush()
@@ -59,7 +59,9 @@ async def redirect_user_to_idp_verify(request: Request):
         logger.info("Redirecting user to IBM Verify for authentication")
         logger.info(f"oauth object type: {type(oauth)}")
         logger.info(f"oauth.verify exists: {hasattr(oauth, 'verify')}")
-        logger.info(f"oauth.verify type: {type(oauth.verify) if hasattr(oauth, 'verify') else 'N/A'}")
+        logger.info(
+            f"oauth.verify type: {type(oauth.verify) if hasattr(oauth, 'verify') else 'N/A'}"
+        )
         response = await oauth.verify.authorize_redirect(request, callback_redirect_uri)
         # After the redirect to the login page, request.session should have a code_verifier
         logger.info("User redirected to IBM Verify for authentication")
