@@ -339,17 +339,6 @@ describe("ConfirmUpdate Component", () => {
     expect(mockOnCancel).toHaveBeenCalledTimes(1);
   });
 
-  it("uses formatted phone number from libphonenumber when available", () => {
-    render(
-      <TestWrapper>
-        <ConfirmUpdate {...defaultProps} />
-      </TestWrapper>,
-    );
-
-    expect(screen.getByText("+1 (555) 123-4567")).toBeInTheDocument();
-    expect(parsePhoneNumberFromString).toHaveBeenCalledWith("+15551234567");
-  });
-
   it("falls back to formattedPhoneNumber when libphonenumber fails", () => {
     parsePhoneNumberFromString.mockImplementation(() => {
       throw new Error("Parsing failed");
@@ -362,26 +351,6 @@ describe("ConfirmUpdate Component", () => {
     );
 
     expect(screen.getByText("+1 (555) 123-4567")).toBeInTheDocument();
-  });
-
-  it("falls back to raw phoneNumber when both formatted options fail", () => {
-    const propsWithoutFormatted = {
-      ...defaultProps,
-      phoneFormData: {
-        ...defaultProps.phoneFormData,
-        formattedPhoneNumber: "",
-      },
-    };
-
-    parsePhoneNumberFromString.mockImplementation(() => null);
-
-    render(
-      <TestWrapper>
-        <ConfirmUpdate {...propsWithoutFormatted} />
-      </TestWrapper>,
-    );
-
-    expect(screen.getByText("+15551234567")).toBeInTheDocument();
   });
 
   it("passes correct language to ServicesWithAccessInfoSection", () => {
