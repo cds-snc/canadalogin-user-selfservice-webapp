@@ -7,15 +7,20 @@ import {
   GcdsButton,
   GcdsGrid,
   GcdsLink,
+  GcdsErrorMessage,
+  GcdsIcon,
 } from "@cdssnc/gcds-components-react";
 import { getPageContent } from "../../../utils/functions.jsx";
-
+import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx";
 import { PAGES } from "../../../utils/constants";
 
-export default function ConfirmContactPhoneNumberUpdate({
+export default function ConfirmUpdate({
   onNext,
   phoneFormData,
   onCancel,
+  errorMessage,
+  setErrorCode,
+  localLoading,
 }) {
   const { language } = useParams();
   const pageContentJson = getPageContent(
@@ -25,6 +30,11 @@ export default function ConfirmContactPhoneNumberUpdate({
 
   return (
     <GcdsContainer>
+      {errorMessage && (
+        <GcdsErrorMessage messageId="message-props">
+          {errorMessage}
+        </GcdsErrorMessage>
+      )}
       <GcdsGrid columns="1" gap="300">
         <GcdsHeading tag="h1" lang={language}>
           {pageContentJson["1"]}
@@ -42,7 +52,11 @@ export default function ConfirmContactPhoneNumberUpdate({
             <li>{pageContentJson["5"]}</li>
           </ul>
         </GcdsText>
-        <GcdsNotice type="info" noticeTitleTag="h2" noticeTitle=" ">
+
+        <ServicesWithAccessInfoSection currentLang={language} />
+
+        <GcdsNotice type="info" noticeTitleTag="h2" noticeTitle="Heads up">
+          <GcdsIcon name="warning" size="small" />
           <GcdsText>
             {pageContentJson["6"]} <strong>{pageContentJson["7"]}</strong>
             <GcdsText>
@@ -55,9 +69,14 @@ export default function ConfirmContactPhoneNumberUpdate({
         </GcdsNotice>
         <GcdsGrid columns="max-content max-content" gap="200">
           <GcdsButton
+            disabled={localLoading}
             style={{ width: "fit-content" }}
             onGcdsClick={async (ev) => {
               ev.preventDefault();
+              // Clear error when user clicks
+              if (setErrorCode) {
+                setErrorCode("");
+              }
               onNext();
             }}
           >
@@ -65,6 +84,7 @@ export default function ConfirmContactPhoneNumberUpdate({
           </GcdsButton>
           <GcdsButton
             buttonRole="secondary"
+            disabled={localLoading}
             onGcdsClick={(ev) => {
               ev.preventDefault();
               onCancel();

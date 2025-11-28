@@ -24,7 +24,7 @@ import YouMayUpdateEmailAtOtherPlaces from "./components/Manage/YouMayUpdateEmai
 import EditProfileNamePage from "./features/ProfileName/components/EditProfileNamePage.jsx";
 import Verification from "./components/Verification/Verification.jsx";
 import ChangePasswordIndex from "./features/ChangePassword/components/ChangePasswordIndex.jsx";
-import UpdateContactPhoneNumberContainer from "./features/ContactPhoneNumber/components/UpdateContactPhoneNumberContainer.jsx";
+import EditContactPhoneNumberPage from "./features/ContactPhoneNumber/components/EditContactPhoneNumberPage.jsx";
 import AddMFAPage from "./features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPage.jsx";
 import DeleteMFAPage from "./features/MFAPhoneNumber/DeleteMFAPhoneNumber/component/DeleteMFAPage.jsx";
 import { PAGES } from "./utils/constants.jsx";
@@ -91,9 +91,9 @@ export const appRoutes = [
                     handle: { id: PAGES.editLanguagePreferences },
                   },
                   {
-                    path: "update-contact-phone-number",
-                    element: <UpdateContactPhoneNumberContainer />,
-                    handle: { id: PAGES.enterNewPhoneNumber },
+                    path: "update-contact-phone/:step?",
+                    element: <EditContactPhoneNumberPage />,
+                    handle: { id: PAGES.editContactPhoneNumberPage },
                   },
                 ],
               },
