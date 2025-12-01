@@ -69,7 +69,9 @@ async def redirect_user_to_idp_verify(request: Request):
 
         # manually generate a code_verifier, make sure PKCE is used
         code_verifier = generate_token(48)  # Generate a secure random code verifier
-        response = await oauth.verify.authorize_redirect(request, callback_redirect_uri, code_verifier=code_verifier)
+        response = await oauth.verify.authorize_redirect(
+            request, callback_redirect_uri, code_verifier=code_verifier
+        )
         # After the redirect to the login page, request.session should have a code_verifier
         logger.info("User redirected to IBM Verify for authentication")
         flush_logs()  # Force flush to ensure CloudWatch gets this log
