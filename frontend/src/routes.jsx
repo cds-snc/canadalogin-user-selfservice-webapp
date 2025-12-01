@@ -9,18 +9,11 @@ import {
 } from "./components/Providers/PrivateRoute.jsx";
 import { UserProvider } from "./components/Providers/UserProvider";
 
-import AreYouSureUpdateContactNumber from "./components/Manage/AreYouSureUpdateContactNumber.jsx";
-import AreYouSureUpdateYourEmail from "./components/Manage/AreYouSureUpdateYourEmail.jsx";
-import CheckYourEmail from "./components/Manage/CheckYourEmail.jsx";
-import CompleteTwoStepVerification from "./components/Manage/CompleteTwoStepVerification.jsx";
 import EditLanguagePreferencePage from "./features/LanguagePreference/components/EditLanguagePreferencePage.jsx";
-import EnterNewEmail from "./components/Manage/EnterNewEmail.jsx";
-import FirstVerifyItsYou from "./components/Manage/FirstVerifyItsYou.jsx";
 import ManageDashboard from "./components/Manage/ManageDashboard.jsx";
 import ProfileHome from "./components/Manage/ProfileHome.jsx";
 import Manage2FAVerifications from "./components/Manage/SecuritySettings/Manage2FAVerifications.jsx";
 import SecuritySettings from "./components/Manage/SecuritySettings/SecuritySettings.jsx";
-import YouMayUpdateEmailAtOtherPlaces from "./components/Manage/YouMayUpdateEmailAtOtherPlaces.jsx";
 import EditProfileNamePage from "./features/ProfileName/components/EditProfileNamePage.jsx";
 import Verification from "./components/Verification/Verification.jsx";
 import ChangePasswordIndex from "./features/ChangePassword/components/ChangePasswordIndex.jsx";
@@ -53,26 +46,6 @@ export const appRoutes = [
                 element: <ManageDashboard />,
               },
               {
-                path: "checkyouremail",
-                element: <CheckYourEmail />,
-                handle: { id: PAGES.CheckYourEmail },
-              },
-              {
-                path: "completetwostepverification",
-                element: <CompleteTwoStepVerification />,
-                handle: { id: PAGES.CompleteTwoStepVerification },
-              },
-              {
-                path: "firstverifyitsyou",
-                element: <FirstVerifyItsYou />,
-                handle: { id: PAGES.FirstVerifyItsYou },
-              },
-              {
-                path: "enternewemail",
-                element: <EnterNewEmail />,
-                handle: { id: PAGES.EnterNewEmail },
-              },
-              {
                 path: "profile",
                 handle: { id: PAGES.ProfileHome, breadcrumbId: "2" },
                 children: [
@@ -96,21 +69,6 @@ export const appRoutes = [
                     handle: { id: PAGES.editContactPhoneNumberPage },
                   },
                 ],
-              },
-              {
-                path: "areYouSureUpdateContactNumber",
-                element: <AreYouSureUpdateContactNumber />,
-                handle: { id: PAGES.areYouSureUpdateContactNumber },
-              },
-              {
-                path: "youMayUpdateEmailAtOtherPlaces",
-                element: <YouMayUpdateEmailAtOtherPlaces />,
-                handle: { id: PAGES.youMayUpdateEmailAtOtherPlaces },
-              },
-              {
-                path: "areYouSureUpdateYourEmail",
-                element: <AreYouSureUpdateYourEmail />,
-                handle: { id: PAGES.areYouSureUpdateYourEmail },
               },
               {
                 path: "security-settings",

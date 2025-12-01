@@ -4,16 +4,8 @@ import { PAGES } from "../../../utils/constants.jsx";
 // Import all the components that were previously handled by the Page component
 import ManageDashboard from "../../../components/Manage/ManageDashboard.jsx";
 import ProfileHome from "../../../components/Manage/ProfileHome.jsx";
-import CheckYourEmail from "../../../components/Manage/CheckYourEmail.jsx";
-import CompleteTwoStepVerification from "../../../components/Manage/CompleteTwoStepVerification.jsx";
-import FirstVerifyItsYou from "../../../components/Manage/FirstVerifyItsYou.jsx";
-import EnterNewEmail from "../../../components/Manage/EnterNewEmail.jsx";
 import EditProfileNamePage from "../../../features/ProfileName/components/EditProfileNamePage.jsx";
 import EditLanguagePreferencePage from "../../../features/LanguagePreference/components/EditLanguagePreferencePage.jsx";
-import AreYouSureUpdateContactNumber from "../../../components/Manage/AreYouSureUpdateContactNumber.jsx";
-import EnterNewPhoneNumber from "../../../components/Manage/EnterNewPhoneNumber.jsx";
-import YouMayUpdateEmailAtOtherPlaces from "../../../components/Manage/YouMayUpdateEmailAtOtherPlaces.jsx";
-import AreYouSureUpdateYourEmail from "../../../components/Manage/AreYouSureUpdateYourEmail.jsx";
 import SecuritySettings from "../../../components/Manage/SecuritySettings/SecuritySettings.jsx";
 import Manage2FAVerifications from "../../../components/Manage/SecuritySettings/Manage2FAVerifications.jsx";
 import EditLanguagePreferences from "../../../features/LanguagePreference/components/EditLanguagePreferences.jsx";
@@ -33,26 +25,10 @@ const PageRenderer = ({ page, ...props }) => {
       return <ManageDashboard />;
     case PAGES.ProfileHome:
       return <ProfileHome />;
-    case PAGES.CheckYourEmail:
-      return <CheckYourEmail />;
-    case PAGES.CompleteTwoStepVerification:
-      return <CompleteTwoStepVerification />;
-    case PAGES.FirstVerifyItsYou:
-      return <FirstVerifyItsYou />;
-    case PAGES.EnterNewEmail:
-      return <EnterNewEmail />;
     case PAGES.editProfileNamePage:
       return <EditProfileNamePage />;
     case PAGES.editLanguagePreferencePage:
       return <EditLanguagePreferencePage />;
-    case PAGES.areYouSureUpdateContactNumber:
-      return <AreYouSureUpdateContactNumber />;
-    case PAGES.enterNewPhoneNumber:
-      return <EnterNewPhoneNumber />;
-    case PAGES.youMayUpdateEmailAtOtherPlaces:
-      return <YouMayUpdateEmailAtOtherPlaces />;
-    case PAGES.areYouSureUpdateYourEmail:
-      return <AreYouSureUpdateYourEmail />;
     case PAGES.securitySettings:
       return <SecuritySettings />;
     case PAGES.manage2FAVerifications:
