@@ -4,6 +4,7 @@ import sys
 from fastapi import Request
 from fastapi.responses import RedirectResponse
 from authlib.integrations.starlette_client import OAuthError
+from authlib.common.security import generate_token
 from starsessions.session import get_session_handler
 from app.auth.services.oidc_config import oauth
 from app.config import get_configuration
@@ -65,7 +66,10 @@ async def redirect_user_to_idp_verify(request: Request):
         logger.info(
             f"oauth.verify type: {type(oauth.verify) if hasattr(oauth, 'verify') else 'N/A'}"
         )
-        response = await oauth.verify.authorize_redirect(request, callback_redirect_uri)
+
+        # manually generate a code_verifier, make sure PKCE is used
+        code_verifier = generate_token(48)  # Generate a secure random code verifier
+        response = await oauth.verify.authorize_redirect(request, callback_redirect_uri, code_verifier=code_verifier)
         # After the redirect to the login page, request.session should have a code_verifier
         logger.info("User redirected to IBM Verify for authentication")
         flush_logs()  # Force flush to ensure CloudWatch gets this log
