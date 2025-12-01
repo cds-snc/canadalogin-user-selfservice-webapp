@@ -53,8 +53,11 @@ async def redirect_user_to_idp_verify(request: Request):
     """
     try:
         callback_redirect_uri = get_callback_redirect_uri(request)
-        for k, v in request.session.items():
-            logger.info(f"Login Request Session Items: {k}: {v}")
+        if request.session is not None:
+            for k, v in request.session.items():
+                logger.info(f"Login Request Session Items: {k}: {v}")
+        else:
+            logger.warning("redirect_user_to_idp_verify - Session is empty.")
 
         logger.info("Redirecting user to IBM Verify for authentication")
         logger.info(f"oauth object type: {type(oauth)}")
@@ -67,7 +70,7 @@ async def redirect_user_to_idp_verify(request: Request):
         logger.info("User redirected to IBM Verify for authentication")
         flush_logs()  # Force flush to ensure CloudWatch gets this log
 
-        if request.session:
+        if request.session is not None:
             for k, v in request.session.items():
                 logger.info(f"After Redirected user - Request Session Items: {k}: {v}")
         else:
@@ -89,9 +92,10 @@ async def callback_handler(request: Request):
     Handle the OAuth callback from IBM Verify.
     This function processes the response from IBM Verify after user authentication.
     """
+    logger.info("OIDC Callback Handler")
+
     try:
-        logger.info("OIDC Callback Handler")
-        if request.session:
+        if request.session is not None:
             for k, v in request.session.items():
                 logger.info(f"Callback Handler: Request Session Items: {k}: {v}")
         else:
@@ -110,9 +114,14 @@ async def callback_handler(request: Request):
             logger.info("OIDC Responsed")
         except OAuthError as error:
             logger.error(f"OAuth error during token retrieval: {error}")
-            logger.error(
-                f"Redirect user back to IBM Verify to be re-authenticated: {redirectValue}"
-            )
+            if request.session is not None:
+                for k, v in request.session.items():
+                    logger.info(f"OAuthError : Request Session Items: {k}: {v}")
+            else:
+                logger.warning("OAuthError callback_handler - Session is empty.")
+                logger.error(
+                    f"Redirect user back to IBM Verify to be re-authenticated: {redirectValue}"
+                )
             # redirect back to IBM Verify to retry authentication
             raise OAuthError("Invalid or expired token") from error
 
