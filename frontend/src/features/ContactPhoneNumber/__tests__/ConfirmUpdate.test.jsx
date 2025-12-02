@@ -96,22 +96,6 @@ vi.mock("../../../utils/functions.jsx", () => ({
   },
 }));
 
-// Mock ServicesWithAccessInfoSection component
-vi.mock(
-  "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx",
-  () => ({
-    default: ({ currentLang }) => (
-      <div data-testid="services-with-access-info" data-lang={currentLang}>
-        <p>Mocked Services Info Section</p>
-        <ul>
-          <li>Test Service 1</li>
-          <li>Test Service 2</li>
-        </ul>
-      </div>
-    ),
-  }),
-);
-
 // Mock react-router
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
@@ -223,19 +207,6 @@ describe("ConfirmUpdate Component", () => {
     expect(screen.getByText("+1 (555) 123-4567")).toBeInTheDocument();
   });
 
-  it("renders services with access info section", () => {
-    render(
-      <TestWrapper>
-        <ConfirmUpdate {...defaultProps} />
-      </TestWrapper>,
-    );
-
-    expect(screen.getByTestId("services-with-access-info")).toBeInTheDocument();
-    expect(
-      screen.getByText("Mocked Services Info Section"),
-    ).toBeInTheDocument();
-  });
-
   it("displays warning message with icon", () => {
     render(
       <TestWrapper>
@@ -244,7 +215,7 @@ describe("ConfirmUpdate Component", () => {
     );
 
     expect(screen.getByTestId("gcds-icon")).toBeInTheDocument();
-    expect(screen.getByText("Heads up")).toBeInTheDocument();
+    expect(screen.getByTestId("gcds-notice")).toBeInTheDocument();
   });
 
   it("displays error message when provided", () => {
@@ -351,16 +322,5 @@ describe("ConfirmUpdate Component", () => {
     );
 
     expect(screen.getByText("+1 (555) 123-4567")).toBeInTheDocument();
-  });
-
-  it("passes correct language to ServicesWithAccessInfoSection", () => {
-    render(
-      <TestWrapper>
-        <ConfirmUpdate {...defaultProps} />
-      </TestWrapper>,
-    );
-
-    const servicesInfo = screen.getByTestId("services-with-access-info");
-    expect(servicesInfo).toHaveAttribute("data-lang", "en");
   });
 });

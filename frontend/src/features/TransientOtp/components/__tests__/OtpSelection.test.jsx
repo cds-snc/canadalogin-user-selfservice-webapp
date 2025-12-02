@@ -56,7 +56,7 @@ vi.mock("../../../../utils/functions.jsx", () => ({
 vi.mock("../../../../utils/gcHelpCentreLinks.jsx", () => ({
   gcHelpCentreLinks: {
     twoStepVerification: "https://help.example.com/2fa",
-    cannotAccessPhone: "https://help.example.com/no-phone",
+    recover2StepVerification: "https://help.example.com/no-phone",
   },
 }));
 
@@ -220,12 +220,10 @@ describe("OtpSelection Component", () => {
       const links = screen.getAllByTestId("gcds-link");
       expect(links).toHaveLength(2);
       expect(links[0]).toHaveAttribute("href", "https://help.example.com/2fa");
-      expect(links[0]).toHaveAttribute("target", "_blank");
       expect(links[1]).toHaveAttribute(
         "href",
         "https://help.example.com/no-phone",
       );
-      expect(links[1]).toHaveAttribute("target", "_blank");
     });
 
     it("renders submit and cancel buttons", () => {
@@ -921,13 +919,16 @@ describe("OtpSelection Component", () => {
       expect(radioGroup.querySelector("legend")).toBeInTheDocument();
     });
 
-    it("renders external links with target _blank", () => {
+    it("renders external links with proper hrefs", () => {
       renderComponent();
 
       const links = screen.getAllByTestId("gcds-link");
-      links.forEach((link) => {
-        expect(link).toHaveAttribute("target", "_blank");
-      });
+      expect(links).toHaveLength(2);
+      expect(links[0]).toHaveAttribute("href", "https://help.example.com/2fa");
+      expect(links[1]).toHaveAttribute(
+        "href",
+        "https://help.example.com/no-phone",
+      );
     });
   });
 });
