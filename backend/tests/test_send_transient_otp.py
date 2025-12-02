@@ -4,6 +4,7 @@ from types import SimpleNamespace
 
 import app.otp.services.send_transient_otp as feature_module
 import pytest
+from fastapi import HTTPException
 
 # Schemas
 from app.otp.schemas import OtpDataResponse, OtpType, UserOtpInfo
@@ -273,17 +274,18 @@ async def test_handle_non_201_returns_error_model():
             userName="user@example.com",
             phoneNumber=None,
         )
-        result = await handle_otp_send(client, info, user_access_token="USER_TOKEN")
+        # Now expects HTTPException with status code 400
+        with pytest.raises(HTTPException) as exc_info:
+            await handle_otp_send(client, info, user_access_token="USER_TOKEN")
 
-    result_dict = try_to_dict(result)
-    assert result_dict.get("success") is False
-    assert "bad request" in (result_dict.get("message") or "").lower()
+        assert exc_info.value.status_code == 400
+        assert "Bad Request" in str(exc_info.value.detail)
 
 
 @pytest.mark.asyncio
 async def test_handle_validation_error_due_to_incomplete_payload():
     """
-    Return 201 but missing required fields to trigger ValidationError -> "Server Error"
+    Return 201 but missing required fields to trigger ValidationError -> HTTPException 422
     """
     incomplete = {
         "trxnId": "only-id"
@@ -299,11 +301,12 @@ async def test_handle_validation_error_due_to_incomplete_payload():
             userName="user@example.com",
             phoneNumber="+14165551234",  # ✅ E.164
         )
-        result = await handle_otp_send(client, info, user_access_token="USER_TOKEN")
+        # Now expects HTTPException with status code 422 for validation errors
+        with pytest.raises(HTTPException) as exc_info:
+            await handle_otp_send(client, info, user_access_token="USER_TOKEN")
 
-    result_dict = try_to_dict(result)
-    assert result_dict.get("success") is False
-    assert (result_dict.get("message") or "") == "Server Error"
+        assert exc_info.value.status_code == 422
+        assert "Validation Error" in str(exc_info.value.detail)
 
 
 @pytest.mark.asyncio
@@ -341,7 +344,7 @@ async def test_handle_user_mismatch_returns_403(monkeypatch):
 @pytest.mark.asyncio
 async def test_handle_transport_exception_is_captured_in_message():
     """
-    Simulate network failure inside transport; handle_otp_send catches and returns ResponseModel with 'Send transient' message.
+    Simulate network failure inside transport; handle_otp_send catches and raises HTTPException 500.
     """
 
     def handler(request: Request) -> Response:
@@ -354,14 +357,12 @@ async def test_handle_transport_exception_is_captured_in_message():
             userName="user@example.com",
             phoneNumber="+14165551234",  # ✅ E.164
         )
-        result = await handle_otp_send(client, info, user_access_token="USER_TOKEN")
+        # Now expects HTTPException with status code 500 for transport errors
+        with pytest.raises(HTTPException) as exc_info:
+            await handle_otp_send(client, info, user_access_token="USER_TOKEN")
 
-    result_dict = try_to_dict(result)
-    assert result_dict.get("success") is False
-    # Implementation uses Enum value in the message (e.g., "sms")
-    assert "Send transient sms error: simulated network failure" in (
-        result_dict.get("message") or ""
-    )
+        assert exc_info.value.status_code == 500
+        assert "Dispatch sms OTP" in str(exc_info.value.detail)
 
 
 @pytest.mark.asyncio
@@ -388,8 +389,9 @@ async def test_handle_status_code_none_branch(monkeypatch):
             userName="user@example.com",
             phoneNumber=None,
         )
-        result = await handle_otp_send(client, info, user_access_token="USER_TOKEN")
+        # Now expects HTTPException with status code 500 for status_code None
+        with pytest.raises(HTTPException) as exc_info:
+            await handle_otp_send(client, info, user_access_token="USER_TOKEN")
 
-    result_dict = try_to_dict(result)
-    assert result_dict.get("success") is False
-    assert (result_dict.get("message") or "").lower() == "unknown error"
+        assert exc_info.value.status_code == 500
+        assert "Unknown error" in str(exc_info.value.detail)
