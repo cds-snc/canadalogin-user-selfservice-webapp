@@ -33,54 +33,6 @@ def sanitize_user_profile_data(user_data: UserProfileUpdateRequest) -> dict:
     return updated_data_dict
 
 
-def set_notification_type_for_phone_update(
-    profile: IBMVerifyUpdateUserProfile,
-    updated_data: dict,
-) -> IBMVerifyUpdateUserProfile:
-    """
-    Set notification type to EMAIL if phone numbers are being updated.
-
-    When a user updates their phone numbers, we need to notify them via email
-
-    Args:
-        profile: The validated merged profile
-        updated_data: Dictionary containing the fields being updated
-
-    Returns:
-        IBMVerifyUpdateUserProfile: Profile with updated notification type
-
-    Raises:
-        ValueError: If notification object is None when phone numbers are updated
-    """
-    if "phoneNumbers" not in updated_data:
-        logger.debug("No phone number updates, keeping existing notification type")
-        return profile
-
-    phone_numbers = updated_data["phoneNumbers"]
-    if not phone_numbers:
-        logger.debug("Phone numbers list is empty, keeping existing notification type")
-        return profile
-
-    if profile.notification is None:
-        logger.error("Cannot set notification type: notification object is None")
-        raise ValueError(
-            "Profile notification object cannot be None when updating phone numbers"
-        )
-
-    logger.info("Phone numbers are being updated, setting notification type to EMAIL")
-
-    # Use Pydantic's model_copy for immutable update
-    updated_profile = profile.model_copy(
-        update={
-            "notification": profile.notification.model_copy(
-                update={"notifyType": NotifyType.EMAIL}
-            )
-        }
-    )
-
-    return updated_profile
-
-
 async def dispatch_update_my_profile(
     request: Request,
     user_profile_payload: str,
@@ -168,14 +120,6 @@ async def update_my_profile(
     except ValidationError as e:
         logger.error(f"Merged Profile Validation Error: {e.json()}")
         raise HTTPException(status_code=422, detail="Request data validation error")
-
-    try:
-        validate_merged_profile = set_notification_type_for_phone_update(
-            validate_merged_profile, updated_user_data_dict
-        )
-    except ValueError as e:
-        logger.error(f"Failed to set notification type: {str(e)}")
-        raise HTTPException(status_code=422, detail="Invalid profile notification data")
 
     user_profile_payload = validate_merged_profile.model_dump_json(
         by_alias=True, exclude_none=True
