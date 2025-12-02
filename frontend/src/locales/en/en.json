@@ -4,8 +4,8 @@
     "2": "Step 2 of 4",
     "3": "Create a password",
     "4": "Your password should be a phrase or series of words that only you can recognize. It must be",
-    "5": "at least",
-    "6": "characters. You can use multiple words separated by spaces to meet the character limit.",
+    "5": "at least {minPasswordLength} characters",
+    "6": "You can use multiple words separated by spaces to meet the character limit.",
     "7": "Password safety tips",
     "8": "The longer and more unusual the password, the harder it is to guess. So avoid using common phrases. Also avoid repeating passwords from other online accounts such as banks, email and social media. You don't need capitals, numbers or characters, though you're welcome to use them.",
     "9": "Password",
@@ -86,7 +86,8 @@
     "26": "Send the code again",
     "27": "Cancel",
     "28": "Set up text (SMS) verification instead",
-    "29": "Set up voice call verification instead"
+    "29": "Set up voice call verification instead",
+    "30": "I cannot access my phone"
   },
   "Button": {
     "submit": "Continue",
@@ -467,7 +468,6 @@
     "10": "Need help?",
     "11": "Loading...",
     "12": "Get help with 2-step verification",
-    "13": "I cannot access my phone",
     "14": "To add a phone number,",
     "15": "To delete this number,",
     "16": "How should we send you the code?"

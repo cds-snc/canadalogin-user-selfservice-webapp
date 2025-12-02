@@ -15,6 +15,7 @@ import { path } from "../../../utils/routeHelpers.js";
 
 import { useParams } from "react-router";
 import { FLOW_TYPES, PAGES } from "../../../utils/constants.jsx";
+import { gcHelpCentreLinks } from "../../../utils/gcHelpCentreLinks.jsx";
 
 const initialTime = 10;
 
@@ -194,6 +195,11 @@ export default function OtpVerification({
               : pageContentJson["26"]}
           </GcdsLink>
         )}
+      </GcdsText>
+      <GcdsText>
+        <GcdsLink href={gcHelpCentreLinks.cannotAccessPhone}>
+          {pageContentJson["30"]}
+        </GcdsLink>
       </GcdsText>
     </GcdsContainer>
   );
