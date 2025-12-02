@@ -15,7 +15,7 @@ from app.utils.helpers import (
 from app.utils.schemas import ResponseModel
 from app.utils.request_error_handler import RequestErrorHandler
 from fastapi import HTTPException
-from httpx import AsyncClient
+from httpx import AsyncClient, HTTPStatusError
 from pydantic import ValidationError
 
 logger = logging.getLogger(__name__)
@@ -156,17 +156,16 @@ async def handle_otp_send(
             logger.error(
                 f"Error while sending {user_otp_info.otpType} OTP: {http_client_response.json()}"
             )
-            error_message = http_client_response.json().get("error", "Unknown error")
-            # Return appropriate HTTP status code based on the upstream error
-            status_code = http_client_response.status_code
-            if status_code == 403:
-                raise HTTPException(status_code=403, detail=error_message)
-            elif status_code == 404:
-                raise HTTPException(status_code=404, detail=error_message)
-            elif status_code >= 400 and status_code < 500:
-                raise HTTPException(status_code=400, detail=error_message)
-            else:
-                raise HTTPException(status_code=500, detail=error_message)
+            # Use RequestErrorHandler to handle the error response consistently
+            # Create an HTTPStatusError to pass to the handler
+            error = HTTPStatusError(
+                message=f"HTTP {http_client_response.status_code}",
+                request=http_client_response.request,
+                response=http_client_response,
+            )
+            RequestErrorHandler.handle(
+                error, context=f"Send {user_otp_info.otpType.value} OTP"
+            )
 
         response_json = http_client_response.json()
 

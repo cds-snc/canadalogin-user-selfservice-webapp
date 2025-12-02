@@ -279,7 +279,7 @@ async def test_handle_non_201_returns_error_model():
             await handle_otp_send(client, info, user_access_token="USER_TOKEN")
 
         assert exc_info.value.status_code == 400
-        assert "Bad Request" in str(exc_info.value.detail)
+        assert "Bad request" in str(exc_info.value.detail)
 
 
 @pytest.mark.asyncio
