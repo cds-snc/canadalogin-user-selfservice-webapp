@@ -164,8 +164,13 @@ async def reauthenticate_user(request: Request, returnToPage: str = "/"):
         # if the user recently logged in, we can set the max age to 15 minutes
         # will reautenticate after max age value
         max_age_in_seconds = 900
+        # manually generate a code_verifier, make sure PKCE is used
+        code_verifier = generate_token(48)  # Generate a secure random code verifier
         return await oauth.verify.authorize_redirect(
-            request, callback_redirect_uri, max_age=max_age_in_seconds
+            request,
+            callback_redirect_uri,
+            code_verifier=code_verifier,
+            max_age=max_age_in_seconds,
         )
     except OAuthError as error:
         logger.exception("Unexpected error during redirect_to_verify")
