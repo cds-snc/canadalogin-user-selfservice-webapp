@@ -13,8 +13,9 @@ from app.utils.helpers import (
     prepare_pydantic_phone_number_for_verify,
 )
 from app.utils.schemas import ResponseModel
+from app.utils.request_error_handler import RequestErrorHandler
 from fastapi import HTTPException
-from httpx import AsyncClient
+from httpx import AsyncClient, HTTPStatusError
 from pydantic import ValidationError
 
 logger = logging.getLogger(__name__)
@@ -148,21 +149,22 @@ async def handle_otp_send(
         )
 
         if http_client_response.status_code is None:
-            return ResponseModel(
-                success=False,
-                data=None,
-                message="Unknown error",
-            )
+            logger.error("HTTP response status code is None")
+            raise HTTPException(status_code=500, detail="Unknown error")
 
         if http_client_response.status_code != 201:
             logger.error(
                 f"Error while sending {user_otp_info.otpType} OTP: {http_client_response.json()}"
             )
-            error_message = http_client_response.json().get("error", "Unknown error")
-            return ResponseModel(
-                success=False,
-                data=None,
-                message=error_message,
+            # Use RequestErrorHandler to handle the error response consistently
+            # Create an HTTPStatusError to pass to the handler
+            error = HTTPStatusError(
+                message=f"HTTP {http_client_response.status_code}",
+                request=http_client_response.request,
+                response=http_client_response,
+            )
+            RequestErrorHandler.handle(
+                error, context=f"Send {user_otp_info.otpType.value} OTP"
             )
 
         response_json = http_client_response.json()
@@ -175,11 +177,7 @@ async def handle_otp_send(
 
             except ValidationError as e:
                 logger.error(f"Validation Error: {e.json()}")
-                return ResponseModel(
-                    success=False,
-                    data=None,
-                    message="Server Error",
-                )
+                RequestErrorHandler.handle(e, context="OTP response validation")
 
             return ResponseModel(
                 success=True,
@@ -189,10 +187,8 @@ async def handle_otp_send(
 
     except Exception as e:
         logger.error(f"Send transient {user_otp_info.otpType.value} error: {str(e)}")
-        return ResponseModel(
-            success=False,
-            data=None,
-            message=f"Send transient {user_otp_info.otpType.value} error: {str(e)}",
+        RequestErrorHandler.handle(
+            e, context=f"Send transient {user_otp_info.otpType.value} OTP"
         )
 
 
@@ -243,12 +239,11 @@ async def dispatch_otp(
         else:
             generate_error_response(400, "Unknown error")
 
-    except HTTPException as he:
-        logger.error(f"HTTP Exception in {user_otp_info.otpType} send: {str(he)}")
-        raise he
     except Exception as error:
         logger.error(
             f"Request to: /v2.0/factors/{user_otp_info.otpType}otp/transient/verifications error: {str(error)}",
             exc_info=True,
         )
-        raise error  # Raise the error to ensure proper exception handling
+        RequestErrorHandler.handle(
+            error, context=f"Dispatch {user_otp_info.otpType.value} OTP"
+        )
