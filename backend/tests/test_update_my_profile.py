@@ -13,7 +13,6 @@ from app.users.services.update_my_profile import (
 from app.users.schemas import (
     IBMVerifyUpdateUserProfile,
     IBMVerifyUserProfileSchema,
-    NotifyType,
     UserProfileUpdateRequest,
     UserProfileName,
 )
