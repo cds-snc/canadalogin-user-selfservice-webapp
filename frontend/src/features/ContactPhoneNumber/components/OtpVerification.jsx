@@ -75,9 +75,10 @@ export default function OtpVerification({
     setCodeRequested(false);
   };
 
-  const requestNewCode = () => {
+  const requestNewCode = (otpType = null) => {
     onChangePhoneForm("otp", "");
-    requestNewOtpCode();
+    // Pass the specific otpType if provided, otherwise use current state
+    requestNewOtpCode(otpType || phoneFormData.otpType);
     setTime(initialTime);
     setCodeRequested(true);
   };
@@ -169,6 +170,24 @@ export default function OtpVerification({
         </GcdsGrid>
       </GcdsContainer>
       <GcdsHeading tag="h2">{pageContentJson["10"]}</GcdsHeading>
+
+      <GcdsText>
+        <GcdsLink
+          onGcdsClick={() => {
+            const newOtpType =
+              userMfaType === FLOW_TYPES.sms
+                ? FLOW_TYPES.voice
+                : FLOW_TYPES.sms;
+            onChangePhoneForm("otpType", newOtpType);
+            // Pass the new OTP type to ensure it uses the correct type
+            requestNewCode(newOtpType);
+          }}
+        >
+          {userMfaType === FLOW_TYPES.sms
+            ? pageContentJson["29"]
+            : pageContentJson["28"]}
+        </GcdsLink>
+      </GcdsText>
 
       <GcdsText>
         {time > 0 ? (

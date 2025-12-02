@@ -99,9 +99,9 @@
   },
   "ProfileUpdateNameConfirmUpdate": {
     "1": "Voulez-vous vraiment modifier votre nom?",
-    "2": "Vous avez demandé à remplacer votre nom par le nom suivant:",
+    "2": "Vous avez demandé à remplacer votre nom par le nom suivant :",
     "3": "Exemple: Nouveau nom",
-    "4": "Cette action modifiera votre nom pour les services suivants:",
+    "4": "Cette action modifiera votre nom pour les services suivants :",
     "5": "GEO.ca",
     "6": "Attention",
     "7": "Cette action",
@@ -266,7 +266,7 @@
     "1": "Voulez-vous vraiment mettre à jour votre langue de communication?",
     "2": "Vous avez demandé à changer votre langue de communication pour la langue suivante:",
     "3": "Exemple : Nouveau nom",
-    "4": "Cette action entraîne la modification de votre langue de communication pour les services suivants:",
+    "4": "Cette action entraîne la modification de votre langue de communication pour les services suivants :",
     "5": "GEO.ca",
     "6": "Attention",
     "7": "Ceci",
@@ -324,12 +324,15 @@
     "9": "Échec de la déconnexion. Redirection..."
   },
   "ServicesWithAccessInfo": {
-    "1": "Services ayant accès à votre nom",
-    "2": "Les services suivants ont accès à votre nom par le biais de Connexion GC:",
+    "1": "Services ayant accès à votre {information}",
+    "2": "Les services suivants ont accès à votre {information} par le biais de Connexion GC :",
     "3": "GEO.ca",
-    "4": "Si vous cherchez à mettre à jour votre nom pour un service qui n’est pas lié à votre compte Connexion GC, vous devez le faire depuis le compte que vous possédez pour le service en question.",
+    "4": "Si vous cherchez à mettre à jour votre {information} pour un service qui n’est pas lié à votre compte Connexion GC, vous devez le faire depuis le compte que vous possédez pour le service en question.",
     "5": "Pour rechercher un autre compte du GC, consultez le",
-    "6": "répertoire des comptes du GC."
+    "6": "répertoire des comptes du GC",
+    "7": "nom",
+    "8": "numéro de téléphone de communication",
+    "9": "langue de communication"
   },
   "EnterNewPhoneNumber": {
     "1": "Entrez un nouveau numéro de téléphone",
@@ -350,9 +353,9 @@
   },
   "ConfirmContactPhoneNumberUpdate": {
     "1": "Voulez-vous vraiment modifier votre numéro de téléphone de communication?",
-    "2": "Vous avez demandé à remplacer votre nom par le nom suivant:",
+    "2": "Vous avez demandé à remplacer votre nom par le nom suivant :",
     "3": "Exemple Newname",
-    "4": "Cette action modifiera votre numéro de téléphone de communication pour les services suivants:",
+    "4": "Cette action modifiera votre numéro de téléphone de communication pour les services suivants :",
     "5": "GEO.ca",
     "6": "Cette action ne modifie que votre",
     "7": "numéro de téléphone de communication.",

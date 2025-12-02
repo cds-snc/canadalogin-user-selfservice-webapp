@@ -54,7 +54,7 @@ export default function ConfirmUpdate({
         <GcdsGrid columns="1" gap="300">
           <GcdsHeading tag="h1">{pageContentJson["1"]}</GcdsHeading>
           <div>
-            <GcdsText marginBottom="0">
+            <GcdsText marginBottom="400">
               {pageContentJson["2"]} <strong>{formattedName}</strong>.
             </GcdsText>
             <GcdsText marginBottom="0">{pageContentJson["4"]}</GcdsText>

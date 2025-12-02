@@ -53,7 +53,10 @@ export default function ProfileUpdateName({
         {pageNameEditJson["6"]} <strong>{pageNameEditJson["7"]}</strong>
       </GcdsText>
 
-      <ServicesWithAccessInfoSection currentLang={language} />
+      <ServicesWithAccessInfoSection
+        currentLang={language}
+        information={"name"}
+      />
 
       <form id="form" style={{ marginTop: "38px" }} onSubmit={useSubmitHandler}>
         <GcdsContainer marginTop="100" marginBottom="0">

@@ -70,6 +70,7 @@ export default function EditLanguagePreferences({
       <GcdsGrid columns="1fr">
         <ServicesWithAccessInfoSection
           currentLang={languageFormData.languageCode}
+          information={"languagePreference"}
         />
       </GcdsGrid>
 

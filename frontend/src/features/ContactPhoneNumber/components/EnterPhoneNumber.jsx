@@ -21,23 +21,7 @@ import {
   FLOW_TYPES,
   PAGES,
 } from "../../../utils/constants.jsx";
-
-const ServicesAccessingPhoneNumber = ({ pageContentJson }) => {
-  return (
-    <GcdsDetails detailsTitle={pageContentJson["3"]}>
-      <GcdsText>{pageContentJson["4"]}</GcdsText>
-      <GcdsText>{pageContentJson["5"]}</GcdsText>
-      <GcdsText>{pageContentJson["6"]}</GcdsText>
-      <GcdsText>
-        {pageContentJson["7"]}{" "}
-        <GcdsLink href="https://accounts.gc.ca/directory">
-          {pageContentJson["8"]}
-        </GcdsLink>
-        .
-      </GcdsText>
-    </GcdsDetails>
-  );
-};
+import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx";
 
 const PageHeader = ({ language, pageContentJson }) => {
   return (
@@ -46,7 +30,10 @@ const PageHeader = ({ language, pageContentJson }) => {
         {pageContentJson["1"]}
       </GcdsHeading>
       <GcdsText>{pageContentJson["2"]}</GcdsText>
-      <ServicesAccessingPhoneNumber pageContentJson={pageContentJson} />
+      <ServicesWithAccessInfoSection
+        currentLang={language}
+        information={"contactPhoneNumber"}
+      />
     </>
   );
 };
