@@ -1,4 +1,6 @@
 import React from "react";
+import { useParams } from "react-router";
+
 import {
   GcdsContainer,
   GcdsHeading,
@@ -18,12 +20,11 @@ export default function ConfirmUpdate({
   errorMessage,
   localLoading,
 }) {
+  const { language } = useParams();
+
   if (!languageFormData?.languageCode) return null;
 
-  const pageContentJson = getPageContent(
-    languageFormData.languageCode,
-    PAGES.confirmLanguageUpdate,
-  );
+  const pageContentJson = getPageContent(language, PAGES.confirmLanguageUpdate);
 
   return (
     <GcdsContainer>
@@ -38,7 +39,7 @@ export default function ConfirmUpdate({
         {pageContentJson["2"]}{" "}
         <strong>
           {
-            LANGUAGE_DISPLAY_NAMES[languageFormData.languageCode][
+            LANGUAGE_DISPLAY_NAMES[language][
               languageFormData.updatedPreferredLanguage
             ]
           }
