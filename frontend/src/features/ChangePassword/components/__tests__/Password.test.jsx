@@ -148,19 +148,31 @@ vi.mock("../../../../utils/functions.jsx", () => ({
     };
     return mockContent[page] || {};
   }),
+  getContentWithVariables: vi.fn((content, variables = {}) => {
+    if (typeof content === "string") {
+      let result = content;
+      Object.keys(variables).forEach((key) => {
+        const regex = new RegExp(`{${key}}`, "g");
+        result = result.replace(regex, variables[key]);
+      });
+      return result;
+    }
+    return content || "";
+  }),
 }));
-
-const mockRequestPasswordPolicy = vi.fn();
-const mockTransientOtpSend = vi.fn();
-const mockTransientOtpVerify = vi.fn();
-const mockFinalStep = vi.fn();
 
 vi.mock("../../../../services/authService.jsx", () => ({
   authService: {
-    requestPasswordPolicy: (...args) => mockRequestPasswordPolicy(...args),
-    transientOtpSend: (...args) => mockTransientOtpSend(...args),
-    transientOtpVerify: (...args) => mockTransientOtpVerify(...args),
-    finalStep: (...args) => mockFinalStep(...args),
+    requestPasswordPolicy: vi.fn().mockResolvedValue({
+      success: true,
+      data: {
+        pwdMinLength: 12,
+        pwdMaxLength: 110,
+      },
+    }),
+    transientOtpSend: vi.fn(),
+    transientOtpVerify: vi.fn(),
+    finalStep: vi.fn(),
   },
 }));
 
@@ -215,8 +227,15 @@ describe("Password Component", () => {
     );
   };
 
-  beforeEach(() => {
+  let mockAuthService;
+
+  beforeEach(async () => {
     vi.clearAllMocks();
+    // Get reference to the mocked service
+    const { authService } = await import(
+      "../../../../services/authService.jsx"
+    );
+    mockAuthService = authService;
   });
 
   afterEach(() => {
@@ -241,7 +260,8 @@ describe("Password Component", () => {
       await waitFor(() => {
         expect(screen.getByText("Characters:")).toBeInTheDocument();
         expect(screen.getByText("0")).toBeInTheDocument();
-        expect(screen.getByText("12")).toBeInTheDocument();
+        // Check that the character counter shows the pattern: "/ 12 minimum"
+        expect(screen.getByText("/ 12", { exact: false })).toBeInTheDocument();
       });
     });
   });
@@ -402,12 +422,14 @@ describe("Password Component", () => {
       renderComponent();
 
       await waitFor(() => {
-        expect(mockRequestPasswordPolicy).toHaveBeenCalled();
+        expect(mockAuthService.requestPasswordPolicy).toHaveBeenCalled();
       });
     });
 
     it("handles policy loading errors gracefully", async () => {
-      mockRequestPasswordPolicy.mockRejectedValue(new Error("API Error"));
+      mockAuthService.requestPasswordPolicy.mockRejectedValue(
+        new Error("API Error"),
+      );
 
       const consoleSpy = vi
         .spyOn(console, "error")

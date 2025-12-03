@@ -1,21 +1,44 @@
 import { GcdsDetails, GcdsText, GcdsLink } from "@cdssnc/gcds-components-react";
-import { getPageContent } from "../../utils/functions.jsx";
+import {
+  getContentWithVariables,
+  getPageContent,
+} from "../../utils/functions.jsx";
 import { EXTERNAL_NAVIGATION_LINKS, PAGES } from "../../utils/constants.jsx";
 
-export default function ServicesWithAccessInfoSection({ currentLang }) {
+export default function ServicesWithAccessInfoSection({
+  currentLang,
+  information,
+}) {
   const pageContentJson = getPageContent(
     currentLang,
     PAGES.ServicesWithAccessInfo,
   );
+  const informationMap = {
+    name: pageContentJson["7"],
+    contactPhoneNumber: pageContentJson["8"],
+    languagePreference: pageContentJson["9"],
+  };
   return (
-    <GcdsDetails detailsTitle={pageContentJson["1"]}>
+    <GcdsDetails
+      detailsTitle={getContentWithVariables(pageContentJson["1"], {
+        information: informationMap[information],
+      })}
+    >
       <GcdsText>
-        <span>{pageContentJson["2"]}</span>
+        <span>
+          {getContentWithVariables(pageContentJson["2"], {
+            information: informationMap[information],
+          })}
+        </span>
       </GcdsText>
       <ul style={{ margin: 0 }}>
         <li>{pageContentJson["3"]}</li>
       </ul>
-      <GcdsText>{pageContentJson["4"]}</GcdsText>
+      <GcdsText>
+        {getContentWithVariables(pageContentJson["4"], {
+          information: informationMap[information],
+        })}
+      </GcdsText>
       <GcdsText>
         {pageContentJson["5"]}&nbsp;
         <GcdsLink href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}>

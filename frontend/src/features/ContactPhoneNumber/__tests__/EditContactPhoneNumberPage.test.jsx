@@ -113,7 +113,10 @@ vi.mock("../components/OtpVerification.jsx", () => ({
       <button data-testid="cancel-btn" onClick={onCancel}>
         Cancel
       </button>
-      <button data-testid="resend-btn" onClick={requestNewOtpCode}>
+      <button
+        data-testid="resend-btn"
+        onClick={() => requestNewOtpCode(phoneFormData?.otpType)}
+      >
         Resend
       </button>
     </div>

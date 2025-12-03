@@ -85,7 +85,7 @@ export default function EditContactPhoneNumberPage() {
     }));
   };
 
-  const sendOTP = async ({ reSendOtpCode = false } = {}) => {
+  const sendOTP = async ({ reSendOtpCode = false, otpType = null } = {}) => {
     try {
       if (!reSendOtpCode) {
         setLocalLoading(true);
@@ -95,7 +95,7 @@ export default function EditContactPhoneNumberPage() {
       const formdata = {
         phoneNumber: phoneFormData.phoneNumber,
         userName: userName,
-        otpType: serverMapping[phoneFormData.otpType],
+        otpType: serverMapping[otpType || phoneFormData.otpType],
       };
 
       const response = await authService.transientOtpSend(formdata);
@@ -210,7 +210,9 @@ export default function EditContactPhoneNumberPage() {
         onNext={verifyOtp}
         onCancel={handleBackToProfile}
         onBack={handleBackToEnterPhone}
-        requestNewOtpCode={() => sendOTP({ reSendOtpCode: true })}
+        requestNewOtpCode={(otpType) =>
+          sendOTP({ reSendOtpCode: true, otpType })
+        }
         setErrorCode={setErrorCode}
       />
     ),

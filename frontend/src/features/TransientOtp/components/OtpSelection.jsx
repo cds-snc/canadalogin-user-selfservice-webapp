@@ -114,7 +114,8 @@ export default function OtpSelection({
         <GcdsContainer>
           <GcdsHeading tag="h2">{pageContentJson["4"]}</GcdsHeading>
           <GcdsText>
-            {pageContentJson["5"]} {pageContentJson["6"]} {pageContentJson["7"]}
+            {pageContentJson["5"]} <strong>{pageContentJson["6"]}</strong>{" "}
+            {pageContentJson["7"]}
           </GcdsText>
         </GcdsContainer>
         {radioComponent}
@@ -153,7 +154,10 @@ export default function OtpSelection({
           </GcdsLink>
         </GcdsText>
         <GcdsText>
-          <GcdsLink href={gcHelpCentreLinks.cannotAccessPhone} target="_blank">
+          <GcdsLink
+            href={gcHelpCentreLinks.recover2StepVerification}
+            target="_blank"
+          >
             {pageContentJson["13"]}
           </GcdsLink>
         </GcdsText>

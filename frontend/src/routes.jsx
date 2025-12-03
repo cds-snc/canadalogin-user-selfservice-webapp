@@ -47,7 +47,7 @@ export const appRoutes = [
               },
               {
                 path: "profile",
-                handle: { id: PAGES.ProfileHome, breadcrumbId: "2" },
+                handle: { id: PAGES.ProfileHome, breadcrumbId: "1" },
                 children: [
                   {
                     index: true,

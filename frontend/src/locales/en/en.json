@@ -4,8 +4,8 @@
     "2": "Step 2 of 4",
     "3": "Create a password",
     "4": "Your password should be a phrase or series of words that only you can recognize. It must be",
-    "5": "at least",
-    "6": "characters. You can use multiple words separated by spaces to meet the character limit.",
+    "5": "at least {minPasswordLength} characters",
+    "6": "You can use multiple words separated by spaces to meet the character limit.",
     "7": "Password safety tips",
     "8": "The longer and more unusual the password, the harder it is to guess. So avoid using common phrases. Also avoid repeating passwords from other online accounts such as banks, email and social media. You don't need capitals, numbers or characters, though you're welcome to use them.",
     "9": "Password",
@@ -86,7 +86,8 @@
     "26": "Send the code again",
     "27": "Cancel",
     "28": "Set up text (SMS) verification instead",
-    "29": "Set up voice call verification instead"
+    "29": "Set up voice call verification instead",
+    "30": "I cannot access my phone"
   },
   "Button": {
     "submit": "Continue",
@@ -279,9 +280,9 @@
   },
   "ConfirmLanguageUpdate": {
     "1": "Are you sure you want to update your language preference?",
-    "2": "You’ve requested to update your language to:",
+    "2": "You’ve requested to update your language preference to:",
     "3": "Example Newname",
-    "4": "This will update your language with the following services:",
+    "4": "This will update your language preference with the following services: ",
     "5": "GEO.ca",
     "6": "Heads up",
     "7": "This ",
@@ -293,7 +294,7 @@
   "SuccessfullyUpdatedLanguage": {
     "0": "Success",
     "1": "Your language preference has been updated to",
-    "2": "You may need to update your language preferences in other places",
+    "2": "You may need to update your language preference in other places",
     "3": "This only changes your language preference with services connected to your GC Sign in.",
     "4": "If you are trying to update your language preference with a service that’s not connected to your GC Sign in, you’ll need to go to that account. ",
     "5": "To search for another GC Account, visit the ",
@@ -343,12 +344,15 @@
     "9": "Failed to sign you out. Redirecting..."
   },
   "ServicesWithAccessInfo": {
-    "1": "What services have access to your information",
-    "2": "The following services have access to your name through GC Sign in:",
+    "1": "What services have access to your {information}",
+    "2": "The following services have access to your {information} through GC Sign in:",
     "3": "GEO.ca",
-    "4": "If you are trying to update your name with a service that’s not connected to GC Sign in, you’ll need to go to that account.",
+    "4": "If you are trying to update your {information} with a service that’s not connected to GC Sign in, you’ll need to go to that account.",
     "5": "To search for another GC Account, visit the",
-    "6": "GC Account directory."
+    "6": "GC Account directory",
+    "7": "name",
+    "8": "contact phone number",
+    "9": "language preference"
   },
   "ConfirmContactPhoneNumberUpdate": {
     "1": "Are you sure you want to update your phone number?",
@@ -464,7 +468,6 @@
     "10": "Need help?",
     "11": "Loading...",
     "12": "Get help with 2-step verification",
-    "13": "I cannot access my phone",
     "14": "To add a phone number,",
     "15": "To delete this number,",
     "16": "How should we send you the code?"

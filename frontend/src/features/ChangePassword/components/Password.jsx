@@ -10,7 +10,10 @@ import {
   GcdsButton,
   GcdsHeading,
 } from "@cdssnc/gcds-components-react";
-import { getPageContent } from "../../../utils/functions.jsx";
+import {
+  getContentWithVariables,
+  getPageContent,
+} from "../../../utils/functions.jsx";
 import { authService } from "../../../services/authService.jsx";
 import { passwordUpdate } from "../api/passwordUpdate.jsx";
 
@@ -115,18 +118,24 @@ export default function Password({
         {pageContentJson["14"]}
       </GcdsHeading>
 
-      <>
-        <GcdsText>
-          <span>{pageContentJson["4"]}</span>{" "}
-          <strong>
-            <span>{pageContentJson["5"]}</span> {passwordPolicy.min}{" "}
-          </strong>{" "}
-          <span>{pageContentJson["6"]}</span>
-        </GcdsText>
-        <GcdsDetails detailsTitle={pageContentJson["7"]}>
-          <GcdsText>{pageContentJson["8"]}</GcdsText>
-        </GcdsDetails>
-      </>
+      <GcdsText>
+        <span>{pageContentJson["4"]}</span>{" "}
+        <strong>
+          <span>
+            {getContentWithVariables(pageContentJson["5"], {
+              minPasswordLength: passwordPolicy.min,
+            })}
+          </span>
+        </strong>
+        {". "}
+        <span>{pageContentJson["6"]}</span>
+      </GcdsText>
+      <GcdsDetails
+        detailsTitle={pageContentJson["7"]}
+        style={{ marginBottom: "1rem" }}
+      >
+        <GcdsText>{pageContentJson["8"]}</GcdsText>
+      </GcdsDetails>
 
       <GcdsContainer>
         <GcdsInput

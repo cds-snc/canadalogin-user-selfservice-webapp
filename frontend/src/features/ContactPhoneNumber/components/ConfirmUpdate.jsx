@@ -11,7 +11,6 @@ import {
   GcdsIcon,
 } from "@cdssnc/gcds-components-react";
 import { getPageContent } from "../../../utils/functions.jsx";
-import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx";
 import { PAGES } from "../../../utils/constants";
 
 export default function ConfirmUpdate({
@@ -53,9 +52,7 @@ export default function ConfirmUpdate({
           </ul>
         </GcdsText>
 
-        <ServicesWithAccessInfoSection currentLang={language} />
-
-        <GcdsNotice type="info" noticeTitleTag="h2" noticeTitle="Heads up">
+        <GcdsNotice type="info" noticeTitleTag="h2" noticeTitle=" ">
           <GcdsIcon name="warning" size="small" />
           <GcdsText>
             {pageContentJson["6"]} <strong>{pageContentJson["7"]}</strong>

@@ -72,7 +72,10 @@ export default function EditLanguagePreferences({
       <GcdsText>{pageContentJson["2"]}</GcdsText>
 
       <GcdsGrid columns="1fr">
-        <ServicesWithAccessInfoSection currentLang={language} />
+        <ServicesWithAccessInfoSection
+          currentLang={language}
+          information={"languagePreference"}
+        />
       </GcdsGrid>
 
       <form id="form" style={{ marginTop: "38px" }} onSubmit={onSubmitHandler}>

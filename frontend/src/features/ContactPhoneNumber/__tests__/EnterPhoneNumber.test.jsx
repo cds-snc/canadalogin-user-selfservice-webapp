@@ -159,9 +159,28 @@ vi.mock("../../../utils/functions.jsx", () => ({
         submit: "Continue",
         cancel: "Cancel",
       },
+      ServicesWithAccessInfo: {
+        1: "What services are accessing your {information}?",
+        2: "Your {information} helps us keep your account secure.",
+        3: "Test Service",
+        4: "Learn more about {information} access",
+        5: "Learn more about",
+        6: "which services access your contact information",
+        7: "name",
+        8: "contact phone number",
+        9: "language preference",
+      },
     };
     return mockContent[page] || {};
   },
+  getContentWithVariables: vi.fn((content, variables = {}) => {
+    if (!content) return "";
+    return Object.keys(variables).reduce(
+      (result, key) =>
+        result.replace(new RegExp(`{${key}}`, "g"), variables[key]),
+      content,
+    );
+  }),
 }));
 
 // Mock react-router
@@ -254,11 +273,12 @@ describe("EnterPhoneNumber Component", () => {
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
       "Enter your new phone number",
     );
-    expect(
-      screen.getByText(
-        "Your contact phone number helps us keep your account secure.",
-      ),
-    ).toBeInTheDocument();
+    // Use getAllByText to get all instances, then check the first one (main content)
+    const secureTexts = screen.getAllByText(
+      "Your contact phone number helps us keep your account secure.",
+    );
+    expect(secureTexts).toHaveLength(2); // One in main content, one in details
+    expect(secureTexts[0]).toBeInTheDocument();
   });
 
   it("renders the phone input with correct label", () => {
