@@ -1,5 +1,53 @@
 # Changelog
 
+## [1.7.1](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.7.0...v1.7.1) (2025-12-03)
+
+
+### Bug Fixes
+
+* **backend:** 906 bugbackend pkce code challenge ([#972](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/972)) ([649f503](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/649f503a2715b66565437d99a4d8b29e213ef0c6))
+* **backend:** 906 bugbackend pkce code challenge ([#978](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/978)) ([09724fd](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/09724fdb48fa29154665275562ba2dbe34779c97))
+* **backend:** additional logging ([#966](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/966)) ([13eab02](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/13eab02da763eb87589fc828977f2147a9c247b4))
+* **backend:** improve error handling in OTP sending process ([#977](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/977)) ([694ae3e](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/694ae3e43b0a4513727b75346f86b215ee354bb4))
+* **backend:** limit swagger docs to local development ([#957](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/957)) ([832097d](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/832097d661a86e4a3f8892df0d1240300cf85e1d))
+* **backend:** Log session requests to debug authentication issue ([#930](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/930)) ([7956362](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/79563622cc85d19acc83c4ac6a567434063245f3))
+* **backend:** Remove Profile Notification ([#974](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/974)) ([fd8f561](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/fd8f561fac57eb949ec158f378af41c887507789))
+* **frontend:** Display content based on language toggle ([#982](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/982)) ([cfd4025](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/cfd40258441b2129e503180e08841dae4baa752f))
+* **frontend:** Edit Language Preference success page Signout button now signs user out ([#928](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/928)) ([625458c](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/625458c49e5e65616c32601a0c08391d7389f7ea))
+* **frontend:** Edit name - Remove link to "Connected Services" after updating name ([#947](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/947)) ([b4fa188](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/b4fa18880bcad02d3b911232b61a63cf6bc71276))
+* **frontend:** improve storybook tests with better design standards ([#936](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/936)) ([80cce0a](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/80cce0af00ca6d26a00cd2c504e9162bf3934850))
+* **frontend:** Password Error Message ([#959](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/959)) ([6af36a7](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/6af36a73a4bdbc41b0ba95fb81374a8488712ac5))
+* **frontend:** Remove blank link for Password Recovery ([#945](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/945)) ([0c2ace0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/0c2ace0d3863b179302a14e9c71d5815d4e051b3))
+* **frontend:** update French translation for last password change date ([#943](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/943)) ([47889f8](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/47889f87f7ed4ba0c46a57af0fff951275ff14d7))
+* MFA phone number selected is now used, rather than defaulting to the first phone number ([27bd082](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/27bd0829ac49e8972672266191ebfd7eab878e51))
+* MFA phone number selected is now used, rather than defaulting to… ([#932](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/932)) ([27bd082](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/27bd0829ac49e8972672266191ebfd7eab878e51))
+* missing link for alternate MFA method setup in Add MFA Flow ([#921](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/921)) ([d0df229](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/d0df2294027ddc39990ed21b8b14d2e70d8fb841))
+* Update release-please to bump staging version, not test version ([#946](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/946)) ([c55a8db](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/c55a8dbe3220d300dd0d95910040ab873866447b))
+
+
+### Code Refactoring
+
+* **frontend:** edit name flow to follow design pattern in add mfa ([#955](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/955)) ([9421430](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/9421430773f643660113ee22e7b26987bbd74178))
+* **frontend:** Language Preference Components and Update Routing ([#961](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/961)) ([b5d0bfe](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/b5d0bfe3c2b627aef2306f406ccdbeccf5544e48))
+* **frontend:** remove unused components and update routes ([#976](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/976)) ([15061a0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/15061a03659265148ee55c7e100df0dac718f49b))
+
+
+### Tests
+
+* **backend:** Update logging ([#970](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/970)) ([e0d4283](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/e0d4283c4474c79fec1e2a01e65acb67eb883f27))
+
+
+### Miscellaneous Chores
+
+* **deps:** update all minor dependencies ([#922](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/922)) ([89a3e09](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/89a3e098786559ddae81dc4b0ca914a8ef94934a))
+* **deps:** update all patch dependencies ([#908](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/908)) ([8d7faac](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/8d7faac2b3152260bf9cc6af9a493882872d5da1))
+* **deps:** update github/codeql-action action to v3.31.2 ([#909](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/909)) ([acf49a8](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/acf49a8dcabdc340d85f98d3053837a1a8846d38))
+
+
+### Continuous Integration
+
+* bump staging version ([#925](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/925)) ([021a357](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/021a35799cf08e0ec37bce3befbe6610b7dadfdd))
+
 ## [1.7.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.6.0...v1.7.0) (2025-11-13)
 
 
