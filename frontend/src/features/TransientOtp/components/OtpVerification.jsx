@@ -197,7 +197,7 @@ export default function OtpVerification({
         )}
       </GcdsText>
       <GcdsText>
-        <GcdsLink href={gcHelpCentreLinks.cannotAccessPhone}>
+        <GcdsLink href={gcHelpCentreLinks.cannotAccessPhone} target="_blank">
           {pageContentJson["30"]}
         </GcdsLink>
       </GcdsText>
