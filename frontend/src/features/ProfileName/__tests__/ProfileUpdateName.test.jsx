@@ -48,7 +48,7 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
     />
   ),
   GcdsInput: ({ inputId, ...props }) => {
-    const { name, type, value, onChange, ...domProps } = props;
+    const { name, type, value, onChange, onKeyDown, ...domProps } = props;
     return (
       <input
         {...domProps}
@@ -57,6 +57,7 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
         type={type}
         value={value}
         onChange={onChange}
+        onKeyDown={onKeyDown}
         data-testid={props["data-testid"]}
       />
     );
@@ -358,6 +359,148 @@ describe("UpdateProfileName Component", () => {
 
     expect(firstNameInput).toHaveValue("John");
     expect(lastNameInput).toHaveValue("Doe");
+  });
+
+  it("prevents invalid characters in name inputs", () => {
+    render(
+      <TestWrapper>
+        <UpdateProfileName {...defaultProps} />
+      </TestWrapper>,
+    );
+
+    const firstNameInput = screen.getByTestId("givenName");
+    const lastNameInput = screen.getByTestId("familyName");
+
+    // Test invalid characters (numbers, special characters)
+    fireEvent.change(firstNameInput, {
+      target: { name: "givenName", value: "John123" },
+    });
+
+    // onNameFormChange should not be called for invalid input
+    expect(mockOnNameFormChange).not.toHaveBeenCalledWith(
+      "givenName",
+      "John123",
+    );
+
+    fireEvent.change(lastNameInput, {
+      target: { name: "familyName", value: "Doe@#$" },
+    });
+
+    // onNameFormChange should not be called for invalid input
+    expect(mockOnNameFormChange).not.toHaveBeenCalledWith(
+      "familyName",
+      "Doe@#$",
+    );
+  });
+
+  it("allows valid characters in name inputs", () => {
+    render(
+      <TestWrapper>
+        <UpdateProfileName {...defaultProps} />
+      </TestWrapper>,
+    );
+
+    const firstNameInput = screen.getByTestId("givenName");
+    const lastNameInput = screen.getByTestId("familyName");
+
+    // Test valid characters (letters, spaces, hyphens, apostrophes)
+    fireEvent.change(firstNameInput, {
+      target: { name: "givenName", value: "Jean-Pierre" },
+    });
+
+    expect(mockOnNameFormChange).toHaveBeenCalledWith(
+      "givenName",
+      "Jean-Pierre",
+    );
+
+    fireEvent.change(lastNameInput, {
+      target: { name: "familyName", value: "O'Connor" },
+    });
+
+    expect(mockOnNameFormChange).toHaveBeenCalledWith("familyName", "O'Connor");
+  });
+
+  it("allows international characters in name inputs", () => {
+    render(
+      <TestWrapper>
+        <UpdateProfileName {...defaultProps} />
+      </TestWrapper>,
+    );
+
+    const firstNameInput = screen.getByTestId("givenName");
+    const lastNameInput = screen.getByTestId("familyName");
+
+    // Test international characters
+    fireEvent.change(firstNameInput, {
+      target: { name: "givenName", value: "José" },
+    });
+
+    expect(mockOnNameFormChange).toHaveBeenCalledWith("givenName", "José");
+
+    fireEvent.change(lastNameInput, {
+      target: { name: "familyName", value: "Müller" },
+    });
+
+    expect(mockOnNameFormChange).toHaveBeenCalledWith("familyName", "Müller");
+  });
+
+  it("allows valid characters to be typed via keydown", () => {
+    render(
+      <TestWrapper>
+        <UpdateProfileName {...defaultProps} />
+      </TestWrapper>,
+    );
+
+    const firstNameInput = screen.getByTestId("givenName");
+
+    // Test valid characters being typed
+    const validKeyDownEvent = {
+      key: "a",
+      target: { name: "givenName" },
+      preventDefault: vi.fn(),
+    };
+
+    fireEvent.keyDown(firstNameInput, validKeyDownEvent);
+    expect(validKeyDownEvent.preventDefault).not.toHaveBeenCalled();
+
+    const validKeyDownEvent2 = {
+      key: "-",
+      target: { name: "givenName" },
+      preventDefault: vi.fn(),
+    };
+
+    fireEvent.keyDown(firstNameInput, validKeyDownEvent2);
+    expect(validKeyDownEvent2.preventDefault).not.toHaveBeenCalled();
+  });
+
+  it("allows control keys and special keys", () => {
+    render(
+      <TestWrapper>
+        <UpdateProfileName {...defaultProps} />
+      </TestWrapper>,
+    );
+
+    const firstNameInput = screen.getByTestId("givenName");
+
+    // Test control keys (should not be prevented)
+    const controlKeyEvent = {
+      key: "Backspace",
+      target: { name: "givenName" },
+      preventDefault: vi.fn(),
+    };
+
+    fireEvent.keyDown(firstNameInput, controlKeyEvent);
+    expect(controlKeyEvent.preventDefault).not.toHaveBeenCalled();
+
+    const ctrlKeyEvent = {
+      key: "v",
+      ctrlKey: true,
+      target: { name: "givenName" },
+      preventDefault: vi.fn(),
+    };
+
+    fireEvent.keyDown(firstNameInput, ctrlKeyEvent);
+    expect(ctrlKeyEvent.preventDefault).not.toHaveBeenCalled();
   });
 
   it("matches snapshot", () => {

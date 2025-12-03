@@ -25,8 +25,51 @@ export default function ProfileUpdateName({
   const { language } = useParams();
   const pageNameEditJson = getPageContent(language, PAGES.profileUpdateName);
 
+  const validateNameInput = (value) => {
+    // Allow alphabetical characters, spaces, hyphens, and apostrophes
+    // This regex allows Unicode letters to support international names
+    const nameRegex =
+      /^[a-zA-ZÀ-ÿĀ-žА-я\u0100-\u017F\u0180-\u024F\u1E00-\u1EFF\s'-]*$/;
+    return nameRegex.test(value);
+  };
+
+  const validateCharacter = (char) => {
+    // Check if a single character is valid for names
+    const charRegex =
+      /[a-zA-ZÀ-ÿĀ-žА-я\u0100-\u017F\u0180-\u024F\u1E00-\u1EFF\s'-]/;
+    return charRegex.test(char);
+  };
+
+  const handleKeyDown = (e) => {
+    const { name } = e.target;
+    const char = e.key;
+
+    // Only apply validation to name fields
+    if (name === "givenName" || name === "familyName") {
+      // Allow control keys (backspace, delete, tab, etc.)
+      if (e.ctrlKey || e.metaKey || char.length > 1) {
+        return;
+      }
+
+      // Prevent invalid characters from being typed
+      if (!validateCharacter(char)) {
+        e.preventDefault();
+      }
+    }
+  };
+
   const handleProfileChange = (e) => {
     const { name, value } = e.target;
+
+    // Additional validation as fallback
+    if (
+      (name === "givenName" || name === "familyName") &&
+      !validateNameInput(value)
+    ) {
+      // Prevent invalid characters from being entered
+      return;
+    }
+
     onNameFormChange(name, value);
     // Clear error when user starts typing
     if (setErrorCode) {
@@ -70,6 +113,8 @@ export default function ProfileUpdateName({
             lang={language}
             value={nameFormData.givenName}
             onChange={handleProfileChange}
+            onKeyDown={handleKeyDown}
+            pattern="[a-zA-ZÀ-ÿĀ-žА-я\u0100-\u017F\u0180-\u024F\u1E00-\u1EFF\s'-]*"
           />
           <GcdsInput
             inputId="familyName"
@@ -82,6 +127,8 @@ export default function ProfileUpdateName({
             required
             value={nameFormData.familyName}
             onChange={handleProfileChange}
+            onKeyDown={handleKeyDown}
+            pattern="[a-zA-ZÀ-ÿĀ-žА-я\u0100-\u017F\u0180-\u024F\u1E00-\u1EFF\s'-]*"
           />
         </GcdsContainer>
 
