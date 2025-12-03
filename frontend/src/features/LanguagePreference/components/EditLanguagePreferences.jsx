@@ -1,4 +1,6 @@
 import React from "react";
+import { useParams } from "react-router";
+
 import {
   GcdsContainer,
   GcdsHeading,
@@ -22,8 +24,10 @@ export default function EditLanguagePreferences({
   errorMessage,
   setErrorCode,
 }) {
+  const { language } = useParams();
+
   const pageContentJson = getPageContent(
-    languageFormData.languageCode,
+    language,
     PAGES.editLanguagePreferences,
   );
 
@@ -68,9 +72,7 @@ export default function EditLanguagePreferences({
       <GcdsText>{pageContentJson["2"]}</GcdsText>
 
       <GcdsGrid columns="1fr">
-        <ServicesWithAccessInfoSection
-          currentLang={languageFormData.languageCode}
-        />
+        <ServicesWithAccessInfoSection currentLang={language} />
       </GcdsGrid>
 
       <form id="form" style={{ marginTop: "38px" }} onSubmit={onSubmitHandler}>
@@ -79,7 +81,7 @@ export default function EditLanguagePreferences({
             name="radio"
             legend={pageContentJson["3"]}
             options={languageOptions}
-            lang={languageFormData.languageCode}
+            lang={language}
             onChange={handleProfileChange}
           />
         </GcdsContainer>
