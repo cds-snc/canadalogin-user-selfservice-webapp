@@ -42,7 +42,10 @@ async def third_step_update_password(
             completed_response = CompleteUpdatePasswordIbmApiResponse(**response_json)
         except ValidationError as validation_error:
             logger.warning("Invalid API response schema: %s", validation_error.errors())
-            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid API response schema")
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Invalid API response schema",
+            )
 
         # Revoke and invalidate the session here
 

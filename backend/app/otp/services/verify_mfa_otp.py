@@ -84,4 +84,7 @@ async def dispatch_verify_mfa_otp(
             exc_info=True,
         )
         # Don't expose server errors to client
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unable to verify MFA code")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Unable to verify MFA code",
+        )

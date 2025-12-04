@@ -135,4 +135,7 @@ async def dispatch_otp_enrollment(
             exc_info=True,
         )
         # Don't expose server errors to client
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unable to enroll MFA phone number")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Unable to enroll MFA phone number",
+        )

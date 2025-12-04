@@ -150,7 +150,10 @@ async def handle_otp_send(
 
         if http_client_response.status_code is None:
             logger.error("HTTP response status code is None")
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unknown error")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Unknown error",
+            )
 
         if http_client_response.status_code != 201:
             logger.error(
