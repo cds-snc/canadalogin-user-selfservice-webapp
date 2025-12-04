@@ -1,7 +1,7 @@
 import logging
 from typing import Dict
 
-from fastapi import HTTPException, status, Request, status
+from fastapi import HTTPException, status, Request
 from httpx import AsyncClient, Response
 
 from app.utils.access_token import get_admin_token, get_auth_request_headers
