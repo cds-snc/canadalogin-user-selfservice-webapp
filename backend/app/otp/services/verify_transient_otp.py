@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from httpx import AsyncClient
 
 from app.config import get_configuration
@@ -60,7 +60,7 @@ async def handle_otp_verification(
             exc_info=True,
         )
         raise HTTPException(
-            status_code=400,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"{user_verification_data.otpType} verification error: {str(e)}",
         )
 

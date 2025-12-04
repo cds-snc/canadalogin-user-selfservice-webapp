@@ -1,6 +1,6 @@
 import logging
 from pydantic import ValidationError
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from httpx import AsyncClient
 from app.utils.access_token import get_admin_token
 from app.config import get_configuration
@@ -21,7 +21,7 @@ async def dispatch_get_password_policy(global_http_client: AsyncClient):
         access_token = await get_admin_token(global_http_client)
         if not access_token:
             logger.error("Failed to get access token")
-            raise HTTPException(status_code=500, detail="Failed to get access token")
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to get access token")
         headers = get_auth_request_headers(access_token)
 
         settings = get_configuration()
@@ -55,7 +55,7 @@ async def get_password_policy(global_http_client: AsyncClient):
             validated_data = IBMVerifyPasswordPolicy(**response_json)
         except ValidationError as validation_error:
             logger.warning("Invalid API response schema: %s", validation_error.errors())
-            raise HTTPException(status_code=422, detail="Invalid API response schema")
+            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid API response schema")
 
         return ResponseModel(
             success=True,

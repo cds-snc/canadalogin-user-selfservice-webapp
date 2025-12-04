@@ -12,7 +12,7 @@ from app.users.schemas import (
     UserPhoneOTP,
 )
 from app.utils.schemas import ResponseModel
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from httpx import AsyncClient, Response
 
 profile_import_path = "app.otp.services.delete_mfa_otp.get_my_profile"
@@ -232,7 +232,7 @@ async def test_handle_otp_deletion_last_factor_protection(monkeypatch):
         with pytest.raises(HTTPException) as exc_info:
             await handle_otp_deletion(client, deletion_request, "fake-token")
 
-        assert exc_info.value.status_code == 409
+        assert exc_info.value.status_code == status.HTTP_409_CONFLICT
         assert "Cannot delete last remaining MFA factor" in str(exc_info.value.detail)
 
 
@@ -352,7 +352,7 @@ async def test_handle_otp_deletion_exception(monkeypatch):
         with pytest.raises(HTTPException) as exc_info:
             await handle_otp_deletion(client, deletion_request, "fake-token")
 
-        assert exc_info.value.status_code == 500
+        assert exc_info.value.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
         # Generic error message for security (don't expose server errors)
         assert "Unable to delete MFA phone number" in str(exc_info.value.detail)
 
@@ -468,7 +468,7 @@ async def test_dispatch_otp_deletion_unsupported_type():
     with pytest.raises(HTTPException) as exc_info:
         await dispatch_otp_deletion(mock_client, deletion_request)
 
-    assert exc_info.value.status_code == 500
+    assert exc_info.value.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
     assert "Unable to delete MFA phone number" in str(exc_info.value.detail)
 
 
@@ -568,5 +568,5 @@ async def test_dispatch_otp_deletion_generic_exception(monkeypatch):
     with pytest.raises(HTTPException) as exc_info:
         await dispatch_otp_deletion(mock_client, deletion_request)
 
-    assert exc_info.value.status_code == 500
+    assert exc_info.value.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
     assert "Unable to delete MFA phone number" in str(exc_info.value.detail)

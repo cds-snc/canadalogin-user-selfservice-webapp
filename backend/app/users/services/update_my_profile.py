@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import HTTPException, Request
+from fastapi import HTTPException, Request, status
 from httpx import Response
 from pydantic import ValidationError
 
@@ -106,7 +106,8 @@ async def update_my_profile(
     if not username_match:
         logger.error("User mismatch - cannot update profile")
         raise HTTPException(
-            status_code=403, detail="User mismatch - cannot update profile"
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User mismatch - cannot update profile",
         )
 
     # Prevent changing the userName
@@ -118,7 +119,10 @@ async def update_my_profile(
         validate_merged_profile = IBMVerifyUpdateUserProfile(**merged_profile)
     except ValidationError as e:
         logger.error(f"Merged Profile Validation Error: {e.json()}")
-        raise HTTPException(status_code=422, detail="Request data validation error")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Request data validation error",
+        )
 
     user_profile_payload = validate_merged_profile.model_dump_json(
         by_alias=True, exclude_none=True
@@ -131,7 +135,10 @@ async def update_my_profile(
         json_data = response.json()
     except Exception as e:
         logger.error(f"Failed to parse profile response: {str(e)}")
-        raise HTTPException(status_code=422, detail="Request data validation error")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Request data validation error",
+        )
 
     json_data["phoneNumbers"] = mask_contact_phone_numbers(json_data)
 
@@ -139,7 +146,10 @@ async def update_my_profile(
         response_data = IBMVerifyUserProfileSchema(**json_data)
     except ValidationError as e:
         logger.error(f"Profile Validation Error: {e.json()}")
-        raise HTTPException(status_code=422, detail="Request data validation error")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Request data validation error",
+        )
 
     return ProfileResponse(
         success=True,

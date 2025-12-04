@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from httpx import AsyncClient
 from pydantic import ValidationError
 
@@ -52,7 +52,7 @@ async def first_step_update_password(
             validated_data = UpdatePasswordIbmApiResponse(**response_json)
         except ValidationError as validation_error:
             logger.warning("Invalid API response schema: %s", validation_error.errors())
-            raise HTTPException(status_code=422, detail="Invalid response")
+            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid response")
 
         client_data = UpdatePasswordClientResponsePayload(
             trxId=validated_data.trxId,

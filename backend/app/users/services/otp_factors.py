@@ -13,7 +13,7 @@ from app.users.services.get_my_profile import get_my_profile
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.mask_phone_number import mask_phone_number
 from app.utils.request_error_handler import RequestErrorHandler
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from httpx import AsyncClient
 from pydantic import ValidationError
 
@@ -27,11 +27,17 @@ async def parse_phone_auth_factors_response(
     factors = data.factors
     if not factors:
         logger.warning("No OTP factors found for user")
-        raise HTTPException(status_code=404, detail="No OTP factors found for user")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No OTP factors found for user",
+        )
     first_factor = factors[0]
     if not first_factor:
         logger.warning("No OTP factors found for user")
-        raise HTTPException(status_code=404, detail="No OTP factors found for user")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No OTP factors found for user",
+        )
 
     phone_factors = []
     ALLOWED_TYPES = {OtpType.SMSOTP.value, OtpType.VOICEOTP.value}
@@ -53,7 +59,10 @@ async def parse_phone_auth_factors_response(
 
     if not phone_factors:
         logger.warning("No OTP factors found for user")
-        raise HTTPException(status_code=404, detail="No OTP factors found for user")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No OTP factors found for user",
+        )
 
     return phone_factors
 
@@ -66,11 +75,17 @@ async def parse_phone_auth_factors_response_unmasked(
     factors = data.factors
     if not factors:
         logger.warning("No OTP factors found for user")
-        raise HTTPException(status_code=404, detail="No OTP factors found for user")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No OTP factors found for user",
+        )
     first_factor = factors[0]
     if not first_factor:
         logger.warning("No OTP factors found for user")
-        raise HTTPException(status_code=404, detail="No OTP factors found for user")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No OTP factors found for user",
+        )
 
     phone_factors = []
     ALLOWED_TYPES = {OtpType.SMSOTP.value, OtpType.VOICEOTP.value}
@@ -91,7 +106,10 @@ async def parse_phone_auth_factors_response_unmasked(
 
     if not phone_factors:
         logger.warning("No OTP factors found for user")
-        raise HTTPException(status_code=404, detail="No OTP factors found for user")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No OTP factors found for user",
+        )
 
     return phone_factors
 
@@ -165,7 +183,10 @@ async def get_user_otp_factors_unmasked(
             validated_data = UserAuthFactorsIbmResponse(**user_otp_factors_response)
         except ValidationError as validation_error:
             logger.warning("Invalid API response schema: %s", validation_error.errors())
-            raise HTTPException(status_code=422, detail="Invalid response")
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Invalid response",
+            )
 
         phone_number_otp_factors = await parse_phone_auth_factors_response_unmasked(
             validated_data
@@ -216,7 +237,10 @@ async def get_user_otp_factors(
                     logger.warning(
                         "Invalid API response schema: %s", validation_error.errors()
                     )
-                    raise HTTPException(status_code=422, detail="Invalid response")
+                    raise HTTPException(
+                        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                        detail="Invalid response",
+                    )
 
                 phone_number_otp_factor = await parse_phone_auth_factors_response(
                     validated_data
@@ -234,10 +258,14 @@ async def get_user_otp_factors(
                     f"user_id and user profile id dont match. user_profile_id = {user_profile_id}. user_profile.data.id = {user_profile.data.id}"
                 )
                 raise HTTPException(
-                    status_code=404, detail="No OTP factors found for user"
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="No OTP factors found for user",
                 )
         else:
-            raise HTTPException(status_code=404, detail="No OTP factors found for user")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="No OTP factors found for user",
+            )
 
     except Exception as e:
         logger.error(f"Error getting user auth factors: {str(e)}", exc_info=True)
