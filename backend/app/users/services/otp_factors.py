@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from typing import Optional
 
 from app.config import get_configuration
 from app.password.schemas import OtpType
@@ -96,7 +97,9 @@ async def parse_phone_auth_factors_response_unmasked(
 
 
 async def dispatch_user_auth_factors(
-    global_http_client: AsyncClient, user_profile_id: str, validated: bool | None = True
+    global_http_client: AsyncClient,
+    user_profile_id: str,
+    validated: Optional[bool] = True,
 ):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
@@ -183,7 +186,7 @@ async def get_user_otp_factors(
     global_http_client: AsyncClient,
     user_id: str,
     user_access_token: str,
-    validated: bool | None = True,
+    validated: Optional[bool] = True,
 ):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""

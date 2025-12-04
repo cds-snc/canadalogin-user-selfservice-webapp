@@ -86,6 +86,9 @@ async def handle_otp_deletion(
                 success=False, data=None, message="Unable to delete MFA phone number"
             )
 
+    except HTTPException:
+        # Re-raise HTTPException as-is (like 409 Conflict)
+        raise
     except Exception as e:
         logger.error(
             f"{deletion_request.otpType} OTP deletion error: {str(e)}",

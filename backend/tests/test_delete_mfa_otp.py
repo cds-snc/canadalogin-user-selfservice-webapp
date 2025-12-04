@@ -67,7 +67,7 @@ async def test_handle_otp_deletion_sms_success(monkeypatch):
         )
 
     # Mock get_user_otp_factors to return multiple factors (so deletion is allowed)
-    async def mock_get_user_otp_factors(client, user_id, token):
+    async def mock_get_user_otp_factors(client, user_id, token, validated=True):
         return create_mock_user_factors(num_factors=2)
 
     # Mock dispatch_otp_deletion to return successful response
@@ -130,7 +130,7 @@ async def test_handle_otp_deletion_voice_success(monkeypatch):
         )
 
     # Mock get_user_otp_factors to return multiple factors (so deletion is allowed)
-    async def mock_get_user_otp_factors(client, user_id, token):
+    async def mock_get_user_otp_factors(client, user_id, token, validated=True):
         return create_mock_user_factors(num_factors=2)
 
     # Mock dispatch_otp_deletion to return successful response
@@ -217,7 +217,7 @@ async def test_handle_otp_deletion_last_factor_protection(monkeypatch):
         )
 
     # Mock get_user_otp_factors to return only ONE factor (should prevent deletion)
-    async def mock_get_user_otp_factors(client, user_id, token):
+    async def mock_get_user_otp_factors(client, user_id, token, validated=True):
         return create_mock_user_factors(num_factors=1)
 
     monkeypatch.setattr(profile_import_path, mock_my_profile)
@@ -229,11 +229,11 @@ async def test_handle_otp_deletion_last_factor_protection(monkeypatch):
     deletion_request = OtpDeletionRequest(id="factor123", otpType=OtpType.SMS)
 
     async with AsyncClient(base_url="http://localhost") as client:
-        result = await handle_otp_deletion(client, deletion_request, "fake-token")
+        with pytest.raises(HTTPException) as exc_info:
+            await handle_otp_deletion(client, deletion_request, "fake-token")
 
-        assert isinstance(result, ResponseModel)
-        assert result.success is False
-        assert result.message == "Cannot delete last remaining MFA factor"
+        assert exc_info.value.status_code == 409
+        assert "Cannot delete last remaining MFA factor" in str(exc_info.value.detail)
 
 
 @pytest.mark.asyncio
@@ -268,7 +268,7 @@ async def test_handle_otp_deletion_unexpected_status(monkeypatch):
         )
 
     # Mock get_user_otp_factors to return multiple factors
-    async def mock_get_user_otp_factors(client, user_id, token):
+    async def mock_get_user_otp_factors(client, user_id, token, validated=True):
         return create_mock_user_factors(num_factors=2)
 
     # Mock dispatch_otp_deletion to return unexpected status
@@ -329,7 +329,7 @@ async def test_handle_otp_deletion_exception(monkeypatch):
         )
 
     # Mock get_user_otp_factors to return multiple factors
-    async def mock_get_user_otp_factors(client, user_id, token):
+    async def mock_get_user_otp_factors(client, user_id, token, validated=True):
         return create_mock_user_factors(num_factors=2)
 
     # Mock dispatch_otp_deletion to raise an exception
