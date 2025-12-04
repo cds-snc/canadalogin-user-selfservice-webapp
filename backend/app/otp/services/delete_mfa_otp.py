@@ -51,15 +51,15 @@ async def handle_otp_deletion(
         )
 
         # Check if user has multiple factors before allowing deletion
+        # Check all factors (validated and unvalidated) to prevent deletion of last remaining factor
         user_factors_response = await get_user_otp_factors(
-            global_http_client, user_id, user_access_token
+            global_http_client, user_id, user_access_token, validated=None
         )
         if not user_factors_response.success or len(user_factors_response.data) <= 1:
             logger.warning(f"User {user_id} cannot delete last remaining MFA factor")
-            return ResponseModel(
-                success=False,
-                data=None,
-                message="Cannot delete last remaining MFA factor",
+            raise HTTPException(
+                status_code=409,  # Conflict - business rule prevents this action
+                detail="Cannot delete last remaining MFA factor",
             )
 
         http_client_response = await dispatch_otp_deletion(

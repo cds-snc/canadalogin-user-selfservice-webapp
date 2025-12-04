@@ -96,7 +96,7 @@ async def parse_phone_auth_factors_response_unmasked(
 
 
 async def dispatch_user_auth_factors(
-    global_http_client: AsyncClient, user_profile_id: str, validated: bool = True
+    global_http_client: AsyncClient, user_profile_id: str, validated: bool | None = True
 ):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
@@ -110,10 +110,14 @@ async def dispatch_user_auth_factors(
 
         # Combine all search parameters into a single 'search' parameter, URL-encoded following the specs of IBM Verify docs
         # https://docs.verify.ibm.com/verify/reference/listfactorenrollments_20
-        validated_str = "true" if validated else "false"
-        search_value = (
-            f'userId="{user_profile_id}"&enabled=true&validated={validated_str}'
-        )
+        if validated is None:
+            # Get all factors regardless of validation status
+            search_value = f'userId="{user_profile_id}"&enabled=true'
+        else:
+            validated_str = "true" if validated else "false"
+            search_value = (
+                f'userId="{user_profile_id}"&enabled=true&validated={validated_str}'
+            )
         search_params = {"search": search_value}
         logger.info(
             f"get user auth factors, userid: {user_profile_id}, validated: {validated}"
@@ -179,7 +183,7 @@ async def get_user_otp_factors(
     global_http_client: AsyncClient,
     user_id: str,
     user_access_token: str,
-    validated: bool = True,
+    validated: bool | None = True,
 ):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
