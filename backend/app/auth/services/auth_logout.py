@@ -1,5 +1,5 @@
 import logging
-from fastapi import Request, HTTPException
+from fastapi import Request, HTTPException, status
 from urllib.parse import urlencode
 from authlib.jose import jwt
 from authlib.jose.errors import JoseError
@@ -194,10 +194,13 @@ async def backchannel_logout(request: Request):
         )
     except ValueError as ve:
         logger.error(f"Value error during backchannel logout: {ve}")
-        raise HTTPException(status_code=400, detail=str(ve)) from ve
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(ve)
+        ) from ve
     except Exception:
         logger.exception("Unexpected error during backchannel logout")
         # IBM Verify expects a 400 response for any error during backchannel logout
         raise HTTPException(
-            status_code=400, detail="Internal error during backchannel logout"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Internal error during backchannel logout",
         )

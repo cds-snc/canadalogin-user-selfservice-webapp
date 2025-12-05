@@ -11,7 +11,7 @@ from app.utils.helpers import (
 )
 from app.utils.request_error_handler import RequestErrorHandler
 from app.utils.schemas import ResponseModel
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from httpx import AsyncClient, HTTPStatusError
 from pydantic import ValidationError
 
@@ -85,7 +85,7 @@ async def handle_otp_enrollment(
             exc_info=True,
         )
         raise HTTPException(
-            status_code=500,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Unable to enroll MFA phone number",
         )
 
@@ -135,4 +135,7 @@ async def dispatch_otp_enrollment(
             exc_info=True,
         )
         # Don't expose server errors to client
-        raise HTTPException(status_code=500, detail="Unable to enroll MFA phone number")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Unable to enroll MFA phone number",
+        )

@@ -8,7 +8,7 @@ from app.users.services.get_my_profile import get_my_profile
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.request_error_handler import RequestErrorHandler
 from app.utils.schemas import ResponseModel
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from httpx import AsyncClient, HTTPStatusError
 
 logger = logging.getLogger(__name__)
@@ -51,15 +51,15 @@ async def handle_otp_deletion(
         )
 
         # Check if user has multiple factors before allowing deletion
+        # Check all factors (validated and unvalidated) to prevent deletion of last remaining factor
         user_factors_response = await get_user_otp_factors(
-            global_http_client, user_id, user_access_token
+            global_http_client, user_id, user_access_token, validated=None
         )
         if not user_factors_response.success or len(user_factors_response.data) <= 1:
             logger.warning(f"User {user_id} cannot delete last remaining MFA factor")
-            return ResponseModel(
-                success=False,
-                data=None,
-                message="Cannot delete last remaining MFA factor",
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Cannot delete last remaining MFA factor",
             )
 
         http_client_response = await dispatch_otp_deletion(
@@ -86,13 +86,16 @@ async def handle_otp_deletion(
                 success=False, data=None, message="Unable to delete MFA phone number"
             )
 
+    except HTTPException:
+        # Re-raise HTTPException as-is (like 409 Conflict)
+        raise
     except Exception as e:
         logger.error(
             f"{deletion_request.otpType} OTP deletion error: {str(e)}",
             exc_info=True,
         )
         raise HTTPException(
-            status_code=500,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Unable to delete MFA phone number",
         )
 
@@ -131,4 +134,7 @@ async def dispatch_otp_deletion(
             exc_info=True,
         )
         # Don't expose server errors to client
-        raise HTTPException(status_code=500, detail="Unable to delete MFA phone number")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Unable to delete MFA phone number",
+        )

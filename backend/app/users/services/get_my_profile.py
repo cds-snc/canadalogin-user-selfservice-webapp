@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from pydantic import ValidationError
 from httpx import AsyncClient
 
@@ -83,7 +83,10 @@ async def get_my_profile(
         response_data = IBMVerifyUserProfileSchema(**profile_data)
     except ValidationError as e:
         logger.error(f"Profile Validation Error: {e.json()}")
-        raise HTTPException(status_code=422, detail="Request data validation error")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Request data validation error",
+        )
     return ProfileResponse(
         success=True,
         message="User profile retrieved successfully.",

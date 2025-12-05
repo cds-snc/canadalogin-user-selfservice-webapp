@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from httpx import AsyncClient
 from pydantic import ValidationError
 
@@ -58,7 +58,7 @@ async def handle_otp_status_retrieval(
 
     except Exception as e:
         raise HTTPException(
-            status_code=405,
+            status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
             detail=f"Verify transient {retrieval_data.otpType} error: {str(e)}",
         )
 

@@ -1,7 +1,7 @@
 import logging
 import threading
 from datetime import datetime
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from httpx import AsyncClient
 from app.config import get_configuration
 from app.utils.request_error_handler import RequestErrorHandler
@@ -59,13 +59,18 @@ async def get_admin_token(global_http_client: AsyncClient) -> str:
                 response.status_code,
                 response.text,
             )
-            raise HTTPException(status_code=400, detail="Server Error")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Server Error"
+            )
         return access_token
     except Exception as e:
         if isinstance(e, HTTPException):
             raise
         logger.error("Unexpected error getting token", exc_info=True)
-        raise HTTPException(status_code=500, detail="Unexpected server error") from e
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Unexpected server error",
+        ) from e
 
 
 def get_auth_request_headers(

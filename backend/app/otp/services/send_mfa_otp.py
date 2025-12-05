@@ -1,5 +1,5 @@
 from app.config import get_configuration
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from app.otp.schemas import (
     OtpType,
     OtpVerificationCreateRequest,
@@ -59,7 +59,8 @@ async def dispatch_send_mfa_otp(
         )
         # Don't expose server errors to client
         raise HTTPException(
-            status_code=500, detail="Unable to send MFA verification code"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Unable to send MFA verification code",
         )
 
 

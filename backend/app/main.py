@@ -5,7 +5,7 @@ import logging
 import json
 from contextlib import asynccontextmanager
 
-from fastapi import HTTPException, Request
+from fastapi import HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -209,7 +209,9 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         error_message = error["msg"]
         logger.error(f"Validation error: {error_message} at " + str(request.url))
         break
-    return generate_error_response(status_code=400, message=error_message)
+    return generate_error_response(
+        status_code=status.HTTP_400_BAD_REQUEST, message=error_message
+    )
 
 
 @app.exception_handler(HTTPException)
@@ -226,7 +228,7 @@ async def oauth_error_handler(request: Request, exc: OAuthError):
     logger.error("OAuth exception handler error: %s", exc)
     if "application/json" in request.headers.get("accept", ""):
         return JSONResponse(
-            status_code=401,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             content={"detail": "Invalid or expired token"},
         )
     return await redirect_user_to_idp_verify(request)

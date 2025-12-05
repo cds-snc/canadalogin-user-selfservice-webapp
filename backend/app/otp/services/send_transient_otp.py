@@ -14,7 +14,7 @@ from app.utils.helpers import (
 )
 from app.utils.schemas import ResponseModel
 from app.utils.request_error_handler import RequestErrorHandler
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from httpx import AsyncClient, HTTPStatusError
 from pydantic import ValidationError
 
@@ -82,7 +82,7 @@ async def resolve_masked_phone_number(
         # If no match found, raise an error
         logger.error(f"Could not resolve masked phone number ending in {masked_last_4}")
         raise HTTPException(
-            status_code=400,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"No matching phone factor found for number ending in {masked_last_4}",
         )
 
@@ -150,7 +150,10 @@ async def handle_otp_send(
 
         if http_client_response.status_code is None:
             logger.error("HTTP response status code is None")
-            raise HTTPException(status_code=500, detail="Unknown error")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Unknown error",
+            )
 
         if http_client_response.status_code != 201:
             logger.error(

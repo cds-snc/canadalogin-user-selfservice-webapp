@@ -9,7 +9,7 @@ from app.users.services.get_my_profile import get_my_profile
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.request_error_handler import RequestErrorHandler
 from app.utils.schemas import ResponseModel
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from httpx import AsyncClient, HTTPStatusError
 
 logger = logging.getLogger(__name__)
@@ -84,4 +84,7 @@ async def dispatch_verify_mfa_otp(
             exc_info=True,
         )
         # Don't expose server errors to client
-        raise HTTPException(status_code=500, detail="Unable to verify MFA code")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Unable to verify MFA code",
+        )
