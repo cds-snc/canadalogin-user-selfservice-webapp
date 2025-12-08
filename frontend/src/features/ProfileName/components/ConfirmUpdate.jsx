@@ -13,7 +13,7 @@ import { useParams } from "react-router";
 import { getPageContent } from "../../../utils/functions.jsx";
 import { PAGES } from "../../../utils/constants.jsx";
 import Loader from "../../../components/Layout/Loading";
-import { useUser } from "../../../components/Providers/useUser.js";
+import RPNameDisplay from "../../../components/RPInfo/RPNameDisplay.jsx";
 
 const ErrorMessage = ({ errorMessage }) => {
   return (
@@ -44,15 +44,6 @@ export default function ConfirmUpdate({
 
   const formattedName = nameFormData?.formatted;
 
-  const { state } = useUser();
-
-  const rp = state.relyingPartyInfo
-    ? {
-        name: state.relyingPartyInfo.linkName,
-        url: state.relyingPartyInfo.url,
-      }
-    : null;
-
   if (!nameFormData?.formatted) return null;
 
   return localLoading ? (
@@ -69,7 +60,9 @@ export default function ConfirmUpdate({
             </GcdsText>
             <GcdsText marginBottom="0">{pageContentJson["4"]}</GcdsText>
             <ul>
-              <li>{rp?.name ?? pageContentJson["5"]}</li>
+              <li>
+                <RPNameDisplay rpName={pageContentJson["5"]} />
+              </li>
             </ul>
           </div>
 
