@@ -16,7 +16,6 @@ from starsessions.stores.redis import RedisStore
 
 from app.config import get_configuration
 from app.utils.helpers import generate_error_response
-from app.auth.services.auth import redirect_user_to_idp_verify
 from app.constants.redis_keys import RedisKeys
 
 from .routers import health
