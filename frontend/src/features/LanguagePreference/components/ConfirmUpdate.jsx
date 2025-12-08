@@ -12,6 +12,7 @@ import {
 
 import { getPageContent } from "../../../utils/functions.jsx";
 import { PAGES, LANGUAGE_DISPLAY_NAMES } from "../../../utils/constants.jsx";
+import { useUser } from "../../../components/Providers/useUser.js";
 
 export default function ConfirmUpdate({
   languageFormData,
@@ -21,10 +22,18 @@ export default function ConfirmUpdate({
   localLoading,
 }) {
   const { language } = useParams();
+  const { state } = useUser();
 
   if (!languageFormData?.languageCode) return null;
 
   const pageContentJson = getPageContent(language, PAGES.confirmLanguageUpdate);
+
+  const rp = state.relyingPartyInfo
+    ? {
+        name: state.relyingPartyInfo.linkName,
+        url: state.relyingPartyInfo.url,
+      }
+    : null;
 
   return (
     <GcdsContainer>
@@ -48,7 +57,7 @@ export default function ConfirmUpdate({
       </GcdsText>
       <GcdsText>{pageContentJson["4"]}</GcdsText>
       <ul>
-        <li>{pageContentJson["5"]}</li>
+        <li>{rp?.name ?? pageContentJson["5"]}</li>
       </ul>
 
       <GcdsGrid columns="max-content max-content" gap="200">

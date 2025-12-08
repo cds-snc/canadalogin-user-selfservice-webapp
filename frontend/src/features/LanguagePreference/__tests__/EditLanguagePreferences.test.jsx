@@ -166,6 +166,12 @@ describe("EditLanguagePreferences Component", () => {
         userProfile: {
           preferredLanguage,
         },
+        relyingPartyInfo: {
+          icon: "test-icon.png",
+          id: "test-service-id",
+          linkName: "Test Service",
+          url: "https://test-service.example.com",
+        },
       },
     });
 
@@ -355,6 +361,12 @@ describe("EditLanguagePreferences Component", () => {
       useUser.mockReturnValue({
         state: {
           userProfile: null,
+          relyingPartyInfo: {
+            icon: "test-icon.png",
+            id: "test-service-id",
+            linkName: "Test Service",
+            url: "https://test-service.example.com",
+          },
         },
       });
 
@@ -382,6 +394,12 @@ describe("EditLanguagePreferences Component", () => {
           userProfile: {
             preferredLanguage: undefined,
           },
+          relyingPartyInfo: {
+            icon: "test-icon.png",
+            id: "test-service-id",
+            linkName: "Test Service",
+            url: "https://test-service.example.com",
+          },
         },
       });
 
@@ -408,6 +426,12 @@ describe("EditLanguagePreferences Component", () => {
         state: {
           userProfile: {
             preferredLanguage: "en-ca",
+          },
+          relyingPartyInfo: {
+            icon: "test-icon.png",
+            id: "test-service-id",
+            linkName: "Test Service",
+            url: "https://test-service.example.com",
           },
         },
       });

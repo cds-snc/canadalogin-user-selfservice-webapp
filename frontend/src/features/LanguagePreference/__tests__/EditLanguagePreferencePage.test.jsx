@@ -49,6 +49,12 @@ describe("EditLanguagePreferencePage Container", () => {
           preferredLanguage: "en-ca",
           userName: "test-user",
         },
+        relyingPartyInfo: {
+          icon: "test-icon.png",
+          id: "test-service-id",
+          linkName: "Test Service",
+          url: "https://test-service.example.com",
+        },
       },
       dispatch: vi.fn(),
     });

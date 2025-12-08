@@ -4,6 +4,7 @@ import {
   getPageContent,
 } from "../../utils/functions.jsx";
 import { EXTERNAL_NAVIGATION_LINKS, PAGES } from "../../utils/constants.jsx";
+import { useUser } from "../Providers/useUser.js";
 
 export default function ServicesWithAccessInfoSection({
   currentLang,
@@ -18,6 +19,14 @@ export default function ServicesWithAccessInfoSection({
     contactPhoneNumber: pageContentJson["8"],
     languagePreference: pageContentJson["9"],
   };
+  const { state } = useUser();
+
+  const rp = state.relyingPartyInfo
+    ? {
+        name: state.relyingPartyInfo.linkName,
+        url: state.relyingPartyInfo.url,
+      }
+    : null;
   return (
     <GcdsDetails
       detailsTitle={getContentWithVariables(pageContentJson["1"], {
@@ -32,7 +41,7 @@ export default function ServicesWithAccessInfoSection({
         </span>
       </GcdsText>
       <ul style={{ margin: 0 }}>
-        <li>{pageContentJson["3"]}</li>
+        <li>{rp?.name ?? pageContentJson["3"]}</li>
       </ul>
       <GcdsText>
         {getContentWithVariables(pageContentJson["4"], {

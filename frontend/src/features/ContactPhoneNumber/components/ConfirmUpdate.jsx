@@ -12,6 +12,7 @@ import {
 } from "@cdssnc/gcds-components-react";
 import { getPageContent } from "../../../utils/functions.jsx";
 import { PAGES } from "../../../utils/constants";
+import { useUser } from "../../../components/Providers/useUser.js";
 
 export default function ConfirmUpdate({
   onNext,
@@ -26,6 +27,15 @@ export default function ConfirmUpdate({
     language,
     PAGES.confirmContactPhoneNumberUpdate,
   );
+
+  const { state } = useUser();
+
+  const rp = state.relyingPartyInfo
+    ? {
+        name: state.relyingPartyInfo.linkName,
+        url: state.relyingPartyInfo.url,
+      }
+    : null;
 
   return (
     <GcdsContainer>
@@ -48,7 +58,7 @@ export default function ConfirmUpdate({
         <GcdsText>
           {pageContentJson["4"]}
           <ul>
-            <li>{pageContentJson["5"]}</li>
+            <li>{rp?.name ?? pageContentJson["5"]}</li>
           </ul>
         </GcdsText>
 
