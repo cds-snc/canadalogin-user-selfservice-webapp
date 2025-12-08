@@ -63,6 +63,7 @@ async def introspect_user_token(
 
 
 def set_rp_client_id_in_session(request: Request) -> None:
+    logger.info("Set RP info in session if exists")
     if SessionKeys.RP_CLIENT_ID_KEY.value in request.query_params:
         rp_client_id = request.query_params[SessionKeys.RP_CLIENT_ID_KEY.value]
         request.session[SessionKeys.RP_CLIENT_ID_KEY.value] = rp_client_id
@@ -75,26 +76,31 @@ async def get_users_current_session(request: Request):
     The user access token is stored in memory on the server
     Authlib docs - https://docs.authlib.org/en/latest/client/fastapi.html
     """
+    logger.info("Get Users Current Session")
 
     set_rp_client_id_in_session(request)
 
     user_access_token = request.session.get(
         SessionKeys.SESSION_USER_ACCESS_TOKEN_KEY.value
     )
-    logger.info("Get Users Session")
+    logger.info("Check if Users Current Session has access token")
 
     if not user_access_token:
-        logger.info("Not authenticated - no user access token found")
+        logger.info("Not authenticated - no user access token found in session")
         raise OAuthError("user access token not found")
     logger.info("Access Token found in session")
     http_client = await get_http_client(request)
+    logger.info("introspect user token")
     validate_user_token_response = await introspect_user_token(
         http_client, user_access_token
     )
     data = validate_user_token_response
+    logger.info("validate user token response received")
     if not data.get("active"):
+        logger.info("User access token is not active, clearing session")
         request.session.clear()
-        raise OAuthError("Invalid or expired token")
+        raise OAuthError("Introspect token was Invalid or expired token")
+    logger.info("User access token is active")
     return user_access_token
 
 

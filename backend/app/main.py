@@ -225,13 +225,12 @@ async def custom_http_exception_handler(request: Request, exc: HTTPException):
 @app.exception_handler(OAuthError)
 async def oauth_error_handler(request: Request, exc: OAuthError):
     """Catch OAuth errors and redirect user to IdP login."""
-    logger.error("OAuth exception handler error: %s", exc)
-    if "application/json" in request.headers.get("accept", ""):
-        return JSONResponse(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            content={"detail": "Invalid or expired token"},
-        )
-    return await redirect_user_to_idp_verify(request)
+    logger.error("Oauth Exception Error Handler: %s", exc)
+    logger.info("Return 401 JSON response")
+    return JSONResponse(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        content={"detail": "Invalid or expired token"},
+    )
 
 
 def log_request_response(
