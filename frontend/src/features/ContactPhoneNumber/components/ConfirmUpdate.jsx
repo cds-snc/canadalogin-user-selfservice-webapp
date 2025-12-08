@@ -12,6 +12,7 @@ import {
 } from "@cdssnc/gcds-components-react";
 import { getPageContent } from "../../../utils/functions.jsx";
 import { PAGES } from "../../../utils/constants";
+import RPNameDisplay from "../../../components/RPInfo/RPNameDisplay.jsx";
 
 export default function ConfirmUpdate({
   onNext,
@@ -48,7 +49,9 @@ export default function ConfirmUpdate({
         <GcdsText>
           {pageContentJson["4"]}
           <ul>
-            <li>{pageContentJson["5"]}</li>
+            <li>
+              <RPNameDisplay rpName={pageContentJson["5"]} />
+            </li>
           </ul>
         </GcdsText>
 

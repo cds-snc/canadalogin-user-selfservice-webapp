@@ -12,6 +12,7 @@ import {
 
 import { getPageContent } from "../../../utils/functions.jsx";
 import { PAGES, LANGUAGE_DISPLAY_NAMES } from "../../../utils/constants.jsx";
+import RPNameDisplay from "../../../components/RPInfo/RPNameDisplay.jsx";
 
 export default function ConfirmUpdate({
   languageFormData,
@@ -48,7 +49,9 @@ export default function ConfirmUpdate({
       </GcdsText>
       <GcdsText>{pageContentJson["4"]}</GcdsText>
       <ul>
-        <li>{pageContentJson["5"]}</li>
+        <li>
+          <RPNameDisplay rpName={pageContentJson["5"]} />
+        </li>
       </ul>
 
       <GcdsGrid columns="max-content max-content" gap="200">

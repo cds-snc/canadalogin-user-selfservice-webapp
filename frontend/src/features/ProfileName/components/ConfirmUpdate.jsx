@@ -13,6 +13,7 @@ import { useParams } from "react-router";
 import { getPageContent } from "../../../utils/functions.jsx";
 import { PAGES } from "../../../utils/constants.jsx";
 import Loader from "../../../components/Layout/Loading";
+import RPNameDisplay from "../../../components/RPInfo/RPNameDisplay.jsx";
 
 const ErrorMessage = ({ errorMessage }) => {
   return (
@@ -59,7 +60,9 @@ export default function ConfirmUpdate({
             </GcdsText>
             <GcdsText marginBottom="0">{pageContentJson["4"]}</GcdsText>
             <ul>
-              <li>{pageContentJson["5"]}</li>
+              <li>
+                <RPNameDisplay rpName={pageContentJson["5"]} />
+              </li>
             </ul>
           </div>
 
