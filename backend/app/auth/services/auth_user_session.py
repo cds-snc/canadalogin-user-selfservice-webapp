@@ -95,7 +95,7 @@ async def get_users_current_session(request: Request):
         http_client, user_access_token
     )
     data = validate_user_token_response
-    logger.info("validate user token response received")
+    logger.info("introspect response received - check active status")
     if not data.get("active"):
         logger.info("User access token is not active, clearing session")
         request.session.clear()
