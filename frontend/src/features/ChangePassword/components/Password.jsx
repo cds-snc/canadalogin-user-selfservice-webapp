@@ -113,7 +113,7 @@ export default function Password({
   ];
 
   return (
-    <GcdsContainer>
+    <GcdsContainer role="main">
       <GcdsHeading tag="h1" lang={language}>
         {pageContentJson["14"]}
       </GcdsHeading>

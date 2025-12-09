@@ -79,7 +79,7 @@ export default function OtpVerification({
 
   const userMfaType = userSelectedMfaFactor?.type;
   return (
-    <GcdsContainer>
+    <GcdsContainer role="main">
       <GcdsContainer>
         <GcdsHeading tag="h1" lang={language}>
           {userMfaType === FLOW_TYPES.email
@@ -164,6 +164,7 @@ export default function OtpVerification({
 
       <GcdsText>
         <GcdsLink
+          role="button"
           onGcdsClick={() => {
             onBack();
           }}
@@ -183,6 +184,7 @@ export default function OtpVerification({
           </span>
         ) : (
           <GcdsLink
+            role="button"
             onGcdsClick={() => {
               requestOtpCode();
               setTime(initialTime);
