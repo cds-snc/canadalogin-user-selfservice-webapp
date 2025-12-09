@@ -1,5 +1,36 @@
 # Changelog
 
+## [1.8.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.7.1...v1.8.0) (2025-12-09)
+
+
+### Features
+
+* **frontend:** integrate relying party information into various components and tests ([#1005](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1005)) ([af49140](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/af49140acbed22d50e2488e143fd5b2fcf20d8ab))
+
+
+### Bug Fixes
+
+* **backend:** prevent deletion of last remaining MFA factor and update validation logic ([#993](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/993)) ([a707dd2](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/a707dd2fad2994153ed148c56d2b3b41ad449d28))
+* **frontend:** enhance name input validation ([#986](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/986)) ([ec2e813](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/ec2e813246843b15fee70ffc65c14376dd143d0d))
+* **frontend:** manage app figma alignment passthrough ([#983](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/983)) ([65dffc4](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/65dffc412e730bcf1ca83f40a20d8d27266a2468))
+
+
+### Tests
+
+* **backend:** add additional logging for pkce code verifier and user session issue ([#1007](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1007)) ([31893c1](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/31893c1ff7c2aab73d12f5e479021943abe471f5))
+
+
+### Miscellaneous Chores
+
+* **deps:** update all non-major github action dependencies ([#949](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/949)) ([77747df](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/77747df3724ad6ac4d3aab13d9519a41aa56c9c1))
+* **deps:** update all patch dependencies ([#950](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/950)) ([d028900](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/d028900491acc2918040e1ded1982864038a2035))
+
+
+### Continuous Integration
+
+* Publish v.1.7.1 ([#981](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/981)) ([d2da479](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/d2da479bf97e6ea4564142df95d375acd164eaca))
+* release 1.8.0 ([#1009](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1009)) ([6d2ebc5](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/6d2ebc5fc470b51507e31fb27656222be19f8a89))
+
 ## [1.7.1](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.7.0...v1.7.1) (2025-12-03)
 
 
