@@ -57,7 +57,7 @@ export default function SuccessfullyUpdated({
   if (!languageFormData?.languageCode) return null;
 
   return (
-    <GcdsContainer>
+    <GcdsContainer role="main">
       <GcdsText>
         {" "}
         <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle=" ">

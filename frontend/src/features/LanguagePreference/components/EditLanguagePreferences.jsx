@@ -61,7 +61,7 @@ export default function EditLanguagePreferences({
   };
 
   return (
-    <GcdsContainer>
+    <GcdsContainer role="main">
       {errorMessage && (
         <GcdsErrorMessage messageId="message-props">
           {errorMessage}
