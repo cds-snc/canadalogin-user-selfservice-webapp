@@ -29,7 +29,7 @@ export default function ConfirmUpdate({
   );
 
   return (
-    <GcdsContainer>
+    <GcdsContainer role="main">
       {errorMessage && (
         <GcdsErrorMessage messageId="message-props">
           {errorMessage}
