@@ -22,7 +22,7 @@ export default function SuccessfullyUpdated({
     PAGES.successfullyUpdatedContactPhoneNumber,
   );
   return (
-    <GcdsContainer>
+    <GcdsContainer role="main">
       <GcdsGrid columns="1">
         <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle=" ">
           <GcdsText>

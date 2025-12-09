@@ -106,7 +106,7 @@ export default function OtpVerification({
   const userMfaType = phoneFormData.otpType;
 
   return (
-    <GcdsContainer>
+    <GcdsContainer role="main">
       {codeRequested && (
         <GcdsNotice
           type="success"
@@ -173,6 +173,7 @@ export default function OtpVerification({
 
       <GcdsText>
         <GcdsLink
+          role="button"
           onGcdsClick={() => {
             const newOtpType =
               userMfaType === FLOW_TYPES.sms
@@ -200,6 +201,7 @@ export default function OtpVerification({
           </span>
         ) : (
           <GcdsLink
+            role="button"
             onGcdsClick={() => {
               requestNewCode();
             }}
@@ -213,6 +215,7 @@ export default function OtpVerification({
 
       <GcdsText>
         <GcdsLink
+          role="button"
           onGcdsClick={() => {
             clearValues();
             onBack();

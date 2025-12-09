@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router";
 import { isValidPhoneNumber } from "libphonenumber-js";
 import PhoneInput from "react-phone-input-2";
@@ -121,8 +121,40 @@ export default function EnterPhoneNumber({
     return validatedPhoneNumber;
   };
 
+  // Add accessibility attributes to phone input components after mount
+  useEffect(() => {
+    const addAccessibilityAttributes = () => {
+      const countryList = document.querySelector(
+        '.country-list[role="listbox"]',
+      );
+      if (countryList && !countryList.getAttribute("aria-label")) {
+        countryList.setAttribute("aria-label", "Countries List");
+      }
+    };
+
+    // Create a MutationObserver to watch for the dropdown being added to DOM
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === "childList") {
+          addAccessibilityAttributes();
+        }
+      });
+    });
+
+    // Start observing changes to document body
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+
+    // Also run immediately in case the dropdown is already rendered
+    addAccessibilityAttributes();
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <GcdsContainer>
+    <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="500">
         <section>
           <PageHeader language={language} pageContentJson={pageContentJson} />
