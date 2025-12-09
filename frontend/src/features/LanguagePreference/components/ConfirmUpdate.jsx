@@ -28,7 +28,7 @@ export default function ConfirmUpdate({
   const pageContentJson = getPageContent(language, PAGES.confirmLanguageUpdate);
 
   return (
-    <GcdsContainer>
+    <GcdsContainer role="main">
       {errorMessage && (
         <GcdsErrorMessage messageId="message-props">
           {errorMessage}
