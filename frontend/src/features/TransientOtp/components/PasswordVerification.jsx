@@ -46,7 +46,7 @@ export default function PasswordVerification({
   ];
 
   return (
-    <GcdsContainer>
+    <GcdsContainer role="main">
       <GcdsContainer className="gcds-gap">
         <GcdsHeading tag="h1" lang={language}>
           {pageContentJson["1"]}
