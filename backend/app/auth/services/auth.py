@@ -69,7 +69,13 @@ async def redirect_user_to_idp_verify(request: Request):
 
         # manually generate a code_verifier, make sure PKCE is used
         code_verifier = generate_token(48)  # Generate a secure random code verifier
-        response = await oauth.verify.authorize_redirect(
+        oidc_client = oauth.verify
+        if oidc_client is None:
+            raise Exception("OAuth client 'verify' is not registered")
+        # reset client kwargs to ensure PKCE and scopes are set
+        oidc_client.client_kwargs["code_challenge_method"] = "S256"
+        oidc_client.client_kwargs["scope"] = "openid email profile phone"
+        response = await oidc_client.authorize_redirect(
             request, callback_redirect_uri, code_verifier=code_verifier
         )
         # After the redirect to the login page, request.session should have a code_verifier
@@ -166,7 +172,13 @@ async def reauthenticate_user(request: Request, returnToPage: str = "/"):
         max_age_in_seconds = 900
         # manually generate a code_verifier, make sure PKCE is used
         code_verifier = generate_token(48)  # Generate a secure random code verifier
-        return await oauth.verify.authorize_redirect(
+        oidc_client = oauth.verify
+        if oidc_client is None:
+            raise Exception("OAuth client 'verify' is not registered")
+        # reset client kwargs to ensure PKCE and scopes are set
+        oidc_client.client_kwargs["code_challenge_method"] = "S256"
+        oidc_client.client_kwargs["scope"] = "openid email profile phone"
+        return await oidc_client.authorize_redirect(
             request,
             callback_redirect_uri,
             code_verifier=code_verifier,
