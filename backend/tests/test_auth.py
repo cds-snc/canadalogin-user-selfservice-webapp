@@ -108,6 +108,11 @@ class FakeVerifyClient:
             transport=transport, base_url="https://idp.example"
         )
         self.last_authorize_redirect_kwargs = {}
+        # Add client_kwargs to support code that sets PKCE and scope
+        self.client_kwargs = {
+            "code_challenge_method": "S256",
+            "scope": "openid email profile phone",
+        }
 
     async def authorize_redirect(self, request: Request, redirect_uri: str, **kwargs):
         # Record kwargs (e.g., max_age) so tests can assert
@@ -139,6 +144,11 @@ class RaisingVerifyClient(FakeVerifyClient):
         self._client = None
         self.exc = exc
         self.last_authorize_redirect_kwargs = {}
+        # Add client_kwargs to support code that sets PKCE and scope
+        self.client_kwargs = {
+            "code_challenge_method": "S256",
+            "scope": "openid email profile phone",
+        }
 
     async def authorize_access_token(self, request: Request):
         raise self.exc
