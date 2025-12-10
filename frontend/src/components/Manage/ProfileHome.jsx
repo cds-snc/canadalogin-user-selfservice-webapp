@@ -37,7 +37,7 @@ export default function ProfileHome() {
   const phoneNumbers = state?.userProfile?.phoneNumbers || [];
 
   return (
-    <GcdsContainer>
+    <GcdsContainer role="main">
       <GcdsHeading tag="h1">{pageContent["1"]}</GcdsHeading>
       <GcdsHeading tag="h2">{pageContent["2"]}</GcdsHeading>
 
