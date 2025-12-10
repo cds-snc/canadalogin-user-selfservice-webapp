@@ -54,7 +54,7 @@ export default function SuccessfullyUpdated({ nameFormData, onBackToProfile }) {
     }
   };
   return (
-    <GcdsContainer>
+    <GcdsContainer role="main">
       <GcdsText>
         {" "}
         <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle=" ">

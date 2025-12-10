@@ -83,7 +83,7 @@ export default function ProfileUpdateName({
   };
 
   return (
-    <GcdsContainer>
+    <GcdsContainer role="main">
       {errorMessage && (
         <GcdsErrorMessage messageId="message-props">
           {errorMessage}

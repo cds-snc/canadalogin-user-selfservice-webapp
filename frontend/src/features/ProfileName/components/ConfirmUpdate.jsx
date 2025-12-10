@@ -51,7 +51,7 @@ export default function ConfirmUpdate({
   ) : (
     <>
       <ErrorMessage errorMessage={errorMessage} />
-      <GcdsContainer>
+      <GcdsContainer role="main">
         <GcdsGrid columns="1" gap="300">
           <GcdsHeading tag="h1">{pageContentJson["1"]}</GcdsHeading>
           <div>
