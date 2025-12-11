@@ -10,6 +10,7 @@ import { useParams } from "react-router";
 import { PAGES } from "../../../../utils/constants";
 import { getPageContent } from "../../../../utils/functions";
 import { path } from "../../../../utils/routeHelpers";
+import { useEnterKeySubmit } from "../../../../utils/enterKeyHandler";
 
 export default function DeleteMFAPhoneNumberConfirm({
   onNext,
@@ -22,8 +23,15 @@ export default function DeleteMFAPhoneNumberConfirm({
     language,
     PAGES.deleteMFAPhoneNumberConfirm,
   );
+
+  const onSubmitHandler = async (ev) => {
+    ev.preventDefault();
+    await onNext();
+  };
+
+  const handleKeyDown = useEnterKeySubmit(onSubmitHandler);
   return (
-    <GcdsContainer>
+    <GcdsContainer role="main" onKeyDown={handleKeyDown}>
       <GcdsGrid columns="1" gap="500">
         <GcdsContainer>
           <GcdsHeading tag="h1" lang={language}>
@@ -46,10 +54,7 @@ export default function DeleteMFAPhoneNumberConfirm({
         <GcdsButton
           buttonRole="danger"
           style={{ width: "fit-content" }}
-          onGcdsClick={async (ev) => {
-            ev.preventDefault();
-            await onNext();
-          }}
+          onGcdsClick={onSubmitHandler}
         >
           {pageContentJson["9"]}
         </GcdsButton>

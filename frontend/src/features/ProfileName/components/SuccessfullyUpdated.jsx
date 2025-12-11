@@ -15,6 +15,8 @@ import { EXTERNAL_NAVIGATION_LINKS, PAGES } from "../../../utils/constants.jsx";
 import { useUser } from "../../../components/Providers/useUser.tsx";
 import { authService } from "../../../services/authService.jsx";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
+import { useEnterKeySubmit } from "../../../utils/enterKeyHandler.jsx";
+import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 
 export default function SuccessfullyUpdated({ nameFormData, onBackToProfile }) {
   const { language } = useParams();
@@ -53,8 +55,15 @@ export default function SuccessfullyUpdated({ nameFormData, onBackToProfile }) {
       }, 2000);
     }
   };
+
+  const onSubmitHandler = async (ev) => {
+    ev.preventDefault();
+    await onBackToProfile();
+  };
+
+  const handleEnterKeyDown = useEnterKeySubmit(onSubmitHandler);
   return (
-    <GcdsContainer>
+    <GcdsContainer role="main" onKeyDown={handleEnterKeyDown}>
       <GcdsText>
         {" "}
         <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle=" ">
@@ -75,15 +84,12 @@ export default function SuccessfullyUpdated({ nameFormData, onBackToProfile }) {
         </GcdsLink>
       </GcdsText>
       <GcdsGrid columns="max-content max-content" gap="200">
-        <GcdsButton
+        <SubmitButton
           style={{ width: "fit-content" }}
-          onGcdsClick={(ev) => {
-            ev.preventDefault();
-            onBackToProfile();
-          }}
+          onGcdsClick={onSubmitHandler}
         >
           {pageContentJson["6"]}
-        </GcdsButton>
+        </SubmitButton>
         &nbsp;
         <GcdsButton
           buttonRole="secondary"

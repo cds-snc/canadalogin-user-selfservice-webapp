@@ -11,8 +11,10 @@ import { useParams } from "react-router";
 
 import { getPageContent } from "../../../utils/functions.jsx";
 import { gcHelpCentreLinks } from "../../../utils/gcHelpCentreLinks.jsx";
+import { useEnterKeySubmit } from "../../../utils/enterKeyHandler";
 
 import { FLOW_TYPES, PAGES } from "../../../utils/constants.jsx";
+import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 
 export default function OtpSelection({
   onNext,
@@ -26,7 +28,14 @@ export default function OtpSelection({
 
   const pageContentJson = getPageContent(language, PAGES.transientOtpSelection);
 
-  const { submit, cancel } = getPageContent(language, "Button");
+  const { cancel } = getPageContent(language, "Button");
+
+  const onSubmitHandler = async (ev) => {
+    ev.preventDefault();
+    await onNext();
+  };
+
+  const handleKeyDown = useEnterKeySubmit(onSubmitHandler);
 
   const configureRadioSMSOptions = () => {
     let radioOptionsValues = [];
@@ -99,7 +108,7 @@ export default function OtpSelection({
     );
 
   return (
-    <GcdsContainer role="main">
+    <GcdsContainer role="main" onKeyDown={handleKeyDown}>
       <GcdsContainer className="gcds-gap">
         <GcdsHeading tag="h1" lang={language}>
           {pageContentJson["1"]}
@@ -120,15 +129,11 @@ export default function OtpSelection({
         </GcdsContainer>
         {radioComponent}
         <GcdsGrid columns="max-content max-content" gap="200">
-          <GcdsButton
+          <SubmitButton
             style={{ width: "fit-content" }}
-            onGcdsClick={(ev) => {
-              ev.preventDefault();
-              onNext();
-            }}
-          >
-            {submit}
-          </GcdsButton>
+            onGcdsClick={onSubmitHandler}
+            currentLang={language}
+          ></SubmitButton>
 
           <GcdsButton
             buttonRole="secondary"

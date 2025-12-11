@@ -16,6 +16,8 @@ import { path } from "../../../utils/routeHelpers.js";
 import { useParams } from "react-router";
 import { FLOW_TYPES, PAGES } from "../../../utils/constants.jsx";
 import { gcHelpCentreLinks } from "../../../utils/gcHelpCentreLinks.jsx";
+import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
+import { useEnterKeySubmit } from "../../../utils/enterKeyHandler.jsx";
 
 const initialTime = 10;
 
@@ -38,7 +40,7 @@ export default function OtpVerification({
   });
   const [time, setTime] = useState(initialTime);
   const pageContentJson = getPageContent(language, PAGES.verification);
-  const { submit, cancel } = getPageContent(language, "Button");
+  const { cancel } = getPageContent(language, "Button");
 
   const { id } = userProfile ?? {};
   const didFetch = useRef(false);
@@ -47,6 +49,21 @@ export default function OtpVerification({
     const value = e.target.value;
     setUserOtpValue(value);
   };
+
+  const onSubmitHandler = async (ev) => {
+    ev.preventDefault();
+    setErrorCode(""); // Clear any previous errors
+    try {
+      await validateOtpCode(userOtpValue);
+    } catch (error) {
+      // Handle validation errors
+      if (error?.data?.message) {
+        setErrorCode(error.data.message);
+      }
+    }
+  };
+
+  const handleKeyDown = useEnterKeySubmit(onSubmitHandler);
 
   useEffect(() => {
     if (time <= 0) return;
@@ -79,7 +96,7 @@ export default function OtpVerification({
 
   const userMfaType = userSelectedMfaFactor?.type;
   return (
-    <GcdsContainer role="main">
+    <GcdsContainer role="main" onKeyDown={handleKeyDown}>
       <GcdsContainer>
         <GcdsHeading tag="h1" lang={language}>
           {userMfaType === FLOW_TYPES.email
@@ -129,24 +146,12 @@ export default function OtpVerification({
         ></GcdsInput>
 
         <GcdsGrid columns="max-content max-content" gap="200">
-          <GcdsButton
+          <SubmitButton
             disabled={userOtpValue.length < 6}
             style={{ width: "fit-content" }}
-            onGcdsClick={async (ev) => {
-              ev.preventDefault();
-              setErrorCode(""); // Clear any previous errors
-              try {
-                await validateOtpCode(userOtpValue);
-              } catch (error) {
-                // Handle validation errors
-                if (error?.data?.message) {
-                  setErrorCode(error.data.message);
-                }
-              }
-            }}
-          >
-            {submit}
-          </GcdsButton>
+            onGcdsClick={onSubmitHandler}
+            currentLang={language}
+          ></SubmitButton>
 
           <GcdsButton
             buttonRole="secondary"

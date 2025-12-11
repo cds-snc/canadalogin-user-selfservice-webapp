@@ -2,7 +2,9 @@
 
 exports[`UpdateProfileName Component > matches snapshot 1`] = `
 <div>
-  <div>
+  <div
+    role="main"
+  >
     <h1
       tag="h1"
     >
@@ -27,53 +29,48 @@ exports[`UpdateProfileName Component > matches snapshot 1`] = `
         </li>
       </ul>
     </div>
-    <form
-      id="form"
-      style="margin-top: 38px;"
+    <div
+      style="margin-top: 1.5rem;"
     >
-      <div
-        style="margin-bottom: 0px;"
+      <input
+        data-testid="givenName"
+        id="givenName"
+        label="First name"
+        lang="en"
+        name="givenName"
+        pattern="[a-zA-ZÀ-ÿĀ-žА-я\\u0100-\\u017F\\u0180-\\u024F\\u1E00-\\u1EFF\\s'-]*"
+        type="text"
+        validateon="other"
+        value=""
+      />
+      <input
+        data-testid="familyName"
+        id="familyName"
+        label="Last name"
+        lang="en"
+        name="familyName"
+        pattern="[a-zA-ZÀ-ÿĀ-žА-я\\u0100-\\u017F\\u0180-\\u024F\\u1E00-\\u1EFF\\s'-]*"
+        required=""
+        type="text"
+        validateon="other"
+        value=""
+      />
+    </div>
+    <div
+      columns="max-content max-content"
+      gap="200"
+    >
+      <button
+        type="submit"
       >
-        <input
-          data-testid="givenName"
-          id="givenName"
-          label="First name"
-          lang="en"
-          name="givenName"
-          pattern="[a-zA-ZÀ-ÿĀ-žА-я\\u0100-\\u017F\\u0180-\\u024F\\u1E00-\\u1EFF\\s'-]*"
-          type="text"
-          validateon="other"
-          value=""
-        />
-        <input
-          data-testid="familyName"
-          id="familyName"
-          label="Last name"
-          lang="en"
-          name="familyName"
-          pattern="[a-zA-ZÀ-ÿĀ-žА-я\\u0100-\\u017F\\u0180-\\u024F\\u1E00-\\u1EFF\\s'-]*"
-          required=""
-          type="text"
-          validateon="other"
-          value=""
-        />
-      </div>
-      <div
-        columns="max-content max-content"
-        gap="200"
+        Continue
+      </button>
+      <button
+        data-button-role="secondary"
       >
-        <button
-          type="submit"
-        >
-          Continue
-        </button>
-        <button
-          data-button-role="secondary"
-        >
-          Cancel
-        </button>
-      </div>
-    </form>
+        Cancel
+      </button>
+    </div>
   </div>
 </div>
 `;

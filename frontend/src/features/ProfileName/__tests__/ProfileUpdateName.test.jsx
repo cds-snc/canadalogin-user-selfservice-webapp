@@ -289,8 +289,8 @@ describe("UpdateProfileName Component", () => {
       </TestWrapper>,
     );
 
-    const form = document.getElementById("form");
-    fireEvent.submit(form);
+    const submitButton = screen.getByRole("button", { name: /continue/i });
+    fireEvent.click(submitButton);
 
     expect(mockOnNext).toHaveBeenCalledTimes(1);
   });

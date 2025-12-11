@@ -38,6 +38,7 @@ export default function EditProfileNamePage() {
     familyName: "",
     formatted: "",
   });
+  console.log(nameFormData);
 
   const loaderPageContentJson = getPageContent(language, PAGES.otpSelection);
   const errorPageJson = getPageContent(language, PAGES.error);

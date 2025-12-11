@@ -15,6 +15,8 @@ import { getPageContent } from "../../../utils/functions.jsx";
 
 import { FLOW_TYPES, PAGES } from "../../../utils/constants.jsx";
 import { useParams } from "react-router";
+import { useEnterKeySubmit } from "../../../utils/enterKeyHandler.jsx";
+import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 
 const initialTime = 10;
 
@@ -66,7 +68,7 @@ export default function OtpVerification({
   const [codeRequested, setCodeRequested] = useState(false);
   const [time, setTime] = useState(initialTime);
   const pageContentJson = getPageContent(language, PAGES.verification);
-  const { submit, cancel } = getPageContent(language, "Button");
+  const { cancel } = getPageContent(language, "Button");
 
   const clearValues = () => {
     onChangePhoneForm("phoneNumber", "");
@@ -93,6 +95,13 @@ export default function OtpVerification({
     }
   };
 
+  const onSubmitHandler = async (ev) => {
+    ev.preventDefault();
+    onNext();
+  };
+
+  const handleKeyDown = useEnterKeySubmit(onSubmitHandler);
+
   useEffect(() => {
     if (time <= 0) return;
 
@@ -106,7 +115,7 @@ export default function OtpVerification({
   const userMfaType = phoneFormData.otpType;
 
   return (
-    <GcdsContainer role="main">
+    <GcdsContainer role="main" onKeyDown={handleKeyDown}>
       {codeRequested && (
         <GcdsNotice
           type="success"
@@ -146,16 +155,12 @@ export default function OtpVerification({
         ></GcdsInput>
 
         <GcdsGrid columns="max-content max-content" gap="200">
-          <GcdsButton
+          <SubmitButton
             disabled={phoneFormData.otp.length < 6}
             style={{ width: "fit-content" }}
-            onGcdsClick={(ev) => {
-              ev.preventDefault();
-              onNext();
-            }}
-          >
-            {submit}
-          </GcdsButton>
+            onGcdsClick={onSubmitHandler}
+            currentLang={language}
+          ></SubmitButton>
 
           <GcdsButton
             buttonRole="secondary"

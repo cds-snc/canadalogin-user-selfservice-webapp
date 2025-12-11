@@ -10,6 +10,8 @@ import {
 import { useParams } from "react-router";
 import { FLOW_TYPES, PAGES } from "../../../../utils/constants";
 import { getPageContent } from "../../../../utils/functions";
+import { useEnterKeySubmit } from "../../../../utils/enterKeyHandler";
+import SubmitButton from "../../../../components/Layout/SubmitButton";
 
 export default function AddSecondMFA({
   phoneFormData,
@@ -24,8 +26,15 @@ export default function AddSecondMFA({
       : PAGES.addSecondMFAVoiceCall,
   );
 
+  const onSubmitHandler = async (ev) => {
+    ev.preventDefault();
+    await onAddSecondMFA();
+  };
+
+  const handleKeyDown = useEnterKeySubmit(onSubmitHandler);
+
   return (
-    <GcdsContainer>
+    <GcdsContainer role="main" onKeyDown={handleKeyDown}>
       <GcdsText>
         {" "}
         <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle=" ">
@@ -51,15 +60,13 @@ export default function AddSecondMFA({
       <GcdsGrid columns="max-content max-content" gap="200">
         <GcdsText>
           {" "}
-          <GcdsButton
+          <SubmitButton
             style={{ width: "fit-content" }}
-            onGcdsClick={async (ev) => {
-              ev.preventDefault();
-              await onAddSecondMFA();
-            }}
+            onGcdsClick={onSubmitHandler}
+            currentLang={language}
           >
             {pageContentJson["9"]}
-          </GcdsButton>
+          </SubmitButton>
         </GcdsText>
         &nbsp;
         <GcdsLink

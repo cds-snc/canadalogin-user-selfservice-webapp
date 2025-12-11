@@ -12,6 +12,8 @@ import {
 import { getPageContent } from "../../../utils/functions";
 import { PAGES } from "../../../utils/constants";
 import { useParams } from "react-router";
+import SubmitButton from "../../../components/Layout/SubmitButton";
+import { useEnterKeySubmit } from "../../../utils/enterKeyHandler";
 
 export default function PasswordVerification({
   userPasswordValue,
@@ -25,10 +27,25 @@ export default function PasswordVerification({
   const { language } = useParams();
   const [checkedValue, setCheckedValue] = useState(false);
 
+  const onSubmitHandler = async (ev) => {
+    ev.preventDefault();
+    setErrorCode(""); // Clear any previous errors
+    try {
+      await validatePassword(userPasswordValue);
+    } catch (error) {
+      // Handle validation errors
+      if (error?.data?.message) {
+        setErrorCode(error.data.message);
+      }
+    }
+  };
+
+  const handleKeyDown = useEnterKeySubmit(onSubmitHandler);
+
   const pageContentJson = getPageContent(language, PAGES.passwordVerification);
   const passwordPageContentJson = getPageContent(language, PAGES.password);
 
-  const { submit, cancel } = getPageContent(language, "Button");
+  const { cancel } = getPageContent(language, "Button");
   const parentPageContent =
     parentPage === PAGES.deleteMFAPage
       ? pageContentJson["8"]
@@ -46,7 +63,7 @@ export default function PasswordVerification({
   ];
 
   return (
-    <GcdsContainer role="main">
+    <GcdsContainer role="main" onKeyDown={handleKeyDown}>
       <GcdsContainer className="gcds-gap">
         <GcdsHeading tag="h1" lang={language}>
           {pageContentJson["1"]}
@@ -82,23 +99,11 @@ export default function PasswordVerification({
       ></GcdsCheckboxes>
 
       <GcdsGrid columns="max-content max-content" gap="200">
-        <GcdsButton
+        <SubmitButton
+          currentLang={language}
           style={{ width: "fit-content" }}
-          onGcdsClick={async (ev) => {
-            ev.preventDefault();
-            setErrorCode(""); // Clear any previous errors
-            try {
-              await validatePassword(userPasswordValue);
-            } catch (error) {
-              // Handle validation errors
-              if (error?.data?.message) {
-                setErrorCode(error.data.message);
-              }
-            }
-          }}
-        >
-          {submit}
-        </GcdsButton>
+          onGcdsClick={onSubmitHandler}
+        ></SubmitButton>
 
         <GcdsButton
           buttonRole="secondary"

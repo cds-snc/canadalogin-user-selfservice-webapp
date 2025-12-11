@@ -16,6 +16,8 @@ import { useParams } from "react-router";
 import { countryMapping, FLOW_TYPES, PAGES } from "../../../../utils/constants";
 import { getPageContent } from "../../../../utils/functions";
 import { path } from "../../../../utils/routeHelpers";
+import { useEnterKeySubmit } from "../../../../utils/enterKeyHandler";
+import SubmitButton from "../../../../components/Layout/SubmitButton";
 
 const RadioButtons = ({
   onChangePhoneForm,
@@ -86,7 +88,7 @@ export default function AddMFAPhoneNumber({
   const { language } = useParams();
   const [phoneNumberValid, setPhoneNumberValid] = useState(true);
   const pageContentJson = getPageContent(language, PAGES.addMFANumber);
-  const { submit, cancel } = getPageContent(language, "Button");
+  const { cancel } = getPageContent(language, "Button");
   const backtoProfilePage = path(PAGES.ProfileHome, { language: language });
 
   const isPhoneNumberValid = (phoneNumber, country) => {
@@ -95,8 +97,23 @@ export default function AddMFAPhoneNumber({
     return validatedPhoneNumber;
   };
 
+  const onSubmitHandler = async (ev) => {
+    ev.preventDefault();
+    try {
+      setErrorCode("");
+      await onNext();
+    } catch (error) {
+      // Handle validation errors
+      if (error?.data?.message) {
+        setErrorCode(error.data.message);
+      }
+    }
+  };
+
+  const handleKeyDown = useEnterKeySubmit(onSubmitHandler);
+
   return (
-    <GcdsContainer>
+    <GcdsContainer role="main" onKeyDown={handleKeyDown}>
       <GcdsGrid columns="1" gap="500">
         <GcdsContainer>
           <GcdsHeading tag="h1" lang={language}>
@@ -163,24 +180,12 @@ export default function AddMFAPhoneNumber({
       </GcdsGrid>
 
       <GcdsGrid columns="max-content max-content" gap="200">
-        <GcdsButton
+        <SubmitButton
           disabled={!phoneNumberValid}
           style={{ width: "fit-content" }}
-          onGcdsClick={async (ev) => {
-            ev.preventDefault();
-            try {
-              setErrorCode("");
-              await onNext();
-            } catch (error) {
-              // Handle validation errors
-              if (error?.data?.message) {
-                setErrorCode(error.data.message);
-              }
-            }
-          }}
-        >
-          {submit}
-        </GcdsButton>
+          onGcdsClick={onSubmitHandler}
+          currentLang={language}
+        ></SubmitButton>
 
         <GcdsButton
           buttonRole="secondary"

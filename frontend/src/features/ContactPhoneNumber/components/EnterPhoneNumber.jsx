@@ -22,6 +22,8 @@ import {
   PAGES,
 } from "../../../utils/constants.jsx";
 import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx";
+import { useEnterKeySubmit } from "../../../utils/enterKeyHandler.jsx";
+import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 
 const PageHeader = ({ language, pageContentJson }) => {
   return (
@@ -113,13 +115,20 @@ export default function EnterPhoneNumber({
   const pageContentJson = getPageContent(language, PAGES.enterNewPhoneNumber);
   const otpPageContentJson = getPageContent(language, PAGES.otpSelection);
 
-  const { submit, cancel } = getPageContent(language, "Button");
+  const { cancel } = getPageContent(language, "Button");
 
   const isPhoneNumberValid = (phoneNumber, country) => {
     const capitalize = country.toUpperCase();
     const validatedPhoneNumber = isValidPhoneNumber(phoneNumber, capitalize);
     return validatedPhoneNumber;
   };
+
+  const onSubmitHandler = async (ev) => {
+    ev.preventDefault();
+    onNext();
+  };
+
+  const handleKeyDown = useEnterKeySubmit(onSubmitHandler);
 
   // Add accessibility attributes to phone input components after mount
   useEffect(() => {
@@ -154,7 +163,7 @@ export default function EnterPhoneNumber({
   }, []);
 
   return (
-    <GcdsContainer role="main">
+    <GcdsContainer role="main" onKeyDown={handleKeyDown}>
       <GcdsGrid columns="1" gap="500">
         <section>
           <PageHeader language={language} pageContentJson={pageContentJson} />
@@ -220,16 +229,12 @@ export default function EnterPhoneNumber({
       </GcdsGrid>
 
       <GcdsGrid columns="max-content max-content" gap="200">
-        <GcdsButton
+        <SubmitButton
           disabled={!phoneNumberValid}
           style={{ width: "fit-content" }}
-          onGcdsClick={(ev) => {
-            ev.preventDefault();
-            onNext();
-          }}
-        >
-          {submit}
-        </GcdsButton>
+          onGcdsClick={onSubmitHandler}
+          currentLang={language}
+        ></SubmitButton>
 
         <GcdsButton
           buttonRole="secondary"
