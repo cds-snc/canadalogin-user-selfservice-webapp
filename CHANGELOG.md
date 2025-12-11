@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.8.1](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.8.0...v1.8.1) (2025-12-11)
+
+
+### Bug Fixes
+
+* **backend:** add flush logs ([#1023](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1023)) ([b679653](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/b679653f9cf095c47d31b94de6eaea2d91fdef86))
+* **backend:** reset oidc client code_challenge ([#1020](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1020)) ([8f4859f](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/8f4859fa806d048226a50c6677dfe9a0acbb8e7c))
+* **frontend:** add package-lock into repo ([#1015](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1015)) ([fbe50f2](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/fbe50f29291dbf8e28d2ec842c9ca7618969019a))
+* **frontend:** add role attribute to GcdsContainer for accessibility ([#1011](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1011)) ([18dde15](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/18dde158e154d2acb12a1895fda765c4572d65ac))
+* **frontend:** add role attributes to GcdsContainer and buttons for improved accessibility ([#1012](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1012)) ([55ad77d](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/55ad77dfc25482a163616ece4b300faf0ca75101))
+* **frontend:** list of accessibility issues for the manage change password flow ([#1010](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1010)) ([9d94b4f](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/9d94b4f93fc22a58c38bf59ec941b7dc2241b91f))
+* Remove old slack notification workflow, we use the GitHub Slack integration now ([572e182](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/572e182cdd2c7e06e6e02aede5dc87b8fb81b800))
+* Remove old slack notification workflow, we use the official GitHub Slack integration now ([#1021](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1021)) ([572e182](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/572e182cdd2c7e06e6e02aede5dc87b8fb81b800))
+
+
+### Continuous Integration
+
+* deploy 1.8.1 to test ([#1035](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1035)) ([20fcb49](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/20fcb49e77335b3c4c4da92b7da400266a0ae804))
+
 ## [1.8.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.7.1...v1.8.0) (2025-12-09)
 
 
