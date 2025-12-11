@@ -13,7 +13,6 @@ import { getPageContent } from "../../../utils/functions";
 import { PAGES } from "../../../utils/constants";
 import { useParams } from "react-router";
 import SubmitButton from "../../../components/Layout/SubmitButton";
-import { useEnterKeySubmit } from "../../../utils/enterKeyHandler";
 
 export default function PasswordVerification({
   userPasswordValue,
@@ -40,8 +39,6 @@ export default function PasswordVerification({
     }
   };
 
-  const handleKeyDown = useEnterKeySubmit(onSubmitHandler);
-
   const pageContentJson = getPageContent(language, PAGES.passwordVerification);
   const passwordPageContentJson = getPageContent(language, PAGES.password);
 
@@ -63,7 +60,7 @@ export default function PasswordVerification({
   ];
 
   return (
-    <GcdsContainer role="main" onKeyDown={handleKeyDown}>
+    <GcdsContainer role="main">
       <GcdsContainer className="gcds-gap">
         <GcdsHeading tag="h1" lang={language}>
           {pageContentJson["1"]}
@@ -72,24 +69,24 @@ export default function PasswordVerification({
       <GcdsText>
         {parentPageContent} {pageContentJson["3"]}
       </GcdsText>
-
-      <GcdsInput
-        inputId="passwordVerification"
-        label={pageContentJson["4"]}
-        autofocus
-        autocomplete="one-time-code"
-        name="passwordVerification"
-        type={checkedValue ? "text" : "password"}
-        validateOn="other"
-        errorMessage={errorMessage}
-        value={userPasswordValue}
-        onGcdsInput={(ev) => {
-          setUserPasswordValue(ev.target.value);
-        }}
-        lang={language}
-        size="12"
-      ></GcdsInput>
-
+      <form onSubmit={onSubmitHandler}>
+        <GcdsInput
+          inputId="passwordVerification"
+          label={pageContentJson["4"]}
+          autofocus
+          autocomplete="one-time-code"
+          name="passwordVerification"
+          type={checkedValue ? "text" : "password"}
+          validateOn="other"
+          errorMessage={errorMessage}
+          value={userPasswordValue}
+          onGcdsInput={(ev) => {
+            setUserPasswordValue(ev.target.value);
+          }}
+          lang={language}
+          size="12"
+        ></GcdsInput>
+      </form>
       <GcdsCheckboxes
         checkboxId="password-checkbox"
         legend={passwordPageContentJson["11"]}

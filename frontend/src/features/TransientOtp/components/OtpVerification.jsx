@@ -17,7 +17,6 @@ import { useParams } from "react-router";
 import { FLOW_TYPES, PAGES } from "../../../utils/constants.jsx";
 import { gcHelpCentreLinks } from "../../../utils/gcHelpCentreLinks.jsx";
 import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
-import { useEnterKeySubmit } from "../../../utils/enterKeyHandler.jsx";
 
 const initialTime = 10;
 
@@ -63,8 +62,6 @@ export default function OtpVerification({
     }
   };
 
-  const handleKeyDown = useEnterKeySubmit(onSubmitHandler);
-
   useEffect(() => {
     if (time <= 0) return;
 
@@ -96,7 +93,7 @@ export default function OtpVerification({
 
   const userMfaType = userSelectedMfaFactor?.type;
   return (
-    <GcdsContainer role="main" onKeyDown={handleKeyDown}>
+    <GcdsContainer role="main">
       <GcdsContainer>
         <GcdsHeading tag="h1" lang={language}>
           {userMfaType === FLOW_TYPES.email
@@ -127,23 +124,26 @@ export default function OtpVerification({
           <GcdsHeading tag="h2">{pageContentJson["8"]}</GcdsHeading>
         )}
 
-        <GcdsInput
-          inputId="verificationCode"
-          label={pageContentJson["9"]}
-          autofocus
-          autocomplete="one-time-code"
-          name="verificationCode"
-          type="text"
-          validateOn="other"
-          errorMessage={errorMessage}
-          value={userOtpValue}
-          onGcdsInput={handleChange}
-          lang={language}
-          size="6"
-          maxlength={6}
-          minlength={6}
-          required={errorMessage === ""}
-        ></GcdsInput>
+        <form onSubmit={onSubmitHandler}>
+          {" "}
+          <GcdsInput
+            inputId="verificationCode"
+            label={pageContentJson["9"]}
+            autofocus
+            autocomplete="one-time-code"
+            name="verificationCode"
+            type="text"
+            validateOn="other"
+            errorMessage={errorMessage}
+            value={userOtpValue}
+            onGcdsInput={handleChange}
+            lang={language}
+            size="6"
+            maxlength={6}
+            minlength={6}
+            required={errorMessage === ""}
+          ></GcdsInput>
+        </form>
 
         <GcdsGrid columns="max-content max-content" gap="200">
           <SubmitButton

@@ -14,7 +14,6 @@ import { getPageContent } from "../../../utils/functions.jsx";
 import { PAGES } from "../../../utils/constants.jsx";
 import Loader from "../../../components/Layout/Loading";
 import RPNameDisplay from "../../../components/RPInfo/RPNameDisplay.jsx";
-import { useEnterKeySubmit } from "../../../utils/enterKeyHandler.jsx";
 import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 
 const ErrorMessage = ({ errorMessage }) => {
@@ -51,8 +50,6 @@ export default function ConfirmUpdate({
     await onConfirm();
   };
 
-  const handleKeyDown = useEnterKeySubmit(onSubmitHandler);
-
   if (!nameFormData?.formatted) return null;
 
   return localLoading ? (
@@ -60,7 +57,7 @@ export default function ConfirmUpdate({
   ) : (
     <>
       <ErrorMessage errorMessage={errorMessage} />
-      <GcdsContainer role="main" onKeyDown={handleKeyDown}>
+      <GcdsContainer role="main">
         <GcdsGrid columns="1" gap="300">
           <GcdsHeading tag="h1">{pageContentJson["1"]}</GcdsHeading>
           <div>

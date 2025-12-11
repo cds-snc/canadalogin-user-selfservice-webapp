@@ -10,7 +10,6 @@ import { useParams } from "react-router";
 import { PAGES } from "../../../../utils/constants";
 import { getPageContent } from "../../../../utils/functions";
 import { path } from "../../../../utils/routeHelpers";
-import { useEnterKeySubmit } from "../../../../utils/enterKeyHandler";
 
 export default function DeleteMFAPhoneNumberConfirm({
   onNext,
@@ -29,9 +28,8 @@ export default function DeleteMFAPhoneNumberConfirm({
     await onNext();
   };
 
-  const handleKeyDown = useEnterKeySubmit(onSubmitHandler);
   return (
-    <GcdsContainer role="main" onKeyDown={handleKeyDown}>
+    <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="500">
         <GcdsContainer>
           <GcdsHeading tag="h1" lang={language}>

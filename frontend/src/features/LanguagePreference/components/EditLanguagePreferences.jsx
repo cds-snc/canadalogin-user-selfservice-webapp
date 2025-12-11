@@ -15,7 +15,6 @@ import { getPageContent } from "../../../utils/functions.jsx";
 
 import { PAGES, PROFILE_LANGUAGES } from "../../../utils/constants.jsx";
 import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx";
-import { useEnterKeySubmit } from "../../../utils/enterKeyHandler.jsx";
 import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 
 export default function EditLanguagePreferences({
@@ -62,10 +61,8 @@ export default function EditLanguagePreferences({
     await onNext();
   };
 
-  const handleKeyDown = useEnterKeySubmit(onSubmitHandler);
-
   return (
-    <GcdsContainer role="main" onKeyDown={handleKeyDown}>
+    <GcdsContainer role="main">
       {errorMessage && (
         <GcdsErrorMessage messageId="message-props">
           {errorMessage}
@@ -82,15 +79,18 @@ export default function EditLanguagePreferences({
         />
       </GcdsGrid>
 
-      <GcdsContainer marginTop="100">
-        <GcdsRadios
-          name="radio"
-          legend={pageContentJson["3"]}
-          options={languageOptions}
-          lang={language}
-          onChange={handleProfileChange}
-        />
-      </GcdsContainer>
+      <form onSubmit={onSubmitHandler}>
+        {" "}
+        <GcdsContainer marginTop="100">
+          <GcdsRadios
+            name="radio"
+            legend={pageContentJson["3"]}
+            options={languageOptions}
+            lang={language}
+            onChange={handleProfileChange}
+          />
+        </GcdsContainer>
+      </form>
 
       <GcdsGrid columns="max-content max-content" gap="200">
         <SubmitButton onGcdsClick={onSubmitHandler} currentLang={language}>

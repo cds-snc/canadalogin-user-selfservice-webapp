@@ -10,7 +10,6 @@ import {
 } from "@cdssnc/gcds-components-react";
 import { getPageContent } from "../../../utils/functions.jsx";
 import { PAGES } from "../../../utils/constants";
-import { useEnterKeySubmit } from "../../../utils/enterKeyHandler.jsx";
 import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 
 export default function SuccessfullyUpdated({
@@ -29,10 +28,8 @@ export default function SuccessfullyUpdated({
     onNext();
   };
 
-  const handleKeyDown = useEnterKeySubmit(onSubmitHandler);
-
   return (
-    <GcdsContainer role="main" onKeyDown={handleKeyDown}>
+    <GcdsContainer role="main">
       <GcdsGrid columns="1">
         <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle=" ">
           <GcdsText>

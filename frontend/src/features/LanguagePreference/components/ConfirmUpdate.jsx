@@ -13,7 +13,6 @@ import {
 import { getPageContent } from "../../../utils/functions.jsx";
 import { PAGES, LANGUAGE_DISPLAY_NAMES } from "../../../utils/constants.jsx";
 import RPNameDisplay from "../../../components/RPInfo/RPNameDisplay.jsx";
-import { useEnterKeySubmit } from "../../../utils/enterKeyHandler.jsx";
 import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 
 export default function ConfirmUpdate({
@@ -32,12 +31,10 @@ export default function ConfirmUpdate({
     await onConfirm();
   };
 
-  const handleKeyDown = useEnterKeySubmit(onSubmitHandler);
-
   if (!languageFormData?.languageCode) return null;
 
   return (
-    <GcdsContainer role="main" onKeyDown={handleKeyDown}>
+    <GcdsContainer role="main">
       {errorMessage && (
         <GcdsErrorMessage messageId="message-props">
           {errorMessage}

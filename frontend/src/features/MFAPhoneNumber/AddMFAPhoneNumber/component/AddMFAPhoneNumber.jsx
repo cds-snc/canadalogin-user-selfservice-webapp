@@ -16,7 +16,6 @@ import { useParams } from "react-router";
 import { countryMapping, FLOW_TYPES, PAGES } from "../../../../utils/constants";
 import { getPageContent } from "../../../../utils/functions";
 import { path } from "../../../../utils/routeHelpers";
-import { useEnterKeySubmit } from "../../../../utils/enterKeyHandler";
 import SubmitButton from "../../../../components/Layout/SubmitButton";
 
 const RadioButtons = ({
@@ -110,10 +109,8 @@ export default function AddMFAPhoneNumber({
     }
   };
 
-  const handleKeyDown = useEnterKeySubmit(onSubmitHandler);
-
   return (
-    <GcdsContainer role="main" onKeyDown={handleKeyDown}>
+    <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="500">
         <GcdsContainer>
           <GcdsHeading tag="h1" lang={language}>
@@ -133,40 +130,43 @@ export default function AddMFAPhoneNumber({
               {errorMessage}
             </GcdsErrorMessage>
           )}
-          <PhoneInput
-            inputProps={{
-              name: "phone",
-              required: true,
-              autoFocus: true,
-            }}
-            specialLabel={pageContentJson["7"]}
-            country={"ca"}
-            preferredCountries={["ca"]}
-            onlyCountries={countryMapping.countries}
-            localization={
-              language === "fr"
-                ? countryMapping.frLocalization
-                : countryMapping.localization
-            }
-            value={phoneFormData.phoneNumber}
-            className={"high-res"}
-            enableSearch={true}
-            countryCodeEditable={false}
-            disableSearchIcon={false}
-            defaultErrorMessage={pageContentJson["14"]}
-            onChange={(phone, country, event, formatted) => {
-              onChangePhoneForm("phoneNumber", `+${phone}`);
-              onChangePhoneForm("formattedPhoneNumber", formatted);
-              const isNumberValid = isPhoneNumberValid(
-                phone,
-                country.countryCode,
-              );
-              setPhoneNumberValid(isNumberValid);
-            }}
-            isValid={(inputNumber, country) => {
-              return isPhoneNumberValid(inputNumber, country.iso2);
-            }}
-          />
+          <form onSubmit={onSubmitHandler}>
+            {" "}
+            <PhoneInput
+              inputProps={{
+                name: "phone",
+                required: true,
+                autoFocus: true,
+              }}
+              specialLabel={pageContentJson["7"]}
+              country={"ca"}
+              preferredCountries={["ca"]}
+              onlyCountries={countryMapping.countries}
+              localization={
+                language === "fr"
+                  ? countryMapping.frLocalization
+                  : countryMapping.localization
+              }
+              value={phoneFormData.phoneNumber}
+              className={"high-res"}
+              enableSearch={true}
+              countryCodeEditable={false}
+              disableSearchIcon={false}
+              defaultErrorMessage={pageContentJson["14"]}
+              onChange={(phone, country, event, formatted) => {
+                onChangePhoneForm("phoneNumber", `+${phone}`);
+                onChangePhoneForm("formattedPhoneNumber", formatted);
+                const isNumberValid = isPhoneNumberValid(
+                  phone,
+                  country.countryCode,
+                );
+                setPhoneNumberValid(isNumberValid);
+              }}
+              isValid={(inputNumber, country) => {
+                return isPhoneNumberValid(inputNumber, country.iso2);
+              }}
+            />
+          </form>
         </section>
 
         <section>

@@ -13,7 +13,6 @@ import {
 import { useParams } from "react-router";
 import { FLOW_TYPES, PAGES } from "../../../../utils/constants";
 import { getPageContent } from "../../../../utils/functions";
-import { useEnterKeySubmit } from "../../../../utils/enterKeyHandler";
 import SubmitButton from "../../../../components/Layout/SubmitButton";
 
 const initialTime = 10;
@@ -112,10 +111,8 @@ export default function AddMFAOtpVerification({
     await onNext();
   };
 
-  const handleKeyDown = useEnterKeySubmit(onSubmitHandler);
-
   return (
-    <GcdsContainer role="main" onKeyDown={handleKeyDown}>
+    <GcdsContainer role="main">
       {codeRequested && (
         <GcdsNotice
           type="success"
@@ -136,23 +133,25 @@ export default function AddMFAOtpVerification({
         />
 
         <GcdsHeading tag="h2">{pageContentJson["8"]}</GcdsHeading>
-
-        <GcdsInput
-          inputId="verificationCode"
-          label={pageContentJson["9"]}
-          autofocus
-          autocomplete="one-time-code"
-          name="verificationCode"
-          type="text"
-          value={phoneFormData.otp}
-          validateOn="other"
-          errorMessage={errorMessage}
-          onGcdsInput={handleChange}
-          lang={language}
-          size="6"
-          maxlength={6}
-          minlength={6}
-        ></GcdsInput>
+        <form onSubmit={onSubmitHandler}>
+          {" "}
+          <GcdsInput
+            inputId="verificationCode"
+            label={pageContentJson["9"]}
+            autofocus
+            autocomplete="one-time-code"
+            name="verificationCode"
+            type="text"
+            value={phoneFormData.otp}
+            validateOn="other"
+            errorMessage={errorMessage}
+            onGcdsInput={handleChange}
+            lang={language}
+            size="6"
+            maxlength={6}
+            minlength={6}
+          ></GcdsInput>
+        </form>
 
         <GcdsGrid columns="max-content max-content" gap="200">
           <SubmitButton

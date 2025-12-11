@@ -15,7 +15,6 @@ import { EXTERNAL_NAVIGATION_LINKS, PAGES } from "../../../utils/constants.jsx";
 import { useUser } from "../../../components/Providers/useUser.tsx";
 import { authService } from "../../../services/authService.jsx";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
-import { useEnterKeySubmit } from "../../../utils/enterKeyHandler.jsx";
 import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 
 export default function SuccessfullyUpdated({ nameFormData, onBackToProfile }) {
@@ -61,9 +60,8 @@ export default function SuccessfullyUpdated({ nameFormData, onBackToProfile }) {
     await onBackToProfile();
   };
 
-  const handleEnterKeyDown = useEnterKeySubmit(onSubmitHandler);
   return (
-    <GcdsContainer role="main" onKeyDown={handleEnterKeyDown}>
+    <GcdsContainer role="main">
       <GcdsText>
         {" "}
         <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle=" ">

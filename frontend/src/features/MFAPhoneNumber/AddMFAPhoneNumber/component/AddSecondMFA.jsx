@@ -10,7 +10,6 @@ import {
 import { useParams } from "react-router";
 import { FLOW_TYPES, PAGES } from "../../../../utils/constants";
 import { getPageContent } from "../../../../utils/functions";
-import { useEnterKeySubmit } from "../../../../utils/enterKeyHandler";
 import SubmitButton from "../../../../components/Layout/SubmitButton";
 
 export default function AddSecondMFA({
@@ -31,10 +30,8 @@ export default function AddSecondMFA({
     await onAddSecondMFA();
   };
 
-  const handleKeyDown = useEnterKeySubmit(onSubmitHandler);
-
   return (
-    <GcdsContainer role="main" onKeyDown={handleKeyDown}>
+    <GcdsContainer role="main">
       <GcdsText>
         {" "}
         <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle=" ">

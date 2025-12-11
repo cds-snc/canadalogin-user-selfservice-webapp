@@ -15,7 +15,6 @@ import { PAGES, LANGUAGE_DISPLAY_NAMES } from "../../../utils/constants.jsx";
 import { useUser } from "../../../components/Providers/useUser.tsx";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
 import { authService } from "../../../services/authService.jsx";
-import { useEnterKeySubmit } from "../../../utils/enterKeyHandler.jsx";
 import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 
 export default function SuccessfullyUpdated({
@@ -61,12 +60,10 @@ export default function SuccessfullyUpdated({
     await onBackToProfile();
   };
 
-  const handleKeyDown = useEnterKeySubmit(onSubmitHandler);
-
   if (!languageFormData?.languageCode) return null;
 
   return (
-    <GcdsContainer role="main" onKeyDown={handleKeyDown}>
+    <GcdsContainer role="main">
       <GcdsText>
         {" "}
         <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle=" ">

@@ -11,7 +11,6 @@ import { useParams } from "react-router";
 
 import { getPageContent } from "../../../utils/functions.jsx";
 import { gcHelpCentreLinks } from "../../../utils/gcHelpCentreLinks.jsx";
-import { useEnterKeySubmit } from "../../../utils/enterKeyHandler";
 
 import { FLOW_TYPES, PAGES } from "../../../utils/constants.jsx";
 import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
@@ -34,8 +33,6 @@ export default function OtpSelection({
     ev.preventDefault();
     await onNext();
   };
-
-  const handleKeyDown = useEnterKeySubmit(onSubmitHandler);
 
   const configureRadioSMSOptions = () => {
     let radioOptionsValues = [];
@@ -108,7 +105,7 @@ export default function OtpSelection({
     );
 
   return (
-    <GcdsContainer role="main" onKeyDown={handleKeyDown}>
+    <GcdsContainer role="main">
       <GcdsContainer className="gcds-gap">
         <GcdsHeading tag="h1" lang={language}>
           {pageContentJson["1"]}
@@ -127,7 +124,8 @@ export default function OtpSelection({
             {pageContentJson["7"]}
           </GcdsText>
         </GcdsContainer>
-        {radioComponent}
+        <form onSubmit={onSubmitHandler}>{radioComponent}</form>
+
         <GcdsGrid columns="max-content max-content" gap="200">
           <SubmitButton
             style={{ width: "fit-content" }}

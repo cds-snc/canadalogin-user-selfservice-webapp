@@ -13,7 +13,6 @@ import { getPageContent } from "../../../utils/functions.jsx";
 import { PAGES } from "../../../utils/constants.jsx";
 import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx";
-import { useEnterKeySubmit } from "../../../utils/enterKeyHandler.jsx";
 
 export default function ProfileUpdateName({
   nameFormData,
@@ -81,10 +80,8 @@ export default function ProfileUpdateName({
     await onNext();
   };
 
-  const handleEnterKeyDown = useEnterKeySubmit(onSubmitHandler);
-
   return (
-    <GcdsContainer role="main" onKeyDown={handleEnterKeyDown}>
+    <GcdsContainer role="main">
       {errorMessage && (
         <GcdsErrorMessage messageId="message-props">
           {errorMessage}
@@ -101,36 +98,38 @@ export default function ProfileUpdateName({
         currentLang={language}
         information={"name"}
       />
-
-      <GcdsContainer style={{ marginTop: "1.5rem" }}>
-        <GcdsInput
-          inputId="givenName"
-          label={pageNameEditJson["2"]}
-          name="givenName"
-          type="text"
-          validateOn="other"
-          data-testid="givenName"
-          lang={language}
-          value={nameFormData.givenName}
-          onChange={handleProfileChange}
-          onKeyUp={handleKeyUp}
-          pattern="[a-zA-ZÀ-ÿĀ-žА-я\u0100-\u017F\u0180-\u024F\u1E00-\u1EFF\s'-]*"
-        />
-        <GcdsInput
-          inputId="familyName"
-          label={pageNameEditJson["3"]}
-          name="familyName"
-          type="text"
-          validateOn="other"
-          data-testid="familyName"
-          lang={language}
-          required
-          value={nameFormData.familyName}
-          onChange={handleProfileChange}
-          onKeyUp={handleKeyUp}
-          pattern="[a-zA-ZÀ-ÿĀ-žА-я\u0100-\u017F\u0180-\u024F\u1E00-\u1EFF\s'-]*"
-        />
-      </GcdsContainer>
+      <form onSubmit={onSubmitHandler}>
+        {" "}
+        <GcdsContainer style={{ marginTop: "1.5rem" }}>
+          <GcdsInput
+            inputId="givenName"
+            label={pageNameEditJson["2"]}
+            name="givenName"
+            type="text"
+            validateOn="other"
+            data-testid="givenName"
+            lang={language}
+            value={nameFormData.givenName}
+            onChange={handleProfileChange}
+            onKeyUp={handleKeyUp}
+            pattern="[a-zA-ZÀ-ÿĀ-žА-я\u0100-\u017F\u0180-\u024F\u1E00-\u1EFF\s'-]*"
+          />
+          <GcdsInput
+            inputId="familyName"
+            label={pageNameEditJson["3"]}
+            name="familyName"
+            type="text"
+            validateOn="other"
+            data-testid="familyName"
+            lang={language}
+            required
+            value={nameFormData.familyName}
+            onChange={handleProfileChange}
+            onKeyUp={handleKeyUp}
+            pattern="[a-zA-ZÀ-ÿĀ-žА-я\u0100-\u017F\u0180-\u024F\u1E00-\u1EFF\s'-]*"
+          />
+        </GcdsContainer>
+      </form>
 
       <GcdsGrid columns="max-content max-content" gap="200">
         <SubmitButton

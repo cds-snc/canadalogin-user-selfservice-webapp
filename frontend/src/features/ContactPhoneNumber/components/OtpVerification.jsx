@@ -15,7 +15,6 @@ import { getPageContent } from "../../../utils/functions.jsx";
 
 import { FLOW_TYPES, PAGES } from "../../../utils/constants.jsx";
 import { useParams } from "react-router";
-import { useEnterKeySubmit } from "../../../utils/enterKeyHandler.jsx";
 import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 
 const initialTime = 10;
@@ -100,8 +99,6 @@ export default function OtpVerification({
     onNext();
   };
 
-  const handleKeyDown = useEnterKeySubmit(onSubmitHandler);
-
   useEffect(() => {
     if (time <= 0) return;
 
@@ -115,7 +112,7 @@ export default function OtpVerification({
   const userMfaType = phoneFormData.otpType;
 
   return (
-    <GcdsContainer role="main" onKeyDown={handleKeyDown}>
+    <GcdsContainer role="main">
       {codeRequested && (
         <GcdsNotice
           type="success"
@@ -136,23 +133,25 @@ export default function OtpVerification({
         />
 
         <GcdsHeading tag="h2">{pageContentJson["8"]}</GcdsHeading>
-
-        <GcdsInput
-          inputId="verificationCode"
-          label={pageContentJson["9"]}
-          autofocus
-          autocomplete="one-time-code"
-          name="verificationCode"
-          type="text"
-          value={phoneFormData.otp}
-          validateOn="other"
-          errorMessage={errorMessage}
-          onGcdsInput={handleChange}
-          lang={language}
-          size="6"
-          maxlength={6}
-          minlength={6}
-        ></GcdsInput>
+        <form onSubmit={onSubmitHandler}>
+          {" "}
+          <GcdsInput
+            inputId="verificationCode"
+            label={pageContentJson["9"]}
+            autofocus
+            autocomplete="one-time-code"
+            name="verificationCode"
+            type="text"
+            value={phoneFormData.otp}
+            validateOn="other"
+            errorMessage={errorMessage}
+            onGcdsInput={handleChange}
+            lang={language}
+            size="6"
+            maxlength={6}
+            minlength={6}
+          ></GcdsInput>
+        </form>
 
         <GcdsGrid columns="max-content max-content" gap="200">
           <SubmitButton

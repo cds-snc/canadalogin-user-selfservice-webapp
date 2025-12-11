@@ -14,7 +14,6 @@ import { getPageContent } from "../../../utils/functions.jsx";
 import { PAGES } from "../../../utils/constants";
 import RPNameDisplay from "../../../components/RPInfo/RPNameDisplay.jsx";
 import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
-import { useEnterKeySubmit } from "../../../utils/enterKeyHandler.jsx";
 
 export default function ConfirmUpdate({
   onNext,
@@ -38,10 +37,8 @@ export default function ConfirmUpdate({
     await onNext();
   };
 
-  const handleKeyDown = useEnterKeySubmit(onSubmitHandler);
-
   return (
-    <GcdsContainer role="main" onKeyDown={handleKeyDown}>
+    <GcdsContainer role="main">
       {errorMessage && (
         <GcdsErrorMessage messageId="message-props">
           {errorMessage}
