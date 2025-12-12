@@ -38,6 +38,13 @@ jobs:
         with:
           token: ${{ steps.sre_app_token.outputs.token }}
 
+      - name: Debug release-please outputs
+        run: |
+          echo "release_created='${{ steps.release.outputs.release_created }}'"
+          echo "version='${{ steps.release.outputs.version }}'"
+          echo "tag_name='${{ steps.release.outputs.tag_name }}'"
+          echo "release_name='${{ steps.release.outputs.release_name }}'"
+
   notify-slack-about-deploy:
     runs-on: ubuntu-latest
     outputs:
@@ -118,6 +125,11 @@ jobs:
     environment: dev
     needs: [notify-slack-about-deploy, release-please]
     steps:
+      - name: Debug release-please job outputs
+        run: |
+          echo "needs.release-please.outputs.release_created='${{ needs.release-please.outputs.release_created }}'"
+          echo "needs.release-please.outputs.version='${{ needs.release-please.outputs.version }}'"
+
       - name: Audit DNS requests
         uses: cds-snc/dns-proxy-action@main
         env:
