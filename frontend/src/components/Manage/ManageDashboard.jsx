@@ -30,7 +30,7 @@ export default function ManageDashboard() {
   });
 
   return (
-    <GcdsContainer>
+    <GcdsContainer role="main">
       {hasErrors() && (
         <GcdsErrorSummary
           data-testid="errorSummary"
@@ -59,6 +59,7 @@ export default function ManageDashboard() {
             height="76"
             viewBox="0 0 76 76"
             fill="none"
+            aria-label="Personal Information Icon"
           >
             <circle cx="37.6221" cy="38.4707" r="37.5" fill="#DBEAFE" />
             <path
@@ -96,6 +97,7 @@ export default function ManageDashboard() {
             height="76"
             viewBox="0 0 76 76"
             fill="none"
+            aria-label="Security Settings Icon"
           >
             <circle cx="37.6221" cy="38.4707" r="37.5" fill="#DBEAFE" />
             <path
