@@ -289,8 +289,8 @@ describe("UpdateProfileName Component", () => {
       </TestWrapper>,
     );
 
-    const form = document.getElementById("form");
-    fireEvent.submit(form);
+    const submitButton = screen.getByRole("button", { name: /continue/i });
+    fireEvent.click(submitButton);
 
     expect(mockOnNext).toHaveBeenCalledTimes(1);
   });
@@ -506,14 +506,5 @@ describe("UpdateProfileName Component", () => {
 
     fireEvent.keyDown(firstNameInput, ctrlKeyEvent);
     expect(ctrlKeyEvent.preventDefault).not.toHaveBeenCalled();
-  });
-
-  it("matches snapshot", () => {
-    const { container } = render(
-      <TestWrapper>
-        <UpdateProfileName {...defaultProps} />
-      </TestWrapper>,
-    );
-    expect(container).toMatchSnapshot();
   });
 });

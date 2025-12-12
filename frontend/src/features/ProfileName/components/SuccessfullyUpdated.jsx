@@ -15,6 +15,7 @@ import { EXTERNAL_NAVIGATION_LINKS, PAGES } from "../../../utils/constants.jsx";
 import { useUser } from "../../../components/Providers/useUser.tsx";
 import { authService } from "../../../services/authService.jsx";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
+import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 
 export default function SuccessfullyUpdated({ nameFormData, onBackToProfile }) {
   const { language } = useParams();
@@ -53,6 +54,12 @@ export default function SuccessfullyUpdated({ nameFormData, onBackToProfile }) {
       }, 2000);
     }
   };
+
+  const onSubmitHandler = async (ev) => {
+    ev.preventDefault();
+    await onBackToProfile();
+  };
+
   return (
     <GcdsContainer role="main">
       <GcdsText>
@@ -75,15 +82,12 @@ export default function SuccessfullyUpdated({ nameFormData, onBackToProfile }) {
         </GcdsLink>
       </GcdsText>
       <GcdsGrid columns="max-content max-content" gap="200">
-        <GcdsButton
+        <SubmitButton
           style={{ width: "fit-content" }}
-          onGcdsClick={(ev) => {
-            ev.preventDefault();
-            onBackToProfile();
-          }}
+          onGcdsClick={onSubmitHandler}
         >
           {pageContentJson["6"]}
-        </GcdsButton>
+        </SubmitButton>
         &nbsp;
         <GcdsButton
           buttonRole="secondary"

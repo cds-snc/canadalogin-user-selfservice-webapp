@@ -10,6 +10,7 @@ import {
 } from "@cdssnc/gcds-components-react";
 import { getPageContent } from "../../../utils/functions.jsx";
 import { PAGES } from "../../../utils/constants";
+import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 
 export default function SuccessfullyUpdated({
   onNext,
@@ -21,6 +22,12 @@ export default function SuccessfullyUpdated({
     language,
     PAGES.successfullyUpdatedContactPhoneNumber,
   );
+
+  const onSubmitHandler = async (ev) => {
+    ev.preventDefault();
+    onNext();
+  };
+
   return (
     <GcdsContainer role="main">
       <GcdsGrid columns="1">
@@ -45,15 +52,13 @@ export default function SuccessfullyUpdated({
           <GcdsLink href="#">{pageContentJson["6"]}</GcdsLink>
         </GcdsText>
         <GcdsGrid columns="max-content max-content" gap="200">
-          <GcdsButton
+          <SubmitButton
             style={{ width: "fit-content" }}
-            onGcdsClick={(ev) => {
-              ev.preventDefault();
-              onNext();
-            }}
+            onGcdsClick={onSubmitHandler}
+            currentLang={language}
           >
             {pageContentJson["7"]}
-          </GcdsButton>
+          </SubmitButton>
 
           <GcdsButton
             buttonRole="secondary"

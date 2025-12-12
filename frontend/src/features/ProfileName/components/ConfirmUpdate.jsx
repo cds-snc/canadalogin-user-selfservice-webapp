@@ -14,6 +14,7 @@ import { getPageContent } from "../../../utils/functions.jsx";
 import { PAGES } from "../../../utils/constants.jsx";
 import Loader from "../../../components/Layout/Loading";
 import RPNameDisplay from "../../../components/RPInfo/RPNameDisplay.jsx";
+import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 
 const ErrorMessage = ({ errorMessage }) => {
   return (
@@ -44,6 +45,11 @@ export default function ConfirmUpdate({
 
   const formattedName = nameFormData?.formatted;
 
+  const onSubmitHandler = async (ev) => {
+    ev.preventDefault();
+    await onConfirm();
+  };
+
   if (!nameFormData?.formatted) return null;
 
   return localLoading ? (
@@ -73,14 +79,9 @@ export default function ConfirmUpdate({
             </GcdsText>
           </GcdsNotice>
           <GcdsGrid columns="max-content max-content" gap="200">
-            <GcdsButton
-              onGcdsClick={async (ev) => {
-                ev.preventDefault();
-                await onConfirm();
-              }}
-            >
+            <SubmitButton onGcdsClick={onSubmitHandler} currentLang={language}>
               {pageContentJson["8"]}
-            </GcdsButton>
+            </SubmitButton>
             <GcdsButton
               buttonRole="secondary"
               onGcdsClick={(ev) => {

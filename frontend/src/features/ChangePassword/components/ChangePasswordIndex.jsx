@@ -92,6 +92,7 @@ export default function ChangePasswordIndex() {
   };
 
   const validateOtpCode = async (userOtpValue) => {
+    setLocalLoading(true);
     try {
       const response = await passwordUpdate.secondStep(
         userOtpValue,
@@ -105,10 +106,13 @@ export default function ChangePasswordIndex() {
       if (err && err.data && err.data.message) {
         setErrorCode(err.data.message);
       }
+    } finally {
+      setLocalLoading(false);
     }
   };
 
   const validatePassword = async (userPasswordValue) => {
+    setLocalLoading(true);
     try {
       const passwordPolicyResponse = await authService.requestPasswordPolicy();
       if (passwordPolicyResponse.success) {
@@ -136,11 +140,14 @@ export default function ChangePasswordIndex() {
       if (err && err.data && err.data.message) {
         setErrorCode(err.data.message);
       }
+    } finally {
+      setLocalLoading(false);
     }
   };
 
   useEffect(() => {
     const fetchUserOtpPhoneFactors = async () => {
+      setLocalLoading(true);
       try {
         const response = await otpFactors.getUserOtpPhoneFactors(id);
         if (
@@ -156,6 +163,8 @@ export default function ChangePasswordIndex() {
         }
       } catch (err) {
         console.error("err", err);
+      } finally {
+        setLocalLoading(false);
       }
     };
 
@@ -228,7 +237,7 @@ export default function ChangePasswordIndex() {
   };
 
   return localLoading ? (
-    <Loader text={pageContentJson["12"]} />
+    <Loader text={pageContentJson["11"]} />
   ) : (
     <StepContent
       StepComponent={steps[passwordUpdateStep]}
