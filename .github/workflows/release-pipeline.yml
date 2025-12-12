@@ -113,8 +113,27 @@ jobs:
   build-backend:
     runs-on: ubuntu-latest
     environment: dev
-    needs: notify-slack-about-deploy
+    needs: [notify-slack-about-deploy, release-please]
     steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Fetch tags
+        run: git fetch --prune --unshallow --tags
+
+      - name: Detect release tag on current commit
+        id: detect-release-tag
+        run: |
+          RELEASE_TAG=$(git tag --points-at "$GITHUB_SHA" | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1 || true)
+
+          if [ -z "$RELEASE_TAG" ]; then
+            echo "No release tag (vX.Y.Z) found on this commit."
+          else
+            echo "Found release tag: '$RELEASE_TAG'"
+          fi
+
+          echo "release_tag=$RELEASE_TAG" >> "$GITHUB_OUTPUT"
+
       - name: Audit DNS requests
         uses: cds-snc/dns-proxy-action@main
         env:
@@ -133,19 +152,25 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
 
-      - name: Checkout
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-
-      - name: Build Docker image
+      - name: Build and push Docker image (SHA tag)
         working-directory: ./backend/
         run: |
           docker build \
-          --tag ${{ vars.ARTIFACT_ECR_REPOSITORY }}:$GITHUB_SHA .
+            --tag "${{ vars.ARTIFACT_ECR_REPOSITORY }}:$GITHUB_SHA" \
+            .
 
-      - name: Push Container to Amazon ECR
-        working-directory: ./backend/
+          docker push "${{ vars.ARTIFACT_ECR_REPOSITORY }}:$GITHUB_SHA"
+
+      - name: Tag and push Docker image (Release tag)
+        if: steps.detect-release-tag.outputs.release_tag != ''
         run: |
-          docker push ${{ vars.ARTIFACT_ECR_REPOSITORY }}:$GITHUB_SHA
+          RELEASE_TAG="${{ steps.detect-release-tag.outputs.release_tag }}"
+
+          docker tag \
+            "${{ vars.ARTIFACT_ECR_REPOSITORY }}:$GITHUB_SHA" \
+            "${{ vars.ARTIFACT_ECR_REPOSITORY }}:$RELEASE_TAG"
+
+          docker push "${{ vars.ARTIFACT_ECR_REPOSITORY }}:$RELEASE_TAG"
 
       - name: Docker generate SBOM
         uses: cds-snc/security-tools/.github/actions/generate-sbom@34794baf2af592913bb5b51d8df4f8d0acc49b6f # v3.2.0
@@ -328,6 +353,35 @@ jobs:
           cluster: ${{ vars.ECS_CLUSTER }}
           wait-for-service-stability: true
           propagate-tags: SERVICE
+
+      - name: Tag deployed image in ECR
+        if: steps.check-deployment-needed.outputs.deployment_needed == 'true'
+        run: |
+          REPO_URI="${{ vars.ARTIFACT_ECR_REPOSITORY }}"
+          REPO_NAME=$(echo "$REPO_URI" | cut -d/ -f2-)
+
+          echo "Repository name is: $REPO_NAME"
+          echo "Deployment SHA is: $DEPLOYMENT_SHA"
+
+          MANIFEST=$(aws ecr batch-get-image \
+            --region ca-central-1 \
+            --repository-name "$REPO_NAME" \
+            --image-ids imageTag="$DEPLOYMENT_SHA" \
+            --query 'images[0].imageManifest' \
+            --output text)
+
+          if [ -z "$MANIFEST" ]; then
+            echo "ERROR: No image manifest found for tag $DEPLOYMENT_SHA in $REPO_NAME"
+            exit 1
+          fi
+
+          aws ecr put-image \
+            --region ca-central-1 \
+            --repository-name "$REPO_NAME" \
+            --image-tag "deployed" \
+            --image-manifest "$MANIFEST"
+
+          echo "Tagged $REPO_NAME:$DEPLOYMENT_SHA as $REPO_NAME:deployed"
 
   notify-slack-about-deploy-success:
     runs-on: ubuntu-latest

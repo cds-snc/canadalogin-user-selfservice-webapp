@@ -66,6 +66,7 @@ async def redirect_user_to_idp_verify(request: Request):
         logger.info(
             f"oauth.verify type: {type(oauth.verify) if hasattr(oauth, 'verify') else 'N/A'}"
         )
+        flush_logs()  # Force flush to ensure CloudWatch gets this log
 
         # manually generate a code_verifier, make sure PKCE is used
         code_verifier = generate_token(48)  # Generate a secure random code verifier

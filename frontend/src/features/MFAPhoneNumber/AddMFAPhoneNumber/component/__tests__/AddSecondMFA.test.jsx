@@ -1,7 +1,6 @@
 import { render, screen, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { BrowserRouter } from "react-router";
-import * as ReactRouter from "react-router";
 import AddSecondMFA from "../AddSecondMFA";
 import "@testing-library/jest-dom/vitest";
 
@@ -48,7 +47,10 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
 
 // Mock react-router
 const mockUseParams = vi.fn();
-vi.spyOn(ReactRouter, "useParams").mockImplementation(mockUseParams);
+vi.mock("react-router", () => ({
+  BrowserRouter: ({ children }) => <div>{children}</div>,
+  useParams: () => mockUseParams(),
+}));
 
 // Mock utils
 vi.mock("../../../../utils/constants", () => ({
