@@ -23,6 +23,9 @@ jobs:
   # creates the release when the PR is merged.
   release-please:
     runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      version: ${{ steps.release.outputs.version }}
     steps:
       - uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547 # v1.12.0
         id: sre_app_token
@@ -113,7 +116,7 @@ jobs:
   build-backend:
     runs-on: ubuntu-latest
     environment: dev
-    needs: notify-slack-about-deploy
+    needs: [notify-slack-about-deploy, release-please]
     steps:
       - name: Audit DNS requests
         uses: cds-snc/dns-proxy-action@main
@@ -136,16 +139,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
-      - name: Build Docker image
+      - name: Build and push Docker image (No release created)
+        if: needs.release-please.outputs.release_created == 'false'
         working-directory: ./backend/
         run: |
           docker build \
-          --tag ${{ vars.ARTIFACT_ECR_REPOSITORY }}:$GITHUB_SHA .
+            --tag "${{ vars.ARTIFACT_ECR_REPOSITORY }}:$GITHUB_SHA" \
+            .
 
-      - name: Push Container to Amazon ECR
+          docker push ${{ vars.ARTIFACT_ECR_REPOSITORY }}:$GITHUB_SHA
+
+      - name: Build and push Docker image (Release created)
+        if: needs.release-please.outputs.release_created == 'true'
         working-directory: ./backend/
         run: |
+          RELEASE_TAG="v${{ needs.release-please.outputs.version }}"
+          docker build \
+            --tag "${{ vars.ARTIFACT_ECR_REPOSITORY }}:$GITHUB_SHA" \
+            --tag "${{ vars.ARTIFACT_ECR_REPOSITORY }}:$RELEASE_TAG" \
+            .
+
           docker push ${{ vars.ARTIFACT_ECR_REPOSITORY }}:$GITHUB_SHA
+          docker push ${{ vars.ARTIFACT_ECR_REPOSITORY }}:$RELEASE_TAG
 
       - name: Docker generate SBOM
         uses: cds-snc/security-tools/.github/actions/generate-sbom@34794baf2af592913bb5b51d8df4f8d0acc49b6f # v3.2.0
