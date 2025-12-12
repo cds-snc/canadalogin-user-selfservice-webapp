@@ -354,6 +354,14 @@ jobs:
           wait-for-service-stability: true
           propagate-tags: SERVICE
 
+      - name: Update SSM parameter for deployed image
+        run: |
+          aws ssm put-parameter \
+            --name "/ecs/${{ env.ECS_CLUSTER }}/${{ vars.ECS_SERVICE }}/container-image" \
+            --value "${{ vars.ARTIFACT_ECR_REPOSITORY }}:${{ env.DEPLOYMENT_SHA }}" \
+            --type "String" \
+            --overwrite
+
       - name: Tag deployed image in ECR
         if: steps.check-deployment-needed.outputs.deployment_needed == 'true'
         run: |
