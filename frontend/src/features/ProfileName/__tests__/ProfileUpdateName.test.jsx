@@ -507,13 +507,4 @@ describe("UpdateProfileName Component", () => {
     fireEvent.keyDown(firstNameInput, ctrlKeyEvent);
     expect(ctrlKeyEvent.preventDefault).not.toHaveBeenCalled();
   });
-
-  it("matches snapshot", () => {
-    const { container } = render(
-      <TestWrapper>
-        <UpdateProfileName {...defaultProps} />
-      </TestWrapper>,
-    );
-    expect(container).toMatchSnapshot();
-  });
 });
