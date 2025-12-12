@@ -2,7 +2,9 @@
 
 exports[`UpdateProfileName Component > matches snapshot 1`] = `
 <div>
-  <div>
+  <div
+    role="main"
+  >
     <h1
       tag="h1"
     >
