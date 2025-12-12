@@ -40,9 +40,7 @@ jobs:
 
       - name: Debug global outputs
         run: |
-          echo "releases_created='${{ steps.release.outputs.releases_created }}'"
-          echo "prs_created='${{ steps.release.outputs.prs_created }}'"
-          echo "paths_released='${{ steps.release.outputs.paths_released }}'"
+          echo "all outputs: ${{ toJson(steps.release.outputs) }}"
 
       - name: Debug path outputs for '.'
         run: |
