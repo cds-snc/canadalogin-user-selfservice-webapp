@@ -38,6 +38,18 @@ jobs:
         with:
           token: ${{ steps.sre_app_token.outputs.token }}
 
+      - name: Debug global outputs
+        run: |
+          echo "releases_created='${{ steps.release.outputs.releases_created }}'"
+          echo "prs_created='${{ steps.release.outputs.prs_created }}'"
+          echo "paths_released='${{ steps.release.outputs.paths_released }}'"
+
+      - name: Debug path outputs for '.'
+        run: |
+          echo ".--release_created='${{ steps.release.outputs['.--release_created'] }}'"
+          echo ".--version='${{ steps.release.outputs['.--version'] }}'"
+          echo ".--tag_name='${{ steps.release.outputs['.--tag_name'] }}'"
+
       - name: Debug release-please outputs
         run: |
           echo "release_created='${{ steps.release.outputs.release_created }}'"
