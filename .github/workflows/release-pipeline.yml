@@ -357,7 +357,7 @@ jobs:
       - name: Update SSM parameter for deployed image
         run: |
           aws ssm put-parameter \
-            --name "/ecs/${{ env.ECS_CLUSTER }}/${{ vars.ECS_SERVICE }}/container-image" \
+            --name "/ecs/${{ vars.ECS_CLUSTER }}/${{ vars.ECS_SERVICE }}/container-image" \
             --value "${{ vars.ARTIFACT_ECR_REPOSITORY }}:${{ env.DEPLOYMENT_SHA }}" \
             --type "String" \
             --overwrite
