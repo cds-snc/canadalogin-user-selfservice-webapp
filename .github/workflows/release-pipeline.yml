@@ -23,9 +23,6 @@ jobs:
   # creates the release when the PR is merged.
   release-please:
     runs-on: ubuntu-latest
-    outputs:
-      release_created: ${{ steps.release.outputs.release_created }}
-      version: ${{ steps.release.outputs.version }}
     steps:
       - uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547 # v1.12.0
         id: sre_app_token
@@ -37,23 +34,6 @@ jobs:
         id: release
         with:
           token: ${{ steps.sre_app_token.outputs.token }}
-
-      - name: Debug global outputs
-        run: |
-          echo "all outputs: ${{ toJson(steps.release.outputs) }}"
-
-      - name: Debug path outputs for '.'
-        run: |
-          echo ".--release_created='${{ steps.release.outputs['.--release_created'] }}'"
-          echo ".--version='${{ steps.release.outputs['.--version'] }}'"
-          echo ".--tag_name='${{ steps.release.outputs['.--tag_name'] }}'"
-
-      - name: Debug release-please outputs
-        run: |
-          echo "release_created='${{ steps.release.outputs.release_created }}'"
-          echo "version='${{ steps.release.outputs.version }}'"
-          echo "tag_name='${{ steps.release.outputs.tag_name }}'"
-          echo "release_name='${{ steps.release.outputs.release_name }}'"
 
   notify-slack-about-deploy:
     runs-on: ubuntu-latest
@@ -135,10 +115,24 @@ jobs:
     environment: dev
     needs: [notify-slack-about-deploy, release-please]
     steps:
-      - name: Debug release-please job outputs
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Fetch tags
+        run: git fetch --prune --unshallow --tags
+
+      - name: Detect release tag on current commit
+        id: detect-release-tag
         run: |
-          echo "needs.release-please.outputs.release_created='${{ needs.release-please.outputs.release_created }}'"
-          echo "needs.release-please.outputs.version='${{ needs.release-please.outputs.version }}'"
+          RELEASE_TAG=$(git tag --points-at "$GITHUB_SHA" | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1 || true)
+
+          if [ -z "$RELEASE_TAG" ]; then
+            echo "No release tag (vX.Y.Z) found on this commit."
+          else
+            echo "Found release tag: '$RELEASE_TAG'"
+          fi
+
+          echo "release_tag=$RELEASE_TAG" >> "$GITHUB_OUTPUT"
 
       - name: Audit DNS requests
         uses: cds-snc/dns-proxy-action@main
@@ -158,31 +152,25 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
 
-      - name: Checkout
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-
-      - name: Build and push Docker image (No release created)
-        if: needs.release-please.outputs.release_created == 'false'
+      - name: Build and push Docker image (SHA tag)
         working-directory: ./backend/
         run: |
           docker build \
             --tag "${{ vars.ARTIFACT_ECR_REPOSITORY }}:$GITHUB_SHA" \
             .
 
-          docker push ${{ vars.ARTIFACT_ECR_REPOSITORY }}:$GITHUB_SHA
+          docker push "${{ vars.ARTIFACT_ECR_REPOSITORY }}:$GITHUB_SHA"
 
-      - name: Build and push Docker image (Release created)
-        if: needs.release-please.outputs.release_created == 'true'
-        working-directory: ./backend/
+      - name: Tag and push Docker image (Release tag)
+        if: steps.detect-release-tag.outputs.release_tag != ''
         run: |
-          RELEASE_TAG="v${{ needs.release-please.outputs.version }}"
-          docker build \
-            --tag "${{ vars.ARTIFACT_ECR_REPOSITORY }}:$GITHUB_SHA" \
-            --tag "${{ vars.ARTIFACT_ECR_REPOSITORY }}:$RELEASE_TAG" \
-            .
+          RELEASE_TAG="${{ steps.detect-release-tag.outputs.release_tag }}"
 
-          docker push ${{ vars.ARTIFACT_ECR_REPOSITORY }}:$GITHUB_SHA
-          docker push ${{ vars.ARTIFACT_ECR_REPOSITORY }}:$RELEASE_TAG
+          docker tag \
+            "${{ vars.ARTIFACT_ECR_REPOSITORY }}:$GITHUB_SHA" \
+            "${{ vars.ARTIFACT_ECR_REPOSITORY }}:$RELEASE_TAG"
+
+          docker push "${{ vars.ARTIFACT_ECR_REPOSITORY }}:$RELEASE_TAG"
 
       - name: Docker generate SBOM
         uses: cds-snc/security-tools/.github/actions/generate-sbom@34794baf2af592913bb5b51d8df4f8d0acc49b6f # v3.2.0
