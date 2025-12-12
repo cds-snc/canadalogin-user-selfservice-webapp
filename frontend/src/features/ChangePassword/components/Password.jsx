@@ -144,7 +144,6 @@ export default function Password({
       </GcdsDetails>
 
       <form onSubmit={onSubmitHandler}>
-        {" "}
         <GcdsContainer>
           <GcdsInput
             inputId="input-password"

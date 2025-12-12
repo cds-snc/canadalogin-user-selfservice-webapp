@@ -99,7 +99,6 @@ export default function ProfileUpdateName({
         information={"name"}
       />
       <form onSubmit={onSubmitHandler}>
-        {" "}
         <GcdsContainer style={{ marginTop: "1.5rem" }}>
           <GcdsInput
             inputId="givenName"

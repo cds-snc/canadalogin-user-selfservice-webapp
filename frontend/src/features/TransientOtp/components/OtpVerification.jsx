@@ -125,7 +125,6 @@ export default function OtpVerification({
         )}
 
         <form onSubmit={onSubmitHandler}>
-          {" "}
           <GcdsInput
             inputId="verificationCode"
             label={pageContentJson["9"]}

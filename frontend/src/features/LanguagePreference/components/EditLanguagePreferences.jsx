@@ -80,7 +80,6 @@ export default function EditLanguagePreferences({
       </GcdsGrid>
 
       <form onSubmit={onSubmitHandler}>
-        {" "}
         <GcdsContainer marginTop="100">
           <GcdsRadios
             name="radio"

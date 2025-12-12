@@ -131,7 +131,6 @@ export default function AddMFAPhoneNumber({
             </GcdsErrorMessage>
           )}
           <form onSubmit={onSubmitHandler}>
-            {" "}
             <PhoneInput
               inputProps={{
                 name: "phone",
