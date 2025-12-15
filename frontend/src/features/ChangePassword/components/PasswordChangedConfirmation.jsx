@@ -22,10 +22,6 @@ export default function PasswordChangedConfirmation({ onNext }) {
     PAGES.passwordChangedConfirmation,
   );
 
-  const redirectToHomepage = () => {
-    return (window.location.href = "/");
-  };
-
   useEffect(() => {
     if (time <= 0) return;
 
@@ -60,7 +56,7 @@ export default function PasswordChangedConfirmation({ onNext }) {
           style={{ width: "fit-content" }}
           onGcdsClick={(ev) => {
             ev.preventDefault();
-            redirectToHomepage();
+            onNext();
           }}
         >
           {pageContentJson["6"]}
