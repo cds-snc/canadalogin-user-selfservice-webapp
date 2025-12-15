@@ -100,6 +100,7 @@ export const PAGES = {
   transientOtpSelection: "TransientOtpSelection",
   successBanner: "SuccessBanner",
   passwordVerification: "PasswordVerification",
+  editEmailPage: "EditEmailPage",
   editEmailEnterEmail: "EditEmailEnterEmail",
 };
 

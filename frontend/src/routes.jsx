@@ -21,6 +21,7 @@ import EditContactPhoneNumberPage from "./features/ContactPhoneNumber/components
 import AddMFAPage from "./features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPage.jsx";
 import DeleteMFAPage from "./features/MFAPhoneNumber/DeleteMFAPhoneNumber/component/DeleteMFAPage.jsx";
 import { PAGES } from "./utils/constants.jsx";
+import EditEmailAddressPage from "./features/EmailAddress/EditEmailAddressPage.jsx";
 
 export const appRoutes = [
   {
@@ -67,6 +68,11 @@ export const appRoutes = [
                     path: "update-contact-phone/:step?",
                     element: <EditContactPhoneNumberPage />,
                     handle: { id: PAGES.editContactPhoneNumberPage },
+                  },
+                  {
+                    path: "update-email/:step?",
+                    element: <EditEmailAddressPage />,
+                    handle: { id: PAGES.editEmailPage },
                   },
                 ],
               },

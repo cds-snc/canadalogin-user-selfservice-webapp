@@ -12,9 +12,10 @@ import OtpVerification from "../TransientOtp/components/OtpVerification";
 import { usePasswordValidation } from "../../hooks/usePasswordValidation";
 import { useOtpOperations } from "../../hooks/useOtpOperations";
 import { useUser } from "../../components/Providers/useUser";
+import EditEmailEnterEmail from "./EditEmailEnterEmail";
 
 export default function EditEmailAddressPage() {
-  const [wizardStep, setWizardStep] = useState("passwordVerification");
+  const [wizardStep, setWizardStep] = useState("enterEmail");
   const [errorCode, setErrorCode] = useState("");
   const [userPasswordValue, setUserPasswordValue] = useState("");
 
@@ -100,6 +101,7 @@ export default function EditEmailAddressPage() {
         onCancel={handleBackToProfile}
       />
     ),
+    enterEmail: <EditEmailEnterEmail onCancel={handleBackToProfile} />,
   };
   return localLoading ? (
     <Loader text={pageContentJson["12"]} />
