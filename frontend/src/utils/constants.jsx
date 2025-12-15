@@ -102,6 +102,7 @@ export const PAGES = {
   passwordVerification: "PasswordVerification",
   editEmailPage: "EditEmailPage",
   editEmailEnterEmail: "EditEmailEnterEmail",
+  emailOtpValidation: "EmailOtpValidation",
 };
 
 export const FOOTERS = {

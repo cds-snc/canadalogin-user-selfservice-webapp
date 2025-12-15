@@ -15,10 +15,29 @@ import {
 import ServicesWithAccessInfoSection from "../../components/InfoBlocks/ServicesWithAccessInfoSection";
 import SubmitButton from "../../components/Layout/SubmitButton";
 
-export default function EditEmailEnterEmail({ onCancel }) {
+export default function EditEmailEnterEmail({
+  onSubmit,
+  onCancel,
+  handleFormChange,
+  formData,
+  errorMessage,
+  setErrorCode,
+}) {
   const { language } = useParams();
   const pageContentJson = getPageContent(language, PAGES.editEmailEnterEmail);
   const { cancel } = getPageContent(language, "Button");
+
+  const onSubmitHandler = async (ev) => {
+    ev.preventDefault();
+    const emailAddress = formData?.emailAddress || "";
+    await onSubmit(emailAddress);
+  };
+
+  const handleInputChange = (ev) => {
+    setErrorCode(""); // Clear any existing errors
+    handleFormChange(ev);
+  };
+
   return (
     <GcdsContainer role="main">
       <GcdsHeading tag="h1" lang={language}>
@@ -44,17 +63,23 @@ export default function EditEmailEnterEmail({ onCancel }) {
         currentLang={language}
         information={ServicesWithAccessInfoSectionInformation.EMAIL_ADDRESS}
       />
-
-      <GcdsInput
-        style={{ marginTop: "1.5rem" }}
-        label={pageContentJson["6"]}
-        id="email"
-        name="email"
-        type="email"
-      />
+      <form onSubmit={onSubmitHandler}>
+        <GcdsInput
+          style={{ marginTop: "1.5rem" }}
+          label={pageContentJson["6"]}
+          id="emailAddress"
+          name="emailAddress"
+          type="email"
+          value={formData?.emailAddress || ""}
+          errorMessage={errorMessage}
+          validateOn="other"
+          onGcdsInput={handleInputChange}
+          required
+        />
+      </form>
 
       <GcdsGrid columns="max-content max-content" gap="200">
-        <SubmitButton />
+        <SubmitButton onGcdsClick={onSubmitHandler} />
         <GcdsButton
           buttonRole="secondary"
           onGcdsClick={(ev) => {

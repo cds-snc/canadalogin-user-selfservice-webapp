@@ -499,5 +499,17 @@
     "4": "The email address that GC Sign in uses to contact you",
     "5": "The email address that services connected to your GC Sign in may use to contact you",
     "6": "Email"
+  },
+  "EmailOtpValidation": {
+    "1": "Check your email",
+    "2": "We have sent an email with a 6-digit code to:",
+    "3": "Your email might take a few minutes to arrive. If you do not get an email, check your spam folder.",
+    "4": "Your code will expire in",
+    "5": "10 minutes.",
+    "6": "6-digit code",
+    "7": "Problems with the code?",
+    "8": "Use a different email",
+    "12": "You can request a new code in",
+    "13": "seconds"
   }
 }

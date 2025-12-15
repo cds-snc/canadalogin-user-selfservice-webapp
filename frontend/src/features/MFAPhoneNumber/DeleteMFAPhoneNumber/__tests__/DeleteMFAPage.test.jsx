@@ -781,8 +781,6 @@ describe("DeleteMFAPage", () => {
       });
     });
 
-
-
     it("should handle cancel navigation from any step", async () => {
       useOtpOperations.mockReturnValue({
         userPhoneFactors: [
@@ -827,10 +825,6 @@ describe("DeleteMFAPage", () => {
       );
     });
   });
-
-
-
-
 
   describe("French Language Support", () => {
     it("should work correctly with French language parameter", async () => {

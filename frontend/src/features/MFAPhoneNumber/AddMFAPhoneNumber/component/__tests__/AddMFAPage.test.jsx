@@ -22,7 +22,7 @@ vi.mock("react-router", async () => {
   return {
     ...actual,
     useNavigate: () => vi.fn(),
-    useParams: () => ({ lang: "en", id: "mock-id" })
+    useParams: () => ({ lang: "en", id: "mock-id" }),
   };
 });
 vi.mock("../../../../../hooks/useOtpOperations");
@@ -120,13 +120,10 @@ vi.mock("../../../../TransientOtp/components/OtpVerification", () => ({
         }
       }
     };
-    
+
     return (
       <div data-testid="otp-verification">
-        <button
-          onClick={handleNext}
-          data-testid="otp-verification-next"
-        >
+        <button onClick={handleNext} data-testid="otp-verification-next">
           Next
         </button>
         <button onClick={onBack} data-testid="otp-verification-back">
@@ -810,8 +807,6 @@ describe("AddMFAPage Unit Tests", () => {
     });
   });
 
-
-
   describe("Handler Functions Coverage", () => {
     it("should test handleChangeUserMfaSelection function", async () => {
       const mockPhoneFactors = [
@@ -1057,8 +1052,6 @@ describe("AddMFAPage Unit Tests", () => {
   });
 
   describe("AddSecondMFA Flow Functions", () => {
-
-
     it("should test onUseDifferentPhoneNumber function", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
@@ -1374,8 +1367,8 @@ describe("AddMFAPage Unit Tests", () => {
 
       const responseError = {
         response: {
-          data: { message: "RESPONSE_ERROR" }
-        }
+          data: { message: "RESPONSE_ERROR" },
+        },
       };
       authService.transientOtpVerify.mockRejectedValue(responseError);
 
@@ -1417,15 +1410,19 @@ describe("AddMFAPage Unit Tests", () => {
       otpFactors.getUserOtpPhoneFactors
         .mockResolvedValueOnce({
           success: true,
-          data: [{ id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" }],
+          data: [
+            { id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" },
+          ],
         })
         .mockResolvedValueOnce({
           success: true,
-          data: [{ 
-            id: "unvalidated-factor", 
-            type: "sms", 
-            phoneNumber: "+15551234567" 
-          }],
+          data: [
+            {
+              id: "unvalidated-factor",
+              type: "sms",
+              phoneNumber: "+15551234567",
+            },
+          ],
         });
 
       addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
@@ -1473,7 +1470,10 @@ describe("AddMFAPage Unit Tests", () => {
 
       // This should call getUserOtpPhoneFactors with false parameter
       await waitFor(() => {
-        expect(otpFactors.getUserOtpPhoneFactors).toHaveBeenCalledWith("test-user-123", false);
+        expect(otpFactors.getUserOtpPhoneFactors).toHaveBeenCalledWith(
+          "test-user-123",
+          false,
+        );
       });
     });
 
@@ -1481,7 +1481,9 @@ describe("AddMFAPage Unit Tests", () => {
       otpFactors.getUserOtpPhoneFactors
         .mockResolvedValueOnce({
           success: true,
-          data: [{ id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" }],
+          data: [
+            { id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" },
+          ],
         })
         .mockRejectedValueOnce(new Error("No existing MFA"));
 
@@ -1541,7 +1543,7 @@ describe("AddMFAPage Unit Tests", () => {
 
       authService.transientOtpSend.mockResolvedValue({
         success: true,
-        data: { trxnId: "test-trxn" }
+        data: { trxnId: "test-trxn" },
       });
 
       render(
@@ -1585,7 +1587,7 @@ describe("AddMFAPage Unit Tests", () => {
       });
 
       const otpError = {
-        data: { message: "OTP_REQUEST_ERROR" }
+        data: { message: "OTP_REQUEST_ERROR" },
       };
       authService.transientOtpSend.mockRejectedValue(otpError);
 
@@ -1686,8 +1688,18 @@ describe("AddMFAPage Unit Tests", () => {
     it("should handle verifyMFAOtp with duplicate phone number navigation", async () => {
       // Mock user phone factors with same last 4 digits
       const mockPhoneFactors = [
-        { id: "factor1", type: "sms", phoneNumber: "+15554567890", lastFourDigits: "7890" },
-        { id: "factor2", type: "voice", phoneNumber: "+15554567890", lastFourDigits: "7890" }
+        {
+          id: "factor1",
+          type: "sms",
+          phoneNumber: "+15554567890",
+          lastFourDigits: "7890",
+        },
+        {
+          id: "factor2",
+          type: "voice",
+          phoneNumber: "+15554567890",
+          lastFourDigits: "7890",
+        },
       ];
 
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
@@ -2322,10 +2334,9 @@ describe("AddMFAPage Unit Tests", () => {
         success: true,
       });
 
-
-
       functions.getPageContent.mockImplementation((language, page) => {
-        if (page === "successBanner") return { 5: "Voice call", 6: "Text message" };
+        if (page === "successBanner")
+          return { 5: "Voice call", 6: "Text message" };
         return { 11: "Loading..." };
       });
 
@@ -2377,8 +2388,6 @@ describe("AddMFAPage Unit Tests", () => {
         expect(addMFAPhoneNumberApi.verifyMFAOTP).toHaveBeenCalled();
       });
     });
-
-
 
     it("should handle console.error in useEffect when getUserOtpPhoneFactors fails", async () => {
       const consoleErrorSpy = vi
@@ -2474,8 +2483,8 @@ describe("AddMFAPage Unit Tests", () => {
       await waitFor(() => {
         expect(addMFAPhoneNumberApi.enrollMFA).toHaveBeenCalledWith(
           expect.objectContaining({
-            phoneNumber: expect.any(String)
-          })
+            phoneNumber: expect.any(String),
+          }),
         );
       });
     });

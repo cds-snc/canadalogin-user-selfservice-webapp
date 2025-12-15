@@ -127,6 +127,23 @@ export const authService = {
       handleApiError(error);
     }
   },
+
+  update_email_address: async (newEmailAddress) => {
+    try {
+      const updatePayload = {
+        userName: newEmailAddress,
+        emails: [{ value: newEmailAddress, type: "work" }],
+      };
+
+      const response = await axios.post(
+        `${config.apiUrl}${SUBMIT_END_POINTS.profile}`,
+        updatePayload,
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
   get_rp_info: async () => {
     try {
       const response = await axios.get(
