@@ -11,18 +11,16 @@ import {
 } from "@cdssnc/gcds-components-react";
 import { getPageContent } from "../../../utils/functions";
 import { PAGES } from "../../../utils/constants";
+const initialTime = 20;
 
-export default function PasswordChangedConfirmation() {
+export default function PasswordChangedConfirmation({ onNext }) {
   const { language } = useParams();
-  const [time, setTime] = useState(5);
+  const [time, setTime] = useState(initialTime);
+
   const pageContentJson = getPageContent(
     language,
     PAGES.passwordChangedConfirmation,
   );
-
-  const redirectToHomepage = () => {
-    return (window.location.href = "/");
-  };
 
   useEffect(() => {
     if (time <= 0) return;
@@ -36,10 +34,10 @@ export default function PasswordChangedConfirmation() {
 
   useEffect(() => {
     if (time <= 0) {
-      redirectToHomepage();
+      onNext();
       return;
     }
-  }, [time]);
+  }, [onNext, time]);
 
   return (
     <GcdsContainer>
@@ -49,16 +47,19 @@ export default function PasswordChangedConfirmation() {
       <br />
       &nbsp;
       <GcdsHeading tag="h1">{pageContentJson["2"]}</GcdsHeading>
-      <GcdsText>{pageContentJson["3"]}</GcdsText>
+      <GcdsText>
+        {pageContentJson["3"]} {time} {pageContentJson["4"]}
+      </GcdsText>
+      <GcdsText>{pageContentJson["5"]}</GcdsText>
       <GcdsGrid columns="auto auto" gap="1rem" align-items="center">
         <GcdsButton
           style={{ width: "fit-content" }}
           onGcdsClick={(ev) => {
             ev.preventDefault();
-            redirectToHomepage();
+            onNext();
           }}
         >
-          {pageContentJson["4"]}
+          {pageContentJson["6"]}
         </GcdsButton>
       </GcdsGrid>
     </GcdsContainer>

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useParams, useLocation, useNavigate } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import { useUser } from "../../../components/Providers/useUser.tsx";
 import Loader from "../../../components/Layout/Loading.jsx";
 
@@ -24,8 +24,8 @@ const defaulPasswordUpdatetStep = "passwordVerification";
 export default function ChangePasswordIndex() {
   const { language } = useParams();
   const { state, dispatch } = useUser();
-  const { removeAuthenticatedPage } = userProfileDispatch(dispatch);
-  const { pathname } = useLocation();
+  const { setLoading } = userProfileDispatch(dispatch);
+
   const [userSelectedMfaFactor, setUserSelectedMfaFactor] = useState(null);
   const [otpSentResponse, setOtpSentResponse] = useState(null);
   const [errorCode, setErrorCode] = useState("");
@@ -40,11 +40,12 @@ export default function ChangePasswordIndex() {
   const [userOtpValue, setUserOtpValue] = useState("");
   const [userPasswordValue, setUserPasswordValue] = useState("");
   const pageContentJson = getPageContent(language, PAGES.otpSelection);
+  const navBarContent = getPageContent(language, "TopNavBar");
 
   const [passwordUpdateStep, setPasswordUpdateStep] = useState(
     defaulPasswordUpdatetStep,
   );
-  const [localLoading, setLocalLoading] = useState(false);
+  const [localLoading, setLocalLoading] = useState(true);
   const { userProfile } = state;
   const { id, userName } = userProfile ?? {};
   const navigate = useNavigate();
@@ -172,14 +173,28 @@ export default function ChangePasswordIndex() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    return () => {
-      // when a user navigates away from this component, we remove the pathname from the array
-      // In the Private Route handler, we track the page to avoid a redirect loop to reautenticate the user
-      removeAuthenticatedPage(pathname);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const logout = async () => {
+    setLoading(true, navBarContent["8"]); // Use logout loading text
+
+    try {
+      const response = await authService.logout();
+
+      if (response && response.data && response.data.redirect_url) {
+        window.location.href = response.data.redirect_url;
+      } else {
+        // Fallback redirect if no redirect_url provided
+        window.location.href = "/";
+      }
+    } catch (error) {
+      console.error("Logout failed:", error);
+      // Update loading text to show error
+      setLoading(true, navBarContent["9"]);
+      // Redirect after error
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 2000);
+    }
+  };
 
   const steps = {
     passwordVerification: (
@@ -233,7 +248,13 @@ export default function ChangePasswordIndex() {
         onBack={() => setPasswordUpdateStep("otpValidation")}
       />
     ),
-    passwordChangedConfirmation: <PasswordChangedConfirmation />,
+    passwordChangedConfirmation: (
+      <PasswordChangedConfirmation
+        onNext={() => {
+          logout();
+        }}
+      />
+    ),
   };
 
   return localLoading ? (

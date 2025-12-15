@@ -217,6 +217,7 @@ describe("Password Component", () => {
     userOtpValue: "123456",
     setErrorCode: vi.fn(),
     errorMessage: "",
+    setLocalLoading: vi.fn(),
   };
 
   const renderComponent = (props = {}) => {
@@ -313,7 +314,7 @@ describe("Password Component", () => {
       const passwordInput = screen.getByTestId("password-input");
       const submitButton = screen.getByTestId("submit-button");
 
-      fireEvent.change(passwordInput, { target: { value: "myPillow123456" } });
+      fireEvent.change(passwordInput, { target: { value: "pillowmooseDish" } });
       fireEvent.click(submitButton);
 
       expect(setErrorCode).toHaveBeenCalledWith("example_password_used");
@@ -326,20 +327,9 @@ describe("Password Component", () => {
       const passwordInput = screen.getByTestId("password-input");
       const submitButton = screen.getByTestId("submit-button");
 
-      fireEvent.change(passwordInput, { target: { value: "bigMoose123456" } });
-      fireEvent.click(submitButton);
-
-      expect(setErrorCode).toHaveBeenCalledWith("example_password_used");
-    });
-
-    it("detects forbidden word 'dish'", async () => {
-      const setErrorCode = vi.fn();
-      renderComponent({ setErrorCode });
-
-      const passwordInput = screen.getByTestId("password-input");
-      const submitButton = screen.getByTestId("submit-button");
-
-      fireEvent.change(passwordInput, { target: { value: "superDish123456" } });
+      fireEvent.change(passwordInput, {
+        target: { value: "pillow mooseDish" },
+      });
       fireEvent.click(submitButton);
 
       expect(setErrorCode).toHaveBeenCalledWith("example_password_used");
@@ -388,7 +378,7 @@ describe("Password Component", () => {
       const submitButton = screen.getByTestId("submit-button");
 
       fireEvent.change(passwordInput, {
-        target: { value: "pillowMooseDish123456" },
+        target: { value: "pILLOW Moose Dish" },
       });
       fireEvent.click(submitButton);
 
