@@ -47,9 +47,12 @@ export default function ChangePasswordIndex() {
   });
 
   // Use the password validation hook
-  const { validatePassword } = usePasswordValidation(setErrorCode, () => {
-    setPasswordUpdateStep("otpSelection");
-  });
+  const { validatePassword, validatePasswordLoading } = usePasswordValidation(
+    setErrorCode,
+    () => {
+      setPasswordUpdateStep("otpSelection");
+    },
+  );
 
   // Use the OTP operations hook
   const {
@@ -168,7 +171,7 @@ export default function ChangePasswordIndex() {
     passwordChangedConfirmation: <PasswordChangedConfirmation />,
   };
 
-  return localLoading ? (
+  return localLoading || validatePasswordLoading ? (
     <Loader text={pageContentJson["11"]} />
   ) : (
     <StepContent

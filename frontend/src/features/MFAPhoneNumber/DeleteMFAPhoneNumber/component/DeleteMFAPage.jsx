@@ -39,9 +39,12 @@ export default function DeleteMFAPage() {
   });
 
   // Use the password validation hook
-  const { validatePassword } = usePasswordValidation(setErrorCode, () => {
-    setWizardStep("otpSelection");
-  });
+  const { validatePassword, validatePasswordLoading } = usePasswordValidation(
+    setErrorCode,
+    () => {
+      setWizardStep("otpSelection");
+    },
+  );
 
   // Use the OTP operations hook
   const {
@@ -193,7 +196,7 @@ export default function DeleteMFAPage() {
     ),
   };
 
-  return localLoading ? (
+  return localLoading || validatePasswordLoading ? (
     <Loader text={pageContentJson["11"]} />
   ) : (
     <StepContent

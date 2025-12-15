@@ -32,9 +32,12 @@ export default function EditEmailAddressPage() {
   const pageContentJson = getPageContent(language, PAGES.otpSelection);
 
   // Use the password validation hook
-  const { validatePassword } = usePasswordValidation(setErrorCode, () => {
-    setWizardStep("otpSelection");
-  });
+  const { validatePassword, validatePasswordLoading } = usePasswordValidation(
+    setErrorCode,
+    () => {
+      setWizardStep("otpSelection");
+    },
+  );
 
   // Use the OTP operations hook
   const {
@@ -103,7 +106,7 @@ export default function EditEmailAddressPage() {
     ),
     enterEmail: <EditEmailEnterEmail onCancel={handleBackToProfile} />,
   };
-  return localLoading ? (
+  return localLoading || validatePasswordLoading ? (
     <Loader text={pageContentJson["12"]} />
   ) : (
     <StepContent

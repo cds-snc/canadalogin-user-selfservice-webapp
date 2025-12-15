@@ -43,9 +43,12 @@ export default function AddMFAPage() {
   });
 
   // Use the password validation hook
-  const { validatePassword } = usePasswordValidation(setErrorCode, () => {
-    setWizardStep("otpSelection");
-  });
+  const { validatePassword, validatePasswordLoading } = usePasswordValidation(
+    setErrorCode,
+    () => {
+      setWizardStep("otpSelection");
+    },
+  );
 
   // Use the OTP operations hook
   const {
@@ -446,7 +449,7 @@ export default function AddMFAPage() {
     ),
   };
 
-  return localLoading ? (
+  return localLoading || validatePasswordLoading ? (
     <Loader text={pageContentJson["11"]} />
   ) : (
     <StepContent

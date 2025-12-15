@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { authService } from "../services/authService";
 
 /**
@@ -7,7 +8,9 @@ import { authService } from "../services/authService";
  * @returns {Object} - Object containing validatePassword function and loading state
  */
 export function usePasswordValidation(setErrorCode, onSuccess) {
+  const [validatePasswordLoading, setValidatePasswordLoading] = useState(false);
   const validatePassword = async (userPasswordValue) => {
+    setValidatePasswordLoading(true);
     try {
       // Get password policy first
       const passwordPolicyResponse = await authService.requestPasswordPolicy();
@@ -44,8 +47,10 @@ export function usePasswordValidation(setErrorCode, onSuccess) {
       if (err && err.data && err.data.message) {
         setErrorCode(err.data.message);
       }
+    } finally {
+      setValidatePasswordLoading(false);
     }
   };
 
-  return { validatePassword };
+  return { validatePassword, validatePasswordLoading };
 }
