@@ -1694,9 +1694,7 @@ export const UseDifferentPhoneNumber = (() => {
       await step("Test use different phone number link", async () => {
         await waitFor(async () => {
           // Use canvas.getByText to directly find the link by its text content
-          let differentPhoneNumberLink = canvas.getByText(
-            "Use a different phone number",
-          );
+          let differentPhoneNumberLink = canvas.getByText("Try another way");
           await expect(differentPhoneNumberLink).toBeInTheDocument();
 
           // Verify we found the correct gcds-link element

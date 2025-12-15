@@ -20,6 +20,7 @@ import {
   countryMapping,
   FLOW_TYPES,
   PAGES,
+  ServicesWithAccessInfoSectionInformation,
 } from "../../../utils/constants.jsx";
 import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx";
 
@@ -32,7 +33,9 @@ const PageHeader = ({ language, pageContentJson }) => {
       <GcdsText>{pageContentJson["2"]}</GcdsText>
       <ServicesWithAccessInfoSection
         currentLang={language}
-        information={"contactPhoneNumber"}
+        information={
+          ServicesWithAccessInfoSectionInformation.CONTACT_PHONE_NUMBER
+        }
       />
     </>
   );

@@ -13,7 +13,11 @@ import {
 
 import { getPageContent } from "../../../utils/functions.jsx";
 
-import { PAGES, PROFILE_LANGUAGES } from "../../../utils/constants.jsx";
+import {
+  PAGES,
+  PROFILE_LANGUAGES,
+  ServicesWithAccessInfoSectionInformation,
+} from "../../../utils/constants.jsx";
 import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx";
 
 export default function EditLanguagePreferences({
@@ -74,7 +78,9 @@ export default function EditLanguagePreferences({
       <GcdsGrid columns="1fr">
         <ServicesWithAccessInfoSection
           currentLang={language}
-          information={"languagePreference"}
+          information={
+            ServicesWithAccessInfoSectionInformation.LANGUAGE_PREFERENCE
+          }
         />
       </GcdsGrid>
 

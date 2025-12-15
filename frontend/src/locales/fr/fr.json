@@ -77,7 +77,7 @@
     "18": "Connectez-vous avec Connextion GC",
     "19": "pour accéder à vôtre",
     "20": "compte",
-    "21": "Utiliser un autre numéro de téléphone",
+    "21": "Essayer une autre méthode",
     "22": "Consultez vos courriels",
     "23": "Nous avons envoyé un courriel contenant un code à 6 chiffres à l’adresse :",
     "24": "Le courriel pourrait prendre quelques minutes à arriver. Si vous ne voyez pas le courriel, vérifiez s’il se trouve dans votre dossier de pourriels.",
@@ -85,7 +85,8 @@
     "26": "Demander un nouveau code",
     "27": "Annuler",
     "28": "Configurer la vérification par message texte (SMS)",
-    "29": "Configurez la vérification par appel vocal"
+    "29": "Configurez la vérification par appel vocal",
+    "30": "Je n’ai pas accès à mon téléphone"
   },
   "Button": {
     "submit": "Continuer",

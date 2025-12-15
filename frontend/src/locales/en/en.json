@@ -78,7 +78,7 @@
     "18": "Complete 2-step verification",
     "19": "to continue to your",
     "20": "account",
-    "21": "Use a different phone number",
+    "21": "Try another way",
     "22": "Check your email",
     "23": "We have sent an email with a 6-digit code to:",
     "24": "Your email might take a few minutes to arrive. If you do not get an email, check your spam folder.",
@@ -352,7 +352,8 @@
     "6": "GC Account directory",
     "7": "name",
     "8": "contact phone number",
-    "9": "language preference"
+    "9": "language preference",
+    "10": "email address"
   },
   "ConfirmContactPhoneNumberUpdate": {
     "1": "Are you sure you want to update your phone number?",
@@ -490,5 +491,13 @@
     "6": "Reset your password",
     "7": "To add a phone number,",
     "8": "To delete this number,"
+  },
+  "EditEmailEnterEmail": {
+    "1": "Enter a new email address",
+    "2": "Changing your email address will affect:",
+    "3": "The email address you use to sign in",
+    "4": "The email address that GC Sign in uses to contact you",
+    "5": "The email address that services connected to your GC Sign in may use to contact you",
+    "6": "email"
   }
 }

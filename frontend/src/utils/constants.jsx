@@ -42,6 +42,13 @@ export const FLOW_TYPES = {
   manage: "manage",
 };
 
+export const ServicesWithAccessInfoSectionInformation = {
+  NAME: "name",
+  CONTACT_PHONE_NUMBER: "contactPhoneNumber",
+  LANGUAGE_PREFERENCE: "languagePreference",
+  EMAIL_ADDRESS: "emailAddress",
+};
+
 export const LINK_SUBMIT_TYPES = {
   useNewVerification: "useNewVerification",
   requestNewCode: "requestNewCode",
@@ -93,6 +100,7 @@ export const PAGES = {
   transientOtpSelection: "TransientOtpSelection",
   successBanner: "SuccessBanner",
   passwordVerification: "PasswordVerification",
+  editEmailEnterEmail: "EditEmailEnterEmail",
 };
 
 export const FOOTERS = {

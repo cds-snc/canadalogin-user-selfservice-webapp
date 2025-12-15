@@ -193,6 +193,7 @@ const mockSetUserOtpValue = vi.fn();
 const mockRequestOtpCode = vi.fn();
 const mockValidateOtpCode = vi.fn();
 const mockSetErrorCode = vi.fn();
+const mockOnCancel = vi.fn(() => mockNavigateHelper("/en/security-settings"));
 
 const defaultProps = {
   onNext: mockOnNext,
@@ -200,6 +201,7 @@ const defaultProps = {
   requestOtpCode: mockRequestOtpCode,
   validateOtpCode: mockValidateOtpCode,
   setErrorCode: mockSetErrorCode,
+  onCancel: mockOnCancel,
   errorMessage: "",
   userProfile: {
     id: "user-123",

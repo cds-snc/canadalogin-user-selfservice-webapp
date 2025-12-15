@@ -10,7 +10,10 @@ import {
   GcdsErrorMessage,
 } from "@cdssnc/gcds-components-react";
 import { getPageContent } from "../../../utils/functions.jsx";
-import { PAGES } from "../../../utils/constants.jsx";
+import {
+  PAGES,
+  ServicesWithAccessInfoSectionInformation,
+} from "../../../utils/constants.jsx";
 import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx";
 
@@ -98,7 +101,7 @@ export default function ProfileUpdateName({
 
       <ServicesWithAccessInfoSection
         currentLang={language}
-        information={"name"}
+        information={ServicesWithAccessInfoSectionInformation.NAME}
       />
 
       <form id="form" style={{ marginTop: "38px" }} onSubmit={useSubmitHandler}>
