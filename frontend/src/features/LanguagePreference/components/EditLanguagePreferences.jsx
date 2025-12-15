@@ -19,6 +19,7 @@ import {
   ServicesWithAccessInfoSectionInformation,
 } from "../../../utils/constants.jsx";
 import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx";
+import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 
 export default function EditLanguagePreferences({
   languageFormData,
@@ -59,9 +60,9 @@ export default function EditLanguagePreferences({
     }
   };
 
-  const onSubmitHandler = (event) => {
-    event.preventDefault();
-    onNext();
+  const onSubmitHandler = async (ev) => {
+    ev.preventDefault();
+    await onNext();
   };
 
   return (
@@ -84,7 +85,7 @@ export default function EditLanguagePreferences({
         />
       </GcdsGrid>
 
-      <form id="form" style={{ marginTop: "38px" }} onSubmit={onSubmitHandler}>
+      <form onSubmit={onSubmitHandler}>
         <GcdsContainer marginTop="100">
           <GcdsRadios
             name="radio"
@@ -94,28 +95,23 @@ export default function EditLanguagePreferences({
             onChange={handleProfileChange}
           />
         </GcdsContainer>
-
-        <GcdsGrid columns="max-content max-content" gap="200">
-          <GcdsButton
-            onGcdsClick={(ev) => {
-              ev.preventDefault();
-              onSubmitHandler(ev);
-            }}
-          >
-            {pageContentJson["15"]}
-          </GcdsButton>
-
-          <GcdsButton
-            buttonRole="secondary"
-            onGcdsClick={(ev) => {
-              ev.preventDefault();
-              onCancel();
-            }}
-          >
-            {pageContentJson["16"]}
-          </GcdsButton>
-        </GcdsGrid>
       </form>
+
+      <GcdsGrid columns="max-content max-content" gap="200">
+        <SubmitButton onGcdsClick={onSubmitHandler} currentLang={language}>
+          {pageContentJson["15"]}
+        </SubmitButton>
+
+        <GcdsButton
+          buttonRole="secondary"
+          onGcdsClick={(ev) => {
+            ev.preventDefault();
+            onCancel();
+          }}
+        >
+          {pageContentJson["16"]}
+        </GcdsButton>
+      </GcdsGrid>
     </GcdsContainer>
   );
 }

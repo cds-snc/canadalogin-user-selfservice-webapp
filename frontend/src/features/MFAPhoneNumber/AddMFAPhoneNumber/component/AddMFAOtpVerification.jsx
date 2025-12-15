@@ -13,6 +13,7 @@ import {
 import { useParams } from "react-router";
 import { FLOW_TYPES, PAGES } from "../../../../utils/constants";
 import { getPageContent } from "../../../../utils/functions";
+import SubmitButton from "../../../../components/Layout/SubmitButton";
 
 const initialTime = 10;
 
@@ -65,7 +66,7 @@ export default function AddMFAOtpVerification({
   const [codeRequested, setCodeRequested] = useState(false);
   const [time, setTime] = useState(initialTime);
   const pageContentJson = getPageContent(language, PAGES.verification);
-  const { submit, cancel } = getPageContent(language, "Button");
+  const { cancel } = getPageContent(language, "Button");
 
   const clearValues = () => {
     onChangePhoneForm("phoneNumber", "");
@@ -104,8 +105,14 @@ export default function AddMFAOtpVerification({
   }, [time]);
 
   const userMfaType = phoneFormData.otpType;
+
+  const onSubmitHandler = async (ev) => {
+    ev.preventDefault();
+    await onNext();
+  };
+
   return (
-    <GcdsContainer>
+    <GcdsContainer role="main">
       {codeRequested && (
         <GcdsNotice
           type="success"
@@ -126,35 +133,32 @@ export default function AddMFAOtpVerification({
         />
 
         <GcdsHeading tag="h2">{pageContentJson["8"]}</GcdsHeading>
-
-        <GcdsInput
-          inputId="verificationCode"
-          label={pageContentJson["9"]}
-          autofocus
-          autocomplete="one-time-code"
-          name="verificationCode"
-          type="text"
-          value={phoneFormData.otp}
-          validateOn="other"
-          errorMessage={errorMessage}
-          onGcdsInput={handleChange}
-          lang={language}
-          size="6"
-          maxlength={6}
-          minlength={6}
-        ></GcdsInput>
+        <form onSubmit={onSubmitHandler}>
+          <GcdsInput
+            inputId="verificationCode"
+            label={pageContentJson["9"]}
+            autofocus
+            autocomplete="one-time-code"
+            name="verificationCode"
+            type="text"
+            value={phoneFormData.otp}
+            validateOn="other"
+            errorMessage={errorMessage}
+            onGcdsInput={handleChange}
+            lang={language}
+            size="6"
+            maxlength={6}
+            minlength={6}
+          ></GcdsInput>
+        </form>
 
         <GcdsGrid columns="max-content max-content" gap="200">
-          <GcdsButton
+          <SubmitButton
             disabled={phoneFormData.otp.length < 6}
             style={{ width: "fit-content" }}
-            onGcdsClick={(ev) => {
-              ev.preventDefault();
-              onNext();
-            }}
-          >
-            {submit}
-          </GcdsButton>
+            onGcdsClick={onSubmitHandler}
+            currentLang={language}
+          ></SubmitButton>
 
           <GcdsButton
             buttonRole="secondary"

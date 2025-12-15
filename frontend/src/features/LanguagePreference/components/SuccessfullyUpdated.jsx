@@ -15,6 +15,7 @@ import { PAGES, LANGUAGE_DISPLAY_NAMES } from "../../../utils/constants.jsx";
 import { useUser } from "../../../components/Providers/useUser.tsx";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
 import { authService } from "../../../services/authService.jsx";
+import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 
 export default function SuccessfullyUpdated({
   languageFormData,
@@ -54,6 +55,11 @@ export default function SuccessfullyUpdated({
     }
   };
 
+  const onSubmitHandler = async (ev) => {
+    ev.preventDefault();
+    await onBackToProfile();
+  };
+
   if (!languageFormData?.languageCode) return null;
 
   return (
@@ -80,15 +86,13 @@ export default function SuccessfullyUpdated({
       </GcdsText>
 
       <GcdsGrid columns="max-content max-content" gap="200">
-        <GcdsButton
+        <SubmitButton
           style={{ width: "fit-content" }}
-          onGcdsClick={(ev) => {
-            ev.preventDefault();
-            onBackToProfile();
-          }}
+          onGcdsClick={onSubmitHandler}
+          currentLang={language}
         >
           {pageContentJson["6"]}
-        </GcdsButton>
+        </SubmitButton>
         &nbsp;
         <GcdsButton
           buttonRole="secondary"

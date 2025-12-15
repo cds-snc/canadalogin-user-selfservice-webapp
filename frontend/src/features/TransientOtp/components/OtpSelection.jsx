@@ -13,6 +13,7 @@ import { getPageContent } from "../../../utils/functions.jsx";
 import { gcHelpCentreLinks } from "../../../utils/gcHelpCentreLinks.jsx";
 
 import { FLOW_TYPES, PAGES } from "../../../utils/constants.jsx";
+import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 
 export default function OtpSelection({
   onNext,
@@ -26,7 +27,12 @@ export default function OtpSelection({
 
   const pageContentJson = getPageContent(language, PAGES.transientOtpSelection);
 
-  const { submit, cancel } = getPageContent(language, "Button");
+  const { cancel } = getPageContent(language, "Button");
+
+  const onSubmitHandler = async (ev) => {
+    ev.preventDefault();
+    await onNext();
+  };
 
   const configureRadioSMSOptions = () => {
     let radioOptionsValues = [];
@@ -118,17 +124,14 @@ export default function OtpSelection({
             {pageContentJson["7"]}
           </GcdsText>
         </GcdsContainer>
-        {radioComponent}
+        <form onSubmit={onSubmitHandler}>{radioComponent}</form>
+
         <GcdsGrid columns="max-content max-content" gap="200">
-          <GcdsButton
+          <SubmitButton
             style={{ width: "fit-content" }}
-            onGcdsClick={(ev) => {
-              ev.preventDefault();
-              onNext();
-            }}
-          >
-            {submit}
-          </GcdsButton>
+            onGcdsClick={onSubmitHandler}
+            currentLang={language}
+          ></SubmitButton>
 
           <GcdsButton
             buttonRole="secondary"

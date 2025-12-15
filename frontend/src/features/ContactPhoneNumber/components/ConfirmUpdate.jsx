@@ -13,6 +13,7 @@ import {
 import { getPageContent } from "../../../utils/functions.jsx";
 import { PAGES } from "../../../utils/constants";
 import RPNameDisplay from "../../../components/RPInfo/RPNameDisplay.jsx";
+import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 
 export default function ConfirmUpdate({
   onNext,
@@ -27,6 +28,14 @@ export default function ConfirmUpdate({
     language,
     PAGES.confirmContactPhoneNumberUpdate,
   );
+  const onSubmitHandler = async (ev) => {
+    ev.preventDefault();
+    // Clear error when user clicks
+    if (setErrorCode) {
+      setErrorCode("");
+    }
+    await onNext();
+  };
 
   return (
     <GcdsContainer role="main">
@@ -68,20 +77,14 @@ export default function ConfirmUpdate({
           </GcdsText>
         </GcdsNotice>
         <GcdsGrid columns="max-content max-content" gap="200">
-          <GcdsButton
+          <SubmitButton
             disabled={localLoading}
             style={{ width: "fit-content" }}
-            onGcdsClick={async (ev) => {
-              ev.preventDefault();
-              // Clear error when user clicks
-              if (setErrorCode) {
-                setErrorCode("");
-              }
-              onNext();
-            }}
+            onGcdsClick={onSubmitHandler}
+            currentLang={language}
           >
             {pageContentJson["10"]}
-          </GcdsButton>
+          </SubmitButton>
           <GcdsButton
             buttonRole="secondary"
             disabled={localLoading}

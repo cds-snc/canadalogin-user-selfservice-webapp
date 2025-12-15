@@ -84,6 +84,7 @@ export default function ChangePasswordIndex() {
 
   // Custom validateOtpCode for password change flow using passwordUpdate API
   const validateOtpCode = async (userOtpValue) => {
+    setLocalLoading(true);
     try {
       const response = await passwordUpdate.secondStep(
         userOtpValue,
@@ -97,6 +98,8 @@ export default function ChangePasswordIndex() {
       if (err && err.data && err.data.message) {
         setErrorCode(err.data.message);
       }
+    } finally {
+      setLocalLoading(false);
     }
   };
 
@@ -166,7 +169,7 @@ export default function ChangePasswordIndex() {
   };
 
   return localLoading ? (
-    <Loader text={pageContentJson["12"]} />
+    <Loader text={pageContentJson["11"]} />
   ) : (
     <StepContent
       StepComponent={steps[passwordUpdateStep]}

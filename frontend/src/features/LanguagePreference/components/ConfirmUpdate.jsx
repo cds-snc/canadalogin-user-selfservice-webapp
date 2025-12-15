@@ -13,6 +13,7 @@ import {
 import { getPageContent } from "../../../utils/functions.jsx";
 import { PAGES, LANGUAGE_DISPLAY_NAMES } from "../../../utils/constants.jsx";
 import RPNameDisplay from "../../../components/RPInfo/RPNameDisplay.jsx";
+import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 
 export default function ConfirmUpdate({
   languageFormData,
@@ -23,9 +24,14 @@ export default function ConfirmUpdate({
 }) {
   const { language } = useParams();
 
-  if (!languageFormData?.languageCode) return null;
-
   const pageContentJson = getPageContent(language, PAGES.confirmLanguageUpdate);
+
+  const onSubmitHandler = async (ev) => {
+    ev.preventDefault();
+    await onConfirm();
+  };
+
+  if (!languageFormData?.languageCode) return null;
 
   return (
     <GcdsContainer role="main">
@@ -55,15 +61,13 @@ export default function ConfirmUpdate({
       </ul>
 
       <GcdsGrid columns="max-content max-content" gap="200">
-        <GcdsButton
-          onGcdsClick={async (ev) => {
-            ev.preventDefault();
-            await onConfirm();
-          }}
+        <SubmitButton
+          onGcdsClick={onSubmitHandler}
           disabled={localLoading}
+          currentLang={language}
         >
           {pageContentJson["8"]}
-        </GcdsButton>
+        </SubmitButton>
         <GcdsButton
           buttonRole="secondary"
           onGcdsClick={(ev) => {

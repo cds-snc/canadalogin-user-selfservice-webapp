@@ -16,6 +16,7 @@ import { useParams } from "react-router";
 import { countryMapping, FLOW_TYPES, PAGES } from "../../../../utils/constants";
 import { getPageContent } from "../../../../utils/functions";
 import { path } from "../../../../utils/routeHelpers";
+import SubmitButton from "../../../../components/Layout/SubmitButton";
 
 const RadioButtons = ({
   onChangePhoneForm,
@@ -86,7 +87,7 @@ export default function AddMFAPhoneNumber({
   const { language } = useParams();
   const [phoneNumberValid, setPhoneNumberValid] = useState(true);
   const pageContentJson = getPageContent(language, PAGES.addMFANumber);
-  const { submit, cancel } = getPageContent(language, "Button");
+  const { cancel } = getPageContent(language, "Button");
   const backtoProfilePage = path(PAGES.ProfileHome, { language: language });
 
   const isPhoneNumberValid = (phoneNumber, country) => {
@@ -95,8 +96,21 @@ export default function AddMFAPhoneNumber({
     return validatedPhoneNumber;
   };
 
+  const onSubmitHandler = async (ev) => {
+    ev.preventDefault();
+    try {
+      setErrorCode("");
+      await onNext();
+    } catch (error) {
+      // Handle validation errors
+      if (error?.data?.message) {
+        setErrorCode(error.data.message);
+      }
+    }
+  };
+
   return (
-    <GcdsContainer>
+    <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="500">
         <GcdsContainer>
           <GcdsHeading tag="h1" lang={language}>
@@ -116,40 +130,42 @@ export default function AddMFAPhoneNumber({
               {errorMessage}
             </GcdsErrorMessage>
           )}
-          <PhoneInput
-            inputProps={{
-              name: "phone",
-              required: true,
-              autoFocus: true,
-            }}
-            specialLabel={pageContentJson["7"]}
-            country={"ca"}
-            preferredCountries={["ca"]}
-            onlyCountries={countryMapping.countries}
-            localization={
-              language === "fr"
-                ? countryMapping.frLocalization
-                : countryMapping.localization
-            }
-            value={phoneFormData.phoneNumber}
-            className={"high-res"}
-            enableSearch={true}
-            countryCodeEditable={false}
-            disableSearchIcon={false}
-            defaultErrorMessage={pageContentJson["14"]}
-            onChange={(phone, country, event, formatted) => {
-              onChangePhoneForm("phoneNumber", `+${phone}`);
-              onChangePhoneForm("formattedPhoneNumber", formatted);
-              const isNumberValid = isPhoneNumberValid(
-                phone,
-                country.countryCode,
-              );
-              setPhoneNumberValid(isNumberValid);
-            }}
-            isValid={(inputNumber, country) => {
-              return isPhoneNumberValid(inputNumber, country.iso2);
-            }}
-          />
+          <form onSubmit={onSubmitHandler}>
+            <PhoneInput
+              inputProps={{
+                name: "phone",
+                required: true,
+                autoFocus: true,
+              }}
+              specialLabel={pageContentJson["7"]}
+              country={"ca"}
+              preferredCountries={["ca"]}
+              onlyCountries={countryMapping.countries}
+              localization={
+                language === "fr"
+                  ? countryMapping.frLocalization
+                  : countryMapping.localization
+              }
+              value={phoneFormData.phoneNumber}
+              className={"high-res"}
+              enableSearch={true}
+              countryCodeEditable={false}
+              disableSearchIcon={false}
+              defaultErrorMessage={pageContentJson["14"]}
+              onChange={(phone, country, event, formatted) => {
+                onChangePhoneForm("phoneNumber", `+${phone}`);
+                onChangePhoneForm("formattedPhoneNumber", formatted);
+                const isNumberValid = isPhoneNumberValid(
+                  phone,
+                  country.countryCode,
+                );
+                setPhoneNumberValid(isNumberValid);
+              }}
+              isValid={(inputNumber, country) => {
+                return isPhoneNumberValid(inputNumber, country.iso2);
+              }}
+            />
+          </form>
         </section>
 
         <section>
@@ -163,24 +179,12 @@ export default function AddMFAPhoneNumber({
       </GcdsGrid>
 
       <GcdsGrid columns="max-content max-content" gap="200">
-        <GcdsButton
+        <SubmitButton
           disabled={!phoneNumberValid}
           style={{ width: "fit-content" }}
-          onGcdsClick={async (ev) => {
-            ev.preventDefault();
-            try {
-              setErrorCode("");
-              await onNext();
-            } catch (error) {
-              // Handle validation errors
-              if (error?.data?.message) {
-                setErrorCode(error.data.message);
-              }
-            }
-          }}
-        >
-          {submit}
-        </GcdsButton>
+          onGcdsClick={onSubmitHandler}
+          currentLang={language}
+        ></SubmitButton>
 
         <GcdsButton
           buttonRole="secondary"

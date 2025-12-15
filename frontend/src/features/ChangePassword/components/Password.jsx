@@ -19,6 +19,7 @@ import { passwordUpdate } from "../api/passwordUpdate.jsx";
 
 import { PAGES } from "../../../utils/constants.jsx";
 import { path } from "../../../utils/routeHelpers.js";
+import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 
 export default function Password({
   onNext,
@@ -28,7 +29,7 @@ export default function Password({
   errorMessage,
 }) {
   const { language } = useParams();
-  const { submit, cancel } = getPageContent(language, "Button");
+  const { cancel } = getPageContent(language, "Button");
   const [passwordPolicy, setPasswordPolicy] = useState({ min: 12, max: 110 });
   const [checkedValue, setCheckedValue] = useState(false);
   const [password, setPassword] = useState("");
@@ -40,6 +41,11 @@ export default function Password({
   });
 
   const navigate = useNavigate();
+
+  const onSubmitHandler = async (ev) => {
+    ev.preventDefault();
+    await completePasswordUpdate();
+  };
 
   useEffect(() => {
     async function loadMinMax() {
@@ -137,59 +143,57 @@ export default function Password({
         <GcdsText>{pageContentJson["8"]}</GcdsText>
       </GcdsDetails>
 
-      <GcdsContainer>
-        <GcdsInput
-          inputId="input-password"
-          label={pageContentJson["9"]}
-          name="password"
-          hint={pageContentJson["10"]}
-          type={checkedValue ? "text" : "password"}
-          onGcdsInput={handlePasswordChange}
-          errorMessage={errorMessage}
-          minlength={passwordPolicy.min}
-          maxlength={passwordPolicy.max}
-          lang={language}
-          autofocus
-        ></GcdsInput>
+      <form onSubmit={onSubmitHandler}>
+        <GcdsContainer>
+          <GcdsInput
+            inputId="input-password"
+            label={pageContentJson["9"]}
+            name="password"
+            hint={pageContentJson["10"]}
+            type={checkedValue ? "text" : "password"}
+            onGcdsInput={handlePasswordChange}
+            errorMessage={errorMessage}
+            minlength={passwordPolicy.min}
+            maxlength={passwordPolicy.max}
+            lang={language}
+            autofocus
+          ></GcdsInput>
 
-        <GcdsCheckboxes
-          checkboxId="checkbox-default"
-          legend={pageContentJson["11"]}
-          name="checkbox"
-          options={optionsValues}
-          onGcdsChange={() => setCheckedValue(!checkedValue)}
-        ></GcdsCheckboxes>
+          <GcdsCheckboxes
+            checkboxId="checkbox-default"
+            legend={pageContentJson["11"]}
+            name="checkbox"
+            options={optionsValues}
+            onGcdsChange={() => setCheckedValue(!checkedValue)}
+          ></GcdsCheckboxes>
 
-        <GcdsText>
-          <span>{pageContentJson["12"]}</span>{" "}
-          <strong>{passwordStrength}</strong> / {passwordPolicy.min}{" "}
-          <span>{pageContentJson["13"]}</span>
-        </GcdsText>
+          <GcdsText>
+            <span>{pageContentJson["12"]}</span>{" "}
+            <strong>{passwordStrength}</strong> / {passwordPolicy.min}{" "}
+            <span>{pageContentJson["13"]}</span>
+          </GcdsText>
 
-        <GcdsGrid columns="max-content max-content" gap="200">
-          <GcdsButton
-            disabled={password.length < passwordPolicy.min}
-            style={{ width: "fit-content" }}
-            onGcdsClick={(ev) => {
-              ev.preventDefault();
-              completePasswordUpdate();
-            }}
-          >
-            {submit}
-          </GcdsButton>
+          <GcdsGrid columns="max-content max-content" gap="200">
+            <SubmitButton
+              disabled={password.length < passwordPolicy.min}
+              style={{ width: "fit-content" }}
+              onGcdsClick={onSubmitHandler}
+              currentLang={language}
+            ></SubmitButton>
 
-          <GcdsButton
-            buttonRole="secondary"
-            style={{ width: "fit-content" }}
-            onGcdsClick={(ev) => {
-              ev.preventDefault();
-              navigate(backToSecuritySettingsPage);
-            }}
-          >
-            {cancel}
-          </GcdsButton>
-        </GcdsGrid>
-      </GcdsContainer>
+            <GcdsButton
+              buttonRole="secondary"
+              style={{ width: "fit-content" }}
+              onGcdsClick={(ev) => {
+                ev.preventDefault();
+                navigate(backToSecuritySettingsPage);
+              }}
+            >
+              {cancel}
+            </GcdsButton>
+          </GcdsGrid>
+        </GcdsContainer>
+      </form>
     </GcdsContainer>
   );
 }

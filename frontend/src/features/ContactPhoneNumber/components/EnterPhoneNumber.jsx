@@ -23,6 +23,7 @@ import {
   ServicesWithAccessInfoSectionInformation,
 } from "../../../utils/constants.jsx";
 import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx";
+import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 
 const PageHeader = ({ language, pageContentJson }) => {
   return (
@@ -116,12 +117,17 @@ export default function EnterPhoneNumber({
   const pageContentJson = getPageContent(language, PAGES.enterNewPhoneNumber);
   const otpPageContentJson = getPageContent(language, PAGES.otpSelection);
 
-  const { submit, cancel } = getPageContent(language, "Button");
+  const { cancel } = getPageContent(language, "Button");
 
   const isPhoneNumberValid = (phoneNumber, country) => {
     const capitalize = country.toUpperCase();
     const validatedPhoneNumber = isValidPhoneNumber(phoneNumber, capitalize);
     return validatedPhoneNumber;
+  };
+
+  const onSubmitHandler = async (ev) => {
+    ev.preventDefault();
+    await onNext();
   };
 
   // Add accessibility attributes to phone input components after mount
@@ -163,51 +169,53 @@ export default function EnterPhoneNumber({
           <PageHeader language={language} pageContentJson={pageContentJson} />
         </section>
 
-        <section>
-          {errorMessage && (
-            <GcdsErrorMessage messageId="message-props">
-              {errorMessage}
-            </GcdsErrorMessage>
-          )}
-          <PhoneInput
-            inputProps={{
-              name: "phone",
-              required: true,
-              autoFocus: true,
-            }}
-            specialLabel={pageContentJson["10"]}
-            country={"ca"}
-            preferredCountries={["ca"]}
-            onlyCountries={countryMapping.countries}
-            localization={
-              language === "fr"
-                ? countryMapping.frLocalization
-                : countryMapping.localization
-            }
-            value={phoneFormData.phoneNumber}
-            className={"high-res"}
-            enableSearch={true}
-            countryCodeEditable={false}
-            disableSearchIcon={false}
-            defaultErrorMessage={pageContentJson["14"]}
-            onChange={(phone, country, event, formatted) => {
-              onChangePhoneForm("phoneNumber", `+${phone}`);
-              onChangePhoneForm("formattedPhoneNumber", formatted);
-              const isNumberValid = isPhoneNumberValid(
-                phone,
-                country.countryCode,
-              );
-              setPhoneNumberValid(isNumberValid);
-              // Clear error when user makes changes
-              if (setErrorCode) {
-                setErrorCode("");
+        <form onSubmit={onSubmitHandler}>
+          <section>
+            {errorMessage && (
+              <GcdsErrorMessage messageId="message-props">
+                {errorMessage}
+              </GcdsErrorMessage>
+            )}{" "}
+            <PhoneInput
+              inputProps={{
+                name: "phone",
+                required: true,
+                autoFocus: true,
+              }}
+              specialLabel={pageContentJson["10"]}
+              country={"ca"}
+              preferredCountries={["ca"]}
+              onlyCountries={countryMapping.countries}
+              localization={
+                language === "fr"
+                  ? countryMapping.frLocalization
+                  : countryMapping.localization
               }
-            }}
-            isValid={(inputNumber, country) => {
-              return isPhoneNumberValid(inputNumber, country.iso2);
-            }}
-          />
-        </section>
+              value={phoneFormData.phoneNumber}
+              className={"high-res"}
+              enableSearch={true}
+              countryCodeEditable={false}
+              disableSearchIcon={false}
+              defaultErrorMessage={pageContentJson["14"]}
+              onChange={(phone, country, event, formatted) => {
+                onChangePhoneForm("phoneNumber", `+${phone}`);
+                onChangePhoneForm("formattedPhoneNumber", formatted);
+                const isNumberValid = isPhoneNumberValid(
+                  phone,
+                  country.countryCode,
+                );
+                setPhoneNumberValid(isNumberValid);
+                // Clear error when user makes changes
+                if (setErrorCode) {
+                  setErrorCode("");
+                }
+              }}
+              isValid={(inputNumber, country) => {
+                return isPhoneNumberValid(inputNumber, country.iso2);
+              }}
+            />
+          </section>
+        </form>
 
         <section>
           <MyCountryIsNotListed pageContentJson={pageContentJson} />
@@ -223,16 +231,12 @@ export default function EnterPhoneNumber({
       </GcdsGrid>
 
       <GcdsGrid columns="max-content max-content" gap="200">
-        <GcdsButton
+        <SubmitButton
           disabled={!phoneNumberValid}
           style={{ width: "fit-content" }}
-          onGcdsClick={(ev) => {
-            ev.preventDefault();
-            onNext();
-          }}
-        >
-          {submit}
-        </GcdsButton>
+          onGcdsClick={onSubmitHandler}
+          currentLang={language}
+        ></SubmitButton>
 
         <GcdsButton
           buttonRole="secondary"
