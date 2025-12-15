@@ -73,16 +73,11 @@ export default function Password({
   }
 
   function isExamplePasswordUsed(pwd) {
-    const examplePassword = ["pillow", "moose", "dish"];
+    // remove all whitespace and lowercase
+    // disallow "pillowmoosedish" in any casing/spacing
 
-    const passwordContainsForbiddenWord = examplePassword.some((word) =>
-      pwd.toLowerCase().includes(word.toLowerCase()),
-    );
-
-    if (passwordContainsForbiddenWord) {
-      return true;
-    }
-    return false;
+    const normalized = pwd.replace(/\s+/g, "").toLowerCase();
+    return normalized === "pillowmoosedish";
   }
 
   const completePasswordUpdate = async () => {
@@ -177,7 +172,6 @@ export default function Password({
             <SubmitButton
               disabled={password.length < passwordPolicy.min}
               style={{ width: "fit-content" }}
-              onGcdsClick={onSubmitHandler}
               currentLang={language}
             ></SubmitButton>
 

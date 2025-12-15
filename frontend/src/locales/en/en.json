@@ -323,14 +323,12 @@
     "13": "Carrier charges may apply."
   },
   "PasswordChangedConfirmation": {
-    "1": "Your Password changed successfully.",
-    "2": "You will need to sign in using your new password.",
-    "3": "You will be redirected to the sign in page shortly.",
-    "4": "Back to profile",
-    "5": "To search for another GC Account, visit the",
-    "6": "GC Account directory.",
-    "7": "Back to profile",
-    "8": "Sign out"
+    "1": "Your Password has been changed",
+    "2": "You will need to sign in using your new password",
+    "3": "You will be redirected to the sign in page in",
+    "4": "seconds",
+    "5": "If you are not automatically redirected, use the button below",
+    "6": "Sign in"
   },
   "TopNavBar": {
     "1": "GC Sign in",
