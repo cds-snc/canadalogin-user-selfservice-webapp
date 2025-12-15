@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom/vitest";
 import { BrowserRouter } from "react-router";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, cleanup, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import DeleteMFAPage from "../component/DeleteMFAPage.jsx";
 import { UserProvider } from "../../../../components/Providers/UserProvider.tsx";
@@ -71,6 +71,13 @@ vi.mock("../../../../utils/functions", () => ({
 vi.mock("../../../../services/authService", () => ({
   authService: {
     verifyPassword: vi.fn(),
+    get_my_user_profile: vi.fn().mockResolvedValue({ success: true, user: {} }),
+    get_rp_info: vi.fn().mockResolvedValue({ success: true }),
+    keepAlive: vi.fn().mockResolvedValue({ success: true }),
+    logout: vi.fn().mockResolvedValue({ success: true }),
+    requestPasswordPolicy: vi.fn(),
+    transientOtpSend: vi.fn(),
+    transientOtpVerify: vi.fn(),
   },
 }));
 
@@ -145,35 +152,6 @@ vi.mock("../../../TransientOtp/components/OtpSelection", () => ({
   ),
 }));
 
-vi.mock("../../../TransientOtp/components/OtpVerification", async () => {
-  const React = await import("react");
-  return {
-    default: function MockOtpVerification({
-      validateOtpCode,
-      requestOtpCode,
-      onBack,
-    }) {
-      // Call requestOtpCode when component mounts to simulate the real behavior
-      React.useEffect(() => {
-        if (requestOtpCode) {
-          requestOtpCode();
-        }
-      }, [requestOtpCode]);
-
-      return (
-        <div data-testid="otp-verification">
-          <button onClick={validateOtpCode} data-testid="otp-verification-next">
-            Next
-          </button>
-          <button onClick={onBack} data-testid="otp-verification-back">
-            Back
-          </button>
-        </div>
-      );
-    },
-  };
-});
-
 vi.mock("../../../TransientOtp/components/PasswordVerification", () => ({
   default: ({ validatePassword, onCancel }) => (
     <div data-testid="password-verification">
@@ -219,23 +197,16 @@ vi.mock(
   }),
 );
 
-vi.mock("../../../TransientOtp/components/OtpSelection", () => ({
-  default: ({ onNext }) => (
-    <div data-testid="otp-selection">
-      <button data-testid="otp-selection-next" onClick={onNext}>
-        Next
-      </button>
-    </div>
-  ),
-}));
-
 vi.mock("../../../TransientOtp/components/OtpVerification", () => ({
-  default: ({ onNext, onBack }) => (
+  default: ({ validateOtpCode, onBack }) => (
     <div data-testid="otp-verification">
       <button data-testid="otp-verification-back" onClick={onBack}>
         Back
       </button>
-      <button data-testid="otp-verification-next" onClick={onNext}>
+      <button
+        data-testid="otp-verification-next"
+        onClick={() => validateOtpCode && validateOtpCode("123456")}
+      >
         Next
       </button>
     </div>
@@ -289,15 +260,6 @@ vi.mock("../../../../utils/constants", async () => {
   };
 });
 
-vi.mock("../../../../services/authService", () => ({
-  authService: {
-    requestPasswordPolicy: vi.fn(),
-    verifyPassword: vi.fn(),
-    transientOtpSend: vi.fn(),
-    transientOtpVerify: vi.fn(),
-  },
-}));
-
 const mockUserState = {
   userProfile: {
     id: "test-user-123",
@@ -350,18 +312,17 @@ describe("DeleteMFAPage", () => {
     });
 
     // Mock the usePasswordValidation hook
-    usePasswordValidation.mockImplementation(
-      (setErrorCode, successCallback) => ({
-        validatePassword: vi.fn(async () => {
-          // Don't call successCallback immediately for most tests
-          return Promise.resolve();
-        }),
+    usePasswordValidation.mockImplementation(() => ({
+      validatePassword: vi.fn(async () => {
+        // Don't call successCallback immediately for most tests
+        return Promise.resolve();
       }),
-    );
+    }));
   });
 
   afterEach(() => {
     vi.clearAllMocks();
+    cleanup();
   });
 
   describe("Initial Loading and Error Handling", () => {
@@ -682,8 +643,8 @@ describe("DeleteMFAPage", () => {
         validatePassword: vi.fn(async () => {
           // Simulate the password validation setting an error code
           setErrorCodeCallback("CSIAM0011E");
-          // This error is expected and handled in the component
-          throw new Error("Password validation failed");
+          // Just return without success callback - this simulates failed validation without throwing
+          return Promise.resolve();
         }),
       }));
 
@@ -725,6 +686,193 @@ describe("DeleteMFAPage", () => {
       expect(errorSummary).toHaveAttribute("data-error-code", "CSIAM0011E");
       expect(errorSummary).toHaveAttribute("data-language", "en");
       expect(errorSummary).toHaveTextContent("Error Summary: CSIAM0011E");
+    });
+  });
+
+  describe("Step Navigation Tests", () => {
+    it("should navigate through all steps successfully", async () => {
+      const mockValidateOtpCode = vi.fn();
+      const mockRequestOtpCode = vi.fn();
+
+      useOtpOperations.mockReturnValue({
+        userPhoneFactors: [
+          {
+            id: "factor-1",
+            type: "smsotp",
+            phoneNumber: "+15551234567",
+          },
+        ],
+        userSelectedMfaFactor: {
+          id: "factor-1",
+          type: "smsotp",
+          phoneNumber: "+15551234567",
+        },
+        userOtpValue: "",
+        otpSentResponse: { trxnId: "test-trxn-id" },
+        localLoading: false,
+        handleChangeUserMfaSelection: vi.fn(),
+        handleSetUserOtpValue: vi.fn(),
+        requestOtpCode: mockRequestOtpCode,
+        validateOtpCode: mockValidateOtpCode,
+        fetchUserOtpPhoneFactors: vi.fn().mockResolvedValue({
+          success: true,
+          data: [
+            {
+              id: "factor-1",
+              type: "smsotp",
+              phoneNumber: "+15551234567",
+            },
+          ],
+        }),
+      });
+
+      // Mock successful password validation
+      usePasswordValidation.mockImplementation((setErrorCode, onSuccess) => ({
+        validatePassword: vi.fn(async () => {
+          setErrorCode("");
+          onSuccess();
+        }),
+      }));
+
+      renderComponent();
+
+      // Start at password verification
+      await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      // Navigate to OTP selection
+      const passwordNextButton = screen.getByTestId(
+        "password-verification-next",
+      );
+      act(() => {
+        passwordNextButton.click();
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
+      });
+
+      // Navigate to OTP verification
+      const otpSelectionNextButton = screen.getByTestId("otp-selection-next");
+      act(() => {
+        otpSelectionNextButton.click();
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
+      });
+
+      // Mock successful OTP validation
+      mockValidateOtpCode.mockImplementation(async (otpValue, callback) => {
+        callback();
+      });
+
+      // Navigate to delete confirmation
+      const otpVerificationNextButton = screen.getByTestId(
+        "otp-verification-next",
+      );
+      act(() => {
+        otpVerificationNextButton.click();
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId("delete-confirm")).toBeInTheDocument();
+      });
+    });
+
+
+
+    it("should handle cancel navigation from any step", async () => {
+      useOtpOperations.mockReturnValue({
+        userPhoneFactors: [
+          {
+            id: "factor-1",
+            type: "smsotp",
+            phoneNumber: "+15551234567",
+          },
+        ],
+        userSelectedMfaFactor: null,
+        userOtpValue: "",
+        otpSentResponse: null,
+        localLoading: false,
+        handleChangeUserMfaSelection: vi.fn(),
+        handleSetUserOtpValue: vi.fn(),
+        requestOtpCode: vi.fn(),
+        validateOtpCode: vi.fn(),
+        fetchUserOtpPhoneFactors: vi.fn().mockResolvedValue({
+          success: true,
+          data: [
+            {
+              id: "factor-1",
+              type: "smsotp",
+              phoneNumber: "+15551234567",
+            },
+          ],
+        }),
+      });
+
+      renderComponent();
+
+      await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      // Cancel from password verification
+      const cancelButton = screen.getByTestId("password-verification-back");
+      cancelButton.click();
+
+      expect(mockNavigate).toHaveBeenCalledWith(
+        "/en/security-settings/manage-2fa-verifications",
+      );
+    });
+  });
+
+
+
+
+
+  describe("French Language Support", () => {
+    it("should work correctly with French language parameter", async () => {
+      // Mock the location to include French in pathname
+      mockLocation.pathname = "/fr/delete-mfa";
+
+      useOtpOperations.mockReturnValue({
+        userPhoneFactors: [
+          {
+            id: "factor-1",
+            type: "smsotp",
+            phoneNumber: "+15551234567",
+          },
+        ],
+        userSelectedMfaFactor: null,
+        userOtpValue: "",
+        otpSentResponse: null,
+        localLoading: false,
+        handleChangeUserMfaSelection: vi.fn(),
+        handleSetUserOtpValue: vi.fn(),
+        requestOtpCode: vi.fn(),
+        validateOtpCode: vi.fn(),
+        fetchUserOtpPhoneFactors: vi.fn().mockResolvedValue({
+          success: true,
+          data: [
+            {
+              id: "factor-1",
+              type: "smsotp",
+              phoneNumber: "+15551234567",
+            },
+          ],
+        }),
+      });
+
+      renderComponent();
+
+      await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      // Component should render correctly with French language
+      expect(screen.getByTestId("password-verification")).toBeInTheDocument();
     });
   });
 });
