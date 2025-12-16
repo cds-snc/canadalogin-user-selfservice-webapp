@@ -152,7 +152,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
 
-      - name: Build and push Docker image (SHA tag)
+      - name: Build and push Docker image (SHA and latest tag)
         working-directory: ./backend/
         run: |
           docker build \
@@ -160,6 +160,9 @@ jobs:
             .
 
           docker push "${{ vars.ARTIFACT_ECR_REPOSITORY }}:$GITHUB_SHA"
+
+          docker tag "${{ vars.ARTIFACT_ECR_REPOSITORY }}:$GITHUB_SHA" "${{ vars.ARTIFACT_ECR_REPOSITORY }}:latest"
+          docker push "${{ vars.ARTIFACT_ECR_REPOSITORY }}:latest"
 
       - name: Tag and push Docker image (Release tag)
         if: steps.detect-release-tag.outputs.release_tag != ''
