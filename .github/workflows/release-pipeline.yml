@@ -75,7 +75,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        environment: [dev, test, staging]
+        environment: [dev, test, staging, prod]
     environment: ${{ matrix.environment }}
     needs: notify-slack-about-deploy
     steps:
@@ -189,7 +189,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        environment: [dev, test, staging]
+        environment: [dev, test, staging, prod]
     environment: ${{ matrix.environment }}
     steps:
       - run: echo "Deploying frontend to ${{ matrix.environment }} environment..."
@@ -254,7 +254,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        environment: [dev, test, staging]
+        environment: [dev, test, staging, prod]
     environment: ${{ matrix.environment }}
     steps:
       - run: echo "Deploying backend to ${{ matrix.environment }} environment..."
