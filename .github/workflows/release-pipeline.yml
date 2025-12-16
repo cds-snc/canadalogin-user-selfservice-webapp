@@ -362,35 +362,6 @@ jobs:
             --type "String" \
             --overwrite
 
-      - name: Tag deployed image in ECR
-        if: steps.check-deployment-needed.outputs.deployment_needed == 'true'
-        run: |
-          REPO_URI="${{ vars.ARTIFACT_ECR_REPOSITORY }}"
-          REPO_NAME=$(echo "$REPO_URI" | cut -d/ -f2-)
-
-          echo "Repository name is: $REPO_NAME"
-          echo "Deployment SHA is: $DEPLOYMENT_SHA"
-
-          MANIFEST=$(aws ecr batch-get-image \
-            --region ca-central-1 \
-            --repository-name "$REPO_NAME" \
-            --image-ids imageTag="$DEPLOYMENT_SHA" \
-            --query 'images[0].imageManifest' \
-            --output text)
-
-          if [ -z "$MANIFEST" ]; then
-            echo "ERROR: No image manifest found for tag $DEPLOYMENT_SHA in $REPO_NAME"
-            exit 1
-          fi
-
-          aws ecr put-image \
-            --region ca-central-1 \
-            --repository-name "$REPO_NAME" \
-            --image-tag "deployed" \
-            --image-manifest "$MANIFEST"
-
-          echo "Tagged $REPO_NAME:$DEPLOYMENT_SHA as $REPO_NAME:deployed"
-
   notify-slack-about-deploy-success:
     runs-on: ubuntu-latest
     needs: [notify-slack-about-deploy, deploy-frontends, deploy-backends]
