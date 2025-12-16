@@ -101,17 +101,44 @@ async def update_my_profile(
 
     ibm_user_profile_username = ibm_user_profile.get("userName")
     current_users_username = updated_user_data_dict.get("userName")
-    username_match = ibm_user_profile_username == current_users_username
 
-    if not username_match:
-        logger.error("User mismatch - cannot update profile")
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="User mismatch - cannot update profile",
+    # Check if this is an email change request
+    is_email_change = (
+        current_users_username != ibm_user_profile_username
+        and updated_user_data_dict.get("emails") is not None
+    )
+
+    if is_email_change:
+        # For email changes, validate that the new userName matches the new email
+        new_emails = updated_user_data_dict.get("emails", [])
+        if new_emails and len(new_emails) > 0:
+            new_email_value = (
+                new_emails[0].get("value")
+                if isinstance(new_emails[0], dict)
+                else new_emails[0].value
+            )
+            if current_users_username != new_email_value:
+                logger.error("Username must match email address")
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Username must match email address",
+                )
+        logger.info(
+            f"Email change requested: {ibm_user_profile_username} -> {current_users_username}"
         )
+    else:
+        # For non-email changes, ensure username matches current user
+        username_match = ibm_user_profile_username == current_users_username
 
-    # Prevent changing the userName
-    updated_user_data_dict.pop("userName", None)
+        if not username_match:
+            logger.error("User mismatch - cannot update profile")
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="User mismatch - cannot update profile",
+            )
+
+        # Prevent changing the userName for non-email changes
+        updated_user_data_dict.pop("userName", None)
 
     merged_profile = {**ibm_user_profile, **updated_user_data_dict}
 

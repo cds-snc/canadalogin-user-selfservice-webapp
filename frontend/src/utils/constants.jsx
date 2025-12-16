@@ -103,6 +103,8 @@ export const PAGES = {
   editEmailPage: "EditEmailPage",
   editEmailEnterEmail: "EditEmailEnterEmail",
   emailOtpValidation: "EmailOtpValidation",
+  emailConfirmUpdate: "EmailConfirmUpdate",
+  emailUpdateSuccess: "EmailUpdateSuccess",
 };
 
 export const FOOTERS = {
@@ -122,11 +124,12 @@ export const SERVICES = [
 ];
 
 // Map frontend FLOW_TYPES to backend otpType
-// Backend: sms | voice
-// Frontend: smsotp | voiceotp
+// Backend: sms | voice | email
+// Frontend: smsotp | voiceotp | email
 export const serverMapping = {
   [FLOW_TYPES.sms]: "sms",
   [FLOW_TYPES.voice]: "voice",
+  [FLOW_TYPES.email]: "email",
 };
 
 export const SUBMIT_END_POINTS = {

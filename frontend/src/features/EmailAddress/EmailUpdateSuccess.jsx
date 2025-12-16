@@ -9,7 +9,9 @@ import {
   GcdsGrid,
   GcdsLink,
   GcdsIcon,
+  GcdsNotice,
 } from "@cdssnc/gcds-components-react";
+import SubmitButton from "../../components/Layout/SubmitButton";
 
 export default function EmailUpdateSuccess({
   newEmailAddress,
@@ -17,57 +19,49 @@ export default function EmailUpdateSuccess({
   onSignOut,
 }) {
   const { language } = useParams();
-  const pageContentJson = getPageContent(
-    language,
-    "YouMayUpdateEmailAtOtherPlaces",
-  );
+  const pageContentJson = getPageContent(language, PAGES.emailUpdateSuccess);
 
   return (
     <GcdsContainer role="main">
-      <GcdsIcon
-        name="check-circle"
-        size="5rem"
-        color="#00703c"
-        marginBottom="300"
-      />
+      <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle=" ">
+        <GcdsText>
+          {pageContentJson["1"]} <strong>{newEmailAddress}</strong>
+        </GcdsText>
+      </GcdsNotice>
 
-      <GcdsHeading tag="h1" lang={language} marginBottom="300">
-        {pageContentJson["1"]} {newEmailAddress}
-      </GcdsHeading>
-
-      <GcdsHeading tag="h2" lang={language} marginBottom="200">
+      <GcdsHeading tag="h1" lang={language} marginBottom="300" marginTop="400">
         {pageContentJson["2"]}
       </GcdsHeading>
 
-      <GcdsText marginBottom="200" lang={language}>
-        {pageContentJson["3"]}
+      <GcdsText marginBottom="300" lang={language}>
+        <strong>{pageContentJson["3"]}</strong>
       </GcdsText>
 
-      <GcdsText marginBottom="200" lang={language}>
+      <GcdsText marginBottom="300" lang={language}>
         {pageContentJson["4"]}
       </GcdsText>
 
-      <GcdsText marginBottom="200" lang={language}>
+      <GcdsText marginBottom="300" lang={language}>
         {pageContentJson["5"]}{" "}
-        <GcdsLink
-          href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}
-          target="_blank"
-          external={true}
-        >
+        <GcdsLink href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}>
           {pageContentJson["6"]}
         </GcdsLink>
+        {pageContentJson["7"]}
       </GcdsText>
 
       <GcdsGrid columns="max-content max-content" gap="200" marginTop="400">
-        <GcdsButton onClick={onBackToProfile} style={{ width: "fit-content" }}>
-          {pageContentJson["7"]}
-        </GcdsButton>
+        <SubmitButton
+          onClick={onBackToProfile}
+          style={{ width: "fit-content" }}
+        >
+          {pageContentJson["8"]}
+        </SubmitButton>
         <GcdsButton
           buttonRole="secondary"
           onClick={onSignOut}
           style={{ width: "fit-content" }}
         >
-          {pageContentJson["8"]}
+          {pageContentJson["9"]}
         </GcdsButton>
       </GcdsGrid>
     </GcdsContainer>

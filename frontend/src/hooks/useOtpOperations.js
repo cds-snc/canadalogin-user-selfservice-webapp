@@ -39,21 +39,40 @@ export const useOtpOperations = (
   /**
    * Handle setting the OTP value entered by the user
    */
-  const handleSetUserOtpValue = (otpValue) => {
-    setUserOtpValue(otpValue);
+  const handleSetUserOtpValue = (value) => {
+    setUserOtpValue(value);
   };
 
   /**
-   * Request OTP code to be sent to the selected MFA factor
+   * Request OTP code to be sent to the selected MFA factor or email
+   * @param {string} overrideOtpType - Optional OTP type override
+   * @param {string} targetEmailAddress - Optional target email address for email OTP
    */
-  const requestOtpCode = async () => {
-    if (!userSelectedMfaFactor || !userName) return;
+  const requestOtpCode = async (overrideOtpType, targetEmailAddress) => {
+    if (!userName) return;
+
+    // Allow direct email OTP requests or use selected MFA factor
+    const otpType =
+      overrideOtpType ||
+      (userSelectedMfaFactor
+        ? serverMapping[userSelectedMfaFactor.type]
+        : null);
+    if (!otpType) return;
 
     const userData = {
       userName,
-      otpType: serverMapping[userSelectedMfaFactor.type],
-      phoneNumber: userSelectedMfaFactor.phoneNumber,
+      otpType,
     };
+
+    // Add phoneNumber for SMS/Voice OTP
+    if (otpType !== "email" && userSelectedMfaFactor?.phoneNumber) {
+      userData.phoneNumber = userSelectedMfaFactor.phoneNumber;
+    }
+
+    // Add emailAddress for email OTP when a target email is specified
+    if (otpType === "email" && targetEmailAddress) {
+      userData.emailAddress = targetEmailAddress;
+    }
 
     try {
       const response = await authService.transientOtpSend(userData);
@@ -74,14 +93,25 @@ export const useOtpOperations = (
    * Validate OTP code entered by user
    * @param {string} otpValue - The OTP value to validate
    * @param {function} onSuccess - Callback function to execute on successful validation
+   * @param {string} overrideOtpType - Optional OTP type override (for direct email OTP)
    */
-  const validateOtpCode = async (otpValue, onSuccess) => {
-    if (!otpSentResponse || !userSelectedMfaFactor) return;
+  const validateOtpCode = async (otpValue, onSuccess, overrideOtpType) => {
+    if (!otpSentResponse) return;
+
+    // Determine OTP type: prioritize override, then selected MFA factor, then default
+    let otpType;
+    if (overrideOtpType) {
+      otpType = overrideOtpType;
+    } else if (userSelectedMfaFactor) {
+      otpType = serverMapping[userSelectedMfaFactor.type];
+    } else {
+      otpType = "email"; // Default for email OTP validation
+    }
 
     const userData = {
       otp: otpValue,
       trxnId: otpSentResponse.trxnId,
-      otpType: serverMapping[userSelectedMfaFactor.type],
+      otpType,
     };
 
     try {
@@ -101,6 +131,8 @@ export const useOtpOperations = (
       ) {
         setErrorCode(err.response.data.message);
       }
+    } finally {
+      setUserOtpValue("");
     }
   };
 

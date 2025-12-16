@@ -235,24 +235,6 @@
     "14": "Phone number is required",
     "15": "We are going to verify your phone number by sending a 6-digit code to your phone."
   },
-  "YouMayUpdateEmailAtOtherPlaces": {
-    "1": "Your email has been updated to",
-    "2": "You may need to update your email other places",
-    "3": "This only changes your email with services connected to your GC Sign in.",
-    "4": "If you are trying to update your email with a service that’s not connected to your GC Sign in, you’ll need to go to that account.",
-    "5": "To search for another GC Account, visit the",
-    "6": "GC Account directory.",
-    "7": "Back to profile",
-    "8": "Sign out"
-  },
-  "AreYouSureUpdateYourEmail": {
-    "1": "Are you sure you want to update your email?",
-    "2": "You’ve requested to update your email to:",
-    "3": "This will update the email you use to sign in, as well as the email the following services use to contact you:",
-    "4": "GEO.ca",
-    "5": "Yes, update",
-    "6": "Cancel"
-  },
   "SecuritySettings": {
     "1": "Security settings",
     "2": "How you sign in to GC Sign in",
@@ -509,7 +491,26 @@
     "6": "6-digit code",
     "7": "Problems with the code?",
     "8": "Use a different email",
-    "12": "You can request a new code in",
-    "13": "seconds"
+    "9": "You can request a new code in",
+    "10": "seconds",
+    "11": "Request a new code"
+  },
+  "EmailConfirmUpdate": {
+    "1": "Are you sure you want to update your email?",
+    "2": "You’ve requested to update your email to:",
+    "3": "This will update the email you use to sign in, as well as the email the following services use to contact you:",
+    "4": "GEO.ca",
+    "5": "Yes, update"
+  },
+  "EmailUpdateSuccess": {
+    "1": "Your email has been updated to",
+    "2": "You may need to update your email other places",
+    "3": "This only changes your email with services connected to your GC Sign in.",
+    "4": "If you are trying to update your email with a service that’s not connected to your GC Sign in, you’ll need to go to that account.",
+    "5": "To search for another GC Account, visit the",
+    "6": "GC Account directory",
+    "7": ".",
+    "8": "Back to profile",
+    "9": "Sign out"
   }
 }

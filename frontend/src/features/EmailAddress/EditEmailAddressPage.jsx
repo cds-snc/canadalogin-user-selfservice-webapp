@@ -3,7 +3,7 @@ import Loader from "../../components/Layout/Loading";
 import StepContent from "../../components/Wizard/StepContent";
 import { useNavigate, useParams } from "react-router";
 import { path } from "../../utils/routeHelpers";
-import { PAGES } from "../../utils/constants";
+import { PAGES, FLOW_TYPES } from "../../utils/constants";
 import { getPageContent } from "../../utils/functions";
 import { getErrorMessage } from "../../utils/errorUtils";
 import PasswordVerification from "../TransientOtp/components/PasswordVerification";
@@ -17,9 +17,10 @@ import { userProfileDispatch } from "../../utils/userProfileDispatch";
 import EditEmailEnterEmail from "./EditEmailEnterEmail";
 import EmailOtpValidation from "./EmailOtpValidation";
 import EmailUpdateSuccess from "./EmailUpdateSuccess";
+import EmailConfirmUpdate from "./EmailConfirmUpdate";
 
 export default function EditEmailAddressPage() {
-  const [wizardStep, setWizardStep] = useState("enterEmail");
+  const [wizardStep, setWizardStep] = useState("passwordVerification");
   const [errorCode, setErrorCode] = useState("");
   const [userPasswordValue, setUserPasswordValue] = useState("");
   const [formData, setFormData] = useState({
@@ -27,7 +28,7 @@ export default function EditEmailAddressPage() {
   });
 
   const { language } = useParams();
-  const { state, userDispatch } = useUser();
+  const { state, dispatch } = useUser();
   const { userProfile } = state;
   const { id, userName } = userProfile ?? {};
 
@@ -66,56 +67,92 @@ export default function EditEmailAddressPage() {
     handleChangeUserMfaSelection,
     handleSetUserOtpValue,
     requestOtpCode,
-    validateOtpCode: baseValidateOtpCode,
+    validateOtpCode,
+    setLocalLoading,
   } = useOtpOperations(id, userName, setErrorCode, backToProfile);
+
+  // Get user profile dispatch method
+  const { updateProfileSuccess } = userProfileDispatch(dispatch);
 
   const handleBackToProfile = async () => {
     navigate(backToProfile);
   };
 
-  const handleSignOut = async () => {
+  const handleBackToEnterEmail = async () => {
+    setWizardStep("enterEmail");
+  };
+
+  const handleSignOut = async (e) => {
+    e.preventDefault();
+    setLocalLoading(true);
+
     try {
-      await authService.logout();
-      // Navigate to login or home page after logout
-      navigate(`/${language}`);
+      const response = await authService.logout();
+
+      // Check if response has redirect_url and redirect
+      if (response && response.data && response.data.redirect_url) {
+        window.location.href = response.data.redirect_url;
+      } else {
+        // Fallback redirect if no redirect_url provided
+        window.location.href = "/";
+      }
     } catch (error) {
-      console.error("Error during logout:", error);
-      // Still navigate away even if logout fails
-      navigate(`/${language}`);
+      console.error("Logout failed:", error);
+      // Update loading text to show error
+      setLocalLoading(true);
+      // Redirect after error
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 2000);
     }
   };
 
-  const handleEnterEmailSubmit = async (newEmailAddress) => {
+  const handleEnterEmailSubmit = async () => {
+    // Validate email address before proceeding to OTP validation
+    if (!formData.emailAddress || !formData.emailAddress.trim()) {
+      setErrorCode("EMAIL_REQUIRED");
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.emailAddress)) {
+      setErrorCode("INVALID_EMAIL");
+      return;
+    }
+
+    // Clear any previous errors and proceed to OTP validation
+    setErrorCode("");
+    setWizardStep("emailOtpValidation");
+  };
+
+  const handleEmailChange = async () => {
     try {
       setErrorCode("");
 
-      if (!newEmailAddress || !newEmailAddress.trim()) {
+      if (!formData.emailAddress || !formData.emailAddress.trim()) {
         setErrorCode("EMAIL_REQUIRED");
         return;
       }
 
       // Validate email format
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(newEmailAddress)) {
+      if (!emailRegex.test(formData.emailAddress)) {
         setErrorCode("INVALID_EMAIL");
         return;
       }
 
-      // Update the form data with the new email
-      setFormData((prev) => ({
-        ...prev,
-        emailAddress: newEmailAddress,
-      }));
-
       // Call the backend API to update email address
-      const response = await authService.update_email_address(newEmailAddress);
+      const response = await authService.update_email_address(
+        formData.emailAddress,
+      );
 
       if (response && response.success && response.data) {
         // Update the user profile in context
-        userProfileDispatch(userDispatch, response.data);
+        updateProfileSuccess(response.data);
 
         // Navigate to success step
-        setWizardStep("emailChangeCompleted");
+        setWizardStep("emailUpdateSuccess");
       } else {
         setErrorCode("FAILED_TO_UPDATE_EMAIL");
       }
@@ -127,13 +164,6 @@ export default function EditEmailAddressPage() {
         setErrorCode("FAILED_TO_UPDATE_EMAIL");
       }
     }
-  };
-
-  // Custom validateOtpCode that handles email change logic
-  const validateOtpCode = async (userOtpValue) => {
-    await baseValidateOtpCode(userOtpValue, () => {
-      setWizardStep("enterEmail");
-    });
   };
 
   const errorMessage = getErrorMessage(language, errorCode);
@@ -170,7 +200,13 @@ export default function EditEmailAddressPage() {
         userOtpValue={userOtpValue}
         setUserOtpValue={handleSetUserOtpValue}
         requestOtpCode={requestOtpCode}
-        validateOtpCode={validateOtpCode}
+        validateOtpCode={() =>
+          validateOtpCode(userOtpValue, (response) => {
+            if (response.success) {
+              setWizardStep("enterEmail");
+            }
+          })
+        }
         onBack={() => setWizardStep("otpSelection")}
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
@@ -189,15 +225,37 @@ export default function EditEmailAddressPage() {
     ),
     emailOtpValidation: (
       <EmailOtpValidation
-        onSubmit={handleEnterEmailSubmit}
+        onSubmit={() =>
+          validateOtpCode(
+            userOtpValue,
+            (response) => {
+              if (response.success) {
+                setWizardStep("emailConfirmUpdate");
+              }
+            },
+            FLOW_TYPES.email,
+          )
+        }
         onCancel={handleBackToProfile}
         formData={formData}
+        setFormData={setFormData}
         errorMessage={errorMessage}
         userOtpValue={userOtpValue}
         handleChange={handleSetUserOtpValue}
+        requestOtpCode={() =>
+          requestOtpCode(FLOW_TYPES.email, formData.emailAddress)
+        }
+        onBack={handleBackToEnterEmail}
       />
     ),
-    emailChangeCompleted: (
+    emailConfirmUpdate: (
+      <EmailConfirmUpdate
+        onSubmit={handleEmailChange}
+        onCancel={handleBackToProfile}
+        formData={formData}
+      />
+    ),
+    emailUpdateSuccess: (
       <EmailUpdateSuccess
         newEmailAddress={formData.emailAddress}
         onBackToProfile={handleBackToProfile}
@@ -206,7 +264,7 @@ export default function EditEmailAddressPage() {
     ),
   };
   return localLoading || validatePasswordLoading ? (
-    <Loader text={pageContentJson["12"]} />
+    <Loader text={pageContentJson["11"]} />
   ) : (
     <StepContent
       StepComponent={steps[wizardStep]}

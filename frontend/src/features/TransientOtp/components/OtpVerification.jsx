@@ -122,8 +122,6 @@ export default function OtpVerification({
           <GcdsInput
             inputId="verificationCode"
             label={pageContentJson["9"]}
-            autofocus
-            autocomplete="one-time-code"
             name="verificationCode"
             type="text"
             validateOn="other"
@@ -134,7 +132,6 @@ export default function OtpVerification({
             size="6"
             maxlength={6}
             minlength={6}
-            required={errorMessage === ""}
           ></GcdsInput>
         </form>
 
