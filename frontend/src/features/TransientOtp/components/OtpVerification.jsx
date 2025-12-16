@@ -132,6 +132,7 @@ export default function OtpVerification({
             size="6"
             maxlength={6}
             minlength={6}
+            autocomplete="one-time-code"
           ></GcdsInput>
         </form>
 

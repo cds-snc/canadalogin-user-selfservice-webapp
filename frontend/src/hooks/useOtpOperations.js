@@ -98,14 +98,15 @@ export const useOtpOperations = (
   const validateOtpCode = async (otpValue, onSuccess, overrideOtpType) => {
     if (!otpSentResponse) return;
 
-    // Determine OTP type: prioritize override, then selected MFA factor, then default
+    // Determine OTP type: prioritize override, then selected MFA factor
     let otpType;
     if (overrideOtpType) {
       otpType = overrideOtpType;
     } else if (userSelectedMfaFactor) {
       otpType = serverMapping[userSelectedMfaFactor.type];
     } else {
-      otpType = "email"; // Default for email OTP validation
+      // If no override and no selected MFA factor, don't proceed
+      return;
     }
 
     const userData = {

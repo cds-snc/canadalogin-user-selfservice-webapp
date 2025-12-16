@@ -818,7 +818,7 @@ describe("OtpVerification Component", () => {
       renderComponent();
 
       const input = screen.getByTestId("verificationCode");
-      expect(input).toHaveAttribute("autoComplete", "one-time-code");
+      expect(input).toHaveAttribute("autocomplete", "one-time-code");
     });
 
     it("renders buttons with proper styles", () => {
