@@ -14,6 +14,7 @@ from app.utils.access_token import get_auth_request_headers
 from app.utils.mask_phone_number import mask_contact_phone_numbers
 from app.utils.request_error_handler import RequestErrorHandler
 from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
+from app.auth.services.auth_user_session import update_session_user_info
 
 logger = logging.getLogger(__name__)
 
@@ -177,6 +178,22 @@ async def update_my_profile(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Request data validation error",
         )
+
+    # If this was an email change, update the session with new preferred_username
+    if is_email_change and current_users_username:
+        logger.info(f"Updating session after email change to: {current_users_username}")
+        try:
+            update_session_user_info(
+                request,
+                {
+                    "preferred_username": current_users_username,
+                    "email": current_users_username,
+                },
+            )
+            logger.info("Session updated successfully after email change")
+        except Exception as e:
+            logger.warning(f"Failed to update session after email change: {str(e)}")
+            # Don't fail the entire operation if session update fails
 
     return ProfileResponse(
         success=True,
