@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.1](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.9.0...v1.9.1) (2025-12-17)
+
+
+### Bug Fixes
+
+* Use latest tags instead of deployed in release pipeline ([#1049](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1049)) ([46606c6](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/46606c6390f814ce047a0ca721a437419ff81abc))
+
 ## [1.9.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.8.1...v1.9.0) (2025-12-15)
 
 
