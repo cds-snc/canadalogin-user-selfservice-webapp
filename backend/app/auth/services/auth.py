@@ -4,7 +4,6 @@ import sys
 from fastapi import Request
 from fastapi.responses import RedirectResponse
 from authlib.integrations.starlette_client import OAuthError
-from authlib.common.security import generate_token
 from starsessions.session import get_session_handler
 from app.auth.services.oidc_config import oauth
 from app.config import get_configuration
@@ -68,17 +67,7 @@ async def redirect_user_to_idp_verify(request: Request):
         )
         flush_logs()  # Force flush to ensure CloudWatch gets this log
 
-        # manually generate a code_verifier, make sure PKCE is used
-        code_verifier = generate_token(48)  # Generate a secure random code verifier
-        oidc_client = oauth.verify
-        if oidc_client is None:
-            raise Exception("OAuth client 'verify' is not registered")
-        # reset client kwargs to ensure PKCE and scopes are set
-        oidc_client.client_kwargs["code_challenge_method"] = "S256"
-        oidc_client.client_kwargs["scope"] = "openid email profile phone"
-        response = await oidc_client.authorize_redirect(
-            request, callback_redirect_uri, code_verifier=code_verifier
-        )
+        response = await oauth.verify.authorize_redirect(request, callback_redirect_uri)
         # After the redirect to the login page, request.session should have a code_verifier
         logger.info("User redirected to IBM Verify for authentication")
         flush_logs()  # Force flush to ensure CloudWatch gets this log
@@ -171,18 +160,10 @@ async def reauthenticate_user(request: Request, returnToPage: str = "/"):
         # if the user recently logged in, we can set the max age to 15 minutes
         # will reautenticate after max age value
         max_age_in_seconds = 900
-        # manually generate a code_verifier, make sure PKCE is used
-        code_verifier = generate_token(48)  # Generate a secure random code verifier
-        oidc_client = oauth.verify
-        if oidc_client is None:
-            raise Exception("OAuth client 'verify' is not registered")
-        # reset client kwargs to ensure PKCE and scopes are set
-        oidc_client.client_kwargs["code_challenge_method"] = "S256"
-        oidc_client.client_kwargs["scope"] = "openid email profile phone"
-        return await oidc_client.authorize_redirect(
+
+        return await oauth.verify.authorize_redirect(
             request,
             callback_redirect_uri,
-            code_verifier=code_verifier,
             max_age=max_age_in_seconds,
         )
     except OAuthError as error:
