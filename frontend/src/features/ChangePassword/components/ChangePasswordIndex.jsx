@@ -20,7 +20,6 @@ import PasswordVerification from "../../TransientOtp/components/PasswordVerifica
 import StepContent from "../../../components/Wizard/StepContent.jsx";
 import { usePasswordValidation } from "../../../hooks/usePasswordValidation";
 import { useOtpOperations } from "../../../hooks/useOtpOperations";
-import { set } from "date-fns";
 
 const defaulPasswordUpdatetStep = "passwordVerification";
 
