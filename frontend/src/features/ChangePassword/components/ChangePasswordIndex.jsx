@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useParams, useLocation, useNavigate } from "react-router";
+import { useState } from "react";
+import { useParams, useNavigate } from "react-router";
 import { useUser } from "../../../components/Providers/useUser.tsx";
 import Loader from "../../../components/Layout/Loading.jsx";
 
@@ -9,6 +9,7 @@ import PasswordChangedConfirmation from "./PasswordChangedConfirmation.jsx";
 import { PAGES } from "../../../utils/constants.jsx";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
 import { getErrorMessage } from "../../../utils/errorUtils.js";
+import { authService } from "../../../services/authService.jsx";
 
 import { getPageContent } from "../../../utils/functions.jsx";
 import { path } from "../../../utils/routeHelpers.js";
@@ -19,14 +20,14 @@ import PasswordVerification from "../../TransientOtp/components/PasswordVerifica
 import StepContent from "../../../components/Wizard/StepContent.jsx";
 import { usePasswordValidation } from "../../../hooks/usePasswordValidation";
 import { useOtpOperations } from "../../../hooks/useOtpOperations";
+import { set } from "date-fns";
 
 const defaulPasswordUpdatetStep = "passwordVerification";
 
 export default function ChangePasswordIndex() {
   const { language } = useParams();
   const { state, dispatch } = useUser();
-  const { removeAuthenticatedPage } = userProfileDispatch(dispatch);
-  const { pathname } = useLocation();
+  const { setLoading } = userProfileDispatch(dispatch);
   const [otpSentResponse, setOtpSentResponse] = useState(null);
   const [errorCode, setErrorCode] = useState("");
 
@@ -34,11 +35,12 @@ export default function ChangePasswordIndex() {
 
   const [userPasswordValue, setUserPasswordValue] = useState("");
   const pageContentJson = getPageContent(language, PAGES.otpSelection);
+  const navBarContent = getPageContent(language, "TopNavBar");
 
   const [passwordUpdateStep, setPasswordUpdateStep] = useState(
     defaulPasswordUpdatetStep,
   );
-  const [localLoading, setLocalLoading] = useState(false);
+
   const { userProfile } = state;
   const { id, userName } = userProfile ?? {};
   const navigate = useNavigate();
@@ -59,13 +61,11 @@ export default function ChangePasswordIndex() {
     userPhoneFactors,
     userSelectedMfaFactor,
     userOtpValue,
+    localLoading,
     handleChangeUserMfaSelection,
     handleSetUserOtpValue,
+    setLocalLoading,
   } = useOtpOperations(id, userName, setErrorCode, backToSecuritySettingsPage);
-
-  const handleLoading = (bool) => {
-    setLocalLoading(bool);
-  };
 
   // Custom requestOtpCode for password change flow using passwordUpdate API
   const requestOtpCode = async () => {
@@ -106,14 +106,28 @@ export default function ChangePasswordIndex() {
     }
   };
 
-  useEffect(() => {
-    return () => {
-      // when a user navigates away from this component, we remove the pathname from the array
-      // In the Private Route handler, we track the page to avoid a redirect loop to reautenticate the user
-      removeAuthenticatedPage(pathname);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const logout = async () => {
+    setLoading(true, navBarContent["8"]); // Use logout loading text
+
+    try {
+      const response = await authService.logout();
+
+      if (response && response.data && response.data.redirect_url) {
+        window.location.href = response.data.redirect_url;
+      } else {
+        // Fallback redirect if no redirect_url provided
+        window.location.href = "/";
+      }
+    } catch (error) {
+      console.error("Logout failed:", error);
+      // Update loading text to show error
+      setLoading(true, navBarContent["9"]);
+      // Redirect after error
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 2000);
+    }
+  };
 
   const steps = {
     passwordVerification: (
@@ -159,7 +173,7 @@ export default function ChangePasswordIndex() {
         userProfile={userProfile}
         userSelectedMfaType={userSelectedMfaFactor?.type}
         localLoading={localLoading}
-        setLocalLoading={handleLoading}
+        setLocalLoading={setLocalLoading}
         otpSentResponse={otpSentResponse}
         userOtpValue={userOtpValue}
         onNext={() => {
@@ -168,7 +182,13 @@ export default function ChangePasswordIndex() {
         onBack={() => setPasswordUpdateStep("otpValidation")}
       />
     ),
-    passwordChangedConfirmation: <PasswordChangedConfirmation />,
+    passwordChangedConfirmation: (
+      <PasswordChangedConfirmation
+        onNext={() => {
+          logout();
+        }}
+      />
+    ),
   };
 
   return localLoading || validatePasswordLoading ? (

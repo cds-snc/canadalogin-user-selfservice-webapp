@@ -1,5 +1,31 @@
 # Changelog
 
+## [1.9.1](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.9.0...v1.9.1) (2025-12-17)
+
+
+### Bug Fixes
+
+* Use latest tags instead of deployed in release pipeline ([#1049](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1049)) ([46606c6](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/46606c6390f814ce047a0ca721a437419ff81abc))
+
+## [1.9.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.8.1...v1.9.0) (2025-12-15)
+
+
+### Features
+
+* Add release tag to ECR images ([#1040](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1040)) ([75233d7](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/75233d70b528fc8092238c5ffa98b559c510ec10))
+* **ci/cd:** Add a deployed tag to the currently deployed ECR image in each AWS environment ([#1037](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1037)) ([6a2b8a9](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/6a2b8a9bce4eb6f5b1794bae84395fe78783e4f2))
+* Implement Enter key submission handling across multiple components ([#1038](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1038)) ([26518ab](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/26518abb992143e8eb6da18f0235842f106e29f1))
+* Update SSM with reference to deployed image ([#1041](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1041)) ([5daa5a0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/5daa5a0db2263726ebf4da4a6da8be133e09269d))
+
+
+### Bug Fixes
+
+* **frontend:** add role attribute to GcdsContainer for improved accessibility ([3541382](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/3541382a5e580a04f16ee994a092fccd59a5c6bc))
+* **frontend:** GC SignIn Welcome Page : List of accessibility defects ([#1018](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1018)) ([efddd70](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/efddd709b6dffde52dce4024fd1d44b662090e33))
+* **frontend:** List of accessibility defects for the Basic Information – Edit Name workflow ([#1016](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1016)) ([c6fe352](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/c6fe352c3c9a6349575c4c971d5c543a2a99f005))
+* **frontend:** password change confirmation page and password validation ([c6c20d0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/c6c20d02ef64f4dbc9405af6332c53558c93bd60))
+* **frontend:** Personal Information Page : List of accessibility defects ([#1017](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1017)) ([3541382](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/3541382a5e580a04f16ee994a092fccd59a5c6bc))
+
 ## [1.8.1](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.8.0...v1.8.1) (2025-12-11)
 
 

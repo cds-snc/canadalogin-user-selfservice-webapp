@@ -27,6 +27,7 @@ export default function Password({
   userOtpValue,
   setErrorCode,
   errorMessage,
+  setLocalLoading,
 }) {
   const { language } = useParams();
   const { cancel } = getPageContent(language, "Button");
@@ -73,16 +74,11 @@ export default function Password({
   }
 
   function isExamplePasswordUsed(pwd) {
-    const examplePassword = ["pillow", "moose", "dish"];
+    // remove all whitespace and lowercase
+    // disallow "pillowmoosedish" in any casing/spacing
 
-    const passwordContainsForbiddenWord = examplePassword.some((word) =>
-      pwd.toLowerCase().includes(word.toLowerCase()),
-    );
-
-    if (passwordContainsForbiddenWord) {
-      return true;
-    }
-    return false;
+    const normalized = pwd.replace(/\s+/g, "").toLowerCase();
+    return normalized === "pillowmoosedish";
   }
 
   const completePasswordUpdate = async () => {
@@ -92,7 +88,7 @@ export default function Password({
         setErrorCode("example_password_used");
         return;
       }
-
+      setLocalLoading(true);
       const response = await passwordUpdate.finalStep(
         userOtpValue,
         otpSentResponse.trxId,
@@ -106,6 +102,8 @@ export default function Password({
         setErrorCode(err.data.message);
       }
       console.error("err", err);
+    } finally {
+      setLocalLoading(false);
     }
   };
 
@@ -177,7 +175,6 @@ export default function Password({
             <SubmitButton
               disabled={password.length < passwordPolicy.min}
               style={{ width: "fit-content" }}
-              onGcdsClick={onSubmitHandler}
               currentLang={language}
             ></SubmitButton>
 
