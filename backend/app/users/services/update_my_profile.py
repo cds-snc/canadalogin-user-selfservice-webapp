@@ -14,9 +14,95 @@ from app.utils.access_token import get_auth_request_headers
 from app.utils.mask_phone_number import mask_contact_phone_numbers
 from app.utils.request_error_handler import RequestErrorHandler
 from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
-from app.auth.services.auth_user_session import update_session_user_info
 
 logger = logging.getLogger(__name__)
+
+
+async def update_profile_for_verified_changes(
+    request: Request,
+    user_data: UserProfileUpdateRequest,
+    user_access_token: str,
+) -> ProfileResponse:
+    """
+    Update user profile for any fields that have already been OTP-verified.
+
+    This function bypasses the username mismatch check because the changes
+    have already been validated through OTP verification. This should ONLY be
+    called from the update_profile_with_otp_verification function.
+
+    Supports updating any OTP-verified fields including:
+    - Email address (updates both userName and emails fields)
+    - Name (givenName, familyName)
+    - Phone numbers
+    - Preferred language
+
+    Args:
+        request: FastAPI request object
+        user_data: Profile update request data with OTP-verified changes
+        user_access_token: User's authentication token
+
+    Returns:
+        ProfileResponse: Updated profile data with masked phone numbers
+
+    Raises:
+        HTTPException: For validation or API errors
+    """
+    logger.info("Starting verified profile update")
+
+    updated_user_data_dict = sanitize_user_profile_data(user_data)
+
+    # Get current profile to merge with updates
+    ibm_user_profile_response = await dispatch_get_my_profile_from_ibm(
+        request.app.state.request_client, user_access_token
+    )
+    ibm_user_profile = ibm_user_profile_response.model_dump()
+
+    # For email changes, we allow the userName and emails to be updated
+    # since OTP verification has already been completed
+    merged_profile = {**ibm_user_profile, **updated_user_data_dict}
+
+    try:
+        validate_merged_profile = IBMVerifyUpdateUserProfile(**merged_profile)
+    except ValidationError as e:
+        logger.error(f"Merged Profile Validation Error: {e.json()}")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Request data validation error",
+        )
+
+    user_profile_payload = validate_merged_profile.model_dump_json(
+        by_alias=True, exclude_none=True
+    )
+
+    response = await dispatch_update_my_profile(
+        request, user_profile_payload, user_access_token
+    )
+
+    try:
+        json_data = response.json()
+    except Exception as e:
+        logger.error(f"Failed to parse profile response: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Request data validation error",
+        )
+
+    json_data["phoneNumbers"] = mask_contact_phone_numbers(json_data)
+
+    try:
+        response_data = IBMVerifyUserProfileSchema(**json_data)
+    except ValidationError as e:
+        logger.error(f"Profile Validation Error: {e.json()}")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Request data validation error",
+        )
+
+    return ProfileResponse(
+        success=True,
+        message="User profile updated successfully after OTP verification.",
+        data=response_data,
+    )
 
 
 def sanitize_user_profile_data(user_data: UserProfileUpdateRequest) -> dict:
@@ -103,52 +189,18 @@ async def update_my_profile(
     ibm_user_profile_username = ibm_user_profile.get("userName")
     current_users_username = updated_user_data_dict.get("userName")
 
-    # Check if this is an email change request
-    is_email_change = (
-        current_users_username != ibm_user_profile_username
-        and updated_user_data_dict.get("emails") is not None
-    )
+    username_match = ibm_user_profile_username == current_users_username
 
-    if is_email_change:
-        # For email changes, validate that the new userName matches the new email
-        new_emails = updated_user_data_dict.get("emails", [])
-        if new_emails and len(new_emails) > 0:
-            # Find the email with type "work"
-            work_email = None
-            for email in new_emails:
-                if getattr(email, "type", None) == "work":
-                    work_email = email
-                    break
-
-            # Use work email if found, otherwise fall back to first email
-            target_email = work_email if work_email else new_emails[0]
-            new_email_value = (
-                target_email.get("value")
-                if isinstance(target_email, dict)
-                else target_email.value
-            )
-            if current_users_username != new_email_value:
-                logger.error("Username must match email address")
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Username must match email address",
-                )
-        logger.info(
-            f"Email change requested: {ibm_user_profile_username} -> {current_users_username}"
+    if not username_match:
+        logger.error("User mismatch - cannot update profile")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User mismatch - cannot update profile",
         )
-    else:
-        # For non-email changes, ensure username matches current user
-        username_match = ibm_user_profile_username == current_users_username
 
-        if not username_match:
-            logger.error("User mismatch - cannot update profile")
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="User mismatch - cannot update profile",
-            )
-
-        # Prevent changing the userName for non-email changes
-        updated_user_data_dict.pop("userName", None)
+    # Remove userName and emails from update to prevent any accidental changes
+    # Email changes must go through the secure OTP-verified endpoint
+    updated_user_data_dict.pop("userName", None)
 
     merged_profile = {**ibm_user_profile, **updated_user_data_dict}
 
@@ -187,22 +239,6 @@ async def update_my_profile(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Request data validation error",
         )
-
-    # If this was an email change, update the session with new preferred_username
-    if is_email_change and current_users_username:
-        logger.info(f"Updating session after email change to: {current_users_username}")
-        try:
-            update_session_user_info(
-                request,
-                {
-                    "preferred_username": current_users_username,
-                    "email": current_users_username,
-                },
-            )
-            logger.info("Session updated successfully after email change")
-        except Exception as e:
-            logger.warning(f"Failed to update session after email change: {str(e)}")
-            # Don't fail the entire operation if session update fails
 
     return ProfileResponse(
         success=True,

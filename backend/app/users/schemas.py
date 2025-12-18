@@ -194,3 +194,32 @@ class UserPhoneOTPFactors(BaseModel):
 
 class UserPhoneAuthFactorsResponse(ResponseModel):
     data: list[UserPhoneOTP]
+
+
+class ProfileUpdateWithOtpRequest(BaseModel):
+    """Generalized request schema for updating any profile field with OTP verification"""
+
+    # Profile fields that can be updated (all optional, at least one must be provided)
+    newEmailAddress: Optional[EmailStr] = None
+    name: Optional[UserProfileName] = None
+    phoneNumbers: Optional[List[MetaDataTypeValue]] = None
+    preferredLanguage: Optional[str] = None
+
+    # OTP verification fields (always required)
+    otp: str
+    trxnId: str
+    otpType: str  # "email", "sms", "voice" based on the OTP delivery method
+
+    def model_post_init(self, __context: Any) -> None:
+        """Validate that at least one profile field is provided for update"""
+        update_fields = [
+            self.newEmailAddress,
+            self.name,
+            self.phoneNumbers,
+            self.preferredLanguage,
+        ]
+
+        if not any(field is not None for field in update_fields):
+            raise ValueError("At least one profile field must be provided for update")
+
+        return self

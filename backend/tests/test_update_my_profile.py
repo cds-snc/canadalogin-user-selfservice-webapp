@@ -6,6 +6,7 @@ from app.utils.request_error_handler import RequestErrorHandler
 
 from app.users.services.update_my_profile import (
     update_my_profile as update_profile,
+    update_profile_for_verified_changes,
     dispatch_update_my_profile as dispatch_update_user_profile,
     sanitize_user_profile_data,
 )
@@ -555,3 +556,481 @@ def test_sanitize_user_profile_data():
     assert result["userName"] == "john.doe@example.com"
     assert "preferredLanguage" not in result
     assert "phoneNumbers" not in result
+
+
+# Tests for update_profile_for_verified_changes
+
+
+@pytest.mark.asyncio
+@patch(MASK_PHONE_IMPORT_PATH)
+@patch(DISPATCH_UPDATE_PROFILE_IMPORT_PATH)
+@patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
+@patch(SANITIZE_PROFILE_IMPORT_PATH)
+async def test_update_profile_for_verified_changes_success(
+    mock_sanitize, mock_dispatch_get, mock_dispatch_update, mock_mask
+):
+    """Test successful profile update for verified changes (no username validation)."""
+    # Arrange
+    sanitized_data = {"userName": "new.email@example.com", "preferredLanguage": "fr"}
+    mock_sanitize.return_value = sanitized_data
+
+    profile_data = {
+        "schemas": [
+            "urn:ietf:params:scim:schemas:core:2.0:User",
+            "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+            "urn:ietf:params:scim:schemas:extension:ibm:2.0:Notification",
+        ],
+        "userName": "john.doe@example.com",  # Original username
+        "emails": [{"value": "john.doe@example.com", "type": "work"}],
+        "preferredLanguage": "en",
+        "meta": {
+            "location": "here",
+            "created": "2023-01-01T00:00:00Z",
+            "lastModified": "2023-09-22T12:30:00Z",
+            "resourceType": "User",
+        },
+        "active": True,
+        "id": "user-123",
+        "notification": {"notifyType": "NONE"},
+    }
+
+    mock_profile = IBMVerifyUserProfileSchema(**profile_data)
+    mock_dispatch_get.return_value = mock_profile
+
+    # Updated profile response from IBM (with email change)
+    updated_profile_data = {
+        **profile_data,
+        "userName": "new.email@example.com",
+        "emails": [{"value": "new.email@example.com", "type": "work"}],
+        "preferredLanguage": "fr",
+    }
+    mock_response = Mock()
+    mock_response.json.return_value = updated_profile_data
+    mock_dispatch_update.return_value = mock_response
+    mock_mask.return_value = []
+
+    user_data = UserProfileUpdateRequest(
+        userName="new.email@example.com", preferredLanguage="fr"
+    )
+    mock_request = Mock()
+    mock_request.app = Mock()
+    mock_request.app.state = Mock()
+    mock_request.app.state.request_client = AsyncClient()
+    mock_request.app.state.config = Mock()
+    mock_request.app.state.config.profile_api_endpoint = PROFILE_API_URL
+
+    # Act
+    response = await update_profile_for_verified_changes(
+        mock_request, user_data, user_access_token="token"
+    )
+
+    # Assert
+    assert response.success is True
+    assert (
+        response.message == "User profile updated successfully after OTP verification."
+    )
+    assert response.data.userName == "new.email@example.com"
+    assert response.data.preferredLanguage == "fr"
+
+    mock_sanitize.assert_called_once_with(user_data)
+    mock_dispatch_get.assert_called_once()
+    mock_dispatch_update.assert_called_once()
+    mock_mask.assert_called_once()
+
+
+@pytest.mark.asyncio
+@patch(MASK_PHONE_IMPORT_PATH)
+@patch(DISPATCH_UPDATE_PROFILE_IMPORT_PATH)
+@patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
+@patch(SANITIZE_PROFILE_IMPORT_PATH)
+async def test_update_profile_for_verified_changes_with_email_update(
+    mock_sanitize, mock_dispatch_get, mock_dispatch_update, mock_mask
+):
+    """Test email address change through verified update (bypasses username validation)."""
+    # Arrange - User changing email from john.doe@example.com to new.email@example.com
+    sanitized_data = {
+        "userName": "new.email@example.com",
+        "emails": [{"value": "new.email@example.com", "type": "work"}],
+    }
+    mock_sanitize.return_value = sanitized_data
+
+    current_profile_data = {
+        "schemas": [
+            "urn:ietf:params:scim:schemas:core:2.0:User",
+            "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+        ],
+        "userName": "john.doe@example.com",  # Original username
+        "emails": [{"value": "john.doe@example.com", "type": "work"}],
+        "meta": {
+            "location": "here",
+            "created": "2023-01-01T00:00:00Z",
+            "lastModified": "2023-09-22T12:30:00Z",
+            "resourceType": "User",
+        },
+        "active": True,
+        "id": "user-123",
+    }
+
+    mock_profile = IBMVerifyUserProfileSchema(**current_profile_data)
+    mock_dispatch_get.return_value = mock_profile
+
+    # Updated profile response - email successfully changed
+    updated_profile_data = {
+        **current_profile_data,
+        "userName": "new.email@example.com",
+        "emails": [{"value": "new.email@example.com", "type": "work"}],
+    }
+    mock_response = Mock()
+    mock_response.json.return_value = updated_profile_data
+    mock_dispatch_update.return_value = mock_response
+    mock_mask.return_value = []
+
+    from app.users.schemas import EmailItem
+
+    user_data = UserProfileUpdateRequest(
+        userName="new.email@example.com",
+        emails=[EmailItem(value="new.email@example.com", type="work")],
+    )
+    mock_request = Mock()
+    mock_request.app = Mock()
+    mock_request.app.state = Mock()
+    mock_request.app.state.request_client = AsyncClient()
+    mock_request.app.state.config = Mock()
+    mock_request.app.state.config.profile_api_endpoint = PROFILE_API_URL
+
+    # Act
+    response = await update_profile_for_verified_changes(
+        mock_request, user_data, user_access_token="token"
+    )
+
+    # Assert - Email change was allowed (no username mismatch error)
+    assert response.success is True
+    assert response.data.userName == "new.email@example.com"
+    assert len(response.data.emails) == 1
+    assert response.data.emails[0].value == "new.email@example.com"
+
+    mock_sanitize.assert_called_once()
+    mock_dispatch_get.assert_called_once()
+    mock_dispatch_update.assert_called_once()
+
+
+@pytest.mark.asyncio
+@patch(MASK_PHONE_IMPORT_PATH)
+@patch(DISPATCH_UPDATE_PROFILE_IMPORT_PATH)
+@patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
+@patch(SANITIZE_PROFILE_IMPORT_PATH)
+async def test_update_profile_for_verified_changes_with_phone_masking(
+    mock_sanitize, mock_dispatch_get, mock_dispatch_update, mock_mask
+):
+    """Test that verified update properly masks phone numbers in response."""
+    # Arrange
+    sanitized_data = {
+        "userName": "john.doe@example.com",
+        "phoneNumbers": [{"value": "+1-613-555-1234", "type": "mobile"}],
+    }
+    mock_sanitize.return_value = sanitized_data
+
+    profile_data = {
+        "schemas": [
+            "urn:ietf:params:scim:schemas:core:2.0:User",
+            "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+        ],
+        "userName": "john.doe@example.com",
+        "emails": [{"value": "john.doe@example.com", "type": "work"}],
+        "phoneNumbers": [
+            {"value": "+1-613-999-9999", "type": "work"}
+        ],  # Existing phone
+        "meta": {
+            "location": "here",
+            "created": "2023-01-01T00:00:00Z",
+            "lastModified": "2023-09-22T12:30:00Z",
+            "resourceType": "User",
+        },
+        "active": True,
+        "id": "user-123",
+    }
+
+    mock_profile = IBMVerifyUserProfileSchema(**profile_data)
+    mock_dispatch_get.return_value = mock_profile
+
+    # Updated profile with new phone number
+    updated_profile_data = {
+        **profile_data,
+        "phoneNumbers": [{"value": "+1-613-555-1234", "type": "mobile"}],
+    }
+    mock_response = Mock()
+    mock_response.json.return_value = updated_profile_data
+    mock_dispatch_update.return_value = mock_response
+
+    # Mock masked phone numbers
+    masked_phones = [{"value": "+1 (***) ***-1234", "type": "mobile"}]
+    mock_mask.return_value = masked_phones
+
+    from app.users.schemas import MetaDataTypeValue
+
+    user_data = UserProfileUpdateRequest(
+        userName="john.doe@example.com",
+        phoneNumbers=[MetaDataTypeValue(value="+1-613-555-1234", type="mobile")],
+    )
+    mock_request = Mock()
+    mock_request.app = Mock()
+    mock_request.app.state = Mock()
+    mock_request.app.state.request_client = AsyncClient()
+    mock_request.app.state.config = Mock()
+    mock_request.app.state.config.profile_api_endpoint = PROFILE_API_URL
+
+    # Act
+    response = await update_profile_for_verified_changes(
+        mock_request, user_data, user_access_token="token"
+    )
+
+    # Assert
+    assert response.success is True
+    assert len(response.data.phoneNumbers) == 1
+    assert response.data.phoneNumbers[0].value == "+1 (***) ***-1234"
+    assert response.data.phoneNumbers[0].type == "mobile"
+
+    mock_mask.assert_called_once()
+    # Verify masking was called with updated profile data
+    mask_call_data = mock_mask.call_args[0][0]
+    assert "phoneNumbers" in mask_call_data
+    assert len(mask_call_data["phoneNumbers"]) == 1
+    assert mask_call_data["phoneNumbers"][0]["type"] == "mobile"
+
+
+@pytest.mark.asyncio
+@patch(SANITIZE_PROFILE_IMPORT_PATH)
+@patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
+async def test_update_profile_for_verified_changes_get_profile_failure(
+    mock_dispatch_get, mock_sanitize
+):
+    """Test failure when getting current profile from IBM."""
+    mock_sanitize.return_value = {"userName": "john.doe@example.com"}
+
+    # Mock IBM profile fetch failure
+    mock_dispatch_get.side_effect = HTTPException(
+        status_code=500, detail="Failed to get profile"
+    )
+
+    user_data = UserProfileUpdateRequest(userName="john.doe@example.com")
+    mock_request = Mock()
+    mock_request.app = Mock()
+    mock_request.app.state = Mock()
+    mock_request.app.state.request_client = AsyncClient()
+
+    # Act & Assert
+    with pytest.raises(HTTPException) as exc:
+        await update_profile_for_verified_changes(
+            mock_request, user_data, user_access_token="token"
+        )
+
+    assert exc.value.status_code == 500
+    mock_dispatch_get.assert_called_once()
+
+
+@pytest.mark.asyncio
+@patch(MASK_PHONE_IMPORT_PATH)
+@patch(DISPATCH_UPDATE_PROFILE_IMPORT_PATH)
+@patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
+@patch(SANITIZE_PROFILE_IMPORT_PATH)
+async def test_update_profile_for_verified_changes_dispatch_failure(
+    mock_sanitize, mock_dispatch_get, mock_dispatch_update, mock_mask
+):
+    """Test failure when dispatching update to IBM."""
+    # Arrange
+    mock_sanitize.return_value = {"userName": "john.doe@example.com"}
+
+    profile_data = {
+        "schemas": [
+            "urn:ietf:params:scim:schemas:core:2.0:User",
+            "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+        ],
+        "userName": "john.doe@example.com",
+        "emails": [{"value": "john.doe@example.com", "type": "work"}],
+        "meta": {
+            "location": "here",
+            "created": "2023-01-01T00:00:00Z",
+            "lastModified": "2023-09-22T12:30:00Z",
+            "resourceType": "User",
+        },
+        "active": True,
+        "id": "user-123",
+    }
+
+    mock_profile = IBMVerifyUserProfileSchema(**profile_data)
+    mock_dispatch_get.return_value = mock_profile
+
+    # Mock dispatch update failure
+    mock_dispatch_update.side_effect = HTTPException(
+        status_code=400, detail="Invalid request"
+    )
+
+    user_data = UserProfileUpdateRequest(userName="john.doe@example.com")
+    mock_request = Mock()
+    mock_request.app = Mock()
+    mock_request.app.state = Mock()
+    mock_request.app.state.request_client = AsyncClient()
+    mock_request.app.state.config = Mock()
+    mock_request.app.state.config.profile_api_endpoint = PROFILE_API_URL
+
+    # Act & Assert
+    with pytest.raises(HTTPException) as exc:
+        await update_profile_for_verified_changes(
+            mock_request, user_data, user_access_token="token"
+        )
+
+    assert exc.value.status_code == 400
+    mock_dispatch_get.assert_called_once()
+    mock_dispatch_update.assert_called_once()
+
+
+@pytest.mark.asyncio
+@patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
+@patch(SANITIZE_PROFILE_IMPORT_PATH)
+async def test_update_profile_for_verified_changes_validation_error(
+    mock_sanitize, mock_dispatch_get
+):
+    """Test validation error when merging profile data."""
+    # Arrange - Set up data that will cause validation error
+    mock_sanitize.return_value = {"userName": "john.doe@example.com", "id": 123}
+
+    # Mock IBM profile with incompatible data
+    mock_dispatch_get.return_value = Mock(
+        model_dump=Mock(
+            return_value={
+                "userName": "john.doe@example.com",
+                "id": "string-instead-of-int",
+                "invalid_field": "this-will-cause-validation-error",
+            }
+        )
+    )
+
+    user_data = UserProfileUpdateRequest(userName="john.doe@example.com")
+    mock_request = Mock()
+    mock_request.app = Mock()
+    mock_request.app.state = Mock()
+
+    # Act & Assert
+    with pytest.raises(HTTPException) as exc:
+        await update_profile_for_verified_changes(
+            mock_request, user_data, user_access_token="token"
+        )
+
+    assert exc.value.status_code == 422
+    assert "Request data validation error" in exc.value.detail
+
+
+@pytest.mark.asyncio
+@patch(MASK_PHONE_IMPORT_PATH)
+@patch(DISPATCH_UPDATE_PROFILE_IMPORT_PATH)
+@patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
+@patch(SANITIZE_PROFILE_IMPORT_PATH)
+async def test_update_profile_for_verified_changes_json_parse_error(
+    mock_sanitize, mock_dispatch_get, mock_dispatch_update, mock_mask
+):
+    """Test error handling when response JSON cannot be parsed."""
+    # Arrange
+    mock_sanitize.return_value = {"userName": "john.doe@example.com"}
+
+    profile_data = {
+        "schemas": [
+            "urn:ietf:params:scim:schemas:core:2.0:User",
+            "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+        ],
+        "userName": "john.doe@example.com",
+        "emails": [{"value": "john.doe@example.com", "type": "work"}],
+        "meta": {
+            "location": "here",
+            "created": "2023-01-01T00:00:00Z",
+            "lastModified": "2023-09-22T12:30:00Z",
+            "resourceType": "User",
+        },
+        "active": True,
+        "id": "user-123",
+    }
+
+    mock_profile = IBMVerifyUserProfileSchema(**profile_data)
+    mock_dispatch_get.return_value = mock_profile
+
+    # Mock response with invalid JSON
+    mock_response = Mock()
+    mock_response.json.side_effect = Exception("Invalid JSON")
+    mock_dispatch_update.return_value = mock_response
+
+    user_data = UserProfileUpdateRequest(userName="john.doe@example.com")
+    mock_request = Mock()
+    mock_request.app = Mock()
+    mock_request.app.state = Mock()
+    mock_request.app.state.request_client = AsyncClient()
+    mock_request.app.state.config = Mock()
+    mock_request.app.state.config.profile_api_endpoint = PROFILE_API_URL
+
+    # Act & Assert
+    with pytest.raises(HTTPException) as exc:
+        await update_profile_for_verified_changes(
+            mock_request, user_data, user_access_token="token"
+        )
+
+    assert exc.value.status_code == 422
+    assert "Request data validation error" in exc.value.detail
+
+
+@pytest.mark.asyncio
+@patch(MASK_PHONE_IMPORT_PATH)
+@patch(DISPATCH_UPDATE_PROFILE_IMPORT_PATH)
+@patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
+@patch(SANITIZE_PROFILE_IMPORT_PATH)
+async def test_update_profile_for_verified_changes_response_validation_error(
+    mock_sanitize, mock_dispatch_get, mock_dispatch_update, mock_mask
+):
+    """Test error handling when response data fails validation."""
+    # Arrange
+    mock_sanitize.return_value = {"userName": "john.doe@example.com"}
+
+    profile_data = {
+        "schemas": [
+            "urn:ietf:params:scim:schemas:core:2.0:User",
+            "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+        ],
+        "userName": "john.doe@example.com",
+        "emails": [{"value": "john.doe@example.com", "type": "work"}],
+        "meta": {
+            "location": "here",
+            "created": "2023-01-01T00:00:00Z",
+            "lastModified": "2023-09-22T12:30:00Z",
+            "resourceType": "User",
+        },
+        "active": True,
+        "id": "user-123",
+    }
+
+    mock_profile = IBMVerifyUserProfileSchema(**profile_data)
+    mock_dispatch_get.return_value = mock_profile
+    mock_mask.return_value = []
+
+    # Mock response with invalid data that will fail validation
+    invalid_response_data = {
+        "userName": "john.doe@example.com",
+        "emails": "invalid-emails-format",  # Should be list, not string
+        "id": None,  # Invalid - id is required
+    }
+    mock_response = Mock()
+    mock_response.json.return_value = invalid_response_data
+    mock_dispatch_update.return_value = mock_response
+
+    user_data = UserProfileUpdateRequest(userName="john.doe@example.com")
+    mock_request = Mock()
+    mock_request.app = Mock()
+    mock_request.app.state = Mock()
+    mock_request.app.state.request_client = AsyncClient()
+    mock_request.app.state.config = Mock()
+    mock_request.app.state.config.profile_api_endpoint = PROFILE_API_URL
+
+    # Act & Assert
+    with pytest.raises(HTTPException) as exc:
+        await update_profile_for_verified_changes(
+            mock_request, user_data, user_access_token="token"
+        )
+
+    assert exc.value.status_code == 422
+    assert "Request data validation error" in exc.value.detail

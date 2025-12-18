@@ -8,11 +8,15 @@ from app.users.schemas import (
     UserProfileUpdateRequest,
     RelyingPartyResponse,
     UserPhoneAuthFactorsResponse,
+    ProfileUpdateWithOtpRequest,
 )
 from app.users.services.get_my_profile import get_my_profile
 from app.users.services.update_my_profile import update_my_profile
 from app.users.services.rp_info import get_relying_party_info
 from app.users.services.otp_factors import get_user_otp_factors
+from app.users.services.update_profile_with_otp import (
+    update_profile_with_otp_verification,
+)
 
 from app.auth.services.auth_user_session import get_users_current_session
 
@@ -87,4 +91,41 @@ async def user_factors(
         user_id,
         user_access_token,
         validated,
+    )
+
+
+@router.post(
+    "/profile/update-with-otp",
+    response_model=ProfileResponse,
+    tags=["Users"],
+    summary="Update any profile field with OTP verification",
+    description="Generalized endpoint to atomically validate OTP and update any profile field (email, name, phone, language). Ensures profile changes only occur after successful OTP verification.",
+)
+async def update_user_profile_with_otp_verification(
+    request: Request,
+    profile_update_data: ProfileUpdateWithOtpRequest,
+    user_access_token: str = Depends(get_users_current_session),
+):
+    """
+    Update any user profile field after OTP verification.
+
+    This generalized endpoint provides secure profile updates for:
+    - Email address (updates both email and username)
+    - Full name (givenName, familyName, formatted)
+    - Phone numbers (contact phone numbers)
+    - Preferred language (locale preference)
+
+    The endpoint ensures security by:
+    1. First validating the provided OTP code
+    2. Only after successful OTP verification, updating the specified profile fields
+    3. Updating the user session if email/username changed
+    4. Maintaining atomicity - either all updates succeed or none do
+
+    At least one profile field must be provided for update. The OTP type should
+    match the delivery method used (email, sms, voice).
+    """
+    return await update_profile_with_otp_verification(
+        request,
+        profile_update_data,
+        user_access_token,
     )
