@@ -9,9 +9,7 @@ import {
   GcdsLink,
   GcdsText,
 } from "@cdssnc/gcds-components-react";
-import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 import { getPageContent } from "../../../utils/functions.jsx";
-import { path } from "../../../utils/routeHelpers.js";
 
 import { useParams } from "react-router";
 import { FLOW_TYPES, PAGES } from "../../../utils/constants.jsx";
@@ -30,13 +28,9 @@ export default function OtpVerification({
   validateOtpCode,
   setErrorCode,
   errorMessage,
+  onCancel,
 }) {
   const { language } = useParams();
-
-  const navigateHelper = useNavigateHelper();
-  const backToSecuritySettingsPage = path(PAGES.securitySettings, {
-    language: language,
-  });
   const [time, setTime] = useState(initialTime);
   const pageContentJson = getPageContent(language, PAGES.verification);
   const { cancel } = getPageContent(language, "Button");
@@ -128,8 +122,6 @@ export default function OtpVerification({
           <GcdsInput
             inputId="verificationCode"
             label={pageContentJson["9"]}
-            autofocus
-            autocomplete="one-time-code"
             name="verificationCode"
             type="text"
             validateOn="other"
@@ -140,7 +132,8 @@ export default function OtpVerification({
             size="6"
             maxlength={6}
             minlength={6}
-            required={errorMessage === ""}
+            autocomplete="one-time-code"
+            autofocus
           ></GcdsInput>
         </form>
 
@@ -157,7 +150,7 @@ export default function OtpVerification({
             style={{ width: "fit-content" }}
             onGcdsClick={(ev) => {
               ev.preventDefault();
-              navigateHelper(backToSecuritySettingsPage);
+              onCancel();
             }}
           >
             {cancel}

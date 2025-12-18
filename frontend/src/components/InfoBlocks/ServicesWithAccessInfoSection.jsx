@@ -3,7 +3,11 @@ import {
   getContentWithVariables,
   getPageContent,
 } from "../../utils/functions.jsx";
-import { EXTERNAL_NAVIGATION_LINKS, PAGES } from "../../utils/constants.jsx";
+import {
+  EXTERNAL_NAVIGATION_LINKS,
+  PAGES,
+  ServicesWithAccessInfoSectionInformation,
+} from "../../utils/constants.jsx";
 import RPNameDisplay from "../RPInfo/RPNameDisplay.jsx";
 
 export default function ServicesWithAccessInfoSection({
@@ -15,9 +19,13 @@ export default function ServicesWithAccessInfoSection({
     PAGES.ServicesWithAccessInfo,
   );
   const informationMap = {
-    name: pageContentJson["7"],
-    contactPhoneNumber: pageContentJson["8"],
-    languagePreference: pageContentJson["9"],
+    [ServicesWithAccessInfoSectionInformation.NAME]: pageContentJson["7"],
+    [ServicesWithAccessInfoSectionInformation.CONTACT_PHONE_NUMBER]:
+      pageContentJson["8"],
+    [ServicesWithAccessInfoSectionInformation.LANGUAGE_PREFERENCE]:
+      pageContentJson["9"],
+    [ServicesWithAccessInfoSectionInformation.EMAIL_ADDRESS]:
+      pageContentJson["10"],
   };
 
   return (

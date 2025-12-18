@@ -168,6 +168,32 @@ def update_session_tokens(request: Request, new_tokens: dict):
     request.session[SessionKeys.SESSION_USER_TOKEN.value] = new_tokens
 
 
+def update_session_user_info(request: Request, new_user_info: dict):
+    """
+    Update the session with new user information after profile changes.
+    This is particularly important after email address changes where
+    the preferred_username needs to be synchronized with the new email.
+    """
+    logger.info("Updating session user info")
+
+    # Get existing token data
+    existing_token = request.session.get(SessionKeys.SESSION_USER_TOKEN.value)
+    if not existing_token:
+        logger.warning("No existing token found in session")
+        return
+
+    # Update the userinfo within the existing token structure
+    if "userinfo" in existing_token:
+        existing_token["userinfo"].update(new_user_info)
+    else:
+        existing_token["userinfo"] = new_user_info
+
+    # Save updated token back to session
+    request.session[SessionKeys.SESSION_USER_TOKEN.value] = existing_token
+
+    logger.info(f"Session user info updated with: {list(new_user_info.keys())}")
+
+
 async def get_session_data_by_id(request: Request, session_id: str):
     # Try to get Redis client from the application state
     session_data = None

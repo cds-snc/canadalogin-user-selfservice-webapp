@@ -229,9 +229,11 @@ async def dispatch_otp(
             )
             return response
 
-        elif user_otp_info.userName and user_otp_info.otpType == OtpType.EMAIL:
+        elif user_otp_info.otpType == OtpType.EMAIL:
+            # Use emailAddress if provided, otherwise fall back to userName
+            target_email = user_otp_info.emailAddress or user_otp_info.userName
             user_email_address = {
-                "emailAddress": user_otp_info.userName.lower()
+                "emailAddress": target_email.lower()
             }  # Ensure consistent email formatting
             send_transient_otp_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/emailotp/transient/verifications"
             response = await global_http_client.post(

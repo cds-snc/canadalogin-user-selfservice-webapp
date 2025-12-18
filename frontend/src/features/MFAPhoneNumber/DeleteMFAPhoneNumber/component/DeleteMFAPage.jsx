@@ -1,20 +1,19 @@
-import { GcdsErrorMessage } from "@cdssnc/gcds-components-react";
-import { useEffect, useRef, useState } from "react";
-import { useLocation, useParams } from "react-router";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router";
 import Loader from "../../../../components/Layout/Loading";
 import { useUser } from "../../../../components/Providers/useUser";
-import { useNavigateHelper } from "../../../../hooks/useNavigate";
 import { PAGES, serverMapping } from "../../../../utils/constants";
 import { getPageContent } from "../../../../utils/functions";
+import { getErrorMessage } from "../../../../utils/errorUtils";
 import { path } from "../../../../utils/routeHelpers";
-import { otpFactors } from "../../../TransientOtp/api/otpFactors";
 import OtpSelection from "../../../TransientOtp/components/OtpSelection";
 import OtpVerification from "../../../TransientOtp/components/OtpVerification";
 import { deleteMFAPhoneNumberApi } from "../api/DeleteMFAPhoneNumberAPI";
 import DeleteMFAPhoneNumberConfirm from "./DeleteMFAPhoneNumberConfirm";
-import { authService } from "../../../../services/authService";
 import PasswordVerification from "../../../TransientOtp/components/PasswordVerification";
 import StepContent from "../../../../components/Wizard/StepContent";
+import { usePasswordValidation } from "../../../../hooks/usePasswordValidation";
+import { useOtpOperations } from "../../../../hooks/useOtpOperations";
 
 export default function DeleteMFAPage() {
   const { language } = useParams();
@@ -23,30 +22,41 @@ export default function DeleteMFAPage() {
   const { factorIds } = savedLocationState || {};
 
   const { state } = useUser();
-  const [userPhoneFactors, setUserPhoneFactors] = useState([]);
-
-  const [otpSentResponse, setOtpSentResponse] = useState(null);
   const [userPasswordValue, setUserPasswordValue] = useState("");
-  const [userOtpValue, setUserOtpValue] = useState("");
   const pageContentJson = getPageContent(language, PAGES.otpSelection);
-  const errorPageJson = getPageContent(language, PAGES.error);
 
   const [errorCode, setErrorCode] = useState("");
-  const errorMessage = errorCode
-    ? errorPageJson[errorCode] || errorPageJson["7"]
-    : "";
+  const errorMessage = getErrorMessage(language, errorCode);
   const [wizardStep, setWizardStep] = useState("passwordVerification");
-  const [localLoading, setLocalLoading] = useState(true);
   const { userProfile } = state;
   const { id, userName } = userProfile ?? {};
-  const [userSelectedMfaFactor, setUserSelectedMfaFactor] = useState(null);
-  const navigateHelper = useNavigateHelper();
+  const navigate = useNavigate();
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
     language: language,
   });
   const backToManage2FAVerificationsPage = path(PAGES.manage2FAVerifications, {
     language: language,
   });
+
+  // Use the password validation hook
+  const { validatePassword, validatePasswordLoading } = usePasswordValidation(
+    setErrorCode,
+    () => {
+      setWizardStep("otpSelection");
+    },
+  );
+
+  // Use the OTP operations hook
+  const {
+    userPhoneFactors,
+    userSelectedMfaFactor,
+    userOtpValue,
+    localLoading,
+    handleChangeUserMfaSelection,
+    handleSetUserOtpValue,
+    requestOtpCode,
+    validateOtpCode: baseValidateOtpCode,
+  } = useOtpOperations(id, userName, setErrorCode, backToSecuritySettingsPage);
 
   const [phoneFormData, setPhoneFormData] = useState({
     phoneNumber: "",
@@ -60,20 +70,6 @@ export default function DeleteMFAPage() {
       ...prev,
       [field]: value,
     }));
-  };
-
-  const handleChangeUserMfaSelection = (id) => {
-    const selectedMfaFactor = userPhoneFactors.find(
-      (factor) => factor.id === id,
-    );
-
-    if (selectedMfaFactor) {
-      setUserSelectedMfaFactor(selectedMfaFactor);
-    }
-  };
-
-  const handleSetUserOtpValue = (userOtpValue) => {
-    setUserOtpValue(userOtpValue);
   };
 
   const deleteMFA = async () => {
@@ -94,82 +90,11 @@ export default function DeleteMFAPage() {
     }
   };
 
-  const didFetch = useRef(false);
-
-  const requestOtpCode = async () => {
-    const userData = {
-      userName,
-      otpType: serverMapping[userSelectedMfaFactor.type],
-      phoneNumber: userSelectedMfaFactor.phoneNumber,
-    };
-    try {
-      const response = await authService.transientOtpSend(userData);
-      if (response && response.success) {
-        setOtpSentResponse(response.data);
-      }
-      setErrorCode("");
-    } catch (err) {
-      if (err && err.data && err.data.message) {
-        setErrorCode(err.data.message);
-      }
-    } finally {
-      didFetch.current = false;
-    }
-  };
-
+  // Custom validateOtpCode that handles delete MFA flow
   const validateOtpCode = async (userOtpValue) => {
-    const userData = {
-      otp: userOtpValue,
-      trxnId: otpSentResponse.trxnId,
-      otpType: serverMapping[userSelectedMfaFactor.type],
-    };
-    try {
-      const response = await authService.transientOtpVerify(userData);
-      if (response && response.success) {
-        setWizardStep("deleteMFAPhoneNumberConfirm");
-      }
-      setErrorCode("");
-    } catch (err) {
-      if (
-        err &&
-        err.response &&
-        err.response.data &&
-        err.response.data.message
-      ) {
-        setErrorCode(err.response.data.message);
-      }
-    }
-  };
-
-  const validatePassword = async (userPasswordValue) => {
-    try {
-      const passwordPolicyResponse = await authService.requestPasswordPolicy();
-      if (passwordPolicyResponse.success) {
-        const passwordPolicy = {
-          min: passwordPolicyResponse.data.pwdMinLength,
-          max: passwordPolicyResponse.data.pwdMaxLength,
-        };
-        if (
-          !userPasswordValue ||
-          userPasswordValue.length < passwordPolicy.min ||
-          userPasswordValue.length > passwordPolicy.max
-        ) {
-          setErrorCode("5");
-          return;
-        }
-      }
-      const response = await authService.verifyPassword({
-        password: userPasswordValue,
-      });
-      if (response && response.success) {
-        setWizardStep("otpSelection");
-        setErrorCode("");
-      }
-    } catch (err) {
-      if (err && err.data && err.data.message) {
-        setErrorCode(err.data.message);
-      }
-    }
+    await baseValidateOtpCode(userOtpValue, () => {
+      setWizardStep("deleteMFAPhoneNumberConfirm");
+    });
   };
 
   useEffect(() => {
@@ -178,74 +103,45 @@ export default function DeleteMFAPage() {
       setSavedLocationState(location.state);
     } else {
       // redirect to edit page if no factor data exists
-      navigateHelper(backToManage2FAVerificationsPage);
+      navigate(backToManage2FAVerificationsPage);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    // Check if factorIds exist in savedLocationState
-    if (!savedLocationState?.factorIds) return;
+    // Check if factorIds exist in savedLocationState and userPhoneFactors are available
+    if (!savedLocationState?.factorIds || !userPhoneFactors.length) return;
 
-    const fetchUserOtpPhoneFactors = async () => {
-      setLocalLoading(true);
-      try {
-        const response = await otpFactors.getUserOtpPhoneFactors(id);
-        if (
-          response &&
-          response.success &&
-          response.data.length > 0 &&
-          response.data[0].type
-        ) {
-          const userPhoneFactors = response.data;
-          setUserPhoneFactors(userPhoneFactors);
-          setUserSelectedMfaFactor(userPhoneFactors[0]);
-          // If factor data is provided via location state, pre-select the factors
-          if (factorIds && factorIds.length > 0) {
-            const mfaFactorsToDelete = userPhoneFactors.filter((factor) =>
-              factorIds.includes(factor.id),
-            );
-            if (mfaFactorsToDelete.length > 0) {
-              // Use the first matching factor for display, but collect all types for deletion
-              const firstFactor = mfaFactorsToDelete[0];
+    // If factor data is provided via location state, pre-select the factors
+    if (factorIds && factorIds.length > 0) {
+      const mfaFactorsToDelete = userPhoneFactors.filter((factor) =>
+        factorIds.includes(factor.id),
+      );
+      if (mfaFactorsToDelete.length > 0) {
+        // Use the first matching factor for display, but collect all types for deletion
+        const firstFactor = mfaFactorsToDelete[0];
 
-              // Set the data in phoneFormData for deletion
-              handlePhoneForm("mfaFactorsToDelete", mfaFactorsToDelete); // Use first ID for backward compatibility
-              handlePhoneForm("phoneNumber", firstFactor.phoneNumber);
-              handlePhoneForm(
-                "formattedPhoneNumber",
-                `${firstFactor.phoneNumber}`,
-              );
-            } else {
-              // Factor not found, go back to manage page
-              await navigateHelper(backToManage2FAVerificationsPage);
-            }
-          } else {
-            // No specific factor selected, go back to manage page (shouldn't happen in normal flow)
-            await navigateHelper(backToManage2FAVerificationsPage);
-          }
-        } else {
-          await navigateHelper(backToSecuritySettingsPage);
-        }
-      } catch (err) {
-        console.error("Error fetching user OTP phone factors:", err);
-      } finally {
-        setLocalLoading(false);
+        // Set the data in phoneFormData for deletion
+        handlePhoneForm("mfaFactorsToDelete", mfaFactorsToDelete);
+        handlePhoneForm("phoneNumber", firstFactor.phoneNumber);
+        handlePhoneForm("formattedPhoneNumber", `${firstFactor.phoneNumber}`);
+      } else {
+        // Factor not found, go back to manage page
+        navigate(backToManage2FAVerificationsPage);
       }
-    };
-
-    fetchUserOtpPhoneFactors();
+    } else {
+      // No specific factor selected, go back to manage page (shouldn't happen in normal flow)
+      navigate(backToManage2FAVerificationsPage);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [factorIds]);
+  }, [factorIds, userPhoneFactors]);
 
   const steps = {
     passwordVerification: (
       <PasswordVerification
         userPasswordValue={userPasswordValue}
         setUserPasswordValue={setUserPasswordValue}
-        onCancel={async () =>
-          await navigateHelper(backToManage2FAVerificationsPage)
-        }
+        onCancel={async () => navigate(backToManage2FAVerificationsPage)}
         validatePassword={validatePassword}
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
@@ -262,9 +158,7 @@ export default function DeleteMFAPage() {
           setWizardStep("otpValidation");
         }}
         parentPage={PAGES.deleteMFAPage}
-        onCancel={async () =>
-          await navigateHelper(backToManage2FAVerificationsPage)
-        }
+        onCancel={async () => navigate(backToManage2FAVerificationsPage)}
       />
     ),
     otpValidation: (
@@ -278,6 +172,7 @@ export default function DeleteMFAPage() {
         onBack={() => setWizardStep("otpSelection")}
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
+        onCancel={async () => navigate(backToManage2FAVerificationsPage)}
       />
     ),
     deleteMFAPhoneNumberConfirm: (
@@ -285,23 +180,23 @@ export default function DeleteMFAPage() {
         onNext={async () => {
           try {
             await deleteMFA();
-            await navigateHelper(backToManage2FAVerificationsPage, false, {
-              noticeType: "mfaDeleted",
-              phoneNumber: phoneFormData.formattedPhoneNumber,
+            navigate(backToManage2FAVerificationsPage, {
+              state: {
+                noticeType: "mfaDeleted",
+                phoneNumber: phoneFormData.formattedPhoneNumber,
+              },
             });
           } catch (error) {
             setErrorCode(error?.message || "Unexpected API request error");
           }
         }}
-        onCancel={async () =>
-          await navigateHelper(backToManage2FAVerificationsPage)
-        }
+        onCancel={async () => navigate(backToManage2FAVerificationsPage)}
         phoneFormData={phoneFormData}
       />
     ),
   };
 
-  return localLoading ? (
+  return localLoading || validatePasswordLoading ? (
     <Loader text={pageContentJson["11"]} />
   ) : (
     <StepContent

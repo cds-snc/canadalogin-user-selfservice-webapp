@@ -1,9 +1,10 @@
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import {
   GcdsContainer,
   GcdsHeading,
   GcdsGrid,
   GcdsText,
+  GcdsLink,
 } from "@cdssnc/gcds-components-react";
 
 import { getPageContent } from "../../utils/functions.jsx";
@@ -13,8 +14,13 @@ import VerifiedBadge from "../Badges/VerifiedBadge.jsx";
 import ViewContactPhoneNumber from "../../features/ContactPhoneNumber/components/ViewContactPhoneNumber.jsx";
 import ViewNameCard from "../../features/ProfileName/components/ViewProfileNameCard.jsx";
 import ViewLanguagePreferences from "../../features/LanguagePreference/components/ViewLanguagePreference.jsx";
+import { path } from "../../utils/routeHelpers.js";
 
-const DisplayEmailInfo = ({ email, pageContent }) => {
+const DisplayEmailInfo = ({ email, pageContent, language }) => {
+  const navigate = useNavigate();
+  const editEmail = path(PAGES.editEmailPage, {
+    language: language,
+  });
   return (
     <>
       <GcdsHeading tag="h3" marginTop="300">
@@ -23,6 +29,16 @@ const DisplayEmailInfo = ({ email, pageContent }) => {
       <GcdsText>{pageContent["8"]}</GcdsText>
       <GcdsGrid columns="1fr auto" className="gridInline">
         <GcdsText>{email}</GcdsText>
+        <GcdsLink
+          href={editEmail}
+          size="regular"
+          onGcdsClick={(ev) => {
+            ev.preventDefault();
+            navigate(ev.detail);
+          }}
+        >
+          {pageContent["5"]}
+        </GcdsLink>
       </GcdsGrid>
       <VerifiedBadge text={pageContent["9"]} />
     </>
@@ -47,7 +63,11 @@ export default function ProfileHome() {
         {pageContent["6"]}
       </GcdsHeading>
       <GcdsContainer className="sectionCard">
-        <DisplayEmailInfo email={email} pageContent={pageContent} />
+        <DisplayEmailInfo
+          email={email}
+          pageContent={pageContent}
+          language={language}
+        />
 
         <div className="separator" />
         <ViewContactPhoneNumber

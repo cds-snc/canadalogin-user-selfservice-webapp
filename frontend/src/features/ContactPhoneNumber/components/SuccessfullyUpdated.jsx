@@ -9,7 +9,7 @@ import {
   GcdsLink,
 } from "@cdssnc/gcds-components-react";
 import { getPageContent } from "../../../utils/functions.jsx";
-import { PAGES } from "../../../utils/constants";
+import { EXTERNAL_NAVIGATION_LINKS, PAGES } from "../../../utils/constants";
 import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 
 export default function SuccessfullyUpdated({
@@ -49,7 +49,9 @@ export default function SuccessfullyUpdated({
         <GcdsText>{pageContentJson["4"]}</GcdsText>
         <GcdsText>
           {pageContentJson["5"]}{" "}
-          <GcdsLink href="#">{pageContentJson["6"]}</GcdsLink>
+          <GcdsLink href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}>
+            {pageContentJson["6"]}
+          </GcdsLink>
         </GcdsText>
         <GcdsGrid columns="max-content max-content" gap="200">
           <SubmitButton

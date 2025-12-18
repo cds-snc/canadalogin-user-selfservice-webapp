@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import { useUser } from "../../../components/Providers/useUser.tsx";
 import Loader from "../../../components/Layout/Loading.jsx";
@@ -6,18 +6,20 @@ import Loader from "../../../components/Layout/Loading.jsx";
 import Password from "./Password.jsx";
 import PasswordChangedConfirmation from "./PasswordChangedConfirmation.jsx";
 
-import { otpFactors } from "../api/otpFactors.jsx";
 import { PAGES } from "../../../utils/constants.jsx";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
+import { getErrorMessage } from "../../../utils/errorUtils.js";
+import { authService } from "../../../services/authService.jsx";
 
 import { getPageContent } from "../../../utils/functions.jsx";
 import { path } from "../../../utils/routeHelpers.js";
 import OtpSelection from "../../TransientOtp/components/OtpSelection.jsx";
 import OtpVerification from "../../TransientOtp/components/OtpVerification.jsx";
 import { passwordUpdate } from "../api/passwordUpdate.jsx";
-import { authService } from "../../../services/authService.jsx";
 import PasswordVerification from "../../TransientOtp/components/PasswordVerification.jsx";
 import StepContent from "../../../components/Wizard/StepContent.jsx";
+import { usePasswordValidation } from "../../../hooks/usePasswordValidation";
+import { useOtpOperations } from "../../../hooks/useOtpOperations";
 
 const defaulPasswordUpdatetStep = "passwordVerification";
 
@@ -25,19 +27,11 @@ export default function ChangePasswordIndex() {
   const { language } = useParams();
   const { state, dispatch } = useUser();
   const { setLoading } = userProfileDispatch(dispatch);
-
-  const [userSelectedMfaFactor, setUserSelectedMfaFactor] = useState(null);
   const [otpSentResponse, setOtpSentResponse] = useState(null);
   const [errorCode, setErrorCode] = useState("");
-  const errorPageJson = getPageContent(language, PAGES.error);
 
-  const errorMessage = errorCode
-    ? errorPageJson[errorCode] || errorPageJson["7"]
-    : "";
+  const errorMessage = getErrorMessage(language, errorCode);
 
-  const [userPhoneFactors, setUserPhoneFactors] = useState([]);
-
-  const [userOtpValue, setUserOtpValue] = useState("");
   const [userPasswordValue, setUserPasswordValue] = useState("");
   const pageContentJson = getPageContent(language, PAGES.otpSelection);
   const navBarContent = getPageContent(language, "TopNavBar");
@@ -45,7 +39,7 @@ export default function ChangePasswordIndex() {
   const [passwordUpdateStep, setPasswordUpdateStep] = useState(
     defaulPasswordUpdatetStep,
   );
-  const [localLoading, setLocalLoading] = useState(true);
+
   const { userProfile } = state;
   const { id, userName } = userProfile ?? {};
   const navigate = useNavigate();
@@ -53,26 +47,26 @@ export default function ChangePasswordIndex() {
     language: language,
   });
 
-  const handleChangeUserMfaSelection = (id) => {
-    const selectedMfaFactor = userPhoneFactors.find(
-      (factor) => factor.id === id,
-    );
+  // Use the password validation hook
+  const { validatePassword, validatePasswordLoading } = usePasswordValidation(
+    setErrorCode,
+    () => {
+      setPasswordUpdateStep("otpSelection");
+    },
+  );
 
-    if (selectedMfaFactor) {
-      setUserSelectedMfaFactor(selectedMfaFactor);
-    }
-  };
+  // Use the OTP operations hook
+  const {
+    userPhoneFactors,
+    userSelectedMfaFactor,
+    userOtpValue,
+    localLoading,
+    handleChangeUserMfaSelection,
+    handleSetUserOtpValue,
+    setLocalLoading,
+  } = useOtpOperations(id, userName, setErrorCode, backToSecuritySettingsPage);
 
-  const handleLoading = (bool) => {
-    setLocalLoading(bool);
-  };
-
-  const handleSetUserOtpValue = (userOtpValue) => {
-    setUserOtpValue(userOtpValue);
-  };
-
-  const didFetch = useRef(false);
-
+  // Custom requestOtpCode for password change flow using passwordUpdate API
   const requestOtpCode = async () => {
     try {
       const response = await passwordUpdate.firstStep(
@@ -87,11 +81,10 @@ export default function ChangePasswordIndex() {
       if (err && err.data && err.data.message) {
         setErrorCode(err.data.message);
       }
-    } finally {
-      didFetch.current = false;
     }
   };
 
+  // Custom validateOtpCode for password change flow using passwordUpdate API
   const validateOtpCode = async (userOtpValue) => {
     setLocalLoading(true);
     try {
@@ -111,67 +104,6 @@ export default function ChangePasswordIndex() {
       setLocalLoading(false);
     }
   };
-
-  const validatePassword = async (userPasswordValue) => {
-    setLocalLoading(true);
-    try {
-      const passwordPolicyResponse = await authService.requestPasswordPolicy();
-      if (passwordPolicyResponse.success) {
-        const passwordPolicy = {
-          min: passwordPolicyResponse.data.pwdMinLength,
-          max: passwordPolicyResponse.data.pwdMaxLength,
-        };
-        if (
-          !userPasswordValue ||
-          userPasswordValue.length < passwordPolicy.min ||
-          userPasswordValue.length > passwordPolicy.max
-        ) {
-          setErrorCode("5");
-          return;
-        }
-      }
-      const response = await authService.verifyPassword({
-        password: userPasswordValue,
-      });
-      if (response && response.success) {
-        setPasswordUpdateStep("otpSelection");
-        setErrorCode("");
-      }
-    } catch (err) {
-      if (err && err.data && err.data.message) {
-        setErrorCode(err.data.message);
-      }
-    } finally {
-      setLocalLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    const fetchUserOtpPhoneFactors = async () => {
-      setLocalLoading(true);
-      try {
-        const response = await otpFactors.getUserOtpPhoneFactors(id);
-        if (
-          response &&
-          response.success &&
-          response.data.length > 0 &&
-          response.data[0].type
-        ) {
-          setUserPhoneFactors(response.data);
-          setUserSelectedMfaFactor(response.data[0]);
-        } else {
-          navigate(backToSecuritySettingsPage);
-        }
-      } catch (err) {
-        console.error("err", err);
-      } finally {
-        setLocalLoading(false);
-      }
-    };
-
-    fetchUserOtpPhoneFactors();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const logout = async () => {
     setLoading(true, navBarContent["8"]); // Use logout loading text
@@ -230,6 +162,7 @@ export default function ChangePasswordIndex() {
         onBack={() => setPasswordUpdateStep("otpSelection")}
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
+        onCancel={async () => await navigate(backToSecuritySettingsPage)}
       />
     ),
     passwordChange: (
@@ -239,7 +172,7 @@ export default function ChangePasswordIndex() {
         userProfile={userProfile}
         userSelectedMfaType={userSelectedMfaFactor?.type}
         localLoading={localLoading}
-        setLocalLoading={handleLoading}
+        setLocalLoading={setLocalLoading}
         otpSentResponse={otpSentResponse}
         userOtpValue={userOtpValue}
         onNext={() => {
@@ -257,7 +190,7 @@ export default function ChangePasswordIndex() {
     ),
   };
 
-  return localLoading ? (
+  return localLoading || validatePasswordLoading ? (
     <Loader text={pageContentJson["11"]} />
   ) : (
     <StepContent

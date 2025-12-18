@@ -14,6 +14,7 @@ from app.utils.access_token import get_auth_request_headers
 from app.utils.mask_phone_number import mask_contact_phone_numbers
 from app.utils.request_error_handler import RequestErrorHandler
 from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
+from app.auth.services.auth_user_session import update_session_user_info
 
 logger = logging.getLogger(__name__)
 
@@ -101,17 +102,53 @@ async def update_my_profile(
 
     ibm_user_profile_username = ibm_user_profile.get("userName")
     current_users_username = updated_user_data_dict.get("userName")
-    username_match = ibm_user_profile_username == current_users_username
 
-    if not username_match:
-        logger.error("User mismatch - cannot update profile")
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="User mismatch - cannot update profile",
+    # Check if this is an email change request
+    is_email_change = (
+        current_users_username != ibm_user_profile_username
+        and updated_user_data_dict.get("emails") is not None
+    )
+
+    if is_email_change:
+        # For email changes, validate that the new userName matches the new email
+        new_emails = updated_user_data_dict.get("emails", [])
+        if new_emails and len(new_emails) > 0:
+            # Find the email with type "work"
+            work_email = None
+            for email in new_emails:
+                if getattr(email, "type", None) == "work":
+                    work_email = email
+                    break
+
+            # Use work email if found, otherwise fall back to first email
+            target_email = work_email if work_email else new_emails[0]
+            new_email_value = (
+                target_email.get("value")
+                if isinstance(target_email, dict)
+                else target_email.value
+            )
+            if current_users_username != new_email_value:
+                logger.error("Username must match email address")
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Username must match email address",
+                )
+        logger.info(
+            f"Email change requested: {ibm_user_profile_username} -> {current_users_username}"
         )
+    else:
+        # For non-email changes, ensure username matches current user
+        username_match = ibm_user_profile_username == current_users_username
 
-    # Prevent changing the userName
-    updated_user_data_dict.pop("userName", None)
+        if not username_match:
+            logger.error("User mismatch - cannot update profile")
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="User mismatch - cannot update profile",
+            )
+
+        # Prevent changing the userName for non-email changes
+        updated_user_data_dict.pop("userName", None)
 
     merged_profile = {**ibm_user_profile, **updated_user_data_dict}
 
@@ -150,6 +187,22 @@ async def update_my_profile(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Request data validation error",
         )
+
+    # If this was an email change, update the session with new preferred_username
+    if is_email_change and current_users_username:
+        logger.info(f"Updating session after email change to: {current_users_username}")
+        try:
+            update_session_user_info(
+                request,
+                {
+                    "preferred_username": current_users_username,
+                    "email": current_users_username,
+                },
+            )
+            logger.info("Session updated successfully after email change")
+        except Exception as e:
+            logger.warning(f"Failed to update session after email change: {str(e)}")
+            # Don't fail the entire operation if session update fails
 
     return ProfileResponse(
         success=True,

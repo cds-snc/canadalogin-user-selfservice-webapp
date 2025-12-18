@@ -60,6 +60,12 @@ vi.mock("../../../utils/constants.jsx", () => ({
     en: "en-ca",
     fr: "fr-ca",
   },
+  ServicesWithAccessInfoSectionInformation: {
+    NAME: "name",
+    CONTACT_PHONE_NUMBER: "contactPhoneNumber",
+    LANGUAGE_PREFERENCE: "languagePreference",
+    EMAIL_ADDRESS: "emailAddress",
+  },
 }));
 
 vi.mock(

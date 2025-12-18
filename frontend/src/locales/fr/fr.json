@@ -77,7 +77,7 @@
     "18": "Connectez-vous avec Connextion GC",
     "19": "pour accéder à vôtre",
     "20": "compte",
-    "21": "Utiliser un autre numéro de téléphone",
+    "21": "Essayer une autre méthode",
     "22": "Consultez vos courriels",
     "23": "Nous avons envoyé un courriel contenant un code à 6 chiffres à l’adresse :",
     "24": "Le courriel pourrait prendre quelques minutes à arriver. Si vous ne voyez pas le courriel, vérifiez s’il se trouve dans votre dossier de pourriels.",
@@ -85,7 +85,8 @@
     "26": "Demander un nouveau code",
     "27": "Annuler",
     "28": "Configurer la vérification par message texte (SMS)",
-    "29": "Configurez la vérification par appel vocal"
+    "29": "Configurez la vérification par appel vocal",
+    "30": "Je n’ai pas accès à mon téléphone"
   },
   "Button": {
     "submit": "Continuer",
@@ -485,5 +486,44 @@
     "6": "Réinitialiser le mot de passe",
     "7": "Pour ajouter un numéro de téléphone,",
     "8": "Pour supprimer un numéro de téléphone,"
+  },
+  "EditEmailEnterEmail": {
+    "1": "Enter a new email address",
+    "2": "Changing your email address will affect:",
+    "3": "The email address you use to sign in",
+    "4": "The email address that GC Sign in uses to contact you",
+    "5": "The email address that services connected to your GC Sign in may use to contact you",
+    "6": "Email"
+  },
+  "EmailOtpValidation": {
+    "1": "Check your email",
+    "2": "We have sent an email with a 6-digit code to:",
+    "3": "Your email might take a few minutes to arrive. If you do not get an email, check your spam folder.",
+    "4": "Your code will expire in",
+    "5": "10 minutes.",
+    "6": "6-digit code",
+    "7": "Problems with the code?",
+    "8": "Use a different email",
+    "9": "You can request a new code in",
+    "10": "seconds",
+    "11": "Request a new code"
+  },
+  "EmailConfirmUpdate": {
+    "1": "Are you sure you want to update your email?",
+    "2": "You’ve requested to update your email to:",
+    "3": "This will update the email you use to sign in, as well as the email the following services use to contact you:",
+    "4": "GEO.ca",
+    "5": "Yes, update"
+  },
+  "EmailUpdateSuccess": {
+    "1": "Your email has been updated to",
+    "2": "You may need to update your email other places",
+    "3": "This only changes your email with services connected to your GC Sign in.",
+    "4": "If you are trying to update your email with a service that’s not connected to your GC Sign in, you’ll need to go to that account.",
+    "5": "To search for another GC Account, visit the",
+    "6": "GC Account directory",
+    "7": ".",
+    "8": "Back to profile",
+    "9": "Sign out"
   }
 }

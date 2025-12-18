@@ -103,6 +103,7 @@ class UserProfileUpdateRequest(BaseModel):
     preferredLanguage: Optional[str] = None
     name: Optional[UserProfileName] = None
     userName: EmailStr
+    emails: Optional[List[EmailItem]] = None
     phoneNumbers: Optional[List[MetaDataTypeValue]] = None
     model_config = ConfigDict(validate_by_name=True, validate_by_alias=True)
 
