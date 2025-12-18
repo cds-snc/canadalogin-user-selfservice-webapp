@@ -101,11 +101,13 @@ async def update_my_profile(
     ibm_user_profile = ibm_user_profile_response.model_dump()
 
     ibm_user_profile_username = ibm_user_profile.get("userName")
+    ibm_user_profile_userid = ibm_user_profile.get("userId")
     current_users_username = updated_user_data_dict.get("userName")
+    current_users_id = updated_user_data_dict.get("userId")
 
     # Check if this is an email change request
     is_email_change = (
-        current_users_username != ibm_user_profile_username
+        current_users_id != ibm_user_profile_userid
         and updated_user_data_dict.get("emails") is not None
     )
 
