@@ -1,10 +1,8 @@
 import logging
-import sys
 
 from fastapi import Request
 from fastapi.responses import RedirectResponse
 from authlib.integrations.starlette_client import OAuthError
-from authlib.common.security import generate_token
 from starsessions.session import get_session_handler
 from app.auth.services.oidc_config import oauth
 from app.config import get_configuration
@@ -13,15 +11,6 @@ from app.utils.request_error_handler import RequestErrorHandler
 from app.auth.services.auth_user_session import update_session_tokens
 
 logger = logging.getLogger(__name__)
-
-
-def flush_logs():
-    """Helper function to force flush all log handlers to CloudWatch"""
-    for handler in logger.handlers:
-        if hasattr(handler, "flush"):
-            handler.flush()
-    sys.stdout.flush()
-    sys.stderr.flush()
 
 
 def get_base_profile_management_url():
@@ -54,49 +43,9 @@ async def redirect_user_to_idp_verify(request: Request):
     """
     try:
         callback_redirect_uri = get_callback_redirect_uri(request)
-        if request.session is not None:
-            for k, v in request.session.items():
-                logger.info(f"Login Request Session Items: {k}: {v}")
-        else:
-            logger.warning("redirect_user_to_idp_verify - Session is empty.")
-
-        logger.info("Redirecting user to IBM Verify for authentication")
-        logger.info(f"oauth object type: {type(oauth)}")
-        logger.info(f"oauth.verify exists: {hasattr(oauth, 'verify')}")
-        logger.info(
-            f"oauth.verify type: {type(oauth.verify) if hasattr(oauth, 'verify') else 'N/A'}"
-        )
-        flush_logs()  # Force flush to ensure CloudWatch gets this log
-
-        # manually generate a code_verifier, make sure PKCE is used
-        code_verifier = generate_token(48)  # Generate a secure random code verifier
-        oidc_client = oauth.verify
-        if oidc_client is None:
-            raise Exception("OAuth client 'verify' is not registered")
-        # reset client kwargs to ensure PKCE and scopes are set
-        oidc_client.client_kwargs["code_challenge_method"] = "S256"
-        oidc_client.client_kwargs["scope"] = "openid email profile phone"
-        response = await oidc_client.authorize_redirect(
-            request, callback_redirect_uri, code_verifier=code_verifier
-        )
-        # After the redirect to the login page, request.session should have a code_verifier
-        logger.info("User redirected to IBM Verify for authentication")
-        flush_logs()  # Force flush to ensure CloudWatch gets this log
-
-        if request.session is not None:
-            for k, v in request.session.items():
-                logger.info(f"After Redirected user - Request Session Items: {k}: {v}")
-        else:
-            logger.warning("redirect_user_to_idp_verify - Session is empty.")
-        flush_logs()  # Force flush to ensure CloudWatch gets this log
-
-        return response
-    except OAuthError as error:
-        logger.error("=== OAuthError in redirect_user_to_idp_verify ===")
-        logger.error(f"redirect_user_to_idp_verify - OAuth error: {error}")
-        raise OAuthError("redirect user to idp - OAuth error") from error
+        return await oauth.verify.authorize_redirect(request, callback_redirect_uri)
     except Exception as e:
-        logger.exception("Unexpected error during redirect_to_verify: %s", str(e))
+        logger.exception("Unexpected error during redirect_to_verify", str(e))
         RequestErrorHandler.handle(e, context="Unexpected error during idp redirect")
 
 
@@ -105,15 +54,7 @@ async def callback_handler(request: Request):
     Handle the OAuth callback from IBM Verify.
     This function processes the response from IBM Verify after user authentication.
     """
-    logger.info("OIDC Callback Handler")
-
     try:
-        if request.session is not None:
-            for k, v in request.session.items():
-                logger.info(f"Callback Handler: Request Session Items: {k}: {v}")
-        else:
-            logger.warning("callback_handler - Session is empty.")
-
         redirectValue = get_base_profile_management_url()
         returnToPageValue = request.session.get(SessionKeys.RETURN_TO_PAGE.value)
 
@@ -127,14 +68,9 @@ async def callback_handler(request: Request):
             logger.info("OIDC Responsed")
         except OAuthError as error:
             logger.error(f"OAuth error during token retrieval: {error}")
-            if request.session is not None:
-                for k, v in request.session.items():
-                    logger.info(f"OAuthError : Request Session Items: {k}: {v}")
-            else:
-                logger.warning("OAuthError callback_handler - Session is empty.")
-                logger.error(
-                    f"Redirect user back to IBM Verify to be re-authenticated: {redirectValue}"
-                )
+            logger.error(
+                f"Redirect user back to IBM Verify to be re-authenticated: {redirectValue}"
+            )
             # redirect back to IBM Verify to retry authentication
             raise OAuthError("Invalid or expired token") from error
 
@@ -145,6 +81,7 @@ async def callback_handler(request: Request):
 
         update_session_tokens(request, oidc_response)
 
+        logger.info("OIDC Callback Handler")
         logger.info(f"Redirect to PROFILE_MANAGEMENT_DOMAIN: {redirectValue}")
         return RedirectResponse(url=redirectValue)
     except OAuthError as error:
@@ -171,19 +108,8 @@ async def reauthenticate_user(request: Request, returnToPage: str = "/"):
         # if the user recently logged in, we can set the max age to 15 minutes
         # will reautenticate after max age value
         max_age_in_seconds = 900
-        # manually generate a code_verifier, make sure PKCE is used
-        code_verifier = generate_token(48)  # Generate a secure random code verifier
-        oidc_client = oauth.verify
-        if oidc_client is None:
-            raise Exception("OAuth client 'verify' is not registered")
-        # reset client kwargs to ensure PKCE and scopes are set
-        oidc_client.client_kwargs["code_challenge_method"] = "S256"
-        oidc_client.client_kwargs["scope"] = "openid email profile phone"
-        return await oidc_client.authorize_redirect(
-            request,
-            callback_redirect_uri,
-            code_verifier=code_verifier,
-            max_age=max_age_in_seconds,
+        return await oauth.verify.authorize_redirect(
+            request, callback_redirect_uri, max_age=max_age_in_seconds
         )
     except OAuthError as error:
         logger.exception("Unexpected error during redirect_to_verify")
