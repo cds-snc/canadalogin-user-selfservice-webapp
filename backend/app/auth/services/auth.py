@@ -44,7 +44,9 @@ async def redirect_user_to_idp_verify(request: Request):
     try:
         callback_redirect_uri = get_callback_redirect_uri(request)
         logger.info("Redirecting user to IBM Verify...")
-        redirect_response = await oauth.verify.authorize_redirect(request, callback_redirect_uri)
+        redirect_response = await oauth.verify.authorize_redirect(
+            request, callback_redirect_uri
+        )
         logger.info("User redirected to IBM Verify for authentication")
         return redirect_response
     except Exception as e:
