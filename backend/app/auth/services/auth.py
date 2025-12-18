@@ -51,8 +51,8 @@ async def redirect_user_to_idp_verify(request: Request):
 
 async def callback_handler(request: Request):
     """
-    Get the redirect URL for the OAuth login flow.
-    This function is used to initiate the login process with IBM Verify.
+    Handle the OAuth callback from IBM Verify.
+    This function processes the response from IBM Verify after user authentication.
     """
     try:
         redirectValue = get_base_profile_management_url()
