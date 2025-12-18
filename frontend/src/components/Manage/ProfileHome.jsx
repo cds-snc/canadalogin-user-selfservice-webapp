@@ -8,7 +8,7 @@ import {
 } from "@cdssnc/gcds-components-react";
 
 import { getPageContent } from "../../utils/functions.jsx";
-import { PAGES } from "../../utils/constants.jsx";
+import { PAGES, VITE_ENVIRONMENTS } from "../../utils/constants.jsx";
 import { useUser } from "../Providers/useUser.tsx";
 import VerifiedBadge from "../Badges/VerifiedBadge.jsx";
 import ViewContactPhoneNumber from "../../features/ContactPhoneNumber/components/ViewContactPhoneNumber.jsx";
@@ -25,7 +25,8 @@ const DisplayEmailInfo = ({ email, pageContent, language }) => {
 
   // Only show edit email link in dev and test environments
   const showEditEmailLink =
-    config.environment === "dev" || config.environment === "test";
+    config.environment === VITE_ENVIRONMENTS.dev ||
+    config.environment === VITE_ENVIRONMENTS.test;
 
   return (
     <>
