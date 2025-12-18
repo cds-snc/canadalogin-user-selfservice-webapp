@@ -1,9 +1,11 @@
 from unittest.mock import Mock
 
+from app.otp.schemas import OtpType
 from app.users.schemas import (
     ProfileUpdateWithOtpRequest,
     UserProfileName,
     EmailItem,
+    MetaDataTypeValue,
 )
 from app.users.services.update_profile_with_otp import _build_profile_update_request
 
@@ -18,7 +20,7 @@ class TestBuildProfileUpdateRequest:
             newEmailAddress="newemail@example.com",
             otp="123456",
             trxnId="test-trxn",
-            otpType="email",
+            otpType=OtpType.EMAIL,
         )
 
         # Mock current profile with multiple emails including a work email
@@ -66,7 +68,7 @@ class TestBuildProfileUpdateRequest:
             newEmailAddress="newemail@example.com",
             otp="123456",
             trxnId="test-trxn",
-            otpType="email",
+            otpType=OtpType.EMAIL,
         )
 
         # Mock current profile with no work email
@@ -113,7 +115,7 @@ class TestBuildProfileUpdateRequest:
             newEmailAddress="newemail@example.com",
             otp="123456",
             trxnId="test-trxn",
-            otpType="email",
+            otpType=OtpType.EMAIL,
         )
 
         # Mock current profile with no emails
@@ -143,7 +145,7 @@ class TestBuildProfileUpdateRequest:
             newEmailAddress="newemail@example.com",
             otp="123456",
             trxnId="test-trxn",
-            otpType="email",
+            otpType=OtpType.EMAIL,
         )
 
         # Mock current profile with None emails
@@ -166,14 +168,15 @@ class TestBuildProfileUpdateRequest:
         assert work_email.type == "work"
         assert work_email.value == "newemail@example.com"
 
-    def test_no_email_update_preserves_current_profile(self):
-        """Test that when no email update is requested, current profile is preserved"""
+    def test_phone_number_update_preserves_current_profile(self):
+        """Test that when updating phone numbers, other profile fields are preserved"""
         # Arrange
+        new_phone_numbers = [MetaDataTypeValue(type="work", value="+19876543210")]
         update_data = ProfileUpdateWithOtpRequest(
-            name=UserProfileName(givenName="Jane", familyName="Smith"),
+            phoneNumbers=new_phone_numbers,
             otp="123456",
             trxnId="test-trxn",
-            otpType="email",
+            otpType=OtpType.SMS,
         )
 
         # Mock current profile
@@ -181,17 +184,17 @@ class TestBuildProfileUpdateRequest:
         current_profile.userName = "test@example.com"
         current_profile.preferredLanguage = "en"
         current_profile.name = UserProfileName(givenName="John", familyName="Doe")
-        current_profile.phoneNumbers = []
+        current_profile.phoneNumbers = [
+            MetaDataTypeValue(type="work", value="+11234567890")
+        ]
         current_profile.emails = [EmailItem(type="work", value="test@example.com")]
 
         # Act
         result = _build_profile_update_request(update_data, current_profile)
 
         # Assert
-        # userName should remain unchanged
+        # userName and emails should remain unchanged when updating phone numbers
         assert result.userName == "test@example.com"
-        # emails should not be included in the update (should remain as current profile)
-        # Note: since we're not updating emails, emails won't be explicitly set in update_request_data
-        # But name should be updated
-        assert result.name.givenName == "Jane"
-        assert result.name.familyName == "Smith"
+        # Phone numbers should be updated
+        assert result.phoneNumbers == new_phone_numbers
+        assert result.phoneNumbers[0].value == "+19876543210"

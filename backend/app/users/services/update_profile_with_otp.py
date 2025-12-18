@@ -191,14 +191,9 @@ def _build_profile_update_request(
         request_data["userName"] = update_data.newEmailAddress
         request_data["emails"] = updated_emails
 
-    # Add all other fields directly - sanitize_user_profile_data will handle filtering
-    request_data.update(
-        {
-            "name": update_data.name,
-            "phoneNumbers": update_data.phoneNumbers,
-            "preferredLanguage": update_data.preferredLanguage,
-        }
-    )
+    # Add phone numbers if being updated - sanitize_user_profile_data will handle filtering
+    if update_data.phoneNumbers is not None:
+        request_data["phoneNumbers"] = update_data.phoneNumbers
 
     # Create the request object and use sanitize function to only include explicitly set fields
     profile_update_request = UserProfileUpdateRequest(**request_data)
@@ -212,12 +207,8 @@ def _get_update_field_names(update_data: ProfileUpdateWithOtpRequest) -> list[st
 
     if update_data.newEmailAddress:
         fields.append("email")
-    if update_data.name:
-        fields.append("name")
     if update_data.phoneNumbers:
         fields.append("phoneNumbers")
-    if update_data.preferredLanguage:
-        fields.append("preferredLanguage")
 
     return fields
 
