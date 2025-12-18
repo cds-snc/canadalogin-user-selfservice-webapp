@@ -24,6 +24,7 @@ from app.auth import v1_router as v1_auth_router
 from app.password import v1_router as v1_password_router
 from app.otp import v1_router as v1_otp_router
 from app.auth.services import oidc_config
+from app.auth.services.auth import redirect_user_to_idp_verify
 
 # from Secweb import SecWeb
 
@@ -224,12 +225,26 @@ async def custom_http_exception_handler(request: Request, exc: HTTPException):
 @app.exception_handler(OAuthError)
 async def oauth_error_handler(request: Request, exc: OAuthError):
     """Catch OAuth errors and redirect user to IdP login."""
-    logger.error("Oauth Exception Error Handler: %s", exc)
-    logger.info("Return 401 JSON response")
-    return JSONResponse(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        content={"detail": "Invalid or expired token"},
+    logger.info("Oauth Exception Error Handler: %s", exc)
+    host = request.headers.get("host", "")
+    referer = request.headers.get("referer", "")
+    accept_header = request.headers.get("accept", "")
+
+    logger.info(
+        "Request Header Info: host=%s referer=%s accept=%s",
+        host,
+        referer,
+        accept_header,
     )
+
+    if "application/json" in accept_header:
+        logger.info("Return 401 JSON response")
+        return JSONResponse(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            content={"detail": "Invalid or expired token"},
+        )
+    logger.info("Oauth error - redirecting user to IBM Verify login")
+    return await redirect_user_to_idp_verify(request)
 
 
 def log_request_response(
