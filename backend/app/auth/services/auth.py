@@ -43,9 +43,12 @@ async def redirect_user_to_idp_verify(request: Request):
     """
     try:
         callback_redirect_uri = get_callback_redirect_uri(request)
-        return await oauth.verify.authorize_redirect(request, callback_redirect_uri)
+        logger.info("Redirecting user to IBM Verify...")
+        redirect_response = await oauth.verify.authorize_redirect(request, callback_redirect_uri)
+        logger.info("User redirected to IBM Verify for authentication")
+        return redirect_response
     except Exception as e:
-        logger.exception("Unexpected error during redirect_to_verify", str(e))
+        logger.exception("Unexpected error during redirect_to_verify: %s", str(e))
         RequestErrorHandler.handle(e, context="Unexpected error during idp redirect")
 
 
@@ -54,6 +57,9 @@ async def callback_handler(request: Request):
     Handle the OAuth callback from IBM Verify.
     This function processes the response from IBM Verify after user authentication.
     """
+
+    logger.info("OIDC Callback Handler")
+
     try:
         redirectValue = get_base_profile_management_url()
         returnToPageValue = request.session.get(SessionKeys.RETURN_TO_PAGE.value)
@@ -64,8 +70,9 @@ async def callback_handler(request: Request):
             logger.info(f"Return to page set in session: {redirectValue}")
 
         try:
+            logger.info("Verify Access Token Request")
             oidc_response = await oauth.verify.authorize_access_token(request)
-            logger.info("OIDC Responsed")
+            logger.info("OIDC Response received from IBM Verify")
         except OAuthError as error:
             logger.error(f"OAuth error during token retrieval: {error}")
             logger.error(
@@ -81,7 +88,6 @@ async def callback_handler(request: Request):
 
         update_session_tokens(request, oidc_response)
 
-        logger.info("OIDC Callback Handler")
         logger.info(f"Redirect to PROFILE_MANAGEMENT_DOMAIN: {redirectValue}")
         return RedirectResponse(url=redirectValue)
     except OAuthError as error:
