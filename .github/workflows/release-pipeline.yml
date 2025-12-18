@@ -98,6 +98,7 @@ jobs:
         run: |
           echo "VITE_BACKEND_API_URL=${{ secrets.VITE_BACKEND_API_URL }}" >> $GITHUB_ENV
           echo "VITE_GOOGLE_ANALYTICS_ID=${{ secrets.VITE_GOOGLE_ANALYTICS_ID }}" >> $GITHUB_ENV
+          echo "VITE_ENVIRONMENT=${{ matrix.environment }}" >> $GITHUB_ENV
 
       - name: Build application
         working-directory: frontend
