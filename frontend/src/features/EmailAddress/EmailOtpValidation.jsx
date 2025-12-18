@@ -103,6 +103,7 @@ export default function EmailOtpValidation({
           size="6"
           maxlength={6}
           minlength={6}
+          autofocus
         />
       </form>
 

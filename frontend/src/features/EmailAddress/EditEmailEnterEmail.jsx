@@ -75,6 +75,7 @@ export default function EditEmailEnterEmail({
           validateOn="other"
           onGcdsInput={handleInputChange}
           required
+          autofocus
         />
       </form>
 

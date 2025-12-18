@@ -101,13 +101,11 @@ async def update_my_profile(
     ibm_user_profile = ibm_user_profile_response.model_dump()
 
     ibm_user_profile_username = ibm_user_profile.get("userName")
-    ibm_user_profile_userid = ibm_user_profile.get("userId")
     current_users_username = updated_user_data_dict.get("userName")
-    current_users_id = updated_user_data_dict.get("userId")
 
     # Check if this is an email change request
     is_email_change = (
-        current_users_id != ibm_user_profile_userid
+        current_users_username != ibm_user_profile_username
         and updated_user_data_dict.get("emails") is not None
     )
 
@@ -115,10 +113,19 @@ async def update_my_profile(
         # For email changes, validate that the new userName matches the new email
         new_emails = updated_user_data_dict.get("emails", [])
         if new_emails and len(new_emails) > 0:
+            # Find the email with type "work"
+            work_email = None
+            for email in new_emails:
+                if getattr(email, "type", None) == "work":
+                    work_email = email
+                    break
+
+            # Use work email if found, otherwise fall back to first email
+            target_email = work_email if work_email else new_emails[0]
             new_email_value = (
-                new_emails[0].get("value")
-                if isinstance(new_emails[0], dict)
-                else new_emails[0].value
+                target_email.get("value")
+                if isinstance(target_email, dict)
+                else target_email.value
             )
             if current_users_username != new_email_value:
                 logger.error("Username must match email address")
