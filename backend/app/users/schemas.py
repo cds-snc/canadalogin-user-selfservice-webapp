@@ -2,7 +2,8 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, List, Optional
 
-from app.password.schemas import OtpType
+from app.otp.schemas import OtpType
+from app.password.schemas import OtpType as PhoneOtpType
 from app.utils.schemas import ResponseModel
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
@@ -184,7 +185,7 @@ class UserAuthFactorsIbmResponse(BaseModel):
 
 class UserPhoneOTP(BaseModel):
     id: str
-    type: OtpType
+    type: PhoneOtpType
     phoneNumber: str
 
 
@@ -197,29 +198,34 @@ class UserPhoneAuthFactorsResponse(ResponseModel):
 
 
 class ProfileUpdateWithOtpRequest(BaseModel):
-    """Generalized request schema for updating any profile field with OTP verification"""
+    """Request schema for updating sensitive profile fields with OTP verification.
 
-    # Profile fields that can be updated (all optional, at least one must be provided)
+    This endpoint is used for updating:
+    - Email address (which also updates the username)
+    - Phone numbers
+
+    For non-sensitive fields like name and language preference, use the regular profile update endpoint.
+    """
+
+    # Sensitive profile fields that require OTP verification (all optional, at least one must be provided)
     newEmailAddress: Optional[EmailStr] = None
-    name: Optional[UserProfileName] = None
     phoneNumbers: Optional[List[MetaDataTypeValue]] = None
-    preferredLanguage: Optional[str] = None
 
     # OTP verification fields (always required)
     otp: str
     trxnId: str
-    otpType: str  # "email", "sms", "voice" based on the OTP delivery method
+    otpType: OtpType
 
     def model_post_init(self, __context: Any) -> None:
-        """Validate that at least one profile field is provided for update"""
+        """Validate that at least one sensitive profile field is provided for update"""
         update_fields = [
             self.newEmailAddress,
-            self.name,
             self.phoneNumbers,
-            self.preferredLanguage,
         ]
 
         if not any(field is not None for field in update_fields):
-            raise ValueError("At least one profile field must be provided for update")
+            raise ValueError(
+                "At least one sensitive profile field must be provided for update"
+            )
 
         return self
