@@ -12,7 +12,9 @@ class AppInfo(BaseSettings):
     APP_VERSION: str = Field(default="unknown", description="Application version")
     BUILD_TIMESTAMP: str = Field(default="unknown", description="Build timestamp")
     TAG_VALUE: str = Field(default="unknown", description="Git commit hash or tag")
-    GITHUB_REF: str = Field(default="unknown", description="GitHub reference (branch/tag)")
+    GITHUB_REF: str = Field(
+        default="unknown", description="GitHub reference (branch/tag)"
+    )
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore", case_sensitive=True
     )
