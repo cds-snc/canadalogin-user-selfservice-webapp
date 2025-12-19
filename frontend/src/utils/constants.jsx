@@ -169,6 +169,13 @@ export const GA_LABELS = {
   email: "Email",
 };
 
+export const VITE_ENVIRONMENTS = {
+  dev: "dev",
+  test: "test",
+  staging: "staging",
+  prod: "prod",
+};
+
 export const countryMapping = {
   countries: [
     "ar",
