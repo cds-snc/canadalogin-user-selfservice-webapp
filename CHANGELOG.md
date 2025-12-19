@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.10.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.9.1...v1.10.0) (2025-12-19)
+
+
+### Features
+
+* feature flag to conditionally display edit email link based on environment ([#1071](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1071)) ([190742e](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/190742edb3e853071970408bd5eab731fe266de6))
+* Link OTP verification with profile change ([#1070](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1070)) ([16255f9](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/16255f9466bf9d0566be945248eda02b5cf4e68a))
+* manage profile edit email address ([#1059](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1059)) ([71610cf](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/71610cfbb72ecaf4ec722acccf2c665634fb6908))
+
+
+### Bug Fixes
+
+* **backend:** Reverted changed made during debugging process ([#1066](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1066)) ([00e4d59](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/00e4d592ff7767b3078004afe80caedd69b5eb28))
+
 ## [1.9.1](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.9.0...v1.9.1) (2025-12-17)
 
 
