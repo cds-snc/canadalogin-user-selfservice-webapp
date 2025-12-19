@@ -161,7 +161,7 @@ jobs:
           BUILD_TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           RELEASE_TAG="${{ steps.detect-release-tag.outputs.release_tag }}"
 
-          # Create a meaningful app version for display purposes
+          # Set the Release Tag as a App Version if it exists, otherwise use date+SHA
           if [ -n "$RELEASE_TAG" ]; then
             APP_VERSION="$RELEASE_TAG"
           else
