@@ -9,9 +9,9 @@ class AppInfo(BaseSettings):
     app_name: str = "GC Sign In Backend API"
     github_url: AnyUrl = "https://github.com/cds-snc/gc-signin-user-self-service-webapp"
     email: str = "gcsignin@cds-snc.ca"
-    APP_VERSION: str = Field(default="unknown", description="Application version")
+    RELEASE_TAG: str = Field(default="unknown", description="CI/CD Release tag")
+    ECR_REPOSITORY: str = Field(default="unknown", description="ECR repository name")
     BUILD_TIMESTAMP: str = Field(default="unknown", description="Build timestamp")
-    TAG_VALUE: str = Field(default="unknown", description="ARTIFACT_ECR_REPOSITORY_TAG")
     GITHUB_REF: str = Field(
         default="unknown", description="GitHub reference (branch/tag)"
     )
