@@ -63,6 +63,7 @@ export default function EditEmailAddressPage() {
     userPhoneFactors,
     userSelectedMfaFactor,
     userOtpValue,
+    otpSentResponse,
     localLoading,
     handleChangeUserMfaSelection,
     handleSetUserOtpValue,
@@ -126,7 +127,7 @@ export default function EditEmailAddressPage() {
     setWizardStep("emailOtpValidation");
   };
 
-  const handleEmailChange = async () => {
+  const handleEmailChangeWithOtp = async () => {
     try {
       setErrorCode("");
 
@@ -142,9 +143,18 @@ export default function EditEmailAddressPage() {
         return;
       }
 
+      // Ensure we have OTP data from the previous validation
+      if (!userOtpValue || !otpSentResponse?.trxnId) {
+        setErrorCode("OTP_VERIFICATION_REQUIRED");
+        return;
+      }
+
       // Call the backend API to update email address
-      const response = await authService.update_email_address(
+      const response = await authService.update_email_with_otp(
         formData.emailAddress,
+        userOtpValue,
+        otpSentResponse.trxnId,
+        FLOW_TYPES.email,
       );
 
       if (response && response.success && response.data) {
@@ -157,7 +167,7 @@ export default function EditEmailAddressPage() {
         setErrorCode("FAILED_TO_UPDATE_EMAIL");
       }
     } catch (error) {
-      console.error("Error updating email address:", error);
+      console.error("Error updating email address with OTP:", error);
       if (error && error.data && error.data.message) {
         setErrorCode(error.data.message);
       } else {
@@ -225,17 +235,15 @@ export default function EditEmailAddressPage() {
     ),
     emailOtpValidation: (
       <EmailOtpValidation
-        onSubmit={() =>
-          validateOtpCode(
-            userOtpValue,
-            (response) => {
-              if (response.success) {
-                setWizardStep("emailConfirmUpdate");
-              }
-            },
-            FLOW_TYPES.email,
-          )
-        }
+        onSubmit={() => {
+          // Skip separate OTP validation - go directly to confirmation
+          // OTP will be validated atomically with the email update
+          if (userOtpValue && userOtpValue.trim()) {
+            setWizardStep("emailConfirmUpdate");
+          } else {
+            setErrorCode("OTP_REQUIRED");
+          }
+        }}
         onCancel={handleBackToProfile}
         formData={formData}
         setFormData={setFormData}
@@ -250,7 +258,7 @@ export default function EditEmailAddressPage() {
     ),
     emailConfirmUpdate: (
       <EmailConfirmUpdate
-        onSubmit={handleEmailChange}
+        onSubmit={handleEmailChangeWithOtp}
         onCancel={handleBackToProfile}
         formData={formData}
       />

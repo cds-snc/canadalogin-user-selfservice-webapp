@@ -144,6 +144,7 @@ export const SUBMIT_END_POINTS = {
   mfaVerify: "/v1/otp/mfa/verify",
   mfaDelete: "/v1/otp/mfa/delete",
   profile: "/v1/users/profile",
+  profileUpdateWithOtp: "/v1/users/profile/update-with-otp",
   rp_info: "/v1/users/rp_info",
   users: "/v1/users",
   passwordUpdate: "/v1/password/update",

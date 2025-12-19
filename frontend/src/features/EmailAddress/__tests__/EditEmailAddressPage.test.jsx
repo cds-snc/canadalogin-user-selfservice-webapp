@@ -162,11 +162,14 @@ vi.mock("../../../hooks/useOtpOperations", () => ({
   useOtpOperations: () => ({
     userPhoneFactors: [{ id: "phone1", value: "+1234567890" }],
     userSelectedMfaFactor: null,
-    userOtpValue: "",
+    userOtpValue: "123456", // Provide a mock OTP value
+    otpSentResponse: { trxnId: "mock-transaction-id" }, // Mock transaction ID
     localLoading: false,
     handleChangeUserMfaSelection: vi.fn(),
     handleSetUserOtpValue: vi.fn(),
-    requestOtpCode: vi.fn(),
+    requestOtpCode: vi
+      .fn()
+      .mockResolvedValue({ success: true, trxnId: "mock-transaction-id" }),
     validateOtpCode: (otpValue, callback) => {
       if (callback) {
         callback({ success: true });
@@ -194,7 +197,7 @@ vi.mock("../../../services/authService", () => ({
     logout: vi.fn().mockResolvedValue({
       data: { redirect_url: "https://logout.example.com" },
     }),
-    update_email_address: vi.fn().mockResolvedValue({
+    update_email_with_otp: vi.fn().mockResolvedValue({
       success: true,
       data: { userName: "updated@example.com" },
     }),
@@ -588,7 +591,7 @@ describe("EditEmailAddressPage Integration Tests", () => {
   describe("Error Handling Integration", () => {
     it("handles API errors in handleEmailChange", async () => {
       const { authService } = await import("../../../services/authService");
-      authService.update_email_address.mockRejectedValue({
+      authService.update_email_with_otp.mockRejectedValue({
         data: { message: "EMAIL_UPDATE_FAILED" },
       });
 
@@ -681,7 +684,7 @@ describe("EditEmailAddressPage Integration Tests", () => {
       });
 
       // Mock successful update for this test
-      authService.update_email_address.mockResolvedValue({
+      authService.update_email_with_otp.mockResolvedValue({
         success: true,
         data: { userName: "updated@example.com" },
       });

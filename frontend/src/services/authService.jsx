@@ -128,15 +128,22 @@ export const authService = {
     }
   },
 
-  update_email_address: async (newEmailAddress) => {
+  update_email_with_otp: async (
+    newEmailAddress,
+    otp,
+    trxnId,
+    otpType = "email",
+  ) => {
     try {
       const updatePayload = {
-        userName: newEmailAddress,
-        emails: [{ value: newEmailAddress, type: "work" }],
+        newEmailAddress,
+        otp,
+        trxnId,
+        otpType,
       };
 
       const response = await axios.post(
-        `${config.apiUrl}${SUBMIT_END_POINTS.profile}`,
+        `${config.apiUrl}${SUBMIT_END_POINTS.profileUpdateWithOtp}`,
         updatePayload,
       );
       return response.data;
