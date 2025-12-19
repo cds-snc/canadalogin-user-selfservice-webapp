@@ -72,6 +72,18 @@ async def lifespan(app: FastAPI):
     app.state.config = configuration
     ibm_verify_config = app.state.config.ibm_verify_config
     logger.info("Starting IBM Verify Integration API")
+    logger.info(
+        f"APP_VERSION: {app.state.config.app_info.APP_VERSION}"
+    )
+    logger.info(
+        f"BUILD_TIMESTAMP: {app.state.config.app_info.BUILD_TIMESTAMP}"
+    )
+    logger.info(
+        f"TAG_VALUE: {app.state.config.app_info.TAG_VALUE}"
+    )
+    logger.info(
+        f"GITHUB_REF: {app.state.config.app_info.GITHUB_REF}"
+    )
     logger.info(f"Tenant URL: {ibm_verify_config.IBM_VERIFY_TENANT_URL}")
     logger.info(
         f"Client ID: {ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_API_CLIENT_ID}"
@@ -79,6 +91,7 @@ async def lifespan(app: FastAPI):
     logger.info(
         f"PROFILE_MANAGEMENT_CLIENT_ID: {ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID}"
     )
+
     logger.info("Application startup complete")
     app.state.request_client = httpx.AsyncClient()
 

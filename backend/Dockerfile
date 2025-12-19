@@ -1,5 +1,22 @@
 FROM  python:3.12-slim
 
+ARG APP_VERSION=unknown
+ARG BUILD_TIMESTAMP=unknown
+ARG TAG_VALUE=unknown
+ARG GITHUB_REF=unknown
+
+# Set as environment variables
+ENV APP_VERSION=${APP_VERSION}
+ENV BUILD_TIMESTAMP=${BUILD_TIMESTAMP}
+ENV TAG_VALUE=${TAG_VALUE}
+ENV GITHUB_REF=${GITHUB_REF}
+
+# Add labels for container metadata
+LABEL version=${APP_VERSION}
+LABEL timestamp=${BUILD_TIMESTAMP}
+LABEL tag=${TAG_VALUE}
+LABEL github.ref=${GITHUB_REF}
+
 WORKDIR /app
 
 RUN apt-get update && \

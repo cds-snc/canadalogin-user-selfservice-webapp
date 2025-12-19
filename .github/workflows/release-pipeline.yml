@@ -156,7 +156,27 @@ jobs:
       - name: Build and push Docker image (SHA and latest tag)
         working-directory: ./backend/
         run: |
+
+          # Set ENV variables
+          BUILD_TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          RELEASE_TAG="${{ steps.detect-release-tag.outputs.release_tag }}"
+
+          # Create a meaningful app version for display purposes
+          if [ -n "$RELEASE_TAG" ]; then
+            APP_VERSION="$RELEASE_TAG"
+          else
+            APP_VERSION="v$(date +%Y%m%d)-${GITHUB_SHA}"
+          fi
+
+          echo "GitHub SHA: $GITHUB_SHA"
+          echo "Release tag: $RELEASE_TAG"
+          echo "App version: $APP_VERSION"
+
           docker build \
+            --build-arg APP_VERSION="$APP_VERSION" \
+            --build-arg BUILD_TIMESTAMP="$BUILD_TIMESTAMP" \
+            --build-arg TAG_VALUE="${{ vars.ARTIFACT_ECR_REPOSITORY }}:$GITHUB_SHA" \
+            --build-arg GITHUB_REF="${{ github.ref }}" \
             --tag "${{ vars.ARTIFACT_ECR_REPOSITORY }}:$GITHUB_SHA" \
             .
 
