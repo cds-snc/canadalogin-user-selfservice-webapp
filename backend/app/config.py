@@ -11,7 +11,7 @@ class AppInfo(BaseSettings):
     email: str = "gcsignin@cds-snc.ca"
     APP_VERSION: str = Field(default="unknown", description="Application version")
     BUILD_TIMESTAMP: str = Field(default="unknown", description="Build timestamp")
-    TAG_VALUE: str = Field(default="unknown", description="Git commit hash or tag")
+    TAG_VALUE: str = Field(default="unknown", description="ARTIFACT_ECR_REPOSITORY_TAG")
     GITHUB_REF: str = Field(
         default="unknown", description="GitHub reference (branch/tag)"
     )
