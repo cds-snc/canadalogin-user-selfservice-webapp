@@ -33,29 +33,29 @@ export default function TopNav({ currentLang }) {
     language: currentLang,
   });
 
-  const handleLogout = async (e) => {
-    e.preventDefault();
-    setLoading(true, pageContentJson["8"]); // Use logout loading text
+  // const handleLogout = async (e) => {
+  //   e.preventDefault();
+  //   setLoading(true, pageContentJson["8"]); // Use logout loading text
 
-    try {
-      const response = await authService.logout();
+  //   try {
+  //     const response = await authService.logout();
 
-      if (response && response.data && response.data.redirect_url) {
-        window.location.href = response.data.redirect_url;
-      } else {
-        // Fallback redirect if no redirect_url provided
-        window.location.href = "/";
-      }
-    } catch (error) {
-      console.error("Logout failed:", error);
-      // Update loading text to show error
-      setLoading(true, pageContentJson["9"]);
-      // Redirect after error
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 2000);
-    }
-  };
+  //     if (response && response.data && response.data.redirect_url) {
+  //       window.location.href = response.data.redirect_url;
+  //     } else {
+  //       // Fallback redirect if no redirect_url provided
+  //       window.location.href = "/";
+  //     }
+  //   } catch (error) {
+  //     console.error("Logout failed:", error);
+  //     // Update loading text to show error
+  //     setLoading(true, pageContentJson["9"]);
+  //     // Redirect after error
+  //     setTimeout(() => {
+  //       window.location.href = "/";
+  //     }, 2000);
+  //   }
+  // };
 
   const navLinksJsx = (
     <>
@@ -69,9 +69,9 @@ export default function TopNav({ currentLang }) {
           {pageContentJson["6"] + relyingPartyLinkName}
         </GcdsNavLink>
       )}
-      <GcdsNavLink href="#" onClick={handleLogout}>
+      {/* <GcdsNavLink href="#" onClick={handleLogout}>
         {pageContentJson["7"]}
-      </GcdsNavLink>
+      </GcdsNavLink> */}
     </>
   );
 

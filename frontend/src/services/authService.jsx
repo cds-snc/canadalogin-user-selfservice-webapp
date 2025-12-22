@@ -161,16 +161,16 @@ export const authService = {
       handleApiError(error);
     }
   },
-  logout: async () => {
-    try {
-      const response = await axios.post(
-        `${config.apiUrl}${SUBMIT_END_POINTS.logout}`,
-      );
-      return response.data;
-    } catch (error) {
-      handleApiError(error);
-    }
-  },
+  // logout: async () => {
+  //   try {
+  //     const response = await axios.post(
+  //       `${config.apiUrl}${SUBMIT_END_POINTS.logout}`,
+  //     );
+  //     return response.data;
+  //   } catch (error) {
+  //     handleApiError(error);
+  //   }
+  // },
   keepAlive: async () => {
     try {
       const response = await axios.post(
