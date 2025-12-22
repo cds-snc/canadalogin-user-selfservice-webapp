@@ -17,7 +17,7 @@ from app.auth.services.auth_logout import (
 
 from app.auth.services.auth_user_session import (
     get_users_current_session,
-    get_user_id_token,
+    # get_user_id_token,
     session_extend,
 )
 
