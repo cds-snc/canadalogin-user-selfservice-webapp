@@ -13,13 +13,14 @@ import { getPageContent } from "../../utils/functions.jsx";
 import { path } from "../../utils/routeHelpers.js";
 import { useUser } from "../Providers/useUser";
 import { PAGES } from "../../utils/constants.jsx";
-import { authService } from "../../services/authService.jsx";
-import { userProfileDispatch } from "../../utils/userProfileDispatch.jsx";
+// import { authService } from "../../services/authService.jsx";
+// import { userProfileDispatch } from "../../utils/userProfileDispatch.jsx";
 
 export default function TopNav({ currentLang }) {
   const pageContentJson = getPageContent(currentLang, "TopNavBar");
-  const { state, dispatch } = useUser();
-  const { setLoading } = userProfileDispatch(dispatch);
+  // const { state, dispatch } = useUser();
+  const { state } = useUser();
+  // const { setLoading } = userProfileDispatch(dispatch);
 
   const relyingPartyLinkName = state.relyingPartyInfo?.linkName;
   const relyingPartyUrl = state.relyingPartyInfo?.url;
