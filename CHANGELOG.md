@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.10.2](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.10.1...v1.10.2) (2025-12-22)
+
+
+### Bug Fixes
+
+* Revert change to disable the logout functionality ([#1080](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1080)) ([0047d8f](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/0047d8f070bb6a1d9b8c1965875f5e42e1bffced))
+
+
+### Continuous Integration
+
+* updated the release versions for all environments to 1.10.1 ([#1077](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1077)) ([a325c76](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/a325c76d96e7d6e4fe8b27b22f9ef697a12124d5))
+
 ## [1.10.1](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.10.0...v1.10.1) (2025-12-22)
 
 
