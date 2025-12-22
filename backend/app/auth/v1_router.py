@@ -11,7 +11,7 @@ from app.auth.services.auth_user_session import (
     session_event_sse_generator,
 )
 from app.auth.services.auth_logout import (
-    logout_user,
+    # logout_user,
     backchannel_logout,
 )
 
@@ -63,14 +63,14 @@ async def reauth(
     return await reauthenticate_user(request, returnToPage)
 
 
-@router.post(
-    "/logout",
-    tags=["Auth"],
-    summary="Logout user",
-    description="",
-)
-async def logout(request: Request, id_token: str = Depends(get_user_id_token)):
-    return await logout_user(request, id_token)
+# @router.post(
+#     "/logout",
+#     tags=["Auth"],
+#     summary="Logout user",
+#     description="",
+# )
+# async def logout(request: Request, id_token: str = Depends(get_user_id_token)):
+#     return await logout_user(request, id_token)
 
 
 @router.post(
