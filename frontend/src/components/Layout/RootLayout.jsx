@@ -9,7 +9,7 @@ import config from "../../config.jsx";
 
 import { GcdsContainer, GcdsText } from "@cdssnc/gcds-components-react";
 
-const DisplayReleaseVersion = () => {
+const DisplayReleaseTag = () => {
   const { releaseTag } = config;
 
   if (!releaseTag) {
@@ -39,7 +39,7 @@ export default function RootLayout() {
         <GcdsContainer size="lg" className="gcds-content" id="main-content">
           <Outlet />
         </GcdsContainer>
-        <DisplayReleaseVersion />
+        <DisplayReleaseTag />
       </GcdsContainer>
 
       <Footer currentLang={language} />
