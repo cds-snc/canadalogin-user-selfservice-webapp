@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import HTTPException, Request
+from fastapi import HTTPException, Request, status
 from httpx import Response
 from pydantic import ValidationError
 
@@ -9,7 +9,6 @@ from app.users.schemas import (
     ProfileResponse,
     UserProfileUpdateRequest,
     IBMVerifyUpdateUserProfile,
-    NotifyType,
 )
 from app.utils.access_token import get_auth_request_headers
 from app.utils.mask_phone_number import mask_contact_phone_numbers
@@ -18,6 +17,93 @@ from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
 from app.utils.validate_user_request_match import validate_user_request_match
 
 logger = logging.getLogger(__name__)
+
+
+async def update_profile_for_verified_changes(
+    request: Request,
+    user_data: UserProfileUpdateRequest,
+    user_access_token: str,
+) -> ProfileResponse:
+    """
+    Update user profile for any fields that have already been OTP-verified.
+
+    This function bypasses the username mismatch check because the changes
+    have already been validated through OTP verification. This should ONLY be
+    called from the update_profile_with_otp_verification function.
+
+    Supports updating any OTP-verified fields including:
+    - Email address (updates both userName and emails fields)
+    - Name (givenName, familyName)
+    - Phone numbers
+    - Preferred language
+
+    Args:
+        request: FastAPI request object
+        user_data: Profile update request data with OTP-verified changes
+        user_access_token: User's authentication token
+
+    Returns:
+        ProfileResponse: Updated profile data with masked phone numbers
+
+    Raises:
+        HTTPException: For validation or API errors
+    """
+    logger.info("Starting verified profile update")
+
+    updated_user_data_dict = sanitize_user_profile_data(user_data)
+
+    # Get current profile to merge with updates
+    ibm_user_profile_response = await dispatch_get_my_profile_from_ibm(
+        request.app.state.request_client, user_access_token
+    )
+    ibm_user_profile = ibm_user_profile_response.model_dump()
+
+    # For email changes, we allow the userName and emails to be updated
+    # since OTP verification has already been completed
+    merged_profile = {**ibm_user_profile, **updated_user_data_dict}
+
+    try:
+        validate_merged_profile = IBMVerifyUpdateUserProfile(**merged_profile)
+    except ValidationError as e:
+        logger.error(f"Merged Profile Validation Error: {e.json()}")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Request data validation error",
+        )
+
+    user_profile_payload = validate_merged_profile.model_dump_json(
+        by_alias=True, exclude_none=True
+    )
+
+    response = await dispatch_update_my_profile(
+        request, user_profile_payload, user_access_token
+    )
+
+    try:
+        json_data = response.json()
+    except Exception as e:
+        logger.error(f"Failed to parse profile response: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Request data validation error",
+        )
+
+    json_data["phoneNumbers"] = mask_contact_phone_numbers(json_data)
+
+    try:
+        response_data = IBMVerifyUserProfileSchema(**json_data)
+    except ValidationError as e:
+        logger.error(f"Profile Validation Error: {e.json()}")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Request data validation error",
+        )
+
+    return ProfileResponse(
+        success=True,
+        message="User profile updated successfully after OTP verification.",
+        data=response_data,
+    )
 
 
 def sanitize_user_profile_data(user_data: UserProfileUpdateRequest) -> dict:
@@ -32,54 +118,6 @@ def sanitize_user_profile_data(user_data: UserProfileUpdateRequest) -> dict:
     """
     updated_data_dict = user_data.model_dump(exclude_unset=True, exclude_none=True)
     return updated_data_dict
-
-
-def set_notification_type_for_phone_update(
-    profile: IBMVerifyUpdateUserProfile,
-    updated_data: dict,
-) -> IBMVerifyUpdateUserProfile:
-    """
-    Set notification type to EMAIL if phone numbers are being updated.
-
-    When a user updates their phone numbers, we need to notify them via email
-
-    Args:
-        profile: The validated merged profile
-        updated_data: Dictionary containing the fields being updated
-
-    Returns:
-        IBMVerifyUpdateUserProfile: Profile with updated notification type
-
-    Raises:
-        ValueError: If notification object is None when phone numbers are updated
-    """
-    if "phoneNumbers" not in updated_data:
-        logger.debug("No phone number updates, keeping existing notification type")
-        return profile
-
-    phone_numbers = updated_data["phoneNumbers"]
-    if not phone_numbers:
-        logger.debug("Phone numbers list is empty, keeping existing notification type")
-        return profile
-
-    if profile.notification is None:
-        logger.error("Cannot set notification type: notification object is None")
-        raise ValueError(
-            "Profile notification object cannot be None when updating phone numbers"
-        )
-
-    logger.info("Phone numbers are being updated, setting notification type to EMAIL")
-
-    # Use Pydantic's model_copy for immutable update
-    updated_profile = profile.model_copy(
-        update={
-            "notification": profile.notification.model_copy(
-                update={"notifyType": NotifyType.EMAIL}
-            )
-        }
-    )
-
-    return updated_profile
 
 
 async def dispatch_update_my_profile(
@@ -152,7 +190,9 @@ async def update_my_profile(
 
     validate_user_request_match(ibm_user_profile, current_users_id)
 
-    # Prevent changing the userId
+    # Remove userName and emails from update to prevent any accidental changes
+    # Email changes must go through the secure OTP-verified endpoint
+    updated_user_data_dict.pop("userName", None)
     updated_user_data_dict.pop("userId", None)
 
     merged_profile = {**ibm_user_profile, **updated_user_data_dict}
@@ -161,15 +201,10 @@ async def update_my_profile(
         validate_merged_profile = IBMVerifyUpdateUserProfile(**merged_profile)
     except ValidationError as e:
         logger.error(f"Merged Profile Validation Error: {e.json()}")
-        raise HTTPException(status_code=422, detail="Request data validation error")
-
-    try:
-        validate_merged_profile = set_notification_type_for_phone_update(
-            validate_merged_profile, updated_user_data_dict
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Request data validation error",
         )
-    except ValueError as e:
-        logger.error(f"Failed to set notification type: {str(e)}")
-        raise HTTPException(status_code=422, detail="Invalid profile notification data")
 
     user_profile_payload = validate_merged_profile.model_dump_json(
         by_alias=True, exclude_none=True
@@ -182,7 +217,10 @@ async def update_my_profile(
         json_data = response.json()
     except Exception as e:
         logger.error(f"Failed to parse profile response: {str(e)}")
-        raise HTTPException(status_code=422, detail="Request data validation error")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Request data validation error",
+        )
 
     json_data["phoneNumbers"] = mask_contact_phone_numbers(json_data)
 
@@ -190,7 +228,10 @@ async def update_my_profile(
         response_data = IBMVerifyUserProfileSchema(**json_data)
     except ValidationError as e:
         logger.error(f"Profile Validation Error: {e.json()}")
-        raise HTTPException(status_code=422, detail="Request data validation error")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Request data validation error",
+        )
 
     return ProfileResponse(
         success=True,

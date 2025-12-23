@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useParams, useLocation, useNavigate } from "react-router";
+import React from "react";
+import { useParams } from "react-router";
 
 import {
   GcdsContainer,
@@ -11,13 +11,16 @@ import {
   GcdsLink,
 } from "@cdssnc/gcds-components-react";
 import { getPageContent } from "../../../utils/functions.jsx";
-import { path } from "../../../utils/routeHelpers.js";
 import { PAGES, LANGUAGE_DISPLAY_NAMES } from "../../../utils/constants.jsx";
 import { useUser } from "../../../components/Providers/useUser.tsx";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
 import { authService } from "../../../services/authService.jsx";
+import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 
-export default function SuccessfullyUpdatedLanguage() {
+export default function SuccessfullyUpdated({
+  languageFormData,
+  onBackToProfile,
+}) {
   const { language } = useParams();
   const { state, dispatch } = useUser();
   const { setLoading } = userProfileDispatch(dispatch);
@@ -25,15 +28,7 @@ export default function SuccessfullyUpdatedLanguage() {
     language,
     PAGES.successfullyUpdatedLanguage,
   );
-  const backToProfile = path(PAGES.ProfileHome, { language: language });
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [savedLocationState, setSavedLocationState] = useState(null);
-  const updatedLanguage = savedLocationState?.updatedLanguage;
   const preferredLanguage = state?.userProfile?.preferredLanguage || "";
-  const editLanguagePreferences = path(PAGES.editLanguagePreferences, {
-    language: language,
-  });
 
   const handleSignout = async (e) => {
     e.preventDefault();
@@ -60,29 +55,28 @@ export default function SuccessfullyUpdatedLanguage() {
     }
   };
 
-  useEffect(() => {
-    // redirect to edit page if no updatedLanguage data
-    if (location?.state?.updatedLanguage) {
-      // save location state to local state, when the language is toggled the location.state is null
-      setSavedLocationState(location.state);
-    } else {
-      navigate(editLanguagePreferences);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const onSubmitHandler = async (ev) => {
+    ev.preventDefault();
+    await onBackToProfile();
+  };
 
-  if (!updatedLanguage?.languageCode) return null;
+  if (!languageFormData?.languageCode) return null;
 
   return (
-    <GcdsContainer>
-      <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle=" ">
-        <GcdsText>
-          <strong>
-            {pageContentJson["1"]}{" "}
-            {LANGUAGE_DISPLAY_NAMES[language][preferredLanguage]}
-          </strong>
-        </GcdsText>
-      </GcdsNotice>
+    <GcdsContainer role="main">
+      <GcdsText>
+        {" "}
+        <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle=" ">
+          <GcdsText>
+            <strong>
+              {pageContentJson["1"]}{" "}
+              {LANGUAGE_DISPLAY_NAMES[language]?.[preferredLanguage] ||
+                languageFormData.updatedPreferredLanguage}
+            </strong>
+          </GcdsText>
+        </GcdsNotice>
+      </GcdsText>
+
       <GcdsHeading tag="h1">{pageContentJson["2"]}</GcdsHeading>
       <GcdsHeading tag="h4">{pageContentJson["3"]}</GcdsHeading>
       <GcdsText>{pageContentJson["4"]}</GcdsText>
@@ -92,15 +86,13 @@ export default function SuccessfullyUpdatedLanguage() {
       </GcdsText>
 
       <GcdsGrid columns="max-content max-content" gap="200">
-        <GcdsButton
+        <SubmitButton
           style={{ width: "fit-content" }}
-          onGcdsClick={(ev) => {
-            ev.preventDefault();
-            navigate(backToProfile);
-          }}
+          onGcdsClick={onSubmitHandler}
+          currentLang={language}
         >
           {pageContentJson["6"]}
-        </GcdsButton>
+        </SubmitButton>
         &nbsp;
         <GcdsButton
           buttonRole="secondary"

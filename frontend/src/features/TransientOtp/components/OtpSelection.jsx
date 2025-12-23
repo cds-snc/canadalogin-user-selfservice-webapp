@@ -13,6 +13,7 @@ import { getPageContent } from "../../../utils/functions.jsx";
 import { gcHelpCentreLinks } from "../../../utils/gcHelpCentreLinks.jsx";
 
 import { FLOW_TYPES, PAGES } from "../../../utils/constants.jsx";
+import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 
 export default function OtpSelection({
   onNext,
@@ -26,7 +27,12 @@ export default function OtpSelection({
 
   const pageContentJson = getPageContent(language, PAGES.transientOtpSelection);
 
-  const { submit, cancel } = getPageContent(language, "Button");
+  const { cancel } = getPageContent(language, "Button");
+
+  const onSubmitHandler = async (ev) => {
+    ev.preventDefault();
+    await onNext();
+  };
 
   const configureRadioSMSOptions = () => {
     let radioOptionsValues = [];
@@ -99,7 +105,7 @@ export default function OtpSelection({
     );
 
   return (
-    <GcdsContainer>
+    <GcdsContainer role="main">
       <GcdsContainer className="gcds-gap">
         <GcdsHeading tag="h1" lang={language}>
           {pageContentJson["1"]}
@@ -114,20 +120,18 @@ export default function OtpSelection({
         <GcdsContainer>
           <GcdsHeading tag="h2">{pageContentJson["4"]}</GcdsHeading>
           <GcdsText>
-            {pageContentJson["5"]} {pageContentJson["6"]} {pageContentJson["7"]}
+            {pageContentJson["5"]} <strong>{pageContentJson["6"]}</strong>{" "}
+            {pageContentJson["7"]}
           </GcdsText>
         </GcdsContainer>
-        {radioComponent}
+        <form onSubmit={onSubmitHandler}>{radioComponent}</form>
+
         <GcdsGrid columns="max-content max-content" gap="200">
-          <GcdsButton
+          <SubmitButton
             style={{ width: "fit-content" }}
-            onGcdsClick={(ev) => {
-              ev.preventDefault();
-              onNext();
-            }}
-          >
-            {submit}
-          </GcdsButton>
+            onGcdsClick={onSubmitHandler}
+            currentLang={language}
+          ></SubmitButton>
 
           <GcdsButton
             buttonRole="secondary"
@@ -153,7 +157,10 @@ export default function OtpSelection({
           </GcdsLink>
         </GcdsText>
         <GcdsText>
-          <GcdsLink href={gcHelpCentreLinks.cannotAccessPhone} target="_blank">
+          <GcdsLink
+            href={gcHelpCentreLinks.recover2StepVerification}
+            target="_blank"
+          >
             {pageContentJson["13"]}
           </GcdsLink>
         </GcdsText>

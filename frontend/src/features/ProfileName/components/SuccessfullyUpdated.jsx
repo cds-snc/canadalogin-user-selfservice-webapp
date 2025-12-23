@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { useParams, useLocation, useNavigate } from "react-router";
+import React from "react";
+import { useParams } from "react-router";
 
 import {
   GcdsContainer,
@@ -11,39 +11,24 @@ import {
   GcdsLink,
 } from "@cdssnc/gcds-components-react";
 import { getPageContent } from "../../../utils/functions.jsx";
-import { path } from "../../../utils/routeHelpers.js";
-import { PAGES } from "../../../utils/constants.jsx";
+import { EXTERNAL_NAVIGATION_LINKS, PAGES } from "../../../utils/constants.jsx";
 import { useUser } from "../../../components/Providers/useUser.tsx";
 import { authService } from "../../../services/authService.jsx";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
+import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 
-export default function SuccessfullyUpdatedName() {
+export default function SuccessfullyUpdated({ nameFormData, onBackToProfile }) {
   const { language } = useParams();
-  const location = useLocation();
 
-  const { state, dispatch } = useUser();
+  const { dispatch } = useUser();
   const pageContentJson = getPageContent(
     language,
     PAGES.profileUpdateNameSuccess,
   );
-  const navigate = useNavigate();
 
-  const backToProfile = path(PAGES.ProfileHome, { language: language });
   const { setLoading } = userProfileDispatch(dispatch);
 
-  const username = state?.userProfile?.name.formatted || "";
-  const editProfile = path(PAGES.profileUpdateName, { language: language });
-
-  // state comes from the navigate call in UpdateProfileName.jsx
-  // If user directly navigates directly to this page, there will be no state and will redirected back to edit page
-  const { name } = location.state ?? {};
-
-  useEffect(() => {
-    // If no name data, redirect to edit page
-    if (!name) navigate(editProfile);
-    if (name && name.formatted !== username) navigate(editProfile);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const username = nameFormData?.formatted || "";
 
   const handleSignout = async (e) => {
     e.preventDefault();
@@ -69,32 +54,40 @@ export default function SuccessfullyUpdatedName() {
       }, 2000);
     }
   };
+
+  const onSubmitHandler = async (ev) => {
+    ev.preventDefault();
+    await onBackToProfile();
+  };
+
   return (
-    <GcdsContainer>
-      <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle=" ">
-        <GcdsText>
-          <strong>
-            {pageContentJson["1"]} {username}
-          </strong>
-        </GcdsText>
-      </GcdsNotice>
+    <GcdsContainer role="main">
+      <GcdsText>
+        {" "}
+        <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle=" ">
+          <GcdsText>
+            <strong>
+              {pageContentJson["1"]} {username}
+            </strong>
+          </GcdsText>
+        </GcdsNotice>
+      </GcdsText>
       <GcdsHeading tag="h1">{pageContentJson["2"]}</GcdsHeading>
       <GcdsHeading tag="h4">{pageContentJson["3"]}</GcdsHeading>
       <GcdsText>{pageContentJson["4"]}</GcdsText>
       <GcdsText>
         {pageContentJson["5"]}{" "}
-        <GcdsLink href="#">{pageContentJson["8"]}</GcdsLink>
+        <GcdsLink href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}>
+          {pageContentJson["8"]}
+        </GcdsLink>
       </GcdsText>
       <GcdsGrid columns="max-content max-content" gap="200">
-        <GcdsButton
+        <SubmitButton
           style={{ width: "fit-content" }}
-          onGcdsClick={(ev) => {
-            ev.preventDefault();
-            navigate(backToProfile);
-          }}
+          onGcdsClick={onSubmitHandler}
         >
           {pageContentJson["6"]}
-        </GcdsButton>
+        </SubmitButton>
         &nbsp;
         <GcdsButton
           buttonRole="secondary"

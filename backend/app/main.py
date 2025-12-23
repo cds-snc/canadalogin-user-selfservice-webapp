@@ -5,7 +5,7 @@ import logging
 import json
 from contextlib import asynccontextmanager
 
-from fastapi import HTTPException, Request
+from fastapi import HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -16,7 +16,6 @@ from starsessions.stores.redis import RedisStore
 
 from app.config import get_configuration
 from app.utils.helpers import generate_error_response
-from app.auth.services.auth import redirect_user_to_idp_verify
 from app.constants.redis_keys import RedisKeys
 
 from .routers import health
@@ -25,6 +24,7 @@ from app.auth import v1_router as v1_auth_router
 from app.password import v1_router as v1_password_router
 from app.otp import v1_router as v1_otp_router
 from app.auth.services import oidc_config
+from app.auth.services.auth import redirect_user_to_idp_verify
 
 # from Secweb import SecWeb
 
@@ -56,6 +56,8 @@ CONTACT_INFO = {
 }
 
 redis_url = configuration.session_config.SESSION_REDIS_URL
+is_local_environment = configuration.ENVIRONMENT == "local"
+
 if configuration.ENVIRONMENT != "local":
     # Construct the Redis URL with TLS and authentication for non-local environments
     redis_url = f"rediss://:{configuration.session_config.REDIS_AUTH_SECRET}@{configuration.session_config.REDIS_DOMAIN}:{configuration.session_config.REDIS_PORT}?ssl_cert_reqs=none"
@@ -70,6 +72,10 @@ async def lifespan(app: FastAPI):
     app.state.config = configuration
     ibm_verify_config = app.state.config.ibm_verify_config
     logger.info("Starting IBM Verify Integration API")
+    logger.info(f"RELEASE_TAG: {app.state.config.app_info.RELEASE_TAG}")
+    logger.info(f"BUILD_TIMESTAMP: {app.state.config.app_info.BUILD_TIMESTAMP}")
+    logger.info(f"ECR_REPOSITORY: {app.state.config.app_info.ECR_REPOSITORY}")
+    logger.info(f"GITHUB_REF: {app.state.config.app_info.GITHUB_REF}")
     logger.info(f"Tenant URL: {ibm_verify_config.IBM_VERIFY_TENANT_URL}")
     logger.info(
         f"Client ID: {ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_API_CLIENT_ID}"
@@ -77,6 +83,7 @@ async def lifespan(app: FastAPI):
     logger.info(
         f"PROFILE_MANAGEMENT_CLIENT_ID: {ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID}"
     )
+
     logger.info("Application startup complete")
     app.state.request_client = httpx.AsyncClient()
 
@@ -104,6 +111,9 @@ app = FastAPI(
     title=configuration.app_info.app_name,
     description=API_DESCRIPTION,
     contact=CONTACT_INFO,
+    docs_url="/docs" if is_local_environment else None,
+    redoc_url="/redoc" if is_local_environment else None,
+    openapi_url="/openapi.json" if is_local_environment else None,
 )
 
 # if configuration.ENVIRONMENT != "local":
@@ -206,7 +216,9 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         logger.error(f"Validation error: {error_message} at " + str(request.url))
         logger.error(f"Validation error input: {error_input}")
         break
-    return generate_error_response(status_code=400, message=error_message)
+    return generate_error_response(
+        status_code=status.HTTP_400_BAD_REQUEST, message=error_message
+    )
 
 
 @app.exception_handler(HTTPException)
@@ -220,12 +232,25 @@ async def custom_http_exception_handler(request: Request, exc: HTTPException):
 @app.exception_handler(OAuthError)
 async def oauth_error_handler(request: Request, exc: OAuthError):
     """Catch OAuth errors and redirect user to IdP login."""
-    logger.error("OAuth exception handler error: %s", exc)
-    if "application/json" in request.headers.get("accept", ""):
+    logger.info("Oauth Exception Error Handler: %s", exc)
+    host = request.headers.get("host", "")
+    referer = request.headers.get("referer", "")
+    accept_header = request.headers.get("accept", "")
+
+    logger.info(
+        "Request Header Info: host=%s referer=%s accept=%s",
+        host,
+        referer,
+        accept_header,
+    )
+
+    if "application/json" in accept_header:
+        logger.info("Return 401 JSON response")
         return JSONResponse(
-            status_code=401,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             content={"detail": "Invalid or expired token"},
         )
+    logger.info("Oauth error - redirecting user to IBM Verify login")
     return await redirect_user_to_idp_verify(request)
 
 

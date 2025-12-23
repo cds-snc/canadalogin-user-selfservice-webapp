@@ -9,12 +9,12 @@ import {
   GcdsLink,
   GcdsText,
 } from "@cdssnc/gcds-components-react";
-import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 import { getPageContent } from "../../../utils/functions.jsx";
-import { path } from "../../../utils/routeHelpers.js";
 
 import { useParams } from "react-router";
 import { FLOW_TYPES, PAGES } from "../../../utils/constants.jsx";
+import { gcHelpCentreLinks } from "../../../utils/gcHelpCentreLinks.jsx";
+import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 
 const initialTime = 10;
 
@@ -28,16 +28,12 @@ export default function OtpVerification({
   validateOtpCode,
   setErrorCode,
   errorMessage,
+  onCancel,
 }) {
   const { language } = useParams();
-
-  const navigateHelper = useNavigateHelper();
-  const backToSecuritySettingsPage = path(PAGES.securitySettings, {
-    language: language,
-  });
   const [time, setTime] = useState(initialTime);
   const pageContentJson = getPageContent(language, PAGES.verification);
-  const { submit, cancel } = getPageContent(language, "Button");
+  const { cancel } = getPageContent(language, "Button");
 
   const { id } = userProfile ?? {};
   const didFetch = useRef(false);
@@ -45,6 +41,19 @@ export default function OtpVerification({
   const handleChange = (e) => {
     const value = e.target.value;
     setUserOtpValue(value);
+  };
+
+  const onSubmitHandler = async (ev) => {
+    ev.preventDefault();
+    setErrorCode(""); // Clear any previous errors
+    try {
+      await validateOtpCode(userOtpValue);
+    } catch (error) {
+      // Handle validation errors
+      if (error?.data?.message) {
+        setErrorCode(error.data.message);
+      }
+    }
   };
 
   useEffect(() => {
@@ -78,7 +87,7 @@ export default function OtpVerification({
 
   const userMfaType = userSelectedMfaFactor?.type;
   return (
-    <GcdsContainer>
+    <GcdsContainer role="main">
       <GcdsContainer>
         <GcdsHeading tag="h1" lang={language}>
           {userMfaType === FLOW_TYPES.email
@@ -109,50 +118,39 @@ export default function OtpVerification({
           <GcdsHeading tag="h2">{pageContentJson["8"]}</GcdsHeading>
         )}
 
-        <GcdsInput
-          inputId="verificationCode"
-          label={pageContentJson["9"]}
-          autofocus
-          autocomplete="one-time-code"
-          name="verificationCode"
-          type="text"
-          validateOn="other"
-          errorMessage={errorMessage}
-          value={userOtpValue}
-          onGcdsInput={handleChange}
-          lang={language}
-          size="6"
-          maxlength={6}
-          minlength={6}
-          required={errorMessage === ""}
-        ></GcdsInput>
+        <form onSubmit={onSubmitHandler}>
+          <GcdsInput
+            inputId="verificationCode"
+            label={pageContentJson["9"]}
+            name="verificationCode"
+            type="text"
+            validateOn="other"
+            errorMessage={errorMessage}
+            value={userOtpValue}
+            onGcdsInput={handleChange}
+            lang={language}
+            size="6"
+            maxlength={6}
+            minlength={6}
+            autocomplete="one-time-code"
+            autofocus
+          ></GcdsInput>
+        </form>
 
         <GcdsGrid columns="max-content max-content" gap="200">
-          <GcdsButton
+          <SubmitButton
             disabled={userOtpValue.length < 6}
             style={{ width: "fit-content" }}
-            onGcdsClick={async (ev) => {
-              ev.preventDefault();
-              setErrorCode(""); // Clear any previous errors
-              try {
-                await validateOtpCode(userOtpValue);
-              } catch (error) {
-                // Handle validation errors
-                if (error?.data?.message) {
-                  setErrorCode(error.data.message);
-                }
-              }
-            }}
-          >
-            {submit}
-          </GcdsButton>
+            onGcdsClick={onSubmitHandler}
+            currentLang={language}
+          ></SubmitButton>
 
           <GcdsButton
             buttonRole="secondary"
             style={{ width: "fit-content" }}
             onGcdsClick={(ev) => {
               ev.preventDefault();
-              navigateHelper(backToSecuritySettingsPage);
+              onCancel();
             }}
           >
             {cancel}
@@ -163,6 +161,7 @@ export default function OtpVerification({
 
       <GcdsText>
         <GcdsLink
+          role="button"
           onGcdsClick={() => {
             onBack();
           }}
@@ -182,6 +181,7 @@ export default function OtpVerification({
           </span>
         ) : (
           <GcdsLink
+            role="button"
             onGcdsClick={() => {
               requestOtpCode();
               setTime(initialTime);
@@ -194,6 +194,11 @@ export default function OtpVerification({
               : pageContentJson["26"]}
           </GcdsLink>
         )}
+      </GcdsText>
+      <GcdsText>
+        <GcdsLink href={gcHelpCentreLinks.cannotAccessPhone} target="_blank">
+          {pageContentJson["30"]}
+        </GcdsLink>
       </GcdsText>
     </GcdsContainer>
   );

@@ -75,12 +75,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        environment: [dev, test, staging]
+        environment: [dev, test, staging, prod]
     environment: ${{ matrix.environment }}
     needs: notify-slack-about-deploy
     steps:
       - name: Checkout repository
-        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
       - name: Setup Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
@@ -98,6 +98,7 @@ jobs:
         run: |
           echo "VITE_BACKEND_API_URL=${{ secrets.VITE_BACKEND_API_URL }}" >> $GITHUB_ENV
           echo "VITE_GOOGLE_ANALYTICS_ID=${{ secrets.VITE_GOOGLE_ANALYTICS_ID }}" >> $GITHUB_ENV
+          echo "VITE_ENVIRONMENT=${{ matrix.environment }}" >> $GITHUB_ENV
 
       - name: Build application
         working-directory: frontend
@@ -113,8 +114,27 @@ jobs:
   build-backend:
     runs-on: ubuntu-latest
     environment: dev
-    needs: notify-slack-about-deploy
+    needs: [notify-slack-about-deploy, release-please]
     steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Fetch tags
+        run: git fetch --prune --unshallow --tags
+
+      - name: Detect release tag on current commit
+        id: detect-release-tag
+        run: |
+          RELEASE_TAG=$(git tag --points-at "$GITHUB_SHA" | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1 || true)
+
+          if [ -z "$RELEASE_TAG" ]; then
+            echo "No release tag (vX.Y.Z) found on this commit."
+          else
+            echo "Found release tag: '$RELEASE_TAG'"
+          fi
+
+          echo "release_tag=$RELEASE_TAG" >> "$GITHUB_OUTPUT"
+
       - name: Audit DNS requests
         uses: cds-snc/dns-proxy-action@main
         env:
@@ -133,19 +153,47 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
 
-      - name: Checkout
-        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
-
-      - name: Build Docker image
+      - name: Build and push Docker image (SHA and latest tag)
         working-directory: ./backend/
         run: |
+
+          # Set ENV variables
+          BUILD_TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          RELEASE_TAG="${{ steps.detect-release-tag.outputs.release_tag }}"
+
+          # Set the Release Tag as a App Version if it exists, otherwise use date+SHA
+          if [ -n "$RELEASE_TAG" ]; then
+            RELEASE_VERSION="$RELEASE_TAG"
+          else
+            RELEASE_VERSION="v$(date +%Y%m%d)-${GITHUB_SHA}"
+          fi
+
+          echo "GitHub SHA: $GITHUB_SHA"
+          echo "Release tag: $RELEASE_VERSION"
+
           docker build \
-          --tag ${{ vars.ARTIFACT_ECR_REPOSITORY }}:$GITHUB_SHA .
+            --build-arg RELEASE_TAG="$RELEASE_VERSION" \
+            --build-arg BUILD_TIMESTAMP="$BUILD_TIMESTAMP" \
+            --build-arg ECR_REPOSITORY="${{ vars.ARTIFACT_ECR_REPOSITORY }}:$GITHUB_SHA" \
+            --build-arg GITHUB_REF="${{ github.ref }}" \
+            --tag "${{ vars.ARTIFACT_ECR_REPOSITORY }}:$GITHUB_SHA" \
+            .
 
-      - name: Push Container to Amazon ECR
-        working-directory: ./backend/
+          docker push "${{ vars.ARTIFACT_ECR_REPOSITORY }}:$GITHUB_SHA"
+
+          docker tag "${{ vars.ARTIFACT_ECR_REPOSITORY }}:$GITHUB_SHA" "${{ vars.ARTIFACT_ECR_REPOSITORY }}:latest"
+          docker push "${{ vars.ARTIFACT_ECR_REPOSITORY }}:latest"
+
+      - name: Tag and push Docker image (Release tag)
+        if: steps.detect-release-tag.outputs.release_tag != ''
         run: |
-          docker push ${{ vars.ARTIFACT_ECR_REPOSITORY }}:$GITHUB_SHA
+          RELEASE_TAG="${{ steps.detect-release-tag.outputs.release_tag }}"
+
+          docker tag \
+            "${{ vars.ARTIFACT_ECR_REPOSITORY }}:$GITHUB_SHA" \
+            "${{ vars.ARTIFACT_ECR_REPOSITORY }}:$RELEASE_TAG"
+
+          docker push "${{ vars.ARTIFACT_ECR_REPOSITORY }}:$RELEASE_TAG"
 
       - name: Docker generate SBOM
         uses: cds-snc/security-tools/.github/actions/generate-sbom@34794baf2af592913bb5b51d8df4f8d0acc49b6f # v3.2.0
@@ -164,13 +212,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        environment: [dev, test, staging]
+        environment: [dev, test, staging, prod]
     environment: ${{ matrix.environment }}
     steps:
       - run: echo "Deploying frontend to ${{ matrix.environment }} environment..."
 
       - name: Checkout repository
-        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
       - name: Fetch tags
         run: git fetch --prune --unshallow --tags
@@ -229,13 +277,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        environment: [dev, test, staging]
+        environment: [dev, test, staging, prod]
     environment: ${{ matrix.environment }}
     steps:
       - run: echo "Deploying backend to ${{ matrix.environment }} environment..."
 
       - name: Checkout repository
-        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
       - name: Fetch tags
         run: git fetch --prune --unshallow --tags
@@ -321,13 +369,21 @@ jobs:
 
       - name: Deploy updated ECS task
         if: steps.check-deployment-needed.outputs.deployment_needed == 'true'
-        uses: aws-actions/amazon-ecs-deploy-task-definition@1beffbdddb3eb5f83c7a746c3e9bafeccdccbbaa # v2.4.0
+        uses: aws-actions/amazon-ecs-deploy-task-definition@7b5ba17dae98c8fd463ddf2cef977d3be43322c5 # v2.5.0
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: ${{ vars.ECS_SERVICE }}
           cluster: ${{ vars.ECS_CLUSTER }}
           wait-for-service-stability: true
           propagate-tags: SERVICE
+
+      - name: Update SSM parameter for deployed image
+        run: |
+          aws ssm put-parameter \
+            --name "/ecs/${{ vars.ECS_CLUSTER }}/${{ vars.ECS_SERVICE }}/container-image" \
+            --value "${{ vars.ARTIFACT_ECR_REPOSITORY }}:${{ env.DEPLOYMENT_SHA }}" \
+            --type "String" \
+            --overwrite
 
   notify-slack-about-deploy-success:
     runs-on: ubuntu-latest

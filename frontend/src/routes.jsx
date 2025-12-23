@@ -9,30 +9,19 @@ import {
 } from "./components/Providers/PrivateRoute.jsx";
 import { UserProvider } from "./components/Providers/UserProvider";
 
-import ConfirmLanguageUpdate from "./features/LanguagePreference/components/ConfirmUpdate.jsx";
-import AreYouSureUpdateContactNumber from "./components/Manage/AreYouSureUpdateContactNumber.jsx";
-import AreYouSureUpdateYourEmail from "./components/Manage/AreYouSureUpdateYourEmail.jsx";
-import CheckYourEmail from "./components/Manage/CheckYourEmail.jsx";
-import CompleteTwoStepVerification from "./components/Manage/CompleteTwoStepVerification.jsx";
-import EditLanguagePreferences from "./features/LanguagePreference/components/EditLanguagePreferences.jsx";
-import EnterNewEmail from "./components/Manage/EnterNewEmail.jsx";
-import FirstVerifyItsYou from "./components/Manage/FirstVerifyItsYou.jsx";
+import EditLanguagePreferencePage from "./features/LanguagePreference/components/EditLanguagePreferencePage.jsx";
 import ManageDashboard from "./components/Manage/ManageDashboard.jsx";
 import ProfileHome from "./components/Manage/ProfileHome.jsx";
-
-import ProfileUpdateNameConfirmUpdate from "./features/ProfileName/components/ConfirmUpdate.jsx";
-import ProfileUpdateNameSuccess from "./features/ProfileName/components/SuccessfullyUpdated.jsx";
-import SuccessfullyUpdatedLanguage from "./features/LanguagePreference/components/SuccessfullyUpdated.jsx";
 import Manage2FAVerifications from "./components/Manage/SecuritySettings/Manage2FAVerifications.jsx";
 import SecuritySettings from "./components/Manage/SecuritySettings/SecuritySettings.jsx";
-import YouMayUpdateEmailAtOtherPlaces from "./components/Manage/YouMayUpdateEmailAtOtherPlaces.jsx";
-import ProfileUpdateName from "./features/ProfileName/components/ProfileUpdateName.jsx";
+import EditProfileNamePage from "./features/ProfileName/components/EditProfileNamePage.jsx";
 import Verification from "./components/Verification/Verification.jsx";
 import ChangePasswordIndex from "./features/ChangePassword/components/ChangePasswordIndex.jsx";
-import UpdateContactPhoneNumberContainer from "./features/ContactPhoneNumber/components/UpdateContactPhoneNumberContainer.jsx";
+import EditContactPhoneNumberPage from "./features/ContactPhoneNumber/components/EditContactPhoneNumberPage.jsx";
 import AddMFAPage from "./features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPage.jsx";
 import DeleteMFAPage from "./features/MFAPhoneNumber/DeleteMFAPhoneNumber/component/DeleteMFAPage.jsx";
 import { PAGES } from "./utils/constants.jsx";
+import EditEmailAddressPage from "./features/EmailAddress/EditEmailAddressPage.jsx";
 
 export const appRoutes = [
   {
@@ -58,84 +47,34 @@ export const appRoutes = [
                 element: <ManageDashboard />,
               },
               {
-                path: "checkyouremail",
-                element: <CheckYourEmail />,
-                handle: { id: PAGES.CheckYourEmail },
-              },
-              {
-                path: "completetwostepverification",
-                element: <CompleteTwoStepVerification />,
-                handle: { id: PAGES.CompleteTwoStepVerification },
-              },
-              {
-                path: "firstverifyitsyou",
-                element: <FirstVerifyItsYou />,
-                handle: { id: PAGES.FirstVerifyItsYou },
-              },
-              {
-                path: "enternewemail",
-                element: <EnterNewEmail />,
-                handle: { id: PAGES.EnterNewEmail },
-              },
-              {
                 path: "profile",
-                handle: { id: PAGES.ProfileHome, breadcrumbId: "2" },
+                handle: { id: PAGES.ProfileHome, breadcrumbId: "1" },
                 children: [
                   {
                     index: true,
                     element: <ProfileHome />,
                   },
                   {
-                    path: "update-name",
-                    element: <ProfileUpdateName />,
-                    handle: { id: PAGES.profileUpdateName },
+                    path: "update-name/:step?",
+                    element: <EditProfileNamePage />,
+                    handle: { id: PAGES.editProfileNamePage },
                   },
                   {
-                    path: "update-name/success",
-                    element: <ProfileUpdateNameSuccess />,
-                    handle: { id: PAGES.profileUpdateNameSuccess },
-                  },
-                  {
-                    path: "update-name/confirm-update",
-                    element: <ProfileUpdateNameConfirmUpdate />,
-                    handle: { id: PAGES.profileUpdateNameConfirmUpdate },
-                  },
-                  {
-                    path: "update-language",
-                    element: <EditLanguagePreferences />,
+                    path: "update-language/:step?",
+                    element: <EditLanguagePreferencePage />,
                     handle: { id: PAGES.editLanguagePreferences },
                   },
                   {
-                    path: "update-language/success",
-                    element: <SuccessfullyUpdatedLanguage />,
-                    handle: { id: PAGES.successfullyUpdatedLanguage },
+                    path: "update-contact-phone/:step?",
+                    element: <EditContactPhoneNumberPage />,
+                    handle: { id: PAGES.editContactPhoneNumberPage },
                   },
                   {
-                    path: "update-language/confirm-update",
-                    element: <ConfirmLanguageUpdate />,
-                    handle: { id: PAGES.confirmLanguageUpdate },
-                  },
-                  {
-                    path: "update-contact-phone-number",
-                    element: <UpdateContactPhoneNumberContainer />,
-                    handle: { id: PAGES.enterNewPhoneNumber },
+                    path: "update-email/:step?",
+                    element: <EditEmailAddressPage />,
+                    handle: { id: PAGES.editEmailPage },
                   },
                 ],
-              },
-              {
-                path: "areYouSureUpdateContactNumber",
-                element: <AreYouSureUpdateContactNumber />,
-                handle: { id: PAGES.areYouSureUpdateContactNumber },
-              },
-              {
-                path: "youMayUpdateEmailAtOtherPlaces",
-                element: <YouMayUpdateEmailAtOtherPlaces />,
-                handle: { id: PAGES.youMayUpdateEmailAtOtherPlaces },
-              },
-              {
-                path: "areYouSureUpdateYourEmail",
-                element: <AreYouSureUpdateYourEmail />,
-                handle: { id: PAGES.areYouSureUpdateYourEmail },
               },
               {
                 path: "security-settings",

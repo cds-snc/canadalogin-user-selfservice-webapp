@@ -43,15 +43,12 @@ async def redirect_user_to_idp_verify(request: Request):
     """
     try:
         callback_redirect_uri = get_callback_redirect_uri(request)
-        for k, v in request.session.items():
-            logger.info(f"Login Request Session Items: {k}: {v}")
-
-        logger.info("Redirecting user to IBM Verify for authentication")
-        response = await oauth.verify.authorize_redirect(request, callback_redirect_uri)
-        # After the redirect to the login page, request.session should have a code_verifier
-        for k, v in request.session.items():
-            logger.info(f"After Redirected user Login Request Session Items: {k}: {v}")
-        return response
+        logger.info("Redirecting user to IBM Verify...")
+        redirect_response = await oauth.verify.authorize_redirect(
+            request, callback_redirect_uri
+        )
+        logger.info("User redirected to IBM Verify for authentication")
+        return redirect_response
     except Exception as e:
         logger.exception("Unexpected error during redirect_to_verify: %s", str(e))
         RequestErrorHandler.handle(e, context="Unexpected error during idp redirect")
@@ -62,11 +59,10 @@ async def callback_handler(request: Request):
     Handle the OAuth callback from IBM Verify.
     This function processes the response from IBM Verify after user authentication.
     """
-    try:
-        logger.info("OIDC Callback Handler")
-        for k, v in request.session.items():
-            logger.info(f"Callback Handler: Request Session Items: {k}: {v}")
 
+    logger.info("OIDC Callback Handler")
+
+    try:
         redirectValue = get_base_profile_management_url()
         returnToPageValue = request.session.get(SessionKeys.RETURN_TO_PAGE.value)
 
@@ -76,8 +72,9 @@ async def callback_handler(request: Request):
             logger.info(f"Return to page set in session: {redirectValue}")
 
         try:
+            logger.info("Verify Access Token Request")
             oidc_response = await oauth.verify.authorize_access_token(request)
-            logger.info("OIDC Responsed")
+            logger.info("OIDC Response received from IBM Verify")
         except OAuthError as error:
             logger.error(f"OAuth error during token retrieval: {error}")
             logger.error(

@@ -7,24 +7,43 @@ import {
   GcdsButton,
   GcdsGrid,
   GcdsLink,
+  GcdsErrorMessage,
+  GcdsIcon,
 } from "@cdssnc/gcds-components-react";
 import { getPageContent } from "../../../utils/functions.jsx";
-
 import { PAGES } from "../../../utils/constants";
+import RPNameDisplay from "../../../components/RPInfo/RPNameDisplay.jsx";
+import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 
-export default function ConfirmContactPhoneNumberUpdate({
+export default function ConfirmUpdate({
   onNext,
   phoneFormData,
   onCancel,
+  errorMessage,
+  setErrorCode,
+  localLoading,
 }) {
   const { language } = useParams();
   const pageContentJson = getPageContent(
     language,
     PAGES.confirmContactPhoneNumberUpdate,
   );
+  const onSubmitHandler = async (ev) => {
+    ev.preventDefault();
+    // Clear error when user clicks
+    if (setErrorCode) {
+      setErrorCode("");
+    }
+    await onNext();
+  };
 
   return (
-    <GcdsContainer>
+    <GcdsContainer role="main">
+      {errorMessage && (
+        <GcdsErrorMessage messageId="message-props">
+          {errorMessage}
+        </GcdsErrorMessage>
+      )}
       <GcdsGrid columns="1" gap="300">
         <GcdsHeading tag="h1" lang={language}>
           {pageContentJson["1"]}
@@ -39,10 +58,14 @@ export default function ConfirmContactPhoneNumberUpdate({
         <GcdsText>
           {pageContentJson["4"]}
           <ul>
-            <li>{pageContentJson["5"]}</li>
+            <li>
+              <RPNameDisplay rpName={pageContentJson["5"]} />
+            </li>
           </ul>
         </GcdsText>
+
         <GcdsNotice type="info" noticeTitleTag="h2" noticeTitle=" ">
+          <GcdsIcon name="warning" size="small" />
           <GcdsText>
             {pageContentJson["6"]} <strong>{pageContentJson["7"]}</strong>
             <GcdsText>
@@ -54,17 +77,17 @@ export default function ConfirmContactPhoneNumberUpdate({
           </GcdsText>
         </GcdsNotice>
         <GcdsGrid columns="max-content max-content" gap="200">
-          <GcdsButton
+          <SubmitButton
+            disabled={localLoading}
             style={{ width: "fit-content" }}
-            onGcdsClick={async (ev) => {
-              ev.preventDefault();
-              onNext();
-            }}
+            onGcdsClick={onSubmitHandler}
+            currentLang={language}
           >
             {pageContentJson["10"]}
-          </GcdsButton>
+          </SubmitButton>
           <GcdsButton
             buttonRole="secondary"
+            disabled={localLoading}
             onGcdsClick={(ev) => {
               ev.preventDefault();
               onCancel();

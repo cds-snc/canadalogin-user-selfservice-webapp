@@ -22,8 +22,14 @@ export default function DeleteMFAPhoneNumberConfirm({
     language,
     PAGES.deleteMFAPhoneNumberConfirm,
   );
+
+  const onSubmitHandler = async (ev) => {
+    ev.preventDefault();
+    await onNext();
+  };
+
   return (
-    <GcdsContainer>
+    <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="500">
         <GcdsContainer>
           <GcdsHeading tag="h1" lang={language}>
@@ -46,10 +52,7 @@ export default function DeleteMFAPhoneNumberConfirm({
         <GcdsButton
           buttonRole="danger"
           style={{ width: "fit-content" }}
-          onGcdsClick={async (ev) => {
-            ev.preventDefault();
-            await onNext();
-          }}
+          onGcdsClick={onSubmitHandler}
         >
           {pageContentJson["9"]}
         </GcdsButton>

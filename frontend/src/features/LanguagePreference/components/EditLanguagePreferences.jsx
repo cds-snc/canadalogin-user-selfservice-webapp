@@ -1,4 +1,6 @@
-import { useState } from "react";
+import React from "react";
+import { useParams } from "react-router";
+
 import {
   GcdsContainer,
   GcdsHeading,
@@ -6,40 +8,31 @@ import {
   GcdsButton,
   GcdsGrid,
   GcdsRadios,
+  GcdsErrorMessage,
 } from "@cdssnc/gcds-components-react";
 
-import { useParams, useNavigate } from "react-router";
+import { getPageContent } from "../../../utils/functions.jsx";
 
 import {
-  getPageContent,
-  convertLanguageToLanguageCode,
-} from "../../../utils/functions.jsx";
-
-import { PAGES, PROFILE_LANGUAGES } from "../../../utils/constants.jsx";
-import { path } from "../../../utils/routeHelpers.js";
-import { useUser } from "../../../components/Providers/useUser.tsx";
+  PAGES,
+  PROFILE_LANGUAGES,
+  ServicesWithAccessInfoSectionInformation,
+} from "../../../utils/constants.jsx";
 import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx";
+import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 
-export default function EditLanguagePreferences() {
+export default function EditLanguagePreferences({
+  languageFormData,
+  onLanguageFormChange,
+  onNext,
+  onCancel,
+  errorMessage,
+  setErrorCode,
+}) {
   const { language } = useParams();
-  const navigate = useNavigate();
-
-  const { state } = useUser();
-  const { userProfile } = state;
-  const profilePreferredLanguage = userProfile?.preferredLanguage;
-
-  const [updatedLanguage, setUpdatedLanguage] = useState({
-    updatedPreferredLanguage: profilePreferredLanguage,
-    languageCode: language,
-  });
-
-  const backToProfile = path(PAGES.ProfileHome, { language: language });
-  const confirmLanguageUpdate = path(PAGES.confirmLanguageUpdate, {
-    language: language,
-  });
 
   const pageContentJson = getPageContent(
-    updatedLanguage.languageCode,
+    language,
     PAGES.editLanguagePreferences,
   );
 
@@ -47,70 +40,73 @@ export default function EditLanguagePreferences() {
     label: pageContentJson["13"],
     id: PROFILE_LANGUAGES.en,
     value: PROFILE_LANGUAGES.en,
-    checked: profilePreferredLanguage === PROFILE_LANGUAGES.en,
+    checked: languageFormData.updatedPreferredLanguage === PROFILE_LANGUAGES.en,
   };
   const frenchSelection = {
     label: pageContentJson["14"],
     id: PROFILE_LANGUAGES.fr,
     value: PROFILE_LANGUAGES.fr,
-    checked: profilePreferredLanguage === PROFILE_LANGUAGES.fr,
+    checked: languageFormData.updatedPreferredLanguage === PROFILE_LANGUAGES.fr,
   };
 
   const languageOptions = [englistSelection, frenchSelection];
 
   const handleProfileChange = (e) => {
     const { value } = e.target;
-    const languageCode = convertLanguageToLanguageCode(value);
-    const data = {
-      updatedPreferredLanguage: value,
-      languageCode: languageCode,
-    };
-    setUpdatedLanguage(data);
+    onLanguageFormChange(value);
+    // Clear error when user makes selection
+    if (setErrorCode) {
+      setErrorCode("");
+    }
   };
 
-  const onSubmitHandler = (event) => {
-    event.preventDefault();
-    navigate(confirmLanguageUpdate, {
-      state: { updatedLanguage: updatedLanguage },
-    });
+  const onSubmitHandler = async (ev) => {
+    ev.preventDefault();
+    await onNext();
   };
 
   return (
-    <GcdsContainer>
+    <GcdsContainer role="main">
+      {errorMessage && (
+        <GcdsErrorMessage messageId="message-props">
+          {errorMessage}
+        </GcdsErrorMessage>
+      )}
+
       <GcdsHeading tag="h1">{pageContentJson["1"]}</GcdsHeading>
       <GcdsText>{pageContentJson["2"]}</GcdsText>
 
       <GcdsGrid columns="1fr">
         <ServicesWithAccessInfoSection
-          currentLang={updatedLanguage.languageCode}
+          currentLang={language}
+          information={
+            ServicesWithAccessInfoSectionInformation.LANGUAGE_PREFERENCE
+          }
         />
       </GcdsGrid>
 
-      <GcdsContainer marginTop="100">
-        <GcdsRadios
-          name="radio"
-          legend={pageContentJson["3"]}
-          options={languageOptions}
-          lang={updatedLanguage.languageCode}
-          onChange={handleProfileChange}
-        ></GcdsRadios>
-      </GcdsContainer>
+      <form onSubmit={onSubmitHandler}>
+        <GcdsContainer marginTop="100">
+          <GcdsRadios
+            name="radio"
+            legend={pageContentJson["3"]}
+            options={languageOptions}
+            lang={language}
+            onChange={handleProfileChange}
+          />
+        </GcdsContainer>
+      </form>
 
       <GcdsGrid columns="max-content max-content" gap="200">
-        <GcdsButton
-          onGcdsClick={(ev) => {
-            ev.preventDefault();
-            onSubmitHandler(ev);
-          }}
-        >
+        <SubmitButton onGcdsClick={onSubmitHandler} currentLang={language}>
           {pageContentJson["15"]}
-        </GcdsButton>
+        </SubmitButton>
 
         <GcdsButton
           buttonRole="secondary"
           onGcdsClick={(ev) => {
             ev.preventDefault();
-            navigate(backToProfile);
+            onCancel();
           }}
         >
           {pageContentJson["16"]}

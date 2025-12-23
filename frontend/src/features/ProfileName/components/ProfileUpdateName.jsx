@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useParams, useNavigate } from "react-router";
+import React from "react";
+import { useParams } from "react-router";
 import {
   GcdsButton,
   GcdsContainer,
@@ -7,58 +7,102 @@ import {
   GcdsHeading,
   GcdsInput,
   GcdsText,
+  GcdsErrorMessage,
 } from "@cdssnc/gcds-components-react";
 import { getPageContent } from "../../../utils/functions.jsx";
-import { path } from "../../../utils/routeHelpers.js";
-import { PAGES } from "../../../utils/constants.jsx";
+import {
+  PAGES,
+  ServicesWithAccessInfoSectionInformation,
+} from "../../../utils/constants.jsx";
 import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx";
 
-export default function ProfileUpdateName() {
+export default function ProfileUpdateName({
+  nameFormData,
+  onNameFormChange,
+  onNext,
+  onCancel,
+  errorMessage,
+  setErrorCode,
+}) {
   const { language } = useParams();
   const pageNameEditJson = getPageContent(language, PAGES.profileUpdateName);
-  const navigate = useNavigate();
-  const [editProfile, setEditProfile] = useState({
-    givenName: "",
-    familyName: "",
-    formatted: "",
-  });
 
-  const confirmation = path(PAGES.profileUpdateNameConfirmUpdate, {
-    language: language,
-  });
-  const backToProfile = path(PAGES.ProfileHome, { language: language });
-
-  const handleProfileChange = (e) => {
-    const { name, value } = e.target;
-    setEditProfile((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  const validateCharacter = (char) => {
+    // Check if a single character is valid for names
+    const charRegex =
+      /[a-zA-ZÀ-ÿĀ-žА-я\u0100-\u017F\u0180-\u024F\u1E00-\u1EFF\s'-]/;
+    return charRegex.test(char);
   };
 
-  const useSubmitHandler = (event) => {
-    event.preventDefault();
-    const updatedName = {
-      givenName: editProfile.givenName,
-      familyName: editProfile.familyName,
-      formatted: `${editProfile.givenName} ${editProfile.familyName}`,
-    };
-    navigate(confirmation, { state: { name: updatedName } });
+  const handleKeyUp = (e) => {
+    const { name } = e.target;
+    const char = e.key;
+
+    // Only apply validation to name fields
+    if (name === "givenName" || name === "familyName") {
+      // Prevent invalid characters from being typed
+      if (!validateCharacter(char)) {
+        e.preventDefault();
+        return;
+      }
+      handleProfileChange(e);
+    }
+  };
+
+  // onChange handler with validation for paste operations, etc.
+  const handleProfileChange = (e) => {
+    const { name, value } = e.target;
+
+    // Apply validation to name fields
+    if (name === "givenName" || name === "familyName") {
+      // Filter out invalid characters from pasted content
+      const validCharRegex =
+        /[a-zA-ZÀ-ÿĀ-žА-я\u0100-\u017F\u0180-\u024F\u1E00-\u1EFF\s'-]/g;
+      const filteredValue = value.match(validCharRegex)?.join("") || "";
+
+      // Only update if the filtered value is different from original
+      if (filteredValue !== value) {
+        // Set the filtered value back to the input
+        e.target.value = filteredValue;
+        onNameFormChange(name, filteredValue);
+      } else {
+        onNameFormChange(name, value);
+      }
+    } else {
+      onNameFormChange(name, value);
+    }
+
+    if (setErrorCode) {
+      setErrorCode("");
+    }
+  };
+
+  const onSubmitHandler = async (ev) => {
+    ev.preventDefault();
+    await onNext();
   };
 
   return (
-    <GcdsContainer>
+    <GcdsContainer role="main">
+      {errorMessage && (
+        <GcdsErrorMessage messageId="message-props">
+          {errorMessage}
+        </GcdsErrorMessage>
+      )}
+
       <GcdsHeading tag="h1">{pageNameEditJson["5"]}</GcdsHeading>
 
       <GcdsText>
         {pageNameEditJson["6"]} <strong>{pageNameEditJson["7"]}</strong>
       </GcdsText>
 
-      <ServicesWithAccessInfoSection currentLang={language} />
-
-      <form id="form" style={{ marginTop: "38px" }} onSubmit={useSubmitHandler}>
-        <GcdsContainer marginTop="100" marginBottom="0">
+      <ServicesWithAccessInfoSection
+        currentLang={language}
+        information={ServicesWithAccessInfoSectionInformation.NAME}
+      />
+      <form onSubmit={onSubmitHandler}>
+        <GcdsContainer style={{ marginTop: "1.5rem" }}>
           <GcdsInput
             inputId="givenName"
             label={pageNameEditJson["2"]}
@@ -67,7 +111,10 @@ export default function ProfileUpdateName() {
             validateOn="other"
             data-testid="givenName"
             lang={language}
+            value={nameFormData.givenName}
             onChange={handleProfileChange}
+            onKeyUp={handleKeyUp}
+            pattern="[a-zA-ZÀ-ÿĀ-žА-я\u0100-\u017F\u0180-\u024F\u1E00-\u1EFF\s'-]*"
           />
           <GcdsInput
             inputId="familyName"
@@ -78,28 +125,30 @@ export default function ProfileUpdateName() {
             data-testid="familyName"
             lang={language}
             required
+            value={nameFormData.familyName}
             onChange={handleProfileChange}
+            onKeyUp={handleKeyUp}
+            pattern="[a-zA-ZÀ-ÿĀ-žА-я\u0100-\u017F\u0180-\u024F\u1E00-\u1EFF\s'-]*"
           />
         </GcdsContainer>
-
-        <GcdsGrid columns="max-content max-content" gap="200">
-          <SubmitButton
-            currentLang={language}
-            disabled={false}
-            onGcdsClick={useSubmitHandler}
-          />
-          <GcdsButton
-            buttonRole="secondary"
-            onGcdsClick={(ev) => {
-              console.log(ev);
-              ev.preventDefault();
-              navigate(backToProfile);
-            }}
-          >
-            {pageNameEditJson["4"]}
-          </GcdsButton>
-        </GcdsGrid>
       </form>
+
+      <GcdsGrid columns="max-content max-content" gap="200">
+        <SubmitButton
+          currentLang={language}
+          disabled={false}
+          onGcdsClick={onSubmitHandler}
+        />
+        <GcdsButton
+          buttonRole="secondary"
+          onGcdsClick={(ev) => {
+            ev.preventDefault();
+            onCancel();
+          }}
+        >
+          {pageNameEditJson["4"]}
+        </GcdsButton>
+      </GcdsGrid>
     </GcdsContainer>
   );
 }

@@ -36,6 +36,10 @@ class UserOtpInfo(BaseModel):
         None  # Changed from PhoneNumber to str to handle masked numbers
     )
     userId: str
+    userName: EmailStr
+    emailAddress: Optional[EmailStr] = (
+        None  # For sending OTP to a different email address
+    )
     otpType: OtpType
 
     @field_validator("phoneNumber")

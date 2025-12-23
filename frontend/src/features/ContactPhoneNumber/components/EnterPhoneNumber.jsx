@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router";
 import { isValidPhoneNumber } from "libphonenumber-js";
 import PhoneInput from "react-phone-input-2";
@@ -20,24 +20,10 @@ import {
   countryMapping,
   FLOW_TYPES,
   PAGES,
+  ServicesWithAccessInfoSectionInformation,
 } from "../../../utils/constants.jsx";
-
-const ServicesAccessingPhoneNumber = ({ pageContentJson }) => {
-  return (
-    <GcdsDetails detailsTitle={pageContentJson["3"]}>
-      <GcdsText>{pageContentJson["4"]}</GcdsText>
-      <GcdsText>{pageContentJson["5"]}</GcdsText>
-      <GcdsText>{pageContentJson["6"]}</GcdsText>
-      <GcdsText>
-        {pageContentJson["7"]}{" "}
-        <GcdsLink href="https://accounts.gc.ca/directory">
-          {pageContentJson["8"]}
-        </GcdsLink>
-        .
-      </GcdsText>
-    </GcdsDetails>
-  );
-};
+import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx";
+import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 
 const PageHeader = ({ language, pageContentJson }) => {
   return (
@@ -46,7 +32,12 @@ const PageHeader = ({ language, pageContentJson }) => {
         {pageContentJson["1"]}
       </GcdsHeading>
       <GcdsText>{pageContentJson["2"]}</GcdsText>
-      <ServicesAccessingPhoneNumber pageContentJson={pageContentJson} />
+      <ServicesWithAccessInfoSection
+        currentLang={language}
+        information={
+          ServicesWithAccessInfoSectionInformation.CONTACT_PHONE_NUMBER
+        }
+      />
     </>
   );
 };
@@ -67,6 +58,7 @@ const RadioButtons = ({
   onChangePhoneForm,
   pageContentJson,
   phoneFormData,
+  setErrorCode,
 }) => {
   const configureRadioOptions = () => {
     let radioOptionsValues = [];
@@ -103,6 +95,10 @@ const RadioButtons = ({
       options={radioOptions}
       onGcdsChange={(e) => {
         onChangePhoneForm("otpType", e.target.value);
+        // Clear error when user makes selection
+        if (setErrorCode) {
+          setErrorCode("");
+        }
       }}
     ></GcdsRadios>
   );
@@ -114,13 +110,14 @@ export default function EnterPhoneNumber({
   onChangePhoneForm,
   phoneFormData,
   errorMessage,
+  setErrorCode,
 }) {
   const { language } = useParams();
   const [phoneNumberValid, setPhoneNumberValid] = useState(true);
   const pageContentJson = getPageContent(language, PAGES.enterNewPhoneNumber);
   const otpPageContentJson = getPageContent(language, PAGES.otpSelection);
 
-  const { submit, cancel } = getPageContent(language, "Button");
+  const { cancel } = getPageContent(language, "Button");
 
   const isPhoneNumberValid = (phoneNumber, country) => {
     const capitalize = country.toUpperCase();
@@ -128,54 +125,97 @@ export default function EnterPhoneNumber({
     return validatedPhoneNumber;
   };
 
+  const onSubmitHandler = async (ev) => {
+    ev.preventDefault();
+    await onNext();
+  };
+
+  // Add accessibility attributes to phone input components after mount
+  useEffect(() => {
+    const addAccessibilityAttributes = () => {
+      const countryList = document.querySelector(
+        '.country-list[role="listbox"]',
+      );
+      if (countryList && !countryList.getAttribute("aria-label")) {
+        countryList.setAttribute("aria-label", "Countries List");
+      }
+    };
+
+    // Create a MutationObserver to watch for the dropdown being added to DOM
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === "childList") {
+          addAccessibilityAttributes();
+        }
+      });
+    });
+
+    // Start observing changes to document body
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+
+    // Also run immediately in case the dropdown is already rendered
+    addAccessibilityAttributes();
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <GcdsContainer>
+    <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="500">
         <section>
           <PageHeader language={language} pageContentJson={pageContentJson} />
         </section>
 
-        <section>
-          {errorMessage && (
-            <GcdsErrorMessage messageId="message-props">
-              {errorMessage}
-            </GcdsErrorMessage>
-          )}
-          <PhoneInput
-            inputProps={{
-              name: "phone",
-              required: true,
-              autoFocus: true,
-            }}
-            specialLabel={pageContentJson["10"]}
-            country={"ca"}
-            preferredCountries={["ca"]}
-            onlyCountries={countryMapping.countries}
-            localization={
-              language === "fr"
-                ? countryMapping.frLocalization
-                : countryMapping.localization
-            }
-            value={phoneFormData.phoneNumber}
-            className={"high-res"}
-            enableSearch={true}
-            countryCodeEditable={false}
-            disableSearchIcon={false}
-            defaultErrorMessage={pageContentJson["14"]}
-            onChange={(phone, country, event, formatted) => {
-              onChangePhoneForm("phoneNumber", `+${phone}`);
-              onChangePhoneForm("formattedPhoneNumber", formatted);
-              const isNumberValid = isPhoneNumberValid(
-                phone,
-                country.countryCode,
-              );
-              setPhoneNumberValid(isNumberValid);
-            }}
-            isValid={(inputNumber, country) => {
-              return isPhoneNumberValid(inputNumber, country.iso2);
-            }}
-          />
-        </section>
+        <form onSubmit={onSubmitHandler}>
+          <section>
+            {errorMessage && (
+              <GcdsErrorMessage messageId="message-props">
+                {errorMessage}
+              </GcdsErrorMessage>
+            )}{" "}
+            <PhoneInput
+              inputProps={{
+                name: "phone",
+                required: true,
+                autoFocus: true,
+              }}
+              specialLabel={pageContentJson["10"]}
+              country={"ca"}
+              preferredCountries={["ca"]}
+              onlyCountries={countryMapping.countries}
+              localization={
+                language === "fr"
+                  ? countryMapping.frLocalization
+                  : countryMapping.localization
+              }
+              value={phoneFormData.phoneNumber}
+              className={"high-res"}
+              enableSearch={true}
+              countryCodeEditable={false}
+              disableSearchIcon={false}
+              defaultErrorMessage={pageContentJson["14"]}
+              onChange={(phone, country, event, formatted) => {
+                onChangePhoneForm("phoneNumber", `+${phone}`);
+                onChangePhoneForm("formattedPhoneNumber", formatted);
+                const isNumberValid = isPhoneNumberValid(
+                  phone,
+                  country.countryCode,
+                );
+                setPhoneNumberValid(isNumberValid);
+                // Clear error when user makes changes
+                if (setErrorCode) {
+                  setErrorCode("");
+                }
+              }}
+              isValid={(inputNumber, country) => {
+                return isPhoneNumberValid(inputNumber, country.iso2);
+              }}
+            />
+          </section>
+        </form>
 
         <section>
           <MyCountryIsNotListed pageContentJson={pageContentJson} />
@@ -185,21 +225,18 @@ export default function EnterPhoneNumber({
             onChangePhoneForm={onChangePhoneForm}
             pageContentJson={otpPageContentJson}
             phoneFormData={phoneFormData}
+            setErrorCode={setErrorCode}
           />
         </section>
       </GcdsGrid>
 
       <GcdsGrid columns="max-content max-content" gap="200">
-        <GcdsButton
+        <SubmitButton
           disabled={!phoneNumberValid || !phoneFormData.phoneNumber}
           style={{ width: "fit-content" }}
-          onGcdsClick={(ev) => {
-            ev.preventDefault();
-            onNext();
-          }}
-        >
-          {submit}
-        </GcdsButton>
+          onGcdsClick={onSubmitHandler}
+          currentLang={language}
+        ></SubmitButton>
 
         <GcdsButton
           buttonRole="secondary"

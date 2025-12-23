@@ -73,6 +73,12 @@ vi.mock("../../../components/Providers/useUser.tsx", () => ({
       userProfile: {
         userName: "testuser",
       },
+      relyingPartyInfo: {
+        icon: "test-icon.png",
+        id: "test-service-id",
+        linkName: "Test Service",
+        url: "https://test-service.example.com",
+      },
     },
     dispatch: vi.fn(),
   }),
@@ -121,12 +127,27 @@ describe("ConfirmLanguageUpdate Component", () => {
     vi.clearAllMocks();
   });
 
-  const setup = () =>
-    render(
+  const setup = (overrideProps = {}) => {
+    const defaultProps = {
+      languageFormData: {
+        languageCode: "en",
+        updatedPreferredLanguage: "fr-ca",
+      },
+      onConfirm: vi.fn(),
+      onCancel: vi.fn(),
+      onBack: vi.fn(),
+      errorMessage: "",
+      setErrorCode: vi.fn(),
+      localLoading: false,
+      ...overrideProps,
+    };
+
+    return render(
       <BrowserRouter>
-        <ConfirmLanguageUpdate />
+        <ConfirmLanguageUpdate {...defaultProps} />
       </BrowserRouter>,
     );
+  };
 
   it("renders localized text and translated language name correctly", () => {
     setup();
@@ -143,105 +164,37 @@ describe("ConfirmLanguageUpdate Component", () => {
     expect(screen.getByText("French")).toBeInTheDocument();
   });
 
-  it("calls authService.update_my_user_profile on confirm click", async () => {
-    const { authService } = await import("../../../services/authService.jsx");
-    authService.update_my_user_profile.mockResolvedValueOnce({
-      data: { preferredLanguage: "fr-ca" },
-    });
-
-    setup();
+  it("calls onConfirm when confirm button is clicked", async () => {
+    const mockOnConfirm = vi.fn().mockResolvedValue();
+    setup({ onConfirm: mockOnConfirm });
 
     const confirmButton = screen.getByText("Confirm");
     fireEvent.click(confirmButton);
 
     await waitFor(() => {
-      expect(authService.update_my_user_profile).toHaveBeenCalledWith({
-        preferredLanguage: "fr-ca",
-        userName: "testuser",
-      });
-    });
-
-    await waitFor(() => {
-      expect(mockUpdateProfileSuccess).toHaveBeenCalled();
-    });
-
-    await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith(
-        "/fr/success",
-        expect.objectContaining({
-          state: expect.objectContaining({
-            updatedLanguage: expect.any(Object),
-          }),
-        }),
-      );
+      expect(mockOnConfirm).toHaveBeenCalled();
     });
   });
 
-  it("displays loader when saving", async () => {
-    const { authService } = await import("../../../services/authService.jsx");
+  it("disables button when localLoading is true", () => {
+    setup({ localLoading: true });
 
-    // Create a promise that we control
-    let resolveFn;
-    authService.update_my_user_profile.mockImplementation(
-      () => new Promise((resolve) => (resolveFn = resolve)),
-    );
-
-    setup();
-
-    fireEvent.click(screen.getByText("Confirm"));
-
-    // Wait for loader to appear
-    await waitFor(() => {
-      expect(screen.getByTestId("loader")).toBeInTheDocument();
-    });
-
-    // Resolve the promise to clean up - wrap in waitFor to handle React updates
-    await waitFor(() => {
-      resolveFn({ data: { preferredLanguage: "fr-ca" } });
-    });
-
-    // Wait for the component to finish processing
-    await waitFor(() => {
-      expect(screen.queryByTestId("loader")).not.toBeInTheDocument();
-    });
+    const confirmButton = screen.getByText("Confirm");
+    expect(confirmButton).toBeDisabled();
   });
 
-  it("handles API error gracefully", async () => {
-    const { authService } = await import("../../../services/authService.jsx");
+  it("displays error message when errorMessage prop is provided", () => {
+    setup({ errorMessage: "Something went wrong" });
 
-    authService.update_my_user_profile.mockRejectedValueOnce({
-      data: {
-        message: "NETWORK_ERROR",
-      },
-    });
-
-    setup();
-
-    const confirmButton = screen.getByRole("button", { name: /confirm/i });
-    fireEvent.click(confirmButton);
-
-    // Wait for API call to be made
-    await waitFor(() => {
-      expect(authService.update_my_user_profile).toHaveBeenCalled();
-    });
-
-    // Verify loader is removed after error
-    await waitFor(() => {
-      expect(screen.queryByTestId("loader")).not.toBeInTheDocument();
-    });
-
-    // Verify navigation didn't happen on error
-    expect(mockNavigate).not.toHaveBeenCalledWith(
-      expect.stringContaining("/success"),
-      expect.anything(),
-    );
+    expect(screen.getByText("Something went wrong")).toBeInTheDocument();
   });
 
-  it("navigates back to profile when cancel is clicked", () => {
-    setup();
+  it("calls onCancel when cancel button is clicked", () => {
+    const mockOnCancel = vi.fn();
+    setup({ onCancel: mockOnCancel });
 
     fireEvent.click(screen.getByText("Cancel"));
 
-    expect(mockNavigate).toHaveBeenCalledWith("/en/home");
+    expect(mockOnCancel).toHaveBeenCalled();
   });
 });

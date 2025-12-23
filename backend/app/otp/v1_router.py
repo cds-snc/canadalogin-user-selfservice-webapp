@@ -150,7 +150,6 @@ async def attempt_mfa_otp_verification(
 @router.delete(
     "/mfa/delete",
     response_model=ResponseModel,
-    status_code=status.HTTP_200_OK,
     tags=["OTP"],
     summary="Delete MFA OTP factor",
     description="Deletes an enrolled MFA OTP factor (SMS or Voice based on otpType)",

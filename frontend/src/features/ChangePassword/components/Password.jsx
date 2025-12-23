@@ -1,25 +1,25 @@
 import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router";
 import {
   GcdsContainer,
   GcdsText,
   GcdsDetails,
   GcdsInput,
-  GcdsStepper,
-  GcdsLink,
   GcdsCheckboxes,
   GcdsGrid,
   GcdsButton,
   GcdsHeading,
 } from "@cdssnc/gcds-components-react";
-import { getPageContent } from "../../../utils/functions.jsx";
+import {
+  getContentWithVariables,
+  getPageContent,
+} from "../../../utils/functions.jsx";
 import { authService } from "../../../services/authService.jsx";
 import { passwordUpdate } from "../api/passwordUpdate.jsx";
 
 import { PAGES } from "../../../utils/constants.jsx";
-import { useUser } from "../../../components/Providers/useUser.tsx";
-import { useParams } from "react-router";
-import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 import { path } from "../../../utils/routeHelpers.js";
+import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 
 export default function Password({
   onNext,
@@ -27,10 +27,10 @@ export default function Password({
   userOtpValue,
   setErrorCode,
   errorMessage,
+  setLocalLoading,
 }) {
-  const { state } = useUser();
   const { language } = useParams();
-  const { submit, cancel } = getPageContent(language, "Button");
+  const { cancel } = getPageContent(language, "Button");
   const [passwordPolicy, setPasswordPolicy] = useState({ min: 12, max: 110 });
   const [checkedValue, setCheckedValue] = useState(false);
   const [password, setPassword] = useState("");
@@ -40,7 +40,13 @@ export default function Password({
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
     language: language,
   });
-  const navigateHelper = useNavigateHelper();
+
+  const navigate = useNavigate();
+
+  const onSubmitHandler = async (ev) => {
+    ev.preventDefault();
+    await completePasswordUpdate();
+  };
 
   useEffect(() => {
     async function loadMinMax() {
@@ -67,9 +73,22 @@ export default function Password({
     setErrorCode("");
   }
 
+  function isExamplePasswordUsed(pwd) {
+    // remove all whitespace and lowercase
+    // disallow "pillowmoosedish" in any casing/spacing
+
+    const normalized = pwd.replace(/\s+/g, "").toLowerCase();
+    return normalized === "pillowmoosedish";
+  }
+
   const completePasswordUpdate = async () => {
     try {
       setErrorCode("");
+      if (isExamplePasswordUsed(password)) {
+        setErrorCode("example_password_used");
+        return;
+      }
+      setLocalLoading(true);
       const response = await passwordUpdate.finalStep(
         userOtpValue,
         otpSentResponse.trxId,
@@ -83,6 +102,8 @@ export default function Password({
         setErrorCode(err.data.message);
       }
       console.error("err", err);
+    } finally {
+      setLocalLoading(false);
     }
   };
 
@@ -96,38 +117,32 @@ export default function Password({
   ];
 
   return (
-    <GcdsContainer>
+    <GcdsContainer role="main">
       <GcdsHeading tag="h1" lang={language}>
         {pageContentJson["14"]}
       </GcdsHeading>
 
-      <>
-        <GcdsText>
-          <span>{pageContentJson["4"]}</span>{" "}
-          <strong>
-            <span>{pageContentJson["5"]}</span> {passwordPolicy.min}{" "}
-          </strong>{" "}
-          <span>{pageContentJson["6"]}</span>
-        </GcdsText>
-        <GcdsDetails detailsTitle={pageContentJson["7"]}>
-          <GcdsText>{pageContentJson["8"]}</GcdsText>
-        </GcdsDetails>
-      </>
+      <GcdsText>
+        <span>{pageContentJson["4"]}</span>{" "}
+        <strong>
+          <span>
+            {getContentWithVariables(pageContentJson["5"], {
+              minPasswordLength: passwordPolicy.min,
+            })}
+          </span>
+        </strong>
+        {". "}
+        <span>{pageContentJson["6"]}</span>
+      </GcdsText>
+      <GcdsDetails
+        detailsTitle={pageContentJson["7"]}
+        style={{ marginBottom: "1rem" }}
+      >
+        <GcdsText>{pageContentJson["8"]}</GcdsText>
+      </GcdsDetails>
 
-      <GcdsContainer>
-        {state.testData !== undefined && (
-          <GcdsInput
-            inputId="input-password"
-            label={pageContentJson["9"]}
-            name="password"
-            value={state.testData.password}
-            hint={pageContentJson["10"]}
-            type="password"
-            onGcdsInput={handlePasswordChange}
-            // errorMessage={error.errorMsg}
-          ></GcdsInput>
-        )}
-        {state.testData === undefined && (
+      <form onSubmit={onSubmitHandler}>
+        <GcdsContainer>
           <GcdsInput
             inputId="input-password"
             label={pageContentJson["9"]}
@@ -141,45 +156,41 @@ export default function Password({
             lang={language}
             autofocus
           ></GcdsInput>
-        )}
-        <GcdsCheckboxes
-          checkboxId="checkbox-default"
-          legend={pageContentJson["11"]}
-          name="checkbox"
-          options={optionsValues}
-          onGcdsChange={() => setCheckedValue(!checkedValue)}
-        ></GcdsCheckboxes>
 
-        <GcdsText>
-          <span>{pageContentJson["12"]}</span>{" "}
-          <strong>{passwordStrength}</strong> / {passwordPolicy.min}{" "}
-          <span>{pageContentJson["13"]}</span>
-        </GcdsText>
+          <GcdsCheckboxes
+            checkboxId="checkbox-default"
+            legend={pageContentJson["11"]}
+            name="checkbox"
+            options={optionsValues}
+            onGcdsChange={() => setCheckedValue(!checkedValue)}
+          ></GcdsCheckboxes>
 
-        <GcdsGrid columns="max-content max-content" gap="200">
-          <GcdsButton
-            disabled={password.length < passwordPolicy.min}
-            style={{ width: "fit-content" }}
-            onGcdsClick={(ev) => {
-              ev.preventDefault();
-              completePasswordUpdate();
-            }}
-          >
-            {submit}
-          </GcdsButton>
+          <GcdsText>
+            <span>{pageContentJson["12"]}</span>{" "}
+            <strong>{passwordStrength}</strong> / {passwordPolicy.min}{" "}
+            <span>{pageContentJson["13"]}</span>
+          </GcdsText>
 
-          <GcdsButton
-            buttonRole="secondary"
-            style={{ width: "fit-content" }}
-            onGcdsClick={(ev) => {
-              ev.preventDefault();
-              navigateHelper(backToSecuritySettingsPage);
-            }}
-          >
-            {cancel}
-          </GcdsButton>
-        </GcdsGrid>
-      </GcdsContainer>
+          <GcdsGrid columns="max-content max-content" gap="200">
+            <SubmitButton
+              disabled={password.length < passwordPolicy.min}
+              style={{ width: "fit-content" }}
+              currentLang={language}
+            ></SubmitButton>
+
+            <GcdsButton
+              buttonRole="secondary"
+              style={{ width: "fit-content" }}
+              onGcdsClick={(ev) => {
+                ev.preventDefault();
+                navigate(backToSecuritySettingsPage);
+              }}
+            >
+              {cancel}
+            </GcdsButton>
+          </GcdsGrid>
+        </GcdsContainer>
+      </form>
     </GcdsContainer>
   );
 }

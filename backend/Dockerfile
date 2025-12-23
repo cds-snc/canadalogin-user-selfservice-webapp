@@ -1,5 +1,22 @@
 FROM  python:3.12-slim
 
+ARG RELEASE_TAG=unknown
+ARG BUILD_TIMESTAMP=unknown
+ARG ECR_REPOSITORY=unknown
+ARG GITHUB_REF=unknown
+
+# Set as environment variables
+ENV RELEASE_TAG=${RELEASE_TAG}
+ENV BUILD_TIMESTAMP=${BUILD_TIMESTAMP}
+ENV ECR_REPOSITORY=${ECR_REPOSITORY}
+ENV GITHUB_REF=${GITHUB_REF}
+
+# Add labels for container metadata
+LABEL release_tag=${RELEASE_TAG}
+LABEL timestamp=${BUILD_TIMESTAMP}
+LABEL ecr_repository=${ECR_REPOSITORY}
+LABEL github.ref=${GITHUB_REF}
+
 WORKDIR /app
 
 RUN apt-get update && \

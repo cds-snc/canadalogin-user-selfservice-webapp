@@ -63,6 +63,7 @@ async def introspect_user_token(
 
 
 def set_rp_client_id_in_session(request: Request) -> None:
+    logger.info("Set RP info in session if exists")
     if SessionKeys.RP_CLIENT_ID_KEY.value in request.query_params:
         rp_client_id = request.query_params[SessionKeys.RP_CLIENT_ID_KEY.value]
         request.session[SessionKeys.RP_CLIENT_ID_KEY.value] = rp_client_id
@@ -75,26 +76,31 @@ async def get_users_current_session(request: Request):
     The user access token is stored in memory on the server
     Authlib docs - https://docs.authlib.org/en/latest/client/fastapi.html
     """
+    logger.info("Get Users Current Session")
 
     set_rp_client_id_in_session(request)
 
     user_access_token = request.session.get(
         SessionKeys.SESSION_USER_ACCESS_TOKEN_KEY.value
     )
-    logger.info("Get Users Session")
+    logger.info("Check if Users Current Session has access token")
 
     if not user_access_token:
-        logger.info("Not authenticated - no user access token found")
+        logger.info("Not authenticated - no user access token found in session")
         raise OAuthError("user access token not found")
     logger.info("Access Token found in session")
     http_client = await get_http_client(request)
+    logger.info("introspect user token")
     validate_user_token_response = await introspect_user_token(
         http_client, user_access_token
     )
     data = validate_user_token_response
+    logger.info("introspect response received - check active status")
     if not data.get("active"):
+        logger.info("User access token is not active, clearing session")
         request.session.clear()
-        raise OAuthError("Invalid or expired token")
+        raise OAuthError("Introspect token was Invalid or expired token")
+    logger.info("User access token is active")
     return user_access_token
 
 
@@ -160,6 +166,32 @@ def update_session_tokens(request: Request, new_tokens: dict):
         "access_token"
     )
     request.session[SessionKeys.SESSION_USER_TOKEN.value] = new_tokens
+
+
+def update_session_user_info(request: Request, new_user_info: dict):
+    """
+    Update the session with new user information after profile changes.
+    This is particularly important after email address changes where
+    the preferred_username needs to be synchronized with the new email.
+    """
+    logger.info("Updating session user info")
+
+    # Get existing token data
+    existing_token = request.session.get(SessionKeys.SESSION_USER_TOKEN.value)
+    if not existing_token:
+        logger.warning("No existing token found in session")
+        return
+
+    # Update the userinfo within the existing token structure
+    if "userinfo" in existing_token:
+        existing_token["userinfo"].update(new_user_info)
+    else:
+        existing_token["userinfo"] = new_user_info
+
+    # Save updated token back to session
+    request.session[SessionKeys.SESSION_USER_TOKEN.value] = existing_token
+
+    logger.info(f"Session user info updated with: {list(new_user_info.keys())}")
 
 
 async def get_session_data_by_id(request: Request, session_id: str):

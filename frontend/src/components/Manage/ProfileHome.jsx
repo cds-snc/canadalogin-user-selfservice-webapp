@@ -1,20 +1,33 @@
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import {
   GcdsContainer,
   GcdsHeading,
   GcdsGrid,
   GcdsText,
+  GcdsLink,
 } from "@cdssnc/gcds-components-react";
 
 import { getPageContent } from "../../utils/functions.jsx";
-import { PAGES } from "../../utils/constants.jsx";
+import { PAGES, VITE_ENVIRONMENTS } from "../../utils/constants.jsx";
 import { useUser } from "../Providers/useUser.tsx";
 import VerifiedBadge from "../Badges/VerifiedBadge.jsx";
 import ViewContactPhoneNumber from "../../features/ContactPhoneNumber/components/ViewContactPhoneNumber.jsx";
 import ViewNameCard from "../../features/ProfileName/components/ViewProfileNameCard.jsx";
 import ViewLanguagePreferences from "../../features/LanguagePreference/components/ViewLanguagePreference.jsx";
+import { path } from "../../utils/routeHelpers.js";
+import config from "../../config.jsx";
 
-const DisplayEmailInfo = ({ email, pageContent }) => {
+const DisplayEmailInfo = ({ email, pageContent, language }) => {
+  const navigate = useNavigate();
+  const editEmail = path(PAGES.editEmailPage, {
+    language: language,
+  });
+
+  // Only show edit email link in dev and test environments
+  const showEditEmailLink =
+    config.environment === VITE_ENVIRONMENTS.dev ||
+    config.environment === VITE_ENVIRONMENTS.test;
+
   return (
     <>
       <GcdsHeading tag="h3" marginTop="300">
@@ -23,6 +36,18 @@ const DisplayEmailInfo = ({ email, pageContent }) => {
       <GcdsText>{pageContent["8"]}</GcdsText>
       <GcdsGrid columns="1fr auto" className="gridInline">
         <GcdsText>{email}</GcdsText>
+        {showEditEmailLink && (
+          <GcdsLink
+            href={editEmail}
+            size="regular"
+            onGcdsClick={(ev) => {
+              ev.preventDefault();
+              navigate(ev.detail);
+            }}
+          >
+            {pageContent["5"]}
+          </GcdsLink>
+        )}
       </GcdsGrid>
       <VerifiedBadge text={pageContent["9"]} />
     </>
@@ -37,7 +62,7 @@ export default function ProfileHome() {
   const phoneNumbers = state?.userProfile?.phoneNumbers || [];
 
   return (
-    <GcdsContainer>
+    <GcdsContainer role="main">
       <GcdsHeading tag="h1">{pageContent["1"]}</GcdsHeading>
       <GcdsHeading tag="h2">{pageContent["2"]}</GcdsHeading>
 
@@ -47,7 +72,11 @@ export default function ProfileHome() {
         {pageContent["6"]}
       </GcdsHeading>
       <GcdsContainer className="sectionCard">
-        <DisplayEmailInfo email={email} pageContent={pageContent} />
+        <DisplayEmailInfo
+          email={email}
+          pageContent={pageContent}
+          language={language}
+        />
 
         <div className="separator" />
         <ViewContactPhoneNumber

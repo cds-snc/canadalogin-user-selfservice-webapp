@@ -3,8 +3,8 @@
     "1": "Votre adresse courriel a bien été vérifiée",
     "3": "Créer un mot de passe",
     "4": "Votre mot de passe doit être une phrase ou une série de mots que personne ne peut reconnaître à part vous. Il doit être composé",
-    "5": "d’au moins",
-    "6": "caractères. Vous pouvez utiliser plusieurs mots séparés par des espaces pour atteindre la limite de caractères.",
+    "5": "d’au moins {minPasswordLength} caractères",
+    "6": "Vous pouvez utiliser plusieurs mots séparés par des espaces pour atteindre la limite de caractères.",
     "7": "Conseils de sécurité pour les mots de passe",
     "8": "Plus le mot de passe est long et inhabituel, plus il est difficile à deviner. Évitez donc d’utiliser des phrases courantes. Évitez également de réutiliser un mot de passe que vous utilisez pour d’autres comptes en ligne (banques, courriels ou encore réseaux sociaux). Vous pouvez inclure des majuscules, des chiffres ou des caractères spéciaux, mais cela est facultatif.",
     "9": "Mot de passe",
@@ -33,6 +33,7 @@
     "11": "Veuillez entrer un nom de famille pour continuer. Si vous n’avez qu’un seul nom, entrez-le dans le champ destiné au nom de famille.",
     "12": "and a maximum of",
     "13": "caractères.",
+    "example_password_used": "Invalid password. Password cannot be the example password. Try again.",
     "CSIAM0010E": "La tentative d'authentification a échoué",
     "CSIAM0011E": "Le code de vérification n'est pas valide ou a expiré.",
     "CSIAM0038E": "Trop de tentatives",
@@ -41,8 +42,8 @@
     "CSIBN0028E": "Le code de vérification n'est pas valide ou a expiré.",
     "CSIBN0021E": "Le code de vérification n'est pas valide.",
     "CSIBH0044E": "L’adresse courriel et le mot de passe ne correspondent pas.",
-    "CSIAI0369E": "Invalid password. Password cannot be the example password. Try again",
-    "CSIAI0370E": "The password has been found in security breach lists. Please choose a different, stronger password."
+    "CSIAI0369E": "We could not validate this password. Try again.",
+    "CSIAI0370E": "This password is too easy to guess. Choose a stronger password."
   },
   "RegisterVerification": {
     "1": "Protégez votre compte avec la vérification en deux étapes",
@@ -76,7 +77,7 @@
     "18": "Connectez-vous avec Connextion GC",
     "19": "pour accéder à vôtre",
     "20": "compte",
-    "21": "Utiliser un autre numéro de téléphone",
+    "21": "Essayer une autre méthode",
     "22": "Consultez vos courriels",
     "23": "Nous avons envoyé un courriel contenant un code à 6 chiffres à l’adresse :",
     "24": "Le courriel pourrait prendre quelques minutes à arriver. Si vous ne voyez pas le courriel, vérifiez s’il se trouve dans votre dossier de pourriels.",
@@ -84,7 +85,8 @@
     "26": "Demander un nouveau code",
     "27": "Annuler",
     "28": "Configurer la vérification par message texte (SMS)",
-    "29": "Configurez la vérification par appel vocal"
+    "29": "Configurez la vérification par appel vocal",
+    "30": "Je n’ai pas accès à mon téléphone"
   },
   "Button": {
     "submit": "Continuer",
@@ -98,9 +100,9 @@
   },
   "ProfileUpdateNameConfirmUpdate": {
     "1": "Voulez-vous vraiment modifier votre nom?",
-    "2": "Vous avez demandé à remplacer votre nom par le nom suivant:",
+    "2": "Vous avez demandé à remplacer votre nom par le nom suivant :",
     "3": "Exemple: Nouveau nom",
-    "4": "Cette action modifiera votre nom pour les services suivants:",
+    "4": "Cette action modifiera votre nom pour les services suivants :",
     "5": "GEO.ca",
     "6": "Attention",
     "7": "Cette action",
@@ -265,7 +267,7 @@
     "1": "Voulez-vous vraiment mettre à jour votre langue de communication?",
     "2": "Vous avez demandé à changer votre langue de communication pour la langue suivante:",
     "3": "Exemple : Nouveau nom",
-    "4": "Cette action entraîne la modification de votre langue de communication pour les services suivants:",
+    "4": "Cette action entraîne la modification de votre langue de communication pour les services suivants :",
     "5": "GEO.ca",
     "6": "Attention",
     "7": "Ceci",
@@ -302,14 +304,12 @@
     "12": "Des frais d’opérateur peuvent s’appliquer."
   },
   "PasswordChangedConfirmation": {
-    "1": "Your email has been updated to",
-    "2": "You may need to update your email other places",
-    "3": "This only changes your email with services connected to your GC Sign in.",
-    "4": "If you are trying to update your email with a service that’s not connected to your GC Sign in, you’ll need to go to that account.",
-    "5": "To search for another GC Account, visit the",
-    "6": "GC Account directory.",
-    "7": "Back to profile",
-    "8": "Sign out"
+    "1": "Votre mot de passe a été modifié",
+    "2": "Vous devrez vous connecter à l'aide de votre nouveau mot de passe",
+    "3": "Vous serez redirigé vers la page de connexion dans",
+    "4": "secondes",
+    "5": "Si vous n'êtes pas automatiquement redirigé, utilisez le bouton ci-dessous",
+    "6": "Se connecter"
   },
   "TopNavBar": {
     "1": "Connexion GC",
@@ -323,12 +323,15 @@
     "9": "Échec de la déconnexion. Redirection..."
   },
   "ServicesWithAccessInfo": {
-    "1": "Services ayant accès à votre nom",
-    "2": "Les services suivants ont accès à votre nom par le biais de Connexion GC:",
+    "1": "Services ayant accès à votre {information}",
+    "2": "Les services suivants ont accès à votre {information} par le biais de Connexion GC :",
     "3": "GEO.ca",
-    "4": "Si vous cherchez à mettre à jour votre nom pour un service qui n’est pas lié à votre compte Connexion GC, vous devez le faire depuis le compte que vous possédez pour le service en question.",
+    "4": "Si vous cherchez à mettre à jour votre {information} pour un service qui n’est pas lié à votre compte Connexion GC, vous devez le faire depuis le compte que vous possédez pour le service en question.",
     "5": "Pour rechercher un autre compte du GC, consultez le",
-    "6": "répertoire des comptes du GC."
+    "6": "répertoire des comptes du GC",
+    "7": "nom",
+    "8": "numéro de téléphone de communication",
+    "9": "langue de communication"
   },
   "EnterNewPhoneNumber": {
     "1": "Entrez un nouveau numéro de téléphone",
@@ -349,9 +352,9 @@
   },
   "ConfirmContactPhoneNumberUpdate": {
     "1": "Voulez-vous vraiment modifier votre numéro de téléphone de communication?",
-    "2": "Vous avez demandé à remplacer votre nom par le nom suivant:",
+    "2": "Vous avez demandé à remplacer votre nom par le nom suivant :",
     "3": "Exemple Newname",
-    "4": "Cette action modifiera votre numéro de téléphone de communication pour les services suivants:",
+    "4": "Cette action modifiera votre numéro de téléphone de communication pour les services suivants :",
     "5": "GEO.ca",
     "6": "Cette action ne modifie que votre",
     "7": "numéro de téléphone de communication.",
@@ -388,7 +391,7 @@
     "3": "Secondes étapes possibles",
     "4": "Vous pouvez recevoir des codes de vérification à usage unique aux numéros suivants.",
     "5": "Téléphone",
-    "6": "Les codes de vérification sont envoyés par:",
+    "6": "Les codes de vérification sont envoyés par :",
     "7": "Message texte",
     "8": "Appel vocal",
     "9": "Supprimer",
@@ -483,5 +486,44 @@
     "6": "Réinitialiser le mot de passe",
     "7": "Pour ajouter un numéro de téléphone,",
     "8": "Pour supprimer un numéro de téléphone,"
+  },
+  "EditEmailEnterEmail": {
+    "1": "Enter a new email address",
+    "2": "Changing your email address will affect:",
+    "3": "The email address you use to sign in",
+    "4": "The email address that GC Sign in uses to contact you",
+    "5": "The email address that services connected to your GC Sign in may use to contact you",
+    "6": "Email"
+  },
+  "EmailOtpValidation": {
+    "1": "Check your email",
+    "2": "We have sent an email with a 6-digit code to:",
+    "3": "Your email might take a few minutes to arrive. If you do not get an email, check your spam folder.",
+    "4": "Your code will expire in",
+    "5": "10 minutes.",
+    "6": "6-digit code",
+    "7": "Problems with the code?",
+    "8": "Use a different email",
+    "9": "You can request a new code in",
+    "10": "seconds",
+    "11": "Request a new code"
+  },
+  "EmailConfirmUpdate": {
+    "1": "Are you sure you want to update your email?",
+    "2": "You’ve requested to update your email to:",
+    "3": "This will update the email you use to sign in, as well as the email the following services use to contact you:",
+    "4": "GEO.ca",
+    "5": "Yes, update"
+  },
+  "EmailUpdateSuccess": {
+    "1": "Your email has been updated to",
+    "2": "You may need to update your email other places",
+    "3": "This only changes your email with services connected to your GC Sign in.",
+    "4": "If you are trying to update your email with a service that’s not connected to your GC Sign in, you’ll need to go to that account.",
+    "5": "To search for another GC Account, visit the",
+    "6": "GC Account directory",
+    "7": ".",
+    "8": "Back to profile",
+    "9": "Sign out"
   }
 }

@@ -1,6 +1,6 @@
 import logging
 from typing import Optional
-from fastapi import HTTPException, Request
+from fastapi import HTTPException, Request, status
 
 from app.users.schemas import (
     IBMVerifyRelyingPartyUserApplicationsSchema,
@@ -58,7 +58,9 @@ async def get_relying_party_info(request: Request):
         )
         if not relying_party_client_id:
             logger.info("Relying party client ID not found in session")
-            raise HTTPException(status_code=400, detail="RP Client ID not found")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="RP Client ID not found"
+            )
         ibm_verify_oidc_applications_response = (
             await dispatch_get_oidc_user_applications(request)
         )
@@ -70,7 +72,10 @@ async def get_relying_party_info(request: Request):
 
         if not rp_info:
             logger.error(f"Relying party with ID {relying_party_client_id} not found")
-            raise HTTPException(status_code=404, detail="Relying party info not found")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Relying party info not found",
+            )
 
         logger.info(f"Relying party profile: {rp_info}")
         return RelyingPartyResponse(

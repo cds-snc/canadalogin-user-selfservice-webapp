@@ -42,6 +42,13 @@ export const FLOW_TYPES = {
   manage: "manage",
 };
 
+export const ServicesWithAccessInfoSectionInformation = {
+  NAME: "name",
+  CONTACT_PHONE_NUMBER: "contactPhoneNumber",
+  LANGUAGE_PREFERENCE: "languagePreference",
+  EMAIL_ADDRESS: "emailAddress",
+};
+
 export const LINK_SUBMIT_TYPES = {
   useNewVerification: "useNewVerification",
   requestNewCode: "requestNewCode",
@@ -66,21 +73,17 @@ export const PAGES = {
   error: "Error",
   manageDashboard: "ManageDashboard",
   ProfileHome: "ProfileHome",
-  CheckYourEmail: "CheckYourEmail",
-  CompleteTwoStepVerification: "CompleteTwoStepVerification",
-  FirstVerifyItsYou: "FirstVerifyItsYou",
-  EnterNewEmail: "EnterNewEmail",
   profileUpdateNameSuccess: "ProfileUpdateNameSuccess",
   profileUpdateNameConfirmUpdate: "ProfileUpdateNameConfirmUpdate",
   profileUpdateName: "ProfileUpdateName",
-  areYouSureUpdateContactNumber: "AreYouSureUpdateContactNumber",
+  editProfileNamePage: "EditProfileNamePage",
   enterNewPhoneNumber: "EnterNewPhoneNumber",
-  youMayUpdateEmailAtOtherPlaces: "YouMayUpdateEmailAtOtherPlaces",
-  areYouSureUpdateYourEmail: "AreYouSureUpdateYourEmail",
   securitySettings: "SecuritySettings",
   editLanguagePreferences: "EditLanguagePreferences",
+  editLanguagePreferencePage: "EditLanguagePreferencePage",
   confirmLanguageUpdate: "ConfirmLanguageUpdate",
   successfullyUpdatedLanguage: "SuccessfullyUpdatedLanguage",
+  editContactPhoneNumberPage: "EditContactPhoneNumberPage",
   passwordChangedConfirmation: "PasswordChangedConfirmation",
   ServicesWithAccessInfo: "ServicesWithAccessInfo",
   confirmContactPhoneNumberUpdate: "ConfirmContactPhoneNumberUpdate",
@@ -97,6 +100,11 @@ export const PAGES = {
   transientOtpSelection: "TransientOtpSelection",
   successBanner: "SuccessBanner",
   passwordVerification: "PasswordVerification",
+  editEmailPage: "EditEmailPage",
+  editEmailEnterEmail: "EditEmailEnterEmail",
+  emailOtpValidation: "EmailOtpValidation",
+  emailConfirmUpdate: "EmailConfirmUpdate",
+  emailUpdateSuccess: "EmailUpdateSuccess",
 };
 
 export const FOOTERS = {
@@ -116,11 +124,12 @@ export const SERVICES = [
 ];
 
 // Map frontend FLOW_TYPES to backend otpType
-// Backend: sms | voice
-// Frontend: smsotp | voiceotp
+// Backend: sms | voice | email
+// Frontend: smsotp | voiceotp | email
 export const serverMapping = {
   [FLOW_TYPES.sms]: "sms",
   [FLOW_TYPES.voice]: "voice",
+  [FLOW_TYPES.email]: "email",
 };
 
 export const SUBMIT_END_POINTS = {
@@ -135,6 +144,7 @@ export const SUBMIT_END_POINTS = {
   mfaVerify: "/v1/otp/mfa/verify",
   mfaDelete: "/v1/otp/mfa/delete",
   profile: "/v1/users/profile",
+  profileUpdateWithOtp: "/v1/users/profile/update-with-otp",
   rp_info: "/v1/users/rp_info",
   users: "/v1/users",
   passwordUpdate: "/v1/password/update",
@@ -158,6 +168,13 @@ export const GA_LABELS = {
   text: "Text",
   input: "Input",
   email: "Email",
+};
+
+export const VITE_ENVIRONMENTS = {
+  dev: "dev",
+  test: "test",
+  staging: "staging",
+  prod: "prod",
 };
 
 export const countryMapping = {

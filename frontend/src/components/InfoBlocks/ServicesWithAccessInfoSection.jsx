@@ -1,21 +1,56 @@
 import { GcdsDetails, GcdsText, GcdsLink } from "@cdssnc/gcds-components-react";
-import { getPageContent } from "../../utils/functions.jsx";
-import { EXTERNAL_NAVIGATION_LINKS, PAGES } from "../../utils/constants.jsx";
+import {
+  getContentWithVariables,
+  getPageContent,
+} from "../../utils/functions.jsx";
+import {
+  EXTERNAL_NAVIGATION_LINKS,
+  PAGES,
+  ServicesWithAccessInfoSectionInformation,
+} from "../../utils/constants.jsx";
+import RPNameDisplay from "../RPInfo/RPNameDisplay.jsx";
 
-export default function ServicesWithAccessInfoSection({ currentLang }) {
+export default function ServicesWithAccessInfoSection({
+  currentLang,
+  information,
+}) {
   const pageContentJson = getPageContent(
     currentLang,
     PAGES.ServicesWithAccessInfo,
   );
+  const informationMap = {
+    [ServicesWithAccessInfoSectionInformation.NAME]: pageContentJson["7"],
+    [ServicesWithAccessInfoSectionInformation.CONTACT_PHONE_NUMBER]:
+      pageContentJson["8"],
+    [ServicesWithAccessInfoSectionInformation.LANGUAGE_PREFERENCE]:
+      pageContentJson["9"],
+    [ServicesWithAccessInfoSectionInformation.EMAIL_ADDRESS]:
+      pageContentJson["10"],
+  };
+
   return (
-    <GcdsDetails detailsTitle={pageContentJson["1"]}>
+    <GcdsDetails
+      detailsTitle={getContentWithVariables(pageContentJson["1"], {
+        information: informationMap[information],
+      })}
+    >
       <GcdsText>
-        <span>{pageContentJson["2"]}</span>
+        <span>
+          {getContentWithVariables(pageContentJson["2"], {
+            information: informationMap[information],
+          })}
+        </span>
       </GcdsText>
       <ul style={{ margin: 0 }}>
-        <li>{pageContentJson["3"]}</li>
+        <li>
+          <RPNameDisplay rpName={pageContentJson["3"]} />
+        </li>
       </ul>
-      <GcdsText>{pageContentJson["4"]}</GcdsText>
+      <GcdsText>
+        {getContentWithVariables(pageContentJson["4"], {
+          information: informationMap[information],
+        })}
+      </GcdsText>
       <GcdsText>
         {pageContentJson["5"]}&nbsp;
         <GcdsLink href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}>

@@ -142,7 +142,12 @@ const mockUserState = {
       formatted: "John Doe",
     },
   },
-  relyingPartyInfo: null,
+  relyingPartyInfo: {
+    icon: "test-icon.png",
+    id: "test-service-id",
+    linkName: "Test Service",
+    url: "https://test-service.example.com",
+  },
   authenticatedPages: [],
 };
 
