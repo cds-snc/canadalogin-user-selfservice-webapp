@@ -154,7 +154,10 @@ vi.mock("../../../services/authService.jsx", () => ({
   authService: {
     logout: vi.fn(() =>
       Promise.resolve({
-        data: { redirect_url: "https://mock-logout-success.example.com" },
+        status: 200,
+        data: {
+          data: { redirect_url: "https://mock-logout-success.example.com" },
+        },
       }),
     ),
   },
@@ -320,9 +323,8 @@ describe("SuccessfullyUpdatedName", () => {
       vi.runAllTimers();
     });
 
-    expect(window.location.href).toBe(
-      "https://mock-logout-success.example.com",
-    );
+    // Since POST is being used, no more redirect is correct logic
+    expect(window.location.href).toBe("");
   });
 
   it("handles logout error gracefully", async () => {

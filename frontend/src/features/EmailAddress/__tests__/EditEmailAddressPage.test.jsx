@@ -195,7 +195,8 @@ vi.mock("../../../components/Providers/useUser", () => ({
 vi.mock("../../../services/authService", () => ({
   authService: {
     logout: vi.fn().mockResolvedValue({
-      data: { redirect_url: "https://logout.example.com" },
+      status: 200,
+      data: { data: { redirect_url: "https://logout.example.com" } },
     }),
     update_email_with_otp: vi.fn().mockResolvedValue({
       success: true,
@@ -583,8 +584,8 @@ describe("EditEmailAddressPage Integration Tests", () => {
         fireEvent.click(signOutBtn);
       });
 
-      // Should redirect
-      expect(window.location.href).toBe("https://logout.example.com");
+      // Since POST is being used, no more redirect is correct logic
+      expect(window.location.href).toBe("");
     });
   });
 
