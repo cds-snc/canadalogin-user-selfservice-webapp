@@ -103,6 +103,7 @@ class IBMVerifyUserProfileSchema(BaseModel):
 class UserProfileUpdateRequest(BaseModel):
     preferredLanguage: Optional[str] = None
     name: Optional[UserProfileName] = None
+    userName: EmailStr
     userId: str
     emails: Optional[List[EmailItem]] = None
     phoneNumbers: Optional[List[MetaDataTypeValue]] = None

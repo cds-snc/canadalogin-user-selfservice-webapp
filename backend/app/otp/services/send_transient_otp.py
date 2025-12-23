@@ -112,6 +112,8 @@ async def handle_otp_send(
             my_profile_response.data.model_dump(), user_otp_info.userId
         )
 
+        logger.info("User verified to send OTP")
+
         # Get user's preferred language from profile
         user_language = my_profile_response.data.preferredLanguage or "en"
         logger.info(f"Using user's preferred language: {user_language}")
