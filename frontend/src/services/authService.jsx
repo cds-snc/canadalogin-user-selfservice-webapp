@@ -166,7 +166,35 @@ export const authService = {
       const response = await axios.post(
         `${config.apiUrl}${SUBMIT_END_POINTS.logout}`,
       );
-      return response.data;
+      const returnedUrl = response?.data?.data?.redirect_url;
+
+      // Check if response has redirect_url
+      if (response?.status === 200 && returnedUrl) {
+        // redirect_url is a GET url with query params
+        // converting to a POST call, and make the POST call
+
+        const postUrl = new URL(returnedUrl);
+        const params = Object.fromEntries(postUrl.searchParams);
+
+        // Create a form and submit it as POST
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = postUrl.origin + postUrl.pathname;
+
+        Object.entries(params).forEach(([key, value]) => {
+          const input = document.createElement("input");
+          input.type = "hidden";
+          input.name = key;
+          input.value = value;
+          form.appendChild(input);
+        });
+
+        document.body.appendChild(form);
+        // Use HTMLFormElement.prototype.submit to avoid naming conflicts
+        HTMLFormElement.prototype.submit.call(form);
+      }
+
+      return response;
     } catch (error) {
       handleApiError(error);
     }
