@@ -9,12 +9,25 @@ import config from "../../config.jsx";
 
 import { GcdsContainer, GcdsText } from "@cdssnc/gcds-components-react";
 
+const DisplayReleaseVersion = () => {
+  const { releaseTag } = config;
+
+  if (!releaseTag) {
+    return null;
+  }
+
+  return (
+    <GcdsContainer size="lg" className="gcds-content version-text">
+      <GcdsText marginBottom="0">Version: {releaseTag}</GcdsText>
+    </GcdsContainer>
+  );
+};
+
 export default function RootLayout() {
   const { pathname } = useLocation();
   const { state: languageState } = useLanguage();
   const { language } = languageState;
   const { langHref } = getLangValues(language, pathname);
-  const { releaseTag } = config;
   useEffect(() => {
     trackPage(pathname);
   }, [pathname]);
@@ -26,9 +39,7 @@ export default function RootLayout() {
         <GcdsContainer size="lg" className="gcds-content" id="main-content">
           <Outlet />
         </GcdsContainer>
-        <GcdsContainer size="lg" className="gcds-content version-text">
-          <GcdsText marginBottom="0">Version: {releaseTag}</GcdsText>
-        </GcdsContainer>
+        <DisplayReleaseVersion />
       </GcdsContainer>
 
       <Footer currentLang={language} />
