@@ -10,9 +10,9 @@ pydantic==2.12.5
 httpx==0.28.1
 email-validator==2.3.0
 pydantic-extra-types==2.10.6
-phonenumbers==9.0.19
+phonenumbers==9.0.20
 cachetools==5.5.2
-authlib==1.6.5
+authlib==1.6.6
 itsdangerous==2.2.0
 starsessions==2.2.1
 PyJWT==2.10.1
