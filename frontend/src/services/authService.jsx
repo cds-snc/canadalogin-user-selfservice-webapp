@@ -194,7 +194,7 @@ export const authService = {
         HTMLFormElement.prototype.submit.call(form);
       }
 
-      return response;
+      return response.data;
     } catch (error) {
       handleApiError(error);
     }

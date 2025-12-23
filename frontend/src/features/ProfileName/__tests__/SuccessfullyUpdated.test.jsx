@@ -154,10 +154,7 @@ vi.mock("../../../services/authService.jsx", () => ({
   authService: {
     logout: vi.fn(() =>
       Promise.resolve({
-        status: 200,
-        data: {
-          data: { redirect_url: "https://mock-logout-success.example.com" },
-        },
+        data: { redirect_url: "https://mock-logout-success.example.com" },
       }),
     ),
   },

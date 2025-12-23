@@ -195,8 +195,7 @@ vi.mock("../../../components/Providers/useUser", () => ({
 vi.mock("../../../services/authService", () => ({
   authService: {
     logout: vi.fn().mockResolvedValue({
-      status: 200,
-      data: { data: { redirect_url: "https://logout.example.com" } },
+      data: { redirect_url: "https://logout.example.com" },
     }),
     update_email_with_otp: vi.fn().mockResolvedValue({
       success: true,

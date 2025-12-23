@@ -36,10 +36,10 @@ export default function SuccessfullyUpdated({
 
     try {
       const response = await authService.logout();
-      const redirectUrl = response?.data?.data?.redirect_url;
+      const redirectUrl = response?.data?.redirect_url || null;
 
-      // Check if response has redirect_url and redirect
-      if (response?.status === 200 && redirectUrl) {
+      // Check if response has redirect_url
+      if (redirectUrl) {
         // form been submitted in authService.logout
         return;
       } else {
