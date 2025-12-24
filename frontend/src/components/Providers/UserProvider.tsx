@@ -306,9 +306,12 @@ export function UserProvider({
   const handleLogout = async () => {
     try {
       const response = await authService.logout();
-      // Check if response has redirect_url and redirect
-      if (response && response.data && response.data.redirect_url) {
-        window.location.href = response.data.redirect_url;
+      const redirectUrl = response?.data?.redirect_url || null;
+
+      // Check if response has redirect_url
+      if (redirectUrl) {
+        // form been submitted in authService.logout
+        return;
       } else {
         // Fallback redirect if no redirect_url provided
         window.location.href = "/";
