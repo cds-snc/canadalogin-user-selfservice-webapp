@@ -110,9 +110,12 @@ export default function ChangePasswordIndex() {
 
     try {
       const response = await authService.logout();
+      const redirectUrl = response?.data?.redirect_url || null;
 
-      if (response && response.data && response.data.redirect_url) {
-        window.location.href = response.data.redirect_url;
+      // Check if response has redirect_url
+      if (redirectUrl) {
+        // form been submitted in authService.logout
+        return;
       } else {
         // Fallback redirect if no redirect_url provided
         window.location.href = "/";

@@ -320,9 +320,8 @@ describe("SuccessfullyUpdatedName", () => {
       vi.runAllTimers();
     });
 
-    expect(window.location.href).toBe(
-      "https://mock-logout-success.example.com",
-    );
+    // Since POST is being used, no more redirect is correct logic
+    expect(window.location.href).toBe("");
   });
 
   it("handles logout error gracefully", async () => {

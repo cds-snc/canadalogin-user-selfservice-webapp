@@ -583,8 +583,8 @@ describe("EditEmailAddressPage Integration Tests", () => {
         fireEvent.click(signOutBtn);
       });
 
-      // Should redirect
-      expect(window.location.href).toBe("https://logout.example.com");
+      // Since POST is being used, no more redirect is correct logic
+      expect(window.location.href).toBe("");
     });
   });
 
