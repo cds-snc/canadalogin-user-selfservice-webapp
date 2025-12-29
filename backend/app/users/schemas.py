@@ -103,7 +103,8 @@ class IBMVerifyUserProfileSchema(BaseModel):
 class UserProfileUpdateRequest(BaseModel):
     preferredLanguage: Optional[str] = None
     name: Optional[UserProfileName] = None
-    userId: str
+    userId: Optional[str] = None
+    userName: Optional[EmailStr] = None  # refactor required so that userID is not confused with userName
     emails: Optional[List[EmailItem]] = None
     phoneNumbers: Optional[List[MetaDataTypeValue]] = None
     model_config = ConfigDict(validate_by_name=True, validate_by_alias=True)

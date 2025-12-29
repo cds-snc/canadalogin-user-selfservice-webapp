@@ -20,6 +20,23 @@ from app.utils.mask_email_address import mask_individual_email_address, mask_pro
 logger = logging.getLogger(__name__)
 
 
+def mask_profile_details(profile_data: dict) -> dict:
+    """
+    Mask sensitive details in the user profile data.
+
+    Args:
+        profile_data: User profile data dictionary
+    Returns:
+        dict: Profile data with masked sensitive details
+    """
+    profile_data["phoneNumbers"] = mask_contact_phone_numbers(profile_data)
+    profile_data["emails"] = mask_profile_email_addresses(profile_data)
+    profile_data["userName"] = mask_individual_email_address(
+        profile_data.get("userName", "")
+    )
+    return profile_data
+
+
 async def update_profile_for_verified_changes(
     request: Request,
     user_data: UserProfileUpdateRequest,
@@ -89,7 +106,8 @@ async def update_profile_for_verified_changes(
             detail="Request data validation error",
         )
 
-    json_data["phoneNumbers"] = mask_contact_phone_numbers(json_data)
+    # json_data["phoneNumbers"] = mask_contact_phone_numbers(json_data)
+    json_data = mask_profile_details(json_data)
 
     try:
         response_data = IBMVerifyUserProfileSchema(**json_data)
@@ -223,11 +241,12 @@ async def update_my_profile(
             detail="Request data validation error",
         )
 
-    json_data["phoneNumbers"] = mask_contact_phone_numbers(json_data)
-    json_data["emails"] = mask_profile_email_addresses(json_data)
-    json_data["userName"] = mask_individual_email_address(
-        json_data.get("userName", "")
-    )
+    # json_data["phoneNumbers"] = mask_contact_phone_numbers(json_data)
+    # json_data["emails"] = mask_profile_email_addresses(json_data)
+    # json_data["userName"] = mask_individual_email_address(
+    #     json_data.get("userName", "")
+    # )
+    json_data = mask_profile_details(json_data)
 
     try:
         response_data = IBMVerifyUserProfileSchema(**json_data)

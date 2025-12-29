@@ -136,7 +136,7 @@ async def handle_otp_send(
                 # The field validator will automatically format it using PhoneNumber
                 resolved_user_otp_info = UserOtpInfo(
                     phoneNumber=actual_phone,
-                    userName=user_otp_info.userName,
+                    userId=user_otp_info.userId,
                     otpType=user_otp_info.otpType,
                 )
                 logger.info("Successfully resolved masked phone number")
