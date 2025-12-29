@@ -70,6 +70,31 @@ jobs:
 
           curl -X POST -H 'Content-type: application/json' --data "$json" ${{ secrets.GC_SIGNIN_OPS_SLACK_INFO_WEBHOOK }}
 
+  # Detect the release tag on the current commit and expose it as a job output.
+  detect-release-tag:
+    runs-on: ubuntu-latest
+    outputs:
+      release_tag: ${{ steps.detect-release-tag.outputs.release_tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Fetch tags
+        run: git fetch --prune --unshallow --tags
+
+      - name: Detect release tag on current commit
+        id: detect-release-tag
+        run: |
+          RELEASE_TAG=$(git tag --points-at "$GITHUB_SHA" | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1 || true)
+
+          if [ -z "$RELEASE_TAG" ]; then
+            echo "No release tag (vX.Y.Z) found on this commit."
+          else
+            echo "Found release tag: '$RELEASE_TAG'"
+          fi
+
+          echo "release_tag=$RELEASE_TAG" >> "$GITHUB_OUTPUT"
+
   # Builds the frontend application for the current SHA and stores the artifact in S3.
   build-frontend:
     runs-on: ubuntu-latest
@@ -77,7 +102,7 @@ jobs:
       matrix:
         environment: [dev, test, staging, prod]
     environment: ${{ matrix.environment }}
-    needs: notify-slack-about-deploy
+    needs: [notify-slack-about-deploy, detect-release-tag]
     steps:
       - name: Checkout repository
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
@@ -114,26 +139,10 @@ jobs:
   build-backend:
     runs-on: ubuntu-latest
     environment: dev
-    needs: [notify-slack-about-deploy, release-please]
+    needs: [notify-slack-about-deploy, release-please, detect-release-tag]
     steps:
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-
-      - name: Fetch tags
-        run: git fetch --prune --unshallow --tags
-
-      - name: Detect release tag on current commit
-        id: detect-release-tag
-        run: |
-          RELEASE_TAG=$(git tag --points-at "$GITHUB_SHA" | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1 || true)
-
-          if [ -z "$RELEASE_TAG" ]; then
-            echo "No release tag (vX.Y.Z) found on this commit."
-          else
-            echo "Found release tag: '$RELEASE_TAG'"
-          fi
-
-          echo "release_tag=$RELEASE_TAG" >> "$GITHUB_OUTPUT"
 
       - name: Audit DNS requests
         uses: cds-snc/dns-proxy-action@main
@@ -159,7 +168,7 @@ jobs:
 
           # Set ENV variables
           BUILD_TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          RELEASE_TAG="${{ steps.detect-release-tag.outputs.release_tag }}"
+          RELEASE_TAG="${{ needs.detect-release-tag.outputs.release_tag }}"
 
           # Set the Release Tag as a App Version if it exists, otherwise use date+SHA
           if [ -n "$RELEASE_TAG" ]; then
@@ -185,9 +194,9 @@ jobs:
           docker push "${{ vars.ARTIFACT_ECR_REPOSITORY }}:latest"
 
       - name: Tag and push Docker image (Release tag)
-        if: steps.detect-release-tag.outputs.release_tag != ''
+        if: needs.detect-release-tag.outputs.release_tag != ''
         run: |
-          RELEASE_TAG="${{ steps.detect-release-tag.outputs.release_tag }}"
+          RELEASE_TAG="${{ needs.detect-release-tag.outputs.release_tag }}"
 
           docker tag \
             "${{ vars.ARTIFACT_ECR_REPOSITORY }}:$GITHUB_SHA" \
