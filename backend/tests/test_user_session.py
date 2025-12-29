@@ -445,7 +445,7 @@ async def test_ensure_user_token_refreshes_and_updates_session():
         patch(
             "app.auth.services.auth_user_session.oauth.verify",
             mock_oauth_verify,
-            create=True
+            create=True,
         ),
     ):
         result = await auth_user_session.ensure_user_token(mock_request)
