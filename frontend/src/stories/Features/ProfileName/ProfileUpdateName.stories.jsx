@@ -7,6 +7,7 @@ export default {
   title: "GC Sign In/Features/ProfileName/ProfileUpdateName",
   component: ProfileUpdateName,
   decorators: [
+    // eslint-disable-next-line no-unused-vars
     (Story) => (
       <UserProvider
         initial={{
