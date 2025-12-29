@@ -15,6 +15,7 @@ from app.utils.mask_phone_number import mask_contact_phone_numbers
 from app.utils.request_error_handler import RequestErrorHandler
 from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
 from app.utils.validate_user_request_match import validate_user_request_match
+from app.utils.mask_email_address import mask_individual_email_address, mask_profile_email_addresses
 
 logger = logging.getLogger(__name__)
 
@@ -223,6 +224,10 @@ async def update_my_profile(
         )
 
     json_data["phoneNumbers"] = mask_contact_phone_numbers(json_data)
+    json_data["emails"] = mask_profile_email_addresses(json_data)
+    json_data["userName"] = mask_individual_email_address(
+        json_data.get("userName", "")
+    )
 
     try:
         response_data = IBMVerifyUserProfileSchema(**json_data)
