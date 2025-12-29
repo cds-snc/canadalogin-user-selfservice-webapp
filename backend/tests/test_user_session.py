@@ -104,7 +104,7 @@ async def test_refresh_token_calls_oauth_and_returns_tokens():
     mock_oauth.verify = MagicMock(fetch_access_token=mock_fetch)
 
     with patch("app.auth.services.auth_user_session.oauth", new=mock_oauth):
-        tokens = await auth_user_session.refresh_token("refresh-xyz")
+        tokens = await auth_user_session.refresh_user_token("refresh-xyz")
         assert tokens.get("access_token") == "new-at"
 
 
@@ -236,7 +236,7 @@ async def test_refresh_token_raises_on_error():
     )
     with patch("app.auth.services.auth_user_session.oauth", new=mock_oauth):
         with pytest.raises(OAuthError):
-            await auth_user_session.refresh_token("r1")
+            await auth_user_session.refresh_user_token("r1")
 
 
 @pytest.mark.asyncio
@@ -423,27 +423,37 @@ async def test_get_users_current_session_raises_when_no_token():
 async def test_ensure_user_token_refreshes_and_updates_session():
     mock_request = MagicMock()
     # existing user token that is about to expire
-    # Note: the implementation mistakenly binds a local variable named "refresh_token"
-    # and then calls it. To match current behavior, make the stored refresh_token a callable.
     new_token = {"access_token": "at-new", "userinfo": {"sid": "s1"}}
-    refresh_callable = AsyncMock(return_value=new_token)
     old_token = {
         "expires_at": 1,
-        "refresh_token": refresh_callable,
+        "refresh_token": "refresh-token-value",
         "userinfo": {"sid": "s1"},
     }
     mock_request.session = {
         SessionKeys.SESSION_USER_TOKEN.value: old_token,
         SessionKeys.SESSION_USER_ACCESS_TOKEN_KEY.value: "at-old",
     }
+
+    # Mock the oauth.verify client and its fetch_access_token method
+    mock_oauth_verify = MagicMock()
+    mock_oauth_verify.fetch_access_token = AsyncMock(return_value=new_token)
+
     with (
         patch(
             "app.auth.services.auth_user_session.update_session_tokens", new=MagicMock()
         ) as mock_update,
+        patch(
+            "app.auth.services.auth_user_session.oauth.verify",
+            mock_oauth_verify,
+            create=True
+        ),
     ):
         result = await auth_user_session.ensure_user_token(mock_request)
         assert result == new_token
         mock_update.assert_called_once()
+        mock_oauth_verify.fetch_access_token.assert_called_once_with(
+            refresh_token="refresh-token-value", grant_type="refresh_token"
+        )
 
 
 @pytest.mark.asyncio
