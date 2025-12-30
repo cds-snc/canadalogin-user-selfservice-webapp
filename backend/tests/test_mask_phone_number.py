@@ -1,5 +1,5 @@
 import pytest
-from app.utils.mask_phone_number import mask_phone_number
+from app.utils.mask_profile_details import mask_phone_number
 from phonenumbers import NumberParseException
 
 

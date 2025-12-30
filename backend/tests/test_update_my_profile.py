@@ -30,9 +30,7 @@ DISPATCH_UPDATE_PROFILE_IMPORT_PATH = (
     "app.users.services.update_my_profile.dispatch_update_my_profile"
 )
 CONFIGURATION_IMPORT_PATH = "app.users.services.get_my_profile.get_configuration"
-MASK_PHONE_IMPORT_PATH = (
-    "app.users.services.update_my_profile.mask_contact_phone_numbers"
-)
+MASK_PHONE_IMPORT_PATH = "app.users.services.update_my_profile.mask_profile_details"
 DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH = (
     "app.users.services.update_my_profile.dispatch_get_my_profile_from_ibm"
 )
@@ -44,7 +42,7 @@ DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH = (
 @patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
 @patch(SANITIZE_PROFILE_IMPORT_PATH)
 async def test_update_profile_success(
-    mock_sanitize, mock_dispatch_get, mock_dispatch_update, mock_mask
+    mock_sanitize, mock_dispatch_get, mock_dispatch_update, mock_masked_profile
 ):
     # Arrange
     sanitized_data = {"userName": "john.doe@example.com", "preferredLanguage": "en"}
@@ -72,7 +70,11 @@ async def test_update_profile_success(
     # Mock dispatch_get_my_profile_from_ibm to return IBMVerifyUserProfileSchema
     mock_profile = IBMVerifyUserProfileSchema(**profile_data)
     mock_dispatch_get.return_value = mock_profile
-    mock_mask.return_value = []
+
+    mock_masked_profile.return_value = {
+        **profile_data,
+        "phoneNumbers": [],
+    }
 
     # Mock dispatch_update_user_profile response
     mock_response = Mock()
@@ -314,12 +316,12 @@ async def test_dispatch_update_user_profile_failure(monkeypatch):
 
 
 @pytest.mark.asyncio
-@patch("app.users.services.update_my_profile.mask_contact_phone_numbers")
+@patch("app.users.services.update_my_profile.mask_profile_details")
 @patch(DISPATCH_UPDATE_PROFILE_IMPORT_PATH)
 @patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
 @patch(SANITIZE_PROFILE_IMPORT_PATH)
 async def test_update_profile_masks_phone_numbers(
-    mock_sanitize, mock_dispatch_get, mock_dispatch_update, mock_mask
+    mock_sanitize, mock_dispatch_get, mock_dispatch_update, mock_mask_profile
 ):
     """Test that update_my_profile returns masked phone numbers in response."""
     # Arrange
@@ -366,7 +368,11 @@ async def test_update_profile_masks_phone_numbers(
         {"value": "+1-613-XXX-XX34", "type": "mobile"},
         {"value": "+1-613-XXX-XX78", "type": "work"},
     ]
-    mock_mask.return_value = masked_phones
+
+    mock_mask_profile.return_value = {
+        **mock_response.json(),
+        "phoneNumbers": masked_phones,
+    }
 
     user_data = UserProfileUpdateRequest(
         userName="john.doe@example.com", preferredLanguage="fr"
@@ -394,8 +400,8 @@ async def test_update_profile_masks_phone_numbers(
     assert response.data.phoneNumbers[1].type == "work"
 
     # Verify masking was called with updated profile data
-    mock_mask.assert_called_once()
-    mask_call_data = mock_mask.call_args[0][0]
+    mock_mask_profile.assert_called_once_with(updated_profile_data)
+    mask_call_data = mock_mask_profile.call_args[0][0]
     assert mask_call_data["userName"] == "john.doe@example.com"
     assert mask_call_data["preferredLanguage"] == "fr"
 
@@ -405,7 +411,7 @@ async def test_update_profile_masks_phone_numbers(
 
 
 @pytest.mark.asyncio
-@patch("app.users.services.update_my_profile.mask_contact_phone_numbers")
+@patch("app.users.services.update_my_profile.mask_profile_details")
 @patch(DISPATCH_UPDATE_PROFILE_IMPORT_PATH)
 @patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
 @patch(SANITIZE_PROFILE_IMPORT_PATH)
@@ -451,7 +457,11 @@ async def test_update_profile_prevents_username_change(
     mock_response = Mock()
     mock_response.json.return_value = updated_profile_data
     mock_dispatch_update.return_value = mock_response
-    mock_mask.return_value = []
+
+    mock_mask.return_value = {
+        **mock_response.json(),
+        "phoneNumbers": [],
+    }
 
     user_data = UserProfileUpdateRequest(
         userName="john.doe@example.com",
@@ -487,7 +497,7 @@ async def test_update_profile_prevents_username_change(
 
 
 @pytest.mark.asyncio
-@patch("app.users.services.update_my_profile.mask_contact_phone_numbers")
+@patch("app.users.services.update_my_profile.mask_profile_details")
 @patch(DISPATCH_UPDATE_PROFILE_IMPORT_PATH)
 @patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
 @patch(SANITIZE_PROFILE_IMPORT_PATH)
@@ -524,7 +534,11 @@ async def test_update_profile_with_no_phone_numbers_to_mask(
     mock_response = Mock()
     mock_response.json.return_value = updated_profile_data
     mock_dispatch_update.return_value = mock_response
-    mock_mask.return_value = []  # No phone numbers to mask
+
+    mock_mask.return_value = {
+        **mock_response.json(),
+        "phoneNumbers": [],
+    }
 
     user_data = UserProfileUpdateRequest(
         userName="john.doe@example.com", preferredLanguage="fr"
@@ -607,7 +621,10 @@ async def test_update_profile_for_verified_changes_success(
     mock_response = Mock()
     mock_response.json.return_value = updated_profile_data
     mock_dispatch_update.return_value = mock_response
-    mock_mask.return_value = []
+    mock_mask.return_value = {
+        **mock_response.json(),
+        "phoneNumbers": [],
+    }
 
     user_data = UserProfileUpdateRequest(
         userName="new.email@example.com", preferredLanguage="fr"
@@ -683,7 +700,11 @@ async def test_update_profile_for_verified_changes_with_email_update(
     mock_response = Mock()
     mock_response.json.return_value = updated_profile_data
     mock_dispatch_update.return_value = mock_response
-    mock_mask.return_value = []
+
+    mock_mask.return_value = {
+        **mock_response.json(),
+        "phoneNumbers": [],
+    }
 
     from app.users.schemas import EmailItem
 
@@ -764,7 +785,11 @@ async def test_update_profile_for_verified_changes_with_phone_masking(
 
     # Mock masked phone numbers
     masked_phones = [{"value": "+1 (***) ***-1234", "type": "mobile"}]
-    mock_mask.return_value = masked_phones
+
+    mock_mask.return_value = {
+        **mock_response.json(),
+        "phoneNumbers": masked_phones,
+    }
 
     from app.users.schemas import MetaDataTypeValue
 
@@ -1006,7 +1031,6 @@ async def test_update_profile_for_verified_changes_response_validation_error(
 
     mock_profile = IBMVerifyUserProfileSchema(**profile_data)
     mock_dispatch_get.return_value = mock_profile
-    mock_mask.return_value = []
 
     # Mock response with invalid data that will fail validation
     invalid_response_data = {
@@ -1017,6 +1041,11 @@ async def test_update_profile_for_verified_changes_response_validation_error(
     mock_response = Mock()
     mock_response.json.return_value = invalid_response_data
     mock_dispatch_update.return_value = mock_response
+
+    mock_mask.return_value = {
+        **mock_response.json(),
+        "phoneNumbers": [],
+    }
 
     user_data = UserProfileUpdateRequest(userName="john.doe@example.com")
     mock_request = Mock()

@@ -65,3 +65,19 @@ def mask_contact_phone_numbers(
         masked_phone["value"] = mask_phone_number(value)
         masked_phone_numbers.append(masked_phone)
     return masked_phone_numbers
+
+
+def mask_profile_details(profile_data: dict) -> dict:
+    """
+    Mask sensitive details in the user profile data.
+
+    Args:
+        profile_data: User profile data dictionary
+    Returns:
+        dict: Profile data with masked sensitive details
+    """
+    profile_data["phoneNumbers"] = mask_contact_phone_numbers(
+        profile_data.get("phoneNumbers", [])
+    )
+
+    return profile_data
