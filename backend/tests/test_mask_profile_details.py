@@ -1,6 +1,9 @@
 import pytest
 from unittest.mock import patch
-from app.utils.mask_profile_details import mask_phone_number, mask_profile_details as mask_profile_details
+from app.utils.mask_profile_details import (
+    mask_phone_number,
+    mask_profile_details as mask_profile_details,
+)
 from phonenumbers import NumberParseException
 
 MASK_PHONE_IMPORT = "app.utils.mask_profile_details.mask_contact_phone_numbers"

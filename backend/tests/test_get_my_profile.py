@@ -214,7 +214,9 @@ async def test_dispatch_get_my_profile_from_ibm_validation_error(monkeypatch):
 @pytest.mark.asyncio
 @patch("app.users.services.get_my_profile.mask_profile_details")
 @patch(GET_PROFILE_DISPATCH_FROM_IBM_IMPORT_PATH)
-async def test_my_profile_with_masked_phone_numbers(mock_dispatch_get, mock_mask_profile):
+async def test_my_profile_with_masked_phone_numbers(
+    mock_dispatch_get, mock_mask_profile
+):
     """Test that get_my_profile returns masked phone numbers."""
     # Arrange
     profile_data = {
