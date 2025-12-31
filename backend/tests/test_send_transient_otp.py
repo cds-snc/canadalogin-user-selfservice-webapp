@@ -108,16 +108,11 @@ def patch_config_and_auth(monkeypatch, fake_settings):
             self.preferredLanguage = preferred_language
 
         def model_dump(self):
-            return {
-                "id": self.userId,
-                "preferredLanguage": self.preferredLanguage
-            }
+            return {"id": self.userId, "preferredLanguage": self.preferredLanguage}
 
     # Async my_profile returning the same username by default
     async def _ok_profile(_client, user_access_token: str):
-        return SimpleNamespace(
-            data=MockProfileData()
-        )
+        return SimpleNamespace(data=MockProfileData())
 
     monkeypatch.setattr(feature_module, "get_my_profile", _ok_profile)
 
@@ -296,9 +291,7 @@ async def test_handle_user_mismatch_returns_403(monkeypatch):
     # Override my_profile to return a different userName → expect 403 error response model
     async def _bad_profile(_client, token):
         return SimpleNamespace(
-            data=SimpleNamespace(
-                userId="intruder@example.com", preferredLanguage="en"
-            )
+            data=SimpleNamespace(userId="intruder@example.com", preferredLanguage="en")
         )
 
     monkeypatch.setattr(feature_module, "get_my_profile", _bad_profile)

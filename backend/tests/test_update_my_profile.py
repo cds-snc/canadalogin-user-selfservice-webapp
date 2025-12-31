@@ -48,24 +48,24 @@ async def test_update_profile_success(
     sanitized_data = {"userName": "john.doe@example.com", "preferredLanguage": "en"}
     mock_sanitize.return_value = sanitized_data
 
-#     profile_data = {
-#         "schemas": [
-#             "urn:ietf:params:scim:schemas:core:2.0:User",
-#             "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
-#             "urn:ietf:params:scim:schemas:extension:ibm:2.0:Notification",
-#         ],
-#         "userName": "john.doe@example.com",
-#         "emails": [{"value": "john.doe@example.com", "type": "work"}],
-#         "meta": {
-#             "location": "here",
-#             "created": "2023-01-01T00:00:00Z",
-#             "lastModified": "2023-09-22T12:30:00Z",
-#             "resourceType": "User",
-#         },
-#         "active": True,
-#         "id": "user-123",
-#         "notification": {"notifyType": "NONE"},
-#     }
+    #     profile_data = {
+    #         "schemas": [
+    #             "urn:ietf:params:scim:schemas:core:2.0:User",
+    #             "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+    #             "urn:ietf:params:scim:schemas:extension:ibm:2.0:Notification",
+    #         ],
+    #         "userName": "john.doe@example.com",
+    #         "emails": [{"value": "john.doe@example.com", "type": "work"}],
+    #         "meta": {
+    #             "location": "here",
+    #             "created": "2023-01-01T00:00:00Z",
+    #             "lastModified": "2023-09-22T12:30:00Z",
+    #             "resourceType": "User",
+    #         },
+    #         "active": True,
+    #         "id": "user-123",
+    #         "notification": {"notifyType": "NONE"},
+    #     }
 
     # Mock dispatch_get_my_profile_from_ibm to return IBMVerifyUserProfileSchema
     mock_profile = IBMVerifyUserProfileSchema(**profile_data)
@@ -75,6 +75,7 @@ async def test_update_profile_success(
         **profile_data,
         "phoneNumbers": [],
     }
+
 
 #     # Mock dispatch_update_user_profile response
 #     mock_response = Mock()
@@ -342,37 +343,37 @@ async def test_update_profile_masks_phone_numbers(
     }
     mock_sanitize.return_value = sanitized_data
 
-#     # Profile from IBM with unmasked phone numbers
-#     profile_data = {
-#         "schemas": [
-#             "urn:ietf:params:scim:schemas:core:2.0:User",
-#             "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
-#         ],
-#         "userName": "john.doe@example.com",
-#         "emails": [{"value": "john.doe@example.com", "type": "work"}],
-#         "phoneNumbers": [
-#             {"value": "+1-613-555-1234", "type": "mobile"},
-#             {"value": "+1-613-555-5678", "type": "work"},
-#         ],
-#         "meta": {
-#             "location": "here",
-#             "created": "2023-01-01T00:00:00Z",
-#             "lastModified": "2023-09-22T12:30:00Z",
-#             "resourceType": "User",
-#         },
-#         "active": True,
-#         "id": "user-123",
-#         "preferredLanguage": "en",
-#     }
+    #     # Profile from IBM with unmasked phone numbers
+    #     profile_data = {
+    #         "schemas": [
+    #             "urn:ietf:params:scim:schemas:core:2.0:User",
+    #             "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+    #         ],
+    #         "userName": "john.doe@example.com",
+    #         "emails": [{"value": "john.doe@example.com", "type": "work"}],
+    #         "phoneNumbers": [
+    #             {"value": "+1-613-555-1234", "type": "mobile"},
+    #             {"value": "+1-613-555-5678", "type": "work"},
+    #         ],
+    #         "meta": {
+    #             "location": "here",
+    #             "created": "2023-01-01T00:00:00Z",
+    #             "lastModified": "2023-09-22T12:30:00Z",
+    #             "resourceType": "User",
+    #         },
+    #         "active": True,
+    #         "id": "user-123",
+    #         "preferredLanguage": "en",
+    #     }
 
-#     mock_profile = IBMVerifyUserProfileSchema(**profile_data)
-#     mock_dispatch_get.return_value = mock_profile
+    #     mock_profile = IBMVerifyUserProfileSchema(**profile_data)
+    #     mock_dispatch_get.return_value = mock_profile
 
-#     # Updated profile response from IBM (after PUT)
-#     updated_profile_data = {**profile_data, "preferredLanguage": "fr"}
-#     mock_response = Mock()
-#     mock_response.json.return_value = updated_profile_data
-#     mock_dispatch_update.return_value = mock_response
+    #     # Updated profile response from IBM (after PUT)
+    #     updated_profile_data = {**profile_data, "preferredLanguage": "fr"}
+    #     mock_response = Mock()
+    #     mock_response.json.return_value = updated_profile_data
+    #     mock_dispatch_update.return_value = mock_response
 
     # Mock masked phone numbers
     masked_phones = [
@@ -385,36 +386,37 @@ async def test_update_profile_masks_phone_numbers(
         "phoneNumbers": masked_phones,
     }
 
-#     user_data = UserProfileUpdateRequest(
-#         userName="john.doe@example.com", preferredLanguage="fr"
-#     )
-#     mock_request = Mock()
-#     mock_request.app = Mock()
-#     mock_request.app.state = Mock()
-#     mock_request.app.state.request_client = AsyncClient()
-#     mock_request.app.state.config = Mock()
-#     mock_request.app.state.config.profile_api_endpoint = PROFILE_API_URL
+    #     user_data = UserProfileUpdateRequest(
+    #         userName="john.doe@example.com", preferredLanguage="fr"
+    #     )
+    #     mock_request = Mock()
+    #     mock_request.app = Mock()
+    #     mock_request.app.state = Mock()
+    #     mock_request.app.state.request_client = AsyncClient()
+    #     mock_request.app.state.config = Mock()
+    #     mock_request.app.state.config.profile_api_endpoint = PROFILE_API_URL
 
-#     # Act
-#     response = await update_profile(mock_request, user_data, user_access_token="token")
+    #     # Act
+    #     response = await update_profile(mock_request, user_data, user_access_token="token")
 
-#     # Assert
-#     assert response.success is True
-#     assert response.message == "User profile updated successfully."
-#     assert response.data.preferredLanguage == "fr"
+    #     # Assert
+    #     assert response.success is True
+    #     assert response.message == "User profile updated successfully."
+    #     assert response.data.preferredLanguage == "fr"
 
-#     # Verify phone numbers are masked in response
-#     assert len(response.data.phoneNumbers) == 2
-#     assert response.data.phoneNumbers[0].value == "+1-613-XXX-XX34"
-#     assert response.data.phoneNumbers[0].type == "mobile"
-#     assert response.data.phoneNumbers[1].value == "+1-613-XXX-XX78"
-#     assert response.data.phoneNumbers[1].type == "work"
+    #     # Verify phone numbers are masked in response
+    #     assert len(response.data.phoneNumbers) == 2
+    #     assert response.data.phoneNumbers[0].value == "+1-613-XXX-XX34"
+    #     assert response.data.phoneNumbers[0].type == "mobile"
+    #     assert response.data.phoneNumbers[1].value == "+1-613-XXX-XX78"
+    #     assert response.data.phoneNumbers[1].type == "work"
 
     # Verify masking was called with updated profile data
     mock_mask_profile.assert_called_once_with(updated_profile_data)
     mask_call_data = mock_mask_profile.call_args[0][0]
     assert mask_call_data["userName"] == "john.doe@example.com"
     assert mask_call_data["preferredLanguage"] == "fr"
+
 
 #     mock_sanitize.assert_called_once()
 #     mock_dispatch_get.assert_called_once()
@@ -438,27 +440,27 @@ async def test_update_profile_prevents_username_change(
     }
     mock_sanitize.return_value = sanitized_data
 
-#     profile_data = {
-#         "schemas": [
-#             "urn:ietf:params:scim:schemas:core:2.0:User",
-#             "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
-#         ],
-#         "userName": "john.doe@example.com",
-#         "emails": [{"value": "john.doe@example.com", "type": "work"}],
-#         "name": {"givenName": "John", "familyName": "Doe"},
-#         "phoneNumbers": [],
-#         "meta": {
-#             "location": "here",
-#             "created": "2023-01-01T00:00:00Z",
-#             "lastModified": "2023-09-22T12:30:00Z",
-#             "resourceType": "User",
-#         },
-#         "active": True,
-#         "id": "user-123",
-#     }
+    #     profile_data = {
+    #         "schemas": [
+    #             "urn:ietf:params:scim:schemas:core:2.0:User",
+    #             "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+    #         ],
+    #         "userName": "john.doe@example.com",
+    #         "emails": [{"value": "john.doe@example.com", "type": "work"}],
+    #         "name": {"givenName": "John", "familyName": "Doe"},
+    #         "phoneNumbers": [],
+    #         "meta": {
+    #             "location": "here",
+    #             "created": "2023-01-01T00:00:00Z",
+    #             "lastModified": "2023-09-22T12:30:00Z",
+    #             "resourceType": "User",
+    #         },
+    #         "active": True,
+    #         "id": "user-123",
+    #     }
 
-#     mock_profile = IBMVerifyUserProfileSchema(**profile_data)
-#     mock_dispatch_get.return_value = mock_profile
+    #     mock_profile = IBMVerifyUserProfileSchema(**profile_data)
+    #     mock_dispatch_get.return_value = mock_profile
 
     # Updated profile response - userName should remain unchanged
     updated_profile_data = {
@@ -473,6 +475,7 @@ async def test_update_profile_prevents_username_change(
         **mock_response.json(),
         "phoneNumbers": [],
     }
+
 
 #     user_data = UserProfileUpdateRequest(
 #         userName="john.doe@example.com",
@@ -520,26 +523,26 @@ async def test_update_profile_with_no_phone_numbers_to_mask(
     sanitized_data = {"userName": "john.doe@example.com", "preferredLanguage": "fr"}
     mock_sanitize.return_value = sanitized_data
 
-#     profile_data = {
-#         "schemas": [
-#             "urn:ietf:params:scim:schemas:core:2.0:User",
-#             "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
-#         ],
-#         "userName": "john.doe@example.com",
-#         "emails": [{"value": "john.doe@example.com", "type": "work"}],
-#         "phoneNumbers": [],  # No phone numbers
-#         "meta": {
-#             "location": "here",
-#             "created": "2023-01-01T00:00:00Z",
-#             "lastModified": "2023-09-22T12:30:00Z",
-#             "resourceType": "User",
-#         },
-#         "active": True,
-#         "id": "user-123",
-#     }
+    #     profile_data = {
+    #         "schemas": [
+    #             "urn:ietf:params:scim:schemas:core:2.0:User",
+    #             "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+    #         ],
+    #         "userName": "john.doe@example.com",
+    #         "emails": [{"value": "john.doe@example.com", "type": "work"}],
+    #         "phoneNumbers": [],  # No phone numbers
+    #         "meta": {
+    #             "location": "here",
+    #             "created": "2023-01-01T00:00:00Z",
+    #             "lastModified": "2023-09-22T12:30:00Z",
+    #             "resourceType": "User",
+    #         },
+    #         "active": True,
+    #         "id": "user-123",
+    #     }
 
-#     mock_profile = IBMVerifyUserProfileSchema(**profile_data)
-#     mock_dispatch_get.return_value = mock_profile
+    #     mock_profile = IBMVerifyUserProfileSchema(**profile_data)
+    #     mock_dispatch_get.return_value = mock_profile
 
     updated_profile_data = {**profile_data, "preferredLanguage": "fr"}
     mock_response = Mock()
@@ -550,6 +553,7 @@ async def test_update_profile_with_no_phone_numbers_to_mask(
         **mock_response.json(),
         "phoneNumbers": [],
     }
+
 
 #     user_data = UserProfileUpdateRequest(
 #         userName="john.doe@example.com", preferredLanguage="fr"

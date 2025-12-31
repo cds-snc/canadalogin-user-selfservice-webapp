@@ -153,6 +153,8 @@ def mask_profile_details(profile_data: dict) -> dict:
     profile_data["phoneNumbers"] = mask_contact_phone_numbers(profile_data)
 
     profile_data["emails"] = mask_profile_email_addresses(profile_data)
-    profile_data["userName"] = mask_individual_email_address(profile_data.get("userName", ""))
+    profile_data["userName"] = mask_individual_email_address(
+        profile_data.get("userName", "")
+    )
 
     return profile_data
