@@ -1,12 +1,12 @@
 import pytest
 from unittest.mock import patch
-from app.utils.mask_profile_details import (
+from app.utils.mask_user_profile import (
     mask_phone_number,
-    mask_profile_details as mask_profile_details,
+    mask_profile_details,
 )
 from phonenumbers import NumberParseException
 
-MASK_PHONE_IMPORT = "app.utils.mask_profile_details.mask_contact_phone_numbers"
+MASK_PHONE_IMPORT = "app.utils.mask_user_profile.mask_contact_phone_numbers"
 
 
 def test_number_with_only_digits():

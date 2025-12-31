@@ -9,7 +9,7 @@ from app.users.schemas import (
     ProfileResponse,
 )
 from app.utils.access_token import get_auth_request_headers
-from app.utils.mask_profile_details import mask_profile_details
+from app.utils.mask_user_profile import mask_profile_details
 from app.utils.request_error_handler import RequestErrorHandler
 from app.config import get_configuration
 
