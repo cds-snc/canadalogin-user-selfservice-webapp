@@ -11,7 +11,7 @@ from app.users.schemas import (
     IBMVerifyUpdateUserProfile,
 )
 from app.utils.access_token import get_auth_request_headers
-from app.utils.mask_phone_number import mask_contact_phone_numbers
+from app.utils.mask_user_profile import mask_profile_details
 from app.utils.request_error_handler import RequestErrorHandler
 from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
 
@@ -87,10 +87,9 @@ async def update_profile_for_verified_changes(
             detail="Request data validation error",
         )
 
-    json_data["phoneNumbers"] = mask_contact_phone_numbers(json_data)
-
+    masked_profile_data = mask_profile_details(json_data)
     try:
-        response_data = IBMVerifyUserProfileSchema(**json_data)
+        response_data = IBMVerifyUserProfileSchema(**masked_profile_data)
     except ValidationError as e:
         logger.error(f"Profile Validation Error: {e.json()}")
         raise HTTPException(
@@ -229,10 +228,10 @@ async def update_my_profile(
             detail="Request data validation error",
         )
 
-    json_data["phoneNumbers"] = mask_contact_phone_numbers(json_data)
+    masked_profile_data = mask_profile_details(json_data)
 
     try:
-        response_data = IBMVerifyUserProfileSchema(**json_data)
+        response_data = IBMVerifyUserProfileSchema(**masked_profile_data)
     except ValidationError as e:
         logger.error(f"Profile Validation Error: {e.json()}")
         raise HTTPException(

@@ -15,7 +15,7 @@ from app.users.services.otp_factors import (
     get_user_otp_factors,
     parse_phone_auth_factors_response,
 )
-from app.utils.mask_phone_number import mask_phone_number
+from app.utils.mask_user_profile import mask_phone_number
 from fastapi import HTTPException
 from httpx import AsyncClient
 

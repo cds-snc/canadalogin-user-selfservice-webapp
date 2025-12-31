@@ -9,7 +9,7 @@ from app.users.schemas import (
     ProfileResponse,
 )
 from app.utils.access_token import get_auth_request_headers
-from app.utils.mask_phone_number import mask_contact_phone_numbers
+from app.utils.mask_user_profile import mask_profile_details
 from app.utils.request_error_handler import RequestErrorHandler
 from app.config import get_configuration
 
@@ -77,10 +77,10 @@ async def get_my_profile(
     logger.info("User profile retrieved successfully.")
 
     profile_data = profile_response.model_dump()
-    profile_data["phoneNumbers"] = mask_contact_phone_numbers(profile_data)
+    masked_profile_data = mask_profile_details(profile_data)
 
     try:
-        response_data = IBMVerifyUserProfileSchema(**profile_data)
+        response_data = IBMVerifyUserProfileSchema(**masked_profile_data)
     except ValidationError as e:
         logger.error(f"Profile Validation Error: {e.json()}")
         raise HTTPException(
