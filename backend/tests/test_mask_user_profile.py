@@ -61,13 +61,12 @@ def test_mask_profile_details_masks_phone_numbers(mock_masked_phone):
 
     mock_masked_phone.return_value = masked_numbers
 
-    original_numbers = list(profile_data["phoneNumbers"])
     result = mask_profile_details(profile_data)
 
     # Should mutate the original dict, not return a new one
     assert result is profile_data
     assert result["phoneNumbers"] == masked_numbers
-    mock_masked_phone.assert_called_once_with(original_numbers)
+    mock_masked_phone.assert_called_once_with(profile_data)
 
 
 @patch(MASK_PHONE_IMPORT)
@@ -80,4 +79,4 @@ def test_mask_profile_details_handles_missing_phone_numbers(mock_masked_phone):
     result = mask_profile_details(profile_data)
 
     assert result["phoneNumbers"] == []
-    mock_masked_phone.assert_called_once_with([])
+    mock_masked_phone.assert_called_once_with(profile_data)

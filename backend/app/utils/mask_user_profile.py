@@ -39,19 +39,19 @@ def mask_phone_number(phone_number: str, region: str = "US") -> str:
 
 
 def mask_contact_phone_numbers(
-    json_data: dict,
+    profile_data: dict,
 ) -> list[MetaDataTypeValue]:
     """
     Mask phone numbers in user profile data, showing only the last 4 digits.
 
     Args:
-        json_data: User profile JSON data containing phoneNumbers
+        profile_data: User profile data dictionary containing phoneNumbers
 
     Returns:
         list[MetaDataTypeValue]: List of phone number objects with masked values
     """
 
-    profile_contact_phone_numbers = json_data.get("phoneNumbers")
+    profile_contact_phone_numbers = profile_data.get("phoneNumbers")
 
     if profile_contact_phone_numbers is None:
         return []
@@ -76,8 +76,6 @@ def mask_profile_details(profile_data: dict) -> dict:
     Returns:
         dict: Profile data with masked sensitive details
     """
-    profile_data["phoneNumbers"] = mask_contact_phone_numbers(
-        profile_data.get("phoneNumbers", [])
-    )
+    profile_data["phoneNumbers"] = mask_contact_phone_numbers(profile_data)
 
     return profile_data
