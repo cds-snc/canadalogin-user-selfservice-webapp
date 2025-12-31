@@ -17,6 +17,8 @@ import DeleteMFAPhoneNumberConfirm from "../../../features/MFAPhoneNumber/Delete
 import AddMFAPage from "../../../features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPage.jsx";
 import AddMFAPhoneNumber from "../../../features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPhoneNumber.jsx";
 import EditContactPhoneNumberPage from "../../../features/ContactPhoneNumber/components/EditContactPhoneNumberPage.jsx";
+import ChangePasswordIndex from "../../../features/ChangePassword/components/ChangePasswordIndex.jsx";
+import EditEmailAddressPage from "../../../features/EmailAddress/EditEmailAddressPage.jsx";
 
 // Storybook Page Renderer - maps page names to components for testing
 const PageRenderer = ({ page, ...props }) => {
@@ -58,6 +60,10 @@ const PageRenderer = ({ page, ...props }) => {
       );
     case PAGES.editContactPhoneNumberPage:
       return <EditContactPhoneNumberPage />;
+    case PAGES.password:
+      return <ChangePasswordIndex />;
+    case PAGES.editEmailPage:
+      return <EditEmailAddressPage />;
     default:
       console.warn(`Unknown page in Storybook: ${page}`);
       return <div>Storybook: Page not found: {page}</div>;

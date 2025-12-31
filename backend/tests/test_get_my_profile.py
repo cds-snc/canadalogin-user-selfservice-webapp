@@ -19,8 +19,9 @@ GET_PROFILE_DISPATCH_FROM_IBM_IMPORT_PATH = (
 
 
 @pytest.mark.asyncio
+@patch("app.users.services.get_my_profile.mask_profile_details")
 @patch(GET_PROFILE_DISPATCH_FROM_IBM_IMPORT_PATH)
-async def test_my_profile_success(mock_dispatch_get):
+async def test_my_profile_success(mock_dispatch_get, mock_mask_profile):
     # Arrange
     profile_data = {
         "schemas": [
@@ -42,6 +43,7 @@ async def test_my_profile_success(mock_dispatch_get):
     # Mock dispatch_get_my_profile_from_ibm to return IBMVerifyUserProfileSchema
     mock_profile = IBMVerifyUserProfileSchema(**profile_data)
     mock_dispatch_get.return_value = mock_profile
+    mock_mask_profile.return_value = profile_data
 
     http_client = AsyncClient()
 
@@ -210,9 +212,11 @@ async def test_dispatch_get_my_profile_from_ibm_validation_error(monkeypatch):
 
 
 @pytest.mark.asyncio
-@patch("app.users.services.get_my_profile.mask_contact_phone_numbers")
+@patch("app.users.services.get_my_profile.mask_profile_details")
 @patch(GET_PROFILE_DISPATCH_FROM_IBM_IMPORT_PATH)
-async def test_my_profile_with_masked_phone_numbers(mock_dispatch_get, mock_mask_phone):
+async def test_my_profile_with_masked_phone_numbers(
+    mock_dispatch_get, mock_mask_profile
+):
     """Test that get_my_profile returns masked phone numbers."""
     # Arrange
     profile_data = {
@@ -245,7 +249,11 @@ async def test_my_profile_with_masked_phone_numbers(mock_dispatch_get, mock_mask
         {"value": "+1-613-XXX-XX34", "type": "mobile"},
         {"value": "+1-613-XXX-XX78", "type": "work"},
     ]
-    mock_mask_phone.return_value = masked_phones
+
+    mock_mask_profile.return_value = {
+        **profile_data,
+        "phoneNumbers": masked_phones,
+    }
 
     http_client = AsyncClient()
 
@@ -266,8 +274,9 @@ async def test_my_profile_with_masked_phone_numbers(mock_dispatch_get, mock_mask
     assert response.data.phoneNumbers[1].type == "work"
 
     # Verify masking function was called with correct data
-    mock_mask_phone.assert_called_once()
-    call_args = mock_mask_phone.call_args[0][0]
+    mock_mask_profile.assert_called_once_with(mock_profile.model_dump())
+
+    call_args = mock_mask_profile.call_args[0][0]
     assert call_args["userName"] == "jo****@example.com"
     assert len(call_args["phoneNumbers"]) == 2
 
@@ -276,9 +285,9 @@ async def test_my_profile_with_masked_phone_numbers(mock_dispatch_get, mock_mask
 
 
 @pytest.mark.asyncio
-@patch("app.users.services.get_my_profile.mask_contact_phone_numbers")
+@patch("app.users.services.get_my_profile.mask_profile_details")
 @patch(GET_PROFILE_DISPATCH_FROM_IBM_IMPORT_PATH)
-async def test_my_profile_with_no_phone_numbers(mock_dispatch_get, mock_mask_phone):
+async def test_my_profile_with_no_phone_numbers(mock_dispatch_get, mock_mask_profile):
     """Test that get_my_profile handles profiles with no phone numbers."""
     # Arrange
     profile_data = {
@@ -301,7 +310,10 @@ async def test_my_profile_with_no_phone_numbers(mock_dispatch_get, mock_mask_pho
 
     mock_profile = IBMVerifyUserProfileSchema(**profile_data)
     mock_dispatch_get.return_value = mock_profile
-    mock_mask_phone.return_value = []
+    mock_mask_profile.return_value = {
+        **profile_data,
+        "phoneNumbers": [],
+    }
 
     http_client = AsyncClient()
 
@@ -310,19 +322,20 @@ async def test_my_profile_with_no_phone_numbers(mock_dispatch_get, mock_mask_pho
 
     # Assert
     assert response.success is True
+
     assert response.data.userName == "ja****@example.com"
     assert len(response.data.phoneNumbers) == 0
 
     # Verify masking was still called (even with empty list)
-    mock_mask_phone.assert_called_once()
+    mock_mask_profile.assert_called_once()
     mock_dispatch_get.assert_called_once_with(http_client, "mock-token")
 
 
 @pytest.mark.asyncio
-@patch("app.users.services.get_my_profile.mask_contact_phone_numbers")
+@patch("app.users.services.get_my_profile.mask_profile_details")
 @patch(GET_PROFILE_DISPATCH_FROM_IBM_IMPORT_PATH)
 async def test_my_profile_validation_error_after_masking(
-    mock_dispatch_get, mock_mask_phone
+    mock_dispatch_get, mock_mask_profile
 ):
     """Test that get_my_profile handles validation errors after phone masking."""
     # Arrange
@@ -349,7 +362,10 @@ async def test_my_profile_validation_error_after_masking(
 
     # Mock mask_contact_phone_numbers to return invalid phone data
     # (e.g., wrong structure that will fail validation)
-    mock_mask_phone.return_value = "invalid_phone_data"  # String instead of list
+    mock_mask_profile.return_value = {
+        **profile_data,
+        "phoneNumbers": "invalid_phone_data",
+    }
 
     http_client = AsyncClient()
 
@@ -361,4 +377,4 @@ async def test_my_profile_validation_error_after_masking(
     assert "Request data validation error" in exc.value.detail
 
     mock_dispatch_get.assert_called_once_with(http_client, "mock-token")
-    mock_mask_phone.assert_called_once()
+    mock_mask_profile.assert_called_once()
