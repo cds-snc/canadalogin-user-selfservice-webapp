@@ -15,8 +15,6 @@ from app.utils.mask_user_profile import mask_profile_details
 from app.utils.request_error_handler import RequestErrorHandler
 from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
 from app.utils.validate_user_request_match import validate_user_request_match
-from app.utils.mask_email_address import mask_individual_email_address, mask_profile_email_addresses
-# from app.utils.helpers import mask_profile_details
 
 logger = logging.getLogger(__name__)
 

@@ -1,11 +1,9 @@
-from app.config import get_configuration
-from app.utils.request_error_handler import RequestErrorHandler
-from app.utils.mask_user_profile import mask_profile_details
 import logging
-
 from fastapi import HTTPException, status
 from pydantic import ValidationError
 from httpx import AsyncClient
+
+from app.config import get_configuration
 
 from app.users.schemas import (
     IBMVerifyUserProfileSchema,
@@ -14,7 +12,6 @@ from app.users.schemas import (
 from app.utils.access_token import get_auth_request_headers
 from app.utils.mask_user_profile import mask_profile_details
 from app.utils.request_error_handler import RequestErrorHandler
-from app.config import get_configuration
 
 logger = logging.getLogger(__name__)
 
