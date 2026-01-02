@@ -428,7 +428,7 @@ async def test_get_cloud_directory_id_null_id():
             )
 
         # Pydantic validation error gets converted to 422 by RequestErrorHandler
-        assert exc_info.value.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert exc_info.value.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
 
 
 @pytest.mark.asyncio

@@ -59,7 +59,7 @@ async def get_password_policy(global_http_client: AsyncClient):
         except ValidationError as validation_error:
             logger.warning("Invalid API response schema: %s", validation_error.errors())
             raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                 detail="Invalid API response schema",
             )
 

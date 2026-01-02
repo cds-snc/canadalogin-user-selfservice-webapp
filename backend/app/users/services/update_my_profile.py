@@ -66,7 +66,7 @@ async def update_profile_for_verified_changes(
     except ValidationError as e:
         logger.error(f"Merged Profile Validation Error: {e.json()}")
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Request data validation error",
         )
 
@@ -83,7 +83,7 @@ async def update_profile_for_verified_changes(
     except Exception as e:
         logger.error(f"Failed to parse profile response: {str(e)}")
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Request data validation error",
         )
 
@@ -93,7 +93,7 @@ async def update_profile_for_verified_changes(
     except ValidationError as e:
         logger.error(f"Profile Validation Error: {e.json()}")
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Request data validation error",
         )
 
@@ -208,7 +208,7 @@ async def update_my_profile(
     except ValidationError as e:
         logger.error(f"Merged Profile Validation Error: {e.json()}")
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Request data validation error",
         )
 
@@ -224,7 +224,7 @@ async def update_my_profile(
     except Exception as e:
         logger.error(f"Failed to parse profile response: {str(e)}")
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Request data validation error",
         )
 
@@ -235,7 +235,7 @@ async def update_my_profile(
     except ValidationError as e:
         logger.error(f"Profile Validation Error: {e.json()}")
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Request data validation error",
         )
 

@@ -73,7 +73,7 @@ class RequestErrorHandler:
         elif isinstance(exc, ValidationError):
             logger.error("%s schema validation failed: %s", context, exc.errors())
             raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                 detail="Validation Error",
             ) from exc
 
