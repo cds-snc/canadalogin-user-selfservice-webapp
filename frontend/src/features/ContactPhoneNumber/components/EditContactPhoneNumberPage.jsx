@@ -152,7 +152,7 @@ export default function EditContactPhoneNumberPage() {
       setErrorCode("");
 
       const formdata = {
-        userName: userName,
+        user_id: state.userProfile.id,
         phoneNumbers: [{ value: phoneFormData.phoneNumber, type: "mobile" }],
       };
 

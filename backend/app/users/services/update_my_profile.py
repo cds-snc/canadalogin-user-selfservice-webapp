@@ -15,6 +15,7 @@ from app.utils.mask_user_profile import mask_profile_details
 from app.utils.request_error_handler import RequestErrorHandler
 from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
 from app.utils.validate_user_request_match import validate_user_request_match
+from app.constants.schema_field_names import USER_ID_FIELD, USERNAME_FIELD
 
 logger = logging.getLogger(__name__)
 
@@ -185,14 +186,14 @@ async def update_my_profile(
         request.app.state.request_client, user_access_token
     )
     ibm_user_profile = ibm_user_profile_response.model_dump()
-    current_users_id = updated_user_data_dict.get("userId")
+    current_users_id = updated_user_data_dict.get(USER_ID_FIELD)
 
     validate_user_request_match(ibm_user_profile, current_users_id)
 
     # Remove userName and emails from update to prevent any accidental changes
     # Email changes must go through the secure OTP-verified endpoint
-    updated_user_data_dict.pop("userName", None)
-    updated_user_data_dict.pop("userId", None)
+    updated_user_data_dict.pop(USERNAME_FIELD, None)
+    updated_user_data_dict.pop(USER_ID_FIELD, None)
 
     merged_profile = {**ibm_user_profile, **updated_user_data_dict}
 
@@ -201,7 +202,7 @@ async def update_my_profile(
     except ValidationError as e:
         logger.error(f"Merged Profile Validation Error: {e.json()}")
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Request data validation error",
         )
 
@@ -217,7 +218,7 @@ async def update_my_profile(
     except Exception as e:
         logger.error(f"Failed to parse profile response: {str(e)}")
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Request data validation error",
         )
 
@@ -228,7 +229,7 @@ async def update_my_profile(
     except ValidationError as e:
         logger.error(f"Profile Validation Error: {e.json()}")
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Request data validation error",
         )
 

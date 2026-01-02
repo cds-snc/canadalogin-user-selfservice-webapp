@@ -3,7 +3,6 @@ from fastapi import HTTPException, status
 from pydantic import ValidationError
 from httpx import AsyncClient
 
-from app.config import get_configuration
 
 from app.users.schemas import (
     IBMVerifyUserProfileSchema,
@@ -12,6 +11,7 @@ from app.users.schemas import (
 from app.utils.access_token import get_auth_request_headers
 from app.utils.mask_user_profile import mask_profile_details
 from app.utils.request_error_handler import RequestErrorHandler
+from app.config import get_configuration
 
 logger = logging.getLogger(__name__)
 
@@ -77,7 +77,6 @@ async def get_my_profile(
     logger.info("User profile retrieved successfully.")
 
     profile_data = profile_response.model_dump()
-    # profile_data = mask_profile_details(profile_data)
     masked_profile_data = mask_profile_details(profile_data)
 
     try:

@@ -103,7 +103,7 @@ class IBMVerifyUserProfileSchema(BaseModel):
 class UserProfileUpdateRequest(BaseModel):
     preferredLanguage: Optional[str] = None
     name: Optional[UserProfileName] = None
-    userId: Optional[str] = None
+    user_id: Optional[str] = None
     userName: Optional[EmailStr] = (
         None  # refactor required so that userID is not confused with userName
     )

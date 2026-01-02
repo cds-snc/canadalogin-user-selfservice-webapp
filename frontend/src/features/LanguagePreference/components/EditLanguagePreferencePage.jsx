@@ -88,7 +88,7 @@ export default function EditLanguagePreferencePage() {
       setLocalLoading(true);
       const response = await authService.update_my_user_profile({
         preferredLanguage: languageFormData.updatedPreferredLanguage,
-        userId: state.userProfile.id,
+        user_id: state.userProfile.id,
       });
       updateProfileSuccess(response.data);
       setWizardStep("success");
