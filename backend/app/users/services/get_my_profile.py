@@ -84,7 +84,7 @@ async def get_my_profile(
     except ValidationError as e:
         logger.error(f"Profile Validation Error: {e.json()}")
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Request data validation error",
         )
     return ProfileResponse(
