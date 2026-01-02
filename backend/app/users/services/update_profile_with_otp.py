@@ -10,7 +10,7 @@ from app.users.schemas import (
     UserProfileUpdateRequest,
     EmailItem,
 )
-from app.users.services.get_my_profile import get_my_profile
+from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
 from app.users.services.update_my_profile import (
     update_profile_for_verified_changes,
     sanitize_user_profile_data,
@@ -70,23 +70,23 @@ async def update_profile_with_otp_verification(
         logger.info("OTP verification successful, proceeding with profile update")
 
         # Step 2: Get current user profile to validate user context and prepare updates
-        current_profile_response = await get_my_profile(
+        # retrieve the raw profile from IBM, the get_my_profile function will mask sensitive data
+        current_profile_response = await dispatch_get_my_profile_from_ibm(
             request.app.state.request_client, user_access_token
         )
 
-        if not current_profile_response.success:
+        if not current_profile_response.userName:
             logger.error("Failed to get current user profile")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Unable to retrieve current user profile",
             )
 
-        current_profile = current_profile_response.data
-        logger.info(f"Current user: {current_profile.userName}")
+        logger.info(f"Current user: {current_profile_response.id}")
 
         # Step 3: Build the profile update request based on provided fields
         profile_update_request = _build_profile_update_request(
-            profile_update_data, current_profile
+            profile_update_data, current_profile_response
         )
 
         logger.info(
