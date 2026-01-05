@@ -82,12 +82,11 @@ async def update_profile_with_otp_verification(
                 detail="Unable to retrieve current user profile",
             )
 
-        current_profile = current_profile_response.data
         logger.info(f"Current user: {current_profile_response.id}")
 
         # Step 3: Build the profile update request based on provided fields
         profile_update_request = _build_profile_update_request(
-            profile_update_data, current_profile
+            profile_update_data, current_profile_response
         )
 
         logger.info(
