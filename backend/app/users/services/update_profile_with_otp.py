@@ -70,7 +70,7 @@ async def update_profile_with_otp_verification(
         logger.info("OTP verification successful, proceeding with profile update")
 
         # Step 2: Get current user profile to validate user context and prepare updates
-        # retrieve the raw profile from IBM, the get_my_profile function will mask sensitive data
+        # retrieve the unmasked profile
         current_profile_response = await dispatch_get_my_profile_from_ibm(
             request.app.state.request_client, user_access_token
         )
