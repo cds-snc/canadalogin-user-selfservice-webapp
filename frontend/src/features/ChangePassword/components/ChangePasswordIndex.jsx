@@ -51,7 +51,12 @@ export default function ChangePasswordIndex() {
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(
     setErrorCode,
     () => {
-      setPasswordUpdateStep("otpSelection");
+      // If there's only one MFA factor, skip OTP selection and go directly to validation
+      if (userPhoneFactors && userPhoneFactors.length === 1) {
+        setPasswordUpdateStep("otpValidation");
+      } else {
+        setPasswordUpdateStep("otpSelection");
+      }
     },
   );
 
@@ -162,10 +167,19 @@ export default function ChangePasswordIndex() {
         setUserOtpValue={handleSetUserOtpValue}
         requestOtpCode={requestOtpCode}
         validateOtpCode={validateOtpCode}
-        onBack={() => setPasswordUpdateStep("otpSelection")}
+        onBack={() => {
+          // If there's only one MFA factor, go back to password verification
+          // Otherwise, go back to OTP selection
+          if (userPhoneFactors && userPhoneFactors.length === 1) {
+            setPasswordUpdateStep("passwordVerification");
+          } else {
+            setPasswordUpdateStep("otpSelection");
+          }
+        }}
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
         onCancel={async () => await navigate(backToSecuritySettingsPage)}
+        showTryAnotherWay={userPhoneFactors && userPhoneFactors.length > 1}
       />
     ),
     passwordChange: (
