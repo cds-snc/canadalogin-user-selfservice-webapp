@@ -109,7 +109,7 @@ async def handle_otp_send(
         )
 
         validate_user_request_match(
-            my_profile_response.data.model_dump(), user_otp_info.userId
+            my_profile_response.data.model_dump(), user_otp_info.user_id
         )
 
         logger.info("User verified to send OTP")
@@ -136,7 +136,7 @@ async def handle_otp_send(
                 # The field validator will automatically format it using PhoneNumber
                 resolved_user_otp_info = UserOtpInfo(
                     phoneNumber=actual_phone,
-                    userId=user_otp_info.userId,
+                    user_id=user_otp_info.user_id,
                     otpType=user_otp_info.otpType,
                 )
                 logger.info("Successfully resolved masked phone number")

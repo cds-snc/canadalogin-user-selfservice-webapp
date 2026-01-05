@@ -312,6 +312,7 @@ async def test_my_profile_with_no_phone_numbers(mock_dispatch_get, mock_mask_pro
     mock_dispatch_get.return_value = mock_profile
     mock_mask_profile.return_value = {
         **profile_data,
+        "userName": "ja****@example.com",
         "phoneNumbers": [],
     }
 

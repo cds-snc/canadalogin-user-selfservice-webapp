@@ -35,7 +35,7 @@ class UserOtpInfo(BaseModel):
     phoneNumber: Optional[str] = (
         None  # Changed from PhoneNumber to str to handle masked numbers
     )
-    userId: str
+    user_id: str
     emailAddress: Optional[EmailStr] = (
         None  # For sending OTP to a different email address
     )

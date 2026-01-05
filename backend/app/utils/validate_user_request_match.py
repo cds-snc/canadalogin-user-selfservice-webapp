@@ -1,6 +1,7 @@
 import logging
 from typing import Dict, Any, Optional
 from fastapi import HTTPException, status
+from app.constants.schema_field_names import ID_FIELD
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +33,7 @@ def validate_user_request_match(
         )
 
     # Extract user ID from profile
-    current_user_id = current_user_profile.get("id")
+    current_user_id = current_user_profile.get(ID_FIELD)
     if not current_user_id:
         logger.error("Missing user ID in profile for validation")
         raise HTTPException(
@@ -46,10 +47,10 @@ def validate_user_request_match(
             status_code=status.HTTP_400_BAD_REQUEST, detail=generic_msg_id
         )
 
-    id_match = request_user_id == current_user_id
+    does_user_id_match = request_user_id == current_user_id
 
     # Perform the validation
-    if not id_match:
+    if not does_user_id_match:
         logger.warning(
             f"User mismatch - cannot update profile - {request_user_id} != {current_user_id}"
         )
