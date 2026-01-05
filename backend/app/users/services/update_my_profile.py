@@ -14,6 +14,7 @@ from app.utils.access_token import get_auth_request_headers
 from app.utils.mask_user_profile import mask_profile_details
 from app.utils.request_error_handler import RequestErrorHandler
 from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
+from app.constants.schema_field_names import USERNAME_FIELD
 
 logger = logging.getLogger(__name__)
 
@@ -199,7 +200,7 @@ async def update_my_profile(
 
     # Remove userName and emails from update to prevent any accidental changes
     # Email changes must go through the secure OTP-verified endpoint
-    updated_user_data_dict.pop("userName", None)
+    updated_user_data_dict.pop(USERNAME_FIELD, None)
 
     merged_profile = {**ibm_user_profile, **updated_user_data_dict}
 
