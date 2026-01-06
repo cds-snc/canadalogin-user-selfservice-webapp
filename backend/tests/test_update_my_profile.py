@@ -7,7 +7,7 @@ from app.utils.request_error_handler import RequestErrorHandler
 from app.users.services.update_my_profile import (
     update_my_profile as update_profile,
     update_profile_for_verified_changes,
-    dispatch_update_my_profile as dispatch_update_user_profile,
+    dispatch_update_my_profile,
     sanitize_user_profile_data,
 )
 
@@ -35,101 +35,139 @@ DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH = (
     "app.users.services.update_my_profile.dispatch_get_my_profile_from_ibm"
 )
 
-
-# @pytest.mark.asyncio
-# @patch(MASK_PHONE_IMPORT_PATH)
-# @patch(DISPATCH_UPDATE_PROFILE_IMPORT_PATH)
-# @patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
-# @patch(SANITIZE_PROFILE_IMPORT_PATH)
-# async def test_update_profile_success(
-#     mock_sanitize, mock_dispatch_get, mock_dispatch_update, mock_masked_profile
-# ):
-#     # Arrange
-#     sanitized_data = {"userName": "john.doe@example.com", "preferredLanguage": "en"}
-#     mock_sanitize.return_value = sanitized_data
-
-#     profile_data = {
-#         "schemas": [
-#             "urn:ietf:params:scim:schemas:core:2.0:User",
-#             "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
-#             "urn:ietf:params:scim:schemas:extension:ibm:2.0:Notification",
-#         ],
-#         "userName": "john.doe@example.com",
-#         "emails": [{"value": "john.doe@example.com", "type": "work"}],
-#         "meta": {
-#             "location": "here",
-#             "created": "2023-01-01T00:00:00Z",
-#             "lastModified": "2023-09-22T12:30:00Z",
-#             "resourceType": "User",
-#         },
-#         "active": True,
-#         "id": "user-123",
-#         "notification": {"notifyType": "NONE"},
-#     }
-
-#     # Mock dispatch_get_my_profile_from_ibm to return IBMVerifyUserProfileSchema
-#     mock_profile = IBMVerifyUserProfileSchema(**profile_data)
-#     mock_dispatch_get.return_value = mock_profile
-
-#     mock_masked_profile.return_value = {
-#         **profile_data,
-#         "phoneNumbers": [],
-#     }
-
-#     # Mock dispatch_update_user_profile response
-#     mock_response = Mock()
-#     mock_response.json.return_value = profile_data
-#     mock_dispatch_update.return_value = mock_response
-
-#     user_data = UserProfileUpdateRequest(
-#         userId="user-123", preferredLanguage="en"
-#     )
-#     mock_request = Mock()
-#     mock_request.app = Mock()
-#     mock_request.app.state = Mock()
-#     mock_request.app.state.request_client = AsyncClient()
-#     mock_request.app.state.config = Mock()
-#     mock_request.app.state.config.profile_api_endpoint = PROFILE_API_URL
-
-#     # Act
-#     response = await update_profile(mock_request, user_data, user_access_token="token")
-
-#     # Assert
-#     assert response.success is True
-#     assert response.message == "User profile updated successfully."
-#     assert mock_dispatch_get.call_args[0][1] == "token"
-
-#     mock_sanitize.assert_called_once()
-#     mock_dispatch_get.assert_called_once()
-#     mock_dispatch_update.assert_called_once()
+MASK_PROFILE_DETAILS_IMPORT_PATH = "app.users.services.update_my_profile.mask_profile_details"
+VALIDATE_USER_REQUEST_MATCH = "app.users.services.update_my_profile.validate_user_request_match"
 
 
-# @pytest.mark.asyncio
-# @patch(SANITIZE_PROFILE_IMPORT_PATH)
-# @patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
-# async def test_update_profile_user_mismatch(mock_dispatch_get, mock_sanitize):
-#     mock_sanitize.return_value = {"userId": "other@example.com"}
+@pytest.mark.asyncio
+@patch(MASK_PROFILE_DETAILS_IMPORT_PATH)
+@patch(DISPATCH_UPDATE_PROFILE_IMPORT_PATH)
+@patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
+@patch(SANITIZE_PROFILE_IMPORT_PATH)
+async def test_update_profile_success(
+    mock_sanitize, mock_dispatch_get, mock_dispatch_update, mock_masked_profile
+):
+    # Arrange
+    sanitized_data = {"user_id": "user-123", "userName": "john.doe@example.com", "preferredLanguage": "en"}
+    mock_sanitize.return_value = sanitized_data
 
-#     profile_data = {"id": "john.doe@example.com"}
+    profile_data = {
+        "schemas": [
+            "urn:ietf:params:scim:schemas:core:2.0:User",
+            "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+        ],
+        "userName": "john.doe@example.com",
+        "emails": [{"value": "john.doe@example.com", "type": "work"}],
+        "meta": {
+            "location": "here",
+            "created": "2023-01-01T00:00:00Z",
+            "lastModified": "2023-09-22T12:30:00Z",
+            "resourceType": "User",
+        },
+        "active": True,
+        "id": "user-123",
+        "notification": {"notifyType": "NONE"},
+    }
 
-#     class DummyData:
-#         def model_dump(self):
-#             return profile_data
+    # Mock dispatch_get_my_profile_from_ibm to return IBMVerifyUserProfileSchema
+    mock_profile = IBMVerifyUserProfileSchema(**profile_data)
+    mock_dispatch_get.return_value = mock_profile
 
-#     mock_dispatch_get.return_value = Mock(data=DummyData())
+    mock_masked_profile.return_value = {
+        **profile_data,
+        "userName": "ja****@example.com",
+        "phoneNumbers": [],
+    }
 
-#     user_data = UserProfileUpdateRequest(userId="other@example.com")
-#     mock_request = Mock()
-#     mock_request.app = Mock()
-#     mock_request.app.state = Mock()
-#     mock_request.app.state.request_client = AsyncClient()
-#     mock_request.app.state.config = Mock()
-#     mock_request.app.state.config.profile_api_endpoint = PROFILE_API_URL
+    # Mock dispatch_update_user_profile response
+    mock_response = Mock()
+    mock_response.json.return_value = profile_data
+    mock_dispatch_update.return_value = mock_response
 
-#     with pytest.raises(HTTPException) as exc:
-#         await update_profile(mock_request, user_data, user_access_token="token")
-#     assert exc.value.status_code == 403
-#     assert mock_dispatch_get.call_args[0][1] == "token"
+    user_data = UserProfileUpdateRequest(user_id="user-123", preferredLanguage="en")
+    mock_request = Mock()
+    mock_request.app = Mock()
+    mock_request.app.state = Mock()
+    mock_request.app.state.request_client = Mock(spec=AsyncClient)
+    mock_request.app.state.config = Mock()
+    mock_request.app.state.config.profile_api_endpoint = PROFILE_API_URL
+
+    # Act
+    response = await update_profile(mock_request, user_data, user_access_token="token")
+
+    # Assert
+    assert response.success is True
+    assert response.message == "User profile updated successfully."
+    assert mock_dispatch_get.call_args[0][1] == "token"
+
+    mock_sanitize.assert_called_once()
+    mock_dispatch_get.assert_called_once()
+    mock_dispatch_update.assert_called_once()
+
+
+@pytest.mark.asyncio
+@patch(VALIDATE_USER_REQUEST_MATCH)
+@patch(SANITIZE_PROFILE_IMPORT_PATH)
+@patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH, new_callable=AsyncMock)
+async def test_update_profile_user_mismatch_403(mock_dispatch_get, mock_sanitize, mock_validate_user):
+    # Arrange - Set up a user ID mismatch scenario
+    mock_sanitize.return_value = {"user_id": "other@example.com"}
+
+    # Mock the validation function to raise a 403 error for user mismatch
+    mock_validate_user.side_effect = HTTPException(
+        status_code=403,
+        detail="7"  # This is the actual error message from the function
+    )
+
+    profile_data = {
+        "schemas": [
+            "urn:ietf:params:scim:schemas:core:2.0:User",
+            "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+        ],
+        "userName": "john.doe@example.com",
+        "emails": [{"value": "john.doe@example.com", "type": "work"}],
+        "meta": {
+            "location": "here",
+            "created": "2023-01-01T00:00:00Z",
+            "lastModified": "2023-09-22T12:30:00Z",
+            "resourceType": "User",
+        },
+        "active": True,
+        "id": "john.doe@example.com",  # Different from sanitized user_id
+        "notification": {"notifyType": "NONE"},
+    }
+
+    mock_profile = IBMVerifyUserProfileSchema(**profile_data)
+    # For AsyncMock, set return_value directly - it will be awaitable
+    mock_dispatch_get.return_value = mock_profile
+
+    user_data = UserProfileUpdateRequest(user_id="other@example.com")
+    mock_request = Mock()
+    mock_request.app = Mock()
+    mock_request.app.state = Mock()
+    mock_request.app.state.request_client = Mock(spec=AsyncClient)
+    mock_request.app.state.config = Mock()
+    mock_request.app.state.config.profile_api_endpoint = PROFILE_API_URL
+
+    # Act & Assert
+    with pytest.raises(HTTPException) as exc:
+        await update_profile(mock_request, user_data, user_access_token="token")
+
+    assert exc.value.status_code == 403
+    assert exc.value.detail == "7"  # The actual generic error message
+
+    # Verify the validation function was called with correct parameters
+    mock_validate_user.assert_called_once()
+    call_args = mock_validate_user.call_args[0]
+
+    # Compare with the model_dump() output, not the raw profile_data
+    expected_profile = mock_profile.model_dump()
+    assert call_args[0] == expected_profile  # ibm_user_profile from model_dump()
+    assert call_args[1] == "other@example.com"  # current_users_id
+
+    # Verify other functions were called as expected
+    mock_sanitize.assert_called_once_with(user_data)
+    mock_dispatch_get.assert_awaited_once()  # Use assert_awaited_once for AsyncMock
 
 
 @pytest.mark.asyncio
@@ -199,131 +237,131 @@ async def test_update_profile_dispatch_failure(
     assert get_call_args[0][1] == "token"  # user_access_token parameter
 
 
-# @pytest.mark.asyncio
-# @patch(SANITIZE_PROFILE_IMPORT_PATH)
-# @patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
-# async def test_update_profile_validation_error(mock_dispatch_get, mock_sanitize):
-#     # Pass something that will cause validation error when merging
-#     mock_sanitize.return_value = {"userName": "john.doe@example.com", "id": 123}
+@pytest.mark.asyncio
+@patch(SANITIZE_PROFILE_IMPORT_PATH)
+@patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
+async def test_update_profile_validation_error(mock_dispatch_get, mock_sanitize):
+    # Pass something that will cause validation error when merging
+    mock_sanitize.return_value = {"userName": "john.doe@example.com", "id": 123, "user_id": "string-instead-of-int"}
 
-#     # Mock IBM profile with mismatched types
-#     mock_dispatch_get.return_value = Mock(
-#         model_dump=Mock(
-#             return_value={
-#                 "userName": "john.doe@example.com",
-#                 "id": "string-instead-of-int",
-#             }
-#         )
-#     )
+    # Mock IBM profile with mismatched types
+    mock_dispatch_get.return_value = Mock(
+        model_dump=Mock(
+            return_value={
+                "userName": "john.doe@example.com",
+                "id": "string-instead-of-int",
+            }
+        )
+    )
 
-#     user_data = UserProfileUpdateRequest(userName="john.doe@example.com")
-#     mock_request = Mock()
-#     mock_request.app = Mock()
-#     mock_request.app.state = Mock()
+    user_data = UserProfileUpdateRequest(userName="john.doe@example.com")
+    mock_request = Mock()
+    mock_request.app = Mock()
+    mock_request.app.state = Mock()
 
-#     # Act & Assert
-#     with pytest.raises(HTTPException) as exc:
-#         await update_profile(mock_request, user_data, user_access_token="token")
+    # Act & Assert
+    with pytest.raises(HTTPException) as exc:
+        await update_profile(mock_request, user_data, user_access_token="token")
 
-#     assert exc.value.status_code == 422
-
-
-# @pytest.mark.asyncio
-# @respx.mock
-# async def test_dispatch_update_user_profile_success():
-#     respx.put(PROFILE_API_URL).mock(
-#         return_value=Response(status_code=200, json={"success": True})
-#     )
-
-#     mock_request = Mock()
-#     mock_request.app = Mock()
-#     mock_request.app.state = Mock()
-#     mock_request.app.state.request_client = AsyncClient()
-#     mock_request.app.state.config = get_configuration()
-
-#     payload = IBMVerifyUpdateUserProfile(
-#         **{
-#             "schemas": [
-#                 "urn:ietf:params:scim:schemas:core:2.0:User",
-#                 "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
-#                 "urn:ietf:params:scim:schemas:extension:ibm:2.0:Notification",
-#             ],
-#             "userName": "john.doe@example.com",
-#             "emails": [{"value": "john.doe@example.com", "type": "work"}],
-#             "meta": {
-#                 "location": "here",
-#                 "created": "2023-01-01T00:00:00Z",
-#                 "lastModified": "2023-09-22T12:30:00Z",
-#                 "resourceType": "User",
-#             },
-#             "active": True,
-#             "id": "user-123",
-#             "notification": {"notifyType": "NONE"},
-#         }
-#     )
-
-#     # Patch raise_for_status to an async no-op to avoid TypeError
-#     mock_request.app.state.request_client.put = AsyncMock(
-#         return_value=Response(status_code=200, json={"success": True})
-#     )
-#     mock_request.app.state.request_client.put.return_value.raise_for_status = Mock()
-
-#     response = await dispatch_update_user_profile(
-#         request=mock_request,
-#         user_profile_payload=payload.model_dump_json(by_alias=True),
-#         user_access_token="mock-token",
-#     )
-#     assert response.status_code == 200
+    assert exc.value.status_code == 422
 
 
-# @pytest.mark.asyncio
-# @respx.mock
-# async def test_dispatch_update_user_profile_failure(monkeypatch):
-#     respx.put(PROFILE_API_URL).mock(
-#         return_value=Response(
-#             status_code=400,
-#             json={"detail": "Invalid request"},
-#         )
-#     )
+@pytest.mark.asyncio
+@respx.mock
+async def test_dispatch_update_user_profile_success():
+    respx.put(PROFILE_API_URL).mock(
+        return_value=Response(status_code=200, json={"success": True})
+    )
 
-#     # Patch error handler to prevent crashing the test
-#     monkeypatch.setattr(
-#         RequestErrorHandler, "handle", lambda e: (_ for _ in ()).throw(e)
-#     )
+    mock_request = Mock()
+    mock_request.app = Mock()
+    mock_request.app.state = Mock()
+    mock_request.app.state.request_client = AsyncClient()
+    mock_request.app.state.config = get_configuration()
 
-#     mock_request = Mock()
-#     mock_request.app = Mock()
-#     mock_request.app.state = Mock()
-#     mock_request.app.state.request_client = AsyncClient()
-#     mock_request.app.state.config = get_configuration()
+    payload = IBMVerifyUpdateUserProfile(
+        **{
+            "schemas": [
+                "urn:ietf:params:scim:schemas:core:2.0:User",
+                "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+                "urn:ietf:params:scim:schemas:extension:ibm:2.0:Notification",
+            ],
+            "userName": "john.doe@example.com",
+            "emails": [{"value": "john.doe@example.com", "type": "work"}],
+            "meta": {
+                "location": "here",
+                "created": "2023-01-01T00:00:00Z",
+                "lastModified": "2023-09-22T12:30:00Z",
+                "resourceType": "User",
+            },
+            "active": True,
+            "id": "user-123",
+            "notification": {"notifyType": "NONE"},
+        }
+    )
 
-#     payload = IBMVerifyUpdateUserProfile(
-#         **{
-#             "schemas": [
-#                 "urn:ietf:params:scim:schemas:core:2.0:User",
-#                 "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
-#                 "urn:ietf:params:scim:schemas:extension:ibm:2.0:Notification",
-#             ],
-#             "userName": "john.doe@example.com",
-#             "emails": [{"value": "john.doe@example.com", "type": "work"}],
-#             "meta": {
-#                 "location": "here",
-#                 "created": "2023-01-01T00:00:00Z",
-#                 "lastModified": "2023-09-22T12:30:00Z",
-#                 "resourceType": "User",
-#             },
-#             "active": True,
-#             "id": "user-123",
-#             "notification": {"notifyType": "NONE"},
-#         }
-#     )
+    # Patch raise_for_status to an async no-op to avoid TypeError
+    mock_request.app.state.request_client.put = AsyncMock(
+        return_value=Response(status_code=200, json={"success": True})
+    )
+    mock_request.app.state.request_client.put.return_value.raise_for_status = Mock()
 
-#     with pytest.raises(Exception):
-#         await dispatch_update_user_profile(
-#             request=mock_request,
-#             user_profile_payload=payload.model_dump_json(by_alias=True),
-#             user_access_token="mock-token",
-#         )
+    response = await dispatch_update_my_profile(
+        request=mock_request,
+        user_profile_payload=payload.model_dump_json(by_alias=True),
+        user_access_token="mock-token",
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_dispatch_update_user_profile_failure(monkeypatch):
+    respx.put(PROFILE_API_URL).mock(
+        return_value=Response(
+            status_code=400,
+            json={"detail": "Invalid request"},
+        )
+    )
+
+    # Patch error handler to prevent crashing the test
+    monkeypatch.setattr(
+        RequestErrorHandler, "handle", lambda e: (_ for _ in ()).throw(e)
+    )
+
+    mock_request = Mock()
+    mock_request.app = Mock()
+    mock_request.app.state = Mock()
+    mock_request.app.state.request_client = AsyncClient()
+    mock_request.app.state.config = get_configuration()
+
+    payload = IBMVerifyUpdateUserProfile(
+        **{
+            "schemas": [
+                "urn:ietf:params:scim:schemas:core:2.0:User",
+                "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+                "urn:ietf:params:scim:schemas:extension:ibm:2.0:Notification",
+            ],
+            "userName": "john.doe@example.com",
+            "emails": [{"value": "john.doe@example.com", "type": "work"}],
+            "meta": {
+                "location": "here",
+                "created": "2023-01-01T00:00:00Z",
+                "lastModified": "2023-09-22T12:30:00Z",
+                "resourceType": "User",
+            },
+            "active": True,
+            "id": "user-123",
+            "notification": {"notifyType": "NONE"},
+        }
+    )
+
+    with pytest.raises(Exception):
+        await dispatch_update_user_profile(
+            request=mock_request,
+            user_profile_payload=payload.model_dump_json(by_alias=True),
+            user_access_token="mock-token",
+        )
 
 
 @pytest.mark.asyncio
@@ -525,7 +563,11 @@ async def test_update_profile_with_no_phone_numbers_to_mask(
 ):
     """Test that update_my_profile handles profiles with no phone numbers."""
     # Arrange
-    sanitized_data = {"userName": "john.doe@example.com", "preferredLanguage": "fr", "user_id": "user-123"}
+    sanitized_data = {
+        "userName": "john.doe@example.com",
+        "preferredLanguage": "fr",
+        "user_id": "user-123",
+    }
     mock_sanitize.return_value = sanitized_data
 
     profile_data = {
@@ -558,7 +600,6 @@ async def test_update_profile_with_no_phone_numbers_to_mask(
         **mock_response.json(),
         "userName": "jo****@example.com",
         "user_id": "user-123",
-
         "phoneNumbers": [],
     }
 
