@@ -160,7 +160,10 @@ vi.mock("../../../hooks/usePasswordValidation", () => ({
 
 vi.mock("../../../hooks/useOtpOperations", () => ({
   useOtpOperations: () => ({
-    userPhoneFactors: [{ id: "phone1", value: "+1234567890" }],
+    userPhoneFactors: [
+      { id: "phone1", value: "+1234567890", type: "sms" },
+      { id: "phone2", value: "+1234567891", type: "voice" },
+    ],
     userSelectedMfaFactor: null,
     userOtpValue: "123456", // Provide a mock OTP value
     otpSentResponse: { trxnId: "mock-transaction-id" }, // Mock transaction ID

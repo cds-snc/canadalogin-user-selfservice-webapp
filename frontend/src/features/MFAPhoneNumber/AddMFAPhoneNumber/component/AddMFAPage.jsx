@@ -46,7 +46,12 @@ export default function AddMFAPage() {
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(
     setErrorCode,
     () => {
-      setWizardStep("otpSelection");
+      // If there's only one MFA factor, skip OTP selection and go directly to validation
+      if (userPhoneFactors && userPhoneFactors.length === 1) {
+        setWizardStep("otpValidation");
+      } else {
+        setWizardStep("otpSelection");
+      }
     },
   );
 
@@ -381,10 +386,19 @@ export default function AddMFAPage() {
         setUserOtpValue={handleSetUserOtpValue}
         requestOtpCode={requestOtpCode}
         validateOtpCode={validateOtpCode}
-        onBack={() => setWizardStep("otpSelection")}
+        onBack={() => {
+          // If there's only one MFA factor, go back to password verification
+          // Otherwise, go back to OTP selection
+          if (userPhoneFactors && userPhoneFactors.length === 1) {
+            setWizardStep("passwordVerification");
+          } else {
+            setWizardStep("otpSelection");
+          }
+        }}
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
         onCancel={async () => navigate(backToManage2FAVerificationsPage)}
+        showTryAnotherWay={userPhoneFactors && userPhoneFactors.length > 1}
       />
     ),
     addMFANumber: (
