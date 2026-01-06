@@ -35,8 +35,12 @@ DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH = (
     "app.users.services.update_my_profile.dispatch_get_my_profile_from_ibm"
 )
 
-MASK_PROFILE_DETAILS_IMPORT_PATH = "app.users.services.update_my_profile.mask_profile_details"
-VALIDATE_USER_REQUEST_MATCH = "app.users.services.update_my_profile.validate_user_request_match"
+MASK_PROFILE_DETAILS_IMPORT_PATH = (
+    "app.users.services.update_my_profile.mask_profile_details"
+)
+VALIDATE_USER_REQUEST_MATCH = (
+    "app.users.services.update_my_profile.validate_user_request_match"
+)
 
 
 @pytest.mark.asyncio
@@ -48,7 +52,11 @@ async def test_update_profile_success(
     mock_sanitize, mock_dispatch_get, mock_dispatch_update, mock_masked_profile
 ):
     # Arrange
-    sanitized_data = {"user_id": "user-123", "userName": "john.doe@example.com", "preferredLanguage": "en"}
+    sanitized_data = {
+        "user_id": "user-123",
+        "userName": "john.doe@example.com",
+        "preferredLanguage": "en",
+    }
     mock_sanitize.return_value = sanitized_data
 
     profile_data = {
@@ -109,14 +117,16 @@ async def test_update_profile_success(
 @patch(VALIDATE_USER_REQUEST_MATCH)
 @patch(SANITIZE_PROFILE_IMPORT_PATH)
 @patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH, new_callable=AsyncMock)
-async def test_update_profile_user_mismatch_403(mock_dispatch_get, mock_sanitize, mock_validate_user):
+async def test_update_profile_user_mismatch_403(
+    mock_dispatch_get, mock_sanitize, mock_validate_user
+):
     # Arrange - Set up a user ID mismatch scenario
     mock_sanitize.return_value = {"user_id": "other@example.com"}
 
     # Mock the validation function to raise a 403 error for user mismatch
     mock_validate_user.side_effect = HTTPException(
         status_code=403,
-        detail="7"  # This is the actual error message from the function
+        detail="7",  # This is the actual error message from the function
     )
 
     profile_data = {
@@ -242,7 +252,11 @@ async def test_update_profile_dispatch_failure(
 @patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
 async def test_update_profile_validation_error(mock_dispatch_get, mock_sanitize):
     # Pass something that will cause validation error when merging
-    mock_sanitize.return_value = {"userName": "john.doe@example.com", "id": 123, "user_id": "string-instead-of-int"}
+    mock_sanitize.return_value = {
+        "userName": "john.doe@example.com",
+        "id": 123,
+        "user_id": "string-instead-of-int",
+    }
 
     # Mock IBM profile with mismatched types
     mock_dispatch_get.return_value = Mock(
@@ -357,7 +371,7 @@ async def test_dispatch_update_user_profile_failure(monkeypatch):
     )
 
     with pytest.raises(Exception):
-        await dispatch_update_user_profile(
+        await dispatch_update_my_profile(
             request=mock_request,
             user_profile_payload=payload.model_dump_json(by_alias=True),
             user_access_token="mock-token",

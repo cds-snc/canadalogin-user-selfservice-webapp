@@ -1,5 +1,4 @@
 import pytest
-from unittest.mock import patch
 from fastapi import HTTPException, status
 
 from app.utils.validate_user_request_match import validate_user_request_match
