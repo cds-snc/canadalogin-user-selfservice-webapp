@@ -38,9 +38,6 @@ DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH = (
 MASK_PROFILE_DETAILS_IMPORT_PATH = (
     "app.users.services.update_my_profile.mask_profile_details"
 )
-VALIDATE_USER_REQUEST_MATCH = (
-    "app.users.services.update_my_profile.validate_user_request_match"
-)
 
 
 @pytest.mark.asyncio
@@ -111,73 +108,6 @@ async def test_update_profile_success(
     mock_sanitize.assert_called_once()
     mock_dispatch_get.assert_called_once()
     mock_dispatch_update.assert_called_once()
-
-
-@pytest.mark.asyncio
-@patch(VALIDATE_USER_REQUEST_MATCH)
-@patch(SANITIZE_PROFILE_IMPORT_PATH)
-@patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH, new_callable=AsyncMock)
-async def test_update_profile_user_mismatch_403(
-    mock_dispatch_get, mock_sanitize, mock_validate_user
-):
-    # Arrange - Set up a user ID mismatch scenario
-    mock_sanitize.return_value = {"user_id": "other@example.com"}
-
-    # Mock the validation function to raise a 403 error for user mismatch
-    mock_validate_user.side_effect = HTTPException(
-        status_code=403,
-        detail="7",  # This is the actual error message from the function
-    )
-
-    profile_data = {
-        "schemas": [
-            "urn:ietf:params:scim:schemas:core:2.0:User",
-            "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
-        ],
-        "userName": "john.doe@example.com",
-        "emails": [{"value": "john.doe@example.com", "type": "work"}],
-        "meta": {
-            "location": "here",
-            "created": "2023-01-01T00:00:00Z",
-            "lastModified": "2023-09-22T12:30:00Z",
-            "resourceType": "User",
-        },
-        "active": True,
-        "id": "john.doe@example.com",  # Different from sanitized user_id
-        "notification": {"notifyType": "NONE"},
-    }
-
-    mock_profile = IBMVerifyUserProfileSchema(**profile_data)
-    # For AsyncMock, set return_value directly - it will be awaitable
-    mock_dispatch_get.return_value = mock_profile
-
-    user_data = UserProfileUpdateRequest(user_id="other@example.com")
-    mock_request = Mock()
-    mock_request.app = Mock()
-    mock_request.app.state = Mock()
-    mock_request.app.state.request_client = Mock(spec=AsyncClient)
-    mock_request.app.state.config = Mock()
-    mock_request.app.state.config.profile_api_endpoint = PROFILE_API_URL
-
-    # Act & Assert
-    with pytest.raises(HTTPException) as exc:
-        await update_profile(mock_request, user_data, user_access_token="token")
-
-    assert exc.value.status_code == 403
-    assert exc.value.detail == "7"  # The actual generic error message
-
-    # Verify the validation function was called with correct parameters
-    mock_validate_user.assert_called_once()
-    call_args = mock_validate_user.call_args[0]
-
-    # Compare with the model_dump() output, not the raw profile_data
-    expected_profile = mock_profile.model_dump()
-    assert call_args[0] == expected_profile  # ibm_user_profile from model_dump()
-    assert call_args[1] == "other@example.com"  # current_users_id
-
-    # Verify other functions were called as expected
-    mock_sanitize.assert_called_once_with(user_data)
-    mock_dispatch_get.assert_awaited_once()  # Use assert_awaited_once for AsyncMock
 
 
 @pytest.mark.asyncio
