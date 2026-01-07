@@ -18,7 +18,7 @@ from fastapi import HTTPException, status
 from httpx import AsyncClient, HTTPStatusError
 from pydantic import ValidationError
 
-from app.utils.validate_user_request_match import validate_user_request_match
+from app.utils.validate_user_request_match import validate_user_id_matches_session
 
 logger = logging.getLogger(__name__)
 

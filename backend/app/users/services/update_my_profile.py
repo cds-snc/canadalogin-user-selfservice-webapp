@@ -14,7 +14,6 @@ from app.utils.access_token import get_auth_request_headers
 from app.utils.mask_user_profile import mask_profile_details
 from app.utils.request_error_handler import RequestErrorHandler
 from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
-from app.utils.validate_user_request_match import validate_user_request_match
 from app.constants.schema_field_names import USER_ID_FIELD, USERNAME_FIELD
 
 logger = logging.getLogger(__name__)
@@ -186,9 +185,6 @@ async def update_my_profile(
         request.app.state.request_client, user_access_token
     )
     ibm_user_profile = ibm_user_profile_response.model_dump()
-    current_users_id = updated_user_data_dict.get(USER_ID_FIELD)
-
-    validate_user_request_match(ibm_user_profile, current_users_id)
 
     # Remove userName and emails from update to prevent any accidental changes
     # Email changes must go through the secure OTP-verified endpoint
