@@ -35,7 +35,7 @@ logger = logging.getLogger(__name__)
 async def user_profile(
     request: Request,
     user_data: UserProfileUpdateRequest,
-    user_access_token: str = Depends(get_users_current_session)
+    user_access_token: str = Depends(get_users_current_session),
 ):
     await validate_user_id_matches_session(request, user_data.user_id)
 

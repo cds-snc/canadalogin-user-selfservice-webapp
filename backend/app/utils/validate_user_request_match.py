@@ -1,5 +1,5 @@
 import logging
-from fastapi import HTTPException, Request, status, Depends
+from fastapi import HTTPException, Request, status
 from app.constants.schema_field_names import UID_FIELD
 from app.auth.services.auth_user_session import get_user_info
 
@@ -7,8 +7,7 @@ logger = logging.getLogger(__name__)
 
 
 async def validate_user_id_matches_session(
-    request: Request,
-    request_user_id: str
+    request: Request, request_user_id: str
 ) -> None:
     """
     Validate that the current authenticated user session matches the user ID in the request.

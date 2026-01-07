@@ -18,8 +18,6 @@ from fastapi import HTTPException, status
 from httpx import AsyncClient, HTTPStatusError
 from pydantic import ValidationError
 
-from app.utils.validate_user_request_match import validate_user_id_matches_session
-
 logger = logging.getLogger(__name__)
 
 
@@ -106,10 +104,6 @@ async def handle_otp_send(
         start_time = datetime.now()
         my_profile_response = await get_my_profile(
             global_http_client, user_access_token
-        )
-
-        validate_user_request_match(
-            my_profile_response.data.model_dump(), user_otp_info.user_id
         )
 
         logger.info("User verified to send OTP")
