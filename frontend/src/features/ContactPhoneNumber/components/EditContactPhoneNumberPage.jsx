@@ -94,7 +94,7 @@ export default function EditContactPhoneNumberPage() {
 
       const formdata = {
         phoneNumber: phoneFormData.phoneNumber,
-        userName: userName,
+        user_id: userProfile.id,
         otpType: serverMapping[otpType || phoneFormData.otpType],
       };
 

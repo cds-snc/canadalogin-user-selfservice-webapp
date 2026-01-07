@@ -22,6 +22,8 @@ from app.utils.schemas import ResponseModel
 from fastapi import APIRouter, Depends, Request, status
 
 from app.otp.services.send_mfa_otp import handle_send_mfa_otp
+from app.utils.validate_user_request_match import validate_user_id_matches_session
+
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -40,6 +42,8 @@ async def send_otp(
     user_otp_info: UserOtpInfo,
     user_access_token: str = Depends(get_users_current_session),
 ):
+    await validate_user_id_matches_session(request, user_otp_info.user_id)
+
     # Get user's preferred language from their profile instead of payload
     return await handle_otp_send(
         request.app.state.request_client,
