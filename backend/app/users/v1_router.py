@@ -37,7 +37,7 @@ async def user_profile(
     user_data: UserProfileUpdateRequest,
     user_access_token: str = Depends(get_users_current_session),
 ):
-    await validate_user_id_matches_session(request, user_data.user_id)
+    await validate_user_id_matches_session(request, user_access_token, user_data.user_id)
 
     return await update_my_profile(
         request,
