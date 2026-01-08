@@ -114,5 +114,6 @@ async def verify_user(
 ):
     return await verify_user_password(
         request,
+        user_access_token,
         payload,
     )
