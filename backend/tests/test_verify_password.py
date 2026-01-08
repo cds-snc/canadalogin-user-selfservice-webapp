@@ -391,79 +391,101 @@ async def test_verify_user_password_get_user_info_fails():
         assert "Session expired" in exc_info.value.detail
 
 
-# @pytest.mark.asyncio
-# async def test_verify_user_password_dispatch_fails():
-#     """Test verify_user_password handles dispatch_verify_password failure."""
-#     # Arrange
-#     mock_request = Mock(spec=Request)
-#     mock_request.app.state.request_client = AsyncMock(spec=AsyncClient)
-#     mock_request.app.state.config.verify_password_api_endpoint = (
-#         "https://verify.ibm.com/v2.0/factors/cloudDirectory/authnmethods/password"
-#     )
+@pytest.mark.asyncio
+async def test_verify_user_password_dispatch_fails():
+    """Test verify_user_password handles dispatch_verify_password failure."""
+    # Arrange
+    mock_request = Mock(spec=Request)
+    mock_request.app = Mock()
+    mock_request.app.state = Mock()
+    mock_request.app.state.request_client = Mock(spec=AsyncClient)
+    mock_request.app.state.config = Mock()
+    mock_request.app.state.config.verify_password_api_endpoint = (
+        "https://verify.ibm.com/v2.0/factors/cloudDirectory/authnmethods/password"
+    )
 
-#     user_password = UserPassword(password="WrongPassword!")
+    user_password = UserPassword(password="WrongPassword!")
 
-#     with patch(
-#         "app.password.services.verify_password.get_user_info"
-#     ) as mock_get_user_info:
-#         mock_get_user_info.return_value = {
-#             "preferred_username": "john.doe@example.com",
-#         }
+    # Mock dispatch_get_my_profile_from_ibm with proper profile structure
+    with patch(
+        "app.password.services.verify_password.dispatch_get_my_profile_from_ibm",
+        new_callable=AsyncMock
+    ) as mock_get_user_info:
+        mock_profile = Mock()
+        mock_profile.userName = "john.doe@example.com"
+        mock_profile.id = "user-123"
+        mock_profile.active = True
+        mock_profile.emails = [{"value": "john.doe@example.com", "type": "work"}]
+        mock_profile.preferredLanguage = "en"
 
-#         with patch(
-#             "app.password.services.verify_password.dispatch_verify_password"
-#         ) as mock_dispatch:
-#             # Simulate verification failure
-#             mock_dispatch.side_effect = HTTPException(
-#                 status_code=401,
-#                 detail="Invalid credentials",
-#             )
+        mock_get_user_info.return_value = mock_profile
 
-#             # Act & Assert
-#             with pytest.raises(HTTPException) as exc_info:
-#                 await verify_user_password(
-#                     request=mock_request,
-#                     payload=user_password,
-#                 )
+        with patch(
+            "app.password.services.verify_password.dispatch_verify_password"
+        ) as mock_dispatch:
+            # Simulate verification failure
+            mock_dispatch.side_effect = HTTPException(
+                status_code=401,
+                detail="Invalid credentials",
+            )
 
-#             assert exc_info.value.status_code == 401
-#             assert "Invalid credentials" in exc_info.value.detail
+            # Act & Assert
+            with pytest.raises(HTTPException) as exc_info:
+                await verify_user_password(
+                    request=mock_request,
+                    user_access_token="user-access-token-123",
+                    payload=user_password,
+                )
+
+            assert exc_info.value.status_code == 401
+            assert "Invalid credentials" in exc_info.value.detail
 
 
-# @pytest.mark.asyncio
-# async def test_verify_user_password_with_logging():
-#     """Test that verify_user_password logs appropriate messages."""
-#     # Arrange
-#     mock_request = Mock(spec=Request)
-#     mock_request.app.state.request_client = AsyncMock(spec=AsyncClient)
-#     mock_request.app.state.config.verify_password_api_endpoint = (
-#         "https://verify.ibm.com/v2.0/factors/cloudDirectory/authnmethods/password"
-#     )
+@pytest.mark.asyncio
+async def test_verify_user_password_with_logging():
+    """Test that verify_user_password logs appropriate messages."""
+    # Arrange
+    mock_request = Mock(spec=Request)
+    mock_request.app = Mock()
+    mock_request.app.state = Mock()
+    mock_request.app.state.request_client = Mock(spec=AsyncClient)
+    mock_request.app.state.config = Mock()
+    mock_request.app.state.config.verify_password_api_endpoint = (
+        "https://verify.ibm.com/v2.0/factors/cloudDirectory/authnmethods/password"
+    )
 
-#     user_password = UserPassword(password="SecurePass123!")
+    user_password = UserPassword(password="WrongPassword!")
 
-#     with patch(
-#         "app.password.services.verify_password.get_user_info"
-#     ) as mock_get_user_info:
-#         mock_get_user_info.return_value = {
-#             "preferred_username": "john.doe@example.com",
-#         }
+    # Mock dispatch_get_my_profile_from_ibm with proper profile structure
+    with patch(
+        "app.password.services.verify_password.dispatch_get_my_profile_from_ibm",
+        new_callable=AsyncMock
+    ) as mock_get_user_info:
+        mock_profile = Mock()
+        mock_profile.userName = "john.doe@example.com"
+        mock_profile.id = "user-123"
+        mock_profile.active = True
+        mock_profile.emails = [{"value": "john.doe@example.com", "type": "work"}]
+        mock_profile.preferredLanguage = "en"
 
-#         with patch(
-#             "app.password.services.verify_password.dispatch_verify_password"
-#         ) as mock_dispatch:
-#             mock_response = Mock(spec=Response)
-#             mock_response.json.return_value = {"id": "user-456"}
-#             mock_dispatch.return_value = mock_response
+        mock_get_user_info.return_value = mock_profile
 
-#             with patch("app.password.services.verify_password.logger") as mock_logger:
-#                 # Act
-#                 result = await verify_user_password(
-#                     request=mock_request,
-#                     payload=user_password,
-#                 )
+        with patch(
+            "app.password.services.verify_password.dispatch_verify_password"
+        ) as mock_dispatch:
+            mock_response = Mock(spec=Response)
+            mock_response.json.return_value = {"id": "user-456"}
+            mock_dispatch.return_value = mock_response
 
-#                 # Assert
-#                 assert result.success is True
-#                 mock_logger.info.assert_any_call("Starting verification for user")
-#                 mock_logger.info.assert_any_call("User verified successfully: user-456")
+            with patch("app.password.services.verify_password.logger") as mock_logger:
+                # Act
+                result = await verify_user_password(
+                    request=mock_request,
+                    user_access_token="user-access-token-123",
+                    payload=user_password,
+                )
+
+                # Assert
+                assert result.success is True
+                mock_logger.info.assert_any_call("Starting verification for user")
+                mock_logger.info.assert_any_call("User verified successfully: user-456")
