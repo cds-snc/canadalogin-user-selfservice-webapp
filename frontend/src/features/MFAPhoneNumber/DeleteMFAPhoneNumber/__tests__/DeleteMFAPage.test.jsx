@@ -701,6 +701,11 @@ describe("DeleteMFAPage", () => {
             type: "smsotp",
             phoneNumber: "+15551234567",
           },
+          {
+            id: "factor-2",
+            type: "voiceotp",
+            phoneNumber: "+15551234568",
+          },
         ],
         userSelectedMfaFactor: {
           id: "factor-1",

@@ -29,6 +29,7 @@ export default function OtpVerification({
   setErrorCode,
   errorMessage,
   onCancel,
+  showTryAnotherWay = true,
 }) {
   const { language } = useParams();
   const [time, setTime] = useState(initialTime);
@@ -159,16 +160,18 @@ export default function OtpVerification({
       </GcdsContainer>
       <GcdsHeading tag="h2">{pageContentJson["10"]}</GcdsHeading>
 
-      <GcdsText>
-        <GcdsLink
-          role="button"
-          onGcdsClick={() => {
-            onBack();
-          }}
-        >
-          {pageContentJson["21"]}
-        </GcdsLink>
-      </GcdsText>
+      {showTryAnotherWay && (
+        <GcdsText>
+          <GcdsLink
+            role="button"
+            onGcdsClick={() => {
+              onBack();
+            }}
+          >
+            {pageContentJson["21"]}
+          </GcdsLink>
+        </GcdsText>
+      )}
 
       <GcdsText>
         {time > 0 ? (

@@ -43,7 +43,12 @@ export default function EditEmailAddressPage() {
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(
     setErrorCode,
     () => {
-      setWizardStep("otpSelection");
+      // If there's only one MFA factor, skip OTP selection and go directly to validation
+      if (userPhoneFactors && userPhoneFactors.length === 1) {
+        setWizardStep("otpValidation");
+      } else {
+        setWizardStep("otpSelection");
+      }
     },
   );
 
@@ -219,10 +224,19 @@ export default function EditEmailAddressPage() {
             }
           })
         }
-        onBack={() => setWizardStep("otpSelection")}
+        onBack={() => {
+          // If there's only one MFA factor, go back to password verification
+          // Otherwise, go back to OTP selection
+          if (userPhoneFactors && userPhoneFactors.length === 1) {
+            setWizardStep("passwordVerification");
+          } else {
+            setWizardStep("otpSelection");
+          }
+        }}
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
         onCancel={handleBackToProfile}
+        showTryAnotherWay={userPhoneFactors && userPhoneFactors.length > 1}
       />
     ),
     enterEmail: (

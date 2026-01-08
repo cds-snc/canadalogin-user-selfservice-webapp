@@ -12,7 +12,7 @@ from app.password.schemas import (
 )
 from app.utils.schemas import ResponseModel
 from app.utils.request_error_handler import RequestErrorHandler
-from app.auth.services.auth_user_session import get_user_info
+from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
 from urllib.parse import quote
 
 logger = logging.getLogger(__name__)
@@ -155,6 +155,7 @@ async def dispatch_verify_password(
 
 async def verify_user_password(
     request: Request,
+    user_access_token: str,
     payload: UserPassword,
 ) -> ResponseModel:
     """
@@ -179,12 +180,15 @@ async def verify_user_password(
         http_client: AsyncClient = request.app.state.request_client
         config = request.app.state.config
 
-        # Get username from the session
-        user_info_from_session = await get_user_info(request)
-        session_username = user_info_from_session.get("preferred_username")
+        # Retrieve unmasked username from the profile
+        user_info_from_profile = await dispatch_get_my_profile_from_ibm(
+            http_client, user_access_token
+        )
+        profile_username = user_info_from_profile.userName
+
         # Prepare verification payload
         verification_data = {
-            "username": session_username,
+            "username": profile_username,
             "password": payload.password,
         }
 
