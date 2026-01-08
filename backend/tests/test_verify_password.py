@@ -229,7 +229,7 @@ async def test_verify_user_password_success():
     # Mock get_user_info
     with patch(
         "app.password.services.verify_password.dispatch_get_my_profile_from_ibm",
-        new_callable=AsyncMock
+        new_callable=AsyncMock,
     ) as mock_get_user_info:
         mock_profile = Mock()
         mock_profile.userName = "john.doe@example.com"
@@ -294,10 +294,10 @@ async def test_verify_user_password_success():
 
             # Extract the payload from kwargs
             kwargs = dispatch_call_args.kwargs
-            assert 'payload' in kwargs
-            actual_payload = kwargs['payload']
-            assert actual_payload['password'] == "SecurePass123!"
-            assert actual_payload['username'] == "john.doe@example.com"
+            assert "payload" in kwargs
+            actual_payload = kwargs["payload"]
+            assert actual_payload["password"] == "SecurePass123!"
+            assert actual_payload["username"] == "john.doe@example.com"
 
 
 @pytest.mark.asyncio
@@ -317,7 +317,7 @@ async def test_verify_user_password_missing_user_id_in_response():
     # Mock dispatch_get_my_profile_from_ibm with proper profile structure
     with patch(
         "app.password.services.verify_password.dispatch_get_my_profile_from_ibm",
-        new_callable=AsyncMock
+        new_callable=AsyncMock,
     ) as mock_get_user_info:
         mock_profile = Mock()
         mock_profile.userName = "john.doe@example.com"
@@ -368,7 +368,7 @@ async def test_verify_user_password_get_user_info_fails():
     # Mock dispatch_get_my_profile_from_ibm with proper profile structure
     with patch(
         "app.password.services.verify_password.dispatch_get_my_profile_from_ibm",
-        new_callable=AsyncMock
+        new_callable=AsyncMock,
     ) as mock_get_user_info:
         mock_get_user_info.side_effect = HTTPException(
             status_code=401,
@@ -405,7 +405,7 @@ async def test_verify_user_password_dispatch_fails():
     # Mock dispatch_get_my_profile_from_ibm with proper profile structure
     with patch(
         "app.password.services.verify_password.dispatch_get_my_profile_from_ibm",
-        new_callable=AsyncMock
+        new_callable=AsyncMock,
     ) as mock_get_user_info:
         mock_profile = Mock()
         mock_profile.userName = "john.doe@example.com"
@@ -455,7 +455,7 @@ async def test_verify_user_password_with_logging():
     # Mock dispatch_get_my_profile_from_ibm with proper profile structure
     with patch(
         "app.password.services.verify_password.dispatch_get_my_profile_from_ibm",
-        new_callable=AsyncMock
+        new_callable=AsyncMock,
     ) as mock_get_user_info:
         mock_profile = Mock()
         mock_profile.userName = "john.doe@example.com"
