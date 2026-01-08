@@ -11,7 +11,7 @@ from app.password.schemas import (
     UpdatePasswordIbmApiResponse,
     UpdatePasswordClientResponsePayload,
 )
-from app.users.services.get_my_profile import get_my_profile
+from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.request_error_handler import RequestErrorHandler
 from app.utils.schemas import ResponseModel
@@ -31,11 +31,13 @@ async def first_step_update_password(
         logger.info(f"First step - attempting update password for: {payload}")
         start_time = datetime.now()
 
-        # Get user's preferred language from their profile
-        user_profile_response = await get_my_profile(
+        # Get user's preferred language and unmasked username from their profile
+        user_profile_response = await dispatch_get_my_profile_from_ibm(
             global_http_client, user_access_token
         )
-        user_language = user_profile_response.data.preferredLanguage or "en"
+
+        payload.userName = user_profile_response.userName
+        user_language = user_profile_response.preferredLanguage or "en"
         logger.info(f"Using user's preferred language: {user_language}")
 
         password_otp_response = await dispatch_password_otp(
