@@ -354,36 +354,41 @@ async def test_verify_user_password_missing_user_id_in_response():
             assert mock_dispatch.await_count == 1
 
 
-# @pytest.mark.asyncio
-# async def test_verify_user_password_get_user_info_fails():
-#     """Test verify_user_password handles get_user_info failure."""
-#     # Arrange
-#     mock_request = Mock(spec=Request)
-#     mock_request.app.state.request_client = AsyncMock(spec=AsyncClient)
-#     mock_request.app.state.config.verify_password_api_endpoint = (
-#         "https://verify.ibm.com/v2.0/factors/cloudDirectory/authnmethods/password"
-#     )
+@pytest.mark.asyncio
+async def test_verify_user_password_get_user_info_fails():
+    """Test verify_user_password handles get_user_info failure."""
+    # Arrange
+    mock_request = Mock(spec=Request)
+    mock_request.app = Mock()
+    mock_request.app.state = Mock()
+    mock_request.app.state.request_client = Mock(spec=AsyncClient)
+    mock_request.app.state.config = Mock()
+    mock_request.app.state.config.verify_password_api_endpoint = (
+        "https://verify.ibm.com/v2.0/factors/cloudDirectory/authnmethods/password"
+    )
 
-#     user_password = UserPassword(password="SecurePass123!")
+    user_password = UserPassword(password="SecurePass123!")
 
-#     with patch(
-#         "app.password.services.verify_password.get_user_info"
-#     ) as mock_get_user_info:
-#         # Simulate session error
-#         mock_get_user_info.side_effect = HTTPException(
-#             status_code=401,
-#             detail="Session expired",
-#         )
+    # Mock dispatch_get_my_profile_from_ibm with proper profile structure
+    with patch(
+        "app.password.services.verify_password.dispatch_get_my_profile_from_ibm",
+        new_callable=AsyncMock
+    ) as mock_get_user_info:
+        mock_get_user_info.side_effect = HTTPException(
+            status_code=401,
+            detail="Session expired",
+        )
 
-#         # Act & Assert
-#         with pytest.raises(HTTPException) as exc_info:
-#             await verify_user_password(
-#                 request=mock_request,
-#                 payload=user_password,
-#             )
+        # Act & Assert
+        with pytest.raises(HTTPException) as exc_info:
+            await verify_user_password(
+                request=mock_request,
+                user_access_token="user-access-token-123",
+                payload=user_password,
+            )
 
-#         assert exc_info.value.status_code == 401
-#         assert "Session expired" in exc_info.value.detail
+        assert exc_info.value.status_code == 401
+        assert "Session expired" in exc_info.value.detail
 
 
 # @pytest.mark.asyncio
