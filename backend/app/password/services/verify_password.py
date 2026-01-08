@@ -181,7 +181,9 @@ async def verify_user_password(
         config = request.app.state.config
 
         # Retrieve unmasked username from the profile
-        user_info_from_profile = await dispatch_get_my_profile_from_ibm(http_client, user_access_token)
+        user_info_from_profile = await dispatch_get_my_profile_from_ibm(
+            http_client, user_access_token
+        )
         profile_username = user_info_from_profile.userName
 
         # Prepare verification payload
