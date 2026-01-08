@@ -510,8 +510,7 @@ async def test_verify_user_password_missing_username_in_profile():
         # and the RequestErrorHandler in dispatch_get_my_profile_from_ibm converts
         # the ValidationError to HTTPException 422
         mock_get_user_info.side_effect = HTTPException(
-            status_code=422,
-            detail="Validation Error"
+            status_code=422, detail="Validation Error"
         )
 
         # Act & Assert
@@ -564,8 +563,7 @@ async def test_verify_user_password_empty_username_in_profile():
         ) as mock_dispatch:
             # Mock IBM Verify API to reject empty username with 400 Bad Request
             mock_dispatch.side_effect = HTTPException(
-                status_code=400,
-                detail="Invalid username"
+                status_code=400, detail="Invalid username"
             )
 
             # Act & Assert - IBM Verify should reject empty username
@@ -583,9 +581,9 @@ async def test_verify_user_password_empty_username_in_profile():
             # Verify that dispatch_verify_password was called with empty username
             dispatch_call_args = mock_dispatch.call_args
             assert dispatch_call_args is not None
-            payload = dispatch_call_args.kwargs['payload']
-            assert payload['username'] == ""  # Empty string was passed through
-            assert payload['password'] == "SecurePass123!"
+            payload = dispatch_call_args.kwargs["payload"]
+            assert payload["username"] == ""  # Empty string was passed through
+            assert payload["password"] == "SecurePass123!"
 
 
 @pytest.mark.asyncio
@@ -673,11 +671,11 @@ async def test_dispatch_get_my_profile_returns_valid_username():
 
             # Verify that dispatch was called with the userName from the profile
             dispatch_call_args = mock_dispatch.call_args
-            payload = dispatch_call_args.kwargs['payload']
-            assert payload['username'] == "john.doe@example.com"
+            payload = dispatch_call_args.kwargs["payload"]
+            assert payload["username"] == "john.doe@example.com"
 
             # Verify that mock_get_user_info was called and returned a profile with userName
             assert mock_get_user_info.await_count == 1
             profile = mock_get_user_info.return_value
-            assert hasattr(profile, 'userName')
+            assert hasattr(profile, "userName")
             assert profile.userName == "john.doe@example.com"
