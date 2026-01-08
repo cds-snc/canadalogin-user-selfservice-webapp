@@ -332,9 +332,8 @@ async def test_verify_user_password_missing_user_id_in_response():
             "app.password.services.verify_password.dispatch_verify_password",
             new_callable=AsyncMock,
         ) as mock_dispatch:
-            # Mock response with missing 'id' field
             mock_response = Mock(spec=Response)
-            mock_response.json.return_value = {"message": "success"}  # Response without 'id' field
+            mock_response.json.return_value = {"message": "success"}  # No 'id' field
             mock_response.status_code = 200
             mock_dispatch.return_value = mock_response
 
@@ -346,10 +345,7 @@ async def test_verify_user_password_missing_user_id_in_response():
                     payload=user_password,
                 )
 
-            # Verify it's an error related to missing or invalid response data
-            assert exc_info.value.status_code >= 400  # Should be a client or server error
-
-            # Verify that the functions were called
+            assert exc_info.value.status_code == 404
             assert mock_get_user_info.await_count == 1
             assert mock_dispatch.await_count == 1
 
