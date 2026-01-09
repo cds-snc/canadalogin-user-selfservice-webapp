@@ -1,7 +1,5 @@
 import logging
 from fastapi import HTTPException, Request, status
-from app.constants.schema_field_names import ID_FIELD
-from app.auth.services.auth_user_session import get_user_info
 from app.users.services.get_my_profile import get_my_profile
 
 
@@ -24,6 +22,7 @@ async def validate_user_id_matches_session(
         HTTPException: 403 Forbidden if user IDs don't match
         HTTPException: 400 Bad Request if required data is missing
     """
+    generic_msg_id = "7"
 
     # session_user_profile: User profile data from Session Data
     user_profile_response = await get_my_profile(
@@ -31,16 +30,8 @@ async def validate_user_id_matches_session(
     )
     user_profile = user_profile_response.data
 
-    generic_msg_id = "7"
-    # Validate input parameters
-    if not isinstance(user_profile, dict):
-        logger.error("Invalid userinfo from token - expected dict")
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=generic_msg_id
-        )
-
     # Extract user ID from profile
-    profile_user_id = user_profile.get(ID_FIELD)
+    profile_user_id = user_profile.id
     if not profile_user_id:
         logger.error("Missing user ID in profile for validation")
         raise HTTPException(
