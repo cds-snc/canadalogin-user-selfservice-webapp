@@ -19,6 +19,7 @@ from app.auth.services.auth_user_session import (
     get_users_current_session,
     get_user_id_token,
     session_extend,
+    debug_current_session_tokens,
 )
 
 from app.constants.session_keys import SessionKeys
@@ -58,9 +59,10 @@ async def callback(request: Request):
 async def reauth(
     request: Request,
     returnToPage: str = "/",
+    acr_values: str = None,
     user_access_token: None = Depends(get_users_current_session),
 ):
-    return await reauthenticate_user(request, returnToPage)
+    return await reauthenticate_user(request, returnToPage, acr_values)
 
 
 @router.post(
@@ -101,3 +103,21 @@ async def session_status(request: Request):
 )
 async def keep_alive(request: Request):
     return await session_extend(request)
+
+
+@router.get(
+    "/debug-session",
+    tags=["Auth"], 
+    summary="Debug session tokens",
+    description="Debug endpoint to log current session token information (local env only)",
+)
+async def debug_session(
+    request: Request,
+    user_access_token: None = Depends(get_users_current_session),
+):
+    """
+    Debug endpoint to inspect session token contents.
+    Only works in local environment for security.
+    """
+    await debug_current_session_tokens(request)
+    return {"message": "Session debug info logged (check server logs)"}

@@ -27,6 +27,7 @@ class IBMVerifyConfig(BaseSettings):
     IBM_VERIFY_PROFILE_MANAGEMENT_API_SECRET: str
     IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID: str
     IBM_VERIFY_PROFILE_MANAGEMENT_SECRET: str
+    RPID: str = "cds-gcsignin-dev.verify.ibm.com"  # FIDO2 Relying Party ID
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore", case_sensitive=True
     )

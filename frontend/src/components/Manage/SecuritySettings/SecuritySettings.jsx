@@ -31,6 +31,9 @@ export default function SecuritySettings() {
   const manage2FAVerificationsPage = path(PAGES.manage2FAVerifications, {
     language: language,
   });
+  const manageFIDO2Page = path(PAGES.manageFIDO2, {
+    language: language,
+  });
 
   return (
     <GcdsContainer role="main">
@@ -59,6 +62,9 @@ export default function SecuritySettings() {
           <EnabledBadge text={pageContent["9"]} />
           <GcdsLink href={manage2FAVerificationsPage} size="regular">
             {pageContent["10"]}
+          </GcdsLink>
+          <GcdsLink href={manageFIDO2Page} size="regular">
+            {pageContent["11"]}
           </GcdsLink>
         </GcdsGrid>
       </GcdsContainer>

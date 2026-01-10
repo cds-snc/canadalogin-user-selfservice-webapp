@@ -233,8 +233,8 @@ def app(monkeypatch, mock_token_transport):
         return await auth_module.redirect_user_to_idp_verify(request)
 
     @base.get("/reauth")
-    async def reauth(request: Request, returnToPage: str = "/"):
-        return await auth_module.reauthenticate_user(request, returnToPage=returnToPage)
+    async def reauth(request: Request, returnToPage: str = "/", acr_values: str = None):
+        return await auth_module.reauthenticate_user(request, returnToPage=returnToPage, acr_values=acr_values)
 
     # Utilities to seed & read session in tests
     @base.get("/seed-session")
@@ -390,3 +390,23 @@ async def test_reauthenticate_user_sets_returnToPage_and_passes_max_age(app, cli
 
     # Confirm we passed max_age=900 to authorize_redirect()
     assert app.state.oauth_verify.last_authorize_redirect_kwargs.get("max_age") == 900
+
+
+@pytest.mark.asyncio
+async def test_reauthenticate_user_with_acr_values_for_stepup(app, client):
+    resp = await client.get(
+        "/reauth", params={"returnToPage": "/security", "acr_values": "loa3_stepup"}, follow_redirects=False
+    )
+    assert resp.status_code in (302, 307)
+    assert resp.headers["location"].startswith(
+        "https://idp.example/authorize?redirect_uri="
+    )
+
+    # Confirm session now contains RETURN_TO_PAGE
+    dump = await client.get("/session-dump")
+    assert dump.status_code == 200
+    assert dump.json().get(FakeSessionKeys.RETURN_TO_PAGE.value) == "/security"
+
+    # Confirm we passed acr_values="loa3_stepup" to authorize_redirect() instead of max_age
+    assert app.state.oauth_verify.last_authorize_redirect_kwargs.get("acr_values") == "loa3_stepup"
+    assert app.state.oauth_verify.last_authorize_redirect_kwargs.get("max_age") is None

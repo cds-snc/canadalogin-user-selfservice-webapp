@@ -1,0 +1,500 @@
+import {
+  GcdsButton,
+  GcdsContainer,
+  GcdsHeading,
+  GcdsLink,
+  GcdsNotice,
+  GcdsText,
+  GcdsAlert,
+  GcdsInput,
+} from "@cdssnc/gcds-components-react";
+import { useEffect, useState } from "react";
+import { useLocation, useParams, useNavigate } from "react-router";
+import { fido2Api } from "../../../features/ManageFIDO2/api/fido2Api.jsx";
+import { PAGES } from "../../../utils/constants.jsx";
+import { getPageContent } from "../../../utils/functions.jsx";
+import { path } from "../../../utils/routeHelpers.js";
+import Loader from "../../Layout/Loading.jsx";
+import NoticeFactory from "../../InfoBlocks/NoticeFactory.jsx";
+import {
+  isWebAuthnSupported,
+  registerFIDO2Credential,
+} from "../../../features/ManageFIDO2/utils/webAuthnUtils.js";
+import VerifiedBadge from "../../Badges/VerifiedBadge.jsx";
+import EnabledBadge from "../../Badges/EnabledBadge.jsx";
+
+export default function ManageFIDO2() {
+  const { language } = useParams();
+  const location = useLocation();
+  const pageContent = getPageContent(language, PAGES.manageFIDO2);
+  const navigate = useNavigate();
+
+  // State management
+  const [fido2Data, setFido2Data] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [registrationLoading, setRegistrationLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [credentialToDelete, setCredentialToDelete] = useState(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newDeviceName, setNewDeviceName] = useState("");
+
+  // Check if we came from another page and need to render success notice
+  const { noticeType, message } = location.state || {};
+  const backToSecuritySettingsPage = path(PAGES.securitySettings, {
+    language: language,
+  });
+
+  // Check WebAuthn support
+  const webAuthnSupported = isWebAuthnSupported();
+
+  /**
+   * Fetch user's FIDO2 credentials
+   */
+  const fetchUserFIDO2Credentials = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fido2Api.getUserFIDO2Credentials();
+
+      if (response && response.authenticated) {
+        setFido2Data(response);
+      } else {
+        setError(pageContent["error_not_authenticated"] || "Not authenticated");
+      }
+    } catch (err) {
+      console.error("Error fetching FIDO2 credentials:", err);
+
+      // Handle authentication/authorization errors
+      if (err.response?.status === 401 || err.response?.status === 400) {
+        setError(
+          pageContent["error_session_expired"] ||
+            "Your session has expired or you don't have permission to access this feature. Please go back to Security Settings and try again.",
+        );
+        // Don't redirect automatically - let user click back button
+      } else {
+        setError(
+          pageContent["error_fetch_credentials"] ||
+            "Failed to fetch FIDO2 credentials",
+        );
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
+   * Handle adding new FIDO2 credential
+   */
+  const handleAddFIDO2 = async () => {
+    if (!webAuthnSupported) {
+      setError(
+        pageContent["error_webauthn_not_supported"] ||
+          "WebAuthn is not supported by your browser",
+      );
+      return;
+    }
+
+    setRegistrationLoading(true);
+    setError(null);
+
+    try {
+      // Step 1: Get attestation options from server
+      const attestationOptions = await fido2Api.getAttestationOptions(
+        "",
+        newDeviceName || "My Security Key",
+      );
+
+      if (!attestationOptions || attestationOptions.status !== "ok") {
+        throw new Error("Failed to get attestation options");
+      }
+
+      // Step 2: Use WebAuthn API to create credential
+      const attestationResult = await registerFIDO2Credential(
+        attestationOptions,
+        newDeviceName || "My Security Key",
+      );
+
+      // Step 3: Send attestation result to server
+      const response =
+        await fido2Api.submitAttestationResult(attestationResult);
+
+      if (response && response.status === "ok") {
+        setSuccess(
+          pageContent["success_credential_added"] ||
+            "Security key successfully added",
+        );
+        setShowAddModal(false);
+        setNewDeviceName("");
+        // Refresh the credential list
+        await fetchUserFIDO2Credentials();
+      } else {
+        throw new Error("Failed to register credential");
+      }
+    } catch (err) {
+      console.error("Error adding FIDO2 credential:", err);
+
+      // Handle authentication/authorization errors
+      if (err.response?.status === 401 || err.response?.status === 400) {
+        setError(
+          pageContent["error_session_expired"] ||
+            "Your session has expired or you don't have permission to access this feature. Please go back to Security Settings and try again.",
+        );
+      } else if (err.message === "NotAllowedError") {
+        setError(
+          pageContent["error_registration_cancelled"] ||
+            "Registration was cancelled",
+        );
+      } else {
+        setError(
+          pageContent["error_add_credential"] || "Failed to add security key",
+        );
+      }
+    } finally {
+      setRegistrationLoading(false);
+    }
+  };
+
+  /**
+   * Handle deleting FIDO2 credential
+   */
+  const handleDeleteFIDO2 = async () => {
+    if (!credentialToDelete) return;
+
+    setDeleteLoading(true);
+    setError(null);
+
+    try {
+      const response = await fido2Api.deleteRegistration(credentialToDelete.id);
+
+      if (response && response.authenticated) {
+        setSuccess(
+          pageContent["success_credential_deleted"] ||
+            "Security key successfully deleted",
+        );
+        setShowDeleteModal(false);
+        setCredentialToDelete(null);
+        // Update the local state with the response
+        setFido2Data(response);
+      } else {
+        throw new Error("Failed to delete credential");
+      }
+    } catch (err) {
+      console.error("Error deleting FIDO2 credential:", err);
+
+      // Handle authentication/authorization errors
+      if (err.response?.status === 401 || err.response?.status === 400) {
+        setError(
+          pageContent["error_session_expired"] ||
+            "Your session has expired or you don't have permission to access this feature. Please go back to Security Settings and try again.",
+        );
+      } else {
+        setError(
+          pageContent["error_delete_credential"] ||
+            "Failed to delete security key",
+        );
+      }
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
+  /**
+   * Open delete confirmation modal
+   */
+  const openDeleteModal = (credential) => {
+    setCredentialToDelete(credential);
+    setShowDeleteModal(true);
+  };
+
+  /**
+   * Close modals and reset state
+   */
+  const closeModals = () => {
+    setShowDeleteModal(false);
+    setShowAddModal(false);
+    setCredentialToDelete(null);
+    setNewDeviceName("");
+    setError(null);
+  };
+
+  // Load FIDO2 credentials on component mount
+  useEffect(() => {
+    fetchUserFIDO2Credentials();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Clear messages after 5 seconds
+  useEffect(() => {
+    if (success || error) {
+      const timer = setTimeout(() => {
+        setSuccess(null);
+        setError(null);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [success, error]);
+
+  /**
+   * Render individual FIDO2 credential item
+   */
+  const renderCredentialItem = (credential, index) => {
+    const createdDate = credential.created
+      ? new Date(credential.created).toLocaleDateString(
+          language === "fr" ? "fr-CA" : "en-CA",
+        )
+      : pageContent["unknown_date"] || "Unknown";
+
+    return (
+      <GcdsContainer
+        key={credential.id || index}
+        className="credential-item"
+        style={{
+          marginBottom: "1rem",
+          padding: "1rem",
+          border: "1px solid #ccc",
+          borderRadius: "4px",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+          }}
+        >
+          <div style={{ flex: 1 }}>
+            <GcdsText size="h6" tag="h3">
+              <strong>
+                {credential.nickname ||
+                  pageContent["unnamed_device"] ||
+                  "Unnamed Device"}
+              </strong>
+            </GcdsText>
+            <GcdsText size="caption">
+              {pageContent["created"] || "Created"}: {createdDate}
+            </GcdsText>
+            <div style={{ marginTop: "0.5rem" }}>
+              {credential.enabled ? (
+                <EnabledBadge text={pageContent["enabled"] || "Enabled"} />
+              ) : (
+                <span className="badge badge-disabled">
+                  {pageContent["disabled"] || "Disabled"}
+                </span>
+              )}
+            </div>
+          </div>
+          <div
+            style={{ display: "flex", gap: "0.5rem", flexDirection: "column" }}
+          >
+            <GcdsButton
+              buttonRole="destructive"
+              size="small"
+              onClick={() => openDeleteModal(credential)}
+              disabled={deleteLoading}
+            >
+              {pageContent["delete"] || "Delete"}
+            </GcdsButton>
+          </div>
+        </div>
+      </GcdsContainer>
+    );
+  };
+
+  if (loading) {
+    return <Loader text={pageContent["loading"] || "Loading..."} />;
+  }
+
+  return (
+    <GcdsContainer>
+      <GcdsHeading tag="h1" size="h3">
+        {pageContent["title"] || "Manage Security Keys (FIDO2)"}
+      </GcdsHeading>
+
+      {/* Back link */}
+      <GcdsLink
+        href={backToSecuritySettingsPage}
+        size="regular"
+        onGcdsClick={(ev) => {
+          ev.preventDefault();
+          navigate(backToSecuritySettingsPage);
+        }}
+      >
+        {pageContent["back_to_security"] || "← Back to Security Settings"}
+      </GcdsLink>
+
+      {/* Notice messages */}
+      {noticeType && message && (
+        <NoticeFactory type={noticeType} message={message} />
+      )}
+
+      {/* Success/Error messages */}
+      {success && (
+        <GcdsAlert
+          alertRole="success"
+          heading={pageContent["success"] || "Success"}
+        >
+          {success}
+        </GcdsAlert>
+      )}
+
+      {error && (
+        <GcdsAlert alertRole="danger" heading={pageContent["error"] || "Error"}>
+          {error}
+        </GcdsAlert>
+      )}
+
+      {/* WebAuthn support warning */}
+      {!webAuthnSupported && (
+        <GcdsAlert
+          alertRole="warning"
+          heading={pageContent["warning"] || "Warning"}
+        >
+          {pageContent["webauthn_not_supported"] ||
+            "Your browser does not support WebAuthn. You will not be able to register new security keys."}
+        </GcdsAlert>
+      )}
+
+      {/* Main content */}
+      <div style={{ marginTop: "2rem" }}>
+        <GcdsText>
+          {pageContent["description"] ||
+            "Security keys (FIDO2) provide strong two-factor authentication. You can register multiple security keys for backup purposes."}
+        </GcdsText>
+
+        {/* Add new security key button */}
+        <div style={{ marginTop: "1rem", marginBottom: "2rem" }}>
+          <GcdsButton
+            onClick={() => setShowAddModal(true)}
+            disabled={!webAuthnSupported || registrationLoading}
+          >
+            {registrationLoading
+              ? pageContent["adding"] || "Adding..."
+              : pageContent["add_security_key"] || "Add Security Key"}
+          </GcdsButton>
+        </div>
+
+        {/* Credentials list */}
+        {fido2Data &&
+        fido2Data.credentials &&
+        fido2Data.credentials.length > 0 ? (
+          <>
+            <GcdsHeading tag="h2" size="h4" style={{ marginTop: "2rem" }}>
+              {pageContent["registered_keys"] || "Registered Security Keys"}
+            </GcdsHeading>
+            {fido2Data.credentials.map((credential, index) =>
+              renderCredentialItem(credential, index),
+            )}
+          </>
+        ) : (
+          <GcdsNotice
+            type="info"
+            heading={pageContent["no_keys"] || "No Security Keys"}
+          >
+            {pageContent["no_keys_message"] ||
+              "You don't have any security keys registered yet. Click 'Add Security Key' to register your first security key."}
+          </GcdsNotice>
+        )}
+      </div>
+
+      {/* Add Security Key Form */}
+      {showAddModal && (
+        <GcdsContainer
+          style={{
+            border: "1px solid #ccc",
+            padding: "1rem",
+            marginTop: "1rem",
+            borderRadius: "4px",
+            backgroundColor: "#f9f9f9",
+          }}
+        >
+          <GcdsHeading tag="h3">
+            {pageContent["add_security_key"] || "Add Security Key"}
+          </GcdsHeading>
+          <GcdsText>
+            {pageContent["add_description"] ||
+              "Give your security key a name to help you identify it later."}
+          </GcdsText>
+
+          <GcdsInput
+            inputId="device-name"
+            label={pageContent["device_name"] || "Device Name"}
+            value={newDeviceName}
+            onGcdsInput={(e) => setNewDeviceName(e.detail.value)}
+            placeholder={
+              pageContent["device_name_placeholder"] || "e.g., My YubiKey"
+            }
+          />
+
+          <div style={{ marginTop: "1rem", display: "flex", gap: "0.5rem" }}>
+            <GcdsButton onClick={handleAddFIDO2} disabled={registrationLoading}>
+              {registrationLoading
+                ? pageContent["registering"] || "Registering..."
+                : pageContent["register"] || "Register"}
+            </GcdsButton>
+            <GcdsButton
+              buttonRole="secondary"
+              onClick={closeModals}
+              disabled={registrationLoading}
+            >
+              {pageContent["cancel"] || "Cancel"}
+            </GcdsButton>
+          </div>
+        </GcdsContainer>
+      )}
+
+      {/* Delete Confirmation Form */}
+      {showDeleteModal && credentialToDelete && (
+        <GcdsContainer
+          style={{
+            border: "2px solid #d93025",
+            padding: "1rem",
+            marginTop: "1rem",
+            borderRadius: "4px",
+            backgroundColor: "#fef7f6",
+          }}
+        >
+          <GcdsHeading tag="h3">
+            {pageContent["confirm_delete"] || "Confirm Delete"}
+          </GcdsHeading>
+          <GcdsText>
+            {pageContent["delete_confirmation"] ||
+              "Are you sure you want to delete this security key?"}
+          </GcdsText>
+          <GcdsText>
+            <strong>
+              {credentialToDelete.nickname ||
+                pageContent["unnamed_device"] ||
+                "Unnamed Device"}
+            </strong>
+          </GcdsText>
+          <GcdsText size="caption">
+            {pageContent["delete_warning"] || "This action cannot be undone."}
+          </GcdsText>
+
+          <div style={{ marginTop: "1rem", display: "flex", gap: "0.5rem" }}>
+            <GcdsButton
+              buttonRole="destructive"
+              onClick={handleDeleteFIDO2}
+              disabled={deleteLoading}
+            >
+              {deleteLoading
+                ? pageContent["deleting"] || "Deleting..."
+                : pageContent["delete"] || "Delete"}
+            </GcdsButton>
+            <GcdsButton
+              buttonRole="secondary"
+              onClick={closeModals}
+              disabled={deleteLoading}
+            >
+              {pageContent["cancel"] || "Cancel"}
+            </GcdsButton>
+          </div>
+        </GcdsContainer>
+      )}
+    </GcdsContainer>
+  );
+}

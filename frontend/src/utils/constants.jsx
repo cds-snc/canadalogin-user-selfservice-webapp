@@ -79,6 +79,7 @@ export const PAGES = {
   editProfileNamePage: "EditProfileNamePage",
   enterNewPhoneNumber: "EnterNewPhoneNumber",
   securitySettings: "SecuritySettings",
+  manageFIDO2: "ManageFIDO2",
   editLanguagePreferences: "EditLanguagePreferences",
   editLanguagePreferencePage: "EditLanguagePreferencePage",
   confirmLanguageUpdate: "ConfirmLanguageUpdate",

@@ -13,6 +13,7 @@ import EditLanguagePreferencePage from "./features/LanguagePreference/components
 import ManageDashboard from "./components/Manage/ManageDashboard.jsx";
 import ProfileHome from "./components/Manage/ProfileHome.jsx";
 import Manage2FAVerifications from "./components/Manage/SecuritySettings/Manage2FAVerifications.jsx";
+import ManageFIDO2 from "./components/Manage/SecuritySettings/ManageFIDO2.jsx";
 import SecuritySettings from "./components/Manage/SecuritySettings/SecuritySettings.jsx";
 import EditProfileNamePage from "./features/ProfileName/components/EditProfileNamePage.jsx";
 import Verification from "./components/Verification/Verification.jsx";
@@ -109,6 +110,16 @@ export const appRoutes = [
                         path: "delete-mfa-phone-number",
                         element: <DeleteMFAPage />,
                         handle: { id: PAGES.deleteMFAPage },
+                      },
+                    ],
+                  },
+                  {
+                    element: <StepupPrivateRoute />,
+                    children: [
+                      {
+                        path: "manage-fido2",
+                        element: <ManageFIDO2 />,
+                        handle: { id: PAGES.manageFIDO2 },
                       },
                     ],
                   },

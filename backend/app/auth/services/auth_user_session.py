@@ -24,6 +24,52 @@ from app.constants.redis_keys import RedisKeys
 logger = logging.getLogger(__name__)
 
 
+def debug_log_token_structure(tokens: dict, context: str = "token_debug"):
+    """
+    Debug function to log token structure safely.
+    Masks sensitive information but shows structure and claims.
+    """
+    try:
+        config = get_configuration()
+        if config.ENVIRONMENT == "local":  # Only log in local environment
+            debug_tokens = {}
+            
+            for key, value in tokens.items():
+                if key == "access_token":
+                    debug_tokens[key] = f"***{value[-10:] if value else 'None'}"
+                elif key == "refresh_token":
+                    debug_tokens[key] = f"***{value[-10:] if value else 'None'}"
+                elif key == "id_token":
+                    # For ID token, try to decode and show claims (without verification for debug)
+                    if value:
+                        try:
+                            import base64
+                            # Split JWT and decode payload (middle part)
+                            parts = value.split('.')
+                            if len(parts) >= 2:
+                                # Add padding if needed
+                                payload = parts[1]
+                                payload += '=' * (4 - len(payload) % 4)
+                                decoded_payload = base64.b64decode(payload)
+                                claims = json.loads(decoded_payload)
+                                debug_tokens[key] = {
+                                    "token_preview": f"***{value[-10:]}",
+                                    "claims": claims
+                                }
+                            else:
+                                debug_tokens[key] = f"***{value[-10:]}"
+                        except Exception as e:
+                            debug_tokens[key] = f"***{value[-10:]} (decode_error: {str(e)})"
+                    else:
+                        debug_tokens[key] = "None"
+                else:
+                    debug_tokens[key] = value
+            
+            logger.info(f"[{context}] Token structure: {json.dumps(debug_tokens, indent=2)}")
+    except Exception as e:
+        logger.warning(f"Error in debug_log_token_structure: {str(e)}")
+
+
 async def get_http_client(request: Request) -> AsyncClient:
     return request.app.state.request_client
 
@@ -132,6 +178,27 @@ async def get_user_info(request: Request):
     return token.get("userinfo")
 
 
+async def debug_current_session_tokens(request: Request):
+    """
+    Debug helper to inspect current session tokens.
+    Use this for debugging token contents.
+    """
+    try:
+        # Get the full token from session
+        user_token = request.session.get(SessionKeys.SESSION_USER_TOKEN.value)
+        if user_token:
+            debug_log_token_structure(user_token, "current_session_debug")
+        else:
+            logger.info("[current_session_debug] No token found in session")
+            
+        # Also log session keys for reference
+        session_keys = list(request.session.keys())
+        logger.info(f"[current_session_debug] Session keys: {session_keys}")
+        
+    except Exception as e:
+        logger.warning(f"Error in debug_current_session_tokens: {str(e)}")
+
+
 async def get_user_access_token(request: Request):
     token = await ensure_user_token(request)
     return token.get("access_token")
@@ -162,6 +229,9 @@ def update_session_tokens(request: Request, new_tokens: dict):
     """
     Update the session with new tokens.
     """
+    # Debug log the token structure in local environment
+    debug_log_token_structure(new_tokens, "update_session_tokens")
+    
     request.session[SessionKeys.SESSION_USER_ACCESS_TOKEN_KEY.value] = new_tokens.get(
         "access_token"
     )
