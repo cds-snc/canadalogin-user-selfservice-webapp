@@ -48,7 +48,7 @@ export default function EditContactPhoneNumberPage() {
   const [phoneFormData, setPhoneFormData] = useState({
     phoneNumber: "",
     otp: "",
-    trxid: "",
+    trxnId: "",
     otpType: FLOW_TYPES.sms,
     formattedPhoneNumber: "",
   });
@@ -94,7 +94,7 @@ export default function EditContactPhoneNumberPage() {
 
       const formdata = {
         phoneNumber: phoneFormData.phoneNumber,
-        user_id: userProfile.id,
+        userName: userName,
         otpType: serverMapping[otpType || phoneFormData.otpType],
       };
 
@@ -123,14 +123,9 @@ export default function EditContactPhoneNumberPage() {
       setLocalLoading(true);
       setErrorCode("");
 
-      const formdata = {
-        otp: phoneFormData.otp,
-        trxnId: phoneFormData.trxnId,
-        otpType: serverMapping[phoneFormData.otpType],
-      };
-
-      const response = await authService.transientOtpVerify(formdata);
-      if (response && response.success) {
+      // Skip separate OTP validation - proceed directly to confirmation
+      // OTP will be validated atomically with the phone update
+      if (phoneFormData.otp && phoneFormData.otp.trim()) {
         setWizardStep("confirmUpdate");
         // Navigate to confirmation URL while preserving state
         navigate(`/${language}/profile/update-contact-phone/confirm-update`, {
@@ -151,12 +146,14 @@ export default function EditContactPhoneNumberPage() {
       setLocalLoading(true);
       setErrorCode("");
 
-      const formdata = {
-        user_id: state.userProfile.id,
-        phoneNumbers: [{ value: phoneFormData.phoneNumber, type: "mobile" }],
-      };
+      // Use the coupled OTP verification + profile update API
+      const response = await authService.update_phone_with_otp(
+        phoneFormData.phoneNumber,
+        phoneFormData.otp,
+        phoneFormData.trxnId,
+        serverMapping[phoneFormData.otpType],
+      );
 
-      const response = await authService.update_my_user_profile(formdata);
       if (response && response.success && response.data) {
         updateProfileSuccess(response.data);
         setWizardStep("success");

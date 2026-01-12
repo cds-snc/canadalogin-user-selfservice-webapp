@@ -151,6 +151,25 @@ export const authService = {
       handleApiError(error);
     }
   },
+
+  update_phone_with_otp: async (phoneNumber, otp, trxnId, otpType = "sms") => {
+    try {
+      const updatePayload = {
+        phoneNumbers: [{ value: phoneNumber, type: "mobile" }],
+        otp,
+        trxnId,
+        otpType,
+      };
+
+      const response = await axios.post(
+        `${config.apiUrl}${SUBMIT_END_POINTS.profileUpdateWithOtp}`,
+        updatePayload,
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
   get_rp_info: async () => {
     try {
       const response = await axios.get(
