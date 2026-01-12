@@ -50,7 +50,7 @@ export const EditContactPhoneNumber = (() => {
       },
       {
         type: "post",
-        endpoint: "/v1/users/profile",
+        endpoint: "/v1/users/profile/update-with-otp",
         response: {
           success: true,
           data: {

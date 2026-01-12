@@ -28,6 +28,7 @@ vi.mock("../../../services/authService.jsx", () => ({
     transientOtpSend: vi.fn(),
     transientOtpVerify: vi.fn(),
     update_my_user_profile: vi.fn(),
+    update_phone_with_otp: vi.fn(),
     get_my_user_profile: vi.fn(),
     logout: vi.fn(),
     get_relying_party_info: vi.fn(),
@@ -291,10 +292,6 @@ describe("EditContactPhoneNumberPage Component", () => {
       step: "verify-otp",
     };
 
-    mockAuthService.transientOtpVerify.mockResolvedValue({
-      success: true,
-    });
-
     render(
       <TestWrapper>
         <EditContactPhoneNumberPage />
@@ -309,18 +306,11 @@ describe("EditContactPhoneNumberPage Component", () => {
     const otpInput = screen.getByTestId("otp-input");
     fireEvent.change(otpInput, { target: { value: "123456" } });
 
-    // Click verify
+    // Click verify - in the refactored flow, this just moves to confirm step without API call
     const verifyBtn = screen.getByTestId("verify-btn");
     fireEvent.click(verifyBtn);
 
-    await waitFor(() => {
-      expect(mockAuthService.transientOtpVerify).toHaveBeenCalledWith({
-        otp: "123456",
-        trxnId: undefined,
-        otpType: "sms",
-      });
-    });
-
+    // The verify step now just navigates to confirm-update without calling transientOtpVerify
     await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith(
         "/en/profile/update-contact-phone/confirm-update",
@@ -336,7 +326,7 @@ describe("EditContactPhoneNumberPage Component", () => {
       step: "confirm-update",
     };
 
-    mockAuthService.update_my_user_profile.mockResolvedValue({
+    mockAuthService.update_phone_with_otp.mockResolvedValue({
       success: true,
       data: { phoneNumbers: [{ value: "+15551234567" }] },
     });
@@ -355,10 +345,12 @@ describe("EditContactPhoneNumberPage Component", () => {
     fireEvent.click(confirmBtn);
 
     await waitFor(() => {
-      expect(mockAuthService.update_my_user_profile).toHaveBeenCalledWith({
-        userName: "testuser",
-        phoneNumbers: [{ value: "", type: "mobile" }],
-      });
+      expect(mockAuthService.update_phone_with_otp).toHaveBeenCalledWith(
+        "", // phoneNumber
+        "", // otp
+        "", // trxnId (initialized as empty string)
+        "sms", // otpType
+      );
     });
 
     await waitFor(() => {
