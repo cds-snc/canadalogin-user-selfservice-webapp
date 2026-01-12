@@ -206,7 +206,7 @@ export default function AddMFAPage() {
 
   const requestOtpCode = async () => {
     const userData = {
-      userName,
+      user_id: userProfile.id,
       otpType: serverMapping[userSelectedMfaFactor.type],
       phoneNumber: userSelectedMfaFactor.phoneNumber,
     };
