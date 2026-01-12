@@ -42,7 +42,9 @@ async def send_otp(
     user_otp_info: UserOtpInfo,
     user_access_token: str = Depends(get_users_current_session),
 ):
-    await validate_user_id_matches_session(request, user_access_token, user_otp_info.user_id)
+    await validate_user_id_matches_session(
+        request, user_access_token, user_otp_info.user_id
+    )
 
     # Get user's preferred language from their profile instead of payload
     return await handle_otp_send(
