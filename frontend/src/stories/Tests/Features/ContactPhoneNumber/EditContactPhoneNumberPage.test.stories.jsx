@@ -184,12 +184,9 @@ export const EditContactPhoneNumber = (() => {
           await expect(gcdsInputs).toBeInTheDocument();
           if (gcdsInputs.shadowRoot) {
             const shadowInput =
-              gcdsInputs.shadowRoot.querySelector("input#verificationCode") ||
               gcdsInputs.shadowRoot.querySelector(
                 'input[name="verificationCode"]',
-              ) ||
-              gcdsInputs.shadowRoot.querySelector('input[maxlength="6"]');
-            await expect(shadowInput).toBeInTheDocument();
+              ) || (await expect(shadowInput).toBeInTheDocument());
             if (shadowInput) {
               // Clear the field by setting value directly (avoid userEvent.clear which can fail)
               shadowInput.value = "";
