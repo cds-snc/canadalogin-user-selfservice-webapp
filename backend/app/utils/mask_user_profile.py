@@ -1,5 +1,8 @@
+import logging
 import phonenumbers
 from app.users.schemas import MetaDataTypeValue
+
+logger = logging.getLogger(__name__)
 
 
 def mask_individual_email_address(email: str) -> str:
