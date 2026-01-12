@@ -97,7 +97,9 @@ def mask_phone_number(phone_number: str, region: str = "US") -> str:
     # Mask all digits except the last 4
     digits = [c for c in formatted_national if c.isdigit()]
     if len(digits) < 4:
-        logger.error(f"Warning: Skipping invalid phone number '{phone_number}': less than 4 digits")
+        logger.error(
+            f"Warning: Skipping invalid phone number '{phone_number}': less than 4 digits"
+        )
         raise ValueError("Phone number must have at least 4 digits")
 
     last4 = digits[-4:]
