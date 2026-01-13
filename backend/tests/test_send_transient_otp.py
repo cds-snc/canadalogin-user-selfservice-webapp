@@ -190,6 +190,35 @@ async def test_dispatch_posts_correct_request_for_phone_otp(otp_type, path_segme
     assert resp.status_code == 201
 
 
+@pytest.mark.asyncio
+async def test_dispatch_posts_correct_request_for_email():
+    """
+    EMAIL path uses emailAddress.lower() -> user@example.com in body.
+    """
+
+    def handler(request: Request) -> Response:
+        assert request.method == "POST"
+        assert request.url.scheme == "https"
+        assert request.url.host == "tenant.verify.ibm.com"
+        assert request.url.path == "/v2.0/factors/emailotp/transient/verifications"
+        assert request.headers.get("Authorization") == "Bearer FAKE_ADMIN_TOKEN"
+        payload = json.loads(request.content.decode() or "{}")
+        assert payload == {"emailAddress": "user@example.com"}
+        return Response(
+            201, json=make_valid_payload(OtpType.EMAIL, trxn_id="tx-email-1")
+        )
+
+    transport = build_transport(handler)
+    async with AsyncClient(transport=transport) as client:
+        info = UserOtpInfo(
+            otpType=OtpType.EMAIL,
+            user_id="user@example.com",
+            emailAddress="User@Example.com",  # ensure lower-casing is applied by impl
+            phoneNumber=None,
+        )
+        resp = await dispatch_otp(client, info)
+    assert resp.status_code == 201
+
 # --------------------------------
 # handle_otp_send (integration-ish)
 # --------------------------------
