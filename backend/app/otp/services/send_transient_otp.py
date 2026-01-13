@@ -105,8 +105,6 @@ async def handle_otp_send(
         my_profile_response = await get_my_profile(
             global_http_client, user_access_token
         )
-        logger.info("User verified to send OTP")
-
         # Get user's preferred language from profile
         user_language = my_profile_response.data.preferredLanguage or "en"
         logger.info(f"Using user's preferred language: {user_language}")

@@ -56,4 +56,4 @@ async def validate_user_id_matches_session(
             status_code=status.HTTP_403_FORBIDDEN, detail=generic_msg_id
         )
 
-    logger.debug("User identity validation passed")
+    logger.debug("Payload User ID Matches Profile User ID")
