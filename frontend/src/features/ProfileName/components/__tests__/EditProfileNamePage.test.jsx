@@ -865,7 +865,7 @@ describe("EditProfileNamePage Unit Tests", () => {
             familyName: "", // Initial empty state
             formatted: "", // Initial empty state (not calculated since we skipped form submission)
           }),
-          userName: "testuser",
+          user_id: "test-user-123",
         });
       });
     });
