@@ -248,7 +248,7 @@ describe("EditContactPhoneNumberPage Component", () => {
     await waitFor(() => {
       expect(mockAuthService.transientOtpSend).toHaveBeenCalledWith({
         phoneNumber: "+15551234567",
-        userName: "testuser",
+        user_id: "test-user-123",
         otpType: "sms",
       });
     });
@@ -425,7 +425,7 @@ describe("EditContactPhoneNumberPage Component", () => {
     await waitFor(() => {
       expect(mockAuthService.transientOtpSend).toHaveBeenCalledWith({
         phoneNumber: "",
-        userName: "testuser",
+        user_id: "test-user-123",
         otpType: "sms",
       });
     });
