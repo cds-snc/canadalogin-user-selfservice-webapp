@@ -55,11 +55,11 @@ class Configuration(BaseSettings):
         None  # Not required for local development, value should be ".gc-signin.cdssandbox.xyz"
     )
     PROFILE_MANAGEMENT_DOMAIN: str = (
-        "http://localhost:3000"  # Frontend Management App domain to app.gc-signin.cdssandbox.xyz
+        "https://www.manageapp.gcsignin:3000"  # Frontend Management App domain to app.gc-signin.cdssandbox.xyz
     )
 
     CORS_ORIGINS: str = Field(
-        default="localhost:3000,localhost:8000",
+        default="www.manageapp.gcsignin:3000,www.manageapp.gcsignin:8000",
         description="Comma-separated list of CORS origins, Terraform cant pass in a list[str].",
     )
 
@@ -72,7 +72,7 @@ class Configuration(BaseSettings):
         """Convert comma-separated CORS_ORIGINS string to list - Terraform cant pass in a list[str]."""
         http_value = "https://"
         if self.ENVIRONMENT == "local":
-            http_value = "http://"
+            http_value = "https://"
         return [
             f"{http_value}{origin.strip()}" for origin in self.CORS_ORIGINS.split(",")
         ]

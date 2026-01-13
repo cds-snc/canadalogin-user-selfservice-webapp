@@ -21,6 +21,7 @@ core
 backend/.coverage
 .coverage
 coverage.xml
+backend/certs/
 
 #Storybook Build
 frontend/storybook-static/

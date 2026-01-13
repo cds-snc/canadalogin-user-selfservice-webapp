@@ -111,9 +111,51 @@ Once running, you can access:
 - ReDoc: `http://localhost:8000/redoc`
 - OpenAPI Spec: `http://localhost:8000/openapi.json`
 
+### HTTPS Setup for Local Development
+
+For FIDO2 development or when you need HTTPS locally, follow these steps:
+
+1. **Install mkcert** (if not already installed):
+```bash
+brew install mkcert
+mkcert -install
+```
+
+2. **Generate SSL certificates**:
+```bash
+cd backend
+mkdir -p certs
+mkcert -cert-file certs/cert.pem -key-file certs/key.pem www.manageapp.gcsignin localhost 127.0.0.1 ::1
+```
+
+3. **Add hostname to `/etc/hosts`** (if using custom domain):
+```bash
+sudo nano /etc/hosts
+# Add this line:
+127.0.0.1       www.manageapp.gcsignin
+```
+
+4. **Run with HTTPS**:
+```bash
+docker run -p 8000:8000 \
+  --add-host host.docker.internal:host-gateway \
+  --env-file .env \
+  -e SESSION_REDIS_URL=redis://host.docker.internal:6379/0 \
+  -v $(pwd):/app \
+  -v $(pwd)/certs:/app/certs \
+  gc-signin-backend \
+  uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --ssl-keyfile=/app/certs/key.pem --ssl-certfile=/app/certs/cert.pem
+```
+
+5. **Access your API**:
+   - HTTPS: `https://www.manageapp.gcsignin:8000/health/health`
+   - Swagger UI: `https://www.manageapp.gcsignin:8000/docs`
+
+**Note**: The certificates are valid for 825 days and work with both `www.manageapp.gcsignin` and `localhost`.
+
 ### Development Mode
 
-For development with hot-reload:
+For development with hot-reload (HTTP):
 
 ```bash
 docker run -p 8000:8000 \
@@ -123,6 +165,19 @@ docker run -p 8000:8000 \
   -v $(pwd):/app \
   gc-signin-backend \
   uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+For development with hot-reload (HTTPS):
+
+```bash
+docker run -p 8000:8000 \
+  --add-host host.docker.internal:host-gateway \
+  --env-file .env \
+  -e SESSION_REDIS_URL=redis://host.docker.internal:6379/0 \
+  -v $(pwd):/app \
+  -v $(pwd)/certs:/app/certs \
+  gc-signin-backend \
+  uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --ssl-keyfile=/app/certs/key.pem --ssl-certfile=/app/certs/cert.pem
 ```
 
 **Note**: The `--add-host host.docker.internal:host-gateway` flag allows the Docker container to access Redis running on your host machine. The environment variable `SESSION_REDIS_URL` overrides the default localhost Redis URL to use `host.docker.internal`.

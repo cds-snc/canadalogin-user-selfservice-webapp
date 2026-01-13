@@ -9,18 +9,86 @@
       "type": "debugpy",
       "request": "launch",
       "module": "uvicorn",
-      "args": ["app.main:app", "--reload", "--port", "8000", "--host", "127.0.0.1"],
+      "args": [
+        "app.main:app",
+        "--reload",
+        "--port",
+        "8000",
+        "--host",
+        "0.0.0.0",
+        "--ssl-keyfile=backend/certs/key.pem",
+        "--ssl-certfile=backend/certs/cert.pem"
+      ],
       "env": {
         "PYTHONPATH": "backend"
       },
-      "jinja": true
+      "jinja": true,
+      "envFile": "${workspaceFolder}/backend/.env"
+    },
+    {
+      "name": "Python Debugger: FastAPI (HTTP)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": [
+        "app.main:app",
+        "--reload",
+        "--port",
+        "8000",
+        "--host",
+        "127.0.0.1"
+      ],
+      "env": {
+        "PYTHONPATH": "backend"
+      },
+      "jinja": true,
+      "envFile": "${workspaceFolder}/backend/.env"
     },
     {
       "name": "React Debugger",
       "request": "launch",
       "type": "chrome",
+      "url": "https://www.manageapp.gcsignin:3000",
+      "webRoot": "${workspaceFolder}/frontend/src"
+    },
+    {
+      "name": "React Debugger (localhost)",
+      "request": "launch",
+      "type": "chrome",
       "url": "http://localhost:3000",
       "webRoot": "${workspaceFolder}/frontend/src"
+    },
+    {
+      "name": "Python Debugger: Current Test File",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "${file}",
+        "-v"
+      ],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/backend/tests/.env",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/backend"
+      }
+    },
+    {
+      "name": "Python Debugger: All Tests",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "backend/tests/",
+        "-v"
+      ],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/backend/tests/.env",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/backend"
+      }
     }
   ]
 }
