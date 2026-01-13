@@ -238,25 +238,26 @@ async def test_handle_success_returns_data_and_message(otp_type):
     )
 
 
-# @pytest.mark.asyncio
-# async def test_handle_non_201_returns_error_model():
-#     def handler(request: Request) -> Response:
-#         return Response(400, json={"error": "Bad Request"})
+@pytest.mark.asyncio
+async def test_handle_non_201_returns_error_model():
+    def handler(request: Request) -> Response:
+        return Response(400, json={"error": "Bad Request"})
 
-#     transport = build_transport(handler)
+    transport = build_transport(handler)
 
-#     async with AsyncClient(transport=transport) as client:
-#         info = UserOtpInfo(
-#             otpType=OtpType.EMAIL,
-#             user_id="user@example.com",
-#             phoneNumber=None,
-#         )
-#         # Now expects HTTPException with status code 400
-#         with pytest.raises(HTTPException) as exc_info:
-#             await handle_otp_send(client, info, user_access_token="USER_TOKEN")
+    async with AsyncClient(transport=transport) as client:
+        info = UserOtpInfo(
+            otpType=OtpType.EMAIL,
+            user_id="user@example.com",
+            emailAddress="user@example.com",
+            phoneNumber=None,
+        )
+        # Now expects HTTPException with status code 400
+        with pytest.raises(HTTPException) as exc_info:
+            await handle_otp_send(client, info, user_access_token="USER_TOKEN")
 
-#         assert exc_info.value.status_code == 400
-#         assert "Bad request" in str(exc_info.value.detail)
+        assert exc_info.value.status_code == 400
+        assert "Bad request" in str(exc_info.value.detail)
 
 
 @pytest.mark.asyncio
