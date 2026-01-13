@@ -7,7 +7,7 @@ from app.utils.request_error_handler import RequestErrorHandler
 from app.users.services.update_my_profile import (
     update_my_profile as update_profile,
     update_profile_for_verified_changes,
-    dispatch_update_my_profile as dispatch_update_user_profile,
+    dispatch_update_my_profile,
     sanitize_user_profile_data,
 )
 
@@ -35,9 +35,13 @@ DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH = (
     "app.users.services.update_my_profile.dispatch_get_my_profile_from_ibm"
 )
 
+MASK_PROFILE_DETAILS_IMPORT_PATH = (
+    "app.users.services.update_my_profile.mask_profile_details"
+)
+
 
 @pytest.mark.asyncio
-@patch(MASK_PHONE_IMPORT_PATH)
+@patch(MASK_PROFILE_DETAILS_IMPORT_PATH)
 @patch(DISPATCH_UPDATE_PROFILE_IMPORT_PATH)
 @patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
 @patch(SANITIZE_PROFILE_IMPORT_PATH)
@@ -45,14 +49,17 @@ async def test_update_profile_success(
     mock_sanitize, mock_dispatch_get, mock_dispatch_update, mock_masked_profile
 ):
     # Arrange
-    sanitized_data = {"userName": "john.doe@example.com", "preferredLanguage": "en"}
+    sanitized_data = {
+        "user_id": "user-123",
+        "userName": "john.doe@example.com",
+        "preferredLanguage": "en",
+    }
     mock_sanitize.return_value = sanitized_data
 
     profile_data = {
         "schemas": [
             "urn:ietf:params:scim:schemas:core:2.0:User",
             "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
-            "urn:ietf:params:scim:schemas:extension:ibm:2.0:Notification",
         ],
         "userName": "john.doe@example.com",
         "emails": [{"value": "john.doe@example.com", "type": "work"}],
@@ -73,6 +80,7 @@ async def test_update_profile_success(
 
     mock_masked_profile.return_value = {
         **profile_data,
+        "userName": "ja****@example.com",
         "phoneNumbers": [],
     }
 
@@ -81,13 +89,11 @@ async def test_update_profile_success(
     mock_response.json.return_value = profile_data
     mock_dispatch_update.return_value = mock_response
 
-    user_data = UserProfileUpdateRequest(
-        userName="john.doe@example.com", preferredLanguage="en"
-    )
+    user_data = UserProfileUpdateRequest(user_id="user-123", preferredLanguage="en")
     mock_request = Mock()
     mock_request.app = Mock()
     mock_request.app.state = Mock()
-    mock_request.app.state.request_client = AsyncClient()
+    mock_request.app.state.request_client = Mock(spec=AsyncClient)
     mock_request.app.state.config = Mock()
     mock_request.app.state.config.profile_api_endpoint = PROFILE_API_URL
 
@@ -105,34 +111,6 @@ async def test_update_profile_success(
 
 
 @pytest.mark.asyncio
-@patch(SANITIZE_PROFILE_IMPORT_PATH)
-@patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
-async def test_update_profile_user_mismatch(mock_dispatch_get, mock_sanitize):
-    mock_sanitize.return_value = {"userName": "other@example.com"}
-
-    profile_data = {"userName": "john.doe@example.com"}
-
-    class DummyData:
-        def model_dump(self):
-            return profile_data
-
-    mock_dispatch_get.return_value = Mock(data=DummyData())
-
-    user_data = UserProfileUpdateRequest(userName="other@example.com")
-    mock_request = Mock()
-    mock_request.app = Mock()
-    mock_request.app.state = Mock()
-    mock_request.app.state.request_client = AsyncClient()
-    mock_request.app.state.config = Mock()
-    mock_request.app.state.config.profile_api_endpoint = PROFILE_API_URL
-
-    with pytest.raises(HTTPException) as exc:
-        await update_profile(mock_request, user_data, user_access_token="token")
-    assert exc.value.status_code == 403
-    assert mock_dispatch_get.call_args[0][1] == "token"
-
-
-@pytest.mark.asyncio
 @patch(MASK_PHONE_IMPORT_PATH)
 @patch(DISPATCH_UPDATE_PROFILE_IMPORT_PATH)
 @patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
@@ -140,8 +118,9 @@ async def test_update_profile_user_mismatch(mock_dispatch_get, mock_sanitize):
 async def test_update_profile_dispatch_failure(
     mock_sanitize, mock_dispatch_get, mock_dispatch_update, mock_mask
 ):
+    """Test that update_profile properly handles dispatch failures."""
     # Arrange
-    mock_sanitize.return_value = {"userName": "john.doe@example.com"}
+    mock_sanitize.return_value = {"user_id": "user-123"}
 
     profile_data = {
         "schemas": [
@@ -170,12 +149,13 @@ async def test_update_profile_dispatch_failure(
     )
     mock_mask.return_value = []
 
-    user_data = UserProfileUpdateRequest(userName="john.doe@example.com")
+    user_data = UserProfileUpdateRequest(user_id="user-123")
 
+    # Create properly mocked request object
     mock_request = Mock()
     mock_request.app = Mock()
     mock_request.app.state = Mock()
-    mock_request.app.state.request_client = AsyncClient()
+    mock_request.app.state.request_client = Mock(spec=AsyncClient)
     mock_request.app.state.config = Mock()
     mock_request.app.state.config.profile_api_endpoint = PROFILE_API_URL
 
@@ -183,9 +163,18 @@ async def test_update_profile_dispatch_failure(
     with pytest.raises(HTTPException) as exc:
         await update_profile(mock_request, user_data, user_access_token="token")
 
+    # Verify the exception details
     assert exc.value.status_code == 400
+    assert exc.value.detail == "Invalid request"
+
+    # Verify all mocks were called as expected
+    mock_sanitize.assert_called_once_with(user_data)
     mock_dispatch_get.assert_called_once()
     mock_dispatch_update.assert_called_once()
+
+    # Verify the get call was made with correct token
+    get_call_args = mock_dispatch_get.call_args
+    assert get_call_args[0][1] == "token"  # user_access_token parameter
 
 
 @pytest.mark.asyncio
@@ -193,7 +182,11 @@ async def test_update_profile_dispatch_failure(
 @patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
 async def test_update_profile_validation_error(mock_dispatch_get, mock_sanitize):
     # Pass something that will cause validation error when merging
-    mock_sanitize.return_value = {"userName": "john.doe@example.com", "id": 123}
+    mock_sanitize.return_value = {
+        "userName": "john.doe@example.com",
+        "id": 123,
+        "user_id": "string-instead-of-int",
+    }
 
     # Mock IBM profile with mismatched types
     mock_dispatch_get.return_value = Mock(
@@ -257,7 +250,7 @@ async def test_dispatch_update_user_profile_success():
     )
     mock_request.app.state.request_client.put.return_value.raise_for_status = Mock()
 
-    response = await dispatch_update_user_profile(
+    response = await dispatch_update_my_profile(
         request=mock_request,
         user_profile_payload=payload.model_dump_json(by_alias=True),
         user_access_token="mock-token",
@@ -308,7 +301,7 @@ async def test_dispatch_update_user_profile_failure(monkeypatch):
     )
 
     with pytest.raises(Exception):
-        await dispatch_update_user_profile(
+        await dispatch_update_my_profile(
             request=mock_request,
             user_profile_payload=payload.model_dump_json(by_alias=True),
             user_access_token="mock-token",
@@ -327,6 +320,7 @@ async def test_update_profile_masks_phone_numbers(
     # Arrange
     sanitized_data = {
         "userName": "john.doe@example.com",
+        "user_id": "user-123",
         "preferredLanguage": "fr",
     }
     mock_sanitize.return_value = sanitized_data
@@ -371,11 +365,12 @@ async def test_update_profile_masks_phone_numbers(
 
     mock_mask_profile.return_value = {
         **mock_response.json(),
+        "userName": "ja****@example.com",
         "phoneNumbers": masked_phones,
     }
 
     user_data = UserProfileUpdateRequest(
-        userName="john.doe@example.com", preferredLanguage="fr"
+        userName="john.doe@example.com", user_id="user-123", preferredLanguage="fr"
     )
     mock_request = Mock()
     mock_request.app = Mock()
@@ -398,6 +393,8 @@ async def test_update_profile_masks_phone_numbers(
     assert response.data.phoneNumbers[0].type == "mobile"
     assert response.data.phoneNumbers[1].value == "+1-613-XXX-XX78"
     assert response.data.phoneNumbers[1].type == "work"
+    assert response.data.userName == "ja****@example.com"
+    assert response.success is True
 
     # Verify masking was called with updated profile data
     mock_mask_profile.assert_called_once_with(updated_profile_data)
@@ -422,7 +419,8 @@ async def test_update_profile_prevents_username_change(
     # Arrange
     # User attempts to change userName from john.doe to jane.smith
     sanitized_data = {
-        "userName": "john.doe@example.com",
+        # "userName": "john.doe@example.com",
+        "user_id": "user-123",
         "name": {"givenName": "Jane", "familyName": "Smith"},
     }
     mock_sanitize.return_value = sanitized_data
@@ -452,6 +450,7 @@ async def test_update_profile_prevents_username_change(
     # Updated profile response - userName should remain unchanged
     updated_profile_data = {
         **profile_data,
+        "user_id": "user-123",
         "name": {"givenName": "Jane", "familyName": "Smith"},
     }
     mock_response = Mock()
@@ -460,11 +459,13 @@ async def test_update_profile_prevents_username_change(
 
     mock_mask.return_value = {
         **mock_response.json(),
+        "userName": "jo****@example.com",
         "phoneNumbers": [],
     }
 
     user_data = UserProfileUpdateRequest(
         userName="john.doe@example.com",
+        user_id="user-123",
         name=UserProfileName(givenName="Jane", familyName="Smith"),
     )
     mock_request = Mock()
@@ -479,7 +480,7 @@ async def test_update_profile_prevents_username_change(
 
     # Assert
     assert response.success is True
-    assert response.data.userName == "john.doe@example.com"  # Username unchanged
+    assert response.data.userName == "jo****@example.com"  # Username unchanged
     assert response.data.name.givenName == "Jane"  # Name updated
     assert response.data.name.familyName == "Smith"
 
@@ -506,7 +507,11 @@ async def test_update_profile_with_no_phone_numbers_to_mask(
 ):
     """Test that update_my_profile handles profiles with no phone numbers."""
     # Arrange
-    sanitized_data = {"userName": "john.doe@example.com", "preferredLanguage": "fr"}
+    sanitized_data = {
+        "userName": "john.doe@example.com",
+        "preferredLanguage": "fr",
+        "user_id": "user-123",
+    }
     mock_sanitize.return_value = sanitized_data
 
     profile_data = {
@@ -537,11 +542,13 @@ async def test_update_profile_with_no_phone_numbers_to_mask(
 
     mock_mask.return_value = {
         **mock_response.json(),
+        "userName": "jo****@example.com",
+        "user_id": "user-123",
         "phoneNumbers": [],
     }
 
     user_data = UserProfileUpdateRequest(
-        userName="john.doe@example.com", preferredLanguage="fr"
+        userName="john.doe@example.com", preferredLanguage="fr", user_id="user-123"
     )
     mock_request = Mock()
     mock_request.app = Mock()

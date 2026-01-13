@@ -87,7 +87,7 @@ export default function EditProfileNamePage() {
       setLocalLoading(true);
       const response = await authService.update_my_user_profile({
         name: nameFormData,
-        userName: state.userProfile.userName,
+        user_id: state.userProfile.id,
       });
       updateProfileSuccess(response.data);
       setWizardStep("success");

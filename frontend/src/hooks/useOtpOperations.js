@@ -60,7 +60,7 @@ export const useOtpOperations = (
     if (!otpType) return;
 
     const userData = {
-      userName,
+      user_id: userId,
       otpType,
     };
 

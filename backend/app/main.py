@@ -212,7 +212,9 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     error_message = ""
     for error in exc.errors():
         error_message = error["msg"]
+        error_input = error.get("input", "")
         logger.error(f"Validation error: {error_message} at " + str(request.url))
+        logger.error(f"Validation error input: {error_input}")
         break
     return generate_error_response(
         status_code=status.HTTP_400_BAD_REQUEST, message=error_message

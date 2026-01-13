@@ -1,8 +1,8 @@
 import logging
-
 from fastapi import HTTPException, status
 from pydantic import ValidationError
 from httpx import AsyncClient
+
 
 from app.users.schemas import (
     IBMVerifyUserProfileSchema,

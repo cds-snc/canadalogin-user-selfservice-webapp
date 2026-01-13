@@ -409,15 +409,21 @@ describe("EnterPhoneNumber Component", () => {
   });
 
   it("calls onNext when continue button is clicked with valid phone", async () => {
+    // Provide props with valid phone number data to enable the button
+    const propsWithValidPhone = {
+      ...defaultProps,
+      phoneFormData: {
+        ...defaultProps.phoneFormData,
+        phoneNumber: "+15551234567",
+        formattedPhoneNumber: "+1 555 123-4567",
+      },
+    };
+
     render(
       <TestWrapper>
-        <EnterPhoneNumber {...defaultProps} />
+        <EnterPhoneNumber {...propsWithValidPhone} />
       </TestWrapper>,
     );
-
-    // First enter a valid phone number
-    const phoneInput = screen.getByTestId("phone-input");
-    fireEvent.change(phoneInput, { target: { value: "+15551234567" } });
 
     await waitFor(() => {
       const continueButtons = screen.getAllByTestId("gcds-button");

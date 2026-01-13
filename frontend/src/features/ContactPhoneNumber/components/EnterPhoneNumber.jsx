@@ -232,7 +232,7 @@ export default function EnterPhoneNumber({
 
       <GcdsGrid columns="max-content max-content" gap="200">
         <SubmitButton
-          disabled={!phoneNumberValid}
+          disabled={!phoneNumberValid || !phoneFormData.phoneNumber}
           style={{ width: "fit-content" }}
           onGcdsClick={onSubmitHandler}
           currentLang={language}

@@ -19,6 +19,7 @@ from app.users.services.update_profile_with_otp import (
 )
 
 from app.auth.services.auth_user_session import get_users_current_session
+from app.utils.validate_user_request_match import validate_user_id_matches_session
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -36,6 +37,10 @@ async def user_profile(
     user_data: UserProfileUpdateRequest,
     user_access_token: str = Depends(get_users_current_session),
 ):
+    await validate_user_id_matches_session(
+        request, user_access_token, user_data.user_id
+    )
+
     return await update_my_profile(
         request,
         user_data,

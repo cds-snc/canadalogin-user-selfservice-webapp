@@ -14,7 +14,7 @@ from app.utils.access_token import get_auth_request_headers
 from app.utils.mask_user_profile import mask_profile_details
 from app.utils.request_error_handler import RequestErrorHandler
 from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
-from app.constants.schema_field_names import USERNAME_FIELD
+from app.constants.schema_field_names import USER_ID_FIELD, USERNAME_FIELD
 
 logger = logging.getLogger(__name__)
 
@@ -186,21 +186,10 @@ async def update_my_profile(
     )
     ibm_user_profile = ibm_user_profile_response.model_dump()
 
-    ibm_user_profile_username = ibm_user_profile.get("userName")
-    current_users_username = updated_user_data_dict.get("userName")
-
-    username_match = ibm_user_profile_username == current_users_username
-
-    if not username_match:
-        logger.error("User mismatch - cannot update profile")
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="User mismatch - cannot update profile",
-        )
-
     # Remove userName and emails from update to prevent any accidental changes
     # Email changes must go through the secure OTP-verified endpoint
     updated_user_data_dict.pop(USERNAME_FIELD, None)
+    updated_user_data_dict.pop(USER_ID_FIELD, None)
 
     merged_profile = {**ibm_user_profile, **updated_user_data_dict}
 

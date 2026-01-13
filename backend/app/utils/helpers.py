@@ -1,7 +1,7 @@
 from typing import Dict
+from fastapi.responses import JSONResponse
 
 from app.utils.schemas import ResponseModel
-from fastapi.responses import JSONResponse
 
 
 def generate_error_response(status_code: int, message: str):

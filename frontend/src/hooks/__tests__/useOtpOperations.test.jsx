@@ -373,9 +373,9 @@ describe("useOtpOperations", () => {
       });
 
       expect(mockAuthService.transientOtpSend).toHaveBeenCalledWith({
-        userName: "testuser@example.com",
         otpType: "sms",
         phoneNumber: "+15551234567",
+        user_id: "test-user-123",
       });
       expect(result.current.otpSentResponse).toEqual({
         trxnId: "test-transaction-id",
@@ -683,9 +683,9 @@ describe("useOtpOperations", () => {
       });
 
       expect(mockAuthService.transientOtpSend).toHaveBeenCalledWith({
-        userName: "testuser@example.com",
         otpType: "voice",
         phoneNumber: "+15559876543",
+        user_id: "test-user-123",
       });
     });
 

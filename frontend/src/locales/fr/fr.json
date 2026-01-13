@@ -26,7 +26,7 @@
     "4": "Les mots de passe doivent être composés de 12 caractères",
     "5": "Les mots de passe sont composés d’entre 12 et 65 caractères. Veuillez réessayer.",
     "6": "Code invalide. Veuillez réessayer.",
-    "7": "Server Error. Please try again later.",
+    "7": "Une erreur du serveur s’est produite. Veuillez réessayer plus tard.",
     "8": "Numéro de téléphone invalide. Les numéros de téléphone pour le pays que vous avez sélectionné doivent être composés de ",
     "9": " chiffres. Assurez-vous d’avoir sélectionné le bon pays ou essayez d’entrer à nouveau votre numéro de téléphone. Les extensions ne sont pas permises.",
     "10": "Veuillez entrer un numéro de téléphone pour continuer.",

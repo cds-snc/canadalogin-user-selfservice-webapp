@@ -59,7 +59,7 @@ export default function EditContactPhoneNumberPage() {
   const { updateProfileSuccess } = userProfileDispatch(dispatch);
   const backToProfile = path(PAGES.ProfileHome, { language: language });
   const { userProfile } = state;
-  const { userName } = userProfile ?? {};
+  const { id } = userProfile ?? {};
 
   // Sync wizard step with URL parameter changes
   useEffect(() => {
@@ -94,7 +94,7 @@ export default function EditContactPhoneNumberPage() {
 
       const formdata = {
         phoneNumber: phoneFormData.phoneNumber,
-        userName: userName,
+        user_id: id,
         otpType: serverMapping[otpType || phoneFormData.otpType],
       };
 
