@@ -1,5 +1,40 @@
 # Changelog
 
+## [1.10.3](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.10.2...v1.10.3) (2026-01-12)
+
+
+### Bug Fixes
+
+* **deps:** update all minor dependencies ([#1003](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1003)) ([9b1d8ee](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/9b1d8ee2897836b19d44ae40b47a26b32da9c4e6))
+* **frontend:** Add stories for features ([#1097](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1097)) ([6178737](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/61787374aacc457b61ac7a3d18d3ac01c8eba244))
+* **frontend:** make logout post call ([#1089](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1089)) ([edfc4db](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/edfc4db76ee0ceae3db0891ce0d3c101d84681e9))
+* **frontend:** Number Selection Screen Appears When Adding a Phone Number in 2-Step Verification ([#1111](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1111)) ([e6ac066](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/e6ac0663047623202c9f64781f7bcbaad4faeeb0))
+
+
+### Code Refactoring
+
+* **backend:** created a utility function to mask profile details ([#1102](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1102)) ([bc1344a](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/bc1344a22ad29c13a0dfdbdd2c6fd7346d24e70d))
+* **backend:** retrieve unmasked profile for the update profile ([#1108](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1108)) ([b04a20c](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/b04a20c694b3992951ea44da3325c8590113c4ce))
+* **backend:** Update instances of status.HTTP_422_UNPROCESSABLE_ENTITY to the more correct status.HTTP_422_UNPROCESSABLE_CONTENT ([#1106](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1106)) ([8c1b078](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/8c1b0787b952df1f7890223a4f0bf349c1f036e0))
+* **backend:** Update the http status to use the fastapi status value ([8c1b078](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/8c1b0787b952df1f7890223a4f0bf349c1f036e0))
+* **backend:** utility constant to store hardcoded values ([#1110](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1110)) ([5ddff95](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/5ddff95cdbd92d710967ee9d9752358ddb6e3d44))
+* **ci/cd:** Pull release tag extraction into its own job in the release pipeline ([#1099](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1099)) ([0e42977](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/0e42977d11a9347153fc6731963ddfa6df861487))
+* **frontend:** Edit Contact Phone Number verifies OTP in single transaction ([#1117](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1117)) ([2eb6dc7](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/2eb6dc70d2a8ee1bccefece562ebc6a504bfbf50))
+
+
+### Miscellaneous Chores
+
+* **deps:** lock file maintenance ([#1044](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1044)) ([81e88e7](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/81e88e7983193a9920d56e0929507fa1dd6a4d17))
+* **deps:** update all non-major github action dependencies ([#1004](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1004)) ([7a5d9fe](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/7a5d9fe589b5a157408e68ba6fcb8e3e0906533e))
+* **deps:** update all patch dependencies ([#1043](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1043)) ([9939d11](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/9939d118bd16382eeb6115673b3bcd70244a288e))
+* **deps:** update dependency vite to v6.4.1 [security] ([#1033](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1033)) ([736631b](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/736631b7c30005e0d313876679257fe5164a9b35))
+
+
+### Continuous Integration
+
+* display application version in footer ([#1100](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1100)) ([3ce3447](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/3ce344774ce313b8caa06bb1ff1d5b510746ba4d))
+* release 1.10.2 ([#1083](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1083)) ([db59492](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/db594920da079a4c5ef371e63ec83aa2889eb127))
+
 ## [1.10.2](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.10.1...v1.10.2) (2025-12-22)
 
 
