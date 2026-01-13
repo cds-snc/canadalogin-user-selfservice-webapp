@@ -219,6 +219,7 @@ async def test_dispatch_posts_correct_request_for_email():
         resp = await dispatch_otp(client, info)
     assert resp.status_code == 201
 
+
 # --------------------------------
 # handle_otp_send (integration-ish)
 # --------------------------------
@@ -319,7 +320,7 @@ async def test_handle_validation_error_due_to_incomplete_payload():
 @pytest.mark.asyncio
 async def test_handle_user_mismatch_returns_403(monkeypatch):
     """
-    Test that user mismatch validation (which happens at route level) 
+    Test that user mismatch validation (which happens at route level)
     properly raises 403 before handle_otp_send is called.
     This test simulates the validation that occurs in the route.
     """
@@ -329,8 +330,7 @@ async def test_handle_user_mismatch_returns_403(monkeypatch):
     async def mock_validation_failure(request, user_access_token, request_user_id):
         # Simulate the validation logic that would happen at route level
         raise HTTPException(
-            status_code=403,
-            detail="User mismatch - cannot update profile"
+            status_code=403, detail="User mismatch - cannot update profile"
         )
 
     # This test validates that the route-level validation would catch the mismatch
