@@ -104,8 +104,15 @@ export default function ManageFIDO2() {
     try {
       // Step 1: Get attestation options from server
       const attestationOptions = await fido2Api.getAttestationOptions(
-        "",
-        newDeviceName || "My Security Key",
+        "john.phan+t3@cds-snc.ca",
+        "John Phan",
+        {
+          attestation: "direct",
+          requireResidentKey: false,
+          userVerification: "preferred",
+          // authenticatorAttachment can be "platform", "cross-platform", or undefined
+          // authenticatorAttachment: "cross-platform", // Uncomment to prefer external authenticators
+        },
       );
 
       if (!attestationOptions || attestationOptions.status !== "ok") {
@@ -115,7 +122,7 @@ export default function ManageFIDO2() {
       // Step 2: Use WebAuthn API to create credential
       const attestationResult = await registerFIDO2Credential(
         attestationOptions,
-        newDeviceName || "My Security Key",
+        newDeviceName || "testfido2",
       );
 
       // Step 3: Send attestation result to server
@@ -137,22 +144,27 @@ export default function ManageFIDO2() {
     } catch (err) {
       console.error("Error adding FIDO2 credential:", err);
 
-      // Handle authentication/authorization errors
-      if (err.response?.status === 401 || err.response?.status === 400) {
-        setError(
+      // Extract specific error message from server response
+      let errorMessage =
+        pageContent["error_add_credential"] || "Failed to add security key";
+
+      if (err.response?.data?.errorMessage) {
+        // Handle fido2Error format from ciservices.js
+        errorMessage = err.response.data.errorMessage;
+      } else if (err.response?.data?.message) {
+        // Handle IBM Verify error format
+        errorMessage = err.response.data.message;
+      } else if (err.response?.status === 401 || err.response?.status === 400) {
+        errorMessage =
           pageContent["error_session_expired"] ||
-            "Your session has expired or you don't have permission to access this feature. Please go back to Security Settings and try again.",
-        );
+          "Your session has expired or you don't have permission to access this feature. Please go back to Security Settings and try again.";
       } else if (err.message === "NotAllowedError") {
-        setError(
+        errorMessage =
           pageContent["error_registration_cancelled"] ||
-            "Registration was cancelled",
-        );
-      } else {
-        setError(
-          pageContent["error_add_credential"] || "Failed to add security key",
-        );
+          "Registration was cancelled";
       }
+
+      setError(errorMessage);
     } finally {
       setRegistrationLoading(false);
     }

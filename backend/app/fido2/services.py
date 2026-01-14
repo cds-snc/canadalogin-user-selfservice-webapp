@@ -384,36 +384,107 @@ class FIDO2Service:
             # Modify request body for IBM Verify API
             body_to_send = request_body.copy() if request_body else {}
 
-            # Replace username with userId
+            # Replace username with userId (but NOT for attestation/result)
             if "username" in body_to_send:
                 del body_to_send["username"]
-                if user_id:
+                if user_id and not endpoint_path.endswith("/attestation/result"):
                     body_to_send["userId"] = user_id
 
             # Enable registration immediately for attestation results
             if endpoint_path.endswith("/attestation/result"):
+                # Add enabled: true like ciservices.js does
                 body_to_send["enabled"] = True
 
+                # For attestation/result, only include the fields that IBM Verify expects
+                # based on the successful ciservices.js payload (no userId field)
+                expected_fields = [
+                    "response",
+                    "id",
+                    "nickname",
+                    "rawId",
+                    "type",
+                    "getClientExtensionResults",
+                    "enabled",
+                ]
+                body_to_send = {
+                    key: value
+                    for key, value in body_to_send.items()
+                    if key in expected_fields
+                }
+
+                # Ensure getClientExtensionResults is an empty object if null/None
+                # to match the successful ciservices.js format
+                if body_to_send.get("getClientExtensionResults") is None:
+                    body_to_send["getClientExtensionResults"] = {}
+
             # Make the request using admin token for FIDO2 operations
-            url = f"{self.tenant_url}/v2.0/factors/fido2/relyingparties/{rp_uuid}{endpoint_path}"
+            url = f"{self.tenant_url.rstrip('/')}/v2.0/factors/fido2/relyingparties/{rp_uuid}{endpoint_path}"
             headers = get_auth_request_headers(admin_token, json_content_type=True)
 
+            logger.info(f"Sending request to IBM Verify: URL={url}")
+            logger.info(f"Request body: {body_to_send}")
+
             response = await http_client.post(url, headers=headers, json=body_to_send)
-            response.raise_for_status()
 
-            response_data = response.json()
+            # Handle IBM Verify API response - return the same status code
+            if response.status_code == 200:
+                response_data = response.json()
+                # Add FIDO2 server spec fields for success
+                response_data["status"] = "ok"
+                response_data["errorMessage"] = ""
+                return response_data
+            else:
+                # Log the full response for debugging
+                logger.error(f"IBM Verify API error - Status: {response.status_code}")
+                logger.error(f"Response headers: {dict(response.headers)}")
+                logger.error(f"Response body: {response.text}")
 
-            # Add FIDO2 server spec fields
-            response_data["status"] = "ok"
-            response_data["errorMessage"] = ""
+                # Return error with the same status code as IBM Verify
+                try:
+                    error_data = response.json()
+                    # Check for IBM Verify error format
+                    if error_data.get("success") == False and "message" in error_data:
+                        error_response = {
+                            "status": "failed",
+                            "errorMessage": error_data["message"],
+                        }
+                    elif "error" in error_data and "messageId" in error_data.get(
+                        "error", {}
+                    ):
+                        # Handle CI-style error format
+                        error_info = error_data["error"]
+                        error_message = f"{error_info.get('messageId', '')}: {error_info.get('messageDescription', '')}"
+                        error_response = {
+                            "status": "failed",
+                            "errorMessage": error_message,
+                        }
+                    else:
+                        # Generic error response
+                        error_response = {
+                            "status": "failed",
+                            "errorMessage": f"Unexpected HTTP response code: {response.status_code}",
+                        }
+                except Exception:
+                    # If JSON parsing fails, return generic error
+                    error_response = {
+                        "status": "failed",
+                        "errorMessage": f"Unexpected HTTP response code: {response.status_code}",
+                    }
 
-            return response_data
+                # Raise HTTPException with the same status code as IBM Verify
+                raise HTTPException(
+                    status_code=response.status_code, detail=error_response
+                )
 
         except HTTPException:
             raise
         except Exception as e:
             logger.error(f"Error proxying FIDO2 request: {str(e)}")
-            RequestErrorHandler.handle(e)
+            # Return error in fido2Error format instead of raising exception
+            return {
+                "status": "failed",
+                "errorMessage": f"Error proxying FIDO2 request: {str(e)}",
+            }
 
     async def validate_fido2_login(
         self, http_client: AsyncClient, assertion_result: Dict[str, Any]

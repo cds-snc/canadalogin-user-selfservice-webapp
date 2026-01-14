@@ -64,6 +64,7 @@ class FIDO2AttestationResultRequest(BaseModel):
     response: Dict[str, Any]
     nickname: Optional[str] = None
     enabled: bool = True
+    getClientExtensionResults: Optional[Dict[str, Any]] = None
 
 
 class FIDO2AssertionOptionsRequest(BaseModel):
@@ -96,4 +97,3 @@ class ErrorResponse(BaseModel):
 
     status: str = "failed"
     error: str
-

@@ -1,23 +1,68 @@
 # HTTPS Setup for Local Development
 
+This guide covers setting up HTTPS for local development using mkcert. Both frontend and backend **share the same SSL certificate** for consistency.
+
 ## Quick Start
 
-### 1. Generate SSL Certificates (Already Done)
+### 1. Install mkcert
+
+```bash
+brew install mkcert
+mkcert -install
+```
+
+**Important**: The `mkcert -install` command installs the local Certificate Authority (CA) on your system so browsers trust the certificates.
+
+For macOS-specific instructions on trusting local certificates, see: [How to make Node.js running HTTPS localhost on macOS](https://steffodimfelt.medium.com/how-to-make-node-js-running-https-localhost-on-macos-67b0840ad4c5)
+
+### 2. Generate SSL Certificates
 
 ```bash
 cd backend
+mkdir -p certs
 mkcert -cert-file certs/cert.pem -key-file certs/key.pem www.manageapp.gcsignin localhost 127.0.0.1 ::1
 ```
 
-Certificates location: `backend/certs/`
+**Certificate location**: `backend/certs/` (shared by both frontend and backend)
 
-### 2. Update `/etc/hosts` (Already Done)
+### 3. Update `/etc/hosts`
 
+```bash
+sudo nano /etc/hosts
+```
+
+Add this line:
 ```
 127.0.0.1       www.manageapp.gcsignin
 ```
 
-### 3. Run Backend with HTTPS
+### 4. Configure Frontend to Use Shared Certificate
+
+The frontend uses the same certificate as the backend. Update `frontend/vite.config.js`:
+
+```javascript
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import fs from "fs";
+import path from "path";
+
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    host: "www.manageapp.gcsignin",
+    port: 3000,
+    allowedHosts: ["www.manageapp.gcsignin"],
+    https: {
+      key: fs.readFileSync(path.resolve(__dirname, "../backend/certs/key.pem")),
+      cert: fs.readFileSync(path.resolve(__dirname, "../backend/certs/cert.pem")),
+    },
+  },
+});
+```
+
+### 5. Run Backend with HTTPS
+
+From the `backend/` directory:
 
 **Start container:**
 ```bash
@@ -42,32 +87,59 @@ docker stop gc-signin-backend-https && docker rm gc-signin-backend-https
 docker logs -f gc-signin-backend-https
 ```
 
-### 4. Update Backend Configuration
+### 6. Run Frontend with HTTPS
+
+From the `frontend/` directory:
+
+```bash
+npm run dev
+```
+
+The frontend will automatically use the shared certificate from `backend/certs/`.
+
+### 7. Update Backend Configuration
 
 In `backend/.env`, set:
 ```env
-RPID=www.manageapp.gcsignin
+
+If you see certificate warnings in your browser:
+
+1. **Ensure mkcert CA is installed**:
+```bash
+mkcert -install
 ```
 
-### 5. Update Frontend Configuration
+2. **On macOS**, verify the certificate is trusted:
+   - Open Keychain Access
+   - Search for "mkcert"
+   - Double-click the certificate
+   - Under "Trust", set "When using this certificate" to "Always Trust"
+   
+   For detailed macOS instructions, see: [How to make Node.js running HTTPS localhost on macOS](https://steffodimfelt.medium.com/how-to-make-node-js-running-https-localhost-on-macos-67b0840ad4c5)
+
+3. **Completely restart your browser** (not just reload the tab):
+   - Quit the browser application entirely
+   - Reopen and navigate to https://www.manageapp.gcsignin:3000
+
+4. **For Chrome/Edge**: If you still see warnings, type `thisisunsafe` on the warning page to bypass it 8. Update Frontend Configuration
 
 In `frontend/.env`, set:
 ```env
 VITE_BACKEND_API_URL=https://www.manageapp.gcsignin:8000
 ```
 
-### 6. Update IBM Verify OAuth Client
+### 9. Update IBM Verify OAuth Client
 
 Add these redirect URIs to your IBM Verify OAuth client:
 - `https://www.manageapp.gcsignin:8000/v1/auth/callback`
 - Keep: `http://localhost:8000/v1/auth/callback` (for non-HTTPS development)
 
-### 7. Access Your Application
+### 10. Access Your Application
 
 - **Backend API**: https://www.manageapp.gcsignin:8000
 - **Backend Health**: https://www.manageapp.gcsignin:8000/health/health
 - **Swagger UI**: https://www.manageapp.gcsignin:8000/docs
-- **Frontend**: https://localhost:3000 (with your vite-plugin-mkcert setup)
+- **Frontend**: https://www.manageapp.gcsignin:3000
 
 ## Testing
 
@@ -94,7 +166,16 @@ docker stop gc-signin-backend-https && docker rm gc-signin-backend-https
 # or
 docker ps | grep 8000
 docker stop <container_id>
-```
+```Shared by**: Both frontend and backend use the same certificate
+- **Ignored by Git**: Yes (see `.gitignore`)
+
+## Why Share the Same Certificate?
+
+Both frontend and backend use the same certificate for:
+- **Consistency**: Single source of truth for SSL configuration
+- **Simplicity**: Only one certificate to generate and manage
+- **Easier troubleshooting**: Both services have identical SSL setup
+- **Same domain**: Both services run on www.manageapp.gcsignin
 
 ### Redis connection error
 Ensure Redis is running:

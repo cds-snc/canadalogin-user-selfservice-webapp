@@ -51,15 +51,33 @@ export const fido2Api = {
   /**
    * Get attestation options for FIDO2 registration (start registration)
    */
-  getAttestationOptions: async (username = "", displayName = "") => {
+  getAttestationOptions: async (
+    username = "",
+    displayName = "",
+    options = {},
+  ) => {
     try {
+      const requestBody = {
+        username,
+        displayName,
+        attestation: options.attestation || "none",
+        authenticatorSelection: {
+          requireResidentKey: options.requireResidentKey || false,
+          userVerification: options.userVerification || "preferred",
+          ...(options.authenticatorAttachment && {
+            authenticatorAttachment: options.authenticatorAttachment,
+          }),
+        },
+      };
+
+      // Add extensions if resident key is required (workaround for WebAuthn spec issue)
+      if (requestBody.authenticatorSelection.requireResidentKey) {
+        requestBody.extensions = { credProtect: 2 };
+      }
+
       const response = await axios.post(
         `${config.apiUrl}/v1/fido2/attestation/options`,
-        {
-          username,
-          displayName,
-          attestation: "none",
-        },
+        requestBody,
       );
       return response.data;
     } catch (error) {
