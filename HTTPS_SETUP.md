@@ -53,8 +53,8 @@ export default defineConfig({
     port: 3000,
     allowedHosts: ["www.manageapp.gcsignin"],
     https: {
-      key: fs.readFileSync(path.resolve(__dirname, "../backend/certs/key.pem")),
-      cert: fs.readFileSync(path.resolve(__dirname, "../backend/certs/cert.pem")),
+      key: fs.readFileSync(path.resolve("../backend/certs/key.pem")),
+      cert: fs.readFileSync(path.resolve("../backend/certs/cert.pem")),
     },
   },
 });
