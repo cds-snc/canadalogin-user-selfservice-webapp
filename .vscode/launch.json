@@ -48,7 +48,7 @@
       "name": "React Debugger",
       "request": "launch",
       "type": "chrome",
-      "url": "https://www.manageapp.gcsignin:3000",
+      "url": "https://app.auth.signin-connexion.cdssandbox.xyz:3000",
       "webRoot": "${workspaceFolder}/frontend/src"
     },
     {

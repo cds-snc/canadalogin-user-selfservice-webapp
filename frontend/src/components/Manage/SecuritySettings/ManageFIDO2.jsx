@@ -19,9 +19,12 @@ import NoticeFactory from "../../InfoBlocks/NoticeFactory.jsx";
 import {
   isWebAuthnSupported,
   registerFIDO2Credential,
+  prepareAssertionOptions,
+  formatAssertionForServer,
 } from "../../../features/ManageFIDO2/utils/webAuthnUtils.js";
 import VerifiedBadge from "../../Badges/VerifiedBadge.jsx";
 import EnabledBadge from "../../Badges/EnabledBadge.jsx";
+import { useUser } from "../../Providers/useUser.js";
 
 export default function ManageFIDO2() {
   const { language } = useParams();
@@ -34,12 +37,15 @@ export default function ManageFIDO2() {
   const [loading, setLoading] = useState(true);
   const [registrationLoading, setRegistrationLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [authenticateLoading, setAuthenticateLoading] = useState(null); // Track which credential is being authenticated
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [credentialToDelete, setCredentialToDelete] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newDeviceName, setNewDeviceName] = useState("");
+  const { state } = useUser();
+  console.log(state);
 
   // Check if we came from another page and need to render success notice
   const { noticeType, message } = location.state || {};
@@ -114,6 +120,7 @@ export default function ManageFIDO2() {
           // authenticatorAttachment: "cross-platform", // Uncomment to prefer external authenticators
         },
       );
+      console.log(attestationOptions);
 
       if (!attestationOptions || attestationOptions.status !== "ok") {
         throw new Error("Failed to get attestation options");
@@ -215,6 +222,93 @@ export default function ManageFIDO2() {
   };
 
   /**
+   * Handle authenticating with a specific FIDO2 credential
+   */
+  const handleAuthenticate = async (credential) => {
+    if (!webAuthnSupported) {
+      setError(
+        pageContent["webauthn_not_supported"] ||
+          "Your browser does not support WebAuthn.",
+      );
+      return;
+    }
+
+    setAuthenticateLoading(credential.id);
+    setError(null);
+
+    try {
+      // Step 1: Get assertion options from server
+      const assertionOptions = await fido2Api.getAssertionOptions(
+        "john.phan+t3@cds-snc.ca",
+      );
+
+      // Step 2: Filter allowed credentials to only include the selected credential
+      const filteredOptions = {
+        ...assertionOptions,
+        allowCredentials: assertionOptions.allowCredentials
+          ? assertionOptions.allowCredentials.filter(
+              (cred) => cred.id === credential.credentialId,
+            )
+          : [
+              {
+                id: credential.credentialId,
+                type: "public-key",
+                transports: ["usb", "nfc", "ble", "internal"],
+              },
+            ],
+      };
+
+      // Step 3: Prepare assertion options for WebAuthn API
+      const preparedOptions = prepareAssertionOptions(filteredOptions);
+
+      // Step 4: Call WebAuthn API to get assertion
+      const assertion = await navigator.credentials.get({
+        publicKey: preparedOptions,
+      });
+
+      if (!assertion) {
+        throw new Error("Authentication was cancelled or failed");
+      }
+
+      // Step 5: Format assertion for server
+      const assertionResult = formatAssertionForServer(assertion);
+
+      // Step 6: Submit assertion result to server for verification
+      const result = await fido2Api.submitAssertionResult(assertionResult);
+
+      if (result.authenticated) {
+        setSuccess(
+          pageContent["authenticate_success"] ||
+            `Authentication successful with ${credential.nickname || "security key"}!`,
+        );
+      } else {
+        throw new Error("Authentication verification failed");
+      }
+    } catch (err) {
+      console.error("Authentication error:", err);
+      let errorMessage =
+        pageContent["authenticate_error"] ||
+        "Authentication failed. Please try again.";
+
+      if (err.name === "NotAllowedError") {
+        errorMessage =
+          pageContent["authenticate_cancelled"] ||
+          "Authentication was cancelled or timed out.";
+      } else if (err.name === "InvalidStateError") {
+        errorMessage =
+          pageContent["authenticate_invalid_state"] ||
+          "This security key is not registered or cannot be used.";
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+
+      setError(errorMessage);
+    } finally {
+      setAuthenticateLoading(null);
+    }
+  };
+
+  /**
    * Open delete confirmation modal
    */
   const openDeleteModal = (credential) => {
@@ -230,6 +324,7 @@ export default function ManageFIDO2() {
     setShowAddModal(false);
     setCredentialToDelete(null);
     setNewDeviceName("");
+    setAuthenticateLoading(null);
     setError(null);
   };
 
@@ -302,6 +397,20 @@ export default function ManageFIDO2() {
           <div
             style={{ display: "flex", gap: "0.5rem", flexDirection: "column" }}
           >
+            <GcdsButton
+              buttonRole="primary"
+              size="small"
+              onClick={() => handleAuthenticate(credential)}
+              disabled={
+                !webAuthnSupported ||
+                authenticateLoading === credential.id ||
+                !credential.enabled
+              }
+            >
+              {authenticateLoading === credential.id
+                ? pageContent["authenticating"] || "Authenticating..."
+                : pageContent["authenticate"] || "Authenticate"}
+            </GcdsButton>
             <GcdsButton
               buttonRole="destructive"
               size="small"
@@ -435,7 +544,7 @@ export default function ManageFIDO2() {
             inputId="device-name"
             label={pageContent["device_name"] || "Device Name"}
             value={newDeviceName}
-            onGcdsInput={(e) => setNewDeviceName(e.detail.value)}
+            onGcdsInput={(e) => setNewDeviceName(e.target.value)}
             placeholder={
               pageContent["device_name_placeholder"] || "e.g., My YubiKey"
             }

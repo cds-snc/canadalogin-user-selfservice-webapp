@@ -416,6 +416,8 @@ class FIDO2Service:
                 # to match the successful ciservices.js format
                 if body_to_send.get("getClientExtensionResults") is None:
                     body_to_send["getClientExtensionResults"] = {}
+            if endpoint_path.endswith("/assertion/options"):
+                del body_to_send["attestation"]
 
             # Make the request using admin token for FIDO2 operations
             url = f"{self.tenant_url.rstrip('/')}/v2.0/factors/fido2/relyingparties/{rp_uuid}{endpoint_path}"

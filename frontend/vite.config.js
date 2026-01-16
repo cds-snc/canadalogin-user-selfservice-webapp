@@ -7,9 +7,9 @@ import path from "path";
 export default defineConfig({
   plugins: [react()],
   server: {
-    host: "www.manageapp.gcsignin",
+    host: "app.auth.signin-connexion.cdssandbox.xyz",
     port: 3000,
-    allowedHosts: ["www.manageapp.gcsignin"],
+    allowedHosts: ["app.auth.signin-connexion.cdssandbox.xyz"],
     https: {
       key: fs.readFileSync(path.resolve("../backend/certs/key.pem")),
       cert: fs.readFileSync(path.resolve("../backend/certs/cert.pem")),

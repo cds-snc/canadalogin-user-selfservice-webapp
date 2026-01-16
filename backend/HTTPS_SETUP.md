@@ -20,7 +20,7 @@ For macOS-specific instructions on trusting local certificates, see: [How to mak
 ```bash
 cd backend
 mkdir -p certs
-mkcert -cert-file certs/cert.pem -key-file certs/key.pem www.manageapp.gcsignin localhost 127.0.0.1 ::1
+mkcert -cert-file certs/cert.pem -key-file certs/key.pem app.auth.signin-connexion.cdssandbox.xyz localhost 127.0.0.1 ::1
 ```
 
 **Certificate location**: `backend/certs/` (shared by both frontend and backend)
@@ -33,7 +33,7 @@ sudo nano /etc/hosts
 
 Add this line:
 ```
-127.0.0.1       www.manageapp.gcsignin
+127.0.0.1       app.auth.signin-connexion.cdssandbox.xyz
 ```
 
 ### 4. Configure Frontend to Use Shared Certificate
@@ -49,9 +49,9 @@ import path from "path";
 export default defineConfig({
   plugins: [react()],
   server: {
-    host: "www.manageapp.gcsignin",
+    host: "app.auth.signin-connexion.cdssandbox.xyz",
     port: 3000,
-    allowedHosts: ["www.manageapp.gcsignin"],
+    allowedHosts: ["app.auth.signin-connexion.cdssandbox.xyz"],
     https: {
       key: fs.readFileSync(path.resolve(__dirname, "../backend/certs/key.pem")),
       cert: fs.readFileSync(path.resolve(__dirname, "../backend/certs/cert.pem")),
@@ -119,33 +119,33 @@ mkcert -install
 
 3. **Completely restart your browser** (not just reload the tab):
    - Quit the browser application entirely
-   - Reopen and navigate to https://www.manageapp.gcsignin:3000
+   - Reopen and navigate to https://app.auth.signin-connexion.cdssandbox.xyz:3000
 
 4. **For Chrome/Edge**: If you still see warnings, type `thisisunsafe` on the warning page to bypass it 8. Update Frontend Configuration
 
 In `frontend/.env`, set:
 ```env
-VITE_BACKEND_API_URL=https://www.manageapp.gcsignin:8000
+VITE_BACKEND_API_URL=https://app.auth.signin-connexion.cdssandbox.xyz:8000
 ```
 
 ### 9. Update IBM Verify OAuth Client
 
 Add these redirect URIs to your IBM Verify OAuth client:
-- `https://www.manageapp.gcsignin:8000/v1/auth/callback`
+- `https://app.auth.signin-connexion.cdssandbox.xyz:8000/v1/auth/callback`
 - Keep: `http://localhost:8000/v1/auth/callback` (for non-HTTPS development)
 
 ### 10. Access Your Application
 
-- **Backend API**: https://www.manageapp.gcsignin:8000
-- **Backend Health**: https://www.manageapp.gcsignin:8000/health/health
-- **Swagger UI**: https://www.manageapp.gcsignin:8000/docs
-- **Frontend**: https://www.manageapp.gcsignin:3000
+- **Backend API**: https://app.auth.signin-connexion.cdssandbox.xyz:8000
+- **Backend Health**: https://app.auth.signin-connexion.cdssandbox.xyz/health/health
+- **Swagger UI**: https://app.auth.signin-connexion.cdssandbox.xyz/docs
+- **Frontend**: https://app.auth.signin-connexion.cdssandbox.xyz:3000
 
 ## Testing
 
 ```bash
 # Test backend HTTPS
-curl https://www.manageapp.gcsignin:8000/health/health
+curl https://app.auth.signin-connexion.cdssandbox.xyz:8000/health/health
 
 # Should return:
 # {"status":"healthy","timestamp":"...","service":"gc-signin-backend"}
@@ -175,7 +175,7 @@ Both frontend and backend use the same certificate for:
 - **Consistency**: Single source of truth for SSL configuration
 - **Simplicity**: Only one certificate to generate and manage
 - **Easier troubleshooting**: Both services have identical SSL setup
-- **Same domain**: Both services run on www.manageapp.gcsignin
+- **Same domain**: Both services run on app.auth.signin-connexion.cdssandbox.xyz
 
 ### Redis connection error
 Ensure Redis is running:
@@ -190,7 +190,7 @@ brew services start redis
 ## Certificate Information
 
 - **Validity**: 825 days from generation
-- **Domains**: www.manageapp.gcsignin, localhost, 127.0.0.1, ::1
+- **Domains**: app.auth.signin-connexion.cdssandbox.xyz, localhost, 127.0.0.1, ::1
 - **Location**: `backend/certs/cert.pem` and `backend/certs/key.pem`
 - **Ignored by Git**: Yes (see `.gitignore`)
 
@@ -206,4 +206,4 @@ Access: http://localhost:8000
 ```bash
 docker run -p 8000:8000 --add-host host.docker.internal:host-gateway --env-file .env -e SESSION_REDIS_URL=redis://host.docker.internal:6379/0 -v $(pwd):/app -v $(pwd)/certs:/app/certs gc-signin-backend uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --ssl-keyfile=/app/certs/key.pem --ssl-certfile=/app/certs/cert.pem
 ```
-Access: https://www.manageapp.gcsignin:8000
+Access: https://app.auth.signin-connexion.cdssandbox.xyz:8000

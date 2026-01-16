@@ -55,11 +55,11 @@ class Configuration(BaseSettings):
         None  # Not required for local development, value should be ".gc-signin.cdssandbox.xyz"
     )
     PROFILE_MANAGEMENT_DOMAIN: str = (
-        "https://www.manageapp.gcsignin:3000"  # Frontend Management App domain to app.gc-signin.cdssandbox.xyz
+        "https://app.auth.signin-connexion.cdssandbox.xyz:3000"  # Frontend Management App domain to app.gc-signin.cdssandbox.xyz
     )
 
     CORS_ORIGINS: str = Field(
-        default="www.manageapp.gcsignin:3000,www.manageapp.gcsignin:8000",
+        default="app.auth.signin-connexion.cdssandbox.xyz:3000,app.auth.signin-connexion.cdssandbox.xyz:8000",
         description="Comma-separated list of CORS origins, Terraform cant pass in a list[str].",
     )
 

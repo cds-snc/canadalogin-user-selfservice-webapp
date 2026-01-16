@@ -125,14 +125,14 @@ mkcert -install
 ```bash
 cd backend
 mkdir -p certs
-mkcert -cert-file certs/cert.pem -key-file certs/key.pem www.manageapp.gcsignin localhost 127.0.0.1 ::1
+mkcert -cert-file certs/cert.pem -key-file certs/key.pem app.auth.signin-connexion.cdssandbox.xyz localhost 127.0.0.1 ::1
 ```
 
 3. **Add hostname to `/etc/hosts`** (if using custom domain):
 ```bash
 sudo nano /etc/hosts
 # Add this line:
-127.0.0.1       www.manageapp.gcsignin
+127.0.0.1       app.auth.signin-connexion.cdssandbox.xyz
 ```
 
 4. **Run with HTTPS**:
@@ -148,10 +148,10 @@ docker run -p 8000:8000 \
 ```
 
 5. **Access your API**:
-   - HTTPS: `https://www.manageapp.gcsignin:8000/health/health`
-   - Swagger UI: `https://www.manageapp.gcsignin:8000/docs`
+   - HTTPS: `https://app.auth.signin-connexion.cdssandbox.xyz:8000/health/health`
+   - Swagger UI: `https://app.auth.signin-connexion.cdssandbox.xyz:8000/docs`
 
-**Note**: The certificates are valid for 825 days and work with both `www.manageapp.gcsignin` and `localhost`.
+**Note**: The certificates are valid for 825 days and work with both `app.auth.signin-connexion.cdssandbox.xyz` and `localhost`.
 
 ### Development Mode
 

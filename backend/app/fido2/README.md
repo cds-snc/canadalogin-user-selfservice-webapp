@@ -32,8 +32,8 @@ The FIDO2 module provides the following functionality:
 
 - **POST** `/api/v1/fido2/assertion/options` - Get assertion options for FIDO2 authentication
 - **POST** `/api/v1/fido2/assertion/result` - Submit assertion result to complete authentication
-- **POST** `/api/v1/fido2/public/assertion/options` - Public endpoint for login flow (no auth required)
-- **POST** `/api/v1/fido2/public/assertion/result` - Public endpoint for login completion
+- **POST** `/api/v1/fido2/assertion/options` - Public endpoint for login flow (no auth required)
+- **POST** `/api/v1/fido2/assertion/result` - Public endpoint for login completion
 
 ## Architecture
 
