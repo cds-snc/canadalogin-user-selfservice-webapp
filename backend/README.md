@@ -95,8 +95,29 @@ The API will be available at `http://localhost:8000`
 ### Prerequisites
 
 - VS Code with Python extension installed
+- **Python dependencies installed** (see setup below)
 - Redis running locally (see Redis setup above)
 - Environment variables configured in `backend/.env`
+
+#### Initial Setup (Required Before Debugging)
+
+1. **Install Python dependencies** (run from repo root):
+```bash
+make install-dev-python
+```
+
+2. **Activate virtual environment** (if created):
+```bash
+source .venv/bin/activate
+```
+
+3. **Verify installation**:
+```bash
+cd backend
+python -c "import fastapi; print('Dependencies installed successfully')"
+```
+
+**Note**: The `make install-dev-python` command installs both runtime and development dependencies needed for debugging and testing.
 
 ### Available Debug Configurations
 
