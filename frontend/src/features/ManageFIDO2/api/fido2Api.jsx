@@ -51,15 +51,9 @@ export const fido2Api = {
   /**
    * Get attestation options for FIDO2 registration (start registration)
    */
-  getAttestationOptions: async (
-    username = "",
-    displayName = "",
-    options = {},
-  ) => {
+  getAttestationOptions: async (options = {}) => {
     try {
       const requestBody = {
-        username,
-        displayName,
         attestation: options.attestation || "none",
         authenticatorSelection: {
           requireResidentKey: options.requireResidentKey || false,
@@ -103,12 +97,11 @@ export const fido2Api = {
   /**
    * Get assertion options for FIDO2 authentication
    */
-  getAssertionOptions: async (username = "") => {
+  getAssertionOptions: async () => {
     try {
       const response = await axios.post(
         `${config.apiUrl}/v1/fido2/assertion/options`,
         {
-          username,
           userVerification: "preferred",
         },
       );

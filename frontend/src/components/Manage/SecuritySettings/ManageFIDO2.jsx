@@ -109,18 +109,13 @@ export default function ManageFIDO2() {
 
     try {
       // Step 1: Get attestation options from server
-      const attestationOptions = await fido2Api.getAttestationOptions(
-        "john.phan+t3@cds-snc.ca",
-        "John Phan",
-        {
-          attestation: "direct",
-          requireResidentKey: false,
-          userVerification: "preferred",
-          // authenticatorAttachment can be "platform", "cross-platform", or undefined
-          // authenticatorAttachment: "cross-platform", // Uncomment to prefer external authenticators
-        },
-      );
-      console.log(attestationOptions);
+      const attestationOptions = await fido2Api.getAttestationOptions({
+        attestation: "direct",
+        requireResidentKey: false,
+        userVerification: "preferred",
+        // authenticatorAttachment can be "platform", "cross-platform", or undefined
+        // authenticatorAttachment: "cross-platform", // Uncomment to prefer external authenticators
+      });
 
       if (!attestationOptions || attestationOptions.status !== "ok") {
         throw new Error("Failed to get attestation options");
@@ -238,9 +233,7 @@ export default function ManageFIDO2() {
 
     try {
       // Step 1: Get assertion options from server
-      const assertionOptions = await fido2Api.getAssertionOptions(
-        "john.phan+t3@cds-snc.ca",
-      );
+      const assertionOptions = await fido2Api.getAssertionOptions();
 
       // Step 2: Filter allowed credentials to only include the selected credential
       const filteredOptions = {

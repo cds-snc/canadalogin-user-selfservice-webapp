@@ -49,8 +49,6 @@ class DeleteRegistrationRequest(BaseModel):
 class FIDO2AttestationOptionsRequest(BaseModel):
     """Request model for FIDO2 attestation options"""
 
-    username: Optional[str] = None
-    displayName: Optional[str] = None
     attestation: Optional[str] = "none"
     authenticatorSelection: Optional[Dict[str, Any]] = None
 
@@ -70,7 +68,6 @@ class FIDO2AttestationResultRequest(BaseModel):
 class FIDO2AssertionOptionsRequest(BaseModel):
     """Request model for FIDO2 assertion options"""
 
-    username: Optional[str] = None
     userVerification: str = "preferred"
     attestation: Optional[str] = "none"
 

@@ -15,6 +15,7 @@ from app.fido2.schemas import (
     FIDO2UserResponse,
     DeleteRegistrationRequest,
 )
+from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +28,48 @@ class FIDO2Service:
         self.tenant_url = self.config.ibm_verify_config.IBM_VERIFY_TENANT_URL
         # This should be configured via IBMVerifyConfig
         self.rp_id = self.config.ibm_verify_config.RPID
+
+    async def _get_user_profile_info(
+        self, http_client: AsyncClient, user_access_token: str
+    ) -> tuple[str, str]:
+        """
+        Get username and displayName from user profile using their access token.
+
+        Returns:
+            tuple[str, str]: (username, displayName)
+        """
+        try:
+            logger.info("Fetching user profile for FIDO2 operation")
+            profile = await dispatch_get_my_profile_from_ibm(
+                http_client, user_access_token
+            )
+
+            username = profile.userName
+
+            # Construct display name from profile
+            display_name = ""
+            if profile.name:
+                if profile.name.givenName and profile.name.familyName:
+                    display_name = f"{profile.name.givenName} {profile.name.familyName}"
+                elif profile.name.formatted:
+                    display_name = profile.name.formatted
+                elif profile.name.givenName:
+                    display_name = profile.name.givenName
+                elif profile.name.familyName:
+                    display_name = profile.name.familyName
+
+            # Fallback to username if no display name could be constructed
+            if not display_name:
+                display_name = username
+
+            logger.info(
+                f"Retrieved user profile - username: {username}, displayName: {display_name}"
+            )
+            return username, display_name
+
+        except Exception as e:
+            logger.error(f"Error fetching user profile for FIDO2: {str(e)}")
+            RequestErrorHandler.handle(e)
 
     async def _get_rp_uuid_from_rp_id(
         self, http_client: AsyncClient, access_token: str, rp_id: str
@@ -384,8 +427,28 @@ class FIDO2Service:
             # Modify request body for IBM Verify API
             body_to_send = request_body.copy() if request_body else {}
 
+            # For attestation options, automatically fetch and inject user profile information
+            if endpoint_path.endswith("/attestation/options") and user_access_token:
+                username, display_name = await self._get_user_profile_info(
+                    http_client, user_access_token
+                )
+                body_to_send["username"] = username
+                body_to_send["displayName"] = display_name
+                logger.info(
+                    f"Injected user profile info - username: {username}, displayName: {display_name}"
+                )
+
+            # For assertion options, automatically fetch and inject username
+            elif endpoint_path.endswith("/assertion/options") and user_access_token:
+                username, _ = await self._get_user_profile_info(
+                    http_client, user_access_token
+                )
+                body_to_send["username"] = username
+                logger.info(f"Injected username for assertion options: {username}")
+
             # Replace username with userId (but NOT for attestation/result)
             if "username" in body_to_send:
+                username_for_lookup = body_to_send["username"]
                 del body_to_send["username"]
                 if user_id and not endpoint_path.endswith("/attestation/result"):
                     body_to_send["userId"] = user_id
