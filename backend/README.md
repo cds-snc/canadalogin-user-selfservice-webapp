@@ -90,6 +90,113 @@ fastapi run backend/app/main.py or uvicorn app.main:app --reload --app-dir backe
 
 The API will be available at `http://localhost:8000`
 
+## Development with VS Code Debugger
+
+### Prerequisites
+
+- VS Code with Python extension installed
+- **Python dependencies installed** (see setup below)
+- Redis running locally (see Redis setup above)
+- Environment variables configured in `backend/.env`
+
+#### Initial Setup (Required Before Debugging)
+
+1. **Install Python dependencies** (run from repo root):
+```bash
+make install-dev-python
+```
+
+2. **Activate virtual environment** (if created):
+```bash
+source .venv/bin/activate
+```
+
+3. **Verify installation**:
+```bash
+cd backend
+python -c "import fastapi; print('Dependencies installed successfully')"
+```
+
+**Note**: The `make install-dev-python` command installs both runtime and development dependencies needed for debugging and testing.
+
+### Available Debug Configurations
+
+The project includes several VS Code debug configurations in [`.vscode/launch.json`](../.vscode/launch.json):
+
+#### 1. Python Debugger: FastAPI (HTTPS)
+Runs the backend with SSL certificates for FIDO2 development:
+- **Use when**: Developing FIDO2/WebAuthn features
+- **URL**: `https://app.auth.signin-connexion.cdssandbox.xyz:8000` or `https://localhost:8000`
+- **Requirements**: SSL certificates in `backend/certs/`
+
+#### 2. Python Debugger: FastAPI (HTTP)
+Runs the backend without SSL for general development:
+- **Use when**: General API development without FIDO2
+- **URL**: `http://localhost:8000`
+- **Requirements**: None
+
+#### 3. Test Debug Configurations
+- **Current Test File**: Debug the currently open test file
+- **All Tests**: Debug all tests in the test suite
+
+### Using the Debugger
+
+1. **Open VS Code** in the workspace root directory
+2. **Set breakpoints** in your Python code where needed
+3. **Open the Run and Debug panel** (Ctrl+Shift+D / Cmd+Shift+D)
+4. **Select a configuration** from the dropdown
+5. **Press F5** or click the green play button
+
+### Environment Setup for Debugging
+
+The debugger configurations automatically:
+- Set `PYTHONPATH` to the backend directory
+- Load environment variables from `backend/.env`
+- Configure the correct host and port settings
+
+**Note**: Ensure Redis is running before starting the debugger:
+```bash
+brew services start redis
+redis-cli ping  # Should return PONG
+```
+
+### HTTPS Development Setup
+
+For FIDO2/WebAuthn development using the HTTPS configuration:
+
+1. **Generate SSL certificates** (if not already done):
+```bash
+cd backend
+mkdir -p certs
+mkcert -cert-file certs/cert.pem -key-file certs/key.pem app.auth.signin-connexion.cdssandbox.xyz localhost 127.0.0.1 ::1
+```
+
+2. **Update `/etc/hosts`** (if using custom domain):
+```bash
+sudo nano /etc/hosts
+# Add: 127.0.0.1       app.auth.signin-connexion.cdssandbox.xyz
+```
+
+3. **Use the "Python Debugger: FastAPI" configuration**
+
+### Development Container Support
+
+To run the backend in a development container:
+
+1. **Open in dev container**:
+- Open the gc-signin-user-selfservice-webapp in VSCode at the project's root directory, there should be a .devcontainer folder
+- Open VSCode search menu (Ctrl+Shift+P / Cmd+Shift+P)
+- Type "dev containers: reopen in container" and select
+- VSCode will automatically re-open in a dev container and install all dependencies
+- Start the FastAPI debugger as above
+
+### Troubleshooting Debugger Issues
+
+- **Cannot connect to Redis**: Ensure Redis is running with `brew services start redis`
+- **Import errors**: Check that `PYTHONPATH` is set correctly in the debug configuration
+- **SSL certificate errors**: Regenerate certificates or use the HTTP configuration
+- **Port already in use**: Stop any running containers or processes on port 8000
+
 ### Verification
 
 After starting the container, verify the application is working:
