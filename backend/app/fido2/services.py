@@ -63,9 +63,7 @@ class FIDO2Service:
             if not display_name:
                 display_name = username
 
-            logger.info(
-                f"Retrieved user profile - username: {username}, displayName: {display_name}"
-            )
+            logger.info("Retrieved user profile for FIDO2 operation")
             return username, display_name
 
         except Exception as e:
@@ -220,7 +218,6 @@ class FIDO2Service:
             response.raise_for_status()
 
             registrations_data = response.json()
-            logger.info(f"Raw response from IBM Verify: {registrations_data}")
 
             credentials = []
 
@@ -415,7 +412,6 @@ class FIDO2Service:
             reg_response.raise_for_status()
 
             registration_data = reg_response.json()
-            logger.info(f"Current registration data: {registration_data}")
 
             if registration_data.get("userId") != user_id:
                 raise HTTPException(
@@ -448,51 +444,13 @@ class FIDO2Service:
             if request_data.enabled is not None:
                 update_payload["enabled"] = request_data.enabled
 
-            logger.info(f"Sending PUT request to: {reg_url}")
-            logger.info(f"Update payload: {update_payload}")
-            logger.info(f"Headers: {headers}")
-
             # Update the registration using PUT (required by IBM Verify API)
-            try:
-                update_response = await http_client.put(
-                    reg_url, headers=headers, json=update_payload
-                )
-                logger.info(f"PUT response status: {update_response.status_code}")
-                logger.info(f"PUT response headers: {dict(update_response.headers)}")
-
-                update_response.raise_for_status()
-
-                # Handle 204 No Content response (successful update with no body)
-                if update_response.status_code == 204:
-                    logger.info("Registration update successful (204 No Content)")
-                    response_data = None
-                else:
-                    response_data = update_response.json()
-                    logger.info(f"PUT response data: {response_data}")
-
-            except Exception as put_error:
-                logger.error(f"PUT request failed with error: {str(put_error)}")
-                if hasattr(put_error, "response") and put_error.response is not None:
-                    logger.error(
-                        f"Error response status: {put_error.response.status_code}"
-                    )
-                    logger.error(
-                        f"Error response headers: {dict(put_error.response.headers)}"
-                    )
-                    try:
-                        error_body = put_error.response.json()
-                        logger.error(f"Error response body: {error_body}")
-                    except:
-                        try:
-                            error_text = put_error.response.text
-                            logger.error(f"Error response text: {error_text}")
-                        except:
-                            logger.error("Could not read error response body")
-                raise
-
-            logger.info(
-                f"Registration updated: {registration_id} with {update_payload}"
+            update_response = await http_client.put(
+                reg_url, headers=headers, json=update_payload
             )
+            update_response.raise_for_status()
+
+            logger.info(f"Registration updated: {registration_id}")
 
             # Return updated user response
             return await self.get_user_response(http_client, user_access_token)
@@ -502,6 +460,147 @@ class FIDO2Service:
         except Exception as e:
             logger.error(f"Error updating registration: {str(e)}")
             RequestErrorHandler.handle(e)
+
+    async def _get_user_id_from_token(
+        self, http_client: AsyncClient, user_access_token: str
+    ) -> str:
+        """Get user ID from access token using userinfo endpoint"""
+        userinfo_url = f"{self.tenant_url}/v1.0/endpoint/default/userinfo"
+        headers = get_auth_request_headers(user_access_token)
+
+        userinfo_response = await http_client.post(userinfo_url, headers=headers)
+        userinfo_response.raise_for_status()
+        userinfo_data = userinfo_response.json()
+
+        user_id = userinfo_data.get("sub")
+        if not user_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="User ID not found in userinfo",
+            )
+        return user_id
+
+    async def _validate_authentication(
+        self,
+        user_id: Optional[str],
+        request_body: Dict[str, Any],
+        validate_username: bool,
+        allow_empty_username: bool,
+    ) -> None:
+        """Validate user authentication requirements"""
+        username = request_body.get("username") if request_body else None
+        if validate_username and not user_id:
+            if not (allow_empty_username and username == ""):
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Not authenticated",
+                )
+
+    async def _prepare_request_body(
+        self,
+        http_client: AsyncClient,
+        user_access_token: Optional[str],
+        endpoint_path: str,
+        request_body: Dict[str, Any],
+        user_id: Optional[str],
+    ) -> Dict[str, Any]:
+        """Prepare and modify request body for IBM Verify API"""
+        body_to_send = request_body.copy() if request_body else {}
+
+        # For attestation options, automatically fetch and inject user profile information
+        if endpoint_path.endswith("/attestation/options") and user_access_token:
+            username, display_name = await self._get_user_profile_info(
+                http_client, user_access_token
+            )
+            body_to_send["username"] = username
+            body_to_send["displayName"] = display_name
+            logger.info(
+                f"Injected user profile info - username: {username}, displayName: {display_name}"
+            )
+
+        # For assertion options, automatically fetch and inject username
+        elif endpoint_path.endswith("/assertion/options") and user_access_token:
+            username, _ = await self._get_user_profile_info(
+                http_client, user_access_token
+            )
+            body_to_send["username"] = username
+            logger.info(f"Injected username for assertion options: {username}")
+
+        # Replace username with userId (but NOT for attestation/result)
+        if "username" in body_to_send:
+            del body_to_send["username"]
+            if user_id and not endpoint_path.endswith("/attestation/result"):
+                body_to_send["userId"] = user_id
+
+        # Handle specific endpoint modifications
+        if endpoint_path.endswith("/attestation/result"):
+            body_to_send = self._prepare_attestation_result_body(body_to_send)
+        elif endpoint_path.endswith("/assertion/options"):
+            body_to_send.pop("attestation", None)
+
+        return body_to_send
+
+    def _prepare_attestation_result_body(
+        self, body_to_send: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Prepare body for attestation/result endpoint"""
+        # Add enabled: true like ciservices.js does
+        body_to_send["enabled"] = True
+
+        # For attestation/result, only include the fields that IBM Verify expects
+        expected_fields = [
+            "response",
+            "id",
+            "nickname",
+            "rawId",
+            "type",
+            "getClientExtensionResults",
+            "enabled",
+        ]
+        body_to_send = {
+            key: value for key, value in body_to_send.items() if key in expected_fields
+        }
+
+        # Ensure getClientExtensionResults is an empty object if null/None
+        if body_to_send.get("getClientExtensionResults") is None:
+            body_to_send["getClientExtensionResults"] = {}
+
+        return body_to_send
+
+    def _handle_error_response(self, response) -> Dict[str, Any]:
+        """Handle error response from IBM Verify API"""
+        logger.error(f"IBM Verify API error - Status: {response.status_code}")
+        logger.error(f"Response headers: {dict(response.headers)}")
+        logger.error(f"Response body: {response.text}")
+
+        try:
+            error_data = response.json()
+            # Check for IBM Verify error format
+            if error_data.get("success") is False and "message" in error_data:
+                return {
+                    "status": "failed",
+                    "errorMessage": error_data["message"],
+                }
+            elif "error" in error_data and "messageId" in error_data.get("error", {}):
+                # Handle CI-style error format
+                error_info = error_data["error"]
+                error_message = f"{error_info.get('messageId', '')}: {error_info.get('messageDescription', '')}"
+                return {
+                    "status": "failed",
+                    "errorMessage": error_message,
+                }
+            else:
+                # Generic error response
+                return {
+                    "status": "failed",
+                    "errorMessage": f"Unexpected HTTP response code: {response.status_code}",
+                }
+        except Exception:
+            # If JSON parsing fails, return generic error
+            return {
+                "status": "failed",
+                "errorMessage": f"Unexpected HTTP response code: {response.status_code}",
+            }
 
     async def proxy_fido2_request(
         self,
@@ -525,100 +624,27 @@ class FIDO2Service:
 
             user_id = None
             if user_access_token:
-                # Get user ID from the token using userinfo endpoint
-                userinfo_url = f"{self.tenant_url}/v1.0/endpoint/default/userinfo"
-                headers = get_auth_request_headers(user_access_token)
-
-                userinfo_response = await http_client.post(
-                    userinfo_url, headers=headers
+                user_id = await self._get_user_id_from_token(
+                    http_client, user_access_token
                 )
-                userinfo_response.raise_for_status()
-                userinfo_data = userinfo_response.json()
-
-                user_id = userinfo_data.get("sub")
-                if not user_id:
-                    raise HTTPException(
-                        status_code=status.HTTP_400_BAD_REQUEST,
-                        detail="User ID not found in userinfo",
-                    )
 
             # Validate username if required
-            username = request_body.get("username") if request_body else None
-            if validate_username and not user_id:
-                if not (allow_empty_username and username == ""):
-                    raise HTTPException(
-                        status_code=status.HTTP_401_UNAUTHORIZED,
-                        detail="Not authenticated",
-                    )
+            await self._validate_authentication(
+                user_id, request_body, validate_username, allow_empty_username
+            )
 
-            # Modify request body for IBM Verify API
-            body_to_send = request_body.copy() if request_body else {}
-
-            # For attestation options, automatically fetch and inject user profile information
-            if endpoint_path.endswith("/attestation/options") and user_access_token:
-                username, display_name = await self._get_user_profile_info(
-                    http_client, user_access_token
-                )
-                body_to_send["username"] = username
-                body_to_send["displayName"] = display_name
-                logger.info(
-                    f"Injected user profile info - username: {username}, displayName: {display_name}"
-                )
-
-            # For assertion options, automatically fetch and inject username
-            elif endpoint_path.endswith("/assertion/options") and user_access_token:
-                username, _ = await self._get_user_profile_info(
-                    http_client, user_access_token
-                )
-                body_to_send["username"] = username
-                logger.info(f"Injected username for assertion options: {username}")
-
-            # Replace username with userId (but NOT for attestation/result)
-            if "username" in body_to_send:
-                username_for_lookup = body_to_send["username"]
-                del body_to_send["username"]
-                if user_id and not endpoint_path.endswith("/attestation/result"):
-                    body_to_send["userId"] = user_id
-
-            # Enable registration immediately for attestation results
-            if endpoint_path.endswith("/attestation/result"):
-                # Add enabled: true like ciservices.js does
-                body_to_send["enabled"] = True
-
-                # For attestation/result, only include the fields that IBM Verify expects
-                # based on the successful ciservices.js payload (no userId field)
-                expected_fields = [
-                    "response",
-                    "id",
-                    "nickname",
-                    "rawId",
-                    "type",
-                    "getClientExtensionResults",
-                    "enabled",
-                ]
-                body_to_send = {
-                    key: value
-                    for key, value in body_to_send.items()
-                    if key in expected_fields
-                }
-
-                # Ensure getClientExtensionResults is an empty object if null/None
-                # to match the successful ciservices.js format
-                if body_to_send.get("getClientExtensionResults") is None:
-                    body_to_send["getClientExtensionResults"] = {}
-            if endpoint_path.endswith("/assertion/options"):
-                del body_to_send["attestation"]
+            # Prepare request body
+            body_to_send = await self._prepare_request_body(
+                http_client, user_access_token, endpoint_path, request_body, user_id
+            )
 
             # Make the request using admin token for FIDO2 operations
             url = f"{self.tenant_url.rstrip('/')}/v2.0/factors/fido2/relyingparties/{rp_uuid}{endpoint_path}"
             headers = get_auth_request_headers(admin_token, json_content_type=True)
 
-            logger.info(f"Sending request to IBM Verify: URL={url}")
-            logger.info(f"Request body: {body_to_send}")
-
             response = await http_client.post(url, headers=headers, json=body_to_send)
 
-            # Handle IBM Verify API response - return the same status code
+            # Handle IBM Verify API response
             if response.status_code == 200:
                 response_data = response.json()
                 # Add FIDO2 server spec fields for success
@@ -626,43 +652,7 @@ class FIDO2Service:
                 response_data["errorMessage"] = ""
                 return response_data
             else:
-                # Log the full response for debugging
-                logger.error(f"IBM Verify API error - Status: {response.status_code}")
-                logger.error(f"Response headers: {dict(response.headers)}")
-                logger.error(f"Response body: {response.text}")
-
-                # Return error with the same status code as IBM Verify
-                try:
-                    error_data = response.json()
-                    # Check for IBM Verify error format
-                    if error_data.get("success") == False and "message" in error_data:
-                        error_response = {
-                            "status": "failed",
-                            "errorMessage": error_data["message"],
-                        }
-                    elif "error" in error_data and "messageId" in error_data.get(
-                        "error", {}
-                    ):
-                        # Handle CI-style error format
-                        error_info = error_data["error"]
-                        error_message = f"{error_info.get('messageId', '')}: {error_info.get('messageDescription', '')}"
-                        error_response = {
-                            "status": "failed",
-                            "errorMessage": error_message,
-                        }
-                    else:
-                        # Generic error response
-                        error_response = {
-                            "status": "failed",
-                            "errorMessage": f"Unexpected HTTP response code: {response.status_code}",
-                        }
-                except Exception:
-                    # If JSON parsing fails, return generic error
-                    error_response = {
-                        "status": "failed",
-                        "errorMessage": f"Unexpected HTTP response code: {response.status_code}",
-                    }
-
+                error_response = self._handle_error_response(response)
                 # Raise HTTPException with the same status code as IBM Verify
                 raise HTTPException(
                     status_code=response.status_code, detail=error_response
