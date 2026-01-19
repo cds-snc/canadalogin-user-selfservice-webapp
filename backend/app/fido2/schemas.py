@@ -46,6 +46,14 @@ class DeleteRegistrationRequest(BaseModel):
     id: str
 
 
+class UpdateRegistrationRequest(BaseModel):
+    """Request model for updating a FIDO2 registration"""
+
+    id: str
+    nickname: Optional[str] = None
+    enabled: Optional[bool] = None
+
+
 class FIDO2AttestationOptionsRequest(BaseModel):
     """Request model for FIDO2 attestation options"""
 

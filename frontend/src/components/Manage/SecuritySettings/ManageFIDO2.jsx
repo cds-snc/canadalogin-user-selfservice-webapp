@@ -37,13 +37,17 @@ export default function ManageFIDO2() {
   const [loading, setLoading] = useState(true);
   const [registrationLoading, setRegistrationLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [renameLoading, setRenameLoading] = useState(false);
   const [authenticateLoading, setAuthenticateLoading] = useState(null); // Track which credential is being authenticated
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [credentialToDelete, setCredentialToDelete] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showRenameModal, setShowRenameModal] = useState(false);
+  const [credentialToRename, setCredentialToRename] = useState(null);
   const [newDeviceName, setNewDeviceName] = useState("");
+  const [renameDeviceName, setRenameDeviceName] = useState("");
   const { state } = useUser();
   console.log(state);
 
@@ -217,6 +221,54 @@ export default function ManageFIDO2() {
   };
 
   /**
+   * Handle renaming FIDO2 credential
+   */
+  const handleRenameFIDO2 = async () => {
+    if (!credentialToRename || !renameDeviceName.trim()) return;
+
+    setRenameLoading(true);
+    setError(null);
+
+    try {
+      const response = await fido2Api.updateRegistration(
+        credentialToRename.id,
+        { nickname: renameDeviceName.trim() },
+      );
+
+      if (response && response.authenticated) {
+        setSuccess(
+          pageContent["success_credential_renamed"] ||
+            "Security key successfully renamed",
+        );
+        setShowRenameModal(false);
+        setCredentialToRename(null);
+        setRenameDeviceName("");
+        // Update the local state with the response
+        setFido2Data(response);
+      } else {
+        throw new Error("Failed to rename credential");
+      }
+    } catch (err) {
+      console.error("Error renaming FIDO2 credential:", err);
+
+      // Handle authentication/authorization errors
+      if (err.response?.status === 401 || err.response?.status === 400) {
+        setError(
+          pageContent["error_session_expired"] ||
+            "Your session has expired or you don't have permission to access this feature. Please go back to Security Settings and try again.",
+        );
+      } else {
+        setError(
+          pageContent["error_rename_credential"] ||
+            "Failed to rename security key",
+        );
+      }
+    } finally {
+      setRenameLoading(false);
+    }
+  };
+
+  /**
    * Handle authenticating with a specific FIDO2 credential
    */
   const handleAuthenticate = async (credential) => {
@@ -310,13 +362,25 @@ export default function ManageFIDO2() {
   };
 
   /**
+   * Open rename modal
+   */
+  const openRenameModal = (credential) => {
+    setCredentialToRename(credential);
+    setRenameDeviceName(credential.nickname || "");
+    setShowRenameModal(true);
+  };
+
+  /**
    * Close modals and reset state
    */
   const closeModals = () => {
     setShowDeleteModal(false);
     setShowAddModal(false);
+    setShowRenameModal(false);
     setCredentialToDelete(null);
+    setCredentialToRename(null);
     setNewDeviceName("");
+    setRenameDeviceName("");
     setAuthenticateLoading(null);
     setError(null);
   };
@@ -403,6 +467,14 @@ export default function ManageFIDO2() {
               {authenticateLoading === credential.id
                 ? pageContent["authenticating"] || "Authenticating..."
                 : pageContent["authenticate"] || "Authenticate"}
+            </GcdsButton>
+            <GcdsButton
+              buttonRole="secondary"
+              size="small"
+              onClick={() => openRenameModal(credential)}
+              disabled={renameLoading}
+            >
+              {pageContent["rename"] || "Rename"}
             </GcdsButton>
             <GcdsButton
               buttonRole="destructive"
@@ -603,6 +675,64 @@ export default function ManageFIDO2() {
               buttonRole="secondary"
               onClick={closeModals}
               disabled={deleteLoading}
+            >
+              {pageContent["cancel"] || "Cancel"}
+            </GcdsButton>
+          </div>
+        </GcdsContainer>
+      )}
+
+      {/* Rename Security Key Form */}
+      {showRenameModal && credentialToRename && (
+        <GcdsContainer
+          style={{
+            border: "1px solid #0056b3",
+            padding: "1rem",
+            marginTop: "1rem",
+            borderRadius: "4px",
+            backgroundColor: "#f0f8ff",
+          }}
+        >
+          <GcdsHeading tag="h3">
+            {pageContent["rename_security_key"] || "Rename Security Key"}
+          </GcdsHeading>
+          <GcdsText>
+            {pageContent["rename_description"] ||
+              "Enter a new name for your security key."}
+          </GcdsText>
+          <GcdsText>
+            <strong>
+              Current name:{" "}
+              {credentialToRename.nickname ||
+                pageContent["unnamed_device"] ||
+                "Unnamed Device"}
+            </strong>
+          </GcdsText>
+
+          <GcdsInput
+            inputId="rename-device-name"
+            label={pageContent["new_device_name"] || "New Device Name"}
+            value={renameDeviceName}
+            onGcdsInput={(e) => setRenameDeviceName(e.target.value)}
+            placeholder={
+              pageContent["device_name_placeholder"] || "e.g., My YubiKey"
+            }
+            style={{ marginTop: "1rem" }}
+          />
+
+          <div style={{ marginTop: "1rem", display: "flex", gap: "0.5rem" }}>
+            <GcdsButton
+              onClick={handleRenameFIDO2}
+              disabled={renameLoading || !renameDeviceName.trim()}
+            >
+              {renameLoading
+                ? pageContent["renaming"] || "Renaming..."
+                : pageContent["rename"] || "Rename"}
+            </GcdsButton>
+            <GcdsButton
+              buttonRole="secondary"
+              onClick={closeModals}
+              disabled={renameLoading}
             >
               {pageContent["cancel"] || "Cancel"}
             </GcdsButton>

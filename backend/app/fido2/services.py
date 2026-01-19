@@ -14,6 +14,7 @@ from app.fido2.schemas import (
     FIDO2CredentialSummary,
     FIDO2UserResponse,
     DeleteRegistrationRequest,
+    UpdateRegistrationRequest,
 )
 from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
 
@@ -374,6 +375,132 @@ class FIDO2Service:
             raise
         except Exception as e:
             logger.error(f"Error deleting registration: {str(e)}")
+            RequestErrorHandler.handle(e)
+
+    async def update_registration(
+        self,
+        http_client: AsyncClient,
+        user_access_token: str,
+        request_data: UpdateRegistrationRequest,
+    ) -> FIDO2UserResponse:
+        """Update a FIDO2 registration (nickname, enabled status)"""
+        try:
+            registration_id = request_data.id
+
+            # Get user ID from the token using userinfo endpoint
+            userinfo_url = f"{self.tenant_url}/v1.0/endpoint/default/userinfo"
+            headers = get_auth_request_headers(user_access_token)
+
+            userinfo_response = await http_client.post(userinfo_url, headers=headers)
+            userinfo_response.raise_for_status()
+            userinfo_data = userinfo_response.json()
+
+            user_id = userinfo_data.get("sub")
+            if not user_id:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="User ID not found in userinfo",
+                )
+
+            # Get admin token for update operations
+            admin_token = await get_admin_token(http_client)
+
+            # First verify ownership
+            reg_url = (
+                f"{self.tenant_url}/v2.0/factors/fido2/registrations/{registration_id}"
+            )
+            headers = get_auth_request_headers(admin_token, json_content_type=True)
+
+            reg_response = await http_client.get(reg_url, headers=headers)
+            reg_response.raise_for_status()
+
+            registration_data = reg_response.json()
+            logger.info(f"Current registration data: {registration_data}")
+
+            if registration_data.get("userId") != user_id:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Not owner of registration",
+                )
+
+            # Prepare update payload - IBM Verify API requires PUT with complete object
+            # Start with current registration data and update specific fields
+            current_attributes = registration_data.get("attributes", {})
+            update_payload = registration_data.copy()  # Preserve all existing fields
+
+            # Ensure required fields are set
+            update_payload["id"] = registration_id
+            update_payload["userId"] = user_id
+            update_payload["attributes"] = (
+                current_attributes.copy()
+            )  # Preserve existing attributes
+
+            # Override with provided values
+            if request_data.nickname is not None:
+                # Send nickname inside attributes field
+                update_payload["attributes"]["nickname"] = request_data.nickname
+            elif "nickname" not in update_payload["attributes"]:
+                # Preserve existing nickname from top-level or set empty if none
+                existing_nickname = registration_data.get("nickname", "")
+                if existing_nickname:
+                    update_payload["attributes"]["nickname"] = existing_nickname
+
+            if request_data.enabled is not None:
+                update_payload["enabled"] = request_data.enabled
+
+            logger.info(f"Sending PUT request to: {reg_url}")
+            logger.info(f"Update payload: {update_payload}")
+            logger.info(f"Headers: {headers}")
+
+            # Update the registration using PUT (required by IBM Verify API)
+            try:
+                update_response = await http_client.put(
+                    reg_url, headers=headers, json=update_payload
+                )
+                logger.info(f"PUT response status: {update_response.status_code}")
+                logger.info(f"PUT response headers: {dict(update_response.headers)}")
+
+                update_response.raise_for_status()
+
+                # Handle 204 No Content response (successful update with no body)
+                if update_response.status_code == 204:
+                    logger.info("Registration update successful (204 No Content)")
+                    response_data = None
+                else:
+                    response_data = update_response.json()
+                    logger.info(f"PUT response data: {response_data}")
+
+            except Exception as put_error:
+                logger.error(f"PUT request failed with error: {str(put_error)}")
+                if hasattr(put_error, "response") and put_error.response is not None:
+                    logger.error(
+                        f"Error response status: {put_error.response.status_code}"
+                    )
+                    logger.error(
+                        f"Error response headers: {dict(put_error.response.headers)}"
+                    )
+                    try:
+                        error_body = put_error.response.json()
+                        logger.error(f"Error response body: {error_body}")
+                    except:
+                        try:
+                            error_text = put_error.response.text
+                            logger.error(f"Error response text: {error_text}")
+                        except:
+                            logger.error("Could not read error response body")
+                raise
+
+            logger.info(
+                f"Registration updated: {registration_id} with {update_payload}"
+            )
+
+            # Return updated user response
+            return await self.get_user_response(http_client, user_access_token)
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"Error updating registration: {str(e)}")
             RequestErrorHandler.handle(e)
 
     async def proxy_fido2_request(

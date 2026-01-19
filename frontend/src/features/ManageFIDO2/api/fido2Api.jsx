@@ -49,6 +49,24 @@ export const fido2Api = {
   },
 
   /**
+   * Update a FIDO2 registration (rename/enable/disable)
+   */
+  updateRegistration: async (registrationId, updates) => {
+    try {
+      const response = await axios.put(
+        `${config.apiUrl}/v1/fido2/registration`,
+        {
+          id: registrationId,
+          ...updates,
+        },
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  /**
    * Get attestation options for FIDO2 registration (start registration)
    */
   getAttestationOptions: async (options = {}) => {

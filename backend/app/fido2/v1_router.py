@@ -11,6 +11,7 @@ from app.fido2.schemas import (
     FIDO2UserResponse,
     FIDO2RegistrationResponse,
     DeleteRegistrationRequest,
+    UpdateRegistrationRequest,
     FIDO2AttestationOptionsRequest,
     FIDO2AttestationResultRequest,
     FIDO2AssertionOptionsRequest,
@@ -83,6 +84,27 @@ async def delete_fido2_registration(
     Returns updated user credentials after deletion.
     """
     return await fido2_service.delete_registration(
+        http_client, user_access_token, request_data
+    )
+
+
+@router.put(
+    "/registration",
+    response_model=FIDO2UserResponse,
+    summary="Update FIDO2 registration",
+    description="Update a FIDO2 registration (nickname, enabled status) and return updated user credentials",
+)
+async def update_fido2_registration(
+    request_data: UpdateRegistrationRequest,
+    user_access_token: str = Depends(get_users_current_session),
+    http_client: AsyncClient = Depends(get_http_client),
+):
+    """
+    Update a FIDO2 registration - allows updating nickname and enabled status.
+    Only allows updating registrations owned by the current user.
+    Returns updated user credentials after update.
+    """
+    return await fido2_service.update_registration(
         http_client, user_access_token, request_data
     )
 
