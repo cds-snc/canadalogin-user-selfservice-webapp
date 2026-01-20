@@ -58,9 +58,10 @@ async def callback(request: Request):
 async def reauth(
     request: Request,
     returnToPage: str = "/",
+    acr_values: str = None,
     user_access_token: None = Depends(get_users_current_session),
 ):
-    return await reauthenticate_user(request, returnToPage)
+    return await reauthenticate_user(request, returnToPage, acr_values)
 
 
 @router.post(

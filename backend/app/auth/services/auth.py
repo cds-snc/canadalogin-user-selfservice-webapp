@@ -100,10 +100,18 @@ async def callback_handler(request: Request):
         RequestErrorHandler.handle(e, context="Unexpected error during idp redirect")
 
 
-async def reauthenticate_user(request: Request, returnToPage: str = "/"):
+async def reauthenticate_user(
+    request: Request, returnToPage: str = "/", acr_values: str = None
+):
     """
     Get the redirect URL for the OAuth login flow.
     This function is used to initiate a reauthentication flow with IBM Verify.
+
+    Args:
+        request: The FastAPI request object
+        returnToPage: The page to return to after authentication
+        acr_values: If provided, uses acr_values for step-up authentication (e.g., "loa3_stepup")
+                   If not provided, uses max_age for standard reauthentication
     """
     try:
 
@@ -113,12 +121,18 @@ async def reauthenticate_user(request: Request, returnToPage: str = "/"):
             request.session[SessionKeys.RETURN_TO_PAGE.value] = returnToPage
             logger.info(f"Return to page set in session: {returnToPage}")
 
-        # if the user recently logged in, we can set the max age to 15 minutes
-        # will reautenticate after max age value
-        max_age_in_seconds = 900
-        return await oauth.verify.authorize_redirect(
-            request, callback_redirect_uri, max_age=max_age_in_seconds
-        )
+        if acr_values:
+            # Use acr_values for step-up authentication to require LOA3 level
+            return await oauth.verify.authorize_redirect(
+                request, callback_redirect_uri, acr_values=acr_values
+            )
+        else:
+            # if the user recently logged in, we can set the max age to 15 minutes
+            # will reauthenticate after max age value
+            max_age_in_seconds = 900
+            return await oauth.verify.authorize_redirect(
+                request, callback_redirect_uri, max_age=max_age_in_seconds
+            )
     except OAuthError as error:
         logger.exception("Unexpected error during redirect_to_verify")
         raise OAuthError("Invalid or expired token") from error
