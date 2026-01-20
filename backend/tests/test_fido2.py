@@ -123,12 +123,14 @@ class TestFIDO2Service:
         }
         mock_http_client.get = AsyncMock(return_value=mock_response)
 
-        with patch.object(
-            fido2_service, "_get_user_scim_id", return_value="user-scim-id"
-        ), patch.object(
-            fido2_service, "_get_rp_uuid_from_rp_id", return_value="rp-uuid"
-        ), patch(
-            "app.fido2.services.get_admin_token", return_value="test-token"
+        with (
+            patch.object(
+                fido2_service, "_get_user_scim_id", return_value="user-scim-id"
+            ),
+            patch.object(
+                fido2_service, "_get_rp_uuid_from_rp_id", return_value="rp-uuid"
+            ),
+            patch("app.fido2.services.get_admin_token", return_value="test-token"),
         ):
 
             credentials = await fido2_service.get_user_fido2_registrations(
