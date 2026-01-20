@@ -101,8 +101,23 @@ The frontend will automatically use the shared certificate from `backend/certs/`
 
 In `backend/.env`, set:
 ```env
-RPID=manageapp.gcsignin
+RPID=app.auth.signin-connexion.cdssandbox.xyz
 ```
+
+**Important**: Also update `backend/app/config.py` to replace any localhost references:
+
+```python
+# Replace localhost with the proper domain
+# Find and update any localhost URLs to:
+# https://app.auth.signin-connexion.cdssandbox.xyz:8000
+```
+
+In `frontend/.env`, set:
+```env
+VITE_BACKEND_API_URL=https://app.auth.signin-connexion.cdssandbox.xyz:8000
+```
+
+### 8. Browser Certificate Trust (if needed)
 
 If you see certificate warnings in your browser:
 
@@ -122,11 +137,6 @@ mkcert -install
 3. **Completely restart your browser** (not just reload the tab):
    - Quit the browser application entirely
    - Reopen and navigate to https://app.auth.signin-connexion.cdssandbox.xyz:3000
-
-In `frontend/.env`, set:
-```env
-VITE_BACKEND_API_URL=https://app.auth.signin-connexion.cdssandbox.xyz:8000
-```
 
 ### 9. Update IBM Verify OAuth Client
 
