@@ -101,11 +101,6 @@ export function formatAttestationForServer(credential) {
     },
   };
 
-  // Include transports if available
-  if (credential.response.getTransports) {
-    result.transports = credential.response.getTransports();
-  }
-
   return result;
 }
 
