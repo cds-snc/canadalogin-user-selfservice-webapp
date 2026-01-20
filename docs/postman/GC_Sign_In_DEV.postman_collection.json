@@ -1,619 +1,556 @@
 {
-	"info": {
-		"_postman_id": "f2945d8b-b511-430e-8e1c-8408da9127b9",
-		"name": "GC_Sign_In_DEV",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "34745011"
-	},
-	"item": [
-		{
-			"name": "IBM Verify API",
-			"item": [
-				{
-					"name": "User Access Token Requests",
-					"item": [
-						{
-							"name": "Get User Access Token",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{ADMIN_ACCESS_TOKEN}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/x-www-form-urlencoded",
-										"type": "text"
-									},
-									{
-										"key": "Accept",
-										"value": "application/json",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "urlencoded",
-									"urlencoded": [
-										{
-											"key": "grant_type",
-											"value": "urn:ietf:params:oauth:grant-type:jwt-bearer",
-											"type": "text"
-										},
-										{
-											"key": "client_id",
-											"value": "{{IBM_VERIFY_CLIENT_ID}}",
-											"type": "text"
-										},
-										{
-											"key": "client_secret",
-											"value": "{{IBM_VERIFY_CLIENT_SECRET}}",
-											"type": "text"
-										},
-										{
-											"key": "scope",
-											"value": "openid profile offline_access email",
-											"type": "text"
-										},
-										{
-											"key": "assertion",
-											"value": "eyJhbGciOiJSUzI1NiIsImtpZCI6InNlcnZlciJ9.eyJzdWIiOiI3NzEwMDFGT0RGIiwianRpIjoiNjk4OGJiZTMtNjY2Ny00ZjgxLThlMzYtMzY1NDNhYjEyZDcyIiwiaWF0IjoxNzQ4Mjc2NDE1LCJleHAiOjE3NDgyNzY3MTUsInRlbmFudElkIjoiY2RzLWdjc2lnbmluLWRldi52ZXJpZnkuaWJtLmNvbSIsImlzcyI6Imh0dHBzOi8vY2RzLWdjc2lnbmluLWRldi52ZXJpZnkuaWJtLmNvbS92Mi4wL2ZhY3RvcnMiLCJhdWQiOlsiYzYyN2QwOGItYmI2Mi00MTlkLWJkOTQtYjJhMTc2MDE2MDdlIiwiaHR0cHM6Ly9jZHMtZ2NzaWduaW4tZGV2LnZlcmlmeS5pYm0uY29tL3YxLjAvZW5kcG9pbnQvZGVmYXVsdC90b2tlbiJdLCJmYWN0b3IiOiJwYXNzd29yZCIsImFtciI6WyJwYXNzd29yZCJdLCJncmFudF9pZCI6ImVkYzc5YzQ2LWExYmEtNGIxYi05MGQwLTRhYTE4MDY2MjFlMCIsInN1Yl90eXBlIjoidWlkIn0.kJevdaDcPb8RcDrXlPQij9pX5PMIXcjKjdeLPxXq4FRjdERTaVI1kDQNDYszGqsq8yz4sLgCPIeJVsGBc-cdL7FvTET1PwFDXNf9jPB_-iVw5kzWryuGz19A4STCmU1z8nMBpzmZSGWd_WdfbDBFV1utTRjWGNO0MVfhmDdXQZJXya2zmMdbl5LQoR0L1PQSCi3YliAHztQFmbSMNKBRFHr8z74XiSvwlxCFdLxn1mA7VvPNqiIj2TTUHog7u44MEF_Nv7wmtCW1t3xUUBZ81Jo6RsFNYmFEbq8kbzSegGDHqS1kn50EtxdWzXCNubij8IGjQoykEO0NohYrMaGiYw",
-											"type": "text"
-										}
-									]
-								},
-								"url": {
-									"raw": "{{IBM_VERIFY_TENANT_URL}}/oauth2/token",
-									"host": [
-										"{{IBM_VERIFY_TENANT_URL}}"
-									],
-									"path": [
-										"oauth2",
-										"token"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Refresh Token",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{ACCESS_TOKEN}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/x-www-form-urlencoded",
-										"type": "text"
-									},
-									{
-										"key": "Accept",
-										"value": "application/json",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "urlencoded",
-									"urlencoded": [
-										{
-											"key": "grant_type",
-											"value": "refresh_token",
-											"type": "text"
-										},
-										{
-											"key": "client_id",
-											"value": "{{IBM_VERIFY_CLIENT_ID}}",
-											"type": "text"
-										},
-										{
-											"key": "client_secret",
-											"value": "{{IBM_VERIFY_CLIENT_SECRET}}",
-											"type": "text"
-										},
-										{
-											"key": "scope",
-											"value": "openid profile",
-											"type": "text"
-										},
-										{
-											"key": "refresh_token",
-											"value": "LNijWg1Ef0GV3RVFTK4hM674A_BI2_abkaRkYNV0-Mw.Iq2UmFLU9rnSDS0-0WF0xeoiJfkbsV4PoyoTR-6xVR6LAa_0nJQl4UEc95HLu4NkoZ53pIe-rwXxsi8eAe6o1g.M18xNzQ4MDA4NzU1XzM4",
-											"type": "text"
-										}
-									]
-								},
-								"url": {
-									"raw": "{{IBM_VERIFY_TENANT_URL}}/oauth2/token",
-									"host": [
-										"{{IBM_VERIFY_TENANT_URL}}"
-									],
-									"path": [
-										"oauth2",
-										"token"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "New Request",
-							"request": {
-								"method": "GET",
-								"header": []
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "Authenticate User with Pasword",
-					"item": [
-						{
-							"name": "SignIn User Auth Only",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{ACCESS_TOKEN}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "{{SCIMJSON CONTENT HEADER}}",
-										"type": "text"
-									},
-									{
-										"key": "Accept",
-										"value": "{{SCIMJSON CONTENT HEADER}}",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"schemas\": [\"urn:ietf:params:scim:schemas:ibm:core:2.0:AuthenticateUser\"],\n  \"userName\": \"mahamoud.mohamoud+2221@cds-snc.ca\",\n  \"password\": \"Strongpassword12!\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{IBM_VERIFY_TENANT_URL}}/v2.0/Users/authentication",
-									"host": [
-										"{{IBM_VERIFY_TENANT_URL}}"
-									],
-									"path": [
-										"v2.0",
-										"Users",
-										"authentication"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "SignIn With Password - Return JWT",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{ACCESS_TOKEN}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json",
-										"type": "text"
-									},
-									{
-										"key": "Accept",
-										"value": "application/json",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"username\": \"mahamoud.mohamoud+2221@cds-snc.ca\",\n  \"password\": \"Strongpassword12!\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{IBM_VERIFY_TENANT_URL}}/v1.0/authnmethods/password/{{Cloud Directory ID}}?returnJwt=true",
-									"host": [
-										"{{IBM_VERIFY_TENANT_URL}}"
-									],
-									"path": [
-										"v1.0",
-										"authnmethods",
-										"password",
-										"{{Cloud Directory ID}}"
-									],
-									"query": [
-										{
-											"key": "returnJwt",
-											"value": "true"
-										}
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "User Profile",
-					"item": [
-						{
-							"name": "User Profile By ID",
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{ACCESS_TOKEN}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "GET",
-								"header": [
-									{
-										"key": "Accept",
-										"value": "{{SCIMJSON CONTENT HEADER}}",
-										"type": "text"
-									},
-									{
-										"key": "Content-Type",
-										"value": "{{SCIMJSON CONTENT HEADER}}",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "formdata",
-									"formdata": [
-										{
-											"key": "grant_type",
-											"value": "client_credentials",
-											"type": "text",
-											"disabled": true
-										},
-										{
-											"key": "scope",
-											"value": "openid",
-											"type": "text",
-											"disabled": true
-										},
-										{
-											"key": "client_id",
-											"value": "{{IBM_VERIFY_API_CLIENT_ID}}",
-											"type": "text",
-											"disabled": true
-										},
-										{
-											"key": "client_secret",
-											"value": "{{IBM_VERIFY_API_CLIENT_SECRET}}",
-											"type": "text",
-											"disabled": true
-										}
-									]
-								},
-								"url": {
-									"raw": "{{IBM_VERIFY_TENANT_URL}}/v2.0/Users/{{User ID}}",
-									"host": [
-										"{{IBM_VERIFY_TENANT_URL}}"
-									],
-									"path": [
-										"v2.0",
-										"Users",
-										"{{User ID}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "GET Sessions for the User",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{ADMIN_ACCESS_TOKEN}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{IBM_VERIFY_TENANT_URL}}/v1.0/auth/sessions/{{User ID}}",
-									"host": [
-										"{{IBM_VERIFY_TENANT_URL}}"
-									],
-									"path": [
-										"v1.0",
-										"auth",
-										"sessions",
-										"{{User ID}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Authenticated User Profile",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{User Access Token}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "GET",
-								"header": [
-									{
-										"key": "Accept",
-										"value": "{{SCIMJSON CONTENT HEADER}}",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{IBM_VERIFY_TENANT_URL}}/v2.0/Me",
-									"host": [
-										"{{IBM_VERIFY_TENANT_URL}}"
-									],
-									"path": [
-										"v2.0",
-										"Me"
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "Get a Admin Oauth Token",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/x-www-form-urlencoded",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "grant_type",
-									"value": "client_credentials",
-									"type": "text"
-								},
-								{
-									"key": "scope",
-									"value": "openid",
-									"type": "text"
-								},
-								{
-									"key": "client_id",
-									"value": "{{IBM_VERIFY_API_CLIENT_ID}}",
-									"type": "text"
-								},
-								{
-									"key": "client_secret",
-									"value": "{{IBM_VERIFY_API_CLIENT_SECRET}}",
-									"type": "text"
-								}
-							]
-						},
-						"url": {
-							"raw": "{{IBM_VERIFY_TENANT_URL}}/oauth2/token",
-							"host": [
-								"{{IBM_VERIFY_TENANT_URL}}"
-							],
-							"path": [
-								"oauth2",
-								"token"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Cloud Directory ID",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{ACCESS_TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							},
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{IBM_VERIFY_TENANT_URL}}/v1.0/authnmethods/password?search=name%20%3D%20%22Cloud%20Directory%22",
-							"host": [
-								"{{IBM_VERIFY_TENANT_URL}}"
-							],
-							"path": [
-								"v1.0",
-								"authnmethods",
-								"password"
-							],
-							"query": [
-								{
-									"key": "search",
-									"value": "name%20%3D%20%22Cloud%20Directory%22"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Browser Session",
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/x-www-form-urlencoded",
-								"type": "text"
-							},
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "urlencoded",
-							"urlencoded": [
-								{
-									"key": "redirect_url",
-									"value": "https%3A%2F%2Fcds-gcsignin-dev.verify.ibm.com%2Foauth2%2Fauthorize%3Fclient_id%3Dabb9c045-e61b-4f99-b89f-85eb988b8c7d%26stateId%3Df874f27e-ff69-44a8-a8c8-9272f08ec63e%26themeId%3Def8a162b-ddb5-4c3f-bff8-895495022567",
-									"type": "text"
-								},
-								{
-									"key": "access_token",
-									"value": "{{User Access Token}}",
-									"type": "text"
-								}
-							]
-						},
-						"url": {
-							"raw": "{{IBM_VERIFY_TENANT_URL}}/v1.0/auth/session",
-							"host": [
-								"{{IBM_VERIFY_TENANT_URL}}"
-							],
-							"path": [
-								"v1.0",
-								"auth",
-								"session"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Retrieve User Info OIDC",
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/x-www-form-urlencoded",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "access_token",
-									"value": "8iU6m7TrP5lZPUhpVNKKTcfhFCsEhBVUxZ9N9XNvYw8.DGhnqMb3I3zwdv2EcFtcSeYiNE8qbjTVNY8eX_hsDkXFBY1C6VM6DQu3Z4awDGLftAFclffp2XRZQlxJSwMZYQ.M18xNzQ2NjU2MzAzXzM4",
-									"type": "text"
-								}
-							]
-						},
-						"url": {
-							"raw": "{{IBM_VERIFY_TENANT_URL}}/oauth2/userinfo",
-							"host": [
-								"{{IBM_VERIFY_TENANT_URL}}"
-							],
-							"path": [
-								"oauth2",
-								"userinfo"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		}
-	]
+  "info": {
+    "_postman_id": "f2945d8b-b511-430e-8e1c-8408da9127b9",
+    "name": "GC_Sign_In_DEV",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "34745011"
+  },
+  "item": [
+    {
+      "name": "IBM Verify API",
+      "item": [
+        {
+          "name": "User Access Token Requests",
+          "item": [
+            {
+              "name": "Get User Access Token",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{ADMIN_ACCESS_TOKEN}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/x-www-form-urlencoded",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "grant_type",
+                      "value": "urn:ietf:params:oauth:grant-type:jwt-bearer",
+                      "type": "text"
+                    },
+                    {
+                      "key": "client_id",
+                      "value": "{{IBM_VERIFY_CLIENT_ID}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "client_secret",
+                      "value": "{{IBM_VERIFY_CLIENT_SECRET}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "scope",
+                      "value": "openid profile offline_access email",
+                      "type": "text"
+                    },
+                    {
+                      "key": "assertion",
+                      "value": "eyJhbGciOiJSUzI1NiIsImtpZCI6InNlcnZlciJ9.eyJzdWIiOiI3NzEwMDFGT0RGIiwianRpIjoiNjk4OGJiZTMtNjY2Ny00ZjgxLThlMzYtMzY1NDNhYjEyZDcyIiwiaWF0IjoxNzQ4Mjc2NDE1LCJleHAiOjE3NDgyNzY3MTUsInRlbmFudElkIjoiY2RzLWdjc2lnbmluLWRldi52ZXJpZnkuaWJtLmNvbSIsImlzcyI6Imh0dHBzOi8vY2RzLWdjc2lnbmluLWRldi52ZXJpZnkuaWJtLmNvbS92Mi4wL2ZhY3RvcnMiLCJhdWQiOlsiYzYyN2QwOGItYmI2Mi00MTlkLWJkOTQtYjJhMTc2MDE2MDdlIiwiaHR0cHM6Ly9jZHMtZ2NzaWduaW4tZGV2LnZlcmlmeS5pYm0uY29tL3YxLjAvZW5kcG9pbnQvZGVmYXVsdC90b2tlbiJdLCJmYWN0b3IiOiJwYXNzd29yZCIsImFtciI6WyJwYXNzd29yZCJdLCJncmFudF9pZCI6ImVkYzc5YzQ2LWExYmEtNGIxYi05MGQwLTRhYTE4MDY2MjFlMCIsInN1Yl90eXBlIjoidWlkIn0.kJevdaDcPb8RcDrXlPQij9pX5PMIXcjKjdeLPxXq4FRjdERTaVI1kDQNDYszGqsq8yz4sLgCPIeJVsGBc-cdL7FvTET1PwFDXNf9jPB_-iVw5kzWryuGz19A4STCmU1z8nMBpzmZSGWd_WdfbDBFV1utTRjWGNO0MVfhmDdXQZJXya2zmMdbl5LQoR0L1PQSCi3YliAHztQFmbSMNKBRFHr8z74XiSvwlxCFdLxn1mA7VvPNqiIj2TTUHog7u44MEF_Nv7wmtCW1t3xUUBZ81Jo6RsFNYmFEbq8kbzSegGDHqS1kn50EtxdWzXCNubij8IGjQoykEO0NohYrMaGiYw",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{IBM_VERIFY_TENANT_URL}}/oauth2/token",
+                  "host": ["{{IBM_VERIFY_TENANT_URL}}"],
+                  "path": ["oauth2", "token"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Refresh Token",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{ACCESS_TOKEN}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/x-www-form-urlencoded",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "grant_type",
+                      "value": "refresh_token",
+                      "type": "text"
+                    },
+                    {
+                      "key": "client_id",
+                      "value": "{{IBM_VERIFY_CLIENT_ID}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "client_secret",
+                      "value": "{{IBM_VERIFY_CLIENT_SECRET}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "scope",
+                      "value": "openid profile",
+                      "type": "text"
+                    },
+                    {
+                      "key": "refresh_token",
+                      "value": "LNijWg1Ef0GV3RVFTK4hM674A_BI2_abkaRkYNV0-Mw.Iq2UmFLU9rnSDS0-0WF0xeoiJfkbsV4PoyoTR-6xVR6LAa_0nJQl4UEc95HLu4NkoZ53pIe-rwXxsi8eAe6o1g.M18xNzQ4MDA4NzU1XzM4",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{IBM_VERIFY_TENANT_URL}}/oauth2/token",
+                  "host": ["{{IBM_VERIFY_TENANT_URL}}"],
+                  "path": ["oauth2", "token"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "New Request",
+              "request": {
+                "method": "GET",
+                "header": []
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Authenticate User with Pasword",
+          "item": [
+            {
+              "name": "SignIn User Auth Only",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{ACCESS_TOKEN}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "{{SCIMJSON CONTENT HEADER}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "{{SCIMJSON CONTENT HEADER}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"schemas\": [\"urn:ietf:params:scim:schemas:ibm:core:2.0:AuthenticateUser\"],\n  \"userName\": \"mahamoud.mohamoud+2221@cds-snc.ca\",\n  \"password\": \"Strongpassword12!\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{IBM_VERIFY_TENANT_URL}}/v2.0/Users/authentication",
+                  "host": ["{{IBM_VERIFY_TENANT_URL}}"],
+                  "path": ["v2.0", "Users", "authentication"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "SignIn With Password - Return JWT",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{ACCESS_TOKEN}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"username\": \"mahamoud.mohamoud+2221@cds-snc.ca\",\n  \"password\": \"Strongpassword12!\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{IBM_VERIFY_TENANT_URL}}/v1.0/authnmethods/password/{{Cloud Directory ID}}?returnJwt=true",
+                  "host": ["{{IBM_VERIFY_TENANT_URL}}"],
+                  "path": ["v1.0", "authnmethods", "password", "{{Cloud Directory ID}}"],
+                  "query": [
+                    {
+                      "key": "returnJwt",
+                      "value": "true"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "User Profile",
+          "item": [
+            {
+              "name": "User Profile By ID",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{ACCESS_TOKEN}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "{{SCIMJSON CONTENT HEADER}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "{{SCIMJSON CONTENT HEADER}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "grant_type",
+                      "value": "client_credentials",
+                      "type": "text",
+                      "disabled": true
+                    },
+                    {
+                      "key": "scope",
+                      "value": "openid",
+                      "type": "text",
+                      "disabled": true
+                    },
+                    {
+                      "key": "client_id",
+                      "value": "{{IBM_VERIFY_API_CLIENT_ID}}",
+                      "type": "text",
+                      "disabled": true
+                    },
+                    {
+                      "key": "client_secret",
+                      "value": "{{IBM_VERIFY_API_CLIENT_SECRET}}",
+                      "type": "text",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{IBM_VERIFY_TENANT_URL}}/v2.0/Users/{{User ID}}",
+                  "host": ["{{IBM_VERIFY_TENANT_URL}}"],
+                  "path": ["v2.0", "Users", "{{User ID}}"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "GET Sessions for the User",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{ADMIN_ACCESS_TOKEN}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{IBM_VERIFY_TENANT_URL}}/v1.0/auth/sessions/{{User ID}}",
+                  "host": ["{{IBM_VERIFY_TENANT_URL}}"],
+                  "path": ["v1.0", "auth", "sessions", "{{User ID}}"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Authenticated User Profile",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{User Access Token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "{{SCIMJSON CONTENT HEADER}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{IBM_VERIFY_TENANT_URL}}/v2.0/Me",
+                  "host": ["{{IBM_VERIFY_TENANT_URL}}"],
+                  "path": ["v2.0", "Me"]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Get a Admin Oauth Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "grant_type",
+                  "value": "client_credentials",
+                  "type": "text"
+                },
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "text"
+                },
+                {
+                  "key": "client_id",
+                  "value": "{{IBM_VERIFY_API_CLIENT_ID}}",
+                  "type": "text"
+                },
+                {
+                  "key": "client_secret",
+                  "value": "{{IBM_VERIFY_API_CLIENT_SECRET}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{IBM_VERIFY_TENANT_URL}}/oauth2/token",
+              "host": ["{{IBM_VERIFY_TENANT_URL}}"],
+              "path": ["oauth2", "token"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Cloud Directory ID",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{IBM_VERIFY_TENANT_URL}}/v1.0/authnmethods/password?search=name%20%3D%20%22Cloud%20Directory%22",
+              "host": ["{{IBM_VERIFY_TENANT_URL}}"],
+              "path": ["v1.0", "authnmethods", "password"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "name%20%3D%20%22Cloud%20Directory%22"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Browser Session",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "redirect_url",
+                  "value": "https%3A%2F%2Fauth.signin-connexion.cdssandbox.xyz%2Foauth2%2Fauthorize%3Fclient_id%3Dabb9c045-e61b-4f99-b89f-85eb988b8c7d%26stateId%3Df874f27e-ff69-44a8-a8c8-9272f08ec63e%26themeId%3Def8a162b-ddb5-4c3f-bff8-895495022567",
+                  "type": "text"
+                },
+                {
+                  "key": "access_token",
+                  "value": "{{User Access Token}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{IBM_VERIFY_TENANT_URL}}/v1.0/auth/session",
+              "host": ["{{IBM_VERIFY_TENANT_URL}}"],
+              "path": ["v1.0", "auth", "session"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Retrieve User Info OIDC",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "access_token",
+                  "value": "8iU6m7TrP5lZPUhpVNKKTcfhFCsEhBVUxZ9N9XNvYw8.DGhnqMb3I3zwdv2EcFtcSeYiNE8qbjTVNY8eX_hsDkXFBY1C6VM6DQu3Z4awDGLftAFclffp2XRZQlxJSwMZYQ.M18xNzQ2NjU2MzAzXzM4",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{IBM_VERIFY_TENANT_URL}}/oauth2/userinfo",
+              "host": ["{{IBM_VERIFY_TENANT_URL}}"],
+              "path": ["oauth2", "userinfo"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
 }

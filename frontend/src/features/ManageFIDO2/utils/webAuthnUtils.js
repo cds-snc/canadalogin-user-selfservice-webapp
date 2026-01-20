@@ -87,7 +87,7 @@ export function prepareAssertionOptions(options) {
  * Convert WebAuthn credential to format expected by server
  */
 export function formatAttestationForServer(credential) {
-  return {
+  const result = {
     id: credential.id,
     rawId: arrayBufferToBase64url(credential.rawId),
     type: credential.type,
@@ -100,6 +100,13 @@ export function formatAttestationForServer(credential) {
       ),
     },
   };
+
+  // Include transports if available
+  if (credential.response.getTransports) {
+    result.transports = credential.response.getTransports();
+  }
+
+  return result;
 }
 
 /**

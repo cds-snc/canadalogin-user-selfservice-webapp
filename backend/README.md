@@ -47,20 +47,21 @@ This approach works across different Docker platforms (Docker Desktop, Colima, e
 Create a `.env` file with the following variables:
 
 ```env
-IBM_VERIFY_TENANT_URL=https://cds-gcsignin-dev.verify.ibm.com/
+IBM_VERIFY_TENANT_URL=https://auth.signin-connexion.cdssandbox.xyz/
 IBM_VERIFY_PROFILE_MANAGEMENT_API_CLIENT_ID=
 IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID=
 IBM_VERIFY_PROFILE_MANAGEMENT_SECRET=
 IBM_VERIFY_PROFILE_MANAGEMENT_API_SECRET=
+RPID=auth.signin-connexion.cdssandbox.xyz
 ```
 
 #### IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID and IBM_VERIFY_PROFILE_MANAGEMENT_SECRET
 
-Head to https://cds-gcsignin-dev.verify.ibm.com/ui/admin/application/9053160440215070489?tab=sso, open the "Sign-on" tab, and copy the Client ID and Client secret.
+Head to https://auth.signin-connexion.cdssandbox.xyz/ui/admin/application/9053160440215070489?tab=sso, open the "Sign-on" tab, and copy the Client ID and Client secret.
 
 #### IBM_VERIFY_PROFILE_MANAGEMENT_API_CLIENT_ID and IBM_VERIFY_PROFILE_MANAGEMENT_API_SECRET
 
-Head to https://cds-gcsignin-dev.verify.ibm.com/ui/admin/application/9053160440215070489?tab=API%20access, open the "API access" tab. Select the DEV API Client key. Copy the Client ID and Client secret on the right side of the screen.
+Head to https://auth.signin-connexion.cdssandbox.xyz/ui/admin/application/9053160440215070489?tab=API%20access, open the "API access" tab. Select the DEV API Client key. Copy the Client ID and Client secret on the right side of the screen.
 
 ### Quick Start
 
