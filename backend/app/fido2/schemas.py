@@ -71,6 +71,7 @@ class FIDO2AttestationResultRequest(BaseModel):
     nickname: Optional[str] = None
     enabled: bool = True
     getClientExtensionResults: Optional[Dict[str, Any]] = None
+    getTransports: Optional[List[str]] = None
 
 
 class FIDO2AssertionOptionsRequest(BaseModel):

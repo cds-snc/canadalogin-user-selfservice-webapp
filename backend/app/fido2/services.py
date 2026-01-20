@@ -547,20 +547,6 @@ class FIDO2Service:
         # Add enabled: true like ciservices.js does
         body_to_send["enabled"] = True
 
-        # For attestation/result, only include the fields that IBM Verify expects
-        expected_fields = [
-            "response",
-            "id",
-            "nickname",
-            "rawId",
-            "type",
-            "getClientExtensionResults",
-            "enabled",
-        ]
-        body_to_send = {
-            key: value for key, value in body_to_send.items() if key in expected_fields
-        }
-
         # Ensure getClientExtensionResults is an empty object if null/None
         if body_to_send.get("getClientExtensionResults") is None:
             body_to_send["getClientExtensionResults"] = {}
