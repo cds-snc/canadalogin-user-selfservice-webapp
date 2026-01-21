@@ -38,13 +38,13 @@ class TestFIDO2Service:
         mock_response = Mock()
         mock_response.raise_for_status.return_value = None
         mock_response.json.return_value = {
-            "fido2": {"relyingparties": [{"id": "test-uuid", "rpId": "localhost"}]}
+            "fido2": {"relyingparties": [{"id": "test-uuid", "rpId": "test-rpid"}]}
         }
         mock_http_client.get = AsyncMock(return_value=mock_response)
 
         with patch("app.fido2.services.get_admin_token", return_value="test-token"):
             rp_uuid = await fido2_service._get_rp_uuid_from_rp_id(
-                mock_http_client, "test-token", "localhost"
+                mock_http_client, "test-token", "test-rpid"
             )
             assert rp_uuid == "test-uuid"
 
@@ -64,7 +64,7 @@ class TestFIDO2Service:
         with patch("app.fido2.services.get_admin_token", return_value="test-token"):
             with pytest.raises(HTTPException) as exc_info:
                 await fido2_service._get_rp_uuid_from_rp_id(
-                    mock_http_client, "test-token", "localhost"
+                    mock_http_client, "test-token", "test-rpid"
                 )
             assert exc_info.value.status_code == 404
 
@@ -198,7 +198,7 @@ class TestFIDO2Service:
                     "created": "2024-01-01T00:00:00Z",
                     "attributes": {
                         "nickname": "Test Device",
-                        "rpId": "localhost",
+                        "rpId": "test-rpid",
                         "credentialId": "cred-1",
                     },
                 }
@@ -305,7 +305,7 @@ class TestFIDO2Service:
         mock_registration_response.json.return_value = {
             "id": "reg-1",
             "userId": "user-id-123",
-            "rpId": "localhost",
+            "rpId": "test-rpid",
             "enabled": True,
             "created": "2024-01-01T00:00:00Z",
             "attributes": {
@@ -345,7 +345,7 @@ class TestFIDO2Service:
         mock_registration_response.json.return_value = {
             "id": "reg-1",
             "userId": "different-user-id",
-            "rpId": "localhost",
+            "rpId": "test-rpid",
             "enabled": True,
             "references": {"rpUuid": "rp-uuid-123"},
             "attributes": {},
@@ -887,7 +887,7 @@ class TestFIDO2Service:
         rp_response.status_code = 200
         rp_response.raise_for_status.return_value = None
         rp_response.json.return_value = {
-            "relyingparties": [{"rpId": "localhost", "id": "test-rp-uuid"}]
+            "relyingparties": [{"rpId": "test-rpid", "id": "test-rp-uuid"}]
         }
         mock_http_client.get = AsyncMock(return_value=rp_response)
 
@@ -917,7 +917,7 @@ class TestFIDO2Service:
         rp_response.status_code = 200
         rp_response.raise_for_status.return_value = None
         rp_response.json.return_value = {
-            "relyingparties": [{"rpId": "localhost", "id": "test-rp-uuid"}]
+            "relyingparties": [{"rpId": "test-rpid", "id": "test-rp-uuid"}]
         }
 
         # Mock error response for the actual proxy request
@@ -961,7 +961,7 @@ class TestFIDO2Service:
         rp_response.status_code = 200
         rp_response.raise_for_status.return_value = None
         rp_response.json.return_value = {
-            "relyingparties": [{"rpId": "localhost", "id": "test-rp-uuid"}]
+            "relyingparties": [{"rpId": "test-rpid", "id": "test-rp-uuid"}]
         }
 
         # Mock assertion result proxy response
@@ -1049,7 +1049,7 @@ class TestFIDO2Service:
         rp_response.status_code = 200
         rp_response.raise_for_status.return_value = None
         rp_response.json.return_value = {
-            "relyingparties": [{"rpId": "localhost", "id": "test-rp-uuid"}]
+            "relyingparties": [{"rpId": "test-rpid", "id": "test-rp-uuid"}]
         }
 
         # Mock failed assertion result

@@ -336,6 +336,7 @@ To run the unit tests, follow these steps:
    export IBM_VERIFY_PROFILE_MANAGEMENT_API_SECRET=abc123
    export IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID=abc123
    export IBM_VERIFY_PROFILE_MANAGEMENT_SECRET=abc123
+   export RPID=test-rpid
    ```
 
 3. Run all the tests (run this from root of the repo):
