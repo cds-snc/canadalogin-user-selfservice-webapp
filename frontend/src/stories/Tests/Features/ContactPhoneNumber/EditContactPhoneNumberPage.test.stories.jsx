@@ -239,17 +239,12 @@ export const EditContactPhoneNumber = (() => {
             async () => {
               // Check for confirmation text in the page content (shadow DOM compatible)
               const pageText = canvasElement.textContent || "";
+              const canvas = within(canvasElement);
+              const hasAddPhoneText = canvas.getByText(
+                /Are you sure you want to update your phone number/i,
+              );
 
-              // Look for confirmation text that indicates we're on the confirm page
-              const hasConfirmationText =
-                pageText.includes(
-                  "You've requested to update your contact phone number to",
-                ) ||
-                pageText.includes(
-                  "Are you sure you want to update your phone number",
-                );
-
-              await expect(hasConfirmationText).toBe(true);
+              await expect(hasAddPhoneText).toBeTruthy();
 
               // Look for the formatted phone number pattern
               const phonePattern = /\+1 \(\d{3}\) \d{3}-\d{4}/;
