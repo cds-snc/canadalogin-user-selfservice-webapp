@@ -28,9 +28,6 @@ class IBMVerifyConfig(BaseSettings):
     IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID: str
     IBM_VERIFY_PROFILE_MANAGEMENT_SECRET: str
     RPID: str
-    # Optional fields that can override Configuration defaults
-    PROFILE_MANAGEMENT_DOMAIN: Optional[str] = None
-    CORS_ORIGINS: Optional[str] = None
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore", case_sensitive=True
     )
@@ -71,32 +68,17 @@ class Configuration(BaseSettings):
     )
 
     @property
-    def effective_profile_management_domain(self) -> str:
-        """Get PROFILE_MANAGEMENT_DOMAIN from IBMVerifyConfig if set, otherwise use default"""
-        return (
-            self.ibm_verify_config.PROFILE_MANAGEMENT_DOMAIN
-            or self.PROFILE_MANAGEMENT_DOMAIN
-        )
-
-    @property
-    def effective_cors_origins(self) -> str:
-        """Get CORS_ORIGINS from IBMVerifyConfig if set, otherwise use default"""
-        return self.ibm_verify_config.CORS_ORIGINS or self.CORS_ORIGINS
-
-    @property
     def cors_origins_list(self) -> List[str]:
         """Convert comma-separated CORS_ORIGINS string to list - Terraform cant pass in a list[str]."""
         http_value = "https://"
         # Use http:// only if environment is local AND using default localhost values
         if (
             self.ENVIRONMENT == "local"
-            and not self.ibm_verify_config.PROFILE_MANAGEMENT_DOMAIN
-            and not self.ibm_verify_config.CORS_ORIGINS
+            and self.CORS_ORIGINS == "localhost:3000,localhost:8000"
         ):
             http_value = "http://"
         return [
-            f"{http_value}{origin.strip()}"
-            for origin in self.effective_cors_origins.split(",")
+            f"{http_value}{origin.strip()}" for origin in self.CORS_ORIGINS.split(",")
         ]
 
     @property
