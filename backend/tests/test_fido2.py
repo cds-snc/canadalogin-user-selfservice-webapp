@@ -942,16 +942,16 @@ class TestFIDO2Service:
             ),
             patch("app.fido2.services.get_admin_token", return_value="admin-token"),
         ):
-            result = await fido2_service.proxy_fido2_request(
-                mock_http_client,
-                "user-token",
-                "/assertion/result",  # Use assertion/result to avoid profile fetching
-                {"challenge": "test"},
-            )
+            with pytest.raises(HTTPException) as exc_info:
+                await fido2_service.proxy_fido2_request(
+                    mock_http_client,
+                    "user-token",
+                    "/assertion/result",  # Use assertion/result to avoid profile fetching
+                    {"challenge": "test"},
+                )
 
-            # Should return the error response from _handle_error_response
-            assert "status" in result
-            assert result["status"] == "failed"
+            # Should raise HTTPException with appropriate status code
+            assert exc_info.value.status_code == 400
 
     @pytest.mark.asyncio
     async def test_validate_fido2_login_success(self, fido2_service, mock_http_client):
