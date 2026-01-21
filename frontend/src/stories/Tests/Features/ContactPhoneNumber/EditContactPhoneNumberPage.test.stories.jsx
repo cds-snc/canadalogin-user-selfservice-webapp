@@ -171,14 +171,14 @@ export const EditContactPhoneNumber = (() => {
         });
       });
 
-      await step("Verify OTP verification page and enter OTP", async () => {
-        // Enter OTP - following AddMFAPage pattern exactly
-        await waitFor(async () => {
-          const hasVerificationText =
-            canvasElement.textContent.includes("Check your phone");
-          await expect(hasVerificationText).toBeTruthy();
-        });
+      // Enter OTP
+      await waitFor(async () => {
+        const hasVerificationText =
+          canvasElement.textContent.includes("Check your phone");
+        await expect(hasVerificationText).toBeTruthy();
+      });
 
+      await step("Verify OTP verification page and enter OTP", async () => {
         await waitFor(async () => {
           const gcdsInputs = canvasElement.querySelector("gcds-input");
           await expect(gcdsInputs).toBeInTheDocument();
@@ -200,33 +200,19 @@ export const EditContactPhoneNumber = (() => {
       });
 
       await step("Click Continue button", async () => {
-        // Click Continue button - following AddMFAPage pattern exactly
+        // Wait for the input to be ready
         await waitFor(async () => {
           const canvas = within(canvasElement);
           const continueButton = canvas.getByText(/Continue/i);
           await expect(continueButton).toBeInTheDocument();
-
-          if (
-            continueButton &&
-            continueButton.tagName === "GCDS-BUTTON" &&
-            continueButton.shadowRoot
-          ) {
+          if (continueButton && continueButton.shadowRoot) {
             const actualButton =
               continueButton.shadowRoot.querySelector(
                 'button[part="button"]',
               ) || continueButton.shadowRoot.querySelector("button");
             if (actualButton) {
-              // Dispatch gcdsClick event to bypass disabled state
-              const gcdsClickEvent = new CustomEvent("gcdsClick", {
-                bubbles: true,
-                cancelable: true,
-                detail: {},
-              });
-              Object.defineProperty(gcdsClickEvent, "preventDefault", {
-                value: () => {},
-                writable: false,
-              });
-              continueButton.dispatchEvent(gcdsClickEvent);
+              await expect(actualButton).toBeInTheDocument();
+              await userEvent.click(actualButton);
             }
           }
         });
