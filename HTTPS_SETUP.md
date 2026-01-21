@@ -104,46 +104,6 @@ In `backend/.env`, set:
 RPID=app.auth.signin-connexion.cdssandbox.xyz
 ```
 
-**Important**: Also update `backend/app/config.py` to replace any localhost references:
-
-```python
-# Replace localhost with the proper domain
-# Find and update any localhost URLs to:
-# app.auth.signin-connexion.cdssandbox.xyz
-# Find and update any http to https 
-class Configuration(BaseSettings):
-    app_info: AppInfo = AppInfo()
-    ibm_verify_config: IBMVerifyConfig = IBMVerifyConfig()
-    session_config: SessionConfig = SessionConfig()
-    ENVIRONMENT: str = Field(default="local")
-    V1_API_VERSION: str = "/v1"
-    ROOT_DOMAIN: Optional[str] = (
-        None  # Not required for local development, value should be ".gc-signin.cdssandbox.xyz"
-    )
-    PROFILE_MANAGEMENT_DOMAIN: str = (
-        "https://app.auth.signin-connexion.cdssandbox.xyz:3000"  # Frontend Management App domain to app.gc-signin.cdssandbox.xyz
-    )
-
-    CORS_ORIGINS: str = Field(
-        default="app.auth.signin-connexion.cdssandbox.xyz:3000,app.auth.signin-connexion.cdssandbox.xyz:8000",
-        description="Comma-separated list of CORS origins, Terraform cant pass in a list[str].",
-    )
-
-    model_config = SettingsConfigDict(
-        env_file=".env", env_file_encoding="utf-8", extra="ignore"
-    )
-
-    @property
-    def cors_origins_list(self) -> List[str]:
-        """Convert comma-separated CORS_ORIGINS string to list - Terraform cant pass in a list[str]."""
-        http_value = "https://"
-        if self.ENVIRONMENT == "local":
-            http_value = "https://"
-        return [
-            f"{http_value}{origin.strip()}" for origin in self.CORS_ORIGINS.split(",")
-        ]
-```
-
 In `frontend/.env`, set:
 ```env
 VITE_BACKEND_API_URL=https://app.auth.signin-connexion.cdssandbox.xyz:8000
