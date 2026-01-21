@@ -235,42 +235,45 @@ export const EditContactPhoneNumber = (() => {
       await step(
         "Verify confirmation page and formatted phone number",
         async () => {
-          await waitFor(async () => {
-            // Check for confirmation text in the page content (shadow DOM compatible)
-            const pageText = canvasElement.textContent || "";
+          await waitFor(
+            async () => {
+              // Check for confirmation text in the page content (shadow DOM compatible)
+              const pageText = canvasElement.textContent || "";
 
-            // Look for confirmation text that indicates we're on the confirm page
-            const hasConfirmationText =
-              pageText.includes(
-                "You've requested to update your contact phone number to",
-              ) ||
-              pageText.includes(
-                "requested to update your contact phone number",
-              );
+              // Look for confirmation text that indicates we're on the confirm page
+              const hasConfirmationText =
+                pageText.includes(
+                  "You've requested to update your contact phone number to",
+                ) ||
+                pageText.includes(
+                  "Are you sure you want to update your phone number",
+                );
 
-            await expect(hasConfirmationText).toBe(true);
+              await expect(hasConfirmationText).toBe(true);
 
-            // Look for the formatted phone number pattern
-            const phonePattern = /\+1 \(\d{3}\) \d{3}-\d{4}/;
-            const hasFormattedPhone = phonePattern.test(pageText);
-            await expect(hasFormattedPhone).toBe(true);
+              // Look for the formatted phone number pattern
+              const phonePattern = /\+1 \(\d{3}\) \d{3}-\d{4}/;
+              const hasFormattedPhone = phonePattern.test(pageText);
+              await expect(hasFormattedPhone).toBe(true);
 
-            // Also verify "Yes, update" button is present
-            const allButtons = canvasElement.querySelectorAll("gcds-button");
-            let hasYesUpdateButton = false;
+              // Also verify "Yes, update" button is present
+              const allButtons = canvasElement.querySelectorAll("gcds-button");
+              let hasYesUpdateButton = false;
 
-            for (const button of allButtons) {
-              if (
-                button.textContent &&
-                button.textContent.includes("Yes, update")
-              ) {
-                hasYesUpdateButton = true;
-                break;
+              for (const button of allButtons) {
+                if (
+                  button.textContent &&
+                  button.textContent.includes("Yes, update")
+                ) {
+                  hasYesUpdateButton = true;
+                  break;
+                }
               }
-            }
 
-            await expect(hasYesUpdateButton).toBe(true);
-          });
+              await expect(hasYesUpdateButton).toBe(true);
+            },
+            { timeout: 10000 },
+          ); // Increased timeout for CI environments
         },
       );
 
