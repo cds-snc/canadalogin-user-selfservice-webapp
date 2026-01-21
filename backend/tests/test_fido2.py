@@ -362,8 +362,10 @@ class TestFIDO2Service:
             assert exc_info.value.status_code == 403
 
     @pytest.mark.asyncio
-    async def test_delete_registration_success(self, fido2_service, mock_http_client):
-        """Test successful registration deletion"""
+    async def test_delete_registration_success_with_mock_responses(
+        self, fido2_service, mock_http_client
+    ):
+        """Test successful registration deletion with comprehensive mocked responses"""
         # Mock userinfo response
         mock_userinfo_response = Mock()
         mock_userinfo_response.raise_for_status.return_value = None
@@ -504,8 +506,8 @@ class TestFIDO2Service:
             await fido2_service._get_user_id_from_token(mock_http_client, "user-token")
         assert exc_info.value.status_code == 400
 
-    def test_prepare_attestation_result_body(self, fido2_service):
-        """Test attestation result body preparation"""
+    def test_prepare_attestation_result_body_comprehensive(self, fido2_service):
+        """Test comprehensive attestation result body preparation scenarios"""
         # Test with None getClientExtensionResults
         body = {
             "id": "test-id",
