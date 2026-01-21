@@ -22,7 +22,15 @@ class TestFIDO2Service:
     @pytest.fixture
     def fido2_service(self):
         """Create FIDO2Service instance for testing"""
-        return FIDO2Service()
+        with patch("app.fido2.services.get_configuration") as mock_get_config:
+            # Mock the configuration with a proper tenant URL
+            mock_config = Mock()
+            mock_config.ibm_verify_config = Mock()
+            mock_config.ibm_verify_config.IBM_VERIFY_TENANT_URL = "https://test-rpid/v1"
+            mock_config.ibm_verify_config.rp_id = "test-rpid"
+            mock_get_config.return_value = mock_config
+
+            return FIDO2Service()
 
     @pytest.fixture
     def mock_http_client(self):

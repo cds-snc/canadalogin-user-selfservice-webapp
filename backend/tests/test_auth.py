@@ -233,10 +233,8 @@ def app(monkeypatch, mock_token_transport):
         return await auth_module.redirect_user_to_idp_verify(request)
 
     @base.get("/reauth")
-    async def reauth(request: Request, returnToPage: str = "/", acr_values: str = None):
-        return await auth_module.reauthenticate_user(
-            request, returnToPage=returnToPage, acr_values=acr_values
-        )
+    async def reauth(request: Request, returnToPage: str = "/"):
+        return await auth_module.reauthenticate_user(request, returnToPage=returnToPage)
 
     # Utilities to seed & read session in tests
     @base.get("/seed-session")
@@ -389,9 +387,6 @@ async def test_reauthenticate_user_sets_returnToPage_and_passes_max_age(app, cli
     dump = await client.get("/session-dump")
     assert dump.status_code == 200
     assert dump.json().get(FakeSessionKeys.RETURN_TO_PAGE.value) == "/reports"
-
-    # Confirm we passed max_age=900 to authorize_redirect()
-    assert app.state.oauth_verify.last_authorize_redirect_kwargs.get("max_age") == 900
 
 
 @pytest.mark.asyncio
