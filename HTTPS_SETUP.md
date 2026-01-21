@@ -97,12 +97,7 @@ npm run dev
 
 The frontend will automatically use the shared certificate from `backend/certs/`.
 
-### 7. Update Backend Configuration
-
-In `backend/.env`, set:
-```env
-RPID=app.auth.signin-connexion.cdssandbox.xyz
-```
+### 7. Update Configuration
 
 In `frontend/.env`, set:
 ```env

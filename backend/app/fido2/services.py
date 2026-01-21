@@ -4,6 +4,7 @@ FIDO2 services for interacting with IBM Verify API
 
 import logging
 from typing import List, Dict, Any, Optional
+from urllib.parse import urlparse
 from fastapi import HTTPException, status
 from httpx import AsyncClient
 from app.utils.access_token import get_admin_token, get_auth_request_headers
@@ -27,8 +28,8 @@ class FIDO2Service:
     def __init__(self):
         self.config = get_configuration()
         self.tenant_url = self.config.ibm_verify_config.IBM_VERIFY_TENANT_URL
-        # This should be configured via IBMVerifyConfig
-        self.rp_id = self.config.ibm_verify_config.RPID
+        parsed_url = urlparse(self.config.ibm_verify_config.IBM_VERIFY_TENANT_URL)
+        self.rp_id = parsed_url.hostname
 
     async def _get_user_profile_info(
         self, http_client: AsyncClient, user_access_token: str
