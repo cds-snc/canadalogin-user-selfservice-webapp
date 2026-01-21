@@ -67,7 +67,9 @@ class FIDO2Service:
             return username, display_name
 
         except Exception as e:
-            logger.error(f"Error fetching user profile for FIDO2: {str(e)}")
+            logger.error(
+                f"Error fetching user profile for FIDO2: {str(e)}", exc_info=True
+            )
             RequestErrorHandler.handle(e)
 
     async def _get_rp_uuid_from_rp_id(
@@ -99,7 +101,7 @@ class FIDO2Service:
         except HTTPException:
             raise
         except Exception as e:
-            logger.error(f"Error getting RP UUID: {str(e)}")
+            logger.error(f"Error getting RP UUID: {str(e)}", exc_info=True)
             RequestErrorHandler.handle(e)
 
     async def _get_user_scim_id_with_user_token(
@@ -132,7 +134,9 @@ class FIDO2Service:
         except HTTPException:
             raise
         except Exception as e:
-            logger.error(f"Error getting user SCIM ID with user token: {str(e)}")
+            logger.error(
+                f"Error getting user SCIM ID with user token: {str(e)}", exc_info=True
+            )
             RequestErrorHandler.handle(e)
 
     async def _get_user_scim_id(
@@ -165,7 +169,7 @@ class FIDO2Service:
         except HTTPException:
             raise
         except Exception as e:
-            logger.error(f"Error getting user SCIM ID: {str(e)}")
+            logger.error(f"Error getting user SCIM ID: {str(e)}", exc_info=True)
             RequestErrorHandler.handle(e)
 
     async def get_user_fido2_registrations(
@@ -239,7 +243,7 @@ class FIDO2Service:
         except HTTPException:
             raise
         except Exception as e:
-            logger.error(f"Error getting FIDO2 registrations: {str(e)}")
+            logger.error(f"Error getting FIDO2 registrations: {str(e)}", exc_info=True)
             RequestErrorHandler.handle(e)
 
     async def get_user_response(
@@ -247,7 +251,7 @@ class FIDO2Service:
         http_client: AsyncClient,
         user_access_token: str,
     ) -> FIDO2UserResponse:
-        """Get user response with FIDO2 credentials - equivalent to getUserResponse in JS"""
+        """Get user response with FIDO2 credentials"""
         try:
             credentials = await self.get_user_fido2_registrations(
                 http_client, user_access_token
@@ -261,8 +265,8 @@ class FIDO2Service:
             )
 
         except Exception as e:
-            logger.error(f"Error getting user response: {str(e)}")
-            raise
+            logger.error(f"Error getting user response: {str(e)}", exc_info=True)
+            RequestErrorHandler.handle(e)
 
     async def get_registration_details(
         self, http_client: AsyncClient, user_access_token: str, registration_id: str
@@ -311,7 +315,7 @@ class FIDO2Service:
         except HTTPException:
             raise
         except Exception as e:
-            logger.error(f"Error getting registration details: {str(e)}")
+            logger.error(f"Error getting registration details: {str(e)}", exc_info=True)
             RequestErrorHandler.handle(e)
 
     async def delete_registration(
@@ -371,7 +375,7 @@ class FIDO2Service:
         except HTTPException:
             raise
         except Exception as e:
-            logger.error(f"Error deleting registration: {str(e)}")
+            logger.error(f"Error deleting registration: {str(e)}", exc_info=True)
             RequestErrorHandler.handle(e)
 
     async def update_registration(
@@ -458,7 +462,7 @@ class FIDO2Service:
         except HTTPException:
             raise
         except Exception as e:
-            logger.error(f"Error updating registration: {str(e)}")
+            logger.error(f"Error updating registration: {str(e)}", exc_info=True)
             RequestErrorHandler.handle(e)
 
     async def _get_user_id_from_token(
@@ -599,7 +603,6 @@ class FIDO2Service:
     ) -> Dict[str, Any]:
         """
         Proxy FIDO2 server requests to IBM Verify API
-        Equivalent to proxyFIDO2ServerRequest in JS
         """
         try:
             # Get admin token for RP operations
@@ -647,19 +650,14 @@ class FIDO2Service:
         except HTTPException:
             raise
         except Exception as e:
-            logger.error(f"Error proxying FIDO2 request: {str(e)}")
-            # Return error in fido2Error format instead of raising exception
-            return {
-                "status": "failed",
-                "errorMessage": f"Error proxying FIDO2 request: {str(e)}",
-            }
+            logger.error(f"Error proxying FIDO2 request: {str(e)}", exc_info=True)
+            RequestErrorHandler.handle(e)
 
     async def validate_fido2_login(
         self, http_client: AsyncClient, assertion_result: Dict[str, Any]
     ) -> FIDO2UserResponse:
         """
         Validate FIDO2 assertion and complete login
-        Equivalent to validateFIDO2Login in JS
         """
         try:
             access_token = await get_admin_token(http_client)
@@ -720,7 +718,7 @@ class FIDO2Service:
         except HTTPException:
             raise
         except Exception as e:
-            logger.error(f"Error validating FIDO2 login: {str(e)}")
+            logger.error(f"Error validating FIDO2 login: {str(e)}", exc_info=True)
             RequestErrorHandler.handle(e)
 
 
