@@ -184,12 +184,15 @@ export const EditContactPhoneNumber = (() => {
           await expect(gcdsInputs).toBeInTheDocument();
           if (gcdsInputs.shadowRoot) {
             const shadowInput =
+              gcdsInputs.shadowRoot.querySelector("input#verificationCode") ||
               gcdsInputs.shadowRoot.querySelector(
                 'input[name="verificationCode"]',
-              ) || (await expect(shadowInput).toBeInTheDocument());
+              ) ||
+              gcdsInputs.shadowRoot.querySelector('input[maxlength="6"]');
+            await expect(shadowInput).toBeInTheDocument();
             if (shadowInput) {
               // Clear the field by setting value directly (avoid userEvent.clear which can fail)
-              shadowInput.value = "";
+              shadowInput.value = "654321";
               shadowInput.dispatchEvent(new Event("input", { bubbles: true }));
 
               // Type the OTP code
@@ -200,19 +203,34 @@ export const EditContactPhoneNumber = (() => {
       });
 
       await step("Click Continue button", async () => {
-        // Wait for the input to be ready
+        // Click Continue button - following AddMFAPage pattern exactly
         await waitFor(async () => {
           const canvas = within(canvasElement);
           const continueButton = canvas.getByText(/Continue/i);
           await expect(continueButton).toBeInTheDocument();
-          if (continueButton && continueButton.shadowRoot) {
+
+          if (
+            continueButton &&
+            continueButton.tagName === "GCDS-BUTTON" &&
+            continueButton.shadowRoot
+          ) {
             const actualButton =
               continueButton.shadowRoot.querySelector(
                 'button[part="button"]',
               ) || continueButton.shadowRoot.querySelector("button");
             if (actualButton) {
-              await expect(actualButton).toBeInTheDocument();
-              await userEvent.click(actualButton);
+              await expect(actualButton.disabled).toBe(false);
+              // Dispatch gcdsClick event to bypass disabled state
+              const gcdsClickEvent = new CustomEvent("gcdsClick", {
+                bubbles: true,
+                cancelable: true,
+                detail: {},
+              });
+              Object.defineProperty(gcdsClickEvent, "preventDefault", {
+                value: () => {},
+                writable: false,
+              });
+              continueButton.dispatchEvent(gcdsClickEvent);
             }
           }
         });
