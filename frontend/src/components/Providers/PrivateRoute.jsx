@@ -46,7 +46,8 @@ function StepupPrivateRoute() {
     returnToPagePath === pathname;
 
   const performStepupRedirect = useCallback(() => {
-    const redirectUrl = `${OIDC_REDIRECT.reauth}?${returnToPageKey}=${encodeURIComponent(pathname)}`;
+    let redirectUrl = `${OIDC_REDIRECT.reauth}?${returnToPageKey}=${encodeURIComponent(pathname)}`;
+
     window.location.href = redirectUrl;
   }, [pathname, returnToPageKey]);
 

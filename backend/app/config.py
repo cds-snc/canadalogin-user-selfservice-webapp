@@ -70,7 +70,11 @@ class Configuration(BaseSettings):
     def cors_origins_list(self) -> List[str]:
         """Convert comma-separated CORS_ORIGINS string to list - Terraform cant pass in a list[str]."""
         http_value = "https://"
-        if self.ENVIRONMENT == "local":
+        # Use http:// only if environment is local AND using default localhost values
+        if (
+            self.ENVIRONMENT == "local"
+            and self.CORS_ORIGINS == "localhost:3000,localhost:8000"
+        ):
             http_value = "http://"
         return [
             f"{http_value}{origin.strip()}" for origin in self.CORS_ORIGINS.split(",")

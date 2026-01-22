@@ -97,12 +97,14 @@ npm run dev
 
 The frontend will automatically use the shared certificate from `backend/certs/`.
 
-### 7. Update Backend Configuration
+### 7. Update Configuration
 
-In `backend/.env`, set:
+In `frontend/.env`, set:
 ```env
-RPID=manageapp.gcsignin
+VITE_BACKEND_API_URL=https://app.auth.signin-connexion.cdssandbox.xyz:8000
 ```
+
+### 8. Browser Certificate Trust (if needed)
 
 If you see certificate warnings in your browser:
 
@@ -122,11 +124,6 @@ mkcert -install
 3. **Completely restart your browser** (not just reload the tab):
    - Quit the browser application entirely
    - Reopen and navigate to https://app.auth.signin-connexion.cdssandbox.xyz:3000
-
-In `frontend/.env`, set:
-```env
-VITE_BACKEND_API_URL=https://app.auth.signin-connexion.cdssandbox.xyz:8000
-```
 
 ### 9. Update IBM Verify OAuth Client
 
