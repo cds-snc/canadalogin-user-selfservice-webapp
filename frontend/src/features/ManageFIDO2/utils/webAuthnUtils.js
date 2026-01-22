@@ -101,15 +101,6 @@ export function formatAttestationForServer(credential) {
     },
   };
 
-  // Debug logging
-  console.log("credential:", credential);
-  console.log("credential.response:", credential.response);
-  console.log(
-    "credential.response.transports:",
-    credential.response.transports,
-  );
-  console.log("JSON.stringify(credential):", JSON.stringify(credential));
-
   // Try multiple ways to access transports
   if (credential.response.transports) {
     result.getTransports = credential.response.transports;
