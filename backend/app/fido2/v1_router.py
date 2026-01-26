@@ -7,6 +7,7 @@ from typing import Dict, Any
 from fastapi import APIRouter, Depends, Request
 from httpx import AsyncClient
 from app.fido2.services import fido2_service
+from app.fido2.metadata_service import metadata_service
 from app.fido2.schemas import (
     FIDO2UserResponse,
     FIDO2RegistrationResponse,
@@ -16,6 +17,9 @@ from app.fido2.schemas import (
     FIDO2AttestationResultRequest,
     FIDO2AssertionOptionsRequest,
     FIDO2AssertionResultRequest,
+    FIDO2MetadataResponse,
+    AAGUIDListResponse,
+    MetadataStatsResponse,
 )
 from app.auth.services.auth_user_session import (
     get_users_current_session,
@@ -273,4 +277,86 @@ async def submit_assertion_result_public(
 
     except Exception as e:
         logger.error(f"Error validating FIDO2 login: {str(e)}")
+        raise
+
+
+@router.get(
+    "/metadata/{aaguid}",
+    response_model=FIDO2MetadataResponse,
+    summary="Get FIDO2 authenticator metadata",
+    description="Get metadata information for a specific AAGUID (Authenticator Attestation GUID)",
+)
+def get_authenticator_metadata(aaguid: str) -> FIDO2MetadataResponse:
+    """
+    Get metadata information for a specific AAGUID.
+
+    This endpoint provides information about FIDO2 authenticators including:
+    - Device description and manufacturer info
+    - Security characteristics (key protection, user verification methods)
+    - Supported features and extensions
+    - Status and certification information
+
+    Args:
+        aaguid: The Authenticator Attestation GUID in standard UUID format
+
+    Returns:
+        Metadata information for the specified authenticator
+    """
+    try:
+        metadata = metadata_service.get_metadata(aaguid)
+        return FIDO2MetadataResponse(**metadata)
+    except Exception as e:
+        logger.error(f"Error getting metadata for AAGUID {aaguid}: {str(e)}")
+        raise
+
+
+@router.get(
+    "/metadata",
+    response_model=AAGUIDListResponse,
+    summary="List known AAGUIDs",
+    description="Get a list of all known AAGUIDs with their descriptions",
+)
+def list_known_aaguids() -> AAGUIDListResponse:
+    """
+    Get a list of all known AAGUIDs with their descriptions.
+
+    This endpoint returns a mapping of all AAGUIDs that have metadata
+    available in the system, including both FIDO Alliance MDS3 entries
+    and custom entries for devices not well represented in the official metadata.
+
+    Returns:
+        Dictionary mapping AAGUIDs to their descriptions
+    """
+    try:
+        aaguids = metadata_service.get_all_known_aaguids()
+        return AAGUIDListResponse(aaguids=aaguids)
+    except Exception as e:
+        logger.error(f"Error listing known AAGUIDs: {str(e)}")
+        raise
+
+
+@router.get(
+    "/metadata/stats",
+    response_model=MetadataStatsResponse,
+    summary="Get metadata service statistics",
+    description="Get statistics about the metadata cache including MDS3 update status",
+)
+def get_metadata_stats() -> MetadataStatsResponse:
+    """
+    Get statistics about the metadata service.
+
+    This endpoint returns information about:
+    - Total number of cached metadata entries
+    - Number of custom entries vs MDS3 entries
+    - Last MDS3 update timestamp
+    - Next scheduled refresh time
+
+    Returns:
+        Statistics about the metadata service
+    """
+    try:
+        stats = metadata_service.get_metadata_stats()
+        return MetadataStatsResponse(**stats)
+    except Exception as e:
+        logger.error(f"Error getting metadata stats: {str(e)}")
         raise
