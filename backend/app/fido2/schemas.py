@@ -105,24 +105,6 @@ class ErrorResponse(BaseModel):
     error: str
 
 
-class FIDO2MetadataResponse(BaseModel):
-    """Response model for FIDO2 metadata information"""
-
-    aaguid: str
-    description: str
-    icon: Optional[str] = None
-    authenticatorVersion: Optional[int] = None
-    protocolFamily: Optional[str] = None
-    attestationTypes: List[str] = []
-    keyProtection: List[str] = []
-    matcherProtection: List[str] = []
-    attachmentHint: List[str] = []
-    supportedExtensions: List[str] = []
-    statusReports: List[Dict[str, Any]] = []
-    is_known: bool = True
-    is_custom: bool = False
-
-
 class AAGUIDListResponse(BaseModel):
     """Response model for list of known AAGUIDs"""
 

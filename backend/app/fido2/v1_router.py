@@ -17,7 +17,6 @@ from app.fido2.schemas import (
     FIDO2AttestationResultRequest,
     FIDO2AssertionOptionsRequest,
     FIDO2AssertionResultRequest,
-    FIDO2MetadataResponse,
     AAGUIDListResponse,
     MetadataStatsResponse,
 )
@@ -282,11 +281,11 @@ async def submit_assertion_result_public(
 
 @router.get(
     "/metadata/{aaguid}",
-    response_model=FIDO2MetadataResponse,
+    response_model=Dict[str, Any],
     summary="Get FIDO2 authenticator metadata",
     description="Get metadata information for a specific AAGUID (Authenticator Attestation GUID)",
 )
-def get_authenticator_metadata(aaguid: str) -> FIDO2MetadataResponse:
+def get_authenticator_metadata(aaguid: str) -> Dict[str, Any]:
     """
     Get metadata information for a specific AAGUID.
 
@@ -300,11 +299,25 @@ def get_authenticator_metadata(aaguid: str) -> FIDO2MetadataResponse:
         aaguid: The Authenticator Attestation GUID in standard UUID format
 
     Returns:
-        Metadata information for the specified authenticator
+        Native metadata object (MDS3 entry or custom dict) with all available fields
     """
     try:
         metadata = metadata_service.get_metadata(aaguid)
-        return FIDO2MetadataResponse(**metadata)
+
+        # Convert native MDS3 objects to dict for JSON serialization
+        if hasattr(metadata, "__dict__"):
+            import dataclasses
+
+            metadata_dict = dataclasses.asdict(metadata)
+            # Add helper fields
+            metadata_dict["is_known"] = True
+            metadata_dict["is_custom"] = False
+            metadata_dict["is_mds3"] = True
+            return metadata_dict
+        else:
+            # Already a dict (custom entry or fallback)
+            return metadata
+
     except Exception as e:
         logger.error(f"Error getting metadata for AAGUID {aaguid}: {str(e)}")
         raise

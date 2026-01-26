@@ -6,10 +6,10 @@ import logging
 import threading
 import time
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, Union
 from fastapi import HTTPException
 import httpx
-from fido2.mds3 import parse_blob
+from fido2.mds3 import parse_blob, MetadataBlobPayloadEntry
 
 logger = logging.getLogger(__name__)
 
@@ -33,9 +33,11 @@ class FIDO2MetadataService:
     """Service for managing FIDO2 metadata information"""
 
     def __init__(self):
-        self.metadata_cache: Dict[str, Dict[str, Any]] = {}
+        self.metadata_cache: Dict[
+            str, Union[Dict[str, Any], MetadataBlobPayloadEntry]
+        ] = {}
         self.custom_entries: Dict[str, Dict[str, Any]] = {}
-        self.mds3_entries: Dict[str, Dict[str, Any]] = {}
+        self.mds3_entries: Dict[str, MetadataBlobPayloadEntry] = {}
         self._lock = threading.Lock()
         self._last_mds3_update = 0
         self._mds3_update_interval = 24 * 60 * 60  # 24 hours in seconds
@@ -51,7 +53,7 @@ class FIDO2MetadataService:
             CACHE_DIR.mkdir(exist_ok=True)
 
             # Add custom metadata for known devices (fallbacks)
-            self._add_custom_metadata()
+            # self._add_custom_metadata()
 
             # Try to load MDS3 metadata (download if needed)
             try:
@@ -72,7 +74,7 @@ class FIDO2MetadataService:
         except Exception as e:
             logger.error(f"Failed to initialize metadata service: {e}")
             # Ensure we have at least custom metadata
-            self._add_custom_metadata()
+            # self._add_custom_metadata()
             self._rebuild_cache()
 
     def _add_custom_metadata(self):
@@ -256,65 +258,12 @@ class FIDO2MetadataService:
                 f"Successfully parsed MDS3 blob with {len(blob_payload.entries)} entries"
             )
 
-            # Convert MDS3 entries to our format
+            # Store native MDS3 entry objects directly - no conversion needed!
             mds3_entries = {}
             for entry in blob_payload.entries:
                 if entry.aaguid:  # Only process entries with AAGUIDs
                     aaguid = str(entry.aaguid).lower()
-
-                    # Extract metadata statement if available
-                    metadata_statement = entry.metadata_statement
-                    if metadata_statement:
-                        mds3_entries[aaguid] = {
-                            "aaguid": aaguid,
-                            "description": getattr(
-                                metadata_statement, "description", "FIDO2 Authenticator"
-                            ),
-                            "icon": getattr(metadata_statement, "icon", None),
-                            "authenticatorVersion": getattr(
-                                metadata_statement, "authenticatorVersion", None
-                            ),
-                            "protocolFamily": getattr(
-                                metadata_statement, "protocolFamily", "fido2"
-                            ),
-                            "attestationTypes": getattr(
-                                metadata_statement, "attestationTypes", []
-                            ),
-                            "keyProtection": getattr(
-                                metadata_statement, "keyProtection", []
-                            ),
-                            "matcherProtection": getattr(
-                                metadata_statement, "matcherProtection", []
-                            ),
-                            "attachmentHint": getattr(
-                                metadata_statement, "attachmentHint", []
-                            ),
-                            "supportedExtensions": getattr(
-                                metadata_statement, "supportedExtensions", []
-                            ),
-                            "statusReports": (
-                                [
-                                    {
-                                        "status": (
-                                            status.status.name
-                                            if hasattr(status.status, "name")
-                                            else str(status.status)
-                                        ),
-                                        "effectiveDate": (
-                                            status.effective_date.isoformat()
-                                            if status.effective_date
-                                            else None
-                                        ),
-                                    }
-                                    for status in entry.status_reports
-                                ]
-                                if entry.status_reports
-                                else []
-                            ),
-                            "is_known": True,
-                            "is_custom": False,
-                            "is_mds3": True,
-                        }
+                    mds3_entries[aaguid] = entry
 
             with self._lock:
                 self.mds3_entries = mds3_entries
@@ -335,7 +284,9 @@ class FIDO2MetadataService:
 
             logger.info(f"Cache rebuilt with {len(self.metadata_cache)} total entries")
 
-    def get_metadata(self, aaguid: str) -> Dict[str, Any]:
+    def get_metadata(
+        self, aaguid: str
+    ) -> Union[Dict[str, Any], MetadataBlobPayloadEntry]:
         """Get metadata for a specific AAGUID"""
         if not aaguid:
             raise HTTPException(status_code=400, detail="AAGUID is required")
@@ -360,10 +311,25 @@ class FIDO2MetadataService:
     def get_all_known_aaguids(self) -> Dict[str, str]:
         """Get a list of all known AAGUIDs with their descriptions"""
         with self._lock:
-            return {
-                aaguid: metadata["description"]
-                for aaguid, metadata in self.metadata_cache.items()
-            }
+            result = {}
+            for aaguid, metadata in self.metadata_cache.items():
+                if (
+                    hasattr(metadata, "metadata_statement")
+                    and metadata.metadata_statement
+                ):
+                    # Native MDS3 object
+                    description = getattr(
+                        metadata.metadata_statement,
+                        "description",
+                        "FIDO2 Authenticator",
+                    )
+                elif isinstance(metadata, dict) and "description" in metadata:
+                    # Custom dict entry
+                    description = metadata["description"]
+                else:
+                    description = "FIDO2 Authenticator"
+                result[aaguid] = description
+            return result
 
     def get_metadata_stats(self) -> Dict[str, Any]:
         """Get statistics about the metadata cache"""
