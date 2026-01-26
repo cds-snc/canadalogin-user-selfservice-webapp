@@ -7,7 +7,6 @@ import threading
 import time
 from pathlib import Path
 from typing import Dict, Any
-from base64 import b64decode
 from fastapi import HTTPException
 import httpx
 from fido2.mds3 import parse_blob
@@ -25,33 +24,8 @@ BLOB_FILE_PATH = CACHE_DIR / "blob.jwt"
 CERT_FILE_PATH = CACHE_DIR / "globalsign-r3.crt"
 CACHE_MAX_AGE = 24 * 60 * 60  # 24 hours in seconds
 
-# GlobalSign R3 root certificate (base64 DER format as used in official examples)
-GLOBALSIGN_R3_ROOT_CERT_B64 = b64decode(
-    """
-MIIDXzCCAkegAwIBAgILBAAAAAABIVhTCKIwDQYJKoZIhvcNAQELBQAwTDEgMB4G
-A1UECxMXR2xvYmFsU2lnbiBSb290IENBIC0gUjMxEzARBgNVBAoTCkdsb2JhbFNp
-Z24xEzARBgNVBAMTCkdsb2JhbFNpZ24wHhcNMDkwMzE4MTAwMDAwWhcNMjkwMzE4
-MTAwMDAwWjBMMSAwHgYDVQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEG
-A1UEChMKR2xvYmFsU2lnbjETMBEGA1UEAxMKR2xvYmFsU2lnbjCCASIwDQYJKoZI
-hvcNAQEBBQADggEPADCCAQoCggEBAMwldpB5BngiFvXAg7aEyiie/QV2EcWtiHL8
-RgJDx7KKnQRfJMsuS+FggkbhUqsMgUdwbN1k0ev1LKMPgj0MK66X17YUhhB5uzsT
-gHeMCOFJ0mpiLx9e+pZo34knlTifBtc+ycsmWQ1z3rDI6SYOgxXG71uL0gRgykmm
-KPZpO/bLyCiR5Z2KYVc3rHQU3HTgOu5yLy6c+9C7v/U9AOEGM+iCK65TpjoWc4zd
-QQ4gOsC0p6Hpsk+QLjJg6VfLuQSSaGjlOCZgdbKfd/+RFO+uIEn8rUAVSNECMWEZ
-XriX7613t2Saer9fwRPvm2L7DWzgVGkWqQPabumDk3F2xmmFghcCAwEAAaNCMEAw
-DgYDVR0PAQH/BAQDAgEGMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYEFI/wS3+o
-LkUkrk1Q+mOai97i3Ru8MA0GCSqGSIb3DQEBCwUAA4IBAQBLQNvAUKr+yAzv95ZU
-RUm7lgAJQayzE4aGKAczymvmdLm6AC2upArT9fHxD4q/c2dKg8dEe3jgr25sbwMp
-jjM5RcOO5LlXbKr8EpbsU8Yt5CRsuZRj+9xTaGdWPoO4zzUhw8lo/s7awlOqzJCK
-6fBdRoyV3XpYKBovHd7NADdBj+1EbddTKJd+82cEHhXXipa0095MJ6RMG3NzdvQX
-mcIfeg7jLQitChws/zyrVQ4PkX4268NXSb7hLi18YIvDQVETI53O9zJrlAGomecs
-Mx86OyXShkDOOyyGeMlhLxS67ttVb9+E7gUJTb0o2HLO02JQZR7rkpeDMdmztcpH
-WD9f"""
-)
-
 # Known AAGUIDs for common devices (used as fallbacks)
 APPLE_AAGUID = "adce0002-35bc-c60a-648b-0b25f1f05503"  # Real Apple AAGUID
-YUBIKEY_AAGUID = "c5ef55ff-ad9a-4b9f-b580-adebafe026d0"  # YubiKey 5 series
 WINDOWS_HELLO_AAGUID = "08987058-cadc-4b81-b6e1-30de50dcbe96"  # Windows Hello
 
 
@@ -129,25 +103,6 @@ class FIDO2MetadataService:
             "is_custom": True,
         }
 
-        # YubiKey 5 Series
-        yubikey_metadata = {
-            "aaguid": YUBIKEY_AAGUID,
-            "description": "YubiKey 5 Series",
-            "icon": "https://www.yubico.com/wp-content/uploads/2019/10/Yubikey5.png",
-            "authenticatorVersion": 1,
-            "protocolFamily": "fido2",
-            "attestationTypes": ["basic_full", "none"],
-            "keyProtection": ["hardware"],
-            "matcherProtection": [],
-            "attachmentHint": ["cross_platform"],
-            "supportedExtensions": [],
-            "statusReports": [
-                {"status": "FIDO_CERTIFIED", "effectiveDate": "2019-01-01"}
-            ],
-            "is_known": True,
-            "is_custom": True,
-        }
-
         # Windows Hello
         windows_metadata = {
             "aaguid": WINDOWS_HELLO_AAGUID,
@@ -169,11 +124,9 @@ class FIDO2MetadataService:
 
         with self._lock:
             self.metadata_cache[APPLE_AAGUID] = apple_metadata
-            self.metadata_cache[YUBIKEY_AAGUID] = yubikey_metadata
             self.metadata_cache[WINDOWS_HELLO_AAGUID] = windows_metadata
 
             self.custom_entries[APPLE_AAGUID] = apple_metadata
-            self.custom_entries[YUBIKEY_AAGUID] = yubikey_metadata
             self.custom_entries[WINDOWS_HELLO_AAGUID] = windows_metadata
 
         logger.info(f"Added {len(self.custom_entries)} custom metadata entries")
@@ -229,9 +182,19 @@ class FIDO2MetadataService:
             with open(CERT_FILE_PATH, "rb") as f:
                 return f.read()
 
-        # Fall back to embedded certificate
-        logger.warning("Using embedded GlobalSign certificate as fallback")
-        return GLOBALSIGN_R3_ROOT_CERT_B64
+        # Check if we have any cached certificate (even if stale)
+        if CERT_FILE_PATH.exists():
+            logger.warning(
+                "Using stale cached GlobalSign certificate - download failed"
+            )
+            with open(CERT_FILE_PATH, "rb") as f:
+                return f.read()
+
+        # No certificate available
+        raise Exception(
+            "No GlobalSign certificate available. "
+            "Unable to download certificate and no cached version found."
+        )
 
     def _download_mds3_blob(self) -> bool:
         """Download the MDS3 blob and save it to local cache"""
@@ -366,13 +329,9 @@ class FIDO2MetadataService:
     def _rebuild_cache(self):
         """Rebuild the metadata cache from custom and MDS3 entries"""
         with self._lock:
-            # Start with custom entries (higher priority)
-            self.metadata_cache = self.custom_entries.copy()
-
-            # Add MDS3 entries (only if not overridden by custom)
-            for aaguid, metadata in self.mds3_entries.items():
-                if aaguid not in self.metadata_cache:
-                    self.metadata_cache[aaguid] = metadata
+            # Start with MDS3 entries (larger set) and override with custom entries (higher priority)
+            # This is more efficient than iterating through the larger MDS3 set
+            self.metadata_cache = {**self.mds3_entries, **self.custom_entries}
 
             logger.info(f"Cache rebuilt with {len(self.metadata_cache)} total entries")
 
