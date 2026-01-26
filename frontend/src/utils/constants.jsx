@@ -105,6 +105,7 @@ export const PAGES = {
   emailOtpValidation: "EmailOtpValidation",
   emailConfirmUpdate: "EmailConfirmUpdate",
   emailUpdateSuccess: "EmailUpdateSuccess",
+  addFido2PasskeyPage: "AddFIDO2PasskeyPage",
 };
 
 export const FOOTERS = {
