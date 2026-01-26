@@ -25,7 +25,7 @@ function PrivateRoute() {
   return <Outlet />;
 }
 
-function StepupPrivateRoute() {
+function StepupPrivateRoute({ redirectPath = "" }) {
   const { state, dispatch } = useUser();
   const { setAuthenticatedPage } = userProfileDispatch(dispatch);
   const { pathname } = useLocation();
@@ -46,10 +46,10 @@ function StepupPrivateRoute() {
     returnToPagePath === pathname;
 
   const performStepupRedirect = useCallback(() => {
-    let redirectUrl = `${OIDC_REDIRECT.reauth}?${returnToPageKey}=${encodeURIComponent(pathname)}`;
+    let redirectUrl = `${OIDC_REDIRECT.reauth}?${returnToPageKey}=${redirectPath ? encodeURIComponent(redirectPath) : encodeURIComponent(pathname)}`;
 
     window.location.href = redirectUrl;
-  }, [pathname, returnToPageKey]);
+  }, [pathname, returnToPageKey, redirectPath]);
 
   const handleAuthenticationSuccess = useCallback(() => {
     console.log(

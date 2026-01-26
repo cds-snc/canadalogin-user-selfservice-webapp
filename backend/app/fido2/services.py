@@ -629,7 +629,7 @@ class FIDO2Service:
             )
 
             # Make the request using admin token for FIDO2 operations
-            url = f"{self.tenant_url.rstrip('/')}/v2.0/factors/fido2/relyingparties/{rp_uuid}{endpoint_path}"
+            url = f"{self.tenant_url}/v2.0/factors/fido2/relyingparties/{rp_uuid}{endpoint_path}"
             headers = get_auth_request_headers(admin_token, json_content_type=True)
 
             response = await http_client.post(url, headers=headers, json=body_to_send)

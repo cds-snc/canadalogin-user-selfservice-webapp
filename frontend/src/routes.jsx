@@ -114,7 +114,9 @@ export const appRoutes = [
                     ],
                   },
                   {
-                    element: <StepupPrivateRoute />,
+                    element: (
+                      <StepupPrivateRoute redirectPath="/en/security-settings/add-fido2/add-fido2-passkey" />
+                    ),
                     children: [
                       {
                         path: "add-fido2/fido2-verification",

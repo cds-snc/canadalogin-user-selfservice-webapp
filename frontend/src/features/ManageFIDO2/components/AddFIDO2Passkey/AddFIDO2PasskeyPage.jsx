@@ -15,6 +15,7 @@ import { getPageContent } from "../../../../utils/functions";
 import { fido2Api } from "../../api/fido2Api";
 import StepContent from "../../../../components/Wizard/StepContent";
 import Loader from "../../../../components/Layout/Loading";
+import AddFIDO2Passkey from "./AddFIDO2Passkey";
 
 export default function AddFIDO2PasskeyPage() {
   // Map URL step parameter to internal wizard steps
@@ -26,6 +27,8 @@ export default function AddFIDO2PasskeyPage() {
         return "otpSelection";
       case "otp-validation":
         return "otpValidation";
+      case "add-fido2-passkey":
+        return "addFido2Passkey";
       default:
         return "passwordVerification";
     }
@@ -42,7 +45,8 @@ export default function AddFIDO2PasskeyPage() {
   const errorMessage = getErrorMessage(language, errorCode);
   const loaderPageContentJson = getPageContent(language, PAGES.otpSelection);
   const [userPasswordValue, setUserPasswordValue] = useState("");
-  const [fido2Data, setFido2Data] = useState(null);
+  const [fido2Data, setFido2Data] = useState([]);
+  console.log("fido2Data", fido2Data);
 
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
     language: language,
@@ -70,11 +74,31 @@ export default function AddFIDO2PasskeyPage() {
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(
     setErrorCode,
     () => {
-      // If there's only one MFA factor, skip OTP selection and go directly to validation
-      if (userPhoneFactors && userPhoneFactors.length === 1) {
-        setWizardStep("otpValidation");
+      if (fido2Data && fido2Data.length > 0) {
+        // Handle case when FIDO2 data exists
+        // Go to access policy OOTB step up
+        navigate(
+          `/${language}/security-settings/add-fido2/fido2-verification`,
+          {
+            replace: true,
+          },
+        );
       } else {
-        setWizardStep("otpSelection");
+        // Handle case when no FIDO2 data exists
+        // If there's only one MFA factor, skip OTP selection and go directly to validation
+        if (userPhoneFactors && userPhoneFactors.length === 1) {
+          setWizardStep("otpValidation");
+          // Navigate to confirmation URL while preserving state
+          navigate(`/${language}/security-settings/add-fido2/otp-validation`, {
+            replace: true,
+          });
+        } else {
+          setWizardStep("otpSelection");
+          // Navigate to confirmation URL while preserving state
+          navigate(`/${language}/security-settings/add-fido2/otp-selection`, {
+            replace: true,
+          });
+        }
       }
     },
   );
@@ -111,7 +135,11 @@ export default function AddFIDO2PasskeyPage() {
     try {
       const response = await authService.transientOtpVerify(userData);
       if (response && response.success) {
-        setWizardStep("addMFANumber");
+        setWizardStep("addFido2Passkey");
+        // Navigate to confirmation URL while preserving state
+        navigate(`/${language}/security-settings/add-fido2/add-fido2-passkey`, {
+          replace: true,
+        });
         setErrorCode("");
       }
     } catch (err) {
@@ -176,7 +204,7 @@ export default function AddFIDO2PasskeyPage() {
         const response = await fido2Api.getUserFIDO2Credentials();
 
         if (response && response.authenticated) {
-          setFido2Data(response);
+          setFido2Data(response.credentials);
         }
       } catch (error) {
         if (error && error.data && error.data.message) {
@@ -200,7 +228,7 @@ export default function AddFIDO2PasskeyPage() {
         validatePassword={validatePassword}
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
-        parentPage={PAGES.addMFAPage}
+        parentPage={PAGES.addFido2Passkey}
       />
     ),
     otpSelection: (
@@ -212,8 +240,11 @@ export default function AddFIDO2PasskeyPage() {
         userSelectedMfaFactor={userSelectedMfaFactor}
         onNext={() => {
           setWizardStep("otpValidation");
+          navigate(`/${language}/security-settings/add-fido2/otp-validation`, {
+            replace: true,
+          });
         }}
-        parentPage={PAGES.addMFAPage}
+        parentPage={PAGES.addFido2Passkey}
         onCancel={async () => navigate(backToManage2FAVerificationsPage)}
       />
     ),
@@ -230,8 +261,17 @@ export default function AddFIDO2PasskeyPage() {
           // Otherwise, go back to OTP selection
           if (userPhoneFactors && userPhoneFactors.length === 1) {
             setWizardStep("passwordVerification");
+            navigate(
+              `/${language}/security-settings/add-fido2/password-verification`,
+              {
+                replace: true,
+              },
+            );
           } else {
             setWizardStep("otpSelection");
+            navigate(`/${language}/security-settings/add-fido2/otp-selection`, {
+              replace: true,
+            });
           }
         }}
         setErrorCode={setErrorCode}
@@ -240,6 +280,7 @@ export default function AddFIDO2PasskeyPage() {
         showTryAnotherWay={userPhoneFactors && userPhoneFactors.length > 1}
       />
     ),
+    addFido2Passkey: <AddFIDO2Passkey />,
   };
   return localLoading || validatePasswordLoading ? (
     <Loader text={loaderPageContentJson["11"]} />

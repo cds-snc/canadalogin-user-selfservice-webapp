@@ -32,10 +32,6 @@ export default function SecuritySettings() {
     language: language,
   });
 
-  const addFIDO2Page = path(PAGES.addFido2PasskeyPage, {
-    language: language,
-  });
-
   return (
     <GcdsContainer role="main">
       <GcdsHeading tag="h1">{pageContent["1"]}</GcdsHeading>
@@ -64,9 +60,6 @@ export default function SecuritySettings() {
             {pageContent["10"]}
           </GcdsLink>
         </GcdsGrid>
-        <GcdsLink href={addFIDO2Page} size="regular">
-          {pageContent["11"]}
-        </GcdsLink>
       </GcdsContainer>
     </GcdsContainer>
   );
