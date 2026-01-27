@@ -59,6 +59,10 @@ vi.mock("../../../../utils/constants.jsx", () => ({
     manage2FAVerifications: "Manage2FAVerifications",
     securitySettings: "SecuritySettings",
   },
+  VITE_ENVIRONMENTS: {
+    dev: "development",
+    test: "test",
+  },
 }));
 
 vi.mock("../../../../utils/routeHelpers.js", () => ({
@@ -78,6 +82,7 @@ vi.mock("../../../../features/TransientOtp/api/otpFactors.jsx", () => ({
 
 // Import the mocked module
 import { otpFactors } from "../../../../features/TransientOtp/api/otpFactors.jsx";
+import { VITE_ENVIRONMENTS } from "../../../../utils/constants.jsx";
 
 describe("Manage2FAVerifications Component Unit Tests", () => {
   beforeEach(() => {
