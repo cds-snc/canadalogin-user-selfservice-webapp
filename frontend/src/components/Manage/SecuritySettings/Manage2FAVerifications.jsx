@@ -9,12 +9,13 @@ import {
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router";
 import { otpFactors } from "../../../features/TransientOtp/api/otpFactors.jsx";
-import { PAGES } from "../../../utils/constants.jsx";
+import { PAGES, VITE_ENVIRONMENTS } from "../../../utils/constants.jsx";
 import { getPageContent } from "../../../utils/functions.jsx";
 import { path } from "../../../utils/routeHelpers.js";
 import Loader from "../../Layout/Loading.jsx";
 import { useUser } from "../../Providers/useUser.js";
 import NoticeFactory from "../../InfoBlocks/NoticeFactory.jsx";
+import config from "../../../config.jsx";
 
 export default function Manage2FAVerifications() {
   const { language } = useParams();
@@ -25,11 +26,14 @@ export default function Manage2FAVerifications() {
   const [userPhoneFactorsMap, setUserPhoneFactorsMap] = useState({});
   const [loading, setLoading] = useState(true);
 
+  // Only show add passkey link in dev and test environments
+  const showAddPasskeyLink =
+    config.environment === VITE_ENVIRONMENTS.dev ||
+    config.environment === VITE_ENVIRONMENTS.test;
+
   // Check if we came from another page and need to render success notice
   const { noticeType, phoneNumber, otpType, passkeyName } =
     location.state || {};
-  console.log("noticeType", noticeType);
-  console.log("passkeyName", passkeyName);
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
     language: language,
   });
@@ -182,15 +186,17 @@ export default function Manage2FAVerifications() {
         </GcdsButton>
       </GcdsContainer>
 
-      <GcdsButton
-        id="add-fido2-button"
-        onGcdsClick={(ev) => {
-          ev.preventDefault();
-          navigate(addFido2PagePath);
-        }}
-      >
-        {pageContent["12"]}
-      </GcdsButton>
+      {showAddPasskeyLink && (
+        <GcdsButton
+          id="add-fido2-button"
+          onGcdsClick={(ev) => {
+            ev.preventDefault();
+            navigate(addFido2PagePath);
+          }}
+        >
+          {pageContent["12"]}
+        </GcdsButton>
+      )}
     </GcdsContainer>
   );
 }
