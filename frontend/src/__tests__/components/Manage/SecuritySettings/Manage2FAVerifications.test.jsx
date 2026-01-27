@@ -82,7 +82,6 @@ vi.mock("../../../../features/TransientOtp/api/otpFactors.jsx", () => ({
 
 // Import the mocked module
 import { otpFactors } from "../../../../features/TransientOtp/api/otpFactors.jsx";
-import { VITE_ENVIRONMENTS } from "../../../../utils/constants.jsx";
 
 describe("Manage2FAVerifications Component Unit Tests", () => {
   beforeEach(() => {
