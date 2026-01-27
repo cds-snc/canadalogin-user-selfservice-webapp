@@ -7,9 +7,8 @@ import {
   GcdsText,
 } from "@cdssnc/gcds-components-react";
 import { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 import { otpFactors } from "../../../features/TransientOtp/api/otpFactors.jsx";
-import { useNavigateHelper } from "../../../hooks/useNavigate.js";
 import { PAGES } from "../../../utils/constants.jsx";
 import { getPageContent } from "../../../utils/functions.jsx";
 import { path } from "../../../utils/routeHelpers.js";
@@ -21,16 +20,20 @@ export default function Manage2FAVerifications() {
   const { language } = useParams();
   const location = useLocation();
   const pageContent = getPageContent(language, PAGES.manage2FAVerifications);
-  const navigateHelper = useNavigateHelper();
+  const navigate = useNavigate();
   const { state, _dispatch } = useUser();
   const [userPhoneFactorsMap, setUserPhoneFactorsMap] = useState({});
   const [loading, setLoading] = useState(true);
 
   // Check if we came from another page and need to render success notice
-  const { noticeType, phoneNumber, otpType } = location.state || {};
+  const { noticeType, phoneNumber, otpType, passkeyName } =
+    location.state || {};
+  console.log("noticeType", noticeType);
+  console.log("passkeyName", passkeyName);
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
     language: language,
   });
+  const addFido2PagePath = path(PAGES.addFido2PasskeyPage, { language });
 
   const availableFactorsUIContentMap = {
     smsotp: pageContent["7"],
@@ -64,7 +67,7 @@ export default function Manage2FAVerifications() {
           }, {});
           setUserPhoneFactorsMap(userPhoneFactorsMap);
         } else {
-          navigateHelper(backToSecuritySettingsPage);
+          navigate(backToSecuritySettingsPage);
         }
       } catch (err) {
         console.error("err", err);
@@ -98,10 +101,12 @@ export default function Manage2FAVerifications() {
               size="regular"
               onGcdsClick={(ev) => {
                 ev.preventDefault();
-                navigateHelper(path(PAGES.deleteMFAPage, { language }), false, {
-                  phoneNumber: phoneNumber,
-                  factorIds: factors.map((factor) => factor.id),
-                  formattedPhoneNumber: `+1 ${phoneNumber}`,
+                navigate(path(PAGES.deleteMFAPage, { language }), {
+                  state: {
+                    phoneNumber: phoneNumber,
+                    factorIds: factors.map((factor) => factor.id),
+                    formattedPhoneNumber: `+1 ${phoneNumber}`,
+                  },
                 });
               }}
             >
@@ -123,6 +128,7 @@ export default function Manage2FAVerifications() {
           noticeType={noticeType}
           phoneNumber={phoneNumber}
           otpType={otpType}
+          passkeyName={passkeyName}
         />
       )}
 
@@ -169,12 +175,22 @@ export default function Manage2FAVerifications() {
           id="add-mfa-button"
           onGcdsClick={(ev) => {
             ev.preventDefault();
-            navigateHelper(path(PAGES.addMFAPage, { language }));
+            navigate(path(PAGES.addMFAPage, { language }));
           }}
         >
           {pageContent["10"]}
         </GcdsButton>
       </GcdsContainer>
+
+      <GcdsButton
+        id="add-fido2-button"
+        onGcdsClick={(ev) => {
+          ev.preventDefault();
+          navigate(addFido2PagePath);
+        }}
+      >
+        {pageContent["12"]}
+      </GcdsButton>
     </GcdsContainer>
   );
 }

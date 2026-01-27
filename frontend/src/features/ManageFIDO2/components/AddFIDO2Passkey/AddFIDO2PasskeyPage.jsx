@@ -2,7 +2,7 @@ import { useLocation, useNavigate, useParams } from "react-router";
 import { useUser } from "../../../../components/Providers/useUser";
 import { useEffect, useRef, useState } from "react";
 import { path } from "../../../../utils/routeHelpers";
-import { FLOW_TYPES, PAGES, serverMapping } from "../../../../utils/constants";
+import { PAGES, serverMapping } from "../../../../utils/constants";
 import { getErrorMessage } from "../../../../utils/errorUtils";
 import { useOtpOperations } from "../../../../hooks/useOtpOperations";
 import { otpFactors } from "../../../TransientOtp/api/otpFactors";
@@ -46,7 +46,6 @@ export default function AddFIDO2PasskeyPage() {
   const loaderPageContentJson = getPageContent(language, PAGES.otpSelection);
   const [userPasswordValue, setUserPasswordValue] = useState("");
   const [fido2Data, setFido2Data] = useState([]);
-  console.log("fido2Data", fido2Data);
 
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
     language: language,
@@ -280,7 +279,13 @@ export default function AddFIDO2PasskeyPage() {
         showTryAnotherWay={userPhoneFactors && userPhoneFactors.length > 1}
       />
     ),
-    addFido2Passkey: <AddFIDO2Passkey />,
+    addFido2Passkey: (
+      <AddFIDO2Passkey
+        setErrorCode={setErrorCode}
+        errorMessage={errorMessage}
+        onCancel={async () => navigate(backToManage2FAVerificationsPage)}
+      />
+    ),
   };
   return localLoading || validatePasswordLoading ? (
     <Loader text={loaderPageContentJson["11"]} />

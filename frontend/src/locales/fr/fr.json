@@ -43,7 +43,10 @@
     "CSIBN0021E": "Le code de vérification n'est pas valide.",
     "CSIBH0044E": "L’adresse courriel et le mot de passe ne correspondent pas.",
     "CSIAI0369E": "We could not validate this password. Try again.",
-    "CSIAI0370E": "This password is too easy to guess. Choose a stronger password."
+    "CSIAI0370E": "This password is too easy to guess. Choose a stronger password.",
+    "error_webauthn_not_supported": "WebAuthn is not supported by your browser",
+    "error_failed_to_get_attestation_options": "Failed to get attestation options",
+    "error_duplicate_passkey": "The user attempted to register an authenticator that contains one of the credentials already registered with the relying party."
   },
   "RegisterVerification": {
     "1": "Protégez votre compte avec la vérification en deux étapes",
@@ -188,13 +191,6 @@
     "8": "répertoire des comptes du GC.",
     "12": "Déconnexion en cours...",
     "13": "Échec de la déconnexion. Redirection..."
-  },
-  "FirstVerifyItsYou": {
-    "1": "Vérifiez d'abord qu'il s'agit bien de vous",
-    "2": "Pour modifier votre adresse e-mail, saisissez d'abord votre mot de passe actuel.",
-    "3": "Mot de passe",
-    "4": "Continuer",
-    "5": "Annuler"
   },
   "ProfileUpdateName": {
     "2": "Prénom",
@@ -396,7 +392,8 @@
     "8": "Appel vocal",
     "9": "Supprimer",
     "10": "+ Ajouter un numéro de téléphone",
-    "11": "Chargement..."
+    "11": "Chargement...",
+    "12": "+ Add a passkey"
   },
   "AddMFANumber": {
     "1": "Entrez votre nouveau numéro de téléphone",
@@ -475,7 +472,8 @@
     "3": "Vous avez ajouté l’option de vérification par",
     "4": "pour le numéro",
     "5": "appel vocal",
-    "6": "message texte"
+    "6": "message texte",
+    "7": "for passkey verification"
   },
   "PasswordVerification": {
     "1": "Veuillez vous authentifier",
@@ -525,5 +523,14 @@
     "7": ".",
     "8": "Back to profile",
     "9": "Sign out"
+  },
+  "AddFIDO2Passkey": {
+    "1": "Add a new passkey",
+    "2": "Give your security key a name to help you identify it later.",
+    "3": "Passkey name",
+    "4": "e.g., My YubiKey",
+    "5": "Registering...",
+    "6": "Register",
+    "7": "Add a new passkey you want to use for verification each time you sign in."
   }
 }

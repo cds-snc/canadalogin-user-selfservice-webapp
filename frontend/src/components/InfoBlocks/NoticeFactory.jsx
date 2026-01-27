@@ -3,7 +3,12 @@ import { getPageContent } from "../../utils/functions";
 import { PAGES } from "../../utils/constants";
 import { useParams } from "react-router";
 
-export default function NoticeFactory({ noticeType, phoneNumber, otpType }) {
+export default function NoticeFactory({
+  noticeType,
+  phoneNumber,
+  otpType,
+  passkeyName,
+}) {
   const { language } = useParams();
   const successBannerJson = getPageContent(language, PAGES.successBanner);
 
@@ -33,6 +38,17 @@ export default function NoticeFactory({ noticeType, phoneNumber, otpType }) {
         </GcdsNotice>
       </GcdsText>
     ),
+
+    passkeyAdded: ({ passkeyName }) => (
+      <GcdsText>
+        <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={" "}>
+          <GcdsText>
+            {successBannerJson["3"]} <strong>{passkeyName}</strong>{" "}
+            {successBannerJson["7"]}
+          </GcdsText>
+        </GcdsNotice>
+      </GcdsText>
+    ),
   };
 
   // Handle invalid noticeType gracefully
@@ -41,5 +57,5 @@ export default function NoticeFactory({ noticeType, phoneNumber, otpType }) {
     return null;
   }
 
-  return NoticeComponent({ phoneNumber, otpType });
+  return NoticeComponent({ phoneNumber, otpType, passkeyName });
 }
