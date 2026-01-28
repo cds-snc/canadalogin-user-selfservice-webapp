@@ -43,12 +43,14 @@ export default function PasswordVerification({
   const passwordPageContentJson = getPageContent(language, PAGES.password);
 
   const { cancel } = getPageContent(language, "Button");
-  const parentPageContent =
-    parentPage === PAGES.deleteMFAPage
-      ? pageContentJson["8"]
-      : parentPage === PAGES.addMFAPage
-        ? pageContentJson["7"]
-        : pageContentJson["2"];
+
+  const pageContentMap = {
+    [PAGES.deleteMFAPage]: pageContentJson["8"],
+    [PAGES.addMFAPage]: pageContentJson["7"],
+    [PAGES.addFido2Passkey]: pageContentJson["9"],
+  };
+
+  const parentPageContent = pageContentMap[parentPage] || pageContentJson["2"];
 
   const optionsValues = [
     {

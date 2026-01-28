@@ -201,9 +201,8 @@ export default function AddFIDO2PasskeyPage() {
 
       try {
         const response = await fido2Api.getUserFIDO2Credentials();
-
-        if (response && response.authenticated) {
-          setFido2Data(response.credentials);
+        if (response && response?.data?.authenticated) {
+          setFido2Data(response?.data?.credentials || []);
         }
       } catch (error) {
         if (error && error.data && error.data.message) {

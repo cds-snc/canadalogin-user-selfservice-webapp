@@ -10,10 +10,13 @@ from app.fido2.services import FIDO2Service
 from app.fido2.schemas import (
     FIDO2CredentialSummary,
     FIDO2UserResponse,
-    FIDO2RegistrationResponse,
+    FIDO2UserResponseModel,
+    FIDO2RegistrationResponseModel,
+    FIDO2CredentialsResponseModel,
     DeleteRegistrationRequest,
     UpdateRegistrationRequest,
 )
+from app.utils.schemas import ResponseModel
 
 
 class TestFIDO2Service:
@@ -224,38 +227,50 @@ class TestFIDO2Service:
             patch("app.fido2.services.get_admin_token", return_value="test-token"),
         ):
 
-            credentials = await fido2_service.get_user_fido2_registrations(
+            credentials_response = await fido2_service.get_user_fido2_registrations(
                 mock_http_client, "testuser"
             )
 
-            assert len(credentials) == 1
-            assert credentials[0].id == "reg-1"
-            assert credentials[0].nickname == "Test Device"
-            assert credentials[0].enabled is True
+            assert isinstance(credentials_response, FIDO2CredentialsResponseModel)
+            assert credentials_response.success is True
+            assert len(credentials_response.data) == 1
+            assert credentials_response.data[0].id == "reg-1"
+            assert credentials_response.data[0].nickname == "Test Device"
+            assert credentials_response.data[0].enabled is True
 
     @pytest.mark.asyncio
     async def test_get_user_response_success(self, fido2_service, mock_http_client):
         """Test successful user response generation"""
-        mock_credentials = [
-            FIDO2CredentialSummary(
-                id="reg-1", nickname="Test Device", enabled=True, credentialId="cred-1"
-            )
-        ]
+        mock_credentials_response = FIDO2CredentialsResponseModel(
+            success=True,
+            data=[
+                FIDO2CredentialSummary(
+                    id="reg-1",
+                    nickname="Test Device",
+                    enabled=True,
+                    credentialId="cred-1",
+                )
+            ],
+            message="Success",
+        )
 
         with patch.object(
-            fido2_service, "get_user_fido2_registrations", return_value=mock_credentials
+            fido2_service,
+            "get_user_fido2_registrations",
+            return_value=mock_credentials_response,
         ):
             user_response = await fido2_service.get_user_response(
                 mock_http_client, "testuser"
             )
 
-            assert isinstance(user_response, FIDO2UserResponse)
-            assert user_response.authenticated is True
+            assert isinstance(user_response, FIDO2UserResponseModel)
+            assert user_response.success is True
+            assert user_response.data.authenticated is True
             assert (
-                user_response.username is None
+                user_response.data.username is None
             )  # Username is intentionally None in the service implementation
-            assert len(user_response.credentials) == 1
-            assert user_response.credentials[0].id == "reg-1"
+            assert len(user_response.data.credentials) == 1
+            assert user_response.data.credentials[0].id == "reg-1"
 
     @pytest.mark.asyncio
     async def test_get_user_profile_info_success(self, fido2_service, mock_http_client):
@@ -327,15 +342,18 @@ class TestFIDO2Service:
         mock_http_client.get = AsyncMock(return_value=mock_registration_response)
 
         with patch("app.fido2.services.get_admin_token", return_value="admin-token"):
-            registration = await fido2_service.get_registration_details(
+            registration_response = await fido2_service.get_registration_details(
                 mock_http_client, "user-token", "reg-1"
             )
 
-            assert isinstance(registration, FIDO2RegistrationResponse)
-            assert registration.id == "reg-1"
-            assert registration.userId == "user-id-123"
-            assert registration.enabled is True
-            assert registration.attributes["transactions"] == []  # Added by service
+            assert isinstance(registration_response, FIDO2RegistrationResponseModel)
+            assert registration_response.success is True
+            assert registration_response.data.id == "reg-1"
+            assert registration_response.data.userId == "user-id-123"
+            assert registration_response.data.enabled is True
+            assert (
+                registration_response.data.attributes["transactions"] == []
+            )  # Added by service
 
     @pytest.mark.asyncio
     async def test_get_registration_details_ownership_violation(
@@ -912,8 +930,10 @@ class TestFIDO2Service:
                 {"challenge": "test"},
             )
 
-            assert result["success"] is True
-            assert result["data"] == "test-result"
+            assert isinstance(result, ResponseModel)
+            assert result.success is True
+            assert result.data["success"] is True
+            assert result.data["data"] == "test-result"
 
     @pytest.mark.asyncio
     async def test_proxy_fido2_request_error(self, fido2_service, mock_http_client):
@@ -1044,8 +1064,10 @@ class TestFIDO2Service:
                 mock_http_client, {"assertion": "test-assertion"}
             )
 
-            assert isinstance(result, FIDO2UserResponse)
-            assert result.authenticated is True
+            assert isinstance(result, FIDO2UserResponseModel)
+            assert result.success is True
+            assert result.data.authenticated is True
+            assert result.data.username == "testuser"
 
     @pytest.mark.asyncio
     async def test_validate_fido2_login_assertion_failed(

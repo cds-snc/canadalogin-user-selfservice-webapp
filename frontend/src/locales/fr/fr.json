@@ -46,7 +46,8 @@
     "CSIAI0370E": "This password is too easy to guess. Choose a stronger password.",
     "error_webauthn_not_supported": "WebAuthn is not supported by your browser",
     "error_failed_to_get_attestation_options": "Failed to get attestation options",
-    "error_duplicate_passkey": "The user attempted to register an authenticator that contains one of the credentials already registered with the relying party."
+    "error_duplicate_passkey": "The user attempted to register an authenticator that contains one of the credentials already registered with the relying party.",
+    "error_passkey_name_required": "Passkey name required."
   },
   "RegisterVerification": {
     "1": "Protégez votre compte avec la vérification en deux étapes",
@@ -483,7 +484,8 @@
     "5": "Mot de passe oublié?",
     "6": "Réinitialiser le mot de passe",
     "7": "Pour ajouter un numéro de téléphone,",
-    "8": "Pour supprimer un numéro de téléphone,"
+    "8": "Pour supprimer un numéro de téléphone,",
+    "9": "To add a passkey,"
   },
   "EditEmailEnterEmail": {
     "1": "Enter a new email address",

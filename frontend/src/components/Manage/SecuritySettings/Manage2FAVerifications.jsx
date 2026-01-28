@@ -16,6 +16,7 @@ import Loader from "../../Layout/Loading.jsx";
 import { useUser } from "../../Providers/useUser.js";
 import NoticeFactory from "../../InfoBlocks/NoticeFactory.jsx";
 import config from "../../../config.jsx";
+import PhoneFactorsList from "./PhoneFactorsList.jsx";
 
 export default function Manage2FAVerifications() {
   const { language } = useParams();
@@ -38,13 +39,6 @@ export default function Manage2FAVerifications() {
     language: language,
   });
   const addFido2PagePath = path(PAGES.addFido2PasskeyPage, { language });
-
-  const availableFactorsUIContentMap = {
-    smsotp: pageContent["7"],
-    voiceotp: pageContent["8"],
-  };
-  const availableFactorsUIContent = (factor) =>
-    availableFactorsUIContentMap[factor] || factor;
 
   useEffect(() => {
     const fetchUserOtpPhoneFactors = async () => {
@@ -83,45 +77,6 @@ export default function Manage2FAVerifications() {
     fetchUserOtpPhoneFactors();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const phoneFactorsComponent = Object.entries(userPhoneFactorsMap).map(
-    ([phoneNumber, factors], index) => {
-      const availableFactorsComponent = factors?.map((factor, idx) => {
-        return (
-          <li key={idx}>
-            <GcdsText>{availableFactorsUIContent(factor.type)}</GcdsText>
-          </li>
-        );
-      });
-      return (
-        <GcdsContainer key={index}>
-          <GcdsText>
-            <strong>{`${phoneNumber}`}</strong>
-          </GcdsText>
-          <GcdsText>{pageContent["6"]}</GcdsText>
-          <ul>{availableFactorsComponent}</ul>
-          {Object.keys(userPhoneFactorsMap).length > 1 && (
-            <GcdsLink
-              href={path(PAGES.deleteMFAPage, { language })}
-              size="regular"
-              onGcdsClick={(ev) => {
-                ev.preventDefault();
-                navigate(path(PAGES.deleteMFAPage, { language }), {
-                  state: {
-                    phoneNumber: phoneNumber,
-                    factorIds: factors.map((factor) => factor.id),
-                    formattedPhoneNumber: `+1 ${phoneNumber}`,
-                  },
-                });
-              }}
-            >
-              {pageContent["9"]}
-            </GcdsLink>
-          )}
-          <div className="separator" />
-        </GcdsContainer>
-      );
-    },
-  );
 
   return loading ? (
     <Loader text={pageContent["11"]} />
@@ -174,7 +129,7 @@ export default function Manage2FAVerifications() {
             {pageContent["5"]}
           </div>
         </GcdsHeading>
-        {phoneFactorsComponent}
+        <PhoneFactorsList userPhoneFactorsMap={userPhoneFactorsMap} />
         <GcdsButton
           id="add-mfa-button"
           onGcdsClick={(ev) => {

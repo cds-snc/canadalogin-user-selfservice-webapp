@@ -44,22 +44,27 @@ export default function AddFIDO2Passkey({
       return;
     }
 
+    if (!newDeviceName || newDeviceName.trim() === "") {
+      setErrorCode(errorPageContent["error_passkey_name_required"]);
+      return;
+    }
+
     setRegistrationLoading(true);
     setErrorCode(null);
 
     try {
       // Step 1: Get attestation options from server
-      const attestationOptions = await fido2Api.getAttestationOptions({
-        attestation: "direct",
-        requireResidentKey: false,
-        userVerification: "preferred",
-      });
+      const attestationResponse = await fido2Api.getAttestationOptions();
 
-      if (!attestationOptions || attestationOptions.status !== "ok") {
+      if (!attestationResponse?.success || !attestationResponse?.data) {
         setErrorCode(
           errorPageContent["error_failed_to_get_attestation_options"],
         );
+        return;
       }
+
+      // Extract the actual attestation options from the response
+      const attestationOptions = attestationResponse.data;
 
       // Step 2: Use WebAuthn API to create credential
       const attestationResult = await registerFIDO2Credential(
@@ -71,7 +76,7 @@ export default function AddFIDO2Passkey({
       const response =
         await fido2Api.submitAttestationResult(attestationResult);
 
-      if (response && response.status === "ok") {
+      if (response && response.success) {
         navigate(backToManage2FAVerificationsPage, {
           state: {
             noticeType: NOTICE_TYPES.passkeyAdded,
@@ -84,7 +89,6 @@ export default function AddFIDO2Passkey({
       }
     } catch (err) {
       if (err instanceof DOMException && err.name === "InvalidStateError") {
-        console.log("here");
         setErrorCode("error_duplicate_passkey");
       } else {
         setErrorCode(
@@ -121,6 +125,7 @@ export default function AddFIDO2Passkey({
           value={newDeviceName}
           onGcdsInput={(e) => setNewDeviceName(e.target.value)}
           placeholder={pageContent["4"]}
+          required={true}
         />
       </form>
 
