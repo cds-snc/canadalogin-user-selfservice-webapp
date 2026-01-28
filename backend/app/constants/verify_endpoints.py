@@ -11,3 +11,12 @@ class VerifyAPIEndpoint(str, Enum):
     PASSWORDPOLICY = "/v2.0/PasswordPolicies"
     END_SESSION_ENDPOINT = "/oauth2/rplogout"
     VERIFY_PASSWORD = "/v1.0/authnmethods/password"
+
+    # FIDO2 Endpoints
+    FIDO2_RELYING_PARTIES = "/config/v2.0/factors/fido2/relyingparties"
+    FIDO2_REGISTRATIONS = "/v2.0/factors/fido2/registrations"
+    FIDO2_RP_BASE = "/v2.0/factors/fido2/relyingparties"
+
+    # User Management Endpoints
+    USERS = "/v2.0/Users"
+    USERINFO = "/v1.0/endpoint/default/userinfo"
