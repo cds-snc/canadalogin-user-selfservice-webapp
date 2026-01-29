@@ -86,22 +86,6 @@ class FIDO2AttestationResultRequest(BaseModel):
     getTransports: Optional[List[str]] = None
 
 
-class FIDO2AssertionOptionsRequest(BaseModel):
-    """Request model for FIDO2 assertion options"""
-
-    userVerification: str = "preferred"
-    attestation: Optional[str] = "none"
-
-
-class FIDO2AssertionResultRequest(BaseModel):
-    """Request model for FIDO2 assertion result"""
-
-    id: str
-    rawId: str
-    type: str
-    response: Dict[str, Any]
-
-
 class FIDO2ServerResponse(BaseModel):
     """Standard FIDO2 server response"""
 

@@ -34,16 +34,7 @@ class TestDeleteRegistration:
         mock_data.id = "registration-123"
         return mock_data
 
-    @pytest.fixture
-    def mock_user_response(self):
-        """Create a mock FIDO2 user response"""
-        return MagicMock(
-            registrations=[],
-            user_id="user-456",
-        )
-
     @pytest.mark.asyncio
-    @patch.object(delete_module, "get_user_response")
     @patch.object(delete_module, "get_auth_request_headers")
     @patch.object(delete_module, "verify_registration_ownership")
     @patch.object(delete_module, "get_admin_token")
@@ -56,12 +47,10 @@ class TestDeleteRegistration:
         mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_get_auth_request_headers,
-        mock_get_user_response,
         mock_http_client,
         mock_request_data,
-        mock_user_response,
     ):
-        """Should successfully delete a registration and return updated user response"""
+        """Should successfully delete a registration and return ResponseModel"""
         # Setup mocks
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
         mock_get_user_id_from_token.return_value = "user-456"
@@ -72,10 +61,10 @@ class TestDeleteRegistration:
         mock_get_auth_request_headers.return_value = {
             "Authorization": "Bearer admin-token-xyz"
         }
-        mock_get_user_response.return_value = mock_user_response
 
-        # Setup HTTP client mock for delete
+        # Setup HTTP client mock for delete (204 No Content)
         mock_delete_response = MagicMock()
+        mock_delete_response.status_code = 204
         mock_delete_response.raise_for_status = MagicMock()
         mock_http_client.delete = AsyncMock(return_value=mock_delete_response)
 
@@ -87,7 +76,8 @@ class TestDeleteRegistration:
         )
 
         # Verify
-        assert result == mock_user_response
+        assert result.success is True
+        assert result.message == "FIDO2 registration deleted successfully"
         mock_get_tenant_url.assert_called_once()
         mock_get_user_id_from_token.assert_called_once_with(
             mock_http_client, "user-token-abc"
@@ -97,12 +87,8 @@ class TestDeleteRegistration:
             mock_http_client, "admin-token-xyz", "registration-123", "user-456"
         )
         mock_http_client.delete.assert_called_once()
-        mock_get_user_response.assert_called_once_with(
-            mock_http_client, "user-token-abc"
-        )
 
     @pytest.mark.asyncio
-    @patch.object(delete_module, "get_user_response")
     @patch.object(delete_module, "get_auth_request_headers")
     @patch.object(delete_module, "verify_registration_ownership")
     @patch.object(delete_module, "get_admin_token")
@@ -115,7 +101,6 @@ class TestDeleteRegistration:
         mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_get_auth_request_headers,
-        mock_get_user_response,
         mock_http_client,
         mock_request_data,
     ):
@@ -126,9 +111,9 @@ class TestDeleteRegistration:
         mock_get_auth_request_headers.return_value = {
             "Authorization": "Bearer admin-token-xyz"
         }
-        mock_get_user_response.return_value = MagicMock()
 
         mock_delete_response = MagicMock()
+        mock_delete_response.status_code = 204
         mock_delete_response.raise_for_status = MagicMock()
         mock_http_client.delete = AsyncMock(return_value=mock_delete_response)
 
@@ -291,52 +276,6 @@ class TestDeleteRegistration:
         mock_request_error_handler.handle.assert_called_once()
 
     @pytest.mark.asyncio
-    @patch.object(delete_module, "RequestErrorHandler")
-    @patch.object(delete_module, "get_user_response")
-    @patch.object(delete_module, "get_auth_request_headers")
-    @patch.object(delete_module, "verify_registration_ownership")
-    @patch.object(delete_module, "get_admin_token")
-    @patch.object(delete_module, "get_user_id_from_token")
-    @patch.object(delete_module, "get_tenant_url")
-    async def test_handles_get_user_response_error(
-        self,
-        mock_get_tenant_url,
-        mock_get_user_id_from_token,
-        mock_get_admin_token,
-        mock_verify_registration_ownership,
-        mock_get_auth_request_headers,
-        mock_get_user_response,
-        mock_request_error_handler,
-        mock_http_client,
-        mock_request_data,
-    ):
-        """Should handle error when getting updated user response fails"""
-        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
-        mock_get_user_id_from_token.return_value = "user-456"
-        mock_get_admin_token.return_value = "admin-token-xyz"
-        mock_get_auth_request_headers.return_value = {
-            "Authorization": "Bearer admin-token-xyz"
-        }
-
-        mock_delete_response = MagicMock()
-        mock_delete_response.raise_for_status = MagicMock()
-        mock_http_client.delete = AsyncMock(return_value=mock_delete_response)
-
-        mock_get_user_response.side_effect = HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to fetch user response",
-        )
-
-        await delete_registration(
-            http_client=mock_http_client,
-            user_access_token="user-token-abc",
-            request_data=mock_request_data,
-        )
-
-        mock_request_error_handler.handle.assert_called_once()
-
-    @pytest.mark.asyncio
-    @patch.object(delete_module, "get_user_response")
     @patch.object(delete_module, "get_auth_request_headers")
     @patch.object(delete_module, "verify_registration_ownership")
     @patch.object(delete_module, "get_admin_token")
@@ -349,7 +288,6 @@ class TestDeleteRegistration:
         mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_get_auth_request_headers,
-        mock_get_user_response,
         mock_http_client,
         mock_request_data,
     ):
@@ -362,9 +300,9 @@ class TestDeleteRegistration:
             "Content-Type": "application/json",
         }
         mock_get_auth_request_headers.return_value = expected_headers
-        mock_get_user_response.return_value = MagicMock()
 
         mock_delete_response = MagicMock()
+        mock_delete_response.status_code = 204
         mock_delete_response.raise_for_status = MagicMock()
         mock_http_client.delete = AsyncMock(return_value=mock_delete_response)
 
@@ -406,24 +344,22 @@ class TestDeleteRegistration:
         assert "Unexpected error" in str(error_arg)
 
     @pytest.mark.asyncio
-    @patch.object(delete_module, "get_user_response")
     @patch.object(delete_module, "get_auth_request_headers")
     @patch.object(delete_module, "verify_registration_ownership")
     @patch.object(delete_module, "get_admin_token")
     @patch.object(delete_module, "get_user_id_from_token")
     @patch.object(delete_module, "get_tenant_url")
-    async def test_uses_user_access_token_for_user_id_and_response(
+    async def test_uses_user_access_token_for_user_id(
         self,
         mock_get_tenant_url,
         mock_get_user_id_from_token,
         mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_get_auth_request_headers,
-        mock_get_user_response,
         mock_http_client,
         mock_request_data,
     ):
-        """Should use user access token for both getting user ID and final response"""
+        """Should use user access token for getting user ID"""
         user_token = "specific-user-token"
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
         mock_get_user_id_from_token.return_value = "user-456"
@@ -431,9 +367,9 @@ class TestDeleteRegistration:
         mock_get_auth_request_headers.return_value = {
             "Authorization": "Bearer admin-token-xyz"
         }
-        mock_get_user_response.return_value = MagicMock()
 
         mock_delete_response = MagicMock()
+        mock_delete_response.status_code = 204
         mock_delete_response.raise_for_status = MagicMock()
         mock_http_client.delete = AsyncMock(return_value=mock_delete_response)
 
@@ -443,14 +379,12 @@ class TestDeleteRegistration:
             request_data=mock_request_data,
         )
 
-        # Verify user token is used for both calls
+        # Verify user token is used for getting user ID
         mock_get_user_id_from_token.assert_called_once_with(
             mock_http_client, user_token
         )
-        mock_get_user_response.assert_called_once_with(mock_http_client, user_token)
 
     @pytest.mark.asyncio
-    @patch.object(delete_module, "get_user_response")
     @patch.object(delete_module, "get_auth_request_headers")
     @patch.object(delete_module, "verify_registration_ownership")
     @patch.object(delete_module, "get_admin_token")
@@ -463,7 +397,6 @@ class TestDeleteRegistration:
         mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_get_auth_request_headers,
-        mock_get_user_response,
         mock_http_client,
     ):
         """Should handle different registration ID formats"""
@@ -473,9 +406,9 @@ class TestDeleteRegistration:
         mock_get_auth_request_headers.return_value = {
             "Authorization": "Bearer admin-token-xyz"
         }
-        mock_get_user_response.return_value = MagicMock()
 
         mock_delete_response = MagicMock()
+        mock_delete_response.status_code = 204
         mock_delete_response.raise_for_status = MagicMock()
         mock_http_client.delete = AsyncMock(return_value=mock_delete_response)
 
@@ -539,3 +472,43 @@ class TestDeleteRegistration:
         mock_request_error_handler.handle.assert_called_once()
         error_arg = mock_request_error_handler.handle.call_args[0][0]
         assert isinstance(error_arg, ConnectionError)
+
+    @pytest.mark.asyncio
+    @patch.object(delete_module, "get_auth_request_headers")
+    @patch.object(delete_module, "verify_registration_ownership")
+    @patch.object(delete_module, "get_admin_token")
+    @patch.object(delete_module, "get_user_id_from_token")
+    @patch.object(delete_module, "get_tenant_url")
+    async def test_returns_response_model_with_no_data(
+        self,
+        mock_get_tenant_url,
+        mock_get_user_id_from_token,
+        mock_get_admin_token,
+        mock_verify_registration_ownership,
+        mock_get_auth_request_headers,
+        mock_http_client,
+        mock_request_data,
+    ):
+        """Should return ResponseModel with success=True and no data (204 No Content)"""
+        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
+        mock_get_user_id_from_token.return_value = "user-456"
+        mock_get_admin_token.return_value = "admin-token-xyz"
+        mock_get_auth_request_headers.return_value = {
+            "Authorization": "Bearer admin-token-xyz"
+        }
+
+        mock_delete_response = MagicMock()
+        mock_delete_response.status_code = 204
+        mock_delete_response.raise_for_status = MagicMock()
+        mock_http_client.delete = AsyncMock(return_value=mock_delete_response)
+
+        result = await delete_registration(
+            http_client=mock_http_client,
+            user_access_token="user-token-abc",
+            request_data=mock_request_data,
+        )
+
+        # Verify ResponseModel structure (204 No Content means no data)
+        assert result.success is True
+        assert result.message == "FIDO2 registration deleted successfully"
+        assert result.data is None
