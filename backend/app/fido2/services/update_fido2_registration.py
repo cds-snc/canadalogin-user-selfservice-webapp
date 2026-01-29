@@ -6,17 +6,14 @@ import logging
 from httpx import AsyncClient
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.request_error_handler import RequestErrorHandler
+from app.utils.schemas import ResponseModel
 from app.constants.verify_endpoints import VerifyAPIEndpoint
-from app.fido2.schemas import (
-    UpdateRegistrationRequest,
-    FIDO2UserResponseModel,
-)
+from app.fido2.schemas import UpdateRegistrationRequest
 from app.fido2.services.helper_utils import (
     get_tenant_url,
     get_user_id_from_token,
     verify_registration_ownership,
 )
-from app.fido2.services.get_fido2_registrations import get_user_response
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +22,7 @@ async def update_registration(
     http_client: AsyncClient,
     user_access_token: str,
     request_data: UpdateRegistrationRequest,
-) -> FIDO2UserResponseModel:
+) -> ResponseModel:
     """Update a FIDO2 registration (nickname, enabled status)"""
     try:
         tenant_url = get_tenant_url()
@@ -78,8 +75,9 @@ async def update_registration(
 
         logger.info(f"Registration updated: {registration_id}")
 
-        # Return updated user response
-        return await get_user_response(http_client, user_access_token)
+        return ResponseModel(
+            success=True, message="FIDO2 registration updated successfully"
+        )
 
     except Exception as e:
         logger.error(f"Error updating registration: {str(e)}", exc_info=True)

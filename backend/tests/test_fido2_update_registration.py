@@ -71,16 +71,7 @@ class TestUpdateRegistration:
             },
         }
 
-    @pytest.fixture
-    def mock_user_response(self):
-        """Create a mock FIDO2 user response"""
-        return MagicMock(
-            success=True,
-            data=MagicMock(credentials=[]),
-        )
-
     @pytest.mark.asyncio
-    @patch.object(update_module, "get_user_response")
     @patch.object(update_module, "get_auth_request_headers")
     @patch.object(update_module, "verify_registration_ownership")
     @patch.object(update_module, "get_admin_token")
@@ -93,13 +84,11 @@ class TestUpdateRegistration:
         mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_get_auth_request_headers,
-        mock_get_user_response,
         mock_http_client,
         mock_request_data_nickname,
         mock_registration_data,
-        mock_user_response,
     ):
-        """Should successfully update registration nickname"""
+        """Should successfully update registration nickname and return ResponseModel"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
         mock_get_user_id_from_token.return_value = "user-456"
         mock_get_admin_token.return_value = "admin-token-xyz"
@@ -107,7 +96,6 @@ class TestUpdateRegistration:
         mock_get_auth_request_headers.return_value = {
             "Authorization": "Bearer admin-token-xyz"
         }
-        mock_get_user_response.return_value = mock_user_response
 
         mock_put_response = MagicMock()
         mock_put_response.raise_for_status = MagicMock()
@@ -119,13 +107,13 @@ class TestUpdateRegistration:
             request_data=mock_request_data_nickname,
         )
 
-        assert result == mock_user_response
+        assert result.success is True
+        assert result.message == "FIDO2 registration updated successfully"
         mock_http_client.put.assert_called_once()
         call_kwargs = mock_http_client.put.call_args[1]
         assert call_kwargs["json"]["attributes"]["nickname"] == "New Passkey Name"
 
     @pytest.mark.asyncio
-    @patch.object(update_module, "get_user_response")
     @patch.object(update_module, "get_auth_request_headers")
     @patch.object(update_module, "verify_registration_ownership")
     @patch.object(update_module, "get_admin_token")
@@ -138,11 +126,9 @@ class TestUpdateRegistration:
         mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_get_auth_request_headers,
-        mock_get_user_response,
         mock_http_client,
         mock_request_data_enabled,
         mock_registration_data,
-        mock_user_response,
     ):
         """Should successfully update registration enabled status"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
@@ -152,7 +138,6 @@ class TestUpdateRegistration:
         mock_get_auth_request_headers.return_value = {
             "Authorization": "Bearer admin-token-xyz"
         }
-        mock_get_user_response.return_value = mock_user_response
 
         mock_put_response = MagicMock()
         mock_put_response.raise_for_status = MagicMock()
@@ -164,12 +149,12 @@ class TestUpdateRegistration:
             request_data=mock_request_data_enabled,
         )
 
-        assert result == mock_user_response
+        assert result.success is True
+        assert result.message == "FIDO2 registration updated successfully"
         call_kwargs = mock_http_client.put.call_args[1]
         assert call_kwargs["json"]["enabled"] is False
 
     @pytest.mark.asyncio
-    @patch.object(update_module, "get_user_response")
     @patch.object(update_module, "get_auth_request_headers")
     @patch.object(update_module, "verify_registration_ownership")
     @patch.object(update_module, "get_admin_token")
@@ -182,11 +167,9 @@ class TestUpdateRegistration:
         mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_get_auth_request_headers,
-        mock_get_user_response,
         mock_http_client,
         mock_request_data_both,
         mock_registration_data,
-        mock_user_response,
     ):
         """Should update both nickname and enabled status"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
@@ -196,24 +179,23 @@ class TestUpdateRegistration:
         mock_get_auth_request_headers.return_value = {
             "Authorization": "Bearer admin-token-xyz"
         }
-        mock_get_user_response.return_value = mock_user_response
 
         mock_put_response = MagicMock()
         mock_put_response.raise_for_status = MagicMock()
         mock_http_client.put = AsyncMock(return_value=mock_put_response)
 
-        await update_registration(
+        result = await update_registration(
             http_client=mock_http_client,
             user_access_token="user-token-abc",
             request_data=mock_request_data_both,
         )
 
+        assert result.success is True
         call_kwargs = mock_http_client.put.call_args[1]
         assert call_kwargs["json"]["attributes"]["nickname"] == "Updated Name"
         assert call_kwargs["json"]["enabled"] is True
 
     @pytest.mark.asyncio
-    @patch.object(update_module, "get_user_response")
     @patch.object(update_module, "get_auth_request_headers")
     @patch.object(update_module, "verify_registration_ownership")
     @patch.object(update_module, "get_admin_token")
@@ -226,11 +208,9 @@ class TestUpdateRegistration:
         mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_get_auth_request_headers,
-        mock_get_user_response,
         mock_http_client,
         mock_request_data_nickname,
         mock_registration_data,
-        mock_user_response,
     ):
         """Should preserve existing attributes when updating"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
@@ -240,7 +220,6 @@ class TestUpdateRegistration:
         mock_get_auth_request_headers.return_value = {
             "Authorization": "Bearer admin-token-xyz"
         }
-        mock_get_user_response.return_value = mock_user_response
 
         mock_put_response = MagicMock()
         mock_put_response.raise_for_status = MagicMock()
@@ -259,7 +238,6 @@ class TestUpdateRegistration:
         assert payload["attributes"]["credentialId"] == "cred-abc-123"
 
     @pytest.mark.asyncio
-    @patch.object(update_module, "get_user_response")
     @patch.object(update_module, "get_auth_request_headers")
     @patch.object(update_module, "verify_registration_ownership")
     @patch.object(update_module, "get_admin_token")
@@ -272,11 +250,9 @@ class TestUpdateRegistration:
         mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_get_auth_request_headers,
-        mock_get_user_response,
         mock_http_client,
         mock_request_data_nickname,
         mock_registration_data,
-        mock_user_response,
     ):
         """Should call correct FIDO2 registrations endpoint with PUT"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
@@ -286,7 +262,6 @@ class TestUpdateRegistration:
         mock_get_auth_request_headers.return_value = {
             "Authorization": "Bearer admin-token-xyz"
         }
-        mock_get_user_response.return_value = mock_user_response
 
         mock_put_response = MagicMock()
         mock_put_response.raise_for_status = MagicMock()
@@ -439,51 +414,6 @@ class TestUpdateRegistration:
         mock_request_error_handler.handle.assert_called_once()
 
     @pytest.mark.asyncio
-    @patch.object(update_module, "RequestErrorHandler")
-    @patch.object(update_module, "get_user_response")
-    @patch.object(update_module, "get_auth_request_headers")
-    @patch.object(update_module, "verify_registration_ownership")
-    @patch.object(update_module, "get_admin_token")
-    @patch.object(update_module, "get_user_id_from_token")
-    @patch.object(update_module, "get_tenant_url")
-    async def test_handles_get_user_response_error(
-        self,
-        mock_get_tenant_url,
-        mock_get_user_id_from_token,
-        mock_get_admin_token,
-        mock_verify_registration_ownership,
-        mock_get_auth_request_headers,
-        mock_get_user_response,
-        mock_request_error_handler,
-        mock_http_client,
-        mock_request_data_nickname,
-        mock_registration_data,
-    ):
-        """Should handle error when getting updated user response fails"""
-        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
-        mock_get_user_id_from_token.return_value = "user-456"
-        mock_get_admin_token.return_value = "admin-token-xyz"
-        mock_verify_registration_ownership.return_value = mock_registration_data.copy()
-        mock_get_auth_request_headers.return_value = {
-            "Authorization": "Bearer admin-token-xyz"
-        }
-
-        mock_put_response = MagicMock()
-        mock_put_response.raise_for_status = MagicMock()
-        mock_http_client.put = AsyncMock(return_value=mock_put_response)
-
-        mock_get_user_response.side_effect = Exception("Failed to get user response")
-
-        await update_registration(
-            http_client=mock_http_client,
-            user_access_token="user-token-abc",
-            request_data=mock_request_data_nickname,
-        )
-
-        mock_request_error_handler.handle.assert_called_once()
-
-    @pytest.mark.asyncio
-    @patch.object(update_module, "get_user_response")
     @patch.object(update_module, "get_auth_request_headers")
     @patch.object(update_module, "verify_registration_ownership")
     @patch.object(update_module, "get_admin_token")
@@ -496,11 +426,9 @@ class TestUpdateRegistration:
         mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_get_auth_request_headers,
-        mock_get_user_response,
         mock_http_client,
         mock_request_data_nickname,
         mock_registration_data,
-        mock_user_response,
     ):
         """Should set required id and userId fields in payload"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
@@ -510,7 +438,6 @@ class TestUpdateRegistration:
         mock_get_auth_request_headers.return_value = {
             "Authorization": "Bearer admin-token-xyz"
         }
-        mock_get_user_response.return_value = mock_user_response
 
         mock_put_response = MagicMock()
         mock_put_response.raise_for_status = MagicMock()
@@ -528,7 +455,6 @@ class TestUpdateRegistration:
         assert payload["userId"] == "user-456"
 
     @pytest.mark.asyncio
-    @patch.object(update_module, "get_user_response")
     @patch.object(update_module, "get_auth_request_headers")
     @patch.object(update_module, "verify_registration_ownership")
     @patch.object(update_module, "get_admin_token")
@@ -541,11 +467,9 @@ class TestUpdateRegistration:
         mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_get_auth_request_headers,
-        mock_get_user_response,
         mock_http_client,
         mock_request_data_enabled,
         mock_registration_data,
-        mock_user_response,
     ):
         """Should preserve existing nickname when nickname is None"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
@@ -555,7 +479,6 @@ class TestUpdateRegistration:
         mock_get_auth_request_headers.return_value = {
             "Authorization": "Bearer admin-token-xyz"
         }
-        mock_get_user_response.return_value = mock_user_response
 
         mock_put_response = MagicMock()
         mock_put_response.raise_for_status = MagicMock()
@@ -573,7 +496,6 @@ class TestUpdateRegistration:
         assert payload["attributes"]["nickname"] == "Old Passkey Name"
 
     @pytest.mark.asyncio
-    @patch.object(update_module, "get_user_response")
     @patch.object(update_module, "get_auth_request_headers")
     @patch.object(update_module, "verify_registration_ownership")
     @patch.object(update_module, "get_admin_token")
@@ -586,10 +508,8 @@ class TestUpdateRegistration:
         mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_get_auth_request_headers,
-        mock_get_user_response,
         mock_http_client,
         mock_request_data_nickname,
-        mock_user_response,
     ):
         """Should handle registration data without attributes"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
@@ -604,7 +524,6 @@ class TestUpdateRegistration:
         mock_get_auth_request_headers.return_value = {
             "Authorization": "Bearer admin-token-xyz"
         }
-        mock_get_user_response.return_value = mock_user_response
 
         mock_put_response = MagicMock()
         mock_put_response.raise_for_status = MagicMock()
@@ -622,7 +541,6 @@ class TestUpdateRegistration:
         assert payload["attributes"]["nickname"] == "New Passkey Name"
 
     @pytest.mark.asyncio
-    @patch.object(update_module, "get_user_response")
     @patch.object(update_module, "get_auth_request_headers")
     @patch.object(update_module, "verify_registration_ownership")
     @patch.object(update_module, "get_admin_token")
@@ -635,10 +553,8 @@ class TestUpdateRegistration:
         mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_get_auth_request_headers,
-        mock_get_user_response,
         mock_http_client,
         mock_request_data_enabled,
-        mock_user_response,
     ):
         """Should use top-level nickname when attributes.nickname is missing"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
@@ -654,7 +570,6 @@ class TestUpdateRegistration:
         mock_get_auth_request_headers.return_value = {
             "Authorization": "Bearer admin-token-xyz"
         }
-        mock_get_user_response.return_value = mock_user_response
 
         mock_put_response = MagicMock()
         mock_put_response.raise_for_status = MagicMock()
@@ -692,7 +607,6 @@ class TestUpdateRegistration:
         mock_request_error_handler.handle.assert_called_once()
 
     @pytest.mark.asyncio
-    @patch.object(update_module, "get_user_response")
     @patch.object(update_module, "get_auth_request_headers")
     @patch.object(update_module, "verify_registration_ownership")
     @patch.object(update_module, "get_admin_token")
@@ -705,11 +619,9 @@ class TestUpdateRegistration:
         mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_get_auth_request_headers,
-        mock_get_user_response,
         mock_http_client,
         mock_request_data_nickname,
         mock_registration_data,
-        mock_user_response,
     ):
         """Should use admin token for the PUT request"""
         admin_token = "specific-admin-token"
@@ -720,7 +632,6 @@ class TestUpdateRegistration:
         mock_get_auth_request_headers.return_value = {
             "Authorization": f"Bearer {admin_token}"
         }
-        mock_get_user_response.return_value = mock_user_response
 
         mock_put_response = MagicMock()
         mock_put_response.raise_for_status = MagicMock()
@@ -735,3 +646,44 @@ class TestUpdateRegistration:
         mock_get_auth_request_headers.assert_called_once_with(
             admin_token, json_content_type=True
         )
+
+    @pytest.mark.asyncio
+    @patch.object(update_module, "get_auth_request_headers")
+    @patch.object(update_module, "verify_registration_ownership")
+    @patch.object(update_module, "get_admin_token")
+    @patch.object(update_module, "get_user_id_from_token")
+    @patch.object(update_module, "get_tenant_url")
+    async def test_returns_response_model_with_no_data(
+        self,
+        mock_get_tenant_url,
+        mock_get_user_id_from_token,
+        mock_get_admin_token,
+        mock_verify_registration_ownership,
+        mock_get_auth_request_headers,
+        mock_http_client,
+        mock_request_data_nickname,
+        mock_registration_data,
+    ):
+        """Should return ResponseModel with success=True and no data"""
+        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
+        mock_get_user_id_from_token.return_value = "user-456"
+        mock_get_admin_token.return_value = "admin-token-xyz"
+        mock_verify_registration_ownership.return_value = mock_registration_data.copy()
+        mock_get_auth_request_headers.return_value = {
+            "Authorization": "Bearer admin-token-xyz"
+        }
+
+        mock_put_response = MagicMock()
+        mock_put_response.raise_for_status = MagicMock()
+        mock_http_client.put = AsyncMock(return_value=mock_put_response)
+
+        result = await update_registration(
+            http_client=mock_http_client,
+            user_access_token="user-token-abc",
+            request_data=mock_request_data_nickname,
+        )
+
+        # Verify ResponseModel structure
+        assert result.success is True
+        assert result.message == "FIDO2 registration updated successfully"
+        assert result.data is None
