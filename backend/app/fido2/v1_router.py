@@ -5,7 +5,6 @@ FIDO2 API router endpoints
 import logging
 from fastapi import APIRouter, Depends, Request
 from httpx import AsyncClient
-from app.fido2.services import fido2_service
 from app.fido2.schemas import (
     FIDO2UserResponse,
     FIDO2UserResponseModel,
@@ -21,6 +20,20 @@ from app.auth.services.auth_user_session import (
     get_users_current_session,
     get_http_client,
 )
+
+# Import individual service functions
+from app.fido2.services.get_fido2_registrations import get_user_response
+from app.fido2.services.get_registration_details import (
+    get_registration_details as get_registration_details_service,
+)
+from app.fido2.services.delete_fido2_registration import (
+    delete_registration as delete_registration_service,
+)
+from app.fido2.services.update_fido2_registration import (
+    update_registration as update_registration_service,
+)
+from app.fido2.services.proxy_fido2_request import proxy_fido2_request
+from app.fido2.services.validate_fido2_login import validate_fido2_login
 
 logger = logging.getLogger(__name__)
 router = APIRouter(tags=["fido2"])
@@ -41,7 +54,7 @@ async def get_user_fido2_credentials(
     Returns user authentication status and list of registered FIDO2 credentials.
     """
     try:
-        return await fido2_service.get_user_response(http_client, user_access_token)
+        return await get_user_response(http_client, user_access_token)
     except Exception as e:
         logger.error(f"Error getting user FIDO2 credentials: {str(e)}")
         return FIDO2UserResponseModel(
@@ -66,7 +79,7 @@ async def get_registration_details(
     Get details of a specific FIDO2 registration - equivalent to registrationDetails in JS.
     Only returns registrations owned by the current user.
     """
-    return await fido2_service.get_registration_details(
+    return await get_registration_details_service(
         http_client, user_access_token, registration_id
     )
 
@@ -87,7 +100,7 @@ async def delete_fido2_registration(
     Only allows deletion of registrations owned by the current user.
     Returns updated user credentials after deletion.
     """
-    return await fido2_service.delete_registration(
+    return await delete_registration_service(
         http_client, user_access_token, request_data
     )
 
@@ -108,7 +121,7 @@ async def update_fido2_registration(
     Only allows updating registrations owned by the current user.
     Returns updated user credentials after update.
     """
-    return await fido2_service.update_registration(
+    return await update_registration_service(
         http_client, user_access_token, request_data
     )
 
@@ -136,7 +149,7 @@ async def get_attestation_options(
         },
     }
 
-    return await fido2_service.proxy_fido2_request(
+    return await proxy_fido2_request(
         http_client=http_client,
         user_access_token=user_access_token,
         endpoint_path="/attestation/options",
@@ -161,7 +174,7 @@ async def submit_attestation_result(
     Proxy FIDO2 attestation result request to IBM Verify.
     Used to complete the FIDO2 registration process.
     """
-    return await fido2_service.proxy_fido2_request(
+    return await proxy_fido2_request(
         http_client=http_client,
         user_access_token=user_access_token,
         endpoint_path="/attestation/result",
@@ -186,7 +199,7 @@ async def get_assertion_options(
     Proxy FIDO2 assertion options request to IBM Verify.
     Used to start the FIDO2 authentication process.
     """
-    return await fido2_service.proxy_fido2_request(
+    return await proxy_fido2_request(
         http_client=http_client,
         user_access_token=user_access_token,
         endpoint_path="/assertion/options",
@@ -212,7 +225,7 @@ async def submit_assertion_result(
     Equivalent to validateFIDO2Login in JS.
     """
     try:
-        user_response = await fido2_service.validate_fido2_login(
+        user_response = await validate_fido2_login(
             http_client, request_data.model_dump()
         )
 
@@ -246,7 +259,7 @@ async def get_assertion_options_public(
     Public endpoint for FIDO2 assertion options - used during login flow.
     Does not require existing authentication.
     """
-    return await fido2_service.proxy_fido2_request(
+    return await proxy_fido2_request(
         http_client=http_client,
         user_access_token=None,
         endpoint_path="/assertion/options",
@@ -271,7 +284,7 @@ async def submit_assertion_result_public(
     Does not require existing authentication.
     """
     try:
-        user_response = await fido2_service.validate_fido2_login(
+        user_response = await validate_fido2_login(
             http_client, request_data.model_dump()
         )
 
