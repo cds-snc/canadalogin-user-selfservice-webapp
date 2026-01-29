@@ -7,37 +7,38 @@ import {
   GcdsText,
 } from "@cdssnc/gcds-components-react";
 import { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 import { otpFactors } from "../../../features/TransientOtp/api/otpFactors.jsx";
-import { useNavigateHelper } from "../../../hooks/useNavigate.js";
-import { PAGES } from "../../../utils/constants.jsx";
+import { PAGES, VITE_ENVIRONMENTS } from "../../../utils/constants.jsx";
 import { getPageContent } from "../../../utils/functions.jsx";
 import { path } from "../../../utils/routeHelpers.js";
 import Loader from "../../Layout/Loading.jsx";
 import { useUser } from "../../Providers/useUser.js";
 import NoticeFactory from "../../InfoBlocks/NoticeFactory.jsx";
+import config from "../../../config.jsx";
+import PhoneFactorsList from "./PhoneFactorsList.jsx";
 
 export default function Manage2FAVerifications() {
   const { language } = useParams();
   const location = useLocation();
   const pageContent = getPageContent(language, PAGES.manage2FAVerifications);
-  const navigateHelper = useNavigateHelper();
+  const navigate = useNavigate();
   const { state, _dispatch } = useUser();
   const [userPhoneFactorsMap, setUserPhoneFactorsMap] = useState({});
   const [loading, setLoading] = useState(true);
 
+  // Only show add passkey link in dev and test environments
+  const showAddPasskeyLink =
+    config.environment === VITE_ENVIRONMENTS.dev ||
+    config.environment === VITE_ENVIRONMENTS.test;
+
   // Check if we came from another page and need to render success notice
-  const { noticeType, phoneNumber, otpType } = location.state || {};
+  const { noticeType, phoneNumber, otpType, passkeyName } =
+    location.state || {};
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
     language: language,
   });
-
-  const availableFactorsUIContentMap = {
-    smsotp: pageContent["7"],
-    voiceotp: pageContent["8"],
-  };
-  const availableFactorsUIContent = (factor) =>
-    availableFactorsUIContentMap[factor] || factor;
+  const addFido2PagePath = path(PAGES.addFido2PasskeyPage, { language });
 
   useEffect(() => {
     const fetchUserOtpPhoneFactors = async () => {
@@ -64,7 +65,7 @@ export default function Manage2FAVerifications() {
           }, {});
           setUserPhoneFactorsMap(userPhoneFactorsMap);
         } else {
-          navigateHelper(backToSecuritySettingsPage);
+          navigate(backToSecuritySettingsPage);
         }
       } catch (err) {
         console.error("err", err);
@@ -76,43 +77,6 @@ export default function Manage2FAVerifications() {
     fetchUserOtpPhoneFactors();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const phoneFactorsComponent = Object.entries(userPhoneFactorsMap).map(
-    ([phoneNumber, factors], index) => {
-      const availableFactorsComponent = factors?.map((factor, idx) => {
-        return (
-          <li key={idx}>
-            <GcdsText>{availableFactorsUIContent(factor.type)}</GcdsText>
-          </li>
-        );
-      });
-      return (
-        <GcdsContainer key={index}>
-          <GcdsText>
-            <strong>{`${phoneNumber}`}</strong>
-          </GcdsText>
-          <GcdsText>{pageContent["6"]}</GcdsText>
-          <ul>{availableFactorsComponent}</ul>
-          {Object.keys(userPhoneFactorsMap).length > 1 && (
-            <GcdsLink
-              href={path(PAGES.deleteMFAPage, { language })}
-              size="regular"
-              onGcdsClick={(ev) => {
-                ev.preventDefault();
-                navigateHelper(path(PAGES.deleteMFAPage, { language }), false, {
-                  phoneNumber: phoneNumber,
-                  factorIds: factors.map((factor) => factor.id),
-                  formattedPhoneNumber: `+1 ${phoneNumber}`,
-                });
-              }}
-            >
-              {pageContent["9"]}
-            </GcdsLink>
-          )}
-          <div className="separator" />
-        </GcdsContainer>
-      );
-    },
-  );
 
   return loading ? (
     <Loader text={pageContent["11"]} />
@@ -123,6 +87,7 @@ export default function Manage2FAVerifications() {
           noticeType={noticeType}
           phoneNumber={phoneNumber}
           otpType={otpType}
+          passkeyName={passkeyName}
         />
       )}
 
@@ -164,17 +129,29 @@ export default function Manage2FAVerifications() {
             {pageContent["5"]}
           </div>
         </GcdsHeading>
-        {phoneFactorsComponent}
+        <PhoneFactorsList userPhoneFactorsMap={userPhoneFactorsMap} />
         <GcdsButton
           id="add-mfa-button"
           onGcdsClick={(ev) => {
             ev.preventDefault();
-            navigateHelper(path(PAGES.addMFAPage, { language }));
+            navigate(path(PAGES.addMFAPage, { language }));
           }}
         >
           {pageContent["10"]}
         </GcdsButton>
       </GcdsContainer>
+
+      {showAddPasskeyLink && (
+        <GcdsButton
+          id="add-fido2-button"
+          onGcdsClick={(ev) => {
+            ev.preventDefault();
+            navigate(addFido2PagePath);
+          }}
+        >
+          {pageContent["12"]}
+        </GcdsButton>
+      )}
     </GcdsContainer>
   );
 }

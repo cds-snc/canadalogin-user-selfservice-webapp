@@ -44,7 +44,11 @@
     "CSIBN0021E": "The verification code is invalid.",
     "CSIBH0044E": "The email and password combination do not match.",
     "CSIAI0369E": "We could not validate this password. Try again.",
-    "CSIAI0370E": "This password is too easy to guess. Choose a stronger password."
+    "CSIAI0370E": "This password is too easy to guess. Choose a stronger password.",
+    "error_webauthn_not_supported": "WebAuthn is not supported by your browser",
+    "error_failed_to_get_attestation_options": "Failed to get attestation options",
+    "error_duplicate_passkey": "The user attempted to register an authenticator that contains one of the credentials already registered with the relying party.",
+    "error_passkey_name_required": "Passkey name required."
   },
   "RegisterVerification": {
     "1": "Protect your account with 2-step verification",
@@ -168,13 +172,6 @@
     "9": "Call me instead",
     "10": "You can request a new code in",
     "11": "10 seconds"
-  },
-  "FirstVerifyItsYou": {
-    "1": "First, verify it's you ",
-    "2": "To edit your email, first enter your current password.",
-    "3": "Password",
-    "4": "Continue",
-    "5": "Cancel"
   },
   "EnterNewEmail": {
     "1": "Enter a new email address",
@@ -381,7 +378,8 @@
     "8": "Voice call",
     "9": "Delete",
     "10": "+ Add a phone number",
-    "11": "Loading..."
+    "11": "Loading...",
+    "12": "+ Add a passkey"
   },
   "AddMFANumber": {
     "1": "Enter your new phone number",
@@ -460,7 +458,8 @@
     "3": "You have successfully added",
     "4": "verification for",
     "5": "voice call",
-    "6": "text (SMS)"
+    "6": "text (SMS)",
+    "7": "for passkey verification"
   },
   "PasswordVerification": {
     "1": "First, verify it’s you",
@@ -470,7 +469,8 @@
     "5": "Forgot your password?",
     "6": "Reset your password",
     "7": "To add a phone number,",
-    "8": "To delete this number,"
+    "8": "To delete this number,",
+    "9": "To add a passkey,"
   },
   "EditEmailEnterEmail": {
     "1": "Enter a new email address",
@@ -510,5 +510,14 @@
     "7": ".",
     "8": "Back to profile",
     "9": "Sign out"
+  },
+  "AddFIDO2Passkey": {
+    "1": "Add a new passkey",
+    "2": "Give your security key a name to help you identify it later.",
+    "3": "Passkey name",
+    "4": "e.g., My YubiKey",
+    "5": "Registering...",
+    "6": "Register",
+    "7": "Add a new passkey you want to use for verification each time you sign in."
   }
 }

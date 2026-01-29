@@ -3,20 +3,20 @@ FIDO2 API router endpoints
 """
 
 import logging
-from typing import Dict, Any
 from fastapi import APIRouter, Depends, Request
 from httpx import AsyncClient
 from app.fido2.services import fido2_service
 from app.fido2.schemas import (
     FIDO2UserResponse,
-    FIDO2RegistrationResponse,
+    FIDO2UserResponseModel,
+    FIDO2RegistrationResponseModel,
     DeleteRegistrationRequest,
     UpdateRegistrationRequest,
-    FIDO2AttestationOptionsRequest,
     FIDO2AttestationResultRequest,
     FIDO2AssertionOptionsRequest,
     FIDO2AssertionResultRequest,
 )
+from app.utils.schemas import ResponseModel
 from app.auth.services.auth_user_session import (
     get_users_current_session,
     get_http_client,
@@ -28,7 +28,7 @@ router = APIRouter(tags=["fido2"])
 
 @router.get(
     "/user",
-    response_model=FIDO2UserResponse,
+    response_model=FIDO2UserResponseModel,
     summary="Get user FIDO2 credentials",
     description="Get the current user's FIDO2 credentials and authentication status",
 )
@@ -44,12 +44,16 @@ async def get_user_fido2_credentials(
         return await fido2_service.get_user_response(http_client, user_access_token)
     except Exception as e:
         logger.error(f"Error getting user FIDO2 credentials: {str(e)}")
-        return FIDO2UserResponse(authenticated=False)
+        return FIDO2UserResponseModel(
+            success=False,
+            data=FIDO2UserResponse(authenticated=False),
+            message="Failed to get user FIDO2 credentials",
+        )
 
 
 @router.get(
     "/registration/{registration_id}",
-    response_model=FIDO2RegistrationResponse,
+    response_model=FIDO2RegistrationResponseModel,
     summary="Get FIDO2 registration details",
     description="Get detailed information about a specific FIDO2 registration",
 )
@@ -69,7 +73,7 @@ async def get_registration_details(
 
 @router.delete(
     "/registration",
-    response_model=FIDO2UserResponse,
+    response_model=FIDO2UserResponseModel,
     summary="Delete FIDO2 registration",
     description="Delete a FIDO2 registration and return updated user credentials",
 )
@@ -90,7 +94,7 @@ async def delete_fido2_registration(
 
 @router.put(
     "/registration",
-    response_model=FIDO2UserResponse,
+    response_model=FIDO2UserResponseModel,
     summary="Update FIDO2 registration",
     description="Update a FIDO2 registration (nickname, enabled status) and return updated user credentials",
 )
@@ -111,24 +115,32 @@ async def update_fido2_registration(
 
 @router.post(
     "/attestation/options",
-    response_model=Dict[str, Any],
+    response_model=ResponseModel,
     summary="Get FIDO2 attestation options",
     description="Get attestation options for FIDO2 registration",
 )
 async def get_attestation_options(
-    request_data: FIDO2AttestationOptionsRequest,
     user_access_token: str = Depends(get_users_current_session),
     http_client: AsyncClient = Depends(get_http_client),
 ):
     """
-    Proxy FIDO2 attestation options request to IBM Verify.
+    Get FIDO2 attestation options with server-side defaults.
     Used to start the FIDO2 registration process.
     """
+    # Set proper defaults for FIDO2 attestation
+    request_body = {
+        "attestation": "direct",
+        "authenticatorSelection": {
+            "requireResidentKey": False,
+            "userVerification": "preferred",
+        },
+    }
+
     return await fido2_service.proxy_fido2_request(
         http_client=http_client,
         user_access_token=user_access_token,
         endpoint_path="/attestation/options",
-        request_body=request_data.model_dump(),
+        request_body=request_body,
         validate_username=True,
         allow_empty_username=True,
     )
@@ -136,7 +148,7 @@ async def get_attestation_options(
 
 @router.post(
     "/attestation/result",
-    response_model=Dict[str, Any],
+    response_model=ResponseModel,
     summary="Submit FIDO2 attestation result",
     description="Submit attestation result to complete FIDO2 registration",
 )
@@ -161,7 +173,7 @@ async def submit_attestation_result(
 
 @router.post(
     "/assertion/options",
-    response_model=Dict[str, Any],
+    response_model=ResponseModel,
     summary="Get FIDO2 assertion options",
     description="Get assertion options for FIDO2 authentication",
 )
@@ -186,7 +198,7 @@ async def get_assertion_options(
 
 @router.post(
     "/assertion/result",
-    response_model=FIDO2UserResponse,
+    response_model=FIDO2UserResponseModel,
     summary="Submit FIDO2 assertion result",
     description="Submit assertion result to complete FIDO2 authentication and login",
 )
@@ -222,7 +234,7 @@ async def submit_assertion_result(
 
 @router.post(
     "/public/assertion/options",
-    response_model=Dict[str, Any],
+    response_model=ResponseModel,
     summary="Get FIDO2 assertion options (public)",
     description="Get assertion options for FIDO2 authentication without requiring existing session",
 )
@@ -245,7 +257,7 @@ async def get_assertion_options_public(
 
 @router.post(
     "/public/assertion/result",
-    response_model=FIDO2UserResponse,
+    response_model=FIDO2UserResponseModel,
     summary="Submit FIDO2 assertion result (public)",
     description="Submit assertion result to complete FIDO2 authentication during login",
 )

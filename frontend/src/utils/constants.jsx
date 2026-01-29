@@ -65,6 +65,12 @@ export const FORM_FIELDS = [
   "lastName",
 ];
 
+export const NOTICE_TYPES = {
+  mfaAdded: "mfaAdded",
+  mfaDeleted: "mfaDeleted",
+  passkeyAdded: "passkeyAdded",
+};
+
 export const PAGES = {
   // this is used as key to get the language locales from json files, should probably be renamed in the future to reflect the usage
   verification: "Verification",
@@ -105,6 +111,8 @@ export const PAGES = {
   emailOtpValidation: "EmailOtpValidation",
   emailConfirmUpdate: "EmailConfirmUpdate",
   emailUpdateSuccess: "EmailUpdateSuccess",
+  addFido2PasskeyPage: "AddFIDO2PasskeyPage",
+  addFIDO2Passkey: "AddFIDO2Passkey",
 };
 
 export const FOOTERS = {

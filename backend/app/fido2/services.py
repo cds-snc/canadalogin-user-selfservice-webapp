@@ -3,17 +3,22 @@ FIDO2 services for interacting with IBM Verify API
 """
 
 import logging
-from typing import List, Dict, Any, Optional
+from typing import Dict, Any, Optional
 from urllib.parse import urlparse
 from fastapi import HTTPException, status
 from httpx import AsyncClient
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.request_error_handler import RequestErrorHandler
+from app.utils.schemas import ResponseModel
 from app.config import get_configuration
+from app.constants.verify_endpoints import VerifyAPIEndpoint
 from app.fido2.schemas import (
     FIDO2RegistrationResponse,
     FIDO2CredentialSummary,
     FIDO2UserResponse,
+    FIDO2UserResponseModel,
+    FIDO2RegistrationResponseModel,
+    FIDO2CredentialsResponseModel,
     DeleteRegistrationRequest,
     UpdateRegistrationRequest,
 )
@@ -78,7 +83,7 @@ class FIDO2Service:
     ) -> str:
         """Get RP UUID from RP ID by querying the discovery service"""
         try:
-            url = f"{self.tenant_url}/config/v2.0/factors/fido2/relyingparties"
+            url = f"{self.tenant_url}{VerifyAPIEndpoint.FIDO2_RELYING_PARTIES.value}"
             headers = get_auth_request_headers(access_token, json_content_type=True)
 
             response = await http_client.get(url, headers=headers)
@@ -110,7 +115,7 @@ class FIDO2Service:
     ) -> str:
         """Get user SCIM ID from username using the user's own access token"""
         try:
-            url = f"{self.tenant_url}/v2.0/Users"
+            url = f"{self.tenant_url}{VerifyAPIEndpoint.USERS.value}"
             headers = get_auth_request_headers(user_access_token)
             params = {"filter": f'userName eq "{username}"'}
 
@@ -145,7 +150,7 @@ class FIDO2Service:
     ) -> str:
         """Get user SCIM ID from username"""
         try:
-            url = f"{self.tenant_url}/v2.0/Users"
+            url = f"{self.tenant_url}{VerifyAPIEndpoint.USERS.value}"
             headers = get_auth_request_headers(access_token)
             params = {"filter": f'userName eq "{username}"'}
 
@@ -175,7 +180,7 @@ class FIDO2Service:
 
     async def get_user_fido2_registrations(
         self, http_client: AsyncClient, user_access_token: str
-    ) -> List[FIDO2CredentialSummary]:
+    ) -> FIDO2CredentialsResponseModel:
         """Get all FIDO2 registrations for a user using their own access token"""
         try:
             logger.info("Getting FIDO2 registrations using user access token")
@@ -183,7 +188,7 @@ class FIDO2Service:
 
             # First, we need to get the user ID from the token
             # We can use the userinfo endpoint with the user's token (like the JavaScript does)
-            userinfo_url = f"{self.tenant_url}/v1.0/endpoint/default/userinfo"
+            userinfo_url = f"{self.tenant_url}{VerifyAPIEndpoint.USERINFO.value}"
             headers = get_auth_request_headers(user_access_token)
 
             userinfo_response = await http_client.post(userinfo_url, headers=headers)
@@ -207,7 +212,7 @@ class FIDO2Service:
             logger.info(f"Found RP UUID: {rp_uuid}")
 
             # Search for registrations using user's own token and RP UUID
-            url = f"{self.tenant_url}/v2.0/factors/fido2/registrations"
+            url = f"{self.tenant_url}{VerifyAPIEndpoint.FIDO2_REGISTRATIONS.value}"
             headers = get_auth_request_headers(
                 user_access_token, json_content_type=True
             )
@@ -239,7 +244,11 @@ class FIDO2Service:
                 credentials.append(credential)
 
             logger.info(f"Found {len(credentials)} FIDO2 credentials")
-            return credentials
+            return FIDO2CredentialsResponseModel(
+                success=True,
+                data=credentials,
+                message="FIDO2 credentials retrieved successfully",
+            )
 
         except HTTPException:
             raise
@@ -251,18 +260,24 @@ class FIDO2Service:
         self,
         http_client: AsyncClient,
         user_access_token: str,
-    ) -> FIDO2UserResponse:
+    ) -> FIDO2UserResponseModel:
         """Get user response with FIDO2 credentials"""
         try:
-            credentials = await self.get_user_fido2_registrations(
+            credentials_response = await self.get_user_fido2_registrations(
                 http_client, user_access_token
             )
 
-            return FIDO2UserResponse(
+            user_response = FIDO2UserResponse(
                 authenticated=True,
                 username=None,  # We can extract this from token if needed
                 displayName=None,
-                credentials=credentials,
+                credentials=credentials_response.data or [],
+            )
+
+            return FIDO2UserResponseModel(
+                success=True,
+                data=user_response,
+                message="User FIDO2 data retrieved successfully",
             )
 
         except Exception as e:
@@ -271,11 +286,11 @@ class FIDO2Service:
 
     async def get_registration_details(
         self, http_client: AsyncClient, user_access_token: str, registration_id: str
-    ) -> FIDO2RegistrationResponse:
+    ) -> FIDO2RegistrationResponseModel:
         """Get details of a specific FIDO2 registration"""
         try:
             # Get user ID from the token using userinfo endpoint
-            userinfo_url = f"{self.tenant_url}/v1.0/endpoint/default/userinfo"
+            userinfo_url = f"{self.tenant_url}{VerifyAPIEndpoint.USERINFO.value}"
             headers = get_auth_request_headers(user_access_token)
 
             userinfo_response = await http_client.post(userinfo_url, headers=headers)
@@ -291,9 +306,7 @@ class FIDO2Service:
 
             # Get the registration with admin token for now (registration details might need admin access)
             admin_token = await get_admin_token(http_client)
-            url = (
-                f"{self.tenant_url}/v2.0/factors/fido2/registrations/{registration_id}"
-            )
+            url = f"{self.tenant_url}{VerifyAPIEndpoint.FIDO2_REGISTRATIONS.value}/{registration_id}"
             headers = get_auth_request_headers(admin_token, json_content_type=True)
 
             response = await http_client.get(url, headers=headers)
@@ -311,7 +324,12 @@ class FIDO2Service:
             # TODO: Add transaction data if needed
             registration_data.setdefault("attributes", {})["transactions"] = []
 
-            return FIDO2RegistrationResponse(**registration_data)
+            registration_response = FIDO2RegistrationResponse(**registration_data)
+            return FIDO2RegistrationResponseModel(
+                success=True,
+                data=registration_response,
+                message="Registration details retrieved successfully",
+            )
 
         except HTTPException:
             raise
@@ -324,13 +342,13 @@ class FIDO2Service:
         http_client: AsyncClient,
         user_access_token: str,
         request_data: DeleteRegistrationRequest,
-    ) -> FIDO2UserResponse:
+    ) -> FIDO2UserResponseModel:
         """Delete a FIDO2 registration"""
         try:
             registration_id = request_data.id
 
             # Get user ID from the token using userinfo endpoint
-            userinfo_url = f"{self.tenant_url}/v1.0/endpoint/default/userinfo"
+            userinfo_url = f"{self.tenant_url}{VerifyAPIEndpoint.USERINFO.value}"
             headers = get_auth_request_headers(user_access_token)
 
             userinfo_response = await http_client.post(userinfo_url, headers=headers)
@@ -348,9 +366,7 @@ class FIDO2Service:
             admin_token = await get_admin_token(http_client)
 
             # First verify ownership
-            reg_url = (
-                f"{self.tenant_url}/v2.0/factors/fido2/registrations/{registration_id}"
-            )
+            reg_url = f"{self.tenant_url}{VerifyAPIEndpoint.FIDO2_REGISTRATIONS.value}/{registration_id}"
             headers = get_auth_request_headers(admin_token, json_content_type=True)
 
             reg_response = await http_client.get(reg_url, headers=headers)
@@ -384,13 +400,13 @@ class FIDO2Service:
         http_client: AsyncClient,
         user_access_token: str,
         request_data: UpdateRegistrationRequest,
-    ) -> FIDO2UserResponse:
+    ) -> FIDO2UserResponseModel:
         """Update a FIDO2 registration (nickname, enabled status)"""
         try:
             registration_id = request_data.id
 
             # Get user ID from the token using userinfo endpoint
-            userinfo_url = f"{self.tenant_url}/v1.0/endpoint/default/userinfo"
+            userinfo_url = f"{self.tenant_url}{VerifyAPIEndpoint.USERINFO.value}"
             headers = get_auth_request_headers(user_access_token)
 
             userinfo_response = await http_client.post(userinfo_url, headers=headers)
@@ -408,9 +424,7 @@ class FIDO2Service:
             admin_token = await get_admin_token(http_client)
 
             # First verify ownership
-            reg_url = (
-                f"{self.tenant_url}/v2.0/factors/fido2/registrations/{registration_id}"
-            )
+            reg_url = f"{self.tenant_url}{VerifyAPIEndpoint.FIDO2_REGISTRATIONS.value}/{registration_id}"
             headers = get_auth_request_headers(admin_token, json_content_type=True)
 
             reg_response = await http_client.get(reg_url, headers=headers)
@@ -470,7 +484,7 @@ class FIDO2Service:
         self, http_client: AsyncClient, user_access_token: str
     ) -> str:
         """Get user ID from access token using userinfo endpoint"""
-        userinfo_url = f"{self.tenant_url}/v1.0/endpoint/default/userinfo"
+        userinfo_url = f"{self.tenant_url}{VerifyAPIEndpoint.USERINFO.value}"
         headers = get_auth_request_headers(user_access_token)
 
         userinfo_response = await http_client.post(userinfo_url, headers=headers)
@@ -601,7 +615,7 @@ class FIDO2Service:
         request_body: Dict[str, Any] = None,
         validate_username: bool = True,
         allow_empty_username: bool = False,
-    ) -> Dict[str, Any]:
+    ) -> ResponseModel:
         """
         Proxy FIDO2 server requests to IBM Verify API
         """
@@ -629,7 +643,7 @@ class FIDO2Service:
             )
 
             # Make the request using admin token for FIDO2 operations
-            url = f"{self.tenant_url.rstrip('/')}/v2.0/factors/fido2/relyingparties/{rp_uuid}{endpoint_path}"
+            url = f"{self.tenant_url}{VerifyAPIEndpoint.FIDO2_RP_BASE.value}/{rp_uuid}{endpoint_path}"
             headers = get_auth_request_headers(admin_token, json_content_type=True)
 
             response = await http_client.post(url, headers=headers, json=body_to_send)
@@ -637,10 +651,11 @@ class FIDO2Service:
             # Handle IBM Verify API response
             if response.status_code == 200:
                 response_data = response.json()
-                # Add FIDO2 server spec fields for success
-                response_data["status"] = "ok"
-                response_data["errorMessage"] = ""
-                return response_data
+                return ResponseModel(
+                    success=True,
+                    data=response_data,
+                    message="FIDO2 request processed successfully",
+                )
             else:
                 error_response = self._handle_error_response(response)
                 # Raise HTTPException with the same status code as IBM Verify
@@ -656,7 +671,7 @@ class FIDO2Service:
 
     async def validate_fido2_login(
         self, http_client: AsyncClient, assertion_result: Dict[str, Any]
-    ) -> FIDO2UserResponse:
+    ) -> FIDO2UserResponseModel:
         """
         Validate FIDO2 assertion and complete login
         """
@@ -667,7 +682,7 @@ class FIDO2Service:
             )
 
             # Submit assertion result
-            url = f"{self.tenant_url}/v2.0/factors/fido2/relyingparties/{rp_uuid}/assertion/result"
+            url = f"{self.tenant_url}{VerifyAPIEndpoint.FIDO2_RP_BASE.value}/{rp_uuid}/assertion/result"
             headers = get_auth_request_headers(access_token, json_content_type=True)
 
             response = await http_client.post(
@@ -685,7 +700,7 @@ class FIDO2Service:
                 )
 
             # Get user details
-            user_url = f"{self.tenant_url}/v2.0/Users"
+            user_url = f"{self.tenant_url}{VerifyAPIEndpoint.USERS.value}"
             user_params = {"filter": f'id eq "{user_id}"'}
 
             user_response = await http_client.get(
@@ -703,8 +718,19 @@ class FIDO2Service:
                     username = user["userName"]
                     display_name = user.get("name", {}).get("formatted", username)
 
-                    return await self.get_user_response(
-                        http_client, username, display_name
+                    # Create a user response for successful FIDO2 login
+                    # Since this is for login validation, we'll return a minimal response
+                    user_response = FIDO2UserResponse(
+                        authenticated=True,
+                        username=username,
+                        displayName=display_name,
+                        credentials=[],  # Don't need to fetch full credentials for login validation
+                    )
+
+                    return FIDO2UserResponseModel(
+                        success=True,
+                        data=user_response,
+                        message="FIDO2 login validated successfully",
                     )
                 else:
                     raise HTTPException(

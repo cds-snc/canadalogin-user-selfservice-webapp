@@ -20,6 +20,7 @@ import Manage2FAVerifications from "../../../../components/Manage/SecuritySettin
 vi.mock("react-router", () => ({
   useParams: () => ({ language: "en" }),
   useLocation: () => ({ state: null }),
+  useNavigate: () => vi.fn(),
 }));
 
 vi.mock("../../../../hooks/useNavigate.js", () => ({
@@ -57,6 +58,10 @@ vi.mock("../../../../utils/constants.jsx", () => ({
   PAGES: {
     manage2FAVerifications: "Manage2FAVerifications",
     securitySettings: "SecuritySettings",
+  },
+  VITE_ENVIRONMENTS: {
+    dev: "development",
+    test: "test",
   },
 }));
 

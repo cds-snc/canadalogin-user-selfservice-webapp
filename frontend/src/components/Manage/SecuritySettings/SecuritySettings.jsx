@@ -54,7 +54,6 @@ export default function SecuritySettings() {
           {pageContent["7"]}
         </GcdsHeading>
         <GcdsText>{pageContent["8"]}</GcdsText>
-
         <GcdsGrid columns="1fr" gap="1rem" align-items="center">
           <EnabledBadge text={pageContent["9"]} />
           <GcdsLink href={manage2FAVerificationsPage} size="regular">
