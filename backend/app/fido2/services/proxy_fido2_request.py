@@ -58,12 +58,6 @@ async def _prepare_request_body(
             f"Injected user profile info - username: {username}, displayName: {display_name}"
         )
 
-    # For assertion options, automatically fetch and inject username
-    elif endpoint_path.endswith("/assertion/options") and user_access_token:
-        username, _ = await get_user_profile_info(http_client, user_access_token)
-        body_to_send["username"] = username
-        logger.info(f"Injected username for assertion options: {username}")
-
     # Replace username with userId (but NOT for attestation/result)
     if "username" in body_to_send:
         del body_to_send["username"]
@@ -73,8 +67,6 @@ async def _prepare_request_body(
     # Handle specific endpoint modifications
     if endpoint_path.endswith("/attestation/result"):
         body_to_send = _prepare_attestation_result_body(body_to_send)
-    elif endpoint_path.endswith("/assertion/options"):
-        body_to_send.pop("attestation", None)
 
     return body_to_send
 
