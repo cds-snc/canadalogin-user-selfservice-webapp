@@ -33,6 +33,10 @@ export default function Manage2FAVerifications() {
     config.environment === VITE_ENVIRONMENTS.dev ||
     config.environment === VITE_ENVIRONMENTS.test;
 
+  const showManageFIDO2 =
+    config.environment === VITE_ENVIRONMENTS.dev ||
+    config.environment === VITE_ENVIRONMENTS.test;
+
   // Check if we came from another page and need to render success notice
   const { noticeType, phoneNumber, otpType, passkeyName } =
     location.state || {};
@@ -153,7 +157,7 @@ export default function Manage2FAVerifications() {
           {pageContent["12"]}
         </GcdsButton>
       )}
-      <ManageFIDO2 />
+      {showManageFIDO2 && <ManageFIDO2 />}
     </GcdsContainer>
   );
 }

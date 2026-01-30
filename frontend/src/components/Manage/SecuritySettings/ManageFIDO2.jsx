@@ -49,6 +49,9 @@ export default function ManageFIDO2() {
   const [newDeviceName, setNewDeviceName] = useState("");
   const [renameDeviceName, setRenameDeviceName] = useState("");
   const errorPageContent = getPageContent(language, PAGES.error);
+  const deleteFIDO2PasskeyPagePath = path(PAGES.deleteFIDO2PasskeyPage, {
+    language,
+  });
 
   // Check if we came from another page and need to render success notice
   const { noticeType, message } = location.state || {};
@@ -437,7 +440,10 @@ export default function ManageFIDO2() {
             <GcdsButton
               buttonRole="destructive"
               size="small"
-              onClick={() => openDeleteModal(credential)}
+              onClick={(ev) => {
+                ev.preventDefault();
+                navigate(deleteFIDO2PasskeyPagePath);
+              }}
               disabled={deleteLoading}
             >
               {pageContent["delete"] || "Delete"}

@@ -16,7 +16,7 @@ import { fido2Api } from "../../api/fido2Api";
 import StepContent from "../../../../components/Wizard/StepContent";
 import Loader from "../../../../components/Layout/Loading";
 
-export default function AddFIDO2PasskeyPage() {
+export default function DeleteFIDO2PasskeyPage() {
   // Map URL step parameter to internal wizard steps
   const getWizardStepFromUrl = (urlStep) => {
     switch (urlStep) {

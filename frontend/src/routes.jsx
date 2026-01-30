@@ -23,6 +23,7 @@ import DeleteMFAPage from "./features/MFAPhoneNumber/DeleteMFAPhoneNumber/compon
 import { PAGES } from "./utils/constants.jsx";
 import EditEmailAddressPage from "./features/EmailAddress/EditEmailAddressPage.jsx";
 import AddFIDO2PasskeyPage from "./features/ManageFIDO2/components/AddFIDO2Passkey/AddFIDO2PasskeyPage.jsx";
+import DeleteFIDO2PasskeyPage from "./features/ManageFIDO2/components/DeleteFIDO2Passkey.jsx/DeleteFIDO2PasskeyPage.jsx";
 
 export const appRoutes = [
   {
@@ -127,6 +128,23 @@ export const appRoutes = [
                         path: "add-fido2/:step?",
                         element: <AddFIDO2PasskeyPage />,
                         handle: { id: PAGES.addFIDO2PasskeyPage },
+                      },
+                      {
+                        element: (
+                          <StepupPrivateRoute redirectPath="/en/security-settings/manage-2fa-verifications/delete-fido2/delete-fido2-passkey" />
+                        ),
+                        children: [
+                          {
+                            path: "delete-fido2/fido2-verification",
+                            element: <DeleteFIDO2PasskeyPage />,
+                            handle: { id: PAGES.deleteFIDO2PasskeyPage },
+                          },
+                        ],
+                      },
+                      {
+                        path: "delete-fido2/:step?",
+                        element: <DeleteFIDO2PasskeyPage />,
+                        handle: { id: PAGES.deleteFIDO2PasskeyPage },
                       },
                     ],
                   },
