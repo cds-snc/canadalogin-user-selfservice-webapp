@@ -4,7 +4,6 @@ Service for proxying FIDO2 requests to IBM Verify API
 
 import logging
 from typing import Dict, Any, Optional
-from fastapi import HTTPException
 from httpx import AsyncClient
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.request_error_handler import RequestErrorHandler
@@ -101,8 +100,6 @@ async def proxy_fido2_request(
             message="FIDO2 request processed successfully",
         )
 
-    except HTTPException:
-        raise
     except Exception as e:
         logger.error(f"Error proxying FIDO2 request: {str(e)}", exc_info=True)
         RequestErrorHandler.handle(e)
