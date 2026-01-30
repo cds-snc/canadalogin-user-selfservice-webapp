@@ -65,6 +65,7 @@ class TestHelperUtils:
         # Arrange
         mock_profile = Mock()
         mock_profile.userName = "testuser@example.com"
+        mock_profile.id = "user-123"
         mock_profile.name = Mock()
         mock_profile.name.givenName = "John"
         mock_profile.name.familyName = "Doe"
@@ -74,13 +75,14 @@ class TestHelperUtils:
         http_client = AsyncClient()
 
         # Act
-        username, display_name = await get_user_profile_info(
+        username, display_name, user_id = await get_user_profile_info(
             http_client, MOCK_USER_TOKEN
         )
 
         # Assert
         assert username == "testuser@example.com"
         assert display_name == "John Doe"
+        assert user_id == "user-123"
         mock_dispatch_profile.assert_called_once_with(http_client, MOCK_USER_TOKEN)
 
     @pytest.mark.asyncio
@@ -90,6 +92,7 @@ class TestHelperUtils:
         # Arrange
         mock_profile = Mock()
         mock_profile.userName = "testuser@example.com"
+        mock_profile.id = "user-123"
         mock_profile.name = Mock()
         mock_profile.name.givenName = None
         mock_profile.name.familyName = None
@@ -99,13 +102,14 @@ class TestHelperUtils:
         http_client = AsyncClient()
 
         # Act
-        username, display_name = await get_user_profile_info(
+        username, display_name, user_id = await get_user_profile_info(
             http_client, MOCK_USER_TOKEN
         )
 
         # Assert
         assert username == "testuser@example.com"
         assert display_name == "John Doe Jr."
+        assert user_id == "user-123"
 
     @pytest.mark.asyncio
     @patch("app.fido2.services.helper_utils.dispatch_get_my_profile_from_ibm")
@@ -114,6 +118,7 @@ class TestHelperUtils:
         # Arrange
         mock_profile = Mock()
         mock_profile.userName = "testuser@example.com"
+        mock_profile.id = "user-123"
         mock_profile.name = Mock()
         mock_profile.name.givenName = None
         mock_profile.name.familyName = None
@@ -123,13 +128,14 @@ class TestHelperUtils:
         http_client = AsyncClient()
 
         # Act
-        username, display_name = await get_user_profile_info(
+        username, display_name, user_id = await get_user_profile_info(
             http_client, MOCK_USER_TOKEN
         )
 
         # Assert
         assert username == "testuser@example.com"
         assert display_name == "testuser@example.com"
+        assert user_id == "user-123"
 
     @pytest.mark.asyncio
     @patch("app.fido2.services.helper_utils.dispatch_get_my_profile_from_ibm")

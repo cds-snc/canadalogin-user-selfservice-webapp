@@ -62,14 +62,14 @@ class TestGetUserFido2Registrations:
     @patch.object(get_registrations_module, "get_auth_request_headers")
     @patch.object(get_registrations_module, "get_rp_uuid_from_rp_id")
     @patch.object(get_registrations_module, "get_admin_token")
-    @patch.object(get_registrations_module, "get_user_id_from_token")
+    @patch.object(get_registrations_module, "get_user_profile_info")
     @patch.object(get_registrations_module, "get_rp_id")
     @patch.object(get_registrations_module, "get_tenant_url")
     async def test_successful_get_registrations(
         self,
         mock_get_tenant_url,
         mock_get_rp_id,
-        mock_get_user_id_from_token,
+        mock_get_user_profile_info,
         mock_get_admin_token,
         mock_get_rp_uuid_from_rp_id,
         mock_get_auth_request_headers,
@@ -80,7 +80,11 @@ class TestGetUserFido2Registrations:
         # Setup mocks
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
         mock_get_rp_id.return_value = "example.com"
-        mock_get_user_id_from_token.return_value = "user-456"
+        mock_get_user_profile_info.return_value = (
+            "user@example.com",
+            "Test User",
+            "user-456",
+        )
         mock_get_admin_token.return_value = "admin-token-xyz"
         mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
         mock_get_auth_request_headers.return_value = {
@@ -111,14 +115,14 @@ class TestGetUserFido2Registrations:
     @patch.object(get_registrations_module, "get_auth_request_headers")
     @patch.object(get_registrations_module, "get_rp_uuid_from_rp_id")
     @patch.object(get_registrations_module, "get_admin_token")
-    @patch.object(get_registrations_module, "get_user_id_from_token")
+    @patch.object(get_registrations_module, "get_user_profile_info")
     @patch.object(get_registrations_module, "get_rp_id")
     @patch.object(get_registrations_module, "get_tenant_url")
     async def test_returns_empty_list_when_no_registrations(
         self,
         mock_get_tenant_url,
         mock_get_rp_id,
-        mock_get_user_id_from_token,
+        mock_get_user_profile_info,
         mock_get_admin_token,
         mock_get_rp_uuid_from_rp_id,
         mock_get_auth_request_headers,
@@ -127,7 +131,11 @@ class TestGetUserFido2Registrations:
         """Should return empty list when user has no registrations"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
         mock_get_rp_id.return_value = "example.com"
-        mock_get_user_id_from_token.return_value = "user-456"
+        mock_get_user_profile_info.return_value = (
+            "user@example.com",
+            "Test User",
+            "user-456",
+        )
         mock_get_admin_token.return_value = "admin-token-xyz"
         mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
         mock_get_auth_request_headers.return_value = {
@@ -152,14 +160,14 @@ class TestGetUserFido2Registrations:
     @patch.object(get_registrations_module, "get_auth_request_headers")
     @patch.object(get_registrations_module, "get_rp_uuid_from_rp_id")
     @patch.object(get_registrations_module, "get_admin_token")
-    @patch.object(get_registrations_module, "get_user_id_from_token")
+    @patch.object(get_registrations_module, "get_user_profile_info")
     @patch.object(get_registrations_module, "get_rp_id")
     @patch.object(get_registrations_module, "get_tenant_url")
     async def test_constructs_correct_search_filter(
         self,
         mock_get_tenant_url,
         mock_get_rp_id,
-        mock_get_user_id_from_token,
+        mock_get_user_profile_info,
         mock_get_admin_token,
         mock_get_rp_uuid_from_rp_id,
         mock_get_auth_request_headers,
@@ -168,7 +176,11 @@ class TestGetUserFido2Registrations:
         """Should construct correct search filter with userId and rpUuid"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
         mock_get_rp_id.return_value = "example.com"
-        mock_get_user_id_from_token.return_value = "user-456"
+        mock_get_user_profile_info.return_value = (
+            "user@example.com",
+            "Test User",
+            "user-456",
+        )
         mock_get_admin_token.return_value = "admin-token-xyz"
         mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
         mock_get_auth_request_headers.return_value = {
@@ -192,20 +204,20 @@ class TestGetUserFido2Registrations:
         assert 'references/rpUuid="rp-uuid-123"' in search_filter
 
     @pytest.mark.asyncio
-    @patch.object(get_registrations_module, "get_user_id_from_token")
+    @patch.object(get_registrations_module, "get_user_profile_info")
     @patch.object(get_registrations_module, "get_rp_id")
     @patch.object(get_registrations_module, "get_tenant_url")
     async def test_propagates_http_exception(
         self,
         mock_get_tenant_url,
         mock_get_rp_id,
-        mock_get_user_id_from_token,
+        mock_get_user_profile_info,
         mock_http_client,
     ):
         """Should propagate HTTPException without wrapping"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
         mock_get_rp_id.return_value = "example.com"
-        mock_get_user_id_from_token.side_effect = HTTPException(
+        mock_get_user_profile_info.side_effect = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token",
         )
@@ -221,14 +233,14 @@ class TestGetUserFido2Registrations:
     @pytest.mark.asyncio
     @patch.object(get_registrations_module, "RequestErrorHandler")
     @patch.object(get_registrations_module, "get_admin_token")
-    @patch.object(get_registrations_module, "get_user_id_from_token")
+    @patch.object(get_registrations_module, "get_user_profile_info")
     @patch.object(get_registrations_module, "get_rp_id")
     @patch.object(get_registrations_module, "get_tenant_url")
     async def test_handles_admin_token_error(
         self,
         mock_get_tenant_url,
         mock_get_rp_id,
-        mock_get_user_id_from_token,
+        mock_get_user_profile_info,
         mock_get_admin_token,
         mock_request_error_handler,
         mock_http_client,
@@ -236,7 +248,11 @@ class TestGetUserFido2Registrations:
         """Should handle error when getting admin token fails"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
         mock_get_rp_id.return_value = "example.com"
-        mock_get_user_id_from_token.return_value = "user-456"
+        mock_get_user_profile_info.return_value = (
+            "user@example.com",
+            "Test User",
+            "user-456",
+        )
         mock_get_admin_token.side_effect = Exception("Token service error")
 
         await get_user_fido2_registrations(
@@ -251,14 +267,14 @@ class TestGetUserFido2Registrations:
     @patch.object(get_registrations_module, "get_auth_request_headers")
     @patch.object(get_registrations_module, "get_rp_uuid_from_rp_id")
     @patch.object(get_registrations_module, "get_admin_token")
-    @patch.object(get_registrations_module, "get_user_id_from_token")
+    @patch.object(get_registrations_module, "get_user_profile_info")
     @patch.object(get_registrations_module, "get_rp_id")
     @patch.object(get_registrations_module, "get_tenant_url")
     async def test_handles_http_get_error(
         self,
         mock_get_tenant_url,
         mock_get_rp_id,
-        mock_get_user_id_from_token,
+        mock_get_user_profile_info,
         mock_get_admin_token,
         mock_get_rp_uuid_from_rp_id,
         mock_get_auth_request_headers,
@@ -268,7 +284,11 @@ class TestGetUserFido2Registrations:
         """Should handle error when HTTP GET request fails"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
         mock_get_rp_id.return_value = "example.com"
-        mock_get_user_id_from_token.return_value = "user-456"
+        mock_get_user_profile_info.return_value = (
+            "user@example.com",
+            "Test User",
+            "user-456",
+        )
         mock_get_admin_token.return_value = "admin-token-xyz"
         mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
         mock_get_auth_request_headers.return_value = {
@@ -298,14 +318,14 @@ class TestGetUserFido2Registrations:
     @patch.object(get_registrations_module, "get_auth_request_headers")
     @patch.object(get_registrations_module, "get_rp_uuid_from_rp_id")
     @patch.object(get_registrations_module, "get_admin_token")
-    @patch.object(get_registrations_module, "get_user_id_from_token")
+    @patch.object(get_registrations_module, "get_user_profile_info")
     @patch.object(get_registrations_module, "get_rp_id")
     @patch.object(get_registrations_module, "get_tenant_url")
     async def test_handles_missing_attributes(
         self,
         mock_get_tenant_url,
         mock_get_rp_id,
-        mock_get_user_id_from_token,
+        mock_get_user_profile_info,
         mock_get_admin_token,
         mock_get_rp_uuid_from_rp_id,
         mock_get_auth_request_headers,
@@ -314,7 +334,11 @@ class TestGetUserFido2Registrations:
         """Should handle registrations with missing attributes"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
         mock_get_rp_id.return_value = "example.com"
-        mock_get_user_id_from_token.return_value = "user-456"
+        mock_get_user_profile_info.return_value = (
+            "user@example.com",
+            "Test User",
+            "user-456",
+        )
         mock_get_admin_token.return_value = "admin-token-xyz"
         mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
         mock_get_auth_request_headers.return_value = {
@@ -349,14 +373,14 @@ class TestGetUserFido2Registrations:
     @patch.object(get_registrations_module, "get_auth_request_headers")
     @patch.object(get_registrations_module, "get_rp_uuid_from_rp_id")
     @patch.object(get_registrations_module, "get_admin_token")
-    @patch.object(get_registrations_module, "get_user_id_from_token")
+    @patch.object(get_registrations_module, "get_user_profile_info")
     @patch.object(get_registrations_module, "get_rp_id")
     @patch.object(get_registrations_module, "get_tenant_url")
     async def test_handles_missing_fido2_key(
         self,
         mock_get_tenant_url,
         mock_get_rp_id,
-        mock_get_user_id_from_token,
+        mock_get_user_profile_info,
         mock_get_admin_token,
         mock_get_rp_uuid_from_rp_id,
         mock_get_auth_request_headers,
@@ -365,7 +389,11 @@ class TestGetUserFido2Registrations:
         """Should handle response with missing fido2 key"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
         mock_get_rp_id.return_value = "example.com"
-        mock_get_user_id_from_token.return_value = "user-456"
+        mock_get_user_profile_info.return_value = (
+            "user@example.com",
+            "Test User",
+            "user-456",
+        )
         mock_get_admin_token.return_value = "admin-token-xyz"
         mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
         mock_get_auth_request_headers.return_value = {
