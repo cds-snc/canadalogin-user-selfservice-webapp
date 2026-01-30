@@ -75,12 +75,12 @@ class TestUpdateRegistration:
     @patch.object(update_module, "get_auth_request_headers")
     @patch.object(update_module, "verify_registration_ownership")
     @patch.object(update_module, "get_admin_token")
-    @patch.object(update_module, "get_user_id_from_token")
+    @patch.object(update_module, "get_user_profile_info")
     @patch.object(update_module, "get_tenant_url")
     async def test_successful_nickname_update(
         self,
         mock_get_tenant_url,
-        mock_get_user_id_from_token,
+        mock_get_user_profile_info,
         mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_get_auth_request_headers,
@@ -90,7 +90,11 @@ class TestUpdateRegistration:
     ):
         """Should successfully update registration nickname and return ResponseModel"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
-        mock_get_user_id_from_token.return_value = "user-456"
+        mock_get_user_profile_info.return_value = (
+            "user@example.com",
+            "Test User",
+            "user-456",
+        )
         mock_get_admin_token.return_value = "admin-token-xyz"
         mock_verify_registration_ownership.return_value = mock_registration_data.copy()
         mock_get_auth_request_headers.return_value = {
@@ -117,12 +121,12 @@ class TestUpdateRegistration:
     @patch.object(update_module, "get_auth_request_headers")
     @patch.object(update_module, "verify_registration_ownership")
     @patch.object(update_module, "get_admin_token")
-    @patch.object(update_module, "get_user_id_from_token")
+    @patch.object(update_module, "get_user_profile_info")
     @patch.object(update_module, "get_tenant_url")
     async def test_successful_enabled_status_update(
         self,
         mock_get_tenant_url,
-        mock_get_user_id_from_token,
+        mock_get_user_profile_info,
         mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_get_auth_request_headers,
@@ -132,7 +136,11 @@ class TestUpdateRegistration:
     ):
         """Should successfully update registration enabled status"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
-        mock_get_user_id_from_token.return_value = "user-456"
+        mock_get_user_profile_info.return_value = (
+            "user@example.com",
+            "Test User",
+            "user-456",
+        )
         mock_get_admin_token.return_value = "admin-token-xyz"
         mock_verify_registration_ownership.return_value = mock_registration_data.copy()
         mock_get_auth_request_headers.return_value = {
@@ -158,12 +166,12 @@ class TestUpdateRegistration:
     @patch.object(update_module, "get_auth_request_headers")
     @patch.object(update_module, "verify_registration_ownership")
     @patch.object(update_module, "get_admin_token")
-    @patch.object(update_module, "get_user_id_from_token")
+    @patch.object(update_module, "get_user_profile_info")
     @patch.object(update_module, "get_tenant_url")
     async def test_update_both_nickname_and_enabled(
         self,
         mock_get_tenant_url,
-        mock_get_user_id_from_token,
+        mock_get_user_profile_info,
         mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_get_auth_request_headers,
@@ -173,7 +181,11 @@ class TestUpdateRegistration:
     ):
         """Should update both nickname and enabled status"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
-        mock_get_user_id_from_token.return_value = "user-456"
+        mock_get_user_profile_info.return_value = (
+            "user@example.com",
+            "Test User",
+            "user-456",
+        )
         mock_get_admin_token.return_value = "admin-token-xyz"
         mock_verify_registration_ownership.return_value = mock_registration_data.copy()
         mock_get_auth_request_headers.return_value = {
@@ -199,12 +211,12 @@ class TestUpdateRegistration:
     @patch.object(update_module, "get_auth_request_headers")
     @patch.object(update_module, "verify_registration_ownership")
     @patch.object(update_module, "get_admin_token")
-    @patch.object(update_module, "get_user_id_from_token")
+    @patch.object(update_module, "get_user_profile_info")
     @patch.object(update_module, "get_tenant_url")
     async def test_preserves_existing_attributes(
         self,
         mock_get_tenant_url,
-        mock_get_user_id_from_token,
+        mock_get_user_profile_info,
         mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_get_auth_request_headers,
@@ -214,7 +226,11 @@ class TestUpdateRegistration:
     ):
         """Should preserve existing attributes when updating"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
-        mock_get_user_id_from_token.return_value = "user-456"
+        mock_get_user_profile_info.return_value = (
+            "user@example.com",
+            "Test User",
+            "user-456",
+        )
         mock_get_admin_token.return_value = "admin-token-xyz"
         mock_verify_registration_ownership.return_value = mock_registration_data.copy()
         mock_get_auth_request_headers.return_value = {
@@ -241,12 +257,12 @@ class TestUpdateRegistration:
     @patch.object(update_module, "get_auth_request_headers")
     @patch.object(update_module, "verify_registration_ownership")
     @patch.object(update_module, "get_admin_token")
-    @patch.object(update_module, "get_user_id_from_token")
+    @patch.object(update_module, "get_user_profile_info")
     @patch.object(update_module, "get_tenant_url")
     async def test_calls_correct_endpoint(
         self,
         mock_get_tenant_url,
-        mock_get_user_id_from_token,
+        mock_get_user_profile_info,
         mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_get_auth_request_headers,
@@ -256,7 +272,11 @@ class TestUpdateRegistration:
     ):
         """Should call correct FIDO2 registrations endpoint with PUT"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
-        mock_get_user_id_from_token.return_value = "user-456"
+        mock_get_user_profile_info.return_value = (
+            "user@example.com",
+            "Test User",
+            "user-456",
+        )
         mock_get_admin_token.return_value = "admin-token-xyz"
         mock_verify_registration_ownership.return_value = mock_registration_data.copy()
         mock_get_auth_request_headers.return_value = {
@@ -279,19 +299,19 @@ class TestUpdateRegistration:
 
     @pytest.mark.asyncio
     @patch.object(update_module, "RequestErrorHandler")
-    @patch.object(update_module, "get_user_id_from_token")
+    @patch.object(update_module, "get_user_profile_info")
     @patch.object(update_module, "get_tenant_url")
     async def test_handles_get_user_id_error(
         self,
         mock_get_tenant_url,
-        mock_get_user_id_from_token,
+        mock_get_user_profile_info,
         mock_request_error_handler,
         mock_http_client,
         mock_request_data_nickname,
     ):
         """Should handle error when getting user ID fails"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
-        mock_get_user_id_from_token.side_effect = HTTPException(
+        mock_get_user_profile_info.side_effect = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token",
         )
@@ -307,12 +327,12 @@ class TestUpdateRegistration:
     @pytest.mark.asyncio
     @patch.object(update_module, "RequestErrorHandler")
     @patch.object(update_module, "get_admin_token")
-    @patch.object(update_module, "get_user_id_from_token")
+    @patch.object(update_module, "get_user_profile_info")
     @patch.object(update_module, "get_tenant_url")
     async def test_handles_get_admin_token_error(
         self,
         mock_get_tenant_url,
-        mock_get_user_id_from_token,
+        mock_get_user_profile_info,
         mock_get_admin_token,
         mock_request_error_handler,
         mock_http_client,
@@ -320,7 +340,11 @@ class TestUpdateRegistration:
     ):
         """Should handle error when getting admin token fails"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
-        mock_get_user_id_from_token.return_value = "user-456"
+        mock_get_user_profile_info.return_value = (
+            "user@example.com",
+            "Test User",
+            "user-456",
+        )
         mock_get_admin_token.side_effect = Exception("Token service error")
 
         await update_registration(
@@ -335,12 +359,12 @@ class TestUpdateRegistration:
     @patch.object(update_module, "RequestErrorHandler")
     @patch.object(update_module, "verify_registration_ownership")
     @patch.object(update_module, "get_admin_token")
-    @patch.object(update_module, "get_user_id_from_token")
+    @patch.object(update_module, "get_user_profile_info")
     @patch.object(update_module, "get_tenant_url")
     async def test_handles_ownership_verification_failure(
         self,
         mock_get_tenant_url,
-        mock_get_user_id_from_token,
+        mock_get_user_profile_info,
         mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_request_error_handler,
@@ -349,7 +373,11 @@ class TestUpdateRegistration:
     ):
         """Should handle error when ownership verification fails"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
-        mock_get_user_id_from_token.return_value = "user-456"
+        mock_get_user_profile_info.return_value = (
+            "user@example.com",
+            "Test User",
+            "user-456",
+        )
         mock_get_admin_token.return_value = "admin-token-xyz"
         mock_verify_registration_ownership.side_effect = HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -369,12 +397,12 @@ class TestUpdateRegistration:
     @patch.object(update_module, "get_auth_request_headers")
     @patch.object(update_module, "verify_registration_ownership")
     @patch.object(update_module, "get_admin_token")
-    @patch.object(update_module, "get_user_id_from_token")
+    @patch.object(update_module, "get_user_profile_info")
     @patch.object(update_module, "get_tenant_url")
     async def test_handles_http_put_error(
         self,
         mock_get_tenant_url,
-        mock_get_user_id_from_token,
+        mock_get_user_profile_info,
         mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_get_auth_request_headers,
@@ -385,7 +413,11 @@ class TestUpdateRegistration:
     ):
         """Should handle error when HTTP PUT request fails"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
-        mock_get_user_id_from_token.return_value = "user-456"
+        mock_get_user_profile_info.return_value = (
+            "user@example.com",
+            "Test User",
+            "user-456",
+        )
         mock_get_admin_token.return_value = "admin-token-xyz"
         mock_verify_registration_ownership.return_value = mock_registration_data.copy()
         mock_get_auth_request_headers.return_value = {
@@ -417,12 +449,12 @@ class TestUpdateRegistration:
     @patch.object(update_module, "get_auth_request_headers")
     @patch.object(update_module, "verify_registration_ownership")
     @patch.object(update_module, "get_admin_token")
-    @patch.object(update_module, "get_user_id_from_token")
+    @patch.object(update_module, "get_user_profile_info")
     @patch.object(update_module, "get_tenant_url")
     async def test_sets_required_fields_in_payload(
         self,
         mock_get_tenant_url,
-        mock_get_user_id_from_token,
+        mock_get_user_profile_info,
         mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_get_auth_request_headers,
@@ -432,7 +464,11 @@ class TestUpdateRegistration:
     ):
         """Should set required id and userId fields in payload"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
-        mock_get_user_id_from_token.return_value = "user-456"
+        mock_get_user_profile_info.return_value = (
+            "user@example.com",
+            "Test User",
+            "user-456",
+        )
         mock_get_admin_token.return_value = "admin-token-xyz"
         mock_verify_registration_ownership.return_value = mock_registration_data.copy()
         mock_get_auth_request_headers.return_value = {
@@ -458,12 +494,12 @@ class TestUpdateRegistration:
     @patch.object(update_module, "get_auth_request_headers")
     @patch.object(update_module, "verify_registration_ownership")
     @patch.object(update_module, "get_admin_token")
-    @patch.object(update_module, "get_user_id_from_token")
+    @patch.object(update_module, "get_user_profile_info")
     @patch.object(update_module, "get_tenant_url")
     async def test_preserves_existing_nickname_when_not_provided(
         self,
         mock_get_tenant_url,
-        mock_get_user_id_from_token,
+        mock_get_user_profile_info,
         mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_get_auth_request_headers,
@@ -473,7 +509,11 @@ class TestUpdateRegistration:
     ):
         """Should preserve existing nickname when nickname is None"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
-        mock_get_user_id_from_token.return_value = "user-456"
+        mock_get_user_profile_info.return_value = (
+            "user@example.com",
+            "Test User",
+            "user-456",
+        )
         mock_get_admin_token.return_value = "admin-token-xyz"
         mock_verify_registration_ownership.return_value = mock_registration_data.copy()
         mock_get_auth_request_headers.return_value = {
@@ -499,12 +539,12 @@ class TestUpdateRegistration:
     @patch.object(update_module, "get_auth_request_headers")
     @patch.object(update_module, "verify_registration_ownership")
     @patch.object(update_module, "get_admin_token")
-    @patch.object(update_module, "get_user_id_from_token")
+    @patch.object(update_module, "get_user_profile_info")
     @patch.object(update_module, "get_tenant_url")
     async def test_handles_registration_without_attributes(
         self,
         mock_get_tenant_url,
-        mock_get_user_id_from_token,
+        mock_get_user_profile_info,
         mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_get_auth_request_headers,
@@ -513,7 +553,11 @@ class TestUpdateRegistration:
     ):
         """Should handle registration data without attributes"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
-        mock_get_user_id_from_token.return_value = "user-456"
+        mock_get_user_profile_info.return_value = (
+            "user@example.com",
+            "Test User",
+            "user-456",
+        )
         mock_get_admin_token.return_value = "admin-token-xyz"
         # Registration without attributes
         mock_verify_registration_ownership.return_value = {
@@ -544,12 +588,12 @@ class TestUpdateRegistration:
     @patch.object(update_module, "get_auth_request_headers")
     @patch.object(update_module, "verify_registration_ownership")
     @patch.object(update_module, "get_admin_token")
-    @patch.object(update_module, "get_user_id_from_token")
+    @patch.object(update_module, "get_user_profile_info")
     @patch.object(update_module, "get_tenant_url")
     async def test_uses_top_level_nickname_when_no_attribute_nickname(
         self,
         mock_get_tenant_url,
-        mock_get_user_id_from_token,
+        mock_get_user_profile_info,
         mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_get_auth_request_headers,
@@ -558,7 +602,11 @@ class TestUpdateRegistration:
     ):
         """Should use top-level nickname when attributes.nickname is missing"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
-        mock_get_user_id_from_token.return_value = "user-456"
+        mock_get_user_profile_info.return_value = (
+            "user@example.com",
+            "Test User",
+            "user-456",
+        )
         mock_get_admin_token.return_value = "admin-token-xyz"
         # Registration with top-level nickname but not in attributes
         mock_verify_registration_ownership.return_value = {
@@ -610,12 +658,12 @@ class TestUpdateRegistration:
     @patch.object(update_module, "get_auth_request_headers")
     @patch.object(update_module, "verify_registration_ownership")
     @patch.object(update_module, "get_admin_token")
-    @patch.object(update_module, "get_user_id_from_token")
+    @patch.object(update_module, "get_user_profile_info")
     @patch.object(update_module, "get_tenant_url")
     async def test_uses_admin_token_for_put_request(
         self,
         mock_get_tenant_url,
-        mock_get_user_id_from_token,
+        mock_get_user_profile_info,
         mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_get_auth_request_headers,
@@ -626,7 +674,11 @@ class TestUpdateRegistration:
         """Should use admin token for the PUT request"""
         admin_token = "specific-admin-token"
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
-        mock_get_user_id_from_token.return_value = "user-456"
+        mock_get_user_profile_info.return_value = (
+            "user@example.com",
+            "Test User",
+            "user-456",
+        )
         mock_get_admin_token.return_value = admin_token
         mock_verify_registration_ownership.return_value = mock_registration_data.copy()
         mock_get_auth_request_headers.return_value = {
@@ -651,12 +703,12 @@ class TestUpdateRegistration:
     @patch.object(update_module, "get_auth_request_headers")
     @patch.object(update_module, "verify_registration_ownership")
     @patch.object(update_module, "get_admin_token")
-    @patch.object(update_module, "get_user_id_from_token")
+    @patch.object(update_module, "get_user_profile_info")
     @patch.object(update_module, "get_tenant_url")
     async def test_returns_response_model_with_no_data(
         self,
         mock_get_tenant_url,
-        mock_get_user_id_from_token,
+        mock_get_user_profile_info,
         mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_get_auth_request_headers,
@@ -666,7 +718,11 @@ class TestUpdateRegistration:
     ):
         """Should return ResponseModel with success=True and no data"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
-        mock_get_user_id_from_token.return_value = "user-456"
+        mock_get_user_profile_info.return_value = (
+            "user@example.com",
+            "Test User",
+            "user-456",
+        )
         mock_get_admin_token.return_value = "admin-token-xyz"
         mock_verify_registration_ownership.return_value = mock_registration_data.copy()
         mock_get_auth_request_headers.return_value = {

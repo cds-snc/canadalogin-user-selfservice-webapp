@@ -30,7 +30,10 @@ from app.fido2.services.delete_fido2_registration import (
 from app.fido2.services.update_fido2_registration import (
     update_registration as update_registration_service,
 )
-from app.fido2.services.proxy_fido2_request import proxy_fido2_request
+from app.fido2.services.add_fido2_registration import (
+    get_attestation_options as get_attestation_options_service,
+    submit_attestation_result as submit_attestation_result_service,
+)
 
 logger = logging.getLogger(__name__)
 router = APIRouter(tags=["fido2"])
@@ -146,10 +149,9 @@ async def get_attestation_options(
         },
     }
 
-    return await proxy_fido2_request(
+    return await get_attestation_options_service(
         http_client=http_client,
         user_access_token=user_access_token,
-        endpoint_path="/attestation/options",
         request_body=request_body,
     )
 
@@ -166,12 +168,11 @@ async def submit_attestation_result(
     http_client: AsyncClient = Depends(get_http_client),
 ):
     """
-    Proxy FIDO2 attestation result request to IBM Verify.
+    Submit FIDO2 attestation result to IBM Verify.
     Used to complete the FIDO2 registration process.
     """
-    return await proxy_fido2_request(
+    return await submit_attestation_result_service(
         http_client=http_client,
         user_access_token=user_access_token,
-        endpoint_path="/attestation/result",
         request_body=request_data.model_dump(),
     )

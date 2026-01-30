@@ -6,7 +6,7 @@ This package contains organized service functions for FIDO2 passkey management:
 - get_registration_details: Get details of a specific registration
 - delete_fido2_registration: Delete FIDO2 passkeys
 - update_fido2_registration: Rename/update FIDO2 passkeys
-- proxy_fido2_request: Proxy FIDO2 requests to IBM Verify API
+- add_fido2_registration: Add new FIDO2 passkeys (attestation options/result)
 - helper_utils: Shared utility functions
 """
 
@@ -17,7 +17,10 @@ from app.fido2.services.get_fido2_registrations import (
 from app.fido2.services.get_registration_details import get_registration_details
 from app.fido2.services.delete_fido2_registration import delete_registration
 from app.fido2.services.update_fido2_registration import update_registration
-from app.fido2.services.proxy_fido2_request import proxy_fido2_request
+from app.fido2.services.add_fido2_registration import (
+    get_attestation_options,
+    submit_attestation_result,
+)
 
 __all__ = [
     "get_user_fido2_registrations",
@@ -25,5 +28,6 @@ __all__ = [
     "get_registration_details",
     "delete_registration",
     "update_registration",
-    "proxy_fido2_request",
+    "get_attestation_options",
+    "submit_attestation_result",
 ]
