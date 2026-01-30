@@ -111,8 +111,11 @@ export const PAGES = {
   emailOtpValidation: "EmailOtpValidation",
   emailConfirmUpdate: "EmailConfirmUpdate",
   emailUpdateSuccess: "EmailUpdateSuccess",
-  addFido2PasskeyPage: "AddFIDO2PasskeyPage",
+  addFIDO2PasskeyPage: "AddFIDO2PasskeyPage",
   addFIDO2Passkey: "AddFIDO2Passkey",
+  deleteFIDO2PasskeyPage: "DeleteFIDO2PasskeyPage",
+  deleteFIDO2Passkey: "DeleteFIDO2Passkey",
+  manageFIDO2: "ManageFIDO2",
 };
 
 export const FOOTERS = {

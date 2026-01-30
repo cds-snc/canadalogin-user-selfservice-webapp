@@ -48,6 +48,7 @@ export default function PasswordVerification({
     [PAGES.deleteMFAPage]: pageContentJson["8"],
     [PAGES.addMFAPage]: pageContentJson["7"],
     [PAGES.addFido2Passkey]: pageContentJson["9"],
+    [PAGES.deleteFIDO2Passkey]: pageContentJson["10"],
   };
 
   const parentPageContent = pageContentMap[parentPage] || pageContentJson["2"];

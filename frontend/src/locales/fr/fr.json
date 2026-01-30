@@ -485,7 +485,8 @@
     "6": "Réinitialiser le mot de passe",
     "7": "Pour ajouter un numéro de téléphone,",
     "8": "Pour supprimer un numéro de téléphone,",
-    "9": "To add a passkey,"
+    "9": "To add a passkey,",
+    "10": "To delete this passkey,"
   },
   "EditEmailEnterEmail": {
     "1": "Enter a new email address",

@@ -17,6 +17,7 @@ import { useUser } from "../../Providers/useUser.js";
 import NoticeFactory from "../../InfoBlocks/NoticeFactory.jsx";
 import config from "../../../config.jsx";
 import PhoneFactorsList from "./PhoneFactorsList.jsx";
+import ManageFIDO2 from "./ManageFIDO2.jsx";
 
 export default function Manage2FAVerifications() {
   const { language } = useParams();
@@ -38,7 +39,7 @@ export default function Manage2FAVerifications() {
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
     language: language,
   });
-  const addFido2PagePath = path(PAGES.addFido2PasskeyPage, { language });
+  const addFido2PagePath = path(PAGES.addFIDO2PasskeyPage, { language });
 
   useEffect(() => {
     const fetchUserOtpPhoneFactors = async () => {
@@ -152,6 +153,7 @@ export default function Manage2FAVerifications() {
           {pageContent["12"]}
         </GcdsButton>
       )}
+      <ManageFIDO2 />
     </GcdsContainer>
   );
 }
