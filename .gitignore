@@ -21,6 +21,11 @@ core
 backend/.coverage
 .coverage
 coverage.xml
+backend/certs/cert.pem
+backend/certs/key.pem
+
+#Frontend
+frontend/vite.config.js
 
 #Storybook Build
 frontend/storybook-static/
