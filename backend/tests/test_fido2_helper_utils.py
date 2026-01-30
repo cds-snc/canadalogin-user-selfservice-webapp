@@ -13,7 +13,6 @@ from app.fido2.services.helper_utils import (
     get_tenant_url,
     get_user_profile_info,
     get_rp_uuid_from_rp_id,
-    get_user_id_from_token,
     verify_registration_ownership,
 )
 
@@ -210,55 +209,6 @@ class TestHelperUtils:
 
         assert exc_info.value.status_code == 404
         assert "not found" in str(exc_info.value.detail)
-
-    @pytest.mark.asyncio
-    @respx.mock
-    @patch("app.fido2.services.helper_utils.get_tenant_url")
-    @patch("app.fido2.services.helper_utils.get_auth_request_headers")
-    async def test_get_user_id_from_token_success(self, mock_headers, mock_tenant_url):
-        """Test successful user ID retrieval from token"""
-        # Arrange
-        mock_tenant_url.return_value = MOCK_TENANT_URL
-        mock_headers.return_value = {"Authorization": f"Bearer {MOCK_USER_TOKEN}"}
-
-        mock_response = {"sub": MOCK_USER_ID, "email": "test@example.com"}
-
-        respx.post(f"{MOCK_TENANT_URL}/v1.0/endpoint/default/userinfo").mock(
-            return_value=Response(200, json=mock_response)
-        )
-
-        http_client = AsyncClient()
-
-        # Act
-        result = await get_user_id_from_token(http_client, MOCK_USER_TOKEN)
-
-        # Assert
-        assert result == MOCK_USER_ID
-
-    @pytest.mark.asyncio
-    @respx.mock
-    @patch("app.fido2.services.helper_utils.get_tenant_url")
-    @patch("app.fido2.services.helper_utils.get_auth_request_headers")
-    async def test_get_user_id_from_token_no_sub(self, mock_headers, mock_tenant_url):
-        """Test user ID retrieval when 'sub' not in response"""
-        # Arrange
-        mock_tenant_url.return_value = MOCK_TENANT_URL
-        mock_headers.return_value = {"Authorization": f"Bearer {MOCK_USER_TOKEN}"}
-
-        mock_response = {"email": "test@example.com"}
-
-        respx.post(f"{MOCK_TENANT_URL}/v1.0/endpoint/default/userinfo").mock(
-            return_value=Response(200, json=mock_response)
-        )
-
-        http_client = AsyncClient()
-
-        # Act & Assert
-        with pytest.raises(HTTPException) as exc_info:
-            await get_user_id_from_token(http_client, MOCK_USER_TOKEN)
-
-        assert exc_info.value.status_code == 400
-        assert "User ID not found" in str(exc_info.value.detail)
 
     @pytest.mark.asyncio
     @respx.mock

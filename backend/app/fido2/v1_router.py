@@ -151,8 +151,6 @@ async def get_attestation_options(
         user_access_token=user_access_token,
         endpoint_path="/attestation/options",
         request_body=request_body,
-        validate_username=True,
-        allow_empty_username=True,
     )
 
 
@@ -176,6 +174,4 @@ async def submit_attestation_result(
         user_access_token=user_access_token,
         endpoint_path="/attestation/result",
         request_body=request_data.model_dump(),
-        validate_username=True,
-        allow_empty_username=True,
     )

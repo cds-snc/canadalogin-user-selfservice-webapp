@@ -12,7 +12,7 @@ from app.fido2.schemas import (
 )
 from app.fido2.services.helper_utils import (
     get_tenant_url,
-    get_user_id_from_token,
+    get_user_profile_info,
     verify_registration_ownership,
 )
 from app.utils.schemas import ResponseModel
@@ -31,7 +31,9 @@ async def delete_registration(
         registration_id = request_data.id
 
         # Get user ID from the token using userinfo endpoint
-        user_id = await get_user_id_from_token(http_client, user_access_token)
+        _username, _display_name, user_id = await get_user_profile_info(
+            http_client, user_access_token
+        )
 
         # Get admin token for delete operations (might need admin access)
         admin_token = await get_admin_token(http_client)

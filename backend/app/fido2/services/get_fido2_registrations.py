@@ -18,7 +18,7 @@ from app.fido2.services.helper_utils import (
     get_rp_id,
     get_tenant_url,
     get_rp_uuid_from_rp_id,
-    get_user_id_from_token,
+    get_user_profile_info,
 )
 
 logger = logging.getLogger(__name__)
@@ -36,7 +36,9 @@ async def get_user_fido2_registrations(
         logger.info(f"Using RPID: {rp_id}")
 
         # Get user ID from the token using userinfo endpoint
-        user_id = await get_user_id_from_token(http_client, user_access_token)
+        _username, _display_name, user_id = await get_user_profile_info(
+            http_client, user_access_token
+        )
         logger.info(f"Found user ID from userinfo: {user_id}")
 
         # Get RP UUID from RP ID

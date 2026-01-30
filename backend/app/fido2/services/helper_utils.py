@@ -31,7 +31,7 @@ def get_tenant_url() -> str:
 
 async def get_user_profile_info(
     http_client: AsyncClient, user_access_token: str
-) -> tuple[str, str]:
+) -> tuple[str, str, str]:
     """
     Get username and displayName from user profile using their access token.
 
@@ -43,6 +43,7 @@ async def get_user_profile_info(
         profile = await dispatch_get_my_profile_from_ibm(http_client, user_access_token)
 
         username = profile.userName
+        user_id = profile.id
 
         # Construct display name from profile
         display_name = ""
@@ -61,7 +62,7 @@ async def get_user_profile_info(
             display_name = username
 
         logger.info("Retrieved user profile for FIDO2 operation")
-        return username, display_name
+        return username, display_name, user_id
 
     except Exception as e:
         logger.error(f"Error fetching user profile for FIDO2: {str(e)}", exc_info=True)
@@ -99,34 +100,6 @@ async def get_rp_uuid_from_rp_id(
         raise
     except Exception as e:
         logger.error(f"Error getting RP UUID: {str(e)}", exc_info=True)
-        RequestErrorHandler.handle(e)
-
-
-async def get_user_id_from_token(
-    http_client: AsyncClient, user_access_token: str
-) -> str:
-    """Get user ID from access token using userinfo endpoint"""
-    try:
-        tenant_url = get_tenant_url()
-        userinfo_url = f"{tenant_url}{VerifyAPIEndpoint.USERINFO.value}"
-        headers = get_auth_request_headers(user_access_token)
-
-        userinfo_response = await http_client.post(userinfo_url, headers=headers)
-        userinfo_response.raise_for_status()
-        userinfo_data = userinfo_response.json()
-
-        user_id = userinfo_data.get("sub")
-        if not user_id:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="User ID not found in userinfo",
-            )
-        return user_id
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error getting user ID from token: {str(e)}", exc_info=True)
         RequestErrorHandler.handle(e)
 
 
