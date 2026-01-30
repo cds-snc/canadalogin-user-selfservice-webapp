@@ -380,7 +380,10 @@
     "9": "Delete",
     "10": "+ Add a phone number",
     "11": "Loading...",
-    "12": "+ Add a passkey"
+    "12": "+ Add a passkey",
+    "13": "Delete passkey",
+    "14": "Rename passkey",
+    "15": "Passkeys and Security Keys"
   },
   "AddMFANumber": {
     "1": "Enter your new phone number",

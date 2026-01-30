@@ -1,6 +1,7 @@
 import {
   GcdsButton,
   GcdsContainer,
+  GcdsGrid,
   GcdsHeading,
   GcdsLink,
   GcdsNotice,
@@ -141,17 +142,79 @@ export default function Manage2FAVerifications() {
         </GcdsButton>
       </GcdsContainer>
 
-      {showAddPasskeyLink && (
-        <GcdsButton
-          id="add-fido2-button"
-          onGcdsClick={(ev) => {
-            ev.preventDefault();
-            navigate(addFido2PagePath);
-          }}
+      <GcdsContainer className="sectionCard">
+        <GcdsHeading
+          tag="h3"
+          marginTop="300"
+          style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
         >
-          {pageContent["12"]}
-        </GcdsButton>
-      )}
+          <div
+            style={{
+              display: "flex",
+              height: "1.875rem",
+              padding: "0 0.625rem",
+              justifyContent: "center",
+              alignItems: "center",
+              gap: "0.3125rem",
+              borderRadius: "0.3125rem",
+              width: "fit-content",
+            }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="25"
+              viewBox="0 0 16 25"
+              fill="none"
+            >
+              <path
+                d="M2.18182 24.5464C1.58182 24.5464 1.06818 24.3328 0.640909 23.9055C0.213636 23.4782 0 22.9646 0 22.3646V2.7282C0 2.1282 0.213636 1.61457 0.640909 1.1873C1.06818 0.760023 1.58182 0.546387 2.18182 0.546387H13.0909C13.6909 0.546387 14.2045 0.760023 14.6318 1.1873C15.0591 1.61457 15.2727 2.1282 15.2727 2.7282V22.3646C15.2727 22.9646 15.0591 23.4782 14.6318 23.9055C14.2045 24.3328 13.6909 24.5464 13.0909 24.5464H2.18182ZM2.18182 21.2737V22.3646H13.0909V21.2737H2.18182ZM2.18182 19.0918H13.0909V6.00093H2.18182V19.0918ZM2.18182 3.81911H13.0909V2.7282H2.18182V3.81911Z"
+                fill="#333333"
+              />
+            </svg>
+            {pageContent["15"]}
+          </div>
+        </GcdsHeading>
+
+
+      <GcdsGrid columns="repeat(auto-fit, minmax(100px, 200px))">
+        {showAddPasskeyLink && (
+          <GcdsButton
+            id="add-fido2-button"
+            onGcdsClick={(ev) => {
+              ev.preventDefault();
+              navigate(addFido2PagePath);
+            }}
+          >
+            {pageContent["12"]}
+          </GcdsButton>
+        )}
+
+        {showAddPasskeyLink && (
+          <GcdsButton
+            id="delete-fido2-button"
+            onGcdsClick={(ev) => {
+             
+            }}
+          >
+            {pageContent["13"]}
+          </GcdsButton>
+        )}
+
+        {showAddPasskeyLink && (
+          <GcdsButton
+            id="rename-fido2-button"
+            onGcdsClick={(ev) => {
+            }}
+          >
+            {pageContent["14"]}
+          </GcdsButton>
+        )}
+      </GcdsGrid>
+
+
+
+      </GcdsContainer>
     </GcdsContainer>
   );
 }
