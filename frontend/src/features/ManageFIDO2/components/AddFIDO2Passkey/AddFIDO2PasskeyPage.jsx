@@ -77,7 +77,7 @@ export default function AddFIDO2PasskeyPage() {
         // Handle case when FIDO2 data exists
         // Go to access policy OOTB step up
         navigate(
-          `/${language}/security-settings/add-fido2/fido2-verification`,
+          `/${language}/security-settings/manage-2fa-verifications/add-fido2/fido2-verification`,
           {
             replace: true,
           },
@@ -88,15 +88,21 @@ export default function AddFIDO2PasskeyPage() {
         if (userPhoneFactors && userPhoneFactors.length === 1) {
           setWizardStep("otpValidation");
           // Navigate to confirmation URL while preserving state
-          navigate(`/${language}/security-settings/add-fido2/otp-validation`, {
-            replace: true,
-          });
+          navigate(
+            `/${language}/security-settings/manage-2fa-verifications/add-fido2/otp-validation`,
+            {
+              replace: true,
+            },
+          );
         } else {
           setWizardStep("otpSelection");
           // Navigate to confirmation URL while preserving state
-          navigate(`/${language}/security-settings/add-fido2/otp-selection`, {
-            replace: true,
-          });
+          navigate(
+            `/${language}/security-settings/manage-2fa-verifications/add-fido2/otp-selection`,
+            {
+              replace: true,
+            },
+          );
         }
       }
     },
@@ -136,9 +142,12 @@ export default function AddFIDO2PasskeyPage() {
       if (response && response.success) {
         setWizardStep("addFido2Passkey");
         // Navigate to confirmation URL while preserving state
-        navigate(`/${language}/security-settings/add-fido2/add-fido2-passkey`, {
-          replace: true,
-        });
+        navigate(
+          `/${language}/security-settings/manage-2fa-verifications/add-fido2/add-fido2-passkey`,
+          {
+            replace: true,
+          },
+        );
         setErrorCode("");
       }
     } catch (err) {
@@ -260,16 +269,19 @@ export default function AddFIDO2PasskeyPage() {
           if (userPhoneFactors && userPhoneFactors.length === 1) {
             setWizardStep("passwordVerification");
             navigate(
-              `/${language}/security-settings/add-fido2/password-verification`,
+              `/${language}/security-settings/manage-2fa-verifications/add-fido2/password-verification`,
               {
                 replace: true,
               },
             );
           } else {
             setWizardStep("otpSelection");
-            navigate(`/${language}/security-settings/add-fido2/otp-selection`, {
-              replace: true,
-            });
+            navigate(
+              `/${language}/security-settings/manage-2fa-verifications/add-fido2/otp-selection`,
+              {
+                replace: true,
+              },
+            );
           }
         }}
         setErrorCode={setErrorCode}

@@ -111,24 +111,24 @@ export const appRoutes = [
                         element: <DeleteMFAPage />,
                         handle: { id: PAGES.deleteMFAPage },
                       },
-                    ],
-                  },
-                  {
-                    element: (
-                      <StepupPrivateRoute redirectPath="/en/security-settings/add-fido2/add-fido2-passkey" />
-                    ),
-                    children: [
                       {
-                        path: "add-fido2/fido2-verification",
+                        element: (
+                          <StepupPrivateRoute redirectPath="/en/security-settings/manage-2fa-verifications/add-fido2/add-fido2-passkey" />
+                        ),
+                        children: [
+                          {
+                            path: "add-fido2/fido2-verification",
+                            element: <AddFIDO2PasskeyPage />,
+                            handle: { id: PAGES.addFido2PasskeyPage },
+                          },
+                        ],
+                      },
+                      {
+                        path: "add-fido2/:step?",
                         element: <AddFIDO2PasskeyPage />,
                         handle: { id: PAGES.addFido2PasskeyPage },
                       },
                     ],
-                  },
-                  {
-                    path: "add-fido2/:step?",
-                    element: <AddFIDO2PasskeyPage />,
-                    handle: { id: PAGES.addFido2PasskeyPage },
                   },
                 ],
               },
