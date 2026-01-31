@@ -85,13 +85,11 @@ export default function AddFIDO2PasskeyPage() {
         // Handle case when no FIDO2 data exists
         // If there's only one MFA factor, skip OTP selection and go directly to validation
         if (userPhoneFactors && userPhoneFactors.length === 1) {
-          setWizardStep("otpValidation");
           // Navigate to confirmation URL while preserving state
           navigate(`/${language}/security-settings/add-fido2/otp-validation`, {
             replace: true,
           });
         } else {
-          setWizardStep("otpSelection");
           // Navigate to confirmation URL while preserving state
           navigate(`/${language}/security-settings/add-fido2/otp-selection`, {
             replace: true,
@@ -133,7 +131,6 @@ export default function AddFIDO2PasskeyPage() {
     try {
       const response = await authService.transientOtpVerify(userData);
       if (response && response.success) {
-        setWizardStep("addFido2Passkey");
         // Navigate to confirmation URL while preserving state
         navigate(`/${language}/security-settings/add-fido2/add-fido2-passkey`, {
           replace: true,
@@ -151,6 +148,14 @@ export default function AddFIDO2PasskeyPage() {
       }
     }
   };
+
+  // Sync wizard step with URL parameter changes
+  useEffect(() => {
+    const newWizardStep = getWizardStepFromUrl(step);
+    if (newWizardStep !== wizardStep) {
+      setWizardStep(newWizardStep);
+    }
+  }, [step, wizardStep]);
 
   useEffect(() => {
     const fetchUserOtpPhoneFactors = async () => {
@@ -220,7 +225,6 @@ export default function AddFIDO2PasskeyPage() {
         onChangeUserSelectedMfaFactor={handleChangeUserMfaSelection}
         userSelectedMfaFactor={userSelectedMfaFactor}
         onNext={() => {
-          setWizardStep("otpValidation");
           navigate(`/${language}/security-settings/add-fido2/otp-validation`, {
             replace: true,
           });
@@ -241,7 +245,6 @@ export default function AddFIDO2PasskeyPage() {
           // If there's only one MFA factor, go back to password verification
           // Otherwise, go back to OTP selection
           if (userPhoneFactors && userPhoneFactors.length === 1) {
-            setWizardStep("passwordVerification");
             navigate(
               `/${language}/security-settings/add-fido2/password-verification`,
               {
@@ -249,7 +252,6 @@ export default function AddFIDO2PasskeyPage() {
               },
             );
           } else {
-            setWizardStep("otpSelection");
             navigate(`/${language}/security-settings/add-fido2/otp-selection`, {
               replace: true,
             });
