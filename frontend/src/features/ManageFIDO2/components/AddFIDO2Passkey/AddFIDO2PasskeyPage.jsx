@@ -1,4 +1,4 @@
-import { useLocation, useNavigate, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { useUser } from "../../../../components/Providers/useUser";
 import { useEffect, useRef, useState } from "react";
 import { path } from "../../../../utils/routeHelpers";
@@ -37,7 +37,6 @@ export default function AddFIDO2PasskeyPage() {
   const { language, step } = useParams();
   const { state } = useUser();
   const navigate = useNavigate();
-  const location = useLocation();
   const [wizardStep, setWizardStep] = useState(getWizardStepFromUrl(step));
   const [errorCode, setErrorCode] = useState("");
   const { userProfile } = state;
@@ -152,22 +151,6 @@ export default function AddFIDO2PasskeyPage() {
       }
     }
   };
-
-  // Sync wizard step with URL parameter changes
-  useEffect(() => {
-    const newWizardStep = getWizardStepFromUrl(step);
-    if (newWizardStep !== wizardStep) {
-      setWizardStep(newWizardStep);
-    }
-  }, [step, wizardStep]);
-
-  // Check if we're coming from a redirect with state data
-  useEffect(() => {
-    if (location?.state?.step) {
-      // If we have state with a specific step, navigate to that step
-      setWizardStep(location?.state?.step);
-    }
-  }, [location.state]);
 
   useEffect(() => {
     const fetchUserOtpPhoneFactors = async () => {
