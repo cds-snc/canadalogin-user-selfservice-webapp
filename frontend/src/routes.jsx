@@ -114,19 +114,19 @@ export const appRoutes = [
                     ],
                   },
                   {
-                    element: (
-                      <StepupPrivateRoute redirectPath="/en/security-settings/add-fido2/add-fido2-passkey" />
-                    ),
+                    element: <StepupPrivateRoute />,
                     children: [
                       {
                         path: "add-fido2/fido2-verification",
-                        element: <AddFIDO2PasskeyPage />,
+                        element: (
+                          <AddFIDO2PasskeyPage step={"addFido2Passkey"} />
+                        ),
                         handle: { id: PAGES.addFido2PasskeyPage },
                       },
                     ],
                   },
                   {
-                    path: "add-fido2/:step?",
+                    path: "add-fido2",
                     element: <AddFIDO2PasskeyPage />,
                     handle: { id: PAGES.addFido2PasskeyPage },
                   },
