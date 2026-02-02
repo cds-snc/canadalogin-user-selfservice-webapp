@@ -1,4 +1,4 @@
-import { useLocation, useNavigate, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { useUser } from "../../../../components/Providers/useUser";
 import { useEffect, useRef, useState } from "react";
 import { path } from "../../../../utils/routeHelpers";
@@ -17,28 +17,11 @@ import StepContent from "../../../../components/Wizard/StepContent";
 import Loader from "../../../../components/Layout/Loading";
 import AddFIDO2Passkey from "./AddFIDO2Passkey";
 
-export default function AddFIDO2PasskeyPage() {
-  // Map URL step parameter to internal wizard steps
-  const getWizardStepFromUrl = (urlStep) => {
-    switch (urlStep) {
-      case "password-verification":
-        return "passwordVerification";
-      case "otp-selection":
-        return "otpSelection";
-      case "otp-validation":
-        return "otpValidation";
-      case "add-fido2-passkey":
-        return "addFido2Passkey";
-      default:
-        return "passwordVerification";
-    }
-  };
-
-  const { language, step } = useParams();
+export default function AddFIDO2PasskeyPage({ step }) {
+  const { language } = useParams();
   const { state } = useUser();
   const navigate = useNavigate();
-  const location = useLocation();
-  const [wizardStep, setWizardStep] = useState(getWizardStepFromUrl(step));
+  const [wizardStep, setWizardStep] = useState(step ?? "passwordVerification");
   const [errorCode, setErrorCode] = useState("");
   const { userProfile } = state;
   const { id, userName } = userProfile ?? {};
@@ -87,22 +70,8 @@ export default function AddFIDO2PasskeyPage() {
         // If there's only one MFA factor, skip OTP selection and go directly to validation
         if (userPhoneFactors && userPhoneFactors.length === 1) {
           setWizardStep("otpValidation");
-          // Navigate to confirmation URL while preserving state
-          navigate(
-            `/${language}/security-settings/manage-2fa-verifications/add-fido2/otp-validation`,
-            {
-              replace: true,
-            },
-          );
         } else {
           setWizardStep("otpSelection");
-          // Navigate to confirmation URL while preserving state
-          navigate(
-            `/${language}/security-settings/manage-2fa-verifications/add-fido2/otp-selection`,
-            {
-              replace: true,
-            },
-          );
         }
       }
     },
@@ -140,14 +109,8 @@ export default function AddFIDO2PasskeyPage() {
     try {
       const response = await authService.transientOtpVerify(userData);
       if (response && response.success) {
-        setWizardStep("addFido2Passkey");
         // Navigate to confirmation URL while preserving state
-        navigate(
-          `/${language}/security-settings/manage-2fa-verifications/add-fido2/add-fido2-passkey`,
-          {
-            replace: true,
-          },
-        );
+        setWizardStep("addFido2Passkey");
         setErrorCode("");
       }
     } catch (err) {
@@ -161,22 +124,6 @@ export default function AddFIDO2PasskeyPage() {
       }
     }
   };
-
-  // Sync wizard step with URL parameter changes
-  useEffect(() => {
-    const newWizardStep = getWizardStepFromUrl(step);
-    if (newWizardStep !== wizardStep) {
-      setWizardStep(newWizardStep);
-    }
-  }, [step, wizardStep]);
-
-  // Check if we're coming from a redirect with state data
-  useEffect(() => {
-    if (location?.state?.step) {
-      // If we have state with a specific step, navigate to that step
-      setWizardStep(location?.state?.step);
-    }
-  }, [location.state]);
 
   useEffect(() => {
     const fetchUserOtpPhoneFactors = async () => {
@@ -247,9 +194,6 @@ export default function AddFIDO2PasskeyPage() {
         userSelectedMfaFactor={userSelectedMfaFactor}
         onNext={() => {
           setWizardStep("otpValidation");
-          navigate(`/${language}/security-settings/add-fido2/otp-validation`, {
-            replace: true,
-          });
         }}
         parentPage={PAGES.addFido2Passkey}
         onCancel={async () => navigate(backToManage2FAVerificationsPage)}
@@ -268,20 +212,8 @@ export default function AddFIDO2PasskeyPage() {
           // Otherwise, go back to OTP selection
           if (userPhoneFactors && userPhoneFactors.length === 1) {
             setWizardStep("passwordVerification");
-            navigate(
-              `/${language}/security-settings/manage-2fa-verifications/add-fido2/password-verification`,
-              {
-                replace: true,
-              },
-            );
           } else {
             setWizardStep("otpSelection");
-            navigate(
-              `/${language}/security-settings/manage-2fa-verifications/add-fido2/otp-selection`,
-              {
-                replace: true,
-              },
-            );
           }
         }}
         setErrorCode={setErrorCode}
