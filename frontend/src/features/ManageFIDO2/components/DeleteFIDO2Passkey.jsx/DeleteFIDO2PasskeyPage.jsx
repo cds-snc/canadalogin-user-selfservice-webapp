@@ -1,4 +1,4 @@
-import { useLocation, useNavigate, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { useUser } from "../../../../components/Providers/useUser";
 import { useEffect, useRef, useState } from "react";
 import { path } from "../../../../utils/routeHelpers";
@@ -15,29 +15,14 @@ import { getPageContent } from "../../../../utils/functions";
 import { fido2Api } from "../../api/fido2Api";
 import StepContent from "../../../../components/Wizard/StepContent";
 import Loader from "../../../../components/Layout/Loading";
+import DeleteFIDO2PasskeyConfirmation from "./DeleteFIDO2PasskeyConfirmation";
+import DeleteFIDO2PasskeySuccess from "./DeleteFIDO2PasskeySuccess";
 
-export default function DeleteFIDO2PasskeyPage() {
-  // Map URL step parameter to internal wizard steps
-  const getWizardStepFromUrl = (urlStep) => {
-    switch (urlStep) {
-      case "password-verification":
-        return "passwordVerification";
-      case "otp-selection":
-        return "otpSelection";
-      case "otp-validation":
-        return "otpValidation";
-      case "delete-fido2-passkey":
-        return "deleteFido2Passkey";
-      default:
-        return "passwordVerification";
-    }
-  };
-
-  const { language, step } = useParams();
+export default function DeleteFIDO2PasskeyPage({ step }) {
+  const { language } = useParams();
   const { state } = useUser();
   const navigate = useNavigate();
-  const location = useLocation();
-  const [wizardStep, setWizardStep] = useState(getWizardStepFromUrl(step));
+  const [wizardStep, setWizardStep] = useState(step ?? "passwordVerification");
   const [errorCode, setErrorCode] = useState("");
   const { userProfile } = state;
   const { id, userName } = userProfile ?? {};
@@ -86,22 +71,8 @@ export default function DeleteFIDO2PasskeyPage() {
         // If there's only one MFA factor, skip OTP selection and go directly to validation
         if (userPhoneFactors && userPhoneFactors.length === 1) {
           setWizardStep("otpValidation");
-          // Navigate to confirmation URL while preserving state
-          navigate(
-            `/${language}/security-settings/delete-fido2/otp-validation`,
-            {
-              replace: true,
-            },
-          );
         } else {
           setWizardStep("otpSelection");
-          // Navigate to confirmation URL while preserving state
-          navigate(
-            `/${language}/security-settings/delete-fido2/otp-selection`,
-            {
-              replace: true,
-            },
-          );
         }
       }
     },
@@ -160,22 +131,6 @@ export default function DeleteFIDO2PasskeyPage() {
       }
     }
   };
-
-  // Sync wizard step with URL parameter changes
-  useEffect(() => {
-    const newWizardStep = getWizardStepFromUrl(step);
-    if (newWizardStep !== wizardStep) {
-      setWizardStep(newWizardStep);
-    }
-  }, [step, wizardStep]);
-
-  // Check if we're coming from a redirect with state data
-  useEffect(() => {
-    if (location?.state?.step) {
-      // If we have state with a specific step, navigate to that step
-      setWizardStep(location?.state?.step);
-    }
-  }, [location.state]);
 
   useEffect(() => {
     const fetchUserOtpPhoneFactors = async () => {
@@ -246,12 +201,6 @@ export default function DeleteFIDO2PasskeyPage() {
         userSelectedMfaFactor={userSelectedMfaFactor}
         onNext={() => {
           setWizardStep("otpValidation");
-          navigate(
-            `/${language}/security-settings/delete-fido2/otp-validation`,
-            {
-              replace: true,
-            },
-          );
         }}
         parentPage={PAGES.deleteFido2Passkey}
         onCancel={async () => navigate(backToManage2FAVerificationsPage)}
@@ -270,20 +219,8 @@ export default function DeleteFIDO2PasskeyPage() {
           // Otherwise, go back to OTP selection
           if (userPhoneFactors && userPhoneFactors.length === 1) {
             setWizardStep("passwordVerification");
-            navigate(
-              `/${language}/security-settings/delete-fido2/password-verification`,
-              {
-                replace: true,
-              },
-            );
           } else {
             setWizardStep("otpSelection");
-            navigate(
-              `/${language}/security-settings/delete-fido2/otp-selection`,
-              {
-                replace: true,
-              },
-            );
           }
         }}
         setErrorCode={setErrorCode}
@@ -292,6 +229,8 @@ export default function DeleteFIDO2PasskeyPage() {
         showTryAnotherWay={userPhoneFactors && userPhoneFactors.length > 1}
       />
     ),
+    deleteFIDO2PasskeyConfirmation: <DeleteFIDO2PasskeyConfirmation />,
+    deleteFIDO2PasskeySuccess: <DeleteFIDO2PasskeySuccess />,
   };
   return localLoading || validatePasswordLoading ? (
     <Loader text={loaderPageContentJson["11"]} />
