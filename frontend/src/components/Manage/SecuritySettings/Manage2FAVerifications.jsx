@@ -17,7 +17,6 @@ import { useUser } from "../../Providers/useUser.js";
 import NoticeFactory from "../../InfoBlocks/NoticeFactory.jsx";
 import config from "../../../config.jsx";
 import PhoneFactorsList from "./PhoneFactorsList.jsx";
-import ManageFIDO2 from "./ManageFIDO2.jsx";
 
 export default function Manage2FAVerifications() {
   const { language } = useParams();
@@ -30,10 +29,6 @@ export default function Manage2FAVerifications() {
 
   // Only show add passkey link in dev and test environments
   const showAddPasskeyLink =
-    config.environment === VITE_ENVIRONMENTS.dev ||
-    config.environment === VITE_ENVIRONMENTS.test;
-
-  const showManageFIDO2 =
     config.environment === VITE_ENVIRONMENTS.dev ||
     config.environment === VITE_ENVIRONMENTS.test;
 
@@ -157,7 +152,6 @@ export default function Manage2FAVerifications() {
           {pageContent["12"]}
         </GcdsButton>
       )}
-      {showManageFIDO2 && <ManageFIDO2 />}
     </GcdsContainer>
   );
 }
