@@ -21,7 +21,7 @@ export default function DeleteFIDO2PasskeyConfirm({ setErrorCode }) {
   );
   const errorPageContent = getPageContent(language, PAGES.error);
   const [passkey, setPasskey] = useState({});
-  const [localLoading, setLocalLoading] = useState(false);
+  const [localLoading, setLocalLoading] = useState(true);
   const navigate = useNavigate();
 
   const backToManage2FAVerificationsPage = path(PAGES.manage2FAVerifications, {
