@@ -34,19 +34,47 @@ class TestGetRegistrationDetails:
         return {
             "id": "reg-123",
             "userId": "user-456",
+            "type": "<type>",
+            "created": "2018-07-16T02:13:47.719Z",
+            "updated": "2018-07-16T02:13:47.719Z",
+            "attempted": "2018-07-16T02:13:47.719Z",
+            "enabled": True,
+            "validated": True,
+            "attributes": {
+                "attestationType": "Basic",
+                "attestationFormat": "packed",
+                "nickname": "My FIDO Authenticator",
+                "aaGuid": "1e5fa156-3754-4265-8796-1a2f0a6f036f",
+                "userVerified": True,
+                "userPresent": True,
+                "icon": "string",
+                "description": "string",
+                "credentialId": "string",
+                "credentialPublicKey": "string",
+                "rpId": "string",
+                "counter": 0,
+                "transports": ["string"],
+                "x5c": ["string"],
+                "backupEligibility": True,
+                "backupState": True,
+            },
+            "references": {"rpUuid": "string"},
+            "assertion": "string",
+        }
+
+    @pytest.fixture
+    def mock_registration_data_no_attributes(self):
+        """Create mock registration data without attributes"""
+        return {
+            "id": "reg-123",
+            "userId": "user-456",
             "rpId": "example.com",
             "enabled": True,
-            "nickname": "My Passkey",
-            "created": "2024-01-15T10:30:00Z",
-            "updated": "2024-01-20T14:00:00Z",
-            "attributes": {
-                "nickname": "My Passkey",
-                "credentialId": "cred-abc-123",
-                "credentialPublicKey": "public-key-data",
-            },
-            "references": {
-                "rpUuid": "rp-uuid-123",
-            },
+            "references": {"rpUuid": "rp-uuid-123"},
+            "type": "<type>",
+            "created": "2018-07-16T02:13:47.719Z",
+            "updated": "2018-07-16T02:13:47.719Z",
+            "validated": True,
         }
 
     @pytest.mark.asyncio
@@ -133,6 +161,7 @@ class TestGetRegistrationDetails:
         mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_http_client,
+        mock_registration_data_no_attributes,
     ):
         """Should create attributes dict if missing and add transactions"""
         mock_get_user_profile_info.return_value = (
@@ -142,13 +171,9 @@ class TestGetRegistrationDetails:
         )
         mock_get_admin_token.return_value = "admin-token-xyz"
         # Registration without attributes - but with all required fields
-        mock_verify_registration_ownership.return_value = {
-            "id": "reg-123",
-            "userId": "user-456",
-            "rpId": "example.com",
-            "enabled": True,
-            "references": {"rpUuid": "rp-uuid-123"},
-        }
+        mock_verify_registration_ownership.return_value = (
+            mock_registration_data_no_attributes
+        )
 
         result = await get_registration_details(
             http_client=mock_http_client,
@@ -311,6 +336,7 @@ class TestGetRegistrationDetails:
         mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_http_client,
+        mock_registration_data_no_attributes,
     ):
         """Should handle different registration ID formats"""
         mock_get_user_profile_info.return_value = (
@@ -322,14 +348,9 @@ class TestGetRegistrationDetails:
 
         # Test with UUID-style registration ID
         uuid_registration_id = "550e8400-e29b-41d4-a716-446655440000"
-        mock_verify_registration_ownership.return_value = {
-            "id": uuid_registration_id,
-            "userId": "user-456",
-            "rpId": "example.com",
-            "enabled": True,
-            "attributes": {},
-            "references": {"rpUuid": "rp-uuid-123"},
-        }
+        mock_verify_registration_ownership.return_value = (
+            mock_registration_data_no_attributes
+        )
 
         result = await get_registration_details(
             http_client=mock_http_client,
