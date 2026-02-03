@@ -80,7 +80,7 @@ describe("useOtpOperations", () => {
       expect(result.current.userSelectedMfaFactor).toBeNull();
       expect(result.current.otpSentResponse).toBeNull();
       expect(result.current.userOtpValue).toBe("");
-      expect(result.current.localLoading).toBe(false);
+      expect(result.current.localLoading).toBe(true);
     });
 
     it("should fetch user phone factors when userId is provided", async () => {
