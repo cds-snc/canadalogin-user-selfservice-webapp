@@ -48,7 +48,8 @@
     "error_webauthn_not_supported": "WebAuthn is not supported by your browser",
     "error_failed_to_get_attestation_options": "Failed to get attestation options",
     "error_duplicate_passkey": "The user attempted to register an authenticator that contains one of the credentials already registered with the relying party.",
-    "error_passkey_name_required": "Passkey name required."
+    "error_passkey_name_required": "Passkey name required.",
+    "error_delete_credential": "Failed to delete security key"
   },
   "RegisterVerification": {
     "1": "Protect your account with 2-step verification",
@@ -459,7 +460,8 @@
     "4": "verification for",
     "5": "voice call",
     "6": "text (SMS)",
-    "7": "for passkey verification"
+    "7": "for passkey verification",
+    "8": "from your 2-step verification passkeys"
   },
   "PasswordVerification": {
     "1": "First, verify it’s you",
@@ -521,34 +523,17 @@
     "6": "Register",
     "7": "Add a new passkey you want to use for verification each time you sign in."
   },
-  "ManageFIDO2": {
-    "1": "Manage Security Keys",
-    "2": "Security keys provide strong protection against account takeovers.",
-    "3": "Your security keys",
-    "4": "Add security key",
-    "add_security_key": "Add Security Key",
-    "add_description": "Give your security key a name to help you identify it later.",
-    "device_name": "Device Name",
-    "device_name_placeholder": "e.g., My YubiKey",
-    "register": "Register",
-    "registering": "Registering...",
-    "cancel": "Cancel",
-    "delete": "Delete",
-    "deleting": "Deleting...",
-    "confirm_delete": "Confirm Delete",
-    "delete_confirmation": "Are you sure you want to delete this security key?",
-    "delete_warning": "This action cannot be undone.",
-    "unnamed_device": "Unnamed Device",
-    "back_to_security": "← Back to Security Settings",
-    "no_security_keys": "You don't have any security keys yet.",
-    "webauthn_not_supported": "Your browser doesn't support WebAuthn. Please use a modern browser to manage security keys.",
-    "registration_success": "Security key registered successfully!",
-    "registration_error": "Failed to register security key. Please try again.",
-    "delete_success": "Security key deleted successfully!",
-    "delete_error": "Failed to delete security key. Please try again.",
-    "loading": "Loading...",
-    "error_loading": "Failed to load security keys. Please try again.",
-    "error_session_expired": "Your session has expired or you don't have permission to access this feature. Please go back to Security Settings and try again.",
-    "created": "Created"
+  "DeleteFIDO2PasskeyConfirm": {
+    "1": "Are you sure you want to delete this passkey?",
+    "2": "You will no longer be able to use",
+    "3": "passkey to sign in.",
+    "4": "This",
+    "5": "will not",
+    "6": "delete this number from your contact information. To manage your contact phone number, go to",
+    "7": "Personal Information",
+    "8": ".",
+    "9": "Yes, delete",
+    "10": "Cancel",
+    "11": "Loading..."
   }
 }

@@ -112,24 +112,38 @@ export const appRoutes = [
                         element: <DeleteMFAPage />,
                         handle: { id: PAGES.deleteMFAPage },
                       },
-                    ],
-                  },
-                  {
-                    element: <StepupPrivateRoute />,
-                    children: [
                       {
-                        path: "add-fido2/fido2-verification",
-                        element: (
-                          <AddFIDO2PasskeyPage step={"addFido2Passkey"} />
-                        ),
-                        handle: { id: PAGES.addFido2PasskeyPage },
+                        element: <StepupPrivateRoute />,
+                        children: [
+                          {
+                            path: "add-fido2/fido2-verification",
+                            element: (
+                              <AddFIDO2PasskeyPage step={"addFido2Passkey"} />
+                            ),
+                            handle: { id: PAGES.addFIDO2PasskeyPage },
+                          },
+                          {
+                            path: "delete-fido2/:passkeyId?/fido2-verification",
+                            element: (
+                              <DeleteFIDO2PasskeyPage
+                                step={"deleteFIDO2PasskeyConfirmation"}
+                              />
+                            ),
+                            handle: { id: PAGES.deleteFIDO2PasskeyPage },
+                          },
+                        ],
+                      },
+                      {
+                        path: "add-fido2",
+                        element: <AddFIDO2PasskeyPage />,
+                        handle: { id: PAGES.addFIDO2PasskeyPage },
+                      },
+                      {
+                        path: "delete-fido2/:passkeyId?",
+                        element: <DeleteFIDO2PasskeyPage />,
+                        handle: { id: PAGES.deleteFIDO2PasskeyPage },
                       },
                     ],
-                  },
-                  {
-                    path: "add-fido2",
-                    element: <AddFIDO2PasskeyPage />,
-                    handle: { id: PAGES.addFido2PasskeyPage },
                   },
                 ],
               },

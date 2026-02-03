@@ -69,6 +69,7 @@ export const NOTICE_TYPES = {
   mfaAdded: "mfaAdded",
   mfaDeleted: "mfaDeleted",
   passkeyAdded: "passkeyAdded",
+  passkeyDeleted: "passkeyDeleted",
 };
 
 export const PAGES = {
@@ -114,8 +115,7 @@ export const PAGES = {
   addFIDO2PasskeyPage: "AddFIDO2PasskeyPage",
   addFIDO2Passkey: "AddFIDO2Passkey",
   deleteFIDO2PasskeyPage: "DeleteFIDO2PasskeyPage",
-  deleteFIDO2Passkey: "DeleteFIDO2Passkey",
-  manageFIDO2: "ManageFIDO2",
+  deleteFIDO2PasskeyConfirm: "DeleteFIDO2PasskeyConfirm",
 };
 
 export const FOOTERS = {
