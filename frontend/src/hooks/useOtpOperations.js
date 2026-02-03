@@ -18,7 +18,7 @@ export const useOtpOperations = (
   const [userSelectedMfaFactor, setUserSelectedMfaFactor] = useState(null);
   const [otpSentResponse, setOtpSentResponse] = useState(null);
   const [userOtpValue, setUserOtpValue] = useState("");
-  const [localLoading, setLocalLoading] = useState(false);
+  const [localLoading, setLocalLoading] = useState(true);
 
   const navigate = useNavigate();
   const didFetch = useRef(false);

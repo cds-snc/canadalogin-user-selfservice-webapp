@@ -48,7 +48,8 @@
     "error_webauthn_not_supported": "WebAuthn is not supported by your browser",
     "error_failed_to_get_attestation_options": "Failed to get attestation options",
     "error_duplicate_passkey": "The user attempted to register an authenticator that contains one of the credentials already registered with the relying party.",
-    "error_passkey_name_required": "Passkey name required."
+    "error_passkey_name_required": "Passkey name required.",
+    "error_delete_credential": "Failed to delete security key"
   },
   "RegisterVerification": {
     "1": "Protect your account with 2-step verification",
@@ -459,7 +460,8 @@
     "4": "verification for",
     "5": "voice call",
     "6": "text (SMS)",
-    "7": "for passkey verification"
+    "7": "for passkey verification",
+    "8": "from your 2-step verification passkeys"
   },
   "PasswordVerification": {
     "1": "First, verify it’s you",
@@ -470,7 +472,8 @@
     "6": "Reset your password",
     "7": "To add a phone number,",
     "8": "To delete this number,",
-    "9": "To add a passkey,"
+    "9": "To add a passkey,",
+    "10": "To delete this passkey,"
   },
   "EditEmailEnterEmail": {
     "1": "Enter a new email address",
@@ -519,5 +522,18 @@
     "5": "Registering...",
     "6": "Register",
     "7": "Add a new passkey you want to use for verification each time you sign in."
+  },
+  "DeleteFIDO2PasskeyConfirm": {
+    "1": "Are you sure you want to delete this passkey?",
+    "2": "You will no longer be able to use",
+    "3": "passkey to sign in.",
+    "4": "This",
+    "5": "will not",
+    "6": "delete this number from your contact information. To manage your contact phone number, go to",
+    "7": "Personal Information",
+    "8": ".",
+    "9": "Yes, delete",
+    "10": "Cancel",
+    "11": "Loading..."
   }
 }

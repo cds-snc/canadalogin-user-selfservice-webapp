@@ -38,7 +38,7 @@ export default function Manage2FAVerifications() {
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
     language: language,
   });
-  const addFido2PagePath = path(PAGES.addFido2PasskeyPage, { language });
+  const addFido2PagePath = path(PAGES.addFIDO2PasskeyPage, { language });
 
   useEffect(() => {
     const fetchUserOtpPhoneFactors = async () => {

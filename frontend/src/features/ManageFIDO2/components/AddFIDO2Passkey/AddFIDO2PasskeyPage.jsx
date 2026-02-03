@@ -60,7 +60,7 @@ export default function AddFIDO2PasskeyPage({ step }) {
         // Handle case when FIDO2 data exists
         // Go to access policy OOTB step up
         navigate(
-          `/${language}/security-settings/add-fido2/fido2-verification`,
+          `/${language}/security-settings/manage-2fa-verifications/add-fido2/fido2-verification`,
           {
             replace: true,
           },

@@ -12,12 +12,14 @@ class FIDO2RegistrationResponse(BaseModel):
 
     id: str
     userId: str
-    rpId: str
+    type: str
+    created: str
+    updated: str
+    attempted: Optional[str] = None
     enabled: bool
-    nickname: Optional[str] = None
+    validated: bool
     attributes: Dict[str, Any]
     references: Dict[str, Any]
-    created: Optional[str] = None
 
 
 class FIDO2CredentialSummary(BaseModel):

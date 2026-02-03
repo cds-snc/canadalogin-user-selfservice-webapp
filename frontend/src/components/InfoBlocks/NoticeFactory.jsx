@@ -49,6 +49,17 @@ export default function NoticeFactory({
         </GcdsNotice>
       </GcdsText>
     ),
+
+    passkeyDeleted: ({ passkeyName }) => (
+      <GcdsText>
+        <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={" "}>
+          <GcdsText>
+            {successBannerJson["1"]} <strong>{passkeyName}</strong>{" "}
+            {successBannerJson["8"]}
+          </GcdsText>
+        </GcdsNotice>
+      </GcdsText>
+    ),
   };
 
   // Handle invalid noticeType gracefully
