@@ -18,6 +18,8 @@ import { useUser } from "../../Providers/useUser.js";
 import NoticeFactory from "../../InfoBlocks/NoticeFactory.jsx";
 import config from "../../../config.jsx";
 import PhoneFactorsList from "./PhoneFactorsList.jsx";
+import FIDO2PasskeyList from "./FIDO2PasskeyList.jsx";
+import { fido2Api } from "../../../features/ManageFIDO2/api/fido2Api.jsx";
 
 export default function Manage2FAVerifications() {
   const { language } = useParams();
@@ -26,6 +28,7 @@ export default function Manage2FAVerifications() {
   const navigate = useNavigate();
   const { state, _dispatch } = useUser();
   const [userPhoneFactorsMap, setUserPhoneFactorsMap] = useState({});
+  const [userFIDO2CredentialsData, setUserFIDO2CredentialsData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Only show add passkey link in dev and test environments
@@ -75,9 +78,37 @@ export default function Manage2FAVerifications() {
       }
     };
 
+    /**
+     * Fetch user's FIDO2 credentials
+     */
+    const fetchUserFIDO2Credentials = async () => {
+      // setLocalLoading(true);
+      // setErrorCode("");
+
+      try {
+        const response = await fido2Api.getUserFIDO2Credentials();
+        if (response && response?.data?.authenticated) {
+          setUserFIDO2CredentialsData(response?.data?.credentials || []);
+        }
+      } catch (error) {
+        if (error && error.data && error.data.message) {
+          setErrorCode(error.data.message);
+        }
+      } finally {
+        setLocalLoading(false);
+      }
+    };
+
     fetchUserOtpPhoneFactors();
+    fetchUserFIDO2Credentials();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  console.log(userPhoneFactorsMap);
+
+  console.log("userFIDO2CredentialsData:", userFIDO2CredentialsData);
+  console.log("isArray:", Array.isArray(userFIDO2CredentialsData));
 
   return loading ? (
     <Loader text={pageContent["11"]} />
@@ -110,7 +141,7 @@ export default function Manage2FAVerifications() {
               padding: "0 0.625rem",
               justifyContent: "center",
               alignItems: "center",
-              gap: "0.3125rem",
+              gap: "0.31235rem",
               borderRadius: "0.3125rem",
               width: "fit-content",
             }}
@@ -176,24 +207,31 @@ export default function Manage2FAVerifications() {
               {pageContent["15"]}
             </div>
           </GcdsHeading>
-
-          <GcdsGrid columns="repeat(auto-fit, minmax(100px, 200px))">
-            <GcdsButton
-              id="add-fido2-button"
-              onGcdsClick={(ev) => {
-                ev.preventDefault();
-                navigate(addFido2PagePath);
-              }}
-            >
-              {pageContent["12"]}
-            </GcdsButton>
+          <FIDO2PasskeyList
+            userFIDO2CredentialsData={userFIDO2CredentialsData}
+          />
+          {/* <GcdsGrid
+            tag="article"
+            columns-desktop="1fr 1fr 1fr"
+            columns-tablet="1fr 1fr"
+            columns="1fr"
+          >
             <GcdsButton id="delete-fido2-button" onGcdsClick={(ev) => {}}>
               {pageContent["13"]}
             </GcdsButton>
             <GcdsButton id="rename-fido2-button" onGcdsClick={(ev) => {}}>
               {pageContent["14"]}
-            </GcdsButton>
-          </GcdsGrid>
+            </GcdsButton> */}
+          <GcdsButton
+            id="add-fido2-button"
+            onGcdsClick={(ev) => {
+              ev.preventDefault();
+              navigate(addFido2PagePath);
+            }}
+          >
+            {pageContent["12"]}
+          </GcdsButton>
+          {/* </GcdsGrid> */}
         </GcdsContainer>
       )}
     </GcdsContainer>
