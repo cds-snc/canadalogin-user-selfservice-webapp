@@ -24,7 +24,6 @@ export default function Manage2FAVerifications() {
   const pageContent = getPageContent(language, PAGES.manage2FAVerifications);
   const navigate = useNavigate();
   const { state, _dispatch } = useUser();
-  const [errorCode, setErrorCode] = useState("");
   const [userPhoneFactorsMap, setUserPhoneFactorsMap] = useState({});
   const [userFIDO2CredentialsData, setUserFIDO2CredentialsData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -81,6 +80,7 @@ export default function Manage2FAVerifications() {
      */
     const fetchUserFIDO2Credentials = async () => {
       setLoading(true);
+
       try {
         const response = await fido2Api.getUserFIDO2Credentials();
         console.log(response);
@@ -91,7 +91,8 @@ export default function Manage2FAVerifications() {
         if (err && err?.data && err?.data?.message) {
           setErrorCode(err.data.message);
         } else {
-          console.error(err);
+          console.error("err", err);
+          navigate(backToSecuritySettingsPage);
         }
       } finally {
         setLoading(false);
