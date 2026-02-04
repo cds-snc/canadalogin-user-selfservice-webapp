@@ -104,12 +104,6 @@ export default function Manage2FAVerifications() {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  console.log(userPhoneFactorsMap);
-
-  console.log("userFIDO2CredentialsData:", userFIDO2CredentialsData);
-  console.log("isArray:", Array.isArray(userFIDO2CredentialsData));
-
   return loading ? (
     <Loader text={pageContent["11"]} />
   ) : (
@@ -210,18 +204,7 @@ export default function Manage2FAVerifications() {
           <FIDO2PasskeyList
             userFIDO2CredentialsData={userFIDO2CredentialsData}
           />
-          {/* <GcdsGrid
-            tag="article"
-            columns-desktop="1fr 1fr 1fr"
-            columns-tablet="1fr 1fr"
-            columns="1fr"
-          >
-            <GcdsButton id="delete-fido2-button" onGcdsClick={(ev) => {}}>
-              {pageContent["13"]}
-            </GcdsButton>
-            <GcdsButton id="rename-fido2-button" onGcdsClick={(ev) => {}}>
-              {pageContent["14"]}
-            </GcdsButton> */}
+
           <GcdsButton
             id="add-fido2-button"
             onGcdsClick={(ev) => {
@@ -231,7 +214,6 @@ export default function Manage2FAVerifications() {
           >
             {pageContent["12"]}
           </GcdsButton>
-          {/* </GcdsGrid> */}
         </GcdsContainer>
       )}
     </GcdsContainer>
