@@ -31,7 +31,7 @@ export default function FIDO2PasskeyList({ userFIDO2CredentialsData }) {
           <GcdsGrid columns="max-content max-content" gap="200">
             <GcdsButton
               id="delete-fido2-button"
-              buttonRole="danger"
+              buttonRole="secondary"
               onClick={() => {
                 navigate(`${deletePasskeyPage}/${id}`);
               }}
