@@ -81,26 +81,28 @@ export default function Manage2FAVerifications() {
      */
     const fetchUserFIDO2Credentials = async () => {
       setLoading(true);
-
       try {
         const response = await fido2Api.getUserFIDO2Credentials();
+        console.log(response);
         if (response && response?.data?.authenticated) {
           setUserFIDO2CredentialsData(response?.data?.credentials || []);
         }
-      } catch (error) {
-        if (error && error.data && error.data.message) {
-          setErrorCode(error.data.message);
+      } catch (err) {
+        if (err && err?.data && err?.data?.message) {
+          setErrorCode(err.data.message);
+        } else {
+          console.error(err);
         }
       } finally {
-        setLocalLoading(false);
+        setLoading(false);
       }
     };
 
     fetchUserOtpPhoneFactors();
     fetchUserFIDO2Credentials();
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   return loading ? (
     <Loader text={pageContent["11"]} />
   ) : (
