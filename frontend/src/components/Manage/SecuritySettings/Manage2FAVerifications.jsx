@@ -1,10 +1,7 @@
 import {
   GcdsButton,
   GcdsContainer,
-  GcdsGrid,
   GcdsHeading,
-  GcdsLink,
-  GcdsNotice,
   GcdsText,
 } from "@cdssnc/gcds-components-react";
 import { useEffect, useState } from "react";
