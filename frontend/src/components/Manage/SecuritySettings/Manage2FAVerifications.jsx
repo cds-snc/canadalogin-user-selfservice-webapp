@@ -134,7 +134,7 @@ export default function Manage2FAVerifications() {
               padding: "0 0.625rem",
               justifyContent: "center",
               alignItems: "center",
-              gap: "0.31235rem",
+              gap: "0.3125rem",
               borderRadius: "0.3125rem",
               width: "fit-content",
             }}
