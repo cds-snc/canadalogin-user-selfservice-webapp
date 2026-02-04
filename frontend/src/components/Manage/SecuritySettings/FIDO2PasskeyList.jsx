@@ -35,17 +35,15 @@ export default function FIDO2PasskeyList({ userFIDO2CredentialsData }) {
           >
             {pageContent["14"]}
           </GcdsButton>
-          {userFIDO2CredentialsData.length > 1 && (
-            <GcdsButton
-              id="delete-fido2-button"
-              buttonRole="secondary"
-              onClick={() => {
-                navigate(`${deletePasskeyPage}/${id}`);
-              }}
-            >
-              {pageContent["13"]}
-            </GcdsButton>
-          )}
+          <GcdsButton
+            id="delete-fido2-button"
+            buttonRole="secondary"
+            onClick={() => {
+              navigate(`${deletePasskeyPage}/${id}`);
+            }}
+          >
+            {pageContent["13"]}
+          </GcdsButton>
         </GcdsGrid>
         <div className="separator" />
       </GcdsContainer>
