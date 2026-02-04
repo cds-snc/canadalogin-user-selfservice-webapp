@@ -27,8 +27,15 @@ export default function FIDO2PasskeyList({ userFIDO2CredentialsData }) {
           <strong>{pageContent["16"]}</strong>
           {new Date(created).toLocaleString()}
         </GcdsText>
-        {userFIDO2CredentialsData.length > 1 && (
-          <GcdsGrid columns="max-content max-content" gap="200">
+        <GcdsGrid columns="max-content max-content" gap="200">
+          <GcdsButton
+            id="rename-fido2-button"
+            buttonRole="secondary"
+            onGcdsClick={() => {}}
+          >
+            {pageContent["14"]}
+          </GcdsButton>
+          {userFIDO2CredentialsData.length > 1 && (
             <GcdsButton
               id="delete-fido2-button"
               buttonRole="secondary"
@@ -38,15 +45,8 @@ export default function FIDO2PasskeyList({ userFIDO2CredentialsData }) {
             >
               {pageContent["13"]}
             </GcdsButton>
-            <GcdsButton
-              id="rename-fido2-button"
-              buttonRole="secondary"
-              onGcdsClick={() => {}}
-            >
-              {pageContent["14"]}
-            </GcdsButton>
-          </GcdsGrid>
-        )}
+          )}
+        </GcdsGrid>
         <div className="separator" />
       </GcdsContainer>
     );
