@@ -168,7 +168,7 @@ export default function Manage2FAVerifications() {
         </GcdsButton>
       </GcdsContainer>
 
-      {showAddPasskeyLink && (
+      {showFIDO2PasskeyFeature && (
         <GcdsContainer className="sectionCard">
           <GcdsHeading
             tag="h3"
