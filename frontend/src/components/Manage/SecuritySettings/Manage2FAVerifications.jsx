@@ -29,7 +29,7 @@ export default function Manage2FAVerifications() {
   const [loading, setLoading] = useState(true);
 
   // Only show add passkey link in dev and test environments
-  const showAddPasskeyLink =
+  const showFIDO2PasskeyFeature =
     config.environment === VITE_ENVIRONMENTS.dev ||
     config.environment === VITE_ENVIRONMENTS.test;
 
@@ -99,7 +99,9 @@ export default function Manage2FAVerifications() {
     };
 
     fetchUserOtpPhoneFactors();
-    fetchUserFIDO2Credentials();
+    if (showFIDO2PasskeyFeature) {
+      fetchUserFIDO2Credentials();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
