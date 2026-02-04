@@ -89,9 +89,8 @@ export default function Manage2FAVerifications() {
         }
       } catch (err) {
         if (err && err?.data && err?.data?.message) {
-          setErrorCode(err.data.message);
-        } else {
           console.error("err", err);
+        } else {
           navigate(backToSecuritySettingsPage);
         }
       } finally {
