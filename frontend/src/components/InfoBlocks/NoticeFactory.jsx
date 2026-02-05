@@ -60,6 +60,16 @@ export default function NoticeFactory({
         </GcdsNotice>
       </GcdsText>
     ),
+
+    passkeyRenamed: ({ passkeyName }) => (
+      <GcdsText>
+        <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={" "}>
+          <GcdsText>
+            {successBannerJson["9"]} <strong>{passkeyName}</strong>
+          </GcdsText>
+        </GcdsNotice>
+      </GcdsText>
+    ),
   };
 
   // Handle invalid noticeType gracefully

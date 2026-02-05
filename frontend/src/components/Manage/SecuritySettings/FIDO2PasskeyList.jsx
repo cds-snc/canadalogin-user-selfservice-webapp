@@ -16,6 +16,9 @@ export default function FIDO2PasskeyList({ userFIDO2CredentialsData }) {
   const deletePasskeyPage = path(PAGES.deleteFIDO2PasskeyPage, {
     language: language,
   });
+  const renamePasskeyPage = path(PAGES.renameFIDO2PasskeyPage, {
+    language: language,
+  });
 
   return userFIDO2CredentialsData.map(({ id, nickname, created }) => {
     return (
@@ -31,7 +34,11 @@ export default function FIDO2PasskeyList({ userFIDO2CredentialsData }) {
           <GcdsButton
             id="rename-fido2-button"
             buttonRole="secondary"
-            onGcdsClick={() => {}}
+            onGcdsClick={() => {
+              navigate(`${renamePasskeyPage}`, {
+                state: { passkeyId: id, passkeyNickname: nickname },
+              });
+            }}
           >
             {pageContent["14"]}
           </GcdsButton>
