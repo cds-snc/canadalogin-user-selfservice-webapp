@@ -36,9 +36,6 @@ export default function Manage2FAVerifications() {
   // Check if we came from another page and need to render success notice
   const { noticeType, phoneNumber, otpType, passkeyName } =
     location.state || {};
-  const backToSecuritySettingsPage = path(PAGES.securitySettings, {
-    language: language,
-  });
   const addFido2PagePath = path(PAGES.addFIDO2PasskeyPage, { language });
 
   useEffect(() => {
@@ -65,8 +62,6 @@ export default function Manage2FAVerifications() {
             return acc;
           }, {});
           setUserPhoneFactorsMap(userPhoneFactorsMap);
-        } else {
-          navigate(backToSecuritySettingsPage);
         }
       } catch (err) {
         console.error("err", err);
@@ -83,15 +78,12 @@ export default function Manage2FAVerifications() {
 
       try {
         const response = await fido2Api.getUserFIDO2Credentials();
-        console.log(response);
         if (response && response?.data?.authenticated) {
           setUserFIDO2CredentialsData(response?.data?.credentials || []);
         }
       } catch (err) {
         if (err && err?.data && err?.data?.message) {
           console.error("err", err);
-        } else {
-          navigate(backToSecuritySettingsPage);
         }
       } finally {
         setLoading(false);
