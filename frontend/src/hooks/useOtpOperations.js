@@ -205,13 +205,16 @@ export const useOtpOperations = (
         if (mapType) {
           setPhoneFactorsMap(factorsMap);
         }
+      } else {
+        if (fallbackNavigationPath) {
+          navigate(fallbackNavigationPath);
+        }
       }
     } catch (err) {
       console.error("Error fetching user OTP phone factors:", err);
       if (fallbackNavigationPath) {
         navigate(fallbackNavigationPath);
       }
-      return { phoneFactors: [], phoneFactorsMap: {} };
     } finally {
       setLocalLoading(false);
     }
