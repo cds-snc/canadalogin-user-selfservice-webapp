@@ -78,8 +78,8 @@ export default function Manage2FAVerifications() {
 
       try {
         const response = await fido2Api.getUserFIDO2Credentials();
-        if (response && response?.data?.authenticated) {
-          setUserFIDO2CredentialsData(response?.data?.credentials || []);
+        if (response && response?.success) {
+          setUserFIDO2CredentialsData(response?.data?.fido2 || []);
         }
       } catch (err) {
         if (err && err?.data && err?.data?.message) {

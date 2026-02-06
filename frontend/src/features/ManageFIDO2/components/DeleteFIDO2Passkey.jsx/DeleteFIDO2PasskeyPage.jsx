@@ -103,8 +103,8 @@ export default function DeleteFIDO2PasskeyPage({ step }) {
 
       try {
         const response = await fido2Api.getUserFIDO2Credentials();
-        if (response && response?.data?.authenticated) {
-          setFido2Data(response?.data?.credentials || []);
+        if (response && response?.success) {
+          setFido2Data(response?.data?.fido2 || []);
         }
       } catch (error) {
         if (error && error.data && error.data.message) {

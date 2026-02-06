@@ -44,15 +44,7 @@ This approach works across different Docker platforms (Docker Desktop, Colima, e
 
 ### Environment Variables
 
-Create a `.env` file with the following variables:
-
-```env
-IBM_VERIFY_TENANT_URL=https://auth.signin-connexion.cdssandbox.xyz/
-IBM_VERIFY_PROFILE_MANAGEMENT_API_CLIENT_ID=
-IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID=
-IBM_VERIFY_PROFILE_MANAGEMENT_SECRET=
-IBM_VERIFY_PROFILE_MANAGEMENT_API_SECRET=
-```
+Create a `.env` file by making a copy from the `backend/.env.example` file
 
 #### IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID and IBM_VERIFY_PROFILE_MANAGEMENT_SECRET
 

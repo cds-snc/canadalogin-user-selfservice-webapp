@@ -20,7 +20,7 @@ from app.auth.services.auth_user_session import (
 )
 
 # Import individual service functions
-from app.fido2.services.get_fido2_registrations import get_user_response
+from app.fido2.services.get_fido2_registrations import get_user_fido2_registrations
 from app.fido2.services.get_registration_details import (
     get_registration_details as get_registration_details_service,
 )
@@ -54,7 +54,7 @@ async def get_user_fido2_credentials(
     Returns user authentication status and list of registered FIDO2 credentials.
     """
     try:
-        return await get_user_response(http_client, user_access_token)
+        return await get_user_fido2_registrations(http_client, user_access_token)
     except Exception as e:
         logger.error(f"Error getting user FIDO2 credentials: {str(e)}")
         return FIDO2UserResponseModel(

@@ -17,11 +17,11 @@ export default function FIDO2PasskeyList({ userFIDO2CredentialsData }) {
     language: language,
   });
 
-  return userFIDO2CredentialsData.map(({ id, nickname, created }) => {
+  return userFIDO2CredentialsData.map(({ id, attributes, created }) => {
     return (
       <GcdsContainer key={id}>
         <GcdsText>
-          <strong>{`${nickname}`}</strong>
+          <strong>{`${attributes.nickname}`}</strong>
         </GcdsText>
         <GcdsText>
           <strong>{pageContent["16"]}</strong>

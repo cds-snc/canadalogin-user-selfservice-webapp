@@ -12,7 +12,6 @@ This package contains organized service functions for FIDO2 passkey management:
 
 from app.fido2.services.get_fido2_registrations import (
     get_user_fido2_registrations,
-    get_user_response,
 )
 from app.fido2.services.get_registration_details import get_registration_details
 from app.fido2.services.delete_fido2_registration import delete_registration
@@ -24,7 +23,6 @@ from app.fido2.services.add_fido2_registration import (
 
 __all__ = [
     "get_user_fido2_registrations",
-    "get_user_response",
     "get_registration_details",
     "delete_registration",
     "update_registration",

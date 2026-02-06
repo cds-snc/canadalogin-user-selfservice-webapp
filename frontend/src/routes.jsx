@@ -118,7 +118,7 @@ export const appRoutes = [
                           {
                             path: "add-fido2/fido2-verification",
                             element: (
-                              <AddFIDO2PasskeyPage step={"addFido2Passkey"} />
+                              <AddFIDO2PasskeyPage step={"addFIDO2Passkey"} />
                             ),
                             handle: { id: PAGES.addFIDO2PasskeyPage },
                           },

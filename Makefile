@@ -1,10 +1,10 @@
 .PHONY: install-dev-python install-python fmt-ci-python fmt-python lint-python run-tests
 
 install-python: 
-	@pip install -r ./backend/requirements.txt
+	@pip3 install -r ./backend/requirements.txt
 
 install-dev-python:
-	@pip install -r ./backend/requirements-dev.txt
+	@pip3 install -r ./backend/requirements-dev.txt
 
 install-frontend-deps:
 	cd frontend && npm install
