@@ -56,11 +56,11 @@ export default function DeleteMFAPage() {
     userPhoneFactors,
     userSelectedMfaFactor,
     userOtpValue,
+    otpSentResponse,
     localLoading,
     handleChangeUserMfaSelection,
     handleSetUserOtpValue,
     requestOtpCode,
-    validateOtpCode: baseValidateOtpCode,
   } = useOtpOperations(id, userName, setErrorCode, backToSecuritySettingsPage);
 
   const [phoneFormData, setPhoneFormData] = useState({
@@ -79,11 +79,21 @@ export default function DeleteMFAPage() {
 
   const deleteMFA = async () => {
     try {
+      // Use the OTP value and trxnId from the verification step
+      // Note: otpType is the type of factor being deleted
+      // otpVerificationType is the type of OTP used for verification (may differ)
+      const verificationOtpType = userSelectedMfaFactor
+        ? serverMapping[userSelectedMfaFactor.type]
+        : serverMapping[phoneFormData.mfaFactorsToDelete[0]?.type];
+
       await Promise.all(
         phoneFormData.mfaFactorsToDelete.map((mfaFactor) =>
           deleteMFAPhoneNumberApi.deleteMFA({
             id: mfaFactor.id,
-            otpType: serverMapping[mfaFactor.type],
+            otpType: serverMapping[mfaFactor.type], // Type of factor being deleted
+            otp: userOtpValue,
+            trxnId: otpSentResponse.trxnId,
+            otpVerificationType: verificationOtpType, // Type of OTP used for verification
           }),
         ),
       );
@@ -96,10 +106,8 @@ export default function DeleteMFAPage() {
   };
 
   // Custom validateOtpCode that handles delete MFA flow
-  const validateOtpCode = async (userOtpValue) => {
-    await baseValidateOtpCode(userOtpValue, () => {
-      setWizardStep("deleteMFAPhoneNumberConfirm");
-    });
+  const validateOtpCode = async () => {
+    setWizardStep("deleteMFAPhoneNumberConfirm");
   };
 
   useEffect(() => {
