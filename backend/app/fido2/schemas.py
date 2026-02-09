@@ -3,8 +3,9 @@ FIDO2 schemas for request/response models
 """
 
 from typing import List, Optional, Dict, Any
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from app.utils.schemas import ResponseModel
+from app.otp.schemas import OtpType
 
 
 class FIDO2RegistrationResponse(BaseModel):
@@ -46,6 +47,15 @@ class DeleteRegistrationRequest(BaseModel):
     id: str
 
 
+class AttestationOptionsRequest(BaseModel):
+    """Request model for getting FIDO2 attestation options"""
+
+    # Optional OTP verification fields (if not provided, reauthentication will be used)
+    otp: Optional[str] = None
+    trxnId: Optional[str] = None
+    otpVerificationType: Optional[OtpType] = None
+
+
 class UpdateRegistrationRequest(BaseModel):
     """Request model for updating a FIDO2 registration"""
 
@@ -56,6 +66,8 @@ class UpdateRegistrationRequest(BaseModel):
 
 class FIDO2AttestationResultRequest(BaseModel):
     """Request model for FIDO2 attestation result"""
+
+    model_config = ConfigDict(exclude_none=True)
 
     id: str
     rawId: str

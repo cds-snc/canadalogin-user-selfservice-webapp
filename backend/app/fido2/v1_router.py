@@ -12,6 +12,7 @@ from app.fido2.schemas import (
     DeleteRegistrationRequest,
     UpdateRegistrationRequest,
     FIDO2AttestationResultRequest,
+    AttestationOptionsRequest,
 )
 from app.utils.schemas import ResponseModel
 from app.auth.services.auth_user_session import (
@@ -133,6 +134,7 @@ async def update_fido2_registration(
     description="Get attestation options for FIDO2 registration",
 )
 async def get_attestation_options(
+    request_data: AttestationOptionsRequest,
     user_access_token: str = Depends(get_users_current_session),
     http_client: AsyncClient = Depends(get_http_client),
 ):
@@ -140,19 +142,11 @@ async def get_attestation_options(
     Get FIDO2 attestation options with server-side defaults.
     Used to start the FIDO2 registration process.
     """
-    # Set proper defaults for FIDO2 attestation
-    request_body = {
-        "attestation": "direct",
-        "authenticatorSelection": {
-            "requireResidentKey": False,
-            "userVerification": "preferred",
-        },
-    }
 
     return await get_attestation_options_service(
         http_client=http_client,
         user_access_token=user_access_token,
-        request_body=request_body,
+        request_data=request_data,
     )
 
 

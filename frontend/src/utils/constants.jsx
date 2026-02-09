@@ -18,6 +18,13 @@ export const OIDC_REDIRECT = {
   reauth: `${config.apiUrl}/v1/auth/reauth`,
 };
 
+export const INVALID_OTP_ERROR_CODES = [
+  "CSIAM0011E",
+  "CSIBN0025E",
+  "CSIBN0028E",
+  "CSIBN0021E",
+];
+
 export const CONTEXT_ACTIONS = {
   logOut: "LOG_OUT",
   set_loading: "SET_LOADING",

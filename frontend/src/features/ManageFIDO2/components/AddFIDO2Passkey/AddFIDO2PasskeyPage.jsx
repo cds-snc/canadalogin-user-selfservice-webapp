@@ -2,7 +2,11 @@ import { useNavigate, useParams } from "react-router";
 import { useUser } from "../../../../components/Providers/useUser";
 import { useEffect, useRef, useState } from "react";
 import { path } from "../../../../utils/routeHelpers";
-import { PAGES, serverMapping } from "../../../../utils/constants";
+import {
+  INVALID_OTP_ERROR_CODES,
+  PAGES,
+  serverMapping,
+} from "../../../../utils/constants";
 import { getErrorMessage } from "../../../../utils/errorUtils";
 import { useOtpOperations } from "../../../../hooks/useOtpOperations";
 import { usePasswordValidation } from "../../../../hooks/usePasswordValidation";
@@ -54,14 +58,7 @@ export default function AddFIDO2PasskeyPage({ step }) {
     setErrorCode,
     () => {
       if (fido2Data && fido2Data.length > 0) {
-        // Handle case when FIDO2 data exists
-        // Go to access policy OOTB step up
-        navigate(
-          `/${language}/security-settings/manage-2fa-verifications/add-fido2/fido2-verification`,
-          {
-            replace: true,
-          },
-        );
+        setWizardStep("addFIDO2Passkey");
       } else {
         // Handle case when no FIDO2 data exists
         // If there's only one MFA factor, skip OTP selection and go directly to validation
@@ -97,29 +94,9 @@ export default function AddFIDO2PasskeyPage({ step }) {
     }
   };
 
-  const validateOtpCode = async (userOtpValue) => {
-    const userData = {
-      otp: userOtpValue,
-      trxnId: otpSentResponse.trxnId,
-      otpType: serverMapping[userSelectedMfaFactor.type],
-    };
-    try {
-      const response = await authService.transientOtpVerify(userData);
-      if (response && response.success) {
-        // Navigate to confirmation URL while preserving state
-        setWizardStep("addFIDO2Passkey");
-        setErrorCode("");
-      }
-    } catch (err) {
-      if (
-        err &&
-        err.response &&
-        err.response.data &&
-        err.response.data.message
-      ) {
-        setErrorCode(err.response.data.message);
-      }
-    }
+  const validateOtpCode = async () => {
+    setWizardStep("addFIDO2Passkey");
+    setErrorCode("");
   };
 
   useEffect(() => {
@@ -133,6 +110,13 @@ export default function AddFIDO2PasskeyPage({ step }) {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (INVALID_OTP_ERROR_CODES.includes(errorCode)) {
+      // If OTP is invalid, go back to OTP selection step
+      setWizardStep("otpValidation");
+    }
+  }, [errorCode]);
 
   const steps = {
     passwordVerification: (
@@ -188,6 +172,11 @@ export default function AddFIDO2PasskeyPage({ step }) {
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
         onCancel={async () => navigate(backToManage2FAVerificationsPage)}
+        otpData={{
+          otp: userOtpValue,
+          trxnId: otpSentResponse?.trxnId,
+          otpVerificationType: serverMapping[userSelectedMfaFactor?.type],
+        }}
       />
     ),
   };

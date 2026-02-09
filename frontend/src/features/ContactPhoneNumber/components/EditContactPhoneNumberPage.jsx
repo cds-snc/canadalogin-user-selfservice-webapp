@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useLocation, useNavigate } from "react-router";
+import { useState } from "react";
+import { useParams, useNavigate } from "react-router";
 import { useUser } from "../../../components/Providers/useUser.tsx";
 import { getPageContent } from "../../../utils/functions.jsx";
-import { PAGES, FLOW_TYPES } from "../../../utils/constants.jsx";
+import {
+  PAGES,
+  FLOW_TYPES,
+  INVALID_OTP_ERROR_CODES,
+} from "../../../utils/constants.jsx";
 import { path } from "../../../utils/routeHelpers.js";
 import { authService } from "../../../services/authService.jsx";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
@@ -23,26 +27,11 @@ const serverMapping = {
 };
 
 export default function EditContactPhoneNumberPage() {
-  const { language, step } = useParams();
+  const { language } = useParams();
   const { state, dispatch } = useUser();
   const navigate = useNavigate();
-  const location = useLocation();
 
-  // Map URL step parameter to internal wizard steps
-  const getWizardStepFromUrl = (urlStep) => {
-    switch (urlStep) {
-      case "verify-otp":
-        return "verifyOtp";
-      case "confirm-update":
-        return "confirmUpdate";
-      case "success":
-        return "success";
-      default:
-        return "enterPhone";
-    }
-  };
-
-  const [wizardStep, setWizardStep] = useState(getWizardStepFromUrl(step));
+  const [wizardStep, setWizardStep] = useState("enterPhone");
   const [errorCode, setErrorCode] = useState("");
   const [localLoading, setLocalLoading] = useState(false);
   const [phoneFormData, setPhoneFormData] = useState({
@@ -60,23 +49,6 @@ export default function EditContactPhoneNumberPage() {
   const backToProfile = path(PAGES.ProfileHome, { language: language });
   const { userProfile } = state;
   const { id } = userProfile ?? {};
-
-  // Sync wizard step with URL parameter changes
-  useEffect(() => {
-    const newWizardStep = getWizardStepFromUrl(step);
-    if (newWizardStep !== wizardStep) {
-      setWizardStep(newWizardStep);
-    }
-  }, [step, wizardStep]);
-
-  // Check if we're coming from a redirect with state data
-  useEffect(() => {
-    if (location?.state?.phoneFormData && location.state.step) {
-      // If we have state with a specific step, navigate to that step
-      setPhoneFormData(location.state.phoneFormData);
-      setWizardStep(location.state.step);
-    }
-  }, [location.state]);
 
   const handlePhoneFormChange = (field, value) => {
     setPhoneFormData((prev) => ({
@@ -103,10 +75,6 @@ export default function EditContactPhoneNumberPage() {
         handlePhoneFormChange("trxnId", response.data.trxnId);
         if (!reSendOtpCode) {
           setWizardStep("verifyOtp");
-          // Navigate to OTP verification URL while preserving state
-          navigate(`/${language}/profile/update-contact-phone/verify-otp`, {
-            replace: true,
-          });
         }
       }
     } catch (error) {
@@ -119,26 +87,7 @@ export default function EditContactPhoneNumberPage() {
   };
 
   const verifyOtp = async () => {
-    try {
-      setLocalLoading(true);
-      setErrorCode("");
-
-      // Skip separate OTP validation - proceed directly to confirmation
-      // OTP will be validated atomically with the phone update
-      if (phoneFormData.otp && phoneFormData.otp.trim()) {
-        setWizardStep("confirmUpdate");
-        // Navigate to confirmation URL while preserving state
-        navigate(`/${language}/profile/update-contact-phone/confirm-update`, {
-          replace: true,
-        });
-      }
-    } catch (error) {
-      if (error && error.data && error.data.message) {
-        setErrorCode(error.data.message);
-      }
-    } finally {
-      setLocalLoading(false);
-    }
+    setWizardStep("confirmUpdate");
   };
 
   const updateProfile = async () => {
@@ -157,14 +106,18 @@ export default function EditContactPhoneNumberPage() {
       if (response && response.success && response.data) {
         updateProfileSuccess(response.data);
         setWizardStep("success");
-        // Navigate to success URL while preserving state
-        navigate(`/${language}/profile/update-contact-phone/success`, {
-          replace: true,
-        });
       }
     } catch (error) {
       if (error && error.data && error.data.message) {
-        setErrorCode(error.data.message);
+        setErrorCode(error?.data?.message);
+        if (INVALID_OTP_ERROR_CODES.includes(error?.data?.message)) {
+          console.log(
+            "OTP validation failed during phone update:",
+            error.data.message,
+          );
+          // If OTP is invalid, go back to OTP validation step
+          setWizardStep("verifyOtp");
+        }
       }
     } finally {
       setLocalLoading(false);

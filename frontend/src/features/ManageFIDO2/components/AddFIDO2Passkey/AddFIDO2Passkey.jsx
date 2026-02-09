@@ -21,6 +21,7 @@ export default function AddFIDO2Passkey({
   setErrorCode,
   errorMessage,
   onCancel,
+  otpData = null,
 }) {
   const { language } = useParams();
   const pageContent = getPageContent(language, PAGES.addFIDO2Passkey);
@@ -54,7 +55,7 @@ export default function AddFIDO2Passkey({
 
     try {
       // Step 1: Get attestation options from server
-      const attestationResponse = await fido2Api.getAttestationOptions();
+      const attestationResponse = await fido2Api.getAttestationOptions(otpData);
 
       if (!attestationResponse?.success || !attestationResponse?.data) {
         setErrorCode(
@@ -91,9 +92,7 @@ export default function AddFIDO2Passkey({
       if (err instanceof DOMException && err.name === "InvalidStateError") {
         setErrorCode("error_duplicate_passkey");
       } else {
-        setErrorCode(
-          err?.data?.message || "error_failed_to_register_credential",
-        );
+        setErrorCode(err?.data?.message);
       }
     } finally {
       setRegistrationLoading(false);

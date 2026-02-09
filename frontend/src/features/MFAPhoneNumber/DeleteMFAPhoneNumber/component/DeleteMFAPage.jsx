@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router";
 import Loader from "../../../../components/Layout/Loading";
 import { useUser } from "../../../../components/Providers/useUser";
-import { PAGES, serverMapping } from "../../../../utils/constants";
+import {
+  INVALID_OTP_ERROR_CODES,
+  PAGES,
+  serverMapping,
+} from "../../../../utils/constants";
 import { getPageContent } from "../../../../utils/functions";
 import { getErrorMessage } from "../../../../utils/errorUtils";
 import { path } from "../../../../utils/routeHelpers";
@@ -98,9 +102,17 @@ export default function DeleteMFAPage() {
         ),
       );
       setErrorCode("");
+      navigate(backToManage2FAVerificationsPage, {
+        state: {
+          noticeType: "mfaDeleted",
+          phoneNumber: phoneFormData.formattedPhoneNumber,
+        },
+      });
     } catch (error) {
-      if (error && error.data && error.data.message) {
-        setErrorCode(error.data.message);
+      setErrorCode(error?.data?.message);
+      if (INVALID_OTP_ERROR_CODES.includes(error?.data?.message)) {
+        // If OTP is invalid, go back to OTP validation step
+        setWizardStep("otpValidation");
       }
     }
   };
@@ -202,14 +214,12 @@ export default function DeleteMFAPage() {
         onNext={async () => {
           try {
             await deleteMFA();
-            navigate(backToManage2FAVerificationsPage, {
-              state: {
-                noticeType: "mfaDeleted",
-                phoneNumber: phoneFormData.formattedPhoneNumber,
-              },
-            });
           } catch (error) {
-            setErrorCode(error?.message || "Unexpected API request error");
+            setErrorCode(error?.data?.message);
+            if (INVALID_OTP_ERROR_CODES.includes(error?.data?.message)) {
+              // If OTP is invalid, go back to OTP validation step
+              setWizardStep("otpValidation");
+            }
           }
         }}
         onCancel={async () => navigate(backToManage2FAVerificationsPage)}

@@ -15,6 +15,8 @@ from app.fido2.services.helper_utils import (
     get_rp_uuid_from_rp_id,
     get_user_profile_info,
 )
+from app.fido2.schemas import AttestationOptionsRequest
+from app.utils.helpers import verify_otp_before_operation
 
 logger = logging.getLogger(__name__)
 
@@ -34,13 +36,37 @@ def _prepare_attestation_result_body(body_to_send: Dict[str, Any]) -> Dict[str, 
 async def get_attestation_options(
     http_client: AsyncClient,
     user_access_token: str,
-    request_body: Dict[str, Any] = None,
+    request_data: AttestationOptionsRequest,
 ) -> ResponseModel:
     """
     Get FIDO2 attestation options for starting passkey registration.
     Automatically injects user profile information.
     """
+
+    # Set proper defaults for FIDO2 attestation
+    request_body = {
+        "attestation": "direct",
+        "authenticatorSelection": {
+            "requireResidentKey": False,
+            "userVerification": "preferred",
+        },
+    }
+
     try:
+        # Step 1: Verify authentication - either OTP or reauthentication
+        if (
+            request_data.otp
+            and request_data.trxnId
+            and request_data.otpVerificationType
+        ):
+            # OTP verification provided
+            await verify_otp_before_operation(
+                global_http_client=http_client,
+                otp=request_data.otp,
+                trxn_id=request_data.trxnId,
+                otp_type=request_data.otpVerificationType,
+            )
+
         tenant_url = get_tenant_url()
         rp_id = get_rp_id()
 
@@ -67,6 +93,7 @@ async def get_attestation_options(
         headers = get_auth_request_headers(admin_token, json_content_type=True)
 
         response = await http_client.post(url, headers=headers, json=body_to_send)
+        logger.info(response)
         response.raise_for_status()
 
         response_data = response.json()

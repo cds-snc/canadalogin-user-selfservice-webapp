@@ -9,6 +9,7 @@ import importlib
 import pytest
 from httpx import AsyncClient, HTTPStatusError, Request, Response
 from unittest.mock import AsyncMock, MagicMock, patch
+from app.fido2.schemas import AttestationOptionsRequest
 
 # Import the module using importlib to get the actual module object
 add_module = importlib.import_module("app.fido2.services.add_fido2_registration")
@@ -97,10 +98,11 @@ class TestGetAttestationOptions:
         mock_response.raise_for_status = MagicMock()
         mock_http_client.post = AsyncMock(return_value=mock_response)
 
+        request_data = AttestationOptionsRequest()
         result = await get_attestation_options(
             http_client=mock_http_client,
             user_access_token="user-token",
-            request_body={"attestation": "direct"},
+            request_data=request_data,
         )
 
         assert result.success is True
@@ -147,10 +149,11 @@ class TestGetAttestationOptions:
         mock_response.raise_for_status = MagicMock()
         mock_http_client.post = AsyncMock(return_value=mock_response)
 
+        request_data = AttestationOptionsRequest()
         await get_attestation_options(
             http_client=mock_http_client,
             user_access_token="user-token",
-            request_body={},
+            request_data=request_data,
         )
 
         # Verify the body sent to the API includes displayName and userId
@@ -196,9 +199,11 @@ class TestGetAttestationOptions:
         mock_response.raise_for_status = MagicMock()
         mock_http_client.post = AsyncMock(return_value=mock_response)
 
+        request_data = AttestationOptionsRequest()
         await get_attestation_options(
             http_client=mock_http_client,
             user_access_token="user-token",
+            request_data=request_data,
         )
 
         call_args = mock_http_client.post.call_args[0]
@@ -225,9 +230,11 @@ class TestGetAttestationOptions:
         mock_get_rp_id.return_value = "example.com"
         mock_get_admin_token.side_effect = Exception("Token service error")
 
+        request_data = AttestationOptionsRequest()
         await get_attestation_options(
             http_client=mock_http_client,
             user_access_token="user-token",
+            request_data=request_data,
         )
 
         mock_request_error_handler.handle.assert_called_once()
@@ -256,9 +263,11 @@ class TestGetAttestationOptions:
         mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
         mock_get_user_profile_info.side_effect = Exception("Profile fetch error")
 
+        request_data = AttestationOptionsRequest()
         await get_attestation_options(
             http_client=mock_http_client,
             user_access_token="user-token",
+            request_data=request_data,
         )
 
         mock_request_error_handler.handle.assert_called_once()
@@ -304,9 +313,11 @@ class TestGetAttestationOptions:
         )
         mock_http_client.post = AsyncMock(return_value=mock_response_obj)
 
+        request_data = AttestationOptionsRequest()
         await get_attestation_options(
             http_client=mock_http_client,
             user_access_token="user-token",
+            request_data=request_data,
         )
 
         mock_request_error_handler.handle.assert_called_once()
@@ -348,10 +359,11 @@ class TestGetAttestationOptions:
         mock_response.raise_for_status = MagicMock()
         mock_http_client.post = AsyncMock(return_value=mock_response)
 
+        request_data = AttestationOptionsRequest()
         result = await get_attestation_options(
             http_client=mock_http_client,
             user_access_token="user-token",
-            request_body=None,
+            request_data=request_data,
         )
 
         assert result.success is True
