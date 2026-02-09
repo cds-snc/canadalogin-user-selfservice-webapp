@@ -1,12 +1,11 @@
 import pytest
-from unittest.mock import Mock, patch, AsyncMock
+from unittest.mock import Mock, patch
 from fastapi import HTTPException
 from httpx import AsyncClient
 
 from app.otp.schemas import OtpType
 from app.users.schemas import (
     ProfileUpdateWithOtpRequest,
-    ProfileResponse,
     UserProfileName,
     EmailItem,
     MetaDataTypeValue,
