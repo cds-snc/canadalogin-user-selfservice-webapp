@@ -48,7 +48,7 @@ export default function Manage2FAVerifications() {
     state.userProfile.id,
     state.userProfile.userName,
     () => {}, // No error code setter needed
-    navigate(backToSecuritySettingsPage), // No fallback navigation
+    backToSecuritySettingsPage, // No fallback navigation
     MAP_TYPES.fullPhoneNumber,
   );
 

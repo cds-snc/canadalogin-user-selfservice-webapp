@@ -36,7 +36,7 @@ export default function FIDO2PasskeyList({ userFIDO2CredentialsData }) {
             buttonRole="secondary"
             onGcdsClick={() => {
               navigate(`${renamePasskeyPage}`, {
-                state: { passkeyId: id, passkeyNickname: nickname },
+                state: { passkeyId: id, passkeyNickname: attributes.nickname },
               });
             }}
           >
