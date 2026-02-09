@@ -29,6 +29,9 @@ export default function Manage2FAVerifications() {
   const { state, _dispatch } = useUser();
   const [userFIDO2CredentialsData, setUserFIDO2CredentialsData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const backToSecuritySettingsPage = path(PAGES.securitySettings, {
+    language: language,
+  });
 
   // Only show add passkey link in dev and test environments
   const showFIDO2PasskeyFeature =
@@ -45,7 +48,7 @@ export default function Manage2FAVerifications() {
     state.userProfile.id,
     state.userProfile.userName,
     () => {}, // No error code setter needed
-    null, // No fallback navigation
+    navigate(backToSecuritySettingsPage), // No fallback navigation
     MAP_TYPES.fullPhoneNumber,
   );
 

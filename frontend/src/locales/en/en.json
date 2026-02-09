@@ -49,7 +49,8 @@
     "error_failed_to_get_attestation_options": "Failed to get attestation options",
     "error_duplicate_passkey": "The user attempted to register an authenticator that contains one of the credentials already registered with the relying party.",
     "error_passkey_name_required": "Passkey name required.",
-    "error_delete_credential": "Failed to delete security key"
+    "error_delete_credential": "Failed to delete security key",
+    "error_rename_credential": "Failed to rename security key"
   },
   "RegisterVerification": {
     "1": "Protect your account with 2-step verification",
@@ -465,7 +466,8 @@
     "5": "voice call",
     "6": "text (SMS)",
     "7": "for passkey verification",
-    "8": "from your 2-step verification passkeys"
+    "8": "from your 2-step verification passkeys",
+    "9": "You have successfully renamed your passkey to"
   },
   "PasswordVerification": {
     "1": "First, verify it’s you",
@@ -539,5 +541,13 @@
     "9": "Yes, delete",
     "10": "Cancel",
     "11": "Loading..."
+  },
+  "RenameFIDO2PasskeyPage": {
+    "1": "Enter a new passkey name",
+    "2": "Give your security key a name to help you identify it later.",
+    "3": "Passkey name",
+    "4": "e.g., My YubiKey",
+    "5": "Renaming...",
+    "6": "Rename"
   }
 }

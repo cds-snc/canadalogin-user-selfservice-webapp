@@ -116,6 +116,7 @@ export const PAGES = {
   addFIDO2Passkey: "AddFIDO2Passkey",
   deleteFIDO2PasskeyPage: "DeleteFIDO2PasskeyPage",
   deleteFIDO2PasskeyConfirm: "DeleteFIDO2PasskeyConfirm",
+  renameFIDO2PasskeyPage: "RenameFIDO2PasskeyPage",
 };
 
 export const FOOTERS = {
@@ -187,6 +188,10 @@ export const VITE_ENVIRONMENTS = {
   staging: "staging",
   prod: "prod",
 };
+
+export const NON_PROD_FEATURE =
+  config.environment === VITE_ENVIRONMENTS.dev ||
+  config.environment === VITE_ENVIRONMENTS.test;
 
 export const countryMapping = {
   countries: [
