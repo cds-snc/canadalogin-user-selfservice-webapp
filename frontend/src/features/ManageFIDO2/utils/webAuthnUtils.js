@@ -107,9 +107,22 @@ export function formatAttestationForServer(credential) {
   } else if ("transports" in credential.response) {
     result.getTransports = credential.response.transports;
   } else {
-    const jsonCredential = JSON.parse(JSON.stringify(credential));
-    if (jsonCredential.response && jsonCredential.response.transports) {
-      result.getTransports = jsonCredential.response.transports;
+    try {
+      const jsonCredential = JSON.parse(JSON.stringify(credential));
+      if (jsonCredential.response && jsonCredential.response.transports) {
+        result.getTransports = jsonCredential.response.transports;
+      }
+    } catch (err) {
+      if (
+        err instanceof TypeError &&
+        err.message.includes("Illegal invocation")
+      ) {
+        // 1password and bitwarden don't have JSON serializable credentials, so need to catch the error when trying to get transports
+        // Just error to console, credential can still be saved
+        console.error(err);
+      } else {
+        throw err;
+      }
     }
   }
 
@@ -156,7 +169,7 @@ export async function registerFIDO2Credential(
     });
 
     if (!credential) {
-      throw new Error("Failed to create credential");
+      throw new Error();
     }
 
     // Format for server
@@ -169,7 +182,7 @@ export async function registerFIDO2Credential(
 
     return attestationResult;
   } catch (error) {
-    console.error("Error during FIDO2 registration:", error);
+    console.error(error);
     throw error;
   }
 }
@@ -188,13 +201,13 @@ export async function authenticateFIDO2Credential(assertionOptions) {
     });
 
     if (!credential) {
-      throw new Error("Failed to get credential");
+      throw new Error();
     }
 
     // Format for server
     return formatAssertionForServer(credential);
   } catch (error) {
-    console.error("Error during FIDO2 authentication:", error);
+    console.error(error);
     throw error;
   }
 }
