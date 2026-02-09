@@ -1,5 +1,4 @@
 import json
-from unittest.mock import AsyncMock, Mock
 
 import pytest
 from app.otp.schemas import OtpType
