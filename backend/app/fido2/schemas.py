@@ -56,6 +56,13 @@ class AttestationOptionsRequest(BaseModel):
     otpVerificationType: Optional[OtpType] = None
 
 
+class AssertionOptionsRequest(BaseModel):
+    """Request model for getting FIDO2 assertion options (for authentication)"""
+
+    # No additional fields needed - userId is retrieved from session
+    pass
+
+
 class UpdateRegistrationRequest(BaseModel):
     """Request model for updating a FIDO2 registration"""
 
@@ -77,3 +84,25 @@ class FIDO2AttestationResultRequest(BaseModel):
     enabled: bool = True
     getClientExtensionResults: Optional[Dict[str, Any]] = None
     getTransports: Optional[List[str]] = None
+
+
+class AssertionResponse(BaseModel):
+    """Response object from the authenticator during assertion"""
+
+    clientDataJSON: str
+    signature: str
+    authenticatorData: str
+    userHandle: Optional[str] = None
+
+
+class FIDO2AssertionResultRequest(BaseModel):
+    """Request model for FIDO2 assertion result (authentication)"""
+
+    model_config = ConfigDict(exclude_none=True)
+
+    response: AssertionResponse
+    id: str
+    rawId: str
+    type: str
+    getClientExtensionResults: Optional[Dict[str, Any]] = None
+    authenticatorAttachment: Optional[str] = None

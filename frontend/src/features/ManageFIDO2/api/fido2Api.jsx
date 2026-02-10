@@ -112,9 +112,7 @@ export const fido2Api = {
     try {
       const response = await axios.post(
         `${config.apiUrl}/v1/fido2/assertion/options`,
-        {
-          userVerification: "preferred",
-        },
+        {}, // Empty body - userId is retrieved from session on backend
       );
       return response.data;
     } catch (error) {
@@ -125,12 +123,10 @@ export const fido2Api = {
   /**
    * Submit assertion result (complete authentication)
    */
-  submitAssertionResult: async (assertionResult) => {
+  submitAssertionResult: async (assertionResult, returnJwt = false) => {
     try {
-      const response = await axios.post(
-        `${config.apiUrl}/v1/fido2/assertion/result`,
-        assertionResult,
-      );
+      const url = `${config.apiUrl}/v1/fido2/assertion/result${returnJwt ? "?return_jwt=true" : ""}`;
+      const response = await axios.post(url, assertionResult);
       return response.data;
     } catch (error) {
       handleApiError(error);
