@@ -1,22 +1,26 @@
 import config from "../config";
-export const AVAILABLE_LANGUAGES = { en: "en", fr: "fr" };
+
+export const AVAILABLE_LANGUAGES = { en: "en", fr: "fr" } as const;
+
 export const PROFILE_LANGUAGES = {
   en: "en-ca",
   fr: "fr-ca",
-};
+} as const;
+
 export const LANGUAGE_DISPLAY_NAMES = {
   en: { "en-ca": "English", "fr-ca": "French" },
   fr: { "en-ca": "Anglais", "fr-ca": "Français" },
-};
+} as const;
 
 export const EXTERNAL_NAVIGATION_LINKS = {
   gcAccountDirectory:
     "https://www.canada.ca/en/government/sign-in-online-account.html",
-};
+} as const;
+
 export const OIDC_REDIRECT = {
   login: `${config.apiUrl}/v1/auth/login`,
   reauth: `${config.apiUrl}/v1/auth/reauth`,
-};
+} as const;
 
 export const CONTEXT_ACTIONS = {
   logOut: "LOG_OUT",
@@ -31,7 +35,7 @@ export const CONTEXT_ACTIONS = {
   hide_session_timeout_modal: "HIDE_SESSION_TIMEOUT_MODAL",
   set_session_timeout_loading: "SET_SESSION_TIMEOUT_LOADING",
   reset_expire_time: "RESET_EXPIRE_TIME",
-};
+} as const;
 
 export const FLOW_TYPES = {
   sms: "smsotp",
@@ -40,19 +44,19 @@ export const FLOW_TYPES = {
   dashboard: "dashboard",
   profile: "profile",
   manage: "manage",
-};
+} as const;
 
 export const ServicesWithAccessInfoSectionInformation = {
   NAME: "name",
   CONTACT_PHONE_NUMBER: "contactPhoneNumber",
   LANGUAGE_PREFERENCE: "languagePreference",
   EMAIL_ADDRESS: "emailAddress",
-};
+} as const;
 
 export const LINK_SUBMIT_TYPES = {
   useNewVerification: "useNewVerification",
   requestNewCode: "requestNewCode",
-};
+} as const;
 
 export const FORM_FIELDS = [
   "email",
@@ -63,14 +67,14 @@ export const FORM_FIELDS = [
   "verificationType",
   "firstName",
   "lastName",
-];
+] as const;
 
 export const NOTICE_TYPES = {
   mfaAdded: "mfaAdded",
   mfaDeleted: "mfaDeleted",
   passkeyAdded: "passkeyAdded",
   passkeyDeleted: "passkeyDeleted",
-};
+} as const;
 
 export const PAGES = {
   // this is used as key to get the language locales from json files, should probably be renamed in the future to reflect the usage
@@ -117,16 +121,23 @@ export const PAGES = {
   deleteFIDO2PasskeyPage: "DeleteFIDO2PasskeyPage",
   deleteFIDO2PasskeyConfirm: "DeleteFIDO2PasskeyConfirm",
   renameFIDO2PasskeyPage: "RenameFIDO2PasskeyPage",
-};
+} as const;
 
 export const FOOTERS = {
   default: {
     en: '{ "About GC Sign in": "https://gc-signin.cdssandbox.xyz/en/", "Help": "https://gc-signin.cdssandbox.xyz/en/", "Terms": "https://gc-signin.cdssandbox.xyz/en/" }',
     fr: '{ "À propos de Connexion GC": "https://gc-signin.cdssandbox.xyz/en/", "Aide": "https://gc-signin.cdssandbox.xyz/fr/", "Avis": "https://gc-signin.cdssandbox.xyz/en/" }',
   },
-};
+} as const;
 
-export const SERVICES = [
+interface Service {
+  id: number;
+  title: string;
+  description: string;
+  url: string;
+}
+
+export const SERVICES: Service[] = [
   {
     id: 1,
     title: "Parks Canada Reservations",
@@ -142,7 +153,7 @@ export const serverMapping = {
   [FLOW_TYPES.sms]: "sms",
   [FLOW_TYPES.voice]: "voice",
   [FLOW_TYPES.email]: "email",
-};
+} as const;
 
 export const SUBMIT_END_POINTS = {
   requestPasswordPolicy: "/v1/password/policy",
@@ -164,15 +175,15 @@ export const SUBMIT_END_POINTS = {
   sessionStatus: "/v1/auth/session-status",
   keepAlive: "/v1/auth/keep-alive",
   passwordVerify: "/v1/password/verify",
-};
+} as const;
 
 export const RP_CLIENT_ID_KEY = "rp_client_id";
 
 export const GA_CATEGORIES = {
   pageView: "pageview",
-};
+} as const;
 
-export const GA_ACTIONS = {};
+export const GA_ACTIONS = {} as const;
 
 export const GA_LABELS = {
   button: "Button",
@@ -180,14 +191,14 @@ export const GA_LABELS = {
   text: "Text",
   input: "Input",
   email: "Email",
-};
+} as const;
 
 export const VITE_ENVIRONMENTS = {
   dev: "dev",
   test: "test",
   staging: "staging",
   prod: "prod",
-};
+} as const;
 
 export const NON_PROD_FEATURE =
   config.environment === VITE_ENVIRONMENTS.dev ||
@@ -332,7 +343,7 @@ export const countryMapping = {
     kp: "Corée du Nord",
     kr: "Corée du Sud",
     cr: "Costa Rica",
-    ci: "Côte d’Ivoire",
+    ci: "Côte d'Ivoire",
     hr: "Croatie",
     cu: "Cuba",
     cw: "Curaçao",
@@ -376,7 +387,7 @@ export const countryMapping = {
     hn: "Honduras",
     hu: "Hongrie",
     cx: "Île Christmas",
-    ac: "Île de l’Ascension",
+    ac: "Île de l'Ascension",
     im: "Île de Man",
     nf: "Île Norfolk",
     ax: "Îles Åland",
@@ -513,7 +524,7 @@ export const countryMapping = {
     td: "Tchad",
     cz: "Tchéquie",
     tf: "Terres australes françaises",
-    io: "Territoire britannique de l’océan Indien",
+    io: "Territoire britannique de l'océan Indien",
     ps: "Territoires palestiniens",
     th: "Thaïlande",
     tl: "Timor oriental",
@@ -536,4 +547,4 @@ export const countryMapping = {
     zm: "Zambie",
     zw: "Zimbabwe",
   },
-};
+} as const;

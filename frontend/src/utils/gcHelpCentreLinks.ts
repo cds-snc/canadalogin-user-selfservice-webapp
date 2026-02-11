@@ -6,4 +6,4 @@ export const gcHelpCentreLinks = {
     "https://gc-signin.cdssandbox.xyz/en/users/trouble-signing-in/problems-signing-in-with-2-step-verification/##cannot-access-your-phone",
   recover2StepVerification:
     "https://gc-signin.cdssandbox.xyz/en/users/trouble-signing-in/problems-signing-in-with-2-step-verification",
-};
+} as const;

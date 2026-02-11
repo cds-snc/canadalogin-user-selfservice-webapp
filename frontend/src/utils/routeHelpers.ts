@@ -1,10 +1,24 @@
 import { appRoutes } from "../routes";
 import { generatePath } from "react-router";
 
-let routeMap = null;
+interface RouteObject {
+  path?: string;
+  index?: boolean;
+  handle?: { id: string; breadcrumbId?: string };
+  children?: RouteObject[];
+}
 
-function collectRoutes(routeList, parentPath = "") {
-  const map = {};
+interface Params {
+  [key: string]: string;
+}
+
+let routeMap: Record<string, string> | null = null;
+
+function collectRoutes(
+  routeList: RouteObject[],
+  parentPath = "",
+): Record<string, string> {
+  const map: Record<string, string> = {};
   for (const r of routeList) {
     const fullPath = r.index
       ? parentPath
@@ -20,15 +34,15 @@ function collectRoutes(routeList, parentPath = "") {
   return map;
 }
 
-function ensureRouteMap() {
+function ensureRouteMap(): void {
   if (!routeMap) {
-    routeMap = collectRoutes(appRoutes);
+    routeMap = collectRoutes(appRoutes as RouteObject[]);
   }
 }
 
-export function path(id, params) {
+export function path(id: string, params: Params): string {
   ensureRouteMap();
-  const pattern = routeMap[id];
+  const pattern = routeMap![id];
   if (!pattern) throw new Error(`No route with id=${id}`);
 
   if (!params["language"]) {

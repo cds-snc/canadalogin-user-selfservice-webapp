@@ -4,11 +4,11 @@
 
 /**
  * Changes the favicon to a specified URL
- * @param {string} faviconUrl - The URL of the new favicon
+ * @param faviconUrl - The URL of the new favicon
  */
-export const changeFavicon = (faviconUrl) => {
+export const changeFavicon = (faviconUrl: string): void => {
   // Find existing favicon link element
-  let link =
+  const link: HTMLLinkElement | null =
     document.querySelector("link[rel*='icon']") ||
     document.createElement("link");
 
@@ -26,7 +26,7 @@ export const changeFavicon = (faviconUrl) => {
 /**
  * Restores the default Canada.ca favicon
  */
-export const restoreDefaultFavicon = () => {
+export const restoreDefaultFavicon = (): void => {
   changeFavicon(
     "https://www.canada.ca/etc/designs/canada/wet-boew/assets/favicon.ico",
   );
@@ -35,7 +35,7 @@ export const restoreDefaultFavicon = () => {
 /**
  * Changes favicon to a warning/alert icon (red triangle with white exclamation mark)
  */
-export const setWarningFavicon = () => {
+export const setWarningFavicon = (): void => {
   // Use a FontAwesome SVG warning icon as favicon
   // Example uses the FontAwesome exclamation-triangle SVG path
   const svg = `
