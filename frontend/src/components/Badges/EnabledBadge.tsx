@@ -1,6 +1,10 @@
 import { GcdsContainer } from "@cdssnc/gcds-components-react";
 
-export default function EnabledBadge({ text }) {
+interface EnabledBadgeProps {
+  text: string;
+}
+
+export default function EnabledBadge({ text }: EnabledBadgeProps) {
   return (
     <GcdsContainer>
       <div

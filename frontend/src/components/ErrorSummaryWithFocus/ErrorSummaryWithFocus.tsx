@@ -3,13 +3,22 @@ import { useEffect, useRef } from "react";
 import { getPageContent } from "../../utils/functions";
 import { PAGES } from "../../utils/constants";
 
+interface ErrorSummaryWithFocusProps {
+  errorCode: string;
+  language: string;
+  id?: string;
+  errorLinks?: Record<string, string>;
+  autoFocus?: boolean;
+  [key: string]: unknown;
+}
+
 /**
  * A reusable error summary component that automatically scrolls to and focuses
  * the error when rendered. This ensures consistent accessibility behavior across
  * all pages that display error summaries.
  *
  * @param {Object} props - The component props
- * @param {string} props.errorMessage - The error message to display
+ * @param {string} props.errorCode - The error code to look up the message
  * @param {string} props.language - The current language (en/fr)
  * @param {string} [props.id="errorSummary"] - The ID for the error summary element
  * @param {Object} [props.errorLinks] - Custom error links object (optional)
@@ -23,19 +32,19 @@ export default function ErrorSummaryWithFocus({
   errorLinks,
   autoFocus = true,
   ...otherProps
-}) {
-  const errorSummaryRef = useRef(null);
+}: ErrorSummaryWithFocusProps) {
+  const errorSummaryRef = useRef<HTMLDivElement>(null);
 
   // Get error page content internally
-  const errorPageJson = getPageContent(language, PAGES.error);
+  const errorPageJson = getPageContent(language, PAGES.error) || {};
 
   const errorMessage = errorCode
-    ? errorPageJson[errorCode] || errorPageJson["7"]
+    ? (errorPageJson[errorCode] as string) || (errorPageJson["7"] as string) || ""
     : "";
 
   // Effect to scroll to and focus error summary when error message changes
   useEffect(() => {
-    let timeoutId;
+    let timeoutId: ReturnType<typeof setTimeout>;
 
     if (errorMessage && errorSummaryRef.current && autoFocus) {
       // Small delay to ensure the component is fully rendered

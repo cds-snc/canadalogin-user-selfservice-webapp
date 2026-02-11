@@ -7,8 +7,9 @@ import { getFooter } from "../utils/functions";
 import * as engJson from "../locales/en/en.json";
 // @ts-ignore
 import * as frJson from "../locales/fr/fr.json";
-import { PAGES } from "../utils/constants.jsx";
-import { page } from "@vitest/browser/context";
+import { PAGES } from "../utils/constants";
+
+type JsonRecord = Record<string, unknown>;
 
 const subLinks = {
   attribute: "sub-links",
@@ -77,15 +78,15 @@ const GCDS_TAG_ATTRIBUTES = {
 
 interface TestParameters {
   language: string;
-  pageContentJson: JSON;
+  pageContentJson: JsonRecord;
   langLink: string;
-  buttonJson: JSON;
+  buttonJson: JsonRecord | null;
   isVoice: boolean;
-  stepper: Array<string>;
+  stepper: Array<string> | null;
   textKeysToNotSearch: Array<string>;
   smsTextKeys: Array<string>;
   voiceTextKeys: Array<string>;
-  serviceKey: string;
+  serviceKey: string | null;
 }
 
 export const buildTestSuite = {
@@ -191,7 +192,7 @@ const pageSetup = {
   gcdsMap: (
     language: string,
     page: string,
-    pageContentJson: JSON,
+    pageContentJson: JsonRecord,
     flow: string,
   ) => {
     switch (page) {
@@ -205,13 +206,13 @@ const pageSetup = {
         return new Map();
     }
   },
-  passwordGcdsMap: (flow: string, pageContentJson: JSON) => {
+  passwordGcdsMap: (flow: string, pageContentJson: JsonRecord) => {
     const gcdsElementMap = new Map();
     gcdsElementMap.set("9", [
       "gcds-input",
       createMap("gcds-input2", [
         "input-password",
-        pageContentJson["9"],
+        pageContentJson["9"] as string,
         "password",
         "password",
         "",
@@ -220,13 +221,13 @@ const pageSetup = {
 
     return gcdsElementMap;
   },
-  verificationGcdsMap: (pageContentJson: JSON) => {
+  verificationGcdsMap: (pageContentJson: JsonRecord) => {
     const gcdsElementMap = new Map();
     gcdsElementMap.set("9", [
       "gcds-input",
       createMap("gcds-input", [
         "verificationCode",
-        pageContentJson["9"],
+        pageContentJson["9"] as string,
         "verificationCode",
         "text",
         "other",
@@ -235,19 +236,19 @@ const pageSetup = {
 
     return gcdsElementMap;
   },
-  manageDashboardGcdsMap(pageContentJson: JSON) {
+  manageDashboardGcdsMap(pageContentJson: JsonRecord) {
     const gcdsElementMap = new Map();
     gcdsElementMap.set("2", [
       "gcds-card",
-      createMap("gcds-card", [pageContentJson["2"], "#", "h3"]),
+      createMap("gcds-card", [pageContentJson["2"] as string, "#", "h3"]),
     ]);
     gcdsElementMap.set("3", [
       "gcds-card",
-      createMap("gcds-card", [pageContentJson["3"], "#", "h3"]),
+      createMap("gcds-card", [pageContentJson["3"] as string, "#", "h3"]),
     ]);
     return gcdsElementMap;
   },
-  securitySettingsGcdsMap: (pageContentJson: JSON) => {
+  securitySettingsGcdsMap: (_pageContentJson: JsonRecord) => {
     const gcdsElementMap = new Map();
 
     return gcdsElementMap;
@@ -257,23 +258,24 @@ const pageSetup = {
 const testSuite = {
   parameters: (
     language: string,
-    page: string,
-    flow: string,
-    type: string,
+    _page: string,
+    _flow: string,
+    _type: string,
     link: string,
   ) => {
+    const page = _page; // Use _page to avoid unused variable warning
     return {
       language: language,
       pageContentJson:
         language !== AVAILABLE_LANGUAGES.fr ? engJson[page] : frJson[page],
       langLink: link,
       buttonJson: pageSetup.button(page, language),
-      stepper: pageSetup.stepper(page, flow, type),
-      textKeysToNotSearch: pageSetup.textKeysToNotSearch(page, flow, type),
-      isVoice: type === FLOW_TYPES.voice,
+      stepper: pageSetup.stepper(page, _flow, _type),
+      textKeysToNotSearch: pageSetup.textKeysToNotSearch(page, _flow, _type),
+      isVoice: _type === FLOW_TYPES.voice,
       smsTextKeys: pageSetup.smsTextKeys(page),
       voiceTextKeys: pageSetup.voiceTextKeys(page),
-      serviceKey: pageSetup.serviceKey(page, flow),
+      serviceKey: pageSetup.serviceKey(page, _flow),
     };
   },
   page: (
@@ -312,13 +314,13 @@ const testSuite = {
           if (language === AVAILABLE_LANGUAGES.fr)
             expect(
               screen.queryByText(
-                pageContentJson[key] + " " + SERVICES[0].title,
+                (pageContentJson[key] as string) + " " + SERVICES[0].title,
               ),
             ).toBeInTheDocument();
           else
             expect(
               screen.queryByText(
-                SERVICES[0].title + " " + pageContentJson[key],
+                SERVICES[0].title + " " + (pageContentJson[key] as string),
               ),
             ).toBeInTheDocument();
         else if (
@@ -326,7 +328,7 @@ const testSuite = {
           (smsTextKeys.includes(key) && !isVoice) ||
           (voiceTextKeys.includes(key) && isVoice)
         ) {
-          expect(screen.queryByText(pageContentJson[key])).toBeInTheDocument();
+          expect(screen.queryByText(pageContentJson[key] as string)).toBeInTheDocument();
         }
     });
   },
@@ -371,8 +373,8 @@ function createMap(type: string, values: Array<string>) {
 function verifyCommonElements(
   language: string,
   langLink: string,
-  buttonJson: JSON,
-  stepper: Array<string>,
+  buttonJson: JsonRecord | null,
+  stepper: Array<string> | null,
 ) {
   verifyGcdsHtmlElement(
     "gcds-header",
@@ -383,7 +385,7 @@ function verifyCommonElements(
     verifyGcdsHtmlElement("gcds-stepper", createMap("gcds-stepper", stepper));
   if (buttonJson) {
     verifyGcdsHtmlElement("gcds-button", createMap("gcds-button", ["submit"]));
-    expect(screen.queryByText(buttonJson["submit"])).toBeInTheDocument();
+    expect(screen.queryByText(buttonJson["submit"] as string)).toBeInTheDocument();
   }
 
   verifyGcdsHtmlElement(

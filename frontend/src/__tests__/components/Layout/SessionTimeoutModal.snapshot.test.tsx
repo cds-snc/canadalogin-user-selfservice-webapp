@@ -1,4 +1,3 @@
-import React from "react";
 import { render } from "@testing-library/react";
 import { vi, describe, beforeEach, it, expect } from "vitest";
 import "@testing-library/jest-dom/vitest";
@@ -13,6 +12,13 @@ vi.mock("react-modal", () => ({
     className,
     overlayClassName,
     ...props
+  }: {
+    children?: React.ReactNode;
+    isOpen?: boolean;
+    contentLabel?: string;
+    className?: string;
+    overlayClassName?: string;
+    [key: string]: unknown;
   }) =>
     isOpen ? (
       <div
@@ -36,6 +42,14 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
     buttonType,
     buttonRole,
     ...props
+  }: {
+    children?: React.ReactNode;
+    buttonId?: string;
+    onClick?: () => void;
+    disabled?: boolean;
+    buttonType?: string;
+    buttonRole?: string;
+    [key: string]: unknown;
   }) => (
     <button
       data-testid={buttonId}
@@ -48,12 +62,20 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
       {children}
     </button>
   ),
-  GcdsText: ({ children, size, className }) => (
+  GcdsText: ({ children, size, className }: {
+    children?: React.ReactNode;
+    size?: string;
+    className?: string;
+  }) => (
     <div data-size={size} className={className}>
       {children}
     </div>
   ),
-  GcdsIcon: ({ name, size, className }) => (
+  GcdsIcon: ({ name, size, className }: {
+    name?: string;
+    size?: string;
+    className?: string;
+  }) => (
     <div
       data-testid="warning-icon"
       data-icon-name={name}
@@ -83,10 +105,10 @@ vi.mock("../../../utils/faviconUtils.js", () => ({
 }));
 
 vi.mock("../../../hooks/useBreakpoints.ts", () => ({
-  useBreakpoints: vi.fn(() => ({
+  useBreakpoints: vi.fn().mockReturnValue({
     mobile: false,
     tablet: false,
-  })),
+  }),
 }));
 
 import { useBreakpoints } from "../../../hooks/useBreakpoints.ts";
