@@ -12,6 +12,7 @@ class VerifyAPIEndpoint(str, Enum):
     END_SESSION_ENDPOINT = "/oauth2/rplogout"
     VERIFY_PASSWORD = "/v1.0/authnmethods/password"
     EXCHANGE_TOKEN_SESSION = "/v1.0/auth/session"
+    GET_ACCESS_TOKEN = "/oauth2/token"
 
     # FIDO2 Endpoints
     FIDO2_RELYING_PARTIES = "/config/v2.0/factors/fido2/relyingparties"

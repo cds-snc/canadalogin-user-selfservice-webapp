@@ -12,9 +12,9 @@ import Loader from "../../../../components/Layout/Loading";
 import DeleteFIDO2PasskeyConfirm from "./DeleteFIDO2PasskeyConfirm";
 
 export default function DeleteFIDO2PasskeyPage({ step }) {
-  const { language, passkeyId } = useParams();
+  const { language } = useParams();
   const navigate = useNavigate();
-  const [wizardStep, _setWizardStep] = useState(step ?? "passwordVerification");
+  const [wizardStep, setWizardStep] = useState(step ?? "passwordVerification");
   const [errorCode, setErrorCode] = useState("");
   const errorMessage = getErrorMessage(language, errorCode);
   const loaderPageContentJson = getPageContent(language, PAGES.otpSelection);
@@ -31,14 +31,7 @@ export default function DeleteFIDO2PasskeyPage({ step }) {
     setErrorCode,
     () => {
       if (fido2Data && fido2Data.length > 0) {
-        // Handle case when FIDO2 data exists
-        // Go to access policy OOTB step up
-        navigate(
-          `/${language}/security-settings/manage-2fa-verifications/delete-fido2/${passkeyId}/fido2-verification`,
-          {
-            replace: true,
-          },
-        );
+        setWizardStep("deleteFIDO2PasskeyConfirmation");
       } else {
         navigate(backToManage2FAVerificationsPage);
       }

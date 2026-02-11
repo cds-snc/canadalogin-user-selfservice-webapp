@@ -90,7 +90,9 @@ export default function FIDO2PasskeyList({ userFIDO2CredentialsData }) {
             id="delete-fido2-button"
             buttonRole="secondary"
             onClick={() => {
-              navigate(`${deletePasskeyPage}/${id}`);
+              navigate(`${deletePasskeyPage}`, {
+                state: { passkeyId: id, passkeyNickname: attributes.nickname },
+              });
             }}
           >
             {pageContent["13"]}

@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 import { path } from "../../../../utils/routeHelpers";
 import { getPageContent } from "../../../../utils/functions";
 import { NOTICE_TYPES, PAGES } from "../../../../utils/constants";
@@ -9,19 +9,20 @@ import {
   GcdsHeading,
   GcdsText,
 } from "@cdssnc/gcds-components-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { fido2Api } from "../../api/fido2Api";
 import Loader from "../../../../components/Layout/Loading";
 
 export default function DeleteFIDO2PasskeyConfirm({ setErrorCode }) {
-  const { language, passkeyId } = useParams();
+  const { language } = useParams();
   const pageContentJson = getPageContent(
     language,
     PAGES.deleteFIDO2PasskeyConfirm,
   );
+  const location = useLocation();
+  const { passkeyId, passkeyNickname } = location.state ?? {};
   const errorPageContent = getPageContent(language, PAGES.error);
-  const [passkey, setPasskey] = useState({});
-  const [localLoading, setLocalLoading] = useState(true);
+  const [localLoading, setLocalLoading] = useState(false);
   const navigate = useNavigate();
 
   const backToManage2FAVerificationsPage = path(PAGES.manage2FAVerifications, {
@@ -32,18 +33,19 @@ export default function DeleteFIDO2PasskeyConfirm({ setErrorCode }) {
    * Handle deleting FIDO2 credential
    */
   const handleDeleteFIDO2 = async () => {
-    if (!passkey) return;
+    if (!passkeyId) return;
 
     setErrorCode("");
+    setLocalLoading(true);
 
     try {
-      const response = await fido2Api.deleteRegistration(passkey.id);
+      const response = await fido2Api.deleteRegistration(passkeyId);
 
       if (response && response.success) {
         navigate(backToManage2FAVerificationsPage, {
           state: {
             noticeType: NOTICE_TYPES.passkeyDeleted,
-            passkeyName: passkey?.attributes?.nickname,
+            passkeyName: passkeyNickname,
           },
         });
       } else {
@@ -55,30 +57,6 @@ export default function DeleteFIDO2PasskeyConfirm({ setErrorCode }) {
     }
   };
 
-  useEffect(() => {
-    /**
-     * Fetch passkey details
-     */
-    const fetchPasskeyDetails = async () => {
-      setLocalLoading(true);
-      setErrorCode("");
-
-      try {
-        const response = await fido2Api.getRegistrationDetails(passkeyId);
-        if (response && response.success && response.data) {
-          setPasskey(response.data);
-        }
-      } catch (error) {
-        if (error && error.data && error.data.message) {
-          setErrorCode(error.data.message);
-        }
-      } finally {
-        setLocalLoading(false);
-      }
-    };
-    fetchPasskeyDetails();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
   const onSubmitHandler = async (ev) => {
     ev.preventDefault();
     await handleDeleteFIDO2();
@@ -94,8 +72,7 @@ export default function DeleteFIDO2PasskeyConfirm({ setErrorCode }) {
             {pageContentJson["1"]}
           </GcdsHeading>
           <GcdsText>
-            {pageContentJson["2"]}{" "}
-            <strong>{passkey?.attributes?.nickname}</strong>{" "}
+            {pageContentJson["2"]} <strong>{passkeyNickname}</strong>{" "}
             {pageContentJson["3"]}
           </GcdsText>
         </GcdsContainer>
