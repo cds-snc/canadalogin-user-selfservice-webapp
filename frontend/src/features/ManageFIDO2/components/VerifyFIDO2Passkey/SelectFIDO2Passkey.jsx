@@ -12,12 +12,12 @@ import { authenticateFIDO2Credential } from "../../utils/webAuthnUtils";
 import { getPageContent } from "../../../../utils/functions";
 import { PAGES } from "../../../../utils/constants";
 import { path } from "../../../../utils/routeHelpers";
-import Loader from "../../../../components/Layout/Loading";
 
 export default function SelectFIDO2Passkey({
-  setWizardStep,
   setAssertionResult,
   setErrorCode,
+  onCallback,
+  submitAttestationResult = false,
 }) {
   const { language } = useParams();
   const navigate = useNavigate();
@@ -55,8 +55,17 @@ export default function SelectFIDO2Passkey({
       );
 
       // Step 3: Store assertion result and proceed to confirmation
-      setAssertionResult(assertionResult);
-      setWizardStep("deleteFIDO2PasskeyConfirmation");
+      setAssertionResult?.(assertionResult);
+
+      // Step 4 (optional): Submit the assertion result now if needed for immediate verification
+      if (submitAttestationResult) {
+        await fido2Api.submitAssertionResult(
+          assertionResult,
+          true, // returnJwt = true for step-up authentication
+        );
+      }
+
+      onCallback?.();
     } catch (err) {
       console.error(errorPageContent["error_fido2_verification"], err);
       setErrorCode(errorPageContent["error_fido2_verification"]);

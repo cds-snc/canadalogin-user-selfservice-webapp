@@ -65,9 +65,11 @@ export default function DeleteFIDO2PasskeyPage({ step }) {
     ),
     selectFIDO2Passkey: (
       <SelectFIDO2Passkey
-        setWizardStep={setWizardStep}
         setAssertionResult={setAssertionResult}
         setErrorCode={setErrorCode}
+        onCallback={() => {
+          setWizardStep("deleteFIDO2PasskeyConfirmation");
+        }}
       />
     ),
     deleteFIDO2PasskeyConfirmation: (

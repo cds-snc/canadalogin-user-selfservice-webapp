@@ -19,6 +19,7 @@ import { fetchUserFIDO2Credentials } from "../../utils/fetchUserFIDO2Credentials
 import StepContent from "../../../../components/Wizard/StepContent";
 import Loader from "../../../../components/Layout/Loading";
 import AddFIDO2Passkey from "./AddFIDO2Passkey";
+import SelectFIDO2Passkey from "../VerifyFIDO2Passkey/SelectFIDO2Passkey";
 
 export default function AddFIDO2PasskeyPage({ step }) {
   const { language } = useParams();
@@ -58,7 +59,7 @@ export default function AddFIDO2PasskeyPage({ step }) {
     setErrorCode,
     () => {
       if (fido2Data && fido2Data.length > 0) {
-        setWizardStep("addFIDO2Passkey");
+        setWizardStep("selectFIDO2Passkey");
       } else {
         // Handle case when no FIDO2 data exists
         // If there's only one MFA factor, skip OTP selection and go directly to validation
@@ -165,6 +166,15 @@ export default function AddFIDO2PasskeyPage({ step }) {
         errorMessage={errorMessage}
         onCancel={async () => navigate(backToManage2FAVerificationsPage)}
         showTryAnotherWay={userPhoneFactors && userPhoneFactors.length > 1}
+      />
+    ),
+    selectFIDO2Passkey: (
+      <SelectFIDO2Passkey
+        submitAttestationResult={true}
+        setErrorCode={setErrorCode}
+        onCallback={() => {
+          setWizardStep("addFIDO2Passkey");
+        }}
       />
     ),
     addFIDO2Passkey: (
