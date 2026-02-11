@@ -4,21 +4,35 @@ import { otpFactors } from "../features/TransientOtp/api/otpFactors";
 import { authService } from "../services/authService";
 import { serverMapping } from "../utils/constants";
 
+export const MAP_TYPES = {
+  lastFourDigits: "lastFourDigits",
+  fullPhoneNumber: "fullPhoneNumber",
+};
+
 /**
  * Custom hook that provides common OTP operations used across multiple components
  * including MFA factor selection, OTP sending/validation, and user phone factor fetching
+ * @param {string} userId - The user ID
+ * @param {string} userName - The user name
+ * @param {Function} setErrorCode - Function to set error codes
+ * @param {string} fallbackNavigationPath - Path to navigate on error
+ * @param {string} mapType - Type of phone factors map to create ('lastFourDigits' or 'fullPhoneNumber')
+ * @param {string} mfaTrxnId - MFA enrollment trxnId if calling from the Add MFA flow
  */
 export const useOtpOperations = (
   userId,
   userName,
   setErrorCode,
   fallbackNavigationPath,
+  mapType = null,
+  mfaTrxnId = "",
 ) => {
   const [userPhoneFactors, setUserPhoneFactors] = useState([]);
   const [userSelectedMfaFactor, setUserSelectedMfaFactor] = useState(null);
   const [otpSentResponse, setOtpSentResponse] = useState(null);
   const [userOtpValue, setUserOtpValue] = useState("");
   const [localLoading, setLocalLoading] = useState(true);
+  const [phoneFactorsMap, setPhoneFactorsMap] = useState({});
 
   const navigate = useNavigate();
   const didFetch = useRef(false);
@@ -138,10 +152,37 @@ export const useOtpOperations = (
   };
 
   /**
+   * Create a phone factors map with customizable transformation
+   * @param {Array} phoneFactors - Array of phone factors
+   * @param {string} mapType - Type of map to create ('lastFourDigits' or 'fullPhoneNumber')
+   * @returns {Object} Phone factors map
+   */
+  const createPhoneFactorsMap = (phoneFactors, mapType = "lastFourDigits") => {
+    return phoneFactors.reduce((acc, factor) => {
+      if (mapType === MAP_TYPES.lastFourDigits) {
+        // For AddMFAPage: key is last 4 digits, value is array of types
+        const visibleDigits = factor.phoneNumber.slice(-4);
+        acc[visibleDigits] = acc[visibleDigits]
+          ? [...acc[visibleDigits], factor.type]
+          : [factor.type];
+      } else if (mapType === MAP_TYPES.fullPhoneNumber) {
+        // For Manage2FAVerifications: key is full phone number, value is array of {type, id}
+        acc[factor.phoneNumber] = acc[factor.phoneNumber]
+          ? [...acc[factor.phoneNumber], { type: factor.type, id: factor.id }]
+          : [{ type: factor.type, id: factor.id }];
+      }
+      return acc;
+    }, {});
+  };
+
+  /**
    * Fetch user's OTP phone factors from the API
+   * @param {Object} options - Optional configuration
+   * @param {string} options.mapType - Type of phone factors map to create (overrides hook's mapType)
+   * @returns {Object} Object containing phoneFactors and phoneFactorsMap
    */
   const fetchUserOtpPhoneFactors = async () => {
-    if (!userId) return;
+    if (!userId) return { phoneFactors: [], phoneFactorsMap: {} };
 
     setLocalLoading(true);
     try {
@@ -155,20 +196,25 @@ export const useOtpOperations = (
         const phoneFactors = response.data;
         setUserPhoneFactors(phoneFactors);
         setUserSelectedMfaFactor(phoneFactors[0]);
-        return phoneFactors;
+
+        const factorsMap = mapType
+          ? createPhoneFactorsMap(phoneFactors, mapType)
+          : {};
+
+        // Update state if mapType is provided
+        if (mapType) {
+          setPhoneFactorsMap(factorsMap);
+        }
       } else {
-        // If no phone factors available, redirect to fallback page
         if (fallbackNavigationPath) {
           navigate(fallbackNavigationPath);
         }
-        return [];
       }
     } catch (err) {
       console.error("Error fetching user OTP phone factors:", err);
       if (fallbackNavigationPath) {
         navigate(fallbackNavigationPath);
       }
-      return [];
     } finally {
       setLocalLoading(false);
     }
@@ -182,7 +228,7 @@ export const useOtpOperations = (
       fetchUserOtpPhoneFactors();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId]);
+  }, [userId, mfaTrxnId]);
 
   return {
     // State
@@ -191,6 +237,7 @@ export const useOtpOperations = (
     otpSentResponse,
     userOtpValue,
     localLoading,
+    phoneFactorsMap,
 
     // Setters
     setUserPhoneFactors,
@@ -205,5 +252,6 @@ export const useOtpOperations = (
     requestOtpCode,
     validateOtpCode,
     fetchUserOtpPhoneFactors,
+    createPhoneFactorsMap,
   };
 };

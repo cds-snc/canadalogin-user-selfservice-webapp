@@ -23,7 +23,7 @@ import DeleteMFAPage from "./features/MFAPhoneNumber/DeleteMFAPhoneNumber/compon
 import { PAGES } from "./utils/constants.jsx";
 import EditEmailAddressPage from "./features/EmailAddress/EditEmailAddressPage.jsx";
 import AddFIDO2PasskeyPage from "./features/ManageFIDO2/components/AddFIDO2Passkey/AddFIDO2PasskeyPage.jsx";
-import DeleteFIDO2PasskeyPage from "./features/ManageFIDO2/components/DeleteFIDO2Passkey.jsx/DeleteFIDO2PasskeyPage.jsx";
+import DeleteFIDO2PasskeyPage from "./features/ManageFIDO2/components/DeleteFIDO2Passkey/DeleteFIDO2PasskeyPage.jsx";
 import { RenameFIDO2PasskeyPage } from "./features/ManageFIDO2/components/RenameFIDO2Passkey/RenameFIDO2PasskeyPage.jsx";
 
 export const appRoutes = [
@@ -119,7 +119,7 @@ export const appRoutes = [
                           {
                             path: "add-fido2/fido2-verification",
                             element: (
-                              <AddFIDO2PasskeyPage step={"addFido2Passkey"} />
+                              <AddFIDO2PasskeyPage step={"addFIDO2Passkey"} />
                             ),
                             handle: { id: PAGES.addFIDO2PasskeyPage },
                           },

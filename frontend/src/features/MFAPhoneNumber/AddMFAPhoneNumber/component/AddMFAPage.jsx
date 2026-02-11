@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import Loader from "../../../../components/Layout/Loading";
 import { useUser } from "../../../../components/Providers/useUser";
@@ -18,7 +18,10 @@ import { authService } from "../../../../services/authService";
 import PasswordVerification from "../../../TransientOtp/components/PasswordVerification";
 import StepContent from "../../../../components/Wizard/StepContent";
 import { usePasswordValidation } from "../../../../hooks/usePasswordValidation";
-import { useOtpOperations } from "../../../../hooks/useOtpOperations";
+import {
+  MAP_TYPES,
+  useOtpOperations,
+} from "../../../../hooks/useOtpOperations";
 
 export default function AddMFAPage() {
   const { language } = useParams();
@@ -31,6 +34,14 @@ export default function AddMFAPage() {
 
   const [wizardStep, setWizardStep] = useState("passwordVerification");
   const { userProfile } = state;
+  const [phoneFormData, setPhoneFormData] = useState({
+    phoneNumber: "",
+    otp: "",
+    mfaId: "",
+    trxnId: "",
+    otpType: FLOW_TYPES.sms,
+    formattedPhoneNumber: "",
+  });
 
   const { id, userName } = userProfile ?? {};
 
@@ -62,23 +73,19 @@ export default function AddMFAPage() {
     userOtpValue,
     otpSentResponse,
     localLoading,
+    phoneFactorsMap: userPhoneFactorsMap,
     handleChangeUserMfaSelection,
     handleSetUserOtpValue,
-    setUserPhoneFactors,
-    setUserSelectedMfaFactor,
     setLocalLoading,
     setOtpSentResponse,
-  } = useOtpOperations(id, userName, setErrorCode, backToSecuritySettingsPage);
-
-  const [userPhoneFactorsMap, setUserPhoneFactorsMap] = useState({});
-  const [phoneFormData, setPhoneFormData] = useState({
-    phoneNumber: "",
-    otp: "",
-    mfaId: "",
-    trxnId: "",
-    otpType: FLOW_TYPES.sms,
-    formattedPhoneNumber: "",
-  });
+  } = useOtpOperations(
+    id,
+    userName,
+    setErrorCode,
+    backToSecuritySettingsPage,
+    MAP_TYPES.lastFourDigits,
+    phoneFormData?.trxnId,
+  );
 
   const successBannerJson = getPageContent(language, PAGES.successBanner);
   const errorMessage = getErrorMessage(language, errorCode);
@@ -316,42 +323,6 @@ export default function AddMFAPage() {
       });
     }
   }
-
-  useEffect(() => {
-    const fetchUserOtpPhoneFactors = async () => {
-      setLocalLoading(true);
-      try {
-        const response = await otpFactors.getUserOtpPhoneFactors(id);
-        if (
-          response &&
-          response.success &&
-          response.data.length > 0 &&
-          response.data[0].type
-        ) {
-          const userPhoneFactors = response.data;
-          setUserPhoneFactors(userPhoneFactors);
-          setUserSelectedMfaFactor(userPhoneFactors[0]);
-          const userPhoneFactorsMap = userPhoneFactors.reduce((acc, factor) => {
-            const visibleDigits = factor.phoneNumber.slice(-4);
-            acc[visibleDigits] = acc[visibleDigits]
-              ? [...acc[visibleDigits], factor.type]
-              : [factor.type];
-            return acc;
-          }, {});
-          setUserPhoneFactorsMap(userPhoneFactorsMap);
-        } else {
-          navigate(backToSecuritySettingsPage);
-        }
-      } catch (err) {
-        console.error("Error fetching user OTP phone factors:", err);
-      } finally {
-        setLocalLoading(false);
-      }
-    };
-
-    fetchUserOtpPhoneFactors();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phoneFormData.trxnId]);
 
   const steps = {
     passwordVerification: (

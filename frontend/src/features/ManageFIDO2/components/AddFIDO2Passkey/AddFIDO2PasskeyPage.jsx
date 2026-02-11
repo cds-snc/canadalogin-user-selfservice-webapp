@@ -5,14 +5,13 @@ import { path } from "../../../../utils/routeHelpers";
 import { PAGES, serverMapping } from "../../../../utils/constants";
 import { getErrorMessage } from "../../../../utils/errorUtils";
 import { useOtpOperations } from "../../../../hooks/useOtpOperations";
-import { otpFactors } from "../../../TransientOtp/api/otpFactors";
 import { usePasswordValidation } from "../../../../hooks/usePasswordValidation";
 import PasswordVerification from "../../../TransientOtp/components/PasswordVerification";
 import OtpSelection from "../../../TransientOtp/components/OtpSelection";
 import OtpVerification from "../../../TransientOtp/components/OtpVerification";
 import { authService } from "../../../../services/authService";
 import { getPageContent } from "../../../../utils/functions";
-import { fido2Api } from "../../api/fido2Api";
+import { fetchUserFIDO2Credentials } from "../../utils/fetchUserFIDO2Credentials";
 import StepContent from "../../../../components/Wizard/StepContent";
 import Loader from "../../../../components/Layout/Loading";
 import AddFIDO2Passkey from "./AddFIDO2Passkey";
@@ -46,8 +45,6 @@ export default function AddFIDO2PasskeyPage({ step }) {
     localLoading,
     handleChangeUserMfaSelection,
     handleSetUserOtpValue,
-    setUserPhoneFactors,
-    setUserSelectedMfaFactor,
     setLocalLoading,
     setOtpSentResponse,
   } = useOtpOperations(id, userName, setErrorCode, backToSecuritySettingsPage);
@@ -110,7 +107,7 @@ export default function AddFIDO2PasskeyPage({ step }) {
       const response = await authService.transientOtpVerify(userData);
       if (response && response.success) {
         // Navigate to confirmation URL while preserving state
-        setWizardStep("addFido2Passkey");
+        setWizardStep("addFIDO2Passkey");
         setErrorCode("");
       }
     } catch (err) {
@@ -126,50 +123,14 @@ export default function AddFIDO2PasskeyPage({ step }) {
   };
 
   useEffect(() => {
-    const fetchUserOtpPhoneFactors = async () => {
-      setLocalLoading(true);
-      try {
-        const response = await otpFactors.getUserOtpPhoneFactors(id);
-        if (
-          response &&
-          response.success &&
-          response.data.length > 0 &&
-          response.data[0].type
-        ) {
-          const userPhoneFactors = response.data;
-          setUserPhoneFactors(userPhoneFactors);
-          setUserSelectedMfaFactor(userPhoneFactors[0]);
-        } else {
-          navigate(backToSecuritySettingsPage);
-        }
-      } catch (err) {
-        console.error("Error fetching user OTP phone factors:", err);
-      } finally {
-        setLocalLoading(false);
-      }
-    };
     /**
      * Fetch user's FIDO2 credentials
      */
-    const fetchUserFIDO2Credentials = async () => {
-      setLocalLoading(true);
-      setErrorCode("");
-
-      try {
-        const response = await fido2Api.getUserFIDO2Credentials();
-        if (response && response?.data?.authenticated) {
-          setFido2Data(response?.data?.credentials || []);
-        }
-      } catch (error) {
-        if (error && error.data && error.data.message) {
-          setErrorCode(error.data.message);
-        }
-      } finally {
-        setLocalLoading(false);
-      }
-    };
-    fetchUserFIDO2Credentials();
-    fetchUserOtpPhoneFactors();
+    fetchUserFIDO2Credentials({
+      setLoading: setLocalLoading,
+      setData: setFido2Data,
+      setErrorCode,
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -182,7 +143,7 @@ export default function AddFIDO2PasskeyPage({ step }) {
         validatePassword={validatePassword}
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
-        parentPage={PAGES.addFido2Passkey}
+        parentPage={PAGES.addFIDO2Passkey}
       />
     ),
     otpSelection: (
@@ -195,7 +156,7 @@ export default function AddFIDO2PasskeyPage({ step }) {
         onNext={() => {
           setWizardStep("otpValidation");
         }}
-        parentPage={PAGES.addFido2Passkey}
+        parentPage={PAGES.addFIDO2Passkey}
         onCancel={async () => navigate(backToManage2FAVerificationsPage)}
       />
     ),
@@ -222,7 +183,7 @@ export default function AddFIDO2PasskeyPage({ step }) {
         showTryAnotherWay={userPhoneFactors && userPhoneFactors.length > 1}
       />
     ),
-    addFido2Passkey: (
+    addFIDO2Passkey: (
       <AddFIDO2Passkey
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}

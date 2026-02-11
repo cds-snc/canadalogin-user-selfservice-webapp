@@ -18,7 +18,6 @@ get_registrations_module = importlib.import_module(
 
 # Import functions directly for testing
 get_user_fido2_registrations = get_registrations_module.get_user_fido2_registrations
-get_user_response = get_registrations_module.get_user_response
 
 
 class TestGetUserFido2Registrations:
@@ -37,23 +36,33 @@ class TestGetUserFido2Registrations:
             "fido2": [
                 {
                     "id": "reg-123",
+                    "userId": "user-456",
+                    "type": "fido2",
+                    "created": "2024-01-15T10:30:00Z",
+                    "updated": "2024-01-15T10:30:00Z",
+                    "enabled": True,
+                    "validated": True,
                     "attributes": {
                         "nickname": "My Passkey",
                         "rpId": "example.com",
                         "credentialId": "cred-abc",
                     },
-                    "enabled": True,
-                    "created": "2024-01-15T10:30:00Z",
+                    "references": {"rpUuid": "rp-uuid-123"},
                 },
                 {
                     "id": "reg-456",
+                    "userId": "user-456",
+                    "type": "fido2",
+                    "created": "2024-01-20T14:00:00Z",
+                    "updated": "2024-01-20T14:00:00Z",
+                    "enabled": False,
+                    "validated": True,
                     "attributes": {
                         "nickname": "Work Laptop",
                         "rpId": "example.com",
                         "credentialId": "cred-def",
                     },
-                    "enabled": False,
-                    "created": "2024-01-20T14:00:00Z",
+                    "references": {"rpUuid": "rp-uuid-123"},
                 },
             ]
         }
@@ -104,12 +113,13 @@ class TestGetUserFido2Registrations:
 
         # Verify
         assert result.success is True
-        assert len(result.data) == 2
-        assert result.data[0].id == "reg-123"
-        assert result.data[0].nickname == "My Passkey"
-        assert result.data[0].enabled is True
-        assert result.data[1].id == "reg-456"
-        assert result.data[1].enabled is False
+        assert result.data is not None
+        assert len(result.data.fido2) == 2
+        assert result.data.fido2[0].id == "reg-123"
+        assert result.data.fido2[0].attributes["nickname"] == "My Passkey"
+        assert result.data.fido2[0].enabled is True
+        assert result.data.fido2[1].id == "reg-456"
+        assert result.data.fido2[1].enabled is False
 
     @pytest.mark.asyncio
     @patch.object(get_registrations_module, "get_auth_request_headers")
@@ -153,7 +163,8 @@ class TestGetUserFido2Registrations:
         )
 
         assert result.success is True
-        assert len(result.data) == 0
+        assert result.data is not None
+        assert len(result.data.fido2) == 0
         assert result.message == "FIDO2 credentials retrieved successfully"
 
     @pytest.mark.asyncio
@@ -345,205 +356,37 @@ class TestGetUserFido2Registrations:
             "Authorization": "Bearer user-token"
         }
 
-        # Registration with minimal data
-        mock_response = MagicMock()
-        mock_response.raise_for_status = MagicMock()
-        mock_response.json.return_value = {
+        # Registration with minimal data but all required fields
+        minimal_registration = {
             "fido2": [
                 {
-                    "id": "reg-minimal",
-                    # No attributes, no enabled, no created
+                    "id": "reg-789",
+                    "userId": "user-456",
+                    "type": "fido2",
+                    "created": "2024-01-25T09:00:00Z",
+                    "updated": "2024-01-25T09:00:00Z",
+                    "enabled": True,
+                    "validated": False,
+                    "attributes": {},
+                    "references": {},
                 }
             ]
         }
-        mock_http_client.get = AsyncMock(return_value=mock_response)
-
-        result = await get_user_fido2_registrations(
-            http_client=mock_http_client,
-            user_access_token="user-token-abc",
-        )
-
-        assert result.success is True
-        assert len(result.data) == 1
-        assert result.data[0].id == "reg-minimal"
-        assert result.data[0].nickname is None
-        assert result.data[0].enabled is False
-
-    @pytest.mark.asyncio
-    @patch.object(get_registrations_module, "get_auth_request_headers")
-    @patch.object(get_registrations_module, "get_rp_uuid_from_rp_id")
-    @patch.object(get_registrations_module, "get_admin_token")
-    @patch.object(get_registrations_module, "get_user_profile_info")
-    @patch.object(get_registrations_module, "get_rp_id")
-    @patch.object(get_registrations_module, "get_tenant_url")
-    async def test_handles_missing_fido2_key(
-        self,
-        mock_get_tenant_url,
-        mock_get_rp_id,
-        mock_get_user_profile_info,
-        mock_get_admin_token,
-        mock_get_rp_uuid_from_rp_id,
-        mock_get_auth_request_headers,
-        mock_http_client,
-    ):
-        """Should handle response with missing fido2 key"""
-        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
-        mock_get_rp_id.return_value = "example.com"
-        mock_get_user_profile_info.return_value = (
-            "user@example.com",
-            "Test User",
-            "user-456",
-        )
-        mock_get_admin_token.return_value = "admin-token-xyz"
-        mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
-        mock_get_auth_request_headers.return_value = {
-            "Authorization": "Bearer user-token"
-        }
-
         mock_response = MagicMock()
         mock_response.raise_for_status = MagicMock()
-        mock_response.json.return_value = {}  # No fido2 key
+        mock_response.json.return_value = minimal_registration
         mock_http_client.get = AsyncMock(return_value=mock_response)
 
+        # Execute
         result = await get_user_fido2_registrations(
             http_client=mock_http_client,
             user_access_token="user-token-abc",
         )
 
+        # Verify - should handle empty attributes/references
         assert result.success is True
-        assert len(result.data) == 0
-
-
-class TestGetUserResponse:
-    """Tests for get_user_response function"""
-
-    @pytest.fixture
-    def mock_http_client(self):
-        """Create a mock HTTP client"""
-        return AsyncMock(spec=AsyncClient)
-
-    @pytest.fixture
-    def mock_credentials_list(self):
-        """Create mock FIDO2CredentialSummary objects"""
-        from app.fido2.schemas import FIDO2CredentialSummary
-
-        return [
-            FIDO2CredentialSummary(
-                id="reg-123",
-                nickname="My Passkey",
-                enabled=True,
-                created="2024-01-15T10:30:00Z",
-            ),
-            FIDO2CredentialSummary(
-                id="reg-456",
-                nickname="Work Laptop",
-                enabled=False,
-                created="2024-01-20T14:00:00Z",
-            ),
-        ]
-
-    @pytest.mark.asyncio
-    @patch.object(get_registrations_module, "get_user_fido2_registrations")
-    async def test_successful_get_user_response(
-        self,
-        mock_get_user_fido2_registrations,
-        mock_http_client,
-        mock_credentials_list,
-    ):
-        """Should successfully return user response with credentials"""
-        # Create mock credentials response with proper Pydantic objects
-        mock_credentials = MagicMock()
-        mock_credentials.data = mock_credentials_list
-        mock_get_user_fido2_registrations.return_value = mock_credentials
-
-        result = await get_user_response(
-            http_client=mock_http_client,
-            user_access_token="user-token-abc",
-        )
-
-        assert result.success is True
-        assert result.data.authenticated is True
-        assert len(result.data.credentials) == 2
-        assert result.message == "User FIDO2 data retrieved successfully"
-
-    @pytest.mark.asyncio
-    @patch.object(get_registrations_module, "get_user_fido2_registrations")
-    async def test_returns_empty_credentials_list(
-        self,
-        mock_get_user_fido2_registrations,
-        mock_http_client,
-    ):
-        """Should return empty credentials list when user has none"""
-        mock_credentials = MagicMock()
-        mock_credentials.data = []
-        mock_get_user_fido2_registrations.return_value = mock_credentials
-
-        result = await get_user_response(
-            http_client=mock_http_client,
-            user_access_token="user-token-abc",
-        )
-
-        assert result.success is True
-        assert result.data.authenticated is True
-        assert len(result.data.credentials) == 0
-
-    @pytest.mark.asyncio
-    @patch.object(get_registrations_module, "get_user_fido2_registrations")
-    async def test_handles_none_data(
-        self,
-        mock_get_user_fido2_registrations,
-        mock_http_client,
-    ):
-        """Should handle None data from get_user_fido2_registrations"""
-        mock_credentials = MagicMock()
-        mock_credentials.data = None
-        mock_get_user_fido2_registrations.return_value = mock_credentials
-
-        result = await get_user_response(
-            http_client=mock_http_client,
-            user_access_token="user-token-abc",
-        )
-
-        assert result.success is True
-        assert result.data.credentials == []
-
-    @pytest.mark.asyncio
-    @patch.object(get_registrations_module, "RequestErrorHandler")
-    @patch.object(get_registrations_module, "get_user_fido2_registrations")
-    async def test_handles_registrations_error(
-        self,
-        mock_get_user_fido2_registrations,
-        mock_request_error_handler,
-        mock_http_client,
-    ):
-        """Should handle error from get_user_fido2_registrations"""
-        mock_get_user_fido2_registrations.side_effect = Exception(
-            "Failed to get registrations"
-        )
-
-        await get_user_response(
-            http_client=mock_http_client,
-            user_access_token="user-token-abc",
-        )
-
-        mock_request_error_handler.handle.assert_called_once()
-
-    @pytest.mark.asyncio
-    @patch.object(get_registrations_module, "get_user_fido2_registrations")
-    async def test_sets_username_and_displayname_to_none(
-        self,
-        mock_get_user_fido2_registrations,
-        mock_http_client,
-    ):
-        """Should set username and displayName to None"""
-        mock_credentials = MagicMock()
-        mock_credentials.data = []
-        mock_get_user_fido2_registrations.return_value = mock_credentials
-
-        result = await get_user_response(
-            http_client=mock_http_client,
-            user_access_token="user-token-abc",
-        )
-
-        assert result.data.username is None
-        assert result.data.displayName is None
+        assert result.data is not None
+        assert len(result.data.fido2) == 1
+        assert result.data.fido2[0].id == "reg-789"
+        assert result.data.fido2[0].attributes == {}
+        assert result.data.fido2[0].references == {}

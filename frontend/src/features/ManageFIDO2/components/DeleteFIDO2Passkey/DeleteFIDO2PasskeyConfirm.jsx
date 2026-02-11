@@ -34,7 +34,6 @@ export default function DeleteFIDO2PasskeyConfirm({ setErrorCode }) {
   const handleDeleteFIDO2 = async () => {
     if (!passkey) return;
 
-    setLocalLoading(true);
     setErrorCode("");
 
     try {
@@ -53,8 +52,6 @@ export default function DeleteFIDO2PasskeyConfirm({ setErrorCode }) {
     } catch (err) {
       console.error(errorPageContent["error_delete_credential"], err);
       setErrorCode(errorPageContent["error_delete_credential"]);
-    } finally {
-      setLocalLoading(false);
     }
   };
 

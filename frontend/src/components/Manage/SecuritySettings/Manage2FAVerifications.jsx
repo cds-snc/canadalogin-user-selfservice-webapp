@@ -6,7 +6,10 @@ import {
 } from "@cdssnc/gcds-components-react";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router";
-import { otpFactors } from "../../../features/TransientOtp/api/otpFactors.jsx";
+import {
+  MAP_TYPES,
+  useOtpOperations,
+} from "../../../hooks/useOtpOperations.js";
 import { PAGES, VITE_ENVIRONMENTS } from "../../../utils/constants.jsx";
 import { getPageContent } from "../../../utils/functions.jsx";
 import { path } from "../../../utils/routeHelpers.js";
@@ -24,7 +27,6 @@ export default function Manage2FAVerifications() {
   const pageContent = getPageContent(language, PAGES.manage2FAVerifications);
   const navigate = useNavigate();
   const { state, _dispatch } = useUser();
-  const [userPhoneFactorsMap, setUserPhoneFactorsMap] = useState({});
   const [userFIDO2CredentialsData, setUserFIDO2CredentialsData] = useState([]);
   const [loading, setLoading] = useState(true);
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
@@ -41,40 +43,16 @@ export default function Manage2FAVerifications() {
     location.state || {};
   const addFido2PagePath = path(PAGES.addFIDO2PasskeyPage, { language });
 
-  useEffect(() => {
-    const fetchUserOtpPhoneFactors = async () => {
-      setLoading(true);
-      try {
-        const response = await otpFactors.getUserOtpPhoneFactors(
-          state.userProfile.id,
-        );
-        if (
-          response &&
-          response.success &&
-          response.data.length > 0 &&
-          response.data[0].type
-        ) {
-          const userPhoneFactors = response.data;
-          const userPhoneFactorsMap = userPhoneFactors.reduce((acc, factor) => {
-            acc[factor.phoneNumber] = acc[factor.phoneNumber]
-              ? [
-                  ...acc[factor.phoneNumber],
-                  { type: factor.type, id: factor.id },
-                ]
-              : [{ type: factor.type, id: factor.id }];
-            return acc;
-          }, {});
-          setUserPhoneFactorsMap(userPhoneFactorsMap);
-        } else {
-          navigate(backToSecuritySettingsPage);
-        }
-      } catch (err) {
-        console.error("err", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Use the OTP operations hook for fetching phone factors
+  const { phoneFactorsMap: userPhoneFactorsMap } = useOtpOperations(
+    state.userProfile.id,
+    state.userProfile.userName,
+    () => {}, // No error code setter needed
+    backToSecuritySettingsPage, // No fallback navigation
+    MAP_TYPES.fullPhoneNumber,
+  );
 
+  useEffect(() => {
     /**
      * Fetch user's FIDO2 credentials
      */
@@ -83,8 +61,8 @@ export default function Manage2FAVerifications() {
 
       try {
         const response = await fido2Api.getUserFIDO2Credentials();
-        if (response && response?.data?.authenticated) {
-          setUserFIDO2CredentialsData(response?.data?.credentials || []);
+        if (response && response?.success) {
+          setUserFIDO2CredentialsData(response?.data?.fido2 || []);
         }
       } catch (err) {
         if (err && err?.data && err?.data?.message) {
@@ -95,7 +73,6 @@ export default function Manage2FAVerifications() {
       }
     };
 
-    fetchUserOtpPhoneFactors();
     if (showFIDO2PasskeyFeature) {
       fetchUserFIDO2Credentials();
     }
