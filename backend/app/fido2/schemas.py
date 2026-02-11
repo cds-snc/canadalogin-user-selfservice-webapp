@@ -26,7 +26,6 @@ class FIDO2UserResponse(BaseModel):
     """Model for user response with FIDO2 credentials"""
 
     fido2: List[FIDO2RegistrationResponse] = []
-    fido2: List[FIDO2RegistrationResponse] = []
 
 
 class FIDO2UserResponseModel(ResponseModel):
