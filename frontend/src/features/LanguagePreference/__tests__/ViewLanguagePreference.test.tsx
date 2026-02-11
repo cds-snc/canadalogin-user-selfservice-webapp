@@ -22,7 +22,7 @@ vi.mock("../../../utils/routeHelpers.js", () => ({
 }));
 
 // Mock constants
-vi.mock("../../../utils/constants.jsx", () => ({
+vi.mock("../../../utils/constants.ts", () => ({
   PAGES: {
     editLanguagePreferences: "edit-language-preferences",
   },

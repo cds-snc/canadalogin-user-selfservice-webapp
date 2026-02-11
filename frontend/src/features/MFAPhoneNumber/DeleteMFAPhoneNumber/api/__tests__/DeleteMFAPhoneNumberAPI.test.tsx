@@ -12,7 +12,7 @@ vi.mock("../../../../../utils/apiErrorHandler.js", () => ({
 }));
 
 // Mock config
-vi.mock("../../../../../config.jsx", () => ({
+vi.mock("../../../../../config.ts", () => ({
   default: {
     apiUrl: "http://localhost:8000",
   },

@@ -71,7 +71,7 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
 }));
 
 // Mock functions
-vi.mock("../../../utils/functions.jsx", () => ({
+vi.mock("../../../utils/functions.ts", () => ({
   getPageContent: (language, page) => {
     const mockContent = {
       ConfirmContactPhoneNumberUpdate: {
@@ -106,8 +106,8 @@ vi.mock("react-router", async () => {
 });
 
 // Mock constants
-vi.mock("../../../utils/constants.jsx", async () => {
-  const actual = await vi.importActual("../../../utils/constants.jsx");
+vi.mock("../../../utils/constants.ts", async () => {
+  const actual = await vi.importActual("../../../utils/constants.ts");
   return {
     ...actual,
     SERVICES: [{ id: 1, title: "Test Service", description: "", url: "#" }],

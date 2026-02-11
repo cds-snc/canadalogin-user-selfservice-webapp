@@ -10,12 +10,12 @@ import {
   CONTEXT_ACTIONS,
   SUBMIT_END_POINTS,
   RP_CLIENT_ID_KEY,
-} from "../../utils/constants.jsx";
+} from "../../utils/constants.ts";
 import UserContext from "./UserContext";
-import { authService } from "../../services/authService.jsx";
-import Loader from "../Layout/Loading.jsx";
-import SessionTimeoutModal from "../Layout/SessionTimeoutModal.jsx";
-import { getPageContent } from "../../utils/functions.jsx";
+import { authService } from "../../services/authService.tsx";
+import Loader from "../Layout/Loading.tsx";
+import SessionTimeoutModal from "../Layout/SessionTimeoutModal.tsx";
+import { getPageContent } from "../../utils/functions.ts";
 
 interface Action {
   type: string;

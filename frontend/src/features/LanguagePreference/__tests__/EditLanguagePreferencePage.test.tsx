@@ -22,14 +22,14 @@ vi.mock("../../../components/Providers/useUser.tsx", () => ({
   useUser: vi.fn(),
 }));
 
-vi.mock("../../../components/Wizard/StepContent.jsx", () => ({
+vi.mock("../../../components/Wizard/StepContent.tsx", () => ({
   __esModule: true,
   default: ({ StepComponent }) => (
     <div data-testid="step-content">{StepComponent}</div>
   ),
 }));
 
-vi.mock("../../../components/Layout/Loading.jsx", () => ({
+vi.mock("../../../components/Layout/Loading.tsx", () => ({
   __esModule: true,
   default: ({ text }) => <div data-testid="loading">{text}</div>,
 }));

@@ -5,11 +5,11 @@ import {
   GA_LABELS,
   PAGES,
   SUBMIT_END_POINTS,
-} from "../utils/constants.jsx";
+} from "../utils/constants.ts";
 import { useUser } from "../components/Providers/useUser";
-import { authService } from "../services/authService.jsx";
+import { authService } from "../services/authService.tsx";
 import { useNavigate } from "react-router";
-import { trackEvent } from "../utils/gatag.jsx";
+import { trackEvent } from "../utils/gatag.ts";
 
 export interface SubmitDataOptions {
   language: string;

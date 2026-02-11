@@ -26,7 +26,7 @@ vi.mock("react-router", async () => {
   };
 });
 
-vi.mock("../../../utils/functions.jsx", () => ({
+vi.mock("../../../utils/functions.ts", () => ({
   getPageContent: vi.fn(() => ({
     1: "Confirm language update",
     2: "You are changing your language to",
@@ -45,7 +45,7 @@ vi.mock("../../../utils/routeHelpers.js", () => ({
   path: vi.fn((page, params) => `/${params.language}/${page}`),
 }));
 
-vi.mock("../../../utils/constants.jsx", () => ({
+vi.mock("../../../utils/constants.ts", () => ({
   PAGES: {
     confirmLanguageUpdate: "confirm",
     otpSelection: "otp-selection",
@@ -61,7 +61,7 @@ vi.mock("../../../utils/constants.jsx", () => ({
 }));
 
 const mockUpdateProfileSuccess = vi.fn();
-vi.mock("../../../utils/userProfileDispatch.jsx", () => ({
+vi.mock("../../../utils/userProfileDispatch.tsx", () => ({
   userProfileDispatch: () => ({
     updateProfileSuccess: mockUpdateProfileSuccess,
   }),
@@ -84,7 +84,7 @@ vi.mock("../../../components/Providers/useUser.tsx", () => ({
   }),
 }));
 
-vi.mock("../../../services/authService.jsx", () => ({
+vi.mock("../../../services/authService.tsx", () => ({
   authService: {
     update_my_user_profile: vi.fn(),
   },

@@ -24,7 +24,7 @@ vi.mock("../../../components/Providers/useUser.tsx", () => ({
   useUser: vi.fn(),
 }));
 
-vi.mock("../../../utils/functions.jsx", () => ({
+vi.mock("../../../utils/functions.ts", () => ({
   getPageContent: vi.fn(() => ({
     1: "Edit language preferences",
     2: "Select your preferred language for notifications and communications.",
@@ -50,7 +50,7 @@ vi.mock("../../../utils/routeHelpers.js", () => ({
   }),
 }));
 
-vi.mock("../../../utils/constants.jsx", () => ({
+vi.mock("../../../utils/constants.ts", () => ({
   PAGES: {
     editLanguagePreferences: "edit-language-preferences",
     ProfileHome: "profile-home",
@@ -69,7 +69,7 @@ vi.mock("../../../utils/constants.jsx", () => ({
 }));
 
 vi.mock(
-  "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx",
+  "../../../components/InfoBlocks/ServicesWithAccessInfoSection.tsx",
   () => ({
     default: ({ currentLang }) => (
       <div data-testid="services-info">Services Info - {currentLang}</div>

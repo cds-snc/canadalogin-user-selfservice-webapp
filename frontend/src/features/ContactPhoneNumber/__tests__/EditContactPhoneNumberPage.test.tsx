@@ -23,7 +23,7 @@ vi.mock("react-router", async () => {
 });
 
 // Mock auth service
-vi.mock("../../../services/authService.jsx", () => ({
+vi.mock("../../../services/authService.tsx", () => ({
   authService: {
     transientOtpSend: vi.fn(),
     transientOtpVerify: vi.fn(),
@@ -36,7 +36,7 @@ vi.mock("../../../services/authService.jsx", () => ({
 }));
 
 // Mock utility functions
-vi.mock("../../../utils/functions.jsx", () => ({
+vi.mock("../../../utils/functions.ts", () => ({
   getPageContent: () => ({
     11: "Loading...",
     error: "An error occurred",
@@ -47,15 +47,15 @@ vi.mock("../../../utils/routeHelpers.js", () => ({
   path: vi.fn(() => "/en/profile"),
 }));
 
-vi.mock("../../../utils/userProfileDispatch.jsx", () => ({
+vi.mock("../../../utils/userProfileDispatch.tsx", () => ({
   userProfileDispatch: () => ({
     updateProfileSuccess: vi.fn(),
   }),
 }));
 
 // Mock constants
-vi.mock("../../../utils/constants.jsx", async () => {
-  const actual = await vi.importActual("../../../utils/constants.jsx");
+vi.mock("../../../utils/constants.ts", async () => {
+  const actual = await vi.importActual("../../../utils/constants.ts");
   return {
     ...actual,
     SERVICES: [{ id: 1, title: "Test Service", description: "", url: "#" }],
@@ -63,7 +63,7 @@ vi.mock("../../../utils/constants.jsx", async () => {
 });
 
 // Mock components
-vi.mock("../components/EnterPhoneNumber.jsx", () => ({
+vi.mock("../components/EnterPhoneNumber.tsx", () => ({
   default: ({
     onNext,
     onCancel,
@@ -89,7 +89,7 @@ vi.mock("../components/EnterPhoneNumber.jsx", () => ({
   ),
 }));
 
-vi.mock("../components/OtpVerification.jsx", () => ({
+vi.mock("../components/OtpVerification.tsx", () => ({
   default: ({
     onNext,
     onCancel,
@@ -124,7 +124,7 @@ vi.mock("../components/OtpVerification.jsx", () => ({
   ),
 }));
 
-vi.mock("../components/ConfirmUpdate.jsx", () => ({
+vi.mock("../components/ConfirmUpdate.tsx", () => ({
   default: ({ onNext, onCancel, phoneFormData }) => (
     <div data-testid="confirm-update">
       <h2>Confirm Update</h2>
@@ -139,7 +139,7 @@ vi.mock("../components/ConfirmUpdate.jsx", () => ({
   ),
 }));
 
-vi.mock("../components/SuccessfullyUpdated.jsx", () => ({
+vi.mock("../components/SuccessfullyUpdated.tsx", () => ({
   default: ({ onNext, phoneFormData }) => (
     <div data-testid="successfully-updated">
       <h2>Successfully Updated</h2>
@@ -151,11 +151,11 @@ vi.mock("../components/SuccessfullyUpdated.jsx", () => ({
   ),
 }));
 
-vi.mock("../../../components/Wizard/StepContent.jsx", () => ({
+vi.mock("../../../components/Wizard/StepContent.tsx", () => ({
   default: ({ StepComponent }) => StepComponent,
 }));
 
-vi.mock("../../../components/Layout/Loading.jsx", () => ({
+vi.mock("../../../components/Layout/Loading.tsx", () => ({
   default: ({ text }) => <div data-testid="loader">{text}</div>,
 }));
 
@@ -198,7 +198,7 @@ describe("EditContactPhoneNumberPage Component", () => {
     mockParams = { language: "en", step: undefined };
 
     // Get the mocked auth service
-    const { authService } = await import("../../../services/authService.jsx");
+    const { authService } = await import("../../../services/authService.tsx");
     mockAuthService = authService;
   });
 

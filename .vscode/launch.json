@@ -15,9 +15,7 @@
         "--port",
         "8000",
         "--host",
-        "0.0.0.0",
-        "--ssl-keyfile=backend/certs/key.pem",
-        "--ssl-certfile=backend/certs/cert.pem"
+        "0.0.0.0"
       ],
       "env": {
         "PYTHONPATH": "backend"
@@ -63,10 +61,7 @@
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
-      "args": [
-        "${file}",
-        "-v"
-      ],
+      "args": ["${file}", "-v"],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}",
       "envFile": "${workspaceFolder}/backend/tests/.env",
@@ -79,10 +74,7 @@
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
-      "args": [
-        "backend/tests/",
-        "-v"
-      ],
+      "args": ["backend/tests/", "-v"],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}",
       "envFile": "${workspaceFolder}/backend/tests/.env",

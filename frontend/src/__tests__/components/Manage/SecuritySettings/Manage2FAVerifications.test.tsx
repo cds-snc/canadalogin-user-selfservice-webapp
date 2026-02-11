@@ -48,7 +48,7 @@ vi.mock("../../../../hooks/useOtpOperations.js", () => ({
   },
 }));
 
-vi.mock("../../../../utils/functions.jsx", () => ({
+vi.mock("../../../../utils/functions.ts", () => ({
   getPageContent: () => ({
     1: "Manage 2-step verification methods",
     2: "Choose how you would like to receive verification codes when signing in to your GC Account.",
@@ -64,7 +64,7 @@ vi.mock("../../../../utils/functions.jsx", () => ({
   }),
 }));
 
-vi.mock("../../../../utils/constants.jsx", () => ({
+vi.mock("../../../../utils/constants.ts", () => ({
   PAGES: {
     manage2FAVerifications: "Manage2FAVerifications",
     securitySettings: "SecuritySettings",
@@ -80,17 +80,17 @@ vi.mock("../../../../utils/routeHelpers.js", () => ({
   path: () => "/security-settings",
 }));
 
-vi.mock("../../../../components/Layout/Loading.jsx", () => ({
+vi.mock("../../../../components/Layout/Loading.tsx", () => ({
   default: ({ text }) => <div data-testid="loading">{text}</div>,
 }));
 
-vi.mock("../../../../config.jsx", () => ({
+vi.mock("../../../../config.ts", () => ({
   default: {
     environment: "test",
   },
 }));
 
-vi.mock("../../../../features/ManageFIDO2/api/fido2Api.jsx", () => ({
+vi.mock("../../../../features/ManageFIDO2/api/fido2Api.tsx", () => ({
   fido2Api: {
     getUserFIDO2Credentials: vi.fn(),
   },

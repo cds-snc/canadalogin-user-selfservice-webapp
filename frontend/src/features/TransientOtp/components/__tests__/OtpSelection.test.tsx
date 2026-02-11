@@ -22,7 +22,7 @@ vi.mock("../../../../hooks/useNavigate.js", () => ({
 }));
 
 // Mock utilities
-vi.mock("../../../../utils/functions.jsx", () => ({
+vi.mock("../../../../utils/functions.ts", () => ({
   getPageContent: vi.fn((language, page) => {
     if (page === PAGES.transientOtpSelection) {
       return {
@@ -53,7 +53,7 @@ vi.mock("../../../../utils/functions.jsx", () => ({
   }),
 }));
 
-vi.mock("../../../../utils/gcHelpCentreLinks.jsx", () => ({
+vi.mock("../../../../utils/gcHelpCentreLinks.tsx", () => ({
   gcHelpCentreLinks: {
     twoStepVerification: "https://help.example.com/2fa",
     recover2StepVerification: "https://help.example.com/no-phone",

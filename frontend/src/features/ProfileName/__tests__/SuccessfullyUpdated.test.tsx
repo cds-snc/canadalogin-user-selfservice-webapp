@@ -119,7 +119,7 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
   GcdsLink: ({ children, ...props }) => <a {...props}>{children}</a>,
 }));
 
-vi.mock("../../../utils/functions.jsx", () => ({
+vi.mock("../../../utils/functions.ts", () => ({
   getPageContent: vi.fn(() => ({
     1: "Hello",
     2: "Profile Updated Successfully",
@@ -134,7 +134,7 @@ vi.mock("../../../utils/functions.jsx", () => ({
   })),
 }));
 
-vi.mock("../../../utils/constants.jsx", () => ({
+vi.mock("../../../utils/constants.ts", () => ({
   PAGES: {
     ProfileHome: "profile-home",
     profileUpdateName: "profile-update-name",
@@ -150,7 +150,7 @@ vi.mock("../../../utils/routeHelpers.js", () => ({
   path: (page, params) => `/${params.language}/${page}`,
 }));
 
-vi.mock("../../../services/authService.jsx", () => ({
+vi.mock("../../../services/authService.tsx", () => ({
   authService: {
     logout: vi.fn(() =>
       Promise.resolve({
@@ -160,7 +160,7 @@ vi.mock("../../../services/authService.jsx", () => ({
   },
 }));
 
-vi.mock("../../../utils/userProfileDispatch.jsx", () => ({
+vi.mock("../../../utils/userProfileDispatch.tsx", () => ({
   userProfileDispatch: () => ({ setLoading: mockSetLoading }),
 }));
 
@@ -326,7 +326,7 @@ describe("SuccessfullyUpdatedName", () => {
 
   it("handles logout error gracefully", async () => {
     // Mock authService.logout to throw an error
-    const mockAuthService = await import("../../../services/authService.jsx");
+    const mockAuthService = await import("../../../services/authService.tsx");
     vi.mocked(mockAuthService.authService.logout).mockRejectedValueOnce(
       new Error("Network error"),
     );

@@ -125,7 +125,7 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
 }));
 
 // Mock utility functions
-vi.mock("../../../../utils/functions.jsx", () => ({
+vi.mock("../../../../utils/functions.ts", () => ({
   getPageContent: vi.fn((language, page) => {
     const mockContent = {
       password: {
@@ -161,7 +161,7 @@ vi.mock("../../../../utils/functions.jsx", () => ({
   }),
 }));
 
-vi.mock("../../../../services/authService.jsx", () => ({
+vi.mock("../../../../services/authService.tsx", () => ({
   authService: {
     requestPasswordPolicy: vi.fn().mockResolvedValue({
       success: true,
@@ -177,7 +177,7 @@ vi.mock("../../../../services/authService.jsx", () => ({
 }));
 
 // Mock constants
-vi.mock("../../../../utils/constants.jsx", async (importOriginal) => {
+vi.mock("../../../../utils/constants.ts", async (importOriginal) => {
   const actual = await importOriginal();
   return {
     ...actual,
@@ -194,7 +194,7 @@ vi.mock("../../../../utils/routeHelpers.js", () => ({
 }));
 
 // Mock password update API
-vi.mock("../../api/passwordUpdate.jsx", () => ({
+vi.mock("../../api/passwordUpdate.tsx", () => ({
   passwordUpdate: {
     finalStep: vi.fn(),
   },
@@ -234,7 +234,7 @@ describe("Password Component", () => {
     vi.clearAllMocks();
     // Get reference to the mocked service
     const { authService } = await import(
-      "../../../../services/authService.jsx"
+      "../../../../services/authService.tsx"
     );
     mockAuthService = authService;
   });

@@ -98,7 +98,7 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
   ),
 }));
 
-vi.mock("../../../../utils/functions.jsx", () => ({
+vi.mock("../../../../utils/functions.ts", () => ({
   getPageContent: () => ({
     1: "Are you sure you want to update your name?",
     2: "You’ve requested to update your name to:",
@@ -116,7 +116,7 @@ vi.mock("../../../../utils/functions.jsx", () => ({
 }));
 
 vi.mock(
-  "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx",
+  "../../../components/InfoBlocks/ServicesWithAccessInfoSection.tsx",
   () => ({
     default: () => (
       <div data-testid="services-with-access-info">

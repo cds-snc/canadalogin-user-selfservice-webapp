@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { getPageContent } from "../utils/functions";
-import { PAGES } from "../utils/constants.jsx";
+import { PAGES } from "../utils/constants.ts";
 
 type ErrorMap = Record<string, string>;
 

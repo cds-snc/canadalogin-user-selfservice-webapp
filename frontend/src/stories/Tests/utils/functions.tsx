@@ -1,13 +1,9 @@
 import { expect, userEvent, within } from "@storybook/test";
 import { reactRouterParameters } from "storybook-addon-remix-react-router";
 import { http, HttpResponse } from "msw";
-import config from "../../../config.jsx";
-import {
-  ACTION_TYPES,
-  TEST_TYPES,
-  TestDataUserProvider,
-} from "./constants.jsx";
-import PageRenderer from "./PageRenderer.jsx";
+import config from "../../../config.ts";
+import { ACTION_TYPES, TEST_TYPES, TestDataUserProvider } from "./constants.ts";
+import PageRenderer from "./PageRenderer.tsx";
 import { UserProvider } from "../../../components/Providers/UserProvider";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider";
 import React from "react";

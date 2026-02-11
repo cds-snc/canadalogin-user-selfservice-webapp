@@ -62,7 +62,11 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
       {children}
     </button>
   ),
-  GcdsText: ({ children, size, className }: {
+  GcdsText: ({
+    children,
+    size,
+    className,
+  }: {
     children?: React.ReactNode;
     size?: string;
     className?: string;
@@ -71,7 +75,11 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
       {children}
     </div>
   ),
-  GcdsIcon: ({ name, size, className }: {
+  GcdsIcon: ({
+    name,
+    size,
+    className,
+  }: {
     name?: string;
     size?: string;
     className?: string;
@@ -85,7 +93,7 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
   ),
 }));
 
-vi.mock("../../../utils/functions.jsx", () => ({
+vi.mock("../../../utils/functions.ts", () => ({
   getPageContent: vi.fn(() => ({
     1: "Your session is about to end due to inactivity",
     2: "If you do not continue your session you will be signed out automatically",

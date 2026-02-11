@@ -36,7 +36,7 @@ vi.mock("../../../../components/Providers/useUser.tsx", () => ({
 const mockTransientOtpSend = vi.fn();
 const mockTransientOtpVerify = vi.fn();
 
-vi.mock("../../../../services/authService.jsx", () => ({
+vi.mock("../../../../services/authService.tsx", () => ({
   authService: {
     transientOtpSend: (...args) => mockTransientOtpSend(...args),
     transientOtpVerify: (...args) => mockTransientOtpVerify(...args),
@@ -44,7 +44,7 @@ vi.mock("../../../../services/authService.jsx", () => ({
 }));
 
 // Mock utilities
-vi.mock("../../../../utils/functions.jsx", () => ({
+vi.mock("../../../../utils/functions.ts", () => ({
   getPageContent: vi.fn((language, page) => {
     if (page === PAGES.verification) {
       return {

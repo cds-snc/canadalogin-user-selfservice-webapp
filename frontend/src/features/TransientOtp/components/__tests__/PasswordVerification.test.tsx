@@ -16,7 +16,7 @@ vi.mock("react-router", async () => {
 });
 
 // Mock utilities
-vi.mock("../../../../utils/functions.jsx", () => ({
+vi.mock("../../../../utils/functions.ts", () => ({
   getPageContent: vi.fn((language, page) => {
     if (page === PAGES.passwordVerification) {
       return {

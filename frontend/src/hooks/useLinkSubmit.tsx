@@ -5,7 +5,7 @@ import {
   GA_LABELS,
   LINK_SUBMIT_TYPES,
   PAGES,
-} from "../utils/constants.jsx";
+} from "../utils/constants.ts";
 import { useUser } from "../components/Providers/useUser";
 import { useNavigate } from "react-router";
 import {

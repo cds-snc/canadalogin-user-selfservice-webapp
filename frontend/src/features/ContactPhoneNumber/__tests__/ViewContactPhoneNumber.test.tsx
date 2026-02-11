@@ -24,7 +24,7 @@ vi.mock("../../../hooks/useNavigate.tsx", () => ({
 }));
 
 // Mock the redirect function to prevent navigation errors
-vi.mock("../../../utils/redirect.jsx", () => ({
+vi.mock("../../../utils/redirect.tsx", () => ({
   redirectToLogin: vi.fn(),
 }));
 
@@ -40,7 +40,7 @@ vi.mock("../../../utils/apiErrorHandler.js", () => ({
 }));
 
 // Mock VerifiedBadge component
-vi.mock("../../../components/Badges/VerifiedBadge.jsx", () => ({
+vi.mock("../../../components/Badges/VerifiedBadge.tsx", () => ({
   default: ({ text }) => <div data-testid="verified-badge">{text}</div>,
 }));
 

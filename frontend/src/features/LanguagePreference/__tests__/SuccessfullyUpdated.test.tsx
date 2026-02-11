@@ -24,19 +24,19 @@ vi.mock("../../../components/Providers/useUser.tsx", () => ({
   useUser: vi.fn(),
 }));
 
-vi.mock("../../../utils/userProfileDispatch.jsx", () => ({
+vi.mock("../../../utils/userProfileDispatch.tsx", () => ({
   userProfileDispatch: vi.fn(() => ({
     setLoading: vi.fn(),
   })),
 }));
 
-vi.mock("../../../services/authService.jsx", () => ({
+vi.mock("../../../services/authService.tsx", () => ({
   authService: {
     logout: vi.fn(),
   },
 }));
 
-vi.mock("../../../utils/functions.jsx", () => ({
+vi.mock("../../../utils/functions.ts", () => ({
   getPageContent: vi.fn(() => ({
     1: "Your language preference has been successfully updated to",
     2: "What happens next?",
@@ -63,7 +63,7 @@ vi.mock("../../../utils/routeHelpers.js", () => ({
   }),
 }));
 
-vi.mock("../../../utils/constants.jsx", async (importOriginal) => {
+vi.mock("../../../utils/constants.ts", async (importOriginal) => {
   const actual = await importOriginal();
   return {
     ...actual,
