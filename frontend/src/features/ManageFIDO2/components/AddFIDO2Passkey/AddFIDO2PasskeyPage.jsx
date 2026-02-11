@@ -95,9 +95,29 @@ export default function AddFIDO2PasskeyPage({ step }) {
     }
   };
 
-  const validateOtpCode = async () => {
-    setWizardStep("addFIDO2Passkey");
-    setErrorCode("");
+  const validateOtpCode = async (userOtpValue) => {
+    const userData = {
+      otp: userOtpValue,
+      trxnId: otpSentResponse.trxnId,
+      otpType: serverMapping[userSelectedMfaFactor.type],
+    };
+    try {
+      const response = await authService.transientOtpVerify(userData);
+      if (response && response.success) {
+        // Navigate to confirmation URL while preserving state
+        setWizardStep("addFIDO2Passkey");
+        setErrorCode("");
+      }
+    } catch (err) {
+      if (
+        err &&
+        err.response &&
+        err.response.data &&
+        err.response.data.message
+      ) {
+        setErrorCode(err.response.data.message);
+      }
+    }
   };
 
   useEffect(() => {
@@ -182,11 +202,6 @@ export default function AddFIDO2PasskeyPage({ step }) {
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
         onCancel={async () => navigate(backToManage2FAVerificationsPage)}
-        otpData={{
-          otp: userOtpValue,
-          trxnId: otpSentResponse?.trxnId,
-          otpVerificationType: serverMapping[userSelectedMfaFactor?.type],
-        }}
       />
     ),
   };

@@ -16,7 +16,6 @@ from app.fido2.services.helper_utils import (
     get_user_profile_info,
 )
 from app.fido2.schemas import AttestationOptionsRequest
-from app.utils.helpers import verify_otp_before_operation
 
 logger = logging.getLogger(__name__)
 
@@ -53,20 +52,6 @@ async def get_attestation_options(
     }
 
     try:
-        # Step 1: Verify authentication - either OTP or reauthentication
-        if (
-            request_data.otp
-            and request_data.trxnId
-            and request_data.otpVerificationType
-        ):
-            # OTP verification provided
-            await verify_otp_before_operation(
-                global_http_client=http_client,
-                otp=request_data.otp,
-                trxn_id=request_data.trxnId,
-                otp_type=request_data.otpVerificationType,
-            )
-
         tenant_url = get_tenant_url()
         rp_id = get_rp_id()
 

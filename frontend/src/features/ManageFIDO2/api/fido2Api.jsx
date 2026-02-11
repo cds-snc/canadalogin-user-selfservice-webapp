@@ -72,16 +72,9 @@ export const fido2Api = {
   /**
    * Get attestation options for FIDO2 registration (start registration)
    */
-  getAttestationOptions: async (otpData = null) => {
+  getAttestationOptions: async () => {
     try {
       const requestData = {};
-
-      // Include OTP verification data if provided
-      if (otpData?.otp && otpData?.trxnId && otpData?.otpVerificationType) {
-        requestData.otp = otpData.otp;
-        requestData.trxnId = otpData.trxnId;
-        requestData.otpVerificationType = otpData.otpVerificationType;
-      }
 
       const response = await axios.post(
         `${config.apiUrl}/v1/fido2/attestation/options`,

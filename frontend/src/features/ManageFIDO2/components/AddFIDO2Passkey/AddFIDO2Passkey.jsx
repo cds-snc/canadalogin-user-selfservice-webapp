@@ -21,7 +21,6 @@ export default function AddFIDO2Passkey({
   setErrorCode,
   errorMessage,
   onCancel,
-  otpData = null,
 }) {
   const { language } = useParams();
   const pageContent = getPageContent(language, PAGES.addFIDO2Passkey);
@@ -55,7 +54,7 @@ export default function AddFIDO2Passkey({
 
     try {
       // Step 1: Get attestation options from server
-      const attestationResponse = await fido2Api.getAttestationOptions(otpData);
+      const attestationResponse = await fido2Api.getAttestationOptions();
 
       if (!attestationResponse?.success || !attestationResponse?.data) {
         setErrorCode(
