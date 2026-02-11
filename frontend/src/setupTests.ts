@@ -35,4 +35,4 @@ vi.mock("axios", () => {
 });
 
 // Mock Storybook actions addon so stories using `action()` don't fail in tests
-vi.mock("@storybook/addon-actions", () => ({ action: (name) => vi.fn() }));
+vi.mock("@storybook/addon-actions", () => ({ action: () => vi.fn() }));

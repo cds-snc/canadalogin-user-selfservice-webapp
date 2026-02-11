@@ -8,7 +8,8 @@ import { authService } from "../services/authService";
  * @returns {Object} - Object containing validatePassword function and loading state
  */
 export function usePasswordValidation(setErrorCode, onSuccess) {
-  const [validatePasswordLoading, setValidatePasswordLoading] = useState<boolean>(false);
+  const [validatePasswordLoading, setValidatePasswordLoading] =
+    useState<boolean>(false);
   const validatePassword = async (userPasswordValue) => {
     setValidatePasswordLoading(true);
     try {

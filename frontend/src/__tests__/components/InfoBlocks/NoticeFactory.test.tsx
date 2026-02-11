@@ -1,3 +1,4 @@
+import React from "react";
 import { render, screen } from "@testing-library/react";
 import { vi, describe, beforeEach, it, expect, afterEach } from "vitest";
 import "@testing-library/jest-dom/vitest";
@@ -11,7 +12,13 @@ vi.mock("react-router", () => ({
 
 // Mock GCDS components
 vi.mock("@cdssnc/gcds-components-react", () => ({
-  GcdsNotice: ({ children, type, noticeTitleTag, noticeTitle, ...props }: {
+  GcdsNotice: ({
+    children,
+    type,
+    noticeTitleTag,
+    noticeTitle,
+    ...props
+  }: {
     children?: React.ReactNode;
     type?: string;
     noticeTitleTag?: string;
@@ -28,7 +35,10 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
       {children}
     </div>
   ),
-  GcdsText: ({ children, ...props }: {
+  GcdsText: ({
+    children,
+    ...props
+  }: {
     children?: React.ReactNode;
     [key: string]: unknown;
   }) => (

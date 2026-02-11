@@ -1,8 +1,5 @@
 import AddMFAPhoneNumber from "../../../../features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPhoneNumber";
-import {
-  AVAILABLE_LANGUAGES,
-  FLOW_TYPES,
-} from "../../../../utils/constants";
+import { AVAILABLE_LANGUAGES, FLOW_TYPES } from "../../../../utils/constants";
 
 export default {
   title:

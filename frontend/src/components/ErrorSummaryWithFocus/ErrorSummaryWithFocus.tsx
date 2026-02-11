@@ -39,7 +39,9 @@ export default function ErrorSummaryWithFocus({
   const errorPageJson = getPageContent(language, PAGES.error) || {};
 
   const errorMessage = errorCode
-    ? (errorPageJson[errorCode] as string) || (errorPageJson["7"] as string) || ""
+    ? (errorPageJson[errorCode] as string) ||
+      (errorPageJson["7"] as string) ||
+      ""
     : "";
 
   // Effect to scroll to and focus error summary when error message changes

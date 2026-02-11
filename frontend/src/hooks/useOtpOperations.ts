@@ -32,7 +32,9 @@ export const useOtpOperations = (
   const [otpSentResponse, setOtpSentResponse] = useState(null);
   const [userOtpValue, setUserOtpValue] = useState<string>("");
   const [localLoading, setLocalLoading] = useState<boolean>(true);
-  const [phoneFactorsMap, setPhoneFactorsMap] = useState<Record<string, unknown>>({});
+  const [phoneFactorsMap, setPhoneFactorsMap] = useState<
+    Record<string, unknown>
+  >({});
 
   const navigate = useNavigate();
   const didFetch = useRef(false);

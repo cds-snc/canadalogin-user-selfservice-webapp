@@ -3,9 +3,9 @@ import { expect } from "vitest";
 import "@testing-library/jest-dom";
 import { AVAILABLE_LANGUAGES, FLOW_TYPES, SERVICES } from "../utils/constants";
 import { getFooter } from "../utils/functions";
-// @ts-ignore
+// @ts-expect-error - import JSON for tests
 import * as engJson from "../locales/en/en.json";
-// @ts-ignore
+// @ts-expect-error - import JSON for tests
 import * as frJson from "../locales/fr/fr.json";
 import { PAGES } from "../utils/constants";
 
@@ -118,7 +118,7 @@ const pageSetup = {
           : frJson["Button"];
     }
   },
-  stepper: (page: string, flow: string, type: string) => {
+  stepper: (page: string) => {
     switch (page) {
       case PAGES.verification:
         return null;
@@ -126,7 +126,7 @@ const pageSetup = {
         return null;
     }
   },
-  textKeysToNotSearch: (page: string, flow: string, type: string) => {
+  textKeysToNotSearch: (page: string) => {
     switch (page) {
       case PAGES.password:
         return [
@@ -179,7 +179,7 @@ const pageSetup = {
         return [];
     }
   },
-  serviceKey: (page: string, flow: string) => {
+  serviceKey: (page: string) => {
     switch (page) {
       case PAGES.password:
         return "16";
@@ -248,7 +248,7 @@ const pageSetup = {
     ]);
     return gcdsElementMap;
   },
-  securitySettingsGcdsMap: (_pageContentJson: JsonRecord) => {
+  securitySettingsGcdsMap: () => {
     const gcdsElementMap = new Map();
 
     return gcdsElementMap;
@@ -328,7 +328,9 @@ const testSuite = {
           (smsTextKeys.includes(key) && !isVoice) ||
           (voiceTextKeys.includes(key) && isVoice)
         ) {
-          expect(screen.queryByText(pageContentJson[key] as string)).toBeInTheDocument();
+          expect(
+            screen.queryByText(pageContentJson[key] as string),
+          ).toBeInTheDocument();
         }
     });
   },
@@ -385,7 +387,9 @@ function verifyCommonElements(
     verifyGcdsHtmlElement("gcds-stepper", createMap("gcds-stepper", stepper));
   if (buttonJson) {
     verifyGcdsHtmlElement("gcds-button", createMap("gcds-button", ["submit"]));
-    expect(screen.queryByText(buttonJson["submit"] as string)).toBeInTheDocument();
+    expect(
+      screen.queryByText(buttonJson["submit"] as string),
+    ).toBeInTheDocument();
   }
 
   verifyGcdsHtmlElement(

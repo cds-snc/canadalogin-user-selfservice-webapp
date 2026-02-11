@@ -13,7 +13,7 @@ const initialState = {
 
 interface Action {
   type: string;
-  payload: any;
+  payload: string | null;
 }
 
 interface LanguageProviderProps {
@@ -48,7 +48,7 @@ export const LanguageProvider = ({
 }: LanguageProviderProps) => {
   const [state, dispatch] = useReducer(languageReducer, initial);
 
-  const setAppLanguage = (selectedLanguage) => {
+  const setAppLanguage = (selectedLanguage: string) => {
     dispatch({ type: CONTEXT_ACTIONS.set_language, payload: selectedLanguage });
   };
 

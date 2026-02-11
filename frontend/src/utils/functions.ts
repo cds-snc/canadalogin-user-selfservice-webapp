@@ -96,13 +96,18 @@ export function isNameValid(
 ): RegExpMatchArray | null | true {
   if (minLength === 0)
     if (name !== null && name.length > 0) {
-      const isValidName = /^[a-zA-Z\-_ '']()ÀàÂâÆæÇçÉéÈèÊêËëÎîÏïÔôŒœÙùÛûÜüŸÿ]+$/;
-      return isValidName.test(name) ? (name.match(isValidName) as RegExpMatchArray) : null;
+      const isValidName =
+        /^[a-zA-Z\-_ '']()ÀàÂâÆæÇçÉéÈèÊêËëÎîÏïÔôŒœÙùÛûÜüŸÿ]+$/;
+      return isValidName.test(name)
+        ? (name.match(isValidName) as RegExpMatchArray)
+        : null;
     } else return true;
 
   const isValidName = /^[a-zA-Z\-_ '']()ÀàÂâÆæÇçÉéÈèÊêËëÎîÏïÔôŒœÙùÛûÜüŸÿ]{2,}$/;
 
-  return name !== null && isValidName.test(name) ? (name.match(isValidName) as RegExpMatchArray) : null;
+  return name !== null && isValidName.test(name)
+    ? (name.match(isValidName) as RegExpMatchArray)
+    : null;
 }
 
 export function capitalizeFirstLetter(str: string | null | undefined): string {
@@ -130,9 +135,7 @@ export function formatTime(
   });
 }
 
-export function convertLanguageToLanguageCode(
-  updatedLanguage: string,
-): string {
+export function convertLanguageToLanguageCode(updatedLanguage: string): string {
   const languageKeys = Object.keys(PROFILE_LANGUAGES);
 
   return (

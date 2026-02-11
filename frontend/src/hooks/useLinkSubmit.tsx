@@ -7,6 +7,7 @@ import {
   PAGES,
 } from "../utils/constants.ts";
 import { useUser } from "../components/Providers/useUser";
+import type { UserData } from "../components/Providers/UserProvider";
 import { useNavigate } from "react-router";
 import {
   callAnalytics,
@@ -17,7 +18,7 @@ import {
 import { path } from "../utils/routeHelpers.js";
 
 export function useLinkSubmit(submitDataOptions: SubmitDataOptions) {
-  const { state, dispatch } = useUser();
+  const { state } = useUser();
   const navigate = useNavigate();
   const [isPending, startTransition] = useTransition();
   const [codeRequested, setCodeRequested] = useState(false);
@@ -42,7 +43,7 @@ export function useLinkSubmit(submitDataOptions: SubmitDataOptions) {
           state.userData,
         );
         console.log("success....", response);
-        const userData = setUserData(
+        setUserData(
           linkFlowType + submitDataOptions.type,
           state.userData,
           response,
@@ -114,8 +115,8 @@ function setTag(
 }
 function setUserData(
   type: string,
-  userData: any,
-  response: any,
+  userData: UserData,
+  response: { [key: string]: unknown } | null,
   submitData: SubmitData,
 ) {
   switch (type) {
@@ -132,7 +133,7 @@ function setUserData(
 
 function setSubmitData(
   submitDataOptions: SubmitDataOptions,
-  userData: any,
+  userData: UserData,
   changeType: boolean,
 ) {
   return {

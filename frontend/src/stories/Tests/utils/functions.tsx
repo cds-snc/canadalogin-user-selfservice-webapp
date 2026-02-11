@@ -17,8 +17,8 @@ const stepSuccessMessage = "Verify success message is on Page.";
 const stepNavigateMessage = "Verify page was navigated properly.";
 
 interface TestCase {
-  canvasElement: any;
-  step: any;
+  canvasElement: HTMLElement;
+  step: Step;
   stepMessage: string;
   message: string;
   linkText: string;
@@ -35,6 +35,8 @@ interface Input {
   stepMessage: string;
   value: string;
 }
+
+type Step = (name: string, fn: () => Promise<void> | void) => Promise<void>;
 
 interface PathParams {
   language: string;
@@ -131,12 +133,16 @@ export async function testCase({
 }
 
 const testItem = {
-  canvas: async (canvasElement: any, timeToWait: number) => {
+  canvas: async (canvasElement: HTMLElement, timeToWait: number) => {
     const canvas = within(canvasElement);
     await new Promise((r) => setTimeout(r, timeToWait));
     return canvas;
   },
-  typeInInput: async (canvas: any, step: any, input: Input) => {
+  typeInInput: async (
+    canvas: ReturnType<typeof within>,
+    step: Step,
+    input: Input,
+  ) => {
     await step(input.stepMessage, async () => {
       const placeholder = canvas.queryByRole("textbox");
       await userEvent.type(placeholder, input.value);
@@ -144,15 +150,15 @@ const testItem = {
     });
     await new Promise((r) => setTimeout(r, 1000));
   },
-  clickButton: async (canvas: any, step: any) => {
+  clickButton: async (canvas: ReturnType<typeof within>, step: Step) => {
     await step("Click button", async () => {
       await userEvent.click(canvas.queryByRole("button", { name: /test/i }));
     });
     await new Promise((r) => setTimeout(r, 1000));
   },
   queryPageText: async (
-    canvas: any,
-    step: any,
+    canvas: ReturnType<typeof within>,
+    step: Step,
     message: string,
     text: string,
   ) => {
@@ -161,8 +167,8 @@ const testItem = {
     });
   },
   clickLink: async (
-    canvas: any,
-    step: any,
+    canvas: ReturnType<typeof within>,
+    step: Step,
     stepMessage: string,
     linkText: string,
   ) => {
@@ -174,8 +180,8 @@ const testItem = {
     await new Promise((r) => setTimeout(r, 1000));
   },
   checkErrorMsg: async (
-    canvas: any,
-    step: any,
+    canvas: ReturnType<typeof within>,
+    step: Step,
     stepMessage: string,
     link: string,
     message: string,
@@ -191,8 +197,8 @@ const testItem = {
     });
   },
   checkAttribute: async (
-    canvas: any,
-    step: any,
+    canvas: ReturnType<typeof within>,
+    step: Step,
     stepMessage: string,
     message: string,
     attribute: string,
@@ -245,7 +251,7 @@ function buildRoutingParams(
 }
 
 function buildMswMapping(mswArray: Array<MSW>) {
-  let handlers: any[] = [];
+  let handlers: unknown[] = [];
 
   // Add default handlers for EventSource endpoints that are always needed
   handlers.push(
@@ -329,7 +335,7 @@ function buildMswMapping(mswArray: Array<MSW>) {
   };
 }
 
-export const Template = (args: any) => {
+export const Template = (args: Record<string, unknown>) => {
   const testData = {
     ...TestDataUserProvider,
     loadingText: null,
@@ -345,7 +351,7 @@ export const Template = (args: any) => {
   );
 };
 
-export const TestTemplate = (args: any) => {
+export const TestTemplate = (args: Record<string, unknown>) => {
   const testData = {
     ...TestDataUserProvider,
     loadingText: null,

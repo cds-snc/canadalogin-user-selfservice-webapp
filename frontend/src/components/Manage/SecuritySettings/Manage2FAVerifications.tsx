@@ -6,10 +6,7 @@ import {
 } from "@cdssnc/gcds-components-react";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router";
-import {
-  MAP_TYPES,
-  useOtpOperations,
-} from "../../../hooks/useOtpOperations";
+import { MAP_TYPES, useOtpOperations } from "../../../hooks/useOtpOperations";
 import { PAGES, VITE_ENVIRONMENTS } from "../../../utils/constants";
 import { getPageContent } from "../../../utils/functions";
 import { path } from "../../../utils/routeHelpers";

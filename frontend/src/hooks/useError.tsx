@@ -19,8 +19,8 @@ export function useError(language: string) {
     setErrors({});
   };
 
-  const getError = (index: string): { heading: any; errorMsg: string } => {
-    return { heading: errorPageJson[1], errorMsg: errors[index] };
+  const getError = (index: string): { heading: string; errorMsg: string } => {
+    return { heading: String(errorPageJson[1]), errorMsg: errors[index] };
   };
 
   const hasErrors = (): boolean => {

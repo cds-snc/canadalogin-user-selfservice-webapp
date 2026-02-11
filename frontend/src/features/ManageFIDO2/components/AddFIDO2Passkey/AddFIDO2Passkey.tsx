@@ -26,7 +26,8 @@ export default function AddFIDO2Passkey({
   const pageContent = getPageContent(language, PAGES.addFIDO2Passkey);
   const errorPageContent = getPageContent(language, PAGES.error);
   const [newDeviceName, setNewDeviceName] = useState<string>("");
-  const [registrationLoading, setRegistrationLoading] = useState<boolean>(false);
+  const [registrationLoading, setRegistrationLoading] =
+    useState<boolean>(false);
   const navigate = useNavigate();
   const backToManage2FAVerificationsPage = path(PAGES.manage2FAVerifications, {
     language: language,

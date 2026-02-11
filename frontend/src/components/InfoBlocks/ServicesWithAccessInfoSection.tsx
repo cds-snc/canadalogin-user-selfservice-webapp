@@ -1,8 +1,5 @@
 import { GcdsDetails, GcdsText, GcdsLink } from "@cdssnc/gcds-components-react";
-import {
-  getContentWithVariables,
-  getPageContent,
-} from "../../utils/functions";
+import { getContentWithVariables, getPageContent } from "../../utils/functions";
 import {
   EXTERNAL_NAVIGATION_LINKS,
   PAGES,

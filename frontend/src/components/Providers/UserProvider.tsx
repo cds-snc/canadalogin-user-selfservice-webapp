@@ -17,9 +17,9 @@ import Loader from "../Layout/Loading.tsx";
 import SessionTimeoutModal from "../Layout/SessionTimeoutModal.tsx";
 import { getPageContent } from "../../utils/functions.ts";
 
-interface Action {
+export interface Action {
   type: string;
-  payload: any;
+  payload: unknown;
 }
 
 export interface UserProfile {
@@ -58,11 +58,28 @@ export interface RelyingPartyInfo {
 
 export interface UserState {
   userProfile: UserProfile | null;
-  userData: any;
+  userData: UserData;
   isLoading: boolean;
   loadingText: string | null;
   relyingPartyInfo: RelyingPartyInfo | null;
   authenticatedPages: string[];
+}
+
+export interface UserData {
+  service: string;
+  language: string;
+  email: string | null;
+  emailLanguage?: string | null;
+  emailValidated?: boolean;
+  trxnId?: string | null;
+  passwordSubmitted?: boolean;
+  phone?: string | null;
+  stepVerificationSent?: boolean;
+  stepVerified?: boolean;
+  viewPrivacy?: boolean;
+  id?: string | null;
+  otpType?: string | null;
+  passwordValidated?: boolean;
 }
 
 export interface SessionTimeoutState {
@@ -223,7 +240,7 @@ export function UserProvider({
     ? `${config.apiUrl}${SUBMIT_END_POINTS.sessionStatus}`
     : ""; // Empty string prevents connection
 
-  const [eventSource, eventSourceStatus] = useEventSource(
+  const [eventSource] = useEventSource(
     sseUrl, // Connects after user authentication
     true,
   );

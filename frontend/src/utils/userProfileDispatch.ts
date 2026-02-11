@@ -1,3 +1,4 @@
+import React from "react";
 import { CONTEXT_ACTIONS } from "./constants";
 import { Action } from "../types";
 

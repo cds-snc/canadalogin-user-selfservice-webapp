@@ -1316,7 +1316,7 @@ export const ResendOtpCode = (() => {
                 if (visible) {
                   resendLink = visible.closest("gcds-link");
                 }
-              } catch (e) {
+              } catch {
                 // ignore and let waitFor retry
               }
             }

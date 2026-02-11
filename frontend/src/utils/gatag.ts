@@ -11,6 +11,10 @@ interface TrackEventParams {
   label: string;
 }
 
-export function trackEvent({ category, action, label }: TrackEventParams): void {
+export function trackEvent({
+  category,
+  action,
+  label,
+}: TrackEventParams): void {
   ReactGA.event({ category: category, action: action, label: label });
 }

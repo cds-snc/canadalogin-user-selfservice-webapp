@@ -100,7 +100,7 @@ export const EditContactPhoneNumber = (() => {
               // Fallback to input/gcds-input selectors if needed
               try {
                 await expect(canvas.getByText(/phone/i)).toBeInTheDocument();
-              } catch (e) {
+              } catch {
                 // ignore and try element selectors
               }
 

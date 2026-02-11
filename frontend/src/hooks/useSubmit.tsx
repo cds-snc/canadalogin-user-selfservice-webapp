@@ -7,6 +7,7 @@ import {
   SUBMIT_END_POINTS,
 } from "../utils/constants.ts";
 import { useUser } from "../components/Providers/useUser";
+import type { UserData } from "../components/Providers/UserProvider";
 import { authService } from "../services/authService.tsx";
 import { useNavigate } from "react-router";
 import { trackEvent } from "../utils/gatag.ts";
@@ -34,9 +35,9 @@ export interface SubmitData {
 
 export function useSubmit(
   submitDataOptions: SubmitDataOptions,
-  validateFunction: any,
+  validateFunction: (...args: unknown[]) => boolean,
 ) {
-  const { state, dispatch } = useUser();
+  const { state } = useUser();
   const navigate = useNavigate();
   const [isPending, startTransition] = useTransition();
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -60,11 +61,7 @@ export function useSubmit(
           submitDataOptions.type + "_submit_success",
           GA_LABELS.button,
         );
-        const navigateTo = setNavigateTo(
-          submitDataOptions,
-          response,
-          submitData,
-        );
+        const navigateTo = setNavigateTo(submitDataOptions);
         navigate(navigateTo);
         return;
       } catch (error) {
@@ -108,11 +105,7 @@ function setSubmitData(formData: FormData) {
   return submitData;
 }
 
-function setNavigateTo(
-  submitDataOptions: SubmitDataOptions,
-  response: any,
-  submitData: SubmitData,
-) {
+function setNavigateTo(submitDataOptions: SubmitDataOptions) {
   switch (submitDataOptions.flow + submitDataOptions.page) {
     default:
       return submitDataOptions.navigateTo;
@@ -135,7 +128,7 @@ export async function callAnalytics(
 export async function callAuthService(
   submitDataOptions: SubmitDataOptions,
   submitData: SubmitData,
-  userData: any,
+  userData: UserData,
 ) {
   let payload = {};
   switch (submitDataOptions.endpoint) {
@@ -181,41 +174,12 @@ export async function callAuthService(
   }
 }
 
-function setUserData(
-  submitDataOptions: SubmitDataOptions,
-  submitData: SubmitData,
-  userData: any,
-  response: any,
-) {
-  switch (submitDataOptions.page) {
-    case PAGES.password:
-      return {
-        ...userData,
-        otpType: response.data.otpType,
-        id: response.data.id,
-        phone: response.data.phone,
-        passwordValidated: true,
-      };
-    case PAGES.verificationSetUp:
-      return {
-        ...userData,
-        phone: submitData.phone,
-        stepVerificationSent: true,
-        trxnId: response.data.trxnId,
-      };
-    case PAGES.verification:
-      return { ...userData, stepVerified: true };
-    case PAGES.privacy:
-      return { ...userData, viewPrivacy: true };
-    default:
-      return { ...userData };
-  }
-}
+// setUserData is not used in this module; user state updates are handled elsewhere
 
 function validateObject(
   page: string,
   submitData: SubmitData,
-  validateFunction: any,
+  validateFunction: (...args: unknown[]) => boolean,
 ) {
   switch (page) {
     case PAGES.signup:
