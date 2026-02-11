@@ -91,9 +91,7 @@ export default function AddFIDO2Passkey({
       if (err instanceof DOMException && err.name === "InvalidStateError") {
         setErrorCode("error_duplicate_passkey");
       } else {
-        setErrorCode(
-          err?.data?.message || "error_failed_to_register_credential",
-        );
+        setErrorCode(err?.data?.message);
       }
     } finally {
       setRegistrationLoading(false);

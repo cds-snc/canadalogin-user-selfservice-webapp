@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router";
 import Loader from "../../../../components/Layout/Loading";
 import { useUser } from "../../../../components/Providers/useUser";
-import { PAGES, serverMapping } from "../../../../utils/constants";
+import {
+  INVALID_OTP_ERROR_CODES,
+  PAGES,
+  serverMapping,
+} from "../../../../utils/constants";
 import { getPageContent } from "../../../../utils/functions";
 import { getErrorMessage } from "../../../../utils/errorUtils";
 import { path } from "../../../../utils/routeHelpers";
@@ -56,11 +60,11 @@ export default function DeleteMFAPage() {
     userPhoneFactors,
     userSelectedMfaFactor,
     userOtpValue,
+    otpSentResponse,
     localLoading,
     handleChangeUserMfaSelection,
     handleSetUserOtpValue,
     requestOtpCode,
-    validateOtpCode: baseValidateOtpCode,
   } = useOtpOperations(id, userName, setErrorCode, backToSecuritySettingsPage);
 
   const [phoneFormData, setPhoneFormData] = useState({
@@ -79,27 +83,43 @@ export default function DeleteMFAPage() {
 
   const deleteMFA = async () => {
     try {
+      // Use the OTP value and trxnId from the verification step
+      // Note: otpType is the type of factor being deleted
+      // otpVerificationType is the type of OTP used for verification (may differ)
+      const verificationOtpType = userSelectedMfaFactor
+        ? serverMapping[userSelectedMfaFactor.type]
+        : serverMapping[phoneFormData.mfaFactorsToDelete[0]?.type];
+
       await Promise.all(
         phoneFormData.mfaFactorsToDelete.map((mfaFactor) =>
           deleteMFAPhoneNumberApi.deleteMFA({
             id: mfaFactor.id,
-            otpType: serverMapping[mfaFactor.type],
+            otpType: serverMapping[mfaFactor.type], // Type of factor being deleted
+            otp: userOtpValue,
+            trxnId: otpSentResponse.trxnId,
+            otpVerificationType: verificationOtpType, // Type of OTP used for verification
           }),
         ),
       );
       setErrorCode("");
+      navigate(backToManage2FAVerificationsPage, {
+        state: {
+          noticeType: "mfaDeleted",
+          phoneNumber: phoneFormData.formattedPhoneNumber,
+        },
+      });
     } catch (error) {
-      if (error && error.data && error.data.message) {
-        setErrorCode(error.data.message);
+      setErrorCode(error?.data?.message);
+      if (INVALID_OTP_ERROR_CODES.includes(error?.data?.message)) {
+        // If OTP is invalid, go back to OTP validation step
+        setWizardStep("otpValidation");
       }
     }
   };
 
   // Custom validateOtpCode that handles delete MFA flow
-  const validateOtpCode = async (userOtpValue) => {
-    await baseValidateOtpCode(userOtpValue, () => {
-      setWizardStep("deleteMFAPhoneNumberConfirm");
-    });
+  const validateOtpCode = async () => {
+    setWizardStep("deleteMFAPhoneNumberConfirm");
   };
 
   useEffect(() => {
@@ -194,14 +214,12 @@ export default function DeleteMFAPage() {
         onNext={async () => {
           try {
             await deleteMFA();
-            navigate(backToManage2FAVerificationsPage, {
-              state: {
-                noticeType: "mfaDeleted",
-                phoneNumber: phoneFormData.formattedPhoneNumber,
-              },
-            });
           } catch (error) {
-            setErrorCode(error?.message || "Unexpected API request error");
+            setErrorCode(error?.data?.message);
+            if (INVALID_OTP_ERROR_CODES.includes(error?.data?.message)) {
+              // If OTP is invalid, go back to OTP validation step
+              setWizardStep("otpValidation");
+            }
           }
         }}
         onCancel={async () => navigate(backToManage2FAVerificationsPage)}

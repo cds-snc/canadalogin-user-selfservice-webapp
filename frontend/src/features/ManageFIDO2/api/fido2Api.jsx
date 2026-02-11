@@ -32,14 +32,17 @@ export const fido2Api = {
   },
 
   /**
-   * Delete a FIDO2 registration
+   * Delete a FIDO2 registration with FIDO2 verification
    */
-  deleteRegistration: async (registrationId) => {
+  deleteRegistration: async (registrationId, assertionResult) => {
     try {
       const response = await axios.delete(
         `${config.apiUrl}/v1/fido2/registration`,
         {
-          data: { id: registrationId },
+          data: {
+            id: registrationId,
+            assertionResult: assertionResult,
+          },
         },
       );
       return response.data;
@@ -71,9 +74,11 @@ export const fido2Api = {
    */
   getAttestationOptions: async () => {
     try {
+      const requestData = {};
+
       const response = await axios.post(
         `${config.apiUrl}/v1/fido2/attestation/options`,
-        {}, // Empty body - all defaults set on server
+        requestData,
       );
       return response.data;
     } catch (error) {
@@ -103,9 +108,7 @@ export const fido2Api = {
     try {
       const response = await axios.post(
         `${config.apiUrl}/v1/fido2/assertion/options`,
-        {
-          userVerification: "preferred",
-        },
+        {}, // Empty body - userId is retrieved from session on backend
       );
       return response.data;
     } catch (error) {
@@ -116,12 +119,10 @@ export const fido2Api = {
   /**
    * Submit assertion result (complete authentication)
    */
-  submitAssertionResult: async (assertionResult) => {
+  submitAssertionResult: async (assertionResult, returnJwt = false) => {
     try {
-      const response = await axios.post(
-        `${config.apiUrl}/v1/fido2/assertion/result`,
-        assertionResult,
-      );
+      const url = `${config.apiUrl}/v1/fido2/assertion/result${returnJwt ? "?return_jwt=true" : ""}`;
+      const response = await axios.post(url, assertionResult);
       return response.data;
     } catch (error) {
       handleApiError(error);

@@ -3,7 +3,7 @@ FIDO2 API router endpoints
 """
 
 import logging
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from httpx import AsyncClient
 from app.fido2.schemas import (
     FIDO2UserResponse,
@@ -12,6 +12,9 @@ from app.fido2.schemas import (
     DeleteRegistrationRequest,
     UpdateRegistrationRequest,
     FIDO2AttestationResultRequest,
+    AttestationOptionsRequest,
+    AssertionOptionsRequest,
+    FIDO2AssertionResultRequest,
 )
 from app.utils.schemas import ResponseModel
 from app.auth.services.auth_user_session import (
@@ -33,6 +36,10 @@ from app.fido2.services.update_fido2_registration import (
 from app.fido2.services.add_fido2_registration import (
     get_attestation_options as get_attestation_options_service,
     submit_attestation_result as submit_attestation_result_service,
+)
+from app.fido2.services.authenticate_fido2_registration import (
+    get_assertion_options as get_assertion_options_service,
+    submit_assertion_result as submit_assertion_result_service,
 )
 
 logger = logging.getLogger(__name__)
@@ -88,20 +95,22 @@ async def get_registration_details(
     "/registration",
     response_model=FIDO2UserResponseModel,
     summary="Delete FIDO2 registration",
-    description="Delete a FIDO2 registration and return updated user credentials",
+    description="Delete a FIDO2 registration with FIDO2 verification and return updated user credentials",
 )
 async def delete_fido2_registration(
+    request: Request,
     request_data: DeleteRegistrationRequest,
     user_access_token: str = Depends(get_users_current_session),
     http_client: AsyncClient = Depends(get_http_client),
 ):
     """
-    Delete a FIDO2 registration - equivalent to deleteRegistration in JS.
+    Delete a FIDO2 registration with FIDO2 authentication verification.
+    Requires FIDO2 assertion proof before deletion.
     Only allows deletion of registrations owned by the current user.
     Returns updated user credentials after deletion.
     """
     return await delete_registration_service(
-        http_client, user_access_token, request_data
+        request, http_client, user_access_token, request_data
     )
 
 
@@ -133,6 +142,7 @@ async def update_fido2_registration(
     description="Get attestation options for FIDO2 registration",
 )
 async def get_attestation_options(
+    request_data: AttestationOptionsRequest,
     user_access_token: str = Depends(get_users_current_session),
     http_client: AsyncClient = Depends(get_http_client),
 ):
@@ -140,19 +150,11 @@ async def get_attestation_options(
     Get FIDO2 attestation options with server-side defaults.
     Used to start the FIDO2 registration process.
     """
-    # Set proper defaults for FIDO2 attestation
-    request_body = {
-        "attestation": "direct",
-        "authenticatorSelection": {
-            "requireResidentKey": False,
-            "userVerification": "preferred",
-        },
-    }
 
     return await get_attestation_options_service(
         http_client=http_client,
         user_access_token=user_access_token,
-        request_body=request_body,
+        request_data=request_data,
     )
 
 
@@ -175,4 +177,60 @@ async def submit_attestation_result(
         http_client=http_client,
         user_access_token=user_access_token,
         request_body=request_data.model_dump(),
+    )
+
+
+@router.post(
+    "/assertion/options",
+    response_model=ResponseModel,
+    summary="Get FIDO2 assertion options",
+    description="Get assertion options for FIDO2 authentication",
+)
+async def get_assertion_options(
+    request_data: AssertionOptionsRequest,
+    user_access_token: str = Depends(get_users_current_session),
+    http_client: AsyncClient = Depends(get_http_client),
+):
+    """
+    Get FIDO2 assertion options with server-side defaults.
+    Used to start the FIDO2 authentication process.
+    """
+    return await get_assertion_options_service(
+        http_client=http_client,
+        user_access_token=user_access_token,
+        request_data=request_data,
+    )
+
+
+@router.post(
+    "/assertion/result",
+    response_model=ResponseModel,
+    summary="Submit FIDO2 assertion result",
+    description="Submit assertion result to complete FIDO2 authentication",
+)
+async def submit_assertion_result(
+    request: Request,
+    request_data: FIDO2AssertionResultRequest,
+    return_jwt: bool = False,
+    user_access_token: str = Depends(get_users_current_session),
+    http_client: AsyncClient = Depends(get_http_client),
+):
+    """
+    Submit FIDO2 assertion result to IBM Verify.
+    Used to complete the FIDO2 authentication process.
+
+    Args:
+        request: FastAPI Request for session storage
+        request_data: Assertion result from the client
+        return_jwt: If True, returns a JWT token that can be used for
+                   session establishment or step-up authentication.
+                   The JWT will be automatically stored in the session
+                   and can be checked for step-up auth verification.
+    """
+    return await submit_assertion_result_service(
+        request=request,
+        http_client=http_client,
+        user_access_token=user_access_token,
+        request_body=request_data,
+        return_jwt=return_jwt,
     )

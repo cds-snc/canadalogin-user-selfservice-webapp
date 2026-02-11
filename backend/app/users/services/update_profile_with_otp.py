@@ -2,8 +2,6 @@ import logging
 
 from fastapi import HTTPException, status, Request
 
-from app.otp.schemas import UserOtpVerificationInfo, OtpType
-from app.otp.services.verify_transient_otp import handle_otp_verification
 from app.users.schemas import (
     ProfileUpdateWithOtpRequest,
     ProfileResponse,
@@ -16,6 +14,7 @@ from app.users.services.update_my_profile import (
     sanitize_user_profile_data,
 )
 from app.auth.services.auth_user_session import update_session_user_info
+from app.utils.helpers import verify_otp_before_operation
 
 logger = logging.getLogger(__name__)
 
@@ -45,27 +44,13 @@ async def update_profile_with_otp_verification(
     try:
         logger.info("Starting atomic profile update with OTP verification")
 
-        # Step 1: Validate the OTP first
-        otp_type = _get_otp_type_enum(profile_update_data.otpType)
-        otp_verification_data = UserOtpVerificationInfo(
+        # Step 1: Validate the OTP first using the helper function
+        await verify_otp_before_operation(
+            global_http_client=request.app.state.request_client,
             otp=profile_update_data.otp,
-            trxnId=profile_update_data.trxnId,
-            otpType=otp_type,
+            trxn_id=profile_update_data.trxnId,
+            otp_type=profile_update_data.otpType,
         )
-
-        logger.info(
-            f"Attempting OTP verification for profile update (type: {profile_update_data.otpType})"
-        )
-        otp_verification_response = await handle_otp_verification(
-            request.app.state.request_client, otp_verification_data
-        )
-
-        if not otp_verification_response.success:
-            logger.error("OTP verification failed for profile update")
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="OTP verification failed. Unable to update profile.",
-            )
 
         logger.info("OTP verification successful, proceeding with profile update")
 
@@ -138,18 +123,6 @@ async def update_profile_with_otp_verification(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An unexpected error occurred during profile update",
-        )
-
-
-def _get_otp_type_enum(otp_type_string: str) -> OtpType:
-    """Convert string OTP type to enum"""
-    try:
-        return OtpType(otp_type_string)
-    except ValueError:
-        logger.error(f"Invalid OTP type: {otp_type_string}")
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid OTP type: {otp_type_string}",
         )
 
 

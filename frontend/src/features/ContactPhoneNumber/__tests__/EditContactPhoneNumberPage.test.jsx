@@ -226,7 +226,7 @@ describe("EditContactPhoneNumberPage Component", () => {
     expect(phoneInput).toHaveValue("+15551234567");
   });
 
-  it("navigates to OTP verification after successful OTP send", async () => {
+  it("shows OTP verification after successful OTP send", async () => {
     mockAuthService.transientOtpSend.mockResolvedValue({
       data: { trxnId: "test-trxn-id" },
     });
@@ -254,10 +254,7 @@ describe("EditContactPhoneNumberPage Component", () => {
     });
 
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith(
-        "/en/profile/update-contact-phone/verify-otp",
-        { replace: true },
-      );
+      expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
     });
   });
 
@@ -285,18 +282,22 @@ describe("EditContactPhoneNumberPage Component", () => {
     });
   });
 
-  it("navigates to confirm step after successful OTP verification", async () => {
-    // Start with OTP verification step
-    mockParams = {
-      language: "en",
-      step: "verify-otp",
-    };
+  it("shows confirm step after OTP verification", async () => {
+    mockAuthService.transientOtpSend.mockResolvedValue({
+      data: { trxnId: "test-trxn-id" },
+    });
 
     render(
       <TestWrapper>
         <EditContactPhoneNumberPage />
       </TestWrapper>,
     );
+
+    // Enter phone number and send OTP
+    const phoneInput = screen.getByTestId("phone-input");
+    fireEvent.change(phoneInput, { target: { value: "+15551234567" } });
+    const nextBtn = screen.getByTestId("next-btn");
+    fireEvent.click(nextBtn);
 
     await waitFor(() => {
       expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
@@ -306,25 +307,19 @@ describe("EditContactPhoneNumberPage Component", () => {
     const otpInput = screen.getByTestId("otp-input");
     fireEvent.change(otpInput, { target: { value: "123456" } });
 
-    // Click verify - in the refactored flow, this just moves to confirm step without API call
+    // Click verify - moves to confirm step without API call
     const verifyBtn = screen.getByTestId("verify-btn");
     fireEvent.click(verifyBtn);
 
-    // The verify step now just navigates to confirm-update without calling transientOtpVerify
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith(
-        "/en/profile/update-contact-phone/confirm-update",
-        { replace: true },
-      );
+      expect(screen.getByTestId("confirm-update")).toBeInTheDocument();
     });
   });
 
-  it("completes profile update and navigates to success", async () => {
-    // Start with confirm step
-    mockParams = {
-      language: "en",
-      step: "confirm-update",
-    };
+  it("completes profile update and shows success", async () => {
+    mockAuthService.transientOtpSend.mockResolvedValue({
+      data: { trxnId: "test-trxn-id" },
+    });
 
     mockAuthService.update_phone_with_otp.mockResolvedValue({
       success: true,
@@ -337,35 +332,44 @@ describe("EditContactPhoneNumberPage Component", () => {
       </TestWrapper>,
     );
 
+    // Step 1: Enter phone
+    const phoneInput = screen.getByTestId("phone-input");
+    fireEvent.change(phoneInput, { target: { value: "+15551234567" } });
+    fireEvent.click(screen.getByTestId("next-btn"));
+
+    // Step 2: Verify OTP
+    await waitFor(() => {
+      expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
+    });
+    const otpInput = screen.getByTestId("otp-input");
+    fireEvent.change(otpInput, { target: { value: "123456" } });
+    fireEvent.click(screen.getByTestId("verify-btn"));
+
+    // Step 3: Confirm update
     await waitFor(() => {
       expect(screen.getByTestId("confirm-update")).toBeInTheDocument();
     });
-
     const confirmBtn = screen.getByTestId("confirm-btn");
     fireEvent.click(confirmBtn);
 
     await waitFor(() => {
       expect(mockAuthService.update_phone_with_otp).toHaveBeenCalledWith(
-        "", // phoneNumber
-        "", // otp
-        "", // trxnId (initialized as empty string)
-        "sms", // otpType
+        "+15551234567",
+        "123456",
+        "test-trxn-id",
+        "sms",
       );
     });
 
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith(
-        "/en/profile/update-contact-phone/success",
-        { replace: true },
-      );
+      expect(screen.getByTestId("successfully-updated")).toBeInTheDocument();
     });
   });
 
   it("handles back navigation from OTP verification", async () => {
-    mockParams = {
-      language: "en",
-      step: "verify-otp",
-    };
+    mockAuthService.transientOtpSend.mockResolvedValue({
+      data: { trxnId: "test-trxn-id" },
+    });
 
     render(
       <TestWrapper>
@@ -373,12 +377,21 @@ describe("EditContactPhoneNumberPage Component", () => {
       </TestWrapper>,
     );
 
+    // Navigate to OTP step
+    const phoneInput = screen.getByTestId("phone-input");
+    fireEvent.change(phoneInput, { target: { value: "+15551234567" } });
+    fireEvent.click(screen.getByTestId("next-btn"));
+
     await waitFor(() => {
       expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
     });
 
     const backBtn = screen.getByTestId("back-btn");
     fireEvent.click(backBtn);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("enter-phone-number")).toBeInTheDocument();
+    });
 
     expect(mockNavigate).toHaveBeenCalledWith(
       "/en/profile/update-contact-phone",
@@ -400,13 +413,8 @@ describe("EditContactPhoneNumberPage Component", () => {
   });
 
   it("handles resend OTP functionality", async () => {
-    mockParams = {
-      language: "en",
-      step: "verify-otp",
-    };
-
     mockAuthService.transientOtpSend.mockResolvedValue({
-      data: { trxnId: "new-trxn-id" },
+      data: { trxnId: "test-trxn-id" },
     });
 
     render(
@@ -415,16 +423,25 @@ describe("EditContactPhoneNumberPage Component", () => {
       </TestWrapper>,
     );
 
+    // Navigate to OTP step
+    const phoneInput = screen.getByTestId("phone-input");
+    fireEvent.change(phoneInput, { target: { value: "+15551234567" } });
+    fireEvent.click(screen.getByTestId("next-btn"));
+
     await waitFor(() => {
       expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
     });
 
+    // Clear previous calls
+    mockAuthService.transientOtpSend.mockClear();
+
+    // Resend OTP
     const resendBtn = screen.getByTestId("resend-btn");
     fireEvent.click(resendBtn);
 
     await waitFor(() => {
       expect(mockAuthService.transientOtpSend).toHaveBeenCalledWith({
-        phoneNumber: "",
+        phoneNumber: "+15551234567",
         user_id: "test-user-123",
         otpType: "sms",
       });
@@ -450,56 +467,5 @@ describe("EditContactPhoneNumberPage Component", () => {
 
     expect(screen.getByTestId("loader")).toBeInTheDocument();
     expect(screen.getByText("Loading...")).toBeInTheDocument();
-  });
-
-  it("initializes with state from location", () => {
-    const testPhoneData = {
-      phoneNumber: "+15551234567",
-      otp: "123456",
-      otpType: "voice",
-    };
-
-    mockLocation.state = {
-      phoneFormData: testPhoneData,
-      step: "verifyOtp",
-    };
-
-    mockParams = {
-      language: "en",
-      step: "verify-otp",
-    };
-
-    render(
-      <TestWrapper>
-        <EditContactPhoneNumberPage />
-      </TestWrapper>,
-    );
-
-    expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
-  });
-
-  it("maps URL steps to wizard steps correctly", () => {
-    const testCases = [
-      { urlStep: undefined, expectedComponent: "enter-phone-number" },
-      { urlStep: "verify-otp", expectedComponent: "otp-verification" },
-      { urlStep: "confirm-update", expectedComponent: "confirm-update" },
-      { urlStep: "success", expectedComponent: "successfully-updated" },
-    ];
-
-    testCases.forEach(({ urlStep, expectedComponent }) => {
-      mockParams = {
-        language: "en",
-        step: urlStep,
-      };
-
-      const { unmount } = render(
-        <TestWrapper>
-          <EditContactPhoneNumberPage />
-        </TestWrapper>,
-      );
-
-      expect(screen.getByTestId(expectedComponent)).toBeInTheDocument();
-      unmount();
-    });
   });
 });

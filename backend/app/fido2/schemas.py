@@ -3,7 +3,7 @@ FIDO2 schemas for request/response models
 """
 
 from typing import List, Optional, Dict, Any
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from app.utils.schemas import ResponseModel
 
 
@@ -40,10 +40,17 @@ class FIDO2RegistrationResponseModel(ResponseModel):
     data: Optional[FIDO2RegistrationResponse] = None
 
 
-class DeleteRegistrationRequest(BaseModel):
-    """Request model for deleting a FIDO2 registration"""
+class AttestationOptionsRequest(BaseModel):
+    """Request model for getting FIDO2 attestation options"""
 
-    id: str
+    pass
+
+
+class AssertionOptionsRequest(BaseModel):
+    """Request model for getting FIDO2 assertion options (for authentication)"""
+
+    # No additional fields needed - userId is retrieved from session
+    pass
 
 
 class UpdateRegistrationRequest(BaseModel):
@@ -57,6 +64,8 @@ class UpdateRegistrationRequest(BaseModel):
 class FIDO2AttestationResultRequest(BaseModel):
     """Request model for FIDO2 attestation result"""
 
+    model_config = ConfigDict(exclude_none=True)
+
     id: str
     rawId: str
     type: str
@@ -65,3 +74,32 @@ class FIDO2AttestationResultRequest(BaseModel):
     enabled: bool = True
     getClientExtensionResults: Optional[Dict[str, Any]] = None
     getTransports: Optional[List[str]] = None
+
+
+class AssertionResponse(BaseModel):
+    """Response object from the authenticator during assertion"""
+
+    clientDataJSON: str
+    signature: str
+    authenticatorData: str
+    userHandle: Optional[str] = None
+
+
+class FIDO2AssertionResultRequest(BaseModel):
+    """Request model for FIDO2 assertion result (authentication)"""
+
+    model_config = ConfigDict(exclude_none=True)
+
+    response: AssertionResponse
+    id: str
+    rawId: str
+    type: str
+    getClientExtensionResults: Optional[Dict[str, Any]] = None
+    authenticatorAttachment: Optional[str] = None
+
+
+class DeleteRegistrationRequest(BaseModel):
+    """Request model for deleting a FIDO2 registration with FIDO2 verification"""
+
+    id: str  # ID of the passkey to delete
+    assertionResult: FIDO2AssertionResultRequest  # FIDO2 authentication proof

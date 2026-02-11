@@ -2,7 +2,11 @@ import { useNavigate, useParams } from "react-router";
 import { useUser } from "../../../../components/Providers/useUser";
 import { useEffect, useRef, useState } from "react";
 import { path } from "../../../../utils/routeHelpers";
-import { PAGES, serverMapping } from "../../../../utils/constants";
+import {
+  INVALID_OTP_ERROR_CODES,
+  PAGES,
+  serverMapping,
+} from "../../../../utils/constants";
 import { getErrorMessage } from "../../../../utils/errorUtils";
 import { useOtpOperations } from "../../../../hooks/useOtpOperations";
 import { usePasswordValidation } from "../../../../hooks/usePasswordValidation";
@@ -15,6 +19,7 @@ import { fetchUserFIDO2Credentials } from "../../utils/fetchUserFIDO2Credentials
 import StepContent from "../../../../components/Wizard/StepContent";
 import Loader from "../../../../components/Layout/Loading";
 import AddFIDO2Passkey from "./AddFIDO2Passkey";
+import SelectFIDO2Passkey from "../VerifyFIDO2Passkey/SelectFIDO2Passkey";
 
 export default function AddFIDO2PasskeyPage({ step }) {
   const { language } = useParams();
@@ -54,14 +59,7 @@ export default function AddFIDO2PasskeyPage({ step }) {
     setErrorCode,
     () => {
       if (fido2Data && fido2Data.length > 0) {
-        // Handle case when FIDO2 data exists
-        // Go to access policy OOTB step up
-        navigate(
-          `/${language}/security-settings/manage-2fa-verifications/add-fido2/fido2-verification`,
-          {
-            replace: true,
-          },
-        );
+        setWizardStep("selectFIDO2Passkey");
       } else {
         // Handle case when no FIDO2 data exists
         // If there's only one MFA factor, skip OTP selection and go directly to validation
@@ -134,6 +132,13 @@ export default function AddFIDO2PasskeyPage({ step }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    if (INVALID_OTP_ERROR_CODES.includes(errorCode)) {
+      // If OTP is invalid, go back to OTP selection step
+      setWizardStep("otpValidation");
+    }
+  }, [errorCode]);
+
   const steps = {
     passwordVerification: (
       <PasswordVerification
@@ -181,6 +186,15 @@ export default function AddFIDO2PasskeyPage({ step }) {
         errorMessage={errorMessage}
         onCancel={async () => navigate(backToManage2FAVerificationsPage)}
         showTryAnotherWay={userPhoneFactors && userPhoneFactors.length > 1}
+      />
+    ),
+    selectFIDO2Passkey: (
+      <SelectFIDO2Passkey
+        submitAttestationResult={true}
+        setErrorCode={setErrorCode}
+        onCallback={() => {
+          setWizardStep("addFIDO2Passkey");
+        }}
       />
     ),
     addFIDO2Passkey: (

@@ -1,7 +1,7 @@
 """
-Unit tests for FIDO2 add_fido2_registration.py module
+Unit tests for FIDO2 authenticate_fido2_registration.py module
 
-Tests the get_attestation_options and submit_attestation_result functions.
+Tests the get_assertion_options and submit_assertion_result functions.
 Uses importlib to import the actual module for patching.
 """
 
@@ -9,49 +9,20 @@ import importlib
 import pytest
 from httpx import AsyncClient, HTTPStatusError, Request, Response
 from unittest.mock import AsyncMock, MagicMock, patch
-from app.fido2.schemas import AttestationOptionsRequest
+from app.fido2.schemas import AssertionOptionsRequest, FIDO2AssertionResultRequest
 
 # Import the module using importlib to get the actual module object
-add_module = importlib.import_module("app.fido2.services.add_fido2_registration")
+auth_module = importlib.import_module(
+    "app.fido2.services.authenticate_fido2_registration"
+)
 
 # Import functions directly for testing
-_prepare_attestation_result_body = add_module._prepare_attestation_result_body
-get_attestation_options = add_module.get_attestation_options
-submit_attestation_result = add_module.submit_attestation_result
+get_assertion_options = auth_module.get_assertion_options
+submit_assertion_result = auth_module.submit_assertion_result
 
 
-class TestPrepareAttestationResultBody:
-    """Tests for _prepare_attestation_result_body function"""
-
-    def test_adds_enabled_true(self):
-        """Should add enabled: true to body"""
-        body = {"data": "test"}
-        result = _prepare_attestation_result_body(body)
-        assert result["enabled"] is True
-
-    def test_sets_empty_client_extension_results_when_none(self):
-        """Should set getClientExtensionResults to empty dict if None"""
-        body = {"getClientExtensionResults": None}
-        result = _prepare_attestation_result_body(body)
-        assert result["getClientExtensionResults"] == {}
-
-    def test_preserves_existing_client_extension_results(self):
-        """Should preserve existing getClientExtensionResults"""
-        body = {"getClientExtensionResults": {"key": "value"}}
-        result = _prepare_attestation_result_body(body)
-        assert result["getClientExtensionResults"] == {"key": "value"}
-
-    def test_modifies_original_dict(self):
-        """Verify the function modifies and returns the same dict"""
-        body = {"data": "test", "getClientExtensionResults": None}
-        result = _prepare_attestation_result_body(body)
-        assert result is body
-        assert result["enabled"] is True
-        assert result["getClientExtensionResults"] == {}
-
-
-class TestGetAttestationOptions:
-    """Tests for get_attestation_options function"""
+class TestGetAssertionOptions:
+    """Tests for get_assertion_options function"""
 
     @pytest.fixture
     def mock_http_client(self):
@@ -59,13 +30,13 @@ class TestGetAttestationOptions:
         return AsyncMock(spec=AsyncClient)
 
     @pytest.mark.asyncio
-    @patch.object(add_module, "get_auth_request_headers")
-    @patch.object(add_module, "get_user_profile_info")
-    @patch.object(add_module, "get_rp_uuid_from_rp_id")
-    @patch.object(add_module, "get_admin_token")
-    @patch.object(add_module, "get_rp_id")
-    @patch.object(add_module, "get_tenant_url")
-    async def test_successful_attestation_options(
+    @patch.object(auth_module, "get_auth_request_headers")
+    @patch.object(auth_module, "get_user_profile_info")
+    @patch.object(auth_module, "get_rp_uuid_from_rp_id")
+    @patch.object(auth_module, "get_admin_token")
+    @patch.object(auth_module, "get_rp_id")
+    @patch.object(auth_module, "get_tenant_url")
+    async def test_successful_assertion_options(
         self,
         mock_get_tenant_url,
         mock_get_rp_id,
@@ -75,7 +46,7 @@ class TestGetAttestationOptions:
         mock_get_auth_request_headers,
         mock_http_client,
     ):
-        """Should successfully get attestation options"""
+        """Should successfully get assertion options"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
         mock_get_rp_id.return_value = "example.com"
         mock_get_admin_token.return_value = "admin-token"
@@ -93,13 +64,14 @@ class TestGetAttestationOptions:
         mock_response.status_code = 200
         mock_response.json.return_value = {
             "challenge": "abc123",
-            "rp": {"name": "Example"},
+            "allowCredentials": [],
+            "timeout": 60000,
         }
         mock_response.raise_for_status = MagicMock()
         mock_http_client.post = AsyncMock(return_value=mock_response)
 
-        request_data = AttestationOptionsRequest()
-        result = await get_attestation_options(
+        request_data = AssertionOptionsRequest()
+        result = await get_assertion_options(
             http_client=mock_http_client,
             user_access_token="user-token",
             request_data=request_data,
@@ -107,19 +79,19 @@ class TestGetAttestationOptions:
 
         assert result.success is True
         assert result.data["challenge"] == "abc123"
-        assert result.message == "Attestation options retrieved successfully"
+        assert result.message == "Assertion options retrieved successfully"
         mock_get_user_profile_info.assert_called_once_with(
             mock_http_client, "user-token"
         )
 
     @pytest.mark.asyncio
-    @patch.object(add_module, "get_auth_request_headers")
-    @patch.object(add_module, "get_user_profile_info")
-    @patch.object(add_module, "get_rp_uuid_from_rp_id")
-    @patch.object(add_module, "get_admin_token")
-    @patch.object(add_module, "get_rp_id")
-    @patch.object(add_module, "get_tenant_url")
-    async def test_injects_user_profile(
+    @patch.object(auth_module, "get_auth_request_headers")
+    @patch.object(auth_module, "get_user_profile_info")
+    @patch.object(auth_module, "get_rp_uuid_from_rp_id")
+    @patch.object(auth_module, "get_admin_token")
+    @patch.object(auth_module, "get_rp_id")
+    @patch.object(auth_module, "get_tenant_url")
+    async def test_injects_user_id(
         self,
         mock_get_tenant_url,
         mock_get_rp_id,
@@ -129,7 +101,7 @@ class TestGetAttestationOptions:
         mock_get_auth_request_headers,
         mock_http_client,
     ):
-        """Should inject displayName and userId into request body"""
+        """Should inject userId into request body"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
         mock_get_rp_id.return_value = "example.com"
         mock_get_admin_token.return_value = "admin-token"
@@ -149,27 +121,27 @@ class TestGetAttestationOptions:
         mock_response.raise_for_status = MagicMock()
         mock_http_client.post = AsyncMock(return_value=mock_response)
 
-        request_data = AttestationOptionsRequest()
-        await get_attestation_options(
+        request_data = AssertionOptionsRequest()
+        await get_assertion_options(
             http_client=mock_http_client,
             user_access_token="user-token",
             request_data=request_data,
         )
 
-        # Verify the body sent to the API includes displayName and userId
+        # Verify the body sent to the API includes userId
         call_kwargs = mock_http_client.post.call_args[1]
         sent_body = call_kwargs["json"]
-        assert sent_body["displayName"] == "Display Name"
         assert sent_body["userId"] == "user-123"
+        assert "userVerification" in sent_body
 
     @pytest.mark.asyncio
-    @patch.object(add_module, "get_auth_request_headers")
-    @patch.object(add_module, "get_user_profile_info")
-    @patch.object(add_module, "get_rp_uuid_from_rp_id")
-    @patch.object(add_module, "get_admin_token")
-    @patch.object(add_module, "get_rp_id")
-    @patch.object(add_module, "get_tenant_url")
-    async def test_calls_correct_endpoint(
+    @patch.object(auth_module, "get_auth_request_headers")
+    @patch.object(auth_module, "get_user_profile_info")
+    @patch.object(auth_module, "get_rp_uuid_from_rp_id")
+    @patch.object(auth_module, "get_admin_token")
+    @patch.object(auth_module, "get_rp_id")
+    @patch.object(auth_module, "get_tenant_url")
+    async def test_sets_user_verification_preferred(
         self,
         mock_get_tenant_url,
         mock_get_rp_id,
@@ -179,7 +151,7 @@ class TestGetAttestationOptions:
         mock_get_auth_request_headers,
         mock_http_client,
     ):
-        """Should call the correct attestation/options endpoint"""
+        """Should set userVerification to 'preferred' by default"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
         mock_get_rp_id.return_value = "example.com"
         mock_get_admin_token.return_value = "admin-token"
@@ -199,8 +171,57 @@ class TestGetAttestationOptions:
         mock_response.raise_for_status = MagicMock()
         mock_http_client.post = AsyncMock(return_value=mock_response)
 
-        request_data = AttestationOptionsRequest()
-        await get_attestation_options(
+        request_data = AssertionOptionsRequest()
+        await get_assertion_options(
+            http_client=mock_http_client,
+            user_access_token="user-token",
+            request_data=request_data,
+        )
+
+        # Verify userVerification is set to preferred
+        call_kwargs = mock_http_client.post.call_args[1]
+        sent_body = call_kwargs["json"]
+        assert sent_body["userVerification"] == "preferred"
+
+    @pytest.mark.asyncio
+    @patch.object(auth_module, "get_auth_request_headers")
+    @patch.object(auth_module, "get_user_profile_info")
+    @patch.object(auth_module, "get_rp_uuid_from_rp_id")
+    @patch.object(auth_module, "get_admin_token")
+    @patch.object(auth_module, "get_rp_id")
+    @patch.object(auth_module, "get_tenant_url")
+    async def test_calls_correct_endpoint(
+        self,
+        mock_get_tenant_url,
+        mock_get_rp_id,
+        mock_get_admin_token,
+        mock_get_rp_uuid_from_rp_id,
+        mock_get_user_profile_info,
+        mock_get_auth_request_headers,
+        mock_http_client,
+    ):
+        """Should call the correct assertion/options endpoint"""
+        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
+        mock_get_rp_id.return_value = "example.com"
+        mock_get_admin_token.return_value = "admin-token"
+        mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
+        mock_get_user_profile_info.return_value = (
+            "user@example.com",
+            "Test User",
+            "user-id-456",
+        )
+        mock_get_auth_request_headers.return_value = {
+            "Authorization": "Bearer admin-token"
+        }
+
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"challenge": "abc123"}
+        mock_response.raise_for_status = MagicMock()
+        mock_http_client.post = AsyncMock(return_value=mock_response)
+
+        request_data = AssertionOptionsRequest()
+        await get_assertion_options(
             http_client=mock_http_client,
             user_access_token="user-token",
             request_data=request_data,
@@ -208,15 +229,13 @@ class TestGetAttestationOptions:
 
         call_args = mock_http_client.post.call_args[0]
         url = call_args[0]
-        assert (
-            "/v2.0/factors/fido2/relyingparties/rp-uuid-123/attestation/options" in url
-        )
+        assert "/v2.0/factors/fido2/relyingparties/rp-uuid-123/assertion/options" in url
 
     @pytest.mark.asyncio
-    @patch.object(add_module, "RequestErrorHandler")
-    @patch.object(add_module, "get_admin_token")
-    @patch.object(add_module, "get_rp_id")
-    @patch.object(add_module, "get_tenant_url")
+    @patch.object(auth_module, "RequestErrorHandler")
+    @patch.object(auth_module, "get_admin_token")
+    @patch.object(auth_module, "get_rp_id")
+    @patch.object(auth_module, "get_tenant_url")
     async def test_handles_admin_token_error(
         self,
         mock_get_tenant_url,
@@ -230,8 +249,8 @@ class TestGetAttestationOptions:
         mock_get_rp_id.return_value = "example.com"
         mock_get_admin_token.side_effect = Exception("Token service error")
 
-        request_data = AttestationOptionsRequest()
-        await get_attestation_options(
+        request_data = AssertionOptionsRequest()
+        await get_assertion_options(
             http_client=mock_http_client,
             user_access_token="user-token",
             request_data=request_data,
@@ -240,12 +259,12 @@ class TestGetAttestationOptions:
         mock_request_error_handler.handle.assert_called_once()
 
     @pytest.mark.asyncio
-    @patch.object(add_module, "RequestErrorHandler")
-    @patch.object(add_module, "get_user_profile_info")
-    @patch.object(add_module, "get_rp_uuid_from_rp_id")
-    @patch.object(add_module, "get_admin_token")
-    @patch.object(add_module, "get_rp_id")
-    @patch.object(add_module, "get_tenant_url")
+    @patch.object(auth_module, "RequestErrorHandler")
+    @patch.object(auth_module, "get_user_profile_info")
+    @patch.object(auth_module, "get_rp_uuid_from_rp_id")
+    @patch.object(auth_module, "get_admin_token")
+    @patch.object(auth_module, "get_rp_id")
+    @patch.object(auth_module, "get_tenant_url")
     async def test_handles_user_profile_error(
         self,
         mock_get_tenant_url,
@@ -263,8 +282,8 @@ class TestGetAttestationOptions:
         mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
         mock_get_user_profile_info.side_effect = Exception("Profile fetch error")
 
-        request_data = AttestationOptionsRequest()
-        await get_attestation_options(
+        request_data = AssertionOptionsRequest()
+        await get_assertion_options(
             http_client=mock_http_client,
             user_access_token="user-token",
             request_data=request_data,
@@ -273,13 +292,13 @@ class TestGetAttestationOptions:
         mock_request_error_handler.handle.assert_called_once()
 
     @pytest.mark.asyncio
-    @patch.object(add_module, "RequestErrorHandler")
-    @patch.object(add_module, "get_auth_request_headers")
-    @patch.object(add_module, "get_user_profile_info")
-    @patch.object(add_module, "get_rp_uuid_from_rp_id")
-    @patch.object(add_module, "get_admin_token")
-    @patch.object(add_module, "get_rp_id")
-    @patch.object(add_module, "get_tenant_url")
+    @patch.object(auth_module, "RequestErrorHandler")
+    @patch.object(auth_module, "get_auth_request_headers")
+    @patch.object(auth_module, "get_user_profile_info")
+    @patch.object(auth_module, "get_rp_uuid_from_rp_id")
+    @patch.object(auth_module, "get_admin_token")
+    @patch.object(auth_module, "get_rp_id")
+    @patch.object(auth_module, "get_tenant_url")
     async def test_handles_http_error(
         self,
         mock_get_tenant_url,
@@ -313,8 +332,8 @@ class TestGetAttestationOptions:
         )
         mock_http_client.post = AsyncMock(return_value=mock_response_obj)
 
-        request_data = AttestationOptionsRequest()
-        await get_attestation_options(
+        request_data = AssertionOptionsRequest()
+        await get_assertion_options(
             http_client=mock_http_client,
             user_access_token="user-token",
             request_data=request_data,
@@ -323,13 +342,13 @@ class TestGetAttestationOptions:
         mock_request_error_handler.handle.assert_called_once()
 
     @pytest.mark.asyncio
-    @patch.object(add_module, "get_auth_request_headers")
-    @patch.object(add_module, "get_user_profile_info")
-    @patch.object(add_module, "get_rp_uuid_from_rp_id")
-    @patch.object(add_module, "get_admin_token")
-    @patch.object(add_module, "get_rp_id")
-    @patch.object(add_module, "get_tenant_url")
-    async def test_handles_none_request_body(
+    @patch.object(auth_module, "get_auth_request_headers")
+    @patch.object(auth_module, "get_user_profile_info")
+    @patch.object(auth_module, "get_rp_uuid_from_rp_id")
+    @patch.object(auth_module, "get_admin_token")
+    @patch.object(auth_module, "get_rp_id")
+    @patch.object(auth_module, "get_tenant_url")
+    async def test_uses_admin_token_for_request(
         self,
         mock_get_tenant_url,
         mock_get_rp_id,
@@ -339,10 +358,11 @@ class TestGetAttestationOptions:
         mock_get_auth_request_headers,
         mock_http_client,
     ):
-        """Should handle None request body"""
+        """Should use admin token for assertion options request"""
+        admin_token = "specific-admin-token"
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
         mock_get_rp_id.return_value = "example.com"
-        mock_get_admin_token.return_value = "admin-token"
+        mock_get_admin_token.return_value = admin_token
         mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
         mock_get_user_profile_info.return_value = (
             "user@example.com",
@@ -350,7 +370,7 @@ class TestGetAttestationOptions:
             "user-id-456",
         )
         mock_get_auth_request_headers.return_value = {
-            "Authorization": "Bearer admin-token"
+            "Authorization": f"Bearer {admin_token}"
         }
 
         mock_response = MagicMock()
@@ -359,31 +379,57 @@ class TestGetAttestationOptions:
         mock_response.raise_for_status = MagicMock()
         mock_http_client.post = AsyncMock(return_value=mock_response)
 
-        request_data = AttestationOptionsRequest()
-        result = await get_attestation_options(
+        request_data = AssertionOptionsRequest()
+        await get_assertion_options(
             http_client=mock_http_client,
             user_access_token="user-token",
             request_data=request_data,
         )
 
-        assert result.success is True
+        # Verify admin token was used
+        mock_get_auth_request_headers.assert_called_once_with(
+            admin_token, json_content_type=True
+        )
 
 
-class TestSubmitAttestationResult:
-    """Tests for submit_attestation_result function"""
+class TestSubmitAssertionResult:
+    """Tests for submit_assertion_result function"""
 
     @pytest.fixture
     def mock_http_client(self):
         """Create a mock HTTP client"""
         return AsyncMock(spec=AsyncClient)
 
+    @pytest.fixture
+    def mock_request(self):
+        """Create a mock FastAPI Request object"""
+        mock_req = MagicMock()
+        mock_req.session = {}
+        return mock_req
+
+    @pytest.fixture
+    def mock_assertion_request(self):
+        """Create mock assertion result request data"""
+        mock_data = MagicMock(spec=FIDO2AssertionResultRequest)
+        mock_data.model_dump.return_value = {
+            "id": "credential-id",
+            "rawId": "raw-id",
+            "type": "public-key",
+            "response": {
+                "authenticatorData": "auth-data",
+                "clientDataJSON": "client-data",
+                "signature": "signature",
+            },
+        }
+        return mock_data
+
     @pytest.mark.asyncio
-    @patch.object(add_module, "get_auth_request_headers")
-    @patch.object(add_module, "get_rp_uuid_from_rp_id")
-    @patch.object(add_module, "get_admin_token")
-    @patch.object(add_module, "get_rp_id")
-    @patch.object(add_module, "get_tenant_url")
-    async def test_successful_attestation_result(
+    @patch.object(auth_module, "get_auth_request_headers")
+    @patch.object(auth_module, "get_rp_uuid_from_rp_id")
+    @patch.object(auth_module, "get_admin_token")
+    @patch.object(auth_module, "get_rp_id")
+    @patch.object(auth_module, "get_tenant_url")
+    async def test_successful_assertion_result(
         self,
         mock_get_tenant_url,
         mock_get_rp_id,
@@ -391,8 +437,10 @@ class TestSubmitAttestationResult:
         mock_get_rp_uuid_from_rp_id,
         mock_get_auth_request_headers,
         mock_http_client,
+        mock_request,
+        mock_assertion_request,
     ):
-        """Should successfully submit attestation result"""
+        """Should successfully submit assertion result"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
         mock_get_rp_id.return_value = "example.com"
         mock_get_admin_token.return_value = "admin-token"
@@ -403,30 +451,28 @@ class TestSubmitAttestationResult:
 
         mock_response = MagicMock()
         mock_response.status_code = 200
-        mock_response.json.return_value = {"status": "ok", "id": "registration-123"}
+        mock_response.json.return_value = {"status": "ok", "verified": True}
         mock_response.raise_for_status = MagicMock()
         mock_http_client.post = AsyncMock(return_value=mock_response)
 
-        result = await submit_attestation_result(
+        result = await submit_assertion_result(
+            request=mock_request,
             http_client=mock_http_client,
             user_access_token="user-token",
-            request_body={
-                "id": "credential-id",
-                "rawId": "raw-id",
-                "type": "public-key",
-            },
+            request_body=mock_assertion_request,
+            return_jwt=False,
         )
 
         assert result.success is True
-        assert result.message == "FIDO2 registration completed successfully"
+        assert result.message == "FIDO2 authentication completed successfully"
 
     @pytest.mark.asyncio
-    @patch.object(add_module, "get_auth_request_headers")
-    @patch.object(add_module, "get_rp_uuid_from_rp_id")
-    @patch.object(add_module, "get_admin_token")
-    @patch.object(add_module, "get_rp_id")
-    @patch.object(add_module, "get_tenant_url")
-    async def test_adds_enabled_true(
+    @patch.object(auth_module, "get_auth_request_headers")
+    @patch.object(auth_module, "get_rp_uuid_from_rp_id")
+    @patch.object(auth_module, "get_admin_token")
+    @patch.object(auth_module, "get_rp_id")
+    @patch.object(auth_module, "get_tenant_url")
+    async def test_return_jwt_true_adds_query_parameter(
         self,
         mock_get_tenant_url,
         mock_get_rp_id,
@@ -434,8 +480,55 @@ class TestSubmitAttestationResult:
         mock_get_rp_uuid_from_rp_id,
         mock_get_auth_request_headers,
         mock_http_client,
+        mock_request,
+        mock_assertion_request,
     ):
-        """Should add enabled: true to request body"""
+        """Should add returnJwt=true query parameter when requested"""
+        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
+        mock_get_rp_id.return_value = "example.com"
+        mock_get_admin_token.return_value = "admin-token"
+        mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
+        mock_get_auth_request_headers.return_value = {
+            "Authorization": "Bearer admin-token"
+        }
+
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"status": "ok", "assertion": "jwt-token"}
+        mock_response.raise_for_status = MagicMock()
+        mock_http_client.post = AsyncMock(return_value=mock_response)
+
+        await submit_assertion_result(
+            request=mock_request,
+            http_client=mock_http_client,
+            user_access_token="user-token",
+            request_body=mock_assertion_request,
+            return_jwt=True,
+        )
+
+        # Verify URL includes returnJwt query parameter
+        call_args = mock_http_client.post.call_args[0]
+        url = call_args[0]
+        assert "returnJwt=true" in url
+
+    @pytest.mark.asyncio
+    @patch.object(auth_module, "get_auth_request_headers")
+    @patch.object(auth_module, "get_rp_uuid_from_rp_id")
+    @patch.object(auth_module, "get_admin_token")
+    @patch.object(auth_module, "get_rp_id")
+    @patch.object(auth_module, "get_tenant_url")
+    async def test_return_jwt_false_no_query_parameter(
+        self,
+        mock_get_tenant_url,
+        mock_get_rp_id,
+        mock_get_admin_token,
+        mock_get_rp_uuid_from_rp_id,
+        mock_get_auth_request_headers,
+        mock_http_client,
+        mock_request,
+        mock_assertion_request,
+    ):
+        """Should not add returnJwt query parameter when return_jwt=False"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
         mock_get_rp_id.return_value = "example.com"
         mock_get_admin_token.return_value = "admin-token"
@@ -450,62 +543,25 @@ class TestSubmitAttestationResult:
         mock_response.raise_for_status = MagicMock()
         mock_http_client.post = AsyncMock(return_value=mock_response)
 
-        await submit_attestation_result(
+        await submit_assertion_result(
+            request=mock_request,
             http_client=mock_http_client,
             user_access_token="user-token",
-            request_body={"id": "credential-id"},
+            request_body=mock_assertion_request,
+            return_jwt=False,
         )
 
-        call_kwargs = mock_http_client.post.call_args[1]
-        sent_body = call_kwargs["json"]
-        assert sent_body["enabled"] is True
+        # Verify URL does not include returnJwt query parameter
+        call_args = mock_http_client.post.call_args[0]
+        url = call_args[0]
+        assert "returnJwt" not in url
 
     @pytest.mark.asyncio
-    @patch.object(add_module, "get_auth_request_headers")
-    @patch.object(add_module, "get_rp_uuid_from_rp_id")
-    @patch.object(add_module, "get_admin_token")
-    @patch.object(add_module, "get_rp_id")
-    @patch.object(add_module, "get_tenant_url")
-    async def test_handles_null_client_extension_results(
-        self,
-        mock_get_tenant_url,
-        mock_get_rp_id,
-        mock_get_admin_token,
-        mock_get_rp_uuid_from_rp_id,
-        mock_get_auth_request_headers,
-        mock_http_client,
-    ):
-        """Should set getClientExtensionResults to empty dict if None"""
-        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
-        mock_get_rp_id.return_value = "example.com"
-        mock_get_admin_token.return_value = "admin-token"
-        mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
-        mock_get_auth_request_headers.return_value = {
-            "Authorization": "Bearer admin-token"
-        }
-
-        mock_response = MagicMock()
-        mock_response.status_code = 200
-        mock_response.json.return_value = {"status": "ok"}
-        mock_response.raise_for_status = MagicMock()
-        mock_http_client.post = AsyncMock(return_value=mock_response)
-
-        await submit_attestation_result(
-            http_client=mock_http_client,
-            user_access_token="user-token",
-            request_body={"id": "credential-id", "getClientExtensionResults": None},
-        )
-
-        call_kwargs = mock_http_client.post.call_args[1]
-        sent_body = call_kwargs["json"]
-        assert sent_body["getClientExtensionResults"] == {}
-
-    @pytest.mark.asyncio
-    @patch.object(add_module, "get_auth_request_headers")
-    @patch.object(add_module, "get_rp_uuid_from_rp_id")
-    @patch.object(add_module, "get_admin_token")
-    @patch.object(add_module, "get_rp_id")
-    @patch.object(add_module, "get_tenant_url")
+    @patch.object(auth_module, "get_auth_request_headers")
+    @patch.object(auth_module, "get_rp_uuid_from_rp_id")
+    @patch.object(auth_module, "get_admin_token")
+    @patch.object(auth_module, "get_rp_id")
+    @patch.object(auth_module, "get_tenant_url")
     async def test_calls_correct_endpoint(
         self,
         mock_get_tenant_url,
@@ -514,8 +570,10 @@ class TestSubmitAttestationResult:
         mock_get_rp_uuid_from_rp_id,
         mock_get_auth_request_headers,
         mock_http_client,
+        mock_request,
+        mock_assertion_request,
     ):
-        """Should call the correct attestation/result endpoint"""
+        """Should call the correct assertion/result endpoint"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
         mock_get_rp_id.return_value = "example.com"
         mock_get_admin_token.return_value = "admin-token"
@@ -530,23 +588,23 @@ class TestSubmitAttestationResult:
         mock_response.raise_for_status = MagicMock()
         mock_http_client.post = AsyncMock(return_value=mock_response)
 
-        await submit_attestation_result(
+        await submit_assertion_result(
+            request=mock_request,
             http_client=mock_http_client,
             user_access_token="user-token",
-            request_body={"id": "credential-id"},
+            request_body=mock_assertion_request,
+            return_jwt=False,
         )
 
         call_args = mock_http_client.post.call_args[0]
         url = call_args[0]
-        assert (
-            "/v2.0/factors/fido2/relyingparties/rp-uuid-123/attestation/result" in url
-        )
+        assert "/v2.0/factors/fido2/relyingparties/rp-uuid-123/assertion/result" in url
 
     @pytest.mark.asyncio
-    @patch.object(add_module, "RequestErrorHandler")
-    @patch.object(add_module, "get_admin_token")
-    @patch.object(add_module, "get_rp_id")
-    @patch.object(add_module, "get_tenant_url")
+    @patch.object(auth_module, "RequestErrorHandler")
+    @patch.object(auth_module, "get_admin_token")
+    @patch.object(auth_module, "get_rp_id")
+    @patch.object(auth_module, "get_tenant_url")
     async def test_handles_admin_token_error(
         self,
         mock_get_tenant_url,
@@ -554,27 +612,31 @@ class TestSubmitAttestationResult:
         mock_get_admin_token,
         mock_request_error_handler,
         mock_http_client,
+        mock_request,
+        mock_assertion_request,
     ):
         """Should handle error when getting admin token fails"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
         mock_get_rp_id.return_value = "example.com"
         mock_get_admin_token.side_effect = Exception("Token service error")
 
-        await submit_attestation_result(
+        await submit_assertion_result(
+            request=mock_request,
             http_client=mock_http_client,
             user_access_token="user-token",
-            request_body={"id": "credential-id"},
+            request_body=mock_assertion_request,
+            return_jwt=False,
         )
 
         mock_request_error_handler.handle.assert_called_once()
 
     @pytest.mark.asyncio
-    @patch.object(add_module, "RequestErrorHandler")
-    @patch.object(add_module, "get_auth_request_headers")
-    @patch.object(add_module, "get_rp_uuid_from_rp_id")
-    @patch.object(add_module, "get_admin_token")
-    @patch.object(add_module, "get_rp_id")
-    @patch.object(add_module, "get_tenant_url")
+    @patch.object(auth_module, "RequestErrorHandler")
+    @patch.object(auth_module, "get_auth_request_headers")
+    @patch.object(auth_module, "get_rp_uuid_from_rp_id")
+    @patch.object(auth_module, "get_admin_token")
+    @patch.object(auth_module, "get_rp_id")
+    @patch.object(auth_module, "get_tenant_url")
     async def test_handles_http_error(
         self,
         mock_get_tenant_url,
@@ -584,6 +646,8 @@ class TestSubmitAttestationResult:
         mock_get_auth_request_headers,
         mock_request_error_handler,
         mock_http_client,
+        mock_request,
+        mock_assertion_request,
     ):
         """Should handle HTTP error from API"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
@@ -594,29 +658,31 @@ class TestSubmitAttestationResult:
             "Authorization": "Bearer admin-token"
         }
 
-        mock_request = Request("POST", "https://example.com")
-        mock_response = Response(400, request=mock_request)
+        mock_request_obj = Request("POST", "https://example.com")
+        mock_response = Response(401, request=mock_request_obj)
         mock_response_obj = MagicMock()
         mock_response_obj.raise_for_status.side_effect = HTTPStatusError(
-            message="Bad Request", request=mock_request, response=mock_response
+            message="Unauthorized", request=mock_request_obj, response=mock_response
         )
         mock_http_client.post = AsyncMock(return_value=mock_response_obj)
 
-        await submit_attestation_result(
+        await submit_assertion_result(
+            request=mock_request,
             http_client=mock_http_client,
             user_access_token="user-token",
-            request_body={"id": "credential-id"},
+            request_body=mock_assertion_request,
+            return_jwt=False,
         )
 
         mock_request_error_handler.handle.assert_called_once()
 
     @pytest.mark.asyncio
-    @patch.object(add_module, "get_auth_request_headers")
-    @patch.object(add_module, "get_rp_uuid_from_rp_id")
-    @patch.object(add_module, "get_admin_token")
-    @patch.object(add_module, "get_rp_id")
-    @patch.object(add_module, "get_tenant_url")
-    async def test_handles_none_request_body(
+    @patch.object(auth_module, "get_auth_request_headers")
+    @patch.object(auth_module, "get_rp_uuid_from_rp_id")
+    @patch.object(auth_module, "get_admin_token")
+    @patch.object(auth_module, "get_rp_id")
+    @patch.object(auth_module, "get_tenant_url")
+    async def test_uses_model_dump_for_request_body(
         self,
         mock_get_tenant_url,
         mock_get_rp_id,
@@ -624,8 +690,10 @@ class TestSubmitAttestationResult:
         mock_get_rp_uuid_from_rp_id,
         mock_get_auth_request_headers,
         mock_http_client,
+        mock_request,
+        mock_assertion_request,
     ):
-        """Should handle None request body"""
+        """Should use model_dump to serialize request body"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
         mock_get_rp_id.return_value = "example.com"
         mock_get_admin_token.return_value = "admin-token"
@@ -640,21 +708,24 @@ class TestSubmitAttestationResult:
         mock_response.raise_for_status = MagicMock()
         mock_http_client.post = AsyncMock(return_value=mock_response)
 
-        result = await submit_attestation_result(
+        await submit_assertion_result(
+            request=mock_request,
             http_client=mock_http_client,
             user_access_token="user-token",
-            request_body=None,
+            request_body=mock_assertion_request,
+            return_jwt=False,
         )
 
-        assert result.success is True
+        # Verify model_dump was called
+        mock_assertion_request.model_dump.assert_called_once_with(exclude_none=True)
 
     @pytest.mark.asyncio
-    @patch.object(add_module, "get_auth_request_headers")
-    @patch.object(add_module, "get_rp_uuid_from_rp_id")
-    @patch.object(add_module, "get_admin_token")
-    @patch.object(add_module, "get_rp_id")
-    @patch.object(add_module, "get_tenant_url")
-    async def test_preserves_existing_client_extension_results(
+    @patch.object(auth_module, "get_auth_request_headers")
+    @patch.object(auth_module, "get_rp_uuid_from_rp_id")
+    @patch.object(auth_module, "get_admin_token")
+    @patch.object(auth_module, "get_rp_id")
+    @patch.object(auth_module, "get_tenant_url")
+    async def test_uses_admin_token_for_request(
         self,
         mock_get_tenant_url,
         mock_get_rp_id,
@@ -662,14 +733,17 @@ class TestSubmitAttestationResult:
         mock_get_rp_uuid_from_rp_id,
         mock_get_auth_request_headers,
         mock_http_client,
+        mock_request,
+        mock_assertion_request,
     ):
-        """Should preserve existing getClientExtensionResults"""
+        """Should use admin token for assertion result request"""
+        admin_token = "specific-admin-token"
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
         mock_get_rp_id.return_value = "example.com"
-        mock_get_admin_token.return_value = "admin-token"
+        mock_get_admin_token.return_value = admin_token
         mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
         mock_get_auth_request_headers.return_value = {
-            "Authorization": "Bearer admin-token"
+            "Authorization": f"Bearer {admin_token}"
         }
 
         mock_response = MagicMock()
@@ -678,15 +752,90 @@ class TestSubmitAttestationResult:
         mock_response.raise_for_status = MagicMock()
         mock_http_client.post = AsyncMock(return_value=mock_response)
 
-        await submit_attestation_result(
+        await submit_assertion_result(
+            request=mock_request,
             http_client=mock_http_client,
             user_access_token="user-token",
-            request_body={
-                "id": "credential-id",
-                "getClientExtensionResults": {"credProtect": 1},
-            },
+            request_body=mock_assertion_request,
+            return_jwt=False,
         )
 
-        call_kwargs = mock_http_client.post.call_args[1]
-        sent_body = call_kwargs["json"]
-        assert sent_body["getClientExtensionResults"] == {"credProtect": 1}
+        # Verify admin token was used
+        mock_get_auth_request_headers.assert_called_once_with(
+            admin_token, json_content_type=True
+        )
+
+    @pytest.mark.asyncio
+    @patch.object(auth_module, "get_auth_request_headers")
+    @patch.object(auth_module, "get_rp_uuid_from_rp_id")
+    @patch.object(auth_module, "get_admin_token")
+    @patch.object(auth_module, "get_rp_id")
+    @patch.object(auth_module, "get_tenant_url")
+    async def test_returns_response_data_in_result(
+        self,
+        mock_get_tenant_url,
+        mock_get_rp_id,
+        mock_get_admin_token,
+        mock_get_rp_uuid_from_rp_id,
+        mock_get_auth_request_headers,
+        mock_http_client,
+        mock_request,
+        mock_assertion_request,
+    ):
+        """Should return API response data in ResponseModel"""
+        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
+        mock_get_rp_id.return_value = "example.com"
+        mock_get_admin_token.return_value = "admin-token"
+        mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
+        mock_get_auth_request_headers.return_value = {
+            "Authorization": "Bearer admin-token"
+        }
+
+        expected_response = {"status": "ok", "verified": True, "userId": "user-123"}
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = expected_response
+        mock_response.raise_for_status = MagicMock()
+        mock_http_client.post = AsyncMock(return_value=mock_response)
+
+        result = await submit_assertion_result(
+            request=mock_request,
+            http_client=mock_http_client,
+            user_access_token="user-token",
+            request_body=mock_assertion_request,
+            return_jwt=False,
+        )
+
+        assert result.data == expected_response
+        assert result.data["status"] == "ok"
+        assert result.data["verified"] is True
+
+    @pytest.mark.asyncio
+    @patch.object(auth_module, "RequestErrorHandler")
+    @patch.object(auth_module, "get_rp_id")
+    @patch.object(auth_module, "get_tenant_url")
+    async def test_handles_generic_exception(
+        self,
+        mock_get_tenant_url,
+        mock_get_rp_id,
+        mock_request_error_handler,
+        mock_http_client,
+        mock_request,
+        mock_assertion_request,
+    ):
+        """Should handle any generic exception and call error handler"""
+        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
+        mock_get_rp_id.side_effect = Exception("Unexpected error")
+
+        await submit_assertion_result(
+            request=mock_request,
+            http_client=mock_http_client,
+            user_access_token="user-token",
+            request_body=mock_assertion_request,
+            return_jwt=False,
+        )
+
+        mock_request_error_handler.handle.assert_called_once()
+        error_arg = mock_request_error_handler.handle.call_args[0][0]
+        assert isinstance(error_arg, Exception)
+        assert "Unexpected error" in str(error_arg)

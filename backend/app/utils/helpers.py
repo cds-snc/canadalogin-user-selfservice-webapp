@@ -1,7 +1,18 @@
-from typing import Dict
+import logging
+from typing import Dict, TYPE_CHECKING
+from fastapi import HTTPException, status
 from fastapi.responses import JSONResponse
+from httpx import AsyncClient
 
 from app.utils.schemas import ResponseModel
+
+# TYPE_CHECKING is True only during static type checking (mypy, IDEs), not at runtime.
+# This allows us to import types for annotations without causing circular imports.
+# At runtime, these imports are skipped, breaking the circular dependency.
+if TYPE_CHECKING:
+    from app.otp.schemas import OtpType
+
+logger = logging.getLogger(__name__)
 
 
 def generate_error_response(status_code: int, message: str):
@@ -45,3 +56,66 @@ def extract_last_4_digits(masked_phone: str) -> str:
     # Extract only digits and return the last 4
     digits = "".join(filter(str.isdigit, masked_phone))
     return digits[-4:] if len(digits) >= 4 else digits
+
+
+async def verify_otp_before_operation(
+    global_http_client: AsyncClient,
+    otp: str,
+    trxn_id: str,
+    otp_type: "OtpType",
+) -> None:
+    """
+    Verify OTP before performing a sensitive operation.
+
+    This helper function validates an OTP code before allowing operations like
+    profile updates, MFA deletion, or other sensitive actions.
+
+    Args:
+        global_http_client: HTTP client for making requests
+        otp: The OTP code to verify
+        trxn_id: Transaction ID from OTP request
+        otp_type: OTP type enum (OtpType.SMS, OtpType.VOICE, OtpType.EMAIL)
+
+    Raises:
+        HTTPException: 400 if OTP verification fails
+        HTTPException: 500 for unexpected errors
+
+    Returns:
+        None if verification succeeds
+    """
+    # Import at runtime to avoid circular dependencies (OtpType is imported above for type checking only)
+    from app.otp.schemas import UserOtpVerificationInfo
+    from app.otp.services.verify_transient_otp import handle_otp_verification
+
+    try:
+        # Create verification data
+        otp_verification_data = UserOtpVerificationInfo(
+            otp=otp, trxnId=trxn_id, otpType=otp_type
+        )
+
+        logger.info(f"Attempting OTP verification (type: {otp_type.value})")
+        otp_verification_response = await handle_otp_verification(
+            global_http_client, otp_verification_data
+        )
+
+        if not otp_verification_response.success:
+            logger.error("OTP verification failed")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="OTP verification failed.",
+            )
+
+        logger.info("OTP verification successful")
+
+    except HTTPException:
+        # Re-raise HTTP exceptions as-is
+        raise
+    except Exception as e:
+        logger.error(
+            f"Unexpected error during OTP verification: {str(e)}",
+            exc_info=True,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred during OTP verification",
+        )

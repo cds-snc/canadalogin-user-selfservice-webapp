@@ -8,6 +8,7 @@ from app.users.services.get_my_profile import get_my_profile
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.request_error_handler import RequestErrorHandler
 from app.utils.schemas import ResponseModel
+from app.utils.helpers import verify_otp_before_operation
 from fastapi import HTTPException, status
 from httpx import AsyncClient, HTTPStatusError
 
@@ -29,13 +30,22 @@ async def handle_otp_deletion(
     deletion_request: OtpDeletionRequest,
     user_access_token: str,
 ):
-    """Delete an OTP factor enrollment (SMS or Voice)"""
+    """Delete an OTP factor enrollment (SMS or Voice) after OTP verification"""
     try:
         otp_type = deletion_request.otpType
         logger.info(f"Attempting to delete {otp_type} OTP factor")
         start_time = datetime.now()
 
-        # Verify user profile
+        # Step 1: Verify OTP before proceeding with deletion
+        # Use the verification OTP type (may differ from the factor being deleted)
+        await verify_otp_before_operation(
+            global_http_client=global_http_client,
+            otp=deletion_request.otp,
+            trxn_id=deletion_request.trxnId,
+            otp_type=deletion_request.otpVerificationType,
+        )
+
+        # Step 2: Verify user profile
         my_profile_response = await get_my_profile(
             global_http_client, user_access_token
         )
@@ -50,7 +60,7 @@ async def handle_otp_deletion(
             f"Deleting {otp_type} OTP factor {deletion_request.id} for user: {user_id}"
         )
 
-        # Check if user has multiple factors before allowing deletion
+        # Step 3: Check if user has multiple factors before allowing deletion
         # Check all factors (validated and unvalidated) to prevent deletion of last remaining factor
         user_factors_response = await get_user_otp_factors(
             global_http_client, user_id, user_access_token, validated=None
@@ -62,6 +72,7 @@ async def handle_otp_deletion(
                 detail="Cannot delete last remaining MFA factor",
             )
 
+        # Step 4: Dispatch the deletion to IBM Verify
         http_client_response = await dispatch_otp_deletion(
             global_http_client, deletion_request
         )
@@ -87,7 +98,7 @@ async def handle_otp_deletion(
             )
 
     except HTTPException:
-        # Re-raise HTTPException as-is (like 409 Conflict)
+        # Re-raise HTTPException as-is (like 409 Conflict or 400 Bad Request from OTP verification)
         raise
     except Exception as e:
         logger.error(

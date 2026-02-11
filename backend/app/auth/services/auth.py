@@ -108,8 +108,6 @@ async def reauthenticate_user(request: Request, returnToPage: str = "/"):
     Args:
         request: The FastAPI request object
         returnToPage: The page to return to after authentication
-        acr_values: If provided, uses acr_values for step-up authentication (e.g., "loa3_stepup")
-                   If not provided, uses max_age for standard reauthentication
     """
     try:
 

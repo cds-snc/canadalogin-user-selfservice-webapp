@@ -10,18 +10,20 @@ import { fetchUserFIDO2Credentials } from "../../utils/fetchUserFIDO2Credentials
 import StepContent from "../../../../components/Wizard/StepContent";
 import Loader from "../../../../components/Layout/Loading";
 import DeleteFIDO2PasskeyConfirm from "./DeleteFIDO2PasskeyConfirm";
+import SelectFIDO2Passkey from "../VerifyFIDO2Passkey/SelectFIDO2Passkey";
 
 export default function DeleteFIDO2PasskeyPage({ step }) {
-  const { language, passkeyId } = useParams();
+  const { language } = useParams();
   const navigate = useNavigate();
-  const [wizardStep, _setWizardStep] = useState(step ?? "passwordVerification");
+  const [wizardStep, setWizardStep] = useState(step ?? "passwordVerification");
   const [errorCode, setErrorCode] = useState("");
   const errorMessage = getErrorMessage(language, errorCode);
   const loaderPageContentJson = getPageContent(language, PAGES.otpSelection);
   const [userPasswordValue, setUserPasswordValue] = useState("");
   const [fido2Data, setFido2Data] = useState([]);
   const [localLoading, setLocalLoading] = useState(true);
-
+  const [assertionResult, setAssertionResult] = useState(null);
+  console.log("errorCode", errorCode);
   const backToManage2FAVerificationsPage = path(PAGES.manage2FAVerifications, {
     language: language,
   });
@@ -31,14 +33,7 @@ export default function DeleteFIDO2PasskeyPage({ step }) {
     setErrorCode,
     () => {
       if (fido2Data && fido2Data.length > 0) {
-        // Handle case when FIDO2 data exists
-        // Go to access policy OOTB step up
-        navigate(
-          `/${language}/security-settings/manage-2fa-verifications/delete-fido2/${passkeyId}/fido2-verification`,
-          {
-            replace: true,
-          },
-        );
+        setWizardStep("selectFIDO2Passkey");
       } else {
         navigate(backToManage2FAVerificationsPage);
       }
@@ -68,8 +63,20 @@ export default function DeleteFIDO2PasskeyPage({ step }) {
         parentPage={PAGES.deleteFido2Passkey}
       />
     ),
+    selectFIDO2Passkey: (
+      <SelectFIDO2Passkey
+        setAssertionResult={setAssertionResult}
+        setErrorCode={setErrorCode}
+        onCallback={() => {
+          setWizardStep("deleteFIDO2PasskeyConfirmation");
+        }}
+      />
+    ),
     deleteFIDO2PasskeyConfirmation: (
-      <DeleteFIDO2PasskeyConfirm setErrorCode={setErrorCode} />
+      <DeleteFIDO2PasskeyConfirm
+        setErrorCode={setErrorCode}
+        assertionResult={assertionResult}
+      />
     ),
   };
   return localLoading || validatePasswordLoading ? (

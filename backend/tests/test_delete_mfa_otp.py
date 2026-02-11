@@ -16,6 +16,7 @@ from fastapi import HTTPException, status
 from httpx import AsyncClient, Response
 
 profile_import_path = "app.otp.services.delete_mfa_otp.get_my_profile"
+verify_otp_import_path = "app.otp.services.delete_mfa_otp.verify_otp_before_operation"
 
 
 def create_mock_user_factors(num_factors=2):
@@ -35,9 +36,28 @@ def create_mock_user_factors(num_factors=2):
     )
 
 
+def create_deletion_request(
+    factor_id="factor123", otp_type=OtpType.SMS, verification_type=None
+):
+    """Helper function to create OtpDeletionRequest with all required fields"""
+    if verification_type is None:
+        verification_type = otp_type
+    return OtpDeletionRequest(
+        id=factor_id,
+        otpType=otp_type,
+        otp="123456",
+        trxnId="txn123",
+        otpVerificationType=verification_type,
+    )
+
+
 @pytest.mark.asyncio
 async def test_handle_otp_deletion_sms_success(monkeypatch):
     """Test successful SMS OTP factor deletion"""
+
+    # Mock verify_otp_before_operation to succeed
+    async def mock_verify_otp(global_http_client, otp, trxn_id, otp_type):
+        return None  # Success means no exception
 
     # Mock my_profile to return a valid user profile
     async def mock_my_profile(client, token):
@@ -76,6 +96,7 @@ async def test_handle_otp_deletion_sms_success(monkeypatch):
         mock_response.status_code = 204  # No Content for successful deletion
         return mock_response
 
+    monkeypatch.setattr(verify_otp_import_path, mock_verify_otp)
     monkeypatch.setattr(profile_import_path, mock_my_profile)
     monkeypatch.setattr(
         "app.otp.services.delete_mfa_otp.get_user_otp_factors",
@@ -86,7 +107,7 @@ async def test_handle_otp_deletion_sms_success(monkeypatch):
         mock_dispatch_otp_deletion,
     )
 
-    deletion_request = OtpDeletionRequest(id="factor123", otpType=OtpType.SMS)
+    deletion_request = create_deletion_request()
 
     async with AsyncClient(base_url="http://localhost") as client:
         result = await handle_otp_deletion(client, deletion_request, "fake-token")
@@ -102,6 +123,10 @@ async def test_handle_otp_deletion_sms_success(monkeypatch):
 async def test_handle_otp_deletion_voice_success(monkeypatch):
     """Test successful Voice OTP factor deletion"""
 
+    # Mock verify_otp_before_operation to succeed
+    async def mock_verify_otp(global_http_client, otp, trxn_id, otp_type):
+        return None  # Success means no exception
+
     # Mock my_profile to return a valid user profile
     async def mock_my_profile(client, token):
         return ProfileResponse(
@@ -139,6 +164,7 @@ async def test_handle_otp_deletion_voice_success(monkeypatch):
         mock_response.status_code = 204  # No Content for successful deletion
         return mock_response
 
+    monkeypatch.setattr(verify_otp_import_path, mock_verify_otp)
     monkeypatch.setattr(profile_import_path, mock_my_profile)
     monkeypatch.setattr(
         "app.otp.services.delete_mfa_otp.get_user_otp_factors",
@@ -149,7 +175,9 @@ async def test_handle_otp_deletion_voice_success(monkeypatch):
         mock_dispatch_otp_deletion,
     )
 
-    deletion_request = OtpDeletionRequest(id="factor456", otpType=OtpType.VOICE)
+    deletion_request = create_deletion_request(
+        factor_id="factor456", otp_type=OtpType.VOICE
+    )
 
     async with AsyncClient(base_url="http://localhost") as client:
         result = await handle_otp_deletion(client, deletion_request, "fake-token")
@@ -165,6 +193,10 @@ async def test_handle_otp_deletion_voice_success(monkeypatch):
 async def test_handle_otp_deletion_profile_failure(monkeypatch):
     """Test OTP deletion when profile retrieval fails"""
 
+    # Mock verify_otp_before_operation to succeed
+    async def mock_verify_otp(global_http_client, otp, trxn_id, otp_type):
+        return None  # Success means no exception
+
     # Mock my_profile to return failure
     async def mock_my_profile(client, token):
         return ProfileResponse(
@@ -173,9 +205,10 @@ async def test_handle_otp_deletion_profile_failure(monkeypatch):
             data=None,
         )
 
+    monkeypatch.setattr(verify_otp_import_path, mock_verify_otp)
     monkeypatch.setattr(profile_import_path, mock_my_profile)
 
-    deletion_request = OtpDeletionRequest(id="factor123", otpType=OtpType.SMS)
+    deletion_request = create_deletion_request()
 
     async with AsyncClient(base_url="http://localhost") as client:
         result = await handle_otp_deletion(client, deletion_request, "fake-token")
@@ -220,13 +253,18 @@ async def test_handle_otp_deletion_last_factor_protection(monkeypatch):
     async def mock_get_user_otp_factors(client, user_id, token, validated=True):
         return create_mock_user_factors(num_factors=1)
 
+    # Mock verify_otp_before_operation to succeed
+    async def mock_verify_otp(global_http_client, otp, trxn_id, otp_type):
+        return None  # Success means no exception
+
+    monkeypatch.setattr(verify_otp_import_path, mock_verify_otp)
     monkeypatch.setattr(profile_import_path, mock_my_profile)
     monkeypatch.setattr(
         "app.otp.services.delete_mfa_otp.get_user_otp_factors",
         mock_get_user_otp_factors,
     )
 
-    deletion_request = OtpDeletionRequest(id="factor123", otpType=OtpType.SMS)
+    deletion_request = create_deletion_request()
 
     async with AsyncClient(base_url="http://localhost") as client:
         with pytest.raises(HTTPException) as exc_info:
@@ -277,6 +315,11 @@ async def test_handle_otp_deletion_unexpected_status(monkeypatch):
         mock_response.status_code = 200  # Unexpected status for deletion
         return mock_response
 
+    # Mock verify_otp_before_operation to succeed
+    async def mock_verify_otp(global_http_client, otp, trxn_id, otp_type):
+        return None  # Success means no exception
+
+    monkeypatch.setattr(verify_otp_import_path, mock_verify_otp)
     monkeypatch.setattr(profile_import_path, mock_my_profile)
     monkeypatch.setattr(
         "app.otp.services.delete_mfa_otp.get_user_otp_factors",
@@ -287,7 +330,7 @@ async def test_handle_otp_deletion_unexpected_status(monkeypatch):
         mock_dispatch_otp_deletion,
     )
 
-    deletion_request = OtpDeletionRequest(id="factor123", otpType=OtpType.SMS)
+    deletion_request = create_deletion_request()
 
     async with AsyncClient(base_url="http://localhost") as client:
         result = await handle_otp_deletion(client, deletion_request, "fake-token")
@@ -336,6 +379,11 @@ async def test_handle_otp_deletion_exception(monkeypatch):
     async def mock_dispatch_otp_deletion(client, deletion_request):
         raise Exception("Network error")
 
+    # Mock verify_otp_before_operation to succeed
+    async def mock_verify_otp(global_http_client, otp, trxn_id, otp_type):
+        return None  # Success means no exception
+
+    monkeypatch.setattr(verify_otp_import_path, mock_verify_otp)
     monkeypatch.setattr(profile_import_path, mock_my_profile)
     monkeypatch.setattr(
         "app.otp.services.delete_mfa_otp.get_user_otp_factors",
@@ -346,7 +394,7 @@ async def test_handle_otp_deletion_exception(monkeypatch):
         mock_dispatch_otp_deletion,
     )
 
-    deletion_request = OtpDeletionRequest(id="factor123", otpType=OtpType.SMS)
+    deletion_request = create_deletion_request()
 
     async with AsyncClient(base_url="http://localhost") as client:
         with pytest.raises(HTTPException) as exc_info:
@@ -393,7 +441,7 @@ async def test_dispatch_otp_deletion_sms_success(monkeypatch):
         "app.otp.services.delete_mfa_otp.get_configuration", mock_get_configuration
     )
 
-    deletion_request = OtpDeletionRequest(id="factor123", otpType=OtpType.SMS)
+    deletion_request = create_deletion_request()
 
     result = await dispatch_otp_deletion(mock_client, deletion_request)
 
@@ -443,7 +491,9 @@ async def test_dispatch_otp_deletion_voice_success(monkeypatch):
         "app.otp.services.delete_mfa_otp.get_configuration", mock_get_configuration
     )
 
-    deletion_request = OtpDeletionRequest(id="factor456", otpType=OtpType.VOICE)
+    deletion_request = create_deletion_request(
+        factor_id="factor456", otp_type=OtpType.VOICE
+    )
 
     result = await dispatch_otp_deletion(mock_client, deletion_request)
 
@@ -460,7 +510,7 @@ async def test_dispatch_otp_deletion_voice_success(monkeypatch):
 @pytest.mark.asyncio
 async def test_dispatch_otp_deletion_unsupported_type():
     """Test dispatch with unsupported OTP type"""
-    deletion_request = OtpDeletionRequest(id="factor123", otpType=OtpType.EMAIL)
+    deletion_request = create_deletion_request(otp_type=OtpType.EMAIL)
 
     mock_client = AsyncMock(spec=AsyncClient)
 
@@ -522,7 +572,7 @@ async def test_dispatch_otp_deletion_http_error(monkeypatch):
     )
     mock_client.delete.side_effect = http_error
 
-    deletion_request = OtpDeletionRequest(id="factor123", otpType=OtpType.SMS)
+    deletion_request = create_deletion_request()
 
     result = await dispatch_otp_deletion(mock_client, deletion_request)
 
@@ -562,7 +612,7 @@ async def test_dispatch_otp_deletion_generic_exception(monkeypatch):
     mock_client = AsyncMock(spec=AsyncClient)
     mock_client.delete.side_effect = Exception("Connection timeout")
 
-    deletion_request = OtpDeletionRequest(id="factor123", otpType=OtpType.SMS)
+    deletion_request = create_deletion_request()
 
     # Now expecting HTTPException due to our security enhancement
     with pytest.raises(HTTPException) as exc_info:

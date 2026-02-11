@@ -13,6 +13,7 @@ export default function FIDO2PasskeyList({ userFIDO2CredentialsData }) {
   const { language } = useParams();
   const navigate = useNavigate();
   const pageContent = getPageContent(language, PAGES.manage2FAVerifications);
+
   const deletePasskeyPage = path(PAGES.deleteFIDO2PasskeyPage, {
     language: language,
   });
@@ -30,7 +31,7 @@ export default function FIDO2PasskeyList({ userFIDO2CredentialsData }) {
           <strong>{pageContent["16"]}</strong>
           {new Date(created).toLocaleString()}
         </GcdsText>
-        <GcdsGrid columns="max-content max-content" gap="200">
+        <GcdsGrid columns="max-content max-content max-content" gap="200">
           <GcdsButton
             id="rename-fido2-button"
             buttonRole="secondary"
@@ -46,7 +47,9 @@ export default function FIDO2PasskeyList({ userFIDO2CredentialsData }) {
             id="delete-fido2-button"
             buttonRole="secondary"
             onClick={() => {
-              navigate(`${deletePasskeyPage}/${id}`);
+              navigate(`${deletePasskeyPage}`, {
+                state: { passkeyId: id, passkeyNickname: attributes.nickname },
+              });
             }}
           >
             {pageContent["13"]}
