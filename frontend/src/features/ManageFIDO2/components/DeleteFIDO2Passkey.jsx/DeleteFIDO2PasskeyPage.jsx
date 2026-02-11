@@ -10,6 +10,7 @@ import { fetchUserFIDO2Credentials } from "../../utils/fetchUserFIDO2Credentials
 import StepContent from "../../../../components/Wizard/StepContent";
 import Loader from "../../../../components/Layout/Loading";
 import DeleteFIDO2PasskeyConfirm from "./DeleteFIDO2PasskeyConfirm";
+import SelectFIDO2Passkey from "../VerifyFIDO2Passkey/SelectFIDO2Passkey";
 
 export default function DeleteFIDO2PasskeyPage({ step }) {
   const { language } = useParams();
@@ -21,7 +22,8 @@ export default function DeleteFIDO2PasskeyPage({ step }) {
   const [userPasswordValue, setUserPasswordValue] = useState("");
   const [fido2Data, setFido2Data] = useState([]);
   const [localLoading, setLocalLoading] = useState(true);
-
+  const [assertionResult, setAssertionResult] = useState(null);
+  console.log("errorCode", errorCode);
   const backToManage2FAVerificationsPage = path(PAGES.manage2FAVerifications, {
     language: language,
   });
@@ -31,7 +33,7 @@ export default function DeleteFIDO2PasskeyPage({ step }) {
     setErrorCode,
     () => {
       if (fido2Data && fido2Data.length > 0) {
-        setWizardStep("deleteFIDO2PasskeyConfirmation");
+        setWizardStep("selectFIDO2Passkey");
       } else {
         navigate(backToManage2FAVerificationsPage);
       }
@@ -61,8 +63,18 @@ export default function DeleteFIDO2PasskeyPage({ step }) {
         parentPage={PAGES.deleteFido2Passkey}
       />
     ),
+    selectFIDO2Passkey: (
+      <SelectFIDO2Passkey
+        setWizardStep={setWizardStep}
+        setAssertionResult={setAssertionResult}
+        setErrorCode={setErrorCode}
+      />
+    ),
     deleteFIDO2PasskeyConfirmation: (
-      <DeleteFIDO2PasskeyConfirm setErrorCode={setErrorCode} />
+      <DeleteFIDO2PasskeyConfirm
+        setErrorCode={setErrorCode}
+        assertionResult={assertionResult}
+      />
     ),
   };
   return localLoading || validatePasswordLoading ? (

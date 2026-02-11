@@ -13,7 +13,10 @@ import { useState } from "react";
 import { fido2Api } from "../../api/fido2Api";
 import Loader from "../../../../components/Layout/Loading";
 
-export default function DeleteFIDO2PasskeyConfirm({ setErrorCode }) {
+export default function DeleteFIDO2PasskeyConfirm({
+  setErrorCode,
+  assertionResult,
+}) {
   const { language } = useParams();
   const pageContentJson = getPageContent(
     language,
@@ -29,17 +32,26 @@ export default function DeleteFIDO2PasskeyConfirm({ setErrorCode }) {
     language: language,
   });
 
+  console.log(passkeyId);
+
   /**
-   * Handle deleting FIDO2 credential
+   * Handle deleting FIDO2 credential with pre-verified assertion result
    */
   const handleDeleteFIDO2 = async () => {
-    if (!passkeyId) return;
+    if (!passkeyId || !assertionResult) {
+      setErrorCode(errorPageContent["error_delete_credential"]);
+      return;
+    }
 
     setErrorCode("");
     setLocalLoading(true);
 
     try {
-      const response = await fido2Api.deleteRegistration(passkeyId);
+      // Delete the passkey with assertion proof from previous step
+      const response = await fido2Api.deleteRegistration(
+        passkeyId,
+        assertionResult,
+      );
 
       if (response && response.success) {
         navigate(backToManage2FAVerificationsPage, {

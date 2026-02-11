@@ -95,20 +95,22 @@ async def get_registration_details(
     "/registration",
     response_model=FIDO2UserResponseModel,
     summary="Delete FIDO2 registration",
-    description="Delete a FIDO2 registration and return updated user credentials",
+    description="Delete a FIDO2 registration with FIDO2 verification and return updated user credentials",
 )
 async def delete_fido2_registration(
+    request: Request,
     request_data: DeleteRegistrationRequest,
     user_access_token: str = Depends(get_users_current_session),
     http_client: AsyncClient = Depends(get_http_client),
 ):
     """
-    Delete a FIDO2 registration - equivalent to deleteRegistration in JS.
+    Delete a FIDO2 registration with FIDO2 authentication verification.
+    Requires FIDO2 assertion proof before deletion.
     Only allows deletion of registrations owned by the current user.
     Returns updated user credentials after deletion.
     """
     return await delete_registration_service(
-        http_client, user_access_token, request_data
+        request, http_client, user_access_token, request_data
     )
 
 

@@ -4,6 +4,7 @@ Service for deleting FIDO2 registrations (passkeys)
 
 import logging
 from httpx import AsyncClient
+from fastapi import Request
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.request_error_handler import RequestErrorHandler
 from app.constants.verify_endpoints import VerifyAPIEndpoint
@@ -15,22 +16,45 @@ from app.fido2.services.helper_utils import (
     get_user_profile_info,
     verify_registration_ownership,
 )
+from app.fido2.services.authenticate_fido2_registration import (
+    submit_assertion_result,
+)
 from app.utils.schemas import ResponseModel
 
 logger = logging.getLogger(__name__)
 
 
 async def delete_registration(
+    request: Request,
     http_client: AsyncClient,
     user_access_token: str,
     request_data: DeleteRegistrationRequest,
 ) -> ResponseModel:
-    """Delete a FIDO2 registration"""
+    """Delete a FIDO2 registration after verifying with FIDO2 authentication"""
     try:
         tenant_url = get_tenant_url()
         registration_id = request_data.id
 
-        # Get user ID from the token using userinfo endpoint
+        # Step 1: Verify FIDO2 authentication
+        logger.info("Verifying FIDO2 authentication before deletion")
+        assertion_response = await submit_assertion_result(
+            request=request,
+            http_client=http_client,
+            user_access_token=user_access_token,
+            request_body=request_data.assertionResult,
+            return_jwt=True,  # We don't need the JWT for deletion
+        )
+
+        if not assertion_response.success:
+            logger.error("FIDO2 authentication failed")
+            return ResponseModel(
+                success=False,
+                message="FIDO2 authentication required to delete passkey",
+            )
+
+        logger.info("FIDO2 authentication verified successfully")
+
+        # Step 2: Get user ID from the token using userinfo endpoint
         _username, _display_name, user_id = await get_user_profile_info(
             http_client, user_access_token
         )
@@ -43,7 +67,7 @@ async def delete_registration(
             http_client, admin_token, registration_id, user_id
         )
 
-        # Delete the registration
+        # Step 3: Delete the registration
         reg_url = f"{tenant_url}{VerifyAPIEndpoint.FIDO2_REGISTRATIONS.value}/{registration_id}"
         headers = get_auth_request_headers(admin_token, json_content_type=True)
 

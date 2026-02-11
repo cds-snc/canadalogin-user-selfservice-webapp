@@ -32,14 +32,17 @@ export const fido2Api = {
   },
 
   /**
-   * Delete a FIDO2 registration
+   * Delete a FIDO2 registration with FIDO2 verification
    */
-  deleteRegistration: async (registrationId) => {
+  deleteRegistration: async (registrationId, assertionResult) => {
     try {
       const response = await axios.delete(
         `${config.apiUrl}/v1/fido2/registration`,
         {
-          data: { id: registrationId },
+          data: {
+            id: registrationId,
+            assertionResult: assertionResult,
+          },
         },
       );
       return response.data;

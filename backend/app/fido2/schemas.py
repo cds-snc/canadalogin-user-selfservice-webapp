@@ -41,12 +41,6 @@ class FIDO2RegistrationResponseModel(ResponseModel):
     data: Optional[FIDO2RegistrationResponse] = None
 
 
-class DeleteRegistrationRequest(BaseModel):
-    """Request model for deleting a FIDO2 registration"""
-
-    id: str
-
-
 class AttestationOptionsRequest(BaseModel):
     """Request model for getting FIDO2 attestation options"""
 
@@ -106,3 +100,10 @@ class FIDO2AssertionResultRequest(BaseModel):
     type: str
     getClientExtensionResults: Optional[Dict[str, Any]] = None
     authenticatorAttachment: Optional[str] = None
+
+
+class DeleteRegistrationRequest(BaseModel):
+    """Request model for deleting a FIDO2 registration with FIDO2 verification"""
+
+    id: str  # ID of the passkey to delete
+    assertionResult: FIDO2AssertionResultRequest  # FIDO2 authentication proof

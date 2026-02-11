@@ -122,6 +122,7 @@ export const PAGES = {
   addFIDO2PasskeyPage: "AddFIDO2PasskeyPage",
   addFIDO2Passkey: "AddFIDO2Passkey",
   deleteFIDO2PasskeyPage: "DeleteFIDO2PasskeyPage",
+  selectFIDO2Passkey: "SelectFIDO2Passkey",
   deleteFIDO2PasskeyConfirm: "DeleteFIDO2PasskeyConfirm",
   renameFIDO2PasskeyPage: "RenameFIDO2PasskeyPage",
 };
