@@ -72,7 +72,6 @@
     "patch-package": "^8.0.0",
     "playwright": "^1.57.0",
     "prettier": "3.6.2",
-    "prop-types": "^15.8.1",
     "storybook": "^8.6.15",
     "storybook-addon-remix-react-router": "^4.0.1",
     "typescript": "^5.9.3",
