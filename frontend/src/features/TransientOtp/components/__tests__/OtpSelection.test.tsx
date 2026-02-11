@@ -53,7 +53,7 @@ vi.mock("../../../../utils/functions.ts", () => ({
   }),
 }));
 
-vi.mock("../../../../utils/gcHelpCentreLinks.tsx", () => ({
+vi.mock("../../../../utils/gcHelpCentreLinks", () => ({
   gcHelpCentreLinks: {
     twoStepVerification: "https://help.example.com/2fa",
     recover2StepVerification: "https://help.example.com/no-phone",

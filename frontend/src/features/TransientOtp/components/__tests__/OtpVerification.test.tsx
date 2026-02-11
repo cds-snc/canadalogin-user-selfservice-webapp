@@ -480,7 +480,10 @@ describe("OtpVerification Component", () => {
       const input = screen.getByTestId("verificationCode");
       await user.type(input, "123456");
 
-      expect(mockSetUserOtpValue).toHaveBeenCalledTimes(6);
+      await waitFor(() => {
+        const joined = mockSetUserOtpValue.mock.calls.map((c) => c[0]).join("");
+        expect(joined).toBe("123456");
+      });
     });
 
     it("displays the current userOtpValue", () => {

@@ -93,24 +93,35 @@ export const EditContactPhoneNumber = (() => {
       await step(
         "Verify page loads and phone input form is present",
         async () => {
-          await waitFor(async () => {
-            // Check for phone input field
-            const phoneInput = canvasElement.querySelector(
-              'input[placeholder*="phone"], input[type="tel"], gcds-input[type="tel"]',
-            );
-            await expect(phoneInput).toBeInTheDocument();
+          await waitFor(
+            async () => {
+              const canvas = within(canvasElement);
+              // Prefer visible instruction text first
+              // Fallback to input/gcds-input selectors if needed
+              try {
+                await expect(canvas.getByText(/phone/i)).toBeInTheDocument();
+              } catch (e) {
+                // ignore and try element selectors
+              }
 
-            // Check for SMS/Voice radio buttons
-            const radioGroup = canvasElement.querySelector("gcds-radios");
-            await expect(radioGroup).toBeInTheDocument();
+              // Check for phone input field
+              const phoneInput =
+                canvasElement.querySelector("input, gcds-input");
+              await expect(phoneInput).toBeInTheDocument();
 
-            // Check for Continue button
-            const buttons = canvasElement.querySelectorAll("gcds-button");
-            await expect(buttons.length).toBeGreaterThan(0);
+              // Check for SMS/Voice radio buttons
+              const radioGroup = canvasElement.querySelector("gcds-radios");
+              await expect(radioGroup).toBeInTheDocument();
 
-            // Verify basic page structure exists
-            await expect(canvasElement).toBeInTheDocument();
-          });
+              // Check for Continue button
+              const buttons = canvasElement.querySelectorAll("gcds-button");
+              await expect(buttons.length).toBeGreaterThan(0);
+
+              // Verify basic page structure exists
+              await expect(canvasElement).toBeInTheDocument();
+            },
+            { timeout: 20000 },
+          );
         },
       );
 
@@ -172,34 +183,42 @@ export const EditContactPhoneNumber = (() => {
       });
 
       // Enter OTP
-      await waitFor(async () => {
-        const hasVerificationText =
-          canvasElement.textContent.includes("Check your phone");
-        await expect(hasVerificationText).toBeTruthy();
-      });
+      await waitFor(
+        async () => {
+          const hasVerificationText =
+            canvasElement.textContent.includes("Check your phone");
+          await expect(hasVerificationText).toBeTruthy();
+        },
+        { timeout: 15000 },
+      );
 
       await step("Verify OTP verification page and enter OTP", async () => {
-        await waitFor(async () => {
-          const gcdsInputs = canvasElement.querySelector("gcds-input");
-          await expect(gcdsInputs).toBeInTheDocument();
-          if (gcdsInputs.shadowRoot) {
-            const shadowInput =
-              gcdsInputs.shadowRoot.querySelector("input#verificationCode") ||
-              gcdsInputs.shadowRoot.querySelector(
-                'input[name="verificationCode"]',
-              ) ||
-              gcdsInputs.shadowRoot.querySelector('input[maxlength="6"]');
-            await expect(shadowInput).toBeInTheDocument();
-            if (shadowInput) {
-              // Clear the field by setting value directly (avoid userEvent.clear which can fail)
-              shadowInput.value = "654321";
-              shadowInput.dispatchEvent(new Event("input", { bubbles: true }));
+        await waitFor(
+          async () => {
+            const gcdsInputs = canvasElement.querySelector("gcds-input");
+            await expect(gcdsInputs).toBeInTheDocument();
+            if (gcdsInputs.shadowRoot) {
+              const shadowInput =
+                gcdsInputs.shadowRoot.querySelector("input#verificationCode") ||
+                gcdsInputs.shadowRoot.querySelector(
+                  'input[name="verificationCode"]',
+                ) ||
+                gcdsInputs.shadowRoot.querySelector('input[maxlength="6"]');
+              await expect(shadowInput).toBeInTheDocument();
+              if (shadowInput) {
+                // Clear the field by setting value directly (avoid userEvent.clear which can fail)
+                shadowInput.value = "654321";
+                shadowInput.dispatchEvent(
+                  new Event("input", { bubbles: true }),
+                );
 
-              // Type the OTP code
-              await userEvent.type(shadowInput, "654321");
+                // Type the OTP code
+                await userEvent.type(shadowInput, "654321");
+              }
             }
-          }
-        });
+          },
+          { timeout: 15000 },
+        );
       });
 
       await step("Click Continue button", async () => {

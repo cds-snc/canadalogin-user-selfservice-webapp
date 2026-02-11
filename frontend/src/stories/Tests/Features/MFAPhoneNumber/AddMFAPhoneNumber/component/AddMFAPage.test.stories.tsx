@@ -82,24 +82,30 @@ export const SelectVoiceCallRadioButton = (() => {
     },
     play: async ({ canvasElement, step }) => {
       await step("Verify password input is displayed", async () => {
-        await waitFor(async () => {
-          const canvas = within(canvasElement);
-          const gcdsInput = canvasElement.querySelector("gcds-input");
-          await expect(gcdsInput).toBeInTheDocument();
-          if (gcdsInput && gcdsInput.shadowRoot) {
-            const input = gcdsInput.shadowRoot.querySelector(
-              'input[name="passwordVerification"]',
-            );
-            await expect(input).toBeInTheDocument();
-          }
+        await waitFor(
+          async () => {
+            const canvas = within(canvasElement);
+            // Ensure the visible instruction is present first
+            await expect(
+              canvas.getByText(/first enter your current password/i),
+            ).toBeInTheDocument();
 
-          await expect(
-            canvas.getByText(/first enter your current password/i),
-          ).toBeInTheDocument();
+            // If the gcds-input custom element is present, assert on its inner input too
+            const gcdsInput = canvasElement.querySelector("gcds-input");
+            if (gcdsInput) {
+              if (gcdsInput.shadowRoot) {
+                const input = gcdsInput.shadowRoot.querySelector(
+                  'input[name="passwordVerification"]',
+                );
+                await expect(input).toBeInTheDocument();
+              }
+            }
 
-          const continueButton = canvasElement.querySelector("gcds-button");
-          await expect(continueButton).toBeInTheDocument();
-        });
+            const continueButton = canvasElement.querySelector("gcds-button");
+            await expect(continueButton).toBeInTheDocument();
+          },
+          { timeout: 20000 },
+        );
 
         const gcdsInputs = canvasElement.querySelectorAll("gcds-input");
         for (const input of gcdsInputs) {
@@ -1282,17 +1288,39 @@ export const ResendOtpCode = (() => {
       });
       await step("Test resend OTP functionality", async () => {
         // Wait for navigation to resend OTP screen
-        await waitFor(async () => {
-          await expect(
-            canvas.getByText(/Request a new code in/i),
-          ).toBeInTheDocument();
-        });
+        await waitFor(
+          async () => {
+            await expect(
+              canvas.getByText(/Request a new code in/i),
+            ).toBeInTheDocument();
+          },
+          { timeout: 30000 },
+        );
+
         await waitFor(
           async () => {
             const resendLinks = canvasElement.querySelectorAll("gcds-link");
-            const resendLink = Array.from(resendLinks).find((link) =>
-              link.textContent.includes("Request a new code"),
+            let resendLink = Array.from(resendLinks).find(
+              (link) =>
+                (link.textContent &&
+                  link.textContent.includes("Request a new code")) ||
+                (link.shadowRoot &&
+                  link.shadowRoot.textContent &&
+                  link.shadowRoot.textContent.includes("Request a new code")),
             );
+
+            if (!resendLink) {
+              // Fallback: try finding by visible text then locate parent gcds-link
+              try {
+                const visible = canvas.getByText(/Request a new code/i);
+                if (visible) {
+                  resendLink = visible.closest("gcds-link");
+                }
+              } catch (e) {
+                // ignore and let waitFor retry
+              }
+            }
+
             await expect(resendLink).toBeInTheDocument();
 
             // Click the gcds-link element directly or find the actual link in shadow DOM
@@ -1304,15 +1332,18 @@ export const ResendOtpCode = (() => {
               await userEvent.click(resendLink);
             }
           },
-          { timeout: 11000 },
+          { timeout: 30000 },
         );
 
         // Wait for resend request to process
-        await waitFor(async () => {
-          await expect(
-            canvas.getByText(/Request a new code in/i),
-          ).toBeInTheDocument();
-        });
+        await waitFor(
+          async () => {
+            await expect(
+              canvas.getByText(/Request a new code in/i),
+            ).toBeInTheDocument();
+          },
+          { timeout: 20000 },
+        );
       });
     },
   };

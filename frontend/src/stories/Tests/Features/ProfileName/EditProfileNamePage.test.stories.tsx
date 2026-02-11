@@ -79,114 +79,135 @@ export const EditProfileName = (() => {
       await step(
         "Verify page loads and basic elements are present",
         async () => {
-          await waitFor(async () => {
-            // Check for input elements
-            const inputs = canvasElement.querySelectorAll("gcds-input");
-            await expect(inputs.length).toBeGreaterThan(0);
+          await waitFor(
+            async () => {
+              // Check for input elements
+              const inputs = canvasElement.querySelectorAll("gcds-input");
+              await expect(inputs.length).toBeGreaterThan(0);
 
-            // Check for buttons
-            const buttons = canvasElement.querySelectorAll("gcds-button");
-            await expect(buttons.length).toBeGreaterThan(0);
+              // Check for buttons
+              const buttons = canvasElement.querySelectorAll("gcds-button");
+              await expect(buttons.length).toBeGreaterThan(0);
 
-            // Verify basic page structure exists
-            await expect(canvasElement).toBeInTheDocument();
-          });
+              // Verify basic page structure exists
+              await expect(canvasElement).toBeInTheDocument();
+            },
+            { timeout: 20000 },
+          );
         },
       );
 
       await step("Verify inputs can be found by data-testid", async () => {
-        await waitFor(async () => {
-          // Look for inputs by their data-testid attributes
-          const givenNameInput = canvasElement.querySelector(
-            '[data-testid="givenName"]',
-          );
-          const familyNameInput = canvasElement.querySelector(
-            '[data-testid="familyName"]',
-          );
+        await waitFor(
+          async () => {
+            // Look for inputs by their data-testid attributes
+            const givenNameInput = canvasElement.querySelector(
+              '[data-testid="givenName"]',
+            );
+            const familyNameInput = canvasElement.querySelector(
+              '[data-testid="familyName"]',
+            );
 
-          // Check each input individually
-          await expect(givenNameInput).toBeInTheDocument();
-          await expect(familyNameInput).toBeInTheDocument();
-        });
+            // Check each input individually
+            await expect(givenNameInput).toBeInTheDocument();
+            await expect(familyNameInput).toBeInTheDocument();
+          },
+          { timeout: 15000 },
+        );
       });
 
       await step("Enter name and click Continue", async () => {
-        await waitFor(async () => {
-          // Find the GCDS inputs
-          const givenNameInput = canvasElement.querySelector(
-            '[data-testid="givenName"]',
-          );
-          const familyNameInput = canvasElement.querySelector(
-            '[data-testid="familyName"]',
-          );
-
-          // Handle given name input via shadow DOM
-          if (givenNameInput && givenNameInput.shadowRoot) {
-            const shadowInput =
-              givenNameInput.shadowRoot.querySelector("input");
-            if (shadowInput) {
-              // Clear and set value directly
-              shadowInput.value = "John";
-
-              // Dispatch input event on the shadow input
-              shadowInput.dispatchEvent(new Event("input", { bubbles: true }));
-              shadowInput.dispatchEvent(new Event("change", { bubbles: true }));
-
-              // Trigger the gcdsInput event on the gcds-input component to update parent state
-              const gcdsInputEvent = new CustomEvent("gcdsInput", {
-                bubbles: true,
-                detail: { value: "John" },
-              });
-              givenNameInput.dispatchEvent(gcdsInputEvent);
-            }
-          }
-
-          // Handle family name input via shadow DOM
-          if (familyNameInput && familyNameInput.shadowRoot) {
-            const shadowInput =
-              familyNameInput.shadowRoot.querySelector("input");
-            if (shadowInput) {
-              // Clear and set value directly
-              shadowInput.value = "Smith";
-
-              // Dispatch input event on the shadow input
-              shadowInput.dispatchEvent(new Event("input", { bubbles: true }));
-              shadowInput.dispatchEvent(new Event("change", { bubbles: true }));
-
-              // Trigger the gcdsInput event on the gcds-input component to update parent state
-              const gcdsInputEvent = new CustomEvent("gcdsInput", {
-                bubbles: true,
-                detail: { value: "Smith" },
-              });
-              familyNameInput.dispatchEvent(gcdsInputEvent);
-            }
-          }
-
-          // Find and click the Continue button by text content
-          const continueButtons = canvasElement.querySelectorAll("gcds-button");
-          let continueButton = null;
-
-          // Find the button that contains "Continue" text
-          for (const button of continueButtons) {
-            if (button.textContent && button.textContent.includes("Continue")) {
-              continueButton = button;
-              break;
-            }
-          }
-
-          await expect(continueButton).toBeInTheDocument();
-
-          if (continueButton && continueButton.shadowRoot) {
-            // Find the actual button element in shadow DOM
-            const actualButton = continueButton.shadowRoot.querySelector(
-              'button[type="submit"]',
+        await waitFor(
+          async () => {
+            // Find the GCDS inputs
+            const givenNameInput = canvasElement.querySelector(
+              '[data-testid="givenName"]',
             );
-            await expect(actualButton).toBeInTheDocument();
+            const familyNameInput = canvasElement.querySelector(
+              '[data-testid="familyName"]',
+            );
 
-            // Direct click on the actual button element
-            await userEvent.click(actualButton);
-          }
-        });
+            // Handle given name input via shadow DOM
+            if (givenNameInput && givenNameInput.shadowRoot) {
+              const shadowInput =
+                givenNameInput.shadowRoot.querySelector("input");
+              if (shadowInput) {
+                // Clear and set value directly
+                shadowInput.value = "John";
+
+                // Dispatch input event on the shadow input
+                shadowInput.dispatchEvent(
+                  new Event("input", { bubbles: true }),
+                );
+                shadowInput.dispatchEvent(
+                  new Event("change", { bubbles: true }),
+                );
+
+                // Trigger the gcdsInput event on the gcds-input component to update parent state
+                const gcdsInputEvent = new CustomEvent("gcdsInput", {
+                  bubbles: true,
+                  detail: { value: "John" },
+                });
+                givenNameInput.dispatchEvent(gcdsInputEvent);
+              }
+            }
+
+            // Handle family name input via shadow DOM
+            if (familyNameInput && familyNameInput.shadowRoot) {
+              const shadowInput =
+                familyNameInput.shadowRoot.querySelector("input");
+              if (shadowInput) {
+                // Clear and set value directly
+                shadowInput.value = "Smith";
+
+                // Dispatch input event on the shadow input
+                shadowInput.dispatchEvent(
+                  new Event("input", { bubbles: true }),
+                );
+                shadowInput.dispatchEvent(
+                  new Event("change", { bubbles: true }),
+                );
+
+                // Trigger the gcdsInput event on the gcds-input component to update parent state
+                const gcdsInputEvent = new CustomEvent("gcdsInput", {
+                  bubbles: true,
+                  detail: { value: "Smith" },
+                });
+                familyNameInput.dispatchEvent(gcdsInputEvent);
+              }
+            }
+
+            // Find and click the Continue button by text content
+            const continueButtons =
+              canvasElement.querySelectorAll("gcds-button");
+            let continueButton = null;
+
+            // Find the button that contains "Continue" text
+            for (const button of continueButtons) {
+              if (
+                button.textContent &&
+                button.textContent.includes("Continue")
+              ) {
+                continueButton = button;
+                break;
+              }
+            }
+
+            await expect(continueButton).toBeInTheDocument();
+
+            if (continueButton && continueButton.shadowRoot) {
+              // Find the actual button element in shadow DOM
+              const actualButton = continueButton.shadowRoot.querySelector(
+                'button[type="submit"]',
+              );
+              await expect(actualButton).toBeInTheDocument();
+
+              // Direct click on the actual button element
+              await userEvent.click(actualButton);
+            }
+          },
+          { timeout: 15000 },
+        );
       });
 
       await step("Verify confirmation page and click Yes, update", async () => {

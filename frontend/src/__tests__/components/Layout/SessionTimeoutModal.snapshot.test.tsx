@@ -94,17 +94,32 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
 }));
 
 vi.mock("../../../utils/functions.ts", () => ({
-  getPageContent: vi.fn(() => ({
-    1: "Your session is about to end due to inactivity",
-    2: "If you do not continue your session you will be signed out automatically",
-    3: "Do you wish to continue your session?",
-    4: "Stay signed in",
-    5: "Sign out",
-    6: "Extending...",
-    7: "Signing you out...",
-    8: "Your session will expire at {{time}}.",
-  })),
-  formatTime: vi.fn(() => "12:34:56"),
+  getPageContent: vi.fn((language) => {
+    const en = {
+      1: "Your session is about to end due to inactivity ",
+      2: "If you do not continue your session you will be signed out automatically",
+      3: "Do you wish to continue your session?",
+      4: "Stay signed in",
+      5: "Sign out",
+      6: "Extending...",
+      7: "Signing you out...",
+      8: "Your session will expire at {{time}}.",
+    };
+
+    const fr = {
+      1: "Votre session est sur le point de se terminer en raison d'une inactivité",
+      2: "Si vous ne poursuivez pas votre session, vous serez automatiquement déconnecté",
+      3: "Souhaitez-vous poursuivre votre session ?",
+      4: "Rester connecté",
+      5: "Se déconnecter",
+      6: "Prolongation...",
+      7: "Déconnexion en cours...",
+      8: "Votre session expirera à {{time}}.",
+    };
+
+    return language === "fr" ? fr : en;
+  }),
+  formatTime: vi.fn(() => "04:34:56 AM"),
 }));
 
 vi.mock("../../../utils/faviconUtils.js", () => ({

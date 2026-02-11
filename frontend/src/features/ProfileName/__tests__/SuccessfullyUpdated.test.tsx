@@ -150,7 +150,7 @@ vi.mock("../../../utils/routeHelpers.js", () => ({
   path: (page, params) => `/${params.language}/${page}`,
 }));
 
-vi.mock("../../../services/authService.tsx", () => ({
+vi.mock("../../../services/authService", () => ({
   authService: {
     logout: vi.fn(() =>
       Promise.resolve({
@@ -160,7 +160,7 @@ vi.mock("../../../services/authService.tsx", () => ({
   },
 }));
 
-vi.mock("../../../utils/userProfileDispatch.tsx", () => ({
+vi.mock("../../../utils/userProfileDispatch", () => ({
   userProfileDispatch: () => ({ setLoading: mockSetLoading }),
 }));
 
@@ -292,6 +292,7 @@ describe("SuccessfullyUpdatedName", () => {
 
     await act(async () => {
       signOutButton.click();
+      await Promise.resolve();
     });
 
     expect(mockSetLoading).toHaveBeenCalledWith(true, "Signing out...");
@@ -313,6 +314,7 @@ describe("SuccessfullyUpdatedName", () => {
 
     await act(async () => {
       signOutButton.click();
+      await Promise.resolve();
     });
 
     // Wait for the logout to complete
@@ -326,7 +328,7 @@ describe("SuccessfullyUpdatedName", () => {
 
   it("handles logout error gracefully", async () => {
     // Mock authService.logout to throw an error
-    const mockAuthService = await import("../../../services/authService.tsx");
+    const mockAuthService = await import("../../../services/authService");
     vi.mocked(mockAuthService.authService.logout).mockRejectedValueOnce(
       new Error("Network error"),
     );
@@ -346,6 +348,7 @@ describe("SuccessfullyUpdatedName", () => {
 
     await act(async () => {
       signOutButton.click();
+      await Promise.resolve();
     });
 
     // Wait for error handling
