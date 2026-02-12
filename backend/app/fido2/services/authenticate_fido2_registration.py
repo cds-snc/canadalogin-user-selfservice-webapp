@@ -16,8 +16,11 @@ from app.fido2.services.helper_utils import (
     get_user_profile_info,
 )
 from app.fido2.schemas import AssertionOptionsRequest, FIDO2AssertionResultRequest
+import base64
 
-# from app.auth.services.auth_user_session import update_session_tokens
+from app.auth.services.auth_user_session import (
+    introspect_user_token,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -131,93 +134,95 @@ async def submit_assertion_result(
         response_data = response.json()
         logger.info("Assertion result submitted successfully")
 
-        # # Store FIDO2 JWT in session if requested (useful for step-up authentication)
-        # if return_jwt and "assertion" in response_data:
-        #     fido2_jwt = response_data["assertion"]
-        #     request.session["fido2_auth_jwt"] = fido2_jwt
-        #     logger.info("FIDO2 authentication JWT stored in session for step-up auth")
+        # Store FIDO2 JWT in session if requested (useful for step-up authentication)
+        if return_jwt and "assertion" in response_data:
+            fido2_jwt = response_data["assertion"]
+            request.session["fido2_auth_jwt"] = fido2_jwt
+            logger.info("FIDO2 authentication JWT stored in session for step-up auth")
 
-        #     # Exchange the FIDO2 JWT for OAuth access token, then update session
-        #     try:
-        #         logger.info("Step 1: Exchanging FIDO2 JWT for OAuth access token")
+            # Exchange the FIDO2 JWT for OAuth access token, then update session
+            try:
+                logger.info("Step 1: Exchanging FIDO2 JWT for OAuth access token")
 
-        #         # Get configuration for client credentials
-        #         from app.config import get_configuration
+                # Get configuration for client credentials
+                from app.config import get_configuration
 
-        #         settings = get_configuration()
+                settings = get_configuration()
 
-        #         # Step 1: Token exchange to get OAuth access token from FIDO2 JWT
-        #         token_exchange_url = (
-        #             f"{tenant_url}{VerifyAPIEndpoint.GET_ACCESS_TOKEN.value}"
-        #         )
+                # Step 1: Token exchange to get OAuth access token from FIDO2 JWT
 
-        #         token_exchange_data = {
-        #             "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
-        #             "subject_token": fido2_jwt,
-        #             "subject_token_type": "urn:ietf:params:oauth:token-type:jwt",
-        #             "client_id": settings.ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_API_CLIENT_ID,
-        #             "client_secret": settings.ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_API_SECRET,
-        #         }
+                client_creds = f"{settings.ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID}:{settings.ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_SECRET}"
+                basic_auth = base64.b64encode(client_creds.encode()).decode()
 
-        #         token_exchange_headers = {
-        #             "Content-Type": "application/x-www-form-urlencoded",
-        #             "Accept": "application/json",
-        #         }
+                token_exchange_url = (
+                    f"{tenant_url}{VerifyAPIEndpoint.GET_ACCESS_TOKEN.value}"
+                )
 
-        #         token_response = await http_client.post(
-        #             token_exchange_url,
-        #             data=token_exchange_data,
-        #             headers=token_exchange_headers,
-        #         )
+                token_exchange_data = {
+                    "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
+                    "subject_token": fido2_jwt,
+                    "subject_token_type": "urn:gc:token-type:fido2",
+                    "requested_token_type": "urn:ietf:params:oauth:token-type:access_token",
+                }
 
-        #         logger.info(
-        #             f"Token exchange response status: {token_response.status_code}"
-        #         )
-        #         logger.info(f"Token exchange response body: {token_response.text}")
-        #         token_response.raise_for_status()
+                token_exchange_headers = {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "Accept": "application/json",
+                    "Authorization": f"Basic {basic_auth}",
+                }
 
-        #         token_data = token_response.json()
-        #         oauth_access_token = token_data.get("access_token")
+                token_response = await http_client.post(
+                    token_exchange_url,
+                    data=token_exchange_data,
+                    headers=token_exchange_headers,
+                )
 
-        #         if not oauth_access_token:
-        #             raise Exception("No access_token in token exchange response")
+                logger.info(
+                    f"Token exchange response status: {token_response.status_code}"
+                )
+                logger.info(f"Token exchange response body: {token_response.text}")
+                token_response.raise_for_status()
 
-        #         logger.info("Successfully exchanged FIDO2 JWT for OAuth access token")
+                token_data = token_response.json()
+                oauth_access_token = token_data.get("access_token")
 
-        #         # Step 2: Use the OAuth access token to establish session
-        #         logger.info("Step 2: Using OAuth access token to establish session")
-        #         exchange_url = (
-        #             f"{tenant_url}{VerifyAPIEndpoint.EXCHANGE_TOKEN_SESSION.value}"
-        #         )
+                await introspect_user_token(http_client, oauth_access_token)
+                # update_session_tokens(request, token_data)
 
-        #         session_data = {"access_token": oauth_access_token}
-        #         session_headers = {
-        #             "Content-Type": "application/x-www-form-urlencoded",
-        #             "Accept": "application/json",
-        #         }
+                if not oauth_access_token:
+                    raise Exception("No access_token in token exchange response")
 
-        #         session_response = await http_client.post(
-        #             exchange_url, data=session_data, headers=session_headers
-        #         )
+                logger.info("Successfully exchanged FIDO2 JWT for OAuth access token")
 
-        #         logger.info(f"Session response status: {session_response.status_code}")
-        #         logger.info(f"Session response body: {session_response.text}")
-        #         session_response.raise_for_status()
+                # Step 2: Use the OAuth access token to establish session
+                logger.info("Step 2: Using OAuth access token to establish session")
+                exchange_url = (
+                    f"{tenant_url}{VerifyAPIEndpoint.EXCHANGE_TOKEN_SESSION.value}"
+                )
 
-        #         new_tokens = session_response.json()
-        #         logger.info("Successfully obtained new session tokens")
+                session_data = {"access_token": oauth_access_token}
+                session_headers = {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "Accept": "application/json",
+                }
 
-        #         # Update session with new tokens that include FIDO2 in AMR claims
-        #         update_session_tokens(request, new_tokens)
-        #         logger.info("Session updated with FIDO2-authenticated tokens")
+                session_response = await http_client.post(
+                    exchange_url, data=session_data, headers=session_headers
+                )
 
-        #     except Exception as exchange_error:
-        #         logger.error(
-        #             f"Error in token exchange process: {str(exchange_error)}",
-        #             exc_info=True,
-        #         )
-        #         # Don't fail the whole request if token exchange fails
-        #         # The assertion was successful, just log the error
+                logger.info(f"Session response status: {session_response.status_code}")
+                session_response.raise_for_status()
+
+                # Update session with new tokens that include FIDO2 in AMR claims
+                logger.info("Session updated with FIDO2-authenticated tokens")
+
+            except Exception as exchange_error:
+                logger.error(
+                    f"Error in token exchange process: {str(exchange_error)}",
+                    exc_info=True,
+                )
+                # Don't fail the whole request if token exchange fails
+                # The assertion was successful, just log the error
 
         return ResponseModel(
             success=True,
