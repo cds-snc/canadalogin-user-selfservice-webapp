@@ -12,18 +12,26 @@ import { getPageContent } from "../../../utils/functions";
 import { EXTERNAL_NAVIGATION_LINKS, PAGES } from "../../../utils/constants";
 import SubmitButton from "../../../components/Layout/SubmitButton";
 
+import { FormEvent } from "react";
+
+type SuccessfullyUpdatedProps = {
+  onNext: () => Promise<void> | void;
+  onCancel: () => void;
+  phoneFormData?: { formattedPhoneNumber?: string };
+};
+
 export default function SuccessfullyUpdated({
   onNext,
   onCancel,
   phoneFormData,
-}) {
+}: SuccessfullyUpdatedProps) {
   const { language } = useParams();
   const pageContentJson = getPageContent(
     language,
     PAGES.successfullyUpdatedContactPhoneNumber,
   );
 
-  const onSubmitHandler = async (ev) => {
+  const onSubmitHandler = async (ev: FormEvent) => {
     ev.preventDefault();
     onNext();
   };

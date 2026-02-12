@@ -12,9 +12,15 @@ import parsePhoneNumberFromString from "libphonenumber-js";
 import { PAGES } from "../../../utils/constants";
 import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 import VerifiedBadge from "../../../components/Badges/VerifiedBadge";
-import { path } from "../../../utils/routeHelpers";
+import { path } from "../../../utils/routeHelpers.ts";
 
-const DisplayPhoneNumbers = ({ phoneNumbers }) => {
+type PhoneNumber = { value: string };
+
+type DisplayPhoneNumbersProps = {
+  phoneNumbers: PhoneNumber[];
+};
+
+const DisplayPhoneNumbers = ({ phoneNumbers }: DisplayPhoneNumbersProps) => {
   return (
     <>
       <GcdsGrid columns="1fr">
@@ -48,7 +54,11 @@ const DisplayPhoneNumbers = ({ phoneNumbers }) => {
   );
 };
 
-const AddPhoneNumber = (props) => {
+type AddPhoneNumberProps = {
+  pageContent: Record<string, string>;
+  language?: string;
+};
+const AddPhoneNumber = (props: AddPhoneNumberProps) => {
   const { pageContent, language } = props;
   const navigateHelper = useNavigateHelper();
   const newContactPhoneNumber = path(PAGES.editContactPhoneNumberPage, {
@@ -69,7 +79,12 @@ const AddPhoneNumber = (props) => {
   );
 };
 
-const ContactPhoneNumber = (props) => {
+type ContactPhoneNumberProps = {
+  pageContent: Record<string, string>;
+  phoneNumbers: PhoneNumber[];
+  language?: string;
+};
+const ContactPhoneNumber = (props: ContactPhoneNumberProps) => {
   const { pageContent, phoneNumbers, language } = props;
   const newContactPhoneNumber = path(PAGES.editContactPhoneNumberPage, {
     language: language,
@@ -85,7 +100,7 @@ const ContactPhoneNumber = (props) => {
         <GcdsLink
           href={newContactPhoneNumber}
           size="regular"
-          onGcdsClick={(ev) => {
+          onGcdsClick={(ev: any) => {
             ev.preventDefault();
             navigateHelper(ev.detail);
           }}
@@ -98,7 +113,14 @@ const ContactPhoneNumber = (props) => {
   );
 };
 
-export default function ViewContactPhoneNumber({ pageContent, phoneNumbers }) {
+type ViewContactPhoneNumberProps = {
+  pageContent: Record<string, string>;
+  phoneNumbers: PhoneNumber[] | null;
+};
+export default function ViewContactPhoneNumber({
+  pageContent,
+  phoneNumbers,
+}: ViewContactPhoneNumberProps) {
   const { language } = useParams();
   return (
     <GcdsContainer>

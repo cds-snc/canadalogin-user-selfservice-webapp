@@ -15,18 +15,31 @@ import { PAGES, LANGUAGE_DISPLAY_NAMES } from "../../../utils/constants";
 import RPNameDisplay from "../../../components/RPInfo/RPNameDisplay";
 import SubmitButton from "../../../components/Layout/SubmitButton";
 
+import { FormEvent } from "react";
+
+type ConfirmUpdateProps = {
+  languageFormData: {
+    languageCode?: string;
+    updatedPreferredLanguage?: string;
+  };
+  onConfirm: () => Promise<void> | void;
+  onCancel: () => void;
+  errorMessage?: string | null;
+  localLoading?: boolean;
+};
+
 export default function ConfirmUpdate({
   languageFormData,
   onConfirm,
   onCancel,
   errorMessage,
   localLoading,
-}) {
+}: ConfirmUpdateProps) {
   const { language } = useParams();
 
   const pageContentJson = getPageContent(language, PAGES.confirmLanguageUpdate);
 
-  const onSubmitHandler = async (ev) => {
+  const onSubmitHandler = async (ev: FormEvent) => {
     ev.preventDefault();
     await onConfirm();
   };

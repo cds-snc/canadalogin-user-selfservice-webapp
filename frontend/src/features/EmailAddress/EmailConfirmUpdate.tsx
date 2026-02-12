@@ -8,16 +8,29 @@ import {
   GcdsHeading,
   GcdsText,
 } from "@cdssnc/gcds-components-react";
-import RPNameDisplay from "../../components/RPInfo/RPNameDisplay";
 import SubmitButton from "../../components/Layout/SubmitButton";
+import RPNameDisplay from "../../components/RPInfo/RPNameDisplay";
+import { FormEvent } from "react";
 
-export default function EmailConfirmUpdate({ formData, onSubmit, onCancel }) {
+type EmailConfirmUpdateProps = {
+  onSubmit: () => Promise<void> | void;
+  onCancel: () => void;
+  formData: { emailAddress?: string };
+  setFormData?: (f: { emailAddress?: string }) => void;
+  errorMessage?: string | null;
+};
+
+export default function EmailConfirmUpdate({
+  onSubmit,
+  onCancel,
+  formData,
+}: EmailConfirmUpdateProps) {
   const { language } = useParams();
 
   const pageContentJson = getPageContent(language, PAGES.emailConfirmUpdate);
   const { cancel } = getPageContent(language, "Button");
 
-  const onSubmitHandler = async (ev) => {
+  const onSubmitHandler = async (ev: FormEvent) => {
     ev.preventDefault();
     await onSubmit();
   };

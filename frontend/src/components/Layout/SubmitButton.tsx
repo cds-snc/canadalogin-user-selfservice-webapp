@@ -1,5 +1,15 @@
 import { GcdsButton } from "@cdssnc/gcds-components-react";
 import { getPageContent } from "../../utils/functions";
+import { ReactNode, CSSProperties, KeyboardEventHandler } from "react";
+
+type SubmitButtonProps = {
+  currentLang?: string;
+  disabled?: boolean;
+  onGcdsClick?: (...args: any[]) => void;
+  style?: CSSProperties;
+  children?: ReactNode;
+  onKeyDown?: KeyboardEventHandler<HTMLButtonElement>;
+} & Record<string, unknown>;
 
 export default function SubmitButton({
   currentLang,
@@ -9,7 +19,7 @@ export default function SubmitButton({
   children,
   onKeyDown,
   ...props
-}) {
+}: SubmitButtonProps) {
   const { submit } = getPageContent(currentLang, "Button");
 
   return (
@@ -19,7 +29,7 @@ export default function SubmitButton({
       onGcdsClick={onGcdsClick}
       onKeyDown={onKeyDown}
       style={style}
-      {...props}
+      {...(props as Record<string, any>)}
     >
       {children || submit}
     </GcdsButton>

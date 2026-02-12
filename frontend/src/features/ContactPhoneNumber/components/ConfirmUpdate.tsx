@@ -15,6 +15,17 @@ import { PAGES } from "../../../utils/constants";
 import RPNameDisplay from "../../../components/RPInfo/RPNameDisplay";
 import SubmitButton from "../../../components/Layout/SubmitButton";
 
+import { FormEvent } from "react";
+
+type ConfirmUpdateProps = {
+  onNext: () => Promise<void> | void;
+  phoneFormData: { formattedPhoneNumber?: string };
+  onCancel: () => void;
+  errorMessage?: string | null;
+  setErrorCode?: (code: string) => void;
+  localLoading?: boolean;
+};
+
 export default function ConfirmUpdate({
   onNext,
   phoneFormData,
@@ -22,13 +33,13 @@ export default function ConfirmUpdate({
   errorMessage,
   setErrorCode,
   localLoading,
-}) {
+}: ConfirmUpdateProps) {
   const { language } = useParams();
   const pageContentJson = getPageContent(
     language,
     PAGES.confirmContactPhoneNumberUpdate,
   );
-  const onSubmitHandler = async (ev) => {
+  const onSubmitHandler = async (ev: FormEvent) => {
     ev.preventDefault();
     // Clear error when user clicks
     if (setErrorCode) {

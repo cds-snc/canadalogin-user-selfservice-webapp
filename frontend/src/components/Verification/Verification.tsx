@@ -8,7 +8,7 @@ import {
   GcdsStepper,
   GcdsText,
 } from "@cdssnc/gcds-components-react";
-import { getPageContent, isCodeValid } from "../../utils/functions";
+import { getPageContent, isCodeValid } from "../../utils/functions.ts";
 import {
   AVAILABLE_LANGUAGES,
   FLOW_TYPES,
@@ -21,7 +21,7 @@ import { useParams } from "react-router";
 import SubmitButton from "../Layout/SubmitButton";
 import { useUser } from "../Providers/useUser.tsx";
 import { useEffect, useState } from "react";
-import { useLinkSubmit } from "../../hooks/useLinkSubmit";
+import { useLinkSubmit } from "../../hooks/useLinkSubmit.tsx";
 import { useSubmit } from "../../hooks/useSubmit";
 import { useError } from "../../hooks/useError";
 const initialTime = 10;

@@ -18,11 +18,19 @@ import { getPageContent } from "../../../../utils/functions";
 import { path } from "../../../../utils/routeHelpers";
 import SubmitButton from "../../../../components/Layout/SubmitButton";
 
+import { ChangeEvent } from "react";
+
+type RadioButtonsProps = {
+  onChangePhoneForm: (key: string, value: any) => void;
+  pageContentJson: Record<string, string>;
+  phoneFormData: { otpType?: string };
+};
+
 const RadioButtons = ({
   onChangePhoneForm,
   pageContentJson,
   phoneFormData,
-}) => {
+}: RadioButtonsProps) => {
   const configureRadioOptions = () => {
     let radioOptionsValues = [];
 
@@ -57,14 +65,17 @@ const RadioButtons = ({
       hint={pageContentJson["15"]}
       options={radioOptions}
       required={true}
-      onGcdsChange={(e) => {
+      onGcdsChange={(e: ChangeEvent<HTMLInputElement>) => {
         onChangePhoneForm("otpType", e.target.value);
       }}
     ></GcdsRadios>
   );
 };
 
-const MyCountryIsNotListed = ({ pageContentJson }) => {
+type MyCountryIsNotListedProps = { pageContentJson: Record<string, string> };
+const MyCountryIsNotListed = ({
+  pageContentJson,
+}: MyCountryIsNotListedProps) => {
   return (
     <GcdsText>
       <GcdsDetails detailsTitle={pageContentJson["8"]}>
@@ -76,6 +87,19 @@ const MyCountryIsNotListed = ({ pageContentJson }) => {
   );
 };
 
+type AddMFAPhoneNumberProps = {
+  onNext: () => Promise<void> | void;
+  onCancel: () => void;
+  onChangePhoneForm: (key: string, value: any) => void;
+  phoneFormData: {
+    phoneNumber?: string;
+    formattedPhoneNumber?: string;
+    otpType?: string;
+  };
+  setErrorCode: (code: string) => void;
+  errorMessage?: string | null;
+};
+
 export default function AddMFAPhoneNumber({
   onNext,
   onCancel,
@@ -83,7 +107,7 @@ export default function AddMFAPhoneNumber({
   phoneFormData,
   setErrorCode,
   errorMessage,
-}) {
+}: AddMFAPhoneNumberProps) {
   const { language } = useParams();
   const [phoneNumberValid, setPhoneNumberValid] = useState(true);
   const pageContentJson = getPageContent(language, PAGES.addMFANumber);
@@ -96,7 +120,7 @@ export default function AddMFAPhoneNumber({
     return validatedPhoneNumber;
   };
 
-  const onSubmitHandler = async (ev) => {
+  const onSubmitHandler = async (ev: Event) => {
     ev.preventDefault();
     try {
       setErrorCode("");

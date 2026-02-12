@@ -35,7 +35,13 @@ export const MfaDeletedWithPhoneNumber = {
   render: () => (
     <NoticeFactory noticeType="mfaDeleted" phoneNumber="+1 (555) 123-4567" />
   ),
-  play: async ({ canvasElement, step }) => {
+  play: async ({
+    canvasElement,
+    step,
+  }: {
+    canvasElement: HTMLElement;
+    step: any;
+  }) => {
     const canvas = within(canvasElement);
 
     await step("Verify notice renders", async () => {
@@ -73,7 +79,13 @@ export const MfaDeletedWithoutPhoneNumber = {
     },
   },
   render: () => <NoticeFactory noticeType="mfaDeleted" />,
-  play: async ({ canvasElement, step }) => {
+  play: async ({
+    canvasElement,
+    step,
+  }: {
+    canvasElement: HTMLElement;
+    step: any;
+  }) => {
     await step("Verify notice renders", async () => {
       const { notice } = await waitForGcdsNotice(canvasElement);
       await expect(notice).toBeInTheDocument();
@@ -114,7 +126,13 @@ export const MfaAddedWithSMS = {
       otpType="sms"
     />
   ),
-  play: async ({ canvasElement, step }) => {
+  play: async ({
+    canvasElement,
+    step,
+  }: {
+    canvasElement: HTMLElement;
+    step: any;
+  }) => {
     const canvas = within(canvasElement);
 
     await step("Verify notice renders", async () => {
@@ -167,7 +185,13 @@ export const MfaAddedWithVoice = {
       otpType="voice"
     />
   ),
-  play: async ({ canvasElement, step }) => {
+  play: async ({
+    canvasElement,
+    step,
+  }: {
+    canvasElement: HTMLElement;
+    step: any;
+  }) => {
     const canvas = within(canvasElement);
 
     await step("Verify notice renders", async () => {
@@ -201,7 +225,13 @@ export const MfaAddedWithoutPhoneNumber = {
     },
   },
   render: () => <NoticeFactory noticeType="mfaAdded" otpType="sms" />,
-  play: async ({ canvasElement, step }) => {
+  play: async ({
+    canvasElement,
+    step,
+  }: {
+    canvasElement: HTMLElement;
+    step: any;
+  }) => {
     await step("Verify notice renders", async () => {
       const { notice } = await waitForGcdsNotice(canvasElement);
       await expect(notice).toBeInTheDocument();
@@ -238,7 +268,13 @@ export const MfaAddedWithoutOtpType = {
   render: () => (
     <NoticeFactory noticeType="mfaAdded" phoneNumber="+1 (555) 333-4444" />
   ),
-  play: async ({ canvasElement, step }) => {
+  play: async ({
+    canvasElement,
+    step,
+  }: {
+    canvasElement: HTMLElement;
+    step: any;
+  }) => {
     const canvas = within(canvasElement);
 
     await step("Verify notice renders", async () => {
@@ -276,7 +312,13 @@ export const MfaDeletedFrench = {
   render: () => (
     <NoticeFactory noticeType="mfaDeleted" phoneNumber="+1 (555) 777-8888" />
   ),
-  play: async ({ canvasElement, step }) => {
+  play: async ({
+    canvasElement,
+    step,
+  }: {
+    canvasElement: HTMLElement;
+    step: any;
+  }) => {
     const canvas = within(canvasElement);
 
     await step("Verify notice renders in French context", async () => {
@@ -313,7 +355,13 @@ export const VerifyGcdsNoticeAttributes = {
   render: () => (
     <NoticeFactory noticeType="mfaDeleted" phoneNumber="+1 (555) 999-0000" />
   ),
-  play: async ({ canvasElement, step }) => {
+  play: async ({
+    canvasElement,
+    step,
+  }: {
+    canvasElement: HTMLElement;
+    step: any;
+  }) => {
     await step("Verify GcdsNotice renders", async () => {
       const { notice } = await waitForGcdsNotice(canvasElement);
       await expect(notice).toBeInTheDocument();
@@ -357,7 +405,13 @@ export const VerifyMfaAddedStructure = {
       otpType="sms"
     />
   ),
-  play: async ({ canvasElement, step }) => {
+  play: async ({
+    canvasElement,
+    step,
+  }: {
+    canvasElement: HTMLElement;
+    step: any;
+  }) => {
     await step("Verify component hierarchy", async () => {
       // Wait for notice and text elements to be rendered
       await waitForGcdsNotice(canvasElement, { minTextCount: 2 });
@@ -406,7 +460,13 @@ export const EmptyPhoneNumberHandling = {
     },
   },
   render: () => <NoticeFactory noticeType="mfaDeleted" phoneNumber="" />,
-  play: async ({ canvasElement, step }) => {
+  play: async ({
+    canvasElement,
+    step,
+  }: {
+    canvasElement: HTMLElement;
+    step: any;
+  }) => {
     await step("Verify component renders with empty phone number", async () => {
       const { notice } = await waitForGcdsNotice(canvasElement);
       await expect(notice).toBeInTheDocument();

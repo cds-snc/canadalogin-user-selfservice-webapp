@@ -10,11 +10,11 @@ import {
   GcdsGrid,
   GcdsLink,
 } from "@cdssnc/gcds-components-react";
-import { getPageContent } from "../../../utils/functions";
+import { getPageContent } from "../../../utils/functions.ts";
 import { EXTERNAL_NAVIGATION_LINKS, PAGES } from "../../../utils/constants";
 import { useUser } from "../../../components/Providers/useUser.tsx";
 import { authService } from "../../../services/authService";
-import { userProfileDispatch } from "../../../utils/userProfileDispatch";
+import { userProfileDispatch } from "../../../utils/userProfileDispatch.ts";
 import SubmitButton from "../../../components/Layout/SubmitButton";
 
 export default function SuccessfullyUpdated({ nameFormData, onBackToProfile }) {

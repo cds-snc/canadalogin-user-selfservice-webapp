@@ -1,6 +1,11 @@
 import { GcdsContainer, GcdsHeading } from "@cdssnc/gcds-components-react";
+import { ReactNode } from "react";
 
-export default function Loader({ text }) {
+type LoaderProps = {
+  text?: ReactNode;
+};
+
+export default function Loader({ text }: LoaderProps) {
   return (
     <>
       <GcdsContainer className="page-loader">

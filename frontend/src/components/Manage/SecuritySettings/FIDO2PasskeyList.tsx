@@ -8,8 +8,21 @@ import { useNavigate, useParams } from "react-router";
 import { PAGES } from "../../../utils/constants";
 import { getPageContent } from "../../../utils/functions";
 import { path } from "../../../utils/routeHelpers";
+import { ReactNode } from "react";
 
-export default function FIDO2PasskeyList({ userFIDO2CredentialsData }) {
+type Credential = {
+  id: string;
+  attributes: { nickname?: string };
+  created: string | number;
+};
+
+type FIDO2PasskeyListProps = {
+  userFIDO2CredentialsData?: Credential[];
+};
+
+export default function FIDO2PasskeyList({
+  userFIDO2CredentialsData = [],
+}: FIDO2PasskeyListProps) {
   const { language } = useParams();
   const navigate = useNavigate();
   const pageContent = getPageContent(language, PAGES.manage2FAVerifications);
@@ -21,7 +34,7 @@ export default function FIDO2PasskeyList({ userFIDO2CredentialsData }) {
     language: language,
   });
 
-  return userFIDO2CredentialsData.map(({ id, attributes, created }) => {
+  return (userFIDO2CredentialsData || []).map(({ id, attributes, created }) => {
     return (
       <GcdsContainer key={id}>
         <GcdsText>

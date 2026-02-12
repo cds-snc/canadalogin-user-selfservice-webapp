@@ -3,9 +3,9 @@ import { expect } from "vitest";
 import "@testing-library/jest-dom";
 import { AVAILABLE_LANGUAGES, FLOW_TYPES, SERVICES } from "../utils/constants";
 import { getFooter } from "../utils/functions";
-// @ts-ignore
+// @ts-expect-error: allow importing JSON modules for test content
 import * as engJson from "../locales/en/en.json";
-// @ts-ignore
+// @ts-expect-error: allow importing JSON modules for test content
 import * as frJson from "../locales/fr/fr.json";
 import { PAGES } from "../utils/constants";
 import { page } from "@vitest/browser/context";

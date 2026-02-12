@@ -14,6 +14,20 @@ import { getPageContent } from "../../utils/functions";
 import SubmitButton from "../../components/Layout/SubmitButton";
 
 const initialTime = 10;
+import { ChangeEvent, FormEvent } from "react";
+
+type EmailOtpValidationProps = {
+  onSubmit: () => Promise<void> | void;
+  onCancel: () => void;
+  formData: { emailAddress?: string };
+  setFormData: (f: { emailAddress?: string }) => void;
+  errorMessage?: string | null;
+  userOtpValue?: string;
+  handleChange: (value: string) => void;
+  requestOtpCode?: () => Promise<void> | void;
+  onBack: () => void;
+};
+
 export default function EmailOtpValidation({
   onSubmit,
   onCancel,
@@ -24,7 +38,7 @@ export default function EmailOtpValidation({
   handleChange,
   requestOtpCode,
   onBack,
-}) {
+}: EmailOtpValidationProps) {
   const { language } = useParams();
   const pageContentJson = getPageContent(language, PAGES.emailOtpValidation);
   const { cancel } = getPageContent(language, "Button");
@@ -36,17 +50,17 @@ export default function EmailOtpValidation({
     setFormData({ emailAddress: "" });
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     handleChange(value);
   };
 
-  const onSubmitHandler = async (ev) => {
+  const onSubmitHandler = async (ev: FormEvent) => {
     ev.preventDefault();
     await onSubmit();
   };
 
-  const handleResendCode = async (ev) => {
+  const handleResendCode = async (ev: FormEvent) => {
     ev.preventDefault();
     if (requestOtpCode) {
       await requestOtpCode();

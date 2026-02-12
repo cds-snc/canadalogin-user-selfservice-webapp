@@ -15,8 +15,13 @@ import { useUser } from "../Providers/useUser";
 import { PAGES } from "../../utils/constants";
 import { authService } from "../../services/authService";
 import { userProfileDispatch } from "../../utils/userProfileDispatch";
+import { MouseEvent } from "react";
 
-export default function TopNav({ currentLang }) {
+type TopNavProps = {
+  currentLang?: string;
+};
+
+export default function TopNav({ currentLang }: TopNavProps) {
   const pageContentJson = getPageContent(currentLang, "TopNavBar");
   const { state, dispatch } = useUser();
   const { setLoading } = userProfileDispatch(dispatch);
@@ -33,7 +38,7 @@ export default function TopNav({ currentLang }) {
     language: currentLang,
   });
 
-  const handleLogout = async (e) => {
+  const handleLogout = async (e: MouseEvent) => {
     e.preventDefault();
     setLoading(true, pageContentJson["8"]); // Use logout loading text
     try {

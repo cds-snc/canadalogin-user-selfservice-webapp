@@ -12,7 +12,6 @@ export default {
     layout: "fullscreen",
   },
   decorators: [
-    // eslint-disable-next-line no-unused-vars
     (Story) => (
       <UserProvider>
         <LanguageProvider>

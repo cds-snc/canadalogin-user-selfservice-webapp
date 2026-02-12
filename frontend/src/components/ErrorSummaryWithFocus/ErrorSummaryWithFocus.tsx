@@ -2,6 +2,7 @@ import { GcdsErrorSummary } from "@cdssnc/gcds-components-react";
 import { useEffect, useRef } from "react";
 import { getPageContent } from "../../utils/functions";
 import { PAGES } from "../../utils/constants";
+import { ReactNode, MutableRefObject } from "react";
 
 /**
  * A reusable error summary component that automatically scrolls to and focuses
@@ -16,6 +17,15 @@ import { PAGES } from "../../utils/constants";
  * @param {boolean} [props.autoFocus=true] - Whether to auto-scroll and focus (default: true)
  * @param {Object} [props.otherProps] - Any other props to pass to GcdsErrorSummary
  */
+type ErrorSummaryWithFocusProps = {
+  errorCode?: string | null;
+  language?: string;
+  id?: string;
+  errorLinks?: Record<string, string>;
+  autoFocus?: boolean;
+  [key: string]: any;
+};
+
 export default function ErrorSummaryWithFocus({
   errorCode,
   language,
@@ -23,8 +33,10 @@ export default function ErrorSummaryWithFocus({
   errorLinks,
   autoFocus = true,
   ...otherProps
-}) {
-  const errorSummaryRef = useRef(null);
+}: ErrorSummaryWithFocusProps) {
+  const errorSummaryRef = useRef<HTMLElement | null>(
+    null,
+  ) as MutableRefObject<HTMLElement | null>;
 
   // Get error page content internally
   const errorPageJson = getPageContent(language, PAGES.error);
@@ -68,7 +80,7 @@ export default function ErrorSummaryWithFocus({
   }
 
   // Default error links structure if not provided
-  const defaultErrorLinks = {
+  const defaultErrorLinks: Record<string, string> = {
     "#error-href-1": errorMessage,
   };
 

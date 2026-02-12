@@ -6,11 +6,17 @@ import {
   ServicesWithAccessInfoSectionInformation,
 } from "../../utils/constants";
 import RPNameDisplay from "../RPInfo/RPNameDisplay";
+import { ReactNode } from "react";
+
+type ServicesWithAccessInfoSectionProps = {
+  currentLang?: string;
+  information: keyof typeof ServicesWithAccessInfoSectionInformation;
+};
 
 export default function ServicesWithAccessInfoSection({
   currentLang,
   information,
-}) {
+}: ServicesWithAccessInfoSectionProps) {
   const pageContentJson = getPageContent(
     currentLang,
     PAGES.ServicesWithAccessInfo,

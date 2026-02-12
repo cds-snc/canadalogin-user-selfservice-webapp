@@ -9,8 +9,8 @@ import { useParams } from "react-router";
 import { useError } from "../../hooks/useError";
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
 import { PAGES } from "../../utils/constants";
-import { getPageContent } from "../../utils/functions";
-import { path } from "../../utils/routeHelpers";
+import { getPageContent } from "../../utils/functions.ts";
+import { path } from "../../utils/routeHelpers.ts";
 import { useUser } from "../Providers/useUser.tsx";
 
 export default function ManageDashboard() {

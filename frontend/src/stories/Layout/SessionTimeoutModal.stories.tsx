@@ -12,11 +12,6 @@ The SessionTimeoutModal component displays a warning dialog when a user's sessio
 It provides options to extend the session or sign out, and automatically manages favicon changes to alert the user.
 
 **Key Features:**
-- Responsive design (desktop/mobile layouts)
-- Internationalization support (English/French)
-- Favicon warning indicator
-- Loading states during actions
-- Accessibility compliant modal
         `,
       },
     },

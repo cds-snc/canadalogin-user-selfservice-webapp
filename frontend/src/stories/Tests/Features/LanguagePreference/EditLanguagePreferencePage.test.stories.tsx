@@ -72,7 +72,13 @@ export const EditLanguagePreference = (() => {
         dangerouslyIgnoreUnhandledErrors: true,
       },
     },
-    play: async ({ canvasElement, step }) => {
+    play: async ({
+      canvasElement,
+      step,
+    }: {
+      canvasElement: HTMLElement;
+      step: any;
+    }) => {
       await step(
         "Verify page loads and basic elements are present",
         async () => {

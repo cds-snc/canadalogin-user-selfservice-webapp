@@ -58,7 +58,13 @@ export const ConfirmationPageDisplay = {
       dangerouslyIgnoreUnhandledErrors: true,
     },
   },
-  play: async ({ canvasElement, step }) => {
+  play: async ({
+    canvasElement,
+    step,
+  }: {
+    canvasElement: HTMLElement;
+    step: any;
+  }) => {
     await step("Verify confirmation heading is displayed", async () => {
       // Wait for the heading to be rendered - no hardcoded timeout needed
       await waitFor(
@@ -92,7 +98,13 @@ export const DeleteButtonPresent = {
       dangerouslyIgnoreUnhandledErrors: true,
     },
   },
-  play: async ({ canvasElement, step }) => {
+  play: async ({
+    canvasElement,
+    step,
+  }: {
+    canvasElement: HTMLElement;
+    step: any;
+  }) => {
     await step(
       "Verify delete button exists and has danger styling",
       async () => {
@@ -123,7 +135,13 @@ export const CancelButtonPresent = {
       dangerouslyIgnoreUnhandledErrors: true,
     },
   },
-  play: async ({ canvasElement, step }) => {
+  play: async ({
+    canvasElement,
+    step,
+  }: {
+    canvasElement: HTMLElement;
+    step: any;
+  }) => {
     await step(
       "Verify cancel button exists and has secondary styling",
       async () => {

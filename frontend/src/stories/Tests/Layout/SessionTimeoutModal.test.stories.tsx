@@ -35,7 +35,13 @@ export default {
 // Simple test to just verify component renders
 export const ComponentRenders = {
   name: "Component renders successfully",
-  play: async ({ canvasElement, step }) => {
+  play: async ({
+    canvasElement,
+    step,
+  }: {
+    canvasElement: HTMLElement;
+    step: any;
+  }) => {
     await step("Verify component exists", async () => {
       // Wait for the modal to be rendered using our helper function
       const { modal } = await waitForModal({ canvasElement });
@@ -64,7 +70,13 @@ export const ComponentRenders = {
 // Test clicking the "Stay signed in" button
 export const ClickStaySignedInButton = {
   name: "Click Stay signed in button",
-  play: async ({ canvasElement, step }) => {
+  play: async ({
+    canvasElement,
+    step,
+  }: {
+    canvasElement: HTMLElement;
+    step: any;
+  }) => {
     await step("Find and click the stay signed in button", async () => {
       // Wait for modal and buttons to be rendered
       await waitForModal({ canvasElement });
@@ -100,7 +112,13 @@ export const ClickStaySignedInButton = {
 // Test clicking the "Sign out" button
 export const ClickSignOutButton = {
   name: "Click Sign out button",
-  play: async ({ canvasElement, step }) => {
+  play: async ({
+    canvasElement,
+    step,
+  }: {
+    canvasElement: HTMLElement;
+    step: any;
+  }) => {
     await step("Find and click the sign out button", async () => {
       // Wait for modal and buttons to be rendered
       await waitForModal({ canvasElement });
@@ -145,7 +163,13 @@ export const LoadingState = {
   args: {
     isLoading: true,
   },
-  play: async ({ canvasElement, step }) => {
+  play: async ({
+    canvasElement,
+    step,
+  }: {
+    canvasElement: HTMLElement;
+    step: any;
+  }) => {
     await step("Verify loading state", async () => {
       // Wait for modal and buttons to be rendered
       await waitForModal({ canvasElement });
@@ -182,7 +206,13 @@ export const LoadingState = {
 // Test modal content
 export const ModalContentDisplay = {
   name: "Modal content displays correctly",
-  play: async ({ canvasElement, step }) => {
+  play: async ({
+    canvasElement,
+    step,
+  }: {
+    canvasElement: HTMLElement;
+    step: any;
+  }) => {
     await step("Verify modal header and warning icon", async () => {
       // Wait for modal to be rendered
       const { modal } = await waitForModal({ canvasElement });
@@ -230,7 +260,13 @@ export const FrenchLanguage = {
   args: {
     currentLang: "fr",
   },
-  play: async ({ canvasElement, step }) => {
+  play: async ({
+    canvasElement,
+    step,
+  }: {
+    canvasElement: HTMLElement;
+    step: any;
+  }) => {
     await step("Verify modal renders with French language", async () => {
       // Wait for modal and buttons to be rendered
       const { modal } = await waitForModal({

@@ -7,12 +7,12 @@ import Password from "./Password";
 import PasswordChangedConfirmation from "./PasswordChangedConfirmation";
 
 import { PAGES } from "../../../utils/constants";
-import { userProfileDispatch } from "../../../utils/userProfileDispatch";
+import { userProfileDispatch } from "../../../utils/userProfileDispatch.ts";
 import { getErrorMessage } from "../../../utils/errorUtils";
 import { authService } from "../../../services/authService";
 
-import { getPageContent } from "../../../utils/functions";
-import { path } from "../../../utils/routeHelpers";
+import { getPageContent } from "../../../utils/functions.ts";
+import { path } from "../../../utils/routeHelpers.ts";
 import OtpSelection from "../../TransientOtp/components/OtpSelection";
 import OtpVerification from "../../TransientOtp/components/OtpVerification";
 import { passwordUpdate } from "../api/passwordUpdate";

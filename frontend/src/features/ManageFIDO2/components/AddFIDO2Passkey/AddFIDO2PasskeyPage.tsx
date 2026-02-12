@@ -21,7 +21,13 @@ import Loader from "../../../../components/Layout/Loading";
 import AddFIDO2Passkey from "./AddFIDO2Passkey";
 import SelectFIDO2Passkey from "../VerifyFIDO2Passkey/SelectFIDO2Passkey";
 
-export default function AddFIDO2PasskeyPage({ step }) {
+type AddFIDO2PasskeyPageProps = {
+  step?: string;
+};
+
+export default function AddFIDO2PasskeyPage({
+  step,
+}: AddFIDO2PasskeyPageProps) {
   const { language } = useParams();
   const { state } = useUser();
   const navigate = useNavigate();

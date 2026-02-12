@@ -1,6 +1,11 @@
 import { GcdsContainer } from "@cdssnc/gcds-components-react";
+import { ReactNode } from "react";
 
-export default function EnabledBadge({ text }) {
+type EnabledBadgeProps = {
+  text?: ReactNode;
+};
+
+export default function EnabledBadge({ text }: EnabledBadgeProps) {
   return (
     <GcdsContainer>
       <div

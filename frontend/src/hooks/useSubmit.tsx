@@ -36,7 +36,7 @@ export function useSubmit(
   submitDataOptions: SubmitDataOptions,
   validateFunction: any,
 ) {
-  const { state, dispatch } = useUser();
+  const { state, dispatch: _dispatch } = useUser();
   const navigate = useNavigate();
   const [isPending, startTransition] = useTransition();
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -108,11 +108,7 @@ function setSubmitData(formData: FormData) {
   return submitData;
 }
 
-function setNavigateTo(
-  submitDataOptions: SubmitDataOptions,
-  response: any,
-  submitData: SubmitData,
-) {
+function setNavigateTo(submitDataOptions: SubmitDataOptions) {
   switch (submitDataOptions.flow + submitDataOptions.page) {
     default:
       return submitDataOptions.navigateTo;
@@ -181,7 +177,7 @@ export async function callAuthService(
   }
 }
 
-function setUserData(
+function _setUserData(
   submitDataOptions: SubmitDataOptions,
   submitData: SubmitData,
   userData: any,

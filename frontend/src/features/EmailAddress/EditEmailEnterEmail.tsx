@@ -14,28 +14,43 @@ import {
 } from "@cdssnc/gcds-components-react";
 import ServicesWithAccessInfoSection from "../../components/InfoBlocks/ServicesWithAccessInfoSection";
 import SubmitButton from "../../components/Layout/SubmitButton";
+import { ChangeEvent, FormEvent } from "react";
+
+type EditEmailEnterEmailProps = {
+  onSubmit: (email: string) => Promise<void> | void;
+  onCancel: () => void;
+  formData: { emailAddress?: string };
+  setFormData?: (f: { emailAddress?: string }) => void;
+  // Legacy prop name used in some tests / callers
+  handleFormChange?: (f: { emailAddress?: string }) => void;
+  errorMessage?: string | null;
+  setErrorCode?: (code: string | null) => void;
+};
 
 export default function EditEmailEnterEmail({
   onSubmit,
   onCancel,
-  handleFormChange,
   formData,
+  setFormData,
+  handleFormChange,
   errorMessage,
   setErrorCode,
-}) {
+}: EditEmailEnterEmailProps) {
   const { language } = useParams();
   const pageContentJson = getPageContent(language, PAGES.editEmailEnterEmail);
   const { cancel } = getPageContent(language, "Button");
 
-  const onSubmitHandler = async (ev) => {
+  const onSubmitHandler = async (ev: FormEvent) => {
     ev.preventDefault();
     const emailAddress = formData?.emailAddress || "";
     await onSubmit(emailAddress);
   };
 
-  const handleInputChange = (ev) => {
-    setErrorCode(""); // Clear any existing errors
-    handleFormChange(ev);
+  const handleInputChange = (ev: ChangeEvent<HTMLInputElement>) => {
+    if (setErrorCode) setErrorCode(""); // Clear any existing errors
+    const value = (ev.target as HTMLInputElement).value;
+    const setter = setFormData ?? handleFormChange;
+    if (setter) setter({ emailAddress: value });
   };
 
   return (

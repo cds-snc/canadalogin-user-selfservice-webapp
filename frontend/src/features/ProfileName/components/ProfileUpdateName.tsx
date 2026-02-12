@@ -1,5 +1,6 @@
 import React from "react";
 import { useParams } from "react-router";
+import { ChangeEvent, KeyboardEvent, FormEvent } from "react";
 import {
   GcdsButton,
   GcdsContainer,
@@ -17,6 +18,17 @@ import {
 import SubmitButton from "../../../components/Layout/SubmitButton";
 import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection";
 
+type NameFormData = { givenName?: string; familyName?: string };
+
+type ProfileUpdateNameProps = {
+  nameFormData: NameFormData;
+  onNameFormChange: (name: string, value: string) => void;
+  onNext: () => Promise<void> | void;
+  onCancel: () => void;
+  errorMessage?: string | null;
+  setErrorCode?: (code: string) => void;
+};
+
 export default function ProfileUpdateName({
   nameFormData,
   onNameFormChange,
@@ -24,19 +36,19 @@ export default function ProfileUpdateName({
   onCancel,
   errorMessage,
   setErrorCode,
-}) {
+}: ProfileUpdateNameProps) {
   const { language } = useParams();
   const pageNameEditJson = getPageContent(language, PAGES.profileUpdateName);
 
-  const validateCharacter = (char) => {
+  const validateCharacter = (char: string) => {
     // Check if a single character is valid for names
     const charRegex =
       /[a-zA-ZÀ-ÿĀ-žА-я\u0100-\u017F\u0180-\u024F\u1E00-\u1EFF\s'-]/;
     return charRegex.test(char);
   };
 
-  const handleKeyUp = (e) => {
-    const { name } = e.target;
+  const handleKeyUp = (e: KeyboardEvent<HTMLInputElement>) => {
+    const name = (e.currentTarget && e.currentTarget.name) || "";
     const char = e.key;
 
     // Only apply validation to name fields
@@ -46,13 +58,14 @@ export default function ProfileUpdateName({
         e.preventDefault();
         return;
       }
-      handleProfileChange(e);
+      handleProfileChange(e as unknown as ChangeEvent<HTMLInputElement>);
     }
   };
 
   // onChange handler with validation for paste operations, etc.
-  const handleProfileChange = (e) => {
-    const { name, value } = e.target;
+  const handleProfileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const name = e.currentTarget.name;
+    const value = e.currentTarget.value;
 
     // Apply validation to name fields
     if (name === "givenName" || name === "familyName") {
@@ -63,8 +76,6 @@ export default function ProfileUpdateName({
 
       // Only update if the filtered value is different from original
       if (filteredValue !== value) {
-        // Set the filtered value back to the input
-        e.target.value = filteredValue;
         onNameFormChange(name, filteredValue);
       } else {
         onNameFormChange(name, value);
@@ -78,7 +89,7 @@ export default function ProfileUpdateName({
     }
   };
 
-  const onSubmitHandler = async (ev) => {
+  const onSubmitHandler = async (ev: FormEvent) => {
     ev.preventDefault();
     await onNext();
   };

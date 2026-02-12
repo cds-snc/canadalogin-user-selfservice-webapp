@@ -7,14 +7,14 @@ import {
   GcdsLink,
 } from "@cdssnc/gcds-components-react";
 
-import { getPageContent } from "../../utils/functions";
+import { getPageContent } from "../../utils/functions.ts";
 import { PAGES, VITE_ENVIRONMENTS } from "../../utils/constants";
 import { useUser } from "../Providers/useUser.tsx";
 import VerifiedBadge from "../Badges/VerifiedBadge";
 import ViewContactPhoneNumber from "../../features/ContactPhoneNumber/components/ViewContactPhoneNumber";
 import ViewNameCard from "../../features/ProfileName/components/ViewProfileNameCard";
 import ViewLanguagePreferences from "../../features/LanguagePreference/components/ViewLanguagePreference";
-import { path } from "../../utils/routeHelpers";
+import { path } from "../../utils/routeHelpers.ts";
 import config from "../../config";
 
 const DisplayEmailInfo = ({ email, pageContent, language }) => {

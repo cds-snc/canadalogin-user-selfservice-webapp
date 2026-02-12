@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import { useUser } from "../../../components/Providers/useUser.tsx";
-import { getPageContent } from "../../../utils/functions";
+import { getPageContent } from "../../../utils/functions.ts";
 import {
   PAGES,
   FLOW_TYPES,
   INVALID_OTP_ERROR_CODES,
 } from "../../../utils/constants";
-import { path } from "../../../utils/routeHelpers";
+import { path } from "../../../utils/routeHelpers.ts";
 import { authService } from "../../../services/authService";
-import { userProfileDispatch } from "../../../utils/userProfileDispatch";
+import { userProfileDispatch } from "../../../utils/userProfileDispatch.ts";
 import StepContent from "../../../components/Wizard/StepContent";
 import Loader from "../../../components/Layout/Loading";
 import EnterPhoneNumber from "./EnterPhoneNumber";

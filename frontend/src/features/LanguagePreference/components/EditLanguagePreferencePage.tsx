@@ -4,11 +4,11 @@ import { useUser } from "../../../components/Providers/useUser.tsx";
 import {
   getPageContent,
   convertLanguageToLanguageCode,
-} from "../../../utils/functions";
+} from "../../../utils/functions.ts";
 import { PAGES } from "../../../utils/constants";
-import { path } from "../../../utils/routeHelpers";
+import { path } from "../../../utils/routeHelpers.ts";
 import { authService } from "../../../services/authService";
-import { userProfileDispatch } from "../../../utils/userProfileDispatch";
+import { userProfileDispatch } from "../../../utils/userProfileDispatch.ts";
 import StepContent from "../../../components/Wizard/StepContent";
 import Loader from "../../../components/Layout/Loading";
 import EditLanguagePreferences from "./EditLanguagePreferences";

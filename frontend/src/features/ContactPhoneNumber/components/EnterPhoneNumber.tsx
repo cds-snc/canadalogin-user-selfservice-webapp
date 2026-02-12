@@ -25,7 +25,14 @@ import {
 import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection";
 import SubmitButton from "../../../components/Layout/SubmitButton";
 
-const PageHeader = ({ language, pageContentJson }) => {
+import { ChangeEvent, FormEvent } from "react";
+
+type PageHeaderProps = {
+  language?: string;
+  pageContentJson: Record<string, string>;
+};
+
+const PageHeader = ({ language, pageContentJson }: PageHeaderProps) => {
   return (
     <>
       <GcdsHeading tag="h1" lang={language}>
@@ -42,7 +49,10 @@ const PageHeader = ({ language, pageContentJson }) => {
   );
 };
 
-const MyCountryIsNotListed = ({ pageContentJson }) => {
+type MyCountryIsNotListedProps = { pageContentJson: Record<string, string> };
+const MyCountryIsNotListed = ({
+  pageContentJson,
+}: MyCountryIsNotListedProps) => {
   return (
     <GcdsText>
       <GcdsDetails detailsTitle={pageContentJson["11"]}>
@@ -54,12 +64,19 @@ const MyCountryIsNotListed = ({ pageContentJson }) => {
   );
 };
 
+type RadioButtonsProps = {
+  onChangePhoneForm: (key: string, value: any) => void;
+  pageContentJson: Record<string, string>;
+  phoneFormData: { otpType?: string };
+  setErrorCode?: (code: string) => void;
+};
+
 const RadioButtons = ({
   onChangePhoneForm,
   pageContentJson,
   phoneFormData,
   setErrorCode,
-}) => {
+}: RadioButtonsProps) => {
   const configureRadioOptions = () => {
     let radioOptionsValues = [];
 
@@ -93,7 +110,7 @@ const RadioButtons = ({
       legend={pageContentJson["5"]}
       hint={pageContentJson["13"]}
       options={radioOptions}
-      onGcdsChange={(e) => {
+      onGcdsChange={(e: ChangeEvent<HTMLInputElement>) => {
         onChangePhoneForm("otpType", e.target.value);
         // Clear error when user makes selection
         if (setErrorCode) {
@@ -104,6 +121,19 @@ const RadioButtons = ({
   );
 };
 
+type EnterPhoneNumberProps = {
+  onNext: () => Promise<void> | void;
+  onCancel: () => void;
+  onChangePhoneForm: (key: string, value: any) => void;
+  phoneFormData: {
+    phoneNumber?: string;
+    formattedPhoneNumber?: string;
+    otpType?: string;
+  };
+  errorMessage?: string | null;
+  setErrorCode?: (code: string) => void;
+};
+
 export default function EnterPhoneNumber({
   onNext,
   onCancel,
@@ -111,7 +141,7 @@ export default function EnterPhoneNumber({
   phoneFormData,
   errorMessage,
   setErrorCode,
-}) {
+}: EnterPhoneNumberProps) {
   const { language } = useParams();
   const [phoneNumberValid, setPhoneNumberValid] = useState(true);
   const pageContentJson = getPageContent(language, PAGES.enterNewPhoneNumber);
@@ -125,7 +155,7 @@ export default function EnterPhoneNumber({
     return validatedPhoneNumber;
   };
 
-  const onSubmitHandler = async (ev) => {
+  const onSubmitHandler = async (ev: FormEvent) => {
     ev.preventDefault();
     await onNext();
   };

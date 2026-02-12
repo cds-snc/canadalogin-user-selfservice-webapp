@@ -13,17 +13,24 @@ import { getPageContent } from "../../../../utils/functions";
 import { PAGES } from "../../../../utils/constants";
 import { path } from "../../../../utils/routeHelpers";
 
+type SelectFIDO2PasskeyProps = {
+  setAssertionResult?: (res: any) => void;
+  setErrorCode?: (code: string | null) => void;
+  onCallback?: () => void;
+  submitAttestationResult?: boolean;
+};
+
 export default function SelectFIDO2Passkey({
   setAssertionResult,
   setErrorCode,
   onCallback,
   submitAttestationResult = false,
-}) {
+}: SelectFIDO2PasskeyProps) {
   const { language } = useParams();
   const navigate = useNavigate();
   const pageContentJson = getPageContent(language, PAGES.selectFIDO2Passkey);
   const errorPageContent = getPageContent(language, PAGES.error);
-  const hasTriggeredRef = useRef(false);
+  const hasTriggeredRef = useRef<boolean>(false);
 
   const backToManage2FAVerificationsPage = path(PAGES.manage2FAVerifications, {
     language: language,

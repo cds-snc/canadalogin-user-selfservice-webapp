@@ -13,10 +13,15 @@ import { useState } from "react";
 import { fido2Api } from "../../api/fido2Api";
 import Loader from "../../../../components/Layout/Loading";
 
+type DeleteFIDO2PasskeyConfirmProps = {
+  setErrorCode: (code: string) => void;
+  assertionResult?: any;
+};
+
 export default function DeleteFIDO2PasskeyConfirm({
   setErrorCode,
   assertionResult,
-}) {
+}: DeleteFIDO2PasskeyConfirmProps) {
   const { language } = useParams();
   const pageContentJson = getPageContent(
     language,
@@ -69,7 +74,7 @@ export default function DeleteFIDO2PasskeyConfirm({
     }
   };
 
-  const onSubmitHandler = async (ev) => {
+  const onSubmitHandler = async (ev: Event) => {
     ev.preventDefault();
     await handleDeleteFIDO2();
   };

@@ -1,5 +1,6 @@
+import React from "react";
 import { createContext } from "react";
-import type { UserState } from "./UserProvider";
+import { UserState } from "./UserProvider";
 
 interface UserContextType {
   state: UserState;

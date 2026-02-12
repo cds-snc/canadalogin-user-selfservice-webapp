@@ -1,5 +1,6 @@
 import React from "react";
 import { useParams } from "react-router";
+import { MouseEvent } from "react";
 import {
   GcdsContainer,
   GcdsHeading,
@@ -9,11 +10,17 @@ import {
 } from "@cdssnc/gcds-components-react";
 
 import { PAGES } from "../../../utils/constants";
-import { path } from "../../../utils/routeHelpers";
+import { path } from "../../../utils/routeHelpers.ts";
 import { useUser } from "../../../components/Providers/useUser.tsx";
 import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 
-export default function ViewProfileNameSectionCard({ pageContent }) {
+type ViewProfileNameSectionCardProps = {
+  pageContent: Record<string, string>;
+};
+
+export default function ViewProfileNameSectionCard({
+  pageContent,
+}: ViewProfileNameSectionCardProps) {
   const { language } = useParams();
   const { state } = useUser();
   const navigateHelper = useNavigateHelper();
@@ -30,9 +37,10 @@ export default function ViewProfileNameSectionCard({ pageContent }) {
         <GcdsLink
           href={editProfile}
           size="regular"
-          onGcdsClick={(ev) => {
+          onGcdsClick={(ev: any) => {
             ev.preventDefault();
-            navigateHelper(ev.detail);
+            // gcds custom event carries navigation detail
+            navigateHelper((ev as any).detail as string);
           }}
         >
           {pageContent["5"]}

@@ -11,11 +11,19 @@ import { PAGES } from "../../../../utils/constants";
 import { getPageContent } from "../../../../utils/functions";
 import { path } from "../../../../utils/routeHelpers";
 
+import { FormEvent } from "react";
+
+type DeleteMFAPhoneNumberConfirmProps = {
+  onNext: () => Promise<void> | void;
+  onCancel: () => void;
+  phoneFormData?: { formattedPhoneNumber?: string };
+};
+
 export default function DeleteMFAPhoneNumberConfirm({
   onNext,
   onCancel,
   phoneFormData,
-}) {
+}: DeleteMFAPhoneNumberConfirmProps) {
   const { language } = useParams();
   const backtoProfilePage = path(PAGES.ProfileHome, { language: language });
   const pageContentJson = getPageContent(
@@ -23,7 +31,7 @@ export default function DeleteMFAPhoneNumberConfirm({
     PAGES.deleteMFAPhoneNumberConfirm,
   );
 
-  const onSubmitHandler = async (ev) => {
+  const onSubmitHandler = async (ev: FormEvent) => {
     ev.preventDefault();
     await onNext();
   };

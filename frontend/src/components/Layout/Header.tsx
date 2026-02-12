@@ -7,8 +7,14 @@ import {
 
 import TopNav from "./TopNav";
 import Breadcrumbs from "./Breadcrumbs";
+import { MouseEvent } from "react";
 
-export default function Header({ langHref, currentLang }) {
+type HeaderProps = {
+  langHref?: string;
+  currentLang?: string;
+};
+
+export default function Header({ langHref, currentLang }: HeaderProps) {
   const navigate = useNavigate();
 
   return (
@@ -24,7 +30,7 @@ export default function Header({ langHref, currentLang }) {
           slot="toggle"
           href={langHref}
           lang={currentLang}
-          onGcdsClick={(ev) => {
+          onGcdsClick={(ev: any) => {
             ev.preventDefault();
             navigate(ev.detail);
           }}

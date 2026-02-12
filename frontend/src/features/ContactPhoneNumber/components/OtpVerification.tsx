@@ -19,12 +19,21 @@ import SubmitButton from "../../../components/Layout/SubmitButton";
 
 const initialTime = 10;
 
+import { ChangeEvent, FormEvent } from "react";
+
+type PageHeaderProps = {
+  language?: string;
+  pageContentJson: Record<string, string>;
+  userMfaType?: string;
+  formattedPhoneNumber?: string;
+};
+
 const PageHeader = ({
   language,
   pageContentJson,
   userMfaType,
   formattedPhoneNumber,
-}) => {
+}: PageHeaderProps) => {
   return (
     <>
       <GcdsHeading tag="h1" lang={language}>
@@ -52,6 +61,21 @@ const PageHeader = ({
   );
 };
 
+type OtpVerificationProps = {
+  onNext: () => void;
+  onCancel: () => void;
+  onBack: () => void;
+  onChangePhoneForm: (key: string, value: any) => void;
+  phoneFormData: {
+    otp?: string;
+    otpType?: string;
+    formattedPhoneNumber?: string;
+  };
+  errorMessage?: string | null;
+  requestNewOtpCode: (otpType?: string | null) => void;
+  setErrorCode?: (code: string) => void;
+};
+
 export default function OtpVerification({
   onNext,
   onCancel,
@@ -61,7 +85,7 @@ export default function OtpVerification({
   errorMessage,
   requestNewOtpCode,
   setErrorCode,
-}) {
+}: OtpVerificationProps) {
   const { language } = useParams();
 
   const [codeRequested, setCodeRequested] = useState(false);
@@ -84,7 +108,7 @@ export default function OtpVerification({
     setCodeRequested(true);
   };
 
-  const handleChange = (e) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     onChangePhoneForm("otp", value);
     setCodeRequested(false);
@@ -94,7 +118,7 @@ export default function OtpVerification({
     }
   };
 
-  const onSubmitHandler = async (ev) => {
+  const onSubmitHandler = async (ev: FormEvent) => {
     ev.preventDefault();
     onNext();
   };

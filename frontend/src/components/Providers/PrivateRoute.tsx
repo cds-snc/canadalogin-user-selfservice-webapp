@@ -3,9 +3,9 @@ import { Outlet, useLocation, useSearchParams, useParams } from "react-router";
 import { useUser } from "./useUser.tsx";
 import Loader from "../../components/Layout/Loading";
 
-import { isEmailValid, getPageContent } from "../../utils/functions";
+import { isEmailValid, getPageContent } from "../../utils/functions.ts";
 import { FLOW_TYPES, OIDC_REDIRECT, PAGES } from "../../utils/constants";
-import { userProfileDispatch } from "../../utils/userProfileDispatch";
+import { userProfileDispatch } from "../../utils/userProfileDispatch.ts";
 import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
 
 function PrivateRoute() {

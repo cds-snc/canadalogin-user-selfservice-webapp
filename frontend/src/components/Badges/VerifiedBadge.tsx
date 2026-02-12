@@ -1,6 +1,11 @@
 import { GcdsContainer, GcdsIcon } from "@cdssnc/gcds-components-react";
+import { ReactNode } from "react";
 
-export default function VerifiedBadge({ text }) {
+type VerifiedBadgeProps = {
+  text?: ReactNode;
+};
+
+export default function VerifiedBadge({ text }: VerifiedBadgeProps) {
   return (
     <GcdsContainer>
       <div

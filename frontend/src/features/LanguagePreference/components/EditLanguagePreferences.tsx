@@ -21,6 +21,17 @@ import {
 import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection";
 import SubmitButton from "../../../components/Layout/SubmitButton";
 
+import { ChangeEvent, FormEvent } from "react";
+
+type EditLanguagePreferencesProps = {
+  languageFormData: { updatedPreferredLanguage?: string };
+  onLanguageFormChange: (value: string) => void;
+  onNext: () => Promise<void> | void;
+  onCancel: () => void;
+  errorMessage?: string | null;
+  setErrorCode?: (code: string) => void;
+};
+
 export default function EditLanguagePreferences({
   languageFormData,
   onLanguageFormChange,
@@ -28,7 +39,7 @@ export default function EditLanguagePreferences({
   onCancel,
   errorMessage,
   setErrorCode,
-}) {
+}: EditLanguagePreferencesProps) {
   const { language } = useParams();
 
   const pageContentJson = getPageContent(
@@ -51,7 +62,7 @@ export default function EditLanguagePreferences({
 
   const languageOptions = [englistSelection, frenchSelection];
 
-  const handleProfileChange = (e) => {
+  const handleProfileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     onLanguageFormChange(value);
     // Clear error when user makes selection
@@ -60,7 +71,7 @@ export default function EditLanguagePreferences({
     }
   };
 
-  const onSubmitHandler = async (ev) => {
+  const onSubmitHandler = async (ev: FormEvent) => {
     ev.preventDefault();
     await onNext();
   };

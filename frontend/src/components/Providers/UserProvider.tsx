@@ -223,7 +223,7 @@ export function UserProvider({
     ? `${config.apiUrl}${SUBMIT_END_POINTS.sessionStatus}`
     : ""; // Empty string prevents connection
 
-  const [eventSource, eventSourceStatus] = useEventSource(
+  const [eventSource, _eventSourceStatus] = useEventSource(
     sseUrl, // Connects after user authentication
     true,
   );

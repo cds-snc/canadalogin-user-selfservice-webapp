@@ -17,11 +17,17 @@ import {
   GcdsText,
 } from "@cdssnc/gcds-components-react";
 
+type AddFIDO2PasskeyProps = {
+  setErrorCode: (code: string | null) => void;
+  errorMessage?: string | null;
+  onCancel?: (e?: any) => void;
+};
+
 export default function AddFIDO2Passkey({
   setErrorCode,
   errorMessage,
   onCancel,
-}) {
+}: AddFIDO2PasskeyProps) {
   const { language } = useParams();
   const pageContent = getPageContent(language, PAGES.addFIDO2Passkey);
   const errorPageContent = getPageContent(language, PAGES.error);

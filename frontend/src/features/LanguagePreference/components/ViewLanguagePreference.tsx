@@ -8,10 +8,16 @@ import {
 import { useNavigate } from "react-router";
 
 import { PAGES, LANGUAGE_DISPLAY_NAMES } from "../../../utils/constants";
-import { path } from "../../../utils/routeHelpers";
+import { path } from "../../../utils/routeHelpers.ts";
 import { useUser } from "../../../components/Providers/useUser.tsx";
 
-export default function ViewLanguagePreferences({ pageContent }) {
+type ViewLanguagePreferencesProps = {
+  pageContent: Record<string, string>;
+};
+
+export default function ViewLanguagePreferences({
+  pageContent,
+}: ViewLanguagePreferencesProps) {
   const { language } = useParams();
   const { state } = useUser();
   const navigate = useNavigate();

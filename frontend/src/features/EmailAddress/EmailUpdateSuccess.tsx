@@ -1,4 +1,5 @@
 import { useParams } from "react-router";
+import { MouseEvent } from "react";
 import { getPageContent } from "../../utils/functions";
 import { PAGES, EXTERNAL_NAVIGATION_LINKS } from "../../utils/constants";
 import {
@@ -13,11 +14,17 @@ import {
 } from "@cdssnc/gcds-components-react";
 import SubmitButton from "../../components/Layout/SubmitButton";
 
+type EmailUpdateSuccessProps = {
+  newEmailAddress?: string;
+  onBackToProfile: (ev?: MouseEvent) => void;
+  onSignOut?: (ev?: MouseEvent) => void;
+};
+
 export default function EmailUpdateSuccess({
   newEmailAddress,
   onBackToProfile,
   onSignOut,
-}) {
+}: EmailUpdateSuccessProps) {
   const { language } = useParams();
   const pageContentJson = getPageContent(language, PAGES.emailUpdateSuccess);
 

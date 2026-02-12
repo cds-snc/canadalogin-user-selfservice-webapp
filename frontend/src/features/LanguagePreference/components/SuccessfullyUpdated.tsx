@@ -10,17 +10,27 @@ import {
   GcdsGrid,
   GcdsLink,
 } from "@cdssnc/gcds-components-react";
-import { getPageContent } from "../../../utils/functions";
+import { getPageContent } from "../../../utils/functions.ts";
 import { PAGES, LANGUAGE_DISPLAY_NAMES } from "../../../utils/constants";
 import { useUser } from "../../../components/Providers/useUser.tsx";
-import { userProfileDispatch } from "../../../utils/userProfileDispatch";
+import { userProfileDispatch } from "../../../utils/userProfileDispatch.ts";
 import { authService } from "../../../services/authService";
 import SubmitButton from "../../../components/Layout/SubmitButton";
+
+import { MouseEvent, FormEvent } from "react";
+
+type SuccessfullyUpdatedProps = {
+  languageFormData: {
+    languageCode?: string;
+    updatedPreferredLanguage?: string;
+  };
+  onBackToProfile: () => Promise<void> | void;
+};
 
 export default function SuccessfullyUpdated({
   languageFormData,
   onBackToProfile,
-}) {
+}: SuccessfullyUpdatedProps) {
   const { language } = useParams();
   const { state, dispatch } = useUser();
   const { setLoading } = userProfileDispatch(dispatch);
@@ -30,7 +40,7 @@ export default function SuccessfullyUpdated({
   );
   const preferredLanguage = state?.userProfile?.preferredLanguage || "";
 
-  const handleSignout = async (e) => {
+  const handleSignout = async (e: MouseEvent) => {
     e.preventDefault();
     setLoading(true, pageContentJson["12"]);
 
@@ -57,7 +67,7 @@ export default function SuccessfullyUpdated({
     }
   };
 
-  const onSubmitHandler = async (ev) => {
+  const onSubmitHandler = async (ev: FormEvent) => {
     ev.preventDefault();
     await onBackToProfile();
   };

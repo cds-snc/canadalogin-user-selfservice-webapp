@@ -1,7 +1,12 @@
 import { GcdsText } from "@cdssnc/gcds-components-react";
 import { useUser } from "../Providers/useUser";
+import { ReactNode } from "react";
 
-export default function RPNameDisplay({ rpName }) {
+type RPNameDisplayProps = {
+  rpName?: ReactNode;
+};
+
+export default function RPNameDisplay({ rpName }: RPNameDisplayProps) {
   const { state } = useUser();
 
   const rp = state?.relyingPartyInfo
