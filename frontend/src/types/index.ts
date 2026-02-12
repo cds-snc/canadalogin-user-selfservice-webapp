@@ -2,7 +2,6 @@ import React from "react";
 // Shared TypeScript interfaces for the GC Sign In frontend
 
 import { ReactNode } from "react";
-import { AxiosResponse } from "axios";
 
 /**
  * User profile data structure from IBM Verify API
