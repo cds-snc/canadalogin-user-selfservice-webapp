@@ -34,8 +34,6 @@ async def health_check(request: Request):
     Returns:
         HealthResponse: Service health information including status and timestamp
     """
-    logger.info("Health check hit - headers: %s", dict(request.headers))
-
     return {
         "status": "healthy",
         "timestamp": datetime.today().strftime("%Y-%m-%d %H:%M:%S"),
