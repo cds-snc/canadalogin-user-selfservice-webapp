@@ -467,6 +467,7 @@ class TestSubmitAssertionResult:
         assert result.message == "FIDO2 authentication completed successfully"
 
     @pytest.mark.asyncio
+    @patch.object(auth_module, "introspect_user_token")
     @patch.object(auth_module, "get_auth_request_headers")
     @patch.object(auth_module, "get_rp_uuid_from_rp_id")
     @patch.object(auth_module, "get_admin_token")
@@ -479,6 +480,7 @@ class TestSubmitAssertionResult:
         mock_get_admin_token,
         mock_get_rp_uuid_from_rp_id,
         mock_get_auth_request_headers,
+        mock_introspect_user_token,
         mock_http_client,
         mock_request,
         mock_assertion_request,
@@ -491,12 +493,38 @@ class TestSubmitAssertionResult:
         mock_get_auth_request_headers.return_value = {
             "Authorization": "Bearer admin-token"
         }
+        mock_introspect_user_token.return_value = AsyncMock()
 
-        mock_response = MagicMock()
-        mock_response.status_code = 200
-        mock_response.json.return_value = {"status": "ok", "assertion": "jwt-token"}
-        mock_response.raise_for_status = MagicMock()
-        mock_http_client.post = AsyncMock(return_value=mock_response)
+        # Mock responses for all three POST calls:
+        # 1. assertion/result - returns JWT
+        # 2. token exchange - returns access token
+        # 3. session exchange - establishes session
+        assertion_response = MagicMock()
+        assertion_response.status_code = 200
+        assertion_response.json.return_value = {
+            "status": "ok",
+            "assertion": "jwt-token",
+        }
+        assertion_response.raise_for_status = MagicMock()
+
+        token_exchange_response = MagicMock()
+        token_exchange_response.status_code = 200
+        token_exchange_response.json.return_value = {
+            "access_token": "oauth-token",
+            "token_type": "Bearer",
+        }
+        token_exchange_response.raise_for_status = MagicMock()
+        token_exchange_response.text = '{"access_token": "oauth-token"}'
+
+        session_response = MagicMock()
+        session_response.status_code = 200
+        session_response.json.return_value = {"session_id": "session-123"}
+        session_response.raise_for_status = MagicMock()
+
+        # Configure mock to return different responses for each call
+        mock_http_client.post = AsyncMock(
+            side_effect=[assertion_response, token_exchange_response, session_response]
+        )
 
         await submit_assertion_result(
             request=mock_request,
@@ -506,9 +534,9 @@ class TestSubmitAssertionResult:
             return_jwt=True,
         )
 
-        # Verify URL includes returnJwt query parameter
-        call_args = mock_http_client.post.call_args[0]
-        url = call_args[0]
+        # Verify the first POST call (assertion/result) includes returnJwt query parameter
+        first_call_args = mock_http_client.post.call_args_list[0][0]
+        url = first_call_args[0]
         assert "returnJwt=true" in url
 
     @pytest.mark.asyncio
