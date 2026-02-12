@@ -34,6 +34,7 @@ configuration = get_configuration()
 
 class HealthCheckFilter(logging.Filter):
     """Filter to suppress healthcheck logs from Uvicorn access logs."""
+
     def filter(self, record: logging.LogRecord) -> bool:
         # Suppress logs for /health/health endpoint
         return record.getMessage().find("/health/health") == -1
