@@ -256,9 +256,9 @@
     "6": "Retour au profil",
     "7": "Se déconnecter",
     "8": "répertoire des comptes du GC.",
-    "9": "Pour voir les services connectés à votre compte GC Sign in, accédez à ",
+    "9": "Pour voir les services connectés à votre compte ConnexionCanada, accédez à ",
     "10": "Services connectés",
-    "11": "dans votre tableau de bord GC Sign in.",
+    "11": "dans votre tableau de bord ConnexionCanada.",
     "12": "Déconnexion en cours...",
     "13": "Échec de la déconnexion. Redirection..."
   },
@@ -496,8 +496,8 @@
     "1": "Enter a new email address",
     "2": "Changing your email address will affect:",
     "3": "The email address you use to sign in",
-    "4": "The email address that GC Sign in uses to contact you",
-    "5": "The email address that services connected to your GC Sign in may use to contact you",
+    "4": "The email address that CanadaLogin uses to contact you",
+    "5": "The email address that services connected to your CanadaLogin may use to contact you",
     "6": "Email"
   },
   "EmailOtpValidation": {
@@ -523,8 +523,8 @@
   "EmailUpdateSuccess": {
     "1": "Your email has been updated to",
     "2": "You may need to update your email other places",
-    "3": "This only changes your email with services connected to your GC Sign in.",
-    "4": "If you are trying to update your email with a service that’s not connected to your GC Sign in, you’ll need to go to that account.",
+    "3": "This only changes your email with services connected to your CanadaLogin.",
+    "4": "If you are trying to update your email with a service that’s not connected to your CanadaLogin, you’ll need to go to that account.",
     "5": "To search for another GC Account, visit the",
     "6": "GC Account directory",
     "7": ".",
