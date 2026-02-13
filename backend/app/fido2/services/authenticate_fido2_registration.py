@@ -18,11 +18,104 @@ from app.fido2.services.helper_utils import (
 from app.fido2.schemas import AssertionOptionsRequest, FIDO2AssertionResultRequest
 import base64
 
-from app.auth.services.auth_user_session import (
-    introspect_user_token,
-)
-
 logger = logging.getLogger(__name__)
+
+
+async def _exchange_fido2_jwt_for_access_token(
+    http_client: AsyncClient,
+    tenant_url: str,
+    fido2_jwt: str,
+    client_id: str,
+    client_secret: str,
+) -> str:
+    """
+    Convert FIDO2 JWT to OAuth access token using jwt-bearer grant.
+
+    Args:
+        http_client: AsyncClient for making HTTP requests
+        tenant_url: IBM Verify tenant URL
+        fido2_jwt: FIDO2 assertion JWT
+        client_id: OAuth client ID (OIDC application)
+        client_secret: OAuth client secret
+
+    Returns:
+        Access token with FIDO2 authentication
+
+    Raises:
+        Exception: If token exchange fails
+    """
+    logger.info("Step 1: Exchanging FIDO2 JWT for OAuth access token")
+
+    client_creds = f"{client_id}:{client_secret}"
+    basic_auth = base64.b64encode(client_creds.encode()).decode()
+
+    token_url = f"{tenant_url}{VerifyAPIEndpoint.GET_ACCESS_TOKEN.value}"
+
+    jwt_bearer_data = {
+        "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
+        "assertion": fido2_jwt,
+    }
+
+    jwt_bearer_headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Accept": "application/json",
+        "Authorization": f"Basic {basic_auth}",
+    }
+
+    response = await http_client.post(
+        token_url,
+        data=jwt_bearer_data,
+        headers=jwt_bearer_headers,
+    )
+
+    logger.info(f"Token exchange response status: {response.status_code}")
+    logger.info(f"Token exchange response body: {response.text}")
+    response.raise_for_status()
+
+    token_data = response.json()
+    access_token = token_data.get("access_token")
+
+    if not access_token:
+        raise Exception("No access_token in token exchange response")
+
+    logger.info("Successfully exchanged FIDO2 JWT for OAuth access token")
+    return access_token
+
+
+async def _establish_session_with_token(
+    http_client: AsyncClient,
+    tenant_url: str,
+    access_token: str,
+) -> None:
+    """
+    Use OAuth access token to establish session.
+
+    Args:
+        http_client: AsyncClient for making HTTP requests
+        tenant_url: IBM Verify tenant URL
+        access_token: OAuth access token to establish session with
+
+    Raises:
+        Exception: If session exchange fails
+    """
+    logger.info("Step 2: Using OAuth access token to establish session")
+
+    exchange_url = f"{tenant_url}{VerifyAPIEndpoint.EXCHANGE_TOKEN_SESSION.value}"
+
+    session_data = {"access_token": access_token}
+    session_headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Accept": "application/json",
+    }
+
+    session_response = await http_client.post(
+        exchange_url, data=session_data, headers=session_headers
+    )
+
+    logger.info(f"Session response status: {session_response.status_code}")
+    session_response.raise_for_status()
+
+    logger.info("Session updated with FIDO2-authenticated tokens")
 
 
 async def get_assertion_options(
@@ -140,81 +233,27 @@ async def submit_assertion_result(
             request.session["fido2_auth_jwt"] = fido2_jwt
             logger.info("FIDO2 authentication JWT stored in session for step-up auth")
 
-            # Exchange the FIDO2 JWT for OAuth access token, then update session
+            # Exchange tokens to combine authentication methods
             try:
-                logger.info("Step 1: Exchanging FIDO2 JWT for OAuth access token")
-
-                # Get configuration for client credentials
                 from app.config import get_configuration
 
                 settings = get_configuration()
 
-                # Step 1: Token exchange to get OAuth access token from FIDO2 JWT
-
-                client_creds = f"{settings.ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID}:{settings.ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_SECRET}"
-                basic_auth = base64.b64encode(client_creds.encode()).decode()
-
-                token_exchange_url = (
-                    f"{tenant_url}{VerifyAPIEndpoint.GET_ACCESS_TOKEN.value}"
+                # Step 1: Convert FIDO2 JWT to access token
+                oauth_access_token = await _exchange_fido2_jwt_for_access_token(
+                    http_client=http_client,
+                    tenant_url=tenant_url,
+                    fido2_jwt=fido2_jwt,
+                    client_id=settings.ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID,
+                    client_secret=settings.ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_SECRET,
                 )
-
-                token_exchange_data = {
-                    "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
-                    "subject_token": fido2_jwt,
-                    "subject_token_type": "urn:gc:token-type:fido2",
-                    "requested_token_type": "urn:ietf:params:oauth:token-type:access_token",
-                }
-
-                token_exchange_headers = {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                    "Accept": "application/json",
-                    "Authorization": f"Basic {basic_auth}",
-                }
-
-                token_response = await http_client.post(
-                    token_exchange_url,
-                    data=token_exchange_data,
-                    headers=token_exchange_headers,
-                )
-
-                logger.info(
-                    f"Token exchange response status: {token_response.status_code}"
-                )
-                logger.info(f"Token exchange response body: {token_response.text}")
-                token_response.raise_for_status()
-
-                token_data = token_response.json()
-                oauth_access_token = token_data.get("access_token")
-
-                await introspect_user_token(http_client, oauth_access_token)
-                # update_session_tokens(request, token_data)
-
-                if not oauth_access_token:
-                    raise Exception("No access_token in token exchange response")
-
-                logger.info("Successfully exchanged FIDO2 JWT for OAuth access token")
 
                 # Step 2: Use the OAuth access token to establish session
-                logger.info("Step 2: Using OAuth access token to establish session")
-                exchange_url = (
-                    f"{tenant_url}{VerifyAPIEndpoint.EXCHANGE_TOKEN_SESSION.value}"
+                await _establish_session_with_token(
+                    http_client=http_client,
+                    tenant_url=tenant_url,
+                    access_token=oauth_access_token,
                 )
-
-                session_data = {"access_token": oauth_access_token}
-                session_headers = {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                    "Accept": "application/json",
-                }
-
-                session_response = await http_client.post(
-                    exchange_url, data=session_data, headers=session_headers
-                )
-
-                logger.info(f"Session response status: {session_response.status_code}")
-                session_response.raise_for_status()
-
-                # Update session with new tokens that include FIDO2 in AMR claims
-                logger.info("Session updated with FIDO2-authenticated tokens")
 
             except Exception as exchange_error:
                 logger.error(

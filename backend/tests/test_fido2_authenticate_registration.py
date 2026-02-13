@@ -467,7 +467,8 @@ class TestSubmitAssertionResult:
         assert result.message == "FIDO2 authentication completed successfully"
 
     @pytest.mark.asyncio
-    @patch.object(auth_module, "introspect_user_token")
+    @patch.object(auth_module, "_establish_session_with_token")
+    @patch.object(auth_module, "_exchange_fido2_jwt_for_access_token")
     @patch.object(auth_module, "get_auth_request_headers")
     @patch.object(auth_module, "get_rp_uuid_from_rp_id")
     @patch.object(auth_module, "get_admin_token")
@@ -480,7 +481,8 @@ class TestSubmitAssertionResult:
         mock_get_admin_token,
         mock_get_rp_uuid_from_rp_id,
         mock_get_auth_request_headers,
-        mock_introspect_user_token,
+        mock_exchange_fido2_jwt,
+        mock_establish_session,
         mock_http_client,
         mock_request,
         mock_assertion_request,
@@ -493,12 +495,12 @@ class TestSubmitAssertionResult:
         mock_get_auth_request_headers.return_value = {
             "Authorization": "Bearer admin-token"
         }
-        mock_introspect_user_token.return_value = AsyncMock()
 
-        # Mock responses for all three POST calls:
-        # 1. assertion/result - returns JWT
-        # 2. token exchange - returns access token
-        # 3. session exchange - establishes session
+        # Mock the helper functions
+        mock_exchange_fido2_jwt.return_value = "oauth-access-token"
+        mock_establish_session.return_value = AsyncMock()
+
+        # Mock response for assertion/result
         assertion_response = MagicMock()
         assertion_response.status_code = 200
         assertion_response.json.return_value = {
@@ -507,24 +509,7 @@ class TestSubmitAssertionResult:
         }
         assertion_response.raise_for_status = MagicMock()
 
-        token_exchange_response = MagicMock()
-        token_exchange_response.status_code = 200
-        token_exchange_response.json.return_value = {
-            "access_token": "oauth-token",
-            "token_type": "Bearer",
-        }
-        token_exchange_response.raise_for_status = MagicMock()
-        token_exchange_response.text = '{"access_token": "oauth-token"}'
-
-        session_response = MagicMock()
-        session_response.status_code = 200
-        session_response.json.return_value = {"session_id": "session-123"}
-        session_response.raise_for_status = MagicMock()
-
-        # Configure mock to return different responses for each call
-        mock_http_client.post = AsyncMock(
-            side_effect=[assertion_response, token_exchange_response, session_response]
-        )
+        mock_http_client.post = AsyncMock(return_value=assertion_response)
 
         await submit_assertion_result(
             request=mock_request,
@@ -534,10 +519,14 @@ class TestSubmitAssertionResult:
             return_jwt=True,
         )
 
-        # Verify the first POST call (assertion/result) includes returnJwt query parameter
-        first_call_args = mock_http_client.post.call_args_list[0][0]
-        url = first_call_args[0]
+        # Verify the POST call (assertion/result) includes returnJwt query parameter
+        call_args = mock_http_client.post.call_args[0]
+        url = call_args[0]
         assert "returnJwt=true" in url
+
+        # Verify helper functions were called
+        assert mock_exchange_fido2_jwt.called
+        assert mock_establish_session.called
 
     @pytest.mark.asyncio
     @patch.object(auth_module, "get_auth_request_headers")
@@ -867,3 +856,183 @@ class TestSubmitAssertionResult:
         error_arg = mock_request_error_handler.handle.call_args[0][0]
         assert isinstance(error_arg, Exception)
         assert "Unexpected error" in str(error_arg)
+
+
+class TestExchangeFido2JwtForAccessToken:
+    """Tests for _exchange_fido2_jwt_for_access_token helper function"""
+
+    @pytest.fixture
+    def mock_http_client(self):
+        """Create a mock HTTP client"""
+        return AsyncMock(spec=AsyncClient)
+
+    @pytest.mark.asyncio
+    async def test_successful_token_exchange(self, mock_http_client):
+        """Should successfully exchange FIDO2 JWT for OAuth access token"""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "access_token": "oauth-access-token-123",
+            "token_type": "Bearer",
+            "expires_in": 3600,
+        }
+        mock_response.raise_for_status = MagicMock()
+        mock_http_client.post = AsyncMock(return_value=mock_response)
+
+        # Access the private function
+        exchange_func = auth_module._exchange_fido2_jwt_for_access_token
+
+        result = await exchange_func(
+            http_client=mock_http_client,
+            tenant_url="https://tenant.verify.ibm.com",
+            fido2_jwt="fido2-jwt-token",
+            client_id="client-id-123",
+            client_secret="client-secret-456",
+        )
+
+        assert result == "oauth-access-token-123"
+
+        # Verify the POST call
+        mock_http_client.post.assert_called_once()
+        call_args = mock_http_client.post.call_args
+        url = call_args[0][0]
+        assert "https://tenant.verify.ibm.com/oauth2/token" in url
+
+        # Verify request data
+        data = call_args[1]["data"]
+        assert data["grant_type"] == "urn:ietf:params:oauth:grant-type:jwt-bearer"
+        assert data["assertion"] == "fido2-jwt-token"
+
+        # Verify headers
+        headers = call_args[1]["headers"]
+        assert "Authorization" in headers
+        assert headers["Authorization"].startswith("Basic ")
+
+    @pytest.mark.asyncio
+    async def test_handles_http_error(self, mock_http_client):
+        """Should handle HTTP errors during token exchange"""
+        mock_response = MagicMock()
+        mock_response.status_code = 400
+        mock_response.text = "Invalid grant"
+
+        http_error = HTTPStatusError(
+            "400 Bad Request",
+            request=MagicMock(spec=Request),
+            response=mock_response,
+        )
+        mock_http_client.post = AsyncMock(side_effect=http_error)
+
+        exchange_func = auth_module._exchange_fido2_jwt_for_access_token
+
+        with pytest.raises(HTTPStatusError):
+            await exchange_func(
+                http_client=mock_http_client,
+                tenant_url="https://tenant.verify.ibm.com",
+                fido2_jwt="fido2-jwt-token",
+                client_id="client-id-123",
+                client_secret="client-secret-456",
+            )
+
+    @pytest.mark.asyncio
+    async def test_handles_missing_access_token(self, mock_http_client):
+        """Should handle response without access_token field"""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "token_type": "Bearer",
+            "expires_in": 3600,
+        }
+        mock_response.raise_for_status = MagicMock()
+        mock_http_client.post = AsyncMock(return_value=mock_response)
+
+        exchange_func = auth_module._exchange_fido2_jwt_for_access_token
+
+        with pytest.raises(Exception) as exc_info:
+            await exchange_func(
+                http_client=mock_http_client,
+                tenant_url="https://tenant.verify.ibm.com",
+                fido2_jwt="fido2-jwt-token",
+                client_id="client-id-123",
+                client_secret="client-secret-456",
+            )
+
+        assert "No access_token" in str(exc_info.value)
+
+
+class TestEstablishSessionWithToken:
+    """Tests for _establish_session_with_token helper function"""
+
+    @pytest.fixture
+    def mock_http_client(self):
+        """Create a mock HTTP client"""
+        return AsyncMock(spec=AsyncClient)
+
+    @pytest.mark.asyncio
+    async def test_successful_session_establishment(self, mock_http_client):
+        """Should successfully establish session with OAuth token"""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "access_token": "session-access-token",
+            "id_token": "session-id-token",
+        }
+        mock_response.raise_for_status = MagicMock()
+        mock_http_client.post = AsyncMock(return_value=mock_response)
+
+        establish_func = auth_module._establish_session_with_token
+
+        # Should not raise any errors
+        await establish_func(
+            http_client=mock_http_client,
+            tenant_url="https://tenant.verify.ibm.com",
+            access_token="oauth-access-token-123",
+        )
+
+        # Verify the POST call
+        mock_http_client.post.assert_called_once()
+        call_args = mock_http_client.post.call_args
+        url = call_args[0][0]
+        assert "https://tenant.verify.ibm.com/v1.0/auth/session" in url
+
+        # Verify request data
+        data = call_args[1]["data"]
+        assert data["access_token"] == "oauth-access-token-123"
+
+    @pytest.mark.asyncio
+    async def test_handles_http_error(self, mock_http_client):
+        """Should handle HTTP errors during session establishment"""
+        mock_response = MagicMock()
+        mock_response.status_code = 401
+        mock_response.text = "Unauthorized"
+
+        http_error = HTTPStatusError(
+            "401 Unauthorized",
+            request=MagicMock(spec=Request),
+            response=mock_response,
+        )
+        mock_http_client.post = AsyncMock(side_effect=http_error)
+
+        establish_func = auth_module._establish_session_with_token
+
+        with pytest.raises(HTTPStatusError):
+            await establish_func(
+                http_client=mock_http_client,
+                tenant_url="https://tenant.verify.ibm.com",
+                access_token="oauth-access-token-123",
+            )
+
+    @pytest.mark.asyncio
+    async def test_handles_generic_exception(self, mock_http_client):
+        """Should handle generic exceptions during session establishment"""
+        mock_http_client.post = AsyncMock(side_effect=Exception("Network error"))
+
+        establish_func = auth_module._establish_session_with_token
+
+        with pytest.raises(Exception) as exc_info:
+            await establish_func(
+                http_client=mock_http_client,
+                tenant_url="https://tenant.verify.ibm.com",
+                access_token="oauth-access-token-123",
+            )
+
+        assert "Network error" in str(exc_info.value)
