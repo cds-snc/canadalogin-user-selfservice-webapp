@@ -1,6 +1,5 @@
 import logging
 import phonenumbers
-from app.users.schemas import MetaDataTypeValue
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +44,7 @@ def mask_individual_email_address(email: str) -> str:
 
 def mask_profile_email_addresses(
     profile_data: dict,
-) -> list[MetaDataTypeValue]:
+):
     """
     Mask email addresses in user profile.
 
@@ -119,7 +118,7 @@ def mask_phone_number(phone_number: str, region: str = "US") -> str:
 
 def mask_contact_phone_numbers(
     profile_data: dict,
-) -> list[MetaDataTypeValue]:
+):
     """
     Mask phone numbers in user profile data, showing only the last 4 digits.
 

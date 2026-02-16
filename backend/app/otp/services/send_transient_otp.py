@@ -3,13 +3,11 @@ from datetime import datetime
 
 from app.config import get_configuration
 from app.otp.schemas import OtpDataResponse, OtpType, UserOtpInfo
-from app.users.services.otp_factors import get_user_otp_factors_unmasked
+from app.users.services.otp_factors import get_user_otp_factor
 from app.users.services.get_my_profile import get_my_profile
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.helpers import (
-    extract_last_4_digits,
     generate_error_response,
-    is_masked_phone_number,
     prepare_pydantic_phone_number_for_verify,
 )
 from app.utils.schemas import ResponseModel
@@ -19,76 +17,6 @@ from httpx import AsyncClient, HTTPStatusError
 from pydantic import ValidationError
 
 logger = logging.getLogger(__name__)
-
-
-async def resolve_masked_phone_number(
-    global_http_client: AsyncClient,
-    user_profile_id: str,
-    masked_phone: str,
-    otp_type: OtpType,
-) -> str:
-    """
-    Resolve a masked phone number to the actual phone number by matching last 4 digits.
-
-    Args:
-        global_http_client: HTTP client for API calls
-        user_profile_id: User's profile ID
-        masked_phone: Masked phone number (e.g., "***-***-1234")
-        otp_type: OTP type enum (OtpType.SMS or OtpType.VOICE)
-
-    Returns:
-        The resolved actual phone number
-    """
-    try:
-        # Get unmasked user OTP factors
-        user_factors = await get_user_otp_factors_unmasked(
-            global_http_client, user_profile_id
-        )
-
-        # Extract last 4 digits from masked phone
-        masked_last_4 = extract_last_4_digits(masked_phone)
-
-        # Find matching factor by last 4 digits and type
-        for factor in user_factors:
-            factor_phone = factor.get("phoneNumber", "")
-            factor_type = factor.get("type", "")
-
-            # Extract last 4 digits from the actual phone number
-            actual_last_4 = "".join(filter(str.isdigit, factor_phone))[-4:]
-
-            # Match by last 4 digits and compatible type
-            type_match = False
-            if otp_type == OtpType.SMS and factor_type.lower() in ["smsotp", "sms"]:
-                type_match = True
-            elif otp_type == OtpType.VOICE and factor_type.lower() in [
-                "voiceotp",
-                "voice",
-            ]:
-                type_match = True
-
-            if actual_last_4 == masked_last_4 and type_match:
-                logger.info(f"Resolved masked phone number. Last 4: {masked_last_4}")
-                # Ensure phone number has proper format for PhoneNumber validation
-                # Add + prefix if it's missing (needed for international format)
-                if factor_phone.isdigit():
-                    if len(factor_phone) == 11 and factor_phone.startswith("1"):
-                        # 11-digit number starting with 1 (North American with country code)
-                        factor_phone = f"+{factor_phone}"
-                    elif len(factor_phone) == 10:
-                        # 10-digit number (North American without country code)
-                        factor_phone = f"+1{factor_phone}"
-                return factor_phone
-
-        # If no match found, raise an error
-        logger.error(f"Could not resolve masked phone number ending in {masked_last_4}")
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"No matching phone factor found for number ending in {masked_last_4}",
-        )
-
-    except Exception as e:
-        logger.error(f"Error resolving masked phone number: {str(e)}")
-        raise
 
 
 async def handle_otp_send(
@@ -109,34 +37,17 @@ async def handle_otp_send(
         user_language = my_profile_response.data.preferredLanguage or "en"
         logger.info(f"Using user's preferred language: {user_language}")
 
-        # Handle masked phone numbers
-        resolved_user_otp_info = user_otp_info
-        if user_otp_info.phoneNumber and is_masked_phone_number(
-            user_otp_info.phoneNumber
-        ):
-            logger.info("Detected masked phone number, resolving to actual number")
-            try:
-                actual_phone = await resolve_masked_phone_number(
-                    global_http_client,
-                    my_profile_response.data.id,
-                    user_otp_info.phoneNumber,
-                    user_otp_info.otpType,
-                )
+        if user_otp_info.factor_id is not None:
+            user_otp_factor = await get_user_otp_factor(
+                global_http_client,
+                my_profile_response.data.id,
+                user_otp_info.factor_id
+            )
 
-                # Create a new UserOtpInfo with the resolved phone number
-                # The field validator will automatically format it using PhoneNumber
-                resolved_user_otp_info = UserOtpInfo(
-                    phoneNumber=actual_phone,
-                    user_id=user_otp_info.user_id,
-                    otpType=user_otp_info.otpType,
-                )
-                logger.info("Successfully resolved masked phone number")
-            except Exception as e:
-                logger.error(f"Failed to resolve masked phone number: {str(e)}")
-                return generate_error_response(400, str(e))
+            user_otp_info.destination = user_otp_factor.get("destination")
 
         http_client_response = await dispatch_otp(
-            global_http_client, resolved_user_otp_info, user_language
+            global_http_client, user_otp_info, user_language
         )
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(
@@ -203,10 +114,10 @@ async def dispatch_otp(
         headers = get_auth_request_headers(access_token, True, language)
         settings = get_configuration().ibm_verify_config
 
-        if user_otp_info.phoneNumber:
+        if user_otp_info.otpType == OtpType.SMS or user_otp_info.otpType == OtpType.VOICE:
             user_phone_number = {
                 "phoneNumber": prepare_pydantic_phone_number_for_verify(
-                    user_otp_info.phoneNumber
+                    user_otp_info.destination
                 )  # Ensure consistent formatting of phone numbers
             }
 
@@ -226,7 +137,7 @@ async def dispatch_otp(
 
         elif user_otp_info.otpType == OtpType.EMAIL:
             # Use emailAddress if provided, otherwise fall back to userName
-            target_email = user_otp_info.emailAddress or user_otp_info.userName
+            target_email = user_otp_info.destination
             user_email_address = {
                 "emailAddress": target_email.lower()
             }  # Ensure consistent email formatting

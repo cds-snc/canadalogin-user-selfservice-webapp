@@ -184,7 +184,7 @@ async def test_dispatch_posts_correct_request_for_phone_otp(otp_type, path_segme
         info = UserOtpInfo(
             otpType=otp_type,
             user_id="user@example.com",
-            phoneNumber="+14165551234",  # ✅ E.164 valid input for Pydantic PhoneNumber
+            destination="+14165551234",  # ✅ E.164 valid input for Pydantic PhoneNumber
         )
         resp = await dispatch_otp(client, info)
     assert resp.status_code == 201
@@ -213,8 +213,7 @@ async def test_dispatch_posts_correct_request_for_email():
         info = UserOtpInfo(
             otpType=OtpType.EMAIL,
             user_id="user@example.com",
-            emailAddress="User@Example.com",  # ensure lower-casing is applied by impl
-            phoneNumber=None,
+            destination="User@Example.com",  # ensure lower-casing is applied by impl
         )
         resp = await dispatch_otp(client, info)
     assert resp.status_code == 201
@@ -240,16 +239,14 @@ async def test_handle_success_returns_data_and_message(otp_type):
         info = UserOtpInfo(
             otpType=otp_type,
             user_id="user@example.com",
-            phoneNumber=(
-                "+14165551234" if otp_type != OtpType.EMAIL else None
+            destination=(
+                "+14165551234" if otp_type != OtpType.EMAIL else "user@example.com"
             ),  # ✅ E.164
         )
         result = await handle_otp_send(client, info, user_access_token="USER_TOKEN")
-
-    # The function returns a ResponseModel-like object; be robust (dict or model)
-    result_dict = try_to_dict(result)
-    assert result_dict.get("success") is True
-    data = result_dict.get("data")
+    assert getattr(result, "success", None) is True
+    data = getattr(result, "data", None)
+    message = getattr(result, "message", None)
     # Validate data against OtpDataResponse regardless of shape
     if isinstance(data, dict):
         model = OtpDataResponse(**data)
@@ -261,9 +258,9 @@ async def test_handle_success_returns_data_and_message(otp_type):
     if otp_type == OtpType.EMAIL:
         assert model.emailAddress == "user@example.com"
     else:
-        assert model.phoneNumber == "+14165551234"
+        assert model.phoneNumber == "+1 (***) ***-1234"
     # success message uses enum .value per implementation
-    assert (result_dict.get("message") or "").startswith(
+    assert (message or "").startswith(
         f"{otp_type.value} OTP sent successfully"
     )
 
@@ -279,8 +276,7 @@ async def test_handle_non_201_returns_error_model():
         info = UserOtpInfo(
             otpType=OtpType.EMAIL,
             user_id="user@example.com",
-            emailAddress="user@example.com",
-            phoneNumber=None,
+            destination="user@example.com"
         )
         # Now expects HTTPException with status code 400
         with pytest.raises(HTTPException) as exc_info:
@@ -307,7 +303,7 @@ async def test_handle_validation_error_due_to_incomplete_payload():
         info = UserOtpInfo(
             otpType=OtpType.SMS,
             user_id="user@example.com",
-            phoneNumber="+14165551234",  # ✅ E.164
+            destination="+14165551234",  # ✅ E.164
         )
         # Now expects HTTPException with status code 422 for validation errors
         with pytest.raises(HTTPException) as exc_info:
@@ -338,8 +334,7 @@ async def test_handle_user_mismatch_returns_403(monkeypatch):
     info = UserOtpInfo(
         otpType=OtpType.SMS,
         user_id="user@example.com",
-        emailAddress="user@example.com",
-        phoneNumber="+14165551234",  # ✅ E.164
+        destination="+14165551234",  # ✅ E.164
     )
 
     # Simulate what would happen at the route level
@@ -364,7 +359,7 @@ async def test_handle_transport_exception_is_captured_in_message():
         info = UserOtpInfo(
             otpType=OtpType.SMS,
             user_id="user@example.com",
-            phoneNumber="+14165551234",  # ✅ E.164
+            destination="+14165551234",  # ✅ E.164
         )
         # Now expects HTTPException with status code 500 for transport errors
         with pytest.raises(HTTPException) as exc_info:
@@ -396,7 +391,7 @@ async def test_handle_status_code_none_branch(monkeypatch):
         info = UserOtpInfo(
             otpType=OtpType.EMAIL,
             user_id="user@example.com",
-            phoneNumber=None,
+            destination="user@example.com",
         )
         # Now expects HTTPException with status code 500 for status_code None
         with pytest.raises(HTTPException) as exc_info:
