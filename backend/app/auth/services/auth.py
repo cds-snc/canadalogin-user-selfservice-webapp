@@ -1,4 +1,5 @@
 import logging
+import os
 
 from fastapi import Request
 from fastapi.responses import RedirectResponse
@@ -9,6 +10,9 @@ from app.constants.session_keys import SessionKeys
 from app.auth.services.auth_user_session import update_session_tokens
 
 logger = logging.getLogger(__name__)
+
+# Check if running in GitHub Codespaces
+IS_CODESPACES = os.environ.get("CODESPACES") == "true"
 
 
 def get_base_profile_management_url():
@@ -26,12 +30,31 @@ def get_callback_redirect_uri(request: Request):
     """
     config = get_configuration()
     redirect_uri = request.url_for(SessionKeys.CALLBACK_ROUTE_NAME.value)
+    redirect_uri_str = str(redirect_uri)
+
+    # Handle Codespaces reverse proxy - only when running in GitHub Codespaces
+    if IS_CODESPACES:
+        forwarded_host = request.headers.get("X-Forwarded-Host")
+        forwarded_proto = request.headers.get("X-Forwarded-Proto", "https")
+        if forwarded_host:
+            from urllib.parse import urlparse, urlunparse
+            parsed = urlparse(redirect_uri_str)
+            redirect_uri_str = urlunparse((
+                forwarded_proto,
+                forwarded_host,
+                parsed.path,
+                parsed.params,
+                parsed.query,
+                parsed.fragment
+            ))
+            logger.info(f"Codespaces: Callback Redirect URI: {redirect_uri_str}")
+            return redirect_uri_str
 
     if config.ENVIRONMENT != "local":
-        redirect_uri = str(redirect_uri).replace("http://", "https://")
+        redirect_uri_str = redirect_uri_str.replace("http://", "https://")
 
-    logger.info(f"Callback Redirect URI: {redirect_uri}")
-    return redirect_uri
+    logger.info(f"Callback Redirect URI: {redirect_uri_str}")
+    return redirect_uri_str
 
 
 async def redirect_user_to_idp_verify(request: Request):
