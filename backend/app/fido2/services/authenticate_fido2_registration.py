@@ -18,7 +18,83 @@ from app.fido2.services.helper_utils import (
 from app.fido2.schemas import AssertionOptionsRequest, FIDO2AssertionResultRequest
 import base64
 
+from app.auth.services.auth_user_session import introspect_user_token
+from app.config import get_configuration
+
 logger = logging.getLogger(__name__)
+
+
+async def _perform_mfa_refresh_token_flow(
+    http_client: AsyncClient,
+    tenant_url: str,
+    refresh_token: str,
+    client_id: str,
+    client_secret: str,
+) -> dict:
+    """
+    Perform refresh token flow to get MFA challenge token.
+
+    This triggers the MFA policy and returns a token with:
+    - scope: "mfa_challenge"
+    - allowedFactors: ["fido2"]
+
+    Args:
+        http_client: AsyncClient for making HTTP requests
+        tenant_url: IBM Verify tenant URL
+        refresh_token: User's refresh token
+        client_id: OAuth client ID
+        client_secret: OAuth client secret
+
+    Returns:
+        Token response with MFA challenge token
+
+    Raises:
+        Exception: If refresh token flow fails
+    """
+    logger.info("Step 1: Performing refresh token flow for MFA challenge")
+
+    client_creds = f"{client_id}:{client_secret}"
+    basic_auth = base64.b64encode(client_creds.encode()).decode()
+
+    token_url = f"{tenant_url}{VerifyAPIEndpoint.GET_ACCESS_TOKEN.value}"
+
+    refresh_data = {
+        "grant_type": "refresh_token",
+        "refresh_token": refresh_token,
+    }
+
+    refresh_headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Accept": "application/json",
+        "Authorization": f"Basic {basic_auth}",
+    }
+
+    response = await http_client.post(
+        token_url,
+        data=refresh_data,
+        headers=refresh_headers,
+    )
+
+    logger.info(f"Refresh token flow response status: {response.status_code}")
+    logger.info(f"Refresh token flow response body: {response.text}")
+    response.raise_for_status()
+
+    token_data = response.json()
+
+    # Verify we got an MFA challenge token
+    scope = token_data.get("scope", "")
+    allowed_factors = token_data.get("allowedFactors", [])
+
+    logger.info(f"Token scope: {scope}, allowedFactors: {allowed_factors}")
+
+    if "mfa_challenge" not in scope:
+        logger.warning(f"Expected 'mfa_challenge' scope, got: {scope}")
+
+    if "fido2" not in allowed_factors:
+        logger.warning(f"Expected 'fido2' in allowedFactors, got: {allowed_factors}")
+
+    logger.info("Successfully obtained MFA challenge token")
+    return token_data
 
 
 async def _exchange_fido2_jwt_for_access_token(
@@ -27,24 +103,29 @@ async def _exchange_fido2_jwt_for_access_token(
     fido2_jwt: str,
     client_id: str,
     client_secret: str,
-) -> str:
+) -> dict:
     """
-    Convert FIDO2 JWT to OAuth access token using jwt-bearer grant.
+    Exchange FIDO2 JWT for OAuth access token using jwt-bearer grant.
+
+    This completes the MFA challenge by exchanging the FIDO2 JWT
+    for a token with combined authentication methods (password + FIDO2).
 
     Args:
         http_client: AsyncClient for making HTTP requests
         tenant_url: IBM Verify tenant URL
-        fido2_jwt: FIDO2 assertion JWT
-        client_id: OAuth client ID (OIDC application)
+        fido2_jwt: FIDO2 assertion JWT from authentication
+        client_id: OAuth client ID
         client_secret: OAuth client secret
 
     Returns:
-        Access token with FIDO2 authentication
+        Token response with access token that has combined AMR claims
 
     Raises:
         Exception: If token exchange fails
     """
-    logger.info("Step 1: Exchanging FIDO2 JWT for OAuth access token")
+    logger.info(
+        "Step 4: Exchanging FIDO2 JWT for combined access token using jwt-bearer grant"
+    )
 
     client_creds = f"{client_id}:{client_secret}"
     basic_auth = base64.b64encode(client_creds.encode()).decode()
@@ -78,44 +159,9 @@ async def _exchange_fido2_jwt_for_access_token(
     if not access_token:
         raise Exception("No access_token in token exchange response")
 
-    logger.info("Successfully exchanged FIDO2 JWT for OAuth access token")
-    return access_token
-
-
-async def _establish_session_with_token(
-    http_client: AsyncClient,
-    tenant_url: str,
-    access_token: str,
-) -> None:
-    """
-    Use OAuth access token to establish session.
-
-    Args:
-        http_client: AsyncClient for making HTTP requests
-        tenant_url: IBM Verify tenant URL
-        access_token: OAuth access token to establish session with
-
-    Raises:
-        Exception: If session exchange fails
-    """
-    logger.info("Step 2: Using OAuth access token to establish session")
-
-    exchange_url = f"{tenant_url}{VerifyAPIEndpoint.EXCHANGE_TOKEN_SESSION.value}"
-
-    session_data = {"access_token": access_token}
-    session_headers = {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Accept": "application/json",
-    }
-
-    session_response = await http_client.post(
-        exchange_url, data=session_data, headers=session_headers
-    )
-
-    logger.info(f"Session response status: {session_response.status_code}")
-    session_response.raise_for_status()
-
-    logger.info("Session updated with FIDO2-authenticated tokens")
+    logger.info("Successfully exchanged FIDO2 JWT for combined OAuth access token")
+    logger.info(f"Token data keys: {token_data.keys()}")
+    return token_data
 
 
 async def get_assertion_options(
@@ -212,14 +258,52 @@ async def submit_assertion_result(
         # Prepare request body
         body_to_send = request_body.model_dump(exclude_none=True)
 
+        # IBM Verify recommended flow: If return_jwt is True, perform MFA flow BEFORE FIDO2 auth
+        mfa_challenge_token = None
+        if return_jwt:
+            try:
+                from app.auth.services.auth_user_session import get_user_refresh_token
+
+                settings = get_configuration()
+
+                # Step 1: Get refresh token from session
+                refresh_token = await get_user_refresh_token(request)
+                if not refresh_token:
+                    raise Exception("No refresh token available in session")
+
+                logger.info("Starting IBM Verify MFA flow for token combination")
+
+                # Step 2: Perform refresh token flow to get MFA challenge token
+                mfa_token_data = await _perform_mfa_refresh_token_flow(
+                    http_client=http_client,
+                    tenant_url=tenant_url,
+                    refresh_token=refresh_token,
+                    client_id=settings.ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID,
+                    client_secret=settings.ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_SECRET,
+                )
+
+                # Use the MFA challenge token for FIDO2 authentication
+                mfa_challenge_token = mfa_token_data.get("access_token")
+                logger.info("Using MFA challenge token for FIDO2 authentication")
+
+            except Exception as mfa_error:
+                logger.error(
+                    f"Error getting MFA challenge token: {str(mfa_error)}",
+                    exc_info=True,
+                )
+                # Continue with admin token if MFA flow fails
+                logger.warning("Falling back to admin token for FIDO2 authentication")
+
         # Build URL with optional returnJwt query parameter
         url = f"{tenant_url}{VerifyAPIEndpoint.FIDO2_RP_BASE.value}/{rp_uuid}/assertion/result"
         if return_jwt:
             url += "?returnJwt=true"
             logger.info("Requesting JWT token in assertion result response")
 
-        # Make the request
-        headers = get_auth_request_headers(admin_token, json_content_type=True)
+        # Step 3: Make the FIDO2 authentication request
+        # Use MFA challenge token if available, otherwise use admin token
+        auth_token = mfa_challenge_token if mfa_challenge_token else admin_token
+        headers = get_auth_request_headers(auth_token, json_content_type=True)
 
         response = await http_client.post(url, headers=headers, json=body_to_send)
         response.raise_for_status()
@@ -227,20 +311,19 @@ async def submit_assertion_result(
         response_data = response.json()
         logger.info("Assertion result submitted successfully")
 
-        # Store FIDO2 JWT in session if requested (useful for step-up authentication)
+        # Store FIDO2 JWT in session if requested and perform token exchange
         if return_jwt and "assertion" in response_data:
             fido2_jwt = response_data["assertion"]
             request.session["fido2_auth_jwt"] = fido2_jwt
             logger.info("FIDO2 authentication JWT stored in session for step-up auth")
 
-            # Exchange tokens to combine authentication methods
+            # Step 4: Exchange FIDO2 JWT for combined access token
             try:
-                from app.config import get_configuration
+                from app.auth.services.auth_user_session import update_session_tokens
 
                 settings = get_configuration()
 
-                # Step 1: Convert FIDO2 JWT to access token
-                oauth_access_token = await _exchange_fido2_jwt_for_access_token(
+                combined_token_data = await _exchange_fido2_jwt_for_access_token(
                     http_client=http_client,
                     tenant_url=tenant_url,
                     fido2_jwt=fido2_jwt,
@@ -248,16 +331,18 @@ async def submit_assertion_result(
                     client_secret=settings.ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_SECRET,
                 )
 
-                # Step 2: Use the OAuth access token to establish session
-                await _establish_session_with_token(
-                    http_client=http_client,
-                    tenant_url=tenant_url,
-                    access_token=oauth_access_token,
+                # Update session with the new combined tokens
+                introspect_user_token(
+                    http_client, combined_token_data.get("access_token")
+                )
+                # update_session_tokens(request, combined_token_data)
+                logger.info(
+                    "Session updated with combined password + FIDO2 authentication tokens"
                 )
 
             except Exception as exchange_error:
                 logger.error(
-                    f"Error in token exchange process: {str(exchange_error)}",
+                    f"Error exchanging FIDO2 JWT for combined token: {str(exchange_error)}",
                     exc_info=True,
                 )
                 # Don't fail the whole request if token exchange fails

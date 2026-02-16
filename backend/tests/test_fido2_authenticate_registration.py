@@ -467,8 +467,10 @@ class TestSubmitAssertionResult:
         assert result.message == "FIDO2 authentication completed successfully"
 
     @pytest.mark.asyncio
-    @patch.object(auth_module, "_establish_session_with_token")
+    @patch("app.fido2.services.authenticate_fido2_registration.update_session_tokens")
+    @patch("app.fido2.services.authenticate_fido2_registration.get_user_refresh_token")
     @patch.object(auth_module, "_exchange_fido2_jwt_for_access_token")
+    @patch.object(auth_module, "_perform_mfa_refresh_token_flow")
     @patch.object(auth_module, "get_auth_request_headers")
     @patch.object(auth_module, "get_rp_uuid_from_rp_id")
     @patch.object(auth_module, "get_admin_token")
@@ -481,13 +483,15 @@ class TestSubmitAssertionResult:
         mock_get_admin_token,
         mock_get_rp_uuid_from_rp_id,
         mock_get_auth_request_headers,
+        mock_perform_mfa_refresh,
         mock_exchange_fido2_jwt,
-        mock_establish_session,
+        mock_get_user_refresh_token,
+        mock_update_session_tokens,
         mock_http_client,
         mock_request,
         mock_assertion_request,
     ):
-        """Should add returnJwt=true query parameter when requested"""
+        """Should add returnJwt=true query parameter and perform MFA token flow"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
         mock_get_rp_id.return_value = "example.com"
         mock_get_admin_token.return_value = "admin-token"
@@ -496,16 +500,28 @@ class TestSubmitAssertionResult:
             "Authorization": "Bearer admin-token"
         }
 
-        # Mock the helper functions
-        mock_exchange_fido2_jwt.return_value = "oauth-access-token"
-        mock_establish_session.return_value = AsyncMock()
+        # Mock the new MFA flow helper functions
+        mock_get_user_refresh_token.return_value = AsyncMock(
+            return_value="refresh-token-123"
+        )
+        mock_perform_mfa_refresh.return_value = {
+            "access_token": "mfa-challenge-token",
+            "scope": "mfa_challenge",
+            "allowedFactors": ["fido2"],
+        }
+        mock_exchange_fido2_jwt.return_value = {
+            "access_token": "combined-access-token",
+            "id_token": "combined-id-token",
+            "refresh_token": "new-refresh-token",
+        }
+        mock_update_session_tokens.return_value = None
 
         # Mock response for assertion/result
         assertion_response = MagicMock()
         assertion_response.status_code = 200
         assertion_response.json.return_value = {
             "status": "ok",
-            "assertion": "jwt-token",
+            "assertion": "fido2-jwt-token",
         }
         assertion_response.raise_for_status = MagicMock()
 
@@ -524,9 +540,11 @@ class TestSubmitAssertionResult:
         url = call_args[0]
         assert "returnJwt=true" in url
 
-        # Verify helper functions were called
+        # Verify the MFA flow functions were called
+        assert mock_get_user_refresh_token.called
+        assert mock_perform_mfa_refresh.called
         assert mock_exchange_fido2_jwt.called
-        assert mock_establish_session.called
+        assert mock_update_session_tokens.called
 
     @pytest.mark.asyncio
     @patch.object(auth_module, "get_auth_request_headers")
@@ -858,6 +876,111 @@ class TestSubmitAssertionResult:
         assert "Unexpected error" in str(error_arg)
 
 
+class TestPerformMfaRefreshTokenFlow:
+    """Tests for _perform_mfa_refresh_token_flow helper function"""
+
+    @pytest.fixture
+    def mock_http_client(self):
+        """Create a mock HTTP client"""
+        return AsyncMock(spec=AsyncClient)
+
+    @pytest.mark.asyncio
+    async def test_successful_mfa_refresh_flow(self, mock_http_client):
+        """Should successfully perform MFA refresh token flow"""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "access_token": "mfa-challenge-token-123",
+            "token_type": "Bearer",
+            "expires_in": 3600,
+            "scope": "mfa_challenge",
+            "allowedFactors": ["fido2"],
+        }
+        mock_response.raise_for_status = MagicMock()
+        mock_http_client.post = AsyncMock(return_value=mock_response)
+
+        refresh_func = auth_module._perform_mfa_refresh_token_flow
+
+        result = await refresh_func(
+            http_client=mock_http_client,
+            tenant_url="https://tenant.verify.ibm.com",
+            refresh_token="user-refresh-token",
+            client_id="client-id-123",
+            client_secret="client-secret-456",
+        )
+
+        assert result["access_token"] == "mfa-challenge-token-123"
+        assert result["scope"] == "mfa_challenge"
+        assert "fido2" in result["allowedFactors"]
+
+        # Verify the POST call
+        mock_http_client.post.assert_called_once()
+        call_args = mock_http_client.post.call_args
+        url = call_args[0][0]
+        assert "https://tenant.verify.ibm.com/oauth2/token" in url
+
+        # Verify request data
+        data = call_args[1]["data"]
+        assert data["grant_type"] == "refresh_token"
+        assert data["refresh_token"] == "user-refresh-token"
+
+        # Verify headers
+        headers = call_args[1]["headers"]
+        assert "Authorization" in headers
+        assert headers["Authorization"].startswith("Basic ")
+
+    @pytest.mark.asyncio
+    async def test_handles_http_error(self, mock_http_client):
+        """Should handle HTTP errors during MFA refresh flow"""
+        mock_response = MagicMock()
+        mock_response.status_code = 401
+        mock_response.text = "Invalid refresh token"
+
+        http_error = HTTPStatusError(
+            "401 Unauthorized",
+            request=MagicMock(spec=Request),
+            response=mock_response,
+        )
+        mock_http_client.post = AsyncMock(side_effect=http_error)
+
+        refresh_func = auth_module._perform_mfa_refresh_token_flow
+
+        with pytest.raises(HTTPStatusError):
+            await refresh_func(
+                http_client=mock_http_client,
+                tenant_url="https://tenant.verify.ibm.com",
+                refresh_token="invalid-refresh-token",
+                client_id="client-id-123",
+                client_secret="client-secret-456",
+            )
+
+    @pytest.mark.asyncio
+    async def test_warns_on_missing_mfa_challenge_scope(self, mock_http_client):
+        """Should log warning if mfa_challenge scope is missing"""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "access_token": "token-123",
+            "scope": "openid profile",  # Missing mfa_challenge
+            "allowedFactors": ["fido2"],
+        }
+        mock_response.raise_for_status = MagicMock()
+        mock_http_client.post = AsyncMock(return_value=mock_response)
+
+        refresh_func = auth_module._perform_mfa_refresh_token_flow
+
+        result = await refresh_func(
+            http_client=mock_http_client,
+            tenant_url="https://tenant.verify.ibm.com",
+            refresh_token="user-refresh-token",
+            client_id="client-id-123",
+            client_secret="client-secret-456",
+        )
+
+        # Should still return the token data even with missing scope
+        assert result["access_token"] == "token-123"
+
+
 class TestExchangeFido2JwtForAccessToken:
     """Tests for _exchange_fido2_jwt_for_access_token helper function"""
 
@@ -868,11 +991,13 @@ class TestExchangeFido2JwtForAccessToken:
 
     @pytest.mark.asyncio
     async def test_successful_token_exchange(self, mock_http_client):
-        """Should successfully exchange FIDO2 JWT for OAuth access token"""
+        """Should successfully exchange FIDO2 JWT for combined OAuth access token"""
         mock_response = MagicMock()
         mock_response.status_code = 200
         mock_response.json.return_value = {
-            "access_token": "oauth-access-token-123",
+            "access_token": "combined-access-token-123",
+            "id_token": "combined-id-token-456",
+            "refresh_token": "new-refresh-token-789",
             "token_type": "Bearer",
             "expires_in": 3600,
         }
@@ -890,7 +1015,11 @@ class TestExchangeFido2JwtForAccessToken:
             client_secret="client-secret-456",
         )
 
-        assert result == "oauth-access-token-123"
+        # Should return full token data now
+        assert isinstance(result, dict)
+        assert result["access_token"] == "combined-access-token-123"
+        assert result["id_token"] == "combined-id-token-456"
+        assert result["refresh_token"] == "new-refresh-token-789"
 
         # Verify the POST call
         mock_http_client.post.assert_called_once()
@@ -957,82 +1086,3 @@ class TestExchangeFido2JwtForAccessToken:
             )
 
         assert "No access_token" in str(exc_info.value)
-
-
-class TestEstablishSessionWithToken:
-    """Tests for _establish_session_with_token helper function"""
-
-    @pytest.fixture
-    def mock_http_client(self):
-        """Create a mock HTTP client"""
-        return AsyncMock(spec=AsyncClient)
-
-    @pytest.mark.asyncio
-    async def test_successful_session_establishment(self, mock_http_client):
-        """Should successfully establish session with OAuth token"""
-        mock_response = MagicMock()
-        mock_response.status_code = 200
-        mock_response.json.return_value = {
-            "access_token": "session-access-token",
-            "id_token": "session-id-token",
-        }
-        mock_response.raise_for_status = MagicMock()
-        mock_http_client.post = AsyncMock(return_value=mock_response)
-
-        establish_func = auth_module._establish_session_with_token
-
-        # Should not raise any errors
-        await establish_func(
-            http_client=mock_http_client,
-            tenant_url="https://tenant.verify.ibm.com",
-            access_token="oauth-access-token-123",
-        )
-
-        # Verify the POST call
-        mock_http_client.post.assert_called_once()
-        call_args = mock_http_client.post.call_args
-        url = call_args[0][0]
-        assert "https://tenant.verify.ibm.com/v1.0/auth/session" in url
-
-        # Verify request data
-        data = call_args[1]["data"]
-        assert data["access_token"] == "oauth-access-token-123"
-
-    @pytest.mark.asyncio
-    async def test_handles_http_error(self, mock_http_client):
-        """Should handle HTTP errors during session establishment"""
-        mock_response = MagicMock()
-        mock_response.status_code = 401
-        mock_response.text = "Unauthorized"
-
-        http_error = HTTPStatusError(
-            "401 Unauthorized",
-            request=MagicMock(spec=Request),
-            response=mock_response,
-        )
-        mock_http_client.post = AsyncMock(side_effect=http_error)
-
-        establish_func = auth_module._establish_session_with_token
-
-        with pytest.raises(HTTPStatusError):
-            await establish_func(
-                http_client=mock_http_client,
-                tenant_url="https://tenant.verify.ibm.com",
-                access_token="oauth-access-token-123",
-            )
-
-    @pytest.mark.asyncio
-    async def test_handles_generic_exception(self, mock_http_client):
-        """Should handle generic exceptions during session establishment"""
-        mock_http_client.post = AsyncMock(side_effect=Exception("Network error"))
-
-        establish_func = auth_module._establish_session_with_token
-
-        with pytest.raises(Exception) as exc_info:
-            await establish_func(
-                http_client=mock_http_client,
-                tenant_url="https://tenant.verify.ibm.com",
-                access_token="oauth-access-token-123",
-            )
-
-        assert "Network error" in str(exc_info.value)
