@@ -71,7 +71,7 @@ export default function ProfileUpdateName({
       // For regular inputs (like in tests), update the target directly
       const inputElement = e.target.shadowRoot?.activeElement || e.target;
       inputElement.value = filteredValue;
-      
+
       onNameFormChange(name, filteredValue);
 
       if (setErrorCode) {
