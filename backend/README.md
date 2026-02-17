@@ -1,6 +1,6 @@
 # Backend Application
 
-This is the FastAPI application for the GC Sign in back-end API.
+This is the FastAPI application for the CanadaLogin back-end API.
 
 ## Running with Docker
 

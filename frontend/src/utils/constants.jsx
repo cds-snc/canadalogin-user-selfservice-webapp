@@ -129,7 +129,7 @@ export const PAGES = {
 
 export const FOOTERS = {
   default: {
-    en: '{ "About GC Sign in": "https://gc-signin.cdssandbox.xyz/en/", "Help": "https://gc-signin.cdssandbox.xyz/en/", "Terms": "https://gc-signin.cdssandbox.xyz/en/" }',
+    en: '{ "About CanadaLogin": "https://gc-signin.cdssandbox.xyz/en/", "Help": "https://gc-signin.cdssandbox.xyz/en/", "Terms": "https://gc-signin.cdssandbox.xyz/en/" }',
     fr: '{ "À propos de Connexion GC": "https://gc-signin.cdssandbox.xyz/en/", "Aide": "https://gc-signin.cdssandbox.xyz/fr/", "Avis": "https://gc-signin.cdssandbox.xyz/en/" }',
   },
 };

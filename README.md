@@ -59,9 +59,9 @@ To bypass in a one-off situation: `git commit --no-verify`
 
 - [IBM Verify Documentation](https://docs.verify.ibm.com/verify/reference/overview)
 
-### Other GC Sign in Repos
+### Other CanadaLogin Repos
 
-- [GC Sign in Terraform Repo (AWS Deployment)](https://github.com/cds-snc/gc-signin-terraform)
+- [CanadaLogin Terraform Repo (AWS Deployment)](https://github.com/cds-snc/gc-signin-terraform)
 - [IBM Tenant Configuration Repo](https://github.com/cds-snc/gc-signin-ibm-configuration)
 - [CanadaLogin Static website](https://github.com/cds-snc/gc-signin-static-website)
 
