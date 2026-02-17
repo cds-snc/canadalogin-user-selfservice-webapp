@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Optional
 
 from app.utils.schemas import ResponseModel
-from app.utils.mask_user_profile import mask_phone_number, mask_individual_email_address
+from app.utils.string_masking import mask_phone_number, mask_email_address
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -91,7 +91,7 @@ class OtpDataResponse(BaseModel):
     def mask_email_address(cls, v):
         if v is None:
             return v
-        return mask_individual_email_address(v)
+        return mask_email_address(v)
 
 
 class OtpRequestResponse(ResponseModel):

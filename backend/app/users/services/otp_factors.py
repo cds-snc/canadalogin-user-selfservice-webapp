@@ -11,7 +11,7 @@ from app.users.schemas import (
 )
 from app.users.services.get_my_profile import get_my_profile
 from app.utils.access_token import get_admin_token, get_auth_request_headers
-from app.utils.mask_user_profile import mask_phone_number
+from app.utils.string_masking import mask_phone_number
 from app.utils.request_error_handler import RequestErrorHandler
 from fastapi import HTTPException, status
 from httpx import AsyncClient
