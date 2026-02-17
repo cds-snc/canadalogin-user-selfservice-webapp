@@ -260,9 +260,7 @@ async def test_handle_success_returns_data_and_message(otp_type):
     else:
         assert model.phoneNumber == "+1 (***) ***-1234"
     # success message uses enum .value per implementation
-    assert (message or "").startswith(
-        f"{otp_type.value} OTP sent successfully"
-    )
+    assert (message or "").startswith(f"{otp_type.value} OTP sent successfully")
 
 
 @pytest.mark.asyncio
@@ -276,7 +274,7 @@ async def test_handle_non_201_returns_error_model():
         info = UserOtpInfo(
             otpType=OtpType.EMAIL,
             user_id="user@example.com",
-            destination="user@example.com"
+            destination="user@example.com",
         )
         # Now expects HTTPException with status code 400
         with pytest.raises(HTTPException) as exc_info:

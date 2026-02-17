@@ -3,7 +3,14 @@ from typing import Optional
 
 from app.utils.schemas import ResponseModel
 from app.utils.mask_user_profile import mask_phone_number, mask_individual_email_address
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, model_validator, field_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    EmailStr,
+    Field,
+    model_validator,
+    field_validator,
+)
 from pydantic_extra_types.phone_numbers import PhoneNumber
 
 
@@ -48,6 +55,7 @@ class UserOtpInfo(BaseModel):
 
         # For non-masked numbers, validate with PhoneNumber using a temporary model
         try:
+
             class TempPhoneModel(BaseModel):
                 phone: PhoneNumber
 

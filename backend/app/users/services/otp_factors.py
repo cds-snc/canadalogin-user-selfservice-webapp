@@ -193,7 +193,14 @@ async def get_user_otp_factor(
             validated_data
         )
 
-        phone_number_otp_factor = next((factor for factor in phone_number_otp_factors if factor.get("id") == factor_id), None)
+        phone_number_otp_factor = next(
+            (
+                factor
+                for factor in phone_number_otp_factors
+                if factor.get("id") == factor_id
+            ),
+            None,
+        )
 
         if phone_number_otp_factor is None:
             raise HTTPException(

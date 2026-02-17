@@ -39,9 +39,7 @@ async def handle_otp_send(
 
         if user_otp_info.factor_id is not None:
             user_otp_factor = await get_user_otp_factor(
-                global_http_client,
-                my_profile_response.data.id,
-                user_otp_info.factor_id
+                global_http_client, my_profile_response.data.id, user_otp_info.factor_id
             )
 
             user_otp_info.destination = user_otp_factor.get("destination")
@@ -114,7 +112,10 @@ async def dispatch_otp(
         headers = get_auth_request_headers(access_token, True, language)
         settings = get_configuration().ibm_verify_config
 
-        if user_otp_info.otpType == OtpType.SMS or user_otp_info.otpType == OtpType.VOICE:
+        if (
+            user_otp_info.otpType == OtpType.SMS
+            or user_otp_info.otpType == OtpType.VOICE
+        ):
             user_phone_number = {
                 "phoneNumber": prepare_pydantic_phone_number_for_verify(
                     user_otp_info.destination
