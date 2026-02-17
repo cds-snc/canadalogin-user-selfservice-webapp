@@ -1,4 +1,3 @@
-import React from "react";
 import { useParams } from "react-router";
 import {
   GcdsButton,
@@ -28,53 +27,56 @@ export default function ProfileUpdateName({
   const { language } = useParams();
   const pageNameEditJson = getPageContent(language, PAGES.profileUpdateName);
 
-  const validateCharacter = (char) => {
-    // Check if a single character is valid for names
-    const charRegex =
-      /[a-zA-ZÀ-ÿĀ-žА-я\u0100-\u017F\u0180-\u024F\u1E00-\u1EFF\s'-]/;
-    return charRegex.test(char);
+  /**
+   * Capitalizes the first letter of each word in a name.
+   * Canadian naming conventions: First letter should be capitalized.
+   */
+  const capitalizeFirstLetter = (str) => {
+    if (!str) return str;
+    // Split by spaces, hyphens, and apostrophes, capitalize first letter of each part
+    return str
+      .split(/([\s'-])/) // Split while keeping delimiters
+      .map((part) => {
+        if (part.match(/^[\s'-]$/)) return part; // Keep delimiters as-is
+        if (part.length === 0) return part;
+        return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
+      })
+      .join("");
   };
 
-  const handleKeyUp = (e) => {
-    const { name } = e.target;
-    const char = e.key;
-
-    // Only apply validation to name fields
-    if (name === "givenName" || name === "familyName") {
-      // Prevent invalid characters from being typed
-      if (!validateCharacter(char)) {
-        e.preventDefault();
-        return;
-      }
-      handleProfileChange(e);
-    }
+  /**
+   * Validates and filters name input to only allow valid characters.
+   * Canadian naming rules: Letters (including accented), spaces, hyphens, and apostrophes only.
+   * No numbers or other symbols allowed.
+   */
+  const filterNameInput = (value) => {
+    // Only allow: letters (including international/accented), spaces, hyphens, apostrophes
+    const validCharRegex =
+      /[a-zA-ZÀ-ÿĀ-žА-я\u0100-\u017F\u0180-\u024F\u1E00-\u1EFF\s'-]/g;
+    const filtered = value.match(validCharRegex)?.join("") || "";
+    return capitalizeFirstLetter(filtered);
   };
 
-  // onChange handler with validation for paste operations, etc.
-  const handleProfileChange = (e) => {
+  /**
+   * Handle input event - blocks invalid characters immediately.
+   * Filters input in real-time and updates state.
+   */
+  const handleInput = (e) => {
     const { name, value } = e.target;
 
-    // Apply validation to name fields
     if (name === "givenName" || name === "familyName") {
-      // Filter out invalid characters from pasted content
-      const validCharRegex =
-        /[a-zA-ZÀ-ÿĀ-žА-я\u0100-\u017F\u0180-\u024F\u1E00-\u1EFF\s'-]/g;
-      const filteredValue = value.match(validCharRegex)?.join("") || "";
+      const filteredValue = filterNameInput(value);
 
-      // Only update if the filtered value is different from original
-      if (filteredValue !== value) {
-        // Set the filtered value back to the input
-        e.target.value = filteredValue;
-        onNameFormChange(name, filteredValue);
-      } else {
-        onNameFormChange(name, value);
+      // For GCDS components with shadow DOM, update the internal input element
+      // For regular inputs (like in tests), update the target directly
+      const inputElement = e.target.shadowRoot?.activeElement || e.target;
+      inputElement.value = filteredValue;
+      
+      onNameFormChange(name, filteredValue);
+
+      if (setErrorCode) {
+        setErrorCode("");
       }
-    } else {
-      onNameFormChange(name, value);
-    }
-
-    if (setErrorCode) {
-      setErrorCode("");
     }
   };
 
@@ -112,9 +114,8 @@ export default function ProfileUpdateName({
             data-testid="givenName"
             lang={language}
             value={nameFormData.givenName}
-            onChange={handleProfileChange}
-            onKeyUp={handleKeyUp}
-            pattern="[a-zA-ZÀ-ÿĀ-žА-я\u0100-\u017F\u0180-\u024F\u1E00-\u1EFF\s'-]*"
+            onInput={handleInput}
+            required
           />
           <GcdsInput
             inputId="familyName"
@@ -126,9 +127,7 @@ export default function ProfileUpdateName({
             lang={language}
             required
             value={nameFormData.familyName}
-            onChange={handleProfileChange}
-            onKeyUp={handleKeyUp}
-            pattern="[a-zA-ZÀ-ÿĀ-žА-я\u0100-\u017F\u0180-\u024F\u1E00-\u1EFF\s'-]*"
+            onInput={handleInput}
           />
         </GcdsContainer>
       </form>
