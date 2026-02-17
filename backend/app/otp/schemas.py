@@ -40,7 +40,7 @@ class UserOtpInfo(BaseModel):
     @model_validator(mode="after")
     def validate(self):
         if self.factor_id is None and self.destination is None:
-            raise ValueError(f"Must contain factor_id or destination")
+            raise ValueError("Must contain factor_id or destination")
 
         # Validate only phone numbers
         if self.otpType not in {OtpType.SMS, OtpType.VOICE} or self.destination is None:
@@ -77,7 +77,6 @@ class OtpDataResponse(BaseModel):
     def mask_phone_number(cls, v):
         if v is None:
             return v
-        print("hi")
         return mask_phone_number(v)
 
     @field_validator("emailAddress")
