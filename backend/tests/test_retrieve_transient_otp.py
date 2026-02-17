@@ -131,40 +131,19 @@ async def test_handle_success_validates_into_OtpDataResponse(otp_type, monkeypat
 
     # Expect enum value in message because implementation uses the Enum directly
     expected_msg_fragment = f"{otp_type} OTP status checked successfully"
-
-    # Assert ResponseModel-like contract defensively (dict or model)
-    if isinstance(result, dict):
-        assert result.get("success") is True
-        data = result.get("data")
-        # If 'data' is a dict; validate via OtpDataResponse
-        if isinstance(data, dict):
-            data_model = OtpDataResponse(**data)
-        else:
-            data_model = data  # maybe already a model
-        assert isinstance(data_model, OtpDataResponse)
-        assert data_model.id == trxn_id
-        assert data_model.correlation == "corr-xyz"
-        if otp_type == OtpType.EMAIL:
-            assert data_model.emailAddress == "user@example.com"
-            assert data_model.phoneNumber in (None, "")
-        else:
-            assert data_model.phoneNumber == "+14165551234"
-            assert data_model.emailAddress in (None, "")
-        assert expected_msg_fragment in (result.get("message") or "")
+    # Possibly a Pydantic ResponseModel instance
+    assert getattr(result, "success", None) is True
+    data = getattr(result, "data", None)
+    assert isinstance(data, OtpDataResponse)
+    assert data.id == trxn_id
+    assert data.correlation == "corr-xyz"
+    if otp_type == OtpType.EMAIL:
+        assert data.emailAddress == "us****@example.com"
+        assert data.phoneNumber in (None, "")
     else:
-        # Possibly a Pydantic ResponseModel instance
-        assert getattr(result, "success", None) is True
-        data = getattr(result, "data", None)
-        assert isinstance(data, OtpDataResponse)
-        assert data.id == trxn_id
-        assert data.correlation == "corr-xyz"
-        if otp_type == OtpType.EMAIL:
-            assert data.emailAddress == "user@example.com"
-            assert data.phoneNumber in (None, "")
-        else:
-            assert data.phoneNumber == "+14165551234"
-            assert data.emailAddress in (None, "")
-        assert expected_msg_fragment in (getattr(result, "message", "") or "")
+        assert data.phoneNumber == "+1 (***) ***-1234"
+        assert data.emailAddress in (None, "")
+    assert expected_msg_fragment in (getattr(result, "message", "") or "")
 
 
 @pytest.mark.asyncio

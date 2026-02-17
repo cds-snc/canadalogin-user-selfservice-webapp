@@ -1,46 +1,13 @@
 import pytest
 from unittest.mock import patch
 from app.utils.mask_user_profile import (
-    mask_phone_number,
     mask_profile_details,
+    mask_contact_phone_numbers,
+    mask_profile_email_addresses,
 )
 from phonenumbers import NumberParseException
 
 MASK_PHONE_IMPORT = "app.utils.mask_user_profile.mask_contact_phone_numbers"
-
-
-def test_number_with_only_digits():
-    phone = "+19876541234"
-    result = mask_phone_number(phone)
-    assert result.endswith("1234")
-    assert result == "+1 (***) ***-1234"
-
-
-def test_invalid_short_number():
-    with pytest.raises(ValueError, match="Phone number must have at least 4 digits"):
-        mask_phone_number("123")
-
-
-def test_valid_international_number():
-    phone = "+44 20 8366 1177"
-    result = mask_phone_number(phone)
-    assert result.endswith("1177")
-    assert result == "+44 *** **** 1177"
-
-
-def test_valid_ca_number():
-    phone = "+1 (613) 123-4567"
-    result = mask_phone_number(phone)
-    assert result.endswith("4567")
-    assert result == "+1 (***) ***-4567"
-
-
-def test_invalid_input():
-    with pytest.raises(
-        NumberParseException,
-        match="The string supplied did not seem to be a phone number.",
-    ):
-        mask_phone_number("abcedefg")
 
 
 @patch(MASK_PHONE_IMPORT)
@@ -80,3 +47,34 @@ def test_mask_profile_details_handles_missing_phone_numbers(mock_masked_phone):
 
     assert result["phoneNumbers"] == []
     mock_masked_phone.assert_called_once_with(profile_data)
+
+
+def test_mask_contact_phone_numbers_valid_phone_number():
+    profile_data = {
+        "phoneNumbers": [{"value": "+1-613-555-1234", "type": "mobile"}],
+    }
+    result = mask_contact_phone_numbers(profile_data)
+    assert result == [{"value": "+1 (***) ***-1234", "type": "mobile"}]
+
+
+def test_mask_contact_phone_numbers_invalid_phone_number():
+    with pytest.raises(
+        NumberParseException,
+        match="The string supplied did not seem to be a phone number.",
+    ):
+        profile_data = {
+            "phoneNumbers": [{"value": "abcdef", "type": "mobile"}],
+        }
+        mask_contact_phone_numbers(profile_data)
+
+
+def test_mask_profile_email_addresses_valid_email():
+    profile_data = {"emails": [{"value": "test_1-2.3+test@test.com"}]}
+    result = mask_profile_email_addresses(profile_data)
+    assert result == [{"value": "te****@test.com"}]
+
+
+def test_mask_profile_email_addresses_invalid_email():
+    profile_data = {"emails": [{"value": "test.com"}]}
+    result = mask_profile_email_addresses(profile_data)
+    assert result == []

@@ -377,7 +377,7 @@ describe("useOtpOperations", () => {
 
       expect(mockAuthService.transientOtpSend).toHaveBeenCalledWith({
         otpType: "sms",
-        phoneNumber: "+15551234567",
+        factor_id: "factor-1",
         user_id: "test-user-123",
       });
       expect(result.current.otpSentResponse).toEqual({
@@ -687,7 +687,7 @@ describe("useOtpOperations", () => {
 
       expect(mockAuthService.transientOtpSend).toHaveBeenCalledWith({
         otpType: "voice",
-        phoneNumber: "+15559876543",
+        factor_id: "factor-2",
         user_id: "test-user-123",
       });
     });

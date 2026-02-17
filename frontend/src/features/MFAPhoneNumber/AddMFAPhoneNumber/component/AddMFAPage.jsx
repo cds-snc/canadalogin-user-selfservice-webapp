@@ -214,8 +214,8 @@ export default function AddMFAPage() {
   const requestOtpCode = async () => {
     const userData = {
       user_id: userProfile.id,
+      factor_id: userSelectedMfaFactor.id,
       otpType: serverMapping[userSelectedMfaFactor.type],
-      phoneNumber: userSelectedMfaFactor.phoneNumber,
     };
     try {
       const response = await authService.transientOtpSend(userData);

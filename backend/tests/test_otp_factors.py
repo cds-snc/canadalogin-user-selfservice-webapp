@@ -15,7 +15,7 @@ from app.users.services.otp_factors import (
     get_user_otp_factors,
     parse_phone_auth_factors_response,
 )
-from app.utils.mask_user_profile import mask_phone_number
+from app.utils.string_masking import mask_phone_number
 from fastapi import HTTPException
 from httpx import AsyncClient
 
@@ -298,19 +298,19 @@ async def test_parse_phone_auth_factors_response_unmasked():
     assert result[0]["id"] == "factor1"
     assert result[0]["type"] == OtpType.SMSOTP.value
     # Should return the actual phone number, not masked
-    assert result[0]["phoneNumber"] == "+1 234-567-8901"
+    assert result[0]["destination"] == "+1 234-567-8901"
 
 
 @pytest.mark.asyncio
-async def test_get_user_otp_factors_unmasked(monkeypatch):
+async def test_get_user_otp_factor(monkeypatch):
     """Test getting unmasked user OTP factors"""
-    from app.users.services.otp_factors import get_user_otp_factors_unmasked
+    from app.users.services.otp_factors import get_user_otp_factor
 
     async def mock_dispatch_user_auth_factors(client, user_id, validated=True):
         return {
             "factors": [
                 {
-                    "id": "factor1",
+                    "id": "factor123",
                     "userId": "user123",
                     "type": OtpType.SMSOTP.value,
                     "created": datetime.now().isoformat(),
@@ -333,11 +333,8 @@ async def test_get_user_otp_factors_unmasked(monkeypatch):
     )
 
     async with AsyncClient(base_url="http://localhost") as client:
-        result = await get_user_otp_factors_unmasked(client, "user123")
-
-        assert isinstance(result, list)
-        assert len(result) == 1
-        assert result[0]["id"] == "factor1"
-        assert result[0]["type"] == OtpType.SMSOTP.value
+        result = await get_user_otp_factor(client, "user123", "factor123")
+        assert result["id"] == "factor123"
+        assert result["type"] == OtpType.SMSOTP.value
         # Should return unmasked phone number
-        assert result[0]["phoneNumber"] == "+1 234-567-8901"
+        assert result["destination"] == "+1 234-567-8901"

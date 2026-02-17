@@ -94,16 +94,19 @@ The API will be available at `http://localhost:8000`
 #### Initial Setup (Required Before Debugging)
 
 1. **Install Python dependencies** (run from repo root):
+
 ```bash
 make install-dev-python
 ```
 
 2. **Activate virtual environment** (if created):
+
 ```bash
 source .venv/bin/activate
 ```
 
 3. **Verify installation**:
+
 ```bash
 cd backend
 python -c "import fastapi; print('Dependencies installed successfully')"
@@ -116,18 +119,23 @@ python -c "import fastapi; print('Dependencies installed successfully')"
 The project includes several VS Code debug configurations in [`.vscode/launch.json`](../.vscode/launch.json):
 
 #### 1. Python Debugger: FastAPI (HTTPS)
+
 Runs the backend with SSL certificates for FIDO2 development:
+
 - **Use when**: Developing FIDO2/WebAuthn features
 - **URL**: `https://app.auth.signin-connexion.cdssandbox.xyz:8000` or `https://localhost:8000`
 - **Requirements**: SSL certificates in `backend/certs/`
 
 #### 2. Python Debugger: FastAPI (HTTP)
+
 Runs the backend without SSL for general development:
+
 - **Use when**: General API development without FIDO2
 - **URL**: `http://localhost:8000`
 - **Requirements**: None
 
 #### 3. Test Debug Configurations
+
 - **Current Test File**: Debug the currently open test file
 - **All Tests**: Debug all tests in the test suite
 
@@ -142,11 +150,13 @@ Runs the backend without SSL for general development:
 ### Environment Setup for Debugging
 
 The debugger configurations automatically:
+
 - Set `PYTHONPATH` to the backend directory
 - Load environment variables from `backend/.env`
 - Configure the correct host and port settings
 
 **Note**: Ensure Redis is running before starting the debugger:
+
 ```bash
 brew services start redis
 redis-cli ping  # Should return PONG
@@ -157,6 +167,7 @@ redis-cli ping  # Should return PONG
 For FIDO2/WebAuthn development using the HTTPS configuration:
 
 1. **Generate SSL certificates** (if not already done):
+
 ```bash
 cd backend
 mkdir -p certs
@@ -164,6 +175,7 @@ mkcert -cert-file certs/cert.pem -key-file certs/key.pem app.auth.signin-connexi
 ```
 
 2. **Update `/etc/hosts`** (if using custom domain):
+
 ```bash
 sudo nano /etc/hosts
 # Add: 127.0.0.1       app.auth.signin-connexion.cdssandbox.xyz
@@ -176,6 +188,7 @@ sudo nano /etc/hosts
 To run the backend in a development container:
 
 1. **Open in dev container**:
+
 - Open the gc-signin-user-selfservice-webapp in VSCode at the project's root directory, there should be a .devcontainer folder
 - Open VSCode search menu (Ctrl+Shift+P / Cmd+Shift+P)
 - Type "dev containers: reopen in container" and select
@@ -317,31 +330,19 @@ To run the unit tests, follow these steps:
    make install-dev-python
    ```
 
-2. Set environment variables (they can be dummy values for mock tests)
-
-   ```bash
-   export IBM_VERIFY_TENANT_URL=abc123
-   export IBM_VERIFY_API_CLIENT_ID=abc123
-   export IBM_VERIFY_API_CLIENT_SECRET=abc123
-   export IBM_VERIFY_PROFILE_MANAGEMENT_API_CLIENT_ID=abc123
-   export IBM_VERIFY_PROFILE_MANAGEMENT_API_SECRET=abc123
-   export IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID=abc123
-   export IBM_VERIFY_PROFILE_MANAGEMENT_SECRET=abc123
-   ```
-
-3. Run all the tests (run this from root of the repo):
+2. Run all the tests (run this from root of the repo):
 
    ```bash
    make run-pytest
    ```
 
-4. Run tests and generate a coverage report:
+3. Run tests and generate a coverage report:
 
    ```bash
    pytest --cov=app --cov-report=term-missing
    ```
 
-5. Run a specific test:
+4. Run a specific test:
    ```bash
    pytest tests/test_hello.py::test_hello_world -v
    ```
