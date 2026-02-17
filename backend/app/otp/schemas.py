@@ -74,6 +74,7 @@ class OtpDataResponse(BaseModel):
     retries: int
 
     @field_validator("phoneNumber")
+    @classmethod
     def mask_phone_number(cls, v):
         if v is None:
             return v
@@ -81,6 +82,7 @@ class OtpDataResponse(BaseModel):
         return mask_phone_number(v)
 
     @field_validator("emailAddress")
+    @classmethod
     def mask_email_address(cls, v):
         if v is None:
             return v
