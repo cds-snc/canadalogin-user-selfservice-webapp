@@ -211,8 +211,8 @@ export function UserProvider({
   );
 
   // Timer refs for session management
-  const warningTimerRef = useRef<number | null>(null);
-  const expireTimerRef = useRef<number | null>(null);
+  const warningTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const expireTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Session timeout configuration (in milliseconds)
   const WARNING_TIME = 5 * 60 * 1000; // 5 minutes before expiry
@@ -265,7 +265,7 @@ export function UserProvider({
           type: CONTEXT_ACTIONS.show_session_timeout_modal,
           payload: expireTimeMs,
         });
-      }, timeUntilWarning);
+      }, timeUntilWarning) as unknown as NodeJS.Timeout;
     } else {
       // If less than 5 minutes remain, show the modal immediately
       sessionTimeoutDispatch({
@@ -277,7 +277,7 @@ export function UserProvider({
     // Set expire timer
     expireTimerRef.current = setTimeout(async () => {
       await handleLogout();
-    }, timeUntilExpire);
+    }, timeUntilExpire) as unknown as NodeJS.Timeout;
 
     console.log(
       `Session timers set: warning in ${timeUntilWarning}ms, expire in ${timeUntilExpire}ms`,
