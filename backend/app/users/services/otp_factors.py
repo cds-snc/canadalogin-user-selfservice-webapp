@@ -11,7 +11,7 @@ from app.users.schemas import (
 )
 from app.users.services.get_my_profile import get_my_profile
 from app.utils.access_token import get_admin_token, get_auth_request_headers
-from app.utils.mask_user_profile import mask_phone_number
+from app.utils.string_masking import mask_phone_number
 from app.utils.request_error_handler import RequestErrorHandler
 from fastapi import HTTPException, status
 from httpx import AsyncClient
@@ -100,7 +100,7 @@ async def parse_phone_auth_factors_response_unmasked(
                 {
                     "id": factor.id,
                     "type": factor.type,
-                    "phoneNumber": phone_number,  # Unmasked phone number
+                    "destination": phone_number,  # Unmasked phone number
                 }
             )
 
@@ -157,19 +157,20 @@ async def dispatch_user_auth_factors(
         RequestErrorHandler.handle(e)
 
 
-async def get_user_otp_factors_unmasked(
+async def get_user_otp_factor(
     global_http_client: AsyncClient,
     user_profile_id: str,
+    factor_id: str,
     validated: bool = True,
 ):
     """
-    Get user OTP factors with unmasked phone numbers for internal use.
+    Get user OTP factor with unmasked phone numbers for internal use.
     The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls.
     """
     try:
         logger.info(
-            f"get_user_otp_factors_unmasked for profile_id: {user_profile_id}, validated: {validated}"
+            f"get_user_otp_factor for profile_id: {user_profile_id}, validated: {validated}"
         )
 
         start_time = datetime.now()
@@ -187,14 +188,31 @@ async def get_user_otp_factors_unmasked(
                 status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                 detail="Invalid response",
             )
-
+        # current only support phone OTP
         phone_number_otp_factors = await parse_phone_auth_factors_response_unmasked(
             validated_data
         )
+
+        phone_number_otp_factor = next(
+            (
+                factor
+                for factor in phone_number_otp_factors
+                if factor.get("id") == factor_id
+            ),
+            None,
+        )
+
+        if phone_number_otp_factor is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User OTP Factor not found",
+            )
+
         logger.info(
             "success response and data validation for user auth factors (unmasked)"
         )
-        return phone_number_otp_factors
+
+        return phone_number_otp_factor
 
     except Exception as e:
         logger.error(

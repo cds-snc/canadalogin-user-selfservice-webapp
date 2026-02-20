@@ -77,9 +77,9 @@ const GCDS_TAG_ATTRIBUTES = {
 
 interface TestParameters {
   language: string;
-  pageContentJson: JSON;
+  pageContentJson: any;
   langLink: string;
-  buttonJson: JSON;
+  buttonJson: any;
   isVoice: boolean;
   stepper: Array<string>;
   textKeysToNotSearch: Array<string>;

@@ -59,34 +59,30 @@ export const useOtpOperations = (
 
   /**
    * Request OTP code to be sent to the selected MFA factor or email
-   * @param {string} overrideOtpType - Optional OTP type override
-   * @param {string} targetEmailAddress - Optional target email address for email OTP
+   * @param {object} override - Optional OTP override
    */
-  const requestOtpCode = async (overrideOtpType, targetEmailAddress) => {
+  const requestOtpCode = async (override) => {
     if (!userName) return;
 
-    // Allow direct email OTP requests or use selected MFA factor
-    const otpType =
-      overrideOtpType ||
-      (userSelectedMfaFactor
-        ? serverMapping[userSelectedMfaFactor.type]
-        : null);
-    if (!otpType) return;
+    let userData;
 
-    const userData = {
-      user_id: userId,
-      otpType,
-    };
-
-    // Add phoneNumber for SMS/Voice OTP
-    if (otpType !== "email" && userSelectedMfaFactor?.phoneNumber) {
-      userData.phoneNumber = userSelectedMfaFactor.phoneNumber;
+    if (userSelectedMfaFactor) {
+      userData = {
+        user_id: userId,
+        otpType: serverMapping[userSelectedMfaFactor.type],
+        factor_id: userSelectedMfaFactor.id,
+      };
     }
 
-    // Add emailAddress for email OTP when a target email is specified
-    if (otpType === "email" && targetEmailAddress) {
-      userData.emailAddress = targetEmailAddress;
+    if (override) {
+      userData = {
+        user_id: userId,
+        otpType: override.otpType,
+        destination: override.destination,
+      };
     }
+
+    if (!userData) return;
 
     try {
       const response = await authService.transientOtpSend(userData);
