@@ -1,5 +1,50 @@
 # Changelog
 
+## [1.11.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.10.3...v1.11.0) (2026-02-20)
+
+
+### Features
+
+* Add log filter to remove healthcheck spam from our ECS logs ([#1178](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1178)) ([3b3f484](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/3b3f484d27ed88c6ad60c67c1da20b5a36f4dd29))
+* **frontend:** add tsconig file ([#1191](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1191)) ([92de3d0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/92de3d0b5168205cae6ea90f9f4f051158b18ae5))
+* **frontend:** IDV Landing page on the security settings page ([#1165](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1165)) ([64f8bc6](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/64f8bc68604b85e46424d7d7df80d8a69c38f2ba))
+* **frontend:** implement add fido2 passkey pages and re verification logic ([#1137](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1137)) ([c16b11e](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/c16b11e2771eee972435b30d8d1f3102a6e6550d))
+* **frontend:** Implement rename passkey flow ([#1158](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1158)) ([bc2e2d6](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/bc2e2d6efe468e7092c4a5a52775c46ea78c7637))
+* **frontend:** Implement rename passkey flow and associated UI components ([bc2e2d6](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/bc2e2d6efe468e7092c4a5a52775c46ea78c7637))
+* **frontend:** update navigation for deleting FIDO2 passkeys with state ([66e986b](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/66e986b83106feab03647504fb90dfca5d655148))
+* IDV Landing page on the security settings page ([64f8bc6](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/64f8bc68604b85e46424d7d7df80d8a69c38f2ba))
+* Implement user profile name validation to reject numbers and special symbols ([#1189](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1189)) ([a3716b0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/a3716b04ba65b634736f5d4bca5ec9e571749008))
+
+
+### Bug Fixes
+
+* Add vite.config.js, cert.pem and key.pem to .gitignore for HTTPS for local development using mkcert ([#1141](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1141)) ([e386d3e](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/e386d3ef02bad003442d6a1a5fb634671572d9b9))
+* **frontend:** fix add passkey flow bug sending multiple mfa otps ([#1144](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1144)) ([0931e21](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/0931e21e14eed2861daf0fb5dc96af0a073e17f4))
+* **frontend:** Handle TypeError for non-serializable credentials in formatAttestationForServer ([#1168](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1168)) ([d0c5c94](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/d0c5c944a5e2671ff9bb2c009201b1a00f04822a))
+* **frontend:** Prevent redirection to Security Settings page on 4xx fetches ([#1153](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1153)) ([b60e9d4](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/b60e9d452f75653d89c51fa4cce7bda53ab9c2c9))
+* **frontend:** Prevent redirection to Security Settings page when no passkeys are present ([b60e9d4](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/b60e9d452f75653d89c51fa4cce7bda53ab9c2c9))
+* **frontend:** Retrieve and display list of FIDO2 passkeys on Security Settings page ([#1142](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1142)) ([398b965](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/398b96539ec4da66802ecd29e4af2521b8fae3ef))
+
+
+### Code Refactoring
+
+* **backend:** refactor FIDO2 services and unit tests ([#1139](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1139)) ([db2cf34](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/db2cf345880039d389c95bdef20ea0f9f102d1d1))
+* **backend:** update FIDO2 registration schema and response handling to align with IBM Verify schema ([#1166](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1166)) ([230e568](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/230e56813b747fc38067a2e49544c782aee165e0))
+* **frontend:** clean up DeleteFIDO2Passkey components and remove unused code ([66e986b](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/66e986b83106feab03647504fb90dfca5d655148))
+
+
+### Continuous Integration
+
+* update version for the Test environment ([5fbe62c](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/5fbe62c18eb1b15b1ddc069ad0cefdec547ab423))
+* update version for the Test environment - 1.10.3 ([#1121](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1121)) ([5fbe62c](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/5fbe62c18eb1b15b1ddc069ad0cefdec547ab423))
+
+
+### Documentation
+
+* add bruno collection ([#1136](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1136)) ([a581bd0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/a581bd03930839297d9478863f2bea69068e0c02))
+* add HTTPS setup guide for local development with mkcert ([#1124](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1124)) ([8e2fa28](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/8e2fa28264ad73092705cc669feb7517486de0d0))
+* update HTTPS setup for local development to use subdomain of vanity domain ([#1125](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1125)) ([71a9439](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/71a9439b9efcd42742978a8638ee30a8263f6d80))
+
 ## [1.10.3](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.10.2...v1.10.3) (2026-01-12)
 
 
