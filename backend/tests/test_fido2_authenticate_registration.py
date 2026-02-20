@@ -468,7 +468,7 @@ class TestSubmitAssertionResult:
 
     @pytest.mark.asyncio
     @patch("app.auth.services.auth_user_session.update_session_tokens")
-    @patch("app.auth.services.auth_user_session.introspect_user_token")
+    @patch.object(auth_module, "_exchange_token_for_session")
     @patch.object(auth_module, "_exchange_fido2_jwt_for_access_token")
     @patch.object(auth_module, "get_auth_request_headers")
     @patch.object(auth_module, "get_rp_uuid_from_rp_id")
@@ -483,7 +483,7 @@ class TestSubmitAssertionResult:
         mock_get_rp_uuid_from_rp_id,
         mock_get_auth_request_headers,
         mock_exchange_fido2_jwt,
-        mock_introspect_token,
+        mock_exchange_session,
         mock_update_session_tokens,
         mock_http_client,
         mock_request,
@@ -508,8 +508,9 @@ class TestSubmitAssertionResult:
             "access_token": "combined-access-token",
             "id_token": "combined-id-token",
             "refresh_token": "new-refresh-token",
+            "expires_in": 3600,
         }
-        mock_introspect_token.return_value = AsyncMock()
+        mock_exchange_session.return_value = {"session_id": "session-123"}
         mock_update_session_tokens.return_value = None
 
         # Mock response for assertion/result
@@ -546,9 +547,8 @@ class TestSubmitAssertionResult:
         # Verify JWT exchange was called
         assert mock_exchange_fido2_jwt.called
 
-        # Note: If introspect_user_token fails (e.g., admin token issues),
-        # the exception is caught and update_session_tokens won't be called.
-        # The overall request still succeeds with FIDO2 authentication completed.
+        # Verify session exchange was called
+        assert mock_exchange_session.called
 
         # Verify the result is successful
         assert result.success is True
@@ -1032,6 +1032,146 @@ class TestExchangeFido2JwtForAccessToken:
         assert "No access_token" in str(exc_info.value)
 
 
+class TestExchangeTokenForSession:
+    """Tests for _exchange_token_for_session helper function"""
+
+    @pytest.fixture
+    def mock_http_client(self):
+        """Create a mock HTTP client"""
+        return AsyncMock(spec=AsyncClient)
+
+    @pytest.mark.asyncio
+    async def test_successful_session_exchange(self, mock_http_client):
+        """Should successfully exchange access token for IBM Verify session"""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "session_id": "session-123",
+            "status": "active",
+        }
+        mock_response.raise_for_status = MagicMock()
+        mock_http_client.post = AsyncMock(return_value=mock_response)
+
+        # Access the private function
+        exchange_func = auth_module._exchange_token_for_session
+
+        result = await exchange_func(
+            http_client=mock_http_client,
+            tenant_url="https://tenant.verify.ibm.com",
+            access_token="access-token-123",
+        )
+
+        # Should return session data
+        assert isinstance(result, dict)
+        assert result["session_id"] == "session-123"
+        assert result["status"] == "active"
+
+        # Verify the POST call
+        mock_http_client.post.assert_called_once()
+        call_args = mock_http_client.post.call_args
+        url = call_args[0][0]
+        assert "https://tenant.verify.ibm.com/v1.0/auth/session" in url
+
+        # Verify request data
+        data = call_args[1]["data"]
+        assert data["access_token"] == "access-token-123"
+
+        # Verify headers
+        headers = call_args[1]["headers"]
+        assert headers["Content-Type"] == "application/x-www-form-urlencoded"
+        assert headers["Accept"] == "application/json"
+
+    @pytest.mark.asyncio
+    async def test_handles_http_error(self, mock_http_client):
+        """Should handle HTTP errors during session exchange"""
+        mock_response = MagicMock()
+        mock_response.status_code = 400
+        mock_response.text = "Invalid token"
+
+        http_error = HTTPStatusError(
+            "400 Bad Request",
+            request=MagicMock(spec=Request),
+            response=mock_response,
+        )
+        mock_http_client.post = AsyncMock(side_effect=http_error)
+
+        exchange_func = auth_module._exchange_token_for_session
+
+        with pytest.raises(HTTPStatusError):
+            await exchange_func(
+                http_client=mock_http_client,
+                tenant_url="https://tenant.verify.ibm.com",
+                access_token="invalid-token",
+            )
+
+    @pytest.mark.asyncio
+    async def test_handles_network_error(self, mock_http_client):
+        """Should handle network errors during session exchange"""
+        mock_http_client.post = AsyncMock(
+            side_effect=Exception("Network connection failed")
+        )
+
+        exchange_func = auth_module._exchange_token_for_session
+
+        with pytest.raises(Exception) as exc_info:
+            await exchange_func(
+                http_client=mock_http_client,
+                tenant_url="https://tenant.verify.ibm.com",
+                access_token="access-token-123",
+            )
+
+        assert "Network connection failed" in str(exc_info.value)
+
+    @pytest.mark.asyncio
+    async def test_handles_empty_response_body(self, mock_http_client):
+        """Should handle 201 Created with empty response body"""
+        mock_response = MagicMock()
+        mock_response.status_code = 201
+        mock_response.content = b""  # Empty body
+        mock_response.raise_for_status = MagicMock()
+        mock_http_client.post = AsyncMock(return_value=mock_response)
+
+        exchange_func = auth_module._exchange_token_for_session
+
+        result = await exchange_func(
+            http_client=mock_http_client,
+            tenant_url="https://tenant.verify.ibm.com",
+            access_token="access-token-123",
+        )
+
+        # Should return empty dict when no response body
+        assert isinstance(result, dict)
+        assert len(result) == 0
+
+        # Verify the POST call was made
+        mock_http_client.post.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_handles_invalid_json_response(self, mock_http_client):
+        """Should handle response with invalid JSON (e.g., plain text)"""
+        mock_response = MagicMock()
+        mock_response.status_code = 201
+        mock_response.content = b"Session created successfully"  # Plain text, not JSON
+        mock_response.json.side_effect = Exception("Invalid JSON")
+        mock_response.raise_for_status = MagicMock()
+        mock_http_client.post = AsyncMock(return_value=mock_response)
+
+        exchange_func = auth_module._exchange_token_for_session
+
+        result = await exchange_func(
+            http_client=mock_http_client,
+            tenant_url="https://tenant.verify.ibm.com",
+            access_token="access-token-123",
+        )
+
+        # Should return empty dict when JSON parsing fails
+        assert isinstance(result, dict)
+        assert len(result) == 0
+
+        # Verify the POST call was made
+        mock_http_client.post.assert_called_once()
+
+
 class TestSubmitAssertionResultEdgeCases:
     """Additional tests for submit_assertion_result edge cases and uncovered branches"""
 
@@ -1114,7 +1254,7 @@ class TestSubmitAssertionResultEdgeCases:
 
     @pytest.mark.asyncio
     @patch("app.auth.services.auth_user_session.update_session_tokens")
-    @patch.object(auth_module, "introspect_user_token")
+    @patch.object(auth_module, "_exchange_token_for_session")
     @patch.object(auth_module, "_exchange_fido2_jwt_for_access_token")
     @patch.object(auth_module, "get_auth_request_headers")
     @patch.object(auth_module, "get_rp_uuid_from_rp_id")
@@ -1129,7 +1269,7 @@ class TestSubmitAssertionResultEdgeCases:
         mock_get_rp_uuid_from_rp_id,
         mock_get_auth_request_headers,
         mock_exchange_fido2_jwt,
-        mock_introspect_token,
+        mock_exchange_session,
         mock_update_session_tokens,
         mock_http_client,
         mock_request,
@@ -1163,8 +1303,9 @@ class TestSubmitAssertionResultEdgeCases:
         mock_exchange_fido2_jwt.return_value = {
             "access_token": "new-token",
             "refresh_token": "new-refresh",
+            "expires_in": 3600,
         }
-        mock_introspect_token.return_value = AsyncMock()
+        mock_exchange_session.return_value = {"session_id": "session-123"}
 
         result = await submit_assertion_result(
             request=mock_request,
@@ -1183,14 +1324,14 @@ class TestSubmitAssertionResultEdgeCases:
 
     @pytest.mark.asyncio
     @patch("app.auth.services.auth_user_session.update_session_tokens")
-    @patch.object(auth_module, "introspect_user_token")
+    @patch.object(auth_module, "_exchange_token_for_session")
     @patch.object(auth_module, "_exchange_fido2_jwt_for_access_token")
     @patch.object(auth_module, "get_auth_request_headers")
     @patch.object(auth_module, "get_rp_uuid_from_rp_id")
     @patch.object(auth_module, "get_admin_token")
     @patch.object(auth_module, "get_rp_id")
     @patch.object(auth_module, "get_tenant_url")
-    async def test_continues_despite_introspect_token_failure(
+    async def test_continues_despite_token_exchange_failure(
         self,
         mock_get_tenant_url,
         mock_get_rp_id,
@@ -1198,7 +1339,7 @@ class TestSubmitAssertionResultEdgeCases:
         mock_get_rp_uuid_from_rp_id,
         mock_get_auth_request_headers,
         mock_exchange_fido2_jwt,
-        mock_introspect_token,
+        mock_exchange_session,
         mock_update_session_tokens,
         mock_http_client,
         mock_request,
@@ -1225,12 +1366,8 @@ class TestSubmitAssertionResultEdgeCases:
         mock_response.raise_for_status = MagicMock()
         mock_http_client.post = AsyncMock(return_value=mock_response)
 
-        mock_exchange_fido2_jwt.return_value = {
-            "access_token": "new-token",
-            "refresh_token": "new-refresh",
-        }
-        # Introspect fails
-        mock_introspect_token.side_effect = Exception("Introspect failed")
+        # Token exchange fails
+        mock_exchange_fido2_jwt.side_effect = Exception("Token exchange failed")
 
         result = await submit_assertion_result(
             request=mock_request,
@@ -1240,9 +1377,9 @@ class TestSubmitAssertionResultEdgeCases:
             return_jwt=True,
         )
 
-        # Should still succeed despite introspect failure (exception is caught gracefully)
+        # Should still succeed despite exchange failure (exception is caught gracefully)
         assert result.success is True
-        mock_introspect_token.assert_called_once()
+        mock_exchange_fido2_jwt.assert_called_once()
         # Session cleanup doesn't happen when exception occurs
         assert "stepup_token" in mock_request.session  # Still present due to exception
 
@@ -1295,14 +1432,14 @@ class TestSubmitAssertionResultEdgeCases:
 
     @pytest.mark.asyncio
     @patch("app.auth.services.auth_user_session.update_session_tokens")
-    @patch.object(auth_module, "introspect_user_token")
+    @patch.object(auth_module, "_exchange_token_for_session")
     @patch.object(auth_module, "_exchange_fido2_jwt_for_access_token")
     @patch.object(auth_module, "get_auth_request_headers")
     @patch.object(auth_module, "get_rp_uuid_from_rp_id")
     @patch.object(auth_module, "get_admin_token")
     @patch.object(auth_module, "get_rp_id")
     @patch.object(auth_module, "get_tenant_url")
-    async def test_handles_exchange_without_access_token_gracefully(
+    async def test_updates_session_with_token_metadata(
         self,
         mock_get_tenant_url,
         mock_get_rp_id,
@@ -1310,7 +1447,7 @@ class TestSubmitAssertionResultEdgeCases:
         mock_get_rp_uuid_from_rp_id,
         mock_get_auth_request_headers,
         mock_exchange_fido2_jwt,
-        mock_introspect_token,
+        mock_exchange_session,
         mock_update_session_tokens,
         mock_http_client,
         mock_request,
@@ -1337,12 +1474,15 @@ class TestSubmitAssertionResultEdgeCases:
         mock_response.raise_for_status = MagicMock()
         mock_http_client.post = AsyncMock(return_value=mock_response)
 
-        # Token exchange returns data with None access_token
+        # Token exchange returns full metadata
         mock_exchange_fido2_jwt.return_value = {
-            "access_token": None,
-            "refresh_token": "new-refresh",
+            "access_token": "combined-token-123",
+            "refresh_token": "new-refresh-456",
+            "id_token": "new-id-789",
+            "expires_in": 7200,
+            "token_type": "Bearer",
         }
-        mock_introspect_token.return_value = AsyncMock()
+        mock_exchange_session.return_value = {"session_id": "session-123"}
 
         result = await submit_assertion_result(
             request=mock_request,
@@ -1352,9 +1492,111 @@ class TestSubmitAssertionResultEdgeCases:
             return_jwt=True,
         )
 
-        # Should still succeed (graceful error handling)
+        # Should succeed and update session with full token data
         assert result.success is True
-        # introspect should be called with None
-        mock_introspect_token.assert_called_once_with(mock_http_client, None)
-        # Session cleanup still happens even with None access_token
+        # Verify update_session_tokens was called with full metadata
+        mock_update_session_tokens.assert_called_once()
+        call_args = mock_update_session_tokens.call_args[0]
+        token_data = call_args[1]
+        assert token_data["access_token"] == "combined-token-123"
+        assert token_data["expires_in"] == 7200
+        # Session cleanup happens after successful exchange
         assert "stepup_token" not in mock_request.session
+
+    @pytest.mark.asyncio
+    @patch("app.auth.services.auth_user_session.update_session_user_info")
+    @patch("app.auth.services.auth_user_session.update_session_tokens")
+    @patch.object(auth_module, "_exchange_token_for_session")
+    @patch.object(auth_module, "_exchange_fido2_jwt_for_access_token")
+    @patch.object(auth_module, "get_auth_request_headers")
+    @patch.object(auth_module, "get_rp_uuid_from_rp_id")
+    @patch.object(auth_module, "get_admin_token")
+    @patch.object(auth_module, "get_rp_id")
+    @patch.object(auth_module, "get_tenant_url")
+    async def test_preserves_userinfo_including_sid_when_updating_tokens(
+        self,
+        mock_get_tenant_url,
+        mock_get_rp_id,
+        mock_get_admin_token,
+        mock_get_rp_uuid_from_rp_id,
+        mock_get_auth_request_headers,
+        mock_exchange_fido2_jwt,
+        mock_exchange_session,
+        mock_update_session_tokens,
+        mock_update_session_user_info,
+        mock_http_client,
+        mock_request,
+        mock_assertion_request,
+    ):
+        """Should preserve existing userinfo (including sid) when updating session tokens"""
+        from app.constants.session_keys import SessionKeys
+
+        # Set up session with existing token data including userinfo with sid
+        mock_request.session = {
+            "stepup_token": "stepup-token-123",
+            SessionKeys.SESSION_USER_TOKEN.value: {
+                "access_token": "old-access-token",
+                "refresh_token": "old-refresh-token",
+                "userinfo": {
+                    "sid": "session-id-from-oidc-login",
+                    "sub": "user-123",
+                    "email": "user@example.com",
+                },
+            },
+        }
+
+        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
+        mock_get_rp_id.return_value = "example.com"
+        mock_get_admin_token.return_value = "admin-token"
+        mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
+        mock_get_auth_request_headers.return_value = {
+            "Authorization": "Bearer stepup-token-123"
+        }
+
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "status": "ok",
+            "verified": True,
+            "assertion": "fido2-jwt-token",
+        }
+        mock_response.raise_for_status = MagicMock()
+        mock_http_client.post = AsyncMock(return_value=mock_response)
+
+        # JWT bearer token exchange returns tokens WITHOUT userinfo
+        # (This is typical for OAuth token exchange endpoints)
+        mock_exchange_fido2_jwt.return_value = {
+            "access_token": "combined-token-123",
+            "refresh_token": "new-refresh-456",
+            "id_token": "new-id-789",
+            "expires_in": 7200,
+            "token_type": "Bearer",
+            # Note: No userinfo here - that's the point of this test
+        }
+        mock_exchange_session.return_value = {"session_id": "session-123"}
+
+        result = await submit_assertion_result(
+            request=mock_request,
+            http_client=mock_http_client,
+            user_access_token="user-token",
+            request_body=mock_assertion_request,
+            return_jwt=True,
+        )
+
+        # Should succeed
+        assert result.success is True
+
+        # Verify update_session_tokens was called with token data (without userinfo)
+        mock_update_session_tokens.assert_called_once()
+        call_args = mock_update_session_tokens.call_args[0]
+        token_data = call_args[1]
+        assert token_data["access_token"] == "combined-token-123"
+        assert token_data["refresh_token"] == "new-refresh-456"
+
+        # CRITICAL: Verify update_session_user_info was called to preserve userinfo (including sid)
+        mock_update_session_user_info.assert_called_once()
+        user_info_args = mock_update_session_user_info.call_args[0]
+        userinfo = user_info_args[1]
+        assert userinfo["sid"] == "session-id-from-oidc-login"
+        assert userinfo["sub"] == "user-123"
+        assert userinfo["email"] == "user@example.com"

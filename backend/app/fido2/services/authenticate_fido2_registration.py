@@ -18,10 +18,61 @@ from app.fido2.services.helper_utils import (
 from app.fido2.schemas import AssertionOptionsRequest, FIDO2AssertionResultRequest
 import base64
 
-from app.auth.services.auth_user_session import introspect_user_token
 from app.config import get_configuration
 
 logger = logging.getLogger(__name__)
+
+
+async def _exchange_token_for_session(
+    http_client: AsyncClient,
+    tenant_url: str,
+    access_token: str,
+) -> dict:
+    """
+    Exchange access token for IBM Verify session.
+
+    This establishes a session in IBM Verify using the combined access token,
+    which may be necessary for certain IBM Verify operations.
+
+    Args:
+        http_client: AsyncClient for making HTTP requests
+        tenant_url: IBM Verify tenant URL
+        access_token: Access token to exchange for session
+
+    Returns:
+        Session response data
+
+    Raises:
+        Exception: If session exchange fails
+    """
+    logger.info("Step 6a: Exchanging access token for IBM Verify session")
+
+    exchange_url = f"{tenant_url}{VerifyAPIEndpoint.EXCHANGE_TOKEN_SESSION.value}"
+
+    session_data = {"access_token": access_token}
+    session_headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Accept": "application/json",
+    }
+
+    response = await http_client.post(
+        exchange_url, data=session_data, headers=session_headers
+    )
+
+    logger.info(f"Session exchange response status: {response.status_code}")
+    response.raise_for_status()
+
+    # IBM Verify may return 201 Created with empty body
+    session_response_data = {}
+    if response.content:
+        try:
+            session_response_data = response.json()
+        except Exception as e:
+            logger.warning(f"Could not parse session response as JSON: {e}")
+            # Session was created successfully (201), just no response body
+
+    logger.info("Successfully exchanged token for IBM Verify session")
+    return session_response_data
 
 
 async def _exchange_fido2_jwt_for_access_token(
@@ -77,7 +128,6 @@ async def _exchange_fido2_jwt_for_access_token(
     )
 
     logger.info(f"Token exchange response status: {response.status_code}")
-    logger.info(f"Token exchange response body: {response.text}")
     response.raise_for_status()
 
     token_data = response.json()
@@ -235,8 +285,6 @@ async def submit_assertion_result(
 
             # Step 5: Exchange FIDO2 JWT for combined access token
             try:
-                from app.auth.services.auth_user_session import update_session_tokens
-
                 settings = get_configuration()
 
                 # Use STS client credentials for jwt-bearer grant (step 5)
@@ -248,11 +296,41 @@ async def submit_assertion_result(
                     client_secret=settings.ibm_verify_config.IBM_VERIFY_STS_SECRET,
                 )
 
-                # Step 6: Update session with the new combined tokens
-                await introspect_user_token(
-                    http_client, combined_token_data.get("access_token")
+                # Step 6: Exchange token for IBM Verify session
+                await _exchange_token_for_session(
+                    http_client=http_client,
+                    tenant_url=tenant_url,
+                    access_token=combined_token_data.get("access_token"),
                 )
+
+                # Step 6b: Preserve existing userinfo (including sid) before updating session
+                from app.constants.session_keys import SessionKeys
+                from app.auth.services.auth_user_session import (
+                    update_session_tokens,
+                    update_session_user_info,
+                )
+
+                existing_token = request.session.get(
+                    SessionKeys.SESSION_USER_TOKEN.value
+                )
+                existing_userinfo = (
+                    existing_token.get("userinfo") if existing_token else None
+                )
+
+                # Step 6c: Update session with new tokens that include FIDO2 in AMR claims
+                logger.info("Updating session with FIDO2-authenticated tokens")
                 update_session_tokens(request, combined_token_data)
+
+                # Step 6d: Restore userinfo (including sid) to maintain session continuity
+                if existing_userinfo:
+                    update_session_user_info(request, existing_userinfo)
+                    logger.info(
+                        "Preserved existing userinfo (including sid) in session"
+                    )
+
+                logger.info(
+                    f"Session updated with tokens. Expires in: {combined_token_data.get('expires_in')} seconds"
+                )
 
                 # Clean up stepup token from session after successful authentication
                 if "stepup_token" in request.session:

@@ -51,9 +51,6 @@ async def introspect_user_token(
 
         response.raise_for_status()
         response_json = response.json()
-        logger.info(
-            f"returned response from introspect_token_api_endpoint: {response_json}"
-        )
         return response_json
     except Exception as e:
         logger.error(f"Error introspect_user_token: {str(e)}", exc_info=True)
