@@ -172,6 +172,7 @@ export const SUBMIT_END_POINTS = {
   sessionStatus: "/v1/auth/session-status",
   keepAlive: "/v1/auth/keep-alive",
   passwordVerify: "/v1/password/verify",
+  passwordVerifyStepup: "/v1/password/verify/stepup",
 };
 
 export const RP_CLIENT_ID_KEY = "rp_client_id";

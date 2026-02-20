@@ -239,6 +239,17 @@ export const authService = {
       handleApiError(error);
     }
   },
+  verifyPasswordForStepup: async ({ password }) => {
+    try {
+      const response = await axios.post(
+        `${config.apiUrl}${SUBMIT_END_POINTS.passwordVerifyStepup}`,
+        { password },
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
 };
 
 function buildTestResponse(userData, type) {

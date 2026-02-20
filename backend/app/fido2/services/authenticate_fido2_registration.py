@@ -24,46 +24,57 @@ from app.config import get_configuration
 logger = logging.getLogger(__name__)
 
 
-async def _perform_mfa_refresh_token_flow(
+async def _perform_mfa_token_exchange(
     http_client: AsyncClient,
     tenant_url: str,
-    refresh_token: str,
+    user_access_token: str,
     client_id: str,
     client_secret: str,
 ) -> dict:
     """
-    Perform refresh token flow to get MFA challenge token.
+    [DEPRECATED - NOT USABLE] Token exchange for MFA challenge token.
 
-    This triggers the MFA policy and returns a token with:
+    This function is kept for reference but cannot be used due to IBM Verify restriction:
+    "CSIAQ5207E Clients are not allowed to perform a token exchange on their own tokens."
+
+    The proper flow requires password verification first (POST /v1/password/verify/stepup)
+    which performs the correct token exchange sequence and stores stepup_token in session.
+
+    Uses RFC 8693 token exchange with the user's access token as subject_token
+    to obtain an MFA challenge token with:
     - scope: "mfa_challenge"
     - allowedFactors: ["fido2"]
 
     Args:
         http_client: AsyncClient for making HTTP requests
         tenant_url: IBM Verify tenant URL
-        refresh_token: User's refresh token
-        client_id: OAuth client ID
-        client_secret: OAuth client secret
+        user_access_token: User's current access token
+        client_id: STS OAuth client ID
+        client_secret: STS OAuth client secret
 
     Returns:
         Token response with MFA challenge token
 
     Raises:
-        Exception: If refresh token flow fails
+        Exception: If token exchange fails
     """
-    logger.info("Step 1: Performing refresh token flow for MFA challenge")
+    logger.info("Step 1: Performing token exchange for MFA challenge")
 
     client_creds = f"{client_id}:{client_secret}"
     basic_auth = base64.b64encode(client_creds.encode()).decode()
 
     token_url = f"{tenant_url}{VerifyAPIEndpoint.GET_ACCESS_TOKEN.value}"
 
-    refresh_data = {
-        "grant_type": "refresh_token",
-        "refresh_token": refresh_token,
+    exchange_data = {
+        "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
+        "client_id": client_id,
+        "client_secret": client_secret,
+        "subject_token": user_access_token,
+        "subject_token_type": "urn:ietf:params:oauth:token-type:access_token",
+        "scope": "openid 2fa_required_scope",
     }
 
-    refresh_headers = {
+    exchange_headers = {
         "Content-Type": "application/x-www-form-urlencoded",
         "Accept": "application/json",
         "Authorization": f"Basic {basic_auth}",
@@ -71,12 +82,12 @@ async def _perform_mfa_refresh_token_flow(
 
     response = await http_client.post(
         token_url,
-        data=refresh_data,
-        headers=refresh_headers,
+        data=exchange_data,
+        headers=exchange_headers,
     )
 
-    logger.info(f"Refresh token flow response status: {response.status_code}")
-    logger.info(f"Refresh token flow response body: {response.text}")
+    logger.info(f"Token exchange response status: {response.status_code}")
+    logger.info(f"Token exchange response body: {response.text}")
     response.raise_for_status()
 
     token_data = response.json()
@@ -107,15 +118,15 @@ async def _exchange_fido2_jwt_for_access_token(
     """
     Exchange FIDO2 JWT for OAuth access token using jwt-bearer grant.
 
-    This completes the MFA challenge by exchanging the FIDO2 JWT
+    This completes the step-up authentication by exchanging the FIDO2 JWT
     for a token with combined authentication methods (password + FIDO2).
 
     Args:
         http_client: AsyncClient for making HTTP requests
         tenant_url: IBM Verify tenant URL
         fido2_jwt: FIDO2 assertion JWT from authentication
-        client_id: OAuth client ID
-        client_secret: OAuth client secret
+        client_id: STS OAuth client ID
+        client_secret: STS OAuth client secret
 
     Returns:
         Token response with access token that has combined AMR claims
@@ -124,7 +135,7 @@ async def _exchange_fido2_jwt_for_access_token(
         Exception: If token exchange fails
     """
     logger.info(
-        "Step 4: Exchanging FIDO2 JWT for combined access token using jwt-bearer grant"
+        "Step 5: Exchanging FIDO2 JWT for combined access token using jwt-bearer grant"
     )
 
     client_creds = f"{client_id}:{client_secret}"
@@ -258,41 +269,29 @@ async def submit_assertion_result(
         # Prepare request body
         body_to_send = request_body.model_dump(exclude_none=True)
 
-        # IBM Verify recommended flow: If return_jwt is True, perform MFA flow BEFORE FIDO2 auth
-        mfa_challenge_token = None
+        # Check for stepup token from enhanced password verification (steps 1-3)
+        stepup_token = request.session.get("stepup_token")
+
+        # Determine which token to use for FIDO2 authentication
+        auth_token_for_fido2 = None
+
         if return_jwt:
-            try:
-                from app.auth.services.auth_user_session import get_user_refresh_token
-
-                settings = get_configuration()
-
-                # Step 1: Get refresh token from session
-                refresh_token = await get_user_refresh_token(request)
-                if not refresh_token:
-                    raise Exception("No refresh token available in session")
-
-                logger.info("Starting IBM Verify MFA flow for token combination")
-
-                # Step 2: Perform refresh token flow to get MFA challenge token
-                mfa_token_data = await _perform_mfa_refresh_token_flow(
-                    http_client=http_client,
-                    tenant_url=tenant_url,
-                    refresh_token=refresh_token,
-                    client_id=settings.ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID,
-                    client_secret=settings.ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_SECRET,
+            if stepup_token:
+                # Step 4: Use stepup token from password verification (steps 1-3)
+                logger.info(
+                    "Using stepup token from password verification for FIDO2 authentication"
                 )
-
-                # Use the MFA challenge token for FIDO2 authentication
-                mfa_challenge_token = mfa_token_data.get("access_token")
-                logger.info("Using MFA challenge token for FIDO2 authentication")
-
-            except Exception as mfa_error:
+                auth_token_for_fido2 = stepup_token
+            else:
+                # No stepup token - password verification required first
                 logger.error(
-                    f"Error getting MFA challenge token: {str(mfa_error)}",
-                    exc_info=True,
+                    "No stepup_token in session. Password verification must be performed first "
+                    "by calling POST /v1/password/verify/stepup endpoint."
                 )
-                # Continue with admin token if MFA flow fails
-                logger.warning("Falling back to admin token for FIDO2 authentication")
+                raise Exception(
+                    "Step-up authentication required: Password must be verified before FIDO2 authentication. "
+                    "Please call POST /v1/password/verify/stepup first."
+                )
 
         # Build URL with optional returnJwt query parameter
         url = f"{tenant_url}{VerifyAPIEndpoint.FIDO2_RP_BASE.value}/{rp_uuid}/assertion/result"
@@ -300,9 +299,10 @@ async def submit_assertion_result(
             url += "?returnJwt=true"
             logger.info("Requesting JWT token in assertion result response")
 
-        # Step 3: Make the FIDO2 authentication request
-        # Use MFA challenge token if available, otherwise use admin token
-        auth_token = mfa_challenge_token if mfa_challenge_token else admin_token
+        # Step 4: Make the FIDO2 authentication request
+        # When return_jwt=True, requires stepup token from password verification
+        # When return_jwt=False, uses admin token for regular FIDO2 operations
+        auth_token = auth_token_for_fido2 if auth_token_for_fido2 else admin_token
         headers = get_auth_request_headers(auth_token, json_content_type=True)
 
         response = await http_client.post(url, headers=headers, json=body_to_send)
@@ -317,25 +317,33 @@ async def submit_assertion_result(
             request.session["fido2_auth_jwt"] = fido2_jwt
             logger.info("FIDO2 authentication JWT stored in session for step-up auth")
 
-            # Step 4: Exchange FIDO2 JWT for combined access token
+            # Step 5: Exchange FIDO2 JWT for combined access token
             try:
                 from app.auth.services.auth_user_session import update_session_tokens
 
                 settings = get_configuration()
 
+                # Use STS client credentials for jwt-bearer grant (step 5)
                 combined_token_data = await _exchange_fido2_jwt_for_access_token(
                     http_client=http_client,
                     tenant_url=tenant_url,
                     fido2_jwt=fido2_jwt,
-                    client_id=settings.ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID,
-                    client_secret=settings.ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_SECRET,
+                    client_id=settings.ibm_verify_config.IBM_VERIFY_STS_CLIENT_ID,
+                    client_secret=settings.ibm_verify_config.IBM_VERIFY_STS_SECRET,
                 )
 
-                # Update session with the new combined tokens
-                introspect_user_token(
+                # Step 6: Update session with the new combined tokens
+                await introspect_user_token(
                     http_client, combined_token_data.get("access_token")
                 )
-                # update_session_tokens(request, combined_token_data)
+                update_session_tokens(request, combined_token_data)
+
+                # Clean up stepup token from session after successful authentication
+                if "stepup_token" in request.session:
+                    del request.session["stepup_token"]
+                if "stepup_grant_id" in request.session:
+                    del request.session["stepup_grant_id"]
+
                 logger.info(
                     "Session updated with combined password + FIDO2 authentication tokens"
                 )

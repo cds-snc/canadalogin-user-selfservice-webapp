@@ -48,11 +48,11 @@ Create a `.env` file by making a copy from the `backend/.env.example` file
 
 #### IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID and IBM_VERIFY_PROFILE_MANAGEMENT_SECRET
 
-Head to https://auth.signin-connexion.cdssandbox.xyz/ui/admin/application/9053160440215070489?tab=sso, open the "Sign-on" tab, and copy the Client ID and Client secret.
+Head to https://cds-gcsignin-dev.verify.ibm.com/ui/admin/application/9053160440215070489?tab=sso, open the "Sign-on" tab, and copy the Client ID and Client secret.
 
 #### IBM_VERIFY_PROFILE_MANAGEMENT_API_CLIENT_ID and IBM_VERIFY_PROFILE_MANAGEMENT_API_SECRET
 
-Head to https://auth.signin-connexion.cdssandbox.xyz/ui/admin/application/9053160440215070489?tab=API%20access, open the "API access" tab. Select the DEV API Client key. Copy the Client ID and Client secret on the right side of the screen.
+Head to https://cds-gcsignin-dev.verify.ibm.com/ui/admin/application/9053160440215070489?tab=API%20access, open the "API access" tab. Select the DEV API Client key. Copy the Client ID and Client secret on the right side of the screen.
 
 ### Quick Start
 
@@ -118,7 +118,7 @@ The project includes several VS Code debug configurations in [`.vscode/launch.js
 #### 1. Python Debugger: FastAPI (HTTPS)
 Runs the backend with SSL certificates for FIDO2 development:
 - **Use when**: Developing FIDO2/WebAuthn features
-- **URL**: `https://app.auth.signin-connexion.cdssandbox.xyz:8000` or `https://localhost:8000`
+- **URL**: `https://app.cds-gcsignin-dev.verify.ibm.com:8000` or `https://localhost:8000`
 - **Requirements**: SSL certificates in `backend/certs/`
 
 #### 2. Python Debugger: FastAPI (HTTP)
@@ -160,13 +160,13 @@ For FIDO2/WebAuthn development using the HTTPS configuration:
 ```bash
 cd backend
 mkdir -p certs
-mkcert -cert-file certs/cert.pem -key-file certs/key.pem app.auth.signin-connexion.cdssandbox.xyz localhost 127.0.0.1 ::1
+mkcert -cert-file certs/cert.pem -key-file certs/key.pem app.cds-gcsignin-dev.verify.ibm.com localhost 127.0.0.1 ::1
 ```
 
 2. **Update `/etc/hosts`** (if using custom domain):
 ```bash
 sudo nano /etc/hosts
-# Add: 127.0.0.1       app.auth.signin-connexion.cdssandbox.xyz
+# Add: 127.0.0.1       app.cds-gcsignin-dev.verify.ibm.com
 ```
 
 3. **Use the "Python Debugger: FastAPI" configuration**

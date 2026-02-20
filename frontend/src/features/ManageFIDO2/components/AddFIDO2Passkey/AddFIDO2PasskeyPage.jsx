@@ -54,7 +54,8 @@ export default function AddFIDO2PasskeyPage({ step }) {
     setOtpSentResponse,
   } = useOtpOperations(id, userName, setErrorCode, backToSecuritySettingsPage);
 
-  // Use the password validation hook
+  // Use the password validation hook with stepup=true for FIDO2 step-up authentication
+  // This enables token exchange that stores stepup_token in session
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(
     setErrorCode,
     () => {
@@ -70,6 +71,7 @@ export default function AddFIDO2PasskeyPage({ step }) {
         }
       }
     },
+    true, // useStepup=true for FIDO2 step-up authentication
   );
 
   const didFetch = useRef(false);
