@@ -925,31 +925,6 @@ class TestSubmitAssertionResult:
         assert "Unexpected error" in str(error_arg)
 
 
-class TestPerformMfaTokenExchange:
-    """Tests for _perform_mfa_token_exchange helper function (DEPRECATED)
-
-    Note: This function is deprecated and not used in the actual flow.
-    The proper flow requires password verification first via POST /v1/password/verify/stepup
-    which stores stepup_token in session. These tests are kept for documentation purposes.
-    """
-
-    @pytest.fixture
-    def mock_http_client(self):
-        """Create a mock HTTP client"""
-        return AsyncMock(spec=AsyncClient)
-
-    @pytest.mark.asyncio
-    async def test_deprecated_function_exists(self, mock_http_client):
-        """Should verify the deprecated function exists for backwards compatibility"""
-        # The function exists but is marked as deprecated
-        assert hasattr(auth_module, "_perform_mfa_token_exchange")
-
-        # Function should have deprecation notice in docstring
-        func = auth_module._perform_mfa_token_exchange
-        assert "DEPRECATED" in func.__doc__
-        assert "NOT USABLE" in func.__doc__
-
-
 class TestExchangeFido2JwtForAccessToken:
     """Tests for _exchange_fido2_jwt_for_access_token helper function"""
 
@@ -1055,3 +1030,331 @@ class TestExchangeFido2JwtForAccessToken:
             )
 
         assert "No access_token" in str(exc_info.value)
+
+
+class TestSubmitAssertionResultEdgeCases:
+    """Additional tests for submit_assertion_result edge cases and uncovered branches"""
+
+    @pytest.fixture
+    def mock_http_client(self):
+        """Create a mock HTTP client"""
+        return AsyncMock(spec=AsyncClient)
+
+    @pytest.fixture
+    def mock_request(self):
+        """Create a mock FastAPI Request object"""
+        mock_req = MagicMock()
+        mock_req.session = {}
+        return mock_req
+
+    @pytest.fixture
+    def mock_assertion_request(self):
+        """Create mock assertion result request data"""
+        mock_data = MagicMock(spec=FIDO2AssertionResultRequest)
+        mock_data.model_dump.return_value = {
+            "id": "credential-id",
+            "rawId": "raw-id",
+            "type": "public-key",
+            "response": {
+                "authenticatorData": "auth-data",
+                "clientDataJSON": "client-data",
+                "signature": "signature",
+            },
+        }
+        return mock_data
+
+    @pytest.mark.asyncio
+    @patch.object(auth_module, "get_auth_request_headers")
+    @patch.object(auth_module, "get_rp_uuid_from_rp_id")
+    @patch.object(auth_module, "get_admin_token")
+    @patch.object(auth_module, "get_rp_id")
+    @patch.object(auth_module, "get_tenant_url")
+    async def test_return_jwt_true_without_assertion_in_response(
+        self,
+        mock_get_tenant_url,
+        mock_get_rp_id,
+        mock_get_admin_token,
+        mock_get_rp_uuid_from_rp_id,
+        mock_get_auth_request_headers,
+        mock_http_client,
+        mock_request,
+        mock_assertion_request,
+    ):
+        """Should handle return_jwt=True when response doesn't contain assertion"""
+        mock_request.session = {"stepup_token": "stepup-token-123"}
+
+        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
+        mock_get_rp_id.return_value = "example.com"
+        mock_get_admin_token.return_value = "admin-token"
+        mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
+        mock_get_auth_request_headers.return_value = {
+            "Authorization": "Bearer stepup-token-123"
+        }
+
+        # Response without assertion field
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"status": "ok", "verified": True}
+        mock_response.raise_for_status = MagicMock()
+        mock_http_client.post = AsyncMock(return_value=mock_response)
+
+        result = await submit_assertion_result(
+            request=mock_request,
+            http_client=mock_http_client,
+            user_access_token="user-token",
+            request_body=mock_assertion_request,
+            return_jwt=True,
+        )
+
+        # Should still succeed
+        assert result.success is True
+        assert result.message == "FIDO2 authentication completed successfully"
+        # JWT shouldn't be stored since there's no assertion
+        assert "fido2_auth_jwt" not in mock_request.session
+
+    @pytest.mark.asyncio
+    @patch("app.auth.services.auth_user_session.update_session_tokens")
+    @patch.object(auth_module, "introspect_user_token")
+    @patch.object(auth_module, "_exchange_fido2_jwt_for_access_token")
+    @patch.object(auth_module, "get_auth_request_headers")
+    @patch.object(auth_module, "get_rp_uuid_from_rp_id")
+    @patch.object(auth_module, "get_admin_token")
+    @patch.object(auth_module, "get_rp_id")
+    @patch.object(auth_module, "get_tenant_url")
+    async def test_cleans_up_stepup_grant_id_from_session(
+        self,
+        mock_get_tenant_url,
+        mock_get_rp_id,
+        mock_get_admin_token,
+        mock_get_rp_uuid_from_rp_id,
+        mock_get_auth_request_headers,
+        mock_exchange_fido2_jwt,
+        mock_introspect_token,
+        mock_update_session_tokens,
+        mock_http_client,
+        mock_request,
+        mock_assertion_request,
+    ):
+        """Should clean up both stepup_token and stepup_grant_id from session"""
+        # Session with both stepup_token and stepup_grant_id
+        mock_request.session = {
+            "stepup_token": "stepup-token-123",
+            "stepup_grant_id": "grant-id-456",
+        }
+
+        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
+        mock_get_rp_id.return_value = "example.com"
+        mock_get_admin_token.return_value = "admin-token"
+        mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
+        mock_get_auth_request_headers.return_value = {
+            "Authorization": "Bearer stepup-token-123"
+        }
+
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "status": "ok",
+            "verified": True,
+            "assertion": "fido2-jwt-token",
+        }
+        mock_response.raise_for_status = MagicMock()
+        mock_http_client.post = AsyncMock(return_value=mock_response)
+
+        mock_exchange_fido2_jwt.return_value = {
+            "access_token": "new-token",
+            "refresh_token": "new-refresh",
+        }
+        mock_introspect_token.return_value = AsyncMock()
+
+        result = await submit_assertion_result(
+            request=mock_request,
+            http_client=mock_http_client,
+            user_access_token="user-token",
+            request_body=mock_assertion_request,
+            return_jwt=True,
+        )
+
+        assert result.success is True
+        # Both should be cleaned up after successful token exchange
+        assert "stepup_token" not in mock_request.session
+        assert "stepup_grant_id" not in mock_request.session
+        # fido2_auth_jwt should be stored
+        assert mock_request.session["fido2_auth_jwt"] == "fido2-jwt-token"
+
+    @pytest.mark.asyncio
+    @patch("app.auth.services.auth_user_session.update_session_tokens")
+    @patch.object(auth_module, "introspect_user_token")
+    @patch.object(auth_module, "_exchange_fido2_jwt_for_access_token")
+    @patch.object(auth_module, "get_auth_request_headers")
+    @patch.object(auth_module, "get_rp_uuid_from_rp_id")
+    @patch.object(auth_module, "get_admin_token")
+    @patch.object(auth_module, "get_rp_id")
+    @patch.object(auth_module, "get_tenant_url")
+    async def test_continues_despite_introspect_token_failure(
+        self,
+        mock_get_tenant_url,
+        mock_get_rp_id,
+        mock_get_admin_token,
+        mock_get_rp_uuid_from_rp_id,
+        mock_get_auth_request_headers,
+        mock_exchange_fido2_jwt,
+        mock_introspect_token,
+        mock_update_session_tokens,
+        mock_http_client,
+        mock_request,
+        mock_assertion_request,
+    ):
+        """Should continue successfully even if introspect_user_token fails"""
+        mock_request.session = {"stepup_token": "stepup-token-123"}
+
+        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
+        mock_get_rp_id.return_value = "example.com"
+        mock_get_admin_token.return_value = "admin-token"
+        mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
+        mock_get_auth_request_headers.return_value = {
+            "Authorization": "Bearer stepup-token-123"
+        }
+
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "status": "ok",
+            "verified": True,
+            "assertion": "fido2-jwt-token",
+        }
+        mock_response.raise_for_status = MagicMock()
+        mock_http_client.post = AsyncMock(return_value=mock_response)
+
+        mock_exchange_fido2_jwt.return_value = {
+            "access_token": "new-token",
+            "refresh_token": "new-refresh",
+        }
+        # Introspect fails
+        mock_introspect_token.side_effect = Exception("Introspect failed")
+
+        result = await submit_assertion_result(
+            request=mock_request,
+            http_client=mock_http_client,
+            user_access_token="user-token",
+            request_body=mock_assertion_request,
+            return_jwt=True,
+        )
+
+        # Should still succeed despite introspect failure (exception is caught gracefully)
+        assert result.success is True
+        mock_introspect_token.assert_called_once()
+        # Session cleanup doesn't happen when exception occurs
+        assert "stepup_token" in mock_request.session  # Still present due to exception
+
+    @pytest.mark.asyncio
+    @patch.object(auth_module, "get_auth_request_headers")
+    @patch.object(auth_module, "get_rp_uuid_from_rp_id")
+    @patch.object(auth_module, "get_admin_token")
+    @patch.object(auth_module, "get_rp_id")
+    @patch.object(auth_module, "get_tenant_url")
+    async def test_url_without_return_jwt_parameter(
+        self,
+        mock_get_tenant_url,
+        mock_get_rp_id,
+        mock_get_admin_token,
+        mock_get_rp_uuid_from_rp_id,
+        mock_get_auth_request_headers,
+        mock_http_client,
+        mock_request,
+        mock_assertion_request,
+    ):
+        """Should build URL without returnJwt query parameter when return_jwt=False"""
+        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
+        mock_get_rp_id.return_value = "example.com"
+        mock_get_admin_token.return_value = "admin-token"
+        mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
+        mock_get_auth_request_headers.return_value = {
+            "Authorization": "Bearer admin-token"
+        }
+
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"status": "ok", "verified": True}
+        mock_response.raise_for_status = MagicMock()
+        mock_http_client.post = AsyncMock(return_value=mock_response)
+
+        result = await submit_assertion_result(
+            request=mock_request,
+            http_client=mock_http_client,
+            user_access_token="user-token",
+            request_body=mock_assertion_request,
+            return_jwt=False,
+        )
+
+        assert result.success is True
+        # Verify URL doesn't contain returnJwt query parameter
+        call_args = mock_http_client.post.call_args
+        url = call_args[0][0]
+        assert "returnJwt" not in url
+        assert url.endswith("/assertion/result")
+
+    @pytest.mark.asyncio
+    @patch("app.auth.services.auth_user_session.update_session_tokens")
+    @patch.object(auth_module, "introspect_user_token")
+    @patch.object(auth_module, "_exchange_fido2_jwt_for_access_token")
+    @patch.object(auth_module, "get_auth_request_headers")
+    @patch.object(auth_module, "get_rp_uuid_from_rp_id")
+    @patch.object(auth_module, "get_admin_token")
+    @patch.object(auth_module, "get_rp_id")
+    @patch.object(auth_module, "get_tenant_url")
+    async def test_handles_exchange_without_access_token_gracefully(
+        self,
+        mock_get_tenant_url,
+        mock_get_rp_id,
+        mock_get_admin_token,
+        mock_get_rp_uuid_from_rp_id,
+        mock_get_auth_request_headers,
+        mock_exchange_fido2_jwt,
+        mock_introspect_token,
+        mock_update_session_tokens,
+        mock_http_client,
+        mock_request,
+        mock_assertion_request,
+    ):
+        """Should handle gracefully when token exchange returns data without access_token"""
+        mock_request.session = {"stepup_token": "stepup-token-123"}
+
+        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
+        mock_get_rp_id.return_value = "example.com"
+        mock_get_admin_token.return_value = "admin-token"
+        mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
+        mock_get_auth_request_headers.return_value = {
+            "Authorization": "Bearer stepup-token-123"
+        }
+
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "status": "ok",
+            "verified": True,
+            "assertion": "fido2-jwt-token",
+        }
+        mock_response.raise_for_status = MagicMock()
+        mock_http_client.post = AsyncMock(return_value=mock_response)
+
+        # Token exchange returns data with None access_token
+        mock_exchange_fido2_jwt.return_value = {
+            "access_token": None,
+            "refresh_token": "new-refresh",
+        }
+        mock_introspect_token.return_value = AsyncMock()
+
+        result = await submit_assertion_result(
+            request=mock_request,
+            http_client=mock_http_client,
+            user_access_token="user-token",
+            request_body=mock_assertion_request,
+            return_jwt=True,
+        )
+
+        # Should still succeed (graceful error handling)
+        assert result.success is True
+        # introspect should be called with None
+        mock_introspect_token.assert_called_once_with(mock_http_client, None)
+        # Session cleanup still happens even with None access_token
+        assert "stepup_token" not in mock_request.session
