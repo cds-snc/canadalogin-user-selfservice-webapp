@@ -1,18 +1,19 @@
 """
 Enhanced password verification service for step-up authentication flow.
 
-This implements steps 1-3 of the FIDO2 step-up authentication:
-1. Get oauth token with grant-type: policyauth
-2. Verify password using token from step 1 with returnJwt=true
-3. Exchange password JWT for oauth token with jwt-bearer grant
+This implements steps 1-2 of the FIDO2 step-up authentication:
+1. Verify password with returnJwt=true using current user's access token
+2. Exchange password JWT for OAuth token using jwt-bearer grant
 """
 
 import logging
 import base64
+import time
 from httpx import AsyncClient
 from fastapi import Request
 from app.utils.schemas import ResponseModel
 from app.utils.request_error_handler import RequestErrorHandler
+from app.utils.access_token import get_admin_token
 from app.password.schemas import UserPassword, VerifiedUserPassword
 from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
 from app.password.services.verify_password import get_cloud_directory_id
@@ -22,81 +23,25 @@ from app.config import get_configuration
 logger = logging.getLogger(__name__)
 
 
-async def get_policyauth_token(
-    http_client: AsyncClient,
-    tenant_url: str,
-    client_id: str,
-    client_secret: str,
-) -> str:
-    """
-    Step 1: Get OAuth token with grant_type policyauth.
-
-    Args:
-        http_client: AsyncClient for making HTTP requests
-        tenant_url: IBM Verify tenant URL
-        client_id: OAuth client ID (original application)
-        client_secret: OAuth client secret (original application)
-
-    Returns:
-        Access token for policy-based authentication
-
-    Raises:
-        Exception: If token request fails
-    """
-    logger.info("Step 1: Getting policyauth token for step-up flow")
-
-    client_creds = f"{client_id}:{client_secret}"
-    basic_auth = base64.b64encode(client_creds.encode()).decode()
-
-    token_url = f"{tenant_url}{VerifyAPIEndpoint.GET_ACCESS_TOKEN.value}"
-
-    token_data = {
-        "grant_type": "policyauth",
-        "scope": "openid",
-    }
-
-    headers = {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Accept": "application/json",
-        "Authorization": f"Basic {basic_auth}",
-    }
-
-    response = await http_client.post(
-        token_url,
-        data=token_data,
-        headers=headers,
-    )
-
-    logger.info(f"Policyauth token response status: {response.status_code}")
-    logger.info(f"Policyauth token response body: {response.text}")
-    response.raise_for_status()
-
-    token_response = response.json()
-    access_token = token_response.get("access_token")
-
-    if not access_token:
-        raise Exception("No access_token in policyauth response")
-
-    logger.info("Successfully obtained policyauth token")
-    return access_token
-
-
 async def verify_password_with_jwt(
     http_client: AsyncClient,
     tenant_url: str,
     verify_password_endpoint: str,
-    policyauth_token: str,
+    admin_token: str,
     username: str,
     password: str,
 ) -> tuple[str, str]:
     """
-    Step 2: Verify password using policyauth token with returnJwt=true.
+    Step 1: Verify password using admin token with returnJwt=true.
+
+    Note: The returnJwt=true parameter requires elevated permissions,
+    so we use an admin token instead of the user's regular access token.
 
     Args:
         http_client: AsyncClient for making HTTP requests
         tenant_url: IBM Verify tenant URL
         verify_password_endpoint: Password verification endpoint
-        policyauth_token: Token from step 1
+        admin_token: Admin token with elevated permissions
         username: User's username
         password: User's password
 
@@ -106,9 +51,9 @@ async def verify_password_with_jwt(
     Raises:
         Exception: If password verification fails
     """
-    logger.info("Step 2: Verifying password with returnJwt=true")
+    logger.info("Step 1: Verifying password with returnJwt=true")
 
-    # Get cloud directory ID
+    # Get Cloud Directory ID
     cloud_directory_id = await get_cloud_directory_id(
         http_client, verify_password_endpoint
     )
@@ -124,7 +69,7 @@ async def verify_password_with_jwt(
     headers = {
         "Content-Type": "application/json",
         "Accept": "application/json",
-        "Authorization": f"Bearer {policyauth_token}",
+        "Authorization": f"Bearer {admin_token}",
     }
 
     response = await http_client.post(
@@ -159,7 +104,7 @@ async def exchange_password_jwt_for_token(
     client_secret: str,
 ) -> dict:
     """
-    Step 3: Exchange password JWT for OAuth token using jwt-bearer grant.
+    Step 2: Exchange password JWT for OAuth token using jwt-bearer grant.
 
     Args:
         http_client: AsyncClient for making HTTP requests
@@ -174,7 +119,7 @@ async def exchange_password_jwt_for_token(
     Raises:
         Exception: If token exchange fails
     """
-    logger.info("Step 3: Exchanging password JWT for OAuth token")
+    logger.info("Step 2: Exchanging password JWT for OAuth token")
 
     client_creds = f"{client_id}:{client_secret}"
     basic_auth = base64.b64encode(client_creds.encode()).decode()
@@ -221,12 +166,11 @@ async def verify_password_for_stepup(
     """
     Enhanced password verification for FIDO2 step-up authentication.
 
-    Performs steps 1-3:
-    1. Get policyauth token
-    2. Verify password with returnJwt=true
-    3. Exchange password JWT for OAuth token using STS credentials
+    Performs steps 1-2:
+    1. Verify password with returnJwt=true using admin token (elevated permissions required)
+    2. Exchange password JWT for OAuth token using jwt-bearer grant
 
-    Stores the resulting token in session for use in FIDO2 authentication.
+    Stores the resulting token data in session for use in FIDO2 authentication.
 
     Args:
         request: FastAPI request object
@@ -251,37 +195,37 @@ async def verify_password_for_stepup(
         )
         username = user_info.userName
 
-        # Step 1: Get policyauth token (using original application credentials)
-        policyauth_token = await get_policyauth_token(
-            http_client=http_client,
-            tenant_url=config.ibm_verify_config.IBM_VERIFY_TENANT_URL,
-            client_id=config.ibm_verify_config.IBM_VERIFY_STS_CLIENT_ID,
-            client_secret=config.ibm_verify_config.IBM_VERIFY_STS_SECRET,
-        )
+        # Get admin token for password verification with returnJwt=true
+        admin_token = await get_admin_token(http_client)
+        logger.info("Retrieved admin token for password verification")
 
-        # Step 2: Verify password with JWT
+        # Step 1: Verify password with JWT using admin token
+        # Note: returnJwt=true requires elevated permissions
         user_id, password_jwt = await verify_password_with_jwt(
             http_client=http_client,
             tenant_url=config.ibm_verify_config.IBM_VERIFY_TENANT_URL,
             verify_password_endpoint=config.verify_password_api_endpoint,
-            policyauth_token=policyauth_token,
+            admin_token=admin_token,
             username=username,
             password=payload.password,
         )
 
-        # Step 3: Exchange password JWT for OAuth token
+        # Step 2: Exchange password JWT for OAuth token
         stepup_token_data = await exchange_password_jwt_for_token(
             http_client=http_client,
             tenant_url=config.ibm_verify_config.IBM_VERIFY_TENANT_URL,
             password_jwt=password_jwt,
-            client_id=config.ibm_verify_config.IBM_VERIFY_STS_CLIENT_ID,
-            client_secret=config.ibm_verify_config.IBM_VERIFY_STS_SECRET,
+            client_id=config.ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID,
+            client_secret=config.ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_SECRET,
         )
 
-        # Store the stepup token in session for FIDO2 authentication
-        request.session["stepup_token"] = stepup_token_data.get("access_token")
-        request.session["stepup_grant_id"] = stepup_token_data.get("grant_id")
-        logger.info("Stored stepup token in session for FIDO2 authentication")
+        # Store the complete token data with timestamp for expiry checking
+        request.session["stepup_token_data"] = stepup_token_data
+        request.session["stepup_token_timestamp"] = time.time()
+        logger.info(
+            f"Stored stepup token data in session (expires_in: {stepup_token_data.get('expires_in')}s) "
+            "for FIDO2 authentication"
+        )
 
         return ResponseModel(
             success=True,

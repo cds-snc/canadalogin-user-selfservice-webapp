@@ -6,6 +6,7 @@ Uses importlib to import the actual module for patching.
 """
 
 import importlib
+import time
 import pytest
 from httpx import AsyncClient, HTTPStatusError, Request, Response
 from unittest.mock import AsyncMock, MagicMock, patch
@@ -468,8 +469,8 @@ class TestSubmitAssertionResult:
 
     @pytest.mark.asyncio
     @patch("app.auth.services.auth_user_session.update_session_tokens")
-    @patch.object(auth_module, "_exchange_token_for_session")
     @patch.object(auth_module, "_exchange_fido2_jwt_for_access_token")
+    @patch.object(auth_module, "_perform_mfa_refresh_token_flow")
     @patch.object(auth_module, "get_auth_request_headers")
     @patch.object(auth_module, "get_rp_uuid_from_rp_id")
     @patch.object(auth_module, "get_admin_token")
@@ -482,16 +483,26 @@ class TestSubmitAssertionResult:
         mock_get_admin_token,
         mock_get_rp_uuid_from_rp_id,
         mock_get_auth_request_headers,
+        mock_perform_mfa_refresh,
         mock_exchange_fido2_jwt,
-        mock_exchange_session,
         mock_update_session_tokens,
         mock_http_client,
         mock_request,
         mock_assertion_request,
     ):
-        """Should use stepup_token from session for FIDO2 step-up authentication"""
-        # Set stepup_token in session
-        mock_request.session = {"stepup_token": "stepup-token-from-password-verify"}
+        """Should use stepup_refresh_token from session for FIDO2 step-up authentication"""
+        # Set stepup tokens in session
+        mock_request.session = {
+            "stepup_token_data": {
+                "access_token": "stepup-access-token-123",
+                "refresh_token": "stepup-refresh-token-from-password-verify",
+                "grant_id": "grant-id-123",
+                "expires_in": 3600,
+                "scope": "openid profile offline_access email",
+                "token_type": "bearer",
+            },
+            "stepup_token_timestamp": time.time(),
+        }
 
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
         mock_get_rp_id.return_value = "example.com"
@@ -504,13 +515,17 @@ class TestSubmitAssertionResult:
 
         mock_get_auth_request_headers.side_effect = mock_headers_func
 
+        mock_perform_mfa_refresh.return_value = {
+            "access_token": "mfa-challenge-token",
+            "scope": "mfa_challenge",
+            "allowedFactors": ["fido2"],
+        }
         mock_exchange_fido2_jwt.return_value = {
             "access_token": "combined-access-token",
             "id_token": "combined-id-token",
             "refresh_token": "new-refresh-token",
             "expires_in": 3600,
         }
-        mock_exchange_session.return_value = {"session_id": "session-123"}
         mock_update_session_tokens.return_value = None
 
         # Mock response for assertion/result
@@ -540,16 +555,17 @@ class TestSubmitAssertionResult:
         assert "returnJwt=true" in url
         assert "assertion/result" in url
 
-        # Verify stepup token was used (not admin token)
+        # Verify MFA refresh flow was called
+        assert mock_perform_mfa_refresh.called
+
+        # Verify MFA challenge token was used (not admin token)
         headers_call = mock_get_auth_request_headers.call_args[0][0]
-        assert headers_call == "stepup-token-from-password-verify"
+        assert headers_call == "mfa-challenge-token"
 
         # Verify JWT exchange was called
         assert mock_exchange_fido2_jwt.called
 
-        # Verify session exchange was called
-        assert mock_exchange_session.called
-
+        # Verify userinfo fetch was called
         # Verify the result is successful
         assert result.success is True
         assert result.message == "FIDO2 authentication completed successfully"
@@ -616,8 +632,8 @@ class TestSubmitAssertionResult:
         mock_request,
         mock_assertion_request,
     ):
-        """Should raise exception when return_jwt=True but no stepup_token in session"""
-        # No stepup_token in session
+        """Should raise exception when return_jwt=True but no stepup_refresh_token in session"""
+        # No stepup_refresh_token in session
         mock_request.session = {}
 
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
@@ -633,12 +649,65 @@ class TestSubmitAssertionResult:
             return_jwt=True,
         )
 
-        # Should call error handler with exception about missing stepup token
+        # Should call error handler with exception about missing stepup_token_data
         mock_request_error_handler.handle.assert_called_once()
         error_arg = mock_request_error_handler.handle.call_args[0][0]
         assert isinstance(error_arg, Exception)
         assert "Step-up authentication required" in str(error_arg)
-        assert "POST /v1/password/verify/stepup first" in str(error_arg)
+        assert "stepup_token_data" in str(
+            error_arg
+        ) or "Password must be verified" in str(error_arg)
+
+    @pytest.mark.asyncio
+    @patch.object(auth_module, "_is_token_expired")
+    @patch.object(auth_module, "RequestErrorHandler")
+    @patch.object(auth_module, "get_rp_uuid_from_rp_id")
+    @patch.object(auth_module, "get_admin_token")
+    @patch.object(auth_module, "get_rp_id")
+    @patch.object(auth_module, "get_tenant_url")
+    async def test_return_jwt_true_with_expired_token_raises_exception(
+        self,
+        mock_get_tenant_url,
+        mock_get_rp_id,
+        mock_get_admin_token,
+        mock_get_rp_uuid_from_rp_id,
+        mock_request_error_handler,
+        mock_is_token_expired,
+        mock_http_client,
+        mock_request,
+        mock_assertion_request,
+    ):
+        """Should raise exception when stepup token has expired"""
+        # Setup session with expired token
+        mock_request.session = {
+            "stepup_token_data": {
+                "access_token": "access-token-123",
+                "refresh_token": "refresh-token-123",
+                "grant_id": "grant-id-123",
+                "expires_in": 3600,
+            },
+            "stepup_token_timestamp": time.time() - 4000,  # Expired
+        }
+
+        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
+        mock_get_rp_id.return_value = "example.com"
+        mock_get_admin_token.return_value = "admin-token"
+        mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
+        mock_is_token_expired.return_value = True  # Token is expired
+
+        await submit_assertion_result(
+            request=mock_request,
+            http_client=mock_http_client,
+            user_access_token="user-token",
+            request_body=mock_assertion_request,
+            return_jwt=True,
+        )
+
+        # Should call error handler with expired token exception
+        mock_request_error_handler.handle.assert_called_once()
+        error_arg = mock_request_error_handler.handle.call_args[0][0]
+        assert isinstance(error_arg, Exception)
+        assert "Step-up token expired" in str(error_arg)
 
     @pytest.mark.asyncio
     @patch.object(auth_module, "get_auth_request_headers")
@@ -1032,146 +1101,6 @@ class TestExchangeFido2JwtForAccessToken:
         assert "No access_token" in str(exc_info.value)
 
 
-class TestExchangeTokenForSession:
-    """Tests for _exchange_token_for_session helper function"""
-
-    @pytest.fixture
-    def mock_http_client(self):
-        """Create a mock HTTP client"""
-        return AsyncMock(spec=AsyncClient)
-
-    @pytest.mark.asyncio
-    async def test_successful_session_exchange(self, mock_http_client):
-        """Should successfully exchange access token for IBM Verify session"""
-        mock_response = MagicMock()
-        mock_response.status_code = 200
-        mock_response.json.return_value = {
-            "session_id": "session-123",
-            "status": "active",
-        }
-        mock_response.raise_for_status = MagicMock()
-        mock_http_client.post = AsyncMock(return_value=mock_response)
-
-        # Access the private function
-        exchange_func = auth_module._exchange_token_for_session
-
-        result = await exchange_func(
-            http_client=mock_http_client,
-            tenant_url="https://tenant.verify.ibm.com",
-            access_token="access-token-123",
-        )
-
-        # Should return session data
-        assert isinstance(result, dict)
-        assert result["session_id"] == "session-123"
-        assert result["status"] == "active"
-
-        # Verify the POST call
-        mock_http_client.post.assert_called_once()
-        call_args = mock_http_client.post.call_args
-        url = call_args[0][0]
-        assert "https://tenant.verify.ibm.com/v1.0/auth/session" in url
-
-        # Verify request data
-        data = call_args[1]["data"]
-        assert data["access_token"] == "access-token-123"
-
-        # Verify headers
-        headers = call_args[1]["headers"]
-        assert headers["Content-Type"] == "application/x-www-form-urlencoded"
-        assert headers["Accept"] == "application/json"
-
-    @pytest.mark.asyncio
-    async def test_handles_http_error(self, mock_http_client):
-        """Should handle HTTP errors during session exchange"""
-        mock_response = MagicMock()
-        mock_response.status_code = 400
-        mock_response.text = "Invalid token"
-
-        http_error = HTTPStatusError(
-            "400 Bad Request",
-            request=MagicMock(spec=Request),
-            response=mock_response,
-        )
-        mock_http_client.post = AsyncMock(side_effect=http_error)
-
-        exchange_func = auth_module._exchange_token_for_session
-
-        with pytest.raises(HTTPStatusError):
-            await exchange_func(
-                http_client=mock_http_client,
-                tenant_url="https://tenant.verify.ibm.com",
-                access_token="invalid-token",
-            )
-
-    @pytest.mark.asyncio
-    async def test_handles_network_error(self, mock_http_client):
-        """Should handle network errors during session exchange"""
-        mock_http_client.post = AsyncMock(
-            side_effect=Exception("Network connection failed")
-        )
-
-        exchange_func = auth_module._exchange_token_for_session
-
-        with pytest.raises(Exception) as exc_info:
-            await exchange_func(
-                http_client=mock_http_client,
-                tenant_url="https://tenant.verify.ibm.com",
-                access_token="access-token-123",
-            )
-
-        assert "Network connection failed" in str(exc_info.value)
-
-    @pytest.mark.asyncio
-    async def test_handles_empty_response_body(self, mock_http_client):
-        """Should handle 201 Created with empty response body"""
-        mock_response = MagicMock()
-        mock_response.status_code = 201
-        mock_response.content = b""  # Empty body
-        mock_response.raise_for_status = MagicMock()
-        mock_http_client.post = AsyncMock(return_value=mock_response)
-
-        exchange_func = auth_module._exchange_token_for_session
-
-        result = await exchange_func(
-            http_client=mock_http_client,
-            tenant_url="https://tenant.verify.ibm.com",
-            access_token="access-token-123",
-        )
-
-        # Should return empty dict when no response body
-        assert isinstance(result, dict)
-        assert len(result) == 0
-
-        # Verify the POST call was made
-        mock_http_client.post.assert_called_once()
-
-    @pytest.mark.asyncio
-    async def test_handles_invalid_json_response(self, mock_http_client):
-        """Should handle response with invalid JSON (e.g., plain text)"""
-        mock_response = MagicMock()
-        mock_response.status_code = 201
-        mock_response.content = b"Session created successfully"  # Plain text, not JSON
-        mock_response.json.side_effect = Exception("Invalid JSON")
-        mock_response.raise_for_status = MagicMock()
-        mock_http_client.post = AsyncMock(return_value=mock_response)
-
-        exchange_func = auth_module._exchange_token_for_session
-
-        result = await exchange_func(
-            http_client=mock_http_client,
-            tenant_url="https://tenant.verify.ibm.com",
-            access_token="access-token-123",
-        )
-
-        # Should return empty dict when JSON parsing fails
-        assert isinstance(result, dict)
-        assert len(result) == 0
-
-        # Verify the POST call was made
-        mock_http_client.post.assert_called_once()
-
-
 class TestSubmitAssertionResultEdgeCases:
     """Additional tests for submit_assertion_result edge cases and uncovered branches"""
 
@@ -1204,6 +1133,7 @@ class TestSubmitAssertionResultEdgeCases:
         return mock_data
 
     @pytest.mark.asyncio
+    @patch.object(auth_module, "_perform_mfa_refresh_token_flow")
     @patch.object(auth_module, "get_auth_request_headers")
     @patch.object(auth_module, "get_rp_uuid_from_rp_id")
     @patch.object(auth_module, "get_admin_token")
@@ -1216,19 +1146,36 @@ class TestSubmitAssertionResultEdgeCases:
         mock_get_admin_token,
         mock_get_rp_uuid_from_rp_id,
         mock_get_auth_request_headers,
+        mock_perform_mfa_refresh,
         mock_http_client,
         mock_request,
         mock_assertion_request,
     ):
         """Should handle return_jwt=True when response doesn't contain assertion"""
-        mock_request.session = {"stepup_token": "stepup-token-123"}
+        mock_request.session = {
+            "stepup_token_data": {
+                "access_token": "stepup-access-123",
+                "refresh_token": "stepup-refresh-123",
+                "grant_id": "grant-id-123",
+                "expires_in": 3600,
+                "scope": "openid profile offline_access email",
+                "token_type": "bearer",
+            },
+            "stepup_token_timestamp": time.time(),
+        }
 
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
         mock_get_rp_id.return_value = "example.com"
         mock_get_admin_token.return_value = "admin-token"
         mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
         mock_get_auth_request_headers.return_value = {
-            "Authorization": "Bearer stepup-token-123"
+            "Authorization": "Bearer mfa-challenge-token"
+        }
+
+        mock_perform_mfa_refresh.return_value = {
+            "access_token": "mfa-challenge-token",
+            "scope": "mfa_challenge",
+            "allowedFactors": ["fido2"],
         }
 
         # Response without assertion field
@@ -1253,9 +1200,10 @@ class TestSubmitAssertionResultEdgeCases:
         assert "fido2_auth_jwt" not in mock_request.session
 
     @pytest.mark.asyncio
+    @patch("starsessions.get_session_handler")
     @patch("app.auth.services.auth_user_session.update_session_tokens")
-    @patch.object(auth_module, "_exchange_token_for_session")
     @patch.object(auth_module, "_exchange_fido2_jwt_for_access_token")
+    @patch.object(auth_module, "_perform_mfa_refresh_token_flow")
     @patch.object(auth_module, "get_auth_request_headers")
     @patch.object(auth_module, "get_rp_uuid_from_rp_id")
     @patch.object(auth_module, "get_admin_token")
@@ -1268,26 +1216,44 @@ class TestSubmitAssertionResultEdgeCases:
         mock_get_admin_token,
         mock_get_rp_uuid_from_rp_id,
         mock_get_auth_request_headers,
+        mock_perform_mfa_refresh,
         mock_exchange_fido2_jwt,
-        mock_exchange_session,
         mock_update_session_tokens,
+        mock_get_session_handler,
         mock_http_client,
         mock_request,
         mock_assertion_request,
     ):
-        """Should clean up both stepup_token and stepup_grant_id from session"""
-        # Session with both stepup_token and stepup_grant_id
+        """Should clean up stepup_token_data and stepup_token_timestamp from session"""
+        # Session with stepup tokens
         mock_request.session = {
-            "stepup_token": "stepup-token-123",
-            "stepup_grant_id": "grant-id-456",
+            "stepup_token_data": {
+                "access_token": "stepup-access-123",
+                "refresh_token": "stepup-refresh-123",
+                "grant_id": "grant-id-456",
+                "expires_in": 3600,
+                "scope": "openid profile offline_access email",
+                "token_type": "bearer",
+            },
+            "stepup_token_timestamp": time.time(),
         }
+
+        # Mock session handler
+        mock_handler = MagicMock()
+        mock_get_session_handler.return_value = mock_handler
 
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
         mock_get_rp_id.return_value = "example.com"
         mock_get_admin_token.return_value = "admin-token"
         mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
         mock_get_auth_request_headers.return_value = {
-            "Authorization": "Bearer stepup-token-123"
+            "Authorization": "Bearer mfa-challenge-token"
+        }
+
+        mock_perform_mfa_refresh.return_value = {
+            "access_token": "mfa-challenge-token",
+            "scope": "mfa_challenge",
+            "allowedFactors": ["fido2"],
         }
 
         mock_response = MagicMock()
@@ -1300,13 +1266,26 @@ class TestSubmitAssertionResultEdgeCases:
         mock_response.raise_for_status = MagicMock()
         mock_http_client.post = AsyncMock(return_value=mock_response)
 
+        # Create a valid id_token JWT with sid
+        import base64
+        import json
+
+        payload = {
+            "sid": "session-id-123",
+            "amr": ["password", "fido2"],
+            "sub": "user-123",
+        }
+        payload_b64 = (
+            base64.b64encode(json.dumps(payload).encode()).decode().rstrip("=")
+        )
+        id_token = f"header.{payload_b64}.signature"
+
         mock_exchange_fido2_jwt.return_value = {
             "access_token": "new-token",
             "refresh_token": "new-refresh",
             "expires_in": 3600,
+            "id_token": id_token,
         }
-        mock_exchange_session.return_value = {"session_id": "session-123"}
-
         result = await submit_assertion_result(
             request=mock_request,
             http_client=mock_http_client,
@@ -1316,16 +1295,16 @@ class TestSubmitAssertionResultEdgeCases:
         )
 
         assert result.success is True
-        # Both should be cleaned up after successful token exchange
-        assert "stepup_token" not in mock_request.session
-        assert "stepup_grant_id" not in mock_request.session
+        # All stepup tokens should be cleaned up after successful token exchange
+        assert "stepup_token_data" not in mock_request.session
+        assert "stepup_token_timestamp" not in mock_request.session
         # fido2_auth_jwt should be stored
         assert mock_request.session["fido2_auth_jwt"] == "fido2-jwt-token"
 
     @pytest.mark.asyncio
     @patch("app.auth.services.auth_user_session.update_session_tokens")
-    @patch.object(auth_module, "_exchange_token_for_session")
     @patch.object(auth_module, "_exchange_fido2_jwt_for_access_token")
+    @patch.object(auth_module, "_perform_mfa_refresh_token_flow")
     @patch.object(auth_module, "get_auth_request_headers")
     @patch.object(auth_module, "get_rp_uuid_from_rp_id")
     @patch.object(auth_module, "get_admin_token")
@@ -1338,22 +1317,38 @@ class TestSubmitAssertionResultEdgeCases:
         mock_get_admin_token,
         mock_get_rp_uuid_from_rp_id,
         mock_get_auth_request_headers,
+        mock_perform_mfa_refresh,
         mock_exchange_fido2_jwt,
-        mock_exchange_session,
         mock_update_session_tokens,
         mock_http_client,
         mock_request,
         mock_assertion_request,
     ):
-        """Should continue successfully even if introspect_user_token fails"""
-        mock_request.session = {"stepup_token": "stepup-token-123"}
+        """Should continue successfully even if token exchange fails"""
+        mock_request.session = {
+            "stepup_token_data": {
+                "access_token": "stepup-access-123",
+                "refresh_token": "stepup-refresh-123",
+                "grant_id": "grant-id-123",
+                "expires_in": 3600,
+                "scope": "openid profile offline_access email",
+                "token_type": "bearer",
+            },
+            "stepup_token_timestamp": time.time(),
+        }
 
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
         mock_get_rp_id.return_value = "example.com"
         mock_get_admin_token.return_value = "admin-token"
         mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
         mock_get_auth_request_headers.return_value = {
-            "Authorization": "Bearer stepup-token-123"
+            "Authorization": "Bearer mfa-challenge-token"
+        }
+
+        mock_perform_mfa_refresh.return_value = {
+            "access_token": "mfa-challenge-token",
+            "scope": "mfa_challenge",
+            "allowedFactors": ["fido2"],
         }
 
         mock_response = MagicMock()
@@ -1381,7 +1376,9 @@ class TestSubmitAssertionResultEdgeCases:
         assert result.success is True
         mock_exchange_fido2_jwt.assert_called_once()
         # Session cleanup doesn't happen when exception occurs
-        assert "stepup_token" in mock_request.session  # Still present due to exception
+        assert (
+            "stepup_token_data" in mock_request.session
+        )  # Still present due to exception
 
     @pytest.mark.asyncio
     @patch.object(auth_module, "get_auth_request_headers")
@@ -1432,8 +1429,8 @@ class TestSubmitAssertionResultEdgeCases:
 
     @pytest.mark.asyncio
     @patch("app.auth.services.auth_user_session.update_session_tokens")
-    @patch.object(auth_module, "_exchange_token_for_session")
     @patch.object(auth_module, "_exchange_fido2_jwt_for_access_token")
+    @patch.object(auth_module, "_perform_mfa_refresh_token_flow")
     @patch.object(auth_module, "get_auth_request_headers")
     @patch.object(auth_module, "get_rp_uuid_from_rp_id")
     @patch.object(auth_module, "get_admin_token")
@@ -1446,22 +1443,38 @@ class TestSubmitAssertionResultEdgeCases:
         mock_get_admin_token,
         mock_get_rp_uuid_from_rp_id,
         mock_get_auth_request_headers,
+        mock_perform_mfa_refresh,
         mock_exchange_fido2_jwt,
-        mock_exchange_session,
         mock_update_session_tokens,
         mock_http_client,
         mock_request,
         mock_assertion_request,
     ):
-        """Should handle gracefully when token exchange returns data without access_token"""
-        mock_request.session = {"stepup_token": "stepup-token-123"}
+        """Should update session with full token metadata"""
+        mock_request.session = {
+            "stepup_token_data": {
+                "access_token": "stepup-access-123",
+                "refresh_token": "stepup-refresh-123",
+                "grant_id": "grant-id-123",
+                "expires_in": 3600,
+                "scope": "openid profile offline_access email",
+                "token_type": "bearer",
+            },
+            "stepup_token_timestamp": time.time(),
+        }
 
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
         mock_get_rp_id.return_value = "example.com"
         mock_get_admin_token.return_value = "admin-token"
         mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
         mock_get_auth_request_headers.return_value = {
-            "Authorization": "Bearer stepup-token-123"
+            "Authorization": "Bearer mfa-challenge-token"
+        }
+
+        mock_perform_mfa_refresh.return_value = {
+            "access_token": "mfa-challenge-token",
+            "scope": "mfa_challenge",
+            "allowedFactors": ["fido2"],
         }
 
         mock_response = MagicMock()
@@ -1482,8 +1495,6 @@ class TestSubmitAssertionResultEdgeCases:
             "expires_in": 7200,
             "token_type": "Bearer",
         }
-        mock_exchange_session.return_value = {"session_id": "session-123"}
-
         result = await submit_assertion_result(
             request=mock_request,
             http_client=mock_http_client,
@@ -1501,44 +1512,52 @@ class TestSubmitAssertionResultEdgeCases:
         assert token_data["access_token"] == "combined-token-123"
         assert token_data["expires_in"] == 7200
         # Session cleanup happens after successful exchange
-        assert "stepup_token" not in mock_request.session
+        assert "stepup_token_data" not in mock_request.session
 
     @pytest.mark.asyncio
     @patch("app.auth.services.auth_user_session.update_session_user_info")
     @patch("app.auth.services.auth_user_session.update_session_tokens")
-    @patch.object(auth_module, "_exchange_token_for_session")
     @patch.object(auth_module, "_exchange_fido2_jwt_for_access_token")
+    @patch.object(auth_module, "_perform_mfa_refresh_token_flow")
     @patch.object(auth_module, "get_auth_request_headers")
     @patch.object(auth_module, "get_rp_uuid_from_rp_id")
     @patch.object(auth_module, "get_admin_token")
     @patch.object(auth_module, "get_rp_id")
     @patch.object(auth_module, "get_tenant_url")
-    async def test_preserves_userinfo_including_sid_when_updating_tokens(
+    async def test_fetches_fresh_userinfo_when_updating_tokens(
         self,
         mock_get_tenant_url,
         mock_get_rp_id,
         mock_get_admin_token,
         mock_get_rp_uuid_from_rp_id,
         mock_get_auth_request_headers,
+        mock_perform_mfa_refresh,
         mock_exchange_fido2_jwt,
-        mock_exchange_session,
         mock_update_session_tokens,
         mock_update_session_user_info,
         mock_http_client,
         mock_request,
         mock_assertion_request,
     ):
-        """Should preserve existing userinfo (including sid) when updating session tokens"""
+        """Should fetch fresh userinfo (including sid) after token exchange"""
         from app.constants.session_keys import SessionKeys
 
         # Set up session with existing token data including userinfo with sid
         mock_request.session = {
-            "stepup_token": "stepup-token-123",
+            "stepup_token_data": {
+                "access_token": "stepup-access-123",
+                "refresh_token": "stepup-refresh-123",
+                "grant_id": "grant-id-123",
+                "expires_in": 3600,
+                "scope": "openid profile offline_access email",
+                "token_type": "bearer",
+            },
+            "stepup_token_timestamp": time.time(),
             SessionKeys.SESSION_USER_TOKEN.value: {
                 "access_token": "old-access-token",
                 "refresh_token": "old-refresh-token",
                 "userinfo": {
-                    "sid": "session-id-from-oidc-login",
+                    "sid": "old-session-id-from-oidc-login",
                     "sub": "user-123",
                     "email": "user@example.com",
                 },
@@ -1550,7 +1569,13 @@ class TestSubmitAssertionResultEdgeCases:
         mock_get_admin_token.return_value = "admin-token"
         mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
         mock_get_auth_request_headers.return_value = {
-            "Authorization": "Bearer stepup-token-123"
+            "Authorization": "Bearer mfa-challenge-token"
+        }
+
+        mock_perform_mfa_refresh.return_value = {
+            "access_token": "mfa-challenge-token",
+            "scope": "mfa_challenge",
+            "allowedFactors": ["fido2"],
         }
 
         mock_response = MagicMock()
@@ -1563,18 +1588,31 @@ class TestSubmitAssertionResultEdgeCases:
         mock_response.raise_for_status = MagicMock()
         mock_http_client.post = AsyncMock(return_value=mock_response)
 
-        # JWT bearer token exchange returns tokens WITHOUT userinfo
-        # (This is typical for OAuth token exchange endpoints)
+        # Create a valid id_token JWT with userinfo including sid
+        import base64
+        import json
+
+        payload = {
+            "sid": "new-session-id-from-fido2-stepup",
+            "sub": "user-123",
+            "email": "user@example.com",
+            "amr": ["password", "fido2"],
+        }
+        payload_b64 = (
+            base64.b64encode(json.dumps(payload).encode()).decode().rstrip("=")
+        )
+        id_token = f"header.{payload_b64}.signature"
+
+        # JWT bearer token exchange returns tokens with id_token
         mock_exchange_fido2_jwt.return_value = {
             "access_token": "combined-token-123",
             "refresh_token": "new-refresh-456",
-            "id_token": "new-id-789",
+            "id_token": id_token,
             "expires_in": 7200,
             "token_type": "Bearer",
-            # Note: No userinfo here - that's the point of this test
         }
-        mock_exchange_session.return_value = {"session_id": "session-123"}
 
+        # Fresh userinfo fetched from /oauth2/userinfo with NEW sid
         result = await submit_assertion_result(
             request=mock_request,
             http_client=mock_http_client,
@@ -1586,17 +1624,207 @@ class TestSubmitAssertionResultEdgeCases:
         # Should succeed
         assert result.success is True
 
-        # Verify update_session_tokens was called with token data (without userinfo)
+        # Verify update_session_tokens was called with token data including fresh userinfo
         mock_update_session_tokens.assert_called_once()
         call_args = mock_update_session_tokens.call_args[0]
         token_data = call_args[1]
         assert token_data["access_token"] == "combined-token-123"
         assert token_data["refresh_token"] == "new-refresh-456"
 
-        # CRITICAL: Verify update_session_user_info was called to preserve userinfo (including sid)
-        mock_update_session_user_info.assert_called_once()
-        user_info_args = mock_update_session_user_info.call_args[0]
-        userinfo = user_info_args[1]
-        assert userinfo["sid"] == "session-id-from-oidc-login"
-        assert userinfo["sub"] == "user-123"
-        assert userinfo["email"] == "user@example.com"
+        # CRITICAL: Verify userinfo was fetched and included with NEW sid
+        assert "userinfo" in token_data
+        assert token_data["userinfo"]["sid"] == "new-session-id-from-fido2-stepup"
+        assert token_data["userinfo"]["sub"] == "user-123"
+        assert token_data["userinfo"]["email"] == "user@example.com"
+
+
+class TestPerformMfaRefreshTokenFlow:
+    """Tests for _perform_mfa_refresh_token_flow helper function"""
+
+    @pytest.fixture
+    def mock_http_client(self):
+        """Create a mock HTTP client"""
+        return AsyncMock(spec=AsyncClient)
+
+    @pytest.mark.asyncio
+    async def test_successful_mfa_refresh_token_flow(self, mock_http_client):
+        """Should successfully perform MFA refresh token flow"""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "access_token": "mfa-challenge-token-xyz",
+            "scope": "mfa_challenge",
+            "allowedFactors": ["fido2"],
+            "expires_in": 300,
+        }
+        mock_response.raise_for_status = MagicMock()
+        mock_http_client.post = AsyncMock(return_value=mock_response)
+
+        # Access the private function
+        mfa_flow_func = auth_module._perform_mfa_refresh_token_flow
+
+        result = await mfa_flow_func(
+            http_client=mock_http_client,
+            tenant_url="https://tenant.verify.ibm.com",
+            refresh_token="refresh-token-123",
+            client_id="client-id",
+            client_secret="client-secret",
+        )
+
+        # Should return token data
+        assert isinstance(result, dict)
+        assert result["access_token"] == "mfa-challenge-token-xyz"
+        assert result["scope"] == "mfa_challenge"
+        assert result["allowedFactors"] == ["fido2"]
+
+        # Verify the POST call
+        mock_http_client.post.assert_called_once()
+        call_args = mock_http_client.post.call_args
+        url = call_args[0][0]
+        assert "/oauth2/token" in url
+
+        # Verify request data
+        data = call_args[1]["data"]
+        assert data["grant_type"] == "refresh_token"
+        assert data["refresh_token"] == "refresh-token-123"
+
+        # Verify headers include Basic auth
+        headers = call_args[1]["headers"]
+        assert "Authorization" in headers
+        assert headers["Authorization"].startswith("Basic ")
+
+    @pytest.mark.asyncio
+    async def test_verifies_scope_contains_mfa_challenge(self, mock_http_client):
+        """Should log warning if scope doesn't contain mfa_challenge"""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "access_token": "token-123",
+            "scope": "some_other_scope",  # Missing mfa_challenge
+            "allowedFactors": ["fido2"],
+        }
+        mock_response.raise_for_status = MagicMock()
+        mock_http_client.post = AsyncMock(return_value=mock_response)
+
+        mfa_flow_func = auth_module._perform_mfa_refresh_token_flow
+
+        result = await mfa_flow_func(
+            http_client=mock_http_client,
+            tenant_url="https://tenant.verify.ibm.com",
+            refresh_token="refresh-token-123",
+            client_id="client-id",
+            client_secret="client-secret",
+        )
+
+        # Should still return the data (just logs warning)
+        assert result["scope"] == "some_other_scope"
+        assert "access_token" in result
+
+    @pytest.mark.asyncio
+    async def test_verifies_allowed_factors_contains_fido2(self, mock_http_client):
+        """Should log warning if allowedFactors doesn't contain fido2"""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "access_token": "token-123",
+            "scope": "mfa_challenge",
+            "allowedFactors": ["totp", "sms"],  # Missing fido2
+        }
+        mock_response.raise_for_status = MagicMock()
+        mock_http_client.post = AsyncMock(return_value=mock_response)
+
+        mfa_flow_func = auth_module._perform_mfa_refresh_token_flow
+
+        result = await mfa_flow_func(
+            http_client=mock_http_client,
+            tenant_url="https://tenant.verify.ibm.com",
+            refresh_token="refresh-token-123",
+            client_id="client-id",
+            client_secret="client-secret",
+        )
+
+        # Should still return the data (just logs warning)
+        assert result["allowedFactors"] == ["totp", "sms"]
+        assert "access_token" in result
+
+    @pytest.mark.asyncio
+    async def test_handles_http_error(self, mock_http_client):
+        """Should handle HTTP errors during MFA refresh token flow"""
+        mock_response = MagicMock()
+        mock_response.status_code = 400
+        mock_response.text = "Invalid refresh token"
+
+        http_error = HTTPStatusError(
+            "400 Bad Request",
+            request=MagicMock(spec=Request),
+            response=mock_response,
+        )
+        mock_http_client.post = AsyncMock(side_effect=http_error)
+
+        mfa_flow_func = auth_module._perform_mfa_refresh_token_flow
+
+        with pytest.raises(HTTPStatusError):
+            await mfa_flow_func(
+                http_client=mock_http_client,
+                tenant_url="https://tenant.verify.ibm.com",
+                refresh_token="invalid-token",
+                client_id="client-id",
+                client_secret="client-secret",
+            )
+
+
+class TestIsTokenExpired:
+    """Tests for _is_token_expired helper function"""
+
+    def test_token_not_expired(self):
+        """Should return False when token is still valid"""
+        is_expired_func = auth_module._is_token_expired
+
+        token_data = {"expires_in": 3600}
+        token_timestamp = time.time()
+
+        result = is_expired_func(token_data, token_timestamp)
+        assert result is False
+
+    def test_token_expired(self):
+        """Should return True when token has expired"""
+        is_expired_func = auth_module._is_token_expired
+
+        token_data = {"expires_in": 3600}
+        token_timestamp = time.time() - 3700  # More than 3600 seconds ago
+
+        result = is_expired_func(token_data, token_timestamp)
+        assert result is True
+
+    def test_token_expiring_soon_with_buffer(self):
+        """Should return True when token is within 30 second expiry buffer"""
+        is_expired_func = auth_module._is_token_expired
+
+        token_data = {"expires_in": 3600}
+        token_timestamp = time.time() - 3580  # 20 seconds left, within 30s buffer
+
+        result = is_expired_func(token_data, token_timestamp)
+        assert result is True
+
+    def test_missing_token_data(self):
+        """Should return True when token data is None"""
+        is_expired_func = auth_module._is_token_expired
+
+        result = is_expired_func(None, time.time())
+        assert result is True
+
+    def test_missing_timestamp(self):
+        """Should return True when timestamp is None"""
+        is_expired_func = auth_module._is_token_expired
+
+        token_data = {"expires_in": 3600}
+        result = is_expired_func(token_data, None)
+        assert result is True
+
+    def test_zero_expires_in(self):
+        """Should return True when expires_in is 0"""
+        is_expired_func = auth_module._is_token_expired
+
+        token_data = {"expires_in": 0}
+        result = is_expired_func(token_data, time.time())
+        assert result is True

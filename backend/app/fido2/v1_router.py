@@ -223,9 +223,9 @@ async def submit_assertion_result(
         request: FastAPI Request for session storage
         request_data: Assertion result from the client
         return_jwt: If True, returns a JWT token that can be used for
-                   session establishment or step-up authentication.
+                   step-up authentication with combined AMR claims.
                    The JWT will be automatically stored in the session
-                   and can be checked for step-up auth verification.
+                   and exchanged for a combined token with password + FIDO2 AMR.
     """
     return await submit_assertion_result_service(
         request=request,

@@ -2,10 +2,9 @@
 Unit tests for verify_password_stepup.py module
 
 Tests the enhanced password verification for FIDO2 step-up authentication flow:
-1. get_policyauth_token() - Get policyauth OAuth token
-2. verify_password_with_jwt() - Verify password with returnJwt=true
-3. exchange_password_jwt_for_token() - Exchange password JWT for OAuth token
-4. verify_password_for_stepup() - Main orchestrator function
+1. verify_password_with_jwt() - Verify password with returnJwt=true using current user token
+2. exchange_password_jwt_for_token() - Exchange password JWT for OAuth token
+3. verify_password_for_stepup() - Main orchestrator function
 """
 
 import importlib
@@ -18,108 +17,9 @@ from app.password.schemas import UserPassword
 stepup_module = importlib.import_module("app.password.services.verify_password_stepup")
 
 # Import functions directly for testing
-get_policyauth_token = stepup_module.get_policyauth_token
 verify_password_with_jwt = stepup_module.verify_password_with_jwt
 exchange_password_jwt_for_token = stepup_module.exchange_password_jwt_for_token
 verify_password_for_stepup = stepup_module.verify_password_for_stepup
-
-
-class TestGetPolicyauthToken:
-    """Tests for get_policyauth_token function"""
-
-    @pytest.fixture
-    def mock_http_client(self):
-        """Create a mock HTTP client"""
-        return AsyncMock(spec=AsyncClient)
-
-    @pytest.mark.asyncio
-    async def test_successful_policyauth_token(self, mock_http_client):
-        """Should successfully get policyauth token"""
-        mock_response = MagicMock()
-        mock_response.status_code = 200
-        mock_response.text = '{"access_token": "policyauth-token-123"}'
-        mock_response.json.return_value = {
-            "access_token": "policyauth-token-123",
-            "token_type": "Bearer",
-            "expires_in": 3600,
-        }
-        mock_response.raise_for_status = MagicMock()
-        mock_http_client.post = AsyncMock(return_value=mock_response)
-
-        result = await get_policyauth_token(
-            http_client=mock_http_client,
-            tenant_url="https://tenant.verify.ibm.com",
-            client_id="client-id-123",
-            client_secret="client-secret-456",
-        )
-
-        assert result == "policyauth-token-123"
-
-        # Verify the POST call
-        mock_http_client.post.assert_called_once()
-        call_args = mock_http_client.post.call_args
-        url = call_args[0][0]
-        assert "https://tenant.verify.ibm.com/oauth2/token" in url
-
-        # Verify request data
-        data = call_args[1]["data"]
-        assert data["grant_type"] == "policyauth"
-        assert data["scope"] == "openid"
-
-        # Verify headers include Basic auth
-        headers = call_args[1]["headers"]
-        assert "Authorization" in headers
-        assert headers["Authorization"].startswith("Basic ")
-
-    @pytest.mark.asyncio
-    async def test_handles_http_error(self, mock_http_client):
-        """Should handle HTTP error when policyauth grant not allowed"""
-        mock_response = Response(
-            400,
-            json={
-                "error": "unauthorized_client",
-                "error_description": "Client not allowed to use policyauth grant",
-            },
-        )
-        http_error = HTTPStatusError(
-            "400 Bad Request",
-            request=MagicMock(spec=Request),
-            response=mock_response,
-        )
-        mock_response_obj = MagicMock()
-        mock_response_obj.raise_for_status.side_effect = http_error
-        mock_http_client.post = AsyncMock(return_value=mock_response_obj)
-
-        with pytest.raises(HTTPStatusError):
-            await get_policyauth_token(
-                http_client=mock_http_client,
-                tenant_url="https://tenant.verify.ibm.com",
-                client_id="client-id-123",
-                client_secret="client-secret-456",
-            )
-
-    @pytest.mark.asyncio
-    async def test_handles_missing_access_token(self, mock_http_client):
-        """Should raise exception when access_token missing from response"""
-        mock_response = MagicMock()
-        mock_response.status_code = 200
-        mock_response.text = '{"token_type": "Bearer"}'
-        mock_response.json.return_value = {
-            "token_type": "Bearer",
-            "expires_in": 3600,
-        }
-        mock_response.raise_for_status = MagicMock()
-        mock_http_client.post = AsyncMock(return_value=mock_response)
-
-        with pytest.raises(Exception) as exc_info:
-            await get_policyauth_token(
-                http_client=mock_http_client,
-                tenant_url="https://tenant.verify.ibm.com",
-                client_id="client-id-123",
-                client_secret="client-secret-456",
-            )
-
-        assert "No access_token" in str(exc_info.value)
 
 
 class TestVerifyPasswordWithJwt:
@@ -152,7 +52,7 @@ class TestVerifyPasswordWithJwt:
             http_client=mock_http_client,
             tenant_url="https://tenant.verify.ibm.com",
             verify_password_endpoint="https://tenant.verify.ibm.com/v2.0/authnmethods/password",
-            policyauth_token="policyauth-token-123",
+            admin_token="admin-token-123",
             username="user@example.com",
             password="SecurePass123!",
         )
@@ -174,7 +74,7 @@ class TestVerifyPasswordWithJwt:
 
         # Verify auth header
         headers = call_args[1]["headers"]
-        assert headers["Authorization"] == "Bearer policyauth-token-123"
+        assert headers["Authorization"] == "Bearer admin-token-123"
 
     @pytest.mark.asyncio
     @patch("app.password.services.verify_password_stepup.get_cloud_directory_id")
@@ -199,7 +99,7 @@ class TestVerifyPasswordWithJwt:
                 http_client=mock_http_client,
                 tenant_url="https://tenant.verify.ibm.com",
                 verify_password_endpoint="https://tenant.verify.ibm.com/v2.0/authnmethods/password",
-                policyauth_token="policyauth-token-123",
+                admin_token="admin-token-123",
                 username="user@example.com",
                 password="WrongPassword",
             )
@@ -226,7 +126,7 @@ class TestVerifyPasswordWithJwt:
                 http_client=mock_http_client,
                 tenant_url="https://tenant.verify.ibm.com",
                 verify_password_endpoint="https://tenant.verify.ibm.com/v2.0/authnmethods/password",
-                policyauth_token="policyauth-token-123",
+                admin_token="admin-token-123",
                 username="user@example.com",
                 password="Password123!",
             )
@@ -253,7 +153,7 @@ class TestVerifyPasswordWithJwt:
                 http_client=mock_http_client,
                 tenant_url="https://tenant.verify.ibm.com",
                 verify_password_endpoint="https://tenant.verify.ibm.com/v2.0/authnmethods/password",
-                policyauth_token="policyauth-token-123",
+                admin_token="admin-token-123",
                 username="user@example.com",
                 password="Password123!",
             )
@@ -384,10 +284,10 @@ class TestVerifyPasswordForStepup:
     )
     @patch.object(stepup_module, "exchange_password_jwt_for_token")
     @patch.object(stepup_module, "verify_password_with_jwt")
-    @patch.object(stepup_module, "get_policyauth_token")
+    @patch.object(stepup_module, "get_admin_token")
     async def test_successful_complete_flow(
         self,
-        mock_get_policyauth,
+        mock_get_admin_token,
         mock_verify_password,
         mock_exchange_jwt,
         mock_get_profile,
@@ -395,14 +295,18 @@ class TestVerifyPasswordForStepup:
         mock_request,
         mock_password_payload,
     ):
-        """Should complete entire 3-step flow successfully"""
+        """Should complete entire 2-step flow successfully"""
         # Mock config
         mock_config = MagicMock()
         mock_config.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
             "https://tenant.verify.ibm.com"
         )
-        mock_config.ibm_verify_config.IBM_VERIFY_STS_CLIENT_ID = "sts-client-123"
-        mock_config.ibm_verify_config.IBM_VERIFY_STS_SECRET = "sts-secret-456"
+        mock_config.ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID = (
+            "profile-mgmt-client-123"
+        )
+        mock_config.ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_SECRET = (
+            "profile-mgmt-secret-456"
+        )
         mock_config.verify_password_api_endpoint = (
             "https://tenant.verify.ibm.com/v2.0/authnmethods/password"
         )
@@ -413,16 +317,18 @@ class TestVerifyPasswordForStepup:
         mock_user_info.userName = "user@example.com"
         mock_get_profile.return_value = mock_user_info
 
-        # Mock step 1: policyauth token
-        mock_get_policyauth.return_value = "policyauth-token-123"
+        # Mock admin token
+        mock_get_admin_token.return_value = "admin-token-123"
 
-        # Mock step 2: password verification
+        # Mock step 1: password verification with JWT
         mock_verify_password.return_value = ("user-123", "password-jwt-token")
 
-        # Mock step 3: JWT exchange
+        # Mock step 2: JWT exchange
         mock_exchange_jwt.return_value = {
             "access_token": "stepup-token-456",
-            "grant_id": "grant-789",
+            "refresh_token": "stepup-refresh-789",
+            "grant_id": "grant-abc",
+            "expires_in": 3600,
         }
 
         result = await verify_password_for_stepup(
@@ -436,12 +342,17 @@ class TestVerifyPasswordForStepup:
         assert result.data.id == "user-123"
         assert "successfully" in result.message.lower()
 
-        # Verify session storage
-        assert mock_request.session["stepup_token"] == "stepup-token-456"
-        assert mock_request.session["stepup_grant_id"] == "grant-789"
+        # Verify session storage uses new structure
+        assert "stepup_token_data" in mock_request.session
+        assert "stepup_token_timestamp" in mock_request.session
+        assert (
+            mock_request.session["stepup_token_data"]["access_token"]
+            == "stepup-token-456"
+        )
+        assert mock_request.session["stepup_token_data"]["grant_id"] == "grant-abc"
+        assert isinstance(mock_request.session["stepup_token_timestamp"], float)
 
-        # Verify all steps were called in order
-        mock_get_policyauth.assert_called_once()
+        # Verify all steps were called
         mock_verify_password.assert_called_once()
         mock_exchange_jwt.assert_called_once()
 
@@ -451,56 +362,11 @@ class TestVerifyPasswordForStepup:
     @patch(
         "app.password.services.verify_password_stepup.dispatch_get_my_profile_from_ibm"
     )
-    @patch.object(stepup_module, "get_policyauth_token")
-    async def test_handles_policyauth_error(
-        self,
-        mock_get_policyauth,
-        mock_get_profile,
-        mock_get_config,
-        mock_error_handler,
-        mock_request,
-        mock_password_payload,
-    ):
-        """Should handle error when policyauth token fails"""
-        # Mock config
-        mock_config = MagicMock()
-        mock_config.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
-            "https://tenant.verify.ibm.com"
-        )
-        mock_config.ibm_verify_config.IBM_VERIFY_STS_CLIENT_ID = "sts-client-123"
-        mock_config.ibm_verify_config.IBM_VERIFY_STS_SECRET = "sts-secret-456"
-        mock_get_config.return_value = mock_config
-
-        # Mock user profile
-        mock_user_info = MagicMock()
-        mock_user_info.userName = "user@example.com"
-        mock_get_profile.return_value = mock_user_info
-
-        # Mock step 1 failure
-        mock_get_policyauth.side_effect = Exception("policyauth grant not allowed")
-
-        await verify_password_for_stepup(
-            request=mock_request,
-            user_access_token="user-access-token",
-            payload=mock_password_payload,
-        )
-
-        # Verify error handler was called
-        mock_error_handler.handle.assert_called_once()
-        error_arg = mock_error_handler.handle.call_args[0][0]
-        assert "policyauth" in str(error_arg)
-
-    @pytest.mark.asyncio
-    @patch("app.password.services.verify_password_stepup.RequestErrorHandler")
-    @patch("app.password.services.verify_password_stepup.get_configuration")
-    @patch(
-        "app.password.services.verify_password_stepup.dispatch_get_my_profile_from_ibm"
-    )
     @patch.object(stepup_module, "verify_password_with_jwt")
-    @patch.object(stepup_module, "get_policyauth_token")
+    @patch.object(stepup_module, "get_admin_token")
     async def test_handles_password_verification_error(
         self,
-        mock_get_policyauth,
+        mock_get_admin_token,
         mock_verify_password,
         mock_get_profile,
         mock_get_config,
@@ -524,10 +390,10 @@ class TestVerifyPasswordForStepup:
         mock_user_info.userName = "user@example.com"
         mock_get_profile.return_value = mock_user_info
 
-        # Mock step 1 success
-        mock_get_policyauth.return_value = "policyauth-token-123"
+        # Mock admin token
+        mock_get_admin_token.return_value = "admin-token-123"
 
-        # Mock step 2 failure
+        # Mock step 1 failure
         mock_verify_password.side_effect = Exception("Invalid password")
 
         await verify_password_for_stepup(
@@ -547,10 +413,10 @@ class TestVerifyPasswordForStepup:
     )
     @patch.object(stepup_module, "exchange_password_jwt_for_token")
     @patch.object(stepup_module, "verify_password_with_jwt")
-    @patch.object(stepup_module, "get_policyauth_token")
+    @patch.object(stepup_module, "get_admin_token")
     async def test_handles_jwt_exchange_error(
         self,
-        mock_get_policyauth,
+        mock_get_admin_token,
         mock_verify_password,
         mock_exchange_jwt,
         mock_get_profile,
@@ -565,8 +431,12 @@ class TestVerifyPasswordForStepup:
         mock_config.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
             "https://tenant.verify.ibm.com"
         )
-        mock_config.ibm_verify_config.IBM_VERIFY_STS_CLIENT_ID = "sts-client-123"
-        mock_config.ibm_verify_config.IBM_VERIFY_STS_SECRET = "sts-secret-456"
+        mock_config.ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID = (
+            "profile-mgmt-client-123"
+        )
+        mock_config.ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_SECRET = (
+            "profile-mgmt-secret-456"
+        )
         mock_config.verify_password_api_endpoint = (
             "https://tenant.verify.ibm.com/v2.0/authnmethods/password"
         )
@@ -577,11 +447,13 @@ class TestVerifyPasswordForStepup:
         mock_user_info.userName = "user@example.com"
         mock_get_profile.return_value = mock_user_info
 
-        # Mock step 1 & 2 success
-        mock_get_policyauth.return_value = "policyauth-token-123"
+        # Mock admin token
+        mock_get_admin_token.return_value = "admin-token-123"
+
+        # Mock step 1 success
         mock_verify_password.return_value = ("user-123", "password-jwt-token")
 
-        # Mock step 3 failure
+        # Mock step 2 failure
         mock_exchange_jwt.side_effect = Exception("Invalid grant")
 
         await verify_password_for_stepup(
