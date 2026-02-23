@@ -57,12 +57,12 @@ describe("useOtpOperations", () => {
         {
           id: "factor-1",
           type: "smsotp",
-          phoneNumber: "+15551234567",
+          destination: "+15551234567",
         },
         {
           id: "factor-2",
           type: "voiceotp",
-          phoneNumber: "+15559876543",
+          destination: "+15559876543",
         },
       ],
     });
@@ -99,12 +99,12 @@ describe("useOtpOperations", () => {
         expect(result.current.localLoading).toBe(false);
       });
 
-      expect(mockGetUserOtpPhoneFactors).toHaveBeenCalledWith("test-user-123");
+      expect(mockGetUserOtpPhoneFactors).toHaveBeenCalled();
       expect(result.current.userPhoneFactors).toHaveLength(2);
       expect(result.current.userSelectedMfaFactor).toEqual({
         id: "factor-1",
         type: "smsotp",
-        phoneNumber: "+15551234567",
+        destination: "+15551234567",
       });
     });
 
@@ -145,18 +145,18 @@ describe("useOtpOperations", () => {
         {
           id: "factor-1",
           type: "smsotp",
-          phoneNumber: "+15551234567",
+          destination: "+15551234567",
         },
         {
           id: "factor-2",
           type: "voiceotp",
-          phoneNumber: "+15559876543",
+          destination: "+15559876543",
         },
       ]);
       expect(result.current.userSelectedMfaFactor).toEqual({
         id: "factor-1",
         type: "smsotp",
-        phoneNumber: "+15551234567",
+        destination: "+15551234567",
       });
     });
 
@@ -190,7 +190,7 @@ describe("useOtpOperations", () => {
         data: [
           {
             id: "factor-1",
-            phoneNumber: "+15551234567",
+            destination: "+15551234567",
             // No type field
           },
         ],
@@ -296,7 +296,7 @@ describe("useOtpOperations", () => {
       expect(result.current.userSelectedMfaFactor).toEqual({
         id: "factor-2",
         type: "voiceotp",
-        phoneNumber: "+15559876543",
+        destination: "+15559876543",
       });
     });
 
@@ -634,12 +634,12 @@ describe("useOtpOperations", () => {
       );
 
       const newPhoneFactors = [
-        { id: "new-factor", type: "smsotp", phoneNumber: "+15551111111" },
+        { id: "new-factor", type: "smsotp", destination: "+15551111111" },
       ];
       const newSelectedFactor = {
         id: "new-factor",
         type: "smsotp",
-        phoneNumber: "+15551111111",
+        destination: "+15551111111",
       };
       const newOtpResponse = { trxnId: "new-transaction" };
 
@@ -717,9 +717,7 @@ describe("useOtpOperations", () => {
         expect(mockGetUserOtpPhoneFactors).toHaveBeenCalledTimes(2);
       });
 
-      expect(mockGetUserOtpPhoneFactors).toHaveBeenLastCalledWith(
-        "new-user-456",
-      );
+      expect(mockGetUserOtpPhoneFactors).toHaveBeenLastCalledWith();
     });
   });
 });

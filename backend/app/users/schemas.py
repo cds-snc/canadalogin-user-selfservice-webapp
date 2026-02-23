@@ -250,7 +250,7 @@ class UserAuthFactorsIbmResponse(BaseModel):
 class UserPhoneOTP(BaseModel):
     id: str
     type: PhoneOtpType
-    phoneNumber: str
+    destination: str
 
 
 class UserPhoneOTPFactors(BaseModel):

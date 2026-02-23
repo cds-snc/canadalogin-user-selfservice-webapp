@@ -110,7 +110,7 @@ class RetrievalData(BaseModel):
 
 
 class OtpEnrollmentRequest(BaseModel):
-    phoneNumber: PhoneNumber
+    destination: PhoneNumber
     otpType: OtpType
 
 
@@ -119,7 +119,7 @@ class EnrollmentResponseData(BaseModel):
     id: str
     userId: str
     type: str
-    phoneNumber: str
+    destination: str
     created: str
     updated: str
     enabled: bool

@@ -27,7 +27,7 @@ def create_mock_user_factors(num_factors=2):
         factor_type = PasswordOtpType.SMSOTP if i % 2 == 0 else PasswordOtpType.VOICEOTP
         factors.append(
             UserPhoneOTP(
-                id=f"factor{i + 1}", type=factor_type, phoneNumber="5551234567"
+                id=f"factor{i + 1}", type=factor_type, destination="5551234567"
             )
         )
 
@@ -87,7 +87,7 @@ async def test_handle_otp_deletion_sms_success(monkeypatch):
         )
 
     # Mock get_user_otp_factors to return multiple factors (so deletion is allowed)
-    async def mock_get_user_otp_factors(client, user_id, token, validated=True):
+    async def mock_get_user_otp_factors(client, user_id, validated=True):
         return create_mock_user_factors(num_factors=2)
 
     # Mock dispatch_otp_deletion to return successful response
@@ -155,7 +155,7 @@ async def test_handle_otp_deletion_voice_success(monkeypatch):
         )
 
     # Mock get_user_otp_factors to return multiple factors (so deletion is allowed)
-    async def mock_get_user_otp_factors(client, user_id, token, validated=True):
+    async def mock_get_user_otp_factors(client, user_id, validated=True):
         return create_mock_user_factors(num_factors=2)
 
     # Mock dispatch_otp_deletion to return successful response
@@ -190,35 +190,6 @@ async def test_handle_otp_deletion_voice_success(monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_handle_otp_deletion_profile_failure(monkeypatch):
-    """Test OTP deletion when profile retrieval fails"""
-
-    # Mock verify_otp_before_operation to succeed
-    async def mock_verify_otp(global_http_client, otp, trxn_id, otp_type):
-        return None  # Success means no exception
-
-    # Mock my_profile to return failure
-    async def mock_my_profile(client, token):
-        return ProfileResponse(
-            success=False,
-            message="Unauthorized",
-            data=None,
-        )
-
-    monkeypatch.setattr(verify_otp_import_path, mock_verify_otp)
-    monkeypatch.setattr(profile_import_path, mock_my_profile)
-
-    deletion_request = create_deletion_request()
-
-    async with AsyncClient(base_url="http://localhost") as client:
-        result = await handle_otp_deletion(client, deletion_request, "fake-token")
-
-        assert isinstance(result, ResponseModel)
-        assert result.success is False
-        assert result.message == "User verification failed"
-
-
-@pytest.mark.asyncio
 async def test_handle_otp_deletion_last_factor_protection(monkeypatch):
     """Test OTP deletion when user has only one factor (should fail)"""
 
@@ -250,7 +221,7 @@ async def test_handle_otp_deletion_last_factor_protection(monkeypatch):
         )
 
     # Mock get_user_otp_factors to return only ONE factor (should prevent deletion)
-    async def mock_get_user_otp_factors(client, user_id, token, validated=True):
+    async def mock_get_user_otp_factors(client, user_id, validated=True):
         return create_mock_user_factors(num_factors=1)
 
     # Mock verify_otp_before_operation to succeed
@@ -306,7 +277,7 @@ async def test_handle_otp_deletion_unexpected_status(monkeypatch):
         )
 
     # Mock get_user_otp_factors to return multiple factors
-    async def mock_get_user_otp_factors(client, user_id, token, validated=True):
+    async def mock_get_user_otp_factors(client, user_id, validated=True):
         return create_mock_user_factors(num_factors=2)
 
     # Mock dispatch_otp_deletion to return unexpected status

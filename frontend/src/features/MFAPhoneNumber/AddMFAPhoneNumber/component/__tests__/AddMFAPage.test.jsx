@@ -364,7 +364,7 @@ describe("AddMFAPage Unit Tests", () => {
     it("should display specific error message when errorCode matches errorPageJson key", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
-        data: [{ id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" }],
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
       // Mock the component to simulate an error state
@@ -396,7 +396,7 @@ describe("AddMFAPage Unit Tests", () => {
     it('should display fallback error message for "Unexpected API request error"', async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
-        data: [{ id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" }],
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
       // This tests line 23: errorMessage = errorPageJson["7"];
@@ -424,7 +424,7 @@ describe("AddMFAPage Unit Tests", () => {
     it("should handle API error in enrollMFA and set error code", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
-        data: [{ id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" }],
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
       const apiError = {
@@ -477,7 +477,7 @@ describe("AddMFAPage Unit Tests", () => {
     it("should handle enrollMFA error without data.message", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
-        data: [{ id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" }],
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
       // Mock the transientOtpVerify for this test
@@ -533,7 +533,7 @@ describe("AddMFAPage Unit Tests", () => {
     it("should handle API error in sendMFAOtp", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
-        data: [{ id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" }],
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
       addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
@@ -591,7 +591,7 @@ describe("AddMFAPage Unit Tests", () => {
     it("should navigate to manage2FAVerifications when user has multiple phone factors with same last 4 digits", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
-        data: [{ id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" }],
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
       addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
@@ -662,7 +662,7 @@ describe("AddMFAPage Unit Tests", () => {
     it("should handle verifyMFAOtp API error", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
-        data: [{ id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" }],
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
       addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
@@ -741,7 +741,7 @@ describe("AddMFAPage Unit Tests", () => {
     it("should handle deleteMFA API error", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
-        data: [{ id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" }],
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
       addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
@@ -811,8 +811,8 @@ describe("AddMFAPage Unit Tests", () => {
   describe("Handler Functions Coverage", () => {
     it("should test handleChangeUserMfaSelection function", async () => {
       const mockPhoneFactors = [
-        { id: "factor1", type: "sms", phoneNumber: "+1234567890" },
-        { id: "factor2", type: "voice", phoneNumber: "+1234567891" },
+        { id: "factor1", type: "sms", destination: "+1234567890" },
+        { id: "factor2", type: "voice", destination: "+1234567891" },
       ];
 
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
@@ -845,7 +845,7 @@ describe("AddMFAPage Unit Tests", () => {
     it("should test handlePhoneForm function through AddMFAPhoneNumber interaction", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
-        data: [{ id: "factor1", type: "sms", phoneNumber: "+1234567890" }],
+        data: [{ id: "factor1", type: "sms", destination: "+1234567890" }],
       });
 
       addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
@@ -903,7 +903,7 @@ describe("AddMFAPage Unit Tests", () => {
     it("should test handleOtpSentResponse and handleSetUserOtpValue functions", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
-        data: [{ id: "factor1", type: "sms", phoneNumber: "+1234567890" }],
+        data: [{ id: "factor1", type: "sms", destination: "+1234567890" }],
       });
 
       render(
@@ -942,7 +942,7 @@ describe("AddMFAPage Unit Tests", () => {
     it("should test onBack functions in steps", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
-        data: [{ id: "factor1", type: "sms", phoneNumber: "+1234567890" }],
+        data: [{ id: "factor1", type: "sms", destination: "+1234567890" }],
       });
 
       render(
@@ -983,7 +983,7 @@ describe("AddMFAPage Unit Tests", () => {
     it("should test addMFAValidation onBack function", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
-        data: [{ id: "factor1", type: "sms", phoneNumber: "+1234567890" }],
+        data: [{ id: "factor1", type: "sms", destination: "+1234567890" }],
       });
 
       addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
@@ -1054,7 +1054,7 @@ describe("AddMFAPage Unit Tests", () => {
     it("should test onUseDifferentPhoneNumber function", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
-        data: [{ id: "factor1", type: "smsotp", phoneNumber: "+1234567890" }],
+        data: [{ id: "factor1", type: "smsotp", destination: "+1234567890" }],
       });
 
       addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
@@ -1127,7 +1127,7 @@ describe("AddMFAPage Unit Tests", () => {
     it("should test onAddSecondMFA function with voice to SMS conversion", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
-        data: [{ id: "factor1", type: "voice", phoneNumber: "+1234567890" }],
+        data: [{ id: "factor1", type: "voice", destination: "+1234567890" }],
       });
 
       addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
@@ -1210,7 +1210,7 @@ describe("AddMFAPage Unit Tests", () => {
     it("should call sendMFAOtp with reSendOtpCode=true when requesting new OTP", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
-        data: [{ id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" }],
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
       addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
@@ -1278,7 +1278,7 @@ describe("AddMFAPage Unit Tests", () => {
     it("should handle adding second MFA with opposite OTP type", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
-        data: [{ id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" }],
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
       addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
@@ -1350,7 +1350,7 @@ describe("AddMFAPage Unit Tests", () => {
       // This should trigger second MFA enrollment with voice type (lines 296-334)
       await waitFor(() => {
         expect(addMFAPhoneNumberApi.enrollMFA).toHaveBeenCalledWith({
-          phoneNumber: "",
+          destination: "",
           otpType: "voice",
         });
       });
@@ -1361,7 +1361,7 @@ describe("AddMFAPage Unit Tests", () => {
     it("should handle validateOtpCode with response error format", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
-        data: [{ id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" }],
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
       const responseError = {
@@ -1410,7 +1410,7 @@ describe("AddMFAPage Unit Tests", () => {
         .mockResolvedValueOnce({
           success: true,
           data: [
-            { id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" },
+            { id: "factor-1", type: "smsotp", destination: "+15551234567" },
           ],
         })
         .mockResolvedValueOnce({
@@ -1419,7 +1419,7 @@ describe("AddMFAPage Unit Tests", () => {
             {
               id: "unvalidated-factor",
               type: "sms",
-              phoneNumber: "+15551234567",
+              destination: "+15551234567",
             },
           ],
         });
@@ -1469,22 +1469,15 @@ describe("AddMFAPage Unit Tests", () => {
 
       // This should call getUserOtpPhoneFactors with false parameter
       await waitFor(() => {
-        expect(otpFactors.getUserOtpPhoneFactors).toHaveBeenCalledWith(
-          "test-user-123",
-          false,
-        );
+        expect(otpFactors.getUserOtpPhoneFactors).toHaveBeenCalledWith(false);
       });
     });
 
     it("should handle no existing MFA found scenario in handleMFAEnrollment", async () => {
-      otpFactors.getUserOtpPhoneFactors
-        .mockResolvedValueOnce({
-          success: true,
-          data: [
-            { id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" },
-          ],
-        })
-        .mockRejectedValueOnce(new Error("No existing MFA"));
+      otpFactors.getUserOtpPhoneFactors.mockResolvedValueOnce({
+        success: true,
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
+      });
 
       addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
         data: { id: "mfa-123" },
@@ -1537,7 +1530,7 @@ describe("AddMFAPage Unit Tests", () => {
     it("should handle requestOtpCode function coverage", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
-        data: [{ id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" }],
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
       authService.transientOtpSend.mockResolvedValue({
@@ -1582,7 +1575,7 @@ describe("AddMFAPage Unit Tests", () => {
     it("should handle requestOtpCode error scenario", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
-        data: [{ id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" }],
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
       const otpError = {
@@ -1627,7 +1620,7 @@ describe("AddMFAPage Unit Tests", () => {
     it("should handle deleteMFA with default parameters", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
-        data: [{ id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" }],
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
       deleteMFAPhoneNumberApi.deleteMFA.mockResolvedValue({
@@ -1690,13 +1683,13 @@ describe("AddMFAPage Unit Tests", () => {
         {
           id: "factor1",
           type: "sms",
-          phoneNumber: "+15554567890",
+          destination: "+15554567890",
           lastFourDigits: "7890",
         },
         {
           id: "factor2",
           type: "voice",
-          phoneNumber: "+15554567890",
+          destination: "+15554567890",
           lastFourDigits: "7890",
         },
       ];
@@ -1778,7 +1771,7 @@ describe("AddMFAPage Unit Tests", () => {
     it("should not render error summary when no error code is present", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
-        data: [{ id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" }],
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
       render(
@@ -1799,7 +1792,7 @@ describe("AddMFAPage Unit Tests", () => {
     it("should render error summary when errorCode is set during enrollMFA failure", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
-        data: [{ id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" }],
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
       const apiError = {
@@ -1875,7 +1868,7 @@ describe("AddMFAPage Unit Tests", () => {
 
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
-        data: [{ id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" }],
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
       const apiError = {
@@ -1957,7 +1950,7 @@ describe("AddMFAPage Unit Tests", () => {
     it("should render error summary when sendMFAOtp fails", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
-        data: [{ id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" }],
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
       addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
@@ -2032,7 +2025,7 @@ describe("AddMFAPage Unit Tests", () => {
     it("should render error summary when verifyMFAOtp fails", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
-        data: [{ id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" }],
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
       addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
@@ -2127,7 +2120,7 @@ describe("AddMFAPage Unit Tests", () => {
     it("should render error summary when password verification fails", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
-        data: [{ id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" }],
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
       const apiError = {
@@ -2180,7 +2173,7 @@ describe("AddMFAPage Unit Tests", () => {
     it("should clear error summary when error is resolved", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
-        data: [{ id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" }],
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
       // First call fails, second succeeds
@@ -2243,7 +2236,7 @@ describe("AddMFAPage Unit Tests", () => {
     it("should test handleSetupAlternateMFAMethod function", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
-        data: [{ id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" }],
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
       addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
@@ -2318,7 +2311,7 @@ describe("AddMFAPage Unit Tests", () => {
     it("should handle voice OTP type in successBanner mapping", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
-        data: [{ id: "factor1", type: "voice", phoneNumber: "+1234567890" }],
+        data: [{ id: "factor1", type: "voice", destination: "+1234567890" }],
       });
 
       addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
@@ -2414,7 +2407,7 @@ describe("AddMFAPage Unit Tests", () => {
     it("should handle enrollMFA with phoneNumber parameter", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
-        data: [{ id: "factor-1", type: "voice", phoneNumber: "+15551234567" }],
+        data: [{ id: "factor-1", type: "voice", destination: "+15551234567" }],
       });
 
       addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
@@ -2480,7 +2473,7 @@ describe("AddMFAPage Unit Tests", () => {
       await waitFor(() => {
         expect(addMFAPhoneNumberApi.enrollMFA).toHaveBeenCalledWith(
           expect.objectContaining({
-            phoneNumber: expect.any(String),
+            destination: expect.any(String),
           }),
         );
       });
@@ -2489,7 +2482,7 @@ describe("AddMFAPage Unit Tests", () => {
     it("should handle sendMFAOtp with different reSendOtpCode parameter", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
-        data: [{ id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" }],
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
       addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({

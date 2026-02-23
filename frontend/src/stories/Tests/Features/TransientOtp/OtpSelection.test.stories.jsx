@@ -26,13 +26,13 @@ const multipleFactors = [
   {
     id: "factor-1",
     type: FLOW_TYPES.sms,
-    phoneNumber: "+15551234567",
+    destination: "+15551234567",
     status: "active",
   },
   {
     id: "factor-2",
     type: FLOW_TYPES.voice,
-    phoneNumber: "+15559876543",
+    destination: "+15559876543",
     status: "active",
   },
 ];
@@ -41,7 +41,7 @@ const singleSMSFactor = [
   {
     id: "factor-1",
     type: FLOW_TYPES.sms,
-    phoneNumber: "+15551234567",
+    destination: "+15551234567",
     status: "active",
   },
 ];
