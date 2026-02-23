@@ -12,7 +12,7 @@ import axios from "axios";
 const axiosInstance = axios.create({
   withCredentials: true,
   headers: {
-    "X-GC-Client": "gc-signin-webapp",
+    "X-GC-Client": "canada-login-manage-profile-frontend",
   },
 });
 
