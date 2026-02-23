@@ -6,10 +6,10 @@ import logging
 import time
 from httpx import AsyncClient
 from fastapi import Request
-from starsessions import get_session_handler
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.request_error_handler import RequestErrorHandler
 from app.utils.schemas import ResponseModel
+from app.constants.session_keys import SessionKeys
 from app.constants.verify_endpoints import VerifyAPIEndpoint
 from app.fido2.services.helper_utils import (
     get_tenant_url,
@@ -367,8 +367,7 @@ async def submit_assertion_result(
         # Store FIDO2 JWT in session if requested and perform token exchange
         if return_jwt and "assertion" in response_data:
             fido2_jwt = response_data["assertion"]
-            request.session["fido2_auth_jwt"] = fido2_jwt
-            logger.info("FIDO2 authentication JWT stored in session for step-up auth")
+            logger.info("FIDO2 assertion JWT received, proceeding with token exchange")
 
             # Step 5: Exchange FIDO2 JWT for combined access token
             try:
@@ -385,52 +384,63 @@ async def submit_assertion_result(
                     client_secret=settings.ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_SECRET,
                 )
 
-                id_token = combined_token_data.get("id_token")
-                payload_json = None
+                # Decode the AMR claims from the combined id_token for logging
+                import json
 
-                # Decode the JWT id_token to inspect its contents
-                if id_token:
-                    import json
-
-                    # JWT format: header.payload.signature (each part is base64url encoded)
-                    parts = id_token.split(".")
+                combined_id_token = combined_token_data.get("id_token")
+                combined_amr = None
+                if combined_id_token:
+                    parts = combined_id_token.split(".")
                     if len(parts) == 3:
-                        # Decode the payload (middle part)
-                        # Add padding if needed for base64 decoding
                         payload_b64 = parts[1]
                         padding = 4 - (len(payload_b64) % 4)
                         if padding != 4:
                             payload_b64 += "=" * padding
-
                         try:
                             payload_bytes = base64.b64decode(payload_b64)
-                            payload_json = json.loads(payload_bytes)
+                            combined_payload = json.loads(payload_bytes)
+                            combined_amr = combined_payload.get("amr")
                             logger.info(
-                                f"Decoded id_token payload: {json.dumps(payload_json, indent=2)}"
+                                f"Combined token amr: {combined_amr}, sid: {combined_payload.get('sid')}"
                             )
-                            logger.info(f"id_token sid: {payload_json.get('sid')}")
-                            logger.info(f"id_token amr: {payload_json.get('amr')}")
                         except Exception as decode_error:
-                            logger.warning(f"Could not decode id_token: {decode_error}")
+                            logger.warning(
+                                f"Could not decode combined id_token: {decode_error}"
+                            )
 
-                # Add userinfo to token data before updating session (if available)
-                if payload_json:
-                    combined_token_data["userinfo"] = payload_json
-
-                # Step 6: Update FastAPI session with combined tokens and userinfo
+                # Step 6: Merge the elevated access_token/refresh_token into the existing
+                # session token while PRESERVING the original id_token and sid.
+                #
+                # The jwt-bearer exchange returns a new id_token tied to a different IBM
+                # Verify session. Replacing it would cause rplogout to receive an
+                # id_token_hint that doesn't match the browser's existing ci_session
+                # cookie, triggering the logout consent screen.
+                #
+                # The original id_token (from the initial OIDC login) must stay in the
+                # session so that rplogout can match it with the browser cookie.
                 logger.info(
                     "Updating FastAPI session with elevated authentication (password + FIDO2)"
                 )
-                # Get the handler and set sid as session id (from id_token), if available
-                if payload_json and payload_json.get("sid"):
-                    handler = get_session_handler(request)
-                    new_session_id = payload_json.get("sid")
-                    handler.session_id = new_session_id
-                    logger.info(
-                        f"Updated session ID to sid from id_token: {new_session_id}"
-                    )
+                existing_token = request.session.get(
+                    SessionKeys.SESSION_USER_TOKEN.value, {}
+                )
+                original_id_token = existing_token.get("id_token")
+                original_userinfo = existing_token.get("userinfo", {})
 
-                update_session_tokens(request, combined_token_data)
+                # Build the merged token: new access/refresh tokens + original id_token
+                merged_token_data = dict(combined_token_data)
+                merged_token_data["id_token"] = original_id_token
+
+                # Carry forward original userinfo but patch in the new AMR claims
+                merged_userinfo = dict(original_userinfo)
+                if combined_amr:
+                    merged_userinfo["amr"] = combined_amr
+                merged_token_data["userinfo"] = merged_userinfo
+
+                update_session_tokens(request, merged_token_data)
+                logger.info(
+                    "Preserved original id_token; updated access_token and amr claims"
+                )
 
                 # Clean up stepup tokens from session after successful authentication
                 if "stepup_token_data" in request.session:

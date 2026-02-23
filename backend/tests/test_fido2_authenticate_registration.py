@@ -1298,8 +1298,8 @@ class TestSubmitAssertionResultEdgeCases:
         # All stepup tokens should be cleaned up after successful token exchange
         assert "stepup_token_data" not in mock_request.session
         assert "stepup_token_timestamp" not in mock_request.session
-        # fido2_auth_jwt should be stored
-        assert mock_request.session["fido2_auth_jwt"] == "fido2-jwt-token"
+        # fido2_auth_jwt should NOT be stored in the session (used transiently for exchange only)
+        assert "fido2_auth_jwt" not in mock_request.session
 
     @pytest.mark.asyncio
     @patch("app.auth.services.auth_user_session.update_session_tokens")

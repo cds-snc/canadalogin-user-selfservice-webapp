@@ -145,7 +145,6 @@ async def exchange_password_jwt_for_token(
     )
 
     logger.info(f"JWT exchange response status: {response.status_code}")
-    logger.info(f"JWT exchange response body: {response.text}")
     response.raise_for_status()
 
     token_data = response.json()
@@ -222,10 +221,6 @@ async def verify_password_for_stepup(
         # Store the complete token data with timestamp for expiry checking
         request.session["stepup_token_data"] = stepup_token_data
         request.session["stepup_token_timestamp"] = time.time()
-        logger.info(
-            f"Stored stepup token data in session (expires_in: {stepup_token_data.get('expires_in')}s) "
-            "for FIDO2 authentication"
-        )
 
         return ResponseModel(
             success=True,
