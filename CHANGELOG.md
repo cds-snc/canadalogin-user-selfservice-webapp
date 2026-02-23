@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.11.1](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.11.0...v1.11.1) (2026-02-23)
+
+
+### Continuous Integration
+
+* bump TEST environment deployed version ([#1206](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1206)) ([80044c6](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/80044c62a04a596e2542a9a00273ecf910001d4c))
+* deploy to TEST environment on release ([#1204](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1204)) ([daef445](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/daef4454ac339a43d341ae6f159fa2365df2a6d3))
+
 ## [1.11.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.10.3...v1.11.0) (2026-02-20)
 
 
