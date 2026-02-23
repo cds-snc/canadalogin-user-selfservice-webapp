@@ -15,7 +15,6 @@ from app.utils.schemas import ResponseModel
 from fastapi import HTTPException, status
 from httpx import AsyncClient, Response
 
-profile_import_path = "app.otp.services.delete_mfa_otp.get_my_profile"
 verify_otp_import_path = "app.otp.services.delete_mfa_otp.verify_otp_before_operation"
 
 
@@ -97,7 +96,6 @@ async def test_handle_otp_deletion_sms_success(monkeypatch):
         return mock_response
 
     monkeypatch.setattr(verify_otp_import_path, mock_verify_otp)
-    monkeypatch.setattr(profile_import_path, mock_my_profile)
     monkeypatch.setattr(
         "app.otp.services.delete_mfa_otp.get_user_otp_factors",
         mock_get_user_otp_factors,
@@ -165,7 +163,6 @@ async def test_handle_otp_deletion_voice_success(monkeypatch):
         return mock_response
 
     monkeypatch.setattr(verify_otp_import_path, mock_verify_otp)
-    monkeypatch.setattr(profile_import_path, mock_my_profile)
     monkeypatch.setattr(
         "app.otp.services.delete_mfa_otp.get_user_otp_factors",
         mock_get_user_otp_factors,
@@ -229,7 +226,6 @@ async def test_handle_otp_deletion_last_factor_protection(monkeypatch):
         return None  # Success means no exception
 
     monkeypatch.setattr(verify_otp_import_path, mock_verify_otp)
-    monkeypatch.setattr(profile_import_path, mock_my_profile)
     monkeypatch.setattr(
         "app.otp.services.delete_mfa_otp.get_user_otp_factors",
         mock_get_user_otp_factors,
@@ -291,7 +287,6 @@ async def test_handle_otp_deletion_unexpected_status(monkeypatch):
         return None  # Success means no exception
 
     monkeypatch.setattr(verify_otp_import_path, mock_verify_otp)
-    monkeypatch.setattr(profile_import_path, mock_my_profile)
     monkeypatch.setattr(
         "app.otp.services.delete_mfa_otp.get_user_otp_factors",
         mock_get_user_otp_factors,
@@ -355,7 +350,6 @@ async def test_handle_otp_deletion_exception(monkeypatch):
         return None  # Success means no exception
 
     monkeypatch.setattr(verify_otp_import_path, mock_verify_otp)
-    monkeypatch.setattr(profile_import_path, mock_my_profile)
     monkeypatch.setattr(
         "app.otp.services.delete_mfa_otp.get_user_otp_factors",
         mock_get_user_otp_factors,
