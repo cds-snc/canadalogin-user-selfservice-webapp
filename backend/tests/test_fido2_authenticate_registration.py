@@ -1515,7 +1515,6 @@ class TestSubmitAssertionResultEdgeCases:
         assert "stepup_token_data" not in mock_request.session
 
     @pytest.mark.asyncio
-    @patch("app.auth.services.auth_user_session.update_session_user_info")
     @patch("app.auth.services.auth_user_session.update_session_tokens")
     @patch.object(auth_module, "_exchange_fido2_jwt_for_access_token")
     @patch.object(auth_module, "_perform_mfa_refresh_token_flow")
@@ -1524,7 +1523,7 @@ class TestSubmitAssertionResultEdgeCases:
     @patch.object(auth_module, "get_admin_token")
     @patch.object(auth_module, "get_rp_id")
     @patch.object(auth_module, "get_tenant_url")
-    async def test_fetches_fresh_userinfo_when_updating_tokens(
+    async def test_preserves_original_id_token_and_sid_in_merged_session(
         self,
         mock_get_tenant_url,
         mock_get_rp_id,
@@ -1534,32 +1533,42 @@ class TestSubmitAssertionResultEdgeCases:
         mock_perform_mfa_refresh,
         mock_exchange_fido2_jwt,
         mock_update_session_tokens,
-        mock_update_session_user_info,
         mock_http_client,
         mock_request,
         mock_assertion_request,
     ):
-        """Should fetch fresh userinfo (including sid) after token exchange"""
+        """
+        The merged session must preserve the original id_token and sid from the OIDC
+        login, even though the jwt-bearer exchange returns a new id_token with a
+        different sid.  If the new id_token were stored, rplogout would send an
+        id_token_hint that doesn't match the browser's ci_session cookie and the
+        user would be redirected to a logout consent screen instead of logging out
+        automatically.
+
+        The AMR claims from the combined token ARE patched in so downstream code
+        can verify step-up authentication was completed.
+        """
         from app.constants.session_keys import SessionKeys
 
-        # Set up session with existing token data including userinfo with sid
+        original_id_token = "original.oidc.idtoken"
+
+        # Set up session with existing token data including original id_token and userinfo
         mock_request.session = {
             "stepup_token_data": {
                 "access_token": "stepup-access-123",
                 "refresh_token": "stepup-refresh-123",
-                "grant_id": "grant-id-123",
                 "expires_in": 3600,
-                "scope": "openid profile offline_access email",
-                "token_type": "bearer",
             },
             "stepup_token_timestamp": time.time(),
             SessionKeys.SESSION_USER_TOKEN.value: {
                 "access_token": "old-access-token",
                 "refresh_token": "old-refresh-token",
+                "id_token": original_id_token,
                 "userinfo": {
-                    "sid": "old-session-id-from-oidc-login",
+                    "sid": "original-sid-from-oidc-login",
                     "sub": "user-123",
                     "email": "user@example.com",
+                    "amr": ["pwd"],
                 },
             },
         }
@@ -1569,9 +1578,8 @@ class TestSubmitAssertionResultEdgeCases:
         mock_get_admin_token.return_value = "admin-token"
         mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
         mock_get_auth_request_headers.return_value = {
-            "Authorization": "Bearer mfa-challenge-token"
+            "Authorization": "Bearer mfa-token"
         }
-
         mock_perform_mfa_refresh.return_value = {
             "access_token": "mfa-challenge-token",
             "scope": "mfa_challenge",
@@ -1588,31 +1596,27 @@ class TestSubmitAssertionResultEdgeCases:
         mock_response.raise_for_status = MagicMock()
         mock_http_client.post = AsyncMock(return_value=mock_response)
 
-        # Create a valid id_token JWT with userinfo including sid
+        # The jwt-bearer exchange returns a NEW id_token with a DIFFERENT sid
         import base64
         import json
 
-        payload = {
-            "sid": "new-session-id-from-fido2-stepup",
-            "sub": "user-123",
-            "email": "user@example.com",
+        combined_payload = {
+            "sid": "new-combined-sid-different-from-original",
             "amr": ["password", "fido2"],
+            "sub": "user-123",
         }
-        payload_b64 = (
-            base64.b64encode(json.dumps(payload).encode()).decode().rstrip("=")
+        combined_payload_b64 = (
+            base64.b64encode(json.dumps(combined_payload).encode()).decode().rstrip("=")
         )
-        id_token = f"header.{payload_b64}.signature"
+        combined_id_token = f"header.{combined_payload_b64}.signature"
 
-        # JWT bearer token exchange returns tokens with id_token
         mock_exchange_fido2_jwt.return_value = {
-            "access_token": "combined-token-123",
-            "refresh_token": "new-refresh-456",
-            "id_token": id_token,
+            "access_token": "combined-access-token",
+            "refresh_token": "combined-refresh-token",
+            "id_token": combined_id_token,
             "expires_in": 7200,
-            "token_type": "Bearer",
         }
 
-        # Fresh userinfo fetched from /oauth2/userinfo with NEW sid
         result = await submit_assertion_result(
             request=mock_request,
             http_client=mock_http_client,
@@ -1621,21 +1625,25 @@ class TestSubmitAssertionResultEdgeCases:
             return_jwt=True,
         )
 
-        # Should succeed
         assert result.success is True
-
-        # Verify update_session_tokens was called with token data including fresh userinfo
         mock_update_session_tokens.assert_called_once()
         call_args = mock_update_session_tokens.call_args[0]
         token_data = call_args[1]
-        assert token_data["access_token"] == "combined-token-123"
-        assert token_data["refresh_token"] == "new-refresh-456"
 
-        # CRITICAL: Verify userinfo was fetched and included with NEW sid
-        assert "userinfo" in token_data
-        assert token_data["userinfo"]["sid"] == "new-session-id-from-fido2-stepup"
+        # Elevated access + refresh tokens from the jwt-bearer exchange
+        assert token_data["access_token"] == "combined-access-token"
+        assert token_data["refresh_token"] == "combined-refresh-token"
+
+        # CRITICAL: original id_token must be preserved so rplogout works without consent
+        assert token_data["id_token"] == original_id_token
+
+        # CRITICAL: original sid must be preserved for Redis session lookup and SSE
+        assert token_data["userinfo"]["sid"] == "original-sid-from-oidc-login"
         assert token_data["userinfo"]["sub"] == "user-123"
         assert token_data["userinfo"]["email"] == "user@example.com"
+
+        # AMR is updated to reflect the elevated step-up authentication
+        assert token_data["userinfo"]["amr"] == ["password", "fido2"]
 
 
 class TestPerformMfaRefreshTokenFlow:
@@ -1828,3 +1836,484 @@ class TestIsTokenExpired:
         token_data = {"expires_in": 0}
         result = is_expired_func(token_data, time.time())
         assert result is True
+
+
+# ---------------------------------------------------------------------------
+# Helper: _decode_jwt_payload
+# ---------------------------------------------------------------------------
+
+
+class TestDecodeJwtPayload:
+    """Tests for _decode_jwt_payload internal helper"""
+
+    def _make_jwt(self, payload: dict) -> str:
+        """Build a minimal JWT string with a real base64url-encoded payload."""
+        import base64
+        import json
+
+        payload_bytes = json.dumps(payload).encode()
+        # Strip '=' padding to mimic real JWTs
+        payload_b64 = base64.b64encode(payload_bytes).decode().rstrip("=")
+        return f"header.{payload_b64}.signature"
+
+    def test_valid_jwt_returns_payload(self):
+        """Should decode and return the payload dict from a well-formed JWT"""
+        payload = {"sub": "user-123", "sid": "some-sid", "amr": ["password"]}
+        token = self._make_jwt(payload)
+        result = auth_module._decode_jwt_payload(token)
+        assert result == payload
+
+    def test_valid_jwt_missing_padding(self):
+        """Should handle base64url payloads of any length (padding re-added internally)"""
+        # Exercise all four modulo-4 residue classes by varying payload content
+        for extra in ["", "x", "xx", "xxx"]:
+            payload = {"key": f"v{extra}"}
+            token = self._make_jwt(payload)
+            result = auth_module._decode_jwt_payload(token)
+            assert result == {"key": f"v{extra}"}
+
+    def test_not_three_parts_returns_none(self):
+        """Should return None when the JWT does not have exactly 3 parts"""
+        assert auth_module._decode_jwt_payload("only.two") is None
+        assert auth_module._decode_jwt_payload("a.b.c.d") is None
+        assert auth_module._decode_jwt_payload("nodots") is None
+
+    def test_invalid_base64_returns_none(self):
+        """Should return None and log a warning if base64 decoding fails"""
+        token = "header.!!!invalid_base64!!!.signature"
+        result = auth_module._decode_jwt_payload(token)
+        assert result is None
+
+    def test_non_json_payload_returns_none(self):
+        """Should return None when the payload is valid base64 but not JSON"""
+        import base64
+
+        payload_b64 = base64.b64encode(b"not-json-at-all").decode().rstrip("=")
+        token = f"header.{payload_b64}.signature"
+        result = auth_module._decode_jwt_payload(token)
+        assert result is None
+
+    def test_empty_payload_dict_returns_dict(self):
+        """Should return an empty dict when JWT payload encodes {}"""
+        token = self._make_jwt({})
+        result = auth_module._decode_jwt_payload(token)
+        assert result == {}
+
+
+# ---------------------------------------------------------------------------
+# Helper: _validate_stepup_tokens
+# ---------------------------------------------------------------------------
+
+
+class TestValidateStepupTokens:
+    """Tests for _validate_stepup_tokens internal helper"""
+
+    def _make_request(self, session: dict) -> MagicMock:
+        req = MagicMock()
+        req.session = session
+        return req
+
+    def test_missing_stepup_token_data_raises(self):
+        """Should raise an Exception when stepup_token_data is not in session"""
+        request = self._make_request({})
+        with pytest.raises(Exception, match="Step-up authentication required"):
+            auth_module._validate_stepup_tokens(request)
+
+    def test_none_stepup_token_data_raises(self):
+        """Should raise when stepup_token_data is explicitly None"""
+        request = self._make_request({"stepup_token_data": None})
+        with pytest.raises(Exception, match="Step-up authentication required"):
+            auth_module._validate_stepup_tokens(request)
+
+    def test_expired_token_raises(self):
+        """Should raise when the stepup token has expired (timestamp = 0 means always expired)"""
+        request = self._make_request(
+            {
+                "stepup_token_data": {"access_token": "tok", "expires_in": 60},
+                "stepup_token_timestamp": 0,  # epoch — definitely expired
+            }
+        )
+        with pytest.raises(Exception, match="expired"):
+            auth_module._validate_stepup_tokens(request)
+
+    def test_valid_token_returns_token_data(self):
+        """Should return the stepup_token_data dict when token is present and unexpired"""
+        token_data = {"access_token": "tok", "refresh_token": "ref", "expires_in": 3600}
+        request = self._make_request(
+            {
+                "stepup_token_data": token_data,
+                "stepup_token_timestamp": time.time(),
+            }
+        )
+        result = auth_module._validate_stepup_tokens(request)
+        assert result == token_data
+
+    def test_missing_timestamp_treated_as_expired(self):
+        """Should raise when stepup_token_timestamp is absent (treated as expired)"""
+        request = self._make_request(
+            {
+                "stepup_token_data": {"access_token": "tok", "expires_in": 3600},
+                # no stepup_token_timestamp key
+            }
+        )
+        with pytest.raises(Exception):
+            auth_module._validate_stepup_tokens(request)
+
+
+# ---------------------------------------------------------------------------
+# Helper: _get_mfa_challenge_token
+# ---------------------------------------------------------------------------
+
+
+class TestGetMfaChallengeToken:
+    """Tests for _get_mfa_challenge_token internal helper"""
+
+    @pytest.fixture
+    def mock_http_client(self):
+        return AsyncMock(spec=AsyncClient)
+
+    def _make_request(self, session: dict) -> MagicMock:
+        req = MagicMock()
+        req.session = session
+        return req
+
+    def _valid_session(self) -> dict:
+        return {
+            "stepup_token_data": {
+                "access_token": "stepup-at",
+                "refresh_token": "stepup-rt",
+                "expires_in": 3600,
+            },
+            "stepup_token_timestamp": time.time(),
+        }
+
+    @pytest.mark.asyncio
+    async def test_missing_stepup_raises(self, mock_http_client):
+        """Should propagate the exception from _validate_stepup_tokens"""
+        request = self._make_request({})
+        with pytest.raises(Exception, match="Step-up authentication required"):
+            await auth_module._get_mfa_challenge_token(
+                request, mock_http_client, "https://tenant.example.com"
+            )
+
+    @pytest.mark.asyncio
+    async def test_no_refresh_token_in_stepup_raises(self, mock_http_client):
+        """Should raise when stepup_token_data has no refresh_token"""
+        request = self._make_request(
+            {
+                "stepup_token_data": {"access_token": "at", "expires_in": 3600},
+                "stepup_token_timestamp": time.time(),
+            }
+        )
+        with pytest.raises(Exception, match="No refresh_token"):
+            await auth_module._get_mfa_challenge_token(
+                request, mock_http_client, "https://tenant.example.com"
+            )
+
+    @pytest.mark.asyncio
+    @patch.object(auth_module, "_perform_mfa_refresh_token_flow")
+    async def test_mfa_refresh_failure_wraps_exception(
+        self, mock_mfa_refresh, mock_http_client
+    ):
+        """Should wrap _perform_mfa_refresh_token_flow exceptions with a descriptive message"""
+        mock_mfa_refresh.side_effect = Exception("network error")
+        request = self._make_request(self._valid_session())
+        with pytest.raises(Exception, match="MFA refresh token flow failed"):
+            await auth_module._get_mfa_challenge_token(
+                request, mock_http_client, "https://tenant.example.com"
+            )
+
+    @pytest.mark.asyncio
+    @patch.object(auth_module, "_perform_mfa_refresh_token_flow")
+    async def test_success_returns_access_token(
+        self, mock_mfa_refresh, mock_http_client
+    ):
+        """Should return the access_token from the MFA refresh token response"""
+        mock_mfa_refresh.return_value = {
+            "access_token": "mfa-challenge-token",
+            "scope": "mfa_challenge",
+        }
+        request = self._make_request(self._valid_session())
+        result = await auth_module._get_mfa_challenge_token(
+            request, mock_http_client, "https://tenant.example.com"
+        )
+        assert result == "mfa-challenge-token"
+        mock_mfa_refresh.assert_called_once()
+
+    @pytest.mark.asyncio
+    @patch.object(auth_module, "_perform_mfa_refresh_token_flow")
+    async def test_passes_correct_refresh_token(
+        self, mock_mfa_refresh, mock_http_client
+    ):
+        """Should pass the stepup refresh_token to _perform_mfa_refresh_token_flow"""
+        mock_mfa_refresh.return_value = {"access_token": "tok"}
+        request = self._make_request(self._valid_session())
+        await auth_module._get_mfa_challenge_token(
+            request, mock_http_client, "https://tenant.example.com"
+        )
+        call_kwargs = mock_mfa_refresh.call_args[1]
+        assert call_kwargs["refresh_token"] == "stepup-rt"
+        assert call_kwargs["tenant_url"] == "https://tenant.example.com"
+
+
+# ---------------------------------------------------------------------------
+# Helper: _build_merged_session_token
+# ---------------------------------------------------------------------------
+
+
+class TestBuildMergedSessionToken:
+    """Tests for _build_merged_session_token internal helper"""
+
+    def _make_request(self, session: dict) -> MagicMock:
+        req = MagicMock()
+        req.session = session
+        return req
+
+    def test_preserves_original_id_token(self):
+        """New id_token from jwt-bearer exchange must NOT replace the original"""
+        from app.constants.session_keys import SessionKeys
+
+        request = self._make_request(
+            {
+                SessionKeys.SESSION_USER_TOKEN.value: {
+                    "id_token": "original-id-token",
+                    "access_token": "old-at",
+                    "userinfo": {"sid": "orig-sid", "sub": "u1"},
+                }
+            }
+        )
+        combined = {
+            "access_token": "new-at",
+            "refresh_token": "new-rt",
+            "id_token": "new-id-token-different-session",
+        }
+        result = auth_module._build_merged_session_token(request, combined, None)
+        assert result["id_token"] == "original-id-token"
+        assert result["access_token"] == "new-at"
+        assert result["refresh_token"] == "new-rt"
+
+    def test_amr_is_patched_into_userinfo(self):
+        """Combined AMR claims should be written into the merged userinfo"""
+        from app.constants.session_keys import SessionKeys
+
+        request = self._make_request(
+            {
+                SessionKeys.SESSION_USER_TOKEN.value: {
+                    "id_token": "original-id-token",
+                    "userinfo": {"sid": "orig-sid", "amr": ["pwd"], "sub": "u1"},
+                }
+            }
+        )
+        combined = {"access_token": "new-at", "id_token": "new-id"}
+        result = auth_module._build_merged_session_token(
+            request, combined, ["password", "fido2"]
+        )
+        assert result["userinfo"]["amr"] == ["password", "fido2"]
+
+    def test_none_combined_amr_leaves_original_amr_unchanged(self):
+        """When combined_amr is None the original userinfo AMR must not be touched"""
+        from app.constants.session_keys import SessionKeys
+
+        request = self._make_request(
+            {
+                SessionKeys.SESSION_USER_TOKEN.value: {
+                    "id_token": "orig-id",
+                    "userinfo": {"amr": ["pwd"], "sid": "s1"},
+                }
+            }
+        )
+        combined = {"access_token": "new-at"}
+        result = auth_module._build_merged_session_token(request, combined, None)
+        assert result["userinfo"]["amr"] == ["pwd"]
+
+    def test_original_userinfo_fields_preserved(self):
+        """sid, sub, email and other original userinfo fields must be carried over"""
+        from app.constants.session_keys import SessionKeys
+
+        original_userinfo = {
+            "sid": "original-sid",
+            "sub": "user-999",
+            "email": "u@example.com",
+            "given_name": "Alice",
+        }
+        request = self._make_request(
+            {
+                SessionKeys.SESSION_USER_TOKEN.value: {
+                    "id_token": "orig-id",
+                    "userinfo": original_userinfo,
+                }
+            }
+        )
+        combined = {
+            "access_token": "elevated-at",
+            "id_token": "combined-id-different-sid",
+        }
+        result = auth_module._build_merged_session_token(
+            request, combined, ["password", "fido2"]
+        )
+        assert result["userinfo"]["sid"] == "original-sid"
+        assert result["userinfo"]["sub"] == "user-999"
+        assert result["userinfo"]["email"] == "u@example.com"
+        assert result["userinfo"]["given_name"] == "Alice"
+
+    def test_empty_session_handled_gracefully(self):
+        """Should return a merged token even when session has no existing token data"""
+
+        request = self._make_request({})  # no SESSION_USER_TOKEN key
+        combined = {"access_token": "at", "refresh_token": "rt"}
+        result = auth_module._build_merged_session_token(request, combined, None)
+        # id_token comes from original (None since session empty)
+        assert result["id_token"] is None
+        assert result["access_token"] == "at"
+        assert result["userinfo"] == {}
+
+    def test_returns_copy_not_mutating_original(self):
+        """build_merged_session_token must not mutate the combined_token_data dict"""
+        from app.constants.session_keys import SessionKeys
+
+        request = self._make_request(
+            {
+                SessionKeys.SESSION_USER_TOKEN.value: {
+                    "id_token": "orig",
+                    "userinfo": {"sid": "s"},
+                }
+            }
+        )
+        combined = {"access_token": "at", "id_token": "new-id"}
+        original_combined = dict(combined)
+        auth_module._build_merged_session_token(request, combined, ["password"])
+        assert combined == original_combined  # combined must be unchanged
+
+
+# ---------------------------------------------------------------------------
+# Helper: _exchange_and_update_session
+# ---------------------------------------------------------------------------
+
+
+class TestExchangeAndUpdateSession:
+    """Tests for _exchange_and_update_session internal helper"""
+
+    @pytest.fixture
+    def mock_http_client(self):
+        return AsyncMock(spec=AsyncClient)
+
+    def _make_request_with_session(self) -> MagicMock:
+        from app.constants.session_keys import SessionKeys
+
+        req = MagicMock()
+        req.session = {
+            "stepup_token_data": {"access_token": "sat", "refresh_token": "srt"},
+            "stepup_token_timestamp": time.time(),
+            SessionKeys.SESSION_USER_TOKEN.value: {
+                "id_token": "original-id",
+                "access_token": "old-at",
+                "userinfo": {"sid": "orig-sid", "amr": ["pwd"]},
+            },
+        }
+        return req
+
+    def _make_valid_combined_id_token(self, amr: list) -> str:
+        import base64
+        import json
+
+        payload = {"sid": "new-combined-sid", "amr": amr, "sub": "u1"}
+        b64 = base64.b64encode(json.dumps(payload).encode()).decode().rstrip("=")
+        return f"hdr.{b64}.sig"
+
+    @pytest.mark.asyncio
+    @patch("app.auth.services.auth_user_session.update_session_tokens")
+    @patch.object(auth_module, "_exchange_fido2_jwt_for_access_token")
+    async def test_full_success_updates_session_and_cleans_up(
+        self, mock_exchange, mock_update_tokens, mock_http_client
+    ):
+        """Should exchange JWT, call update_session_tokens, and remove stepup keys"""
+        combined_id_token = self._make_valid_combined_id_token(["password", "fido2"])
+        mock_exchange.return_value = {
+            "access_token": "combined-at",
+            "refresh_token": "combined-rt",
+            "id_token": combined_id_token,
+        }
+        request = self._make_request_with_session()
+
+        await auth_module._exchange_and_update_session(
+            request, mock_http_client, "https://tenant.example.com", "fido2-jwt"
+        )
+
+        mock_exchange.assert_called_once()
+        assert mock_exchange.call_args[1]["fido2_jwt"] == "fido2-jwt"
+
+        mock_update_tokens.assert_called_once()
+        call_token_data = mock_update_tokens.call_args[0][1]
+        # Original id_token preserved
+        assert call_token_data["id_token"] == "original-id"
+        # Elevated access token present
+        assert call_token_data["access_token"] == "combined-at"
+        # AMR updated
+        assert call_token_data["userinfo"]["amr"] == ["password", "fido2"]
+        # Original sid preserved
+        assert call_token_data["userinfo"]["sid"] == "orig-sid"
+
+    @pytest.mark.asyncio
+    @patch("app.auth.services.auth_user_session.update_session_tokens")
+    @patch.object(auth_module, "_exchange_fido2_jwt_for_access_token")
+    async def test_stepup_keys_removed_from_session_after_success(
+        self, mock_exchange, mock_update_tokens, mock_http_client
+    ):
+        """Should pop stepup_token_data and stepup_token_timestamp from session"""
+        combined_id_token = self._make_valid_combined_id_token(["password", "fido2"])
+        mock_exchange.return_value = {
+            "access_token": "at",
+            "refresh_token": "rt",
+            "id_token": combined_id_token,
+        }
+        request = self._make_request_with_session()
+        assert "stepup_token_data" in request.session
+        assert "stepup_token_timestamp" in request.session
+
+        await auth_module._exchange_and_update_session(
+            request, mock_http_client, "https://tenant.example.com", "fido2-jwt"
+        )
+
+        assert "stepup_token_data" not in request.session
+        assert "stepup_token_timestamp" not in request.session
+
+    @pytest.mark.asyncio
+    @patch("app.auth.services.auth_user_session.update_session_tokens")
+    @patch.object(auth_module, "_exchange_fido2_jwt_for_access_token")
+    async def test_exchange_exception_propagates(
+        self, mock_exchange, mock_update_tokens, mock_http_client
+    ):
+        """Should not swallow exceptions from _exchange_fido2_jwt_for_access_token"""
+        mock_exchange.side_effect = Exception("exchange failed")
+        request = self._make_request_with_session()
+
+        with pytest.raises(Exception, match="exchange failed"):
+            await auth_module._exchange_and_update_session(
+                request, mock_http_client, "https://tenant.example.com", "fido2-jwt"
+            )
+        mock_update_tokens.assert_not_called()
+
+    @pytest.mark.asyncio
+    @patch("app.auth.services.auth_user_session.update_session_tokens")
+    @patch.object(auth_module, "_exchange_fido2_jwt_for_access_token")
+    async def test_no_id_token_in_combined_response(
+        self, mock_exchange, mock_update_tokens, mock_http_client
+    ):
+        """Should work without an id_token in combined response (amr stays as-is)"""
+        mock_exchange.return_value = {
+            "access_token": "at",
+            "refresh_token": "rt",
+            # no id_token key
+        }
+        request = self._make_request_with_session()
+
+        await auth_module._exchange_and_update_session(
+            request, mock_http_client, "https://tenant.example.com", "fido2-jwt"
+        )
+
+        mock_update_tokens.assert_called_once()
+        call_token_data = mock_update_tokens.call_args[0][1]
+        # Original id_token preserved (from session)
+        assert call_token_data["id_token"] == "original-id"
+        # AMR unchanged since no combined id_token to decode
+        assert call_token_data["userinfo"]["amr"] == ["pwd"]
