@@ -11,6 +11,10 @@ import {
   CircularProgress,
 } from "@mui/material";
 import config from "../config";
+import {
+  X_GC_CLIENT_HEADER_NAME,
+  X_GC_CLIENT_HEADER_VALUE,
+} from "../../utils/axiosInstance.js";
 
 function MFASignIn() {
   const navigate = useNavigate();
@@ -38,7 +42,7 @@ function MFASignIn() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-GC-Client": "canada-login-manage-profile-frontend",
+          [X_GC_CLIENT_HEADER_NAME]: X_GC_CLIENT_HEADER_VALUE,
         },
         body: JSON.stringify({
           username: formData.email,

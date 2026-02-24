@@ -10,6 +10,10 @@ import {
   Alert,
 } from "@mui/material";
 import config from "../config";
+import {
+  X_GC_CLIENT_HEADER_NAME,
+  X_GC_CLIENT_HEADER_VALUE,
+} from "../../utils/axiosInstance.js";
 
 function PasskeySignIn() {
   const navigate = useNavigate();
@@ -29,7 +33,7 @@ function PasskeySignIn() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-GC-Client": "canada-login-manage-profile-frontend",
+            [X_GC_CLIENT_HEADER_NAME]: X_GC_CLIENT_HEADER_VALUE,
           },
           body: JSON.stringify({ username }),
         },
@@ -60,7 +64,7 @@ function PasskeySignIn() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-GC-Client": "canada-login-manage-profile-frontend",
+            [X_GC_CLIENT_HEADER_NAME]: X_GC_CLIENT_HEADER_VALUE,
           },
           body: JSON.stringify({
             username,
