@@ -292,7 +292,7 @@ jobs:
 
       - name: Invalidate FRONTEND_APP_CLOUDFRONT_DISTRIBUTION cache
         run: |
-          aws cloudfront create-invalidation --distribution-id ${{ secrets.FRONTEND_APP_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/index.html"
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.FRONTEND_APP_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/index.html" "/assets/*" "/mockServiceWorker.js"
 
   # Deploys backend application to necessary environments.
   # We check the current SHA deployed to the environment to only deploy if necessary.
