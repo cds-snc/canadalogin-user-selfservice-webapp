@@ -347,6 +347,20 @@ To run the unit tests, follow these steps:
    pytest tests/test_hello.py::test_hello_world -v
    ```
 
+### VS Code Test Explorer
+
+The repository's `.vscode/settings.json` configures pytest for the VS Code Test Explorer automatically — no manual setup required beyond installing dependencies.
+
+**Prerequisites:**
+
+1. Install the [Python extension](https://marketplace.visualstudio.com/items?itemName=ms-python.python) for VS Code
+2. Install dev dependencies: `make install-dev-python`
+3. Select the `.venv` interpreter (VS Code may prompt automatically, otherwise use **Cmd+Shift+P → Python: Select Interpreter** and choose `.venv/bin/python`)
+
+Test discovery and the run/debug buttons in the **Testing** panel will then work against all tests in `backend/tests/`.
+
+> **Note:** Tests use `from app.xxx import ...` style imports. The `conftest.py` adds `backend/` to `sys.path` automatically so imports resolve correctly whether you run pytest from the terminal or via Test Explorer.
+
 ## Other commands
 
 - Format python (from root folder)
@@ -356,8 +370,21 @@ To run the unit tests, follow these steps:
   ```
 
 - Run Lint (from root folder)
+
   ```bash
   make lint-python
+  ```
+
+- Enable pre-commit hook (runs `black --check` and `flake8` on staged files automatically at commit time):
+
+  ```bash
+  make setup-hooks
+  ```
+
+- Disable pre-commit hook:
+
+  ```bash
+  make uninstall-hooks
   ```
 - Building a Dockerimage from your macbook M1 to AWS
   ```bash
