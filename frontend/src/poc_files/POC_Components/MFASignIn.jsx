@@ -38,6 +38,7 @@ function MFASignIn() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "X-GC-Client": "canada-login-manage-profile-frontend",
         },
         body: JSON.stringify({
           username: formData.email,

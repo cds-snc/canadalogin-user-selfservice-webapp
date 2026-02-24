@@ -1,5 +1,8 @@
 import axios from "axios";
 
+export const X_GC_CLIENT_HEADER_NAME = "X-GC-Client";
+export const X_GC_CLIENT_HEADER_VALUE = "canada-login-manage-profile-frontend";
+
 /**
  * Configured axios instance for all API requests.
  *
@@ -12,7 +15,7 @@ import axios from "axios";
 const axiosInstance = axios.create({
   withCredentials: true,
   headers: {
-    "X-GC-Client": "canada-login-manage-profile-frontend",
+    [X_GC_CLIENT_HEADER_NAME]: X_GC_CLIENT_HEADER_VALUE,
   },
 });
 

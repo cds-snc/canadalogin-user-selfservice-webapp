@@ -1,4 +1,6 @@
 import config from "../config";
+import { X_GC_CLIENT_HEADER_VALUE } from "./axiosInstance.js";
+
 export const AVAILABLE_LANGUAGES = { en: "en", fr: "fr" };
 export const PROFILE_LANGUAGES = {
   en: "en-ca",
@@ -14,8 +16,8 @@ export const EXTERNAL_NAVIGATION_LINKS = {
     "https://www.canada.ca/en/government/sign-in-online-account.html",
 };
 export const OIDC_REDIRECT = {
-  login: `${config.apiUrl}/v1/auth/login`,
-  reauth: `${config.apiUrl}/v1/auth/reauth`,
+  login: `${config.apiUrl}/v1/auth/login?x-gc-client=${X_GC_CLIENT_HEADER_VALUE}`,
+  reauth: `${config.apiUrl}/v1/auth/reauth?x-gc-client=${X_GC_CLIENT_HEADER_VALUE}`,
 };
 
 export const INVALID_OTP_ERROR_CODES = [

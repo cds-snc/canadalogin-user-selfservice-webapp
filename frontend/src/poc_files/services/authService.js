@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "../../utils/axiosInstance.js";
 import config from "../config";
 
 // Helper functions for base64url encoding/decoding

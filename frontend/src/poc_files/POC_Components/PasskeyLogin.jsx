@@ -29,6 +29,7 @@ function PasskeyLogin() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "X-GC-Client": "canada-login-manage-profile-frontend",
           },
           body: JSON.stringify({ username: email }),
         },
@@ -106,6 +107,7 @@ function PasskeyLogin() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "X-GC-Client": "canada-login-manage-profile-frontend",
           },
           body: JSON.stringify(verificationData),
         },
