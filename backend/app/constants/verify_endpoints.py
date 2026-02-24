@@ -13,6 +13,7 @@ class VerifyAPIEndpoint(str, Enum):
     VERIFY_PASSWORD = "/v1.0/authnmethods/password"
     EXCHANGE_TOKEN_SESSION = "/v1.0/auth/session"
     GET_ACCESS_TOKEN = "/oauth2/token"
+    GET_OIDC_USERINFO = "/oauth2/userinfo"
 
     # FIDO2 Endpoints
     FIDO2_RELYING_PARTIES = "/config/v2.0/factors/fido2/relyingparties"

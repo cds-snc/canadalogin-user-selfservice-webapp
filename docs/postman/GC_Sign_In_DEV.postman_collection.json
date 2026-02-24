@@ -495,7 +495,7 @@
               "urlencoded": [
                 {
                   "key": "redirect_url",
-                  "value": "https%3A%2F%2Fauth.signin-connexion.cdssandbox.xyz%2Foauth2%2Fauthorize%3Fclient_id%3Dabb9c045-e61b-4f99-b89f-85eb988b8c7d%26stateId%3Df874f27e-ff69-44a8-a8c8-9272f08ec63e%26themeId%3Def8a162b-ddb5-4c3f-bff8-895495022567",
+                  "value": "https%3A%2F%2Fcds-gcsignin-dev.verify.ibm.com%2Foauth2%2Fauthorize%3Fclient_id%3Dabb9c045-e61b-4f99-b89f-85eb988b8c7d%26stateId%3Df874f27e-ff69-44a8-a8c8-9272f08ec63e%26themeId%3Def8a162b-ddb5-4c3f-bff8-895495022567",
                   "type": "text"
                 },
                 {

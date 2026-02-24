@@ -1,0 +1,66 @@
+#!/bin/sh
+# Pre-commit hook: mirrors the same checks run in GitHub Actions CI/CD
+#   Backend  — black (format check) + flake8 (lint) on staged .py files
+#   Frontend — prettier + eslint via lint-staged on staged frontend files
+#
+# To skip in an emergency: git commit --no-verify
+
+set -e
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+
+# ── Backend: black --check + flake8 ─────────────────────────────────────────
+
+STAGED_PY=$(git diff --cached --name-only --diff-filter=ACM | grep '\.py$' || true)
+
+if [ -n "$STAGED_PY" ]; then
+  VENV_BLACK="$REPO_ROOT/.venv/bin/black"
+  VENV_FLAKE8="$REPO_ROOT/.venv/bin/flake8"
+
+  if [ ! -f "$VENV_BLACK" ]; then
+    echo "❌ Python venv not found at $REPO_ROOT/.venv"
+    echo "   Run: python -m venv .venv && pip install -r backend/requirements-dev.txt"
+    exit 1
+  fi
+
+  echo "🐍 Running black format check on staged Python files..."
+  # shellcheck disable=SC2086
+  if ! echo "$STAGED_PY" | xargs "$VENV_BLACK" --check --target-version py311 --quiet; then
+    echo ""
+    echo "❌ Black formatting check failed."
+    echo "   Run 'make fmt-python' to auto-format, then re-stage the files."
+    exit 1
+  fi
+
+  echo "🔍 Running flake8 lint on staged Python files..."
+  # shellcheck disable=SC2086
+  if ! echo "$STAGED_PY" | xargs "$VENV_FLAKE8"; then
+    echo ""
+    echo "❌ Flake8 lint check failed. Please fix the issues listed above."
+    exit 1
+  fi
+
+  echo "✅ Python checks passed."
+fi
+
+# ── Frontend: prettier + eslint via lint-staged ──────────────────────────────
+
+STAGED_FRONTEND=$(git diff --cached --name-only --diff-filter=ACM | grep '^frontend/' || true)
+
+if [ -n "$STAGED_FRONTEND" ]; then
+  if [ ! -d "$REPO_ROOT/frontend/node_modules" ]; then
+    echo "❌ frontend/node_modules not found."
+    echo "   Run: cd frontend && npm install"
+    exit 1
+  fi
+
+  echo "🎨 Running lint-staged on staged frontend files..."
+  if ! (cd "$REPO_ROOT/frontend" && npx lint-staged); then
+    echo ""
+    echo "❌ Frontend lint/format checks failed."
+    echo "   Run 'cd frontend && npm run fix' to auto-fix, then re-stage the files."
+    exit 1
+  fi
+
+  echo "✅ Frontend checks passed."
+fi
