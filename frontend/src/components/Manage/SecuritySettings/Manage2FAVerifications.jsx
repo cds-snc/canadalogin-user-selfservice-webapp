@@ -10,7 +10,7 @@ import {
   MAP_TYPES,
   useOtpOperations,
 } from "../../../hooks/useOtpOperations.js";
-import { NON_PROD_FEATURE, PAGES } from "../../../utils/constants.jsx";
+import { ENABLE_FEATURE_IN_DEV, PAGES } from "../../../utils/constants.jsx";
 import { getPageContent } from "../../../utils/functions.jsx";
 import { path } from "../../../utils/routeHelpers.js";
 import Loader from "../../Layout/Loading.jsx";
@@ -67,7 +67,7 @@ export default function Manage2FAVerifications() {
       }
     };
 
-    if (NON_PROD_FEATURE) {
+    if (ENABLE_FEATURE_IN_DEV) {
       fetchUserFIDO2Credentials();
     }
   }, []);
@@ -135,7 +135,7 @@ export default function Manage2FAVerifications() {
         </GcdsButton>
       </GcdsContainer>
 
-      {NON_PROD_FEATURE && (
+      {ENABLE_FEATURE_IN_DEV && (
         <GcdsContainer className="sectionCard">
           <GcdsHeading
             tag="h3"

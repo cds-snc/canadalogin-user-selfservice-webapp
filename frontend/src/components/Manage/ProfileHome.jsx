@@ -8,7 +8,7 @@ import {
 } from "@cdssnc/gcds-components-react";
 
 import { getPageContent } from "../../utils/functions.jsx";
-import { NON_PROD_FEATURE, PAGES } from "../../utils/constants.jsx";
+import { ENABLE_FEATURE_IN_DEV, PAGES } from "../../utils/constants.jsx";
 import { useUser } from "../Providers/useUser.tsx";
 import VerifiedBadge from "../Badges/VerifiedBadge.jsx";
 import ViewContactPhoneNumber from "../../features/ContactPhoneNumber/components/ViewContactPhoneNumber.jsx";
@@ -30,7 +30,7 @@ const DisplayEmailInfo = ({ email, pageContent, language }) => {
       <GcdsText>{pageContent["8"]}</GcdsText>
       <GcdsGrid columns="1fr auto" className="gridInline">
         <GcdsText>{email}</GcdsText>
-        {NON_PROD_FEATURE && (
+        {ENABLE_FEATURE_IN_DEV && (
           <GcdsLink
             href={editEmail}
             size="regular"
