@@ -154,7 +154,6 @@ export const useOtpOperations = (
    * @returns {Object} Phone factors map
    */
   const createPhoneFactorsMap = (phoneFactors, mapType = "lastFourDigits") => {
-    console.log(phoneFactors);
     return phoneFactors.reduce((acc, factor) => {
       if (mapType === MAP_TYPES.lastFourDigits) {
         // For AddMFAPage: key is last 4 digits, value is array of types
