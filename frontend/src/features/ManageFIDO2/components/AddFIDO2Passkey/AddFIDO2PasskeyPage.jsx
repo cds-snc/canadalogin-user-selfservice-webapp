@@ -71,7 +71,6 @@ export default function AddFIDO2PasskeyPage({ step }) {
         }
       }
     },
-    true, // useStepup=true for FIDO2 step-up authentication
   );
 
   const didFetch = useRef(false);

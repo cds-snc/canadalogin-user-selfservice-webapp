@@ -164,7 +164,7 @@ export const useOtpOperations = (
       } else if (mapType === MAP_TYPES.fullPhoneNumber) {
         // For Manage2FAVerifications: key is full phone number, value is array of {type, id}
         acc[factor.destination] = acc[factor.destination]
-          ? [...acc[factor.phoneNumber], { type: factor.type, id: factor.id }]
+          ? [...acc[factor.destination], { type: factor.type, id: factor.id }]
           : [{ type: factor.type, id: factor.id }];
       }
       return acc;
