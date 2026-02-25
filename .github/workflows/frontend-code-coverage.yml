@@ -14,6 +14,8 @@ on:
 jobs:
   vite-test:
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.57.0-jammy
     strategy:
       matrix:
         include:
@@ -40,7 +42,7 @@ jobs:
 
       - name: "Run Vitest Code Coverage"
         working-directory: ${{ matrix.module }}
-        run: npx vitest --run --coverage --config vitest.config.js
+        run: npx vitest --run --coverage
 
       - name: "Upload Coverage"
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
