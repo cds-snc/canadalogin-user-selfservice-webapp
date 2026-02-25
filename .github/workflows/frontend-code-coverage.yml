@@ -38,25 +38,9 @@ jobs:
         working-directory: ${{ matrix.module }}
         run: npm install
 
-      - name: "Cache Playwright browsers"
-        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
-        id: playwright-cache
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('frontend/package-lock.json') }}
-
-      - name: "Install Playwright deps"
-        working-directory: ${{ matrix.module }}
-        run: npx playwright install-deps
-
-      - name: "Install Playwright browsers"
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        working-directory: ${{ matrix.module }}
-        run: npx playwright install
-
       - name: "Run Vitest Code Coverage"
         working-directory: ${{ matrix.module }}
-        run: npx vitest --run --coverage
+        run: npx vitest --run --coverage --config vitest.config.js
 
       - name: "Upload Coverage"
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
