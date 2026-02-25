@@ -23,7 +23,6 @@ export default function DeleteFIDO2PasskeyPage({ step }) {
   const [fido2Data, setFido2Data] = useState([]);
   const [localLoading, setLocalLoading] = useState(true);
   const [assertionResult, setAssertionResult] = useState(null);
-  console.log("errorCode", errorCode);
   const backToManage2FAVerificationsPage = path(PAGES.manage2FAVerifications, {
     language: language,
   });

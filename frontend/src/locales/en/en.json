@@ -383,11 +383,16 @@
     "9": "Delete",
     "10": "+ Add a phone number",
     "11": "Loading...",
-    "12": "+ Add a passkey",
+    "12": "+ Add a passkey or security key",
     "13": "Delete",
     "14": "Rename",
-    "15": "Passkeys and Security Keys",
-    "16": "Date created: "
+    "15": "Passkeys and security Keys",
+    "16": "Created on ",
+    "17": "With passkeys, sign in becomes simpler.",
+    "18": "What are passkeys?",
+    "19": "Passkeys are encrypted digital keys you create using your fingerprint, face, or screen lock.",
+    "20": "Where are passkeys saved?",
+    "21": "Passkeys are often saved to your password manager, so you can sign in on other devices. Sometimes they are saved directly to your device."
   },
   "AddMFANumber": {
     "1": "Enter your new phone number",

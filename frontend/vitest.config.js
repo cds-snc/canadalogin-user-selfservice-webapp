@@ -1,5 +1,6 @@
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
+import svgr from "vite-plugin-svgr";
 
 const filesToInclude = [
   "**/src/App.jsx",
@@ -22,7 +23,7 @@ const filesToExclude = [
   "**/src/__tests__/testSuite.tsx",
 ];
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), svgr()],
   preview: {
     port: 3001,
   },

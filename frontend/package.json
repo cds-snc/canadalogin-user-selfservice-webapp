@@ -78,6 +78,7 @@
     "storybook-addon-remix-react-router": "^4.0.1",
     "typescript": "~5.7.2",
     "vite": "^6.4.1",
+    "vite-plugin-svgr": "^4.5.0",
     "vitest": "^3.1.2"
   },
   "vitest": {

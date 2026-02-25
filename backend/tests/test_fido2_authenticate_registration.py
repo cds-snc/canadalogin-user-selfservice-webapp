@@ -616,32 +616,43 @@ class TestSubmitAssertionResult:
         assert "returnJwt" not in url
 
     @pytest.mark.asyncio
+    @patch.object(auth_module, "get_auth_request_headers")
     @patch.object(auth_module, "RequestErrorHandler")
     @patch.object(auth_module, "get_rp_uuid_from_rp_id")
     @patch.object(auth_module, "get_admin_token")
     @patch.object(auth_module, "get_rp_id")
     @patch.object(auth_module, "get_tenant_url")
-    async def test_return_jwt_true_without_stepup_token_raises_exception(
+    async def test_return_jwt_true_without_stepup_token_falls_back_to_admin_token(
         self,
         mock_get_tenant_url,
         mock_get_rp_id,
         mock_get_admin_token,
         mock_get_rp_uuid_from_rp_id,
         mock_request_error_handler,
+        mock_get_auth_request_headers,
         mock_http_client,
         mock_request,
         mock_assertion_request,
     ):
-        """Should raise exception when return_jwt=True but no stepup_refresh_token in session"""
-        # No stepup_refresh_token in session
+        """When return_jwt=True but no stepup token in session, should fall back to admin_token without returnJwt"""
+        # No stepup token in session
         mock_request.session = {}
 
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
         mock_get_rp_id.return_value = "example.com"
         mock_get_admin_token.return_value = "admin-token"
         mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
+        mock_get_auth_request_headers.return_value = {
+            "Authorization": "Bearer admin-token"
+        }
 
-        await submit_assertion_result(
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"status": "ok"}
+        mock_response.raise_for_status = MagicMock()
+        mock_http_client.post = AsyncMock(return_value=mock_response)
+
+        result = await submit_assertion_result(
             request=mock_request,
             http_client=mock_http_client,
             user_access_token="user-token",
@@ -649,14 +660,12 @@ class TestSubmitAssertionResult:
             return_jwt=True,
         )
 
-        # Should call error handler with exception about missing stepup_token_data
-        mock_request_error_handler.handle.assert_called_once()
-        error_arg = mock_request_error_handler.handle.call_args[0][0]
-        assert isinstance(error_arg, Exception)
-        assert "Step-up authentication required" in str(error_arg)
-        assert "stepup_token_data" in str(
-            error_arg
-        ) or "Password must be verified" in str(error_arg)
+        # Should succeed using admin_token fallback, without returnJwt query parameter
+        assert result.success is True
+        mock_request_error_handler.handle.assert_not_called()
+        call_args = mock_http_client.post.call_args[0]
+        url = call_args[0]
+        assert "returnJwt" not in url
 
     @pytest.mark.asyncio
     @patch.object(auth_module, "_is_token_expired")
@@ -1913,17 +1922,17 @@ class TestValidateStepupTokens:
         req.session = session
         return req
 
-    def test_missing_stepup_token_data_raises(self):
-        """Should raise an Exception when stepup_token_data is not in session"""
+    def test_missing_stepup_token_data_returns_none(self):
+        """Should return None when stepup_token_data is not in session"""
         request = self._make_request({})
-        with pytest.raises(Exception, match="Step-up authentication required"):
-            auth_module._validate_stepup_tokens(request)
+        result = auth_module._validate_stepup_tokens(request)
+        assert result is None
 
-    def test_none_stepup_token_data_raises(self):
-        """Should raise when stepup_token_data is explicitly None"""
+    def test_none_stepup_token_data_returns_none(self):
+        """Should return None when stepup_token_data is explicitly None"""
         request = self._make_request({"stepup_token_data": None})
-        with pytest.raises(Exception, match="Step-up authentication required"):
-            auth_module._validate_stepup_tokens(request)
+        result = auth_module._validate_stepup_tokens(request)
+        assert result is None
 
     def test_expired_token_raises(self):
         """Should raise when the stepup token has expired (timestamp = 0 means always expired)"""

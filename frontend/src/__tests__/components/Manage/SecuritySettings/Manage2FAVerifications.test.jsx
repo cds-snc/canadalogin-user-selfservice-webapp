@@ -96,6 +96,55 @@ vi.mock("../../../../features/ManageFIDO2/api/fido2Api.jsx", () => ({
   },
 }));
 
+vi.mock("@cdssnc/gcds-components-react", () => ({
+  GcdsContainer: ({ children }) => <div>{children}</div>,
+  GcdsGrid: ({ children }) => <div>{children}</div>,
+  GcdsHeading: ({ children }) => <div>{children}</div>,
+  GcdsText: ({ children }) => <div>{children}</div>,
+  GcdsButton: ({ children, onGcdsClick, onClick, id }) => (
+    <button id={id} onClick={onGcdsClick ?? onClick}>
+      {children}
+    </button>
+  ),
+  GcdsLink: ({ children }) => <a>{children}</a>,
+}));
+
+vi.mock(
+  "../../../../components/Manage/SecuritySettings/PhoneFactorsList.jsx",
+  () => ({
+    default: ({ userPhoneFactorsMap }) => (
+      <div data-testid="phone-factors-list">
+        {Object.keys(userPhoneFactorsMap).map((phoneNumber) => (
+          <div key={phoneNumber}>
+            <strong>{phoneNumber}</strong>
+            {userPhoneFactorsMap[phoneNumber].map((factor, i) => (
+              <div key={i}>
+                {factor.type === "smsotp"
+                  ? "Text message (SMS)"
+                  : factor.type === "voiceotp"
+                    ? "Voice call"
+                    : factor.type}
+              </div>
+            ))}
+            {Object.keys(userPhoneFactorsMap).length > 1 && <a>Remove</a>}
+          </div>
+        ))}
+      </div>
+    ),
+  }),
+);
+
+vi.mock(
+  "../../../../components/Manage/SecuritySettings/FIDO2PasskeyList.jsx",
+  () => ({
+    default: () => null,
+  }),
+);
+
+vi.mock("../../../../components/InfoBlocks/NoticeFactory.jsx", () => ({
+  default: () => null,
+}));
+
 describe("Manage2FAVerifications Component Unit Tests", () => {
   beforeEach(() => {
     vi.clearAllMocks();
