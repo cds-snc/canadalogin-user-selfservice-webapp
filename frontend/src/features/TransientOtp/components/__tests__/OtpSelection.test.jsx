@@ -241,7 +241,7 @@ describe("OtpSelection Component", () => {
         {
           id: "sms-factor-1",
           type: FLOW_TYPES.sms,
-          phoneNumber: "+15551234567",
+          destination: "+15551234567",
         },
       ];
 
@@ -259,12 +259,12 @@ describe("OtpSelection Component", () => {
         {
           id: "sms-factor-1",
           type: FLOW_TYPES.sms,
-          phoneNumber: "+15551234567",
+          destination: "+15551234567",
         },
         {
           id: "sms-factor-2",
           type: FLOW_TYPES.sms,
-          phoneNumber: "+15559876543",
+          destination: "+15559876543",
         },
       ];
 
@@ -283,19 +283,19 @@ describe("OtpSelection Component", () => {
         {
           id: "sms-factor-1",
           type: FLOW_TYPES.sms,
-          phoneNumber: "+15551234567",
+          destination: "+15551234567",
         },
         {
           id: "sms-factor-2",
           type: FLOW_TYPES.sms,
-          phoneNumber: "+15559876543",
+          destination: "+15559876543",
         },
       ];
 
       const userSelectedMfaFactor = {
         id: "sms-factor-2",
         type: FLOW_TYPES.sms,
-        phoneNumber: "+15559876543",
+        destination: "+15559876543",
       };
 
       renderComponent({ userPhoneFactors, userSelectedMfaFactor });
@@ -314,7 +314,7 @@ describe("OtpSelection Component", () => {
         {
           id: "voice-factor-1",
           type: FLOW_TYPES.voice,
-          phoneNumber: "+15551234567",
+          destination: "+15551234567",
         },
       ];
 
@@ -328,12 +328,12 @@ describe("OtpSelection Component", () => {
         {
           id: "voice-factor-1",
           type: FLOW_TYPES.voice,
-          phoneNumber: "+15551234567",
+          destination: "+15551234567",
         },
         {
           id: "voice-factor-2",
           type: FLOW_TYPES.voice,
-          phoneNumber: "+15559876543",
+          destination: "+15559876543",
         },
       ];
 
@@ -348,19 +348,19 @@ describe("OtpSelection Component", () => {
         {
           id: "voice-factor-1",
           type: FLOW_TYPES.voice,
-          phoneNumber: "+15551234567",
+          destination: "+15551234567",
         },
         {
           id: "voice-factor-2",
           type: FLOW_TYPES.voice,
-          phoneNumber: "+15559876543",
+          destination: "+15559876543",
         },
       ];
 
       const userSelectedMfaFactor = {
         id: "voice-factor-1",
         type: FLOW_TYPES.voice,
-        phoneNumber: "+15551234567",
+        destination: "+15551234567",
       };
 
       renderComponent({ userPhoneFactors, userSelectedMfaFactor });
@@ -383,12 +383,12 @@ describe("OtpSelection Component", () => {
         {
           id: "sms-factor-1",
           type: FLOW_TYPES.sms,
-          phoneNumber: "+15551234567",
+          destination: "+15551234567",
         },
         {
           id: "voice-factor-1",
           type: FLOW_TYPES.voice,
-          phoneNumber: "+15559876543",
+          destination: "+15559876543",
         },
       ];
 
@@ -405,22 +405,22 @@ describe("OtpSelection Component", () => {
         {
           id: "sms-factor-1",
           type: FLOW_TYPES.sms,
-          phoneNumber: "+15551111111",
+          destination: "+15551111111",
         },
         {
           id: "sms-factor-2",
           type: FLOW_TYPES.sms,
-          phoneNumber: "+15552222222",
+          destination: "+15552222222",
         },
         {
           id: "voice-factor-1",
           type: FLOW_TYPES.voice,
-          phoneNumber: "+15553333333",
+          destination: "+15553333333",
         },
         {
           id: "voice-factor-2",
           type: FLOW_TYPES.voice,
-          phoneNumber: "+15554444444",
+          destination: "+15554444444",
         },
       ];
 
@@ -441,19 +441,19 @@ describe("OtpSelection Component", () => {
         {
           id: "sms-factor-1",
           type: FLOW_TYPES.sms,
-          phoneNumber: "+15551234567",
+          destination: "+15551234567",
         },
         {
           id: "voice-factor-1",
           type: FLOW_TYPES.voice,
-          phoneNumber: "+15559876543",
+          destination: "+15559876543",
         },
       ];
 
       const userSelectedMfaFactor = {
         id: "voice-factor-1",
         type: FLOW_TYPES.voice,
-        phoneNumber: "+15559876543",
+        destination: "+15559876543",
       };
 
       renderComponent({ userPhoneFactors, userSelectedMfaFactor });
@@ -476,7 +476,7 @@ describe("OtpSelection Component", () => {
         {
           id: "sms-factor-1",
           type: FLOW_TYPES.sms,
-          phoneNumber: "+15551234567",
+          destination: "+15551234567",
         },
       ];
 
@@ -496,7 +496,7 @@ describe("OtpSelection Component", () => {
         {
           id: "voice-factor-1",
           type: FLOW_TYPES.voice,
-          phoneNumber: "+15551234567",
+          destination: "+15551234567",
         },
       ];
 
@@ -550,12 +550,12 @@ describe("OtpSelection Component", () => {
         {
           id: "sms-factor-1",
           type: FLOW_TYPES.sms,
-          phoneNumber: "+15551234567",
+          destionation: "+15551234567",
         },
         {
           id: "voice-factor-1",
           type: FLOW_TYPES.voice,
-          phoneNumber: "+15559876543",
+          destinatino: "+15559876543",
         },
       ];
 
@@ -577,17 +577,17 @@ describe("OtpSelection Component", () => {
         {
           id: "sms-factor-1",
           type: FLOW_TYPES.sms,
-          phoneNumber: "+15551234567",
+          destination: "+15551234567",
         },
         {
           id: "voice-factor-1",
           type: FLOW_TYPES.voice,
-          phoneNumber: "+15559876543",
+          destination: "+15559876543",
         },
         {
           id: "sms-factor-2",
           type: FLOW_TYPES.sms,
-          phoneNumber: "+15551111111",
+          destination: "+15551111111",
         },
       ];
 
@@ -659,7 +659,7 @@ describe("OtpSelection Component", () => {
         {
           id: "sms-factor-1",
           type: FLOW_TYPES.sms,
-          phoneNumber: "+15551234567",
+          destination: "+15551234567",
         },
       ];
 
@@ -676,17 +676,17 @@ describe("OtpSelection Component", () => {
         {
           id: "sms-factor-1",
           type: FLOW_TYPES.sms,
-          phoneNumber: "+1 (555) 123-4567",
+          destination: "+1 (555) 123-4567",
         },
         {
           id: "sms-factor-2",
           type: FLOW_TYPES.sms,
-          phoneNumber: "555-123-4567",
+          destination: "555-123-4567",
         },
         {
           id: "voice-factor-1",
           type: FLOW_TYPES.voice,
-          phoneNumber: "+15551234567",
+          destination: "+15551234567",
         },
       ];
 
@@ -703,7 +703,7 @@ describe("OtpSelection Component", () => {
       const userPhoneFactors = [
         {
           id: "factor-1",
-          phoneNumber: "+15551234567",
+          destination: "+15551234567",
         },
       ];
 
@@ -720,7 +720,7 @@ describe("OtpSelection Component", () => {
         {
           id: "factor-1",
           type: "unknown",
-          phoneNumber: "+15551234567",
+          destination: "+15551234567",
         },
       ];
 
@@ -782,12 +782,12 @@ describe("OtpSelection Component", () => {
         {
           id: "sms-factor-1",
           type: FLOW_TYPES.sms,
-          phoneNumber: "+15551234567",
+          destination: "+15551234567",
         },
         {
           id: "voice-factor-1",
           type: FLOW_TYPES.voice,
-          phoneNumber: "+15559876543",
+          destination: "+15559876543",
         },
       ];
 
@@ -805,12 +805,12 @@ describe("OtpSelection Component", () => {
         {
           id: "sms-factor-1",
           type: FLOW_TYPES.sms,
-          phoneNumber: "+15551234567",
+          destination: "+15551234567",
         },
         {
           id: "voice-factor-1",
           type: FLOW_TYPES.voice,
-          phoneNumber: "+15559876543",
+          destination: "+15559876543",
         },
       ];
 
@@ -848,12 +848,12 @@ describe("OtpSelection Component", () => {
         {
           id: "sms-factor-1",
           type: FLOW_TYPES.sms,
-          phoneNumber: "+15551234567",
+          destination: "+15551234567",
         },
         {
           id: "voice-factor-1",
           type: FLOW_TYPES.voice,
-          phoneNumber: "+15559876543",
+          destination: "+15559876543",
         },
       ];
 
@@ -882,7 +882,7 @@ describe("OtpSelection Component", () => {
         {
           id: "sms-factor-1",
           type: FLOW_TYPES.sms,
-          phoneNumber: "+15551234567",
+          destination: "+15551234567",
         },
       ];
 
@@ -903,12 +903,12 @@ describe("OtpSelection Component", () => {
         {
           id: "sms-factor-1",
           type: FLOW_TYPES.sms,
-          phoneNumber: "+15551234567",
+          destination: "+15551234567",
         },
         {
           id: "voice-factor-1",
           type: FLOW_TYPES.voice,
-          phoneNumber: "+15559876543",
+          destination: "+15559876543",
         },
       ];
 

@@ -1,6 +1,6 @@
 import logging
 
-from app.auth.services.auth_user_session import get_users_current_session
+from app.auth.services.auth_user_session import get_users_current_session, get_user_info
 from app.otp.schemas import (
     OtpDeletionRequest,
     OtpEnrollmentRequest,
@@ -163,10 +163,11 @@ async def attempt_mfa_otp_verification(
 async def delete_mfa_otp_factor(
     request: Request,
     deletion_request: OtpDeletionRequest,
+    user_info: str = Depends(get_user_info),
     user_access_token: str = Depends(get_users_current_session),
 ):
     return await handle_otp_deletion(
         request.app.state.request_client,
         deletion_request,
-        user_access_token,
+        user_info.get("sub"),
     )

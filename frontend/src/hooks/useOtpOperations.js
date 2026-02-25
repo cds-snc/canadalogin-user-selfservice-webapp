@@ -157,13 +157,13 @@ export const useOtpOperations = (
     return phoneFactors.reduce((acc, factor) => {
       if (mapType === MAP_TYPES.lastFourDigits) {
         // For AddMFAPage: key is last 4 digits, value is array of types
-        const visibleDigits = factor.phoneNumber.slice(-4);
+        const visibleDigits = factor.destination.slice(-4);
         acc[visibleDigits] = acc[visibleDigits]
           ? [...acc[visibleDigits], factor.type]
           : [factor.type];
       } else if (mapType === MAP_TYPES.fullPhoneNumber) {
         // For Manage2FAVerifications: key is full phone number, value is array of {type, id}
-        acc[factor.phoneNumber] = acc[factor.phoneNumber]
+        acc[factor.destination] = acc[factor.destination]
           ? [...acc[factor.phoneNumber], { type: factor.type, id: factor.id }]
           : [{ type: factor.type, id: factor.id }];
       }
@@ -182,7 +182,7 @@ export const useOtpOperations = (
 
     setLocalLoading(true);
     try {
-      const response = await otpFactors.getUserOtpPhoneFactors(userId);
+      const response = await otpFactors.getUserOtpPhoneFactors();
       if (
         response &&
         response.success &&

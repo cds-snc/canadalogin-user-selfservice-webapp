@@ -29,20 +29,19 @@ describe("otpFactors API", () => {
 
   describe("getUserOtpPhoneFactors", () => {
     it("successfully fetches user OTP phone factors", async () => {
-      const mockUserId = "test-user-123";
       const mockResponseData = {
         success: true,
         data: [
           {
             id: "factor-1",
             type: "smsotp",
-            phoneNumber: "+15551234567",
+            destination: "+15551234567",
             status: "active",
           },
           {
             id: "factor-2",
             type: "voiceotp",
-            phoneNumber: "+15559876543",
+            destination: "+15559876543",
             status: "active",
           },
         ],
@@ -52,10 +51,10 @@ describe("otpFactors API", () => {
         data: mockResponseData,
       });
 
-      const result = await otpFactors.getUserOtpPhoneFactors(mockUserId);
+      const result = await otpFactors.getUserOtpPhoneFactors();
 
       expect(axios.get).toHaveBeenCalledWith(
-        `http://localhost:8000/v1/users/${mockUserId}/otp_factors`,
+        `http://localhost:8000/v1/users/otp_factors`,
         {
           params: {
             validated: true,
@@ -67,14 +66,13 @@ describe("otpFactors API", () => {
     });
 
     it("returns data with single OTP factor", async () => {
-      const mockUserId = "user-456";
       const mockResponseData = {
         success: true,
         data: [
           {
             id: "factor-1",
             type: "smsotp",
-            phoneNumber: "+15551234567",
+            destination: "+15551234567",
             status: "active",
           },
         ],
@@ -84,10 +82,10 @@ describe("otpFactors API", () => {
         data: mockResponseData,
       });
 
-      const result = await otpFactors.getUserOtpPhoneFactors(mockUserId);
+      const result = await otpFactors.getUserOtpPhoneFactors();
 
       expect(axios.get).toHaveBeenCalledWith(
-        "http://localhost:8000/v1/users/user-456/otp_factors",
+        "http://localhost:8000/v1/users/otp_factors",
         {
           params: {
             validated: true,
@@ -99,7 +97,6 @@ describe("otpFactors API", () => {
     });
 
     it("returns data with no OTP factors (empty array)", async () => {
-      const mockUserId = "user-789";
       const mockResponseData = {
         success: true,
         data: [],
@@ -109,10 +106,10 @@ describe("otpFactors API", () => {
         data: mockResponseData,
       });
 
-      const result = await otpFactors.getUserOtpPhoneFactors(mockUserId);
+      const result = await otpFactors.getUserOtpPhoneFactors();
 
       expect(axios.get).toHaveBeenCalledWith(
-        "http://localhost:8000/v1/users/user-789/otp_factors",
+        "http://localhost:8000/v1/users/otp_factors",
         {
           params: {
             validated: true,
@@ -131,19 +128,19 @@ describe("otpFactors API", () => {
           {
             id: "sms-factor",
             type: "smsotp",
-            phoneNumber: "+15551111111",
+            destination: "+15551111111",
             status: "active",
           },
           {
             id: "voice-factor",
             type: "voiceotp",
-            phoneNumber: "+15552222222",
+            destination: "+15552222222",
             status: "active",
           },
           {
             id: "another-sms",
             type: "smsotp",
-            phoneNumber: "+15553333333",
+            destination: "+15553333333",
             status: "pending",
           },
         ],
@@ -161,15 +158,14 @@ describe("otpFactors API", () => {
     });
 
     it("calls handleApiError when request fails with network error", async () => {
-      const mockUserId = "user-error";
       const networkError = new Error("Network Error");
 
       axios.get.mockRejectedValue(networkError);
 
-      const result = await otpFactors.getUserOtpPhoneFactors(mockUserId);
+      const result = await otpFactors.getUserOtpPhoneFactors();
 
       expect(axios.get).toHaveBeenCalledWith(
-        "http://localhost:8000/v1/users/user-error/otp_factors",
+        "http://localhost:8000/v1/users/otp_factors",
         {
           params: {
             validated: true,
@@ -245,15 +241,12 @@ describe("otpFactors API", () => {
       await otpFactors.getUserOtpPhoneFactors(mockUserId);
 
       const calledUrl = axios.get.mock.calls[0][0];
-      expect(calledUrl).toBe(
-        "http://localhost:8000/v1/users/format-test-user/otp_factors",
-      );
+      expect(calledUrl).toBe("http://localhost:8000/v1/users/otp_factors");
       expect(calledUrl).toContain("/v1/users/");
       expect(calledUrl).toContain("/otp_factors");
     });
 
     it("handles user ID with special characters", async () => {
-      const mockUserId = "user-with-dashes-123";
       const mockResponseData = {
         success: true,
         data: [],
@@ -263,10 +256,10 @@ describe("otpFactors API", () => {
         data: mockResponseData,
       });
 
-      await otpFactors.getUserOtpPhoneFactors(mockUserId);
+      await otpFactors.getUserOtpPhoneFactors();
 
       expect(axios.get).toHaveBeenCalledWith(
-        "http://localhost:8000/v1/users/user-with-dashes-123/otp_factors",
+        "http://localhost:8000/v1/users/otp_factors",
         {
           params: {
             validated: true,

@@ -5,12 +5,12 @@ import { SUBMIT_END_POINTS } from "../../../../utils/constants.jsx";
 
 export const addMFAPhoneNumberApi = {
   // Enroll a phone number for MFA OTP authentication
-  enrollMFA: async ({ phoneNumber, otpType }) => {
+  enrollMFA: async ({ destination, otpType }) => {
     try {
       const response = await axios.post(
         `${config.apiUrl}${SUBMIT_END_POINTS.mfaEnroll}`,
         {
-          phoneNumber,
+          destination,
           otpType,
         },
       );
