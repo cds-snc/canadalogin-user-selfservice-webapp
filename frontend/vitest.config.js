@@ -1,6 +1,11 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
+import { storybookTest } from "@storybook/experimental-addon-test/vitest-plugin";
+
+const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const filesToInclude = [
   "**/src/App.jsx",
@@ -31,23 +36,62 @@ export default defineConfig({
     port: 3000,
   },
   test: {
-    globals: true,
-    setupFiles: ["./src/setup-msw.js", "./src/setupTests.js"],
-    include: [
-      "src/__tests__/**/*.test.{js,jsx,ts,tsx}",
-      "src/__tests__/**/*.spec.{js,jsx,ts,tsx}",
-      "src/**/*.test.{js,jsx,ts,tsx}",
-      "src/**/*.spec.{js,jsx,ts,tsx}",
-      "src/**/__tests__/**/*.{js,jsx,ts,tsx}",
-      // Include test story files for setTimeout refactoring
-      "src/**/*.test.stories.{js,jsx,ts,tsx}",
-    ],
-    exclude: [
-      ...filesToExclude,
-      "**/node_modules/**",
-      "**/dist/**",
-      "**/.{idea,git,cache,output,temp}/**",
-      "**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*",
+    projects: [
+      {
+        plugins: [react(), svgr()],
+        test: {
+          name: "unit",
+          globals: true,
+          setupFiles: ["./src/setup-msw.js", "./src/setupTests.js"],
+          include: [
+            "src/__tests__/**/*.test.{js,jsx,ts,tsx}",
+            "src/__tests__/**/*.spec.{js,jsx,ts,tsx}",
+            "src/**/*.test.{js,jsx,ts,tsx}",
+            "src/**/*.spec.{js,jsx,ts,tsx}",
+            "src/**/__tests__/**/*.{js,jsx,ts,tsx}",
+            // Include test story files for setTimeout refactoring
+            "src/**/*.test.stories.{js,jsx,ts,tsx}",
+          ],
+          exclude: [
+            ...filesToExclude,
+            "**/node_modules/**",
+            "**/dist/**",
+            "**/.{idea,git,cache,output,temp}/**",
+            "**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*",
+          ],
+          css: true,
+          environment: "jsdom",
+          // Don't fail on unhandled errors from third-party components (GCDS)
+          onUnhandledRejection: "ignore",
+          dangerouslyIgnoreUnhandledErrors: true,
+          // Reduce test output verbosity
+          reporter: ["verbose"],
+          silent: false,
+        },
+      },
+      {
+        plugins: [
+          react(),
+          svgr(),
+          storybookTest({
+            configDir: path.join(dirname, ".storybook"),
+            // Note: Removed Tests/Manage exclusion to allow setTimeout refactoring tests
+          }),
+        ],
+        test: {
+          name: "storybook",
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: "playwright",
+            instances: [{ browser: "chromium" }],
+          },
+          setupFiles: [".storybook/vitest.setup.js"],
+          // Note: Removed Tests/Manage exclusion to allow setTimeout refactoring tests
+          silent: true,
+          reporter: ["basic"],
+        },
+      },
     ],
     coverage: {
       reporter: ["text", "json-summary", "json", "html"],
@@ -64,13 +108,5 @@ export default defineConfig({
         statements: 10,
       },
     },
-    css: true,
-    environment: "jsdom",
-    // Don't fail on unhandled errors from third-party components (GCDS)
-    onUnhandledRejection: "ignore",
-    dangerouslyIgnoreUnhandledErrors: true,
-    // Reduce test output verbosity
-    reporter: ["verbose"],
-    silent: false,
   },
 });
