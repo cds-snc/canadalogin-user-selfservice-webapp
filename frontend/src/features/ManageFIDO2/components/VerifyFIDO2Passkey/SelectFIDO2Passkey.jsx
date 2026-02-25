@@ -59,10 +59,7 @@ export default function SelectFIDO2Passkey({
 
       // Step 4 (optional): Submit the assertion result now if needed for immediate verification
       if (submitAttestationResult) {
-        await fido2Api.submitAssertionResult(
-          assertionResult,
-          true, // returnJwt = true for step-up authentication
-        );
+        await fido2Api.submitAssertionResult(assertionResult);
       }
 
       onCallback?.();

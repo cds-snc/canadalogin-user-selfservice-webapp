@@ -154,6 +154,7 @@ export const useOtpOperations = (
    * @returns {Object} Phone factors map
    */
   const createPhoneFactorsMap = (phoneFactors, mapType = "lastFourDigits") => {
+    console.log(phoneFactors);
     return phoneFactors.reduce((acc, factor) => {
       if (mapType === MAP_TYPES.lastFourDigits) {
         // For AddMFAPage: key is last 4 digits, value is array of types
@@ -164,7 +165,7 @@ export const useOtpOperations = (
       } else if (mapType === MAP_TYPES.fullPhoneNumber) {
         // For Manage2FAVerifications: key is full phone number, value is array of {type, id}
         acc[factor.destination] = acc[factor.destination]
-          ? [...acc[factor.phoneNumber], { type: factor.type, id: factor.id }]
+          ? [...acc[factor.destination], { type: factor.type, id: factor.id }]
           : [{ type: factor.type, id: factor.id }];
       }
       return acc;
