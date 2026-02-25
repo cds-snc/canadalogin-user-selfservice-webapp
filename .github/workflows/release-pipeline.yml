@@ -73,6 +73,7 @@ jobs:
   # Detect the release tag on the current commit and expose it as a job output.
   detect-release-tag:
     runs-on: ubuntu-latest
+    needs: [release-please]
     outputs:
       release_tag: ${{ steps.detect-release-tag.outputs.release_tag }}
     steps:
