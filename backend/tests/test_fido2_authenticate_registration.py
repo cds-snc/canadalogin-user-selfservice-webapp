@@ -622,7 +622,7 @@ class TestSubmitAssertionResult:
     @patch.object(auth_module, "get_admin_token")
     @patch.object(auth_module, "get_rp_id")
     @patch.object(auth_module, "get_tenant_url")
-    async def test_return_jwt_true_without_stepup_token_falls_back_to_admin_token(
+    async def test_return_jwt_true_without_stepup_token_raises(
         self,
         mock_get_tenant_url,
         mock_get_rp_id,
@@ -634,7 +634,7 @@ class TestSubmitAssertionResult:
         mock_request,
         mock_assertion_request,
     ):
-        """When return_jwt=True but no stepup token in session, should fall back to admin_token without returnJwt"""
+        """When return_jwt=True but no stepup token in session, should forward step-up required error to error handler"""
         # No stepup token in session
         mock_request.session = {}
 
@@ -642,17 +642,8 @@ class TestSubmitAssertionResult:
         mock_get_rp_id.return_value = "example.com"
         mock_get_admin_token.return_value = "admin-token"
         mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
-        mock_get_auth_request_headers.return_value = {
-            "Authorization": "Bearer admin-token"
-        }
 
-        mock_response = MagicMock()
-        mock_response.status_code = 200
-        mock_response.json.return_value = {"status": "ok"}
-        mock_response.raise_for_status = MagicMock()
-        mock_http_client.post = AsyncMock(return_value=mock_response)
-
-        result = await submit_assertion_result(
+        await submit_assertion_result(
             request=mock_request,
             http_client=mock_http_client,
             user_access_token="user-token",
@@ -660,12 +651,11 @@ class TestSubmitAssertionResult:
             return_jwt=True,
         )
 
-        # Should succeed using admin_token fallback, without returnJwt query parameter
-        assert result.success is True
-        mock_request_error_handler.handle.assert_not_called()
-        call_args = mock_http_client.post.call_args[0]
-        url = call_args[0]
-        assert "returnJwt" not in url
+        # Should call error handler with step-up required exception
+        mock_request_error_handler.handle.assert_called_once()
+        error_arg = mock_request_error_handler.handle.call_args[0][0]
+        assert isinstance(error_arg, Exception)
+        assert "Step-up authentication required" in str(error_arg)
 
     @pytest.mark.asyncio
     @patch.object(auth_module, "_is_token_expired")

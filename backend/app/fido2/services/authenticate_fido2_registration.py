@@ -281,15 +281,12 @@ async def _get_mfa_challenge_token(
         MFA challenge access token string, or None if no stepup token is present in session
 
     Raises:
-        Exception: If stepup tokens are expired or MFA refresh fails
+        Exception: If stepup token data is missing, tokens are expired, or MFA refresh fails
     """
     stepup_token_data = _validate_stepup_tokens(request)
 
     if stepup_token_data is None:
-        logger.warning(
-            "No stepup_token_data available; skipping MFA challenge token retrieval."
-        )
-        return None
+        raise Exception("Step-up authentication required")
 
     stepup_refresh_token = stepup_token_data.get("refresh_token")
     if not stepup_refresh_token:
