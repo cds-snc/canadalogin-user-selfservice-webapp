@@ -198,9 +198,7 @@ export const VITE_ENVIRONMENTS = {
   prod: "prod",
 };
 
-export const NON_PROD_FEATURE =
-  config.environment === VITE_ENVIRONMENTS.dev ||
-  config.environment === VITE_ENVIRONMENTS.test;
+export const NON_PROD_FEATURE = config.environment === VITE_ENVIRONMENTS.dev;
 
 export const countryMapping = {
   countries: [
