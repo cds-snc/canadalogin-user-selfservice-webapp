@@ -27,7 +27,6 @@ export default function Manage2FAVerifications() {
   const navigate = useNavigate();
   const { state, _dispatch } = useUser();
   const [userFIDO2CredentialsData, setUserFIDO2CredentialsData] = useState([]);
-  const [loading, setLoading] = useState(false);
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
     language: language,
   });
@@ -38,7 +37,11 @@ export default function Manage2FAVerifications() {
   const addFido2PagePath = path(PAGES.addFIDO2PasskeyPage, { language });
 
   // Use the OTP operations hook for fetching phone factors
-  const { phoneFactorsMap: userPhoneFactorsMap } = useOtpOperations(
+  const {
+    phoneFactorsMap: userPhoneFactorsMap,
+    localLoading,
+    setLocalLoading,
+  } = useOtpOperations(
     state.userProfile.id,
     state.userProfile.userName,
     () => {}, // No error code setter needed
@@ -51,7 +54,7 @@ export default function Manage2FAVerifications() {
      * Fetch user's FIDO2 credentials
      */
     const fetchUserFIDO2Credentials = async () => {
-      setLoading(true);
+      setLocalLoading(true);
 
       try {
         const response = await fido2Api.getUserFIDO2Credentials();
@@ -63,16 +66,17 @@ export default function Manage2FAVerifications() {
           console.error("err", err);
         }
       } finally {
-        setLoading(false);
+        setLocalLoading(false);
       }
     };
 
     if (NON_PROD_FEATURE) {
       fetchUserFIDO2Credentials();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return loading ? (
+  return localLoading ? (
     <Loader text={pageContent["11"]} />
   ) : (
     <GcdsContainer>
