@@ -10,7 +10,7 @@ import {
   MAP_TYPES,
   useOtpOperations,
 } from "../../../hooks/useOtpOperations.js";
-import { NON_PROD_FEATURE, PAGES } from "../../../utils/constants.jsx";
+import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants.jsx";
 import { getPageContent } from "../../../utils/functions.jsx";
 import { path } from "../../../utils/routeHelpers.js";
 import Loader from "../../Layout/Loading.jsx";
@@ -70,7 +70,7 @@ export default function Manage2FAVerifications() {
       }
     };
 
-    if (NON_PROD_FEATURE) {
+    if (DEV_ONLY_FEATURE) {
       fetchUserFIDO2Credentials();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -139,7 +139,7 @@ export default function Manage2FAVerifications() {
         </GcdsButton>
       </GcdsContainer>
 
-      {NON_PROD_FEATURE && (
+      {DEV_ONLY_FEATURE && (
         <GcdsContainer className="sectionCard">
           <GcdsHeading
             tag="h3"
