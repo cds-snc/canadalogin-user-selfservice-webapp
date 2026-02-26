@@ -43,8 +43,7 @@ If so, ensure the following:
 
 > ℹ️ **Note:** If the PR exceeds size guidelines or introduces architectural changes, please explain why and suggest how reviewers can approach it efficiently.  
 > ℹ️ **Note:** Architectural or significant changes should go through the [RFC process](https://docs.google.com/document/d/1kRDswJZ9wCiI7D2K3GYWnGEDp2yPUGLQ9_yuNoYQCf0/edit?tab=t.0#heading=h.gwtmzfdyqc3h) and be logged in the [Product Decision Log](https://docs.google.com/document/d/1JN4a3ulfl3_NKD_eA2h4J17QdR3nN3JV680U087PeYE/edit?tab=t.0#heading=h.q8c85u2i9t5z) before beginning work on code and a PR.  
-> ℹ️ **Note:** Architectural changes that impact external clients or other CDS teams should go through the [ADR process](https://github.com/cds-snc/ADR).  
-> <br />
+> ℹ️ **Note:** Architectural changes that impact external clients or other CDS teams should go through the [ADR process](https://github.com/cds-snc/ADR). <br />
 
 ## 🔍 Code Review Checklist for Reviewers
 
