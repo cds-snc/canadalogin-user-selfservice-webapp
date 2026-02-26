@@ -27,7 +27,7 @@ export default function Manage2FAVerifications() {
   const navigate = useNavigate();
   const { state, _dispatch } = useUser();
   const [userFIDO2CredentialsData, setUserFIDO2CredentialsData] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
     language: language,
   });
