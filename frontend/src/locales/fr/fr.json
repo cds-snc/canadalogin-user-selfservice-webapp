@@ -102,7 +102,7 @@
     "1": "Bienvenue,",
     "2": "Renseignements personnels",
     "3": "Paramètres de sécurité",
-    "4": "Gérer Connexion GC"
+    "4": "Gérer ConnexionCanada"
   },
   "ProfileUpdateNameConfirmUpdate": {
     "1": "Voulez-vous vraiment modifier votre nom?",
@@ -201,7 +201,7 @@
     "4": "Annuler",
     "5": "Modifier votre nom",
     "6": "Cette action modifiera votre nom pour",
-    "7": "tous les services auxquels vous avez communiqué votre nom par le biais de Connexion GC."
+    "7": "tous les services auxquels vous avez communiqué votre nom par le biais de ConnexionCanada."
   },
   "AreYouSureUpdateContactNumber": {
     "1": "Êtes-vous sûr de vouloir mettre à jour votre numéro de téléphone ?",
@@ -236,7 +236,7 @@
   },
   "EditLanguagePreferences": {
     "1": "Modifier votre langue de communication",
-    "2": "Cette action modifiera la langue officielle dans laquelle ConnexionCanada et les services liés à Connexion GC communiqueront avec vous.",
+    "2": "Cette action modifiera la langue officielle dans laquelle ConnexionCanada et les services liés à ConnexionCanada communiqueront avec vous.",
     "3": "Veuillez choisir votre langue de communication",
     "13": "Anglais",
     "14": "Français",
@@ -311,9 +311,9 @@
     "6": "Se connecter"
   },
   "TopNavBar": {
-    "1": "Connexion GC",
+    "1": "ConnexionCanada",
     "2": "Menu",
-    "3": "Compte Connexion GC",
+    "3": "Identifiant ConnexionCanada",
     "4": "Renseignements personnels",
     "5": "Paramètres de sécurité",
     "6": "Retour à ",
@@ -334,7 +334,7 @@
   },
   "EnterNewPhoneNumber": {
     "1": "Entrez un nouveau numéro de téléphone",
-    "2": "Cette action modifiera le numéro de téléphone que Connexion GC et les services liés à votre identifiant ConnexionCanada peuvent utiliser pour vous contacter.",
+    "2": "Cette action modifiera le numéro de téléphone que ConnexionCanada et les services liés à votre identifiant ConnexionCanada peuvent utiliser pour vous contacter.",
     "3": "Services ayant accès à votre numéro de téléphone de communication",
     "4": "Les services suivants ont accès à votre numéro de téléphone de communication par le biais de ConnexionCanada:",
     "5": "GEO.ca",
