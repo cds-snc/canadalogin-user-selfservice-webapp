@@ -127,6 +127,7 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
     mockUseOtpOperations.mockReturnValue({
       phoneFactorsMap: {},
       localLoading: false,
+      setLocalLoading: vi.fn(),
     });
 
     vi.mocked(fido2Api.getUserFIDO2Credentials).mockResolvedValue({
@@ -136,8 +137,13 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
   });
 
   it("displays loading state while fetching verification methods", () => {
+    mockUseOtpOperations.mockReturnValue({
+      phoneFactorsMap: {},
+      localLoading: true,
+      setLocalLoading: vi.fn(),
+    });
     const { getByTestId } = render(<Manage2FAVerifications />);
-    // Component will be in loading state initially
+    // Component will be in loading state when localLoading is true
     expect(getByTestId("loading")).toBeInTheDocument();
     expect(getByTestId("loading")).toHaveTextContent(
       "Loading verification methods...",
@@ -153,6 +159,7 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
         ],
       },
       localLoading: false,
+      setLocalLoading: vi.fn(),
     });
 
     const { getByText } = render(<Manage2FAVerifications />);
@@ -175,6 +182,7 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
         5555555555: [{ phoneNumber: "5555555555", type: "voiceotp" }],
       },
       localLoading: false,
+      setLocalLoading: vi.fn(),
     });
 
     const { getByText } = render(<Manage2FAVerifications />);
@@ -192,6 +200,7 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
         5551234567: [{ phoneNumber: "5551234567", type: "voiceotp" }],
       },
       localLoading: false,
+      setLocalLoading: vi.fn(),
     });
 
     const { getByText, queryByText } = render(<Manage2FAVerifications />);
@@ -209,6 +218,7 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
         5551234567: [{ phoneNumber: "5551234567", type: "unknown_type" }],
       },
       localLoading: false,
+      setLocalLoading: vi.fn(),
     });
 
     const { getByText } = render(<Manage2FAVerifications />);
@@ -226,6 +236,7 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
         15551234567890: [{ phoneNumber: "15551234567890", type: "smsotp" }],
       },
       localLoading: false,
+      setLocalLoading: vi.fn(),
     });
 
     const { getByText } = render(<Manage2FAVerifications />);
@@ -244,6 +255,7 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
         5553333333: [{ phoneNumber: "5553333333", type: "smsotp" }],
       },
       localLoading: false,
+      setLocalLoading: vi.fn(),
     });
 
     const { getAllByText } = render(<Manage2FAVerifications />);
@@ -259,6 +271,7 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
     mockUseOtpOperations.mockReturnValue({
       phoneFactorsMap: {},
       localLoading: false,
+      setLocalLoading: vi.fn(),
     });
 
     const { getByText } = render(<Manage2FAVerifications />);
@@ -275,6 +288,7 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
     mockUseOtpOperations.mockReturnValue({
       phoneFactorsMap: {},
       localLoading: true,
+      setLocalLoading: vi.fn(),
     });
 
     const { getByTestId } = render(<Manage2FAVerifications />);
@@ -289,6 +303,7 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
         5551234567: [{ phoneNumber: "5551234567", type: "smsotp" }],
       },
       localLoading: false,
+      setLocalLoading: vi.fn(),
     });
 
     const { getByText } = render(<Manage2FAVerifications />);
