@@ -16,6 +16,22 @@ import "@testing-library/jest-dom/vitest";
 import Manage2FAVerifications from "../../../../components/Manage/SecuritySettings/Manage2FAVerifications";
 import { fido2Api } from "../../../../features/ManageFIDO2/api/fido2Api.jsx";
 
+// Mock GCDS web components — they rely on custom elements which don't work in jsdom
+vi.mock("@cdssnc/gcds-components-react", () => ({
+  GcdsButton: ({ children, ...props }) => (
+    <button {...props}>{children}</button>
+  ),
+  GcdsContainer: ({ children, ...props }) => <div {...props}>{children}</div>,
+  GcdsHeading: ({ children, ...props }) => <div {...props}>{children}</div>,
+  GcdsText: ({ children, ...props }) => <span {...props}>{children}</span>,
+  GcdsLink: ({ children, href, ...props }) => (
+    <a href={href || "#"} {...props}>
+      {children}
+    </a>
+  ),
+  GcdsGrid: ({ children, ...props }) => <div {...props}>{children}</div>,
+}));
+
 // Simple mocks for dependencies
 vi.mock("react-router", () => ({
   useParams: () => ({ language: "en" }),
@@ -68,12 +84,19 @@ vi.mock("../../../../utils/constants.jsx", () => ({
   PAGES: {
     manage2FAVerifications: "Manage2FAVerifications",
     securitySettings: "SecuritySettings",
+    addMFAPage: "AddMFAPage",
+    addFIDO2PasskeyPage: "AddFIDO2PasskeyPage",
+    deleteMFAPage: "DeleteMFAPage",
+    deleteFIDO2PasskeyPage: "DeleteFIDO2PasskeyPage",
+    renameFIDO2PasskeyPage: "RenameFIDO2PasskeyPage",
   },
   VITE_ENVIRONMENTS: {
     dev: "development",
     test: "test",
   },
   SERVICES: [],
+  // Enable so the FIDO2 fetch useEffect runs and setLoading(false) is called
+  NON_PROD_FEATURE: true,
 }));
 
 vi.mock("../../../../utils/routeHelpers.js", () => ({

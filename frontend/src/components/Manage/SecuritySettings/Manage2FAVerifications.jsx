@@ -11,13 +11,12 @@ import {
   MAP_TYPES,
   useOtpOperations,
 } from "../../../hooks/useOtpOperations.js";
-import { PAGES, VITE_ENVIRONMENTS } from "../../../utils/constants.jsx";
+import { NON_PROD_FEATURE, PAGES } from "../../../utils/constants.jsx";
 import { getPageContent } from "../../../utils/functions.jsx";
 import { path } from "../../../utils/routeHelpers.js";
 import Loader from "../../Layout/Loading.jsx";
 import { useUser } from "../../Providers/useUser.js";
 import NoticeFactory from "../../InfoBlocks/NoticeFactory.jsx";
-import config from "../../../config.jsx";
 import PhoneFactorsList from "./PhoneFactorsList.jsx";
 import FIDO2PasskeyList from "./FIDO2PasskeyList.jsx";
 import { fido2Api } from "../../../features/ManageFIDO2/api/fido2Api.jsx";
@@ -61,11 +60,6 @@ export default function Manage2FAVerifications() {
     language: language,
   });
 
-  // Only show add passkey link in dev and test environments
-  const showFIDO2PasskeyFeature =
-    config.environment === VITE_ENVIRONMENTS.dev ||
-    config.environment === VITE_ENVIRONMENTS.test;
-
   // Check if we came from another page and need to render success notice
   const { noticeType, phoneNumber, otpType, passkeyName } =
     location.state || {};
@@ -101,10 +95,9 @@ export default function Manage2FAVerifications() {
       }
     };
 
-    if (showFIDO2PasskeyFeature) {
+    if (NON_PROD_FEATURE) {
       fetchUserFIDO2Credentials();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return loading ? (
@@ -155,7 +148,7 @@ export default function Manage2FAVerifications() {
         </GcdsButton>
       </GcdsGrid>
 
-      {showFIDO2PasskeyFeature && (
+      {NON_PROD_FEATURE && (
         <GcdsGrid {...sectionCardProps}>
           <SectionHeader
             icon={<FIDOPasskeyIcon width="34" height="34" />}
