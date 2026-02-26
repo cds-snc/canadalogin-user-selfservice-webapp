@@ -42,6 +42,10 @@ export default defineConfig({
         test: {
           name: "unit",
           globals: true,
+          // Ensure React exports its development/test build which includes `act`.
+          // Without this, Test Explorer may not set NODE_ENV and React loads its
+          // production bundle where React.act is undefined.
+          env: { NODE_ENV: "test" },
           setupFiles: ["./src/setup-msw.js", "./src/setupTests.js"],
           include: [
             "src/__tests__/**/*.test.{js,jsx,ts,tsx}",
