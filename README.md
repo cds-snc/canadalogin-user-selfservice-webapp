@@ -29,6 +29,32 @@ git clone https://github.com/cds-snc/gc-signin-user-selfservice-webapp.git
 
 - See the [frontend README](frontend/README.md)
 
+### Developer Tooling
+
+#### VS Code Settings
+The `.vscode/settings.json` in this repo pre-configures VS Code for the project:
+- Sets the Python interpreter to the local `.venv`
+- Enables pytest in the Test Explorer (see the backend README for setup)
+
+#### Git Pre-commit Hook (optional)
+A pre-commit hook is available at `.githooks/pre-commit` that mirrors the same checks run in GitHub Actions CI/CD:
+- **Backend** — `black --check` (format) and `flake8` (lint) on staged Python files
+- **Frontend** — `prettier` and `eslint` via `lint-staged` on staged frontend files
+
+The hook is **opt-in** — it only activates when you run:
+
+```bash
+make setup-hooks
+```
+
+To disable it:
+
+```bash
+make uninstall-hooks
+```
+
+To bypass in a one-off situation: `git commit --no-verify`
+
 ### Additional Documentation
 
 - [IBM Verify Documentation](https://docs.verify.ibm.com/verify/reference/overview)

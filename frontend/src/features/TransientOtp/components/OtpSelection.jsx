@@ -43,7 +43,7 @@ export default function OtpSelection({
 
     // Add all SMS factors as radio options
     smsPhoneFactors?.forEach((smsPhoneFactor) => {
-      const smsLabel = `${pageContentJson["8"]} ${smsPhoneFactor.phoneNumber}`;
+      const smsLabel = `${pageContentJson["8"]} ${smsPhoneFactor.destination}`;
       const smsOtpRadioOption = {
         label: smsLabel,
         id: `${FLOW_TYPES.sms}-${smsPhoneFactor.id}`,
@@ -65,7 +65,7 @@ export default function OtpSelection({
 
     // Add all Voice factors as radio options
     voicePhoneFactors?.forEach((voicePhoneFactor) => {
-      const voiceLabel = `${pageContentJson["9"]} ${voicePhoneFactor.phoneNumber}`;
+      const voiceLabel = `${pageContentJson["9"]} ${voicePhoneFactor.destination}`;
       const voiceOtpRadioOption = {
         label: voiceLabel,
         id: `${FLOW_TYPES.voice}-${voicePhoneFactor.id}`,

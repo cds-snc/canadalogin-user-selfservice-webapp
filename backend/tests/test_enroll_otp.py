@@ -11,12 +11,12 @@ from app.users.schemas import IBMVerifyUserProfileSchema, ProfileResponse
 
 @pytest.fixture
 def mock_sms_enrollment_request():
-    return OtpEnrollmentRequest(phoneNumber="+19025555555", otpType=OtpType.SMS)
+    return OtpEnrollmentRequest(destination="+19025555555", otpType=OtpType.SMS)
 
 
 @pytest.fixture
 def mock_voice_enrollment_request():
-    return OtpEnrollmentRequest(phoneNumber="+19025555555", otpType=OtpType.VOICE)
+    return OtpEnrollmentRequest(destination="+19025555555", otpType=OtpType.VOICE)
 
 
 @pytest.fixture

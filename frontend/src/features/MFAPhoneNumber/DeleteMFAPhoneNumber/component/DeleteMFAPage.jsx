@@ -148,8 +148,8 @@ export default function DeleteMFAPage() {
 
         // Set the data in phoneFormData for deletion
         handlePhoneForm("mfaFactorsToDelete", mfaFactorsToDelete);
-        handlePhoneForm("phoneNumber", firstFactor.phoneNumber);
-        handlePhoneForm("formattedPhoneNumber", `${firstFactor.phoneNumber}`);
+        handlePhoneForm("phoneNumber", firstFactor.destination);
+        handlePhoneForm("formattedPhoneNumber", `${firstFactor.destination}`);
       } else {
         // Factor not found, go back to manage page
         navigate(backToManage2FAVerificationsPage);

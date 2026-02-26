@@ -66,7 +66,7 @@ async def handle_otp_enrollment(
         try:
             # Parse the enrollment response
             # Add phoneNumber from request since it may not be in IBM response
-            response_json["phoneNumber"] = enrollment_request.phoneNumber
+            response_json["destination"] = enrollment_request.destination
             enrollment_data = EnrollmentResponseData(**response_json)
 
             return ResponseModel(
@@ -103,7 +103,7 @@ async def dispatch_otp_enrollment(
 
         # Format phone number for IBM Verify
         formatted_phone = prepare_pydantic_phone_number_for_verify(
-            enrollment_request.phoneNumber
+            enrollment_request.destination
         )
 
         enrollment_data = {

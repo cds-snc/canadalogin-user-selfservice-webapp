@@ -59,34 +59,30 @@ export const useOtpOperations = (
 
   /**
    * Request OTP code to be sent to the selected MFA factor or email
-   * @param {string} overrideOtpType - Optional OTP type override
-   * @param {string} targetEmailAddress - Optional target email address for email OTP
+   * @param {object} override - Optional OTP override
    */
-  const requestOtpCode = async (overrideOtpType, targetEmailAddress) => {
+  const requestOtpCode = async (override) => {
     if (!userName) return;
 
-    // Allow direct email OTP requests or use selected MFA factor
-    const otpType =
-      overrideOtpType ||
-      (userSelectedMfaFactor
-        ? serverMapping[userSelectedMfaFactor.type]
-        : null);
-    if (!otpType) return;
+    let userData;
 
-    const userData = {
-      user_id: userId,
-      otpType,
-    };
-
-    // Add phoneNumber for SMS/Voice OTP
-    if (otpType !== "email" && userSelectedMfaFactor?.phoneNumber) {
-      userData.phoneNumber = userSelectedMfaFactor.phoneNumber;
+    if (userSelectedMfaFactor) {
+      userData = {
+        user_id: userId,
+        otpType: serverMapping[userSelectedMfaFactor.type],
+        factor_id: userSelectedMfaFactor.id,
+      };
     }
 
-    // Add emailAddress for email OTP when a target email is specified
-    if (otpType === "email" && targetEmailAddress) {
-      userData.emailAddress = targetEmailAddress;
+    if (override) {
+      userData = {
+        user_id: userId,
+        otpType: override.otpType,
+        destination: override.destination,
+      };
     }
+
+    if (!userData) return;
 
     try {
       const response = await authService.transientOtpSend(userData);
@@ -161,14 +157,14 @@ export const useOtpOperations = (
     return phoneFactors.reduce((acc, factor) => {
       if (mapType === MAP_TYPES.lastFourDigits) {
         // For AddMFAPage: key is last 4 digits, value is array of types
-        const visibleDigits = factor.phoneNumber.slice(-4);
+        const visibleDigits = factor.destination.slice(-4);
         acc[visibleDigits] = acc[visibleDigits]
           ? [...acc[visibleDigits], factor.type]
           : [factor.type];
       } else if (mapType === MAP_TYPES.fullPhoneNumber) {
         // For Manage2FAVerifications: key is full phone number, value is array of {type, id}
-        acc[factor.phoneNumber] = acc[factor.phoneNumber]
-          ? [...acc[factor.phoneNumber], { type: factor.type, id: factor.id }]
+        acc[factor.destination] = acc[factor.destination]
+          ? [...acc[factor.destination], { type: factor.type, id: factor.id }]
           : [{ type: factor.type, id: factor.id }];
       }
       return acc;
@@ -186,7 +182,7 @@ export const useOtpOperations = (
 
     setLocalLoading(true);
     try {
-      const response = await otpFactors.getUserOtpPhoneFactors(userId);
+      const response = await otpFactors.getUserOtpPhoneFactors();
       if (
         response &&
         response.success &&

@@ -9,6 +9,7 @@ from app.password.services.second_step_update_password import (
     second_step_update_password,
 )
 from app.password.services.verify_password import verify_user_password
+from app.password.services.verify_password_stepup import verify_password_for_stepup
 
 from app.password.services.third_step_update_password import third_step_update_password
 from app.password.services.password_policy import get_password_policy
@@ -113,6 +114,34 @@ async def verify_user(
     user_access_token: str = Depends(get_users_current_session),
 ):
     return await verify_user_password(
+        request,
+        user_access_token,
+        payload,
+    )
+
+
+@router.post(
+    "/verify/stepup",
+    tags=["Password"],
+    summary="Verify password for step-up authentication (FIDO2 flow)",
+    response_model=VerifiedUserPasswordResponse,
+)
+async def verify_user_for_stepup(
+    request: Request,
+    payload: UserPassword,
+    user_access_token: str = Depends(get_users_current_session),
+):
+    """
+    Enhanced password verification for FIDO2 step-up authentication.
+
+    Performs:
+    1. Get policyauth token
+    2. Verify password with returnJwt=true
+    3. Exchange password JWT for OAuth token
+
+    Stores the resulting token in session for subsequent FIDO2 authentication.
+    """
+    return await verify_password_for_stepup(
         request,
         user_access_token,
         payload,

@@ -5,7 +5,7 @@ from typing import Any, List, Optional
 from app.otp.schemas import OtpType
 from app.password.schemas import OtpType as PhoneOtpType
 from app.utils.schemas import ResponseModel
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 SCIM_CORE_USER = "urn:ietf:params:scim:schemas:core:2.0:User"
 SCIM_IBM_USER_EXT = "urn:ietf:params:scim:schemas:extension:ibm:2.0:User"
@@ -78,9 +78,70 @@ class Meta(BaseModel):
 
 
 class UserProfileName(BaseModel):
+    """
+    User profile name following Canadian naming conventions.
+
+    Rules:
+    - Only letters (including accented/international), spaces, hyphens, and apostrophes allowed
+    - No numbers or other symbols permitted
+    - First letter after spaces, hyphens, and apostrophes is auto-capitalized
+    """
+
     formatted: Optional[str] = None
     familyName: Optional[str] = None
     givenName: Optional[str] = None
+
+    @field_validator("familyName", "givenName")
+    @classmethod
+    def validate_name_characters(cls, v: Optional[str]) -> Optional[str]:
+        """
+        Validate and transform name fields according to Canadian naming rules.
+
+        Allowed characters:
+        - Letters (a-z, A-Z)
+        - Accented/international characters (À-ÿ, Ā-ž, А-я, etc.)
+        - Spaces
+        - Hyphens (-)
+        - Apostrophes (')
+
+        Not allowed:
+        - Numbers (0-9)
+        - Special symbols (@, #, $, %, etc.)
+
+        Transformation:
+        - Auto-capitalizes first letter after spaces, hyphens, and apostrophes
+        """
+        if v is None:
+            return v
+
+        import re
+
+        # Pattern matches valid name characters: letters (including international), spaces, hyphens, apostrophes
+        valid_pattern = (
+            r"^[a-zA-ZÀ-ÿĀ-žА-я\u0100-\u017F\u0180-\u024F\u1E00-\u1EFF\s'-]+$"
+        )
+
+        if not re.match(valid_pattern, v):
+            raise ValueError(
+                "Name contains invalid characters. Only letters, spaces, hyphens, and apostrophes are allowed. No numbers or special symbols permitted."
+            )
+
+        # Additional check: no numbers
+        if re.search(r"\d", v):
+            raise ValueError("Names cannot contain numbers")
+
+        # Auto-capitalize: split by spaces, hyphens, and apostrophes, then capitalize first letter
+        def capitalize_name(name: str) -> str:
+            parts = re.split(r"([\s'-])", name)  # Split while keeping delimiters
+            capitalized_parts = []
+            for part in parts:
+                if re.match(r"^[\s'-]$", part):  # Keep delimiters as-is
+                    capitalized_parts.append(part)
+                elif part:  # Capitalize non-empty parts
+                    capitalized_parts.append(part[0].upper() + part[1:].lower())
+            return "".join(capitalized_parts)
+
+        return capitalize_name(v)
 
 
 class IBMVerifyUserProfileSchema(BaseModel):
@@ -189,7 +250,7 @@ class UserAuthFactorsIbmResponse(BaseModel):
 class UserPhoneOTP(BaseModel):
     id: str
     type: PhoneOtpType
-    phoneNumber: str
+    destination: str
 
 
 class UserPhoneOTPFactors(BaseModel):

@@ -172,6 +172,7 @@ export const SUBMIT_END_POINTS = {
   sessionStatus: "/v1/auth/session-status",
   keepAlive: "/v1/auth/keep-alive",
   passwordVerify: "/v1/password/verify",
+  passwordVerifyStepup: "/v1/password/verify/stepup",
 };
 
 export const RP_CLIENT_ID_KEY = "rp_client_id";
@@ -197,9 +198,7 @@ export const VITE_ENVIRONMENTS = {
   prod: "prod",
 };
 
-export const NON_PROD_FEATURE =
-  config.environment === VITE_ENVIRONMENTS.dev ||
-  config.environment === VITE_ENVIRONMENTS.test;
+export const NON_PROD_FEATURE = config.environment === VITE_ENVIRONMENTS.dev;
 
 export const countryMapping = {
   countries: [

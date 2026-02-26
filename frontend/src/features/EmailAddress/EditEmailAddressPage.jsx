@@ -267,7 +267,10 @@ export default function EditEmailAddressPage() {
         userOtpValue={userOtpValue}
         handleChange={handleSetUserOtpValue}
         requestOtpCode={() =>
-          requestOtpCode(FLOW_TYPES.email, formData.emailAddress)
+          requestOtpCode({
+            otpType: FLOW_TYPES.email,
+            destination: formData.emailAddress,
+          })
         }
         onBack={handleBackToEnterEmail}
       />

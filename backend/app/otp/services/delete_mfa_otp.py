@@ -4,7 +4,6 @@ from datetime import datetime
 from app.config import get_configuration
 from app.otp.schemas import OtpDeletionRequest, OtpType
 from app.users.services.otp_factors import get_user_otp_factors
-from app.users.services.get_my_profile import get_my_profile
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.request_error_handler import RequestErrorHandler
 from app.utils.schemas import ResponseModel
@@ -28,7 +27,7 @@ def _get_endpoint_for_otp_type(otp_type: OtpType) -> str:
 async def handle_otp_deletion(
     global_http_client: AsyncClient,
     deletion_request: OtpDeletionRequest,
-    user_access_token: str,
+    user_id: str,
 ):
     """Delete an OTP factor enrollment (SMS or Voice) after OTP verification"""
     try:
@@ -45,25 +44,10 @@ async def handle_otp_deletion(
             otp_type=deletion_request.otpVerificationType,
         )
 
-        # Step 2: Verify user profile
-        my_profile_response = await get_my_profile(
-            global_http_client, user_access_token
-        )
-        if not my_profile_response.success:
-            logger.error(f"Failed to get user profile for {otp_type} deletion")
-            return ResponseModel(
-                success=False, data=None, message="User verification failed"
-            )
-
-        user_id = my_profile_response.data.id
-        logger.info(
-            f"Deleting {otp_type} OTP factor {deletion_request.id} for user: {user_id}"
-        )
-
-        # Step 3: Check if user has multiple factors before allowing deletion
+        # Step 2: Check if user has multiple factors before allowing deletion
         # Check all factors (validated and unvalidated) to prevent deletion of last remaining factor
         user_factors_response = await get_user_otp_factors(
-            global_http_client, user_id, user_access_token, validated=None
+            global_http_client, user_id, validated=None
         )
         if not user_factors_response.success or len(user_factors_response.data) <= 1:
             logger.warning(f"User {user_id} cannot delete last remaining MFA factor")
@@ -72,7 +56,7 @@ async def handle_otp_deletion(
                 detail="Cannot delete last remaining MFA factor",
             )
 
-        # Step 4: Dispatch the deletion to IBM Verify
+        # Step 3: Dispatch the deletion to IBM Verify
         http_client_response = await dispatch_otp_deletion(
             global_http_client, deletion_request
         )

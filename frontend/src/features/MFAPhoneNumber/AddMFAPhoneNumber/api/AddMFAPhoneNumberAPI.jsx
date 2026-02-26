@@ -1,18 +1,16 @@
-import axios from "axios";
+import axios from "../../../../utils/axiosInstance.js";
 import config from "../../../../config.jsx";
 import { handleApiError } from "../../../../utils/apiErrorHandler.js";
 import { SUBMIT_END_POINTS } from "../../../../utils/constants.jsx";
 
-axios.defaults.withCredentials = true;
-
 export const addMFAPhoneNumberApi = {
   // Enroll a phone number for MFA OTP authentication
-  enrollMFA: async ({ phoneNumber, otpType }) => {
+  enrollMFA: async ({ destination, otpType }) => {
     try {
       const response = await axios.post(
         `${config.apiUrl}${SUBMIT_END_POINTS.mfaEnroll}`,
         {
-          phoneNumber,
+          destination,
           otpType,
         },
       );

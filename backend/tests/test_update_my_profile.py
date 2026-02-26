@@ -1070,3 +1070,117 @@ async def test_update_profile_for_verified_changes_response_validation_error(
 
     assert exc.value.status_code == 422
     assert "Request data validation error" in exc.value.detail
+
+
+def test_user_profile_name_validation_rejects_numbers():
+    """Test that UserProfileName rejects names with numbers"""
+    from pydantic import ValidationError
+
+    # Test givenName with numbers
+    with pytest.raises(ValidationError) as exc:
+        UserProfileName(givenName="John123", familyName="Doe")
+
+    assert "Name contains invalid characters" in str(
+        exc.value
+    ) or "Names cannot contain numbers" in str(exc.value)
+
+    # Test familyName with numbers
+    with pytest.raises(ValidationError) as exc:
+        UserProfileName(givenName="John", familyName="Doe456")
+
+    assert "Name contains invalid characters" in str(
+        exc.value
+    ) or "Names cannot contain numbers" in str(exc.value)
+
+
+def test_user_profile_name_validation_rejects_special_symbols():
+    """Test that UserProfileName rejects names with special symbols (except hyphen and apostrophe)"""
+    from pydantic import ValidationError
+
+    invalid_names = [
+        "John@",
+        "Doe#Smith",
+        "Jane$",
+        "Smith%Jones",
+        "O&Connor",
+        "Jean*Pierre",
+    ]
+
+    for invalid_name in invalid_names:
+        with pytest.raises(ValidationError) as exc:
+            UserProfileName(givenName=invalid_name, familyName="Test")
+
+        assert "Name contains invalid characters" in str(exc.value)
+
+
+def test_user_profile_name_validation_allows_valid_characters():
+    """Test that UserProfileName allows valid characters"""
+
+    # Valid names with letters, spaces, hyphens, apostrophes
+    valid_names = [
+        ("Jean-Pierre", "Dubois"),
+        ("Mary", "O'Connor"),
+        ("José", "García"),
+        ("François", "Müller"),
+        ("Anne Marie", "Smith-Jones"),
+        ("Владимир", "Иванов"),  # Cyrillic
+    ]
+
+    for given_name, family_name in valid_names:
+        # Should not raise an exception
+        name = UserProfileName(givenName=given_name, familyName=family_name)
+        assert name.givenName == given_name
+        assert name.familyName == family_name
+
+
+def test_user_profile_name_validation_allows_none():
+    """Test that UserProfileName allows None values for optional fields"""
+
+    # givenName is optional
+    name = UserProfileName(givenName=None, familyName="Doe")
+    assert name.givenName is None
+    assert name.familyName == "Doe"
+
+    # Both can be None (though this might not make sense in practice)
+    name = UserProfileName(givenName=None, familyName=None)
+    assert name.givenName is None
+    assert name.familyName is None
+
+
+def test_user_profile_name_auto_capitalizes():
+    """Test that names are auto-capitalized according to Canadian naming rules"""
+
+    # Test simple names - lowercase to capitalized
+    name = UserProfileName(familyName="smith", givenName="john")
+    assert name.familyName == "Smith"
+    assert name.givenName == "John"
+
+    # Test hyphenated names - capitalize after hyphens
+    name = UserProfileName(familyName="martin-jones", givenName="jean-pierre")
+    assert name.familyName == "Martin-Jones"
+    assert name.givenName == "Jean-Pierre"
+
+    # Test names with apostrophes - capitalize after apostrophes
+    name = UserProfileName(familyName="o'connor", givenName="d'angelo")
+    assert name.familyName == "O'Connor"
+    assert name.givenName == "D'Angelo"
+
+    # Test names with spaces - capitalize after spaces
+    name = UserProfileName(familyName="van der berg", givenName="mary anne")
+    assert name.familyName == "Van Der Berg"
+    assert name.givenName == "Mary Anne"
+
+    # Test mixed case input - should normalize to proper capitalization
+    name = UserProfileName(familyName="McDONALD", givenName="SARAH")
+    assert name.familyName == "Mcdonald"
+    assert name.givenName == "Sarah"
+
+    # Test complex combinations - multiple delimiters
+    name = UserProfileName(familyName="o'brien-smith", givenName="jean-marie")
+    assert name.familyName == "O'Brien-Smith"
+    assert name.givenName == "Jean-Marie"
+
+    # Test already properly capitalized names - should remain unchanged
+    name = UserProfileName(familyName="O'Neill", givenName="Mary-Jane")
+    assert name.familyName == "O'Neill"
+    assert name.givenName == "Mary-Jane"

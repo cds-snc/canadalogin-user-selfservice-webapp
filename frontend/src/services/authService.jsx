@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "../utils/axiosInstance.js";
 import config from "../config";
 import {
   FLOW_TYPES,
@@ -15,8 +15,6 @@ import {
   TEST_USERS,
   VALIDATION_CODE_ERROR_RESPONSE,
 } from "../stories/Tests/utils/constants.jsx";
-
-axios.defaults.withCredentials = true;
 
 export const authService = {
   requestPasswordPolicy: async () => {
@@ -232,6 +230,17 @@ export const authService = {
     try {
       const response = await axios.post(
         `${config.apiUrl}${SUBMIT_END_POINTS.passwordVerify}`,
+        { password },
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+  verifyPasswordForStepup: async ({ password }) => {
+    try {
+      const response = await axios.post(
+        `${config.apiUrl}${SUBMIT_END_POINTS.passwordVerifyStepup}`,
         { password },
       );
       return response.data;

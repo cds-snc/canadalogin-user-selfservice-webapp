@@ -35,20 +35,20 @@ export const SelectVoiceCallRadioButton = (() => {
     [
       {
         type: "get",
-        endpoint: "/v1/users/test-user-123/otp_factors",
+        endpoint: "/v1/users/otp_factors",
         response: {
           success: true,
           data: [
             {
               id: "factor-1",
               type: "smsotp",
-              phoneNumber: "+15551234567",
+              destination: "+15551234567",
               status: "active",
             },
             {
               id: "factor-2",
               type: "voiceotp",
-              phoneNumber: "+15559876543",
+              destination: "+15559876543",
               status: "active",
             },
           ],
@@ -278,20 +278,20 @@ export const SelectTextMessageRadioButton = (() => {
     [
       {
         type: "get",
-        endpoint: "/v1/users/test-user-123/otp_factors",
+        endpoint: "/v1/users/otp_factors",
         response: {
           success: true,
           data: [
             {
               id: "factor-1",
               type: "smsotp",
-              phoneNumber: "+15559876543",
+              destination: "+15559876543",
               status: "active",
             },
             {
               id: "factor-2",
               type: "voiceotp",
-              phoneNumber: "+15559876543",
+              destination: "+15559876543",
               status: "active",
             },
           ],
@@ -525,20 +525,20 @@ export const CompleteAddMFAFlowSMS = (() => {
     [
       {
         type: "get",
-        endpoint: "/v1/users/test-user-123/otp_factors",
+        endpoint: "/v1/users/otp_factors",
         response: {
           success: true,
           data: [
             {
               id: "factor-1",
               type: "smsotp",
-              phoneNumber: "+15551234567",
+              destination: "+15551234567",
               status: "active",
             },
             {
               id: "factor-2",
               type: "voiceotp",
-              phoneNumber: "+15551234567",
+              destination: "+15551234567",
               status: "active",
             },
           ],
@@ -1019,20 +1019,20 @@ export const ResendOtpCode = (() => {
     [
       {
         type: "get",
-        endpoint: "/v1/users/test-user-123/otp_factors",
+        endpoint: "/v1/users/otp_factors",
         response: {
           success: true,
           data: [
             {
               id: "factor-1",
               type: "smsotp",
-              phoneNumber: "+15551234567",
+              destination: "+15551234567",
               status: "active",
             },
             {
               id: "factor-2",
               type: "voiceotp",
-              phoneNumber: "+15551234567",
+              destination: "+15551234567",
               status: "active",
             },
           ],
@@ -1328,20 +1328,20 @@ export const UseDifferentPhoneNumber = (() => {
     [
       {
         type: "get",
-        endpoint: "/v1/users/test-user-123/otp_factors",
+        endpoint: "/v1/users/otp_factors",
         response: {
           success: true,
           data: [
             {
               id: "factor-1",
               type: "smsotp",
-              phoneNumber: "+15551234567",
+              destination: "+15551234567",
               status: "active",
             },
             {
               id: "factor-2",
               type: "voiceotp",
-              phoneNumber: "+15551234567",
+              destination: "+15551234567",
               status: "active",
             },
           ],

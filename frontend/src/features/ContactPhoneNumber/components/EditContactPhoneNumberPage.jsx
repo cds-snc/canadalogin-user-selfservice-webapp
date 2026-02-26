@@ -65,7 +65,7 @@ export default function EditContactPhoneNumberPage() {
       setErrorCode("");
 
       const formdata = {
-        phoneNumber: phoneFormData.phoneNumber,
+        destination: phoneFormData.phoneNumber,
         user_id: id,
         otpType: serverMapping[otpType || phoneFormData.otpType],
       };

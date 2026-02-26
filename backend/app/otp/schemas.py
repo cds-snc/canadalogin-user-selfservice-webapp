@@ -1,9 +1,16 @@
 from enum import Enum
 from typing import Optional
 
-from app.utils.helpers import is_masked_phone_number
 from app.utils.schemas import ResponseModel
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
+from app.utils.string_masking import mask_phone_number, mask_email_address
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    EmailStr,
+    Field,
+    model_validator,
+    field_validator,
+)
 from pydantic_extra_types.phone_numbers import PhoneNumber
 
 
@@ -32,24 +39,19 @@ class AuthenticatedUserResponse(ResponseModel):
 
 
 class UserOtpInfo(BaseModel):
-    phoneNumber: Optional[str] = (
-        None  # Changed from PhoneNumber to str to handle masked numbers
-    )
+    factor_id: Optional[str] = None
     user_id: str
-    emailAddress: Optional[EmailStr] = (
-        None  # For sending OTP to a different email address
-    )
     otpType: OtpType
+    destination: Optional[str] = None
 
-    @field_validator("phoneNumber")
-    @classmethod
-    def validate_phone_number(cls, v):
-        if v is None:
-            return v
+    @model_validator(mode="after")
+    def validate(self):
+        if self.factor_id is None and self.destination is None:
+            raise ValueError("Must contain factor_id or destination")
 
-        # Allow masked phone numbers to pass through without validation
-        if is_masked_phone_number(v):
-            return v
+        # Validate only phone numbers
+        if self.otpType not in {OtpType.SMS, OtpType.VOICE} or self.destination is None:
+            return self
 
         # For non-masked numbers, validate with PhoneNumber using a temporary model
         try:
@@ -57,10 +59,12 @@ class UserOtpInfo(BaseModel):
             class TempPhoneModel(BaseModel):
                 phone: PhoneNumber
 
-            temp_model = TempPhoneModel(phone=v)
-            return temp_model.phone  # This will be the tel: formatted string
+            temp_model = TempPhoneModel(phone=self.destination)
+            self.destination = temp_model.phone
         except Exception as e:
-            raise ValueError(f"Invalid phone number format: {v}") from e
+            raise ValueError(f"Invalid phone number format: {self.destination}") from e
+
+        return self
 
 
 class OtpDataResponse(BaseModel):
@@ -76,6 +80,18 @@ class OtpDataResponse(BaseModel):
     emailAddress: Optional[str] = None
     attempts: int
     retries: int
+
+    @field_validator("phoneNumber")
+    def mask_phone_number(cls, v):
+        if v is None:
+            return v
+        return mask_phone_number(v)
+
+    @field_validator("emailAddress")
+    def mask_email_address(cls, v):
+        if v is None:
+            return v
+        return mask_email_address(v)
 
 
 class OtpRequestResponse(ResponseModel):
@@ -94,7 +110,7 @@ class RetrievalData(BaseModel):
 
 
 class OtpEnrollmentRequest(BaseModel):
-    phoneNumber: PhoneNumber
+    destination: PhoneNumber
     otpType: OtpType
 
 
@@ -103,7 +119,7 @@ class EnrollmentResponseData(BaseModel):
     id: str
     userId: str
     type: str
-    phoneNumber: str
+    destination: str
     created: str
     updated: str
     enabled: bool

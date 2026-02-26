@@ -5,9 +5,14 @@ import { authService } from "../services/authService";
  * Custom hook for password validation
  * @param {Function} setErrorCode - Function to set error codes
  * @param {Function} onSuccess - Callback function to execute on successful validation
+ * @param {boolean} useStepup - If true, uses stepup endpoint for FIDO2 token exchange
  * @returns {Object} - Object containing validatePassword function and loading state
  */
-export function usePasswordValidation(setErrorCode, onSuccess) {
+export function usePasswordValidation(
+  setErrorCode,
+  onSuccess,
+  useStepup = false,
+) {
   const [validatePasswordLoading, setValidatePasswordLoading] = useState(false);
   const validatePassword = async (userPasswordValue) => {
     setValidatePasswordLoading(true);
@@ -31,10 +36,14 @@ export function usePasswordValidation(setErrorCode, onSuccess) {
         }
       }
 
-      // Verify password with backend
-      const response = await authService.verifyPassword({
-        password: userPasswordValue,
-      });
+      // Verify password with backend (use stepup endpoint if requested)
+      const response = useStepup
+        ? await authService.verifyPasswordForStepup({
+            password: userPasswordValue,
+          })
+        : await authService.verifyPassword({
+            password: userPasswordValue,
+          });
 
       if (response && response.success) {
         setErrorCode("");

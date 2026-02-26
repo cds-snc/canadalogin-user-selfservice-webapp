@@ -48,7 +48,7 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
     />
   ),
   GcdsInput: ({ inputId, ...props }) => {
-    const { name, type, value, onChange, onKeyDown, ...domProps } = props;
+    const { name, type, value, onInput, ...domProps } = props;
     return (
       <input
         {...domProps}
@@ -56,8 +56,7 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
         name={name}
         type={type}
         value={value}
-        onChange={onChange}
-        onKeyDown={onKeyDown}
+        onInput={onInput}
         data-testid={props["data-testid"]}
       />
     );
@@ -262,7 +261,7 @@ describe("UpdateProfileName Component", () => {
     expect(lastNameInput).toHaveValue("");
 
     // Simulate typing in first name
-    fireEvent.change(firstNameInput, {
+    fireEvent.input(firstNameInput, {
       target: { name: "givenName", value: mockUpdateUserName.firstName },
     });
 
@@ -272,7 +271,7 @@ describe("UpdateProfileName Component", () => {
     );
 
     // Simulate typing in last name
-    fireEvent.change(lastNameInput, {
+    fireEvent.input(lastNameInput, {
       target: { name: "familyName", value: mockUpdateUserName.lastName },
     });
 
@@ -337,7 +336,7 @@ describe("UpdateProfileName Component", () => {
 
     const firstNameInput = screen.getByTestId("givenName");
 
-    fireEvent.change(firstNameInput, {
+    fireEvent.input(firstNameInput, {
       target: { name: "givenName", value: "New" },
     });
 
@@ -376,26 +375,20 @@ describe("UpdateProfileName Component", () => {
     const firstNameInput = screen.getByTestId("givenName");
     const lastNameInput = screen.getByTestId("familyName");
 
-    // Test invalid characters (numbers, special characters)
-    fireEvent.change(firstNameInput, {
+    // Test invalid characters (numbers, special characters) - they get filtered out
+    fireEvent.input(firstNameInput, {
       target: { name: "givenName", value: "John123" },
     });
 
-    // onNameFormChange should not be called for invalid input
-    expect(mockOnNameFormChange).not.toHaveBeenCalledWith(
-      "givenName",
-      "John123",
-    );
+    // onNameFormChange should be called with filtered value (numbers removed and capitalized)
+    expect(mockOnNameFormChange).toHaveBeenCalledWith("givenName", "John");
 
-    fireEvent.change(lastNameInput, {
+    fireEvent.input(lastNameInput, {
       target: { name: "familyName", value: "Doe@#$" },
     });
 
-    // onNameFormChange should not be called for invalid input
-    expect(mockOnNameFormChange).not.toHaveBeenCalledWith(
-      "familyName",
-      "Doe@#$",
-    );
+    // onNameFormChange should be called with filtered value (symbols removed)
+    expect(mockOnNameFormChange).toHaveBeenCalledWith("familyName", "Doe");
   });
 
   it("allows valid characters in name inputs", () => {
@@ -409,7 +402,7 @@ describe("UpdateProfileName Component", () => {
     const lastNameInput = screen.getByTestId("familyName");
 
     // Test valid characters (letters, spaces, hyphens, apostrophes)
-    fireEvent.change(firstNameInput, {
+    fireEvent.input(firstNameInput, {
       target: { name: "givenName", value: "Jean-Pierre" },
     });
 
@@ -418,7 +411,7 @@ describe("UpdateProfileName Component", () => {
       "Jean-Pierre",
     );
 
-    fireEvent.change(lastNameInput, {
+    fireEvent.input(lastNameInput, {
       target: { name: "familyName", value: "O'Connor" },
     });
 
@@ -435,18 +428,46 @@ describe("UpdateProfileName Component", () => {
     const firstNameInput = screen.getByTestId("givenName");
     const lastNameInput = screen.getByTestId("familyName");
 
-    // Test international characters
-    fireEvent.change(firstNameInput, {
-      target: { name: "givenName", value: "José" },
+    // Test international characters - should be capitalized
+    fireEvent.input(firstNameInput, {
+      target: { name: "givenName", value: "josé" },
     });
 
     expect(mockOnNameFormChange).toHaveBeenCalledWith("givenName", "José");
 
-    fireEvent.change(lastNameInput, {
-      target: { name: "familyName", value: "Müller" },
+    fireEvent.input(lastNameInput, {
+      target: { name: "familyName", value: "müller" },
     });
 
     expect(mockOnNameFormChange).toHaveBeenCalledWith("familyName", "Müller");
+  });
+
+  it("capitalizes first letter of names", () => {
+    render(
+      <TestWrapper>
+        <UpdateProfileName {...defaultProps} />
+      </TestWrapper>,
+    );
+
+    const firstNameInput = screen.getByTestId("givenName");
+    const lastNameInput = screen.getByTestId("familyName");
+
+    // Test lowercase input - should be capitalized
+    fireEvent.input(firstNameInput, {
+      target: { name: "givenName", value: "john" },
+    });
+
+    expect(mockOnNameFormChange).toHaveBeenCalledWith("givenName", "John");
+
+    // Test hyphenated names - each part should be capitalized
+    fireEvent.input(lastNameInput, {
+      target: { name: "familyName", value: "smith-jones" },
+    });
+
+    expect(mockOnNameFormChange).toHaveBeenCalledWith(
+      "familyName",
+      "Smith-Jones",
+    );
   });
 
   it("allows valid characters to be typed via keydown", () => {

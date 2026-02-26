@@ -31,7 +31,31 @@ This is the frontend application built with React and GC Design System for the G
    npm run test
    ```
 
-See package.json scripts for additional commands.
+See `package.json` scripts for additional commands.
+
+### Pre-commit Hook (optional)
+
+A pre-commit hook is available that runs `prettier` and `eslint` automatically on staged frontend files whenever you commit. It is **opt-in** and must be activated from the repo root:
+
+```bash
+make setup-hooks
+```
+
+To disable it:
+
+```bash
+make uninstall-hooks
+```
+
+To run the same checks manually:
+
+```bash
+# Auto-fix lint and format issues
+npm run fix
+
+# Check only (no changes written — mirrors CI)
+npm run check
+```
 
 4. Run Storybook:
    ```bash

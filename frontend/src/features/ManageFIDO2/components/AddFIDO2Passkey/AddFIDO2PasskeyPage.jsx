@@ -54,7 +54,8 @@ export default function AddFIDO2PasskeyPage({ step }) {
     setOtpSentResponse,
   } = useOtpOperations(id, userName, setErrorCode, backToSecuritySettingsPage);
 
-  // Use the password validation hook
+  // Use the password validation hook with stepup=true for FIDO2 step-up authentication
+  // This enables token exchange that stores stepup_token in session
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(
     setErrorCode,
     () => {
@@ -77,8 +78,8 @@ export default function AddFIDO2PasskeyPage({ step }) {
   const requestOtpCode = async () => {
     const userData = {
       user_id: userProfile.id,
+      factor_id: userSelectedMfaFactor.id,
       otpType: serverMapping[userSelectedMfaFactor.type],
-      phoneNumber: userSelectedMfaFactor.phoneNumber,
     };
     try {
       const response = await authService.transientOtpSend(userData);
