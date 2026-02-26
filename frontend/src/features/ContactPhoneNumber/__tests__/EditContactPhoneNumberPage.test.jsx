@@ -1,7 +1,7 @@
 import { BrowserRouter } from "react-router";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import EditContactPhoneNumberPage from "../components/EditContactPhoneNumberPage.jsx";
+import EditContactPhoneNumberPage from "../components/EditContactPhoneNumberPage";
 import { UserProvider } from "../../../components/Providers/UserProvider.tsx";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider.tsx";
 import "@testing-library/jest-dom/vitest";
@@ -23,7 +23,7 @@ vi.mock("react-router", async () => {
 });
 
 // Mock auth service
-vi.mock("../../../services/authService.jsx", () => ({
+vi.mock("../../../services/authService", () => ({
   authService: {
     transientOtpSend: vi.fn(),
     transientOtpVerify: vi.fn(),
@@ -36,26 +36,26 @@ vi.mock("../../../services/authService.jsx", () => ({
 }));
 
 // Mock utility functions
-vi.mock("../../../utils/functions.jsx", () => ({
+vi.mock("../../../utils/functions", () => ({
   getPageContent: () => ({
     11: "Loading...",
     error: "An error occurred",
   }),
 }));
 
-vi.mock("../../../utils/routeHelpers.js", () => ({
+vi.mock("../../../utils/routeHelpers", () => ({
   path: vi.fn(() => "/en/profile"),
 }));
 
-vi.mock("../../../utils/userProfileDispatch.jsx", () => ({
+vi.mock("../../../utils/userProfileDispatch", () => ({
   userProfileDispatch: () => ({
     updateProfileSuccess: vi.fn(),
   }),
 }));
 
 // Mock constants
-vi.mock("../../../utils/constants.jsx", async () => {
-  const actual = await vi.importActual("../../../utils/constants.jsx");
+vi.mock("../../../utils/constants", async () => {
+  const actual = await vi.importActual("../../../utils/constants");
   return {
     ...actual,
     SERVICES: [{ id: 1, title: "Test Service", description: "", url: "#" }],
@@ -63,7 +63,7 @@ vi.mock("../../../utils/constants.jsx", async () => {
 });
 
 // Mock components
-vi.mock("../components/EnterPhoneNumber.jsx", () => ({
+vi.mock("../components/EnterPhoneNumber", () => ({
   default: ({
     onNext,
     onCancel,
@@ -89,7 +89,7 @@ vi.mock("../components/EnterPhoneNumber.jsx", () => ({
   ),
 }));
 
-vi.mock("../components/OtpVerification.jsx", () => ({
+vi.mock("../components/OtpVerification", () => ({
   default: ({
     onNext,
     onCancel,
@@ -124,7 +124,7 @@ vi.mock("../components/OtpVerification.jsx", () => ({
   ),
 }));
 
-vi.mock("../components/ConfirmUpdate.jsx", () => ({
+vi.mock("../components/ConfirmUpdate", () => ({
   default: ({ onNext, onCancel, phoneFormData }) => (
     <div data-testid="confirm-update">
       <h2>Confirm Update</h2>
@@ -139,7 +139,7 @@ vi.mock("../components/ConfirmUpdate.jsx", () => ({
   ),
 }));
 
-vi.mock("../components/SuccessfullyUpdated.jsx", () => ({
+vi.mock("../components/SuccessfullyUpdated", () => ({
   default: ({ onNext, phoneFormData }) => (
     <div data-testid="successfully-updated">
       <h2>Successfully Updated</h2>
@@ -151,11 +151,11 @@ vi.mock("../components/SuccessfullyUpdated.jsx", () => ({
   ),
 }));
 
-vi.mock("../../../components/Wizard/StepContent.jsx", () => ({
+vi.mock("../../../components/Wizard/StepContent", () => ({
   default: ({ StepComponent }) => StepComponent,
 }));
 
-vi.mock("../../../components/Layout/Loading.jsx", () => ({
+vi.mock("../../../components/Layout/Loading", () => ({
   default: ({ text }) => <div data-testid="loader">{text}</div>,
 }));
 
@@ -198,7 +198,7 @@ describe("EditContactPhoneNumberPage Component", () => {
     mockParams = { language: "en", step: undefined };
 
     // Get the mocked auth service
-    const { authService } = await import("../../../services/authService.jsx");
+    const { authService } = await import("../../../services/authService");
     mockAuthService = authService;
   });
 

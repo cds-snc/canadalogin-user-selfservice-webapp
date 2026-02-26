@@ -1,5 +1,5 @@
-import ConfirmUpdate from "../../../features/ProfileName/components/ConfirmUpdate.jsx";
-import { AVAILABLE_LANGUAGES } from "../../../utils/constants.jsx";
+import ConfirmUpdate from "../../../features/ProfileName/components/ConfirmUpdate";
+import { AVAILABLE_LANGUAGES } from "../../../utils/constants";
 import { UserProvider } from "../../../components/Providers/UserProvider.tsx";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider.tsx";
 

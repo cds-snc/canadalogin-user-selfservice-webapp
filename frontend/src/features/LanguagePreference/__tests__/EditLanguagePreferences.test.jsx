@@ -3,7 +3,7 @@ import "@testing-library/jest-dom/vitest";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { useParams, useNavigate } from "react-router";
-import EditLanguagePreferences from "../components/EditLanguagePreferences.jsx";
+import EditLanguagePreferences from "../components/EditLanguagePreferences";
 import { useUser } from "../../../components/Providers/useUser.tsx";
 
 // ────────────────────────────────────────────────
@@ -24,7 +24,7 @@ vi.mock("../../../components/Providers/useUser.tsx", () => ({
   useUser: vi.fn(),
 }));
 
-vi.mock("../../../utils/functions.jsx", () => ({
+vi.mock("../../../utils/functions", () => ({
   getPageContent: vi.fn(() => ({
     1: "Edit language preferences",
     2: "Select your preferred language for notifications and communications.",
@@ -41,7 +41,7 @@ vi.mock("../../../utils/functions.jsx", () => ({
   }),
 }));
 
-vi.mock("../../../utils/routeHelpers.js", () => ({
+vi.mock("../../../utils/routeHelpers", () => ({
   path: vi.fn((page, params) => {
     if (page === "profile-home") return `/${params.language}/profile`;
     if (page === "confirm-language-update")
@@ -50,7 +50,7 @@ vi.mock("../../../utils/routeHelpers.js", () => ({
   }),
 }));
 
-vi.mock("../../../utils/constants.jsx", () => ({
+vi.mock("../../../utils/constants", () => ({
   PAGES: {
     editLanguagePreferences: "edit-language-preferences",
     ProfileHome: "profile-home",
@@ -69,7 +69,7 @@ vi.mock("../../../utils/constants.jsx", () => ({
 }));
 
 vi.mock(
-  "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx",
+  "../../../components/InfoBlocks/ServicesWithAccessInfoSection",
   () => ({
     default: ({ currentLang }) => (
       <div data-testid="services-info">Services Info - {currentLang}</div>

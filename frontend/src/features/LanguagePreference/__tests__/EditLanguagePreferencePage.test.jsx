@@ -2,7 +2,7 @@ import "@testing-library/jest-dom/vitest";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { useParams, useLocation, useNavigate } from "react-router";
-import EditLanguagePreferencePage from "../components/EditLanguagePreferencePage.jsx";
+import EditLanguagePreferencePage from "../components/EditLanguagePreferencePage";
 import { useUser } from "../../../components/Providers/useUser.tsx";
 
 // Mock all the dependencies
@@ -22,14 +22,14 @@ vi.mock("../../../components/Providers/useUser.tsx", () => ({
   useUser: vi.fn(),
 }));
 
-vi.mock("../../../components/Wizard/StepContent.jsx", () => ({
+vi.mock("../../../components/Wizard/StepContent", () => ({
   __esModule: true,
   default: ({ StepComponent }) => (
     <div data-testid="step-content">{StepComponent}</div>
   ),
 }));
 
-vi.mock("../../../components/Layout/Loading.jsx", () => ({
+vi.mock("../../../components/Layout/Loading", () => ({
   __esModule: true,
   default: ({ text }) => <div data-testid="loading">{text}</div>,
 }));

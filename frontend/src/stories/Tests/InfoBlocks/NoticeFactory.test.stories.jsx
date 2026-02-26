@@ -1,11 +1,11 @@
 import { expect, within, waitFor } from "@storybook/test";
-import { AVAILABLE_LANGUAGES, PAGES } from "../../../utils/constants.jsx";
+import { AVAILABLE_LANGUAGES, PAGES } from "../../../utils/constants";
 import { buildTestCase, TestTemplate } from "../utils/functions.tsx";
 import {
   waitForGcdsNotice,
   waitForTextContent,
-} from "../utils/gcdsTestHelpers.js";
-import NoticeFactory from "../../../components/InfoBlocks/NoticeFactory.jsx";
+} from "../utils/gcdsTestHelpers";
+import NoticeFactory from "../../../components/InfoBlocks/NoticeFactory";
 
 export default {
   title: "GC Sign In/Tests/InfoBlocks/NoticeFactory",

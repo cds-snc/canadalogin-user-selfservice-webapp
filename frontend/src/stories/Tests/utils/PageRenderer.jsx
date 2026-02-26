@@ -1,24 +1,24 @@
 import React from "react";
-import { PAGES } from "../../../utils/constants.jsx";
+import { PAGES } from "../../../utils/constants";
 
 // Import all the components that were previously handled by the Page component
-import ManageDashboard from "../../../components/Manage/ManageDashboard.jsx";
-import ProfileHome from "../../../components/Manage/ProfileHome.jsx";
-import EditProfileNamePage from "../../../features/ProfileName/components/EditProfileNamePage.jsx";
-import EditLanguagePreferencePage from "../../../features/LanguagePreference/components/EditLanguagePreferencePage.jsx";
-import SecuritySettings from "../../../components/Manage/SecuritySettings/SecuritySettings.jsx";
-import Manage2FAVerifications from "../../../components/Manage/SecuritySettings/Manage2FAVerifications.jsx";
-import EditLanguagePreferences from "../../../features/LanguagePreference/components/EditLanguagePreferences.jsx";
-import ConfirmLanguageUpdate from "../../../features/LanguagePreference/components/ConfirmUpdate.jsx";
-import SuccessfullyUpdatedLanguage from "../../../features/LanguagePreference/components/SuccessfullyUpdated.jsx";
-import Verification from "../../../components/Verification/Verification.jsx";
-import DeleteMFAPage from "../../../features/MFAPhoneNumber/DeleteMFAPhoneNumber/component/DeleteMFAPage.jsx";
-import DeleteMFAPhoneNumberConfirm from "../../../features/MFAPhoneNumber/DeleteMFAPhoneNumber/component/DeleteMFAPhoneNumberConfirm.jsx";
-import AddMFAPage from "../../../features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPage.jsx";
-import AddMFAPhoneNumber from "../../../features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPhoneNumber.jsx";
-import EditContactPhoneNumberPage from "../../../features/ContactPhoneNumber/components/EditContactPhoneNumberPage.jsx";
-import ChangePasswordIndex from "../../../features/ChangePassword/components/ChangePasswordIndex.jsx";
-import EditEmailAddressPage from "../../../features/EmailAddress/EditEmailAddressPage.jsx";
+import ManageDashboard from "../../../components/Manage/ManageDashboard";
+import ProfileHome from "../../../components/Manage/ProfileHome";
+import EditProfileNamePage from "../../../features/ProfileName/components/EditProfileNamePage";
+import EditLanguagePreferencePage from "../../../features/LanguagePreference/components/EditLanguagePreferencePage";
+import SecuritySettings from "../../../components/Manage/SecuritySettings/SecuritySettings";
+import Manage2FAVerifications from "../../../components/Manage/SecuritySettings/Manage2FAVerifications";
+import EditLanguagePreferences from "../../../features/LanguagePreference/components/EditLanguagePreferences";
+import ConfirmLanguageUpdate from "../../../features/LanguagePreference/components/ConfirmUpdate";
+import SuccessfullyUpdatedLanguage from "../../../features/LanguagePreference/components/SuccessfullyUpdated";
+import Verification from "../../../components/Verification/Verification";
+import DeleteMFAPage from "../../../features/MFAPhoneNumber/DeleteMFAPhoneNumber/component/DeleteMFAPage";
+import DeleteMFAPhoneNumberConfirm from "../../../features/MFAPhoneNumber/DeleteMFAPhoneNumber/component/DeleteMFAPhoneNumberConfirm";
+import AddMFAPage from "../../../features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPage";
+import AddMFAPhoneNumber from "../../../features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPhoneNumber";
+import EditContactPhoneNumberPage from "../../../features/ContactPhoneNumber/components/EditContactPhoneNumberPage";
+import ChangePasswordIndex from "../../../features/ChangePassword/components/ChangePasswordIndex";
+import EditEmailAddressPage from "../../../features/EmailAddress/EditEmailAddressPage";
 
 // Storybook Page Renderer - maps page names to components for testing
 const PageRenderer = ({ page, ...props }) => {

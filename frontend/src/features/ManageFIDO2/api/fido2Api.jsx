@@ -1,6 +1,6 @@
-import axios from "../../../utils/axiosInstance.js";
-import config from "../../../config.jsx";
-import { handleApiError } from "../../../utils/apiErrorHandler.js";
+import axios from "../../../utils/axiosInstance";
+import config from "../../../config";
+import { handleApiError } from "../../../utils/apiErrorHandler";
 
 export const fido2Api = {
   /**

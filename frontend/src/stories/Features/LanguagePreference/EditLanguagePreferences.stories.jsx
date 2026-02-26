@@ -1,8 +1,8 @@
-import EditLanguagePreferences from "../../../features/LanguagePreference/components/EditLanguagePreferences.jsx";
+import EditLanguagePreferences from "../../../features/LanguagePreference/components/EditLanguagePreferences";
 import {
   AVAILABLE_LANGUAGES,
   PROFILE_LANGUAGES,
-} from "../../../utils/constants.jsx";
+} from "../../../utils/constants";
 import { UserProvider } from "../../../components/Providers/UserProvider.tsx";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider.tsx";
 

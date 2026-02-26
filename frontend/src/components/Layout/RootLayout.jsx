@@ -2,10 +2,10 @@ import { useEffect } from "react";
 import { Outlet, useLocation } from "react-router";
 import { useLanguage } from "../Providers/LanguageProvider";
 import { getLangValues } from "../../utils/functions";
-import { trackPage } from "../../utils/gatag.jsx";
+import { trackPage } from "../../utils/gatag";
 import Header from "../Layout/Header";
 import Footer from "../Layout/Footer";
-import config from "../../config.jsx";
+import config from "../../config";
 
 import { GcdsContainer, GcdsText } from "@cdssnc/gcds-components-react";
 

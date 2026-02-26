@@ -1,18 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import axios from "../../../../../utils/axiosInstance.js";
-import { deleteMFAPhoneNumberApi } from "../DeleteMFAPhoneNumberAPI.jsx";
-import { handleApiError } from "../../../../../utils/apiErrorHandler.js";
+import axios from "../../../../../utils/axiosInstance";
+import { deleteMFAPhoneNumberApi } from "../DeleteMFAPhoneNumberAPI";
+import { handleApiError } from "../../../../../utils/apiErrorHandler";
 
 // Mock axios instance
-vi.mock("../../../../../utils/axiosInstance.js");
+vi.mock("../../../../../utils/axiosInstance");
 
 // Mock handleApiError
-vi.mock("../../../../../utils/apiErrorHandler.js", () => ({
+vi.mock("../../../../../utils/apiErrorHandler", () => ({
   handleApiError: vi.fn(),
 }));
 
 // Mock config
-vi.mock("../../../../../config.jsx", () => ({
+vi.mock("../../../../../config", () => ({
   default: {
     apiUrl: "http://localhost:8000",
   },

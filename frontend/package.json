@@ -8,6 +8,8 @@
     "dev": "vite --port 3000 --host 0.0.0.0",
     "preview": "vite preview --port 3001",
     "build": "tsc -b && vite build",
+    "extract:types": "tsc -p tsconfig.extract.json",
+    "analyze:types": "node scripts/analyze-declarations.cjs",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier . --write",
@@ -22,6 +24,7 @@
     "build-storybook": "storybook build",
     "install-playwright": "npx playwright install-deps && npx playwright install"
   },
+
   "dependencies": {
     "@cdssnc/gcds-components": "^0.45.0",
     "@cdssnc/gcds-components-react": "^0.45.0",

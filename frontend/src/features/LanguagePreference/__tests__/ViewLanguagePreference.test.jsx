@@ -2,7 +2,7 @@ import "@testing-library/jest-dom/vitest";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { useParams, useNavigate } from "react-router";
-import ViewLanguagePreferences from "../components/ViewLanguagePreference.jsx";
+import ViewLanguagePreferences from "../components/ViewLanguagePreference";
 import { useUser } from "../../../components/Providers/useUser.tsx";
 
 // Mock React Router hooks
@@ -17,12 +17,12 @@ vi.mock("../../../components/Providers/useUser.tsx", () => ({
 }));
 
 // Mock route helpers
-vi.mock("../../../utils/routeHelpers.js", () => ({
+vi.mock("../../../utils/routeHelpers", () => ({
   path: vi.fn(() => `/en/edit-language-preferences`),
 }));
 
 // Mock constants
-vi.mock("../../../utils/constants.jsx", () => ({
+vi.mock("../../../utils/constants", () => ({
   PAGES: {
     editLanguagePreferences: "edit-language-preferences",
   },

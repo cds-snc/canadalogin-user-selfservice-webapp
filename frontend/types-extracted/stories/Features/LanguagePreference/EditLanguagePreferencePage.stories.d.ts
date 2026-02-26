@@ -1,0 +1,19 @@
+declare namespace _default {
+    export let title: string;
+    export { TestTemplate as component };
+    export namespace parameters {
+        let layout: string;
+    }
+    export namespace args {
+        let page: string;
+        let email: string;
+        let phone: string;
+        let id: string;
+        let firstName: string;
+        let lastName: string;
+    }
+}
+export default _default;
+export const Default: any;
+export const French: any;
+import { TestTemplate } from "../../Tests/utils/functions.tsx";

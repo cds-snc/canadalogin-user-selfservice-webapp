@@ -2,7 +2,7 @@ import "@testing-library/jest-dom/vitest";
 import { BrowserRouter } from "react-router";
 import { render, screen, waitFor, cleanup, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import DeleteMFAPage from "../component/DeleteMFAPage.jsx";
+import DeleteMFAPage from "../component/DeleteMFAPage";
 import { UserProvider } from "../../../../components/Providers/UserProvider.tsx";
 import { LanguageProvider } from "../../../../components/Providers/LanguageProvider.tsx";
 import { useOtpOperations } from "../../../../hooks/useOtpOperations";
@@ -239,7 +239,7 @@ vi.mock("../../../../utils/functions", () => ({
   }),
 }));
 
-vi.mock("../../../../utils/routeHelpers.js", () => ({
+vi.mock("../../../../utils/routeHelpers", () => ({
   path: vi.fn((page) => {
     if (page === "SecuritySettings" || page === "securitySettings")
       return "/en/security-settings";

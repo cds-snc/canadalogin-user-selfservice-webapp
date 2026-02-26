@@ -1,5 +1,5 @@
-import PasswordVerification from "../../../features/TransientOtp/components/PasswordVerification.jsx";
-import { AVAILABLE_LANGUAGES } from "../../../utils/constants.jsx";
+import PasswordVerification from "../../../features/TransientOtp/components/PasswordVerification";
+import { AVAILABLE_LANGUAGES } from "../../../utils/constants";
 
 export default {
   title: "GC Sign In/Features/TransientOtp/PasswordVerification",

@@ -1,7 +1,7 @@
 import { BrowserRouter } from "react-router";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import SuccessfullyUpdated from "../components/SuccessfullyUpdated.jsx";
+import SuccessfullyUpdated from "../components/SuccessfullyUpdated";
 import { UserProvider } from "../../../components/Providers/UserProvider.tsx";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider.tsx";
 import "@testing-library/jest-dom/vitest";
@@ -59,7 +59,7 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
 }));
 
 // Mock functions
-vi.mock("../../../utils/functions.jsx", () => ({
+vi.mock("../../../utils/functions", () => ({
   getPageContent: () => ({
     1: "Your new contact phone number is:",
     2: "Your contact phone number has been updated",
@@ -82,8 +82,8 @@ vi.mock("react-router", async () => {
 });
 
 // Mock constants
-vi.mock("../../../utils/constants.jsx", async () => {
-  const actual = await vi.importActual("../../../utils/constants.jsx");
+vi.mock("../../../utils/constants", async () => {
+  const actual = await vi.importActual("../../../utils/constants");
   return {
     ...actual,
     SERVICES: [{ id: 1, title: "Test Service", description: "", url: "#" }],

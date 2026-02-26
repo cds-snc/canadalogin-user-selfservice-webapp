@@ -3,8 +3,8 @@ import { BrowserRouter } from "react-router";
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import userEvent from "@testing-library/user-event";
-import PasswordVerification from "../PasswordVerification.jsx";
-import { PAGES } from "../../../../utils/constants.jsx";
+import PasswordVerification from "../PasswordVerification";
+import { PAGES } from "../../../../utils/constants";
 
 // Mock the navigation hooks
 vi.mock("react-router", async () => {
@@ -16,7 +16,7 @@ vi.mock("react-router", async () => {
 });
 
 // Mock utilities
-vi.mock("../../../../utils/functions.jsx", () => ({
+vi.mock("../../../../utils/functions", () => ({
   getPageContent: vi.fn((language, page) => {
     if (page === PAGES.passwordVerification) {
       return {

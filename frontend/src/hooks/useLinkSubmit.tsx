@@ -5,16 +5,15 @@ import {
   GA_LABELS,
   LINK_SUBMIT_TYPES,
   PAGES,
-} from "../utils/constants.jsx";
+} from "../utils/constants";
 import { useUser } from "../components/Providers/useUser";
 import { useNavigate } from "react-router";
 import {
   callAnalytics,
-  callAuthService,
-  SubmitData,
-  SubmitDataOptions,
+  callAuthService
 } from "./useSubmit";
-import { path } from "../utils/routeHelpers.js";
+import type { SubmitDataOptions, SubmitData } from "../types/hooks";
+import { path } from "../utils/routeHelpers";
 
 export function useLinkSubmit(submitDataOptions: SubmitDataOptions) {
   const { state, dispatch } = useUser();

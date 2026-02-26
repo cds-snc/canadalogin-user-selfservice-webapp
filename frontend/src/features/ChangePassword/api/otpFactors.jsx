@@ -1,7 +1,7 @@
-import axios from "../../../utils/axiosInstance.js";
-import config from "../../../config.jsx";
-import { SUBMIT_END_POINTS } from "../../../utils/constants.jsx";
-import { handleApiError } from "../../../utils/apiErrorHandler.js";
+import axios from "../../../utils/axiosInstance";
+import config from "../../../config";
+import { SUBMIT_END_POINTS } from "../../../utils/constants";
+import { handleApiError } from "../../../utils/apiErrorHandler";
 
 export const otpFactors = {
   getUserOtpPhoneFactors: async (user_id) => {

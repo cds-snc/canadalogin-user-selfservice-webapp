@@ -5,9 +5,9 @@ import {
   GcdsGrid,
 } from "@cdssnc/gcds-components-react";
 import { useNavigate, useParams } from "react-router";
-import { PAGES } from "../../../utils/constants.jsx";
-import { getPageContent } from "../../../utils/functions.jsx";
-import { path } from "../../../utils/routeHelpers.js";
+import { PAGES } from "../../../utils/constants";
+import { getPageContent } from "../../../utils/functions";
+import { path } from "../../../utils/routeHelpers";
 
 export default function FIDO2PasskeyList({ userFIDO2CredentialsData }) {
   const { language } = useParams();

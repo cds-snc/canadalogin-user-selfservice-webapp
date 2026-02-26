@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { BrowserRouter } from "react-router";
-import ConfirmUpdate from "../components/ConfirmUpdate.jsx";
+import ConfirmUpdate from "../components/ConfirmUpdate";
 import { UserProvider } from "../../../components/Providers/UserProvider.tsx";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider.tsx";
 import "@testing-library/jest-dom/vitest";
@@ -77,7 +77,7 @@ vi.mock("react-router", async () => {
 });
 
 // Mock constants - CORRECTED
-vi.mock("../../../utils/constants.jsx", async (importOriginal) => {
+vi.mock("../../../utils/constants", async (importOriginal) => {
   const actual = await importOriginal();
   return {
     ...actual,
@@ -137,7 +137,7 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
 }));
 
 // Mock utility functions
-vi.mock("../../../utils/functions.jsx", () => ({
+vi.mock("../../../utils/functions", () => ({
   getPageContent: () => ({
     1: "Confirm name update",
     2: "You've requested to update your name to:",
@@ -153,7 +153,7 @@ vi.mock("../../../utils/functions.jsx", () => ({
 }));
 
 // Mock route helpers
-vi.mock("../../../utils/routeHelpers.js", () => ({
+vi.mock("../../../utils/routeHelpers", () => ({
   path: vi.fn((page) => {
     const routes = {
       profileUpdateNameSuccess: `/en/profile/update-name/success`,
@@ -164,7 +164,7 @@ vi.mock("../../../utils/routeHelpers.js", () => ({
   }),
 }));
 
-vi.mock("../../../services/authService.jsx", () => ({
+vi.mock("../../../services/authService", () => ({
   authService: {
     get_my_user_profile: vi.fn(() =>
       Promise.resolve({
@@ -197,7 +197,7 @@ vi.mock("../../../services/authService.jsx", () => ({
 }));
 
 // Mock user profile dispatch
-vi.mock("../../../utils/userProfileDispatch.jsx", () => ({
+vi.mock("../../../utils/userProfileDispatch", () => ({
   userProfileDispatch: () => ({
     updateProfileSuccess: vi.fn(),
   }),

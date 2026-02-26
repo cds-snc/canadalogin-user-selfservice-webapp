@@ -5,32 +5,12 @@ import {
   GA_LABELS,
   PAGES,
   SUBMIT_END_POINTS,
-} from "../utils/constants.jsx";
+} from "../utils/constants";
 import { useUser } from "../components/Providers/useUser";
-import { authService } from "../services/authService.jsx";
+import { authService } from "../services/authService";
 import { useNavigate } from "react-router";
-import { trackEvent } from "../utils/gatag.jsx";
-
-export interface SubmitDataOptions {
-  language: string;
-  page: string;
-  flow: string;
-  type: string;
-  endpoint: string;
-  navigateTo: string;
-  onError: (error: Error) => void;
-}
-
-export interface SubmitData {
-  email: string;
-  language: string;
-  verificationCode: string;
-  password: string;
-  phone: string;
-  verificationType: string;
-  firstName: string;
-  lastName: string;
-}
+import { trackEvent } from "../utils/gatag";
+import type { SubmitDataOptions, SubmitData } from "../types/hooks";
 
 export function useSubmit(
   submitDataOptions: SubmitDataOptions,
@@ -92,7 +72,7 @@ export function useSubmit(
   return { handleSubmit, isPending };
 }
 function setSubmitData(formData: FormData) {
-  const submitData = {
+  const submitData: SubmitData = {
     email: null,
     language: null,
     verificationCode: null,
@@ -137,7 +117,7 @@ export async function callAuthService(
   submitData: SubmitData,
   userData: any,
 ) {
-  let payload = {};
+  let payload: Record<string, any> = {};
   switch (submitDataOptions.endpoint) {
     case SUBMIT_END_POINTS.create:
       payload = {

@@ -2,9 +2,9 @@ import "@testing-library/jest-dom/vitest";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, within } from "@testing-library/react";
 import { useParams, useNavigate } from "react-router";
-import SuccessfullyUpdatedLanguage from "../components/SuccessfullyUpdated.jsx";
+import SuccessfullyUpdatedLanguage from "../components/SuccessfullyUpdated";
 import { useUser } from "../../../components/Providers/useUser.tsx";
-import { authService } from "../../../services/authService.jsx";
+import { authService } from "../../../services/authService";
 
 // ────────────────────────────────────────────────
 // Mocks
@@ -24,19 +24,19 @@ vi.mock("../../../components/Providers/useUser.tsx", () => ({
   useUser: vi.fn(),
 }));
 
-vi.mock("../../../utils/userProfileDispatch.jsx", () => ({
+vi.mock("../../../utils/userProfileDispatch", () => ({
   userProfileDispatch: vi.fn(() => ({
     setLoading: vi.fn(),
   })),
 }));
 
-vi.mock("../../../services/authService.jsx", () => ({
+vi.mock("../../../services/authService", () => ({
   authService: {
     logout: vi.fn(),
   },
 }));
 
-vi.mock("../../../utils/functions.jsx", () => ({
+vi.mock("../../../utils/functions", () => ({
   getPageContent: vi.fn(() => ({
     1: "Your language preference has been successfully updated to",
     2: "What happens next?",
@@ -54,7 +54,7 @@ vi.mock("../../../utils/functions.jsx", () => ({
   }),
 }));
 
-vi.mock("../../../utils/routeHelpers.js", () => ({
+vi.mock("../../../utils/routeHelpers", () => ({
   path: vi.fn((page, params) => {
     if (page === "profile-home") return `/${params.language}/profile`;
     if (page === "edit-language-preferences")
@@ -63,7 +63,7 @@ vi.mock("../../../utils/routeHelpers.js", () => ({
   }),
 }));
 
-vi.mock("../../../utils/constants.jsx", async (importOriginal) => {
+vi.mock("../../../utils/constants", async (importOriginal) => {
   const actual = await importOriginal();
   return {
     ...actual,

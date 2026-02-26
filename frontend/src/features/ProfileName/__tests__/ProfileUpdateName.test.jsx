@@ -1,7 +1,7 @@
 import { BrowserRouter } from "react-router";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import UpdateProfileName from "../components/ProfileUpdateName.jsx";
+import UpdateProfileName from "../components/ProfileUpdateName";
 import { UserProvider } from "../../../components/Providers/UserProvider.tsx";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider.tsx";
 import "@testing-library/jest-dom/vitest";
@@ -97,7 +97,7 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
   ),
 }));
 
-vi.mock("../../../../utils/functions.jsx", () => ({
+vi.mock("../../../../utils/functions", () => ({
   getPageContent: () => ({
     1: "Are you sure you want to update your name?",
     2: "You’ve requested to update your name to:",
@@ -115,7 +115,7 @@ vi.mock("../../../../utils/functions.jsx", () => ({
 }));
 
 vi.mock(
-  "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx",
+  "../../../components/InfoBlocks/ServicesWithAccessInfoSection",
   () => ({
     default: () => (
       <div data-testid="services-with-access-info">
@@ -140,7 +140,7 @@ vi.mock("react-router", async () => {
 });
 
 // Mock the redirect function to prevent navigation errors
-vi.mock("../../../utils/apiErrorHandler.js", () => ({
+vi.mock("../../../utils/apiErrorHandler", () => ({
   redirectToLogin: vi.fn(),
   handleApiError: vi.fn(),
 }));

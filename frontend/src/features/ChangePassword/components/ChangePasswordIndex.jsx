@@ -1,23 +1,23 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import { useUser } from "../../../components/Providers/useUser.tsx";
-import Loader from "../../../components/Layout/Loading.jsx";
+import Loader from "../../../components/Layout/Loading";
 
-import Password from "./Password.jsx";
-import PasswordChangedConfirmation from "./PasswordChangedConfirmation.jsx";
+import Password from "./Password";
+import PasswordChangedConfirmation from "./PasswordChangedConfirmation";
 
-import { PAGES } from "../../../utils/constants.jsx";
-import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
-import { getErrorMessage } from "../../../utils/errorUtils.js";
-import { authService } from "../../../services/authService.jsx";
+import { PAGES } from "../../../utils/constants";
+import { userProfileDispatch } from "../../../utils/userProfileDispatch";
+import { getErrorMessage } from "../../../utils/errorUtils";
+import { authService } from "../../../services/authService";
 
-import { getPageContent } from "../../../utils/functions.jsx";
-import { path } from "../../../utils/routeHelpers.js";
-import OtpSelection from "../../TransientOtp/components/OtpSelection.jsx";
-import OtpVerification from "../../TransientOtp/components/OtpVerification.jsx";
-import { passwordUpdate } from "../api/passwordUpdate.jsx";
-import PasswordVerification from "../../TransientOtp/components/PasswordVerification.jsx";
-import StepContent from "../../../components/Wizard/StepContent.jsx";
+import { getPageContent } from "../../../utils/functions";
+import { path } from "../../../utils/routeHelpers";
+import OtpSelection from "../../TransientOtp/components/OtpSelection";
+import OtpVerification from "../../TransientOtp/components/OtpVerification";
+import { passwordUpdate } from "../api/passwordUpdate";
+import PasswordVerification from "../../TransientOtp/components/PasswordVerification";
+import StepContent from "../../../components/Wizard/StepContent";
 import { usePasswordValidation } from "../../../hooks/usePasswordValidation";
 import { useOtpOperations } from "../../../hooks/useOtpOperations";
 

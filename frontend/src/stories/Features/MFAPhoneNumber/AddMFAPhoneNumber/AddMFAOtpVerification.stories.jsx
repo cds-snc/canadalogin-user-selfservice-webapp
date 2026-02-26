@@ -1,8 +1,8 @@
-import AddMFAOtpVerification from "../../../../features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAOtpVerification.jsx";
+import AddMFAOtpVerification from "../../../../features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAOtpVerification";
 import {
   AVAILABLE_LANGUAGES,
   FLOW_TYPES,
-} from "../../../../utils/constants.jsx";
+} from "../../../../utils/constants";
 
 export default {
   title:

@@ -1,8 +1,8 @@
 import { BrowserRouter } from "react-router";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { FLOW_TYPES } from "../../../utils/constants.jsx";
-import OtpVerification from "../components/OtpVerification.jsx";
+import { FLOW_TYPES } from "../../../utils/constants";
+import OtpVerification from "../components/OtpVerification";
 import { UserProvider } from "../../../components/Providers/UserProvider.tsx";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider.tsx";
 import "@testing-library/jest-dom/vitest";
@@ -73,7 +73,7 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
 }));
 
 // Mock functions
-vi.mock("../../../utils/functions.jsx", () => ({
+vi.mock("../../../utils/functions", () => ({
   getPageContent: (language, page) => {
     const mockContent = {
       Verification: {
@@ -112,8 +112,8 @@ vi.mock("react-router", async () => {
 });
 
 // Mock constants
-vi.mock("../../../utils/constants.jsx", async () => {
-  const actual = await vi.importActual("../../../utils/constants.jsx");
+vi.mock("../../../utils/constants", async () => {
+  const actual = await vi.importActual("../../../utils/constants");
   return {
     ...actual,
     SERVICES: [{ id: 1, title: "Test Service", description: "", url: "#" }],

@@ -1,4 +1,4 @@
-import Header from "../../components/Layout/Header.jsx";
+import Header from "../../components/Layout/Header";
 import { UserProvider } from "../../components/Providers/UserProvider";
 import { LanguageProvider } from "../../components/Providers/LanguageProvider";
 

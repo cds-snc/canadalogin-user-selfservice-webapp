@@ -3,8 +3,8 @@ import { BrowserRouter } from "react-router";
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import userEvent from "@testing-library/user-event";
-import OtpSelection from "../OtpSelection.jsx";
-import { FLOW_TYPES, PAGES } from "../../../../utils/constants.jsx";
+import OtpSelection from "../OtpSelection";
+import { FLOW_TYPES, PAGES } from "../../../../utils/constants";
 
 // Mock the navigation hooks
 const mockNavigateHelper = vi.fn();
@@ -17,12 +17,12 @@ vi.mock("react-router", async () => {
   };
 });
 
-vi.mock("../../../../hooks/useNavigate.js", () => ({
+vi.mock("../../../../hooks/useNavigate", () => ({
   useNavigateHelper: () => mockNavigateHelper,
 }));
 
 // Mock utilities
-vi.mock("../../../../utils/functions.jsx", () => ({
+vi.mock("../../../../utils/functions", () => ({
   getPageContent: vi.fn((language, page) => {
     if (page === PAGES.transientOtpSelection) {
       return {
@@ -53,14 +53,14 @@ vi.mock("../../../../utils/functions.jsx", () => ({
   }),
 }));
 
-vi.mock("../../../../utils/gcHelpCentreLinks.jsx", () => ({
+vi.mock("../../../../utils/gcHelpCentreLinks", () => ({
   gcHelpCentreLinks: {
     twoStepVerification: "https://help.example.com/2fa",
     recover2StepVerification: "https://help.example.com/no-phone",
   },
 }));
 
-vi.mock("../../../../utils/routeHelpers.js", () => ({
+vi.mock("../../../../utils/routeHelpers", () => ({
   path: vi.fn((page, { language }) => {
     if (page === PAGES.manage2FAVerifications) {
       return `/${language}/security-settings/manage-2fa-verifications`;

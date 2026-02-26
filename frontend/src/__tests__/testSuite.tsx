@@ -7,7 +7,7 @@ import { getFooter } from "../utils/functions";
 import * as engJson from "../locales/en/en.json";
 // @ts-ignore
 import * as frJson from "../locales/fr/fr.json";
-import { PAGES } from "../utils/constants.jsx";
+import { PAGES } from "../utils/constants";
 import { page } from "@vitest/browser/context";
 
 const subLinks = {

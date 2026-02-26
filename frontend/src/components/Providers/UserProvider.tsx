@@ -10,12 +10,12 @@ import {
   CONTEXT_ACTIONS,
   SUBMIT_END_POINTS,
   RP_CLIENT_ID_KEY,
-} from "../../utils/constants.jsx";
+} from "../../utils/constants";
 import UserContext from "./UserContext";
-import { authService } from "../../services/authService.jsx";
-import Loader from "../Layout/Loading.jsx";
-import SessionTimeoutModal from "../Layout/SessionTimeoutModal.jsx";
-import { getPageContent } from "../../utils/functions.jsx";
+import { authService } from "../../services/authService";
+import Loader from "../Layout/Loading";
+import SessionTimeoutModal from "../Layout/SessionTimeoutModal";
+import { getPageContent } from "../../utils/functions";
 
 interface Action {
   type: string;

@@ -1,21 +1,21 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import { useUser } from "../../../components/Providers/useUser.tsx";
-import { getPageContent } from "../../../utils/functions.jsx";
+import { getPageContent } from "../../../utils/functions";
 import {
   PAGES,
   FLOW_TYPES,
   INVALID_OTP_ERROR_CODES,
-} from "../../../utils/constants.jsx";
-import { path } from "../../../utils/routeHelpers.js";
-import { authService } from "../../../services/authService.jsx";
-import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
-import StepContent from "../../../components/Wizard/StepContent.jsx";
-import Loader from "../../../components/Layout/Loading.jsx";
-import EnterPhoneNumber from "./EnterPhoneNumber.jsx";
-import OtpVerification from "./OtpVerification.jsx";
-import ConfirmUpdate from "./ConfirmUpdate.jsx";
-import SuccessfullyUpdated from "./SuccessfullyUpdated.jsx";
+} from "../../../utils/constants";
+import { path } from "../../../utils/routeHelpers";
+import { authService } from "../../../services/authService";
+import { userProfileDispatch } from "../../../utils/userProfileDispatch";
+import StepContent from "../../../components/Wizard/StepContent";
+import Loader from "../../../components/Layout/Loading";
+import EnterPhoneNumber from "./EnterPhoneNumber";
+import OtpVerification from "./OtpVerification";
+import ConfirmUpdate from "./ConfirmUpdate";
+import SuccessfullyUpdated from "./SuccessfullyUpdated";
 
 // Map frontend FLOW_TYPES to backend otpType
 // Backend: sms | voice

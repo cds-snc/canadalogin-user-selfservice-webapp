@@ -9,17 +9,17 @@ import { useLocation, useNavigate, useParams } from "react-router";
 import {
   MAP_TYPES,
   useOtpOperations,
-} from "../../../hooks/useOtpOperations.js";
-import { PAGES, VITE_ENVIRONMENTS } from "../../../utils/constants.jsx";
-import { getPageContent } from "../../../utils/functions.jsx";
-import { path } from "../../../utils/routeHelpers.js";
-import Loader from "../../Layout/Loading.jsx";
-import { useUser } from "../../Providers/useUser.js";
-import NoticeFactory from "../../InfoBlocks/NoticeFactory.jsx";
-import config from "../../../config.jsx";
-import PhoneFactorsList from "./PhoneFactorsList.jsx";
-import FIDO2PasskeyList from "./FIDO2PasskeyList.jsx";
-import { fido2Api } from "../../../features/ManageFIDO2/api/fido2Api.jsx";
+} from "../../../hooks/useOtpOperations";
+import { PAGES, VITE_ENVIRONMENTS } from "../../../utils/constants";
+import { getPageContent } from "../../../utils/functions";
+import { path } from "../../../utils/routeHelpers";
+import Loader from "../../Layout/Loading";
+import { useUser } from "../../Providers/useUser";
+import NoticeFactory from "../../InfoBlocks/NoticeFactory";
+import config from "../../../config";
+import PhoneFactorsList from "./PhoneFactorsList";
+import FIDO2PasskeyList from "./FIDO2PasskeyList";
+import { fido2Api } from "../../../features/ManageFIDO2/api/fido2Api";
 
 export default function Manage2FAVerifications() {
   const { language } = useParams();

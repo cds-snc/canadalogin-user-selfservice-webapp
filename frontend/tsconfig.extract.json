@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "./types-extracted",
+    "noEmit": false,
+    "jsx": "react-jsx",
+    "skipLibCheck": true,
+    "isolatedModules": false
+  },
+  "include": ["src/**/*"]
+}

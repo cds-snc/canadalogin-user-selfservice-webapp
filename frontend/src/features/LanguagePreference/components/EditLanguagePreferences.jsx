@@ -11,15 +11,15 @@ import {
   GcdsErrorMessage,
 } from "@cdssnc/gcds-components-react";
 
-import { getPageContent } from "../../../utils/functions.jsx";
+import { getPageContent } from "../../../utils/functions";
 
 import {
   PAGES,
   PROFILE_LANGUAGES,
   ServicesWithAccessInfoSectionInformation,
-} from "../../../utils/constants.jsx";
-import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx";
-import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
+} from "../../../utils/constants";
+import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection";
+import SubmitButton from "../../../components/Layout/SubmitButton";
 
 export default function EditLanguagePreferences({
   languageFormData,

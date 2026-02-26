@@ -1,0 +1,3599 @@
+{
+  "generatedAt": "2026-02-26T16:23:37.156Z",
+  "totalFiles": 220,
+  "totalExports": 778,
+  "files": [
+    {
+      "file": "utils/constants.d.ts",
+      "size": 13422,
+      "exportCount": 275,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "INVALID_OTP_ERROR_CODES",
+          "FORM_FIELDS",
+          "SERVICES",
+          "serverMapping",
+          "requestPasswordPolicy",
+          "create",
+          "createCoreProfile",
+          "transientOtpVerify",
+          "transientOtpSend",
+          "mfaEnroll",
+          "mfaSend",
+          "mfaVerify",
+          "mfaDelete",
+          "profileUpdateWithOtp",
+          "rp_info",
+          "users",
+          "passwordUpdate",
+          "logout",
+          "sessionStatus",
+          "keepAlive",
+          "passwordVerify",
+          "passwordVerifyStepup",
+          "RP_CLIENT_ID_KEY",
+          "GA_ACTIONS",
+          "button",
+          "link",
+          "text",
+          "input",
+          "NON_PROD_FEATURE",
+          "af",
+          "za",
+          "al",
+          "dz",
+          "de",
+          "ad",
+          "ao",
+          "ai",
+          "aq",
+          "ag",
+          "sa",
+          "ar",
+          "am",
+          "aw",
+          "au",
+          "at",
+          "az",
+          "bs",
+          "bh",
+          "bd",
+          "bb",
+          "be",
+          "bz",
+          "bj",
+          "bm",
+          "bt",
+          "by",
+          "bo",
+          "ba",
+          "bw",
+          "br",
+          "bn",
+          "bg",
+          "bf",
+          "bi",
+          "kh",
+          "cm",
+          "ca",
+          "cv",
+          "ea",
+          "cl",
+          "cn",
+          "cy",
+          "co",
+          "km",
+          "cg",
+          "cd",
+          "kp",
+          "kr",
+          "cr",
+          "ci",
+          "hr",
+          "cu",
+          "cw",
+          "dk",
+          "dg",
+          "dj",
+          "dm",
+          "eg",
+          "ae",
+          "ec",
+          "er",
+          "es",
+          "ee",
+          "sz",
+          "va",
+          "fm",
+          "us",
+          "et",
+          "fj",
+          "fi",
+          "ga",
+          "gm",
+          "ge",
+          "gs",
+          "gh",
+          "gi",
+          "gr",
+          "gd",
+          "gl",
+          "gp",
+          "gu",
+          "gt",
+          "gn",
+          "gq",
+          "gw",
+          "gy",
+          "gf",
+          "ht",
+          "hn",
+          "hu",
+          "cx",
+          "ac",
+          "nf",
+          "ax",
+          "ky",
+          "ic",
+          "cc",
+          "ck",
+          "fo",
+          "fk",
+          "mp",
+          "mh",
+          "um",
+          "pn",
+          "sb",
+          "tc",
+          "vg",
+          "vi",
+          "id",
+          "iq",
+          "ir",
+          "ie",
+          "is",
+          "il",
+          "it",
+          "jm",
+          "jp",
+          "jo",
+          "kz",
+          "ke",
+          "kg",
+          "ki",
+          "xk",
+          "kw",
+          "re",
+          "la",
+          "ls",
+          "lv",
+          "lb",
+          "lr",
+          "ly",
+          "li",
+          "lt",
+          "lu",
+          "mk",
+          "mg",
+          "mw",
+          "mv",
+          "ml",
+          "mt",
+          "ma",
+          "mq",
+          "mu",
+          "mr",
+          "yt",
+          "mx",
+          "md",
+          "mc",
+          "mn",
+          "me",
+          "ms",
+          "mz",
+          "mm",
+          "na",
+          "nr",
+          "np",
+          "ni",
+          "ne",
+          "ng",
+          "nu",
+          "no",
+          "nc",
+          "nz",
+          "om",
+          "ug",
+          "uz",
+          "pk",
+          "pw",
+          "pa",
+          "pg",
+          "py",
+          "nl",
+          "bq",
+          "pe",
+          "ph",
+          "pl",
+          "pf",
+          "pr",
+          "pt",
+          "qa",
+          "hk",
+          "mo",
+          "cf",
+          "ro",
+          "gb",
+          "ru",
+          "rw",
+          "eh",
+          "bl",
+          "kn",
+          "sm",
+          "mf",
+          "sx",
+          "pm",
+          "vc",
+          "sh",
+          "lc",
+          "sv",
+          "ws",
+          "as",
+          "st",
+          "sn",
+          "rs",
+          "sc",
+          "sl",
+          "sg",
+          "sk",
+          "si",
+          "so",
+          "sd",
+          "ss",
+          "lk",
+          "se",
+          "ch",
+          "sr",
+          "sj",
+          "sy",
+          "tj",
+          "tw",
+          "tz",
+          "td",
+          "cz",
+          "tf",
+          "io",
+          "ps",
+          "th",
+          "tl",
+          "tg",
+          "tk",
+          "to",
+          "tt",
+          "ta",
+          "tn",
+          "tm",
+          "tr",
+          "tv",
+          "ua",
+          "uy",
+          "vu",
+          "ve",
+          "vn",
+          "wf",
+          "ye",
+          "zm",
+          "zw"
+        ],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "stories/Tests/utils/constants.d.ts",
+      "size": 20365,
+      "exportCount": 27,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "TEST_USERS",
+          "TEST_PROTOTYPES",
+          "active",
+          "emails",
+          "phoneNumbers",
+          "userName",
+          "preferredLanguage",
+          "icon",
+          "linkName",
+          "url",
+          "otp",
+          "verificationCode",
+          "password",
+          "firstname",
+          "lastName",
+          "message",
+          "type",
+          "updated",
+          "expiry",
+          "state",
+          "correlationID",
+          "emailAddress",
+          "attempts",
+          "retries",
+          "status",
+          "phoneNumber",
+          "endpoint"
+        ],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "stories/Tests/InfoBlocks/NoticeFactory.test.stories.d.ts",
+      "size": 7606,
+      "exportCount": 24,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [
+          "render_1",
+          "play_1",
+          "render_2",
+          "play_2",
+          "render_3",
+          "play_3",
+          "render_4",
+          "play_4",
+          "render_5",
+          "play_5",
+          "render_6",
+          "play_6",
+          "render_7",
+          "play_7",
+          "render_8",
+          "play_8",
+          "render_9",
+          "play_9",
+          "render_10",
+          "play_10",
+          "render_11",
+          "play_11"
+        ],
+        "vars": [
+          "title"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Tests/Layout/SessionTimeoutModal.test.stories.d.ts",
+      "size": 5976,
+      "exportCount": 16,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [
+          "play_1",
+          "play_2",
+          "play_3",
+          "play_4",
+          "play_5",
+          "play_6",
+          "play_7",
+          "play_8",
+          "play_9",
+          "play_10",
+          "play_11",
+          "play_12",
+          "play_13",
+          "play_14"
+        ],
+        "vars": [
+          "title"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Tests/Features/MFAPhoneNumber/DeleteMFAPhoneNumber/DeleteMFAPhoneNumberConfirm.test.stories.d.ts",
+      "size": 9158,
+      "exportCount": 13,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [
+          "play_1",
+          "play_2",
+          "play_3",
+          "play_4",
+          "play_5",
+          "play_6",
+          "play_7",
+          "play_8",
+          "play_9",
+          "play_10",
+          "play_11"
+        ],
+        "vars": [
+          "title"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Tests/utils/gcdsTestHelpers.d.ts",
+      "size": 6358,
+      "exportCount": 12,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [
+          "waitForGcdsComponent",
+          "waitForGcdsComponents",
+          "waitForGcdsButton",
+          "getClickableButton",
+          "waitForTextContent",
+          "waitForPhoneNumber",
+          "waitForComponentReady",
+          "waitForGcdsNotice",
+          "waitForModal",
+          "waitForGcdsInput",
+          "waitForButtonByText"
+        ],
+        "vars": [
+          "DEFAULT_TIMEOUT"
+        ],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "utils/functions.d.ts",
+      "size": 772,
+      "exportCount": 12,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [
+          "getLanguage",
+          "getLangValues",
+          "getPageContent",
+          "getContentWithVariables",
+          "getFooter",
+          "isEmailValid",
+          "isCodeValid",
+          "isPasswordValid",
+          "isNameValid",
+          "capitalizeFirstLetter",
+          "formatTime",
+          "convertLanguageToLanguageCode"
+        ],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "stories/Features/TransientOtp/OtpVerification.stories.d.ts",
+      "size": 1252,
+      "exportCount": 9,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "SMSVerification",
+          "VoiceCallVerification",
+          "EmailVerification",
+          "PartialInput",
+          "CompleteInput",
+          "WithError",
+          "FrenchLanguage"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "types/user.d.ts",
+      "size": 1355,
+      "exportCount": 8,
+      "exports": {
+        "interfaces": [
+          "UserData",
+          "Name",
+          "Email",
+          "PhoneNumber",
+          "UserProfileDetails",
+          "Meta",
+          "UserProfile",
+          "RelyingPartyInfo"
+        ],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "stories/Features/LanguagePreference/EditLanguagePreferences.stories.d.ts",
+      "size": 1183,
+      "exportCount": 8,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "decorators",
+          "EnglishSelected",
+          "FrenchSelected",
+          "NoSelection",
+          "WithError",
+          "FrenchInterface"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Features/ContactPhoneNumber/EnterPhoneNumber.stories.d.ts",
+      "size": 1145,
+      "exportCount": 8,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "decorators",
+          "Default",
+          "FilledFormSMS",
+          "FilledFormVoice",
+          "WithError",
+          "French"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Features/ContactPhoneNumber/ConfirmUpdate.stories.d.ts",
+      "size": 1010,
+      "exportCount": 8,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "decorators",
+          "DefaultSMS",
+          "VoiceConfirmation",
+          "Loading",
+          "WithError",
+          "French"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Features/TransientOtp/OtpSelection.stories.d.ts",
+      "size": 841,
+      "exportCount": 8,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "SingleSMSFactor",
+          "SingleVoiceFactor",
+          "MultipleFactors",
+          "DeleteMFAContext",
+          "NoFactors",
+          "French"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "features/ManageFIDO2/utils/webAuthnUtils.d.ts",
+      "size": 1528,
+      "exportCount": 7,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [
+          "prepareAttestationOptions",
+          "prepareAssertionOptions",
+          "formatAttestationForServer",
+          "formatAssertionForServer",
+          "registerFIDO2Credential",
+          "authenticateFIDO2Credential",
+          "isWebAuthnSupported"
+        ],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "stories/Features/ContactPhoneNumber/OtpVerification.stories.d.ts",
+      "size": 1291,
+      "exportCount": 7,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "SMSVerification",
+          "VoiceCallVerification",
+          "WithOtpCode",
+          "WithError",
+          "French"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Features/EmailAddress/EmailOtpValidation.stories.d.ts",
+      "size": 1261,
+      "exportCount": 7,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "Default",
+          "WithOtpCode",
+          "WithError",
+          "PartialOtpCode",
+          "French"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Features/EmailAddress/EditEmailEnterEmail.stories.d.ts",
+      "size": 1100,
+      "exportCount": 7,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "decorators",
+          "Default",
+          "FilledForm",
+          "WithError",
+          "French"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Tests/Features/TransientOtp/OtpVerification.test.stories.d.ts",
+      "size": 1092,
+      "exportCount": 7,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "SMSVerificationFlow",
+          "VoiceCallVerificationFlow",
+          "EmailVerificationFlow",
+          "InputStateManagement",
+          "ErrorStateDisplay"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Features/TransientOtp/PasswordVerification.stories.d.ts",
+      "size": 1067,
+      "exportCount": 7,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "Default",
+          "PasswordEntered",
+          "WithError",
+          "EmailUpdateContext",
+          "French"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Features/LanguagePreference/ConfirmUpdate.stories.d.ts",
+      "size": 877,
+      "exportCount": 7,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "decorators",
+          "EnglishConfirmation",
+          "FrenchConfirmation",
+          "Loading",
+          "WithError"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Features/EmailAddress/EmailConfirmUpdate.stories.d.ts",
+      "size": 860,
+      "exportCount": 7,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "decorators",
+          "Default",
+          "LongEmailAddress",
+          "NoFormData",
+          "French"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Features/ContactPhoneNumber/EditContactPhoneNumberPage.stories.d.ts",
+      "size": 735,
+      "exportCount": 7,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "Default",
+          "OtpVerificationStep",
+          "ConfirmUpdateStep",
+          "SuccessStep",
+          "French"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Pages/Manage/SecuritySettings/Manage2FAVerifications.stories.d.ts",
+      "size": 644,
+      "exportCount": 7,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "SinglePhoneSMSOnly",
+          "SinglePhoneBothMethods",
+          "MultiplePhones",
+          "French",
+          "EmptyState"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Tests/Features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPage.test.stories.d.ts",
+      "size": 2951,
+      "exportCount": 6,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [
+          "play_1",
+          "play_2",
+          "play_3",
+          "play_4"
+        ],
+        "vars": [
+          "title"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Features/ProfileName/ProfileUpdateName.stories.d.ts",
+      "size": 1062,
+      "exportCount": 6,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "decorators",
+          "Default",
+          "FilledForm",
+          "WithError"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Features/ChangePassword/Password.stories.d.ts",
+      "size": 860,
+      "exportCount": 6,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "Default",
+          "WithError",
+          "WithOtpCode",
+          "French"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Features/ProfileName/ConfirmUpdate.stories.d.ts",
+      "size": 806,
+      "exportCount": 6,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "decorators",
+          "Default",
+          "Loading",
+          "WithError"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Features/EmailAddress/EmailUpdateSuccess.stories.d.ts",
+      "size": 775,
+      "exportCount": 6,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "Default",
+          "LongEmailAddress",
+          "WithoutEmailAddress",
+          "French"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Features/ContactPhoneNumber/ViewContactPhoneNumber.stories.d.ts",
+      "size": 580,
+      "exportCount": 6,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "SinglePhoneNumber",
+          "MultiplePhoneNumbers",
+          "NoPhoneNumbers",
+          "French"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Layout/SessionTimeoutModal.stories.d.ts",
+      "size": 7810,
+      "exportCount": 5,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "control",
+          "options",
+          "action"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Features/MFAPhoneNumber/AddMFAPhoneNumber/AddMFAOtpVerification.stories.d.ts",
+      "size": 1142,
+      "exportCount": 5,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "SMSVerification",
+          "VoiceVerification",
+          "WithOtpCode"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Features/MFAPhoneNumber/AddMFAPhoneNumber/AddMFAPhoneNumber.stories.d.ts",
+      "size": 879,
+      "exportCount": 5,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "Default",
+          "WithPhoneNumber",
+          "WithError"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "types/api.d.ts",
+      "size": 831,
+      "exportCount": 5,
+      "exports": {
+        "interfaces": [
+          "ApiResponse",
+          "OtpResponseData",
+          "PasswordResponseData",
+          "ErrorResponse",
+          "MSWMock"
+        ],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "stories/Tests/Features/TransientOtp/OtpSelection.test.stories.d.ts",
+      "size": 769,
+      "exportCount": 5,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "MultipleFactorsRadioButtons",
+          "SingleFactorNoRadios",
+          "DeleteMFAContext"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Features/ContactPhoneNumber/SuccessfullyUpdated.stories.d.ts",
+      "size": 748,
+      "exportCount": 5,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "Default",
+          "WithoutPhoneNumber",
+          "French"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Features/LanguagePreference/SuccessfullyUpdated.stories.d.ts",
+      "size": 702,
+      "exportCount": 5,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "decorators",
+          "EnglishUpdated",
+          "FrenchUpdated"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Features/MFAPhoneNumber/DeleteMFAPhoneNumber/DeleteMFAPhoneNumberConfirm.stories.d.ts",
+      "size": 659,
+      "exportCount": 5,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "Default",
+          "WithError",
+          "Loading"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "types/constants.d.ts",
+      "size": 610,
+      "exportCount": 5,
+      "exports": {
+        "interfaces": [],
+        "types": [
+          "FlowType",
+          "NoticeType",
+          "Language",
+          "SubmitEndPointKey",
+          "PageKey"
+        ],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "stories/Features/ProfileName/ViewProfileNameCard.stories.d.ts",
+      "size": 585,
+      "exportCount": 5,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "decorators",
+          "Default",
+          "LongNames"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "components/Providers/UserProvider.d.ts",
+      "size": 1590,
+      "exportCount": 4,
+      "exports": {
+        "interfaces": [
+          "UserProfile",
+          "RelyingPartyInfo",
+          "UserState",
+          "SessionTimeoutState"
+        ],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "stories/Layout/SubmitButton.stories.d.ts",
+      "size": 1503,
+      "exportCount": 4,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "tags",
+          "disabled"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Layout/Header.stories.d.ts",
+      "size": 997,
+      "exportCount": 4,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "tags",
+          "decorators"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Features/MFAPhoneNumber/AddMFAPhoneNumber/AddMFAPage.stories.d.ts",
+      "size": 738,
+      "exportCount": 4,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "Default",
+          "French"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Features/MFAPhoneNumber/DeleteMFAPhoneNumber/DeleteMFAPage.stories.d.ts",
+      "size": 738,
+      "exportCount": 4,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "Default",
+          "French"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Features/ChangePassword/ChangePasswordIndex.stories.d.ts",
+      "size": 666,
+      "exportCount": 4,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "Default",
+          "French"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Features/EmailAddress/EditEmailAddressPage.stories.d.ts",
+      "size": 666,
+      "exportCount": 4,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "Default",
+          "French"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Features/ProfileName/SuccessfullyUpdated.stories.d.ts",
+      "size": 649,
+      "exportCount": 4,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "decorators",
+          "Default"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Features/ProfileName/EditProfileNamePage.stories.d.ts",
+      "size": 628,
+      "exportCount": 4,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "Default",
+          "French"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Features/ChangePassword/PasswordChangedConfirmation.stories.d.ts",
+      "size": 614,
+      "exportCount": 4,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "Default",
+          "French"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Features/MFAPhoneNumber/AddMFAPhoneNumber/AddSecondMFA.stories.d.ts",
+      "size": 581,
+      "exportCount": 4,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "Default",
+          "French"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "types/webauthn.d.ts",
+      "size": 556,
+      "exportCount": 4,
+      "exports": {
+        "interfaces": [
+          "AttestationOptions",
+          "AssertionOptions",
+          "AttestationResult",
+          "AssertionResult"
+        ],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "stories/Features/LanguagePreference/ViewLanguagePreference.stories.d.ts",
+      "size": 518,
+      "exportCount": 4,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "EnglishPreference",
+          "FrenchPreference"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Features/LanguagePreference/EditLanguagePreferencePage.stories.d.ts",
+      "size": 512,
+      "exportCount": 4,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "Default",
+          "French"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Tests/utils/functions.d.ts",
+      "size": 1321,
+      "exportCount": 3,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "buildTestCase",
+          "Template",
+          "TestTemplate"
+        ],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "stories/Layout/Footer.stories.d.ts",
+      "size": 729,
+      "exportCount": 3,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title",
+          "tags"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Pages/Manage/ManageLandingPage.stories.d.ts",
+      "size": 185,
+      "exportCount": 3,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "English",
+          "French"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Pages/Manage/ProfileLandingPage.stories.d.ts",
+      "size": 185,
+      "exportCount": 3,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "English",
+          "French"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Pages/Manage/ProfileUpdateName.stories.d.ts",
+      "size": 185,
+      "exportCount": 3,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "English",
+          "French"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Pages/Manage/ProfileUpdateNameConfirmUpdate.stories.d.ts",
+      "size": 185,
+      "exportCount": 3,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "English",
+          "French"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Pages/Manage/ProfileUpdateNameSuccess.stories.d.ts",
+      "size": 185,
+      "exportCount": 3,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "English",
+          "French"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Pages/Manage/SecuritySettings.stories.d.ts",
+      "size": 185,
+      "exportCount": 3,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "English",
+          "French"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "utils/faviconUtils.d.ts",
+      "size": 147,
+      "exportCount": 3,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [
+          "changeFavicon",
+          "restoreDefaultFavicon",
+          "setWarningFavicon"
+        ],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "stories/Tests/Features/ContactPhoneNumber/EditContactPhoneNumberPage.test.stories.d.ts",
+      "size": 1289,
+      "exportCount": 2,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Tests/Features/LanguagePreference/EditLanguagePreferencePage.test.stories.d.ts",
+      "size": 1289,
+      "exportCount": 2,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "stories/Tests/Features/ProfileName/EditProfileNamePage.test.stories.d.ts",
+      "size": 1282,
+      "exportCount": 2,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "title"
+        ],
+        "defaultExport": "_default"
+      }
+    },
+    {
+      "file": "components/Providers/LanguageProvider.d.ts",
+      "size": 588,
+      "exportCount": 2,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "LanguageProvider",
+          "useLanguage"
+        ],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "types/hooks.d.ts",
+      "size": 497,
+      "exportCount": 2,
+      "exports": {
+        "interfaces": [
+          "SubmitDataOptions",
+          "SubmitData"
+        ],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/ManageFIDO2/utils/fetchUserFIDO2Credentials.d.ts",
+      "size": 464,
+      "exportCount": 2,
+      "exports": {
+        "interfaces": [],
+        "types": [
+          "FetchFIDO2Options"
+        ],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "fetchUserFIDO2Credentials"
+        ],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "types/fido2.d.ts",
+      "size": 286,
+      "exportCount": 2,
+      "exports": {
+        "interfaces": [
+          "Fido2Credential",
+          "GetUserFido2Response"
+        ],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "components/Providers/PrivateRoute.d.ts",
+      "size": 200,
+      "exportCount": 2,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [
+          "PrivateRoute",
+          "StepupPrivateRoute"
+        ],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "utils/gatag.d.ts",
+      "size": 175,
+      "exportCount": 2,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [
+          "trackPage",
+          "trackEvent"
+        ],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "utils/apiErrorHandler.d.ts",
+      "size": 92,
+      "exportCount": 2,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [
+          "redirectToLogin",
+          "handleApiError"
+        ],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "routes.d.ts",
+      "size": 2766,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "appRoutes"
+        ],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "hooks/useOtpOperations.d.ts",
+      "size": 1188,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [
+          "useOtpOperations"
+        ],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "services/authService.d.ts",
+      "size": 1184,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [
+          "isMobileMediaQuery"
+        ],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "components/ErrorSummaryWithFocus/ErrorSummaryWithFocus.d.ts",
+      "size": 1030,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "ErrorSummaryWithFocus"
+      }
+    },
+    {
+      "file": "features/TransientOtp/components/OtpVerification.d.ts",
+      "size": 526,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "OtpVerification"
+      }
+    },
+    {
+      "file": "hooks/usePasswordValidation.d.ts",
+      "size": 480,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [
+          "usePasswordValidation"
+        ],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAOtpVerification.d.ts",
+      "size": 473,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "AddMFAOtpVerification"
+      }
+    },
+    {
+      "file": "features/EmailAddress/EmailOtpValidation.d.ts",
+      "size": 394,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "EmailOtpValidation"
+      }
+    },
+    {
+      "file": "features/ContactPhoneNumber/components/OtpVerification.d.ts",
+      "size": 378,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "OtpVerification"
+      }
+    },
+    {
+      "file": "features/TransientOtp/components/PasswordVerification.d.ts",
+      "size": 378,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "PasswordVerification"
+      }
+    },
+    {
+      "file": "utils/axiosInstance.d.ts",
+      "size": 363,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "axiosInstance"
+      }
+    },
+    {
+      "file": "features/TransientOtp/components/OtpSelection.d.ts",
+      "size": 347,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "OtpSelection"
+      }
+    },
+    {
+      "file": "components/Layout/SessionTimeoutModal.d.ts",
+      "size": 330,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "SessionTimeoutModal"
+      }
+    },
+    {
+      "file": "features/LanguagePreference/components/EditLanguagePreferences.d.ts",
+      "size": 326,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "EditLanguagePreferences"
+      }
+    },
+    {
+      "file": "features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPhoneNumber.d.ts",
+      "size": 308,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "AddMFAPhoneNumber"
+      }
+    },
+    {
+      "file": "features/ChangePassword/components/Password.d.ts",
+      "size": 307,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "Password"
+      }
+    },
+    {
+      "file": "features/ContactPhoneNumber/components/EnterPhoneNumber.d.ts",
+      "size": 307,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "EnterPhoneNumber"
+      }
+    },
+    {
+      "file": "features/ProfileName/components/ProfileUpdateName.d.ts",
+      "size": 304,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "ProfileUpdateName"
+      }
+    },
+    {
+      "file": "components/Layout/SubmitButton.d.ts",
+      "size": 302,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "SubmitButton"
+      }
+    },
+    {
+      "file": "features/EmailAddress/EditEmailEnterEmail.d.ts",
+      "size": 302,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "EditEmailEnterEmail"
+      }
+    },
+    {
+      "file": "features/ContactPhoneNumber/components/ConfirmUpdate.d.ts",
+      "size": 294,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "ConfirmUpdate"
+      }
+    },
+    {
+      "file": "features/ManageFIDO2/components/VerifyFIDO2Passkey/SelectFIDO2Passkey.d.ts",
+      "size": 278,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "SelectFIDO2Passkey"
+      }
+    },
+    {
+      "file": "features/LanguagePreference/components/ConfirmUpdate.d.ts",
+      "size": 269,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "ConfirmUpdate"
+      }
+    },
+    {
+      "file": "features/ProfileName/components/ConfirmUpdate.d.ts",
+      "size": 261,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "ConfirmUpdate"
+      }
+    },
+    {
+      "file": "utils/userProfileDispatch.d.ts",
+      "size": 253,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [
+          "userProfileDispatch"
+        ],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "components/Providers/UserContext.d.ts",
+      "size": 233,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "UserContext"
+      }
+    },
+    {
+      "file": "features/EmailAddress/EmailUpdateSuccess.d.ts",
+      "size": 212,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "EmailUpdateSuccess"
+      }
+    },
+    {
+      "file": "features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddSecondMFA.d.ts",
+      "size": 206,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "AddSecondMFA"
+      }
+    },
+    {
+      "file": "features/MFAPhoneNumber/DeleteMFAPhoneNumber/component/DeleteMFAPhoneNumberConfirm.d.ts",
+      "size": 197,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "DeleteMFAPhoneNumberConfirm"
+      }
+    },
+    {
+      "file": "features/ManageFIDO2/components/AddFIDO2Passkey/AddFIDO2Passkey.d.ts",
+      "size": 195,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "AddFIDO2Passkey"
+      }
+    },
+    {
+      "file": "features/ContactPhoneNumber/components/SuccessfullyUpdated.d.ts",
+      "size": 189,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "SuccessfullyUpdated"
+      }
+    },
+    {
+      "file": "components/Wizard/StepContent.d.ts",
+      "size": 186,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "StepContent"
+      }
+    },
+    {
+      "file": "components/InfoBlocks/NoticeFactory.d.ts",
+      "size": 184,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "NoticeFactory"
+      }
+    },
+    {
+      "file": "features/LanguagePreference/components/SuccessfullyUpdated.d.ts",
+      "size": 184,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "SuccessfullyUpdated"
+      }
+    },
+    {
+      "file": "features/ManageFIDO2/components/DeleteFIDO2Passkey/DeleteFIDO2PasskeyConfirm.d.ts",
+      "size": 182,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "DeleteFIDO2PasskeyConfirm"
+      }
+    },
+    {
+      "file": "features/EmailAddress/EmailConfirmUpdate.d.ts",
+      "size": 181,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "EmailConfirmUpdate"
+      }
+    },
+    {
+      "file": "components/InfoBlocks/ServicesWithAccessInfoSection.d.ts",
+      "size": 176,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "ServicesWithAccessInfoSection"
+      }
+    },
+    {
+      "file": "features/ProfileName/components/SuccessfullyUpdated.d.ts",
+      "size": 175,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "SuccessfullyUpdated"
+      }
+    },
+    {
+      "file": "__tests__/testSuite.d.ts",
+      "size": 172,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "buildTestSuite"
+        ],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/ContactPhoneNumber/components/ViewContactPhoneNumber.d.ts",
+      "size": 170,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "ViewContactPhoneNumber"
+      }
+    },
+    {
+      "file": "stories/Tests/utils/PageRenderer.d.ts",
+      "size": 163,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "PageRenderer"
+      }
+    },
+    {
+      "file": "components/Layout/Header.d.ts",
+      "size": 146,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "Header"
+      }
+    },
+    {
+      "file": "components/Manage/SecuritySettings/PhoneFactorsList.d.ts",
+      "size": 145,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "PhoneFactorsList"
+      }
+    },
+    {
+      "file": "config.d.ts",
+      "size": 144,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "config"
+      }
+    },
+    {
+      "file": "features/ProfileName/components/ViewProfileNameCard.d.ts",
+      "size": 137,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "ViewProfileNameSectionCard"
+      }
+    },
+    {
+      "file": "features/LanguagePreference/components/ViewLanguagePreference.d.ts",
+      "size": 134,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "ViewLanguagePreferences"
+      }
+    },
+    {
+      "file": "features/ChangePassword/components/PasswordChangedConfirmation.d.ts",
+      "size": 128,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "PasswordChangedConfirmation"
+      }
+    },
+    {
+      "file": "features/ManageFIDO2/components/DeleteFIDO2Passkey/DeleteFIDO2PasskeyPage.d.ts",
+      "size": 119,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "DeleteFIDO2PasskeyPage"
+      }
+    },
+    {
+      "file": "components/Layout/Footer.d.ts",
+      "size": 117,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "Footer"
+      }
+    },
+    {
+      "file": "components/Layout/TopNav.d.ts",
+      "size": 117,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "TopNav"
+      }
+    },
+    {
+      "file": "components/Manage/SecuritySettings/FIDO2PasskeyList.d.ts",
+      "size": 117,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "FIDO2PasskeyList"
+      }
+    },
+    {
+      "file": "features/ManageFIDO2/components/AddFIDO2Passkey/AddFIDO2PasskeyPage.d.ts",
+      "size": 116,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "AddFIDO2PasskeyPage"
+      }
+    },
+    {
+      "file": "components/RPInfo/RPNameDisplay.d.ts",
+      "size": 114,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "RPNameDisplay"
+      }
+    },
+    {
+      "file": "poc_files/POC_Components/LanguageSwitcher.d.ts",
+      "size": 111,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "LanguageSwitcher"
+      }
+    },
+    {
+      "file": "components/Badges/VerifiedBadge.d.ts",
+      "size": 110,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "VerifiedBadge"
+      }
+    },
+    {
+      "file": "components/Badges/EnabledBadge.d.ts",
+      "size": 109,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "EnabledBadge"
+      }
+    },
+    {
+      "file": "poc_files/POC_Components/PasswordSignup.d.ts",
+      "size": 107,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "PasswordSignup"
+      }
+    },
+    {
+      "file": "poc_files/POC_Components/PasskeySignIn.d.ts",
+      "size": 105,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "PasskeySignIn"
+      }
+    },
+    {
+      "file": "poc_files/POC_Components/PasskeySignup.d.ts",
+      "size": 105,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "PasskeySignup"
+      }
+    },
+    {
+      "file": "components/Layout/Loading.d.ts",
+      "size": 103,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "Loader"
+      }
+    },
+    {
+      "file": "poc_files/POC_Components/PasskeyLogin.d.ts",
+      "size": 103,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "PasskeyLogin"
+      }
+    },
+    {
+      "file": "poc_files/POC_Components/Dashboard.d.ts",
+      "size": 97,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "Dashboard"
+      }
+    },
+    {
+      "file": "poc_files/POC_Components/MFASignIn.d.ts",
+      "size": 97,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "MFASignIn"
+      }
+    },
+    {
+      "file": "poc_files/POC_Components/MFASignup.d.ts",
+      "size": 97,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "MFASignup"
+      }
+    },
+    {
+      "file": "features/ContactPhoneNumber/components/EditContactPhoneNumberPage.d.ts",
+      "size": 95,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "EditContactPhoneNumberPage"
+      }
+    },
+    {
+      "file": "features/LanguagePreference/components/EditLanguagePreferencePage.d.ts",
+      "size": 95,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "EditLanguagePreferencePage"
+      }
+    },
+    {
+      "file": "poc_files/App_old.d.ts",
+      "size": 93,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "App_old"
+      }
+    },
+    {
+      "file": "components/Manage/SecuritySettings/Manage2FAVerifications.d.ts",
+      "size": 91,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "Manage2FAVerifications"
+      }
+    },
+    {
+      "file": "poc_files/POC_Components/SignIn.d.ts",
+      "size": 91,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "SignIn"
+      }
+    },
+    {
+      "file": "poc_files/POC_Components/Signup.d.ts",
+      "size": 91,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "Signup"
+      }
+    },
+    {
+      "file": "features/EmailAddress/EditEmailAddressPage.d.ts",
+      "size": 89,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "EditEmailAddressPage"
+      }
+    },
+    {
+      "file": "poc_files/POC_Components/Login.d.ts",
+      "size": 89,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "Login"
+      }
+    },
+    {
+      "file": "features/ChangePassword/components/ChangePasswordIndex.d.ts",
+      "size": 88,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "ChangePasswordIndex"
+      }
+    },
+    {
+      "file": "features/ProfileName/components/EditProfileNamePage.d.ts",
+      "size": 88,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "EditProfileNamePage"
+      }
+    },
+    {
+      "file": "poc_files/POC_Components/Home.d.ts",
+      "size": 87,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "Home"
+      }
+    },
+    {
+      "file": "components/Manage/SecuritySettings/SecuritySettings.d.ts",
+      "size": 85,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "SecuritySettings"
+      }
+    },
+    {
+      "file": "components/Manage/ManageDashboard.d.ts",
+      "size": 84,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "ManageDashboard"
+      }
+    },
+    {
+      "file": "features/ManageFIDO2/components/RenameFIDO2Passkey/RenameFIDO2PasskeyPage.d.ts",
+      "size": 83,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [
+          "RenameFIDO2PasskeyPage"
+        ],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/MFAPhoneNumber/DeleteMFAPhoneNumber/component/DeleteMFAPage.d.ts",
+      "size": 82,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "DeleteMFAPage"
+      }
+    },
+    {
+      "file": "components/Verification/Verification.d.ts",
+      "size": 81,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "Verification"
+      }
+    },
+    {
+      "file": "components/Layout/Breadcrumbs.d.ts",
+      "size": 80,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "Breadcrumbs"
+      }
+    },
+    {
+      "file": "components/Manage/ProfileHome.d.ts",
+      "size": 80,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "ProfileHome"
+      }
+    },
+    {
+      "file": "router.d.ts",
+      "size": 80,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "router"
+      }
+    },
+    {
+      "file": "components/Layout/RootLayout.d.ts",
+      "size": 79,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "RootLayout"
+      }
+    },
+    {
+      "file": "features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPage.d.ts",
+      "size": 79,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "AddMFAPage"
+      }
+    },
+    {
+      "file": "utils/errorUtils.d.ts",
+      "size": 78,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [
+          "getErrorMessage"
+        ],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "poc_files/config.d.ts",
+      "size": 76,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "config"
+      }
+    },
+    {
+      "file": "utils/routeHelpers.d.ts",
+      "size": 52,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [
+          "path"
+        ],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "components/Providers/AppLanguageSetup.d.ts",
+      "size": 50,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [
+          "AppLanguageSetup"
+        ],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "poc_files/theme.d.ts",
+      "size": 48,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "theme"
+      }
+    },
+    {
+      "file": "poc_files/i18n.d.ts",
+      "size": 21,
+      "exportCount": 1,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": "i18n"
+      }
+    },
+    {
+      "file": "features/ManageFIDO2/api/fido2Api.d.ts",
+      "size": 599,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "hooks/useSubmit.d.ts",
+      "size": 562,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "poc_files/services/authService.d.ts",
+      "size": 500,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/MFAPhoneNumber/AddMFAPhoneNumber/api/AddMFAPhoneNumberAPI.d.ts",
+      "size": 425,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "hooks/useLinkSubmit.d.ts",
+      "size": 295,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "hooks/useError.d.ts",
+      "size": 264,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/ChangePassword/api/passwordUpdate.d.ts",
+      "size": 261,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/MFAPhoneNumber/DeleteMFAPhoneNumber/api/DeleteMFAPhoneNumberAPI.d.ts",
+      "size": 255,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "types/index.d.ts",
+      "size": 154,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "utils/gcHelpCentreLinks.d.ts",
+      "size": 153,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "components/Providers/useUser.d.ts",
+      "size": 146,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "hooks/useNavigate.d.ts",
+      "size": 124,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/TransientOtp/api/otpFactors.d.ts",
+      "size": 104,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/ChangePassword/api/otpFactors.d.ts",
+      "size": 97,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "hooks/useBreakpoints.d.ts",
+      "size": 89,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "main.d.ts",
+      "size": 71,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "__tests__/Header.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "__tests__/components/InfoBlocks/NoticeFactory.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "__tests__/components/Layout/SessionTimeoutModal.snapshot.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "__tests__/components/Layout/SessionTimeoutModal.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "__tests__/components/Manage/SecuritySettings/Manage2FAVerifications.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "components/ErrorSummaryWithFocus/__tests__/ErrorSummaryWithFocus.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/ChangePassword/components/__tests__/Password.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/ContactPhoneNumber/__tests__/ConfirmUpdate.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/ContactPhoneNumber/__tests__/EditContactPhoneNumberPage.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/ContactPhoneNumber/__tests__/EnterPhoneNumber.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/ContactPhoneNumber/__tests__/OtpVerification.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/ContactPhoneNumber/__tests__/SuccessfullyUpdated.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/ContactPhoneNumber/__tests__/ViewContactPhoneNumber.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/EmailAddress/__tests__/EditEmailAddressPage.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/EmailAddress/__tests__/EditEmailEnterEmail.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/EmailAddress/__tests__/EmailConfirmUpdate.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/EmailAddress/__tests__/EmailOtpValidation.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/EmailAddress/__tests__/EmailUpdateSuccess.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/LanguagePreference/__tests__/ConfirmUpdate.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/LanguagePreference/__tests__/EditLanguagePreferencePage.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/LanguagePreference/__tests__/EditLanguagePreferences.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/LanguagePreference/__tests__/SuccessfullyUpdated.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/LanguagePreference/__tests__/ViewLanguagePreference.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/MFAPhoneNumber/AddMFAPhoneNumber/component/__tests__/AddMFAOtpVerification.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/MFAPhoneNumber/AddMFAPhoneNumber/component/__tests__/AddMFAPage.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/MFAPhoneNumber/AddMFAPhoneNumber/component/__tests__/AddMFAPhoneNumber.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/MFAPhoneNumber/AddMFAPhoneNumber/component/__tests__/AddSecondMFA.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/MFAPhoneNumber/DeleteMFAPhoneNumber/__tests__/DeleteMFAPage.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/MFAPhoneNumber/DeleteMFAPhoneNumber/api/__tests__/DeleteMFAPhoneNumberAPI.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/ProfileName/__tests__/ConfirmUpdate.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/ProfileName/__tests__/ProfileUpdateName.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/ProfileName/__tests__/SuccessfullyUpdated.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/ProfileName/components/__tests__/EditProfileNamePage.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/TransientOtp/api/__tests__/otpFactors.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/TransientOtp/components/__tests__/OtpSelection.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/TransientOtp/components/__tests__/OtpVerification.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "features/TransientOtp/components/__tests__/PasswordVerification.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "hooks/__tests__/useOtpOperations.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "hooks/__tests__/usePasswordValidation.test.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "setup-msw.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    },
+    {
+      "file": "setupTests.d.ts",
+      "size": 11,
+      "exportCount": 0,
+      "exports": {
+        "interfaces": [],
+        "types": [],
+        "enums": [],
+        "funcs": [],
+        "vars": [],
+        "defaultExport": null
+      }
+    }
+  ]
+}

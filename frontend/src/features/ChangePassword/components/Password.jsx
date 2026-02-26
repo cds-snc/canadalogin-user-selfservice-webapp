@@ -13,13 +13,13 @@ import {
 import {
   getContentWithVariables,
   getPageContent,
-} from "../../../utils/functions.jsx";
-import { authService } from "../../../services/authService.jsx";
-import { passwordUpdate } from "../api/passwordUpdate.jsx";
+} from "../../../utils/functions";
+import { authService } from "../../../services/authService";
+import { passwordUpdate } from "../api/passwordUpdate";
 
-import { PAGES } from "../../../utils/constants.jsx";
-import { path } from "../../../utils/routeHelpers.js";
-import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
+import { PAGES } from "../../../utils/constants";
+import { path } from "../../../utils/routeHelpers";
+import SubmitButton from "../../../components/Layout/SubmitButton";
 
 export default function Password({
   onNext,

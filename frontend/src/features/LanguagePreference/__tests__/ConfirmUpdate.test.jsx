@@ -2,7 +2,7 @@ import "@testing-library/jest-dom/vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { BrowserRouter } from "react-router";
-import ConfirmLanguageUpdate from "../components/ConfirmUpdate.jsx";
+import ConfirmLanguageUpdate from "../components/ConfirmUpdate";
 
 // ────────────────────────────────────────────────
 // Mocks
@@ -26,7 +26,7 @@ vi.mock("react-router", async () => {
   };
 });
 
-vi.mock("../../../utils/functions.jsx", () => ({
+vi.mock("../../../utils/functions", () => ({
   getPageContent: vi.fn(() => ({
     1: "Confirm language update",
     2: "You are changing your language to",
@@ -41,11 +41,11 @@ vi.mock("../../../utils/functions.jsx", () => ({
   ),
 }));
 
-vi.mock("../../../utils/routeHelpers.js", () => ({
+vi.mock("../../../utils/routeHelpers", () => ({
   path: vi.fn((page, params) => `/${params.language}/${page}`),
 }));
 
-vi.mock("../../../utils/constants.jsx", () => ({
+vi.mock("../../../utils/constants", () => ({
   PAGES: {
     confirmLanguageUpdate: "confirm",
     otpSelection: "otp-selection",
@@ -61,7 +61,7 @@ vi.mock("../../../utils/constants.jsx", () => ({
 }));
 
 const mockUpdateProfileSuccess = vi.fn();
-vi.mock("../../../utils/userProfileDispatch.jsx", () => ({
+vi.mock("../../../utils/userProfileDispatch", () => ({
   userProfileDispatch: () => ({
     updateProfileSuccess: mockUpdateProfileSuccess,
   }),
@@ -84,7 +84,7 @@ vi.mock("../../../components/Providers/useUser.tsx", () => ({
   }),
 }));
 
-vi.mock("../../../services/authService.jsx", () => ({
+vi.mock("../../../services/authService", () => ({
   authService: {
     update_my_user_profile: vi.fn(),
   },

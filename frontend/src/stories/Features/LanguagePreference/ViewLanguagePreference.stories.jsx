@@ -1,11 +1,11 @@
-import ViewLanguagePreferences from "../../../features/LanguagePreference/components/ViewLanguagePreference.jsx";
+import ViewLanguagePreferences from "../../../features/LanguagePreference/components/ViewLanguagePreference";
 import {
   AVAILABLE_LANGUAGES,
   PROFILE_LANGUAGES,
   PAGES,
   LANGUAGE_DISPLAY_NAMES,
-} from "../../../utils/constants.jsx";
-import { getPageContent } from "../../../utils/functions.jsx";
+} from "../../../utils/constants";
+import { getPageContent } from "../../../utils/functions";
 import { UserProvider } from "../../../components/Providers/UserProvider.tsx";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider.tsx";
 import { useUser } from "../../../components/Providers/useUser.tsx";

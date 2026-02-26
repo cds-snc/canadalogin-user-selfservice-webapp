@@ -15,15 +15,15 @@ import {
   GcdsButton,
   GcdsErrorMessage,
 } from "@cdssnc/gcds-components-react";
-import { getPageContent } from "../../../utils/functions.jsx";
+import { getPageContent } from "../../../utils/functions";
 import {
   countryMapping,
   FLOW_TYPES,
   PAGES,
   ServicesWithAccessInfoSectionInformation,
-} from "../../../utils/constants.jsx";
-import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx";
-import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
+} from "../../../utils/constants";
+import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection";
+import SubmitButton from "../../../components/Layout/SubmitButton";
 
 const PageHeader = ({ language, pageContentJson }) => {
   return (

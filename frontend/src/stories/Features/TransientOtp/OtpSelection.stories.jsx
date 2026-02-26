@@ -1,9 +1,9 @@
-import OtpSelection from "../../../features/TransientOtp/components/OtpSelection.jsx";
+import OtpSelection from "../../../features/TransientOtp/components/OtpSelection";
 import {
   AVAILABLE_LANGUAGES,
   FLOW_TYPES,
   PAGES,
-} from "../../../utils/constants.jsx";
+} from "../../../utils/constants";
 
 export default {
   title: "GC Sign In/Features/TransientOtp/OtpSelection",

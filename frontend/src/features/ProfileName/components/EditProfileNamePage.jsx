@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useLocation, useNavigate } from "react-router";
 import { useUser } from "../../../components/Providers/useUser.tsx";
-import { getPageContent } from "../../../utils/functions.jsx";
-import { PAGES } from "../../../utils/constants.jsx";
-import { path } from "../../../utils/routeHelpers.js";
-import { authService } from "../../../services/authService.jsx";
-import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
-import StepContent from "../../../components/Wizard/StepContent.jsx";
-import Loader from "../../../components/Layout/Loading.jsx";
-import ProfileUpdateName from "./ProfileUpdateName.jsx";
-import ConfirmUpdate from "./ConfirmUpdate.jsx";
-import SuccessfullyUpdated from "./SuccessfullyUpdated.jsx";
+import { getPageContent } from "../../../utils/functions";
+import { PAGES } from "../../../utils/constants";
+import { path } from "../../../utils/routeHelpers";
+import { authService } from "../../../services/authService";
+import { userProfileDispatch } from "../../../utils/userProfileDispatch";
+import StepContent from "../../../components/Wizard/StepContent";
+import Loader from "../../../components/Layout/Loading";
+import ProfileUpdateName from "./ProfileUpdateName";
+import ConfirmUpdate from "./ConfirmUpdate";
+import SuccessfullyUpdated from "./SuccessfullyUpdated";
 
 export default function EditProfileNamePage() {
   const { language, step } = useParams();

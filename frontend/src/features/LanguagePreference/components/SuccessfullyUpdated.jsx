@@ -10,12 +10,12 @@ import {
   GcdsGrid,
   GcdsLink,
 } from "@cdssnc/gcds-components-react";
-import { getPageContent } from "../../../utils/functions.jsx";
-import { PAGES, LANGUAGE_DISPLAY_NAMES } from "../../../utils/constants.jsx";
+import { getPageContent } from "../../../utils/functions";
+import { PAGES, LANGUAGE_DISPLAY_NAMES } from "../../../utils/constants";
 import { useUser } from "../../../components/Providers/useUser.tsx";
-import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
-import { authService } from "../../../services/authService.jsx";
-import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
+import { userProfileDispatch } from "../../../utils/userProfileDispatch";
+import { authService } from "../../../services/authService";
+import SubmitButton from "../../../components/Layout/SubmitButton";
 
 export default function SuccessfullyUpdated({
   languageFormData,

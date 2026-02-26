@@ -2,7 +2,7 @@ import "@testing-library/jest-dom/vitest";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { BrowserRouter } from "react-router";
-import Password from "../Password.jsx";
+import Password from "../Password";
 
 // Mock the GCDS components
 vi.mock("@cdssnc/gcds-components-react", () => ({
@@ -125,7 +125,7 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
 }));
 
 // Mock utility functions
-vi.mock("../../../../utils/functions.jsx", () => ({
+vi.mock("../../../../utils/functions", () => ({
   getPageContent: vi.fn((language, page) => {
     const mockContent = {
       password: {
@@ -161,7 +161,7 @@ vi.mock("../../../../utils/functions.jsx", () => ({
   }),
 }));
 
-vi.mock("../../../../services/authService.jsx", () => ({
+vi.mock("../../../../services/authService", () => ({
   authService: {
     requestPasswordPolicy: vi.fn().mockResolvedValue({
       success: true,
@@ -177,7 +177,7 @@ vi.mock("../../../../services/authService.jsx", () => ({
 }));
 
 // Mock constants
-vi.mock("../../../../utils/constants.jsx", async (importOriginal) => {
+vi.mock("../../../../utils/constants", async (importOriginal) => {
   const actual = await importOriginal();
   return {
     ...actual,
@@ -189,12 +189,12 @@ vi.mock("../../../../utils/constants.jsx", async (importOriginal) => {
 });
 
 // Mock route helpers
-vi.mock("../../../../utils/routeHelpers.js", () => ({
+vi.mock("../../../../utils/routeHelpers", () => ({
   path: vi.fn((page, params) => `/${params.language}/${page}`),
 }));
 
 // Mock password update API
-vi.mock("../../api/passwordUpdate.jsx", () => ({
+vi.mock("../../api/passwordUpdate", () => ({
   passwordUpdate: {
     finalStep: vi.fn(),
   },
@@ -234,7 +234,7 @@ describe("Password Component", () => {
     vi.clearAllMocks();
     // Get reference to the mocked service
     const { authService } = await import(
-      "../../../../services/authService.jsx"
+      "../../../../services/authService"
     );
     mockAuthService = authService;
   });

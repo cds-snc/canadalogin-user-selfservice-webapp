@@ -8,7 +8,7 @@ import {
   GcdsStepper,
   GcdsText,
 } from "@cdssnc/gcds-components-react";
-import { getPageContent, isCodeValid } from "../../utils/functions.jsx";
+import { getPageContent, isCodeValid } from "../../utils/functions";
 import {
   AVAILABLE_LANGUAGES,
   FLOW_TYPES,
@@ -16,12 +16,12 @@ import {
   PAGES,
   SERVICES,
   SUBMIT_END_POINTS,
-} from "../../utils/constants.jsx";
+} from "../../utils/constants";
 import { useParams } from "react-router";
-import SubmitButton from "../Layout/SubmitButton.jsx";
+import SubmitButton from "../Layout/SubmitButton";
 import { useUser } from "../Providers/useUser.tsx";
 import { useEffect, useState } from "react";
-import { useLinkSubmit } from "../../hooks/useLinkSubmit.js";
+import { useLinkSubmit } from "../../hooks/useLinkSubmit";
 import { useSubmit } from "../../hooks/useSubmit";
 import { useError } from "../../hooks/useError";
 const initialTime = 10;

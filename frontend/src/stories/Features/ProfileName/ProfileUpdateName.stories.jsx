@@ -1,5 +1,5 @@
-import ProfileUpdateName from "../../../features/ProfileName/components/ProfileUpdateName.jsx";
-import { AVAILABLE_LANGUAGES } from "../../../utils/constants.jsx";
+import ProfileUpdateName from "../../../features/ProfileName/components/ProfileUpdateName";
+import { AVAILABLE_LANGUAGES } from "../../../utils/constants";
 import { UserProvider } from "../../../components/Providers/UserProvider.tsx";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider.tsx";
 

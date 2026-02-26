@@ -1,0 +1,1322 @@
+[
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/MFAPhoneNumber/AddMFAPhoneNumber/component/__tests__/AddMFAPage.test.jsx",
+    "ext": "jsx",
+    "lines": 2550,
+    "size": 77122
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Tests/Features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPage.test.stories.jsx",
+    "ext": "jsx",
+    "lines": 1733,
+    "size": 59336
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/MFAPhoneNumber/AddMFAPhoneNumber/component/__tests__/AddMFAPhoneNumber.test.jsx",
+    "ext": "jsx",
+    "lines": 1179,
+    "size": 37430
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/TransientOtp/components/__tests__/OtpSelection.test.jsx",
+    "ext": "jsx",
+    "lines": 935,
+    "size": 26900
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ProfileName/components/__tests__/EditProfileNamePage.test.jsx",
+    "ext": "jsx",
+    "lines": 931,
+    "size": 27206
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/MFAPhoneNumber/DeleteMFAPhoneNumber/__tests__/DeleteMFAPage.test.jsx",
+    "ext": "jsx",
+    "lines": 878,
+    "size": 25926
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/TransientOtp/components/__tests__/OtpVerification.test.jsx",
+    "ext": "jsx",
+    "lines": 851,
+    "size": 25463
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/MFAPhoneNumber/AddMFAPhoneNumber/component/__tests__/AddMFAOtpVerification.test.jsx",
+    "ext": "jsx",
+    "lines": 830,
+    "size": 26546
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/EmailAddress/__tests__/EditEmailEnterEmail.test.jsx",
+    "ext": "jsx",
+    "lines": 808,
+    "size": 23715
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/EmailAddress/__tests__/EmailOtpValidation.test.jsx",
+    "ext": "jsx",
+    "lines": 753,
+    "size": 21883
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/hooks/__tests__/useOtpOperations.test.jsx",
+    "ext": "jsx",
+    "lines": 724,
+    "size": 20305
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/EmailAddress/__tests__/EditEmailAddressPage.test.jsx",
+    "ext": "jsx",
+    "lines": 716,
+    "size": 20990
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/components/ErrorSummaryWithFocus/__tests__/ErrorSummaryWithFocus.test.jsx",
+    "ext": "jsx",
+    "lines": 685,
+    "size": 19798
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/TransientOtp/components/__tests__/PasswordVerification.test.jsx",
+    "ext": "jsx",
+    "lines": 658,
+    "size": 21466
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/EmailAddress/__tests__/EmailConfirmUpdate.test.jsx",
+    "ext": "jsx",
+    "lines": 649,
+    "size": 18528
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/LanguagePreference/__tests__/SuccessfullyUpdated.test.jsx",
+    "ext": "jsx",
+    "lines": 629,
+    "size": 18846
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Tests/Layout/SessionTimeoutModal.test.stories.jsx",
+    "ext": "jsx",
+    "lines": 616,
+    "size": 20718
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/MFAPhoneNumber/AddMFAPhoneNumber/component/__tests__/AddSecondMFA.test.jsx",
+    "ext": "jsx",
+    "lines": 609,
+    "size": 18044
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/EmailAddress/__tests__/EmailUpdateSuccess.test.jsx",
+    "ext": "jsx",
+    "lines": 608,
+    "size": 18327
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/utils/constants.jsx",
+    "ext": "jsx",
+    "lines": 549,
+    "size": 13018
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/LanguagePreference/__tests__/EditLanguagePreferences.test.jsx",
+    "ext": "jsx",
+    "lines": 534,
+    "size": 15993
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ProfileName/__tests__/ProfileUpdateName.test.jsx",
+    "ext": "jsx",
+    "lines": 532,
+    "size": 13856
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Tests/Features/MFAPhoneNumber/DeleteMFAPhoneNumber/DeleteMFAPhoneNumberConfirm.test.stories.jsx",
+    "ext": "jsx",
+    "lines": 529,
+    "size": 14302
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ContactPhoneNumber/__tests__/EnterPhoneNumber.test.jsx",
+    "ext": "jsx",
+    "lines": 516,
+    "size": 14557
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ChangePassword/components/__tests__/Password.test.jsx",
+    "ext": "jsx",
+    "lines": 500,
+    "size": 13938
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Tests/InfoBlocks/NoticeFactory.test.stories.jsx",
+    "ext": "jsx",
+    "lines": 490,
+    "size": 14458
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/components/Providers/UserProvider.tsx",
+    "ext": "tsx",
+    "lines": 476,
+    "size": 14553
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ContactPhoneNumber/__tests__/EditContactPhoneNumberPage.test.jsx",
+    "ext": "jsx",
+    "lines": 472,
+    "size": 12895
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Tests/utils/gcdsTestHelpers.js",
+    "ext": "js",
+    "lines": 461,
+    "size": 14514
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ContactPhoneNumber/__tests__/OtpVerification.test.jsx",
+    "ext": "jsx",
+    "lines": 447,
+    "size": 12077
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Tests/utils/constants.jsx",
+    "ext": "jsx",
+    "lines": 446,
+    "size": 11969
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPage.jsx",
+    "ext": "jsx",
+    "lines": 432,
+    "size": 13210
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/__tests__/testSuite.tsx",
+    "ext": "tsx",
+    "lines": 394,
+    "size": 9603
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/hooks/__tests__/usePasswordValidation.test.jsx",
+    "ext": "jsx",
+    "lines": 387,
+    "size": 12721
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ProfileName/__tests__/ConfirmUpdate.test.jsx",
+    "ext": "jsx",
+    "lines": 383,
+    "size": 9924
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Tests/utils/functions.tsx",
+    "ext": "tsx",
+    "lines": 380,
+    "size": 9868
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ProfileName/__tests__/SuccessfullyUpdated.test.jsx",
+    "ext": "jsx",
+    "lines": 377,
+    "size": 9503
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ContactPhoneNumber/__tests__/ViewContactPhoneNumber.test.jsx",
+    "ext": "jsx",
+    "lines": 370,
+    "size": 10157
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Tests/Features/MFAPhoneNumber/DeleteMFAPhoneNumber/DeleteMFAPage.test.stories.jsx",
+    "ext": "jsx",
+    "lines": 369,
+    "size": 12290
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/services/authService.jsx",
+    "ext": "jsx",
+    "lines": 368,
+    "size": 10895
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/LanguagePreference/__tests__/ViewLanguagePreference.test.jsx",
+    "ext": "jsx",
+    "lines": 367,
+    "size": 10338
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Tests/Features/ContactPhoneNumber/EditContactPhoneNumberPage.test.stories.jsx",
+    "ext": "jsx",
+    "lines": 365,
+    "size": 12586
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/MFAPhoneNumber/DeleteMFAPhoneNumber/api/__tests__/DeleteMFAPhoneNumberAPI.test.jsx",
+    "ext": "jsx",
+    "lines": 358,
+    "size": 9502
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/setup-msw.js",
+    "ext": "js",
+    "lines": 346,
+    "size": 10844
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ContactPhoneNumber/__tests__/ConfirmUpdate.test.jsx",
+    "ext": "jsx",
+    "lines": 334,
+    "size": 8883
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ContactPhoneNumber/__tests__/SuccessfullyUpdated.test.jsx",
+    "ext": "jsx",
+    "lines": 321,
+    "size": 8351
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/TransientOtp/api/__tests__/otpFactors.test.jsx",
+    "ext": "jsx",
+    "lines": 310,
+    "size": 8270
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/EmailAddress/EditEmailAddressPage.jsx",
+    "ext": "jsx",
+    "lines": 303,
+    "size": 9502
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/poc_files/POC_Components/MFASignup.jsx",
+    "ext": "jsx",
+    "lines": 299,
+    "size": 8627
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/__tests__/components/Manage/SecuritySettings/Manage2FAVerifications.test.jsx",
+    "ext": "jsx",
+    "lines": 289,
+    "size": 8765
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Tests/Features/LanguagePreference/EditLanguagePreferencePage.test.stories.jsx",
+    "ext": "jsx",
+    "lines": 289,
+    "size": 9461
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ContactPhoneNumber/components/EnterPhoneNumber.jsx",
+    "ext": "jsx",
+    "lines": 255,
+    "size": 7513
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Tests/Features/TransientOtp/OtpVerification.test.stories.jsx",
+    "ext": "jsx",
+    "lines": 255,
+    "size": 7682
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/hooks/useOtpOperations.js",
+    "ext": "js",
+    "lines": 254,
+    "size": 7508
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/MFAPhoneNumber/DeleteMFAPhoneNumber/component/DeleteMFAPage.jsx",
+    "ext": "jsx",
+    "lines": 241,
+    "size": 8812
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/hooks/useSubmit.tsx",
+    "ext": "tsx",
+    "lines": 235,
+    "size": 6147
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ContactPhoneNumber/components/OtpVerification.jsx",
+    "ext": "jsx",
+    "lines": 233,
+    "size": 5955
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Tests/Features/ProfileName/EditProfileNamePage.test.stories.jsx",
+    "ext": "jsx",
+    "lines": 231,
+    "size": 7387
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAOtpVerification.jsx",
+    "ext": "jsx",
+    "lines": 225,
+    "size": 5671
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ManageFIDO2/utils/webAuthnUtils.js",
+    "ext": "js",
+    "lines": 225,
+    "size": 5820
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/components/Verification/Verification.jsx",
+    "ext": "jsx",
+    "lines": 222,
+    "size": 6258
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ChangePassword/components/ChangePasswordIndex.jsx",
+    "ext": "jsx",
+    "lines": 220,
+    "size": 7338
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ManageFIDO2/components/AddFIDO2Passkey/AddFIDO2PasskeyPage.jsx",
+    "ext": "jsx",
+    "lines": 219,
+    "size": 7352
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Features/TransientOtp/OtpVerification.stories.jsx",
+    "ext": "jsx",
+    "lines": 216,
+    "size": 5387
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/__tests__/components/InfoBlocks/NoticeFactory.test.jsx",
+    "ext": "jsx",
+    "lines": 214,
+    "size": 6717
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/poc_files/POC_Components/PasskeyLogin.jsx",
+    "ext": "jsx",
+    "lines": 211,
+    "size": 6085
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/TransientOtp/components/OtpVerification.jsx",
+    "ext": "jsx",
+    "lines": 209,
+    "size": 5551
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPhoneNumber.jsx",
+    "ext": "jsx",
+    "lines": 203,
+    "size": 5995
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ContactPhoneNumber/components/EditContactPhoneNumberPage.jsx",
+    "ext": "jsx",
+    "lines": 201,
+    "size": 5981
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/LanguagePreference/__tests__/ConfirmUpdate.test.jsx",
+    "ext": "jsx",
+    "lines": 201,
+    "size": 5846
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/components/Manage/SecuritySettings/Manage2FAVerifications.jsx",
+    "ext": "jsx",
+    "lines": 197,
+    "size": 7173
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ChangePassword/components/Password.jsx",
+    "ext": "jsx",
+    "lines": 197,
+    "size": 5480
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/components/Layout/SessionTimeoutModal.jsx",
+    "ext": "jsx",
+    "lines": 194,
+    "size": 5383
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/hooks/useLinkSubmit.tsx",
+    "ext": "tsx",
+    "lines": 193,
+    "size": 5112
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/poc_files/POC_Components/Home.jsx",
+    "ext": "jsx",
+    "lines": 188,
+    "size": 4800
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Layout/SessionTimeoutModal.stories.jsx",
+    "ext": "jsx",
+    "lines": 187,
+    "size": 4168
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/poc_files/POC_Components/PasskeySignIn.jsx",
+    "ext": "jsx",
+    "lines": 186,
+    "size": 5000
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Features/ChangePassword/ChangePasswordIndex.stories.jsx",
+    "ext": "jsx",
+    "lines": 184,
+    "size": 4242
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/poc_files/POC_Components/PasskeySignup.jsx",
+    "ext": "jsx",
+    "lines": 181,
+    "size": 5034
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Features/ContactPhoneNumber/EditContactPhoneNumberPage.stories.jsx",
+    "ext": "jsx",
+    "lines": 180,
+    "size": 4149
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Features/ContactPhoneNumber/EnterPhoneNumber.stories.jsx",
+    "ext": "jsx",
+    "lines": 178,
+    "size": 4338
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Tests/Features/TransientOtp/OtpSelection.test.stories.jsx",
+    "ext": "jsx",
+    "lines": 173,
+    "size": 5014
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/components/Providers/PrivateRoute.jsx",
+    "ext": "jsx",
+    "lines": 172,
+    "size": 5188
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Features/ContactPhoneNumber/ConfirmUpdate.stories.jsx",
+    "ext": "jsx",
+    "lines": 172,
+    "size": 4291
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/TransientOtp/components/OtpSelection.jsx",
+    "ext": "jsx",
+    "lines": 171,
+    "size": 4946
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Features/LanguagePreference/EditLanguagePreferences.stories.jsx",
+    "ext": "jsx",
+    "lines": 170,
+    "size": 4179
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/__tests__/components/Layout/SessionTimeoutModal.snapshot.test.jsx",
+    "ext": "jsx",
+    "lines": 169,
+    "size": 4447
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/poc_files/POC_Components/PasswordSignup.jsx",
+    "ext": "jsx",
+    "lines": 166,
+    "size": 4361
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Features/MFAPhoneNumber/DeleteMFAPhoneNumber/DeleteMFAPage.stories.jsx",
+    "ext": "jsx",
+    "lines": 162,
+    "size": 3647
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Features/TransientOtp/OtpSelection.stories.jsx",
+    "ext": "jsx",
+    "lines": 161,
+    "size": 3610
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/LanguagePreference/components/EditLanguagePreferencePage.jsx",
+    "ext": "jsx",
+    "lines": 160,
+    "size": 5169
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Pages/Manage/SecuritySettings/Manage2FAVerifications.stories.jsx",
+    "ext": "jsx",
+    "lines": 160,
+    "size": 3838
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/poc_files/POC_Components/Login.jsx",
+    "ext": "jsx",
+    "lines": 159,
+    "size": 4250
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ProfileName/components/EditProfileNamePage.jsx",
+    "ext": "jsx",
+    "lines": 158,
+    "size": 4962
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/poc_files/POC_Components/Dashboard.js",
+    "ext": "js",
+    "lines": 158,
+    "size": 4312
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Features/ContactPhoneNumber/OtpVerification.stories.jsx",
+    "ext": "jsx",
+    "lines": 157,
+    "size": 3903
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/EmailAddress/EmailOtpValidation.jsx",
+    "ext": "jsx",
+    "lines": 154,
+    "size": 3676
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ProfileName/components/ProfileUpdateName.jsx",
+    "ext": "jsx",
+    "lines": 154,
+    "size": 4589
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Features/LanguagePreference/ViewLanguagePreference.stories.jsx",
+    "ext": "jsx",
+    "lines": 154,
+    "size": 4171
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ManageFIDO2/components/AddFIDO2Passkey/AddFIDO2Passkey.jsx",
+    "ext": "jsx",
+    "lines": 151,
+    "size": 4378
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/routes.jsx",
+    "ext": "jsx",
+    "lines": 148,
+    "size": 6031
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Features/EmailAddress/EditEmailEnterEmail.stories.jsx",
+    "ext": "jsx",
+    "lines": 146,
+    "size": 3414
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/__tests__/components/Layout/SessionTimeoutModal.test.jsx",
+    "ext": "jsx",
+    "lines": 142,
+    "size": 3499
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Features/EmailAddress/EmailOtpValidation.stories.jsx",
+    "ext": "jsx",
+    "lines": 141,
+    "size": 3337
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Features/ContactPhoneNumber/ViewContactPhoneNumber.stories.jsx",
+    "ext": "jsx",
+    "lines": 140,
+    "size": 3281
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Features/EmailAddress/EditEmailAddressPage.stories.jsx",
+    "ext": "jsx",
+    "lines": 140,
+    "size": 3099
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/poc_files/services/authService.js",
+    "ext": "js",
+    "lines": 139,
+    "size": 3942
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Features/EmailAddress/EmailConfirmUpdate.stories.jsx",
+    "ext": "jsx",
+    "lines": 137,
+    "size": 3315
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Features/LanguagePreference/ConfirmUpdate.stories.jsx",
+    "ext": "jsx",
+    "lines": 136,
+    "size": 3485
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Features/TransientOtp/PasswordVerification.stories.jsx",
+    "ext": "jsx",
+    "lines": 135,
+    "size": 3411
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/poc_files/POC_Components/MFASignIn.jsx",
+    "ext": "jsx",
+    "lines": 132,
+    "size": 3225
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/poc_files/POC_Components/SignIn.js",
+    "ext": "js",
+    "lines": 131,
+    "size": 3201
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ManageFIDO2/api/fido2Api.jsx",
+    "ext": "jsx",
+    "lines": 130,
+    "size": 3186
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/components/Layout/TopNav.jsx",
+    "ext": "jsx",
+    "lines": 126,
+    "size": 3763
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/components/Manage/ManageDashboard.jsx",
+    "ext": "jsx",
+    "lines": 123,
+    "size": 10340
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Features/ProfileName/ConfirmUpdate.stories.jsx",
+    "ext": "jsx",
+    "lines": 123,
+    "size": 3233
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Features/ProfileName/ViewProfileNameCard.stories.jsx",
+    "ext": "jsx",
+    "lines": 123,
+    "size": 3412
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ContactPhoneNumber/components/ViewContactPhoneNumber.jsx",
+    "ext": "jsx",
+    "lines": 122,
+    "size": 3357
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/TransientOtp/components/PasswordVerification.jsx",
+    "ext": "jsx",
+    "lines": 122,
+    "size": 3381
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/utils/functions.jsx",
+    "ext": "jsx",
+    "lines": 122,
+    "size": 3393
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Features/ProfileName/ProfileUpdateName.stories.jsx",
+    "ext": "jsx",
+    "lines": 121,
+    "size": 3238
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Features/ChangePassword/Password.stories.jsx",
+    "ext": "jsx",
+    "lines": 119,
+    "size": 2801
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/LanguagePreference/components/EditLanguagePreferences.jsx",
+    "ext": "jsx",
+    "lines": 118,
+    "size": 3007
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ManageFIDO2/components/DeleteFIDO2Passkey/DeleteFIDO2PasskeyConfirm.jsx",
+    "ext": "jsx",
+    "lines": 116,
+    "size": 3310
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/poc_files/POC_Components/Signup.jsx",
+    "ext": "jsx",
+    "lines": 115,
+    "size": 3855
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Features/MFAPhoneNumber/AddMFAPhoneNumber/AddMFAPage.stories.jsx",
+    "ext": "jsx",
+    "lines": 115,
+    "size": 2564
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ManageFIDO2/components/RenameFIDO2Passkey/RenameFIDO2PasskeyPage.jsx",
+    "ext": "jsx",
+    "lines": 114,
+    "size": 3357
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/LanguagePreference/components/SuccessfullyUpdated.jsx",
+    "ext": "jsx",
+    "lines": 113,
+    "size": 3316
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ManageFIDO2/components/VerifyFIDO2Passkey/SelectFIDO2Passkey.jsx",
+    "ext": "jsx",
+    "lines": 107,
+    "size": 3326
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ProfileName/components/SuccessfullyUpdated.jsx",
+    "ext": "jsx",
+    "lines": 105,
+    "size": 3058
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ContactPhoneNumber/components/ConfirmUpdate.jsx",
+    "ext": "jsx",
+    "lines": 103,
+    "size": 2824
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Features/EmailAddress/EmailUpdateSuccess.stories.jsx",
+    "ext": "jsx",
+    "lines": 103,
+    "size": 2583
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/components/Manage/ProfileHome.jsx",
+    "ext": "jsx",
+    "lines": 101,
+    "size": 3234
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/poc_files/POC_Components/Home.js",
+    "ext": "js",
+    "lines": 101,
+    "size": 2591
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ProfileName/components/ConfirmUpdate.jsx",
+    "ext": "jsx",
+    "lines": 100,
+    "size": 2771
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/__tests__/Header.test.jsx",
+    "ext": "jsx",
+    "lines": 98,
+    "size": 3050
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/EmailAddress/EditEmailEnterEmail.jsx",
+    "ext": "jsx",
+    "lines": 97,
+    "size": 2648
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/poc_files/theme.js",
+    "ext": "js",
+    "lines": 93,
+    "size": 1880
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ManageFIDO2/components/DeleteFIDO2Passkey/DeleteFIDO2PasskeyPage.jsx",
+    "ext": "jsx",
+    "lines": 92,
+    "size": 3278
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Features/ContactPhoneNumber/SuccessfullyUpdated.stories.jsx",
+    "ext": "jsx",
+    "lines": 91,
+    "size": 2263
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/components/ErrorSummaryWithFocus/ErrorSummaryWithFocus.jsx",
+    "ext": "jsx",
+    "lines": 86,
+    "size": 2628
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/components/Manage/SecuritySettings/SecuritySettings.jsx",
+    "ext": "jsx",
+    "lines": 85,
+    "size": 3005
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/LanguagePreference/__tests__/EditLanguagePreferencePage.test.jsx",
+    "ext": "jsx",
+    "lines": 85,
+    "size": 2444
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/LanguagePreference/components/ConfirmUpdate.jsx",
+    "ext": "jsx",
+    "lines": 84,
+    "size": 2076
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Features/LanguagePreference/SuccessfullyUpdated.stories.jsx",
+    "ext": "jsx",
+    "lines": 84,
+    "size": 2189
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Features/ProfileName/SuccessfullyUpdated.stories.jsx",
+    "ext": "jsx",
+    "lines": 84,
+    "size": 2354
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/components/InfoBlocks/NoticeFactory.jsx",
+    "ext": "jsx",
+    "lines": 83,
+    "size": 2483
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddSecondMFA.jsx",
+    "ext": "jsx",
+    "lines": 81,
+    "size": 2097
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ContactPhoneNumber/components/SuccessfullyUpdated.jsx",
+    "ext": "jsx",
+    "lines": 80,
+    "size": 2175
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/MFAPhoneNumber/DeleteMFAPhoneNumber/component/DeleteMFAPhoneNumberConfirm.jsx",
+    "ext": "jsx",
+    "lines": 74,
+    "size": 2014
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Tests/utils/PageRenderer.jsx",
+    "ext": "jsx",
+    "lines": 74,
+    "size": 3678
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Features/LanguagePreference/EditLanguagePreferencePage.stories.jsx",
+    "ext": "jsx",
+    "lines": 73,
+    "size": 1573
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/EmailAddress/EmailUpdateSuccess.jsx",
+    "ext": "jsx",
+    "lines": 70,
+    "size": 1950
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/components/Providers/LanguageProvider.tsx",
+    "ext": "tsx",
+    "lines": 69,
+    "size": 1463
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ChangePassword/components/PasswordChangedConfirmation.jsx",
+    "ext": "jsx",
+    "lines": 68,
+    "size": 1658
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/components/Providers/AppLanguageSetup.tsx",
+    "ext": "tsx",
+    "lines": 67,
+    "size": 2169
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/types/user.ts",
+    "ext": "ts",
+    "lines": 67,
+    "size": 1276
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/hooks/usePasswordValidation.js",
+    "ext": "js",
+    "lines": 66,
+    "size": 2086
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/components/Manage/SecuritySettings/PhoneFactorsList.jsx",
+    "ext": "jsx",
+    "lines": 65,
+    "size": 2045
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/components/InfoBlocks/ServicesWithAccessInfoSection.jsx",
+    "ext": "jsx",
+    "lines": 64,
+    "size": 1810
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/components/Manage/SecuritySettings/FIDO2PasskeyList.jsx",
+    "ext": "jsx",
+    "lines": 63,
+    "size": 1969
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/EmailAddress/EmailConfirmUpdate.jsx",
+    "ext": "jsx",
+    "lines": 59,
+    "size": 1667
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Features/ProfileName/EditProfileNamePage.stories.jsx",
+    "ext": "jsx",
+    "lines": 59,
+    "size": 1443
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/components/Layout/Breadcrumbs.jsx",
+    "ext": "jsx",
+    "lines": 58,
+    "size": 1915
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Features/ChangePassword/PasswordChangedConfirmation.stories.jsx",
+    "ext": "jsx",
+    "lines": 58,
+    "size": 1546
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Features/MFAPhoneNumber/AddMFAPhoneNumber/AddMFAOtpVerification.stories.jsx",
+    "ext": "jsx",
+    "lines": 58,
+    "size": 1512
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/MFAPhoneNumber/AddMFAPhoneNumber/api/AddMFAPhoneNumberAPI.jsx",
+    "ext": "jsx",
+    "lines": 57,
+    "size": 1382
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Layout/SubmitButton.stories.jsx",
+    "ext": "jsx",
+    "lines": 52,
+    "size": 936
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/poc_files/App_old.js",
+    "ext": "js",
+    "lines": 51,
+    "size": 1909
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/poc_files/i18n.js",
+    "ext": "js",
+    "lines": 50,
+    "size": 1282
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/components/Layout/RootLayout.jsx",
+    "ext": "jsx",
+    "lines": 49,
+    "size": 1400
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ChangePassword/api/passwordUpdate.jsx",
+    "ext": "jsx",
+    "lines": 49,
+    "size": 1365
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/utils/faviconUtils.js",
+    "ext": "js",
+    "lines": 49,
+    "size": 1642
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/LanguagePreference/components/ViewLanguagePreference.jsx",
+    "ext": "jsx",
+    "lines": 47,
+    "size": 1297
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Layout/Header.stories.jsx",
+    "ext": "jsx",
+    "lines": 46,
+    "size": 1052
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/components/Badges/EnabledBadge.jsx",
+    "ext": "jsx",
+    "lines": 44,
+    "size": 1606
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ProfileName/components/ViewProfileNameCard.jsx",
+    "ext": "jsx",
+    "lines": 44,
+    "size": 1293
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/poc_files/POC_Components/LanguageSwitcher.jsx",
+    "ext": "jsx",
+    "lines": 44,
+    "size": 1241
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ManageFIDO2/utils/fetchUserFIDO2Credentials.js",
+    "ext": "js",
+    "lines": 43,
+    "size": 1144
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/components/Badges/VerifiedBadge.jsx",
+    "ext": "jsx",
+    "lines": 41,
+    "size": 954
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Features/MFAPhoneNumber/AddMFAPhoneNumber/AddMFAPhoneNumber.stories.jsx",
+    "ext": "jsx",
+    "lines": 41,
+    "size": 1163
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Features/MFAPhoneNumber/AddMFAPhoneNumber/AddSecondMFA.stories.jsx",
+    "ext": "jsx",
+    "lines": 41,
+    "size": 992
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/types/api.ts",
+    "ext": "ts",
+    "lines": 40,
+    "size": 766
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/utils/routeHelpers.js",
+    "ext": "js",
+    "lines": 40,
+    "size": 891
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Features/MFAPhoneNumber/DeleteMFAPhoneNumber/DeleteMFAPhoneNumberConfirm.stories.jsx",
+    "ext": "jsx",
+    "lines": 39,
+    "size": 1067
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/components/Layout/Header.jsx",
+    "ext": "jsx",
+    "lines": 37,
+    "size": 862
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/hooks/useError.tsx",
+    "ext": "tsx",
+    "lines": 37,
+    "size": 1049
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/types/constants.ts",
+    "ext": "ts",
+    "lines": 36,
+    "size": 739
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/hooks/useBreakpoints.ts",
+    "ext": "ts",
+    "lines": 33,
+    "size": 844
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Layout/Footer.stories.jsx",
+    "ext": "jsx",
+    "lines": 30,
+    "size": 626
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/main.tsx",
+    "ext": "tsx",
+    "lines": 29,
+    "size": 789
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Pages/Manage/ProfileUpdateNameConfirmUpdate.stories.jsx",
+    "ext": "jsx",
+    "lines": 29,
+    "size": 696
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/components/Layout/SubmitButton.jsx",
+    "ext": "jsx",
+    "lines": 28,
+    "size": 541
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/MFAPhoneNumber/DeleteMFAPhoneNumber/api/DeleteMFAPhoneNumberAPI.jsx",
+    "ext": "jsx",
+    "lines": 28,
+    "size": 789
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Pages/Manage/ManageLandingPage.stories.jsx",
+    "ext": "jsx",
+    "lines": 28,
+    "size": 642
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Pages/Manage/ProfileLandingPage.stories.jsx",
+    "ext": "jsx",
+    "lines": 28,
+    "size": 635
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Pages/Manage/ProfileUpdateName.stories.jsx",
+    "ext": "jsx",
+    "lines": 28,
+    "size": 645
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Pages/Manage/ProfileUpdateNameSuccess.stories.jsx",
+    "ext": "jsx",
+    "lines": 28,
+    "size": 660
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/stories/Pages/Manage/SecuritySettings.stories.jsx",
+    "ext": "jsx",
+    "lines": 28,
+    "size": 650
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/TransientOtp/api/otpFactors.jsx",
+    "ext": "jsx",
+    "lines": 23,
+    "size": 620
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/utils/userProfileDispatch.jsx",
+    "ext": "jsx",
+    "lines": 21,
+    "size": 616
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/utils/axiosInstance.js",
+    "ext": "js",
+    "lines": 20,
+    "size": 475
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/features/ChangePassword/api/otpFactors.jsx",
+    "ext": "jsx",
+    "lines": 18,
+    "size": 534
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/setupTests.js",
+    "ext": "js",
+    "lines": 17,
+    "size": 411
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/components/RPInfo/RPNameDisplay.jsx",
+    "ext": "jsx",
+    "lines": 16,
+    "size": 403
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/utils/errorUtils.js",
+    "ext": "js",
+    "lines": 16,
+    "size": 553
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/components/Layout/Loading.jsx",
+    "ext": "jsx",
+    "lines": 14,
+    "size": 338
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/components/Wizard/StepContent.jsx",
+    "ext": "jsx",
+    "lines": 13,
+    "size": 382
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/utils/apiErrorHandler.js",
+    "ext": "js",
+    "lines": 13,
+    "size": 285
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/components/Providers/useUser.tsx",
+    "ext": "tsx",
+    "lines": 12,
+    "size": 377
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/components/Layout/Footer.jsx",
+    "ext": "jsx",
+    "lines": 11,
+    "size": 333
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/components/Providers/UserContext.tsx",
+    "ext": "tsx",
+    "lines": 11,
+    "size": 266
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/utils/gatag.jsx",
+    "ext": "jsx",
+    "lines": 11,
+    "size": 335
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/utils/gcHelpCentreLinks.jsx",
+    "ext": "jsx",
+    "lines": 10,
+    "size": 525
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/config.jsx",
+    "ext": "jsx",
+    "lines": 9,
+    "size": 294
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/hooks/useNavigate.tsx",
+    "ext": "tsx",
+    "lines": 8,
+    "size": 248
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/router.jsx",
+    "ext": "jsx",
+    "lines": 7,
+    "size": 162
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/poc_files/config.js",
+    "ext": "js",
+    "lines": 6,
+    "size": 110
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/types/index.ts",
+    "ext": "ts",
+    "lines": 4,
+    "size": 76
+  },
+  {
+    "path": "/Users/yiwei.wang/repo/poc/cl-self-todos/frontend/src/declarations.d.ts",
+    "ext": "ts",
+    "lines": 2,
+    "size": 24
+  }
+]

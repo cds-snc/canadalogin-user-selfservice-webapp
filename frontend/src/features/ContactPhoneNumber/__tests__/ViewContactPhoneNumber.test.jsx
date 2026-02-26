@@ -2,7 +2,7 @@ import "@testing-library/jest-dom/vitest";
 import { BrowserRouter } from "react-router";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import ViewContactPhoneNumber from "../components/ViewContactPhoneNumber.jsx";
+import ViewContactPhoneNumber from "../components/ViewContactPhoneNumber";
 import { UserProvider } from "../../../components/Providers/UserProvider.tsx";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider.tsx";
 
@@ -24,23 +24,23 @@ vi.mock("../../../hooks/useNavigate.tsx", () => ({
 }));
 
 // Mock the redirect function to prevent navigation errors
-vi.mock("../../../utils/redirect.jsx", () => ({
+vi.mock("../../../utils/redirect", () => ({
   redirectToLogin: vi.fn(),
 }));
 
 // Mock route helpers
-vi.mock("../../../utils/routeHelpers.js", () => ({
+vi.mock("../../../utils/routeHelpers", () => ({
   path: vi.fn(() => "/en/manage-dashboard"),
 }));
 
 // In your test file (e.g., ViewContactPhoneNumber.test.jsx)
-vi.mock("../../../utils/apiErrorHandler.js", () => ({
+vi.mock("../../../utils/apiErrorHandler", () => ({
   handleApiError: vi.fn(),
   redirectToLogin: vi.fn(),
 }));
 
 // Mock VerifiedBadge component
-vi.mock("../../../components/Badges/VerifiedBadge.jsx", () => ({
+vi.mock("../../../components/Badges/VerifiedBadge", () => ({
   default: ({ text }) => <div data-testid="verified-badge">{text}</div>,
 }));
 

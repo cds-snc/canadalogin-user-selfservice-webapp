@@ -2,7 +2,7 @@ import { render, screen, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { BrowserRouter } from "react-router";
 import "@testing-library/jest-dom";
-import SuccessfullyUpdatedName from "../components/SuccessfullyUpdated.jsx";
+import SuccessfullyUpdatedName from "../components/SuccessfullyUpdated";
 
 const mockNavigate = vi.fn();
 const mockSetLoading = vi.fn();
@@ -119,7 +119,7 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
   GcdsLink: ({ children, ...props }) => <a {...props}>{children}</a>,
 }));
 
-vi.mock("../../../utils/functions.jsx", () => ({
+vi.mock("../../../utils/functions", () => ({
   getPageContent: vi.fn(() => ({
     1: "Hello",
     2: "Profile Updated Successfully",
@@ -134,7 +134,7 @@ vi.mock("../../../utils/functions.jsx", () => ({
   })),
 }));
 
-vi.mock("../../../utils/constants.jsx", () => ({
+vi.mock("../../../utils/constants", () => ({
   PAGES: {
     ProfileHome: "profile-home",
     profileUpdateName: "profile-update-name",
@@ -146,11 +146,11 @@ vi.mock("../../../utils/constants.jsx", () => ({
   },
 }));
 
-vi.mock("../../../utils/routeHelpers.js", () => ({
+vi.mock("../../../utils/routeHelpers", () => ({
   path: (page, params) => `/${params.language}/${page}`,
 }));
 
-vi.mock("../../../services/authService.jsx", () => ({
+vi.mock("../../../services/authService", () => ({
   authService: {
     logout: vi.fn(() =>
       Promise.resolve({
@@ -160,7 +160,7 @@ vi.mock("../../../services/authService.jsx", () => ({
   },
 }));
 
-vi.mock("../../../utils/userProfileDispatch.jsx", () => ({
+vi.mock("../../../utils/userProfileDispatch", () => ({
   userProfileDispatch: () => ({ setLoading: mockSetLoading }),
 }));
 
@@ -326,7 +326,7 @@ describe("SuccessfullyUpdatedName", () => {
 
   it("handles logout error gracefully", async () => {
     // Mock authService.logout to throw an error
-    const mockAuthService = await import("../../../services/authService.jsx");
+    const mockAuthService = await import("../../../services/authService");
     vi.mocked(mockAuthService.authService.logout).mockRejectedValueOnce(
       new Error("Network error"),
     );

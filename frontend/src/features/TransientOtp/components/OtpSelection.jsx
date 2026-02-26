@@ -9,11 +9,11 @@ import {
 } from "@cdssnc/gcds-components-react";
 import { useParams } from "react-router";
 
-import { getPageContent } from "../../../utils/functions.jsx";
-import { gcHelpCentreLinks } from "../../../utils/gcHelpCentreLinks.jsx";
+import { getPageContent } from "../../../utils/functions";
+import { gcHelpCentreLinks } from "../../../utils/gcHelpCentreLinks";
 
-import { FLOW_TYPES, PAGES } from "../../../utils/constants.jsx";
-import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
+import { FLOW_TYPES, PAGES } from "../../../utils/constants";
+import SubmitButton from "../../../components/Layout/SubmitButton";
 
 export default function OtpSelection({
   onNext,

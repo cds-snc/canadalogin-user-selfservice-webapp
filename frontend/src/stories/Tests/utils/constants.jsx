@@ -1,4 +1,4 @@
-import { SERVICES, SUBMIT_END_POINTS } from "../../../utils/constants.jsx";
+import { SERVICES, SUBMIT_END_POINTS } from "../../../utils/constants";
 export const TEST_USERS = new Map([
   [
     "test@test.gc.ca",

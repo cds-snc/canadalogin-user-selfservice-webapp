@@ -3,7 +3,7 @@ import {
   waitForModal,
   getClickableButton,
   waitForTextContent,
-} from "../utils/gcdsTestHelpers.js";
+} from "../utils/gcdsTestHelpers";
 import SessionTimeoutModal from "../../../components/Layout/SessionTimeoutModal";
 
 export default {

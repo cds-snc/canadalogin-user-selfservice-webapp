@@ -4,16 +4,16 @@ import { useUser } from "../../../components/Providers/useUser.tsx";
 import {
   getPageContent,
   convertLanguageToLanguageCode,
-} from "../../../utils/functions.jsx";
-import { PAGES } from "../../../utils/constants.jsx";
-import { path } from "../../../utils/routeHelpers.js";
-import { authService } from "../../../services/authService.jsx";
-import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
-import StepContent from "../../../components/Wizard/StepContent.jsx";
-import Loader from "../../../components/Layout/Loading.jsx";
-import EditLanguagePreferences from "./EditLanguagePreferences.jsx";
-import ConfirmUpdate from "./ConfirmUpdate.jsx";
-import SuccessfullyUpdated from "./SuccessfullyUpdated.jsx";
+} from "../../../utils/functions";
+import { PAGES } from "../../../utils/constants";
+import { path } from "../../../utils/routeHelpers";
+import { authService } from "../../../services/authService";
+import { userProfileDispatch } from "../../../utils/userProfileDispatch";
+import StepContent from "../../../components/Wizard/StepContent";
+import Loader from "../../../components/Layout/Loading";
+import EditLanguagePreferences from "./EditLanguagePreferences";
+import ConfirmUpdate from "./ConfirmUpdate";
+import SuccessfullyUpdated from "./SuccessfullyUpdated";
 
 export default function EditLanguagePreferencePage() {
   const { language, step } = useParams();

@@ -1,5 +1,5 @@
-import SuccessfullyUpdated from "../../../features/ProfileName/components/SuccessfullyUpdated.jsx";
-import { AVAILABLE_LANGUAGES } from "../../../utils/constants.jsx";
+import SuccessfullyUpdated from "../../../features/ProfileName/components/SuccessfullyUpdated";
+import { AVAILABLE_LANGUAGES } from "../../../utils/constants";
 import { UserProvider } from "../../../components/Providers/UserProvider.tsx";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider.tsx";
 

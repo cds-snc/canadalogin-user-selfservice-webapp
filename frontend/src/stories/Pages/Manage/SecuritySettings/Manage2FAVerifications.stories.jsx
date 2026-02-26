@@ -1,10 +1,10 @@
-import Manage2FAVerifications from "../../../../components/Manage/SecuritySettings/Manage2FAVerifications.jsx";
+import Manage2FAVerifications from "../../../../components/Manage/SecuritySettings/Manage2FAVerifications";
 import {
   AVAILABLE_LANGUAGES,
   FLOW_TYPES,
   PAGES,
   SUBMIT_END_POINTS,
-} from "../../../../utils/constants.jsx";
+} from "../../../../utils/constants";
 import { buildTestCase, Template } from "../../../Tests/utils/functions.tsx";
 
 export default {

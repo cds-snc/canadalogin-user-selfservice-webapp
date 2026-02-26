@@ -8,13 +8,13 @@ import {
   GcdsText,
   GcdsLink,
 } from "@cdssnc/gcds-components-react";
-import { getPageContent } from "../../../utils/functions.jsx";
-import { path } from "../../../utils/routeHelpers.js";
-import { PAGES, NON_PROD_FEATURE } from "../../../utils/constants.jsx";
+import { getPageContent } from "../../../utils/functions";
+import { path } from "../../../utils/routeHelpers";
+import { PAGES, NON_PROD_FEATURE } from "../../../utils/constants";
 
-import { useUser } from "../../Providers/useUser.js";
-import EnabledBadge from "../../Badges/EnabledBadge.jsx";
-import VerifiedBadge from "../../Badges/VerifiedBadge.jsx";
+import { useUser } from "../../Providers/useUser";
+import EnabledBadge from "../../Badges/EnabledBadge";
+import VerifiedBadge from "../../Badges/VerifiedBadge";
 
 export default function SecuritySettings() {
   const { language } = useParams();

@@ -1,30 +1,30 @@
 import { Navigate } from "react-router";
 
-import RootLayout from "./components/Layout/RootLayout.jsx";
+import RootLayout from "./components/Layout/RootLayout";
 import { AppLanguageSetup } from "./components/Providers/AppLanguageSetup";
 import { LanguageProvider } from "./components/Providers/LanguageProvider";
 import {
   PrivateRoute,
   StepupPrivateRoute,
-} from "./components/Providers/PrivateRoute.jsx";
+} from "./components/Providers/PrivateRoute";
 import { UserProvider } from "./components/Providers/UserProvider";
 
-import EditLanguagePreferencePage from "./features/LanguagePreference/components/EditLanguagePreferencePage.jsx";
-import ManageDashboard from "./components/Manage/ManageDashboard.jsx";
-import ProfileHome from "./components/Manage/ProfileHome.jsx";
-import Manage2FAVerifications from "./components/Manage/SecuritySettings/Manage2FAVerifications.jsx";
-import SecuritySettings from "./components/Manage/SecuritySettings/SecuritySettings.jsx";
-import EditProfileNamePage from "./features/ProfileName/components/EditProfileNamePage.jsx";
-import Verification from "./components/Verification/Verification.jsx";
-import ChangePasswordIndex from "./features/ChangePassword/components/ChangePasswordIndex.jsx";
-import EditContactPhoneNumberPage from "./features/ContactPhoneNumber/components/EditContactPhoneNumberPage.jsx";
-import AddMFAPage from "./features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPage.jsx";
-import DeleteMFAPage from "./features/MFAPhoneNumber/DeleteMFAPhoneNumber/component/DeleteMFAPage.jsx";
-import { PAGES } from "./utils/constants.jsx";
-import EditEmailAddressPage from "./features/EmailAddress/EditEmailAddressPage.jsx";
-import AddFIDO2PasskeyPage from "./features/ManageFIDO2/components/AddFIDO2Passkey/AddFIDO2PasskeyPage.jsx";
-import DeleteFIDO2PasskeyPage from "./features/ManageFIDO2/components/DeleteFIDO2Passkey/DeleteFIDO2PasskeyPage.jsx";
-import { RenameFIDO2PasskeyPage } from "./features/ManageFIDO2/components/RenameFIDO2Passkey/RenameFIDO2PasskeyPage.jsx";
+import EditLanguagePreferencePage from "./features/LanguagePreference/components/EditLanguagePreferencePage";
+import ManageDashboard from "./components/Manage/ManageDashboard";
+import ProfileHome from "./components/Manage/ProfileHome";
+import Manage2FAVerifications from "./components/Manage/SecuritySettings/Manage2FAVerifications";
+import SecuritySettings from "./components/Manage/SecuritySettings/SecuritySettings";
+import EditProfileNamePage from "./features/ProfileName/components/EditProfileNamePage";
+import Verification from "./components/Verification/Verification";
+import ChangePasswordIndex from "./features/ChangePassword/components/ChangePasswordIndex";
+import EditContactPhoneNumberPage from "./features/ContactPhoneNumber/components/EditContactPhoneNumberPage";
+import AddMFAPage from "./features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPage";
+import DeleteMFAPage from "./features/MFAPhoneNumber/DeleteMFAPhoneNumber/component/DeleteMFAPage";
+import { PAGES } from "./utils/constants";
+import EditEmailAddressPage from "./features/EmailAddress/EditEmailAddressPage";
+import AddFIDO2PasskeyPage from "./features/ManageFIDO2/components/AddFIDO2Passkey/AddFIDO2PasskeyPage";
+import DeleteFIDO2PasskeyPage from "./features/ManageFIDO2/components/DeleteFIDO2Passkey/DeleteFIDO2PasskeyPage";
+import { RenameFIDO2PasskeyPage } from "./features/ManageFIDO2/components/RenameFIDO2Passkey/RenameFIDO2PasskeyPage";
 
 export const appRoutes = [
   {

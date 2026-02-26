@@ -14,7 +14,7 @@ import { render, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import "@testing-library/jest-dom/vitest";
 import Manage2FAVerifications from "../../../../components/Manage/SecuritySettings/Manage2FAVerifications";
-import { fido2Api } from "../../../../features/ManageFIDO2/api/fido2Api.jsx";
+import { fido2Api } from "../../../../features/ManageFIDO2/api/fido2Api";
 
 // Simple mocks for dependencies
 vi.mock("react-router", () => ({
@@ -23,11 +23,11 @@ vi.mock("react-router", () => ({
   useNavigate: () => vi.fn(),
 }));
 
-vi.mock("../../../../hooks/useNavigate.js", () => ({
+vi.mock("../../../../hooks/useNavigate", () => ({
   useNavigateHelper: () => vi.fn(),
 }));
 
-vi.mock("../../../../components/Providers/useUser.js", () => ({
+vi.mock("../../../../components/Providers/useUser", () => ({
   useUser: () => ({
     state: {
       userProfile: {
@@ -40,7 +40,7 @@ vi.mock("../../../../components/Providers/useUser.js", () => ({
 
 // Create a mock function that can be configured per test
 const mockUseOtpOperations = vi.fn();
-vi.mock("../../../../hooks/useOtpOperations.js", () => ({
+vi.mock("../../../../hooks/useOtpOperations", () => ({
   useOtpOperations: () => mockUseOtpOperations(),
   MAP_TYPES: {
     LAST_FOUR_DIGITS: "lastFourDigits",
@@ -48,7 +48,7 @@ vi.mock("../../../../hooks/useOtpOperations.js", () => ({
   },
 }));
 
-vi.mock("../../../../utils/functions.jsx", () => ({
+vi.mock("../../../../utils/functions", () => ({
   getPageContent: () => ({
     1: "Manage 2-step verification methods",
     2: "Choose how you would like to receive verification codes when signing in to your GC Account.",
@@ -64,7 +64,7 @@ vi.mock("../../../../utils/functions.jsx", () => ({
   }),
 }));
 
-vi.mock("../../../../utils/constants.jsx", () => ({
+vi.mock("../../../../utils/constants", () => ({
   PAGES: {
     manage2FAVerifications: "Manage2FAVerifications",
     securitySettings: "SecuritySettings",
@@ -76,21 +76,21 @@ vi.mock("../../../../utils/constants.jsx", () => ({
   SERVICES: [],
 }));
 
-vi.mock("../../../../utils/routeHelpers.js", () => ({
+vi.mock("../../../../utils/routeHelpers", () => ({
   path: () => "/security-settings",
 }));
 
-vi.mock("../../../../components/Layout/Loading.jsx", () => ({
+vi.mock("../../../../components/Layout/Loading", () => ({
   default: ({ text }) => <div data-testid="loading">{text}</div>,
 }));
 
-vi.mock("../../../../config.jsx", () => ({
+vi.mock("../../../../config", () => ({
   default: {
     environment: "test",
   },
 }));
 
-vi.mock("../../../../features/ManageFIDO2/api/fido2Api.jsx", () => ({
+vi.mock("../../../../features/ManageFIDO2/api/fido2Api", () => ({
   fido2Api: {
     getUserFIDO2Credentials: vi.fn(),
   },
