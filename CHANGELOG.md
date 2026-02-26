@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.1](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.12.0...v1.12.1) (2026-02-26)
+
+
+### Bug Fixes
+
+* fix security settings loading screen in test env ([#1235](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1235)) ([dba2b93](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/dba2b93b576d9442412fd3f535bf1e92e8b1500e))
+
 ## [1.12.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.11.1...v1.12.0) (2026-02-26)
 
 
