@@ -96,7 +96,7 @@ vi.mock("../../../../utils/constants.jsx", () => ({
   },
   SERVICES: [],
   // Enable so the FIDO2 fetch useEffect runs and setLoading(false) is called
-  NON_PROD_FEATURE: true,
+  DEV_ONLY_FEATURE: true,
 }));
 
 vi.mock("../../../../utils/routeHelpers.js", () => ({
