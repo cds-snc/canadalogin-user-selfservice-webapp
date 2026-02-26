@@ -10,7 +10,7 @@ import {
 } from "@cdssnc/gcds-components-react";
 import { getPageContent } from "../../../utils/functions.jsx";
 import { path } from "../../../utils/routeHelpers.js";
-import { PAGES, ENABLE_FEATURE_IN_DEV } from "../../../utils/constants.jsx";
+import { PAGES, NON_PROD_FEATURE } from "../../../utils/constants.jsx";
 
 import { useUser } from "../../Providers/useUser.js";
 import EnabledBadge from "../../Badges/EnabledBadge.jsx";
@@ -62,7 +62,7 @@ export default function SecuritySettings() {
           </GcdsLink>
         </GcdsGrid>
       </GcdsContainer>
-      {ENABLE_FEATURE_IN_DEV && (
+      {NON_PROD_FEATURE && (
         <GcdsContainer className="sectionCard">
           <GcdsHeading tag="h3" marginTop="300">
             Identity Verification
