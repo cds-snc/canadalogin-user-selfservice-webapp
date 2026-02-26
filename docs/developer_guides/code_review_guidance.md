@@ -5,9 +5,9 @@
 ### 📦 Size Guidelines
 
 - [ ] PR changes are **under 300 lines** (additions + deletions)  
-       **NOTE**: In some exceptional cases, a larger PR is required for a complex change, updates to static content or refactoring but should be avoided whenever possible.
+      **NOTE**: In some exceptional cases, a larger PR is required for a complex change, updates to static content or refactoring but should be avoided whenever possible.
 - [ ] No more than **10 files changed**.  
-       **NOTE**: This is a suggestion and may not apply if a feature requires small changes in various files, utility files, etc.
+      **NOTE**: This is a suggestion and may not apply if a feature requires small changes in various files, utility files, etc.
 - [ ] PR represents a **single logical change** or concern
 - [ ] Larger changes have been split into **multiple smaller PRs** where possible
 
@@ -43,14 +43,15 @@ If so, ensure the following:
 
 > ℹ️ **Note:** If the PR exceeds size guidelines or introduces architectural changes, please explain why and suggest how reviewers can approach it efficiently.  
 > ℹ️ **Note:** Architectural or significant changes should go through the [RFC process](https://docs.google.com/document/d/1kRDswJZ9wCiI7D2K3GYWnGEDp2yPUGLQ9_yuNoYQCf0/edit?tab=t.0#heading=h.gwtmzfdyqc3h) and be logged in the [Product Decision Log](https://docs.google.com/document/d/1JN4a3ulfl3_NKD_eA2h4J17QdR3nN3JV680U087PeYE/edit?tab=t.0#heading=h.q8c85u2i9t5z) before beginning work on code and a PR.  
-> ℹ️ **Note:** Architectural changes that impact external clients or other CDS teams should go through the [ADR process](https://github.com/cds-snc/ADR).<br />
+> ℹ️ **Note:** Architectural changes that impact external clients or other CDS teams should go through the [ADR process](https://github.com/cds-snc/ADR).  
+<br />
 
 ## 🔍 Code Review Checklist for Reviewers
 
 ### ⏱️ Review Timing & Scope
 
 - [ ] Review and respond to pull requests within 1–2 business days. If you're unavailable, communicate promptly so the PR can be reassigned to avoid delays.
-- [ ] **Block off dedicated time to do a review and avoid distractions**. Plan to spend \~30–60 minutes per review for PRs under 300 LOC or more.
+- [ ] **Block off dedicated time to do a review and avoid distractions**. Plan to spend \~30–60 minutes per review for PRs under 300 LOC or more.  
 - [ ] For large PRs (>400 LOC), request it be split or set expectations for longer review time
 - [ ] If you're not the right reviewer (e.g. domain unfamiliar), **reassign or tag someone else**
 
