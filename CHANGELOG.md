@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.12.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.11.1...v1.12.0) (2026-02-26)
+
+
+### Features
+
+* **backend:** Implement FIDO2 access token step up ([#1180](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1180)) ([c87137e](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/c87137e20c370951e3adf1f1eb8a4558af12b6b1))
+
+
+### Bug Fixes
+
+* adjust feature flags to disable in-progress features in test env… ([#1228](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1228)) ([f0b1329](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/f0b1329c80bd720fef190e369250e5c6cf6b595f))
+* **ci:** add release-please dependency to detect-release-tag ([#1213](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1213)) ([2398575](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/23985750d4bc6de05c50b098427f2ce262003bfb)), closes [#1132](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1132)
+* correct phone factors mapping ([#1225](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1225)) ([e54667f](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/e54667fd9d985f2bc1de9bfd1b358ba461c5a25e))
+
+
+### Continuous Integration
+
+* bump staging version to 1.11.1 ([#1216](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1216)) ([8921ffc](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/8921ffcbee5e95c5687c85f736e8d30c73a2f453))
+* update invalidation for cloudfront to include the assets folder ([#1212](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1212)) ([7295b92](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/7295b92e2367c18c961f1e68650d8776444ead23))
+
 ## [1.11.1](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.11.0...v1.11.1) (2026-02-23)
 
 
