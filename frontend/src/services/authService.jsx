@@ -1,4 +1,4 @@
-import axios from "../utils/axiosInstance.js";
+import axios from "axios";
 import config from "../config";
 import {
   FLOW_TYPES,
@@ -15,6 +15,8 @@ import {
   TEST_USERS,
   VALIDATION_CODE_ERROR_RESPONSE,
 } from "../stories/Tests/utils/constants.jsx";
+
+axios.defaults.withCredentials = true;
 
 export const authService = {
   requestPasswordPolicy: async () => {

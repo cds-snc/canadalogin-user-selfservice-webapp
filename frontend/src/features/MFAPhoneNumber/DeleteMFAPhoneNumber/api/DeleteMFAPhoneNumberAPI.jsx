@@ -1,7 +1,9 @@
-import axios from "../../../../utils/axiosInstance.js";
+import axios from "axios";
 import config from "../../../../config.jsx";
 import { handleApiError } from "../../../../utils/apiErrorHandler.js";
 import { SUBMIT_END_POINTS } from "../../../../utils/constants.jsx";
+
+axios.defaults.withCredentials = true;
 
 export const deleteMFAPhoneNumberApi = {
   // Delete an MFA OTP phone number with OTP verification
