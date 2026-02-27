@@ -45,9 +45,10 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import fs from "fs";
 import path from "path";
+import svgr from "vite-plugin-svgr";
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), svgr()],
   server: {
     host: "app.cds-gcsignin-dev.verify.ibm.com",
     port: 3000,
