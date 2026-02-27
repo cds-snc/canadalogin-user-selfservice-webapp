@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router";
 import {
   GcdsButton,
   GcdsContainer,
+  GcdsErrorMessage,
   GcdsGrid,
   GcdsHeading,
   GcdsText,
@@ -12,16 +13,19 @@ import { authenticateFIDO2Credential } from "../../utils/webAuthnUtils";
 import { getPageContent } from "../../../../utils/functions";
 import { PAGES } from "../../../../utils/constants";
 import { path } from "../../../../utils/routeHelpers";
+import FIDOPasskeyCollage from "../../../../assets/icons/passkey_collage.svg?react";
 
-export default function SelectFIDO2Passkey({
+export default function VerifyFIDO2Passkey({
   setAssertionResult,
   setErrorCode,
   onCallback,
   submitAttestationResult = false,
+  errorMessage,
+  selectedPasskey,
 }) {
   const { language } = useParams();
   const navigate = useNavigate();
-  const pageContentJson = getPageContent(language, PAGES.selectFIDO2Passkey);
+  const pageContentJson = getPageContent(language, PAGES.verifyFIDO2Passkey);
   const errorPageContent = getPageContent(language, PAGES.error);
   const hasTriggeredRef = useRef(false);
 
@@ -49,10 +53,20 @@ export default function SelectFIDO2Passkey({
         throw new Error(errorPageContent["error_get_assertion_options"]);
       }
 
+      const assertionData = { ...optionsResponse.data };
+
+      // If a specific credential is required, filter allowCredentials to only that one
+      if (
+        selectedPasskey?.attributes?.credentialId &&
+        assertionData.allowCredentials
+      ) {
+        assertionData.allowCredentials = assertionData.allowCredentials.filter(
+          (cred) => cred.id === selectedPasskey.attributes.credentialId,
+        );
+      }
+
       // Step 2: Use WebAuthn API to authenticate with the passkey
-      const assertionResult = await authenticateFIDO2Credential(
-        optionsResponse.data,
-      );
+      const assertionResult = await authenticateFIDO2Credential(assertionData);
 
       // Step 3: Store assertion result and proceed to confirmation
       setAssertionResult?.(assertionResult);
@@ -64,8 +78,8 @@ export default function SelectFIDO2Passkey({
 
       onCallback?.();
     } catch (err) {
-      console.error(errorPageContent["error_fido2_verification"], err);
-      setErrorCode(errorPageContent["error_fido2_verification"]);
+      console.error("error_fido2_verification", err);
+      setErrorCode("error_fido2_verification");
     } finally {
       hasTriggeredRef.current = false;
     }
@@ -80,25 +94,44 @@ export default function SelectFIDO2Passkey({
 
   return (
     <GcdsContainer role="main">
-      <GcdsGrid columns="1" gap="500">
-        <GcdsContainer>
-          <GcdsHeading tag="h1" lang={language}>
-            {pageContentJson["heading"]}
-          </GcdsHeading>
-          <GcdsText>{pageContentJson["instruction"]}</GcdsText>
-        </GcdsContainer>
-      </GcdsGrid>
+      <GcdsGrid columns="1" gap="300">
+        <GcdsHeading tag="h1" lang={language}>
+          {pageContentJson["1"]}
+        </GcdsHeading>
+        <GcdsText>
+          {pageContentJson["1"]}{" "}
+          <strong>{selectedPasskey?.attributes?.nickname}</strong>
+        </GcdsText>
 
+        <FIDOPasskeyCollage />
+
+        <GcdsText> {pageContentJson["2"]} </GcdsText>
+      </GcdsGrid>
+      {errorMessage && (
+        <GcdsErrorMessage messageId="error-message">
+          {errorMessage}
+        </GcdsErrorMessage>
+      )}
       <GcdsGrid columns="max-content max-content" gap="200">
+        <GcdsButton
+          buttonRole="primary"
+          style={{ width: "fit-content" }}
+          onGcdsClick={async (ev) => {
+            ev.preventDefault();
+            await handleFIDO2Verification();
+          }}
+        >
+          {pageContentJson["4"]}
+        </GcdsButton>
         <GcdsButton
           buttonRole="secondary"
           style={{ width: "fit-content" }}
-          onGcdsClick={(ev) => {
+          onGcdsClick={async (ev) => {
             ev.preventDefault();
             navigate(backToManage2FAVerificationsPage);
           }}
         >
-          {pageContentJson["cancel_button"]}
+          {pageContentJson["3"]}
         </GcdsButton>
       </GcdsGrid>
     </GcdsContainer>

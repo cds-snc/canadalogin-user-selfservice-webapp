@@ -69,7 +69,12 @@ export default function ChangePasswordIndex() {
     handleChangeUserMfaSelection,
     handleSetUserOtpValue,
     setLocalLoading,
-  } = useOtpOperations(id, userName, setErrorCode, backToSecuritySettingsPage);
+  } = useOtpOperations({
+    userId: id,
+    userName,
+    setErrorCode,
+    fallbackNavigationPath: backToSecuritySettingsPage,
+  });
 
   // Custom requestOtpCode for password change flow using passwordUpdate API
   const requestOtpCode = async () => {

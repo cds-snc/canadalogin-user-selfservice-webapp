@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { otpFactors } from "../features/TransientOtp/api/otpFactors";
 import { authService } from "../services/authService";
 import { serverMapping } from "../utils/constants";
+import { fetchUserFIDO2Credentials } from "../features/ManageFIDO2/utils/fetchUserFIDO2Credentials";
 
 export const MAP_TYPES = {
   lastFourDigits: "lastFourDigits",
@@ -18,21 +19,41 @@ export const MAP_TYPES = {
  * @param {string} fallbackNavigationPath - Path to navigate on error
  * @param {string} mapType - Type of phone factors map to create ('lastFourDigits' or 'fullPhoneNumber')
  * @param {string} mfaTrxnId - MFA enrollment trxnId if calling from the Add MFA flow
+ * @param {bool} fetchFIDO2Passkeys - boolean flag to fetch FIDO2 passkey MFAs
+ * @param {bool} externalLoading - caller-owned loading flag ORed into localLoading.
+ *   Pass true when the caller has its own async fetch that starts on mount so that
+ *   localLoading begins true from the very first render, preventing a flash of
+ *   un-loaded content before the first useEffect tick fires.
  */
-export const useOtpOperations = (
+export const useOtpOperations = ({
   userId,
   userName,
   setErrorCode,
   fallbackNavigationPath,
   mapType = null,
   mfaTrxnId = "",
-) => {
+  fetchFIDO2Passkeys,
+  externalLoading = false,
+}) => {
   const [userPhoneFactors, setUserPhoneFactors] = useState([]);
   const [userSelectedMfaFactor, setUserSelectedMfaFactor] = useState(null);
   const [otpSentResponse, setOtpSentResponse] = useState(null);
   const [userOtpValue, setUserOtpValue] = useState("");
-  const [localLoading, setLocalLoading] = useState(true);
+  // Two independent loading flags to prevent flashing UI:
+  // - otpLoading: owned by the OTP phone factors fetch inside this hook.
+  //   Initialised to true when userId is present so the screen starts in the
+  //   loading state before the first useEffect tick fires.
+  // - externalLoadingState: mirrors the caller-supplied externalLoading initial
+  //   value and can be updated via setLocalLoading for subsequent operations
+  //   (e.g. logout, enrollMFA). The caller is responsible for supplying the
+  //   correct initial value so the screen never briefly renders un-loaded.
+  // localLoading is true as long as either flag is true.
+  const [otpLoading, setOtpLoading] = useState(!!userId);
+  const [externalLoadingState, setExternalLoading] = useState(externalLoading);
+  const localLoading = otpLoading || externalLoadingState;
+  const setLocalLoading = setExternalLoading;
   const [phoneFactorsMap, setPhoneFactorsMap] = useState({});
+  const [fido2Data, setFido2Data] = useState([]);
 
   const navigate = useNavigate();
   const didFetch = useRef(false);
@@ -180,7 +201,7 @@ export const useOtpOperations = (
   const fetchUserOtpPhoneFactors = async () => {
     if (!userId) return { phoneFactors: [], phoneFactorsMap: {} };
 
-    setLocalLoading(true);
+    setOtpLoading(true);
     try {
       const response = await otpFactors.getUserOtpPhoneFactors();
       if (
@@ -212,7 +233,7 @@ export const useOtpOperations = (
         navigate(fallbackNavigationPath);
       }
     } finally {
-      setLocalLoading(false);
+      setOtpLoading(false);
     }
   };
 
@@ -226,6 +247,21 @@ export const useOtpOperations = (
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId, mfaTrxnId]);
 
+  useEffect(() => {
+    /**
+     * Fetch user's FIDO2 credentials
+     */
+    if (fetchFIDO2Passkeys) {
+      fetchUserFIDO2Credentials({
+        setLoading: setLocalLoading,
+        setData: setFido2Data,
+        setErrorCode: setErrorCode,
+      });
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return {
     // State
     userPhoneFactors,
@@ -234,6 +270,7 @@ export const useOtpOperations = (
     userOtpValue,
     localLoading,
     phoneFactorsMap,
+    fido2Data,
 
     // Setters
     setUserPhoneFactors,

@@ -49,7 +49,10 @@
     "error_duplicate_passkey": "The user attempted to register an authenticator that contains one of the credentials already registered with the relying party.",
     "error_passkey_name_required": "Passkey name required.",
     "error_delete_credential": "Failed to delete security key",
-    "error_rename_credential": "Failed to rename security key"
+    "error_rename_credential": "Failed to rename security key",
+    "error_fido2_verification": "Échec de la vérification avec la clé d'accès",
+    "error_fido2_wrong_passkey": "Vous avez utilisé une clé d'accès différente de celle que vous avez sélectionnée. Veuillez réessayer avec la bonne clé d'accès.",
+    "error_get_assertion_options": "Échec de l'obtention des options d'authentification"
   },
   "RegisterVerification": {
     "1": "Protégez votre compte avec la vérification en deux étapes",
@@ -476,7 +479,14 @@
     "13": "Je n’ai pas accès à mon téléphone",
     "14": "Pour ajouter un numéro de téléphone,",
     "15": "Pour supprimer un numéro de téléphone,",
-    "16": "Comment souhaitez-vous recevoir le code?"
+    "16": "Comment souhaitez-vous recevoir le code?",
+    "17": "Clé d'accès ou clé de sécurité",
+    "18": "M'envoyer un message texte",
+    "19": "M'appeler",
+    "20": "Vérifier",
+    "21": "Choisissez votre méthode de vérification",
+    "22": "Pour supprimer une clé d'accès ou une clé de sécurité,",
+    "23": "Pour ajouter une clé d'accès ou une clé de sécurité,"
   },
   "SuccessBanner": {
     "1": "Vous avez supprimé le",

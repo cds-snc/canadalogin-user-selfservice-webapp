@@ -78,14 +78,14 @@ export default function AddMFAPage() {
     handleSetUserOtpValue,
     setLocalLoading,
     setOtpSentResponse,
-  } = useOtpOperations(
-    id,
+  } = useOtpOperations({
+    userId: id,
     userName,
     setErrorCode,
-    backToSecuritySettingsPage,
-    MAP_TYPES.lastFourDigits,
-    phoneFormData?.trxnId,
-  );
+    fallbackNavigationPath: backToSecuritySettingsPage,
+    mapType: MAP_TYPES.lastFourDigits,
+    mfaTrxnId: phoneFormData?.trxnId,
+  });
 
   const successBannerJson = getPageContent(language, PAGES.successBanner);
   const errorMessage = getErrorMessage(language, errorCode);
