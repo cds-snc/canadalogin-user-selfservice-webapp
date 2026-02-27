@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import axios from "../../../../utils/axiosInstance.js";
+import axios from "axios";
 import { otpFactors } from "../otpFactors.jsx";
 import { handleApiError } from "../../../../utils/apiErrorHandler.js";
 
-// Mock axios instance
-vi.mock("../../../../utils/axiosInstance.js");
+// Mock axios
+vi.mock("axios");
 
 // Mock handleApiError
 vi.mock("../../../../utils/apiErrorHandler.js", () => ({

@@ -1,7 +1,9 @@
-import axios from "../../../utils/axiosInstance.js";
+import axios from "axios";
 import config from "../../../config.jsx";
 import { SUBMIT_END_POINTS } from "../../../utils/constants.jsx";
 import { handleApiError } from "../../../utils/apiErrorHandler.js";
+
+axios.defaults.withCredentials = true;
 const passwordUpdateApi = `${config.apiUrl}${SUBMIT_END_POINTS.passwordUpdate}`;
 
 export const passwordUpdate = {
