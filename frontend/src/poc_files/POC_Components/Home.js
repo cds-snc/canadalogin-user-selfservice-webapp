@@ -24,7 +24,7 @@ const Home = () => {
         }}
       >
         <Typography component="h1" variant="h4" gutterBottom>
-          Sign in with CanadaLogin
+          Sign in with GC Sign in
         </Typography>
 
         <Paper
