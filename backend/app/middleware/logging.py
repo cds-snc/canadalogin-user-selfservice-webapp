@@ -1,6 +1,5 @@
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
-from pythonjsonlogger.json import JsonFormatter
 from urllib.parse import urlencode
 from app.auth.services.auth_user_session import get_user_info
 from authlib.integrations.starlette_client import OAuthError
@@ -8,13 +7,10 @@ from datetime import datetime
 
 import logging
 import hashlib
+import json
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARNING)
-
-handler = logging.StreamHandler()
-handler.setFormatter(JsonFormatter())
-logger.addHandler(handler)
 
 PROJECT_NAME = "GCAuth"
 APPLICATION_NAME = "SelfService"
@@ -98,7 +94,6 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         log_level = logging.INFO
         level = "INFO"
 
-
         if response.status_code >= 400 and response.status_code < 500:
             log_level = logging.WARNING
             level = "WARNING"
@@ -109,12 +104,14 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         if response.status_code >= 400:
             logger.log(
                 log_level,
-                {
-                    "code": f"{PROJECT_NAME}.{APPLICATION_NAME}.{level}.{response.status_code}",
-                    "level": level,
-                    "context": context,
-                    "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                }
+                json.dumps(
+                    {
+                        "code": f"{PROJECT_NAME}.{APPLICATION_NAME}.{level}.{response.status_code}",
+                        "level": level,
+                        "context": context,
+                        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    }
+                ),
             )
 
         return response
