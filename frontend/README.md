@@ -1,6 +1,6 @@
-# CanadaLogin - User self-service Frontend Application
+# GC Sign in - User self-service Frontend Application
 
-This is the frontend application built with React and GC Design System for the Government of Canada CanadaLogin user self-service application.
+This is the frontend application built with React and GC Design System for the Government of Canada GC Sign in user self-service application.
 
 ## Running the Application
 

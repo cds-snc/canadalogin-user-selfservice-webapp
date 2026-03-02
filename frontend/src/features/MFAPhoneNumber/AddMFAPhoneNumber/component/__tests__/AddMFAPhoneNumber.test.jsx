@@ -96,7 +96,7 @@ vi.mock("@/utils/functions", () => ({
         6: "Numéro de téléphone",
         7: "Entrez votre nouveau numéro de téléphone",
         8: "Mon pays n'est pas dans la liste",
-        9: "Certains pays ne sont pas pris en charge en raison de limitations techniques. Si votre pays n'apparaît pas dans la liste, vous ne pouvez pas créer d’identifiant ConnexionCanada à l'heure actuelle. Nous nous excusons des désagréments que cela pourrait causer.",
+        9: "Certains pays ne sont pas pris en charge en raison de limitations techniques. Si votre pays n'apparaît pas dans la liste, vous ne pouvez pas créer de compte Connexion GC à l'heure actuelle. Nous nous excusons des désagréments que cela pourrait causer.",
         10: "Comment souhaitez-vous recevoir votre code de vérification?",
         11: "Message texte (SMS)",
         12: "Recevoir un message texte avec votre code de vérification",

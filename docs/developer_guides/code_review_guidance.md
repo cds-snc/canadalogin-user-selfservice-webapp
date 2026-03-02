@@ -1,4 +1,4 @@
-# CanadaLogin Pull Request and Code Review Guidance
+# GC Sign in Pull Request and Code Review Guidance
 
 ## ✅ Pull Request Checklist
 
