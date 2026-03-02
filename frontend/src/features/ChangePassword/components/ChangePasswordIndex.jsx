@@ -145,6 +145,7 @@ export default function ChangePasswordIndex() {
         validatePassword={validatePassword}
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
+        parentPage={PAGES.password}
       />
     ),
     otpSelection: (
