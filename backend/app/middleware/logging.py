@@ -95,15 +95,20 @@ class LoggingMiddleware(BaseHTTPMiddleware):
 
         context = await self.build_context(request, response)
         # Get response status
+        log_level = logging.INFO
         level = "INFO"
 
+
         if response.status_code >= 400 and response.status_code < 500:
+            log_level = logging.WARNING
             level = "WARNING"
         elif response.status_code >= 500:
+            log_level = logging.ERROR
             level = "ERROR"
 
         if response.status_code >= 400:
-            logger.error(
+            logger.log(
+                log_level,
                 {
                     "code": f"{PROJECT_NAME}.{APPLICATION_NAME}.{level}.{response.status_code}",
                     "level": level,
