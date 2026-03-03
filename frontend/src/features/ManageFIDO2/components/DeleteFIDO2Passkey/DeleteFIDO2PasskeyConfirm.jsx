@@ -32,8 +32,6 @@ export default function DeleteFIDO2PasskeyConfirm({
     language: language,
   });
 
-  console.log(passkeyId);
-
   /**
    * Handle deleting FIDO2 credential with pre-verified assertion result
    */

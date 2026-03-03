@@ -1,6 +1,7 @@
 import {
   GcdsButton,
   GcdsContainer,
+  GcdsGrid,
   GcdsHeading,
   GcdsText,
 } from "@cdssnc/gcds-components-react";
@@ -19,6 +20,33 @@ import NoticeFactory from "../../InfoBlocks/NoticeFactory.jsx";
 import PhoneFactorsList from "./PhoneFactorsList.jsx";
 import FIDO2PasskeyList from "./FIDO2PasskeyList.jsx";
 import { fido2Api } from "../../../features/ManageFIDO2/api/fido2Api.jsx";
+import FIDOPasskeyIcon from "../../../assets/icons/FIDO_Passkey_mark_A_black.svg?react";
+import FIDOPasskeyCollage from "../../../assets/icons/passkey_collage.svg?react";
+
+const sectionCardProps = {
+  columns: "1fr",
+  gap: "300",
+  className: "sectionCard",
+  style: { padding: "1.5rem 1.25rem" },
+};
+
+const headerGridProps = {
+  columns: "max-content 1fr",
+  gap: "150",
+  "align-items": "center",
+  style: { alignItems: "center" },
+};
+
+function SectionHeader({ icon, title }) {
+  return (
+    <GcdsGrid {...headerGridProps}>
+      {icon}
+      <GcdsHeading tag="h3" marginTop="0" marginBottom="0">
+        {title}
+      </GcdsHeading>
+    </GcdsGrid>
+  );
+}
 
 export default function Manage2FAVerifications() {
   const { language } = useParams();
@@ -94,24 +122,9 @@ export default function Manage2FAVerifications() {
 
       <GcdsHeading tag="h2">{pageContent["3"]}</GcdsHeading>
       <GcdsText>{pageContent["4"]}</GcdsText>
-      <GcdsContainer className="sectionCard">
-        <GcdsHeading
-          tag="h3"
-          marginTop="300"
-          style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
-        >
-          <div
-            style={{
-              display: "flex",
-              height: "1.875rem",
-              padding: "0 0.625rem",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: "0.3125rem",
-              borderRadius: "0.3125rem",
-              width: "fit-content",
-            }}
-          >
+      <GcdsGrid {...sectionCardProps}>
+        <SectionHeader
+          icon={
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"
@@ -124,9 +137,9 @@ export default function Manage2FAVerifications() {
                 fill="#333333"
               />
             </svg>
-            {pageContent["5"]}
-          </div>
-        </GcdsHeading>
+          }
+          title={pageContent["5"]}
+        />
         <PhoneFactorsList userPhoneFactorsMap={userPhoneFactorsMap} />
         <GcdsButton
           id="add-mfa-button"
@@ -137,46 +150,41 @@ export default function Manage2FAVerifications() {
         >
           {pageContent["10"]}
         </GcdsButton>
-      </GcdsContainer>
+      </GcdsGrid>
 
       {DEV_ONLY_FEATURE && (
-        <GcdsContainer className="sectionCard">
-          <GcdsHeading
-            tag="h3"
-            marginTop="300"
-            style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
-          >
-            <div
-              style={{
-                display: "flex",
-                height: "1.875rem",
-                padding: "0 0.625rem",
-                justifyContent: "center",
-                alignItems: "center",
-                gap: "0.3125rem",
-                borderRadius: "0.3125rem",
-                width: "fit-content",
-              }}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="25"
-                viewBox="0 0 16 25"
-                fill="none"
-              >
-                <path
-                  d="M2.18182 24.5464C1.58182 24.5464 1.06818 24.3328 0.640909 23.9055C0.213636 23.4782 0 22.9646 0 22.3646V2.7282C0 2.1282 0.213636 1.61457 0.640909 1.1873C1.06818 0.760023 1.58182 0.546387 2.18182 0.546387H13.0909C13.6909 0.546387 14.2045 0.760023 14.6318 1.1873C15.0591 1.61457 15.2727 2.1282 15.2727 2.7282V22.3646C15.2727 22.9646 15.0591 23.4782 14.6318 23.9055C14.2045 24.3328 13.6909 24.5464 13.0909 24.5464H2.18182ZM2.18182 21.2737V22.3646H13.0909V21.2737H2.18182ZM2.18182 19.0918H13.0909V6.00093H2.18182V19.0918ZM2.18182 3.81911H13.0909V2.7282H2.18182V3.81911Z"
-                  fill="#333333"
-                />
-              </svg>
-              {pageContent["15"]}
-            </div>
-          </GcdsHeading>
+        <GcdsGrid {...sectionCardProps}>
+          <SectionHeader
+            icon={<FIDOPasskeyIcon width="34" height="34" />}
+            title={pageContent["15"]}
+          />
+          {userFIDO2CredentialsData.length < 1 && (
+            <>
+              <FIDOPasskeyCollage />
+              <GcdsContainer>
+                <GcdsText marginBottom="0">
+                  {<strong>{pageContent["17"]}</strong>}
+                </GcdsText>
+                <ul>
+                  <li>
+                    <GcdsText marginBottom="0">
+                      {<strong>{pageContent["18"]}</strong>}
+                    </GcdsText>
+                    <GcdsText marginBottom="0">{pageContent["19"]}</GcdsText>
+                  </li>
+                  <li>
+                    <GcdsText marginBottom="0">
+                      {<strong>{pageContent["20"]}</strong>}
+                    </GcdsText>
+                    <GcdsText marginBottom="0">{pageContent["21"]}</GcdsText>
+                  </li>
+                </ul>
+              </GcdsContainer>
+            </>
+          )}
           <FIDO2PasskeyList
             userFIDO2CredentialsData={userFIDO2CredentialsData}
           />
-
           <GcdsButton
             id="add-fido2-button"
             onGcdsClick={(ev) => {
@@ -186,7 +194,7 @@ export default function Manage2FAVerifications() {
           >
             {pageContent["12"]}
           </GcdsButton>
-        </GcdsContainer>
+        </GcdsGrid>
       )}
     </GcdsContainer>
   );

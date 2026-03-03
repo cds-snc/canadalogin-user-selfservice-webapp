@@ -28,8 +28,10 @@ export default function FIDO2PasskeyList({ userFIDO2CredentialsData }) {
           <strong>{`${attributes.nickname}`}</strong>
         </GcdsText>
         <GcdsText>
-          <strong>{pageContent["16"]}</strong>
-          {new Date(created).toLocaleString()}
+          <span style={{ color: "#595959" }}>
+            {pageContent["16"]}
+            {new Date(created).toLocaleDateString()}
+          </span>
         </GcdsText>
         <GcdsGrid columns="max-content max-content max-content" gap="200">
           <GcdsButton

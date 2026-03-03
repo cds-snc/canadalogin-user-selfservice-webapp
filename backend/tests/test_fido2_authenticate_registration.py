@@ -616,24 +616,26 @@ class TestSubmitAssertionResult:
         assert "returnJwt" not in url
 
     @pytest.mark.asyncio
+    @patch.object(auth_module, "get_auth_request_headers")
     @patch.object(auth_module, "RequestErrorHandler")
     @patch.object(auth_module, "get_rp_uuid_from_rp_id")
     @patch.object(auth_module, "get_admin_token")
     @patch.object(auth_module, "get_rp_id")
     @patch.object(auth_module, "get_tenant_url")
-    async def test_return_jwt_true_without_stepup_token_raises_exception(
+    async def test_return_jwt_true_without_stepup_token_raises(
         self,
         mock_get_tenant_url,
         mock_get_rp_id,
         mock_get_admin_token,
         mock_get_rp_uuid_from_rp_id,
         mock_request_error_handler,
+        mock_get_auth_request_headers,
         mock_http_client,
         mock_request,
         mock_assertion_request,
     ):
-        """Should raise exception when return_jwt=True but no stepup_refresh_token in session"""
-        # No stepup_refresh_token in session
+        """When return_jwt=True but no stepup token in session, should forward step-up required error to error handler"""
+        # No stepup token in session
         mock_request.session = {}
 
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
@@ -649,14 +651,11 @@ class TestSubmitAssertionResult:
             return_jwt=True,
         )
 
-        # Should call error handler with exception about missing stepup_token_data
+        # Should call error handler with step-up required exception
         mock_request_error_handler.handle.assert_called_once()
         error_arg = mock_request_error_handler.handle.call_args[0][0]
         assert isinstance(error_arg, Exception)
         assert "Step-up authentication required" in str(error_arg)
-        assert "stepup_token_data" in str(
-            error_arg
-        ) or "Password must be verified" in str(error_arg)
 
     @pytest.mark.asyncio
     @patch.object(auth_module, "_is_token_expired")
@@ -1913,17 +1912,17 @@ class TestValidateStepupTokens:
         req.session = session
         return req
 
-    def test_missing_stepup_token_data_raises(self):
-        """Should raise an Exception when stepup_token_data is not in session"""
+    def test_missing_stepup_token_data_returns_none(self):
+        """Should return None when stepup_token_data is not in session"""
         request = self._make_request({})
-        with pytest.raises(Exception, match="Step-up authentication required"):
-            auth_module._validate_stepup_tokens(request)
+        result = auth_module._validate_stepup_tokens(request)
+        assert result is None
 
-    def test_none_stepup_token_data_raises(self):
-        """Should raise when stepup_token_data is explicitly None"""
+    def test_none_stepup_token_data_returns_none(self):
+        """Should return None when stepup_token_data is explicitly None"""
         request = self._make_request({"stepup_token_data": None})
-        with pytest.raises(Exception, match="Step-up authentication required"):
-            auth_module._validate_stepup_tokens(request)
+        result = auth_module._validate_stepup_tokens(request)
+        assert result is None
 
     def test_expired_token_raises(self):
         """Should raise when the stepup token has expired (timestamp = 0 means always expired)"""

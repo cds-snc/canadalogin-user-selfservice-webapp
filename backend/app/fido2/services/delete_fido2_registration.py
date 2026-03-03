@@ -42,7 +42,7 @@ async def delete_registration(
             http_client=http_client,
             user_access_token=user_access_token,
             request_body=request_data.assertionResult,
-            return_jwt=True,  # We don't need the JWT for deletion
+            return_jwt=False,
         )
 
         if not assertion_response.success:

@@ -224,7 +224,7 @@ def _decode_jwt_payload(token: str) -> dict | None:
         return None
 
 
-def _validate_stepup_tokens(request: Request) -> dict:
+def _validate_stepup_tokens(request: Request) -> dict | None:
     """
     Validate that a valid, unexpired stepup token exists in the session.
 
@@ -235,23 +235,19 @@ def _validate_stepup_tokens(request: Request) -> dict:
         request: FastAPI Request with session data
 
     Returns:
-        stepup_token_data dict from the session
+        stepup_token_data dict from the session, or None if not present
 
     Raises:
-        Exception: If stepup tokens are missing or expired
+        Exception: If stepup tokens are expired
     """
     stepup_token_data = request.session.get("stepup_token_data")
     stepup_token_timestamp = request.session.get("stepup_token_timestamp")
 
     if not stepup_token_data:
-        logger.error(
-            "No stepup_token_data in session. Password verification must be performed first "
-            "by calling POST /v1/password/verify/stepup endpoint."
+        logger.warning(
+            "No stepup_token_data in session. Skipping step-up token validation."
         )
-        raise Exception(
-            "Step-up authentication required: Password must be verified before FIDO2 "
-            "authentication. Please call POST /v1/password/verify/stepup first."
-        )
+        return None
 
     if _is_token_expired(stepup_token_data, stepup_token_timestamp):
         logger.error(
@@ -268,7 +264,7 @@ async def _get_mfa_challenge_token(
     request: Request,
     http_client: AsyncClient,
     tenant_url: str,
-) -> str:
+) -> str | None:
     """
     Validate stepup session and obtain an MFA challenge token via refresh flow.
 
@@ -282,12 +278,15 @@ async def _get_mfa_challenge_token(
         tenant_url: IBM Verify tenant URL
 
     Returns:
-        MFA challenge access token string
+        MFA challenge access token string, or None if no stepup token is present in session
 
     Raises:
-        Exception: If stepup tokens are invalid/expired or MFA refresh fails
+        Exception: If stepup token data is missing, tokens are expired, or MFA refresh fails
     """
     stepup_token_data = _validate_stepup_tokens(request)
+
+    if stepup_token_data is None:
+        raise Exception("Step-up authentication required")
 
     stepup_refresh_token = stepup_token_data.get("refresh_token")
     if not stepup_refresh_token:
@@ -521,7 +520,7 @@ async def submit_assertion_result(
         # Step 4: Submit FIDO2 assertion result
         auth_token = mfa_challenge_token if mfa_challenge_token else admin_token
         url = f"{tenant_url}{VerifyAPIEndpoint.FIDO2_RP_BASE.value}/{rp_uuid}/assertion/result"
-        if return_jwt:
+        if return_jwt and mfa_challenge_token:
             url += "?returnJwt=true"
             logger.info("Requesting JWT token in assertion result response")
 
