@@ -5,13 +5,13 @@ from app.auth.services.auth_user_session import get_user_info
 from authlib.integrations.starlette_client import OAuthError
 from datetime import datetime
 
-import logging
+import importlib
 import hashlib
 import json
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.WARNING)
-
+std_logging = importlib.import_module("logging")
+logger = std_logging.getLogger(__name__)
+logger.setLevel(std_logging.WARNING)
 PROJECT_NAME = "GCAuth"
 APPLICATION_NAME = "SelfService"
 QUERY_STRING_BLACKLIST = ["secret", "token"]
@@ -91,14 +91,14 @@ class LoggingMiddleware(BaseHTTPMiddleware):
 
         context = await self.build_context(request, response)
         # Get response status
-        log_level = logging.INFO
+        log_level = std_logging.INFO
         level = "INFO"
 
         if response.status_code >= 400 and response.status_code < 500:
-            log_level = logging.WARNING
+            log_level = std_logging.WARNING
             level = "WARNING"
         elif response.status_code >= 500:
-            log_level = logging.ERROR
+            log_level = std_logging.ERROR
             level = "ERROR"
 
         if response.status_code >= 400:
