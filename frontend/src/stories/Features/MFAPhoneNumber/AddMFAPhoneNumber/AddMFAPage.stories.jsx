@@ -41,14 +41,14 @@ Default.parameters = buildTestCase.parameters(
   [
     {
       type: "get",
-      endpoint: "/v1/users/test-user-123/otp_factors",
+      endpoint: "/v1/users/otp_factors",
       response: {
         success: true,
         data: [
           {
             id: "factor-1",
             type: "smsotp",
-            phoneNumber: "+15551234567",
+            destination: "+15551234567",
             status: "active",
           },
         ],
@@ -81,14 +81,14 @@ French.parameters = buildTestCase.parameters(
   [
     {
       type: "get",
-      endpoint: "/v1/users/test-user-123/otp_factors",
+      endpoint: "/v1/users/otp_factors",
       response: {
         success: true,
         data: [
           {
             id: "factor-1",
             type: "smsotp",
-            phoneNumber: "+15551234567",
+            destination: "+15551234567",
             status: "active",
           },
         ],

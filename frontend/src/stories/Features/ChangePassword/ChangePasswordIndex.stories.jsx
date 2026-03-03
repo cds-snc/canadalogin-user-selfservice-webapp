@@ -2,6 +2,7 @@ import {
   AVAILABLE_LANGUAGES,
   FLOW_TYPES,
   PAGES,
+  SUBMIT_END_POINTS,
 } from "../../../utils/constants.jsx";
 import { buildTestCase, TestTemplate } from "../../Tests/utils/functions.tsx";
 
@@ -37,14 +38,14 @@ Default.parameters = (() => {
     [
       {
         type: "get",
-        endpoint: "/v1/users/test-user-123/otp_factors",
+        endpoint: "/v1/users/otp_factors",
         response: {
           success: true,
           data: [
             {
               id: "factor-1",
               type: "smsotp",
-              phoneNumber: "+15551234567",
+              destination: "+15551234567",
               status: "active",
             },
           ],
@@ -52,7 +53,7 @@ Default.parameters = (() => {
       },
       {
         type: "post",
-        endpoint: "/v1/auth/password/verify",
+        endpoint: `${SUBMIT_END_POINTS.passwordVerify}`,
         response: {
           success: true,
           data: [],
@@ -60,7 +61,7 @@ Default.parameters = (() => {
       },
       {
         type: "get",
-        endpoint: "/v1/auth/password/policy",
+        endpoint: `${SUBMIT_END_POINTS.requestPasswordPolicy}`,
         response: {
           success: true,
           data: { pwdMinLength: 12, pwdMaxLength: 65 },
@@ -68,7 +69,7 @@ Default.parameters = (() => {
       },
       {
         type: "post",
-        endpoint: "/v1/auth/password/update",
+        endpoint: `${SUBMIT_END_POINTS.passwordUpdate}`,
         response: {
           success: true,
           data: { message: "Password updated successfully" },
@@ -94,14 +95,6 @@ Default.parameters = (() => {
 
   return {
     ...baseParams,
-    reactRouter: {
-      ...baseParams.reactRouter,
-      location: {
-        ...baseParams.reactRouter.location,
-        pathname: "/en/update-password",
-        state: {},
-      },
-    },
   };
 })();
 
@@ -114,14 +107,14 @@ French.parameters = (() => {
     [
       {
         type: "get",
-        endpoint: "/v1/users/test-user-123/otp_factors",
+        endpoint: "/v1/users/otp_factors",
         response: {
           success: true,
           data: [
             {
               id: "factor-1",
               type: "smsotp",
-              phoneNumber: "+15551234567",
+              destination: "+15551234567",
               status: "active",
             },
           ],
@@ -129,7 +122,7 @@ French.parameters = (() => {
       },
       {
         type: "post",
-        endpoint: "/v1/auth/password/verify",
+        endpoint: `${SUBMIT_END_POINTS.passwordVerify}`,
         response: {
           success: true,
           data: [],
@@ -137,7 +130,7 @@ French.parameters = (() => {
       },
       {
         type: "get",
-        endpoint: "/v1/auth/password/policy",
+        endpoint: `${SUBMIT_END_POINTS.requestPasswordPolicy}`,
         response: {
           success: true,
           data: { pwdMinLength: 12, pwdMaxLength: 65 },
@@ -145,7 +138,7 @@ French.parameters = (() => {
       },
       {
         type: "post",
-        endpoint: "/v1/auth/password/update",
+        endpoint: `${SUBMIT_END_POINTS.passwordUpdate}`,
         response: {
           success: true,
           data: { message: "Password updated successfully" },
@@ -171,13 +164,5 @@ French.parameters = (() => {
 
   return {
     ...baseParams,
-    reactRouter: {
-      ...baseParams.reactRouter,
-      location: {
-        ...baseParams.reactRouter.location,
-        pathname: "/fr/update-password",
-        state: {},
-      },
-    },
   };
 })();
