@@ -87,7 +87,7 @@ export default function AddMFAPage() {
     mfaTrxnId: phoneFormData?.trxnId,
   });
 
-  const successBannerJson = getPageContent(language, PAGES.successBanner);
+  const noticeFactoryContent = getPageContent(language, PAGES.noticeFactory);
   const errorMessage = getErrorMessage(language, errorCode);
 
   const handlePhoneForm = (field, value) => {
@@ -167,8 +167,8 @@ export default function AddMFAPage() {
         ) {
           const otpType =
             phoneFormData.otpType === FLOW_TYPES.voice
-              ? successBannerJson["5"]
-              : successBannerJson["6"];
+              ? noticeFactoryContent["5"]
+              : noticeFactoryContent["6"];
           navigate(backToManage2FAVerificationsPage, {
             state: {
               noticeType: "mfaAdded",
@@ -402,8 +402,8 @@ export default function AddMFAPage() {
         onSkipForNow={async () => {
           const otpType =
             phoneFormData.otpType === FLOW_TYPES.voice
-              ? successBannerJson["5"]
-              : successBannerJson["6"];
+              ? noticeFactoryContent["5"]
+              : noticeFactoryContent["6"];
           navigate(backToManage2FAVerificationsPage, {
             state: {
               noticeType: "mfaAdded",

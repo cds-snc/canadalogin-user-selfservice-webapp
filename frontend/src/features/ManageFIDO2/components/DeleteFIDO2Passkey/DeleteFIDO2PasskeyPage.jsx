@@ -15,6 +15,8 @@ import { useOtpOperations } from "../../../../hooks/useOtpOperations";
 import { authService } from "../../../../services/authService";
 import OtpSelection from "../../../TransientOtp/components/OtpSelection";
 import OtpVerification from "../../../TransientOtp/components/OtpVerification";
+import DeleteFIDO2PasskeySuccess from "./DeleteFIDO2PasskeySuccess";
+import { fido2Api } from "../../api/fido2Api";
 
 export default function DeleteFIDO2PasskeyPage({ step }) {
   const { state } = useUser();
@@ -29,6 +31,8 @@ export default function DeleteFIDO2PasskeyPage({ step }) {
 
   const [assertionResult, setAssertionResult] = useState(null);
   const [selectedPasskey, setSelectedPasskey] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const errorPageContent = getPageContent(language, PAGES.error);
   const backToManage2FAVerificationsPage = path(PAGES.manage2FAVerifications, {
     language: language,
   });
@@ -117,6 +121,38 @@ export default function DeleteFIDO2PasskeyPage({ step }) {
     }
   };
 
+  const handleDeleteFIDO2 = async () => {
+    const passkeyId = selectedPasskey?.id;
+
+    if (!passkeyId || !assertionResult) {
+      setErrorCode(errorPageContent["error_delete_credential"]);
+      return;
+    }
+
+    setErrorCode("");
+    setDeleteLoading(true);
+
+    try {
+      const response = await fido2Api.deleteRegistration(
+        passkeyId,
+        assertionResult,
+      );
+
+      if (response && response.success) {
+        setWizardStep("deleteFIDO2PasskeySuccess");
+      } else {
+        throw new Error(errorPageContent["error_delete_credential"]);
+      }
+    } catch (err) {
+      console.error(errorPageContent["error_delete_credential"], err);
+      setErrorCode(errorPageContent["error_delete_credential"]);
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
+  const isLoading = localLoading || validatePasswordLoading || deleteLoading;
+
   const steps = {
     passwordVerification: (
       <PasswordVerification
@@ -165,7 +201,7 @@ export default function DeleteFIDO2PasskeyPage({ step }) {
         }}
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
-        onCancel={async () => navigate(backToManage2FAVerificationsPage)}
+        onCancel={() => navigate(backToManage2FAVerificationsPage)}
         showTryAnotherWay={userPhoneFactors && userPhoneFactors.length > 1}
       />
     ),
@@ -182,12 +218,18 @@ export default function DeleteFIDO2PasskeyPage({ step }) {
     ),
     deleteFIDO2PasskeyConfirmation: (
       <DeleteFIDO2PasskeyConfirm
-        setErrorCode={setErrorCode}
-        assertionResult={assertionResult}
+        passkeyNickname={selectedPasskey?.attributes?.nickname}
+        onConfirm={handleDeleteFIDO2}
+        onCancel={() => navigate(backToManage2FAVerificationsPage)}
+      />
+    ),
+    deleteFIDO2PasskeySuccess: (
+      <DeleteFIDO2PasskeySuccess
+        onNext={() => navigate(backToManage2FAVerificationsPage)}
       />
     ),
   };
-  return localLoading || validatePasswordLoading ? (
+  return isLoading ? (
     <Loader text={loaderPageContentJson["11"]} />
   ) : (
     <StepContent

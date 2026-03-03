@@ -42,7 +42,7 @@ vi.mock("../../../utils/functions", () => ({
 
 vi.mock("../../../utils/constants", () => ({
   PAGES: {
-    successBanner: "successBanner",
+    noticeFactory: "NoticeFactory",
   },
 }));
 

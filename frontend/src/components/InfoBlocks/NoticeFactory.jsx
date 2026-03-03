@@ -10,7 +10,7 @@ export default function NoticeFactory({
   passkeyName,
 }) {
   const { language } = useParams();
-  const successBannerJson = getPageContent(language, PAGES.successBanner);
+  const noticeFactoryContent = getPageContent(language, PAGES.noticeFactory);
 
   /**
    * Factory for creating pre-configured notice components
@@ -21,8 +21,8 @@ export default function NoticeFactory({
       <GcdsText>
         <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={" "}>
           <GcdsText>
-            {successBannerJson["1"]} <strong>{phoneNumber}</strong>{" "}
-            {successBannerJson["2"]}
+            {noticeFactoryContent["1"]} <strong>{phoneNumber}</strong>{" "}
+            {noticeFactoryContent["2"]}
           </GcdsText>
         </GcdsNotice>
       </GcdsText>
@@ -32,7 +32,7 @@ export default function NoticeFactory({
       <GcdsText>
         <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={" "}>
           <GcdsText>
-            {successBannerJson["3"]} {otpType} {successBannerJson["4"]}{" "}
+            {noticeFactoryContent["3"]} {otpType} {noticeFactoryContent["4"]}{" "}
             <strong>{phoneNumber}</strong>
           </GcdsText>
         </GcdsNotice>
@@ -43,8 +43,8 @@ export default function NoticeFactory({
       <GcdsText>
         <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={" "}>
           <GcdsText>
-            {successBannerJson["3"]} <strong>{passkeyName}</strong>{" "}
-            {successBannerJson["7"]}
+            {noticeFactoryContent["3"]} <strong>{passkeyName}</strong>{" "}
+            {noticeFactoryContent["7"]}
           </GcdsText>
         </GcdsNotice>
       </GcdsText>
@@ -52,10 +52,14 @@ export default function NoticeFactory({
 
     passkeyDeleted: ({ passkeyName }) => (
       <GcdsText>
-        <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={" "}>
+        <GcdsNotice
+          type="success"
+          noticeTitleTag="h2"
+          noticeTitle={noticeFactoryContent["notice_title_success"]}
+        >
           <GcdsText>
-            {successBannerJson["1"]} <strong>{passkeyName}</strong>{" "}
-            {successBannerJson["8"]}
+            {noticeFactoryContent["8"]} <strong>{passkeyName}</strong>{" "}
+            {noticeFactoryContent["10"]}
           </GcdsText>
         </GcdsNotice>
       </GcdsText>
@@ -65,7 +69,7 @@ export default function NoticeFactory({
       <GcdsText>
         <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={" "}>
           <GcdsText>
-            {successBannerJson["9"]} <strong>{passkeyName}</strong>
+            {noticeFactoryContent["9"]} <strong>{passkeyName}</strong>
           </GcdsText>
         </GcdsNotice>
       </GcdsText>

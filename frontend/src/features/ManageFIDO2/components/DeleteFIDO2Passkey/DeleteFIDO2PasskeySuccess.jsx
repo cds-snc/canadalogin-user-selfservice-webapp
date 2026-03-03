@@ -1,4 +1,4 @@
-import { useParams } from "react-router";
+import { useLocation, useParams } from "react-router";
 import { getPageContent } from "../../../../utils/functions";
 import { PAGES } from "../../../../utils/constants";
 import {
@@ -8,53 +8,42 @@ import {
   GcdsHeading,
   GcdsText,
 } from "@cdssnc/gcds-components-react";
+import NoticeFactory from "../../../../components/InfoBlocks/NoticeFactory";
 
-export default function DeleteFIDO2PasskeyConfirm({
-  passkeyNickname,
-  onConfirm,
-  onCancel,
-}) {
+export default function DeleteFIDO2PasskeySuccess({ onNext }) {
+  const location = useLocation();
   const { language } = useParams();
+  const { passkeyNickname } = location.state ?? {};
   const pageContentJson = getPageContent(
     language,
-    PAGES.deleteFIDO2PasskeyConfirm,
+    PAGES.deleteFIDO2PasskeySuccess,
   );
 
   return (
     <GcdsContainer role="main">
-      <GcdsGrid columns="1" gap="500">
+      <GcdsGrid columns="1" gap="400">
+        <NoticeFactory
+          noticeType={"passkeyDeleted"}
+          passkeyName={passkeyNickname}
+        />
         <GcdsContainer>
           <GcdsHeading tag="h1" lang={language}>
             {pageContentJson["1"]}
           </GcdsHeading>
           <GcdsText>
-            {pageContentJson["2"]} <strong>{passkeyNickname}</strong>{" "}
-            {pageContentJson["3"]}
+            {pageContentJson["2"]} <strong>{pageContentJson["3"]}</strong>{" "}
           </GcdsText>
+          <GcdsText>{pageContentJson["4"]}</GcdsText>
         </GcdsContainer>
       </GcdsGrid>
 
       <GcdsGrid columns="max-content max-content" gap="200">
         <GcdsButton
-          buttonRole="danger"
+          buttonRole="primary"
           style={{ width: "fit-content" }}
-          onGcdsClick={async (ev) => {
-            ev.preventDefault();
-            await onConfirm();
-          }}
+          onGcdsClick={onNext}
         >
-          {pageContentJson["9"]}
-        </GcdsButton>
-
-        <GcdsButton
-          buttonRole="secondary"
-          style={{ width: "fit-content" }}
-          onGcdsClick={(ev) => {
-            ev.preventDefault();
-            onCancel();
-          }}
-        >
-          {pageContentJson["10"]}
+          {pageContentJson["5"]}
         </GcdsButton>
       </GcdsGrid>
     </GcdsContainer>

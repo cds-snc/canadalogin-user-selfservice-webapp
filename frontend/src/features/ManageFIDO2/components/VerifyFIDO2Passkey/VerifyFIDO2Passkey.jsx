@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import {
   GcdsButton,
@@ -14,6 +14,7 @@ import { getPageContent } from "../../../../utils/functions";
 import { PAGES } from "../../../../utils/constants";
 import { path } from "../../../../utils/routeHelpers";
 import FIDOPasskeyCollage from "../../../../assets/icons/passkey_collage.svg?react";
+import Loader from "../../../../components/Layout/Loading";
 
 export default function VerifyFIDO2Passkey({
   setAssertionResult,
@@ -28,6 +29,7 @@ export default function VerifyFIDO2Passkey({
   const pageContentJson = getPageContent(language, PAGES.verifyFIDO2Passkey);
   const errorPageContent = getPageContent(language, PAGES.error);
   const hasTriggeredRef = useRef(false);
+  const [localLoading, setLocalLoading] = useState(true);
 
   const backToManage2FAVerificationsPage = path(PAGES.manage2FAVerifications, {
     language: language,
@@ -37,6 +39,8 @@ export default function VerifyFIDO2Passkey({
    * Trigger FIDO2 authentication flow
    */
   const handleFIDO2Verification = async () => {
+    setLocalLoading(true);
+    setErrorCode("");
     // Prevent multiple calls - persist across strict mode remounts
     if (hasTriggeredRef.current) {
       return;
@@ -52,7 +56,7 @@ export default function VerifyFIDO2Passkey({
       if (!optionsResponse?.success) {
         throw new Error(errorPageContent["error_get_assertion_options"]);
       }
-
+      setLocalLoading(false);
       const assertionData = { ...optionsResponse.data };
 
       // If a specific credential is required, filter allowCredentials to only that one
@@ -75,12 +79,12 @@ export default function VerifyFIDO2Passkey({
       if (submitAttestationResult) {
         await fido2Api.submitAssertionResult(assertionResult);
       }
-
-      onCallback?.();
+      await onCallback?.();
     } catch (err) {
       console.error("error_fido2_verification", err);
       setErrorCode("error_fido2_verification");
     } finally {
+      setLocalLoading(false);
       hasTriggeredRef.current = false;
     }
   };
@@ -92,7 +96,9 @@ export default function VerifyFIDO2Passkey({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return (
+  return localLoading ? (
+    <Loader text={pageContentJson["9"]} />
+  ) : (
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="300">
         <GcdsHeading tag="h1" lang={language}>
@@ -103,7 +109,9 @@ export default function VerifyFIDO2Passkey({
           <strong>{selectedPasskey?.attributes?.nickname}</strong>
         </GcdsText>
 
-        <FIDOPasskeyCollage />
+        <GcdsContainer style={{ justifySelf: "center" }}>
+          <FIDOPasskeyCollage />
+        </GcdsContainer>
 
         <GcdsText> {pageContentJson["2"]} </GcdsText>
       </GcdsGrid>

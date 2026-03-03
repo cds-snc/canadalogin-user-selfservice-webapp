@@ -11,7 +11,7 @@ export default {
   title: "GC Sign In/Tests/InfoBlocks/NoticeFactory",
   component: TestTemplate,
   args: {
-    page: PAGES.successBanner,
+    page: PAGES.noticeFactory,
     email: "test@example.com",
     phone: "+15551234567",
     id: "test-user-123",
