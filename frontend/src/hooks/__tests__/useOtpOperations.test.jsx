@@ -74,24 +74,25 @@ describe("useOtpOperations", () => {
 
   describe("Initial State", () => {
     it("should initialize with correct default values", () => {
-      const { result } = renderHook(() => useOtpOperations(), { wrapper });
+      const { result } = renderHook(() => useOtpOperations({}), { wrapper });
 
       expect(result.current.userPhoneFactors).toEqual([]);
       expect(result.current.userSelectedMfaFactor).toBeNull();
       expect(result.current.otpSentResponse).toBeNull();
       expect(result.current.userOtpValue).toBe("");
-      expect(result.current.localLoading).toBe(true);
+      // No userId provided → otpLoading initialises to false
+      expect(result.current.localLoading).toBe(false);
     });
 
     it("should fetch user phone factors when userId is provided", async () => {
       const { result } = renderHook(
         () =>
-          useOtpOperations(
-            defaultProps.userId,
-            defaultProps.userName,
-            defaultProps.setErrorCode,
-            defaultProps.fallbackNavigationPath,
-          ),
+          useOtpOperations({
+            userId: defaultProps.userId,
+            userName: defaultProps.userName,
+            setErrorCode: defaultProps.setErrorCode,
+            fallbackNavigationPath: defaultProps.fallbackNavigationPath,
+          }),
         { wrapper },
       );
 
@@ -111,12 +112,12 @@ describe("useOtpOperations", () => {
     it("should not fetch factors when userId is not provided", () => {
       renderHook(
         () =>
-          useOtpOperations(
-            null,
-            defaultProps.userName,
-            defaultProps.setErrorCode,
-            defaultProps.fallbackNavigationPath,
-          ),
+          useOtpOperations({
+            userId: null,
+            userName: defaultProps.userName,
+            setErrorCode: defaultProps.setErrorCode,
+            fallbackNavigationPath: defaultProps.fallbackNavigationPath,
+          }),
         { wrapper },
       );
 
@@ -128,12 +129,12 @@ describe("useOtpOperations", () => {
     it("should handle successful API response with valid data", async () => {
       const { result } = renderHook(
         () =>
-          useOtpOperations(
-            defaultProps.userId,
-            defaultProps.userName,
-            defaultProps.setErrorCode,
-            defaultProps.fallbackNavigationPath,
-          ),
+          useOtpOperations({
+            userId: defaultProps.userId,
+            userName: defaultProps.userName,
+            setErrorCode: defaultProps.setErrorCode,
+            fallbackNavigationPath: defaultProps.fallbackNavigationPath,
+          }),
         { wrapper },
       );
 
@@ -168,12 +169,12 @@ describe("useOtpOperations", () => {
 
       const { result } = renderHook(
         () =>
-          useOtpOperations(
-            defaultProps.userId,
-            defaultProps.userName,
-            defaultProps.setErrorCode,
-            defaultProps.fallbackNavigationPath,
-          ),
+          useOtpOperations({
+            userId: defaultProps.userId,
+            userName: defaultProps.userName,
+            setErrorCode: defaultProps.setErrorCode,
+            fallbackNavigationPath: defaultProps.fallbackNavigationPath,
+          }),
         { wrapper },
       );
 
@@ -198,12 +199,12 @@ describe("useOtpOperations", () => {
 
       const { result } = renderHook(
         () =>
-          useOtpOperations(
-            defaultProps.userId,
-            defaultProps.userName,
-            defaultProps.setErrorCode,
-            defaultProps.fallbackNavigationPath,
-          ),
+          useOtpOperations({
+            userId: defaultProps.userId,
+            userName: defaultProps.userName,
+            setErrorCode: defaultProps.setErrorCode,
+            fallbackNavigationPath: defaultProps.fallbackNavigationPath,
+          }),
         { wrapper },
       );
 
@@ -225,12 +226,12 @@ describe("useOtpOperations", () => {
 
       const { result } = renderHook(
         () =>
-          useOtpOperations(
-            defaultProps.userId,
-            defaultProps.userName,
-            defaultProps.setErrorCode,
-            defaultProps.fallbackNavigationPath,
-          ),
+          useOtpOperations({
+            userId: defaultProps.userId,
+            userName: defaultProps.userName,
+            setErrorCode: defaultProps.setErrorCode,
+            fallbackNavigationPath: defaultProps.fallbackNavigationPath,
+          }),
         { wrapper },
       );
 
@@ -255,12 +256,12 @@ describe("useOtpOperations", () => {
 
       renderHook(
         () =>
-          useOtpOperations(
-            defaultProps.userId,
-            defaultProps.userName,
-            defaultProps.setErrorCode,
-            null,
-          ),
+          useOtpOperations({
+            userId: defaultProps.userId,
+            userName: defaultProps.userName,
+            setErrorCode: defaultProps.setErrorCode,
+            fallbackNavigationPath: null,
+          }),
         { wrapper },
       );
 
@@ -276,12 +277,12 @@ describe("useOtpOperations", () => {
     it("should select the correct factor by ID", async () => {
       const { result } = renderHook(
         () =>
-          useOtpOperations(
-            defaultProps.userId,
-            defaultProps.userName,
-            defaultProps.setErrorCode,
-            defaultProps.fallbackNavigationPath,
-          ),
+          useOtpOperations({
+            userId: defaultProps.userId,
+            userName: defaultProps.userName,
+            setErrorCode: defaultProps.setErrorCode,
+            fallbackNavigationPath: defaultProps.fallbackNavigationPath,
+          }),
         { wrapper },
       );
 
@@ -303,12 +304,12 @@ describe("useOtpOperations", () => {
     it("should not change selection for non-existent factor ID", async () => {
       const { result } = renderHook(
         () =>
-          useOtpOperations(
-            defaultProps.userId,
-            defaultProps.userName,
-            defaultProps.setErrorCode,
-            defaultProps.fallbackNavigationPath,
-          ),
+          useOtpOperations({
+            userId: defaultProps.userId,
+            userName: defaultProps.userName,
+            setErrorCode: defaultProps.setErrorCode,
+            fallbackNavigationPath: defaultProps.fallbackNavigationPath,
+          }),
         { wrapper },
       );
 
@@ -330,12 +331,12 @@ describe("useOtpOperations", () => {
     it("should update OTP value correctly", () => {
       const { result } = renderHook(
         () =>
-          useOtpOperations(
-            defaultProps.userId,
-            defaultProps.userName,
-            defaultProps.setErrorCode,
-            defaultProps.fallbackNavigationPath,
-          ),
+          useOtpOperations({
+            userId: defaultProps.userId,
+            userName: defaultProps.userName,
+            setErrorCode: defaultProps.setErrorCode,
+            fallbackNavigationPath: defaultProps.fallbackNavigationPath,
+          }),
         { wrapper },
       );
 
@@ -358,12 +359,12 @@ describe("useOtpOperations", () => {
     it("should send OTP request successfully", async () => {
       const { result } = renderHook(
         () =>
-          useOtpOperations(
-            defaultProps.userId,
-            defaultProps.userName,
-            defaultProps.setErrorCode,
-            defaultProps.fallbackNavigationPath,
-          ),
+          useOtpOperations({
+            userId: defaultProps.userId,
+            userName: defaultProps.userName,
+            setErrorCode: defaultProps.setErrorCode,
+            fallbackNavigationPath: defaultProps.fallbackNavigationPath,
+          }),
         { wrapper },
       );
 
@@ -389,12 +390,12 @@ describe("useOtpOperations", () => {
     it("should not send request when userSelectedMfaFactor is null", async () => {
       const { result } = renderHook(
         () =>
-          useOtpOperations(
-            defaultProps.userId,
-            defaultProps.userName,
-            defaultProps.setErrorCode,
-            defaultProps.fallbackNavigationPath,
-          ),
+          useOtpOperations({
+            userId: defaultProps.userId,
+            userName: defaultProps.userName,
+            setErrorCode: defaultProps.setErrorCode,
+            fallbackNavigationPath: defaultProps.fallbackNavigationPath,
+          }),
         { wrapper },
       );
 
@@ -413,12 +414,12 @@ describe("useOtpOperations", () => {
     it("should not send request when userName is not provided", async () => {
       const { result } = renderHook(
         () =>
-          useOtpOperations(
-            defaultProps.userId,
-            null,
-            defaultProps.setErrorCode,
-            defaultProps.fallbackNavigationPath,
-          ),
+          useOtpOperations({
+            userId: defaultProps.userId,
+            userName: null,
+            setErrorCode: defaultProps.setErrorCode,
+            fallbackNavigationPath: defaultProps.fallbackNavigationPath,
+          }),
         { wrapper },
       );
 
@@ -440,12 +441,12 @@ describe("useOtpOperations", () => {
 
       const { result } = renderHook(
         () =>
-          useOtpOperations(
-            defaultProps.userId,
-            defaultProps.userName,
-            defaultProps.setErrorCode,
-            defaultProps.fallbackNavigationPath,
-          ),
+          useOtpOperations({
+            userId: defaultProps.userId,
+            userName: defaultProps.userName,
+            setErrorCode: defaultProps.setErrorCode,
+            fallbackNavigationPath: defaultProps.fallbackNavigationPath,
+          }),
         { wrapper },
       );
 
@@ -474,12 +475,12 @@ describe("useOtpOperations", () => {
     it("should validate OTP successfully", async () => {
       const { result } = renderHook(
         () =>
-          useOtpOperations(
-            defaultProps.userId,
-            defaultProps.userName,
-            defaultProps.setErrorCode,
-            defaultProps.fallbackNavigationPath,
-          ),
+          useOtpOperations({
+            userId: defaultProps.userId,
+            userName: defaultProps.userName,
+            setErrorCode: defaultProps.setErrorCode,
+            fallbackNavigationPath: defaultProps.fallbackNavigationPath,
+          }),
         { wrapper },
       );
 
@@ -511,12 +512,12 @@ describe("useOtpOperations", () => {
     it("should not validate when otpSentResponse is null", async () => {
       const { result } = renderHook(
         () =>
-          useOtpOperations(
-            defaultProps.userId,
-            defaultProps.userName,
-            defaultProps.setErrorCode,
-            defaultProps.fallbackNavigationPath,
-          ),
+          useOtpOperations({
+            userId: defaultProps.userId,
+            userName: defaultProps.userName,
+            setErrorCode: defaultProps.setErrorCode,
+            fallbackNavigationPath: defaultProps.fallbackNavigationPath,
+          }),
         { wrapper },
       );
 
@@ -535,12 +536,12 @@ describe("useOtpOperations", () => {
     it("should not validate when userSelectedMfaFactor is null", async () => {
       const { result } = renderHook(
         () =>
-          useOtpOperations(
-            defaultProps.userId,
-            defaultProps.userName,
-            defaultProps.setErrorCode,
-            defaultProps.fallbackNavigationPath,
-          ),
+          useOtpOperations({
+            userId: defaultProps.userId,
+            userName: defaultProps.userName,
+            setErrorCode: defaultProps.setErrorCode,
+            fallbackNavigationPath: defaultProps.fallbackNavigationPath,
+          }),
         { wrapper },
       );
 
@@ -566,12 +567,12 @@ describe("useOtpOperations", () => {
 
       const { result } = renderHook(
         () =>
-          useOtpOperations(
-            defaultProps.userId,
-            defaultProps.userName,
-            defaultProps.setErrorCode,
-            defaultProps.fallbackNavigationPath,
-          ),
+          useOtpOperations({
+            userId: defaultProps.userId,
+            userName: defaultProps.userName,
+            setErrorCode: defaultProps.setErrorCode,
+            fallbackNavigationPath: defaultProps.fallbackNavigationPath,
+          }),
         { wrapper },
       );
 
@@ -594,12 +595,12 @@ describe("useOtpOperations", () => {
     it("should validate without calling onSuccess when onSuccess is not provided", async () => {
       const { result } = renderHook(
         () =>
-          useOtpOperations(
-            defaultProps.userId,
-            defaultProps.userName,
-            defaultProps.setErrorCode,
-            defaultProps.fallbackNavigationPath,
-          ),
+          useOtpOperations({
+            userId: defaultProps.userId,
+            userName: defaultProps.userName,
+            setErrorCode: defaultProps.setErrorCode,
+            fallbackNavigationPath: defaultProps.fallbackNavigationPath,
+          }),
         { wrapper },
       );
 
@@ -624,12 +625,12 @@ describe("useOtpOperations", () => {
     it("should provide working setters for all state values", () => {
       const { result } = renderHook(
         () =>
-          useOtpOperations(
-            defaultProps.userId,
-            defaultProps.userName,
-            defaultProps.setErrorCode,
-            defaultProps.fallbackNavigationPath,
-          ),
+          useOtpOperations({
+            userId: defaultProps.userId,
+            userName: defaultProps.userName,
+            setErrorCode: defaultProps.setErrorCode,
+            fallbackNavigationPath: defaultProps.fallbackNavigationPath,
+          }),
         { wrapper },
       );
 
@@ -663,12 +664,12 @@ describe("useOtpOperations", () => {
     it("should handle server mapping for different OTP types", async () => {
       const { result } = renderHook(
         () =>
-          useOtpOperations(
-            defaultProps.userId,
-            defaultProps.userName,
-            defaultProps.setErrorCode,
-            defaultProps.fallbackNavigationPath,
-          ),
+          useOtpOperations({
+            userId: defaultProps.userId,
+            userName: defaultProps.userName,
+            setErrorCode: defaultProps.setErrorCode,
+            fallbackNavigationPath: defaultProps.fallbackNavigationPath,
+          }),
         { wrapper },
       );
 
@@ -695,12 +696,12 @@ describe("useOtpOperations", () => {
     it("should handle userId change by refetching factors", async () => {
       const { result, rerender } = renderHook(
         ({ userId }) =>
-          useOtpOperations(
+          useOtpOperations({
             userId,
-            defaultProps.userName,
-            defaultProps.setErrorCode,
-            defaultProps.fallbackNavigationPath,
-          ),
+            userName: defaultProps.userName,
+            setErrorCode: defaultProps.setErrorCode,
+            fallbackNavigationPath: defaultProps.fallbackNavigationPath,
+          }),
         { wrapper, initialProps: { userId: defaultProps.userId } },
       );
 

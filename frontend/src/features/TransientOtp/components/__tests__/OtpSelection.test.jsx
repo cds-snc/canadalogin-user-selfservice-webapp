@@ -6,9 +6,9 @@ import userEvent from "@testing-library/user-event";
 import OtpSelection from "../OtpSelection.jsx";
 import { FLOW_TYPES, PAGES } from "../../../../utils/constants.jsx";
 
-// Mock the navigation hooks
-const mockNavigateHelper = vi.fn();
-
+// ---------------------------------------------------------------------------
+// Router / navigate mocks
+// ---------------------------------------------------------------------------
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
   return {
@@ -18,10 +18,12 @@ vi.mock("react-router", async () => {
 });
 
 vi.mock("../../../../hooks/useNavigate.js", () => ({
-  useNavigateHelper: () => mockNavigateHelper,
+  useNavigateHelper: () => vi.fn(),
 }));
 
-// Mock utilities
+// ---------------------------------------------------------------------------
+// Utility mocks
+// ---------------------------------------------------------------------------
 vi.mock("../../../../utils/functions.jsx", () => ({
   getPageContent: vi.fn((language, page) => {
     if (page === PAGES.transientOtpSelection) {
@@ -29,7 +31,6 @@ vi.mock("../../../../utils/functions.jsx", () => ({
         1: "Complete 2-step verification",
         2: "To change your password,",
         3: "first complete 2-step verification.",
-        4: "Choose how you want to receive a verification code",
         5: "Once the code is sent it will expire in",
         6: "10 minutes.",
         7: "Carrier charges may apply.",
@@ -40,12 +41,17 @@ vi.mock("../../../../utils/functions.jsx", () => ({
         13: "I cannot access my phone",
         14: "To add a phone number,",
         15: "To delete this number,",
-        16: "How should we send you the code?",
+        17: "Passkey or security key",
+        18: "Select SMS",
+        19: "Select voice",
+        20: "Use passkey",
+        21: "How do you want to verify?",
+        22: "To delete this passkey,",
+        23: "To add a passkey,",
       };
     }
     if (page === "Button") {
       return {
-        submit: "Submit",
         cancel: "Cancel",
       };
     }
@@ -61,34 +67,32 @@ vi.mock("../../../../utils/gcHelpCentreLinks.jsx", () => ({
 }));
 
 vi.mock("../../../../utils/routeHelpers.js", () => ({
-  path: vi.fn((page, { language }) => {
-    if (page === PAGES.manage2FAVerifications) {
-      return `/${language}/security-settings/manage-2fa-verifications`;
-    }
-    return `/${language}/test`;
-  }),
+  path: vi.fn((page, { language }) => `/${language}/test`),
 }));
 
-// Mock GCDS components
+// ---------------------------------------------------------------------------
+// GCDS component mocks
+// ---------------------------------------------------------------------------
 vi.mock("@cdssnc/gcds-components-react", () => ({
   GcdsButton: ({ children, onGcdsClick, buttonRole, style }) => (
     <button
       data-testid={
         buttonRole === "secondary" ? "cancel-button" : "submit-button"
       }
+      data-role={buttonRole}
       onClick={onGcdsClick}
       style={style}
     >
       {children}
     </button>
   ),
-  GcdsContainer: ({ children, className }) => (
-    <div data-testid="container" className={className}>
+  GcdsContainer: ({ children, className, role }) => (
+    <div className={className} role={role}>
       {children}
     </div>
   ),
-  GcdsGrid: ({ children, columns, gap }) => (
-    <div data-testid="grid" data-columns={columns} data-gap={gap}>
+  GcdsGrid: ({ children, columns }) => (
+    <div data-testid="grid" data-columns={columns}>
       {children}
     </div>
   ),
@@ -100,46 +104,40 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
       </Tag>
     );
   },
-  GcdsLink: ({ children, href, target }) => (
-    <a data-testid="gcds-link" href={href} target={target}>
-      {children}
-    </a>
-  ),
-  GcdsRadios: ({ name, legend, options, onGcdsChange }) => (
-    <div data-testid="radio-group">
-      <fieldset>
-        <legend>{legend}</legend>
-        {options.map((option) => (
-          <label key={option.id} data-testid={`radio-label-${option.id}`}>
-            <input
-              type="radio"
-              name={name}
-              id={option.id}
-              value={option.value}
-              defaultChecked={option.checked}
-              data-testid={`radio-${option.id}`}
-              onChange={onGcdsChange}
-            />
-            {option.label}
-          </label>
-        ))}
-      </fieldset>
-    </div>
-  ),
-  GcdsText: ({ children }) => <p data-testid="text">{children}</p>,
+  // Differentiate external links (href) from button-style links (onGcdsClick)
+  GcdsLink: ({ children, href, target, onGcdsClick }) => {
+    if (href) {
+      return (
+        <a data-testid="gcds-link-external" href={href} target={target}>
+          {children}
+        </a>
+      );
+    }
+    return (
+      <button data-testid="gcds-link-button" onClick={onGcdsClick}>
+        {children}
+      </button>
+    );
+  },
+  GcdsText: ({ children }) => <p data-testid="gcds-text">{children}</p>,
 }));
 
+// ---------------------------------------------------------------------------
+// Default props / helpers
+// ---------------------------------------------------------------------------
 const mockOnNext = vi.fn();
 const mockOnChangeUserSelectedMfaFactor = vi.fn();
 const mockOnCancel = vi.fn();
+const mockOnSelectFIDO2 = vi.fn();
 
 const defaultProps = {
   onNext: mockOnNext,
-  userSelectedMfaFactor: null,
   onChangeUserSelectedMfaFactor: mockOnChangeUserSelectedMfaFactor,
   userPhoneFactors: [],
+  fido2Data: [],
   parentPage: "password",
   onCancel: mockOnCancel,
+  onSelectFIDO2: mockOnSelectFIDO2,
 };
 
 const renderComponent = (props = {}) => {
@@ -151,6 +149,9 @@ const renderComponent = (props = {}) => {
   );
 };
 
+// ---------------------------------------------------------------------------
+// Tests
+// ---------------------------------------------------------------------------
 describe("OtpSelection Component", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -160,6 +161,7 @@ describe("OtpSelection Component", () => {
     vi.clearAllMocks();
   });
 
+  // -------------------------------------------------------------------------
   describe("Rendering and Layout", () => {
     it("renders the main heading", () => {
       renderComponent();
@@ -168,56 +170,21 @@ describe("OtpSelection Component", () => {
       ).toBeInTheDocument();
     });
 
-    it("renders with default parent page content", () => {
-      renderComponent();
-      expect(screen.getByText(/To change your password,/)).toBeInTheDocument();
-      expect(
-        screen.getByText(/first complete 2-step verification\./),
-      ).toBeInTheDocument();
-    });
-
-    it("renders with deleteMFAPage parent page content", () => {
-      renderComponent({ parentPage: PAGES.deleteMFAPage });
-      expect(screen.getByText(/To delete this number,/)).toBeInTheDocument();
-      expect(
-        screen.getByText(/first complete 2-step verification\./),
-      ).toBeInTheDocument();
-    });
-
-    it("renders with addMFAPage parent page content", () => {
-      renderComponent({ parentPage: PAGES.addMFAPage });
-      expect(screen.getByText(/To add a phone number,/)).toBeInTheDocument();
-      expect(
-        screen.getByText(/first complete 2-step verification\./),
-      ).toBeInTheDocument();
-    });
-
-    it("renders the verification code instructions heading", () => {
+    it("renders the 'how to verify' section heading", () => {
       renderComponent();
       expect(
-        screen.getByText("Choose how you want to receive a verification code"),
+        screen.getByText("How do you want to verify?"),
       ).toBeInTheDocument();
     });
 
-    it("renders the expiration and carrier charge notices", () => {
-      renderComponent();
-      expect(
-        screen.getByText(/Once the code is sent it will expire in/),
-      ).toBeInTheDocument();
-      expect(screen.getByText(/10 minutes\./)).toBeInTheDocument();
-      expect(
-        screen.getByText(/Carrier charges may apply\./),
-      ).toBeInTheDocument();
-    });
-
-    it("renders the help section", () => {
+    it("renders the 'Need help?' section heading", () => {
       renderComponent();
       expect(screen.getByText("Need help?")).toBeInTheDocument();
     });
 
-    it("renders help links", () => {
+    it("renders help links with correct hrefs", () => {
       renderComponent();
-      const links = screen.getAllByTestId("gcds-link");
+      const links = screen.getAllByTestId("gcds-link-external");
       expect(links).toHaveLength(2);
       expect(links[0]).toHaveAttribute("href", "https://help.example.com/2fa");
       expect(links[1]).toHaveAttribute(
@@ -226,709 +193,416 @@ describe("OtpSelection Component", () => {
       );
     });
 
-    it("renders submit and cancel buttons", () => {
+    it("renders help link labels", () => {
       renderComponent();
-      expect(screen.getByTestId("submit-button")).toBeInTheDocument();
-      expect(screen.getByTestId("cancel-button")).toBeInTheDocument();
-      expect(screen.getByText("Submit")).toBeInTheDocument();
-      expect(screen.getByText("Cancel")).toBeInTheDocument();
-    });
-  });
-
-  describe("Radio Options Configuration - SMS Only", () => {
-    it("renders text display (not radio) for single SMS factor", () => {
-      const userPhoneFactors = [
-        {
-          id: "sms-factor-1",
-          type: FLOW_TYPES.sms,
-          destination: "+15551234567",
-        },
-      ];
-
-      renderComponent({ userPhoneFactors });
-
-      // Should display as text, not radio group when only one factor
-      expect(screen.queryByTestId("radio-group")).not.toBeInTheDocument();
-      expect(
-        screen.getByText(/Text message \+15551234567/),
-      ).toBeInTheDocument();
-    });
-
-    it("renders radio buttons for multiple SMS factors", () => {
-      const userPhoneFactors = [
-        {
-          id: "sms-factor-1",
-          type: FLOW_TYPES.sms,
-          destination: "+15551234567",
-        },
-        {
-          id: "sms-factor-2",
-          type: FLOW_TYPES.sms,
-          destination: "+15559876543",
-        },
-      ];
-
-      renderComponent({ userPhoneFactors });
-
-      expect(
-        screen.getByText(/Text message \+15551234567/),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByText(/Text message \+15559876543/),
-      ).toBeInTheDocument();
-    });
-
-    it("sets correct checked state for selected SMS factor", () => {
-      const userPhoneFactors = [
-        {
-          id: "sms-factor-1",
-          type: FLOW_TYPES.sms,
-          destination: "+15551234567",
-        },
-        {
-          id: "sms-factor-2",
-          type: FLOW_TYPES.sms,
-          destination: "+15559876543",
-        },
-      ];
-
-      const userSelectedMfaFactor = {
-        id: "sms-factor-2",
-        type: FLOW_TYPES.sms,
-        destination: "+15559876543",
-      };
-
-      renderComponent({ userPhoneFactors, userSelectedMfaFactor });
-
-      const radio1 = screen.getByTestId(`radio-${FLOW_TYPES.sms}-sms-factor-1`);
-      const radio2 = screen.getByTestId(`radio-${FLOW_TYPES.sms}-sms-factor-2`);
-
-      expect(radio1).not.toBeChecked();
-      expect(radio2).toBeChecked();
-    });
-  });
-
-  describe("Radio Options Configuration - Voice Only", () => {
-    it("renders radio buttons for single Voice factor", () => {
-      const userPhoneFactors = [
-        {
-          id: "voice-factor-1",
-          type: FLOW_TYPES.voice,
-          destination: "+15551234567",
-        },
-      ];
-
-      renderComponent({ userPhoneFactors });
-
-      expect(screen.getByText(/Voice call \+15551234567/)).toBeInTheDocument();
-    });
-
-    it("renders radio buttons for multiple Voice factors", () => {
-      const userPhoneFactors = [
-        {
-          id: "voice-factor-1",
-          type: FLOW_TYPES.voice,
-          destination: "+15551234567",
-        },
-        {
-          id: "voice-factor-2",
-          type: FLOW_TYPES.voice,
-          destination: "+15559876543",
-        },
-      ];
-
-      renderComponent({ userPhoneFactors });
-
-      expect(screen.getByText(/Voice call \+15551234567/)).toBeInTheDocument();
-      expect(screen.getByText(/Voice call \+15559876543/)).toBeInTheDocument();
-    });
-
-    it("sets correct checked state for selected Voice factor", () => {
-      const userPhoneFactors = [
-        {
-          id: "voice-factor-1",
-          type: FLOW_TYPES.voice,
-          destination: "+15551234567",
-        },
-        {
-          id: "voice-factor-2",
-          type: FLOW_TYPES.voice,
-          destination: "+15559876543",
-        },
-      ];
-
-      const userSelectedMfaFactor = {
-        id: "voice-factor-1",
-        type: FLOW_TYPES.voice,
-        destination: "+15551234567",
-      };
-
-      renderComponent({ userPhoneFactors, userSelectedMfaFactor });
-
-      const radio1 = screen.getByTestId(
-        `radio-${FLOW_TYPES.voice}-voice-factor-1`,
-      );
-      const radio2 = screen.getByTestId(
-        `radio-${FLOW_TYPES.voice}-voice-factor-2`,
-      );
-
-      expect(radio1).toBeChecked();
-      expect(radio2).not.toBeChecked();
-    });
-  });
-
-  describe("Radio Options Configuration - Mixed SMS and Voice", () => {
-    it("renders radio buttons for both SMS and Voice factors", () => {
-      const userPhoneFactors = [
-        {
-          id: "sms-factor-1",
-          type: FLOW_TYPES.sms,
-          destination: "+15551234567",
-        },
-        {
-          id: "voice-factor-1",
-          type: FLOW_TYPES.voice,
-          destination: "+15559876543",
-        },
-      ];
-
-      renderComponent({ userPhoneFactors });
-
-      expect(
-        screen.getByText(/Text message \+15551234567/),
-      ).toBeInTheDocument();
-      expect(screen.getByText(/Voice call \+15559876543/)).toBeInTheDocument();
-    });
-
-    it("renders multiple SMS and Voice factors correctly", () => {
-      const userPhoneFactors = [
-        {
-          id: "sms-factor-1",
-          type: FLOW_TYPES.sms,
-          destination: "+15551111111",
-        },
-        {
-          id: "sms-factor-2",
-          type: FLOW_TYPES.sms,
-          destination: "+15552222222",
-        },
-        {
-          id: "voice-factor-1",
-          type: FLOW_TYPES.voice,
-          destination: "+15553333333",
-        },
-        {
-          id: "voice-factor-2",
-          type: FLOW_TYPES.voice,
-          destination: "+15554444444",
-        },
-      ];
-
-      renderComponent({ userPhoneFactors });
-
-      expect(
-        screen.getByText(/Text message \+15551111111/),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByText(/Text message \+15552222222/),
-      ).toBeInTheDocument();
-      expect(screen.getByText(/Voice call \+15553333333/)).toBeInTheDocument();
-      expect(screen.getByText(/Voice call \+15554444444/)).toBeInTheDocument();
-    });
-
-    it("handles selection across different factor types", () => {
-      const userPhoneFactors = [
-        {
-          id: "sms-factor-1",
-          type: FLOW_TYPES.sms,
-          destination: "+15551234567",
-        },
-        {
-          id: "voice-factor-1",
-          type: FLOW_TYPES.voice,
-          destination: "+15559876543",
-        },
-      ];
-
-      const userSelectedMfaFactor = {
-        id: "voice-factor-1",
-        type: FLOW_TYPES.voice,
-        destination: "+15559876543",
-      };
-
-      renderComponent({ userPhoneFactors, userSelectedMfaFactor });
-
-      const smsRadio = screen.getByTestId(
-        `radio-${FLOW_TYPES.sms}-sms-factor-1`,
-      );
-      const voiceRadio = screen.getByTestId(
-        `radio-${FLOW_TYPES.voice}-voice-factor-1`,
-      );
-
-      expect(smsRadio).not.toBeChecked();
-      expect(voiceRadio).toBeChecked();
-    });
-  });
-
-  describe("Single Factor Display", () => {
-    it("displays text instead of radio when only one SMS factor exists", () => {
-      const userPhoneFactors = [
-        {
-          id: "sms-factor-1",
-          type: FLOW_TYPES.sms,
-          destination: "+15551234567",
-        },
-      ];
-
-      renderComponent({ userPhoneFactors });
-
-      // Should display as text, not radio group
-      expect(screen.queryByTestId("radio-group")).not.toBeInTheDocument();
-      const textElements = screen.getAllByTestId("text");
-      const hasPhoneNumber = textElements.some((el) =>
-        el.textContent.includes("Text message +15551234567"),
-      );
-      expect(hasPhoneNumber).toBe(true);
-    });
-
-    it("displays text instead of radio when only one Voice factor exists", () => {
-      const userPhoneFactors = [
-        {
-          id: "voice-factor-1",
-          type: FLOW_TYPES.voice,
-          destination: "+15551234567",
-        },
-      ];
-
-      renderComponent({ userPhoneFactors });
-
-      // Should display as text, not radio group
-      expect(screen.queryByTestId("radio-group")).not.toBeInTheDocument();
-      const textElements = screen.getAllByTestId("text");
-      const hasPhoneNumber = textElements.some((el) =>
-        el.textContent.includes("Voice call +15551234567"),
-      );
-      expect(hasPhoneNumber).toBe(true);
-    });
-  });
-
-  describe("User Interactions", () => {
-    it("calls onNext when submit button is clicked", async () => {
-      const user = userEvent.setup();
-      renderComponent();
-
-      const submitButton = screen.getByTestId("submit-button");
-      await user.click(submitButton);
-
-      expect(mockOnNext).toHaveBeenCalledTimes(1);
-    });
-
-    it("prevents default event when submit button is clicked", async () => {
-      const user = userEvent.setup();
-      renderComponent();
-
-      const submitButton = screen.getByTestId("submit-button");
-      await user.click(submitButton);
-
-      // onNext should be called
-      expect(mockOnNext).toHaveBeenCalled();
-    });
-
-    it("navigates to manage 2FA page when cancel button is clicked", async () => {
-      const user = userEvent.setup();
-      renderComponent();
-
-      const cancelButton = screen.getByTestId("cancel-button");
-      await user.click(cancelButton);
-
-      expect(mockOnCancel).toHaveBeenCalledTimes(1);
-    });
-
-    it("calls onChangeUserSelectedMfaFactor when radio option is selected", async () => {
-      const user = userEvent.setup();
-      const userPhoneFactors = [
-        {
-          id: "sms-factor-1",
-          type: FLOW_TYPES.sms,
-          destionation: "+15551234567",
-        },
-        {
-          id: "voice-factor-1",
-          type: FLOW_TYPES.voice,
-          destinatino: "+15559876543",
-        },
-      ];
-
-      renderComponent({ userPhoneFactors });
-
-      const smsRadio = screen.getByTestId(
-        `radio-${FLOW_TYPES.sms}-sms-factor-1`,
-      );
-      await user.click(smsRadio);
-
-      expect(mockOnChangeUserSelectedMfaFactor).toHaveBeenCalledWith(
-        "sms-factor-1",
-      );
-    });
-
-    it("handles multiple radio selection changes", async () => {
-      const user = userEvent.setup();
-      const userPhoneFactors = [
-        {
-          id: "sms-factor-1",
-          type: FLOW_TYPES.sms,
-          destination: "+15551234567",
-        },
-        {
-          id: "voice-factor-1",
-          type: FLOW_TYPES.voice,
-          destination: "+15559876543",
-        },
-        {
-          id: "sms-factor-2",
-          type: FLOW_TYPES.sms,
-          destination: "+15551111111",
-        },
-      ];
-
-      renderComponent({ userPhoneFactors });
-
-      const smsRadio1 = screen.getByTestId(
-        `radio-${FLOW_TYPES.sms}-sms-factor-1`,
-      );
-      const voiceRadio = screen.getByTestId(
-        `radio-${FLOW_TYPES.voice}-voice-factor-1`,
-      );
-      const smsRadio2 = screen.getByTestId(
-        `radio-${FLOW_TYPES.sms}-sms-factor-2`,
-      );
-
-      await user.click(smsRadio1);
-      expect(mockOnChangeUserSelectedMfaFactor).toHaveBeenCalledWith(
-        "sms-factor-1",
-      );
-
-      await user.click(voiceRadio);
-      expect(mockOnChangeUserSelectedMfaFactor).toHaveBeenCalledWith(
-        "voice-factor-1",
-      );
-
-      await user.click(smsRadio2);
-      expect(mockOnChangeUserSelectedMfaFactor).toHaveBeenCalledWith(
-        "sms-factor-2",
-      );
-
-      expect(mockOnChangeUserSelectedMfaFactor).toHaveBeenCalledTimes(3);
-    });
-  });
-
-  describe("Edge Cases", () => {
-    it("handles empty userPhoneFactors array", () => {
-      renderComponent({ userPhoneFactors: [] });
-
-      // Should still render the page structure
-      expect(
-        screen.getByText("Complete 2-step verification"),
-      ).toBeInTheDocument();
-      expect(screen.getByTestId("submit-button")).toBeInTheDocument();
-      expect(screen.getByTestId("cancel-button")).toBeInTheDocument();
-    });
-
-    it("handles null userPhoneFactors", () => {
-      renderComponent({ userPhoneFactors: null });
-
-      // Should still render the page structure
-      expect(
-        screen.getByText("Complete 2-step verification"),
-      ).toBeInTheDocument();
-      expect(screen.getByTestId("submit-button")).toBeInTheDocument();
-    });
-
-    it("handles undefined userPhoneFactors", () => {
-      renderComponent({ userPhoneFactors: undefined });
-
-      // Should still render the page structure
-      expect(
-        screen.getByText("Complete 2-step verification"),
-      ).toBeInTheDocument();
-      expect(screen.getByTestId("submit-button")).toBeInTheDocument();
-    });
-
-    it("handles null userSelectedMfaFactor", () => {
-      const userPhoneFactors = [
-        {
-          id: "sms-factor-1",
-          type: FLOW_TYPES.sms,
-          destination: "+15551234567",
-        },
-      ];
-
-      renderComponent({ userPhoneFactors, userSelectedMfaFactor: null });
-
-      // Should render without errors
-      expect(
-        screen.getByText(/Text message \+15551234567/),
-      ).toBeInTheDocument();
-    });
-
-    it("handles phone numbers with different formats", () => {
-      const userPhoneFactors = [
-        {
-          id: "sms-factor-1",
-          type: FLOW_TYPES.sms,
-          destination: "+1 (555) 123-4567",
-        },
-        {
-          id: "sms-factor-2",
-          type: FLOW_TYPES.sms,
-          destination: "555-123-4567",
-        },
-        {
-          id: "voice-factor-1",
-          type: FLOW_TYPES.voice,
-          destination: "+15551234567",
-        },
-      ];
-
-      renderComponent({ userPhoneFactors });
-
-      expect(
-        screen.getByText(/Text message \+1 \(555\) 123-4567/),
-      ).toBeInTheDocument();
-      expect(screen.getByText(/Text message 555-123-4567/)).toBeInTheDocument();
-      expect(screen.getByText(/Voice call \+15551234567/)).toBeInTheDocument();
-    });
-
-    it("handles factors without type field", () => {
-      const userPhoneFactors = [
-        {
-          id: "factor-1",
-          destination: "+15551234567",
-        },
-      ];
-
-      renderComponent({ userPhoneFactors });
-
-      // Should not crash, but won't display the factor
-      expect(
-        screen.getByText("Complete 2-step verification"),
-      ).toBeInTheDocument();
-    });
-
-    it("handles factors with unknown type", () => {
-      const userPhoneFactors = [
-        {
-          id: "factor-1",
-          type: "unknown",
-          destination: "+15551234567",
-        },
-      ];
-
-      renderComponent({ userPhoneFactors });
-
-      // Should not display the unknown type
-      expect(screen.queryByText(/unknown/)).not.toBeInTheDocument();
-    });
-  });
-
-  describe("Language Support", () => {
-    it("passes language to heading component", () => {
-      renderComponent();
-
-      const heading = screen.getByTestId("heading-h1");
-      expect(heading).toHaveAttribute("lang", "en");
-    });
-
-    it("renders with French language parameter", () => {
-      vi.doMock("react-router", async () => {
-        const actual = await vi.importActual("react-router");
-        return {
-          ...actual,
-          useParams: () => ({ language: "fr" }),
-        };
-      });
-
-      // This test verifies the component can handle different language params
-      renderComponent();
-      expect(
-        screen.getByText("Complete 2-step verification"),
-      ).toBeInTheDocument();
-    });
-  });
-
-  describe("Grid and Layout Attributes", () => {
-    it("renders grid with correct columns and gap attributes", () => {
-      renderComponent();
-
-      const grid = screen.getByTestId("grid");
-      expect(grid).toHaveAttribute("data-columns", "max-content max-content");
-      expect(grid).toHaveAttribute("data-gap", "200");
-    });
-
-    it("renders buttons with correct styles", () => {
-      renderComponent();
-
-      const submitButton = screen.getByTestId("submit-button");
-      expect(submitButton).toHaveStyle({ width: "fit-content" });
-
-      const cancelButton = screen.getByTestId("cancel-button");
-      expect(cancelButton).toHaveStyle({ width: "fit-content" });
-    });
-  });
-
-  describe("Radio Legend", () => {
-    it("displays correct radio legend for multiple options", () => {
-      const userPhoneFactors = [
-        {
-          id: "sms-factor-1",
-          type: FLOW_TYPES.sms,
-          destination: "+15551234567",
-        },
-        {
-          id: "voice-factor-1",
-          type: FLOW_TYPES.voice,
-          destination: "+15559876543",
-        },
-      ];
-
-      renderComponent({ userPhoneFactors });
-
-      expect(
-        screen.getByText("How should we send you the code?"),
-      ).toBeInTheDocument();
-    });
-  });
-
-  describe("Integration Tests", () => {
-    it("renders complete component with all sections", () => {
-      const userPhoneFactors = [
-        {
-          id: "sms-factor-1",
-          type: FLOW_TYPES.sms,
-          destination: "+15551234567",
-        },
-        {
-          id: "voice-factor-1",
-          type: FLOW_TYPES.voice,
-          destination: "+15559876543",
-        },
-      ];
-
-      renderComponent({ userPhoneFactors });
-
-      // Main heading
-      expect(
-        screen.getByText("Complete 2-step verification"),
-      ).toBeInTheDocument();
-
-      // Instructions
-      expect(screen.getByText(/To change your password,/)).toBeInTheDocument();
-
-      // Radio options
-      expect(
-        screen.getByText(/Text message \+15551234567/),
-      ).toBeInTheDocument();
-      expect(screen.getByText(/Voice call \+15559876543/)).toBeInTheDocument();
-
-      // Buttons
-      expect(screen.getByTestId("submit-button")).toBeInTheDocument();
-      expect(screen.getByTestId("cancel-button")).toBeInTheDocument();
-
-      // Help section
-      expect(screen.getByText("Need help?")).toBeInTheDocument();
       expect(
         screen.getByText("Get help with 2-step verification"),
       ).toBeInTheDocument();
       expect(screen.getByText("I cannot access my phone")).toBeInTheDocument();
     });
 
-    it("handles full user workflow from selection to submission", async () => {
+    it("renders the cancel button", () => {
+      renderComponent();
+      expect(screen.getByTestId("cancel-button")).toBeInTheDocument();
+      expect(screen.getByText("Cancel")).toBeInTheDocument();
+    });
+
+    it("does NOT render a submit button", () => {
+      renderComponent();
+      expect(screen.queryByTestId("submit-button")).not.toBeInTheDocument();
+    });
+
+    it("passes language attribute to the h1 heading", () => {
+      renderComponent();
+      const h1 = screen.getByTestId("heading-h1");
+      expect(h1).toHaveAttribute("lang", "en");
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  describe("Parent page content variations", () => {
+    it("renders default (password) parent page content", () => {
+      renderComponent({ parentPage: "password" });
+      expect(screen.getByText(/To change your password,/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/first complete 2-step verification./),
+      ).toBeInTheDocument();
+    });
+
+    it("renders deleteMFAPage parent page content", () => {
+      renderComponent({ parentPage: PAGES.deleteMFAPage });
+      expect(screen.getByText(/To delete this number,/)).toBeInTheDocument();
+    });
+
+    it("renders addMFAPage parent page content", () => {
+      renderComponent({ parentPage: PAGES.addMFAPage });
+      expect(screen.getByText(/To add a phone number,/)).toBeInTheDocument();
+    });
+
+    it("renders deleteFIDO2PasskeyPage parent page content", () => {
+      renderComponent({ parentPage: PAGES.deleteFIDO2PasskeyPage });
+      expect(screen.getByText(/To delete this passkey,/)).toBeInTheDocument();
+    });
+
+    it("renders addFIDO2PasskeyPage parent page content", () => {
+      renderComponent({ parentPage: PAGES.addFIDO2PasskeyPage });
+      expect(screen.getByText(/To add a passkey,/)).toBeInTheDocument();
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  describe("SMS Section", () => {
+    it("does not render SMS section when there are no SMS factors", () => {
+      renderComponent({ userPhoneFactors: [] });
+      expect(screen.queryByText("Text message")).not.toBeInTheDocument();
+    });
+
+    it("renders SMS section heading when an SMS factor is present", () => {
+      renderComponent({
+        userPhoneFactors: [
+          { id: "sms-1", type: FLOW_TYPES.sms, destination: "+15551234567" },
+        ],
+      });
+      expect(screen.getByText("Text message")).toBeInTheDocument();
+    });
+
+    it("renders the SMS factor destination", () => {
+      renderComponent({
+        userPhoneFactors: [
+          { id: "sms-1", type: FLOW_TYPES.sms, destination: "+15551234567" },
+        ],
+      });
+      expect(screen.getByText("+15551234567")).toBeInTheDocument();
+    });
+
+    it("renders a select link for each SMS factor", () => {
+      renderComponent({
+        userPhoneFactors: [
+          { id: "sms-1", type: FLOW_TYPES.sms, destination: "+15551111111" },
+          { id: "sms-2", type: FLOW_TYPES.sms, destination: "+15552222222" },
+        ],
+      });
+      const selectLinks = screen.getAllByText("Select SMS");
+      expect(selectLinks).toHaveLength(2);
+    });
+
+    it("renders expiry and carrier charge text inside the SMS section", () => {
+      renderComponent({
+        userPhoneFactors: [
+          { id: "sms-1", type: FLOW_TYPES.sms, destination: "+15551234567" },
+        ],
+      });
+      expect(
+        screen.getByText(/Once the code is sent it will expire in/),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(/Carrier charges may apply./),
+      ).toBeInTheDocument();
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  describe("Voice Section", () => {
+    it("does not render Voice section when there are no voice factors", () => {
+      renderComponent({ userPhoneFactors: [] });
+      expect(screen.queryByText("Voice call")).not.toBeInTheDocument();
+    });
+
+    it("renders Voice section heading when a voice factor is present", () => {
+      renderComponent({
+        userPhoneFactors: [
+          {
+            id: "voice-1",
+            type: FLOW_TYPES.voice,
+            destination: "+15559876543",
+          },
+        ],
+      });
+      expect(screen.getByText("Voice call")).toBeInTheDocument();
+    });
+
+    it("renders the voice factor destination", () => {
+      renderComponent({
+        userPhoneFactors: [
+          {
+            id: "voice-1",
+            type: FLOW_TYPES.voice,
+            destination: "+15559876543",
+          },
+        ],
+      });
+      expect(screen.getByText("+15559876543")).toBeInTheDocument();
+    });
+
+    it("renders a select link for each voice factor", () => {
+      renderComponent({
+        userPhoneFactors: [
+          {
+            id: "voice-1",
+            type: FLOW_TYPES.voice,
+            destination: "+15551111111",
+          },
+          {
+            id: "voice-2",
+            type: FLOW_TYPES.voice,
+            destination: "+15552222222",
+          },
+        ],
+      });
+      const selectLinks = screen.getAllByText("Select voice");
+      expect(selectLinks).toHaveLength(2);
+    });
+
+    it("renders both SMS and Voice sections when both types are present", () => {
+      renderComponent({
+        userPhoneFactors: [
+          { id: "sms-1", type: FLOW_TYPES.sms, destination: "+15551111111" },
+          {
+            id: "voice-1",
+            type: FLOW_TYPES.voice,
+            destination: "+15552222222",
+          },
+        ],
+      });
+      expect(screen.getByText("Text message")).toBeInTheDocument();
+      expect(screen.getByText("Voice call")).toBeInTheDocument();
+      expect(screen.getByText("+15551111111")).toBeInTheDocument();
+      expect(screen.getByText("+15552222222")).toBeInTheDocument();
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  describe("FIDO2 / Passkey Section", () => {
+    it("does not render FIDO2 section when fido2Data is an empty array", () => {
+      renderComponent({ fido2Data: [] });
+      expect(
+        screen.queryByText("Passkey or security key"),
+      ).not.toBeInTheDocument();
+    });
+
+    it("does not render FIDO2 section when fido2Data is null", () => {
+      renderComponent({ fido2Data: null });
+      expect(
+        screen.queryByText("Passkey or security key"),
+      ).not.toBeInTheDocument();
+    });
+
+    it("does not render FIDO2 section when fido2Data is undefined", () => {
+      renderComponent({ fido2Data: undefined });
+      expect(
+        screen.queryByText("Passkey or security key"),
+      ).not.toBeInTheDocument();
+    });
+
+    it("renders FIDO2 section heading when passkeys are present", () => {
+      renderComponent({
+        fido2Data: [{ id: "passkey-1", attributes: { nickname: "My Key" } }],
+      });
+      expect(screen.getByText("Passkey or security key")).toBeInTheDocument();
+    });
+
+    it("renders passkey nickname when available", () => {
+      renderComponent({
+        fido2Data: [
+          { id: "passkey-1", attributes: { nickname: "Work Laptop Key" } },
+        ],
+      });
+      expect(screen.getByText("Work Laptop Key")).toBeInTheDocument();
+    });
+
+    it("renders passkey id when nickname is not available", () => {
+      renderComponent({
+        fido2Data: [{ id: "passkey-id-no-nickname", attributes: {} }],
+      });
+      expect(screen.getByText("passkey-id-no-nickname")).toBeInTheDocument();
+    });
+
+    it("renders passkey id when attributes object is missing", () => {
+      renderComponent({
+        fido2Data: [{ id: "passkey-no-attrs" }],
+      });
+      expect(screen.getByText("passkey-no-attrs")).toBeInTheDocument();
+    });
+
+    it("renders a select link for each passkey", () => {
+      renderComponent({
+        fido2Data: [
+          { id: "passkey-1", attributes: { nickname: "Key One" } },
+          { id: "passkey-2", attributes: { nickname: "Key Two" } },
+        ],
+      });
+      const passkeyLinks = screen.getAllByText("Use passkey");
+      expect(passkeyLinks).toHaveLength(2);
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  describe("User Interactions", () => {
+    it("clicking an SMS factor link calls onChangeUserSelectedMfaFactor with its id", async () => {
       const user = userEvent.setup();
-      const userPhoneFactors = [
-        {
-          id: "sms-factor-1",
-          type: FLOW_TYPES.sms,
-          destination: "+15551234567",
-        },
-        {
-          id: "voice-factor-1",
-          type: FLOW_TYPES.voice,
-          destination: "+15559876543",
-        },
-      ];
+      renderComponent({
+        userPhoneFactors: [
+          {
+            id: "sms-factor-1",
+            type: FLOW_TYPES.sms,
+            destination: "+15551234567",
+          },
+        ],
+      });
 
-      renderComponent({ userPhoneFactors });
+      const selectLink = screen.getByText("Select SMS");
+      await user.click(selectLink);
 
-      // Select a factor
-      const voiceRadio = screen.getByTestId(
-        `radio-${FLOW_TYPES.voice}-voice-factor-1`,
+      expect(mockOnChangeUserSelectedMfaFactor).toHaveBeenCalledWith(
+        "sms-factor-1",
       );
-      await user.click(voiceRadio);
+    });
+
+    it("clicking an SMS factor link also calls onNext", async () => {
+      const user = userEvent.setup();
+      renderComponent({
+        userPhoneFactors: [
+          {
+            id: "sms-factor-1",
+            type: FLOW_TYPES.sms,
+            destination: "+15551234567",
+          },
+        ],
+      });
+
+      const selectLink = screen.getByText("Select SMS");
+      await user.click(selectLink);
+
+      expect(mockOnNext).toHaveBeenCalledTimes(1);
+    });
+
+    it("clicking a voice factor link calls onChangeUserSelectedMfaFactor with its id", async () => {
+      const user = userEvent.setup();
+      renderComponent({
+        userPhoneFactors: [
+          {
+            id: "voice-factor-1",
+            type: FLOW_TYPES.voice,
+            destination: "+15559876543",
+          },
+        ],
+      });
+
+      const selectLink = screen.getByText("Select voice");
+      await user.click(selectLink);
 
       expect(mockOnChangeUserSelectedMfaFactor).toHaveBeenCalledWith(
         "voice-factor-1",
       );
-
-      // Submit
-      const submitButton = screen.getByTestId("submit-button");
-      await user.click(submitButton);
-
-      expect(mockOnNext).toHaveBeenCalled();
+      expect(mockOnNext).toHaveBeenCalledTimes(1);
     });
 
-    it("handles cancellation workflow", async () => {
+    it("clicking a FIDO2 passkey link calls onSelectFIDO2 with the full passkey object", async () => {
       const user = userEvent.setup();
-      const userPhoneFactors = [
-        {
-          id: "sms-factor-1",
-          type: FLOW_TYPES.sms,
-          destination: "+15551234567",
-        },
-      ];
+      const passkey = { id: "passkey-1", attributes: { nickname: "My Key" } };
+      renderComponent({ fido2Data: [passkey] });
 
-      renderComponent({ userPhoneFactors });
+      const selectLink = screen.getByText("Use passkey");
+      await user.click(selectLink);
 
-      // Click cancel
+      expect(mockOnSelectFIDO2).toHaveBeenCalledWith(passkey);
+    });
+
+    it("clicking the cancel button calls onCancel", async () => {
+      const user = userEvent.setup();
+      renderComponent();
+
       const cancelButton = screen.getByTestId("cancel-button");
       await user.click(cancelButton);
 
       expect(mockOnCancel).toHaveBeenCalledTimes(1);
+    });
+
+    it("clicking the cancel button does NOT call onNext", async () => {
+      const user = userEvent.setup();
+      renderComponent();
+
+      const cancelButton = screen.getByTestId("cancel-button");
+      await user.click(cancelButton);
+
       expect(mockOnNext).not.toHaveBeenCalled();
+    });
+
+    it("selecting different SMS factors calls onChangeUserSelectedMfaFactor with the correct id each time", async () => {
+      const user = userEvent.setup();
+      renderComponent({
+        userPhoneFactors: [
+          { id: "sms-1", type: FLOW_TYPES.sms, destination: "+15551111111" },
+          { id: "sms-2", type: FLOW_TYPES.sms, destination: "+15552222222" },
+        ],
+      });
+
+      const selectLinks = screen.getAllByText("Select SMS");
+      await user.click(selectLinks[0]);
+      expect(mockOnChangeUserSelectedMfaFactor).toHaveBeenCalledWith("sms-1");
+
+      await user.click(selectLinks[1]);
+      expect(mockOnChangeUserSelectedMfaFactor).toHaveBeenCalledWith("sms-2");
+
+      expect(mockOnNext).toHaveBeenCalledTimes(2);
     });
   });
 
-  describe("Accessibility", () => {
-    it("renders radio group with proper structure", () => {
-      const userPhoneFactors = [
-        {
-          id: "sms-factor-1",
-          type: FLOW_TYPES.sms,
-          destination: "+15551234567",
-        },
-        {
-          id: "voice-factor-1",
-          type: FLOW_TYPES.voice,
-          destination: "+15559876543",
-        },
-      ];
+  // -------------------------------------------------------------------------
+  describe("Edge Cases", () => {
+    it("renders core layout even with no phone factors and no passkeys", () => {
+      renderComponent({ userPhoneFactors: [], fido2Data: [] });
 
-      renderComponent({ userPhoneFactors });
-
-      const radioGroup = screen.getByTestId("radio-group");
-      expect(radioGroup.querySelector("fieldset")).toBeInTheDocument();
-      expect(radioGroup.querySelector("legend")).toBeInTheDocument();
+      expect(
+        screen.getByText("Complete 2-step verification"),
+      ).toBeInTheDocument();
+      expect(screen.getByText("Cancel")).toBeInTheDocument();
+      expect(screen.getByText("Need help?")).toBeInTheDocument();
     });
 
-    it("renders external links with proper hrefs", () => {
-      renderComponent();
+    it("handles null userPhoneFactors without crashing", () => {
+      renderComponent({ userPhoneFactors: null });
+      expect(
+        screen.getByText("Complete 2-step verification"),
+      ).toBeInTheDocument();
+      expect(screen.queryByText("Text message")).not.toBeInTheDocument();
+      expect(screen.queryByText("Voice call")).not.toBeInTheDocument();
+    });
 
-      const links = screen.getAllByTestId("gcds-link");
-      expect(links).toHaveLength(2);
-      expect(links[0]).toHaveAttribute("href", "https://help.example.com/2fa");
-      expect(links[1]).toHaveAttribute(
-        "href",
-        "https://help.example.com/no-phone",
-      );
+    it("handles undefined userPhoneFactors without crashing", () => {
+      renderComponent({ userPhoneFactors: undefined });
+      expect(
+        screen.getByText("Complete 2-step verification"),
+      ).toBeInTheDocument();
+    });
+
+    it("renders all three sections when SMS, Voice, and FIDO2 factors are present", () => {
+      renderComponent({
+        userPhoneFactors: [
+          { id: "sms-1", type: FLOW_TYPES.sms, destination: "+15551111111" },
+          {
+            id: "voice-1",
+            type: FLOW_TYPES.voice,
+            destination: "+15552222222",
+          },
+        ],
+        fido2Data: [{ id: "passkey-1", attributes: { nickname: "My Key" } }],
+      });
+
+      expect(screen.getByText("Text message")).toBeInTheDocument();
+      expect(screen.getByText("Voice call")).toBeInTheDocument();
+      expect(screen.getByText("Passkey or security key")).toBeInTheDocument();
+    });
+
+    it("does not crash when onSelectFIDO2 is not provided and a passkey link is clicked", async () => {
+      const user = userEvent.setup();
+      renderComponent({
+        fido2Data: [{ id: "passkey-1", attributes: { nickname: "My Key" } }],
+        onSelectFIDO2: undefined,
+      });
+
+      const selectLink = screen.getByText("Use passkey");
+      await expect(user.click(selectLink)).resolves.not.toThrow();
     });
   });
 });

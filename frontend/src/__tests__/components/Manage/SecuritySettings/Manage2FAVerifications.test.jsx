@@ -177,6 +177,7 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
       phoneFactorsMap: {},
       localLoading: false,
       setLocalLoading: vi.fn(),
+      fido2Data: [],
     });
 
     vi.mocked(fido2Api.getUserFIDO2Credentials).mockResolvedValue({
@@ -190,6 +191,7 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
       phoneFactorsMap: {},
       localLoading: true,
       setLocalLoading: vi.fn(),
+      fido2Data: [],
     });
     const { getByTestId } = render(<Manage2FAVerifications />);
     // Component will be in loading state when localLoading is true
@@ -209,6 +211,7 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
       },
       localLoading: false,
       setLocalLoading: vi.fn(),
+      fido2Data: [],
     });
 
     const { getByText } = render(<Manage2FAVerifications />);
@@ -232,6 +235,7 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
       },
       localLoading: false,
       setLocalLoading: vi.fn(),
+      fido2Data: [],
     });
 
     const { getByText } = render(<Manage2FAVerifications />);
@@ -250,6 +254,7 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
       },
       localLoading: false,
       setLocalLoading: vi.fn(),
+      fido2Data: [],
     });
 
     const { getByText, queryByText } = render(<Manage2FAVerifications />);
@@ -268,6 +273,7 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
       },
       localLoading: false,
       setLocalLoading: vi.fn(),
+      fido2Data: [],
     });
 
     const { getByText } = render(<Manage2FAVerifications />);
@@ -286,6 +292,7 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
       },
       localLoading: false,
       setLocalLoading: vi.fn(),
+      fido2Data: [],
     });
 
     const { getByText } = render(<Manage2FAVerifications />);
@@ -305,6 +312,7 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
       },
       localLoading: false,
       setLocalLoading: vi.fn(),
+      fido2Data: [],
     });
 
     const { getAllByText } = render(<Manage2FAVerifications />);
@@ -321,6 +329,7 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
       phoneFactorsMap: {},
       localLoading: false,
       setLocalLoading: vi.fn(),
+      fido2Data: [],
     });
 
     const { getByText } = render(<Manage2FAVerifications />);
@@ -338,6 +347,7 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
       phoneFactorsMap: {},
       localLoading: true,
       setLocalLoading: vi.fn(),
+      fido2Data: [],
     });
 
     const { getByTestId } = render(<Manage2FAVerifications />);
@@ -353,6 +363,7 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
       },
       localLoading: false,
       setLocalLoading: vi.fn(),
+      fido2Data: [],
     });
 
     const { getByText } = render(<Manage2FAVerifications />);
