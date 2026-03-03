@@ -214,6 +214,11 @@ export default function DeleteFIDO2PasskeyPage({ step }) {
         onCallback={() => {
           setWizardStep("deleteFIDO2PasskeyConfirmation");
         }}
+        onTryAnotherWayHandler={() => {
+          setSelectedPasskey(null);
+          setAssertionResult(null);
+          setWizardStep("otpSelection");
+        }}
       />
     ),
     deleteFIDO2PasskeyConfirmation: (

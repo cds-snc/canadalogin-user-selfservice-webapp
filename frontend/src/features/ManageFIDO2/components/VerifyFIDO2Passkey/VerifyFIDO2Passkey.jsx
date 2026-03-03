@@ -6,6 +6,7 @@ import {
   GcdsErrorMessage,
   GcdsGrid,
   GcdsHeading,
+  GcdsLink,
   GcdsText,
 } from "@cdssnc/gcds-components-react";
 import { fido2Api } from "../../api/fido2Api";
@@ -15,6 +16,7 @@ import { PAGES } from "../../../../utils/constants";
 import { path } from "../../../../utils/routeHelpers";
 import FIDOPasskeyCollage from "../../../../assets/icons/passkey_collage.svg?react";
 import Loader from "../../../../components/Layout/Loading";
+import { gcHelpCentreLinks } from "../../../../utils/gcHelpCentreLinks";
 
 export default function VerifyFIDO2Passkey({
   setAssertionResult,
@@ -23,6 +25,7 @@ export default function VerifyFIDO2Passkey({
   submitAttestationResult = false,
   errorMessage,
   selectedPasskey,
+  onTryAnotherWayHandler,
 }) {
   const { language } = useParams();
   const navigate = useNavigate();
@@ -141,6 +144,27 @@ export default function VerifyFIDO2Passkey({
         >
           {pageContentJson["3"]}
         </GcdsButton>
+      </GcdsGrid>
+
+      <GcdsGrid columns="1" gap="300">
+        <GcdsHeading tag="h2">{pageContentJson["5"]}</GcdsHeading>
+        <GcdsLink
+          role="button"
+          onGcdsClick={() => {
+            onTryAnotherWayHandler?.();
+          }}
+        >
+          {pageContentJson["6"]}
+        </GcdsLink>
+
+        {/* TODO: add correct hrefs to the links below once domain migrations are done */}
+        <GcdsLink
+          href={gcHelpCentreLinks.recover2StepVerification}
+          target="_blank"
+        >
+          {pageContentJson["7"]}
+        </GcdsLink>
+        <GcdsLink>{pageContentJson["8"]}</GcdsLink>
       </GcdsGrid>
     </GcdsContainer>
   );

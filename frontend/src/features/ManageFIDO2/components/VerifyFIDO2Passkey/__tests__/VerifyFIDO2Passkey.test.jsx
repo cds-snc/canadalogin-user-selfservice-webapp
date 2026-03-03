@@ -92,6 +92,11 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
       {children}
     </button>
   ),
+  GcdsLink: ({ children, onGcdsClick, ...props }) => (
+    <a onClick={onGcdsClick} {...props}>
+      {children}
+    </a>
+  ),
   GcdsErrorMessage: ({ children, ...props }) => (
     <div data-testid="error-message" {...props}>
       {children}
