@@ -24,8 +24,8 @@ export default {
   },
 };
 
-// Test: Select Voice Call radio button with multiple factors
-export const SelectVoiceCallRadioButton = (() => {
+// Test: Select Voice Call factor link with multiple factors
+export const SelectVoiceCallLink = (() => {
   const baseParams = buildTestCase.parameters(
     "",
     {
@@ -155,104 +155,27 @@ export const SelectVoiceCallRadioButton = (() => {
         }
       });
 
-      await step("Verify radio buttons are displayed", async () => {
+      await step("Verify factor selection links are displayed", async () => {
         await waitFor(async () => {
-          const gcdsRadios = canvasElement.querySelector("gcds-radios");
-          await expect(gcdsRadios).toBeInTheDocument();
+          const gcdsLinks = canvasElement.querySelectorAll("gcds-link");
+          await expect(gcdsLinks.length).toBeGreaterThan(0);
         });
       });
 
-      await step("Select the Voice Call radio button", async () => {
+      await step("Select the Voice Call factor", async () => {
         await waitFor(async () => {
-          const gcdsRadios = canvasElement.querySelector("gcds-radios");
-          await expect(gcdsRadios).toBeInTheDocument();
-
-          if (gcdsRadios && gcdsRadios.shadowRoot) {
-            // Find the voice call radio button (factor-2)
-            const voiceRadioButton = gcdsRadios.shadowRoot.querySelector(
-              'input[value="factor-2"]',
-            );
-
-            await expect(voiceRadioButton).toBeInTheDocument();
-
-            // Click the voice call radio button
-            await userEvent.click(voiceRadioButton);
-            // Verify the voice call radio button is selected
-            await expect(voiceRadioButton.checked).toBe(true);
-          }
-        });
-      });
-
-      await step("Verify Voice Call option content is displayed", async () => {
-        await waitFor(async () => {
-          await expect(
-            canvasElement
-              .querySelector("gcds-radios")
-              .shadowRoot.querySelector('label[for="voiceotp-factor-2"]'),
-          ).toBeInTheDocument();
-
-          const labelText = canvasElement
-            .querySelector("gcds-radios")
-            .shadowRoot.querySelector(
-              'label[for="voiceotp-factor-2"]',
-            ).textContent;
-          await expect(labelText).toContain("Voice call");
-          await expect(labelText).toContain("+15559876543");
-        });
-      });
-
-      await step(
-        "Verify gcds-radios value updates to selected option",
-        async () => {
-          const gcdsRadios = canvasElement.querySelector("gcds-radios");
-          await waitFor(async () => {
-            // The gcds-radios component should update its value attribute
-            const currentValue = gcdsRadios.getAttribute("value");
-            await expect(currentValue).toBe("factor-2");
+          const factorLinks = canvasElement.querySelectorAll("gcds-link");
+          const callMeLink = Array.from(factorLinks).find(
+            (link) => link.textContent.trim() === "Call me",
+          );
+          await expect(callMeLink).toBeInTheDocument();
+          const gcdsClickEvent = new CustomEvent("gcdsClick", {
+            bubbles: true,
+            cancelable: true,
+            detail: {},
           });
-        },
-      );
-
-      await step("Verify Continue button remains enabled", async () => {
-        const canvas = within(canvasElement);
-        const continueButton = canvas.getByText(/Continue/i);
-        await waitFor(async () => {
-          await expect(continueButton).toBeInTheDocument();
+          callMeLink.dispatchEvent(gcdsClickEvent);
         });
-
-        if (continueButton && continueButton.shadowRoot) {
-          const actualButton =
-            continueButton.shadowRoot.querySelector('button[part="button"]') ||
-            continueButton.shadowRoot.querySelector("button");
-
-          if (actualButton) {
-            await expect(actualButton.disabled).toBe(false);
-          }
-        }
-        if (continueButton) {
-          if (
-            continueButton.tagName === "GCDS-BUTTON" &&
-            continueButton.shadowRoot
-          ) {
-            const actualButton =
-              continueButton.shadowRoot.querySelector(
-                'button[part="button"]',
-              ) || continueButton.shadowRoot.querySelector("button");
-            if (actualButton) {
-              // Dispatch gcdsClick event to bypass disabled state
-              const gcdsClickEvent = new CustomEvent("gcdsClick", {
-                bubbles: true,
-                cancelable: true,
-                detail: {},
-              });
-              Object.defineProperty(gcdsClickEvent, "preventDefault", {
-                value: () => {},
-                writable: false,
-              });
-              continueButton.dispatchEvent(gcdsClickEvent);
-            }
-          }
-        }
       });
 
       await step("Verify digit verification text is displayed", async () => {
@@ -268,7 +191,7 @@ export const SelectVoiceCallRadioButton = (() => {
   };
 })();
 
-export const SelectTextMessageRadioButton = (() => {
+export const SelectTextMessageLink = (() => {
   const baseParams = buildTestCase.parameters(
     "",
     {
@@ -398,107 +321,27 @@ export const SelectTextMessageRadioButton = (() => {
         }
       });
 
-      await step("Verify radio buttons are displayed", async () => {
+      await step("Verify factor selection links are displayed", async () => {
         await waitFor(async () => {
-          const gcdsRadios = canvasElement.querySelector("gcds-radios");
-          await expect(gcdsRadios).toBeInTheDocument();
+          const gcdsLinks = canvasElement.querySelectorAll("gcds-link");
+          await expect(gcdsLinks.length).toBeGreaterThan(0);
         });
       });
 
-      await step("Select the Text Message radio button", async () => {
+      await step("Select the Text Message factor", async () => {
         await waitFor(async () => {
-          const gcdsRadios = canvasElement.querySelector("gcds-radios");
-          await expect(gcdsRadios).toBeInTheDocument();
-
-          if (gcdsRadios && gcdsRadios.shadowRoot) {
-            // Find the text message radio button (factor-1)
-            const textMessageRadioButton = gcdsRadios.shadowRoot.querySelector(
-              'input[value="factor-1"]',
-            );
-
-            await expect(textMessageRadioButton).toBeInTheDocument();
-
-            // Click the text message radio button
-            await userEvent.click(textMessageRadioButton);
-            // Verify the text message radio button is selected
-            await expect(textMessageRadioButton.checked).toBe(true);
-          }
-        });
-      });
-
-      await step(
-        "Verify Text Message option content is displayed",
-        async () => {
-          await waitFor(async () => {
-            // Verify the text message label content
-            await expect(
-              canvasElement
-                .querySelector("gcds-radios")
-                .shadowRoot.querySelector('label[for="smsotp-factor-1"]'),
-            ).toBeInTheDocument();
-            const labelText = canvasElement
-              .querySelector("gcds-radios")
-              .shadowRoot.querySelector(
-                'label[for="smsotp-factor-1"]',
-              ).textContent;
-            await expect(labelText).toContain("Text message");
-            await expect(labelText).toContain("+15559876543");
+          const factorLinks = canvasElement.querySelectorAll("gcds-link");
+          const textMeLink = Array.from(factorLinks).find(
+            (link) => link.textContent.trim() === "Text me",
+          );
+          await expect(textMeLink).toBeInTheDocument();
+          const gcdsClickEvent = new CustomEvent("gcdsClick", {
+            bubbles: true,
+            cancelable: true,
+            detail: {},
           });
-        },
-      );
-
-      await step(
-        "Verify gcds-radios value updates to selected option",
-        async () => {
-          const gcdsRadios = canvasElement.querySelector("gcds-radios");
-          await waitFor(async () => {
-            // The gcds-radios component should update its value attribute
-            const currentValue = gcdsRadios.getAttribute("value");
-            await expect(currentValue).toBe("factor-1");
-          });
-        },
-      );
-
-      await step("Verify Continue button remains enabled", async () => {
-        const canvas = within(canvasElement);
-        const continueButton = canvas.getByText(/Continue/i);
-        await waitFor(async () => {
-          await expect(continueButton).toBeInTheDocument();
+          textMeLink.dispatchEvent(gcdsClickEvent);
         });
-
-        if (continueButton && continueButton.shadowRoot) {
-          const actualButton =
-            continueButton.shadowRoot.querySelector('button[part="button"]') ||
-            continueButton.shadowRoot.querySelector("button");
-
-          if (actualButton) {
-            await expect(actualButton.disabled).toBe(false);
-          }
-        }
-        if (continueButton) {
-          if (
-            continueButton.tagName === "GCDS-BUTTON" &&
-            continueButton.shadowRoot
-          ) {
-            const actualButton =
-              continueButton.shadowRoot.querySelector(
-                'button[part="button"]',
-              ) || continueButton.shadowRoot.querySelector("button");
-            if (actualButton) {
-              // Dispatch gcdsClick event to bypass disabled state
-              const gcdsClickEvent = new CustomEvent("gcdsClick", {
-                bubbles: true,
-                cancelable: true,
-                detail: {},
-              });
-              Object.defineProperty(gcdsClickEvent, "preventDefault", {
-                value: () => {},
-                writable: false,
-              });
-              continueButton.dispatchEvent(gcdsClickEvent);
-            }
-          }
-        }
       });
 
       await step("Verify digit verification text is displayed", async () => {
@@ -688,105 +531,30 @@ export const CompleteAddMFAFlowSMS = (() => {
           }
         });
 
-        await step("Verify radio buttons are displayed", async () => {
+        await step("Verify factor selection links are displayed", async () => {
           await waitFor(async () => {
-            const gcdsRadios = canvasElement.querySelector("gcds-radios");
-            await expect(gcdsRadios).toBeInTheDocument();
+            const gcdsLinks = canvasElement.querySelectorAll("gcds-link");
+            await expect(gcdsLinks.length).toBeGreaterThan(0);
           });
         });
 
         // Navigate through initial OTP steps (selection + verification)
-        let continueButton = canvas.getByText(/Continue/i);
+        let continueButton;
 
-        await step("Select the Text Message radio button", async () => {
+        await step("Select the Text Message factor", async () => {
           await waitFor(async () => {
-            const gcdsRadios = canvasElement.querySelector("gcds-radios");
-            await expect(gcdsRadios).toBeInTheDocument();
-
-            if (gcdsRadios && gcdsRadios.shadowRoot) {
-              // Find the text message radio button (factor-1)
-              const textMessageRadioButton =
-                gcdsRadios.shadowRoot.querySelector('input[value="factor-1"]');
-
-              await expect(textMessageRadioButton).toBeInTheDocument();
-
-              // Click the text message radio button
-              await userEvent.click(textMessageRadioButton);
-              // Verify the text message radio button is selected
-              await expect(textMessageRadioButton.checked).toBe(true);
-            }
-          });
-        });
-
-        await step(
-          "Verify Text Message option content is displayed",
-          async () => {
-            await waitFor(async () => {
-              const gcdsRadios = canvasElement.querySelector("gcds-radios");
-              const textLabel = gcdsRadios.shadowRoot.querySelector(
-                'label[for="smsotp-factor-1"]',
-              );
-              await expect(textLabel).toBeInTheDocument();
-              const labelText = textLabel.textContent;
-              await expect(labelText).toContain("Text message");
-              await expect(labelText).toContain("+15551234567");
+            const factorLinks = canvasElement.querySelectorAll("gcds-link");
+            const textMeLink = Array.from(factorLinks).find(
+              (link) => link.textContent.trim() === "Text me",
+            );
+            await expect(textMeLink).toBeInTheDocument();
+            const gcdsClickEvent = new CustomEvent("gcdsClick", {
+              bubbles: true,
+              cancelable: true,
+              detail: {},
             });
-          },
-        );
-
-        await step(
-          "Verify gcds-radios value updates to selected option",
-          async () => {
-            const gcdsRadios = canvasElement.querySelector("gcds-radios");
-            await waitFor(async () => {
-              // The gcds-radios component should update its value attribute
-              const currentValue = gcdsRadios.getAttribute("value");
-              await expect(currentValue).toBe("factor-1");
-            });
-          },
-        );
-
-        await step("Verify Continue button remains enabled", async () => {
-          const canvas = within(canvasElement);
-          const continueButton = canvas.getByText(/Continue/i);
-          await waitFor(async () => {
-            await expect(continueButton).toBeInTheDocument();
+            textMeLink.dispatchEvent(gcdsClickEvent);
           });
-
-          if (continueButton && continueButton.shadowRoot) {
-            const actualButton =
-              continueButton.shadowRoot.querySelector(
-                'button[part="button"]',
-              ) || continueButton.shadowRoot.querySelector("button");
-
-            if (actualButton) {
-              await expect(actualButton.disabled).toBe(false);
-            }
-          }
-          if (continueButton) {
-            if (
-              continueButton.tagName === "GCDS-BUTTON" &&
-              continueButton.shadowRoot
-            ) {
-              const actualButton =
-                continueButton.shadowRoot.querySelector(
-                  'button[part="button"]',
-                ) || continueButton.shadowRoot.querySelector("button");
-              if (actualButton) {
-                // Dispatch gcdsClick event to bypass disabled state
-                const gcdsClickEvent = new CustomEvent("gcdsClick", {
-                  bubbles: true,
-                  cancelable: true,
-                  detail: {},
-                });
-                Object.defineProperty(gcdsClickEvent, "preventDefault", {
-                  value: () => {},
-                  writable: false,
-                });
-                continueButton.dispatchEvent(gcdsClickEvent);
-              }
-            }
-          }
         });
 
         // Enter OTP
@@ -1182,102 +950,27 @@ export const ResendOtpCode = (() => {
           }
         });
 
-        await step("Verify radio buttons are displayed", async () => {
+        await step("Verify factor selection links are displayed", async () => {
           await waitFor(async () => {
-            const gcdsRadios = canvasElement.querySelector("gcds-radios");
-            await expect(gcdsRadios).toBeInTheDocument();
+            const gcdsLinks = canvasElement.querySelectorAll("gcds-link");
+            await expect(gcdsLinks.length).toBeGreaterThan(0);
           });
         });
 
-        await step("Select the Text Message radio button", async () => {
+        await step("Select the Text Message factor", async () => {
           await waitFor(async () => {
-            const gcdsRadios = canvasElement.querySelector("gcds-radios");
-            await expect(gcdsRadios).toBeInTheDocument();
-
-            if (gcdsRadios && gcdsRadios.shadowRoot) {
-              // Find the text message radio button (factor-1)
-              const textMessageRadioButton =
-                gcdsRadios.shadowRoot.querySelector('input[value="factor-1"]');
-
-              await expect(textMessageRadioButton).toBeInTheDocument();
-
-              // Click the text message radio button
-              await userEvent.click(textMessageRadioButton);
-              // Verify the text message radio button is selected
-              await expect(textMessageRadioButton.checked).toBe(true);
-            }
-          });
-        });
-
-        await step(
-          "Verify Text Message option content is displayed",
-          async () => {
-            await waitFor(async () => {
-              const gcdsRadios = canvasElement.querySelector("gcds-radios");
-              const textLabel = gcdsRadios.shadowRoot.querySelector(
-                'label[for="smsotp-factor-1"]',
-              );
-              await expect(textLabel).toBeInTheDocument();
-              const labelText = textLabel.textContent;
-              await expect(labelText).toContain("Text message");
-              await expect(labelText).toContain("+15551234567");
+            const factorLinks = canvasElement.querySelectorAll("gcds-link");
+            const textMeLink = Array.from(factorLinks).find(
+              (link) => link.textContent.trim() === "Text me",
+            );
+            await expect(textMeLink).toBeInTheDocument();
+            const gcdsClickEvent = new CustomEvent("gcdsClick", {
+              bubbles: true,
+              cancelable: true,
+              detail: {},
             });
-          },
-        );
-
-        await step(
-          "Verify gcds-radios value updates to selected option",
-          async () => {
-            const gcdsRadios = canvasElement.querySelector("gcds-radios");
-            await waitFor(async () => {
-              // The gcds-radios component should update its value attribute
-              const currentValue = gcdsRadios.getAttribute("value");
-              await expect(currentValue).toBe("factor-1");
-            });
-          },
-        );
-
-        await step("Verify Continue button remains enabled", async () => {
-          const canvas = within(canvasElement);
-          const continueButton = canvas.getByText(/Continue/i);
-          await waitFor(async () => {
-            await expect(continueButton).toBeInTheDocument();
+            textMeLink.dispatchEvent(gcdsClickEvent);
           });
-
-          if (continueButton && continueButton.shadowRoot) {
-            const actualButton =
-              continueButton.shadowRoot.querySelector(
-                'button[part="button"]',
-              ) || continueButton.shadowRoot.querySelector("button");
-
-            if (actualButton) {
-              await expect(actualButton.disabled).toBe(false);
-            }
-          }
-          if (continueButton) {
-            if (
-              continueButton.tagName === "GCDS-BUTTON" &&
-              continueButton.shadowRoot
-            ) {
-              const actualButton =
-                continueButton.shadowRoot.querySelector(
-                  'button[part="button"]',
-                ) || continueButton.shadowRoot.querySelector("button");
-              if (actualButton) {
-                // Dispatch gcdsClick event to bypass disabled state
-                const gcdsClickEvent = new CustomEvent("gcdsClick", {
-                  bubbles: true,
-                  cancelable: true,
-                  detail: {},
-                });
-                Object.defineProperty(gcdsClickEvent, "preventDefault", {
-                  value: () => {},
-                  writable: false,
-                });
-                continueButton.dispatchEvent(gcdsClickEvent);
-              }
-            }
-          }
         });
       });
       await step("Test resend OTP functionality", async () => {
@@ -1498,111 +1191,27 @@ export const UseDifferentPhoneNumber = (() => {
           }
         });
 
-        await step("Verify radio buttons are displayed", async () => {
+        await step("Verify factor selection links are displayed", async () => {
           await waitFor(async () => {
-            const gcdsRadios = canvasElement.querySelector("gcds-radios");
-            await expect(gcdsRadios).toBeInTheDocument();
+            const gcdsLinks = canvasElement.querySelectorAll("gcds-link");
+            await expect(gcdsLinks.length).toBeGreaterThan(0);
           });
         });
 
-        await step("Select the Text Message radio button", async () => {
+        await step("Select the Text Message factor", async () => {
           await waitFor(async () => {
-            const gcdsRadios = canvasElement.querySelector("gcds-radios");
-            await expect(gcdsRadios).toBeInTheDocument();
-
-            if (gcdsRadios && gcdsRadios.shadowRoot) {
-              // Find the text message radio button (factor-1)
-              const textMessageRadioButton =
-                gcdsRadios.shadowRoot.querySelector('input[value="factor-1"]');
-
-              await expect(textMessageRadioButton).toBeInTheDocument();
-
-              // Click the text message radio button
-              await userEvent.click(textMessageRadioButton);
-              // Verify the text message radio button is selected
-              await expect(textMessageRadioButton.checked).toBe(true);
-            }
-          });
-        });
-
-        await step(
-          "Verify Text Message option content is displayed",
-          async () => {
-            await waitFor(async () => {
-              await expect(
-                canvasElement
-                  .querySelector("gcds-radios")
-                  .shadowRoot.querySelector('label[for="smsotp-factor-1"]'),
-              ).toBeInTheDocument();
-              await expect(
-                canvasElement
-                  .querySelector("gcds-radios")
-                  .shadowRoot.querySelector('label[for="smsotp-factor-1"]')
-                  .textContent,
-              ).toContain("Text message");
-              await expect(
-                canvasElement
-                  .querySelector("gcds-radios")
-                  .shadowRoot.querySelector('label[for="smsotp-factor-1"]')
-                  .textContent,
-              ).toContain("+15551234567");
+            const factorLinks = canvasElement.querySelectorAll("gcds-link");
+            const textMeLink = Array.from(factorLinks).find(
+              (link) => link.textContent.trim() === "Text me",
+            );
+            await expect(textMeLink).toBeInTheDocument();
+            const gcdsClickEvent = new CustomEvent("gcdsClick", {
+              bubbles: true,
+              cancelable: true,
+              detail: {},
             });
-          },
-        );
-
-        await step(
-          "Verify gcds-radios value updates to selected option",
-          async () => {
-            const gcdsRadios = canvasElement.querySelector("gcds-radios");
-            await waitFor(async () => {
-              // The gcds-radios component should update its value attribute
-              const currentValue = gcdsRadios.getAttribute("value");
-              await expect(currentValue).toBe("factor-1");
-            });
-          },
-        );
-
-        await step("Verify Continue button remains enabled", async () => {
-          const canvas = within(canvasElement);
-          const continueButton = canvas.getByText(/Continue/i);
-          await waitFor(async () => {
-            await expect(continueButton).toBeInTheDocument();
+            textMeLink.dispatchEvent(gcdsClickEvent);
           });
-
-          if (continueButton && continueButton.shadowRoot) {
-            const actualButton =
-              continueButton.shadowRoot.querySelector(
-                'button[part="button"]',
-              ) || continueButton.shadowRoot.querySelector("button");
-
-            if (actualButton) {
-              await expect(actualButton.disabled).toBe(false);
-            }
-          }
-          if (continueButton) {
-            if (
-              continueButton.tagName === "GCDS-BUTTON" &&
-              continueButton.shadowRoot
-            ) {
-              const actualButton =
-                continueButton.shadowRoot.querySelector(
-                  'button[part="button"]',
-                ) || continueButton.shadowRoot.querySelector("button");
-              if (actualButton) {
-                // Dispatch gcdsClick event to bypass disabled state
-                const gcdsClickEvent = new CustomEvent("gcdsClick", {
-                  bubbles: true,
-                  cancelable: true,
-                  detail: {},
-                });
-                Object.defineProperty(gcdsClickEvent, "preventDefault", {
-                  value: () => {},
-                  writable: false,
-                });
-                continueButton.dispatchEvent(gcdsClickEvent);
-              }
-            }
-          }
         });
       });
 
