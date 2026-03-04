@@ -185,12 +185,8 @@ describe("OtpSelection Component", () => {
     it("renders help links with correct hrefs", () => {
       renderComponent();
       const links = screen.getAllByTestId("gcds-link-external");
-      expect(links).toHaveLength(2);
+      expect(links).toHaveLength(1);
       expect(links[0]).toHaveAttribute("href", "https://help.example.com/2fa");
-      expect(links[1]).toHaveAttribute(
-        "href",
-        "https://help.example.com/no-phone",
-      );
     });
 
     it("renders help link labels", () => {
@@ -198,7 +194,6 @@ describe("OtpSelection Component", () => {
       expect(
         screen.getByText("Get help with 2-step verification"),
       ).toBeInTheDocument();
-      expect(screen.getByText("I cannot access my phone")).toBeInTheDocument();
     });
 
     it("renders the cancel button", () => {

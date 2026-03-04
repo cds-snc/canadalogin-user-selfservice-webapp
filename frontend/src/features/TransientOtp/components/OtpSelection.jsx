@@ -218,14 +218,6 @@ export default function OtpSelection({
             {pageContentJson["12"]}
           </GcdsLink>
         </GcdsText>
-        <GcdsText>
-          <GcdsLink
-            href={gcHelpCentreLinks.recover2StepVerification}
-            target="_blank"
-          >
-            {pageContentJson["13"]}
-          </GcdsLink>
-        </GcdsText>
       </GcdsContainer>
     </GcdsContainer>
   );

@@ -16,7 +16,6 @@ import { PAGES } from "../../../../utils/constants";
 import { path } from "../../../../utils/routeHelpers";
 import FIDOPasskeyCollage from "../../../../assets/icons/passkey_collage.svg?react";
 import Loader from "../../../../components/Layout/Loading";
-import { gcHelpCentreLinks } from "../../../../utils/gcHelpCentreLinks";
 
 export default function VerifyFIDO2Passkey({
   setAssertionResult,
@@ -158,12 +157,6 @@ export default function VerifyFIDO2Passkey({
         </GcdsLink>
 
         {/* TODO: add correct hrefs to the links below once domain migrations are done */}
-        <GcdsLink
-          href={gcHelpCentreLinks.recover2StepVerification}
-          target="_blank"
-        >
-          {pageContentJson["7"]}
-        </GcdsLink>
         <GcdsLink>{pageContentJson["8"]}</GcdsLink>
       </GcdsGrid>
     </GcdsContainer>
