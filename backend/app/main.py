@@ -26,6 +26,7 @@ from app.otp import v1_router as v1_otp_router
 from app.fido2 import v1_router as v1_fido2_router
 from app.auth.services import oidc_config
 from app.auth.services.auth import redirect_user_to_idp_verify
+from app.middleware.standardized_logging import StandardizedLoggingMiddleware
 
 # from Secweb import SecWeb
 
@@ -175,6 +176,9 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["*"],
 )
+
+# Logging
+app.add_middleware(StandardizedLoggingMiddleware)
 
 # Autoload session if cookie is present
 app.add_middleware(SessionAutoloadMiddleware)
