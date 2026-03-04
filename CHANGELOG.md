@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.13.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.12.1...v1.13.0) (2026-03-03)
+
+
+### Features
+
+* **frontend:** implement list passkeys according to figma ([#1226](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1226)) ([b6cd718](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/b6cd718cb7556ce0b7bbb22ba76ece32da3a224a))
+
+
+### Bug Fixes
+
+* **frontend:** Re-brand Manage app to CanadaLogin and update documentation ([#1183](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1183)) ([57b442b](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/57b442bbb1833c0603af0b9de325a0656fd87c47))
+* **frontend:** Re-brand Manage app to CanadaLogin and update documentation ([#1244](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1244)) ([4c0d215](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/4c0d2156aa6ed1335f534a2ff48b09f6da68e494))
+
+
+### Miscellaneous Chores
+
+* **ci:** update generate-sbom version ([#1246](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1246)) ([f6efe43](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/f6efe43cc5ae9b9ce05be22eb1b643aa3e166113))
+
 ## [1.12.1](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.12.0...v1.12.1) (2026-02-26)
 
 
