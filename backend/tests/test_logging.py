@@ -188,7 +188,9 @@ async def test_log_signed_in(monkeypatch, caplog):
     async def mock_get_user_info(*args, **kwargs):
         return {"sub": "12345678", "amr": ["password"]}
 
-    monkeypatch.setattr("app.middleware.logging.get_user_info", mock_get_user_info)
+    monkeypatch.setattr(
+        "app.middleware.standardized_logging.get_user_info", mock_get_user_info
+    )
 
     client.get("/v1/users/rp_info")
 
