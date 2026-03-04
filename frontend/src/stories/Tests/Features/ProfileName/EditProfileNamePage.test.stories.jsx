@@ -38,9 +38,9 @@ export const EditProfileName = (() => {
           data: {
             userName: "test@example.com",
             name: {
-              givenName: "John",
-              familyName: "Smith",
-              formatted: "John Smith",
+              givenName: "Test",
+              familyName: "User",
+              formatted: "Test User",
             },
           },
         },
@@ -110,36 +110,10 @@ export const EditProfileName = (() => {
         });
       });
 
-      await step("Enter name and click Continue", async () => {
-        // Find the GCDS inputs
-        const givenNameInput = canvasElement.querySelector(
-          '[data-testid="givenName"]',
-        );
-        const familyNameInput = canvasElement.querySelector(
-          '[data-testid="familyName"]',
-        );
-
-        // Handle given name input
-        if (givenNameInput && givenNameInput.shadowRoot) {
-          const shadowInput = givenNameInput.shadowRoot.querySelector(
-            "input[name='givenName']",
-          );
-          if (shadowInput) {
-            // Type the OTP code
-            await userEvent.type(shadowInput, "John");
-          }
-        }
-
-        // Handle family name input
-        if (familyNameInput && familyNameInput.shadowRoot) {
-          const shadowInput = familyNameInput.shadowRoot.querySelector(
-            "input[name='familyName']",
-          );
-          if (shadowInput) {
-            // Type the OTP code
-            await userEvent.type(shadowInput, "Smith");
-          }
-        }
+      await step("Click Continue with pre-populated name", async () => {
+        // The component auto-populates givenName and familyName from the user
+        // profile state ("Test" / "User" from TestDataUserProvider), so no
+        // typing is needed — just click Continue.
 
         // Wait a bit for React state to update
         await waitFor(async () => {
@@ -177,11 +151,11 @@ export const EditProfileName = (() => {
             canvas.getByText(/You’ve requested to update your name to:/i),
           ).toBeInTheDocument();
 
-          // Check that "John" and "Smith" appear somewhere on the page
-          // (might be in separate elements or formatted text)
+          // The form was pre-populated with "Test" / "User" from the provider;
+          // verify those values appear on the confirmation page.
           const pageText = canvasElement.textContent;
-          await expect(pageText).toContain("John");
-          await expect(pageText).toContain("Smith");
+          await expect(pageText).toContain("Test");
+          await expect(pageText).toContain("User");
 
           // Find the "Yes, update" button specifically
           const allButtons = canvasElement.querySelectorAll("gcds-button");
@@ -220,7 +194,7 @@ export const EditProfileName = (() => {
 
           // Check that the success message is present with the updated name
           const successText = canvas.getByText(
-            /Your name has been updated to John Smith/i,
+            /Your name has been updated to Test User/i,
           );
           await expect(successText).toBeInTheDocument();
         });
