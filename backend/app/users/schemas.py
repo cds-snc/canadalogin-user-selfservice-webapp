@@ -5,7 +5,14 @@ from typing import Any, List, Optional
 from app.otp.schemas import OtpType
 from app.password.schemas import OtpType as PhoneOtpType
 from app.utils.schemas import ResponseModel
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    EmailStr,
+    Field,
+    ValidationInfo,
+    field_validator,
+)
 
 SCIM_CORE_USER = "urn:ietf:params:scim:schemas:core:2.0:User"
 SCIM_IBM_USER_EXT = "urn:ietf:params:scim:schemas:extension:ibm:2.0:User"
@@ -93,7 +100,9 @@ class UserProfileName(BaseModel):
 
     @field_validator("familyName", "givenName")
     @classmethod
-    def validate_name_characters(cls, v: Optional[str]) -> Optional[str]:
+    def validate_name_characters(
+        cls, v: Optional[str], info: ValidationInfo
+    ) -> Optional[str]:
         """
         Validate and transform name fields according to Canadian naming rules.
 
@@ -110,8 +119,14 @@ class UserProfileName(BaseModel):
 
         Transformation:
         - Auto-capitalizes first letter after spaces, hyphens, and apostrophes
+
+        Note: givenName is optional — an empty string is allowed and returned as-is.
         """
         if v is None:
+            return v
+
+        # givenName is not required; allow empty string without validation
+        if v == "" and info.field_name == "givenName":
             return v
 
         import re

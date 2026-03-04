@@ -85,6 +85,8 @@ export default function ProfileUpdateName({
     await onNext();
   };
 
+  console.log(nameFormData);
+
   return (
     <GcdsContainer role="main">
       {errorMessage && (
@@ -115,7 +117,6 @@ export default function ProfileUpdateName({
             lang={language}
             value={nameFormData.givenName}
             onInput={handleInput}
-            required
           />
           <GcdsInput
             inputId="familyName"

@@ -197,14 +197,6 @@ const TestWrapper = ({ children, initialEntries = ["/"] }) => {
   return <RouterProvider router={router} />;
 };
 
-// Helper function to simulate navigation and URL parameter updates
-const simulateNavigation = (newParams, newLocation = null) => {
-  mockParams = { ...mockParams, ...newParams };
-  if (newLocation) {
-    mockLocation = newLocation;
-  }
-};
-
 describe("EditProfileNamePage Unit Tests", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -264,7 +256,7 @@ describe("EditProfileNamePage Unit Tests", () => {
 
       expect(screen.getByTestId("step-content")).toBeInTheDocument();
       expect(screen.getByTestId("name-form-data")).toHaveTextContent(
-        "No name data",
+        "John Doe",
       );
     });
 
@@ -296,22 +288,7 @@ describe("EditProfileNamePage Unit Tests", () => {
       });
     });
 
-    it("should initialize with location state when provided", async () => {
-      // Set up confirm step with location state
-      simulateNavigation(
-        { step: "confirm-update" },
-        {
-          state: {
-            name: {
-              givenName: "Jane",
-              familyName: "Smith",
-              formatted: "Jane Smith",
-            },
-            step: "confirmUpdate",
-          },
-        },
-      );
-
+    it("should pre-populate form from user profile name", async () => {
       render(
         <UserContext.Provider
           value={{ state: mockUserState, dispatch: mockDispatch }}
@@ -321,11 +298,12 @@ describe("EditProfileNamePage Unit Tests", () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByTestId("confirm-update")).toBeInTheDocument();
+        expect(screen.getByTestId("profile-update-name")).toBeInTheDocument();
       });
 
-      expect(screen.getByTestId("confirm-name-data")).toHaveTextContent(
-        "Jane Smith",
+      // Form should be pre-populated with current user profile name
+      expect(screen.getByTestId("name-form-data")).toHaveTextContent(
+        "John Doe",
       );
     });
   });
@@ -549,8 +527,6 @@ describe("EditProfileNamePage Unit Tests", () => {
     });
 
     it("should navigate back to profile from confirm step", async () => {
-      // Start with confirm step
-      simulateNavigation({ step: "confirm-update" });
       vi.mocked(useNavigate).mockReturnValue(mockNavigate);
 
       render(
@@ -560,6 +536,13 @@ describe("EditProfileNamePage Unit Tests", () => {
           <EditProfileNamePage />
         </UserContext.Provider>,
       );
+
+      // Navigate to confirm step
+      await waitFor(() => {
+        expect(screen.getByTestId("profile-update-name")).toBeInTheDocument();
+      });
+
+      screen.getByTestId("profile-update-name-next").click();
 
       await waitFor(() => {
         expect(screen.getByTestId("confirm-update")).toBeInTheDocument();
@@ -572,8 +555,6 @@ describe("EditProfileNamePage Unit Tests", () => {
     });
 
     it("should navigate back to profile from success step", async () => {
-      // Start with success step
-      simulateNavigation({ step: "success" });
       vi.mocked(useNavigate).mockReturnValue(mockNavigate);
 
       render(
@@ -583,6 +564,19 @@ describe("EditProfileNamePage Unit Tests", () => {
           <EditProfileNamePage />
         </UserContext.Provider>,
       );
+
+      // Navigate through to success step
+      await waitFor(() => {
+        expect(screen.getByTestId("profile-update-name")).toBeInTheDocument();
+      });
+
+      screen.getByTestId("profile-update-name-next").click();
+
+      await waitFor(() => {
+        expect(screen.getByTestId("confirm-update")).toBeInTheDocument();
+      });
+
+      screen.getByTestId("confirm-update-confirm").click();
 
       await waitFor(() => {
         expect(screen.getByTestId("successfully-updated")).toBeInTheDocument();
@@ -622,9 +616,6 @@ describe("EditProfileNamePage Unit Tests", () => {
     });
 
     it("should display fallback error message when errorCode not found in errorPageJson", async () => {
-      // Start with confirm step
-      simulateNavigation({ step: "confirm-update" });
-
       render(
         <UserContext.Provider
           value={{ state: mockUserState, dispatch: mockDispatch }}
@@ -633,11 +624,18 @@ describe("EditProfileNamePage Unit Tests", () => {
         </UserContext.Provider>,
       );
 
+      // Navigate to confirm step
+      await waitFor(() => {
+        expect(screen.getByTestId("profile-update-name")).toBeInTheDocument();
+      });
+
+      screen.getByTestId("profile-update-name-next").click();
+
       await waitFor(() => {
         expect(screen.getByTestId("confirm-update")).toBeInTheDocument();
       });
 
-      // Trigger error with unknown code
+      // Trigger error with code that maps to CONFIRM_ERROR in errorPageJson
       const setErrorButton = screen.getByText("Set Error");
       setErrorButton.click();
 
@@ -674,9 +672,6 @@ describe("EditProfileNamePage Unit Tests", () => {
     });
 
     it("should clear error when successful update occurs", async () => {
-      // Start with confirm step
-      simulateNavigation({ step: "confirm-update" });
-
       render(
         <UserContext.Provider
           value={{ state: mockUserState, dispatch: mockDispatch }}
@@ -684,6 +679,13 @@ describe("EditProfileNamePage Unit Tests", () => {
           <EditProfileNamePage />
         </UserContext.Provider>,
       );
+
+      // Navigate to confirm step
+      await waitFor(() => {
+        expect(screen.getByTestId("profile-update-name")).toBeInTheDocument();
+      });
+
+      screen.getByTestId("profile-update-name-next").click();
 
       await waitFor(() => {
         expect(screen.getByTestId("confirm-update")).toBeInTheDocument();
@@ -745,31 +747,6 @@ describe("EditProfileNamePage Unit Tests", () => {
     });
 
     it("should maintain form data across steps", async () => {
-      // Start with confirm step and provide name data through location state
-      simulateNavigation(
-        { step: "confirm-update" },
-        {
-          state: {
-            name: {
-              givenName: "Jane",
-              familyName: "Smith",
-              formatted: "Jane Smith",
-            },
-            step: "confirmUpdate",
-          },
-        },
-      );
-      vi.mocked(useLocation).mockReturnValue({
-        state: {
-          name: {
-            givenName: "Jane",
-            familyName: "Smith",
-            formatted: "Jane Smith",
-          },
-          step: "confirmUpdate",
-        },
-      });
-
       render(
         <UserContext.Provider
           value={{ state: mockUserState, dispatch: mockDispatch }}
@@ -778,13 +755,20 @@ describe("EditProfileNamePage Unit Tests", () => {
         </UserContext.Provider>,
       );
 
+      // Navigate to confirm step — form data pre-populated from user profile
+      await waitFor(() => {
+        expect(screen.getByTestId("profile-update-name")).toBeInTheDocument();
+      });
+
+      screen.getByTestId("profile-update-name-next").click();
+
       await waitFor(() => {
         expect(screen.getByTestId("confirm-update")).toBeInTheDocument();
       });
 
-      // Should maintain the same data in confirm step
+      // Should show user profile name data in confirm step
       expect(screen.getByTestId("confirm-name-data")).toHaveTextContent(
-        "Jane Smith",
+        "John Doe",
       );
     });
   });
@@ -835,12 +819,6 @@ describe("EditProfileNamePage Unit Tests", () => {
 
   describe("User Profile Integration", () => {
     it("should use user profile data correctly in API call", async () => {
-      // Start with confirm step
-      simulateNavigation({ language: "en", step: "confirm-update" });
-      vi.mocked(useParams).mockReturnValue({
-        language: "en",
-        step: "confirm-update",
-      });
       vi.mocked(useNavigate).mockReturnValue(mockNavigate);
 
       render(
@@ -851,6 +829,13 @@ describe("EditProfileNamePage Unit Tests", () => {
         </UserContext.Provider>,
       );
 
+      // Navigate to confirm step
+      await waitFor(() => {
+        expect(screen.getByTestId("profile-update-name")).toBeInTheDocument();
+      });
+
+      screen.getByTestId("profile-update-name-next").click();
+
       await waitFor(() => {
         expect(screen.getByTestId("confirm-update")).toBeInTheDocument();
       });
@@ -858,12 +843,13 @@ describe("EditProfileNamePage Unit Tests", () => {
       const confirmButton = screen.getByTestId("confirm-update-confirm");
       confirmButton.click();
 
+      // API should be called with pre-populated user profile name
       await waitFor(() => {
         expect(authService.update_my_user_profile).toHaveBeenCalledWith({
           name: expect.objectContaining({
-            givenName: "", // Initial empty state
-            familyName: "", // Initial empty state
-            formatted: "", // Initial empty state (not calculated since we skipped form submission)
+            givenName: "John",
+            familyName: "Doe",
+            formatted: "John Doe",
           }),
           user_id: "test-user-123",
         });
@@ -871,21 +857,22 @@ describe("EditProfileNamePage Unit Tests", () => {
     });
 
     it("should update user profile state after successful update", async () => {
-      // Start with confirm step
-      simulateNavigation({ language: "en", step: "confirm-update" });
-      vi.mocked(useParams).mockReturnValue({
-        language: "en",
-        step: "confirm-update",
-      });
       vi.mocked(useNavigate).mockReturnValue(mockNavigate);
 
-      const { rerender } = render(
+      render(
         <UserContext.Provider
           value={{ state: mockUserState, dispatch: mockDispatch }}
         >
           <EditProfileNamePage />
         </UserContext.Provider>,
       );
+
+      // Navigate to confirm step
+      await waitFor(() => {
+        expect(screen.getByTestId("profile-update-name")).toBeInTheDocument();
+      });
+
+      screen.getByTestId("profile-update-name-next").click();
 
       await waitFor(() => {
         expect(screen.getByTestId("confirm-update")).toBeInTheDocument();
@@ -898,30 +885,7 @@ describe("EditProfileNamePage Unit Tests", () => {
         expect(authService.update_my_user_profile).toHaveBeenCalled();
       });
 
-      // After successful API call, navigate should be called with success URL
-      await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith(
-          "/en/profile/update-name/success",
-          { replace: true },
-        );
-      });
-
-      // Simulate navigation to success step by updating useParams mock
-      vi.mocked(useParams).mockReturnValue({
-        language: "en",
-        step: "success",
-      });
-
-      // Re-render component with new step parameter
-      rerender(
-        <UserContext.Provider
-          value={{ state: mockUserState, dispatch: mockDispatch }}
-        >
-          <EditProfileNamePage />
-        </UserContext.Provider>,
-      );
-
-      // Should now show success step
+      // After successful API call, wizard advances to success step
       await waitFor(() => {
         expect(screen.getByTestId("successfully-updated")).toBeInTheDocument();
       });
