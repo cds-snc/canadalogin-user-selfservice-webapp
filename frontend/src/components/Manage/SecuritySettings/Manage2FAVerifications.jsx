@@ -5,7 +5,6 @@ import {
   GcdsHeading,
   GcdsText,
 } from "@cdssnc/gcds-components-react";
-import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router";
 import {
   MAP_TYPES,
@@ -19,7 +18,6 @@ import { useUser } from "../../Providers/useUser.js";
 import NoticeFactory from "../../InfoBlocks/NoticeFactory.jsx";
 import PhoneFactorsList from "./PhoneFactorsList.jsx";
 import FIDO2PasskeyList from "./FIDO2PasskeyList.jsx";
-import { fido2Api } from "../../../features/ManageFIDO2/api/fido2Api.jsx";
 import FIDOPasskeyIcon from "../../../assets/icons/FIDO_Passkey_mark_A_black.svg?react";
 import FIDOPasskeyCollage from "../../../assets/icons/passkey_collage.svg?react";
 
@@ -54,7 +52,6 @@ export default function Manage2FAVerifications() {
   const pageContent = getPageContent(language, PAGES.manage2FAVerifications);
   const navigate = useNavigate();
   const { state, _dispatch } = useUser();
-  const [userFIDO2CredentialsData, setUserFIDO2CredentialsData] = useState([]);
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
     language: language,
   });
@@ -64,45 +61,23 @@ export default function Manage2FAVerifications() {
     location.state || {};
   const addFido2PagePath = path(PAGES.addFIDO2PasskeyPage, { language });
 
-  // Use the OTP operations hook for fetching phone factors
+  // Use the OTP operations hook for fetching phone factors.
+  // externalLoading is initialised to !!DEV_ONLY_FEATURE so that localLoading
+  // starts true from the very first render when the FIDO2 fetch will run,
+  // preventing a flash of un-loaded content before the useEffect fires.
   const {
     phoneFactorsMap: userPhoneFactorsMap,
     localLoading,
-    setLocalLoading,
-  } = useOtpOperations(
-    state.userProfile.id,
-    state.userProfile.userName,
-    () => {}, // No error code setter needed
-    backToSecuritySettingsPage, // No fallback navigation
-    MAP_TYPES.fullPhoneNumber,
-  );
-
-  useEffect(() => {
-    /**
-     * Fetch user's FIDO2 credentials
-     */
-    const fetchUserFIDO2Credentials = async () => {
-      setLocalLoading(true);
-
-      try {
-        const response = await fido2Api.getUserFIDO2Credentials();
-        if (response && response?.success) {
-          setUserFIDO2CredentialsData(response?.data?.fido2 || []);
-        }
-      } catch (err) {
-        if (err && err?.data && err?.data?.message) {
-          console.error("err", err);
-        }
-      } finally {
-        setLocalLoading(false);
-      }
-    };
-
-    if (DEV_ONLY_FEATURE) {
-      fetchUserFIDO2Credentials();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    fido2Data: userFIDO2CredentialsData,
+  } = useOtpOperations({
+    userId: state.userProfile.id,
+    userName: state.userProfile.userName,
+    setErrorCode: () => {}, // No error code setter needed
+    fallbackNavigationPath: backToSecuritySettingsPage,
+    mapType: MAP_TYPES.fullPhoneNumber,
+    externalLoading: DEV_ONLY_FEATURE,
+    fetchFIDO2Passkeys: DEV_ONLY_FEATURE,
+  });
 
   return localLoading ? (
     <Loader text={pageContent["11"]} />

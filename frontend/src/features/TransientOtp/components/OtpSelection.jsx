@@ -4,7 +4,6 @@ import {
   GcdsGrid,
   GcdsHeading,
   GcdsLink,
-  GcdsRadios,
   GcdsText,
 } from "@cdssnc/gcds-components-react";
 import { useParams } from "react-router";
@@ -13,96 +12,78 @@ import { getPageContent } from "../../../utils/functions.jsx";
 import { gcHelpCentreLinks } from "../../../utils/gcHelpCentreLinks.jsx";
 
 import { FLOW_TYPES, PAGES } from "../../../utils/constants.jsx";
-import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
+import SMSIcon from "../../../assets/icons/sms_icon.svg?react";
+import VoiceIcon from "../../../assets/icons/voicecall_icon.svg?react";
+import FIDO2Icon from "../../../assets/icons/FIDO_Passkey_mark_A_black.svg?react";
+
+const headerGridProps = {
+  columns: "max-content 1fr",
+  gap: "150",
+  "align-items": "center",
+  style: { alignItems: "center", paddingTop: "3rem", paddingBottom: "1.5rem" },
+};
+
+function SectionHeader({ icon, title, paddingBottom }) {
+  return (
+    <GcdsGrid
+      {...headerGridProps}
+      style={{ ...headerGridProps.style, paddingBottom }}
+    >
+      {icon}
+      <GcdsHeading tag="h3" marginTop="0" marginBottom="0">
+        {title}
+      </GcdsHeading>
+    </GcdsGrid>
+  );
+}
 
 export default function OtpSelection({
   onNext,
-  userSelectedMfaFactor,
   onChangeUserSelectedMfaFactor,
   userPhoneFactors,
+  fido2Data,
+  onSelectFIDO2,
   parentPage,
   onCancel,
 }) {
   const { language } = useParams();
 
   const pageContentJson = getPageContent(language, PAGES.transientOtpSelection);
-
   const { cancel } = getPageContent(language, "Button");
 
-  const onSubmitHandler = async (ev) => {
-    ev.preventDefault();
-    await onNext();
+  const smsFactors =
+    userPhoneFactors?.filter((f) => f.type === FLOW_TYPES.sms) ?? [];
+  const voiceFactors =
+    userPhoneFactors?.filter((f) => f.type === FLOW_TYPES.voice) ?? [];
+  const hasFido2 = fido2Data && fido2Data.length > 0;
+
+  const handlePhoneFactorSelect = (factorId) => {
+    onChangeUserSelectedMfaFactor(factorId);
+    onNext();
   };
-
-  const configureRadioSMSOptions = () => {
-    let radioOptionsValues = [];
-
-    const smsPhoneFactors = userPhoneFactors?.filter(
-      (factor) => factor.type === FLOW_TYPES.sms,
-    );
-
-    // Add all SMS factors as radio options
-    smsPhoneFactors?.forEach((smsPhoneFactor) => {
-      const smsLabel = `${pageContentJson["8"]} ${smsPhoneFactor.destination}`;
-      const smsOtpRadioOption = {
-        label: smsLabel,
-        id: `${FLOW_TYPES.sms}-${smsPhoneFactor.id}`,
-        value: smsPhoneFactor.id,
-        checked: userSelectedMfaFactor?.id == smsPhoneFactor.id,
-      };
-      radioOptionsValues.push(smsOtpRadioOption);
-    });
-
-    return radioOptionsValues;
-  };
-
-  const configureRadioVoiceOptions = () => {
-    let radioOptionsValues = [];
-
-    const voicePhoneFactors = userPhoneFactors?.filter(
-      (factor) => factor.type === FLOW_TYPES.voice,
-    );
-
-    // Add all Voice factors as radio options
-    voicePhoneFactors?.forEach((voicePhoneFactor) => {
-      const voiceLabel = `${pageContentJson["9"]} ${voicePhoneFactor.destination}`;
-      const voiceOtpRadioOption = {
-        label: voiceLabel,
-        id: `${FLOW_TYPES.voice}-${voicePhoneFactor.id}`,
-        value: voicePhoneFactor.id,
-        checked: userSelectedMfaFactor?.id == voicePhoneFactor.id,
-      };
-      radioOptionsValues.push(voiceOtpRadioOption);
-    });
-
-    return radioOptionsValues;
-  };
-
-  const radioSMSOptions = configureRadioSMSOptions();
-  const radioVoiceOptions = configureRadioVoiceOptions();
-  const combinedOptions = [...radioSMSOptions, ...radioVoiceOptions];
 
   const parentPageContent =
     parentPage === PAGES.deleteMFAPage
       ? pageContentJson["15"]
       : parentPage === PAGES.addMFAPage
         ? pageContentJson["14"]
-        : pageContentJson["2"];
+        : parentPage === PAGES.deleteFIDO2PasskeyPage
+          ? pageContentJson["22"]
+          : parentPage === PAGES.addFIDO2PasskeyPage
+            ? pageContentJson["23"]
+            : pageContentJson["2"];
 
-  const radioComponent =
-    combinedOptions.length >= 2 ? (
-      <GcdsRadios
-        name="combinedRadio"
-        legend={pageContentJson["16"]}
-        options={combinedOptions}
-        onGcdsChange={(e) => onChangeUserSelectedMfaFactor(e.target.value)}
-      ></GcdsRadios>
-    ) : (
-      <>
-        <GcdsText>{combinedOptions[0]?.label}</GcdsText>
-        <GcdsText>{combinedOptions[0]?.hint}</GcdsText>
-      </>
-    );
+  const factorRowStyle = {
+    borderBottom: "0.0625rem solid #A5A5A5",
+    paddingBottom: "1.5rem",
+    paddingTop: "1.5rem",
+  };
+
+  const factorListStyle = {
+    display: "flex",
+    flexDirection: "column",
+    gap: "1.5rem",
+  };
 
   return (
     <GcdsContainer role="main">
@@ -110,58 +91,131 @@ export default function OtpSelection({
         <GcdsHeading tag="h1" lang={language}>
           {pageContentJson["1"]}
         </GcdsHeading>
+        <GcdsText>
+          {parentPageContent} {pageContentJson["3"]}
+        </GcdsText>
       </GcdsContainer>
       <GcdsContainer>
-        <GcdsContainer>
-          <GcdsText>
-            {parentPageContent} {pageContentJson["3"]}
-          </GcdsText>
-        </GcdsContainer>
-        <GcdsContainer>
-          <GcdsHeading tag="h2">{pageContentJson["4"]}</GcdsHeading>
-          <GcdsText>
-            {pageContentJson["5"]} <strong>{pageContentJson["6"]}</strong>{" "}
-            {pageContentJson["7"]}
-          </GcdsText>
-        </GcdsContainer>
-        <form onSubmit={onSubmitHandler}>{radioComponent}</form>
+        <GcdsHeading tag="h2" marginTop="600" marginBottom="300">
+          {pageContentJson["21"]}
+        </GcdsHeading>
+        {/* Text message section */}
+        {smsFactors.length > 0 && (
+          <GcdsContainer>
+            <SectionHeader
+              icon={<SMSIcon width="23" height="23" />}
+              title={pageContentJson["8"]}
+            />
+            <GcdsContainer style={factorListStyle}>
+              <GcdsText marginBottom="0">
+                {pageContentJson["5"]} <strong>{pageContentJson["6"]}</strong>{" "}
+                {pageContentJson["7"]}
+              </GcdsText>
+              {smsFactors.map((factor) => (
+                <GcdsGrid
+                  key={factor.id}
+                  columns="1fr auto"
+                  align-items="center"
+                  style={factorRowStyle}
+                >
+                  <GcdsText marginBottom="0">{factor.destination}</GcdsText>
+                  <GcdsLink
+                    role="button"
+                    onGcdsClick={() => handlePhoneFactorSelect(factor.id)}
+                  >
+                    {pageContentJson["18"]}
+                  </GcdsLink>
+                </GcdsGrid>
+              ))}
+            </GcdsContainer>
+          </GcdsContainer>
+        )}
 
-        <GcdsGrid columns="max-content max-content" gap="200">
-          <SubmitButton
-            style={{ width: "fit-content" }}
-            onGcdsClick={onSubmitHandler}
-            currentLang={language}
-          ></SubmitButton>
+        {/* Voice call section */}
+        {voiceFactors.length > 0 && (
+          <GcdsContainer>
+            <SectionHeader
+              icon={<VoiceIcon width="23" height="23" />}
+              title={pageContentJson["9"]}
+            />
+            <GcdsContainer style={factorListStyle}>
+              <GcdsText marginBottom="0">
+                {pageContentJson["5"]} <strong>{pageContentJson["6"]}</strong>{" "}
+                {pageContentJson["7"]}
+              </GcdsText>
+              {voiceFactors.map((factor) => (
+                <GcdsGrid
+                  key={factor.id}
+                  columns="1fr auto"
+                  align-items="center"
+                  style={factorRowStyle}
+                >
+                  <GcdsText marginBottom="0">{factor.destination}</GcdsText>
+                  <GcdsLink
+                    role="button"
+                    onGcdsClick={() => handlePhoneFactorSelect(factor.id)}
+                  >
+                    {pageContentJson["19"]}
+                  </GcdsLink>
+                </GcdsGrid>
+              ))}
+            </GcdsContainer>
+          </GcdsContainer>
+        )}
 
-          <GcdsButton
-            buttonRole="secondary"
-            style={{ width: "fit-content" }}
-            onGcdsClick={(ev) => {
-              ev.preventDefault();
-              onCancel();
-            }}
-          >
-            {cancel}
-          </GcdsButton>
-        </GcdsGrid>
+        {/* Passkey or security key section */}
+        {hasFido2 && (
+          <GcdsContainer>
+            <SectionHeader
+              icon={<FIDO2Icon width="34" height="34" />}
+              title={pageContentJson["17"]}
+              paddingBottom="0"
+            />
+            <GcdsContainer style={factorListStyle}>
+              {fido2Data.map((passkey) => (
+                <GcdsGrid
+                  key={passkey.id}
+                  columns="1fr auto"
+                  align-items="center"
+                  style={factorRowStyle}
+                >
+                  <GcdsText marginBottom="0">
+                    {passkey.attributes?.nickname ?? passkey.id}
+                  </GcdsText>
+                  <GcdsLink
+                    role="button"
+                    onGcdsClick={() => onSelectFIDO2 && onSelectFIDO2(passkey)}
+                  >
+                    {pageContentJson["20"]}
+                  </GcdsLink>
+                </GcdsGrid>
+              ))}
+            </GcdsContainer>
+          </GcdsContainer>
+        )}
+
+        <GcdsButton
+          buttonRole="secondary"
+          style={{ width: "fit-content", marginTop: "1.5rem" }}
+          onGcdsClick={(ev) => {
+            ev.preventDefault();
+            onCancel();
+          }}
+        >
+          {cancel}
+        </GcdsButton>
       </GcdsContainer>
 
       <GcdsContainer>
-        <GcdsHeading tag="h2">{pageContentJson["10"]}</GcdsHeading>
+        <GcdsHeading tag="h2" marginTop="600" marginBottom="300">
+          {pageContentJson["10"]}
+        </GcdsHeading>
         <GcdsText>
           <GcdsLink
             href={gcHelpCentreLinks.twoStepVerification}
             target="_blank"
           >
             {pageContentJson["12"]}
-          </GcdsLink>
-        </GcdsText>
-        <GcdsText>
-          <GcdsLink
-            href={gcHelpCentreLinks.recover2StepVerification}
-            target="_blank"
-          >
-            {pageContentJson["13"]}
           </GcdsLink>
         </GcdsText>
       </GcdsContainer>

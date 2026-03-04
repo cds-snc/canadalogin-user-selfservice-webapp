@@ -64,28 +64,22 @@ MultipleFactorsRadioButtons.parameters = {
 MultipleFactorsRadioButtons.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
 
-  // Test core functionality: wait for radio group to render with multiple options
+  // No more radio buttons — each factor is a row with a gcds-link select button
   await waitFor(async () => {
     const gcdsRadios = canvasElement.querySelector("gcds-radios");
-    await expect(gcdsRadios).toBeInTheDocument();
+    await expect(gcdsRadios).not.toBeInTheDocument();
   });
 
-  // Test that the component has multiple options configured
+  // Verify factor rows are rendered as gcds-link elements
   await waitFor(async () => {
-    const gcdsRadios = canvasElement.querySelector("gcds-radios");
-    // Just verify the component exists - let accessibility addon handle the details
-    await expect(gcdsRadios).toBeInTheDocument();
-
-    // Check component has legend for grouping
-    const legend = gcdsRadios.getAttribute("legend");
-    await expect(legend).toBeTruthy();
+    const selectLinks = canvasElement.querySelectorAll("gcds-link");
+    // At least 2 select-factor links (one per phone factor) plus help links
+    await expect(selectLinks.length).toBeGreaterThanOrEqual(2);
   });
 
-  // Test that action buttons are functional
+  // Only a cancel button exists (no continue/submit button)
   await waitFor(async () => {
-    const continueButton = canvas.getByText(/continue/i);
     const cancelButton = canvas.getByText(/cancel/i);
-    await expect(continueButton).toBeInTheDocument();
     await expect(cancelButton).toBeInTheDocument();
   });
 };
@@ -108,23 +102,27 @@ SingleFactorNoRadios.parameters = {
 SingleFactorNoRadios.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
 
-  // Test core functionality: no radio component for single factor
+  // No radio buttons in new design
   await waitFor(async () => {
     const gcdsRadios = canvasElement.querySelector("gcds-radios");
     await expect(gcdsRadios).not.toBeInTheDocument();
   });
 
-  // Test that factor information is displayed directly as text
+  // The factor destination should appear as text in the row
   await waitFor(async () => {
-    const factorText = canvas.getByText(/text message.*\+15551234567/i);
-    await expect(factorText).toBeInTheDocument();
+    const destination = canvas.getByText("+15551234567");
+    await expect(destination).toBeInTheDocument();
   });
 
-  // Test that action buttons are available
+  // A gcds-link select button is rendered for the factor
   await waitFor(async () => {
-    const continueButton = canvas.getByText(/continue/i);
+    const selectLinks = canvasElement.querySelectorAll("gcds-link");
+    await expect(selectLinks.length).toBeGreaterThanOrEqual(1);
+  });
+
+  // Only a cancel button (no continue/submit button)
+  await waitFor(async () => {
     const cancelButton = canvas.getByText(/cancel/i);
-    await expect(continueButton).toBeInTheDocument();
     await expect(cancelButton).toBeInTheDocument();
   });
 };
@@ -154,19 +152,23 @@ DeleteMFAContext.parameters = {
   },
 };
 DeleteMFAContext.play = async ({ canvasElement }) => {
-  // Test core functionality: radio buttons are present in delete context
+  const canvas = within(canvasElement);
+
+  // No radio buttons in new design
   await waitFor(async () => {
     const gcdsRadios = canvasElement.querySelector("gcds-radios");
-    await expect(gcdsRadios).toBeInTheDocument();
+    await expect(gcdsRadios).not.toBeInTheDocument();
   });
 
-  // Test that the component is configured for delete context
+  // Factor rows rendered as gcds-link elements
   await waitFor(async () => {
-    const gcdsRadios = canvasElement.querySelector("gcds-radios");
-    await expect(gcdsRadios).toBeInTheDocument();
+    const selectLinks = canvasElement.querySelectorAll("gcds-link");
+    await expect(selectLinks.length).toBeGreaterThanOrEqual(2);
+  });
 
-    // Verify proper legend for grouping
-    const legend = gcdsRadios.getAttribute("legend");
-    await expect(legend).toBeTruthy();
+  // Verify cancel button is present
+  await waitFor(async () => {
+    const cancelButton = canvas.getByText(/cancel/i);
+    await expect(cancelButton).toBeInTheDocument();
   });
 };

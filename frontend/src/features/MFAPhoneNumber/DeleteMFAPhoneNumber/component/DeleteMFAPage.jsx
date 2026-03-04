@@ -65,7 +65,12 @@ export default function DeleteMFAPage() {
     handleChangeUserMfaSelection,
     handleSetUserOtpValue,
     requestOtpCode,
-  } = useOtpOperations(id, userName, setErrorCode, backToSecuritySettingsPage);
+  } = useOtpOperations({
+    userId: id,
+    userName,
+    setErrorCode,
+    fallbackNavigationPath: backToSecuritySettingsPage,
+  });
 
   const [phoneFormData, setPhoneFormData] = useState({
     phoneNumber: "",

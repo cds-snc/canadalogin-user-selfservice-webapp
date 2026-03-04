@@ -51,7 +51,8 @@
     "error_passkey_name_required": "Passkey name required.",
     "error_delete_credential": "Failed to delete security key",
     "error_rename_credential": "Failed to rename security key",
-    "error_fido2_verification": "Failed to verify with passkey",
+    "error_fido2_verification": "Passkey prompt was either cancelled or timed out. Try again.",
+    "error_fido2_wrong_passkey": "You used a different passkey than the one you selected. Please try again with the correct passkey.",
     "error_get_assertion_options": "Failed to get authentication options"
   },
   "RegisterVerification": {
@@ -460,12 +461,19 @@
     "10": "Need help?",
     "11": "Loading...",
     "12": "Get help with 2-step verification",
-    "13": "Recover 2-step verification",
     "14": "To add a phone number,",
     "15": "To delete this number,",
-    "16": "How should we send you the code?"
+    "16": "How should we send you the code?",
+    "17": "Passkey or security key",
+    "18": "Text me",
+    "19": "Call me",
+    "20": "Verify",
+    "21": "Choose how you want to verify",
+    "22": "To delete a passkey or security key,",
+    "23": "To add a passkey or security key,"
   },
-  "SuccessBanner": {
+  "NoticeFactory": {
+    "notice_title_success": "Success",
     "1": "You have successfully deleted",
     "2": "from your 2-step verification phone numbers",
     "3": "You have successfully added",
@@ -473,8 +481,9 @@
     "5": "voice call",
     "6": "text (SMS)",
     "7": "for passkey verification",
-    "8": "from your 2-step verification passkeys",
-    "9": "You have successfully renamed your passkey to"
+    "8": "Your passkey",
+    "9": "You have successfully renamed your passkey to",
+    "10": "has been deleted from your CanadaLogin"
   },
   "PasswordVerification": {
     "1": "First, verify it’s you",
@@ -536,17 +545,20 @@
     "6": "Register",
     "7": "Add a new passkey you want to use for verification each time you sign in."
   },
-  "SelectFIDO2Passkey": {
-    "heading": "Verify with Passkey",
-    "instruction": "To continue with managing your passkey, please verify your identity using one of your registered passkeys.",
-    "verifying_passkey": "Verifying with your passkey...",
-    "verify_button": "Verify with Passkey",
-    "cancel_button": "Cancel"
+  "VerifyFIDO2Passkey": {
+    "1": "Verify with your passkey",
+    "2": "There will be a pop-up on your device asking for your fingerprint, face, or screen lock.",
+    "3": "Cancel",
+    "4": "Continue",
+    "5": "Problems with your passkey?",
+    "6": "Try another way",
+    "8": "Help with passkey sign in",
+    "9": "Loading..."
   },
   "DeleteFIDO2PasskeyConfirm": {
     "1": "Are you sure you want to delete this passkey?",
-    "2": "You will no longer be able to use",
-    "3": "passkey to sign in.",
+    "2": "You will no longer be able to use your passkey",
+    "3": "to sign in.",
     "4": "This",
     "5": "will not",
     "6": "delete this number from your contact information. To manage your contact phone number, go to",
@@ -555,6 +567,13 @@
     "9": "Yes, delete",
     "10": "Cancel",
     "11": "Loading..."
+  },
+  "DeleteFIDO2PasskeySuccess": {
+    "1": "Remove passkey from your device (optional)",
+    "2": "To ensure your password manager doesn’t prompt for  passkeys, we recommend also",
+    "3": "removing the passkey from your password manager.",
+    "4": "For more information on how to do this, see the help centre of your password manager provider.",
+    "5": "Continue"
   },
   "RenameFIDO2PasskeyPage": {
     "1": "Enter a new passkey name",

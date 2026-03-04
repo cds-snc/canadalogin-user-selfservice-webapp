@@ -75,7 +75,12 @@ export default function EditEmailAddressPage() {
     requestOtpCode,
     validateOtpCode,
     setLocalLoading,
-  } = useOtpOperations(id, userName, setErrorCode, backToProfile);
+  } = useOtpOperations({
+    userId: id,
+    userName,
+    setErrorCode,
+    fallbackNavigationPath: backToProfile,
+  });
 
   // Get user profile dispatch method
   const { updateProfileSuccess } = userProfileDispatch(dispatch);

@@ -320,6 +320,12 @@ function buildMswMapping(mswArray: Array<MSW>) {
               return HttpResponse.json(msw.response);
             }),
           );
+      else if (msw.type === "delete")
+        handlers.push(
+          http.delete(`${config.apiUrl}${msw.endpoint}`, async () => {
+            return HttpResponse.json(msw.response);
+          }),
+        );
     });
 
   return {

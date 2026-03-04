@@ -112,7 +112,7 @@ export const PAGES = {
   deleteMFAPage: "DeleteMFAPage",
   deleteMFAPhoneNumberConfirm: "DeleteMFAPhoneNumberConfirm",
   transientOtpSelection: "TransientOtpSelection",
-  successBanner: "SuccessBanner",
+  noticeFactory: "NoticeFactory",
   passwordVerification: "PasswordVerification",
   editEmailPage: "EditEmailPage",
   editEmailEnterEmail: "EditEmailEnterEmail",
@@ -122,9 +122,10 @@ export const PAGES = {
   addFIDO2PasskeyPage: "AddFIDO2PasskeyPage",
   addFIDO2Passkey: "AddFIDO2Passkey",
   deleteFIDO2PasskeyPage: "DeleteFIDO2PasskeyPage",
-  selectFIDO2Passkey: "SelectFIDO2Passkey",
+  verifyFIDO2Passkey: "VerifyFIDO2Passkey",
   deleteFIDO2PasskeyConfirm: "DeleteFIDO2PasskeyConfirm",
   renameFIDO2PasskeyPage: "RenameFIDO2PasskeyPage",
+  deleteFIDO2PasskeySuccess: "DeleteFIDO2PasskeySuccess",
 };
 
 export const FOOTERS = {

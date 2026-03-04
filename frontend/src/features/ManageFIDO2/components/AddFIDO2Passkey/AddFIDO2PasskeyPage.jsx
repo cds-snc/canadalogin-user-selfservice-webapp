@@ -19,7 +19,7 @@ import { fetchUserFIDO2Credentials } from "../../utils/fetchUserFIDO2Credentials
 import StepContent from "../../../../components/Wizard/StepContent";
 import Loader from "../../../../components/Layout/Loading";
 import AddFIDO2Passkey from "./AddFIDO2Passkey";
-import SelectFIDO2Passkey from "../VerifyFIDO2Passkey/SelectFIDO2Passkey";
+import VerifyFIDO2Passkey from "../VerifyFIDO2Passkey/VerifyFIDO2Passkey";
 
 export default function AddFIDO2PasskeyPage({ step }) {
   const { language } = useParams();
@@ -52,7 +52,12 @@ export default function AddFIDO2PasskeyPage({ step }) {
     handleSetUserOtpValue,
     setLocalLoading,
     setOtpSentResponse,
-  } = useOtpOperations(id, userName, setErrorCode, backToSecuritySettingsPage);
+  } = useOtpOperations({
+    userId: id,
+    userName,
+    setErrorCode,
+    fallbackNavigationPath: backToSecuritySettingsPage,
+  });
 
   // Use the password validation hook with stepup=true for FIDO2 step-up authentication
   // This enables token exchange that stores stepup_token in session
@@ -190,7 +195,7 @@ export default function AddFIDO2PasskeyPage({ step }) {
       />
     ),
     selectFIDO2Passkey: (
-      <SelectFIDO2Passkey
+      <VerifyFIDO2Passkey
         submitAttestationResult={true}
         setErrorCode={setErrorCode}
         onCallback={() => {

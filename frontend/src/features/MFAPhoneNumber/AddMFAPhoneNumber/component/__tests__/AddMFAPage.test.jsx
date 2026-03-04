@@ -331,7 +331,7 @@ describe("AddMFAPage Unit Tests", () => {
           7: "Unexpected API request error message",
           "Some API Error": "Custom API Error Message",
         };
-      if (page === "successBanner")
+      if (page === "noticeFactory")
         return {
           5: "Voice call",
           6: "Text message",
@@ -1712,7 +1712,7 @@ describe("AddMFAPage Unit Tests", () => {
       });
 
       functions.getPageContent.mockImplementation((language, page) => {
-        if (page === "successBanner") return { 5: "Voice", 6: "SMS" };
+        if (page === "noticeFactory") return { 5: "Voice", 6: "SMS" };
         return { 11: "Loading..." };
       });
 
@@ -2308,7 +2308,7 @@ describe("AddMFAPage Unit Tests", () => {
       });
     });
 
-    it("should handle voice OTP type in successBanner mapping", async () => {
+    it("should handle voice OTP type in noticeFactory mapping", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
         data: [{ id: "factor1", type: "voice", destination: "+1234567890" }],
@@ -2327,7 +2327,7 @@ describe("AddMFAPage Unit Tests", () => {
       });
 
       functions.getPageContent.mockImplementation((language, page) => {
-        if (page === "successBanner")
+        if (page === "noticeFactory")
           return { 5: "Voice call", 6: "Text message" };
         return { 11: "Loading..." };
       });
