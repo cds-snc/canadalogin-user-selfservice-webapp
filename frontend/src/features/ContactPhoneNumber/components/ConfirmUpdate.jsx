@@ -14,6 +14,7 @@ import { getPageContent } from "../../../utils/functions.jsx";
 import { PAGES } from "../../../utils/constants";
 import RPNameDisplay from "../../../components/RPInfo/RPNameDisplay.jsx";
 import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
+import { path } from "../../../utils/routeHelpers.js";
 
 export default function ConfirmUpdate({
   onNext,
@@ -28,6 +29,10 @@ export default function ConfirmUpdate({
     language,
     PAGES.confirmContactPhoneNumberUpdate,
   );
+
+  const manage2FAVerificationsPage = path(PAGES.manage2FAVerifications, {
+    language,
+  });
   const onSubmitHandler = async (ev) => {
     ev.preventDefault();
     // Clear error when user clicks
@@ -70,7 +75,7 @@ export default function ConfirmUpdate({
             {pageContentJson["6"]} <strong>{pageContentJson["7"]}</strong>
             <GcdsText>
               {pageContentJson["8"]}{" "}
-              <GcdsLink href="https://accounts.gc.ca/directory">
+              <GcdsLink href={manage2FAVerificationsPage}>
                 {pageContentJson["9"]}
               </GcdsLink>
             </GcdsText>
