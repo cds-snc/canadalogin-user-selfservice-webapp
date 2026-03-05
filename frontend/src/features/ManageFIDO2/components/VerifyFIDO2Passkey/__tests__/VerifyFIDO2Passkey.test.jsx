@@ -232,12 +232,15 @@ describe("VerifyFIDO2Passkey", () => {
     expect(screen.getByText("Work Laptop")).toBeInTheDocument();
   });
 
-  it("calls setAssertionResult with the credential after successful auth", async () => {
-    const setAssertionResult = vi.fn();
-    renderComponent({ setAssertionResult });
+  it("calls authenticateFIDO2Credential with the assertion data after getting options", async () => {
+    renderComponent();
 
     await waitFor(() => {
-      expect(setAssertionResult).toHaveBeenCalledWith(defaultAssertionResult);
+      expect(mockAuthenticateFIDO2Credential).toHaveBeenCalledWith(
+        expect.objectContaining({
+          challenge: "test-challenge",
+        }),
+      );
     });
   });
 

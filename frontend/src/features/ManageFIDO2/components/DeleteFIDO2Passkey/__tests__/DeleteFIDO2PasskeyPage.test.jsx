@@ -23,10 +23,14 @@ import DeleteFIDO2PasskeyPage from "../DeleteFIDO2PasskeyPage";
 // ─── Router ────────────────────────────────────────────────────────────────
 
 const mockNavigate = vi.fn();
+const mockLocation = {
+  state: { passkeyId: "passkey-42", passkeyNickname: "My Passkey" },
+};
 
 vi.mock("react-router", () => ({
   useParams: () => ({ language: "en" }),
   useNavigate: () => mockNavigate,
+  useLocation: () => mockLocation,
 }));
 
 // ─── Utilities ─────────────────────────────────────────────────────────────
@@ -96,8 +100,7 @@ const mockOtpOpsDefaults = {
   userSelectedMfaFactor: { id: "factor-1", type: "sms" },
   userOtpValue: "",
   otpSentResponse: { trxnId: "txn-123" },
-  localLoading: false,
-  fido2Data: [],
+  otpLoading: false,
   handleChangeUserMfaSelection: vi.fn(),
   handleSetUserOtpValue: vi.fn(),
   setOtpSentResponse: vi.fn(),
@@ -107,6 +110,19 @@ const mockUseOtpOperations = vi.fn(() => mockOtpOpsDefaults);
 
 vi.mock("../../../../../hooks/useOtpOperations.js", () => ({
   useOtpOperations: (...args) => mockUseOtpOperations(...args),
+}));
+
+// usePasskeyOperations – configurable per test
+const mockPasskeyOpsDefaults = {
+  fido2Data: [],
+  loading: false,
+  refetch: vi.fn(),
+};
+
+const mockUsePasskeyOperations = vi.fn(() => mockPasskeyOpsDefaults);
+
+vi.mock("../../../../../hooks/usePasskeyOperations.js", () => ({
+  usePasskeyOperations: (...args) => mockUsePasskeyOperations(...args),
 }));
 
 // usePasswordValidation – capture the onSuccess callback for manual invocation
@@ -206,12 +222,11 @@ vi.mock("../../../../TransientOtp/components/OtpVerification", () => ({
 }));
 
 vi.mock("../../VerifyFIDO2Passkey/VerifyFIDO2Passkey", () => ({
-  default: ({ setAssertionResult, onCallback }) => (
+  default: ({ onCallback }) => (
     <div data-testid="step-verifyFIDO2Passkey">
       <button
         data-testid="fido2-verify-callback"
         onClick={() => {
-          setAssertionResult({ id: "assertion-result" });
           onCallback();
         }}
       >
@@ -257,8 +272,13 @@ describe("DeleteFIDO2PasskeyPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockUseOtpOperations.mockReturnValue({ ...mockOtpOpsDefaults });
+    mockUsePasskeyOperations.mockReturnValue({ ...mockPasskeyOpsDefaults });
     mockValidatePasswordLoading.value = false;
     capturedPasswordSuccessCallback = null;
+    mockLocation.state = {
+      passkeyId: "passkey-42",
+      passkeyNickname: "My Passkey",
+    };
   });
 
   // ── Initial render ────────────────────────────────────────────────────
@@ -291,10 +311,10 @@ describe("DeleteFIDO2PasskeyPage", () => {
 
   // ── Loader ────────────────────────────────────────────────────────────
 
-  it("shows Loader when localLoading is true", () => {
+  it("shows Loader when otpLoading is true", () => {
     mockUseOtpOperations.mockReturnValue({
       ...mockOtpOpsDefaults,
-      localLoading: true,
+      otpLoading: true,
     });
     renderPage();
     expect(screen.getByTestId("loader")).toBeInTheDocument();
@@ -313,6 +333,9 @@ describe("DeleteFIDO2PasskeyPage", () => {
     mockUseOtpOperations.mockReturnValue({
       ...mockOtpOpsDefaults,
       userPhoneFactors: [{ id: "factor-1", type: "sms" }],
+    });
+    mockUsePasskeyOperations.mockReturnValue({
+      ...mockPasskeyOpsDefaults,
       fido2Data: [],
     });
     renderPage();
@@ -334,6 +357,9 @@ describe("DeleteFIDO2PasskeyPage", () => {
         { id: "factor-1", type: "sms" },
         { id: "factor-2", type: "voice" },
       ],
+    });
+    mockUsePasskeyOperations.mockReturnValue({
+      ...mockPasskeyOpsDefaults,
       fido2Data: [],
     });
     renderPage();
@@ -350,6 +376,9 @@ describe("DeleteFIDO2PasskeyPage", () => {
     mockUseOtpOperations.mockReturnValue({
       ...mockOtpOpsDefaults,
       userPhoneFactors: [{ id: "factor-1", type: "sms" }],
+    });
+    mockUsePasskeyOperations.mockReturnValue({
+      ...mockPasskeyOpsDefaults,
       fido2Data: [{ id: "passkey-1" }],
     });
     renderPage();
@@ -477,8 +506,9 @@ describe("DeleteFIDO2PasskeyPage", () => {
     );
   });
 
-  it("does not advance on delete when passkeyId or assertionResult is missing", async () => {
-    // Start at confirmation step directly - no selectedPasskey/assertionResult set
+  it("does not advance on delete when passkeyId is missing", async () => {
+    // Simulate arriving at the page with no passkeyId in location state
+    mockLocation.state = null;
     renderPage({ step: "deleteFIDO2PasskeyConfirmation" });
     await userEvent.click(screen.getByTestId("confirm-delete"));
     await waitFor(() =>

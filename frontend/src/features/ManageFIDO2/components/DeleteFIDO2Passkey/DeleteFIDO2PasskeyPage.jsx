@@ -47,7 +47,7 @@ export default function DeleteFIDO2PasskeyPage({ step }) {
     userSelectedMfaFactor,
     userOtpValue,
     otpSentResponse,
-    localLoading,
+    otpLoading: localLoading,
     handleChangeUserMfaSelection,
     handleSetUserOtpValue,
     setOtpSentResponse,

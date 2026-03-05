@@ -51,6 +51,9 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
       {children}
     </button>
   ),
+  GcdsInput: ({ inputId, value, onInput }) => (
+    <input data-testid={inputId} value={value ?? ""} onChange={onInput} />
+  ),
 }));
 
 const makeCredential = (overrides = {}) => ({
@@ -116,7 +119,7 @@ describe("FIDO2PasskeyList", () => {
     expect(screen.getByText("Passkey Three")).toBeInTheDocument();
   });
 
-  it("navigates to the rename page when Rename is clicked", async () => {
+  it("shows inline edit field when Rename is clicked", async () => {
     const credential = makeCredential({
       id: "cred-1",
       attributes: { nickname: "My Key" },
@@ -125,10 +128,12 @@ describe("FIDO2PasskeyList", () => {
 
     await userEvent.click(screen.getByTestId("rename-fido2-button"));
 
-    expect(mockNavigate).toHaveBeenCalledOnce();
-    expect(mockNavigate).toHaveBeenCalledWith("/en/mock-path", {
-      state: { passkeyId: "cred-1", passkeyNickname: "My Key" },
-    });
+    // Should show inline input pre-populated with the nickname
+    expect(screen.getByTestId("passkeyNickname")).toBeInTheDocument();
+    // The rename button should be replaced by a save button
+    expect(screen.queryByTestId("rename-fido2-button")).not.toBeInTheDocument();
+    // Should NOT navigate to a separate page
+    expect(mockNavigate).not.toHaveBeenCalled();
   });
 
   it("navigates to the delete page when Delete is clicked", async () => {
