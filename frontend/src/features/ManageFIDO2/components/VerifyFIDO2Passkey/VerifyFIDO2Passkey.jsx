@@ -18,7 +18,6 @@ import FIDOPasskeyCollage from "../../../../assets/icons/passkey_collage.svg?rea
 import Loader from "../../../../components/Layout/Loading";
 
 export default function VerifyFIDO2Passkey({
-  setAssertionResult,
   setErrorCode,
   onCallback,
   submitAttestationResult = false,
@@ -74,10 +73,7 @@ export default function VerifyFIDO2Passkey({
       // Step 2: Use WebAuthn API to authenticate with the passkey
       const assertionResult = await authenticateFIDO2Credential(assertionData);
 
-      // Step 3: Store assertion result and proceed to confirmation
-      setAssertionResult?.(assertionResult);
-
-      // Step 4 (optional): Submit the assertion result now if needed for immediate verification
+      // Step 3 (optional): Submit the assertion result now if needed for immediate verification
       if (submitAttestationResult) {
         await fido2Api.submitAssertionResult(assertionResult);
       }

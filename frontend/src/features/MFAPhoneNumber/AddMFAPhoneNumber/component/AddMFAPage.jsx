@@ -72,11 +72,11 @@ export default function AddMFAPage() {
     userSelectedMfaFactor,
     userOtpValue,
     otpSentResponse,
-    localLoading,
+    otpLoading: localLoading,
     phoneFactorsMap: userPhoneFactorsMap,
     handleChangeUserMfaSelection,
     handleSetUserOtpValue,
-    setLocalLoading,
+    setOtpLoading: setLocalLoading,
     setOtpSentResponse,
   } = useOtpOperations({
     userId: id,

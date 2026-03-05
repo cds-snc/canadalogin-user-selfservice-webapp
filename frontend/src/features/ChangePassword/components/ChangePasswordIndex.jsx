@@ -65,10 +65,10 @@ export default function ChangePasswordIndex() {
     userPhoneFactors,
     userSelectedMfaFactor,
     userOtpValue,
-    localLoading,
+    otpLoading: localLoading,
     handleChangeUserMfaSelection,
     handleSetUserOtpValue,
-    setLocalLoading,
+    setOtpLoading: setLocalLoading,
   } = useOtpOperations({
     userId: id,
     userName,

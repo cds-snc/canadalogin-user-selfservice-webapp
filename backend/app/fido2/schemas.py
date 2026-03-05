@@ -99,7 +99,9 @@ class FIDO2AssertionResultRequest(BaseModel):
 
 
 class DeleteRegistrationRequest(BaseModel):
-    """Request model for deleting a FIDO2 registration with FIDO2 verification"""
+    """Request model for deleting a FIDO2 registration"""
 
     id: str  # ID of the passkey to delete
-    assertionResult: FIDO2AssertionResultRequest  # FIDO2 authentication proof
+    assertionResult: Optional[FIDO2AssertionResultRequest] = (
+        None  # FIDO2 authentication proof (optional if OTP-verified)
+    )

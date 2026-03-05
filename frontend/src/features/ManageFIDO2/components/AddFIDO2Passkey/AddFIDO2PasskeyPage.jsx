@@ -47,10 +47,10 @@ export default function AddFIDO2PasskeyPage({ step }) {
     userSelectedMfaFactor,
     userOtpValue,
     otpSentResponse,
-    localLoading,
+    otpLoading: localLoading,
     handleChangeUserMfaSelection,
     handleSetUserOtpValue,
-    setLocalLoading,
+    setOtpLoading: setLocalLoading,
     setOtpSentResponse,
   } = useOtpOperations({
     userId: id,
