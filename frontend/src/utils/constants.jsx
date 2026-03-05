@@ -130,8 +130,8 @@ export const PAGES = {
 
 export const FOOTERS = {
   default: {
-    en: '{ "About CanadaLogin": "https://gc-signin.cdssandbox.xyz/en/", "Help": "https://gc-signin.cdssandbox.xyz/en/", "Terms": "https://gc-signin.cdssandbox.xyz/en/" }',
-    fr: '{ "À propos de ConnexionCanada": "https://gc-signin.cdssandbox.xyz/en/", "Aide": "https://gc-signin.cdssandbox.xyz/fr/", "Avis": "https://gc-signin.cdssandbox.xyz/en/" }',
+    en: '{ "About CanadaLogin": "https://gc-signin.cdssandbox.xyz/en/users/what-is-canadalogin/", "Help": "https://gc-signin.cdssandbox.xyz/en/users/", "Terms": "https://gc-signin.cdssandbox.xyz/en/terms/" }',
+    fr: '{ "À propos de ConnexionCanada": "https://gc-signin.cdssandbox.xyz/fr/utilisateurs/a-propos/", "Aide": "https://gc-signin.cdssandbox.xyz/fr/utilisateurs/", "Avis": "https://gc-signin.cdssandbox.xyz/fr/utilisateurs/avis/" }',
   },
 };
 
