@@ -7,7 +7,8 @@
  * - Displaying nickname and created-on date (date only, no time)
  * - Navigation on Rename and Delete button clicks
  */
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
+import { fido2Api } from "../../../../features/ManageFIDO2/api/fido2Api.jsx";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import "@testing-library/jest-dom/vitest";
@@ -20,11 +21,19 @@ vi.mock("react-router", () => ({
   useNavigate: () => mockNavigate,
 }));
 
+vi.mock("../../../../features/ManageFIDO2/api/fido2Api.jsx", () => ({
+  fido2Api: {
+    updateRegistration: vi.fn(),
+  },
+}));
+
 vi.mock("../../../../utils/functions.jsx", () => ({
   getPageContent: () => ({
     13: "Delete",
     14: "Rename",
     16: "Created on ",
+    22: "Save",
+    error_rename_credential: "Error renaming credential",
   }),
 }));
 
@@ -46,13 +55,22 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
   ),
   GcdsText: ({ children }) => <p data-testid="gcds-text">{children}</p>,
   GcdsGrid: ({ children }) => <div data-testid="gcds-grid">{children}</div>,
-  GcdsButton: ({ children, onGcdsClick, onClick, id }) => (
-    <button data-testid={id} onClick={onGcdsClick ?? onClick}>
+  GcdsButton: ({ children, onGcdsClick, onClick, id, disabled }) => (
+    <button
+      data-testid={id}
+      onClick={onGcdsClick ?? onClick}
+      disabled={disabled}
+    >
       {children}
     </button>
   ),
-  GcdsInput: ({ inputId, value, onInput }) => (
-    <input data-testid={inputId} value={value ?? ""} onChange={onInput} />
+  GcdsInput: ({ inputId, value, onInput, errorMessage }) => (
+    <>
+      <input data-testid={inputId} value={value ?? ""} onChange={onInput} />
+      {errorMessage && (
+        <span data-testid={`${inputId}-error`}>{errorMessage}</span>
+      )}
+    </>
   ),
 }));
 
@@ -170,5 +188,172 @@ describe("FIDO2PasskeyList", () => {
     ];
     render(<FIDO2PasskeyList userFIDO2CredentialsData={credentials} />);
     expect(screen.getAllByTestId("gcds-container")).toHaveLength(2);
+  });
+});
+
+describe("FIDO2PasskeyList — inline rename (Save) flow", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(fido2Api.updateRegistration).mockResolvedValue({ success: true });
+  });
+
+  const credential = makeCredential({
+    id: "cred-1",
+    attributes: { nickname: "My Key" },
+  });
+
+  it("pre-populates the input with the current nickname when editing starts", async () => {
+    render(<FIDO2PasskeyList userFIDO2CredentialsData={[credential]} />);
+    await userEvent.click(screen.getByTestId("rename-fido2-button"));
+    expect(screen.getByTestId("passkeyNickname")).toHaveValue("My Key");
+  });
+
+  it("updates the input value as the user types", async () => {
+    const user = userEvent.setup();
+    render(<FIDO2PasskeyList userFIDO2CredentialsData={[credential]} />);
+    await user.click(screen.getByTestId("rename-fido2-button"));
+    const input = screen.getByTestId("passkeyNickname");
+    await user.clear(input);
+    await user.type(input, "New Name");
+    expect(input).toHaveValue("New Name");
+  });
+
+  it("calls fido2Api.updateRegistration with the passkey id and nickname", async () => {
+    render(
+      <FIDO2PasskeyList
+        userFIDO2CredentialsData={[credential]}
+        onRenameSuccess={vi.fn()}
+      />,
+    );
+    await userEvent.click(screen.getByTestId("rename-fido2-button"));
+    await userEvent.click(screen.getByTestId("save-fido2-button"));
+    await waitFor(() =>
+      expect(fido2Api.updateRegistration).toHaveBeenCalledWith("cred-1", {
+        nickname: "My Key",
+      }),
+    );
+  });
+
+  it("calls onRenameSuccess after a successful save", async () => {
+    const onRenameSuccess = vi.fn();
+    render(
+      <FIDO2PasskeyList
+        userFIDO2CredentialsData={[credential]}
+        onRenameSuccess={onRenameSuccess}
+      />,
+    );
+    await userEvent.click(screen.getByTestId("rename-fido2-button"));
+    await userEvent.click(screen.getByTestId("save-fido2-button"));
+    await waitFor(() => expect(onRenameSuccess).toHaveBeenCalledOnce());
+  });
+
+  it("exits editing mode (hides input, shows Rename button) after a successful save", async () => {
+    render(<FIDO2PasskeyList userFIDO2CredentialsData={[credential]} />);
+    await userEvent.click(screen.getByTestId("rename-fido2-button"));
+    expect(screen.getByTestId("passkeyNickname")).toBeInTheDocument();
+
+    await userEvent.click(screen.getByTestId("save-fido2-button"));
+
+    await waitFor(() => {
+      expect(screen.queryByTestId("passkeyNickname")).not.toBeInTheDocument();
+      expect(screen.getByTestId("rename-fido2-button")).toBeInTheDocument();
+    });
+  });
+
+  it("does NOT call onRenameSuccess when the rename API returns a failure response", async () => {
+    vi.mocked(fido2Api.updateRegistration).mockResolvedValue({
+      success: false,
+    });
+    const onRenameSuccess = vi.fn();
+    render(
+      <FIDO2PasskeyList
+        userFIDO2CredentialsData={[credential]}
+        onRenameSuccess={onRenameSuccess}
+      />,
+    );
+    await userEvent.click(screen.getByTestId("rename-fido2-button"));
+    await userEvent.click(screen.getByTestId("save-fido2-button"));
+    // Editing always closes after the API call completes
+    await waitFor(() =>
+      expect(screen.queryByTestId("passkeyNickname")).not.toBeInTheDocument(),
+    );
+    expect(onRenameSuccess).not.toHaveBeenCalled();
+  });
+
+  it("does NOT call onRenameSuccess when the rename API rejects", async () => {
+    vi.mocked(fido2Api.updateRegistration).mockRejectedValue(
+      new Error("Network error"),
+    );
+    const onRenameSuccess = vi.fn();
+    render(
+      <FIDO2PasskeyList
+        userFIDO2CredentialsData={[credential]}
+        onRenameSuccess={onRenameSuccess}
+      />,
+    );
+    await userEvent.click(screen.getByTestId("rename-fido2-button"));
+    await userEvent.click(screen.getByTestId("save-fido2-button"));
+    // Editing always closes after the API call completes
+    await waitFor(() =>
+      expect(screen.queryByTestId("passkeyNickname")).not.toBeInTheDocument(),
+    );
+    expect(onRenameSuccess).not.toHaveBeenCalled();
+  });
+
+  it("does NOT call onRenameSuccess when the API fails", async () => {
+    vi.mocked(fido2Api.updateRegistration).mockResolvedValue({
+      success: false,
+    });
+    const onRenameSuccess = vi.fn();
+    render(
+      <FIDO2PasskeyList
+        userFIDO2CredentialsData={[credential]}
+        onRenameSuccess={onRenameSuccess}
+      />,
+    );
+    await userEvent.click(screen.getByTestId("rename-fido2-button"));
+    await userEvent.click(screen.getByTestId("save-fido2-button"));
+    // Wait for editing to close (async API has settled)
+    await waitFor(() =>
+      expect(screen.getByTestId("rename-fido2-button")).toBeInTheDocument(),
+    );
+    expect(onRenameSuccess).not.toHaveBeenCalled();
+  });
+
+  it("Save button is disabled while the API call is in progress", async () => {
+    // Keep the promise pending so we can observe the disabled state
+    let resolveRename;
+    vi.mocked(fido2Api.updateRegistration).mockImplementation(
+      () => new Promise((res) => (resolveRename = res)),
+    );
+
+    render(<FIDO2PasskeyList userFIDO2CredentialsData={[credential]} />);
+    await userEvent.click(screen.getByTestId("rename-fido2-button"));
+    await userEvent.click(screen.getByTestId("save-fido2-button"));
+
+    expect(screen.getByTestId("save-fido2-button")).toBeDisabled();
+
+    // Resolve so we don't leave dangling promises
+    resolveRename({ success: true });
+  });
+
+  it("Save button calls updateRegistration with trimmed nickname", async () => {
+    const user = userEvent.setup();
+    render(
+      <FIDO2PasskeyList
+        userFIDO2CredentialsData={[credential]}
+        onRenameSuccess={vi.fn()}
+      />,
+    );
+    await user.click(screen.getByTestId("rename-fido2-button"));
+    const input = screen.getByTestId("passkeyNickname");
+    await user.clear(input);
+    await user.type(input, "  Trimmed  ");
+    await user.click(screen.getByTestId("save-fido2-button"));
+    await waitFor(() =>
+      expect(fido2Api.updateRegistration).toHaveBeenCalledWith("cred-1", {
+        nickname: "Trimmed",
+      }),
+    );
   });
 });
