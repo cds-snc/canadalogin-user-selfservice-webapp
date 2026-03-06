@@ -120,6 +120,7 @@ export default function OtpSelection({
                 >
                   <GcdsText marginBottom="0">{factor.destination}</GcdsText>
                   <GcdsLink
+                    size="regular"
                     role="button"
                     onGcdsClick={() => handlePhoneFactorSelect(factor.id)}
                   >
@@ -152,6 +153,7 @@ export default function OtpSelection({
                 >
                   <GcdsText marginBottom="0">{factor.destination}</GcdsText>
                   <GcdsLink
+                    size="regular"
                     role="button"
                     onGcdsClick={() => handlePhoneFactorSelect(factor.id)}
                   >
@@ -183,6 +185,7 @@ export default function OtpSelection({
                     {passkey.attributes?.nickname ?? passkey.id}
                   </GcdsText>
                   <GcdsLink
+                    size="regular"
                     role="button"
                     onGcdsClick={() => onSelectFIDO2 && onSelectFIDO2(passkey)}
                   >
