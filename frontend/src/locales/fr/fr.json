@@ -408,7 +408,8 @@
     "18": "What are passkeys?",
     "19": "Passkeys are encrypted digital keys you create using your fingerprint, face, or screen lock.",
     "20": "Where are passkeys saved?",
-    "21": "Passkeys are often saved to your password manager, so you can sign in on other devices. Sometimes they are saved directly to your device."
+    "21": "Passkeys are often saved to your password manager, so you can sign in on other devices. Sometimes they are saved directly to your device.",
+    "22": "Save"
   },
   "AddMFANumber": {
     "1": "Entrez votre nouveau numéro de téléphone",
@@ -589,13 +590,5 @@
     "3": "removing the passkey from your password manager.",
     "4": "For more information on how to do this, see the help centre of your password manager provider.",
     "5": "Continue"
-  },
-  "RenameFIDO2PasskeyPage": {
-    "1": "Enter a new passkey name",
-    "2": "Give your security key a name to help you identify it later.",
-    "3": "Passkey name",
-    "4": "e.g., My YubiKey",
-    "5": "Renaming...",
-    "6": "Rename"
   }
 }

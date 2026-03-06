@@ -3,10 +3,7 @@ import { Navigate } from "react-router";
 import RootLayout from "./components/Layout/RootLayout.jsx";
 import { AppLanguageSetup } from "./components/Providers/AppLanguageSetup";
 import { LanguageProvider } from "./components/Providers/LanguageProvider";
-import {
-  PrivateRoute,
-  StepupPrivateRoute,
-} from "./components/Providers/PrivateRoute.jsx";
+import { PrivateRoute } from "./components/Providers/PrivateRoute.jsx";
 import { UserProvider } from "./components/Providers/UserProvider";
 
 import EditLanguagePreferencePage from "./features/LanguagePreference/components/EditLanguagePreferencePage.jsx";
@@ -15,7 +12,6 @@ import ProfileHome from "./components/Manage/ProfileHome.jsx";
 import Manage2FAVerifications from "./components/Manage/SecuritySettings/Manage2FAVerifications.jsx";
 import SecuritySettings from "./components/Manage/SecuritySettings/SecuritySettings.jsx";
 import EditProfileNamePage from "./features/ProfileName/components/EditProfileNamePage.jsx";
-import Verification from "./components/Verification/Verification.jsx";
 import ChangePasswordIndex from "./features/ChangePassword/components/ChangePasswordIndex.jsx";
 import EditContactPhoneNumberPage from "./features/ContactPhoneNumber/components/EditContactPhoneNumberPage.jsx";
 import AddMFAPage from "./features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPage.jsx";
@@ -24,7 +20,6 @@ import { PAGES } from "./utils/constants.jsx";
 import EditEmailAddressPage from "./features/EmailAddress/EditEmailAddressPage.jsx";
 import AddFIDO2PasskeyPage from "./features/ManageFIDO2/components/AddFIDO2Passkey/AddFIDO2PasskeyPage.jsx";
 import DeleteFIDO2PasskeyPage from "./features/ManageFIDO2/components/DeleteFIDO2Passkey/DeleteFIDO2PasskeyPage.jsx";
-import { RenameFIDO2PasskeyPage } from "./features/ManageFIDO2/components/RenameFIDO2Passkey/RenameFIDO2PasskeyPage.jsx";
 
 export const appRoutes = [
   {
@@ -123,19 +118,9 @@ export const appRoutes = [
                         element: <DeleteFIDO2PasskeyPage />,
                         handle: { id: PAGES.deleteFIDO2PasskeyPage },
                       },
-                      {
-                        path: "rename-fido2",
-                        element: <RenameFIDO2PasskeyPage />,
-                        handle: { id: PAGES.renameFIDO2PasskeyPage },
-                      },
                     ],
                   },
                 ],
-              },
-              {
-                path: "verification",
-                element: <Verification />,
-                handle: { id: PAGES.verification },
               },
             ],
           },

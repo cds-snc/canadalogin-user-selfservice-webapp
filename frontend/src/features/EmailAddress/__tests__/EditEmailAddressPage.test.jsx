@@ -167,7 +167,7 @@ vi.mock("../../../hooks/useOtpOperations", () => ({
     userSelectedMfaFactor: null,
     userOtpValue: "123456", // Provide a mock OTP value
     otpSentResponse: { trxnId: "mock-transaction-id" }, // Mock transaction ID
-    localLoading: false,
+    otpLoading: false,
     handleChangeUserMfaSelection: vi.fn(),
     handleSetUserOtpValue: vi.fn(),
     requestOtpCode: vi
@@ -178,7 +178,7 @@ vi.mock("../../../hooks/useOtpOperations", () => ({
         callback({ success: true });
       }
     },
-    setLocalLoading: vi.fn(),
+    setOtpLoading: vi.fn(),
   }),
 }));
 

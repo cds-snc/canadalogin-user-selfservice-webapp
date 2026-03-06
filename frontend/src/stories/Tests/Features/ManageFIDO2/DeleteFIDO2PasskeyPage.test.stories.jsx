@@ -288,6 +288,7 @@ export const CompleteDeleteViaFIDO2Passkey = (() => {
     "",
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.profile },
     [...coreEndpoints(passkeyData), ...fido2AssertionEndpoints],
+    { passkeyId: "passkey-1", passkeyNickname: "Work Laptop" },
   );
 
   return {

@@ -276,13 +276,13 @@ describe("AddMFAPage Unit Tests", () => {
       userSelectedMfaFactor: { type: "sms" },
       userOtpValue: "",
       otpSentResponse: { trxnId: "mock-trxn-id" },
-      localLoading: false,
+      otpLoading: false,
       phoneFactorsMap: {}, // Empty map so add-second-mfa step is shown
       handleChangeUserMfaSelection: vi.fn(),
       handleSetUserOtpValue: vi.fn(),
       setUserPhoneFactors: vi.fn(),
       setUserSelectedMfaFactor: vi.fn(),
-      setLocalLoading: vi.fn(),
+      setOtpLoading: vi.fn(),
       setOtpSentResponse: vi.fn(),
     });
 

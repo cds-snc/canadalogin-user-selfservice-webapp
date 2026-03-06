@@ -35,24 +35,29 @@ async def delete_registration(
         tenant_url = get_tenant_url()
         registration_id = request_data.id
 
-        # Step 1: Verify FIDO2 authentication
-        logger.info("Verifying FIDO2 authentication before deletion")
-        assertion_response = await submit_assertion_result(
-            request=request,
-            http_client=http_client,
-            user_access_token=user_access_token,
-            request_body=request_data.assertionResult,
-            return_jwt=False,
-        )
-
-        if not assertion_response.success:
-            logger.error("FIDO2 authentication failed")
-            return ResponseModel(
-                success=False,
-                message="FIDO2 authentication required to delete passkey",
+        # Step 1: Verify FIDO2 authentication (only when an assertion result is provided)
+        if request_data.assertionResult is not None:
+            logger.info("Verifying FIDO2 authentication before deletion")
+            assertion_response = await submit_assertion_result(
+                request=request,
+                http_client=http_client,
+                user_access_token=user_access_token,
+                request_body=request_data.assertionResult,
+                return_jwt=False,
             )
 
-        logger.info("FIDO2 authentication verified successfully")
+            if not assertion_response.success:
+                logger.error("FIDO2 authentication failed")
+                return ResponseModel(
+                    success=False,
+                    message="FIDO2 authentication required to delete passkey",
+                )
+
+            logger.info("FIDO2 authentication verified successfully")
+        else:
+            logger.info(
+                "No assertionResult provided — skipping FIDO2 verification (OTP-verified flow)"
+            )
 
         # Step 2: Get user ID from the token using userinfo endpoint
         _username, _display_name, user_id = await get_user_profile_info(

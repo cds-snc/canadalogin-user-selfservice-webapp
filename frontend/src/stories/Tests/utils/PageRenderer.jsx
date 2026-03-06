@@ -11,7 +11,6 @@ import Manage2FAVerifications from "../../../components/Manage/SecuritySettings/
 import EditLanguagePreferences from "../../../features/LanguagePreference/components/EditLanguagePreferences.jsx";
 import ConfirmLanguageUpdate from "../../../features/LanguagePreference/components/ConfirmUpdate.jsx";
 import SuccessfullyUpdatedLanguage from "../../../features/LanguagePreference/components/SuccessfullyUpdated.jsx";
-import Verification from "../../../components/Verification/Verification.jsx";
 import DeleteMFAPage from "../../../features/MFAPhoneNumber/DeleteMFAPhoneNumber/component/DeleteMFAPage.jsx";
 import DeleteMFAPhoneNumberConfirm from "../../../features/MFAPhoneNumber/DeleteMFAPhoneNumber/component/DeleteMFAPhoneNumberConfirm.jsx";
 import AddMFAPage from "../../../features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPage.jsx";
@@ -42,8 +41,6 @@ const PageRenderer = ({ page, ...props }) => {
       return <ConfirmLanguageUpdate />;
     case PAGES.successfullyUpdatedLanguage:
       return <SuccessfullyUpdatedLanguage />;
-    case PAGES.verification:
-      return <Verification />;
     case PAGES.deleteMFAPage:
       return <DeleteMFAPage />;
     case PAGES.deleteMFAPhoneNumberConfirm:

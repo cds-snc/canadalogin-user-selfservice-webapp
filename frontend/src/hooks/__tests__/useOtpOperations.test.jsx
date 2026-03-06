@@ -81,7 +81,7 @@ describe("useOtpOperations", () => {
       expect(result.current.otpSentResponse).toBeNull();
       expect(result.current.userOtpValue).toBe("");
       // No userId provided → otpLoading initialises to false
-      expect(result.current.localLoading).toBe(false);
+      expect(result.current.otpLoading).toBe(false);
     });
 
     it("should fetch user phone factors when userId is provided", async () => {
@@ -97,7 +97,7 @@ describe("useOtpOperations", () => {
       );
 
       await waitFor(() => {
-        expect(result.current.localLoading).toBe(false);
+        expect(result.current.otpLoading).toBe(false);
       });
 
       expect(mockGetUserOtpPhoneFactors).toHaveBeenCalled();
@@ -139,7 +139,7 @@ describe("useOtpOperations", () => {
       );
 
       await waitFor(() => {
-        expect(result.current.localLoading).toBe(false);
+        expect(result.current.otpLoading).toBe(false);
       });
 
       expect(result.current.userPhoneFactors).toEqual([
@@ -179,7 +179,7 @@ describe("useOtpOperations", () => {
       );
 
       await waitFor(() => {
-        expect(result.current.localLoading).toBe(false);
+        expect(result.current.otpLoading).toBe(false);
       });
 
       expect(mockNavigate).toHaveBeenCalledWith("/fallback-path");
@@ -236,7 +236,7 @@ describe("useOtpOperations", () => {
       );
 
       await waitFor(() => {
-        expect(result.current.localLoading).toBe(false);
+        expect(result.current.otpLoading).toBe(false);
       });
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
@@ -649,14 +649,14 @@ describe("useOtpOperations", () => {
         result.current.setUserSelectedMfaFactor(newSelectedFactor);
         result.current.setOtpSentResponse(newOtpResponse);
         result.current.setUserOtpValue("654321");
-        result.current.setLocalLoading(true);
+        result.current.setOtpLoading(true);
       });
 
       expect(result.current.userPhoneFactors).toEqual(newPhoneFactors);
       expect(result.current.userSelectedMfaFactor).toEqual(newSelectedFactor);
       expect(result.current.otpSentResponse).toEqual(newOtpResponse);
       expect(result.current.userOtpValue).toBe("654321");
-      expect(result.current.localLoading).toBe(true);
+      expect(result.current.otpLoading).toBe(true);
     });
   });
 

@@ -211,9 +211,14 @@ export const buildTestCase = {
     navigationLink: string,
     pathParams: PathParams,
     mswArray: Array<MSW>,
+    locationState?: Record<string, unknown>,
   ) => {
     const routingPath = buildPath(pathParams, navigationLink);
-    const reactRoutingParameters = buildRoutingParams(pathParams, routingPath);
+    const reactRoutingParameters = buildRoutingParams(
+      pathParams,
+      routingPath,
+      locationState,
+    );
     const mswResponse = buildMswMapping(mswArray);
 
     return {
@@ -233,11 +238,13 @@ function buildPath(pathParams: PathParams, navigationLink: string) {
 function buildRoutingParams(
   pathParams: PathParams,
   routingPath: { path: string },
+  locationState?: Record<string, unknown>,
 ) {
   return {
     reactRouter: reactRouterParameters({
       location: {
         pathParams: { ...pathParams },
+        ...(locationState ? { state: locationState } : {}),
       },
       routing: routingPath,
     }),

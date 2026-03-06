@@ -301,7 +301,7 @@ describe("DeleteMFAPage", () => {
       userSelectedMfaFactor: null,
       userOtpValue: "",
       otpSentResponse: null,
-      localLoading: false, // Default to false for most tests
+      otpLoading: false, // Default to false for most tests
       handleChangeUserMfaSelection: vi.fn(),
       handleSetUserOtpValue: vi.fn(),
       requestOtpCode: vi.fn(),
@@ -333,7 +333,7 @@ describe("DeleteMFAPage", () => {
         userSelectedMfaFactor: null,
         userOtpValue: "",
         otpSentResponse: null,
-        localLoading: true, // Set loading to true for this specific test
+        otpLoading: true, // Set loading to true for this specific test
         handleChangeUserMfaSelection: vi.fn(),
         handleSetUserOtpValue: vi.fn(),
         requestOtpCode: vi.fn(),
@@ -366,7 +366,7 @@ describe("DeleteMFAPage", () => {
           userSelectedMfaFactor: null,
           userOtpValue: "",
           otpSentResponse: null,
-          localLoading: false,
+          otpLoading: false,
           handleChangeUserMfaSelection: vi.fn(),
           handleSetUserOtpValue: vi.fn(),
           requestOtpCode: vi.fn(),
@@ -402,7 +402,7 @@ describe("DeleteMFAPage", () => {
           userSelectedMfaFactor: null,
           userOtpValue: "",
           otpSentResponse: null,
-          localLoading: false,
+          otpLoading: false,
           handleChangeUserMfaSelection: vi.fn(),
           handleSetUserOtpValue: vi.fn(),
           requestOtpCode: vi.fn(),
@@ -462,7 +462,7 @@ describe("DeleteMFAPage", () => {
         userSelectedMfaFactor: null,
         userOtpValue: "",
         otpSentResponse: null,
-        localLoading: false,
+        otpLoading: false,
         handleChangeUserMfaSelection: vi.fn(),
         handleSetUserOtpValue: vi.fn(),
         requestOtpCode: vi.fn(),
@@ -520,7 +520,7 @@ describe("DeleteMFAPage", () => {
           userSelectedMfaFactor: null,
           userOtpValue: "",
           otpSentResponse: null,
-          localLoading: false,
+          otpLoading: false,
           handleChangeUserMfaSelection: vi.fn(),
           handleSetUserOtpValue: vi.fn(),
           requestOtpCode: vi.fn(),
@@ -558,7 +558,7 @@ describe("DeleteMFAPage", () => {
         userSelectedMfaFactor: null,
         userOtpValue: "",
         otpSentResponse: null,
-        localLoading: false, // Important: not loading
+        otpLoading: false, // Important: not loading
         handleChangeUserMfaSelection: vi.fn(),
         handleSetUserOtpValue: vi.fn(),
         requestOtpCode: vi.fn(),
@@ -610,7 +610,7 @@ describe("DeleteMFAPage", () => {
         userSelectedMfaFactor: null,
         userOtpValue: "",
         otpSentResponse: null,
-        localLoading: false, // Important: not loading
+        otpLoading: false, // Important: not loading
         handleChangeUserMfaSelection: vi.fn(),
         handleSetUserOtpValue: vi.fn(),
         requestOtpCode: vi.fn(),
@@ -714,7 +714,7 @@ describe("DeleteMFAPage", () => {
         },
         userOtpValue: "",
         otpSentResponse: { trxnId: "test-trxn-id" },
-        localLoading: false,
+        otpLoading: false,
         handleChangeUserMfaSelection: vi.fn(),
         handleSetUserOtpValue: vi.fn(),
         requestOtpCode: mockRequestOtpCode,
@@ -798,7 +798,7 @@ describe("DeleteMFAPage", () => {
         userSelectedMfaFactor: null,
         userOtpValue: "",
         otpSentResponse: null,
-        localLoading: false,
+        otpLoading: false,
         handleChangeUserMfaSelection: vi.fn(),
         handleSetUserOtpValue: vi.fn(),
         requestOtpCode: vi.fn(),
@@ -847,7 +847,7 @@ describe("DeleteMFAPage", () => {
         userSelectedMfaFactor: null,
         userOtpValue: "",
         otpSentResponse: null,
-        localLoading: false,
+        otpLoading: false,
         handleChangeUserMfaSelection: vi.fn(),
         handleSetUserOtpValue: vi.fn(),
         requestOtpCode: vi.fn(),

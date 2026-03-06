@@ -61,7 +61,7 @@ export default function DeleteMFAPage() {
     userSelectedMfaFactor,
     userOtpValue,
     otpSentResponse,
-    localLoading,
+    otpLoading: localLoading,
     handleChangeUserMfaSelection,
     handleSetUserOtpValue,
     requestOtpCode,

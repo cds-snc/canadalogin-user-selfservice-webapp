@@ -10,6 +10,7 @@ import {
   MAP_TYPES,
   useOtpOperations,
 } from "../../../hooks/useOtpOperations.js";
+import { usePasskeyOperations } from "../../../hooks/usePasskeyOperations.js";
 import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants.jsx";
 import { getPageContent } from "../../../utils/functions.jsx";
 import { path } from "../../../utils/routeHelpers.js";
@@ -65,21 +66,25 @@ export default function Manage2FAVerifications() {
   // externalLoading is initialised to !!DEV_ONLY_FEATURE so that localLoading
   // starts true from the very first render when the FIDO2 fetch will run,
   // preventing a flash of un-loaded content before the useEffect fires.
+  const { phoneFactorsMap: userPhoneFactorsMap, otpLoading: localLoading } =
+    useOtpOperations({
+      userId: state.userProfile.id,
+      userName: state.userProfile.userName,
+      setErrorCode: () => {}, // No error code setter needed
+      fallbackNavigationPath: backToSecuritySettingsPage,
+      mapType: MAP_TYPES.fullPhoneNumber,
+    });
+
   const {
-    phoneFactorsMap: userPhoneFactorsMap,
-    localLoading,
     fido2Data: userFIDO2CredentialsData,
-  } = useOtpOperations({
-    userId: state.userProfile.id,
-    userName: state.userProfile.userName,
-    setErrorCode: () => {}, // No error code setter needed
-    fallbackNavigationPath: backToSecuritySettingsPage,
-    mapType: MAP_TYPES.fullPhoneNumber,
-    externalLoading: DEV_ONLY_FEATURE,
-    fetchFIDO2Passkeys: DEV_ONLY_FEATURE,
+    loading: passkeyLoading,
+    refetch: refetchPasskeys,
+  } = usePasskeyOperations({
+    enabled: DEV_ONLY_FEATURE,
+    setErrorCode: () => {},
   });
 
-  return localLoading ? (
+  return localLoading || passkeyLoading ? (
     <Loader text={pageContent["11"]} />
   ) : (
     <GcdsContainer>
@@ -159,6 +164,7 @@ export default function Manage2FAVerifications() {
           )}
           <FIDO2PasskeyList
             userFIDO2CredentialsData={userFIDO2CredentialsData}
+            onRenameSuccess={refetchPasskeys}
           />
           <GcdsButton
             id="add-fido2-button"
