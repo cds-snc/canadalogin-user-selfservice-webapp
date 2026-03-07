@@ -12,10 +12,9 @@ export const LANGUAGE_DISPLAY_NAMES = {
 export const EXTERNAL_NAVIGATION_LINKS = {
   gcAccountDirectory:
     "https://www.canada.ca/en/government/sign-in-online-account.html",
-    // To do: update to production URLs once we have prod domain for website
+  // To do: update to production URLs once we have prod domain for website
   websiteStagingEN: "https://login.alpha.canada.ca/en",
   websiteStagingFR: "https://connexion.alpha.canada.ca/fr",
-
 };
 export const OIDC_REDIRECT = {
   login: `${config.apiUrl}/v1/auth/login`,
