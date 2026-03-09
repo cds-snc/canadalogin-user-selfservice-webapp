@@ -267,3 +267,11 @@ body,
 .warning-icon {
   color: var(--gcds-color-red-flag);
 }
+
+.passkey-steps {
+  padding-inline-start: 1.25rem;
+}
+
+.passkey-steps li::marker {
+  font-weight: bold;
+}

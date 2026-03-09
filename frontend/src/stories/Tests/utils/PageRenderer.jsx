@@ -19,6 +19,7 @@ import EditContactPhoneNumberPage from "../../../features/ContactPhoneNumber/com
 import ChangePasswordIndex from "../../../features/ChangePassword/components/ChangePasswordIndex.jsx";
 import EditEmailAddressPage from "../../../features/EmailAddress/EditEmailAddressPage.jsx";
 import DeleteFIDO2PasskeyPage from "../../../features/ManageFIDO2/components/DeleteFIDO2Passkey/DeleteFIDO2PasskeyPage.jsx";
+import AddFIDO2PasskeyPage from "../../../features/ManageFIDO2/components/AddFIDO2Passkey/AddFIDO2PasskeyPage.jsx";
 
 // Storybook Page Renderer - maps page names to components for testing
 const PageRenderer = ({ page, ...props }) => {
@@ -64,6 +65,8 @@ const PageRenderer = ({ page, ...props }) => {
       return <EditEmailAddressPage />;
     case PAGES.deleteFIDO2PasskeyPage:
       return <DeleteFIDO2PasskeyPage />;
+    case PAGES.addFIDO2PasskeyPage:
+      return <AddFIDO2PasskeyPage />;
     default:
       console.warn(`Unknown page in Storybook: ${page}`);
       return <div>Storybook: Page not found: {page}</div>;

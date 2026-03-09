@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { path } from "../../../../utils/routeHelpers";
 import {
   INVALID_OTP_ERROR_CODES,
+  NOTICE_TYPES,
   PAGES,
   serverMapping,
 } from "../../../../utils/constants";
@@ -15,11 +16,17 @@ import OtpSelection from "../../../TransientOtp/components/OtpSelection";
 import OtpVerification from "../../../TransientOtp/components/OtpVerification";
 import { authService } from "../../../../services/authService";
 import { getPageContent } from "../../../../utils/functions";
-import { fetchUserFIDO2Credentials } from "../../utils/fetchUserFIDO2Credentials";
 import StepContent from "../../../../components/Wizard/StepContent";
 import Loader from "../../../../components/Layout/Loading";
 import AddFIDO2Passkey from "./AddFIDO2Passkey";
+import AddFIDO2PasskeyNickname from "./AddFIDO2PasskeyNickname";
 import VerifyFIDO2Passkey from "../VerifyFIDO2Passkey/VerifyFIDO2Passkey";
+import { usePasskeyOperations } from "../../../../hooks/usePasskeyOperations";
+import { fido2Api } from "../../api/fido2Api";
+import {
+  isWebAuthnSupported,
+  registerFIDO2Credential,
+} from "../../utils/webAuthnUtils";
 
 export default function AddFIDO2PasskeyPage({ step }) {
   const { language } = useParams();
@@ -32,7 +39,9 @@ export default function AddFIDO2PasskeyPage({ step }) {
   const errorMessage = getErrorMessage(language, errorCode);
   const loaderPageContentJson = getPageContent(language, PAGES.otpSelection);
   const [userPasswordValue, setUserPasswordValue] = useState("");
-  const [fido2Data, setFido2Data] = useState([]);
+  const [selected2FAPasskey, setSelected2FAPasskey] = useState(null);
+  const [attestationResult, setAttestationResult] = useState(null);
+  const [registrationLoading, setRegistrationLoading] = useState(false);
 
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
     language: language,
@@ -50,7 +59,6 @@ export default function AddFIDO2PasskeyPage({ step }) {
     otpLoading: localLoading,
     handleChangeUserMfaSelection,
     handleSetUserOtpValue,
-    setOtpLoading: setLocalLoading,
     setOtpSentResponse,
   } = useOtpOperations({
     userId: id,
@@ -59,26 +67,99 @@ export default function AddFIDO2PasskeyPage({ step }) {
     fallbackNavigationPath: backToSecuritySettingsPage,
   });
 
-  // Use the password validation hook with stepup=true for FIDO2 step-up authentication
-  // This enables token exchange that stores stepup_token in session
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(
     setErrorCode,
     () => {
-      if (fido2Data && fido2Data.length > 0) {
-        setWizardStep("selectFIDO2Passkey");
+      // If there's only one MFA factor, skip OTP selection and go directly to validation
+      if (
+        userPhoneFactors &&
+        userPhoneFactors.length === 1 &&
+        (!fido2Data || fido2Data.length === 0)
+      ) {
+        setWizardStep("otpValidation");
       } else {
-        // Handle case when no FIDO2 data exists
-        // If there's only one MFA factor, skip OTP selection and go directly to validation
-        if (userPhoneFactors && userPhoneFactors.length === 1) {
-          setWizardStep("otpValidation");
-        } else {
-          setWizardStep("otpSelection");
-        }
+        setWizardStep("otpSelection");
       }
     },
   );
 
+  const { fido2Data, loading: passkeyLoading } = usePasskeyOperations({
+    setErrorCode,
+  });
+
   const didFetch = useRef(false);
+
+  /**
+   * Step 1 of passkey registration: get attestation options from server and
+   * trigger the browser WebAuthn popup. Stores the attestation result so the
+   * nickname step can submit it.
+   */
+  const handleGetAttestationOptions = async () => {
+    if (!isWebAuthnSupported()) {
+      setErrorCode("error_webauthn_not_supported");
+      return;
+    }
+
+    setRegistrationLoading(true);
+    setErrorCode(null);
+
+    try {
+      const attestationResponse = await fido2Api.getAttestationOptions();
+
+      if (!attestationResponse?.success || !attestationResponse?.data) {
+        setErrorCode("error_failed_to_get_attestation_options");
+        return;
+      }
+      setRegistrationLoading(false);
+
+      // Trigger the browser WebAuthn popup — nickname is not known yet
+      const result = await registerFIDO2Credential(attestationResponse.data);
+      setAttestationResult(result);
+      setWizardStep("addFIDO2PasskeyNickname");
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "InvalidStateError") {
+        setErrorCode("error_duplicate_passkey");
+      } else {
+        setErrorCode("error_fido2_verification");
+      }
+    } finally {
+      setRegistrationLoading(false);
+    }
+  };
+
+  /**
+   * Step 2 of passkey registration: merge the device nickname into the stored
+   * attestation result and send it to the server.
+   */
+  const handleSubmitAttestation = async (deviceName) => {
+    setRegistrationLoading(true);
+    setErrorCode(null);
+
+    try {
+      const response = await fido2Api.submitAttestationResult({
+        ...attestationResult,
+        nickname: deviceName.trim(),
+      });
+
+      if (response && response.success) {
+        navigate(backToManage2FAVerificationsPage, {
+          state: {
+            noticeType: NOTICE_TYPES.passkeyAdded,
+            passkeyName: deviceName.trim(),
+          },
+        });
+      } else {
+        throw new Error("Failed to register credential");
+      }
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "InvalidStateError") {
+        setErrorCode("error_duplicate_passkey");
+      } else {
+        setErrorCode(err?.data?.message);
+      }
+      setRegistrationLoading(false);
+    }
+  };
 
   const requestOtpCode = async () => {
     const userData = {
@@ -127,18 +208,6 @@ export default function AddFIDO2PasskeyPage({ step }) {
   };
 
   useEffect(() => {
-    /**
-     * Fetch user's FIDO2 credentials
-     */
-    fetchUserFIDO2Credentials({
-      setLoading: setLocalLoading,
-      setData: setFido2Data,
-      setErrorCode,
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
     if (INVALID_OTP_ERROR_CODES.includes(errorCode)) {
       // If OTP is invalid, go back to OTP selection step
       setWizardStep("otpValidation");
@@ -163,9 +232,12 @@ export default function AddFIDO2PasskeyPage({ step }) {
         userProfile={userProfile}
         userPhoneFactors={userPhoneFactors}
         onChangeUserSelectedMfaFactor={handleChangeUserMfaSelection}
-        userSelectedMfaFactor={userSelectedMfaFactor}
         onNext={() => {
           setWizardStep("otpValidation");
+        }}
+        onSelectFIDO2={(passkey) => {
+          setSelected2FAPasskey(passkey);
+          setWizardStep("verifyFIDO2Passkey");
         }}
         parentPage={PAGES.addFIDO2Passkey}
         onCancel={async () => navigate(backToManage2FAVerificationsPage)}
@@ -190,28 +262,50 @@ export default function AddFIDO2PasskeyPage({ step }) {
         }}
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
-        onCancel={async () => navigate(backToManage2FAVerificationsPage)}
+        onCancel={() => navigate(backToManage2FAVerificationsPage)}
         showTryAnotherWay={userPhoneFactors && userPhoneFactors.length > 1}
       />
     ),
-    selectFIDO2Passkey: (
+    verifyFIDO2Passkey: (
       <VerifyFIDO2Passkey
-        submitAttestationResult={true}
+        errorMessage={errorMessage}
         setErrorCode={setErrorCode}
+        selectedPasskey={selected2FAPasskey}
         onCallback={() => {
           setWizardStep("addFIDO2Passkey");
+        }}
+        onTryAnotherWayHandler={() => {
+          setSelected2FAPasskey(null);
+          setWizardStep("otpSelection");
         }}
       />
     ),
     addFIDO2Passkey: (
       <AddFIDO2Passkey
+        errorMessage={errorMessage}
+        onCancel={async () => navigate(backToManage2FAVerificationsPage)}
+        onRegister={handleGetAttestationOptions}
+        registrationLoading={registrationLoading}
+      />
+    ),
+    addFIDO2PasskeyNickname: (
+      <AddFIDO2PasskeyNickname
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
         onCancel={async () => navigate(backToManage2FAVerificationsPage)}
+        onSubmit={handleSubmitAttestation}
+        registrationLoading={registrationLoading}
       />
     ),
   };
-  return localLoading || validatePasswordLoading ? (
+
+  const isLoading =
+    localLoading ||
+    validatePasswordLoading ||
+    passkeyLoading ||
+    registrationLoading;
+
+  return isLoading ? (
     <Loader text={loaderPageContentJson["11"]} />
   ) : (
     <StepContent
