@@ -12,6 +12,9 @@ export const LANGUAGE_DISPLAY_NAMES = {
 export const EXTERNAL_NAVIGATION_LINKS = {
   gcAccountDirectory:
     "https://www.canada.ca/en/government/sign-in-online-account.html",
+  // To do: update to production URLs once we have prod domain for website
+  websiteStagingEN: "https://login.alpha.canada.ca/en",
+  websiteStagingFR: "https://connexion.alpha.canada.ca/fr",
 };
 export const OIDC_REDIRECT = {
   login: `${config.apiUrl}/v1/auth/login`,
@@ -129,8 +132,8 @@ export const PAGES = {
 
 export const FOOTERS = {
   default: {
-    en: '{ "About CanadaLogin": "https://gc-signin.cdssandbox.xyz/en/", "Help": "https://gc-signin.cdssandbox.xyz/en/", "Terms": "https://gc-signin.cdssandbox.xyz/en/" }',
-    fr: '{ "À propos de ConnexionCanada": "https://gc-signin.cdssandbox.xyz/en/", "Aide": "https://gc-signin.cdssandbox.xyz/fr/", "Avis": "https://gc-signin.cdssandbox.xyz/en/" }',
+    en: `{ "About CanadaLogin": "${EXTERNAL_NAVIGATION_LINKS.websiteStagingEN}/users/what-is-canadalogin/", "Help": "${EXTERNAL_NAVIGATION_LINKS.websiteStagingEN}/users/", "Terms": "${EXTERNAL_NAVIGATION_LINKS.websiteStagingEN}/users/terms/" }`,
+    fr: `{ "À propos de ConnexionCanada": "${EXTERNAL_NAVIGATION_LINKS.websiteStagingFR}/utilisateurs/a-propos/", "Aide": "${EXTERNAL_NAVIGATION_LINKS.websiteStagingFR}/utilisateurs/", "Avis": "${EXTERNAL_NAVIGATION_LINKS.websiteStagingFR}/utilisateurs/avis/" }`,
   },
 };
 
