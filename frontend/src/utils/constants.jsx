@@ -121,6 +121,7 @@ export const PAGES = {
   emailUpdateSuccess: "EmailUpdateSuccess",
   addFIDO2PasskeyPage: "AddFIDO2PasskeyPage",
   addFIDO2Passkey: "AddFIDO2Passkey",
+  addFIDO2PasskeyNickname: "AddFIDO2PasskeyNickname",
   deleteFIDO2PasskeyPage: "DeleteFIDO2PasskeyPage",
   verifyFIDO2Passkey: "VerifyFIDO2Passkey",
   deleteFIDO2PasskeyConfirm: "DeleteFIDO2PasskeyConfirm",

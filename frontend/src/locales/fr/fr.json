@@ -509,8 +509,8 @@
     "6": "Réinitialiser le mot de passe",
     "7": "Pour ajouter un numéro de téléphone,",
     "8": "Pour supprimer un numéro de téléphone,",
-    "9": "To add a passkey,",
-    "10": "To delete this passkey,"
+    "9": "To add a passkey or security key,",
+    "10": "To delete a passkey or security key,"
   },
   "EditEmailEnterEmail": {
     "1": "Enter a new email address",
@@ -552,13 +552,26 @@
     "9": "Sign out"
   },
   "AddFIDO2Passkey": {
-    "1": "Add a new passkey",
-    "2": "Give your security key a name to help you identify it later.",
+    "1": "How to create a passkey",
+    "2": "Select “Create a passkey” below.",
+    "3": "There will be a pop-up on your device. You may have to enable passkey or your password manager on your device to get started.",
+    "4": "If prompted, choose an email to create your passkey with. ",
+    "5": "Make sure you select an email only.",
+    "6": "you",
+    "7": "have control over.",
+    "8": "Follow the remaining steps in the pop-up.",
+    "9": "Make sure you only create a passkey on a device",
+    "10": "you control",
+    "11": "Create a passkey",
+    "12": "Cancel"
+  },
+  "AddFIDO2PasskeyNickname": {
+    "1": "Name your passkey",
+    "2": "Give your passkey a memorable name that helps you remember what device you created it on.",
     "3": "Passkey name",
-    "4": "e.g., My YubiKey",
-    "5": "Registering...",
-    "6": "Register",
-    "7": "Add a new passkey you want to use for verification each time you sign in."
+    "4": "example: My Phone",
+    "5": "Continue",
+    "6": "Cancel"
   },
   "VerifyFIDO2Passkey": {
     "1": "Verify with your passkey",
