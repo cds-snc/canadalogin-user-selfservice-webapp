@@ -119,7 +119,7 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
   GcdsLink: ({ children, ...props }) => <a {...props}>{children}</a>,
 }));
 
-vi.mock("../../../utils/functions.jsx", () => ({
+vi.mock("../../../utils/functions", () => ({
   getPageContent: vi.fn(() => ({
     1: "Hello",
     2: "Profile Updated Successfully",
@@ -134,7 +134,7 @@ vi.mock("../../../utils/functions.jsx", () => ({
   })),
 }));
 
-vi.mock("../../../utils/constants.jsx", () => ({
+vi.mock("../../../utils/constants", () => ({
   PAGES: {
     ProfileHome: "profile-home",
     profileUpdateName: "profile-update-name",
@@ -146,7 +146,7 @@ vi.mock("../../../utils/constants.jsx", () => ({
   },
 }));
 
-vi.mock("../../../utils/routeHelpers.js", () => ({
+vi.mock("../../../utils/routeHelpers", () => ({
   path: (page, params) => `/${params.language}/${page}`,
 }));
 
@@ -160,7 +160,7 @@ vi.mock("../../../services/authService.jsx", () => ({
   },
 }));
 
-vi.mock("../../../utils/userProfileDispatch.jsx", () => ({
+vi.mock("../../../utils/userProfileDispatch", () => ({
   userProfileDispatch: () => ({ setLoading: mockSetLoading }),
 }));
 

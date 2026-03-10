@@ -12,6 +12,7 @@ bin
 lib
 pyvenv.cfg
 .coverage
+.venv/
 # ACT GITHUB LOCAL Test Runner Environment
 .actrc
 

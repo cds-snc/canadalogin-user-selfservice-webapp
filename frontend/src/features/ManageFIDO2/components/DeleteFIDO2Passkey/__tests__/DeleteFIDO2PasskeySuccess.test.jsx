@@ -19,7 +19,7 @@ vi.mock("react-router", () => ({
   useLocation: () => ({ state: { passkeyNickname: "My Test Passkey" } }),
 }));
 
-vi.mock("../../../../../utils/functions.jsx", () => ({
+vi.mock("../../../../../utils/functions", () => ({
   getPageContent: () => ({
     1: "Passkey deleted",
     2: "Your passkey",
@@ -29,7 +29,7 @@ vi.mock("../../../../../utils/functions.jsx", () => ({
   }),
 }));
 
-vi.mock("../../../../../utils/constants.jsx", () => ({
+vi.mock("../../../../../utils/constants", () => ({
   PAGES: {
     deleteFIDO2PasskeySuccess: "DeleteFIDO2PasskeySuccess",
   },

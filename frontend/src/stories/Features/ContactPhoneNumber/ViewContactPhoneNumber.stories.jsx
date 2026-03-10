@@ -1,5 +1,5 @@
 import ViewContactPhoneNumber from "../../../features/ContactPhoneNumber/components/ViewContactPhoneNumber.jsx";
-import { AVAILABLE_LANGUAGES } from "../../../utils/constants.jsx";
+import { AVAILABLE_LANGUAGES } from "../../../utils/constants";
 
 export default {
   title: "GC Sign In/Features/ContactPhoneNumber/ViewContactPhoneNumber",

@@ -77,7 +77,7 @@ vi.mock("react-router", async () => {
 });
 
 // Mock constants - CORRECTED
-vi.mock("../../../utils/constants.jsx", async (importOriginal) => {
+vi.mock("../../../utils/constants", async (importOriginal) => {
   const actual = await importOriginal();
   return {
     ...actual,
@@ -137,7 +137,7 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
 }));
 
 // Mock utility functions
-vi.mock("../../../utils/functions.jsx", () => ({
+vi.mock("../../../utils/functions", () => ({
   getPageContent: () => ({
     1: "Confirm name update",
     2: "You've requested to update your name to:",
@@ -153,7 +153,7 @@ vi.mock("../../../utils/functions.jsx", () => ({
 }));
 
 // Mock route helpers
-vi.mock("../../../utils/routeHelpers.js", () => ({
+vi.mock("../../../utils/routeHelpers", () => ({
   path: vi.fn((page) => {
     const routes = {
       profileUpdateNameSuccess: `/en/profile/update-name/success`,
@@ -197,7 +197,7 @@ vi.mock("../../../services/authService.jsx", () => ({
 }));
 
 // Mock user profile dispatch
-vi.mock("../../../utils/userProfileDispatch.jsx", () => ({
+vi.mock("../../../utils/userProfileDispatch", () => ({
   userProfileDispatch: () => ({
     updateProfileSuccess: vi.fn(),
   }),

@@ -6,13 +6,13 @@ import Loader from "../../../components/Layout/Loading.jsx";
 import Password from "./Password.jsx";
 import PasswordChangedConfirmation from "./PasswordChangedConfirmation.jsx";
 
-import { PAGES } from "../../../utils/constants.jsx";
-import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
-import { getErrorMessage } from "../../../utils/errorUtils.js";
+import { PAGES } from "../../../utils/constants";
+import { userProfileDispatch } from "../../../utils/userProfileDispatch";
+import { getErrorMessage } from "../../../utils/errorUtils";
 import { authService } from "../../../services/authService.jsx";
 
-import { getPageContent } from "../../../utils/functions.jsx";
-import { path } from "../../../utils/routeHelpers.js";
+import { getPageContent } from "../../../utils/functions";
+import { path } from "../../../utils/routeHelpers";
 import OtpSelection from "../../TransientOtp/components/OtpSelection.jsx";
 import OtpVerification from "../../TransientOtp/components/OtpVerification.jsx";
 import { passwordUpdate } from "../api/passwordUpdate.jsx";

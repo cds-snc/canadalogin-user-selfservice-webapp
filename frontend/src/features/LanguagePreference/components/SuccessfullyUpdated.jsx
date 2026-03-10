@@ -10,14 +10,14 @@ import {
   GcdsGrid,
   GcdsLink,
 } from "@cdssnc/gcds-components-react";
-import { getPageContent } from "../../../utils/functions.jsx";
+import { getPageContent } from "../../../utils/functions";
 import {
   PAGES,
   LANGUAGE_DISPLAY_NAMES,
   EXTERNAL_NAVIGATION_LINKS,
-} from "../../../utils/constants.jsx";
+} from "../../../utils/constants";
 import { useUser } from "../../../components/Providers/useUser.tsx";
-import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
+import { userProfileDispatch } from "../../../utils/userProfileDispatch";
 import { authService } from "../../../services/authService.jsx";
 import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 

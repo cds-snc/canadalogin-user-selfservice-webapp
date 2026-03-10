@@ -4,7 +4,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import userEvent from "@testing-library/user-event";
 import OtpVerification from "../OtpVerification.jsx";
-import { FLOW_TYPES, PAGES } from "../../../../utils/constants.jsx";
+import { FLOW_TYPES, PAGES } from "../../../../utils/constants";
 
 // Mock the navigation hooks
 const mockNavigateHelper = vi.fn();
@@ -44,7 +44,7 @@ vi.mock("../../../../services/authService.jsx", () => ({
 }));
 
 // Mock utilities
-vi.mock("../../../../utils/functions.jsx", () => ({
+vi.mock("../../../../utils/functions", () => ({
   getPageContent: vi.fn((language, page) => {
     if (page === PAGES.verification) {
       return {
@@ -86,7 +86,7 @@ vi.mock("../../../../utils/functions.jsx", () => ({
   }),
 }));
 
-vi.mock("../../../../utils/routeHelpers.js", () => ({
+vi.mock("../../../../utils/routeHelpers", () => ({
   path: vi.fn((page, { language }) => {
     if (page === PAGES.securitySettings) {
       return `/${language}/security-settings`;

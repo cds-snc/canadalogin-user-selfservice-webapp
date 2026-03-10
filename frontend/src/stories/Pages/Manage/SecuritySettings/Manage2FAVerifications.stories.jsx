@@ -4,7 +4,7 @@ import {
   FLOW_TYPES,
   PAGES,
   SUBMIT_END_POINTS,
-} from "../../../../utils/constants.jsx";
+} from "../../../../utils/constants";
 import { buildTestCase, Template } from "../../../Tests/utils/functions.tsx";
 
 export default {

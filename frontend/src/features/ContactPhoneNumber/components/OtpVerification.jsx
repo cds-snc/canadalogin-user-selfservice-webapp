@@ -11,9 +11,9 @@ import {
   GcdsGrid,
 } from "@cdssnc/gcds-components-react";
 
-import { getPageContent } from "../../../utils/functions.jsx";
+import { getPageContent } from "../../../utils/functions";
 
-import { FLOW_TYPES, PAGES } from "../../../utils/constants.jsx";
+import { FLOW_TYPES, PAGES } from "../../../utils/constants";
 import { useParams } from "react-router";
 import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 

@@ -11,9 +11,9 @@ import {
   useOtpOperations,
 } from "../../../hooks/useOtpOperations.js";
 import { usePasskeyOperations } from "../../../hooks/usePasskeyOperations.js";
-import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants.jsx";
-import { getPageContent } from "../../../utils/functions.jsx";
-import { path } from "../../../utils/routeHelpers.js";
+import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
+import { getPageContent } from "../../../utils/functions";
+import { path } from "../../../utils/routeHelpers";
 import Loader from "../../Layout/Loading.jsx";
 import { useUser } from "../../Providers/useUser.js";
 import NoticeFactory from "../../InfoBlocks/NoticeFactory.jsx";

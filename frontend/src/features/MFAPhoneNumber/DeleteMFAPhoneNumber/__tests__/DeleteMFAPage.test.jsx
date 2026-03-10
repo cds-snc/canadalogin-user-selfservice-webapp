@@ -239,7 +239,7 @@ vi.mock("../../../../utils/functions", () => ({
   }),
 }));
 
-vi.mock("../../../../utils/routeHelpers.js", () => ({
+vi.mock("../../../../utils/routeHelpers", () => ({
   path: vi.fn((page) => {
     if (page === "SecuritySettings" || page === "securitySettings")
       return "/en/security-settings";

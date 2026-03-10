@@ -1,13 +1,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import axios from "axios";
 import { otpFactors } from "../otpFactors.jsx";
-import { handleApiError } from "../../../../utils/apiErrorHandler.js";
+import { handleApiError } from "../../../../utils/apiErrorHandler";
 
 // Mock axios
 vi.mock("axios");
 
 // Mock handleApiError
-vi.mock("../../../../utils/apiErrorHandler.js", () => ({
+vi.mock("../../../../utils/apiErrorHandler", () => ({
   handleApiError: vi.fn(),
 }));
 

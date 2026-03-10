@@ -1,6 +1,6 @@
 import axios from "axios";
 import config from "../../../config.jsx";
-import { handleApiError } from "../../../utils/apiErrorHandler.js";
+import { handleApiError } from "../../../utils/apiErrorHandler";
 
 axios.defaults.withCredentials = true;
 

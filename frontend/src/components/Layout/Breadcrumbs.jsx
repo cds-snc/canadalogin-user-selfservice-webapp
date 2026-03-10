@@ -9,7 +9,7 @@ import {
   GcdsTopNav,
 } from "@cdssnc/gcds-components-react";
 import { useMatches, useParams } from "react-router";
-import { getPageContent } from "../../utils/functions.jsx";
+import { getPageContent } from "../../utils/functions";
 import { useUser } from "../Providers/useUser";
 
 export default function Breadcrumbs() {

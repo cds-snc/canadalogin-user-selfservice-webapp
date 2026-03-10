@@ -63,7 +63,7 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
   ),
 }));
 
-vi.mock("../../../utils/functions.jsx", () => ({
+vi.mock("../../../utils/functions", () => ({
   getPageContent: vi.fn(() => ({
     1: "Your session is about to end due to inactivity",
     2: "If you do not continue your session you will be signed out automatically",
@@ -77,7 +77,7 @@ vi.mock("../../../utils/functions.jsx", () => ({
   formatTime: vi.fn(() => `12:34:56`),
 }));
 
-vi.mock("../../../utils/faviconUtils.js", () => ({
+vi.mock("../../../utils/faviconUtils", () => ({
   setWarningFavicon: vi.fn(),
   restoreDefaultFavicon: vi.fn(),
 }));

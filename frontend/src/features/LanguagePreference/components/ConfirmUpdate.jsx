@@ -10,8 +10,8 @@ import {
   GcdsErrorMessage,
 } from "@cdssnc/gcds-components-react";
 
-import { getPageContent } from "../../../utils/functions.jsx";
-import { PAGES, LANGUAGE_DISPLAY_NAMES } from "../../../utils/constants.jsx";
+import { getPageContent } from "../../../utils/functions";
+import { PAGES, LANGUAGE_DISPLAY_NAMES } from "../../../utils/constants";
 import RPNameDisplay from "../../../components/RPInfo/RPNameDisplay.jsx";
 import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 

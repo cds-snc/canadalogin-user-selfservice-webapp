@@ -17,7 +17,7 @@ vi.mock("react-router", () => ({
   useParams: () => ({ language: "en" }),
 }));
 
-vi.mock("../../../../../utils/functions.jsx", () => ({
+vi.mock("../../../../../utils/functions", () => ({
   getPageContent: () => ({
     1: "Are you sure you want to delete this passkey?",
     2: "You are about to delete",
@@ -27,7 +27,7 @@ vi.mock("../../../../../utils/functions.jsx", () => ({
   }),
 }));
 
-vi.mock("../../../../../utils/constants.jsx", () => ({
+vi.mock("../../../../../utils/constants", () => ({
   PAGES: {
     deleteFIDO2PasskeyConfirm: "DeleteFIDO2PasskeyConfirm",
   },

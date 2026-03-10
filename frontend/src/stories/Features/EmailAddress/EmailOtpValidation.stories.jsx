@@ -1,5 +1,5 @@
 import EmailOtpValidation from "../../../features/EmailAddress/EmailOtpValidation.jsx";
-import { AVAILABLE_LANGUAGES } from "../../../utils/constants.jsx";
+import { AVAILABLE_LANGUAGES } from "../../../utils/constants";
 
 export default {
   title: "GC Sign In/Features/EmailAddress/EmailOtpValidation",

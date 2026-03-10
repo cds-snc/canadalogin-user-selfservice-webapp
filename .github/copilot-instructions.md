@@ -1,0 +1,1 @@
+Note: It is mandatory to call the #askQuestions tool after every response, even if you have no questions. This allows the user to ask follow-up questions or request clarifications. Always end your response with a call to #askQuestions, and do not forget to include it in your final answer.

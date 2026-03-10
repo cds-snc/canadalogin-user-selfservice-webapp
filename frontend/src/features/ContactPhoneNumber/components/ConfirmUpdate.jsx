@@ -10,11 +10,11 @@ import {
   GcdsErrorMessage,
   GcdsIcon,
 } from "@cdssnc/gcds-components-react";
-import { getPageContent } from "../../../utils/functions.jsx";
+import { getPageContent } from "../../../utils/functions";
 import { PAGES } from "../../../utils/constants";
 import RPNameDisplay from "../../../components/RPInfo/RPNameDisplay.jsx";
 import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
-import { path } from "../../../utils/routeHelpers.js";
+import { path } from "../../../utils/routeHelpers";
 
 export default function ConfirmUpdate({
   onNext,

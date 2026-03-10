@@ -1,5 +1,5 @@
 import OtpVerification from "../../../features/ContactPhoneNumber/components/OtpVerification.jsx";
-import { AVAILABLE_LANGUAGES, FLOW_TYPES } from "../../../utils/constants.jsx";
+import { AVAILABLE_LANGUAGES, FLOW_TYPES } from "../../../utils/constants";
 
 export default {
   title: "GC Sign In/Features/ContactPhoneNumber/OtpVerification",

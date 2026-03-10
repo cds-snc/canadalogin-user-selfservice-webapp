@@ -8,11 +8,11 @@ import {
   GcdsText,
   GcdsErrorMessage,
 } from "@cdssnc/gcds-components-react";
-import { getPageContent } from "../../../utils/functions.jsx";
+import { getPageContent } from "../../../utils/functions";
 import {
   PAGES,
   ServicesWithAccessInfoSectionInformation,
-} from "../../../utils/constants.jsx";
+} from "../../../utils/constants";
 import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx";
 

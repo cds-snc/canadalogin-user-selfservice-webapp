@@ -125,7 +125,7 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
 }));
 
 // Mock utility functions
-vi.mock("../../../../utils/functions.jsx", () => ({
+vi.mock("../../../../utils/functions", () => ({
   getPageContent: vi.fn((language, page) => {
     const mockContent = {
       password: {
@@ -177,7 +177,7 @@ vi.mock("../../../../services/authService.jsx", () => ({
 }));
 
 // Mock constants
-vi.mock("../../../../utils/constants.jsx", async (importOriginal) => {
+vi.mock("../../../../utils/constants", async (importOriginal) => {
   const actual = await importOriginal();
   return {
     ...actual,
@@ -189,7 +189,7 @@ vi.mock("../../../../utils/constants.jsx", async (importOriginal) => {
 });
 
 // Mock route helpers
-vi.mock("../../../../utils/routeHelpers.js", () => ({
+vi.mock("../../../../utils/routeHelpers", () => ({
   path: vi.fn((page, params) => `/${params.language}/${page}`),
 }));
 

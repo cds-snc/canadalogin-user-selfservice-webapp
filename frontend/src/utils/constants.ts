@@ -1,32 +1,35 @@
-import config from "../config";
-export const AVAILABLE_LANGUAGES = { en: "en", fr: "fr" };
+import config from "../config.jsx";
+
+export const AVAILABLE_LANGUAGES = { en: "en", fr: "fr" } as const;
+
 export const PROFILE_LANGUAGES = {
   en: "en-ca",
   fr: "fr-ca",
-};
+} as const;
+
 export const LANGUAGE_DISPLAY_NAMES = {
   en: { "en-ca": "English", "fr-ca": "French" },
   fr: { "en-ca": "Anglais", "fr-ca": "Français" },
-};
+} as const;
 
 export const EXTERNAL_NAVIGATION_LINKS = {
   gcAccountDirectory:
     "https://www.canada.ca/en/government/sign-in-online-account.html",
-  // To do: update to production URLs once we have prod domain for website
   websiteStagingEN: "https://login.alpha.canada.ca/en",
   websiteStagingFR: "https://connexion.alpha.canada.ca/fr",
-};
+} as const;
+
 export const OIDC_REDIRECT = {
   login: `${config.apiUrl}/v1/auth/login`,
   reauth: `${config.apiUrl}/v1/auth/reauth`,
-};
+} as const;
 
 export const INVALID_OTP_ERROR_CODES = [
   "CSIAM0011E",
   "CSIBN0025E",
   "CSIBN0028E",
   "CSIBN0021E",
-];
+] as const;
 
 export const CONTEXT_ACTIONS = {
   logOut: "LOG_OUT",
@@ -41,7 +44,7 @@ export const CONTEXT_ACTIONS = {
   hide_session_timeout_modal: "HIDE_SESSION_TIMEOUT_MODAL",
   set_session_timeout_loading: "SET_SESSION_TIMEOUT_LOADING",
   reset_expire_time: "RESET_EXPIRE_TIME",
-};
+} as const;
 
 export const FLOW_TYPES = {
   sms: "smsotp",
@@ -50,19 +53,19 @@ export const FLOW_TYPES = {
   dashboard: "dashboard",
   profile: "profile",
   manage: "manage",
-};
+} as const;
 
 export const ServicesWithAccessInfoSectionInformation = {
   NAME: "name",
   CONTACT_PHONE_NUMBER: "contactPhoneNumber",
   LANGUAGE_PREFERENCE: "languagePreference",
   EMAIL_ADDRESS: "emailAddress",
-};
+} as const;
 
 export const LINK_SUBMIT_TYPES = {
   useNewVerification: "useNewVerification",
   requestNewCode: "requestNewCode",
-};
+} as const;
 
 export const FORM_FIELDS = [
   "email",
@@ -73,17 +76,16 @@ export const FORM_FIELDS = [
   "verificationType",
   "firstName",
   "lastName",
-];
+] as const;
 
 export const NOTICE_TYPES = {
   mfaAdded: "mfaAdded",
   mfaDeleted: "mfaDeleted",
   passkeyAdded: "passkeyAdded",
   passkeyDeleted: "passkeyDeleted",
-};
+} as const;
 
 export const PAGES = {
-  // this is used as key to get the language locales from json files, should probably be renamed in the future to reflect the usage
   verification: "Verification",
   otpSelection: "OtpSelection",
   password: "Password",
@@ -129,14 +131,14 @@ export const PAGES = {
   verifyFIDO2Passkey: "VerifyFIDO2Passkey",
   deleteFIDO2PasskeyConfirm: "DeleteFIDO2PasskeyConfirm",
   deleteFIDO2PasskeySuccess: "DeleteFIDO2PasskeySuccess",
-};
+} as const;
 
 export const FOOTERS = {
   default: {
     en: `{ "About CanadaLogin": "${EXTERNAL_NAVIGATION_LINKS.websiteStagingEN}/users/what-is-canadalogin/", "Help": "${EXTERNAL_NAVIGATION_LINKS.websiteStagingEN}/users/", "Terms": "${EXTERNAL_NAVIGATION_LINKS.websiteStagingEN}/users/terms/" }`,
     fr: `{ "À propos de ConnexionCanada": "${EXTERNAL_NAVIGATION_LINKS.websiteStagingFR}/utilisateurs/a-propos/", "Aide": "${EXTERNAL_NAVIGATION_LINKS.websiteStagingFR}/utilisateurs/", "Avis": "${EXTERNAL_NAVIGATION_LINKS.websiteStagingFR}/utilisateurs/avis/" }`,
   },
-};
+} as const;
 
 export const SERVICES = [
   {
@@ -145,16 +147,13 @@ export const SERVICES = [
     description: "",
     url: "#",
   },
-];
+] as const;
 
-// Map frontend FLOW_TYPES to backend otpType
-// Backend: sms | voice | email
-// Frontend: smsotp | voiceotp | email
 export const serverMapping = {
   [FLOW_TYPES.sms]: "sms",
   [FLOW_TYPES.voice]: "voice",
   [FLOW_TYPES.email]: "email",
-};
+} as const;
 
 export const SUBMIT_END_POINTS = {
   requestPasswordPolicy: "/v1/password/policy",
@@ -177,13 +176,13 @@ export const SUBMIT_END_POINTS = {
   keepAlive: "/v1/auth/keep-alive",
   passwordVerify: "/v1/password/verify",
   passwordVerifyStepup: "/v1/password/verify/stepup",
-};
+} as const;
 
 export const RP_CLIENT_ID_KEY = "rp_client_id";
 
 export const GA_CATEGORIES = {
   pageView: "pageview",
-};
+} as const;
 
 export const GA_ACTIONS = {};
 
@@ -193,16 +192,17 @@ export const GA_LABELS = {
   text: "Text",
   input: "Input",
   email: "Email",
-};
+} as const;
 
 export const VITE_ENVIRONMENTS = {
   dev: "dev",
   test: "test",
   staging: "staging",
   prod: "prod",
-};
+} as const;
 
 export const DEV_ONLY_FEATURE = config.environment === VITE_ENVIRONMENTS.dev;
+
 export const NON_PROD_ENVIRONMENT =
   config.environment === VITE_ENVIRONMENTS.dev ||
   config.environment === VITE_ENVIRONMENTS.test;
@@ -550,4 +550,4 @@ export const countryMapping = {
     zm: "Zambie",
     zw: "Zimbabwe",
   },
-};
+} as const;

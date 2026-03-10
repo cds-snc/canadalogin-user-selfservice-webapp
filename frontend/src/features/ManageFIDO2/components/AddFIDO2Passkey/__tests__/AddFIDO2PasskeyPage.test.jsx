@@ -31,11 +31,11 @@ vi.mock("react-router", () => ({
 
 // ─── Utilities ─────────────────────────────────────────────────────────────
 
-vi.mock("../../../../../utils/routeHelpers.js", () => ({
+vi.mock("../../../../../utils/routeHelpers", () => ({
   path: (_page, { language } = {}) => `/${language}/mock-path`,
 }));
 
-vi.mock("../../../../../utils/constants.jsx", () => ({
+vi.mock("../../../../../utils/constants", () => ({
   PAGES: {
     otpSelection: "OtpSelection",
     addFIDO2Passkey: "AddFIDO2Passkey",
@@ -58,14 +58,14 @@ vi.mock("../../../../../utils/constants.jsx", () => ({
   DEV_ONLY_FEATURE: false,
 }));
 
-vi.mock("../../../../../utils/functions.jsx", () => ({
+vi.mock("../../../../../utils/functions", () => ({
   getPageContent: (_lang, page) => {
     if (page === "OtpSelection") return { 11: "Loading..." };
     return { 11: "Loading..." };
   },
 }));
 
-vi.mock("../../../../../utils/errorUtils.js", () => ({
+vi.mock("../../../../../utils/errorUtils", () => ({
   getErrorMessage: () => "",
 }));
 

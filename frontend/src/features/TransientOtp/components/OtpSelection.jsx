@@ -8,10 +8,10 @@ import {
 } from "@cdssnc/gcds-components-react";
 import { useParams } from "react-router";
 
-import { getPageContent } from "../../../utils/functions.jsx";
-import { gcHelpCentreLinks } from "../../../utils/gcHelpCentreLinks.jsx";
+import { getPageContent } from "../../../utils/functions";
+import { gcHelpCentreLinks } from "../../../utils/gcHelpCentreLinks";
 
-import { FLOW_TYPES, PAGES } from "../../../utils/constants.jsx";
+import { FLOW_TYPES, PAGES } from "../../../utils/constants";
 import SMSIcon from "../../../assets/icons/sms_icon.svg?react";
 import VoiceIcon from "../../../assets/icons/voicecall_icon.svg?react";
 import FIDO2Icon from "../../../assets/icons/FIDO_Passkey_mark_A_black.svg?react";

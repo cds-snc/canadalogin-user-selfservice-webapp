@@ -1,6 +1,16 @@
 import { CONTEXT_ACTIONS } from "./constants";
+import type { UserProfileDispatchContract } from "../types/utils";
 
-export const userProfileDispatch = (dispatch) => ({
+type DispatchAction = {
+  type: string;
+  payload?: unknown;
+};
+
+type DispatchFunction = (action: DispatchAction) => void;
+
+export const userProfileDispatch = (
+  dispatch: DispatchFunction,
+): UserProfileDispatchContract => ({
   setLoading: (isLoading, text = null) =>
     dispatch({
       type: CONTEXT_ACTIONS.set_loading,
@@ -12,6 +22,7 @@ export const userProfileDispatch = (dispatch) => ({
 
   setAuthenticatedPage: (value) =>
     dispatch({ type: CONTEXT_ACTIONS.set_authenticated_pages, payload: value }),
+
   removeAuthenticatedPage: (value) =>
     dispatch({
       type: CONTEXT_ACTIONS.remove_authenticated_page,

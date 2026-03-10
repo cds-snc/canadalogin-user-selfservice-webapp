@@ -72,7 +72,7 @@ vi.mock("../../../../hooks/usePasskeyOperations.js", () => ({
   usePasskeyOperations: () => mockUsePasskeyOperations(),
 }));
 
-vi.mock("../../../../utils/functions.jsx", () => ({
+vi.mock("../../../../utils/functions", () => ({
   getPageContent: () => ({
     1: "Manage 2-step verification methods",
     2: "Choose how you would like to receive verification codes when signing in to your GC Account.",
@@ -88,7 +88,7 @@ vi.mock("../../../../utils/functions.jsx", () => ({
   }),
 }));
 
-vi.mock("../../../../utils/constants.jsx", () => ({
+vi.mock("../../../../utils/constants", () => ({
   PAGES: {
     manage2FAVerifications: "Manage2FAVerifications",
     securitySettings: "SecuritySettings",
@@ -107,7 +107,7 @@ vi.mock("../../../../utils/constants.jsx", () => ({
   DEV_ONLY_FEATURE: true,
 }));
 
-vi.mock("../../../../utils/routeHelpers.js", () => ({
+vi.mock("../../../../utils/routeHelpers", () => ({
   path: () => "/security-settings",
 }));
 

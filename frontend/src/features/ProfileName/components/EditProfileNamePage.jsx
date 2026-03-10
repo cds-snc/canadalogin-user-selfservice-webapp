@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import { useUser } from "../../../components/Providers/useUser.tsx";
-import { getPageContent } from "../../../utils/functions.jsx";
-import { PAGES } from "../../../utils/constants.jsx";
-import { path } from "../../../utils/routeHelpers.js";
+import { getPageContent } from "../../../utils/functions";
+import { PAGES } from "../../../utils/constants";
+import { path } from "../../../utils/routeHelpers";
 import { authService } from "../../../services/authService.jsx";
-import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
+import { userProfileDispatch } from "../../../utils/userProfileDispatch";
 import StepContent from "../../../components/Wizard/StepContent.jsx";
 import Loader from "../../../components/Layout/Loading.jsx";
 import ProfileUpdateName from "./ProfileUpdateName.jsx";

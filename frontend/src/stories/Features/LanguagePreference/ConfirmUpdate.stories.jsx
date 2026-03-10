@@ -2,7 +2,7 @@ import ConfirmUpdate from "../../../features/LanguagePreference/components/Confi
 import {
   AVAILABLE_LANGUAGES,
   PROFILE_LANGUAGES,
-} from "../../../utils/constants.jsx";
+} from "../../../utils/constants";
 import { UserProvider } from "../../../components/Providers/UserProvider.tsx";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider.tsx";
 

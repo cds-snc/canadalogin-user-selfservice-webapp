@@ -7,8 +7,8 @@ import {
 } from "@cdssnc/gcds-components-react";
 import { useNavigate } from "react-router";
 
-import { PAGES, LANGUAGE_DISPLAY_NAMES } from "../../../utils/constants.jsx";
-import { path } from "../../../utils/routeHelpers.js";
+import { PAGES, LANGUAGE_DISPLAY_NAMES } from "../../../utils/constants";
+import { path } from "../../../utils/routeHelpers";
 import { useUser } from "../../../components/Providers/useUser.tsx";
 
 export default function ViewLanguagePreferences({ pageContent }) {

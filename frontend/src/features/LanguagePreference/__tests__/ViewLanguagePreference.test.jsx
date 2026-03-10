@@ -17,12 +17,12 @@ vi.mock("../../../components/Providers/useUser.tsx", () => ({
 }));
 
 // Mock route helpers
-vi.mock("../../../utils/routeHelpers.js", () => ({
+vi.mock("../../../utils/routeHelpers", () => ({
   path: vi.fn(() => `/en/edit-language-preferences`),
 }));
 
 // Mock constants
-vi.mock("../../../utils/constants.jsx", () => ({
+vi.mock("../../../utils/constants", () => ({
   PAGES: {
     editLanguagePreferences: "edit-language-preferences",
   },

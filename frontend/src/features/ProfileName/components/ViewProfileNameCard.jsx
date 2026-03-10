@@ -8,8 +8,8 @@ import {
   GcdsLink,
 } from "@cdssnc/gcds-components-react";
 
-import { PAGES } from "../../../utils/constants.jsx";
-import { path } from "../../../utils/routeHelpers.js";
+import { PAGES } from "../../../utils/constants";
+import { path } from "../../../utils/routeHelpers";
 import { useUser } from "../../../components/Providers/useUser.tsx";
 import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 

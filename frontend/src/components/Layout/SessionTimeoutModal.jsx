@@ -1,11 +1,11 @@
 import Modal from "react-modal";
 import { useEffect } from "react";
 import { GcdsButton, GcdsText, GcdsIcon } from "@cdssnc/gcds-components-react";
-import { getPageContent, formatTime } from "../../utils/functions.jsx";
+import { getPageContent, formatTime } from "../../utils/functions";
 import {
   setWarningFavicon,
   restoreDefaultFavicon,
-} from "../../utils/faviconUtils.js";
+} from "../../utils/faviconUtils";
 import { useBreakpoints } from "../../hooks/useBreakpoints.ts";
 
 const SessionTimeoutModal = ({

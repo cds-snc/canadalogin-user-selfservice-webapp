@@ -29,12 +29,12 @@ vi.mock("../../../utils/redirect.jsx", () => ({
 }));
 
 // Mock route helpers
-vi.mock("../../../utils/routeHelpers.js", () => ({
+vi.mock("../../../utils/routeHelpers", () => ({
   path: vi.fn(() => "/en/manage-dashboard"),
 }));
 
 // In your test file (e.g., ViewContactPhoneNumber.test.jsx)
-vi.mock("../../../utils/apiErrorHandler.js", () => ({
+vi.mock("../../../utils/apiErrorHandler", () => ({
   handleApiError: vi.fn(),
   redirectToLogin: vi.fn(),
 }));

@@ -1,5 +1,5 @@
 import PasswordChangedConfirmation from "../../../features/ChangePassword/components/PasswordChangedConfirmation.jsx";
-import { AVAILABLE_LANGUAGES } from "../../../utils/constants.jsx";
+import { AVAILABLE_LANGUAGES } from "../../../utils/constants";
 
 export default {
   title: "GC Sign In/Features/ChangePassword/PasswordChangedConfirmation",
