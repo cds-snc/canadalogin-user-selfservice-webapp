@@ -151,7 +151,7 @@ vi.mock("../components/SuccessfullyUpdated.jsx", () => ({
   ),
 }));
 
-vi.mock("../../../components/Wizard/StepContent.jsx", () => ({
+vi.mock("../../../components/Wizard/StepContent", () => ({
   default: ({ StepComponent }) => StepComponent,
 }));
 

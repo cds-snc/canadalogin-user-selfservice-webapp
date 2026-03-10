@@ -40,7 +40,7 @@ vi.mock("../../../utils/apiErrorHandler", () => ({
 }));
 
 // Mock VerifiedBadge component
-vi.mock("../../../components/Badges/VerifiedBadge.jsx", () => ({
+vi.mock("../../../components/Badges/VerifiedBadge", () => ({
   default: ({ text }) => <div data-testid="verified-badge">{text}</div>,
 }));
 

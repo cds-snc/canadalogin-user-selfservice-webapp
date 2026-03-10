@@ -14,7 +14,7 @@ import {
   ServicesWithAccessInfoSectionInformation,
 } from "../../../utils/constants";
 import SubmitButton from "../../../components/Layout/SubmitButton";
-import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx";
+import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection";
 
 export default function ProfileUpdateName({
   nameFormData,

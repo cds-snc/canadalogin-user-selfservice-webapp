@@ -114,19 +114,16 @@ vi.mock("../../../../utils/functions", () => ({
   }),
 }));
 
-vi.mock(
-  "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx",
-  () => ({
-    default: () => (
-      <div data-testid="services-with-access-info">
-        <p>Mocked Services Info Section</p>
-        <ul>
-          <li>Test content for item 3</li>
-        </ul>
-      </div>
-    ),
-  }),
-);
+vi.mock("../../../components/InfoBlocks/ServicesWithAccessInfoSection", () => ({
+  default: () => (
+    <div data-testid="services-with-access-info">
+      <p>Mocked Services Info Section</p>
+      <ul>
+        <li>Test content for item 3</li>
+      </ul>
+    </div>
+  ),
+}));
 
 // Mock the navigation hook
 const mockNavigate = vi.fn();

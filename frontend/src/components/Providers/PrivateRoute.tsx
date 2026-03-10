@@ -36,7 +36,9 @@ function PrivateRoute() {
     }
   }, [state.isLoading, state.userProfile]);
   if (state.isLoading)
-    return <Loader text={state.loadingText || pageContentJson["11"] || "Loading"} />;
+    return (
+      <Loader text={state.loadingText || pageContentJson["11"] || "Loading"} />
+    );
   if (!state.userProfile) return null;
 
   return <Outlet />;
@@ -142,13 +144,14 @@ const signUp: SignUpGuard = {
   checkVerificationPage: (state, type) => {
     if (type === FLOW_TYPES.email) {
       return (
-        signUp.checkSignUpPage(state) && Boolean(isEmailValid(state.userData.email))
+        signUp.checkSignUpPage(state) &&
+        Boolean(isEmailValid(state.userData.email))
       );
     } else {
       return Boolean(
         signUp.checkVerificationSetUpPage(state) &&
-        state.userData.stepVerificationSent &&
-        state.userData.phone
+          state.userData.stepVerificationSent &&
+          state.userData.phone,
       );
     }
   },
@@ -161,8 +164,8 @@ const signUp: SignUpGuard = {
   checkVerificationSetUpPage: (state) => {
     return Boolean(
       signUp.checkPasswordPage(state) &&
-      state.userData.passwordSubmitted &&
-      state.userData.id
+        state.userData.passwordSubmitted &&
+        state.userData.id,
     );
   },
   checkCoreProfilePage: (state) => {
@@ -181,9 +184,9 @@ const signIn: RouteGuard & {
   checkLoginValidation: (state) => {
     return Boolean(
       signIn.checkPasswordPage(state) &&
-      state.userData.passwordValidated &&
-      state.userData.phone &&
-      state.userData.id
+        state.userData.passwordValidated &&
+        state.userData.phone &&
+        state.userData.id,
     );
   },
 };

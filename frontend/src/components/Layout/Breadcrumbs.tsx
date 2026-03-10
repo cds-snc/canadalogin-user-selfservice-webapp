@@ -1,4 +1,7 @@
-import { GcdsBreadcrumbs, GcdsBreadcrumbsItem } from "@cdssnc/gcds-components-react";
+import {
+  GcdsBreadcrumbs,
+  GcdsBreadcrumbsItem,
+} from "@cdssnc/gcds-components-react";
 import { useMatches, useParams } from "react-router";
 import type { UIMatch } from "react-router";
 import type { PageId } from "../../types/utils";
@@ -40,8 +43,9 @@ export default function Breadcrumbs() {
     .filter((match) => Boolean(match.handle?.breadcrumbId))
     .map((match) => ({
       name:
-        getPageContent(language, match.handle.id)?.[match.handle.breadcrumbId] ??
-        "",
+        getPageContent(language, match.handle.id)?.[
+          match.handle.breadcrumbId
+        ] ?? "",
       url: match.pathname,
     }))
     .slice(0, onIndexRoute ? -1 : undefined);

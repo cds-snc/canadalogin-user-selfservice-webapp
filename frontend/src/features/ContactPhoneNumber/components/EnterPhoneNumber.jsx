@@ -22,7 +22,7 @@ import {
   PAGES,
   ServicesWithAccessInfoSectionInformation,
 } from "../../../utils/constants";
-import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx";
+import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection";
 import SubmitButton from "../../../components/Layout/SubmitButton";
 
 const PageHeader = ({ language, pageContentJson }) => {

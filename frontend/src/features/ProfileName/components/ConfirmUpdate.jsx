@@ -13,7 +13,7 @@ import { useParams } from "react-router";
 import { getPageContent } from "../../../utils/functions";
 import { PAGES } from "../../../utils/constants";
 import Loader from "../../../components/Layout/Loading";
-import RPNameDisplay from "../../../components/RPInfo/RPNameDisplay.jsx";
+import RPNameDisplay from "../../../components/RPInfo/RPNameDisplay";
 import SubmitButton from "../../../components/Layout/SubmitButton";
 
 const ErrorMessage = ({ errorMessage }) => {

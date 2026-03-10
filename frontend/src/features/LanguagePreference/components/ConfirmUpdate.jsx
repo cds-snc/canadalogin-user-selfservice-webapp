@@ -12,7 +12,7 @@ import {
 
 import { getPageContent } from "../../../utils/functions";
 import { PAGES, LANGUAGE_DISPLAY_NAMES } from "../../../utils/constants";
-import RPNameDisplay from "../../../components/RPInfo/RPNameDisplay.jsx";
+import RPNameDisplay from "../../../components/RPInfo/RPNameDisplay";
 import SubmitButton from "../../../components/Layout/SubmitButton";
 
 export default function ConfirmUpdate({

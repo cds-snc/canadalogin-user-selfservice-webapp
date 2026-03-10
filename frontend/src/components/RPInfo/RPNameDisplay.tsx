@@ -1,13 +1,17 @@
 import { GcdsText } from "@cdssnc/gcds-components-react";
 import { useUser } from "../Providers/useUser";
 
-export default function RPNameDisplay({ rpName }) {
+interface RPNameDisplayProps {
+  rpName: string;
+}
+
+export default function RPNameDisplay({ rpName }: RPNameDisplayProps) {
   const { state } = useUser();
 
   const rp = state?.relyingPartyInfo
     ? {
-        name: state?.relyingPartyInfo?.linkName,
-        url: state?.relyingPartyInfo?.url,
+        name: state.relyingPartyInfo.linkName,
+        url: state.relyingPartyInfo.url,
       }
     : null;
 

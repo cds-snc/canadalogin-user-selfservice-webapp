@@ -9,7 +9,7 @@ import { PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import { authService } from "../../../services/authService";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch";
-import StepContent from "../../../components/Wizard/StepContent.jsx";
+import StepContent from "../../../components/Wizard/StepContent";
 import Loader from "../../../components/Layout/Loading";
 import EditLanguagePreferences from "./EditLanguagePreferences.jsx";
 import ConfirmUpdate from "./ConfirmUpdate.jsx";

@@ -22,7 +22,7 @@ vi.mock("../../../components/Providers/useUser", () => ({
   useUser: vi.fn(),
 }));
 
-vi.mock("../../../components/Wizard/StepContent.jsx", () => ({
+vi.mock("../../../components/Wizard/StepContent", () => ({
   __esModule: true,
   default: ({ StepComponent }) => (
     <div data-testid="step-content">{StepComponent}</div>

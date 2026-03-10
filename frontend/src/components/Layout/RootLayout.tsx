@@ -27,7 +27,10 @@ export default function RootLayout() {
   const { pathname } = useLocation();
   const { state: languageState } = useLanguage();
   const { language } = languageState;
-  const { langHref, currentLang } = getLangValues(language ?? undefined, pathname);
+  const { langHref, currentLang } = getLangValues(
+    language ?? undefined,
+    pathname,
+  );
 
   useEffect(() => {
     trackPage(pathname);

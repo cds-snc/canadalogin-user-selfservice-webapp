@@ -2,12 +2,12 @@ import React from "react";
 import { PAGES } from "../../../utils/constants";
 
 // Import all the components that were previously handled by the Page component
-import ManageDashboard from "../../../components/Manage/ManageDashboard.jsx";
-import ProfileHome from "../../../components/Manage/ProfileHome.jsx";
+import ManageDashboard from "../../../components/Manage/ManageDashboard";
+import ProfileHome from "../../../components/Manage/ProfileHome";
 import EditProfileNamePage from "../../../features/ProfileName/components/EditProfileNamePage.jsx";
 import EditLanguagePreferencePage from "../../../features/LanguagePreference/components/EditLanguagePreferencePage.jsx";
-import SecuritySettings from "../../../components/Manage/SecuritySettings/SecuritySettings.jsx";
-import Manage2FAVerifications from "../../../components/Manage/SecuritySettings/Manage2FAVerifications.jsx";
+import SecuritySettings from "../../../components/Manage/SecuritySettings/SecuritySettings";
+import Manage2FAVerifications from "../../../components/Manage/SecuritySettings/Manage2FAVerifications";
 import EditLanguagePreferences from "../../../features/LanguagePreference/components/EditLanguagePreferences.jsx";
 import ConfirmLanguageUpdate from "../../../features/LanguagePreference/components/ConfirmUpdate.jsx";
 import SuccessfullyUpdatedLanguage from "../../../features/LanguagePreference/components/SuccessfullyUpdated.jsx";

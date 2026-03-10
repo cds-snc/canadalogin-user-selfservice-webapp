@@ -141,7 +141,7 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
 }));
 
 vi.mock(
-  "../../../../components/Manage/SecuritySettings/PhoneFactorsList.jsx",
+  "../../../../components/Manage/SecuritySettings/PhoneFactorsList",
   () => ({
     default: ({ userPhoneFactorsMap }) => (
       <div data-testid="phone-factors-list">
@@ -166,13 +166,13 @@ vi.mock(
 );
 
 vi.mock(
-  "../../../../components/Manage/SecuritySettings/FIDO2PasskeyList.jsx",
+  "../../../../components/Manage/SecuritySettings/FIDO2PasskeyList",
   () => ({
     default: () => null,
   }),
 );
 
-vi.mock("../../../../components/InfoBlocks/NoticeFactory.jsx", () => ({
+vi.mock("../../../../components/InfoBlocks/NoticeFactory", () => ({
   default: ({ noticeType }) =>
     noticeType ? <div data-testid="notice-factory">{noticeType}</div> : null,
 }));

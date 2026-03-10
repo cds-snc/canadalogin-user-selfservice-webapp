@@ -10,16 +10,30 @@ import {
 import { getPageContent } from "../../utils/functions";
 import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
 import { useUser } from "../Providers/useUser";
-import VerifiedBadge from "../Badges/VerifiedBadge.jsx";
+import VerifiedBadge from "../Badges/VerifiedBadge";
 import ViewContactPhoneNumber from "../../features/ContactPhoneNumber/components/ViewContactPhoneNumber.jsx";
 import ViewNameCard from "../../features/ProfileName/components/ViewProfileNameCard.jsx";
 import ViewLanguagePreferences from "../../features/LanguagePreference/components/ViewLanguagePreference.jsx";
 import { path } from "../../utils/routeHelpers";
 
-const DisplayEmailInfo = ({ email, pageContent, language }) => {
+interface DisplayEmailInfoProps {
+  email: string;
+  pageContent: Record<string, string>;
+  language?: string;
+}
+
+type GcdsNavigationEvent = CustomEvent<string> & {
+  preventDefault: () => void;
+};
+
+const DisplayEmailInfo = ({
+  email,
+  pageContent,
+  language,
+}: DisplayEmailInfoProps) => {
   const navigate = useNavigate();
   const editEmail = path(PAGES.editEmailPage, {
-    language: language,
+    language,
   });
 
   return (
@@ -34,9 +48,9 @@ const DisplayEmailInfo = ({ email, pageContent, language }) => {
           <GcdsLink
             href={editEmail}
             size="regular"
-            onGcdsClick={(ev) => {
-              ev.preventDefault();
-              navigate(ev.detail);
+            onGcdsClick={(event: GcdsNavigationEvent) => {
+              event.preventDefault();
+              navigate(event.detail);
             }}
           >
             {pageContent["5"]}

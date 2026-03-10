@@ -68,14 +68,11 @@ vi.mock("../../../utils/constants", () => ({
   },
 }));
 
-vi.mock(
-  "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx",
-  () => ({
-    default: ({ currentLang }) => (
-      <div data-testid="services-info">Services Info - {currentLang}</div>
-    ),
-  }),
-);
+vi.mock("../../../components/InfoBlocks/ServicesWithAccessInfoSection", () => ({
+  default: ({ currentLang }) => (
+    <div data-testid="services-info">Services Info - {currentLang}</div>
+  ),
+}));
 
 vi.mock("@cdssnc/gcds-components-react", () => ({
   GcdsContainer: ({ children, marginTop, ...props }) => (

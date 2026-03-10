@@ -1,8 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useReducer,
-} from "react";
+import { createContext, useContext, useReducer } from "react";
 import type { Dispatch, ReactNode } from "react";
 import { CONTEXT_ACTIONS } from "../../utils/constants";
 
