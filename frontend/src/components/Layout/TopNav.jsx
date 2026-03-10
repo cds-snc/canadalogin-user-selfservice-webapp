@@ -13,7 +13,7 @@ import { getPageContent } from "../../utils/functions";
 import { path } from "../../utils/routeHelpers";
 import { useUser } from "../Providers/useUser";
 import { PAGES } from "../../utils/constants";
-import { authService } from "../../services/authService.jsx";
+import { authService } from "../../services/authService";
 import { userProfileDispatch } from "../../utils/userProfileDispatch";
 
 export default function TopNav({ currentLang }) {

@@ -6,7 +6,7 @@ import Loader from "../../components/Layout/Loading.jsx";
 import { isEmailValid, getPageContent } from "../../utils/functions";
 import { FLOW_TYPES, OIDC_REDIRECT, PAGES } from "../../utils/constants";
 import { userProfileDispatch } from "../../utils/userProfileDispatch";
-import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
+import { useNavigateHelper } from "../../hooks/useNavigate";
 
 function PrivateRoute() {
   const { state } = useUser();

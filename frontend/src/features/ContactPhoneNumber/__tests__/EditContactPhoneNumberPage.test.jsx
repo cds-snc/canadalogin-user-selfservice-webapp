@@ -23,7 +23,7 @@ vi.mock("react-router", async () => {
 });
 
 // Mock auth service
-vi.mock("../../../services/authService.jsx", () => ({
+vi.mock("../../../services/authService", () => ({
   authService: {
     transientOtpSend: vi.fn(),
     transientOtpVerify: vi.fn(),
@@ -198,7 +198,7 @@ describe("EditContactPhoneNumberPage Component", () => {
     mockParams = { language: "en", step: undefined };
 
     // Get the mocked auth service
-    const { authService } = await import("../../../services/authService.jsx");
+    const { authService } = await import("../../../services/authService");
     mockAuthService = authService;
   });
 

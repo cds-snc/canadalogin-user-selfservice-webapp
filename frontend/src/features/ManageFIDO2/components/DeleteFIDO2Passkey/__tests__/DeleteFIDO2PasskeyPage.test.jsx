@@ -108,7 +108,7 @@ const mockOtpOpsDefaults = {
 
 const mockUseOtpOperations = vi.fn(() => mockOtpOpsDefaults);
 
-vi.mock("../../../../../hooks/useOtpOperations.js", () => ({
+vi.mock("../../../../../hooks/useOtpOperations", () => ({
   useOtpOperations: (...args) => mockUseOtpOperations(...args),
 }));
 
@@ -121,7 +121,7 @@ const mockPasskeyOpsDefaults = {
 
 const mockUsePasskeyOperations = vi.fn(() => mockPasskeyOpsDefaults);
 
-vi.mock("../../../../../hooks/usePasskeyOperations.js", () => ({
+vi.mock("../../../../../hooks/usePasskeyOperations", () => ({
   usePasskeyOperations: (...args) => mockUsePasskeyOperations(...args),
 }));
 
@@ -130,7 +130,7 @@ let capturedPasswordSuccessCallback = null;
 const mockValidatePassword = vi.fn();
 const mockValidatePasswordLoading = { value: false };
 
-vi.mock("../../../../../hooks/usePasswordValidation.js", () => ({
+vi.mock("../../../../../hooks/usePasswordValidation", () => ({
   usePasswordValidation: (_setErrorCode, onSuccess) => {
     capturedPasswordSuccessCallback = onSuccess;
     return {
@@ -145,7 +145,7 @@ vi.mock("../../../../../hooks/usePasswordValidation.js", () => ({
 const mockTransientOtpSend = vi.fn();
 const mockTransientOtpVerify = vi.fn();
 
-vi.mock("../../../../../services/authService.jsx", () => ({
+vi.mock("../../../../../services/authService", () => ({
   authService: {
     transientOtpSend: (...args) => mockTransientOtpSend(...args),
     transientOtpVerify: (...args) => mockTransientOtpVerify(...args),

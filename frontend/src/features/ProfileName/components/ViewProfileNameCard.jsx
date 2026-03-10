@@ -11,7 +11,7 @@ import {
 import { PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import { useUser } from "../../../components/Providers/useUser.tsx";
-import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
+import { useNavigateHelper } from "../../../hooks/useNavigate";
 
 export default function ViewProfileNameSectionCard({ pageContent }) {
   const { language } = useParams();

@@ -14,7 +14,7 @@ import {
   getContentWithVariables,
   getPageContent,
 } from "../../../utils/functions";
-import { authService } from "../../../services/authService.jsx";
+import { authService } from "../../../services/authService";
 import { passwordUpdate } from "../api/passwordUpdate.jsx";
 
 import { PAGES } from "../../../utils/constants";

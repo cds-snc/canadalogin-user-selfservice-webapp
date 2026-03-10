@@ -8,7 +8,7 @@ import {
   INVALID_OTP_ERROR_CODES,
 } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
-import { authService } from "../../../services/authService.jsx";
+import { authService } from "../../../services/authService";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch";
 import StepContent from "../../../components/Wizard/StepContent.jsx";
 import Loader from "../../../components/Layout/Loading.jsx";

@@ -161,7 +161,7 @@ vi.mock("../../../../utils/functions", () => ({
   }),
 }));
 
-vi.mock("../../../../services/authService.jsx", () => ({
+vi.mock("../../../../services/authService", () => ({
   authService: {
     requestPasswordPolicy: vi.fn().mockResolvedValue({
       success: true,
@@ -233,9 +233,7 @@ describe("Password Component", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     // Get reference to the mocked service
-    const { authService } = await import(
-      "../../../../services/authService.jsx"
-    );
+    const { authService } = await import("../../../../services/authService");
     mockAuthService = authService;
   });
 

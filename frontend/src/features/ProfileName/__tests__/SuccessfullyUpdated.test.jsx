@@ -150,7 +150,7 @@ vi.mock("../../../utils/routeHelpers", () => ({
   path: (page, params) => `/${params.language}/${page}`,
 }));
 
-vi.mock("../../../services/authService.jsx", () => ({
+vi.mock("../../../services/authService", () => ({
   authService: {
     logout: vi.fn(() =>
       Promise.resolve({
@@ -326,7 +326,7 @@ describe("SuccessfullyUpdatedName", () => {
 
   it("handles logout error gracefully", async () => {
     // Mock authService.logout to throw an error
-    const mockAuthService = await import("../../../services/authService.jsx");
+    const mockAuthService = await import("../../../services/authService");
     vi.mocked(mockAuthService.authService.logout).mockRejectedValueOnce(
       new Error("Network error"),
     );

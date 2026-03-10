@@ -4,7 +4,7 @@ import { createMemoryRouter, RouterProvider } from "react-router";
 
 import { vi, describe, beforeEach, it, expect } from "vitest";
 import RootLayout from "../components/Layout/RootLayout";
-import { authService } from "../services/authService.jsx";
+import { authService } from "../services/authService";
 
 import { UserProvider } from "../components/Providers/UserProvider";
 import { LanguageProvider } from "../components/Providers/LanguageProvider";

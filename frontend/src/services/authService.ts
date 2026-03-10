@@ -1,16 +1,32 @@
 import axios from "axios";
+
 import config from "../config";
 import {
   FLOW_TYPES,
-  SUBMIT_END_POINTS,
   RP_CLIENT_ID_KEY,
+  SUBMIT_END_POINTS,
 } from "../utils/constants";
 import { handleApiError } from "../utils/apiErrorHandler";
+import type {
+  AuthServiceContract,
+  AuthServiceError,
+  AuthServiceResponse,
+  LogoutResponseData,
+  OtpRequestPayload,
+  PasswordPayload,
+  PasswordPolicyData,
+  ProfileUpdatePayload,
+  RelyingPartyData,
+  SessionKeepAliveData,
+  UpdateEmailPayload,
+  UpdatePhonePayload,
+  UserPayload,
+} from "../types/services";
 
 import {
   ERROR_RESPONSE,
-  TEST_PROTOTYPES,
   SUCCESS_RESPONSE,
+  TEST_PROTOTYPES,
   TEST_RESPONSES,
   TEST_USERS,
   VALIDATION_CODE_ERROR_RESPONSE,
@@ -18,42 +34,45 @@ import {
 
 axios.defaults.withCredentials = true;
 
-export const authService = {
+export const authService: AuthServiceContract = {
   requestPasswordPolicy: async () => {
     try {
-      const response = await axios.get(
+      const response = await axios.get<AuthServiceResponse<PasswordPolicyData>>(
         `${config.apiUrl}${SUBMIT_END_POINTS.requestPasswordPolicy}`,
       );
       return response.data;
     } catch (error) {
-      handleApiError(error);
+      handleApiError(error as AuthServiceError);
     }
   },
   create: async (userData) => {
-    if (TEST_USERS.has(userData.userName))
+    if (TEST_USERS.has(userData.userName)) {
       return buildTestResponse(userData, "create");
+    }
 
-    const response = await axios.post(
+    const response = await axios.post<AuthServiceResponse>(
       `${config.apiUrl}${SUBMIT_END_POINTS.create}`,
       userData,
     );
     return response.data;
   },
   transientOtpSend: async (userData) => {
-    if (TEST_USERS.has(userData.userName))
+    if (userData.userName && TEST_USERS.has(userData.userName)) {
       return buildTestResponse(userData, "transientOtpSend");
+    }
 
-    const response = await axios.post(
+    const response = await axios.post<AuthServiceResponse>(
       `${config.apiUrl}${SUBMIT_END_POINTS.transientOtpSend}`,
       userData,
     );
     return response.data;
   },
   transientOtpVerify: async (userData) => {
-    if (TEST_USERS.has(userData.userName))
+    if (userData.userName && TEST_USERS.has(userData.userName)) {
       return buildTestResponse(userData, "transientOtpVerify");
+    }
 
-    const response = await axios.post(
+    const response = await axios.post<AuthServiceResponse>(
       `${config.apiUrl}${SUBMIT_END_POINTS.transientOtpVerify}`,
       userData,
     );
@@ -61,73 +80,73 @@ export const authService = {
   },
   createCoreProfile: async (userData) => {
     if (TEST_USERS.has(userData.userName)) {
-      //for un-moderated testing purposes
       openPrototypeWindow("signUpRedirect");
       return SUCCESS_RESPONSE;
     }
 
-    const response = await axios.post(
+    const response = await axios.post<AuthServiceResponse>(
       `${config.apiUrl}${SUBMIT_END_POINTS.createCoreProfile}`,
       userData,
     );
     return response.data;
   },
-  //logic will need to be updated once backend has been completed
   login: async (userData) => {
-    if (TEST_USERS.has(userData.userName))
+    if (TEST_USERS.has(userData.userName)) {
       return buildTestResponse(userData, "login");
-    const response = await axios.post(
+    }
+
+    const response = await axios.post<AuthServiceResponse>(
       `${config.apiUrl}${SUBMIT_END_POINTS.login}`,
       userData,
     );
     return response.data;
   },
   otpSend: async (userData) => {
-    if (TEST_USERS.has(userData.userName))
+    if (userData.userName && TEST_USERS.has(userData.userName)) {
       return buildTestResponse(userData, "otpSend");
+    }
 
-    const response = await axios.post(
+    const response = await axios.post<AuthServiceResponse>(
       `${config.apiUrl}${SUBMIT_END_POINTS.otpSend}`,
       userData,
     );
     return response.data;
   },
   otpVerify: async (userData) => {
-    if (TEST_USERS.has(userData.userName))
+    if (userData.userName && TEST_USERS.has(userData.userName)) {
       return buildTestResponse(userData, "otpVerify");
+    }
 
-    const response = await axios.post(
+    const response = await axios.post<AuthServiceResponse>(
       `${config.apiUrl}${SUBMIT_END_POINTS.otpVerify}`,
       userData,
     );
     return response.data;
   },
-
-  get_my_user_profile: async (rp_client_id) => {
+  get_my_user_profile: async (rpClientId) => {
     let profileUrl = `${config.apiUrl}${SUBMIT_END_POINTS.profile}`;
-    if (rp_client_id) {
-      profileUrl += `?${RP_CLIENT_ID_KEY}=${encodeURIComponent(rp_client_id)}`;
+    if (rpClientId) {
+      profileUrl += `?${RP_CLIENT_ID_KEY}=${encodeURIComponent(rpClientId)}`;
     }
 
     try {
-      const response = await axios.get(profileUrl);
+      const response = await axios.get<AuthServiceResponse>(profileUrl);
       return response.data;
     } catch (error) {
-      handleApiError(error);
+      handleApiError(error as AuthServiceError);
     }
   },
   update_my_user_profile: async (editedProfile) => {
     try {
-      const response = await axios.post(
+      const response = await axios.post<AuthServiceResponse>(
         `${config.apiUrl}${SUBMIT_END_POINTS.profile}`,
         editedProfile,
       );
       return response.data;
     } catch (error) {
-      handleApiError(error);
+      handleApiError(error as AuthServiceError);
     }
   },
-
   update_email_with_otp: async (
     newEmailAddress,
     otp,
@@ -135,67 +154,61 @@ export const authService = {
     otpType = "email",
   ) => {
     try {
-      const updatePayload = {
+      const updatePayload: UpdateEmailPayload = {
         newEmailAddress,
         otp,
         trxnId,
         otpType,
       };
 
-      const response = await axios.post(
+      const response = await axios.post<AuthServiceResponse>(
         `${config.apiUrl}${SUBMIT_END_POINTS.profileUpdateWithOtp}`,
         updatePayload,
       );
       return response.data;
     } catch (error) {
-      handleApiError(error);
+      handleApiError(error as AuthServiceError);
     }
   },
-
   update_phone_with_otp: async (phoneNumber, otp, trxnId, otpType = "sms") => {
     try {
-      const updatePayload = {
+      const updatePayload: UpdatePhonePayload = {
         phoneNumbers: [{ value: phoneNumber, type: "mobile" }],
         otp,
         trxnId,
         otpType,
       };
 
-      const response = await axios.post(
+      const response = await axios.post<AuthServiceResponse>(
         `${config.apiUrl}${SUBMIT_END_POINTS.profileUpdateWithOtp}`,
         updatePayload,
       );
       return response.data;
     } catch (error) {
-      handleApiError(error);
+      handleApiError(error as AuthServiceError);
     }
   },
   get_rp_info: async () => {
     try {
-      const response = await axios.get(
+      const response = await axios.get<AuthServiceResponse<RelyingPartyData>>(
         `${config.apiUrl}${SUBMIT_END_POINTS.rp_info}`,
       );
       return response.data;
     } catch (error) {
-      handleApiError(error);
+      handleApiError(error as AuthServiceError);
     }
   },
   logout: async () => {
     try {
-      const response = await axios.post(
-        `${config.apiUrl}${SUBMIT_END_POINTS.logout}`,
-      );
-      const returnedUrl = response?.data?.data?.redirect_url;
+      const response = await axios.post<
+        AuthServiceResponse<LogoutResponseData>
+      >(`${config.apiUrl}${SUBMIT_END_POINTS.logout}`);
+      const returnedUrl = response.data?.data?.redirect_url;
 
-      // Check if response has redirect_url
-      if (response?.status === 200 && returnedUrl) {
-        // redirect_url is a GET url with query params
-        // converting to a POST call, and make the POST call
-
+      if (response.status === 200 && returnedUrl) {
         const postUrl = new URL(returnedUrl);
-        const params = Object.fromEntries(postUrl.searchParams);
+        const params = Object.fromEntries(postUrl.searchParams.entries());
 
-        // Create a form and submit it as POST
         const form = document.createElement("form");
         form.method = "POST";
         form.action = postUrl.origin + postUrl.pathname;
@@ -209,104 +222,127 @@ export const authService = {
         });
 
         document.body.appendChild(form);
-        // Use HTMLFormElement.prototype.submit to avoid naming conflicts
         HTMLFormElement.prototype.submit.call(form);
       }
 
       return response.data;
     } catch (error) {
-      handleApiError(error);
+      handleApiError(error as AuthServiceError);
     }
   },
   keepAlive: async () => {
     try {
-      const response = await axios.post(
-        `${config.apiUrl}${SUBMIT_END_POINTS.keepAlive}`,
-      );
+      const response = await axios.post<
+        AuthServiceResponse<SessionKeepAliveData>
+      >(`${config.apiUrl}${SUBMIT_END_POINTS.keepAlive}`);
       return response.data;
     } catch (error) {
-      handleApiError(error);
+      handleApiError(error as AuthServiceError);
     }
   },
   verifyPassword: async ({ password }) => {
     try {
-      const response = await axios.post(
+      const response = await axios.post<AuthServiceResponse>(
         `${config.apiUrl}${SUBMIT_END_POINTS.passwordVerify}`,
         { password },
       );
       return response.data;
     } catch (error) {
-      handleApiError(error);
+      handleApiError(error as AuthServiceError);
     }
   },
   verifyPasswordForStepup: async ({ password }) => {
     try {
-      const response = await axios.post(
+      const response = await axios.post<AuthServiceResponse>(
         `${config.apiUrl}${SUBMIT_END_POINTS.passwordVerifyStepup}`,
         { password },
       );
       return response.data;
     } catch (error) {
-      handleApiError(error);
+      handleApiError(error as AuthServiceError);
     }
   },
 };
 
-function buildTestResponse(userData, type) {
+function buildTestResponse(
+  userData: UserPayload | OtpRequestPayload,
+  type: string,
+): AuthServiceResponse {
   console.log("Mocking " + type + " responses for user testing.");
-  let response = null;
+  let response: AuthServiceResponse | null = null;
   const now = new Date();
   const expires = new Date();
+  const userName = userData.userName ?? "";
+
   switch (type) {
     case "transientOtpVerify":
       if (
         userData.otpType === FLOW_TYPES.email &&
-        userData.otp === TEST_USERS.get(userData.userName).emailOtp
-      )
+        userData.otp === TEST_USERS.get(userName)?.emailOtp
+      ) {
         return TEST_RESPONSES.verificationEmailResponse;
-      else if (
+      }
+
+      if (
         userData.otpType === FLOW_TYPES.sms &&
-        userData.otp === TEST_USERS.get(userData.userName).smsOtp
-      )
+        userData.otp === TEST_USERS.get(userName)?.smsOtp
+      ) {
         return TEST_RESPONSES.verificationSmsResponse;
-      else if (
+      }
+
+      if (
         userData.otpType === FLOW_TYPES.voice &&
-        userData.otp === TEST_USERS.get(userData.userName).voiceOtp
-      )
+        userData.otp === TEST_USERS.get(userName)?.voiceOtp
+      ) {
         return TEST_RESPONSES.verificationVoiceResponse;
+      }
 
       throw { response: VALIDATION_CODE_ERROR_RESPONSE };
     case "transientOtpSend":
       if (userData.otpType === FLOW_TYPES.email) {
         response = TEST_RESPONSES.signUpResponse;
-        response.data.phoneNumber = null;
+        if (response.data && typeof response.data === "object") {
+          (response.data as Record<string, unknown>).phoneNumber = null;
+        }
       } else if (userData.otpType === FLOW_TYPES.voice) {
         response = TEST_RESPONSES.verificationVoiceSetUpResponse;
-        response.data.phoneNumber = userData.phoneNumber;
+        if (response.data && typeof response.data === "object") {
+          (response.data as Record<string, unknown>).phoneNumber =
+            userData.phoneNumber;
+        }
       } else {
         response = TEST_RESPONSES.verificationSmsSetUpResponse;
-        response.data.phoneNumber = userData.phoneNumber;
+        if (response.data && typeof response.data === "object") {
+          (response.data as Record<string, unknown>).phoneNumber =
+            userData.phoneNumber;
+        }
       }
 
-      response.data.emailAddress = userData.userName;
-      expires.setMinutes(expires.getMinutes() + 5);
-      response.data.created = now.toISOString();
-      response.data.expiry = expires.toISOString();
-      //for un-moderated testing purposes
-      openPrototypeWindow(userData.otpType);
+      if (response.data && typeof response.data === "object") {
+        (response.data as Record<string, unknown>).emailAddress = userName;
+        expires.setMinutes(expires.getMinutes() + 5);
+        (response.data as Record<string, unknown>).created = now.toISOString();
+        (response.data as Record<string, unknown>).expiry =
+          expires.toISOString();
+      }
+      openPrototypeWindow(
+        typeof userData.otpType === "string" ? userData.otpType : "",
+      );
 
       return response;
     case "otpVerify":
       if (
         userData.otpType === FLOW_TYPES.sms &&
-        userData.otp === TEST_USERS.get(userData.userName).smsOtp
+        userData.otp === TEST_USERS.get(userName)?.smsOtp
       ) {
         TEST_RESPONSES.verificationSmsResponse.message =
           "Sign in sms OTP has been validated";
         return TEST_RESPONSES.verificationSmsResponse;
-      } else if (
+      }
+
+      if (
         userData.otpType === FLOW_TYPES.voice &&
-        userData.otp === TEST_USERS.get(userData.userName).voiceOtp
+        userData.otp === TEST_USERS.get(userName)?.voiceOtp
       ) {
         TEST_RESPONSES.verificationVoiceResponse.message =
           "Sign in voice OTP has been validated";
@@ -318,52 +354,74 @@ function buildTestResponse(userData, type) {
       console.log("sending for ", userData.otpType);
       if (userData.otpType === FLOW_TYPES.voice) {
         response = TEST_RESPONSES.verificationVoiceSetUpResponse;
-        response.data.phoneNumber = userData.phoneNumber;
+        if (response.data && typeof response.data === "object") {
+          (response.data as Record<string, unknown>).phoneNumber =
+            userData.phoneNumber;
+        }
       } else {
         response = TEST_RESPONSES.verificationSmsSetUpResponse;
-        response.data.phoneNumber = userData.phoneNumber;
+        if (response.data && typeof response.data === "object") {
+          (response.data as Record<string, unknown>).phoneNumber =
+            userData.phoneNumber;
+        }
       }
 
-      response.data.emailAddress = userData.userName;
-      expires.setMinutes(expires.getMinutes() + 5);
-      response.data.created = now.toISOString();
-      response.data.expiry = expires.toISOString();
+      if (response.data && typeof response.data === "object") {
+        (response.data as Record<string, unknown>).emailAddress = userName;
+        expires.setMinutes(expires.getMinutes() + 5);
+        (response.data as Record<string, unknown>).created = now.toISOString();
+        (response.data as Record<string, unknown>).expiry =
+          expires.toISOString();
+      }
 
       return response;
     case "create":
       response = TEST_RESPONSES.passwordResponse;
-      response.data.userName = userData.userName;
+      if (response.data && typeof response.data === "object") {
+        (response.data as Record<string, unknown>).userName = userName;
+      }
       return response;
     case "login":
-      if (userData.password === TEST_USERS.get(userData.userName).login) {
+      if (
+        (userData as UserPayload).userName &&
+        userData.password === TEST_USERS.get(userName)?.login
+      ) {
         response = SUCCESS_RESPONSE;
-        response.data.id = "155151-68967896-997097";
-        response.data.phone = "+1(***) ***-1234";
-        response.data.otpType = FLOW_TYPES.sms;
+        if (response.data && typeof response.data === "object") {
+          (response.data as Record<string, unknown>).id =
+            "155151-68967896-997097";
+          (response.data as Record<string, unknown>).phone = "+1(***) ***-1234";
+          (response.data as Record<string, unknown>).otpType = FLOW_TYPES.sms;
+        }
         return response;
       }
+      return ERROR_RESPONSE;
+    default:
       return ERROR_RESPONSE;
   }
 }
 
-function openPrototypeWindow(otpType) {
+function openPrototypeWindow(otpType: string): void {
   const prototypeUrlsMap = TEST_PROTOTYPES.get(otpType);
-  if (isMobileMediaQuery()) {
-    // Code for mobile devices
-    window.open(prototypeUrlsMap.mobileUrl, "_blank").focus();
-    console.log("Mobile device detected for " + otpType);
-  } else {
-    // Code for non-mobile devices
-    window.open(prototypeUrlsMap.desktopUrl, "_blank").focus();
-    console.log("Non-mobile device detected for " + otpType);
+  if (!prototypeUrlsMap) {
+    return;
   }
+
+  const targetUrl = isMobileMediaQuery()
+    ? prototypeUrlsMap.mobileUrl
+    : prototypeUrlsMap.desktopUrl;
+
+  window.open(targetUrl, "_blank")?.focus();
+  console.log(
+    `${isMobileMediaQuery() ? "Mobile" : "Non-mobile"} device detected for ${otpType}`,
+  );
 }
 
-export function isMobileMediaQuery() {
+export function isMobileMediaQuery(): boolean {
   try {
     return window.matchMedia("(max-width: 767px)").matches;
   } catch (error) {
-    console.log(error.message);
+    console.log((error as Error).message);
     return false;
   }
 }

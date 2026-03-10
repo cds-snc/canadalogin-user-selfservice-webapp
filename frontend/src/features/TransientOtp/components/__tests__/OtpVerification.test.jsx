@@ -17,7 +17,7 @@ vi.mock("react-router", async () => {
   };
 });
 
-vi.mock("../../../../hooks/useNavigate.tsx", () => ({
+vi.mock("../../../../hooks/useNavigate", () => ({
   useNavigateHelper: () => mockNavigateHelper,
 }));
 
@@ -36,7 +36,7 @@ vi.mock("../../../../components/Providers/useUser.tsx", () => ({
 const mockTransientOtpSend = vi.fn();
 const mockTransientOtpVerify = vi.fn();
 
-vi.mock("../../../../services/authService.jsx", () => ({
+vi.mock("../../../../services/authService", () => ({
   authService: {
     transientOtpSend: (...args) => mockTransientOtpSend(...args),
     transientOtpVerify: (...args) => mockTransientOtpVerify(...args),
