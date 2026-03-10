@@ -12,7 +12,7 @@ import {
   RP_CLIENT_ID_KEY,
 } from "../../utils/constants";
 import UserContext from "./UserContext";
-import { authService } from "../../services/authService.jsx";
+import { authService } from "../../services/authService";
 import Loader from "../Layout/Loading.jsx";
 import SessionTimeoutModal from "../Layout/SessionTimeoutModal.jsx";
 import { getPageContent } from "../../utils/functions";

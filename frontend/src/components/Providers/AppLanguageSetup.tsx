@@ -3,7 +3,7 @@ import { useLocation } from "react-router";
 import { useLanguage } from "./LanguageProvider.tsx";
 import { useUser } from "./useUser.tsx";
 import { AVAILABLE_LANGUAGES } from "../../utils/constants";
-import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
+import { useNavigateHelper } from "../../hooks/useNavigate";
 
 function validateSelectedLanguage(selectedLanguage: any) {
   if (!selectedLanguage) return undefined;

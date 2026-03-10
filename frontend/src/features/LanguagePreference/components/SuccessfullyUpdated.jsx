@@ -18,7 +18,7 @@ import {
 } from "../../../utils/constants";
 import { useUser } from "../../../components/Providers/useUser.tsx";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch";
-import { authService } from "../../../services/authService.jsx";
+import { authService } from "../../../services/authService";
 import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 
 export default function SuccessfullyUpdated({

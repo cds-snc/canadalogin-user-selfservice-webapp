@@ -9,7 +9,7 @@ import PasswordChangedConfirmation from "./PasswordChangedConfirmation.jsx";
 import { PAGES } from "../../../utils/constants";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch";
 import { getErrorMessage } from "../../../utils/errorUtils";
-import { authService } from "../../../services/authService.jsx";
+import { authService } from "../../../services/authService";
 
 import { getPageContent } from "../../../utils/functions";
 import { path } from "../../../utils/routeHelpers";

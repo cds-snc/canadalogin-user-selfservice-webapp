@@ -10,7 +10,7 @@ import {
 import parsePhoneNumberFromString from "libphonenumber-js";
 
 import { PAGES } from "../../../utils/constants";
-import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
+import { useNavigateHelper } from "../../../hooks/useNavigate";
 import VerifiedBadge from "../../../components/Badges/VerifiedBadge.jsx";
 import { path } from "../../../utils/routeHelpers";
 

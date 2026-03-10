@@ -84,7 +84,7 @@ vi.mock("../../../components/Providers/useUser.tsx", () => ({
   }),
 }));
 
-vi.mock("../../../services/authService.jsx", () => ({
+vi.mock("../../../services/authService", () => ({
   authService: {
     update_my_user_profile: vi.fn(),
   },

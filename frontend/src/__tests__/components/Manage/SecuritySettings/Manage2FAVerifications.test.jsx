@@ -59,7 +59,7 @@ vi.mock("../../../../components/Providers/useUser.js", () => ({
 
 // Create a mock function that can be configured per test
 const mockUseOtpOperations = vi.fn();
-vi.mock("../../../../hooks/useOtpOperations.js", () => ({
+vi.mock("../../../../hooks/useOtpOperations", () => ({
   useOtpOperations: () => mockUseOtpOperations(),
   MAP_TYPES: {
     LAST_FOUR_DIGITS: "lastFourDigits",
@@ -68,7 +68,7 @@ vi.mock("../../../../hooks/useOtpOperations.js", () => ({
 }));
 
 const mockUsePasskeyOperations = vi.fn();
-vi.mock("../../../../hooks/usePasskeyOperations.js", () => ({
+vi.mock("../../../../hooks/usePasskeyOperations", () => ({
   usePasskeyOperations: () => mockUsePasskeyOperations(),
 }));
 

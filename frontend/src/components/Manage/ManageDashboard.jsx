@@ -7,7 +7,7 @@ import {
 } from "@cdssnc/gcds-components-react";
 import { useParams } from "react-router";
 import { useError } from "../../hooks/useError";
-import { useNavigateHelper } from "../../hooks/useNavigate.tsx";
+import { useNavigateHelper } from "../../hooks/useNavigate";
 import { PAGES } from "../../utils/constants";
 import { getPageContent } from "../../utils/functions";
 import { path } from "../../utils/routeHelpers";

@@ -82,7 +82,7 @@ vi.mock("../../../utils/faviconUtils", () => ({
   restoreDefaultFavicon: vi.fn(),
 }));
 
-vi.mock("../../../hooks/useBreakpoints.ts", () => ({
+vi.mock("../../../hooks/useBreakpoints", () => ({
   useBreakpoints: vi.fn(() => ({
     mobile: false,
     tablet: false,

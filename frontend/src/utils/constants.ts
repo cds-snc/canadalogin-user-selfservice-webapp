@@ -162,6 +162,8 @@ export const SUBMIT_END_POINTS = {
   login: "/v1/auth/login",
   transientOtpVerify: "/v1/otp/transient/verify",
   transientOtpSend: "/v1/otp/transient/send",
+  otpSend: "/v1/otp/mfa/send",
+  otpVerify: "/v1/otp/mfa/verify",
   mfaEnroll: "/v1/otp/mfa/enroll",
   mfaSend: "/v1/otp/mfa/send",
   mfaVerify: "/v1/otp/mfa/verify",

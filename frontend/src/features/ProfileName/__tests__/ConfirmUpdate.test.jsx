@@ -164,7 +164,7 @@ vi.mock("../../../utils/routeHelpers", () => ({
   }),
 }));
 
-vi.mock("../../../services/authService.jsx", () => ({
+vi.mock("../../../services/authService", () => ({
   authService: {
     get_my_user_profile: vi.fn(() =>
       Promise.resolve({

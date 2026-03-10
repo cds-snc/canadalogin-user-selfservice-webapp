@@ -6,7 +6,7 @@ import {
   setWarningFavicon,
   restoreDefaultFavicon,
 } from "../../utils/faviconUtils";
-import { useBreakpoints } from "../../hooks/useBreakpoints.ts";
+import { useBreakpoints } from "../../hooks/useBreakpoints";
 
 const SessionTimeoutModal = ({
   isOpen,

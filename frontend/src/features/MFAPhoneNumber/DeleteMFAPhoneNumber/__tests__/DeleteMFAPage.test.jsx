@@ -26,7 +26,7 @@ vi.mock("react-router", async () => {
   };
 });
 
-vi.mock("../../../../hooks/useNavigate.tsx", () => ({
+vi.mock("../../../../hooks/useNavigate", () => ({
   useNavigateHelper: () => mockNavigateHelper,
 }));
 

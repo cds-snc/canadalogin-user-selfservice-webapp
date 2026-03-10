@@ -6,11 +6,8 @@ import {
   GcdsText,
 } from "@cdssnc/gcds-components-react";
 import { useLocation, useNavigate, useParams } from "react-router";
-import {
-  MAP_TYPES,
-  useOtpOperations,
-} from "../../../hooks/useOtpOperations.js";
-import { usePasskeyOperations } from "../../../hooks/usePasskeyOperations.js";
+import { MAP_TYPES, useOtpOperations } from "../../../hooks/useOtpOperations";
+import { usePasskeyOperations } from "../../../hooks/usePasskeyOperations";
 import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
 import { getPageContent } from "../../../utils/functions";
 import { path } from "../../../utils/routeHelpers";
