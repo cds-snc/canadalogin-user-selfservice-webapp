@@ -11,7 +11,11 @@ import {
   GcdsLink,
 } from "@cdssnc/gcds-components-react";
 import { getPageContent } from "../../../utils/functions.jsx";
-import { PAGES, LANGUAGE_DISPLAY_NAMES } from "../../../utils/constants.jsx";
+import {
+  PAGES,
+  LANGUAGE_DISPLAY_NAMES,
+  EXTERNAL_NAVIGATION_LINKS,
+} from "../../../utils/constants.jsx";
 import { useUser } from "../../../components/Providers/useUser.tsx";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch.jsx";
 import { authService } from "../../../services/authService.jsx";
@@ -84,7 +88,9 @@ export default function SuccessfullyUpdated({
       <GcdsText>{pageContentJson["4"]}</GcdsText>
       <GcdsText>
         {pageContentJson["5"]}{" "}
-        <GcdsLink href="#">{pageContentJson["8"]}</GcdsLink>
+        <GcdsLink href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}>
+          {pageContentJson["8"]}
+        </GcdsLink>
       </GcdsText>
 
       <GcdsGrid columns="max-content max-content" gap="200">
