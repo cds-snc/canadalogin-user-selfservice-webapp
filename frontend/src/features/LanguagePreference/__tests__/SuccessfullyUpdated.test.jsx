@@ -5,7 +5,7 @@ import { useParams, useNavigate } from "react-router";
 import SuccessfullyUpdatedLanguage from "../components/SuccessfullyUpdated.jsx";
 import { useUser } from "../../../components/Providers/useUser.tsx";
 import { authService } from "../../../services/authService.jsx";
-import { EXTERNAL_NAVIGATION_LINKS } from "../../../utils/constants.jsx";
+import { EXTERNAL_NAVIGATION_LINKS } from "../../../utils/constants";
 
 // ────────────────────────────────────────────────
 // Mocks
