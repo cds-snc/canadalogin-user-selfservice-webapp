@@ -4,8 +4,8 @@ import {
   FLOW_TYPES,
   SUBMIT_END_POINTS,
   RP_CLIENT_ID_KEY,
-} from "../utils/constants.jsx";
-import { handleApiError } from "../utils/apiErrorHandler.js";
+} from "../utils/constants";
+import { handleApiError } from "../utils/apiErrorHandler";
 
 import {
   ERROR_RESPONSE,
@@ -14,7 +14,7 @@ import {
   TEST_RESPONSES,
   TEST_USERS,
   VALIDATION_CODE_ERROR_RESPONSE,
-} from "../stories/Tests/utils/constants.jsx";
+} from "../stories/Tests/utils/constants";
 
 axios.defaults.withCredentials = true;
 

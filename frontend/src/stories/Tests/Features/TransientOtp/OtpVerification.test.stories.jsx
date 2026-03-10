@@ -1,9 +1,6 @@
 import { expect, within, waitFor } from "@storybook/test";
 import OtpVerification from "../../../../features/TransientOtp/components/OtpVerification.jsx";
-import {
-  AVAILABLE_LANGUAGES,
-  FLOW_TYPES,
-} from "../../../../utils/constants.jsx";
+import { AVAILABLE_LANGUAGES, FLOW_TYPES } from "../../../../utils/constants";
 
 export default {
   title: "GC Sign In/Tests/Features/TransientOtp/OtpVerification",

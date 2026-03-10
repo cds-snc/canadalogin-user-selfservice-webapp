@@ -1,5 +1,5 @@
 import React from "react";
-import { PAGES } from "../../../utils/constants.jsx";
+import { PAGES } from "../../../utils/constants";
 
 // Import all the components that were previously handled by the Page component
 import ManageDashboard from "../../../components/Manage/ManageDashboard.jsx";

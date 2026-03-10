@@ -1,7 +1,7 @@
 import axios from "axios";
 import config from "../../../../config.jsx";
-import { handleApiError } from "../../../../utils/apiErrorHandler.js";
-import { SUBMIT_END_POINTS } from "../../../../utils/constants.jsx";
+import { handleApiError } from "../../../../utils/apiErrorHandler";
+import { SUBMIT_END_POINTS } from "../../../../utils/constants";
 
 axios.defaults.withCredentials = true;
 

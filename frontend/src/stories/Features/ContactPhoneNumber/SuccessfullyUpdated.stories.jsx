@@ -1,5 +1,5 @@
 import SuccessfullyUpdated from "../../../features/ContactPhoneNumber/components/SuccessfullyUpdated.jsx";
-import { AVAILABLE_LANGUAGES } from "../../../utils/constants.jsx";
+import { AVAILABLE_LANGUAGES } from "../../../utils/constants";
 
 export default {
   title: "GC Sign In/Features/ContactPhoneNumber/SuccessfullyUpdated",

@@ -1,13 +1,10 @@
 import { GcdsDetails, GcdsText, GcdsLink } from "@cdssnc/gcds-components-react";
-import {
-  getContentWithVariables,
-  getPageContent,
-} from "../../utils/functions.jsx";
+import { getContentWithVariables, getPageContent } from "../../utils/functions";
 import {
   EXTERNAL_NAVIGATION_LINKS,
   PAGES,
   ServicesWithAccessInfoSectionInformation,
-} from "../../utils/constants.jsx";
+} from "../../utils/constants";
 import RPNameDisplay from "../RPInfo/RPNameDisplay.jsx";
 
 export default function ServicesWithAccessInfoSection({

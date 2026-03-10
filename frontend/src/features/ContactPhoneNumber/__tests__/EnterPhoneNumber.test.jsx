@@ -128,7 +128,7 @@ vi.mock("libphonenumber-js", () => ({
 }));
 
 // Mock functions
-vi.mock("../../../utils/functions.jsx", () => ({
+vi.mock("../../../utils/functions", () => ({
   getPageContent: (language, page) => {
     const mockContent = {
       EnterNewPhoneNumber: {
@@ -193,8 +193,8 @@ vi.mock("react-router", async () => {
 });
 
 // Mock constants
-vi.mock("../../../utils/constants.jsx", async () => {
-  const actual = await vi.importActual("../../../utils/constants.jsx");
+vi.mock("../../../utils/constants", async () => {
+  const actual = await vi.importActual("../../../utils/constants");
   return {
     ...actual,
     SERVICES: [{ id: 1, title: "Test Service", description: "", url: "#" }],

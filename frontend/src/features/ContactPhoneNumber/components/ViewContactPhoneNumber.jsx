@@ -9,10 +9,10 @@ import {
 } from "@cdssnc/gcds-components-react";
 import parsePhoneNumberFromString from "libphonenumber-js";
 
-import { PAGES } from "../../../utils/constants.jsx";
+import { PAGES } from "../../../utils/constants";
 import { useNavigateHelper } from "../../../hooks/useNavigate.tsx";
 import VerifiedBadge from "../../../components/Badges/VerifiedBadge.jsx";
-import { path } from "../../../utils/routeHelpers.js";
+import { path } from "../../../utils/routeHelpers";
 
 const DisplayPhoneNumbers = ({ phoneNumbers }) => {
   return (

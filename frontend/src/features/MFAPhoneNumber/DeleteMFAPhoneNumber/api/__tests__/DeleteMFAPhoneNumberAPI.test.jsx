@@ -1,13 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import axios from "axios";
 import { deleteMFAPhoneNumberApi } from "../DeleteMFAPhoneNumberAPI.jsx";
-import { handleApiError } from "../../../../../utils/apiErrorHandler.js";
+import { handleApiError } from "../../../../../utils/apiErrorHandler";
 
 // Mock axios
 vi.mock("axios");
 
 // Mock handleApiError
-vi.mock("../../../../../utils/apiErrorHandler.js", () => ({
+vi.mock("../../../../../utils/apiErrorHandler", () => ({
   handleApiError: vi.fn(),
 }));
 

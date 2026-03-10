@@ -8,9 +8,9 @@ import {
   GcdsText,
   GcdsLink,
 } from "@cdssnc/gcds-components-react";
-import { getPageContent } from "../../../utils/functions.jsx";
-import { path } from "../../../utils/routeHelpers.js";
-import { PAGES, DEV_ONLY_FEATURE } from "../../../utils/constants.jsx";
+import { getPageContent } from "../../../utils/functions";
+import { path } from "../../../utils/routeHelpers";
+import { PAGES, DEV_ONLY_FEATURE } from "../../../utils/constants";
 
 import { useUser } from "../../Providers/useUser.js";
 import EnabledBadge from "../../Badges/EnabledBadge.jsx";

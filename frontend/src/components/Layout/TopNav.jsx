@@ -9,12 +9,12 @@ import {
   GcdsTopNav,
 } from "@cdssnc/gcds-components-react";
 import { useBreakpoints } from "../../hooks/useBreakpoints";
-import { getPageContent } from "../../utils/functions.jsx";
-import { path } from "../../utils/routeHelpers.js";
+import { getPageContent } from "../../utils/functions";
+import { path } from "../../utils/routeHelpers";
 import { useUser } from "../Providers/useUser";
-import { PAGES } from "../../utils/constants.jsx";
+import { PAGES } from "../../utils/constants";
 import { authService } from "../../services/authService.jsx";
-import { userProfileDispatch } from "../../utils/userProfileDispatch.jsx";
+import { userProfileDispatch } from "../../utils/userProfileDispatch";
 
 export default function TopNav({ currentLang }) {
   const pageContentJson = getPageContent(currentLang, "TopNavBar");

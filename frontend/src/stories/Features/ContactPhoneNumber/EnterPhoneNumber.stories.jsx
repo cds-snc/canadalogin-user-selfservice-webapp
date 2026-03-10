@@ -1,5 +1,5 @@
 import EnterPhoneNumber from "../../../features/ContactPhoneNumber/components/EnterPhoneNumber.jsx";
-import { AVAILABLE_LANGUAGES, FLOW_TYPES } from "../../../utils/constants.jsx";
+import { AVAILABLE_LANGUAGES, FLOW_TYPES } from "../../../utils/constants";
 import { UserProvider } from "../../../components/Providers/UserProvider.tsx";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider.tsx";
 

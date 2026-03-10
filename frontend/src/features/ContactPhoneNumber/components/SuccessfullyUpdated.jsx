@@ -8,7 +8,7 @@ import {
   GcdsGrid,
   GcdsLink,
 } from "@cdssnc/gcds-components-react";
-import { getPageContent } from "../../../utils/functions.jsx";
+import { getPageContent } from "../../../utils/functions";
 import { EXTERNAL_NAVIGATION_LINKS, PAGES } from "../../../utils/constants";
 import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 

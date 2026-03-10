@@ -36,26 +36,26 @@ vi.mock("../../../services/authService.jsx", () => ({
 }));
 
 // Mock utility functions
-vi.mock("../../../utils/functions.jsx", () => ({
+vi.mock("../../../utils/functions", () => ({
   getPageContent: () => ({
     11: "Loading...",
     error: "An error occurred",
   }),
 }));
 
-vi.mock("../../../utils/routeHelpers.js", () => ({
+vi.mock("../../../utils/routeHelpers", () => ({
   path: vi.fn(() => "/en/profile"),
 }));
 
-vi.mock("../../../utils/userProfileDispatch.jsx", () => ({
+vi.mock("../../../utils/userProfileDispatch", () => ({
   userProfileDispatch: () => ({
     updateProfileSuccess: vi.fn(),
   }),
 }));
 
 // Mock constants
-vi.mock("../../../utils/constants.jsx", async () => {
-  const actual = await vi.importActual("../../../utils/constants.jsx");
+vi.mock("../../../utils/constants", async () => {
+  const actual = await vi.importActual("../../../utils/constants");
   return {
     ...actual,
     SERVICES: [{ id: 1, title: "Test Service", description: "", url: "#" }],

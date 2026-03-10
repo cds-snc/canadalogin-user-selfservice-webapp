@@ -2,7 +2,7 @@ import {
   AVAILABLE_LANGUAGES,
   FLOW_TYPES,
   PAGES,
-} from "../../../utils/constants.jsx";
+} from "../../../utils/constants";
 import { buildTestCase, Template } from "../../Tests/utils/functions.tsx";
 
 export default {

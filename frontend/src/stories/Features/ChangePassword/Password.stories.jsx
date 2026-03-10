@@ -1,5 +1,5 @@
 import Password from "../../../features/ChangePassword/components/Password.jsx";
-import { AVAILABLE_LANGUAGES } from "../../../utils/constants.jsx";
+import { AVAILABLE_LANGUAGES } from "../../../utils/constants";
 
 export default {
   title: "GC Sign In/Features/ChangePassword/Password",

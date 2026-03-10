@@ -1,5 +1,5 @@
 import EmailUpdateSuccess from "../../../features/EmailAddress/EmailUpdateSuccess.jsx";
-import { AVAILABLE_LANGUAGES } from "../../../utils/constants.jsx";
+import { AVAILABLE_LANGUAGES } from "../../../utils/constants";
 
 export default {
   title: "GC Sign In/Features/EmailAddress/EmailUpdateSuccess",

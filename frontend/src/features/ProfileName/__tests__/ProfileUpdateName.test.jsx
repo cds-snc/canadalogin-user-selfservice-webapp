@@ -97,7 +97,7 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
   ),
 }));
 
-vi.mock("../../../../utils/functions.jsx", () => ({
+vi.mock("../../../../utils/functions", () => ({
   getPageContent: () => ({
     1: "Are you sure you want to update your name?",
     2: "You’ve requested to update your name to:",
@@ -140,7 +140,7 @@ vi.mock("react-router", async () => {
 });
 
 // Mock the redirect function to prevent navigation errors
-vi.mock("../../../utils/apiErrorHandler.js", () => ({
+vi.mock("../../../utils/apiErrorHandler", () => ({
   redirectToLogin: vi.fn(),
   handleApiError: vi.fn(),
 }));

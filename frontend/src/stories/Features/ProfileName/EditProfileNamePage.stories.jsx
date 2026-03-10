@@ -1,4 +1,4 @@
-import { AVAILABLE_LANGUAGES, PAGES } from "../../../utils/constants.jsx";
+import { AVAILABLE_LANGUAGES, PAGES } from "../../../utils/constants";
 import { Template } from "../../Tests/utils/functions.tsx";
 
 export default {

@@ -20,7 +20,7 @@ vi.mock("react-router", () => ({
   useParams: () => ({ language: "en" }),
 }));
 
-vi.mock("../../../../../utils/functions.jsx", () => ({
+vi.mock("../../../../../utils/functions", () => ({
   getPageContent: () => ({
     1: "Name your passkey",
     2: "Give your passkey a recognisable name.",
@@ -31,7 +31,7 @@ vi.mock("../../../../../utils/functions.jsx", () => ({
   }),
 }));
 
-vi.mock("../../../../../utils/constants.jsx", () => ({
+vi.mock("../../../../../utils/constants", () => ({
   PAGES: {
     addFIDO2PasskeyNickname: "AddFIDO2PasskeyNickname",
   },

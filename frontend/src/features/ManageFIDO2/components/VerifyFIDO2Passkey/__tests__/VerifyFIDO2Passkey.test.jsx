@@ -33,11 +33,11 @@ vi.mock("react-router", () => ({
 
 // ─── Utilities ─────────────────────────────────────────────────────────────
 
-vi.mock("../../../../../utils/routeHelpers.js", () => ({
+vi.mock("../../../../../utils/routeHelpers", () => ({
   path: (_page, { language } = {}) => `/${language}/mock-path`,
 }));
 
-vi.mock("../../../../../utils/constants.jsx", () => ({
+vi.mock("../../../../../utils/constants", () => ({
   PAGES: {
     verifyFIDO2Passkey: "VerifyFIDO2Passkey",
     manage2FAVerifications: "Manage2FAVerifications",
@@ -48,7 +48,7 @@ vi.mock("../../../../../utils/constants.jsx", () => ({
   DEV_ONLY_FEATURE: false,
 }));
 
-vi.mock("../../../../../utils/functions.jsx", () => ({
+vi.mock("../../../../../utils/functions", () => ({
   getPageContent: (_lang, page) => {
     if (page === "VerifyFIDO2Passkey") {
       return {

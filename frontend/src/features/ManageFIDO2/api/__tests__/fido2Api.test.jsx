@@ -19,13 +19,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import axios from "axios";
 import { fido2Api } from "../fido2Api.jsx";
-import { handleApiError } from "../../../../utils/apiErrorHandler.js";
+import { handleApiError } from "../../../../utils/apiErrorHandler";
 
 // ─── Mocks ─────────────────────────────────────────────────────────────────
 
 vi.mock("axios");
 
-vi.mock("../../../../utils/apiErrorHandler.js", () => ({
+vi.mock("../../../../utils/apiErrorHandler", () => ({
   handleApiError: vi.fn(),
 }));
 

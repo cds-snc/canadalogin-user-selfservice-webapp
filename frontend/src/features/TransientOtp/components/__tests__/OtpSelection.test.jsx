@@ -4,7 +4,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import userEvent from "@testing-library/user-event";
 import OtpSelection from "../OtpSelection.jsx";
-import { FLOW_TYPES, PAGES } from "../../../../utils/constants.jsx";
+import { FLOW_TYPES, PAGES } from "../../../../utils/constants";
 
 // ---------------------------------------------------------------------------
 // Router / navigate mocks
@@ -24,7 +24,7 @@ vi.mock("../../../../hooks/useNavigate.js", () => ({
 // ---------------------------------------------------------------------------
 // Utility mocks
 // ---------------------------------------------------------------------------
-vi.mock("../../../../utils/functions.jsx", () => ({
+vi.mock("../../../../utils/functions", () => ({
   getPageContent: vi.fn((language, page) => {
     if (page === PAGES.transientOtpSelection) {
       return {
@@ -59,14 +59,14 @@ vi.mock("../../../../utils/functions.jsx", () => ({
   }),
 }));
 
-vi.mock("../../../../utils/gcHelpCentreLinks.jsx", () => ({
+vi.mock("../../../../utils/gcHelpCentreLinks", () => ({
   gcHelpCentreLinks: {
     twoStepVerification: "https://help.example.com/2fa",
     recover2StepVerification: "https://help.example.com/no-phone",
   },
 }));
 
-vi.mock("../../../../utils/routeHelpers.js", () => ({
+vi.mock("../../../../utils/routeHelpers", () => ({
   path: vi.fn((page, { language }) => `/${language}/test`),
 }));
 

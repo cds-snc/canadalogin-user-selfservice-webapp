@@ -9,11 +9,11 @@ import {
   GcdsLink,
   GcdsText,
 } from "@cdssnc/gcds-components-react";
-import { getPageContent } from "../../../utils/functions.jsx";
+import { getPageContent } from "../../../utils/functions";
 
 import { useParams } from "react-router";
-import { FLOW_TYPES, PAGES } from "../../../utils/constants.jsx";
-import { gcHelpCentreLinks } from "../../../utils/gcHelpCentreLinks.jsx";
+import { FLOW_TYPES, PAGES } from "../../../utils/constants";
+import { gcHelpCentreLinks } from "../../../utils/gcHelpCentreLinks";
 import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
 
 const initialTime = 10;

@@ -27,7 +27,7 @@ vi.mock("../../../../features/ManageFIDO2/api/fido2Api.jsx", () => ({
   },
 }));
 
-vi.mock("../../../../utils/functions.jsx", () => ({
+vi.mock("../../../../utils/functions", () => ({
   getPageContent: () => ({
     13: "Delete",
     14: "Rename",
@@ -37,7 +37,7 @@ vi.mock("../../../../utils/functions.jsx", () => ({
   }),
 }));
 
-vi.mock("../../../../utils/constants.jsx", () => ({
+vi.mock("../../../../utils/constants", () => ({
   PAGES: {
     manage2FAVerifications: "Manage2FAVerifications",
     deleteFIDO2PasskeyPage: "deleteFIDO2PasskeyPage",
@@ -45,7 +45,7 @@ vi.mock("../../../../utils/constants.jsx", () => ({
   },
 }));
 
-vi.mock("../../../../utils/routeHelpers.js", () => ({
+vi.mock("../../../../utils/routeHelpers", () => ({
   path: (_page, { language } = {}) => `/${language}/mock-path`,
 }));
 

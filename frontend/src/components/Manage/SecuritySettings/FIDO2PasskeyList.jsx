@@ -6,9 +6,9 @@ import {
   GcdsInput,
 } from "@cdssnc/gcds-components-react";
 import { useNavigate, useParams } from "react-router";
-import { PAGES } from "../../../utils/constants.jsx";
-import { getPageContent } from "../../../utils/functions.jsx";
-import { path } from "../../../utils/routeHelpers.js";
+import { PAGES } from "../../../utils/constants";
+import { getPageContent } from "../../../utils/functions";
+import { path } from "../../../utils/routeHelpers";
 import { useState } from "react";
 import { fido2Api } from "../../../features/ManageFIDO2/api/fido2Api.jsx";
 

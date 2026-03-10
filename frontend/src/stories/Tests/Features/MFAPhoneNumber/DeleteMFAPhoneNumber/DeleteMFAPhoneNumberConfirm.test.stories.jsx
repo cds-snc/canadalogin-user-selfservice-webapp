@@ -3,7 +3,7 @@ import {
   AVAILABLE_LANGUAGES,
   FLOW_TYPES,
   PAGES,
-} from "../../../../../utils/constants.jsx";
+} from "../../../../../utils/constants";
 import { buildTestCase, TestTemplate } from "../../../utils/functions.tsx";
 import {
   waitForComponentReady,

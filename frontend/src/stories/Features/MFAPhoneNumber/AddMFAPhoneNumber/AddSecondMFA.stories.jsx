@@ -1,5 +1,5 @@
 import AddSecondMFA from "../../../../features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddSecondMFA.jsx";
-import { AVAILABLE_LANGUAGES } from "../../../../utils/constants.jsx";
+import { AVAILABLE_LANGUAGES } from "../../../../utils/constants";
 
 export default {
   title: "GC Sign In/Features/MFAPhoneNumber/AddMFAPhoneNumber/AddSecondMFA",

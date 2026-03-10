@@ -12,6 +12,8 @@ bin
 lib
 pyvenv.cfg
 .coverage
+.venv/
+.github/copilot-instructions.md
 # ACT GITHUB LOCAL Test Runner Environment
 .actrc
 

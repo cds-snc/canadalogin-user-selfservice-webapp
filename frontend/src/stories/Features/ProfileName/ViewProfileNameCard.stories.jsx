@@ -1,6 +1,6 @@
 import ViewProfileNameCard from "../../../features/ProfileName/components/ViewProfileNameCard.jsx";
-import { AVAILABLE_LANGUAGES, PAGES } from "../../../utils/constants.jsx";
-import { getPageContent } from "../../../utils/functions.jsx";
+import { AVAILABLE_LANGUAGES, PAGES } from "../../../utils/constants";
+import { getPageContent } from "../../../utils/functions";
 import { UserProvider } from "../../../components/Providers/UserProvider.tsx";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider.tsx";
 

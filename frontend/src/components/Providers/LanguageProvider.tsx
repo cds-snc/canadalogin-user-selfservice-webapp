@@ -5,7 +5,7 @@ import {
   ReactNode,
   Dispatch,
 } from "react";
-import { CONTEXT_ACTIONS } from "../../utils/constants.jsx";
+import { CONTEXT_ACTIONS } from "../../utils/constants";
 
 const initialState = {
   language: null,
