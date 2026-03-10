@@ -1,7 +1,7 @@
 import { expect, userEvent, within } from "@storybook/test";
 import { reactRouterParameters } from "storybook-addon-remix-react-router";
 import { http, HttpResponse } from "msw";
-import config from "../../../config.jsx";
+import config from "../../../config";
 import {
   ACTION_TYPES,
   TEST_TYPES,
@@ -10,7 +10,6 @@ import {
 import PageRenderer from "./PageRenderer.jsx";
 import { UserProvider } from "../../../components/Providers/UserProvider";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider";
-import React from "react";
 
 const stepErrorMessage = "Verify error message is on Page.";
 const stepSuccessMessage = "Verify success message is on Page.";

@@ -115,7 +115,7 @@ vi.mock("../../../../components/Layout/Loading", () => ({
   default: ({ text }) => <div data-testid="loading">{text}</div>,
 }));
 
-vi.mock("../../../../config.jsx", () => ({
+vi.mock("../../../../config", () => ({
   default: {
     environment: "test",
   },

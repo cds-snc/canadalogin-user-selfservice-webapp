@@ -1,5 +1,5 @@
 import axios from "axios";
-import config from "../../../config.jsx";
+import config from "../../../config";
 import { SUBMIT_END_POINTS } from "../../../utils/constants";
 import { handleApiError } from "../../../utils/apiErrorHandler";
 

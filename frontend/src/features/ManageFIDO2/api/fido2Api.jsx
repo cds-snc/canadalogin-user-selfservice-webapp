@@ -1,5 +1,5 @@
 import axios from "axios";
-import config from "../../../config.jsx";
+import config from "../../../config";
 import { handleApiError } from "../../../utils/apiErrorHandler";
 
 axios.defaults.withCredentials = true;
