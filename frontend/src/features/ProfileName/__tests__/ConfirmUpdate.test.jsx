@@ -3,8 +3,8 @@ import { render, screen, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { BrowserRouter } from "react-router";
 import ConfirmUpdate from "../components/ConfirmUpdate.jsx";
-import { UserProvider } from "../../../components/Providers/UserProvider.tsx";
-import { LanguageProvider } from "../../../components/Providers/LanguageProvider.tsx";
+import { UserProvider } from "../../../components/Providers/UserProvider";
+import { LanguageProvider } from "../../../components/Providers/LanguageProvider";
 import "@testing-library/jest-dom/vitest";
 
 // Mock variables need to be declared first
@@ -211,7 +211,7 @@ const mockSessionTimeoutState = {
 };
 
 // Mock the user hooks
-vi.mock("../../../components/Providers/useUser.tsx", () => ({
+vi.mock("../../../components/Providers/useUser", () => ({
   useUser: () => ({
     state: mockUserState,
     dispatch: mockDispatch,

@@ -3,8 +3,8 @@ import { BrowserRouter } from "react-router";
 import { render, screen, waitFor, cleanup, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import DeleteMFAPage from "../component/DeleteMFAPage.jsx";
-import { UserProvider } from "../../../../components/Providers/UserProvider.tsx";
-import { LanguageProvider } from "../../../../components/Providers/LanguageProvider.tsx";
+import { UserProvider } from "../../../../components/Providers/UserProvider";
+import { LanguageProvider } from "../../../../components/Providers/LanguageProvider";
 import { useOtpOperations } from "../../../../hooks/useOtpOperations";
 import { usePasswordValidation } from "../../../../hooks/usePasswordValidation";
 

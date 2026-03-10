@@ -2,8 +2,8 @@ import { BrowserRouter } from "react-router";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import UpdateProfileName from "../components/ProfileUpdateName.jsx";
-import { UserProvider } from "../../../components/Providers/UserProvider.tsx";
-import { LanguageProvider } from "../../../components/Providers/LanguageProvider.tsx";
+import { UserProvider } from "../../../components/Providers/UserProvider";
+import { LanguageProvider } from "../../../components/Providers/LanguageProvider";
 import "@testing-library/jest-dom/vitest";
 
 vi.mock("@cdssnc/gcds-components-react", () => ({
@@ -114,19 +114,16 @@ vi.mock("../../../../utils/functions", () => ({
   }),
 }));
 
-vi.mock(
-  "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx",
-  () => ({
-    default: () => (
-      <div data-testid="services-with-access-info">
-        <p>Mocked Services Info Section</p>
-        <ul>
-          <li>Test content for item 3</li>
-        </ul>
-      </div>
-    ),
-  }),
-);
+vi.mock("../../../components/InfoBlocks/ServicesWithAccessInfoSection", () => ({
+  default: () => (
+    <div data-testid="services-with-access-info">
+      <p>Mocked Services Info Section</p>
+      <ul>
+        <li>Test content for item 3</li>
+      </ul>
+    </div>
+  ),
+}));
 
 // Mock the navigation hook
 const mockNavigate = vi.fn();

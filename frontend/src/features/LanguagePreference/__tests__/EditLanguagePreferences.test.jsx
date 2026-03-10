@@ -4,7 +4,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { useParams, useNavigate } from "react-router";
 import EditLanguagePreferences from "../components/EditLanguagePreferences.jsx";
-import { useUser } from "../../../components/Providers/useUser.tsx";
+import { useUser } from "../../../components/Providers/useUser";
 
 // ────────────────────────────────────────────────
 // Mocks
@@ -20,7 +20,7 @@ vi.mock("react-router", async () => {
   };
 });
 
-vi.mock("../../../components/Providers/useUser.tsx", () => ({
+vi.mock("../../../components/Providers/useUser", () => ({
   useUser: vi.fn(),
 }));
 
@@ -68,14 +68,11 @@ vi.mock("../../../utils/constants", () => ({
   },
 }));
 
-vi.mock(
-  "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx",
-  () => ({
-    default: ({ currentLang }) => (
-      <div data-testid="services-info">Services Info - {currentLang}</div>
-    ),
-  }),
-);
+vi.mock("../../../components/InfoBlocks/ServicesWithAccessInfoSection", () => ({
+  default: ({ currentLang }) => (
+    <div data-testid="services-info">Services Info - {currentLang}</div>
+  ),
+}));
 
 vi.mock("@cdssnc/gcds-components-react", () => ({
   GcdsContainer: ({ children, marginTop, ...props }) => (

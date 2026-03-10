@@ -11,7 +11,7 @@ import parsePhoneNumberFromString from "libphonenumber-js";
 
 import { PAGES } from "../../../utils/constants";
 import { useNavigateHelper } from "../../../hooks/useNavigate";
-import VerifiedBadge from "../../../components/Badges/VerifiedBadge.jsx";
+import VerifiedBadge from "../../../components/Badges/VerifiedBadge";
 import { path } from "../../../utils/routeHelpers";
 
 const DisplayPhoneNumbers = ({ phoneNumbers }) => {

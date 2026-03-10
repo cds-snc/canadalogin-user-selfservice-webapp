@@ -67,7 +67,7 @@ vi.mock("../../../utils/userProfileDispatch", () => ({
   }),
 }));
 
-vi.mock("../../../components/Providers/useUser.tsx", () => ({
+vi.mock("../../../components/Providers/useUser", () => ({
   useUser: () => ({
     state: {
       userProfile: {

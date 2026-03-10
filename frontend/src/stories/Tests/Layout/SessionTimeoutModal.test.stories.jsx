@@ -69,13 +69,19 @@ export const ClickStaySignedInButton = {
       // Wait for modal and buttons to be rendered
       await waitForModal({ canvasElement });
 
-      // Find the primary button (Stay signed in)
-      const primaryButton = document.querySelector(
-        'gcds-button[buttontype="primary"]',
-      );
-      await expect(primaryButton).toBeInTheDocument();
+      let stayButton = null;
+      const gcdsButtonsInDocument = document.querySelectorAll("gcds-button");
 
-      const stayButton = getClickableButton(primaryButton) || primaryButton;
+      for (const gcdsButton of gcdsButtonsInDocument) {
+        if (
+          gcdsButton.textContent &&
+          gcdsButton.textContent.includes("Stay signed in")
+        ) {
+          stayButton = getClickableButton(gcdsButton) || gcdsButton;
+          break;
+        }
+      }
+
       await expect(stayButton).toBeInTheDocument();
 
       // Click the button

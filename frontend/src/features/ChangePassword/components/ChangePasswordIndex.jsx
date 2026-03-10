@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router";
-import { useUser } from "../../../components/Providers/useUser.tsx";
-import Loader from "../../../components/Layout/Loading.jsx";
+import { useUser } from "../../../components/Providers/useUser";
+import Loader from "../../../components/Layout/Loading";
 
 import Password from "./Password.jsx";
 import PasswordChangedConfirmation from "./PasswordChangedConfirmation.jsx";
@@ -17,7 +17,7 @@ import OtpSelection from "../../TransientOtp/components/OtpSelection.jsx";
 import OtpVerification from "../../TransientOtp/components/OtpVerification.jsx";
 import { passwordUpdate } from "../api/passwordUpdate.jsx";
 import PasswordVerification from "../../TransientOtp/components/PasswordVerification.jsx";
-import StepContent from "../../../components/Wizard/StepContent.jsx";
+import StepContent from "../../../components/Wizard/StepContent";
 import { usePasswordValidation } from "../../../hooks/usePasswordValidation";
 import { useOtpOperations } from "../../../hooks/useOtpOperations";
 

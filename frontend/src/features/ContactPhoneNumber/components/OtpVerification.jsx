@@ -15,7 +15,7 @@ import { getPageContent } from "../../../utils/functions";
 
 import { FLOW_TYPES, PAGES } from "../../../utils/constants";
 import { useParams } from "react-router";
-import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
+import SubmitButton from "../../../components/Layout/SubmitButton";
 
 const initialTime = 10;
 

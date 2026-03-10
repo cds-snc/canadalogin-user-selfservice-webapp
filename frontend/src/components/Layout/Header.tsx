@@ -8,7 +8,16 @@ import {
 import TopNav from "./TopNav";
 import Breadcrumbs from "./Breadcrumbs";
 
-export default function Header({ langHref, currentLang }) {
+interface HeaderProps {
+  langHref: string;
+  currentLang: string;
+}
+
+type LanguageToggleEvent = CustomEvent<string> & {
+  preventDefault: () => void;
+};
+
+export default function Header({ langHref, currentLang }: HeaderProps) {
   const navigate = useNavigate();
 
   return (
@@ -24,7 +33,7 @@ export default function Header({ langHref, currentLang }) {
           slot="toggle"
           href={langHref}
           lang={currentLang}
-          onGcdsClick={(ev) => {
+          onGcdsClick={(ev: LanguageToggleEvent) => {
             ev.preventDefault();
             navigate(ev.detail);
           }}

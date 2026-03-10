@@ -2,8 +2,8 @@ import { BrowserRouter } from "react-router";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import EnterPhoneNumber from "../components/EnterPhoneNumber.jsx";
-import { UserProvider } from "../../../components/Providers/UserProvider.tsx";
-import { LanguageProvider } from "../../../components/Providers/LanguageProvider.tsx";
+import { UserProvider } from "../../../components/Providers/UserProvider";
+import { LanguageProvider } from "../../../components/Providers/LanguageProvider";
 import "@testing-library/jest-dom/vitest";
 
 // Mock GCDS components

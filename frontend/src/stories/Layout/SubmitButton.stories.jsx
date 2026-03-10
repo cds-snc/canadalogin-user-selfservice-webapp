@@ -1,4 +1,4 @@
-import SubmitButton from "../../components/Layout/SubmitButton.jsx";
+import SubmitButton from "../../components/Layout/SubmitButton";
 
 export default {
   title: "GC Sign In/Layout/SubmitButton",

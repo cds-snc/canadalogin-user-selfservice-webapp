@@ -6,9 +6,9 @@ import {
   LANGUAGE_DISPLAY_NAMES,
 } from "../../../utils/constants";
 import { getPageContent } from "../../../utils/functions";
-import { UserProvider } from "../../../components/Providers/UserProvider.tsx";
-import { LanguageProvider } from "../../../components/Providers/LanguageProvider.tsx";
-import { useUser } from "../../../components/Providers/useUser.tsx";
+import { UserProvider } from "../../../components/Providers/UserProvider";
+import { LanguageProvider } from "../../../components/Providers/LanguageProvider";
+import { useUser } from "../../../components/Providers/useUser";
 
 // Create a wrapper component that provides the proper context
 const ViewLanguagePreferencesWrapper = ({

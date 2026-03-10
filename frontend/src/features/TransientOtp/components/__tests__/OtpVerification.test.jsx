@@ -26,7 +26,7 @@ const mockUserState = {
   testData: undefined,
 };
 
-vi.mock("../../../../components/Providers/useUser.tsx", () => ({
+vi.mock("../../../../components/Providers/useUser", () => ({
   useUser: () => ({
     state: mockUserState,
   }),

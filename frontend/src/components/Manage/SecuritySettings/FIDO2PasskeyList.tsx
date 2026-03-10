@@ -10,46 +10,66 @@ import { PAGES } from "../../../utils/constants";
 import { getPageContent } from "../../../utils/functions";
 import { path } from "../../../utils/routeHelpers";
 import { useState } from "react";
-import { fido2Api } from "../../../features/ManageFIDO2/api/fido2Api.jsx";
+import { fido2Api } from "../../../features/ManageFIDO2/api/fido2Api";
+import type { Fido2Credential } from "../../../types/hooks";
+
+interface Fido2CredentialWithCreated extends Fido2Credential {
+  created?: string;
+  attributes?: {
+    nickname?: string;
+    [key: string]: unknown;
+  };
+}
+
+interface FIDO2PasskeyListProps {
+  userFIDO2CredentialsData: Fido2CredentialWithCreated[];
+  onRenameSuccess?: () => Promise<void> | void;
+}
+
+interface RenameRegistrationResponse {
+  success?: boolean;
+}
 
 export default function FIDO2PasskeyList({
   userFIDO2CredentialsData,
   onRenameSuccess,
-}) {
+}: FIDO2PasskeyListProps) {
   const { language } = useParams();
   const navigate = useNavigate();
   const pageContent = getPageContent(language, PAGES.manage2FAVerifications);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [editingPasskeyId, setEditingPasskeyId] = useState(null);
-  const [passkeyNicknameInputs, setPasskeyNicknameInputs] = useState({});
+  const [editingPasskeyId, setEditingPasskeyId] = useState<string | null>(null);
+  const [passkeyNicknameInputs, setPasskeyNicknameInputs] = useState<
+    Record<string, string>
+  >({});
   const errorPageContent = getPageContent(language, PAGES.error);
 
   const deletePasskeyPage = path(PAGES.deleteFIDO2PasskeyPage, {
-    language: language,
+    language,
   });
 
-  /**
-   * Handle renaming FIDO2 credential
-   */
-  const handleRenameFIDO2 = async (passkeyId, renameDeviceName) => {
+  const handleRenameFIDO2 = async (
+    passkeyId: string,
+    renameDeviceName: string,
+  ) => {
     if (!passkeyId || !renameDeviceName.trim()) return;
 
     setLoading(true);
-    setErrorMessage(null);
+    setErrorMessage("");
 
     try {
-      const response = await fido2Api.updateRegistration(passkeyId, {
+      const response = (await fido2Api.updateRegistration(passkeyId, {
         nickname: renameDeviceName.trim(),
-      });
+      })) as RenameRegistrationResponse | undefined;
 
-      if (response && response.success) {
+      if (response?.success) {
         await onRenameSuccess?.();
       } else {
         throw new Error(errorPageContent["error_rename_credential"]);
       }
-    } catch (err) {
-      console.error(errorPageContent["error_rename_credential"], err);
+    } catch (error) {
+      console.error(errorPageContent["error_rename_credential"], error);
       setErrorMessage(errorPageContent["error_rename_credential"]);
     } finally {
       setLoading(false);
@@ -58,7 +78,8 @@ export default function FIDO2PasskeyList({
 
   return userFIDO2CredentialsData.map(({ id, attributes, created }) => {
     const isEditing = editingPasskeyId === id;
-    const nicknameValue = passkeyNicknameInputs[id] ?? attributes.nickname;
+    const nicknameValue =
+      passkeyNicknameInputs[id] ?? attributes?.nickname ?? "";
 
     return (
       <GcdsContainer key={id}>
@@ -72,22 +93,24 @@ export default function FIDO2PasskeyList({
             lang={language}
             errorMessage={errorMessage}
             value={nicknameValue}
-            onInput={(e) => {
-              setPasskeyNicknameInputs((prev) => ({
-                ...prev,
-                [id]: e.target.value,
+            onInput={(event) => {
+              const nextValue = (event.target as HTMLInputElement).value;
+
+              setPasskeyNicknameInputs((previous) => ({
+                ...previous,
+                [id]: nextValue,
               }));
             }}
           />
         ) : (
           <GcdsText>
-            <strong>{`${attributes.nickname}`}</strong>
+            <strong>{nicknameValue}</strong>
           </GcdsText>
         )}
         <GcdsText>
           <span style={{ color: "#595959" }}>
             {pageContent["16"]}
-            {new Date(created).toLocaleDateString()}
+            {created ? new Date(created).toLocaleDateString() : ""}
           </span>
         </GcdsText>
         <GcdsGrid columns="max-content max-content max-content" gap="200">
@@ -119,7 +142,7 @@ export default function FIDO2PasskeyList({
             buttonRole="secondary"
             onClick={() => {
               navigate(`${deletePasskeyPage}`, {
-                state: { passkeyId: id, passkeyNickname: attributes.nickname },
+                state: { passkeyId: id, passkeyNickname: nicknameValue },
               });
             }}
           >

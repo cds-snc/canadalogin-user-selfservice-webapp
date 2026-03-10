@@ -12,8 +12,8 @@ import {
 } from "@cdssnc/gcds-components-react";
 import { getPageContent } from "../../../utils/functions";
 import { PAGES } from "../../../utils/constants";
-import RPNameDisplay from "../../../components/RPInfo/RPNameDisplay.jsx";
-import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
+import RPNameDisplay from "../../../components/RPInfo/RPNameDisplay";
+import SubmitButton from "../../../components/Layout/SubmitButton";
 import { path } from "../../../utils/routeHelpers";
 
 export default function ConfirmUpdate({

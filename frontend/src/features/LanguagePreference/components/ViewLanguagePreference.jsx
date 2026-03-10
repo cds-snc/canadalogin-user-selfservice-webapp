@@ -9,7 +9,7 @@ import { useNavigate } from "react-router";
 
 import { PAGES, LANGUAGE_DISPLAY_NAMES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
-import { useUser } from "../../../components/Providers/useUser.tsx";
+import { useUser } from "../../../components/Providers/useUser";
 
 export default function ViewLanguagePreferences({ pageContent }) {
   const { language } = useParams();

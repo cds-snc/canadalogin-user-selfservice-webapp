@@ -5,17 +5,22 @@ import {
   PAGES,
   ServicesWithAccessInfoSectionInformation,
 } from "../../utils/constants";
-import RPNameDisplay from "../RPInfo/RPNameDisplay.jsx";
+import RPNameDisplay from "../RPInfo/RPNameDisplay";
+
+interface ServicesWithAccessInfoSectionProps {
+  currentLang: string;
+  information: string;
+}
 
 export default function ServicesWithAccessInfoSection({
   currentLang,
   information,
-}) {
+}: ServicesWithAccessInfoSectionProps) {
   const pageContentJson = getPageContent(
     currentLang,
     PAGES.ServicesWithAccessInfo,
   );
-  const informationMap = {
+  const informationMap: Record<string, string> = {
     [ServicesWithAccessInfoSectionInformation.NAME]: pageContentJson["7"],
     [ServicesWithAccessInfoSectionInformation.CONTACT_PHONE_NUMBER]:
       pageContentJson["8"],

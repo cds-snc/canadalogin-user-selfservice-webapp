@@ -12,9 +12,9 @@ import { getPageContent } from "../../../utils/functions";
 import { path } from "../../../utils/routeHelpers";
 import { PAGES, DEV_ONLY_FEATURE } from "../../../utils/constants";
 
-import { useUser } from "../../Providers/useUser.js";
-import EnabledBadge from "../../Badges/EnabledBadge.jsx";
-import VerifiedBadge from "../../Badges/VerifiedBadge.jsx";
+import { useUser } from "../../Providers/useUser";
+import EnabledBadge from "../../Badges/EnabledBadge";
+import VerifiedBadge from "../../Badges/VerifiedBadge";
 
 export default function SecuritySettings() {
   const { language } = useParams();
@@ -22,15 +22,15 @@ export default function SecuritySettings() {
   const pageContent = getPageContent(language, PAGES.securitySettings);
   const { state } = useUser();
   const lastPasswordChange = state?.userProfile?.details?.pwdChangedTime || "";
-  const formattedPasswordChangeDate = format(
-    new Date(lastPasswordChange),
-    "MMMM d, yyyy",
-    { locale: language === "fr" ? frCA : enCA },
-  );
+  const formattedPasswordChangeDate = lastPasswordChange
+    ? format(new Date(lastPasswordChange), "MMMM d, yyyy", {
+        locale: language === "fr" ? frCA : enCA,
+      })
+    : "";
 
-  const passwordPage = path(PAGES.password, { language: language });
+  const passwordPage = path(PAGES.password, { language });
   const manage2FAVerificationsPage = path(PAGES.manage2FAVerifications, {
-    language: language,
+    language,
   });
 
   return (
@@ -40,7 +40,7 @@ export default function SecuritySettings() {
       <GcdsText>{pageContent["3"]}</GcdsText>
       <GcdsContainer className="sectionCard">
         <GcdsHeading tag="h3">{pageContent["4"]}</GcdsHeading>
-        <GcdsGrid columns="1fr" gap="1rem" align-items="center">
+        <GcdsGrid columns="1fr" gap="300" align-items="center">
           <GcdsText>
             {pageContent["5"]} {formattedPasswordChangeDate}
           </GcdsText>
@@ -55,7 +55,7 @@ export default function SecuritySettings() {
           {pageContent["7"]}
         </GcdsHeading>
         <GcdsText>{pageContent["8"]}</GcdsText>
-        <GcdsGrid columns="1fr" gap="1rem" align-items="center">
+        <GcdsGrid columns="1fr" gap="300" align-items="center">
           <EnabledBadge text={pageContent["9"]} />
           <GcdsLink href={manage2FAVerificationsPage} size="regular">
             {pageContent["10"]}
@@ -71,7 +71,7 @@ export default function SecuritySettings() {
             Some services require users to complete identity verification prior
             to being granted access to the service.
           </GcdsText>
-          <GcdsGrid columns="1fr" gap="1rem" align-items="center">
+          <GcdsGrid columns="1fr" gap="300" align-items="center">
             <VerifiedBadge text="Identity Verified" />
             <GcdsLink href={manage2FAVerificationsPage} size="regular">
               View Details

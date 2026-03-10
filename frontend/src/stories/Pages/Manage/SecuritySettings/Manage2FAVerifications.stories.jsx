@@ -1,4 +1,4 @@
-import Manage2FAVerifications from "../../../../components/Manage/SecuritySettings/Manage2FAVerifications.jsx";
+import Manage2FAVerifications from "../../../../components/Manage/SecuritySettings/Manage2FAVerifications";
 import {
   AVAILABLE_LANGUAGES,
   FLOW_TYPES,

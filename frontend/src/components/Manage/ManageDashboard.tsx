@@ -11,7 +11,11 @@ import { useNavigateHelper } from "../../hooks/useNavigate";
 import { PAGES } from "../../utils/constants";
 import { getPageContent } from "../../utils/functions";
 import { path } from "../../utils/routeHelpers";
-import { useUser } from "../Providers/useUser.tsx";
+import { useUser } from "../Providers/useUser";
+
+type GcdsNavigationEvent = CustomEvent<string> & {
+  preventDefault: () => void;
+};
 
 export default function ManageDashboard() {
   const { language } = useParams();
@@ -23,10 +27,10 @@ export default function ManageDashboard() {
   const navigateHelper = useNavigateHelper();
 
   const personalInformationLink = path(PAGES.ProfileHome, {
-    language: language,
+    language,
   });
   const securitySettingsLink = path(PAGES.securitySettings, {
-    language: language,
+    language,
   });
 
   return (
@@ -35,7 +39,7 @@ export default function ManageDashboard() {
         <GcdsErrorSummary
           data-testid="errorSummary"
           errorLinks={`{"#dashboard": "${error.errorMsg}"}`}
-          heading={error.heading}
+          heading={typeof error.heading === "string" ? error.heading : ""}
         />
       )}
       <GcdsHeading tag="h1">
@@ -46,11 +50,11 @@ export default function ManageDashboard() {
         <GcdsCard
           className="dashboard-card"
           cardTitle={pageContent["2"]}
-          cardTitleTag="h2"
+          cardTitleTag="h3"
           href={personalInformationLink}
-          onGcdsClick={(ev) => {
-            ev.preventDefault();
-            navigateHelper(ev.detail);
+          onGcdsClick={(event: GcdsNavigationEvent) => {
+            event.preventDefault();
+            navigateHelper(event.detail);
           }}
         >
           <svg
@@ -84,11 +88,11 @@ export default function ManageDashboard() {
         <GcdsCard
           className="dashboard-card"
           cardTitle={pageContent["3"]}
-          cardTitleTag="h2"
+          cardTitleTag="h3"
           href={securitySettingsLink}
-          onGcdsClick={(ev) => {
-            ev.preventDefault();
-            navigateHelper(ev.detail);
+          onGcdsClick={(event: GcdsNavigationEvent) => {
+            event.preventDefault();
+            navigateHelper(event.detail);
           }}
         >
           <svg

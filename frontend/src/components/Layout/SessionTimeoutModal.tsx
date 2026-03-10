@@ -8,6 +8,15 @@ import {
 } from "../../utils/faviconUtils";
 import { useBreakpoints } from "../../hooks/useBreakpoints";
 
+interface SessionTimeoutModalProps {
+  isOpen: boolean;
+  expirationTime: string | number | Date | null | undefined;
+  onKeepSession: () => void | Promise<void>;
+  onLogout: () => void | Promise<void>;
+  isLoading?: boolean;
+  currentLang: string;
+}
+
 const SessionTimeoutModal = ({
   isOpen,
   expirationTime,
@@ -15,9 +24,10 @@ const SessionTimeoutModal = ({
   onLogout,
   isLoading = false,
   currentLang,
-}) => {
+}: SessionTimeoutModalProps) => {
   const { mobile, tablet } = useBreakpoints();
-  const pageContentJson = getPageContent(currentLang, "SessionManagement");
+  const pageContentJson: Record<string, string> =
+    getPageContent(currentLang, "SessionManagement") ?? {};
 
   // Change favicon when modal opens/closes
   useEffect(() => {
@@ -81,9 +91,9 @@ const SessionTimeoutModal = ({
             <div className="d-flex gap-3 mt-4">
               <GcdsButton
                 buttonId="keep-session-btn"
-                size="default"
+                size="regular"
                 type="button"
-                buttonType="primary"
+                buttonRole="primary"
                 onClick={onKeepSession}
                 disabled={isLoading}
               >
@@ -92,7 +102,7 @@ const SessionTimeoutModal = ({
 
               <GcdsButton
                 buttonId="logout-btn"
-                size="default"
+                size="regular"
                 type="button"
                 buttonRole="danger"
                 onClick={onLogout}
@@ -153,9 +163,9 @@ const SessionTimeoutModal = ({
             <div className="d-flex gap-3 mt-4">
               <GcdsButton
                 buttonId="keep-session-btn"
-                size="default"
+                size="regular"
                 type="button"
-                buttonType="primary"
+                buttonRole="primary"
                 onClick={onKeepSession}
                 disabled={isLoading}
               >
@@ -164,7 +174,7 @@ const SessionTimeoutModal = ({
 
               <GcdsButton
                 buttonId="logout-btn"
-                size="default"
+                size="regular"
                 type="button"
                 buttonRole="danger"
                 onClick={onLogout}

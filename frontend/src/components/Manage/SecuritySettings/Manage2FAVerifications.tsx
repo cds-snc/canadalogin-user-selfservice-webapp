@@ -11,29 +11,43 @@ import { usePasskeyOperations } from "../../../hooks/usePasskeyOperations";
 import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
 import { getPageContent } from "../../../utils/functions";
 import { path } from "../../../utils/routeHelpers";
-import Loader from "../../Layout/Loading.jsx";
-import { useUser } from "../../Providers/useUser.js";
-import NoticeFactory from "../../InfoBlocks/NoticeFactory.jsx";
-import PhoneFactorsList from "./PhoneFactorsList.jsx";
-import FIDO2PasskeyList from "./FIDO2PasskeyList.jsx";
+import Loader from "../../Layout/Loading";
+import { useUser } from "../../Providers/useUser";
+import NoticeFactory from "../../InfoBlocks/NoticeFactory";
+import PhoneFactorsList from "./PhoneFactorsList";
+import FIDO2PasskeyList from "./FIDO2PasskeyList";
 import FIDOPasskeyIcon from "../../../assets/icons/FIDO_Passkey_mark_A_black.svg?react";
 import FIDOPasskeyCollage from "../../../assets/icons/passkey_collage.svg?react";
+import type { NoticeType } from "../../InfoBlocks/NoticeFactory";
+import type { OtpFactorReference } from "../../../types/hooks";
 
 const sectionCardProps = {
   columns: "1fr",
   gap: "300",
   className: "sectionCard",
   style: { padding: "1.5rem 1.25rem" },
-};
+} as const;
 
 const headerGridProps = {
   columns: "max-content 1fr",
   gap: "150",
   "align-items": "center",
   style: { alignItems: "center" },
-};
+} as const;
 
-function SectionHeader({ icon, title }) {
+interface SectionHeaderProps {
+  icon: React.ReactNode;
+  title: string;
+}
+
+interface Manage2FANoticeState {
+  noticeType?: NoticeType;
+  phoneNumber?: string;
+  otpType?: string;
+  passkeyName?: string;
+}
+
+function SectionHeader({ icon, title }: SectionHeaderProps) {
   return (
     <GcdsGrid {...headerGridProps}>
       {icon}
@@ -49,25 +63,20 @@ export default function Manage2FAVerifications() {
   const location = useLocation();
   const pageContent = getPageContent(language, PAGES.manage2FAVerifications);
   const navigate = useNavigate();
-  const { state, _dispatch } = useUser();
+  const { state } = useUser();
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
-    language: language,
+    language,
   });
 
-  // Check if we came from another page and need to render success notice
   const { noticeType, phoneNumber, otpType, passkeyName } =
-    location.state || {};
+    (location.state as Manage2FANoticeState | null) || {};
   const addFido2PagePath = path(PAGES.addFIDO2PasskeyPage, { language });
 
-  // Use the OTP operations hook for fetching phone factors.
-  // externalLoading is initialised to !!DEV_ONLY_FEATURE so that localLoading
-  // starts true from the very first render when the FIDO2 fetch will run,
-  // preventing a flash of un-loaded content before the useEffect fires.
   const { phoneFactorsMap: userPhoneFactorsMap, otpLoading: localLoading } =
     useOtpOperations({
-      userId: state.userProfile.id,
-      userName: state.userProfile.userName,
-      setErrorCode: () => {}, // No error code setter needed
+      userId: state.userProfile?.id,
+      userName: state.userProfile?.userName,
+      setErrorCode: () => {},
       fallbackNavigationPath: backToSecuritySettingsPage,
       mapType: MAP_TYPES.fullPhoneNumber,
     });
@@ -80,6 +89,11 @@ export default function Manage2FAVerifications() {
     enabled: DEV_ONLY_FEATURE,
     setErrorCode: () => {},
   });
+
+  const fullPhoneFactorsMap = userPhoneFactorsMap as Record<
+    string,
+    OtpFactorReference[]
+  >;
 
   return localLoading || passkeyLoading ? (
     <Loader text={pageContent["11"]} />
@@ -117,11 +131,11 @@ export default function Manage2FAVerifications() {
           }
           title={pageContent["5"]}
         />
-        <PhoneFactorsList userPhoneFactorsMap={userPhoneFactorsMap} />
+        <PhoneFactorsList userPhoneFactorsMap={fullPhoneFactorsMap} />
         <GcdsButton
           id="add-mfa-button"
-          onGcdsClick={(ev) => {
-            ev.preventDefault();
+          onGcdsClick={(event) => {
+            event.preventDefault();
             navigate(path(PAGES.addMFAPage, { language }));
           }}
         >
@@ -165,8 +179,8 @@ export default function Manage2FAVerifications() {
           />
           <GcdsButton
             id="add-fido2-button"
-            onGcdsClick={(ev) => {
-              ev.preventDefault();
+            onGcdsClick={(event) => {
+              event.preventDefault();
               navigate(addFido2PagePath);
             }}
           >

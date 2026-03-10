@@ -2,8 +2,8 @@ import { BrowserRouter } from "react-router";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import EditContactPhoneNumberPage from "../components/EditContactPhoneNumberPage.jsx";
-import { UserProvider } from "../../../components/Providers/UserProvider.tsx";
-import { LanguageProvider } from "../../../components/Providers/LanguageProvider.tsx";
+import { UserProvider } from "../../../components/Providers/UserProvider";
+import { LanguageProvider } from "../../../components/Providers/LanguageProvider";
 import "@testing-library/jest-dom/vitest";
 
 // Declare mock functions first
@@ -151,11 +151,11 @@ vi.mock("../components/SuccessfullyUpdated.jsx", () => ({
   ),
 }));
 
-vi.mock("../../../components/Wizard/StepContent.jsx", () => ({
+vi.mock("../../../components/Wizard/StepContent", () => ({
   default: ({ StepComponent }) => StepComponent,
 }));
 
-vi.mock("../../../components/Layout/Loading.jsx", () => ({
+vi.mock("../../../components/Layout/Loading", () => ({
   default: ({ text }) => <div data-testid="loader">{text}</div>,
 }));
 

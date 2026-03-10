@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router";
-import { useUser } from "../../../components/Providers/useUser.tsx";
+import { useUser } from "../../../components/Providers/useUser";
 import { getPageContent } from "../../../utils/functions";
 import {
   PAGES,
@@ -10,8 +10,8 @@ import {
 import { path } from "../../../utils/routeHelpers";
 import { authService } from "../../../services/authService";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch";
-import StepContent from "../../../components/Wizard/StepContent.jsx";
-import Loader from "../../../components/Layout/Loading.jsx";
+import StepContent from "../../../components/Wizard/StepContent";
+import Loader from "../../../components/Layout/Loading";
 import EnterPhoneNumber from "./EnterPhoneNumber.jsx";
 import OtpVerification from "./OtpVerification.jsx";
 import ConfirmUpdate from "./ConfirmUpdate.jsx";

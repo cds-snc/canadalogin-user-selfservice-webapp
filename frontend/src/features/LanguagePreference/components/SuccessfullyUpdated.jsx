@@ -16,10 +16,10 @@ import {
   LANGUAGE_DISPLAY_NAMES,
   EXTERNAL_NAVIGATION_LINKS,
 } from "../../../utils/constants";
-import { useUser } from "../../../components/Providers/useUser.tsx";
+import { useUser } from "../../../components/Providers/useUser";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch";
 import { authService } from "../../../services/authService";
-import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
+import SubmitButton from "../../../components/Layout/SubmitButton";
 
 export default function SuccessfullyUpdated({
   languageFormData,

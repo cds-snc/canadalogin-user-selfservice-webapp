@@ -1,6 +1,10 @@
 import { GcdsContainer, GcdsIcon } from "@cdssnc/gcds-components-react";
 
-export default function VerifiedBadge({ text }) {
+interface VerifiedBadgeProps {
+  text: string;
+}
+
+export default function VerifiedBadge({ text }: VerifiedBadgeProps) {
   return (
     <GcdsContainer>
       <div

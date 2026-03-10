@@ -5,7 +5,7 @@ import {
   waitForGcdsNotice,
   waitForTextContent,
 } from "../utils/gcdsTestHelpers.js";
-import NoticeFactory from "../../../components/InfoBlocks/NoticeFactory.jsx";
+import NoticeFactory from "../../../components/InfoBlocks/NoticeFactory";
 
 export default {
   title: "GC Sign In/Tests/InfoBlocks/NoticeFactory",
