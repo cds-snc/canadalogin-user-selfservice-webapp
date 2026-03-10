@@ -25,7 +25,7 @@ vi.mock("react-router", async () => {
 });
 
 // Remove the duplicate mock and keep only this one with vi.fn()
-vi.mock("../../../components/Providers/useUser.tsx", () => ({
+vi.mock("../../../components/Providers/useUser", () => ({
   useUser: vi.fn(() => ({
     state: mockUserState,
     dispatch: mockDispatch,
@@ -165,7 +165,7 @@ vi.mock("../../../utils/userProfileDispatch", () => ({
 }));
 
 // Import useUser after the mock is defined
-import { useUser } from "../../../components/Providers/useUser.tsx";
+import { useUser } from "../../../components/Providers/useUser";
 
 describe("SuccessfullyUpdatedName", () => {
   const mockOnBackToProfile = vi.fn();

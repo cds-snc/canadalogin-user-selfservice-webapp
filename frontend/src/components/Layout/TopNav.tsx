@@ -1,8 +1,5 @@
 import {
-  GcdsBreadcrumbs,
-  GcdsBreadcrumbsItem,
   GcdsContainer,
-  GcdsHeader,
   GcdsNavGroup,
   GcdsNavLink,
   GcdsText,
@@ -16,13 +13,22 @@ import { PAGES } from "../../utils/constants";
 import { authService } from "../../services/authService";
 import { userProfileDispatch } from "../../utils/userProfileDispatch";
 
-export default function TopNav({ currentLang }) {
-  const pageContentJson = getPageContent(currentLang, "TopNavBar");
+interface TopNavProps {
+  currentLang: string;
+}
+
+type NavigationEvent = {
+  preventDefault: () => void;
+};
+
+export default function TopNav({ currentLang }: TopNavProps) {
+  const pageContentJson: Record<string, string> =
+    getPageContent(currentLang, "TopNavBar") ?? {};
   const { state, dispatch } = useUser();
   const { setLoading } = userProfileDispatch(dispatch);
 
-  const relyingPartyLinkName = state.relyingPartyInfo?.linkName;
-  const relyingPartyUrl = state.relyingPartyInfo?.url;
+  const relyingPartyLinkName = state.relyingPartyInfo?.linkName ?? "";
+  const relyingPartyUrl = state.relyingPartyInfo?.url ?? "";
   const shouldRenderRelyingPartyLink = relyingPartyLinkName && relyingPartyUrl;
 
   const { mobile, tablet } = useBreakpoints();
@@ -33,8 +39,8 @@ export default function TopNav({ currentLang }) {
     language: currentLang,
   });
 
-  const handleLogout = async (e) => {
-    e.preventDefault();
+  const handleLogout = async (event: NavigationEvent) => {
+    event.preventDefault();
     setLoading(true, pageContentJson["8"]); // Use logout loading text
     try {
       const response = await authService.logout();

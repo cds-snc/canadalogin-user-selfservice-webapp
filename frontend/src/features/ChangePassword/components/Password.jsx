@@ -19,7 +19,7 @@ import { passwordUpdate } from "../api/passwordUpdate.jsx";
 
 import { PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
-import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
+import SubmitButton from "../../../components/Layout/SubmitButton";
 
 export default function Password({
   onNext,

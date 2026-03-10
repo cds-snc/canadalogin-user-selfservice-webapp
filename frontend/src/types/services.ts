@@ -66,7 +66,10 @@ export type SessionKeepAliveData = {
 };
 
 export type RelyingPartyData = {
+  icon: string;
   id: string;
+  linkName: string;
+  url: string;
   [key: string]: unknown;
 };
 

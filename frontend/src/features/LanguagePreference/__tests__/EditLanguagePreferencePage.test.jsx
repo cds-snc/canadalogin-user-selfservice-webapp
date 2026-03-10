@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { useParams, useLocation, useNavigate } from "react-router";
 import EditLanguagePreferencePage from "../components/EditLanguagePreferencePage.jsx";
-import { useUser } from "../../../components/Providers/useUser.tsx";
+import { useUser } from "../../../components/Providers/useUser";
 
 // Mock all the dependencies
 const mockNavigate = vi.fn();
@@ -18,7 +18,7 @@ vi.mock("react-router", async () => {
   };
 });
 
-vi.mock("../../../components/Providers/useUser.tsx", () => ({
+vi.mock("../../../components/Providers/useUser", () => ({
   useUser: vi.fn(),
 }));
 
@@ -29,7 +29,7 @@ vi.mock("../../../components/Wizard/StepContent.jsx", () => ({
   ),
 }));
 
-vi.mock("../../../components/Layout/Loading.jsx", () => ({
+vi.mock("../../../components/Layout/Loading", () => ({
   __esModule: true,
   default: ({ text }) => <div data-testid="loading">{text}</div>,
 }));

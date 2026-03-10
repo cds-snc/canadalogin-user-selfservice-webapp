@@ -5,12 +5,12 @@ import { getLangValues } from "../../utils/functions";
 import { trackPage } from "../../utils/gatag";
 import Header from "../Layout/Header";
 import Footer from "../Layout/Footer";
-import config from "../../config.jsx";
+import config from "../../config";
 
 import { GcdsContainer, GcdsText } from "@cdssnc/gcds-components-react";
 
 const DisplayReleaseTag = () => {
-  const { releaseTag } = config;
+  const { releaseTag } = config as { releaseTag?: string };
 
   if (!releaseTag) {
     return null;
@@ -27,14 +27,15 @@ export default function RootLayout() {
   const { pathname } = useLocation();
   const { state: languageState } = useLanguage();
   const { language } = languageState;
-  const { langHref } = getLangValues(language, pathname);
+  const { langHref, currentLang } = getLangValues(language ?? undefined, pathname);
+
   useEffect(() => {
     trackPage(pathname);
   }, [pathname]);
 
   return (
     <div className="mainBody">
-      <Header langHref={langHref} currentLang={language} />
+      <Header langHref={langHref} currentLang={currentLang} />
       <GcdsContainer className="gcds-page">
         <GcdsContainer size="lg" className="gcds-content" id="main-content">
           <Outlet />
@@ -42,7 +43,7 @@ export default function RootLayout() {
         <DisplayReleaseTag />
       </GcdsContainer>
 
-      <Footer currentLang={language} />
+      <Footer currentLang={currentLang} />
     </div>
   );
 }

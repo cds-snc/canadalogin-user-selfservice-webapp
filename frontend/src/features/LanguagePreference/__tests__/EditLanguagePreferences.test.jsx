@@ -4,7 +4,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { useParams, useNavigate } from "react-router";
 import EditLanguagePreferences from "../components/EditLanguagePreferences.jsx";
-import { useUser } from "../../../components/Providers/useUser.tsx";
+import { useUser } from "../../../components/Providers/useUser";
 
 // ────────────────────────────────────────────────
 // Mocks
@@ -20,7 +20,7 @@ vi.mock("react-router", async () => {
   };
 });
 
-vi.mock("../../../components/Providers/useUser.tsx", () => ({
+vi.mock("../../../components/Providers/useUser", () => ({
   useUser: vi.fn(),
 }));
 

@@ -11,7 +11,7 @@ import { useNavigateHelper } from "../../hooks/useNavigate";
 import { PAGES } from "../../utils/constants";
 import { getPageContent } from "../../utils/functions";
 import { path } from "../../utils/routeHelpers";
-import { useUser } from "../Providers/useUser.tsx";
+import { useUser } from "../Providers/useUser";
 
 export default function ManageDashboard() {
   const { language } = useParams();

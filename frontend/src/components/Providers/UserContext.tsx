@@ -1,10 +1,5 @@
 import { createContext } from "react";
-import type { UserState } from "./UserProvider";
+import type { UserContextValue } from "./UserProvider";
 
-interface UserContextType {
-  state: UserState;
-  dispatch: React.Dispatch<any>;
-}
-
-const UserContext = createContext<UserContextType | null>(null);
+const UserContext = createContext<UserContextValue | null>(null);
 export default UserContext;

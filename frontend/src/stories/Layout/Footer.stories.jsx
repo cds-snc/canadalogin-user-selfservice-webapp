@@ -1,4 +1,4 @@
-import Footer from "../../components/Layout/Footer.jsx";
+import Footer from "../../components/Layout/Footer";
 
 export default {
   title: "GC Sign In/Layout/Footer",

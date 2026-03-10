@@ -48,7 +48,7 @@ exports[`SessionTimeoutModal Snapshots > matches snapshot for mobile view 1`] = 
       class="d-flex gap-3 mt-4"
     >
       <button
-        data-button-type="primary"
+        data-button-role="primary"
         data-testid="keep-session-btn"
         type="button"
       >
@@ -114,7 +114,7 @@ exports[`SessionTimeoutModal Snapshots > matches snapshot for tablet view 1`] = 
       class="d-flex gap-3 mt-4"
     >
       <button
-        data-button-type="primary"
+        data-button-role="primary"
         data-testid="keep-session-btn"
         type="button"
       >
@@ -180,7 +180,7 @@ exports[`SessionTimeoutModal Snapshots > matches snapshot in loading state 1`] =
       class="d-flex gap-3 mt-4"
     >
       <button
-        data-button-type="primary"
+        data-button-role="primary"
         data-testid="keep-session-btn"
         disabled=""
         type="button"
@@ -250,7 +250,7 @@ exports[`SessionTimeoutModal Snapshots > matches snapshot when modal is open - d
       class="d-flex gap-3 mt-4"
     >
       <button
-        data-button-type="primary"
+        data-button-role="primary"
         data-testid="keep-session-btn"
         type="button"
       >
@@ -316,7 +316,7 @@ exports[`SessionTimeoutModal Snapshots > matches snapshot with French language 1
       class="d-flex gap-3 mt-4"
     >
       <button
-        data-button-type="primary"
+        data-button-role="primary"
         data-testid="keep-session-btn"
         type="button"
       >

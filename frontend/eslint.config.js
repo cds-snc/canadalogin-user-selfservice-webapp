@@ -43,7 +43,7 @@ export default [
     },
   },
   {
-    files: ["src/utils/**/*.{ts,tsx}", "src/types/**/*.{ts,tsx}"],
+    files: ["src/**/*.{ts,tsx}"],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,

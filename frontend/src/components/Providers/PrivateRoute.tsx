@@ -1,17 +1,34 @@
 import { useEffect, useCallback } from "react";
 import { Outlet, useLocation, useSearchParams, useParams } from "react-router";
-import { useUser } from "./useUser.tsx";
-import Loader from "../../components/Layout/Loading.jsx";
+import { useUser } from "./useUser";
+import Loader from "../../components/Layout/Loading";
 
 import { isEmailValid, getPageContent } from "../../utils/functions";
 import { FLOW_TYPES, OIDC_REDIRECT, PAGES } from "../../utils/constants";
 import { userProfileDispatch } from "../../utils/userProfileDispatch";
 import { useNavigateHelper } from "../../hooks/useNavigate";
+import type { UserState } from "./UserProvider";
+
+interface StepupPrivateRouteProps {
+  redirectPath?: string;
+}
+
+type RouteGuard = {
+  checkPasswordPage: (state: UserState) => boolean;
+};
+
+type SignUpGuard = RouteGuard & {
+  checkSignUpPage: (state: UserState) => boolean;
+  checkVerificationPage: (state: UserState, type?: string | null) => boolean;
+  checkVerificationSetUpPage: (state: UserState) => boolean;
+  checkCoreProfilePage: (state: UserState) => boolean;
+};
 
 function PrivateRoute() {
   const { state } = useUser();
   const { language } = useParams();
-  const pageContentJson = getPageContent(language, PAGES.otpSelection);
+  const pageContentJson: Record<string, string> =
+    getPageContent(language, PAGES.otpSelection) ?? {};
 
   useEffect(() => {
     if (!state.isLoading && !state.userProfile) {
@@ -19,20 +36,21 @@ function PrivateRoute() {
     }
   }, [state.isLoading, state.userProfile]);
   if (state.isLoading)
-    return <Loader text={state.loadingText || pageContentJson["11"]} />;
+    return <Loader text={state.loadingText || pageContentJson["11"] || "Loading"} />;
   if (!state.userProfile) return null;
 
   return <Outlet />;
 }
 
-function StepupPrivateRoute({ redirectPath = "" }) {
+function StepupPrivateRoute({ redirectPath = "" }: StepupPrivateRouteProps) {
   const { state, dispatch } = useUser();
   const { setAuthenticatedPage } = userProfileDispatch(dispatch);
   const { pathname } = useLocation();
   const { language } = useParams();
   const [searchParams] = useSearchParams();
   const navigateHelper = useNavigateHelper();
-  const pageContentJson = getPageContent(language, PAGES.otpSelection);
+  const pageContentJson: Record<string, string> =
+    getPageContent(language, PAGES.otpSelection) ?? {};
 
   const returnToPageKey = "returnToPage";
   const returnToPagePath = searchParams.get(returnToPageKey);
@@ -46,7 +64,7 @@ function StepupPrivateRoute({ redirectPath = "" }) {
     returnToPagePath === pathname;
 
   const performStepupRedirect = useCallback(() => {
-    let redirectUrl = `${OIDC_REDIRECT.reauth}?${returnToPageKey}=${redirectPath ? encodeURIComponent(redirectPath) : encodeURIComponent(pathname)}`;
+    const redirectUrl = `${OIDC_REDIRECT.reauth}?${returnToPageKey}=${redirectPath ? encodeURIComponent(redirectPath) : encodeURIComponent(pathname)}`;
 
     window.location.href = redirectUrl;
   }, [pathname, returnToPageKey, redirectPath]);
@@ -56,7 +74,7 @@ function StepupPrivateRoute({ redirectPath = "" }) {
       "Step-up authentication successful, marking page as authenticated",
     );
     setAuthenticatedPage(pathname);
-    navigateHelper(returnToPagePath, { replace: true });
+    navigateHelper(returnToPagePath ?? pathname, true);
   }, [pathname, setAuthenticatedPage, returnToPagePath, navigateHelper]);
 
   useEffect(() => {
@@ -110,24 +128,24 @@ function StepupPrivateRoute({ redirectPath = "" }) {
   if (!shouldShowContent) {
     // Without this, the password page will appear to the user before we redirect to IDP
     // Loading state - this can be a general loading component or spinner in the future
-    return <Loader text={pageContentJson["1"]} />;
+    return <Loader text={pageContentJson["1"] || "Loading"} />;
   }
 
   // Render protected sensitive page
   return <Outlet />;
 }
 
-const signUp = {
+const signUp: SignUpGuard = {
   checkSignUpPage: (state) => {
     return state.userData.viewPrivacy;
   },
   checkVerificationPage: (state, type) => {
     if (type === FLOW_TYPES.email) {
       return (
-        signUp.checkSignUpPage(state) && isEmailValid(state.userData.email)
+        signUp.checkSignUpPage(state) && Boolean(isEmailValid(state.userData.email))
       );
     } else {
-      return (
+      return Boolean(
         signUp.checkVerificationSetUpPage(state) &&
         state.userData.stepVerificationSent &&
         state.userData.phone
@@ -141,7 +159,7 @@ const signUp = {
     );
   },
   checkVerificationSetUpPage: (state) => {
-    return (
+    return Boolean(
       signUp.checkPasswordPage(state) &&
       state.userData.passwordSubmitted &&
       state.userData.id
@@ -154,12 +172,14 @@ const signUp = {
   },
 };
 
-const signIn = {
+const signIn: RouteGuard & {
+  checkLoginValidation: (state: UserState) => boolean;
+} = {
   checkPasswordPage: (state) => {
-    return isEmailValid(state.userData.email);
+    return Boolean(isEmailValid(state.userData.email));
   },
   checkLoginValidation: (state) => {
-    return (
+    return Boolean(
       signIn.checkPasswordPage(state) &&
       state.userData.passwordValidated &&
       state.userData.phone &&

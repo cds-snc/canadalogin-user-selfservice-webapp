@@ -23,7 +23,7 @@ import {
   ServicesWithAccessInfoSectionInformation,
 } from "../../../utils/constants";
 import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx";
-import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
+import SubmitButton from "../../../components/Layout/SubmitButton";
 
 const PageHeader = ({ language, pageContentJson }) => {
   return (

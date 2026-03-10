@@ -1,7 +1,7 @@
 import SuccessfullyUpdated from "../../../features/ProfileName/components/SuccessfullyUpdated.jsx";
 import { AVAILABLE_LANGUAGES } from "../../../utils/constants";
-import { UserProvider } from "../../../components/Providers/UserProvider.tsx";
-import { LanguageProvider } from "../../../components/Providers/LanguageProvider.tsx";
+import { UserProvider } from "../../../components/Providers/UserProvider";
+import { LanguageProvider } from "../../../components/Providers/LanguageProvider";
 
 export default {
   title: "GC Sign In/Features/ProfileName/SuccessfullyUpdated",

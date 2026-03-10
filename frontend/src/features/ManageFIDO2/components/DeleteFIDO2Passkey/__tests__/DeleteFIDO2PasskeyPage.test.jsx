@@ -86,7 +86,7 @@ vi.mock("../../../../../components/Wizard/StepContent", () => ({
 
 // ─── Providers / Hooks ─────────────────────────────────────────────────────
 
-vi.mock("../../../../../components/Providers/useUser.js", () => ({
+vi.mock("../../../../../components/Providers/useUser", () => ({
   useUser: () => ({
     state: {
       userProfile: { id: "user-1", userName: "test@example.com" },

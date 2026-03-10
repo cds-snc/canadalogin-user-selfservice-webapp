@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, within } from "@testing-library/react";
 import { useParams, useNavigate } from "react-router";
 import SuccessfullyUpdatedLanguage from "../components/SuccessfullyUpdated.jsx";
-import { useUser } from "../../../components/Providers/useUser.tsx";
+import { useUser } from "../../../components/Providers/useUser";
 import { authService } from "../../../services/authService";
 import { EXTERNAL_NAVIGATION_LINKS } from "../../../utils/constants";
 
@@ -21,7 +21,7 @@ vi.mock("react-router", async () => {
   };
 });
 
-vi.mock("../../../components/Providers/useUser.tsx", () => ({
+vi.mock("../../../components/Providers/useUser", () => ({
   useUser: vi.fn(),
 }));
 

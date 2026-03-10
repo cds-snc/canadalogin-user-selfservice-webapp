@@ -46,7 +46,7 @@ vi.mock("../../../../hooks/useNavigate.js", () => ({
   useNavigateHelper: () => vi.fn(),
 }));
 
-vi.mock("../../../../components/Providers/useUser.js", () => ({
+vi.mock("../../../../components/Providers/useUser", () => ({
   useUser: () => ({
     state: {
       userProfile: {
@@ -111,7 +111,7 @@ vi.mock("../../../../utils/routeHelpers", () => ({
   path: () => "/security-settings",
 }));
 
-vi.mock("../../../../components/Layout/Loading.jsx", () => ({
+vi.mock("../../../../components/Layout/Loading", () => ({
   default: ({ text }) => <div data-testid="loading">{text}</div>,
 }));
 

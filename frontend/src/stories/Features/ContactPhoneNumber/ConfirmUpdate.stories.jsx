@@ -1,7 +1,7 @@
 import ConfirmUpdate from "../../../features/ContactPhoneNumber/components/ConfirmUpdate.jsx";
 import { AVAILABLE_LANGUAGES, FLOW_TYPES } from "../../../utils/constants";
-import { UserProvider } from "../../../components/Providers/UserProvider.tsx";
-import { LanguageProvider } from "../../../components/Providers/LanguageProvider.tsx";
+import { UserProvider } from "../../../components/Providers/UserProvider";
+import { LanguageProvider } from "../../../components/Providers/LanguageProvider";
 
 export default {
   title: "GC Sign In/Features/ContactPhoneNumber/ConfirmUpdate",

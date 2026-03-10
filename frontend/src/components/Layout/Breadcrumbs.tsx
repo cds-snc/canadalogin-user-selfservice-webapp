@@ -1,23 +1,26 @@
-import {
-  GcdsBreadcrumbs,
-  GcdsBreadcrumbsItem,
-  GcdsContainer,
-  GcdsHeader,
-  GcdsNavGroup,
-  GcdsNavLink,
-  GcdsText,
-  GcdsTopNav,
-} from "@cdssnc/gcds-components-react";
+import { GcdsBreadcrumbs, GcdsBreadcrumbsItem } from "@cdssnc/gcds-components-react";
 import { useMatches, useParams } from "react-router";
+import type { UIMatch } from "react-router";
+import type { PageId } from "../../types/utils";
 import { getPageContent } from "../../utils/functions";
 import { useUser } from "../Providers/useUser";
 
+type BreadcrumbHandle = {
+  id: PageId;
+  breadcrumbId: string;
+};
+
+type BreadcrumbLink = {
+  name: string;
+  url: string;
+};
+
 export default function Breadcrumbs() {
-  const matches = useMatches();
+  const matches = useMatches() as Array<UIMatch<unknown, BreadcrumbHandle>>;
   const { language } = useParams();
   const { state } = useUser();
 
-  const rp = state.relyingPartyInfo
+  const rp: BreadcrumbLink | null = state.relyingPartyInfo
     ? {
         name: state.relyingPartyInfo.linkName,
         url: state.relyingPartyInfo.url,
@@ -36,14 +39,16 @@ export default function Breadcrumbs() {
   const routeCrumbs = matches
     .filter((match) => Boolean(match.handle?.breadcrumbId))
     .map((match) => ({
-      name: getPageContent(language, match.handle.id)[
-        match.handle.breadcrumbId
-      ],
+      name:
+        getPageContent(language, match.handle.id)?.[match.handle.breadcrumbId] ??
+        "",
       url: match.pathname,
     }))
     .slice(0, onIndexRoute ? -1 : undefined);
 
-  const crumbsToRender = [rp, ...routeCrumbs].filter((crumb) => Boolean(crumb));
+  const crumbsToRender = [rp, ...routeCrumbs].filter(
+    (crumb): crumb is BreadcrumbLink => Boolean(crumb),
+  );
 
   return (
     <GcdsBreadcrumbs slot="breadcrumb" hideCanadaLink>

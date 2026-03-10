@@ -12,7 +12,7 @@ import { getPageContent } from "../../../utils/functions";
 import { path } from "../../../utils/routeHelpers";
 import { PAGES, DEV_ONLY_FEATURE } from "../../../utils/constants";
 
-import { useUser } from "../../Providers/useUser.js";
+import { useUser } from "../../Providers/useUser";
 import EnabledBadge from "../../Badges/EnabledBadge.jsx";
 import VerifiedBadge from "../../Badges/VerifiedBadge.jsx";
 

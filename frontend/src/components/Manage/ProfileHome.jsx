@@ -9,7 +9,7 @@ import {
 
 import { getPageContent } from "../../utils/functions";
 import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
-import { useUser } from "../Providers/useUser.tsx";
+import { useUser } from "../Providers/useUser";
 import VerifiedBadge from "../Badges/VerifiedBadge.jsx";
 import ViewContactPhoneNumber from "../../features/ContactPhoneNumber/components/ViewContactPhoneNumber.jsx";
 import ViewNameCard from "../../features/ProfileName/components/ViewProfileNameCard.jsx";

@@ -49,7 +49,7 @@ exports[`SessionTimeoutModal > Snapshot Tests > matches snapshot in loading stat
         class="d-flex gap-3 mt-4"
       >
         <button
-          data-button-type="primary"
+          data-button-role="primary"
           data-testid="keep-session-btn"
           disabled=""
           type="button"
@@ -121,7 +121,7 @@ exports[`SessionTimeoutModal > Snapshot Tests > matches snapshot when modal is o
         class="d-flex gap-3 mt-4"
       >
         <button
-          data-button-type="primary"
+          data-button-role="primary"
           data-testid="keep-session-btn"
           type="button"
         >

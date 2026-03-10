@@ -13,7 +13,7 @@ import {
   PAGES,
   ServicesWithAccessInfoSectionInformation,
 } from "../../../utils/constants";
-import SubmitButton from "../../../components/Layout/SubmitButton.jsx";
+import SubmitButton from "../../../components/Layout/SubmitButton";
 import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection.jsx";
 
 export default function ProfileUpdateName({

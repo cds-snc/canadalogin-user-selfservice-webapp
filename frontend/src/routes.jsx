@@ -1,9 +1,9 @@
 import { Navigate } from "react-router";
 
-import RootLayout from "./components/Layout/RootLayout.jsx";
+import RootLayout from "./components/Layout/RootLayout";
 import { AppLanguageSetup } from "./components/Providers/AppLanguageSetup";
 import { LanguageProvider } from "./components/Providers/LanguageProvider";
-import { PrivateRoute } from "./components/Providers/PrivateRoute.jsx";
+import { PrivateRoute } from "./components/Providers/PrivateRoute";
 import { UserProvider } from "./components/Providers/UserProvider";
 
 import EditLanguagePreferencePage from "./features/LanguagePreference/components/EditLanguagePreferencePage.jsx";

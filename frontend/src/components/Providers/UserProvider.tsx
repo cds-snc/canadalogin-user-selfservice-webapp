@@ -1,4 +1,5 @@
-import { useReducer, useEffect, ReactNode, useRef, useMemo } from "react";
+import { useReducer, useEffect, useRef, useMemo } from "react";
+import type { Dispatch, ReactNode } from "react";
 import { useSearchParams, useParams } from "react-router";
 import {
   useEventSource,
@@ -13,14 +14,9 @@ import {
 } from "../../utils/constants";
 import UserContext from "./UserContext";
 import { authService } from "../../services/authService";
-import Loader from "../Layout/Loading.jsx";
-import SessionTimeoutModal from "../Layout/SessionTimeoutModal.jsx";
+import Loader from "../Layout/Loading";
+import SessionTimeoutModal from "../Layout/SessionTimeoutModal";
 import { getPageContent } from "../../utils/functions";
-
-interface Action {
-  type: string;
-  payload: any;
-}
 
 export interface UserProfile {
   id: string;
@@ -58,11 +54,75 @@ export interface RelyingPartyInfo {
 
 export interface UserState {
   userProfile: UserProfile | null;
-  userData: any;
+  userData: UserData;
   isLoading: boolean;
   loadingText: string | null;
   relyingPartyInfo: RelyingPartyInfo | null;
   authenticatedPages: string[];
+}
+
+export interface UserData {
+  service: string;
+  language: string;
+  email: string | null;
+  emailLanguage: string | null;
+  emailValidated: boolean;
+  trxnId: string | null;
+  passwordSubmitted: boolean;
+  phone: string | null;
+  stepVerificationSent: boolean;
+  stepVerified: boolean;
+  viewPrivacy: boolean;
+  id: string | null;
+  otpType: string | null;
+  passwordValidated: boolean;
+}
+
+type LoadingStatePayload = {
+  isLoading: boolean;
+  text?: string | null;
+};
+
+export type UserAction =
+  | {
+      type: typeof CONTEXT_ACTIONS.set_loading;
+      payload: boolean | LoadingStatePayload;
+    }
+  | {
+      type: typeof CONTEXT_ACTIONS.updated_profile_success;
+      payload: UserProfile | null;
+    }
+  | {
+      type: typeof CONTEXT_ACTIONS.set_relying_party_data;
+      payload: RelyingPartyInfo | null;
+    }
+  | {
+      type: typeof CONTEXT_ACTIONS.set_authenticated_pages;
+      payload: string;
+    }
+  | {
+      type: typeof CONTEXT_ACTIONS.remove_authenticated_page;
+      payload: string;
+    };
+
+type SessionTimeoutAction =
+  | {
+      type: typeof CONTEXT_ACTIONS.show_session_timeout_modal;
+      payload: number | null;
+    }
+  | {
+      type: typeof CONTEXT_ACTIONS.hide_session_timeout_modal;
+    }
+  | {
+      type: typeof CONTEXT_ACTIONS.reset_expire_time;
+      payload: number | null;
+    };
+
+export type UserDispatch = Dispatch<UserAction>;
+
+export interface UserContextValue {
+  state: UserState;
+  dispatch: UserDispatch;
 }
 
 export interface SessionTimeoutState {
@@ -111,7 +171,7 @@ const initialSessionState: SessionTimeoutState = {
 
 function userReducer(
   state: UserState = initialState,
-  action: Action,
+  action: UserAction,
 ): UserState {
   switch (action.type) {
     case CONTEXT_ACTIONS.set_loading:
@@ -156,7 +216,7 @@ function userReducer(
 
 function sessionTimeoutReducer(
   state: SessionTimeoutState = initialSessionState,
-  action: Action,
+  action: SessionTimeoutAction,
 ): SessionTimeoutState {
   switch (action.type) {
     case CONTEXT_ACTIONS.show_session_timeout_modal:
@@ -223,7 +283,7 @@ export function UserProvider({
     ? `${config.apiUrl}${SUBMIT_END_POINTS.sessionStatus}`
     : ""; // Empty string prevents connection
 
-  const [eventSource, eventSourceStatus] = useEventSource(
+  const [eventSource] = useEventSource(
     sseUrl, // Connects after user authentication
     true,
   );
@@ -290,11 +350,10 @@ export function UserProvider({
       const response = await authService.keepAlive();
       sessionTimeoutDispatch({
         type: CONTEXT_ACTIONS.hide_session_timeout_modal,
-        payload: null,
       });
       sessionTimeoutDispatch({
         type: CONTEXT_ACTIONS.reset_expire_time,
-        payload: response.data.expire,
+        payload: Number(response?.data?.expire ?? 0),
       });
     } catch (error) {
       console.error("Error keeping session alive:", error);
@@ -363,7 +422,7 @@ export function UserProvider({
             if (latestExpireRef.current !== eventData.expire) {
               sessionTimeoutDispatch({
                 type: CONTEXT_ACTIONS.reset_expire_time,
-                payload: eventData.expire,
+                payload: Number(eventData.expire),
               });
             }
           }
@@ -414,7 +473,7 @@ export function UserProvider({
           // User is authenticated, set the profile
           userDispatch({
             type: CONTEXT_ACTIONS.updated_profile_success,
-            payload: response.data,
+            payload: response.data as UserProfile,
           });
           // Now that we have the profile, we can get the relying party info if not already set
           await getRelyingPartyInfo();

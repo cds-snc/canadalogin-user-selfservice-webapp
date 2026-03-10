@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router";
-import { useUser } from "../../../components/Providers/useUser.tsx";
-import Loader from "../../../components/Layout/Loading.jsx";
+import { useUser } from "../../../components/Providers/useUser";
+import Loader from "../../../components/Layout/Loading";
 
 import Password from "./Password.jsx";
 import PasswordChangedConfirmation from "./PasswordChangedConfirmation.jsx";

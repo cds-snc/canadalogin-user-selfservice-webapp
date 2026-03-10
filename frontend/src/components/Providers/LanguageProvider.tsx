@@ -2,30 +2,32 @@ import {
   createContext,
   useContext,
   useReducer,
-  ReactNode,
-  Dispatch,
 } from "react";
+import type { Dispatch, ReactNode } from "react";
 import { CONTEXT_ACTIONS } from "../../utils/constants";
 
 const initialState = {
   language: null,
 };
 
-interface Action {
-  type: string;
-  payload: any;
-}
-
 interface LanguageProviderProps {
   children: ReactNode;
   initial?: LanguageState;
 }
 
-interface LanguageState {
+export interface LanguageState {
   language: string | null;
 }
 
-function languageReducer(state = initialState, action: Action) {
+export type LanguageAction = {
+  type: typeof CONTEXT_ACTIONS.set_language;
+  payload: string | null;
+};
+
+function languageReducer(
+  state: LanguageState = initialState,
+  action: LanguageAction,
+) {
   switch (action.type) {
     case CONTEXT_ACTIONS.set_language:
       return { ...state, language: action.payload };
@@ -36,7 +38,7 @@ function languageReducer(state = initialState, action: Action) {
 
 interface LanguageContextType {
   state: LanguageState;
-  dispatch: Dispatch<Action>;
+  dispatch: Dispatch<LanguageAction>;
   setAppLanguage: (lang: string) => void;
 }
 
@@ -48,7 +50,7 @@ export const LanguageProvider = ({
 }: LanguageProviderProps) => {
   const [state, dispatch] = useReducer(languageReducer, initial);
 
-  const setAppLanguage = (selectedLanguage) => {
+  const setAppLanguage = (selectedLanguage: string) => {
     dispatch({ type: CONTEXT_ACTIONS.set_language, payload: selectedLanguage });
   };
 
