@@ -11,16 +11,26 @@ import {
 import RPNameDisplay from "../../components/RPInfo/RPNameDisplay";
 import SubmitButton from "../../components/Layout/SubmitButton";
 
-export default function EmailConfirmUpdate({ formData, onSubmit, onCancel }) {
+type EmailFormData = {
+  emailAddress: string;
+};
+
+interface EmailConfirmUpdateProps {
+  formData: EmailFormData;
+  onSubmit: () => Promise<void>;
+  onCancel: () => void | Promise<void>;
+}
+
+export default function EmailConfirmUpdate({
+  formData,
+  onSubmit,
+  onCancel,
+}: EmailConfirmUpdateProps) {
   const { language } = useParams();
 
-  const pageContentJson = getPageContent(language, PAGES.emailConfirmUpdate);
-  const { cancel } = getPageContent(language, "Button");
-
-  const onSubmitHandler = async (ev) => {
-    ev.preventDefault();
-    await onSubmit();
-  };
+  const pageContentJson =
+    getPageContent(language, PAGES.emailConfirmUpdate) ?? {};
+  const { cancel } = getPageContent(language, "Button") ?? {};
 
   if (!formData?.emailAddress) return null;
 
@@ -33,21 +43,22 @@ export default function EmailConfirmUpdate({ formData, onSubmit, onCancel }) {
       <GcdsText>{pageContentJson["3"]}</GcdsText>
       <ul>
         <li>
-          <RPNameDisplay rpName={pageContentJson["4"]} />
+          <RPNameDisplay rpName={pageContentJson["4"] ?? ""} />
         </li>
       </ul>
-      <GcdsGrid columns="max-content max-content" gap="200" marginTop="400">
+      <GcdsGrid columns="max-content max-content" gap="200">
         <SubmitButton
-          type="submit"
-          text={pageContentJson["5"]}
-          onClick={onSubmitHandler}
-        />
+          currentLang={language ?? "en"}
+          onClick={() => void onSubmit()}
+        >
+          {pageContentJson["5"]}
+        </SubmitButton>
         <GcdsButton
           buttonRole="secondary"
           style={{ width: "fit-content" }}
           onGcdsClick={(ev) => {
             ev.preventDefault();
-            onCancel();
+            void onCancel();
           }}
         >
           {cancel}

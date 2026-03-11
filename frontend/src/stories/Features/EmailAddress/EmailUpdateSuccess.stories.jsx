@@ -1,4 +1,4 @@
-import EmailUpdateSuccess from "../../../features/EmailAddress/EmailUpdateSuccess.jsx";
+import EmailUpdateSuccess from "../../../features/EmailAddress/EmailUpdateSuccess";
 import { AVAILABLE_LANGUAGES } from "../../../utils/constants";
 
 export default {

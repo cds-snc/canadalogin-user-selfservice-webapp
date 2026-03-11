@@ -1,4 +1,4 @@
-import EditEmailEnterEmail from "../../../features/EmailAddress/EditEmailEnterEmail.jsx";
+import EditEmailEnterEmail from "../../../features/EmailAddress/EditEmailEnterEmail";
 import { AVAILABLE_LANGUAGES } from "../../../utils/constants";
 import { UserProvider } from "../../../components/Providers/UserProvider";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider";

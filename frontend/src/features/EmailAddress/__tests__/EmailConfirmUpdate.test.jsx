@@ -39,9 +39,9 @@ vi.mock("../../../components/RPInfo/RPNameDisplay", () => ({
 
 // Mock SubmitButton component
 vi.mock("../../../components/Layout/SubmitButton", () => ({
-  default: ({ text, onClick, type }) => (
-    <button data-testid="submit-button" onClick={onClick} type={type}>
-      {text}
+  default: ({ onClick, children }) => (
+    <button data-testid="submit-button" onClick={onClick} type="submit">
+      {children}
     </button>
   ),
 }));
@@ -111,9 +111,9 @@ vi.mock("../../components/RPInfo/RPNameDisplay", () => ({
 }));
 
 vi.mock("../../components/Layout/SubmitButton", () => ({
-  default: ({ text, onClick, type }) => (
-    <button data-testid="submit-button" onClick={onClick} type={type}>
-      {text}
+  default: ({ onClick, children }) => (
+    <button data-testid="submit-button" onClick={onClick} type="submit">
+      {children}
     </button>
   ),
 }));
@@ -399,7 +399,6 @@ describe("EmailConfirmUpdate", () => {
       expect(grid).toBeInTheDocument();
       expect(grid).toHaveAttribute("data-columns", "max-content max-content");
       expect(grid).toHaveAttribute("data-gap", "200");
-      expect(grid).toHaveAttribute("data-margin-top", "400");
     });
 
     it("should handle multiple button clicks", async () => {

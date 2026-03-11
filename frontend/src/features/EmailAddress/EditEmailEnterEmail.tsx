@@ -15,6 +15,19 @@ import {
 import ServicesWithAccessInfoSection from "../../components/InfoBlocks/ServicesWithAccessInfoSection";
 import SubmitButton from "../../components/Layout/SubmitButton";
 
+type EmailFormData = {
+  emailAddress: string;
+};
+
+interface EditEmailEnterEmailProps {
+  onSubmit: (emailAddress: string) => Promise<void>;
+  onCancel: () => void | Promise<void>;
+  handleFormChange: (ev: CustomEvent<string>) => void;
+  formData: EmailFormData;
+  errorMessage?: string;
+  setErrorCode: (errorCode: string) => void;
+}
+
 export default function EditEmailEnterEmail({
   onSubmit,
   onCancel,
@@ -22,18 +35,19 @@ export default function EditEmailEnterEmail({
   formData,
   errorMessage,
   setErrorCode,
-}) {
+}: EditEmailEnterEmailProps) {
   const { language } = useParams();
-  const pageContentJson = getPageContent(language, PAGES.editEmailEnterEmail);
-  const { cancel } = getPageContent(language, "Button");
+  const pageContentJson = getPageContent(language, PAGES.editEmailEnterEmail)!;
+  const { cancel } = getPageContent(language, "Button")!;
 
-  const onSubmitHandler = async (ev) => {
+  const onSubmitHandler: React.FormEventHandler<HTMLFormElement> = async (
+    ev,
+  ) => {
     ev.preventDefault();
-    const emailAddress = formData?.emailAddress || "";
-    await onSubmit(emailAddress);
+    await onSubmit(formData?.emailAddress || "");
   };
 
-  const handleInputChange = (ev) => {
+  const handleInputChange = (ev: CustomEvent<string>) => {
     setErrorCode(""); // Clear any existing errors
     handleFormChange(ev);
   };
@@ -60,14 +74,14 @@ export default function EditEmailEnterEmail({
       </GcdsContainer>
 
       <ServicesWithAccessInfoSection
-        currentLang={language}
+        currentLang={language ?? "en"}
         information={ServicesWithAccessInfoSectionInformation.EMAIL_ADDRESS}
       />
       <form onSubmit={onSubmitHandler}>
         <GcdsInput
           style={{ marginTop: "1.5rem" }}
           label={pageContentJson["6"]}
-          id="emailAddress"
+          inputId="emailAddress"
           name="emailAddress"
           type="email"
           value={formData?.emailAddress || ""}
@@ -75,17 +89,23 @@ export default function EditEmailEnterEmail({
           validateOn="other"
           onGcdsInput={handleInputChange}
           required
-          autofocus
+          autoFocus
         />
       </form>
 
       <GcdsGrid columns="max-content max-content" gap="200">
-        <SubmitButton onGcdsClick={onSubmitHandler} />
+        <SubmitButton
+          currentLang={language ?? "en"}
+          onGcdsClick={(ev) => {
+            ev.preventDefault();
+            void onSubmit(formData?.emailAddress || "");
+          }}
+        />
         <GcdsButton
           buttonRole="secondary"
           onGcdsClick={(ev) => {
             ev.preventDefault();
-            onCancel();
+            void onCancel();
           }}
         >
           {cancel}

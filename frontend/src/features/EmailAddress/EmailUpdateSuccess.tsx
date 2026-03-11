@@ -8,18 +8,24 @@ import {
   GcdsButton,
   GcdsGrid,
   GcdsLink,
-  GcdsIcon,
   GcdsNotice,
 } from "@cdssnc/gcds-components-react";
 import SubmitButton from "../../components/Layout/SubmitButton";
+
+interface EmailUpdateSuccessProps {
+  newEmailAddress: string;
+  onBackToProfile: () => void | Promise<void>;
+  onSignOut: (e: React.MouseEvent) => Promise<void>;
+}
 
 export default function EmailUpdateSuccess({
   newEmailAddress,
   onBackToProfile,
   onSignOut,
-}) {
+}: EmailUpdateSuccessProps) {
   const { language } = useParams();
-  const pageContentJson = getPageContent(language, PAGES.emailUpdateSuccess);
+  const pageContentJson =
+    getPageContent(language, PAGES.emailUpdateSuccess) ?? {};
 
   return (
     <GcdsContainer role="main">
@@ -49,10 +55,11 @@ export default function EmailUpdateSuccess({
         {pageContentJson["7"]}
       </GcdsText>
 
-      <GcdsGrid columns="max-content max-content" gap="200" marginTop="400">
+      <GcdsGrid columns="max-content max-content" gap="200">
         <SubmitButton
-          onClick={onBackToProfile}
+          currentLang={language ?? "en"}
           style={{ width: "fit-content" }}
+          onClick={onBackToProfile}
         >
           {pageContentJson["8"]}
         </SubmitButton>

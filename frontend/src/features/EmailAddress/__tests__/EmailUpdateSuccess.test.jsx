@@ -379,7 +379,6 @@ describe("EmailUpdateSuccess", () => {
       expect(container).toHaveAttribute("role", "main");
       expect(grid).toHaveAttribute("data-columns", "max-content max-content");
       expect(grid).toHaveAttribute("data-gap", "200");
-      expect(grid).toHaveAttribute("data-margin-top", "400");
       expect(notice).toHaveAttribute("data-type", "success");
     });
 

@@ -13,7 +13,24 @@ import { PAGES } from "../../utils/constants";
 import { getPageContent } from "../../utils/functions";
 import SubmitButton from "../../components/Layout/SubmitButton";
 
+type EmailFormData = {
+  emailAddress: string;
+};
+
+interface EmailOtpValidationProps {
+  onSubmit: () => void | Promise<void>;
+  onCancel: () => void | Promise<void>;
+  formData: EmailFormData;
+  setFormData: (data: EmailFormData) => void;
+  errorMessage?: string;
+  userOtpValue: string;
+  handleChange: (value: string) => void;
+  requestOtpCode: () => Promise<void>;
+  onBack: () => void | Promise<void>;
+}
+
 const initialTime = 10;
+
 export default function EmailOtpValidation({
   onSubmit,
   onCancel,
@@ -24,10 +41,10 @@ export default function EmailOtpValidation({
   handleChange,
   requestOtpCode,
   onBack,
-}) {
+}: EmailOtpValidationProps) {
   const { language } = useParams();
-  const pageContentJson = getPageContent(language, PAGES.emailOtpValidation);
-  const { cancel } = getPageContent(language, "Button");
+  const pageContentJson = getPageContent(language, PAGES.emailOtpValidation)!;
+  const { cancel } = getPageContent(language, "Button")!;
   const didFetch = useRef(false);
 
   const [time, setTime] = useState(initialTime);
@@ -36,17 +53,19 @@ export default function EmailOtpValidation({
     setFormData({ emailAddress: "" });
   };
 
-  const handleInputChange = (e) => {
-    const value = e.target.value;
+  const handleInputChange = (e: CustomEvent<string>) => {
+    const value = (e.target as HTMLInputElement).value;
     handleChange(value);
   };
 
-  const onSubmitHandler = async (ev) => {
+  const onSubmitHandler: React.FormEventHandler<HTMLFormElement> = async (
+    ev,
+  ) => {
     ev.preventDefault();
     await onSubmit();
   };
 
-  const handleResendCode = async (ev) => {
+  const handleResendCode = async (ev: Event) => {
     ev.preventDefault();
     if (requestOtpCode) {
       await requestOtpCode();
@@ -58,7 +77,7 @@ export default function EmailOtpValidation({
   useEffect(() => {
     if (!didFetch.current && requestOtpCode) {
       didFetch.current = true;
-      requestOtpCode();
+      void requestOtpCode();
     }
   }, [requestOtpCode]);
 
@@ -92,6 +111,7 @@ export default function EmailOtpValidation({
           style={{ marginTop: "1.5rem" }}
           label={pageContentJson["6"]}
           id="verificationCode"
+          inputId="verificationCode"
           name="verificationCode"
           type="text"
           autocomplete="one-time-code"
@@ -100,20 +120,26 @@ export default function EmailOtpValidation({
           value={userOtpValue}
           onGcdsInput={handleInputChange}
           lang={language}
-          size="6"
+          size={6}
           maxlength={6}
           minlength={6}
-          autofocus
+          autoFocus
         />
       </form>
 
       <GcdsGrid columns="max-content max-content" gap="200">
-        <SubmitButton onGcdsClick={onSubmitHandler} />
+        <SubmitButton
+          currentLang={language ?? "en"}
+          onGcdsClick={(ev) => {
+            ev.preventDefault();
+            void onSubmit();
+          }}
+        />
         <GcdsButton
           buttonRole="secondary"
           onGcdsClick={(ev) => {
             ev.preventDefault();
-            onCancel();
+            void onCancel();
           }}
         >
           {cancel}
@@ -126,7 +152,7 @@ export default function EmailOtpValidation({
         <GcdsLink
           onGcdsClick={async () => {
             clearValues();
-            onBack();
+            await onBack();
           }}
         >
           {pageContentJson["8"]}
