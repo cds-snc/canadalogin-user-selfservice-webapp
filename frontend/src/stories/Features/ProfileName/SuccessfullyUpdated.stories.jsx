@@ -1,4 +1,4 @@
-import SuccessfullyUpdated from "../../../features/ProfileName/components/SuccessfullyUpdated.jsx";
+import SuccessfullyUpdated from "../../../features/ProfileName/components/SuccessfullyUpdated";
 import { AVAILABLE_LANGUAGES } from "../../../utils/constants";
 import { UserProvider } from "../../../components/Providers/UserProvider";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider";

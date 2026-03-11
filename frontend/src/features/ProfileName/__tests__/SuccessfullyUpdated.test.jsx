@@ -2,7 +2,7 @@ import { render, screen, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { BrowserRouter } from "react-router";
 import "@testing-library/jest-dom";
-import SuccessfullyUpdatedName from "../components/SuccessfullyUpdated.jsx";
+import SuccessfullyUpdatedName from "../components/SuccessfullyUpdated";
 
 const mockNavigate = vi.fn();
 const mockSetLoading = vi.fn();

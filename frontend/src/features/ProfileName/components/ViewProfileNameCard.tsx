@@ -1,24 +1,32 @@
-import React from "react";
 import { useParams } from "react-router";
 import {
   GcdsContainer,
-  GcdsHeading,
   GcdsGrid,
-  GcdsText,
+  GcdsHeading,
   GcdsLink,
+  GcdsText,
 } from "@cdssnc/gcds-components-react";
 
 import { PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import { useUser } from "../../../components/Providers/useUser";
 import { useNavigateHelper } from "../../../hooks/useNavigate";
+import type {
+  GcdsNavigationEvent,
+  ProfileNameViewProps,
+} from "../../../types/profileName";
 
-export default function ViewProfileNameSectionCard({ pageContent }) {
-  const { language } = useParams();
+export default function ViewProfileNameCard({
+  pageContent,
+}: ProfileNameViewProps) {
+  const { language = "en" } = useParams<{ language: string }>();
+  const routeLanguage = language === "fr" ? "fr" : "en";
   const { state } = useUser();
   const navigateHelper = useNavigateHelper();
   const name = state?.userProfile?.name?.formatted || "";
-  const editProfile = path(PAGES.editProfileNamePage, { language: language });
+  const editProfile = path(PAGES.editProfileNamePage, {
+    language: routeLanguage,
+  });
 
   return (
     <GcdsContainer className="sectionCard">
@@ -30,9 +38,9 @@ export default function ViewProfileNameSectionCard({ pageContent }) {
         <GcdsLink
           href={editProfile}
           size="regular"
-          onGcdsClick={(ev) => {
-            ev.preventDefault();
-            navigateHelper(ev.detail);
+          onGcdsClick={(event: GcdsNavigationEvent) => {
+            event.preventDefault();
+            navigateHelper(event.detail);
           }}
         >
           {pageContent["5"]}

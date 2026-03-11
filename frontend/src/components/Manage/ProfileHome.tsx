@@ -12,7 +12,7 @@ import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
 import { useUser } from "../Providers/useUser";
 import VerifiedBadge from "../Badges/VerifiedBadge";
 import ViewContactPhoneNumber from "../../features/ContactPhoneNumber/components/ViewContactPhoneNumber";
-import ViewNameCard from "../../features/ProfileName/components/ViewProfileNameCard.jsx";
+import ViewNameCard from "../../features/ProfileName/components/ViewProfileNameCard";
 import ViewLanguagePreferences from "../../features/LanguagePreference/components/ViewLanguagePreference";
 import { path } from "../../utils/routeHelpers";
 

@@ -1,4 +1,4 @@
-import ProfileUpdateName from "../../../features/ProfileName/components/ProfileUpdateName.jsx";
+import ProfileUpdateName from "../../../features/ProfileName/components/ProfileUpdateName";
 import { AVAILABLE_LANGUAGES } from "../../../utils/constants";
 import { UserProvider } from "../../../components/Providers/UserProvider";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider";
