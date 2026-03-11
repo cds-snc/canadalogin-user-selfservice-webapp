@@ -1,6 +1,6 @@
 import { generatePath } from "react-router";
 
-import { appRoutes } from "../routes.jsx";
+import { appRoutes } from "../routes";
 import type { PageId, RouteParams } from "../types/utils";
 
 type AppRoute = {

@@ -7,7 +7,7 @@ import router from "./router";
 import { RouterProvider } from "react-router";
 import ReactGA from "react-ga4";
 
-import config from "./config.jsx";
+import config from "./config";
 
 ReactGA.initialize(config.gatag, {
   gaOptions: {

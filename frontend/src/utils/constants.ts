@@ -1,4 +1,4 @@
-import config from "../config.jsx";
+import config from "../config";
 
 export const AVAILABLE_LANGUAGES = { en: "en", fr: "fr" } as const;
 

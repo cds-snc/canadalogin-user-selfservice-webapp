@@ -29,7 +29,7 @@ vi.mock("../../../../utils/apiErrorHandler", () => ({
   handleApiError: vi.fn(),
 }));
 
-vi.mock("../../../../config.jsx", () => ({
+vi.mock("../../../../config", () => ({
   default: {
     apiUrl: "http://localhost:8000",
   },

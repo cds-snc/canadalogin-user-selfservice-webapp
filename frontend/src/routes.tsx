@@ -1,4 +1,5 @@
 import { Navigate } from "react-router";
+import type { RouteObject } from "react-router";
 
 import RootLayout from "./components/Layout/RootLayout";
 import { AppLanguageSetup } from "./components/Providers/AppLanguageSetup";
@@ -21,7 +22,7 @@ import EditEmailAddressPage from "./features/EmailAddress/EditEmailAddressPage.j
 import AddFIDO2PasskeyPage from "./features/ManageFIDO2/components/AddFIDO2Passkey/AddFIDO2PasskeyPage.jsx";
 import DeleteFIDO2PasskeyPage from "./features/ManageFIDO2/components/DeleteFIDO2Passkey/DeleteFIDO2PasskeyPage.jsx";
 
-export const appRoutes = [
+export const appRoutes: RouteObject[] = [
   {
     element: (
       <UserProvider>
@@ -110,12 +111,12 @@ export const appRoutes = [
                       },
                       {
                         path: "add-fido2",
-                        element: <AddFIDO2PasskeyPage />,
+                        element: <AddFIDO2PasskeyPage step={undefined} />,
                         handle: { id: PAGES.addFIDO2PasskeyPage },
                       },
                       {
                         path: "delete-fido2/:passkeyId?",
-                        element: <DeleteFIDO2PasskeyPage />,
+                        element: <DeleteFIDO2PasskeyPage step={undefined} />,
                         handle: { id: PAGES.deleteFIDO2PasskeyPage },
                       },
                     ],
