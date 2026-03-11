@@ -2,7 +2,7 @@ import "@testing-library/jest-dom/vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { BrowserRouter } from "react-router";
-import ConfirmLanguageUpdate from "../components/ConfirmUpdate.jsx";
+import ConfirmLanguageUpdate from "../components/ConfirmUpdate";
 
 // ────────────────────────────────────────────────
 // Mocks

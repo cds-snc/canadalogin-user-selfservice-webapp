@@ -1,18 +1,15 @@
-import React from "react";
 import { useParams } from "react-router";
-
 import {
-  GcdsContainer,
-  GcdsHeading,
-  GcdsText,
   GcdsButton,
-  GcdsGrid,
-  GcdsRadios,
+  GcdsContainer,
   GcdsErrorMessage,
+  GcdsGrid,
+  GcdsHeading,
+  GcdsRadios,
+  GcdsText,
 } from "@cdssnc/gcds-components-react";
 
 import { getPageContent } from "../../../utils/functions";
-
 import {
   PAGES,
   PROFILE_LANGUAGES,
@@ -20,6 +17,10 @@ import {
 } from "../../../utils/constants";
 import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection";
 import SubmitButton from "../../../components/Layout/SubmitButton";
+import type {
+  LanguagePreferenceEditProps,
+  LanguagePreferencePageContent,
+} from "../../../types/languagePreference";
 
 export default function EditLanguagePreferences({
   languageFormData,
@@ -28,15 +29,15 @@ export default function EditLanguagePreferences({
   onCancel,
   errorMessage,
   setErrorCode,
-}) {
-  const { language } = useParams();
+}: LanguagePreferenceEditProps) {
+  const { language = "en" } = useParams<{ language: string }>();
 
-  const pageContentJson = getPageContent(
-    language,
-    PAGES.editLanguagePreferences,
-  );
+  const pageContentJson =
+    (getPageContent(language, PAGES.editLanguagePreferences) as
+      | LanguagePreferencePageContent
+      | undefined) ?? {};
 
-  const englistSelection = {
+  const englishSelection = {
     label: pageContentJson["13"],
     id: PROFILE_LANGUAGES.en,
     value: PROFILE_LANGUAGES.en,
@@ -49,29 +50,36 @@ export default function EditLanguagePreferences({
     checked: languageFormData.updatedPreferredLanguage === PROFILE_LANGUAGES.fr,
   };
 
-  const languageOptions = [englistSelection, frenchSelection];
+  const languageOptions = [englishSelection, frenchSelection];
 
-  const handleProfileChange = (e) => {
-    const { value } = e.target;
+  const applyLanguageSelection = (value?: string) => {
+    if (!value) {
+      return;
+    }
+
     onLanguageFormChange(value);
-    // Clear error when user makes selection
     if (setErrorCode) {
       setErrorCode("");
     }
   };
 
-  const onSubmitHandler = async (ev) => {
-    ev.preventDefault();
-    await onNext();
+  const handleProfileChange = (event: Event) => {
+    const target = event.target as HTMLInputElement | null;
+    applyLanguageSelection(target?.value);
+  };
+
+  const onSubmitHandler = (event: Event | React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    void onNext();
   };
 
   return (
     <GcdsContainer role="main">
-      {errorMessage && (
+      {errorMessage ? (
         <GcdsErrorMessage messageId="message-props">
           {errorMessage}
         </GcdsErrorMessage>
-      )}
+      ) : null}
 
       <GcdsHeading tag="h1">{pageContentJson["1"]}</GcdsHeading>
       <GcdsText>{pageContentJson["2"]}</GcdsText>
@@ -86,13 +94,17 @@ export default function EditLanguagePreferences({
       </GcdsGrid>
 
       <form onSubmit={onSubmitHandler}>
-        <GcdsContainer marginTop="100">
+        <GcdsContainer style={{ marginTop: "1rem" }}>
           <GcdsRadios
             name="radio"
             legend={pageContentJson["3"]}
             options={languageOptions}
             lang={language}
-            onChange={handleProfileChange}
+            onChange={(event) => {
+              const target = event.target as HTMLInputElement | null;
+              applyLanguageSelection(target?.value);
+            }}
+            onGcdsChange={handleProfileChange}
           />
         </GcdsContainer>
       </form>
@@ -104,9 +116,9 @@ export default function EditLanguagePreferences({
 
         <GcdsButton
           buttonRole="secondary"
-          onGcdsClick={(ev) => {
-            ev.preventDefault();
-            onCancel();
+          onGcdsClick={(event: Event) => {
+            event.preventDefault();
+            void onCancel();
           }}
         >
           {pageContentJson["16"]}

@@ -13,7 +13,7 @@ import { useUser } from "../Providers/useUser";
 import VerifiedBadge from "../Badges/VerifiedBadge";
 import ViewContactPhoneNumber from "../../features/ContactPhoneNumber/components/ViewContactPhoneNumber";
 import ViewNameCard from "../../features/ProfileName/components/ViewProfileNameCard.jsx";
-import ViewLanguagePreferences from "../../features/LanguagePreference/components/ViewLanguagePreference.jsx";
+import ViewLanguagePreferences from "../../features/LanguagePreference/components/ViewLanguagePreference";
 import { path } from "../../utils/routeHelpers";
 
 interface DisplayEmailInfoProps {

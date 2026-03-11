@@ -2,7 +2,7 @@ import "@testing-library/jest-dom/vitest";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { useParams, useLocation, useNavigate } from "react-router";
-import EditLanguagePreferencePage from "../components/EditLanguagePreferencePage.jsx";
+import EditLanguagePreferencePage from "../components/EditLanguagePreferencePage";
 import { useUser } from "../../../components/Providers/useUser";
 
 // Mock all the dependencies

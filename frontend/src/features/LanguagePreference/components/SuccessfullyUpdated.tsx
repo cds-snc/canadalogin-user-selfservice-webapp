@@ -1,83 +1,92 @@
-import React from "react";
 import { useParams } from "react-router";
-
 import {
-  GcdsContainer,
-  GcdsHeading,
-  GcdsText,
-  GcdsNotice,
   GcdsButton,
+  GcdsContainer,
   GcdsGrid,
+  GcdsHeading,
   GcdsLink,
+  GcdsNotice,
+  GcdsText,
 } from "@cdssnc/gcds-components-react";
+
 import { getPageContent } from "../../../utils/functions";
 import {
-  PAGES,
-  LANGUAGE_DISPLAY_NAMES,
   EXTERNAL_NAVIGATION_LINKS,
+  LANGUAGE_DISPLAY_NAMES,
+  PAGES,
 } from "../../../utils/constants";
 import { useUser } from "../../../components/Providers/useUser";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch";
 import { authService } from "../../../services/authService";
 import SubmitButton from "../../../components/Layout/SubmitButton";
+import type {
+  LanguagePreferencePageContent,
+  LanguagePreferenceSuccessProps,
+} from "../../../types/languagePreference";
+import type {
+  AuthServiceResponse,
+  LogoutResponseData,
+} from "../../../types/services";
 
 export default function SuccessfullyUpdated({
   languageFormData,
   onBackToProfile,
-}) {
-  const { language } = useParams();
+}: LanguagePreferenceSuccessProps) {
+  const { language = "en" } = useParams<{ language: string }>();
+  const routeLanguage = language === "fr" ? "fr" : "en";
   const { state, dispatch } = useUser();
   const { setLoading } = userProfileDispatch(dispatch);
-  const pageContentJson = getPageContent(
-    language,
-    PAGES.successfullyUpdatedLanguage,
-  );
+  const pageContentJson =
+    (getPageContent(routeLanguage, PAGES.successfullyUpdatedLanguage) as
+      | LanguagePreferencePageContent
+      | undefined) ?? {};
   const preferredLanguage = state?.userProfile?.preferredLanguage || "";
 
-  const handleSignout = async (e) => {
-    e.preventDefault();
+  const handleSignout = async (event: Event) => {
+    event.preventDefault();
     setLoading(true, pageContentJson["12"]);
 
     try {
-      const response = await authService.logout();
+      const response = (await authService.logout()) as
+        | AuthServiceResponse<LogoutResponseData>
+        | undefined;
       const redirectUrl = response?.data?.redirect_url || null;
 
-      // Check if response has redirect_url
       if (redirectUrl) {
-        // form been submitted in authService.logout
         return;
-      } else {
-        // Fallback redirect if no redirect_url provided
-        window.location.href = "/";
       }
+
+      window.location.href = "/";
     } catch (error) {
       console.error("Logout failed:", error);
-      // Update loading text to show error
       setLoading(true, pageContentJson["13"]);
-      // Redirect after error
       setTimeout(() => {
         window.location.href = "/";
       }, 2000);
     }
   };
 
-  const onSubmitHandler = async (ev) => {
-    ev.preventDefault();
-    await onBackToProfile();
+  const onSubmitHandler = (event: Event | CustomEvent<string | void>) => {
+    event.preventDefault();
+    void onBackToProfile();
   };
 
-  if (!languageFormData?.languageCode) return null;
+  if (!languageFormData?.languageCode) {
+    return null;
+  }
+
+  const displayLanguageName =
+    LANGUAGE_DISPLAY_NAMES[routeLanguage]?.[
+      preferredLanguage as keyof (typeof LANGUAGE_DISPLAY_NAMES)["en"]
+    ] || languageFormData.updatedPreferredLanguage;
 
   return (
     <GcdsContainer role="main">
       <GcdsText>
-        {" "}
         <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle=" ">
           <GcdsText>
             <strong>
-              {pageContentJson["1"]}{" "}
-              {LANGUAGE_DISPLAY_NAMES[language]?.[preferredLanguage] ||
-                languageFormData.updatedPreferredLanguage}
+              {pageContentJson["1"]} {displayLanguageName}
             </strong>
           </GcdsText>
         </GcdsNotice>
@@ -97,17 +106,15 @@ export default function SuccessfullyUpdated({
         <SubmitButton
           style={{ width: "fit-content" }}
           onGcdsClick={onSubmitHandler}
-          currentLang={language}
+          currentLang={routeLanguage}
         >
           {pageContentJson["6"]}
         </SubmitButton>
-        &nbsp;
         <GcdsButton
           buttonRole="secondary"
           style={{ width: "fit-content" }}
-          onGcdsClick={(ev) => {
-            ev.preventDefault();
-            handleSignout(ev);
+          onGcdsClick={(event: Event) => {
+            void handleSignout(event);
           }}
         >
           {pageContentJson["7"]}
