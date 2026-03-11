@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import {
   GcdsButton,
   GcdsContainer,
@@ -12,6 +13,7 @@ import { getPageContent } from "../../../utils/functions";
 import { gcHelpCentreLinks } from "../../../utils/gcHelpCentreLinks";
 
 import { FLOW_TYPES, PAGES } from "../../../utils/constants";
+import type { Fido2Credential, OtpFactor } from "../../../types/hooks";
 import SMSIcon from "../../../assets/icons/sms_icon.svg?react";
 import VoiceIcon from "../../../assets/icons/voicecall_icon.svg?react";
 import FIDO2Icon from "../../../assets/icons/FIDO_Passkey_mark_A_black.svg?react";
@@ -21,9 +23,15 @@ const headerGridProps = {
   gap: "150",
   "align-items": "center",
   style: { alignItems: "center", paddingTop: "3rem", paddingBottom: "1.5rem" },
-};
+} as const;
 
-function SectionHeader({ icon, title, paddingBottom }) {
+interface SectionHeaderProps {
+  icon: ReactNode;
+  title: string;
+  paddingBottom?: string;
+}
+
+function SectionHeader({ icon, title, paddingBottom }: SectionHeaderProps) {
   return (
     <GcdsGrid
       {...headerGridProps}
@@ -37,6 +45,16 @@ function SectionHeader({ icon, title, paddingBottom }) {
   );
 }
 
+interface OtpSelectionProps {
+  onNext: () => void;
+  onChangeUserSelectedMfaFactor: (factorId: string) => void;
+  userPhoneFactors?: OtpFactor[] | null;
+  fido2Data?: Fido2Credential[] | null;
+  onSelectFIDO2?: (passkey: Fido2Credential) => void;
+  parentPage: string;
+  onCancel: () => void;
+}
+
 export default function OtpSelection({
   onNext,
   onChangeUserSelectedMfaFactor,
@@ -45,11 +63,12 @@ export default function OtpSelection({
   onSelectFIDO2,
   parentPage,
   onCancel,
-}) {
+}: OtpSelectionProps) {
   const { language } = useParams();
 
-  const pageContentJson = getPageContent(language, PAGES.transientOtpSelection);
-  const { cancel } = getPageContent(language, "Button");
+  const pageContentJson =
+    getPageContent(language, PAGES.transientOtpSelection) ?? {};
+  const { cancel } = getPageContent(language, "Button") ?? {};
 
   const smsFactors =
     userPhoneFactors?.filter((f) => f.type === FLOW_TYPES.sms) ?? [];
@@ -57,7 +76,7 @@ export default function OtpSelection({
     userPhoneFactors?.filter((f) => f.type === FLOW_TYPES.voice) ?? [];
   const hasFido2 = fido2Data && fido2Data.length > 0;
 
-  const handlePhoneFactorSelect = (factorId) => {
+  const handlePhoneFactorSelect = (factorId: string) => {
     onChangeUserSelectedMfaFactor(factorId);
     onNext();
   };
@@ -81,7 +100,7 @@ export default function OtpSelection({
 
   const factorListStyle = {
     display: "flex",
-    flexDirection: "column",
+    flexDirection: "column" as const,
     gap: "1.5rem",
   };
 
@@ -104,7 +123,7 @@ export default function OtpSelection({
           <GcdsContainer>
             <SectionHeader
               icon={<SMSIcon width="23" height="23" />}
-              title={pageContentJson["8"]}
+              title={pageContentJson["8"] ?? ""}
             />
             <GcdsContainer style={factorListStyle}>
               <GcdsText marginBottom="0">
@@ -137,7 +156,7 @@ export default function OtpSelection({
           <GcdsContainer>
             <SectionHeader
               icon={<VoiceIcon width="23" height="23" />}
-              title={pageContentJson["9"]}
+              title={pageContentJson["9"] ?? ""}
             />
             <GcdsContainer style={factorListStyle}>
               <GcdsText marginBottom="0">
@@ -170,11 +189,11 @@ export default function OtpSelection({
           <GcdsContainer>
             <SectionHeader
               icon={<FIDO2Icon width="34" height="34" />}
-              title={pageContentJson["17"]}
+              title={pageContentJson["17"] ?? ""}
               paddingBottom="0"
             />
             <GcdsContainer style={factorListStyle}>
-              {fido2Data.map((passkey) => (
+              {fido2Data?.map((passkey) => (
                 <GcdsGrid
                   key={passkey.id}
                   columns="1fr auto"

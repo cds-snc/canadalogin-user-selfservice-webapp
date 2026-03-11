@@ -166,7 +166,7 @@ export default function DeleteFIDO2PasskeyPage({ step }) {
         validatePassword={validatePassword}
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
-        parentPage={PAGES.deleteFido2Passkey}
+        parentPage={PAGES.deleteFIDO2PasskeyPage}
       />
     ),
     otpSelection: (

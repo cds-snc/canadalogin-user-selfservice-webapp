@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import axios from "axios";
-import { otpFactors } from "../otpFactors.jsx";
+import { otpFactors } from "../otpFactors";
 import { handleApiError } from "../../../../utils/apiErrorHandler";
 
 // Mock axios
