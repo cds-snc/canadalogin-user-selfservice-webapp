@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { BrowserRouter } from "react-router";
-import ConfirmUpdate from "../components/ConfirmUpdate.jsx";
+import ConfirmUpdate from "../components/ConfirmUpdate";
 import { UserProvider } from "../../../components/Providers/UserProvider";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider";
 import "@testing-library/jest-dom/vitest";

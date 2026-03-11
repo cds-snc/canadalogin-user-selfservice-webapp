@@ -1,4 +1,4 @@
-import ConfirmUpdate from "../../../features/ProfileName/components/ConfirmUpdate.jsx";
+import ConfirmUpdate from "../../../features/ProfileName/components/ConfirmUpdate";
 import { AVAILABLE_LANGUAGES } from "../../../utils/constants";
 import { UserProvider } from "../../../components/Providers/UserProvider";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider";

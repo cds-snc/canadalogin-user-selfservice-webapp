@@ -1,7 +1,7 @@
 import { BrowserRouter } from "react-router";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import UpdateProfileName from "../components/ProfileUpdateName.jsx";
+import UpdateProfileName from "../components/ProfileUpdateName";
 import { UserProvider } from "../../../components/Providers/UserProvider";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider";
 import "@testing-library/jest-dom/vitest";

@@ -1,4 +1,4 @@
-import ViewProfileNameCard from "../../../features/ProfileName/components/ViewProfileNameCard.jsx";
+import ViewProfileNameCard from "../../../features/ProfileName/components/ViewProfileNameCard";
 import { AVAILABLE_LANGUAGES, PAGES } from "../../../utils/constants";
 import { getPageContent } from "../../../utils/functions";
 import { UserProvider } from "../../../components/Providers/UserProvider";

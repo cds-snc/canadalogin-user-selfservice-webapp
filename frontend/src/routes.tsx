@@ -12,7 +12,7 @@ import ManageDashboard from "./components/Manage/ManageDashboard";
 import ProfileHome from "./components/Manage/ProfileHome";
 import Manage2FAVerifications from "./components/Manage/SecuritySettings/Manage2FAVerifications";
 import SecuritySettings from "./components/Manage/SecuritySettings/SecuritySettings";
-import EditProfileNamePage from "./features/ProfileName/components/EditProfileNamePage.jsx";
+import EditProfileNamePage from "./features/ProfileName/components/EditProfileNamePage";
 import ChangePasswordIndex from "./features/ChangePassword/components/ChangePasswordIndex";
 import EditContactPhoneNumberPage from "./features/ContactPhoneNumber/components/EditContactPhoneNumberPage";
 import AddMFAPage from "./features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPage";
