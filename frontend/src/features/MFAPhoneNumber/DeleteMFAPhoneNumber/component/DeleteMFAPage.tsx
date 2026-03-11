@@ -18,20 +18,38 @@ import PasswordVerification from "../../../TransientOtp/components/PasswordVerif
 import StepContent from "../../../../components/Wizard/StepContent";
 import { usePasswordValidation } from "../../../../hooks/usePasswordValidation";
 import { useOtpOperations } from "../../../../hooks/useOtpOperations";
+import { OtpFactor } from "../../../../types/hooks";
+
+interface DeletePhoneFormData {
+  phoneNumber: string;
+  otp: string;
+  formattedPhoneNumber: string;
+  mfaFactorsToDelete: OtpFactor[];
+}
+
+type WizardStep =
+  | "passwordVerification"
+  | "otpSelection"
+  | "otpValidation"
+  | "deleteMFAPhoneNumberConfirm";
 
 export default function DeleteMFAPage() {
   const { language } = useParams();
   const location = useLocation();
-  const [savedLocationState, setSavedLocationState] = useState(null);
+  const [savedLocationState, setSavedLocationState] = useState<{
+    factorIds?: string[];
+  } | null>(null);
   const { factorIds } = savedLocationState || {};
 
   const { state } = useUser();
   const [userPasswordValue, setUserPasswordValue] = useState("");
-  const pageContentJson = getPageContent(language, PAGES.otpSelection);
+  const pageContentJson = getPageContent(language, PAGES.otpSelection)!;
 
   const [errorCode, setErrorCode] = useState("");
   const errorMessage = getErrorMessage(language, errorCode);
-  const [wizardStep, setWizardStep] = useState("passwordVerification");
+  const [wizardStep, setWizardStep] = useState<WizardStep>(
+    "passwordVerification",
+  );
   const { userProfile } = state;
   const { id, userName } = userProfile ?? {};
   const navigate = useNavigate();
@@ -72,14 +90,14 @@ export default function DeleteMFAPage() {
     fallbackNavigationPath: backToSecuritySettingsPage,
   });
 
-  const [phoneFormData, setPhoneFormData] = useState({
+  const [phoneFormData, setPhoneFormData] = useState<DeletePhoneFormData>({
     phoneNumber: "",
     otp: "",
     formattedPhoneNumber: "",
     mfaFactorsToDelete: [],
   });
 
-  const handlePhoneForm = (field, value) => {
+  const handlePhoneForm = (field: string, value: unknown) => {
     setPhoneFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -92,16 +110,22 @@ export default function DeleteMFAPage() {
       // Note: otpType is the type of factor being deleted
       // otpVerificationType is the type of OTP used for verification (may differ)
       const verificationOtpType = userSelectedMfaFactor
-        ? serverMapping[userSelectedMfaFactor.type]
-        : serverMapping[phoneFormData.mfaFactorsToDelete[0]?.type];
+        ? serverMapping[
+            userSelectedMfaFactor.type as keyof typeof serverMapping
+          ]
+        : serverMapping[
+            phoneFormData.mfaFactorsToDelete[0]
+              ?.type as keyof typeof serverMapping
+          ];
 
       await Promise.all(
         phoneFormData.mfaFactorsToDelete.map((mfaFactor) =>
           deleteMFAPhoneNumberApi.deleteMFA({
             id: mfaFactor.id,
-            otpType: serverMapping[mfaFactor.type], // Type of factor being deleted
+            otpType:
+              serverMapping[mfaFactor.type as keyof typeof serverMapping], // Type of factor being deleted
             otp: userOtpValue,
-            trxnId: otpSentResponse.trxnId,
+            trxnId: otpSentResponse?.trxnId,
             otpVerificationType: verificationOtpType, // Type of OTP used for verification
           }),
         ),
@@ -114,8 +138,13 @@ export default function DeleteMFAPage() {
         },
       });
     } catch (error) {
-      setErrorCode(error?.data?.message);
-      if (INVALID_OTP_ERROR_CODES.includes(error?.data?.message)) {
+      const err = error as { data?: { message?: string } };
+      setErrorCode(err?.data?.message ?? "");
+      if (
+        (INVALID_OTP_ERROR_CODES as readonly string[]).includes(
+          err?.data?.message ?? "",
+        )
+      ) {
         // If OTP is invalid, go back to OTP validation step
         setWizardStep("otpValidation");
       }
@@ -128,9 +157,10 @@ export default function DeleteMFAPage() {
   };
 
   useEffect(() => {
-    if (location?.state?.factorIds && location?.state?.factorIds.length > 0) {
+    const locationState = location?.state as { factorIds?: string[] } | null;
+    if (locationState?.factorIds && locationState.factorIds.length > 0) {
       // save location state to local state, when the language is toggled the location.state is null
-      setSavedLocationState(location.state);
+      setSavedLocationState(locationState);
     } else {
       // redirect to edit page if no factor data exists
       navigate(backToManage2FAVerificationsPage);
@@ -166,7 +196,7 @@ export default function DeleteMFAPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [factorIds, userPhoneFactors]);
 
-  const steps = {
+  const steps: Record<WizardStep, React.ReactElement> = {
     passwordVerification: (
       <PasswordVerification
         userPasswordValue={userPasswordValue}
@@ -180,10 +210,8 @@ export default function DeleteMFAPage() {
     ),
     otpSelection: (
       <OtpSelection
-        userProfile={userProfile}
         userPhoneFactors={userPhoneFactors}
         onChangeUserSelectedMfaFactor={handleChangeUserMfaSelection}
-        userSelectedMfaFactor={userSelectedMfaFactor}
         onNext={() => {
           setWizardStep("otpValidation");
         }}
@@ -194,7 +222,7 @@ export default function DeleteMFAPage() {
     otpValidation: (
       <OtpVerification
         userProfile={userProfile}
-        userSelectedMfaFactor={userSelectedMfaFactor}
+        userSelectedMfaFactor={userSelectedMfaFactor!}
         userOtpValue={userOtpValue}
         setUserOtpValue={handleSetUserOtpValue}
         requestOtpCode={requestOtpCode}
@@ -220,8 +248,13 @@ export default function DeleteMFAPage() {
           try {
             await deleteMFA();
           } catch (error) {
-            setErrorCode(error?.data?.message);
-            if (INVALID_OTP_ERROR_CODES.includes(error?.data?.message)) {
+            const err = error as { data?: { message?: string } };
+            setErrorCode(err?.data?.message ?? "");
+            if (
+              (INVALID_OTP_ERROR_CODES as readonly string[]).includes(
+                err?.data?.message ?? "",
+              )
+            ) {
               // If OTP is invalid, go back to OTP validation step
               setWizardStep("otpValidation");
             }

@@ -1,5 +1,4 @@
 import {
-  GcdsButton,
   GcdsContainer,
   GcdsGrid,
   GcdsHeading,
@@ -12,20 +11,35 @@ import { FLOW_TYPES, PAGES } from "../../../../utils/constants";
 import { getPageContent } from "../../../../utils/functions";
 import SubmitButton from "../../../../components/Layout/SubmitButton";
 
+interface PhoneFormData {
+  phoneNumber: string;
+  otp: string;
+  mfaId: string;
+  trxnId: string;
+  otpType: string;
+  formattedPhoneNumber: string;
+}
+
+interface AddSecondMFAProps {
+  phoneFormData: PhoneFormData;
+  onSkipForNow: () => Promise<void>;
+  onAddSecondMFA: () => Promise<void>;
+}
+
 export default function AddSecondMFA({
   phoneFormData,
   onSkipForNow,
   onAddSecondMFA,
-}) {
+}: AddSecondMFAProps) {
   const { language } = useParams();
   const pageContentJson = getPageContent(
     language,
     phoneFormData.otpType === FLOW_TYPES.voice
       ? PAGES.addSecondMFATextMessage
       : PAGES.addSecondMFAVoiceCall,
-  );
+  )!;
 
-  const onSubmitHandler = async (ev) => {
+  const onSubmitHandler = async (ev: Event) => {
     ev.preventDefault();
     await onAddSecondMFA();
   };
@@ -60,7 +74,7 @@ export default function AddSecondMFA({
           <SubmitButton
             style={{ width: "fit-content" }}
             onGcdsClick={onSubmitHandler}
-            currentLang={language}
+            currentLang={language ?? "en"}
           >
             {pageContentJson["9"]}
           </SubmitButton>

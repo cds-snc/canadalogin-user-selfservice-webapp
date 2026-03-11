@@ -1,4 +1,4 @@
-import AddMFAPhoneNumber from "../../../../features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPhoneNumber.jsx";
+import AddMFAPhoneNumber from "../../../../features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPhoneNumber";
 import { AVAILABLE_LANGUAGES, FLOW_TYPES } from "../../../../utils/constants";
 
 export default {

@@ -11,19 +11,29 @@ import { PAGES } from "../../../../utils/constants";
 import { getPageContent } from "../../../../utils/functions";
 import { path } from "../../../../utils/routeHelpers";
 
+interface PhoneFormData {
+  formattedPhoneNumber?: string;
+}
+
+interface DeleteMFAPhoneNumberConfirmProps {
+  onNext: () => Promise<void>;
+  onCancel: () => Promise<void>;
+  phoneFormData: PhoneFormData;
+}
+
 export default function DeleteMFAPhoneNumberConfirm({
   onNext,
   onCancel,
   phoneFormData,
-}) {
+}: DeleteMFAPhoneNumberConfirmProps) {
   const { language } = useParams();
   const backtoProfilePage = path(PAGES.ProfileHome, { language: language });
   const pageContentJson = getPageContent(
     language,
     PAGES.deleteMFAPhoneNumberConfirm,
-  );
+  )!;
 
-  const onSubmitHandler = async (ev) => {
+  const onSubmitHandler = async (ev: Event) => {
     ev.preventDefault();
     await onNext();
   };
