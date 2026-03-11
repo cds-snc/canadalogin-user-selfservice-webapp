@@ -18,26 +18,33 @@ import EditEmailEnterEmail from "./EditEmailEnterEmail";
 import EmailOtpValidation from "./EmailOtpValidation";
 import EmailUpdateSuccess from "./EmailUpdateSuccess";
 import EmailConfirmUpdate from "./EmailConfirmUpdate";
+import type { UserProfile } from "../../types/user";
+
+type EmailFormData = {
+  emailAddress: string;
+};
+
+type CaughtError = { data?: { message?: string } };
 
 export default function EditEmailAddressPage() {
   const [wizardStep, setWizardStep] = useState("passwordVerification");
   const [errorCode, setErrorCode] = useState("");
   const [userPasswordValue, setUserPasswordValue] = useState("");
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<EmailFormData>({
     emailAddress: "",
   });
 
   const { language } = useParams();
   const { state, dispatch } = useUser();
   const { userProfile } = state;
-  const { id, userName } = userProfile ?? {};
+  const { id, userName } = (userProfile ?? {}) as Partial<UserProfile>;
 
   const navigate = useNavigate();
 
   const backToProfile = path(PAGES.ProfileHome, {
     language: language,
   });
-  const pageContentJson = getPageContent(language, PAGES.otpSelection);
+  const pageContentJson = getPageContent(language, PAGES.otpSelection) ?? {};
 
   // Use the password validation hook
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(
@@ -52,15 +59,17 @@ export default function EditEmailAddressPage() {
     },
   );
 
-  const handleFormChange = (ev) => {
-    // Handle both regular events and GcdsInput events
-    const name = ev.target?.name || ev.detail?.name;
-    const value = ev.target?.value || ev.detail?.value;
+  const handleFormChange = (ev: CustomEvent<string>) => {
+    const target = ev.target as HTMLInputElement | null;
+    const name = target?.name;
+    const value = target?.value;
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    if (name) {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value ?? "",
+      }));
+    }
   };
 
   // Use the OTP operations hook
@@ -93,13 +102,15 @@ export default function EditEmailAddressPage() {
     setWizardStep("enterEmail");
   };
 
-  const handleSignOut = async (e) => {
+  const handleSignOut = async (e: React.MouseEvent) => {
     e.preventDefault();
     setLocalLoading(true);
 
     try {
       const response = await authService.logout();
-      const redirectUrl = response?.data?.redirect_url || null;
+      const redirectUrl =
+        (response as { data?: { redirect_url?: string } })?.data
+          ?.redirect_url ?? null;
 
       // Check if response has redirect_url
       if (redirectUrl) {
@@ -120,7 +131,8 @@ export default function EditEmailAddressPage() {
     }
   };
 
-  const handleEnterEmailSubmit = async () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleEnterEmailSubmit = async (_emailAddress?: string) => {
     // Validate email address before proceeding to OTP validation
     if (!formData.emailAddress || !formData.emailAddress.trim()) {
       setErrorCode("EMAIL_REQUIRED");
@@ -171,7 +183,9 @@ export default function EditEmailAddressPage() {
 
       if (response && response.success && response.data) {
         // Update the user profile in context
-        updateProfileSuccess(response.data);
+        updateProfileSuccess(
+          response.data as Parameters<typeof updateProfileSuccess>[0],
+        );
 
         // Navigate to success step
         setWizardStep("emailUpdateSuccess");
@@ -180,8 +194,9 @@ export default function EditEmailAddressPage() {
       }
     } catch (error) {
       console.error("Error updating email address with OTP:", error);
-      if (error && error.data && error.data.message) {
-        setErrorCode(error.data.message);
+      const apiError = error as CaughtError;
+      if (apiError?.data?.message) {
+        setErrorCode(apiError.data.message);
       } else {
         setErrorCode("FAILED_TO_UPDATE_EMAIL");
       }
@@ -190,7 +205,7 @@ export default function EditEmailAddressPage() {
 
   const errorMessage = getErrorMessage(language, errorCode);
 
-  const steps = {
+  const steps: Record<string, React.ReactElement> = {
     passwordVerification: (
       <PasswordVerification
         userPasswordValue={userPasswordValue}
@@ -204,10 +219,8 @@ export default function EditEmailAddressPage() {
     ),
     otpSelection: (
       <OtpSelection
-        userProfile={userProfile}
         userPhoneFactors={userPhoneFactors}
         onChangeUserSelectedMfaFactor={handleChangeUserMfaSelection}
-        userSelectedMfaFactor={userSelectedMfaFactor}
         onNext={() => {
           setWizardStep("otpValidation");
         }}
@@ -218,13 +231,13 @@ export default function EditEmailAddressPage() {
     otpValidation: (
       <OtpVerification
         userProfile={userProfile}
-        userSelectedMfaFactor={userSelectedMfaFactor}
+        userSelectedMfaFactor={userSelectedMfaFactor!}
         userOtpValue={userOtpValue}
         setUserOtpValue={handleSetUserOtpValue}
         requestOtpCode={requestOtpCode}
         validateOtpCode={() =>
           validateOtpCode(userOtpValue, (response) => {
-            if (response.success) {
+            if ((response as { success?: boolean })?.success) {
               setWizardStep("enterEmail");
             }
           })
@@ -241,7 +254,9 @@ export default function EditEmailAddressPage() {
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
         onCancel={handleBackToProfile}
-        showTryAnotherWay={userPhoneFactors && userPhoneFactors.length > 1}
+        showTryAnotherWay={
+          userPhoneFactors != null && userPhoneFactors.length > 1
+        }
       />
     ),
     enterEmail: (

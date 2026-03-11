@@ -18,7 +18,7 @@ import EditContactPhoneNumberPage from "./features/ContactPhoneNumber/components
 import AddMFAPage from "./features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPage.jsx";
 import DeleteMFAPage from "./features/MFAPhoneNumber/DeleteMFAPhoneNumber/component/DeleteMFAPage.jsx";
 import { PAGES } from "./utils/constants";
-import EditEmailAddressPage from "./features/EmailAddress/EditEmailAddressPage.jsx";
+import EditEmailAddressPage from "./features/EmailAddress/EditEmailAddressPage";
 import AddFIDO2PasskeyPage from "./features/ManageFIDO2/components/AddFIDO2Passkey/AddFIDO2PasskeyPage.jsx";
 import DeleteFIDO2PasskeyPage from "./features/ManageFIDO2/components/DeleteFIDO2Passkey/DeleteFIDO2PasskeyPage.jsx";
 
