@@ -1,4 +1,4 @@
-import ConfirmUpdate from "../../../features/ContactPhoneNumber/components/ConfirmUpdate.jsx";
+import ConfirmUpdate from "../../../features/ContactPhoneNumber/components/ConfirmUpdate";
 import { AVAILABLE_LANGUAGES, FLOW_TYPES } from "../../../utils/constants";
 import { UserProvider } from "../../../components/Providers/UserProvider";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider";

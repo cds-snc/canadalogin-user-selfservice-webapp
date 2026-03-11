@@ -1,7 +1,7 @@
 import { BrowserRouter } from "react-router";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import EditContactPhoneNumberPage from "../components/EditContactPhoneNumberPage.jsx";
+import EditContactPhoneNumberPage from "../components/EditContactPhoneNumberPage";
 import { UserProvider } from "../../../components/Providers/UserProvider";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider";
 import "@testing-library/jest-dom/vitest";
@@ -63,7 +63,7 @@ vi.mock("../../../utils/constants", async () => {
 });
 
 // Mock components
-vi.mock("../components/EnterPhoneNumber.jsx", () => ({
+vi.mock("../components/EnterPhoneNumber", () => ({
   default: ({
     onNext,
     onCancel,
@@ -89,7 +89,7 @@ vi.mock("../components/EnterPhoneNumber.jsx", () => ({
   ),
 }));
 
-vi.mock("../components/OtpVerification.jsx", () => ({
+vi.mock("../components/OtpVerification", () => ({
   default: ({
     onNext,
     onCancel,
@@ -124,7 +124,7 @@ vi.mock("../components/OtpVerification.jsx", () => ({
   ),
 }));
 
-vi.mock("../components/ConfirmUpdate.jsx", () => ({
+vi.mock("../components/ConfirmUpdate", () => ({
   default: ({ onNext, onCancel, phoneFormData }) => (
     <div data-testid="confirm-update">
       <h2>Confirm Update</h2>
@@ -139,7 +139,7 @@ vi.mock("../components/ConfirmUpdate.jsx", () => ({
   ),
 }));
 
-vi.mock("../components/SuccessfullyUpdated.jsx", () => ({
+vi.mock("../components/SuccessfullyUpdated", () => ({
   default: ({ onNext, phoneFormData }) => (
     <div data-testid="successfully-updated">
       <h2>Successfully Updated</h2>

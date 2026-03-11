@@ -1,19 +1,20 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import type { FormEventHandler, ReactElement } from "react";
 import { useParams } from "react-router";
 import { isValidPhoneNumber } from "libphonenumber-js";
+import type { CountryCode } from "libphonenumber-js";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/material.css";
 
 import {
+  GcdsButton,
   GcdsContainer,
   GcdsDetails,
+  GcdsErrorMessage,
   GcdsGrid,
   GcdsHeading,
-  GcdsLink,
-  GcdsText,
   GcdsRadios,
-  GcdsButton,
-  GcdsErrorMessage,
+  GcdsText,
 } from "@cdssnc/gcds-components-react";
 import { getPageContent } from "../../../utils/functions";
 import {
@@ -24,8 +25,51 @@ import {
 } from "../../../utils/constants";
 import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection";
 import SubmitButton from "../../../components/Layout/SubmitButton";
+import type {
+  ContactPhoneOtpType,
+  ContactPhonePageContent,
+  ContactPhoneStepProps,
+} from "../../../types/contactPhoneNumber";
 
-const PageHeader = ({ language, pageContentJson }) => {
+type PhoneInputCountryData = {
+  countryCode?: string;
+  iso2?: string;
+};
+
+type PhoneInputChangeEvent = Event | React.ChangeEvent<HTMLInputElement>;
+
+interface PhoneInputProps {
+  inputProps?: Record<string, unknown>;
+  specialLabel?: string;
+  country?: string;
+  preferredCountries?: string[];
+  onlyCountries?: string[];
+  localization?: Record<string, string>;
+  value?: string;
+  className?: string;
+  enableSearch?: boolean;
+  countryCodeEditable?: boolean;
+  disableSearchIcon?: boolean;
+  defaultErrorMessage?: string;
+  onChange?: (
+    phone: string,
+    country: PhoneInputCountryData,
+    event: PhoneInputChangeEvent,
+    formattedValue: string,
+  ) => void;
+  isValid?: (inputNumber: string, country: PhoneInputCountryData) => boolean;
+}
+
+const TypedPhoneInput = PhoneInput as unknown as (
+  props: PhoneInputProps,
+) => ReactElement;
+
+interface PageHeaderProps {
+  language: string;
+  pageContentJson: ContactPhonePageContent;
+}
+
+function PageHeader({ language, pageContentJson }: PageHeaderProps) {
   return (
     <>
       <GcdsHeading tag="h1" lang={language}>
@@ -40,9 +84,13 @@ const PageHeader = ({ language, pageContentJson }) => {
       />
     </>
   );
-};
+}
 
-const MyCountryIsNotListed = ({ pageContentJson }) => {
+function MyCountryIsNotListed({
+  pageContentJson,
+}: {
+  pageContentJson: ContactPhonePageContent;
+}) {
   return (
     <GcdsText>
       <GcdsDetails detailsTitle={pageContentJson["11"]}>
@@ -52,57 +100,60 @@ const MyCountryIsNotListed = ({ pageContentJson }) => {
       </GcdsDetails>
     </GcdsText>
   );
+}
+
+type RadioOption = {
+  label: string;
+  id: ContactPhoneOtpType;
+  value: ContactPhoneOtpType;
+  hint: string;
+  checked: boolean;
 };
 
-const RadioButtons = ({
+interface RadioButtonsProps {
+  onChangePhoneForm: ContactPhoneStepProps["onChangePhoneForm"];
+  pageContentJson: ContactPhonePageContent;
+  phoneFormData: ContactPhoneStepProps["phoneFormData"];
+  setErrorCode?: ContactPhoneStepProps["setErrorCode"];
+}
+
+function RadioButtons({
   onChangePhoneForm,
   pageContentJson,
   phoneFormData,
   setErrorCode,
-}) => {
-  const configureRadioOptions = () => {
-    let radioOptionsValues = [];
-
-    const smsLabel = `${pageContentJson["7"]}`;
-    const smsOtpRadioOption = {
-      label: smsLabel,
+}: RadioButtonsProps) {
+  const radioOptions: RadioOption[] = [
+    {
+      label: pageContentJson["7"],
       id: FLOW_TYPES.sms,
       value: FLOW_TYPES.sms,
       hint: pageContentJson["8"],
       checked: phoneFormData.otpType === FLOW_TYPES.sms,
-    };
-    radioOptionsValues.push(smsOtpRadioOption);
-
-    const voiceLabel = `${pageContentJson["9"]}`;
-    const voiceOtpRadioOption = {
-      label: voiceLabel,
+    },
+    {
+      label: pageContentJson["9"],
       id: FLOW_TYPES.voice,
       value: FLOW_TYPES.voice,
       hint: pageContentJson["10"],
       checked: phoneFormData.otpType === FLOW_TYPES.voice,
-    };
-    radioOptionsValues.push(voiceOtpRadioOption);
+    },
+  ];
 
-    return radioOptionsValues;
-  };
-
-  const radioOptions = configureRadioOptions();
   return (
     <GcdsRadios
       name="radio"
       legend={pageContentJson["5"]}
       hint={pageContentJson["13"]}
       options={radioOptions}
-      onGcdsChange={(e) => {
-        onChangePhoneForm("otpType", e.target.value);
-        // Clear error when user makes selection
-        if (setErrorCode) {
-          setErrorCode("");
-        }
+      onGcdsChange={(event: Event) => {
+        const target = event.target as HTMLInputElement;
+        onChangePhoneForm("otpType", target.value as ContactPhoneOtpType);
+        setErrorCode?.("");
       }}
-    ></GcdsRadios>
+    />
   );
-};
+}
 
 export default function EnterPhoneNumber({
   onNext,
@@ -111,26 +162,44 @@ export default function EnterPhoneNumber({
   phoneFormData,
   errorMessage,
   setErrorCode,
-}) {
-  const { language } = useParams();
+}: ContactPhoneStepProps) {
+  const { language = "en" } = useParams<{ language: string }>();
   const [phoneNumberValid, setPhoneNumberValid] = useState(true);
-  const pageContentJson = getPageContent(language, PAGES.enterNewPhoneNumber);
-  const otpPageContentJson = getPageContent(language, PAGES.otpSelection);
+  const pageContentJson =
+    (getPageContent(language, PAGES.enterNewPhoneNumber) as
+      | ContactPhonePageContent
+      | undefined) ?? {};
+  const otpPageContentJson =
+    (getPageContent(language, PAGES.otpSelection) as
+      | ContactPhonePageContent
+      | undefined) ?? {};
+  const buttonContent =
+    (getPageContent(language, "Button") as
+      | ContactPhonePageContent
+      | undefined) ?? {};
 
-  const { cancel } = getPageContent(language, "Button");
+  const validatePhoneNumber = (phoneNumber: string, countryCode?: string) => {
+    const normalizedCountryCode = countryCode?.toUpperCase();
+    if (!normalizedCountryCode) {
+      return false;
+    }
 
-  const isPhoneNumberValid = (phoneNumber, country) => {
-    const capitalize = country.toUpperCase();
-    const validatedPhoneNumber = isValidPhoneNumber(phoneNumber, capitalize);
-    return validatedPhoneNumber;
+    return isValidPhoneNumber(
+      phoneNumber,
+      normalizedCountryCode as CountryCode,
+    );
   };
 
-  const onSubmitHandler = async (ev) => {
-    ev.preventDefault();
+  const onSubmitHandler: FormEventHandler<HTMLFormElement> = async (event) => {
+    event.preventDefault();
     await onNext();
   };
 
-  // Add accessibility attributes to phone input components after mount
+  const onSubmitClick = (event: CustomEvent<string | void>) => {
+    event.preventDefault();
+    void onNext();
+  };
+
   useEffect(() => {
     const addAccessibilityAttributes = () => {
       const countryList = document.querySelector(
@@ -141,22 +210,19 @@ export default function EnterPhoneNumber({
       }
     };
 
-    // Create a MutationObserver to watch for the dropdown being added to DOM
     const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
+      for (const mutation of mutations) {
         if (mutation.type === "childList") {
           addAccessibilityAttributes();
         }
-      });
+      }
     });
 
-    // Start observing changes to document body
     observer.observe(document.body, {
       childList: true,
       subtree: true,
     });
 
-    // Also run immediately in case the dropdown is already rendered
     addAccessibilityAttributes();
 
     return () => observer.disconnect();
@@ -171,47 +237,45 @@ export default function EnterPhoneNumber({
 
         <form onSubmit={onSubmitHandler}>
           <section>
-            {errorMessage && (
+            {errorMessage ? (
               <GcdsErrorMessage messageId="message-props">
                 {errorMessage}
               </GcdsErrorMessage>
-            )}{" "}
-            <PhoneInput
+            ) : null}{" "}
+            <TypedPhoneInput
               inputProps={{
                 name: "phone",
                 required: true,
                 autoFocus: true,
               }}
               specialLabel={pageContentJson["10"]}
-              country={"ca"}
+              country="ca"
               preferredCountries={["ca"]}
-              onlyCountries={countryMapping.countries}
+              onlyCountries={countryMapping.countries as unknown as string[]}
               localization={
                 language === "fr"
-                  ? countryMapping.frLocalization
-                  : countryMapping.localization
+                  ? (countryMapping.frLocalization as Record<string, string>)
+                  : (countryMapping.localization as Record<string, string>)
               }
               value={phoneFormData.phoneNumber}
-              className={"high-res"}
-              enableSearch={true}
+              className="high-res"
+              enableSearch
               countryCodeEditable={false}
               disableSearchIcon={false}
               defaultErrorMessage={pageContentJson["14"]}
-              onChange={(phone, country, event, formatted) => {
+              onChange={(phone, country, _event, formatted) => {
                 onChangePhoneForm("phoneNumber", `+${phone}`);
                 onChangePhoneForm("formattedPhoneNumber", formatted);
-                const isNumberValid = isPhoneNumberValid(
+
+                const isNumberValid = validatePhoneNumber(
                   phone,
                   country.countryCode,
                 );
                 setPhoneNumberValid(isNumberValid);
-                // Clear error when user makes changes
-                if (setErrorCode) {
-                  setErrorCode("");
-                }
+                setErrorCode?.("");
               }}
               isValid={(inputNumber, country) => {
-                return isPhoneNumberValid(inputNumber, country.iso2);
+                return validatePhoneNumber(inputNumber, country.iso2);
               }}
             />
           </section>
@@ -234,19 +298,19 @@ export default function EnterPhoneNumber({
         <SubmitButton
           disabled={!phoneNumberValid || !phoneFormData.phoneNumber}
           style={{ width: "fit-content" }}
-          onGcdsClick={onSubmitHandler}
+          onGcdsClick={onSubmitClick}
           currentLang={language}
-        ></SubmitButton>
+        />
 
         <GcdsButton
           buttonRole="secondary"
           style={{ width: "fit-content" }}
-          onGcdsClick={(ev) => {
-            ev.preventDefault();
-            onCancel();
+          onGcdsClick={(event: Event) => {
+            event.preventDefault();
+            void onCancel();
           }}
         >
-          {cancel}
+          {buttonContent.cancel}
         </GcdsButton>
       </GcdsGrid>
     </GcdsContainer>

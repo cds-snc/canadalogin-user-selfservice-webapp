@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type { FormEventHandler } from "react";
 import { useParams, useNavigate } from "react-router";
 import {
   GcdsContainer,
@@ -15,11 +16,39 @@ import {
   getPageContent,
 } from "../../../utils/functions";
 import { authService } from "../../../services/authService";
-import { passwordUpdate } from "../api/passwordUpdate.jsx";
+import { passwordUpdate } from "../api/passwordUpdate";
 
 import { PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import SubmitButton from "../../../components/Layout/SubmitButton";
+import type {
+  AuthServiceError,
+  PasswordPolicyData,
+} from "../../../types/services";
+import type { PasswordUpdateTransactionData } from "../api/passwordUpdate";
+
+interface PasswordPolicy {
+  min: number;
+  max: number;
+}
+
+interface PasswordProps {
+  onNext: (data?: unknown) => void;
+  otpSentResponse: PasswordUpdateTransactionData;
+  userOtpValue: string;
+  setErrorCode: (errorCode: string) => void;
+  errorMessage?: string;
+  setLocalLoading: (isLoading: boolean) => void;
+}
+
+function getApiErrorMessage(error: unknown): string | undefined {
+  if (!error || typeof error !== "object") {
+    return undefined;
+  }
+
+  const authError = error as AuthServiceError;
+  return authError.data?.message ?? authError.response?.data?.message;
+}
 
 export default function Password({
   onNext,
@@ -28,34 +57,38 @@ export default function Password({
   setErrorCode,
   errorMessage,
   setLocalLoading,
-}) {
-  const { language } = useParams();
-  const { cancel } = getPageContent(language, "Button");
-  const [passwordPolicy, setPasswordPolicy] = useState({ min: 12, max: 110 });
+}: PasswordProps) {
+  const { language } = useParams<{ language: string }>();
+  const { cancel } = getPageContent(language, "Button") ?? {};
+  const [passwordPolicy, setPasswordPolicy] = useState<PasswordPolicy>({
+    min: 12,
+    max: 110,
+  });
   const [checkedValue, setCheckedValue] = useState(false);
   const [password, setPassword] = useState("");
 
   const [passwordStrength, setPasswordStrength] = useState(0);
-  const pageContentJson = getPageContent(language, PAGES.password);
+  const pageContentJson = getPageContent(language, PAGES.password) ?? {};
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
-    language: language,
+    language,
   });
 
   const navigate = useNavigate();
 
-  const onSubmitHandler = async (ev) => {
+  const onSubmitHandler: FormEventHandler<HTMLFormElement> = (ev) => {
     ev.preventDefault();
-    await completePasswordUpdate();
+    void completePasswordUpdate();
   };
 
   useEffect(() => {
     async function loadMinMax() {
       try {
         const response = await authService.requestPasswordPolicy();
-        if (response.success) {
+        const policyData = response?.data as PasswordPolicyData | undefined;
+        if (response?.success && policyData) {
           const policy = {
-            min: response.data.pwdMinLength,
-            max: response.data.pwdMaxLength,
+            min: policyData.pwdMinLength,
+            max: policyData.pwdMaxLength,
           };
           setPasswordPolicy(policy);
         }
@@ -67,13 +100,14 @@ export default function Password({
     loadMinMax();
   }, []);
 
-  function handlePasswordChange(event) {
-    setPasswordStrength(event.target.value.length);
-    setPassword(event.target.value);
+  function handlePasswordChange(event: CustomEvent<string>) {
+    const input = event.target as HTMLInputElement;
+    setPasswordStrength(input.value.length);
+    setPassword(input.value);
     setErrorCode("");
   }
 
-  function isExamplePasswordUsed(pwd) {
+  function isExamplePasswordUsed(pwd: string) {
     // remove all whitespace and lowercase
     // disallow "pillowmoosedish" in any casing/spacing
 
@@ -98,8 +132,9 @@ export default function Password({
         onNext(response.data);
       }
     } catch (err) {
-      if (err && err.data && err.data.message) {
-        setErrorCode(err.data.message);
+      const errorMessage = getApiErrorMessage(err);
+      if (errorMessage) {
+        setErrorCode(errorMessage);
       }
       console.error("err", err);
     } finally {
@@ -154,11 +189,11 @@ export default function Password({
             minlength={passwordPolicy.min}
             maxlength={passwordPolicy.max}
             lang={language}
-            autofocus
+            autoFocus
           ></GcdsInput>
 
           <GcdsCheckboxes
-            checkboxId="checkbox-default"
+            id="checkbox-default"
             legend={pageContentJson["11"]}
             name="checkbox"
             options={optionsValues}
@@ -175,7 +210,7 @@ export default function Password({
             <SubmitButton
               disabled={password.length < passwordPolicy.min}
               style={{ width: "fit-content" }}
-              currentLang={language}
+              currentLang={language ?? "en"}
             ></SubmitButton>
 
             <GcdsButton

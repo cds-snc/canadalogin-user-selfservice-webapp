@@ -2,7 +2,7 @@ import "@testing-library/jest-dom/vitest";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { BrowserRouter } from "react-router";
-import Password from "../Password.jsx";
+import Password from "../Password";
 
 // Mock the GCDS components
 vi.mock("@cdssnc/gcds-components-react", () => ({
@@ -194,7 +194,7 @@ vi.mock("../../../../utils/routeHelpers", () => ({
 }));
 
 // Mock password update API
-vi.mock("../../api/passwordUpdate.jsx", () => ({
+vi.mock("../../api/passwordUpdate", () => ({
   passwordUpdate: {
     finalStep: vi.fn(),
   },

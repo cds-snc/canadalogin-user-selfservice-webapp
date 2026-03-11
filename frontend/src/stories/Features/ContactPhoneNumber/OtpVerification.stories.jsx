@@ -1,4 +1,4 @@
-import OtpVerification from "../../../features/ContactPhoneNumber/components/OtpVerification.jsx";
+import OtpVerification from "../../../features/ContactPhoneNumber/components/OtpVerification";
 import { AVAILABLE_LANGUAGES, FLOW_TYPES } from "../../../utils/constants";
 
 export default {

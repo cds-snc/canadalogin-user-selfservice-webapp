@@ -1,85 +1,125 @@
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router";
+import type { ReactNode } from "react";
+import { useNavigate, useParams } from "react-router";
+
 import { useUser } from "../../../components/Providers/useUser";
 import { getPageContent } from "../../../utils/functions";
 import {
-  PAGES,
   FLOW_TYPES,
   INVALID_OTP_ERROR_CODES,
+  PAGES,
 } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import { authService } from "../../../services/authService";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch";
 import StepContent from "../../../components/Wizard/StepContent";
 import Loader from "../../../components/Layout/Loading";
-import EnterPhoneNumber from "./EnterPhoneNumber.jsx";
-import OtpVerification from "./OtpVerification.jsx";
-import ConfirmUpdate from "./ConfirmUpdate.jsx";
-import SuccessfullyUpdated from "./SuccessfullyUpdated.jsx";
+import EnterPhoneNumber from "./EnterPhoneNumber";
+import OtpVerification from "./OtpVerification";
+import ConfirmUpdate from "./ConfirmUpdate";
+import SuccessfullyUpdated from "./SuccessfullyUpdated";
+import type {
+  ContactPhoneFormData,
+  ContactPhoneOtpType,
+  ContactPhonePageContent,
+  ContactPhoneTransactionData,
+  ContactPhoneWizardStep,
+} from "../../../types/contactPhoneNumber";
+import type {
+  AuthServiceError,
+  AuthServiceResponse,
+} from "../../../types/services";
+import type { UserProfile } from "../../../types/user";
 
-// Map frontend FLOW_TYPES to backend otpType
-// Backend: sms | voice
-// Frontend: smsotp | voiceotp
-// IBM Verify seems to use both smsotp | voiceotp and sms | voice
-const serverMapping = {
+type UpdatePhoneTransport = "sms" | "voice";
+
+const serverMapping: Record<ContactPhoneOtpType, UpdatePhoneTransport> = {
   [FLOW_TYPES.sms]: "sms",
   [FLOW_TYPES.voice]: "voice",
 };
 
+const initialPhoneFormData: ContactPhoneFormData = {
+  phoneNumber: "",
+  otp: "",
+  trxnId: "",
+  otpType: FLOW_TYPES.sms,
+  formattedPhoneNumber: "",
+};
+
+function getApiErrorMessage(error: unknown): string | undefined {
+  if (!error || typeof error !== "object") {
+    return undefined;
+  }
+
+  const authError = error as AuthServiceError;
+  return authError.data?.message ?? authError.response?.data?.message;
+}
+
 export default function EditContactPhoneNumberPage() {
-  const { language } = useParams();
+  const { language = "en" } = useParams<{ language: string }>();
   const { state, dispatch } = useUser();
   const navigate = useNavigate();
 
-  const [wizardStep, setWizardStep] = useState("enterPhone");
+  const [wizardStep, setWizardStep] =
+    useState<ContactPhoneWizardStep>("enterPhone");
   const [errorCode, setErrorCode] = useState("");
   const [localLoading, setLocalLoading] = useState(false);
-  const [phoneFormData, setPhoneFormData] = useState({
-    phoneNumber: "",
-    otp: "",
-    trxnId: "",
-    otpType: FLOW_TYPES.sms,
-    formattedPhoneNumber: "",
-  });
+  const [phoneFormData, setPhoneFormData] =
+    useState<ContactPhoneFormData>(initialPhoneFormData);
 
-  const loaderPageContentJson = getPageContent(language, PAGES.otpSelection);
-  const errorPageJson = getPageContent(language, PAGES.error);
+  const loaderPageContentJson =
+    (getPageContent(language, PAGES.otpSelection) as
+      | ContactPhonePageContent
+      | undefined) ?? {};
+  const errorPageJson =
+    (getPageContent(language, PAGES.error) as
+      | ContactPhonePageContent
+      | undefined) ?? {};
 
   const { updateProfileSuccess } = userProfileDispatch(dispatch);
-  const backToProfile = path(PAGES.ProfileHome, { language: language });
+  const backToProfile = path(PAGES.ProfileHome, { language });
   const { userProfile } = state;
   const { id } = userProfile ?? {};
 
-  const handlePhoneFormChange = (field, value) => {
+  const handlePhoneFormChange = <TField extends keyof ContactPhoneFormData>(
+    field: TField,
+    value: ContactPhoneFormData[TField],
+  ) => {
     setPhoneFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
 
-  const sendOTP = async ({ reSendOtpCode = false, otpType = null } = {}) => {
+  const sendOtp = async ({
+    reSendOtpCode = false,
+    otpType,
+  }: {
+    reSendOtpCode?: boolean;
+    otpType?: ContactPhoneOtpType;
+  } = {}) => {
     try {
       if (!reSendOtpCode) {
         setLocalLoading(true);
       }
       setErrorCode("");
 
-      const formdata = {
+      const response = (await authService.transientOtpSend({
         destination: phoneFormData.phoneNumber,
         user_id: id,
-        otpType: serverMapping[otpType || phoneFormData.otpType],
-      };
+        otpType: serverMapping[otpType ?? phoneFormData.otpType],
+      })) as AuthServiceResponse<ContactPhoneTransactionData> | undefined;
 
-      const response = await authService.transientOtpSend(formdata);
-      if (response && response.data && response.data.trxnId) {
+      if (response?.data?.trxnId) {
         handlePhoneFormChange("trxnId", response.data.trxnId);
         if (!reSendOtpCode) {
           setWizardStep("verifyOtp");
         }
       }
     } catch (error) {
-      if (error && error.data && error.data.message) {
-        setErrorCode(error.data.message);
+      const message = getApiErrorMessage(error);
+      if (message) {
+        setErrorCode(message);
       }
     } finally {
       setLocalLoading(false);
@@ -95,27 +135,27 @@ export default function EditContactPhoneNumberPage() {
       setLocalLoading(true);
       setErrorCode("");
 
-      // Use the coupled OTP verification + profile update API
-      const response = await authService.update_phone_with_otp(
+      const response = (await authService.update_phone_with_otp(
         phoneFormData.phoneNumber,
         phoneFormData.otp,
         phoneFormData.trxnId,
         serverMapping[phoneFormData.otpType],
-      );
+      )) as AuthServiceResponse<UserProfile> | undefined;
 
-      if (response && response.success && response.data) {
+      if (response?.success && response.data) {
         updateProfileSuccess(response.data);
         setWizardStep("success");
       }
     } catch (error) {
-      if (error && error.data && error.data.message) {
-        setErrorCode(error?.data?.message);
-        if (INVALID_OTP_ERROR_CODES.includes(error?.data?.message)) {
-          console.log(
-            "OTP validation failed during phone update:",
-            error.data.message,
-          );
-          // If OTP is invalid, go back to OTP validation step
+      const message = getApiErrorMessage(error);
+      if (message) {
+        setErrorCode(message);
+        if (
+          INVALID_OTP_ERROR_CODES.includes(
+            message as (typeof INVALID_OTP_ERROR_CODES)[number],
+          )
+        ) {
+          console.log("OTP validation failed during phone update:", message);
           setWizardStep("verifyOtp");
         }
       }
@@ -139,14 +179,14 @@ export default function EditContactPhoneNumberPage() {
     errorMessage = errorCode;
   }
 
-  const steps = {
+  const steps: Record<ContactPhoneWizardStep, ReactNode> = {
     enterPhone: (
       <EnterPhoneNumber
         userProfile={userProfile}
         phoneFormData={phoneFormData}
         onChangePhoneForm={handlePhoneFormChange}
         errorMessage={errorMessage}
-        onNext={sendOTP}
+        onNext={sendOtp}
         onCancel={handleBackToProfile}
         setErrorCode={setErrorCode}
       />
@@ -161,7 +201,7 @@ export default function EditContactPhoneNumberPage() {
         onCancel={handleBackToProfile}
         onBack={handleBackToEnterPhone}
         requestNewOtpCode={(otpType) =>
-          sendOTP({ reSendOtpCode: true, otpType })
+          sendOtp({ reSendOtpCode: true, otpType })
         }
         setErrorCode={setErrorCode}
       />
@@ -180,7 +220,6 @@ export default function EditContactPhoneNumberPage() {
     ),
     success: (
       <SuccessfullyUpdated
-        userProfile={userProfile}
         phoneFormData={phoneFormData}
         onNext={handleBackToProfile}
         onCancel={handleBackToProfile}

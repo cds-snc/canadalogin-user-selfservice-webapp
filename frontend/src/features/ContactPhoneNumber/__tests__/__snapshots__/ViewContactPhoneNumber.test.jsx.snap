@@ -59,7 +59,7 @@ exports[`ViewContactPhoneNumber Component > matches snapshot with phone numbers 
       >
         <p
           data-testid="gcds-text"
-          margin-bottom="400"
+          marginbottom="400"
           style="place-content: center;"
         >
           (555) 123-4567

@@ -1,10 +1,11 @@
 import { useState } from "react";
+import type { ReactNode } from "react";
 import { useParams, useNavigate } from "react-router";
 import { useUser } from "../../../components/Providers/useUser";
 import Loader from "../../../components/Layout/Loading";
 
-import Password from "./Password.jsx";
-import PasswordChangedConfirmation from "./PasswordChangedConfirmation.jsx";
+import Password from "./Password";
+import PasswordChangedConfirmation from "./PasswordChangedConfirmation";
 
 import { PAGES } from "../../../utils/constants";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch";
@@ -15,36 +16,54 @@ import { getPageContent } from "../../../utils/functions";
 import { path } from "../../../utils/routeHelpers";
 import OtpSelection from "../../TransientOtp/components/OtpSelection";
 import OtpVerification from "../../TransientOtp/components/OtpVerification";
-import { passwordUpdate } from "../api/passwordUpdate.jsx";
+import { passwordUpdate } from "../api/passwordUpdate";
 import PasswordVerification from "../../TransientOtp/components/PasswordVerification";
 import StepContent from "../../../components/Wizard/StepContent";
 import { usePasswordValidation } from "../../../hooks/usePasswordValidation";
 import { useOtpOperations } from "../../../hooks/useOtpOperations";
+import type { AuthServiceError } from "../../../types/services";
+import type { PasswordUpdateTransactionData } from "../api/passwordUpdate";
 
-const defaulPasswordUpdatetStep = "passwordVerification";
+const defaultPasswordUpdateStep = "passwordVerification";
+
+type PasswordUpdateStep =
+  | "passwordVerification"
+  | "otpSelection"
+  | "otpValidation"
+  | "passwordChange"
+  | "passwordChangedConfirmation";
+
+function getApiErrorMessage(error: unknown): string | undefined {
+  if (!error || typeof error !== "object") {
+    return undefined;
+  }
+
+  const authError = error as AuthServiceError;
+  return authError.data?.message ?? authError.response?.data?.message;
+}
 
 export default function ChangePasswordIndex() {
-  const { language } = useParams();
+  const { language } = useParams<{ language: string }>();
   const { state, dispatch } = useUser();
   const { setLoading } = userProfileDispatch(dispatch);
-  const [otpSentResponse, setOtpSentResponse] = useState(null);
+  const [otpSentResponse, setOtpSentResponse] =
+    useState<PasswordUpdateTransactionData | null>(null);
   const [errorCode, setErrorCode] = useState("");
 
   const errorMessage = getErrorMessage(language, errorCode);
 
   const [userPasswordValue, setUserPasswordValue] = useState("");
-  const pageContentJson = getPageContent(language, PAGES.otpSelection);
-  const navBarContent = getPageContent(language, "TopNavBar");
+  const pageContentJson = getPageContent(language, PAGES.otpSelection) ?? {};
+  const navBarContent = getPageContent(language, "TopNavBar") ?? {};
 
-  const [passwordUpdateStep, setPasswordUpdateStep] = useState(
-    defaulPasswordUpdatetStep,
-  );
+  const [passwordUpdateStep, setPasswordUpdateStep] =
+    useState<PasswordUpdateStep>(defaultPasswordUpdateStep);
 
   const { userProfile } = state;
   const { id, userName } = userProfile ?? {};
   const navigate = useNavigate();
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
-    language: language,
+    language,
   });
 
   // Use the password validation hook
@@ -83,32 +102,38 @@ export default function ChangePasswordIndex() {
         userName,
         userSelectedMfaFactor,
       );
-      if (response && response.success) {
+      if (response?.success && response.data) {
         setOtpSentResponse(response.data);
       }
       setErrorCode("");
     } catch (err) {
-      if (err && err.data && err.data.message) {
-        setErrorCode(err.data.message);
+      const message = getApiErrorMessage(err);
+      if (message) {
+        setErrorCode(message);
       }
     }
   };
 
   // Custom validateOtpCode for password change flow using passwordUpdate API
-  const validateOtpCode = async (userOtpValue) => {
+  const validateOtpCode = async (userOtp: string) => {
+    if (!otpSentResponse?.trxId) {
+      return;
+    }
+
     setLocalLoading(true);
     try {
       const response = await passwordUpdate.secondStep(
-        userOtpValue,
+        userOtp,
         otpSentResponse.trxId,
       );
-      if (response && response.success) {
+      if (response?.success) {
         setPasswordUpdateStep("passwordChange");
       }
       setErrorCode("");
     } catch (err) {
-      if (err && err.data && err.data.message) {
-        setErrorCode(err.data.message);
+      const message = getApiErrorMessage(err);
+      if (message) {
+        setErrorCode(message);
       }
     } finally {
       setLocalLoading(false);
@@ -146,7 +171,7 @@ export default function ChangePasswordIndex() {
       <PasswordVerification
         userPasswordValue={userPasswordValue}
         setUserPasswordValue={setUserPasswordValue}
-        onCancel={async () => await navigate(backToSecuritySettingsPage)}
+        onCancel={() => navigate(backToSecuritySettingsPage)}
         validatePassword={validatePassword}
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
@@ -155,17 +180,16 @@ export default function ChangePasswordIndex() {
     ),
     otpSelection: (
       <OtpSelection
-        userProfile={userProfile}
         userPhoneFactors={userPhoneFactors}
         onChangeUserSelectedMfaFactor={handleChangeUserMfaSelection}
-        userSelectedMfaFactor={userSelectedMfaFactor}
         onNext={() => {
           setPasswordUpdateStep("otpValidation");
         }}
-        onCancel={async () => await navigate(backToSecuritySettingsPage)}
+        onCancel={() => navigate(backToSecuritySettingsPage)}
+        parentPage={PAGES.password}
       />
     ),
-    otpValidation: (
+    otpValidation: userSelectedMfaFactor ? (
       <OtpVerification
         userProfile={userProfile}
         userSelectedMfaFactor={userSelectedMfaFactor}
@@ -174,36 +198,32 @@ export default function ChangePasswordIndex() {
         requestOtpCode={requestOtpCode}
         validateOtpCode={validateOtpCode}
         onBack={() => {
-          // If there's only one MFA factor, go back to password verification
-          // Otherwise, go back to OTP selection
-          if (userPhoneFactors && userPhoneFactors.length === 1) {
+          // If there's only one MFA factor, go back to password verification.
+          if (userPhoneFactors.length === 1) {
             setPasswordUpdateStep("passwordVerification");
-          } else {
-            setPasswordUpdateStep("otpSelection");
+            return;
           }
+
+          setPasswordUpdateStep("otpSelection");
         }}
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
-        onCancel={async () => await navigate(backToSecuritySettingsPage)}
-        showTryAnotherWay={userPhoneFactors && userPhoneFactors.length > 1}
+        onCancel={() => navigate(backToSecuritySettingsPage)}
+        showTryAnotherWay={userPhoneFactors.length > 1}
       />
-    ),
-    passwordChange: (
+    ) : null,
+    passwordChange: otpSentResponse ? (
       <Password
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
-        userProfile={userProfile}
-        userSelectedMfaType={userSelectedMfaFactor?.type}
-        localLoading={localLoading}
         setLocalLoading={setLocalLoading}
         otpSentResponse={otpSentResponse}
         userOtpValue={userOtpValue}
         onNext={() => {
           setPasswordUpdateStep("passwordChangedConfirmation");
         }}
-        onBack={() => setPasswordUpdateStep("otpValidation")}
       />
-    ),
+    ) : null,
     passwordChangedConfirmation: (
       <PasswordChangedConfirmation
         onNext={() => {
@@ -213,11 +233,13 @@ export default function ChangePasswordIndex() {
     ),
   };
 
+  const stepComponent = steps[passwordUpdateStep] as ReactNode;
+
   return localLoading || validatePasswordLoading ? (
     <Loader text={pageContentJson["11"]} />
   ) : (
     <StepContent
-      StepComponent={steps[passwordUpdateStep]}
+      StepComponent={stepComponent}
       errorCode={errorCode}
       language={language}
     />
