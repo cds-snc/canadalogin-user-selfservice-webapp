@@ -1,4 +1,4 @@
-import PasswordChangedConfirmation from "../../../features/ChangePassword/components/PasswordChangedConfirmation.jsx";
+import PasswordChangedConfirmation from "../../../features/ChangePassword/components/PasswordChangedConfirmation";
 import { AVAILABLE_LANGUAGES } from "../../../utils/constants";
 
 export default {
