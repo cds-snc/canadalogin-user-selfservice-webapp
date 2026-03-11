@@ -1,4 +1,4 @@
-import EnterPhoneNumber from "../../../features/ContactPhoneNumber/components/EnterPhoneNumber.jsx";
+import EnterPhoneNumber from "../../../features/ContactPhoneNumber/components/EnterPhoneNumber";
 import { AVAILABLE_LANGUAGES, FLOW_TYPES } from "../../../utils/constants";
 import { UserProvider } from "../../../components/Providers/UserProvider";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider";

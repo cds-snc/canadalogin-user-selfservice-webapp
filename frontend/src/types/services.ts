@@ -82,7 +82,7 @@ export type UpdatePhonePayload = {
   phoneNumbers: PhoneNumberEntry[];
   otp: string;
   trxnId: string;
-  otpType: "sms";
+  otpType: Extract<OtpTransportType, "sms" | "voice">;
 };
 
 export type UpdateEmailPayload = {
@@ -129,7 +129,7 @@ export type AuthServiceContract = {
     phoneNumber: string,
     otp: string,
     trxnId: string,
-    otpType?: "sms",
+    otpType?: Extract<OtpTransportType, "sms" | "voice">,
   ) => Promise<AuthServiceResponse | undefined>;
   get_rp_info: () => Promise<AuthServiceResponse<RelyingPartyData> | undefined>;
   logout: () => Promise<AuthServiceResponse<LogoutResponseData> | undefined>;
