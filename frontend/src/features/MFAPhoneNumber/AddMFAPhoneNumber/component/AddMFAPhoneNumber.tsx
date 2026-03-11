@@ -46,6 +46,7 @@ const RadioButtons = ({
   pageContentJson,
   phoneFormData,
 }: RadioButtonsProps) => {
+  // Set up radio buttons
   const configureRadioOptions = (): RadioOption[] => {
     const radioOptionsValues: RadioOption[] = [];
 
