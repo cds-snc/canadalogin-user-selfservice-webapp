@@ -31,7 +31,8 @@ export default function NoticeFactory({
   passkeyName,
 }: NoticeFactoryProps) {
   const { language } = useParams();
-  const noticeFactoryContent = getPageContent(language, PAGES.noticeFactory);
+  const noticeFactoryContent: Record<string, string> =
+    getPageContent(language, PAGES.noticeFactory) ?? {};
 
   const NoticeComponents: Record<
     NoticeType,

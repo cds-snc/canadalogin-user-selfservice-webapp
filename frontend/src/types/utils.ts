@@ -1,3 +1,5 @@
+import type { UserProfile } from "./user";
+
 export type AppLanguage = "en" | "fr";
 
 export type ProfileLanguageCode = "en-ca" | "fr-ca";
@@ -90,7 +92,7 @@ export type ApiErrorLike = {
 
 export type UserProfileDispatchContract = {
   setLoading: (isLoading: boolean, text?: string | null) => void;
-  updateProfileSuccess: (data: unknown) => void;
+  updateProfileSuccess: (data: UserProfile | null) => void;
   setAuthenticatedPage: (value: string) => void;
   removeAuthenticatedPage: (value: string) => void;
 };

@@ -64,7 +64,8 @@ const DisplayEmailInfo = ({
 
 export default function ProfileHome() {
   const { language } = useParams();
-  const pageContent = getPageContent(language, PAGES.ProfileHome);
+  const pageContent: Record<string, string> =
+    getPageContent(language, PAGES.ProfileHome) ?? {};
   const { state } = useUser();
   const email = state?.userProfile?.userName || "";
   const phoneNumbers = state?.userProfile?.phoneNumbers || [];

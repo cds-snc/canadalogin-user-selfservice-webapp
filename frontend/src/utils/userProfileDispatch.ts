@@ -1,15 +1,9 @@
+import type { UserDispatch } from "../types/user";
 import { CONTEXT_ACTIONS } from "./constants";
 import type { UserProfileDispatchContract } from "../types/utils";
 
-type DispatchAction = {
-  type: string;
-  payload?: unknown;
-};
-
-type DispatchFunction = (action: DispatchAction) => void;
-
 export const userProfileDispatch = (
-  dispatch: DispatchFunction,
+  dispatch: UserDispatch,
 ): UserProfileDispatchContract => ({
   setLoading: (isLoading, text = null) =>
     dispatch({

@@ -19,7 +19,8 @@ import VerifiedBadge from "../../Badges/VerifiedBadge";
 export default function SecuritySettings() {
   const { language } = useParams();
 
-  const pageContent = getPageContent(language, PAGES.securitySettings);
+  const pageContent: Record<string, string> =
+    getPageContent(language, PAGES.securitySettings) ?? {};
   const { state } = useUser();
   const lastPasswordChange = state?.userProfile?.details?.pwdChangedTime || "";
   const formattedPasswordChangeDate = lastPasswordChange
