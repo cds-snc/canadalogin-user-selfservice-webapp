@@ -1,5 +1,5 @@
 import { useReducer, useEffect, useRef, useMemo } from "react";
-import type { Dispatch, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { useSearchParams, useParams } from "react-router";
 import {
   useEventSource,
@@ -7,7 +7,6 @@ import {
 } from "@react-nano/use-event-source";
 import config from "../../config";
 import {
-  SERVICES,
   CONTEXT_ACTIONS,
   SUBMIT_END_POINTS,
   RP_CLIENT_ID_KEY,
@@ -17,93 +16,16 @@ import { authService } from "../../services/authService";
 import Loader from "../Layout/Loading";
 import SessionTimeoutModal from "../Layout/SessionTimeoutModal";
 import { getPageContent } from "../../utils/functions";
-
-export interface UserProfile {
-  id: string;
-  active: boolean;
-  details?: null | {
-    emailVerified: boolean | null;
-    lastLogin: string | null;
-    lastMFA: string | null;
-    twoFactorAuthentication: boolean;
-    pwdChangedTime: string | null;
-  };
-  emails?: null | Array<{ value: string; type: string }>;
-  phoneNumbers?: null | Array<{ value: string; type: string }>;
-  meta?: {
-    created: string;
-    location: string;
-    lastModified: string;
-    resourceType: string;
-  };
-  userName: string;
-  preferredLanguage?: string;
-  name?: {
-    givenName?: string;
-    familyName?: string;
-    formatted?: string;
-  } | null;
-}
-
-export interface RelyingPartyInfo {
-  icon: string;
-  id: string;
-  linkName: string;
-  url: string;
-}
-
-export interface UserState {
-  userProfile: UserProfile | null;
-  userData: UserData;
-  isLoading: boolean;
-  loadingText: string | null;
-  relyingPartyInfo: RelyingPartyInfo | null;
-  authenticatedPages: string[];
-}
-
-export interface UserData {
-  service: string;
-  language: string;
-  email: string | null;
-  emailLanguage: string | null;
-  emailValidated: boolean;
-  trxnId: string | null;
-  passwordSubmitted: boolean;
-  phone: string | null;
-  stepVerificationSent: boolean;
-  stepVerified: boolean;
-  viewPrivacy: boolean;
-  id: string | null;
-  otpType: string | null;
-  passwordValidated: boolean;
-}
-
-type LoadingStatePayload = {
-  isLoading: boolean;
-  text?: string | null;
-};
-
-export type UserAction =
-  | {
-      type: typeof CONTEXT_ACTIONS.set_loading;
-      payload: boolean | LoadingStatePayload;
-    }
-  | {
-      type: typeof CONTEXT_ACTIONS.updated_profile_success;
-      payload: UserProfile | null;
-    }
-  | {
-      type: typeof CONTEXT_ACTIONS.set_relying_party_data;
-      payload: RelyingPartyInfo | null;
-    }
-  | {
-      type: typeof CONTEXT_ACTIONS.set_authenticated_pages;
-      payload: string;
-    }
-  | {
-      type: typeof CONTEXT_ACTIONS.remove_authenticated_page;
-      payload: string;
-    };
+import type {
+  SessionTimeoutState,
+  UserAction,
+  UserProfile,
+  UserState,
+} from "../../types/user";
+import {
+  initialSessionTimeoutState as defaultSessionTimeoutState,
+  initialUserState,
+} from "../../types/user";
 
 type SessionTimeoutAction =
   | {
@@ -118,59 +40,14 @@ type SessionTimeoutAction =
       payload: number | null;
     };
 
-export type UserDispatch = Dispatch<UserAction>;
-
-export interface UserContextValue {
-  state: UserState;
-  dispatch: UserDispatch;
-}
-
-export interface SessionTimeoutState {
-  showModal: boolean;
-  isLoading: boolean;
-  expirationTime: number | null;
-  newServerSideExpirationTime: number | null;
-}
-
 interface UserProviderProps {
   children: ReactNode;
   initial?: UserState;
   initialSessionTimeoutState?: SessionTimeoutState;
 }
 
-const initialState: UserState = {
-  isLoading: true,
-  loadingText: null,
-  userData: {
-    service: SERVICES[0].title, //to be set later when url referrer is given, also need to refactor other pages to use this value
-    language: "en", //to be set later when refactoring possibly
-    email: null,
-    emailLanguage: null,
-    emailValidated: false,
-    trxnId: null,
-    passwordSubmitted: false,
-    phone: null,
-    stepVerificationSent: false,
-    stepVerified: false,
-    viewPrivacy: false,
-    id: null,
-    otpType: null,
-    passwordValidated: false,
-  },
-  userProfile: null,
-  relyingPartyInfo: null,
-  authenticatedPages: [],
-};
-
-const initialSessionState: SessionTimeoutState = {
-  showModal: false,
-  isLoading: false,
-  expirationTime: null,
-  newServerSideExpirationTime: null,
-};
-
 function userReducer(
-  state: UserState = initialState,
+  state: UserState = initialUserState,
   action: UserAction,
 ): UserState {
   switch (action.type) {
@@ -215,7 +92,7 @@ function userReducer(
 }
 
 function sessionTimeoutReducer(
-  state: SessionTimeoutState = initialSessionState,
+  state: SessionTimeoutState = defaultSessionTimeoutState,
   action: SessionTimeoutAction,
 ): SessionTimeoutState {
   switch (action.type) {
@@ -247,8 +124,8 @@ function sessionTimeoutReducer(
 
 export function UserProvider({
   children,
-  initial = initialState,
-  initialSessionTimeoutState = initialSessionState,
+  initial = initialUserState,
+  initialSessionTimeoutState = defaultSessionTimeoutState,
 }: UserProviderProps) {
   const [userState, userDispatch] = useReducer(userReducer, initial);
   const [sessionTimeoutState, sessionTimeoutDispatch] = useReducer(
@@ -257,7 +134,8 @@ export function UserProvider({
   );
   const [searchParams] = useSearchParams();
   const { language } = useParams();
-  const pageContentJson = getPageContent(language, "SessionManagement");
+  const pageContentJson: Record<string, string> =
+    getPageContent(language, "SessionManagement") ?? {};
 
   // keep latest expire in a ref so SSE handler can compare without capturing stale closure state
   const latestExpireRef = useRef<number | null>(
@@ -466,7 +344,7 @@ export function UserProvider({
         // as it's a session based authentication, the backend keeps track of the session
         // and the relying party info associated with the session
         // so we need to pass the rp_client_id to the backend to store in the session otherwise it will be lost
-        const rp_client_id = searchParams.get(RP_CLIENT_ID_KEY);
+        const rp_client_id = searchParams.get(RP_CLIENT_ID_KEY) ?? undefined;
 
         const response = await authService.get_my_user_profile(rp_client_id);
         if (response && response.data) {
@@ -527,7 +405,7 @@ export function UserProvider({
         onKeepSession={handleKeepSession}
         onLogout={handleLogout}
         isLoading={sessionTimeoutState.isLoading}
-        currentLang={language}
+        currentLang={language ?? "en"}
       />
     </UserContext.Provider>
   );

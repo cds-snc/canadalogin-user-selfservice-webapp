@@ -22,7 +22,8 @@ export default function PhoneFactorsList({
 }: PhoneFactorsListProps) {
   const { language } = useParams();
   const navigate = useNavigate();
-  const pageContent = getPageContent(language, PAGES.manage2FAVerifications);
+  const pageContent: Record<string, string> =
+    getPageContent(language, PAGES.manage2FAVerifications) ?? {};
 
   const availableFactorsUIContentMap: Record<string, string> = {
     smsotp: pageContent["7"],

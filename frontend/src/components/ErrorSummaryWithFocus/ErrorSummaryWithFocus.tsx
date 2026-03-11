@@ -28,7 +28,8 @@ export default function ErrorSummaryWithFocus({
 }: ErrorSummaryWithFocusProps) {
   const errorSummaryRef = useRef<ComponentRef<typeof GcdsErrorSummary>>(null);
 
-  const errorPageJson = getPageContent(language, PAGES.error);
+  const errorPageJson: Record<string, string> =
+    getPageContent(language, PAGES.error) ?? {};
 
   const errorMessage = errorCode
     ? errorPageJson[errorCode] || errorPageJson["7"]
@@ -70,7 +71,7 @@ export default function ErrorSummaryWithFocus({
       ref={errorSummaryRef}
       id={id}
       errorLinks={errorLinks || defaultErrorLinks}
-      heading={errorPageJson[1]}
+      heading={errorPageJson["1"] ?? ""}
       lang={language}
       {...otherProps}
     />

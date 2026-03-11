@@ -16,10 +16,8 @@ export default function ServicesWithAccessInfoSection({
   currentLang,
   information,
 }: ServicesWithAccessInfoSectionProps) {
-  const pageContentJson = getPageContent(
-    currentLang,
-    PAGES.ServicesWithAccessInfo,
-  );
+  const pageContentJson: Record<string, string> =
+    getPageContent(currentLang, PAGES.ServicesWithAccessInfo) ?? {};
   const informationMap: Record<string, string> = {
     [ServicesWithAccessInfoSectionInformation.NAME]: pageContentJson["7"],
     [ServicesWithAccessInfoSectionInformation.CONTACT_PHONE_NUMBER]:

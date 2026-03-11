@@ -61,7 +61,8 @@ function SectionHeader({ icon, title }: SectionHeaderProps) {
 export default function Manage2FAVerifications() {
   const { language } = useParams();
   const location = useLocation();
-  const pageContent = getPageContent(language, PAGES.manage2FAVerifications);
+  const pageContent: Record<string, string> =
+    getPageContent(language, PAGES.manage2FAVerifications) ?? {};
   const navigate = useNavigate();
   const { state } = useUser();
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {

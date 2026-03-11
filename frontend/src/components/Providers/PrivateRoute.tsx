@@ -7,7 +7,7 @@ import { isEmailValid, getPageContent } from "../../utils/functions";
 import { FLOW_TYPES, OIDC_REDIRECT, PAGES } from "../../utils/constants";
 import { userProfileDispatch } from "../../utils/userProfileDispatch";
 import { useNavigateHelper } from "../../hooks/useNavigate";
-import type { UserState } from "./UserProvider";
+import type { UserState } from "../../types/user";
 
 interface StepupPrivateRouteProps {
   redirectPath?: string;

@@ -36,14 +36,16 @@ export default function FIDO2PasskeyList({
 }: FIDO2PasskeyListProps) {
   const { language } = useParams();
   const navigate = useNavigate();
-  const pageContent = getPageContent(language, PAGES.manage2FAVerifications);
+  const pageContent: Record<string, string> =
+    getPageContent(language, PAGES.manage2FAVerifications) ?? {};
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [editingPasskeyId, setEditingPasskeyId] = useState<string | null>(null);
   const [passkeyNicknameInputs, setPasskeyNicknameInputs] = useState<
     Record<string, string>
   >({});
-  const errorPageContent = getPageContent(language, PAGES.error);
+  const errorPageContent: Record<string, string> =
+    getPageContent(language, PAGES.error) ?? {};
 
   const deletePasskeyPage = path(PAGES.deleteFIDO2PasskeyPage, {
     language,

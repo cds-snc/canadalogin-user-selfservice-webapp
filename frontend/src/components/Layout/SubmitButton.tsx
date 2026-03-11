@@ -30,7 +30,8 @@ export default function SubmitButton({
   onKeyDown,
   ...props
 }: SubmitButtonProps) {
-  const { submit } = getPageContent(currentLang, "Button");
+  const buttonContent = getPageContent(currentLang, "Button") ?? {};
+  const submit = buttonContent.submit ?? "Submit";
 
   return (
     <GcdsButton

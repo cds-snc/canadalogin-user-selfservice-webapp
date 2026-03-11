@@ -20,10 +20,11 @@ type GcdsNavigationEvent = CustomEvent<string> & {
 export default function ManageDashboard() {
   const { language } = useParams();
   const { state } = useUser();
-  const { getError, hasErrors } = useError(language);
+  const { getError, hasErrors } = useError(language ?? "en");
   const username = state?.userProfile?.name?.formatted || "";
   const error = getError("#dashboard");
-  const pageContent = getPageContent(language, PAGES.manageDashboard);
+  const pageContent: Record<string, string> =
+    getPageContent(language, PAGES.manageDashboard) ?? {};
   const navigateHelper = useNavigateHelper();
 
   const personalInformationLink = path(PAGES.ProfileHome, {
