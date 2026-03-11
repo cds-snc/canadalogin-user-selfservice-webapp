@@ -11,16 +11,21 @@ import {
 } from "@cdssnc/gcds-components-react";
 import { getPageContent } from "../../../utils/functions";
 import { PAGES } from "../../../utils/constants";
+
 const initialTime = 20;
 
-export default function PasswordChangedConfirmation({ onNext }) {
-  const { language } = useParams();
+interface PasswordChangedConfirmationProps {
+  onNext: () => void | Promise<void>;
+}
+
+export default function PasswordChangedConfirmation({
+  onNext,
+}: PasswordChangedConfirmationProps) {
+  const { language } = useParams<{ language: string }>();
   const [time, setTime] = useState(initialTime);
 
-  const pageContentJson = getPageContent(
-    language,
-    PAGES.passwordChangedConfirmation,
-  );
+  const pageContentJson =
+    getPageContent(language, PAGES.passwordChangedConfirmation) ?? {};
 
   useEffect(() => {
     if (time <= 0) return;
@@ -51,7 +56,7 @@ export default function PasswordChangedConfirmation({ onNext }) {
         {pageContentJson["3"]} {time} {pageContentJson["4"]}
       </GcdsText>
       <GcdsText>{pageContentJson["5"]}</GcdsText>
-      <GcdsGrid columns="auto auto" gap="1rem" align-items="center">
+      <GcdsGrid columns="auto auto" gap="200" align-items="center">
         <GcdsButton
           style={{ width: "fit-content" }}
           onGcdsClick={(ev) => {
