@@ -1,4 +1,4 @@
-import AddSecondMFA from "../../../../features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddSecondMFA.jsx";
+import AddSecondMFA from "../../../../features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddSecondMFA";
 import { AVAILABLE_LANGUAGES } from "../../../../utils/constants";
 
 export default {

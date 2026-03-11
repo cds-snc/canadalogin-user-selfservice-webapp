@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import axios from "axios";
-import { deleteMFAPhoneNumberApi } from "../DeleteMFAPhoneNumberAPI.jsx";
+import { deleteMFAPhoneNumberApi } from "../DeleteMFAPhoneNumberAPI";
 import { handleApiError } from "../../../../../utils/apiErrorHandler";
 
 // Mock axios

@@ -1,4 +1,4 @@
-import DeleteMFAPhoneNumberConfirm from "../../../../features/MFAPhoneNumber/DeleteMFAPhoneNumber/component/DeleteMFAPhoneNumberConfirm.jsx";
+import DeleteMFAPhoneNumberConfirm from "../../../../features/MFAPhoneNumber/DeleteMFAPhoneNumber/component/DeleteMFAPhoneNumberConfirm";
 import { AVAILABLE_LANGUAGES } from "../../../../utils/constants";
 
 export default {

@@ -22,19 +22,39 @@ import {
   MAP_TYPES,
   useOtpOperations,
 } from "../../../../hooks/useOtpOperations";
+import { OtpSentData } from "../../../../types/hooks";
+
+interface PhoneFormData {
+  phoneNumber: string;
+  otp: string;
+  mfaId: string;
+  trxnId: string;
+  otpType: string;
+  formattedPhoneNumber: string;
+}
+
+type WizardStep =
+  | "passwordVerification"
+  | "otpSelection"
+  | "otpValidation"
+  | "addMFANumber"
+  | "addMFAValidation"
+  | "addSecondMFA";
 
 export default function AddMFAPage() {
   const { language } = useParams();
   const { state } = useUser();
 
   const [userPasswordValue, setUserPasswordValue] = useState("");
-  const pageContentJson = getPageContent(language, PAGES.otpSelection);
+  const pageContentJson = getPageContent(language, PAGES.otpSelection)!;
 
   const [errorCode, setErrorCode] = useState("");
 
-  const [wizardStep, setWizardStep] = useState("passwordVerification");
+  const [wizardStep, setWizardStep] = useState<WizardStep>(
+    "passwordVerification",
+  );
   const { userProfile } = state;
-  const [phoneFormData, setPhoneFormData] = useState({
+  const [phoneFormData, setPhoneFormData] = useState<PhoneFormData>({
     phoneNumber: "",
     otp: "",
     mfaId: "",
@@ -87,41 +107,56 @@ export default function AddMFAPage() {
     mfaTrxnId: phoneFormData?.trxnId,
   });
 
-  const noticeFactoryContent = getPageContent(language, PAGES.noticeFactory);
+  const noticeFactoryContent = getPageContent(language, PAGES.noticeFactory)!;
   const errorMessage = getErrorMessage(language, errorCode);
 
-  const handlePhoneForm = (field, value) => {
+  const handlePhoneForm = (field: string, value: unknown) => {
     setPhoneFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
 
-  const enrollMFA = async ({ phoneNumber, otpType } = {}) => {
+  const enrollMFA = async ({
+    phoneNumber,
+    otpType,
+  }: { phoneNumber?: string; otpType?: string } = {}) => {
     setLocalLoading(true);
     setErrorCode("");
     try {
       const payload = {
         destination: phoneNumber ?? phoneFormData.phoneNumber,
-        otpType: serverMapping[otpType ?? phoneFormData.otpType],
+        otpType:
+          serverMapping[
+            (otpType ?? phoneFormData.otpType) as keyof typeof serverMapping
+          ],
       };
 
       const response = await addMFAPhoneNumberApi.enrollMFA(payload);
-      if (response && response.data && response.data.id) {
-        handlePhoneForm("mfaId", response.data.id);
+      const responseData = response as {
+        data?: { id?: string };
+        [key: string]: unknown;
+      } | null;
+      if (responseData && responseData.data && responseData.data.id) {
+        handlePhoneForm("mfaId", responseData.data.id);
       }
       setErrorCode("");
       return response;
     } catch (error) {
-      if (error && error.data && error.data.message) {
-        setErrorCode(error.data.message);
+      const err = error as { data?: { message?: string } };
+      if (err && err.data && err.data.message) {
+        setErrorCode(err.data.message);
       }
     } finally {
       setLocalLoading(false);
     }
   };
 
-  const sendMFAOtp = async ({ reSendOtpCode = false, mfaId, otpType } = {}) => {
+  const sendMFAOtp = async ({
+    reSendOtpCode = false,
+    mfaId,
+    otpType,
+  }: { reSendOtpCode?: boolean; mfaId?: string; otpType?: string } = {}) => {
     if (!reSendOtpCode) {
       setLocalLoading(true);
     }
@@ -130,19 +165,27 @@ export default function AddMFAPage() {
     try {
       const payload = {
         id: mfaId ?? phoneFormData.mfaId,
-        otpType: serverMapping[otpType ?? phoneFormData.otpType],
+        otpType:
+          serverMapping[
+            (otpType ?? phoneFormData.otpType) as keyof typeof serverMapping
+          ],
       };
 
       const response = await addMFAPhoneNumberApi.sendMFAOTP(payload);
-      if (response && response.data && response.data.id) {
-        handlePhoneForm("trxnId", response.data.id);
+      const responseData = response as {
+        data?: { id?: string };
+        [key: string]: unknown;
+      } | null;
+      if (responseData && responseData.data && responseData.data.id) {
+        handlePhoneForm("trxnId", responseData.data.id);
         if (!reSendOtpCode) {
           setWizardStep("addMFAValidation");
         }
       }
     } catch (error) {
-      if (error && error.data && error.data.message) {
-        setErrorCode(error.data.message);
+      const err = error as { data?: { message?: string } };
+      if (err && err.data && err.data.message) {
+        setErrorCode(err.data.message);
       }
     } finally {
       setLocalLoading(false);
@@ -155,15 +198,20 @@ export default function AddMFAPage() {
         id: phoneFormData.mfaId,
         otp: phoneFormData.otp,
         trxnId: phoneFormData.trxnId,
-        otpType: serverMapping[phoneFormData.otpType],
+        otpType:
+          serverMapping[phoneFormData.otpType as keyof typeof serverMapping],
       };
 
       const response = await addMFAPhoneNumberApi.verifyMFAOTP(payload);
-      if (response && response.success) {
+      const responseData = response as {
+        success?: boolean;
+        [key: string]: unknown;
+      } | null;
+      if (responseData && responseData.success) {
         const visibleDigits = phoneFormData.phoneNumber.slice(-4);
         if (
           visibleDigits in userPhoneFactorsMap &&
-          userPhoneFactorsMap[visibleDigits].length >= 1
+          (userPhoneFactorsMap[visibleDigits] as unknown[]).length >= 1
         ) {
           const otpType =
             phoneFormData.otpType === FLOW_TYPES.voice
@@ -182,26 +230,31 @@ export default function AddMFAPage() {
         setErrorCode("");
       }
     } catch (error) {
-      if (error && error.data && error.data.message) {
-        setErrorCode(error.data.message);
+      const err = error as { data?: { message?: string } };
+      if (err && err.data && err.data.message) {
+        setErrorCode(err.data.message);
       }
     }
   };
 
-  const deleteMFA = async ({ id, otpType } = {}) => {
+  const deleteMFA = async ({
+    id,
+    otpType,
+  }: { id?: string; otpType?: string } = {}) => {
     setLocalLoading(true);
     try {
       const payload = {
         id: id ?? phoneFormData.mfaId,
         otpType: otpType
-          ? serverMapping[otpType]
-          : serverMapping[phoneFormData.otpType],
+          ? serverMapping[otpType as keyof typeof serverMapping]
+          : serverMapping[phoneFormData.otpType as keyof typeof serverMapping],
       };
 
       await deleteMFAPhoneNumberApi.deleteMFA(payload);
     } catch (error) {
-      if (error && error.data && error.data.message) {
-        setErrorCode(error.data.message);
+      const err = error as { data?: { message?: string } };
+      if (err && err.data && err.data.message) {
+        setErrorCode(err.data.message);
         setErrorCode("");
       }
     } finally {
@@ -213,30 +266,37 @@ export default function AddMFAPage() {
 
   const requestOtpCode = async () => {
     const userData = {
-      user_id: userProfile.id,
-      factor_id: userSelectedMfaFactor.id,
-      otpType: serverMapping[userSelectedMfaFactor.type],
+      user_id: userProfile!.id,
+      factor_id: userSelectedMfaFactor!.id,
+      otpType:
+        serverMapping[
+          userSelectedMfaFactor!.type as keyof typeof serverMapping
+        ],
     };
     try {
       const response = await authService.transientOtpSend(userData);
       if (response && response.success) {
-        setOtpSentResponse(response.data);
+        setOtpSentResponse(response.data as OtpSentData);
         setErrorCode("");
       }
     } catch (err) {
-      if (err && err.data && err.data.message) {
-        setErrorCode(err.data.message);
+      const error = err as { data?: { message?: string } };
+      if (error && error.data && error.data.message) {
+        setErrorCode(error.data.message);
       }
     } finally {
       didFetch.current = false;
     }
   };
 
-  const validateOtpCode = async (userOtpValue) => {
+  const validateOtpCode = async (userOtpValue: string) => {
     const userData = {
       otp: userOtpValue,
-      trxnId: otpSentResponse.trxnId,
-      otpType: serverMapping[userSelectedMfaFactor.type],
+      trxnId: otpSentResponse?.trxnId ?? "",
+      otpType:
+        serverMapping[
+          userSelectedMfaFactor!.type as keyof typeof serverMapping
+        ],
     };
     try {
       const response = await authService.transientOtpVerify(userData);
@@ -245,13 +305,16 @@ export default function AddMFAPage() {
         setErrorCode("");
       }
     } catch (err) {
+      const error = err as {
+        response?: { data?: { message?: string } };
+      };
       if (
-        err &&
-        err.response &&
-        err.response.data &&
-        err.response.data.message
+        error &&
+        error.response &&
+        error.response.data &&
+        error.response.data.message
       ) {
-        setErrorCode(err.response.data.message);
+        setErrorCode(error.response.data.message);
       }
     }
   };
@@ -278,14 +341,16 @@ export default function AddMFAPage() {
     }
     // Enroll new MFA after deletion
     const enrollMfaResponse = await enrollMFA();
-    if (
-      enrollMfaResponse &&
-      enrollMfaResponse.data &&
-      enrollMfaResponse.data.id
-    ) {
+    const enrollData = enrollMfaResponse as
+      | {
+          data?: { id?: string };
+        }
+      | null
+      | undefined;
+    if (enrollData && enrollData.data && enrollData.data.id) {
       await sendMFAOtp({
         reSendOtpCode: false,
-        mfaId: enrollMfaResponse?.data?.id,
+        mfaId: enrollData.data.id,
       });
     }
   };
@@ -300,16 +365,22 @@ export default function AddMFAPage() {
       phoneNumber: phoneFormData.phoneNumber,
       otpType: secondMFAOtpType,
     });
-    if (enrollMfaResponse?.data?.id) {
+    const enrollData = enrollMfaResponse as
+      | {
+          data?: { id?: string };
+        }
+      | null
+      | undefined;
+    if (enrollData?.data?.id) {
       await sendMFAOtp({
         reSendOtpCode: false,
-        mfaId: enrollMfaResponse.data.id,
+        mfaId: enrollData.data.id,
         otpType: secondMFAOtpType,
       });
     }
   }
 
-  const steps = {
+  const steps: Record<WizardStep, React.ReactElement> = {
     passwordVerification: (
       <PasswordVerification
         userPasswordValue={userPasswordValue}
@@ -323,10 +394,8 @@ export default function AddMFAPage() {
     ),
     otpSelection: (
       <OtpSelection
-        userProfile={userProfile}
         userPhoneFactors={userPhoneFactors}
         onChangeUserSelectedMfaFactor={handleChangeUserMfaSelection}
-        userSelectedMfaFactor={userSelectedMfaFactor}
         onNext={() => {
           setWizardStep("otpValidation");
         }}
@@ -337,7 +406,7 @@ export default function AddMFAPage() {
     otpValidation: (
       <OtpVerification
         userProfile={userProfile}
-        userSelectedMfaFactor={userSelectedMfaFactor}
+        userSelectedMfaFactor={userSelectedMfaFactor!}
         userOtpValue={userOtpValue}
         setUserOtpValue={handleSetUserOtpValue}
         requestOtpCode={requestOtpCode}
@@ -369,7 +438,6 @@ export default function AddMFAPage() {
     ),
     addMFAValidation: (
       <AddMFAOtpVerification
-        userProfile={userProfile}
         phoneFormData={phoneFormData}
         onChangePhoneForm={handlePhoneForm}
         errorMessage={errorMessage}

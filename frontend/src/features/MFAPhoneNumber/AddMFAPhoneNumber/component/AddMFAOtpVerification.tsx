@@ -17,12 +17,19 @@ import SubmitButton from "../../../../components/Layout/SubmitButton";
 
 const initialTime = 10;
 
+interface PageHeaderProps {
+  language: string | undefined;
+  pageContentJson: Record<string, string>;
+  userMfaType: string;
+  formattedPhoneNumber: string;
+}
+
 const PageHeader = ({
   language,
   pageContentJson,
   userMfaType,
   formattedPhoneNumber,
-}) => {
+}: PageHeaderProps) => {
   return (
     <>
       <GcdsHeading tag="h1" lang={language}>
@@ -50,6 +57,27 @@ const PageHeader = ({
   );
 };
 
+interface PhoneFormData {
+  phoneNumber: string;
+  otp: string;
+  mfaId: string;
+  trxnId: string;
+  otpType: string;
+  formattedPhoneNumber: string;
+}
+
+interface AddMFAOtpVerificationProps {
+  onNext: () => Promise<void>;
+  onCancel: () => Promise<void>;
+  onBack: () => Promise<void>;
+  onChangePhoneForm: (field: string, value: string) => void;
+  phoneFormData: PhoneFormData;
+  errorMessage: string;
+  requestNewOtpCode: () => Promise<void>;
+  onUseDifferentPhoneNumber: () => Promise<void>;
+  onSetupAlternateMFAMethod: () => Promise<void>;
+}
+
 export default function AddMFAOtpVerification({
   onNext,
   onCancel,
@@ -60,13 +88,13 @@ export default function AddMFAOtpVerification({
   requestNewOtpCode,
   onUseDifferentPhoneNumber,
   onSetupAlternateMFAMethod,
-}) {
+}: AddMFAOtpVerificationProps) {
   const { language } = useParams();
 
   const [codeRequested, setCodeRequested] = useState(false);
   const [time, setTime] = useState(initialTime);
-  const pageContentJson = getPageContent(language, PAGES.verification);
-  const { cancel } = getPageContent(language, "Button");
+  const pageContentJson = getPageContent(language, PAGES.verification)!;
+  const { cancel } = getPageContent(language, "Button")!;
 
   const clearValues = () => {
     onChangePhoneForm("phoneNumber", "");
@@ -82,8 +110,8 @@ export default function AddMFAOtpVerification({
     setCodeRequested(true);
   };
 
-  const handleChange = (e) => {
-    const value = e.target.value;
+  const handleChange = (e: CustomEvent<string>) => {
+    const value = (e.target as HTMLInputElement).value;
     onChangePhoneForm("otp", value);
     setCodeRequested(false);
   };
@@ -106,9 +134,13 @@ export default function AddMFAOtpVerification({
 
   const userMfaType = phoneFormData.otpType;
 
-  const onSubmitHandler = async (ev) => {
-    ev.preventDefault();
+  const doSubmit = async () => {
     await onNext();
+  };
+
+  const onSubmitHandler: React.FormEventHandler<HTMLFormElement> = (ev) => {
+    ev.preventDefault();
+    void doSubmit();
   };
 
   return (
@@ -137,7 +169,7 @@ export default function AddMFAOtpVerification({
           <GcdsInput
             inputId="verificationCode"
             label={pageContentJson["9"]}
-            autofocus
+            autoFocus
             autocomplete="one-time-code"
             name="verificationCode"
             type="text"
@@ -146,7 +178,7 @@ export default function AddMFAOtpVerification({
             errorMessage={errorMessage}
             onGcdsInput={handleChange}
             lang={language}
-            size="6"
+            size={6}
             maxlength={6}
             minlength={6}
           ></GcdsInput>
@@ -156,8 +188,11 @@ export default function AddMFAOtpVerification({
           <SubmitButton
             disabled={phoneFormData.otp.length < 6}
             style={{ width: "fit-content" }}
-            onGcdsClick={onSubmitHandler}
-            currentLang={language}
+            onGcdsClick={(ev) => {
+              ev.preventDefault();
+              void doSubmit();
+            }}
+            currentLang={language ?? "en"}
           ></SubmitButton>
 
           <GcdsButton

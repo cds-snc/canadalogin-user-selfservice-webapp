@@ -15,8 +15,8 @@ import SecuritySettings from "./components/Manage/SecuritySettings/SecuritySetti
 import EditProfileNamePage from "./features/ProfileName/components/EditProfileNamePage.jsx";
 import ChangePasswordIndex from "./features/ChangePassword/components/ChangePasswordIndex.jsx";
 import EditContactPhoneNumberPage from "./features/ContactPhoneNumber/components/EditContactPhoneNumberPage.jsx";
-import AddMFAPage from "./features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPage.jsx";
-import DeleteMFAPage from "./features/MFAPhoneNumber/DeleteMFAPhoneNumber/component/DeleteMFAPage.jsx";
+import AddMFAPage from "./features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPage";
+import DeleteMFAPage from "./features/MFAPhoneNumber/DeleteMFAPhoneNumber/component/DeleteMFAPage";
 import { PAGES } from "./utils/constants";
 import EditEmailAddressPage from "./features/EmailAddress/EditEmailAddressPage";
 import AddFIDO2PasskeyPage from "./features/ManageFIDO2/components/AddFIDO2Passkey/AddFIDO2PasskeyPage.jsx";
