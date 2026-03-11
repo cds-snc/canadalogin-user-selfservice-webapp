@@ -1,4 +1,4 @@
-import Password from "../../../features/ChangePassword/components/Password.jsx";
+import Password from "../../../features/ChangePassword/components/Password";
 import { AVAILABLE_LANGUAGES } from "../../../utils/constants";
 
 export default {

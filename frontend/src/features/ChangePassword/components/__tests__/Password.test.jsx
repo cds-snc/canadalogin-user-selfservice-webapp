@@ -2,7 +2,8 @@ import "@testing-library/jest-dom/vitest";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { BrowserRouter } from "react-router";
-import Password from "../Password.jsx";
+import Password from "../Password";
+import { isExamplePasswordUsed } from "../passwordUtils";
 
 // Mock the GCDS components
 vi.mock("@cdssnc/gcds-components-react", () => ({
@@ -194,7 +195,7 @@ vi.mock("../../../../utils/routeHelpers", () => ({
 }));
 
 // Mock password update API
-vi.mock("../../api/passwordUpdate.jsx", () => ({
+vi.mock("../../api/passwordUpdate", () => ({
   passwordUpdate: {
     finalStep: vi.fn(),
   },
@@ -305,32 +306,12 @@ describe("Password Component", () => {
   });
 
   describe("Forbidden Words Detection", () => {
-    it("detects forbidden word 'pillow'", async () => {
-      const setErrorCode = vi.fn();
-      renderComponent({ setErrorCode });
-
-      const passwordInput = screen.getByTestId("password-input");
-      const submitButton = screen.getByTestId("submit-button");
-
-      fireEvent.change(passwordInput, { target: { value: "pillowmooseDish" } });
-      fireEvent.click(submitButton);
-
-      expect(setErrorCode).toHaveBeenCalledWith("example_password_used");
+    it("detects forbidden word 'pillow'", () => {
+      expect(isExamplePasswordUsed("pillowmooseDish")).toBe(true);
     });
 
-    it("detects forbidden word 'moose'", async () => {
-      const setErrorCode = vi.fn();
-      renderComponent({ setErrorCode });
-
-      const passwordInput = screen.getByTestId("password-input");
-      const submitButton = screen.getByTestId("submit-button");
-
-      fireEvent.change(passwordInput, {
-        target: { value: "pillow mooseDish" },
-      });
-      fireEvent.click(submitButton);
-
-      expect(setErrorCode).toHaveBeenCalledWith("example_password_used");
+    it("detects forbidden word 'moose'", () => {
+      expect(isExamplePasswordUsed("pillow mooseDish")).toBe(true);
     });
   });
 
@@ -368,19 +349,8 @@ describe("Password Component", () => {
   });
 
   describe("Advanced Scenarios", () => {
-    it("handles multiple forbidden words", async () => {
-      const setErrorCode = vi.fn();
-      renderComponent({ setErrorCode });
-
-      const passwordInput = screen.getByTestId("password-input");
-      const submitButton = screen.getByTestId("submit-button");
-
-      fireEvent.change(passwordInput, {
-        target: { value: "pILLOW Moose Dish" },
-      });
-      fireEvent.click(submitButton);
-
-      expect(setErrorCode).toHaveBeenCalledWith("example_password_used");
+    it("handles multiple forbidden words", () => {
+      expect(isExamplePasswordUsed("pILLOW Moose Dish")).toBe(true);
     });
 
     it("handles empty password gracefully", async () => {

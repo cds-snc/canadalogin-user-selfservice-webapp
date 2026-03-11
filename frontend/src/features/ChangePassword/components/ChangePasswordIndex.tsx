@@ -1,58 +1,62 @@
-import { useState } from "react";
-import { useParams, useNavigate } from "react-router";
-import { useUser } from "../../../components/Providers/useUser";
+import { type ReactNode, useState } from "react";
+import { useNavigate, useParams } from "react-router";
+
 import Loader from "../../../components/Layout/Loading";
-
-import Password from "./Password.jsx";
-import PasswordChangedConfirmation from "./PasswordChangedConfirmation.jsx";
-
-import { PAGES } from "../../../utils/constants";
-import { userProfileDispatch } from "../../../utils/userProfileDispatch";
-import { getErrorMessage } from "../../../utils/errorUtils";
+import { useUser } from "../../../components/Providers/useUser";
+import StepContent from "../../../components/Wizard/StepContent";
 import { authService } from "../../../services/authService";
-
+import type { OtpSentData } from "../../../types/hooks";
+import { PAGES } from "../../../utils/constants";
+import { getErrorMessage } from "../../../utils/errorUtils";
 import { getPageContent } from "../../../utils/functions";
 import { path } from "../../../utils/routeHelpers";
+import { userProfileDispatch } from "../../../utils/userProfileDispatch";
+import { useOtpOperations } from "../../../hooks/useOtpOperations";
+import { usePasswordValidation } from "../../../hooks/usePasswordValidation";
 import OtpSelection from "../../TransientOtp/components/OtpSelection.jsx";
 import OtpVerification from "../../TransientOtp/components/OtpVerification.jsx";
-import { passwordUpdate } from "../api/passwordUpdate.jsx";
 import PasswordVerification from "../../TransientOtp/components/PasswordVerification.jsx";
-import StepContent from "../../../components/Wizard/StepContent";
-import { usePasswordValidation } from "../../../hooks/usePasswordValidation";
-import { useOtpOperations } from "../../../hooks/useOtpOperations";
+import { passwordUpdate } from "../api/passwordUpdate";
+import Password from "./Password";
+import PasswordChangedConfirmation from "./PasswordChangedConfirmation";
 
-const defaulPasswordUpdatetStep = "passwordVerification";
+type PasswordUpdateStep =
+  | "passwordVerification"
+  | "otpSelection"
+  | "otpValidation"
+  | "passwordChange"
+  | "passwordChangedConfirmation";
+
+const defaultPasswordUpdateStep: PasswordUpdateStep = "passwordVerification";
 
 export default function ChangePasswordIndex() {
   const { language } = useParams();
+  const resolvedLanguage = language ?? "en";
   const { state, dispatch } = useUser();
   const { setLoading } = userProfileDispatch(dispatch);
-  const [otpSentResponse, setOtpSentResponse] = useState(null);
-  const [errorCode, setErrorCode] = useState("");
-
-  const errorMessage = getErrorMessage(language, errorCode);
-
-  const [userPasswordValue, setUserPasswordValue] = useState("");
-  const pageContentJson = getPageContent(language, PAGES.otpSelection);
-  const navBarContent = getPageContent(language, "TopNavBar");
-
-  const [passwordUpdateStep, setPasswordUpdateStep] = useState(
-    defaulPasswordUpdatetStep,
+  const [otpSentResponse, setOtpSentResponse] = useState<OtpSentData | null>(
+    null,
   );
+  const [errorCode, setErrorCode] = useState("");
+  const [userPasswordValue, setUserPasswordValue] = useState("");
+  const [passwordUpdateStep, setPasswordUpdateStep] =
+    useState<PasswordUpdateStep>(defaultPasswordUpdateStep);
+
+  const errorMessage = getErrorMessage(resolvedLanguage, errorCode);
+  const pageContentJson = getPageContent(resolvedLanguage, PAGES.otpSelection);
+  const navBarContent = getPageContent(resolvedLanguage, "TopNavBar") ?? {};
 
   const { userProfile } = state;
   const { id, userName } = userProfile ?? {};
   const navigate = useNavigate();
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
-    language: language,
+    language: resolvedLanguage,
   });
 
-  // Use the password validation hook
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(
     setErrorCode,
     () => {
-      // If there's only one MFA factor, skip OTP selection and go directly to validation
-      if (userPhoneFactors && userPhoneFactors.length === 1) {
+      if (userPhoneFactors.length === 1) {
         setPasswordUpdateStep("otpValidation");
       } else {
         setPasswordUpdateStep("otpSelection");
@@ -60,7 +64,6 @@ export default function ChangePasswordIndex() {
     },
   );
 
-  // Use the OTP operations hook
   const {
     userPhoneFactors,
     userSelectedMfaFactor,
@@ -76,39 +79,47 @@ export default function ChangePasswordIndex() {
     fallbackNavigationPath: backToSecuritySettingsPage,
   });
 
-  // Custom requestOtpCode for password change flow using passwordUpdate API
   const requestOtpCode = async () => {
+    if (!userName || !userSelectedMfaFactor) {
+      return;
+    }
+
     try {
       const response = await passwordUpdate.firstStep(
         userName,
         userSelectedMfaFactor,
       );
-      if (response && response.success) {
+      if (response?.success && response.data) {
         setOtpSentResponse(response.data);
       }
       setErrorCode("");
-    } catch (err) {
-      if (err && err.data && err.data.message) {
-        setErrorCode(err.data.message);
+    } catch (error) {
+      const authError = error as { data?: { message?: string } };
+      if (authError.data?.message) {
+        setErrorCode(authError.data.message);
       }
     }
   };
 
-  // Custom validateOtpCode for password change flow using passwordUpdate API
-  const validateOtpCode = async (userOtpValue) => {
+  const validateOtpCode = async (otpValue: string) => {
+    if (!otpSentResponse?.trxnId) {
+      return;
+    }
+
     setLocalLoading(true);
     try {
       const response = await passwordUpdate.secondStep(
-        userOtpValue,
-        otpSentResponse.trxId,
+        otpValue,
+        otpSentResponse.trxnId,
       );
-      if (response && response.success) {
+      if (response?.success) {
         setPasswordUpdateStep("passwordChange");
       }
       setErrorCode("");
-    } catch (err) {
-      if (err && err.data && err.data.message) {
-        setErrorCode(err.data.message);
+    } catch (error) {
+      const authError = error as { data?: { message?: string } };
+      if (authError.data?.message) {
+        setErrorCode(authError.data.message);
       }
     } finally {
       setLocalLoading(false);
@@ -116,37 +127,34 @@ export default function ChangePasswordIndex() {
   };
 
   const logout = async () => {
-    setLoading(true, navBarContent["8"]); // Use logout loading text
+    setLoading(true, navBarContent["8"]);
 
     try {
       const response = await authService.logout();
-      const redirectUrl = response?.data?.redirect_url || null;
+      const redirectUrl = response?.data?.redirect_url ?? null;
 
-      // Check if response has redirect_url
       if (redirectUrl) {
-        // form been submitted in authService.logout
         return;
-      } else {
-        // Fallback redirect if no redirect_url provided
-        window.location.href = "/";
       }
+
+      window.location.href = "/";
     } catch (error) {
       console.error("Logout failed:", error);
-      // Update loading text to show error
       setLoading(true, navBarContent["9"]);
-      // Redirect after error
-      setTimeout(() => {
+      window.setTimeout(() => {
         window.location.href = "/";
       }, 2000);
     }
   };
 
-  const steps = {
+  const steps: Record<PasswordUpdateStep, ReactNode> = {
     passwordVerification: (
       <PasswordVerification
         userPasswordValue={userPasswordValue}
         setUserPasswordValue={setUserPasswordValue}
-        onCancel={async () => await navigate(backToSecuritySettingsPage)}
+        onCancel={() => {
+          navigate(backToSecuritySettingsPage);
+        }}
         validatePassword={validatePassword}
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
@@ -155,14 +163,17 @@ export default function ChangePasswordIndex() {
     ),
     otpSelection: (
       <OtpSelection
-        userProfile={userProfile}
         userPhoneFactors={userPhoneFactors}
         onChangeUserSelectedMfaFactor={handleChangeUserMfaSelection}
-        userSelectedMfaFactor={userSelectedMfaFactor}
+        fido2Data={[]}
+        onSelectFIDO2={() => {}}
+        parentPage={PAGES.password}
         onNext={() => {
           setPasswordUpdateStep("otpValidation");
         }}
-        onCancel={async () => await navigate(backToSecuritySettingsPage)}
+        onCancel={() => {
+          navigate(backToSecuritySettingsPage);
+        }}
       />
     ),
     otpValidation: (
@@ -174,9 +185,7 @@ export default function ChangePasswordIndex() {
         requestOtpCode={requestOtpCode}
         validateOtpCode={validateOtpCode}
         onBack={() => {
-          // If there's only one MFA factor, go back to password verification
-          // Otherwise, go back to OTP selection
-          if (userPhoneFactors && userPhoneFactors.length === 1) {
+          if (userPhoneFactors.length === 1) {
             setPasswordUpdateStep("passwordVerification");
           } else {
             setPasswordUpdateStep("otpSelection");
@@ -184,42 +193,40 @@ export default function ChangePasswordIndex() {
         }}
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
-        onCancel={async () => await navigate(backToSecuritySettingsPage)}
-        showTryAnotherWay={userPhoneFactors && userPhoneFactors.length > 1}
+        onCancel={() => {
+          navigate(backToSecuritySettingsPage);
+        }}
+        showTryAnotherWay={userPhoneFactors.length > 1}
       />
     ),
     passwordChange: (
       <Password
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
-        userProfile={userProfile}
-        userSelectedMfaType={userSelectedMfaFactor?.type}
-        localLoading={localLoading}
         setLocalLoading={setLocalLoading}
         otpSentResponse={otpSentResponse}
         userOtpValue={userOtpValue}
         onNext={() => {
           setPasswordUpdateStep("passwordChangedConfirmation");
         }}
-        onBack={() => setPasswordUpdateStep("otpValidation")}
       />
     ),
     passwordChangedConfirmation: (
       <PasswordChangedConfirmation
         onNext={() => {
-          logout();
+          void logout();
         }}
       />
     ),
   };
 
   return localLoading || validatePasswordLoading ? (
-    <Loader text={pageContentJson["11"]} />
+    <Loader text={pageContentJson?.["11"] ?? ""} />
   ) : (
     <StepContent
       StepComponent={steps[passwordUpdateStep]}
       errorCode={errorCode}
-      language={language}
+      language={resolvedLanguage}
     />
   );
 }

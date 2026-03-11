@@ -1,41 +1,52 @@
-import { useState, useEffect } from "react";
+import {
+  GcdsButton,
+  GcdsContainer,
+  GcdsGrid,
+  GcdsHeading,
+  GcdsNotice,
+  GcdsText,
+} from "@cdssnc/gcds-components-react";
+import { type ComponentPropsWithoutRef, useEffect, useState } from "react";
 import { useParams } from "react-router";
 
-import {
-  GcdsContainer,
-  GcdsHeading,
-  GcdsText,
-  GcdsNotice,
-  GcdsButton,
-  GcdsGrid,
-} from "@cdssnc/gcds-components-react";
-import { getPageContent } from "../../../utils/functions";
 import { PAGES } from "../../../utils/constants";
+import { getPageContent } from "../../../utils/functions";
+
+type ButtonClickEvent = Parameters<
+  NonNullable<ComponentPropsWithoutRef<typeof GcdsButton>["onGcdsClick"]>
+>[0];
+
+interface PasswordChangedConfirmationProps {
+  onNext: () => void | Promise<void>;
+}
+
 const initialTime = 20;
 
-export default function PasswordChangedConfirmation({ onNext }) {
+export default function PasswordChangedConfirmation({
+  onNext,
+}: PasswordChangedConfirmationProps) {
   const { language } = useParams();
+  const resolvedLanguage = language ?? "en";
   const [time, setTime] = useState(initialTime);
 
-  const pageContentJson = getPageContent(
-    language,
-    PAGES.passwordChangedConfirmation,
-  );
+  const pageContentJson =
+    getPageContent(resolvedLanguage, PAGES.passwordChangedConfirmation) ?? {};
 
   useEffect(() => {
-    if (time <= 0) return;
+    if (time <= 0) {
+      return;
+    }
 
-    const timer = setTimeout(() => {
+    const timer = window.setTimeout(() => {
       setTime((prevTime) => prevTime - 1);
     }, 1000);
 
-    return () => clearTimeout(timer);
+    return () => window.clearTimeout(timer);
   }, [time]);
 
   useEffect(() => {
     if (time <= 0) {
-      onNext();
-      return;
+      void onNext();
     }
   }, [onNext, time]);
 
@@ -51,12 +62,12 @@ export default function PasswordChangedConfirmation({ onNext }) {
         {pageContentJson["3"]} {time} {pageContentJson["4"]}
       </GcdsText>
       <GcdsText>{pageContentJson["5"]}</GcdsText>
-      <GcdsGrid columns="auto auto" gap="1rem" align-items="center">
+      <GcdsGrid columns="auto auto" gap="300" align-items="center">
         <GcdsButton
           style={{ width: "fit-content" }}
-          onGcdsClick={(ev) => {
-            ev.preventDefault();
-            onNext();
+          onGcdsClick={(event: ButtonClickEvent) => {
+            event.preventDefault();
+            void onNext();
           }}
         >
           {pageContentJson["6"]}
