@@ -8,7 +8,7 @@
  * - Navigation on Rename and Delete button clicks
  */
 import { render, screen, waitFor } from "@testing-library/react";
-import { fido2Api } from "../../../../features/ManageFIDO2/api/fido2Api.jsx";
+import { fido2Api } from "../../../../features/ManageFIDO2/api/fido2Api";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import "@testing-library/jest-dom/vitest";
@@ -21,7 +21,7 @@ vi.mock("react-router", () => ({
   useNavigate: () => mockNavigate,
 }));
 
-vi.mock("../../../../features/ManageFIDO2/api/fido2Api.jsx", () => ({
+vi.mock("../../../../features/ManageFIDO2/api/fido2Api", () => ({
   fido2Api: {
     updateRegistration: vi.fn(),
   },

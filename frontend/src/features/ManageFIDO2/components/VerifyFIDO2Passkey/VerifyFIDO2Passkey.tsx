@@ -16,6 +16,16 @@ import { PAGES } from "../../../../utils/constants";
 import { path } from "../../../../utils/routeHelpers";
 import FIDOPasskeyCollage from "../../../../assets/icons/passkey_collage.svg?react";
 import Loader from "../../../../components/Layout/Loading";
+import type { Fido2Credential } from "../../../../types/hooks";
+
+interface VerifyFIDO2PasskeyProps {
+  setErrorCode: (code: string) => void;
+  onCallback?: () => Promise<void> | void;
+  submitAttestationResult?: boolean;
+  errorMessage: string;
+  selectedPasskey?: Fido2Credential | null;
+  onTryAnotherWayHandler?: () => void;
+}
 
 export default function VerifyFIDO2Passkey({
   setErrorCode,
@@ -24,11 +34,11 @@ export default function VerifyFIDO2Passkey({
   errorMessage,
   selectedPasskey,
   onTryAnotherWayHandler,
-}) {
+}: VerifyFIDO2PasskeyProps) {
   const { language } = useParams();
   const navigate = useNavigate();
-  const pageContentJson = getPageContent(language, PAGES.verifyFIDO2Passkey);
-  const errorPageContent = getPageContent(language, PAGES.error);
+  const pageContentJson = getPageContent(language, PAGES.verifyFIDO2Passkey)!;
+  const errorPageContent = getPageContent(language, PAGES.error)!;
   const hasTriggeredRef = useRef(false);
   const [localLoading, setLocalLoading] = useState(true);
 
@@ -52,13 +62,23 @@ export default function VerifyFIDO2Passkey({
 
     try {
       // Step 1: Get assertion options from server
-      const optionsResponse = await fido2Api.getAssertionOptions();
+      const optionsResponse = (await fido2Api.getAssertionOptions()) as
+        | {
+            success?: boolean;
+            data?: Record<string, unknown> & {
+              allowCredentials?: Array<{ id: string }>;
+            };
+          }
+        | undefined;
 
       if (!optionsResponse?.success) {
         throw new Error(errorPageContent["error_get_assertion_options"]);
       }
       setLocalLoading(false);
-      const assertionData = { ...optionsResponse.data };
+      const assertionData = { ...optionsResponse.data } as Record<
+        string,
+        unknown
+      > & { allowCredentials?: Array<{ id: string }> };
 
       // If a specific credential is required, filter allowCredentials to only that one
       if (
@@ -66,7 +86,7 @@ export default function VerifyFIDO2Passkey({
         assertionData.allowCredentials
       ) {
         assertionData.allowCredentials = assertionData.allowCredentials.filter(
-          (cred) => cred.id === selectedPasskey.attributes.credentialId,
+          (cred) => cred.id === selectedPasskey.attributes!.credentialId,
         );
       }
 
@@ -89,7 +109,7 @@ export default function VerifyFIDO2Passkey({
 
   // Automatically trigger FIDO2 verification when component mounts
   useEffect(() => {
-    handleFIDO2Verification();
+    void handleFIDO2Verification();
     // No cleanup needed - flag persists across remounts
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

@@ -145,7 +145,7 @@ vi.mock("../../../../../services/authService", () => ({
 
 const mockGetAttestationOptions = vi.fn();
 const mockSubmitAttestationResult = vi.fn();
-vi.mock("../../../api/fido2Api.jsx", () => ({
+vi.mock("../../../api/fido2Api", () => ({
   fido2Api: {
     getAttestationOptions: (...args) => mockGetAttestationOptions(...args),
     submitAttestationResult: (...args) => mockSubmitAttestationResult(...args),

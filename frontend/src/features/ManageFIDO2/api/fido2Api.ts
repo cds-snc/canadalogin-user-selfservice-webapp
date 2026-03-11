@@ -1,6 +1,7 @@
 import axios from "axios";
 import config from "../../../config";
 import { handleApiError } from "../../../utils/apiErrorHandler";
+import type { ApiErrorLike } from "../../../types/utils";
 
 axios.defaults.withCredentials = true;
 
@@ -11,30 +12,33 @@ export const fido2Api = {
   getUserFIDO2Credentials: async () => {
     try {
       const response = await axios.get(`${config.apiUrl}/v1/fido2/user`);
-      return response.data;
+      return response.data as unknown;
     } catch (error) {
-      handleApiError(error);
+      handleApiError(error as ApiErrorLike);
     }
   },
 
   /**
    * Get details of a specific FIDO2 registration
    */
-  getRegistrationDetails: async (registrationId) => {
+  getRegistrationDetails: async (registrationId: string) => {
     try {
       const response = await axios.get(
         `${config.apiUrl}/v1/fido2/registration/${registrationId}`,
       );
-      return response.data;
+      return response.data as unknown;
     } catch (error) {
-      handleApiError(error);
+      handleApiError(error as ApiErrorLike);
     }
   },
 
   /**
    * Delete a FIDO2 registration with FIDO2 verification
    */
-  deleteRegistration: async (registrationId, assertionResult) => {
+  deleteRegistration: async (
+    registrationId: string,
+    assertionResult?: unknown,
+  ) => {
     try {
       const response = await axios.delete(
         `${config.apiUrl}/v1/fido2/registration`,
@@ -45,16 +49,19 @@ export const fido2Api = {
           },
         },
       );
-      return response.data;
+      return response.data as unknown;
     } catch (error) {
-      handleApiError(error);
+      handleApiError(error as ApiErrorLike);
     }
   },
 
   /**
    * Update a FIDO2 registration (rename/enable/disable)
    */
-  updateRegistration: async (registrationId, updates) => {
+  updateRegistration: async (
+    registrationId: string,
+    updates: Record<string, unknown>,
+  ) => {
     try {
       const response = await axios.put(
         `${config.apiUrl}/v1/fido2/registration`,
@@ -63,9 +70,9 @@ export const fido2Api = {
           ...updates,
         },
       );
-      return response.data;
+      return response.data as unknown;
     } catch (error) {
-      handleApiError(error);
+      handleApiError(error as ApiErrorLike);
     }
   },
 
@@ -80,24 +87,24 @@ export const fido2Api = {
         `${config.apiUrl}/v1/fido2/attestation/options`,
         requestData,
       );
-      return response.data;
+      return response.data as unknown;
     } catch (error) {
-      handleApiError(error);
+      handleApiError(error as ApiErrorLike);
     }
   },
 
   /**
    * Submit attestation result (complete registration)
    */
-  submitAttestationResult: async (attestationResult) => {
+  submitAttestationResult: async (attestationResult: unknown) => {
     try {
       const response = await axios.post(
         `${config.apiUrl}/v1/fido2/attestation/result`,
         attestationResult,
       );
-      return response.data;
+      return response.data as unknown;
     } catch (error) {
-      handleApiError(error);
+      handleApiError(error as ApiErrorLike);
     }
   },
 
@@ -110,22 +117,25 @@ export const fido2Api = {
         `${config.apiUrl}/v1/fido2/assertion/options`,
         {}, // Empty body - userId is retrieved from session on backend
       );
-      return response.data;
+      return response.data as unknown;
     } catch (error) {
-      handleApiError(error);
+      handleApiError(error as ApiErrorLike);
     }
   },
 
   /**
    * Submit assertion result (complete authentication)
    */
-  submitAssertionResult: async (assertionResult, returnJwt = false) => {
+  submitAssertionResult: async (
+    assertionResult: unknown,
+    returnJwt = false,
+  ) => {
     try {
       const url = `${config.apiUrl}/v1/fido2/assertion/result${returnJwt ? "?return_jwt=true" : ""}`;
       const response = await axios.post(url, assertionResult);
-      return response.data;
+      return response.data as unknown;
     } catch (error) {
-      handleApiError(error);
+      handleApiError(error as ApiErrorLike);
     }
   },
 };

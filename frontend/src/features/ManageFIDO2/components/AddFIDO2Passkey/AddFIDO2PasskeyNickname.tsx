@@ -11,15 +11,23 @@ import {
   GcdsText,
 } from "@cdssnc/gcds-components-react";
 
+interface AddFIDO2PasskeyNicknameProps {
+  setErrorCode: (code: string) => void;
+  errorMessage: string;
+  onCancel: () => void;
+  onSubmit: (deviceName: string) => Promise<void>;
+  registrationLoading: boolean;
+}
+
 export default function AddFIDO2PasskeyNickname({
   setErrorCode,
   errorMessage,
   onCancel,
   onSubmit,
   registrationLoading,
-}) {
+}: AddFIDO2PasskeyNicknameProps) {
   const { language } = useParams();
-  const pageContent = getPageContent(language, PAGES.addFIDO2PasskeyNickname);
+  const pageContent = getPageContent(language, PAGES.addFIDO2PasskeyNickname)!;
   const [newDeviceName, setNewDeviceName] = useState("");
 
   const handleSubmit = async () => {
@@ -30,6 +38,11 @@ export default function AddFIDO2PasskeyNickname({
     await onSubmit(newDeviceName);
   };
 
+  const onSubmitHandler: React.FormEventHandler<HTMLFormElement> = (ev) => {
+    ev.preventDefault();
+    void handleSubmit();
+  };
+
   return (
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="300">
@@ -37,18 +50,15 @@ export default function AddFIDO2PasskeyNickname({
           {pageContent["1"]}
         </GcdsHeading>
         <GcdsText marginBottom="0">{pageContent["2"]}</GcdsText>
-        <form
-          onSubmit={async (e) => {
-            e.preventDefault();
-            await handleSubmit();
-          }}
-        >
+        <form onSubmit={onSubmitHandler}>
           <GcdsInput
             errorMessage={errorMessage}
             inputId="passkey-name"
             label={pageContent["3"]}
             value={newDeviceName}
-            onGcdsInput={(e) => setNewDeviceName(e.target.value)}
+            onGcdsInput={(e: CustomEvent<string>) =>
+              setNewDeviceName((e.target as HTMLInputElement).value)
+            }
             hint={pageContent["4"]}
             required={true}
           />

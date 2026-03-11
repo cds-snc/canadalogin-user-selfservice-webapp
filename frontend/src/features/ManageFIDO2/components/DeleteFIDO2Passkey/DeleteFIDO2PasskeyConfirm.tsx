@@ -9,16 +9,22 @@ import {
   GcdsText,
 } from "@cdssnc/gcds-components-react";
 
+interface DeleteFIDO2PasskeyConfirmProps {
+  passkeyNickname?: string;
+  onConfirm: () => Promise<void>;
+  onCancel: () => void;
+}
+
 export default function DeleteFIDO2PasskeyConfirm({
   passkeyNickname,
   onConfirm,
   onCancel,
-}) {
+}: DeleteFIDO2PasskeyConfirmProps) {
   const { language } = useParams();
   const pageContentJson = getPageContent(
     language,
     PAGES.deleteFIDO2PasskeyConfirm,
-  );
+  )!;
 
   return (
     <GcdsContainer role="main">

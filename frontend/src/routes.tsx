@@ -19,8 +19,8 @@ import AddMFAPage from "./features/MFAPhoneNumber/AddMFAPhoneNumber/component/Ad
 import DeleteMFAPage from "./features/MFAPhoneNumber/DeleteMFAPhoneNumber/component/DeleteMFAPage";
 import { PAGES } from "./utils/constants";
 import EditEmailAddressPage from "./features/EmailAddress/EditEmailAddressPage";
-import AddFIDO2PasskeyPage from "./features/ManageFIDO2/components/AddFIDO2Passkey/AddFIDO2PasskeyPage.jsx";
-import DeleteFIDO2PasskeyPage from "./features/ManageFIDO2/components/DeleteFIDO2Passkey/DeleteFIDO2PasskeyPage.jsx";
+import AddFIDO2PasskeyPage from "./features/ManageFIDO2/components/AddFIDO2Passkey/AddFIDO2PasskeyPage";
+import DeleteFIDO2PasskeyPage from "./features/ManageFIDO2/components/DeleteFIDO2Passkey/DeleteFIDO2PasskeyPage";
 
 export const appRoutes: RouteObject[] = [
   {

@@ -12,14 +12,21 @@ import {
 } from "@cdssnc/gcds-components-react";
 import FIDOPasskeyCollage from "../../../../assets/icons/passkey_collage.svg?react";
 
+interface AddFIDO2PasskeyProps {
+  errorMessage: string;
+  onCancel: () => void;
+  onRegister: () => Promise<void>;
+  registrationLoading: boolean;
+}
+
 export default function AddFIDO2Passkey({
   errorMessage,
   onCancel,
   onRegister,
   registrationLoading,
-}) {
+}: AddFIDO2PasskeyProps) {
   const { language } = useParams();
-  const pageContent = getPageContent(language, PAGES.addFIDO2Passkey);
+  const pageContent = getPageContent(language, PAGES.addFIDO2Passkey)!;
 
   return (
     <GcdsContainer role="main">

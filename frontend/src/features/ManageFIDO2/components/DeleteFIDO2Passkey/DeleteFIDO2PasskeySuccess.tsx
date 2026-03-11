@@ -10,14 +10,22 @@ import {
 } from "@cdssnc/gcds-components-react";
 import NoticeFactory from "../../../../components/InfoBlocks/NoticeFactory";
 
-export default function DeleteFIDO2PasskeySuccess({ onNext }) {
+interface DeleteFIDO2PasskeySuccessProps {
+  onNext: () => void;
+}
+
+export default function DeleteFIDO2PasskeySuccess({
+  onNext,
+}: DeleteFIDO2PasskeySuccessProps) {
   const location = useLocation();
   const { language } = useParams();
-  const { passkeyNickname } = location.state ?? {};
+  const { passkeyNickname } = (location.state ?? {}) as {
+    passkeyNickname?: string;
+  };
   const pageContentJson = getPageContent(
     language,
     PAGES.deleteFIDO2PasskeySuccess,
-  );
+  )!;
 
   return (
     <GcdsContainer role="main">

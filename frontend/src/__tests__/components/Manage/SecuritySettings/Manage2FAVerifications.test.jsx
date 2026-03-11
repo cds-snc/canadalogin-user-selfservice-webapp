@@ -15,7 +15,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import "@testing-library/jest-dom/vitest";
 import Manage2FAVerifications from "../../../../components/Manage/SecuritySettings/Manage2FAVerifications";
-import { fido2Api } from "../../../../features/ManageFIDO2/api/fido2Api.jsx";
+import { fido2Api } from "../../../../features/ManageFIDO2/api/fido2Api";
 
 // Mock GCDS web components — they rely on custom elements which don't work in jsdom
 vi.mock("@cdssnc/gcds-components-react", () => ({
@@ -121,7 +121,7 @@ vi.mock("../../../../config", () => ({
   },
 }));
 
-vi.mock("../../../../features/ManageFIDO2/api/fido2Api.jsx", () => ({
+vi.mock("../../../../features/ManageFIDO2/api/fido2Api", () => ({
   fido2Api: {
     getUserFIDO2Credentials: vi.fn(),
   },
