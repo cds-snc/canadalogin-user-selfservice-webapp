@@ -15,8 +15,30 @@ import { useParams } from "react-router";
 import { FLOW_TYPES, PAGES } from "../../../utils/constants";
 import { gcHelpCentreLinks } from "../../../utils/gcHelpCentreLinks";
 import SubmitButton from "../../../components/Layout/SubmitButton";
+import type { OtpFactor } from "../../../types/hooks";
+import type { UserProfile } from "../../../types/user";
+
+interface MfaFactor extends OtpFactor {
+  phoneNumber?: string;
+}
+
+type CaughtApiError = { data?: { message?: string } };
 
 const initialTime = 10;
+
+interface OtpVerificationProps {
+  userProfile?: UserProfile | null;
+  userSelectedMfaFactor: MfaFactor;
+  setUserOtpValue: (value: string) => void;
+  userOtpValue: string;
+  onBack: () => void;
+  requestOtpCode: () => Promise<void>;
+  validateOtpCode: (otpValue: string) => Promise<void>;
+  setErrorCode: (errorCode: string) => void;
+  errorMessage?: string;
+  onCancel: () => void;
+  showTryAnotherWay?: boolean;
+}
 
 export default function OtpVerification({
   userProfile,
@@ -30,31 +52,36 @@ export default function OtpVerification({
   errorMessage,
   onCancel,
   showTryAnotherWay = true,
-}) {
+}: OtpVerificationProps) {
   const { language } = useParams();
   const [time, setTime] = useState(initialTime);
-  const pageContentJson = getPageContent(language, PAGES.verification);
-  const { cancel } = getPageContent(language, "Button");
+  const pageContentJson = getPageContent(language, PAGES.verification) ?? {};
+  const { cancel } = getPageContent(language, "Button") ?? {};
 
   const { id } = userProfile ?? {};
   const didFetch = useRef(false);
 
-  const handleChange = (e) => {
-    const value = e.target.value;
+  const handleChange = (e: CustomEvent<string>) => {
+    const value = (e.target as HTMLInputElement).value;
     setUserOtpValue(value);
   };
 
-  const onSubmitHandler = async (ev) => {
-    ev.preventDefault();
+  const doSubmit = async () => {
     setErrorCode(""); // Clear any previous errors
     try {
       await validateOtpCode(userOtpValue);
     } catch (error) {
       // Handle validation errors
-      if (error?.data?.message) {
-        setErrorCode(error.data.message);
+      const apiError = error as CaughtApiError;
+      if (apiError?.data?.message) {
+        setErrorCode(apiError.data.message);
       }
     }
+  };
+
+  const onSubmitHandler: React.FormEventHandler<HTMLFormElement> = (ev) => {
+    ev.preventDefault();
+    void doSubmit();
   };
 
   useEffect(() => {
@@ -76,8 +103,9 @@ export default function OtpVerification({
         await requestOtpCode();
       } catch (error) {
         // Handle OTP request errors
-        if (error?.data?.message) {
-          setErrorCode(error.data.message);
+        const apiError = error as CaughtApiError;
+        if (apiError?.data?.message) {
+          setErrorCode(apiError.data.message);
         }
       }
     };
@@ -130,11 +158,11 @@ export default function OtpVerification({
             value={userOtpValue}
             onGcdsInput={handleChange}
             lang={language}
-            size="6"
+            size={6}
             maxlength={6}
             minlength={6}
             autocomplete="one-time-code"
-            autofocus
+            autoFocus
           ></GcdsInput>
         </form>
 
@@ -142,8 +170,11 @@ export default function OtpVerification({
           <SubmitButton
             disabled={userOtpValue.length < 6}
             style={{ width: "fit-content" }}
-            onGcdsClick={onSubmitHandler}
-            currentLang={language}
+            onGcdsClick={(ev) => {
+              ev.preventDefault();
+              void doSubmit();
+            }}
+            currentLang={language ?? "en"}
           ></SubmitButton>
 
           <GcdsButton
@@ -186,7 +217,7 @@ export default function OtpVerification({
           <GcdsLink
             role="button"
             onGcdsClick={() => {
-              requestOtpCode();
+              void requestOtpCode();
               setTime(initialTime);
               setErrorCode("");
               setUserOtpValue("");

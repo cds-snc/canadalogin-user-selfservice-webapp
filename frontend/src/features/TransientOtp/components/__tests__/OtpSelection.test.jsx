@@ -3,7 +3,7 @@ import { BrowserRouter } from "react-router";
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import userEvent from "@testing-library/user-event";
-import OtpSelection from "../OtpSelection.jsx";
+import OtpSelection from "../OtpSelection";
 import { FLOW_TYPES, PAGES } from "../../../../utils/constants";
 
 // ---------------------------------------------------------------------------
