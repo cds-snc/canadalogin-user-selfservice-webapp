@@ -1,4 +1,4 @@
-import ViewContactPhoneNumber from "../../../features/ContactPhoneNumber/components/ViewContactPhoneNumber.jsx";
+import ViewContactPhoneNumber from "../../../features/ContactPhoneNumber/components/ViewContactPhoneNumber";
 import { AVAILABLE_LANGUAGES } from "../../../utils/constants";
 
 export default {

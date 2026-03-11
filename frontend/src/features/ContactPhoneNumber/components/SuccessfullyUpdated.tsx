@@ -1,31 +1,36 @@
 import { useParams } from "react-router";
 import {
-  GcdsContainer,
-  GcdsHeading,
-  GcdsText,
-  GcdsNotice,
   GcdsButton,
+  GcdsContainer,
   GcdsGrid,
+  GcdsHeading,
   GcdsLink,
+  GcdsNotice,
+  GcdsText,
 } from "@cdssnc/gcds-components-react";
+
 import { getPageContent } from "../../../utils/functions";
 import { EXTERNAL_NAVIGATION_LINKS, PAGES } from "../../../utils/constants";
 import SubmitButton from "../../../components/Layout/SubmitButton";
+import type {
+  ContactPhonePageContent,
+  ContactPhoneSuccessProps,
+} from "../../../types/contactPhoneNumber";
 
 export default function SuccessfullyUpdated({
   onNext,
   onCancel,
   phoneFormData,
-}) {
-  const { language } = useParams();
-  const pageContentJson = getPageContent(
-    language,
-    PAGES.successfullyUpdatedContactPhoneNumber,
-  );
+}: ContactPhoneSuccessProps) {
+  const { language = "en" } = useParams<{ language: string }>();
+  const pageContentJson =
+    (getPageContent(language, PAGES.successfullyUpdatedContactPhoneNumber) as
+      | ContactPhonePageContent
+      | undefined) ?? {};
 
-  const onSubmitHandler = async (ev) => {
-    ev.preventDefault();
-    onNext();
+  const onSubmitClick = (event: CustomEvent<string | void>) => {
+    event.preventDefault();
+    void onNext();
   };
 
   return (
@@ -56,7 +61,7 @@ export default function SuccessfullyUpdated({
         <GcdsGrid columns="max-content max-content" gap="200">
           <SubmitButton
             style={{ width: "fit-content" }}
-            onGcdsClick={onSubmitHandler}
+            onGcdsClick={onSubmitClick}
             currentLang={language}
           >
             {pageContentJson["7"]}
@@ -65,9 +70,9 @@ export default function SuccessfullyUpdated({
           <GcdsButton
             buttonRole="secondary"
             style={{ width: "fit-content" }}
-            onGcdsClick={(ev) => {
-              ev.preventDefault();
-              onCancel();
+            onGcdsClick={(event: Event) => {
+              event.preventDefault();
+              void onCancel();
             }}
           >
             {pageContentJson["8"]}

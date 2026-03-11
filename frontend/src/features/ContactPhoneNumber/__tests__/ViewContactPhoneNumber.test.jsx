@@ -2,9 +2,7 @@ import "@testing-library/jest-dom/vitest";
 import { BrowserRouter } from "react-router";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import ViewContactPhoneNumber from "../components/ViewContactPhoneNumber.jsx";
-import { UserProvider } from "../../../components/Providers/UserProvider";
-import { LanguageProvider } from "../../../components/Providers/LanguageProvider";
+import ViewContactPhoneNumber from "../components/ViewContactPhoneNumber";
 
 // Mock the navigation hook
 const mockNavigate = vi.fn();
@@ -17,29 +15,24 @@ vi.mock("react-router", async () => {
   };
 });
 
-// Mock the navigate helper
 const mockNavigateHelper = vi.fn();
 vi.mock("../../../hooks/useNavigate", () => ({
   useNavigateHelper: () => mockNavigateHelper,
 }));
 
-// Mock the redirect function to prevent navigation errors
 vi.mock("../../../utils/redirect.jsx", () => ({
   redirectToLogin: vi.fn(),
 }));
 
-// Mock route helpers
 vi.mock("../../../utils/routeHelpers", () => ({
   path: vi.fn(() => "/en/manage-dashboard"),
 }));
 
-// In your test file (e.g., ViewContactPhoneNumber.test.jsx)
 vi.mock("../../../utils/apiErrorHandler", () => ({
   handleApiError: vi.fn(),
   redirectToLogin: vi.fn(),
 }));
 
-// Mock VerifiedBadge component
 vi.mock("../../../components/Badges/VerifiedBadge", () => ({
   default: ({ text }) => <div data-testid="verified-badge">{text}</div>,
 }));
@@ -74,9 +67,9 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
     <a
       data-testid="gcds-link"
       href={href}
-      onClick={(e) => {
-        e.preventDefault();
-        onGcdsClick?.({ detail: href, preventDefault: e.preventDefault });
+      onClick={(event) => {
+        event.preventDefault();
+        onGcdsClick?.({ detail: href, preventDefault: event.preventDefault });
       }}
       {...props}
     >
@@ -96,60 +89,6 @@ vi.mock("libphonenumber-js", () => ({
 }));
 
 import parsePhoneNumberFromString from "libphonenumber-js";
-
-const mockUserState = {
-  isLoading: false,
-  loadingText: null,
-  userData: {
-    service: "Test Service",
-    language: "en",
-    email: "test@example.com",
-    emailLanguage: null,
-    emailValidated: true,
-    trxnId: null,
-    passwordSubmitted: false,
-    phone: null,
-    stepVerificationSent: false,
-    stepVerified: false,
-    viewPrivacy: false,
-    id: "test-user-123",
-    otpType: null,
-    passwordValidated: false,
-  },
-  userProfile: {
-    id: "test-user-123",
-    active: true,
-    details: {
-      emailVerified: true,
-      lastLogin: "2025-09-08T12:00:00Z",
-      lastMFA: "2025-09-08T12:00:00Z",
-      twoFactorAuthentication: true,
-      pwdChangedTime: "2025-09-08T12:00:00Z",
-    },
-    emails: [{ value: "test@example.com", type: "primary" }],
-    phoneNumbers: [{ value: "+1234567890", type: "primary" }],
-    meta: {
-      created: "2025-09-08T12:00:00Z",
-      location: "test",
-      lastModified: "2025-09-08T12:00:00Z",
-      resourceType: "User",
-    },
-    userName: "testuser",
-    preferredLanguage: "en",
-    name: {
-      givenName: "John",
-      familyName: "Doe",
-      formatted: "John Doe",
-    },
-  },
-  relyingPartyInfo: {
-    icon: "test-icon.png",
-    id: "test-service-id",
-    linkName: "Test Service",
-    url: "https://test-service.example.com",
-  },
-  authenticatedPages: [],
-};
 
 const defaultPageContent = {
   5: "Edit",
@@ -176,11 +115,7 @@ describe("ViewContactPhoneNumber Component", () => {
   });
 
   const TestWrapper = ({ children }) => (
-    <BrowserRouter>
-      <UserProvider initial={mockUserState}>
-        <LanguageProvider>{children}</LanguageProvider>
-      </UserProvider>
-    </BrowserRouter>
+    <BrowserRouter>{children}</BrowserRouter>
   );
 
   it("renders with correct heading", () => {

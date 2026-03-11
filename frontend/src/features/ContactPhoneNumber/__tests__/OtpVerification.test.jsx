@@ -2,7 +2,7 @@ import { BrowserRouter } from "react-router";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { FLOW_TYPES } from "../../../utils/constants";
-import OtpVerification from "../components/OtpVerification.jsx";
+import OtpVerification from "../components/OtpVerification";
 import { UserProvider } from "../../../components/Providers/UserProvider";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider";
 import "@testing-library/jest-dom/vitest";

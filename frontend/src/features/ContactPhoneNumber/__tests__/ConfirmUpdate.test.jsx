@@ -1,9 +1,7 @@
 import { BrowserRouter } from "react-router";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import ConfirmUpdate from "../components/ConfirmUpdate.jsx";
-import { UserProvider } from "../../../components/Providers/UserProvider";
-import { LanguageProvider } from "../../../components/Providers/LanguageProvider";
+import ConfirmUpdate from "../components/ConfirmUpdate";
 import "@testing-library/jest-dom/vitest";
 
 // Mock GCDS components
@@ -114,6 +112,10 @@ vi.mock("../../../utils/constants", async () => {
   };
 });
 
+vi.mock("../../../components/RPInfo/RPNameDisplay", () => ({
+  default: ({ rpName }) => <span data-testid="rp-name-display">{rpName}</span>,
+}));
+
 // Mock libphonenumber-js for phone formatting
 vi.mock("libphonenumber-js", () => ({
   default: vi.fn(),
@@ -121,40 +123,7 @@ vi.mock("libphonenumber-js", () => ({
 
 import parsePhoneNumberFromString from "libphonenumber-js";
 
-const mockUserState = {
-  isLoading: false,
-  loadingText: null,
-  userData: {
-    service: "Test Service",
-    language: "en",
-    email: "test@example.com",
-    id: "test-user-123",
-  },
-  userProfile: {
-    id: "test-user-123",
-    userName: "testuser",
-    name: {
-      givenName: "John",
-      familyName: "Doe",
-      formatted: "John Doe",
-    },
-  },
-  relyingPartyInfo: {
-    icon: "test-icon.png",
-    id: "test-service-id",
-    linkName: "Test Service",
-    url: "https://test-service.example.com",
-  },
-  authenticatedPages: [],
-};
-
-const TestWrapper = ({ children }) => (
-  <BrowserRouter>
-    <UserProvider initial={mockUserState}>
-      <LanguageProvider>{children}</LanguageProvider>
-    </UserProvider>
-  </BrowserRouter>
-);
+const TestWrapper = ({ children }) => <BrowserRouter>{children}</BrowserRouter>;
 
 describe("ConfirmUpdate Component", () => {
   const mockOnNext = vi.fn();

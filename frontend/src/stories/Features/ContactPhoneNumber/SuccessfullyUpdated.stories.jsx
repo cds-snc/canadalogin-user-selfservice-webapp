@@ -1,4 +1,4 @@
-import SuccessfullyUpdated from "../../../features/ContactPhoneNumber/components/SuccessfullyUpdated.jsx";
+import SuccessfullyUpdated from "../../../features/ContactPhoneNumber/components/SuccessfullyUpdated";
 import { AVAILABLE_LANGUAGES } from "../../../utils/constants";
 
 export default {

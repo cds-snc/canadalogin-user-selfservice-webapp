@@ -1,30 +1,43 @@
 import { useEffect, useState } from "react";
+import type { FormEventHandler } from "react";
 
 import {
+  GcdsButton,
   GcdsContainer,
+  GcdsGrid,
   GcdsHeading,
   GcdsInput,
   GcdsLink,
   GcdsNotice,
   GcdsText,
-  GcdsButton,
-  GcdsGrid,
 } from "@cdssnc/gcds-components-react";
 
 import { getPageContent } from "../../../utils/functions";
 
-import { FLOW_TYPES, PAGES } from "../../../utils/constants";
 import { useParams } from "react-router";
+import { FLOW_TYPES, PAGES } from "../../../utils/constants";
 import SubmitButton from "../../../components/Layout/SubmitButton";
+import type {
+  ContactPhoneOtpType,
+  ContactPhoneOtpVerificationProps,
+  ContactPhonePageContent,
+} from "../../../types/contactPhoneNumber";
 
 const initialTime = 10;
 
-const PageHeader = ({
+interface PageHeaderProps {
+  language: string;
+  pageContentJson: ContactPhonePageContent;
+  userMfaType: ContactPhoneOtpType;
+  formattedPhoneNumber: string;
+}
+
+function PageHeader({
   language,
   pageContentJson,
   userMfaType,
   formattedPhoneNumber,
-}) => {
+}: PageHeaderProps) {
   return (
     <>
       <GcdsHeading tag="h1" lang={language}>
@@ -41,16 +54,14 @@ const PageHeader = ({
       <GcdsText>
         {userMfaType === FLOW_TYPES.voice
           ? pageContentJson["5"]
-          : userMfaType === FLOW_TYPES.sms
-            ? pageContentJson["4"]
-            : pageContentJson["24"]}
+          : pageContentJson["4"]}
       </GcdsText>
       <GcdsText>
         {pageContentJson["6"]} <strong>{pageContentJson["7"]}</strong>
       </GcdsText>
     </>
   );
-};
+}
 
 export default function OtpVerification({
   onNext,
@@ -61,13 +72,19 @@ export default function OtpVerification({
   errorMessage,
   requestNewOtpCode,
   setErrorCode,
-}) {
-  const { language } = useParams();
+}: ContactPhoneOtpVerificationProps) {
+  const { language = "en" } = useParams<{ language: string }>();
 
   const [codeRequested, setCodeRequested] = useState(false);
   const [time, setTime] = useState(initialTime);
-  const pageContentJson = getPageContent(language, PAGES.verification);
-  const { cancel } = getPageContent(language, "Button");
+  const pageContentJson =
+    (getPageContent(language, PAGES.verification) as
+      | ContactPhonePageContent
+      | undefined) ?? {};
+  const buttonContent =
+    (getPageContent(language, "Button") as
+      | ContactPhonePageContent
+      | undefined) ?? {};
 
   const clearValues = () => {
     onChangePhoneForm("phoneNumber", "");
@@ -76,31 +93,34 @@ export default function OtpVerification({
     setCodeRequested(false);
   };
 
-  const requestNewCode = (otpType = null) => {
+  const requestNewCode = async (otpType?: ContactPhoneOtpType) => {
     onChangePhoneForm("otp", "");
-    // Pass the specific otpType if provided, otherwise use current state
-    requestNewOtpCode(otpType || phoneFormData.otpType);
+    await requestNewOtpCode(otpType ?? phoneFormData.otpType);
     setTime(initialTime);
     setCodeRequested(true);
   };
 
-  const handleChange = (e) => {
-    const value = e.target.value;
-    onChangePhoneForm("otp", value);
+  const handleChange = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    onChangePhoneForm("otp", target.value);
     setCodeRequested(false);
-    // Clear error when user types
-    if (setErrorCode) {
-      setErrorCode("");
-    }
+    setErrorCode?.("");
   };
 
-  const onSubmitHandler = async (ev) => {
-    ev.preventDefault();
-    onNext();
+  const onSubmitHandler: FormEventHandler<HTMLFormElement> = async (event) => {
+    event.preventDefault();
+    await onNext();
+  };
+
+  const onSubmitClick = (event: CustomEvent<string | void>) => {
+    event.preventDefault();
+    void onNext();
   };
 
   useEffect(() => {
-    if (time <= 0) return;
+    if (time <= 0) {
+      return;
+    }
 
     const timer = setTimeout(() => {
       setTime((prevTime) => prevTime - 1);
@@ -113,7 +133,7 @@ export default function OtpVerification({
 
   return (
     <GcdsContainer role="main">
-      {codeRequested && (
+      {codeRequested ? (
         <GcdsNotice
           type="success"
           noticeTitleTag="h2"
@@ -122,7 +142,7 @@ export default function OtpVerification({
         >
           &nbsp;
         </GcdsNotice>
-      )}
+      ) : null}
 
       <GcdsContainer>
         <PageHeader
@@ -137,7 +157,7 @@ export default function OtpVerification({
           <GcdsInput
             inputId="verificationCode"
             label={pageContentJson["9"]}
-            autofocus
+            autoFocus
             autocomplete="one-time-code"
             name="verificationCode"
             type="text"
@@ -146,29 +166,29 @@ export default function OtpVerification({
             errorMessage={errorMessage}
             onGcdsInput={handleChange}
             lang={language}
-            size="6"
+            size={6}
             maxlength={6}
             minlength={6}
-          ></GcdsInput>
+          />
         </form>
 
         <GcdsGrid columns="max-content max-content" gap="200">
           <SubmitButton
             disabled={phoneFormData.otp.length < 6}
             style={{ width: "fit-content" }}
-            onGcdsClick={onSubmitHandler}
+            onGcdsClick={onSubmitClick}
             currentLang={language}
-          ></SubmitButton>
+          />
 
           <GcdsButton
             buttonRole="secondary"
             style={{ width: "fit-content" }}
-            onGcdsClick={(ev) => {
-              ev.preventDefault();
-              onCancel();
+            onGcdsClick={(event: Event) => {
+              event.preventDefault();
+              void onCancel();
             }}
           >
-            {cancel}
+            {buttonContent.cancel}
           </GcdsButton>
         </GcdsGrid>
       </GcdsContainer>
@@ -183,8 +203,7 @@ export default function OtpVerification({
                 ? FLOW_TYPES.voice
                 : FLOW_TYPES.sms;
             onChangePhoneForm("otpType", newOtpType);
-            // Pass the new OTP type to ensure it uses the correct type
-            requestNewCode(newOtpType);
+            void requestNewCode(newOtpType);
           }}
         >
           {userMfaType === FLOW_TYPES.sms
@@ -206,12 +225,10 @@ export default function OtpVerification({
           <GcdsLink
             role="button"
             onGcdsClick={() => {
-              requestNewCode();
+              void requestNewCode();
             }}
           >
-            {userMfaType !== FLOW_TYPES.email
-              ? pageContentJson["16"]
-              : pageContentJson["26"]}
+            {pageContentJson["16"]}
           </GcdsLink>
         )}
       </GcdsText>
@@ -221,7 +238,7 @@ export default function OtpVerification({
           role="button"
           onGcdsClick={() => {
             clearValues();
-            onBack();
+            void onBack();
           }}
         >
           {pageContentJson["21"]}
