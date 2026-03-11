@@ -1,4 +1,4 @@
-import EmailOtpValidation from "../../../features/EmailAddress/EmailOtpValidation.jsx";
+import EmailOtpValidation from "../../../features/EmailAddress/EmailOtpValidation";
 import { AVAILABLE_LANGUAGES } from "../../../utils/constants";
 
 export default {
