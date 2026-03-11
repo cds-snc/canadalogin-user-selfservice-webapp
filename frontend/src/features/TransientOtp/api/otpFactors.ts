@@ -7,10 +7,17 @@ import type { ApiErrorLike } from "../../../types/utils";
 
 axios.defaults.withCredentials = true;
 
+type OtpFactorsApiResponse = {
+  success: boolean;
+  data: OtpFactor[];
+};
+
 export const otpFactors = {
-  getUserOtpPhoneFactors: async (validated = true): Promise<OtpFactor[]> => {
+  getUserOtpPhoneFactors: async (
+    validated = true,
+  ): Promise<OtpFactorsApiResponse | undefined> => {
     try {
-      const response = await axios.get<OtpFactor[]>(
+      const response = await axios.get<OtpFactorsApiResponse>(
         `${config.apiUrl}${SUBMIT_END_POINTS.users}/otp_factors`,
         {
           params: {
