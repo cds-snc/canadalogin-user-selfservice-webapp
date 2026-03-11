@@ -3,7 +3,7 @@ import "@testing-library/jest-dom/vitest";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { useParams, useNavigate } from "react-router";
-import EditLanguagePreferences from "../components/EditLanguagePreferences.jsx";
+import EditLanguagePreferences from "../components/EditLanguagePreferences";
 import { useUser } from "../../../components/Providers/useUser";
 
 // ────────────────────────────────────────────────

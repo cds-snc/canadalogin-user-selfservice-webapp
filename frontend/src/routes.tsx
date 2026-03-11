@@ -7,7 +7,7 @@ import { LanguageProvider } from "./components/Providers/LanguageProvider";
 import { PrivateRoute } from "./components/Providers/PrivateRoute";
 import { UserProvider } from "./components/Providers/UserProvider";
 
-import EditLanguagePreferencePage from "./features/LanguagePreference/components/EditLanguagePreferencePage.jsx";
+import EditLanguagePreferencePage from "./features/LanguagePreference/components/EditLanguagePreferencePage";
 import ManageDashboard from "./components/Manage/ManageDashboard";
 import ProfileHome from "./components/Manage/ProfileHome";
 import Manage2FAVerifications from "./components/Manage/SecuritySettings/Manage2FAVerifications";

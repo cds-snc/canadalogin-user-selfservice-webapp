@@ -1,19 +1,21 @@
-import React from "react";
 import { useParams } from "react-router";
-
 import {
+  GcdsButton,
   GcdsContainer,
+  GcdsErrorMessage,
+  GcdsGrid,
   GcdsHeading,
   GcdsText,
-  GcdsButton,
-  GcdsGrid,
-  GcdsErrorMessage,
 } from "@cdssnc/gcds-components-react";
 
 import { getPageContent } from "../../../utils/functions";
-import { PAGES, LANGUAGE_DISPLAY_NAMES } from "../../../utils/constants";
+import { LANGUAGE_DISPLAY_NAMES, PAGES } from "../../../utils/constants";
 import RPNameDisplay from "../../../components/RPInfo/RPNameDisplay";
 import SubmitButton from "../../../components/Layout/SubmitButton";
+import type {
+  LanguagePreferenceConfirmProps,
+  LanguagePreferencePageContent,
+} from "../../../types/languagePreference";
 
 export default function ConfirmUpdate({
   languageFormData,
@@ -21,37 +23,40 @@ export default function ConfirmUpdate({
   onCancel,
   errorMessage,
   localLoading,
-}) {
-  const { language } = useParams();
+}: LanguagePreferenceConfirmProps) {
+  const { language = "en" } = useParams<{ language: string }>();
+  const routeLanguage = language === "fr" ? "fr" : "en";
 
-  const pageContentJson = getPageContent(language, PAGES.confirmLanguageUpdate);
+  const pageContentJson =
+    (getPageContent(routeLanguage, PAGES.confirmLanguageUpdate) as
+      | LanguagePreferencePageContent
+      | undefined) ?? {};
 
-  const onSubmitHandler = async (ev) => {
-    ev.preventDefault();
-    await onConfirm();
+  const onSubmitHandler = (event: Event | CustomEvent<string | void>) => {
+    event.preventDefault();
+    void onConfirm();
   };
 
-  if (!languageFormData?.languageCode) return null;
+  if (!languageFormData?.languageCode) {
+    return null;
+  }
+
+  const displayLanguageName =
+    LANGUAGE_DISPLAY_NAMES[routeLanguage]?.[
+      languageFormData.updatedPreferredLanguage as keyof (typeof LANGUAGE_DISPLAY_NAMES)["en"]
+    ] || languageFormData.updatedPreferredLanguage;
 
   return (
     <GcdsContainer role="main">
-      {errorMessage && (
+      {errorMessage ? (
         <GcdsErrorMessage messageId="message-props">
           {errorMessage}
         </GcdsErrorMessage>
-      )}
+      ) : null}
 
       <GcdsHeading tag="h1">{pageContentJson["1"]}</GcdsHeading>
       <GcdsText>
-        {pageContentJson["2"]}{" "}
-        <strong>
-          {
-            LANGUAGE_DISPLAY_NAMES[language][
-              languageFormData.updatedPreferredLanguage
-            ]
-          }
-        </strong>
-        .
+        {pageContentJson["2"]} <strong>{displayLanguageName}</strong>.
       </GcdsText>
       <GcdsText>{pageContentJson["4"]}</GcdsText>
       <ul>
@@ -64,15 +69,15 @@ export default function ConfirmUpdate({
         <SubmitButton
           onGcdsClick={onSubmitHandler}
           disabled={localLoading}
-          currentLang={language}
+          currentLang={routeLanguage}
         >
           {pageContentJson["8"]}
         </SubmitButton>
         <GcdsButton
           buttonRole="secondary"
-          onGcdsClick={(ev) => {
-            ev.preventDefault();
-            onCancel();
+          onGcdsClick={(event: Event) => {
+            event.preventDefault();
+            void onCancel();
           }}
         >
           {pageContentJson["9"]}

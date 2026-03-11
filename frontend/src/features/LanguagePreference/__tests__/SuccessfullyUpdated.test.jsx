@@ -2,7 +2,7 @@ import "@testing-library/jest-dom/vitest";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, within } from "@testing-library/react";
 import { useParams, useNavigate } from "react-router";
-import SuccessfullyUpdatedLanguage from "../components/SuccessfullyUpdated.jsx";
+import SuccessfullyUpdatedLanguage from "../components/SuccessfullyUpdated";
 import { useUser } from "../../../components/Providers/useUser";
 import { authService } from "../../../services/authService";
 import { EXTERNAL_NAVIGATION_LINKS } from "../../../utils/constants";

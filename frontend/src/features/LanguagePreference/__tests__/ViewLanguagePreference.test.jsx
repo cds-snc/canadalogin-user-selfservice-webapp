@@ -2,7 +2,7 @@ import "@testing-library/jest-dom/vitest";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { useParams, useNavigate } from "react-router";
-import ViewLanguagePreferences from "../components/ViewLanguagePreference.jsx";
+import ViewLanguagePreferences from "../components/ViewLanguagePreference";
 import { useUser } from "../../../components/Providers/useUser";
 
 // Mock React Router hooks
