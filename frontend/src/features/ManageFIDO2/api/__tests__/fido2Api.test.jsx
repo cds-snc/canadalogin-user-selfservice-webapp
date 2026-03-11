@@ -18,7 +18,7 @@
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import axios from "axios";
-import { fido2Api } from "../fido2Api.jsx";
+import { fido2Api } from "../fido2Api";
 import { handleApiError } from "../../../../utils/apiErrorHandler";
 
 // ─── Mocks ─────────────────────────────────────────────────────────────────

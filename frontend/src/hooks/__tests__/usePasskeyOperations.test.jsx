@@ -12,14 +12,11 @@
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { usePasskeyOperations } from "../usePasskeyOperations";
-import { fetchUserFIDO2Credentials } from "../../features/ManageFIDO2/utils/fetchUserFIDO2Credentials.js";
+import { fetchUserFIDO2Credentials } from "../../features/ManageFIDO2/utils/fetchUserFIDO2Credentials";
 
-vi.mock(
-  "../../features/ManageFIDO2/utils/fetchUserFIDO2Credentials.js",
-  () => ({
-    fetchUserFIDO2Credentials: vi.fn(),
-  }),
-);
+vi.mock("../../features/ManageFIDO2/utils/fetchUserFIDO2Credentials", () => ({
+  fetchUserFIDO2Credentials: vi.fn(),
+}));
 
 const sampleCredentials = [
   {

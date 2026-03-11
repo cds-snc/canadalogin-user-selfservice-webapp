@@ -154,7 +154,7 @@ vi.mock("../../../../../services/authService", () => ({
 
 const mockDeleteRegistration = vi.fn();
 
-vi.mock("../../../api/fido2Api.jsx", () => ({
+vi.mock("../../../api/fido2Api", () => ({
   fido2Api: {
     deleteRegistration: (...args) => mockDeleteRegistration(...args),
   },

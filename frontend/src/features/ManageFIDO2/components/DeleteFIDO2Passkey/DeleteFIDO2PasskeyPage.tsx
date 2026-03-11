@@ -18,8 +18,15 @@ import OtpSelection from "../../../TransientOtp/components/OtpSelection";
 import OtpVerification from "../../../TransientOtp/components/OtpVerification";
 import DeleteFIDO2PasskeySuccess from "./DeleteFIDO2PasskeySuccess";
 import { fido2Api } from "../../api/fido2Api";
+import type { Fido2Credential, OtpSentData } from "../../../../types/hooks";
 
-export default function DeleteFIDO2PasskeyPage({ step }) {
+interface DeleteFIDO2PasskeyPageProps {
+  step?: string;
+}
+
+export default function DeleteFIDO2PasskeyPage({
+  step,
+}: DeleteFIDO2PasskeyPageProps) {
   const { state } = useUser();
   const { userProfile } = state;
   const { language } = useParams();
@@ -27,15 +34,19 @@ export default function DeleteFIDO2PasskeyPage({ step }) {
   const {
     passkeyId: passkeyToDeleteId,
     passkeyNickname: passkeyToDeleteNickname,
-  } = location.state || {};
+  } = (location.state || {}) as {
+    passkeyId?: string;
+    passkeyNickname?: string;
+  };
   const navigate = useNavigate();
   const [wizardStep, setWizardStep] = useState(step ?? "passwordVerification");
   const [errorCode, setErrorCode] = useState("");
   const errorMessage = getErrorMessage(language, errorCode);
-  const loaderPageContentJson = getPageContent(language, PAGES.otpSelection);
+  const loaderPageContentJson = getPageContent(language, PAGES.otpSelection)!;
   const [userPasswordValue, setUserPasswordValue] = useState("");
 
-  const [selected2FAPasskey, setSelected2FAPasskey] = useState(null);
+  const [selected2FAPasskey, setSelected2FAPasskey] =
+    useState<Fido2Credential | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const backToManage2FAVerificationsPage = path(PAGES.manage2FAVerifications, {
     language: language,
@@ -52,8 +63,8 @@ export default function DeleteFIDO2PasskeyPage({ step }) {
     handleSetUserOtpValue,
     setOtpSentResponse,
   } = useOtpOperations({
-    userId: userProfile.id,
-    userName: userProfile.userName,
+    userId: userProfile!.id,
+    userName: userProfile!.userName,
     setErrorCode,
     fallbackNavigationPath: backToManage2FAVerificationsPage,
   });
@@ -83,30 +94,37 @@ export default function DeleteFIDO2PasskeyPage({ step }) {
 
   const requestOtpCode = async () => {
     const userData = {
-      user_id: userProfile.id,
-      factor_id: userSelectedMfaFactor.id,
-      otpType: serverMapping[userSelectedMfaFactor.type],
+      user_id: userProfile!.id,
+      factor_id: userSelectedMfaFactor!.id,
+      otpType:
+        serverMapping[
+          userSelectedMfaFactor!.type as keyof typeof serverMapping
+        ],
     };
     try {
       const response = await authService.transientOtpSend(userData);
       if (response && response.success) {
-        setOtpSentResponse(response.data);
+        setOtpSentResponse(response.data as OtpSentData);
         setErrorCode("");
       }
     } catch (err) {
-      if (err && err.data && err.data.message) {
-        setErrorCode(err.data.message);
+      const errData = err as { data?: { message?: string } };
+      if (errData && errData.data && errData.data.message) {
+        setErrorCode(errData.data.message);
       }
     } finally {
       didFetch.current = false;
     }
   };
 
-  const validateOtpCode = async (userOtpValue) => {
+  const validateOtpCode = async (userOtpValue: string) => {
     const userData = {
       otp: userOtpValue,
-      trxnId: otpSentResponse.trxnId,
-      otpType: serverMapping[userSelectedMfaFactor.type],
+      trxnId: otpSentResponse!.trxnId,
+      otpType:
+        serverMapping[
+          userSelectedMfaFactor!.type as keyof typeof serverMapping
+        ],
     };
     try {
       const response = await authService.transientOtpVerify(userData);
@@ -116,13 +134,14 @@ export default function DeleteFIDO2PasskeyPage({ step }) {
         setErrorCode("");
       }
     } catch (err) {
+      const errData = err as { response?: { data?: { message?: string } } };
       if (
-        err &&
-        err.response &&
-        err.response.data &&
-        err.response.data.message
+        errData &&
+        errData.response &&
+        errData.response.data &&
+        errData.response.data.message
       ) {
-        setErrorCode(err.response.data.message);
+        setErrorCode(errData.response.data.message);
       }
     }
   };
@@ -139,7 +158,9 @@ export default function DeleteFIDO2PasskeyPage({ step }) {
     setDeleteLoading(true);
 
     try {
-      const response = await fido2Api.deleteRegistration(passkeyId);
+      const response = (await fido2Api.deleteRegistration(passkeyId)) as
+        | { success?: boolean }
+        | undefined;
 
       if (response && response.success) {
         setWizardStep("deleteFIDO2PasskeySuccess");
@@ -157,7 +178,7 @@ export default function DeleteFIDO2PasskeyPage({ step }) {
   const isLoading =
     localLoading || passkeyLoading || validatePasswordLoading || deleteLoading;
 
-  const steps = {
+  const steps: Record<string, React.ReactNode> = {
     passwordVerification: (
       <PasswordVerification
         userPasswordValue={userPasswordValue}
@@ -172,7 +193,6 @@ export default function DeleteFIDO2PasskeyPage({ step }) {
     otpSelection: (
       <OtpSelection
         fido2Data={fido2Data}
-        userProfile={userProfile}
         userPhoneFactors={userPhoneFactors}
         onChangeUserSelectedMfaFactor={handleChangeUserMfaSelection}
         onNext={() => {
@@ -189,7 +209,7 @@ export default function DeleteFIDO2PasskeyPage({ step }) {
     otpValidation: (
       <OtpVerification
         userProfile={userProfile}
-        userSelectedMfaFactor={userSelectedMfaFactor}
+        userSelectedMfaFactor={userSelectedMfaFactor!}
         userOtpValue={userOtpValue}
         setUserOtpValue={handleSetUserOtpValue}
         requestOtpCode={requestOtpCode}

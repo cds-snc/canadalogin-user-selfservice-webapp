@@ -109,7 +109,7 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
 const mockGetAssertionOptions = vi.fn();
 const mockSubmitAssertionResult = vi.fn();
 
-vi.mock("../../../api/fido2Api.jsx", () => ({
+vi.mock("../../../api/fido2Api", () => ({
   fido2Api: {
     getAssertionOptions: (...args) => mockGetAssertionOptions(...args),
     submitAssertionResult: (...args) => mockSubmitAssertionResult(...args),
