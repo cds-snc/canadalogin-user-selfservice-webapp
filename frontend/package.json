@@ -75,7 +75,7 @@
     "playwright": "^1.57.0",
     "prettier": "3.6.2",
     "prop-types": "^15.8.1",
-    "storybook": "^8.6.15",
+    "storybook": "^8.6.17",
     "storybook-addon-remix-react-router": "^4.0.1",
     "typescript": "~5.7.2",
     "vite": "^6.4.1",
