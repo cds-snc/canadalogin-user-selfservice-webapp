@@ -13,7 +13,6 @@ import { getPageContent } from "../../../utils/functions";
 
 import { useParams } from "react-router";
 import { FLOW_TYPES, PAGES } from "../../../utils/constants";
-import { gcHelpCentreLinks } from "../../../utils/gcHelpCentreLinks";
 import SubmitButton from "../../../components/Layout/SubmitButton";
 import type { OtpFactor } from "../../../types/hooks";
 import type { UserProfile } from "../../../types/user";
@@ -228,11 +227,6 @@ export default function OtpVerification({
               : pageContentJson["26"]}
           </GcdsLink>
         )}
-      </GcdsText>
-      <GcdsText>
-        <GcdsLink href={gcHelpCentreLinks.cannotAccessPhone} target="_blank">
-          {pageContentJson["30"]}
-        </GcdsLink>
       </GcdsText>
     </GcdsContainer>
   );

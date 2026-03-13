@@ -173,7 +173,7 @@ export default function VerifyFIDO2Passkey({
         </GcdsLink>
 
         {/* TODO: add correct hrefs to the links below once domain migrations are done */}
-        <GcdsLink>{pageContentJson["8"]}</GcdsLink>
+        <GcdsLink target="_blank">{pageContentJson["8"]}</GcdsLink>
       </GcdsGrid>
     </GcdsContainer>
   );

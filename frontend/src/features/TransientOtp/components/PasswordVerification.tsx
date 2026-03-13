@@ -49,7 +49,7 @@ export default function PasswordVerification({
   const pageContentMap: Record<string, string> = {
     [PAGES.deleteMFAPage]: pageContentJson["8"],
     [PAGES.addMFAPage]: pageContentJson["7"],
-    [PAGES.addFIDO2Passkey]: pageContentJson["9"],
+    [PAGES.addFIDO2PasskeyPage]: pageContentJson["9"],
     [PAGES.deleteFIDO2PasskeyPage]: pageContentJson["10"],
     [PAGES.password]: pageContentJson["2"],
   };

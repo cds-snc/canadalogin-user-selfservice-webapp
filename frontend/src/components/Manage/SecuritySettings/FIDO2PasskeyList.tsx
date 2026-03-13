@@ -24,6 +24,8 @@ interface Fido2CredentialWithCreated extends Fido2Credential {
 interface FIDO2PasskeyListProps {
   userFIDO2CredentialsData: Fido2CredentialWithCreated[];
   onRenameSuccess?: () => Promise<void> | void;
+  setErrorCode: (errorCode: string) => void;
+  errorMessage: string;
 }
 
 interface RenameRegistrationResponse {
@@ -33,13 +35,14 @@ interface RenameRegistrationResponse {
 export default function FIDO2PasskeyList({
   userFIDO2CredentialsData,
   onRenameSuccess,
+  errorMessage,
+  setErrorCode,
 }: FIDO2PasskeyListProps) {
   const { language } = useParams();
   const navigate = useNavigate();
   const pageContent: Record<string, string> =
     getPageContent(language, PAGES.manage2FAVerifications) ?? {};
   const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
   const [editingPasskeyId, setEditingPasskeyId] = useState<string | null>(null);
   const [passkeyNicknameInputs, setPasskeyNicknameInputs] = useState<
     Record<string, string>
@@ -55,10 +58,13 @@ export default function FIDO2PasskeyList({
     passkeyId: string,
     renameDeviceName: string,
   ) => {
-    if (!passkeyId || !renameDeviceName.trim()) return;
+    if (!passkeyId || !renameDeviceName.trim()) {
+      setErrorCode("error_rename_credential");
+      return;
+    }
 
     setLoading(true);
-    setErrorMessage("");
+    setErrorCode("");
 
     try {
       const response = (await fido2Api.updateRegistration(passkeyId, {
@@ -71,10 +77,11 @@ export default function FIDO2PasskeyList({
         throw new Error(errorPageContent["error_rename_credential"]);
       }
     } catch (error) {
-      console.error(errorPageContent["error_rename_credential"], error);
-      setErrorMessage(errorPageContent["error_rename_credential"]);
+      console.error(["error_rename_credential"], error);
+      setErrorCode("error_rename_credential");
     } finally {
       setLoading(false);
+      setEditingPasskeyId(null);
     }
   };
 
@@ -87,6 +94,7 @@ export default function FIDO2PasskeyList({
       <GcdsContainer key={id}>
         {isEditing ? (
           <GcdsInput
+            label={pageContent[24]}
             inputId="passkeyNickname"
             name="passkeyNickname"
             type="text"
@@ -117,39 +125,57 @@ export default function FIDO2PasskeyList({
         </GcdsText>
         <GcdsGrid columns="max-content max-content max-content" gap="200">
           {isEditing ? (
-            <GcdsButton
-              id="save-fido2-button"
-              buttonRole="primary"
-              onGcdsClick={async () => {
-                await handleRenameFIDO2(id, nicknameValue);
-                setEditingPasskeyId(null);
-              }}
-              disabled={loading}
-            >
-              {pageContent["22"]}
-            </GcdsButton>
+            <>
+              <GcdsButton
+                id="save-fido2-button"
+                buttonRole="primary"
+                onGcdsClick={async () => {
+                  await handleRenameFIDO2(id, nicknameValue);
+                }}
+                disabled={loading}
+              >
+                {pageContent["22"]}
+              </GcdsButton>
+              <GcdsButton
+                id="cancel-fido2-button"
+                buttonRole="secondary"
+                onClick={() => {
+                  setPasskeyNicknameInputs((previous) => {
+                    const next = { ...previous };
+                    delete next[id];
+                    return next;
+                  });
+                  setEditingPasskeyId(null);
+                }}
+                disabled={loading}
+              >
+                {pageContent["23"]}
+              </GcdsButton>
+            </>
           ) : (
-            <GcdsButton
-              id="rename-fido2-button"
-              buttonRole="secondary"
-              onGcdsClick={() => {
-                setEditingPasskeyId(id);
-              }}
-            >
-              {pageContent["14"]}
-            </GcdsButton>
+            <>
+              <GcdsButton
+                id="rename-fido2-button"
+                buttonRole="secondary"
+                onGcdsClick={() => {
+                  setEditingPasskeyId(id);
+                }}
+              >
+                {pageContent["14"]}
+              </GcdsButton>
+              <GcdsButton
+                id="delete-fido2-button"
+                buttonRole="secondary"
+                onClick={() => {
+                  navigate(`${deletePasskeyPage}`, {
+                    state: { passkeyId: id, passkeyNickname: nicknameValue },
+                  });
+                }}
+              >
+                {pageContent["13"]}
+              </GcdsButton>
+            </>
           )}
-          <GcdsButton
-            id="delete-fido2-button"
-            buttonRole="secondary"
-            onClick={() => {
-              navigate(`${deletePasskeyPage}`, {
-                state: { passkeyId: id, passkeyNickname: nicknameValue },
-              });
-            }}
-          >
-            {pageContent["13"]}
-          </GcdsButton>
         </GcdsGrid>
         <div className="separator" />
       </GcdsContainer>

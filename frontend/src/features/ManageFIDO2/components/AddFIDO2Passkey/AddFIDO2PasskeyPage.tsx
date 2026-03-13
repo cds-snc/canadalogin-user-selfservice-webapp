@@ -123,6 +123,7 @@ export default function AddFIDO2PasskeyPage({
         setErrorCode("error_failed_to_get_attestation_options");
         return;
       }
+      setRegistrationLoading(false);
 
       // Trigger the browser WebAuthn popup — nickname is not known yet
       const result = await registerFIDO2Credential(attestationResponse.data);
@@ -157,7 +158,6 @@ export default function AddFIDO2PasskeyPage({
         navigate(backToManage2FAVerificationsPage, {
           state: {
             noticeType: NOTICE_TYPES.passkeyAdded,
-            passkeyName: deviceName.trim(),
           },
         });
       } else {
@@ -244,7 +244,7 @@ export default function AddFIDO2PasskeyPage({
         validatePassword={validatePassword}
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
-        parentPage={PAGES.addFIDO2Passkey}
+        parentPage={PAGES.addFIDO2PasskeyPage}
       />
     ),
     otpSelection: (
@@ -259,7 +259,7 @@ export default function AddFIDO2PasskeyPage({
           setSelected2FAPasskey(passkey);
           setWizardStep("verifyFIDO2Passkey");
         }}
-        parentPage={PAGES.addFIDO2Passkey}
+        parentPage={PAGES.addFIDO2PasskeyPage}
         onCancel={async () => navigate(backToManage2FAVerificationsPage)}
       />
     ),
@@ -312,7 +312,6 @@ export default function AddFIDO2PasskeyPage({
       <AddFIDO2PasskeyNickname
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
-        onCancel={async () => navigate(backToManage2FAVerificationsPage)}
         onSubmit={handleSubmitAttestation}
         registrationLoading={registrationLoading}
       />

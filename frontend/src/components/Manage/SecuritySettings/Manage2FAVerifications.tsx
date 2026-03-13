@@ -20,6 +20,9 @@ import FIDOPasskeyIcon from "../../../assets/icons/FIDO_Passkey_mark_A_black.svg
 import FIDOPasskeyCollage from "../../../assets/icons/passkey_collage.svg?react";
 import type { NoticeType } from "../../InfoBlocks/NoticeFactory";
 import type { OtpFactorReference } from "../../../types/hooks";
+import { useState } from "react";
+import { getErrorMessage } from "../../../utils/errorUtils";
+import ErrorSummaryWithFocus from "../../ErrorSummaryWithFocus/ErrorSummaryWithFocus";
 
 const sectionCardProps = {
   columns: "1fr",
@@ -68,6 +71,9 @@ export default function Manage2FAVerifications() {
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
     language,
   });
+  const [errorCode, setErrorCode] = useState("");
+
+  const errorMessage = getErrorMessage(language, errorCode);
 
   const { noticeType, phoneNumber, otpType, passkeyName } =
     (location.state as Manage2FANoticeState | null) || {};
@@ -100,6 +106,7 @@ export default function Manage2FAVerifications() {
     <Loader text={pageContent["11"]} />
   ) : (
     <GcdsContainer>
+      <ErrorSummaryWithFocus errorCode={errorCode} language={language} />
       {noticeType && (
         <NoticeFactory
           noticeType={noticeType}
@@ -177,6 +184,8 @@ export default function Manage2FAVerifications() {
           <FIDO2PasskeyList
             userFIDO2CredentialsData={userFIDO2CredentialsData}
             onRenameSuccess={refetchPasskeys}
+            setErrorCode={setErrorCode}
+            errorMessage={errorMessage}
           />
           <GcdsButton
             id="add-fido2-button"

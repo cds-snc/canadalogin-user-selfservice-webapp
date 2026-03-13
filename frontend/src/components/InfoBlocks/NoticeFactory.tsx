@@ -8,8 +8,7 @@ export type NoticeType =
   | "mfaDeleted"
   | "mfaAdded"
   | "passkeyAdded"
-  | "passkeyDeleted"
-  | "passkeyRenamed";
+  | "passkeyDeleted";
 
 interface NoticeFactoryProps {
   noticeType: NoticeType;
@@ -63,13 +62,14 @@ export default function NoticeFactory({
       </GcdsText>
     ),
 
-    passkeyAdded: ({ passkeyName: currentPasskeyName }) => (
+    passkeyAdded: () => (
       <GcdsText>
-        <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={" "}>
-          <GcdsText>
-            {noticeFactoryContent["3"]} <strong>{currentPasskeyName}</strong>{" "}
-            {noticeFactoryContent["7"]}
-          </GcdsText>
+        <GcdsNotice
+          type="success"
+          noticeTitleTag="h2"
+          noticeTitle={noticeFactoryContent["notice_title_success"]}
+        >
+          <GcdsText>{noticeFactoryContent["7"]}</GcdsText>
         </GcdsNotice>
       </GcdsText>
     ),
@@ -84,16 +84,6 @@ export default function NoticeFactory({
           <GcdsText>
             {noticeFactoryContent["8"]} <strong>{currentPasskeyName}</strong>{" "}
             {noticeFactoryContent["10"]}
-          </GcdsText>
-        </GcdsNotice>
-      </GcdsText>
-    ),
-
-    passkeyRenamed: ({ passkeyName: currentPasskeyName }) => (
-      <GcdsText>
-        <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={" "}>
-          <GcdsText>
-            {noticeFactoryContent["9"]} <strong>{currentPasskeyName}</strong>
           </GcdsText>
         </GcdsNotice>
       </GcdsText>
