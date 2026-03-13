@@ -158,6 +158,7 @@ export default function AddFIDO2PasskeyPage({
         navigate(backToManage2FAVerificationsPage, {
           state: {
             noticeType: NOTICE_TYPES.passkeyAdded,
+            passkeyName: deviceName.trim(),
           },
         });
       } else {
@@ -313,6 +314,7 @@ export default function AddFIDO2PasskeyPage({
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
         onSubmit={handleSubmitAttestation}
+        onCancel={() => navigate(backToManage2FAVerificationsPage)}
         registrationLoading={registrationLoading}
       />
     ),

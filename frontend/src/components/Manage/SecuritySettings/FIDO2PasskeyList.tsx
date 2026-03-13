@@ -24,8 +24,8 @@ interface Fido2CredentialWithCreated extends Fido2Credential {
 interface FIDO2PasskeyListProps {
   userFIDO2CredentialsData: Fido2CredentialWithCreated[];
   onRenameSuccess?: () => Promise<void> | void;
-  setErrorCode: (errorCode: string) => void;
-  errorMessage: string;
+  setErrorCode?: (errorCode: string) => void;
+  errorMessage?: string;
 }
 
 interface RenameRegistrationResponse {
@@ -35,8 +35,8 @@ interface RenameRegistrationResponse {
 export default function FIDO2PasskeyList({
   userFIDO2CredentialsData,
   onRenameSuccess,
-  errorMessage,
-  setErrorCode,
+  errorMessage = "",
+  setErrorCode = () => {},
 }: FIDO2PasskeyListProps) {
   const { language } = useParams();
   const navigate = useNavigate();

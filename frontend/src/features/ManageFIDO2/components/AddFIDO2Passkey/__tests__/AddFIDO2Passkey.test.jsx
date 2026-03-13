@@ -75,6 +75,11 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
       {children}
     </div>
   ),
+  GcdsLink: ({ children, href, ...props }) => (
+    <a href={href} {...props}>
+      {children}
+    </a>
+  ),
 }));
 
 describe("AddFIDO2Passkey", () => {
