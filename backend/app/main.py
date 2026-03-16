@@ -21,6 +21,7 @@ from app.constants.redis_keys import RedisKeys
 from .routers import health
 from app.users import v1_router as v1_users_router
 from app.auth import v1_router as v1_auth_router
+from app.auth import load_test_router as v1_load_test_router
 from app.password import v1_router as v1_password_router
 from app.otp import v1_router as v1_otp_router
 from app.fido2 import v1_router as v1_fido2_router
@@ -225,6 +226,14 @@ app.include_router(
     prefix=f"{configuration.V1_API_VERSION}/fido2",
     tags=["FIDO2"],
 )
+
+if configuration.ENVIRONMENT != "production":
+    logger.info("Load test session endpoint enabled (non-production environment)")
+    app.include_router(
+        v1_load_test_router.router,
+        prefix=f"{configuration.V1_API_VERSION}/auth/load-test",
+        tags=["Load Test"],
+    )
 
 
 @app.exception_handler(RequestValidationError)
