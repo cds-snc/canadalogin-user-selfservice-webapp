@@ -14,16 +14,16 @@ import {
 interface AddFIDO2PasskeyNicknameProps {
   setErrorCode: (code: string) => void;
   errorMessage: string;
-  onCancel: () => void;
   onSubmit: (deviceName: string) => Promise<void>;
+  onCancel: () => void;
   registrationLoading: boolean;
 }
 
 export default function AddFIDO2PasskeyNickname({
   setErrorCode,
   errorMessage,
-  onCancel,
   onSubmit,
+  onCancel,
   registrationLoading,
 }: AddFIDO2PasskeyNicknameProps) {
   const { language } = useParams();
@@ -60,7 +60,6 @@ export default function AddFIDO2PasskeyNickname({
               setNewDeviceName((e.target as HTMLInputElement).value)
             }
             hint={pageContent["4"]}
-            required={true}
           />
         </form>
         <GcdsGrid columns="max-content max-content" gap="200">

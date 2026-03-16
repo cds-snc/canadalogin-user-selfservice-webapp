@@ -7,6 +7,7 @@ import {
   GcdsErrorMessage,
   GcdsGrid,
   GcdsHeading,
+  GcdsLink,
   GcdsNotice,
   GcdsText,
 } from "@cdssnc/gcds-components-react";
@@ -91,6 +92,13 @@ export default function AddFIDO2Passkey({
         >
           {pageContent["12"]}
         </GcdsButton>
+
+        <GcdsHeading tag="h2">{pageContent["13"]}</GcdsHeading>
+
+        {/* TODO: add link to create passkey help page once available */}
+        <GcdsLink href="#" target="_blank">
+          {pageContent["14"]}
+        </GcdsLink>
       </GcdsGrid>
     </GcdsContainer>
   );

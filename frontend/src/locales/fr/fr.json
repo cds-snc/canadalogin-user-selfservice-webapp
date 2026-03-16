@@ -49,7 +49,7 @@
     "error_duplicate_passkey": "The user attempted to register an authenticator that contains one of the credentials already registered with the relying party.",
     "error_passkey_name_required": "Passkey name required.",
     "error_delete_credential": "Failed to delete security key",
-    "error_rename_credential": "Failed to rename security key",
+    "error_rename_credential": "Enter a name for your passkey to continue",
     "error_fido2_verification": "Échec de la vérification avec la clé d'accès",
     "error_fido2_wrong_passkey": "Vous avez utilisé une clé d'accès différente de celle que vous avez sélectionnée. Veuillez réessayer avec la bonne clé d'accès.",
     "error_get_assertion_options": "Échec de l'obtention des options d'authentification"
@@ -409,7 +409,9 @@
     "19": "Passkeys are encrypted digital keys you create using your fingerprint, face, or screen lock.",
     "20": "Where are passkeys saved?",
     "21": "Passkeys are often saved to your password manager, so you can sign in on other devices. Sometimes they are saved directly to your device.",
-    "22": "Save"
+    "22": "Save",
+    "23": "Cancel",
+    "24": "Name"
   },
   "AddMFANumber": {
     "1": "Entrez votre nouveau numéro de téléphone",
@@ -496,7 +498,7 @@
     "4": "pour le numéro",
     "5": "appel vocal",
     "6": "message texte",
-    "7": "for passkey verification",
+    "7": "Your passkey has been created",
     "8": "from your 2-step verification passkeys",
     "9": "You have successfully renamed your passkey to"
   },
@@ -563,7 +565,9 @@
     "9": "Make sure you only create a passkey on a device",
     "10": "you control",
     "11": "Create a passkey",
-    "12": "Cancel"
+    "12": "Cancel",
+    "13": "Problems with passkey?",
+    "14": "Help with creating a passkey"
   },
   "AddFIDO2PasskeyNickname": {
     "1": "Name your passkey",
@@ -581,7 +585,7 @@
     "5": "Problems with your passkey?",
     "6": "Try another way",
     "7": "Recover 2-step verification",
-    "8": "Help with passkey sign in",
+    "8": "Help with signing in with a passkey",
     "9": "Chargement..."
   },
   "DeleteFIDO2PasskeyConfirm": {

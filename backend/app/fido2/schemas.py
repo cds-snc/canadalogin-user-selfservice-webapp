@@ -3,7 +3,7 @@ FIDO2 schemas for request/response models
 """
 
 from typing import List, Optional, Dict, Any
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, field_validator
 from app.utils.schemas import ResponseModel
 
 
@@ -60,6 +60,13 @@ class UpdateRegistrationRequest(BaseModel):
     nickname: Optional[str] = None
     enabled: Optional[bool] = None
 
+    @field_validator("nickname")
+    @classmethod
+    def nickname_must_not_be_blank(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None and not v.strip():
+            raise ValueError("nickname cannot be blank or whitespace only")
+        return v.strip() if v is not None else v
+
 
 class FIDO2AttestationResultRequest(BaseModel):
     """Request model for FIDO2 attestation result"""
@@ -74,6 +81,13 @@ class FIDO2AttestationResultRequest(BaseModel):
     enabled: bool = True
     getClientExtensionResults: Optional[Dict[str, Any]] = None
     getTransports: Optional[List[str]] = None
+
+    @field_validator("nickname")
+    @classmethod
+    def nickname_must_not_be_blank(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None and not v.strip():
+            raise ValueError("nickname cannot be blank or whitespace only")
+        return v.strip() if v is not None else v
 
 
 class AssertionResponse(BaseModel):

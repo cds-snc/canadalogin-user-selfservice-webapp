@@ -81,16 +81,14 @@ export default function OtpSelection({
     onNext();
   };
 
-  const parentPageContent =
-    parentPage === PAGES.deleteMFAPage
-      ? pageContentJson["15"]
-      : parentPage === PAGES.addMFAPage
-        ? pageContentJson["14"]
-        : parentPage === PAGES.deleteFIDO2PasskeyPage
-          ? pageContentJson["22"]
-          : parentPage === PAGES.addFIDO2PasskeyPage
-            ? pageContentJson["23"]
-            : pageContentJson["2"];
+  const pageContentMap: Record<string, string> = {
+    [PAGES.deleteMFAPage]: pageContentJson["15"],
+    [PAGES.addMFAPage]: pageContentJson["14"],
+    [PAGES.addFIDO2PasskeyPage]: pageContentJson["23"],
+    [PAGES.deleteFIDO2PasskeyPage]: pageContentJson["22"],
+    [PAGES.password]: pageContentJson["2"],
+  };
+  const parentPageContent = pageContentMap[parentPage] || pageContentJson["2"];
 
   const factorRowStyle = {
     borderBottom: "0.0625rem solid #A5A5A5",
