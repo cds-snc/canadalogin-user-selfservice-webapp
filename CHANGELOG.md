@@ -1,5 +1,44 @@
 # Changelog
 
+## [1.14.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.13.0...v1.14.0) (2026-03-16)
+
+
+### Features
+
+* **front:** 1267 migrate utils folder from js to ts ([#1268](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1268)) ([314fe8a](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/314fe8aa820da1ffaf4c50dc17a4e7e8b0910816))
+* **frontend:** 1274 migrate frontendsrcfeatureschangepassword ([#1292](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1292)) ([7d83073](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/7d83073e7f5794bc2c672840d2bab93280fb7150))
+* **frontend:** contact phone number JS to TS ([#1293](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1293)) ([685bd34](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/685bd3428838d1b9fdf61b55721d34c1adfa21dd))
+* **frontend:** figma revisions passthrough ([#1304](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1304)) ([22c2a06](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/22c2a06200a3a837f6b0ee7626bef1339bdfc501))
+* **frontend:** Implement Add passkey flow according to Figma ([#1263](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1263)) ([60b8592](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/60b85925e401889a1ca2d8643a982cfb1e3a60f0))
+* **frontend:** implement delete passkey flow according to figma ([#1249](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1249)) ([2b4f56a](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/2b4f56ac40586c19de4a713d5a352d912910031d))
+* **frontend:** implement rename passkey flow according to figma ([#1261](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1261)) ([96aa77e](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/96aa77e5206924675b7b9aa00e9b59cdf68ac5eb))
+* **frontend:** migrate email address management components from JS to TS ([#1291](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1291)) ([eff8a84](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/eff8a8429d80ca278cc1dc58e3cc5e86850caf53))
+* **frontend:** Migrate ManageFIDO2 from JS to TS ([#1297](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1297)) ([2349ff6](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/2349ff61e4f1c2ced5b0713a47c7dd4284f3930f))
+* **frontend:** Migrate MFAPhoneNumber to TS ([#1294](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1294)) ([ad9a92e](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/ad9a92ef214ecb37781f2ca85b064d87c1909978))
+* **frontend:** migrate Transient OTP components and related files from JS to TS ([#1288](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1288)) ([d15b5a6](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/d15b5a61359a0100b83472c72134b006669ba9c2))
+* **frontend:** profilename JS to TS ([#1296](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1296)) ([de338d5](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/de338d519f046b01eab0da9b03dc498be303ea35))
+* Implement Delete FIDO2 Passkey functionality ([2349ff6](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/2349ff61e4f1c2ced5b0713a47c7dd4284f3930f))
+* **middleware:** add error logging middleware following internal standard ([#1239](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1239)) ([78d0ab2](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/78d0ab229d8c3596bcfacf53576cf8b57fd318dd))
+
+
+### Bug Fixes
+
+* **frontend:** 1271 migrate components folder from js to ts ([#1272](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1272)) ([a525051](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/a52505104ab7bc0c0659596eb1b3a4344c7e6be1))
+* **frontend:** hooks and services js to ts ([#1270](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1270)) ([3834186](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/3834186526b96212f589d624cf4928009bdce4b1))
+* **frontend:** Profile preferred name change ([#1257](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1257)) ([2cdbdb0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/2cdbdb01d6ea0c15bdcbaf9ed8a6664c72f80b1a))
+* **frontend:** tighten TS linting strict mode ([#1286](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1286)) ([07ac2f1](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/07ac2f12aec88f55b8b65f888914f71868e64f88))
+* **frontend:** Update external link for GC Account Directory in edit language flow ([#1266](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1266)) ([ff1ccfa](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/ff1ccfaddb8c4e3d6e040168157d75ab8cb66d0c))
+* **frontend:** Update footer links to be correct ([#1260](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1260)) ([b57cf02](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/b57cf02007e9c50453da37f42c281c4a15702633))
+* **frontend:** update name fields to auto-populate from user profile ([#1254](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1254)) ([68540c6](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/68540c6bc10855114bbdb9ccedf38ad768843444))
+* **frontend:** update redirect link for 2FA verifications page in phone number update flow ([#1253](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1253)) ([87a5cd1](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/87a5cd1a1af092e09d6b8ad9ba18c2cfdf138a43))
+* **frontend:** update return type of getUserOtpPhoneFactors to include success status ([#1290](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1290)) ([b24e40c](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/b24e40c599f504d07b6b17a75a759ea096e1e1be))
+
+
+### Miscellaneous Chores
+
+* **deps:** update dependency storybook to v8.6.17 [security] ([#1233](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1233)) ([e45d15c](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/e45d15c5f8873ba01a09a2a41b2d5eac9035e358))
+* Update CDS security tools version to v4.0.2 ([#1255](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1255)) ([148c78e](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/148c78e967cc4f77abc63e93bbcef096b1317f2d))
+
 ## [1.13.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.12.1...v1.13.0) (2026-03-03)
 
 
