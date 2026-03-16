@@ -68,7 +68,7 @@ async def main():
 
         profile = profile_response.json()
         print(f"    Success! Profile data:")
-        print(f"    {json.dumps(profile, indent=2)[:500]}")
+        print(f"    {json.dumps(profile, indent=2)}")
 
         print("\n[✓] Proof of concept complete — load test auth flow works.")
 
