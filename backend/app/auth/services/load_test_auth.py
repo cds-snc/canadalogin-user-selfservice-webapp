@@ -1,12 +1,7 @@
-import logging
-
-from fastapi import HTTPException, status
 from httpx import AsyncClient
 
 from app.config import get_configuration
 from app.constants.verify_endpoints import VerifyAPIEndpoint
-
-logger = logging.getLogger(__name__)
 
 
 async def ropc_authenticate(
@@ -29,37 +24,15 @@ async def ropc_authenticate(
         },
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
-
-    if token_response.status_code != 200:
-        logger.error(
-            "ROPC token request failed: status=%s body=%s",
-            token_response.status_code,
-            token_response.text,
-        )
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="ROPC authentication failed — check test user credentials",
-        )
-
+    token_response.raise_for_status()
     tokens = token_response.json()
 
-    # Fetch userinfo to get the sid (used as session ID)
     userinfo_url = f"{verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.USERINFO.value}"
     userinfo_response = await http_client.get(
         userinfo_url,
         headers={"Authorization": f"Bearer {tokens['access_token']}"},
     )
-
-    if userinfo_response.status_code != 200:
-        logger.error(
-            "Userinfo request failed: status=%s body=%s",
-            userinfo_response.status_code,
-            userinfo_response.text,
-        )
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to fetch userinfo after ROPC authentication",
-        )
+    userinfo_response.raise_for_status()
 
     tokens["userinfo"] = userinfo_response.json()
     return tokens
