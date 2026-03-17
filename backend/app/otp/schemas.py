@@ -165,12 +165,16 @@ class OtpVerificationAttemptRequest(BaseModel):
 
 
 class OtpDeletionRequest(BaseModel):
-    """Request schema for deleting OTP enrollment with verification"""
+    """Request schema for deleting OTP enrollment with verification.
+
+    otp, trxnId, and otpVerificationType are optional to support deletion of
+    unvalidated factors (which do not require OTP verification).
+    """
 
     id: str
     otpType: OtpType  # Type of the factor being deleted (SMS/Voice)
-    otp: str
-    trxnId: str
-    otpVerificationType: (
-        OtpType  # Type of OTP used for verification (can differ from otpType)
+    otp: Optional[str] = None
+    trxnId: Optional[str] = None
+    otpVerificationType: Optional[OtpType] = (
+        None  # Type of OTP used for verification (can differ from otpType)
     )
