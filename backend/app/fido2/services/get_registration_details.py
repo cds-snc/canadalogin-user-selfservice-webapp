@@ -5,7 +5,6 @@ Service for getting FIDO2 registration details
 import logging
 from httpx import AsyncClient
 from fastapi import HTTPException
-from app.utils.access_token import get_admin_token
 from app.utils.request_error_handler import RequestErrorHandler
 from app.fido2.schemas import (
     FIDO2RegistrationResponse,
@@ -29,12 +28,9 @@ async def get_registration_details(
             http_client, user_access_token
         )
 
-        # Get the registration with admin token (registration details might need admin access)
-        admin_token = await get_admin_token(http_client)
-
         # Verify ownership and get registration data
         registration_data = await verify_registration_ownership(
-            http_client, admin_token, registration_id, user_id
+            http_client, user_access_token, registration_id, user_id
         )
 
         # TODO: Add transaction data if needed

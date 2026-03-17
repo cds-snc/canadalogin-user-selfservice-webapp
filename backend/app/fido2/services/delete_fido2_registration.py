@@ -5,7 +5,7 @@ Service for deleting FIDO2 registrations (passkeys)
 import logging
 from httpx import AsyncClient
 from fastapi import Request
-from app.utils.access_token import get_admin_token, get_auth_request_headers
+from app.utils.access_token import get_auth_request_headers
 from app.utils.request_error_handler import RequestErrorHandler
 from app.constants.verify_endpoints import VerifyAPIEndpoint
 from app.fido2.schemas import (
@@ -64,17 +64,14 @@ async def delete_registration(
             http_client, user_access_token
         )
 
-        # Get admin token for delete operations (might need admin access)
-        admin_token = await get_admin_token(http_client)
-
         # Verify ownership
         await verify_registration_ownership(
-            http_client, admin_token, registration_id, user_id
+            http_client, user_access_token, registration_id, user_id
         )
 
         # Step 3: Delete the registration
         reg_url = f"{tenant_url}{VerifyAPIEndpoint.FIDO2_REGISTRATIONS.value}/{registration_id}"
-        headers = get_auth_request_headers(admin_token, json_content_type=True)
+        headers = get_auth_request_headers(user_access_token, json_content_type=True)
 
         delete_response = await http_client.delete(reg_url, headers=headers)
         delete_response.raise_for_status()

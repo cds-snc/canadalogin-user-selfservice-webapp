@@ -75,7 +75,7 @@ async def get_attestation_options(
 
         # Make the request
         url = f"{tenant_url}{VerifyAPIEndpoint.FIDO2_RP_BASE.value}/{rp_uuid}/attestation/options"
-        headers = get_auth_request_headers(admin_token, json_content_type=True)
+        headers = get_auth_request_headers(user_access_token, json_content_type=True)
 
         response = await http_client.post(url, headers=headers, json=body_to_send)
         logger.info(response)
@@ -115,7 +115,7 @@ async def submit_attestation_result(
 
         # Make the request
         url = f"{tenant_url}{VerifyAPIEndpoint.FIDO2_RP_BASE.value}/{rp_uuid}/attestation/result"
-        headers = get_auth_request_headers(admin_token, json_content_type=True)
+        headers = get_auth_request_headers(user_access_token, json_content_type=True)
 
         response = await http_client.post(url, headers=headers, json=body_to_send)
         response.raise_for_status()

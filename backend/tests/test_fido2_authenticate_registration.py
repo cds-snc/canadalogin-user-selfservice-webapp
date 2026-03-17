@@ -349,7 +349,7 @@ class TestGetAssertionOptions:
     @patch.object(auth_module, "get_admin_token")
     @patch.object(auth_module, "get_rp_id")
     @patch.object(auth_module, "get_tenant_url")
-    async def test_uses_admin_token_for_request(
+    async def test_uses_user_token_for_request(
         self,
         mock_get_tenant_url,
         mock_get_rp_id,
@@ -359,11 +359,10 @@ class TestGetAssertionOptions:
         mock_get_auth_request_headers,
         mock_http_client,
     ):
-        """Should use admin token for assertion options request"""
-        admin_token = "specific-admin-token"
+        """Should use user access token for assertion options request"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
         mock_get_rp_id.return_value = "example.com"
-        mock_get_admin_token.return_value = admin_token
+        mock_get_admin_token.return_value = "admin-token"
         mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
         mock_get_user_profile_info.return_value = (
             "user@example.com",
@@ -371,7 +370,7 @@ class TestGetAssertionOptions:
             "user-id-456",
         )
         mock_get_auth_request_headers.return_value = {
-            "Authorization": f"Bearer {admin_token}"
+            "Authorization": "Bearer user-token"
         }
 
         mock_response = MagicMock()
@@ -387,9 +386,9 @@ class TestGetAssertionOptions:
             request_data=request_data,
         )
 
-        # Verify admin token was used
+        # Verify user access token was used
         mock_get_auth_request_headers.assert_called_once_with(
-            admin_token, json_content_type=True
+            "user-token", json_content_type=True
         )
 
 
@@ -877,7 +876,7 @@ class TestSubmitAssertionResult:
     @patch.object(auth_module, "get_admin_token")
     @patch.object(auth_module, "get_rp_id")
     @patch.object(auth_module, "get_tenant_url")
-    async def test_uses_admin_token_for_request(
+    async def test_uses_user_token_for_request(
         self,
         mock_get_tenant_url,
         mock_get_rp_id,
@@ -888,14 +887,13 @@ class TestSubmitAssertionResult:
         mock_request,
         mock_assertion_request,
     ):
-        """Should use admin token for assertion result request"""
-        admin_token = "specific-admin-token"
+        """Should use user access token for assertion result request"""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
         mock_get_rp_id.return_value = "example.com"
-        mock_get_admin_token.return_value = admin_token
+        mock_get_admin_token.return_value = "admin-token"
         mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
         mock_get_auth_request_headers.return_value = {
-            "Authorization": f"Bearer {admin_token}"
+            "Authorization": "Bearer user-token"
         }
 
         mock_response = MagicMock()
@@ -912,9 +910,9 @@ class TestSubmitAssertionResult:
             return_jwt=False,
         )
 
-        # Verify admin token was used
+        # Verify user access token was used
         mock_get_auth_request_headers.assert_called_once_with(
-            admin_token, json_content_type=True
+            "user-token", json_content_type=True
         )
 
     @pytest.mark.asyncio
