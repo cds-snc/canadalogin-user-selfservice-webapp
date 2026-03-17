@@ -238,80 +238,82 @@ class TestDispatchFunctions:
     async def test_dispatch_sms_otp_enrollment(self, mock_sms_enrollment_request):
         mock_http_client = AsyncMock()
         user_id = "user123"
+        user_access_token = "user_token_123"
 
         mock_response = MagicMock()
         mock_response.status_code = 201
         mock_http_client.post.return_value = mock_response
 
-        with patch("app.otp.services.enroll_mfa_otp.get_admin_token") as mock_get_token:
-            mock_get_token.return_value = "admin_token_123"
+        with patch(
+            "app.otp.services.enroll_mfa_otp.get_auth_request_headers"
+        ) as mock_headers:
+            mock_headers.return_value = {"Authorization": "Bearer user_token_123"}
 
             with patch(
-                "app.otp.services.enroll_mfa_otp.get_auth_request_headers"
-            ) as mock_headers:
-                mock_headers.return_value = {"Authorization": "Bearer admin_token_123"}
+                "app.otp.services.enroll_mfa_otp.get_configuration"
+            ) as mock_config:
+                mock_config.return_value.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
+                    "https://test.verify.ibm.com"
+                )
 
                 with patch(
-                    "app.otp.services.enroll_mfa_otp.get_configuration"
-                ) as mock_config:
-                    mock_config.return_value.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
-                        "https://test.verify.ibm.com"
+                    "app.otp.services.enroll_mfa_otp.prepare_pydantic_phone_number_for_verify"
+                ) as mock_format:
+                    mock_format.return_value = "+19025555555"
+
+                    result = await dispatch_otp_enrollment(
+                        mock_http_client,
+                        mock_sms_enrollment_request,
+                        user_id,
+                        user_access_token,
                     )
 
-                    with patch(
-                        "app.otp.services.enroll_mfa_otp.prepare_pydantic_phone_number_for_verify"
-                    ) as mock_format:
-                        mock_format.return_value = "+19025555555"
-
-                        result = await dispatch_otp_enrollment(
-                            mock_http_client, mock_sms_enrollment_request, user_id
-                        )
-
-                        assert result == mock_response
-                        mock_http_client.post.assert_called_once()
-                        call_args = mock_http_client.post.call_args
-                        assert "smsotp" in call_args[0][0]
-                        assert call_args[1]["json"]["userId"] == user_id
-                        assert call_args[1]["json"]["phoneNumber"] == "+19025555555"
-                        assert call_args[1]["json"]["enabled"] is True
+                    assert result == mock_response
+                    mock_http_client.post.assert_called_once()
+                    call_args = mock_http_client.post.call_args
+                    assert "smsotp" in call_args[0][0]
+                    assert call_args[1]["json"]["userId"] == user_id
+                    assert call_args[1]["json"]["phoneNumber"] == "+19025555555"
+                    assert call_args[1]["json"]["enabled"] is True
 
     @pytest.mark.asyncio
     async def test_dispatch_voice_otp_enrollment(self, mock_voice_enrollment_request):
         mock_http_client = AsyncMock()
         user_id = "user123"
+        user_access_token = "user_token_123"
 
         mock_response = MagicMock()
         mock_response.status_code = 201
         mock_http_client.post.return_value = mock_response
 
-        with patch("app.otp.services.enroll_mfa_otp.get_admin_token") as mock_get_token:
-            mock_get_token.return_value = "admin_token_123"
+        with patch(
+            "app.otp.services.enroll_mfa_otp.get_auth_request_headers"
+        ) as mock_headers:
+            mock_headers.return_value = {"Authorization": "Bearer user_token_123"}
 
             with patch(
-                "app.otp.services.enroll_mfa_otp.get_auth_request_headers"
-            ) as mock_headers:
-                mock_headers.return_value = {"Authorization": "Bearer admin_token_123"}
+                "app.otp.services.enroll_mfa_otp.get_configuration"
+            ) as mock_config:
+                mock_config.return_value.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
+                    "https://test.verify.ibm.com"
+                )
 
                 with patch(
-                    "app.otp.services.enroll_mfa_otp.get_configuration"
-                ) as mock_config:
-                    mock_config.return_value.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
-                        "https://test.verify.ibm.com"
+                    "app.otp.services.enroll_mfa_otp.prepare_pydantic_phone_number_for_verify"
+                ) as mock_format:
+                    mock_format.return_value = "+19025555555"
+
+                    result = await dispatch_otp_enrollment(
+                        mock_http_client,
+                        mock_voice_enrollment_request,
+                        user_id,
+                        user_access_token,
                     )
 
-                    with patch(
-                        "app.otp.services.enroll_mfa_otp.prepare_pydantic_phone_number_for_verify"
-                    ) as mock_format:
-                        mock_format.return_value = "+19025555555"
-
-                        result = await dispatch_otp_enrollment(
-                            mock_http_client, mock_voice_enrollment_request, user_id
-                        )
-
-                        assert result == mock_response
-                        mock_http_client.post.assert_called_once()
-                        call_args = mock_http_client.post.call_args
-                        assert "voiceotp" in call_args[0][0]
-                        assert call_args[1]["json"]["userId"] == user_id
-                        assert call_args[1]["json"]["phoneNumber"] == "+19025555555"
-                        assert call_args[1]["json"]["enabled"] is True
+                    assert result == mock_response
+                    mock_http_client.post.assert_called_once()
+                    call_args = mock_http_client.post.call_args
+                    assert "voiceotp" in call_args[0][0]
+                    assert call_args[1]["json"]["userId"] == user_id
+                    assert call_args[1]["json"]["phoneNumber"] == "+19025555555"
+                    assert call_args[1]["json"]["enabled"] is True

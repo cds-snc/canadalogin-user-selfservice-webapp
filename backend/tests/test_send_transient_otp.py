@@ -53,19 +53,12 @@ def patch_config_and_auth(monkeypatch, fake_settings):
     """
     Patch only app helpers; do NOT mock httpx:
       - get_configuration().ibm_verify_config
-      - get_admin_token (awaitable, accepts the AsyncClient)
       - get_auth_request_headers
       - prepare_pydantic_phone_number_for_verify (normalize to E.164)
       - get_my_profile (awaitable; returns data.userName)
     """
     # Config
     monkeypatch.setattr(feature_module, "get_configuration", lambda: fake_settings)
-
-    # Async get_admin_token(client) -> "FAKE_ADMIN_TOKEN"
-    async def _fake_admin_token(_client):
-        return "FAKE_ADMIN_TOKEN"
-
-    monkeypatch.setattr(feature_module, "get_admin_token", _fake_admin_token)
 
     # Auth headers
     monkeypatch.setattr(
@@ -174,7 +167,7 @@ async def test_dispatch_posts_correct_request_for_phone_otp(otp_type, path_segme
         assert (
             request.url.path == f"/v2.0/factors/{path_segment}/transient/verifications"
         )
-        assert request.headers.get("Authorization") == "Bearer FAKE_ADMIN_TOKEN"
+        assert request.headers.get("Authorization") == "Bearer USER_TOKEN"
         payload = json.loads(request.content.decode() or "{}")
         assert payload == expected_body
         return Response(201, json=make_valid_payload(otp_type, trxn_id="tx-dispatch-1"))
@@ -186,7 +179,7 @@ async def test_dispatch_posts_correct_request_for_phone_otp(otp_type, path_segme
             user_id="user@example.com",
             destination="+14165551234",  # ✅ E.164 valid input for Pydantic PhoneNumber
         )
-        resp = await dispatch_otp(client, info)
+        resp = await dispatch_otp(client, info, "USER_TOKEN")
     assert resp.status_code == 201
 
 
@@ -201,7 +194,7 @@ async def test_dispatch_posts_correct_request_for_email():
         assert request.url.scheme == "https"
         assert request.url.host == "tenant.verify.ibm.com"
         assert request.url.path == "/v2.0/factors/emailotp/transient/verifications"
-        assert request.headers.get("Authorization") == "Bearer FAKE_ADMIN_TOKEN"
+        assert request.headers.get("Authorization") == "Bearer USER_TOKEN"
         payload = json.loads(request.content.decode() or "{}")
         assert payload == {"emailAddress": "user@example.com"}
         return Response(
@@ -215,7 +208,7 @@ async def test_dispatch_posts_correct_request_for_email():
             user_id="user@example.com",
             destination="User@Example.com",  # ensure lower-casing is applied by impl
         )
-        resp = await dispatch_otp(client, info)
+        resp = await dispatch_otp(client, info, "USER_TOKEN")
     assert resp.status_code == 201
 
 
@@ -380,7 +373,7 @@ async def test_handle_status_code_none_branch(monkeypatch):
         def json(self):
             return {}
 
-    async def _fake_dispatch(_client, _info, _language=None):
+    async def _fake_dispatch(_client, _info, _token, _language=None):
         return _Dummy()
 
     monkeypatch.setattr(feature_module, "dispatch_otp", _fake_dispatch)

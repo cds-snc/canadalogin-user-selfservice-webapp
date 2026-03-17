@@ -5,7 +5,7 @@ from app.config import get_configuration
 from app.otp.schemas import OtpDataResponse, OtpType, UserOtpInfo
 from app.users.services.otp_factors import get_user_otp_factor
 from app.users.services.get_my_profile import get_my_profile
-from app.utils.access_token import get_admin_token, get_auth_request_headers
+from app.utils.access_token import get_auth_request_headers
 from app.utils.helpers import (
     generate_error_response,
     prepare_pydantic_phone_number_for_verify,
@@ -45,7 +45,7 @@ async def handle_otp_send(
             user_otp_info.destination = user_otp_factor.get("destination")
 
         http_client_response = await dispatch_otp(
-            global_http_client, user_otp_info, user_language
+            global_http_client, user_otp_info, user_access_token, user_language
         )
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(
@@ -100,16 +100,16 @@ async def handle_otp_send(
 
 
 async def dispatch_otp(
-    global_http_client: AsyncClient, user_otp_info: UserOtpInfo, language: str = None
+    global_http_client: AsyncClient,
+    user_otp_info: UserOtpInfo,
+    user_access_token: str,
+    language: str = None,
 ):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
 
     try:
-        access_token = await get_admin_token(
-            global_http_client
-        )  # Pass global_http_client here
-        headers = get_auth_request_headers(access_token, True, language)
+        headers = get_auth_request_headers(user_access_token, True, language)
         settings = get_configuration().ibm_verify_config
 
         if (
