@@ -90,12 +90,16 @@ async def test_handle_otp_deletion_sms_success(monkeypatch):
         return create_mock_user_factors(num_factors=2)
 
     # Mock dispatch_otp_deletion to return successful response
-    async def mock_dispatch_otp_deletion(client, deletion_request):
+    async def mock_dispatch_otp_deletion(client, deletion_request, user_access_token):
         mock_response = Mock(spec=Response)
         mock_response.status_code = 204  # No Content for successful deletion
         return mock_response
 
     monkeypatch.setattr(verify_otp_import_path, mock_verify_otp)
+    monkeypatch.setattr(
+        "app.otp.services.delete_mfa_otp.get_my_profile",
+        mock_my_profile,
+    )
     monkeypatch.setattr(
         "app.otp.services.delete_mfa_otp.get_user_otp_factors",
         mock_get_user_otp_factors,
@@ -157,12 +161,16 @@ async def test_handle_otp_deletion_voice_success(monkeypatch):
         return create_mock_user_factors(num_factors=2)
 
     # Mock dispatch_otp_deletion to return successful response
-    async def mock_dispatch_otp_deletion(client, deletion_request):
+    async def mock_dispatch_otp_deletion(client, deletion_request, user_access_token):
         mock_response = Mock(spec=Response)
         mock_response.status_code = 204  # No Content for successful deletion
         return mock_response
 
     monkeypatch.setattr(verify_otp_import_path, mock_verify_otp)
+    monkeypatch.setattr(
+        "app.otp.services.delete_mfa_otp.get_my_profile",
+        mock_my_profile,
+    )
     monkeypatch.setattr(
         "app.otp.services.delete_mfa_otp.get_user_otp_factors",
         mock_get_user_otp_factors,
@@ -227,6 +235,10 @@ async def test_handle_otp_deletion_last_factor_protection(monkeypatch):
 
     monkeypatch.setattr(verify_otp_import_path, mock_verify_otp)
     monkeypatch.setattr(
+        "app.otp.services.delete_mfa_otp.get_my_profile",
+        mock_my_profile,
+    )
+    monkeypatch.setattr(
         "app.otp.services.delete_mfa_otp.get_user_otp_factors",
         mock_get_user_otp_factors,
     )
@@ -277,7 +289,7 @@ async def test_handle_otp_deletion_unexpected_status(monkeypatch):
         return create_mock_user_factors(num_factors=2)
 
     # Mock dispatch_otp_deletion to return unexpected status
-    async def mock_dispatch_otp_deletion(client, deletion_request):
+    async def mock_dispatch_otp_deletion(client, deletion_request, user_access_token):
         mock_response = Mock(spec=Response)
         mock_response.status_code = 200  # Unexpected status for deletion
         return mock_response
@@ -287,6 +299,10 @@ async def test_handle_otp_deletion_unexpected_status(monkeypatch):
         return None  # Success means no exception
 
     monkeypatch.setattr(verify_otp_import_path, mock_verify_otp)
+    monkeypatch.setattr(
+        "app.otp.services.delete_mfa_otp.get_my_profile",
+        mock_my_profile,
+    )
     monkeypatch.setattr(
         "app.otp.services.delete_mfa_otp.get_user_otp_factors",
         mock_get_user_otp_factors,
@@ -338,11 +354,11 @@ async def test_handle_otp_deletion_exception(monkeypatch):
         )
 
     # Mock get_user_otp_factors to return multiple factors
-    async def mock_get_user_otp_factors(client, user_id, token, validated=True):
+    async def mock_get_user_otp_factors(client, user_id, validated=True):
         return create_mock_user_factors(num_factors=2)
 
     # Mock dispatch_otp_deletion to raise an exception
-    async def mock_dispatch_otp_deletion(client, deletion_request):
+    async def mock_dispatch_otp_deletion(client, deletion_request, user_access_token):
         raise Exception("Network error")
 
     # Mock verify_otp_before_operation to succeed
@@ -350,6 +366,10 @@ async def test_handle_otp_deletion_exception(monkeypatch):
         return None  # Success means no exception
 
     monkeypatch.setattr(verify_otp_import_path, mock_verify_otp)
+    monkeypatch.setattr(
+        "app.otp.services.delete_mfa_otp.get_my_profile",
+        mock_my_profile,
+    )
     monkeypatch.setattr(
         "app.otp.services.delete_mfa_otp.get_user_otp_factors",
         mock_get_user_otp_factors,
@@ -374,10 +394,6 @@ async def test_handle_otp_deletion_exception(monkeypatch):
 async def test_dispatch_otp_deletion_sms_success(monkeypatch):
     """Test successful dispatch of SMS OTP deletion to IBM Verify"""
 
-    # Mock get_admin_token
-    async def mock_get_admin_token(client):
-        return "admin-token"
-
     # Mock get_auth_request_headers
     def mock_get_auth_request_headers(token, content_type):
         return {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
@@ -395,9 +411,6 @@ async def test_dispatch_otp_deletion_sms_success(monkeypatch):
     mock_response.raise_for_status = Mock()
     mock_client.delete.return_value = mock_response
 
-    monkeypatch.setattr(
-        "app.otp.services.delete_mfa_otp.get_admin_token", mock_get_admin_token
-    )
     monkeypatch.setattr(
         "app.otp.services.delete_mfa_otp.get_auth_request_headers",
         mock_get_auth_request_headers,
@@ -408,13 +421,13 @@ async def test_dispatch_otp_deletion_sms_success(monkeypatch):
 
     deletion_request = create_deletion_request()
 
-    result = await dispatch_otp_deletion(mock_client, deletion_request)
+    result = await dispatch_otp_deletion(mock_client, deletion_request, "user-token")
 
     assert result.status_code == 204
     mock_client.delete.assert_called_once_with(
         "https://test.verify.ibm.com/v2.0/factors/smsotp/factor123",
         headers={
-            "Authorization": "Bearer admin-token",
+            "Authorization": "Bearer user-token",
             "Content-Type": "application/json",
         },
     )
@@ -423,10 +436,6 @@ async def test_dispatch_otp_deletion_sms_success(monkeypatch):
 @pytest.mark.asyncio
 async def test_dispatch_otp_deletion_voice_success(monkeypatch):
     """Test successful dispatch of Voice OTP deletion to IBM Verify"""
-
-    # Mock get_admin_token
-    async def mock_get_admin_token(client):
-        return "admin-token"
 
     # Mock get_auth_request_headers
     def mock_get_auth_request_headers(token, content_type):
@@ -445,9 +454,6 @@ async def test_dispatch_otp_deletion_voice_success(monkeypatch):
     mock_response.raise_for_status = Mock()
     mock_client.delete.return_value = mock_response
 
-    monkeypatch.setattr(
-        "app.otp.services.delete_mfa_otp.get_admin_token", mock_get_admin_token
-    )
     monkeypatch.setattr(
         "app.otp.services.delete_mfa_otp.get_auth_request_headers",
         mock_get_auth_request_headers,
@@ -460,13 +466,13 @@ async def test_dispatch_otp_deletion_voice_success(monkeypatch):
         factor_id="factor456", otp_type=OtpType.VOICE
     )
 
-    result = await dispatch_otp_deletion(mock_client, deletion_request)
+    result = await dispatch_otp_deletion(mock_client, deletion_request, "user-token")
 
     assert result.status_code == 204
     mock_client.delete.assert_called_once_with(
         "https://test.verify.ibm.com/v2.0/factors/voiceotp/factor456",
         headers={
-            "Authorization": "Bearer admin-token",
+            "Authorization": "Bearer user-token",
             "Content-Type": "application/json",
         },
     )
@@ -481,7 +487,7 @@ async def test_dispatch_otp_deletion_unsupported_type():
 
     # Now expecting HTTPException due to our security enhancement
     with pytest.raises(HTTPException) as exc_info:
-        await dispatch_otp_deletion(mock_client, deletion_request)
+        await dispatch_otp_deletion(mock_client, deletion_request, "user-token")
 
     assert exc_info.value.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
     assert "Unable to delete MFA phone number" in str(exc_info.value.detail)
@@ -491,10 +497,6 @@ async def test_dispatch_otp_deletion_unsupported_type():
 async def test_dispatch_otp_deletion_http_error(monkeypatch):
     """Test dispatch when HTTP error occurs"""
     from httpx import HTTPStatusError
-
-    # Mock get_admin_token
-    async def mock_get_admin_token(client):
-        return "admin-token"
 
     # Mock get_auth_request_headers
     def mock_get_auth_request_headers(token, content_type):
@@ -510,9 +512,6 @@ async def test_dispatch_otp_deletion_http_error(monkeypatch):
     def mock_handle_error(error):
         return Mock(status_code=404)
 
-    monkeypatch.setattr(
-        "app.otp.services.delete_mfa_otp.get_admin_token", mock_get_admin_token
-    )
     monkeypatch.setattr(
         "app.otp.services.delete_mfa_otp.get_auth_request_headers",
         mock_get_auth_request_headers,
@@ -539,7 +538,7 @@ async def test_dispatch_otp_deletion_http_error(monkeypatch):
 
     deletion_request = create_deletion_request()
 
-    result = await dispatch_otp_deletion(mock_client, deletion_request)
+    result = await dispatch_otp_deletion(mock_client, deletion_request, "user-token")
 
     assert result.status_code == 404
 
@@ -547,10 +546,6 @@ async def test_dispatch_otp_deletion_http_error(monkeypatch):
 @pytest.mark.asyncio
 async def test_dispatch_otp_deletion_generic_exception(monkeypatch):
     """Test dispatch when generic exception occurs"""
-
-    # Mock get_admin_token
-    async def mock_get_admin_token(client):
-        return "admin-token"
 
     # Mock get_auth_request_headers
     def mock_get_auth_request_headers(token, content_type):
@@ -562,9 +557,6 @@ async def test_dispatch_otp_deletion_generic_exception(monkeypatch):
         config.ibm_verify_config.IBM_VERIFY_TENANT_URL = "https://test.verify.ibm.com"
         return config
 
-    monkeypatch.setattr(
-        "app.otp.services.delete_mfa_otp.get_admin_token", mock_get_admin_token
-    )
     monkeypatch.setattr(
         "app.otp.services.delete_mfa_otp.get_auth_request_headers",
         mock_get_auth_request_headers,
@@ -581,7 +573,7 @@ async def test_dispatch_otp_deletion_generic_exception(monkeypatch):
 
     # Now expecting HTTPException due to our security enhancement
     with pytest.raises(HTTPException) as exc_info:
-        await dispatch_otp_deletion(mock_client, deletion_request)
+        await dispatch_otp_deletion(mock_client, deletion_request, "user-token")
 
     assert exc_info.value.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
     assert "Unable to delete MFA phone number" in str(exc_info.value.detail)

@@ -6,7 +6,7 @@ from app.otp.schemas import (
     VerificationCreateResponseData,
 )
 from app.users.services.get_my_profile import get_my_profile
-from app.utils.access_token import get_admin_token, get_auth_request_headers
+from app.utils.access_token import get_auth_request_headers
 from app.utils.helpers import generate_error_response
 from app.utils.request_error_handler import RequestErrorHandler
 from app.utils.schemas import ResponseModel
@@ -24,12 +24,12 @@ async def dispatch_send_mfa_otp(
     global_http_client: AsyncClient,
     verification_request: OtpVerificationCreateRequest,
     otp_type: OtpType,
+    user_access_token: str,
     language: str = None,
 ):
     """Dispatch Send MFA OTP verification to IBM Verify"""
     try:
-        access_token = await get_admin_token(global_http_client)
-        headers = get_auth_request_headers(access_token, True, language)
+        headers = get_auth_request_headers(user_access_token, True, language)
         settings = get_configuration().ibm_verify_config
 
         if otp_type == OtpType.SMS:
@@ -92,7 +92,11 @@ async def handle_send_mfa_otp(
         logger.info(f"Using user's preferred language: {user_language}")
 
         http_client_response = await dispatch_send_mfa_otp(
-            global_http_client, verification_request, otp_type, user_language
+            global_http_client,
+            verification_request,
+            otp_type,
+            user_access_token,
+            user_language,
         )
 
         response_json = http_client_response.json()

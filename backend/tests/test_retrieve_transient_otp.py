@@ -31,15 +31,10 @@ def patch_config_and_auth(monkeypatch, fake_settings):
     """
     Patches:
     - get_configuration().ibm_verify_config
-    - get_admin_token (returns a constant)  ← make it ASYNC to match implementation
     - get_auth_request_headers (returns a minimal header)
     """
     monkeypatch.setattr(feature_module, "get_configuration", lambda: fake_settings)
 
-    async def _fake_admin_token():
-        return "FAKE_ADMIN_TOKEN"
-
-    monkeypatch.setattr(feature_module, "get_admin_token", _fake_admin_token)
     monkeypatch.setattr(
         feature_module,
         "get_auth_request_headers",
@@ -100,7 +95,7 @@ async def test_dispatch_success_for_each_otp_type(otp_type, path_segment):
     transport = build_transport(handler)
     async with AsyncClient(transport=transport) as client:
         retrieval_data = RetrievalData(otpType=otp_type, trxnId=trxn_id)
-        resp = await dispatch_otp_status_retrieval(client, retrieval_data)
+        resp = await dispatch_otp_status_retrieval(client, retrieval_data, "USER_TOKEN")
         assert resp.status_code == 200
         assert resp.json() == {"ok": True}
 
@@ -116,18 +111,16 @@ async def test_handle_success_validates_into_OtpDataResponse(otp_type, monkeypat
     trxn_id = f"ok-{otp_type.value}-123"
     payload = make_valid_payload(otp_type, trxn_id, correlation_id="corr-xyz")
 
-    # Monkeypatch dispatch to tolerate wrong argument order and return our payload
-    async def fake_dispatch(arg1, arg2):
-        # identify retrieval_data regardless of order
-        rd = arg1 if isinstance(arg1, RetrievalData) else arg2
-        assert isinstance(rd, RetrievalData)
+    # Monkeypatch dispatch to return our payload
+    async def fake_dispatch(client, retrieval_data, user_access_token):
+        assert isinstance(retrieval_data, RetrievalData)
         return Response(200, json=payload)
 
     monkeypatch.setattr(feature_module, "dispatch_otp_status_retrieval", fake_dispatch)
 
     async with AsyncClient() as client:
         rd = RetrievalData(otpType=otp_type, trxnId=trxn_id)
-        result = await handle_otp_status_retrieval(client, rd)
+        result = await handle_otp_status_retrieval(client, rd, "USER_TOKEN")
 
     # Expect enum value in message because implementation uses the Enum directly
     expected_msg_fragment = f"{otp_type} OTP status checked successfully"
@@ -156,7 +149,7 @@ async def test_handle_non_200_returns_error_model(monkeypatch):
 
     async with AsyncClient() as client:
         rd = RetrievalData(otpType=OtpType.EMAIL, trxnId="bad-req-1")
-        result = await handle_otp_status_retrieval(client, rd)
+        result = await handle_otp_status_retrieval(client, rd, "USER_TOKEN")
 
     # Be robust to either dict or Pydantic model shapes.
     if isinstance(result, dict):
@@ -195,7 +188,7 @@ async def test_handle_validation_error_due_to_incomplete_payload(monkeypatch):
 
     async with AsyncClient() as client:
         rd = RetrievalData(otpType=OtpType.SMS, trxnId="only-id-present")
-        result = await handle_otp_status_retrieval(client, rd)
+        result = await handle_otp_status_retrieval(client, rd, "USER_TOKEN")
 
     # Be robust to either dict or Pydantic model shapes.
     if isinstance(result, dict):
@@ -232,7 +225,7 @@ async def test_handle_transport_exception_translates_to_405_http_exception(monke
     async with AsyncClient() as client:
         rd = RetrievalData(otpType=OtpType.VOICE, trxnId="trxn-err-1")
         with pytest.raises(HTTPException) as excinfo:
-            await handle_otp_status_retrieval(client, rd)
+            await handle_otp_status_retrieval(client, rd, "USER_TOKEN")
 
     exc: HTTPException = excinfo.value
     assert exc.status_code == 405
