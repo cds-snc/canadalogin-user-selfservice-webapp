@@ -35,28 +35,52 @@ async def handle_otp_deletion(
         logger.info(f"Attempting to delete {otp_type} OTP factor")
         start_time = datetime.now()
 
-        # Step 1: Verify OTP before proceeding with deletion
-        # Use the verification OTP type (may differ from the factor being deleted)
-        await verify_otp_before_operation(
-            global_http_client=global_http_client,
-            otp=deletion_request.otp,
-            trxn_id=deletion_request.trxnId,
-            otp_type=deletion_request.otpVerificationType,
-        )
-
-        # Step 2: Check if user has multiple factors before allowing deletion
-        # Check all factors (validated and unvalidated) to prevent deletion of last remaining factor
-        user_factors_response = await get_user_otp_factors(
-            global_http_client, user_id, validated=None
-        )
-        if not user_factors_response.success or len(user_factors_response.data) <= 1:
-            logger.warning(f"User {user_id} cannot delete last remaining MFA factor")
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail="Cannot delete last remaining MFA factor",
+        if deletion_request.otp is None:
+            # Unvalidated factor deletion path — no OTP required.
+            # Verify the factor is actually unvalidated before allowing deletion.
+            unvalidated_factors = await get_user_otp_factors(
+                global_http_client, user_id, validated=False
+            )
+            factor_is_unvalidated = unvalidated_factors.success and any(
+                f.id == deletion_request.id for f in (unvalidated_factors.data or [])
+            )
+            if not factor_is_unvalidated:
+                logger.warning(
+                    f"Factor {deletion_request.id} is not unvalidated; OTP required"
+                )
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="OTP verification required to delete a validated factor",
+                )
+        else:
+            # Validated factor deletion path — OTP verification required.
+            # Step 1: Verify OTP before proceeding with deletion
+            # Use the verification OTP type (may differ from the factor being deleted)
+            await verify_otp_before_operation(
+                global_http_client=global_http_client,
+                otp=deletion_request.otp,
+                trxn_id=deletion_request.trxnId,
+                otp_type=deletion_request.otpVerificationType,
             )
 
-        # Step 3: Dispatch the deletion to IBM Verify
+            # Step 2: Check if user has multiple factors before allowing deletion
+            # Check all factors (validated and unvalidated) to prevent deletion of last remaining factor
+            user_factors_response = await get_user_otp_factors(
+                global_http_client, user_id, validated=None
+            )
+            if (
+                not user_factors_response.success
+                or len(user_factors_response.data) <= 1
+            ):
+                logger.warning(
+                    f"User {user_id} cannot delete last remaining MFA factor"
+                )
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="Cannot delete last remaining MFA factor",
+                )
+
+        # Dispatch the deletion to IBM Verify
         http_client_response = await dispatch_otp_deletion(
             global_http_client, deletion_request
         )
