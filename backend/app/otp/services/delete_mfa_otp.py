@@ -42,6 +42,12 @@ async def handle_otp_deletion(
         )
         user_id = my_profile_response.data.id
 
+        # Get user ID from the access token
+        my_profile_response = await get_my_profile(
+            global_http_client, user_access_token
+        )
+        user_id = my_profile_response.data.id
+
         if deletion_request.otp is None:
             # Unvalidated factor deletion path — no OTP required.
             # Verify the factor is actually unvalidated before allowing deletion.
