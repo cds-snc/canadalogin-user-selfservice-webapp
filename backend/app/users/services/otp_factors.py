@@ -9,7 +9,7 @@ from app.users.schemas import (
     UserPhoneAuthFactorsResponse,
     UserPhoneOTPFactors,
 )
-from app.utils.access_token import get_admin_token, get_auth_request_headers
+from app.utils.access_token import get_auth_request_headers
 from app.utils.string_masking import mask_phone_number
 from app.utils.request_error_handler import RequestErrorHandler
 from fastapi import HTTPException, status
@@ -53,33 +53,29 @@ async def parse_phone_auth_factors_response(
 
 async def dispatch_user_auth_factors(
     global_http_client: AsyncClient,
-    user_profile_id: str,
+    user_access_token: str,
     validated: Optional[bool] = True,
 ):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
 
     try:
-        access_token = await get_admin_token(global_http_client)
-        headers = get_auth_request_headers(access_token, True)
+        headers = get_auth_request_headers(user_access_token, True)
         settings = get_configuration()
 
         user_otp_factors_api_endpoint = settings.user_otp_factors_api_endpoint
 
         # Combine all search parameters into a single 'search' parameter, URL-encoded following the specs of IBM Verify docs
         # https://docs.verify.ibm.com/verify/reference/listfactorenrollments_20
+        # With user access token the results are automatically scoped to the authenticated user
         if validated is None:
             # Get all factors regardless of validation status
-            search_value = f'userId="{user_profile_id}"&enabled=true'
+            search_value = "enabled=true"
         else:
             validated_str = "true" if validated else "false"
-            search_value = (
-                f'userId="{user_profile_id}"&enabled=true&validated={validated_str}'
-            )
+            search_value = f"enabled=true&validated={validated_str}"
         search_params = {"search": search_value}
-        logger.info(
-            f"get user auth factors, userid: {user_profile_id}, validated: {validated}"
-        )
+        logger.info(f"get user auth factors, validated: {validated}")
 
         otp_factor_response = await global_http_client.get(
             user_otp_factors_api_endpoint, params=search_params, headers=headers
@@ -96,7 +92,7 @@ async def dispatch_user_auth_factors(
 
 async def get_user_otp_factor(
     global_http_client: AsyncClient,
-    user_id: str,
+    user_access_token: str,
     factor_id: str,
     validated: bool = True,
 ):
@@ -107,12 +103,12 @@ async def get_user_otp_factor(
     """
     try:
         logger.info(
-            f"get_user_otp_factor for user_id: {user_id}, validated: {validated}"
+            f"get_user_otp_factor for factor_id: {factor_id}, validated: {validated}"
         )
 
         start_time = datetime.now()
         user_otp_factors_response = await dispatch_user_auth_factors(
-            global_http_client, user_id, validated
+            global_http_client, user_access_token, validated
         )
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(f"user_otp_factors returned in {duration:.2f} seconds")
@@ -154,17 +150,17 @@ async def get_user_otp_factor(
 
 async def get_user_otp_factors(
     global_http_client: AsyncClient,
-    user_id: str,
+    user_access_token: str,
     validated: Optional[bool] = True,
 ):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
 
     try:
-        logger.info(f"user_id: {user_id} ")
+        logger.info("get_user_otp_factors")
         start_time = datetime.now()
         user_otp_factors_response = await dispatch_user_auth_factors(
-            global_http_client, user_id, validated
+            global_http_client, user_access_token, validated
         )
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(f"user_otp_factors returned in {duration:.2f} seconds")

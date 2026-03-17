@@ -39,7 +39,7 @@ async def handle_otp_send(
 
         if user_otp_info.factor_id is not None:
             user_otp_factor = await get_user_otp_factor(
-                global_http_client, my_profile_response.data.id, user_otp_info.factor_id
+                global_http_client, user_access_token, user_otp_info.factor_id
             )
 
             user_otp_info.destination = user_otp_factor.get("destination")

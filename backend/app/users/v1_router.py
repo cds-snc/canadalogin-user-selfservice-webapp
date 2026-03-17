@@ -18,7 +18,7 @@ from app.users.services.update_profile_with_otp import (
     update_profile_with_otp_verification,
 )
 
-from app.auth.services.auth_user_session import get_users_current_session, get_user_info
+from app.auth.services.auth_user_session import get_users_current_session
 from app.utils.validate_user_request_match import validate_user_id_matches_session
 
 router = APIRouter()
@@ -88,12 +88,11 @@ async def rp_info(
 async def user_factors(
     request: Request,
     validated: bool = True,
-    user_info: str = Depends(get_user_info),
     user_access_token: str = Depends(get_users_current_session),
 ):
     return await get_user_otp_factors(
         request.app.state.request_client,
-        user_info.get("sub"),
+        user_access_token,
         validated,
     )
 
