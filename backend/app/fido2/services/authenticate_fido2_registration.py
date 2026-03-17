@@ -457,7 +457,7 @@ async def get_assertion_options(
 
         # Make the request
         url = f"{tenant_url}{VerifyAPIEndpoint.FIDO2_RP_BASE.value}/{rp_uuid}/assertion/options"
-        headers = get_auth_request_headers(admin_token, json_content_type=True)
+        headers = get_auth_request_headers(user_access_token, json_content_type=True)
 
         response = await http_client.post(url, headers=headers, json=body_to_send)
         logger.info(f"Assertion options response status: {response.status_code}")
@@ -518,7 +518,7 @@ async def submit_assertion_result(
             )
 
         # Step 4: Submit FIDO2 assertion result
-        auth_token = mfa_challenge_token if mfa_challenge_token else admin_token
+        auth_token = mfa_challenge_token if mfa_challenge_token else user_access_token
         url = f"{tenant_url}{VerifyAPIEndpoint.FIDO2_RP_BASE.value}/{rp_uuid}/assertion/result"
         if return_jwt and mfa_challenge_token:
             url += "?returnJwt=true"
