@@ -1,5 +1,11 @@
 import { BrowserRouter } from "react-router";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import EditContactPhoneNumberPage from "../components/EditContactPhoneNumberPage";
 import { UserProvider } from "../../../components/Providers/UserProvider";
@@ -449,11 +455,15 @@ describe("EditContactPhoneNumberPage Component", () => {
   });
 
   it("shows loading state when localLoading is true", async () => {
+    // Use a manually-resolved promise so we can drain all async work before
+    // the test exits. Without this the pending timer fires after jsdom tears
+    // down, causing "window is not defined" unhandled errors.
+    let resolveOtp;
     mockAuthService.transientOtpSend.mockImplementation(
       () =>
-        new Promise((resolve) =>
-          setTimeout(() => resolve({ data: { trxnId: "test" } }), 100),
-        ),
+        new Promise((resolve) => {
+          resolveOtp = resolve;
+        }),
     );
 
     render(
@@ -467,5 +477,11 @@ describe("EditContactPhoneNumberPage Component", () => {
 
     expect(screen.getByTestId("loader")).toBeInTheDocument();
     expect(screen.getByText("Loading...")).toBeInTheDocument();
+
+    // Resolve the promise and flush all resulting React state updates so no
+    // async work is left pending when the test environment is torn down.
+    await act(async () => {
+      resolveOtp({ data: { trxnId: "test" } });
+    });
   });
 });

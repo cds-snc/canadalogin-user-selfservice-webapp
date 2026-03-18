@@ -30,21 +30,21 @@ const mockUserProfile = {
 const mockSMSFactor = {
   id: "factor-1",
   type: FLOW_TYPES.sms,
-  phoneNumber: "+15551234567",
+  destination: "+15551234567",
   status: "active",
 };
 
 const mockVoiceFactor = {
   id: "factor-2",
   type: FLOW_TYPES.voice,
-  phoneNumber: "+15559876543",
+  destination: "+15559876543",
   status: "active",
 };
 
 const mockEmailFactor = {
   id: "factor-3",
   type: FLOW_TYPES.email,
-  phoneNumber: "test@example.com",
+  destination: "test@example.com",
   status: "active",
 };
 

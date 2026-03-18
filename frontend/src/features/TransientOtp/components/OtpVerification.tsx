@@ -17,17 +17,13 @@ import SubmitButton from "../../../components/Layout/SubmitButton";
 import type { OtpFactor } from "../../../types/hooks";
 import type { UserProfile } from "../../../types/user";
 
-interface MfaFactor extends OtpFactor {
-  phoneNumber?: string;
-}
-
 type CaughtApiError = { data?: { message?: string } };
 
 const initialTime = 10;
 
 interface OtpVerificationProps {
   userProfile?: UserProfile | null;
-  userSelectedMfaFactor: MfaFactor;
+  userSelectedMfaFactor: OtpFactor;
   setUserOtpValue: (value: string) => void;
   userOtpValue: string;
   onBack: () => void;
@@ -130,7 +126,7 @@ export default function OtpVerification({
               ? pageContentJson["2"]
               : pageContentJson["23"]}
           &nbsp;
-          <strong>{userSelectedMfaFactor.phoneNumber}</strong>
+          <strong>{userSelectedMfaFactor.destination}</strong>
         </GcdsText>
         <GcdsText>
           {userMfaType === FLOW_TYPES.voice

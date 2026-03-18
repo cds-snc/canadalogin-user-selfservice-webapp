@@ -210,7 +210,7 @@ const defaultProps = {
   userSelectedMfaFactor: {
     id: "factor-1",
     type: FLOW_TYPES.sms,
-    phoneNumber: "+15551234567",
+    destination: "+15551234567",
   },
   otpSentResponse: {
     trxnId: "txn-123",
@@ -248,7 +248,7 @@ describe("OtpVerification Component", () => {
       const response = await mockTransientOtpSend({
         userName: defaultProps.userProfile.userName,
         otpType: "sms",
-        phoneNumber: defaultProps.userSelectedMfaFactor.phoneNumber,
+        destination: defaultProps.userSelectedMfaFactor.destination,
       });
       if (response.success && response.data) {
         mockSetOtpSentResponse({ trxnId: response.data.trxnId });
@@ -338,7 +338,7 @@ describe("OtpVerification Component", () => {
       const voiceFactor = {
         id: "factor-2",
         type: FLOW_TYPES.voice,
-        phoneNumber: "+15559876543",
+        destination: "+15559876543",
       };
       renderComponent({ userSelectedMfaFactor: voiceFactor });
 
@@ -356,7 +356,7 @@ describe("OtpVerification Component", () => {
       const voiceFactor = {
         id: "factor-2",
         type: FLOW_TYPES.voice,
-        phoneNumber: "+15559876543",
+        destination: "+15559876543",
       };
       renderComponent({ userSelectedMfaFactor: voiceFactor });
 
@@ -370,7 +370,7 @@ describe("OtpVerification Component", () => {
       const emailFactor = {
         id: "factor-3",
         type: FLOW_TYPES.email,
-        phoneNumber: "test@example.com",
+        destination: "test@example.com",
       };
       renderComponent({ userSelectedMfaFactor: emailFactor });
 
@@ -381,7 +381,7 @@ describe("OtpVerification Component", () => {
       const emailFactor = {
         id: "factor-3",
         type: FLOW_TYPES.email,
-        phoneNumber: "test@example.com",
+        destination: "test@example.com",
       };
       renderComponent({ userSelectedMfaFactor: emailFactor });
 
@@ -399,7 +399,7 @@ describe("OtpVerification Component", () => {
       const emailFactor = {
         id: "factor-3",
         type: FLOW_TYPES.email,
-        phoneNumber: "test@example.com",
+        destination: "test@example.com",
       };
       renderComponent({ userSelectedMfaFactor: emailFactor });
 
