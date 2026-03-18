@@ -79,12 +79,10 @@ class TestGetRegistrationDetails:
 
     @pytest.mark.asyncio
     @patch.object(get_details_module, "verify_registration_ownership")
-    @patch.object(get_details_module, "get_admin_token")
     @patch.object(get_details_module, "get_user_profile_info")
     async def test_successful_get_registration_details(
         self,
         mock_get_user_profile_info,
-        mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_http_client,
         mock_registration_data,
@@ -95,7 +93,6 @@ class TestGetRegistrationDetails:
             "Test User",
             "user-456",
         )
-        mock_get_admin_token.return_value = "admin-token-xyz"
         mock_verify_registration_ownership.return_value = mock_registration_data
 
         result = await get_registration_details(
@@ -110,19 +107,16 @@ class TestGetRegistrationDetails:
         mock_get_user_profile_info.assert_called_once_with(
             mock_http_client, "user-token-abc"
         )
-        mock_get_admin_token.assert_called_once_with(mock_http_client)
         mock_verify_registration_ownership.assert_called_once_with(
-            mock_http_client, "admin-token-xyz", "reg-123", "user-456"
+            mock_http_client, "user-token-abc", "reg-123", "user-456"
         )
 
     @pytest.mark.asyncio
     @patch.object(get_details_module, "verify_registration_ownership")
-    @patch.object(get_details_module, "get_admin_token")
     @patch.object(get_details_module, "get_user_profile_info")
     async def test_adds_transactions_array_to_attributes(
         self,
         mock_get_user_profile_info,
-        mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_http_client,
         mock_registration_data,
@@ -133,7 +127,6 @@ class TestGetRegistrationDetails:
             "Test User",
             "user-456",
         )
-        mock_get_admin_token.return_value = "admin-token-xyz"
         mock_verify_registration_ownership.return_value = mock_registration_data.copy()
 
         result = await get_registration_details(
@@ -153,12 +146,10 @@ class TestGetRegistrationDetails:
 
     @pytest.mark.asyncio
     @patch.object(get_details_module, "verify_registration_ownership")
-    @patch.object(get_details_module, "get_admin_token")
     @patch.object(get_details_module, "get_user_profile_info")
     async def test_creates_attributes_if_missing(
         self,
         mock_get_user_profile_info,
-        mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_http_client,
         mock_registration_data_no_attributes,
@@ -169,7 +160,6 @@ class TestGetRegistrationDetails:
             "Test User",
             "user-456",
         )
-        mock_get_admin_token.return_value = "admin-token-xyz"
         # Registration without attributes - but with all required fields
         mock_verify_registration_ownership.return_value = (
             mock_registration_data_no_attributes
@@ -206,42 +196,11 @@ class TestGetRegistrationDetails:
         assert exc.value.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.asyncio
-    @patch.object(get_details_module, "get_admin_token")
-    @patch.object(get_details_module, "get_user_profile_info")
-    async def test_propagates_http_exception_from_admin_token(
-        self,
-        mock_get_user_profile_info,
-        mock_get_admin_token,
-        mock_http_client,
-    ):
-        """Should propagate HTTPException when getting admin token fails"""
-        mock_get_user_profile_info.return_value = (
-            "user@example.com",
-            "Test User",
-            "user-456",
-        )
-        mock_get_admin_token.side_effect = HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Token service unavailable",
-        )
-
-        with pytest.raises(HTTPException) as exc:
-            await get_registration_details(
-                http_client=mock_http_client,
-                user_access_token="user-token-abc",
-                registration_id="reg-123",
-            )
-
-        assert exc.value.status_code == status.HTTP_503_SERVICE_UNAVAILABLE
-
-    @pytest.mark.asyncio
     @patch.object(get_details_module, "verify_registration_ownership")
-    @patch.object(get_details_module, "get_admin_token")
     @patch.object(get_details_module, "get_user_profile_info")
     async def test_propagates_http_exception_from_ownership_verification(
         self,
         mock_get_user_profile_info,
-        mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_http_client,
     ):
@@ -251,7 +210,6 @@ class TestGetRegistrationDetails:
             "Test User",
             "user-456",
         )
-        mock_get_admin_token.return_value = "admin-token-xyz"
         mock_verify_registration_ownership.side_effect = HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="User does not own this registration",
@@ -291,26 +249,22 @@ class TestGetRegistrationDetails:
 
     @pytest.mark.asyncio
     @patch.object(get_details_module, "verify_registration_ownership")
-    @patch.object(get_details_module, "get_admin_token")
     @patch.object(get_details_module, "get_user_profile_info")
     async def test_uses_correct_token_for_each_call(
         self,
         mock_get_user_profile_info,
-        mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_http_client,
         mock_registration_data,
     ):
-        """Should use user token for user ID and admin token for ownership verification"""
+        """Should use user access token for all calls"""
         user_token = "specific-user-token"
-        admin_token = "specific-admin-token"
 
         mock_get_user_profile_info.return_value = (
             "user@example.com",
             "Test User",
             "user-456",
         )
-        mock_get_admin_token.return_value = admin_token
         mock_verify_registration_ownership.return_value = mock_registration_data
 
         await get_registration_details(
@@ -321,19 +275,17 @@ class TestGetRegistrationDetails:
 
         # User token used for getting user ID
         mock_get_user_profile_info.assert_called_once_with(mock_http_client, user_token)
-        # Admin token used for ownership verification
+        # User access token used for ownership verification
         mock_verify_registration_ownership.assert_called_once_with(
-            mock_http_client, admin_token, "reg-123", "user-456"
+            mock_http_client, user_token, "reg-123", "user-456"
         )
 
     @pytest.mark.asyncio
     @patch.object(get_details_module, "verify_registration_ownership")
-    @patch.object(get_details_module, "get_admin_token")
     @patch.object(get_details_module, "get_user_profile_info")
     async def test_different_registration_ids(
         self,
         mock_get_user_profile_info,
-        mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_http_client,
         mock_registration_data_no_attributes,
@@ -344,7 +296,6 @@ class TestGetRegistrationDetails:
             "Test User",
             "user-456",
         )
-        mock_get_admin_token.return_value = "admin-token-xyz"
 
         # Test with UUID-style registration ID
         uuid_registration_id = "550e8400-e29b-41d4-a716-446655440000"
@@ -360,18 +311,16 @@ class TestGetRegistrationDetails:
 
         assert result.success is True
         mock_verify_registration_ownership.assert_called_with(
-            mock_http_client, "admin-token-xyz", uuid_registration_id, "user-456"
+            mock_http_client, "user-token-abc", uuid_registration_id, "user-456"
         )
 
     @pytest.mark.asyncio
     @patch.object(get_details_module, "RequestErrorHandler")
     @patch.object(get_details_module, "verify_registration_ownership")
-    @patch.object(get_details_module, "get_admin_token")
     @patch.object(get_details_module, "get_user_profile_info")
     async def test_handles_connection_error(
         self,
         mock_get_user_profile_info,
-        mock_get_admin_token,
         mock_verify_registration_ownership,
         mock_request_error_handler,
         mock_http_client,
@@ -382,7 +331,6 @@ class TestGetRegistrationDetails:
             "Test User",
             "user-456",
         )
-        mock_get_admin_token.return_value = "admin-token-xyz"
         mock_verify_registration_ownership.side_effect = ConnectionError(
             "Connection refused"
         )

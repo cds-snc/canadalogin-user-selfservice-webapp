@@ -4,7 +4,7 @@ from datetime import datetime
 from app.config import get_configuration
 from app.otp.schemas import EnrollmentResponseData, OtpEnrollmentRequest, OtpType
 from app.users.services.get_my_profile import get_my_profile
-from app.utils.access_token import get_admin_token, get_auth_request_headers
+from app.utils.access_token import get_auth_request_headers
 from app.utils.helpers import (
     generate_error_response,
     prepare_pydantic_phone_number_for_verify,
@@ -43,7 +43,7 @@ async def handle_otp_enrollment(
         logger.info(f"Enrolling {otp_type} OTP for user: {user_id}")
 
         http_client_response = await dispatch_otp_enrollment(
-            global_http_client, enrollment_request, user_id
+            global_http_client, enrollment_request, user_id, user_access_token
         )
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(
@@ -94,11 +94,11 @@ async def dispatch_otp_enrollment(
     global_http_client: AsyncClient,
     enrollment_request: OtpEnrollmentRequest,
     user_id: str,
+    user_access_token: str,
 ):
     """Dispatch OTP enrollment to IBM Verify (SMS or Voice)"""
     try:
-        access_token = await get_admin_token(global_http_client)
-        headers = get_auth_request_headers(access_token, True)
+        headers = get_auth_request_headers(user_access_token, True)
         settings = get_configuration().ibm_verify_config
 
         # Format phone number for IBM Verify

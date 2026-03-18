@@ -105,7 +105,7 @@ async def get_rp_uuid_from_rp_id(
 
 async def verify_registration_ownership(
     http_client: AsyncClient,
-    admin_token: str,
+    access_token: str,
     registration_id: str,
     user_id: str,
 ) -> Dict[str, Any]:
@@ -121,7 +121,7 @@ async def verify_registration_ownership(
     try:
         tenant_url = get_tenant_url()
         reg_url = f"{tenant_url}{VerifyAPIEndpoint.FIDO2_REGISTRATIONS.value}/{registration_id}"
-        headers = get_auth_request_headers(admin_token, json_content_type=True)
+        headers = get_auth_request_headers(access_token, json_content_type=True)
 
         reg_response = await http_client.get(reg_url, headers=headers)
         reg_response.raise_for_status()

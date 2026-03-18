@@ -6,7 +6,7 @@ from app.otp.schemas import (
     OtpVerificationAttemptRequest,
 )
 from app.users.services.get_my_profile import get_my_profile
-from app.utils.access_token import get_admin_token, get_auth_request_headers
+from app.utils.access_token import get_auth_request_headers
 from app.utils.request_error_handler import RequestErrorHandler
 from app.utils.schemas import ResponseModel
 from fastapi import HTTPException, status
@@ -35,7 +35,9 @@ async def handle_verify_mfa_otp(
                 success=False, data=None, message="User verification failed"
             )
 
-        await dispatch_verify_mfa_otp(global_http_client, attempt_request, otp_type)
+        await dispatch_verify_mfa_otp(
+            global_http_client, attempt_request, otp_type, user_access_token
+        )
 
         # IBM Verify API returns 204 No Content on successful verification attempt
         return ResponseModel(
@@ -53,11 +55,11 @@ async def dispatch_verify_mfa_otp(
     global_http_client: AsyncClient,
     attempt_request: OtpVerificationAttemptRequest,
     otp_type: OtpType,
+    user_access_token: str,
 ):
     """Dispatch MFA OTP verification attempt to IBM Verify"""
     try:
-        access_token = await get_admin_token(global_http_client)
-        headers = get_auth_request_headers(access_token, True)
+        headers = get_auth_request_headers(user_access_token, True)
         settings = get_configuration().ibm_verify_config
 
         attempt_data = {"otp": attempt_request.otp}

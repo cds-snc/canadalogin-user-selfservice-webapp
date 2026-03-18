@@ -83,7 +83,9 @@ async def test_parse_phone_auth_factors_response_empty():
 async def test_get_user_otp_factors_mocked(monkeypatch):
     # Mock dispatch_user_auth_factors to return a valid response
 
-    async def mock_dispatch_user_auth_factors(client, user_profile_id, validated=True):
+    async def mock_dispatch_user_auth_factors(
+        client, user_access_token, validated=True
+    ):
         return {
             "factors": [
                 {
@@ -110,7 +112,7 @@ async def test_get_user_otp_factors_mocked(monkeypatch):
     )
 
     async with AsyncClient(base_url="http://localhost") as client:
-        result = await get_user_otp_factors(client, "user123", "fake-token")
+        result = await get_user_otp_factors(client, "fake-access-token")
         assert isinstance(result, UserPhoneAuthFactorsResponse)
         assert result.success is True
         assert isinstance(result.data, list)
@@ -122,7 +124,9 @@ async def test_get_user_otp_factors_mocked(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_get_user_otp_factors_invalid_schema(monkeypatch):
-    async def mock_dispatch_user_auth_factors(client, user_profile_id, validated=True):
+    async def mock_dispatch_user_auth_factors(
+        client, user_access_token, validated=True
+    ):
         # Missing required fields for Factor → will cause ValidationError
         return {
             "factors": [{"invalid": "data"}],
@@ -139,14 +143,16 @@ async def test_get_user_otp_factors_invalid_schema(monkeypatch):
 
     async with AsyncClient(base_url="http://localhost") as client:
         with pytest.raises(HTTPException) as exc_info:
-            await get_user_otp_factors(client, "user123", "fake-token")
+            await get_user_otp_factors(client, "fake-access-token")
         assert exc_info.value.status_code == 422
 
 
 @pytest.mark.asyncio
 async def test_get_user_otp_factors_no_otp_factors(monkeypatch):
 
-    async def mock_dispatch_user_auth_factors(client, user_profile_id, validated=True):
+    async def mock_dispatch_user_auth_factors(
+        client, user_access_token, validated=True
+    ):
         # Valid schema but no SMSOTP or VOICEOTP types
         return {
             "factors": [
@@ -174,7 +180,7 @@ async def test_get_user_otp_factors_no_otp_factors(monkeypatch):
     )
 
     async with AsyncClient(base_url="http://localhost") as client:
-        response = await get_user_otp_factors(client, "user123", "fake-token")
+        response = await get_user_otp_factors(client, "fake-access-token")
         assert response.data == []
 
 
@@ -219,7 +225,9 @@ async def test_get_user_otp_factor(monkeypatch):
     """Test getting unmasked user OTP factors"""
     from app.users.services.otp_factors import get_user_otp_factor
 
-    async def mock_dispatch_user_auth_factors(client, user_id, validated=True):
+    async def mock_dispatch_user_auth_factors(
+        client, user_access_token, validated=True
+    ):
         return {
             "factors": [
                 {
@@ -246,7 +254,7 @@ async def test_get_user_otp_factor(monkeypatch):
     )
 
     async with AsyncClient(base_url="http://localhost") as client:
-        result = await get_user_otp_factor(client, "user123", "factor123")
+        result = await get_user_otp_factor(client, "fake-access-token", "factor123")
         assert result["id"] == "factor123"
         assert result["type"] == OtpType.SMSOTP.value
         # Should return unmasked phone number
