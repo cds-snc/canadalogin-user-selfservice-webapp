@@ -12,10 +12,16 @@ vi.mock("react-router", () => ({
 
 // Mock GCDS components
 vi.mock("@gcds-core/components-react", () => ({
-  GcdsNotice: ({ children, type, noticeTitleTag, noticeTitle, ...props }) => (
+  GcdsNotice: ({
+    children,
+    noticeRole,
+    noticeTitleTag,
+    noticeTitle,
+    ...props
+  }) => (
     <div
       data-testid="gcds-notice"
-      data-type={type}
+      data-notice-role={noticeRole}
       data-notice-title-tag={noticeTitleTag}
       data-notice-title={noticeTitle}
       {...props}
@@ -60,7 +66,7 @@ describe("NoticeFactory", () => {
     it("renders GcdsNotice with correct default attributes", () => {
       render(<NoticeFactory noticeType="mfaDeleted" />);
       const notice = screen.getByTestId("gcds-notice");
-      expect(notice).toHaveAttribute("data-type", "success");
+      expect(notice).toHaveAttribute("data-notice-role", "success");
       expect(notice).toHaveAttribute("data-notice-title-tag", "h2");
       expect(notice).toHaveAttribute("data-notice-title", " ");
     });
@@ -68,7 +74,7 @@ describe("NoticeFactory", () => {
     it("renders with mfaAdded noticeType", () => {
       render(<NoticeFactory noticeType="mfaAdded" />);
       const notice = screen.getByTestId("gcds-notice");
-      expect(notice).toHaveAttribute("data-type", "success");
+      expect(notice).toHaveAttribute("data-notice-role", "success");
     });
   });
 
