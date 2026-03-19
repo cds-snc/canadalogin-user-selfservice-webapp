@@ -1,4 +1,4 @@
-import { GcdsContainer, GcdsHeading } from "@cdssnc/gcds-components-react";
+import { GcdsContainer, GcdsHeading } from "@gcds-core/components-react";
 
 interface LoaderProps {
   text: string;

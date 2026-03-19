@@ -14,7 +14,7 @@
  * - handleSubmitAttestation: success navigates with noticeType, failure sets error
  * - Cancel calls navigate
  */
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import "@testing-library/jest-dom/vitest";
@@ -368,7 +368,9 @@ describe("AddFIDO2PasskeyPage", () => {
     renderPage();
 
     await waitFor(() => expect(capturedPasswordSuccessCallback).not.toBeNull());
-    capturedPasswordSuccessCallback();
+    await act(async () => {
+      capturedPasswordSuccessCallback();
+    });
 
     await waitFor(() =>
       expect(getStep("step-otpValidation")).toBeInTheDocument(),
@@ -387,7 +389,9 @@ describe("AddFIDO2PasskeyPage", () => {
     renderPage();
 
     await waitFor(() => expect(capturedPasswordSuccessCallback).not.toBeNull());
-    capturedPasswordSuccessCallback();
+    await act(async () => {
+      capturedPasswordSuccessCallback();
+    });
 
     await waitFor(() =>
       expect(getStep("step-otpSelection")).toBeInTheDocument(),
@@ -406,7 +410,9 @@ describe("AddFIDO2PasskeyPage", () => {
     renderPage();
 
     await waitFor(() => expect(capturedPasswordSuccessCallback).not.toBeNull());
-    capturedPasswordSuccessCallback();
+    await act(async () => {
+      capturedPasswordSuccessCallback();
+    });
 
     await waitFor(() =>
       expect(getStep("step-otpSelection")).toBeInTheDocument(),

@@ -103,7 +103,7 @@ vi.mock("../../../utils/constants", async (importOriginal) => {
   };
 });
 
-vi.mock("@cdssnc/gcds-components-react", () => ({
+vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children, ...props }) => <div {...props}>{children}</div>,
   GcdsGrid: ({ children, ...props }) => <div {...props}>{children}</div>,
   GcdsHeading: ({ children, tag, ...props }) => {
@@ -111,14 +111,20 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
     return React.createElement(Component, props, children);
   },
   GcdsText: ({ children, marginBottom, ...props }) => (
-    <p {...props} style={{ marginBottom }}>
+    <div {...props} style={{ marginBottom }}>
       {children}
-    </p>
+    </div>
   ),
-  GcdsNotice: ({ children, type, noticeTitle, noticeTitleTag, ...props }) => {
+  GcdsNotice: ({
+    children,
+    noticeRole,
+    noticeTitle,
+    noticeTitleTag,
+    ...props
+  }) => {
     const TitleComponent = noticeTitleTag || "h2";
     return (
-      <div {...props} data-notice-type={type}>
+      <div {...props} data-notice-role={noticeRole}>
         {noticeTitle && React.createElement(TitleComponent, {}, noticeTitle)}
         {children}
       </div>
@@ -339,11 +345,14 @@ describe("ConfirmUpdate Component Tests", () => {
       },
     };
 
-    const { container } = render(
-      <TestWrapper>
-        <ConfirmUpdate {...propsWithoutName} />
-      </TestWrapper>,
-    );
+    let container;
+    await act(async () => {
+      ({ container } = render(
+        <TestWrapper>
+          <ConfirmUpdate {...propsWithoutName} />
+        </TestWrapper>,
+      ));
+    });
 
     expect(container.firstChild).toBeNull();
   });

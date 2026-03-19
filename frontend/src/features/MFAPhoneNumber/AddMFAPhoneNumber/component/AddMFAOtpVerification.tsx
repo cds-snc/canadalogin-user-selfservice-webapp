@@ -9,7 +9,7 @@ import {
   GcdsLink,
   GcdsNotice,
   GcdsText,
-} from "@cdssnc/gcds-components-react";
+} from "@gcds-core/components-react";
 import { useParams } from "react-router";
 import { FLOW_TYPES, PAGES } from "../../../../utils/constants";
 import { getPageContent } from "../../../../utils/functions";
@@ -147,7 +147,7 @@ export default function AddMFAOtpVerification({
     <GcdsContainer role="main">
       {codeRequested && (
         <GcdsNotice
-          type="success"
+          noticeRole="success"
           noticeTitleTag="h2"
           noticeTitle={pageContentJson["17"]}
           data-testid="linkSuccess"

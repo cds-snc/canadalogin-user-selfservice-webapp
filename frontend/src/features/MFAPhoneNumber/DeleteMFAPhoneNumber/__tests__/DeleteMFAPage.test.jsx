@@ -1,6 +1,13 @@
 import "@testing-library/jest-dom/vitest";
 import { BrowserRouter } from "react-router";
-import { render, screen, waitFor, cleanup, act } from "@testing-library/react";
+import {
+  render,
+  screen,
+  waitFor,
+  cleanup,
+  act,
+  fireEvent,
+} from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import DeleteMFAPage from "../component/DeleteMFAPage";
 import { UserProvider } from "../../../../components/Providers/UserProvider";
@@ -87,7 +94,7 @@ vi.mock("../../../../components/Layout/Loading", () => ({
 }));
 
 // Mock GCDS components
-vi.mock("@cdssnc/gcds-components-react", () => ({
+vi.mock("@gcds-core/components-react", () => ({
   GcdsErrorMessage: ({ children, messageId }) => (
     <div data-testid="error-message" data-message-id={messageId}>
       {children}
@@ -341,7 +348,9 @@ describe("DeleteMFAPage", () => {
         fetchUserOtpPhoneFactors: vi.fn(),
       });
 
-      renderComponent();
+      await act(async () => {
+        renderComponent();
+      });
 
       // Should show loading state
       expect(screen.getByTestId("loading")).toBeInTheDocument();
@@ -673,7 +682,7 @@ describe("DeleteMFAPage", () => {
 
       // Click the next button to trigger password validation (which will fail)
       const nextButton = screen.getByTestId("password-verification-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       // Wait for error summary to appear
       await waitFor(() => {
@@ -751,7 +760,7 @@ describe("DeleteMFAPage", () => {
         "password-verification-next",
       );
       act(() => {
-        passwordNextButton.click();
+        fireEvent.click(passwordNextButton);
       });
 
       await waitFor(() => {
@@ -761,7 +770,7 @@ describe("DeleteMFAPage", () => {
       // Navigate to OTP verification
       const otpSelectionNextButton = screen.getByTestId("otp-selection-next");
       act(() => {
-        otpSelectionNextButton.click();
+        fireEvent.click(otpSelectionNextButton);
       });
 
       await waitFor(() => {
@@ -778,7 +787,7 @@ describe("DeleteMFAPage", () => {
         "otp-verification-next",
       );
       act(() => {
-        otpVerificationNextButton.click();
+        fireEvent.click(otpVerificationNextButton);
       });
 
       await waitFor(() => {
@@ -823,7 +832,7 @@ describe("DeleteMFAPage", () => {
 
       // Cancel from password verification
       const cancelButton = screen.getByTestId("password-verification-back");
-      cancelButton.click();
+      fireEvent.click(cancelButton);
 
       expect(mockNavigate).toHaveBeenCalledWith(
         "/en/security-settings/manage-2fa-verifications",

@@ -5,7 +5,7 @@ import SuccessfullyUpdated from "../components/SuccessfullyUpdated";
 import "@testing-library/jest-dom/vitest";
 
 // Mock GCDS components
-vi.mock("@cdssnc/gcds-components-react", () => ({
+vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children, ...props }) => (
     <div data-testid="gcds-container" {...props}>
       {children}
@@ -20,7 +20,13 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
       {children}
     </div>
   ),
-  GcdsHeading: ({ children, tag, ...props }) => {
+  GcdsHeading: ({
+    children,
+    tag,
+    marginBottom: _marginBottom,
+    marginTop: _marginTop,
+    ...props
+  }) => {
     const Tag = tag || "h1";
     return (
       <Tag data-testid="gcds-heading" {...props}>
@@ -28,10 +34,10 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
       </Tag>
     );
   },
-  GcdsText: ({ children, ...props }) => (
-    <p data-testid="gcds-text" {...props}>
+  GcdsText: ({ children, marginBottom: _mb, marginTop: _mt, ...props }) => (
+    <div data-testid="gcds-text" {...props}>
       {children}
-    </p>
+    </div>
   ),
   GcdsButton: ({ children, onGcdsClick, buttonRole, ...props }) => (
     <button
@@ -43,8 +49,8 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
       {children}
     </button>
   ),
-  GcdsNotice: ({ children, noticeTitle, type, ...props }) => (
-    <div data-testid="gcds-notice" data-notice-type={type} {...props}>
+  GcdsNotice: ({ children, noticeTitle, noticeRole }) => (
+    <div data-testid="gcds-notice" data-notice-role={noticeRole}>
       {noticeTitle && <h3>{noticeTitle}</h3>}
       {children}
     </div>
@@ -145,7 +151,7 @@ describe("SuccessfullyUpdated Component", () => {
 
     const notice = screen.getByTestId("gcds-notice");
     expect(notice).toBeInTheDocument();
-    expect(notice).toHaveAttribute("data-notice-type", "success");
+    expect(notice).toHaveAttribute("data-notice-role", "success");
   });
 
   it("displays the updated phone number", () => {

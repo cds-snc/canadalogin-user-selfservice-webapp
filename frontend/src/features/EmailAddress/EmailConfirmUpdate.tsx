@@ -7,7 +7,7 @@ import {
   GcdsGrid,
   GcdsHeading,
   GcdsText,
-} from "@cdssnc/gcds-components-react";
+} from "@gcds-core/components-react";
 import RPNameDisplay from "../../components/RPInfo/RPNameDisplay";
 import SubmitButton from "../../components/Layout/SubmitButton";
 

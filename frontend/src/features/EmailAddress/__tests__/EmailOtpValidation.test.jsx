@@ -34,7 +34,7 @@ vi.mock("../../../utils/constants", () => ({
 
 // Mock SubmitButton component
 vi.mock("../../../components/Layout/SubmitButton", () => ({
-  default: ({ onGcdsClick, children, ...props }) => (
+  default: ({ onGcdsClick, children, currentLang: _cl, ...props }) => (
     <button data-testid="submit-button" onClick={onGcdsClick} {...props}>
       {children || "Submit"}
     </button>
@@ -42,7 +42,7 @@ vi.mock("../../../components/Layout/SubmitButton", () => ({
 }));
 
 // Mock GCDS components to enable proper event handling
-vi.mock("@cdssnc/gcds-components-react", () => ({
+vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children, role }) => (
     <div data-testid="gcds-container" role={role}>
       {children}

@@ -5,7 +5,7 @@ import { BrowserRouter } from "react-router";
 import Password from "../Password";
 
 // Mock the GCDS components
-vi.mock("@cdssnc/gcds-components-react", () => ({
+vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children, ...props }) => (
     <div data-testid="gcds-container" {...props}>
       {children}

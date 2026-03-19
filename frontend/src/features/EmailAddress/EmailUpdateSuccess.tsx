@@ -9,7 +9,7 @@ import {
   GcdsGrid,
   GcdsLink,
   GcdsNotice,
-} from "@cdssnc/gcds-components-react";
+} from "@gcds-core/components-react";
 import SubmitButton from "../../components/Layout/SubmitButton";
 
 interface EmailUpdateSuccessProps {
@@ -29,7 +29,7 @@ export default function EmailUpdateSuccess({
 
   return (
     <GcdsContainer role="main">
-      <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle=" ">
+      <GcdsNotice noticeRole="success" noticeTitleTag="h2" noticeTitle=" ">
         <GcdsText>
           {pageContentJson["1"]} <strong>{newEmailAddress}</strong>
         </GcdsText>

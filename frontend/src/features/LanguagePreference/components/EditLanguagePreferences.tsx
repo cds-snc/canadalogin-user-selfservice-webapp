@@ -7,7 +7,7 @@ import {
   GcdsHeading,
   GcdsRadios,
   GcdsText,
-} from "@cdssnc/gcds-components-react";
+} from "@gcds-core/components-react";
 
 import { getPageContent } from "../../../utils/functions";
 import {

@@ -16,7 +16,7 @@
  * - Retry button re-triggers the FIDO2 flow
  * - Cancel button navigates back to manage 2FA page
  */
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import "@testing-library/jest-dom/vitest";
@@ -82,25 +82,23 @@ vi.mock("../../../../../assets/icons/passkey_collage.svg?react", () => ({
 
 // ─── GCDS components ───────────────────────────────────────────────────────
 
-vi.mock("@cdssnc/gcds-components-react", () => ({
-  GcdsContainer: ({ children, ...props }) => <div {...props}>{children}</div>,
-  GcdsGrid: ({ children, ...props }) => <div {...props}>{children}</div>,
-  GcdsHeading: ({ children, ...props }) => <h1 {...props}>{children}</h1>,
-  GcdsText: ({ children, ...props }) => <p {...props}>{children}</p>,
-  GcdsButton: ({ children, onGcdsClick, buttonRole, ...props }) => (
-    <button data-role={buttonRole} onClick={onGcdsClick} {...props}>
+vi.mock("@gcds-core/components-react", () => ({
+  GcdsContainer: ({ children }) => <div>{children}</div>,
+  GcdsGrid: ({ children }) => <div>{children}</div>,
+  GcdsHeading: ({ children }) => <h1>{children}</h1>,
+  GcdsText: ({ children }) => <div>{children}</div>,
+  GcdsButton: ({ children, onGcdsClick, buttonRole }) => (
+    <button data-role={buttonRole} onClick={onGcdsClick}>
       {children}
     </button>
   ),
-  GcdsLink: ({ children, onGcdsClick, ...props }) => (
-    <a onClick={onGcdsClick} {...props}>
+  GcdsLink: ({ children, onGcdsClick, href }) => (
+    <a href={href} onClick={onGcdsClick}>
       {children}
     </a>
   ),
-  GcdsErrorMessage: ({ children, ...props }) => (
-    <div data-testid="error-message" {...props}>
-      {children}
-    </div>
+  GcdsErrorMessage: ({ children }) => (
+    <div data-testid="error-message">{children}</div>
   ),
 }));
 
@@ -193,7 +191,9 @@ describe("VerifyFIDO2Passkey", () => {
     expect(screen.getByTestId("loader")).toHaveTextContent("Loading...");
 
     // Resolve to clean up
-    resolve(defaultAssertionOptions);
+    await act(async () => {
+      resolve(defaultAssertionOptions);
+    });
   });
 
   // ── Successful flow ───────────────────────────────────────────────────

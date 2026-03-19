@@ -66,7 +66,7 @@ vi.mock("../../../../utils/functions", () => ({
 }));
 
 // Mock GCDS components
-vi.mock("@cdssnc/gcds-components-react", () => ({
+vi.mock("@gcds-core/components-react", () => ({
   GcdsButton: ({ children, onGcdsClick, buttonRole, style }) => (
     <button
       data-testid={
@@ -134,7 +134,7 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
       {errorMessage && <span data-testid="error-message">{errorMessage}</span>}
     </div>
   ),
-  GcdsText: ({ children }) => <p data-testid="text">{children}</p>,
+  GcdsText: ({ children }) => <div data-testid="text">{children}</div>,
   GcdsCheckboxes: vi.fn(({ options, onGcdsChange, legend, ...props }) => (
     <fieldset {...props}>
       <legend>{legend}</legend>

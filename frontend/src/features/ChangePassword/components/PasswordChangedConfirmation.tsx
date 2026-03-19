@@ -8,7 +8,7 @@ import {
   GcdsNotice,
   GcdsButton,
   GcdsGrid,
-} from "@cdssnc/gcds-components-react";
+} from "@gcds-core/components-react";
 import { getPageContent } from "../../../utils/functions";
 import { PAGES } from "../../../utils/constants";
 
@@ -46,7 +46,7 @@ export default function PasswordChangedConfirmation({
 
   return (
     <GcdsContainer>
-      <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle=" ">
+      <GcdsNotice noticeRole="success" noticeTitleTag="h2" noticeTitle=" ">
         <GcdsText>{pageContentJson["1"]}</GcdsText>
       </GcdsNotice>
       <br />

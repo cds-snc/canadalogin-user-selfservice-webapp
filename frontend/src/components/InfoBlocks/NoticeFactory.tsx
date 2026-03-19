@@ -1,4 +1,4 @@
-import { GcdsNotice, GcdsText } from "@cdssnc/gcds-components-react";
+import { GcdsNotice, GcdsText } from "@gcds-core/components-react";
 import { getPageContent } from "../../utils/functions";
 import { PAGES } from "../../utils/constants";
 import { useParams } from "react-router";
@@ -39,7 +39,7 @@ export default function NoticeFactory({
   > = {
     mfaDeleted: ({ phoneNumber: currentPhoneNumber }) => (
       <GcdsText>
-        <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={" "}>
+        <GcdsNotice noticeRole="success" noticeTitleTag="h2" noticeTitle={" "}>
           <GcdsText>
             {noticeFactoryContent["1"]} <strong>{currentPhoneNumber}</strong>{" "}
             {noticeFactoryContent["2"]}
@@ -53,7 +53,7 @@ export default function NoticeFactory({
       otpType: currentOtpType,
     }) => (
       <GcdsText>
-        <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle={" "}>
+        <GcdsNotice noticeRole="success" noticeTitleTag="h2" noticeTitle={" "}>
           <GcdsText>
             {noticeFactoryContent["3"]} {currentOtpType}{" "}
             {noticeFactoryContent["4"]} <strong>{currentPhoneNumber}</strong>
@@ -65,7 +65,7 @@ export default function NoticeFactory({
     passkeyAdded: () => (
       <GcdsText>
         <GcdsNotice
-          type="success"
+          noticeRole="success"
           noticeTitleTag="h2"
           noticeTitle={noticeFactoryContent["notice_title_success"]}
         >
@@ -77,7 +77,7 @@ export default function NoticeFactory({
     passkeyDeleted: ({ passkeyName: currentPasskeyName }) => (
       <GcdsText>
         <GcdsNotice
-          type="success"
+          noticeRole="success"
           noticeTitleTag="h2"
           noticeTitle={noticeFactoryContent["notice_title_success"]}
         >

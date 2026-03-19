@@ -7,7 +7,7 @@ import {
   GcdsLink,
   GcdsNotice,
   GcdsText,
-} from "@cdssnc/gcds-components-react";
+} from "@gcds-core/components-react";
 
 import { getPageContent } from "../../../utils/functions";
 import {
@@ -83,7 +83,7 @@ export default function SuccessfullyUpdated({
   return (
     <GcdsContainer role="main">
       <GcdsText>
-        <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle=" ">
+        <GcdsNotice noticeRole="success" noticeTitleTag="h2" noticeTitle=" ">
           <GcdsText>
             <strong>
               {pageContentJson["1"]} {displayLanguageName}

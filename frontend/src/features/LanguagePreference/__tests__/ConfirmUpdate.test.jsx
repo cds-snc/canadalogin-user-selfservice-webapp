@@ -94,15 +94,15 @@ vi.mock("../../../components/Layout/Loading", () => ({
   default: ({ text }) => <div data-testid="loader">{text}</div>,
 }));
 
-vi.mock("@cdssnc/gcds-components-react", () => ({
+vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children }) => (
     <div data-testid="gcds-container">{children}</div>
   ),
   GcdsHeading: ({ children }) => <h1>{children}</h1>,
   GcdsText: ({ children, ...props }) => (
-    <p data-testid="gcds-text" {...props}>
+    <div data-testid="gcds-text" {...props}>
       {children}
-    </p>
+    </div>
   ),
   GcdsButton: ({ children, onGcdsClick, buttonRole, ...props }) => (
     <button

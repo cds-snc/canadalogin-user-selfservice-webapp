@@ -8,7 +8,7 @@ import {
   GcdsLink,
   GcdsRadios,
   GcdsText,
-} from "@cdssnc/gcds-components-react";
+} from "@gcds-core/components-react";
 import { isValidPhoneNumber, CountryCode } from "libphonenumber-js";
 import { useState } from "react";
 import PhoneInput from "react-phone-input-2";

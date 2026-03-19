@@ -39,7 +39,7 @@ vi.mock("../../../utils/constants", () => ({
 }));
 
 // Mock GCDS components with proper prop handling
-vi.mock("@cdssnc/gcds-components-react", () => ({
+vi.mock("@gcds-core/components-react", () => ({
   GcdsHeading: ({ children, marginTop, ...props }) => (
     <h3 data-testid="gcds-heading" {...props} style={{ marginTop }}>
       {children}
@@ -51,9 +51,9 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
     </div>
   ),
   GcdsText: ({ children, ...props }) => (
-    <p data-testid="gcds-text" {...props}>
+    <div data-testid="gcds-text" {...props}>
       {children}
-    </p>
+    </div>
   ),
   GcdsLink: ({ children, href, onGcdsClick, ...props }) => {
     const handleClick = (e) => {

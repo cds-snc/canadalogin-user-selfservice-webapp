@@ -5,7 +5,7 @@ import {
   GcdsLink,
   GcdsNotice,
   GcdsText,
-} from "@cdssnc/gcds-components-react";
+} from "@gcds-core/components-react";
 import { useParams } from "react-router";
 import { FLOW_TYPES, PAGES } from "../../../../utils/constants";
 import { getPageContent } from "../../../../utils/functions";
@@ -48,7 +48,7 @@ export default function AddSecondMFA({
     <GcdsContainer role="main">
       <GcdsText>
         {" "}
-        <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle=" ">
+        <GcdsNotice noticeRole="success" noticeTitleTag="h2" noticeTitle=" ">
           <GcdsText>
             {pageContentJson["1"]}{" "}
             <strong>{phoneFormData.formattedPhoneNumber} </strong>

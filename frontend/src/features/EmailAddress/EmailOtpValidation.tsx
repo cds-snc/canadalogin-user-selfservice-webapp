@@ -7,7 +7,7 @@ import {
   GcdsInput,
   GcdsLink,
   GcdsText,
-} from "@cdssnc/gcds-components-react";
+} from "@gcds-core/components-react";
 import { useParams } from "react-router";
 import { PAGES } from "../../utils/constants";
 import { getPageContent } from "../../utils/functions";

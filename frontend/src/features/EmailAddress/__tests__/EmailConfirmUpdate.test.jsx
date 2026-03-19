@@ -47,7 +47,7 @@ vi.mock("../../../components/Layout/SubmitButton", () => ({
 }));
 
 // Mock GCDS components to enable proper event handling
-vi.mock("@cdssnc/gcds-components-react", () => ({
+vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children, role }) => (
     <div data-testid="gcds-container" role={role}>
       {children}
