@@ -54,7 +54,7 @@ vi.mock("@gcds-core/components-react", () => ({
     <h1 {...props}>{children}</h1>
   ),
   GcdsText: ({ children, marginBottom: _mb, marginTop: _mt, ...props }) => (
-    <p {...props}>{children}</p>
+    <div {...props}>{children}</div>
   ),
   GcdsErrorMessage: ({ children, messageId: _mid, ...props }) => (
     <div data-testid="error-message" {...props}>

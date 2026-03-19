@@ -16,7 +16,7 @@
  * - Retry button re-triggers the FIDO2 flow
  * - Cancel button navigates back to manage 2FA page
  */
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import "@testing-library/jest-dom/vitest";
@@ -86,7 +86,7 @@ vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children }) => <div>{children}</div>,
   GcdsGrid: ({ children }) => <div>{children}</div>,
   GcdsHeading: ({ children }) => <h1>{children}</h1>,
-  GcdsText: ({ children }) => <p>{children}</p>,
+  GcdsText: ({ children }) => <div>{children}</div>,
   GcdsButton: ({ children, onGcdsClick, buttonRole }) => (
     <button data-role={buttonRole} onClick={onGcdsClick}>
       {children}
@@ -191,7 +191,9 @@ describe("VerifyFIDO2Passkey", () => {
     expect(screen.getByTestId("loader")).toHaveTextContent("Loading...");
 
     // Resolve to clean up
-    resolve(defaultAssertionOptions);
+    await act(async () => {
+      resolve(defaultAssertionOptions);
+    });
   });
 
   // ── Successful flow ───────────────────────────────────────────────────

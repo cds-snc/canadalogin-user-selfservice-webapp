@@ -134,7 +134,7 @@ vi.mock("@gcds-core/components-react", () => ({
       {errorMessage && <span data-testid="error-message">{errorMessage}</span>}
     </div>
   ),
-  GcdsText: ({ children }) => <p data-testid="text">{children}</p>,
+  GcdsText: ({ children }) => <div data-testid="text">{children}</div>,
   GcdsCheckboxes: vi.fn(({ options, onGcdsChange, legend, ...props }) => (
     <fieldset {...props}>
       <legend>{legend}</legend>

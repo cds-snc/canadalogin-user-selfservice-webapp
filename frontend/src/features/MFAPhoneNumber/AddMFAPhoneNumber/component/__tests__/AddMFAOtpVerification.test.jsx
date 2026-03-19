@@ -212,7 +212,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
   });
 
   afterEach(() => {
-    vi.runOnlyPendingTimers();
+    vi.clearAllTimers();
     vi.useRealTimers();
   });
 

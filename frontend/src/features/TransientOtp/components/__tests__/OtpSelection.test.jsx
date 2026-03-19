@@ -119,7 +119,7 @@ vi.mock("@gcds-core/components-react", () => ({
       </button>
     );
   },
-  GcdsText: ({ children }) => <p data-testid="gcds-text">{children}</p>,
+  GcdsText: ({ children }) => <div data-testid="gcds-text">{children}</div>,
 }));
 
 // ---------------------------------------------------------------------------

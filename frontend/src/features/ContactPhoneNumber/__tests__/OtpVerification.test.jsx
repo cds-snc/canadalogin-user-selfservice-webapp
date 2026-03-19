@@ -38,9 +38,9 @@ vi.mock("@gcds-core/components-react", () => ({
     );
   },
   GcdsText: ({ children, marginBottom: _mb, marginTop: _mt, ...props }) => (
-    <p data-testid="gcds-text" {...props}>
+    <div data-testid="gcds-text" {...props}>
       {children}
-    </p>
+    </div>
   ),
   GcdsInput: ({
     inputId,

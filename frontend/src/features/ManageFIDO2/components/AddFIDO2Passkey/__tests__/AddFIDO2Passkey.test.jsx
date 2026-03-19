@@ -63,7 +63,7 @@ vi.mock("@gcds-core/components-react", () => ({
     <h1 {...props}>{children}</h1>
   ),
   GcdsText: ({ children, marginBottom: _mb, marginTop: _mt, ...props }) => (
-    <p {...props}>{children}</p>
+    <div {...props}>{children}</div>
   ),
   GcdsNotice: ({
     children,

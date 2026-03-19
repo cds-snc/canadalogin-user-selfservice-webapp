@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import "@testing-library/jest-dom";
 import { createMemoryRouter, RouterProvider } from "react-router";
@@ -386,7 +386,7 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate to add otp selection number step
       const button = screen.getByTestId("password-verification-next");
-      button.click();
+      fireEvent.click(button);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
@@ -444,7 +444,7 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate to add otp selection number step
       const button = screen.getByTestId("password-verification-next");
-      button.click();
+      fireEvent.click(button);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
@@ -452,21 +452,21 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate to add MFA number step to trigger enrollMFA
       const nextButton = screen.getByTestId("otp-selection-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
       });
 
       const otpNextButton = screen.getByTestId("otp-verification-next");
-      otpNextButton.click();
+      fireEvent.click(otpNextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
       });
 
       const addMfaNextButton = screen.getByTestId("add-mfa-phone-number-next");
-      addMfaNextButton.click();
+      fireEvent.click(addMfaNextButton);
 
       // This should trigger the enrollMFA error path (lines 83-88, 97)
       await waitFor(() => {
@@ -500,28 +500,28 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate to add otp selection number step
       const button = screen.getByTestId("password-verification-next");
-      button.click();
+      fireEvent.click(button);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
       });
 
       const nextButton = screen.getByTestId("otp-selection-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
       });
 
       const otpNextButton = screen.getByTestId("otp-verification-next");
-      otpNextButton.click();
+      fireEvent.click(otpNextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
       });
 
       const addMfaNextButton = screen.getByTestId("add-mfa-phone-number-next");
-      addMfaNextButton.click();
+      fireEvent.click(addMfaNextButton);
 
       await waitFor(() => {
         expect(addMFAPhoneNumberApi.enrollMFA).toHaveBeenCalled();
@@ -557,28 +557,28 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate to add otp selection number step
       const button = screen.getByTestId("password-verification-next");
-      button.click();
+      fireEvent.click(button);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
       });
 
       const nextButton = screen.getByTestId("otp-selection-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
       });
 
       const otpNextButton = screen.getByTestId("otp-verification-next");
-      otpNextButton.click();
+      fireEvent.click(otpNextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
       });
 
       const addMfaNextButton = screen.getByTestId("add-mfa-phone-number-next");
-      addMfaNextButton.click();
+      fireEvent.click(addMfaNextButton);
 
       // This should trigger sendMFAOtp error path (lines 115-116, 143-144)
       await waitFor(() => {
@@ -618,7 +618,7 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate to add otp selection number step
       const button = screen.getByTestId("password-verification-next");
-      button.click();
+      fireEvent.click(button);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
@@ -626,21 +626,21 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate through the flow to trigger verifyMFAOtp
       const nextButton = screen.getByTestId("otp-selection-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
       });
 
       const otpNextButton = screen.getByTestId("otp-verification-next");
-      otpNextButton.click();
+      fireEvent.click(otpNextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
       });
 
       const addMfaNextButton = screen.getByTestId("add-mfa-phone-number-next");
-      addMfaNextButton.click();
+      fireEvent.click(addMfaNextButton);
 
       await waitFor(() => {
         expect(
@@ -651,7 +651,7 @@ describe("AddMFAPage Unit Tests", () => {
       const verifyNextButton = screen.getByTestId(
         "add-mfa-otp-verification-next",
       );
-      verifyNextButton.click();
+      fireEvent.click(verifyNextButton);
 
       // This should trigger verifyMFAOtp and navigation logic (lines 168-171)
       await waitFor(() => {
@@ -690,28 +690,28 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate to add otp selection number step
       const button = screen.getByTestId("password-verification-next");
-      button.click();
+      fireEvent.click(button);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
       });
 
       const nextButton = screen.getByTestId("otp-selection-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
       });
 
       const otpNextButton = screen.getByTestId("otp-verification-next");
-      otpNextButton.click();
+      fireEvent.click(otpNextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
       });
 
       const addMfaNextButton = screen.getByTestId("add-mfa-phone-number-next");
-      addMfaNextButton.click();
+      fireEvent.click(addMfaNextButton);
 
       // Wait for sendMFAOTP to have been called (ensures trxnId is set)
       await waitFor(() => {
@@ -728,7 +728,7 @@ describe("AddMFAPage Unit Tests", () => {
       const verifyNextButton = screen.getByTestId(
         "add-mfa-otp-verification-next",
       );
-      verifyNextButton.click();
+      fireEvent.click(verifyNextButton);
 
       // This should trigger verifyMFAOtp error path (lines 181-182)
       await waitFor(() => {
@@ -769,28 +769,28 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate to add otp selection number step
       const button = screen.getByTestId("password-verification-next");
-      button.click();
+      fireEvent.click(button);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
       });
 
       const nextButton = screen.getByTestId("otp-selection-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
       });
 
       const otpNextButton = screen.getByTestId("otp-verification-next");
-      otpNextButton.click();
+      fireEvent.click(otpNextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
       });
 
       const addMfaNextButton = screen.getByTestId("add-mfa-phone-number-next");
-      addMfaNextButton.click();
+      fireEvent.click(addMfaNextButton);
 
       await waitFor(() => {
         expect(
@@ -799,7 +799,7 @@ describe("AddMFAPage Unit Tests", () => {
       });
 
       const useDifferentPhoneButton = screen.getByTestId("use-different-phone");
-      useDifferentPhoneButton.click();
+      fireEvent.click(useDifferentPhoneButton);
 
       // This should trigger deleteMFA error path (lines 188-203)
       await waitFor(() => {
@@ -832,7 +832,7 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate to add otp selection number step
       const button = screen.getByTestId("password-verification-next");
-      button.click();
+      fireEvent.click(button);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
@@ -868,7 +868,7 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate to add otp selection number step
       const button = screen.getByTestId("password-verification-next");
-      button.click();
+      fireEvent.click(button);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
@@ -876,7 +876,7 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate to addMFANumber step
       const nextButton = screen.getByTestId("otp-selection-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
@@ -884,7 +884,7 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate to addMFANumber step
       const otpNextButton = screen.getByTestId("otp-verification-next");
-      otpNextButton.click();
+      fireEvent.click(otpNextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
@@ -892,7 +892,7 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Trigger enrollMFA and sendMFAOtp which test handlePhoneForm
       const addMfaNextButton = screen.getByTestId("add-mfa-phone-number-next");
-      addMfaNextButton.click();
+      fireEvent.click(addMfaNextButton);
 
       await waitFor(() => {
         expect(addMFAPhoneNumberApi.enrollMFA).toHaveBeenCalled();
@@ -918,7 +918,7 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate to add otp selection number step
       const button = screen.getByTestId("password-verification-next");
-      button.click();
+      fireEvent.click(button);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
@@ -926,7 +926,7 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate to otp verification step which uses these handlers
       const nextButton = screen.getByTestId("otp-selection-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
@@ -957,7 +957,7 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate to add otp selection number step
       const button = screen.getByTestId("password-verification-next");
-      button.click();
+      fireEvent.click(button);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
@@ -965,7 +965,7 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate to otp verification step
       const nextButton = screen.getByTestId("otp-selection-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
@@ -973,7 +973,7 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Test onBack function
       const backButton = screen.getByTestId("otp-verification-back");
-      backButton.click();
+      fireEvent.click(backButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
@@ -1006,7 +1006,7 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate to add otp selection number step
       const button = screen.getByTestId("password-verification-next");
-      button.click();
+      fireEvent.click(button);
 
       // Navigate through steps to reach addMFAValidation
       await waitFor(() => {
@@ -1014,21 +1014,21 @@ describe("AddMFAPage Unit Tests", () => {
       });
 
       const nextButton = screen.getByTestId("otp-selection-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
       });
 
       const otpNextButton = screen.getByTestId("otp-verification-next");
-      otpNextButton.click();
+      fireEvent.click(otpNextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
       });
 
       const addMfaNextButton = screen.getByTestId("add-mfa-phone-number-next");
-      addMfaNextButton.click();
+      fireEvent.click(addMfaNextButton);
 
       await waitFor(() => {
         expect(
@@ -1038,7 +1038,7 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Test onBack function - note that it will trigger deleteMFA but may not change step due to the error
       const backButton = screen.getByTestId("add-mfa-otp-verification-back");
-      backButton.click();
+      fireEvent.click(backButton);
 
       // The onBack function calls deleteMFA() without parameters, which may cause an error
       // So we should expect the step to remain at add-mfa-otp-verification
@@ -1080,7 +1080,7 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate to add otp selection number step
       const button = screen.getByTestId("password-verification-next");
-      button.click();
+      fireEvent.click(button);
 
       // Navigate to addMFAValidation step
       await waitFor(() => {
@@ -1088,21 +1088,21 @@ describe("AddMFAPage Unit Tests", () => {
       });
 
       const nextButton = screen.getByTestId("otp-selection-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
       });
 
       const otpNextButton = screen.getByTestId("otp-verification-next");
-      otpNextButton.click();
+      fireEvent.click(otpNextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
       });
 
       const addMfaNextButton = screen.getByTestId("add-mfa-phone-number-next");
-      addMfaNextButton.click();
+      fireEvent.click(addMfaNextButton);
 
       await waitFor(() => {
         expect(
@@ -1112,7 +1112,7 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Test onUseDifferentPhoneNumber function which calls deleteMFA
       const differentPhoneButton = screen.getByTestId("use-different-phone");
-      differentPhoneButton.click();
+      fireEvent.click(differentPhoneButton);
 
       await waitFor(() => {
         expect(deleteMFAPhoneNumberApi.deleteMFA).toHaveBeenCalledWith(
@@ -1154,7 +1154,7 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate to add otp selection number step
       const button = screen.getByTestId("password-verification-next");
-      button.click();
+      fireEvent.click(button);
 
       // Navigate to addSecondMFA step
       await waitFor(() => {
@@ -1162,21 +1162,21 @@ describe("AddMFAPage Unit Tests", () => {
       });
 
       const nextButton = screen.getByTestId("otp-selection-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
       });
 
       const otpNextButton = screen.getByTestId("otp-verification-next");
-      otpNextButton.click();
+      fireEvent.click(otpNextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
       });
 
       const addMfaNextButton = screen.getByTestId("add-mfa-phone-number-next");
-      addMfaNextButton.click();
+      fireEvent.click(addMfaNextButton);
 
       await waitFor(() => {
         expect(
@@ -1185,7 +1185,7 @@ describe("AddMFAPage Unit Tests", () => {
       });
 
       const verifyButton = screen.getByTestId("add-mfa-otp-verification-next");
-      verifyButton.click();
+      fireEvent.click(verifyButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("add-second-mfa")).toBeInTheDocument();
@@ -1193,7 +1193,7 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Test onAddSecondMFA function - should convert voice to SMS
       const addSecondButton = screen.getByTestId("add-second-mfa-btn");
-      addSecondButton.click();
+      fireEvent.click(addSecondButton);
 
       await waitFor(() => {
         // Should call enrollMFA with SMS (opposite of voice)
@@ -1233,28 +1233,28 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate to add otp selection number step
       const button = screen.getByTestId("password-verification-next");
-      button.click();
+      fireEvent.click(button);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
       });
 
       const nextButton = screen.getByTestId("otp-selection-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
       });
 
       const otpNextButton = screen.getByTestId("otp-verification-next");
-      otpNextButton.click();
+      fireEvent.click(otpNextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
       });
 
       const addMfaNextButton = screen.getByTestId("add-mfa-phone-number-next");
-      addMfaNextButton.click();
+      fireEvent.click(addMfaNextButton);
 
       await waitFor(() => {
         expect(
@@ -1263,7 +1263,7 @@ describe("AddMFAPage Unit Tests", () => {
       });
 
       const requestNewOtpButton = screen.getByTestId("request-new-otp");
-      requestNewOtpButton.click();
+      fireEvent.click(requestNewOtpButton);
 
       await waitFor(() => {
         expect(addMFAPhoneNumberApi.sendMFAOTP).toHaveBeenCalledWith({
@@ -1305,7 +1305,7 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate to add otp selection number step
       const button = screen.getByTestId("password-verification-next");
-      button.click();
+      fireEvent.click(button);
 
       // Navigate through the complete flow to reach addSecondMFA step
       await waitFor(() => {
@@ -1313,21 +1313,21 @@ describe("AddMFAPage Unit Tests", () => {
       });
 
       const nextButton = screen.getByTestId("otp-selection-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
       });
 
       const otpNextButton = screen.getByTestId("otp-verification-next");
-      otpNextButton.click();
+      fireEvent.click(otpNextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
       });
 
       const addMfaNextButton = screen.getByTestId("add-mfa-phone-number-next");
-      addMfaNextButton.click();
+      fireEvent.click(addMfaNextButton);
 
       await waitFor(() => {
         expect(
@@ -1338,14 +1338,14 @@ describe("AddMFAPage Unit Tests", () => {
       const verifyNextButton = screen.getByTestId(
         "add-mfa-otp-verification-next",
       );
-      verifyNextButton.click();
+      fireEvent.click(verifyNextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("add-second-mfa")).toBeInTheDocument();
       });
 
       const addSecondMfaButton = screen.getByTestId("add-second-mfa-btn");
-      addSecondMfaButton.click();
+      fireEvent.click(addSecondMfaButton);
 
       // This should trigger second MFA enrollment with voice type (lines 296-334)
       await waitFor(() => {
@@ -1383,14 +1383,14 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate through steps to reach OTP verification
       const button = screen.getByTestId("password-verification-next");
-      button.click();
+      fireEvent.click(button);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
       });
 
       const nextButton = screen.getByTestId("otp-selection-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
@@ -1398,7 +1398,7 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Trigger OTP verification which should cause the response error
       const otpNextButton = screen.getByTestId("otp-verification-next");
-      otpNextButton.click();
+      fireEvent.click(otpNextButton);
 
       await waitFor(() => {
         expect(authService.transientOtpVerify).toHaveBeenCalled();
@@ -1444,28 +1444,28 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate through steps to trigger handleMFAEnrollment
       const button = screen.getByTestId("password-verification-next");
-      button.click();
+      fireEvent.click(button);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
       });
 
       const nextButton = screen.getByTestId("otp-selection-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
       });
 
       const otpNextButton = screen.getByTestId("otp-verification-next");
-      otpNextButton.click();
+      fireEvent.click(otpNextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
       });
 
       const addMfaNextButton = screen.getByTestId("add-mfa-phone-number-next");
-      addMfaNextButton.click();
+      fireEvent.click(addMfaNextButton);
 
       // This should call getUserOtpPhoneFactors with false parameter
       await waitFor(() => {
@@ -1499,28 +1499,28 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate through steps to trigger handleMFAEnrollment catch block
       const button = screen.getByTestId("password-verification-next");
-      button.click();
+      fireEvent.click(button);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
       });
 
       const nextButton = screen.getByTestId("otp-selection-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
       });
 
       const otpNextButton = screen.getByTestId("otp-verification-next");
-      otpNextButton.click();
+      fireEvent.click(otpNextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
       });
 
       const addMfaNextButton = screen.getByTestId("add-mfa-phone-number-next");
-      addMfaNextButton.click();
+      fireEvent.click(addMfaNextButton);
 
       await waitFor(() => {
         expect(addMFAPhoneNumberApi.enrollMFA).toHaveBeenCalled();
@@ -1550,14 +1550,14 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate to OTP verification step
       const button = screen.getByTestId("password-verification-next");
-      button.click();
+      fireEvent.click(button);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
       });
 
       const nextButton = screen.getByTestId("otp-selection-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
@@ -1565,7 +1565,7 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Test request OTP code functionality
       const requestOtpButton = screen.getByTestId("request-otp-code");
-      requestOtpButton.click();
+      fireEvent.click(requestOtpButton);
 
       await waitFor(() => {
         expect(authService.transientOtpSend).toHaveBeenCalled();
@@ -1595,14 +1595,14 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate to OTP verification step
       const button = screen.getByTestId("password-verification-next");
-      button.click();
+      fireEvent.click(button);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
       });
 
       const nextButton = screen.getByTestId("otp-selection-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
@@ -1610,7 +1610,7 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Test request OTP code error handling
       const requestOtpButton = screen.getByTestId("request-otp-code");
-      requestOtpButton.click();
+      fireEvent.click(requestOtpButton);
 
       await waitFor(() => {
         expect(authService.transientOtpSend).toHaveBeenCalled();
@@ -1639,28 +1639,28 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate to addMFAValidation step
       const button = screen.getByTestId("password-verification-next");
-      button.click();
+      fireEvent.click(button);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
       });
 
       const nextButton = screen.getByTestId("otp-selection-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
       });
 
       const otpNextButton = screen.getByTestId("otp-verification-next");
-      otpNextButton.click();
+      fireEvent.click(otpNextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
       });
 
       const addMfaNextButton = screen.getByTestId("add-mfa-phone-number-next");
-      addMfaNextButton.click();
+      fireEvent.click(addMfaNextButton);
 
       await waitFor(() => {
         expect(
@@ -1670,7 +1670,7 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Test onBack function which calls deleteMFA with default parameters
       const backButton = screen.getByTestId("add-mfa-otp-verification-back");
-      backButton.click();
+      fireEvent.click(backButton);
 
       await waitFor(() => {
         expect(deleteMFAPhoneNumberApi.deleteMFA).toHaveBeenCalled();
@@ -1728,28 +1728,28 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate through complete flow to trigger navigation logic
       const button = screen.getByTestId("password-verification-next");
-      button.click();
+      fireEvent.click(button);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
       });
 
       const nextButton = screen.getByTestId("otp-selection-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
       });
 
       const otpNextButton = screen.getByTestId("otp-verification-next");
-      otpNextButton.click();
+      fireEvent.click(otpNextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
       });
 
       const addMfaNextButton = screen.getByTestId("add-mfa-phone-number-next");
-      addMfaNextButton.click();
+      fireEvent.click(addMfaNextButton);
 
       await waitFor(() => {
         expect(
@@ -1758,7 +1758,7 @@ describe("AddMFAPage Unit Tests", () => {
       });
 
       const verifyButton = screen.getByTestId("add-mfa-otp-verification-next");
-      verifyButton.click();
+      fireEvent.click(verifyButton);
 
       // This should trigger the navigation logic for duplicate phone numbers
       await waitFor(() => {
@@ -1825,28 +1825,28 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate through steps to trigger enrollMFA error
       const button = screen.getByTestId("password-verification-next");
-      button.click();
+      fireEvent.click(button);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
       });
 
       const nextButton = screen.getByTestId("otp-selection-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
       });
 
       const otpNextButton = screen.getByTestId("otp-verification-next");
-      otpNextButton.click();
+      fireEvent.click(otpNextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
       });
 
       const addMfaNextButton = screen.getByTestId("add-mfa-phone-number-next");
-      addMfaNextButton.click();
+      fireEvent.click(addMfaNextButton);
 
       // This should trigger enrollMFA error and display error summary
       await waitFor(() => {
@@ -1907,28 +1907,28 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate through steps to trigger enrollMFA error
       const button = screen.getByTestId("password-verification-next");
-      button.click();
+      fireEvent.click(button);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
       });
 
       const nextButton = screen.getByTestId("otp-selection-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
       });
 
       const otpNextButton = screen.getByTestId("otp-verification-next");
-      otpNextButton.click();
+      fireEvent.click(otpNextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
       });
 
       const addMfaNextButton = screen.getByTestId("add-mfa-phone-number-next");
-      addMfaNextButton.click();
+      fireEvent.click(addMfaNextButton);
 
       // This should trigger enrollMFA error and display error summary in French
       await waitFor(() => {
@@ -1987,28 +1987,28 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate through steps to trigger sendMFAOtp error
       const button = screen.getByTestId("password-verification-next");
-      button.click();
+      fireEvent.click(button);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
       });
 
       const nextButton = screen.getByTestId("otp-selection-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
       });
 
       const otpNextButton = screen.getByTestId("otp-verification-next");
-      otpNextButton.click();
+      fireEvent.click(otpNextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
       });
 
       const addMfaNextButton = screen.getByTestId("add-mfa-phone-number-next");
-      addMfaNextButton.click();
+      fireEvent.click(addMfaNextButton);
 
       // This should trigger sendMFAOtp error and display error summary
       await waitFor(() => {
@@ -2066,28 +2066,28 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate through steps to trigger verifyMFAOtp error
       const button = screen.getByTestId("password-verification-next");
-      button.click();
+      fireEvent.click(button);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
       });
 
       const nextButton = screen.getByTestId("otp-selection-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
       });
 
       const otpNextButton = screen.getByTestId("otp-verification-next");
-      otpNextButton.click();
+      fireEvent.click(otpNextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
       });
 
       const addMfaNextButton = screen.getByTestId("add-mfa-phone-number-next");
-      addMfaNextButton.click();
+      fireEvent.click(addMfaNextButton);
 
       await waitFor(() => {
         expect(
@@ -2098,7 +2098,7 @@ describe("AddMFAPage Unit Tests", () => {
       const verifyNextButton = screen.getByTestId(
         "add-mfa-otp-verification-next",
       );
-      verifyNextButton.click();
+      fireEvent.click(verifyNextButton);
 
       // This should trigger verifyMFAOtp error and display error summary
       await waitFor(() => {
@@ -2153,7 +2153,7 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Trigger password verification error
       const button = screen.getByTestId("password-verification-next");
-      button.click();
+      fireEvent.click(button);
 
       // This should trigger password verification error and display error summary
       await waitFor(() => {
@@ -2210,7 +2210,7 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Trigger password verification error first
       const button = screen.getByTestId("password-verification-next");
-      button.click();
+      fireEvent.click(button);
 
       // Should show error summary
       await waitFor(() => {
@@ -2220,7 +2220,7 @@ describe("AddMFAPage Unit Tests", () => {
       });
 
       // Try again - this should succeed and clear the error
-      button.click();
+      fireEvent.click(button);
 
       // Error summary should be cleared and we should move to next step
       await waitFor(() => {
@@ -2263,28 +2263,28 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate to addSecondMFA step
       const button = screen.getByTestId("password-verification-next");
-      button.click();
+      fireEvent.click(button);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
       });
 
       const nextButton = screen.getByTestId("otp-selection-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
       });
 
       const otpNextButton = screen.getByTestId("otp-verification-next");
-      otpNextButton.click();
+      fireEvent.click(otpNextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
       });
 
       const addMfaNextButton = screen.getByTestId("add-mfa-phone-number-next");
-      addMfaNextButton.click();
+      fireEvent.click(addMfaNextButton);
 
       await waitFor(() => {
         expect(
@@ -2293,7 +2293,7 @@ describe("AddMFAPage Unit Tests", () => {
       });
 
       const verifyButton = screen.getByTestId("add-mfa-otp-verification-next");
-      verifyButton.click();
+      fireEvent.click(verifyButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("add-second-mfa")).toBeInTheDocument();
@@ -2301,7 +2301,7 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Test the alternate MFA method setup
       const addSecondButton = screen.getByTestId("add-second-mfa-btn");
-      addSecondButton.click();
+      fireEvent.click(addSecondButton);
 
       await waitFor(() => {
         expect(addMFAPhoneNumberApi.enrollMFA).toHaveBeenCalled();
@@ -2344,28 +2344,28 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate through complete flow with voice OTP
       const button = screen.getByTestId("password-verification-next");
-      button.click();
+      fireEvent.click(button);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
       });
 
       const nextButton = screen.getByTestId("otp-selection-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
       });
 
       const otpNextButton = screen.getByTestId("otp-verification-next");
-      otpNextButton.click();
+      fireEvent.click(otpNextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
       });
 
       const addMfaNextButton = screen.getByTestId("add-mfa-phone-number-next");
-      addMfaNextButton.click();
+      fireEvent.click(addMfaNextButton);
 
       await waitFor(() => {
         expect(
@@ -2374,7 +2374,7 @@ describe("AddMFAPage Unit Tests", () => {
       });
 
       const verifyButton = screen.getByTestId("add-mfa-otp-verification-next");
-      verifyButton.click();
+      fireEvent.click(verifyButton);
 
       await waitFor(() => {
         expect(addMFAPhoneNumberApi.verifyMFAOTP).toHaveBeenCalled();
@@ -2430,28 +2430,28 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate to addSecondMFA step where enrollMFA is called with phoneNumber
       const button = screen.getByTestId("password-verification-next");
-      button.click();
+      fireEvent.click(button);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
       });
 
       const nextButton = screen.getByTestId("otp-selection-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
       });
 
       const otpNextButton = screen.getByTestId("otp-verification-next");
-      otpNextButton.click();
+      fireEvent.click(otpNextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
       });
 
       const addMfaNextButton = screen.getByTestId("add-mfa-phone-number-next");
-      addMfaNextButton.click();
+      fireEvent.click(addMfaNextButton);
 
       await waitFor(() => {
         expect(
@@ -2460,7 +2460,7 @@ describe("AddMFAPage Unit Tests", () => {
       });
 
       const verifyButton = screen.getByTestId("add-mfa-otp-verification-next");
-      verifyButton.click();
+      fireEvent.click(verifyButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("add-second-mfa")).toBeInTheDocument();
@@ -2468,7 +2468,7 @@ describe("AddMFAPage Unit Tests", () => {
 
       // This will trigger handleSetupAlternateMFAMethod which calls enrollMFA with phoneNumber
       const addSecondButton = screen.getByTestId("add-second-mfa-btn");
-      addSecondButton.click();
+      fireEvent.click(addSecondButton);
 
       await waitFor(() => {
         expect(addMFAPhoneNumberApi.enrollMFA).toHaveBeenCalledWith(
@@ -2505,28 +2505,28 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Navigate to addMFAValidation step
       const button = screen.getByTestId("password-verification-next");
-      button.click();
+      fireEvent.click(button);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
       });
 
       const nextButton = screen.getByTestId("otp-selection-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
       });
 
       const otpNextButton = screen.getByTestId("otp-verification-next");
-      otpNextButton.click();
+      fireEvent.click(otpNextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
       });
 
       const addMfaNextButton = screen.getByTestId("add-mfa-phone-number-next");
-      addMfaNextButton.click();
+      fireEvent.click(addMfaNextButton);
 
       await waitFor(() => {
         expect(
@@ -2536,7 +2536,7 @@ describe("AddMFAPage Unit Tests", () => {
 
       // Test request new OTP which calls sendMFAOtp with different parameters
       const requestNewOtpButton = screen.getByTestId("request-new-otp");
-      requestNewOtpButton.click();
+      fireEvent.click(requestNewOtpButton);
 
       await waitFor(() => {
         expect(addMFAPhoneNumberApi.sendMFAOTP).toHaveBeenCalledWith({

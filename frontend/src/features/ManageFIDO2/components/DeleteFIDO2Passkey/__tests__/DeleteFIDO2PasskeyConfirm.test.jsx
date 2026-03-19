@@ -41,7 +41,7 @@ vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children, ...props }) => <div {...props}>{children}</div>,
   GcdsGrid: ({ children, ...props }) => <div {...props}>{children}</div>,
   GcdsHeading: ({ children, ...props }) => <h1 {...props}>{children}</h1>,
-  GcdsText: ({ children, ...props }) => <p {...props}>{children}</p>,
+  GcdsText: ({ children, ...props }) => <div {...props}>{children}</div>,
   GcdsButton: ({ children, onGcdsClick, buttonRole, ...props }) => (
     <button data-role={buttonRole} onClick={onGcdsClick} {...props}>
       {children}

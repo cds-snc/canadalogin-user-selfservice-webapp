@@ -44,7 +44,7 @@ vi.mock("@gcds-core/components-react", () => ({
     const Tag = tag;
     return <Tag data-testid="gcds-heading">{children}</Tag>;
   },
-  GcdsText: ({ children }) => <p data-testid="gcds-text">{children}</p>,
+  GcdsText: ({ children }) => <div data-testid="gcds-text">{children}</div>,
   GcdsButton: ({ children, onGcdsClick, disabled, buttonRole }) => (
     <button
       data-testid="gcds-button"

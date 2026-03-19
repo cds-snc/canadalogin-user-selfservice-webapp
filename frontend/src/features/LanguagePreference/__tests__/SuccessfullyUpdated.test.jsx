@@ -102,9 +102,9 @@ vi.mock("@gcds-core/components-react", () => ({
     );
   },
   GcdsText: ({ children, ...props }) => (
-    <p data-testid="gcds-text" {...props}>
+    <div data-testid="gcds-text" {...props}>
       {children}
-    </p>
+    </div>
   ),
   GcdsNotice: ({ children, noticeRole, noticeTitle, noticeTitleTag }) => (
     <div

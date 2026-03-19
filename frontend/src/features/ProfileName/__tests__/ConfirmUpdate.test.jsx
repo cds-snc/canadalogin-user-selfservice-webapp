@@ -111,9 +111,9 @@ vi.mock("@gcds-core/components-react", () => ({
     return React.createElement(Component, props, children);
   },
   GcdsText: ({ children, marginBottom, ...props }) => (
-    <p {...props} style={{ marginBottom }}>
+    <div {...props} style={{ marginBottom }}>
       {children}
-    </p>
+    </div>
   ),
   GcdsNotice: ({
     children,
@@ -345,11 +345,14 @@ describe("ConfirmUpdate Component Tests", () => {
       },
     };
 
-    const { container } = render(
-      <TestWrapper>
-        <ConfirmUpdate {...propsWithoutName} />
-      </TestWrapper>,
-    );
+    let container;
+    await act(async () => {
+      ({ container } = render(
+        <TestWrapper>
+          <ConfirmUpdate {...propsWithoutName} />
+        </TestWrapper>,
+      ));
+    });
 
     expect(container.firstChild).toBeNull();
   });

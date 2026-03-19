@@ -42,9 +42,9 @@ vi.mock("@gcds-core/components-react", () => ({
     </a>
   ),
   GcdsText: ({ children, ...props }) => (
-    <p data-testid="gcds-text" {...props}>
+    <div data-testid="gcds-text" {...props}>
       {children}
-    </p>
+    </div>
   ),
   GcdsRadios: ({ name, legend, hint, options, onGcdsChange, ...props }) => (
     <fieldset data-testid="gcds-radios" {...props}>

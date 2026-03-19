@@ -7,7 +7,7 @@
  * - Displaying nickname and created-on date (date only, no time)
  * - Navigation on Rename and Delete button clicks
  */
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, act } from "@testing-library/react";
 import { fido2Api } from "../../../../features/ManageFIDO2/api/fido2Api";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -53,7 +53,7 @@ vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children }) => (
     <div data-testid="gcds-container">{children}</div>
   ),
-  GcdsText: ({ children }) => <p data-testid="gcds-text">{children}</p>,
+  GcdsText: ({ children }) => <div data-testid="gcds-text">{children}</div>,
   GcdsGrid: ({ children }) => <div data-testid="gcds-grid">{children}</div>,
   GcdsButton: ({ children, onGcdsClick, onClick, id, disabled }) => (
     <button
@@ -334,7 +334,9 @@ describe("FIDO2PasskeyList — inline rename (Save) flow", () => {
     expect(screen.getByTestId("save-fido2-button")).toBeDisabled();
 
     // Resolve so we don't leave dangling promises
-    resolveRename({ success: true });
+    await act(async () => {
+      resolveRename({ success: true });
+    });
   });
 
   it("Save button calls updateRegistration with trimmed nickname", async () => {

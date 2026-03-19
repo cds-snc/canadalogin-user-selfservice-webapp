@@ -1,4 +1,10 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import {
+  render,
+  screen,
+  waitFor,
+  fireEvent,
+  act,
+} from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import "@testing-library/jest-dom";
 import {
@@ -261,6 +267,14 @@ describe("EditProfileNamePage Unit Tests", () => {
     });
 
     it("should render loader when localLoading is true", async () => {
+      // Use a pending promise to keep the loading state active long enough to check
+      let resolveUpdate;
+      authService.update_my_user_profile.mockReturnValue(
+        new Promise((res) => {
+          resolveUpdate = res;
+        }),
+      );
+
       render(
         <TestWrapper>
           <EditProfileNamePage />
@@ -272,19 +286,22 @@ describe("EditProfileNamePage Unit Tests", () => {
         expect(screen.getByTestId("profile-update-name")).toBeInTheDocument();
       });
 
-      const nextButton = screen.getByTestId("profile-update-name-next");
-      nextButton.click();
+      fireEvent.click(screen.getByTestId("profile-update-name-next"));
 
       await waitFor(() => {
         expect(screen.getByTestId("confirm-update")).toBeInTheDocument();
       });
 
-      const confirmButton = screen.getByTestId("confirm-update-confirm");
-      confirmButton.click();
+      fireEvent.click(screen.getByTestId("confirm-update-confirm"));
 
-      // Should show loader during API call
+      // Should show loader while API call is pending
       await waitFor(() => {
         expect(screen.getByTestId("loader")).toBeInTheDocument();
+      });
+
+      // Resolve to clean up
+      await act(async () => {
+        resolveUpdate({ data: { ...mockUserProfile } });
       });
     });
 
@@ -324,7 +341,7 @@ describe("EditProfileNamePage Unit Tests", () => {
       });
 
       const changeButton = screen.getByText("Change Given Name");
-      changeButton.click();
+      fireEvent.click(changeButton);
 
       // The mock component simulates changing the given name to "John"
       // In real implementation, this would update the nameFormData state
@@ -345,7 +362,7 @@ describe("EditProfileNamePage Unit Tests", () => {
       });
 
       const nextButton = screen.getByTestId("profile-update-name-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("confirm-update")).toBeInTheDocument();
@@ -368,7 +385,7 @@ describe("EditProfileNamePage Unit Tests", () => {
       });
 
       const nextButton = screen.getByTestId("profile-update-name-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("confirm-update")).toBeInTheDocument();
@@ -376,7 +393,7 @@ describe("EditProfileNamePage Unit Tests", () => {
 
       // Navigate back
       const backButton = screen.getByTestId("confirm-update-back");
-      backButton.click();
+      fireEvent.click(backButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("profile-update-name")).toBeInTheDocument();
@@ -401,7 +418,7 @@ describe("EditProfileNamePage Unit Tests", () => {
       });
 
       const nextButton = screen.getByTestId("profile-update-name-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("confirm-update")).toBeInTheDocument();
@@ -409,7 +426,9 @@ describe("EditProfileNamePage Unit Tests", () => {
 
       // Confirm update
       const confirmButton = screen.getByTestId("confirm-update-confirm");
-      confirmButton.click();
+      await act(async () => {
+        fireEvent.click(confirmButton);
+      });
 
       // Should call update API
       await waitFor(() => {
@@ -443,7 +462,7 @@ describe("EditProfileNamePage Unit Tests", () => {
       });
 
       const nextButton = screen.getByTestId("profile-update-name-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("confirm-update")).toBeInTheDocument();
@@ -451,7 +470,9 @@ describe("EditProfileNamePage Unit Tests", () => {
 
       // Confirm update
       const confirmButton = screen.getByTestId("confirm-update-confirm");
-      confirmButton.click();
+      await act(async () => {
+        fireEvent.click(confirmButton);
+      });
 
       await waitFor(() => {
         expect(authService.update_my_user_profile).toHaveBeenCalled();
@@ -484,7 +505,7 @@ describe("EditProfileNamePage Unit Tests", () => {
       });
 
       const nextButton = screen.getByTestId("profile-update-name-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("confirm-update")).toBeInTheDocument();
@@ -492,7 +513,9 @@ describe("EditProfileNamePage Unit Tests", () => {
 
       // Confirm update
       const confirmButton = screen.getByTestId("confirm-update-confirm");
-      confirmButton.click();
+      await act(async () => {
+        fireEvent.click(confirmButton);
+      });
 
       await waitFor(() => {
         expect(authService.update_my_user_profile).toHaveBeenCalled();
@@ -521,7 +544,7 @@ describe("EditProfileNamePage Unit Tests", () => {
       });
 
       const cancelButton = screen.getByTestId("profile-update-name-cancel");
-      cancelButton.click();
+      fireEvent.click(cancelButton);
 
       expect(mockNavigate).toHaveBeenCalledWith("/en/profile");
     });
@@ -542,14 +565,14 @@ describe("EditProfileNamePage Unit Tests", () => {
         expect(screen.getByTestId("profile-update-name")).toBeInTheDocument();
       });
 
-      screen.getByTestId("profile-update-name-next").click();
+      fireEvent.click(screen.getByTestId("profile-update-name-next"));
 
       await waitFor(() => {
         expect(screen.getByTestId("confirm-update")).toBeInTheDocument();
       });
 
       const cancelButton = screen.getByTestId("confirm-update-cancel");
-      cancelButton.click();
+      fireEvent.click(cancelButton);
 
       expect(mockNavigate).toHaveBeenCalledWith("/en/profile");
     });
@@ -570,20 +593,22 @@ describe("EditProfileNamePage Unit Tests", () => {
         expect(screen.getByTestId("profile-update-name")).toBeInTheDocument();
       });
 
-      screen.getByTestId("profile-update-name-next").click();
+      fireEvent.click(screen.getByTestId("profile-update-name-next"));
 
       await waitFor(() => {
         expect(screen.getByTestId("confirm-update")).toBeInTheDocument();
       });
 
-      screen.getByTestId("confirm-update-confirm").click();
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("confirm-update-confirm"));
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("successfully-updated")).toBeInTheDocument();
       });
 
       const backButton = screen.getByTestId("successfully-updated-back");
-      backButton.click();
+      fireEvent.click(backButton);
 
       expect(mockNavigate).toHaveBeenCalledWith("/en/profile");
     });
@@ -606,7 +631,7 @@ describe("EditProfileNamePage Unit Tests", () => {
 
       // Trigger error
       const setErrorButton = screen.getByText("Set Error");
-      setErrorButton.click();
+      fireEvent.click(setErrorButton);
 
       await waitFor(() => {
         expect(
@@ -629,7 +654,7 @@ describe("EditProfileNamePage Unit Tests", () => {
         expect(screen.getByTestId("profile-update-name")).toBeInTheDocument();
       });
 
-      screen.getByTestId("profile-update-name-next").click();
+      fireEvent.click(screen.getByTestId("profile-update-name-next"));
 
       await waitFor(() => {
         expect(screen.getByTestId("confirm-update")).toBeInTheDocument();
@@ -637,7 +662,7 @@ describe("EditProfileNamePage Unit Tests", () => {
 
       // Trigger error with code that maps to CONFIRM_ERROR in errorPageJson
       const setErrorButton = screen.getByText("Set Error");
-      setErrorButton.click();
+      fireEvent.click(setErrorButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("confirm-update-error")).toHaveTextContent(
@@ -662,7 +687,7 @@ describe("EditProfileNamePage Unit Tests", () => {
 
       // Trigger error
       const setErrorButton = screen.getByText("Set Error");
-      setErrorButton.click();
+      fireEvent.click(setErrorButton);
 
       await waitFor(() => {
         const stepContent = screen.getByTestId("step-content");
@@ -685,7 +710,7 @@ describe("EditProfileNamePage Unit Tests", () => {
         expect(screen.getByTestId("profile-update-name")).toBeInTheDocument();
       });
 
-      screen.getByTestId("profile-update-name-next").click();
+      fireEvent.click(screen.getByTestId("profile-update-name-next"));
 
       await waitFor(() => {
         expect(screen.getByTestId("confirm-update")).toBeInTheDocument();
@@ -693,7 +718,7 @@ describe("EditProfileNamePage Unit Tests", () => {
 
       // Set error first
       const setErrorButton = screen.getByText("Set Error");
-      setErrorButton.click();
+      fireEvent.click(setErrorButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("confirm-update-error")).toBeInTheDocument();
@@ -701,7 +726,9 @@ describe("EditProfileNamePage Unit Tests", () => {
 
       // Then successful update should clear error
       const confirmButton = screen.getByTestId("confirm-update-confirm");
-      confirmButton.click();
+      await act(async () => {
+        fireEvent.click(confirmButton);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("successfully-updated")).toBeInTheDocument();
@@ -732,10 +759,10 @@ describe("EditProfileNamePage Unit Tests", () => {
 
       // The mock component simulates form changes
       const changeButton = screen.getByText("Change Given Name");
-      changeButton.click();
+      fireEvent.click(changeButton);
 
       const nextButton = screen.getByTestId("profile-update-name-next");
-      nextButton.click();
+      fireEvent.click(nextButton);
 
       await waitFor(() => {
         expect(screen.getByTestId("confirm-update")).toBeInTheDocument();
@@ -760,7 +787,7 @@ describe("EditProfileNamePage Unit Tests", () => {
         expect(screen.getByTestId("profile-update-name")).toBeInTheDocument();
       });
 
-      screen.getByTestId("profile-update-name-next").click();
+      fireEvent.click(screen.getByTestId("profile-update-name-next"));
 
       await waitFor(() => {
         expect(screen.getByTestId("confirm-update")).toBeInTheDocument();
@@ -807,7 +834,7 @@ describe("EditProfileNamePage Unit Tests", () => {
       });
 
       const setErrorButton = screen.getByText("Set Error");
-      setErrorButton.click();
+      fireEvent.click(setErrorButton);
 
       await waitFor(() => {
         expect(
@@ -834,14 +861,16 @@ describe("EditProfileNamePage Unit Tests", () => {
         expect(screen.getByTestId("profile-update-name")).toBeInTheDocument();
       });
 
-      screen.getByTestId("profile-update-name-next").click();
+      fireEvent.click(screen.getByTestId("profile-update-name-next"));
 
       await waitFor(() => {
         expect(screen.getByTestId("confirm-update")).toBeInTheDocument();
       });
 
       const confirmButton = screen.getByTestId("confirm-update-confirm");
-      confirmButton.click();
+      await act(async () => {
+        fireEvent.click(confirmButton);
+      });
 
       // API should be called with pre-populated user profile name
       await waitFor(() => {
@@ -872,14 +901,16 @@ describe("EditProfileNamePage Unit Tests", () => {
         expect(screen.getByTestId("profile-update-name")).toBeInTheDocument();
       });
 
-      screen.getByTestId("profile-update-name-next").click();
+      fireEvent.click(screen.getByTestId("profile-update-name-next"));
 
       await waitFor(() => {
         expect(screen.getByTestId("confirm-update")).toBeInTheDocument();
       });
 
       const confirmButton = screen.getByTestId("confirm-update-confirm");
-      confirmButton.click();
+      await act(async () => {
+        fireEvent.click(confirmButton);
+      });
 
       await waitFor(() => {
         expect(authService.update_my_user_profile).toHaveBeenCalled();

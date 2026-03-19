@@ -183,7 +183,7 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </div>
   ),
-  GcdsText: ({ children }) => <p data-testid="text">{children}</p>,
+  GcdsText: ({ children }) => <div data-testid="text">{children}</div>,
 }));
 
 const mockOnNext = vi.fn();

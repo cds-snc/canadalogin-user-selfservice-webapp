@@ -100,9 +100,9 @@ vi.mock("@gcds-core/components-react", () => ({
   ),
   GcdsHeading: ({ children }) => <h1>{children}</h1>,
   GcdsText: ({ children, ...props }) => (
-    <p data-testid="gcds-text" {...props}>
+    <div data-testid="gcds-text" {...props}>
       {children}
-    </p>
+    </div>
   ),
   GcdsButton: ({ children, onGcdsClick, buttonRole, ...props }) => (
     <button

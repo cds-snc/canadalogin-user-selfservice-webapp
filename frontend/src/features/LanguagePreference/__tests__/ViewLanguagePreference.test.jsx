@@ -51,9 +51,9 @@ vi.mock("@gcds-core/components-react", () => ({
     </div>
   ),
   GcdsText: ({ children, ...props }) => (
-    <p data-testid="gcds-text" {...props}>
+    <div data-testid="gcds-text" {...props}>
       {children}
-    </p>
+    </div>
   ),
   GcdsLink: ({ children, href, onGcdsClick, ...props }) => {
     const handleClick = (e) => {

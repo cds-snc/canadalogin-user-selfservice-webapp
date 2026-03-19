@@ -54,7 +54,7 @@ vi.mock("@gcds-core/components-react", () => ({
     </button>
   ),
   GcdsText: ({ marginTop, marginBottom, children, ...props }) => (
-    <p
+    <div
       {...props}
       style={{
         marginTop: marginTop,
@@ -63,7 +63,7 @@ vi.mock("@gcds-core/components-react", () => ({
       }}
     >
       {children}
-    </p>
+    </div>
   ),
   GcdsIcon: ({ name, size, className }) => (
     <div
