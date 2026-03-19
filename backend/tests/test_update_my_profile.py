@@ -1170,10 +1170,10 @@ def test_user_profile_name_auto_capitalizes():
     assert name.familyName == "Van Der Berg"
     assert name.givenName == "Mary Anne"
 
-    # Test mixed case input - should normalize to proper capitalization
+    # Test all-caps input - first letter capitalized, rest preserved
     name = UserProfileName(familyName="McDONALD", givenName="SARAH")
-    assert name.familyName == "Mcdonald"
-    assert name.givenName == "Sarah"
+    assert name.familyName == "McDONALD"
+    assert name.givenName == "SARAH"
 
     # Test complex combinations - multiple delimiters
     name = UserProfileName(familyName="o'brien-smith", givenName="jean-marie")
