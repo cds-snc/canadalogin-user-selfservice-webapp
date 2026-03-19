@@ -49,7 +49,7 @@ vi.mock("../../../../../assets/icons/passkey_collage.svg?react", () => ({
   default: (props) => <svg data-testid="passkey-collage" {...props} />,
 }));
 
-vi.mock("@cdssnc/gcds-components-react", () => ({
+vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children, ...props }) => <div {...props}>{children}</div>,
   GcdsGrid: ({ children, ...props }) => <div {...props}>{children}</div>,
   GcdsHeading: ({ children, ...props }) => <h1 {...props}>{children}</h1>,

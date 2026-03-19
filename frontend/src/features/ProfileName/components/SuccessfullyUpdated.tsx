@@ -7,7 +7,7 @@ import {
   GcdsLink,
   GcdsNotice,
   GcdsText,
-} from "@cdssnc/gcds-components-react";
+} from "@gcds-core/components-react";
 
 import { getPageContent } from "../../../utils/functions";
 import { EXTERNAL_NAVIGATION_LINKS, PAGES } from "../../../utils/constants";

@@ -32,7 +32,7 @@ vi.mock("../../../components/Providers/useUser", () => ({
   })),
 }));
 
-vi.mock("@cdssnc/gcds-components-react", () => ({
+vi.mock("@gcds-core/components-react", () => ({
   GcdsButton: ({
     children,
     buttonId,

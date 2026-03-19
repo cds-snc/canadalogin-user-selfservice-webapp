@@ -10,7 +10,7 @@ import {
   GcdsLink,
   GcdsNotice,
   GcdsText,
-} from "@cdssnc/gcds-components-react";
+} from "@gcds-core/components-react";
 import FIDOPasskeyCollage from "../../../../assets/icons/passkey_collage.svg?react";
 
 interface AddFIDO2PasskeyProps {

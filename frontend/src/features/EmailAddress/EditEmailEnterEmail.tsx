@@ -11,7 +11,7 @@ import {
   GcdsHeading,
   GcdsInput,
   GcdsText,
-} from "@cdssnc/gcds-components-react";
+} from "@gcds-core/components-react";
 import ServicesWithAccessInfoSection from "../../components/InfoBlocks/ServicesWithAccessInfoSection";
 import SubmitButton from "../../components/Layout/SubmitButton";
 

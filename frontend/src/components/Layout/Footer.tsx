@@ -1,4 +1,4 @@
-import { GcdsContainer, GcdsFooter } from "@cdssnc/gcds-components-react";
+import { GcdsContainer, GcdsFooter } from "@gcds-core/components-react";
 import { getFooter } from "../../utils/functions";
 
 interface FooterProps {

@@ -1,4 +1,4 @@
-import { GcdsErrorSummary } from "@cdssnc/gcds-components-react";
+import { GcdsErrorSummary } from "@gcds-core/components-react";
 import { useEffect, useRef } from "react";
 import type { ComponentPropsWithoutRef, ComponentRef } from "react";
 import { getPageContent } from "../../utils/functions";

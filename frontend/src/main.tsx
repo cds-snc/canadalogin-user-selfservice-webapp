@@ -1,6 +1,6 @@
 import { Suspense, StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import "@cdssnc/gcds-components-react/gcds.css";
+import "@gcds-core/components-react/gcds.css";
 //need to remove when demo code removed
 import "./index.css";
 import router from "./router";

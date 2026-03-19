@@ -7,7 +7,7 @@ import {
   GcdsGrid,
   GcdsHeading,
   GcdsText,
-} from "@cdssnc/gcds-components-react";
+} from "@gcds-core/components-react";
 
 interface DeleteFIDO2PasskeyConfirmProps {
   passkeyNickname?: string;

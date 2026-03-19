@@ -9,7 +9,7 @@ import {
   GcdsHeading,
   GcdsInput,
   GcdsText,
-} from "@cdssnc/gcds-components-react";
+} from "@gcds-core/components-react";
 
 interface AddFIDO2PasskeyNicknameProps {
   setErrorCode: (code: string) => void;

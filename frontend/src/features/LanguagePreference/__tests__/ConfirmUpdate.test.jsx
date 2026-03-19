@@ -94,7 +94,7 @@ vi.mock("../../../components/Layout/Loading", () => ({
   default: ({ text }) => <div data-testid="loader">{text}</div>,
 }));
 
-vi.mock("@cdssnc/gcds-components-react", () => ({
+vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children }) => (
     <div data-testid="gcds-container">{children}</div>
   ),

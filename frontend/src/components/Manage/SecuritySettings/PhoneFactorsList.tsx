@@ -1,8 +1,4 @@
-import {
-  GcdsContainer,
-  GcdsLink,
-  GcdsText,
-} from "@cdssnc/gcds-components-react";
+import { GcdsContainer, GcdsLink, GcdsText } from "@gcds-core/components-react";
 import { useNavigate, useParams } from "react-router";
 import { PAGES } from "../../../utils/constants";
 import { getPageContent } from "../../../utils/functions";

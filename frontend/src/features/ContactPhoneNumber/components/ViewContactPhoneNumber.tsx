@@ -6,7 +6,7 @@ import {
   GcdsHeading,
   GcdsLink,
   GcdsText,
-} from "@cdssnc/gcds-components-react";
+} from "@gcds-core/components-react";
 import parsePhoneNumberFromString from "libphonenumber-js";
 
 import { PAGES } from "../../../utils/constants";

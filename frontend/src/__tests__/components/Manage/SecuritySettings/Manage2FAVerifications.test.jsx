@@ -18,7 +18,7 @@ import Manage2FAVerifications from "../../../../components/Manage/SecuritySettin
 import { fido2Api } from "../../../../features/ManageFIDO2/api/fido2Api";
 
 // Mock GCDS web components — they rely on custom elements which don't work in jsdom
-vi.mock("@cdssnc/gcds-components-react", () => ({
+vi.mock("@gcds-core/components-react", () => ({
   GcdsButton: ({ children, ...props }) => (
     <button {...props}>{children}</button>
   ),
@@ -127,7 +127,7 @@ vi.mock("../../../../features/ManageFIDO2/api/fido2Api", () => ({
   },
 }));
 
-vi.mock("@cdssnc/gcds-components-react", () => ({
+vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children }) => <div>{children}</div>,
   GcdsGrid: ({ children }) => <div>{children}</div>,
   GcdsHeading: ({ children }) => <div>{children}</div>,

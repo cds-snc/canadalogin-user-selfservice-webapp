@@ -6,7 +6,7 @@ import {
   GcdsGrid,
   GcdsHeading,
   GcdsText,
-} from "@cdssnc/gcds-components-react";
+} from "@gcds-core/components-react";
 
 import { getPageContent } from "../../../utils/functions";
 import { LANGUAGE_DISPLAY_NAMES, PAGES } from "../../../utils/constants";

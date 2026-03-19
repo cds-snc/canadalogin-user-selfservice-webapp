@@ -5,7 +5,7 @@ import AddSecondMFA from "../AddSecondMFA";
 import "@testing-library/jest-dom/vitest";
 
 // Mock GCDS components
-vi.mock("@cdssnc/gcds-components-react", () => ({
+vi.mock("@gcds-core/components-react", () => ({
   GcdsButton: ({ children, onGcdsClick, style }) => (
     <button onClick={onGcdsClick} style={style} data-testid="gcds-button">
       {children}

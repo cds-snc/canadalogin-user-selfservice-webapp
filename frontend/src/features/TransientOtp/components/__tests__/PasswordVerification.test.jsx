@@ -66,7 +66,7 @@ vi.mock("../../../../utils/functions", () => ({
 }));
 
 // Mock GCDS components
-vi.mock("@cdssnc/gcds-components-react", () => ({
+vi.mock("@gcds-core/components-react", () => ({
   GcdsButton: ({ children, onGcdsClick, buttonRole, style }) => (
     <button
       data-testid={

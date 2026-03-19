@@ -4,7 +4,7 @@ import {
   GcdsHeading,
   GcdsLink,
   GcdsText,
-} from "@cdssnc/gcds-components-react";
+} from "@gcds-core/components-react";
 
 import { PAGES, LANGUAGE_DISPLAY_NAMES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";

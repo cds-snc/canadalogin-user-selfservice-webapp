@@ -3,7 +3,7 @@ import {
   GcdsContainer,
   GcdsHeader,
   GcdsLangToggle,
-} from "@cdssnc/gcds-components-react";
+} from "@gcds-core/components-react";
 
 import TopNav from "./TopNav";
 import Breadcrumbs from "./Breadcrumbs";
@@ -26,7 +26,6 @@ export default function Header({ langHref, currentLang }: HeaderProps) {
         lang={currentLang}
         langHref={langHref}
         skipToHref="#main-content"
-        signature-variant={"colour"}
       >
         <TopNav currentLang={currentLang} />
         <GcdsLangToggle

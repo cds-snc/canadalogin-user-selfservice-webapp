@@ -87,7 +87,7 @@ vi.mock("../../../../components/Layout/Loading", () => ({
 }));
 
 // Mock GCDS components
-vi.mock("@cdssnc/gcds-components-react", () => ({
+vi.mock("@gcds-core/components-react", () => ({
   GcdsErrorMessage: ({ children, messageId }) => (
     <div data-testid="error-message" data-message-id={messageId}>
       {children}

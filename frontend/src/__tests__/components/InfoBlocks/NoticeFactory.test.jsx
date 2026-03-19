@@ -11,7 +11,7 @@ vi.mock("react-router", () => ({
 }));
 
 // Mock GCDS components
-vi.mock("@cdssnc/gcds-components-react", () => ({
+vi.mock("@gcds-core/components-react", () => ({
   GcdsNotice: ({ children, type, noticeTitleTag, noticeTitle, ...props }) => (
     <div
       data-testid="gcds-notice"

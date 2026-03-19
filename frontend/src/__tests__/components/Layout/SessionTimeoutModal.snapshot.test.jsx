@@ -27,7 +27,7 @@ vi.mock("react-modal", () => ({
     ) : null,
 }));
 
-vi.mock("@cdssnc/gcds-components-react", () => ({
+vi.mock("@gcds-core/components-react", () => ({
   GcdsButton: ({
     children,
     buttonId,

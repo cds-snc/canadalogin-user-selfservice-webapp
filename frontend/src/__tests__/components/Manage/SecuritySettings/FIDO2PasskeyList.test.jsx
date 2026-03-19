@@ -49,7 +49,7 @@ vi.mock("../../../../utils/routeHelpers", () => ({
   path: (_page, { language } = {}) => `/${language}/mock-path`,
 }));
 
-vi.mock("@cdssnc/gcds-components-react", () => ({
+vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children }) => (
     <div data-testid="gcds-container">{children}</div>
   ),

@@ -1,6 +1,6 @@
 import Modal from "react-modal";
 import { useEffect } from "react";
-import { GcdsButton, GcdsText, GcdsIcon } from "@cdssnc/gcds-components-react";
+import { GcdsButton, GcdsText, GcdsIcon } from "@gcds-core/components-react";
 import { getPageContent, formatTime } from "../../utils/functions";
 import {
   setWarningFavicon,

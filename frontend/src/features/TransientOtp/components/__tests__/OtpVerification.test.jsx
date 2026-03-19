@@ -96,7 +96,7 @@ vi.mock("../../../../utils/routeHelpers", () => ({
 }));
 
 // Mock GCDS components
-vi.mock("@cdssnc/gcds-components-react", () => ({
+vi.mock("@gcds-core/components-react", () => ({
   GcdsButton: ({ children, onGcdsClick, buttonRole, disabled, style }) => (
     <button
       data-testid={

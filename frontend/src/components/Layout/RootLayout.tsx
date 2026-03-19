@@ -7,7 +7,7 @@ import Header from "../Layout/Header";
 import Footer from "../Layout/Footer";
 import config from "../../config";
 
-import { GcdsContainer, GcdsText } from "@cdssnc/gcds-components-react";
+import { GcdsContainer, GcdsText } from "@gcds-core/components-react";
 
 const DisplayReleaseTag = () => {
   const { releaseTag } = config as { releaseTag?: string };

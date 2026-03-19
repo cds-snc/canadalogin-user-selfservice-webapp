@@ -8,7 +8,7 @@ import {
   GcdsHeading,
   GcdsLink,
   GcdsText,
-} from "@cdssnc/gcds-components-react";
+} from "@gcds-core/components-react";
 import { fido2Api } from "../../api/fido2Api";
 import { authenticateFIDO2Credential } from "../../utils/webAuthnUtils";
 import { getPageContent } from "../../../../utils/functions";

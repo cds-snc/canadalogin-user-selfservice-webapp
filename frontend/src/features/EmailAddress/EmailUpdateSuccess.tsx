@@ -9,7 +9,7 @@ import {
   GcdsGrid,
   GcdsLink,
   GcdsNotice,
-} from "@cdssnc/gcds-components-react";
+} from "@gcds-core/components-react";
 import SubmitButton from "../../components/Layout/SubmitButton";
 
 interface EmailUpdateSuccessProps {

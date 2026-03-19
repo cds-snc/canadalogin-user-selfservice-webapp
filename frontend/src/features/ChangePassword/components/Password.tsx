@@ -10,7 +10,7 @@ import {
   GcdsGrid,
   GcdsButton,
   GcdsHeading,
-} from "@cdssnc/gcds-components-react";
+} from "@gcds-core/components-react";
 import {
   getContentWithVariables,
   getPageContent,

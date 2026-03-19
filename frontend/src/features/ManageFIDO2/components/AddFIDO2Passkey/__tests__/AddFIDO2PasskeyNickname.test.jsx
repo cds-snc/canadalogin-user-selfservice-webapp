@@ -40,7 +40,7 @@ vi.mock("../../../../../utils/constants", () => ({
   DEV_ONLY_FEATURE: false,
 }));
 
-vi.mock("@cdssnc/gcds-components-react", () => ({
+vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children, ...props }) => <div {...props}>{children}</div>,
   GcdsGrid: ({ children, ...props }) => <div {...props}>{children}</div>,
   GcdsHeading: ({ children, ...props }) => <h1 {...props}>{children}</h1>,

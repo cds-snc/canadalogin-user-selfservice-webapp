@@ -8,7 +8,7 @@ import { LanguageProvider } from "../../../components/Providers/LanguageProvider
 import "@testing-library/jest-dom/vitest";
 
 // Mock GCDS components
-vi.mock("@cdssnc/gcds-components-react", () => ({
+vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children, ...props }) => (
     <div data-testid="gcds-container" {...props}>
       {children}
