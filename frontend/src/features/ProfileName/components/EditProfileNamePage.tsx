@@ -84,11 +84,18 @@ export default function EditProfileNamePage() {
   };
 
   const handleSubmitNameForm = () => {
-    const formatted =
-      `${nameFormData.givenName} ${nameFormData.familyName}`.trim();
+    const givenName = (nameFormData.givenName ?? "")
+      .trim()
+      .replace(/\s+/g, " ");
+    const familyName = (nameFormData.familyName ?? "")
+      .trim()
+      .replace(/\s+/g, " ");
+    const formatted = `${givenName} ${familyName}`.trim();
 
     setNameFormData((previous) => ({
       ...previous,
+      givenName,
+      familyName,
       formatted,
     }));
     setWizardStep("confirmUpdate");

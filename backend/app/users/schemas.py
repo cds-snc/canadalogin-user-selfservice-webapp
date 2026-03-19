@@ -127,11 +127,15 @@ class UserProfileName(BaseModel):
         if v is None:
             return v
 
+        import re
+
+        # Trim leading/trailing whitespace and collapse internal runs of spaces
+        v = v.strip()
+        v = re.sub(r" +", " ", v)
+
         # givenName is not required; allow empty string without validation
         if v == "" and info.field_name == "givenName":
             return v
-
-        import re
 
         # Pattern matches valid name characters: letters (including international), spaces, hyphens, apostrophes
         valid_pattern = (
