@@ -47,7 +47,7 @@ function capitalizeFirstLetter(value: string): string {
         return part;
       }
 
-      return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
+      return part.charAt(0).toUpperCase() + part.slice(1);
     })
     .join("");
 }
