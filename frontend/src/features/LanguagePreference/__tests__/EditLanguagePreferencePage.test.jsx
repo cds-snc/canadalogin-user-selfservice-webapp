@@ -34,6 +34,67 @@ vi.mock("../../../components/Layout/Loading", () => ({
   default: ({ text }) => <div data-testid="loading">{text}</div>,
 }));
 
+vi.mock("@gcds-core/components-react", () => ({
+  GcdsContainer: ({ children, role, style }) => (
+    <div data-testid="gcds-container" role={role} style={style}>
+      {children}
+    </div>
+  ),
+  GcdsHeading: ({ children, tag = "h1" }) => {
+    const Tag = tag;
+    return <Tag data-testid="gcds-heading">{children}</Tag>;
+  },
+  GcdsText: ({ children }) => <p data-testid="gcds-text">{children}</p>,
+  GcdsButton: ({ children, onGcdsClick, disabled, buttonRole }) => (
+    <button
+      data-testid="gcds-button"
+      data-button-role={buttonRole}
+      onClick={onGcdsClick}
+      disabled={disabled}
+    >
+      {children}
+    </button>
+  ),
+  GcdsRadios: ({ legend, name, options, onGcdsChange }) => (
+    <fieldset data-testid="gcds-radios">
+      <legend>{legend}</legend>
+      {options?.map((opt) => (
+        <label key={opt.id}>
+          <input
+            type="radio"
+            name={name}
+            value={opt.value}
+            onChange={() => onGcdsChange?.({ detail: { value: opt.value } })}
+          />
+          {opt.label}
+        </label>
+      ))}
+    </fieldset>
+  ),
+  GcdsNotice: ({ children, noticeTitle, noticeRole, noticeTitleTag }) => (
+    <div
+      data-testid="gcds-notice"
+      data-notice-role={noticeRole}
+      data-notice-title-tag={noticeTitleTag}
+    >
+      {noticeTitle}
+      {children}
+    </div>
+  ),
+  GcdsGrid: ({ children }) => <div data-testid="gcds-grid">{children}</div>,
+  GcdsLink: ({ children, href }) => (
+    <a data-testid="gcds-link" href={href}>
+      {children}
+    </a>
+  ),
+  GcdsDetails: ({ children, summary }) => (
+    <details data-testid="gcds-details">
+      <summary>{summary}</summary>
+      {children}
+    </details>
+  ),
+}));
+
 describe("EditLanguagePreferencePage Container", () => {
   beforeEach(() => {
     vi.clearAllMocks();

@@ -107,10 +107,10 @@ vi.mock("@gcds-core/components-react", () => ({
       {name}
     </span>
   ),
-  GcdsNotice: ({ children, type, noticeTitleTag, noticeTitle }) => (
+  GcdsNotice: ({ children, noticeRole, noticeTitleTag, noticeTitle }) => (
     <div
       data-testid="gcds-notice"
-      data-type={type}
+      data-notice-role={noticeRole}
       data-notice-title-tag={noticeTitleTag}
       data-notice-title={noticeTitle}
     >
@@ -176,7 +176,7 @@ describe("EmailUpdateSuccess", () => {
       renderComponent();
 
       const notice = screen.getByTestId("gcds-notice");
-      expect(notice).toHaveAttribute("data-type", "success");
+      expect(notice).toHaveAttribute("data-notice-role", "success");
       expect(notice).toHaveAttribute("data-notice-title-tag", "h2");
     });
 
@@ -379,7 +379,7 @@ describe("EmailUpdateSuccess", () => {
       expect(container).toHaveAttribute("role", "main");
       expect(grid).toHaveAttribute("data-columns", "max-content max-content");
       expect(grid).toHaveAttribute("data-gap", "200");
-      expect(notice).toHaveAttribute("data-type", "success");
+      expect(notice).toHaveAttribute("data-notice-role", "success");
     });
 
     it("should render text components with language attributes", () => {

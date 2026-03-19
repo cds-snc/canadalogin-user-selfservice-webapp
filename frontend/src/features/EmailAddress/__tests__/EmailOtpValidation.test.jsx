@@ -34,7 +34,7 @@ vi.mock("../../../utils/constants", () => ({
 
 // Mock SubmitButton component
 vi.mock("../../../components/Layout/SubmitButton", () => ({
-  default: ({ onGcdsClick, children, ...props }) => (
+  default: ({ onGcdsClick, children, currentLang: _cl, ...props }) => (
     <button data-testid="submit-button" onClick={onGcdsClick} {...props}>
       {children || "Submit"}
     </button>

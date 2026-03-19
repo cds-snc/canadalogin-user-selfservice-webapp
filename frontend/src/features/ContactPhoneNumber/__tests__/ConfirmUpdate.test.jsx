@@ -20,7 +20,13 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </div>
   ),
-  GcdsHeading: ({ children, tag, ...props }) => {
+  GcdsHeading: ({
+    children,
+    tag,
+    marginBottom: _marginBottom,
+    marginTop: _marginTop,
+    ...props
+  }) => {
     const Tag = tag || "h1";
     return (
       <Tag data-testid="gcds-heading" {...props}>
@@ -28,7 +34,7 @@ vi.mock("@gcds-core/components-react", () => ({
       </Tag>
     );
   },
-  GcdsText: ({ children, ...props }) => (
+  GcdsText: ({ children, marginBottom: _mb, marginTop: _mt, ...props }) => (
     <p data-testid="gcds-text" {...props}>
       {children}
     </p>
@@ -52,10 +58,16 @@ vi.mock("@gcds-core/components-react", () => ({
   GcdsIcon: ({ name, size }) => (
     <div data-testid="gcds-icon" data-icon-name={name} data-icon-size={size} />
   ),
-  GcdsNotice: ({ children, type, noticeTitle, noticeTitleTag, ...props }) => {
+  GcdsNotice: ({
+    children,
+    noticeRole,
+    noticeTitle,
+    noticeTitleTag,
+    ...props
+  }) => {
     const TitleTag = noticeTitleTag || "h2";
     return (
-      <div data-testid="gcds-notice" data-type={type} {...props}>
+      <div data-testid="gcds-notice" data-notice-role={noticeRole} {...props}>
         {noticeTitle && <TitleTag>{noticeTitle}</TitleTag>}
         {children}
       </div>

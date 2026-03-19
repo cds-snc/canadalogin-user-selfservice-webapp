@@ -23,7 +23,13 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </div>
   ),
-  GcdsHeading: ({ children, tag, ...props }) => {
+  GcdsHeading: ({
+    children,
+    tag,
+    marginBottom: _marginBottom,
+    marginTop: _marginTop,
+    ...props
+  }) => {
     const Tag = tag || "h1";
     return (
       <Tag data-testid="gcds-heading" {...props}>
@@ -31,17 +37,28 @@ vi.mock("@gcds-core/components-react", () => ({
       </Tag>
     );
   },
-  GcdsText: ({ children, ...props }) => (
+  GcdsText: ({ children, marginBottom: _mb, marginTop: _mt, ...props }) => (
     <p data-testid="gcds-text" {...props}>
       {children}
     </p>
   ),
-  GcdsInput: ({ inputId, label, value, onGcdsInput, maxLength, ...props }) => (
+  GcdsInput: ({
+    inputId,
+    label,
+    value,
+    onGcdsInput,
+    maxLength,
+    validateOn: _va,
+    errorMessage,
+    hint: _hint,
+    ...props
+  }) => (
     <div>
       <label htmlFor={inputId}>{label}</label>
       <input
         id={inputId}
         data-testid="gcds-input"
+        data-error-message={errorMessage}
         value={value}
         onChange={(e) => onGcdsInput?.(e)}
         maxLength={maxLength}
@@ -287,9 +304,9 @@ describe("OtpVerification Component", () => {
       </TestWrapper>,
     );
 
-    // Error message is passed to input as errormessage attribute
+    // Error message is passed to input as data-error-message attribute
     expect(screen.getByTestId("gcds-input")).toHaveAttribute(
-      "errormessage",
+      "data-error-message",
       "Invalid verification code",
     );
   });

@@ -83,24 +83,22 @@ vi.mock("../../../../../assets/icons/passkey_collage.svg?react", () => ({
 // ─── GCDS components ───────────────────────────────────────────────────────
 
 vi.mock("@gcds-core/components-react", () => ({
-  GcdsContainer: ({ children, ...props }) => <div {...props}>{children}</div>,
-  GcdsGrid: ({ children, ...props }) => <div {...props}>{children}</div>,
-  GcdsHeading: ({ children, ...props }) => <h1 {...props}>{children}</h1>,
-  GcdsText: ({ children, ...props }) => <p {...props}>{children}</p>,
-  GcdsButton: ({ children, onGcdsClick, buttonRole, ...props }) => (
-    <button data-role={buttonRole} onClick={onGcdsClick} {...props}>
+  GcdsContainer: ({ children }) => <div>{children}</div>,
+  GcdsGrid: ({ children }) => <div>{children}</div>,
+  GcdsHeading: ({ children }) => <h1>{children}</h1>,
+  GcdsText: ({ children }) => <p>{children}</p>,
+  GcdsButton: ({ children, onGcdsClick, buttonRole }) => (
+    <button data-role={buttonRole} onClick={onGcdsClick}>
       {children}
     </button>
   ),
-  GcdsLink: ({ children, onGcdsClick, ...props }) => (
-    <a onClick={onGcdsClick} {...props}>
+  GcdsLink: ({ children, onGcdsClick, href }) => (
+    <a href={href} onClick={onGcdsClick}>
       {children}
     </a>
   ),
-  GcdsErrorMessage: ({ children, ...props }) => (
-    <div data-testid="error-message" {...props}>
-      {children}
-    </div>
+  GcdsErrorMessage: ({ children }) => (
+    <div data-testid="error-message">{children}</div>
   ),
 }));
 

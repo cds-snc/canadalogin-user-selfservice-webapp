@@ -61,7 +61,7 @@ export default function AddFIDO2Passkey({
           </li>
         </ol>
         <GcdsNotice
-          type="warning"
+          noticeRole="warning"
           noticeTitleTag="h2"
           noticeTitle={" "}
           lang={language}

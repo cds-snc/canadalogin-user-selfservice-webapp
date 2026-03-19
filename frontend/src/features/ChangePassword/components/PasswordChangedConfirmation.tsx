@@ -46,7 +46,7 @@ export default function PasswordChangedConfirmation({
 
   return (
     <GcdsContainer>
-      <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle=" ">
+      <GcdsNotice noticeRole="success" noticeTitleTag="h2" noticeTitle=" ">
         <GcdsText>{pageContentJson["1"]}</GcdsText>
       </GcdsNotice>
       <br />

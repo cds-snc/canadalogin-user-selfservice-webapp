@@ -50,12 +50,29 @@ vi.mock("../../../../../assets/icons/passkey_collage.svg?react", () => ({
 }));
 
 vi.mock("@gcds-core/components-react", () => ({
-  GcdsContainer: ({ children, ...props }) => <div {...props}>{children}</div>,
-  GcdsGrid: ({ children, ...props }) => <div {...props}>{children}</div>,
-  GcdsHeading: ({ children, ...props }) => <h1 {...props}>{children}</h1>,
-  GcdsText: ({ children, ...props }) => <p {...props}>{children}</p>,
-  GcdsNotice: ({ children, noticeTitle, ...props }) => (
-    <div data-testid="notice" {...props}>
+  GcdsContainer: ({
+    children,
+    marginBottom: _mb,
+    marginTop: _mt,
+    ...props
+  }) => <div {...props}>{children}</div>,
+  GcdsGrid: ({ children, marginBottom: _mb, marginTop: _mt, ...props }) => (
+    <div {...props}>{children}</div>
+  ),
+  GcdsHeading: ({ children, marginBottom: _mb, marginTop: _mt, ...props }) => (
+    <h1 {...props}>{children}</h1>
+  ),
+  GcdsText: ({ children, marginBottom: _mb, marginTop: _mt, ...props }) => (
+    <p {...props}>{children}</p>
+  ),
+  GcdsNotice: ({
+    children,
+    noticeTitle,
+    noticeRole,
+    noticeTitleTag: _noticeTitleTag,
+    ...props
+  }) => (
+    <div data-testid="notice" data-notice-role={noticeRole} {...props}>
       {noticeTitle}
       {children}
     </div>
@@ -70,7 +87,7 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </button>
   ),
-  GcdsErrorMessage: ({ children, ...props }) => (
+  GcdsErrorMessage: ({ children, messageId: _mid, ...props }) => (
     <div data-testid="error-message" {...props}>
       {children}
     </div>

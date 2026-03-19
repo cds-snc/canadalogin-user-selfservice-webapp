@@ -115,10 +115,16 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </p>
   ),
-  GcdsNotice: ({ children, type, noticeTitle, noticeTitleTag, ...props }) => {
+  GcdsNotice: ({
+    children,
+    noticeRole,
+    noticeTitle,
+    noticeTitleTag,
+    ...props
+  }) => {
     const TitleComponent = noticeTitleTag || "h2";
     return (
-      <div {...props} data-notice-type={type}>
+      <div {...props} data-notice-role={noticeRole}>
         {noticeTitle && React.createElement(TitleComponent, {}, noticeTitle)}
         {children}
       </div>

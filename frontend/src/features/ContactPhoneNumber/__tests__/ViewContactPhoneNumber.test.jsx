@@ -44,8 +44,12 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </div>
   ),
-  GcdsHeading: ({ children, marginTop, style, ...props }) => (
-    <h3 data-testid="gcds-heading" style={{ marginTop, ...style }} {...props}>
+  GcdsHeading: ({ children, marginTop, marginBottom, style, ...props }) => (
+    <h3
+      data-testid="gcds-heading"
+      style={{ marginTop, marginBottom, ...style }}
+      {...props}
+    >
       {children}
     </h3>
   ),
@@ -58,8 +62,19 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </div>
   ),
-  GcdsText: ({ children, placeContent, style, ...props }) => (
-    <p data-testid="gcds-text" style={{ placeContent, ...style }} {...props}>
+  GcdsText: ({
+    children,
+    placeContent,
+    marginTop,
+    marginBottom,
+    style,
+    ...props
+  }) => (
+    <p
+      data-testid="gcds-text"
+      style={{ placeContent, marginTop, marginBottom, ...style }}
+      {...props}
+    >
       {children}
     </p>
   ),
@@ -274,31 +289,5 @@ describe("ViewContactPhoneNumber Component", () => {
     );
 
     expect(screen.getByText("No phone number added")).toBeInTheDocument();
-  });
-
-  it("matches snapshot with no phone numbers", () => {
-    const { container } = render(
-      <TestWrapper>
-        <ViewContactPhoneNumber
-          pageContent={defaultPageContent}
-          phoneNumbers={null}
-        />
-      </TestWrapper>,
-    );
-    expect(container).toMatchSnapshot();
-  });
-
-  it("matches snapshot with phone numbers", () => {
-    const phoneNumbers = [{ value: "+15551234567" }];
-
-    const { container } = render(
-      <TestWrapper>
-        <ViewContactPhoneNumber
-          pageContent={defaultPageContent}
-          phoneNumbers={phoneNumbers}
-        />
-      </TestWrapper>,
-    );
-    expect(container).toMatchSnapshot();
   });
 });

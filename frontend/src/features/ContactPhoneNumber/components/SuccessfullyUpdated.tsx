@@ -36,7 +36,7 @@ export default function SuccessfullyUpdated({
   return (
     <GcdsContainer role="main">
       <GcdsGrid columns="1">
-        <GcdsNotice type="success" noticeTitleTag="h2" noticeTitle=" ">
+        <GcdsNotice noticeRole="success" noticeTitleTag="h2" noticeTitle=" ">
           <GcdsText>
             <strong>
               {pageContentJson["1"]} {phoneFormData?.formattedPhoneNumber || ""}

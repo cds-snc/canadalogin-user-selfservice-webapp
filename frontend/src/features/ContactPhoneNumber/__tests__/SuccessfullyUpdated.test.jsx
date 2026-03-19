@@ -20,7 +20,13 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </div>
   ),
-  GcdsHeading: ({ children, tag, ...props }) => {
+  GcdsHeading: ({
+    children,
+    tag,
+    marginBottom: _marginBottom,
+    marginTop: _marginTop,
+    ...props
+  }) => {
     const Tag = tag || "h1";
     return (
       <Tag data-testid="gcds-heading" {...props}>
@@ -28,7 +34,7 @@ vi.mock("@gcds-core/components-react", () => ({
       </Tag>
     );
   },
-  GcdsText: ({ children, ...props }) => (
+  GcdsText: ({ children, marginBottom: _mb, marginTop: _mt, ...props }) => (
     <p data-testid="gcds-text" {...props}>
       {children}
     </p>
@@ -43,8 +49,8 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </button>
   ),
-  GcdsNotice: ({ children, noticeTitle, type, ...props }) => (
-    <div data-testid="gcds-notice" data-notice-type={type} {...props}>
+  GcdsNotice: ({ children, noticeTitle, noticeRole }) => (
+    <div data-testid="gcds-notice" data-notice-role={noticeRole}>
       {noticeTitle && <h3>{noticeTitle}</h3>}
       {children}
     </div>
@@ -145,7 +151,7 @@ describe("SuccessfullyUpdated Component", () => {
 
     const notice = screen.getByTestId("gcds-notice");
     expect(notice).toBeInTheDocument();
-    expect(notice).toHaveAttribute("data-notice-type", "success");
+    expect(notice).toHaveAttribute("data-notice-role", "success");
   });
 
   it("displays the updated phone number", () => {

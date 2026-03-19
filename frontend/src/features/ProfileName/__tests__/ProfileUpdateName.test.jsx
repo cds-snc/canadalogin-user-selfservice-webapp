@@ -48,7 +48,18 @@ vi.mock("@gcds-core/components-react", () => ({
     />
   ),
   GcdsInput: ({ inputId, ...props }) => {
-    const { name, type, value, onInput, ...domProps } = props;
+    const {
+      name,
+      type,
+      value,
+      onInput,
+      validateOn: _va,
+      onGcdsInput: _gi,
+      label: _label,
+      errorMessage: _em,
+      hint: _hint,
+      ...domProps
+    } = props;
     return (
       <input
         {...domProps}

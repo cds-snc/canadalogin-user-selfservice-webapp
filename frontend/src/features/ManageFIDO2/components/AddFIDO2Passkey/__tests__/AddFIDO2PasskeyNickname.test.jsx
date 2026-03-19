@@ -41,16 +41,36 @@ vi.mock("../../../../../utils/constants", () => ({
 }));
 
 vi.mock("@gcds-core/components-react", () => ({
-  GcdsContainer: ({ children, ...props }) => <div {...props}>{children}</div>,
-  GcdsGrid: ({ children, ...props }) => <div {...props}>{children}</div>,
-  GcdsHeading: ({ children, ...props }) => <h1 {...props}>{children}</h1>,
-  GcdsText: ({ children, ...props }) => <p {...props}>{children}</p>,
-  GcdsErrorMessage: ({ children, ...props }) => (
+  GcdsContainer: ({
+    children,
+    marginBottom: _mb,
+    marginTop: _mt,
+    ...props
+  }) => <div {...props}>{children}</div>,
+  GcdsGrid: ({ children, marginBottom: _mb, marginTop: _mt, ...props }) => (
+    <div {...props}>{children}</div>
+  ),
+  GcdsHeading: ({ children, marginBottom: _mb, marginTop: _mt, ...props }) => (
+    <h1 {...props}>{children}</h1>
+  ),
+  GcdsText: ({ children, marginBottom: _mb, marginTop: _mt, ...props }) => (
+    <p {...props}>{children}</p>
+  ),
+  GcdsErrorMessage: ({ children, messageId: _mid, ...props }) => (
     <div data-testid="error-message" {...props}>
       {children}
     </div>
   ),
-  GcdsInput: ({ label, value, onGcdsInput, errorMessage, hint, ...props }) => (
+  GcdsInput: ({
+    label,
+    value,
+    onGcdsInput,
+    errorMessage,
+    hint,
+    inputId: _iid,
+    validateOn: _va,
+    ...props
+  }) => (
     <div>
       <label htmlFor="passkey-name">{label}</label>
       {hint && <span data-testid="input-hint">{hint}</span>}

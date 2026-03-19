@@ -106,12 +106,11 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </p>
   ),
-  GcdsNotice: ({ children, type, noticeTitle, noticeTitleTag, ...props }) => (
+  GcdsNotice: ({ children, noticeRole, noticeTitle, noticeTitleTag }) => (
     <div
       data-testid="gcds-notice"
-      data-type={type}
+      data-notice-role={noticeRole}
       style={{ noticeTitle: noticeTitle, noticeTitleTag: noticeTitleTag }}
-      {...props}
     >
       {noticeTitle && <div data-testid="notice-title">{noticeTitle}</div>}
       {children}
@@ -201,7 +200,7 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
 
       const notice = screen.getByTestId("gcds-notice");
       expect(notice).toBeInTheDocument();
-      expect(notice).toHaveAttribute("data-type", "success");
+      expect(notice).toHaveAttribute("data-notice-role", "success");
     });
 
     it("displays the success message with language name", () => {
@@ -552,7 +551,7 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
       setup();
 
       const notice = screen.getByTestId("gcds-notice");
-      expect(notice).toHaveAttribute("data-type", "success");
+      expect(notice).toHaveAttribute("data-notice-role", "success");
 
       const noticeText = notice.querySelector('[data-testid="gcds-text"]');
       expect(noticeText).toBeInTheDocument();

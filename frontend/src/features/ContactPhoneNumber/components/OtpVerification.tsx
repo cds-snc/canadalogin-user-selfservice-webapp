@@ -135,7 +135,7 @@ export default function OtpVerification({
     <GcdsContainer role="main">
       {codeRequested ? (
         <GcdsNotice
-          type="success"
+          noticeRole="success"
           noticeTitleTag="h2"
           noticeTitle={pageContentJson["17"]}
           data-testid="linkSuccess"
