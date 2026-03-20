@@ -15,8 +15,8 @@ export const LANGUAGE_DISPLAY_NAMES = {
 export const EXTERNAL_NAVIGATION_LINKS = {
   gcAccountDirectory:
     "https://www.canada.ca/en/government/sign-in-online-account.html",
-  websiteStagingEN: "https://login.alpha.canada.ca/en",
-  websiteStagingFR: "https://connexion.alpha.canada.ca/fr",
+  CanadaLoginWebsiteProdDomainEN: "https://login.canada.ca/en",
+  CanadaLoginWebsiteProdDomainFR: "https://connexion.canada.ca/fr",
 } as const;
 
 export const OIDC_REDIRECT = {
@@ -135,8 +135,8 @@ export const PAGES = {
 
 export const FOOTERS = {
   default: {
-    en: `{ "About CanadaLogin": "${EXTERNAL_NAVIGATION_LINKS.websiteStagingEN}/users/what-is-canadalogin/", "Help": "${EXTERNAL_NAVIGATION_LINKS.websiteStagingEN}/users/", "Terms": "${EXTERNAL_NAVIGATION_LINKS.websiteStagingEN}/users/terms/" }`,
-    fr: `{ "À propos de ConnexionCanada": "${EXTERNAL_NAVIGATION_LINKS.websiteStagingFR}/utilisateurs/a-propos/", "Aide": "${EXTERNAL_NAVIGATION_LINKS.websiteStagingFR}/utilisateurs/", "Avis": "${EXTERNAL_NAVIGATION_LINKS.websiteStagingFR}/utilisateurs/avis/" }`,
+    en: `{ "About CanadaLogin": "${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainEN}/users/what-is-canadalogin/", "Help": "${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainEN}/users/", "Terms": "${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainEN}/users/terms/" }`,
+    fr: `{ "À propos de ConnexionCanada": "${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainFR}/utilisateurs/a-propos/", "Aide": "${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainFR}/utilisateurs/", "Avis": "${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainFR}/utilisateurs/avis/" }`,
   },
 } as const;
 
