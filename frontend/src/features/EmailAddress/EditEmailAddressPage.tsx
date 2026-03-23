@@ -155,7 +155,7 @@ export default function EditEmailAddressPage() {
     }
   };
 
-  const handleEnterEmailSubmit = async (_emailAddress?: string) => {
+  const handleEnterEmailSubmit = async () => {
     trackStepAttempt("email_entry_submit_initiated", "enter_email");
 
     if (!formData.emailAddress || !formData.emailAddress.trim()) {
