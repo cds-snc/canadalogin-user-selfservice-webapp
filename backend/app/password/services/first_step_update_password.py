@@ -85,7 +85,7 @@ async def dispatch_password_otp(
             }
         ],
     }
-    logger.info(f"api endpoint for reset: {first_step_resetter_api_endpoint}")
+    logger.info("api endpoint for reset: calling configured password reset endpoint")
     response = await global_http_client.post(
         first_step_resetter_api_endpoint, json=form_data, headers=headers
     )
