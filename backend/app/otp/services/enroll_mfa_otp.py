@@ -44,17 +44,6 @@ async def handle_otp_enrollment(
         f"{otp_type} OTP enrollment request completed in {duration:.2f} seconds"
     )
 
-    user_id = my_profile_response.data.id
-    logger.info(f"Enrolling {otp_type} OTP for user: {user_id}")
-
-    http_client_response = await dispatch_otp_enrollment(
-        global_http_client, enrollment_request, user_id
-    )
-    duration = (datetime.now() - start_time).total_seconds()
-    logger.info(
-        f"{otp_type} OTP enrollment request completed in {duration:.2f} seconds"
-    )
-
     if (
         http_client_response.status_code is None
         or http_client_response.status_code != 201

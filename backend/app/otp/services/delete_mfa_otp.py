@@ -61,6 +61,7 @@ async def handle_otp_deletion(
         # Use the verification OTP type (may differ from the factor being deleted)
         await verify_otp_before_operation(
             global_http_client=global_http_client,
+            user_access_token=user_access_token,
             otp=deletion_request.otp,
             trxn_id=deletion_request.trxnId,
             otp_type=deletion_request.otpVerificationType,

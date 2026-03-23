@@ -60,6 +60,7 @@ def extract_last_4_digits(masked_phone: str) -> str:
 
 async def verify_otp_before_operation(
     global_http_client: AsyncClient,
+    user_access_token: str,
     otp: str,
     trxn_id: str,
     otp_type: "OtpType",
@@ -94,7 +95,7 @@ async def verify_otp_before_operation(
 
     logger.info(f"Attempting OTP verification (type: {otp_type.value})")
     otp_verification_response = await handle_otp_verification(
-        global_http_client, otp_verification_data
+        global_http_client, otp_verification_data, user_access_token
     )
 
     if not otp_verification_response.success:
