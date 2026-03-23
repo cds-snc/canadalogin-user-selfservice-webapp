@@ -59,7 +59,7 @@ async def dispatch_update_password(
 
     form_data = {"otp": payload.otp, "password": payload.password}
 
-    logger.info(f"final step - resetter_api_endpoint: {final_resetter_api_endpoint}")
+    logger.info("final step - invoking password resetter API endpoint")
     response = await global_http_client.put(
         final_resetter_api_endpoint, json=form_data, headers=headers
     )
