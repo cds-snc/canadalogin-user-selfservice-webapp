@@ -4,9 +4,7 @@ Service for retrieving FIDO2 registrations
 
 import logging
 from httpx import AsyncClient
-from fastapi import HTTPException
 from app.utils.access_token import get_admin_token, get_auth_request_headers
-from app.utils.request_error_handler import RequestErrorHandler
 from app.constants.verify_endpoints import VerifyAPIEndpoint
 from app.fido2.schemas import (
     FIDO2UserResponseModel,

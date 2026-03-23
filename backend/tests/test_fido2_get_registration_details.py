@@ -224,7 +224,6 @@ class TestGetRegistrationDetails:
 
         assert exc.value.status_code == status.HTTP_403_FORBIDDEN
 
-
     @pytest.mark.asyncio
     @patch.object(get_details_module, "verify_registration_ownership")
     @patch.object(get_details_module, "get_user_profile_info")

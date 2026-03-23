@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import Mock, patch, AsyncMock
-from httpx import AsyncClient, Response, HTTPStatusError, Request as HttpxRequest
+from httpx import AsyncClient, Response
 from fastapi import HTTPException, status
 
 from app.password.services.verify_password import (
@@ -136,39 +136,6 @@ async def test_get_cloud_directory_id_empty_password_list():
 
         assert exc_info.value.status_code == status.HTTP_404_NOT_FOUND
         assert "Bad Request" in exc_info.value.detail
-
-
-@pytest.mark.asyncio
-async def test_get_cloud_directory_id_dispatch_raises_http_exception():
-    """Test get_cloud_directory_id re-raises HTTPException from dispatch."""
-    # Arrange
-    mock_http_client = AsyncMock(spec=AsyncClient)
-    verify_password_endpoint = (
-        "https://tenant.verify.ibm.com/v1.0/authnmethods/password"
-    )
-
-    with patch(
-        "app.password.services.verify_password.dispatch_get_cloud_directory_Id"
-    ) as mock_dispatch:
-        mock_dispatch.side_effect = HTTPException(
-            status_code=500, detail="Internal server error"
-        )
-
-        with patch(
-            "app.password.services.verify_password.RequestErrorHandler.handle"
-        ) as mock_handler:
-            mock_handler.side_effect = HTTPException(
-                status_code=500, detail="Failed to get cloud directory id"
-            )
-
-            # Act & Assert
-            with pytest.raises(HTTPException) as exc_info:
-                await get_cloud_directory_id(
-                    global_http_client=mock_http_client,
-                    verify_password_endpoint=verify_password_endpoint,
-                )
-
-            assert exc_info.value.status_code == 500
 
 
 @pytest.mark.asyncio

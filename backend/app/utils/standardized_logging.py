@@ -24,7 +24,7 @@ QUERY_STRING_BLACKLIST = [
 ]
 
 
-class StandardizedLogging():
+class StandardizedLogging:
     def _hash_blacklisted_params(self, query_params) -> str:
         """
         Takes a dictionary of parameters, hashes blacklisted values,

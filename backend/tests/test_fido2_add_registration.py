@@ -7,7 +7,7 @@ Uses importlib to import the actual module for patching.
 
 import importlib
 import pytest
-from httpx import AsyncClient, HTTPStatusError, Request, Response
+from httpx import AsyncClient
 from unittest.mock import AsyncMock, MagicMock, patch
 from app.fido2.schemas import AttestationOptionsRequest
 
@@ -211,7 +211,6 @@ class TestGetAttestationOptions:
         assert (
             "/v2.0/factors/fido2/relyingparties/rp-uuid-123/attestation/options" in url
         )
-
 
     @pytest.mark.asyncio
     @patch.object(add_module, "get_auth_request_headers")
@@ -432,7 +431,6 @@ class TestSubmitAttestationResult:
         assert (
             "/v2.0/factors/fido2/relyingparties/rp-uuid-123/attestation/result" in url
         )
-        
 
     @pytest.mark.asyncio
     @patch.object(add_module, "get_auth_request_headers")

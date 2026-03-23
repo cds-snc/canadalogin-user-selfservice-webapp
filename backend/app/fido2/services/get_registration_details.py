@@ -4,8 +4,6 @@ Service for getting FIDO2 registration details
 
 import logging
 from httpx import AsyncClient
-from fastapi import HTTPException
-from app.utils.request_error_handler import RequestErrorHandler
 from app.fido2.schemas import (
     FIDO2RegistrationResponse,
     FIDO2RegistrationResponseModel,

@@ -17,6 +17,7 @@ logger.setLevel(logging.ERROR)
 
 standard_logger = StandardizedLogging()
 
+
 def extract_response_body(response):
     try:
         return response.json()

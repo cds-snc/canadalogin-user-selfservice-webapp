@@ -17,8 +17,6 @@ from app.otp.services.verify_mfa_otp import (
     dispatch_verify_mfa_otp,
     handle_verify_mfa_otp,
 )
-from fastapi import HTTPException
-from httpx import HTTPStatusError, Request, Response
 
 from app.otp.services.send_mfa_otp import (
     dispatch_send_mfa_otp,
@@ -275,6 +273,7 @@ class TestHandleMFAOTPVerificationCreate:
             assert result.success is False
             assert result.message == "User verification failed"
 
+
 class TestHandleMFAOTPVerificationAttempt:
     """Test the main verification attempt handler function."""
 
@@ -354,6 +353,7 @@ class TestHandleMFAOTPVerificationAttempt:
 
             assert result.success is False
             assert result.message == "User verification failed"
+
 
 class TestDispatchMFAVerificationAttempt:
     """Test the dispatch verification attempt function with error scenarios."""

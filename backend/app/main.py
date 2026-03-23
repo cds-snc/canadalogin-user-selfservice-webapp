@@ -125,8 +125,6 @@ async def lifespan(app: FastAPI):
         logger.info("Closing Redis client")
 
 
-
-
 def create_app():
     app = FastAPI(
         lifespan=lifespan,
@@ -178,7 +176,6 @@ def create_app():
         cookie_domain=configuration.ROOT_DOMAIN,
         cookie_name=configuration.session_config.SESSION_COOKIE_NAME,
     )
-
 
     app.include_router(health.router, prefix="/health")
 

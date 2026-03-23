@@ -12,7 +12,6 @@ import time
 from httpx import AsyncClient
 from fastapi import Request
 from app.utils.schemas import ResponseModel
-from app.utils.request_error_handler import RequestErrorHandler
 from app.utils.access_token import get_admin_token
 from app.password.schemas import UserPassword, VerifiedUserPassword
 from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
@@ -188,9 +187,7 @@ async def verify_password_for_stepup(
     config = get_configuration()
 
     # Get username from profile
-    user_info = await dispatch_get_my_profile_from_ibm(
-        http_client, user_access_token
-    )
+    user_info = await dispatch_get_my_profile_from_ibm(http_client, user_access_token)
     username = user_info.userName
 
     # Get admin token for password verification with returnJwt=true

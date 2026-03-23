@@ -6,7 +6,6 @@ from app.config import get_configuration
 from app.utils.access_token import get_auth_request_headers
 from app.password.schemas import IBMVerifyPasswordPolicy
 from app.utils.schemas import ResponseModel
-from app.utils.request_error_handler import RequestErrorHandler
 
 
 logger = logging.getLogger(__name__)
@@ -39,9 +38,7 @@ async def dispatch_get_password_policy(global_http_client: AsyncClient):
 
 async def get_password_policy(global_http_client: AsyncClient):
     """Get password policy from IBM Verify API"""
-    password_policy_response = await dispatch_get_password_policy(
-        global_http_client
-    )
+    password_policy_response = await dispatch_get_password_policy(global_http_client)
 
     logger.info("password_policy_response returned successfully")
     response_json = password_policy_response.json()

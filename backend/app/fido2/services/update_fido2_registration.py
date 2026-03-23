@@ -5,7 +5,6 @@ Service for updating/renaming FIDO2 registrations (passkeys)
 import logging
 from httpx import AsyncClient
 from app.utils.access_token import get_auth_request_headers
-from app.utils.request_error_handler import RequestErrorHandler
 from app.utils.schemas import ResponseModel
 from app.constants.verify_endpoints import VerifyAPIEndpoint
 from app.fido2.schemas import UpdateRegistrationRequest
@@ -62,7 +61,9 @@ async def update_registration(
         update_payload["enabled"] = request_data.enabled
 
     # Update the registration using PUT (required by IBM Verify API)
-    reg_url = f"{tenant_url}{VerifyAPIEndpoint.FIDO2_REGISTRATIONS.value}/{registration_id}"
+    reg_url = (
+        f"{tenant_url}{VerifyAPIEndpoint.FIDO2_REGISTRATIONS.value}/{registration_id}"
+    )
     headers = get_auth_request_headers(user_access_token, json_content_type=True)
 
     update_response = await http_client.put(

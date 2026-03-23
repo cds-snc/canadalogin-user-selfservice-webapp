@@ -75,9 +75,7 @@ async def dispatch_password_otp_validator(
     response = await global_http_client.post(
         resetter_otp_validator_api_endpoint, json=form_data, headers=headers
     )
-    logger.info(
-        f"returned response from resetter_otp_api_endpoint: {response.json()}"
-    )
+    logger.info(f"returned response from resetter_otp_api_endpoint: {response.json()}")
 
     response.raise_for_status()
     logger.info("resetter_otp_api_endpoint returned successfully")

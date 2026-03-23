@@ -10,7 +10,7 @@ from app.utils.helpers import (
 )
 from app.utils.schemas import ResponseModel
 from fastapi import HTTPException, status
-from httpx import AsyncClient, HTTPStatusError
+from httpx import AsyncClient
 
 logger = logging.getLogger(__name__)
 
@@ -26,9 +26,7 @@ async def handle_otp_enrollment(
     start_time = datetime.now()
 
     # Verify user profile
-    my_profile_response = await get_my_profile(
-        global_http_client, user_access_token
-    )
+    my_profile_response = await get_my_profile(global_http_client, user_access_token)
     if not my_profile_response.success:
         logger.error(f"Failed to get user profile for {otp_type} enrollment")
         return ResponseModel(

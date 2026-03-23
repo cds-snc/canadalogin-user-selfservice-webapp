@@ -11,7 +11,6 @@ from app.users.schemas import (
 )
 from app.utils.access_token import get_auth_request_headers
 from app.utils.string_masking import mask_phone_number
-from fastapi import HTTPException, status
 from httpx import AsyncClient
 
 logger = logging.getLogger(__name__)
@@ -56,7 +55,6 @@ async def dispatch_user_auth_factors(
 ):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
-
 
     headers = get_auth_request_headers(user_access_token, True)
     settings = get_configuration()
@@ -122,9 +120,7 @@ async def get_user_otp_factor(
         None,
     )
 
-    logger.info(
-        "success response and data validation for user auth factors (unmasked)"
-    )
+    logger.info("success response and data validation for user auth factors (unmasked)")
 
     return phone_number_otp_factor
 
@@ -147,9 +143,7 @@ async def get_user_otp_factors(
 
     validated_data = UserAuthFactorsIbmResponse(**user_otp_factors_response)
 
-    phone_number_otp_factor = await parse_phone_auth_factors_response(
-        validated_data
-    )
+    phone_number_otp_factor = await parse_phone_auth_factors_response(validated_data)
     logger.info("success response and data validation for user auth factors")
     return UserPhoneAuthFactorsResponse(
         success=True,

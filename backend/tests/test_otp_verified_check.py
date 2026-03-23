@@ -9,7 +9,6 @@ from app.otp.schemas import OtpType, UserOtpVerificationInfo
 
 # Feature under test
 from app.otp.services.verify_transient_otp import handle_otp_verification, verify_otp
-from fastapi import HTTPException
 from httpx import AsyncClient, MockTransport, Request, Response
 
 # -----------------------

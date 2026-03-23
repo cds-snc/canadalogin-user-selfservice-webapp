@@ -5,7 +5,7 @@ from datetime import datetime
 from httpx import AsyncClient
 from typing import AsyncGenerator
 
-from fastapi import Request, HTTPException
+from fastapi import Request
 from fastapi.responses import StreamingResponse
 from starsessions.session import get_session_metadata
 from authlib.integrations.starlette_client import OAuthError

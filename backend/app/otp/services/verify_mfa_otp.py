@@ -7,10 +7,8 @@ from app.otp.schemas import (
 )
 from app.users.services.get_my_profile import get_my_profile
 from app.utils.access_token import get_auth_request_headers
-from app.utils.request_error_handler import RequestErrorHandler
 from app.utils.schemas import ResponseModel
-from fastapi import HTTPException, status
-from httpx import AsyncClient, HTTPStatusError
+from httpx import AsyncClient
 
 logger = logging.getLogger(__name__)
 
@@ -23,13 +21,9 @@ async def handle_verify_mfa_otp(
 ):
     """Verify MFA OTP for SMS or Voice"""
     # Verify user profile
-    my_profile_response = await get_my_profile(
-        global_http_client, user_access_token
-    )
+    my_profile_response = await get_my_profile(global_http_client, user_access_token)
     if not my_profile_response.success:
-        logger.error(
-            f"Failed to get user profile for {otp_type} verification attempt"
-        )
+        logger.error(f"Failed to get user profile for {otp_type} verification attempt")
         return ResponseModel(
             success=False, data=None, message="User verification failed"
         )

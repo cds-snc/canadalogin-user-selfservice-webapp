@@ -11,7 +11,6 @@ from app.otp.services.retrieve_transient_otp import (
     dispatch_otp_status_retrieval,
     handle_otp_status_retrieval,
 )
-from fastapi import HTTPException
 from httpx import AsyncClient, MockTransport, Request, Response
 
 

@@ -10,7 +10,6 @@ from app.utils.helpers import (
     prepare_pydantic_phone_number_for_verify,
 )
 from app.utils.schemas import ResponseModel
-from app.utils.request_error_handler import RequestErrorHandler
 from fastapi import HTTPException, status
 from httpx import AsyncClient, HTTPStatusError
 
@@ -92,10 +91,7 @@ async def dispatch_otp(
     headers = get_auth_request_headers(user_access_token, True, language)
     settings = get_configuration().ibm_verify_config
 
-    if (
-        user_otp_info.otpType == OtpType.SMS 
-        or user_otp_info.otpType == OtpType.VOICE
-    ):
+    if user_otp_info.otpType == OtpType.SMS or user_otp_info.otpType == OtpType.VOICE:
         user_phone_number = {
             "phoneNumber": prepare_pydantic_phone_number_for_verify(
                 user_otp_info.destination

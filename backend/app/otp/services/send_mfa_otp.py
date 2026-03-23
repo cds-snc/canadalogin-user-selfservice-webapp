@@ -1,5 +1,4 @@
 from app.config import get_configuration
-from fastapi import HTTPException, status
 from app.otp.schemas import (
     OtpType,
     OtpVerificationCreateRequest,
@@ -7,11 +6,10 @@ from app.otp.schemas import (
 )
 from app.users.services.get_my_profile import get_my_profile
 from app.utils.access_token import get_auth_request_headers
-from app.utils.helpers import generate_error_response
 from app.utils.schemas import ResponseModel
 
 
-from httpx import AsyncClient, HTTPStatusError
+from httpx import AsyncClient
 
 import logging
 
@@ -48,15 +46,11 @@ async def handle_send_mfa_otp(
     otp_type: OtpType,
 ):
     """Send an MFA OTP for SMS or Voice"""
-    
+
     # Verify user profile
-    my_profile_response = await get_my_profile(
-        global_http_client, user_access_token
-    )
+    my_profile_response = await get_my_profile(global_http_client, user_access_token)
     if not my_profile_response.success:
-        otp_type_str = (
-            otp_type.value if hasattr(otp_type, "value") else str(otp_type)
-        )
+        otp_type_str = otp_type.value if hasattr(otp_type, "value") else str(otp_type)
         logger.error(
             f"Failed to get user profile for {otp_type_str} verification creation"
         )

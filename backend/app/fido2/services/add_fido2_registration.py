@@ -6,7 +6,6 @@ import logging
 from typing import Dict, Any
 from httpx import AsyncClient
 from app.utils.access_token import get_admin_token, get_auth_request_headers
-from app.utils.request_error_handler import RequestErrorHandler
 from app.utils.schemas import ResponseModel
 from app.constants.verify_endpoints import VerifyAPIEndpoint
 from app.fido2.services.helper_utils import (

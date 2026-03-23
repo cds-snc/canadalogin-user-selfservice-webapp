@@ -58,23 +58,17 @@ async def dispatch_otp_status_retrieval(
 
     if retrieval_data.otpType == OtpType.SMS:
         send_transient_otp_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/smsotp/transient/verifications/{retrieval_data.trxnId}"
-        response = await global_http_client.get(
-            send_transient_otp_url, headers=headers
-        )
+        response = await global_http_client.get(send_transient_otp_url, headers=headers)
         return response
 
     elif retrieval_data.otpType == OtpType.VOICE:
         send_transient_otp_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/voiceotp/transient/verifications/{retrieval_data.trxnId}"
-        response = await global_http_client.get(
-            send_transient_otp_url, headers=headers
-        )
+        response = await global_http_client.get(send_transient_otp_url, headers=headers)
         return response
 
     elif retrieval_data.otpType == OtpType.EMAIL:
         send_transient_otp_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/emailotp/transient/verifications/{retrieval_data.trxnId}"
-        response = await global_http_client.get(
-            send_transient_otp_url, headers=headers
-        )
+        response = await global_http_client.get(send_transient_otp_url, headers=headers)
         return response
 
     else:

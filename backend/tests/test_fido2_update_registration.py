@@ -7,8 +7,7 @@ Uses importlib to import the actual module for patching.
 
 import importlib
 import pytest
-from fastapi import HTTPException, status
-from httpx import AsyncClient, HTTPStatusError, Request, Response
+from httpx import AsyncClient
 from unittest.mock import AsyncMock, MagicMock, patch
 
 # Import the module using importlib to get the actual module object
@@ -281,7 +280,6 @@ class TestUpdateRegistration:
         call_args = mock_http_client.put.call_args[0]
         put_url = call_args[0]
         assert "/v2.0/factors/fido2/registrations/reg-123" in put_url
-    
 
     @pytest.mark.asyncio
     @patch.object(update_module, "get_auth_request_headers")
@@ -458,7 +456,6 @@ class TestUpdateRegistration:
         call_kwargs = mock_http_client.put.call_args[1]
         payload = call_kwargs["json"]
         assert payload["attributes"]["nickname"] == "Top Level Name"
-
 
     @pytest.mark.asyncio
     @patch.object(update_module, "get_auth_request_headers")

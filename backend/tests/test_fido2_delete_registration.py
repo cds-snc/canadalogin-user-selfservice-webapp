@@ -7,8 +7,7 @@ Uses importlib to import the actual module for patching.
 
 import importlib
 import pytest
-from fastapi import HTTPException, status
-from httpx import AsyncClient, HTTPStatusError, Request, Response
+from httpx import AsyncClient
 from unittest.mock import AsyncMock, MagicMock, patch
 
 # Import the module using importlib to get the actual module object
@@ -156,7 +155,6 @@ class TestDeleteRegistration:
         assert "registration-123" in delete_url
         assert "/v2.0/factors/fido2/registrations/" in delete_url
 
-
     @pytest.mark.asyncio
     @patch.object(delete_module, "submit_assertion_result")
     @patch.object(delete_module, "get_auth_request_headers")
@@ -210,7 +208,6 @@ class TestDeleteRegistration:
         )
         call_kwargs = mock_http_client.delete.call_args[1]
         assert call_kwargs["headers"] == expected_headers
-
 
     @pytest.mark.asyncio
     @patch.object(delete_module, "submit_assertion_result")

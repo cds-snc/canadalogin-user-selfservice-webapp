@@ -6,11 +6,10 @@ from app.otp.schemas import OtpDeletionRequest, OtpType
 from app.users.services.get_my_profile import get_my_profile
 from app.users.services.otp_factors import get_user_otp_factors
 from app.utils.access_token import get_auth_request_headers
-from app.utils.request_error_handler import RequestErrorHandler
 from app.utils.schemas import ResponseModel
 from app.utils.helpers import verify_otp_before_operation
 from fastapi import HTTPException, status
-from httpx import AsyncClient, HTTPStatusError, Request, Response
+from httpx import AsyncClient, HTTPStatusError
 
 logger = logging.getLogger(__name__)
 
@@ -36,9 +35,7 @@ async def handle_otp_deletion(
     start_time = datetime.now()
 
     # Get user ID from the access token
-    my_profile_response = await get_my_profile(
-        global_http_client, user_access_token
-    )
+    my_profile_response = await get_my_profile(global_http_client, user_access_token)
     user_id = my_profile_response.data.id
 
     if deletion_request.otp is None:
@@ -74,13 +71,8 @@ async def handle_otp_deletion(
         user_factors_response = await get_user_otp_factors(
             global_http_client, user_access_token, validated=None
         )
-        if (
-            not user_factors_response.success
-            or len(user_factors_response.data) <= 1
-        ):
-            logger.warning(
-                f"User {user_id} cannot delete last remaining MFA factor"
-            )
+        if not user_factors_response.success or len(user_factors_response.data) <= 1:
+            logger.warning(f"User {user_id} cannot delete last remaining MFA factor")
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail="Cannot delete last remaining MFA factor",
@@ -91,9 +83,7 @@ async def handle_otp_deletion(
         global_http_client, deletion_request, user_access_token
     )
     duration = (datetime.now() - start_time).total_seconds()
-    logger.info(
-        f"{otp_type} OTP deletion request completed in {duration:.2f} seconds"
-    )
+    logger.info(f"{otp_type} OTP deletion request completed in {duration:.2f} seconds")
 
     if http_client_response.status_code == 204:
         # IBM Verify returns 204 No Content for successful deletion
@@ -104,7 +94,12 @@ async def handle_otp_deletion(
             message=f"{otp_type.value} OTP factor deleted successfully",
         )
     else:
-        raise HTTPStatusError("Unable to delete MFA phone number", request=http_client_response.request, response=http_client_response)
+        raise HTTPStatusError(
+            "Unable to delete MFA phone number",
+            request=http_client_response.request,
+            response=http_client_response,
+        )
+
 
 async def dispatch_otp_deletion(
     global_http_client: AsyncClient,
@@ -115,7 +110,10 @@ async def dispatch_otp_deletion(
     # Determine the endpoint based on OTP type first to validate
     endpoint = _get_endpoint_for_otp_type(deletion_request.otpType)
     if endpoint == "unknown":
-        raise HTTPException(status.HTTP_502_BAD_GATEWAY, f"Unsupported OTP type: {deletion_request.otpType}")
+        raise HTTPException(
+            status.HTTP_502_BAD_GATEWAY,
+            f"Unsupported OTP type: {deletion_request.otpType}",
+        )
 
     headers = get_auth_request_headers(user_access_token, True)
     settings = get_configuration().ibm_verify_config

@@ -1,7 +1,6 @@
 import pytest
 from datetime import datetime
 
-from fastapi import HTTPException
 from fastapi.responses import StreamingResponse
 from authlib.integrations.starlette_client import OAuthError
 

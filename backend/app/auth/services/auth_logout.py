@@ -1,5 +1,5 @@
 import logging
-from fastapi import Request, HTTPException, status
+from fastapi import Request
 from urllib.parse import urlencode
 from authlib.jose import jwt
 from authlib.jose.errors import JoseError
@@ -9,7 +9,6 @@ from app.auth.services.auth_user_session import get_user_info
 from app.auth.services.auth import get_base_profile_management_url
 from app.utils.schemas import ResponseModel
 from app.auth.schemas import LogoutResponseModel
-from app.utils.request_error_handler import RequestErrorHandler
 from app.utils.redis import get_redis_client
 from app.constants.redis_keys import RedisKeys
 

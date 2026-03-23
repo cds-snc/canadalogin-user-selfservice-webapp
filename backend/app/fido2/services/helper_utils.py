@@ -8,7 +8,6 @@ from urllib.parse import urlparse
 from fastapi import HTTPException, status
 from httpx import AsyncClient
 from app.utils.access_token import get_auth_request_headers
-from app.utils.request_error_handler import RequestErrorHandler
 from app.config import get_configuration
 from app.constants.verify_endpoints import VerifyAPIEndpoint
 from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
@@ -107,7 +106,9 @@ async def verify_registration_ownership(
         HTTPException: If the user does not own the registration
     """
     tenant_url = get_tenant_url()
-    reg_url = f"{tenant_url}{VerifyAPIEndpoint.FIDO2_REGISTRATIONS.value}/{registration_id}"
+    reg_url = (
+        f"{tenant_url}{VerifyAPIEndpoint.FIDO2_REGISTRATIONS.value}/{registration_id}"
+    )
     headers = get_auth_request_headers(access_token, json_content_type=True)
 
     reg_response = await http_client.get(reg_url, headers=headers)

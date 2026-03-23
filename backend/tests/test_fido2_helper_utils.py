@@ -137,7 +137,6 @@ class TestHelperUtils:
         assert display_name == "testuser@example.com"
         assert user_id == "user-123"
 
-
     @pytest.mark.asyncio
     @respx.mock
     @patch("app.fido2.services.helper_utils.get_tenant_url")

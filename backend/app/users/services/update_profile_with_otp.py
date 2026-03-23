@@ -99,9 +99,7 @@ async def update_profile_with_otp_verification(
             update_session_user_info(request, session_updates)
             logger.info("Session updated successfully after profile change")
         except Exception as e:
-            logger.warning(
-                f"Failed to update session after profile change: {str(e)}"
-            )
+            logger.warning(f"Failed to update session after profile change: {str(e)}")
             # Don't fail the entire operation if session update fails
 
     logger.info("Profile updated successfully with OTP verification")

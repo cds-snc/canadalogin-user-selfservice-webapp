@@ -19,7 +19,7 @@ from app.fido2.schemas import (
 from app.utils.schemas import ResponseModel
 from app.auth.services.auth_user_session import (
     get_users_current_session,
-    get_http_client
+    get_http_client,
 )
 
 # Import individual service functions
@@ -44,6 +44,7 @@ from app.fido2.services.authenticate_fido2_registration import (
 
 logger = logging.getLogger(__name__)
 router = APIRouter(tags=["fido2"])
+
 
 @router.get(
     "/user",

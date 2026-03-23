@@ -115,6 +115,7 @@ class TestSMSEnrollment:
             assert result.success is False
             assert "User verification failed" in result.message
 
+
 class TestVoiceEnrollment:
     @pytest.mark.asyncio
     async def test_handle_voice_otp_enrollment_success(

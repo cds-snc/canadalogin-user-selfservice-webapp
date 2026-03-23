@@ -7,7 +7,7 @@ from app.main import app
 from fastapi.testclient import TestClient
 from fastapi import HTTPException, status
 
-client = TestClient(app,raise_server_exceptions=False)
+client = TestClient(app, raise_server_exceptions=False)
 
 
 @pytest.mark.asyncio

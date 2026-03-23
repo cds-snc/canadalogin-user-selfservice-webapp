@@ -11,7 +11,6 @@ from app.password.schemas import (
     IBMIdentitySourceResponse,
 )
 from app.utils.schemas import ResponseModel
-from app.utils.request_error_handler import RequestErrorHandler
 from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
 from urllib.parse import quote
 
@@ -81,17 +80,13 @@ async def get_cloud_directory_id(
 
     if not data_validation.password or len(data_validation.password) == 0:
         logger.error("Cloud Directory ID not found in IBM Verify response")
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Bad Request"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Bad Request")
 
     cloud_directory_id = data_validation.password[0].id
 
     if not cloud_directory_id:
         logger.error("Cloud Directory ID not found in IBM Verify response")
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Bad Request"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Bad Request")
 
     return cloud_directory_id
 
@@ -187,9 +182,7 @@ async def verify_user_password(
 
     if not user_id:
         logger.error("IBM Verify response missing user ID")
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Bad Request"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Bad Request")
 
     logger.info(f"User verified successfully: {user_id}")
 

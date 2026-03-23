@@ -8,7 +8,7 @@ Uses importlib to import the actual module for patching.
 import importlib
 import pytest
 from fastapi import HTTPException, status
-from httpx import AsyncClient, HTTPStatusError, Request, Response
+from httpx import AsyncClient
 from unittest.mock import AsyncMock, MagicMock, patch
 
 # Import the module using importlib to get the actual module object
@@ -240,7 +240,6 @@ class TestGetUserFido2Registrations:
             )
 
         assert exc.value.status_code == status.HTTP_401_UNAUTHORIZED
-
 
     @pytest.mark.asyncio
     @patch.object(get_registrations_module, "get_auth_request_headers")

@@ -6,7 +6,6 @@ import logging
 from httpx import AsyncClient
 from fastapi import Request
 from app.utils.access_token import get_auth_request_headers
-from app.utils.request_error_handler import RequestErrorHandler
 from app.constants.verify_endpoints import VerifyAPIEndpoint
 from app.fido2.schemas import (
     DeleteRegistrationRequest,
@@ -69,7 +68,9 @@ async def delete_registration(
     )
 
     # Step 3: Delete the registration
-    reg_url = f"{tenant_url}{VerifyAPIEndpoint.FIDO2_REGISTRATIONS.value}/{registration_id}"
+    reg_url = (
+        f"{tenant_url}{VerifyAPIEndpoint.FIDO2_REGISTRATIONS.value}/{registration_id}"
+    )
     headers = get_auth_request_headers(user_access_token, json_content_type=True)
 
     delete_response = await http_client.delete(reg_url, headers=headers)

@@ -8,7 +8,7 @@ Uses importlib to import the actual module for patching.
 import importlib
 import time
 import pytest
-from httpx import AsyncClient, HTTPStatusError, Request, Response
+from httpx import AsyncClient, HTTPStatusError, Request
 from unittest.mock import AsyncMock, MagicMock, patch
 from app.fido2.schemas import AssertionOptionsRequest, FIDO2AssertionResultRequest
 
@@ -341,7 +341,7 @@ class TestSubmitAssertionResult:
 
         mock_response = MagicMock()
         mock_response.status_code = 200
-        mock_response.json.return_value = {"status": "ok", "verified": True }
+        mock_response.json.return_value = {"status": "ok", "verified": True}
         mock_response.raise_for_status = MagicMock()
         mock_http_client.post = AsyncMock(return_value=mock_response)
 
@@ -548,7 +548,6 @@ class TestSubmitAssertionResult:
         url = call_args[0]
         assert "/v2.0/factors/fido2/relyingparties/rp-uuid-123/assertion/result" in url
 
-
     @pytest.mark.asyncio
     @patch.object(auth_module, "get_auth_request_headers")
     @patch.object(auth_module, "get_rp_uuid_from_rp_id")
@@ -682,6 +681,7 @@ class TestSubmitAssertionResult:
         assert result.data["status"] == "ok"
         assert result.data["verified"] is True
 
+
 class TestExchangeFido2JwtForAccessToken:
     """Tests for _exchange_fido2_jwt_for_access_token helper function"""
 
@@ -737,7 +737,6 @@ class TestExchangeFido2JwtForAccessToken:
         headers = call_args[1]["headers"]
         assert "Authorization" in headers
         assert headers["Authorization"].startswith("Basic ")
-
 
     @pytest.mark.asyncio
     async def test_handles_missing_access_token(self, mock_http_client):
@@ -1673,7 +1672,6 @@ class TestGetMfaChallengeToken:
             await auth_module._get_mfa_challenge_token(
                 request, mock_http_client, "https://tenant.example.com"
             )
-            
 
     @pytest.mark.asyncio
     @patch.object(auth_module, "_perform_mfa_refresh_token_flow")

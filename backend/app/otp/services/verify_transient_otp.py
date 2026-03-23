@@ -7,7 +7,6 @@ from httpx import AsyncClient
 from app.config import get_configuration
 from app.otp.schemas import OtpType, UserOtpVerificationInfo
 from app.utils.access_token import get_auth_request_headers
-from app.utils.helpers import generate_error_response, format_error_response
 from app.utils.schemas import ResponseModel
 
 logger = logging.getLogger(__name__)
