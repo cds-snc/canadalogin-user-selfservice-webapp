@@ -218,31 +218,3 @@ async def test_verify_otp_before_operation_http_exception(monkeypatch):
         # Should re-raise the original HTTPException
         assert exc_info.value.status_code == 401
         assert "Unauthorized" in str(exc_info.value.detail)
-
-
-@pytest.mark.asyncio
-async def test_verify_otp_before_operation_unexpected_exception(monkeypatch):
-    """Test OTP verification when an unexpected exception occurs"""
-
-    async def mock_handle_otp_verification(client, verification_data):
-        # Raise an unexpected exception
-        raise ValueError("Unexpected error occurred")
-
-    # Patch the import within the verify_otp_before_operation function
-    monkeypatch.setattr(
-        "app.otp.services.verify_transient_otp.handle_otp_verification",
-        mock_handle_otp_verification,
-    )
-
-    async with AsyncClient(base_url="http://localhost") as client:
-        with pytest.raises(HTTPException) as exc_info:
-            await verify_otp_before_operation(
-                global_http_client=client,
-                otp="123456",
-                trxn_id="txn123",
-                otp_type=OtpType.EMAIL,
-            )
-
-        # Should wrap unexpected exceptions in a 500 HTTPException
-        assert exc_info.value.status_code == 500
-        assert "unexpected error occurred" in str(exc_info.value.detail).lower()

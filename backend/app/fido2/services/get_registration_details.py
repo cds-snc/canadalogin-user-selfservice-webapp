@@ -22,29 +22,22 @@ async def get_registration_details(
     http_client: AsyncClient, user_access_token: str, registration_id: str
 ) -> FIDO2RegistrationResponseModel:
     """Get details of a specific FIDO2 registration"""
-    try:
-        # Get user ID from the token using userinfo endpoint
-        _username, _display_name, user_id = await get_user_profile_info(
-            http_client, user_access_token
-        )
+    # Get user ID from the token using userinfo endpoint
+    _username, _display_name, user_id = await get_user_profile_info(
+        http_client, user_access_token
+    )
 
-        # Verify ownership and get registration data
-        registration_data = await verify_registration_ownership(
-            http_client, user_access_token, registration_id, user_id
-        )
+    # Verify ownership and get registration data
+    registration_data = await verify_registration_ownership(
+        http_client, user_access_token, registration_id, user_id
+    )
 
-        # TODO: Add transaction data if needed
-        registration_data.setdefault("attributes", {})["transactions"] = []
+    # TODO: Add transaction data if needed
+    registration_data.setdefault("attributes", {})["transactions"] = []
 
-        registration_response = FIDO2RegistrationResponse(**registration_data)
-        return FIDO2RegistrationResponseModel(
-            success=True,
-            data=registration_response,
-            message="Registration details retrieved successfully",
-        )
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error getting registration details: {str(e)}", exc_info=True)
-        RequestErrorHandler.handle(e)
+    registration_response = FIDO2RegistrationResponse(**registration_data)
+    return FIDO2RegistrationResponseModel(
+        success=True,
+        data=registration_response,
+        message="Registration details retrieved successfully",
+    )

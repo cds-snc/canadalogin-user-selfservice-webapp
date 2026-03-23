@@ -36,28 +36,23 @@ async def dispatch_get_cloud_directory_Id(
     Raises:
         HTTPException: Via RequestErrorHandler for any request failures
     """
-    try:
-        access_token = await get_admin_token(global_http_client)
-        headers = get_auth_request_headers(access_token, True)
-        cloud_directory_name = "Cloud Directory"
-        search_value = f'name="{cloud_directory_name}"'
-        encoded_search = quote(search_value, safe="")
+    access_token = await get_admin_token(global_http_client)
+    headers = get_auth_request_headers(access_token, True)
+    cloud_directory_name = "Cloud Directory"
+    search_value = f'name="{cloud_directory_name}"'
+    encoded_search = quote(search_value, safe="")
 
-        search_identity_source_endpoint = (
-            f"{verify_password_endpoint}?search={encoded_search}"
-        )
-        response = await global_http_client.get(
-            search_identity_source_endpoint, headers=headers
-        )
+    search_identity_source_endpoint = (
+        f"{verify_password_endpoint}?search={encoded_search}"
+    )
+    response = await global_http_client.get(
+        search_identity_source_endpoint, headers=headers
+    )
 
-        logger.info("Request returned")
-        response.raise_for_status()
-        logger.info("successfully retrieved dispatch_get_cloud_directory_Id")
-        return response
-
-    except Exception as e:
-        logger.error(f"Failed to get cloud directory id: {str(e)}", exc_info=True)
-        RequestErrorHandler.handle(e, context="Failed to get cloud directory id")
+    logger.info("Request returned")
+    response.raise_for_status()
+    logger.info("successfully retrieved dispatch_get_cloud_directory_Id")
+    return response
 
 
 async def get_cloud_directory_id(
@@ -78,33 +73,27 @@ async def get_cloud_directory_id(
     Raises:
         HTTPException: Via RequestErrorHandler for any request failures
     """
-    try:
+    response = await dispatch_get_cloud_directory_Id(
+        global_http_client, verify_password_endpoint
+    )
+    response_json = response.json()
+    data_validation = IBMIdentitySourceResponse(**response_json)
 
-        response = await dispatch_get_cloud_directory_Id(
-            global_http_client, verify_password_endpoint
+    if not data_validation.password or len(data_validation.password) == 0:
+        logger.error("Cloud Directory ID not found in IBM Verify response")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Bad Request"
         )
-        response_json = response.json()
-        data_validation = IBMIdentitySourceResponse(**response_json)
 
-        if not data_validation.password or len(data_validation.password) == 0:
-            logger.error("Cloud Directory ID not found in IBM Verify response")
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Bad Request"
-            )
+    cloud_directory_id = data_validation.password[0].id
 
-        cloud_directory_id = data_validation.password[0].id
+    if not cloud_directory_id:
+        logger.error("Cloud Directory ID not found in IBM Verify response")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Bad Request"
+        )
 
-        if not cloud_directory_id:
-            logger.error("Cloud Directory ID not found in IBM Verify response")
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Bad Request"
-            )
-
-        return cloud_directory_id
-
-    except Exception as e:
-        logger.error(f"Failed to get cloud directory id: {str(e)}", exc_info=True)
-        RequestErrorHandler.handle(e, context="Failed to get cloud directory id")
+    return cloud_directory_id
 
 
 async def dispatch_verify_password(
@@ -128,29 +117,24 @@ async def dispatch_verify_password(
     Raises:
         HTTPException: Via RequestErrorHandler for any request failures
     """
-    try:
-        logger.info("Verifying user with IBM Verify")
+    logger.info("Verifying user with IBM Verify")
 
-        access_token = await get_admin_token(http_client)
-        headers = get_auth_request_headers(access_token, True)
-        cloud_directory_id = await get_cloud_directory_id(
-            http_client, verify_password_endpoint
-        )
-        ibm_verify_password_api_endpoint = (
-            f"{verify_password_endpoint}/{cloud_directory_id}"
-        )
+    access_token = await get_admin_token(http_client)
+    headers = get_auth_request_headers(access_token, True)
+    cloud_directory_id = await get_cloud_directory_id(
+        http_client, verify_password_endpoint
+    )
+    ibm_verify_password_api_endpoint = (
+        f"{verify_password_endpoint}/{cloud_directory_id}"
+    )
 
-        response = await http_client.post(
-            ibm_verify_password_api_endpoint, json=payload, headers=headers
-        )
-        response.raise_for_status()
+    response = await http_client.post(
+        ibm_verify_password_api_endpoint, json=payload, headers=headers
+    )
+    response.raise_for_status()
 
-        logger.info("Verified successfully with IBM Verify")
-        return response
-
-    except Exception as e:
-        logger.error(f"Failed to verify with IBM Verify: {str(e)}", exc_info=True)
-        RequestErrorHandler.handle(e, context="User verification failed")
+    logger.info("Verified successfully with IBM Verify")
+    return response
 
 
 async def verify_user_password(
@@ -174,50 +158,43 @@ async def verify_user_password(
     Raises:
         HTTPException: For authentication or verification errors
     """
-    try:
-        logger.info("Starting verification for user")
+    logger.info("Starting verification for user")
 
-        http_client: AsyncClient = request.app.state.request_client
-        config = request.app.state.config
+    http_client: AsyncClient = request.app.state.request_client
+    config = request.app.state.config
 
-        # Retrieve unmasked username from the profile
-        user_info_from_profile = await dispatch_get_my_profile_from_ibm(
-            http_client, user_access_token
-        )
-        profile_username = user_info_from_profile.userName
+    # Retrieve unmasked username from the profile
+    user_info_from_profile = await dispatch_get_my_profile_from_ibm(
+        http_client, user_access_token
+    )
+    profile_username = user_info_from_profile.userName
 
-        # Prepare verification payload
-        verification_data = {
-            "username": profile_username,
-            "password": payload.password,
-        }
+    # Prepare verification payload
+    verification_data = {
+        "username": profile_username,
+        "password": payload.password,
+    }
 
-        # Verify password with IBM Verify
-        response = await dispatch_verify_password(
-            http_client=http_client,
-            verify_password_endpoint=config.verify_password_api_endpoint,
-            payload=verification_data,
-        )
+    # Verify password with IBM Verify
+    response = await dispatch_verify_password(
+        http_client=http_client,
+        verify_password_endpoint=config.verify_password_api_endpoint,
+        payload=verification_data,
+    )
 
-        response_json = response.json()
-        user_id = response_json.get("id")
+    response_json = response.json()
+    user_id = response_json.get("id")
 
-        if not user_id:
-            logger.error("IBM Verify response missing user ID")
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Bad Request"
-            )
-
-        logger.info(f"User verified successfully: {user_id}")
-
-        return ResponseModel(
-            success=True,
-            data=VerifiedUserPassword(id=user_id),
-            message="User verified successfully",
+    if not user_id:
+        logger.error("IBM Verify response missing user ID")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Bad Request"
         )
 
-    except Exception as e:
-        logger.error(
-            f"Unexpected error during user verification: {str(e)}", exc_info=True
-        )
-        RequestErrorHandler.handle(e, context="User verification failed")
+    logger.info(f"User verified successfully: {user_id}")
+
+    return ResponseModel(
+        success=True,
+        data=VerifiedUserPassword(id=user_id),
+        message="User verified successfully",
+    )

@@ -7,7 +7,7 @@ from app.main import app
 from fastapi.testclient import TestClient
 from fastapi import HTTPException, status
 
-client = TestClient(app)
+client = TestClient(app,raise_server_exceptions=False)
 
 
 @pytest.mark.asyncio
@@ -28,7 +28,7 @@ async def test_log_status_400(monkeypatch, caplog):
 
     client.get("/v1/users/rp_info")
 
-    record = caplog.records[0]
+    record = caplog.records[1]
     log_json = json.loads(record.message)
     assert log_json["level"] == "WARNING"
     assert log_json["context"]["response"]["status_code"] == 400
@@ -53,7 +53,7 @@ async def test_log_status_500(monkeypatch, caplog):
 
     client.get("/v1/users/rp_info")
 
-    record = caplog.records[0]
+    record = caplog.records[1]
     log_json = json.loads(record.message)
     assert log_json["level"] == "ERROR"
     assert log_json["context"]["response"]["status_code"] == 500
@@ -78,7 +78,7 @@ async def test_log_request_get(monkeypatch, caplog):
 
     client.get("/v1/users/rp_info")
 
-    record = caplog.records[0]
+    record = caplog.records[1]
     log_json = json.loads(record.message)
     assert log_json["context"]["request"]["method"] == "GET"
     assert log_json["context"]["request"]["path"] == "/v1/users/rp_info"
@@ -111,7 +111,7 @@ async def test_log_request_post(monkeypatch, caplog):
 
     client.post("/v1/users/profile", json=payload)
 
-    record = caplog.records[0]
+    record = caplog.records[1]
     log_json = json.loads(record.message)
     assert log_json["context"]["request"]["method"] == "POST"
     assert log_json["context"]["request"]["path"] == "/v1/users/profile"
@@ -136,7 +136,7 @@ async def test_log_request_query_string(monkeypatch, caplog):
 
     client.get("/v1/users/rp_info?test=data")
 
-    record = caplog.records[0]
+    record = caplog.records[1]
     log_json = json.loads(record.message)
     assert log_json["context"]["request"]["query_string"] == "test=data"
 
@@ -160,7 +160,7 @@ async def test_log_request_query_string_blacklist(monkeypatch, caplog):
 
     client.get("/v1/users/rp_info?test=data&secret=password")
 
-    record = caplog.records[0]
+    record = caplog.records[1]
     log_json = json.loads(record.message)
     assert (
         log_json["context"]["request"]["query_string"]
@@ -189,12 +189,12 @@ async def test_log_signed_in(monkeypatch, caplog):
         return {"sub": "12345678", "amr": ["password"]}
 
     monkeypatch.setattr(
-        "app.middleware.standardized_logging.get_user_info", mock_get_user_info
+        "app.utils.standardized_logging.get_user_info", mock_get_user_info
     )
 
     client.get("/v1/users/rp_info")
 
-    record = caplog.records[0]
+    record = caplog.records[1]
     log_json = json.loads(record.message)
     assert "user" in log_json["context"]
     assert (
@@ -216,13 +216,13 @@ async def test_log_signed_out(monkeypatch, caplog):
     def mock_500(*args, **kwargs):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Internal Server Erroer",
+            detail="Internal Server Error",
         )
 
     monkeypatch.setattr("app.users.v1_router.get_relying_party_info", mock_500)
 
     client.get("/v1/users/rp_info")
 
-    record = caplog.records[0]
+    record = caplog.records[1]
     log_json = json.loads(record.message)
     assert "user" not in log_json["context"]

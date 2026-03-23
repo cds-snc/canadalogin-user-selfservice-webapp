@@ -14,63 +14,49 @@ admin_token_ttl = 7170
 
 async def request_access_token(global_http_client: AsyncClient):
     """Request token from IBM Verify API"""
-    try:
-        settings = get_configuration().ibm_verify_config
+    settings = get_configuration().ibm_verify_config
 
-        token_url = f"{settings.IBM_VERIFY_TENANT_URL}/oauth2/token"
-        logger.info(f"Attempting to get access token from: {token_url}")
+    token_url = f"{settings.IBM_VERIFY_TENANT_URL}/oauth2/token"
+    logger.info(f"Attempting to get access token from: {token_url}")
 
-        data = {
-            "grant_type": "client_credentials",
-            "client_id": settings.IBM_VERIFY_PROFILE_MANAGEMENT_API_CLIENT_ID,
-            "client_secret": settings.IBM_VERIFY_PROFILE_MANAGEMENT_API_SECRET,
-            "scope": "openid",
-        }
-        logger.debug(f"Token URL: {token_url}")
+    data = {
+        "grant_type": "client_credentials",
+        "client_id": settings.IBM_VERIFY_PROFILE_MANAGEMENT_API_CLIENT_ID,
+        "client_secret": settings.IBM_VERIFY_PROFILE_MANAGEMENT_API_SECRET,
+        "scope": "openid",
+    }
+    logger.debug(f"Token URL: {token_url}")
 
-        response = await global_http_client.post(
-            token_url,
-            data=data,
-            headers={"Content-Type": "application/x-www-form-urlencoded"},
-        )
-        response.raise_for_status()
-        logger.info("Request returned successfully")
-        return response
-
-    except Exception as e:
-        logger.error(f"Error requesting token: {str(e)}", exc_info=True)
-        RequestErrorHandler.handle(e)
+    response = await global_http_client.post(
+        token_url,
+        data=data,
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+    )
+    response.raise_for_status()
+    logger.info("Request returned successfully")
+    return response
 
 
 async def get_admin_token(global_http_client: AsyncClient) -> str:
     """Get access token for IBM Verify API operations"""
-    try:
-        logger.info("Attempting to get access token")
+    logger.info("Attempting to get access token")
 
-        start_time = datetime.now()
-        response = await request_access_token(global_http_client)
-        duration = (datetime.now() - start_time).total_seconds()
-        logger.info(f"Token request completed in {duration:.2f} seconds")
-        response_json = response.json()
-        access_token = response_json.get("access_token")
-        if not access_token:
-            logger.error(
-                "Failed to get access token. Status=%s, Body=%s",
-                response.status_code,
-                response.text,
-            )
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="Server Error"
-            )
-        return access_token
-    except Exception as e:
-        if isinstance(e, HTTPException):
-            raise
-        logger.error("Unexpected error getting token", exc_info=True)
+    start_time = datetime.now()
+    response = await request_access_token(global_http_client)
+    duration = (datetime.now() - start_time).total_seconds()
+    logger.info(f"Token request completed in {duration:.2f} seconds")
+    response_json = response.json()
+    access_token = response_json.get("access_token")
+    if not access_token:
+        logger.error(
+            "Failed to get access token. Status=%s, Body=%s",
+            response.status_code,
+            response.text,
+        )
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Unexpected server error",
-        ) from e
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Server Error"
+        )
+    return access_token
 
 
 def get_auth_request_headers(

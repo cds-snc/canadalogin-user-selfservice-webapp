@@ -1,5 +1,5 @@
-from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.requests import Request
+from fastapi import Request
+from fastapi.responses import JSONResponse
 from urllib.parse import urlencode
 from app.auth.services.auth_user_session import get_user_info
 from authlib.integrations.starlette_client import OAuthError
@@ -11,6 +11,7 @@ import json
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARNING)
+
 PROJECT_NAME = "GCAuth"
 APPLICATION_NAME = "SelfService"
 QUERY_STRING_BLACKLIST = [
@@ -23,11 +24,8 @@ QUERY_STRING_BLACKLIST = [
 ]
 
 
-class StandardizedLoggingMiddleware(BaseHTTPMiddleware):
-    def __init__(self, app):
-        super().__init__(app)
-
-    def hash_blacklisted_params(self, query_params) -> str:
+class StandardizedLogging():
+    def _hash_blacklisted_params(self, query_params) -> str:
         """
         Takes a dictionary of parameters, hashes blacklisted values,
         and returns a clean query string.
@@ -43,18 +41,18 @@ class StandardizedLoggingMiddleware(BaseHTTPMiddleware):
 
         return urlencode(processed)
 
-    async def build_context(self, request, response):
+    async def _build_context(self, request, response):
         context = {
-            "user": await self.build_user(request),
-            "request": self.build_request(request),
-            "response": self.build_response(response),
-            "endpoint": self.build_endpoint(request),
+            "user": await self._build_user(request),
+            "request": self._build_request(request),
+            "response": self._build_response(response),
+            "endpoint": self._build_endpoint(request),
         }
 
         # Only include keys where the value is truthy
         return {k: v for k, v in context.items() if v}
 
-    async def build_user(self, request):
+    async def _build_user(self, request):
         try:
             user_info = await get_user_info(request)
             return {
@@ -66,17 +64,17 @@ class StandardizedLoggingMiddleware(BaseHTTPMiddleware):
         except OAuthError:
             return None
 
-    def build_request(self, request):
+    def _build_request(self, request):
         return {
             "method": request.method,
             "path": request.url.path,
-            "query_string": self.hash_blacklisted_params(request.query_params),
+            "query_string": self._hash_blacklisted_params(request.query_params),
         }
 
-    def build_response(self, response):
+    def _build_response(self, response):
         return {"status_code": response.status_code}
 
-    def build_endpoint(self, request):
+    def _build_endpoint(self, request):
         endpoint = request.scope.get("endpoint")
         if endpoint:
             return {
@@ -87,15 +85,8 @@ class StandardizedLoggingMiddleware(BaseHTTPMiddleware):
             }
         return None
 
-    async def dispatch(self, request: Request, call_next):
-        try:
-            response = await call_next(request)
-        except Exception as exc:
-            # Log unhandled exceptions (500 errors)
-            logger.error(f"Unhandled exception: {exc} | Path: {request.url.path}")
-            raise
-
-        context = await self.build_context(request, response)
+    async def log(self, request: Request, response: JSONResponse):
+        context = await self._build_context(request, response)
         # Get response status
         log_level = logging.INFO
         level = "INFO"

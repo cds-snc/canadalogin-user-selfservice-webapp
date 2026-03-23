@@ -51,46 +51,41 @@ async def get_attestation_options(
         },
     }
 
-    try:
-        tenant_url = get_tenant_url()
-        rp_id = get_rp_id()
+    tenant_url = get_tenant_url()
+    rp_id = get_rp_id()
 
-        # Get admin token for RP operations
-        admin_token = await get_admin_token(http_client)
-        rp_uuid = await get_rp_uuid_from_rp_id(http_client, admin_token, rp_id)
+    # Get admin token for RP operations
+    admin_token = await get_admin_token(http_client)
+    rp_uuid = await get_rp_uuid_from_rp_id(http_client, admin_token, rp_id)
 
-        # Get user profile information
-        username, display_name, user_id = await get_user_profile_info(
-            http_client, user_access_token
-        )
+    # Get user profile information
+    username, display_name, user_id = await get_user_profile_info(
+        http_client, user_access_token
+    )
 
-        # Prepare request body with user info
-        body_to_send = request_body.copy() if request_body else {}
-        body_to_send["displayName"] = display_name
-        body_to_send["userId"] = user_id
+    # Prepare request body with user info
+    body_to_send = request_body.copy() if request_body else {}
+    body_to_send["displayName"] = display_name
+    body_to_send["userId"] = user_id
 
-        logger.info(
-            f"Attestation options - username: {username}, displayName: {display_name}"
-        )
+    logger.info(
+        f"Attestation options - username: {username}, displayName: {display_name}"
+    )
 
-        # Make the request
-        url = f"{tenant_url}{VerifyAPIEndpoint.FIDO2_RP_BASE.value}/{rp_uuid}/attestation/options"
-        headers = get_auth_request_headers(user_access_token, json_content_type=True)
+    # Make the request
+    url = f"{tenant_url}{VerifyAPIEndpoint.FIDO2_RP_BASE.value}/{rp_uuid}/attestation/options"
+    headers = get_auth_request_headers(user_access_token, json_content_type=True)
 
-        response = await http_client.post(url, headers=headers, json=body_to_send)
-        logger.info(response)
-        response.raise_for_status()
+    response = await http_client.post(url, headers=headers, json=body_to_send)
+    logger.info(response)
+    response.raise_for_status()
 
-        response_data = response.json()
-        return ResponseModel(
-            success=True,
-            data=response_data,
-            message="Attestation options retrieved successfully",
-        )
-
-    except Exception as e:
-        logger.error(f"Error getting attestation options: {str(e)}", exc_info=True)
-        RequestErrorHandler.handle(e)
+    response_data = response.json()
+    return ResponseModel(
+        success=True,
+        data=response_data,
+        message="Attestation options retrieved successfully",
+    )
 
 
 async def submit_attestation_result(
@@ -101,34 +96,29 @@ async def submit_attestation_result(
     """
     Submit FIDO2 attestation result to complete passkey registration.
     """
-    try:
-        tenant_url = get_tenant_url()
-        rp_id = get_rp_id()
+    tenant_url = get_tenant_url()
+    rp_id = get_rp_id()
 
-        # Get admin token for RP operations
-        admin_token = await get_admin_token(http_client)
-        rp_uuid = await get_rp_uuid_from_rp_id(http_client, admin_token, rp_id)
+    # Get admin token for RP operations
+    admin_token = await get_admin_token(http_client)
+    rp_uuid = await get_rp_uuid_from_rp_id(http_client, admin_token, rp_id)
 
-        # Prepare request body
-        body_to_send = request_body.copy() if request_body else {}
-        body_to_send = _prepare_attestation_result_body(body_to_send)
+    # Prepare request body
+    body_to_send = request_body.copy() if request_body else {}
+    body_to_send = _prepare_attestation_result_body(body_to_send)
 
-        # Make the request
-        url = f"{tenant_url}{VerifyAPIEndpoint.FIDO2_RP_BASE.value}/{rp_uuid}/attestation/result"
-        headers = get_auth_request_headers(user_access_token, json_content_type=True)
+    # Make the request
+    url = f"{tenant_url}{VerifyAPIEndpoint.FIDO2_RP_BASE.value}/{rp_uuid}/attestation/result"
+    headers = get_auth_request_headers(user_access_token, json_content_type=True)
 
-        response = await http_client.post(url, headers=headers, json=body_to_send)
-        response.raise_for_status()
+    response = await http_client.post(url, headers=headers, json=body_to_send)
+    response.raise_for_status()
 
-        response_data = response.json()
-        logger.info("Attestation result submitted successfully")
+    response_data = response.json()
+    logger.info("Attestation result submitted successfully")
 
-        return ResponseModel(
-            success=True,
-            data=response_data,
-            message="FIDO2 registration completed successfully",
-        )
-
-    except Exception as e:
-        logger.error(f"Error submitting attestation result: {str(e)}", exc_info=True)
-        RequestErrorHandler.handle(e)
+    return ResponseModel(
+        success=True,
+        data=response_data,
+        message="FIDO2 registration completed successfully",
+    )

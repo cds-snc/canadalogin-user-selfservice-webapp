@@ -1,6 +1,4 @@
 import logging
-from fastapi import HTTPException, status
-from pydantic import ValidationError
 from httpx import AsyncClient
 
 
@@ -10,7 +8,6 @@ from app.users.schemas import (
 )
 from app.utils.access_token import get_auth_request_headers
 from app.utils.mask_user_profile import mask_profile_details
-from app.utils.request_error_handler import RequestErrorHandler
 from app.config import get_configuration
 
 logger = logging.getLogger(__name__)
@@ -33,24 +30,21 @@ async def dispatch_get_my_profile_from_ibm(
     Raises:
         HTTPException: Via RequestErrorHandler for any request failures
     """
-    try:
-        logger.info("Get my profile")
-        settings = get_configuration()
-        profile_api_endpoint = settings.profile_api_endpoint
-        logger.info("Fetching user profile from IBM Verify")
-        response = await global_http_client.get(
-            profile_api_endpoint,
-            headers=get_auth_request_headers(user_access_token),
-        )
-        response.raise_for_status()
-        logger.info("User profile fetched successfully from IBM Verify")
+    logger.info("Get my profile")
+    settings = get_configuration()
+    profile_api_endpoint = settings.profile_api_endpoint
+    logger.info("Fetching user profile from IBM Verify")
+    response = await global_http_client.get(
+        profile_api_endpoint,
+        headers=get_auth_request_headers(user_access_token),
+    )
+    response.raise_for_status()
 
-        json_data = response.json()
+    logger.info("User profile fetched successfully from IBM Verify")
 
-        return IBMVerifyUserProfileSchema(**json_data)
-    except Exception as e:
-        logger.error(f"Error fetching profile from IBM Verify: {str(e)}", exc_info=True)
-        RequestErrorHandler.handle(e)
+    json_data = response.json()
+
+    return IBMVerifyUserProfileSchema(**json_data)
 
 
 async def get_my_profile(
@@ -79,14 +73,8 @@ async def get_my_profile(
     profile_data = profile_response.model_dump()
     masked_profile_data = mask_profile_details(profile_data)
 
-    try:
-        response_data = IBMVerifyUserProfileSchema(**masked_profile_data)
-    except ValidationError as e:
-        logger.error(f"Profile Validation Error: {e.json()}")
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-            detail="Request data validation error",
-        )
+    response_data = IBMVerifyUserProfileSchema(**masked_profile_data)
+
     return ProfileResponse(
         success=True,
         message="User profile retrieved successfully.",

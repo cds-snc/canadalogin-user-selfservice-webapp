@@ -158,26 +158,6 @@ async def test_get_http_client_returns_client():
 
 
 @pytest.mark.asyncio
-async def test_introspect_user_token_handles_http_exception_and_other_errors():
-    mock_http_client = AsyncMock()
-    # simulate HTTP exception raised by post
-    mock_http_client.post = AsyncMock(side_effect=HTTPException(status_code=500))
-
-    with pytest.raises(HTTPException):
-        await auth_user_session.introspect_user_token(mock_http_client, "token")
-
-    # simulate non-HTTP exception -> RequestErrorHandler.handle should be invoked and HTTPException raised
-    mock_http_client.post = AsyncMock(side_effect=ValueError("boom"))
-    with patch(
-        "app.auth.services.auth_user_session.RequestErrorHandler.handle",
-        new=MagicMock(),
-    ) as mock_handler:
-        with pytest.raises(HTTPException):
-            await auth_user_session.introspect_user_token(mock_http_client, "token2")
-        assert mock_handler.called
-
-
-@pytest.mark.asyncio
 async def test_get_users_current_session_inactive_clears_and_raises():
     mock_request = MagicMock()
     mock_request.query_params = {}
@@ -226,17 +206,6 @@ async def test_ensure_user_token_errors_and_token_wrappers():
         assert iid == "id"
         rt = await auth_user_session.get_user_refresh_token(MagicMock())
         assert rt == "rt"
-
-
-@pytest.mark.asyncio
-async def test_refresh_token_raises_on_error():
-    mock_oauth = MagicMock()
-    mock_oauth.verify = MagicMock(
-        fetch_access_token=AsyncMock(side_effect=Exception("boom"))
-    )
-    with patch("app.auth.services.auth_user_session.oauth", new=mock_oauth):
-        with pytest.raises(OAuthError):
-            await auth_user_session.refresh_user_token("r1")
 
 
 @pytest.mark.asyncio

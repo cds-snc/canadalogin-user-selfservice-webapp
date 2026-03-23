@@ -123,31 +123,6 @@ async def test_get_user_otp_factors_mocked(monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_get_user_otp_factors_invalid_schema(monkeypatch):
-    async def mock_dispatch_user_auth_factors(
-        client, user_access_token, validated=True
-    ):
-        # Missing required fields for Factor → will cause ValidationError
-        return {
-            "factors": [{"invalid": "data"}],
-            "count": 1,
-            "limit": 10,
-            "page": 1,
-            "total": 1,
-        }
-
-    monkeypatch.setattr(
-        "app.users.services.otp_factors.dispatch_user_auth_factors",
-        mock_dispatch_user_auth_factors,
-    )
-
-    async with AsyncClient(base_url="http://localhost") as client:
-        with pytest.raises(HTTPException) as exc_info:
-            await get_user_otp_factors(client, "fake-access-token")
-        assert exc_info.value.status_code == 422
-
-
-@pytest.mark.asyncio
 async def test_get_user_otp_factors_no_otp_factors(monkeypatch):
 
     async def mock_dispatch_user_auth_factors(

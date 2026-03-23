@@ -257,54 +257,6 @@ async def test_handle_success_returns_data_and_message(otp_type):
 
 
 @pytest.mark.asyncio
-async def test_handle_non_201_returns_error_model():
-    def handler(request: Request) -> Response:
-        return Response(400, json={"error": "Bad Request"})
-
-    transport = build_transport(handler)
-
-    async with AsyncClient(transport=transport) as client:
-        info = UserOtpInfo(
-            otpType=OtpType.EMAIL,
-            user_id="user@example.com",
-            destination="user@example.com",
-        )
-        # Now expects HTTPException with status code 400
-        with pytest.raises(HTTPException) as exc_info:
-            await handle_otp_send(client, info, user_access_token="USER_TOKEN")
-
-        assert exc_info.value.status_code == 400
-        assert "Bad request" in str(exc_info.value.detail)
-
-
-@pytest.mark.asyncio
-async def test_handle_validation_error_due_to_incomplete_payload():
-    """
-    Return 201 but missing required fields to trigger ValidationError -> HTTPException 422
-    """
-    incomplete = {
-        "trxnId": "only-id"
-    }  # missing many required fields of OtpDataResponse
-
-    def handler(request: Request) -> Response:
-        return Response(201, json=incomplete)
-
-    transport = build_transport(handler)
-    async with AsyncClient(transport=transport) as client:
-        info = UserOtpInfo(
-            otpType=OtpType.SMS,
-            user_id="user@example.com",
-            destination="+14165551234",  # ✅ E.164
-        )
-        # Now expects HTTPException with status code 422 for validation errors
-        with pytest.raises(HTTPException) as exc_info:
-            await handle_otp_send(client, info, user_access_token="USER_TOKEN")
-
-        assert exc_info.value.status_code == 422
-        assert "Validation Error" in str(exc_info.value.detail)
-
-
-@pytest.mark.asyncio
 async def test_handle_user_mismatch_returns_403(monkeypatch):
     """
     Test that user mismatch validation (which happens at route level)
@@ -334,30 +286,6 @@ async def test_handle_user_mismatch_returns_403(monkeypatch):
 
     assert exc_info.value.status_code == 403
     assert "User mismatch" in str(exc_info.value.detail)
-
-
-@pytest.mark.asyncio
-async def test_handle_transport_exception_is_captured_in_message():
-    """
-    Simulate network failure inside transport; handle_otp_send catches and raises HTTPException 500.
-    """
-
-    def handler(request: Request) -> Response:
-        raise RuntimeError("simulated network failure")
-
-    transport = build_transport(handler)
-    async with AsyncClient(transport=transport) as client:
-        info = UserOtpInfo(
-            otpType=OtpType.SMS,
-            user_id="user@example.com",
-            destination="+14165551234",  # ✅ E.164
-        )
-        # Now expects HTTPException with status code 500 for transport errors
-        with pytest.raises(HTTPException) as exc_info:
-            await handle_otp_send(client, info, user_access_token="USER_TOKEN")
-
-        assert exc_info.value.status_code == 500
-        assert "Dispatch sms OTP" in str(exc_info.value.detail)
 
 
 @pytest.mark.asyncio

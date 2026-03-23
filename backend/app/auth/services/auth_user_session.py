@@ -13,7 +13,6 @@ from authlib.integrations.starlette_client import OAuthError
 from app.config import get_configuration
 from app.constants.session_keys import SessionKeys
 from app.utils.access_token import get_admin_token, get_auth_request_headers
-from app.utils.request_error_handler import RequestErrorHandler
 from app.auth.services.oidc_config import oauth
 from app.auth.schemas import SSEventData, KeepAliveData
 from app.utils.schemas import ResponseModel
@@ -31,32 +30,25 @@ async def get_http_client(request: Request) -> AsyncClient:
 async def introspect_user_token(
     global_http_client: AsyncClient, user_access_token: str
 ):
+    admin_access_token = await get_admin_token(global_http_client)
+    headers = get_auth_request_headers(admin_access_token, True)
+    headers["Content-Type"] = "application/x-www-form-urlencoded"
+    settings = get_configuration()
 
-    try:
-        admin_access_token = await get_admin_token(global_http_client)
-        headers = get_auth_request_headers(admin_access_token, True)
-        headers["Content-Type"] = "application/x-www-form-urlencoded"
-        settings = get_configuration()
+    form_data = {
+        "token": user_access_token,
+        "client_id": settings.ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_API_CLIENT_ID,
+        "client_secret": settings.ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_API_SECRET,
+    }
 
-        form_data = {
-            "token": user_access_token,
-            "client_id": settings.ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_API_CLIENT_ID,
-            "client_secret": settings.ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_API_SECRET,
-        }
+    introspect_token_api_endpoint = settings.introspect_token_api_endpoint
+    response = await global_http_client.post(
+        introspect_token_api_endpoint, data=form_data, headers=headers
+    )
 
-        introspect_token_api_endpoint = settings.introspect_token_api_endpoint
-        response = await global_http_client.post(
-            introspect_token_api_endpoint, data=form_data, headers=headers
-        )
-
-        response.raise_for_status()
-        response_json = response.json()
-        return response_json
-    except Exception as e:
-        logger.error(f"Error introspect_user_token: {str(e)}", exc_info=True)
-        if isinstance(e, HTTPException):
-            raise
-        RequestErrorHandler.handle(e, context="introspect_user_token")
+    response.raise_for_status()
+    response_json = response.json()
+    return response_json
 
 
 def set_rp_client_id_in_session(request: Request) -> None:
@@ -145,14 +137,10 @@ async def get_user_refresh_token(request: Request):
 
 
 async def refresh_user_token(refresh_token: str):
-    try:
-        new_tokens = await oauth.verify.fetch_access_token(
-            refresh_token=refresh_token, grant_type="refresh_token"
-        )
-        return new_tokens
-    except Exception as e:
-        logger.error(f"Error refreshing ID token: {str(e)}", exc_info=True)
-        raise OAuthError("get new token has failed")
+    new_tokens = await oauth.verify.fetch_access_token(
+        refresh_token=refresh_token, grant_type="refresh_token"
+    )
+    return new_tokens
 
 
 def update_session_tokens(request: Request, new_tokens: dict):

@@ -22,33 +22,28 @@ async def handle_verify_mfa_otp(
     otp_type: OtpType,
 ):
     """Verify MFA OTP for SMS or Voice"""
-    try:
-        # Verify user profile
-        my_profile_response = await get_my_profile(
-            global_http_client, user_access_token
+    # Verify user profile
+    my_profile_response = await get_my_profile(
+        global_http_client, user_access_token
+    )
+    if not my_profile_response.success:
+        logger.error(
+            f"Failed to get user profile for {otp_type} verification attempt"
         )
-        if not my_profile_response.success:
-            logger.error(
-                f"Failed to get user profile for {otp_type} verification attempt"
-            )
-            return ResponseModel(
-                success=False, data=None, message="User verification failed"
-            )
-
-        await dispatch_verify_mfa_otp(
-            global_http_client, attempt_request, otp_type, user_access_token
-        )
-
-        # IBM Verify API returns 204 No Content on successful verification attempt
         return ResponseModel(
-            success=True,
-            data=None,
-            message=f"{otp_type.value} MFA OTP verification completed successfully",
+            success=False, data=None, message="User verification failed"
         )
 
-    except Exception as e:
-        logger.error(f"{otp_type} MFA OTP verification attempt error: {str(e)}")
-        RequestErrorHandler.handle(e, f"{otp_type} MFA OTP verification attempt")
+    await dispatch_verify_mfa_otp(
+        global_http_client, attempt_request, otp_type, user_access_token
+    )
+
+    # IBM Verify API returns 204 No Content on successful verification attempt
+    return ResponseModel(
+        success=True,
+        data=None,
+        message=f"{otp_type.value} MFA OTP verification completed successfully",
+    )
 
 
 async def dispatch_verify_mfa_otp(
@@ -58,35 +53,20 @@ async def dispatch_verify_mfa_otp(
     user_access_token: str,
 ):
     """Dispatch MFA OTP verification attempt to IBM Verify"""
-    try:
-        headers = get_auth_request_headers(user_access_token, True)
-        settings = get_configuration().ibm_verify_config
+    headers = get_auth_request_headers(user_access_token, True)
+    settings = get_configuration().ibm_verify_config
 
-        attempt_data = {"otp": attempt_request.otp}
+    attempt_data = {"otp": attempt_request.otp}
 
-        if otp_type == OtpType.SMS:
-            verification_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/smsotp/{attempt_request.id}/verifications/{attempt_request.trxnId}"
-        elif otp_type == OtpType.VOICE:
-            verification_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/voiceotp/{attempt_request.id}/verifications/{attempt_request.trxnId}"
-        else:
-            raise ValueError(f"Unsupported OTP type: {otp_type}")
+    if otp_type == OtpType.SMS:
+        verification_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/smsotp/{attempt_request.id}/verifications/{attempt_request.trxnId}"
+    elif otp_type == OtpType.VOICE:
+        verification_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/voiceotp/{attempt_request.id}/verifications/{attempt_request.trxnId}"
+    else:
+        raise ValueError(f"Unsupported OTP type: {otp_type}")
 
-        response = await global_http_client.post(
-            verification_url, json=attempt_data, headers=headers
-        )
-        response.raise_for_status()
-        return response
-
-    except HTTPStatusError as e:
-        logger.error(f"HTTP error during {otp_type} MFA OTP verification attempt: {e}")
-        return RequestErrorHandler.handle(e)
-    except Exception as e:
-        logger.error(
-            f"{otp_type} MFA OTP verification attempt dispatch error: {str(e)}",
-            exc_info=True,
-        )
-        # Don't expose server errors to client
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Unable to verify MFA code",
-        )
+    response = await global_http_client.post(
+        verification_url, json=attempt_data, headers=headers
+    )
+    response.raise_for_status()
+    return response
