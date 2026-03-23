@@ -60,10 +60,12 @@ export default function EditEmailAddressPage() {
     setErrorCode,
     () => {
       trackStepChange(
-        userPhoneFactors && userPhoneFactors.length === 1 ? "otpValidation" : "otpSelection",
-        "verify_password"
+        userPhoneFactors && userPhoneFactors.length === 1
+          ? "otpValidation"
+          : "otpSelection",
+        "verify_password",
       );
-      
+
       if (userPhoneFactors && userPhoneFactors.length === 1) {
         setWizardStep("otpValidation");
       } else {
@@ -128,12 +130,12 @@ export default function EditEmailAddressPage() {
 
     try {
       trackStepAttempt("sign_out_initiated", "logout");
-      
+
       const response = await trackApiCall(
         "logout",
         "POST",
         () => authService.logout(),
-        "logout"
+        "logout",
       );
 
       const redirectUrl =
@@ -196,7 +198,10 @@ export default function EditEmailAddressPage() {
 
       if (!userOtpValue || !otpSentResponse?.trxnId) {
         setErrorCode("OTP_VERIFICATION_REQUIRED");
-        trackStepError("email_update_failed: OTP_VERIFICATION_REQUIRED", "update_email");
+        trackStepError(
+          "email_update_failed: OTP_VERIFICATION_REQUIRED",
+          "update_email",
+        );
         return;
       }
 
@@ -212,7 +217,7 @@ export default function EditEmailAddressPage() {
           );
           return result;
         },
-        "update_email"
+        "update_email",
       );
 
       if (response && response.success && response.data) {
@@ -224,7 +229,10 @@ export default function EditEmailAddressPage() {
         trackStepChange("emailUpdateSuccess", "update_email");
       } else {
         setErrorCode("FAILED_TO_UPDATE_EMAIL");
-        trackStepError("email_update_failed: FAILED_TO_UPDATE_EMAIL", "update_email");
+        trackStepError(
+          "email_update_failed: FAILED_TO_UPDATE_EMAIL",
+          "update_email",
+        );
       }
     } catch (error) {
       console.error("Error updating email address with OTP:", error);
@@ -283,9 +291,10 @@ export default function EditEmailAddressPage() {
           });
         }}
         onBack={() => {
-          const prevStep = userPhoneFactors && userPhoneFactors.length === 1 
-            ? "passwordVerification" 
-            : "otpSelection";
+          const prevStep =
+            userPhoneFactors && userPhoneFactors.length === 1
+              ? "passwordVerification"
+              : "otpSelection";
           trackStepChange(prevStep, "back");
           setWizardStep(prevStep);
         }}
@@ -311,13 +320,16 @@ export default function EditEmailAddressPage() {
       <EmailOtpValidation
         onSubmit={() => {
           trackStepAttempt("email_otp_validation_initiated", "email_otp");
-          
+
           if (userOtpValue && userOtpValue.trim()) {
             setWizardStep("emailConfirmUpdate");
             trackStepChange("emailConfirmUpdate", "email_otp");
           } else {
             setErrorCode("OTP_REQUIRED");
-            trackStepError("email_otp_validation_failed: OTP_REQUIRED", "email_otp");
+            trackStepError(
+              "email_otp_validation_failed: OTP_REQUIRED",
+              "email_otp",
+            );
           }
         }}
         onCancel={handleBackToProfile}

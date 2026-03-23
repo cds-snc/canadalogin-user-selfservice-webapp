@@ -1,13 +1,13 @@
 import ReactGA from "react-ga4";
 
 import { GA_CATEGORIES, GA4_EVENTS } from "./constants";
-import type { 
-  AnalyticsPayload, 
-  GA4EventParams, 
-  CardClickParams, 
+import type {
+  AnalyticsPayload,
+  GA4EventParams,
+  CardClickParams,
   NavigationParams,
   FormStepTrackingParams,
-  FormApiCallParams
+  FormApiCallParams,
 } from "../types/utils";
 
 export function trackPage(path: string, page?: string) {
@@ -29,14 +29,21 @@ export function trackNavigation(params: NavigationParams) {
   trackGA4Event(GA4_EVENTS.NAVIGATION, params);
 }
 
-export function trackButtonClick(buttonName: string, additionalParams?: GA4EventParams) {
+export function trackButtonClick(
+  buttonName: string,
+  additionalParams?: GA4EventParams,
+) {
   trackGA4Event(GA4_EVENTS.BUTTON_CLICK, {
     button_name: buttonName,
     ...additionalParams,
   });
 }
 
-export function trackLinkClick(linkText: string, destination: string, additionalParams?: GA4EventParams) {
+export function trackLinkClick(
+  linkText: string,
+  destination: string,
+  additionalParams?: GA4EventParams,
+) {
   trackGA4Event(GA4_EVENTS.LINK_CLICK, {
     link_text: linkText,
     destination,
@@ -44,7 +51,10 @@ export function trackLinkClick(linkText: string, destination: string, additional
   });
 }
 
-export function trackFormSubmit(formName: string, additionalParams?: GA4EventParams) {
+export function trackFormSubmit(
+  formName: string,
+  additionalParams?: GA4EventParams,
+) {
   trackGA4Event(GA4_EVENTS.FORM_SUBMIT, {
     form_name: formName,
     ...additionalParams,

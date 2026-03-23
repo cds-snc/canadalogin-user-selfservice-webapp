@@ -45,13 +45,13 @@ export default function ConfirmUpdate({
     if (setErrorCode) {
       setErrorCode("");
     }
-    
+
     trackButtonClick("confirm_phone_update", {
       form_id: "contact_phone_number_update",
       step: "confirmUpdate",
       phone_number: phoneFormData.formattedPhoneNumber,
     });
-    
+
     void onNext();
   };
 
@@ -108,12 +108,12 @@ export default function ConfirmUpdate({
             disabled={localLoading}
             onGcdsClick={(event: Event) => {
               event.preventDefault();
-              
+
               trackButtonClick("cancel_phone_confirmation", {
                 form_id: "contact_phone_number_update",
                 step: "confirmUpdate",
               });
-              
+
               void onCancel();
             }}
           >

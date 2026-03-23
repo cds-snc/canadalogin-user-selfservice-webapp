@@ -14,7 +14,11 @@ interface UseFormTrackingOptions {
   initialStep: string;
 }
 
-export function useFormTracking({ formId, page, initialStep }: UseFormTrackingOptions) {
+export function useFormTracking({
+  formId,
+  page,
+  initialStep,
+}: UseFormTrackingOptions) {
   const stepStartTime = useRef(Date.now());
   const currentStep = useRef(initialStep);
   const attempts = useRef(0);
@@ -55,13 +59,13 @@ export function useFormTracking({ formId, page, initialStep }: UseFormTrackingOp
         attempts: 0,
       });
     },
-    [formId, page]
+    [formId, page],
   );
 
   const trackStepAttempt = useCallback(
     (eventLabel: string, postAction?: string) => {
       attempts.current += 1;
-      
+
       trackFormStepStart({
         form_id: formId,
         page,
@@ -71,7 +75,7 @@ export function useFormTracking({ formId, page, initialStep }: UseFormTrackingOp
         attempts: attempts.current,
       });
     },
-    [formId, page]
+    [formId, page],
   );
 
   const trackStepError = useCallback(
@@ -86,15 +90,15 @@ export function useFormTracking({ formId, page, initialStep }: UseFormTrackingOp
         attempts: attempts.current,
       });
     },
-    [formId, page]
+    [formId, page],
   );
 
   const trackApiCall = useCallback(
-    async <T,>(
+    async <T>(
       apiId: string,
       apiType: string,
       apiCall: () => Promise<T>,
-      postAction?: string
+      postAction?: string,
     ): Promise<T> => {
       const apiStartTime = Date.now();
 
@@ -133,13 +137,14 @@ export function useFormTracking({ formId, page, initialStep }: UseFormTrackingOp
           duration: Date.now() - apiStartTime,
           status: "error",
           error_id: apiId,
-          error_message: error instanceof Error ? error.message : "Unknown error",
+          error_message:
+            error instanceof Error ? error.message : "Unknown error",
         });
 
         throw error;
       }
     },
-    [formId, page]
+    [formId, page],
   );
 
   return {

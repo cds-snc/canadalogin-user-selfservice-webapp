@@ -149,7 +149,7 @@ export default function EditLanguagePreferencePage() {
           });
           return result as AuthServiceResponse<UserProfile>;
         },
-        "update_language"
+        "update_language",
       );
 
       if (response?.data) {

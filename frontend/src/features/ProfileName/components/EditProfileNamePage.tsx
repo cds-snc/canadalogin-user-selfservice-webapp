@@ -107,7 +107,7 @@ export default function EditProfileNamePage() {
       familyName,
       formatted,
     }));
-    
+
     setWizardStep("confirmUpdate");
     trackStepChange("confirmUpdate", "verify");
   };
@@ -129,7 +129,7 @@ export default function EditProfileNamePage() {
           });
           return result as AuthServiceResponse<UserProfile>;
         },
-        "update"
+        "update",
       );
 
       if (response?.data) {

@@ -150,13 +150,13 @@ function RadioButtons({
       onGcdsChange={(event: Event) => {
         const target = event.target as HTMLInputElement;
         const selectedType = target.value as ContactPhoneOtpType;
-        
+
         // Track OTP type selection
         trackButtonClick(`otp_type_${selectedType}`, {
           form_id: "contact_phone_number_update",
           selection_type: selectedType,
         });
-        
+
         onChangePhoneForm("otpType", selectedType);
         setErrorCode?.("");
       }}

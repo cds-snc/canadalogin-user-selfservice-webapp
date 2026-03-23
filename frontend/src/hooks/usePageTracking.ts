@@ -9,7 +9,7 @@ export const usePageTracking = () => {
   useEffect(() => {
     const page = location.pathname + location.search;
     ReactGA.send({ hitType: "pageview   ", page });
-    
+
     if (config.environment === "dev") {
       console.log("GA Pageview:", page);
     }

@@ -74,8 +74,10 @@ export default function DeleteMFAPage() {
     setErrorCode,
     () => {
       trackStepChange(
-        userPhoneFactors && userPhoneFactors.length === 1 ? "otpValidation" : "otpSelection",
-        "verify_password"
+        userPhoneFactors && userPhoneFactors.length === 1
+          ? "otpValidation"
+          : "otpSelection",
+        "verify_password",
       );
 
       if (userPhoneFactors && userPhoneFactors.length === 1) {
@@ -153,7 +155,7 @@ export default function DeleteMFAPage() {
             ),
           );
         },
-        "delete_mfa"
+        "delete_mfa",
       );
 
       setErrorCode("");
@@ -169,9 +171,7 @@ export default function DeleteMFAPage() {
       setErrorCode(errorMsg);
       trackStepError(`mfa_delete_failed: ${errorMsg}`, "delete_mfa");
 
-      if (
-        (INVALID_OTP_ERROR_CODES as readonly string[]).includes(errorMsg)
-      ) {
+      if ((INVALID_OTP_ERROR_CODES as readonly string[]).includes(errorMsg)) {
         setWizardStep("otpValidation");
         trackStepChange("otpValidation", "back");
       }
@@ -256,14 +256,18 @@ export default function DeleteMFAPage() {
         userOtpValue={userOtpValue}
         setUserOtpValue={handleSetUserOtpValue}
         requestOtpCode={() => {
-          trackStepAttempt("user_phone_otp_request_initiated", "user_phone_otp");
+          trackStepAttempt(
+            "user_phone_otp_request_initiated",
+            "user_phone_otp",
+          );
           return requestOtpCode();
         }}
         validateOtpCode={validateOtpCode}
         onBack={() => {
-          const prevStep = userPhoneFactors && userPhoneFactors.length === 1
-            ? "passwordVerification"
-            : "otpSelection";
+          const prevStep =
+            userPhoneFactors && userPhoneFactors.length === 1
+              ? "passwordVerification"
+              : "otpSelection";
           trackStepChange(prevStep, "back");
           setWizardStep(prevStep);
         }}

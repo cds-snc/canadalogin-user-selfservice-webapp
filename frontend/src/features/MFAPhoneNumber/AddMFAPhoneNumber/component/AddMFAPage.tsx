@@ -87,8 +87,10 @@ export default function AddMFAPage() {
     setErrorCode,
     () => {
       trackStepChange(
-        userPhoneFactors && userPhoneFactors.length === 1 ? "otpValidation" : "otpSelection",
-        "verify_password"
+        userPhoneFactors && userPhoneFactors.length === 1
+          ? "otpValidation"
+          : "otpSelection",
+        "verify_password",
       );
 
       if (userPhoneFactors && userPhoneFactors.length === 1) {
@@ -157,7 +159,7 @@ export default function AddMFAPage() {
         "mfa_enroll",
         "POST",
         () => addMFAPhoneNumberApi.enrollMFA(payload),
-        "enroll_mfa"
+        "enroll_mfa",
       );
 
       const responseData = response as {
@@ -206,7 +208,7 @@ export default function AddMFAPage() {
         "mfa_send_otp",
         "POST",
         () => addMFAPhoneNumberApi.sendMFAOTP(payload),
-        "mfa_otp"
+        "mfa_otp",
       );
 
       const responseData = response as {
@@ -226,7 +228,7 @@ export default function AddMFAPage() {
         setErrorCode(err.data.message);
         trackStepError(
           `${reSendOtpCode ? "mfa_otp_resend_failed" : "mfa_otp_request_failed"}: ${err.data.message}`,
-          "mfa_otp"
+          "mfa_otp",
         );
       }
     } finally {
@@ -250,7 +252,7 @@ export default function AddMFAPage() {
         "mfa_verify_otp",
         "POST",
         () => addMFAPhoneNumberApi.verifyMFAOTP(payload),
-        "mfa_otp"
+        "mfa_otp",
       );
 
       const responseData = response as {
@@ -284,7 +286,10 @@ export default function AddMFAPage() {
       const err = error as { data?: { message?: string } };
       if (err && err.data && err.data.message) {
         setErrorCode(err.data.message);
-        trackStepError(`mfa_otp_validation_failed: ${err.data.message}`, "mfa_otp");
+        trackStepError(
+          `mfa_otp_validation_failed: ${err.data.message}`,
+          "mfa_otp",
+        );
       }
     }
   };
@@ -308,7 +313,7 @@ export default function AddMFAPage() {
         "mfa_delete",
         "DELETE",
         () => deleteMFAPhoneNumberApi.deleteMFA(payload),
-        "delete_mfa"
+        "delete_mfa",
       );
     } catch (error) {
       const err = error as { data?: { message?: string } };
@@ -340,7 +345,7 @@ export default function AddMFAPage() {
         "transient_otp_send",
         "POST",
         () => authService.transientOtpSend(userData),
-        "user_phone_otp"
+        "user_phone_otp",
       );
 
       if (response && response.success) {
@@ -351,7 +356,10 @@ export default function AddMFAPage() {
       const error = err as { data?: { message?: string } };
       if (error && error.data && error.data.message) {
         setErrorCode(error.data.message);
-        trackStepError(`user_phone_otp_request_failed: ${error.data.message}`, "user_phone_otp");
+        trackStepError(
+          `user_phone_otp_request_failed: ${error.data.message}`,
+          "user_phone_otp",
+        );
       }
     } finally {
       didFetch.current = false;
@@ -374,7 +382,7 @@ export default function AddMFAPage() {
         "transient_otp_verify",
         "POST",
         () => authService.transientOtpVerify(userData),
-        "user_phone_otp"
+        "user_phone_otp",
       );
 
       if (response && response.success) {
@@ -393,7 +401,10 @@ export default function AddMFAPage() {
         error.response.data.message
       ) {
         setErrorCode(error.response.data.message);
-        trackStepError(`user_phone_otp_validation_failed: ${error.response.data.message}`, "user_phone_otp");
+        trackStepError(
+          `user_phone_otp_validation_failed: ${error.response.data.message}`,
+          "user_phone_otp",
+        );
       }
     }
   };
@@ -494,9 +505,10 @@ export default function AddMFAPage() {
         requestOtpCode={requestOtpCode}
         validateOtpCode={validateOtpCode}
         onBack={() => {
-          const prevStep = userPhoneFactors && userPhoneFactors.length === 1
-            ? "passwordVerification"
-            : "otpSelection";
+          const prevStep =
+            userPhoneFactors && userPhoneFactors.length === 1
+              ? "passwordVerification"
+              : "otpSelection";
           trackStepChange(prevStep, "back");
           setWizardStep(prevStep);
         }}

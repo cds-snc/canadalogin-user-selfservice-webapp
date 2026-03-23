@@ -80,8 +80,10 @@ export default function ChangePasswordIndex() {
     setErrorCode,
     () => {
       trackStepChange(
-        userPhoneFactors && userPhoneFactors.length === 1 ? "otpValidation" : "otpSelection",
-        "verify_password"
+        userPhoneFactors && userPhoneFactors.length === 1
+          ? "otpValidation"
+          : "otpSelection",
+        "verify_password",
       );
 
       if (userPhoneFactors && userPhoneFactors.length === 1) {
@@ -123,7 +125,7 @@ export default function ChangePasswordIndex() {
         "password_update_first_step",
         "POST",
         () => passwordUpdate.firstStep(userName, userSelectedMfaFactor),
-        "password_otp"
+        "password_otp",
       );
 
       if (response?.success && response.data) {
@@ -134,7 +136,10 @@ export default function ChangePasswordIndex() {
       const message = getApiErrorMessage(err);
       if (message) {
         setErrorCode(message);
-        trackStepError(`password_otp_request_failed: ${message}`, "password_otp");
+        trackStepError(
+          `password_otp_request_failed: ${message}`,
+          "password_otp",
+        );
       }
     }
   };
@@ -153,7 +158,7 @@ export default function ChangePasswordIndex() {
         "password_update_second_step",
         "POST",
         () => passwordUpdate.secondStep(userOtp, otpSentResponse.trxId),
-        "password_otp"
+        "password_otp",
       );
 
       if (response?.success) {
@@ -165,7 +170,10 @@ export default function ChangePasswordIndex() {
       const message = getApiErrorMessage(err);
       if (message) {
         setErrorCode(message);
-        trackStepError(`password_otp_validation_failed: ${message}`, "password_otp");
+        trackStepError(
+          `password_otp_validation_failed: ${message}`,
+          "password_otp",
+        );
       }
     } finally {
       setLocalLoading(false);
@@ -181,7 +189,7 @@ export default function ChangePasswordIndex() {
         "logout",
         "POST",
         () => authService.logout(),
-        "logout"
+        "logout",
       );
 
       const redirectUrl = response?.data?.redirect_url || null;
@@ -234,9 +242,10 @@ export default function ChangePasswordIndex() {
         requestOtpCode={requestOtpCode}
         validateOtpCode={validateOtpCode}
         onBack={() => {
-          const prevStep = userPhoneFactors.length === 1 
-            ? "passwordVerification" 
-            : "otpSelection";
+          const prevStep =
+            userPhoneFactors.length === 1
+              ? "passwordVerification"
+              : "otpSelection";
           trackStepChange(prevStep, "back");
           setPasswordUpdateStep(prevStep);
         }}

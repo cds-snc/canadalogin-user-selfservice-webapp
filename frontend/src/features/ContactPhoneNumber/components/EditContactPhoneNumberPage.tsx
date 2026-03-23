@@ -128,7 +128,7 @@ export default function EditContactPhoneNumberPage() {
           });
           return result as AuthServiceResponse<ContactPhoneTransactionData>;
         },
-        "phone_otp"
+        "phone_otp",
       );
 
       if (response?.data?.trxnId) {
@@ -144,7 +144,7 @@ export default function EditContactPhoneNumberPage() {
         setErrorCode(message);
         trackStepError(
           `${reSendOtpCode ? "phone_otp_resend_failed" : "phone_otp_request_failed"}: ${message}`,
-          "phone_otp"
+          "phone_otp",
         );
       }
     } finally {
@@ -176,7 +176,7 @@ export default function EditContactPhoneNumberPage() {
           );
           return result as AuthServiceResponse<UserProfile>;
         },
-        "update_phone"
+        "update_phone",
       );
 
       if (response?.success && response.data) {
