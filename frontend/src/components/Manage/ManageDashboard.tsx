@@ -12,6 +12,7 @@ import { PAGES } from "../../utils/constants";
 import { getPageContent } from "../../utils/functions";
 import { path } from "../../utils/routeHelpers";
 import { useUser } from "../Providers/useUser";
+import { trackCardClick } from "../../utils/gatag";
 
 type GcdsNavigationEvent = CustomEvent<string> & {
   preventDefault: () => void;
@@ -34,6 +35,30 @@ export default function ManageDashboard() {
     language,
   });
 
+  const handlePersonalInfoClick = (event: GcdsNavigationEvent) => {
+    event.preventDefault();
+
+    trackCardClick({
+      card_name: "Personal Information",
+      card_type: "navigation",
+      destination: personalInformationLink,
+    });
+
+    navigateHelper(event.detail);
+  };
+
+  const handleSecuritySettingsClick = (event: GcdsNavigationEvent) => {
+    event.preventDefault();
+
+    trackCardClick({
+      card_name: "Security Settings",
+      card_type: "navigation",
+      destination: securitySettingsLink,
+    });
+
+    navigateHelper(event.detail);
+  };
+
   return (
     <GcdsContainer role="main">
       {hasErrors() && (
@@ -53,10 +78,7 @@ export default function ManageDashboard() {
           cardTitle={pageContent["2"]}
           cardTitleTag="h3"
           href={personalInformationLink}
-          onGcdsClick={(event: GcdsNavigationEvent) => {
-            event.preventDefault();
-            navigateHelper(event.detail);
-          }}
+          onGcdsClick={handlePersonalInfoClick}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -91,10 +113,7 @@ export default function ManageDashboard() {
           cardTitle={pageContent["3"]}
           cardTitleTag="h3"
           href={securitySettingsLink}
-          onGcdsClick={(event: GcdsNavigationEvent) => {
-            event.preventDefault();
-            navigateHelper(event.detail);
-          }}
+          onGcdsClick={handleSecuritySettingsClick}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

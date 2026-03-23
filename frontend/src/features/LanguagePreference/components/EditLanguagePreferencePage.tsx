@@ -11,6 +11,7 @@ import { PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import { authService } from "../../../services/authService";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch";
+import { useFormTracking } from "../../../hooks/useFormTracking";
 import StepContent from "../../../components/Wizard/StepContent";
 import Loader from "../../../components/Layout/Loading";
 import ConfirmUpdate from "./ConfirmUpdate";
@@ -76,6 +77,13 @@ export default function EditLanguagePreferencePage() {
       languageCode: routeLanguage,
     });
 
+  const { trackStepChange, trackStepAttempt, trackStepError, trackApiCall } =
+    useFormTracking({
+      formId: "language_preference_update",
+      page: "edit_language",
+      initialStep: wizardStep,
+    });
+
   const loaderPageContentJson =
     (getPageContent(routeLanguage, PAGES.otpSelection) as
       | LanguagePreferencePageContent
@@ -103,6 +111,8 @@ export default function EditLanguagePreferencePage() {
   }, [locationState]);
 
   const handleLanguageFormChange = (updatedPreferredLanguage: string) => {
+    trackStepAttempt("language_selection_initiated", "select_language");
+
     const languageCode = convertLanguageToLanguageCode(
       updatedPreferredLanguage,
     ) as LanguagePreferenceFormData["languageCode"];
@@ -114,7 +124,10 @@ export default function EditLanguagePreferencePage() {
   };
 
   const handleSubmitLanguageForm = () => {
+    trackStepAttempt("language_form_submit_initiated", "select_language");
+
     setWizardStep("confirmUpdate");
+    trackStepChange("confirmUpdate", "select_language");
     navigate(`/${routeLanguage}/profile/update-language/confirm-update`, {
       replace: true,
     });
@@ -124,15 +137,25 @@ export default function EditLanguagePreferencePage() {
     try {
       setLocalLoading(true);
       setErrorCode("");
+      trackStepAttempt("language_update_submit_initiated", "update_language");
 
-      const response = (await authService.update_my_user_profile({
-        preferredLanguage: languageFormData.updatedPreferredLanguage,
-        user_id: state.userProfile?.id,
-      })) as AuthServiceResponse<UserProfile> | undefined;
+      const response = await trackApiCall(
+        "update_my_user_profile",
+        "PATCH",
+        async () => {
+          const result = await authService.update_my_user_profile({
+            preferredLanguage: languageFormData.updatedPreferredLanguage,
+            user_id: state.userProfile?.id,
+          });
+          return result as AuthServiceResponse<UserProfile>;
+        },
+        "update_language"
+      );
 
       if (response?.data) {
         updateProfileSuccess(response.data);
         setWizardStep("success");
+        trackStepChange("success", "update_language");
 
         const successLanguageCode = convertLanguageToLanguageCode(
           response.data.preferredLanguage || routeLanguage,
@@ -145,6 +168,7 @@ export default function EditLanguagePreferencePage() {
       const message = getApiErrorMessage(error);
       if (message) {
         setErrorCode(message);
+        trackStepError(`language_update_failed: ${message}`, "update_language");
       }
     } finally {
       setLocalLoading(false);

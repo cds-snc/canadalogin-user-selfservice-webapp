@@ -14,6 +14,7 @@ import { useOtpOperations } from "../../hooks/useOtpOperations";
 import { useUser } from "../../components/Providers/useUser";
 import { authService } from "../../services/authService";
 import { userProfileDispatch } from "../../utils/userProfileDispatch";
+import { useFormTracking } from "../../hooks/useFormTracking";
 import EditEmailEnterEmail from "./EditEmailEnterEmail";
 import EmailOtpValidation from "./EmailOtpValidation";
 import EmailUpdateSuccess from "./EmailUpdateSuccess";
@@ -46,11 +47,23 @@ export default function EditEmailAddressPage() {
   });
   const pageContentJson = getPageContent(language, PAGES.otpSelection) ?? {};
 
+  // Initialize form tracking
+  const { trackStepChange, trackStepAttempt, trackStepError, trackApiCall } =
+    useFormTracking({
+      formId: "email_address_update",
+      page: "edit_email",
+      initialStep: wizardStep,
+    });
+
   // Use the password validation hook
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(
     setErrorCode,
     () => {
-      // If there's only one MFA factor, skip OTP selection and go directly to validation
+      trackStepChange(
+        userPhoneFactors && userPhoneFactors.length === 1 ? "otpValidation" : "otpSelection",
+        "verify_password"
+      );
+      
       if (userPhoneFactors && userPhoneFactors.length === 1) {
         setWizardStep("otpValidation");
       } else {
@@ -58,6 +71,12 @@ export default function EditEmailAddressPage() {
       }
     },
   );
+
+  // Create tracked password validation wrapper
+  const handleValidatePassword = async (password: string) => {
+    trackStepAttempt("password_verification_initiated", "verify_password");
+    await validatePassword(password);
+  };
 
   const handleFormChange = (ev: CustomEvent<string>) => {
     const target = ev.target as HTMLInputElement | null;
@@ -99,6 +118,7 @@ export default function EditEmailAddressPage() {
   };
 
   const handleBackToEnterEmail = async () => {
+    trackStepChange("enterEmail", "back");
     setWizardStep("enterEmail");
   };
 
@@ -107,99 +127,111 @@ export default function EditEmailAddressPage() {
     setLocalLoading(true);
 
     try {
-      const response = await authService.logout();
+      trackStepAttempt("sign_out_initiated", "logout");
+      
+      const response = await trackApiCall(
+        "logout",
+        "POST",
+        () => authService.logout(),
+        "logout"
+      );
+
       const redirectUrl =
         (response as { data?: { redirect_url?: string } })?.data
           ?.redirect_url ?? null;
 
-      // Check if response has redirect_url
       if (redirectUrl) {
-        // form been submitted in authService.logout
         return;
       } else {
-        // Fallback redirect if no redirect_url provided
         window.location.href = "/";
       }
     } catch (error) {
       console.error("Logout failed:", error);
-      // Update loading text to show error
+      trackStepError("sign_out_failed", "logout");
       setLocalLoading(true);
-      // Redirect after error
       setTimeout(() => {
         window.location.href = "/";
       }, 2000);
     }
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleEnterEmailSubmit = async (_emailAddress?: string) => {
-    // Validate email address before proceeding to OTP validation
+    trackStepAttempt("email_entry_submit_initiated", "enter_email");
+
     if (!formData.emailAddress || !formData.emailAddress.trim()) {
       setErrorCode("EMAIL_REQUIRED");
+      trackStepError("email_validation_failed: EMAIL_REQUIRED", "enter_email");
       return;
     }
 
-    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.emailAddress)) {
       setErrorCode("INVALID_EMAIL");
+      trackStepError("email_validation_failed: INVALID_EMAIL", "enter_email");
       return;
     }
 
-    // Clear any previous errors and proceed to OTP validation
     setErrorCode("");
     setWizardStep("emailOtpValidation");
+    trackStepChange("emailOtpValidation", "enter_email");
   };
 
   const handleEmailChangeWithOtp = async () => {
     try {
       setErrorCode("");
+      trackStepAttempt("email_update_submit_initiated", "update_email");
 
       if (!formData.emailAddress || !formData.emailAddress.trim()) {
         setErrorCode("EMAIL_REQUIRED");
+        trackStepError("email_update_failed: EMAIL_REQUIRED", "update_email");
         return;
       }
 
-      // Validate email format
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(formData.emailAddress)) {
         setErrorCode("INVALID_EMAIL");
+        trackStepError("email_update_failed: INVALID_EMAIL", "update_email");
         return;
       }
 
-      // Ensure we have OTP data from the previous validation
       if (!userOtpValue || !otpSentResponse?.trxnId) {
         setErrorCode("OTP_VERIFICATION_REQUIRED");
+        trackStepError("email_update_failed: OTP_VERIFICATION_REQUIRED", "update_email");
         return;
       }
 
-      // Call the backend API to update email address
-      const response = await authService.update_email_with_otp(
-        formData.emailAddress,
-        userOtpValue,
-        otpSentResponse.trxnId,
-        FLOW_TYPES.email,
+      const response = await trackApiCall(
+        "update_email_with_otp",
+        "PATCH",
+        async () => {
+          const result = await authService.update_email_with_otp(
+            formData.emailAddress,
+            userOtpValue,
+            otpSentResponse.trxnId,
+            FLOW_TYPES.email,
+          );
+          return result;
+        },
+        "update_email"
       );
 
       if (response && response.success && response.data) {
-        // Update the user profile in context
         updateProfileSuccess(
           response.data as Parameters<typeof updateProfileSuccess>[0],
         );
 
-        // Navigate to success step
         setWizardStep("emailUpdateSuccess");
+        trackStepChange("emailUpdateSuccess", "update_email");
       } else {
         setErrorCode("FAILED_TO_UPDATE_EMAIL");
+        trackStepError("email_update_failed: FAILED_TO_UPDATE_EMAIL", "update_email");
       }
     } catch (error) {
       console.error("Error updating email address with OTP:", error);
       const apiError = error as CaughtError;
-      if (apiError?.data?.message) {
-        setErrorCode(apiError.data.message);
-      } else {
-        setErrorCode("FAILED_TO_UPDATE_EMAIL");
-      }
+      const errorMsg = apiError?.data?.message || "FAILED_TO_UPDATE_EMAIL";
+      setErrorCode(errorMsg);
+      trackStepError(`email_update_failed: ${errorMsg}`, "update_email");
     }
   };
 
@@ -211,7 +243,7 @@ export default function EditEmailAddressPage() {
         userPasswordValue={userPasswordValue}
         setUserPasswordValue={setUserPasswordValue}
         onCancel={handleBackToProfile}
-        validatePassword={validatePassword}
+        validatePassword={handleValidatePassword}
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
         parentPage={PAGES.addMFAPage}
@@ -222,6 +254,7 @@ export default function EditEmailAddressPage() {
         userPhoneFactors={userPhoneFactors}
         onChangeUserSelectedMfaFactor={handleChangeUserMfaSelection}
         onNext={() => {
+          trackStepChange("otpValidation", "phone_selection");
           setWizardStep("otpValidation");
         }}
         parentPage={PAGES.addMFAPage}
@@ -234,22 +267,27 @@ export default function EditEmailAddressPage() {
         userSelectedMfaFactor={userSelectedMfaFactor!}
         userOtpValue={userOtpValue}
         setUserOtpValue={handleSetUserOtpValue}
-        requestOtpCode={requestOtpCode}
-        validateOtpCode={() =>
-          validateOtpCode(userOtpValue, (response) => {
+        requestOtpCode={() => {
+          trackStepAttempt("phone_otp_request_initiated", "phone_otp");
+          return requestOtpCode();
+        }}
+        validateOtpCode={() => {
+          trackStepAttempt("phone_otp_validation_initiated", "phone_otp");
+          return validateOtpCode(userOtpValue, (response) => {
             if ((response as { success?: boolean })?.success) {
               setWizardStep("enterEmail");
+              trackStepChange("enterEmail", "phone_otp");
+            } else {
+              trackStepError("phone_otp_validation_failed", "phone_otp");
             }
-          })
-        }
+          });
+        }}
         onBack={() => {
-          // If there's only one MFA factor, go back to password verification
-          // Otherwise, go back to OTP selection
-          if (userPhoneFactors && userPhoneFactors.length === 1) {
-            setWizardStep("passwordVerification");
-          } else {
-            setWizardStep("otpSelection");
-          }
+          const prevStep = userPhoneFactors && userPhoneFactors.length === 1 
+            ? "passwordVerification" 
+            : "otpSelection";
+          trackStepChange(prevStep, "back");
+          setWizardStep(prevStep);
         }}
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
@@ -272,12 +310,14 @@ export default function EditEmailAddressPage() {
     emailOtpValidation: (
       <EmailOtpValidation
         onSubmit={() => {
-          // Skip separate OTP validation - go directly to confirmation
-          // OTP will be validated atomically with the email update
+          trackStepAttempt("email_otp_validation_initiated", "email_otp");
+          
           if (userOtpValue && userOtpValue.trim()) {
             setWizardStep("emailConfirmUpdate");
+            trackStepChange("emailConfirmUpdate", "email_otp");
           } else {
             setErrorCode("OTP_REQUIRED");
+            trackStepError("email_otp_validation_failed: OTP_REQUIRED", "email_otp");
           }
         }}
         onCancel={handleBackToProfile}
@@ -286,12 +326,13 @@ export default function EditEmailAddressPage() {
         errorMessage={errorMessage}
         userOtpValue={userOtpValue}
         handleChange={handleSetUserOtpValue}
-        requestOtpCode={() =>
-          requestOtpCode({
+        requestOtpCode={() => {
+          trackStepAttempt("email_otp_request_initiated", "email_otp");
+          return requestOtpCode({
             otpType: FLOW_TYPES.email,
             destination: formData.emailAddress,
-          })
-        }
+          });
+        }}
         onBack={handleBackToEnterEmail}
       />
     ),
@@ -310,6 +351,7 @@ export default function EditEmailAddressPage() {
       />
     ),
   };
+
   return localLoading || validatePasswordLoading ? (
     <Loader text={pageContentJson["11"]} />
   ) : (

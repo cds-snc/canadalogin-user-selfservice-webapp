@@ -12,6 +12,7 @@ import {
 import { path } from "../../../utils/routeHelpers";
 import { authService } from "../../../services/authService";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch";
+import { useFormTracking } from "../../../hooks/useFormTracking";
 import StepContent from "../../../components/Wizard/StepContent";
 import Loader from "../../../components/Layout/Loading";
 import EnterPhoneNumber from "./EnterPhoneNumber";
@@ -67,6 +68,14 @@ export default function EditContactPhoneNumberPage() {
   const [phoneFormData, setPhoneFormData] =
     useState<ContactPhoneFormData>(initialPhoneFormData);
 
+  // Initialize form tracking
+  const { trackStepChange, trackStepAttempt, trackStepError, trackApiCall } =
+    useFormTracking({
+      formId: "contact_phone_number_update",
+      page: "edit_phone",
+      initialStep: wizardStep,
+    });
+
   const loaderPageContentJson =
     (getPageContent(language, PAGES.otpSelection) as
       | ContactPhonePageContent
@@ -101,25 +110,42 @@ export default function EditContactPhoneNumberPage() {
     try {
       if (!reSendOtpCode) {
         setLocalLoading(true);
+        trackStepAttempt("phone_number_entry_initiated", "enter_phone");
+      } else {
+        trackStepAttempt("phone_otp_resend_initiated", "phone_otp");
       }
+
       setErrorCode("");
 
-      const response = (await authService.transientOtpSend({
-        destination: phoneFormData.phoneNumber,
-        user_id: id,
-        otpType: serverMapping[otpType ?? phoneFormData.otpType],
-      })) as AuthServiceResponse<ContactPhoneTransactionData> | undefined;
+      const response = await trackApiCall(
+        "transient_otp_send",
+        "POST",
+        async () => {
+          const result = await authService.transientOtpSend({
+            destination: phoneFormData.phoneNumber,
+            user_id: id,
+            otpType: serverMapping[otpType ?? phoneFormData.otpType],
+          });
+          return result as AuthServiceResponse<ContactPhoneTransactionData>;
+        },
+        "phone_otp"
+      );
 
       if (response?.data?.trxnId) {
         handlePhoneFormChange("trxnId", response.data.trxnId);
         if (!reSendOtpCode) {
           setWizardStep("verifyOtp");
+          trackStepChange("verifyOtp", "enter_phone");
         }
       }
     } catch (error) {
       const message = getApiErrorMessage(error);
       if (message) {
         setErrorCode(message);
+        trackStepError(
+          `${reSendOtpCode ? "phone_otp_resend_failed" : "phone_otp_request_failed"}: ${message}`,
+          "phone_otp"
+        );
       }
     } finally {
       setLocalLoading(false);
@@ -127,29 +153,43 @@ export default function EditContactPhoneNumberPage() {
   };
 
   const verifyOtp = async () => {
+    trackStepAttempt("phone_otp_validation_initiated", "phone_otp");
     setWizardStep("confirmUpdate");
+    trackStepChange("confirmUpdate", "phone_otp");
   };
 
   const updateProfile = async () => {
     try {
       setLocalLoading(true);
       setErrorCode("");
+      trackStepAttempt("phone_update_submit_initiated", "update_phone");
 
-      const response = (await authService.update_phone_with_otp(
-        phoneFormData.phoneNumber,
-        phoneFormData.otp,
-        phoneFormData.trxnId,
-        serverMapping[phoneFormData.otpType],
-      )) as AuthServiceResponse<UserProfile> | undefined;
+      const response = await trackApiCall(
+        "update_phone_with_otp",
+        "PATCH",
+        async () => {
+          const result = await authService.update_phone_with_otp(
+            phoneFormData.phoneNumber,
+            phoneFormData.otp,
+            phoneFormData.trxnId,
+            serverMapping[phoneFormData.otpType],
+          );
+          return result as AuthServiceResponse<UserProfile>;
+        },
+        "update_phone"
+      );
 
       if (response?.success && response.data) {
         updateProfileSuccess(response.data);
         setWizardStep("success");
+        trackStepChange("success", "update_phone");
       }
     } catch (error) {
       const message = getApiErrorMessage(error);
       if (message) {
         setErrorCode(message);
+        trackStepError(`phone_update_failed: ${message}`, "update_phone");
+
         if (
           INVALID_OTP_ERROR_CODES.includes(
             message as (typeof INVALID_OTP_ERROR_CODES)[number],
@@ -157,6 +197,7 @@ export default function EditContactPhoneNumberPage() {
         ) {
           console.log("OTP validation failed during phone update:", message);
           setWizardStep("verifyOtp");
+          trackStepChange("verifyOtp", "back");
         }
       }
     } finally {
@@ -170,6 +211,7 @@ export default function EditContactPhoneNumberPage() {
 
   const handleBackToEnterPhone = () => {
     setErrorCode("");
+    trackStepChange("enterPhone", "back");
     setWizardStep("enterPhone");
     navigate(`/${language}/profile/update-contact-phone`, { replace: true });
   };

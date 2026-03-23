@@ -22,6 +22,7 @@ import {
   MAP_TYPES,
   useOtpOperations,
 } from "../../../../hooks/useOtpOperations";
+import { useFormTracking } from "../../../../hooks/useFormTracking";
 import { OtpSentData } from "../../../../types/hooks";
 
 interface PhoneFormData {
@@ -53,6 +54,14 @@ export default function AddMFAPage() {
   const [wizardStep, setWizardStep] = useState<WizardStep>(
     "passwordVerification",
   );
+
+  const { trackStepChange, trackStepAttempt, trackStepError, trackApiCall } =
+    useFormTracking({
+      formId: "add_mfa_phone_number",
+      page: "manage_app_add_mfa",
+      initialStep: wizardStep,
+    });
+
   const { userProfile } = state;
   const [phoneFormData, setPhoneFormData] = useState<PhoneFormData>({
     phoneNumber: "",
@@ -77,7 +86,11 @@ export default function AddMFAPage() {
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(
     setErrorCode,
     () => {
-      // If there's only one MFA factor, skip OTP selection and go directly to validation
+      trackStepChange(
+        userPhoneFactors && userPhoneFactors.length === 1 ? "otpValidation" : "otpSelection",
+        "verify_password"
+      );
+
       if (userPhoneFactors && userPhoneFactors.length === 1) {
         setWizardStep("otpValidation");
       } else {
@@ -85,6 +98,12 @@ export default function AddMFAPage() {
       }
     },
   );
+
+  // Create tracked password validation wrapper
+  const handleValidatePassword = async (password: string) => {
+    trackStepAttempt("password_verification_initiated", "verify_password");
+    await validatePassword(password);
+  };
 
   // Use the OTP operations hook
   const {
@@ -123,6 +142,8 @@ export default function AddMFAPage() {
   }: { phoneNumber?: string; otpType?: string } = {}) => {
     setLocalLoading(true);
     setErrorCode("");
+    trackStepAttempt("mfa_enroll_initiated", "enroll_mfa");
+
     try {
       const payload = {
         destination: phoneNumber ?? phoneFormData.phoneNumber,
@@ -132,7 +153,13 @@ export default function AddMFAPage() {
           ],
       };
 
-      const response = await addMFAPhoneNumberApi.enrollMFA(payload);
+      const response = await trackApiCall(
+        "mfa_enroll",
+        "POST",
+        () => addMFAPhoneNumberApi.enrollMFA(payload),
+        "enroll_mfa"
+      );
+
       const responseData = response as {
         data?: { id?: string };
         [key: string]: unknown;
@@ -146,6 +173,7 @@ export default function AddMFAPage() {
       const err = error as { data?: { message?: string } };
       if (err && err.data && err.data.message) {
         setErrorCode(err.data.message);
+        trackStepError(`mfa_enroll_failed: ${err.data.message}`, "enroll_mfa");
       }
     } finally {
       setLocalLoading(false);
@@ -159,6 +187,9 @@ export default function AddMFAPage() {
   }: { reSendOtpCode?: boolean; mfaId?: string; otpType?: string } = {}) => {
     if (!reSendOtpCode) {
       setLocalLoading(true);
+      trackStepAttempt("mfa_otp_request_initiated", "mfa_otp");
+    } else {
+      trackStepAttempt("mfa_otp_resend_initiated", "mfa_otp");
     }
     setErrorCode("");
 
@@ -171,7 +202,13 @@ export default function AddMFAPage() {
           ],
       };
 
-      const response = await addMFAPhoneNumberApi.sendMFAOTP(payload);
+      const response = await trackApiCall(
+        "mfa_send_otp",
+        "POST",
+        () => addMFAPhoneNumberApi.sendMFAOTP(payload),
+        "mfa_otp"
+      );
+
       const responseData = response as {
         data?: { id?: string };
         [key: string]: unknown;
@@ -180,12 +217,17 @@ export default function AddMFAPage() {
         handlePhoneForm("trxnId", responseData.data.id);
         if (!reSendOtpCode) {
           setWizardStep("addMFAValidation");
+          trackStepChange("addMFAValidation", "enroll_mfa");
         }
       }
     } catch (error) {
       const err = error as { data?: { message?: string } };
       if (err && err.data && err.data.message) {
         setErrorCode(err.data.message);
+        trackStepError(
+          `${reSendOtpCode ? "mfa_otp_resend_failed" : "mfa_otp_request_failed"}: ${err.data.message}`,
+          "mfa_otp"
+        );
       }
     } finally {
       setLocalLoading(false);
@@ -193,6 +235,8 @@ export default function AddMFAPage() {
   };
 
   const verifyMFAOtp = async () => {
+    trackStepAttempt("mfa_otp_validation_initiated", "mfa_otp");
+
     try {
       const payload = {
         id: phoneFormData.mfaId,
@@ -202,7 +246,13 @@ export default function AddMFAPage() {
           serverMapping[phoneFormData.otpType as keyof typeof serverMapping],
       };
 
-      const response = await addMFAPhoneNumberApi.verifyMFAOTP(payload);
+      const response = await trackApiCall(
+        "mfa_verify_otp",
+        "POST",
+        () => addMFAPhoneNumberApi.verifyMFAOTP(payload),
+        "mfa_otp"
+      );
+
       const responseData = response as {
         success?: boolean;
         [key: string]: unknown;
@@ -226,6 +276,7 @@ export default function AddMFAPage() {
           });
         } else {
           setWizardStep("addSecondMFA");
+          trackStepChange("addSecondMFA", "mfa_otp");
         }
         setErrorCode("");
       }
@@ -233,6 +284,7 @@ export default function AddMFAPage() {
       const err = error as { data?: { message?: string } };
       if (err && err.data && err.data.message) {
         setErrorCode(err.data.message);
+        trackStepError(`mfa_otp_validation_failed: ${err.data.message}`, "mfa_otp");
       }
     }
   };
@@ -242,6 +294,8 @@ export default function AddMFAPage() {
     otpType,
   }: { id?: string; otpType?: string } = {}) => {
     setLocalLoading(true);
+    trackStepAttempt("mfa_delete_initiated", "delete_mfa");
+
     try {
       const payload = {
         id: id ?? phoneFormData.mfaId,
@@ -250,11 +304,17 @@ export default function AddMFAPage() {
           : serverMapping[phoneFormData.otpType as keyof typeof serverMapping],
       };
 
-      await deleteMFAPhoneNumberApi.deleteMFA(payload);
+      await trackApiCall(
+        "mfa_delete",
+        "DELETE",
+        () => deleteMFAPhoneNumberApi.deleteMFA(payload),
+        "delete_mfa"
+      );
     } catch (error) {
       const err = error as { data?: { message?: string } };
       if (err && err.data && err.data.message) {
         setErrorCode(err.data.message);
+        trackStepError(`mfa_delete_failed: ${err.data.message}`, "delete_mfa");
         setErrorCode("");
       }
     } finally {
@@ -265,6 +325,8 @@ export default function AddMFAPage() {
   const didFetch = useRef(false);
 
   const requestOtpCode = async () => {
+    trackStepAttempt("user_phone_otp_request_initiated", "user_phone_otp");
+
     const userData = {
       user_id: userProfile!.id,
       factor_id: userSelectedMfaFactor!.id,
@@ -274,7 +336,13 @@ export default function AddMFAPage() {
         ],
     };
     try {
-      const response = await authService.transientOtpSend(userData);
+      const response = await trackApiCall(
+        "transient_otp_send",
+        "POST",
+        () => authService.transientOtpSend(userData),
+        "user_phone_otp"
+      );
+
       if (response && response.success) {
         setOtpSentResponse(response.data as OtpSentData);
         setErrorCode("");
@@ -283,6 +351,7 @@ export default function AddMFAPage() {
       const error = err as { data?: { message?: string } };
       if (error && error.data && error.data.message) {
         setErrorCode(error.data.message);
+        trackStepError(`user_phone_otp_request_failed: ${error.data.message}`, "user_phone_otp");
       }
     } finally {
       didFetch.current = false;
@@ -290,6 +359,8 @@ export default function AddMFAPage() {
   };
 
   const validateOtpCode = async (userOtpValue: string) => {
+    trackStepAttempt("user_phone_otp_validation_initiated", "user_phone_otp");
+
     const userData = {
       otp: userOtpValue,
       trxnId: otpSentResponse?.trxnId ?? "",
@@ -299,9 +370,16 @@ export default function AddMFAPage() {
         ],
     };
     try {
-      const response = await authService.transientOtpVerify(userData);
+      const response = await trackApiCall(
+        "transient_otp_verify",
+        "POST",
+        () => authService.transientOtpVerify(userData),
+        "user_phone_otp"
+      );
+
       if (response && response.success) {
         setWizardStep("addMFANumber");
+        trackStepChange("addMFANumber", "user_phone_otp");
         setErrorCode("");
       }
     } catch (err) {
@@ -315,6 +393,7 @@ export default function AddMFAPage() {
         error.response.data.message
       ) {
         setErrorCode(error.response.data.message);
+        trackStepError(`user_phone_otp_validation_failed: ${error.response.data.message}`, "user_phone_otp");
       }
     }
   };
@@ -356,6 +435,8 @@ export default function AddMFAPage() {
   };
 
   async function handleSetupAlternateMFAMethod() {
+    trackStepAttempt("setup_alternate_mfa_initiated", "setup_alternate_mfa");
+
     const secondMFAOtpType =
       phoneFormData.otpType === FLOW_TYPES.voice
         ? FLOW_TYPES.sms
@@ -386,7 +467,7 @@ export default function AddMFAPage() {
         userPasswordValue={userPasswordValue}
         setUserPasswordValue={setUserPasswordValue}
         onCancel={async () => navigate(backToManage2FAVerificationsPage)}
-        validatePassword={validatePassword}
+        validatePassword={handleValidatePassword}
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
         parentPage={PAGES.addMFAPage}
@@ -397,6 +478,7 @@ export default function AddMFAPage() {
         userPhoneFactors={userPhoneFactors}
         onChangeUserSelectedMfaFactor={handleChangeUserMfaSelection}
         onNext={() => {
+          trackStepChange("otpValidation", "phone_selection");
           setWizardStep("otpValidation");
         }}
         parentPage={PAGES.addMFAPage}
@@ -412,13 +494,11 @@ export default function AddMFAPage() {
         requestOtpCode={requestOtpCode}
         validateOtpCode={validateOtpCode}
         onBack={() => {
-          // If there's only one MFA factor, go back to password verification
-          // Otherwise, go back to OTP selection
-          if (userPhoneFactors && userPhoneFactors.length === 1) {
-            setWizardStep("passwordVerification");
-          } else {
-            setWizardStep("otpSelection");
-          }
+          const prevStep = userPhoneFactors && userPhoneFactors.length === 1
+            ? "passwordVerification"
+            : "otpSelection";
+          trackStepChange(prevStep, "back");
+          setWizardStep(prevStep);
         }}
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
@@ -452,6 +532,7 @@ export default function AddMFAPage() {
         }}
         onBack={async () => {
           setErrorCode("");
+          trackStepChange("addMFANumber", "back");
           await deleteMFA();
           setWizardStep("addMFANumber");
         }}

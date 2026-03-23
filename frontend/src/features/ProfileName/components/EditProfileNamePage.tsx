@@ -8,6 +8,7 @@ import { PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import { authService } from "../../../services/authService";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch";
+import { useFormTracking } from "../../../hooks/useFormTracking";
 import StepContent from "../../../components/Wizard/StepContent";
 import Loader from "../../../components/Layout/Loading";
 import ConfirmUpdate from "./ConfirmUpdate";
@@ -61,6 +62,14 @@ export default function EditProfileNamePage() {
     normalizeNameFormData(state?.userProfile?.name),
   );
 
+  // Initialize form tracking
+  const { trackStepChange, trackStepAttempt, trackStepError, trackApiCall } =
+    useFormTracking({
+      formId: "profile_name_update",
+      page: "edit_name",
+      initialStep: wizardStep,
+    });
+
   const loaderPageContentJson =
     (getPageContent(routeLanguage, PAGES.otpSelection) as
       | ProfileNamePageContent
@@ -98,7 +107,9 @@ export default function EditProfileNamePage() {
       familyName,
       formatted,
     }));
+    
     setWizardStep("confirmUpdate");
+    trackStepChange("confirmUpdate", "verify");
   };
 
   const saveUpdatedProfileData = async () => {
@@ -106,19 +117,31 @@ export default function EditProfileNamePage() {
       setLocalLoading(true);
       setErrorCode("");
 
-      const response = (await authService.update_my_user_profile({
-        name: nameFormData,
-        user_id: state.userProfile?.id,
-      })) as AuthServiceResponse<UserProfile> | undefined;
+      trackStepAttempt("profile_update_submit_initiated", "update");
+
+      const response = await trackApiCall(
+        "update_my_user_profile",
+        "PATCH",
+        async () => {
+          const result = await authService.update_my_user_profile({
+            name: nameFormData,
+            user_id: state.userProfile?.id,
+          });
+          return result as AuthServiceResponse<UserProfile>;
+        },
+        "update"
+      );
 
       if (response?.data) {
         updateProfileSuccess(response.data);
         setWizardStep("success");
+        trackStepChange("success", "update");
       }
     } catch (error) {
       const message = getApiErrorMessage(error);
       if (message) {
         setErrorCode(message);
+        trackStepError(`profile_update_failed: ${message}`, "update");
       }
     } finally {
       setLocalLoading(false);

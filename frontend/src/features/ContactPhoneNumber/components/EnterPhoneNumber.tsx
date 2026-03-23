@@ -30,6 +30,7 @@ import type {
   ContactPhonePageContent,
   ContactPhoneStepProps,
 } from "../../../types/contactPhoneNumber";
+import { trackButtonClick } from "../../../utils/gatag";
 
 type PhoneInputCountryData = {
   countryCode?: string;
@@ -148,7 +149,15 @@ function RadioButtons({
       options={radioOptions}
       onGcdsChange={(event: Event) => {
         const target = event.target as HTMLInputElement;
-        onChangePhoneForm("otpType", target.value as ContactPhoneOtpType);
+        const selectedType = target.value as ContactPhoneOtpType;
+        
+        // Track OTP type selection
+        trackButtonClick(`otp_type_${selectedType}`, {
+          form_id: "contact_phone_number_update",
+          selection_type: selectedType,
+        });
+        
+        onChangePhoneForm("otpType", selectedType);
         setErrorCode?.("");
       }}
     />
@@ -307,6 +316,10 @@ export default function EnterPhoneNumber({
           style={{ width: "fit-content" }}
           onGcdsClick={(event: Event) => {
             event.preventDefault();
+            trackButtonClick("cancel_phone_update", {
+              form_id: "contact_phone_number_update",
+              step: "enter_phone",
+            });
             void onCancel();
           }}
         >

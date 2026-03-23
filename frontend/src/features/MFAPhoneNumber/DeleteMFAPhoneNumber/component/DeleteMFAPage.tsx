@@ -19,6 +19,7 @@ import StepContent from "../../../../components/Wizard/StepContent";
 import { usePasswordValidation } from "../../../../hooks/usePasswordValidation";
 import { useOtpOperations } from "../../../../hooks/useOtpOperations";
 import { OtpFactor } from "../../../../types/hooks";
+import { useFormTracking } from "../../../../hooks/useFormTracking";
 
 interface DeletePhoneFormData {
   phoneNumber: string;
@@ -60,11 +61,23 @@ export default function DeleteMFAPage() {
     language: language,
   });
 
+  // Initialize form tracking
+  const { trackStepChange, trackStepAttempt, trackStepError, trackApiCall } =
+    useFormTracking({
+      formId: "delete_mfa_phone_number",
+      page: "manage_profile_delete_mfa",
+      initialStep: wizardStep,
+    });
+
   // Use the password validation hook
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(
     setErrorCode,
     () => {
-      // If there's only one MFA factor, skip OTP selection and go directly to validation
+      trackStepChange(
+        userPhoneFactors && userPhoneFactors.length === 1 ? "otpValidation" : "otpSelection",
+        "verify_password"
+      );
+
       if (userPhoneFactors && userPhoneFactors.length === 1) {
         setWizardStep("otpValidation");
       } else {
@@ -72,6 +85,12 @@ export default function DeleteMFAPage() {
       }
     },
   );
+
+  // Create tracked password validation wrapper
+  const handleValidatePassword = async (password: string) => {
+    trackStepAttempt("password_verification_initiated", "verify_password");
+    await validatePassword(password);
+  };
 
   // Use the OTP operations hook
   const {
@@ -105,10 +124,9 @@ export default function DeleteMFAPage() {
   };
 
   const deleteMFA = async () => {
+    trackStepAttempt("mfa_delete_initiated", "delete_mfa");
+
     try {
-      // Use the OTP value and trxnId from the verification step
-      // Note: otpType is the type of factor being deleted
-      // otpVerificationType is the type of OTP used for verification (may differ)
       const verificationOtpType = userSelectedMfaFactor
         ? serverMapping[
             userSelectedMfaFactor.type as keyof typeof serverMapping
@@ -118,18 +136,26 @@ export default function DeleteMFAPage() {
               ?.type as keyof typeof serverMapping
           ];
 
-      await Promise.all(
-        phoneFormData.mfaFactorsToDelete.map((mfaFactor) =>
-          deleteMFAPhoneNumberApi.deleteMFA({
-            id: mfaFactor.id,
-            otpType:
-              serverMapping[mfaFactor.type as keyof typeof serverMapping], // Type of factor being deleted
-            otp: userOtpValue,
-            trxnId: otpSentResponse?.trxnId,
-            otpVerificationType: verificationOtpType, // Type of OTP used for verification
-          }),
-        ),
+      await trackApiCall(
+        "mfa_delete",
+        "DELETE",
+        async () => {
+          await Promise.all(
+            phoneFormData.mfaFactorsToDelete.map((mfaFactor) =>
+              deleteMFAPhoneNumberApi.deleteMFA({
+                id: mfaFactor.id,
+                otpType:
+                  serverMapping[mfaFactor.type as keyof typeof serverMapping],
+                otp: userOtpValue,
+                trxnId: otpSentResponse?.trxnId,
+                otpVerificationType: verificationOtpType,
+              }),
+            ),
+          );
+        },
+        "delete_mfa"
       );
+
       setErrorCode("");
       navigate(backToManage2FAVerificationsPage, {
         state: {
@@ -139,21 +165,24 @@ export default function DeleteMFAPage() {
       });
     } catch (error) {
       const err = error as { data?: { message?: string } };
-      setErrorCode(err?.data?.message ?? "");
+      const errorMsg = err?.data?.message ?? "DELETE_MFA_FAILED";
+      setErrorCode(errorMsg);
+      trackStepError(`mfa_delete_failed: ${errorMsg}`, "delete_mfa");
+
       if (
-        (INVALID_OTP_ERROR_CODES as readonly string[]).includes(
-          err?.data?.message ?? "",
-        )
+        (INVALID_OTP_ERROR_CODES as readonly string[]).includes(errorMsg)
       ) {
-        // If OTP is invalid, go back to OTP validation step
         setWizardStep("otpValidation");
+        trackStepChange("otpValidation", "back");
       }
     }
   };
 
   // Custom validateOtpCode that handles delete MFA flow
   const validateOtpCode = async () => {
+    trackStepAttempt("user_phone_otp_validation_initiated", "user_phone_otp");
     setWizardStep("deleteMFAPhoneNumberConfirm");
+    trackStepChange("deleteMFAPhoneNumberConfirm", "user_phone_otp");
   };
 
   useEffect(() => {
@@ -202,7 +231,7 @@ export default function DeleteMFAPage() {
         userPasswordValue={userPasswordValue}
         setUserPasswordValue={setUserPasswordValue}
         onCancel={async () => navigate(backToManage2FAVerificationsPage)}
-        validatePassword={validatePassword}
+        validatePassword={handleValidatePassword}
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
         parentPage={PAGES.addMFAPage}
@@ -213,6 +242,7 @@ export default function DeleteMFAPage() {
         userPhoneFactors={userPhoneFactors}
         onChangeUserSelectedMfaFactor={handleChangeUserMfaSelection}
         onNext={() => {
+          trackStepChange("otpValidation", "phone_selection");
           setWizardStep("otpValidation");
         }}
         parentPage={PAGES.deleteMFAPage}
@@ -225,16 +255,17 @@ export default function DeleteMFAPage() {
         userSelectedMfaFactor={userSelectedMfaFactor!}
         userOtpValue={userOtpValue}
         setUserOtpValue={handleSetUserOtpValue}
-        requestOtpCode={requestOtpCode}
+        requestOtpCode={() => {
+          trackStepAttempt("user_phone_otp_request_initiated", "user_phone_otp");
+          return requestOtpCode();
+        }}
         validateOtpCode={validateOtpCode}
         onBack={() => {
-          // If there's only one MFA factor, go back to password verification
-          // Otherwise, go back to OTP selection
-          if (userPhoneFactors && userPhoneFactors.length === 1) {
-            setWizardStep("passwordVerification");
-          } else {
-            setWizardStep("otpSelection");
-          }
+          const prevStep = userPhoneFactors && userPhoneFactors.length === 1
+            ? "passwordVerification"
+            : "otpSelection";
+          trackStepChange(prevStep, "back");
+          setWizardStep(prevStep);
         }}
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
@@ -249,14 +280,13 @@ export default function DeleteMFAPage() {
             await deleteMFA();
           } catch (error) {
             const err = error as { data?: { message?: string } };
-            setErrorCode(err?.data?.message ?? "");
+            const errorMsg = err?.data?.message ?? "DELETE_MFA_FAILED";
+            setErrorCode(errorMsg);
             if (
-              (INVALID_OTP_ERROR_CODES as readonly string[]).includes(
-                err?.data?.message ?? "",
-              )
+              (INVALID_OTP_ERROR_CODES as readonly string[]).includes(errorMsg)
             ) {
-              // If OTP is invalid, go back to OTP validation step
               setWizardStep("otpValidation");
+              trackStepChange("otpValidation", "back");
             }
           }
         }}

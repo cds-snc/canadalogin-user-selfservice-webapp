@@ -21,6 +21,7 @@ import PasswordVerification from "../../TransientOtp/components/PasswordVerifica
 import StepContent from "../../../components/Wizard/StepContent";
 import { usePasswordValidation } from "../../../hooks/usePasswordValidation";
 import { useOtpOperations } from "../../../hooks/useOtpOperations";
+import { useFormTracking } from "../../../hooks/useFormTracking";
 import type { AuthServiceError } from "../../../types/services";
 import type { PasswordUpdateTransactionData } from "../api/passwordUpdate";
 
@@ -59,6 +60,14 @@ export default function ChangePasswordIndex() {
   const [passwordUpdateStep, setPasswordUpdateStep] =
     useState<PasswordUpdateStep>(defaultPasswordUpdateStep);
 
+  // Initialize form tracking
+  const { trackStepChange, trackStepAttempt, trackStepError, trackApiCall } =
+    useFormTracking({
+      formId: "password_change",
+      page: "change_password",
+      initialStep: passwordUpdateStep,
+    });
+
   const { userProfile } = state;
   const { id, userName } = userProfile ?? {};
   const navigate = useNavigate();
@@ -70,7 +79,11 @@ export default function ChangePasswordIndex() {
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(
     setErrorCode,
     () => {
-      // If there's only one MFA factor, skip OTP selection and go directly to validation
+      trackStepChange(
+        userPhoneFactors && userPhoneFactors.length === 1 ? "otpValidation" : "otpSelection",
+        "verify_password"
+      );
+
       if (userPhoneFactors && userPhoneFactors.length === 1) {
         setPasswordUpdateStep("otpValidation");
       } else {
@@ -78,6 +91,12 @@ export default function ChangePasswordIndex() {
       }
     },
   );
+
+  // Create tracked password validation wrapper
+  const handleValidatePassword = async (password: string) => {
+    trackStepAttempt("password_verification_initiated", "verify_password");
+    await validatePassword(password);
+  };
 
   // Use the OTP operations hook
   const {
@@ -98,10 +117,15 @@ export default function ChangePasswordIndex() {
   // Custom requestOtpCode for password change flow using passwordUpdate API
   const requestOtpCode = async () => {
     try {
-      const response = await passwordUpdate.firstStep(
-        userName,
-        userSelectedMfaFactor,
+      trackStepAttempt("password_otp_request_initiated", "password_otp");
+
+      const response = await trackApiCall(
+        "password_update_first_step",
+        "POST",
+        () => passwordUpdate.firstStep(userName, userSelectedMfaFactor),
+        "password_otp"
       );
+
       if (response?.success && response.data) {
         setOtpSentResponse(response.data);
       }
@@ -110,6 +134,7 @@ export default function ChangePasswordIndex() {
       const message = getApiErrorMessage(err);
       if (message) {
         setErrorCode(message);
+        trackStepError(`password_otp_request_failed: ${message}`, "password_otp");
       }
     }
   };
@@ -121,19 +146,26 @@ export default function ChangePasswordIndex() {
     }
 
     setLocalLoading(true);
+    trackStepAttempt("password_otp_validation_initiated", "password_otp");
+
     try {
-      const response = await passwordUpdate.secondStep(
-        userOtp,
-        otpSentResponse.trxId,
+      const response = await trackApiCall(
+        "password_update_second_step",
+        "POST",
+        () => passwordUpdate.secondStep(userOtp, otpSentResponse.trxId),
+        "password_otp"
       );
+
       if (response?.success) {
         setPasswordUpdateStep("passwordChange");
+        trackStepChange("passwordChange", "password_otp");
       }
       setErrorCode("");
     } catch (err) {
       const message = getApiErrorMessage(err);
       if (message) {
         setErrorCode(message);
+        trackStepError(`password_otp_validation_failed: ${message}`, "password_otp");
       }
     } finally {
       setLocalLoading(false);
@@ -142,24 +174,27 @@ export default function ChangePasswordIndex() {
 
   const logout = async () => {
     setLoading(true, navBarContent["8"]); // Use logout loading text
+    trackStepAttempt("logout_initiated", "logout");
 
     try {
-      const response = await authService.logout();
+      const response = await trackApiCall(
+        "logout",
+        "POST",
+        () => authService.logout(),
+        "logout"
+      );
+
       const redirectUrl = response?.data?.redirect_url || null;
 
-      // Check if response has redirect_url
       if (redirectUrl) {
-        // form been submitted in authService.logout
         return;
       } else {
-        // Fallback redirect if no redirect_url provided
         window.location.href = "/";
       }
     } catch (error) {
       console.error("Logout failed:", error);
-      // Update loading text to show error
+      trackStepError("logout_failed", "logout");
       setLoading(true, navBarContent["9"]);
-      // Redirect after error
       setTimeout(() => {
         window.location.href = "/";
       }, 2000);
@@ -172,7 +207,7 @@ export default function ChangePasswordIndex() {
         userPasswordValue={userPasswordValue}
         setUserPasswordValue={setUserPasswordValue}
         onCancel={() => navigate(backToSecuritySettingsPage)}
-        validatePassword={validatePassword}
+        validatePassword={handleValidatePassword}
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
         parentPage={PAGES.password}
@@ -183,6 +218,7 @@ export default function ChangePasswordIndex() {
         userPhoneFactors={userPhoneFactors}
         onChangeUserSelectedMfaFactor={handleChangeUserMfaSelection}
         onNext={() => {
+          trackStepChange("otpValidation", "phone_selection");
           setPasswordUpdateStep("otpValidation");
         }}
         onCancel={() => navigate(backToSecuritySettingsPage)}
@@ -198,13 +234,11 @@ export default function ChangePasswordIndex() {
         requestOtpCode={requestOtpCode}
         validateOtpCode={validateOtpCode}
         onBack={() => {
-          // If there's only one MFA factor, go back to password verification.
-          if (userPhoneFactors.length === 1) {
-            setPasswordUpdateStep("passwordVerification");
-            return;
-          }
-
-          setPasswordUpdateStep("otpSelection");
+          const prevStep = userPhoneFactors.length === 1 
+            ? "passwordVerification" 
+            : "otpSelection";
+          trackStepChange(prevStep, "back");
+          setPasswordUpdateStep(prevStep);
         }}
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
@@ -220,6 +254,7 @@ export default function ChangePasswordIndex() {
         otpSentResponse={otpSentResponse}
         userOtpValue={userOtpValue}
         onNext={() => {
+          trackStepChange("passwordChangedConfirmation", "password_change");
           setPasswordUpdateStep("passwordChangedConfirmation");
         }}
       />

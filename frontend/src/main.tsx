@@ -9,11 +9,16 @@ import ReactGA from "react-ga4";
 
 import config from "./config";
 
-ReactGA.initialize(config.gatag, {
-  gaOptions: {
-    anonymize_ip: true,
-  },
-});
+if (config.gatag) {
+  ReactGA.initialize(config.gatag, {
+    gaOptions: {
+      anonymize_ip: true,
+      debug_mode: config.environment === "dev",
+    },
+  });
+  ReactGA.send({ hitType: "pageview", page: window.location.pathname });
+}
+
 try {
   const rootElement = document.getElementById("root");
 
@@ -28,7 +33,6 @@ try {
       </Suspense>
     </StrictMode>,
   );
-  console.log("React application rendered successfully"); // Debug log
 } catch (error) {
   console.error("Error rendering React application:", error);
 }

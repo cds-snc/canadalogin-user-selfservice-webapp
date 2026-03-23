@@ -77,6 +77,22 @@ export type AnalyticsPayload = {
   label?: string;
 };
 
+export interface GA4EventParams {
+  [key: string]: string | number | boolean | undefined;
+}
+
+export interface CardClickParams extends GA4EventParams {
+  card_name: string;
+  card_type: string;
+  destination: string;
+}
+
+export interface NavigationParams extends GA4EventParams {
+  from_page: string;
+  to_page: string;
+  link_text?: string;
+}
+
 export type RouteParams = Record<string, string | null | undefined>;
 
 export type ApiErrorResponse = {
@@ -96,3 +112,26 @@ export type UserProfileDispatchContract = {
   setAuthenticatedPage: (value: string) => void;
   removeAuthenticatedPage: (value: string) => void;
 };
+
+export interface FormStepTrackingParams extends GA4EventParams {
+  form_id: string;
+  page: string;
+  step: string;
+  post_action?: string;
+  event_label?: string;
+  duration_ms?: number;
+  attempts?: number;
+}
+
+export interface FormApiCallParams extends GA4EventParams {
+  form_id: string;
+  page: string;
+  step: string;
+  post_action?: string;
+  api_id: string;
+  api_type: string;
+  duration?: number;
+  status?: string;
+  error_id?: string;
+  error_message?: string;
+}
