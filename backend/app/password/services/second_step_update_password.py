@@ -69,9 +69,7 @@ async def dispatch_password_otp_validator(
         "otp": payload.otp,
     }
 
-    logger.info(
-        f"dispatch_otp_validator api endpoint: {resetter_otp_validator_api_endpoint}"
-    )
+    logger.info("dispatch_otp_validator: sending OTP validation request")
     response = await global_http_client.post(
         resetter_otp_validator_api_endpoint, json=form_data, headers=headers
     )
