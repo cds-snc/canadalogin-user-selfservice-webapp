@@ -63,7 +63,6 @@ async def verify_otp_before_operation(
     otp: str,
     trxn_id: str,
     otp_type: "OtpType",
-    user_access_token: str,
 ) -> None:
     """
     Verify OTP before performing a sensitive operation.
@@ -80,7 +79,6 @@ async def verify_otp_before_operation(
     Raises:
         HTTPException: 400 if OTP verification fails
         HTTPException: 500 for unexpected errors
-        user_access_token: User's authentication token
 
     Returns:
         None if verification succeeds
@@ -97,7 +95,7 @@ async def verify_otp_before_operation(
 
         logger.info(f"Attempting OTP verification (type: {otp_type.value})")
         otp_verification_response = await handle_otp_verification(
-            global_http_client, otp_verification_data, user_access_token
+            global_http_client, otp_verification_data
         )
 
         if not otp_verification_response.success:

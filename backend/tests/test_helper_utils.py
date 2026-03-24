@@ -143,7 +143,7 @@ def test_string_error_response_with_empty_strings():
 async def test_verify_otp_before_operation_success(monkeypatch):
     """Test successful OTP verification"""
 
-    async def mock_handle_otp_verification(client, verification_data, access_token):
+    async def mock_handle_otp_verification(client, verification_data):
         # Return a successful response
         return ResponseModel(
             success=True, message="OTP verified successfully", data=None
@@ -162,7 +162,6 @@ async def test_verify_otp_before_operation_success(monkeypatch):
             otp="123456",
             trxn_id="txn123",
             otp_type=OtpType.SMS,
-            user_access_token="test_token",
         )
 
 
@@ -170,7 +169,7 @@ async def test_verify_otp_before_operation_success(monkeypatch):
 async def test_verify_otp_before_operation_failure(monkeypatch):
     """Test OTP verification failure"""
 
-    async def mock_handle_otp_verification(client, verification_data, access_token):
+    async def mock_handle_otp_verification(client, verification_data):
         # Return a failed response
         return ResponseModel(success=False, message="Invalid OTP", data=None)
 
@@ -187,7 +186,6 @@ async def test_verify_otp_before_operation_failure(monkeypatch):
                 otp="wrong_otp",
                 trxn_id="txn123",
                 otp_type=OtpType.SMS,
-                user_access_token="test_token",
             )
 
         assert exc_info.value.status_code == 400
@@ -198,7 +196,7 @@ async def test_verify_otp_before_operation_failure(monkeypatch):
 async def test_verify_otp_before_operation_http_exception(monkeypatch):
     """Test OTP verification when HTTPException is raised"""
 
-    async def mock_handle_otp_verification(client, verification_data, access_token):
+    async def mock_handle_otp_verification(client, verification_data):
         # Raise an HTTPException
         raise HTTPException(status_code=401, detail="Unauthorized")
 
@@ -215,7 +213,6 @@ async def test_verify_otp_before_operation_http_exception(monkeypatch):
                 otp="123456",
                 trxn_id="txn123",
                 otp_type=OtpType.VOICE,
-                user_access_token="test_token",
             )
 
         # Should re-raise the original HTTPException
@@ -227,7 +224,7 @@ async def test_verify_otp_before_operation_http_exception(monkeypatch):
 async def test_verify_otp_before_operation_unexpected_exception(monkeypatch):
     """Test OTP verification when an unexpected exception occurs"""
 
-    async def mock_handle_otp_verification(client, verification_data, access_token):
+    async def mock_handle_otp_verification(client, verification_data):
         # Raise an unexpected exception
         raise ValueError("Unexpected error occurred")
 
@@ -244,7 +241,6 @@ async def test_verify_otp_before_operation_unexpected_exception(monkeypatch):
                 otp="123456",
                 trxn_id="txn123",
                 otp_type=OtpType.EMAIL,
-                user_access_token="test_token",
             )
 
         # Should wrap unexpected exceptions in a 500 HTTPException

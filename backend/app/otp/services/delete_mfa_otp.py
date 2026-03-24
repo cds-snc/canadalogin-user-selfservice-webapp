@@ -68,7 +68,6 @@ async def handle_otp_deletion(
                 otp=deletion_request.otp,
                 trxn_id=deletion_request.trxnId,
                 otp_type=deletion_request.otpVerificationType,
-                user_access_token=user_access_token,
             )
 
             # Step 2: Check if user has multiple factors before allowing deletion
