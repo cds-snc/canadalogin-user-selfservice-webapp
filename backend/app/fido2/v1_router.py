@@ -5,7 +5,9 @@ FIDO2 API router endpoints
 import logging
 from fastapi import APIRouter, Depends, Request
 from httpx import AsyncClient
+from app.fido2.mds_service import mds_service
 from app.fido2.schemas import (
+    FIDO2AuthenticatorMetadata,
     FIDO2UserResponse,
     FIDO2UserResponseModel,
     FIDO2RegistrationResponseModel,
@@ -234,3 +236,22 @@ async def submit_assertion_result(
         request_body=request_data,
         return_jwt=return_jwt,
     )
+
+
+@router.get(
+    "/metadata/{aaguid}",
+    response_model=FIDO2AuthenticatorMetadata,
+    summary="Get authenticator metadata by AAGUID",
+    description="Look up the FIDO Alliance MDS3 metadata for an authenticator by its AAGUID.",
+)
+def get_authenticator_metadata(aaguid: str) -> FIDO2AuthenticatorMetadata:
+    """
+    Return metadata for the given AAGUID from the in-memory MDS3 lookup table.
+
+    The lookup is O(1) and never performs I/O.  If the AAGUID is not present in
+    the table (either the table is empty or the device is simply not listed in
+    the FIDO Alliance MDS), ``is_known`` will be ``False`` and description will
+    be ``"Unknown Authenticator"``.
+    """
+    metadata = mds_service.get_metadata(aaguid)
+    return FIDO2AuthenticatorMetadata(**metadata)
