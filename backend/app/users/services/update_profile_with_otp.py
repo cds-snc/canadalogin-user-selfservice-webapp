@@ -50,6 +50,7 @@ async def update_profile_with_otp_verification(
             otp=profile_update_data.otp,
             trxn_id=profile_update_data.trxnId,
             otp_type=profile_update_data.otpType,
+            user_access_token=user_access_token,
         )
 
         logger.info("OTP verification successful, proceeding with profile update")
