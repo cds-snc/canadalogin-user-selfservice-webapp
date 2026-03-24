@@ -432,3 +432,4 @@ jobs:
           workflow_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           json='{"text":":x: '"${{ env.SLACK_NOTIFICATION_APPLICATION_NAME }}"' FAILED to deploy to the following environments: `'"${{ needs.notify-slack-about-deploy.outputs.envs }}"'`!\n\n<'"$workflow_url"'|Click for more details>"}'
           curl -X POST -H 'Content-type: application/json' --data "$json" ${{ secrets.GC_SIGNIN_OPS_SLACK_ALERT_WEBHOOK }}
+          curl -X POST -H 'Content-type: application/json' --data "$json" ${{ secrets.CL_DEV_SLACK_ALERT_WEBHOOK }}
