@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.14.2](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.14.1...v1.14.2) (2026-03-24)
+
+
+### Bug Fixes
+
+* add user access token to OTP verification and deletion processes ([#1333](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1333)) ([79bfd5e](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/79bfd5e679e88049827c54d424872cae5a6123b1))
+* remove unused GcdsIcon import from ConfirmUpdate component ([#1338](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1338)) ([96a2f0b](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/96a2f0be80b9f771935d222eeeb6a65104842bff))
+
+
+### Continuous Integration
+
+* update staging and prod deployed versions ([#1334](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1334)) ([a029f1a](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/a029f1a4678ad85c6bdbb8ffb83c9b5bea4719d7))
+
 ## [1.14.1](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.14.0...v1.14.1) (2026-03-24)
 
 
