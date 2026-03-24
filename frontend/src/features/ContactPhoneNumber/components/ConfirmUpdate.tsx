@@ -5,7 +5,6 @@ import {
   GcdsErrorMessage,
   GcdsGrid,
   GcdsHeading,
-  GcdsIcon,
   GcdsLink,
   GcdsNotice,
   GcdsText,
