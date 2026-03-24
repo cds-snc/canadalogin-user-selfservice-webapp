@@ -24,6 +24,7 @@ from app.auth import v1_router as v1_auth_router
 from app.password import v1_router as v1_password_router
 from app.otp import v1_router as v1_otp_router
 from app.fido2 import v1_router as v1_fido2_router
+from app.fido2.mds_service import mds_service
 from app.auth.services import oidc_config
 from app.auth.services.auth import redirect_user_to_idp_verify
 from app.middleware.standardized_logging import StandardizedLoggingMiddleware
@@ -106,6 +107,7 @@ async def lifespan(app: FastAPI):
         if pong:
             logger.info("Connected to Redis server successfully")
             app.state.redis_client = redis_client
+            await mds_service.initialize(redis_client)
 
     oidc_config.register_oidc(app.state.config)
     logger.info(f"CORS Origins: {app.state.config.cors_origins_list}")
@@ -114,6 +116,7 @@ async def lifespan(app: FastAPI):
     yield
     logger.info("Closing global HTTP client")
     await app.state.request_client.aclose()
+    await mds_service.shutdown()
     logger.info("Shutting down IBM Verify Integration API")
     if hasattr(app.state, "redis_client"):
         await app.state.redis_client.close()

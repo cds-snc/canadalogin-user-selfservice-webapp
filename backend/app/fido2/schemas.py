@@ -119,3 +119,25 @@ class DeleteRegistrationRequest(BaseModel):
     assertionResult: Optional[FIDO2AssertionResultRequest] = (
         None  # FIDO2 authentication proof (optional if OTP-verified)
     )
+
+
+class ErrorResponse(BaseModel):
+
+    status: str = "failed"
+    error: str
+
+
+class FIDO2AuthenticatorMetadata(BaseModel):
+    """Metadata for a single FIDO2 authenticator, keyed by AAGUID."""
+
+    aaguid: str
+    description: str
+    icon: Optional[str] = None
+    authenticator_version: Optional[int] = None
+    protocol_family: Optional[str] = None
+    attestation_types: List[str] = []
+    key_protection: List[str] = []
+    matcher_protection: List[str] = []
+    attachment_hint: List[str] = []
+    status_reports: List[Dict[str, Any]] = []
+    is_known: bool = True
