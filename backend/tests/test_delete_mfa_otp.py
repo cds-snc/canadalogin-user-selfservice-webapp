@@ -55,7 +55,9 @@ async def test_handle_otp_deletion_sms_success(monkeypatch):
     """Test successful SMS OTP factor deletion"""
 
     # Mock verify_otp_before_operation to succeed
-    async def mock_verify_otp(global_http_client, otp, trxn_id, otp_type):
+    async def mock_verify_otp(
+        global_http_client, otp, trxn_id, otp_type, user_access_token
+    ):
         return None  # Success means no exception
 
     # Mock my_profile to return a valid user profile
@@ -126,7 +128,9 @@ async def test_handle_otp_deletion_voice_success(monkeypatch):
     """Test successful Voice OTP factor deletion"""
 
     # Mock verify_otp_before_operation to succeed
-    async def mock_verify_otp(global_http_client, otp, trxn_id, otp_type):
+    async def mock_verify_otp(
+        global_http_client, otp, trxn_id, otp_type, user_access_token
+    ):
         return None  # Success means no exception
 
     # Mock my_profile to return a valid user profile
@@ -230,7 +234,9 @@ async def test_handle_otp_deletion_last_factor_protection(monkeypatch):
         return create_mock_user_factors(num_factors=1)
 
     # Mock verify_otp_before_operation to succeed
-    async def mock_verify_otp(global_http_client, otp, trxn_id, otp_type):
+    async def mock_verify_otp(
+        global_http_client, otp, trxn_id, otp_type, user_access_token
+    ):
         return None  # Success means no exception
 
     monkeypatch.setattr(verify_otp_import_path, mock_verify_otp)
@@ -295,7 +301,9 @@ async def test_handle_otp_deletion_unexpected_status(monkeypatch):
         return mock_response
 
     # Mock verify_otp_before_operation to succeed
-    async def mock_verify_otp(global_http_client, otp, trxn_id, otp_type):
+    async def mock_verify_otp(
+        global_http_client, otp, trxn_id, otp_type, user_access_token
+    ):
         return None  # Success means no exception
 
     monkeypatch.setattr(verify_otp_import_path, mock_verify_otp)
@@ -362,7 +370,9 @@ async def test_handle_otp_deletion_exception(monkeypatch):
         raise Exception("Network error")
 
     # Mock verify_otp_before_operation to succeed
-    async def mock_verify_otp(global_http_client, otp, trxn_id, otp_type):
+    async def mock_verify_otp(
+        global_http_client, otp, trxn_id, otp_type, user_access_token
+    ):
         return None  # Success means no exception
 
     monkeypatch.setattr(verify_otp_import_path, mock_verify_otp)
