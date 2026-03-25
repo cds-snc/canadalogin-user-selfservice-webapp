@@ -53,6 +53,7 @@ export default function AddFIDO2PasskeyPage({
     unknown
   > | null>(null);
   const [registrationLoading, setRegistrationLoading] = useState(false);
+  const [authenticatorDescription, setAuthenticatorDescription] = useState("");
 
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
     language: language,
@@ -128,6 +129,13 @@ export default function AddFIDO2PasskeyPage({
       // Trigger the browser WebAuthn popup — nickname is not known yet
       const result = await registerFIDO2Credential(attestationResponse.data);
       setAttestationResult(result as unknown as Record<string, unknown>);
+
+      // Look up authenticator description from MDS service using AAGUID
+      if (result.aaguid) {
+        const metadata = await fido2Api.getAuthenticatorMetadata(result.aaguid);
+        setAuthenticatorDescription(metadata?.description ?? "");
+      }
+
       setWizardStep("addFIDO2PasskeyNickname");
     } catch (err) {
       if (err instanceof DOMException && err.name === "InvalidStateError") {
@@ -316,6 +324,7 @@ export default function AddFIDO2PasskeyPage({
         onSubmit={handleSubmitAttestation}
         onCancel={() => navigate(backToManage2FAVerificationsPage)}
         registrationLoading={registrationLoading}
+        initialNickname={authenticatorDescription}
       />
     ),
   };

@@ -119,3 +119,24 @@ class DeleteRegistrationRequest(BaseModel):
     assertionResult: Optional[FIDO2AssertionResultRequest] = (
         None  # FIDO2 authentication proof (optional if OTP-verified)
     )
+
+
+class ErrorResponse(BaseModel):
+
+    status: str = "failed"
+    error: str
+
+
+class FIDO2AuthenticatorMetadata(BaseModel):
+    """Full MDS3 metadata for a single FIDO2 authenticator, keyed by AAGUID.
+
+    The required fields (``aaguid``, ``description``, ``is_known``) are always
+    present.  All remaining fields from the FIDO Alliance metadata statement are
+    passed through as-is via ``extra="allow"``.
+    """
+
+    model_config = ConfigDict(extra="allow")
+
+    aaguid: str
+    description: str
+    is_known: bool = True
