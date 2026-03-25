@@ -120,6 +120,25 @@ interface AttestationResult {
   };
   getTransports?: unknown;
   nickname?: string;
+  aaguid?: string;
+}
+
+/**
+ * Extract AAGUID from authenticator data.
+ * Authenticator data layout: rpIdHash (32) + flags (1) + signCount (4) + AAGUID (16) + ...
+ */
+function extractAaguid(authenticatorData: ArrayBuffer): string {
+  const bytes = new Uint8Array(authenticatorData, 37, 16);
+  const hex = Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+  return [
+    hex.slice(0, 8),
+    hex.slice(8, 12),
+    hex.slice(12, 16),
+    hex.slice(16, 20),
+    hex.slice(20, 32),
+  ].join("-");
 }
 
 interface AssertionResult {
@@ -150,6 +169,18 @@ export function formatAttestationForServer(
       attestationObject: arrayBufferToBase64url(attResponse.attestationObject),
     },
   };
+
+  // Extract AAGUID from authenticator data (available in WebAuthn L2+)
+  try {
+    const attResponseL2 = attResponse as AuthenticatorAttestationResponse & {
+      getAuthenticatorData?: () => ArrayBuffer;
+    };
+    if (typeof attResponseL2.getAuthenticatorData === "function") {
+      result.aaguid = extractAaguid(attResponseL2.getAuthenticatorData());
+    }
+  } catch {
+    // AAGUID extraction is best-effort; absence is handled gracefully upstream
+  }
 
   // Try multiple ways to access transports
   const responseWithTransports =

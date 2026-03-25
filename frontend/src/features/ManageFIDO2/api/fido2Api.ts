@@ -138,4 +138,18 @@ export const fido2Api = {
       handleApiError(error as ApiErrorLike);
     }
   },
+
+  /**
+   * Look up authenticator metadata by AAGUID from the MDS service
+   */
+  getAuthenticatorMetadata: async (aaguid: string) => {
+    try {
+      const response = await axios.get(
+        `${config.apiUrl}/v1/fido2/metadata/${encodeURIComponent(aaguid)}`,
+      );
+      return response.data as { description?: string; is_known?: boolean };
+    } catch {
+      return null;
+    }
+  },
 };

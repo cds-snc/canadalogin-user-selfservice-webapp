@@ -17,6 +17,7 @@ interface AddFIDO2PasskeyNicknameProps {
   onSubmit: (deviceName: string) => Promise<void>;
   onCancel: () => void;
   registrationLoading: boolean;
+  initialNickname?: string;
 }
 
 export default function AddFIDO2PasskeyNickname({
@@ -25,10 +26,11 @@ export default function AddFIDO2PasskeyNickname({
   onSubmit,
   onCancel,
   registrationLoading,
+  initialNickname = "",
 }: AddFIDO2PasskeyNicknameProps) {
   const { language } = useParams();
   const pageContent = getPageContent(language, PAGES.addFIDO2PasskeyNickname)!;
-  const [newDeviceName, setNewDeviceName] = useState("");
+  const [newDeviceName, setNewDeviceName] = useState(initialNickname);
 
   const handleSubmit = async () => {
     if (!newDeviceName || newDeviceName.trim() === "") {

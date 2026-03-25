@@ -2,8 +2,12 @@
 Tests for the FIDO2 Metadata Service (fido2/mds_service.py)
 """
 
+import dataclasses
+import datetime
+import enum
 import json
 from unittest.mock import AsyncMock, MagicMock, patch
+import uuid
 
 import pytest
 
@@ -13,8 +17,7 @@ from app.fido2.mds_service import (
     GLOBALSIGN_ROOT_CERT_URL,
     MDS3_URL,
     REDIS_MDS_TTL,
-    _enum_list,
-    _serialize_status_reports,
+    _to_json_safe,
 )
 from app.constants.redis_keys import RedisKeys
 
@@ -49,62 +52,80 @@ def _make_redis_mock(stored_data: dict | None = None) -> AsyncMock:
 
 
 # ---------------------------------------------------------------------------
-# Unit tests: helper functions
+# Unit tests: _to_json_safe
 # ---------------------------------------------------------------------------
 
 
-def test_enum_list_with_enum_values():
-    class FakeEnum:
-        def __init__(self, v):
-            self.value = v
-
-    items = [FakeEnum("hardware"), FakeEnum("tee")]
-    assert _enum_list(items) == ["hardware", "tee"]
+def test_to_json_safe_uuid():
+    u = uuid.UUID("adce0002-35bc-c60a-648b-0b25f1f05503")
+    assert _to_json_safe(u) == "adce0002-35bc-c60a-648b-0b25f1f05503"
 
 
-def test_enum_list_with_plain_strings():
-    assert _enum_list(["none", "basic_full"]) == ["none", "basic_full"]
+def test_to_json_safe_date():
+    d = datetime.date(2020, 1, 1)
+    assert _to_json_safe(d) == "2020-01-01"
 
 
-def test_enum_list_with_none():
-    assert _enum_list(None) == []
+def test_to_json_safe_datetime():
+    dt = datetime.datetime(2020, 6, 15, 12, 0, 0)
+    assert _to_json_safe(dt) == "2020-06-15T12:00:00"
 
 
-def test_enum_list_with_empty_list():
-    assert _enum_list([]) == []
+def test_to_json_safe_enum():
+    class Color(enum.Enum):
+        RED = "red"
+
+    assert _to_json_safe(Color.RED) == "red"
 
 
-def test_serialize_status_reports_with_value_enum():
-    class FakeStatus:
-        value = "FIDO_CERTIFIED"
-
-    class FakeDate:
-        def isoformat(self):
-            return "2020-01-01"
-
-    class FakeReport:
-        status = FakeStatus()
-        effective_date = FakeDate()
-
-    result = _serialize_status_reports([FakeReport()])
-    assert result == [{"status": "FIDO_CERTIFIED", "effective_date": "2020-01-01"}]
+def test_to_json_safe_nested_dict():
+    u = uuid.UUID("adce0002-35bc-c60a-648b-0b25f1f05503")
+    result = _to_json_safe({"id": u, "items": [u]})
+    assert result == {
+        "id": "adce0002-35bc-c60a-648b-0b25f1f05503",
+        "items": ["adce0002-35bc-c60a-648b-0b25f1f05503"],
+    }
 
 
-def test_serialize_status_reports_no_date():
-    class FakeStatus:
-        value = "NOT_FIDO_CERTIFIED"
+def test_to_json_safe_bytes():
+    import base64
 
-    class FakeReport:
-        status = FakeStatus()
-        effective_date = None
-
-    result = _serialize_status_reports([FakeReport()])
-    assert result == [{"status": "NOT_FIDO_CERTIFIED", "effective_date": None}]
+    raw = b"\x00\x01\x02\xff"
+    result = _to_json_safe(raw)
+    assert isinstance(result, str)
+    assert result == base64.b64encode(raw).decode("ascii")
 
 
-def test_serialize_status_reports_empty():
-    assert _serialize_status_reports(None) == []
-    assert _serialize_status_reports([]) == []
+def test_to_json_safe_passthrough():
+    assert _to_json_safe(42) == 42
+    assert _to_json_safe("hello") == "hello"
+    assert _to_json_safe(None) is None
+    assert _to_json_safe(3.14) == 3.14
+
+
+def test_to_json_safe_dataclass_asdict():
+    """Verify that _to_json_safe handles output of dataclasses.asdict() correctly."""
+
+    @dataclasses.dataclass
+    class Inner:
+        uid: uuid.UUID
+
+    @dataclasses.dataclass
+    class Outer:
+        name: str
+        inner: Inner
+
+    raw = dataclasses.asdict(
+        Outer(
+            name="test",
+            inner=Inner(uid=uuid.UUID("adce0002-35bc-c60a-648b-0b25f1f05503")),
+        )
+    )
+    result = _to_json_safe(raw)
+    assert result == {
+        "name": "test",
+        "inner": {"uid": "adce0002-35bc-c60a-648b-0b25f1f05503"},
+    }
 
 
 # ---------------------------------------------------------------------------

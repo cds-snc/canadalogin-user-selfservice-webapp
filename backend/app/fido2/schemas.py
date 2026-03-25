@@ -128,16 +128,15 @@ class ErrorResponse(BaseModel):
 
 
 class FIDO2AuthenticatorMetadata(BaseModel):
-    """Metadata for a single FIDO2 authenticator, keyed by AAGUID."""
+    """Full MDS3 metadata for a single FIDO2 authenticator, keyed by AAGUID.
+
+    The required fields (``aaguid``, ``description``, ``is_known``) are always
+    present.  All remaining fields from the FIDO Alliance metadata statement are
+    passed through as-is via ``extra="allow"``.
+    """
+
+    model_config = ConfigDict(extra="allow")
 
     aaguid: str
     description: str
-    icon: Optional[str] = None
-    authenticator_version: Optional[int] = None
-    protocol_family: Optional[str] = None
-    attestation_types: List[str] = []
-    key_protection: List[str] = []
-    matcher_protection: List[str] = []
-    attachment_hint: List[str] = []
-    status_reports: List[Dict[str, Any]] = []
     is_known: bool = True

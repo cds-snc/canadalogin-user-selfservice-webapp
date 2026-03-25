@@ -10,9 +10,13 @@ restarts do not require a re-download.
 """
 
 import asyncio
+import dataclasses
+import datetime
+import enum
 import json
 import logging
-from base64 import b64decode
+import uuid as uuid_module
+from base64 import b64decode, b64encode
 from typing import Any
 
 import httpx
@@ -226,6 +230,10 @@ mds_service = FIDO2MetadataService()
 def _parse_mds3_blob(blob_jwt: bytes, cert_bytes: bytes) -> dict[str, dict[str, Any]]:
     """Parse the raw MDS3 JWT blob and return an AAGUID-keyed metadata dict.
 
+    Each value is the full ``MetadataStatement`` serialized to a plain dict,
+    with ``aaguid``, ``status_reports``, and ``is_known`` merged in at the top
+    level for easy access.  Entries that have no metadata statement are skipped.
+
     This function is synchronous because ``fido2.mds3.parse_blob`` is itself
     synchronous.  Callers should run it via ``asyncio.to_thread``.
     """
@@ -236,56 +244,38 @@ def _parse_mds3_blob(blob_jwt: bytes, cert_bytes: bytes) -> dict[str, dict[str, 
         if not entry.aaguid:
             continue
 
-        aaguid = str(entry.aaguid).lower()
         stmt = entry.metadata_statement
+        if stmt is None:
+            continue
 
-        result[aaguid] = {
-            "aaguid": aaguid,
-            "description": stmt.description if stmt else "FIDO2 Authenticator",
-            "icon": getattr(stmt, "icon", None) if stmt else None,
-            "authenticator_version": (
-                getattr(stmt, "authenticator_version", None) if stmt else None
-            ),
-            "protocol_family": (
-                getattr(stmt, "protocol_family", "fido2") if stmt else "fido2"
-            ),
-            "attestation_types": _enum_list(
-                getattr(stmt, "attestation_types", None) if stmt else None
-            ),
-            "key_protection": _enum_list(
-                getattr(stmt, "key_protection", None) if stmt else None
-            ),
-            "matcher_protection": _enum_list(
-                getattr(stmt, "matcher_protection", None) if stmt else None
-            ),
-            "attachment_hint": _enum_list(
-                getattr(stmt, "attachment_hint", None) if stmt else None
-            ),
-            "status_reports": _serialize_status_reports(entry.status_reports),
-            "is_known": True,
-        }
-
-    return result
-
-
-def _enum_list(items: Any) -> list[str]:
-    """Convert a list of enum/string values to plain strings."""
-    if not items:
-        return []
-    return [item.value if hasattr(item, "value") else str(item) for item in items]
-
-
-def _serialize_status_reports(reports: Any) -> list[dict[str, Any]]:
-    result = []
-    for r in reports or []:
-        result.append(
-            {
-                "status": (
-                    r.status.value if hasattr(r.status, "value") else str(r.status)
-                ),
-                "effective_date": (
-                    r.effective_date.isoformat() if r.effective_date else None
-                ),
-            }
+        aaguid = str(entry.aaguid).lower()
+        metadata = _to_json_safe(dataclasses.asdict(stmt))
+        metadata["aaguid"] = aaguid
+        metadata["status_reports"] = _to_json_safe(
+            [dataclasses.asdict(r) for r in (entry.status_reports or [])]
         )
+        metadata["is_known"] = True
+        result[aaguid] = metadata
+
     return result
+
+
+def _to_json_safe(obj: Any) -> Any:
+    """Recursively convert UUID, date/datetime, Enum, and bytes values to JSON-safe types.
+
+    This is needed because ``dataclasses.asdict()`` does not convert leaf values
+    that are not natively JSON-serializable.
+    """
+    if isinstance(obj, dict):
+        return {k: _to_json_safe(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_to_json_safe(i) for i in obj]
+    if isinstance(obj, uuid_module.UUID):
+        return str(obj)
+    if isinstance(obj, (datetime.date, datetime.datetime)):
+        return obj.isoformat()
+    if isinstance(obj, enum.Enum):
+        return obj.value
+    if isinstance(obj, bytes):
+        return b64encode(obj).decode("ascii")
+    return obj
