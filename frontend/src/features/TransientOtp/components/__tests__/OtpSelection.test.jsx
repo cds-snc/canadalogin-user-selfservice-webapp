@@ -73,7 +73,7 @@ vi.mock("../../../../utils/routeHelpers", () => ({
 // ---------------------------------------------------------------------------
 // GCDS component mocks
 // ---------------------------------------------------------------------------
-vi.mock("@cdssnc/gcds-components-react", () => ({
+vi.mock("@gcds-core/components-react", () => ({
   GcdsButton: ({ children, onGcdsClick, buttonRole, style }) => (
     <button
       data-testid={
@@ -119,7 +119,7 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
       </button>
     );
   },
-  GcdsText: ({ children }) => <p data-testid="gcds-text">{children}</p>,
+  GcdsText: ({ children }) => <div data-testid="gcds-text">{children}</div>,
 }));
 
 // ---------------------------------------------------------------------------

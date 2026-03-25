@@ -1,4 +1,4 @@
-import { GcdsContainer, GcdsIcon } from "@cdssnc/gcds-components-react";
+import { GcdsContainer, GcdsIcon } from "@gcds-core/components-react";
 
 interface VerifiedBadgeProps {
   text: string;

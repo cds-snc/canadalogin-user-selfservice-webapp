@@ -32,7 +32,7 @@ vi.mock("../../../components/Providers/useUser", () => ({
   })),
 }));
 
-vi.mock("@cdssnc/gcds-components-react", () => ({
+vi.mock("@gcds-core/components-react", () => ({
   GcdsButton: ({
     children,
     buttonId,
@@ -54,7 +54,7 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
     </button>
   ),
   GcdsText: ({ marginTop, marginBottom, children, ...props }) => (
-    <p
+    <div
       {...props}
       style={{
         marginTop: marginTop,
@@ -63,7 +63,7 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
       }}
     >
       {children}
-    </p>
+    </div>
   ),
   GcdsIcon: ({ name, size, className }) => (
     <div

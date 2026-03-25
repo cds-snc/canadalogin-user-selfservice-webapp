@@ -18,19 +18,15 @@ import Manage2FAVerifications from "../../../../components/Manage/SecuritySettin
 import { fido2Api } from "../../../../features/ManageFIDO2/api/fido2Api";
 
 // Mock GCDS web components — they rely on custom elements which don't work in jsdom
-vi.mock("@cdssnc/gcds-components-react", () => ({
-  GcdsButton: ({ children, ...props }) => (
-    <button {...props}>{children}</button>
+vi.mock("@gcds-core/components-react", () => ({
+  GcdsButton: ({ children, onGcdsClick, onClick }) => (
+    <button onClick={onGcdsClick ?? onClick}>{children}</button>
   ),
-  GcdsContainer: ({ children, ...props }) => <div {...props}>{children}</div>,
-  GcdsHeading: ({ children, ...props }) => <div {...props}>{children}</div>,
-  GcdsText: ({ children, ...props }) => <span {...props}>{children}</span>,
-  GcdsLink: ({ children, href, ...props }) => (
-    <a href={href || "#"} {...props}>
-      {children}
-    </a>
-  ),
-  GcdsGrid: ({ children, ...props }) => <div {...props}>{children}</div>,
+  GcdsContainer: ({ children }) => <div>{children}</div>,
+  GcdsHeading: ({ children }) => <div>{children}</div>,
+  GcdsText: ({ children }) => <span>{children}</span>,
+  GcdsLink: ({ children, href }) => <a href={href || "#"}>{children}</a>,
+  GcdsGrid: ({ children }) => <div>{children}</div>,
 }));
 
 // Simple mocks for dependencies
@@ -127,7 +123,7 @@ vi.mock("../../../../features/ManageFIDO2/api/fido2Api", () => ({
   },
 }));
 
-vi.mock("@cdssnc/gcds-components-react", () => ({
+vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children }) => <div>{children}</div>,
   GcdsGrid: ({ children }) => <div>{children}</div>,
   GcdsHeading: ({ children }) => <div>{children}</div>,

@@ -5,7 +5,7 @@ import ConfirmUpdate from "../components/ConfirmUpdate";
 import "@testing-library/jest-dom/vitest";
 
 // Mock GCDS components
-vi.mock("@cdssnc/gcds-components-react", () => ({
+vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children, ...props }) => (
     <div data-testid="gcds-container" {...props}>
       {children}
@@ -20,7 +20,13 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
       {children}
     </div>
   ),
-  GcdsHeading: ({ children, tag, ...props }) => {
+  GcdsHeading: ({
+    children,
+    tag,
+    marginBottom: _marginBottom,
+    marginTop: _marginTop,
+    ...props
+  }) => {
     const Tag = tag || "h1";
     return (
       <Tag data-testid="gcds-heading" {...props}>
@@ -28,10 +34,10 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
       </Tag>
     );
   },
-  GcdsText: ({ children, ...props }) => (
-    <p data-testid="gcds-text" {...props}>
+  GcdsText: ({ children, marginBottom: _mb, marginTop: _mt, ...props }) => (
+    <div data-testid="gcds-text" {...props}>
       {children}
-    </p>
+    </div>
   ),
   GcdsButton: ({ children, onGcdsClick, disabled, buttonRole, ...props }) => (
     <button
@@ -52,10 +58,16 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
   GcdsIcon: ({ name, size }) => (
     <div data-testid="gcds-icon" data-icon-name={name} data-icon-size={size} />
   ),
-  GcdsNotice: ({ children, type, noticeTitle, noticeTitleTag, ...props }) => {
+  GcdsNotice: ({
+    children,
+    noticeRole,
+    noticeTitle,
+    noticeTitleTag,
+    ...props
+  }) => {
     const TitleTag = noticeTitleTag || "h2";
     return (
-      <div data-testid="gcds-notice" data-type={type} {...props}>
+      <div data-testid="gcds-notice" data-notice-role={noticeRole} {...props}>
         {noticeTitle && <TitleTag>{noticeTitle}</TitleTag>}
         {children}
       </div>
@@ -190,7 +202,6 @@ describe("ConfirmUpdate Component", () => {
       </TestWrapper>,
     );
 
-    expect(screen.getByTestId("gcds-icon")).toBeInTheDocument();
     expect(screen.getByTestId("gcds-notice")).toBeInTheDocument();
   });
 

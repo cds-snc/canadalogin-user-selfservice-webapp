@@ -4,7 +4,7 @@ import {
   GcdsNavLink,
   GcdsText,
   GcdsTopNav,
-} from "@cdssnc/gcds-components-react";
+} from "@gcds-core/components-react";
 import { useBreakpoints } from "../../hooks/useBreakpoints";
 import { getPageContent } from "../../utils/functions";
 import { path } from "../../utils/routeHelpers";
@@ -97,7 +97,7 @@ export default function TopNav({ currentLang }: TopNavProps) {
       <GcdsTopNav
         slot="menu"
         label="Top navigation"
-        alignment="right"
+        alignment="end"
         lang={currentLang}
       >
         {navLinksJsx}
@@ -109,7 +109,7 @@ export default function TopNav({ currentLang }: TopNavProps) {
     <GcdsTopNav
       slot="menu"
       label="Top navigation"
-      alignment="right"
+      alignment="end"
       className="gcds-top-nav"
     >
       <GcdsNavLink href={homeLink} slot="home">

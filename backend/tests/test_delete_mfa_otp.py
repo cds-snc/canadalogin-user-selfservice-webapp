@@ -56,7 +56,7 @@ async def test_handle_otp_deletion_sms_success(monkeypatch):
 
     # Mock verify_otp_before_operation to succeed
     async def mock_verify_otp(
-        global_http_client, user_access_token, otp, trxn_id, otp_type
+        global_http_client, otp, trxn_id, otp_type, user_access_token
     ):
         return None  # Success means no exception
 
@@ -129,7 +129,7 @@ async def test_handle_otp_deletion_voice_success(monkeypatch):
 
     # Mock verify_otp_before_operation to succeed
     async def mock_verify_otp(
-        global_http_client, user_access_token, otp, trxn_id, otp_type
+        global_http_client, otp, trxn_id, otp_type, user_access_token
     ):
         return None  # Success means no exception
 
@@ -235,7 +235,7 @@ async def test_handle_otp_deletion_last_factor_protection(monkeypatch):
 
     # Mock verify_otp_before_operation to succeed
     async def mock_verify_otp(
-        global_http_client, user_access_token, otp, trxn_id, otp_type
+        global_http_client, otp, trxn_id, otp_type, user_access_token
     ):
         return None  # Success means no exception
 

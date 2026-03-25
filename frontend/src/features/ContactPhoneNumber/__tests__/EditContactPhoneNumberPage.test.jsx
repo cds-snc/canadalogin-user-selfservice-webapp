@@ -208,23 +208,27 @@ describe("EditContactPhoneNumberPage Component", () => {
     mockAuthService = authService;
   });
 
-  it("renders enter phone step by default", () => {
-    render(
-      <TestWrapper>
-        <EditContactPhoneNumberPage />
-      </TestWrapper>,
-    );
+  it("renders enter phone step by default", async () => {
+    await act(async () => {
+      render(
+        <TestWrapper>
+          <EditContactPhoneNumberPage />
+        </TestWrapper>,
+      );
+    });
 
     expect(screen.getByTestId("enter-phone-number")).toBeInTheDocument();
     expect(screen.getByText("Enter Phone Number")).toBeInTheDocument();
   });
 
-  it("handles phone number input changes", () => {
-    render(
-      <TestWrapper>
-        <EditContactPhoneNumberPage />
-      </TestWrapper>,
-    );
+  it("handles phone number input changes", async () => {
+    await act(async () => {
+      render(
+        <TestWrapper>
+          <EditContactPhoneNumberPage />
+        </TestWrapper>,
+      );
+    });
 
     const phoneInput = screen.getByTestId("phone-input");
     fireEvent.change(phoneInput, { target: { value: "+15551234567" } });
@@ -406,11 +410,13 @@ describe("EditContactPhoneNumberPage Component", () => {
   });
 
   it("handles cancel navigation", async () => {
-    render(
-      <TestWrapper>
-        <EditContactPhoneNumberPage />
-      </TestWrapper>,
-    );
+    await act(async () => {
+      render(
+        <TestWrapper>
+          <EditContactPhoneNumberPage />
+        </TestWrapper>,
+      );
+    });
 
     const cancelBtn = screen.getByTestId("cancel-btn");
     fireEvent.click(cancelBtn);

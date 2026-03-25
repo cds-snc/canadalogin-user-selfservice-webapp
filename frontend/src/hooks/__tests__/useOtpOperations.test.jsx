@@ -328,7 +328,7 @@ describe("useOtpOperations", () => {
   });
 
   describe("handleSetUserOtpValue", () => {
-    it("should update OTP value correctly", () => {
+    it("should update OTP value correctly", async () => {
       const { result } = renderHook(
         () =>
           useOtpOperations({
@@ -340,7 +340,7 @@ describe("useOtpOperations", () => {
         { wrapper },
       );
 
-      act(() => {
+      await act(async () => {
         result.current.handleSetUserOtpValue("123456");
       });
 
@@ -622,7 +622,7 @@ describe("useOtpOperations", () => {
   });
 
   describe("Setters", () => {
-    it("should provide working setters for all state values", () => {
+    it("should provide working setters for all state values", async () => {
       const { result } = renderHook(
         () =>
           useOtpOperations({
@@ -634,6 +634,11 @@ describe("useOtpOperations", () => {
         { wrapper },
       );
 
+      // Wait for initial data fetch to complete before calling setters
+      await waitFor(() => {
+        expect(result.current.userPhoneFactors).toHaveLength(2);
+      });
+
       const newPhoneFactors = [
         { id: "new-factor", type: "smsotp", destination: "+15551111111" },
       ];
@@ -644,7 +649,7 @@ describe("useOtpOperations", () => {
       };
       const newOtpResponse = { trxnId: "new-transaction" };
 
-      act(() => {
+      await act(async () => {
         result.current.setUserPhoneFactors(newPhoneFactors);
         result.current.setUserSelectedMfaFactor(newSelectedFactor);
         result.current.setOtpSentResponse(newOtpResponse);

@@ -5,7 +5,7 @@ import AddSecondMFA from "../AddSecondMFA";
 import "@testing-library/jest-dom/vitest";
 
 // Mock GCDS components
-vi.mock("@cdssnc/gcds-components-react", () => ({
+vi.mock("@gcds-core/components-react", () => ({
   GcdsButton: ({ children, onGcdsClick, style }) => (
     <button onClick={onGcdsClick} style={style} data-testid="gcds-button">
       {children}
@@ -28,10 +28,10 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
     );
   },
   GcdsText: ({ children }) => <div data-testid="gcds-text">{children}</div>,
-  GcdsNotice: ({ children, type, noticeTitleTag, noticeTitle }) => (
+  GcdsNotice: ({ children, noticeRole, noticeTitleTag, noticeTitle }) => (
     <div
       data-testid="gcds-notice"
-      data-type={type}
+      data-notice-role={noticeRole}
       data-notice-title-tag={noticeTitleTag}
       data-notice-title={noticeTitle}
     >
@@ -132,7 +132,7 @@ describe("AddSecondMFA Unit Tests", () => {
 
       // Check notice component
       const notice = screen.getByTestId("gcds-notice");
-      expect(notice).toHaveAttribute("data-type", "success");
+      expect(notice).toHaveAttribute("data-notice-role", "success");
       expect(notice).toHaveAttribute("data-notice-title-tag", "h2");
 
       // Check grid component
@@ -523,7 +523,7 @@ describe("AddSecondMFA Unit Tests", () => {
       );
 
       const notice = screen.getByTestId("gcds-notice");
-      expect(notice).toHaveAttribute("data-type", "success");
+      expect(notice).toHaveAttribute("data-notice-role", "success");
       expect(notice).toHaveAttribute("data-notice-title-tag", "h2");
     });
 

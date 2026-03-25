@@ -1,7 +1,7 @@
 import {
   GcdsBreadcrumbs,
   GcdsBreadcrumbsItem,
-} from "@cdssnc/gcds-components-react";
+} from "@gcds-core/components-react";
 import { useMatches, useParams } from "react-router";
 import type { UIMatch } from "react-router";
 import type { PageId } from "../../types/utils";

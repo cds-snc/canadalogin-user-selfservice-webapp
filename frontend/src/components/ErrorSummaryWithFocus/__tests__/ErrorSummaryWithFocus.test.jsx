@@ -5,7 +5,7 @@ import ErrorSummaryWithFocus from "../ErrorSummaryWithFocus";
 import "@testing-library/jest-dom/vitest";
 
 // Mock GCDS components to enable proper event handling and testing
-vi.mock("@cdssnc/gcds-components-react", () => ({
+vi.mock("@gcds-core/components-react", () => ({
   GcdsErrorSummary: ({
     children,
     id,

@@ -7,7 +7,7 @@ import {
   GcdsHeading,
   GcdsNotice,
   GcdsText,
-} from "@cdssnc/gcds-components-react";
+} from "@gcds-core/components-react";
 
 import { getPageContent } from "../../../utils/functions";
 import { PAGES } from "../../../utils/constants";
@@ -77,7 +77,7 @@ export default function ConfirmUpdate({
             </ul>
           </div>
 
-          <GcdsNotice type="info" noticeTitleTag="h2" noticeTitle=" ">
+          <GcdsNotice noticeRole="info" noticeTitleTag="h2" noticeTitle=" ">
             <GcdsText>
               {pageContentJson["7"]} <strong>{pageContentJson["11"]}</strong>{" "}
               {pageContentJson["12"]}

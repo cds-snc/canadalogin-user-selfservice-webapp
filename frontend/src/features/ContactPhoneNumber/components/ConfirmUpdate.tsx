@@ -5,11 +5,10 @@ import {
   GcdsErrorMessage,
   GcdsGrid,
   GcdsHeading,
-  GcdsIcon,
   GcdsLink,
   GcdsNotice,
   GcdsText,
-} from "@cdssnc/gcds-components-react";
+} from "@gcds-core/components-react";
 
 import { getPageContent } from "../../../utils/functions";
 import { PAGES } from "../../../utils/constants";
@@ -74,8 +73,7 @@ export default function ConfirmUpdate({
           </ul>
         </GcdsText>
 
-        <GcdsNotice type="info" noticeTitleTag="h2" noticeTitle=" ">
-          <GcdsIcon name="warning-triangle" size="text-small" />
+        <GcdsNotice noticeRole="info" noticeTitleTag="h2" noticeTitle=" ">
           <GcdsText>
             {pageContentJson["6"]} <strong>{pageContentJson["7"]}</strong>
             <GcdsText>

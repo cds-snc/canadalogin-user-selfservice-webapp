@@ -6,7 +6,7 @@ import { UserProvider } from "../../../components/Providers/UserProvider";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider";
 import "@testing-library/jest-dom/vitest";
 
-vi.mock("@cdssnc/gcds-components-react", () => ({
+vi.mock("@gcds-core/components-react", () => ({
   GcdsButton: ({
     children,
     buttonId,
@@ -48,7 +48,18 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
     />
   ),
   GcdsInput: ({ inputId, ...props }) => {
-    const { name, type, value, onInput, ...domProps } = props;
+    const {
+      name,
+      type,
+      value,
+      onInput,
+      validateOn: _va,
+      onGcdsInput: _gi,
+      label: _label,
+      errorMessage: _em,
+      hint: _hint,
+      ...domProps
+    } = props;
     return (
       <input
         {...domProps}

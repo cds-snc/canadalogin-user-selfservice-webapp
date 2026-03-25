@@ -14,7 +14,7 @@
  * - Cancel calls navigate
  * - OTP send / verify error codes are captured
  */
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import "@testing-library/jest-dom/vitest";
@@ -342,7 +342,9 @@ describe("DeleteFIDO2PasskeyPage", () => {
 
     // Invoke the success callback captured from usePasswordValidation
     await waitFor(() => expect(capturedPasswordSuccessCallback).not.toBeNull());
-    capturedPasswordSuccessCallback();
+    await act(async () => {
+      capturedPasswordSuccessCallback();
+    });
 
     await waitFor(() =>
       expect(getStep("step-otpValidation")).toBeInTheDocument(),
@@ -365,7 +367,9 @@ describe("DeleteFIDO2PasskeyPage", () => {
     renderPage();
 
     await waitFor(() => expect(capturedPasswordSuccessCallback).not.toBeNull());
-    capturedPasswordSuccessCallback();
+    await act(async () => {
+      capturedPasswordSuccessCallback();
+    });
 
     await waitFor(() =>
       expect(getStep("step-otpSelection")).toBeInTheDocument(),
@@ -384,7 +388,9 @@ describe("DeleteFIDO2PasskeyPage", () => {
     renderPage();
 
     await waitFor(() => expect(capturedPasswordSuccessCallback).not.toBeNull());
-    capturedPasswordSuccessCallback();
+    await act(async () => {
+      capturedPasswordSuccessCallback();
+    });
 
     await waitFor(() =>
       expect(getStep("step-otpSelection")).toBeInTheDocument(),

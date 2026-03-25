@@ -35,7 +35,10 @@ export default [
     rules: {
       ...js.configs.recommended.rules,
       ...reactHooks.configs.recommended.rules,
-      "no-unused-vars": ["error", { varsIgnorePattern: "^[A-Z_]" }],
+      "no-unused-vars": [
+        "error",
+        { varsIgnorePattern: "^[A-Z_]", argsIgnorePattern: "^_" },
+      ],
       "react-refresh/only-export-components": [
         "warn",
         { allowConstantExport: true },
@@ -63,7 +66,7 @@ export default [
       ...reactHooks.configs.recommended.rules,
       "@typescript-eslint/no-unused-vars": [
         "error",
-        { varsIgnorePattern: "^[A-Z_]" },
+        { varsIgnorePattern: "^_", argsIgnorePattern: "^_" },
       ],
       "react-refresh/only-export-components": [
         "warn",

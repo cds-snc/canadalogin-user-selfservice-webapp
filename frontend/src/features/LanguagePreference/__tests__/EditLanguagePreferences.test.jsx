@@ -74,7 +74,7 @@ vi.mock("../../../components/InfoBlocks/ServicesWithAccessInfoSection", () => ({
   ),
 }));
 
-vi.mock("@cdssnc/gcds-components-react", () => ({
+vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children, marginTop, ...props }) => (
     <div data-testid="gcds-container" style={{ marginTop }} {...props}>
       {children}
@@ -86,9 +86,9 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
     </h1>
   ),
   GcdsText: ({ children, ...props }) => (
-    <p data-testid="gcds-text" {...props}>
+    <div data-testid="gcds-text" {...props}>
       {children}
-    </p>
+    </div>
   ),
   GcdsButton: ({ children, buttonRole, onGcdsClick, ...props }) => {
     const handleClick = (e) => {

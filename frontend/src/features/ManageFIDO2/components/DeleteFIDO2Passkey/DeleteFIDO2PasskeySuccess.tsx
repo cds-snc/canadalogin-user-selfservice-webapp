@@ -7,7 +7,7 @@ import {
   GcdsGrid,
   GcdsHeading,
   GcdsText,
-} from "@cdssnc/gcds-components-react";
+} from "@gcds-core/components-react";
 import NoticeFactory from "../../../../components/InfoBlocks/NoticeFactory";
 
 interface DeleteFIDO2PasskeySuccessProps {

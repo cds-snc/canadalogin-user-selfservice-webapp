@@ -4,7 +4,7 @@ import {
   GcdsErrorSummary,
   GcdsGrid,
   GcdsHeading,
-} from "@cdssnc/gcds-components-react";
+} from "@gcds-core/components-react";
 import { useParams } from "react-router";
 import { useError } from "../../hooks/useError";
 import { useNavigateHelper } from "../../hooks/useNavigate";

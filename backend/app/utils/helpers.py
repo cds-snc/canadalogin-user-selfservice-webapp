@@ -60,10 +60,10 @@ def extract_last_4_digits(masked_phone: str) -> str:
 
 async def verify_otp_before_operation(
     global_http_client: AsyncClient,
-    user_access_token: str,
     otp: str,
     trxn_id: str,
     otp_type: "OtpType",
+    user_access_token: str,
 ) -> None:
     """
     Verify OTP before performing a sensitive operation.
@@ -80,6 +80,7 @@ async def verify_otp_before_operation(
     Raises:
         HTTPException: 400 if OTP verification fails
         HTTPException: 500 for unexpected errors
+        user_access_token: User's authentication token
 
     Returns:
         None if verification succeeds

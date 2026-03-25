@@ -4,7 +4,7 @@ import {
   GcdsGrid,
   GcdsHeading,
   GcdsText,
-} from "@cdssnc/gcds-components-react";
+} from "@gcds-core/components-react";
 import { useLocation, useNavigate, useParams } from "react-router";
 import { MAP_TYPES, useOtpOperations } from "../../../hooks/useOtpOperations";
 import { usePasskeyOperations } from "../../../hooks/usePasskeyOperations";

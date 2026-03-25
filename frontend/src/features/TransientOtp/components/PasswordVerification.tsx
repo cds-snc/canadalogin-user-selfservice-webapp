@@ -9,7 +9,7 @@ import {
   GcdsInput,
   GcdsText,
   GcdsCheckboxes,
-} from "@cdssnc/gcds-components-react";
+} from "@gcds-core/components-react";
 import { getPageContent } from "../../../utils/functions";
 import { PAGES } from "../../../utils/constants";
 import { useParams } from "react-router";

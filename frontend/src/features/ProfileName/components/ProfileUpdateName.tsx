@@ -8,7 +8,7 @@ import {
   GcdsHeading,
   GcdsInput,
   GcdsText,
-} from "@cdssnc/gcds-components-react";
+} from "@gcds-core/components-react";
 
 import { getPageContent } from "../../../utils/functions";
 import {
@@ -47,7 +47,7 @@ function capitalizeFirstLetter(value: string): string {
         return part;
       }
 
-      return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
+      return part.charAt(0).toUpperCase() + part.slice(1);
     })
     .join("");
 }

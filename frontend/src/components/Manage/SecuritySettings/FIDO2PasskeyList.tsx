@@ -4,7 +4,7 @@ import {
   GcdsText,
   GcdsGrid,
   GcdsInput,
-} from "@cdssnc/gcds-components-react";
+} from "@gcds-core/components-react";
 import { useNavigate, useParams } from "react-router";
 import { PAGES } from "../../../utils/constants";
 import { getPageContent } from "../../../utils/functions";
@@ -117,11 +117,9 @@ export default function FIDO2PasskeyList({
             <strong>{nicknameValue}</strong>
           </GcdsText>
         )}
-        <GcdsText>
-          <span style={{ color: "#595959" }}>
-            {pageContent["16"]}
-            {created ? new Date(created).toLocaleDateString() : ""}
-          </span>
+        <GcdsText textRole="secondary">
+          {pageContent["16"]}
+          {created ? new Date(created).toLocaleDateString() : ""}
         </GcdsText>
         <GcdsGrid columns="max-content max-content max-content" gap="200">
           {isEditing ? (

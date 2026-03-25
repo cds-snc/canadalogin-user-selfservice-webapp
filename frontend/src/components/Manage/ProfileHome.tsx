@@ -5,7 +5,7 @@ import {
   GcdsGrid,
   GcdsText,
   GcdsLink,
-} from "@cdssnc/gcds-components-react";
+} from "@gcds-core/components-react";
 
 import { getPageContent } from "../../utils/functions";
 import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";

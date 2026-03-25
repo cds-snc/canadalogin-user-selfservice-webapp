@@ -46,10 +46,10 @@ async def update_profile_with_otp_verification(
     # Step 1: Validate the OTP first using the helper function
     await verify_otp_before_operation(
         global_http_client=request.app.state.request_client,
-        user_access_token=user_access_token,
         otp=profile_update_data.otp,
         trxn_id=profile_update_data.trxnId,
         otp_type=profile_update_data.otpType,
+        user_access_token=user_access_token,
     )
 
     logger.info("OTP verification successful, proceeding with profile update")

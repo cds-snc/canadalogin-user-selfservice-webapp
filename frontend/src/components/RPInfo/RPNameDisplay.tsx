@@ -1,4 +1,4 @@
-import { GcdsText } from "@cdssnc/gcds-components-react";
+import { GcdsText } from "@gcds-core/components-react";
 import { useUser } from "../Providers/useUser";
 
 interface RPNameDisplayProps {

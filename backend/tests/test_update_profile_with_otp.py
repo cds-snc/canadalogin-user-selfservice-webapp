@@ -296,10 +296,10 @@ class TestUpdateProfileWithOtpVerification:
 
         mock_verify_otp.assert_called_once_with(
             global_http_client=mock_request.app.state.request_client,
-            user_access_token="user-token",
             otp="123456",
             trxn_id="test-trxn-id",
             otp_type=OtpType.SMS,
+            user_access_token="user-token",
         )
         mock_get_profile.assert_called_once()
         mock_update_profile.assert_called_once()

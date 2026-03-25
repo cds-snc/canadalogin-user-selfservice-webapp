@@ -30,6 +30,7 @@ async def handle_otp_deletion(
     user_access_token: str,
 ):
     """Delete an OTP factor enrollment (SMS or Voice) after OTP verification"""
+
     otp_type = deletion_request.otpType
     logger.info(f"Attempting to delete {otp_type} OTP factor")
     start_time = datetime.now()

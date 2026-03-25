@@ -7,7 +7,7 @@ import { LanguageProvider } from "../../../components/Providers/LanguageProvider
 import "@testing-library/jest-dom/vitest";
 
 // Mock GCDS components
-vi.mock("@cdssnc/gcds-components-react", () => ({
+vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children, ...props }) => (
     <div data-testid="gcds-container" {...props}>
       {children}
@@ -42,9 +42,9 @@ vi.mock("@cdssnc/gcds-components-react", () => ({
     </a>
   ),
   GcdsText: ({ children, ...props }) => (
-    <p data-testid="gcds-text" {...props}>
+    <div data-testid="gcds-text" {...props}>
       {children}
-    </p>
+    </div>
   ),
   GcdsRadios: ({ name, legend, hint, options, onGcdsChange, ...props }) => (
     <fieldset data-testid="gcds-radios" {...props}>

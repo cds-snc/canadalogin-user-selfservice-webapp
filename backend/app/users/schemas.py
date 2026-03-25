@@ -92,6 +92,7 @@ class UserProfileName(BaseModel):
     - Only letters (including accented/international), spaces, hyphens, and apostrophes allowed
     - No numbers or other symbols permitted
     - First letter after spaces, hyphens, and apostrophes is auto-capitalized
+    - Mid-word capitals are preserved (e.g. MacDonald, JoAnne remain unchanged)
     """
 
     formatted: Optional[str] = None
@@ -118,18 +119,23 @@ class UserProfileName(BaseModel):
         - Special symbols (@, #, $, %, etc.)
 
         Transformation:
-        - Auto-capitalizes first letter after spaces, hyphens, and apostrophes
+        - Ensures the first letter of each word-segment (split by spaces, hyphens, apostrophes) is capitalized
+        - Mid-word capitals are preserved (e.g. MacDonald, JoAnne are accepted as-is)
 
         Note: givenName is optional — an empty string is allowed and returned as-is.
         """
         if v is None:
             return v
 
+        import re
+
+        # Trim leading/trailing whitespace and collapse internal runs of spaces
+        v = v.strip()
+        v = re.sub(r" +", " ", v)
+
         # givenName is not required; allow empty string without validation
         if v == "" and info.field_name == "givenName":
             return v
-
-        import re
 
         # Pattern matches valid name characters: letters (including international), spaces, hyphens, apostrophes
         valid_pattern = (
@@ -152,8 +158,10 @@ class UserProfileName(BaseModel):
             for part in parts:
                 if re.match(r"^[\s'-]$", part):  # Keep delimiters as-is
                     capitalized_parts.append(part)
-                elif part:  # Capitalize non-empty parts
-                    capitalized_parts.append(part[0].upper() + part[1:].lower())
+                elif (
+                    part
+                ):  # Capitalize first letter, preserve remaining casing (e.g. MacDonald, JoAnne)
+                    capitalized_parts.append(part[0].upper() + part[1:])
             return "".join(capitalized_parts)
 
         return capitalize_name(v)
