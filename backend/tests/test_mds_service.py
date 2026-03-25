@@ -13,12 +13,12 @@ import pytest
 
 from app.fido2.mds_service import (
     FIDO2MetadataService,
-    GLOBALSIGN_R3_CERT_DER,
     GLOBALSIGN_ROOT_CERT_URL,
     MDS3_URL,
     REDIS_MDS_TTL,
     _to_json_safe,
 )
+from app.config import _BUNDLED_GLOBALSIGN_CERT_PATH
 from app.constants.redis_keys import RedisKeys
 
 # ---------------------------------------------------------------------------
@@ -349,7 +349,12 @@ async def test_get_root_cert_downloads_successfully():
     service = FIDO2MetadataService()
     expected_cert = b"downloaded-cert-bytes"
 
-    with patch("app.fido2.mds_service.httpx.AsyncClient") as mock_client_cls:
+    with (
+        patch("app.fido2.mds_service._mds_config") as mock_config,
+        patch("app.fido2.mds_service.httpx.AsyncClient") as mock_client_cls,
+    ):
+        mock_config.FIDO2_MDS_CERT_PATH = None  # skip file path, force live download
+        mock_config.FIDO2_GLOBALSIGN_ROOT_CERT_URL = GLOBALSIGN_ROOT_CERT_URL
         mock_response = MagicMock()
         mock_response.raise_for_status = MagicMock()
         mock_response.content = expected_cert
@@ -365,7 +370,8 @@ async def test_get_root_cert_downloads_successfully():
 
 
 @pytest.mark.asyncio
-async def test_get_root_cert_falls_back_to_embedded():
+async def test_get_root_cert_raises_when_no_cert_path_and_download_fails():
+    """With no cert file path and a failed download, _get_root_cert should raise."""
     service = FIDO2MetadataService()
 
     with (
@@ -373,18 +379,15 @@ async def test_get_root_cert_falls_back_to_embedded():
         patch("app.fido2.mds_service.httpx.AsyncClient") as mock_client_cls,
     ):
         mock_config.FIDO2_MDS_CERT_PATH = None
-        mock_config.FIDO2_GLOBALSIGN_ROOT_CERT_URL = (
-            "https://secure.globalsign.com/cacert/root-r3.crt"
-        )
+        mock_config.FIDO2_GLOBALSIGN_ROOT_CERT_URL = GLOBALSIGN_ROOT_CERT_URL
         mock_client = AsyncMock()
         mock_client.__aenter__ = AsyncMock(return_value=mock_client)
         mock_client.__aexit__ = AsyncMock(return_value=False)
         mock_client.get = AsyncMock(side_effect=Exception("Network unreachable"))
         mock_client_cls.return_value = mock_client
 
-        cert = await service._get_root_cert()
-
-    assert cert == GLOBALSIGN_R3_CERT_DER
+        with pytest.raises(Exception, match="Network unreachable"):
+            await service._get_root_cert()
 
 
 # ---------------------------------------------------------------------------
@@ -392,11 +395,12 @@ async def test_get_root_cert_falls_back_to_embedded():
 # ---------------------------------------------------------------------------
 
 
-def test_embedded_cert_is_valid_der():
-    """The embedded cert should be valid base64-decodable DER (starts with SEQUENCE)."""
-    # DER SEQUENCE tag is 0x30
-    assert GLOBALSIGN_R3_CERT_DER[0:1] == b"\x30"
-    assert len(GLOBALSIGN_R3_CERT_DER) > 200  # reasonable minimum for a real cert
+def test_bundled_cert_file_is_valid_der():
+    """The bundled cert file should be valid DER (starts with SEQUENCE tag 0x30)."""
+    with open(_BUNDLED_GLOBALSIGN_CERT_PATH, "rb") as fh:
+        cert = fh.read()
+    assert cert[0:1] == b"\x30"
+    assert len(cert) > 200  # reasonable minimum for a real cert
 
 
 def test_mds_url_constants():

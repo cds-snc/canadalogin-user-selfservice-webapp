@@ -21,7 +21,7 @@ import enum
 import json
 import logging
 import uuid as uuid_module
-from base64 import b64decode, b64encode
+from base64 import b64encode
 from typing import Any
 
 import httpx
@@ -43,34 +43,6 @@ GLOBALSIGN_ROOT_CERT_URL = _mds_config.FIDO2_GLOBALSIGN_ROOT_CERT_URL
 # Alias kept for backward compatibility (e.g. test imports).
 # Value is None by default, meaning no Redis expiry.
 REDIS_MDS_TTL = _mds_config.FIDO2_REDIS_MDS_TTL
-
-# ---------------------------------------------------------------------------
-# Embedded GlobalSign Root CA - R3 certificate (DER, base64-encoded).
-# Used as a fallback when the live download of the cert fails.
-# Source: https://secure.globalsign.com/cacert/root-r3.crt
-# ---------------------------------------------------------------------------
-_GLOBALSIGN_R3_CERT_B64 = (
-    "MIIDXzCCAkegAwIBAgILBAAAAAABIVhTCKIwDQYJKoZIhvcNAQELBQAwTDEgMB4G"
-    "A1UECxMXR2xvYmFsU2lnbiBSb290IENBIC0gUjMxEzARBgNVBAoTCkdsb2JhbFNp"
-    "Z24xEzARBgNVBAMTCkdsb2JhbFNpZ24wHhcNMDkwMzE4MTAwMDAwWhcNMjkwMzE4"
-    "MTAwMDAwWjBMMSAwHgYDVQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEG"
-    "A1UEChMKR2xvYmFsU2lnbjETMBEGA1UEAxMKR2xvYmFsU2lnbjCCASIwDQYJKoZI"
-    "hvcNAQEBBQADggEPADCCAQoCggEBAMwldpB5BngiFvXAg7aEyiie/QV2EcWtiHL8"
-    "RgJDx7KKnQRfJMsuS+FggkbhUqsMgUdwbN1k0ev1LKMPgj0MK66X17YUhhB5uzsT"
-    "gHeMCOFJ0mpiLx9e+pZo34knlTifBtc+ycsmWQ1z3rDI6SYOgxXG71uL0gRgykmm"
-    "KPZpO/bLyCiR5Z2KYVc3rHQU3HTgOu5yLy6c+9C7v/U9AOEGM+iCK65TpjoWc4zd"
-    "QQ4gOsC0p6Hpsk+QLjJg6VfLuQSSaGjlOCZgdbKfd/+RFO+uIEn8rUAVSNECMWEZ"
-    "XriX7613t2Saer9fwRPvm2L7DWzgVGkWqQPabumDk3F2xmmFghcCAwEAAaNCMEAw"
-    "DgYDVR0PAQH/BAQDAgEGMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYEFI/wS3+o"
-    "LkUkrk1Q+mOai97i3Ru8MA0GCSqGSIb3DQEBCwUAA4IBAQBLQNvAUKr+yAzv95ZU"
-    "RUm7lgAJQayzE4aGKAczymvmdLm6AC2upArT9fHxD4q/c2dKg8dEe3jgr25sbwMp"
-    "jjM5RcOO5LlXbKr8EpbsU8Yt5CRsuZRj+9xTaGdWPoO4zzUhw8lo/s7awlOqzJCK"
-    "6fBdRoyV3XpYKBovHd7NADdBj+1EbddTKJd+82cEHhXXipa0095MJ6RMG3NzdvQX"
-    "mcIfeg7jLQitChws/zyrVQ4PkX4268NXSb7hLi18YIvDQVETI53O9zJrlAGomecs"
-    "Mx86OyXShkDOOyyGeMlhLxS67ttVb9+E7gUJTb0o2HLO02JQZR7rkpeDMdmztcpH"
-    "WD9f"
-)
-GLOBALSIGN_R3_CERT_DER: bytes = b64decode(_GLOBALSIGN_R3_CERT_B64)
 
 
 class FIDO2MetadataService:
@@ -175,11 +147,12 @@ class FIDO2MetadataService:
         """Return the GlobalSign R3 root certificate bytes.
 
         Priority:
-        1. File at ``FIDO2_MDS_CERT_PATH`` (if configured).
+        1. File at ``FIDO2_MDS_CERT_PATH`` (defaults to the cert bundled in the repo).
         2. Live download from ``FIDO2_GLOBALSIGN_ROOT_CERT_URL``.
-        3. Embedded fallback bytes (``GLOBALSIGN_R3_CERT_DER``).
+
+        Raises if both sources fail.
         """
-        # 1. Local cert file (operator-supplied)
+        # 1. Local cert file (defaults to bundled cert, operator can override)
         if _mds_config.FIDO2_MDS_CERT_PATH:
             try:
                 with open(_mds_config.FIDO2_MDS_CERT_PATH, "rb") as fh:
@@ -197,19 +170,10 @@ class FIDO2MetadataService:
                 )
 
         # 2. Live download
-        try:
-            async with httpx.AsyncClient(timeout=15.0, follow_redirects=True) as client:
-                response = await client.get(GLOBALSIGN_ROOT_CERT_URL)
-                response.raise_for_status()
-                return response.content
-        except Exception as exc:
-            logger.warning(
-                "MDS: could not download GlobalSign root cert (%s); using embedded copy",
-                exc,
-            )
-
-        # 3. Embedded fallback
-        return GLOBALSIGN_R3_CERT_DER
+        async with httpx.AsyncClient(timeout=15.0, follow_redirects=True) as client:
+            response = await client.get(GLOBALSIGN_ROOT_CERT_URL)
+            response.raise_for_status()
+            return response.content
 
     async def _refresh(self) -> None:
         """Download a fresh MDS3 blob, parse it, update the in-memory table,

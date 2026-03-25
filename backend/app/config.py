@@ -1,8 +1,14 @@
 from functools import lru_cache
+from pathlib import Path
 from typing import List, Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import AnyUrl, Field
 from app.constants.verify_endpoints import VerifyAPIEndpoint
+
+# Path to the GlobalSign R3 root CA certificate bundled with the repository.
+_BUNDLED_GLOBALSIGN_CERT_PATH = str(
+    Path(__file__).parent.parent / "certs" / "globalsign-root-r3.crt"
+)
 
 
 class AppInfo(BaseSettings):
@@ -59,11 +65,11 @@ class FIDO2MDSConfig(BaseSettings):
         description="URL used to download the GlobalSign R3 root CA certificate for MDS3 JWT verification.",
     )
     FIDO2_MDS_CERT_PATH: Optional[str] = Field(
-        default=None,
+        default=_BUNDLED_GLOBALSIGN_CERT_PATH,
         description=(
-            "Path to a local DER-encoded GlobalSign R3 CA certificate file. "
-            "When set, this file is used instead of the live cert download. "
-            "If unset or the file cannot be read, falls back to the embedded certificate."
+            "Path to a local DER-encoded GlobalSign R3 CA certificate file used for "
+            "MDS3 JWT verification. Defaults to the cert bundled with the repository. "
+            "Set to an empty string to skip the file and use the live download instead."
         ),
     )
     FIDO2_REDIS_MDS_TTL: Optional[int] = Field(
