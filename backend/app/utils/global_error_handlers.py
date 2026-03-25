@@ -77,7 +77,7 @@ async def http_status_error_handler(request: Request, exc: HTTPStatusError):
     url = str(exc.request.url) if exc.request else "unknown"
 
     message = (
-        f"Upstream service returned the following HTTP status code: {status_code}.",
+        f"Upstream service returned the following HTTP status code: {status_code}."
     )
 
     if status_code in [
@@ -86,7 +86,8 @@ async def http_status_error_handler(request: Request, exc: HTTPStatusError):
         status.HTTP_404_NOT_FOUND,
     ]:
         body = extract_response_body(exc.response)
-        message = body.get("messageId", "N/A")
+        if "messageId" in body:
+            message = body.get("messageId", "N/A")
         logger.exception(
             f"Correlation ID: {correlation_id} - Upstream service returned an error (status={status_code}, url={url}, messageId={body.get('messageId', 'N/A')}, message={body.get('message', 'N/A')}, detail={body.get('detail', 'N/A')})"
         )

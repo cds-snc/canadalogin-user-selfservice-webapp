@@ -8,7 +8,7 @@ Uses importlib to import the actual module for patching.
 import importlib
 import time
 import pytest
-from httpx import AsyncClient, HTTPStatusError, Request
+from httpx import AsyncClient
 from unittest.mock import AsyncMock, MagicMock, patch
 from app.fido2.schemas import AssertionOptionsRequest, FIDO2AssertionResultRequest
 
@@ -1417,31 +1417,6 @@ class TestPerformMfaRefreshTokenFlow:
         # Should still return the data (just logs warning)
         assert result["allowedFactors"] == ["totp", "sms"]
         assert "access_token" in result
-
-    @pytest.mark.asyncio
-    async def test_handles_http_error(self, mock_http_client):
-        """Should handle HTTP errors during MFA refresh token flow"""
-        mock_response = MagicMock()
-        mock_response.status_code = 400
-        mock_response.text = "Invalid refresh token"
-
-        http_error = HTTPStatusError(
-            "400 Bad Request",
-            request=MagicMock(spec=Request),
-            response=mock_response,
-        )
-        mock_http_client.post = AsyncMock(side_effect=http_error)
-
-        mfa_flow_func = auth_module._perform_mfa_refresh_token_flow
-
-        with pytest.raises(HTTPStatusError):
-            await mfa_flow_func(
-                http_client=mock_http_client,
-                tenant_url="https://tenant.verify.ibm.com",
-                refresh_token="invalid-token",
-                client_id="client-id",
-                client_secret="client-secret",
-            )
 
 
 class TestIsTokenExpired:

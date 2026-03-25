@@ -331,6 +331,7 @@ class TestErrorHandlingDeleteMfaOtp:
         mock_response = Mock()
         mock_response.status_code = 404
         mock_response.request = mock_request
+        mock_response.json = MagicMock(return_value={"messageId": "test123"})
 
         mock_client.delete.side_effect = HTTPStatusError(
             "Not found", request=mock_request, response=mock_response
@@ -351,10 +352,7 @@ class TestErrorHandlingDeleteMfaOtp:
 
         assert response.status_code == status.HTTP_502_BAD_GATEWAY
         assert not response_json["success"]
-        assert (
-            response_json["message"]
-            == "Upstream service returned the following HTTP status code: 404."
-        )
+        assert response_json["message"] == "test123"
 
     @pytest.mark.asyncio
     @patch.object(delete_mfa_otp_module, "get_my_profile")
@@ -553,6 +551,7 @@ class TestErrorHandlingFido2AttestationOptions:
         mock_client = AsyncMock(spec=AsyncClient)
         mock_request = Request("POST", "https://example.com")
         mock_response = Response(400, request=mock_request)
+        mock_response.json = MagicMock(return_value={"messageId": "test123"})
         mock_response_obj = MagicMock()
         mock_response_obj.raise_for_status.side_effect = HTTPStatusError(
             message="Bad Request", request=mock_request, response=mock_response
@@ -570,10 +569,7 @@ class TestErrorHandlingFido2AttestationOptions:
 
         assert response.status_code == status.HTTP_502_BAD_GATEWAY
         assert not response_json["success"]
-        assert (
-            response_json["message"]
-            == "Upstream service returned the following HTTP status code: 400."
-        )
+        assert response_json["message"] == "test123"
 
     @pytest.mark.asyncio
     @patch.object(add_fido2_registration_module, "get_user_profile_info")
@@ -682,6 +678,7 @@ class TestErrorHandlingFido2AttestationResults:
         mock_client = AsyncMock(spec=AsyncClient)
         mock_request = Request("POST", "https://example.com")
         mock_response = Response(400, request=mock_request)
+        mock_response.json = MagicMock(return_value={"messageId": "test123"})
         mock_response_obj = MagicMock()
         mock_response_obj.raise_for_status.side_effect = HTTPStatusError(
             message="Bad Request", request=mock_request, response=mock_response
@@ -704,10 +701,7 @@ class TestErrorHandlingFido2AttestationResults:
 
         assert response.status_code == status.HTTP_502_BAD_GATEWAY
         assert not response_json["success"]
-        assert (
-            response_json["message"]
-            == "Upstream service returned the following HTTP status code: 400."
-        )
+        assert response_json["message"] == "test123"
 
 
 class TestErrorHandlingFido2AssertionOptions:
@@ -814,6 +808,7 @@ class TestErrorHandlingFido2AssertionOptions:
         mock_client = AsyncMock(spec=AsyncClient)
         mock_request = Request("POST", "https://example.com")
         mock_response = Response(400, request=mock_request)
+        mock_response.json = MagicMock(return_value={"messageId": "test123"})
         mock_response_obj = MagicMock()
         mock_response_obj.raise_for_status.side_effect = HTTPStatusError(
             message="Bad Request", request=mock_request, response=mock_response
@@ -831,10 +826,7 @@ class TestErrorHandlingFido2AssertionOptions:
 
         assert response.status_code == status.HTTP_502_BAD_GATEWAY
         assert not response_json["success"]
-        assert (
-            response_json["message"]
-            == "Upstream service returned the following HTTP status code: 400."
-        )
+        assert response_json["message"] == "test123"
 
 
 # endregion
@@ -1356,6 +1348,7 @@ class TestErrorHandlingFido2DeleteRegistration:
             "https://tenant.verify.ibm.com/v2.0/factors/fido2/registrations/reg-123",
         )
         mock_response = Response(404, request=mock_request)
+        mock_response.json = MagicMock(return_value={"messageId": "test123"})
         mock_delete_response = MagicMock()
         mock_delete_response.raise_for_status.side_effect = HTTPStatusError(
             message="Not Found",
@@ -1385,10 +1378,7 @@ class TestErrorHandlingFido2DeleteRegistration:
 
         assert response.status_code == status.HTTP_502_BAD_GATEWAY
         assert not response_json["success"]
-        assert (
-            response_json["message"]
-            == "Upstream service returned the following HTTP status code: 404."
-        )
+        assert response_json["message"] == "test123"
 
     @pytest.mark.asyncio
     @patch.object(delete_fido2_registration_module, "get_tenant_url")
@@ -1753,6 +1743,7 @@ class TestErrorHandlingFido2UpdateRegistrations:
             "https://tenant.verify.ibm.com/v2.0/factors/fido2/registrations/reg-123",
         )
         mock_response = Response(400, request=mock_request)
+        mock_response.json = MagicMock(return_value={"messageId": "test123"})
         mock_put_response = MagicMock()
         mock_put_response.raise_for_status.side_effect = HTTPStatusError(
             message="Bad Request",
@@ -1774,10 +1765,7 @@ class TestErrorHandlingFido2UpdateRegistrations:
 
         assert response.status_code == status.HTTP_502_BAD_GATEWAY
         assert not response_json["success"]
-        assert (
-            response_json["message"]
-            == "Upstream service returned the following HTTP status code: 400."
-        )
+        assert response_json["message"] == "test123"
 
     @pytest.mark.asyncio
     @patch.object(update_fido2_registrations_module, "get_tenant_url")
@@ -1984,6 +1972,7 @@ class TestErrorHandlingSendMfaOtp:
         mock_client = AsyncMock(spec=AsyncClient)
         mock_request = Request("POST", "https://test.ibm.com")
         mock_response = Response(400, request=mock_request)
+        mock_response.json = MagicMock(return_value={"messageId": "test123"})
         http_error = HTTPStatusError(
             "Bad Request", request=mock_request, response=mock_response
         )
@@ -1998,10 +1987,7 @@ class TestErrorHandlingSendMfaOtp:
 
         assert response.status_code == status.HTTP_502_BAD_GATEWAY
         assert not response_json["success"]
-        assert (
-            response_json["message"]
-            == "Upstream service returned the following HTTP status code: 400."
-        )
+        assert response_json["message"] == "test123"
 
     @pytest.mark.asyncio
     async def test_dispatch_verification_attempt_unsupported_otp_type(
@@ -2672,16 +2658,13 @@ class TestErrorHandlingVerifyPassword:
             url="https://tenant.verify.ibm.com/v1.0/authnmethods/password?search=name%3D%22Cloud%20Directory%22",
         )
 
-        mock_response = Mock(spec=Response)
-        mock_response.status_code = 404
-        mock_response.text = "Not Found"
-
-        mock_response.raise_for_status.side_effect = HTTPStatusError(
-            message="Not Found",
-            request=mock_request,
-            response=mock_response,
+        mock_response = Response(404, request=mock_request)
+        mock_response.json = MagicMock(return_value={"messageId": "test123"})
+        mock_response_obj = MagicMock()
+        mock_response_obj.raise_for_status.side_effect = HTTPStatusError(
+            message="Not Found", request=mock_request, response=mock_response
         )
-        mock_client.get.return_value = mock_response
+        mock_client.get = AsyncMock(return_value=mock_response_obj)
 
         request_data = {"password": "purple_monkey_dishwasher"}
 
@@ -2692,10 +2675,7 @@ class TestErrorHandlingVerifyPassword:
 
         assert response.status_code == status.HTTP_502_BAD_GATEWAY
         assert not response_json["success"]
-        assert (
-            response_json["message"]
-            == "Upstream service returned the following HTTP status code: 404."
-        )
+        assert response_json["message"] == "test123"
 
     @pytest.mark.asyncio
     @patch.object(verify_password_module, "dispatch_get_my_profile_from_ibm")
