@@ -5,8 +5,13 @@ Downloads the FIDO Alliance MDS3 blob periodically, parses it with the
 fido2 library, and stores the AAGUID → metadata lookup table in Redis.
 
 Lookup is O(1) via an in-memory dict that is populated at startup and
-refreshed every 24 hours.  Redis acts as a persistent warm-cache so that
-restarts do not require a re-download.
+refreshed on a configurable interval (default: 24 h). Redis acts as a
+persistent warm-cache with no expiry by default, so cached data survives
+across restarts and temporary refresh failures.
+
+All tuneable values (URLs, cert path, TTL, refresh interval) can be
+overridden via environment variables — see ``FIDO2MDSConfig`` in
+``app.config``.
 """
 
 import asyncio
@@ -23,18 +28,21 @@ import httpx
 from fido2.mds3 import parse_blob
 from redis.asyncio import Redis
 
+from app.config import FIDO2MDSConfig
 from app.constants.redis_keys import RedisKeys
 
 logger = logging.getLogger(__name__)
 
-MDS3_URL = "https://mds3.fidoalliance.org/"
-GLOBALSIGN_ROOT_CERT_URL = "https://secure.globalsign.com/cacert/root-r3.crt"
+# Resolved at import time from environment / .env.
+# All three can be overridden via the corresponding environment variables.
+_mds_config = FIDO2MDSConfig()
 
-# Redis key / TTL — TTL is slightly longer than the refresh interval so the
-# cache never expires between scheduled refreshes.
-REDIS_MDS_TTL = 26 * 60 * 60  # 26 hours
+MDS3_URL = _mds_config.FIDO2_MDS3_URL
+GLOBALSIGN_ROOT_CERT_URL = _mds_config.FIDO2_GLOBALSIGN_ROOT_CERT_URL
 
-REFRESH_INTERVAL = 24 * 60 * 60  # refresh every 24 hours
+# Alias kept for backward compatibility (e.g. test imports).
+# Value is None by default, meaning no Redis expiry.
+REDIS_MDS_TTL = _mds_config.FIDO2_REDIS_MDS_TTL
 
 # ---------------------------------------------------------------------------
 # Embedded GlobalSign Root CA - R3 certificate (DER, base64-encoded).
@@ -164,7 +172,31 @@ class FIDO2MetadataService:
         return False
 
     async def _get_root_cert(self) -> bytes:
-        """Download the GlobalSign R3 root certificate; fall back to embedded copy."""
+        """Return the GlobalSign R3 root certificate bytes.
+
+        Priority:
+        1. File at ``FIDO2_MDS_CERT_PATH`` (if configured).
+        2. Live download from ``FIDO2_GLOBALSIGN_ROOT_CERT_URL``.
+        3. Embedded fallback bytes (``GLOBALSIGN_R3_CERT_DER``).
+        """
+        # 1. Local cert file (operator-supplied)
+        if _mds_config.FIDO2_MDS_CERT_PATH:
+            try:
+                with open(_mds_config.FIDO2_MDS_CERT_PATH, "rb") as fh:
+                    cert = fh.read()
+                logger.debug(
+                    "MDS: loaded root cert from file %s",
+                    _mds_config.FIDO2_MDS_CERT_PATH,
+                )
+                return cert
+            except OSError as exc:
+                logger.warning(
+                    "MDS: could not read cert file %s (%s); falling back to live download",
+                    _mds_config.FIDO2_MDS_CERT_PATH,
+                    exc,
+                )
+
+        # 2. Live download
         try:
             async with httpx.AsyncClient(timeout=15.0, follow_redirects=True) as client:
                 response = await client.get(GLOBALSIGN_ROOT_CERT_URL)
@@ -175,7 +207,9 @@ class FIDO2MetadataService:
                 "MDS: could not download GlobalSign root cert (%s); using embedded copy",
                 exc,
             )
-            return GLOBALSIGN_R3_CERT_DER
+
+        # 3. Embedded fallback
+        return GLOBALSIGN_R3_CERT_DER
 
     async def _refresh(self) -> None:
         """Download a fresh MDS3 blob, parse it, update the in-memory table,
@@ -201,18 +235,23 @@ class FIDO2MetadataService:
                 await self._redis.set(
                     RedisKeys.FIDO2_MDS_METADATA,
                     json.dumps(metadata),
-                    ex=REDIS_MDS_TTL,
+                    ex=_mds_config.FIDO2_REDIS_MDS_TTL,
                 )
-                logger.info("MDS: metadata persisted to Redis (TTL %ds)", REDIS_MDS_TTL)
+                ttl_desc = (
+                    f"{_mds_config.FIDO2_REDIS_MDS_TTL}s"
+                    if _mds_config.FIDO2_REDIS_MDS_TTL is not None
+                    else "no expiry"
+                )
+                logger.info("MDS: metadata persisted to Redis (TTL: %s)", ttl_desc)
 
         except Exception as exc:
             logger.error("MDS: refresh failed: %s", exc, exc_info=True)
             # Keep whatever data was already loaded; do not wipe the in-memory table
 
     async def _background_refresh(self) -> None:
-        """Asyncio task: sleep 24 h, then refresh, repeat."""
+        """Asyncio task: sleep for ``FIDO2_REFRESH_INTERVAL`` seconds, then refresh, repeat."""
         while True:
-            await asyncio.sleep(REFRESH_INTERVAL)
+            await asyncio.sleep(_mds_config.FIDO2_REFRESH_INTERVAL)
             logger.info("MDS: scheduled refresh starting…")
             await self._refresh()
 

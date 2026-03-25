@@ -315,6 +315,36 @@ async def test_refresh_keeps_existing_data_on_failure():
 
 
 @pytest.mark.asyncio
+async def test_get_root_cert_loads_from_file_when_path_configured():
+    """When FIDO2_MDS_CERT_PATH is set and the file exists, return file contents."""
+    service = FIDO2MetadataService()
+    cert_bytes = b"file-cert-bytes"
+
+    with (
+        patch("app.fido2.mds_service._mds_config") as mock_config,
+        patch(
+            "builtins.open",
+            MagicMock(
+                return_value=MagicMock(
+                    __enter__=lambda s: MagicMock(read=lambda: cert_bytes),
+                    __exit__=MagicMock(return_value=False),
+                )
+            ),
+        ),
+    ):
+        mock_config.FIDO2_MDS_CERT_PATH = "/path/to/cert.crt"
+        mock_config.FIDO2_GLOBALSIGN_ROOT_CERT_URL = (
+            "https://secure.globalsign.com/cacert/root-r3.crt"
+        )
+        from unittest.mock import mock_open
+
+        with patch("builtins.open", mock_open(read_data=cert_bytes)):
+            cert = await service._get_root_cert()
+
+    assert cert == cert_bytes
+
+
+@pytest.mark.asyncio
 async def test_get_root_cert_downloads_successfully():
     service = FIDO2MetadataService()
     expected_cert = b"downloaded-cert-bytes"
@@ -338,7 +368,14 @@ async def test_get_root_cert_downloads_successfully():
 async def test_get_root_cert_falls_back_to_embedded():
     service = FIDO2MetadataService()
 
-    with patch("app.fido2.mds_service.httpx.AsyncClient") as mock_client_cls:
+    with (
+        patch("app.fido2.mds_service._mds_config") as mock_config,
+        patch("app.fido2.mds_service.httpx.AsyncClient") as mock_client_cls,
+    ):
+        mock_config.FIDO2_MDS_CERT_PATH = None
+        mock_config.FIDO2_GLOBALSIGN_ROOT_CERT_URL = (
+            "https://secure.globalsign.com/cacert/root-r3.crt"
+        )
         mock_client = AsyncMock()
         mock_client.__aenter__ = AsyncMock(return_value=mock_client)
         mock_client.__aexit__ = AsyncMock(return_value=False)
