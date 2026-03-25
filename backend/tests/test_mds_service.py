@@ -364,4 +364,6 @@ def test_embedded_cert_is_valid_der():
 
 def test_mds_url_constants():
     assert MDS3_URL == "https://mds3.fidoalliance.org/"
-    assert "globalsign.com" in GLOBALSIGN_ROOT_CERT_URL
+    assert (
+        GLOBALSIGN_ROOT_CERT_URL == "https://secure.globalsign.com/cacert/root-r3.crt"
+    )

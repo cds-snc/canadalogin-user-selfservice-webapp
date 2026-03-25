@@ -109,7 +109,8 @@ class FIDO2MetadataService:
             try:
                 await self._refresh_task
             except asyncio.CancelledError:
-                pass
+                # Expected when cancelling the background refresh task during shutdown.
+                logger.debug("Background MDS refresh task cancelled during shutdown.")
 
     # ------------------------------------------------------------------
     # Public lookup API
