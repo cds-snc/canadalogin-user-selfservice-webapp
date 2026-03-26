@@ -284,6 +284,7 @@ describe("AddMFAPage Unit Tests", () => {
       setUserSelectedMfaFactor: vi.fn(),
       setOtpLoading: vi.fn(),
       setOtpSentResponse: vi.fn(),
+      requestOtpCode: vi.fn().mockResolvedValue(true),
     });
 
     usePasswordValidation.mockImplementation(
@@ -1533,11 +1534,6 @@ describe("AddMFAPage Unit Tests", () => {
         data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
-      authService.transientOtpSend.mockResolvedValue({
-        success: true,
-        data: { trxnId: "test-trxn" },
-      });
-
       render(
         <TestWrapper>
           <AddMFAPage />
@@ -1563,12 +1559,18 @@ describe("AddMFAPage Unit Tests", () => {
         expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
       });
 
-      // Test request OTP code functionality
+      // Test request OTP code functionality — requestOtpCode comes from the mocked hook
+      const mockRequestOtpCode =
+        useOtpOperations.mock.results[0].value.requestOtpCode;
+      const callsBefore = mockRequestOtpCode.mock.calls.length;
+
       const requestOtpButton = screen.getByTestId("request-otp-code");
       fireEvent.click(requestOtpButton);
 
       await waitFor(() => {
-        expect(authService.transientOtpSend).toHaveBeenCalled();
+        expect(mockRequestOtpCode.mock.calls.length).toBeGreaterThan(
+          callsBefore,
+        );
       });
     });
 
@@ -1578,10 +1580,23 @@ describe("AddMFAPage Unit Tests", () => {
         data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
-      const otpError = {
-        data: { message: "OTP_REQUEST_ERROR" },
-      };
-      authService.transientOtpSend.mockRejectedValue(otpError);
+      // Make requestOtpCode return false to simulate an error
+      useOtpOperations.mockReturnValue({
+        ...useOtpOperations.mock.results[0]?.value,
+        userPhoneFactors: [],
+        userSelectedMfaFactor: { type: "sms" },
+        userOtpValue: "",
+        otpSentResponse: { trxnId: "mock-trxn-id" },
+        otpLoading: false,
+        phoneFactorsMap: {},
+        handleChangeUserMfaSelection: vi.fn(),
+        handleSetUserOtpValue: vi.fn(),
+        setUserPhoneFactors: vi.fn(),
+        setUserSelectedMfaFactor: vi.fn(),
+        setOtpLoading: vi.fn(),
+        setOtpSentResponse: vi.fn(),
+        requestOtpCode: vi.fn().mockResolvedValue(false),
+      });
 
       render(
         <TestWrapper>
@@ -1604,17 +1619,16 @@ describe("AddMFAPage Unit Tests", () => {
       const nextButton = screen.getByTestId("otp-selection-next");
       fireEvent.click(nextButton);
 
+      // When requestOtpCode returns false, navigation to otp-verification is blocked
+      // Component should remain on otp-selection step
       await waitFor(() => {
-        expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
       });
 
-      // Test request OTP code error handling
-      const requestOtpButton = screen.getByTestId("request-otp-code");
-      fireEvent.click(requestOtpButton);
-
-      await waitFor(() => {
-        expect(authService.transientOtpSend).toHaveBeenCalled();
-      });
+      // Verify requestOtpCode was indeed called
+      const mockRequestOtpCode =
+        useOtpOperations.mock.results[0].value.requestOtpCode;
+      expect(mockRequestOtpCode).toHaveBeenCalled();
     });
 
     it("should handle deleteMFA with default parameters", async () => {

@@ -5,6 +5,7 @@ FIDO2 schemas for request/response models
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, ConfigDict, field_validator
 from app.utils.schemas import ResponseModel
+from app.otp.schemas import OtpType
 
 
 class FIDO2RegistrationResponse(BaseModel):
@@ -119,6 +120,9 @@ class DeleteRegistrationRequest(BaseModel):
     assertionResult: Optional[FIDO2AssertionResultRequest] = (
         None  # FIDO2 authentication proof (optional if OTP-verified)
     )
+    otp: Optional[str] = None  # OTP code (for OTP-verified deletion)
+    trxnId: Optional[str] = None  # Transaction ID from OTP request
+    otpVerificationType: Optional[OtpType] = None  # OTP type (SMS/VOICE/EMAIL)
 
 
 class ErrorResponse(BaseModel):

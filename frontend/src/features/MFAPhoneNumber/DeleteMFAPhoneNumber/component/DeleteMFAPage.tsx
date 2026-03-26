@@ -63,10 +63,11 @@ export default function DeleteMFAPage() {
   // Use the password validation hook
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(
     setErrorCode,
-    () => {
+    async () => {
       // If there's only one MFA factor, skip OTP selection and go directly to validation
       if (userPhoneFactors && userPhoneFactors.length === 1) {
-        setWizardStep("otpValidation");
+        const success = await requestOtpCode();
+        if (success) setWizardStep("otpValidation");
       } else {
         setWizardStep("otpSelection");
       }
@@ -139,7 +140,8 @@ export default function DeleteMFAPage() {
       });
     } catch (error) {
       const err = error as { data?: { message?: string } };
-      setErrorCode(err?.data?.message ?? "");
+      const message = err?.data?.message ?? "";
+      setErrorCode(message);
       if (
         (INVALID_OTP_ERROR_CODES as readonly string[]).includes(
           err?.data?.message ?? "",
@@ -213,7 +215,10 @@ export default function DeleteMFAPage() {
         userPhoneFactors={userPhoneFactors}
         onChangeUserSelectedMfaFactor={handleChangeUserMfaSelection}
         onNext={() => {
-          setWizardStep("otpValidation");
+          void (async () => {
+            const success = await requestOtpCode();
+            if (success) setWizardStep("otpValidation");
+          })();
         }}
         parentPage={PAGES.deleteMFAPage}
         onCancel={async () => navigate(backToManage2FAVerificationsPage)}
@@ -221,7 +226,6 @@ export default function DeleteMFAPage() {
     ),
     otpValidation: (
       <OtpVerification
-        userProfile={userProfile}
         userSelectedMfaFactor={userSelectedMfaFactor!}
         userOtpValue={userOtpValue}
         setUserOtpValue={handleSetUserOtpValue}
@@ -245,20 +249,7 @@ export default function DeleteMFAPage() {
     deleteMFAPhoneNumberConfirm: (
       <DeleteMFAPhoneNumberConfirm
         onNext={async () => {
-          try {
-            await deleteMFA();
-          } catch (error) {
-            const err = error as { data?: { message?: string } };
-            setErrorCode(err?.data?.message ?? "");
-            if (
-              (INVALID_OTP_ERROR_CODES as readonly string[]).includes(
-                err?.data?.message ?? "",
-              )
-            ) {
-              // If OTP is invalid, go back to OTP validation step
-              setWizardStep("otpValidation");
-            }
-          }
+          await deleteMFA();
         }}
         onCancel={async () => navigate(backToManage2FAVerificationsPage)}
         phoneFormData={phoneFormData}

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   GcdsButton,
   GcdsContainer,
@@ -45,7 +45,6 @@ export default function EmailOtpValidation({
   const { language } = useParams();
   const pageContentJson = getPageContent(language, PAGES.emailOtpValidation)!;
   const { cancel } = getPageContent(language, "Button")!;
-  const didFetch = useRef(false);
 
   const [time, setTime] = useState(initialTime);
 
@@ -72,14 +71,6 @@ export default function EmailOtpValidation({
       setTime(initialTime); // Reset timer
     }
   };
-
-  // Automatically request OTP when component mounts
-  useEffect(() => {
-    if (!didFetch.current && requestOtpCode) {
-      didFetch.current = true;
-      void requestOtpCode();
-    }
-  }, [requestOtpCode]);
 
   // Countdown timer for resend button
   useEffect(() => {

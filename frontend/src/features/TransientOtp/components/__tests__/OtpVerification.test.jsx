@@ -203,10 +203,6 @@ const defaultProps = {
   setErrorCode: mockSetErrorCode,
   onCancel: mockOnCancel,
   errorMessage: "",
-  userProfile: {
-    id: "user-123",
-    userName: "testuser@example.com",
-  },
   userSelectedMfaFactor: {
     id: "factor-1",
     type: FLOW_TYPES.sms,
@@ -407,61 +403,6 @@ describe("OtpVerification Component", () => {
     });
   });
 
-  describe("Initial OTP Request", () => {
-    it("sends OTP request on component mount", async () => {
-      renderComponent();
-
-      await waitFor(() => {
-        expect(mockRequestOtpCode).toHaveBeenCalledTimes(1);
-      });
-    });
-
-    it("updates otpSentResponse on successful send", async () => {
-      // Override the mock to return specific response
-      mockRequestOtpCode.mockImplementation(async () => {
-        const response = { success: true, data: { trxnId: "new-txn-456" } };
-        mockSetOtpSentResponse({ trxnId: response.data.trxnId });
-        return response;
-      });
-
-      renderComponent();
-
-      await waitFor(() => {
-        expect(mockSetOtpSentResponse).toHaveBeenCalledWith({
-          trxnId: "new-txn-456",
-        });
-      });
-    });
-
-    it("handles send OTP error", async () => {
-      mockRequestOtpCode.mockRejectedValue({
-        data: { message: "CSIAM0038E" },
-      });
-
-      renderComponent();
-
-      await waitFor(() => {
-        expect(mockRequestOtpCode).toHaveBeenCalled();
-      });
-
-      await waitFor(() => {
-        expect(mockSetErrorCode).toHaveBeenCalledWith("CSIAM0038E");
-      });
-    });
-
-    it("does not send OTP if userProfile is null", () => {
-      renderComponent({ userProfile: null });
-
-      expect(mockRequestOtpCode).not.toHaveBeenCalled();
-    });
-
-    it("does not send OTP if userProfile.id is undefined", () => {
-      renderComponent({ userProfile: { userName: "test@example.com" } });
-
-      expect(mockRequestOtpCode).not.toHaveBeenCalled();
-    });
-  });
-
   describe("User Input Handling", () => {
     it("updates userOtpValue when user types", async () => {
       const user = userEvent.setup({ delay: null });
@@ -644,7 +585,7 @@ describe("OtpVerification Component", () => {
 
   describe("Edge Cases", () => {
     it("handles null userProfile gracefully", () => {
-      renderComponent({ userProfile: null });
+      renderComponent();
 
       expect(screen.getByText("Check your phone")).toBeInTheDocument();
       expect(mockRequestOtpCode).not.toHaveBeenCalled();
@@ -667,15 +608,13 @@ describe("OtpVerification Component", () => {
     });
 
     it("handles OTP send error without message", async () => {
+      // OTP send errors are now handled by the parent before navigation
+      // This test verifies the resend button does not crash on error
       mockRequestOtpCode.mockRejectedValue({});
 
       renderComponent();
 
-      await waitFor(() => {
-        expect(mockRequestOtpCode).toHaveBeenCalled();
-      });
-
-      // Should not call setErrorCode if no message
+      // Should not call setErrorCode on mount (no auto-send)
       expect(mockSetErrorCode).not.toHaveBeenCalled();
     });
 
@@ -702,21 +641,12 @@ describe("OtpVerification Component", () => {
   describe("Integration Tests", () => {
     it("complete workflow: mount, type code, submit, success", async () => {
       const user = userEvent.setup({ delay: null });
-      mockRequestOtpCode.mockImplementation(async () => {
-        mockSetOtpSentResponse({ trxnId: "txn-123" });
-        return { success: true, data: { trxnId: "txn-123" } };
-      });
       mockValidateOtpCode.mockImplementation(async () => {
         mockOnNext();
         return { success: true };
       });
 
       renderComponent({ userOtpValue: "123456" });
-
-      // Wait for OTP to be sent
-      await waitFor(() => {
-        expect(mockRequestOtpCode).toHaveBeenCalled();
-      });
 
       // Submit button should be enabled with 6-digit code
       const submitButton = screen.getByTestId("submit-button");
@@ -733,16 +663,8 @@ describe("OtpVerification Component", () => {
 
     it("clears error when submitting valid code after error", async () => {
       const user = userEvent.setup({ delay: null });
-      mockRequestOtpCode.mockImplementation(async () => {
-        mockSetOtpSentResponse({ trxnId: "txn-123" });
-        return { success: true, data: { trxnId: "txn-123" } };
-      });
 
       renderComponent({ userOtpValue: "123456" });
-
-      await waitFor(() => {
-        expect(mockRequestOtpCode).toHaveBeenCalled();
-      });
 
       // Simulate an error first
       mockValidateOtpCode.mockRejectedValueOnce({
@@ -776,10 +698,6 @@ describe("OtpVerification Component", () => {
       const user = userEvent.setup({ delay: null });
 
       renderComponent({ userOtpValue: "123456" });
-
-      await waitFor(() => {
-        expect(mockRequestOtpCode).toHaveBeenCalled();
-      });
 
       const submitButton = screen.getByTestId("submit-button");
 

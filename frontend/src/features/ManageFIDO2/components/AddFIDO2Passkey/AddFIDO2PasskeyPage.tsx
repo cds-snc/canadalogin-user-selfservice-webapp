@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router";
 import { useUser } from "../../../../components/Providers/useUser";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { path } from "../../../../utils/routeHelpers";
 import {
   INVALID_OTP_ERROR_CODES,
@@ -27,7 +27,7 @@ import {
   isWebAuthnSupported,
   registerFIDO2Credential,
 } from "../../utils/webAuthnUtils";
-import type { Fido2Credential, OtpSentData } from "../../../../types/hooks";
+import type { Fido2Credential } from "../../../../types/hooks";
 
 interface AddFIDO2PasskeyPageProps {
   step?: string;
@@ -71,7 +71,7 @@ export default function AddFIDO2PasskeyPage({
     otpLoading: localLoading,
     handleChangeUserMfaSelection,
     handleSetUserOtpValue,
-    setOtpSentResponse,
+    requestOtpCode,
   } = useOtpOperations({
     userId: id,
     userName,
@@ -81,14 +81,15 @@ export default function AddFIDO2PasskeyPage({
 
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(
     setErrorCode,
-    () => {
+    async () => {
       // If there's only one MFA factor, skip OTP selection and go directly to validation
       if (
         userPhoneFactors &&
         userPhoneFactors.length === 1 &&
         (!fido2Data || fido2Data.length === 0)
       ) {
-        setWizardStep("otpValidation");
+        const success = await requestOtpCode();
+        if (success) setWizardStep("otpValidation");
       } else {
         setWizardStep("otpSelection");
       }
@@ -98,8 +99,6 @@ export default function AddFIDO2PasskeyPage({
   const { fido2Data, loading: passkeyLoading } = usePasskeyOperations({
     setErrorCode,
   });
-
-  const didFetch = useRef(false);
 
   /**
    * Step 1 of passkey registration: get attestation options from server and
@@ -183,31 +182,6 @@ export default function AddFIDO2PasskeyPage({
     }
   };
 
-  const requestOtpCode = async () => {
-    const userData = {
-      user_id: userProfile!.id,
-      factor_id: userSelectedMfaFactor!.id,
-      otpType:
-        serverMapping[
-          userSelectedMfaFactor!.type as keyof typeof serverMapping
-        ],
-    };
-    try {
-      const response = await authService.transientOtpSend(userData);
-      if (response && response.success) {
-        setOtpSentResponse(response.data as OtpSentData);
-        setErrorCode("");
-      }
-    } catch (err) {
-      const errData = err as { data?: { message?: string } };
-      if (errData && errData.data && errData.data.message) {
-        setErrorCode(errData.data.message);
-      }
-    } finally {
-      didFetch.current = false;
-    }
-  };
-
   const validateOtpCode = async (userOtpValue: string) => {
     const userData = {
       otp: userOtpValue,
@@ -262,7 +236,10 @@ export default function AddFIDO2PasskeyPage({
         userPhoneFactors={userPhoneFactors}
         onChangeUserSelectedMfaFactor={handleChangeUserMfaSelection}
         onNext={() => {
-          setWizardStep("otpValidation");
+          void (async () => {
+            const success = await requestOtpCode();
+            if (success) setWizardStep("otpValidation");
+          })();
         }}
         onSelectFIDO2={(passkey) => {
           setSelected2FAPasskey(passkey);
@@ -274,7 +251,6 @@ export default function AddFIDO2PasskeyPage({
     ),
     otpValidation: (
       <OtpVerification
-        userProfile={userProfile}
         userSelectedMfaFactor={userSelectedMfaFactor!}
         userOtpValue={userOtpValue}
         setUserOtpValue={handleSetUserOtpValue}
