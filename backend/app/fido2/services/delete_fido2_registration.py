@@ -18,6 +18,7 @@ from app.fido2.services.helper_utils import (
 from app.fido2.services.authenticate_fido2_registration import (
     submit_assertion_result,
 )
+from app.utils.helpers import verify_otp_before_operation
 from app.utils.schemas import ResponseModel
 
 logger = logging.getLogger(__name__)
@@ -50,11 +51,28 @@ async def delete_registration(
                 success=False,
                 message="FIDO2 authentication required to delete passkey",
             )
+        elif (
+            request_data.otp is not None
+            and request_data.trxnId is not None
+            and request_data.otpVerificationType is not None
+        ):
+            logger.info("Verifying OTP before deletion")
+            await verify_otp_before_operation(
+                global_http_client=http_client,
+                otp=request_data.otp,
+                trxn_id=request_data.trxnId,
+                otp_type=request_data.otpVerificationType,
+                user_access_token=user_access_token,
+            )
+            logger.info("OTP verified successfully")
+        else:
+            logger.info(
+                "No assertionResult provided — skipping FIDO2 verification (OTP-verified flow)"
+            )
 
-        logger.info("FIDO2 authentication verified successfully")
-    else:
-        logger.info(
-            "No assertionResult provided — skipping FIDO2 verification (OTP-verified flow)"
+        # Step 2: Get user ID from the token using userinfo endpoint
+        _username, _display_name, user_id = await get_user_profile_info(
+            http_client, user_access_token
         )
 
     # Step 2: Get user ID from the token using userinfo endpoint

@@ -101,6 +101,7 @@ const mockOtpOpsDefaults = {
   handleChangeUserMfaSelection: vi.fn(),
   handleSetUserOtpValue: vi.fn(),
   setOtpSentResponse: vi.fn(),
+  requestOtpCode: vi.fn().mockResolvedValue(true),
 };
 const mockUseOtpOperations = vi.fn(() => mockOtpOpsDefaults);
 vi.mock("../../../../../hooks/useOtpOperations", () => ({

@@ -1,8 +1,14 @@
 from functools import lru_cache
+from pathlib import Path
 from typing import List, Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import AnyUrl, Field
 from app.constants.verify_endpoints import VerifyAPIEndpoint
+
+# Path to the GlobalSign R3 root CA certificate bundled with the repository.
+_BUNDLED_GLOBALSIGN_CERT_PATH = str(
+    Path(__file__).parent.parent / "certs" / "globalsign-root-r3.crt"
+)
 
 
 class AppInfo(BaseSettings):
@@ -39,6 +45,44 @@ class SessionConfig(BaseSettings):
     REDIS_AUTH_SECRET: str = "test-secret"
     REDIS_DOMAIN: str = "localhost"
     REDIS_PORT: int = 6379
+    model_config = SettingsConfigDict(
+        env_file=".env", env_file_encoding="utf-8", extra="ignore", case_sensitive=True
+    )
+
+
+class FIDO2MDSConfig(BaseSettings):
+    """Configuration for the FIDO2 MDS3 metadata service.
+
+    All values can be overridden via environment variables.
+    """
+
+    FIDO2_MDS3_URL: str = Field(
+        default="https://mds3.fidoalliance.org/",
+        description="URL of the FIDO Alliance MDS3 metadata blob.",
+    )
+    FIDO2_GLOBALSIGN_ROOT_CERT_URL: str = Field(
+        default="https://secure.globalsign.com/cacert/root-r3.crt",
+        description="URL used to download the GlobalSign R3 root CA certificate for MDS3 JWT verification.",
+    )
+    FIDO2_MDS_CERT_PATH: Optional[str] = Field(
+        default=_BUNDLED_GLOBALSIGN_CERT_PATH,
+        description=(
+            "Path to a local DER-encoded GlobalSign R3 CA certificate file used for "
+            "MDS3 JWT verification. Defaults to the cert bundled with the repository. "
+            "Set to an empty string to skip the file and use the live download instead."
+        ),
+    )
+    FIDO2_REDIS_MDS_TTL: Optional[int] = Field(
+        default=None,
+        description=(
+            "Redis TTL in seconds for the MDS metadata cache. "
+            "Defaults to None (no expiry) so cached data survives across refresh failures."
+        ),
+    )
+    FIDO2_REFRESH_INTERVAL: int = Field(
+        default=24 * 60 * 60,
+        description="Background MDS refresh interval in seconds. Default is 24 hours.",
+    )
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore", case_sensitive=True
     )

@@ -1,7 +1,11 @@
 import { useLocation, useNavigate, useParams } from "react-router";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { path } from "../../../../utils/routeHelpers";
-import { PAGES, serverMapping } from "../../../../utils/constants";
+import {
+  PAGES,
+  serverMapping,
+  INVALID_OTP_ERROR_CODES,
+} from "../../../../utils/constants";
 import { getErrorMessage } from "../../../../utils/errorUtils";
 import { usePasswordValidation } from "../../../../hooks/usePasswordValidation";
 import PasswordVerification from "../../../TransientOtp/components/PasswordVerification";
@@ -13,12 +17,11 @@ import VerifyFIDO2Passkey from "../VerifyFIDO2Passkey/VerifyFIDO2Passkey";
 import { useUser } from "../../../../components/Providers/useUser";
 import { useOtpOperations } from "../../../../hooks/useOtpOperations";
 import { usePasskeyOperations } from "../../../../hooks/usePasskeyOperations";
-import { authService } from "../../../../services/authService";
 import OtpSelection from "../../../TransientOtp/components/OtpSelection";
 import OtpVerification from "../../../TransientOtp/components/OtpVerification";
 import DeleteFIDO2PasskeySuccess from "./DeleteFIDO2PasskeySuccess";
 import { fido2Api } from "../../api/fido2Api";
-import type { Fido2Credential, OtpSentData } from "../../../../types/hooks";
+import type { Fido2Credential } from "../../../../types/hooks";
 
 interface DeleteFIDO2PasskeyPageProps {
   step?: string;
@@ -61,7 +64,7 @@ export default function DeleteFIDO2PasskeyPage({
     otpLoading: localLoading,
     handleChangeUserMfaSelection,
     handleSetUserOtpValue,
-    setOtpSentResponse,
+    requestOtpCode,
   } = useOtpOperations({
     userId: userProfile!.id,
     userName: userProfile!.userName,
@@ -76,74 +79,24 @@ export default function DeleteFIDO2PasskeyPage({
   // Use the password validation hook
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(
     setErrorCode,
-    () => {
+    async () => {
       // If there's only one MFA factor, skip OTP selection and go directly to validation
       if (
         userPhoneFactors &&
         userPhoneFactors.length === 1 &&
         (!fido2Data || fido2Data.length === 0)
       ) {
-        setWizardStep("otpValidation");
+        const success = await requestOtpCode();
+        if (success) setWizardStep("otpValidation");
       } else {
         setWizardStep("otpSelection");
       }
     },
   );
 
-  const didFetch = useRef(false);
-
-  const requestOtpCode = async () => {
-    const userData = {
-      user_id: userProfile!.id,
-      factor_id: userSelectedMfaFactor!.id,
-      otpType:
-        serverMapping[
-          userSelectedMfaFactor!.type as keyof typeof serverMapping
-        ],
-    };
-    try {
-      const response = await authService.transientOtpSend(userData);
-      if (response && response.success) {
-        setOtpSentResponse(response.data as OtpSentData);
-        setErrorCode("");
-      }
-    } catch (err) {
-      const errData = err as { data?: { message?: string } };
-      if (errData && errData.data && errData.data.message) {
-        setErrorCode(errData.data.message);
-      }
-    } finally {
-      didFetch.current = false;
-    }
-  };
-
-  const validateOtpCode = async (userOtpValue: string) => {
-    const userData = {
-      otp: userOtpValue,
-      trxnId: otpSentResponse!.trxnId,
-      otpType:
-        serverMapping[
-          userSelectedMfaFactor!.type as keyof typeof serverMapping
-        ],
-    };
-    try {
-      const response = await authService.transientOtpVerify(userData);
-      if (response && response.success) {
-        // Navigate to delete confirmation step
-        setWizardStep("deleteFIDO2PasskeyConfirmation");
-        setErrorCode("");
-      }
-    } catch (err) {
-      const errData = err as { response?: { data?: { message?: string } } };
-      if (
-        errData &&
-        errData.response &&
-        errData.response.data &&
-        errData.response.data.message
-      ) {
-        setErrorCode(errData.response.data.message);
-      }
-    }
+  const validateOtpCode = async (_otpValue: string): Promise<void> => {
+    setWizardStep("deleteFIDO2PasskeyConfirmation");
+    setErrorCode("");
   };
 
   const handleDeleteFIDO2 = async () => {
@@ -158,9 +111,23 @@ export default function DeleteFIDO2PasskeyPage({
     setDeleteLoading(true);
 
     try {
-      const response = (await fido2Api.deleteRegistration(passkeyId)) as
-        | { success?: boolean }
-        | undefined;
+      const otpPayload =
+        otpSentResponse?.trxnId && userOtpValue && userSelectedMfaFactor
+          ? {
+              otp: userOtpValue,
+              trxnId: otpSentResponse.trxnId,
+              otpVerificationType:
+                serverMapping[
+                  userSelectedMfaFactor.type as keyof typeof serverMapping
+                ],
+            }
+          : undefined;
+
+      const response = (await fido2Api.deleteRegistration(
+        passkeyId,
+        undefined,
+        otpPayload,
+      )) as { success?: boolean } | undefined;
 
       if (response && response.success) {
         setWizardStep("deleteFIDO2PasskeySuccess");
@@ -168,8 +135,16 @@ export default function DeleteFIDO2PasskeyPage({
         throw new Error("error_delete_credential");
       }
     } catch (err) {
-      console.error("error_delete_credential", err);
-      setErrorCode("error_delete_credential");
+      const errData = err as { data?: { message?: string } };
+      const message = errData?.data?.message ?? "error_delete_credential";
+      setErrorCode(message);
+      if (
+        (INVALID_OTP_ERROR_CODES as readonly string[]).includes(
+          errData?.data?.message ?? "",
+        )
+      ) {
+        setWizardStep("otpValidation");
+      }
     } finally {
       setDeleteLoading(false);
     }
@@ -177,7 +152,6 @@ export default function DeleteFIDO2PasskeyPage({
 
   const isLoading =
     localLoading || passkeyLoading || validatePasswordLoading || deleteLoading;
-
   const steps: Record<string, React.ReactNode> = {
     passwordVerification: (
       <PasswordVerification
@@ -196,7 +170,10 @@ export default function DeleteFIDO2PasskeyPage({
         userPhoneFactors={userPhoneFactors}
         onChangeUserSelectedMfaFactor={handleChangeUserMfaSelection}
         onNext={() => {
-          setWizardStep("otpValidation");
+          void (async () => {
+            const success = await requestOtpCode();
+            if (success) setWizardStep("otpValidation");
+          })();
         }}
         onSelectFIDO2={(passkey) => {
           setSelected2FAPasskey(passkey);
@@ -208,7 +185,6 @@ export default function DeleteFIDO2PasskeyPage({
     ),
     otpValidation: (
       <OtpVerification
-        userProfile={userProfile}
         userSelectedMfaFactor={userSelectedMfaFactor!}
         userOtpValue={userOtpValue}
         setUserOtpValue={handleSetUserOtpValue}

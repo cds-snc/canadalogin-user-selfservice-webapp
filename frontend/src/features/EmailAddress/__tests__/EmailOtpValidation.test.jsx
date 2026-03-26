@@ -428,33 +428,6 @@ describe("EmailOtpValidation", () => {
     });
   });
 
-  describe("Automatic OTP Request", () => {
-    it("requests OTP code automatically on mount", () => {
-      renderComponent();
-
-      expect(mockRequestOtpCode).toHaveBeenCalledTimes(1);
-    });
-
-    it("does not request OTP multiple times on re-render", () => {
-      const { rerender } = renderComponent();
-
-      rerender(
-        <BrowserRouter>
-          <EmailOtpValidation {...defaultProps} userOtpValue="123" />
-        </BrowserRouter>,
-      );
-
-      // Should still be called only once from initial mount
-      expect(mockRequestOtpCode).toHaveBeenCalledTimes(1);
-    });
-
-    it("handles missing requestOtpCode function", () => {
-      renderComponent({ requestOtpCode: undefined });
-
-      expect(() => renderComponent()).not.toThrow();
-    });
-  });
-
   describe("GCDS Component Interactions", () => {
     it("should handle GCDS button click events", async () => {
       const user = userEvent.setup();

@@ -33,11 +33,12 @@ export const fido2Api = {
   },
 
   /**
-   * Delete a FIDO2 registration with FIDO2 verification
+   * Delete a FIDO2 registration with FIDO2 or OTP verification
    */
   deleteRegistration: async (
     registrationId: string,
     assertionResult?: unknown,
+    otpPayload?: { otp: string; trxnId: string; otpVerificationType: string },
   ) => {
     try {
       const response = await axios.delete(
@@ -46,6 +47,7 @@ export const fido2Api = {
           data: {
             id: registrationId,
             assertionResult: assertionResult,
+            ...otpPayload,
           },
         },
       );
@@ -136,6 +138,20 @@ export const fido2Api = {
       return response.data as unknown;
     } catch (error) {
       handleApiError(error as ApiErrorLike);
+    }
+  },
+
+  /**
+   * Look up authenticator metadata by AAGUID from the MDS service
+   */
+  getAuthenticatorMetadata: async (aaguid: string) => {
+    try {
+      const response = await axios.get(
+        `${config.apiUrl}/v1/fido2/metadata/${encodeURIComponent(aaguid)}`,
+      );
+      return response.data as { description?: string; is_known?: boolean };
+    } catch {
+      return null;
     }
   },
 };

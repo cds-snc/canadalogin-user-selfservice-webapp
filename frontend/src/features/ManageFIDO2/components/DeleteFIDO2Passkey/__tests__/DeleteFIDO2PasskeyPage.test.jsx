@@ -53,7 +53,12 @@ vi.mock("../../../../../utils/constants", () => ({
     sms: "sms",
     voice: "voice",
   },
-
+  INVALID_OTP_ERROR_CODES: [
+    "CSIAM0011E",
+    "CSIBN0025E",
+    "CSIBN0028E",
+    "CSIBN0021E",
+  ],
   SERVICES: [],
   VITE_ENVIRONMENTS: { dev: "development", test: "test" },
   DEV_ONLY_FEATURE: false,
@@ -104,6 +109,7 @@ const mockOtpOpsDefaults = {
   handleChangeUserMfaSelection: vi.fn(),
   handleSetUserOtpValue: vi.fn(),
   setOtpSentResponse: vi.fn(),
+  requestOtpCode: vi.fn().mockResolvedValue(true),
 };
 
 const mockUseOtpOperations = vi.fn(() => mockOtpOpsDefaults);
@@ -460,8 +466,7 @@ describe("DeleteFIDO2PasskeyPage", () => {
     expect(mockNavigate).toHaveBeenCalledWith("/en/mock-path");
   });
 
-  it("navigates to deleteFIDO2PasskeyConfirmation after successful OTP verification", async () => {
-    mockTransientOtpVerify.mockResolvedValueOnce({ success: true });
+  it("navigates to deleteFIDO2PasskeyConfirmation after clicking validate OTP", async () => {
     renderPage({ step: "otpValidation" });
     await userEvent.click(screen.getByTestId("otp-validate"));
     await waitFor(() =>
@@ -471,12 +476,26 @@ describe("DeleteFIDO2PasskeyPage", () => {
     );
   });
 
-  it("does not advance when OTP verification fails", async () => {
-    mockTransientOtpVerify.mockRejectedValueOnce({
-      response: { data: { message: "INVALID_OTP" } },
+  it("navigates back to otpValidation when delete fails with an invalid OTP error code", async () => {
+    // Override the hook to provide a real OTP value so the OTP path is taken
+    mockUseOtpOperations.mockReturnValue({
+      ...mockOtpOpsDefaults,
+      userOtpValue: "123456",
+      otpSentResponse: { trxnId: "txn-123" },
+    });
+    mockDeleteRegistration.mockRejectedValueOnce({
+      data: { message: "CSIAM0011E" },
     });
     renderPage({ step: "otpValidation" });
+    // Advance to confirmation
     await userEvent.click(screen.getByTestId("otp-validate"));
+    await waitFor(() =>
+      expect(
+        getStep("step-deleteFIDO2PasskeyConfirmation"),
+      ).toBeInTheDocument(),
+    );
+    // Attempt deletion — should fail with invalid OTP and go back
+    await userEvent.click(screen.getByTestId("confirm-delete"));
     await waitFor(() =>
       expect(getStep("step-otpValidation")).toBeInTheDocument(),
     );
