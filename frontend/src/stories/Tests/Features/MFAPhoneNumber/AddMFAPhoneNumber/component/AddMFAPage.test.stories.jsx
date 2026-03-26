@@ -70,6 +70,14 @@ export const SelectVoiceCallLink = (() => {
           data: { pwdMinLength: 12, pwdMaxLength: 65 },
         },
       },
+      {
+        type: "post",
+        endpoint: `${SUBMIT_END_POINTS.transientOtpSend}`,
+        response: {
+          success: true,
+          data: { trxnId: "txn-123" },
+        },
+      },
     ],
   );
 
@@ -234,6 +242,14 @@ export const SelectTextMessageLink = (() => {
         response: {
           success: true,
           data: { pwdMinLength: 12, pwdMaxLength: 65 },
+        },
+      },
+      {
+        type: "post",
+        endpoint: `${SUBMIT_END_POINTS.transientOtpSend}`,
+        response: {
+          success: true,
+          data: { trxnId: "txn-123" },
         },
       },
     ],

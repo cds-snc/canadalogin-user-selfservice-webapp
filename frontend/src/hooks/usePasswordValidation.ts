@@ -54,7 +54,7 @@ export function usePasswordValidation(
 
       if (response?.success) {
         setErrorCode("");
-        onSuccess?.();
+        await onSuccess?.();
       }
     } catch (err) {
       const message = getErrorMessage(err);

@@ -67,6 +67,7 @@ export type UseOtpValidationSuccess = (response: unknown) => void;
 export type UseOtpOperationsReturn = {
   userPhoneFactors: OtpFactor[];
   userSelectedMfaFactor: OtpFactor | null;
+  userSelectedMfaFactorRef: React.MutableRefObject<OtpFactor | null>;
   otpSentResponse: OtpSentData | null;
   userOtpValue: string;
   otpLoading: boolean;
@@ -80,7 +81,7 @@ export type UseOtpOperationsReturn = {
   setOtpLoading: React.Dispatch<React.SetStateAction<boolean>>;
   handleChangeUserMfaSelection: (id: string) => void;
   handleSetUserOtpValue: (value: string) => void;
-  requestOtpCode: (override?: OtpRequestOverride) => Promise<void>;
+  requestOtpCode: (override?: OtpRequestOverride) => Promise<boolean>;
   validateOtpCode: (
     otpValue: string,
     onSuccess?: UseOtpValidationSuccess,
@@ -96,7 +97,7 @@ export type UseOtpOperationsReturn = {
   ) => PhoneFactorsMap;
 };
 
-export type PasswordValidationSuccessCallback = () => void;
+export type PasswordValidationSuccessCallback = () => void | Promise<void>;
 
 export type UsePasswordValidationReturn = {
   validatePassword: (

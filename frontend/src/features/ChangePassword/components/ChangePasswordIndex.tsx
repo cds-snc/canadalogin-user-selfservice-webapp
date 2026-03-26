@@ -69,10 +69,11 @@ export default function ChangePasswordIndex() {
   // Use the password validation hook
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(
     setErrorCode,
-    () => {
+    async () => {
       // If there's only one MFA factor, skip OTP selection and go directly to validation
       if (userPhoneFactors && userPhoneFactors.length === 1) {
-        setPasswordUpdateStep("otpValidation");
+        const success = await requestOtpCode();
+        if (success) setPasswordUpdateStep("otpValidation");
       } else {
         setPasswordUpdateStep("otpSelection");
       }
@@ -83,6 +84,7 @@ export default function ChangePasswordIndex() {
   const {
     userPhoneFactors,
     userSelectedMfaFactor,
+    userSelectedMfaFactorRef,
     userOtpValue,
     otpLoading: localLoading,
     handleChangeUserMfaSelection,
@@ -96,21 +98,24 @@ export default function ChangePasswordIndex() {
   });
 
   // Custom requestOtpCode for password change flow using passwordUpdate API
-  const requestOtpCode = async () => {
+  const requestOtpCode = async (): Promise<boolean> => {
     try {
       const response = await passwordUpdate.firstStep(
         userName,
-        userSelectedMfaFactor,
+        userSelectedMfaFactorRef.current,
       );
       if (response?.success && response.data) {
         setOtpSentResponse(response.data);
+        setErrorCode("");
+        return true;
       }
-      setErrorCode("");
+      return false;
     } catch (err) {
       const message = getApiErrorMessage(err);
       if (message) {
         setErrorCode(message);
       }
+      return false;
     }
   };
 
@@ -183,7 +188,10 @@ export default function ChangePasswordIndex() {
         userPhoneFactors={userPhoneFactors}
         onChangeUserSelectedMfaFactor={handleChangeUserMfaSelection}
         onNext={() => {
-          setPasswordUpdateStep("otpValidation");
+          void (async () => {
+            const success = await requestOtpCode();
+            if (success) setPasswordUpdateStep("otpValidation");
+          })();
         }}
         onCancel={() => navigate(backToSecuritySettingsPage)}
         parentPage={PAGES.password}
@@ -191,7 +199,6 @@ export default function ChangePasswordIndex() {
     ),
     otpValidation: userSelectedMfaFactor ? (
       <OtpVerification
-        userProfile={userProfile}
         userSelectedMfaFactor={userSelectedMfaFactor}
         userOtpValue={userOtpValue}
         setUserOtpValue={handleSetUserOtpValue}

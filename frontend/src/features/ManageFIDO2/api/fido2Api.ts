@@ -33,11 +33,12 @@ export const fido2Api = {
   },
 
   /**
-   * Delete a FIDO2 registration with FIDO2 verification
+   * Delete a FIDO2 registration with FIDO2 or OTP verification
    */
   deleteRegistration: async (
     registrationId: string,
     assertionResult?: unknown,
+    otpPayload?: { otp: string; trxnId: string; otpVerificationType: string },
   ) => {
     try {
       const response = await axios.delete(
@@ -46,6 +47,7 @@ export const fido2Api = {
           data: {
             id: registrationId,
             assertionResult: assertionResult,
+            ...otpPayload,
           },
         },
       );

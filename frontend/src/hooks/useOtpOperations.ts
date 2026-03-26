@@ -50,6 +50,7 @@ export const useOtpOperations = ({
 
   const navigate = useNavigate();
   const didFetch = useRef(false);
+  const userSelectedMfaFactorRef = useRef<OtpFactor | null>(null);
 
   const handleChangeUserMfaSelection = (id: string): void => {
     const selectedMfaFactor = userPhoneFactors.find(
@@ -58,6 +59,7 @@ export const useOtpOperations = ({
 
     if (selectedMfaFactor) {
       setUserSelectedMfaFactor(selectedMfaFactor);
+      userSelectedMfaFactorRef.current = selectedMfaFactor;
     }
   };
 
@@ -67,9 +69,9 @@ export const useOtpOperations = ({
 
   const requestOtpCode = async (
     override?: OtpRequestOverride,
-  ): Promise<void> => {
+  ): Promise<boolean> => {
     if (!userName) {
-      return;
+      return false;
     }
 
     let userData:
@@ -81,14 +83,13 @@ export const useOtpOperations = ({
         }
       | undefined;
 
-    if (userSelectedMfaFactor) {
+    const currentFactor = userSelectedMfaFactorRef.current;
+    if (currentFactor && !override) {
       userData = {
         user_id: userId,
         otpType:
-          serverMapping[
-            userSelectedMfaFactor.type as keyof typeof serverMapping
-          ],
-        factor_id: userSelectedMfaFactor.id,
+          serverMapping[currentFactor.type as keyof typeof serverMapping],
+        factor_id: currentFactor.id,
       };
     }
 
@@ -101,7 +102,7 @@ export const useOtpOperations = ({
     }
 
     if (!userData) {
-      return;
+      return false;
     }
 
     try {
@@ -109,12 +110,15 @@ export const useOtpOperations = ({
       if (response?.success) {
         setOtpSentResponse((response.data ?? null) as OtpSentData | null);
         setErrorCode("");
+        return true;
       }
+      return false;
     } catch (err) {
       const message = getErrorMessage(err);
       if (message) {
         setErrorCode(message);
       }
+      return false;
     } finally {
       didFetch.current = false;
     }
@@ -207,6 +211,7 @@ export const useOtpOperations = ({
       ) {
         setUserPhoneFactors(phoneFactors);
         setUserSelectedMfaFactor(phoneFactors[0]);
+        userSelectedMfaFactorRef.current = phoneFactors[0];
 
         const factorsMap = mapType
           ? createPhoneFactorsMap(phoneFactors, mapType)
@@ -247,6 +252,7 @@ export const useOtpOperations = ({
   return {
     userPhoneFactors,
     userSelectedMfaFactor,
+    userSelectedMfaFactorRef,
     otpSentResponse,
     userOtpValue,
     otpLoading,

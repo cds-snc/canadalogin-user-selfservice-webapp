@@ -3,7 +3,11 @@ import Loader from "../../components/Layout/Loading";
 import StepContent from "../../components/Wizard/StepContent";
 import { useNavigate, useParams } from "react-router";
 import { path } from "../../utils/routeHelpers";
-import { PAGES, FLOW_TYPES } from "../../utils/constants";
+import {
+  INVALID_OTP_ERROR_CODES,
+  PAGES,
+  FLOW_TYPES,
+} from "../../utils/constants";
 import { getPageContent } from "../../utils/functions";
 import { getErrorMessage } from "../../utils/errorUtils";
 import PasswordVerification from "../TransientOtp/components/PasswordVerification";
@@ -49,10 +53,11 @@ export default function EditEmailAddressPage() {
   // Use the password validation hook
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(
     setErrorCode,
-    () => {
+    async () => {
       // If there's only one MFA factor, skip OTP selection and go directly to validation
       if (userPhoneFactors && userPhoneFactors.length === 1) {
-        setWizardStep("otpValidation");
+        const success = await requestOtpCode();
+        if (success) setWizardStep("otpValidation");
       } else {
         setWizardStep("otpSelection");
       }
@@ -131,7 +136,6 @@ export default function EditEmailAddressPage() {
     }
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleEnterEmailSubmit = async (_emailAddress?: string) => {
     // Validate email address before proceeding to OTP validation
     if (!formData.emailAddress || !formData.emailAddress.trim()) {
@@ -146,9 +150,13 @@ export default function EditEmailAddressPage() {
       return;
     }
 
-    // Clear any previous errors and proceed to OTP validation
+    // Send OTP to the new email address, then navigate to verification step
     setErrorCode("");
-    setWizardStep("emailOtpValidation");
+    const success = await requestOtpCode({
+      otpType: FLOW_TYPES.email,
+      destination: formData.emailAddress,
+    });
+    if (success) setWizardStep("emailOtpValidation");
   };
 
   const handleEmailChangeWithOtp = async () => {
@@ -195,10 +203,14 @@ export default function EditEmailAddressPage() {
     } catch (error) {
       console.error("Error updating email address with OTP:", error);
       const apiError = error as CaughtError;
-      if (apiError?.data?.message) {
-        setErrorCode(apiError.data.message);
-      } else {
-        setErrorCode("FAILED_TO_UPDATE_EMAIL");
+      const message = apiError?.data?.message ?? "FAILED_TO_UPDATE_EMAIL";
+      setErrorCode(message);
+      if (
+        (INVALID_OTP_ERROR_CODES as readonly string[]).includes(
+          apiError?.data?.message ?? "",
+        )
+      ) {
+        setWizardStep("emailOtpValidation");
       }
     }
   };
@@ -222,7 +234,10 @@ export default function EditEmailAddressPage() {
         userPhoneFactors={userPhoneFactors}
         onChangeUserSelectedMfaFactor={handleChangeUserMfaSelection}
         onNext={() => {
-          setWizardStep("otpValidation");
+          void (async () => {
+            const success = await requestOtpCode();
+            if (success) setWizardStep("otpValidation");
+          })();
         }}
         parentPage={PAGES.addMFAPage}
         onCancel={handleBackToProfile}
@@ -230,7 +245,6 @@ export default function EditEmailAddressPage() {
     ),
     otpValidation: (
       <OtpVerification
-        userProfile={userProfile}
         userSelectedMfaFactor={userSelectedMfaFactor!}
         userOtpValue={userOtpValue}
         setUserOtpValue={handleSetUserOtpValue}
@@ -286,12 +300,12 @@ export default function EditEmailAddressPage() {
         errorMessage={errorMessage}
         userOtpValue={userOtpValue}
         handleChange={handleSetUserOtpValue}
-        requestOtpCode={() =>
-          requestOtpCode({
+        requestOtpCode={async () => {
+          await requestOtpCode({
             otpType: FLOW_TYPES.email,
             destination: formData.emailAddress,
-          })
-        }
+          });
+        }}
         onBack={handleBackToEnterEmail}
       />
     ),

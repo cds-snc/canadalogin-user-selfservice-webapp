@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import Loader from "../../../../components/Layout/Loading";
 import { useUser } from "../../../../components/Providers/useUser";
@@ -22,7 +22,6 @@ import {
   MAP_TYPES,
   useOtpOperations,
 } from "../../../../hooks/useOtpOperations";
-import { OtpSentData } from "../../../../types/hooks";
 
 interface PhoneFormData {
   phoneNumber: string;
@@ -76,10 +75,11 @@ export default function AddMFAPage() {
   // Use the password validation hook
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(
     setErrorCode,
-    () => {
+    async () => {
       // If there's only one MFA factor, skip OTP selection and go directly to validation
       if (userPhoneFactors && userPhoneFactors.length === 1) {
-        setWizardStep("otpValidation");
+        const success = await requestOtpCode();
+        if (success) setWizardStep("otpValidation");
       } else {
         setWizardStep("otpSelection");
       }
@@ -97,7 +97,7 @@ export default function AddMFAPage() {
     handleChangeUserMfaSelection,
     handleSetUserOtpValue,
     setOtpLoading: setLocalLoading,
-    setOtpSentResponse,
+    requestOtpCode,
   } = useOtpOperations({
     userId: id,
     userName,
@@ -262,33 +262,6 @@ export default function AddMFAPage() {
     }
   };
 
-  const didFetch = useRef(false);
-
-  const requestOtpCode = async () => {
-    const userData = {
-      user_id: userProfile!.id,
-      factor_id: userSelectedMfaFactor!.id,
-      otpType:
-        serverMapping[
-          userSelectedMfaFactor!.type as keyof typeof serverMapping
-        ],
-    };
-    try {
-      const response = await authService.transientOtpSend(userData);
-      if (response && response.success) {
-        setOtpSentResponse(response.data as OtpSentData);
-        setErrorCode("");
-      }
-    } catch (err) {
-      const error = err as { data?: { message?: string } };
-      if (error && error.data && error.data.message) {
-        setErrorCode(error.data.message);
-      }
-    } finally {
-      didFetch.current = false;
-    }
-  };
-
   const validateOtpCode = async (userOtpValue: string) => {
     const userData = {
       otp: userOtpValue,
@@ -397,7 +370,10 @@ export default function AddMFAPage() {
         userPhoneFactors={userPhoneFactors}
         onChangeUserSelectedMfaFactor={handleChangeUserMfaSelection}
         onNext={() => {
-          setWizardStep("otpValidation");
+          void (async () => {
+            const success = await requestOtpCode();
+            if (success) setWizardStep("otpValidation");
+          })();
         }}
         parentPage={PAGES.addMFAPage}
         onCancel={async () => navigate(backToManage2FAVerificationsPage)}
@@ -405,7 +381,6 @@ export default function AddMFAPage() {
     ),
     otpValidation: (
       <OtpVerification
-        userProfile={userProfile}
         userSelectedMfaFactor={userSelectedMfaFactor!}
         userOtpValue={userOtpValue}
         setUserOtpValue={handleSetUserOtpValue}
