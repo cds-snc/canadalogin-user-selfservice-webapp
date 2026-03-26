@@ -115,33 +115,6 @@ class TestSMSEnrollment:
             assert result.success is False
             assert "User verification failed" in result.message
 
-    @pytest.mark.asyncio
-    async def test_handle_sms_otp_enrollment_ibm_error(
-        self, mock_sms_enrollment_request, mock_user_profile_response
-    ):
-        mock_http_client = AsyncMock()
-        mock_user_access_token = "user_token_123"
-
-        with patch("app.otp.services.enroll_mfa_otp.get_my_profile") as mock_my_profile:
-            mock_my_profile.return_value = mock_user_profile_response
-
-            with patch(
-                "app.otp.services.enroll_mfa_otp.dispatch_otp_enrollment"
-            ) as mock_dispatch:
-                mock_response = MagicMock()
-                mock_response.status_code = 400
-                mock_response.json.return_value = {"error": "Invalid phone number"}
-                mock_dispatch.return_value = mock_response
-
-                result = await handle_otp_enrollment(
-                    mock_http_client,
-                    mock_sms_enrollment_request,
-                    mock_user_access_token,
-                )
-
-                assert result.success is False
-                assert "Invalid phone number" in result.message
-
 
 class TestVoiceEnrollment:
     @pytest.mark.asyncio
@@ -204,33 +177,6 @@ class TestVoiceEnrollment:
 
             assert result.success is False
             assert "User verification failed" in result.message
-
-    @pytest.mark.asyncio
-    async def test_handle_voice_otp_enrollment_ibm_error(
-        self, mock_voice_enrollment_request, mock_user_profile_response
-    ):
-        mock_http_client = AsyncMock()
-        mock_user_access_token = "user_token_123"
-
-        with patch("app.otp.services.enroll_mfa_otp.get_my_profile") as mock_my_profile:
-            mock_my_profile.return_value = mock_user_profile_response
-
-            with patch(
-                "app.otp.services.enroll_mfa_otp.dispatch_otp_enrollment"
-            ) as mock_dispatch:
-                mock_response = MagicMock()
-                mock_response.status_code = 400
-                mock_response.json.return_value = {"error": "Invalid phone number"}
-                mock_dispatch.return_value = mock_response
-
-                result = await handle_otp_enrollment(
-                    mock_http_client,
-                    mock_voice_enrollment_request,
-                    mock_user_access_token,
-                )
-
-                assert result.success is False
-                assert "Invalid phone number" in result.message
 
 
 class TestDispatchFunctions:

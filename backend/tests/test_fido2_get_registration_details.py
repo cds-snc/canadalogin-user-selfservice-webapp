@@ -225,29 +225,6 @@ class TestGetRegistrationDetails:
         assert exc.value.status_code == status.HTTP_403_FORBIDDEN
 
     @pytest.mark.asyncio
-    @patch.object(get_details_module, "RequestErrorHandler")
-    @patch.object(get_details_module, "get_user_profile_info")
-    async def test_handles_generic_exception(
-        self,
-        mock_get_user_profile_info,
-        mock_request_error_handler,
-        mock_http_client,
-    ):
-        """Should handle generic exceptions with RequestErrorHandler"""
-        mock_get_user_profile_info.side_effect = Exception("Unexpected error")
-
-        await get_registration_details(
-            http_client=mock_http_client,
-            user_access_token="user-token-abc",
-            registration_id="reg-123",
-        )
-
-        mock_request_error_handler.handle.assert_called_once()
-        error_arg = mock_request_error_handler.handle.call_args[0][0]
-        assert isinstance(error_arg, Exception)
-        assert "Unexpected error" in str(error_arg)
-
-    @pytest.mark.asyncio
     @patch.object(get_details_module, "verify_registration_ownership")
     @patch.object(get_details_module, "get_user_profile_info")
     async def test_uses_correct_token_for_each_call(
@@ -313,32 +290,3 @@ class TestGetRegistrationDetails:
         mock_verify_registration_ownership.assert_called_with(
             mock_http_client, "user-token-abc", uuid_registration_id, "user-456"
         )
-
-    @pytest.mark.asyncio
-    @patch.object(get_details_module, "RequestErrorHandler")
-    @patch.object(get_details_module, "verify_registration_ownership")
-    @patch.object(get_details_module, "get_user_profile_info")
-    async def test_handles_connection_error(
-        self,
-        mock_get_user_profile_info,
-        mock_verify_registration_ownership,
-        mock_request_error_handler,
-        mock_http_client,
-    ):
-        """Should handle connection errors"""
-        mock_get_user_profile_info.return_value = (
-            "user@example.com",
-            "Test User",
-            "user-456",
-        )
-        mock_verify_registration_ownership.side_effect = ConnectionError(
-            "Connection refused"
-        )
-
-        await get_registration_details(
-            http_client=mock_http_client,
-            user_access_token="user-token-abc",
-            registration_id="reg-123",
-        )
-
-        mock_request_error_handler.handle.assert_called_once()

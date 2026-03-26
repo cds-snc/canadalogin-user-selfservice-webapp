@@ -2,12 +2,10 @@ import logging
 
 from fastapi import Request
 from fastapi.responses import RedirectResponse
-from authlib.integrations.starlette_client import OAuthError
 from starsessions.session import get_session_handler
 from app.auth.services.oidc_config import oauth
 from app.config import get_configuration
 from app.constants.session_keys import SessionKeys
-from app.utils.request_error_handler import RequestErrorHandler
 from app.auth.services.auth_user_session import update_session_tokens
 
 logger = logging.getLogger(__name__)
@@ -41,17 +39,13 @@ async def redirect_user_to_idp_verify(request: Request):
     Get the redirect URL for the OAuth login flow.
     This function is used to initiate the login process with IBM Verify.
     """
-    try:
-        callback_redirect_uri = get_callback_redirect_uri(request)
-        logger.info("Redirecting user to IBM Verify...")
-        redirect_response = await oauth.verify.authorize_redirect(
-            request, callback_redirect_uri
-        )
-        logger.info("User redirected to IBM Verify for authentication")
-        return redirect_response
-    except Exception as e:
-        logger.exception("Unexpected error during redirect_to_verify: %s", str(e))
-        RequestErrorHandler.handle(e, context="Unexpected error during idp redirect")
+    callback_redirect_uri = get_callback_redirect_uri(request)
+    logger.info("Redirecting user to IBM Verify...")
+    redirect_response = await oauth.verify.authorize_redirect(
+        request, callback_redirect_uri
+    )
+    logger.info("User redirected to IBM Verify for authentication")
+    return redirect_response
 
 
 async def callback_handler(request: Request):
@@ -62,42 +56,27 @@ async def callback_handler(request: Request):
 
     logger.info("OIDC Callback Handler")
 
-    try:
-        redirectValue = get_base_profile_management_url()
-        returnToPageValue = request.session.get(SessionKeys.RETURN_TO_PAGE.value)
+    redirectValue = get_base_profile_management_url()
+    returnToPageValue = request.session.get(SessionKeys.RETURN_TO_PAGE.value)
 
-        if returnToPageValue:
-            clientRedirectValue = f"{returnToPageValue}?{SessionKeys.RETURN_TO_PAGE.value}={returnToPageValue}"
-            redirectValue += clientRedirectValue
-            logger.info(f"Return to page set in session: {redirectValue}")
+    if returnToPageValue:
+        clientRedirectValue = f"{returnToPageValue}?{SessionKeys.RETURN_TO_PAGE.value}={returnToPageValue}"
+        redirectValue += clientRedirectValue
+        logger.info(f"Return to page set in session: {redirectValue}")
 
-        try:
-            logger.info("Verify Access Token Request")
-            oidc_response = await oauth.verify.authorize_access_token(request)
-            logger.info("OIDC Response received from IBM Verify")
-        except OAuthError as error:
-            logger.error(f"OAuth error during token retrieval: {error}")
-            logger.error(
-                f"Redirect user back to IBM Verify to be re-authenticated: {redirectValue}"
-            )
-            # redirect back to IBM Verify to retry authentication
-            raise OAuthError("Invalid or expired token") from error
+    logger.info("Verify Access Token Request")
+    oidc_response = await oauth.verify.authorize_access_token(request)
+    logger.info("OIDC Response received from IBM Verify")
 
-        # Get the handler and set your sid as session id. sid is uuid passed in id_token
-        handler = get_session_handler(request)
-        new_session_id = oidc_response.get("userinfo").get("sid")
-        handler.session_id = new_session_id
+    # Get the handler and set your sid as session id. sid is uuid passed in id_token
+    handler = get_session_handler(request)
+    new_session_id = oidc_response.get("userinfo").get("sid")
+    handler.session_id = new_session_id
 
-        update_session_tokens(request, oidc_response)
+    update_session_tokens(request, oidc_response)
 
-        logger.info(f"Redirect to PROFILE_MANAGEMENT_DOMAIN: {redirectValue}")
-        return RedirectResponse(url=redirectValue)
-    except OAuthError as error:
-        logger.error(f"OAuth error: {error}")
-        raise OAuthError("Invalid or expired token") from error
-    except Exception as e:
-        logger.error(f"Unexpected error: {e}")
-        RequestErrorHandler.handle(e, context="Unexpected error during idp redirect")
+    logger.info(f"Redirect to PROFILE_MANAGEMENT_DOMAIN: {redirectValue}")
+    return RedirectResponse(url=redirectValue)
 
 
 async def reauthenticate_user(request: Request, returnToPage: str = "/"):
@@ -109,21 +88,13 @@ async def reauthenticate_user(request: Request, returnToPage: str = "/"):
         request: The FastAPI request object
         returnToPage: The page to return to after authentication
     """
-    try:
+    callback_redirect_uri = get_callback_redirect_uri(request)
 
-        callback_redirect_uri = get_callback_redirect_uri(request)
-
-        if returnToPage:
-            request.session[SessionKeys.RETURN_TO_PAGE.value] = returnToPage
-            logger.info(f"Return to page set in session: {returnToPage}")
-        acr_value = "loa3_stepup"
-        # Use acr_values for step-up authentication to require LOA3 level
-        return await oauth.verify.authorize_redirect(
-            request, callback_redirect_uri, acr_values=acr_value
-        )
-    except OAuthError as error:
-        logger.exception("Unexpected error during redirect_to_verify")
-        raise OAuthError("Invalid or expired token") from error
-    except Exception as e:
-        logger.exception("Unexpected error during redirect_to_verify")
-        RequestErrorHandler.handle(e, context="Unexpected error")
+    if returnToPage:
+        request.session[SessionKeys.RETURN_TO_PAGE.value] = returnToPage
+        logger.info(f"Return to page set in session: {returnToPage}")
+    acr_value = "loa3_stepup"
+    # Use acr_values for step-up authentication to require LOA3 level
+    return await oauth.verify.authorize_redirect(
+        request, callback_redirect_uri, acr_values=acr_value
+    )

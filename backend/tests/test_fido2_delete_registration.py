@@ -7,8 +7,7 @@ Uses importlib to import the actual module for patching.
 
 import importlib
 import pytest
-from fastapi import HTTPException, status
-from httpx import AsyncClient, HTTPStatusError, Request, Response
+from httpx import AsyncClient
 from unittest.mock import AsyncMock, MagicMock, patch
 
 # Import the module using importlib to get the actual module object
@@ -158,149 +157,6 @@ class TestDeleteRegistration:
 
     @pytest.mark.asyncio
     @patch.object(delete_module, "submit_assertion_result")
-    @patch.object(delete_module, "RequestErrorHandler")
-    @patch.object(delete_module, "get_user_profile_info")
-    @patch.object(delete_module, "get_tenant_url")
-    async def test_handles_get_user_profile_error(
-        self,
-        mock_get_tenant_url,
-        mock_get_user_profile_info,
-        mock_request_error_handler,
-        mock_submit_assertion_result,
-        mock_http_client,
-        mock_request_data,
-        mock_request,
-    ):
-        """Should handle error when getting user profile from token fails"""
-        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
-
-        mock_assertion_response = MagicMock()
-        mock_assertion_response.success = True
-        mock_submit_assertion_result.return_value = mock_assertion_response
-
-        mock_get_user_profile_info.side_effect = HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token",
-        )
-
-        await delete_registration(
-            request=mock_request,
-            http_client=mock_http_client,
-            user_access_token="invalid-token",
-            request_data=mock_request_data,
-        )
-
-        mock_request_error_handler.handle.assert_called_once()
-        error_arg = mock_request_error_handler.handle.call_args[0][0]
-        assert isinstance(error_arg, HTTPException)
-        assert error_arg.status_code == status.HTTP_401_UNAUTHORIZED
-
-    @pytest.mark.asyncio
-    @patch.object(delete_module, "submit_assertion_result")
-    @patch.object(delete_module, "RequestErrorHandler")
-    @patch.object(delete_module, "verify_registration_ownership")
-    @patch.object(delete_module, "get_user_profile_info")
-    @patch.object(delete_module, "get_tenant_url")
-    async def test_handles_ownership_verification_failure(
-        self,
-        mock_get_tenant_url,
-        mock_get_user_profile_info,
-        mock_verify_registration_ownership,
-        mock_request_error_handler,
-        mock_submit_assertion_result,
-        mock_http_client,
-        mock_request_data,
-        mock_request,
-    ):
-        """Should handle error when registration ownership verification fails"""
-        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
-
-        mock_assertion_response = MagicMock()
-        mock_assertion_response.success = True
-        mock_submit_assertion_result.return_value = mock_assertion_response
-
-        mock_get_user_profile_info.return_value = (
-            "user@example.com",
-            "Test User",
-            "user-456",
-        )
-        mock_verify_registration_ownership.side_effect = HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="User does not own this registration",
-        )
-
-        await delete_registration(
-            request=mock_request,
-            http_client=mock_http_client,
-            user_access_token="user-token-abc",
-            request_data=mock_request_data,
-        )
-
-        mock_request_error_handler.handle.assert_called_once()
-        error_arg = mock_request_error_handler.handle.call_args[0][0]
-        assert isinstance(error_arg, HTTPException)
-        assert error_arg.status_code == status.HTTP_403_FORBIDDEN
-
-    @pytest.mark.asyncio
-    @patch.object(delete_module, "submit_assertion_result")
-    @patch.object(delete_module, "RequestErrorHandler")
-    @patch.object(delete_module, "get_auth_request_headers")
-    @patch.object(delete_module, "verify_registration_ownership")
-    @patch.object(delete_module, "get_user_profile_info")
-    @patch.object(delete_module, "get_tenant_url")
-    async def test_handles_http_delete_error(
-        self,
-        mock_get_tenant_url,
-        mock_get_user_profile_info,
-        mock_verify_registration_ownership,
-        mock_get_auth_request_headers,
-        mock_request_error_handler,
-        mock_submit_assertion_result,
-        mock_http_client,
-        mock_request_data,
-        mock_request,
-    ):
-        """Should handle error when HTTP delete request fails"""
-        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
-
-        mock_assertion_response = MagicMock()
-        mock_assertion_response.success = True
-        mock_submit_assertion_result.return_value = mock_assertion_response
-
-        mock_get_user_profile_info.return_value = (
-            "user@example.com",
-            "Test User",
-            "user-456",
-        )
-        mock_get_auth_request_headers.return_value = {
-            "Authorization": "Bearer user-token-abc"
-        }
-
-        # Simulate HTTP error on delete
-        mock_request = Request(
-            "DELETE",
-            "https://tenant.verify.ibm.com/v2.0/factors/fido2/registrations/reg-123",
-        )
-        mock_response = Response(404, request=mock_request)
-        mock_delete_response = MagicMock()
-        mock_delete_response.raise_for_status.side_effect = HTTPStatusError(
-            message="Not Found",
-            request=mock_request,
-            response=mock_response,
-        )
-        mock_http_client.delete = AsyncMock(return_value=mock_delete_response)
-
-        await delete_registration(
-            request=mock_request,
-            http_client=mock_http_client,
-            user_access_token="user-token-abc",
-            request_data=mock_request_data,
-        )
-
-        mock_request_error_handler.handle.assert_called_once()
-
-    @pytest.mark.asyncio
-    @patch.object(delete_module, "submit_assertion_result")
     @patch.object(delete_module, "get_auth_request_headers")
     @patch.object(delete_module, "verify_registration_ownership")
     @patch.object(delete_module, "get_user_profile_info")
@@ -352,32 +208,6 @@ class TestDeleteRegistration:
         )
         call_kwargs = mock_http_client.delete.call_args[1]
         assert call_kwargs["headers"] == expected_headers
-
-    @pytest.mark.asyncio
-    @patch.object(delete_module, "RequestErrorHandler")
-    @patch.object(delete_module, "get_tenant_url")
-    async def test_handles_generic_exception(
-        self,
-        mock_get_tenant_url,
-        mock_request_error_handler,
-        mock_http_client,
-        mock_request_data,
-        mock_request,
-    ):
-        """Should handle any generic exception and call error handler"""
-        mock_get_tenant_url.side_effect = Exception("Unexpected error")
-
-        await delete_registration(
-            request=mock_request,
-            http_client=mock_http_client,
-            user_access_token="user-token-abc",
-            request_data=mock_request_data,
-        )
-
-        mock_request_error_handler.handle.assert_called_once()
-        error_arg = mock_request_error_handler.handle.call_args[0][0]
-        assert isinstance(error_arg, Exception)
-        assert "Unexpected error" in str(error_arg)
 
     @pytest.mark.asyncio
     @patch.object(delete_module, "submit_assertion_result")
@@ -486,57 +316,6 @@ class TestDeleteRegistration:
             "550e8400-e29b-41d4-a716-446655440000",
             "user-456",
         )
-
-    @pytest.mark.asyncio
-    @patch.object(delete_module, "submit_assertion_result")
-    @patch.object(delete_module, "RequestErrorHandler")
-    @patch.object(delete_module, "get_auth_request_headers")
-    @patch.object(delete_module, "verify_registration_ownership")
-    @patch.object(delete_module, "get_user_profile_info")
-    @patch.object(delete_module, "get_tenant_url")
-    async def test_handles_connection_error(
-        self,
-        mock_get_tenant_url,
-        mock_get_user_profile_info,
-        mock_verify_registration_ownership,
-        mock_get_auth_request_headers,
-        mock_request_error_handler,
-        mock_submit_assertion_result,
-        mock_http_client,
-        mock_request_data,
-        mock_request,
-    ):
-        """Should handle connection errors during delete request"""
-        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
-
-        mock_assertion_response = MagicMock()
-        mock_assertion_response.success = True
-        mock_submit_assertion_result.return_value = mock_assertion_response
-
-        mock_get_user_profile_info.return_value = (
-            "user@example.com",
-            "Test User",
-            "user-456",
-        )
-        mock_get_auth_request_headers.return_value = {
-            "Authorization": "Bearer user-token-abc"
-        }
-
-        # Simulate connection error
-        mock_http_client.delete = AsyncMock(
-            side_effect=ConnectionError("Connection refused")
-        )
-
-        await delete_registration(
-            request=mock_request,
-            http_client=mock_http_client,
-            user_access_token="user-token-abc",
-            request_data=mock_request_data,
-        )
-
-        mock_request_error_handler.handle.assert_called_once()
-        error_arg = mock_request_error_handler.handle.call_args[0][0]
-        assert isinstance(error_arg, ConnectionError)
 
     @pytest.mark.asyncio
     @patch.object(delete_module, "submit_assertion_result")

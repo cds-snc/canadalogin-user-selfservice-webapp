@@ -572,55 +572,6 @@ class TestUpdateProfileWithOtpVerification:
         assert response.success is True
         assert response.data == updated_profile
 
-    @pytest.mark.asyncio
-    @patch(UPDATE_PROFILE_IMPORT_PATH)
-    @patch(GET_PROFILE_FROM_IBM_IMPORT_PATH)
-    @patch(VERIFY_OTP_IMPORT_PATH)
-    async def test_unexpected_error_is_handled(
-        self, mock_verify_otp, mock_get_profile, mock_update_profile
-    ):
-        """Test handling of unexpected errors"""
-        # Arrange
-        mock_verify_otp.return_value = None
-
-        current_profile = IBMVerifyUserProfileSchema(
-            id="user-123",
-            userName="user@example.com",
-            emails=[EmailItem(value="user@example.com", type="work")],
-            active=True,
-            meta={
-                "location": "https://example.com/users/user-123",
-                "created": "2023-01-01T00:00:00Z",
-                "lastModified": "2023-09-22T12:30:00Z",
-                "resourceType": "User",
-            },
-        )
-        mock_get_profile.return_value = current_profile
-
-        # Mock unexpected error
-        mock_update_profile.side_effect = Exception("Unexpected database error")
-
-        mock_request = Mock()
-        mock_request.app = Mock()
-        mock_request.app.state = Mock()
-        mock_request.app.state.request_client = Mock(spec=AsyncClient)
-
-        profile_update_data = ProfileUpdateWithOtpRequest(
-            otp="123456",
-            trxnId="test-trxn-id",
-            otpType=OtpType.SMS,
-            newEmailAddress="new@example.com",
-        )
-
-        # Act & Assert
-        with pytest.raises(HTTPException) as exc:
-            await update_profile_with_otp_verification(
-                mock_request, profile_update_data, "user-token"
-            )
-
-        assert exc.value.status_code == 500
-        assert "An unexpected error occurred during profile update" in exc.value.detail
-
 
 class TestGetUpdateFieldNames:
     """Test the _get_update_field_names helper function"""

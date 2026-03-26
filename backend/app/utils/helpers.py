@@ -89,35 +89,21 @@ async def verify_otp_before_operation(
     from app.otp.schemas import UserOtpVerificationInfo
     from app.otp.services.verify_transient_otp import handle_otp_verification
 
-    try:
-        # Create verification data
-        otp_verification_data = UserOtpVerificationInfo(
-            otp=otp, trxnId=trxn_id, otpType=otp_type
-        )
+    # Create verification data
+    otp_verification_data = UserOtpVerificationInfo(
+        otp=otp, trxnId=trxn_id, otpType=otp_type
+    )
 
-        logger.info(f"Attempting OTP verification (type: {otp_type.value})")
-        otp_verification_response = await handle_otp_verification(
-            global_http_client, otp_verification_data, user_access_token
-        )
+    logger.info(f"Attempting OTP verification (type: {otp_type.value})")
+    otp_verification_response = await handle_otp_verification(
+        global_http_client, otp_verification_data, user_access_token
+    )
 
-        if not otp_verification_response.success:
-            logger.error("OTP verification failed")
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="OTP verification failed.",
-            )
-
-        logger.info("OTP verification successful")
-
-    except HTTPException:
-        # Re-raise HTTP exceptions as-is
-        raise
-    except Exception as e:
-        logger.error(
-            f"Unexpected error during OTP verification: {str(e)}",
-            exc_info=True,
-        )
+    if not otp_verification_response.success:
+        logger.error("OTP verification failed")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An unexpected error occurred during OTP verification",
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="OTP verification failed.",
         )
+
+    logger.info("OTP verification successful")

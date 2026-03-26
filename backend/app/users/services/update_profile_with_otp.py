@@ -41,90 +41,75 @@ async def update_profile_with_otp_verification(
     Raises:
         HTTPException: For OTP verification failures or profile update errors
     """
-    try:
-        logger.info("Starting atomic profile update with OTP verification")
+    logger.info("Starting atomic profile update with OTP verification")
 
-        # Step 1: Validate the OTP first using the helper function
-        await verify_otp_before_operation(
-            global_http_client=request.app.state.request_client,
-            otp=profile_update_data.otp,
-            trxn_id=profile_update_data.trxnId,
-            otp_type=profile_update_data.otpType,
-            user_access_token=user_access_token,
-        )
+    # Step 1: Validate the OTP first using the helper function
+    await verify_otp_before_operation(
+        global_http_client=request.app.state.request_client,
+        otp=profile_update_data.otp,
+        trxn_id=profile_update_data.trxnId,
+        otp_type=profile_update_data.otpType,
+        user_access_token=user_access_token,
+    )
 
-        logger.info("OTP verification successful, proceeding with profile update")
+    logger.info("OTP verification successful, proceeding with profile update")
 
-        # Step 2: Get current user profile to validate user context and prepare updates
-        # retrieve the unmasked profile
-        current_profile_response = await dispatch_get_my_profile_from_ibm(
-            request.app.state.request_client, user_access_token
-        )
+    # Step 2: Get current user profile to validate user context and prepare updates
+    # retrieve the unmasked profile
+    current_profile_response = await dispatch_get_my_profile_from_ibm(
+        request.app.state.request_client, user_access_token
+    )
 
-        if not current_profile_response.userName:
-            logger.error("Failed to get current user profile")
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Unable to retrieve current user profile",
-            )
-
-        logger.info(f"Current user: {current_profile_response.id}")
-
-        # Step 3: Build the profile update request based on provided fields
-        profile_update_request = _build_profile_update_request(
-            profile_update_data, current_profile_response
-        )
-
-        logger.info(
-            f"Updating profile fields: {_get_update_field_names(profile_update_data)}"
-        )
-
-        # Step 4: Update the profile using the secure update function
-        profile_update_response = await update_profile_for_verified_changes(
-            request, profile_update_request, user_access_token
-        )
-
-        if not profile_update_response.success:
-            logger.error("Profile update failed after successful OTP verification")
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Profile update failed after OTP verification",
-            )
-
-        # Step 5: Update session if email/username was changed
-        session_updates = _build_session_updates(profile_update_data)
-        if session_updates:
-            try:
-                logger.info(
-                    f"Updating session with changes: {list(session_updates.keys())}"
-                )
-                update_session_user_info(request, session_updates)
-                logger.info("Session updated successfully after profile change")
-            except Exception as e:
-                logger.warning(
-                    f"Failed to update session after profile change: {str(e)}"
-                )
-                # Don't fail the entire operation if session update fails
-
-        logger.info("Profile updated successfully with OTP verification")
-
-        return ProfileResponse(
-            success=True,
-            message="Profile updated successfully after OTP verification",
-            data=profile_update_response.data,
-        )
-
-    except HTTPException:
-        # Re-raise HTTP exceptions as-is
-        raise
-    except Exception as e:
-        logger.error(
-            f"Unexpected error during atomic profile update: {str(e)}", exc_info=True
-        )
+    if not current_profile_response.userName:
+        logger.error("Failed to get current user profile")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An unexpected error occurred during profile update",
+            detail="Unable to retrieve current user profile",
         )
+
+    logger.info(f"Current user: {current_profile_response.id}")
+
+    # Step 3: Build the profile update request based on provided fields
+    profile_update_request = _build_profile_update_request(
+        profile_update_data, current_profile_response
+    )
+
+    logger.info(
+        f"Updating profile fields: {_get_update_field_names(profile_update_data)}"
+    )
+
+    # Step 4: Update the profile using the secure update function
+    profile_update_response = await update_profile_for_verified_changes(
+        request, profile_update_request, user_access_token
+    )
+
+    if not profile_update_response.success:
+        logger.error("Profile update failed after successful OTP verification")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Profile update failed after OTP verification",
+        )
+
+    # Step 5: Update session if email/username was changed
+    session_updates = _build_session_updates(profile_update_data)
+    if session_updates:
+        try:
+            logger.info(
+                f"Updating session with changes: {list(session_updates.keys())}"
+            )
+            update_session_user_info(request, session_updates)
+            logger.info("Session updated successfully after profile change")
+        except Exception as e:
+            logger.warning(f"Failed to update session after profile change: {str(e)}")
+            # Don't fail the entire operation if session update fails
+
+    logger.info("Profile updated successfully with OTP verification")
+
+    return ProfileResponse(
+        success=True,
+        message="Profile updated successfully after OTP verification",
+        data=profile_update_response.data,
+    )
 
 
 def _build_profile_update_request(

@@ -11,10 +11,7 @@ from app.users.schemas import (
 )
 from app.utils.access_token import get_auth_request_headers
 from app.utils.string_masking import mask_phone_number
-from app.utils.request_error_handler import RequestErrorHandler
-from fastapi import HTTPException, status
 from httpx import AsyncClient
-from pydantic import ValidationError
 
 logger = logging.getLogger(__name__)
 
@@ -59,35 +56,30 @@ async def dispatch_user_auth_factors(
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
 
-    try:
-        headers = get_auth_request_headers(user_access_token, True)
-        settings = get_configuration()
+    headers = get_auth_request_headers(user_access_token, True)
+    settings = get_configuration()
 
-        user_otp_factors_api_endpoint = settings.user_otp_factors_api_endpoint
+    user_otp_factors_api_endpoint = settings.user_otp_factors_api_endpoint
 
-        # Combine all search parameters into a single 'search' parameter, URL-encoded following the specs of IBM Verify docs
-        # https://docs.verify.ibm.com/verify/reference/listfactorenrollments_20
-        # With user access token the results are automatically scoped to the authenticated user
-        if validated is None:
-            # Get all factors regardless of validation status
-            search_value = "enabled=true"
-        else:
-            validated_str = "true" if validated else "false"
-            search_value = f"enabled=true&validated={validated_str}"
-        search_params = {"search": search_value}
-        logger.info(f"get user auth factors, validated: {validated}")
+    # Combine all search parameters into a single 'search' parameter, URL-encoded following the specs of IBM Verify docs
+    # https://docs.verify.ibm.com/verify/reference/listfactorenrollments_20
+    # With user access token the results are automatically scoped to the authenticated user
+    if validated is None:
+        # Get all factors regardless of validation status
+        search_value = "enabled=true"
+    else:
+        validated_str = "true" if validated else "false"
+        search_value = f"enabled=true&validated={validated_str}"
+    search_params = {"search": search_value}
+    logger.info(f"get user auth factors, validated: {validated}")
 
-        otp_factor_response = await global_http_client.get(
-            user_otp_factors_api_endpoint, params=search_params, headers=headers
-        )
+    otp_factor_response = await global_http_client.get(
+        user_otp_factors_api_endpoint, params=search_params, headers=headers
+    )
 
-        otp_factor_response.raise_for_status()
-        logger.info("user_otp_factors_api_endpoint returned successfully")
-        return otp_factor_response.json()
-
-    except Exception as e:
-        logger.error(f"Error dispatch_password_reset_otp: {str(e)}", exc_info=True)
-        RequestErrorHandler.handle(e)
+    otp_factor_response.raise_for_status()
+    logger.info("user_otp_factors_api_endpoint returned successfully")
+    return otp_factor_response.json()
 
 
 async def get_user_otp_factor(
@@ -101,51 +93,36 @@ async def get_user_otp_factor(
     The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls.
     """
-    try:
-        logger.info(
-            f"get_user_otp_factor for factor_id: {factor_id}, validated: {validated}"
-        )
+    logger.info(
+        f"get_user_otp_factor for factor_id: {factor_id}, validated: {validated}"
+    )
 
-        start_time = datetime.now()
-        user_otp_factors_response = await dispatch_user_auth_factors(
-            global_http_client, user_access_token, validated
-        )
-        duration = (datetime.now() - start_time).total_seconds()
-        logger.info(f"user_otp_factors returned in {duration:.2f} seconds")
+    start_time = datetime.now()
+    user_otp_factors_response = await dispatch_user_auth_factors(
+        global_http_client, user_access_token, validated
+    )
+    duration = (datetime.now() - start_time).total_seconds()
+    logger.info(f"user_otp_factors returned in {duration:.2f} seconds")
 
-        try:
-            validated_data = UserAuthFactorsIbmResponse(**user_otp_factors_response)
-        except ValidationError as validation_error:
-            logger.warning("Invalid API response schema: %s", validation_error.errors())
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-                detail="Invalid response",
-            )
-        # current only support phone OTP
-        phone_number_otp_factors = await parse_phone_auth_factors_response(
-            validated_data, False
-        )
+    validated_data = UserAuthFactorsIbmResponse(**user_otp_factors_response)
 
-        phone_number_otp_factor = next(
-            (
-                factor
-                for factor in phone_number_otp_factors
-                if factor.get("id") == factor_id
-            ),
-            None,
-        )
+    # current only support phone OTP
+    phone_number_otp_factors = await parse_phone_auth_factors_response(
+        validated_data, False
+    )
 
-        logger.info(
-            "success response and data validation for user auth factors (unmasked)"
-        )
+    phone_number_otp_factor = next(
+        (
+            factor
+            for factor in phone_number_otp_factors
+            if factor.get("id") == factor_id
+        ),
+        None,
+    )
 
-        return phone_number_otp_factor
+    logger.info("success response and data validation for user auth factors (unmasked)")
 
-    except Exception as e:
-        logger.error(
-            f"Error getting user auth factors (unmasked): {str(e)}", exc_info=True
-        )
-        RequestErrorHandler.handle(e)
+    return phone_number_otp_factor
 
 
 async def get_user_otp_factors(
@@ -156,34 +133,20 @@ async def get_user_otp_factors(
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
 
-    try:
-        logger.info("get_user_otp_factors")
-        start_time = datetime.now()
-        user_otp_factors_response = await dispatch_user_auth_factors(
-            global_http_client, user_access_token, validated
-        )
-        duration = (datetime.now() - start_time).total_seconds()
-        logger.info(f"user_otp_factors returned in {duration:.2f} seconds")
+    logger.info("get_user_otp_factors")
+    start_time = datetime.now()
+    user_otp_factors_response = await dispatch_user_auth_factors(
+        global_http_client, user_access_token, validated
+    )
+    duration = (datetime.now() - start_time).total_seconds()
+    logger.info(f"user_otp_factors returned in {duration:.2f} seconds")
 
-        try:
-            validated_data = UserAuthFactorsIbmResponse(**user_otp_factors_response)
-        except ValidationError as validation_error:
-            logger.warning("Invalid API response schema: %s", validation_error.errors())
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-                detail="Invalid response",
-            )
+    validated_data = UserAuthFactorsIbmResponse(**user_otp_factors_response)
 
-        phone_number_otp_factor = await parse_phone_auth_factors_response(
-            validated_data
-        )
-        logger.info("success response and data validation for user auth factors")
-        return UserPhoneAuthFactorsResponse(
-            success=True,
-            message="User factor retrieved successfully.",
-            data=phone_number_otp_factor,
-        )
-
-    except Exception as e:
-        logger.error(f"Error getting user auth factors: {str(e)}", exc_info=True)
-        RequestErrorHandler.handle(e)
+    phone_number_otp_factor = await parse_phone_auth_factors_response(validated_data)
+    logger.info("success response and data validation for user auth factors")
+    return UserPhoneAuthFactorsResponse(
+        success=True,
+        message="User factor retrieved successfully.",
+        data=phone_number_otp_factor,
+    )

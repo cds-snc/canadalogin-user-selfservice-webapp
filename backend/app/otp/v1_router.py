@@ -73,7 +73,7 @@ async def verify_otp(
 
 
 @router.get(
-    "/transient/status/{otpType}/{trxnId}",
+    "/transient/status/{otp_type}/{trxn_id}",
     response_model=ResponseModel,
     status_code=status.HTTP_200_OK,
     tags=["OTP"],

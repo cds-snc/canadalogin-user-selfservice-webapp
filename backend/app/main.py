@@ -1,21 +1,19 @@
 from fastapi import FastAPI
 import httpx
-import requests
 import logging
-import json
 from contextlib import asynccontextmanager
 
-from fastapi import HTTPException, Request, status
-from fastapi.responses import JSONResponse
+from fastapi import HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from authlib.integrations.starlette_client import OAuthError
 from starsessions import SessionMiddleware, SessionAutoloadMiddleware
 from redis.asyncio import Redis
 from starsessions.stores.redis import RedisStore
+from httpx import HTTPStatusError, TimeoutException
+from pydantic import ValidationError
 
 from app.config import get_configuration
-from app.utils.helpers import generate_error_response
 from app.constants.redis_keys import RedisKeys
 
 from .routers import health
@@ -26,8 +24,15 @@ from app.otp import v1_router as v1_otp_router
 from app.fido2 import v1_router as v1_fido2_router
 from app.fido2.mds_service import mds_service
 from app.auth.services import oidc_config
-from app.auth.services.auth import redirect_user_to_idp_verify
-from app.middleware.standardized_logging import StandardizedLoggingMiddleware
+from app.utils.global_error_handlers import (
+    http_exception_handler,
+    oauth_error_handler,
+    http_status_error_handler,
+    timeout_error_handler,
+    request_validation_error_handler,
+    validation_error_handler,
+    generic_exception_handler,
+)
 
 # from Secweb import SecWeb
 
@@ -123,173 +128,100 @@ async def lifespan(app: FastAPI):
         logger.info("Closing Redis client")
 
 
-app = FastAPI(
-    lifespan=lifespan,
-    title=configuration.app_info.app_name,
-    description=API_DESCRIPTION,
-    contact=CONTACT_INFO,
-    docs_url="/docs" if is_local_environment else None,
-    redoc_url="/redoc" if is_local_environment else None,
-    openapi_url="/openapi.json" if is_local_environment else None,
-)
-
-# if configuration.ENVIRONMENT != "local":
-#     SecWeb(app=app)
-# else:
-#     SecWeb(
-#         app=app,
-#         Option={
-#             "csp": {
-#                 "default-src": ["'self'"],
-#                 "img-src": ["'self'", "data:", "https://fastapi.tiangolo.com"],
-#                 "font-src": ["'self'", "data:", "https://cdn.jsdelivr.net"],
-#                 "style-src": ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
-#                 "script-src": ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
-#             },
-#             "coep": "unsafe-none",
-#             "coop": "unsafe-none",
-#             "hsts": False,
-#         },
-#     )
-
-# Determine session domain
-# ROOT_DOMAIN is .<ROOT_DOMAIN> example: .signin-connexion.cdssandbox.xyz
-session_domain = None
-if configuration.ENVIRONMENT != "local":
-    session_domain = f".{configuration.ROOT_DOMAIN}"
-logger.info(f"ROOT_DOMAIN: {session_domain}")
-
-session_store = RedisStore(
-    connection=redis_client,
-    prefix=RedisKeys.REDIS_SESSION_KEY.value,
-    gc_ttl=configuration.session_config.SESSION_LIFETIME,
-)
-logger.info("Using RedisStore for session management")
-
-# Determine if cookie should be secure
-cookie_secure = False if configuration.ENVIRONMENT == "local" else True
-logger.info(f"Cookie Secure: {cookie_secure}")
-
-# CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=configuration.cors_origins_list,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-    expose_headers=["*"],
-)
-
-# Logging
-app.add_middleware(StandardizedLoggingMiddleware)
-
-# Autoload session if cookie is present
-app.add_middleware(SessionAutoloadMiddleware)
-# SessionMiddleware
-app.add_middleware(
-    SessionMiddleware,
-    store=session_store,
-    rolling=True,
-    cookie_https_only=cookie_secure,
-    lifetime=configuration.session_config.SESSION_LIFETIME,
-    cookie_domain=configuration.ROOT_DOMAIN,
-    cookie_name=configuration.session_config.SESSION_COOKIE_NAME,
-)
-
-
-app.include_router(health.router, prefix="/health")
-
-app.include_router(
-    v1_users_router.router,
-    prefix=f"{configuration.V1_API_VERSION}/users",
-    tags=["Users"],
-)
-
-app.include_router(
-    v1_auth_router.router,
-    prefix=f"{configuration.V1_API_VERSION}/auth",
-    tags=["Auth"],
-)
-
-app.include_router(
-    v1_password_router.router,
-    prefix=f"{configuration.V1_API_VERSION}/password",
-    tags=["Password"],
-)
-
-app.include_router(
-    v1_otp_router.router,
-    prefix=f"{configuration.V1_API_VERSION}/otp",
-    tags=["OTP"],
-)
-
-app.include_router(
-    v1_fido2_router.router,
-    prefix=f"{configuration.V1_API_VERSION}/fido2",
-    tags=["FIDO2"],
-)
-
-
-@app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    # The Signup user endpoint uses Pydantic to validate the email
-    # This handler is required to send a common format for errors
-
-    error_message = ""
-    for error in exc.errors():
-        error_message = error["msg"]
-        error_input = error.get("input", "")
-        logger.error(f"Validation error: {error_message} at " + str(request.url))
-        logger.error(f"Validation error input: {error_input}")
-        break
-    return generate_error_response(
-        status_code=status.HTTP_400_BAD_REQUEST, message=error_message
+def create_app():
+    app = FastAPI(
+        lifespan=lifespan,
+        title=configuration.app_info.app_name,
+        description=API_DESCRIPTION,
+        contact=CONTACT_INFO,
+        docs_url="/docs" if is_local_environment else None,
+        redoc_url="/redoc" if is_local_environment else None,
+        openapi_url="/openapi.json" if is_local_environment else None,
     )
 
+    # Determine session domain
+    # ROOT_DOMAIN is .<ROOT_DOMAIN> example: .signin-connexion.cdssandbox.xyz
+    session_domain = None
+    if configuration.ENVIRONMENT != "local":
+        session_domain = f".{configuration.ROOT_DOMAIN}"
+    logger.info(f"ROOT_DOMAIN: {session_domain}")
 
-@app.exception_handler(HTTPException)
-async def custom_http_exception_handler(request: Request, exc: HTTPException):
-    return JSONResponse(
-        status_code=exc.status_code,
-        content={"success": False, "message": exc.detail},
+    session_store = RedisStore(
+        connection=redis_client,
+        prefix=RedisKeys.REDIS_SESSION_KEY.value,
+        gc_ttl=configuration.session_config.SESSION_LIFETIME,
+    )
+    logger.info("Using RedisStore for session management")
+
+    # Determine if cookie should be secure
+    cookie_secure = False if configuration.ENVIRONMENT == "local" else True
+    logger.info(f"Cookie Secure: {cookie_secure}")
+
+    # CORS
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=configuration.cors_origins_list,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+        expose_headers=["*"],
     )
 
-
-@app.exception_handler(OAuthError)
-async def oauth_error_handler(request: Request, exc: OAuthError):
-    """Catch OAuth errors and redirect user to IdP login."""
-    logger.info("Oauth Exception Error Handler: %s", exc)
-    host = request.headers.get("host", "")
-    referer = request.headers.get("referer", "")
-    accept_header = request.headers.get("accept", "")
-
-    logger.info(
-        "Request Header Info: host=%s referer=%s accept=%s",
-        host,
-        referer,
-        accept_header,
+    # Autoload session if cookie is present
+    app.add_middleware(SessionAutoloadMiddleware)
+    # SessionMiddleware
+    app.add_middleware(
+        SessionMiddleware,
+        store=session_store,
+        rolling=True,
+        cookie_https_only=cookie_secure,
+        lifetime=configuration.session_config.SESSION_LIFETIME,
+        cookie_domain=configuration.ROOT_DOMAIN,
+        cookie_name=configuration.session_config.SESSION_COOKIE_NAME,
     )
 
-    if "application/json" in accept_header:
-        logger.info("Return 401 JSON response")
-        return JSONResponse(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            content={"detail": "Invalid or expired token"},
-        )
-    logger.info("Oauth error - redirecting user to IBM Verify login")
-    return await redirect_user_to_idp_verify(request)
+    app.include_router(health.router, prefix="/health")
+
+    app.include_router(
+        v1_users_router.router,
+        prefix=f"{configuration.V1_API_VERSION}/users",
+        tags=["Users"],
+    )
+
+    app.include_router(
+        v1_auth_router.router,
+        prefix=f"{configuration.V1_API_VERSION}/auth",
+        tags=["Auth"],
+    )
+
+    app.include_router(
+        v1_password_router.router,
+        prefix=f"{configuration.V1_API_VERSION}/password",
+        tags=["Password"],
+    )
+
+    app.include_router(
+        v1_otp_router.router,
+        prefix=f"{configuration.V1_API_VERSION}/otp",
+        tags=["OTP"],
+    )
+
+    app.include_router(
+        v1_fido2_router.router,
+        prefix=f"{configuration.V1_API_VERSION}/fido2",
+        tags=["FIDO2"],
+    )
+
+    app.add_exception_handler(HTTPException, http_exception_handler)
+    app.add_exception_handler(OAuthError, oauth_error_handler)
+    app.add_exception_handler(HTTPStatusError, http_status_error_handler)
+    app.add_exception_handler(OAuthError, oauth_error_handler)
+    app.add_exception_handler(TimeoutException, timeout_error_handler)
+    app.add_exception_handler(RequestValidationError, request_validation_error_handler)
+    app.add_exception_handler(ValidationError, validation_error_handler)
+    app.add_exception_handler(Exception, generic_exception_handler)
+
+    return app
 
 
-def log_request_response(
-    endpoint: str, request_data: dict, response: requests.Response
-):
-    """Log request and response details"""
-    try:
-        logger.info(f"[{endpoint}] Request data: {json.dumps(request_data, indent=2)}")
-        logger.info(f"[{endpoint}] Response status: {response.status_code}")
-        logger.info(f"[{endpoint}] Response headers: {dict(response.headers)}")
-        logger.info(
-            f"[{endpoint}] Response body: {json.dumps(response.json(), indent=2)}"
-        )
-    except Exception as e:
-        logger.error(f"[{endpoint}] Error logging request/response: {str(e)}")
+app = create_app()

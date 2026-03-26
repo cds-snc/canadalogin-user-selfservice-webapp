@@ -12,7 +12,6 @@ import time
 from httpx import AsyncClient
 from fastapi import Request
 from app.utils.schemas import ResponseModel
-from app.utils.request_error_handler import RequestErrorHandler
 from app.utils.access_token import get_admin_token
 from app.password.schemas import UserPassword, VerifiedUserPassword
 from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
@@ -182,56 +181,45 @@ async def verify_password_for_stepup(
     Raises:
         HTTPException: For any verification errors
     """
-    try:
-        logger.info("Starting enhanced password verification for step-up auth")
+    logger.info("Starting enhanced password verification for step-up auth")
 
-        http_client: AsyncClient = request.app.state.request_client
-        config = get_configuration()
+    http_client: AsyncClient = request.app.state.request_client
+    config = get_configuration()
 
-        # Get username from profile
-        user_info = await dispatch_get_my_profile_from_ibm(
-            http_client, user_access_token
-        )
-        username = user_info.userName
+    # Get username from profile
+    user_info = await dispatch_get_my_profile_from_ibm(http_client, user_access_token)
+    username = user_info.userName
 
-        # Get admin token for password verification with returnJwt=true
-        admin_token = await get_admin_token(http_client)
-        logger.info("Retrieved admin token for password verification")
+    # Get admin token for password verification with returnJwt=true
+    admin_token = await get_admin_token(http_client)
+    logger.info("Retrieved admin token for password verification")
 
-        # Step 1: Verify password with JWT using admin token
-        # Note: returnJwt=true requires elevated permissions
-        user_id, password_jwt = await verify_password_with_jwt(
-            http_client=http_client,
-            tenant_url=config.ibm_verify_config.IBM_VERIFY_TENANT_URL,
-            verify_password_endpoint=config.verify_password_api_endpoint,
-            admin_token=admin_token,
-            username=username,
-            password=payload.password,
-        )
+    # Step 1: Verify password with JWT using admin token
+    # Note: returnJwt=true requires elevated permissions
+    user_id, password_jwt = await verify_password_with_jwt(
+        http_client=http_client,
+        tenant_url=config.ibm_verify_config.IBM_VERIFY_TENANT_URL,
+        verify_password_endpoint=config.verify_password_api_endpoint,
+        admin_token=admin_token,
+        username=username,
+        password=payload.password,
+    )
 
-        # Step 2: Exchange password JWT for OAuth token
-        stepup_token_data = await exchange_password_jwt_for_token(
-            http_client=http_client,
-            tenant_url=config.ibm_verify_config.IBM_VERIFY_TENANT_URL,
-            password_jwt=password_jwt,
-            client_id=config.ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID,
-            client_secret=config.ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_SECRET,
-        )
+    # Step 2: Exchange password JWT for OAuth token
+    stepup_token_data = await exchange_password_jwt_for_token(
+        http_client=http_client,
+        tenant_url=config.ibm_verify_config.IBM_VERIFY_TENANT_URL,
+        password_jwt=password_jwt,
+        client_id=config.ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID,
+        client_secret=config.ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_SECRET,
+    )
 
-        # Store the complete token data with timestamp for expiry checking
-        request.session["stepup_token_data"] = stepup_token_data
-        request.session["stepup_token_timestamp"] = time.time()
+    # Store the complete token data with timestamp for expiry checking
+    request.session["stepup_token_data"] = stepup_token_data
+    request.session["stepup_token_timestamp"] = time.time()
 
-        return ResponseModel(
-            success=True,
-            data=VerifiedUserPassword(id=user_id),
-            message="Password verified successfully for step-up authentication",
-        )
-
-    except Exception as e:
-        logger.error(
-            f"Error in enhanced password verification: {str(e)}", exc_info=True
-        )
-        RequestErrorHandler.handle(
-            e, context="Password verification for step-up failed"
-        )
+    return ResponseModel(
+        success=True,
+        data=VerifiedUserPassword(id=user_id),
+        message="Password verified successfully for step-up authentication",
+    )

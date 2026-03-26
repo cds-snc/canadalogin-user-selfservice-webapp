@@ -1,8 +1,7 @@
 import logging
 
-from fastapi import HTTPException, Request, status
+from fastapi import Request
 from httpx import Response
-from pydantic import ValidationError
 
 from app.users.schemas import (
     IBMVerifyUserProfileSchema,
@@ -12,7 +11,6 @@ from app.users.schemas import (
 )
 from app.utils.access_token import get_auth_request_headers
 from app.utils.mask_user_profile import mask_profile_details
-from app.utils.request_error_handler import RequestErrorHandler
 from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
 from app.constants.schema_field_names import USER_ID_FIELD, USERNAME_FIELD
 
@@ -62,14 +60,7 @@ async def update_profile_for_verified_changes(
     # since OTP verification has already been completed
     merged_profile = {**ibm_user_profile, **updated_user_data_dict}
 
-    try:
-        validate_merged_profile = IBMVerifyUpdateUserProfile(**merged_profile)
-    except ValidationError as e:
-        logger.error(f"Merged Profile Validation Error: {e.json()}")
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-            detail="Request data validation error",
-        )
+    validate_merged_profile = IBMVerifyUpdateUserProfile(**merged_profile)
 
     user_profile_payload = validate_merged_profile.model_dump_json(
         by_alias=True, exclude_none=True
@@ -79,24 +70,10 @@ async def update_profile_for_verified_changes(
         request, user_profile_payload, user_access_token
     )
 
-    try:
-        json_data = response.json()
-    except Exception as e:
-        logger.error(f"Failed to parse profile response: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-            detail="Request data validation error",
-        )
+    json_data = response.json()
 
     masked_profile_data = mask_profile_details(json_data)
-    try:
-        response_data = IBMVerifyUserProfileSchema(**masked_profile_data)
-    except ValidationError as e:
-        logger.error(f"Profile Validation Error: {e.json()}")
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-            detail="Request data validation error",
-        )
+    response_data = IBMVerifyUserProfileSchema(**masked_profile_data)
 
     return ProfileResponse(
         success=True,
@@ -134,25 +111,17 @@ async def dispatch_update_my_profile(
 
     Returns:
         Response: Raw HTTP response from IBM Verify
-
-    Raises:
-        HTTPException: Via RequestErrorHandler for any request failures
     """
-    try:
-        logger.info("dispatch_update_user_profile")
-        headers = get_auth_request_headers(user_access_token)
-        response = await request.app.state.request_client.put(
-            request.app.state.config.profile_api_endpoint,
-            content=user_profile_payload,
-            headers=headers,
-        )
-        response.raise_for_status()
-        logger.info("updating user profile changes returned successfully")
-        return response
-
-    except Exception as e:
-        logger.error(f"Error dispatching update_user_profile: {str(e)}", exc_info=True)
-        RequestErrorHandler.handle(e)
+    logger.info("dispatch_update_user_profile")
+    headers = get_auth_request_headers(user_access_token)
+    response = await request.app.state.request_client.put(
+        request.app.state.config.profile_api_endpoint,
+        content=user_profile_payload,
+        headers=headers,
+    )
+    response.raise_for_status()
+    logger.info("updating user profile changes returned successfully")
+    return response
 
 
 async def update_my_profile(
@@ -173,9 +142,6 @@ async def update_my_profile(
 
     Returns:
         ProfileResponse: Updated profile data with masked phone numbers
-
-    Raises:
-        HTTPException: For authentication, authorization, or validation errors
     """
     logger.info("Starting user profile update")
 
@@ -193,14 +159,7 @@ async def update_my_profile(
 
     merged_profile = {**ibm_user_profile, **updated_user_data_dict}
 
-    try:
-        validate_merged_profile = IBMVerifyUpdateUserProfile(**merged_profile)
-    except ValidationError as e:
-        logger.error(f"Merged Profile Validation Error: {e.json()}")
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-            detail="Request data validation error",
-        )
+    validate_merged_profile = IBMVerifyUpdateUserProfile(**merged_profile)
 
     user_profile_payload = validate_merged_profile.model_dump_json(
         by_alias=True, exclude_none=True
@@ -209,25 +168,11 @@ async def update_my_profile(
     response = await dispatch_update_my_profile(
         request, user_profile_payload, user_access_token
     )
-    try:
-        json_data = response.json()
-    except Exception as e:
-        logger.error(f"Failed to parse profile response: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-            detail="Request data validation error",
-        )
+    json_data = response.json()
 
     masked_profile_data = mask_profile_details(json_data)
 
-    try:
-        response_data = IBMVerifyUserProfileSchema(**masked_profile_data)
-    except ValidationError as e:
-        logger.error(f"Profile Validation Error: {e.json()}")
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-            detail="Request data validation error",
-        )
+    response_data = IBMVerifyUserProfileSchema(**masked_profile_data)
 
     return ProfileResponse(
         success=True,

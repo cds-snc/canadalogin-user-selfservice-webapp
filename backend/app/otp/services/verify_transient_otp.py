@@ -7,9 +7,7 @@ from httpx import AsyncClient
 from app.config import get_configuration
 from app.otp.schemas import OtpType, UserOtpVerificationInfo
 from app.utils.access_token import get_auth_request_headers
-from app.utils.helpers import generate_error_response, format_error_response
 from app.utils.schemas import ResponseModel
-from app.utils.request_error_handler import RequestErrorHandler
 
 logger = logging.getLogger(__name__)
 
@@ -21,49 +19,29 @@ async def handle_otp_verification(
 ):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
-    try:
-        logger.info(f"Attempting to verify {user_verification_data.otpType} OTP")
-        start_time = datetime.now()
-        otp_verification_response = await verify_otp(
-            global_http_client, user_verification_data, user_access_token
-        )
-        duration = (datetime.now() - start_time).total_seconds()
-        logger.info(
-            f"{user_verification_data.otpType} OTP verification response received in {duration:.2f} seconds"
-        )
+    logger.info(f"Attempting to verify {user_verification_data.otpType} OTP")
+    start_time = datetime.now()
+    otp_verification_response = await verify_otp(
+        global_http_client, user_verification_data, user_access_token
+    )
+    duration = (datetime.now() - start_time).total_seconds()
+    logger.info(
+        f"{user_verification_data.otpType} OTP verification response received in {duration:.2f} seconds"
+    )
 
-        if otp_verification_response.status_code is None:
-            return generate_error_response(400, "Unknown error")
-
-        if otp_verification_response.status_code != 204:
-            logger.error(
-                f"Failed to verify {user_verification_data.otpType} OTP. Response: {otp_verification_response.json()}"
-            )
-
-            return generate_error_response(
-                otp_verification_response.status_code,
-                format_error_response(otp_verification_response.json()),
-            )
-
-        return ResponseModel(  # Plain ResponseModel since the response has no content
-            success=True,
-            message=f"{user_verification_data.otpType.value} OTP has been verified",
-        )
-
-    except HTTPException as he:
-        logger.error(
-            f"HTTP Exception in {user_verification_data.otpType} OTP verification: {str(he)}"
-        )
-        raise he
-    except Exception as e:
-        logger.error(
-            f"{user_verification_data.otpType} verification error: {str(e)}",
-            exc_info=True,
-        )
+    if (
+        otp_verification_response.status_code is None
+        or otp_verification_response.status_code != 204
+    ):
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"{user_verification_data.otpType} verification error: {str(e)}",
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=f"Error enrolling {user_verification_data.otpType} OTP: {otp_verification_response.json() if hasattr(otp_verification_response, 'json') else None}",
         )
+
+    return ResponseModel(  # Plain ResponseModel since the response has no content
+        success=True,
+        message=f"{user_verification_data.otpType.value} OTP has been verified",
+    )
 
 
 async def verify_otp(
@@ -71,36 +49,31 @@ async def verify_otp(
     user_verification_data: UserOtpVerificationInfo,
     user_access_token: str,
 ):
-    try:
+    trxnId = user_verification_data.trxnId
+    otp = {
+        "otp": user_verification_data.otp,
+    }
 
-        trxnId = user_verification_data.trxnId
-        otp = {
-            "otp": user_verification_data.otp,
-        }
+    headers = get_auth_request_headers(user_access_token, True)
+    settings = get_configuration().ibm_verify_config
 
-        headers = get_auth_request_headers(user_access_token, True)
-        settings = get_configuration().ibm_verify_config
+    if user_verification_data.otpType == OtpType.SMS:
+        verification_endpoint_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/smsotp/transient/verifications/{trxnId}"
 
-        if user_verification_data.otpType == OtpType.SMS:
-            verification_endpoint_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/smsotp/transient/verifications/{trxnId}"
+    elif user_verification_data.otpType == OtpType.VOICE:
+        verification_endpoint_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/voiceotp/transient/verifications/{trxnId}"
 
-        elif user_verification_data.otpType == OtpType.VOICE:
-            verification_endpoint_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/voiceotp/transient/verifications/{trxnId}"
+    elif user_verification_data.otpType == OtpType.EMAIL:
+        verification_endpoint_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/emailotp/transient/verifications/{trxnId}"
 
-        elif user_verification_data.otpType == OtpType.EMAIL:
-            verification_endpoint_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/emailotp/transient/verifications/{trxnId}"
-
-        else:
-            return generate_error_response(400, "Unknown error")
-        response = await global_http_client.post(
-            verification_endpoint_url, json=otp, headers=headers
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid User OTP Type",
         )
-        response.raise_for_status()
-        logger.info("verify_otp returned successfully")
-        return response
-
-    except Exception as e:
-        logger.error(
-            f"Error Exception in {user_verification_data.otpType} verification: {str(e)}"
-        )
-        RequestErrorHandler.handle(e)
+    response = await global_http_client.post(
+        verification_endpoint_url, json=otp, headers=headers
+    )
+    response.raise_for_status()
+    logger.info("verify_otp returned successfully")
+    return response

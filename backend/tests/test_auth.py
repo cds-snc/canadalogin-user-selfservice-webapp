@@ -354,26 +354,6 @@ async def test_callback_handler_sets_new_session_id_and_updates_tokens(
 
 
 @pytest.mark.asyncio
-async def test_callback_handler_oauth_error_results_in_500(app, monkeypatch):
-    """
-    For this test we want to assert the HTTP 500 response rather than have
-    the app exception bubble up, so use an ASGITransport with
-    raise_app_exceptions=False for this single request.
-    """
-    # Arrange: make oauth.verify.authorize_access_token raise OAuthError
-    OAuthError = auth_module.OAuthError  # from authlib, imported by auth.py
-    raising_client = RaisingVerifyClient(OAuthError("boom"))
-    monkeypatch.setattr(auth_module.oauth, "verify", raising_client, raising=True)
-
-    # Use a dedicated client that does NOT re-raise app exceptions
-    transport = ASGITransport(app=app, raise_app_exceptions=False)
-    async with AsyncClient(transport=transport, base_url="http://testserver") as ac:
-        resp = await ac.get("/auth/callback", follow_redirects=False)
-
-    assert resp.status_code == 500  # Inspect the 500 response instead of exception
-
-
-@pytest.mark.asyncio
 async def test_reauthenticate_user_sets_returnToPage_and_passes_max_age(app, client):
     resp = await client.get(
         "/reauth", params={"returnToPage": "/reports"}, follow_redirects=False

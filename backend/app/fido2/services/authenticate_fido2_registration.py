@@ -8,7 +8,6 @@ import time
 from httpx import AsyncClient
 from fastapi import Request
 from app.utils.access_token import get_admin_token, get_auth_request_headers
-from app.utils.request_error_handler import RequestErrorHandler
 from app.utils.schemas import ResponseModel
 from app.constants.session_keys import SessionKeys
 from app.constants.verify_endpoints import VerifyAPIEndpoint
@@ -293,20 +292,14 @@ async def _get_mfa_challenge_token(
         raise Exception("No refresh_token in stepup token data")
 
     settings = get_configuration()
-    try:
-        logger.info("Starting MFA refresh token flow for FIDO2 authentication")
-        mfa_token_data = await _perform_mfa_refresh_token_flow(
-            http_client=http_client,
-            tenant_url=tenant_url,
-            refresh_token=stepup_refresh_token,
-            client_id=settings.ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID,
-            client_secret=settings.ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_SECRET,
-        )
-    except Exception as mfa_error:
-        logger.error(
-            f"Error getting MFA challenge token: {str(mfa_error)}", exc_info=True
-        )
-        raise Exception(f"MFA refresh token flow failed: {str(mfa_error)}")
+    logger.info("Starting MFA refresh token flow for FIDO2 authentication")
+    mfa_token_data = await _perform_mfa_refresh_token_flow(
+        http_client=http_client,
+        tenant_url=tenant_url,
+        refresh_token=stepup_refresh_token,
+        client_id=settings.ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID,
+        client_secret=settings.ibm_verify_config.IBM_VERIFY_PROFILE_MANAGEMENT_SECRET,
+    )
 
     mfa_challenge_token = mfa_token_data.get("access_token")
     logger.info("MFA challenge token obtained")
@@ -436,43 +429,38 @@ async def get_assertion_options(
         "userVerification": "preferred",
     }
 
-    try:
-        tenant_url = get_tenant_url()
-        rp_id = get_rp_id()
+    tenant_url = get_tenant_url()
+    rp_id = get_rp_id()
 
-        # Get admin token for RP operations
-        admin_token = await get_admin_token(http_client)
-        rp_uuid = await get_rp_uuid_from_rp_id(http_client, admin_token, rp_id)
+    # Get admin token for RP operations
+    admin_token = await get_admin_token(http_client)
+    rp_uuid = await get_rp_uuid_from_rp_id(http_client, admin_token, rp_id)
 
-        # Get user profile information
-        username, display_name, user_id = await get_user_profile_info(
-            http_client, user_access_token
-        )
+    # Get user profile information
+    username, display_name, user_id = await get_user_profile_info(
+        http_client, user_access_token
+    )
 
-        # Prepare request body with user info
-        body_to_send = request_body.copy()
-        body_to_send["userId"] = user_id
+    # Prepare request body with user info
+    body_to_send = request_body.copy()
+    body_to_send["userId"] = user_id
 
-        logger.info(f"Assertion options - username: {username}, userId: {user_id}")
+    logger.info(f"Assertion options - username: {username}, userId: {user_id}")
 
-        # Make the request
-        url = f"{tenant_url}{VerifyAPIEndpoint.FIDO2_RP_BASE.value}/{rp_uuid}/assertion/options"
-        headers = get_auth_request_headers(user_access_token, json_content_type=True)
+    # Make the request
+    url = f"{tenant_url}{VerifyAPIEndpoint.FIDO2_RP_BASE.value}/{rp_uuid}/assertion/options"
+    headers = get_auth_request_headers(user_access_token, json_content_type=True)
 
-        response = await http_client.post(url, headers=headers, json=body_to_send)
-        logger.info(f"Assertion options response status: {response.status_code}")
-        response.raise_for_status()
+    response = await http_client.post(url, headers=headers, json=body_to_send)
+    logger.info(f"Assertion options response status: {response.status_code}")
+    response.raise_for_status()
 
-        response_data = response.json()
-        return ResponseModel(
-            success=True,
-            data=response_data,
-            message="Assertion options retrieved successfully",
-        )
-
-    except Exception as e:
-        logger.error(f"Error getting assertion options: {str(e)}", exc_info=True)
-        RequestErrorHandler.handle(e)
+    response_data = response.json()
+    return ResponseModel(
+        success=True,
+        data=response_data,
+        message="Assertion options retrieved successfully",
+    )
 
 
 async def submit_assertion_result(
@@ -503,56 +491,54 @@ async def submit_assertion_result(
     Returns:
         ResponseModel with authentication result
     """
-    try:
-        tenant_url = get_tenant_url()
-        rp_id = get_rp_id()
-        admin_token = await get_admin_token(http_client)
-        rp_uuid = await get_rp_uuid_from_rp_id(http_client, admin_token, rp_id)
-        body_to_send = request_body.model_dump(exclude_none=True)
+    tenant_url = get_tenant_url()
+    rp_id = get_rp_id()
+    admin_token = await get_admin_token(http_client)
+    rp_uuid = await get_rp_uuid_from_rp_id(http_client, admin_token, rp_id)
+    body_to_send = request_body.model_dump(exclude_none=True)
 
-        # Steps 2–3: Validate stepup session and get MFA challenge token
-        mfa_challenge_token = None
-        if return_jwt:
-            mfa_challenge_token = await _get_mfa_challenge_token(
-                request, http_client, tenant_url
-            )
-
-        # Step 4: Submit FIDO2 assertion result
-        auth_token = mfa_challenge_token if mfa_challenge_token else user_access_token
-        url = f"{tenant_url}{VerifyAPIEndpoint.FIDO2_RP_BASE.value}/{rp_uuid}/assertion/result"
-        if return_jwt and mfa_challenge_token:
-            url += "?returnJwt=true"
-            logger.info("Requesting JWT token in assertion result response")
-
-        headers = get_auth_request_headers(auth_token, json_content_type=True)
-        http_response = await http_client.post(url, headers=headers, json=body_to_send)
-        http_response.raise_for_status()
-
-        response_data = http_response.json()
-        logger.info("Assertion result submitted successfully")
-
-        # Steps 5–6: Exchange FIDO2 JWT and update session
-        if return_jwt and "assertion" in response_data:
-            fido2_jwt = response_data["assertion"]
-            logger.info("FIDO2 assertion JWT received, proceeding with token exchange")
-            try:
-                await _exchange_and_update_session(
-                    request, http_client, tenant_url, fido2_jwt
-                )
-            except Exception as exchange_error:
-                logger.error(
-                    f"Error exchanging FIDO2 JWT for combined token: {str(exchange_error)}",
-                    exc_info=True,
-                )
-                # Don't fail the whole request if token exchange fails —
-                # the FIDO2 assertion itself succeeded
-
-        return ResponseModel(
-            success=True,
-            data=response_data,
-            message="FIDO2 authentication completed successfully",
+    # Steps 2–3: Validate stepup session and get MFA challenge token
+    mfa_challenge_token = None
+    if return_jwt:
+        mfa_challenge_token = await _get_mfa_challenge_token(
+            request, http_client, tenant_url
         )
 
-    except Exception as e:
-        logger.error(f"Error submitting assertion result: {str(e)}", exc_info=True)
-        RequestErrorHandler.handle(e)
+    # Step 4: Submit FIDO2 assertion result
+    auth_token = mfa_challenge_token if mfa_challenge_token else user_access_token
+    url = f"{tenant_url}{VerifyAPIEndpoint.FIDO2_RP_BASE.value}/{rp_uuid}/assertion/result"
+    if return_jwt and mfa_challenge_token:
+        url += "?returnJwt=true"
+        logger.info("Requesting JWT token in assertion result response")
+
+    headers = get_auth_request_headers(auth_token, json_content_type=True)
+    http_response = await http_client.post(url, headers=headers, json=body_to_send)
+    http_response.raise_for_status()
+
+    response_data = http_response.json()
+    logger.info("Assertion result submitted successfully")
+
+    print("hihihihihiihhihihiihihhihihi")
+    print(response_data)
+
+    # Steps 5–6: Exchange FIDO2 JWT and update session
+    if return_jwt and "assertion" in response_data:
+        fido2_jwt = response_data["assertion"]
+        logger.info("FIDO2 assertion JWT received, proceeding with token exchange")
+        try:
+            await _exchange_and_update_session(
+                request, http_client, tenant_url, fido2_jwt
+            )
+        except Exception as exchange_error:
+            logger.error(
+                f"Error exchanging FIDO2 JWT for combined token: {str(exchange_error)}",
+                exc_info=True,
+            )
+            # Don't fail the whole request if token exchange fails —
+            # the FIDO2 assertion itself succeeded
+
+    return ResponseModel(
+        success=True,
+        data=response_data,
+        message="FIDO2 authentication completed successfully",
+    )

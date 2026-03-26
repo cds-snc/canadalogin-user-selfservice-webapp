@@ -259,37 +259,3 @@ async def test_validate_logout_token_missing_jti_raises():
     ):
         with pytest.raises(ValueError):
             await auth_logout.validate_logout_token(mock_request)
-
-
-@pytest.mark.asyncio
-async def test_logout_user_error_path_uses_request_error_handler():
-    # simulate get_user_info raising and RequestErrorHandler.handle raising HTTPException
-    mock_request = AsyncMock()
-
-    class C:
-        pass
-
-    cfg = C()
-    cfg.end_session_endpoint = "https://oidc.example/logout"
-    mock_request.app = MagicMock()
-    mock_request.app.state = MagicMock()
-    mock_request.app.state.config = cfg
-
-    mock_request.session = MagicMock()
-
-    # Simulate get_user_info raising; logout_user should call RequestErrorHandler.handle and return None
-    with (
-        patch(
-            "app.auth.services.auth_logout.get_user_info", new_callable=AsyncMock
-        ) as mock_user_info,
-        patch(
-            "app.auth.services.auth_logout.RequestErrorHandler.handle", new=MagicMock()
-        ) as mock_handler,
-        patch("app.auth.services.auth_logout.logger.exception", new=MagicMock()),
-    ):
-        mock_user_info.side_effect = Exception("boom")
-
-        result = await auth_logout.logout_user(mock_request, "idtok-err")
-        # logout_user swallows the exception and returns None after invoking the handler
-        assert result is None
-        assert mock_handler.called

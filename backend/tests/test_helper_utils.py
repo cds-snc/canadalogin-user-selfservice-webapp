@@ -143,7 +143,9 @@ def test_string_error_response_with_empty_strings():
 async def test_verify_otp_before_operation_success(monkeypatch):
     """Test successful OTP verification"""
 
-    async def mock_handle_otp_verification(client, verification_data, access_token):
+    async def mock_handle_otp_verification(
+        client, verification_data, user_access_token
+    ):
         # Return a successful response
         return ResponseModel(
             success=True, message="OTP verified successfully", data=None
@@ -159,10 +161,10 @@ async def test_verify_otp_before_operation_success(monkeypatch):
         # Should not raise any exception
         await verify_otp_before_operation(
             global_http_client=client,
+            user_access_token="token123",
             otp="123456",
             trxn_id="txn123",
             otp_type=OtpType.SMS,
-            user_access_token="test_token",
         )
 
 
@@ -170,7 +172,9 @@ async def test_verify_otp_before_operation_success(monkeypatch):
 async def test_verify_otp_before_operation_failure(monkeypatch):
     """Test OTP verification failure"""
 
-    async def mock_handle_otp_verification(client, verification_data, access_token):
+    async def mock_handle_otp_verification(
+        client, verification_data, user_access_token
+    ):
         # Return a failed response
         return ResponseModel(success=False, message="Invalid OTP", data=None)
 
@@ -184,10 +188,10 @@ async def test_verify_otp_before_operation_failure(monkeypatch):
         with pytest.raises(HTTPException) as exc_info:
             await verify_otp_before_operation(
                 global_http_client=client,
+                user_access_token="token123",
                 otp="wrong_otp",
                 trxn_id="txn123",
                 otp_type=OtpType.SMS,
-                user_access_token="test_token",
             )
 
         assert exc_info.value.status_code == 400
@@ -198,7 +202,9 @@ async def test_verify_otp_before_operation_failure(monkeypatch):
 async def test_verify_otp_before_operation_http_exception(monkeypatch):
     """Test OTP verification when HTTPException is raised"""
 
-    async def mock_handle_otp_verification(client, verification_data, access_token):
+    async def mock_handle_otp_verification(
+        client, verification_data, user_access_token
+    ):
         # Raise an HTTPException
         raise HTTPException(status_code=401, detail="Unauthorized")
 
@@ -212,41 +218,12 @@ async def test_verify_otp_before_operation_http_exception(monkeypatch):
         with pytest.raises(HTTPException) as exc_info:
             await verify_otp_before_operation(
                 global_http_client=client,
+                user_access_token="token123",
                 otp="123456",
                 trxn_id="txn123",
                 otp_type=OtpType.VOICE,
-                user_access_token="test_token",
             )
 
         # Should re-raise the original HTTPException
         assert exc_info.value.status_code == 401
         assert "Unauthorized" in str(exc_info.value.detail)
-
-
-@pytest.mark.asyncio
-async def test_verify_otp_before_operation_unexpected_exception(monkeypatch):
-    """Test OTP verification when an unexpected exception occurs"""
-
-    async def mock_handle_otp_verification(client, verification_data, access_token):
-        # Raise an unexpected exception
-        raise ValueError("Unexpected error occurred")
-
-    # Patch the import within the verify_otp_before_operation function
-    monkeypatch.setattr(
-        "app.otp.services.verify_transient_otp.handle_otp_verification",
-        mock_handle_otp_verification,
-    )
-
-    async with AsyncClient(base_url="http://localhost") as client:
-        with pytest.raises(HTTPException) as exc_info:
-            await verify_otp_before_operation(
-                global_http_client=client,
-                otp="123456",
-                trxn_id="txn123",
-                otp_type=OtpType.EMAIL,
-                user_access_token="test_token",
-            )
-
-        # Should wrap unexpected exceptions in a 500 HTTPException
-        assert exc_info.value.status_code == 500
-        assert "unexpected error occurred" in str(exc_info.value.detail).lower()
