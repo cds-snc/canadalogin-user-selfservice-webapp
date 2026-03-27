@@ -5,7 +5,7 @@ FIDO2 API router endpoints
 import logging
 from fastapi import APIRouter, Depends, Request
 from httpx import AsyncClient
-from app.fido2.mds_service import mds_service
+from app.fido2.services.mds_service import mds_service
 from app.fido2.schemas import (
     FIDO2AuthenticatorMetadata,
     FIDO2UserResponse,
