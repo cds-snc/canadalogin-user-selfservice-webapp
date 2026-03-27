@@ -701,7 +701,7 @@ describe("DeleteMFAPage", () => {
   describe("Step Navigation Tests", () => {
     it("should navigate through all steps successfully", async () => {
       const mockValidateOtpCode = vi.fn();
-      const mockRequestOtpCode = vi.fn();
+      const mockRequestOtpCode = vi.fn().mockResolvedValue(true);
 
       useOtpOperations.mockReturnValue({
         userPhoneFactors: [

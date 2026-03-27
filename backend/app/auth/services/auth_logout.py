@@ -1,5 +1,5 @@
 import logging
-from fastapi import Request, HTTPException, status
+from fastapi import Request
 from urllib.parse import urlencode
 from authlib.jose import jwt
 from authlib.jose.errors import JoseError
@@ -9,7 +9,6 @@ from app.auth.services.auth_user_session import get_user_info
 from app.auth.services.auth import get_base_profile_management_url
 from app.utils.schemas import ResponseModel
 from app.auth.schemas import LogoutResponseModel
-from app.utils.request_error_handler import RequestErrorHandler
 from app.utils.redis import get_redis_client
 from app.constants.redis_keys import RedisKeys
 
@@ -115,92 +114,70 @@ async def logout_user(request: Request, id_token: str):
     """
     Logs out the user by clearing the session and redirecting to the logout endpoint.
     """
-    try:
-        config = request.app.state.config
-        user_info = await get_user_info(request)
+    config = request.app.state.config
+    user_info = await get_user_info(request)
 
-        # Construct the logout redirect URL
-        end_session_endpoint = config.end_session_endpoint
-        post_logout_redirect_uri = get_base_profile_management_url()
-        locale = user_info.get("locale", "en")
-        # Build the logout URL with query parameters
-        params = {
-            "id_token_hint": id_token,
-            "post_logout_redirect_uri": post_logout_redirect_uri,
-            "ui_locales": locale,
-        }
-        redirect_url = f"{end_session_endpoint}?{urlencode(params)}"
-        logger.debug(f"Constructed logout redirect URL: {redirect_url}")
+    # Construct the logout redirect URL
+    end_session_endpoint = config.end_session_endpoint
+    post_logout_redirect_uri = get_base_profile_management_url()
+    locale = user_info.get("locale", "en")
+    # Build the logout URL with query parameters
+    params = {
+        "id_token_hint": id_token,
+        "post_logout_redirect_uri": post_logout_redirect_uri,
+        "ui_locales": locale,
+    }
+    redirect_url = f"{end_session_endpoint}?{urlencode(params)}"
+    logger.debug(f"Constructed logout redirect URL: {redirect_url}")
 
-        # Create response with the redirect URL
-        response_data = LogoutResponseModel(
-            redirect_url=redirect_url, source="logout_button"
-        )
-        # Clear the session
-        request.session.clear()
+    # Create response with the redirect URL
+    response_data = LogoutResponseModel(
+        redirect_url=redirect_url, source="logout_button"
+    )
+    # Clear the session
+    request.session.clear()
 
-        await mark_session_logout(
-            request, sid=user_info.get("sid"), source="logout_button"
-        )
+    await mark_session_logout(request, sid=user_info.get("sid"), source="logout_button")
 
-        return ResponseModel(
-            success=True,
-            data=response_data,
-            message="Redirect url to logout",
-        )
-    except Exception as e:
-        logger.exception("Unexpected error during logout", str(e))
-        RequestErrorHandler.handle(e, context="Unexpected error during logout")
+    return ResponseModel(
+        success=True,
+        data=response_data,
+        message="Redirect url to logout",
+    )
 
 
 async def backchannel_logout(request: Request):
+    claims = await validate_logout_token(request)
+    sid = claims.get("sid")
+    jti = claims.get("jti")  # JWT ID - unique identifier for the logout token
+    logger.debug(f"Backchannel logout for sid: {sid}, jti: {jti}")
 
-    try:
-        claims = await validate_logout_token(request)
-        sid = claims.get("sid")
-        jti = claims.get("jti")  # JWT ID - unique identifier for the logout token
-        logger.debug(f"Backchannel logout for sid: {sid}, jti: {jti}")
+    # Ensure sid is present (it should be based on validation)
+    if not sid:
+        logger.error("Missing sid claim in logout token")
+        raise ValueError("Missing sid claim in logout token")
+    # Ensure jti is present (it should be based on validation)
+    if not jti:
+        logger.error("Missing jti claim in logout token")
+        raise ValueError("Missing jti claim in logout token")
 
-        # Ensure sid is present (it should be based on validation)
-        if not sid:
-            logger.error("Missing sid claim in logout token")
-            raise ValueError("Missing sid claim in logout token")
-        # Ensure jti is present (it should be based on validation)
-        if not jti:
-            logger.error("Missing jti claim in logout token")
-            raise ValueError("Missing jti claim in logout token")
-
-        # Check if this logout token has already been processed
-        if await is_logout_processed(request, sid):
-            logger.info(
-                f"Logout token {sid} already processed, ignoring duplicate request"
-            )
-            return ResponseModel(
-                success=True, data=None, message="Backchannel logout already processed"
-            )
-
-        # Try to get Redis client from the application state
-        redis_client = get_redis_client(request)
-        logger.info(f"Processing backchannel logout for sid: {sid}")
-        # Delete the session from Redis for the given sid
-        cache_key = f"{RedisKeys.REDIS_SESSION_KEY.value}{sid}"
-        await redis_client.delete(cache_key)
-
-        # Mark this logout token as processed to prevent duplicate processing
-        await mark_session_logout(request, sid, source="backchannel_logout")
-
+    # Check if this logout token has already been processed
+    if await is_logout_processed(request, sid):
+        logger.info(f"Logout token {sid} already processed, ignoring duplicate request")
         return ResponseModel(
-            success=True, data=None, message="Backchannel logout successful"
+            success=True, data=None, message="Backchannel logout already processed"
         )
-    except ValueError as ve:
-        logger.error(f"Value error during backchannel logout: {ve}")
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=str(ve)
-        ) from ve
-    except Exception:
-        logger.exception("Unexpected error during backchannel logout")
-        # IBM Verify expects a 400 response for any error during backchannel logout
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Internal error during backchannel logout",
-        )
+
+    # Try to get Redis client from the application state
+    redis_client = get_redis_client(request)
+    logger.info(f"Processing backchannel logout for sid: {sid}")
+    # Delete the session from Redis for the given sid
+    cache_key = f"{RedisKeys.REDIS_SESSION_KEY.value}{sid}"
+    await redis_client.delete(cache_key)
+
+    # Mark this logout token as processed to prevent duplicate processing
+    await mark_session_logout(request, sid, source="backchannel_logout")
+
+    return ResponseModel(
+        success=True, data=None, message="Backchannel logout successful"
+    )

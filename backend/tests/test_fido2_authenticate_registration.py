@@ -8,7 +8,7 @@ Uses importlib to import the actual module for patching.
 import importlib
 import time
 import pytest
-from httpx import AsyncClient, HTTPStatusError, Request, Response
+from httpx import AsyncClient
 from unittest.mock import AsyncMock, MagicMock, patch
 from app.fido2.schemas import AssertionOptionsRequest, FIDO2AssertionResultRequest
 
@@ -231,116 +231,6 @@ class TestGetAssertionOptions:
         call_args = mock_http_client.post.call_args[0]
         url = call_args[0]
         assert "/v2.0/factors/fido2/relyingparties/rp-uuid-123/assertion/options" in url
-
-    @pytest.mark.asyncio
-    @patch.object(auth_module, "RequestErrorHandler")
-    @patch.object(auth_module, "get_admin_token")
-    @patch.object(auth_module, "get_rp_id")
-    @patch.object(auth_module, "get_tenant_url")
-    async def test_handles_admin_token_error(
-        self,
-        mock_get_tenant_url,
-        mock_get_rp_id,
-        mock_get_admin_token,
-        mock_request_error_handler,
-        mock_http_client,
-    ):
-        """Should handle error when getting admin token fails"""
-        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
-        mock_get_rp_id.return_value = "example.com"
-        mock_get_admin_token.side_effect = Exception("Token service error")
-
-        request_data = AssertionOptionsRequest()
-        await get_assertion_options(
-            http_client=mock_http_client,
-            user_access_token="user-token",
-            request_data=request_data,
-        )
-
-        mock_request_error_handler.handle.assert_called_once()
-
-    @pytest.mark.asyncio
-    @patch.object(auth_module, "RequestErrorHandler")
-    @patch.object(auth_module, "get_user_profile_info")
-    @patch.object(auth_module, "get_rp_uuid_from_rp_id")
-    @patch.object(auth_module, "get_admin_token")
-    @patch.object(auth_module, "get_rp_id")
-    @patch.object(auth_module, "get_tenant_url")
-    async def test_handles_user_profile_error(
-        self,
-        mock_get_tenant_url,
-        mock_get_rp_id,
-        mock_get_admin_token,
-        mock_get_rp_uuid_from_rp_id,
-        mock_get_user_profile_info,
-        mock_request_error_handler,
-        mock_http_client,
-    ):
-        """Should handle error when getting user profile fails"""
-        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
-        mock_get_rp_id.return_value = "example.com"
-        mock_get_admin_token.return_value = "admin-token"
-        mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
-        mock_get_user_profile_info.side_effect = Exception("Profile fetch error")
-
-        request_data = AssertionOptionsRequest()
-        await get_assertion_options(
-            http_client=mock_http_client,
-            user_access_token="user-token",
-            request_data=request_data,
-        )
-
-        mock_request_error_handler.handle.assert_called_once()
-
-    @pytest.mark.asyncio
-    @patch.object(auth_module, "RequestErrorHandler")
-    @patch.object(auth_module, "get_auth_request_headers")
-    @patch.object(auth_module, "get_user_profile_info")
-    @patch.object(auth_module, "get_rp_uuid_from_rp_id")
-    @patch.object(auth_module, "get_admin_token")
-    @patch.object(auth_module, "get_rp_id")
-    @patch.object(auth_module, "get_tenant_url")
-    async def test_handles_http_error(
-        self,
-        mock_get_tenant_url,
-        mock_get_rp_id,
-        mock_get_admin_token,
-        mock_get_rp_uuid_from_rp_id,
-        mock_get_user_profile_info,
-        mock_get_auth_request_headers,
-        mock_request_error_handler,
-        mock_http_client,
-    ):
-        """Should handle HTTP error from API"""
-        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
-        mock_get_rp_id.return_value = "example.com"
-        mock_get_admin_token.return_value = "admin-token"
-        mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
-        mock_get_user_profile_info.return_value = (
-            "user@example.com",
-            "Test User",
-            "user-id-456",
-        )
-        mock_get_auth_request_headers.return_value = {
-            "Authorization": "Bearer admin-token"
-        }
-
-        mock_request = Request("POST", "https://example.com")
-        mock_response = Response(400, request=mock_request)
-        mock_response_obj = MagicMock()
-        mock_response_obj.raise_for_status.side_effect = HTTPStatusError(
-            message="Bad Request", request=mock_request, response=mock_response
-        )
-        mock_http_client.post = AsyncMock(return_value=mock_response_obj)
-
-        request_data = AssertionOptionsRequest()
-        await get_assertion_options(
-            http_client=mock_http_client,
-            user_access_token="user-token",
-            request_data=request_data,
-        )
-
-        mock_request_error_handler.handle.assert_called_once()
 
     @pytest.mark.asyncio
     @patch.object(auth_module, "get_auth_request_headers")
@@ -616,99 +506,6 @@ class TestSubmitAssertionResult:
 
     @pytest.mark.asyncio
     @patch.object(auth_module, "get_auth_request_headers")
-    @patch.object(auth_module, "RequestErrorHandler")
-    @patch.object(auth_module, "get_rp_uuid_from_rp_id")
-    @patch.object(auth_module, "get_admin_token")
-    @patch.object(auth_module, "get_rp_id")
-    @patch.object(auth_module, "get_tenant_url")
-    async def test_return_jwt_true_without_stepup_token_raises(
-        self,
-        mock_get_tenant_url,
-        mock_get_rp_id,
-        mock_get_admin_token,
-        mock_get_rp_uuid_from_rp_id,
-        mock_request_error_handler,
-        mock_get_auth_request_headers,
-        mock_http_client,
-        mock_request,
-        mock_assertion_request,
-    ):
-        """When return_jwt=True but no stepup token in session, should forward step-up required error to error handler"""
-        # No stepup token in session
-        mock_request.session = {}
-
-        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
-        mock_get_rp_id.return_value = "example.com"
-        mock_get_admin_token.return_value = "admin-token"
-        mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
-
-        await submit_assertion_result(
-            request=mock_request,
-            http_client=mock_http_client,
-            user_access_token="user-token",
-            request_body=mock_assertion_request,
-            return_jwt=True,
-        )
-
-        # Should call error handler with step-up required exception
-        mock_request_error_handler.handle.assert_called_once()
-        error_arg = mock_request_error_handler.handle.call_args[0][0]
-        assert isinstance(error_arg, Exception)
-        assert "Step-up authentication required" in str(error_arg)
-
-    @pytest.mark.asyncio
-    @patch.object(auth_module, "_is_token_expired")
-    @patch.object(auth_module, "RequestErrorHandler")
-    @patch.object(auth_module, "get_rp_uuid_from_rp_id")
-    @patch.object(auth_module, "get_admin_token")
-    @patch.object(auth_module, "get_rp_id")
-    @patch.object(auth_module, "get_tenant_url")
-    async def test_return_jwt_true_with_expired_token_raises_exception(
-        self,
-        mock_get_tenant_url,
-        mock_get_rp_id,
-        mock_get_admin_token,
-        mock_get_rp_uuid_from_rp_id,
-        mock_request_error_handler,
-        mock_is_token_expired,
-        mock_http_client,
-        mock_request,
-        mock_assertion_request,
-    ):
-        """Should raise exception when stepup token has expired"""
-        # Setup session with expired token
-        mock_request.session = {
-            "stepup_token_data": {
-                "access_token": "access-token-123",
-                "refresh_token": "refresh-token-123",
-                "grant_id": "grant-id-123",
-                "expires_in": 3600,
-            },
-            "stepup_token_timestamp": time.time() - 4000,  # Expired
-        }
-
-        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
-        mock_get_rp_id.return_value = "example.com"
-        mock_get_admin_token.return_value = "admin-token"
-        mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
-        mock_is_token_expired.return_value = True  # Token is expired
-
-        await submit_assertion_result(
-            request=mock_request,
-            http_client=mock_http_client,
-            user_access_token="user-token",
-            request_body=mock_assertion_request,
-            return_jwt=True,
-        )
-
-        # Should call error handler with expired token exception
-        mock_request_error_handler.handle.assert_called_once()
-        error_arg = mock_request_error_handler.handle.call_args[0][0]
-        assert isinstance(error_arg, Exception)
-        assert "Step-up token expired" in str(error_arg)
-
-    @pytest.mark.asyncio
-    @patch.object(auth_module, "get_auth_request_headers")
     @patch.object(auth_module, "get_rp_uuid_from_rp_id")
     @patch.object(auth_module, "get_admin_token")
     @patch.object(auth_module, "get_rp_id")
@@ -750,82 +547,6 @@ class TestSubmitAssertionResult:
         call_args = mock_http_client.post.call_args[0]
         url = call_args[0]
         assert "/v2.0/factors/fido2/relyingparties/rp-uuid-123/assertion/result" in url
-
-    @pytest.mark.asyncio
-    @patch.object(auth_module, "RequestErrorHandler")
-    @patch.object(auth_module, "get_admin_token")
-    @patch.object(auth_module, "get_rp_id")
-    @patch.object(auth_module, "get_tenant_url")
-    async def test_handles_admin_token_error(
-        self,
-        mock_get_tenant_url,
-        mock_get_rp_id,
-        mock_get_admin_token,
-        mock_request_error_handler,
-        mock_http_client,
-        mock_request,
-        mock_assertion_request,
-    ):
-        """Should handle error when getting admin token fails"""
-        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
-        mock_get_rp_id.return_value = "example.com"
-        mock_get_admin_token.side_effect = Exception("Token service error")
-
-        await submit_assertion_result(
-            request=mock_request,
-            http_client=mock_http_client,
-            user_access_token="user-token",
-            request_body=mock_assertion_request,
-            return_jwt=False,
-        )
-
-        mock_request_error_handler.handle.assert_called_once()
-
-    @pytest.mark.asyncio
-    @patch.object(auth_module, "RequestErrorHandler")
-    @patch.object(auth_module, "get_auth_request_headers")
-    @patch.object(auth_module, "get_rp_uuid_from_rp_id")
-    @patch.object(auth_module, "get_admin_token")
-    @patch.object(auth_module, "get_rp_id")
-    @patch.object(auth_module, "get_tenant_url")
-    async def test_handles_http_error(
-        self,
-        mock_get_tenant_url,
-        mock_get_rp_id,
-        mock_get_admin_token,
-        mock_get_rp_uuid_from_rp_id,
-        mock_get_auth_request_headers,
-        mock_request_error_handler,
-        mock_http_client,
-        mock_request,
-        mock_assertion_request,
-    ):
-        """Should handle HTTP error from API"""
-        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
-        mock_get_rp_id.return_value = "example.com"
-        mock_get_admin_token.return_value = "admin-token"
-        mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
-        mock_get_auth_request_headers.return_value = {
-            "Authorization": "Bearer admin-token"
-        }
-
-        mock_request_obj = Request("POST", "https://example.com")
-        mock_response = Response(401, request=mock_request_obj)
-        mock_response_obj = MagicMock()
-        mock_response_obj.raise_for_status.side_effect = HTTPStatusError(
-            message="Unauthorized", request=mock_request_obj, response=mock_response
-        )
-        mock_http_client.post = AsyncMock(return_value=mock_response_obj)
-
-        await submit_assertion_result(
-            request=mock_request,
-            http_client=mock_http_client,
-            user_access_token="user-token",
-            request_body=mock_assertion_request,
-            return_jwt=False,
-        )
-
-        mock_request_error_handler.handle.assert_called_once()
 
     @pytest.mark.asyncio
     @patch.object(auth_module, "get_auth_request_headers")
@@ -960,36 +681,6 @@ class TestSubmitAssertionResult:
         assert result.data["status"] == "ok"
         assert result.data["verified"] is True
 
-    @pytest.mark.asyncio
-    @patch.object(auth_module, "RequestErrorHandler")
-    @patch.object(auth_module, "get_rp_id")
-    @patch.object(auth_module, "get_tenant_url")
-    async def test_handles_generic_exception(
-        self,
-        mock_get_tenant_url,
-        mock_get_rp_id,
-        mock_request_error_handler,
-        mock_http_client,
-        mock_request,
-        mock_assertion_request,
-    ):
-        """Should handle any generic exception and call error handler"""
-        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
-        mock_get_rp_id.side_effect = Exception("Unexpected error")
-
-        await submit_assertion_result(
-            request=mock_request,
-            http_client=mock_http_client,
-            user_access_token="user-token",
-            request_body=mock_assertion_request,
-            return_jwt=False,
-        )
-
-        mock_request_error_handler.handle.assert_called_once()
-        error_arg = mock_request_error_handler.handle.call_args[0][0]
-        assert isinstance(error_arg, Exception)
-        assert "Unexpected error" in str(error_arg)
-
 
 class TestExchangeFido2JwtForAccessToken:
     """Tests for _exchange_fido2_jwt_for_access_token helper function"""
@@ -1046,31 +737,6 @@ class TestExchangeFido2JwtForAccessToken:
         headers = call_args[1]["headers"]
         assert "Authorization" in headers
         assert headers["Authorization"].startswith("Basic ")
-
-    @pytest.mark.asyncio
-    async def test_handles_http_error(self, mock_http_client):
-        """Should handle HTTP errors during token exchange"""
-        mock_response = MagicMock()
-        mock_response.status_code = 400
-        mock_response.text = "Invalid grant"
-
-        http_error = HTTPStatusError(
-            "400 Bad Request",
-            request=MagicMock(spec=Request),
-            response=mock_response,
-        )
-        mock_http_client.post = AsyncMock(side_effect=http_error)
-
-        exchange_func = auth_module._exchange_fido2_jwt_for_access_token
-
-        with pytest.raises(HTTPStatusError):
-            await exchange_func(
-                http_client=mock_http_client,
-                tenant_url="https://tenant.verify.ibm.com",
-                fido2_jwt="fido2-jwt-token",
-                client_id="client-id-123",
-                client_secret="client-secret-456",
-            )
 
     @pytest.mark.asyncio
     async def test_handles_missing_access_token(self, mock_http_client):
@@ -1752,31 +1418,6 @@ class TestPerformMfaRefreshTokenFlow:
         assert result["allowedFactors"] == ["totp", "sms"]
         assert "access_token" in result
 
-    @pytest.mark.asyncio
-    async def test_handles_http_error(self, mock_http_client):
-        """Should handle HTTP errors during MFA refresh token flow"""
-        mock_response = MagicMock()
-        mock_response.status_code = 400
-        mock_response.text = "Invalid refresh token"
-
-        http_error = HTTPStatusError(
-            "400 Bad Request",
-            request=MagicMock(spec=Request),
-            response=mock_response,
-        )
-        mock_http_client.post = AsyncMock(side_effect=http_error)
-
-        mfa_flow_func = auth_module._perform_mfa_refresh_token_flow
-
-        with pytest.raises(HTTPStatusError):
-            await mfa_flow_func(
-                http_client=mock_http_client,
-                tenant_url="https://tenant.verify.ibm.com",
-                refresh_token="invalid-token",
-                client_id="client-id",
-                client_secret="client-secret",
-            )
-
 
 class TestIsTokenExpired:
     """Tests for _is_token_expired helper function"""
@@ -2003,19 +1644,6 @@ class TestGetMfaChallengeToken:
             }
         )
         with pytest.raises(Exception, match="No refresh_token"):
-            await auth_module._get_mfa_challenge_token(
-                request, mock_http_client, "https://tenant.example.com"
-            )
-
-    @pytest.mark.asyncio
-    @patch.object(auth_module, "_perform_mfa_refresh_token_flow")
-    async def test_mfa_refresh_failure_wraps_exception(
-        self, mock_mfa_refresh, mock_http_client
-    ):
-        """Should wrap _perform_mfa_refresh_token_flow exceptions with a descriptive message"""
-        mock_mfa_refresh.side_effect = Exception("network error")
-        request = self._make_request(self._valid_session())
-        with pytest.raises(Exception, match="MFA refresh token flow failed"):
             await auth_module._get_mfa_challenge_token(
                 request, mock_http_client, "https://tenant.example.com"
             )

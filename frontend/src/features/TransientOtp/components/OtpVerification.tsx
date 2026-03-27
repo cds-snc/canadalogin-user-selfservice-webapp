@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   GcdsButton,
@@ -15,19 +15,17 @@ import { useParams } from "react-router";
 import { FLOW_TYPES, PAGES } from "../../../utils/constants";
 import SubmitButton from "../../../components/Layout/SubmitButton";
 import type { OtpFactor } from "../../../types/hooks";
-import type { UserProfile } from "../../../types/user";
 
 type CaughtApiError = { data?: { message?: string } };
 
 const initialTime = 10;
 
 interface OtpVerificationProps {
-  userProfile?: UserProfile | null;
   userSelectedMfaFactor: OtpFactor;
   setUserOtpValue: (value: string) => void;
   userOtpValue: string;
   onBack: () => void;
-  requestOtpCode: () => Promise<void>;
+  requestOtpCode: () => Promise<void | boolean>;
   validateOtpCode: (otpValue: string) => Promise<void>;
   setErrorCode: (errorCode: string) => void;
   errorMessage?: string;
@@ -36,7 +34,6 @@ interface OtpVerificationProps {
 }
 
 export default function OtpVerification({
-  userProfile,
   userSelectedMfaFactor,
   setUserOtpValue,
   userOtpValue,
@@ -52,9 +49,6 @@ export default function OtpVerification({
   const [time, setTime] = useState(initialTime);
   const pageContentJson = getPageContent(language, PAGES.verification) ?? {};
   const { cancel } = getPageContent(language, "Button") ?? {};
-
-  const { id } = userProfile ?? {};
-  const didFetch = useRef(false);
 
   const handleChange = (e: CustomEvent<string>) => {
     const value = (e.target as HTMLInputElement).value;
@@ -88,26 +82,6 @@ export default function OtpVerification({
 
     return () => clearTimeout(timer);
   }, [time]);
-
-  useEffect(() => {
-    if (!id || didFetch.current) return;
-    didFetch.current = true;
-
-    const sendOtpRequest = async () => {
-      try {
-        await requestOtpCode();
-      } catch (error) {
-        // Handle OTP request errors
-        const apiError = error as CaughtApiError;
-        if (apiError?.data?.message) {
-          setErrorCode(apiError.data.message);
-        }
-      }
-    };
-
-    sendOtpRequest();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
 
   const userMfaType = userSelectedMfaFactor?.type;
   return (

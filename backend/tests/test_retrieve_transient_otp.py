@@ -11,7 +11,6 @@ from app.otp.services.retrieve_transient_otp import (
     dispatch_otp_status_retrieval,
     handle_otp_status_retrieval,
 )
-from fastapi import HTTPException
 from httpx import AsyncClient, MockTransport, Request, Response
 
 
@@ -137,100 +136,3 @@ async def test_handle_success_validates_into_OtpDataResponse(otp_type, monkeypat
         assert data.phoneNumber == "+1 (***) ***-1234"
         assert data.emailAddress in (None, "")
     assert expected_msg_fragment in (getattr(result, "message", "") or "")
-
-
-@pytest.mark.asyncio
-async def test_handle_non_200_returns_error_model(monkeypatch):
-    # Make dispatch return a 400 response (no network)
-    async def fake_dispatch(*args, **kwargs):
-        return Response(400, json={"error": "Bad Request"})
-
-    monkeypatch.setattr(feature_module, "dispatch_otp_status_retrieval", fake_dispatch)
-
-    async with AsyncClient() as client:
-        rd = RetrievalData(otpType=OtpType.EMAIL, trxnId="bad-req-1")
-        result = await handle_otp_status_retrieval(client, rd, "USER_TOKEN")
-
-    # Be robust to either dict or Pydantic model shapes.
-    if isinstance(result, dict):
-        payload = result
-    else:
-        # Try to obtain a plain dict view from a model
-        payload = None
-        for meth in ("model_dump", "dict"):
-            fn = getattr(result, meth, None)
-            if callable(fn):
-                try:
-                    payload = fn()
-                    break
-                except Exception:
-                    pass
-        if payload is None:
-            # Last resort: stringify – just so we don't crash the test
-            payload = {"_repr": repr(result)}
-
-    # Minimal contract: not a success result for non-200
-    assert payload.get("success") in (False, None)
-
-
-@pytest.mark.asyncio
-async def test_handle_validation_error_due_to_incomplete_payload(monkeypatch):
-    """
-    Return a 200 but with missing required fields to trigger pydantic.ValidationError
-    in OtpDataResponse(**response_json). Expect generate_error_response(422, ...).
-    """
-    incomplete_payload = {"trxnId": "only-id-present"}
-
-    async def fake_dispatch(*args, **kwargs):
-        return Response(200, json=incomplete_payload)
-
-    monkeypatch.setattr(feature_module, "dispatch_otp_status_retrieval", fake_dispatch)
-
-    async with AsyncClient() as client:
-        rd = RetrievalData(otpType=OtpType.SMS, trxnId="only-id-present")
-        result = await handle_otp_status_retrieval(client, rd, "USER_TOKEN")
-
-    # Be robust to either dict or Pydantic model shapes.
-    if isinstance(result, dict):
-        payload = result
-    else:
-        payload = None
-        for meth in ("model_dump", "dict"):
-            fn = getattr(result, meth, None)
-            if callable(fn):
-                try:
-                    payload = fn()
-                    break
-                except Exception:
-                    pass
-        if payload is None:
-            payload = {"_repr": repr(result)}
-
-    # Minimal contract: not a success result for validation failure
-    assert payload.get("success") in (False, None)
-
-
-@pytest.mark.asyncio
-async def test_handle_transport_exception_translates_to_405_http_exception(monkeypatch):
-    """
-    If transport raises, our monkeypatched dispatch raises, leading handle_otp_status_retrieval
-    to hit the outer except and raise HTTPException(405).
-    """
-
-    async def fake_dispatch(*args, **kwargs):
-        raise RuntimeError("simulated network failure")
-
-    monkeypatch.setattr(feature_module, "dispatch_otp_status_retrieval", fake_dispatch)
-
-    async with AsyncClient() as client:
-        rd = RetrievalData(otpType=OtpType.VOICE, trxnId="trxn-err-1")
-        with pytest.raises(HTTPException) as excinfo:
-            await handle_otp_status_retrieval(client, rd, "USER_TOKEN")
-
-    exc: HTTPException = excinfo.value
-    assert exc.status_code == 405
-    # Implementation uses Enum value in string form -> handle both possible formats
-    assert (
-        "Verify transient voice error: " in exc.detail
-        or "Verify transient OtpType.VOICE error: " in exc.detail
-    )

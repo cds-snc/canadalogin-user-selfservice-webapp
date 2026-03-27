@@ -5,7 +5,6 @@ import {
   GcdsErrorMessage,
   GcdsGrid,
   GcdsHeading,
-  GcdsIcon,
   GcdsLink,
   GcdsNotice,
   GcdsText,
@@ -82,7 +81,6 @@ export default function ConfirmUpdate({
         </GcdsText>
 
         <GcdsNotice noticeRole="info" noticeTitleTag="h2" noticeTitle=" ">
-          <GcdsIcon name="warning-triangle" size="text-small" />
           <GcdsText>
             {pageContentJson["6"]} <strong>{pageContentJson["7"]}</strong>
             <GcdsText>

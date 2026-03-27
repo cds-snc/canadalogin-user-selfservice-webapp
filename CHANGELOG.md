@@ -1,5 +1,41 @@
 # Changelog
 
+## [1.14.2](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.14.1...v1.14.2) (2026-03-24)
+
+
+### Bug Fixes
+
+* add user access token to OTP verification and deletion processes ([#1333](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1333)) ([79bfd5e](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/79bfd5e679e88049827c54d424872cae5a6123b1))
+* remove unused GcdsIcon import from ConfirmUpdate component ([#1338](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1338)) ([96a2f0b](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/96a2f0be80b9f771935d222eeeb6a65104842bff))
+
+
+### Continuous Integration
+
+* update staging and prod deployed versions ([#1334](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1334)) ([a029f1a](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/a029f1a4678ad85c6bdbb8ffb83c9b5bea4719d7))
+
+## [1.14.1](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.14.0...v1.14.1) (2026-03-24)
+
+
+### Bug Fixes
+
+* **frontend:** Change CanadaLogin website links to be production URLs ([#1323](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1323)) ([7846da4](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/7846da4042bdb9223c8b6cba79591f46fb2a449a))
+* **frontend:** update cdssncgcds/components library to gcds/corecomponents library ([#1319](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1319)) ([33f16c7](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/33f16c7f0244f1ac90e0f0d7feae9b84d1618d6e))
+* OTP Verification screen does not display masked phone number ([#1316](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1316)) ([9bfda5f](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/9bfda5f794d1e464d1c8bd20d99fa4254735590e))
+* preserve mid-word capitalization in user profile names ([#1321](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1321)) ([9de647e](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/9de647e8f681928f262ba2b348e5dd0159b0ed66))
+* support deletion of unvalidated factors without OTP verification ([#1312](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1312)) ([80c5b52](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/80c5b52f2d39367de357b2cd12846034427cf34f))
+* trim whitespace and collapse internal spaces in user profile names ([#1322](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1322)) ([9b4ec17](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/9b4ec172fb3013fcbf8837f1baedc4352e2a1ac9))
+
+
+### Code Refactoring
+
+* refactor api endpoints to use user access token where applicable ([#1314](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1314)) ([75062ac](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/75062acba18e1bfc1ca864a14d57350e718c870e))
+
+
+### Miscellaneous Chores
+
+* **ci:** update prod version to v1.11.1 to match staging and pick up new domain vars ([#1328](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1328)) ([c7f46b0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/c7f46b0ade14ef541b83ff808e143319dc6453bc))
+* **ci:** Update version to 1.11.1 in prod to pick up new domain vars ([c7f46b0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/c7f46b0ade14ef541b83ff808e143319dc6453bc))
+
 ## [1.14.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.13.0...v1.14.0) (2026-03-16)
 
 

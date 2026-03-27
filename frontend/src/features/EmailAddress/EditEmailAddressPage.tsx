@@ -3,7 +3,11 @@ import Loader from "../../components/Layout/Loading";
 import StepContent from "../../components/Wizard/StepContent";
 import { useNavigate, useParams } from "react-router";
 import { path } from "../../utils/routeHelpers";
-import { PAGES, FLOW_TYPES } from "../../utils/constants";
+import {
+  INVALID_OTP_ERROR_CODES,
+  PAGES,
+  FLOW_TYPES,
+} from "../../utils/constants";
 import { getPageContent } from "../../utils/functions";
 import { getErrorMessage } from "../../utils/errorUtils";
 import PasswordVerification from "../TransientOtp/components/PasswordVerification";
@@ -64,7 +68,7 @@ export default function EditEmailAddressPage() {
   // Use the password validation hook
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(
     setErrorCode,
-    () => {
+    async () => {
       trackStepChange(
         userPhoneFactors && userPhoneFactors.length === 1
           ? "otpValidation"
@@ -73,7 +77,8 @@ export default function EditEmailAddressPage() {
       );
 
       if (userPhoneFactors && userPhoneFactors.length === 1) {
-        setWizardStep("otpValidation");
+        const success = await requestOtpCode();
+        if (success) setWizardStep("otpValidation");
       } else {
         setWizardStep("otpSelection");
       }
@@ -175,9 +180,16 @@ export default function EditEmailAddressPage() {
       return;
     }
 
+    // Send OTP to the new email address, then navigate to verification step
     setErrorCode("");
-    setWizardStep("emailOtpValidation");
-    trackStepChange("emailOtpValidation", "enter_email");
+    const success = await requestOtpCode({
+      otpType: FLOW_TYPES.email,
+      destination: formData.emailAddress,
+    });
+    if (success) {
+      setWizardStep("emailOtpValidation");
+      trackStepChange("emailOtpValidation", "enter_email");
+    }
   };
 
   const handleEmailChangeWithOtp = async () => {
@@ -230,9 +242,16 @@ export default function EditEmailAddressPage() {
     } catch (error) {
       console.error("Error updating email address with OTP:", error);
       const apiError = error as CaughtError;
-      const errorMsg = apiError?.data?.message || "FAILED_TO_UPDATE_EMAIL";
-      setErrorCode(errorMsg);
-      trackStepError(`email_update_failed: ${errorMsg}`, "update_email");
+      const message = apiError?.data?.message ?? "FAILED_TO_UPDATE_EMAIL";
+      trackStepError(`email_update_failed: ${message}`, "update_email");
+      setErrorCode(message);
+      if (
+        (INVALID_OTP_ERROR_CODES as readonly string[]).includes(
+          apiError?.data?.message ?? "",
+        )
+      ) {
+        setWizardStep("emailOtpValidation");
+      }
     }
   };
 
@@ -255,8 +274,13 @@ export default function EditEmailAddressPage() {
         userPhoneFactors={userPhoneFactors}
         onChangeUserSelectedMfaFactor={handleChangeUserMfaSelection}
         onNext={() => {
-          trackStepChange("otpValidation", "phone_selection");
-          setWizardStep("otpValidation");
+          void (async () => {
+            const success = await requestOtpCode();
+            if (success) {
+              setWizardStep("otpValidation");
+              trackStepChange("otpValidation", "phone_selection");
+            }
+          })();
         }}
         parentPage={PAGES.addMFAPage}
         onCancel={handleBackToProfile}
@@ -264,7 +288,6 @@ export default function EditEmailAddressPage() {
     ),
     otpValidation: (
       <OtpVerification
-        userProfile={userProfile}
         userSelectedMfaFactor={userSelectedMfaFactor!}
         userOtpValue={userOtpValue}
         setUserOtpValue={handleSetUserOtpValue}
@@ -331,10 +354,10 @@ export default function EditEmailAddressPage() {
         errorMessage={errorMessage}
         userOtpValue={userOtpValue}
         handleChange={handleSetUserOtpValue}
-        requestOtpCode={() => {
+        requestOtpCode={async () => {
           trackInteraction("resend_email_otp_clicked", "email_otp");
           trackStepAttempt("email_otp_request_initiated", "email_otp");
-          return requestOtpCode({
+          await requestOtpCode({
             otpType: FLOW_TYPES.email,
             destination: formData.emailAddress,
           });

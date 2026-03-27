@@ -202,7 +202,6 @@ describe("ConfirmUpdate Component", () => {
       </TestWrapper>,
     );
 
-    expect(screen.getByTestId("gcds-icon")).toBeInTheDocument();
     expect(screen.getByTestId("gcds-notice")).toBeInTheDocument();
   });
 

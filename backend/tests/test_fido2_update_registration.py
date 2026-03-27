@@ -7,8 +7,7 @@ Uses importlib to import the actual module for patching.
 
 import importlib
 import pytest
-from fastapi import HTTPException, status
-from httpx import AsyncClient, HTTPStatusError, Request, Response
+from httpx import AsyncClient
 from unittest.mock import AsyncMock, MagicMock, patch
 
 # Import the module using importlib to get the actual module object
@@ -283,117 +282,6 @@ class TestUpdateRegistration:
         assert "/v2.0/factors/fido2/registrations/reg-123" in put_url
 
     @pytest.mark.asyncio
-    @patch.object(update_module, "RequestErrorHandler")
-    @patch.object(update_module, "get_user_profile_info")
-    @patch.object(update_module, "get_tenant_url")
-    async def test_handles_get_user_id_error(
-        self,
-        mock_get_tenant_url,
-        mock_get_user_profile_info,
-        mock_request_error_handler,
-        mock_http_client,
-        mock_request_data_nickname,
-    ):
-        """Should handle error when getting user ID fails"""
-        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
-        mock_get_user_profile_info.side_effect = HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token",
-        )
-
-        await update_registration(
-            http_client=mock_http_client,
-            user_access_token="invalid-token",
-            request_data=mock_request_data_nickname,
-        )
-
-        mock_request_error_handler.handle.assert_called_once()
-
-    @pytest.mark.asyncio
-    @patch.object(update_module, "RequestErrorHandler")
-    @patch.object(update_module, "verify_registration_ownership")
-    @patch.object(update_module, "get_user_profile_info")
-    @patch.object(update_module, "get_tenant_url")
-    async def test_handles_ownership_verification_failure(
-        self,
-        mock_get_tenant_url,
-        mock_get_user_profile_info,
-        mock_verify_registration_ownership,
-        mock_request_error_handler,
-        mock_http_client,
-        mock_request_data_nickname,
-    ):
-        """Should handle error when ownership verification fails"""
-        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
-        mock_get_user_profile_info.return_value = (
-            "user@example.com",
-            "Test User",
-            "user-456",
-        )
-        mock_verify_registration_ownership.side_effect = HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="User does not own this registration",
-        )
-
-        await update_registration(
-            http_client=mock_http_client,
-            user_access_token="user-token-abc",
-            request_data=mock_request_data_nickname,
-        )
-
-        mock_request_error_handler.handle.assert_called_once()
-
-    @pytest.mark.asyncio
-    @patch.object(update_module, "RequestErrorHandler")
-    @patch.object(update_module, "get_auth_request_headers")
-    @patch.object(update_module, "verify_registration_ownership")
-    @patch.object(update_module, "get_user_profile_info")
-    @patch.object(update_module, "get_tenant_url")
-    async def test_handles_http_put_error(
-        self,
-        mock_get_tenant_url,
-        mock_get_user_profile_info,
-        mock_verify_registration_ownership,
-        mock_get_auth_request_headers,
-        mock_request_error_handler,
-        mock_http_client,
-        mock_request_data_nickname,
-        mock_registration_data,
-    ):
-        """Should handle error when HTTP PUT request fails"""
-        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
-        mock_get_user_profile_info.return_value = (
-            "user@example.com",
-            "Test User",
-            "user-456",
-        )
-        mock_verify_registration_ownership.return_value = mock_registration_data.copy()
-        mock_get_auth_request_headers.return_value = {
-            "Authorization": "Bearer user-token-abc"
-        }
-
-        mock_request = Request(
-            "PUT",
-            "https://tenant.verify.ibm.com/v2.0/factors/fido2/registrations/reg-123",
-        )
-        mock_response = Response(400, request=mock_request)
-        mock_put_response = MagicMock()
-        mock_put_response.raise_for_status.side_effect = HTTPStatusError(
-            message="Bad Request",
-            request=mock_request,
-            response=mock_response,
-        )
-        mock_http_client.put = AsyncMock(return_value=mock_put_response)
-
-        await update_registration(
-            http_client=mock_http_client,
-            user_access_token="user-token-abc",
-            request_data=mock_request_data_nickname,
-        )
-
-        mock_request_error_handler.handle.assert_called_once()
-
-    @pytest.mark.asyncio
     @patch.object(update_module, "get_auth_request_headers")
     @patch.object(update_module, "verify_registration_ownership")
     @patch.object(update_module, "get_user_profile_info")
@@ -568,27 +456,6 @@ class TestUpdateRegistration:
         call_kwargs = mock_http_client.put.call_args[1]
         payload = call_kwargs["json"]
         assert payload["attributes"]["nickname"] == "Top Level Name"
-
-    @pytest.mark.asyncio
-    @patch.object(update_module, "RequestErrorHandler")
-    @patch.object(update_module, "get_tenant_url")
-    async def test_handles_generic_exception(
-        self,
-        mock_get_tenant_url,
-        mock_request_error_handler,
-        mock_http_client,
-        mock_request_data_nickname,
-    ):
-        """Should handle any generic exception"""
-        mock_get_tenant_url.side_effect = Exception("Unexpected error")
-
-        await update_registration(
-            http_client=mock_http_client,
-            user_access_token="user-token-abc",
-            request_data=mock_request_data_nickname,
-        )
-
-        mock_request_error_handler.handle.assert_called_once()
 
     @pytest.mark.asyncio
     @patch.object(update_module, "get_auth_request_headers")

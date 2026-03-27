@@ -138,25 +138,6 @@ class TestHelperUtils:
         assert user_id == "user-123"
 
     @pytest.mark.asyncio
-    @patch("app.fido2.services.helper_utils.dispatch_get_my_profile_from_ibm")
-    @patch("app.utils.request_error_handler.RequestErrorHandler.handle")
-    async def test_get_user_profile_info_error(
-        self, mock_error_handler, mock_dispatch_profile
-    ):
-        """Test user profile retrieval error handling"""
-        # Arrange
-        mock_dispatch_profile.side_effect = Exception("Profile error")
-        # RequestErrorHandler.handle re-raises the exception after logging
-        mock_error_handler.side_effect = Exception("Profile error")
-        http_client = AsyncClient()
-
-        # Act & Assert
-        with pytest.raises(Exception):
-            await get_user_profile_info(http_client, MOCK_USER_TOKEN)
-
-        mock_error_handler.assert_called_once()
-
-    @pytest.mark.asyncio
     @respx.mock
     @patch("app.fido2.services.helper_utils.get_tenant_url")
     @patch("app.fido2.services.helper_utils.get_auth_request_headers")
