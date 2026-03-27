@@ -48,12 +48,18 @@ export default function EditEmailAddressPage() {
   const pageContentJson = getPageContent(language, PAGES.otpSelection) ?? {};
 
   // Initialize form tracking
-  const { trackStepChange, trackStepAttempt, trackStepError, trackApiCall } =
-    useFormTracking({
-      formId: "email_address_update",
-      page: "edit_email",
-      initialStep: wizardStep,
-    });
+  const {
+    trackStepChange,
+    trackStepAttempt,
+    trackFormSubmit,
+    trackStepError,
+    trackSuccess,
+    trackInteraction,
+  } = useFormTracking({
+    formId: "email_address_update",
+    page: "edit_email",
+    initialStep: wizardStep,
+  });
 
   // Use the password validation hook
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(
@@ -120,6 +126,7 @@ export default function EditEmailAddressPage() {
   };
 
   const handleBackToEnterEmail = async () => {
+    trackInteraction("back_to_enter_email_clicked", "back");
     trackStepChange("enterEmail", "back");
     setWizardStep("enterEmail");
   };
@@ -129,22 +136,17 @@ export default function EditEmailAddressPage() {
     setLocalLoading(true);
 
     try {
-      trackStepAttempt("sign_out_initiated", "logout");
-
-      const response = await trackApiCall(
-        "logout",
-        "POST",
-        () => authService.logout(),
-        "logout",
-      );
+      const response = await authService.logout();
 
       const redirectUrl =
         (response as { data?: { redirect_url?: string } })?.data
           ?.redirect_url ?? null;
 
       if (redirectUrl) {
+        trackSuccess("sign_out_success", "logout");
         return;
       } else {
+        trackSuccess("sign_out_success", "logout");
         window.location.href = "/";
       }
     } catch (error) {
@@ -181,7 +183,6 @@ export default function EditEmailAddressPage() {
   const handleEmailChangeWithOtp = async () => {
     try {
       setErrorCode("");
-      trackStepAttempt("email_update_submit_initiated", "update_email");
 
       if (!formData.emailAddress || !formData.emailAddress.trim()) {
         setErrorCode("EMAIL_REQUIRED");
@@ -205,26 +206,18 @@ export default function EditEmailAddressPage() {
         return;
       }
 
-      const response = await trackApiCall(
-        "update_email_with_otp",
-        "PATCH",
-        async () => {
-          const result = await authService.update_email_with_otp(
-            formData.emailAddress,
-            userOtpValue,
-            otpSentResponse.trxnId,
-            FLOW_TYPES.email,
-          );
-          return result;
-        },
-        "update_email",
+      const response = await authService.update_email_with_otp(
+        formData.emailAddress,
+        userOtpValue,
+        otpSentResponse.trxnId,
+        FLOW_TYPES.email,
       );
 
       if (response && response.success && response.data) {
         updateProfileSuccess(
           response.data as Parameters<typeof updateProfileSuccess>[0],
         );
-
+        trackSuccess("email_update_success", "update_email");
         setWizardStep("emailUpdateSuccess");
         trackStepChange("emailUpdateSuccess", "update_email");
       } else {
@@ -339,6 +332,7 @@ export default function EditEmailAddressPage() {
         userOtpValue={userOtpValue}
         handleChange={handleSetUserOtpValue}
         requestOtpCode={() => {
+          trackInteraction("resend_email_otp_clicked", "email_otp");
           trackStepAttempt("email_otp_request_initiated", "email_otp");
           return requestOtpCode({
             otpType: FLOW_TYPES.email,
@@ -350,7 +344,11 @@ export default function EditEmailAddressPage() {
     ),
     emailConfirmUpdate: (
       <EmailConfirmUpdate
-        onSubmit={handleEmailChangeWithOtp}
+        onSubmit={() => {
+          trackFormSubmit("email_update_submit_clicked", "verify");
+          trackStepAttempt("email_update_submit_initiated", "update_email");
+          return handleEmailChangeWithOtp();
+        }}
         onCancel={handleBackToProfile}
         formData={formData}
       />
@@ -359,7 +357,11 @@ export default function EditEmailAddressPage() {
       <EmailUpdateSuccess
         newEmailAddress={formData.emailAddress}
         onBackToProfile={handleBackToProfile}
-        onSignOut={handleSignOut}
+        onSignOut={(e) => {
+          trackFormSubmit("logout_submit_clicked", "verify");
+          trackStepAttempt("sign_out_initiated", "logout");
+          return handleSignOut(e);
+        }}
       />
     ),
   };

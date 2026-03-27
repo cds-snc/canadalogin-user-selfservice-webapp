@@ -61,12 +61,18 @@ export default function ChangePasswordIndex() {
     useState<PasswordUpdateStep>(defaultPasswordUpdateStep);
 
   // Initialize form tracking
-  const { trackStepChange, trackStepAttempt, trackStepError, trackApiCall } =
-    useFormTracking({
-      formId: "password_change",
-      page: "change_password",
-      initialStep: passwordUpdateStep,
-    });
+  const {
+    trackStepChange,
+    trackStepAttempt,
+    trackFormSubmit,
+    trackStepError,
+    trackSuccess,
+    trackInteraction,
+  } = useFormTracking({
+    formId: "password_change",
+    page: "change_password",
+    initialStep: passwordUpdateStep,
+  });
 
   const { userProfile } = state;
   const { id, userName } = userProfile ?? {};
@@ -119,17 +125,14 @@ export default function ChangePasswordIndex() {
   // Custom requestOtpCode for password change flow using passwordUpdate API
   const requestOtpCode = async () => {
     try {
-      trackStepAttempt("password_otp_request_initiated", "password_otp");
-
-      const response = await trackApiCall(
-        "password_update_first_step",
-        "POST",
-        () => passwordUpdate.firstStep(userName, userSelectedMfaFactor),
-        "password_otp",
+      const response = await passwordUpdate.firstStep(
+        userName,
+        userSelectedMfaFactor,
       );
 
       if (response?.success && response.data) {
         setOtpSentResponse(response.data);
+        trackSuccess("password_otp_request_success", "password_otp");
       }
       setErrorCode("");
     } catch (err) {
@@ -151,17 +154,15 @@ export default function ChangePasswordIndex() {
     }
 
     setLocalLoading(true);
-    trackStepAttempt("password_otp_validation_initiated", "password_otp");
 
     try {
-      const response = await trackApiCall(
-        "password_update_second_step",
-        "POST",
-        () => passwordUpdate.secondStep(userOtp, otpSentResponse.trxId),
-        "password_otp",
+      const response = await passwordUpdate.secondStep(
+        userOtp,
+        otpSentResponse.trxId,
       );
 
       if (response?.success) {
+        trackSuccess("password_otp_validation_success", "password_otp");
         setPasswordUpdateStep("passwordChange");
         trackStepChange("passwordChange", "password_otp");
       }
@@ -181,22 +182,18 @@ export default function ChangePasswordIndex() {
   };
 
   const logout = async () => {
-    setLoading(true, navBarContent["8"]); // Use logout loading text
-    trackStepAttempt("logout_initiated", "logout");
+    setLoading(true, navBarContent["8"]);
 
     try {
-      const response = await trackApiCall(
-        "logout",
-        "POST",
-        () => authService.logout(),
-        "logout",
-      );
+      const response = await authService.logout();
 
       const redirectUrl = response?.data?.redirect_url || null;
 
       if (redirectUrl) {
+        trackSuccess("logout_success", "logout");
         return;
       } else {
+        trackSuccess("logout_success", "logout");
         window.location.href = "/";
       }
     } catch (error) {
@@ -239,13 +236,21 @@ export default function ChangePasswordIndex() {
         userSelectedMfaFactor={userSelectedMfaFactor}
         userOtpValue={userOtpValue}
         setUserOtpValue={handleSetUserOtpValue}
-        requestOtpCode={requestOtpCode}
-        validateOtpCode={validateOtpCode}
+        requestOtpCode={() => {
+          trackInteraction("resend_password_otp_clicked", "password_otp");
+          return requestOtpCode();
+        }}
+        validateOtpCode={(userOtp) => {
+          trackFormSubmit("password_otp_validation_submit_clicked", "verify");
+          trackStepAttempt("password_otp_validation_initiated", "password_otp");
+          return validateOtpCode(userOtp);
+        }}
         onBack={() => {
           const prevStep =
             userPhoneFactors.length === 1
               ? "passwordVerification"
               : "otpSelection";
+          trackInteraction("back_button_clicked", "back");
           trackStepChange(prevStep, "back");
           setPasswordUpdateStep(prevStep);
         }}
@@ -271,6 +276,8 @@ export default function ChangePasswordIndex() {
     passwordChangedConfirmation: (
       <PasswordChangedConfirmation
         onNext={() => {
+          trackFormSubmit("logout_submit_clicked", "verify");
+          trackStepAttempt("logout_initiated", "logout");
           logout();
         }}
       />

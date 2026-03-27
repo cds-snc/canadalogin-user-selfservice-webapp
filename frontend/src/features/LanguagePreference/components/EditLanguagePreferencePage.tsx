@@ -77,12 +77,17 @@ export default function EditLanguagePreferencePage() {
       languageCode: routeLanguage,
     });
 
-  const { trackStepChange, trackStepAttempt, trackStepError, trackApiCall } =
-    useFormTracking({
-      formId: "language_preference_update",
-      page: "edit_language",
-      initialStep: wizardStep,
-    });
+  const {
+    trackStepChange,
+    trackStepAttempt,
+    trackFormSubmit,
+    trackStepError,
+    trackSuccess,
+  } = useFormTracking({
+    formId: "language_preference_update",
+    page: "edit_language",
+    initialStep: wizardStep,
+  });
 
   const loaderPageContentJson =
     (getPageContent(routeLanguage, PAGES.otpSelection) as
@@ -137,23 +142,16 @@ export default function EditLanguagePreferencePage() {
     try {
       setLocalLoading(true);
       setErrorCode("");
-      trackStepAttempt("language_update_submit_initiated", "update_language");
 
-      const response = await trackApiCall(
-        "update_my_user_profile",
-        "PATCH",
-        async () => {
-          const result = await authService.update_my_user_profile({
-            preferredLanguage: languageFormData.updatedPreferredLanguage,
-            user_id: state.userProfile?.id,
-          });
-          return result as AuthServiceResponse<UserProfile>;
-        },
-        "update_language",
-      );
+      const result = await authService.update_my_user_profile({
+        preferredLanguage: languageFormData.updatedPreferredLanguage,
+        user_id: state.userProfile?.id,
+      });
+      const response = result as AuthServiceResponse<UserProfile>;
 
       if (response?.data) {
         updateProfileSuccess(response.data);
+        trackSuccess("language_update_success", "update_language");
         setWizardStep("success");
         trackStepChange("success", "update_language");
 
@@ -163,6 +161,12 @@ export default function EditLanguagePreferencePage() {
         navigate(`/${successLanguageCode}/profile/update-language/success`, {
           replace: true,
         });
+      } else {
+        setErrorCode("LANGUAGE_UPDATE_FAILED");
+        trackStepError(
+          "language_update_failed: LANGUAGE_UPDATE_FAILED",
+          "update_language",
+        );
       }
     } catch (error) {
       const message = getApiErrorMessage(error);
@@ -198,7 +202,14 @@ export default function EditLanguagePreferencePage() {
     confirmUpdate: (
       <ConfirmUpdate
         languageFormData={languageFormData}
-        onConfirm={saveUpdatedLanguagePreferences}
+        onConfirm={() => {
+          trackFormSubmit("language_update_submit_clicked", "verify");
+          trackStepAttempt(
+            "language_update_submit_initiated",
+            "update_language",
+          );
+          return saveUpdatedLanguagePreferences();
+        }}
         onCancel={handleBackToProfile}
         errorMessage={errorMessage}
         setErrorCode={setErrorCode}

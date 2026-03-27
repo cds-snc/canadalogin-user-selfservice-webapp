@@ -63,12 +63,17 @@ export default function EditProfileNamePage() {
   );
 
   // Initialize form tracking
-  const { trackStepChange, trackStepAttempt, trackStepError, trackApiCall } =
-    useFormTracking({
-      formId: "profile_name_update",
-      page: "edit_name",
-      initialStep: wizardStep,
-    });
+  const {
+    trackStepChange,
+    trackStepAttempt,
+    trackFormSubmit,
+    trackStepError,
+    trackSuccess,
+  } = useFormTracking({
+    formId: "profile_name_update",
+    page: "edit_name",
+    initialStep: wizardStep,
+  });
 
   const loaderPageContentJson =
     (getPageContent(routeLanguage, PAGES.otpSelection) as
@@ -117,25 +122,21 @@ export default function EditProfileNamePage() {
       setLocalLoading(true);
       setErrorCode("");
 
-      trackStepAttempt("profile_update_submit_initiated", "update");
-
-      const response = await trackApiCall(
-        "update_my_user_profile",
-        "PATCH",
-        async () => {
-          const result = await authService.update_my_user_profile({
-            name: nameFormData,
-            user_id: state.userProfile?.id,
-          });
-          return result as AuthServiceResponse<UserProfile>;
-        },
-        "update",
-      );
+      const response = (await authService.update_my_user_profile({
+        name: nameFormData,
+        user_id: state.userProfile?.id,
+      })) as AuthServiceResponse<UserProfile>;
 
       if (response?.data) {
         updateProfileSuccess(response.data);
+        trackSuccess("profile_update_success", "update");
         setWizardStep("success");
         trackStepChange("success", "update");
+      } else {
+        trackStepError(
+          "profile_update_failed: PROFILE_UPDATE_FAILED",
+          "update",
+        );
       }
     } catch (error) {
       const message = getApiErrorMessage(error);
@@ -171,7 +172,11 @@ export default function EditProfileNamePage() {
     confirmUpdate: (
       <ConfirmUpdate
         nameFormData={nameFormData}
-        onConfirm={saveUpdatedProfileData}
+        onConfirm={() => {
+          trackFormSubmit("profile_update_submit_clicked", "verify");
+          trackStepAttempt("profile_update_submit_initiated", "update");
+          return saveUpdatedProfileData();
+        }}
         onCancel={handleBackToProfile}
         onBack={() => {
           setWizardStep("editName");

@@ -49,7 +49,6 @@ export default function ConfirmUpdate({
     trackButtonClick("confirm_phone_update", {
       form_id: "contact_phone_number_update",
       step: "confirmUpdate",
-      phone_number: phoneFormData.formattedPhoneNumber,
     });
 
     void onNext();

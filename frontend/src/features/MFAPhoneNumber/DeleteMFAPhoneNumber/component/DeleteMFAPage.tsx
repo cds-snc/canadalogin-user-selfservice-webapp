@@ -62,12 +62,17 @@ export default function DeleteMFAPage() {
   });
 
   // Initialize form tracking
-  const { trackStepChange, trackStepAttempt, trackStepError, trackApiCall } =
-    useFormTracking({
-      formId: "delete_mfa_phone_number",
-      page: "manage_profile_delete_mfa",
-      initialStep: wizardStep,
-    });
+  const {
+    trackStepChange,
+    trackStepAttempt,
+    trackFormSubmit,
+    trackStepError,
+    trackSuccess,
+  } = useFormTracking({
+    formId: "delete_mfa_phone_number",
+    page: "manage_profile_delete_mfa",
+    initialStep: wizardStep,
+  });
 
   // Use the password validation hook
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(
@@ -126,8 +131,6 @@ export default function DeleteMFAPage() {
   };
 
   const deleteMFA = async () => {
-    trackStepAttempt("mfa_delete_initiated", "delete_mfa");
-
     try {
       const verificationOtpType = userSelectedMfaFactor
         ? serverMapping[
@@ -138,26 +141,20 @@ export default function DeleteMFAPage() {
               ?.type as keyof typeof serverMapping
           ];
 
-      await trackApiCall(
-        "mfa_delete",
-        "DELETE",
-        async () => {
-          await Promise.all(
-            phoneFormData.mfaFactorsToDelete.map((mfaFactor) =>
-              deleteMFAPhoneNumberApi.deleteMFA({
-                id: mfaFactor.id,
-                otpType:
-                  serverMapping[mfaFactor.type as keyof typeof serverMapping],
-                otp: userOtpValue,
-                trxnId: otpSentResponse?.trxnId,
-                otpVerificationType: verificationOtpType,
-              }),
-            ),
-          );
-        },
-        "delete_mfa",
+      await Promise.all(
+        phoneFormData.mfaFactorsToDelete.map((mfaFactor) =>
+          deleteMFAPhoneNumberApi.deleteMFA({
+            id: mfaFactor.id,
+            otpType:
+              serverMapping[mfaFactor.type as keyof typeof serverMapping],
+            otp: userOtpValue,
+            trxnId: otpSentResponse?.trxnId,
+            otpVerificationType: verificationOtpType,
+          }),
+        ),
       );
 
+      trackSuccess("mfa_delete_success", "delete_mfa");
       setErrorCode("");
       navigate(backToManage2FAVerificationsPage, {
         state: {
@@ -281,6 +278,8 @@ export default function DeleteMFAPage() {
       <DeleteMFAPhoneNumberConfirm
         onNext={async () => {
           try {
+            trackFormSubmit("mfa_delete_submit_clicked", "verify");
+            trackStepAttempt("mfa_delete_initiated", "delete_mfa");
             await deleteMFA();
           } catch (error) {
             const err = error as { data?: { message?: string } };

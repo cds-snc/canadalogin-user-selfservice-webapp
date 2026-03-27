@@ -69,12 +69,18 @@ export default function EditContactPhoneNumberPage() {
     useState<ContactPhoneFormData>(initialPhoneFormData);
 
   // Initialize form tracking
-  const { trackStepChange, trackStepAttempt, trackStepError, trackApiCall } =
-    useFormTracking({
-      formId: "contact_phone_number_update",
-      page: "edit_phone",
-      initialStep: wizardStep,
-    });
+  const {
+    trackStepChange,
+    trackStepAttempt,
+    trackFormSubmit,
+    trackStepError,
+    trackSuccess,
+    trackInteraction,
+  } = useFormTracking({
+    formId: "contact_phone_number_update",
+    page: "edit_phone",
+    initialStep: wizardStep,
+  });
 
   const loaderPageContentJson =
     (getPageContent(language, PAGES.otpSelection) as
@@ -108,31 +114,26 @@ export default function EditContactPhoneNumberPage() {
     otpType?: ContactPhoneOtpType;
   } = {}) => {
     try {
-      if (!reSendOtpCode) {
-        setLocalLoading(true);
-        trackStepAttempt("phone_number_entry_initiated", "enter_phone");
-      } else {
-        trackStepAttempt("phone_otp_resend_initiated", "phone_otp");
-      }
+      if (!reSendOtpCode) setLocalLoading(true);
 
       setErrorCode("");
 
-      const response = await trackApiCall(
-        "transient_otp_send",
-        "POST",
-        async () => {
-          const result = await authService.transientOtpSend({
-            destination: phoneFormData.phoneNumber,
-            user_id: id,
-            otpType: serverMapping[otpType ?? phoneFormData.otpType],
-          });
-          return result as AuthServiceResponse<ContactPhoneTransactionData>;
-        },
-        "phone_otp",
-      );
+      const result = await authService.transientOtpSend({
+        destination: phoneFormData.phoneNumber,
+        user_id: id,
+        otpType: serverMapping[otpType ?? phoneFormData.otpType],
+      });
+      const response =
+        result as AuthServiceResponse<ContactPhoneTransactionData>;
 
       if (response?.data?.trxnId) {
         handlePhoneFormChange("trxnId", response.data.trxnId);
+        trackSuccess(
+          reSendOtpCode
+            ? "phone_otp_resend_success"
+            : "phone_otp_request_success",
+          "phone_otp",
+        );
         if (!reSendOtpCode) {
           setWizardStep("verifyOtp");
           trackStepChange("verifyOtp", "enter_phone");
@@ -162,27 +163,26 @@ export default function EditContactPhoneNumberPage() {
     try {
       setLocalLoading(true);
       setErrorCode("");
-      trackStepAttempt("phone_update_submit_initiated", "update_phone");
 
-      const response = await trackApiCall(
-        "update_phone_with_otp",
-        "PATCH",
-        async () => {
-          const result = await authService.update_phone_with_otp(
-            phoneFormData.phoneNumber,
-            phoneFormData.otp,
-            phoneFormData.trxnId,
-            serverMapping[phoneFormData.otpType],
-          );
-          return result as AuthServiceResponse<UserProfile>;
-        },
-        "update_phone",
+      const result = await authService.update_phone_with_otp(
+        phoneFormData.phoneNumber,
+        phoneFormData.otp,
+        phoneFormData.trxnId,
+        serverMapping[phoneFormData.otpType],
       );
+      const response = result as AuthServiceResponse<UserProfile>;
 
       if (response?.success && response.data) {
         updateProfileSuccess(response.data);
+        trackSuccess("phone_update_success", "update_phone");
         setWizardStep("success");
         trackStepChange("success", "update_phone");
+      } else {
+        setErrorCode("PHONE_UPDATE_FAILED");
+        trackStepError(
+          "phone_update_failed: PHONE_UPDATE_FAILED",
+          "update_phone",
+        );
       }
     } catch (error) {
       const message = getApiErrorMessage(error);
@@ -228,7 +228,11 @@ export default function EditContactPhoneNumberPage() {
         phoneFormData={phoneFormData}
         onChangePhoneForm={handlePhoneFormChange}
         errorMessage={errorMessage}
-        onNext={sendOtp}
+        onNext={() => {
+          trackFormSubmit("phone_number_entry_submit_clicked", "verify");
+          trackStepAttempt("phone_number_entry_initiated", "enter_phone");
+          return sendOtp({ reSendOtpCode: false });
+        }}
         onCancel={handleBackToProfile}
         setErrorCode={setErrorCode}
       />
@@ -241,10 +245,14 @@ export default function EditContactPhoneNumberPage() {
         errorMessage={errorMessage}
         onNext={verifyOtp}
         onCancel={handleBackToProfile}
-        onBack={handleBackToEnterPhone}
-        requestNewOtpCode={(otpType) =>
-          sendOtp({ reSendOtpCode: true, otpType })
-        }
+        onBack={() => {
+          trackInteraction("back_to_enter_phone_clicked", "back");
+          handleBackToEnterPhone();
+        }}
+        requestNewOtpCode={(otpType) => {
+          trackInteraction("resend_otp_clicked", "phone_otp");
+          return sendOtp({ reSendOtpCode: true, otpType });
+        }}
         setErrorCode={setErrorCode}
       />
     ),
@@ -253,7 +261,11 @@ export default function EditContactPhoneNumberPage() {
         userProfile={userProfile}
         phoneFormData={phoneFormData}
         onChangePhoneForm={handlePhoneFormChange}
-        onNext={updateProfile}
+        onNext={() => {
+          trackFormSubmit("phone_update_submit_clicked", "verify");
+          trackStepAttempt("phone_update_submit_initiated", "update_phone");
+          return updateProfile();
+        }}
         onCancel={handleBackToProfile}
         errorMessage={errorMessage}
         setErrorCode={setErrorCode}

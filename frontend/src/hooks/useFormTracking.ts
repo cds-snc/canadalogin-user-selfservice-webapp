@@ -4,8 +4,7 @@ import {
   trackFormStepComplete,
   trackFormStepEnd,
   trackFormStepDuration,
-  trackFormApiCallStart,
-  trackFormApiCallEnd,
+  trackFormSubmitEvent,
 } from "../utils/gatag";
 
 interface UseFormTrackingOptions {
@@ -19,11 +18,13 @@ export function useFormTracking({
   page,
   initialStep,
 }: UseFormTrackingOptions) {
+  const formInitiatedTime = useRef(Date.now());
   const stepStartTime = useRef(Date.now());
   const currentStep = useRef(initialStep);
   const attempts = useRef(0);
 
   useEffect(() => {
+    formInitiatedTime.current = Date.now();
     stepStartTime.current = Date.now();
 
     return () => {
@@ -64,6 +65,7 @@ export function useFormTracking({
 
   const trackStepAttempt = useCallback(
     (eventLabel: string, postAction?: string) => {
+      stepStartTime.current = Date.now();
       attempts.current += 1;
 
       trackFormStepStart({
@@ -76,6 +78,22 @@ export function useFormTracking({
       });
     },
     [formId, page],
+  );
+
+  const trackFormSubmit = useCallback(
+    (eventLabel: string, postAction: string = "verify") => {
+      trackFormSubmitEvent({
+        event_category: "form_interaction",
+        form_id: "gc_signin",
+        page,
+        post_action: postAction,
+        step: page,
+        event_label: eventLabel,
+        duration_ms: Date.now() - formInitiatedTime.current,
+        attempts: attempts.current,
+      });
+    },
+    [page],
   );
 
   const trackStepError = useCallback(
@@ -93,56 +111,31 @@ export function useFormTracking({
     [formId, page],
   );
 
-  const trackApiCall = useCallback(
-    async <T>(
-      apiId: string,
-      apiType: string,
-      apiCall: () => Promise<T>,
-      postAction?: string,
-    ): Promise<T> => {
-      const apiStartTime = Date.now();
-
-      trackFormApiCallStart({
+  const trackSuccess = useCallback(
+    (eventLabel: string, postAction?: string) => {
+      trackFormStepComplete({
         form_id: formId,
         page,
         step: currentStep.current,
         post_action: postAction,
-        api_id: apiId,
-        api_type: apiType,
+        event_label: eventLabel,
+        duration_ms: Date.now() - stepStartTime.current,
+        attempts: attempts.current,
       });
+    },
+    [formId, page],
+  );
 
-      try {
-        const result = await apiCall();
-
-        trackFormApiCallEnd({
-          form_id: formId,
-          page,
-          step: currentStep.current,
-          post_action: postAction,
-          api_id: apiId,
-          api_type: apiType,
-          duration: Date.now() - apiStartTime,
-          status: "success",
-        });
-
-        return result;
-      } catch (error) {
-        trackFormApiCallEnd({
-          form_id: formId,
-          page,
-          step: currentStep.current,
-          post_action: postAction,
-          api_id: apiId,
-          api_type: apiType,
-          duration: Date.now() - apiStartTime,
-          status: "error",
-          error_id: apiId,
-          error_message:
-            error instanceof Error ? error.message : "Unknown error",
-        });
-
-        throw error;
-      }
+  const trackInteraction = useCallback(
+    (eventLabel: string, postAction?: string) => {
+      trackFormStepStart({
+        form_id: formId,
+        page,
+        step: currentStep.current,
+        post_action: postAction,
+        event_label: eventLabel,
+        attempts: attempts.current,
+      });
     },
     [formId, page],
   );
@@ -150,7 +143,9 @@ export function useFormTracking({
   return {
     trackStepChange,
     trackStepAttempt,
+    trackFormSubmit,
     trackStepError,
-    trackApiCall,
+    trackSuccess,
+    trackInteraction,
   };
 }

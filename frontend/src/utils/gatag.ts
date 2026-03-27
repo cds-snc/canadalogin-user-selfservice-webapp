@@ -61,6 +61,10 @@ export function trackFormSubmit(
   });
 }
 
+export function trackFormSubmitEvent(params: GA4EventParams) {
+  trackGA4Event(GA4_EVENTS.FORM_SUBMIT, params);
+}
+
 // Form tracking functions
 export function trackFormStepStart(params: FormStepTrackingParams) {
   trackGA4Event(GA4_EVENTS.FORM_STEP_START, {
