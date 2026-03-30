@@ -2,7 +2,7 @@ import http from "k6/http";
 import { check } from "k6";
 import { htmlReport } from "https://raw.githubusercontent.com/benc-uk/k6-reporter/3.0.4/dist/bundle.js";
 
-const LOAD_MULTIPLIER = parseInt(__ENV.LOAD_MULTIPLIER || "1");
+const LOAD_MULTIPLIER = parseFloat(__ENV.LOAD_MULTIPLIER || "1");
 
 const TARGET_URL = "https://api.login-connexion.alpha.canada.ca/health/health";
 

@@ -38,11 +38,11 @@ docker build -t load-test-local .
 
 ### Run with a reduced load
 
-Override `LOAD_MULTIPLIER` to keep virtual user counts low. A multiplier of `1` gives the baseline scenario. 0.1 is sufficient for local testing.
+Override `LOAD_MULTIPLIER` to keep virtual user counts low. A multiplier of `1` gives the baseline scenario. `0.1` is sufficient for local testing.
 
 ```sh
 docker run --rm \
-  -e LOAD_MULTIPLIER=1 \
+  -e LOAD_MULTIPLIER=0.1 \
   -e APP_NAME=profile-management \
   -e ARTIFACT_BUCKET=unused \
   -e ARTIFACT_PREFIX=unused/ \
