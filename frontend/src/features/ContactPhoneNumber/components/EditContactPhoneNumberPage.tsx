@@ -13,6 +13,8 @@ import { path } from "../../../utils/routeHelpers";
 import { authService } from "../../../services/authService";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch";
 import { useFormTracking } from "../../../hooks/useFormTracking";
+import { GA_FORM_EVENTS } from "../../../utils/constants";
+import { CONTACT_PHONE_ANALYTICS } from "../../../utils/analyticsConstants";
 import StepContent from "../../../components/Wizard/StepContent";
 import Loader from "../../../components/Layout/Loading";
 import EnterPhoneNumber from "./EnterPhoneNumber";
@@ -69,17 +71,8 @@ export default function EditContactPhoneNumberPage() {
     useState<ContactPhoneFormData>(initialPhoneFormData);
 
   // Initialize form tracking
-  const {
-    trackStepChange,
-    trackStepAttempt,
-    trackFormSubmit,
-    trackStepError,
-    trackSuccess,
-    trackInteraction,
-  } = useFormTracking({
-    formId: "contact_phone_number_update",
-    page: "edit_phone",
-    initialStep: wizardStep,
+  const { trackEvent } = useFormTracking({
+    formId: CONTACT_PHONE_ANALYTICS.FLOW_ID,
   });
 
   const loaderPageContentJson =
@@ -128,25 +121,30 @@ export default function EditContactPhoneNumberPage() {
 
       if (response?.data?.trxnId) {
         handlePhoneFormChange("trxnId", response.data.trxnId);
-        trackSuccess(
-          reSendOtpCode
-            ? "phone_otp_resend_success"
-            : "phone_otp_request_success",
-          "phone_otp",
-        );
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE,
+          step: CONTACT_PHONE_ANALYTICS.STEPS.VERIFY_OTP,
+          type: otpType ?? phoneFormData.otpType,
+        });
         if (!reSendOtpCode) {
           setWizardStep("verifyOtp");
-          trackStepChange("verifyOtp", "enter_phone");
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+            step: CONTACT_PHONE_ANALYTICS.STEPS.VERIFY_OTP,
+            type: otpType ?? phoneFormData.otpType,
+          });
         }
       }
     } catch (error) {
       const message = getApiErrorMessage(error);
       if (message) {
         setErrorCode(message);
-        trackStepError(
-          `${reSendOtpCode ? "phone_otp_resend_failed" : "phone_otp_request_failed"}: ${message}`,
-          "phone_otp",
-        );
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_END,
+          step: CONTACT_PHONE_ANALYTICS.STEPS.ENTER_PHONE,
+          type: otpType ?? phoneFormData.otpType,
+          error: message,
+        });
       }
     } finally {
       setLocalLoading(false);
@@ -154,9 +152,15 @@ export default function EditContactPhoneNumberPage() {
   };
 
   const verifyOtp = async () => {
-    trackStepAttempt("phone_otp_validation_initiated", "phone_otp");
+    trackEvent({
+      event: GA_FORM_EVENTS.FORM_STEP_START,
+      step: CONTACT_PHONE_ANALYTICS.STEPS.VERIFY_OTP,
+    });
     setWizardStep("confirmUpdate");
-    trackStepChange("confirmUpdate", "phone_otp");
+    trackEvent({
+      event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+      step: CONTACT_PHONE_ANALYTICS.STEPS.CONFIRM_UPDATE,
+    });
   };
 
   const updateProfile = async () => {
@@ -174,21 +178,28 @@ export default function EditContactPhoneNumberPage() {
 
       if (response?.success && response.data) {
         updateProfileSuccess(response.data);
-        trackSuccess("phone_update_success", "update_phone");
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE,
+          step: CONTACT_PHONE_ANALYTICS.STEPS.SUCCESS,
+        });
         setWizardStep("success");
-        trackStepChange("success", "update_phone");
       } else {
         setErrorCode("PHONE_UPDATE_FAILED");
-        trackStepError(
-          "phone_update_failed: PHONE_UPDATE_FAILED",
-          "update_phone",
-        );
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_END,
+          step: CONTACT_PHONE_ANALYTICS.STEPS.CONFIRM_UPDATE,
+          error: "PHONE_UPDATE_FAILED",
+        });
       }
     } catch (error) {
       const message = getApiErrorMessage(error);
       if (message) {
         setErrorCode(message);
-        trackStepError(`phone_update_failed: ${message}`, "update_phone");
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_END,
+          step: CONTACT_PHONE_ANALYTICS.STEPS.CONFIRM_UPDATE,
+          error: message,
+        });
 
         if (
           INVALID_OTP_ERROR_CODES.includes(
@@ -197,7 +208,11 @@ export default function EditContactPhoneNumberPage() {
         ) {
           console.log("OTP validation failed during phone update:", message);
           setWizardStep("verifyOtp");
-          trackStepChange("verifyOtp", "back");
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+            step: CONTACT_PHONE_ANALYTICS.STEPS.VERIFY_OTP,
+            error: message,
+          });
         }
       }
     } finally {
@@ -211,7 +226,10 @@ export default function EditContactPhoneNumberPage() {
 
   const handleBackToEnterPhone = () => {
     setErrorCode("");
-    trackStepChange("enterPhone", "back");
+    trackEvent({
+      event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+      step: CONTACT_PHONE_ANALYTICS.STEPS.ENTER_PHONE,
+    });
     setWizardStep("enterPhone");
     navigate(`/${language}/profile/update-contact-phone`, { replace: true });
   };
@@ -229,8 +247,14 @@ export default function EditContactPhoneNumberPage() {
         onChangePhoneForm={handlePhoneFormChange}
         errorMessage={errorMessage}
         onNext={() => {
-          trackFormSubmit("phone_number_entry_submit_clicked", "verify");
-          trackStepAttempt("phone_number_entry_initiated", "enter_phone");
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_SUBMIT,
+            step: CONTACT_PHONE_ANALYTICS.STEPS.ENTER_PHONE,
+          });
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_START,
+            step: CONTACT_PHONE_ANALYTICS.STEPS.ENTER_PHONE,
+          });
           return sendOtp({ reSendOtpCode: false });
         }}
         onCancel={handleBackToProfile}
@@ -246,11 +270,18 @@ export default function EditContactPhoneNumberPage() {
         onNext={verifyOtp}
         onCancel={handleBackToProfile}
         onBack={() => {
-          trackInteraction("back_to_enter_phone_clicked", "back");
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+            step: CONTACT_PHONE_ANALYTICS.STEPS.ENTER_PHONE,
+          });
           handleBackToEnterPhone();
         }}
         requestNewOtpCode={(otpType) => {
-          trackInteraction("resend_otp_clicked", "phone_otp");
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_START,
+            step: CONTACT_PHONE_ANALYTICS.STEPS.VERIFY_OTP,
+            type: otpType,
+          });
           return sendOtp({ reSendOtpCode: true, otpType });
         }}
         setErrorCode={setErrorCode}
@@ -262,8 +293,14 @@ export default function EditContactPhoneNumberPage() {
         phoneFormData={phoneFormData}
         onChangePhoneForm={handlePhoneFormChange}
         onNext={() => {
-          trackFormSubmit("phone_update_submit_clicked", "verify");
-          trackStepAttempt("phone_update_submit_initiated", "update_phone");
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_SUBMIT,
+            step: CONTACT_PHONE_ANALYTICS.STEPS.CONFIRM_UPDATE,
+          });
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_START,
+            step: CONTACT_PHONE_ANALYTICS.STEPS.CONFIRM_UPDATE,
+          });
           return updateProfile();
         }}
         onCancel={handleBackToProfile}

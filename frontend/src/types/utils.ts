@@ -135,3 +135,12 @@ export interface FormApiCallParams extends GA4EventParams {
   error_id?: string;
   error_message?: string;
 }
+
+export interface AnalyticsTrackEvent {
+  event: string;
+  form_id: string;
+  step: string;
+  type?: string;
+  error?: string;
+  duration_ms?: number;
+}

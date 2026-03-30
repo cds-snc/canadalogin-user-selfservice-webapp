@@ -186,18 +186,18 @@ export const GA_CATEGORIES = {
   pageView: "pageview",
 } as const;
 
-export const GA4_EVENTS = {
+export const GA_CLICK_EVENTS = {
   CARD_CLICK: "card_click",
-  NAVIGATION: "navigation",
-  FORM_SUBMIT: "form_submit",
   BUTTON_CLICK: "button_click",
-  LINK_CLICK: "link_click",
+} as const;
+
+export const GA_FORM_EVENTS = {
   FORM_STEP_START: "form_step_start",
-  FORM_STEP_COMPLETE: "form_step_complete",
   FORM_STEP_END: "form_step_end",
+  FORM_STEP_CHANGE: "form_step_change",
   FORM_STEP_DURATION: "form_step_duration",
-  FORM_API_CALL_START: "form_api_call_start",
-  FORM_API_CALL_END: "form_api_call_end",
+  FORM_SUBMIT: "form_submit",
+  FORM_SUBMIT_COMPLETE: "form_submit_complete",
 } as const;
 
 export const GA_ACTIONS = {};

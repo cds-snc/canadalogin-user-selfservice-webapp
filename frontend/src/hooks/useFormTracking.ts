@@ -1,151 +1,53 @@
-import { useEffect, useRef, useCallback } from "react";
-import {
-  trackFormStepStart,
-  trackFormStepComplete,
-  trackFormStepEnd,
-  trackFormStepDuration,
-  trackFormSubmitEvent,
-} from "../utils/gatag";
+import { useCallback, useRef } from "react";
+import { trackAnalyticsEvent } from "../utils/gatag";
+import { GA_FORM_EVENTS } from "../utils/constants";
+import type { AnalyticsTrackEvent } from "../types/utils";
 
 interface UseFormTrackingOptions {
   formId: string;
-  page: string;
-  initialStep: string;
 }
 
-export function useFormTracking({
-  formId,
-  page,
-  initialStep,
-}: UseFormTrackingOptions) {
-  const formInitiatedTime = useRef(Date.now());
-  const stepStartTime = useRef(Date.now());
-  const currentStep = useRef(initialStep);
-  const attempts = useRef(0);
+export function useFormTracking({ formId }: UseFormTrackingOptions) {
+  const activeStepRef = useRef<string | null>(null);
+  const stepStartTimeRef = useRef<number | null>(null);
 
-  useEffect(() => {
-    formInitiatedTime.current = Date.now();
-    stepStartTime.current = Date.now();
+  const trackEvent = useCallback(
+    (params: Omit<AnalyticsTrackEvent, "form_id">) => {
+      const now = Date.now();
+      const shouldEndActiveStep =
+        params.event === GA_FORM_EVENTS.FORM_STEP_CHANGE ||
+        params.event === GA_FORM_EVENTS.FORM_STEP_END ||
+        params.event === GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE;
 
-    return () => {
-      trackFormStepDuration({
-        form_id: formId,
-        page,
-        step: currentStep.current,
-        duration_ms: Date.now() - stepStartTime.current,
-      });
-    };
-  }, [formId, page]);
+      if (
+        shouldEndActiveStep &&
+        activeStepRef.current &&
+        stepStartTimeRef.current !== null
+      ) {
+        trackAnalyticsEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_DURATION,
+          form_id: formId,
+          step: activeStepRef.current,
+          type: params.type,
+          duration_ms: now - stepStartTimeRef.current,
+        });
+      }
 
-  const trackStepChange = useCallback(
-    (newStep: string, postAction?: string) => {
-      trackFormStepComplete({
-        form_id: formId,
-        page,
-        step: currentStep.current,
-        post_action: postAction,
-        duration_ms: Date.now() - stepStartTime.current,
-        attempts: attempts.current,
-      });
+      trackAnalyticsEvent({ ...params, form_id: formId });
 
-      currentStep.current = newStep;
-      stepStartTime.current = Date.now();
-      attempts.current = 0;
-
-      trackFormStepStart({
-        form_id: formId,
-        page: newStep,
-        step: newStep,
-        post_action: postAction,
-        attempts: 0,
-      });
+      if (params.event === GA_FORM_EVENTS.FORM_STEP_START) {
+        activeStepRef.current = params.step;
+        stepStartTimeRef.current = now;
+      } else if (params.event === GA_FORM_EVENTS.FORM_STEP_CHANGE) {
+        activeStepRef.current = params.step;
+        stepStartTimeRef.current = now;
+      } else if (shouldEndActiveStep) {
+        activeStepRef.current = null;
+        stepStartTimeRef.current = null;
+      }
     },
-    [formId, page],
+    [formId],
   );
 
-  const trackStepAttempt = useCallback(
-    (eventLabel: string, postAction?: string) => {
-      stepStartTime.current = Date.now();
-      attempts.current += 1;
-
-      trackFormStepStart({
-        form_id: formId,
-        page,
-        step: currentStep.current,
-        post_action: postAction,
-        event_label: eventLabel,
-        attempts: attempts.current,
-      });
-    },
-    [formId, page],
-  );
-
-  const trackFormSubmit = useCallback(
-    (eventLabel: string, postAction: string = "verify") => {
-      trackFormSubmitEvent({
-        event_category: "form_interaction",
-        form_id: "gc_signin",
-        page,
-        post_action: postAction,
-        step: page,
-        event_label: eventLabel,
-        duration_ms: Date.now() - formInitiatedTime.current,
-        attempts: attempts.current,
-      });
-    },
-    [page],
-  );
-
-  const trackStepError = useCallback(
-    (eventLabel: string, postAction?: string) => {
-      trackFormStepEnd({
-        form_id: formId,
-        page,
-        step: currentStep.current,
-        post_action: postAction,
-        event_label: eventLabel,
-        duration_ms: Date.now() - stepStartTime.current,
-        attempts: attempts.current,
-      });
-    },
-    [formId, page],
-  );
-
-  const trackSuccess = useCallback(
-    (eventLabel: string, postAction?: string) => {
-      trackFormStepComplete({
-        form_id: formId,
-        page,
-        step: currentStep.current,
-        post_action: postAction,
-        event_label: eventLabel,
-        duration_ms: Date.now() - stepStartTime.current,
-        attempts: attempts.current,
-      });
-    },
-    [formId, page],
-  );
-
-  const trackInteraction = useCallback(
-    (eventLabel: string, postAction?: string) => {
-      trackFormStepStart({
-        form_id: formId,
-        page,
-        step: currentStep.current,
-        post_action: postAction,
-        event_label: eventLabel,
-        attempts: attempts.current,
-      });
-    },
-    [formId, page],
-  );
-
-  return {
-    trackStepChange,
-    trackStepAttempt,
-    trackFormSubmit,
-    trackStepError,
-    trackSuccess,
-    trackInteraction,
-  };
+  return { trackEvent };
 }

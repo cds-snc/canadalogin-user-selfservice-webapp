@@ -20,6 +20,8 @@ import { usePasswordValidation } from "../../../../hooks/usePasswordValidation";
 import { useOtpOperations } from "../../../../hooks/useOtpOperations";
 import { OtpFactor } from "../../../../types/hooks";
 import { useFormTracking } from "../../../../hooks/useFormTracking";
+import { GA_FORM_EVENTS } from "../../../../utils/constants";
+import { DELETE_MFA_ANALYTICS } from "../../../../utils/analyticsConstants";
 
 interface DeletePhoneFormData {
   phoneNumber: string;
@@ -62,16 +64,8 @@ export default function DeleteMFAPage() {
   });
 
   // Initialize form tracking
-  const {
-    trackStepChange,
-    trackStepAttempt,
-    trackFormSubmit,
-    trackStepError,
-    trackSuccess,
-  } = useFormTracking({
-    formId: "delete_mfa_phone_number",
-    page: "manage_profile_delete_mfa",
-    initialStep: wizardStep,
+  const { trackEvent } = useFormTracking({
+    formId: DELETE_MFA_ANALYTICS.FLOW_ID,
   });
 
   // Use the password validation hook
@@ -79,12 +73,13 @@ export default function DeleteMFAPage() {
     setErrorCode,
     async () => {
       // If there's only one MFA factor, skip OTP selection and go directly to validation
-      trackStepChange(
-        userPhoneFactors && userPhoneFactors.length === 1
-          ? "otpValidation"
-          : "otpSelection",
-        "verify_password",
-      );
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+        step:
+          userPhoneFactors && userPhoneFactors.length === 1
+            ? DELETE_MFA_ANALYTICS.STEPS.OTP_VALIDATION
+            : DELETE_MFA_ANALYTICS.STEPS.OTP_SELECTION,
+      });
       if (userPhoneFactors && userPhoneFactors.length === 1) {
         const success = await requestOtpCode();
         if (success) setWizardStep("otpValidation");
@@ -96,7 +91,10 @@ export default function DeleteMFAPage() {
 
   // Create tracked password validation wrapper
   const handleValidatePassword = async (password: string) => {
-    trackStepAttempt("password_verification_initiated", "verify_password");
+    trackEvent({
+      event: GA_FORM_EVENTS.FORM_STEP_START,
+      step: DELETE_MFA_ANALYTICS.STEPS.VERIFY_PASSWORD,
+    });
     await validatePassword(password);
   };
 
@@ -155,7 +153,10 @@ export default function DeleteMFAPage() {
         ),
       );
 
-      trackSuccess("mfa_delete_success", "delete_mfa");
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE,
+        step: DELETE_MFA_ANALYTICS.STEPS.SUCCESS,
+      });
       setErrorCode("");
       navigate(backToManage2FAVerificationsPage, {
         state: {
@@ -167,7 +168,11 @@ export default function DeleteMFAPage() {
       const err = error as { data?: { message?: string } };
       const message = err?.data?.message ?? "";
       setErrorCode(message);
-      trackStepError(`mfa_delete_failed: ${message}`, "delete_mfa");
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_END,
+        step: DELETE_MFA_ANALYTICS.STEPS.CONFIRM_DELETE,
+        error: message,
+      });
       if (
         (INVALID_OTP_ERROR_CODES as readonly string[]).includes(
           err?.data?.message ?? "",
@@ -175,16 +180,25 @@ export default function DeleteMFAPage() {
       ) {
         // If OTP is invalid, go back to OTP validation step
         setWizardStep("otpValidation");
-        trackStepChange("otpValidation", "back");
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+          step: DELETE_MFA_ANALYTICS.STEPS.OTP_VALIDATION,
+        });
       }
     }
   };
 
   // Custom validateOtpCode that handles delete MFA flow
   const validateOtpCode = async () => {
-    trackStepAttempt("user_phone_otp_validation_initiated", "user_phone_otp");
+    trackEvent({
+      event: GA_FORM_EVENTS.FORM_STEP_START,
+      step: DELETE_MFA_ANALYTICS.STEPS.OTP_VALIDATION,
+    });
     setWizardStep("deleteMFAPhoneNumberConfirm");
-    trackStepChange("deleteMFAPhoneNumberConfirm", "user_phone_otp");
+    trackEvent({
+      event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+      step: DELETE_MFA_ANALYTICS.STEPS.CONFIRM_DELETE,
+    });
   };
 
   useEffect(() => {
@@ -248,7 +262,10 @@ export default function DeleteMFAPage() {
             const success = await requestOtpCode();
             if (success) {
               setWizardStep("otpValidation");
-              trackStepChange("otpValidation", "phone_selection");
+              trackEvent({
+                event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+                step: DELETE_MFA_ANALYTICS.STEPS.OTP_VALIDATION,
+              });
             }
           })();
         }}
@@ -262,10 +279,10 @@ export default function DeleteMFAPage() {
         userOtpValue={userOtpValue}
         setUserOtpValue={handleSetUserOtpValue}
         requestOtpCode={() => {
-          trackStepAttempt(
-            "user_phone_otp_request_initiated",
-            "user_phone_otp",
-          );
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_START,
+            step: DELETE_MFA_ANALYTICS.STEPS.OTP_VALIDATION,
+          });
           return requestOtpCode();
         }}
         validateOtpCode={validateOtpCode}
@@ -274,7 +291,10 @@ export default function DeleteMFAPage() {
             userPhoneFactors && userPhoneFactors.length === 1
               ? "passwordVerification"
               : "otpSelection";
-          trackStepChange(prevStep, "back");
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+            step: DELETE_MFA_ANALYTICS.STEPS.OTP_SELECTION,
+          });
           setWizardStep(prevStep);
         }}
         setErrorCode={setErrorCode}
@@ -286,8 +306,14 @@ export default function DeleteMFAPage() {
     deleteMFAPhoneNumberConfirm: (
       <DeleteMFAPhoneNumberConfirm
         onNext={async () => {
-          trackFormSubmit("mfa_delete_submit_clicked", "verify");
-          trackStepAttempt("mfa_delete_initiated", "delete_mfa");
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_SUBMIT,
+            step: DELETE_MFA_ANALYTICS.STEPS.CONFIRM_DELETE,
+          });
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_START,
+            step: DELETE_MFA_ANALYTICS.STEPS.CONFIRM_DELETE,
+          });
           await deleteMFA();
         }}
         onCancel={async () => navigate(backToManage2FAVerificationsPage)}

@@ -9,6 +9,8 @@ import { path } from "../../../utils/routeHelpers";
 import { authService } from "../../../services/authService";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch";
 import { useFormTracking } from "../../../hooks/useFormTracking";
+import { GA_FORM_EVENTS } from "../../../utils/constants";
+import { PROFILE_NAME_ANALYTICS } from "../../../utils/analyticsConstants";
 import StepContent from "../../../components/Wizard/StepContent";
 import Loader from "../../../components/Layout/Loading";
 import ConfirmUpdate from "./ConfirmUpdate";
@@ -63,16 +65,8 @@ export default function EditProfileNamePage() {
   );
 
   // Initialize form tracking
-  const {
-    trackStepChange,
-    trackStepAttempt,
-    trackFormSubmit,
-    trackStepError,
-    trackSuccess,
-  } = useFormTracking({
-    formId: "profile_name_update",
-    page: "edit_name",
-    initialStep: wizardStep,
+  const { trackEvent } = useFormTracking({
+    formId: PROFILE_NAME_ANALYTICS.FLOW_ID,
   });
 
   const loaderPageContentJson =
@@ -114,7 +108,10 @@ export default function EditProfileNamePage() {
     }));
 
     setWizardStep("confirmUpdate");
-    trackStepChange("confirmUpdate", "verify");
+    trackEvent({
+      event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+      step: PROFILE_NAME_ANALYTICS.STEPS.CONFIRM_UPDATE,
+    });
   };
 
   const saveUpdatedProfileData = async () => {
@@ -129,20 +126,27 @@ export default function EditProfileNamePage() {
 
       if (response?.data) {
         updateProfileSuccess(response.data);
-        trackSuccess("profile_update_success", "update");
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE,
+          step: PROFILE_NAME_ANALYTICS.STEPS.SUCCESS,
+        });
         setWizardStep("success");
-        trackStepChange("success", "update");
       } else {
-        trackStepError(
-          "profile_update_failed: PROFILE_UPDATE_FAILED",
-          "update",
-        );
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_END,
+          step: PROFILE_NAME_ANALYTICS.STEPS.CONFIRM_UPDATE,
+          error: "PROFILE_UPDATE_FAILED",
+        });
       }
     } catch (error) {
       const message = getApiErrorMessage(error);
       if (message) {
         setErrorCode(message);
-        trackStepError(`profile_update_failed: ${message}`, "update");
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_END,
+          step: PROFILE_NAME_ANALYTICS.STEPS.CONFIRM_UPDATE,
+          error: message,
+        });
       }
     } finally {
       setLocalLoading(false);
@@ -173,8 +177,14 @@ export default function EditProfileNamePage() {
       <ConfirmUpdate
         nameFormData={nameFormData}
         onConfirm={() => {
-          trackFormSubmit("profile_update_submit_clicked", "verify");
-          trackStepAttempt("profile_update_submit_initiated", "update");
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_SUBMIT,
+            step: PROFILE_NAME_ANALYTICS.STEPS.CONFIRM_UPDATE,
+          });
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_START,
+            step: PROFILE_NAME_ANALYTICS.STEPS.CONFIRM_UPDATE,
+          });
           return saveUpdatedProfileData();
         }}
         onCancel={handleBackToProfile}
