@@ -410,6 +410,54 @@ jobs:
             --type "String" \
             --overwrite
 
+  # Builds the load test image for the version currently deployed to staging
+  # and pushes it to the load test ECR repository with a :latest tag.
+  # This runs on every workflow run so the load test image always reflects
+  # the staging-deployed version of the code.
+  build-load-test:
+    runs-on: ubuntu-latest
+    environment: staging
+    needs: [release-please]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Fetch tags
+        run: git fetch --prune --unshallow --tags
+
+      - name: Resolve staging deployment SHA
+        run: |
+          STAGING_VERSION=$(cat .deployed_versions/staging.json | jq -r '.version')
+          STAGING_SHA=$(git rev-list -n 1 "v${STAGING_VERSION}")
+          echo "Staging version: ${STAGING_VERSION}"
+          echo "Staging SHA: ${STAGING_SHA}"
+          echo "STAGING_SHA=${STAGING_SHA}" >> $GITHUB_ENV
+
+      - name: Checkout staging version
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          ref: ${{ env.STAGING_SHA }}
+
+      - name: Configure AWS credentials using OIDC role
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/github_action_manage_push_ecr_ecs
+          role-session-name: ECRPushLoadTest
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
+
+      - name: Build and push load test image
+        working-directory: ./load_tests/
+        run: |
+          docker build \
+            --tag "${{ vars.LOAD_TEST_ECR_REPOSITORY }}:latest" \
+            .
+
+          docker push "${{ vars.LOAD_TEST_ECR_REPOSITORY }}:latest"
+
   notify-slack-about-deploy-success:
     runs-on: ubuntu-latest
     needs: [notify-slack-about-deploy, deploy-frontends, deploy-backends]
