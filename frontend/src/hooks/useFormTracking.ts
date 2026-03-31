@@ -1,6 +1,6 @@
 import { useCallback, useRef } from "react";
 import { trackAnalyticsEvent } from "../utils/gatag";
-import { GA_FORM_EVENTS } from "../utils/constants";
+import { GA_FORM_EVENTS } from "../utils/analyticsConstants";
 import type { AnalyticsTrackEvent } from "../types/utils";
 
 interface UseFormTrackingOptions {

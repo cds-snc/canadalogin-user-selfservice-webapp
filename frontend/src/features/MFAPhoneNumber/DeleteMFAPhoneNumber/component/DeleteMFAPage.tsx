@@ -20,7 +20,7 @@ import { usePasswordValidation } from "../../../../hooks/usePasswordValidation";
 import { useOtpOperations } from "../../../../hooks/useOtpOperations";
 import { OtpFactor } from "../../../../types/hooks";
 import { useFormTracking } from "../../../../hooks/useFormTracking";
-import { GA_FORM_EVENTS } from "../../../../utils/constants";
+import { GA_FORM_EVENTS } from "../../../../utils/analyticsConstants";
 import { DELETE_MFA_ANALYTICS } from "../../../../utils/analyticsConstants";
 
 interface DeletePhoneFormData {

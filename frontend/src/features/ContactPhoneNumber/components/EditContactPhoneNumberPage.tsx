@@ -13,7 +13,7 @@ import { path } from "../../../utils/routeHelpers";
 import { authService } from "../../../services/authService";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch";
 import { useFormTracking } from "../../../hooks/useFormTracking";
-import { GA_FORM_EVENTS } from "../../../utils/constants";
+import { GA_FORM_EVENTS } from "../../../utils/analyticsConstants";
 import { CONTACT_PHONE_ANALYTICS } from "../../../utils/analyticsConstants";
 import StepContent from "../../../components/Wizard/StepContent";
 import Loader from "../../../components/Layout/Loading";

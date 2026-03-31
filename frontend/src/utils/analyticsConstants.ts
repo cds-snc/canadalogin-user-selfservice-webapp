@@ -83,3 +83,21 @@ export const EMAIL_ADDRESS_ANALYTICS = {
     LOGOUT: "logout",
   },
 } as const;
+
+export const GA_CATEGORIES = {
+  pageView: "pageview",
+} as const;
+
+export const GA_CLICK_EVENTS = {
+  CARD_CLICK: "card_click",
+  BUTTON_CLICK: "button_click",
+} as const;
+
+export const GA_FORM_EVENTS = {
+  FORM_STEP_START: "form_step_start",
+  FORM_STEP_END: "form_step_end",
+  FORM_STEP_CHANGE: "form_step_change",
+  FORM_STEP_DURATION: "form_step_duration",
+  FORM_SUBMIT: "form_submit",
+  FORM_SUBMIT_COMPLETE: "form_submit_complete",
+} as const;

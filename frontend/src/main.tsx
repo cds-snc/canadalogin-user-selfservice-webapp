@@ -8,12 +8,13 @@ import { RouterProvider } from "react-router";
 import ReactGA from "react-ga4";
 
 import config from "./config";
+import { VITE_ENVIRONMENTS } from "./utils/constants";
 
 if (config.gatag) {
   ReactGA.initialize(config.gatag, {
     gaOptions: {
       anonymize_ip: true,
-      debug_mode: config.environment === "dev",
+      debug_mode: config.environment === VITE_ENVIRONMENTS.dev,
     },
   });
   ReactGA.send({ hitType: "pageview", page: window.location.pathname });

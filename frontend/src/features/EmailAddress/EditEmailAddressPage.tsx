@@ -19,7 +19,7 @@ import { useUser } from "../../components/Providers/useUser";
 import { authService } from "../../services/authService";
 import { userProfileDispatch } from "../../utils/userProfileDispatch";
 import { useFormTracking } from "../../hooks/useFormTracking";
-import { GA_FORM_EVENTS } from "../../utils/constants";
+import { GA_FORM_EVENTS } from "../../utils/analyticsConstants";
 import { EMAIL_ADDRESS_ANALYTICS } from "../../utils/analyticsConstants";
 import EditEmailEnterEmail from "./EditEmailEnterEmail";
 import EmailOtpValidation from "./EmailOtpValidation";

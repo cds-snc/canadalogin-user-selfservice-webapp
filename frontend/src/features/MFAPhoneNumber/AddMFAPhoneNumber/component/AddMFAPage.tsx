@@ -23,7 +23,7 @@ import {
   useOtpOperations,
 } from "../../../../hooks/useOtpOperations";
 import { useFormTracking } from "../../../../hooks/useFormTracking";
-import { GA_FORM_EVENTS } from "../../../../utils/constants";
+import { GA_FORM_EVENTS } from "../../../../utils/analyticsConstants";
 import { ADD_MFA_ANALYTICS } from "../../../../utils/analyticsConstants";
 
 interface PhoneFormData {

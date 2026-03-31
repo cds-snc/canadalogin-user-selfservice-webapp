@@ -22,7 +22,7 @@ import StepContent from "../../../components/Wizard/StepContent";
 import { usePasswordValidation } from "../../../hooks/usePasswordValidation";
 import { useOtpOperations } from "../../../hooks/useOtpOperations";
 import { useFormTracking } from "../../../hooks/useFormTracking";
-import { GA_FORM_EVENTS } from "../../../utils/constants";
+import { GA_FORM_EVENTS } from "../../../utils/analyticsConstants";
 import { CHANGE_PASSWORD_ANALYTICS } from "../../../utils/analyticsConstants";
 import type { AuthServiceError } from "../../../types/services";
 import type { PasswordUpdateTransactionData } from "../api/passwordUpdate";
@@ -217,9 +217,12 @@ export default function ChangePasswordIndex() {
       }
     } catch (error) {
       console.error("Logout failed:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       trackEvent({
         event: GA_FORM_EVENTS.FORM_STEP_END,
         step: CHANGE_PASSWORD_ANALYTICS.STEPS.LOGOUT,
+        error: errorMessage,
       });
       setLoading(true, navBarContent["9"]);
       setTimeout(() => {

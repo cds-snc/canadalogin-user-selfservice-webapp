@@ -1,6 +1,6 @@
 import ReactGA from "react-ga4";
 
-import { GA_CATEGORIES, GA_CLICK_EVENTS } from "./constants";
+import { GA_CATEGORIES, GA_CLICK_EVENTS } from "./analyticsConstants";
 import type {
   AnalyticsPayload,
   AnalyticsTrackEvent,
