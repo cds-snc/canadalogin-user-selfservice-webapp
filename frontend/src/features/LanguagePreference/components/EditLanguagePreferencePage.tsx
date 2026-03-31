@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { ReactNode } from "react";
-import { useLocation, useNavigate, useParams } from "react-router";
+import { useNavigate, useLocation, useParams } from "react-router";
 
 import { useUser } from "../../../components/Providers/useUser";
 import {
@@ -27,22 +27,6 @@ import type {
 } from "../../../types/services";
 import type { UserProfile } from "../../../types/user";
 
-type LanguagePreferenceLocationState = {
-  languageFormData?: LanguagePreferenceFormData;
-  step?: LanguagePreferenceWizardStep;
-};
-
-function getWizardStepFromUrl(urlStep?: string): LanguagePreferenceWizardStep {
-  switch (urlStep) {
-    case "confirm-update":
-      return "confirmUpdate";
-    case "success":
-      return "success";
-    default:
-      return "editLanguage";
-  }
-}
-
 function getApiErrorMessage(error: unknown): string | undefined {
   if (!error || typeof error !== "object") {
     return undefined;
@@ -53,21 +37,18 @@ function getApiErrorMessage(error: unknown): string | undefined {
 }
 
 export default function EditLanguagePreferencePage() {
-  const { language = "en", step } = useParams<{
-    language: string;
-    step?: string;
-  }>();
+  const { language = "en" } = useParams<{ language: string }>();
   const routeLanguage: LanguagePreferenceFormData["languageCode"] =
     language === "fr" ? "fr" : "en";
   const { state, dispatch } = useUser();
   const navigate = useNavigate();
   const location = useLocation();
-  const locationState =
-    location.state as LanguagePreferenceLocationState | null;
+  const initialStep =
+    (location.state as { step?: LanguagePreferenceWizardStep } | null)?.step ??
+    "editLanguage";
 
-  const [wizardStep, setWizardStep] = useState<LanguagePreferenceWizardStep>(
-    getWizardStepFromUrl(step),
-  );
+  const [wizardStep, setWizardStep] =
+    useState<LanguagePreferenceWizardStep>(initialStep);
   const [errorCode, setErrorCode] = useState("");
   const [localLoading, setLocalLoading] = useState(false);
   const [languageFormData, setLanguageFormData] =
@@ -86,21 +67,6 @@ export default function EditLanguagePreferencePage() {
       | undefined) ?? {};
 
   const { updateProfileSuccess } = userProfileDispatch(dispatch);
-  const backToProfile = path(PAGES.ProfileHome, { language: routeLanguage });
-
-  useEffect(() => {
-    const newWizardStep = getWizardStepFromUrl(step);
-    if (newWizardStep !== wizardStep) {
-      setWizardStep(newWizardStep);
-    }
-  }, [step, wizardStep]);
-
-  useEffect(() => {
-    if (locationState?.languageFormData && locationState.step) {
-      setLanguageFormData(locationState.languageFormData);
-      setWizardStep(locationState.step);
-    }
-  }, [locationState]);
 
   const handleLanguageFormChange = (updatedPreferredLanguage: string) => {
     const languageCode = convertLanguageToLanguageCode(
@@ -115,9 +81,6 @@ export default function EditLanguagePreferencePage() {
 
   const handleSubmitLanguageForm = () => {
     setWizardStep("confirmUpdate");
-    navigate(`/${routeLanguage}/profile/update-language/confirm-update`, {
-      replace: true,
-    });
   };
 
   const saveUpdatedLanguagePreferences = async () => {
@@ -132,14 +95,22 @@ export default function EditLanguagePreferencePage() {
 
       if (response?.data) {
         updateProfileSuccess(response.data);
-        setWizardStep("success");
 
         const successLanguageCode = convertLanguageToLanguageCode(
           response.data.preferredLanguage || routeLanguage,
-        );
-        navigate(`/${successLanguageCode}/profile/update-language/success`, {
-          replace: true,
-        });
+        ) as LanguagePreferenceFormData["languageCode"];
+
+        if (successLanguageCode !== routeLanguage) {
+          // Language changed — navigate to the new language URL immediately so
+          // the whole app switches locale. The success step is shown on arrival
+          // via location state read by the useState initializer above.
+          navigate(`/${successLanguageCode}/profile/update-language`, {
+            replace: true,
+            state: { step: "success" as LanguagePreferenceWizardStep },
+          });
+        } else {
+          setWizardStep("success");
+        }
       }
     } catch (error) {
       const message = getApiErrorMessage(error);
@@ -152,7 +123,9 @@ export default function EditLanguagePreferencePage() {
   };
 
   const handleBackToProfile = () => {
-    navigate(backToProfile);
+    navigate(
+      path(PAGES.ProfileHome, { language: languageFormData.languageCode }),
+    );
   };
 
   let errorMessage = errorPageJson[errorCode] || "";

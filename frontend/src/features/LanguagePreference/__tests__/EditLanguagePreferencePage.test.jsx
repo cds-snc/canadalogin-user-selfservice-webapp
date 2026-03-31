@@ -101,8 +101,8 @@ describe("EditLanguagePreferencePage Container", () => {
     useNavigate.mockReturnValue(mockNavigate);
   });
 
-  const setup = (language = "en", step = undefined) => {
-    useParams.mockReturnValue({ language, step });
+  const setup = (language = "en") => {
+    useParams.mockReturnValue({ language });
     useLocation.mockReturnValue({ state: null });
     useUser.mockReturnValue({
       state: {
@@ -133,13 +133,8 @@ describe("EditLanguagePreferencePage Container", () => {
     expect(screen.getByTestId("step-content")).toBeInTheDocument();
   });
 
-  it("handles confirm-update step parameter", () => {
-    setup("en", "confirm-update");
-    expect(screen.getByTestId("step-content")).toBeInTheDocument();
-  });
-
-  it("handles success step parameter", () => {
-    setup("en", "success");
+  it("handles French language parameter", () => {
+    setup("fr");
     expect(screen.getByTestId("step-content")).toBeInTheDocument();
   });
 });
