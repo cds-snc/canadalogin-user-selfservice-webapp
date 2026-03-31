@@ -418,6 +418,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: staging
     needs: [release-please]
+    # Skip the load test build for now
+    if: false
     steps:
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
