@@ -296,6 +296,15 @@ export const KeyboardNavigation = {
       // Test tab navigation
       await userEvent.tab();
       await expect(document.activeElement).toBeTruthy();
+
+      // Verify that tab navigation can reach the second button
+      if (secondButton) {
+        const activeEl = document.activeElement;
+        const isSecondButtonActive =
+          activeEl === secondButton ||
+          (secondButton.contains && secondButton.contains(activeEl));
+        await expect(isSecondButtonActive).toBe(true);
+      }
     });
 
     await step("Test Enter key activation", async () => {
