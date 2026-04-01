@@ -236,14 +236,17 @@ describe("EditProfileNamePage Unit Tests", () => {
 
     // Mock functions
     functions.getPageContent.mockImplementation((language, page) => {
-      if (page === "otpSelection") return { 11: "Loading..." };
-      if (page === "error")
+      if (page === "otpSelection") {
+        return { 11: "Loading..." };
+      }
+      if (page === "error") {
         return {
           7: "Unexpected API request error message",
           TEST_ERROR: "Test error message",
           CONFIRM_ERROR: "Confirm error message",
           UPDATE_ERROR: "Update error message",
         };
+      }
       return {};
     });
   });
@@ -808,9 +811,12 @@ describe("EditProfileNamePage Unit Tests", () => {
 
       functions.getPageContent.mockImplementation((language, page) => {
         if (language === "fr") {
-          if (page === "otpSelection") return { 11: "Chargement..." };
-          if (page === "error")
+          if (page === "otpSelection") {
+            return { 11: "Chargement..." };
+          }
+          if (page === "error") {
             return { TEST_ERROR: "Message d'erreur de test" };
+          }
         }
         return {};
       });

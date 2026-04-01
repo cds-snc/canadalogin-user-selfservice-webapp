@@ -87,7 +87,9 @@ export default function DeleteFIDO2PasskeyPage({
         (!fido2Data || fido2Data.length === 0)
       ) {
         const success = await requestOtpCode();
-        if (success) setWizardStep("otpValidation");
+        if (success) {
+          setWizardStep("otpValidation");
+        }
       } else {
         setWizardStep("otpSelection");
       }
@@ -172,7 +174,9 @@ export default function DeleteFIDO2PasskeyPage({
         onNext={() => {
           void (async () => {
             const success = await requestOtpCode();
-            if (success) setWizardStep("otpValidation");
+            if (success) {
+              setWizardStep("otpValidation");
+            }
           })();
         }}
         onSelectFIDO2={(passkey) => {

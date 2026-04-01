@@ -10,7 +10,9 @@ type LocalizedPages = Record<string, PageContent>;
 function getLangHref(currentLang: string, pathname: string) {
   let newPathname = pathname.slice(1 + currentLang.length);
 
-  if (newPathname.length > 0) newPathname = "/" + newPathname;
+  if (newPathname.length > 0) {
+    newPathname = "/" + newPathname;
+  }
 
   if (currentLang === AVAILABLE_LANGUAGES.fr) {
     return "/" + AVAILABLE_LANGUAGES.en + newPathname.replace(/\/\//g, "/");
@@ -71,7 +73,9 @@ export function getContentWithVariables(
 }
 
 export function getFooter(language: string | undefined) {
-  if (language === AVAILABLE_LANGUAGES.fr) return FOOTERS.default.fr;
+  if (language === AVAILABLE_LANGUAGES.fr) {
+    return FOOTERS.default.fr;
+  }
 
   return FOOTERS.default.en;
 }
@@ -108,7 +112,9 @@ export function isNameValid(name: string | null, minLength: number) {
 }
 
 export function capitalizeFirstLetter(str: string | null | undefined) {
-  if (!str) return "";
+  if (!str) {
+    return "";
+  }
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
@@ -116,11 +122,16 @@ export function formatTime(
   expirationTime: string | number | Date | null | undefined,
   currentLang: string = "en",
 ) {
-  if (!expirationTime) return "0:00";
+  if (!expirationTime) {
+    return "0:00";
+  }
 
   let lang: AppLanguage = "en";
-  if (currentLang === "fr" || currentLang === "fr-ca") lang = "fr";
-  else if (currentLang === "en-ca") lang = "en";
+  if (currentLang === "fr" || currentLang === "fr-ca") {
+    lang = "fr";
+  } else if (currentLang === "en-ca") {
+    lang = "en";
+  }
 
   const date = new Date(expirationTime);
   return date.toLocaleTimeString(lang, {

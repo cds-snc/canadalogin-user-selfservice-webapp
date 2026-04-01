@@ -2,6 +2,7 @@ import logging
 
 from app.auth.services.auth_user_session import get_users_current_session
 from app.otp.schemas import (
+    OtpBatchDeletionRequest,
     OtpDeletionRequest,
     OtpEnrollmentRequest,
     OtpRequestResponse,
@@ -12,7 +13,10 @@ from app.otp.schemas import (
     UserOtpInfo,
     UserOtpVerificationInfo,
 )
-from app.otp.services.delete_mfa_otp import handle_otp_deletion
+from app.otp.services.delete_mfa_otp import (
+    handle_otp_batch_deletion,
+    handle_otp_deletion,
+)
 from app.otp.services.enroll_mfa_otp import handle_otp_enrollment
 from app.otp.services.retrieve_transient_otp import handle_otp_status_retrieval
 from app.otp.services.send_transient_otp import handle_otp_send
@@ -159,7 +163,7 @@ async def attempt_mfa_otp_verification(
     response_model=ResponseModel,
     tags=["OTP"],
     summary="Delete MFA OTP factor",
-    description="Deletes an enrolled MFA OTP factor (SMS or Voice based on otpType)",
+    description="Deletes an enrolled MFA OTP factor (SMS or Voice based on otpType). For unvalidated factors only when no OTP is provided.",
 )
 async def delete_mfa_otp_factor(
     request: Request,
@@ -167,6 +171,25 @@ async def delete_mfa_otp_factor(
     user_access_token: str = Depends(get_users_current_session),
 ):
     return await handle_otp_deletion(
+        request.app.state.request_client,
+        deletion_request,
+        user_access_token,
+    )
+
+
+@router.delete(
+    "/mfa/delete/batch",
+    response_model=ResponseModel,
+    tags=["OTP"],
+    summary="Batch delete MFA OTP factors",
+    description="Deletes multiple enrolled MFA OTP factors with a single OTP verification. Use this when deleting more than one factor tied to the same phone number.",
+)
+async def delete_mfa_otp_factors_batch(
+    request: Request,
+    deletion_request: OtpBatchDeletionRequest,
+    user_access_token: str = Depends(get_users_current_session),
+):
+    return await handle_otp_batch_deletion(
         request.app.state.request_client,
         deletion_request,
         user_access_token,

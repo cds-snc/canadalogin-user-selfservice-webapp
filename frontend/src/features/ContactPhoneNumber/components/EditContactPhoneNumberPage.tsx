@@ -107,7 +107,9 @@ export default function EditContactPhoneNumberPage() {
     otpType?: ContactPhoneOtpType;
   } = {}) => {
     try {
-      if (!reSendOtpCode) setLocalLoading(true);
+      if (!reSendOtpCode) {
+        setLocalLoading(true);
+      }
 
       setErrorCode("");
 

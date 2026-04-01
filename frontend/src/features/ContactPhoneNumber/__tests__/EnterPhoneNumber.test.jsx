@@ -174,7 +174,9 @@ vi.mock("../../../utils/functions", () => ({
     return mockContent[page] || {};
   },
   getContentWithVariables: vi.fn((content, variables = {}) => {
-    if (!content) return "";
+    if (!content) {
+      return "";
+    }
     return Object.keys(variables).reduce(
       (result, key) =>
         result.replace(new RegExp(`{${key}}`, "g"), variables[key]),

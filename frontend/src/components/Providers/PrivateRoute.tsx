@@ -35,11 +35,14 @@ function PrivateRoute() {
       window.location.href = OIDC_REDIRECT.login;
     }
   }, [state.isLoading, state.userProfile]);
-  if (state.isLoading)
+  if (state.isLoading) {
     return (
       <Loader text={state.loadingText || pageContentJson["11"] || "Loading"} />
     );
-  if (!state.userProfile) return null;
+  }
+  if (!state.userProfile) {
+    return null;
+  }
 
   return <Outlet />;
 }

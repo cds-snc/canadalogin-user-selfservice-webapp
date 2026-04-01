@@ -66,9 +66,12 @@ vi.mock("../../../../../utils/constants", () => ({
 
 vi.mock("../../../../../utils/functions", () => ({
   getPageContent: (_lang, page) => {
-    if (page === "OtpSelection") return { 11: "Loading..." };
-    if (page === "Error")
+    if (page === "OtpSelection") {
+      return { 11: "Loading..." };
+    }
+    if (page === "Error") {
       return { error_delete_credential: "Failed to delete credential" };
+    }
     return { 11: "Loading..." };
   },
 }));

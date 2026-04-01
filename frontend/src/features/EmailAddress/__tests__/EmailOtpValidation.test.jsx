@@ -209,7 +209,9 @@ describe("EmailOtpValidation", () => {
     vi.clearAllMocks();
     mockUseParams.mockReturnValue({ language: "en" });
     mockGetPageContent.mockImplementation((language, key) => {
-      if (key === "Button") return defaultButtonContent;
+      if (key === "Button") {
+        return defaultButtonContent;
+      }
       return defaultPageContent;
     });
   });

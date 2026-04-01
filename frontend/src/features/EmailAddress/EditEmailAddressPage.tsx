@@ -72,7 +72,9 @@ export default function EditEmailAddressPage() {
 
       if (userPhoneFactors && userPhoneFactors.length === 1) {
         const success = await requestOtpCode();
-        if (success) setWizardStep("otpValidation");
+        if (success) {
+          setWizardStep("otpValidation");
+        }
       } else {
         setWizardStep("otpSelection");
       }

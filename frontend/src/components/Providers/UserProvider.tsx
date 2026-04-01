@@ -261,7 +261,9 @@ export function UserProvider({
         payload: { isLoading: true, text: pageContentJson["10"] },
       });
       clearTimers();
-      if (eventSource) eventSource.close();
+      if (eventSource) {
+        eventSource.close();
+      }
 
       // Redirect after error
       setTimeout(() => {
@@ -276,7 +278,9 @@ export function UserProvider({
     (event) => {
       if (event.type === "expired") {
         // Session expired - proceed with logout button
-        if (eventSource) eventSource.close();
+        if (eventSource) {
+          eventSource.close();
+        }
         clearTimers();
       }
       if (event.type === "terminated") {
@@ -372,7 +376,9 @@ export function UserProvider({
     return () => {
       // Cleanup on unmount
       clearTimers();
-      if (eventSource) eventSource.close();
+      if (eventSource) {
+        eventSource.close();
+      }
     };
   }, []);
 

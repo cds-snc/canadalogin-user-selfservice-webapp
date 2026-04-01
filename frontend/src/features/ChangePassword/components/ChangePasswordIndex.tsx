@@ -88,7 +88,9 @@ export default function ChangePasswordIndex() {
       });
       if (userPhoneFactors && userPhoneFactors.length === 1) {
         const success = await requestOtpCode();
-        if (success) setPasswordUpdateStep("otpValidation");
+        if (success) {
+          setPasswordUpdateStep("otpValidation");
+        }
       } else {
         setPasswordUpdateStep("otpSelection");
       }

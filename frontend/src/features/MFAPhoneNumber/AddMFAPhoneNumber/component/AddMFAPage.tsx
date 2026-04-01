@@ -55,6 +55,7 @@ export default function AddMFAPage() {
   const [wizardStep, setWizardStep] = useState<WizardStep>(
     "passwordVerification",
   );
+  const [enrollmentLoading, setEnrollmentLoading] = useState(false);
 
   const { trackEvent } = useFormTracking({
     formId: ADD_MFA_ANALYTICS.FLOW_ID,
@@ -94,7 +95,9 @@ export default function AddMFAPage() {
       });
       if (userPhoneFactors && userPhoneFactors.length === 1) {
         const success = await requestOtpCode();
-        if (success) setWizardStep("otpValidation");
+        if (success) {
+          setWizardStep("otpValidation");
+        }
       } else {
         setWizardStep("otpSelection");
       }
@@ -116,11 +119,9 @@ export default function AddMFAPage() {
     userSelectedMfaFactor,
     userOtpValue,
     otpSentResponse,
-    otpLoading: localLoading,
     phoneFactorsMap: userPhoneFactorsMap,
     handleChangeUserMfaSelection,
     handleSetUserOtpValue,
-    setOtpLoading: setLocalLoading,
     requestOtpCode,
   } = useOtpOperations({
     userId: id,
@@ -145,7 +146,6 @@ export default function AddMFAPage() {
     phoneNumber,
     otpType,
   }: { phoneNumber?: string; otpType?: string } = {}) => {
-    setLocalLoading(true);
     setErrorCode("");
 
     try {
@@ -184,8 +184,6 @@ export default function AddMFAPage() {
           error: err.data.message,
         });
       }
-    } finally {
-      setLocalLoading(false);
     }
   };
 
@@ -193,10 +191,11 @@ export default function AddMFAPage() {
     reSendOtpCode = false,
     mfaId,
     otpType,
-  }: { reSendOtpCode?: boolean; mfaId?: string; otpType?: string } = {}) => {
-    if (!reSendOtpCode) {
-      setLocalLoading(true);
-    }
+  }: {
+    reSendOtpCode?: boolean;
+    mfaId?: string;
+    otpType?: string;
+  } = {}): Promise<boolean> => {
     setErrorCode("");
 
     try {
@@ -222,14 +221,15 @@ export default function AddMFAPage() {
           type: otpType ?? phoneFormData.otpType,
         });
         if (!reSendOtpCode) {
-          setWizardStep("addMFAValidation");
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
             step: ADD_MFA_ANALYTICS.STEPS.MFA_OTP,
             type: otpType ?? phoneFormData.otpType,
           });
+          return true;
         }
       }
+      return false;
     } catch (error) {
       const err = error as { data?: { message?: string } };
       if (err && err.data && err.data.message) {
@@ -241,8 +241,7 @@ export default function AddMFAPage() {
           error: err.data.message,
         });
       }
-    } finally {
-      setLocalLoading(false);
+      return false;
     }
   };
 
@@ -312,8 +311,6 @@ export default function AddMFAPage() {
     id,
     otpType,
   }: { id?: string; otpType?: string } = {}) => {
-    setLocalLoading(true);
-
     try {
       const payload = {
         id: id ?? phoneFormData.mfaId,
@@ -341,8 +338,6 @@ export default function AddMFAPage() {
         });
         setErrorCode("");
       }
-    } finally {
-      setLocalLoading(false);
     }
   };
 
@@ -390,19 +385,14 @@ export default function AddMFAPage() {
     }
   };
 
-  const handleMFAEnrollment = async () => {
-    // Get unvalidated OTP phone factors
+  const deleteExistingUnvalidatedMfa = async (otpType: string) => {
     const response = await otpFactors.getUserOtpPhoneFactors(false);
-
-    // If existing unvalidated OTP found, delete it first
     if (response && response.success && response.data.length > 0) {
       const existingMfa = response.data.find(
         (factor) =>
           factor.destination.slice(-4) ===
-            phoneFormData.phoneNumber.slice(-4) &&
-          factor.type === phoneFormData.otpType,
+            phoneFormData.phoneNumber.slice(-4) && factor.type === otpType,
       );
-
       if (existingMfa) {
         trackEvent({
           event: GA_FORM_EVENTS.FORM_STEP_START,
@@ -415,38 +405,51 @@ export default function AddMFAPage() {
         });
       }
     }
-    // Enroll new MFA after deletion
-    trackEvent({
-      event: GA_FORM_EVENTS.FORM_STEP_START,
-      step: ADD_MFA_ANALYTICS.STEPS.ENROLL_MFA,
-      type: phoneFormData.otpType,
-    });
-    const enrollMfaResponse = await enrollMFA();
-    const enrollData = enrollMfaResponse as
-      | {
-          data?: { id?: string };
-        }
-      | null
-      | undefined;
-    if (enrollData && enrollData.data && enrollData.data.id) {
-      trackEvent({
-        event: GA_FORM_EVENTS.FORM_SUBMIT,
-        step: ADD_MFA_ANALYTICS.STEPS.MFA_OTP,
-        type: phoneFormData.otpType,
-      });
+  };
+
+  const handleMFAEnrollment = async () => {
+    setEnrollmentLoading(true);
+    let navigateToValidation = false;
+    try {
+      await deleteExistingUnvalidatedMfa(phoneFormData.otpType);
+      // Enroll new MFA after deletion
       trackEvent({
         event: GA_FORM_EVENTS.FORM_STEP_START,
-        step: ADD_MFA_ANALYTICS.STEPS.MFA_OTP,
+        step: ADD_MFA_ANALYTICS.STEPS.ENROLL_MFA,
         type: phoneFormData.otpType,
       });
-      await sendMFAOtp({
-        reSendOtpCode: false,
-        mfaId: enrollData.data.id,
-      });
+      const enrollMfaResponse = await enrollMFA();
+      const enrollData = enrollMfaResponse as
+        | {
+            data?: { id?: string };
+          }
+        | null
+        | undefined;
+      if (enrollData && enrollData.data && enrollData.data.id) {
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_SUBMIT,
+          step: ADD_MFA_ANALYTICS.STEPS.MFA_OTP,
+          type: phoneFormData.otpType,
+        });
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_START,
+          step: ADD_MFA_ANALYTICS.STEPS.MFA_OTP,
+          type: phoneFormData.otpType,
+        });
+        navigateToValidation = await sendMFAOtp({
+          reSendOtpCode: false,
+          mfaId: enrollData.data.id,
+        });
+      }
+    } finally {
+      setEnrollmentLoading(false);
+      if (navigateToValidation) {
+        setWizardStep("addMFAValidation");
+      }
     }
   };
 
-  async function handleSetupAlternateMFAMethod() {
+  async function handleSetupAlternateMFAMethod(): Promise<boolean> {
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
       step: ADD_MFA_ANALYTICS.STEPS.ADD_SECOND_MFA,
@@ -457,6 +460,9 @@ export default function AddMFAPage() {
         ? FLOW_TYPES.sms
         : FLOW_TYPES.voice;
     handlePhoneForm("otpType", secondMFAOtpType);
+
+    await deleteExistingUnvalidatedMfa(secondMFAOtpType);
+
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_START,
       step: ADD_MFA_ANALYTICS.STEPS.ENROLL_MFA,
@@ -483,12 +489,13 @@ export default function AddMFAPage() {
         step: ADD_MFA_ANALYTICS.STEPS.MFA_OTP,
         type: secondMFAOtpType,
       });
-      await sendMFAOtp({
+      return await sendMFAOtp({
         reSendOtpCode: false,
         mfaId: enrollData.data.id,
         otpType: secondMFAOtpType,
       });
     }
+    return false;
   }
 
   const steps: Record<WizardStep, React.ReactElement> = {
@@ -618,8 +625,13 @@ export default function AddMFAPage() {
             step: ADD_MFA_ANALYTICS.STEPS.ENROLL_MFA,
             type: phoneFormData.otpType,
           });
-          await deleteMFA();
-          setWizardStep("addMFANumber");
+          setEnrollmentLoading(true);
+          try {
+            await deleteMFA();
+          } finally {
+            setEnrollmentLoading(false);
+            setWizardStep("addMFANumber");
+          }
         }}
         onUseDifferentPhoneNumber={async () => {
           trackEvent({
@@ -627,7 +639,12 @@ export default function AddMFAPage() {
             step: ADD_MFA_ANALYTICS.STEPS.ENROLL_MFA,
             type: phoneFormData.otpType,
           });
-          await deleteMFA();
+          setEnrollmentLoading(true);
+          try {
+            await deleteMFA();
+          } finally {
+            setEnrollmentLoading(false);
+          }
         }}
         onSetupAlternateMFAMethod={async () => {
           trackEvent({
@@ -635,8 +652,17 @@ export default function AddMFAPage() {
             step: ADD_MFA_ANALYTICS.STEPS.ENROLL_MFA,
             type: phoneFormData.otpType,
           });
-          await deleteMFA();
-          await handleSetupAlternateMFAMethod();
+          setEnrollmentLoading(true);
+          let navigateToValidation = false;
+          try {
+            await deleteMFA();
+            navigateToValidation = await handleSetupAlternateMFAMethod();
+          } finally {
+            setEnrollmentLoading(false);
+            if (navigateToValidation) {
+              setWizardStep("addMFAValidation");
+            }
+          }
         }}
       />
     ),
@@ -657,13 +683,22 @@ export default function AddMFAPage() {
           });
         }}
         onAddSecondMFA={async () => {
-          await handleSetupAlternateMFAMethod();
+          setEnrollmentLoading(true);
+          let navigateToValidation = false;
+          try {
+            navigateToValidation = await handleSetupAlternateMFAMethod();
+          } finally {
+            setEnrollmentLoading(false);
+            if (navigateToValidation) {
+              setWizardStep("addMFAValidation");
+            }
+          }
         }}
       />
     ),
   };
 
-  return localLoading || validatePasswordLoading ? (
+  return enrollmentLoading || validatePasswordLoading ? (
     <Loader text={pageContentJson["11"]} />
   ) : (
     <StepContent
