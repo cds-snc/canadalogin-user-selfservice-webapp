@@ -34,10 +34,17 @@ async def handle_otp_enrollment(
         )
 
     user_id = my_profile_response.data.id
-    logger.info(f"Enrolling {otp_type} OTP for user: {user_id}")
+    user_language = my_profile_response.data.preferredLanguage or "en"
+    logger.info(
+        f"Enrolling {otp_type} OTP for user: {user_id}, language: {user_language}"
+    )
 
     http_client_response = await dispatch_otp_enrollment(
-        global_http_client, enrollment_request, user_id, user_access_token
+        global_http_client,
+        enrollment_request,
+        user_id,
+        user_access_token,
+        user_language,
     )
     duration = (datetime.now() - start_time).total_seconds()
     logger.info(
@@ -72,9 +79,10 @@ async def dispatch_otp_enrollment(
     enrollment_request: OtpEnrollmentRequest,
     user_id: str,
     user_access_token: str,
+    language: str = None,
 ):
     """Dispatch OTP enrollment to IBM Verify (SMS or Voice)"""
-    headers = get_auth_request_headers(user_access_token, True)
+    headers = get_auth_request_headers(user_access_token, True, language)
     settings = get_configuration().ibm_verify_config
 
     # Format phone number for IBM Verify

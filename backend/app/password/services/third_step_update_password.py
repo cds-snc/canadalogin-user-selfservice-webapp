@@ -8,6 +8,7 @@ from app.password.schemas import (
     ThirdStepPasswordUpdatePayload,
     CompleteUpdatePasswordIbmApiResponse,
 )
+from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.schemas import ResponseModel
 
@@ -18,13 +19,23 @@ async def third_step_update_password(
     global_http_client: AsyncClient,
     session: dict,
     payload: ThirdStepPasswordUpdatePayload,
+    user_access_token,
 ):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
 
     logger.info("Third step - attempting update password for")
     start_time = datetime.now()
-    password_otp_response = await dispatch_update_password(global_http_client, payload)
+
+    user_profile_response = await dispatch_get_my_profile_from_ibm(
+        global_http_client, user_access_token
+    )
+    user_language = user_profile_response.preferredLanguage or "en"
+    logger.info(f"Using user's preferred language: {user_language}")
+
+    password_otp_response = await dispatch_update_password(
+        global_http_client, payload, user_language
+    )
     duration = (datetime.now() - start_time).total_seconds()
     logger.info(
         f"Third step - dispatch_password_reset_otp returned in {duration:.2f} seconds"
@@ -44,13 +55,15 @@ async def third_step_update_password(
 
 
 async def dispatch_update_password(
-    global_http_client: AsyncClient, payload: ThirdStepPasswordUpdatePayload
+    global_http_client: AsyncClient,
+    payload: ThirdStepPasswordUpdatePayload,
+    language: str = None,
 ):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
 
     access_token = await get_admin_token(global_http_client)
-    headers = get_auth_request_headers(access_token, True)
+    headers = get_auth_request_headers(access_token, True, language)
     settings = get_configuration()
 
     final_resetter_api_endpoint = (

@@ -41,6 +41,16 @@ class TestDeleteRegistration:
         mock_data.assertionResult = MagicMock()  # Mock assertion result
         return mock_data
 
+    @pytest.fixture(autouse=True)
+    def mock_dispatch_profile(self):
+        """Mock dispatch_get_my_profile_from_ibm for all delete_registration tests"""
+        mock_profile = MagicMock()
+        mock_profile.preferredLanguage = "en"
+        with patch.object(
+            delete_module, "dispatch_get_my_profile_from_ibm", return_value=mock_profile
+        ):
+            yield
+
     @pytest.mark.asyncio
     @patch.object(delete_module, "submit_assertion_result")
     @patch.object(delete_module, "get_auth_request_headers")
@@ -204,7 +214,7 @@ class TestDeleteRegistration:
 
         # Verify headers were passed correctly
         mock_get_auth_request_headers.assert_called_once_with(
-            "user-token-abc", json_content_type=True
+            "user-token-abc", json_content_type=True, language="en"
         )
         call_kwargs = mock_http_client.delete.call_args[1]
         assert call_kwargs["headers"] == expected_headers
