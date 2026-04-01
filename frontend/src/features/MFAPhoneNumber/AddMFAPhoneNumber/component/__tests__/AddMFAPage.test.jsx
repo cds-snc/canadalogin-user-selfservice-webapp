@@ -1045,16 +1045,13 @@ describe("AddMFAPage Unit Tests", () => {
         ).toBeInTheDocument();
       });
 
-      // Test onBack function - note that it will trigger deleteMFA but may not change step due to the error
+      // Test onBack function - triggers deleteMFA then navigates back to addMFANumber
       const backButton = screen.getByTestId("add-mfa-otp-verification-back");
       fireEvent.click(backButton);
 
-      // The onBack function calls deleteMFA() without parameters, which may cause an error
-      // So we should expect the step to remain at add-mfa-otp-verification
+      // onBack always navigates to addMFANumber (in the finally block)
       await waitFor(() => {
-        expect(
-          screen.getByTestId("add-mfa-otp-verification"),
-        ).toBeInTheDocument();
+        expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
       });
     });
   });
