@@ -35,7 +35,7 @@ async def get_user_profile_info(
     Get username and displayName from user profile using their access token.
 
     Returns:
-        tuple[str, str]: (username, displayName)
+        tuple[str, str, str]: (username, displayName, user_id)
     """
     logger.info("Fetching user profile for FIDO2 operation")
     profile = await dispatch_get_my_profile_from_ibm(http_client, user_access_token)

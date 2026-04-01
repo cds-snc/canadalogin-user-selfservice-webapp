@@ -14,6 +14,7 @@ from app.fido2.services.helper_utils import (
     get_rp_uuid_from_rp_id,
     get_user_profile_info,
 )
+from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
 from app.fido2.schemas import AttestationOptionsRequest
 
 logger = logging.getLogger(__name__)
@@ -106,9 +107,15 @@ async def submit_attestation_result(
     body_to_send = request_body.copy() if request_body else {}
     body_to_send = _prepare_attestation_result_body(body_to_send)
 
+    # Get user's preferred language for email notification localization
+    profile = await dispatch_get_my_profile_from_ibm(http_client, user_access_token)
+    user_language = profile.preferredLanguage or "en"
+
     # Make the request
     url = f"{tenant_url}{VerifyAPIEndpoint.FIDO2_RP_BASE.value}/{rp_uuid}/attestation/result"
-    headers = get_auth_request_headers(user_access_token, json_content_type=True)
+    headers = get_auth_request_headers(
+        user_access_token, json_content_type=True, language=user_language
+    )
 
     response = await http_client.post(url, headers=headers, json=body_to_send)
     response.raise_for_status()

@@ -35,9 +35,11 @@ async def handle_otp_deletion(
     logger.info(f"Attempting to delete {otp_type} OTP factor")
     start_time = datetime.now()
 
-    # Get user ID from the access token
+    # Get user ID and preferred language from the access token
     my_profile_response = await get_my_profile(global_http_client, user_access_token)
     user_id = my_profile_response.data.id
+    user_language = my_profile_response.data.preferredLanguage or "en"
+    logger.info(f"Using user's preferred language: {user_language}")
 
     if deletion_request.otp is None:
         # Unvalidated factor deletion path — no OTP required.
@@ -82,7 +84,7 @@ async def handle_otp_deletion(
 
     # Dispatch the deletion to IBM Verify
     http_client_response = await dispatch_otp_deletion(
-        global_http_client, deletion_request, user_access_token
+        global_http_client, deletion_request, user_access_token, user_language
     )
     duration = (datetime.now() - start_time).total_seconds()
     logger.info(f"{otp_type} OTP deletion request completed in {duration:.2f} seconds")
@@ -107,6 +109,7 @@ async def dispatch_otp_deletion(
     global_http_client: AsyncClient,
     deletion_request: OtpDeletionRequest,
     user_access_token: str,
+    language: str = None,
 ):
     """Dispatch OTP deletion to IBM Verify (SMS or Voice)"""
     # Determine the endpoint based on OTP type first to validate
@@ -117,7 +120,7 @@ async def dispatch_otp_deletion(
             f"Unsupported OTP type: {deletion_request.otpType}",
         )
 
-    headers = get_auth_request_headers(user_access_token, True)
+    headers = get_auth_request_headers(user_access_token, True, language)
     settings = get_configuration().ibm_verify_config
 
     deletion_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/{endpoint}/{deletion_request.id}"
