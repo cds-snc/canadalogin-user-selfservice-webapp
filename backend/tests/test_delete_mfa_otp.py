@@ -2,8 +2,17 @@ from datetime import datetime
 from unittest.mock import AsyncMock, Mock
 
 import pytest
-from app.otp.schemas import OtpDeletionRequest, OtpType
-from app.otp.services.delete_mfa_otp import dispatch_otp_deletion, handle_otp_deletion
+from app.otp.schemas import (
+    OtpBatchDeletionRequest,
+    OtpDeletionRequest,
+    OtpFactorItem,
+    OtpType,
+)
+from app.otp.services.delete_mfa_otp import (
+    dispatch_otp_deletion,
+    handle_otp_batch_deletion,
+    handle_otp_deletion,
+)
 from app.password.schemas import OtpType as PasswordOtpType
 from app.users.schemas import (
     IBMVerifyUserProfileSchema,
@@ -377,22 +386,37 @@ async def test_handle_otp_deletion_unvalidated_factor_success(monkeypatch):
             ),
         )
 
-    # Mock get_user_otp_factors to return the factor as unvalidated
+    # When validated=False, return the target factor so the unvalidated check passes.
+    # Other validated values are not called in the no-otp path.
     async def mock_get_user_otp_factors(client, user_id, validated=True):
-        return UserPhoneAuthFactorsResponse(
-            success=True,
-            message="Factors retrieved",
-            data=[
-                UserPhoneOTP(
-                    id="factor123",
-                    type=PasswordOtpType.SMSOTP,
-                    destination="5551234567",
-                )
-            ],
-        )
+        if validated is False:
+            return create_mock_user_factors(
+                num_factors=1
+            )  # factor1 id matches "factor123"? No, let's use a custom one.
+        return create_mock_user_factors(num_factors=2)
+
+    # Return a response that contains factor123 as unvalidated
+    async def mock_get_user_otp_factors_with_target(client, user_id, validated=True):
+        if validated is False:
+            from app.users.schemas import UserPhoneOTP, UserPhoneAuthFactorsResponse
+
+            return UserPhoneAuthFactorsResponse(
+                success=True,
+                message="User factors retrieved successfully",
+                data=[
+                    UserPhoneOTP(
+                        id="factor123",
+                        type=PasswordOtpType.SMSOTP,
+                        destination="5551234567",
+                    )
+                ],
+            )
+        return create_mock_user_factors(num_factors=2)
 
     # Mock dispatch_otp_deletion to return successful response
-    async def mock_dispatch_otp_deletion(client, deletion_request, user_access_token):
+    async def mock_dispatch_otp_deletion(
+        client, deletion_request, user_access_token, language=None
+    ):
         mock_response = Mock(spec=Response)
         mock_response.status_code = 204
         return mock_response
@@ -403,7 +427,7 @@ async def test_handle_otp_deletion_unvalidated_factor_success(monkeypatch):
     )
     monkeypatch.setattr(
         "app.otp.services.delete_mfa_otp.get_user_otp_factors",
-        mock_get_user_otp_factors,
+        mock_get_user_otp_factors_with_target,
     )
     monkeypatch.setattr(
         "app.otp.services.delete_mfa_otp.dispatch_otp_deletion",
@@ -425,7 +449,8 @@ async def test_handle_otp_deletion_unvalidated_factor_success(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_handle_otp_deletion_validated_factor_without_otp(monkeypatch):
-    """Test that deletion is rejected when no OTP provided for a validated factor"""
+    """Test that attempting to delete a validated factor without OTP raises HTTP 400.
+    Batch deletion of validated factors must use the dedicated batch endpoint."""
 
     async def mock_get_my_profile(client, token):
         return ProfileResponse(
@@ -453,13 +478,15 @@ async def test_handle_otp_deletion_validated_factor_without_otp(monkeypatch):
             ),
         )
 
-    # Factor is not in the unvalidated list — it is validated
+    # When validated=False, return an EMPTY list — the factor is not unvalidated.
     async def mock_get_user_otp_factors(client, user_id, validated=True):
-        return UserPhoneAuthFactorsResponse(
-            success=True,
-            message="Factors retrieved",
-            data=[],  # Empty — factor not found among unvalidated factors
-        )
+        if validated is False:
+            from app.users.schemas import UserPhoneAuthFactorsResponse
+
+            return UserPhoneAuthFactorsResponse(
+                success=True, message="No unvalidated factors", data=[]
+            )
+        return create_mock_user_factors(num_factors=2)
 
     monkeypatch.setattr(
         "app.otp.services.delete_mfa_otp.get_my_profile",
@@ -470,7 +497,7 @@ async def test_handle_otp_deletion_validated_factor_without_otp(monkeypatch):
         mock_get_user_otp_factors,
     )
 
-    # Request without otp/trxnId/otpVerificationType — but factor is validated
+    # Request without otp/trxnId/otpVerificationType — validated factor, no OTP → must fail
     deletion_request = OtpDeletionRequest(id="factor123", otpType=OtpType.SMS)
 
     async with AsyncClient(base_url="http://localhost") as client:
@@ -478,4 +505,122 @@ async def test_handle_otp_deletion_validated_factor_without_otp(monkeypatch):
             await handle_otp_deletion(client, deletion_request, "fake-token")
 
     assert exc_info.value.status_code == status.HTTP_400_BAD_REQUEST
-    assert "OTP verification required" in str(exc_info.value.detail)
+    assert "OTP verification is required" in str(exc_info.value.detail)
+
+
+# ---------------------------------------------------------------------------
+# Tests for handle_otp_batch_deletion
+# ---------------------------------------------------------------------------
+
+
+def create_batch_deletion_request(
+    factor_ids=None,
+    otp="123456",
+    trxn_id="txn123",
+    verification_type=OtpType.SMS,
+):
+    """Helper to create an OtpBatchDeletionRequest."""
+    if factor_ids is None:
+        factor_ids = [("factor1", OtpType.SMS), ("factor2", OtpType.VOICE)]
+    return OtpBatchDeletionRequest(
+        factors=[OtpFactorItem(id=fid, otpType=ftype) for fid, ftype in factor_ids],
+        otp=otp,
+        trxnId=trxn_id,
+        otpVerificationType=verification_type,
+    )
+
+
+@pytest.mark.asyncio
+async def test_handle_otp_batch_deletion_success(monkeypatch):
+    """Test successful batch deletion of multiple OTP factors"""
+
+    async def mock_verify_otp(
+        global_http_client, otp, trxn_id, otp_type, user_access_token
+    ):
+        return None
+
+    async def mock_get_user_otp_factors(client, user_id, validated=True):
+        return create_mock_user_factors(
+            num_factors=3
+        )  # 3 total, deleting 2 → 1 remains
+
+    async def mock_dispatch_otp_deletion(client, deletion_request, user_access_token):
+        mock_response = Mock(spec=Response)
+        mock_response.status_code = 204
+        return mock_response
+
+    monkeypatch.setattr(verify_otp_import_path, mock_verify_otp)
+    monkeypatch.setattr(
+        "app.otp.services.delete_mfa_otp.get_user_otp_factors",
+        mock_get_user_otp_factors,
+    )
+    monkeypatch.setattr(
+        "app.otp.services.delete_mfa_otp.dispatch_otp_deletion",
+        mock_dispatch_otp_deletion,
+    )
+
+    batch_request = create_batch_deletion_request()
+
+    async with AsyncClient(base_url="http://localhost") as client:
+        result = await handle_otp_batch_deletion(client, batch_request, "fake-token")
+
+    assert isinstance(result, ResponseModel)
+    assert result.success is True
+    assert len(result.data["deletedFactors"]) == 2
+    assert result.data["deletedFactors"][0]["factorId"] == "factor1"
+    assert result.data["deletedFactors"][1]["factorId"] == "factor2"
+    assert "2 MFA factor(s) deleted" in result.message
+
+
+@pytest.mark.asyncio
+async def test_handle_otp_batch_deletion_last_factor_protection(monkeypatch):
+    """Test that batch deletion is prevented when it would remove the last factor"""
+
+    async def mock_verify_otp(
+        global_http_client, otp, trxn_id, otp_type, user_access_token
+    ):
+        return None
+
+    # Only 2 total factors; trying to delete both → would leave 0
+    async def mock_get_user_otp_factors(client, user_id, validated=True):
+        return create_mock_user_factors(num_factors=2)
+
+    monkeypatch.setattr(verify_otp_import_path, mock_verify_otp)
+    monkeypatch.setattr(
+        "app.otp.services.delete_mfa_otp.get_user_otp_factors",
+        mock_get_user_otp_factors,
+    )
+
+    batch_request = create_batch_deletion_request(
+        factor_ids=[("factor1", OtpType.SMS), ("factor2", OtpType.VOICE)]
+    )
+
+    async with AsyncClient(base_url="http://localhost") as client:
+        with pytest.raises(HTTPException) as exc_info:
+            await handle_otp_batch_deletion(client, batch_request, "fake-token")
+
+    assert exc_info.value.status_code == status.HTTP_409_CONFLICT
+    assert "Cannot delete last remaining MFA factor" in str(exc_info.value.detail)
+
+
+@pytest.mark.asyncio
+async def test_handle_otp_batch_deletion_otp_failure(monkeypatch):
+    """Test that batch deletion is aborted when OTP verification fails"""
+
+    async def mock_verify_otp_fail(
+        global_http_client, otp, trxn_id, otp_type, user_access_token
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid OTP",
+        )
+
+    monkeypatch.setattr(verify_otp_import_path, mock_verify_otp_fail)
+
+    batch_request = create_batch_deletion_request()
+
+    async with AsyncClient(base_url="http://localhost") as client:
+        with pytest.raises(HTTPException) as exc_info:
+            await handle_otp_batch_deletion(client, batch_request, "fake-token")
+
+    assert exc_info.value.status_code == status.HTTP_400_BAD_REQUEST

@@ -82,7 +82,9 @@ export default function DeleteMFAPage() {
       });
       if (userPhoneFactors && userPhoneFactors.length === 1) {
         const success = await requestOtpCode();
-        if (success) setWizardStep("otpValidation");
+        if (success) {
+          setWizardStep("otpValidation");
+        }
       } else {
         setWizardStep("otpSelection");
       }
@@ -140,18 +142,30 @@ export default function DeleteMFAPage() {
               ?.type as keyof typeof serverMapping
           ];
 
-      await Promise.all(
-        phoneFormData.mfaFactorsToDelete.map((mfaFactor) =>
-          deleteMFAPhoneNumberApi.deleteMFA({
-            id: mfaFactor.id,
-            otpType:
-              serverMapping[mfaFactor.type as keyof typeof serverMapping],
-            otp: userOtpValue,
-            trxnId: otpSentResponse?.trxnId,
-            otpVerificationType: verificationOtpType,
-          }),
-        ),
-      );
+      if (phoneFormData.mfaFactorsToDelete.length > 1) {
+        // Multiple factors tied to the same phone number — verify OTP once and
+        // delete all in a single batch request.  IBM Verify trxnIds are
+        // single-use, so sequential calls with the same trxnId would fail.
+        await deleteMFAPhoneNumberApi.deleteMFABatch({
+          factors: phoneFormData.mfaFactorsToDelete.map((f) => ({
+            id: f.id,
+            otpType: serverMapping[f.type as keyof typeof serverMapping],
+          })),
+          otp: userOtpValue,
+          trxnId: otpSentResponse?.trxnId ?? "",
+          otpVerificationType: verificationOtpType,
+        });
+      } else {
+        const [firstFactor] = phoneFormData.mfaFactorsToDelete;
+        await deleteMFAPhoneNumberApi.deleteMFA({
+          id: firstFactor.id,
+          otpType:
+            serverMapping[firstFactor.type as keyof typeof serverMapping],
+          otp: userOtpValue,
+          trxnId: otpSentResponse?.trxnId,
+          otpVerificationType: verificationOtpType,
+        });
+      }
 
       trackEvent({
         event: GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE,
@@ -215,7 +229,9 @@ export default function DeleteMFAPage() {
 
   useEffect(() => {
     // Check if factorIds exist in savedLocationState and userPhoneFactors are available
-    if (!savedLocationState?.factorIds || !userPhoneFactors.length) return;
+    if (!savedLocationState?.factorIds || !userPhoneFactors.length) {
+      return;
+    }
 
     // If factor data is provided via location state, pre-select the factors
     if (factorIds && factorIds.length > 0) {

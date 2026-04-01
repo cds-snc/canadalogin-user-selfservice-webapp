@@ -178,3 +178,19 @@ class OtpDeletionRequest(BaseModel):
     otpVerificationType: Optional[OtpType] = (
         None  # Type of OTP used for verification (can differ from otpType)
     )
+
+
+class OtpFactorItem(BaseModel):
+    """A single MFA factor to be deleted in a batch operation."""
+
+    id: str
+    otpType: OtpType
+
+
+class OtpBatchDeletionRequest(BaseModel):
+    """Request schema for batch-deleting multiple OTP factors with a single OTP verification."""
+
+    factors: list[OtpFactorItem]
+    otp: str
+    trxnId: str
+    otpVerificationType: OtpType
