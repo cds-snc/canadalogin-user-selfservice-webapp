@@ -11,6 +11,9 @@ import { PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import { authService } from "../../../services/authService";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch";
+import { useFormTracking } from "../../../hooks/useFormTracking";
+import { GA_FORM_EVENTS } from "../../../utils/analyticsConstants";
+import { LANGUAGE_PREFERENCE_ANALYTICS } from "../../../utils/analyticsConstants";
 import StepContent from "../../../components/Wizard/StepContent";
 import Loader from "../../../components/Layout/Loading";
 import ConfirmUpdate from "./ConfirmUpdate";
@@ -57,6 +60,10 @@ export default function EditLanguagePreferencePage() {
       languageCode: routeLanguage,
     });
 
+  const { trackEvent } = useFormTracking({
+    formId: LANGUAGE_PREFERENCE_ANALYTICS.FLOW_ID,
+  });
+
   const loaderPageContentJson =
     (getPageContent(routeLanguage, PAGES.otpSelection) as
       | LanguagePreferencePageContent
@@ -69,6 +76,11 @@ export default function EditLanguagePreferencePage() {
   const { updateProfileSuccess } = userProfileDispatch(dispatch);
 
   const handleLanguageFormChange = (updatedPreferredLanguage: string) => {
+    trackEvent({
+      event: GA_FORM_EVENTS.FORM_STEP_START,
+      step: LANGUAGE_PREFERENCE_ANALYTICS.STEPS.SELECT_LANGUAGE,
+    });
+
     const languageCode = convertLanguageToLanguageCode(
       updatedPreferredLanguage,
     ) as LanguagePreferenceFormData["languageCode"];
@@ -80,7 +92,19 @@ export default function EditLanguagePreferencePage() {
   };
 
   const handleSubmitLanguageForm = () => {
+    trackEvent({
+      event: GA_FORM_EVENTS.FORM_SUBMIT,
+      step: LANGUAGE_PREFERENCE_ANALYTICS.STEPS.SELECT_LANGUAGE,
+    });
+
     setWizardStep("confirmUpdate");
+    trackEvent({
+      event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+      step: LANGUAGE_PREFERENCE_ANALYTICS.STEPS.CONFIRM_UPDATE,
+    });
+    navigate(`/${routeLanguage}/profile/update-language/confirm-update`, {
+      replace: true,
+    });
   };
 
   const saveUpdatedLanguagePreferences = async () => {
@@ -88,13 +112,18 @@ export default function EditLanguagePreferencePage() {
       setLocalLoading(true);
       setErrorCode("");
 
-      const response = (await authService.update_my_user_profile({
+      const result = await authService.update_my_user_profile({
         preferredLanguage: languageFormData.updatedPreferredLanguage,
         user_id: state.userProfile?.id,
-      })) as AuthServiceResponse<UserProfile> | undefined;
+      });
+      const response = result as AuthServiceResponse<UserProfile>;
 
       if (response?.data) {
         updateProfileSuccess(response.data);
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE,
+          step: LANGUAGE_PREFERENCE_ANALYTICS.STEPS.SUCCESS,
+        });
 
         const successLanguageCode = convertLanguageToLanguageCode(
           response.data.preferredLanguage || routeLanguage,
@@ -111,11 +140,23 @@ export default function EditLanguagePreferencePage() {
         } else {
           setWizardStep("success");
         }
+      } else {
+        setErrorCode("LANGUAGE_UPDATE_FAILED");
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_END,
+          step: LANGUAGE_PREFERENCE_ANALYTICS.STEPS.SELECT_LANGUAGE,
+          error: "LANGUAGE_UPDATE_FAILED",
+        });
       }
     } catch (error) {
       const message = getApiErrorMessage(error);
       if (message) {
         setErrorCode(message);
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_END,
+          step: LANGUAGE_PREFERENCE_ANALYTICS.STEPS.SELECT_LANGUAGE,
+          error: message,
+        });
       }
     } finally {
       setLocalLoading(false);
@@ -147,7 +188,17 @@ export default function EditLanguagePreferencePage() {
     confirmUpdate: (
       <ConfirmUpdate
         languageFormData={languageFormData}
-        onConfirm={saveUpdatedLanguagePreferences}
+        onConfirm={() => {
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_SUBMIT,
+            step: LANGUAGE_PREFERENCE_ANALYTICS.STEPS.CONFIRM_UPDATE,
+          });
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_START,
+            step: LANGUAGE_PREFERENCE_ANALYTICS.STEPS.CONFIRM_UPDATE,
+          });
+          return saveUpdatedLanguagePreferences();
+        }}
         onCancel={handleBackToProfile}
         errorMessage={errorMessage}
         setErrorCode={setErrorCode}

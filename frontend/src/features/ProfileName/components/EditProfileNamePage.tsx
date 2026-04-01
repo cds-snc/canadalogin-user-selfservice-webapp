@@ -8,6 +8,9 @@ import { PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import { authService } from "../../../services/authService";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch";
+import { useFormTracking } from "../../../hooks/useFormTracking";
+import { GA_FORM_EVENTS } from "../../../utils/analyticsConstants";
+import { PROFILE_NAME_ANALYTICS } from "../../../utils/analyticsConstants";
 import StepContent from "../../../components/Wizard/StepContent";
 import Loader from "../../../components/Layout/Loading";
 import ConfirmUpdate from "./ConfirmUpdate";
@@ -61,6 +64,11 @@ export default function EditProfileNamePage() {
     normalizeNameFormData(state?.userProfile?.name),
   );
 
+  // Initialize form tracking
+  const { trackEvent } = useFormTracking({
+    formId: PROFILE_NAME_ANALYTICS.FLOW_ID,
+  });
+
   const loaderPageContentJson =
     (getPageContent(routeLanguage, PAGES.otpSelection) as
       | ProfileNamePageContent
@@ -98,7 +106,12 @@ export default function EditProfileNamePage() {
       familyName,
       formatted,
     }));
+
     setWizardStep("confirmUpdate");
+    trackEvent({
+      event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+      step: PROFILE_NAME_ANALYTICS.STEPS.CONFIRM_UPDATE,
+    });
   };
 
   const saveUpdatedProfileData = async () => {
@@ -109,16 +122,31 @@ export default function EditProfileNamePage() {
       const response = (await authService.update_my_user_profile({
         name: nameFormData,
         user_id: state.userProfile?.id,
-      })) as AuthServiceResponse<UserProfile> | undefined;
+      })) as AuthServiceResponse<UserProfile>;
 
       if (response?.data) {
         updateProfileSuccess(response.data);
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE,
+          step: PROFILE_NAME_ANALYTICS.STEPS.SUCCESS,
+        });
         setWizardStep("success");
+      } else {
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_END,
+          step: PROFILE_NAME_ANALYTICS.STEPS.CONFIRM_UPDATE,
+          error: "PROFILE_UPDATE_FAILED",
+        });
       }
     } catch (error) {
       const message = getApiErrorMessage(error);
       if (message) {
         setErrorCode(message);
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_END,
+          step: PROFILE_NAME_ANALYTICS.STEPS.CONFIRM_UPDATE,
+          error: message,
+        });
       }
     } finally {
       setLocalLoading(false);
@@ -148,7 +176,17 @@ export default function EditProfileNamePage() {
     confirmUpdate: (
       <ConfirmUpdate
         nameFormData={nameFormData}
-        onConfirm={saveUpdatedProfileData}
+        onConfirm={() => {
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_SUBMIT,
+            step: PROFILE_NAME_ANALYTICS.STEPS.CONFIRM_UPDATE,
+          });
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_START,
+            step: PROFILE_NAME_ANALYTICS.STEPS.CONFIRM_UPDATE,
+          });
+          return saveUpdatedProfileData();
+        }}
         onCancel={handleBackToProfile}
         onBack={() => {
           setWizardStep("editName");

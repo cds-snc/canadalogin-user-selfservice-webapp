@@ -21,6 +21,9 @@ import PasswordVerification from "../../TransientOtp/components/PasswordVerifica
 import StepContent from "../../../components/Wizard/StepContent";
 import { usePasswordValidation } from "../../../hooks/usePasswordValidation";
 import { useOtpOperations } from "../../../hooks/useOtpOperations";
+import { useFormTracking } from "../../../hooks/useFormTracking";
+import { GA_FORM_EVENTS } from "../../../utils/analyticsConstants";
+import { CHANGE_PASSWORD_ANALYTICS } from "../../../utils/analyticsConstants";
 import type { AuthServiceError } from "../../../types/services";
 import type { PasswordUpdateTransactionData } from "../api/passwordUpdate";
 
@@ -59,6 +62,11 @@ export default function ChangePasswordIndex() {
   const [passwordUpdateStep, setPasswordUpdateStep] =
     useState<PasswordUpdateStep>(defaultPasswordUpdateStep);
 
+  // Initialize form tracking
+  const { trackEvent } = useFormTracking({
+    formId: CHANGE_PASSWORD_ANALYTICS.FLOW_ID,
+  });
+
   const { userProfile } = state;
   const { id, userName } = userProfile ?? {};
   const navigate = useNavigate();
@@ -71,6 +79,13 @@ export default function ChangePasswordIndex() {
     setErrorCode,
     async () => {
       // If there's only one MFA factor, skip OTP selection and go directly to validation
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+        step:
+          userPhoneFactors && userPhoneFactors.length === 1
+            ? CHANGE_PASSWORD_ANALYTICS.STEPS.OTP_VALIDATION
+            : CHANGE_PASSWORD_ANALYTICS.STEPS.OTP_SELECTION,
+      });
       if (userPhoneFactors && userPhoneFactors.length === 1) {
         const success = await requestOtpCode();
         if (success) setPasswordUpdateStep("otpValidation");
@@ -79,6 +94,15 @@ export default function ChangePasswordIndex() {
       }
     },
   );
+
+  // Create tracked password validation wrapper
+  const handleValidatePassword = async (password: string) => {
+    trackEvent({
+      event: GA_FORM_EVENTS.FORM_STEP_START,
+      step: CHANGE_PASSWORD_ANALYTICS.STEPS.VERIFY_PASSWORD,
+    });
+    await validatePassword(password);
+  };
 
   // Use the OTP operations hook
   const {
@@ -104,8 +128,13 @@ export default function ChangePasswordIndex() {
         userName,
         userSelectedMfaFactorRef.current,
       );
+
       if (response?.success && response.data) {
         setOtpSentResponse(response.data);
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE,
+          step: CHANGE_PASSWORD_ANALYTICS.STEPS.OTP_VALIDATION,
+        });
         setErrorCode("");
         return true;
       }
@@ -114,6 +143,11 @@ export default function ChangePasswordIndex() {
       const message = getApiErrorMessage(err);
       if (message) {
         setErrorCode(message);
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_END,
+          step: CHANGE_PASSWORD_ANALYTICS.STEPS.OTP_VALIDATION,
+          error: message,
+        });
       }
       return false;
     }
@@ -126,19 +160,34 @@ export default function ChangePasswordIndex() {
     }
 
     setLocalLoading(true);
+
     try {
       const response = await passwordUpdate.secondStep(
         userOtp,
         otpSentResponse.trxId,
       );
+
       if (response?.success) {
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE,
+          step: CHANGE_PASSWORD_ANALYTICS.STEPS.OTP_VALIDATION,
+        });
         setPasswordUpdateStep("passwordChange");
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+          step: CHANGE_PASSWORD_ANALYTICS.STEPS.CHANGE_PASSWORD,
+        });
       }
       setErrorCode("");
     } catch (err) {
       const message = getApiErrorMessage(err);
       if (message) {
         setErrorCode(message);
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_END,
+          step: CHANGE_PASSWORD_ANALYTICS.STEPS.OTP_VALIDATION,
+          error: message,
+        });
       }
     } finally {
       setLocalLoading(false);
@@ -146,25 +195,36 @@ export default function ChangePasswordIndex() {
   };
 
   const logout = async () => {
-    setLoading(true, navBarContent["8"]); // Use logout loading text
+    setLoading(true, navBarContent["8"]);
 
     try {
       const response = await authService.logout();
+
       const redirectUrl = response?.data?.redirect_url || null;
 
-      // Check if response has redirect_url
       if (redirectUrl) {
-        // form been submitted in authService.logout
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE,
+          step: CHANGE_PASSWORD_ANALYTICS.STEPS.LOGOUT,
+        });
         return;
       } else {
-        // Fallback redirect if no redirect_url provided
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE,
+          step: CHANGE_PASSWORD_ANALYTICS.STEPS.LOGOUT,
+        });
         window.location.href = "/";
       }
     } catch (error) {
       console.error("Logout failed:", error);
-      // Update loading text to show error
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_END,
+        step: CHANGE_PASSWORD_ANALYTICS.STEPS.LOGOUT,
+        error: errorMessage,
+      });
       setLoading(true, navBarContent["9"]);
-      // Redirect after error
       setTimeout(() => {
         window.location.href = "/";
       }, 2000);
@@ -177,7 +237,7 @@ export default function ChangePasswordIndex() {
         userPasswordValue={userPasswordValue}
         setUserPasswordValue={setUserPasswordValue}
         onCancel={() => navigate(backToSecuritySettingsPage)}
-        validatePassword={validatePassword}
+        validatePassword={handleValidatePassword}
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
         parentPage={PAGES.password}
@@ -190,7 +250,13 @@ export default function ChangePasswordIndex() {
         onNext={() => {
           void (async () => {
             const success = await requestOtpCode();
-            if (success) setPasswordUpdateStep("otpValidation");
+            if (success) {
+              setPasswordUpdateStep("otpValidation");
+              trackEvent({
+                event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+                step: CHANGE_PASSWORD_ANALYTICS.STEPS.OTP_VALIDATION,
+              });
+            }
           })();
         }}
         onCancel={() => navigate(backToSecuritySettingsPage)}
@@ -202,16 +268,34 @@ export default function ChangePasswordIndex() {
         userSelectedMfaFactor={userSelectedMfaFactor}
         userOtpValue={userOtpValue}
         setUserOtpValue={handleSetUserOtpValue}
-        requestOtpCode={requestOtpCode}
-        validateOtpCode={validateOtpCode}
+        requestOtpCode={() => {
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_START,
+            step: CHANGE_PASSWORD_ANALYTICS.STEPS.OTP_VALIDATION,
+          });
+          return requestOtpCode();
+        }}
+        validateOtpCode={(userOtp) => {
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_SUBMIT,
+            step: CHANGE_PASSWORD_ANALYTICS.STEPS.OTP_VALIDATION,
+          });
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_START,
+            step: CHANGE_PASSWORD_ANALYTICS.STEPS.OTP_VALIDATION,
+          });
+          return validateOtpCode(userOtp);
+        }}
         onBack={() => {
-          // If there's only one MFA factor, go back to password verification.
-          if (userPhoneFactors.length === 1) {
-            setPasswordUpdateStep("passwordVerification");
-            return;
-          }
-
-          setPasswordUpdateStep("otpSelection");
+          const prevStep =
+            userPhoneFactors.length === 1
+              ? "passwordVerification"
+              : "otpSelection";
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+            step: CHANGE_PASSWORD_ANALYTICS.STEPS.OTP_SELECTION,
+          });
+          setPasswordUpdateStep(prevStep);
         }}
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
@@ -227,6 +311,10 @@ export default function ChangePasswordIndex() {
         otpSentResponse={otpSentResponse}
         userOtpValue={userOtpValue}
         onNext={() => {
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+            step: CHANGE_PASSWORD_ANALYTICS.STEPS.SUCCESS,
+          });
           setPasswordUpdateStep("passwordChangedConfirmation");
         }}
       />
@@ -234,6 +322,14 @@ export default function ChangePasswordIndex() {
     passwordChangedConfirmation: (
       <PasswordChangedConfirmation
         onNext={() => {
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_SUBMIT,
+            step: CHANGE_PASSWORD_ANALYTICS.STEPS.LOGOUT,
+          });
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_START,
+            step: CHANGE_PASSWORD_ANALYTICS.STEPS.LOGOUT,
+          });
           logout();
         }}
       />
