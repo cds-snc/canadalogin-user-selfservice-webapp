@@ -326,17 +326,21 @@ describe("AddMFAPage Unit Tests", () => {
     });
 
     functions.getPageContent.mockImplementation((language, page) => {
-      if (page === "otpSelection") return { 11: "Loading..." };
-      if (page === "error")
+      if (page === "otpSelection") {
+        return { 11: "Loading..." };
+      }
+      if (page === "error") {
         return {
           7: "Unexpected API request error message",
           "Some API Error": "Custom API Error Message",
         };
-      if (page === "noticeFactory")
+      }
+      if (page === "noticeFactory") {
         return {
           5: "Voice call",
           6: "Text message",
         };
+      }
       return {};
     });
 
@@ -404,8 +408,12 @@ describe("AddMFAPage Unit Tests", () => {
       const errorPageJson = { 7: "Unexpected API request error message" };
 
       functions.getPageContent.mockImplementation((language, page) => {
-        if (page === "error") return errorPageJson;
-        if (page === "otpSelection") return { 11: "Loading..." };
+        if (page === "error") {
+          return errorPageJson;
+        }
+        if (page === "otpSelection") {
+          return { 11: "Loading..." };
+        }
         return {};
       });
 
@@ -1726,7 +1734,9 @@ describe("AddMFAPage Unit Tests", () => {
       });
 
       functions.getPageContent.mockImplementation((language, page) => {
-        if (page === "noticeFactory") return { 5: "Voice", 6: "SMS" };
+        if (page === "noticeFactory") {
+          return { 5: "Voice", 6: "SMS" };
+        }
         return { 11: "Loading..." };
       });
 
@@ -2341,8 +2351,9 @@ describe("AddMFAPage Unit Tests", () => {
       });
 
       functions.getPageContent.mockImplementation((language, page) => {
-        if (page === "noticeFactory")
+        if (page === "noticeFactory") {
           return { 5: "Voice call", 6: "Text message" };
+        }
         return { 11: "Loading..." };
       });
 

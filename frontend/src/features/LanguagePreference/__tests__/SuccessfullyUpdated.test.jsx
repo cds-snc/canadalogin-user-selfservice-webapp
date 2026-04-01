@@ -49,17 +49,24 @@ vi.mock("../../../utils/functions", () => ({
     8: "update your browser settings",
   })),
   convertLanguageToLanguageCode: vi.fn((language) => {
-    if (language === "en" || language === "en-ca") return "en";
-    if (language === "fr" || language === "fr-ca") return "fr";
+    if (language === "en" || language === "en-ca") {
+      return "en";
+    }
+    if (language === "fr" || language === "fr-ca") {
+      return "fr";
+    }
     return language;
   }),
 }));
 
 vi.mock("../../../utils/routeHelpers", () => ({
   path: vi.fn((page, params) => {
-    if (page === "profile-home") return `/${params.language}/profile`;
-    if (page === "edit-language-preferences")
+    if (page === "profile-home") {
+      return `/${params.language}/profile`;
+    }
+    if (page === "edit-language-preferences") {
       return `/${params.language}/edit-language`;
+    }
     return `/${params.language}/test-path`;
   }),
 }));
