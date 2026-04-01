@@ -74,12 +74,13 @@ export async function testCase({
 }: TestCase) {
   const canvas = await testItem.canvas(canvasElement, delay);
 
-  if (input !== undefined)
+  if (input !== undefined) {
     switch (input.inputType) {
       case "textBox":
         await testItem.typeInInput(canvas, step, input);
         break;
     }
+  }
 
   switch (actionType) {
     case ACTION_TYPES.link:
@@ -228,8 +229,9 @@ export const buildTestCase = {
 };
 
 function buildPath(pathParams: PathParams, navigationLink: string) {
-  if (pathParams.type !== undefined)
+  if (pathParams.type !== undefined) {
     return { path: "/:language" + navigationLink + "/:type" };
+  }
 
   return { path: "/:language" + navigationLink };
 }
@@ -302,17 +304,17 @@ function buildMswMapping(mswArray: Array<MSW>) {
     }),
   );
 
-  if (mswArray != null)
+  if (mswArray != null) {
     Object.keys(mswArray).forEach((key) => {
       const msw = mswArray[parseInt(key)];
-      if (msw.type === "get")
+      if (msw.type === "get") {
         handlers.push(
           http.get(`${config.apiUrl}${msw.endpoint}`, async () => {
             return HttpResponse.json(msw.response);
           }),
         );
-      else if (msw.type === "post")
-        if (msw.response?.status)
+      } else if (msw.type === "post") {
+        if (msw.response?.status) {
           handlers.push(
             http.post(`${config.apiUrl}${msw.endpoint}`, async () => {
               return HttpResponse.json(msw.response.data, {
@@ -320,19 +322,22 @@ function buildMswMapping(mswArray: Array<MSW>) {
               });
             }),
           );
-        else
+        } else {
           handlers.push(
             http.post(`${config.apiUrl}${msw.endpoint}`, async () => {
               return HttpResponse.json(msw.response);
             }),
           );
-      else if (msw.type === "delete")
+        }
+      } else if (msw.type === "delete") {
         handlers.push(
           http.delete(`${config.apiUrl}${msw.endpoint}`, async () => {
             return HttpResponse.json(msw.response);
           }),
         );
+      }
     });
+  }
 
   return {
     msw: {

@@ -28,9 +28,15 @@ export function trackAnalyticsEvent({
   duration_ms,
 }: AnalyticsTrackEvent) {
   const params: GA4EventParams = { form_id, step };
-  if (type !== undefined) params.type = type;
-  if (error !== undefined) params.error = error;
-  if (duration_ms !== undefined) params.duration_ms = duration_ms;
+  if (type !== undefined) {
+    params.type = type;
+  }
+  if (error !== undefined) {
+    params.error = error;
+  }
+  if (duration_ms !== undefined) {
+    params.duration_ms = duration_ms;
+  }
   ReactGA.event(event, params);
 }
 
