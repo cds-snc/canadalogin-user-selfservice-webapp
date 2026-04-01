@@ -92,7 +92,9 @@ async def test_handle_otp_deletion_sms_success(monkeypatch):
         return create_mock_user_factors(num_factors=2)
 
     # Mock dispatch_otp_deletion to return successful response
-    async def mock_dispatch_otp_deletion(client, deletion_request, user_access_token):
+    async def mock_dispatch_otp_deletion(
+        client, deletion_request, user_access_token, language=None
+    ):
         mock_response = Mock(spec=Response)
         mock_response.status_code = 204  # No Content for successful deletion
         return mock_response
@@ -165,7 +167,9 @@ async def test_handle_otp_deletion_voice_success(monkeypatch):
         return create_mock_user_factors(num_factors=2)
 
     # Mock dispatch_otp_deletion to return successful response
-    async def mock_dispatch_otp_deletion(client, deletion_request, user_access_token):
+    async def mock_dispatch_otp_deletion(
+        client, deletion_request, user_access_token, language=None
+    ):
         mock_response = Mock(spec=Response)
         mock_response.status_code = 204  # No Content for successful deletion
         return mock_response
@@ -264,7 +268,7 @@ async def test_dispatch_otp_deletion_sms_success(monkeypatch):
     """Test successful dispatch of SMS OTP deletion to IBM Verify"""
 
     # Mock get_auth_request_headers
-    def mock_get_auth_request_headers(token, content_type):
+    def mock_get_auth_request_headers(token, content_type, language=None):
         return {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
 
     # Mock get_configuration
@@ -307,7 +311,7 @@ async def test_dispatch_otp_deletion_voice_success(monkeypatch):
     """Test successful dispatch of Voice OTP deletion to IBM Verify"""
 
     # Mock get_auth_request_headers
-    def mock_get_auth_request_headers(token, content_type):
+    def mock_get_auth_request_headers(token, content_type, language=None):
         return {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
 
     # Mock get_configuration
@@ -392,7 +396,9 @@ async def test_handle_otp_deletion_unvalidated_factor_success(monkeypatch):
         )
 
     # Mock dispatch_otp_deletion to return successful response
-    async def mock_dispatch_otp_deletion(client, deletion_request, user_access_token):
+    async def mock_dispatch_otp_deletion(
+        client, deletion_request, user_access_token, language=None
+    ):
         mock_response = Mock(spec=Response)
         mock_response.status_code = 204
         return mock_response
