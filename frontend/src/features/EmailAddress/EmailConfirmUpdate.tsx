@@ -32,7 +32,9 @@ export default function EmailConfirmUpdate({
     getPageContent(language, PAGES.emailConfirmUpdate) ?? {};
   const { cancel } = getPageContent(language, "Button") ?? {};
 
-  if (!formData?.emailAddress) return null;
+  if (!formData?.emailAddress) {
+    return null;
+  }
 
   return (
     <GcdsContainer role="main">

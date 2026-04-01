@@ -74,7 +74,9 @@ export default function EmailOtpValidation({
 
   // Countdown timer for resend button
   useEffect(() => {
-    if (time <= 0) return;
+    if (time <= 0) {
+      return;
+    }
 
     const timer = setTimeout(() => {
       setTime((prevTime) => prevTime - 1);

@@ -43,7 +43,9 @@ const SessionTimeoutModal = ({
     };
   }, [isOpen]);
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   const renderDesktopSessionTimeoutModal = () => {
     return (

@@ -6,7 +6,9 @@ import { AVAILABLE_LANGUAGES } from "../../utils/constants";
 import { useNavigateHelper } from "../../hooks/useNavigate";
 
 function validateSelectedLanguage(selectedLanguage: any) {
-  if (!selectedLanguage) return undefined;
+  if (!selectedLanguage) {
+    return undefined;
+  }
   const SUPPORTED_LANGUAGES = [AVAILABLE_LANGUAGES.en, AVAILABLE_LANGUAGES.fr];
   const languageValue = selectedLanguage.includes("-")
     ? selectedLanguage.split("-")[0].toLowerCase()
@@ -29,7 +31,9 @@ export const AppLanguageSetup = () => {
   const browserLanguage = navigator.language;
 
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading) {
+      return;
+    }
 
     const urlPath = pathname.split("/").filter(Boolean);
     const urlLanguage = urlPath[0]?.toLowerCase();

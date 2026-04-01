@@ -28,7 +28,9 @@ export default function PasswordChangedConfirmation({
     getPageContent(language, PAGES.passwordChangedConfirmation) ?? {};
 
   useEffect(() => {
-    if (time <= 0) return;
+    if (time <= 0) {
+      return;
+    }
 
     const timer = setTimeout(() => {
       setTime((prevTime) => prevTime - 1);
