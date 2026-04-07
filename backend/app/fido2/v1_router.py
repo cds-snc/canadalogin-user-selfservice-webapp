@@ -251,7 +251,7 @@ def get_authenticator_metadata(aaguid: str) -> FIDO2AuthenticatorMetadata:
     The lookup is O(1) and never performs I/O.  If the AAGUID is not present in
     the table (either the table is empty or the device is simply not listed in
     the FIDO Alliance MDS), ``is_known`` will be ``False`` and description will
-    be ``"Unknown Authenticator"``.
+    be ``""``.
     """
     metadata = mds_service.get_metadata(aaguid)
     return FIDO2AuthenticatorMetadata(**metadata)

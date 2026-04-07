@@ -57,9 +57,7 @@ export default function AddFIDO2PasskeyPage({
     unknown
   > | null>(null);
   const [registrationLoading, setRegistrationLoading] = useState(false);
-  const [authenticatorDescription, setAuthenticatorDescription] = useState(
-    addFIDO2PasskeyNicknamepageContent["defaultPasskeyName"],
-  );
+  const [authenticatorDescription, setAuthenticatorDescription] = useState("");
 
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
     language: language,
@@ -140,7 +138,11 @@ export default function AddFIDO2PasskeyPage({
       // Look up authenticator description from MDS service using AAGUID
       if (result.aaguid) {
         const metadata = await fido2Api.getAuthenticatorMetadata(result.aaguid);
-        setAuthenticatorDescription(metadata?.description ?? "");
+        setAuthenticatorDescription(
+          !!metadata?.description
+            ? metadata?.description
+            : addFIDO2PasskeyNicknamepageContent["defaultPasskeyName"],
+        );
       }
 
       setWizardStep("addFIDO2PasskeyNickname");
