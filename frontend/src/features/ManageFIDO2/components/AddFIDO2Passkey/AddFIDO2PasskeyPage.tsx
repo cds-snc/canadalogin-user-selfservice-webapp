@@ -45,6 +45,10 @@ export default function AddFIDO2PasskeyPage({
   const { id, userName } = userProfile ?? {};
   const errorMessage = getErrorMessage(language, errorCode);
   const loaderPageContentJson = getPageContent(language, PAGES.otpSelection)!;
+  const addFIDO2PasskeyNicknamepageContent = getPageContent(
+    language,
+    PAGES.addFIDO2PasskeyNickname,
+  )!;
   const [userPasswordValue, setUserPasswordValue] = useState("");
   const [selected2FAPasskey, setSelected2FAPasskey] =
     useState<Fido2Credential | null>(null);
@@ -53,7 +57,9 @@ export default function AddFIDO2PasskeyPage({
     unknown
   > | null>(null);
   const [registrationLoading, setRegistrationLoading] = useState(false);
-  const [authenticatorDescription, setAuthenticatorDescription] = useState("");
+  const [authenticatorDescription, setAuthenticatorDescription] = useState(
+    addFIDO2PasskeyNicknamepageContent["defaultPasskeyName"],
+  );
 
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
     language: language,

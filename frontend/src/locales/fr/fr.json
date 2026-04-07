@@ -112,7 +112,7 @@
     "2": "Vous avez demandé à remplacer votre nom par le nom suivant :",
     "3": "Exemple: Nouveau nom",
     "4": "Cette action modifiera votre nom pour les services suivants :",
-    "5": "GEO.ca",
+    "5": "RP Name",
     "6": "Attention",
     "7": "Cette action",
     "8": "Oui, mettre à jour",
@@ -149,7 +149,7 @@
     "5": "L'adresse courriel que les services connectés à ConnexionCanada peuvent utiliser pour vous contacter",
     "6": "Quels services ont accès à votre adresse courriel ?",
     "7": "Les services suivants ont accès à votre adresse courriel :",
-    "8": "GEO.ca",
+    "8": "RP Name",
     "9": "Si vous essayez de mettre à jour votre adresse courriel avec un service non connecté à ConnexionCanada, vous devrez accéder à ce compte.",
     "10": "Pour rechercher un autre compte GC, consultez le",
     "11": "Répertoire des comptes GC.",
@@ -211,7 +211,7 @@
     "2": "Vous avez demandé à mettre à jour votre numéro de téléphone :",
     "3": "+1 (123) 456-7890",
     "4": "Votre numéro de téléphone sera mis à jour avec les services suivants :",
-    "5": "GEO.ca",
+    "5": "RP Name",
     "6": "Ceci ne modifie que votre",
     "7": "numéro de téléphone.",
     "8": "Pour modifier votre numéro de vérification en deux étapes, accédez à vos",
@@ -233,7 +233,7 @@
     "1": "Êtes-vous sûr de vouloir mettre à jour votre adresse courriel ?",
     "2": "Vous avez demandé la mise à jour de votre adresse courriel :",
     "3": "Cette action mettra à jour l'adresse courriel que vous utilisez pour vous connecter, ainsi que celle que les services suivants utilisent pour vous contacter :",
-    "4": "GEO.ca",
+    "4": "RP Name",
     "5": "Oui, mettre à jour",
     "6": "Annuler"
   },
@@ -247,7 +247,7 @@
     "16": "Annuler",
     "17": "Êtes-vous certain de vouloir mettre à jour votre préférence linguistique vers :",
     "18": "Cela mettra à jour votre langue auprès des services suivants :",
-    "19": "GEO.ca"
+    "19": "RP Name"
   },
   "SuccessfullyUpdatedLanguage": {
     "0": "Réussite",
@@ -270,7 +270,7 @@
     "2": "Vous avez demandé à changer votre langue de communication pour la langue suivante:",
     "3": "Exemple : Nouveau nom",
     "4": "Cette action entraîne la modification de votre langue de communication pour les services suivants :",
-    "5": "GEO.ca",
+    "5": "RP Name",
     "6": "Attention",
     "7": "Ceci",
     "8": "Oui, mettre à jour",
@@ -327,7 +327,7 @@
   "ServicesWithAccessInfo": {
     "1": "Services ayant accès à votre {information}",
     "2": "Les services suivants ont accès à votre {information} par le biais de ConnexionCanada :",
-    "3": "GEO.ca",
+    "3": "RP Name",
     "4": "Si vous cherchez à mettre à jour votre {information} pour un service qui n’est pas lié à votre identifiant ConnexionCanada, vous devez le faire depuis le compte que vous possédez pour le service en question.",
     "5": "Pour rechercher un autre compte du GC, consultez le",
     "6": "répertoire des comptes du GC",
@@ -340,7 +340,7 @@
     "2": "Cette action modifiera le numéro de téléphone que ConnexionCanada et les services liés à votre identifiant ConnexionCanada peuvent utiliser pour vous contacter.",
     "3": "Services ayant accès à votre numéro de téléphone de communication",
     "4": "Les services suivants ont accès à votre numéro de téléphone de communication par le biais de ConnexionCanada:",
-    "5": "GEO.ca",
+    "5": "RP Name",
     "6": "Si vous cherchez à mettre à jour votre numéro de téléphone de communication pour un service qui n’est pas lié à votre identifiant ConnexionCanada, vous devez le faire depuis le compte que vous possédez pour le service en question.",
     "7": "Pour rechercher un autre compte du GC, consultez le",
     "8": "répertoire des comptes GC",
@@ -357,7 +357,7 @@
     "2": "Vous avez demandé à remplacer votre nom par le nom suivant :",
     "3": "Exemple Newname",
     "4": "Cette action modifiera votre numéro de téléphone de communication pour les services suivants :",
-    "5": "GEO.ca",
+    "5": "RP Name",
     "6": "Cette action ne modifie que votre",
     "7": "numéro de téléphone de communication.",
     "8": "Pour modifier le numéro de téléphone associé à la vérification en deux étapes, rendez-vous sur la page",
@@ -539,7 +539,7 @@
     "1": "Are you sure you want to update your email?",
     "2": "You’ve requested to update your email to:",
     "3": "This will update the email you use to sign in, as well as the email the following services use to contact you:",
-    "4": "GEO.ca",
+    "4": "RP Name",
     "5": "Yes, update"
   },
   "EmailUpdateSuccess": {
@@ -575,7 +575,8 @@
     "3": "Passkey name",
     "4": "example: My Phone",
     "5": "Continue",
-    "6": "Cancel"
+    "6": "Cancel",
+    "defaultPasskeyName": "Passkey"
   },
   "VerifyFIDO2Passkey": {
     "1": "Verify with your passkey",

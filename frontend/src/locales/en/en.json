@@ -113,7 +113,7 @@
     "2": "You’ve requested to update your name to:",
     "3": "Example Newname",
     "4": "This will update your name with the following services:",
-    "5": "GEO.ca",
+    "5": "RP Name",
     "6": "Heads up",
     "7": "This",
     "8": "Yes, update",
@@ -186,7 +186,7 @@
     "5": "The email address that services connected to your CanadaLogin may use to contact you",
     "6": "What services have access to your email address",
     "7": "The following services have access to your email address:",
-    "8": "GEO.ca",
+    "8": "RP Name",
     "9": "If you are trying to update your email address with a service that’s not connected to CanadaLogin, you’ll need to go to that account.",
     "10": "To search for another GC Account, visit the",
     "11": "GC Account directory.",
@@ -212,7 +212,7 @@
     "2": "You’ve requested to update your contact number to:",
     "3": "+1 (123) 456-7890",
     "4": "This will update your contact number with the following services:",
-    "5": "GEO.ca",
+    "5": "RP Name",
     "6": "This only changes your",
     "7": "contact phone number.",
     "8": "To change your 2-step verification number, go to your",
@@ -225,7 +225,7 @@
     "2": "This will update the phone number that CanadaLogin, and services connected to your CanadaLogin may use to contact you.",
     "3": "What services have access to your contact phone number",
     "4": "The following services have access to your contact phone number:",
-    "5": "GEO.ca",
+    "5": "RP Name",
     "6": "If you are trying to update your contact phone number with a service that’s not connected to CanadaLogin, you’ll need to go to that account.",
     "7": "To search for another GC Account, visit the",
     "8": "GC Account directory",
@@ -260,14 +260,14 @@
     "16": "Cancel",
     "17": "Are you sure you want to update your language preference to:",
     "18": "This will update your language with the following services:",
-    "19": "GEO.ca"
+    "19": "RP Name"
   },
   "ConfirmLanguageUpdate": {
     "1": "Are you sure you want to update your language preference?",
     "2": "You’ve requested to update your language preference to:",
     "3": "Example Newname",
     "4": "This will update your language preference with the following services: ",
-    "5": "GEO.ca",
+    "5": "RP Name",
     "6": "Heads up",
     "7": "This ",
     "8": "Yes, update",
@@ -328,7 +328,7 @@
   "ServicesWithAccessInfo": {
     "1": "What services have access to your {information}",
     "2": "The following services have access to your {information} through CanadaLogin:",
-    "3": "GEO.ca",
+    "3": "RP Name",
     "4": "If you are trying to update your {information} with a service that’s not connected to CanadaLogin, you’ll need to go to that account.",
     "5": "To search for another GC Account, visit the",
     "6": "GC Account directory",
@@ -342,7 +342,7 @@
     "2": "You’ve requested to update your contact phone number to:",
     "3": "Example Newname",
     "4": "This will update your contact phone number with the following services:",
-    "5": "GEO.ca",
+    "5": "RP Name",
     "6": "This only changes your",
     "7": "contact phone number.",
     "8": "To change your 2-step verification number, go to your",
@@ -525,7 +525,7 @@
     "1": "Are you sure you want to update your email?",
     "2": "You’ve requested to update your email to:",
     "3": "This will update the email you use to sign in, as well as the email the following services use to contact you:",
-    "4": "GEO.ca",
+    "4": "RP Name",
     "5": "Yes, update"
   },
   "EmailUpdateSuccess": {
@@ -561,7 +561,8 @@
     "3": "Passkey name",
     "4": "example: My Phone",
     "5": "Continue",
-    "6": "Cancel"
+    "6": "Cancel",
+    "defaultPasskeyName": "Passkey"
   },
   "VerifyFIDO2Passkey": {
     "1": "Verify with your passkey",
