@@ -156,7 +156,7 @@ def test_get_metadata_unknown_aaguid():
 
     result = service.get_metadata("00000000-0000-0000-0000-000000000000")
     assert result["is_known"] is False
-    assert result["description"] == "Unknown Authenticator"
+    assert result["description"] == ""
     assert result["aaguid"] == "00000000-0000-0000-0000-000000000000"
 
 

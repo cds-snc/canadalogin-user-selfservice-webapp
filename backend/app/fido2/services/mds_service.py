@@ -108,7 +108,7 @@ class FIDO2MetadataService:
             return entry
         return {
             "aaguid": key,
-            "description": "Unknown Authenticator",
+            "description": "",
             "icon": None,
             "is_known": False,
         }

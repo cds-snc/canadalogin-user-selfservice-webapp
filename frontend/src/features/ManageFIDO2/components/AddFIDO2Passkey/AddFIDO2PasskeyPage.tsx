@@ -45,6 +45,10 @@ export default function AddFIDO2PasskeyPage({
   const { id, userName } = userProfile ?? {};
   const errorMessage = getErrorMessage(language, errorCode);
   const loaderPageContentJson = getPageContent(language, PAGES.otpSelection)!;
+  const addFIDO2PasskeyNicknamepageContent = getPageContent(
+    language,
+    PAGES.addFIDO2PasskeyNickname,
+  )!;
   const [userPasswordValue, setUserPasswordValue] = useState("");
   const [selected2FAPasskey, setSelected2FAPasskey] =
     useState<Fido2Credential | null>(null);
@@ -134,7 +138,11 @@ export default function AddFIDO2PasskeyPage({
       // Look up authenticator description from MDS service using AAGUID
       if (result.aaguid) {
         const metadata = await fido2Api.getAuthenticatorMetadata(result.aaguid);
-        setAuthenticatorDescription(metadata?.description ?? "");
+        setAuthenticatorDescription(
+          !!metadata?.description
+            ? metadata?.description
+            : addFIDO2PasskeyNicknamepageContent["defaultPasskeyName"],
+        );
       }
 
       setWizardStep("addFIDO2PasskeyNickname");
