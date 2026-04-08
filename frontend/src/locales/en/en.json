@@ -112,14 +112,16 @@
     "1": "Are you sure you want to update your name?",
     "2": "You’ve requested to update your name to:",
     "3": "Example Newname",
-    "4": "This will update your name with the following services:",
-    "5": "RP Name",
-    "6": "Heads up",
     "7": "This",
     "8": "Yes, update",
     "9": "Cancel",
     "11": "does not",
-    "12": "legally change your name."
+    "12": "legally change your name.",
+    "13": "This will update your name with",
+    "14": "all",
+    "15": "services you have connected to your",
+    "16": "CanadaLogin",
+    "17": "."
   },
   "ProfileUpdateName": {
     "2": "First name",
@@ -273,7 +275,12 @@
     "8": "Yes, update",
     "9": "Cancel",
     "11": "does not ",
-    "12": "legally change your name."
+    "12": "legally change your name.",
+    "13": "This will update your language preference with",
+    "14": "all",
+    "15": "services you have connected to your",
+    "16": "CanadaLogin",
+    "17": "."
   },
   "SuccessfullyUpdatedLanguage": {
     "0": "Success",
@@ -346,9 +353,14 @@
     "6": "This only changes your",
     "7": "contact phone number.",
     "8": "To change your 2-step verification number, go to your",
-    "9": "security settings.",
+    "9": "security settings",
     "10": "Yes, update",
-    "11": "Cancel"
+    "11": "Cancel",
+    "12": "This will update your contact phone number with",
+    "13": "all",
+    "14": "services you have connected to your",
+    "15": "CanadaLogin",
+    "16": "."
   },
   "SuccessfullyUpdatedContactPhoneNumber": {
     "1": "Your contact phone number has been updated to",
@@ -526,7 +538,12 @@
     "2": "You’ve requested to update your email to:",
     "3": "This will update the email you use to sign in, as well as the email the following services use to contact you:",
     "4": "RP Name",
-    "5": "Yes, update"
+    "5": "Yes, update",
+    "6": "This will update your email with",
+    "7": "all",
+    "8": "services you have connected to your",
+    "9": "CanadaLogin",
+    "10": "."
   },
   "EmailUpdateSuccess": {
     "1": "Your email has been updated to",

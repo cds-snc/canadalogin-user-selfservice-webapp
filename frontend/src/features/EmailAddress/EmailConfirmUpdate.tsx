@@ -8,7 +8,6 @@ import {
   GcdsHeading,
   GcdsText,
 } from "@gcds-core/components-react";
-import RPNameDisplay from "../../components/RPInfo/RPNameDisplay";
 import SubmitButton from "../../components/Layout/SubmitButton";
 
 type EmailFormData = {
@@ -42,12 +41,11 @@ export default function EmailConfirmUpdate({
       <GcdsText>
         {pageContentJson["2"]} <strong>{formData.emailAddress}</strong>.
       </GcdsText>
-      <GcdsText>{pageContentJson["3"]}</GcdsText>
-      <ul>
-        <li>
-          <RPNameDisplay rpName={pageContentJson["4"] ?? ""} />
-        </li>
-      </ul>
+      <GcdsText>
+        {pageContentJson["6"]} <strong>{pageContentJson["7"]}</strong>{" "}
+        {pageContentJson["8"]} <strong>{pageContentJson["9"]}</strong>
+        {pageContentJson["10"]}
+      </GcdsText>
       <GcdsGrid columns="max-content max-content" gap="200">
         <SubmitButton
           currentLang={language ?? "en"}
