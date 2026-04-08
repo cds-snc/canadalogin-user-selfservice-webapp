@@ -1,17 +1,16 @@
 import { useState } from "react";
 
-import { PAGES } from "../utils/constants";
-import { getPageContent } from "../utils/functions";
+import { useTranslation } from "react-i18next";
 import type { ErrorEntry, ErrorMap, UseErrorReturn } from "../types/hooks";
 
-export function useError(language?: string): UseErrorReturn {
-  const errorPageJson: Record<string, string> =
-    getPageContent(language, PAGES.error) ?? {};
+export function useError(): UseErrorReturn {
+  const { t } = useTranslation("common");
   const [errors, setErrors] = useState<ErrorMap>({});
 
   const setError = (link: string, errorId: string) => {
-    if (errorPageJson[errorId]) {
-      setErrors((prev) => ({ ...prev, [link]: errorPageJson[errorId] }));
+    const translated = t(`Error.${errorId}`, { defaultValue: "" });
+    if (translated) {
+      setErrors((prev) => ({ ...prev, [link]: translated }));
       return;
     }
 
@@ -20,7 +19,7 @@ export function useError(language?: string): UseErrorReturn {
       return;
     }
 
-    setErrors((prev) => ({ ...prev, [link]: errorPageJson["7"] }));
+    setErrors((prev) => ({ ...prev, [link]: t("Error.serverError") }));
   };
 
   const clearAllErrors = () => {
@@ -28,7 +27,10 @@ export function useError(language?: string): UseErrorReturn {
   };
 
   const getError = (index: string): ErrorEntry => {
-    return { heading: errorPageJson["1"] ?? "", errorMsg: errors[index] };
+    return {
+      heading: t("Error.genericProblem", { defaultValue: "" }),
+      errorMsg: errors[index],
+    };
   };
 
   const hasErrors = (): boolean => {

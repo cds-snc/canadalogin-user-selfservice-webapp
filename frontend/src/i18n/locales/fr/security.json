@@ -1,0 +1,29 @@
+{
+  "SecuritySettings": {
+    "title": "Paramètres de sécurité",
+    "howYouSignIn": "Comment vous vous connectez à ConnexionCanada",
+    "keepInfoUpdated": "Veillez à toujours avoir accès à votre identifiant ConnexionCanada en maintenant ces renseignements à jour.",
+    "password": "Mot de passe",
+    "lastChangedOn": "Dernière modification le",
+    "change": "Modifier",
+    "twoStepVerification": "Vérification en deux étapes",
+    "twoStepDescription": "L'ajout d'une étape supplémentaire à la vérification de votre mot de passe permet de confirmer votre identité.",
+    "enabled": "Activée",
+    "manage": "Gérer",
+    "pageTitle": "Paramètres de sécurité"
+  },
+  "OtpSelection": {
+    "title": "Vérifiez d'abord qu'il s'agit bien de vous",
+    "description": "La vérification en 2 étapes ajoute une seconde mesure de sécurité à votre mot de passe.",
+    "learnMore": "Apprenez-en plus sur la vérification en deux étapes (s'ouvre dans un nouvel onglet)",
+    "verifyIdentity": "Sélectionnez une autre méthode de vérification à deux étapes",
+    "howToSendCode": "Comment souhaitez-vous recevoir le code?",
+    "changeInSettings": "Vous pourrez modifier ce paramètre lors de votre prochaine connexion.",
+    "textMessage": "Message texte (SMS)",
+    "mobileOnly": "Numéro de téléphone cellulaire seulement.",
+    "voiceCall": "Appel vocal",
+    "mobileOrLandline": "Numéro de téléphone cellulaire ou fixe.",
+    "loading": "Chargement...",
+    "loadingMfaMethods": "Des frais d'opérateur peuvent s'appliquer."
+  }
+}

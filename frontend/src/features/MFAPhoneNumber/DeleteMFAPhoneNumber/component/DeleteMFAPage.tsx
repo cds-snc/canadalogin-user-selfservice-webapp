@@ -7,7 +7,7 @@ import {
   PAGES,
   serverMapping,
 } from "../../../../utils/constants";
-import { getPageContent } from "../../../../utils/functions";
+import { useTranslation } from "react-i18next";
 import { getErrorMessage } from "../../../../utils/errorUtils";
 import { path } from "../../../../utils/routeHelpers";
 import OtpSelection from "../../../TransientOtp/components/OtpSelection";
@@ -46,7 +46,7 @@ export default function DeleteMFAPage() {
 
   const { state } = useUser();
   const [userPasswordValue, setUserPasswordValue] = useState("");
-  const pageContentJson = getPageContent(language, PAGES.otpSelection)!;
+  const { t } = useTranslation("security");
 
   const [errorCode, setErrorCode] = useState("");
   const errorMessage = getErrorMessage(language, errorCode);
@@ -339,7 +339,7 @@ export default function DeleteMFAPage() {
   };
 
   return localLoading || validatePasswordLoading ? (
-    <Loader text={pageContentJson["11"]} />
+    <Loader text={t("OtpSelection.loading")} />
   ) : (
     <StepContent
       StepComponent={steps[wizardStep]}

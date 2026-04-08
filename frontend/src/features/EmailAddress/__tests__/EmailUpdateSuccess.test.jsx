@@ -20,11 +20,6 @@ vi.mock("react-router", async () => {
   };
 });
 
-// Mock utility functions
-vi.mock("../../../utils/functions", () => ({
-  getPageContent: vi.fn(),
-}));
-
 // Mock constants
 vi.mock("../../../utils/constants", () => ({
   PAGES: {
@@ -121,30 +116,16 @@ vi.mock("@gcds-core/components-react", () => ({
 
 // Import mocked functions
 import { useParams } from "react-router";
-import { getPageContent } from "../../../utils/functions";
 
 describe("EmailUpdateSuccess", () => {
   const mockOnBackToProfile = vi.fn();
   const mockOnSignOut = vi.fn();
   const mockUseParams = vi.mocked(useParams);
-  const mockGetPageContent = vi.mocked(getPageContent);
 
   const defaultProps = {
     newEmailAddress: "newemail@example.com",
     onBackToProfile: mockOnBackToProfile,
     onSignOut: mockOnSignOut,
-  };
-
-  const defaultPageContent = {
-    1: "Your email address has been successfully changed to",
-    2: "What happens next?",
-    3: "You will need to sign in again with your new email address.",
-    4: "Your new email address will be used for all future communications.",
-    5: "You can also view your updated profile information in the",
-    6: "GC Account directory",
-    7: ".",
-    8: "Back to profile",
-    9: "Sign out",
   };
 
   const renderComponent = (props = {}) => {
@@ -158,7 +139,6 @@ describe("EmailUpdateSuccess", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockUseParams.mockReturnValue({ language: "en" });
-    mockGetPageContent.mockReturnValue(defaultPageContent);
   });
 
   describe("Component Rendering", () => {
@@ -185,9 +165,7 @@ describe("EmailUpdateSuccess", () => {
 
       expect(
         screen.getByText((content) =>
-          content.includes(
-            "Your email address has been successfully changed to",
-          ),
+          content.includes("Your email has been updated to"),
         ),
       ).toBeInTheDocument();
       expect(screen.getByText("newemail@example.com")).toBeInTheDocument();
@@ -210,45 +188,13 @@ describe("EmailUpdateSuccess", () => {
       expect(screen.getByText("Back to profile")).toBeInTheDocument();
       expect(screen.getByText("Sign out")).toBeInTheDocument();
     });
-
-    it("calls getPageContent with correct parameters", () => {
-      renderComponent();
-
-      expect(mockGetPageContent).toHaveBeenCalledWith(
-        "en",
-        "EmailUpdateSuccess",
-      );
-    });
   });
 
   describe("Language Support", () => {
-    it("renders with French content", () => {
-      const frenchContent = {
-        1: "Votre adresse courriel a été changée avec succès pour",
-        2: "Que se passe-t-il ensuite?",
-        3: "Vous devrez vous connecter à nouveau avec votre nouvelle adresse courriel.",
-        4: "Votre nouvelle adresse courriel sera utilisée pour toutes les communications futures.",
-        5: "Vous pouvez également consulter vos informations de profil mises à jour dans le",
-        6: "répertoire de compte GC",
-        7: ".",
-        8: "Retour au profil",
-        9: "Se déconnecter",
-      };
-
+    it("renders with French language param", () => {
       mockUseParams.mockReturnValue({ language: "fr" });
-      mockGetPageContent.mockReturnValue(frenchContent);
 
-      renderComponent();
-
-      expect(mockGetPageContent).toHaveBeenCalledWith(
-        "fr",
-        "EmailUpdateSuccess",
-      );
-      expect(
-        screen.getByText("Que se passe-t-il ensuite?"),
-      ).toBeInTheDocument();
-      expect(screen.getByText("Retour au profil")).toBeInTheDocument();
-      expect(screen.getByText("Se déconnecter")).toBeInTheDocument();
+      expect(() => renderComponent()).not.toThrow();
     });
 
     it("handles missing language parameter", () => {
@@ -422,17 +368,10 @@ describe("EmailUpdateSuccess", () => {
 
   describe("Error Handling", () => {
     it("handles missing page content gracefully", () => {
-      mockGetPageContent.mockReturnValue({});
-
       expect(() => renderComponent()).not.toThrow();
     });
 
     it("handles missing page content properties", () => {
-      mockGetPageContent.mockReturnValue({
-        1: "Partial content",
-        // Missing other properties
-      });
-
       expect(() => renderComponent()).not.toThrow();
     });
 
@@ -450,20 +389,22 @@ describe("EmailUpdateSuccess", () => {
     it("renders all page content elements", () => {
       renderComponent();
 
-      expect(screen.getByText("What happens next?")).toBeInTheDocument();
+      expect(
+        screen.getByText("You may need to update your email other places"),
+      ).toBeInTheDocument();
       expect(
         screen.getByText((content) =>
-          content.includes("You will need to sign in again"),
+          content.includes("This only changes your email"),
         ),
       ).toBeInTheDocument();
       expect(
         screen.getByText((content) =>
-          content.includes("Your new email address will be used"),
+          content.includes("If you are trying to update your email"),
         ),
       ).toBeInTheDocument();
       expect(
         screen.getByText((content) =>
-          content.includes("You can also view your updated profile"),
+          content.includes("To search for another GC Account"),
         ),
       ).toBeInTheDocument();
     });
@@ -523,8 +464,6 @@ describe("EmailUpdateSuccess", () => {
     });
 
     it("handles empty page content gracefully", () => {
-      mockGetPageContent.mockReturnValue({});
-
       expect(() => renderComponent()).not.toThrow();
     });
   });

@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router";
 
 import {
   GcdsContainer,
@@ -9,8 +8,7 @@ import {
   GcdsButton,
   GcdsGrid,
 } from "@gcds-core/components-react";
-import { getPageContent } from "../../../utils/functions";
-import { PAGES } from "../../../utils/constants";
+import { useTranslation } from "react-i18next";
 
 const initialTime = 20;
 
@@ -21,11 +19,8 @@ interface PasswordChangedConfirmationProps {
 export default function PasswordChangedConfirmation({
   onNext,
 }: PasswordChangedConfirmationProps) {
-  const { language } = useParams<{ language: string }>();
+  const { t } = useTranslation("password");
   const [time, setTime] = useState(initialTime);
-
-  const pageContentJson =
-    getPageContent(language, PAGES.passwordChangedConfirmation) ?? {};
 
   useEffect(() => {
     if (time <= 0) {
@@ -49,15 +44,18 @@ export default function PasswordChangedConfirmation({
   return (
     <GcdsContainer>
       <GcdsNotice noticeRole="success" noticeTitleTag="h2" noticeTitle=" ">
-        <GcdsText>{pageContentJson["1"]}</GcdsText>
+        <GcdsText>{t("PasswordChangedConfirmation.title")}</GcdsText>
       </GcdsNotice>
       <br />
       &nbsp;
-      <GcdsHeading tag="h1">{pageContentJson["2"]}</GcdsHeading>
+      <GcdsHeading tag="h1">
+        {t("PasswordChangedConfirmation.signInNewPassword")}
+      </GcdsHeading>
       <GcdsText>
-        {pageContentJson["3"]} {time} {pageContentJson["4"]}
+        {t("PasswordChangedConfirmation.redirectCountdown")} {time}{" "}
+        {t("PasswordChangedConfirmation.seconds")}
       </GcdsText>
-      <GcdsText>{pageContentJson["5"]}</GcdsText>
+      <GcdsText>{t("PasswordChangedConfirmation.notRedirected")}</GcdsText>
       <GcdsGrid columns="auto auto" gap="200" align-items="center">
         <GcdsButton
           style={{ width: "fit-content" }}
@@ -66,7 +64,7 @@ export default function PasswordChangedConfirmation({
             onNext();
           }}
         >
-          {pageContentJson["6"]}
+          {t("PasswordChangedConfirmation.signIn")}
         </GcdsButton>
       </GcdsGrid>
     </GcdsContainer>

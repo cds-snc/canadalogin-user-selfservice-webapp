@@ -1,7 +1,8 @@
 import Modal from "react-modal";
 import { useEffect } from "react";
 import { GcdsButton, GcdsText, GcdsIcon } from "@gcds-core/components-react";
-import { getPageContent, formatTime } from "../../utils/functions";
+import { formatTime } from "../../utils/functions";
+import { useTranslation } from "react-i18next";
 import {
   setWarningFavicon,
   restoreDefaultFavicon,
@@ -26,8 +27,7 @@ const SessionTimeoutModal = ({
   currentLang,
 }: SessionTimeoutModalProps) => {
   const { mobile, tablet } = useBreakpoints();
-  const pageContentJson: Record<string, string> =
-    getPageContent(currentLang, "SessionManagement") ?? {};
+  const { t } = useTranslation("layout");
 
   // Change favicon when modal opens/closes
   useEffect(() => {
@@ -55,7 +55,7 @@ const SessionTimeoutModal = ({
           shouldCloseOnOverlayClick={false}
           shouldCloseOnEsc={false}
           ariaHideApp={false}
-          contentLabel={pageContentJson["1"]}
+          contentLabel={t("SessionManagement.sessionEndingWarning")}
           className="session-timeout-modal"
           overlayClassName="session-timeout-modal-overlay"
         >
@@ -73,21 +73,22 @@ const SessionTimeoutModal = ({
             />
           </div>
           <div className="modal-header">
-            <h2>{pageContentJson["1"]}</h2>
+            <h2>{t("SessionManagement.sessionEndingWarning")}</h2>
           </div>
 
           <div className="session-timeout-content">
-            <GcdsText size="body">{pageContentJson["2"]}</GcdsText>
-
-            <GcdsText size="body" className="mt-3">
-              {pageContentJson["8"].replace(
-                "{{time}}",
-                formatTime(expirationTime, currentLang),
-              )}
+            <GcdsText size="body">
+              {t("SessionManagement.autoSignOutNotice")}
             </GcdsText>
 
             <GcdsText size="body" className="mt-3">
-              {pageContentJson["3"]}
+              {t("SessionManagement.sessionExpiryTime", {
+                time: formatTime(expirationTime, currentLang),
+              })}
+            </GcdsText>
+
+            <GcdsText size="body" className="mt-3">
+              {t("SessionManagement.continueSessionPrompt")}
             </GcdsText>
 
             <div className="d-flex gap-3 mt-4">
@@ -99,7 +100,9 @@ const SessionTimeoutModal = ({
                 onClick={onKeepSession}
                 disabled={isLoading}
               >
-                {isLoading ? pageContentJson["6"] : pageContentJson["4"]}
+                {isLoading
+                  ? t("SessionManagement.extending")
+                  : t("SessionManagement.staySignedIn")}
               </GcdsButton>
 
               <GcdsButton
@@ -110,7 +113,7 @@ const SessionTimeoutModal = ({
                 onClick={onLogout}
                 disabled={isLoading}
               >
-                {pageContentJson["5"]}
+                {t("SessionManagement.signOut")}
               </GcdsButton>
             </div>
           </div>
@@ -127,7 +130,7 @@ const SessionTimeoutModal = ({
           shouldCloseOnOverlayClick={false}
           shouldCloseOnEsc={false}
           ariaHideApp={false}
-          contentLabel={pageContentJson["1"]}
+          contentLabel={t("SessionManagement.sessionEndingWarning")}
           className="session-timeout-modal mobile"
           overlayClassName="session-timeout-modal-overlay"
         >
@@ -145,21 +148,22 @@ const SessionTimeoutModal = ({
             />
           </div>
           <div className="modal-header">
-            <h2>{pageContentJson["1"]}</h2>
+            <h2>{t("SessionManagement.sessionEndingWarning")}</h2>
           </div>
 
           <div className="session-timeout-content">
-            <GcdsText size="body">{pageContentJson["2"]}</GcdsText>
-
-            <GcdsText size="body" className="mt-3">
-              {pageContentJson["8"].replace(
-                "{{time}}",
-                formatTime(expirationTime, currentLang),
-              )}
+            <GcdsText size="body">
+              {t("SessionManagement.autoSignOutNotice")}
             </GcdsText>
 
             <GcdsText size="body" className="mt-3">
-              {pageContentJson["3"]}
+              {t("SessionManagement.sessionExpiryTime", {
+                time: formatTime(expirationTime, currentLang),
+              })}
+            </GcdsText>
+
+            <GcdsText size="body" className="mt-3">
+              {t("SessionManagement.continueSessionPrompt")}
             </GcdsText>
 
             <div className="d-flex gap-3 mt-4">
@@ -171,7 +175,9 @@ const SessionTimeoutModal = ({
                 onClick={onKeepSession}
                 disabled={isLoading}
               >
-                {isLoading ? pageContentJson["6"] : pageContentJson["4"]}
+                {isLoading
+                  ? t("SessionManagement.extending")
+                  : t("SessionManagement.staySignedIn")}
               </GcdsButton>
 
               <GcdsButton
@@ -182,7 +188,7 @@ const SessionTimeoutModal = ({
                 onClick={onLogout}
                 disabled={isLoading}
               >
-                {pageContentJson["5"]}
+                {t("SessionManagement.signOut")}
               </GcdsButton>
             </div>
           </div>

@@ -8,17 +8,13 @@ import {
   GcdsText,
 } from "@gcds-core/components-react";
 import parsePhoneNumberFromString from "libphonenumber-js";
+import { useTranslation } from "react-i18next";
 
 import { PAGES } from "../../../utils/constants";
 import { useNavigateHelper } from "../../../hooks/useNavigate";
 import VerifiedBadge from "../../../components/Badges/VerifiedBadge";
 import { path } from "../../../utils/routeHelpers";
-import type {
-  ContactPhoneDisplayProps,
-  ContactPhoneDisplaySectionProps,
-  ContactPhoneSectionProps,
-  GcdsNavigationEvent,
-} from "../../../types/contactPhoneNumber";
+import type { GcdsNavigationEvent } from "../../../types/contactPhoneNumber";
 
 function DisplayPhoneNumbers({
   phoneNumbers,
@@ -55,7 +51,8 @@ function DisplayPhoneNumbers({
   );
 }
 
-function AddPhoneNumber({ pageContent, language }: ContactPhoneSectionProps) {
+function AddPhoneNumber({ language }: { language?: string }) {
+  const { t } = useTranslation("profile");
   const navigateHelper = useNavigateHelper();
   const newContactPhoneNumber = path(PAGES.editContactPhoneNumberPage, {
     language,
@@ -64,20 +61,23 @@ function AddPhoneNumber({ pageContent, language }: ContactPhoneSectionProps) {
   return (
     <GcdsGrid columns="1fr auto">
       <section>
-        <GcdsText>{pageContent["18"]}</GcdsText>
+        <GcdsText>{t("ProfileHome.noPhoneAdded")}</GcdsText>
       </section>
       <GcdsButton onGcdsClick={() => navigateHelper(newContactPhoneNumber)}>
-        + {pageContent["19"]}
+        + {t("ProfileHome.addPhoneNumber")}
       </GcdsButton>
     </GcdsGrid>
   );
 }
 
 function ContactPhoneNumber({
-  pageContent,
   phoneNumbers,
   language,
-}: ContactPhoneDisplaySectionProps) {
+}: {
+  phoneNumbers: { value: string }[];
+  language?: string;
+}) {
+  const { t } = useTranslation("profile");
   const newContactPhoneNumber = path(PAGES.editContactPhoneNumberPage, {
     language,
   });
@@ -85,7 +85,7 @@ function ContactPhoneNumber({
 
   return (
     <>
-      <GcdsText>{pageContent["11"]}</GcdsText>
+      <GcdsText>{t("ProfileHome.phoneDescription")}</GcdsText>
 
       <GcdsGrid columns="1fr auto">
         <DisplayPhoneNumbers phoneNumbers={phoneNumbers} />
@@ -97,33 +97,31 @@ function ContactPhoneNumber({
             navigateHelper(event.detail);
           }}
         >
-          {pageContent["5"]}
+          {t("ProfileHome.edit")}
         </GcdsLink>
       </GcdsGrid>
-      <VerifiedBadge text={pageContent["9"]} />
+      <VerifiedBadge text={t("ProfileHome.verified")} />
     </>
   );
 }
 
 export default function ViewContactPhoneNumber({
-  pageContent,
   phoneNumbers,
-}: ContactPhoneDisplayProps) {
+}: {
+  phoneNumbers: { value: string }[] | null;
+}) {
   const { language } = useParams<{ language: string }>();
+  const { t } = useTranslation("profile");
 
   return (
     <GcdsContainer>
       <GcdsHeading tag="h3" marginTop="300">
-        {pageContent["10"]}
+        {t("ProfileHome.contactPhone")}
       </GcdsHeading>
       {phoneNumbers && phoneNumbers.length > 0 ? (
-        <ContactPhoneNumber
-          pageContent={pageContent}
-          phoneNumbers={phoneNumbers}
-          language={language}
-        />
+        <ContactPhoneNumber phoneNumbers={phoneNumbers} language={language} />
       ) : (
-        <AddPhoneNumber pageContent={pageContent} language={language} />
+        <AddPhoneNumber language={language} />
       )}
     </GcdsContainer>
   );

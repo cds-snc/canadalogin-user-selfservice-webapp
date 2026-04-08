@@ -1,6 +1,5 @@
 import { useParams } from "react-router";
-import { getPageContent } from "../../utils/functions";
-import { PAGES } from "../../utils/constants";
+import { useTranslation } from "react-i18next";
 import {
   GcdsButton,
   GcdsContainer,
@@ -26,10 +25,7 @@ export default function EmailConfirmUpdate({
   onCancel,
 }: EmailConfirmUpdateProps) {
   const { language } = useParams();
-
-  const pageContentJson =
-    getPageContent(language, PAGES.emailConfirmUpdate) ?? {};
-  const { cancel } = getPageContent(language, "Button") ?? {};
+  const { t } = useTranslation(["email", "common"]);
 
   if (!formData?.emailAddress) {
     return null;
@@ -37,21 +33,18 @@ export default function EmailConfirmUpdate({
 
   return (
     <GcdsContainer role="main">
-      <GcdsHeading tag="h1">{pageContentJson["1"]}</GcdsHeading>
+      <GcdsHeading tag="h1">{t("EmailConfirmUpdate.title")}</GcdsHeading>
       <GcdsText>
-        {pageContentJson["2"]} <strong>{formData.emailAddress}</strong>.
+        {t("EmailConfirmUpdate.requestedUpdate")}{" "}
+        <strong>{formData.emailAddress}</strong>.
       </GcdsText>
-      <GcdsText>
-        {pageContentJson["6"]} <strong>{pageContentJson["7"]}</strong>{" "}
-        {pageContentJson["8"]} <strong>{pageContentJson["9"]}</strong>
-        {pageContentJson["10"]}
-      </GcdsText>
+      <GcdsText>{t("EmailConfirmUpdate.allServicesNotice")}</GcdsText>
       <GcdsGrid columns="max-content max-content" gap="200">
         <SubmitButton
           currentLang={language ?? "en"}
           onClick={() => void onSubmit()}
         >
-          {pageContentJson["5"]}
+          {t("EmailConfirmUpdate.confirmButton")}
         </SubmitButton>
         <GcdsButton
           buttonRole="secondary"
@@ -61,7 +54,7 @@ export default function EmailConfirmUpdate({
             void onCancel();
           }}
         >
-          {cancel}
+          {t("Button.cancel", { ns: "common" })}
         </GcdsButton>
       </GcdsGrid>
     </GcdsContainer>

@@ -1,5 +1,6 @@
 /** @type { import('@storybook/react').Preview } */
 import "../src/index.css";
+import "../src/i18n";
 import { initialize, mswLoader } from "msw-storybook-addon";
 import { withRouter } from "storybook-addon-remix-react-router";
 

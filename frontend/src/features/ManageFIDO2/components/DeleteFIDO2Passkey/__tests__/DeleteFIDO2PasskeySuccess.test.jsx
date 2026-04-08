@@ -19,16 +19,6 @@ vi.mock("react-router", () => ({
   useLocation: () => ({ state: { passkeyNickname: "My Test Passkey" } }),
 }));
 
-vi.mock("../../../../../utils/functions", () => ({
-  getPageContent: () => ({
-    1: "Passkey deleted",
-    2: "Your passkey",
-    3: "has been removed",
-    4: "You can still sign in using another method.",
-    5: "Back to security settings",
-  }),
-}));
-
 vi.mock("../../../../../utils/constants", () => ({
   PAGES: {
     deleteFIDO2PasskeySuccess: "DeleteFIDO2PasskeySuccess",
@@ -68,14 +58,20 @@ describe("DeleteFIDO2PasskeySuccess", () => {
 
   it("renders the success heading", () => {
     render(<DeleteFIDO2PasskeySuccess onNext={onNext} />);
-    expect(screen.getByText("Passkey deleted")).toBeInTheDocument();
+    expect(
+      screen.getByText("Remove passkey from your device (optional)"),
+    ).toBeInTheDocument();
   });
 
   it("renders body text", () => {
     render(<DeleteFIDO2PasskeySuccess onNext={onNext} />);
-    expect(screen.getByText("has been removed")).toBeInTheDocument();
     expect(
-      screen.getByText("You can still sign in using another method."),
+      screen.getByText("removing the passkey from your password manager."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "For more information on how to do this, see the help centre of your password manager provider.",
+      ),
     ).toBeInTheDocument();
   });
 
@@ -96,12 +92,12 @@ describe("DeleteFIDO2PasskeySuccess", () => {
 
   it("renders the navigation button", () => {
     render(<DeleteFIDO2PasskeySuccess onNext={onNext} />);
-    expect(screen.getByText("Back to security settings")).toBeInTheDocument();
+    expect(screen.getByText("Continue")).toBeInTheDocument();
   });
 
   it("calls onNext when the button is clicked", async () => {
     render(<DeleteFIDO2PasskeySuccess onNext={onNext} />);
-    await userEvent.click(screen.getByText("Back to security settings"));
+    await userEvent.click(screen.getByText("Continue"));
     expect(onNext).toHaveBeenCalledOnce();
   });
 });

@@ -9,7 +9,7 @@ import {
 import { getErrorMessage } from "../../../../utils/errorUtils";
 import { usePasswordValidation } from "../../../../hooks/usePasswordValidation";
 import PasswordVerification from "../../../TransientOtp/components/PasswordVerification";
-import { getPageContent } from "../../../../utils/functions";
+import { useTranslation } from "react-i18next";
 import StepContent from "../../../../components/Wizard/StepContent";
 import Loader from "../../../../components/Layout/Loading";
 import DeleteFIDO2PasskeyConfirm from "./DeleteFIDO2PasskeyConfirm";
@@ -45,7 +45,7 @@ export default function DeleteFIDO2PasskeyPage({
   const [wizardStep, setWizardStep] = useState(step ?? "passwordVerification");
   const [errorCode, setErrorCode] = useState("");
   const errorMessage = getErrorMessage(language, errorCode);
-  const loaderPageContentJson = getPageContent(language, PAGES.otpSelection)!;
+  const { t } = useTranslation("security");
   const [userPasswordValue, setUserPasswordValue] = useState("");
 
   const [selected2FAPasskey, setSelected2FAPasskey] =
@@ -237,7 +237,7 @@ export default function DeleteFIDO2PasskeyPage({
     ),
   };
   return isLoading ? (
-    <Loader text={loaderPageContentJson["11"]} />
+    <Loader text={t("OtpSelection.loading")} />
   ) : (
     <StepContent
       StepComponent={steps[wizardStep]}

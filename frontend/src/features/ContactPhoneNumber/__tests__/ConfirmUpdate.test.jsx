@@ -80,32 +80,6 @@ vi.mock("@gcds-core/components-react", () => ({
   ),
 }));
 
-// Mock functions
-vi.mock("../../../utils/functions", () => ({
-  getPageContent: (language, page) => {
-    const mockContent = {
-      ConfirmContactPhoneNumberUpdate: {
-        1: "Are you sure you want to update your contact phone number?",
-        2: "You've requested to update your contact phone number to:",
-        3: "+1 (555) 123-4567",
-        4: "This will update your contact phone number with the following services:",
-        5: "GEO.ca",
-        6: "This only changes your",
-        7: "contact phone number.",
-        8: "To change your 2-step verification number, go to your",
-        9: "security settings.",
-        10: "Yes, update",
-        11: "Cancel",
-      },
-      Button: {
-        submit: "Yes, update",
-        cancel: "Cancel",
-      },
-    };
-    return mockContent[page] || {};
-  },
-}));
-
 // Mock react-router
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
@@ -176,7 +150,7 @@ describe("ConfirmUpdate Component", () => {
     );
 
     expect(screen.getByTestId("gcds-heading")).toHaveTextContent(
-      "Are you sure you want to update your contact phone number?",
+      "Are you sure you want to update your phone number?",
     );
   });
 

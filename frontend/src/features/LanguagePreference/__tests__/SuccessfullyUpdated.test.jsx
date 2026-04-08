@@ -37,28 +37,6 @@ vi.mock("../../../services/authService", () => ({
   },
 }));
 
-vi.mock("../../../utils/functions", () => ({
-  getPageContent: vi.fn(() => ({
-    1: "Your language preference has been successfully updated to",
-    2: "What happens next?",
-    3: "Updates to your language preference",
-    4: "Your language preference will be applied to all communications and notifications.",
-    5: "To change the interface language,",
-    6: "Return to profile",
-    7: "Sign out",
-    8: "update your browser settings",
-  })),
-  convertLanguageToLanguageCode: vi.fn((language) => {
-    if (language === "en" || language === "en-ca") {
-      return "en";
-    }
-    if (language === "fr" || language === "fr-ca") {
-      return "fr";
-    }
-    return language;
-  }),
-}));
-
 vi.mock("../../../utils/routeHelpers", () => ({
   path: vi.fn((page, params) => {
     if (page === "profile-home") {
@@ -217,7 +195,7 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
       const noticeText = within(notice).getByTestId("gcds-text");
 
       expect(noticeText).toHaveTextContent(
-        "Your language preference has been successfully updated to French",
+        "Your language preference has been updated to French",
       );
     });
 
@@ -225,7 +203,11 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
       setup();
 
       expect(screen.getByTestId("gcds-heading-h1")).toBeInTheDocument();
-      expect(screen.getByText("What happens next?")).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          "You may need to update your language preference in other places",
+        ),
+      ).toBeInTheDocument();
     });
 
     it("renders the subheading", () => {
@@ -233,7 +215,9 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
 
       expect(screen.getByTestId("gcds-heading-h4")).toBeInTheDocument();
       expect(
-        screen.getByText("Updates to your language preference"),
+        screen.getByText(
+          "This only changes your language preference with services connected to your CanadaLogin.",
+        ),
       ).toBeInTheDocument();
     });
 
@@ -244,7 +228,7 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
       expect(textElements.length).toBeGreaterThan(0);
       expect(
         screen.getByText(
-          "Your language preference will be applied to all communications and notifications.",
+          "If you are trying to update your language preference with a service that's not connected to your CanadaLogin, you'll need to go to that account.",
         ),
       ).toBeInTheDocument();
     });
@@ -258,9 +242,7 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
         "href",
         EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory,
       );
-      expect(
-        screen.getByText("update your browser settings"),
-      ).toBeInTheDocument();
+      expect(screen.getByText("GC Account directory.")).toBeInTheDocument();
     });
 
     it("renders return to profile button", () => {
@@ -268,7 +250,7 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
 
       const primaryButton = screen.getByTestId("gcds-button-primary");
       expect(primaryButton).toBeInTheDocument();
-      expect(primaryButton).toHaveTextContent("Return to profile");
+      expect(primaryButton).toHaveTextContent("Back to profile");
     });
 
     it("renders sign out button", () => {
@@ -568,9 +550,11 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
       setup();
 
       const headings = screen.getAllByRole("heading");
-      expect(headings[0]).toHaveTextContent("What happens next?");
+      expect(headings[0]).toHaveTextContent(
+        "You may need to update your language preference in other places",
+      );
       expect(headings[1]).toHaveTextContent(
-        "Updates to your language preference",
+        "This only changes your language preference with services connected to your CanadaLogin.",
       );
     });
   });
@@ -631,7 +615,7 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
       const primaryButton = screen.getByTestId("gcds-button-primary");
       const secondaryButton = screen.getByTestId("gcds-button-secondary");
 
-      expect(primaryButton).toHaveTextContent("Return to profile");
+      expect(primaryButton).toHaveTextContent("Back to profile");
       expect(secondaryButton).toHaveTextContent("Sign out");
     });
   });

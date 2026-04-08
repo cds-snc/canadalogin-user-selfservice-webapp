@@ -26,26 +26,6 @@ vi.mock("react-router", async () => {
   };
 });
 
-vi.mock("../../../utils/functions", () => ({
-  getPageContent: vi.fn(() => ({
-    1: "Confirm language update",
-    2: "You are changing your language to",
-    4: "Once confirmed, the interface will update.",
-    5: "Step 1",
-    8: "Confirm",
-    9: "Cancel",
-    10: "Step 2",
-    13: "This will update your language preference with",
-    14: "all",
-    15: "services you have connected to your",
-    16: "CanadaLogin",
-    17: ".",
-  })),
-  convertLanguageToLanguageCode: vi.fn((val) =>
-    val.startsWith("fr") ? "fr" : "en",
-  ),
-}));
-
 vi.mock("../../../utils/routeHelpers", () => ({
   path: vi.fn((page, params) => `/${params.language}/${page}`),
 }));
@@ -159,12 +139,14 @@ describe("ConfirmLanguageUpdate Component", () => {
 
     const textElements = screen.getAllByTestId("gcds-text");
     const languageChangeText = textElements.find((el) =>
-      el.textContent.includes("You are changing your language to"),
+      el.textContent.includes(
+        "You've requested to update your language preference to:",
+      ),
     );
 
     expect(languageChangeText).toBeInTheDocument();
     expect(languageChangeText).toHaveTextContent(
-      "You are changing your language to French.",
+      "You've requested to update your language preference to: French.",
     );
     expect(screen.getByText("French")).toBeInTheDocument();
   });
@@ -173,7 +155,7 @@ describe("ConfirmLanguageUpdate Component", () => {
     const mockOnConfirm = vi.fn().mockResolvedValue();
     setup({ onConfirm: mockOnConfirm });
 
-    const confirmButton = screen.getByText("Confirm");
+    const confirmButton = screen.getByText("Yes, update");
     fireEvent.click(confirmButton);
 
     await waitFor(() => {
@@ -184,7 +166,7 @@ describe("ConfirmLanguageUpdate Component", () => {
   it("disables button when localLoading is true", () => {
     setup({ localLoading: true });
 
-    const confirmButton = screen.getByText("Confirm");
+    const confirmButton = screen.getByText("Yes, update");
     expect(confirmButton).toBeDisabled();
   });
 

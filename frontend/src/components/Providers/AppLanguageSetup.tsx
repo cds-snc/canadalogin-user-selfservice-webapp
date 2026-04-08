@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router";
+import { useTranslation } from "react-i18next";
 import { useLanguage } from "./LanguageProvider.tsx";
 import { useUser } from "./useUser.tsx";
 import { AVAILABLE_LANGUAGES } from "../../utils/constants";
@@ -25,6 +26,7 @@ export const AppLanguageSetup = () => {
   const { state: languageState, setAppLanguage } = useLanguage();
   const { userProfile, isLoading } = state;
   const { language } = languageState;
+  const { i18n } = useTranslation();
 
   const navigateHelper = useNavigateHelper();
 
@@ -53,6 +55,10 @@ export const AppLanguageSetup = () => {
 
     if (languageToDisplay !== language) {
       setAppLanguage(languageToDisplay);
+    }
+
+    if (i18n.language !== languageToDisplay) {
+      i18n.changeLanguage(languageToDisplay);
     }
 
     if (languageToDisplay !== normalizedUrlLanguage) {

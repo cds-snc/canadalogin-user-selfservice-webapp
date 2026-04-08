@@ -119,21 +119,6 @@ vi.mock("@gcds-core/components-react", () => ({
   GcdsLink: ({ children, ...props }) => <a {...props}>{children}</a>,
 }));
 
-vi.mock("../../../utils/functions", () => ({
-  getPageContent: vi.fn(() => ({
-    1: "Hello",
-    2: "Profile Updated Successfully",
-    3: "What's next?",
-    4: "Your profile information has been updated.",
-    5: "You can now continue using our services or",
-    6: "Back to Profile",
-    7: "Sign Out",
-    8: "learn more about our services",
-    12: "Signing out...",
-    13: "Error signing out. Redirecting...",
-  })),
-}));
-
 vi.mock("../../../utils/constants", () => ({
   PAGES: {
     ProfileHome: "profile-home",
@@ -209,12 +194,14 @@ describe("SuccessfullyUpdatedName", () => {
     );
 
     // Check for the name in the success message (rendered together in strong tag)
-    expect(screen.getByText(/Hello\s+John Doe/)).toBeInTheDocument();
     expect(
-      screen.getByText("Profile Updated Successfully"),
+      screen.getByText(/Your name has been updated to\s+John Doe/),
     ).toBeInTheDocument();
-    expect(screen.getByText("Sign Out")).toBeInTheDocument();
-    expect(screen.getByText("Back to Profile")).toBeInTheDocument();
+    expect(
+      screen.getByText("You may need to update your name in other places."),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Sign out")).toBeInTheDocument();
+    expect(screen.getByText("Back to profile")).toBeInTheDocument();
   });
 
   it("renders with empty name when nameFormData is null", () => {
@@ -229,10 +216,12 @@ describe("SuccessfullyUpdatedName", () => {
       </TestWrapper>,
     );
 
-    // Should render with "Hello " (empty username)
-    expect(screen.getByText("Hello")).toBeInTheDocument();
+    // Should render with "Your name has been updated to" (empty username)
     expect(
-      screen.getByText("Profile Updated Successfully"),
+      screen.getByText("Your name has been updated to"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("You may need to update your name in other places."),
     ).toBeInTheDocument();
   });
 
@@ -248,10 +237,12 @@ describe("SuccessfullyUpdatedName", () => {
       </TestWrapper>,
     );
 
-    // Should render with "Hello " (empty username)
-    expect(screen.getByText("Hello")).toBeInTheDocument();
+    // Should render with "Your name has been updated to" (empty username)
     expect(
-      screen.getByText("Profile Updated Successfully"),
+      screen.getByText("Your name has been updated to"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("You may need to update your name in other places."),
     ).toBeInTheDocument();
   });
 
@@ -267,7 +258,7 @@ describe("SuccessfullyUpdatedName", () => {
       </TestWrapper>,
     );
 
-    const backButton = screen.getByText("Back to Profile");
+    const backButton = screen.getByText("Back to profile");
 
     await act(async () => {
       backButton.click();
@@ -288,13 +279,13 @@ describe("SuccessfullyUpdatedName", () => {
       </TestWrapper>,
     );
 
-    const signOutButton = screen.getByText("Sign Out");
+    const signOutButton = screen.getByText("Sign out");
 
     await act(async () => {
       signOutButton.click();
     });
 
-    expect(mockSetLoading).toHaveBeenCalledWith(true, "Signing out...");
+    expect(mockSetLoading).toHaveBeenCalledWith(true, "Signing you out...");
   });
 
   it("handles logout success and redirects", async () => {
@@ -309,7 +300,7 @@ describe("SuccessfullyUpdatedName", () => {
       </TestWrapper>,
     );
 
-    const signOutButton = screen.getByText("Sign Out");
+    const signOutButton = screen.getByText("Sign out");
 
     await act(async () => {
       signOutButton.click();
@@ -342,7 +333,7 @@ describe("SuccessfullyUpdatedName", () => {
       </TestWrapper>,
     );
 
-    const signOutButton = screen.getByText("Sign Out");
+    const signOutButton = screen.getByText("Sign out");
 
     await act(async () => {
       signOutButton.click();
@@ -355,7 +346,7 @@ describe("SuccessfullyUpdatedName", () => {
 
     expect(mockSetLoading).toHaveBeenCalledWith(
       true,
-      "Error signing out. Redirecting...",
+      "Failed to sign you out. Redirecting...",
     );
   });
 
@@ -371,6 +362,8 @@ describe("SuccessfullyUpdatedName", () => {
       </TestWrapper>,
     );
 
-    expect(screen.getByText(/Hello\s+Jane Marie Smith/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Your name has been updated to\s+Jane Marie Smith/),
+    ).toBeInTheDocument();
   });
 });

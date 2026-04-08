@@ -142,26 +142,6 @@ vi.mock("@gcds-core/components-react", () => ({
   ),
 }));
 
-// Mock utility functions
-vi.mock("../../../utils/functions", () => ({
-  getPageContent: () => ({
-    1: "Confirm name update",
-    2: "You've requested to update your name to:",
-    5: "Service 1",
-    7: "Heads up",
-    8: "Yes, update",
-    9: "Cancel",
-    10: "Service 2",
-    11: "This does not",
-    12: "legally change your name.",
-    13: "This will update your name with",
-    14: "all",
-    15: "services you have connected to your",
-    16: "CanadaLogin",
-    17: ".",
-  }),
-}));
-
 // Mock route helpers
 vi.mock("../../../utils/routeHelpers", () => ({
   path: vi.fn((page) => {
@@ -371,7 +351,9 @@ describe("ConfirmUpdate Component Tests", () => {
     });
 
     // Check for heading
-    expect(screen.getByText("Confirm name update")).toBeInTheDocument();
+    expect(
+      screen.getByText("Are you sure you want to update your name?"),
+    ).toBeInTheDocument();
 
     // Check for confirmation text
     expect(
@@ -380,13 +362,13 @@ describe("ConfirmUpdate Component Tests", () => {
 
     // Check for service info
     expect(
-      screen.getByText((content) =>
-        content.includes("This will update your name with"),
+      screen.getByText(
+        /This will update your name with all services you have connected to your CanadaLogin\./,
       ),
     ).toBeInTheDocument();
 
     // Check for notice section
-    expect(screen.getByText(/Heads up/)).toBeInTheDocument();
+    expect(screen.getByText(/does not/)).toBeInTheDocument();
 
     // Check for buttons
     expect(screen.getByText("Yes, update")).toBeInTheDocument();

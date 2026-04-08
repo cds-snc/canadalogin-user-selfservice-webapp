@@ -15,7 +15,7 @@ import PasswordVerification from "../../../TransientOtp/components/PasswordVerif
 import OtpSelection from "../../../TransientOtp/components/OtpSelection";
 import OtpVerification from "../../../TransientOtp/components/OtpVerification";
 import { authService } from "../../../../services/authService";
-import { getPageContent } from "../../../../utils/functions";
+import { useTranslation } from "react-i18next";
 import StepContent from "../../../../components/Wizard/StepContent";
 import Loader from "../../../../components/Layout/Loading";
 import AddFIDO2Passkey from "./AddFIDO2Passkey";
@@ -44,11 +44,7 @@ export default function AddFIDO2PasskeyPage({
   const { userProfile } = state;
   const { id, userName } = userProfile ?? {};
   const errorMessage = getErrorMessage(language, errorCode);
-  const loaderPageContentJson = getPageContent(language, PAGES.otpSelection)!;
-  const addFIDO2PasskeyNicknamepageContent = getPageContent(
-    language,
-    PAGES.addFIDO2PasskeyNickname,
-  )!;
+  const { t } = useTranslation(["security", "fido2"]);
   const [userPasswordValue, setUserPasswordValue] = useState("");
   const [selected2FAPasskey, setSelected2FAPasskey] =
     useState<Fido2Credential | null>(null);
@@ -141,7 +137,7 @@ export default function AddFIDO2PasskeyPage({
         setAuthenticatorDescription(
           !!metadata?.description
             ? metadata?.description
-            : addFIDO2PasskeyNicknamepageContent["defaultPasskeyName"],
+            : t("AddFIDO2PasskeyNickname.defaultPasskeyName", { ns: "fido2" }),
         );
       }
 
@@ -324,7 +320,7 @@ export default function AddFIDO2PasskeyPage({
     registrationLoading;
 
   return isLoading ? (
-    <Loader text={loaderPageContentJson["11"]} />
+    <Loader text={t("OtpSelection.loading")} />
   ) : (
     <StepContent
       StepComponent={steps[wizardStep]}

@@ -12,7 +12,7 @@ import { userProfileDispatch } from "../../../utils/userProfileDispatch";
 import { getErrorMessage } from "../../../utils/errorUtils";
 import { authService } from "../../../services/authService";
 
-import { getPageContent } from "../../../utils/functions";
+import { useTranslation } from "react-i18next";
 import { path } from "../../../utils/routeHelpers";
 import OtpSelection from "../../TransientOtp/components/OtpSelection";
 import OtpVerification from "../../TransientOtp/components/OtpVerification";
@@ -56,8 +56,7 @@ export default function ChangePasswordIndex() {
   const errorMessage = getErrorMessage(language, errorCode);
 
   const [userPasswordValue, setUserPasswordValue] = useState("");
-  const pageContentJson = getPageContent(language, PAGES.otpSelection) ?? {};
-  const navBarContent = getPageContent(language, "TopNavBar") ?? {};
+  const { t } = useTranslation(["security", "layout"]);
 
   const [passwordUpdateStep, setPasswordUpdateStep] =
     useState<PasswordUpdateStep>(defaultPasswordUpdateStep);
@@ -197,7 +196,7 @@ export default function ChangePasswordIndex() {
   };
 
   const logout = async () => {
-    setLoading(true, navBarContent["8"]);
+    setLoading(true, t("TopNavBar.signingOut", { ns: "layout" }));
 
     try {
       const response = await authService.logout();
@@ -226,7 +225,7 @@ export default function ChangePasswordIndex() {
         step: CHANGE_PASSWORD_ANALYTICS.STEPS.LOGOUT,
         error: errorMessage,
       });
-      setLoading(true, navBarContent["9"]);
+      setLoading(true, t("TopNavBar.signOutFailed", { ns: "layout" }));
       setTimeout(() => {
         window.location.href = "/";
       }, 2000);
@@ -341,7 +340,7 @@ export default function ChangePasswordIndex() {
   const stepComponent = steps[passwordUpdateStep] as ReactNode;
 
   return localLoading || validatePasswordLoading ? (
-    <Loader text={pageContentJson["11"]} />
+    <Loader text={t("OtpSelection.loading")} />
   ) : (
     <StepContent
       StepComponent={stepComponent}

@@ -1,0 +1,42 @@
+{
+  "EditLanguagePreferences": {
+    "title": "Modifier votre langue de communication",
+    "description": "Cette action modifiera la langue officielle dans laquelle ConnexionCanada et les services liés à ConnexionCanada communiqueront avec vous.",
+    "chooseLanguage": "Veuillez choisir votre langue de communication",
+    "english": "Anglais",
+    "french": "Français",
+    "continueButton": "Continuer",
+    "cancelButton": "Annuler",
+    "confirmMessage": "Êtes-vous certain de vouloir mettre à jour votre préférence linguistique vers :",
+    "servicesNotice": "Cela mettra à jour votre langue auprès des services suivants :",
+    "rpName": "RP Name"
+  },
+  "ConfirmLanguageUpdate": {
+    "title": "Voulez-vous vraiment mettre à jour votre langue de communication?",
+    "requestedUpdate": "Vous avez demandé à changer votre langue de communication pour la langue suivante:",
+    "exampleName": "Exemple : Nouveau nom",
+    "allServicesNotice": "Cette action mettra à jour votre langue de communication pour tous les services que vous avez connectés à votre identifiant ConnexionCanada.",
+    "headsUp": "Attention",
+    "thisText": "Ceci",
+    "confirmButton": "Oui, mettre à jour",
+    "cancelButton": "Annuler",
+    "doesNot": "ne modifie pas",
+    "legallyChangeName": "légalement votre nom."
+  },
+  "SuccessfullyUpdatedLanguage": {
+    "successTitle": "Réussite",
+    "languageUpdatedTo": "Votre langue de communication est maintenant le",
+    "updateOtherPlaces": "Vous devez peut-être mettre à jour votre langue de communication ailleurs.",
+    "onlyConnectedServices": "Cette action ne modifie votre langue de communication que pour les services liés à votre identifiant ConnexionCanada.",
+    "notConnectedNotice": "Si vous cherchez à mettre à jour votre langue de communication pour un service qui n'est pas lié à votre identifiant ConnexionCanada, vous devez le faire depuis le compte que vous possédez pour le service en question.",
+    "searchOtherAccounts": "Pour rechercher un autre compte du GC, consultez le",
+    "backToProfile": "Retour au profil",
+    "signOut": "Se déconnecter",
+    "gcAccountDirectory": "répertoire des comptes du GC.",
+    "viewConnectedServices": "Pour voir les services connectés à votre identifiant ConnexionCanada, accédez à ",
+    "connectedServices": "Services connectés",
+    "inYourDashboard": "dans votre tableau de bord ConnexionCanada.",
+    "signingOut": "Déconnexion en cours...",
+    "signOutFailed": "Échec de la déconnexion. Redirection..."
+  }
+}

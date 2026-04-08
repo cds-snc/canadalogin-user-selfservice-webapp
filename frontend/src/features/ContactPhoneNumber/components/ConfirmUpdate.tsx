@@ -10,15 +10,12 @@ import {
   GcdsText,
 } from "@gcds-core/components-react";
 
-import { getPageContent } from "../../../utils/functions";
-import { PAGES } from "../../../utils/constants";
+import { useTranslation } from "react-i18next";
 import SubmitButton from "../../../components/Layout/SubmitButton";
 import { path } from "../../../utils/routeHelpers";
+import { PAGES } from "../../../utils/constants";
 import { trackButtonClick } from "../../../utils/gatag";
-import type {
-  ContactPhoneConfirmUpdateProps,
-  ContactPhonePageContent,
-} from "../../../types/contactPhoneNumber";
+import type { ContactPhoneConfirmUpdateProps } from "../../../types/contactPhoneNumber";
 
 export default function ConfirmUpdate({
   onNext,
@@ -29,10 +26,7 @@ export default function ConfirmUpdate({
   localLoading,
 }: ContactPhoneConfirmUpdateProps) {
   const { language = "en" } = useParams<{ language: string }>();
-  const pageContentJson =
-    (getPageContent(language, PAGES.confirmContactPhoneNumberUpdate) as
-      | ContactPhonePageContent
-      | undefined) ?? {};
+  const { t } = useTranslation("phone");
 
   const manage2FAVerificationsPage = path(PAGES.manage2FAVerifications, {
     language,
@@ -61,33 +55,32 @@ export default function ConfirmUpdate({
       ) : null}
       <GcdsGrid columns="1" gap="300">
         <GcdsHeading tag="h1" lang={language}>
-          {pageContentJson["1"]}
+          {t("ConfirmContactPhoneNumberUpdate.title")}
         </GcdsHeading>
         <div>
-          <GcdsText marginBottom="0">{pageContentJson["2"]}</GcdsText>
+          <GcdsText marginBottom="0">
+            {t("ConfirmContactPhoneNumberUpdate.requestedUpdate")}
+          </GcdsText>
           <GcdsText marginTop="0">
             <strong>{phoneFormData.formattedPhoneNumber}</strong>
-            {pageContentJson["16"]}
           </GcdsText>
         </div>
 
         <GcdsText>
-          <GcdsText>
-            {pageContentJson["12"]} <strong>{pageContentJson["13"]}</strong>{" "}
-            {pageContentJson["14"]} <strong>{pageContentJson["15"]}</strong>
-            {pageContentJson["16"]}
-          </GcdsText>
+          {t("ConfirmContactPhoneNumberUpdate.allServicesNotice")}
         </GcdsText>
 
         <GcdsNotice noticeRole="info" noticeTitleTag="h2" noticeTitle=" ">
           <GcdsText>
-            {pageContentJson["6"]} <strong>{pageContentJson["7"]}</strong>
+            {t("ConfirmContactPhoneNumberUpdate.onlyChanges")}{" "}
+            <strong>
+              {t("ConfirmContactPhoneNumberUpdate.contactPhoneNumber")}
+            </strong>
             <GcdsText>
-              {pageContentJson["8"]}{" "}
+              {t("ConfirmContactPhoneNumberUpdate.changeTwoStep")}{" "}
               <GcdsLink href={manage2FAVerificationsPage}>
-                {pageContentJson["9"]}
+                {t("ConfirmContactPhoneNumberUpdate.securitySettings")}
               </GcdsLink>
-              {pageContentJson["16"]}
             </GcdsText>
           </GcdsText>
         </GcdsNotice>
@@ -98,7 +91,7 @@ export default function ConfirmUpdate({
             onGcdsClick={onSubmitClick}
             currentLang={language}
           >
-            {pageContentJson["10"]}
+            {t("ConfirmContactPhoneNumberUpdate.confirmButton")}
           </SubmitButton>
           <GcdsButton
             buttonRole="secondary"
@@ -114,7 +107,7 @@ export default function ConfirmUpdate({
               void onCancel();
             }}
           >
-            {pageContentJson["11"]}
+            {t("ConfirmContactPhoneNumberUpdate.cancelButton")}
           </GcdsButton>
         </GcdsGrid>
       </GcdsGrid>

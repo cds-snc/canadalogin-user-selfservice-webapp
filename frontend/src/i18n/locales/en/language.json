@@ -1,0 +1,42 @@
+{
+  "EditLanguagePreferences": {
+    "title": "Edit your language preference",
+    "description": "This will update the official language that CanadaLogin and the services connected to CanadaLogin will send you communications in.",
+    "chooseLanguage": "Choose your language preference",
+    "english": "English",
+    "french": "French",
+    "continueButton": "Continue",
+    "cancelButton": "Cancel",
+    "confirmMessage": "Are you sure you want to update your language preference to:",
+    "servicesNotice": "This will update your language with the following services:",
+    "rpName": "RP Name"
+  },
+  "ConfirmLanguageUpdate": {
+    "title": "Are you sure you want to update your language preference?",
+    "requestedUpdate": "You've requested to update your language preference to:",
+    "exampleName": "Example Newname",
+    "allServicesNotice": "This will update your language preference with all services you have connected to your CanadaLogin.",
+    "headsUp": "Heads up",
+    "thisText": "This ",
+    "confirmButton": "Yes, update",
+    "cancelButton": "Cancel",
+    "doesNot": "does not ",
+    "legallyChangeName": "legally change your name."
+  },
+  "SuccessfullyUpdatedLanguage": {
+    "successTitle": "Success",
+    "languageUpdatedTo": "Your language preference has been updated to",
+    "updateOtherPlaces": "You may need to update your language preference in other places",
+    "onlyConnectedServices": "This only changes your language preference with services connected to your CanadaLogin.",
+    "notConnectedNotice": "If you are trying to update your language preference with a service that's not connected to your CanadaLogin, you'll need to go to that account. ",
+    "searchOtherAccounts": "To search for another GC Account, visit the ",
+    "backToProfile": "Back to profile",
+    "signOut": "Sign out",
+    "gcAccountDirectory": "GC Account directory.",
+    "viewConnectedServices": "To view what services are connected to your CanadaLogin, go to ",
+    "connectedServices": "Connected Services ",
+    "inYourDashboard": "in your CanadaLogin dashboard.",
+    "signingOut": "Signing you out...",
+    "signOutFailed": "Failed to sign you out. Redirecting..."
+  }
+}

@@ -16,18 +16,16 @@ import {
   GcdsRadios,
   GcdsText,
 } from "@gcds-core/components-react";
-import { getPageContent } from "../../../utils/functions";
+import { useTranslation } from "react-i18next";
 import {
   countryMapping,
   FLOW_TYPES,
-  PAGES,
   ServicesWithAccessInfoSectionInformation,
 } from "../../../utils/constants";
 import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection";
 import SubmitButton from "../../../components/Layout/SubmitButton";
 import type {
   ContactPhoneOtpType,
-  ContactPhonePageContent,
   ContactPhoneStepProps,
 } from "../../../types/contactPhoneNumber";
 import { trackButtonClick } from "../../../utils/gatag";
@@ -67,16 +65,16 @@ const TypedPhoneInput = PhoneInput as unknown as (
 
 interface PageHeaderProps {
   language: string;
-  pageContentJson: ContactPhonePageContent;
 }
 
-function PageHeader({ language, pageContentJson }: PageHeaderProps) {
+function PageHeader({ language }: PageHeaderProps) {
+  const { t } = useTranslation("phone");
   return (
     <>
       <GcdsHeading tag="h1" lang={language}>
-        {pageContentJson["1"]}
+        {t("EnterNewPhoneNumber.title")}
       </GcdsHeading>
-      <GcdsText>{pageContentJson["2"]}</GcdsText>
+      <GcdsText>{t("EnterNewPhoneNumber.description")}</GcdsText>
       <ServicesWithAccessInfoSection
         currentLang={language}
         information={
@@ -87,16 +85,13 @@ function PageHeader({ language, pageContentJson }: PageHeaderProps) {
   );
 }
 
-function MyCountryIsNotListed({
-  pageContentJson,
-}: {
-  pageContentJson: ContactPhonePageContent;
-}) {
+function MyCountryIsNotListed() {
+  const { t } = useTranslation("phone");
   return (
     <GcdsText>
-      <GcdsDetails detailsTitle={pageContentJson["11"]}>
+      <GcdsDetails detailsTitle={t("EnterNewPhoneNumber.countryNotListed")}>
         <GcdsText>
-          <span>{pageContentJson["12"]}</span>
+          <span>{t("EnterNewPhoneNumber.countryNotSupported")}</span>
         </GcdsText>
       </GcdsDetails>
     </GcdsText>
@@ -113,30 +108,29 @@ type RadioOption = {
 
 interface RadioButtonsProps {
   onChangePhoneForm: ContactPhoneStepProps["onChangePhoneForm"];
-  pageContentJson: ContactPhonePageContent;
   phoneFormData: ContactPhoneStepProps["phoneFormData"];
   setErrorCode?: ContactPhoneStepProps["setErrorCode"];
 }
 
 function RadioButtons({
   onChangePhoneForm,
-  pageContentJson,
   phoneFormData,
   setErrorCode,
 }: RadioButtonsProps) {
+  const { t } = useTranslation("security");
   const radioOptions: RadioOption[] = [
     {
-      label: pageContentJson["7"],
+      label: t("OtpSelection.textMessage"),
       id: FLOW_TYPES.sms,
       value: FLOW_TYPES.sms,
-      hint: pageContentJson["8"],
+      hint: t("OtpSelection.mobileOnly"),
       checked: phoneFormData.otpType === FLOW_TYPES.sms,
     },
     {
-      label: pageContentJson["9"],
+      label: t("OtpSelection.voiceCall"),
       id: FLOW_TYPES.voice,
       value: FLOW_TYPES.voice,
-      hint: pageContentJson["10"],
+      hint: t("OtpSelection.mobileOrLandline"),
       checked: phoneFormData.otpType === FLOW_TYPES.voice,
     },
   ];
@@ -144,8 +138,8 @@ function RadioButtons({
   return (
     <GcdsRadios
       name="radio"
-      legend={pageContentJson["5"]}
-      hint={pageContentJson["13"]}
+      legend={t("OtpSelection.howToSendCode")}
+      hint={t("OtpSelection.carrierCharges")}
       options={radioOptions}
       onGcdsChange={(event: Event) => {
         const target = event.target as HTMLInputElement;
@@ -174,18 +168,7 @@ export default function EnterPhoneNumber({
 }: ContactPhoneStepProps) {
   const { language = "en" } = useParams<{ language: string }>();
   const [phoneNumberValid, setPhoneNumberValid] = useState(true);
-  const pageContentJson =
-    (getPageContent(language, PAGES.enterNewPhoneNumber) as
-      | ContactPhonePageContent
-      | undefined) ?? {};
-  const otpPageContentJson =
-    (getPageContent(language, PAGES.otpSelection) as
-      | ContactPhonePageContent
-      | undefined) ?? {};
-  const buttonContent =
-    (getPageContent(language, "Button") as
-      | ContactPhonePageContent
-      | undefined) ?? {};
+  const { t } = useTranslation(["phone", "security", "common"]);
 
   const validatePhoneNumber = (phoneNumber: string, countryCode?: string) => {
     const normalizedCountryCode = countryCode?.toUpperCase();
@@ -241,7 +224,7 @@ export default function EnterPhoneNumber({
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="500">
         <section>
-          <PageHeader language={language} pageContentJson={pageContentJson} />
+          <PageHeader language={language} />
         </section>
 
         <form onSubmit={onSubmitHandler}>
@@ -257,7 +240,7 @@ export default function EnterPhoneNumber({
                 required: true,
                 autoFocus: true,
               }}
-              specialLabel={pageContentJson["10"]}
+              specialLabel={t("EnterNewPhoneNumber.phoneLabel")}
               country="ca"
               preferredCountries={["ca"]}
               onlyCountries={countryMapping.countries as unknown as string[]}
@@ -271,7 +254,7 @@ export default function EnterPhoneNumber({
               enableSearch
               countryCodeEditable={false}
               disableSearchIcon={false}
-              defaultErrorMessage={pageContentJson["14"]}
+              defaultErrorMessage={t("EnterNewPhoneNumber.phoneRequired")}
               onChange={(phone, country, _event, formatted) => {
                 onChangePhoneForm("phoneNumber", `+${phone}`);
                 onChangePhoneForm("formattedPhoneNumber", formatted);
@@ -291,12 +274,13 @@ export default function EnterPhoneNumber({
         </form>
 
         <section>
-          <MyCountryIsNotListed pageContentJson={pageContentJson} />
-          <GcdsHeading tag="h3">{pageContentJson["13"]}</GcdsHeading>
-          <GcdsText>{pageContentJson["15"]}</GcdsText>
+          <MyCountryIsNotListed />
+          <GcdsHeading tag="h3">
+            {t("EnterNewPhoneNumber.verifyNumber")}
+          </GcdsHeading>
+          <GcdsText>{t("EnterNewPhoneNumber.verifyDescription")}</GcdsText>
           <RadioButtons
             onChangePhoneForm={onChangePhoneForm}
-            pageContentJson={otpPageContentJson}
             phoneFormData={phoneFormData}
             setErrorCode={setErrorCode}
           />
@@ -323,7 +307,7 @@ export default function EnterPhoneNumber({
             void onCancel();
           }}
         >
-          {buttonContent.cancel}
+          {t("Button.cancel", { ns: "common" })}
         </GcdsButton>
       </GcdsGrid>
     </GcdsContainer>

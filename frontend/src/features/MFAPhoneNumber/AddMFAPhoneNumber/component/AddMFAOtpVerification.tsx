@@ -11,47 +11,47 @@ import {
   GcdsText,
 } from "@gcds-core/components-react";
 import { useParams } from "react-router";
-import { FLOW_TYPES, PAGES } from "../../../../utils/constants";
-import { getPageContent } from "../../../../utils/functions";
+import { FLOW_TYPES } from "../../../../utils/constants";
+import { useTranslation } from "react-i18next";
 import SubmitButton from "../../../../components/Layout/SubmitButton";
 
 const initialTime = 10;
 
 interface PageHeaderProps {
   language: string | undefined;
-  pageContentJson: Record<string, string>;
   userMfaType: string;
   formattedPhoneNumber: string;
 }
 
 const PageHeader = ({
   language,
-  pageContentJson,
   userMfaType,
   formattedPhoneNumber,
 }: PageHeaderProps) => {
+  const { t } = useTranslation("verification");
   return (
     <>
       <GcdsHeading tag="h1" lang={language}>
-        {pageContentJson["1"]}
+        {t("Verification.checkYourPhone")}
       </GcdsHeading>
       <GcdsText marginBottom="0">
         {userMfaType === FLOW_TYPES.sms
-          ? pageContentJson["2"]
-          : pageContentJson["3"]}
+          ? t("Verification.smsCodeSent")
+          : t("Verification.voiceCodeSent")}
       </GcdsText>
       <GcdsText marginTop="0">
         <strong>{formattedPhoneNumber}</strong>
       </GcdsText>
       <GcdsText>
         {userMfaType === FLOW_TYPES.voice
-          ? pageContentJson["5"]
+          ? t("Verification.callMayTakeMinutes")
           : userMfaType === FLOW_TYPES.sms
-            ? pageContentJson["4"]
-            : pageContentJson["24"]}
+            ? t("Verification.smsMayTakeMinutes")
+            : t("Verification.emailMayTakeMinutes")}
       </GcdsText>
       <GcdsText>
-        {pageContentJson["6"]} <strong>{pageContentJson["7"]}</strong>
+        {t("Verification.codeExpiresIn")}{" "}
+        <strong>{t("Verification.tenMinutes")}</strong>
       </GcdsText>
     </>
   );
@@ -93,8 +93,7 @@ export default function AddMFAOtpVerification({
 
   const [codeRequested, setCodeRequested] = useState(false);
   const [time, setTime] = useState(initialTime);
-  const pageContentJson = getPageContent(language, PAGES.verification)!;
-  const { cancel } = getPageContent(language, "Button")!;
+  const { t } = useTranslation(["verification", "common"]);
 
   const clearValues = () => {
     onChangePhoneForm("phoneNumber", "");
@@ -151,7 +150,7 @@ export default function AddMFAOtpVerification({
         <GcdsNotice
           noticeRole="success"
           noticeTitleTag="h2"
-          noticeTitle={pageContentJson["17"]}
+          noticeTitle={t("Verification.newCodeSent")}
           data-testid="linkSuccess"
         >
           &nbsp;
@@ -161,16 +160,15 @@ export default function AddMFAOtpVerification({
       <GcdsContainer>
         <PageHeader
           language={language}
-          pageContentJson={pageContentJson}
           userMfaType={userMfaType}
           formattedPhoneNumber={phoneFormData.formattedPhoneNumber}
         />
 
-        <GcdsHeading tag="h2">{pageContentJson["8"]}</GcdsHeading>
+        <GcdsHeading tag="h2">{t("Verification.enterCode")}</GcdsHeading>
         <form onSubmit={onSubmitHandler}>
           <GcdsInput
             inputId="verificationCode"
-            label={pageContentJson["9"]}
+            label={t("Verification.sixDigitCode")}
             autoFocus
             autocomplete="one-time-code"
             name="verificationCode"
@@ -205,11 +203,11 @@ export default function AddMFAOtpVerification({
               onCancel();
             }}
           >
-            {cancel}
+            {t("Button.cancel", { ns: "common" })}
           </GcdsButton>
         </GcdsGrid>
       </GcdsContainer>
-      <GcdsHeading tag="h2">{pageContentJson["10"]}</GcdsHeading>
+      <GcdsHeading tag="h2">{t("Verification.problemsWithCode")}</GcdsHeading>
 
       <GcdsText>
         <GcdsLink
@@ -218,18 +216,18 @@ export default function AddMFAOtpVerification({
           }}
         >
           {userMfaType === FLOW_TYPES.sms
-            ? pageContentJson["29"]
-            : pageContentJson["28"]}
+            ? t("Verification.setupVoiceInstead")
+            : t("Verification.setupSmsInstead")}
         </GcdsLink>
       </GcdsText>
 
       <GcdsText>
         {time > 0 ? (
           <span>
-            {pageContentJson["14"]}
+            {t("Verification.requestNewCodeIn")}
             <strong>
               {" "}
-              {time} {pageContentJson["15"]}
+              {time} {t("Verification.seconds")}
             </strong>
           </span>
         ) : (
@@ -239,8 +237,8 @@ export default function AddMFAOtpVerification({
             }}
           >
             {userMfaType !== FLOW_TYPES.email
-              ? pageContentJson["16"]
-              : pageContentJson["26"]}
+              ? t("Verification.requestNewCode")
+              : t("Verification.sendCodeAgain")}
           </GcdsLink>
         )}
       </GcdsText>
@@ -253,7 +251,7 @@ export default function AddMFAOtpVerification({
             onBack();
           }}
         >
-          {pageContentJson["21"]}
+          {t("Verification.tryAnotherWay")}
         </GcdsLink>
       </GcdsText>
     </GcdsContainer>

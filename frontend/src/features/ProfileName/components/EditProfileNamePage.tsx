@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { useNavigate, useParams } from "react-router";
 
 import { useUser } from "../../../components/Providers/useUser";
-import { getPageContent } from "../../../utils/functions";
+import { useTranslation } from "react-i18next";
 import { PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import { authService } from "../../../services/authService";
@@ -18,7 +18,6 @@ import ProfileUpdateName from "./ProfileUpdateName";
 import SuccessfullyUpdated from "./SuccessfullyUpdated";
 import type {
   ProfileNameFormData,
-  ProfileNamePageContent,
   ProfileNameWizardStep,
 } from "../../../types/profileName";
 import type {
@@ -69,14 +68,7 @@ export default function EditProfileNamePage() {
     formId: PROFILE_NAME_ANALYTICS.FLOW_ID,
   });
 
-  const loaderPageContentJson =
-    (getPageContent(routeLanguage, PAGES.otpSelection) as
-      | ProfileNamePageContent
-      | undefined) ?? {};
-  const errorPageJson =
-    (getPageContent(routeLanguage, PAGES.error) as
-      | ProfileNamePageContent
-      | undefined) ?? {};
+  const { t } = useTranslation(["security", "common"]);
 
   const { updateProfileSuccess } = userProfileDispatch(dispatch);
   const backToProfile = path(PAGES.ProfileHome, { language: routeLanguage });
@@ -157,10 +149,9 @@ export default function EditProfileNamePage() {
     navigate(backToProfile);
   };
 
-  let errorMessage = errorPageJson[errorCode] || "";
-  if (errorCode && errorMessage === "") {
-    errorMessage = errorCode;
-  }
+  let errorMessage = errorCode
+    ? t(`Error.${errorCode}`, { ns: "common", defaultValue: "" }) || errorCode
+    : "";
 
   const steps: Record<ProfileNameWizardStep, ReactNode> = {
     editName: (
@@ -205,7 +196,7 @@ export default function EditProfileNamePage() {
   };
 
   return localLoading ? (
-    <Loader text={loaderPageContentJson["11"]} />
+    <Loader text={t("OtpSelection.loading")} />
   ) : (
     <StepContent
       StepComponent={steps[wizardStep]}
