@@ -12,7 +12,6 @@ import {
 import { getPageContent } from "../../../utils/functions";
 import { PAGES } from "../../../utils/constants";
 import Loader from "../../../components/Layout/Loading";
-import RPNameDisplay from "../../../components/RPInfo/RPNameDisplay";
 import SubmitButton from "../../../components/Layout/SubmitButton";
 import type {
   ProfileNameConfirmProps,
@@ -67,14 +66,14 @@ export default function ConfirmUpdate({
           <GcdsHeading tag="h1">{pageContentJson["1"]}</GcdsHeading>
           <div>
             <GcdsText marginBottom="400">
-              {pageContentJson["2"]} <strong>{formattedName}</strong>.
+              {pageContentJson["2"]} <strong>{formattedName}</strong>
+              {pageContentJson["17"]}
             </GcdsText>
-            <GcdsText marginBottom="0">{pageContentJson["4"]}</GcdsText>
-            <ul>
-              <li>
-                <RPNameDisplay rpName={pageContentJson["5"]} />
-              </li>
-            </ul>
+            <GcdsText>
+              {pageContentJson["13"]} <strong>{pageContentJson["14"]}</strong>{" "}
+              {pageContentJson["15"]} <strong>{pageContentJson["16"]}</strong>
+              {pageContentJson["17"]}
+            </GcdsText>
           </div>
 
           <GcdsNotice noticeRole="info" noticeTitleTag="h2" noticeTitle=" ">

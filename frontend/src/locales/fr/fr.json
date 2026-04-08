@@ -118,7 +118,12 @@
     "8": "Oui, mettre à jour",
     "9": "Annuler",
     "11": "ne modifie pas",
-    "12": "votre nom sur le plan légal."
+    "12": "votre nom sur le plan légal.",
+    "13": "Cette action mettra à jour votre nom pour",
+    "14": "tous",
+    "15": "les services que vous avez connectés à votre identifiant",
+    "16": "ConnexionCanada",
+    "17": "."
   },
   "ProfileHome": {
     "1": "Renseignements personnels",
