@@ -12,7 +12,6 @@ import {
 
 import { getPageContent } from "../../../utils/functions";
 import { PAGES } from "../../../utils/constants";
-import RPNameDisplay from "../../../components/RPInfo/RPNameDisplay";
 import SubmitButton from "../../../components/Layout/SubmitButton";
 import { path } from "../../../utils/routeHelpers";
 import { trackButtonClick } from "../../../utils/gatag";
@@ -68,16 +67,16 @@ export default function ConfirmUpdate({
           <GcdsText marginBottom="0">{pageContentJson["2"]}</GcdsText>
           <GcdsText marginTop="0">
             <strong>{phoneFormData.formattedPhoneNumber}</strong>
+            {pageContentJson["16"]}
           </GcdsText>
         </div>
 
         <GcdsText>
-          {pageContentJson["4"]}
-          <ul>
-            <li>
-              <RPNameDisplay rpName={pageContentJson["5"]} />
-            </li>
-          </ul>
+          <GcdsText>
+            {pageContentJson["12"]} <strong>{pageContentJson["13"]}</strong>{" "}
+            {pageContentJson["14"]} <strong>{pageContentJson["15"]}</strong>
+            {pageContentJson["16"]}
+          </GcdsText>
         </GcdsText>
 
         <GcdsNotice noticeRole="info" noticeTitleTag="h2" noticeTitle=" ">
@@ -88,6 +87,7 @@ export default function ConfirmUpdate({
               <GcdsLink href={manage2FAVerificationsPage}>
                 {pageContentJson["9"]}
               </GcdsLink>
+              {pageContentJson["16"]}
             </GcdsText>
           </GcdsText>
         </GcdsNotice>

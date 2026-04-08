@@ -10,7 +10,6 @@ import {
 
 import { getPageContent } from "../../../utils/functions";
 import { LANGUAGE_DISPLAY_NAMES, PAGES } from "../../../utils/constants";
-import RPNameDisplay from "../../../components/RPInfo/RPNameDisplay";
 import SubmitButton from "../../../components/Layout/SubmitButton";
 import type {
   LanguagePreferenceConfirmProps,
@@ -56,14 +55,14 @@ export default function ConfirmUpdate({
 
       <GcdsHeading tag="h1">{pageContentJson["1"]}</GcdsHeading>
       <GcdsText>
-        {pageContentJson["2"]} <strong>{displayLanguageName}</strong>.
+        {pageContentJson["2"]} <strong>{displayLanguageName}</strong>
+        {pageContentJson["17"]}
       </GcdsText>
-      <GcdsText>{pageContentJson["4"]}</GcdsText>
-      <ul>
-        <li>
-          <RPNameDisplay rpName={pageContentJson["5"]} />
-        </li>
-      </ul>
+      <GcdsText>
+        {pageContentJson["13"]} <strong>{pageContentJson["14"]}</strong>{" "}
+        {pageContentJson["15"]} <strong>{pageContentJson["16"]}</strong>
+        {pageContentJson["17"]}
+      </GcdsText>
 
       <GcdsGrid columns="max-content max-content" gap="200">
         <SubmitButton
