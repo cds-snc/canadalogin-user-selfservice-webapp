@@ -35,6 +35,11 @@ vi.mock("../../../utils/functions", () => ({
     8: "Confirm",
     9: "Cancel",
     10: "Step 2",
+    13: "This will update your language preference with",
+    14: "all",
+    15: "services you have connected to your",
+    16: "CanadaLogin",
+    17: ".",
   })),
   convertLanguageToLanguageCode: vi.fn((val) =>
     val.startsWith("fr") ? "fr" : "en",

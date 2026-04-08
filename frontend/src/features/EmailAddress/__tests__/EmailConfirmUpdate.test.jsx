@@ -135,9 +135,12 @@ describe("EmailConfirmUpdate", () => {
   const defaultPageContent = {
     1: "Confirm your email address change", // Heading
     2: "Your new email address will be", // Text before email
-    3: "This will be used to:", // Text after email
-    4: "Sign in to your account", // RP name text
     5: "Confirm", // Submit button text
+    6: "This will update your email with",
+    7: "all",
+    8: "services you have connected to your",
+    9: "CanadaLogin",
+    10: ".",
   };
 
   const defaultButtonContent = {
@@ -204,11 +207,14 @@ describe("EmailConfirmUpdate", () => {
       expect(screen.getByText("test@example.com")).toBeInTheDocument();
     });
 
-    it("renders RP name display section", () => {
+    it("renders update info text section", () => {
       renderComponent();
 
-      expect(screen.getByTestId("rp-name-display")).toBeInTheDocument();
-      expect(screen.getByText("Sign in to your account")).toBeInTheDocument();
+      expect(
+        screen.getByText((content) =>
+          content.includes("This will update your email with"),
+        ),
+      ).toBeInTheDocument();
     });
 
     it("renders submit and cancel buttons", () => {
@@ -458,12 +464,15 @@ describe("EmailConfirmUpdate", () => {
   });
 
   describe("Component Integration", () => {
-    it("passes correct props to RPNameDisplay", () => {
+    it("renders service update info text", () => {
       renderComponent();
 
-      const rpDisplay = screen.getByTestId("rp-name-display");
-      expect(rpDisplay).toBeInTheDocument();
-      expect(rpDisplay).toHaveTextContent("Sign in to your account");
+      expect(screen.getByText("all")).toBeInTheDocument();
+      expect(
+        screen.getByText((content) =>
+          content.includes("services you have connected to your"),
+        ),
+      ).toBeInTheDocument();
     });
 
     it("passes correct props to SubmitButton", () => {
@@ -486,8 +495,11 @@ describe("EmailConfirmUpdate", () => {
           content.includes("Your new email address will be"),
         ),
       ).toBeInTheDocument();
-      expect(screen.getByText("This will be used to:")).toBeInTheDocument();
-      expect(screen.getByText("Sign in to your account")).toBeInTheDocument();
+      expect(
+        screen.getByText((content) =>
+          content.includes("This will update your email with"),
+        ),
+      ).toBeInTheDocument();
     });
   });
 
@@ -513,14 +525,11 @@ describe("EmailConfirmUpdate", () => {
       expect(strongEmail.tagName.toLowerCase()).toBe("strong");
     });
 
-    it("renders structured content with list", () => {
+    it("renders text content sections", () => {
       renderComponent();
 
-      const list = screen.getByRole("list");
-      expect(list).toBeInTheDocument();
-
-      const listItem = screen.getByRole("listitem");
-      expect(listItem).toBeInTheDocument();
+      const textElements = screen.getAllByTestId("gcds-text");
+      expect(textElements.length).toBeGreaterThanOrEqual(2);
     });
   });
 
