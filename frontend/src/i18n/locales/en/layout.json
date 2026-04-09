@@ -24,8 +24,7 @@
   },
   "ServicesWithAccessInfo": {
     "title": "What services have access to your {{information}}",
-    "description": "The following services have access to your {{information}} through CanadaLogin:",
-    "rpName": "RP Name",
+    "description": "Only services you have connected to your CanadaLogin have access to your {{information}}.",
     "notConnectedNotice": "If you are trying to update your {{information}} with a service that's not connected to CanadaLogin, you'll need to go to that account.",
     "searchOtherAccounts": "To search for another GC Account, visit the",
     "gcAccountDirectory": "GC Account directory",

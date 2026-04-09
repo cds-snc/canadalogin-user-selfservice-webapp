@@ -24,8 +24,7 @@
   },
   "ServicesWithAccessInfo": {
     "title": "Services ayant accès à votre {{information}}",
-    "description": "Les services suivants ont accès à votre {{information}} par le biais de ConnexionCanada :",
-    "rpName": "RP Name",
+    "description": "Seuls les services que vous avez connectés à votre identifiant ConnexionCanada ont accès à votre {{information}}.",
     "notConnectedNotice": "Si vous cherchez à mettre à jour votre {{information}} pour un service qui n'est pas lié à votre identifiant ConnexionCanada, vous devez le faire depuis le compte que vous possédez pour le service en question.",
     "searchOtherAccounts": "Pour rechercher un autre compte du GC, consultez le",
     "gcAccountDirectory": "répertoire des comptes du GC",

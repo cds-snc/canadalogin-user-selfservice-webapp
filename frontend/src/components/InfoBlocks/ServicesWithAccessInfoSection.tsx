@@ -4,7 +4,6 @@ import {
   EXTERNAL_NAVIGATION_LINKS,
   ServicesWithAccessInfoSectionInformation,
 } from "../../utils/constants";
-import RPNameDisplay from "../RPInfo/RPNameDisplay";
 
 interface ServicesWithAccessInfoSectionProps {
   currentLang: string;
@@ -38,17 +37,10 @@ export default function ServicesWithAccessInfoSection({
       })}
     >
       <GcdsText>
-        <span>
-          {t("ServicesWithAccessInfo.description", {
-            information: informationMap[information],
-          })}
-        </span>
+        {t("ServicesWithAccessInfo.description", {
+          information: informationMap[information],
+        })}
       </GcdsText>
-      <ul style={{ margin: 0 }}>
-        <li>
-          <RPNameDisplay rpName={t("ServicesWithAccessInfo.rpName")} />
-        </li>
-      </ul>
       <GcdsText>
         {t("ServicesWithAccessInfo.notConnectedNotice", {
           information: informationMap[information],
