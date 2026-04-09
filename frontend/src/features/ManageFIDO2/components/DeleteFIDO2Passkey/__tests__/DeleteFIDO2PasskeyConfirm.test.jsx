@@ -17,16 +17,6 @@ vi.mock("react-router", () => ({
   useParams: () => ({ language: "en" }),
 }));
 
-vi.mock("../../../../../utils/functions", () => ({
-  getPageContent: () => ({
-    1: "Are you sure you want to delete this passkey?",
-    2: "You are about to delete",
-    3: "from your account.",
-    9: "Delete passkey",
-    10: "Cancel",
-  }),
-}));
-
 vi.mock("../../../../../utils/constants", () => ({
   PAGES: {
     deleteFIDO2PasskeyConfirm: "DeleteFIDO2PasskeyConfirm",
@@ -74,13 +64,13 @@ describe("DeleteFIDO2PasskeyConfirm", () => {
 
   it("renders confirm and cancel buttons", () => {
     render(<DeleteFIDO2PasskeyConfirm {...defaultProps} />);
-    expect(screen.getByText("Delete passkey")).toBeInTheDocument();
+    expect(screen.getByText("Yes, delete")).toBeInTheDocument();
     expect(screen.getByText("Cancel")).toBeInTheDocument();
   });
 
   it("confirm button has danger role", () => {
     render(<DeleteFIDO2PasskeyConfirm {...defaultProps} />);
-    expect(screen.getByText("Delete passkey")).toHaveAttribute(
+    expect(screen.getByText("Yes, delete")).toHaveAttribute(
       "data-role",
       "danger",
     );
@@ -96,7 +86,7 @@ describe("DeleteFIDO2PasskeyConfirm", () => {
 
   it("calls onConfirm when confirm button is clicked", async () => {
     render(<DeleteFIDO2PasskeyConfirm {...defaultProps} />);
-    await userEvent.click(screen.getByText("Delete passkey"));
+    await userEvent.click(screen.getByText("Yes, delete"));
     expect(defaultProps.onConfirm).toHaveBeenCalledOnce();
   });
 

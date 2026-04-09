@@ -112,11 +112,6 @@ vi.mock("react-router", async () => {
   };
 });
 
-// Mock utility functions
-vi.mock("../../../utils/functions", () => ({
-  getPageContent: vi.fn(),
-}));
-
 // Mock constants
 vi.mock("../../../utils/constants", () => ({
   PAGES: {
@@ -146,11 +141,9 @@ vi.mock("../../../components/Layout/SubmitButton", () => ({
 
 // Import mocked functions
 import { useParams } from "react-router";
-import { getPageContent } from "../../../utils/functions";
 
 describe("EditEmailEnterEmail", () => {
   const mockUseParams = vi.mocked(useParams);
-  const mockGetPageContent = vi.mocked(getPageContent);
   const mockOnSubmit = vi.fn();
   const mockOnCancel = vi.fn();
   const mockHandleFormChange = vi.fn();
@@ -168,22 +161,6 @@ describe("EditEmailEnterEmail", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockUseParams.mockReturnValue({ language: "en" });
-    mockGetPageContent.mockImplementation((language, page) => {
-      if (page === "EditEmailEnterEmail") {
-        return {
-          1: "Change your email address",
-          2: "Your new email address will be used to:",
-          3: "Sign in to your account",
-          4: "Receive important notifications",
-          5: "Recover your account if needed",
-          6: "New email address",
-        };
-      }
-      if (page === "Button") {
-        return { cancel: "Cancel" };
-      }
-      return {};
-    });
   });
 
   const renderComponent = (props = {}) => {
@@ -222,16 +199,6 @@ describe("EditEmailEnterEmail", () => {
       expect(submitButton).toBeInTheDocument();
     });
 
-    it("calls getPageContent with correct parameters", () => {
-      renderComponent();
-
-      expect(mockGetPageContent).toHaveBeenCalledWith(
-        "en",
-        "EditEmailEnterEmail",
-      );
-      expect(mockGetPageContent).toHaveBeenCalledWith("en", "Button");
-    });
-
     it("renders cancel button with correct text", () => {
       renderComponent();
 
@@ -244,52 +211,25 @@ describe("EditEmailEnterEmail", () => {
       renderComponent();
 
       expect(mockUseParams).toHaveBeenCalled();
-      expect(mockGetPageContent).toHaveBeenCalledWith(
-        "en",
-        "EditEmailEnterEmail",
-      );
       expect(screen.getByTestId("services-info-section")).toHaveTextContent(
         "Services info for en - emailAddress",
       );
     });
 
-    it("renders with French content", () => {
+    it("renders with French language param", () => {
       mockUseParams.mockReturnValue({ language: "fr" });
-      mockGetPageContent.mockImplementation((language, page) => {
-        if (language === "fr" && page === "EditEmailEnterEmail") {
-          return {
-            1: "Changer votre adresse courriel",
-            2: "Votre nouvelle adresse courriel sera utilisée pour:",
-            3: "Vous connecter à votre compte",
-            4: "Recevoir des notifications importantes",
-            5: "Récupérer votre compte si nécessaire",
-            6: "Nouvelle adresse courriel",
-          };
-        }
-        if (page === "Button") {
-          return { cancel: "Annuler" };
-        }
-        return {};
-      });
 
       renderComponent();
 
       expect(mockUseParams).toHaveBeenCalled();
-      expect(mockGetPageContent).toHaveBeenCalledWith(
-        "fr",
-        "EditEmailEnterEmail",
+      expect(screen.getByTestId("services-info-section")).toHaveTextContent(
+        "Services info for fr - emailAddress",
       );
-      expect(screen.getByText("Annuler")).toBeInTheDocument();
     });
 
     it("handles missing language parameter", () => {
       mockUseParams.mockReturnValue({});
-      renderComponent();
-
-      expect(mockGetPageContent).toHaveBeenCalledWith(
-        undefined,
-        "EditEmailEnterEmail",
-      );
+      expect(() => renderComponent()).not.toThrow();
     });
   });
 
@@ -541,17 +481,11 @@ describe("EditEmailEnterEmail", () => {
     });
 
     it("handles missing page content gracefully", () => {
-      mockGetPageContent.mockReturnValue({});
-
       expect(() => renderComponent()).not.toThrow();
     });
 
     it("handles missing page content properties", () => {
-      // Component expects getPageContent to return an object, not null
-      // When null is returned, the component will throw due to destructuring
-      mockGetPageContent.mockReturnValue(null);
-
-      expect(() => renderComponent()).toThrow();
+      expect(() => renderComponent()).not.toThrow();
     });
 
     it("handles async onSubmit calls correctly", async () => {
@@ -602,16 +536,22 @@ describe("EditEmailEnterEmail", () => {
       renderComponent();
 
       // Check that all page content is rendered
-      expect(screen.getByText("Change your email address")).toBeInTheDocument();
+      expect(screen.getByText("Enter a new email address")).toBeInTheDocument();
       expect(
-        screen.getByText("Your new email address will be used to:"),
-      ).toBeInTheDocument();
-      expect(screen.getByText("Sign in to your account")).toBeInTheDocument();
-      expect(
-        screen.getByText("Receive important notifications"),
+        screen.getByText("Changing your email address will affect:"),
       ).toBeInTheDocument();
       expect(
-        screen.getByText("Recover your account if needed"),
+        screen.getByText("The email address you use to sign in"),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          "The email address that CanadaLogin uses to contact you",
+        ),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          "The email address that services connected to your CanadaLogin may use to contact you",
+        ),
       ).toBeInTheDocument();
     });
   });
@@ -642,30 +582,18 @@ describe("EditEmailEnterEmail", () => {
       mockUseParams.mockReturnValue({ language: undefined });
 
       expect(() => renderComponent()).not.toThrow();
-      expect(mockGetPageContent).toHaveBeenCalledWith(
-        undefined,
-        "EditEmailEnterEmail",
-      );
     });
 
     it("handles empty string language parameter", () => {
       mockUseParams.mockReturnValue({ language: "" });
 
-      renderComponent();
-      expect(mockGetPageContent).toHaveBeenCalledWith(
-        "",
-        "EditEmailEnterEmail",
-      );
+      expect(() => renderComponent()).not.toThrow();
     });
 
     it("handles null language parameter", () => {
       mockUseParams.mockReturnValue({ language: null });
 
-      renderComponent();
-      expect(mockGetPageContent).toHaveBeenCalledWith(
-        null,
-        "EditEmailEnterEmail",
-      );
+      expect(() => renderComponent()).not.toThrow();
     });
 
     it("handles missing useParams return", () => {
@@ -677,34 +605,12 @@ describe("EditEmailEnterEmail", () => {
     });
 
     it("handles undefined page content sections", () => {
-      // Component tries to destructure from undefined page content
-      // This will cause an error when destructuring { cancel }
-      mockGetPageContent.mockImplementation((language, page) => {
-        if (page === "EditEmailEnterEmail") {
-          return undefined;
-        }
-        if (page === "Button") {
-          return undefined;
-        }
-        return {};
-      });
-
-      expect(() => renderComponent()).toThrow();
+      expect(() => renderComponent()).not.toThrow();
     });
 
     it("handles partial page content", () => {
-      mockGetPageContent.mockImplementation((language, page) => {
-        if (page === "EditEmailEnterEmail") {
-          return { 1: "Title only" }; // Missing other keys
-        }
-        if (page === "Button") {
-          return {}; // Missing cancel key
-        }
-        return {};
-      });
-
       renderComponent();
-      expect(screen.getByText("Title only")).toBeInTheDocument();
+      expect(screen.getByText("Enter a new email address")).toBeInTheDocument();
     });
 
     it("handles very long email addresses", async () => {

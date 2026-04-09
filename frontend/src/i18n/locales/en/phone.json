@@ -1,0 +1,54 @@
+{
+  "EnterNewPhoneNumber": {
+    "title": "Enter a new phone number",
+    "description": "This will update the phone number that CanadaLogin, and services connected to your CanadaLogin may use to contact you.",
+    "servicesAccessTitle": "What services have access to your contact phone number",
+    "servicesAccessDescription": "The following services have access to your contact phone number:",
+    "rpName": "RP Name",
+    "notConnectedNotice": "If you are trying to update your contact phone number with a service that's not connected to CanadaLogin, you'll need to go to that account.",
+    "searchOtherAccounts": "To search for another GC Account, visit the",
+    "gcAccountDirectory": "GC Account directory",
+    "countryLabel": "Country",
+    "phoneLabel": "Phone number",
+    "countryNotListed": "My country is not in the list",
+    "countryNotSupported": "Some countries are not supported due to technical limitations. If your country is not listed, you will be unable to create a CanadaLogin at this time. We apologize for the inconvenience.",
+    "verifyNumber": "Verify your number",
+    "phoneRequired": "Phone number is required",
+    "verifyDescription": "We are going to verify your phone number by sending a 6-digit code to your phone."
+  },
+  "AreYouSureUpdateContactNumber": {
+    "title": "Are you sure you want to update your contact phone number?",
+    "requestedUpdate": "You've requested to update your contact number to:",
+    "examplePhone": "+1 (123) 456-7890",
+    "servicesNotice": "This will update your contact number with the following services:",
+    "rpName": "RP Name",
+    "onlyChanges": "This only changes your",
+    "contactPhoneNumber": "contact phone number.",
+    "changeTwoStep": "To change your 2-step verification number, go to your",
+    "securitySettings": "security settings.",
+    "confirmButton": "Yes, update",
+    "cancelButton": "Cancel"
+  },
+  "ConfirmContactPhoneNumberUpdate": {
+    "title": "Are you sure you want to update your phone number?",
+    "requestedUpdate": "You've requested to update your contact phone number to:",
+    "exampleName": "Example Newname",
+    "allServicesNotice": "This will update your contact phone number with <bold>all</bold> services you have connected to your <bold>CanadaLogin</bold>.",
+    "onlyChanges": "This only changes your",
+    "contactPhoneNumber": "contact phone number.",
+    "changeTwoStep": "To change your 2-step verification number, go to your",
+    "securitySettings": "security settings.",
+    "confirmButton": "Yes, update",
+    "cancelButton": "Cancel"
+  },
+  "SuccessfullyUpdatedContactPhoneNumber": {
+    "phoneUpdatedTo": "Your contact phone number has been updated to",
+    "updateOtherPlaces": "You may need to update your phone number in other places",
+    "onlyConnectedServices": "This only changes your contact phone number with services connected to your CanadaLogin. ",
+    "notConnectedNotice": "If you are trying to update your contact phone number with a service that's not connected to your CanadaLogin, you'll need to go to that account.",
+    "searchOtherAccounts": "To search for another GC Account, visit the",
+    "gcAccountDirectory": "GC Account directory.",
+    "backToProfile": "Back to profile",
+    "signOut": "Sign out"
+  }
+}

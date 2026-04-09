@@ -1,11 +1,10 @@
-import engJson from "../locales/en/en.json";
-import frJson from "../locales/fr/fr.json";
+import i18n from "../i18n/index";
+import { PAGE_NAMESPACE_MAP } from "../i18n/index";
 
 import { AVAILABLE_LANGUAGES, FOOTERS, PROFILE_LANGUAGES } from "./constants";
-import type { AppLanguage, ContentVariableMap } from "../types/utils";
+import type { AppLanguage } from "../types/utils";
 
 type PageContent = Record<string, string>;
-type LocalizedPages = Record<string, PageContent>;
 
 function getLangHref(currentLang: string, pathname: string) {
   let newPathname = pathname.slice(1 + currentLang.length);
@@ -50,22 +49,27 @@ export function getPageContent(
   language: string | undefined,
   pageName: string,
 ): PageContent | undefined {
-  const localizedPages =
-    language === AVAILABLE_LANGUAGES.fr
-      ? (frJson as LocalizedPages)
-      : (engJson as LocalizedPages);
+  const ns = PAGE_NAMESPACE_MAP[pageName];
+  if (!ns) {
+    return undefined;
+  }
 
-  return localizedPages[pageName];
+  const lng = language === AVAILABLE_LANGUAGES.fr ? "fr" : "en";
+  const bundle = i18n.getResourceBundle(lng, ns) as
+    | Record<string, PageContent>
+    | undefined;
+
+  return bundle?.[pageName];
 }
 
 export function getContentWithVariables(
   content: string,
-  variables: ContentVariableMap,
+  variables: Record<string, string | number>,
 ) {
   let updatedContent = content;
 
   Object.keys(variables).forEach((key) => {
-    const regex = new RegExp(`{${key}}`, "g");
+    const regex = new RegExp(`\\{\\{${key}\\}\\}`, "g");
     updatedContent = updatedContent.replace(regex, String(variables[key]));
   });
 

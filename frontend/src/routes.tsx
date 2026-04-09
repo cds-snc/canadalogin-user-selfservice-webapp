@@ -39,7 +39,7 @@ export const appRoutes: RouteObject[] = [
           { path: "/", element: <Navigate to="/en" replace /> },
           {
             path: "/:language",
-            handle: { id: PAGES.manageDashboard, breadcrumbId: "4" },
+            handle: { id: PAGES.manageDashboard, breadcrumbId: "pageTitle" },
             children: [
               {
                 index: true,
@@ -47,7 +47,7 @@ export const appRoutes: RouteObject[] = [
               },
               {
                 path: "profile",
-                handle: { id: PAGES.ProfileHome, breadcrumbId: "1" },
+                handle: { id: PAGES.ProfileHome, breadcrumbId: "title" },
                 children: [
                   {
                     index: true,
@@ -77,7 +77,10 @@ export const appRoutes: RouteObject[] = [
               },
               {
                 path: "security-settings",
-                handle: { id: PAGES.securitySettings, breadcrumbId: "11" },
+                handle: {
+                  id: PAGES.securitySettings,
+                  breadcrumbId: "pageTitle",
+                },
                 children: [
                   {
                     index: true,
@@ -92,7 +95,7 @@ export const appRoutes: RouteObject[] = [
                     path: "manage-2fa-verifications",
                     handle: {
                       id: PAGES.manage2FAVerifications,
-                      breadcrumbId: "1",
+                      breadcrumbId: "title",
                     },
                     children: [
                       {

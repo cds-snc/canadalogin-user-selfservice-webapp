@@ -68,22 +68,6 @@ vi.mock("../../../../hooks/usePasskeyOperations", () => ({
   usePasskeyOperations: () => mockUsePasskeyOperations(),
 }));
 
-vi.mock("../../../../utils/functions", () => ({
-  getPageContent: () => ({
-    1: "Manage 2-step verification methods",
-    2: "Choose how you would like to receive verification codes when signing in to your GC Account.",
-    3: "Phone numbers",
-    4: "Your phone numbers for 2-step verification.",
-    5: "Phone",
-    6: "Available methods:",
-    7: "Text message (SMS)",
-    8: "Voice call",
-    9: "Remove",
-    10: "Add phone number",
-    11: "Loading verification methods...",
-  }),
-}));
-
 vi.mock("../../../../utils/constants", () => ({
   PAGES: {
     manage2FAVerifications: "Manage2FAVerifications",
@@ -205,9 +189,7 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
     const { getByTestId } = render(<Manage2FAVerifications />);
     // Component will be in loading state when localLoading is true
     expect(getByTestId("loading")).toBeInTheDocument();
-    expect(getByTestId("loading")).toHaveTextContent(
-      "Loading verification methods...",
-    );
+    expect(getByTestId("loading")).toHaveTextContent("Loading...");
   });
 
   it("displays content when not loading", async () => {
@@ -330,10 +312,8 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
     const { getByText } = render(<Manage2FAVerifications />);
 
     await waitFor(() => {
-      expect(getByText("Add phone number")).toBeInTheDocument();
-      expect(
-        getByText("Manage 2-step verification methods"),
-      ).toBeInTheDocument();
+      expect(getByText("+ Add a phone number")).toBeInTheDocument();
+      expect(getByText("Manage 2-step verification")).toBeInTheDocument();
     });
   });
 
@@ -360,17 +340,17 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
     const { getByText } = render(<Manage2FAVerifications />);
 
     await waitFor(() => {
-      expect(
-        getByText("Manage 2-step verification methods"),
-      ).toBeInTheDocument();
+      expect(getByText("Manage 2-step verification")).toBeInTheDocument();
       expect(
         getByText(
-          "Choose how you would like to receive verification codes when signing in to your GC Account.",
+          "A second step after your password helps verify it's you signing in.",
         ),
       ).toBeInTheDocument();
-      expect(getByText("Phone numbers")).toBeInTheDocument();
+      expect(getByText("Available second steps")).toBeInTheDocument();
       expect(
-        getByText("Your phone numbers for 2-step verification."),
+        getByText(
+          "You can receive one-time verification codes at these numbers.",
+        ),
       ).toBeInTheDocument();
     });
   });
@@ -438,15 +418,15 @@ describe("Manage2FAVerifications — additional coverage", () => {
     // DEV_ONLY_FEATURE is mocked as true in constants mock
     const { getByText } = render(<Manage2FAVerifications />);
     // The add-fido2-button is inside the FIDO2 section
-    expect(getByText("Add phone number")).toBeInTheDocument(); // OTP section always present
+    expect(getByText("+ Add a phone number")).toBeInTheDocument(); // OTP section always present
   });
 
   it("add-mfa button navigates to the add MFA page", async () => {
     const { getByText } = render(<Manage2FAVerifications />);
     await waitFor(() =>
-      expect(getByText("Add phone number")).toBeInTheDocument(),
+      expect(getByText("+ Add a phone number")).toBeInTheDocument(),
     );
-    await userEvent.click(getByText("Add phone number"));
+    await userEvent.click(getByText("+ Add a phone number"));
     expect(mockNavigate).toHaveBeenCalledOnce();
   });
 
@@ -457,7 +437,7 @@ describe("Manage2FAVerifications — additional coverage", () => {
     await waitFor(() => {
       // The section card with FIDO2PasskeyList mock (returns null) should be present
       // We just verify the component renders without crashing and add-mfa-button is there
-      expect(getByText("Add phone number")).toBeInTheDocument();
+      expect(getByText("+ Add a phone number")).toBeInTheDocument();
     });
   });
 
@@ -477,7 +457,7 @@ describe("Manage2FAVerifications — additional coverage", () => {
     });
     const { getByText } = render(<Manage2FAVerifications />);
     await waitFor(() =>
-      expect(getByText("Add phone number")).toBeInTheDocument(),
+      expect(getByText("+ Add a phone number")).toBeInTheDocument(),
     );
   });
 });

@@ -5,7 +5,7 @@ import type {
   KeyboardEventHandler,
   ReactNode,
 } from "react";
-import { getPageContent } from "../../utils/functions";
+import { useTranslation } from "react-i18next";
 
 type BaseButtonProps = Omit<
   ComponentPropsWithoutRef<typeof GcdsButton>,
@@ -22,7 +22,7 @@ interface SubmitButtonProps extends BaseButtonProps {
 }
 
 export default function SubmitButton({
-  currentLang,
+  currentLang: _currentLang,
   disabled,
   onGcdsClick,
   style,
@@ -30,8 +30,7 @@ export default function SubmitButton({
   onKeyDown,
   ...props
 }: SubmitButtonProps) {
-  const buttonContent = getPageContent(currentLang, "Button") ?? {};
-  const submit = buttonContent.submit ?? "Submit";
+  const { t } = useTranslation("common");
 
   return (
     <GcdsButton
@@ -42,7 +41,7 @@ export default function SubmitButton({
       style={style}
       {...props}
     >
-      {children || submit}
+      {children || t("Button.submit")}
     </GcdsButton>
   );
 }

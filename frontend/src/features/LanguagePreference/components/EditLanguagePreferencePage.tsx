@@ -3,10 +3,8 @@ import type { ReactNode } from "react";
 import { useNavigate, useLocation, useParams } from "react-router";
 
 import { useUser } from "../../../components/Providers/useUser";
-import {
-  convertLanguageToLanguageCode,
-  getPageContent,
-} from "../../../utils/functions";
+import { convertLanguageToLanguageCode } from "../../../utils/functions";
+import { useTranslation } from "react-i18next";
 import { PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import { authService } from "../../../services/authService";
@@ -21,7 +19,6 @@ import EditLanguagePreferences from "./EditLanguagePreferences";
 import SuccessfullyUpdated from "./SuccessfullyUpdated";
 import type {
   LanguagePreferenceFormData,
-  LanguagePreferencePageContent,
   LanguagePreferenceWizardStep,
 } from "../../../types/languagePreference";
 import type {
@@ -64,14 +61,7 @@ export default function EditLanguagePreferencePage() {
     formId: LANGUAGE_PREFERENCE_ANALYTICS.FLOW_ID,
   });
 
-  const loaderPageContentJson =
-    (getPageContent(routeLanguage, PAGES.otpSelection) as
-      | LanguagePreferencePageContent
-      | undefined) ?? {};
-  const errorPageJson =
-    (getPageContent(routeLanguage, PAGES.error) as
-      | LanguagePreferencePageContent
-      | undefined) ?? {};
+  const { t } = useTranslation(["security", "common"]);
 
   const { updateProfileSuccess } = userProfileDispatch(dispatch);
 
@@ -169,10 +159,9 @@ export default function EditLanguagePreferencePage() {
     );
   };
 
-  let errorMessage = errorPageJson[errorCode] || "";
-  if (errorCode && errorMessage === "") {
-    errorMessage = errorCode;
-  }
+  let errorMessage = errorCode
+    ? t(`Error.${errorCode}`, { ns: "common", defaultValue: "" }) || errorCode
+    : "";
 
   const steps: Record<LanguagePreferenceWizardStep, ReactNode> = {
     editLanguage: (
@@ -214,7 +203,7 @@ export default function EditLanguagePreferencePage() {
   };
 
   return localLoading ? (
-    <Loader text={loaderPageContentJson["11"]} />
+    <Loader text={t("OtpSelection.loading")} />
   ) : (
     <StepContent
       StepComponent={steps[wizardStep]}

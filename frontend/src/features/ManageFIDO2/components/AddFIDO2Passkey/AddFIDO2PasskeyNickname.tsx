@@ -1,6 +1,5 @@
 import { useParams } from "react-router";
-import { getPageContent } from "../../../../utils/functions";
-import { PAGES } from "../../../../utils/constants";
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import {
   GcdsButton,
@@ -29,7 +28,7 @@ export default function AddFIDO2PasskeyNickname({
   initialNickname = "",
 }: AddFIDO2PasskeyNicknameProps) {
   const { language } = useParams();
-  const pageContent = getPageContent(language, PAGES.addFIDO2PasskeyNickname)!;
+  const { t } = useTranslation("fido2");
   const [newDeviceName, setNewDeviceName] = useState(initialNickname);
 
   const handleSubmit = async () => {
@@ -49,19 +48,21 @@ export default function AddFIDO2PasskeyNickname({
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="300">
         <GcdsHeading tag="h1" lang={language}>
-          {pageContent["1"]}
+          {t("AddFIDO2PasskeyNickname.title")}
         </GcdsHeading>
-        <GcdsText marginBottom="0">{pageContent["2"]}</GcdsText>
+        <GcdsText marginBottom="0">
+          {t("AddFIDO2PasskeyNickname.description")}
+        </GcdsText>
         <form onSubmit={onSubmitHandler}>
           <GcdsInput
             errorMessage={errorMessage}
             inputId="passkey-name"
-            label={pageContent["3"]}
+            label={t("AddFIDO2PasskeyNickname.label")}
             value={newDeviceName}
             onGcdsInput={(e: CustomEvent<string>) =>
               setNewDeviceName((e.target as HTMLInputElement).value)
             }
-            hint={pageContent["4"]}
+            hint={t("AddFIDO2PasskeyNickname.placeholder")}
           />
         </form>
         <GcdsGrid columns="max-content max-content" gap="200">
@@ -72,14 +73,14 @@ export default function AddFIDO2PasskeyNickname({
             }}
             disabled={registrationLoading}
           >
-            {pageContent["5"]}
+            {t("AddFIDO2PasskeyNickname.continueButton")}
           </GcdsButton>
           <GcdsButton
             buttonRole="secondary"
             onClick={onCancel}
             disabled={registrationLoading}
           >
-            {pageContent["6"]}
+            {t("AddFIDO2PasskeyNickname.cancelButton")}
           </GcdsButton>
         </GcdsGrid>
       </GcdsGrid>

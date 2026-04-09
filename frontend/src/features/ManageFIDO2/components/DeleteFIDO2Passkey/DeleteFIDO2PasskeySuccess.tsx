@@ -1,6 +1,6 @@
 import { useLocation, useParams } from "react-router";
-import { getPageContent } from "../../../../utils/functions";
-import { PAGES } from "../../../../utils/constants";
+import { useTranslation } from "react-i18next";
+
 import {
   GcdsButton,
   GcdsContainer,
@@ -22,10 +22,7 @@ export default function DeleteFIDO2PasskeySuccess({
   const { passkeyNickname } = (location.state ?? {}) as {
     passkeyNickname?: string;
   };
-  const pageContentJson = getPageContent(
-    language,
-    PAGES.deleteFIDO2PasskeySuccess,
-  )!;
+  const { t } = useTranslation("fido2");
 
   return (
     <GcdsContainer role="main">
@@ -36,12 +33,15 @@ export default function DeleteFIDO2PasskeySuccess({
         />
         <GcdsContainer>
           <GcdsHeading tag="h1" lang={language}>
-            {pageContentJson["1"]}
+            {t("DeleteFIDO2PasskeySuccess.title")}
           </GcdsHeading>
           <GcdsText>
-            {pageContentJson["2"]} <strong>{pageContentJson["3"]}</strong>{" "}
+            {t("DeleteFIDO2PasskeySuccess.recommendAlso")}{" "}
+            <strong>
+              {t("DeleteFIDO2PasskeySuccess.removeFromManager")}
+            </strong>{" "}
           </GcdsText>
-          <GcdsText>{pageContentJson["4"]}</GcdsText>
+          <GcdsText>{t("DeleteFIDO2PasskeySuccess.moreInformation")}</GcdsText>
         </GcdsContainer>
       </GcdsGrid>
 
@@ -51,7 +51,7 @@ export default function DeleteFIDO2PasskeySuccess({
           style={{ width: "fit-content" }}
           onGcdsClick={onNext}
         >
-          {pageContentJson["5"]}
+          {t("DeleteFIDO2PasskeySuccess.continueButton")}
         </GcdsButton>
       </GcdsGrid>
     </GcdsContainer>

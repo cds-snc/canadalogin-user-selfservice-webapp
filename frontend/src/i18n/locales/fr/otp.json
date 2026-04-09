@@ -1,0 +1,50 @@
+{
+  "TransientOtpSelection": {
+    "13": "Je n'ai pas accès à mon téléphone",
+    "title": "Procédez à la vérification en deux étapes",
+    "toChangePassword": "Pour modifier votre mot de passe,",
+    "firstComplete2Step": "procédez d'abord à la vérification en deux étapes.",
+    "chooseMethod": "Choisissez comment recevoir votre code de vérification",
+    "codeExpiresIn": "Le code expire",
+    "tenMinutes": "10 minutes",
+    "carrierCharges": "après l'envoi. Des frais d'opérateur peuvent s'appliquer.",
+    "textMessage": "Message texte",
+    "voiceCall": "Appel vocal",
+    "needHelp": "Besoin d'aide?",
+    "loading": "Chargement...",
+    "helpLink": "Obtenir de l'aide concernant la vérification en deux étapes",
+    "toAddPhone": "Pour ajouter un numéro de téléphone,",
+    "toDeleteNumber": "Pour supprimer un numéro de téléphone,",
+    "howToSendCode": "Comment souhaitez-vous recevoir le code?",
+    "passkeyOrSecurityKey": "Clé d'accès ou clé de sécurité",
+    "textMe": "M'envoyer un message texte",
+    "callMe": "M'appeler",
+    "verify": "Vérifier",
+    "chooseVerifyMethod": "Choisissez votre méthode de vérification",
+    "toDeletePasskey": "Pour supprimer une clé d'accès ou une clé de sécurité,",
+    "toAddPasskey": "Pour ajouter une clé d'accès ou une clé de sécurité,"
+  },
+  "PasswordVerification": {
+    "title": "Veuillez vous authentifier",
+    "toChangePassword": "Pour modifier votre mot de passe,",
+    "enterCurrentPassword": "entrez d'abord votre mot de passe actuel.",
+    "passwordLabel": "Mot de passe",
+    "forgotPassword": "Mot de passe oublié?",
+    "resetPassword": "Réinitialiser le mot de passe",
+    "toAddPhone": "Pour ajouter un numéro de téléphone,",
+    "toDeleteNumber": "Pour supprimer un numéro de téléphone,",
+    "toAddPasskey": "To add a passkey or security key,",
+    "toDeletePasskey": "To delete a passkey or security key,"
+  },
+  "NoticeFactory": {
+    "successfullyDeleted": "Vous avez supprimé le",
+    "fromVerificationNumbers": "des numéros de téléphone associés à la vérification en deux étapes",
+    "successfullyAdded": "Vous avez ajouté l'option de vérification par",
+    "verificationFor": "pour le numéro",
+    "voiceCall": "appel vocal",
+    "textSms": "message texte",
+    "passkeyCreated": "Your passkey has been created",
+    "yourPasskey": "from your 2-step verification passkeys",
+    "renamedPasskeyTo": "You have successfully renamed your passkey to"
+  }
+}

@@ -9,20 +9,16 @@ import {
   GcdsText,
 } from "@gcds-core/components-react";
 
-import { getPageContent } from "../../../utils/functions";
+import { useTranslation } from "react-i18next";
 import {
   EXTERNAL_NAVIGATION_LINKS,
   LANGUAGE_DISPLAY_NAMES,
-  PAGES,
 } from "../../../utils/constants";
 import { useUser } from "../../../components/Providers/useUser";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch";
 import { authService } from "../../../services/authService";
 import SubmitButton from "../../../components/Layout/SubmitButton";
-import type {
-  LanguagePreferencePageContent,
-  LanguagePreferenceSuccessProps,
-} from "../../../types/languagePreference";
+import type { LanguagePreferenceSuccessProps } from "../../../types/languagePreference";
 import type {
   AuthServiceResponse,
   LogoutResponseData,
@@ -36,15 +32,12 @@ export default function SuccessfullyUpdated({
   const routeLanguage = language === "fr" ? "fr" : "en";
   const { state, dispatch } = useUser();
   const { setLoading } = userProfileDispatch(dispatch);
-  const pageContentJson =
-    (getPageContent(routeLanguage, PAGES.successfullyUpdatedLanguage) as
-      | LanguagePreferencePageContent
-      | undefined) ?? {};
+  const { t } = useTranslation("language");
   const preferredLanguage = state?.userProfile?.preferredLanguage || "";
 
   const handleSignout = async (event: Event) => {
     event.preventDefault();
-    setLoading(true, pageContentJson["12"]);
+    setLoading(true, t("SuccessfullyUpdatedLanguage.signingOut"));
 
     try {
       const response = (await authService.logout()) as
@@ -59,7 +52,7 @@ export default function SuccessfullyUpdated({
       window.location.href = "/";
     } catch (error) {
       console.error("Logout failed:", error);
-      setLoading(true, pageContentJson["13"]);
+      setLoading(true, t("SuccessfullyUpdatedLanguage.signOutFailed"));
       setTimeout(() => {
         window.location.href = "/";
       }, 2000);
@@ -86,19 +79,24 @@ export default function SuccessfullyUpdated({
         <GcdsNotice noticeRole="success" noticeTitleTag="h2" noticeTitle=" ">
           <GcdsText>
             <strong>
-              {pageContentJson["1"]} {displayLanguageName}
+              {t("SuccessfullyUpdatedLanguage.languageUpdatedTo")}{" "}
+              {displayLanguageName}
             </strong>
           </GcdsText>
         </GcdsNotice>
       </GcdsText>
 
-      <GcdsHeading tag="h1">{pageContentJson["2"]}</GcdsHeading>
-      <GcdsHeading tag="h4">{pageContentJson["3"]}</GcdsHeading>
-      <GcdsText>{pageContentJson["4"]}</GcdsText>
+      <GcdsHeading tag="h1">
+        {t("SuccessfullyUpdatedLanguage.updateOtherPlaces")}
+      </GcdsHeading>
+      <GcdsHeading tag="h4">
+        {t("SuccessfullyUpdatedLanguage.onlyConnectedServices")}
+      </GcdsHeading>
+      <GcdsText>{t("SuccessfullyUpdatedLanguage.notConnectedNotice")}</GcdsText>
       <GcdsText>
-        {pageContentJson["5"]}{" "}
+        {t("SuccessfullyUpdatedLanguage.searchOtherAccounts")}{" "}
         <GcdsLink href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}>
-          {pageContentJson["8"]}
+          {t("SuccessfullyUpdatedLanguage.gcAccountDirectory")}
         </GcdsLink>
       </GcdsText>
 
@@ -108,7 +106,7 @@ export default function SuccessfullyUpdated({
           onGcdsClick={onSubmitHandler}
           currentLang={routeLanguage}
         >
-          {pageContentJson["6"]}
+          {t("SuccessfullyUpdatedLanguage.backToProfile")}
         </SubmitButton>
         <GcdsButton
           buttonRole="secondary"
@@ -117,7 +115,7 @@ export default function SuccessfullyUpdated({
             void handleSignout(event);
           }}
         >
-          {pageContentJson["7"]}
+          {t("SuccessfullyUpdatedLanguage.signOut")}
         </GcdsButton>
       </GcdsGrid>
     </GcdsContainer>

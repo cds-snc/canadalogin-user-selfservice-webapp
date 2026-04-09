@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { useNavigate, useParams } from "react-router";
 
 import { useUser } from "../../../components/Providers/useUser";
-import { getPageContent } from "../../../utils/functions";
+import { useTranslation } from "react-i18next";
 import {
   FLOW_TYPES,
   INVALID_OTP_ERROR_CODES,
@@ -24,7 +24,6 @@ import SuccessfullyUpdated from "./SuccessfullyUpdated";
 import type {
   ContactPhoneFormData,
   ContactPhoneOtpType,
-  ContactPhonePageContent,
   ContactPhoneTransactionData,
   ContactPhoneWizardStep,
 } from "../../../types/contactPhoneNumber";
@@ -75,14 +74,7 @@ export default function EditContactPhoneNumberPage() {
     formId: CONTACT_PHONE_ANALYTICS.FLOW_ID,
   });
 
-  const loaderPageContentJson =
-    (getPageContent(language, PAGES.otpSelection) as
-      | ContactPhonePageContent
-      | undefined) ?? {};
-  const errorPageJson =
-    (getPageContent(language, PAGES.error) as
-      | ContactPhonePageContent
-      | undefined) ?? {};
+  const { t } = useTranslation(["security", "common"]);
 
   const { updateProfileSuccess } = userProfileDispatch(dispatch);
   const backToProfile = path(PAGES.ProfileHome, { language });
@@ -236,7 +228,9 @@ export default function EditContactPhoneNumberPage() {
     navigate(`/${language}/profile/update-contact-phone`, { replace: true });
   };
 
-  let errorMessage = errorPageJson[errorCode] || "";
+  let errorMessage = errorCode
+    ? t(`Error.${errorCode}`, { ns: "common", defaultValue: "" })
+    : "";
   if (errorCode && errorMessage === "") {
     errorMessage = errorCode;
   }
@@ -321,7 +315,7 @@ export default function EditContactPhoneNumberPage() {
   };
 
   return localLoading ? (
-    <Loader text={loaderPageContentJson["11"]} />
+    <Loader text={t("OtpSelection.loading")} />
   ) : (
     <StepContent
       StepComponent={steps[wizardStep]}

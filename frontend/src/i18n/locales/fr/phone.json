@@ -1,0 +1,54 @@
+{
+  "EnterNewPhoneNumber": {
+    "title": "Entrez un nouveau numéro de téléphone",
+    "description": "Cette action modifiera le numéro de téléphone que ConnexionCanada et les services liés à votre identifiant ConnexionCanada peuvent utiliser pour vous contacter.",
+    "servicesAccessTitle": "Services ayant accès à votre numéro de téléphone de communication",
+    "servicesAccessDescription": "Les services suivants ont accès à votre numéro de téléphone de communication par le biais de ConnexionCanada:",
+    "rpName": "RP Name",
+    "notConnectedNotice": "Si vous cherchez à mettre à jour votre numéro de téléphone de communication pour un service qui n'est pas lié à votre identifiant ConnexionCanada, vous devez le faire depuis le compte que vous possédez pour le service en question.",
+    "searchOtherAccounts": "Pour rechercher un autre compte du GC, consultez le",
+    "gcAccountDirectory": "répertoire des comptes GC",
+    "countryLabel": "Pays",
+    "phoneLabel": "Numéro de téléphone",
+    "countryNotListed": "Mon pays n'apparaît pas dans la liste",
+    "countryNotSupported": "Certains pays ne sont pas pris en charge en raison de limitations techniques. Si votre pays n'apparaît pas dans la liste, vous ne pouvez pas créer d'identifiant ConnexionCanada à l'heure actuelle. Nous nous excusons des désagréments que cela pourrait causer.",
+    "verifyNumber": "Vérifiez votre numéro de téléphone",
+    "phoneRequired": "Le numéro de téléphone est requis",
+    "verifyDescription": "Nous allons vous envoyer un code à 6 chiffres afin de vérifier votre numéro de téléphone."
+  },
+  "AreYouSureUpdateContactNumber": {
+    "title": "Êtes-vous sûr de vouloir mettre à jour votre numéro de téléphone ?",
+    "requestedUpdate": "Vous avez demandé à mettre à jour votre numéro de téléphone :",
+    "examplePhone": "+1 (123) 456-7890",
+    "servicesNotice": "Votre numéro de téléphone sera mis à jour avec les services suivants :",
+    "rpName": "RP Name",
+    "onlyChanges": "Ceci ne modifie que votre",
+    "contactPhoneNumber": "numéro de téléphone.",
+    "changeTwoStep": "Pour modifier votre numéro de vérification en deux étapes, accédez à vos",
+    "securitySettings": "paramètres de sécurité.",
+    "confirmButton": "Oui, mettre à jour",
+    "cancelButton": "Annuler"
+  },
+  "ConfirmContactPhoneNumberUpdate": {
+    "title": "Voulez-vous vraiment modifier votre numéro de téléphone de communication?",
+    "requestedUpdate": "Vous avez demandé à remplacer votre nom par le nom suivant :",
+    "exampleName": "Exemple Newname",
+    "allServicesNotice": "Cette action mettra à jour votre numéro de téléphone de communication pour <bold>tous</bold> les services que vous avez connectés à votre identifiant <bold>ConnexionCanada</bold>.",
+    "onlyChanges": "Cette action ne modifie que votre",
+    "contactPhoneNumber": "numéro de téléphone de communication.",
+    "changeTwoStep": "Pour modifier le numéro de téléphone associé à la vérification en deux étapes, rendez-vous sur la page",
+    "securitySettings": "paramètres de sécurité.",
+    "confirmButton": "Oui, mettre à jour",
+    "cancelButton": "Annuler"
+  },
+  "SuccessfullyUpdatedContactPhoneNumber": {
+    "phoneUpdatedTo": "Votre numéro de téléphone de communication est maintenant le",
+    "updateOtherPlaces": "Vous devez peut-être mettre à jour votre numéro de téléphone ailleurs.",
+    "onlyConnectedServices": "Cette action ne modifie votre numéro de téléphone de communication que pour les services liés à votre identifiant ConnexionCanada.",
+    "notConnectedNotice": "Si vous cherchez à mettre à jour votre numéro de téléphone de communication pour un service qui n'est pas lié à votre identifiant ConnexionCanada, vous devez le faire depuis le compte que vous possédez pour le service en question.",
+    "searchOtherAccounts": "Pour rechercher un autre compte du GC, consultez le",
+    "gcAccountDirectory": "répertoire des comptes du GC.",
+    "backToProfile": "Retour au profil",
+    "signOut": "Se déconnecter"
+  }
+}

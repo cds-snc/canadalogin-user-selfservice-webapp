@@ -124,43 +124,6 @@ vi.mock("@gcds-core/components-react", () => ({
   ),
 }));
 
-// Mock utility functions
-vi.mock("../../../../utils/functions", () => ({
-  getPageContent: vi.fn((language, page) => {
-    const mockContent = {
-      password: {
-        4: "Password must be at least",
-        5: "minimum",
-        6: "characters long",
-        7: "Password requirements",
-        8: "Your password must meet these requirements",
-        9: "New password",
-        10: "Enter your new password",
-        11: "Show password",
-        12: "Characters:",
-        13: "minimum",
-        14: "Change Password",
-      },
-      Button: {
-        submit: "Submit",
-        cancel: "Cancel",
-      },
-    };
-    return mockContent[page] || {};
-  }),
-  getContentWithVariables: vi.fn((content, variables = {}) => {
-    if (typeof content === "string") {
-      let result = content;
-      Object.keys(variables).forEach((key) => {
-        const regex = new RegExp(`{${key}}`, "g");
-        result = result.replace(regex, variables[key]);
-      });
-      return result;
-    }
-    return content || "";
-  }),
-}));
-
 vi.mock("../../../../services/authService", () => ({
   authService: {
     requestPasswordPolicy: vi.fn().mockResolvedValue({
@@ -257,7 +220,7 @@ describe("Password Component", () => {
       renderComponent();
 
       await waitFor(() => {
-        expect(screen.getByText("Characters:")).toBeInTheDocument();
+        expect(screen.getByText("Minimum length:")).toBeInTheDocument();
         expect(screen.getByText("0")).toBeInTheDocument();
         // Check that the character counter shows the pattern: "/ 12 minimum"
         expect(screen.getByText("/ 12", { exact: false })).toBeInTheDocument();

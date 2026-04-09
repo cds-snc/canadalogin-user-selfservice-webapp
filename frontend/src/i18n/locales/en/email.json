@@ -1,0 +1,56 @@
+{
+  "EnterNewEmail": {
+    "title": "Enter a new email address",
+    "changingAffects": "Changing your email address will affect:",
+    "signInEmail": "The email address you use to sign in",
+    "contactEmail": "The email address that CanadaLogin uses to contact you",
+    "serviceEmail": "The email address that services connected to your CanadaLogin may use to contact you",
+    "servicesAccessTitle": "What services have access to your email address",
+    "servicesAccessDescription": "The following services have access to your email address:",
+    "rpName": "RP Name",
+    "notConnectedNotice": "If you are trying to update your email address with a service that's not connected to CanadaLogin, you'll need to go to that account.",
+    "searchOtherAccounts": "To search for another GC Account, visit the",
+    "gcAccountDirectory": "GC Account directory.",
+    "emailLabel": "Email",
+    "continueButton": "Continue",
+    "cancelButton": "Cancel"
+  },
+  "EditEmailEnterEmail": {
+    "title": "Enter a new email address",
+    "changingAffects": "Changing your email address will affect:",
+    "signInEmail": "The email address you use to sign in",
+    "contactEmail": "The email address that CanadaLogin uses to contact you",
+    "serviceEmail": "The email address that services connected to your CanadaLogin may use to contact you",
+    "emailLabel": "Email"
+  },
+  "EmailOtpValidation": {
+    "title": "Check your email",
+    "codeSent": "We have sent an email with a 6-digit code to:",
+    "emailMayTakeMinutes": "Your email might take a few minutes to arrive. If you do not get an email, check your spam folder.",
+    "codeExpiresIn": "Your code will expire in",
+    "tenMinutes": "10 minutes.",
+    "sixDigitCode": "6-digit code",
+    "problemsWithCode": "Problems with the code?",
+    "useDifferentEmail": "Use a different email",
+    "requestNewCodeIn": "You can request a new code in",
+    "seconds": "seconds",
+    "requestNewCode": "Request a new code"
+  },
+  "EmailConfirmUpdate": {
+    "title": "Are you sure you want to update your email?",
+    "requestedUpdate": "You've requested to update your email to:",
+    "allServicesNotice": "This will update your email with <bold>all</bold> services you have connected to your <bold>CanadaLogin</bold>.",
+    "confirmButton": "Yes, update"
+  },
+  "EmailUpdateSuccess": {
+    "emailUpdatedTo": "Your email has been updated to",
+    "updateOtherPlaces": "You may need to update your email other places",
+    "onlyConnectedServices": "This only changes your email with services connected to your CanadaLogin.",
+    "notConnectedNotice": "If you are trying to update your email with a service that's not connected to your CanadaLogin, you'll need to go to that account.",
+    "searchOtherAccounts": "To search for another GC Account, visit the",
+    "gcAccountDirectory": "GC Account directory",
+    "period": ".",
+    "backToProfile": "Back to profile",
+    "signOut": "Sign out"
+  }
+}

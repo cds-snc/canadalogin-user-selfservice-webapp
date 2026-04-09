@@ -10,17 +10,13 @@ import {
   GcdsText,
 } from "@gcds-core/components-react";
 
-import { getPageContent } from "../../../utils/functions";
-import {
-  PAGES,
-  ServicesWithAccessInfoSectionInformation,
-} from "../../../utils/constants";
+import { useTranslation } from "react-i18next";
+import { ServicesWithAccessInfoSectionInformation } from "../../../utils/constants";
 import SubmitButton from "../../../components/Layout/SubmitButton";
 import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection";
 import type {
   EditableProfileNameField,
   ProfileNameEditProps,
-  ProfileNamePageContent,
 } from "../../../types/profileName";
 
 type NameInputTarget = EventTarget & {
@@ -81,10 +77,7 @@ export default function ProfileUpdateName({
 }: ProfileNameEditProps) {
   const { language = "en" } = useParams<{ language: string }>();
   const routeLanguage = language === "fr" ? "fr" : "en";
-  const pageNameEditJson =
-    (getPageContent(routeLanguage, PAGES.profileUpdateName) as
-      | ProfileNamePageContent
-      | undefined) ?? {};
+  const { t } = useTranslation("profile");
 
   const applyNameInput = (
     field: EditableProfileNameField,
@@ -129,10 +122,11 @@ export default function ProfileUpdateName({
         </GcdsErrorMessage>
       ) : null}
 
-      <GcdsHeading tag="h1">{pageNameEditJson["5"]}</GcdsHeading>
+      <GcdsHeading tag="h1">{t("ProfileUpdateName.title")}</GcdsHeading>
 
       <GcdsText>
-        {pageNameEditJson["6"]} <strong>{pageNameEditJson["7"]}</strong>
+        {t("ProfileUpdateName.updateNotice")}{" "}
+        <strong>{t("ProfileUpdateName.everyService")}</strong>
       </GcdsText>
 
       <ServicesWithAccessInfoSection
@@ -143,7 +137,7 @@ export default function ProfileUpdateName({
         <GcdsContainer style={{ marginTop: "1.5rem" }}>
           <GcdsInput
             inputId="givenName"
-            label={pageNameEditJson["2"]}
+            label={t("ProfileUpdateName.firstName")}
             name="givenName"
             type="text"
             validateOn="other"
@@ -157,7 +151,7 @@ export default function ProfileUpdateName({
           />
           <GcdsInput
             inputId="familyName"
-            label={pageNameEditJson["3"]}
+            label={t("ProfileUpdateName.lastName")}
             name="familyName"
             type="text"
             validateOn="other"
@@ -186,7 +180,7 @@ export default function ProfileUpdateName({
             void onCancel();
           }}
         >
-          {pageNameEditJson["4"]}
+          {t("ProfileUpdateName.cancel")}
         </GcdsButton>
       </GcdsGrid>
     </GcdsContainer>

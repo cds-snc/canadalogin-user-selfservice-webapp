@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import "@gcds-core/components-react/gcds.css";
 //need to remove when demo code removed
 import "./index.css";
+import "./i18n";
 import router from "./router";
 import { RouterProvider } from "react-router";
 import ReactGA from "react-ga4";

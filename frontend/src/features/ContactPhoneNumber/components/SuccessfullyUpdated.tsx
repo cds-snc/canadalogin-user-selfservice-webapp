@@ -9,13 +9,10 @@ import {
   GcdsText,
 } from "@gcds-core/components-react";
 
-import { getPageContent } from "../../../utils/functions";
-import { EXTERNAL_NAVIGATION_LINKS, PAGES } from "../../../utils/constants";
+import { useTranslation } from "react-i18next";
+import { EXTERNAL_NAVIGATION_LINKS } from "../../../utils/constants";
 import SubmitButton from "../../../components/Layout/SubmitButton";
-import type {
-  ContactPhonePageContent,
-  ContactPhoneSuccessProps,
-} from "../../../types/contactPhoneNumber";
+import type { ContactPhoneSuccessProps } from "../../../types/contactPhoneNumber";
 
 export default function SuccessfullyUpdated({
   onNext,
@@ -23,10 +20,7 @@ export default function SuccessfullyUpdated({
   phoneFormData,
 }: ContactPhoneSuccessProps) {
   const { language = "en" } = useParams<{ language: string }>();
-  const pageContentJson =
-    (getPageContent(language, PAGES.successfullyUpdatedContactPhoneNumber) as
-      | ContactPhonePageContent
-      | undefined) ?? {};
+  const { t } = useTranslation("phone");
 
   const onSubmitClick = (event: CustomEvent<string | void>) => {
     event.preventDefault();
@@ -39,23 +33,26 @@ export default function SuccessfullyUpdated({
         <GcdsNotice noticeRole="success" noticeTitleTag="h2" noticeTitle=" ">
           <GcdsText>
             <strong>
-              {pageContentJson["1"]} {phoneFormData?.formattedPhoneNumber || ""}
+              {t("SuccessfullyUpdatedContactPhoneNumber.phoneUpdatedTo")}{" "}
+              {phoneFormData?.formattedPhoneNumber || ""}
             </strong>
           </GcdsText>
         </GcdsNotice>
         <GcdsHeading marginBottom="150" tag="h1">
-          {pageContentJson["2"]}
+          {t("SuccessfullyUpdatedContactPhoneNumber.updateOtherPlaces")}
         </GcdsHeading>
 
         <GcdsHeading marginTop="0" marginBottom="0" tag="h3">
-          {pageContentJson["3"]}
+          {t("SuccessfullyUpdatedContactPhoneNumber.onlyConnectedServices")}
         </GcdsHeading>
 
-        <GcdsText>{pageContentJson["4"]}</GcdsText>
         <GcdsText>
-          {pageContentJson["5"]}{" "}
+          {t("SuccessfullyUpdatedContactPhoneNumber.notConnectedNotice")}
+        </GcdsText>
+        <GcdsText>
+          {t("SuccessfullyUpdatedContactPhoneNumber.searchOtherAccounts")}{" "}
           <GcdsLink href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}>
-            {pageContentJson["6"]}
+            {t("SuccessfullyUpdatedContactPhoneNumber.gcAccountDirectory")}
           </GcdsLink>
         </GcdsText>
         <GcdsGrid columns="max-content max-content" gap="200">
@@ -64,7 +61,7 @@ export default function SuccessfullyUpdated({
             onGcdsClick={onSubmitClick}
             currentLang={language}
           >
-            {pageContentJson["7"]}
+            {t("SuccessfullyUpdatedContactPhoneNumber.backToProfile")}
           </SubmitButton>
 
           <GcdsButton
@@ -75,7 +72,7 @@ export default function SuccessfullyUpdated({
               void onCancel();
             }}
           >
-            {pageContentJson["8"]}
+            {t("SuccessfullyUpdatedContactPhoneNumber.signOut")}
           </GcdsButton>
         </GcdsGrid>
       </GcdsGrid>

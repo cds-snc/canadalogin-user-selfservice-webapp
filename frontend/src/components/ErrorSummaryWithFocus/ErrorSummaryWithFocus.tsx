@@ -1,8 +1,7 @@
 import { GcdsErrorSummary } from "@gcds-core/components-react";
 import { useEffect, useRef } from "react";
 import type { ComponentPropsWithoutRef, ComponentRef } from "react";
-import { getPageContent } from "../../utils/functions";
-import { PAGES } from "../../utils/constants";
+import { useTranslation } from "react-i18next";
 
 type GcdsErrorSummaryProps = ComponentPropsWithoutRef<typeof GcdsErrorSummary>;
 
@@ -28,11 +27,10 @@ export default function ErrorSummaryWithFocus({
 }: ErrorSummaryWithFocusProps) {
   const errorSummaryRef = useRef<ComponentRef<typeof GcdsErrorSummary>>(null);
 
-  const errorPageJson: Record<string, string> =
-    getPageContent(language, PAGES.error) ?? {};
+  const { t } = useTranslation("common");
 
   const errorMessage = errorCode
-    ? errorPageJson[errorCode] || errorPageJson["7"]
+    ? t(`Error.${errorCode}`, { defaultValue: t("Error.serverError") })
     : "";
 
   useEffect(() => {
@@ -71,7 +69,7 @@ export default function ErrorSummaryWithFocus({
       ref={errorSummaryRef}
       id={id}
       errorLinks={errorLinks || defaultErrorLinks}
-      heading={errorPageJson["1"] ?? ""}
+      heading={t("Error.genericProblem")}
       lang={language}
       {...otherProps}
     />

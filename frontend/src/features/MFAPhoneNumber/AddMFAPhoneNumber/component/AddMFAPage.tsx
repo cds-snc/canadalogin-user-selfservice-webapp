@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router";
 import Loader from "../../../../components/Layout/Loading";
 import { useUser } from "../../../../components/Providers/useUser";
 import { FLOW_TYPES, PAGES, serverMapping } from "../../../../utils/constants";
-import { getPageContent } from "../../../../utils/functions";
+import { useTranslation } from "react-i18next";
 import { getErrorMessage } from "../../../../utils/errorUtils";
 import { path } from "../../../../utils/routeHelpers";
 import { otpFactors } from "../../../TransientOtp/api/otpFactors";
@@ -48,7 +48,7 @@ export default function AddMFAPage() {
   const { state } = useUser();
 
   const [userPasswordValue, setUserPasswordValue] = useState("");
-  const pageContentJson = getPageContent(language, PAGES.otpSelection)!;
+  const { t } = useTranslation(["security", "otp"]);
 
   const [errorCode, setErrorCode] = useState("");
 
@@ -132,7 +132,6 @@ export default function AddMFAPage() {
     mfaTrxnId: phoneFormData?.trxnId,
   });
 
-  const noticeFactoryContent = getPageContent(language, PAGES.noticeFactory)!;
   const errorMessage = getErrorMessage(language, errorCode);
 
   const handlePhoneForm = (field: string, value: unknown) => {
@@ -274,8 +273,8 @@ export default function AddMFAPage() {
         ) {
           const otpType =
             phoneFormData.otpType === FLOW_TYPES.voice
-              ? noticeFactoryContent["5"]
-              : noticeFactoryContent["6"];
+              ? t("NoticeFactory.voiceCall", { ns: "otp" })
+              : t("NoticeFactory.textSms", { ns: "otp" });
           navigate(backToManage2FAVerificationsPage, {
             state: {
               noticeType: "mfaAdded",
@@ -672,8 +671,8 @@ export default function AddMFAPage() {
         onSkipForNow={async () => {
           const otpType =
             phoneFormData.otpType === FLOW_TYPES.voice
-              ? noticeFactoryContent["5"]
-              : noticeFactoryContent["6"];
+              ? t("NoticeFactory.voiceCall", { ns: "otp" })
+              : t("NoticeFactory.textSms", { ns: "otp" });
           navigate(backToManage2FAVerificationsPage, {
             state: {
               noticeType: "mfaAdded",
@@ -699,7 +698,7 @@ export default function AddMFAPage() {
   };
 
   return enrollmentLoading || validatePasswordLoading ? (
-    <Loader text={pageContentJson["11"]} />
+    <Loader text={t("OtpSelection.loading")} />
   ) : (
     <StepContent
       StepComponent={steps[wizardStep]}

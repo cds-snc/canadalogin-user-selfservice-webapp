@@ -127,64 +127,6 @@ vi.mock("libphonenumber-js", () => ({
   }),
 }));
 
-// Mock functions
-vi.mock("../../../utils/functions", () => ({
-  getPageContent: (language, page) => {
-    const mockContent = {
-      EnterNewPhoneNumber: {
-        1: "Enter your new phone number",
-        2: "Your contact phone number helps us keep your account secure.",
-        3: "What services are accessing your contact phone number?",
-        4: "Service 1",
-        5: "Service 2",
-        6: "Service 3",
-        7: "Learn more about",
-        8: "which services access your contact phone number",
-        10: "Enter phone number",
-        11: "My country is not listed",
-        12: "If your country is not listed, you can still add your phone number.",
-        13: "How would you like to receive your verification code?",
-        14: "Please enter a valid phone number",
-        15: "Choose how you'd like to receive your verification code.",
-      },
-      OtpSelection: {
-        5: "How would you like to receive your verification code?",
-        7: "Text message",
-        8: "We'll send a 6-digit code to your phone via text message",
-        9: "Voice call",
-        10: "We'll call your phone with a 6-digit code",
-        13: "Both options will send a verification code to the phone number you entered above.",
-      },
-      Button: {
-        submit: "Continue",
-        cancel: "Cancel",
-      },
-      ServicesWithAccessInfo: {
-        1: "What services are accessing your {information}?",
-        2: "Your {information} helps us keep your account secure.",
-        3: "Test Service",
-        4: "Learn more about {information} access",
-        5: "Learn more about",
-        6: "which services access your contact information",
-        7: "name",
-        8: "contact phone number",
-        9: "language preference",
-      },
-    };
-    return mockContent[page] || {};
-  },
-  getContentWithVariables: vi.fn((content, variables = {}) => {
-    if (!content) {
-      return "";
-    }
-    return Object.keys(variables).reduce(
-      (result, key) =>
-        result.replace(new RegExp(`{${key}}`, "g"), variables[key]),
-      content,
-    );
-  }),
-}));
-
 // Mock react-router
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
@@ -280,14 +222,13 @@ describe("EnterPhoneNumber Component", () => {
     );
 
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-      "Enter your new phone number",
+      "Enter a new phone number",
     );
-    // Use getAllByText to get all instances, then check the first one (main content)
-    const secureTexts = screen.getAllByText(
-      "Your contact phone number helps us keep your account secure.",
-    );
-    expect(secureTexts).toHaveLength(2); // One in main content, one in details
-    expect(secureTexts[0]).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "This will update the phone number that CanadaLogin, and services connected to your CanadaLogin may use to contact you.",
+      ),
+    ).toBeInTheDocument();
   });
 
   it("renders the phone input with correct label", () => {
@@ -298,7 +239,7 @@ describe("EnterPhoneNumber Component", () => {
     );
 
     expect(screen.getByTestId("phone-input")).toBeInTheDocument();
-    expect(screen.getByText("Enter phone number")).toBeInTheDocument();
+    expect(screen.getByText("Phone number")).toBeInTheDocument();
   });
 
   it("renders radio buttons for OTP selection", () => {
@@ -311,7 +252,7 @@ describe("EnterPhoneNumber Component", () => {
     expect(screen.getByTestId("gcds-radios")).toBeInTheDocument();
     expect(screen.getByTestId("radio-smsotp")).toBeInTheDocument();
     expect(screen.getByTestId("radio-voiceotp")).toBeInTheDocument();
-    expect(screen.getByText("Text message")).toBeInTheDocument();
+    expect(screen.getByText("Text message (SMS)")).toBeInTheDocument();
     expect(screen.getByText("Voice call")).toBeInTheDocument();
   });
 
@@ -469,7 +410,7 @@ describe("EnterPhoneNumber Component", () => {
 
     expect(
       screen.getByText(
-        "What services are accessing your contact phone number?",
+        "What services have access to your contact phone number",
       ),
     ).toBeInTheDocument();
     expect(screen.getAllByTestId("gcds-details")).toHaveLength(2);
@@ -482,7 +423,9 @@ describe("EnterPhoneNumber Component", () => {
       </TestWrapper>,
     );
 
-    expect(screen.getByText("My country is not listed")).toBeInTheDocument();
+    expect(
+      screen.getByText("My country is not in the list"),
+    ).toBeInTheDocument();
   });
 
   it("shows SMS option as checked by default", () => {

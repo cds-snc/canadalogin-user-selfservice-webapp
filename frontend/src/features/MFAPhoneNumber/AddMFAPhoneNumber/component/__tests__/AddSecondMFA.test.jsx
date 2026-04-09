@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { BrowserRouter } from "react-router";
 import AddSecondMFA from "../AddSecondMFA";
 import "@testing-library/jest-dom/vitest";
+import i18n from "../../../../../i18n/test";
 
 // Mock GCDS components
 vi.mock("@gcds-core/components-react", () => ({
@@ -64,11 +65,6 @@ vi.mock("../../../../utils/constants", () => ({
   },
 }));
 
-const mockGetPageContent = vi.fn();
-vi.mock("../../../../utils/functions", () => ({
-  getPageContent: mockGetPageContent,
-}));
-
 // Test wrapper component
 const TestWrapper = ({ children }) => <BrowserRouter>{children}</BrowserRouter>;
 
@@ -82,22 +78,8 @@ describe("AddSecondMFA Unit Tests", () => {
     otpType: "smsotp",
   };
 
-  const mockPageContent = {
-    1: "You have added",
-    2: "as a 2-step verification phone number.",
-    3: "Set up voice call verification (optional)",
-    4: "Setting up voice call verification allows you to also receive verification codes by",
-    5: "phone call",
-    6: "when signing in.",
-    7: "We recommend setting up this option if you might not be able to receive text messages at any point. Having both methods set up helps make sure you do not get locked out.",
-    8: "Would you like to set up voice call verification?",
-    9: "Yes, set up voice call verification",
-    10: "No, skip for now",
-  };
-
   beforeEach(() => {
     mockUseParams.mockReturnValue({ language: "en" });
-    mockGetPageContent.mockReturnValue(mockPageContent);
   });
 
   afterEach(() => {
@@ -315,20 +297,9 @@ describe("AddSecondMFA Unit Tests", () => {
   });
 
   describe("Language Support", () => {
-    it("should handle French language parameter", () => {
+    it("should handle French language parameter", async () => {
+      await i18n.changeLanguage("fr");
       mockUseParams.mockReturnValue({ language: "fr" });
-      mockGetPageContent.mockReturnValue({
-        1: "Vous avez ajouté",
-        2: "comme numéro de téléphone de vérification en 2 étapes.",
-        3: "Configurez la vérification par appel vocal (optionnel)",
-        4: "La configuration de la vérification par appel vocal vous permet également de recevoir des codes de vérification par",
-        5: "appel téléphonique",
-        6: "lors de la connexion.",
-        7: "Nous recommandons de configurer cette option si vous ne pouvez pas recevoir de messages texte à un moment donné. Avoir les deux méthodes configurées aide à s'assurer que vous ne soyez pas bloqué.",
-        8: "Souhaitez-vous configurer la vérification par appel vocal ?",
-        9: "Oui, configurer la vérification par appel vocal",
-        10: "Non, ignorer pour l'instant",
-      });
 
       render(
         <TestWrapper>
@@ -345,6 +316,7 @@ describe("AddSecondMFA Unit Tests", () => {
 
       // Should show French content - use the actual rendered text
       expect(screen.getByText("Oui, configurer")).toBeInTheDocument();
+      await i18n.changeLanguage("en");
     });
 
     it("should handle missing language parameter", () => {
@@ -544,9 +516,7 @@ describe("AddSecondMFA Unit Tests", () => {
   });
 
   describe("Error Handling", () => {
-    it("should handle getPageContent returning empty object", () => {
-      mockGetPageContent.mockReturnValue({});
-
+    it("should render without crashing with default translations", () => {
       render(
         <TestWrapper>
           <AddSecondMFA

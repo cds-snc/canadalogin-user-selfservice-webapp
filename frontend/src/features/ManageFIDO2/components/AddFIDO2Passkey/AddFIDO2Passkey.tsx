@@ -1,6 +1,5 @@
 import { useParams } from "react-router";
-import { getPageContent } from "../../../../utils/functions";
-import { PAGES } from "../../../../utils/constants";
+import { useTranslation } from "react-i18next";
 import {
   GcdsButton,
   GcdsContainer,
@@ -27,13 +26,13 @@ export default function AddFIDO2Passkey({
   registrationLoading,
 }: AddFIDO2PasskeyProps) {
   const { language } = useParams();
-  const pageContent = getPageContent(language, PAGES.addFIDO2Passkey)!;
+  const { t } = useTranslation("fido2");
 
   return (
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="300">
         <GcdsHeading tag="h1" lang={language}>
-          {pageContent["1"]}
+          {t("AddFIDO2Passkey.title")}
         </GcdsHeading>
         <GcdsContainer>
           <FIDOPasskeyCollage />
@@ -41,22 +40,23 @@ export default function AddFIDO2Passkey({
         <ol className="passkey-steps">
           <li>
             <GcdsText marginBottom="0">
-              <strong>{pageContent["2"]}</strong>
+              <strong>{t("AddFIDO2Passkey.step1")}</strong>
             </GcdsText>
-            <GcdsText>{pageContent["3"]}</GcdsText>
+            <GcdsText>{t("AddFIDO2Passkey.step1Description")}</GcdsText>
           </li>
           <li>
             <GcdsText marginBottom="0">
-              <strong>{pageContent["4"]}</strong>
+              <strong>{t("AddFIDO2Passkey.step2")}</strong>
             </GcdsText>
             <GcdsText>
-              {pageContent["5"]} <strong>{pageContent["6"]}</strong>{" "}
-              {pageContent["7"]}
+              {t("AddFIDO2Passkey.selectEmailOnly")}{" "}
+              <strong>{t("AddFIDO2Passkey.you")}</strong>{" "}
+              {t("AddFIDO2Passkey.haveControlOver")}
             </GcdsText>
           </li>
           <li>
             <GcdsText marginBottom="0">
-              <strong>{pageContent["8"]}</strong>
+              <strong>{t("AddFIDO2Passkey.step3")}</strong>
             </GcdsText>
           </li>
         </ol>
@@ -67,7 +67,8 @@ export default function AddFIDO2Passkey({
           lang={language}
         >
           <GcdsText>
-            {pageContent["9"]} <strong>{pageContent["10"]}</strong>
+            {t("AddFIDO2Passkey.deviceWarning")}{" "}
+            <strong>{t("AddFIDO2Passkey.youControl")}</strong>
           </GcdsText>
         </GcdsNotice>
 
@@ -83,21 +84,21 @@ export default function AddFIDO2Passkey({
           }}
           disabled={registrationLoading}
         >
-          {pageContent["11"]}
+          {t("AddFIDO2Passkey.createButton")}
         </GcdsButton>
         <GcdsButton
           buttonRole="secondary"
           onClick={onCancel}
           disabled={registrationLoading}
         >
-          {pageContent["12"]}
+          {t("AddFIDO2Passkey.cancelButton")}
         </GcdsButton>
 
-        <GcdsHeading tag="h2">{pageContent["13"]}</GcdsHeading>
+        <GcdsHeading tag="h2">{t("AddFIDO2Passkey.problemsTitle")}</GcdsHeading>
 
         {/* TODO: add link to create passkey help page once available */}
         <GcdsLink href="#" target="_blank">
-          {pageContent["14"]}
+          {t("AddFIDO2Passkey.helpLink")}
         </GcdsLink>
       </GcdsGrid>
     </GcdsContainer>

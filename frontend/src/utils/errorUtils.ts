@@ -1,5 +1,4 @@
-import { PAGES } from "./constants";
-import { getPageContent } from "./functions";
+import i18n from "../i18n/index";
 
 export const getErrorMessage = (
   language: string | undefined,
@@ -9,11 +8,11 @@ export const getErrorMessage = (
     return "";
   }
 
-  const errorPageContent = getPageContent(language, PAGES.error);
+  const lng = language === "fr" ? "fr" : "en";
 
-  if (!errorPageContent) {
-    return "";
+  if (i18n.exists(`Error.${errorCode}`, { ns: "common", lng })) {
+    return i18n.t(`Error.${errorCode}`, { ns: "common", lng });
   }
 
-  return errorPageContent[errorCode] || errorPageContent["7"] || "";
+  return i18n.t("Error.serverError", { ns: "common", lng, defaultValue: "" });
 };

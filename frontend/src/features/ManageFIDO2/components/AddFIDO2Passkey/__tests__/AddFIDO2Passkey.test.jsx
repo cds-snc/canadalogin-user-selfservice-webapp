@@ -19,23 +19,6 @@ vi.mock("react-router", () => ({
   useParams: () => ({ language: "en" }),
 }));
 
-vi.mock("../../../../../utils/functions", () => ({
-  getPageContent: () => ({
-    1: "How to create a passkey",
-    2: "Step 1 heading",
-    3: "Step 1 description",
-    4: "Step 2 heading",
-    5: "Open the",
-    6: "Settings",
-    7: "app on your device",
-    8: "Step 3 heading",
-    9: "Warning:",
-    10: "Warning detail",
-    11: "Create a passkey",
-    12: "Cancel",
-  }),
-}));
-
 vi.mock("../../../../../utils/constants", () => ({
   PAGES: {
     addFIDO2Passkey: "AddFIDO2Passkey",
@@ -123,15 +106,23 @@ describe("AddFIDO2Passkey", () => {
 
   it("renders all three step headings in the instruction list", () => {
     render(<AddFIDO2Passkey {...defaultProps} />);
-    expect(screen.getByText("Step 1 heading")).toBeInTheDocument();
-    expect(screen.getByText("Step 2 heading")).toBeInTheDocument();
-    expect(screen.getByText("Step 3 heading")).toBeInTheDocument();
+    expect(
+      screen.getByText("Select \u201cCreate a passkey\u201d below."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/If prompted, choose an email/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Follow the remaining steps in the pop-up."),
+    ).toBeInTheDocument();
   });
 
   it("renders the warning notice", () => {
     render(<AddFIDO2Passkey {...defaultProps} />);
     expect(screen.getByTestId("notice")).toBeInTheDocument();
-    expect(screen.getByText("Warning detail")).toBeInTheDocument();
+    expect(
+      screen.getByText(/Make sure you only create a passkey on a device/),
+    ).toBeInTheDocument();
   });
 
   it("renders the primary and cancel buttons", () => {

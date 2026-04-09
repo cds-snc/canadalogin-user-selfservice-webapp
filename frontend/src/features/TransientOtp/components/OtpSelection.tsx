@@ -9,7 +9,7 @@ import {
 } from "@gcds-core/components-react";
 import { useParams } from "react-router";
 
-import { getPageContent } from "../../../utils/functions";
+import { useTranslation } from "react-i18next";
 import { gcHelpCentreLinks } from "../../../utils/gcHelpCentreLinks";
 
 import { FLOW_TYPES, PAGES } from "../../../utils/constants";
@@ -66,9 +66,7 @@ export default function OtpSelection({
 }: OtpSelectionProps) {
   const { language } = useParams();
 
-  const pageContentJson =
-    getPageContent(language, PAGES.transientOtpSelection) ?? {};
-  const { cancel } = getPageContent(language, "Button") ?? {};
+  const { t } = useTranslation(["otp", "common"]);
 
   const smsFactors =
     userPhoneFactors?.filter((f) => f.type === FLOW_TYPES.sms) ?? [];
@@ -82,13 +80,14 @@ export default function OtpSelection({
   };
 
   const pageContentMap: Record<string, string> = {
-    [PAGES.deleteMFAPage]: pageContentJson["15"],
-    [PAGES.addMFAPage]: pageContentJson["14"],
-    [PAGES.addFIDO2PasskeyPage]: pageContentJson["23"],
-    [PAGES.deleteFIDO2PasskeyPage]: pageContentJson["22"],
-    [PAGES.password]: pageContentJson["2"],
+    [PAGES.deleteMFAPage]: t("TransientOtpSelection.toDeleteNumber"),
+    [PAGES.addMFAPage]: t("TransientOtpSelection.toAddPhone"),
+    [PAGES.addFIDO2PasskeyPage]: t("TransientOtpSelection.toAddPasskey"),
+    [PAGES.deleteFIDO2PasskeyPage]: t("TransientOtpSelection.toDeletePasskey"),
+    [PAGES.password]: t("TransientOtpSelection.toChangePassword"),
   };
-  const parentPageContent = pageContentMap[parentPage] || pageContentJson["2"];
+  const parentPageContent =
+    pageContentMap[parentPage] || t("TransientOtpSelection.toChangePassword");
 
   const factorRowStyle = {
     borderBottom: "0.0625rem solid #A5A5A5",
@@ -106,27 +105,28 @@ export default function OtpSelection({
     <GcdsContainer role="main">
       <GcdsContainer className="gcds-gap">
         <GcdsHeading tag="h1" lang={language}>
-          {pageContentJson["1"]}
+          {t("TransientOtpSelection.title")}
         </GcdsHeading>
         <GcdsText>
-          {parentPageContent} {pageContentJson["3"]}
+          {parentPageContent} {t("TransientOtpSelection.firstComplete2Step")}
         </GcdsText>
       </GcdsContainer>
       <GcdsContainer>
         <GcdsHeading tag="h2" marginTop="600" marginBottom="300">
-          {pageContentJson["21"]}
+          {t("TransientOtpSelection.chooseVerifyMethod")}
         </GcdsHeading>
         {/* Text message section */}
         {smsFactors.length > 0 && (
           <GcdsContainer>
             <SectionHeader
               icon={<SMSIcon width="23" height="23" />}
-              title={pageContentJson["8"] ?? ""}
+              title={t("TransientOtpSelection.textMessage") ?? ""}
             />
             <GcdsContainer style={factorListStyle}>
               <GcdsText marginBottom="0">
-                {pageContentJson["5"]} <strong>{pageContentJson["6"]}</strong>{" "}
-                {pageContentJson["7"]}
+                {t("TransientOtpSelection.codeExpiresIn")}{" "}
+                <strong>{t("TransientOtpSelection.tenMinutes")}</strong>{" "}
+                {t("TransientOtpSelection.carrierCharges")}
               </GcdsText>
               {smsFactors.map((factor) => (
                 <GcdsGrid
@@ -141,7 +141,7 @@ export default function OtpSelection({
                     role="button"
                     onGcdsClick={() => handlePhoneFactorSelect(factor.id)}
                   >
-                    {pageContentJson["18"]}
+                    {t("TransientOtpSelection.textMe")}
                   </GcdsLink>
                 </GcdsGrid>
               ))}
@@ -154,12 +154,13 @@ export default function OtpSelection({
           <GcdsContainer>
             <SectionHeader
               icon={<VoiceIcon width="23" height="23" />}
-              title={pageContentJson["9"] ?? ""}
+              title={t("TransientOtpSelection.voiceCall") ?? ""}
             />
             <GcdsContainer style={factorListStyle}>
               <GcdsText marginBottom="0">
-                {pageContentJson["5"]} <strong>{pageContentJson["6"]}</strong>{" "}
-                {pageContentJson["7"]}
+                {t("TransientOtpSelection.codeExpiresIn")}{" "}
+                <strong>{t("TransientOtpSelection.tenMinutes")}</strong>{" "}
+                {t("TransientOtpSelection.carrierCharges")}
               </GcdsText>
               {voiceFactors.map((factor) => (
                 <GcdsGrid
@@ -174,7 +175,7 @@ export default function OtpSelection({
                     role="button"
                     onGcdsClick={() => handlePhoneFactorSelect(factor.id)}
                   >
-                    {pageContentJson["19"]}
+                    {t("TransientOtpSelection.callMe")}
                   </GcdsLink>
                 </GcdsGrid>
               ))}
@@ -187,7 +188,7 @@ export default function OtpSelection({
           <GcdsContainer>
             <SectionHeader
               icon={<FIDO2Icon width="34" height="34" />}
-              title={pageContentJson["17"] ?? ""}
+              title={t("TransientOtpSelection.passkeyOrSecurityKey") ?? ""}
               paddingBottom="0"
             />
             <GcdsContainer style={factorListStyle}>
@@ -206,7 +207,7 @@ export default function OtpSelection({
                     role="button"
                     onGcdsClick={() => onSelectFIDO2 && onSelectFIDO2(passkey)}
                   >
-                    {pageContentJson["20"]}
+                    {t("TransientOtpSelection.verify")}
                   </GcdsLink>
                 </GcdsGrid>
               ))}
@@ -222,20 +223,20 @@ export default function OtpSelection({
             onCancel();
           }}
         >
-          {cancel}
+          {t("Button.cancel", { ns: "common" })}
         </GcdsButton>
       </GcdsContainer>
 
       <GcdsContainer>
         <GcdsHeading tag="h2" marginTop="600" marginBottom="300">
-          {pageContentJson["10"]}
+          {t("TransientOtpSelection.needHelp")}
         </GcdsHeading>
         <GcdsText>
           <GcdsLink
             href={gcHelpCentreLinks.twoStepVerification}
             target="_blank"
           >
-            {pageContentJson["12"]}
+            {t("TransientOtpSelection.helpLink")}
           </GcdsLink>
         </GcdsText>
       </GcdsContainer>

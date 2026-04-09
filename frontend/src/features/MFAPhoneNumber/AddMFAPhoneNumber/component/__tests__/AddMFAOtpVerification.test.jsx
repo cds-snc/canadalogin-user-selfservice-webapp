@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router";
 import * as ReactRouter from "react-router";
 import AddMFAOtpVerification from "../AddMFAOtpVerification";
 import "@testing-library/jest-dom/vitest";
+import i18n from "../../../../../i18n/test";
 
 // Mock GCDS components to enable proper event handling and testing
 vi.mock("@gcds-core/components-react", () => ({
@@ -112,73 +113,6 @@ vi.mock("@gcds-core/components-react", () => ({
 }));
 
 // Mock dependencies
-vi.mock("../../../../../utils/functions", () => ({
-  getPageContent: vi.fn((language, page) => {
-    if (page === "Button") {
-      if (language === "fr") {
-        return {
-          submit: "Continuer",
-          cancel: "Annuler",
-        };
-      }
-      return {
-        submit: "Continue",
-        cancel: "Cancel",
-      };
-    }
-
-    if (page === "Error") {
-      return {
-        CSIAM0011E: "Invalid verification code. Please try again.",
-        "002": "Verification code has expired. Please request a new one.",
-        "003": "Too many failed attempts. Please try again later.",
-      };
-    }
-
-    // verification page content - using actual JSON structure
-    if (language === "fr") {
-      return {
-        1: "Consultez votre téléphone",
-        2: "Nous avons envoyé un code de vérification à 6 chiffres au numéro suivant par le biais d'un message texte :",
-        3: "Nous avons envoyé un code de vérification à 6 chiffres au numéro suivant par le biais d'un appel vocal :",
-        4: "Votre message texte (SMS) pourrait mettre quelques minutes à vous parvenir.",
-        5: "L'appel pourrait mettre quelques minutes à vous parvenir.",
-        6: "Votre code expirera dans",
-        7: "10 minutes.",
-        8: "Entrez le code",
-        9: "Code à 6 chiffres",
-        10: "Des problèmes avec votre code?",
-        14: "Vous pourrez demander un nouveau code dans",
-        15: "secondes",
-        16: "Demander un nouveau code",
-        17: "Nous vous avons envoyé un nouveau code",
-        21: "Utiliser un autre numéro de téléphone",
-        24: "Le courriel pourrait prendre quelques minutes à arriver. Si vous ne voyez pas le courriel, vérifiez s'il se trouve dans votre dossier de pourriels.",
-        26: "Demander un nouveau code",
-      };
-    }
-
-    return {
-      1: "Check your phone",
-      2: "We have sent a text message with a 6-digit verification code to:",
-      3: "We have sent a 6-digit verification code via voice call to:",
-      4: "Your text (SMS) might take a few minutes to arrive.",
-      5: "Your call might take a few minutes to arrive.",
-      6: "Your code will expire in",
-      7: "10 minutes.",
-      8: "Enter the code",
-      9: "6-digit code",
-      10: "Problems with the code?",
-      14: "Request a new code in",
-      15: "seconds",
-      16: "Request a new code",
-      17: "We have sent you a new code",
-      21: "Use a different phone number",
-      24: "Your email might take a few minutes to arrive. If you do not get an email, check your spam folder.",
-      26: "Send the code again",
-    };
-  }),
-}));
 
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
@@ -559,9 +493,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
         </TestWrapper>,
       );
 
-      const differentPhoneLink = screen.getByText(
-        "Use a different phone number",
-      );
+      const differentPhoneLink = screen.getByText("Try another way");
 
       await act(async () => {
         differentPhoneLink.click();
@@ -628,11 +560,13 @@ describe("AddMFAOtpVerification Unit Tests", () => {
   });
 
   describe("French Language Support", () => {
-    beforeEach(() => {
+    beforeEach(async () => {
+      await i18n.changeLanguage("fr");
       vi.mocked(ReactRouter.useParams).mockReturnValue({ language: "fr" });
     });
 
-    afterEach(() => {
+    afterEach(async () => {
+      await i18n.changeLanguage("en");
       vi.mocked(ReactRouter.useParams).mockReturnValue({ language: "en" });
     });
 

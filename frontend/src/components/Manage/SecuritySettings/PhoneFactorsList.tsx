@@ -1,7 +1,7 @@
 import { GcdsContainer, GcdsLink, GcdsText } from "@gcds-core/components-react";
 import { useNavigate, useParams } from "react-router";
 import { PAGES } from "../../../utils/constants";
-import { getPageContent } from "../../../utils/functions";
+import { useTranslation } from "react-i18next";
 import { path } from "../../../utils/routeHelpers";
 import type { OtpFactorReference } from "../../../types/hooks";
 
@@ -18,12 +18,11 @@ export default function PhoneFactorsList({
 }: PhoneFactorsListProps) {
   const { language } = useParams();
   const navigate = useNavigate();
-  const pageContent: Record<string, string> =
-    getPageContent(language, PAGES.manage2FAVerifications) ?? {};
+  const { t } = useTranslation("mfa");
 
   const availableFactorsUIContentMap: Record<string, string> = {
-    smsotp: pageContent["7"],
-    voiceotp: pageContent["8"],
+    smsotp: t("Manage2FAVerifications.textMessage"),
+    voiceotp: t("Manage2FAVerifications.voiceCall"),
   };
 
   const availableFactorsUIContent = (factor: string) =>
@@ -43,7 +42,7 @@ export default function PhoneFactorsList({
         <GcdsText>
           <strong>{`${phoneNumber}`}</strong>
         </GcdsText>
-        <GcdsText>{pageContent["6"]}</GcdsText>
+        <GcdsText>{t("Manage2FAVerifications.codesSentBy")}</GcdsText>
         <ul>{availableFactorsComponent}</ul>
         {Object.keys(userPhoneFactorsMap).length > 1 && (
           <GcdsLink
@@ -60,7 +59,7 @@ export default function PhoneFactorsList({
               });
             }}
           >
-            {pageContent["9"]}
+            {t("Manage2FAVerifications.deleteButton")}
           </GcdsLink>
         )}
         <div className="separator" />

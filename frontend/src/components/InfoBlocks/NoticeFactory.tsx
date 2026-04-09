@@ -1,7 +1,5 @@
 import { GcdsNotice, GcdsText } from "@gcds-core/components-react";
-import { getPageContent } from "../../utils/functions";
-import { PAGES } from "../../utils/constants";
-import { useParams } from "react-router";
+import { useTranslation } from "react-i18next";
 import type { ReactElement } from "react";
 
 export type NoticeType =
@@ -29,9 +27,7 @@ export default function NoticeFactory({
   otpType,
   passkeyName,
 }: NoticeFactoryProps) {
-  const { language } = useParams();
-  const noticeFactoryContent: Record<string, string> =
-    getPageContent(language, PAGES.noticeFactory) ?? {};
+  const { t } = useTranslation("otp");
 
   const NoticeComponents: Record<
     NoticeType,
@@ -41,8 +37,9 @@ export default function NoticeFactory({
       <GcdsText>
         <GcdsNotice noticeRole="success" noticeTitleTag="h2" noticeTitle={" "}>
           <GcdsText>
-            {noticeFactoryContent["1"]} <strong>{currentPhoneNumber}</strong>{" "}
-            {noticeFactoryContent["2"]}
+            {t("NoticeFactory.successfullyDeleted")}{" "}
+            <strong>{currentPhoneNumber}</strong>{" "}
+            {t("NoticeFactory.fromVerificationNumbers")}
           </GcdsText>
         </GcdsNotice>
       </GcdsText>
@@ -55,8 +52,9 @@ export default function NoticeFactory({
       <GcdsText>
         <GcdsNotice noticeRole="success" noticeTitleTag="h2" noticeTitle={" "}>
           <GcdsText>
-            {noticeFactoryContent["3"]} {currentOtpType}{" "}
-            {noticeFactoryContent["4"]} <strong>{currentPhoneNumber}</strong>
+            {t("NoticeFactory.successfullyAdded")} {currentOtpType}{" "}
+            {t("NoticeFactory.verificationFor")}{" "}
+            <strong>{currentPhoneNumber}</strong>
           </GcdsText>
         </GcdsNotice>
       </GcdsText>
@@ -67,9 +65,9 @@ export default function NoticeFactory({
         <GcdsNotice
           noticeRole="success"
           noticeTitleTag="h2"
-          noticeTitle={noticeFactoryContent["notice_title_success"]}
+          noticeTitle={t("NoticeFactory.notice_title_success")}
         >
-          <GcdsText>{noticeFactoryContent["7"]}</GcdsText>
+          <GcdsText>{t("NoticeFactory.passkeyCreated")}</GcdsText>
         </GcdsNotice>
       </GcdsText>
     ),
@@ -79,11 +77,12 @@ export default function NoticeFactory({
         <GcdsNotice
           noticeRole="success"
           noticeTitleTag="h2"
-          noticeTitle={noticeFactoryContent["notice_title_success"]}
+          noticeTitle={t("NoticeFactory.notice_title_success")}
         >
           <GcdsText>
-            {noticeFactoryContent["8"]} <strong>{currentPasskeyName}</strong>{" "}
-            {noticeFactoryContent["10"]}
+            {t("NoticeFactory.yourPasskey")}{" "}
+            <strong>{currentPasskeyName}</strong>{" "}
+            {t("NoticeFactory.deletedFromCanadaLogin")}
           </GcdsText>
         </GcdsNotice>
       </GcdsText>

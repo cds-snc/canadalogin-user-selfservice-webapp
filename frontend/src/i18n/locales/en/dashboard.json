@@ -1,0 +1,8 @@
+{
+  "ManageDashboard": {
+    "welcome": "Welcome,",
+    "personalInfo": "Personal information",
+    "securitySettings": "Security settings",
+    "pageTitle": "Manage CanadaLogin"
+  }
+}

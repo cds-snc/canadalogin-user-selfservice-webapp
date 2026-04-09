@@ -20,17 +20,6 @@ vi.mock("react-router", () => ({
   useParams: () => ({ language: "en" }),
 }));
 
-vi.mock("../../../../../utils/functions", () => ({
-  getPageContent: () => ({
-    1: "Name your passkey",
-    2: "Give your passkey a recognisable name.",
-    3: "Passkey name",
-    4: "For example: Work laptop",
-    5: "Save passkey",
-    6: "Cancel",
-  }),
-}));
-
 vi.mock("../../../../../utils/constants", () => ({
   PAGES: {
     addFIDO2PasskeyNickname: "AddFIDO2PasskeyNickname",
@@ -119,7 +108,9 @@ describe("AddFIDO2PasskeyNickname", () => {
   it("renders the description text", () => {
     render(<AddFIDO2PasskeyNickname {...defaultProps} />);
     expect(
-      screen.getByText("Give your passkey a recognisable name."),
+      screen.getByText(
+        "Give your passkey a memorable name that helps you remember what device you created it on.",
+      ),
     ).toBeInTheDocument();
   });
 
@@ -131,13 +122,13 @@ describe("AddFIDO2PasskeyNickname", () => {
   it("renders input hint text", () => {
     render(<AddFIDO2PasskeyNickname {...defaultProps} />);
     expect(screen.getByTestId("input-hint")).toHaveTextContent(
-      "For example: Work laptop",
+      "example: My Phone",
     );
   });
 
   it("renders save and cancel buttons", () => {
     render(<AddFIDO2PasskeyNickname {...defaultProps} />);
-    expect(screen.getByText("Save passkey")).toBeInTheDocument();
+    expect(screen.getByText("Continue")).toBeInTheDocument();
     expect(screen.getByText("Cancel")).toBeInTheDocument();
   });
 
@@ -157,7 +148,7 @@ describe("AddFIDO2PasskeyNickname", () => {
 
   it("calls setErrorCode with error_passkey_name_required when name is empty", async () => {
     render(<AddFIDO2PasskeyNickname {...defaultProps} />);
-    await userEvent.click(screen.getByText("Save passkey"));
+    await userEvent.click(screen.getByText("Continue"));
     expect(defaultProps.setErrorCode).toHaveBeenCalledWith(
       "error_passkey_name_required",
     );
@@ -168,7 +159,7 @@ describe("AddFIDO2PasskeyNickname", () => {
     render(<AddFIDO2PasskeyNickname {...defaultProps} />);
     const input = screen.getByTestId("passkey-name-input");
     await userEvent.type(input, "   ");
-    await userEvent.click(screen.getByText("Save passkey"));
+    await userEvent.click(screen.getByText("Continue"));
     expect(defaultProps.setErrorCode).toHaveBeenCalledWith(
       "error_passkey_name_required",
     );
@@ -179,7 +170,7 @@ describe("AddFIDO2PasskeyNickname", () => {
     render(<AddFIDO2PasskeyNickname {...defaultProps} />);
     const input = screen.getByTestId("passkey-name-input");
     await userEvent.type(input, "Work Laptop");
-    await userEvent.click(screen.getByText("Save passkey"));
+    await userEvent.click(screen.getByText("Continue"));
     expect(defaultProps.onSubmit).toHaveBeenCalledWith("Work Laptop");
     expect(defaultProps.setErrorCode).not.toHaveBeenCalled();
   });

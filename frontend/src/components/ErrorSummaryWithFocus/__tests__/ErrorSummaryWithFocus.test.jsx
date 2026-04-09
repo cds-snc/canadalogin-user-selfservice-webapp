@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { BrowserRouter } from "react-router";
 import ErrorSummaryWithFocus from "../ErrorSummaryWithFocus";
 import "@testing-library/jest-dom/vitest";
+import i18n from "../../../i18n/test";
 
 // Mock GCDS components to enable proper event handling and testing
 vi.mock("@gcds-core/components-react", () => ({
@@ -37,37 +38,6 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </div>
   ),
-})); // Mock dependencies
-vi.mock("../../../utils/functions", () => ({
-  getPageContent: vi.fn((language, page) => {
-    if (page === "Error") {
-      if (language === "fr") {
-        return {
-          1: "Il y a un problème avec l'information que vous avez fournie",
-          7: "Une erreur inattendue s'est produite. Veuillez réessayer plus tard.",
-          CSIAM0001E: "Nom d'utilisateur ou mot de passe incorrect.",
-          CSIAM0002E: "Votre compte a été verrouillé.",
-          CSIAM0011E: "Code de vérification invalide. Veuillez réessayer.",
-          ERROR_CODE_123: "Code d'erreur de test pour les tests.",
-        };
-      }
-      return {
-        1: "There is a problem with the information you provided",
-        7: "An unexpected error occurred. Please try again later.",
-        CSIAM0001E: "Incorrect username or password.",
-        CSIAM0002E: "Your account has been locked.",
-        CSIAM0011E: "Invalid verification code. Please try again.",
-        ERROR_CODE_123: "Test error code for testing purposes.",
-      };
-    }
-    return {};
-  }),
-}));
-
-vi.mock("../../../utils/constants", () => ({
-  PAGES: {
-    error: "Error",
-  },
 }));
 
 const TestWrapper = ({ children }) => <BrowserRouter>{children}</BrowserRouter>;
@@ -164,7 +134,7 @@ describe("ErrorSummaryWithFocus Unit Tests", () => {
       );
 
       expect(
-        screen.getByText("Invalid verification code. Please try again."),
+        screen.getByText("The verification code is invalid or has expired."),
       ).toBeInTheDocument();
     });
 
@@ -176,9 +146,7 @@ describe("ErrorSummaryWithFocus Unit Tests", () => {
       );
 
       expect(
-        screen.getByText(
-          "An unexpected error occurred. Please try again later.",
-        ),
+        screen.getByText("Server Error. Please try again later."),
       ).toBeInTheDocument();
     });
 
@@ -189,11 +157,7 @@ describe("ErrorSummaryWithFocus Unit Tests", () => {
         </TestWrapper>,
       );
 
-      expect(
-        screen.getByText(
-          "There is a problem with the information you provided",
-        ),
-      ).toBeInTheDocument();
+      expect(screen.getByText("There was a problem")).toBeInTheDocument();
     });
 
     it("should display error message with correct language attribute", () => {
@@ -209,6 +173,14 @@ describe("ErrorSummaryWithFocus Unit Tests", () => {
   });
 
   describe("French Language Support", () => {
+    beforeEach(() => {
+      i18n.changeLanguage("fr");
+    });
+
+    afterEach(() => {
+      i18n.changeLanguage("en");
+    });
+
     it("should render French content when language is 'fr'", () => {
       render(
         <TestWrapper>
@@ -217,13 +189,11 @@ describe("ErrorSummaryWithFocus Unit Tests", () => {
       );
 
       expect(
-        screen.getByText("Code de vérification invalide. Veuillez réessayer."),
-      ).toBeInTheDocument();
-      expect(
         screen.getByText(
-          "Il y a un problème avec l'information que vous avez fournie",
+          "Le code de vérification n'est pas valide ou a expiré.",
         ),
       ).toBeInTheDocument();
+      expect(screen.getByText("Un problème est survenu")).toBeInTheDocument();
     });
 
     it("should display French default error message for unknown error code", () => {
@@ -235,7 +205,7 @@ describe("ErrorSummaryWithFocus Unit Tests", () => {
 
       expect(
         screen.getByText(
-          "Une erreur inattendue s'est produite. Veuillez réessayer plus tard.",
+          "Une erreur du serveur s'est produite. Veuillez réessayer plus tard.",
         ),
       ).toBeInTheDocument();
     });
@@ -263,7 +233,7 @@ describe("ErrorSummaryWithFocus Unit Tests", () => {
       const link = screen.getByTestId("error-link-0");
       expect(link).toHaveAttribute("href", "#error-href-1");
       expect(link).toHaveTextContent(
-        "Invalid verification code. Please try again.",
+        "The verification code is invalid or has expired.",
       );
     });
 
@@ -353,7 +323,7 @@ describe("ErrorSummaryWithFocus Unit Tests", () => {
     it("should trigger scroll and focus when error message changes", async () => {
       const { rerender } = render(
         <TestWrapper>
-          <ErrorSummaryWithFocus errorCode="CSIAM0001E" language="en" />
+          <ErrorSummaryWithFocus errorCode="CSIAM0010E" language="en" />
         </TestWrapper>,
       );
 
@@ -364,7 +334,7 @@ describe("ErrorSummaryWithFocus Unit Tests", () => {
       // Change error code
       rerender(
         <TestWrapper>
-          <ErrorSummaryWithFocus errorCode="CSIAM0002E" language="en" />
+          <ErrorSummaryWithFocus errorCode="CSIAM0038E" language="en" />
         </TestWrapper>,
       );
 
@@ -438,13 +408,14 @@ describe("ErrorSummaryWithFocus Unit Tests", () => {
   describe("Different Error Codes", () => {
     const errorCodes = [
       {
-        code: "CSIAM0001E",
-        expectedMessage: "Incorrect username or password.",
+        code: "CSIAM0010E",
+        expectedMessage: "The authentication attempt failed",
       },
-      { code: "CSIAM0002E", expectedMessage: "Your account has been locked." },
+      { code: "CSIAM0038E", expectedMessage: "Too Many Attempts" },
       {
-        code: "ERROR_CODE_123",
-        expectedMessage: "Test error code for testing purposes.",
+        code: "CSIAI0021E",
+        expectedMessage:
+          "The password that you specified was used previously, and it cannot be reused.",
       },
     ];
 
@@ -465,57 +436,57 @@ describe("ErrorSummaryWithFocus Unit Tests", () => {
     it("should handle error code changes properly", () => {
       const { rerender } = render(
         <TestWrapper>
-          <ErrorSummaryWithFocus errorCode="CSIAM0001E" language="en" />
+          <ErrorSummaryWithFocus errorCode="CSIAM0010E" language="en" />
         </TestWrapper>,
       );
 
       expect(
-        screen.getByText("Incorrect username or password."),
+        screen.getByText("The authentication attempt failed"),
       ).toBeInTheDocument();
 
       rerender(
         <TestWrapper>
-          <ErrorSummaryWithFocus errorCode="CSIAM0002E" language="en" />
+          <ErrorSummaryWithFocus errorCode="CSIAM0038E" language="en" />
         </TestWrapper>,
       );
 
       expect(
-        screen.queryByText("Incorrect username or password."),
+        screen.queryByText("The authentication attempt failed"),
       ).not.toBeInTheDocument();
-      expect(
-        screen.getByText("Your account has been locked."),
-      ).toBeInTheDocument();
+      expect(screen.getByText("Too Many Attempts")).toBeInTheDocument();
     });
 
     it("should handle language changes properly", () => {
       const { rerender } = render(
         <TestWrapper>
-          <ErrorSummaryWithFocus errorCode="CSIAM0001E" language="en" />
+          <ErrorSummaryWithFocus errorCode="CSIAM0010E" language="en" />
         </TestWrapper>,
       );
 
       expect(
-        screen.getByText("Incorrect username or password."),
+        screen.getByText("The authentication attempt failed"),
       ).toBeInTheDocument();
 
+      i18n.changeLanguage("fr");
       rerender(
         <TestWrapper>
-          <ErrorSummaryWithFocus errorCode="CSIAM0001E" language="fr" />
+          <ErrorSummaryWithFocus errorCode="CSIAM0010E" language="fr" />
         </TestWrapper>,
       );
 
       expect(
-        screen.queryByText("Incorrect username or password."),
+        screen.queryByText("The authentication attempt failed"),
       ).not.toBeInTheDocument();
       expect(
-        screen.getByText("Nom d'utilisateur ou mot de passe incorrect."),
+        screen.getByText("La tentative d'authentification a échoué"),
       ).toBeInTheDocument();
+      i18n.changeLanguage("en");
     });
 
     it("should unmount gracefully when error is cleared", async () => {
       const { rerender } = render(
         <TestWrapper>
-          <ErrorSummaryWithFocus errorCode="CSIAM0001E" language="en" />
+          <ErrorSummaryWithFocus errorCode="CSIAM0010E" language="en" />
         </TestWrapper>,
       );
 
@@ -585,9 +556,7 @@ describe("ErrorSummaryWithFocus Unit Tests", () => {
 
       // Should fall back to default error message
       expect(
-        screen.getByText(
-          "An unexpected error occurred. Please try again later.",
-        ),
+        screen.getByText("Server Error. Please try again later."),
       ).toBeInTheDocument();
     });
   });
@@ -607,7 +576,7 @@ describe("ErrorSummaryWithFocus Unit Tests", () => {
     it("should maintain focus management when error changes", async () => {
       const { rerender } = render(
         <TestWrapper>
-          <ErrorSummaryWithFocus errorCode="CSIAM0001E" language="en" />
+          <ErrorSummaryWithFocus errorCode="CSIAM0010E" language="en" />
         </TestWrapper>,
       );
 
@@ -616,7 +585,7 @@ describe("ErrorSummaryWithFocus Unit Tests", () => {
 
       rerender(
         <TestWrapper>
-          <ErrorSummaryWithFocus errorCode="CSIAM0002E" language="en" />
+          <ErrorSummaryWithFocus errorCode="CSIAM0038E" language="en" />
         </TestWrapper>,
       );
 
@@ -643,12 +612,12 @@ describe("ErrorSummaryWithFocus Unit Tests", () => {
     it("should handle rapid error code changes without issues", async () => {
       const { rerender } = render(
         <TestWrapper>
-          <ErrorSummaryWithFocus errorCode="CSIAM0001E" language="en" />
+          <ErrorSummaryWithFocus errorCode="CSIAM0010E" language="en" />
         </TestWrapper>,
       );
 
       // Rapidly change error codes
-      const errorCodes = ["CSIAM0002E", "CSIAM0011E", "ERROR_CODE_123"];
+      const errorCodes = ["CSIAM0038E", "CSIAM0011E", "CSIAI0021E"];
 
       errorCodes.forEach((code) => {
         rerender(
@@ -660,7 +629,9 @@ describe("ErrorSummaryWithFocus Unit Tests", () => {
 
       // Should still render the last error code
       expect(
-        screen.getByText("Test error code for testing purposes."),
+        screen.getByText(
+          "The password that you specified was used previously, and it cannot be reused.",
+        ),
       ).toBeInTheDocument();
     });
 

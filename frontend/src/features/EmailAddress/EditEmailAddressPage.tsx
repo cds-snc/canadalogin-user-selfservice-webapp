@@ -8,7 +8,7 @@ import {
   PAGES,
   FLOW_TYPES,
 } from "../../utils/constants";
-import { getPageContent } from "../../utils/functions";
+import { useTranslation } from "react-i18next";
 import { getErrorMessage } from "../../utils/errorUtils";
 import PasswordVerification from "../TransientOtp/components/PasswordVerification";
 import OtpSelection from "../TransientOtp/components/OtpSelection";
@@ -51,7 +51,7 @@ export default function EditEmailAddressPage() {
   const backToProfile = path(PAGES.ProfileHome, {
     language: language,
   });
-  const pageContentJson = getPageContent(language, PAGES.otpSelection) ?? {};
+  const { t } = useTranslation("security");
 
   // Initialize form tracking
   const { trackEvent } = useFormTracking({
@@ -477,7 +477,7 @@ export default function EditEmailAddressPage() {
   };
 
   return localLoading || validatePasswordLoading ? (
-    <Loader text={pageContentJson["11"]} />
+    <Loader text={t("OtpSelection.loading")} />
   ) : (
     <StepContent
       StepComponent={steps[wizardStep]}

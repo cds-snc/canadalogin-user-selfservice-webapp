@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router";
 import * as ReactRouter from "react-router";
 import AddMFAPhoneNumber from "../AddMFAPhoneNumber";
 import "@testing-library/jest-dom/vitest";
+import i18n from "../../../../../i18n/test";
 
 // Mock GCDS components to enable proper event handling
 vi.mock("@gcds-core/components-react", () => ({
@@ -68,64 +69,6 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </details>
   ),
-}));
-
-// Mock dependencies
-vi.mock("@/utils/functions", () => ({
-  getPageContent: vi.fn((language, page) => {
-    if (page === "Button") {
-      if (language === "fr") {
-        return {
-          submit: "Continuer",
-          cancel: "Annuler",
-        };
-      }
-      return {
-        submit: "Continue",
-        cancel: "Cancel",
-      };
-    }
-
-    if (language === "fr") {
-      return {
-        1: "Ajouter un numéro de téléphone pour la vérification en deux étapes",
-        2: "Entrez le nouveau numéro de téléphone auquel vous souhaitez recevoir vos codes de sécurité à chaque fois que vous vous connectez.",
-        3: "Ce numéro de téléphone ne sera utilisé que pour la vérification en deux étapes. Pour gérer votre numéro de téléphone de communication, rendez-vous sur la page",
-        4: "Renseignements personnels",
-        5: ".",
-        6: "Numéro de téléphone",
-        7: "Entrez votre nouveau numéro de téléphone",
-        8: "Mon pays n'est pas dans la liste",
-        9: "Certains pays ne sont pas pris en charge en raison de limitations techniques. Si votre pays n'apparaît pas dans la liste, vous ne pouvez pas créer d’identifiant ConnexionCanada à l'heure actuelle. Nous nous excusons des désagréments que cela pourrait causer.",
-        10: "Comment souhaitez-vous recevoir votre code de vérification?",
-        11: "Message texte (SMS)",
-        12: "Recevoir un message texte avec votre code de vérification",
-        13: "Appel vocal",
-        14: "Recevoir un appel téléphonique avec votre code de vérification",
-        15: "Des frais de messagerie standard peuvent s'appliquer",
-        16: "Annuler",
-      };
-    }
-
-    return {
-      1: "Add Phone Number for Two-Step Verification",
-      2: "Enter a phone number to receive text messages or phone calls for two-step verification.",
-      3: "You can also",
-      4: "Personal Information",
-      5: "later.",
-      6: "Phone number",
-      7: "Enter your new phone number",
-      8: "My country is not listed",
-      9: "We currently support phone numbers from select countries.",
-      10: "How would you like to receive your verification code?",
-      11: "Text message (SMS)",
-      12: "Receive a text message with your verification code",
-      13: "Voice call",
-      14: "Receive a phone call with your verification code",
-      15: "Standard messaging rates may apply",
-      16: "Cancel",
-    };
-  }),
 }));
 
 vi.mock("react-router", async () => {
@@ -935,7 +878,8 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
   });
 
   describe("French Language Branch Coverage", () => {
-    it("should use French localization when language is 'fr'", () => {
+    it("should use French localization when language is 'fr'", async () => {
+      await i18n.changeLanguage("fr");
       // Mock useParams to return French language
       vi.mocked(ReactRouter.useParams).mockReturnValue({ language: "fr" });
 
@@ -960,6 +904,7 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
 
       // Reset the mock
       vi.mocked(ReactRouter.useParams).mockReturnValue({ language: "en" });
+      await i18n.changeLanguage("en");
     });
   });
 
@@ -1113,8 +1058,9 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
       expect(cancelButton).toHaveAttribute("data-button-role", "secondary");
     });
 
-    it("should exercise the French localization path in PhoneInput", () => {
+    it("should exercise the French localization path in PhoneInput", async () => {
       // Test French language to trigger the French localization branch
+      await i18n.changeLanguage("fr");
       vi.mocked(ReactRouter.useParams).mockReturnValue({ language: "fr" });
 
       render(
@@ -1134,6 +1080,7 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
 
       // Reset for other tests
       vi.mocked(ReactRouter.useParams).mockReturnValue({ language: "en" });
+      await i18n.changeLanguage("en");
     });
 
     it("should exercise both MyCountryIsNotListed and RadioButtons child components", () => {

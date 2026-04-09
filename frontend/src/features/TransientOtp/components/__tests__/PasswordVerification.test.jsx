@@ -16,54 +16,6 @@ vi.mock("react-router", async () => {
 });
 
 // Mock utilities
-vi.mock("../../../../utils/functions", () => ({
-  getPageContent: vi.fn((language, page) => {
-    if (page === PAGES.passwordVerification) {
-      return {
-        1: "First, verify it's you",
-        2: "To change your password,",
-        3: "first enter your current password.",
-        4: "Password",
-        5: "Forgot your password?",
-        6: "Reset your password",
-        7: "To add a phone number,",
-        8: "To delete this number,",
-      };
-    }
-    if (page === PAGES.error) {
-      return {
-        1: "There was a problem",
-        2: "Invalid email. Email must contain an '@' symbol followed by a domain.",
-        3: "Codes must be six digits. Try again.",
-        4: "Password must be 12 characters",
-        5: "Passwords are 12 to 65 characters long. Please try again.",
-        6: "Code sent does not match. Try again.",
-        7: "Server Error. Please try again later.",
-        8: "Invalid phone number. Phone numbers for the country you selected should be ",
-        9: " digits. Make sure you selected the right country, or try typing your phone number again. Extensions are not allowed.",
-        10: "Enter a phone number to continue.",
-        11: "Enter a last name to continue. If you have a single name, enter it in the last name field.",
-        12: "and a maximum of",
-        13: "characters.",
-        CSIAM0010E: "The authentication attempt failed",
-        CSIAM0011E: "The verification code is invalid or has expired.",
-        CSIAM0038E: "Too Many Attempts",
-        CSIAI0021E:
-          "The password that you specified was used previously, and it cannot be reused.",
-        CSIBN0025E: "The verification code is invalid or has expired.",
-        CSIBN0028E: "The verification code is invalid or has expired.",
-        CSIBN0021E: "The verification code is invalid.",
-      };
-    }
-    if (page === "Button") {
-      return {
-        submit: "Submit",
-        cancel: "Cancel",
-      };
-    }
-    return {};
-  }),
-}));
 
 // Mock GCDS components
 vi.mock("@gcds-core/components-react", () => ({
@@ -231,7 +183,7 @@ describe("PasswordVerification Component", () => {
       renderComponent();
       expect(screen.getByTestId("submit-button")).toBeInTheDocument();
       expect(screen.getByTestId("cancel-button")).toBeInTheDocument();
-      expect(screen.getByText("Submit")).toBeInTheDocument();
+      expect(screen.getByText("Continue")).toBeInTheDocument();
       expect(screen.getByText("Cancel")).toBeInTheDocument();
     });
   });

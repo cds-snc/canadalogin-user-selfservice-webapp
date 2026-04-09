@@ -9,14 +9,11 @@ import {
   GcdsText,
 } from "@gcds-core/components-react";
 
-import { getPageContent } from "../../../utils/functions";
-import { PAGES } from "../../../utils/constants";
+import { useTranslation, Trans } from "react-i18next";
+
 import Loader from "../../../components/Layout/Loading";
 import SubmitButton from "../../../components/Layout/SubmitButton";
-import type {
-  ProfileNameConfirmProps,
-  ProfileNamePageContent,
-} from "../../../types/profileName";
+import type { ProfileNameConfirmProps } from "../../../types/profileName";
 
 function ErrorMessage({ errorMessage }: { errorMessage?: string }) {
   return errorMessage ? (
@@ -36,14 +33,7 @@ export default function ConfirmUpdate({
   const { language = "en" } = useParams<{ language: string }>();
   const routeLanguage = language === "fr" ? "fr" : "en";
 
-  const pageContentJson =
-    (getPageContent(routeLanguage, PAGES.profileUpdateNameConfirmUpdate) as
-      | ProfileNamePageContent
-      | undefined) ?? {};
-  const loaderPageContentJson =
-    (getPageContent(routeLanguage, PAGES.otpSelection) as
-      | ProfileNamePageContent
-      | undefined) ?? {};
+  const { t } = useTranslation(["profile", "security"]);
 
   const formattedName = nameFormData?.formatted;
 
@@ -57,29 +47,34 @@ export default function ConfirmUpdate({
   }
 
   return localLoading ? (
-    <Loader text={loaderPageContentJson["11"]} />
+    <Loader text={t("OtpSelection.loading", { ns: "security" })} />
   ) : (
     <>
       <ErrorMessage errorMessage={errorMessage} />
       <GcdsContainer role="main">
         <GcdsGrid columns="1" gap="300">
-          <GcdsHeading tag="h1">{pageContentJson["1"]}</GcdsHeading>
+          <GcdsHeading tag="h1">
+            {t("ProfileUpdateNameConfirmUpdate.title")}
+          </GcdsHeading>
           <div>
             <GcdsText marginBottom="400">
-              {pageContentJson["2"]} <strong>{formattedName}</strong>
-              {pageContentJson["17"]}
+              {t("ProfileUpdateNameConfirmUpdate.requestedUpdate")}{" "}
+              <strong>{formattedName}</strong>.
             </GcdsText>
-            <GcdsText>
-              {pageContentJson["13"]} <strong>{pageContentJson["14"]}</strong>{" "}
-              {pageContentJson["15"]} <strong>{pageContentJson["16"]}</strong>
-              {pageContentJson["17"]}
+            <GcdsText marginBottom="0">
+              <Trans
+                i18nKey="ProfileUpdateNameConfirmUpdate.allServicesNotice"
+                ns="profile"
+                components={{ bold: <strong /> }}
+              />
             </GcdsText>
           </div>
 
           <GcdsNotice noticeRole="info" noticeTitleTag="h2" noticeTitle=" ">
             <GcdsText>
-              {pageContentJson["7"]} <strong>{pageContentJson["11"]}</strong>{" "}
-              {pageContentJson["12"]}
+              {t("ProfileUpdateNameConfirmUpdate.thisText")}{" "}
+              <strong>{t("ProfileUpdateNameConfirmUpdate.doesNot")}</strong>{" "}
+              {t("ProfileUpdateNameConfirmUpdate.legallyChangeName")}
             </GcdsText>
           </GcdsNotice>
           <GcdsGrid columns="max-content max-content" gap="200">
@@ -87,7 +82,7 @@ export default function ConfirmUpdate({
               onGcdsClick={onSubmitHandler}
               currentLang={routeLanguage}
             >
-              {pageContentJson["8"]}
+              {t("ProfileUpdateNameConfirmUpdate.confirmButton")}
             </SubmitButton>
             <GcdsButton
               buttonRole="secondary"
@@ -96,7 +91,7 @@ export default function ConfirmUpdate({
                 void onCancel();
               }}
             >
-              {pageContentJson["9"]}
+              {t("ProfileUpdateNameConfirmUpdate.cancelButton")}
             </GcdsButton>
           </GcdsGrid>
         </GcdsGrid>

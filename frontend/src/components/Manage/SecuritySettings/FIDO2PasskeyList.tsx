@@ -7,7 +7,7 @@ import {
 } from "@gcds-core/components-react";
 import { useNavigate, useParams } from "react-router";
 import { PAGES } from "../../../utils/constants";
-import { getPageContent } from "../../../utils/functions";
+import { useTranslation } from "react-i18next";
 import { path } from "../../../utils/routeHelpers";
 import { useState } from "react";
 import { fido2Api } from "../../../features/ManageFIDO2/api/fido2Api";
@@ -40,15 +40,12 @@ export default function FIDO2PasskeyList({
 }: FIDO2PasskeyListProps) {
   const { language } = useParams();
   const navigate = useNavigate();
-  const pageContent: Record<string, string> =
-    getPageContent(language, PAGES.manage2FAVerifications) ?? {};
+  const { t } = useTranslation(["mfa", "common"]);
   const [loading, setLoading] = useState(false);
   const [editingPasskeyId, setEditingPasskeyId] = useState<string | null>(null);
   const [passkeyNicknameInputs, setPasskeyNicknameInputs] = useState<
     Record<string, string>
   >({});
-  const errorPageContent: Record<string, string> =
-    getPageContent(language, PAGES.error) ?? {};
 
   const deletePasskeyPage = path(PAGES.deleteFIDO2PasskeyPage, {
     language,
@@ -74,7 +71,7 @@ export default function FIDO2PasskeyList({
       if (response?.success) {
         await onRenameSuccess?.();
       } else {
-        throw new Error(errorPageContent["error_rename_credential"]);
+        throw new Error(t("Error.error_rename_credential", { ns: "common" }));
       }
     } catch (error) {
       console.error(["error_rename_credential"], error);
@@ -94,7 +91,7 @@ export default function FIDO2PasskeyList({
       <GcdsContainer key={id}>
         {isEditing ? (
           <GcdsInput
-            label={pageContent[24]}
+            label={t("Manage2FAVerifications.nameLabel")}
             inputId="passkeyNickname"
             name="passkeyNickname"
             type="text"
@@ -118,7 +115,7 @@ export default function FIDO2PasskeyList({
           </GcdsText>
         )}
         <GcdsText textRole="secondary">
-          {pageContent["16"]}
+          {t("Manage2FAVerifications.createdOn")}
           {created ? new Date(created).toLocaleDateString() : ""}
         </GcdsText>
         <GcdsGrid columns="max-content max-content max-content" gap="200">
@@ -132,7 +129,7 @@ export default function FIDO2PasskeyList({
                 }}
                 disabled={loading}
               >
-                {pageContent["22"]}
+                {t("Manage2FAVerifications.saveButton")}
               </GcdsButton>
               <GcdsButton
                 id="cancel-fido2-button"
@@ -147,7 +144,7 @@ export default function FIDO2PasskeyList({
                 }}
                 disabled={loading}
               >
-                {pageContent["23"]}
+                {t("Manage2FAVerifications.cancelButton")}
               </GcdsButton>
             </>
           ) : (
@@ -159,7 +156,7 @@ export default function FIDO2PasskeyList({
                   setEditingPasskeyId(id);
                 }}
               >
-                {pageContent["14"]}
+                {t("Manage2FAVerifications.renamePasskey")}
               </GcdsButton>
               <GcdsButton
                 id="delete-fido2-button"
@@ -170,7 +167,7 @@ export default function FIDO2PasskeyList({
                   });
                 }}
               >
-                {pageContent["13"]}
+                {t("Manage2FAVerifications.deletePasskey")}
               </GcdsButton>
             </>
           )}

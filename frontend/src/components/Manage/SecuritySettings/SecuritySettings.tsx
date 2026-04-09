@@ -8,7 +8,7 @@ import {
   GcdsText,
   GcdsLink,
 } from "@gcds-core/components-react";
-import { getPageContent } from "../../../utils/functions";
+import { useTranslation } from "react-i18next";
 import { path } from "../../../utils/routeHelpers";
 import { PAGES, DEV_ONLY_FEATURE } from "../../../utils/constants";
 
@@ -19,8 +19,7 @@ import VerifiedBadge from "../../Badges/VerifiedBadge";
 export default function SecuritySettings() {
   const { language } = useParams();
 
-  const pageContent: Record<string, string> =
-    getPageContent(language, PAGES.securitySettings) ?? {};
+  const { t } = useTranslation("security");
   const { state } = useUser();
   const lastPasswordChange = state?.userProfile?.details?.pwdChangedTime || "";
   const formattedPasswordChangeDate = lastPasswordChange
@@ -36,30 +35,30 @@ export default function SecuritySettings() {
 
   return (
     <GcdsContainer role="main">
-      <GcdsHeading tag="h1">{pageContent["1"]}</GcdsHeading>
-      <GcdsHeading tag="h2">{pageContent["2"]}</GcdsHeading>
-      <GcdsText>{pageContent["3"]}</GcdsText>
+      <GcdsHeading tag="h1">{t("SecuritySettings.title")}</GcdsHeading>
+      <GcdsHeading tag="h2">{t("SecuritySettings.howYouSignIn")}</GcdsHeading>
+      <GcdsText>{t("SecuritySettings.keepInfoUpdated")}</GcdsText>
       <GcdsContainer className="sectionCard">
-        <GcdsHeading tag="h3">{pageContent["4"]}</GcdsHeading>
+        <GcdsHeading tag="h3">{t("SecuritySettings.password")}</GcdsHeading>
         <GcdsGrid columns="1fr" gap="300" align-items="center">
           <GcdsText>
-            {pageContent["5"]} {formattedPasswordChangeDate}
+            {t("SecuritySettings.lastChangedOn")} {formattedPasswordChangeDate}
           </GcdsText>
           <GcdsLink size="regular" href={passwordPage}>
-            {pageContent["6"]}
+            {t("SecuritySettings.change")}
           </GcdsLink>
         </GcdsGrid>
       </GcdsContainer>
 
       <GcdsContainer className="sectionCard">
         <GcdsHeading tag="h3" marginTop="300">
-          {pageContent["7"]}
+          {t("SecuritySettings.twoStepVerification")}
         </GcdsHeading>
-        <GcdsText>{pageContent["8"]}</GcdsText>
+        <GcdsText>{t("SecuritySettings.twoStepDescription")}</GcdsText>
         <GcdsGrid columns="1fr" gap="300" align-items="center">
-          <EnabledBadge text={pageContent["9"]} />
+          <EnabledBadge text={t("SecuritySettings.enabled")} />
           <GcdsLink href={manage2FAVerificationsPage} size="regular">
-            {pageContent["10"]}
+            {t("SecuritySettings.manage")}
           </GcdsLink>
         </GcdsGrid>
       </GcdsContainer>
