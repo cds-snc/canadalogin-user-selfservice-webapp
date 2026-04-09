@@ -8,7 +8,7 @@ import {
   GcdsText,
 } from "@gcds-core/components-react";
 
-import { useTranslation } from "react-i18next";
+import { useTranslation, Trans } from "react-i18next";
 import { LANGUAGE_DISPLAY_NAMES } from "../../../utils/constants";
 import SubmitButton from "../../../components/Layout/SubmitButton";
 import type { LanguagePreferenceConfirmProps } from "../../../types/languagePreference";
@@ -52,7 +52,13 @@ export default function ConfirmUpdate({
         {t("ConfirmLanguageUpdate.requestedUpdate")}{" "}
         <strong>{displayLanguageName}</strong>.
       </GcdsText>
-      <GcdsText>{t("ConfirmLanguageUpdate.allServicesNotice")}</GcdsText>
+      <GcdsText>
+        <Trans
+          i18nKey="ConfirmLanguageUpdate.allServicesNotice"
+          ns="language"
+          components={{ bold: <strong /> }}
+        />
+      </GcdsText>
 
       <GcdsGrid columns="max-content max-content" gap="200">
         <SubmitButton

@@ -15,7 +15,7 @@
     "title": "Voulez-vous vraiment mettre à jour votre langue de communication?",
     "requestedUpdate": "Vous avez demandé à changer votre langue de communication pour la langue suivante:",
     "exampleName": "Exemple : Nouveau nom",
-    "allServicesNotice": "Cette action mettra à jour votre langue de communication pour tous les services que vous avez connectés à votre identifiant ConnexionCanada.",
+    "allServicesNotice": "Cette action mettra à jour votre langue de communication pour <bold>tous</bold> les services que vous avez connectés à votre identifiant <bold>ConnexionCanada</bold>.",
     "headsUp": "Attention",
     "thisText": "Ceci",
     "confirmButton": "Oui, mettre à jour",

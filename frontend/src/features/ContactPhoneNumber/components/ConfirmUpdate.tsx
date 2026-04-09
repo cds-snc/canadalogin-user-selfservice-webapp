@@ -10,7 +10,7 @@ import {
   GcdsText,
 } from "@gcds-core/components-react";
 
-import { useTranslation } from "react-i18next";
+import { useTranslation, Trans } from "react-i18next";
 import SubmitButton from "../../../components/Layout/SubmitButton";
 import { path } from "../../../utils/routeHelpers";
 import { PAGES } from "../../../utils/constants";
@@ -67,7 +67,11 @@ export default function ConfirmUpdate({
         </div>
 
         <GcdsText>
-          {t("ConfirmContactPhoneNumberUpdate.allServicesNotice")}
+          <Trans
+            i18nKey="ConfirmContactPhoneNumberUpdate.allServicesNotice"
+            ns="phone"
+            components={{ bold: <strong /> }}
+          />
         </GcdsText>
 
         <GcdsNotice noticeRole="info" noticeTitleTag="h2" noticeTitle=" ">

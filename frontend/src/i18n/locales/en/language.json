@@ -15,7 +15,7 @@
     "title": "Are you sure you want to update your language preference?",
     "requestedUpdate": "You've requested to update your language preference to:",
     "exampleName": "Example Newname",
-    "allServicesNotice": "This will update your language preference with all services you have connected to your CanadaLogin.",
+    "allServicesNotice": "This will update your language preference with <bold>all</bold> services you have connected to your <bold>CanadaLogin</bold>.",
     "headsUp": "Heads up",
     "thisText": "This ",
     "confirmButton": "Yes, update",

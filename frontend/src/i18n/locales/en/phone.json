@@ -33,7 +33,7 @@
     "title": "Are you sure you want to update your phone number?",
     "requestedUpdate": "You've requested to update your contact phone number to:",
     "exampleName": "Example Newname",
-    "allServicesNotice": "This will update your contact phone number with all services you have connected to your CanadaLogin.",
+    "allServicesNotice": "This will update your contact phone number with <bold>all</bold> services you have connected to your <bold>CanadaLogin</bold>.",
     "onlyChanges": "This only changes your",
     "contactPhoneNumber": "contact phone number.",
     "changeTwoStep": "To change your 2-step verification number, go to your",

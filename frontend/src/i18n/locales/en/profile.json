@@ -32,7 +32,7 @@
     "title": "Are you sure you want to update your name?",
     "requestedUpdate": "You've requested to update your name to:",
     "exampleName": "Example Newname",
-    "allServicesNotice": "This will update your name with all services you have connected to your CanadaLogin.",
+    "allServicesNotice": "This will update your name with <bold>all</bold> services you have connected to your <bold>CanadaLogin</bold>.",
     "headsUp": "Heads up",
     "thisText": "This",
     "confirmButton": "Yes, update",

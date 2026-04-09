@@ -9,7 +9,7 @@ import {
   GcdsText,
 } from "@gcds-core/components-react";
 
-import { useTranslation } from "react-i18next";
+import { useTranslation, Trans } from "react-i18next";
 
 import Loader from "../../../components/Layout/Loading";
 import SubmitButton from "../../../components/Layout/SubmitButton";
@@ -62,7 +62,11 @@ export default function ConfirmUpdate({
               <strong>{formattedName}</strong>.
             </GcdsText>
             <GcdsText marginBottom="0">
-              {t("ProfileUpdateNameConfirmUpdate.allServicesNotice")}
+              <Trans
+                i18nKey="ProfileUpdateNameConfirmUpdate.allServicesNotice"
+                ns="profile"
+                components={{ bold: <strong /> }}
+              />
             </GcdsText>
           </div>
 

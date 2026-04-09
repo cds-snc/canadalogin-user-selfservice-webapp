@@ -39,7 +39,7 @@
   "EmailConfirmUpdate": {
     "title": "Are you sure you want to update your email?",
     "requestedUpdate": "You've requested to update your email to:",
-    "allServicesNotice": "This will update your email with all services you have connected to your CanadaLogin.",
+    "allServicesNotice": "This will update your email with <bold>all</bold> services you have connected to your <bold>CanadaLogin</bold>.",
     "confirmButton": "Yes, update"
   },
   "EmailUpdateSuccess": {

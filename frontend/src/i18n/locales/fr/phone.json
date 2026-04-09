@@ -33,7 +33,7 @@
     "title": "Voulez-vous vraiment modifier votre numéro de téléphone de communication?",
     "requestedUpdate": "Vous avez demandé à remplacer votre nom par le nom suivant :",
     "exampleName": "Exemple Newname",
-    "allServicesNotice": "Cette action mettra à jour votre numéro de téléphone de communication pour tous les services que vous avez connectés à votre identifiant ConnexionCanada.",
+    "allServicesNotice": "Cette action mettra à jour votre numéro de téléphone de communication pour <bold>tous</bold> les services que vous avez connectés à votre identifiant <bold>ConnexionCanada</bold>.",
     "onlyChanges": "Cette action ne modifie que votre",
     "contactPhoneNumber": "numéro de téléphone de communication.",
     "changeTwoStep": "Pour modifier le numéro de téléphone associé à la vérification en deux étapes, rendez-vous sur la page",

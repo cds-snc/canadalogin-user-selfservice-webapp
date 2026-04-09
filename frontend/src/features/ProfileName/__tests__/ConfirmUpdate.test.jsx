@@ -360,10 +360,16 @@ describe("ConfirmUpdate Component Tests", () => {
       screen.getByText(/You've requested to update your name to:/),
     ).toBeInTheDocument();
 
-    // Check for service info
+    // Check for service info (bold formatting splits text across elements)
     expect(
       screen.getByText(
-        /This will update your name with all services you have connected to your CanadaLogin\./,
+        (content, element) =>
+          element?.tagName === "DIV" &&
+          element?.getAttribute("style")?.includes("margin-bottom: 0") &&
+          (element?.textContent?.includes(
+            "This will update your name with all services you have connected to your CanadaLogin.",
+          ) ??
+            false),
       ),
     ).toBeInTheDocument();
 

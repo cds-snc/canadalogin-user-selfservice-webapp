@@ -1,5 +1,5 @@
 import { useParams } from "react-router";
-import { useTranslation } from "react-i18next";
+import { useTranslation, Trans } from "react-i18next";
 import {
   GcdsButton,
   GcdsContainer,
@@ -38,7 +38,13 @@ export default function EmailConfirmUpdate({
         {t("EmailConfirmUpdate.requestedUpdate")}{" "}
         <strong>{formData.emailAddress}</strong>.
       </GcdsText>
-      <GcdsText>{t("EmailConfirmUpdate.allServicesNotice")}</GcdsText>
+      <GcdsText>
+        <Trans
+          i18nKey="EmailConfirmUpdate.allServicesNotice"
+          ns="email"
+          components={{ bold: <strong /> }}
+        />
+      </GcdsText>
       <GcdsGrid columns="max-content max-content" gap="200">
         <SubmitButton
           currentLang={language ?? "en"}

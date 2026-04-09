@@ -39,7 +39,7 @@
   "EmailConfirmUpdate": {
     "title": "Are you sure you want to update your email?",
     "requestedUpdate": "You've requested to update your email to:",
-    "allServicesNotice": "Cette action mettra à jour votre adresse courriel pour tous les services que vous avez connectés à votre identifiant ConnexionCanada.",
+    "allServicesNotice": "Cette action mettra à jour votre adresse courriel pour <bold>tous</bold> les services que vous avez connectés à votre identifiant <bold>ConnexionCanada</bold>.",
     "confirmButton": "Yes, update"
   },
   "EmailUpdateSuccess": {

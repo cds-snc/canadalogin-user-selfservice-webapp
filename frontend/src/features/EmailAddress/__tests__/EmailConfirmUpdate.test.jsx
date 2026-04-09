@@ -163,11 +163,11 @@ describe("EmailConfirmUpdate", () => {
     it("renders all services notice text", () => {
       renderComponent();
 
-      expect(
-        screen.getByText((content) =>
-          content.includes("all services you have connected to your"),
-        ),
-      ).toBeInTheDocument();
+      const textElements = screen.getAllByTestId("gcds-text");
+      const noticeEl = textElements.find((el) =>
+        el.textContent?.includes("all services you have connected to your"),
+      );
+      expect(noticeEl).toBeInTheDocument();
     });
 
     it("renders submit and cancel buttons", () => {
@@ -371,14 +371,20 @@ describe("EmailConfirmUpdate", () => {
   });
 
   describe("Component Integration", () => {
-    it("renders allServicesNotice text", () => {
+    it("renders allServicesNotice text with bold emphasis", () => {
       renderComponent();
 
-      expect(
-        screen.getByText(
+      const textElements = screen.getAllByTestId("gcds-text");
+      const noticeEl = textElements.find((el) =>
+        el.textContent?.includes(
           "This will update your email with all services you have connected to your CanadaLogin.",
         ),
-      ).toBeInTheDocument();
+      );
+      expect(noticeEl).toBeInTheDocument();
+      const bolds = noticeEl.querySelectorAll("strong");
+      expect(bolds.length).toBe(2);
+      expect(bolds[0].textContent).toBe("all");
+      expect(bolds[1].textContent).toBe("CanadaLogin");
     });
 
     it("passes correct props to SubmitButton", () => {
@@ -401,11 +407,13 @@ describe("EmailConfirmUpdate", () => {
           content.includes("You've requested to update your email to:"),
         ),
       ).toBeInTheDocument();
-      expect(
-        screen.getByText(
+      const textElements = screen.getAllByTestId("gcds-text");
+      const noticeEl = textElements.find((el) =>
+        el.textContent?.includes(
           "This will update your email with all services you have connected to your CanadaLogin.",
         ),
-      ).toBeInTheDocument();
+      );
+      expect(noticeEl).toBeInTheDocument();
     });
   });
 
