@@ -14,7 +14,11 @@ import { PAGES } from "../../../utils/constants";
 import { useNavigateHelper } from "../../../hooks/useNavigate";
 import VerifiedBadge from "../../../components/Badges/VerifiedBadge";
 import { path } from "../../../utils/routeHelpers";
-import type { GcdsNavigationEvent } from "../../../types/contactPhoneNumber";
+import type {
+  ContactPhoneDisplayEntry,
+  ContactPhoneDisplaySectionProps,
+  GcdsNavigationEvent,
+} from "../../../types/contactPhoneNumber";
 
 function DisplayPhoneNumbers({
   phoneNumbers,
@@ -74,7 +78,7 @@ function ContactPhoneNumber({
   phoneNumbers,
   language,
 }: {
-  phoneNumbers: { value: string }[];
+  phoneNumbers: ContactPhoneDisplayEntry[];
   language?: string;
 }) {
   const { t } = useTranslation("profile");
@@ -108,7 +112,7 @@ function ContactPhoneNumber({
 export default function ViewContactPhoneNumber({
   phoneNumbers,
 }: {
-  phoneNumbers: { value: string }[] | null;
+  phoneNumbers: ContactPhoneDisplayEntry[] | null;
 }) {
   const { language } = useParams<{ language: string }>();
   const { t } = useTranslation("profile");
