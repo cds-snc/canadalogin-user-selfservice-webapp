@@ -15,6 +15,7 @@ import { useNavigateHelper } from "../../../hooks/useNavigate";
 import VerifiedBadge from "../../../components/Badges/VerifiedBadge";
 import { path } from "../../../utils/routeHelpers";
 import type {
+  ContactPhoneDisplayEntry,
   ContactPhoneDisplaySectionProps,
   GcdsNavigationEvent,
 } from "../../../types/contactPhoneNumber";
@@ -77,7 +78,7 @@ function ContactPhoneNumber({
   phoneNumbers,
   language,
 }: {
-  phoneNumbers: { value: string }[];
+  phoneNumbers: ContactPhoneDisplayEntry[];
   language?: string;
 }) {
   const { t } = useTranslation("profile");
