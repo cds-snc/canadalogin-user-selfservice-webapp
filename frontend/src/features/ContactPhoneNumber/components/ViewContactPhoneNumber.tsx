@@ -112,7 +112,7 @@ function ContactPhoneNumber({
 export default function ViewContactPhoneNumber({
   phoneNumbers,
 }: {
-  phoneNumbers: { value: string }[] | null;
+  phoneNumbers: ContactPhoneDisplayEntry[] | null;
 }) {
   const { language } = useParams<{ language: string }>();
   const { t } = useTranslation("profile");
