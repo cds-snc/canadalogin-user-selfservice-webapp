@@ -16,7 +16,6 @@ from app.fido2.services.helper_utils import (
     verify_registration_ownership,
 )
 
-
 # Test Configuration Constants
 MOCK_TENANT_URL = "https://fake-tenant.verify.ibm.com"
 MOCK_RP_ID = "fake-tenant.verify.ibm.com"

@@ -28,7 +28,6 @@ from fastapi import APIRouter, Depends, Request, status
 from app.otp.services.send_mfa_otp import handle_send_mfa_otp
 from app.utils.validate_user_request_match import validate_user_id_matches_session
 
-
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
