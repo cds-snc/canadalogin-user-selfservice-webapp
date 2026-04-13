@@ -1,72 +1,92 @@
 # backend/tests/test_rp_info.py
 
 import types
-import httpx
+import pytest
 
-HTTPXResponse = httpx.Response
+from app.users.services.rp_info import get_rp_info_from_data, get_relying_party_info
+from fastapi import HTTPException
 
 
 class DummyRequest:
-    """
-    Minimal stand-in for FastAPI's Request used by get_relying_party_info.
+    """Minimal stand-in for FastAPI's Request used by get_relying_party_info."""
 
-    Provides:
-      - app.state.request_client: httpx.AsyncClient
-      - app.state.http_client:    httpx.AsyncClient (alias, just in case)
-      - app.state.config.rp_user_applications_api_endpoint: str
-      - session: dict (and state.session for compatibility)
-      - endpoint/url/base_url: str
-      - headers/state: basic containers
-    """
-
-    def __init__(self, client: httpx.AsyncClient, endpoint: str, session: dict):
-        # Some code paths might read request.client directly
-        self.client = client
-
-        # Build app.state with required attributes
-        state = types.SimpleNamespace()
-        state.request_client = client
-        state.http_client = client  # alias if other code paths use it
-        state.config = types.SimpleNamespace(rp_user_applications_api_endpoint=endpoint)
-        self.app = types.SimpleNamespace(state=state)
-
-        # Sessions
+    def __init__(self, session: dict):
         self.session = session
         self.state = types.SimpleNamespace(session=session)
 
-        # URL-ish attributes (harmless if unused)
-        self.endpoint = endpoint
-        self.url = endpoint
-        self.base_url = endpoint
 
-        self.headers = {}
+# ---------------------------------------------------------------------------
+# get_rp_info_from_data unit tests
+# ---------------------------------------------------------------------------
 
 
-def apps_payload_no_match():
-    return {
-        "applications": [
-            {
-                "id": "app-001",
-                "name": "Non Matching App",
-                "description": "does-not-match-any-client-id",
-                "status": ["ENABLED"],
-                "category": ["General"],
-                "links": [],
-            }
-        ]
-    }
+def test_get_rp_info_from_data_known_en():
+    rp = get_rp_info_from_data("2cbc37c1-d7c4-4650-b790-aa314fe45903", "en")
+    assert rp is not None
+    assert rp.id == "2cbc37c1-d7c4-4650-b790-aa314fe45903"
+    assert rp.linkName == "Manage CanadaLogin"
+    assert rp.url == "https://app.login-connexion.cdssandbox.xyz/en"
 
 
-def apps_payload_match_but_no_links(client_id: str):
-    return {
-        "applications": [
-            {
-                "id": "app-002",
-                "name": "Matching App",
-                "description": client_id,
-                "status": ["ENABLED"],
-                "category": ["General"],
-                "links": [],
-            }
-        ]
-    }
+def test_get_rp_info_from_data_known_fr():
+    rp = get_rp_info_from_data("2cbc37c1-d7c4-4650-b790-aa314fe45903", "fr")
+    assert rp is not None
+    assert rp.linkName == "Gérer ConnexionCanada"
+    assert rp.url == "https://app.login-connexion.cdssandbox.xyz/fr"
+
+
+def test_get_rp_info_from_data_unknown_lang_falls_back_to_en():
+    rp = get_rp_info_from_data("2cbc37c1-d7c4-4650-b790-aa314fe45903", "es")
+    assert rp is not None
+    assert rp.linkName == "Manage CanadaLogin"
+
+
+def test_get_rp_info_from_data_unknown_client_id():
+    rp = get_rp_info_from_data("does-not-exist-99999", "en")
+    assert rp is None
+
+
+# ---------------------------------------------------------------------------
+# get_relying_party_info service tests
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_get_relying_party_info_no_session_client_id_raises_400():
+    request = DummyRequest(session={})
+    with pytest.raises(HTTPException) as exc_info:
+        await get_relying_party_info(request, "en")
+    assert exc_info.value.status_code == 400
+    assert exc_info.value.detail == "RP Client ID not found"
+
+
+@pytest.mark.asyncio
+async def test_get_relying_party_info_unknown_client_id_raises_404():
+    request = DummyRequest(session={"rp_client_id": "does-not-exist-99999"})
+    with pytest.raises(HTTPException) as exc_info:
+        await get_relying_party_info(request, "en")
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.detail == "Relying party info not found"
+
+
+@pytest.mark.asyncio
+async def test_get_relying_party_info_success_en():
+    request = DummyRequest(
+        session={"rp_client_id": "2cbc37c1-d7c4-4650-b790-aa314fe45903"}
+    )
+    response = await get_relying_party_info(request, "en")
+    assert response.success is True
+    assert response.data is not None
+    assert response.data.linkName == "Manage CanadaLogin"
+    assert response.data.id == "2cbc37c1-d7c4-4650-b790-aa314fe45903"
+
+
+@pytest.mark.asyncio
+async def test_get_relying_party_info_success_fr():
+    request = DummyRequest(
+        session={"rp_client_id": "2cbc37c1-d7c4-4650-b790-aa314fe45903"}
+    )
+    response = await get_relying_party_info(request, "fr")
+    assert response.success is True
+    assert response.data is not None
+    assert response.data.linkName == "Gérer ConnexionCanada"

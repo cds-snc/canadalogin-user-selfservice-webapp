@@ -1,0 +1,562 @@
+{
+  "03211baf-5927-4a23-9255-5067205483df": {
+    "en": {
+      "name": "Java OIDC RP Simulator EN",
+      "url": "https://localhost:8080/en"
+    },
+    "fr": {
+      "name": "Java OIDC RP Simulator FR",
+      "url": "https://localhost:8080/fr"
+    }
+  },
+  "2cbc37c1-d7c4-4650-b790-aa314fe45903": {
+    "en": {
+      "name": "Manage CanadaLogin",
+      "url": "https://app.login-connexion.cdssandbox.xyz/en"
+    },
+    "fr": {
+      "name": "Gérer ConnexionCanada",
+      "url": "https://app.login-connexion.cdssandbox.xyz/fr"
+    }
+  },
+  "35505dc7-8937-4743-9510-e797dd4eca7d": {
+    "en": {
+      "name": "GCS SIC Migration RP Simulator - Local EN",
+      "url": "http://localhost:8080/en"
+    },
+    "fr": {
+      "name": "GCS SIC Migration RP Simulator - Local FR",
+      "url": "http://localhost:8080/fr"
+    }
+  },
+  "5db6c1a2-de78-44d8-8a8e-894d01271500": {
+    "en": {
+      "name": "GCS SIC Migration RP Simulator - Local GCKey EN",
+      "url": "http://localhost:8080/en"
+    },
+    "fr": {
+      "name": "GCS SIC Migration RP Simulator - Local GCKey FR",
+      "url": "http://localhost:8080/fr"
+    }
+  },
+  "65455f19-d24d-4374-be1b-2e07f442b20c": {
+    "en": {
+      "name": "GCS Migration Solution - Dev EN",
+      "url": "https://app.migration.login-connexion.cdssandbox.xyz//en"
+    },
+    "fr": {
+      "name": "GCS Migration Solution - Dev FR",
+      "url": "https://app.migration.login-connexion.cdssandbox.xyz//fr"
+    }
+  },
+  "70f98892-9518-4289-af03-b5f40d1e2030": {
+    "en": {
+      "name": "Localhost - Simple Relying Party Simulator EN",
+      "url": "http://localhost:8080/en"
+    },
+    "fr": {
+      "name": "Localhost - Simple Relying Party Simulator FR",
+      "url": "http://localhost:8080/fr"
+    }
+  },
+  "7318c333-aae8-4df7-a2b0-cc5cda856f95": {
+    "en": {
+      "name": "GCS SIC Migration RP Simulator - Dev EN",
+      "url": "https://rp-sim.migration.login-connexion.cdssandbox.xyz/en"
+    },
+    "fr": {
+      "name": "GCS SIC Migration RP Simulator - Dev FR",
+      "url": "https://rp-sim.migration.login-connexion.cdssandbox.xyz/fr"
+    }
+  },
+  "89868c80-e4b9-4ec7-b9d4-4346961aa570": {
+    "en": {
+      "name": "Simple Relying Party Simulator EN",
+      "url": "https://rp.app.login-connexion.cdssandbox.xyz/en"
+    },
+    "fr": {
+      "name": "Simple Relying Party Simulator FR",
+      "url": "https://rp.app.login-connexion.cdssandbox.xyz/fr"
+    }
+  },
+  "App to test ROPC": {
+    "en": {
+      "name": "Nathaniel's test OIDC ROPC app EN",
+      "url": "http://localhost:8080/en"
+    },
+    "fr": {
+      "name": "Nathaniel's test OIDC ROPC app FR",
+      "url": "http://localhost:8080/fr"
+    }
+  },
+  "b84ba97e-eafe-441e-99eb-10a64ae01778": {
+    "en": {
+      "name": "GCS SIC Migration RP Simulator - Dev GCKey EN",
+      "url": "https://rp-sim.migration.login-connexion.cdssandbox.xyz/en"
+    },
+    "fr": {
+      "name": "GCS SIC Migration RP Simulator - Dev GCKey FR",
+      "url": "https://rp-sim.migration.login-connexion.cdssandbox.xyz/fr"
+    }
+  },
+  "bca08dc2-59b8-425f-ba75-7f3054f4d077": {
+    "en": {
+      "name": "GitHub codespace Adam - Profile Management App EN",
+      "url": "https://improved-waffle-r4g7qxg6559fjwx-3000.app.github.dev/en"
+    },
+    "fr": {
+      "name": "GitHub codespace Adam - Profile Management App FR",
+      "url": "https://improved-waffle-r4g7qxg6559fjwx-3000.app.github.dev/fr"
+    }
+  },
+  "c6bb2d02-936c-4795-a591-e623261c099d": {
+    "en": {
+      "name": "Localhost - Profile Management App EN",
+      "url": "http://localhost:3000/en"
+    },
+    "fr": {
+      "name": "Localhost - Profile Management App FR",
+      "url": "http://localhost:3000/fr"
+    }
+  },
+  "d109133c-6984-4705-ac5c-eb3538b4c67d": {
+    "en": {
+      "name": "Identity - Localhost - LOA2 - Simple Relying Party Simulator EN",
+      "url": "http://localhost:8080/en"
+    },
+    "fr": {
+      "name": "Identity - Localhost - LOA2 - Simple Relying Party Simulator FR",
+      "url": "http://localhost:8080/fr"
+    }
+  },
+  "e61c1a9e-1ffc-4746-8208-cacdaf928712": {
+    "en": {
+      "name": "GCS Migration Solution - Local EN",
+      "url": "http://localhost:3000/en"
+    },
+    "fr": {
+      "name": "GCS Migration Solution - Local FR",
+      "url": "http://localhost:3000/fr"
+    }
+  },
+  "0ad5480c-dcf6-43b3-b8e7-a3128288c808": {
+    "en": {
+      "name": "FCAC Compliance - FCAC - Dev",
+      "url": "https://fcdc-cms-dev01-pa.powerappsportals.com"
+    },
+    "fr": {
+      "name": "FCAC Compliance - FCAC - Dev",
+      "url": "https://fcdc-cms-dev01-pa.powerappsportals.com"
+    }
+  },
+  "0e6d6fc9-0f55-409a-8ba9-c9b975b3787e": {
+    "en": {
+      "name": "FCAC Compliance - FCAC - Test",
+      "url": "https://fcdc-cms-dev01-pa.powerappsportals.com"
+    },
+    "fr": {
+      "name": "FCAC Compliance - FCAC - Test",
+      "url": "https://fcdc-cms-dev01-pa.powerappsportals.com"
+    }
+  },
+  "16b84589-21b6-4703-996c-a3567438edba": {
+    "en": {
+      "name": "VAC Healthshare - VAC - Test",
+      "url": "https://ift-healthshare-partagesante.vac-acc.gc.ca/healthshare"
+    },
+    "fr": {
+      "name": "VAC Healthshare - VAC - Test",
+      "url": "https://ift-healthshare-partagesante.vac-acc.gc.ca/healthshare"
+    }
+  },
+  "1a71952a-fd6e-4fa6-b5d1-7741644dd6a8": {
+    "en": {
+      "name": "IRIS - PRC - Test",
+      "url": "https://iris-dev.powerappsportals.com"
+    },
+    "fr": {
+      "name": "IRIS - PRC - Test",
+      "url": "https://iris-dev.powerappsportals.com"
+    }
+  },
+  "227a4534-8408-4c3e-8b52-8c97872ef356": {
+    "en": {
+      "name": "EGCS",
+      "url": "https://egcs-portal-dev.intra.azure.cloud.dfo-mpo.gc.ca"
+    },
+    "fr": {
+      "name": "EGCS",
+      "url": "https://egcs-portal-dev.intra.azure.cloud.dfo-mpo.gc.ca"
+    }
+  },
+  "2ea0a368-f8a4-44e5-afef-3a0605eef8df": {
+    "en": {
+      "name": "GC Sign In - Profile Management App",
+      "url": "https://app.test.login-connexion.cdssandbox.xyz"
+    },
+    "fr": {
+      "name": "GC Sign In - Profile Management App",
+      "url": "https://app.test.login-connexion.cdssandbox.xyz"
+    }
+  },
+  "32ebf512-869a-4c13-bab6-33a5a0ff3436": {
+    "en": {
+      "name": "ARS - DotNet OIDC RP Simulator 1",
+      "url": "https://localhost:7132"
+    },
+    "fr": {
+      "name": "ARS - DotNet OIDC RP Simulator 1",
+      "url": "https://localhost:7132"
+    }
+  },
+  "343c9e61-14a8-4415-9244-62c69ab2fb77": {
+    "en": {
+      "name": "VAC Healthshare - VAC - Dev",
+      "url": "https://dev-healthshare-partagesante.vac-acc.gc.ca/healthshare"
+    },
+    "fr": {
+      "name": "VAC Healthshare - VAC - Dev",
+      "url": "https://dev-healthshare-partagesante.vac-acc.gc.ca/healthshare"
+    }
+  },
+  "619b29e8-6c8d-4868-a6ff-9d95ca6adcd2": {
+    "en": {
+      "name": "ECD - CED - DEV",
+      "url": "https://ecd-dev.powerappsportals.com/"
+    },
+    "fr": {
+      "name": "ECD - CED - DEV",
+      "url": "https://ecd-dev.powerappsportals.com/"
+    }
+  },
+  "70e0de4c-ae82-440b-8340-f70b2dcb393e": {
+    "en": {
+      "name": "ISAMS Test Tenant",
+      "url": "https://esdc-gcsignin-isams-test.verify.ibm.com"
+    },
+    "fr": {
+      "name": "ISAMS Test Tenant",
+      "url": "https://esdc-gcsignin-isams-test.verify.ibm.com"
+    }
+  },
+  "889e3dc6-2833-4db2-816a-798a048a8906": {
+    "en": {
+      "name": "MyCGC - CGC - Dev",
+      "url": "https://dev.grainscanada.gc.ca"
+    },
+    "fr": {
+      "name": "MyCGC - CGC - Dev",
+      "url": "https://dev.grainscanada.gc.ca"
+    }
+  },
+  "894df9ab-68cf-44fa-8dac-7d61687ee628": {
+    "en": {
+      "name": "ECCC Localhost Prototype Two",
+      "url": "https://localhost:7204"
+    },
+    "fr": {
+      "name": "ECCC Localhost Prototype Two",
+      "url": "https://localhost:7204"
+    }
+  },
+  "8e21cdc3-2902-4b78-9329-7d1a0589f8ef": {
+    "en": {
+      "name": "EGCS \u2013 QA",
+      "url": "https://egcs-portal-qa.intra.azure.cloud.dfo-mpo.gc.ca"
+    },
+    "fr": {
+      "name": "EGCS \u2013 QA",
+      "url": "https://egcs-portal-qa.intra.azure.cloud.dfo-mpo.gc.ca"
+    }
+  },
+  "95ff081e-020b-4b36-84d3-3c924cab5185": {
+    "en": {
+      "name": "RP - Simple Relying Party Simulator - rp.app.login-connexion.cdssandbox.xyz",
+      "url": "https://rp.app.test.login-connexion.cdssandbox.xyz"
+    },
+    "fr": {
+      "name": "RP - Simple Relying Party Simulator - rp.app.login-connexion.cdssandbox.xyz",
+      "url": "https://rp.app.test.login-connexion.cdssandbox.xyz"
+    }
+  },
+  "ab5b30e2-e1e2-4ca2-9a5c-c1e3da50c23d": {
+    "en": {
+      "name": "PrairiesCan and PacifiCan",
+      "url": "https://iris-dev.powerappsportals.com/en-CA/"
+    },
+    "fr": {
+      "name": "de PrairiesCan et de PacifiCan",
+      "url": "https://iris-dev.powerappsportals.com/fr-CA/"
+    }
+  },
+  "ARS - DotNet OIDC RP Simulator - Default Claims": {
+    "en": {
+      "name": "ARS - DotNet OIDC RP Simulator - Default Claims",
+      "url": "https://localhost:7132"
+    },
+    "fr": {
+      "name": "ARS - DotNet OIDC RP Simulator - Default Claims",
+      "url": "https://localhost:7132"
+    }
+  },
+  "ARS - DotNet OIDC RP Simulator 2": {
+    "en": {
+      "name": "ARS - DotNet OIDC RP Simulator 2",
+      "url": "https://localhost:7132"
+    },
+    "fr": {
+      "name": "ARS - DotNet OIDC RP Simulator 2",
+      "url": "https://localhost:7132"
+    }
+  },
+  "ARS - DotNet OIDC RP Simulator 3": {
+    "en": {
+      "name": "ARS - DotNet OIDC RP Simulator 3",
+      "url": "https://localhost:7132"
+    },
+    "fr": {
+      "name": "ARS - DotNet OIDC RP Simulator 3",
+      "url": "https://localhost:7132"
+    }
+  },
+  "b287520e-d27e-4715-b84c-21d2fb443e13": {
+    "en": {
+      "name": "ATIP Online - TBS - Test",
+      "url": "https://qa2.atip-aiprp.tbs-sct.gc.ca"
+    },
+    "fr": {
+      "name": "ATIP Online - TBS - Test",
+      "url": "https://qa2.atip-aiprp.tbs-sct.gc.ca"
+    }
+  },
+  "b3140165-2a9e-4895-b0e0-fee843235db6": {
+    "en": {
+      "name": "ATIP Online Management Tools - TBS - Test",
+      "url": "https://qa2.aomt-ogael.atip-aiprp.tbs-sct.gc.ca"
+    },
+    "fr": {
+      "name": "ATIP Online Management Tools - TBS - Test",
+      "url": "https://qa2.aomt-ogael.atip-aiprp.tbs-sct.gc.ca"
+    }
+  },
+  "c1d6fb4d-37ff-40b5-b815-986794a59c2f": {
+    "en": {
+      "name": "ATIP Online - TBS - Dev",
+      "url": "https://dev2.atip-aiprp.tbs-sct.gc.ca"
+    },
+    "fr": {
+      "name": "ATIP Online - TBS - Dev",
+      "url": "https://dev2.atip-aiprp.tbs-sct.gc.ca"
+    }
+  },
+  "c54513bc-201e-44d0-a476-6c7cab45b5ba": {
+    "en": {
+      "name": "GCS SIC Migration RP Simulator",
+      "url": "https://rp-sim.migration.test.login-connexion.cdssandbox.xyz"
+    },
+    "fr": {
+      "name": "GCS SIC Migration RP Simulator",
+      "url": "https://rp-sim.migration.test.login-connexion.cdssandbox.xyz"
+    }
+  },
+  "cb802d19-a800-4433-ba7e-369d8ab58604": {
+    "en": {
+      "name": "Geo.ca",
+      "url": "http://localhost:8080"
+    },
+    "fr": {
+      "name": "Geo.ca",
+      "url": "http://localhost:8080"
+    }
+  },
+  "d205edd1-7c07-4f6c-b26d-f75556b32b20": {
+    "en": {
+      "name": "GCS SIC Migration RP Simulator - GCKey Only",
+      "url": "https://rp-sim.migration.test.login-connexion.cdssandbox.xyz"
+    },
+    "fr": {
+      "name": "GCS SIC Migration RP Simulator - GCKey Only",
+      "url": "https://rp-sim.migration.test.login-connexion.cdssandbox.xyz"
+    }
+  },
+  "d46b7676-1e85-435f-bb8c-f95bf87eb1f3": {
+    "en": {
+      "name": "Canadian Dental Care Plan",
+      "url": "https://rp-sim.migration.test.login-connexion.cdssandbox.xyz"
+    },
+    "fr": {
+      "name": "R\u00e9gime canadien de soins dentaires",
+      "url": "https://rp-sim.migration.test.login-connexion.cdssandbox.xyz"
+    }
+  },
+  "dab6fe6f-461e-4df8-91db-9f25b61f6a5e": {
+    "en": {
+      "name": "GC Digital Talent - TBS - Dev",
+      "url": "https://dev-talentcloud.tbs-sct.gc.ca"
+    },
+    "fr": {
+      "name": "GC Digital Talent - TBS - Dev",
+      "url": "https://dev-talentcloud.tbs-sct.gc.ca"
+    }
+  },
+  "Double Sign In Application to Link PAI": {
+    "en": {
+      "name": "GCS Migration Solution",
+      "url": "https://app.migration.login-connexion.alpha.canada.ca/"
+    },
+    "fr": {
+      "name": "GCS Migration Solution",
+      "url": "https://app.migration.login-connexion.alpha.canada.ca/"
+    }
+  },
+  "e3a5cbcc-774f-403f-a30d-dd66342c3796": {
+    "en": {
+      "name": "ATIP Online Management Tools - TBS - Dev",
+      "url": "https://dev2.aomt-ogael.atip-aiprp.tbs-sct.gc.ca"
+    },
+    "fr": {
+      "name": "ATIP Online Management Tools - TBS - Dev",
+      "url": "https://dev2.aomt-ogael.atip-aiprp.tbs-sct.gc.ca"
+    }
+  },
+  "e4216fc1-99f4-4ca2-99d0-31ebc7df3b60": {
+    "en": {
+      "name": "GCS Dev As RP",
+      "url": "https://cds-gcsignin-dev.verify.ibm.com"
+    },
+    "fr": {
+      "name": "GCS Dev As RP",
+      "url": "https://cds-gcsignin-dev.verify.ibm.com"
+    }
+  },
+  "e5e958a9-7d15-4f60-983f-3af2c31e1c21": {
+    "en": {
+      "name": "MyCGC - CGC - Test",
+      "url": "https://dev.grainscanada.gc.ca"
+    },
+    "fr": {
+      "name": "MyCGC - CGC - Test",
+      "url": "https://dev.grainscanada.gc.ca"
+    }
+  },
+  "f68a69d7-5c00-4a8c-97e5-5846ecbaa1fb": {
+    "en": {
+      "name": "ECCC Localhost Prototype",
+      "url": "https://localhost:7104"
+    },
+    "fr": {
+      "name": "ECCC Localhost Prototype",
+      "url": "https://localhost:7104"
+    }
+  },
+  "fe85805c-d2c1-4f25-9d5e-59a29e30ed7e": {
+    "en": {
+      "name": "EGCS",
+      "url": "https://egcs-portal-dev.intra.azure.cloud.dfo-mpo.gc.ca"
+    },
+    "fr": {
+      "name": "EGCS",
+      "url": "https://egcs-portal-dev.intra.azure.cloud.dfo-mpo.gc.ca"
+    }
+  },
+  "30aba01f-573e-45cd-ae61-efd24638a0ae": {
+    "en": {
+      "name": "EGCS - QA",
+      "url": "https://egcs-portal-qa.intra.azure.cloud.dfo-mpo.gc.ca"
+    },
+    "fr": {
+      "name": "EGCS - QA",
+      "url": "https://egcs-portal-qa.intra.azure.cloud.dfo-mpo.gc.ca"
+    }
+  },
+  "ea67c3f5-e4d4-4ddf-b303-63923cf712d1": {
+    "en": {
+      "name": "GC Digital Talent - TBS - Staging",
+      "url": "https://uat-talentcloud.tbs-sct.gc.ca"
+    },
+    "fr": {
+      "name": "GC Digital Talent - TBS - Staging",
+      "url": "https://uat-talentcloud.tbs-sct.gc.ca"
+    }
+  },
+  "f4094137-21f5-4241-9278-788592b2623e": {
+    "en": {
+      "name": "GC Sign In - Profile Management App",
+      "url": "https://app.login-connexion.alpha.canada.ca"
+    },
+    "fr": {
+      "name": "GC Sign In - Profile Management App",
+      "url": "https://app.login-connexion.alpha.canada.ca"
+    }
+  },
+  "1916fe65-d182-445d-9fe8-4b49cef13c4d": {
+    "en": {
+      "name": "GCS SIC Migration RP Simulator",
+      "url": "https://rp-sim.migration.login-connexion.alpha.canada.ca"
+    },
+    "fr": {
+      "name": "GCS SIC Migration RP Simulator",
+      "url": "https://rp-sim.migration.login-connexion.alpha.canada.ca"
+    }
+  },
+  "2b41068f-1b27-42db-9970-288ac11427d2": {
+    "en": {
+      "name": "Geo.ca",
+      "url": "https://app-dev.geo.ca/"
+    },
+    "fr": {
+      "name": "Geo.ca",
+      "url": "https://app-dev.geo.ca/"
+    }
+  },
+  "7f59783f-bf96-4083-b8a9-d9a511c6c6ad": {
+    "en": {
+      "name": "RP - Simple Relying Party Simulator",
+      "url": "https://rp.app.login-connexion.alpha.canada.ca"
+    },
+    "fr": {
+      "name": "RP - Simple Relying Party Simulator",
+      "url": "https://rp.app.login-connexion.alpha.canada.ca"
+    }
+  },
+  "0a42e076-0ff7-4997-ad4a-77b0b4016b47": {
+    "en": {
+      "name": "VAC Healthshare - VAC - Staging",
+      "url": "https://ua-healthshare-partagesante.vac-acc.gc.ca/healthshare"
+    },
+    "fr": {
+      "name": "VAC Healthshare - VAC - Staging",
+      "url": "https://ua-healthshare-partagesante.vac-acc.gc.ca/healthshare"
+    }
+  },
+  "c671cfc4-51e1-4f00-a839-6ccc0c88484f": {
+    "en": {
+      "name": "PrairiesCan and PacifiCan",
+      "url": "https://iris-uat.powerappsportals.com/en-CA/"
+    },
+    "fr": {
+      "name": "PrairiesCan et de PacifiCan",
+      "url": "https://iris-uat.powerappsportals.com/fr-CA/"
+    }
+  },
+  "c5d2a928-6c13-41b2-8b1b-739b68e2e4a9": {
+    "en": {
+      "name": "GC Sign In - Profile Management App",
+      "url": "https://app.login-connexion.canada.ca/en"
+    },
+    "fr": {
+      "name": "GC Sign In - Profile Management App",
+      "url": "https://app.login-connexion.canada.ca/fr"
+    }
+  },
+  "de1e8813-992b-4780-971b-8c1a85746632": {
+    "en": {
+      "name": "GCS Migration Solution",
+      "url": "https://app.migration.login-connexion.canada.ca"
+    },
+    "fr": {
+      "name": "GCS Migration Solution",
+      "url": "https://app.migration.login-connexion.canada.ca"
+    }
+  }
+}

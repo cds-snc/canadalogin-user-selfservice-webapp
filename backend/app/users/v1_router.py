@@ -12,6 +12,7 @@ from app.users.schemas import (
 )
 from app.users.services.get_my_profile import get_my_profile
 from app.users.services.update_my_profile import update_my_profile
+from fastapi import Query
 from app.users.services.rp_info import get_relying_party_info
 from app.users.services.otp_factors import get_user_otp_factors
 from app.users.services.update_profile_with_otp import (
@@ -73,9 +74,10 @@ async def profile(
 )
 async def rp_info(
     request: Request,
+    lang: str = Query(default="en"),
     user_access_token: None = Depends(get_users_current_session),
 ):
-    return await get_relying_party_info(request)
+    return await get_relying_party_info(request, lang)
 
 
 @router.get(

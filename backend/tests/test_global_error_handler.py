@@ -3285,24 +3285,10 @@ class TestErrorHandlingOtpFactors:
 class TestErrorHandlingRpInfo:
 
     @pytest.mark.asyncio
-    @patch.object(rp_info_module, "dispatch_get_oidc_user_applications")
-    async def test_get_relying_party_info_not_found_404(
-        self, mock_dispatch_get_oidc_user_applications, mock_test_client
-    ):
-        mock_dispatch_get_oidc_user_applications.return_value = SimpleNamespace(
-            applications=[
-                SimpleNamespace(
-                    id="app-001",
-                    name="Non Matching App",
-                    description="does-not-match-any-client-id",
-                    status=["ENABLED"],
-                    category=["General"],
-                    links=[],
-                )
-            ]
+    async def test_get_relying_party_info_not_found_404(self, mock_test_client):
+        client = mock_test_client(
+            MagicMock(), session_data={"rp_client_id": "does-not-exist-99999"}
         )
-
-        client = mock_test_client(MagicMock(), session_data={"rp_client_id": "123456"})
 
         response = client.request("GET", "/v1/users/rp_info")
         response_json = response.json()
@@ -3312,58 +3298,17 @@ class TestErrorHandlingRpInfo:
         assert response_json["message"] == "Relying party info not found"
 
     @pytest.mark.asyncio
-    @patch.object(rp_info_module, "dispatch_get_oidc_user_applications")
-    async def test_get_relying_party_info_match_but_no_links_404(
-        self, mock_dispatch_get_oidc_user_applications, mock_test_client
+    async def test_get_relying_party_info_no_client_id_in_session_400(
+        self, mock_test_client
     ):
-        mock_dispatch_get_oidc_user_applications.return_value = SimpleNamespace(
-            applications=[
-                SimpleNamespace(
-                    id="app-002",
-                    name="Matching App",
-                    description="client-123",
-                    status=["ENABLED"],
-                    category=["General"],
-                    links=[],
-                )
-            ]
-        )
-
-        client = mock_test_client(MagicMock(), session_data={"rp_client_id": "123456"})
+        client = mock_test_client(MagicMock(), session_data={})
 
         response = client.request("GET", "/v1/users/rp_info")
         response_json = response.json()
 
-        assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert not response_json["success"]
-        assert response_json["message"] == "Relying party info not found"
-
-    @pytest.mark.asyncio
-    @patch.object(rp_info_module, "get_admin_token")
-    @patch.object(rp_info_module, "get_auth_request_headers")
-    async def test_get_relying_party_info_dispatch_error_bubbles_via_handler(
-        self, mock_get_auth_request_headers, mock_get_admin_token, mock_test_client
-    ):
-
-        mock_get_admin_token.return_value = MagicMock()
-        mock_get_auth_request_headers.return_value = MagicMock()
-
-        mock_client = AsyncMock(spec=AsyncClient)
-        mock_request = Request("GET", "https://example.com")
-        mock_response = Response(500, request=mock_request)
-        mock_client.get.return_value = mock_response
-
-        client = mock_test_client(mock_client, session_data={"rp_client_id": "123456"})
-
-        response = client.request("GET", "/v1/users/rp_info")
-        response_json = response.json()
-
-        assert response.status_code == status.HTTP_502_BAD_GATEWAY
-        assert not response_json["success"]
-        assert (
-            response_json["message"]
-            == "Upstream service returned the following HTTP status code: 500."
-        )
+        assert response_json["message"] == "RP Client ID not found"
 
 
 # endregion

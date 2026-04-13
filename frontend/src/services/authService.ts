@@ -186,10 +186,11 @@ export const authService: AuthServiceContract = {
       handleApiError(error as AuthServiceError);
     }
   },
-  get_rp_info: async () => {
+  get_rp_info: async (lang: string = "en") => {
     try {
       const response = await axios.get<AuthServiceResponse<RelyingPartyData>>(
         `${config.apiUrl}${SUBMIT_END_POINTS.rp_info}`,
+        { params: { lang } },
       );
       return response.data;
     } catch (error) {

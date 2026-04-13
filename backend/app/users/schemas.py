@@ -217,26 +217,9 @@ class ProfileResponse(ResponseModel):
 
 
 class RelyingPartyInfo(BaseModel):
-    icon: str
     id: str
     linkName: str
     url: str
-
-
-# https://docs.verify.ibm.com/verify/reference/searchuserapplication
-
-
-class IBMVerifyRelyingPartyInfoSchema(BaseModel):
-    name: str
-    links: List[RelyingPartyInfo]
-    description: Optional[str]
-    status: List[str]
-    category: List[Any]
-    id: str
-
-
-class IBMVerifyRelyingPartyUserApplicationsSchema(BaseModel):
-    applications: List[IBMVerifyRelyingPartyInfoSchema]
 
 
 class RelyingPartyResponse(ResponseModel):

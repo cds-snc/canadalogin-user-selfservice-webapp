@@ -66,7 +66,6 @@ export type SessionKeepAliveData = {
 };
 
 export type RelyingPartyData = {
-  icon: string;
   id: string;
   linkName: string;
   url: string;
@@ -131,7 +130,9 @@ export type AuthServiceContract = {
     trxnId: string,
     otpType?: Extract<OtpTransportType, "sms" | "voice">,
   ) => Promise<AuthServiceResponse | undefined>;
-  get_rp_info: () => Promise<AuthServiceResponse<RelyingPartyData> | undefined>;
+  get_rp_info: (
+    lang?: string,
+  ) => Promise<AuthServiceResponse<RelyingPartyData> | undefined>;
   logout: () => Promise<AuthServiceResponse<LogoutResponseData> | undefined>;
   keepAlive: () => Promise<
     AuthServiceResponse<SessionKeepAliveData> | undefined

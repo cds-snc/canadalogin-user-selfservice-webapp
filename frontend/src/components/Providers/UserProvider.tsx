@@ -325,7 +325,7 @@ export function UserProvider({
   useEffect(() => {
     const getRelyingPartyInfo = async () => {
       try {
-        const response = await authService.get_rp_info();
+        const response = await authService.get_rp_info(language ?? "en");
         if (response && response.data && response.data.id) {
           userDispatch({
             type: CONTEXT_ACTIONS.set_relying_party_data,
