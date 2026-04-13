@@ -21,6 +21,7 @@ import type {
   UserAction,
   UserProfile,
   UserState,
+  RelyingPartyInfo,
 } from "../../types/user";
 import {
   initialSessionTimeoutState as defaultSessionTimeoutState,
@@ -329,7 +330,7 @@ export function UserProvider({
         if (response && response.data && response.data.id) {
           userDispatch({
             type: CONTEXT_ACTIONS.set_relying_party_data,
-            payload: response.data,
+            payload: response.data as RelyingPartyInfo,
           });
         } else {
           console.error("Error in getting relying party info:", response);
@@ -383,6 +384,29 @@ export function UserProvider({
       }
     };
   }, []);
+
+  // Re-fetch RP info when language changes (e.g. language toggle or profile language preference update)
+  useEffect(() => {
+    if (!userState.userProfile) {
+      return;
+    }
+
+    const updateRpInfoForLanguage = async () => {
+      try {
+        const response = await authService.get_rp_info(language ?? "en");
+        if (response && response.data && response.data.id) {
+          userDispatch({
+            type: CONTEXT_ACTIONS.set_relying_party_data,
+            payload: response.data as RelyingPartyInfo,
+          });
+        }
+      } catch (err) {
+        console.error("Error updating relying party info for language:", err);
+      }
+    };
+
+    updateRpInfoForLanguage();
+  }, [language, userState.userProfile]);
 
   // Start timers when newServerSideExpirationTime is set/updated
   useEffect(() => {

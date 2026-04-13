@@ -30,7 +30,6 @@ export interface UserProfile {
 }
 
 export interface RelyingPartyInfo {
-  icon: string;
   id: string;
   linkName: string;
   url: string;
