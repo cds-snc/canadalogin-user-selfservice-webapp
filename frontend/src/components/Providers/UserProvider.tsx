@@ -406,7 +406,8 @@ export function UserProvider({
     };
 
     updateRpInfoForLanguage();
-  }, [language, userState.userProfile]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [language, userState.userProfile?.id]);
 
   // Start timers when newServerSideExpirationTime is set/updated
   useEffect(() => {
