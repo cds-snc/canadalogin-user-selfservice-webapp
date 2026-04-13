@@ -1,5 +1,5 @@
 -r requirements.txt
-pytest==8.4.2
+pytest==9.0.3
 pytest-cov==4.1.0
 fastapi-cli==0.0.16
 flake8==7.3.0
