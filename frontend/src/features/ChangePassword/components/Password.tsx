@@ -186,6 +186,7 @@ export default function Password({
             maxlength={passwordPolicy.max}
             lang={language}
             autoFocus
+            size={18}
           ></GcdsInput>
 
           <GcdsCheckboxes

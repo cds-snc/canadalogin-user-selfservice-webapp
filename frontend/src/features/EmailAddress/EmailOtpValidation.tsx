@@ -112,7 +112,7 @@ export default function EmailOtpValidation({
           value={userOtpValue}
           onGcdsInput={handleInputChange}
           lang={language}
-          size={6}
+          size={18}
           maxlength={6}
           minlength={6}
           autoFocus
