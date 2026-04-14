@@ -103,7 +103,7 @@ export default function PasswordVerification({
             setUserPasswordValue((ev.target as HTMLInputElement).value);
           }}
           lang={language}
-          size={12}
+          size={18}
         ></GcdsInput>
       </form>
       <GcdsCheckboxes

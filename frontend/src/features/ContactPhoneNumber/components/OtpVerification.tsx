@@ -157,7 +157,7 @@ export default function OtpVerification({
             errorMessage={errorMessage}
             onGcdsInput={handleChange}
             lang={language}
-            size={6}
+            size={18}
             maxlength={6}
             minlength={6}
           />

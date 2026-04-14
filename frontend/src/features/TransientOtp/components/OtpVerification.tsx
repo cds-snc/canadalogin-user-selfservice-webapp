@@ -129,7 +129,7 @@ export default function OtpVerification({
             value={userOtpValue}
             onGcdsInput={handleChange}
             lang={language}
-            size={6}
+            size={18}
             maxlength={6}
             minlength={6}
             autocomplete="one-time-code"
