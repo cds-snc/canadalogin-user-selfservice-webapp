@@ -222,7 +222,7 @@ describe("EmailOtpValidation", () => {
       expect(input).toHaveAttribute("name", "verificationCode");
       expect(input).toHaveAttribute("id", "verificationCode");
       expect(input).toHaveAttribute("autoComplete", "one-time-code");
-      expect(input).toHaveAttribute("size", "6");
+      expect(input).toHaveAttribute("size", "18");
       expect(input).toHaveAttribute("maxLength", "6");
       expect(input).toHaveAttribute("minLength", "6");
     });

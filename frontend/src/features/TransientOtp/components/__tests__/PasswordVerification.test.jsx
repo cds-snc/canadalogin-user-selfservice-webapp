@@ -198,7 +198,7 @@ describe("PasswordVerification Component", () => {
       expect(input).toHaveAttribute("name", "passwordVerification");
       expect(input).toHaveAttribute("autoComplete", "one-time-code");
       expect(input).toHaveAttribute("data-validate-on", "other");
-      expect(input).toHaveAttribute("data-size", "12");
+      expect(input).toHaveAttribute("data-size", "18");
       expect(input).toHaveAttribute("lang", "en");
     });
 
