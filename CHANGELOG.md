@@ -1,5 +1,48 @@
 # Changelog
 
+## [1.15.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.14.2...v1.15.0) (2026-04-14)
+
+
+### Features
+
+* implement FIDO2 Metadata Service with periodic updates and Redis caching ([3e4fc0f](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/3e4fc0fc513f6e7cb705fcd69b12731bb7e3de18))
+* implement mds look up service ([#1345](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1345)) ([4e6ee41](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/4e6ee41cb78670fe7ae36d76e457d52a4a1aad8b))
+* Manage app localization design overhaul ([#1373](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1373)) ([c1d47a3](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/c1d47a30f1176f0825135016b6b90d3274894e65))
+
+
+### Bug Fixes
+
+* build issues and fix prod/staging version ([#1375](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1375)) ([865bc51](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/865bc511c462f5ac5a6e0502a5339e4cbf25defe))
+* enrolling voice otp after sms throws error ([#1364](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1364)) ([dc8e6a2](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/dc8e6a25c3783e1dddc9704ed623a3477357141d))
+* **frontend:** all otp/password fields to be same size ([#1389](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1389)) ([019f546](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/019f54609f0fb1949b6cf5c0aebd823d20a0585e))
+* **frontend:** remove RPNameDisplay component and update ServicesWithAccessInfo localization strings ([#1377](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1377)) ([e236aaf](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/e236aafdbf157fc9841622276c35f96a0b756764))
+* **frontend:** skip axio 1.14.1 malicious version ([#1360](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1360)) ([047a857](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/047a857e14912f6af47e79cd657f503482e82d1c))
+* **frontend:** upgrade axios &gt;=1.15.0 ([#1381](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1381)) ([10ff23a](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/10ff23add041c65635d7594f3b98eef3b629bad2))
+* localize email notifications by user language preference in FIDO2 and OTP services ([#1362](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1362)) ([dc7972b](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/dc7972b4e81ba1e681e33623241739c5d7919264))
+* remove RPNameDisplay component and update ServicesWithAccessInfo localization strings ([e236aaf](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/e236aafdbf157fc9841622276c35f96a0b756764))
+
+
+### Code Refactoring
+
+* add passkey flow default passkey nickname to passkey ([#1368](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1368)) ([78b3466](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/78b3466532efcb57cbd97614f399cd184c9f8637))
+* EditLanguagePreferencePage refactor and improvements ([#1354](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1354)) ([3e4fc0f](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/3e4fc0fc513f6e7cb705fcd69b12731bb7e3de18))
+* guard delete fido2 endpoint with otp verification and OTP verification refactors ([#1350](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1350)) ([90ccddf](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/90ccddff55ccbbc8a0b4fc76f32ed3e0b2b7bf51))
+* replace scattered try/except blocks with unified error handler ([#1325](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1325)) ([34e3a8f](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/34e3a8f63a0d342c46e669d75dff1e0ef30ba636))
+* rp name lists to be generic ([#1371](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1371)) ([6b95b8d](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/6b95b8db379e43fe9ed4de5219631cc7f9c6fdac))
+* simplify language preference page by removing unused parameters and effects ([3e4fc0f](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/3e4fc0fc513f6e7cb705fcd69b12731bb7e3de18))
+* update import paths for mds_service in router and main files ([3e4fc0f](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/3e4fc0fc513f6e7cb705fcd69b12731bb7e3de18))
+
+
+### Miscellaneous Chores
+
+* **deps:** update dependency requests to v2.33.0 [security] ([#1346](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1346)) ([b41e8ee](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/b41e8ee122fd003363ce32fcef811890a8104a20))
+
+
+### Continuous Integration
+
+* update frontend lint pipeline to include TypeScript type checks and adjust ESLint unused vars pattern ([#1340](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1340)) ([c046431](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/c046431cdc20fbdab56534eb5bac70acb87c8e15))
+* update staging and prod deployed version: 1.14.2 ([#1342](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1342)) ([e3bfa47](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/e3bfa47dc8e05abd94f8d54add08b5f3e480f319))
+
 ## [1.14.2](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.14.1...v1.14.2) (2026-03-24)
 
 
