@@ -35,6 +35,7 @@ export default [
     rules: {
       ...js.configs.recommended.rules,
       ...reactHooks.configs.recommended.rules,
+      curly: "error",
       "no-unused-vars": [
         "error",
         { varsIgnorePattern: "^[A-Z_]", argsIgnorePattern: "^_" },
@@ -64,6 +65,7 @@ export default [
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
+      curly: "error",
       "@typescript-eslint/no-unused-vars": [
         "error",
         { varsIgnorePattern: "^_", argsIgnorePattern: "^_" },
@@ -75,4 +77,11 @@ export default [
     },
   },
   eslintConfigPrettier,
+  // Re-enable curly after eslintConfigPrettier (which disables it) —
+  // this is safe with Prettier since adding braces doesn't affect formatting.
+  {
+    rules: {
+      curly: "error",
+    },
+  },
 ];

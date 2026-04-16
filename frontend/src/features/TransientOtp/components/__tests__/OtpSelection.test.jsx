@@ -24,41 +24,6 @@ vi.mock("../../../../hooks/useNavigate.js", () => ({
 // ---------------------------------------------------------------------------
 // Utility mocks
 // ---------------------------------------------------------------------------
-vi.mock("../../../../utils/functions", () => ({
-  getPageContent: vi.fn((language, page) => {
-    if (page === PAGES.transientOtpSelection) {
-      return {
-        1: "Complete 2-step verification",
-        2: "To change your password,",
-        3: "first complete 2-step verification.",
-        5: "Once the code is sent it will expire in",
-        6: "10 minutes.",
-        7: "Carrier charges may apply.",
-        8: "Text message",
-        9: "Voice call",
-        10: "Need help?",
-        12: "Get help with 2-step verification",
-        13: "I cannot access my phone",
-        14: "To add a phone number,",
-        15: "To delete this number,",
-        17: "Passkey or security key",
-        18: "Select SMS",
-        19: "Select voice",
-        20: "Use passkey",
-        21: "How do you want to verify?",
-        22: "To delete this passkey,",
-        23: "To add a passkey,",
-      };
-    }
-    if (page === "Button") {
-      return {
-        cancel: "Cancel",
-      };
-    }
-    return {};
-  }),
-}));
-
 vi.mock("../../../../utils/gcHelpCentreLinks", () => ({
   gcHelpCentreLinks: {
     twoStepVerification: "https://help.example.com/2fa",
@@ -173,7 +138,7 @@ describe("OtpSelection Component", () => {
     it("renders the 'how to verify' section heading", () => {
       renderComponent();
       expect(
-        screen.getByText("How do you want to verify?"),
+        screen.getByText("Choose how you want to verify"),
       ).toBeInTheDocument();
     });
 
@@ -236,12 +201,16 @@ describe("OtpSelection Component", () => {
 
     it("renders deleteFIDO2PasskeyPage parent page content", () => {
       renderComponent({ parentPage: PAGES.deleteFIDO2PasskeyPage });
-      expect(screen.getByText(/To delete this passkey,/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/To delete a passkey or security key,/),
+      ).toBeInTheDocument();
     });
 
     it("renders addFIDO2PasskeyPage parent page content", () => {
       renderComponent({ parentPage: PAGES.addFIDO2PasskeyPage });
-      expect(screen.getByText(/To add a passkey,/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/To add a passkey or security key,/),
+      ).toBeInTheDocument();
     });
   });
 
@@ -277,7 +246,7 @@ describe("OtpSelection Component", () => {
           { id: "sms-2", type: FLOW_TYPES.sms, destination: "+15552222222" },
         ],
       });
-      const selectLinks = screen.getAllByText("Select SMS");
+      const selectLinks = screen.getAllByText("Text me");
       expect(selectLinks).toHaveLength(2);
     });
 
@@ -344,7 +313,7 @@ describe("OtpSelection Component", () => {
           },
         ],
       });
-      const selectLinks = screen.getAllByText("Select voice");
+      const selectLinks = screen.getAllByText("Call me");
       expect(selectLinks).toHaveLength(2);
     });
 
@@ -426,7 +395,7 @@ describe("OtpSelection Component", () => {
           { id: "passkey-2", attributes: { nickname: "Key Two" } },
         ],
       });
-      const passkeyLinks = screen.getAllByText("Use passkey");
+      const passkeyLinks = screen.getAllByText("Verify");
       expect(passkeyLinks).toHaveLength(2);
     });
   });
@@ -445,7 +414,7 @@ describe("OtpSelection Component", () => {
         ],
       });
 
-      const selectLink = screen.getByText("Select SMS");
+      const selectLink = screen.getByText("Text me");
       await user.click(selectLink);
 
       expect(mockOnChangeUserSelectedMfaFactor).toHaveBeenCalledWith(
@@ -465,7 +434,7 @@ describe("OtpSelection Component", () => {
         ],
       });
 
-      const selectLink = screen.getByText("Select SMS");
+      const selectLink = screen.getByText("Text me");
       await user.click(selectLink);
 
       expect(mockOnNext).toHaveBeenCalledTimes(1);
@@ -483,7 +452,7 @@ describe("OtpSelection Component", () => {
         ],
       });
 
-      const selectLink = screen.getByText("Select voice");
+      const selectLink = screen.getByText("Call me");
       await user.click(selectLink);
 
       expect(mockOnChangeUserSelectedMfaFactor).toHaveBeenCalledWith(
@@ -497,7 +466,7 @@ describe("OtpSelection Component", () => {
       const passkey = { id: "passkey-1", attributes: { nickname: "My Key" } };
       renderComponent({ fido2Data: [passkey] });
 
-      const selectLink = screen.getByText("Use passkey");
+      const selectLink = screen.getByText("Verify");
       await user.click(selectLink);
 
       expect(mockOnSelectFIDO2).toHaveBeenCalledWith(passkey);
@@ -532,7 +501,7 @@ describe("OtpSelection Component", () => {
         ],
       });
 
-      const selectLinks = screen.getAllByText("Select SMS");
+      const selectLinks = screen.getAllByText("Text me");
       await user.click(selectLinks[0]);
       expect(mockOnChangeUserSelectedMfaFactor).toHaveBeenCalledWith("sms-1");
 
@@ -596,7 +565,7 @@ describe("OtpSelection Component", () => {
         onSelectFIDO2: undefined,
       });
 
-      const selectLink = screen.getByText("Use passkey");
+      const selectLink = screen.getByText("Verify");
       await expect(user.click(selectLink)).resolves.not.toThrow();
     });
   });

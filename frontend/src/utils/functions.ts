@@ -1,16 +1,17 @@
-import engJson from "../locales/en/en.json";
-import frJson from "../locales/fr/fr.json";
+import i18n from "../i18n/index";
+import { PAGE_NAMESPACE_MAP } from "../i18n/index";
 
 import { AVAILABLE_LANGUAGES, FOOTERS, PROFILE_LANGUAGES } from "./constants";
-import type { AppLanguage, ContentVariableMap } from "../types/utils";
+import type { AppLanguage } from "../types/utils";
 
 type PageContent = Record<string, string>;
-type LocalizedPages = Record<string, PageContent>;
 
 function getLangHref(currentLang: string, pathname: string) {
   let newPathname = pathname.slice(1 + currentLang.length);
 
-  if (newPathname.length > 0) newPathname = "/" + newPathname;
+  if (newPathname.length > 0) {
+    newPathname = "/" + newPathname;
+  }
 
   if (currentLang === AVAILABLE_LANGUAGES.fr) {
     return "/" + AVAILABLE_LANGUAGES.en + newPathname.replace(/\/\//g, "/");
@@ -48,22 +49,27 @@ export function getPageContent(
   language: string | undefined,
   pageName: string,
 ): PageContent | undefined {
-  const localizedPages =
-    language === AVAILABLE_LANGUAGES.fr
-      ? (frJson as LocalizedPages)
-      : (engJson as LocalizedPages);
+  const ns = PAGE_NAMESPACE_MAP[pageName];
+  if (!ns) {
+    return undefined;
+  }
 
-  return localizedPages[pageName];
+  const lng = language === AVAILABLE_LANGUAGES.fr ? "fr" : "en";
+  const bundle = i18n.getResourceBundle(lng, ns) as
+    | Record<string, PageContent>
+    | undefined;
+
+  return bundle?.[pageName];
 }
 
 export function getContentWithVariables(
   content: string,
-  variables: ContentVariableMap,
+  variables: Record<string, string | number>,
 ) {
   let updatedContent = content;
 
   Object.keys(variables).forEach((key) => {
-    const regex = new RegExp(`{${key}}`, "g");
+    const regex = new RegExp(`\\{\\{${key}\\}\\}`, "g");
     updatedContent = updatedContent.replace(regex, String(variables[key]));
   });
 
@@ -71,7 +77,9 @@ export function getContentWithVariables(
 }
 
 export function getFooter(language: string | undefined) {
-  if (language === AVAILABLE_LANGUAGES.fr) return FOOTERS.default.fr;
+  if (language === AVAILABLE_LANGUAGES.fr) {
+    return FOOTERS.default.fr;
+  }
 
   return FOOTERS.default.en;
 }
@@ -108,7 +116,9 @@ export function isNameValid(name: string | null, minLength: number) {
 }
 
 export function capitalizeFirstLetter(str: string | null | undefined) {
-  if (!str) return "";
+  if (!str) {
+    return "";
+  }
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
@@ -116,11 +126,16 @@ export function formatTime(
   expirationTime: string | number | Date | null | undefined,
   currentLang: string = "en",
 ) {
-  if (!expirationTime) return "0:00";
+  if (!expirationTime) {
+    return "0:00";
+  }
 
   let lang: AppLanguage = "en";
-  if (currentLang === "fr" || currentLang === "fr-ca") lang = "fr";
-  else if (currentLang === "en-ca") lang = "en";
+  if (currentLang === "fr" || currentLang === "fr-ca") {
+    lang = "fr";
+  } else if (currentLang === "en-ca") {
+    lang = "en";
+  }
 
   const date = new Date(expirationTime);
   return date.toLocaleTimeString(lang, {

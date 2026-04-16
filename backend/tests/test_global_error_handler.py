@@ -310,10 +310,12 @@ class TestErrorHandlingDeleteMfaOtp:
                 ),
             ],
         )
-        mock_get_auth_request_headers.side_effect = lambda token, _content_type: {
-            "Authorization": f"Bearer {token}",
-            "Content-Type": "application/json",
-        }
+        mock_get_auth_request_headers.side_effect = (
+            lambda token, _content_type, _language=None, **kwargs: {
+                "Authorization": f"Bearer {token}",
+                "Content-Type": "application/json",
+            }
+        )
 
         def mock_get_configuration_return_value():
             config = Mock()
@@ -384,7 +386,9 @@ class TestErrorHandlingDeleteMfaOtp:
             ],
         )
 
-        def mock_dispatch_otp_deletion_return_value(client, request, user_token):
+        def mock_dispatch_otp_deletion_return_value(
+            client, request, user_token, language=None
+        ):
             mock_response = Mock(spec=Response)
             mock_response.status_code = 200  # Unexpected status for deletion
             return mock_response
@@ -443,10 +447,12 @@ class TestErrorHandlingDeleteMfaOtp:
                 ),
             ],
         )
-        mock_get_auth_request_headers.side_effect = lambda token, _content_type: {
-            "Authorization": f"Bearer {token}",
-            "Content-Type": "application/json",
-        }
+        mock_get_auth_request_headers.side_effect = (
+            lambda token, _content_type, _language=None, **kwargs: {
+                "Authorization": f"Bearer {token}",
+                "Content-Type": "application/json",
+            }
+        )
 
         def mock_get_configuration_return_value():
             config = Mock()
@@ -652,6 +658,7 @@ class TestErrorHandlingFido2AttestationResults:
         assert "Token service error" in caplog.text
 
     @pytest.mark.asyncio
+    @patch.object(add_fido2_registration_module, "dispatch_get_my_profile_from_ibm")
     @patch.object(add_fido2_registration_module, "get_auth_request_headers")
     @patch.object(add_fido2_registration_module, "get_rp_uuid_from_rp_id")
     @patch.object(add_fido2_registration_module, "get_admin_token")
@@ -664,6 +671,7 @@ class TestErrorHandlingFido2AttestationResults:
         mock_get_admin_token,
         mock_get_rp_uuid_from_rp_id,
         mock_get_auth_request_headers,
+        mock_dispatch_get_my_profile_from_ibm,
         mock_test_client,
     ):
         """Should handle HTTP error from API"""
@@ -674,6 +682,9 @@ class TestErrorHandlingFido2AttestationResults:
         mock_get_auth_request_headers.return_value = {
             "Authorization": "Bearer admin-token"
         }
+        mock_profile = MagicMock()
+        mock_profile.preferredLanguage = "en"
+        mock_dispatch_get_my_profile_from_ibm.return_value = mock_profile
 
         mock_client = AsyncMock(spec=AsyncClient)
         mock_request = Request("POST", "https://example.com")
@@ -1311,6 +1322,7 @@ class TestErrorHandlingFido2DeleteRegistration:
         assert response_json["message"] == "User does not own this registration"
 
     @pytest.mark.asyncio
+    @patch.object(delete_fido2_registration_module, "dispatch_get_my_profile_from_ibm")
     @patch.object(delete_fido2_registration_module, "submit_assertion_result")
     @patch.object(delete_fido2_registration_module, "get_auth_request_headers")
     @patch.object(delete_fido2_registration_module, "verify_registration_ownership")
@@ -1323,6 +1335,7 @@ class TestErrorHandlingFido2DeleteRegistration:
         mock_verify_registration_ownership,
         mock_get_auth_request_headers,
         mock_submit_assertion_result,
+        mock_dispatch_get_my_profile_from_ibm,
         mock_test_client,
     ):
         """Should handle error when HTTP delete request fails"""
@@ -1340,6 +1353,9 @@ class TestErrorHandlingFido2DeleteRegistration:
         mock_get_auth_request_headers.return_value = {
             "Authorization": "Bearer admin-token-xyz"
         }
+        mock_profile = MagicMock()
+        mock_profile.preferredLanguage = "en"
+        mock_dispatch_get_my_profile_from_ibm.return_value = mock_profile
 
         # Simulate HTTP error on delete
         mock_client = AsyncMock(spec=AsyncClient)
@@ -1413,6 +1429,7 @@ class TestErrorHandlingFido2DeleteRegistration:
         assert "Unexpected error" in caplog.text
 
     @pytest.mark.asyncio
+    @patch.object(delete_fido2_registration_module, "dispatch_get_my_profile_from_ibm")
     @patch.object(delete_fido2_registration_module, "submit_assertion_result")
     @patch.object(delete_fido2_registration_module, "get_auth_request_headers")
     @patch.object(delete_fido2_registration_module, "verify_registration_ownership")
@@ -1425,6 +1442,7 @@ class TestErrorHandlingFido2DeleteRegistration:
         mock_verify_registration_ownership,
         mock_get_auth_request_headers,
         mock_submit_assertion_result,
+        mock_dispatch_get_my_profile_from_ibm,
         mock_test_client,
         caplog,
     ):
@@ -1443,6 +1461,9 @@ class TestErrorHandlingFido2DeleteRegistration:
         mock_get_auth_request_headers.return_value = {
             "Authorization": "Bearer admin-token-xyz"
         }
+        mock_profile = MagicMock()
+        mock_profile.preferredLanguage = "en"
+        mock_dispatch_get_my_profile_from_ibm.return_value = mock_profile
 
         # Simulate connection error
         mock_client = AsyncMock(spec=AsyncClient)

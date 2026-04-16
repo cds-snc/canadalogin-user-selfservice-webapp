@@ -10,15 +10,12 @@ import {
   GcdsText,
 } from "@gcds-core/components-react";
 
-import { getPageContent } from "../../../utils/functions";
-import { PAGES } from "../../../utils/constants";
-import RPNameDisplay from "../../../components/RPInfo/RPNameDisplay";
+import { useTranslation, Trans } from "react-i18next";
 import SubmitButton from "../../../components/Layout/SubmitButton";
 import { path } from "../../../utils/routeHelpers";
-import type {
-  ContactPhoneConfirmUpdateProps,
-  ContactPhonePageContent,
-} from "../../../types/contactPhoneNumber";
+import { PAGES } from "../../../utils/constants";
+import { trackButtonClick } from "../../../utils/gatag";
+import type { ContactPhoneConfirmUpdateProps } from "../../../types/contactPhoneNumber";
 
 export default function ConfirmUpdate({
   onNext,
@@ -29,10 +26,7 @@ export default function ConfirmUpdate({
   localLoading,
 }: ContactPhoneConfirmUpdateProps) {
   const { language = "en" } = useParams<{ language: string }>();
-  const pageContentJson =
-    (getPageContent(language, PAGES.confirmContactPhoneNumberUpdate) as
-      | ContactPhonePageContent
-      | undefined) ?? {};
+  const { t } = useTranslation("phone");
 
   const manage2FAVerificationsPage = path(PAGES.manage2FAVerifications, {
     language,
@@ -43,6 +37,12 @@ export default function ConfirmUpdate({
     if (setErrorCode) {
       setErrorCode("");
     }
+
+    trackButtonClick("confirm_phone_update", {
+      form_id: "contact_phone_number_update",
+      step: "confirmUpdate",
+    });
+
     void onNext();
   };
 
@@ -55,31 +55,35 @@ export default function ConfirmUpdate({
       ) : null}
       <GcdsGrid columns="1" gap="300">
         <GcdsHeading tag="h1" lang={language}>
-          {pageContentJson["1"]}
+          {t("ConfirmContactPhoneNumberUpdate.title")}
         </GcdsHeading>
         <div>
-          <GcdsText marginBottom="0">{pageContentJson["2"]}</GcdsText>
+          <GcdsText marginBottom="0">
+            {t("ConfirmContactPhoneNumberUpdate.requestedUpdate")}
+          </GcdsText>
           <GcdsText marginTop="0">
             <strong>{phoneFormData.formattedPhoneNumber}</strong>
           </GcdsText>
         </div>
 
         <GcdsText>
-          {pageContentJson["4"]}
-          <ul>
-            <li>
-              <RPNameDisplay rpName={pageContentJson["5"]} />
-            </li>
-          </ul>
+          <Trans
+            i18nKey="ConfirmContactPhoneNumberUpdate.allServicesNotice"
+            ns="phone"
+            components={{ bold: <strong /> }}
+          />
         </GcdsText>
 
         <GcdsNotice noticeRole="info" noticeTitleTag="h2" noticeTitle=" ">
           <GcdsText>
-            {pageContentJson["6"]} <strong>{pageContentJson["7"]}</strong>
+            {t("ConfirmContactPhoneNumberUpdate.onlyChanges")}{" "}
+            <strong>
+              {t("ConfirmContactPhoneNumberUpdate.contactPhoneNumber")}
+            </strong>
             <GcdsText>
-              {pageContentJson["8"]}{" "}
+              {t("ConfirmContactPhoneNumberUpdate.changeTwoStep")}{" "}
               <GcdsLink href={manage2FAVerificationsPage}>
-                {pageContentJson["9"]}
+                {t("ConfirmContactPhoneNumberUpdate.securitySettings")}
               </GcdsLink>
             </GcdsText>
           </GcdsText>
@@ -91,17 +95,23 @@ export default function ConfirmUpdate({
             onGcdsClick={onSubmitClick}
             currentLang={language}
           >
-            {pageContentJson["10"]}
+            {t("ConfirmContactPhoneNumberUpdate.confirmButton")}
           </SubmitButton>
           <GcdsButton
             buttonRole="secondary"
             disabled={localLoading}
             onGcdsClick={(event: Event) => {
               event.preventDefault();
+
+              trackButtonClick("cancel_phone_confirmation", {
+                form_id: "contact_phone_number_update",
+                step: "confirmUpdate",
+              });
+
               void onCancel();
             }}
           >
-            {pageContentJson["11"]}
+            {t("ConfirmContactPhoneNumberUpdate.cancelButton")}
           </GcdsButton>
         </GcdsGrid>
       </GcdsGrid>

@@ -8,7 +8,7 @@ import {
 } from "@gcds-core/components-react";
 import { useParams } from "react-router";
 import { PAGES } from "../../../../utils/constants";
-import { getPageContent } from "../../../../utils/functions";
+import { useTranslation } from "react-i18next";
 import { path } from "../../../../utils/routeHelpers";
 
 interface PhoneFormData {
@@ -28,10 +28,7 @@ export default function DeleteMFAPhoneNumberConfirm({
 }: DeleteMFAPhoneNumberConfirmProps) {
   const { language } = useParams();
   const backtoProfilePage = path(PAGES.ProfileHome, { language: language });
-  const pageContentJson = getPageContent(
-    language,
-    PAGES.deleteMFAPhoneNumberConfirm,
-  )!;
+  const { t } = useTranslation("mfa");
 
   const onSubmitHandler = async (ev: Event) => {
     ev.preventDefault();
@@ -43,17 +40,21 @@ export default function DeleteMFAPhoneNumberConfirm({
       <GcdsGrid columns="1" gap="500">
         <GcdsContainer>
           <GcdsHeading tag="h1" lang={language}>
-            {pageContentJson["1"]}
+            {t("DeleteMFAPhoneNumberConfirm.title")}
           </GcdsHeading>
           <GcdsText>
-            {pageContentJson["2"]}{" "}
+            {t("DeleteMFAPhoneNumberConfirm.noLongerUse")}{" "}
             <strong>{phoneFormData?.formattedPhoneNumber}</strong>{" "}
-            {pageContentJson["3"]}
+            {t("DeleteMFAPhoneNumberConfirm.toSignIn")}
           </GcdsText>
           <GcdsText>
-            {pageContentJson["4"]} {pageContentJson["5"]} {pageContentJson["6"]}{" "}
-            <GcdsLink href={backtoProfilePage}>{pageContentJson["7"]}</GcdsLink>
-            {pageContentJson["8"]}
+            {t("DeleteMFAPhoneNumberConfirm.thisText")}{" "}
+            {t("DeleteMFAPhoneNumberConfirm.willNot")}{" "}
+            {t("DeleteMFAPhoneNumberConfirm.deleteFromContact")}{" "}
+            <GcdsLink href={backtoProfilePage}>
+              {t("DeleteMFAPhoneNumberConfirm.personalInformation")}
+            </GcdsLink>
+            {t("DeleteMFAPhoneNumberConfirm.period")}
           </GcdsText>
         </GcdsContainer>
       </GcdsGrid>
@@ -64,7 +65,7 @@ export default function DeleteMFAPhoneNumberConfirm({
           style={{ width: "fit-content" }}
           onGcdsClick={onSubmitHandler}
         >
-          {pageContentJson["9"]}
+          {t("DeleteMFAPhoneNumberConfirm.confirmButton")}
         </GcdsButton>
 
         <GcdsButton
@@ -75,7 +76,7 @@ export default function DeleteMFAPhoneNumberConfirm({
             onCancel();
           }}
         >
-          {pageContentJson["10"]}
+          {t("DeleteMFAPhoneNumberConfirm.cancelButton")}
         </GcdsButton>
       </GcdsGrid>
     </GcdsContainer>

@@ -1,6 +1,5 @@
 import { useParams } from "react-router";
-import { getPageContent } from "../../utils/functions";
-import { PAGES } from "../../utils/constants";
+import { useTranslation, Trans } from "react-i18next";
 import {
   GcdsButton,
   GcdsContainer,
@@ -8,7 +7,6 @@ import {
   GcdsHeading,
   GcdsText,
 } from "@gcds-core/components-react";
-import RPNameDisplay from "../../components/RPInfo/RPNameDisplay";
 import SubmitButton from "../../components/Layout/SubmitButton";
 
 type EmailFormData = {
@@ -27,31 +25,32 @@ export default function EmailConfirmUpdate({
   onCancel,
 }: EmailConfirmUpdateProps) {
   const { language } = useParams();
+  const { t } = useTranslation(["email", "common"]);
 
-  const pageContentJson =
-    getPageContent(language, PAGES.emailConfirmUpdate) ?? {};
-  const { cancel } = getPageContent(language, "Button") ?? {};
-
-  if (!formData?.emailAddress) return null;
+  if (!formData?.emailAddress) {
+    return null;
+  }
 
   return (
     <GcdsContainer role="main">
-      <GcdsHeading tag="h1">{pageContentJson["1"]}</GcdsHeading>
+      <GcdsHeading tag="h1">{t("EmailConfirmUpdate.title")}</GcdsHeading>
       <GcdsText>
-        {pageContentJson["2"]} <strong>{formData.emailAddress}</strong>.
+        {t("EmailConfirmUpdate.requestedUpdate")}{" "}
+        <strong>{formData.emailAddress}</strong>.
       </GcdsText>
-      <GcdsText>{pageContentJson["3"]}</GcdsText>
-      <ul>
-        <li>
-          <RPNameDisplay rpName={pageContentJson["4"] ?? ""} />
-        </li>
-      </ul>
+      <GcdsText>
+        <Trans
+          i18nKey="EmailConfirmUpdate.allServicesNotice"
+          ns="email"
+          components={{ bold: <strong /> }}
+        />
+      </GcdsText>
       <GcdsGrid columns="max-content max-content" gap="200">
         <SubmitButton
           currentLang={language ?? "en"}
           onClick={() => void onSubmit()}
         >
-          {pageContentJson["5"]}
+          {t("EmailConfirmUpdate.confirmButton")}
         </SubmitButton>
         <GcdsButton
           buttonRole="secondary"
@@ -61,7 +60,7 @@ export default function EmailConfirmUpdate({
             void onCancel();
           }}
         >
-          {cancel}
+          {t("Button.cancel", { ns: "common" })}
         </GcdsButton>
       </GcdsGrid>
     </GcdsContainer>

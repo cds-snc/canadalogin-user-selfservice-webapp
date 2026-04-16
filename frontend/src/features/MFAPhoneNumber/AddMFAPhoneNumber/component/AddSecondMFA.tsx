@@ -7,8 +7,8 @@ import {
   GcdsText,
 } from "@gcds-core/components-react";
 import { useParams } from "react-router";
-import { FLOW_TYPES, PAGES } from "../../../../utils/constants";
-import { getPageContent } from "../../../../utils/functions";
+import { FLOW_TYPES } from "../../../../utils/constants";
+import { useTranslation } from "react-i18next";
 import SubmitButton from "../../../../components/Layout/SubmitButton";
 
 interface PhoneFormData {
@@ -32,12 +32,11 @@ export default function AddSecondMFA({
   onAddSecondMFA,
 }: AddSecondMFAProps) {
   const { language } = useParams();
-  const pageContentJson = getPageContent(
-    language,
+  const { t } = useTranslation("mfa");
+  const pageName =
     phoneFormData.otpType === FLOW_TYPES.voice
-      ? PAGES.addSecondMFATextMessage
-      : PAGES.addSecondMFAVoiceCall,
-  )!;
+      ? "AddSecondMFATextMessage"
+      : "AddSecondMFAVoiceCall";
 
   const onSubmitHandler = async (ev: Event) => {
     ev.preventDefault();
@@ -50,23 +49,24 @@ export default function AddSecondMFA({
         {" "}
         <GcdsNotice noticeRole="success" noticeTitleTag="h2" noticeTitle=" ">
           <GcdsText>
-            {pageContentJson["1"]}{" "}
+            {t(`${pageName}.youHaveAdded`)}{" "}
             <strong>{phoneFormData.formattedPhoneNumber} </strong>
-            {pageContentJson["2"]}
+            {t(`${pageName}.asVerificationNumber`)}
           </GcdsText>
         </GcdsNotice>
       </GcdsText>
 
-      <GcdsHeading tag="h1">{pageContentJson["3"]}</GcdsHeading>
+      <GcdsHeading tag="h1">{t(`${pageName}.title`)}</GcdsHeading>
 
       <GcdsText>
-        {pageContentJson["4"]} <strong>{pageContentJson["5"]}</strong>{" "}
-        {pageContentJson["6"]}
+        {t(`${pageName}.settingUpAllows`)}{" "}
+        <strong>{t(`${pageName}.methodName`)}</strong>{" "}
+        {t(`${pageName}.whenSigningIn`)}
       </GcdsText>
 
-      <GcdsText>{pageContentJson["7"]}</GcdsText>
+      <GcdsText>{t(`${pageName}.recommendation`)}</GcdsText>
 
-      <GcdsHeading tag="h2">{pageContentJson["8"]}</GcdsHeading>
+      <GcdsHeading tag="h2">{t(`${pageName}.wouldYouLike`)}</GcdsHeading>
 
       <GcdsGrid columns="max-content max-content" gap="200">
         <GcdsText>
@@ -76,7 +76,7 @@ export default function AddSecondMFA({
             onGcdsClick={onSubmitHandler}
             currentLang={language ?? "en"}
           >
-            {pageContentJson["9"]}
+            {t(`${pageName}.yesSetUp`)}
           </SubmitButton>
         </GcdsText>
         &nbsp;
@@ -86,7 +86,7 @@ export default function AddSecondMFA({
             await onSkipForNow();
           }}
         >
-          {pageContentJson["10"]}
+          {t(`${pageName}.noSkip`)}
         </GcdsLink>
       </GcdsGrid>
     </GcdsContainer>

@@ -89,36 +89,6 @@ vi.mock("@gcds-core/components-react", () => ({
   ),
 }));
 
-// Mock functions
-vi.mock("../../../utils/functions", () => ({
-  getPageContent: (language, page) => {
-    const mockContent = {
-      Verification: {
-        1: "Check your phone",
-        2: "We have sent a 6-digit verification code via text message to +1 (555) 123-4567",
-        3: "We have sent a 6-digit verification code via voice call to +1 (555) 123-4567",
-        4: "Enter 6-digit verification code",
-        5: "Request a new code",
-        6: "Use a different phone number",
-        7: "Resend",
-        8: "Enter verification code",
-        9: "Verification code",
-        10: "Didn't receive a code?",
-        14: "You can request a new code in",
-        15: "seconds",
-        16: "Request a new code",
-        21: "Use a different phone number",
-      },
-      Button: {
-        submit: "Continue",
-        cancel: "Cancel",
-        back: "Back",
-      },
-    };
-    return mockContent[page] || {};
-  },
-}));
-
 // Mock react-router
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
@@ -228,10 +198,10 @@ describe("OtpVerification Component", () => {
       </TestWrapper>,
     );
 
-    // The SMS message should be displayed - mock content key "2"
+    // The SMS message should be displayed
     expect(
       screen.getByText(
-        "We have sent a 6-digit verification code via text message to +1 (555) 123-4567",
+        "We have sent a text message with a 6-digit verification code to:",
       ),
     ).toBeInTheDocument();
   });
@@ -397,7 +367,7 @@ describe("OtpVerification Component", () => {
     );
 
     // The back action is in the second link (getAllByText returns array)
-    const backLinks = screen.getAllByText("Use a different phone number");
+    const backLinks = screen.getAllByText("Try another way");
     const backLink = backLinks[backLinks.length - 1]; // Take the last one
     fireEvent.click(backLink);
 

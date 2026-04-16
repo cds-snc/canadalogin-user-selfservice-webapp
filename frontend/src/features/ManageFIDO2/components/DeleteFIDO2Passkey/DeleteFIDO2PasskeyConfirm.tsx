@@ -1,6 +1,5 @@
 import { useParams } from "react-router";
-import { getPageContent } from "../../../../utils/functions";
-import { PAGES } from "../../../../utils/constants";
+import { useTranslation } from "react-i18next";
 import {
   GcdsButton,
   GcdsContainer,
@@ -21,21 +20,19 @@ export default function DeleteFIDO2PasskeyConfirm({
   onCancel,
 }: DeleteFIDO2PasskeyConfirmProps) {
   const { language } = useParams();
-  const pageContentJson = getPageContent(
-    language,
-    PAGES.deleteFIDO2PasskeyConfirm,
-  )!;
+  const { t } = useTranslation("fido2");
 
   return (
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="500">
         <GcdsContainer>
           <GcdsHeading tag="h1" lang={language}>
-            {pageContentJson["1"]}
+            {t("DeleteFIDO2PasskeyConfirm.title")}
           </GcdsHeading>
           <GcdsText>
-            {pageContentJson["2"]} <strong>{passkeyNickname}</strong>{" "}
-            {pageContentJson["3"]}
+            {t("DeleteFIDO2PasskeyConfirm.noLongerUse")}{" "}
+            <strong>{passkeyNickname}</strong>{" "}
+            {t("DeleteFIDO2PasskeyConfirm.toSignIn")}
           </GcdsText>
         </GcdsContainer>
       </GcdsGrid>
@@ -49,7 +46,7 @@ export default function DeleteFIDO2PasskeyConfirm({
             await onConfirm();
           }}
         >
-          {pageContentJson["9"]}
+          {t("DeleteFIDO2PasskeyConfirm.confirmButton")}
         </GcdsButton>
 
         <GcdsButton
@@ -60,7 +57,7 @@ export default function DeleteFIDO2PasskeyConfirm({
             onCancel();
           }}
         >
-          {pageContentJson["10"]}
+          {t("DeleteFIDO2PasskeyConfirm.cancelButton")}
         </GcdsButton>
       </GcdsGrid>
     </GcdsContainer>

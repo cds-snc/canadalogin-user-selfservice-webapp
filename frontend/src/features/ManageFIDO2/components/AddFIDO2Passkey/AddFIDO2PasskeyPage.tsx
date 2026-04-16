@@ -15,7 +15,7 @@ import PasswordVerification from "../../../TransientOtp/components/PasswordVerif
 import OtpSelection from "../../../TransientOtp/components/OtpSelection";
 import OtpVerification from "../../../TransientOtp/components/OtpVerification";
 import { authService } from "../../../../services/authService";
-import { getPageContent } from "../../../../utils/functions";
+import { useTranslation } from "react-i18next";
 import StepContent from "../../../../components/Wizard/StepContent";
 import Loader from "../../../../components/Layout/Loading";
 import AddFIDO2Passkey from "./AddFIDO2Passkey";
@@ -44,7 +44,7 @@ export default function AddFIDO2PasskeyPage({
   const { userProfile } = state;
   const { id, userName } = userProfile ?? {};
   const errorMessage = getErrorMessage(language, errorCode);
-  const loaderPageContentJson = getPageContent(language, PAGES.otpSelection)!;
+  const { t } = useTranslation(["security", "fido2"]);
   const [userPasswordValue, setUserPasswordValue] = useState("");
   const [selected2FAPasskey, setSelected2FAPasskey] =
     useState<Fido2Credential | null>(null);
@@ -89,7 +89,9 @@ export default function AddFIDO2PasskeyPage({
         (!fido2Data || fido2Data.length === 0)
       ) {
         const success = await requestOtpCode();
-        if (success) setWizardStep("otpValidation");
+        if (success) {
+          setWizardStep("otpValidation");
+        }
       } else {
         setWizardStep("otpSelection");
       }
@@ -132,7 +134,11 @@ export default function AddFIDO2PasskeyPage({
       // Look up authenticator description from MDS service using AAGUID
       if (result.aaguid) {
         const metadata = await fido2Api.getAuthenticatorMetadata(result.aaguid);
-        setAuthenticatorDescription(metadata?.description ?? "");
+        setAuthenticatorDescription(
+          !!metadata?.description
+            ? metadata?.description
+            : t("AddFIDO2PasskeyNickname.defaultPasskeyName", { ns: "fido2" }),
+        );
       }
 
       setWizardStep("addFIDO2PasskeyNickname");
@@ -238,7 +244,9 @@ export default function AddFIDO2PasskeyPage({
         onNext={() => {
           void (async () => {
             const success = await requestOtpCode();
-            if (success) setWizardStep("otpValidation");
+            if (success) {
+              setWizardStep("otpValidation");
+            }
           })();
         }}
         onSelectFIDO2={(passkey) => {
@@ -312,7 +320,7 @@ export default function AddFIDO2PasskeyPage({
     registrationLoading;
 
   return isLoading ? (
-    <Loader text={loaderPageContentJson["11"]} />
+    <Loader text={t("OtpSelection.loading")} />
   ) : (
     <StepContent
       StepComponent={steps[wizardStep]}

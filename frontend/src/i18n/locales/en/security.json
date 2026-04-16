@@ -1,0 +1,30 @@
+{
+  "SecuritySettings": {
+    "title": "Security settings",
+    "howYouSignIn": "How you sign in to CanadaLogin",
+    "keepInfoUpdated": "Make sure you can always access your CanadaLogin by keeping this information up to date.",
+    "password": "Password",
+    "lastChangedOn": "Last changed on",
+    "change": "Change",
+    "twoStepVerification": "2-step verification",
+    "twoStepDescription": "A second step after your password helps verify it's you signing in.",
+    "enabled": "Enabled",
+    "manage": "Manage",
+    "pageTitle": "Security settings"
+  },
+  "OtpSelection": {
+    "title": "First, verify it's you ",
+    "description": "Two-step verification adds a second layer of security before updating your password.",
+    "learnMore": "Learn more about two-step verification (opens in a new tab)",
+    "verifyIdentity": "To update your password, you'll need to verify your identity by receiving a one-time passcode (OTP).",
+    "howToSendCode": "How should we send you the code?",
+    "changeInSettings": "You can change this in 2-step verification - Security Settings.",
+    "textMessage": "Text message (SMS)",
+    "mobileOnly": "Mobile only.",
+    "voiceCall": "Voice call",
+    "mobileOrLandline": "Mobile or landline.",
+    "loading": "Loading...",
+    "loadingMfaMethods": "Loading your MFA methods ...",
+    "carrierCharges": "Carrier charges may apply."
+  }
+}

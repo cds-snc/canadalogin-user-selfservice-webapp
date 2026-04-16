@@ -10,7 +10,7 @@ import {
   GcdsText,
   GcdsCheckboxes,
 } from "@gcds-core/components-react";
-import { getPageContent } from "../../../utils/functions";
+import { useTranslation } from "react-i18next";
 import { PAGES } from "../../../utils/constants";
 import { useParams } from "react-router";
 import SubmitButton from "../../../components/Layout/SubmitButton";
@@ -38,27 +38,22 @@ export default function PasswordVerification({
 }: PasswordVerificationProps) {
   const { language } = useParams();
   const [checkedValue, setCheckedValue] = useState(false);
-
-  const pageContentJson =
-    getPageContent(language, PAGES.passwordVerification) ?? {};
-  const passwordPageContentJson =
-    getPageContent(language, PAGES.password) ?? {};
-
-  const { cancel } = getPageContent(language, "Button") ?? {};
+  const { t } = useTranslation(["otp", "password", "common"]);
 
   const pageContentMap: Record<string, string> = {
-    [PAGES.deleteMFAPage]: pageContentJson["8"],
-    [PAGES.addMFAPage]: pageContentJson["7"],
-    [PAGES.addFIDO2PasskeyPage]: pageContentJson["9"],
-    [PAGES.deleteFIDO2PasskeyPage]: pageContentJson["10"],
-    [PAGES.password]: pageContentJson["2"],
+    [PAGES.deleteMFAPage]: t("PasswordVerification.toDeleteNumber"),
+    [PAGES.addMFAPage]: t("PasswordVerification.toAddPhone"),
+    [PAGES.addFIDO2PasskeyPage]: t("PasswordVerification.toAddPasskey"),
+    [PAGES.deleteFIDO2PasskeyPage]: t("PasswordVerification.toDeletePasskey"),
+    [PAGES.password]: t("PasswordVerification.toChangePassword"),
   };
 
-  const parentPageContent = pageContentMap[parentPage] || pageContentJson["2"];
+  const parentPageContent =
+    pageContentMap[parentPage] || t("PasswordVerification.toChangePassword");
 
   const optionsValues = [
     {
-      label: passwordPageContentJson["11"],
+      label: t("Password.showPassword", { ns: "password" }),
       id: "show-password-checkbox",
       value: "show-password-checkbox",
       checked: checkedValue,
@@ -87,16 +82,16 @@ export default function PasswordVerification({
     <GcdsContainer role="main">
       <GcdsContainer className="gcds-gap">
         <GcdsHeading tag="h1" lang={language}>
-          {pageContentJson["1"]}
+          {t("PasswordVerification.title")}
         </GcdsHeading>
       </GcdsContainer>
       <GcdsText>
-        {parentPageContent} {pageContentJson["3"]}
+        {parentPageContent} {t("PasswordVerification.enterCurrentPassword")}
       </GcdsText>
       <form onSubmit={onSubmitHandler}>
         <GcdsInput
           inputId="passwordVerification"
-          label={pageContentJson["4"]}
+          label={t("PasswordVerification.passwordLabel")}
           autoFocus
           autocomplete="one-time-code"
           name="passwordVerification"
@@ -108,12 +103,12 @@ export default function PasswordVerification({
             setUserPasswordValue((ev.target as HTMLInputElement).value);
           }}
           lang={language}
-          size={12}
+          size={18}
         ></GcdsInput>
       </form>
       <GcdsCheckboxes
         id="password-checkbox"
-        legend={passwordPageContentJson["11"]}
+        legend={t("Password.showPassword", { ns: "password" })}
         name="show-password-checkbox"
         options={optionsValues}
         onGcdsChange={() => setCheckedValue(!checkedValue)}
@@ -137,7 +132,7 @@ export default function PasswordVerification({
             onCancel();
           }}
         >
-          {cancel}
+          {t("Button.cancel", { ns: "common" })}
         </GcdsButton>
       </GcdsGrid>
     </GcdsContainer>

@@ -518,9 +518,6 @@ async def submit_assertion_result(
     response_data = http_response.json()
     logger.info("Assertion result submitted successfully")
 
-    print("hihihihihiihhihihiihihhihihi")
-    print(response_data)
-
     # Steps 5–6: Exchange FIDO2 JWT and update session
     if return_jwt and "assertion" in response_data:
         fido2_jwt = response_data["assertion"]

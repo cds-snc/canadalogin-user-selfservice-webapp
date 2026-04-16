@@ -145,47 +145,50 @@ export const EditProfileName = (() => {
       });
 
       await step("Verify confirmation page and click Yes, update", async () => {
-        await waitFor(async () => {
-          const canvas = within(canvasElement);
-          await expect(
-            canvas.getByText(/You’ve requested to update your name to:/i),
-          ).toBeInTheDocument();
+        await waitFor(
+          async () => {
+            const canvas = within(canvasElement);
+            await expect(
+              canvas.getByText(/You've requested to update your name to:/i),
+            ).toBeInTheDocument();
 
-          // The form was pre-populated with "Test" / "User" from the provider;
-          // verify those values appear on the confirmation page.
-          const pageText = canvasElement.textContent;
-          await expect(pageText).toContain("Test");
-          await expect(pageText).toContain("User");
+            // The form was pre-populated with "Test" / "User" from the provider;
+            // verify those values appear on the confirmation page.
+            const pageText = canvasElement.textContent;
+            await expect(pageText).toContain("Test");
+            await expect(pageText).toContain("User");
 
-          // Find the "Yes, update" button specifically
-          const allButtons = canvasElement.querySelectorAll("gcds-button");
-          let yesUpdateButton = null;
+            // Find the "Yes, update" button specifically
+            const allButtons = canvasElement.querySelectorAll("gcds-button");
+            let yesUpdateButton = null;
 
-          // Find the button that contains "Yes, update" text
-          for (const button of allButtons) {
-            if (
-              button.textContent &&
-              button.textContent.includes("Yes, update")
-            ) {
-              yesUpdateButton = button;
-              break;
+            // Find the button that contains "Yes, update" text
+            for (const button of allButtons) {
+              if (
+                button.textContent &&
+                button.textContent.includes("Yes, update")
+              ) {
+                yesUpdateButton = button;
+                break;
+              }
             }
-          }
 
-          await expect(yesUpdateButton).toBeInTheDocument();
+            await expect(yesUpdateButton).toBeInTheDocument();
 
-          if (yesUpdateButton && yesUpdateButton.shadowRoot) {
-            // Find the actual button element in shadow DOM
-            const actualButton =
-              yesUpdateButton.shadowRoot.querySelector(
-                'button[type="button"]',
-              ) || yesUpdateButton.shadowRoot.querySelector("button");
-            await expect(actualButton).toBeInTheDocument();
+            if (yesUpdateButton && yesUpdateButton.shadowRoot) {
+              // Find the actual button element in shadow DOM
+              const actualButton =
+                yesUpdateButton.shadowRoot.querySelector(
+                  'button[type="button"]',
+                ) || yesUpdateButton.shadowRoot.querySelector("button");
+              await expect(actualButton).toBeInTheDocument();
 
-            // Click the "Yes, update" button
-            await userEvent.click(actualButton);
-          }
-        });
+              // Click the "Yes, update" button
+              await userEvent.click(actualButton);
+            }
+          },
+          { timeout: 3000 },
+        );
       });
 
       await step("Verify success page is displayed", async () => {

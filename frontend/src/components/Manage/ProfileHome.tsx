@@ -7,7 +7,7 @@ import {
   GcdsLink,
 } from "@gcds-core/components-react";
 
-import { getPageContent } from "../../utils/functions";
+import { useTranslation } from "react-i18next";
 import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
 import { useUser } from "../Providers/useUser";
 import VerifiedBadge from "../Badges/VerifiedBadge";
@@ -18,20 +18,16 @@ import { path } from "../../utils/routeHelpers";
 
 interface DisplayEmailInfoProps {
   email: string;
-  pageContent: Record<string, string>;
-  language?: string;
 }
 
 type GcdsNavigationEvent = CustomEvent<string> & {
   preventDefault: () => void;
 };
 
-const DisplayEmailInfo = ({
-  email,
-  pageContent,
-  language,
-}: DisplayEmailInfoProps) => {
+const DisplayEmailInfo = ({ email }: DisplayEmailInfoProps) => {
+  const { language } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation("profile");
   const editEmail = path(PAGES.editEmailPage, {
     language,
   });
@@ -39,9 +35,9 @@ const DisplayEmailInfo = ({
   return (
     <>
       <GcdsHeading tag="h3" marginTop="300">
-        {pageContent["7"]}
+        {t("ProfileHome.email")}
       </GcdsHeading>
-      <GcdsText>{pageContent["8"]}</GcdsText>
+      <GcdsText>{t("ProfileHome.emailDescription")}</GcdsText>
       <GcdsGrid columns="1fr auto" className="gridInline">
         <GcdsText>{email}</GcdsText>
         {DEV_ONLY_FEATURE && (
@@ -53,56 +49,47 @@ const DisplayEmailInfo = ({
               navigate(event.detail);
             }}
           >
-            {pageContent["5"]}
+            {t("ProfileHome.edit")}
           </GcdsLink>
         )}
       </GcdsGrid>
-      <VerifiedBadge text={pageContent["9"]} />
+      <VerifiedBadge text={t("ProfileHome.verified")} />
     </>
   );
 };
 
 export default function ProfileHome() {
-  const { language } = useParams();
-  const pageContent: Record<string, string> =
-    getPageContent(language, PAGES.ProfileHome) ?? {};
+  const { t } = useTranslation("profile");
   const { state } = useUser();
   const email = state?.userProfile?.userName || "";
   const phoneNumbers = state?.userProfile?.phoneNumbers || [];
 
   return (
     <GcdsContainer role="main">
-      <GcdsHeading tag="h1">{pageContent["1"]}</GcdsHeading>
-      <GcdsHeading tag="h2">{pageContent["2"]}</GcdsHeading>
+      <GcdsHeading tag="h1">{t("ProfileHome.title")}</GcdsHeading>
+      <GcdsHeading tag="h2">{t("ProfileHome.basicInfo")}</GcdsHeading>
 
-      <ViewNameCard pageContent={pageContent} />
+      <ViewNameCard />
 
       <GcdsHeading tag="h2" marginTop="300">
-        {pageContent["6"]}
+        {t("ProfileHome.contactInfo")}
       </GcdsHeading>
       <GcdsContainer className="sectionCard">
-        <DisplayEmailInfo
-          email={email}
-          pageContent={pageContent}
-          language={language}
-        />
+        <DisplayEmailInfo email={email} />
 
         <div className="separator" />
-        <ViewContactPhoneNumber
-          pageContent={pageContent}
-          phoneNumbers={phoneNumbers}
-        />
+        <ViewContactPhoneNumber phoneNumbers={phoneNumbers} />
       </GcdsContainer>
 
-      <GcdsHeading tag="h2">{pageContent["12"]}</GcdsHeading>
+      <GcdsHeading tag="h2">{t("ProfileHome.communication")}</GcdsHeading>
       <GcdsContainer className="sectionCard">
-        <ViewLanguagePreferences pageContent={pageContent} />
+        <ViewLanguagePreferences />
         <div className="separator" />
         <GcdsHeading tag="h3" marginTop="300">
-          {pageContent["15"]}
+          {t("ProfileHome.notifications")}
         </GcdsHeading>
-        <GcdsText>{pageContent["16"]}</GcdsText>
-        <GcdsText>{pageContent["17"]}</GcdsText>
+        <GcdsText>{t("ProfileHome.notificationDescription")}</GcdsText>
+        <GcdsText>{t("ProfileHome.serviceNotifications")}</GcdsText>
       </GcdsContainer>
     </GcdsContainer>
   );

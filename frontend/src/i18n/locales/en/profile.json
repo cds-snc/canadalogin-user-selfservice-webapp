@@ -1,0 +1,56 @@
+{
+  "ProfileHome": {
+    "title": "Personal information",
+    "basicInfo": "Basic information",
+    "preferredName": "Preferred name",
+    "exampleName": "Example Name",
+    "edit": "Edit",
+    "contactInfo": "Contact information",
+    "email": "Email",
+    "emailDescription": "This email is used for signing in and contacting you:",
+    "verified": "Verified",
+    "contactPhone": "Contact phone number",
+    "phoneDescription": "This number is used for contacting you:",
+    "communication": "Communication",
+    "languagePreference": "Language Preference",
+    "english": "English",
+    "notifications": "Notifications",
+    "notificationDescription": "We will send account-related notifications to the email registered to your account.",
+    "serviceNotifications": "You may also receive notifications from services connected to your CanadaLogin. You can manage those preferences in each service's settings.",
+    "noPhoneAdded": "No contact phone number has been added",
+    "addPhoneNumber": "Add a phone number"
+  },
+  "ProfileUpdateName": {
+    "firstName": "First name",
+    "lastName": "Last name",
+    "cancel": "Cancel",
+    "title": "Edit your name",
+    "updateNotice": "This will update your name with",
+    "everyService": "every service you have shared your name with through CanadaLogin."
+  },
+  "ProfileUpdateNameConfirmUpdate": {
+    "title": "Are you sure you want to update your name?",
+    "requestedUpdate": "You've requested to update your name to:",
+    "exampleName": "Example Newname",
+    "allServicesNotice": "This will update your name with <bold>all</bold> services you have connected to your <bold>CanadaLogin</bold>.",
+    "headsUp": "Heads up",
+    "thisText": "This",
+    "confirmButton": "Yes, update",
+    "cancelButton": "Cancel",
+    "doesNot": "does not",
+    "legallyChangeName": "legally change your name."
+  },
+  "ProfileUpdateNameSuccess": {
+    "successTitle": "Success",
+    "nameUpdatedTo": "Your name has been updated to",
+    "updateOtherPlaces": "You may need to update your name in other places.",
+    "onlyConnectedServices": "This only changes your name with services connected to your CanadaLogin.",
+    "notConnectedNotice": "If you are trying to update your name with a service that's not connected to your CanadaLogin, you'll need to go to that account.",
+    "searchOtherAccounts": "To search for another GC Account, visit the",
+    "backToProfile": "Back to profile",
+    "signOut": "Sign out",
+    "gcAccountDirectory": "GC Account directory.",
+    "signingOut": "Signing you out...",
+    "signOutFailed": "Failed to sign you out. Redirecting..."
+  }
+}

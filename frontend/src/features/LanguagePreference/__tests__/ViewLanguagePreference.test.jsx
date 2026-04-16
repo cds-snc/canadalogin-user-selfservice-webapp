@@ -73,10 +73,6 @@ vi.mock("@gcds-core/components-react", () => ({
 
 describe("ViewLanguagePreferences Component", () => {
   const mockNavigate = vi.fn();
-  const mockPageContent = {
-    5: "Edit",
-    13: "Language preference",
-  };
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -94,10 +90,10 @@ describe("ViewLanguagePreferences Component", () => {
         },
       });
 
-      render(<ViewLanguagePreferences pageContent={mockPageContent} />);
+      render(<ViewLanguagePreferences />);
 
       expect(screen.getByTestId("gcds-heading")).toBeInTheDocument();
-      expect(screen.getByText("Language preference")).toBeInTheDocument();
+      expect(screen.getByText("Language Preference")).toBeInTheDocument();
     });
 
     it("renders edit link with correct text", () => {
@@ -110,7 +106,7 @@ describe("ViewLanguagePreferences Component", () => {
         },
       });
 
-      render(<ViewLanguagePreferences pageContent={mockPageContent} />);
+      render(<ViewLanguagePreferences />);
 
       const editLink = screen.getByTestId("gcds-link");
       expect(editLink).toBeInTheDocument();
@@ -127,7 +123,7 @@ describe("ViewLanguagePreferences Component", () => {
         },
       });
 
-      render(<ViewLanguagePreferences pageContent={mockPageContent} />);
+      render(<ViewLanguagePreferences />);
 
       expect(screen.getByTestId("gcds-heading")).toBeInTheDocument();
       expect(screen.getByTestId("gcds-grid")).toBeInTheDocument();
@@ -147,7 +143,7 @@ describe("ViewLanguagePreferences Component", () => {
         },
       });
 
-      render(<ViewLanguagePreferences pageContent={mockPageContent} />);
+      render(<ViewLanguagePreferences />);
 
       expect(screen.getByText("English")).toBeInTheDocument();
     });
@@ -162,7 +158,7 @@ describe("ViewLanguagePreferences Component", () => {
         },
       });
 
-      render(<ViewLanguagePreferences pageContent={mockPageContent} />);
+      render(<ViewLanguagePreferences />);
 
       expect(screen.getByText("French")).toBeInTheDocument();
     });
@@ -177,7 +173,7 @@ describe("ViewLanguagePreferences Component", () => {
         },
       });
 
-      render(<ViewLanguagePreferences pageContent={mockPageContent} />);
+      render(<ViewLanguagePreferences />);
 
       expect(screen.getByText("Français")).toBeInTheDocument();
     });
@@ -192,7 +188,7 @@ describe("ViewLanguagePreferences Component", () => {
         },
       });
 
-      render(<ViewLanguagePreferences pageContent={mockPageContent} />);
+      render(<ViewLanguagePreferences />);
 
       expect(screen.getByText("Anglais")).toBeInTheDocument();
     });
@@ -209,7 +205,7 @@ describe("ViewLanguagePreferences Component", () => {
         },
       });
 
-      render(<ViewLanguagePreferences pageContent={mockPageContent} />);
+      render(<ViewLanguagePreferences />);
 
       expect(screen.getByTestId("gcds-text")).toBeInTheDocument();
     });
@@ -222,7 +218,7 @@ describe("ViewLanguagePreferences Component", () => {
         },
       });
 
-      render(<ViewLanguagePreferences pageContent={mockPageContent} />);
+      render(<ViewLanguagePreferences />);
 
       expect(screen.getByTestId("gcds-text")).toBeInTheDocument();
     });
@@ -233,7 +229,7 @@ describe("ViewLanguagePreferences Component", () => {
         state: null,
       });
 
-      render(<ViewLanguagePreferences pageContent={mockPageContent} />);
+      render(<ViewLanguagePreferences />);
 
       expect(screen.getByTestId("gcds-text")).toBeInTheDocument();
     });
@@ -242,7 +238,7 @@ describe("ViewLanguagePreferences Component", () => {
       useParams.mockReturnValue({ language: "en" });
       useUser.mockReturnValue({});
 
-      render(<ViewLanguagePreferences pageContent={mockPageContent} />);
+      render(<ViewLanguagePreferences />);
 
       expect(screen.getByTestId("gcds-text")).toBeInTheDocument();
     });
@@ -259,7 +255,7 @@ describe("ViewLanguagePreferences Component", () => {
         },
       });
 
-      render(<ViewLanguagePreferences pageContent={mockPageContent} />);
+      render(<ViewLanguagePreferences />);
 
       const editLink = screen.getByTestId("gcds-link");
       fireEvent.click(editLink);
@@ -280,7 +276,7 @@ describe("ViewLanguagePreferences Component", () => {
         },
       });
 
-      render(<ViewLanguagePreferences pageContent={mockPageContent} />);
+      render(<ViewLanguagePreferences />);
 
       const editLink = screen.getByTestId("gcds-link");
 
@@ -311,7 +307,7 @@ describe("ViewLanguagePreferences Component", () => {
         },
       });
 
-      render(<ViewLanguagePreferences pageContent={mockPageContent} />);
+      render(<ViewLanguagePreferences />);
 
       const editLink = screen.getByTestId("gcds-link");
       fireEvent.click(editLink);
@@ -319,48 +315,6 @@ describe("ViewLanguagePreferences Component", () => {
       expect(mockNavigate).toHaveBeenCalledWith(
         "/en/edit-language-preferences",
       );
-    });
-  });
-
-  describe("Props and Data Flow", () => {
-    it("uses pageContent prop correctly", () => {
-      const customPageContent = {
-        5: "Modifier",
-        13: "Préférence de langue",
-      };
-
-      useParams.mockReturnValue({ language: "fr" });
-      useUser.mockReturnValue({
-        state: {
-          userProfile: {
-            preferredLanguage: "fr",
-          },
-        },
-      });
-
-      render(<ViewLanguagePreferences pageContent={customPageContent} />);
-
-      expect(screen.getByText("Préférence de langue")).toBeInTheDocument();
-      expect(screen.getByText("Modifier")).toBeInTheDocument();
-    });
-
-    it("handles missing pageContent keys gracefully", () => {
-      const incompletePageContent = {};
-
-      useParams.mockReturnValue({ language: "en" });
-      useUser.mockReturnValue({
-        state: {
-          userProfile: {
-            preferredLanguage: "en",
-          },
-        },
-      });
-
-      render(<ViewLanguagePreferences pageContent={incompletePageContent} />);
-
-      // Should render without crashing
-      expect(screen.getByTestId("gcds-heading")).toBeInTheDocument();
-      expect(screen.getByTestId("gcds-link")).toBeInTheDocument();
     });
   });
 });

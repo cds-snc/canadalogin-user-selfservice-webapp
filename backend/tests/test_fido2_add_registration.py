@@ -267,6 +267,16 @@ class TestSubmitAttestationResult:
         """Create a mock HTTP client"""
         return AsyncMock(spec=AsyncClient)
 
+    @pytest.fixture(autouse=True)
+    def mock_dispatch_profile(self):
+        """Mock dispatch_get_my_profile_from_ibm for all submit_attestation_result tests"""
+        mock_profile = MagicMock()
+        mock_profile.preferredLanguage = "en"
+        with patch.object(
+            add_module, "dispatch_get_my_profile_from_ibm", return_value=mock_profile
+        ):
+            yield
+
     @pytest.mark.asyncio
     @patch.object(add_module, "get_auth_request_headers")
     @patch.object(add_module, "get_rp_uuid_from_rp_id")

@@ -22,7 +22,7 @@ from app.auth import v1_router as v1_auth_router
 from app.password import v1_router as v1_password_router
 from app.otp import v1_router as v1_otp_router
 from app.fido2 import v1_router as v1_fido2_router
-from app.fido2.mds_service import mds_service
+from app.fido2.services.mds_service import mds_service
 from app.auth.services import oidc_config
 from app.utils.global_error_handlers import (
     http_exception_handler,

@@ -9,10 +9,10 @@ import {
   GcdsLink,
   GcdsText,
 } from "@gcds-core/components-react";
-import { getPageContent } from "../../../utils/functions";
+import { useTranslation } from "react-i18next";
 
 import { useParams } from "react-router";
-import { FLOW_TYPES, PAGES } from "../../../utils/constants";
+import { FLOW_TYPES } from "../../../utils/constants";
 import SubmitButton from "../../../components/Layout/SubmitButton";
 import type { OtpFactor } from "../../../types/hooks";
 
@@ -47,8 +47,7 @@ export default function OtpVerification({
 }: OtpVerificationProps) {
   const { language } = useParams();
   const [time, setTime] = useState(initialTime);
-  const pageContentJson = getPageContent(language, PAGES.verification) ?? {};
-  const { cancel } = getPageContent(language, "Button") ?? {};
+  const { t } = useTranslation(["verification", "common"]);
 
   const handleChange = (e: CustomEvent<string>) => {
     const value = (e.target as HTMLInputElement).value;
@@ -74,7 +73,9 @@ export default function OtpVerification({
   };
 
   useEffect(() => {
-    if (time <= 0) return;
+    if (time <= 0) {
+      return;
+    }
 
     const timer = setTimeout(() => {
       setTime((prevTime) => prevTime - 1);
@@ -89,37 +90,38 @@ export default function OtpVerification({
       <GcdsContainer>
         <GcdsHeading tag="h1" lang={language}>
           {userMfaType === FLOW_TYPES.email
-            ? pageContentJson["22"]
-            : pageContentJson["1"]}
+            ? t("Verification.checkYourEmail")
+            : t("Verification.checkYourPhone")}
         </GcdsHeading>
 
         <GcdsText>
           {userMfaType === FLOW_TYPES.voice
-            ? pageContentJson["3"]
+            ? t("Verification.voiceCodeSent")
             : userMfaType === FLOW_TYPES.sms
-              ? pageContentJson["2"]
-              : pageContentJson["23"]}
+              ? t("Verification.smsCodeSent")
+              : t("Verification.emailCodeSent")}
           &nbsp;
           <strong>{userSelectedMfaFactor.destination}</strong>
         </GcdsText>
         <GcdsText>
           {userMfaType === FLOW_TYPES.voice
-            ? pageContentJson["5"]
+            ? t("Verification.callMayTakeMinutes")
             : userMfaType === FLOW_TYPES.sms
-              ? pageContentJson["4"]
-              : pageContentJson["24"]}
+              ? t("Verification.smsMayTakeMinutes")
+              : t("Verification.emailMayTakeMinutes")}
         </GcdsText>
         <GcdsText>
-          {pageContentJson["6"]} <strong>{pageContentJson["7"]}</strong>
+          {t("Verification.codeExpiresIn")}{" "}
+          <strong>{t("Verification.tenMinutes")}</strong>
         </GcdsText>
         {userMfaType !== FLOW_TYPES.email && (
-          <GcdsHeading tag="h2">{pageContentJson["8"]}</GcdsHeading>
+          <GcdsHeading tag="h2">{t("Verification.enterCode")}</GcdsHeading>
         )}
 
         <form onSubmit={onSubmitHandler}>
           <GcdsInput
             inputId="verificationCode"
-            label={pageContentJson["9"]}
+            label={t("Verification.sixDigitCode")}
             name="verificationCode"
             type="text"
             validateOn="other"
@@ -127,7 +129,7 @@ export default function OtpVerification({
             value={userOtpValue}
             onGcdsInput={handleChange}
             lang={language}
-            size={6}
+            size={18}
             maxlength={6}
             minlength={6}
             autocomplete="one-time-code"
@@ -154,11 +156,11 @@ export default function OtpVerification({
               onCancel();
             }}
           >
-            {cancel}
+            {t("Button.cancel", { ns: "common" })}
           </GcdsButton>
         </GcdsGrid>
       </GcdsContainer>
-      <GcdsHeading tag="h2">{pageContentJson["10"]}</GcdsHeading>
+      <GcdsHeading tag="h2">{t("Verification.problemsWithCode")}</GcdsHeading>
 
       {showTryAnotherWay && (
         <GcdsText>
@@ -168,7 +170,7 @@ export default function OtpVerification({
               onBack();
             }}
           >
-            {pageContentJson["21"]}
+            {t("Verification.tryAnotherWay")}
           </GcdsLink>
         </GcdsText>
       )}
@@ -176,10 +178,10 @@ export default function OtpVerification({
       <GcdsText>
         {time > 0 ? (
           <span>
-            {pageContentJson["14"]}
+            {t("Verification.requestNewCodeIn")}
             <strong>
               {" "}
-              {time} {pageContentJson["15"]}
+              {time} {t("Verification.seconds")}
             </strong>
           </span>
         ) : (
@@ -193,8 +195,8 @@ export default function OtpVerification({
             }}
           >
             {userMfaType !== FLOW_TYPES.email
-              ? pageContentJson["16"]
-              : pageContentJson["26"]}
+              ? t("Verification.requestNewCode")
+              : t("Verification.sendCodeAgain")}
           </GcdsLink>
         )}
       </GcdsText>

@@ -1,4 +1,5 @@
 import { vi } from "vitest";
+import "./i18n/test";
 
 // Mock window.matchMedia for useBreakpoints hook
 Object.defineProperty(window, "matchMedia", {

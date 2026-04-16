@@ -9,16 +9,13 @@ import {
   GcdsText,
 } from "@gcds-core/components-react";
 
-import { getPageContent } from "../../../utils/functions";
-import { EXTERNAL_NAVIGATION_LINKS, PAGES } from "../../../utils/constants";
+import { useTranslation } from "react-i18next";
+import { EXTERNAL_NAVIGATION_LINKS } from "../../../utils/constants";
 import { useUser } from "../../../components/Providers/useUser";
 import { authService } from "../../../services/authService";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch";
 import SubmitButton from "../../../components/Layout/SubmitButton";
-import type {
-  ProfileNamePageContent,
-  ProfileNameSuccessProps,
-} from "../../../types/profileName";
+import type { ProfileNameSuccessProps } from "../../../types/profileName";
 import type {
   AuthServiceResponse,
   LogoutResponseData,
@@ -32,17 +29,14 @@ export default function SuccessfullyUpdated({
   const routeLanguage = language === "fr" ? "fr" : "en";
 
   const { dispatch } = useUser();
-  const pageContentJson =
-    (getPageContent(routeLanguage, PAGES.profileUpdateNameSuccess) as
-      | ProfileNamePageContent
-      | undefined) ?? {};
+  const { t } = useTranslation("profile");
 
   const { setLoading } = userProfileDispatch(dispatch);
   const username = nameFormData?.formatted || "";
 
   const handleSignout = async (event: Event) => {
     event.preventDefault();
-    setLoading(true, pageContentJson["12"]);
+    setLoading(true, t("ProfileUpdateNameSuccess.signingOut"));
 
     try {
       const response = (await authService.logout()) as
@@ -57,7 +51,7 @@ export default function SuccessfullyUpdated({
       window.location.href = "/";
     } catch (error) {
       console.error("Logout failed:", error);
-      setLoading(true, pageContentJson["13"]);
+      setLoading(true, t("ProfileUpdateNameSuccess.signOutFailed"));
       setTimeout(() => {
         window.location.href = "/";
       }, 2000);
@@ -75,18 +69,22 @@ export default function SuccessfullyUpdated({
         <GcdsNotice noticeRole="success" noticeTitleTag="h2" noticeTitle=" ">
           <GcdsText>
             <strong>
-              {pageContentJson["1"]} {username}
+              {t("ProfileUpdateNameSuccess.nameUpdatedTo")} {username}
             </strong>
           </GcdsText>
         </GcdsNotice>
       </GcdsText>
-      <GcdsHeading tag="h1">{pageContentJson["2"]}</GcdsHeading>
-      <GcdsHeading tag="h4">{pageContentJson["3"]}</GcdsHeading>
-      <GcdsText>{pageContentJson["4"]}</GcdsText>
+      <GcdsHeading tag="h1">
+        {t("ProfileUpdateNameSuccess.updateOtherPlaces")}
+      </GcdsHeading>
+      <GcdsHeading tag="h4">
+        {t("ProfileUpdateNameSuccess.onlyConnectedServices")}
+      </GcdsHeading>
+      <GcdsText>{t("ProfileUpdateNameSuccess.notConnectedNotice")}</GcdsText>
       <GcdsText>
-        {pageContentJson["5"]}{" "}
+        {t("ProfileUpdateNameSuccess.searchOtherAccounts")}{" "}
         <GcdsLink href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}>
-          {pageContentJson["8"]}
+          {t("ProfileUpdateNameSuccess.gcAccountDirectory")}
         </GcdsLink>
       </GcdsText>
       <GcdsGrid columns="max-content max-content" gap="200">
@@ -95,14 +93,14 @@ export default function SuccessfullyUpdated({
           style={{ width: "fit-content" }}
           onGcdsClick={onSubmitHandler}
         >
-          {pageContentJson["6"]}
+          {t("ProfileUpdateNameSuccess.backToProfile")}
         </SubmitButton>
         <GcdsButton
           buttonRole="secondary"
           style={{ width: "fit-content" }}
           onGcdsClick={handleSignout}
         >
-          {pageContentJson["7"]}
+          {t("ProfileUpdateNameSuccess.signOut")}
         </GcdsButton>
       </GcdsGrid>
     </GcdsContainer>

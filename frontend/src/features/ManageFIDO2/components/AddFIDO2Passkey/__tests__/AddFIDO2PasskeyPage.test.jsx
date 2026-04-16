@@ -60,7 +60,9 @@ vi.mock("../../../../../utils/constants", () => ({
 
 vi.mock("../../../../../utils/functions", () => ({
   getPageContent: (_lang, page) => {
-    if (page === "OtpSelection") return { 11: "Loading..." };
+    if (page === "OtpSelection") {
+      return { 11: "Loading..." };
+    }
     return { 11: "Loading..." };
   },
 }));

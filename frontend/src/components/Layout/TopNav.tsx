@@ -6,7 +6,7 @@ import {
   GcdsTopNav,
 } from "@gcds-core/components-react";
 import { useBreakpoints } from "../../hooks/useBreakpoints";
-import { getPageContent } from "../../utils/functions";
+import { useTranslation } from "react-i18next";
 import { path } from "../../utils/routeHelpers";
 import { useUser } from "../Providers/useUser";
 import { PAGES } from "../../utils/constants";
@@ -22,8 +22,7 @@ type NavigationEvent = {
 };
 
 export default function TopNav({ currentLang }: TopNavProps) {
-  const pageContentJson: Record<string, string> =
-    getPageContent(currentLang, "TopNavBar") ?? {};
+  const { t } = useTranslation("layout");
   const { state, dispatch } = useUser();
   const { setLoading } = userProfileDispatch(dispatch);
 
@@ -41,7 +40,7 @@ export default function TopNav({ currentLang }: TopNavProps) {
 
   const handleLogout = async (event: NavigationEvent) => {
     event.preventDefault();
-    setLoading(true, pageContentJson["8"]); // Use logout loading text
+    setLoading(true, t("TopNavBar.signingOut")); // Use logout loading text
     try {
       const response = await authService.logout();
       const redirectUrl = response?.data?.redirect_url || null;
@@ -57,7 +56,7 @@ export default function TopNav({ currentLang }: TopNavProps) {
     } catch (error) {
       console.error("Logout failed:", error);
       // Update loading text to show error
-      setLoading(true, pageContentJson["9"]);
+      setLoading(true, t("TopNavBar.signOutFailed"));
       // Redirect after error
       setTimeout(() => {
         window.location.href = "/";
@@ -67,18 +66,20 @@ export default function TopNav({ currentLang }: TopNavProps) {
 
   const navLinksJsx = (
     <>
-      <GcdsNavLink href={homeLink}>{pageContentJson["3"]}</GcdsNavLink>
-      <GcdsNavLink href={profileLink}>{pageContentJson["4"]}</GcdsNavLink>
+      <GcdsNavLink href={homeLink}>{t("TopNavBar.home")}</GcdsNavLink>
+      <GcdsNavLink href={profileLink}>
+        {t("TopNavBar.personalInfo")}
+      </GcdsNavLink>
       <GcdsNavLink href={securitySettingsLink}>
-        {pageContentJson["5"]}
+        {t("TopNavBar.securitySettings")}
       </GcdsNavLink>
       {shouldRenderRelyingPartyLink && (
         <GcdsNavLink href={relyingPartyUrl}>
-          {pageContentJson["6"] + relyingPartyLinkName}
+          {t("TopNavBar.returnTo") + relyingPartyLinkName}
         </GcdsNavLink>
       )}
       <GcdsNavLink href="#" onClick={handleLogout}>
-        {pageContentJson["7"]}
+        {t("TopNavBar.signOut")}
       </GcdsNavLink>
     </>
   );
@@ -89,7 +90,7 @@ export default function TopNav({ currentLang }: TopNavProps) {
         <div className="gcds-top-nav-container">
           <div className="gcds-top-nav-width-spacer">
             <GcdsText marginBottom="0">
-              <strong>{pageContentJson["1"]}</strong>
+              <strong>{t("TopNavBar.appName")}</strong>
             </GcdsText>
           </div>
         </div>
@@ -113,7 +114,7 @@ export default function TopNav({ currentLang }: TopNavProps) {
       className="gcds-top-nav"
     >
       <GcdsNavLink href={homeLink} slot="home">
-        {pageContentJson["1"]}
+        {t("TopNavBar.appName")}
       </GcdsNavLink>
       <GcdsNavGroup open-trigger="Menu" menu-label="Menu">
         {navLinksJsx}

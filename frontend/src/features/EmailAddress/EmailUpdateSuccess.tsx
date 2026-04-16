@@ -1,6 +1,6 @@
 import { useParams } from "react-router";
-import { getPageContent } from "../../utils/functions";
-import { PAGES, EXTERNAL_NAVIGATION_LINKS } from "../../utils/constants";
+import { useTranslation } from "react-i18next";
+import { EXTERNAL_NAVIGATION_LINKS } from "../../utils/constants";
 import {
   GcdsContainer,
   GcdsHeading,
@@ -24,35 +24,35 @@ export default function EmailUpdateSuccess({
   onSignOut,
 }: EmailUpdateSuccessProps) {
   const { language } = useParams();
-  const pageContentJson =
-    getPageContent(language, PAGES.emailUpdateSuccess) ?? {};
+  const { t } = useTranslation("email");
 
   return (
     <GcdsContainer role="main">
       <GcdsNotice noticeRole="success" noticeTitleTag="h2" noticeTitle=" ">
         <GcdsText>
-          {pageContentJson["1"]} <strong>{newEmailAddress}</strong>
+          {t("EmailUpdateSuccess.emailUpdatedTo")}{" "}
+          <strong>{newEmailAddress}</strong>
         </GcdsText>
       </GcdsNotice>
 
       <GcdsHeading tag="h1" lang={language} marginBottom="300" marginTop="400">
-        {pageContentJson["2"]}
+        {t("EmailUpdateSuccess.updateOtherPlaces")}
       </GcdsHeading>
 
       <GcdsText marginBottom="300" lang={language}>
-        <strong>{pageContentJson["3"]}</strong>
+        <strong>{t("EmailUpdateSuccess.onlyConnectedServices")}</strong>
       </GcdsText>
 
       <GcdsText marginBottom="300" lang={language}>
-        {pageContentJson["4"]}
+        {t("EmailUpdateSuccess.notConnectedNotice")}
       </GcdsText>
 
       <GcdsText marginBottom="300" lang={language}>
-        {pageContentJson["5"]}{" "}
+        {t("EmailUpdateSuccess.searchOtherAccounts")}{" "}
         <GcdsLink href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}>
-          {pageContentJson["6"]}
+          {t("EmailUpdateSuccess.gcAccountDirectory")}
         </GcdsLink>
-        {pageContentJson["7"]}
+        {t("EmailUpdateSuccess.period")}
       </GcdsText>
 
       <GcdsGrid columns="max-content max-content" gap="200">
@@ -61,14 +61,14 @@ export default function EmailUpdateSuccess({
           style={{ width: "fit-content" }}
           onClick={onBackToProfile}
         >
-          {pageContentJson["8"]}
+          {t("EmailUpdateSuccess.backToProfile")}
         </SubmitButton>
         <GcdsButton
           buttonRole="secondary"
           onClick={onSignOut}
           style={{ width: "fit-content" }}
         >
-          {pageContentJson["9"]}
+          {t("EmailUpdateSuccess.signOut")}
         </GcdsButton>
       </GcdsGrid>
     </GcdsContainer>

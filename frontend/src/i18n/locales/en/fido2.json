@@ -1,0 +1,57 @@
+{
+  "AddFIDO2Passkey": {
+    "title": "How to create a passkey",
+    "step1": "Select “Create a passkey” below.",
+    "step1Description": "There will be a pop-up on your device. You may have to enable passkey or your password manager on your device to get started.",
+    "step2": "If prompted, choose an email to create your passkey with. ",
+    "selectEmailOnly": "Make sure you select an email only.",
+    "you": "you",
+    "haveControlOver": "have control over.",
+    "step3": "Follow the remaining steps in the pop-up.",
+    "deviceWarning": "Make sure you only create a passkey on a device",
+    "youControl": "you control",
+    "createButton": "Create a passkey",
+    "cancelButton": "Cancel",
+    "problemsTitle": "Problems with passkey?",
+    "helpLink": "Help with creating a passkey"
+  },
+  "AddFIDO2PasskeyNickname": {
+    "title": "Name your passkey",
+    "description": "Give your passkey a memorable name that helps you remember what device you created it on.",
+    "label": "Passkey name",
+    "placeholder": "example: My Phone",
+    "continueButton": "Continue",
+    "cancelButton": "Cancel",
+    "defaultPasskeyName": "Passkey"
+  },
+  "VerifyFIDO2Passkey": {
+    "title": "Verify with your passkey",
+    "description": "There will be a pop-up on your device asking for your fingerprint, face, or screen lock.",
+    "cancelButton": "Cancel",
+    "continueButton": "Continue",
+    "problemsTitle": "Problems with your passkey?",
+    "tryAnotherWay": "Try another way",
+    "helpLink": "Help with signing in with a passkey",
+    "loading": "Loading..."
+  },
+  "DeleteFIDO2PasskeyConfirm": {
+    "title": "Are you sure you want to delete this passkey?",
+    "noLongerUse": "You will no longer be able to use your passkey",
+    "toSignIn": "to sign in.",
+    "thisText": "This",
+    "willNot": "will not",
+    "deleteFromContact": "delete this number from your contact information. To manage your contact phone number, go to",
+    "personalInformation": "Personal Information",
+    "period": ".",
+    "confirmButton": "Yes, delete",
+    "cancelButton": "Cancel",
+    "loading": "Loading..."
+  },
+  "DeleteFIDO2PasskeySuccess": {
+    "title": "Remove passkey from your device (optional)",
+    "recommendAlso": "To ensure your password manager doesn’t prompt for  passkeys, we recommend also",
+    "removeFromManager": "removing the passkey from your password manager.",
+    "moreInformation": "For more information on how to do this, see the help centre of your password manager provider.",
+    "continueButton": "Continue"
+  }
+}

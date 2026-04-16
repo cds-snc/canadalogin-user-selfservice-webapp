@@ -9,8 +9,7 @@ import {
   GcdsText,
 } from "@gcds-core/components-react";
 import { useParams } from "react-router";
-import { PAGES } from "../../utils/constants";
-import { getPageContent } from "../../utils/functions";
+import { useTranslation } from "react-i18next";
 import SubmitButton from "../../components/Layout/SubmitButton";
 
 type EmailFormData = {
@@ -43,8 +42,7 @@ export default function EmailOtpValidation({
   onBack,
 }: EmailOtpValidationProps) {
   const { language } = useParams();
-  const pageContentJson = getPageContent(language, PAGES.emailOtpValidation)!;
-  const { cancel } = getPageContent(language, "Button")!;
+  const { t } = useTranslation(["email", "common"]);
 
   const [time, setTime] = useState(initialTime);
 
@@ -74,7 +72,9 @@ export default function EmailOtpValidation({
 
   // Countdown timer for resend button
   useEffect(() => {
-    if (time <= 0) return;
+    if (time <= 0) {
+      return;
+    }
 
     const timer = setTimeout(() => {
       setTime((prevTime) => prevTime - 1);
@@ -86,21 +86,22 @@ export default function EmailOtpValidation({
   return (
     <GcdsContainer role="main">
       <GcdsHeading tag="h1" lang={language}>
-        {pageContentJson["1"]}
+        {t("EmailOtpValidation.title")}
       </GcdsHeading>
 
       <GcdsText>
-        {pageContentJson["2"]} <strong>{formData.emailAddress}</strong>
+        {t("EmailOtpValidation.codeSent")}{" "}
+        <strong>{formData.emailAddress}</strong>
       </GcdsText>
 
-      <GcdsText>{pageContentJson["3"]}</GcdsText>
+      <GcdsText>{t("EmailOtpValidation.emailMayTakeMinutes")}</GcdsText>
 
-      <GcdsText>{pageContentJson["4"]}</GcdsText>
+      <GcdsText>{t("EmailOtpValidation.codeExpiresIn")}</GcdsText>
 
       <form onSubmit={onSubmitHandler}>
         <GcdsInput
           style={{ marginTop: "1.5rem" }}
-          label={pageContentJson["6"]}
+          label={t("EmailOtpValidation.sixDigitCode")}
           id="verificationCode"
           inputId="verificationCode"
           name="verificationCode"
@@ -111,7 +112,7 @@ export default function EmailOtpValidation({
           value={userOtpValue}
           onGcdsInput={handleInputChange}
           lang={language}
-          size={6}
+          size={18}
           maxlength={6}
           minlength={6}
           autoFocus
@@ -133,11 +134,13 @@ export default function EmailOtpValidation({
             void onCancel();
           }}
         >
-          {cancel}
+          {t("Button.cancel", { ns: "common" })}
         </GcdsButton>
       </GcdsGrid>
 
-      <GcdsHeading tag="h2">{pageContentJson["7"]}</GcdsHeading>
+      <GcdsHeading tag="h2">
+        {t("EmailOtpValidation.problemsWithCode")}
+      </GcdsHeading>
 
       <GcdsText>
         <GcdsLink
@@ -146,22 +149,22 @@ export default function EmailOtpValidation({
             await onBack();
           }}
         >
-          {pageContentJson["8"]}
+          {t("EmailOtpValidation.useDifferentEmail")}
         </GcdsLink>
       </GcdsText>
 
       <GcdsText>
         {time > 0 ? (
           <span>
-            {pageContentJson["9"]}
+            {t("EmailOtpValidation.requestNewCodeIn")}
             <strong>
               {" "}
-              {time} {pageContentJson["10"]}
+              {time} {t("EmailOtpValidation.seconds")}
             </strong>
           </span>
         ) : (
           <GcdsLink onGcdsClick={handleResendCode}>
-            {pageContentJson["11"]}
+            {t("EmailOtpValidation.requestNewCode")}
           </GcdsLink>
         )}
       </GcdsText>

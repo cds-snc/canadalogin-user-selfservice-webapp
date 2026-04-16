@@ -11,7 +11,6 @@ from app.users.services.get_my_profile import (
 
 from app.users.schemas import IBMVerifyUserProfileSchema
 
-
 PROFILE_API_URL = "https://fake-tenant.verify.ibm.com/v2.0/Me"
 GET_PROFILE_DISPATCH_FROM_IBM_IMPORT_PATH = (
     "app.users.services.get_my_profile.dispatch_get_my_profile_from_ibm"

@@ -9,7 +9,7 @@ import { useLocation, useNavigate, useParams } from "react-router";
 import { MAP_TYPES, useOtpOperations } from "../../../hooks/useOtpOperations";
 import { usePasskeyOperations } from "../../../hooks/usePasskeyOperations";
 import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
-import { getPageContent } from "../../../utils/functions";
+import { useTranslation } from "react-i18next";
 import { path } from "../../../utils/routeHelpers";
 import Loader from "../../Layout/Loading";
 import { useUser } from "../../Providers/useUser";
@@ -64,8 +64,7 @@ function SectionHeader({ icon, title }: SectionHeaderProps) {
 export default function Manage2FAVerifications() {
   const { language } = useParams();
   const location = useLocation();
-  const pageContent: Record<string, string> =
-    getPageContent(language, PAGES.manage2FAVerifications) ?? {};
+  const { t } = useTranslation("mfa");
   const navigate = useNavigate();
   const { state } = useUser();
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
@@ -103,7 +102,7 @@ export default function Manage2FAVerifications() {
   >;
 
   return localLoading || passkeyLoading ? (
-    <Loader text={pageContent["11"]} />
+    <Loader text={t("Manage2FAVerifications.loading")} />
   ) : (
     <GcdsContainer>
       <ErrorSummaryWithFocus errorCode={errorCode} language={language} />
@@ -116,11 +115,13 @@ export default function Manage2FAVerifications() {
         />
       )}
 
-      <GcdsHeading tag="h1">{pageContent["1"]}</GcdsHeading>
-      <GcdsText>{pageContent["2"]}</GcdsText>
+      <GcdsHeading tag="h1">{t("Manage2FAVerifications.title")}</GcdsHeading>
+      <GcdsText>{t("Manage2FAVerifications.description")}</GcdsText>
 
-      <GcdsHeading tag="h2">{pageContent["3"]}</GcdsHeading>
-      <GcdsText>{pageContent["4"]}</GcdsText>
+      <GcdsHeading tag="h2">
+        {t("Manage2FAVerifications.availableSteps")}
+      </GcdsHeading>
+      <GcdsText>{t("Manage2FAVerifications.phoneCodesDescription")}</GcdsText>
       <GcdsGrid {...sectionCardProps}>
         <SectionHeader
           icon={
@@ -137,7 +138,7 @@ export default function Manage2FAVerifications() {
               />
             </svg>
           }
-          title={pageContent["5"]}
+          title={t("Manage2FAVerifications.phonesHeading")}
         />
         <PhoneFactorsList userPhoneFactorsMap={fullPhoneFactorsMap} />
         <GcdsButton
@@ -147,7 +148,7 @@ export default function Manage2FAVerifications() {
             navigate(path(PAGES.addMFAPage, { language }));
           }}
         >
-          {pageContent["10"]}
+          {t("Manage2FAVerifications.addPhoneNumber")}
         </GcdsButton>
       </GcdsGrid>
 
@@ -155,27 +156,43 @@ export default function Manage2FAVerifications() {
         <GcdsGrid {...sectionCardProps}>
           <SectionHeader
             icon={<FIDOPasskeyIcon width="34" height="34" />}
-            title={pageContent["15"]}
+            title={t("Manage2FAVerifications.passkeysHeading")}
           />
           {userFIDO2CredentialsData.length < 1 && (
             <>
               <FIDOPasskeyCollage />
               <GcdsContainer>
                 <GcdsText marginBottom="0">
-                  {<strong>{pageContent["17"]}</strong>}
+                  {
+                    <strong>
+                      {t("Manage2FAVerifications.passkeysSimplerSignIn")}
+                    </strong>
+                  }
                 </GcdsText>
                 <ul>
                   <li>
                     <GcdsText marginBottom="0">
-                      {<strong>{pageContent["18"]}</strong>}
+                      {
+                        <strong>
+                          {t("Manage2FAVerifications.whatArePasskeys")}
+                        </strong>
+                      }
                     </GcdsText>
-                    <GcdsText marginBottom="0">{pageContent["19"]}</GcdsText>
+                    <GcdsText marginBottom="0">
+                      {t("Manage2FAVerifications.passkeysDescription")}
+                    </GcdsText>
                   </li>
                   <li>
                     <GcdsText marginBottom="0">
-                      {<strong>{pageContent["20"]}</strong>}
+                      {
+                        <strong>
+                          {t("Manage2FAVerifications.whereSaved")}
+                        </strong>
+                      }
                     </GcdsText>
-                    <GcdsText marginBottom="0">{pageContent["21"]}</GcdsText>
+                    <GcdsText marginBottom="0">
+                      {t("Manage2FAVerifications.savedDescription")}
+                    </GcdsText>
                   </li>
                 </ul>
               </GcdsContainer>
@@ -194,7 +211,7 @@ export default function Manage2FAVerifications() {
               navigate(addFido2PagePath);
             }}
           >
-            {pageContent["12"]}
+            {t("Manage2FAVerifications.addPasskey")}
           </GcdsButton>
         </GcdsGrid>
       )}

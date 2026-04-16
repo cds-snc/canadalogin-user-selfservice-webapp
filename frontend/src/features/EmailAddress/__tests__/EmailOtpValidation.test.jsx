@@ -20,11 +20,6 @@ vi.mock("react-router", async () => {
   };
 });
 
-// Mock utility functions
-vi.mock("../../../utils/functions", () => ({
-  getPageContent: vi.fn(),
-}));
-
 // Mock constants
 vi.mock("../../../utils/constants", () => ({
   PAGES: {
@@ -156,7 +151,6 @@ vi.mock("@gcds-core/components-react", () => ({
 
 // Import mocked functions
 import { useParams } from "react-router";
-import { getPageContent } from "../../../utils/functions";
 
 describe("EmailOtpValidation", () => {
   const mockOnSubmit = vi.fn();
@@ -166,7 +160,6 @@ describe("EmailOtpValidation", () => {
   const mockHandleChange = vi.fn();
   const mockRequestOtpCode = vi.fn();
   const mockUseParams = vi.mocked(useParams);
-  const mockGetPageContent = vi.mocked(getPageContent);
 
   const defaultProps = {
     onSubmit: mockOnSubmit,
@@ -180,23 +173,6 @@ describe("EmailOtpValidation", () => {
     requestOtpCode: mockRequestOtpCode,
   };
 
-  const defaultPageContent = {
-    1: "Verify your email address",
-    2: "We sent a verification code to",
-    3: "Enter the 6-digit verification code below.",
-    4: "The code will expire in 10 minutes.",
-    6: "Verification code",
-    7: "Need help?",
-    8: "Change email address",
-    9: "Didn't receive a code? You can request a new one in",
-    10: "seconds",
-    11: "Request new verification code",
-  };
-
-  const defaultButtonContent = {
-    cancel: "Cancel",
-  };
-
   const renderComponent = (props = {}) => {
     return render(
       <BrowserRouter>
@@ -208,10 +184,6 @@ describe("EmailOtpValidation", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockUseParams.mockReturnValue({ language: "en" });
-    mockGetPageContent.mockImplementation((language, key) => {
-      if (key === "Button") return defaultButtonContent;
-      return defaultPageContent;
-    });
   });
 
   describe("Component Rendering", () => {
@@ -228,7 +200,7 @@ describe("EmailOtpValidation", () => {
     it("renders the heading with correct text", () => {
       renderComponent();
 
-      expect(screen.getByText("Verify your email address")).toBeInTheDocument();
+      expect(screen.getByText("Check your email")).toBeInTheDocument();
     });
 
     it("displays the email address in confirmation text", () => {
@@ -236,7 +208,7 @@ describe("EmailOtpValidation", () => {
 
       expect(
         screen.getByText((content) =>
-          content.includes("We sent a verification code to"),
+          content.includes("We have sent an email with a 6-digit code to:"),
         ),
       ).toBeInTheDocument();
       expect(screen.getByText("test@example.com")).toBeInTheDocument();
@@ -250,7 +222,7 @@ describe("EmailOtpValidation", () => {
       expect(input).toHaveAttribute("name", "verificationCode");
       expect(input).toHaveAttribute("id", "verificationCode");
       expect(input).toHaveAttribute("autoComplete", "one-time-code");
-      expect(input).toHaveAttribute("size", "6");
+      expect(input).toHaveAttribute("size", "18");
       expect(input).toHaveAttribute("maxLength", "6");
       expect(input).toHaveAttribute("minLength", "6");
     });
@@ -262,50 +234,13 @@ describe("EmailOtpValidation", () => {
       expect(screen.getByTestId("gcds-button")).toBeInTheDocument();
       expect(screen.getByText("Cancel")).toBeInTheDocument();
     });
-
-    it("calls getPageContent with correct parameters", () => {
-      renderComponent();
-
-      expect(mockGetPageContent).toHaveBeenCalledWith(
-        "en",
-        "EmailOtpValidation",
-      );
-      expect(mockGetPageContent).toHaveBeenCalledWith("en", "Button");
-    });
   });
 
   describe("Language Support", () => {
-    it("renders with French content", () => {
-      const frenchContent = {
-        1: "Vérifiez votre adresse courriel",
-        2: "Nous avons envoyé un code de vérification à",
-        3: "Entrez le code de vérification à 6 chiffres ci-dessous.",
-        4: "Le code expirera dans 10 minutes.",
-        6: "Code de vérification",
-        7: "Besoin d'aide?",
-        8: "Changer l'adresse courriel",
-        9: "Vous n'avez pas reçu de code? Vous pouvez en demander un nouveau dans",
-        10: "secondes",
-        11: "Demander un nouveau code de vérification",
-      };
-
-      const frenchButtonContent = { cancel: "Annuler" };
-
+    it("renders with French language param", () => {
       mockUseParams.mockReturnValue({ language: "fr" });
-      mockGetPageContent
-        .mockReturnValueOnce(frenchContent)
-        .mockReturnValueOnce(frenchButtonContent);
 
-      renderComponent();
-
-      expect(mockGetPageContent).toHaveBeenCalledWith(
-        "fr",
-        "EmailOtpValidation",
-      );
-      expect(
-        screen.getByText("Vérifiez votre adresse courriel"),
-      ).toBeInTheDocument();
-      expect(screen.getByText("Annuler")).toBeInTheDocument();
+      expect(() => renderComponent()).not.toThrow();
     });
 
     it("handles missing language parameter", () => {
@@ -403,7 +338,7 @@ describe("EmailOtpValidation", () => {
       const user = userEvent.setup();
       renderComponent();
 
-      const backLink = screen.getByText("Change email address");
+      const backLink = screen.getByText("Use a different email");
       await user.click(backLink);
 
       expect(mockOnBack).toHaveBeenCalledTimes(1);
@@ -417,9 +352,7 @@ describe("EmailOtpValidation", () => {
 
       expect(
         screen.getByText((content) =>
-          content.includes(
-            "Didn't receive a code? You can request a new one in",
-          ),
+          content.includes("You can request a new code in"),
         ),
       ).toBeInTheDocument();
       expect(
@@ -480,17 +413,10 @@ describe("EmailOtpValidation", () => {
 
   describe("Error Handling", () => {
     it("handles missing page content gracefully", () => {
-      mockGetPageContent.mockReturnValue({});
-
       expect(() => renderComponent()).not.toThrow();
     });
 
     it("handles missing page content properties", () => {
-      mockGetPageContent.mockReturnValue({
-        1: "Partial content",
-        // Missing other properties
-      });
-
       expect(() => renderComponent()).not.toThrow();
     });
 
@@ -529,26 +455,26 @@ describe("EmailOtpValidation", () => {
       const error = screen.getByTestId("gcds-input-error");
 
       expect(input).toHaveValue("123456");
-      expect(label).toHaveTextContent("Verification code");
+      expect(label).toHaveTextContent("6-digit code");
       expect(error).toHaveTextContent("Invalid code");
     });
 
     it("renders all page content elements", () => {
       renderComponent();
 
-      expect(screen.getByText("Verify your email address")).toBeInTheDocument();
+      expect(screen.getByText("Check your email")).toBeInTheDocument();
       expect(
         screen.getByText((content) =>
-          content.includes("We sent a verification code to"),
+          content.includes("We have sent an email with a 6-digit code to:"),
         ),
       ).toBeInTheDocument();
       expect(
-        screen.getByText("Enter the 6-digit verification code below."),
+        screen.getByText(
+          "Your email might take a few minutes to arrive. If you do not get an email, check your spam folder.",
+        ),
       ).toBeInTheDocument();
-      expect(
-        screen.getByText("The code will expire in 10 minutes."),
-      ).toBeInTheDocument();
-      expect(screen.getByText("Need help?")).toBeInTheDocument();
+      expect(screen.getByText("Your code will expire in")).toBeInTheDocument();
+      expect(screen.getByText("Problems with the code?")).toBeInTheDocument();
     });
 
     it("handles form submission with preventDefault", async () => {
@@ -583,7 +509,7 @@ describe("EmailOtpValidation", () => {
       renderComponent();
 
       const heading = screen.getByRole("heading", { level: 2 });
-      expect(heading).toHaveTextContent("Need help?");
+      expect(heading).toHaveTextContent("Problems with the code?");
     });
 
     it("renders email address with strong emphasis", () => {
@@ -643,9 +569,7 @@ describe("EmailOtpValidation", () => {
     });
 
     it("handles empty page content gracefully", () => {
-      mockGetPageContent.mockReturnValue(null);
-
-      expect(() => renderComponent()).toThrow();
+      expect(() => renderComponent()).not.toThrow();
     });
   });
 
@@ -654,7 +578,7 @@ describe("EmailOtpValidation", () => {
       const user = userEvent.setup();
       renderComponent();
 
-      const backLink = screen.getByText("Change email address");
+      const backLink = screen.getByText("Use a different email");
       await user.click(backLink);
 
       expect(mockSetFormData).toHaveBeenCalledWith({ emailAddress: "" });

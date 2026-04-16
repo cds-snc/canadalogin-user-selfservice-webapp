@@ -1,9 +1,6 @@
 import { useParams } from "react-router";
-import { getPageContent } from "../../utils/functions";
-import {
-  PAGES,
-  ServicesWithAccessInfoSectionInformation,
-} from "../../utils/constants";
+import { useTranslation } from "react-i18next";
+import { ServicesWithAccessInfoSectionInformation } from "../../utils/constants";
 import {
   GcdsButton,
   GcdsContainer,
@@ -37,8 +34,7 @@ export default function EditEmailEnterEmail({
   setErrorCode,
 }: EditEmailEnterEmailProps) {
   const { language } = useParams();
-  const pageContentJson = getPageContent(language, PAGES.editEmailEnterEmail)!;
-  const { cancel } = getPageContent(language, "Button")!;
+  const { t } = useTranslation(["email", "common"]);
 
   const onSubmitHandler: React.FormEventHandler<HTMLFormElement> = async (
     ev,
@@ -55,20 +51,28 @@ export default function EditEmailEnterEmail({
   return (
     <GcdsContainer role="main">
       <GcdsHeading tag="h1" lang={language}>
-        {pageContentJson["1"]}
+        {t("EditEmailEnterEmail.title")}
       </GcdsHeading>
 
       <GcdsContainer>
-        <GcdsText marginBottom="0">{pageContentJson["2"]}</GcdsText>
+        <GcdsText marginBottom="0">
+          {t("EditEmailEnterEmail.changingAffects")}
+        </GcdsText>
         <ul>
           <li>
-            <GcdsText marginBottom="0">{pageContentJson["3"]}</GcdsText>
+            <GcdsText marginBottom="0">
+              {t("EditEmailEnterEmail.signInEmail")}
+            </GcdsText>
           </li>
           <li>
-            <GcdsText marginBottom="0">{pageContentJson["4"]}</GcdsText>
+            <GcdsText marginBottom="0">
+              {t("EditEmailEnterEmail.contactEmail")}
+            </GcdsText>
           </li>
           <li>
-            <GcdsText marginBottom="0">{pageContentJson["5"]}</GcdsText>
+            <GcdsText marginBottom="0">
+              {t("EditEmailEnterEmail.serviceEmail")}
+            </GcdsText>
           </li>
         </ul>
       </GcdsContainer>
@@ -80,7 +84,7 @@ export default function EditEmailEnterEmail({
       <form onSubmit={onSubmitHandler}>
         <GcdsInput
           style={{ marginTop: "1.5rem" }}
-          label={pageContentJson["6"]}
+          label={t("EditEmailEnterEmail.emailLabel")}
           inputId="emailAddress"
           name="emailAddress"
           type="email"
@@ -108,7 +112,7 @@ export default function EditEmailEnterEmail({
             void onCancel();
           }}
         >
-          {cancel}
+          {t("Button.cancel", { ns: "common" })}
         </GcdsButton>
       </GcdsGrid>
     </GcdsContainer>

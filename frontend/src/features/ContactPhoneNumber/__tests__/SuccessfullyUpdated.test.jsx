@@ -62,20 +62,6 @@ vi.mock("@gcds-core/components-react", () => ({
   ),
 }));
 
-// Mock functions
-vi.mock("../../../utils/functions", () => ({
-  getPageContent: () => ({
-    1: "Your new contact phone number is:",
-    2: "Your contact phone number has been updated",
-    3: "What happens next?",
-    4: "You can now use your updated contact phone number for two-step verification.",
-    5: "If you need help with your account, visit",
-    6: "GC Key Help Centre",
-    7: "Return to profile",
-    8: "Cancel",
-  }),
-}));
-
 // Mock react-router
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
@@ -138,7 +124,9 @@ describe("SuccessfullyUpdated Component", () => {
     );
 
     expect(
-      screen.getByText("Your contact phone number has been updated"),
+      screen.getByText(
+        "You may need to update your phone number in other places",
+      ),
     ).toBeInTheDocument();
   });
 
@@ -165,7 +153,7 @@ describe("SuccessfullyUpdated Component", () => {
       screen.getByText((content, node) => {
         const hasText = (node) =>
           node.textContent ===
-          "Your new contact phone number is: +1 (555) 123-4567";
+          "Your contact phone number has been updated to +1 (555) 123-4567";
         const nodeHasText = hasText(node);
         const childrenDontHaveText = Array.from(node?.children || []).every(
           (child) => !hasText(child),
@@ -182,7 +170,7 @@ describe("SuccessfullyUpdated Component", () => {
       </TestWrapper>,
     );
 
-    const button = screen.getByText("Return to profile");
+    const button = screen.getByText("Back to profile");
     expect(button).toBeInTheDocument();
   });
 
@@ -194,7 +182,7 @@ describe("SuccessfullyUpdated Component", () => {
       </TestWrapper>,
     );
 
-    const button = screen.getByText("Return to profile");
+    const button = screen.getByText("Back to profile");
     fireEvent.click(button);
 
     expect(mockOnNext).toHaveBeenCalledTimes(1);
@@ -250,7 +238,7 @@ describe("SuccessfullyUpdated Component", () => {
     );
 
     expect(
-      screen.getByText("Your new contact phone number is:"),
+      screen.getByText("Your contact phone number has been updated to"),
     ).toBeInTheDocument();
   });
 
@@ -268,9 +256,11 @@ describe("SuccessfullyUpdated Component", () => {
 
     // Should still render without crashing
     expect(
-      screen.getByText("Your contact phone number has been updated"),
+      screen.getByText(
+        "You may need to update your phone number in other places",
+      ),
     ).toBeInTheDocument();
-    expect(screen.getByText("Return to profile")).toBeInTheDocument();
+    expect(screen.getByText("Back to profile")).toBeInTheDocument();
   });
 
   it("handles empty phoneNumber gracefully", () => {
@@ -291,8 +281,10 @@ describe("SuccessfullyUpdated Component", () => {
 
     // Should still render without crashing
     expect(
-      screen.getByText("Your contact phone number has been updated"),
+      screen.getByText(
+        "You may need to update your phone number in other places",
+      ),
     ).toBeInTheDocument();
-    expect(screen.getByText("Return to profile")).toBeInTheDocument();
+    expect(screen.getByText("Back to profile")).toBeInTheDocument();
   });
 });

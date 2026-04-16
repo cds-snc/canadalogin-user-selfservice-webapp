@@ -105,15 +105,6 @@ vi.mock("libphonenumber-js", () => ({
 
 import parsePhoneNumberFromString from "libphonenumber-js";
 
-const defaultPageContent = {
-  5: "Edit",
-  9: "Verified",
-  10: "Contact phone number",
-  11: "Your contact phone number is",
-  18: "No phone number added",
-  19: "Add phone number",
-};
-
 describe("ViewContactPhoneNumber Component", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -136,10 +127,7 @@ describe("ViewContactPhoneNumber Component", () => {
   it("renders with correct heading", () => {
     render(
       <TestWrapper>
-        <ViewContactPhoneNumber
-          pageContent={defaultPageContent}
-          phoneNumbers={null}
-        />
+        <ViewContactPhoneNumber phoneNumbers={null} />
       </TestWrapper>,
     );
 
@@ -152,24 +140,20 @@ describe("ViewContactPhoneNumber Component", () => {
   it("renders AddPhoneNumber component when phoneNumbers is null", () => {
     render(
       <TestWrapper>
-        <ViewContactPhoneNumber
-          pageContent={defaultPageContent}
-          phoneNumbers={null}
-        />
+        <ViewContactPhoneNumber phoneNumbers={null} />
       </TestWrapper>,
     );
 
-    expect(screen.getByText("No phone number added")).toBeInTheDocument();
-    expect(screen.getByText("+ Add phone number")).toBeInTheDocument();
+    expect(
+      screen.getByText("No contact phone number has been added"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("+ Add a phone number")).toBeInTheDocument();
   });
 
   it("clicking add phone number button navigates to manage dashboard", async () => {
     render(
       <TestWrapper>
-        <ViewContactPhoneNumber
-          pageContent={defaultPageContent}
-          phoneNumbers={null}
-        />
+        <ViewContactPhoneNumber phoneNumbers={null} />
       </TestWrapper>,
     );
 
@@ -187,15 +171,12 @@ describe("ViewContactPhoneNumber Component", () => {
 
     render(
       <TestWrapper>
-        <ViewContactPhoneNumber
-          pageContent={defaultPageContent}
-          phoneNumbers={phoneNumbers}
-        />
+        <ViewContactPhoneNumber phoneNumbers={phoneNumbers} />
       </TestWrapper>,
     );
 
     expect(
-      screen.getByText("Your contact phone number is"),
+      screen.getByText("This number is used for contacting you:"),
     ).toBeInTheDocument();
     expect(screen.getByText("Edit")).toBeInTheDocument();
     expect(screen.getByTestId("verified-badge")).toHaveTextContent("Verified");
@@ -206,10 +187,7 @@ describe("ViewContactPhoneNumber Component", () => {
 
     render(
       <TestWrapper>
-        <ViewContactPhoneNumber
-          pageContent={defaultPageContent}
-          phoneNumbers={phoneNumbers}
-        />
+        <ViewContactPhoneNumber phoneNumbers={phoneNumbers} />
       </TestWrapper>,
     );
 
@@ -222,10 +200,7 @@ describe("ViewContactPhoneNumber Component", () => {
 
     render(
       <TestWrapper>
-        <ViewContactPhoneNumber
-          pageContent={defaultPageContent}
-          phoneNumbers={phoneNumbers}
-        />
+        <ViewContactPhoneNumber phoneNumbers={phoneNumbers} />
       </TestWrapper>,
     );
 
@@ -246,10 +221,7 @@ describe("ViewContactPhoneNumber Component", () => {
       const phoneNumbers = [{ value: "invalid-phone" }];
       render(
         <TestWrapper>
-          <ViewContactPhoneNumber
-            pageContent={defaultPageContent}
-            phoneNumbers={phoneNumbers}
-          />
+          <ViewContactPhoneNumber phoneNumbers={phoneNumbers} />
         </TestWrapper>,
       );
       expect(screen.getByText("invalid-phone")).toBeInTheDocument();
@@ -268,10 +240,7 @@ describe("ViewContactPhoneNumber Component", () => {
 
     render(
       <TestWrapper>
-        <ViewContactPhoneNumber
-          pageContent={defaultPageContent}
-          phoneNumbers={phoneNumbers}
-        />
+        <ViewContactPhoneNumber phoneNumbers={phoneNumbers} />
       </TestWrapper>,
     );
 
@@ -281,13 +250,12 @@ describe("ViewContactPhoneNumber Component", () => {
   it("handles empty phone numbers array", () => {
     render(
       <TestWrapper>
-        <ViewContactPhoneNumber
-          pageContent={defaultPageContent}
-          phoneNumbers={[]}
-        />
+        <ViewContactPhoneNumber phoneNumbers={[]} />
       </TestWrapper>,
     );
 
-    expect(screen.getByText("No phone number added")).toBeInTheDocument();
+    expect(
+      screen.getByText("No contact phone number has been added"),
+    ).toBeInTheDocument();
   });
 });

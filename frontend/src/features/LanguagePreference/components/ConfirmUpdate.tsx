@@ -8,14 +8,10 @@ import {
   GcdsText,
 } from "@gcds-core/components-react";
 
-import { getPageContent } from "../../../utils/functions";
-import { LANGUAGE_DISPLAY_NAMES, PAGES } from "../../../utils/constants";
-import RPNameDisplay from "../../../components/RPInfo/RPNameDisplay";
+import { useTranslation, Trans } from "react-i18next";
+import { LANGUAGE_DISPLAY_NAMES } from "../../../utils/constants";
 import SubmitButton from "../../../components/Layout/SubmitButton";
-import type {
-  LanguagePreferenceConfirmProps,
-  LanguagePreferencePageContent,
-} from "../../../types/languagePreference";
+import type { LanguagePreferenceConfirmProps } from "../../../types/languagePreference";
 
 export default function ConfirmUpdate({
   languageFormData,
@@ -27,10 +23,7 @@ export default function ConfirmUpdate({
   const { language = "en" } = useParams<{ language: string }>();
   const routeLanguage = language === "fr" ? "fr" : "en";
 
-  const pageContentJson =
-    (getPageContent(routeLanguage, PAGES.confirmLanguageUpdate) as
-      | LanguagePreferencePageContent
-      | undefined) ?? {};
+  const { t } = useTranslation("language");
 
   const onSubmitHandler = (event: Event | CustomEvent<string | void>) => {
     event.preventDefault();
@@ -54,16 +47,18 @@ export default function ConfirmUpdate({
         </GcdsErrorMessage>
       ) : null}
 
-      <GcdsHeading tag="h1">{pageContentJson["1"]}</GcdsHeading>
+      <GcdsHeading tag="h1">{t("ConfirmLanguageUpdate.title")}</GcdsHeading>
       <GcdsText>
-        {pageContentJson["2"]} <strong>{displayLanguageName}</strong>.
+        {t("ConfirmLanguageUpdate.requestedUpdate")}{" "}
+        <strong>{displayLanguageName}</strong>.
       </GcdsText>
-      <GcdsText>{pageContentJson["4"]}</GcdsText>
-      <ul>
-        <li>
-          <RPNameDisplay rpName={pageContentJson["5"]} />
-        </li>
-      </ul>
+      <GcdsText>
+        <Trans
+          i18nKey="ConfirmLanguageUpdate.allServicesNotice"
+          ns="language"
+          components={{ bold: <strong /> }}
+        />
+      </GcdsText>
 
       <GcdsGrid columns="max-content max-content" gap="200">
         <SubmitButton
@@ -71,7 +66,7 @@ export default function ConfirmUpdate({
           disabled={localLoading}
           currentLang={routeLanguage}
         >
-          {pageContentJson["8"]}
+          {t("ConfirmLanguageUpdate.confirmButton")}
         </SubmitButton>
         <GcdsButton
           buttonRole="secondary"
@@ -80,7 +75,7 @@ export default function ConfirmUpdate({
             void onCancel();
           }}
         >
-          {pageContentJson["9"]}
+          {t("ConfirmLanguageUpdate.cancelButton")}
         </GcdsButton>
       </GcdsGrid>
     </GcdsContainer>

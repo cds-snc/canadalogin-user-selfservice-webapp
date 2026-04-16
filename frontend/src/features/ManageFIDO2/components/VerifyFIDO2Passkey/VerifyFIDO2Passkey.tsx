@@ -11,7 +11,7 @@ import {
 } from "@gcds-core/components-react";
 import { fido2Api } from "../../api/fido2Api";
 import { authenticateFIDO2Credential } from "../../utils/webAuthnUtils";
-import { getPageContent } from "../../../../utils/functions";
+import { useTranslation } from "react-i18next";
 import { PAGES } from "../../../../utils/constants";
 import { path } from "../../../../utils/routeHelpers";
 import FIDOPasskeyCollage from "../../../../assets/icons/passkey_collage.svg?react";
@@ -37,8 +37,7 @@ export default function VerifyFIDO2Passkey({
 }: VerifyFIDO2PasskeyProps) {
   const { language } = useParams();
   const navigate = useNavigate();
-  const pageContentJson = getPageContent(language, PAGES.verifyFIDO2Passkey)!;
-  const errorPageContent = getPageContent(language, PAGES.error)!;
+  const { t } = useTranslation(["fido2", "common"]);
   const hasTriggeredRef = useRef(false);
   const [localLoading, setLocalLoading] = useState(true);
 
@@ -72,7 +71,9 @@ export default function VerifyFIDO2Passkey({
         | undefined;
 
       if (!optionsResponse?.success) {
-        throw new Error(errorPageContent["error_get_assertion_options"]);
+        throw new Error(
+          t("Error.error_get_assertion_options", { ns: "common" }),
+        );
       }
       setLocalLoading(false);
       const assertionData = { ...optionsResponse.data } as Record<
@@ -115,15 +116,15 @@ export default function VerifyFIDO2Passkey({
   }, []);
 
   return localLoading ? (
-    <Loader text={pageContentJson["9"]} />
+    <Loader text={t("VerifyFIDO2Passkey.loading")} />
   ) : (
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="300">
         <GcdsHeading tag="h1" lang={language}>
-          {pageContentJson["1"]}
+          {t("VerifyFIDO2Passkey.title")}
         </GcdsHeading>
         <GcdsText>
-          {pageContentJson["1"]}{" "}
+          {t("VerifyFIDO2Passkey.title")}{" "}
           <strong>{selectedPasskey?.attributes?.nickname}</strong>
         </GcdsText>
 
@@ -131,7 +132,7 @@ export default function VerifyFIDO2Passkey({
           <FIDOPasskeyCollage />
         </GcdsContainer>
 
-        <GcdsText> {pageContentJson["2"]} </GcdsText>
+        <GcdsText> {t("VerifyFIDO2Passkey.description")} </GcdsText>
       </GcdsGrid>
       {errorMessage && (
         <GcdsErrorMessage messageId="error-message">
@@ -147,7 +148,7 @@ export default function VerifyFIDO2Passkey({
             await handleFIDO2Verification();
           }}
         >
-          {pageContentJson["4"]}
+          {t("VerifyFIDO2Passkey.continueButton")}
         </GcdsButton>
         <GcdsButton
           buttonRole="secondary"
@@ -157,23 +158,25 @@ export default function VerifyFIDO2Passkey({
             navigate(backToManage2FAVerificationsPage);
           }}
         >
-          {pageContentJson["3"]}
+          {t("VerifyFIDO2Passkey.cancelButton")}
         </GcdsButton>
       </GcdsGrid>
 
       <GcdsGrid columns="1" gap="300">
-        <GcdsHeading tag="h2">{pageContentJson["5"]}</GcdsHeading>
+        <GcdsHeading tag="h2">
+          {t("VerifyFIDO2Passkey.problemsTitle")}
+        </GcdsHeading>
         <GcdsLink
           role="button"
           onGcdsClick={() => {
             onTryAnotherWayHandler?.();
           }}
         >
-          {pageContentJson["6"]}
+          {t("VerifyFIDO2Passkey.tryAnotherWay")}
         </GcdsLink>
 
         {/* TODO: add correct hrefs to the links below once domain migrations are done */}
-        <GcdsLink target="_blank">{pageContentJson["8"]}</GcdsLink>
+        <GcdsLink target="_blank">{t("VerifyFIDO2Passkey.helpLink")}</GcdsLink>
       </GcdsGrid>
     </GcdsContainer>
   );

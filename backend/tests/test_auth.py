@@ -17,7 +17,6 @@ from httpx import AsyncClient, MockTransport, Response, ASGITransport
 # Import your module under test directly from your app package
 import app.auth.services.auth as auth_module
 
-
 # =============================================================================
 #  In-file ASGI Session Middleware (no external SessionMiddleware dependency)
 # =============================================================================

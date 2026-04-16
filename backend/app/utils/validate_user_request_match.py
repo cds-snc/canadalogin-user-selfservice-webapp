@@ -2,7 +2,6 @@ import logging
 from fastapi import HTTPException, Request, status
 from app.users.services.get_my_profile import get_my_profile
 
-
 logger = logging.getLogger(__name__)
 
 

@@ -168,6 +168,7 @@ export const SUBMIT_END_POINTS = {
   mfaSend: "/v1/otp/mfa/send",
   mfaVerify: "/v1/otp/mfa/verify",
   mfaDelete: "/v1/otp/mfa/delete",
+  mfaDeleteBatch: "/v1/otp/mfa/delete/batch",
   profile: "/v1/users/profile",
   profileUpdateWithOtp: "/v1/users/profile/update-with-otp",
   rp_info: "/v1/users/rp_info",
@@ -181,20 +182,6 @@ export const SUBMIT_END_POINTS = {
 } as const;
 
 export const RP_CLIENT_ID_KEY = "rp_client_id";
-
-export const GA_CATEGORIES = {
-  pageView: "pageview",
-} as const;
-
-export const GA_ACTIONS = {};
-
-export const GA_LABELS = {
-  button: "Button",
-  link: "Link",
-  text: "Text",
-  input: "Input",
-  email: "Email",
-} as const;
 
 export const VITE_ENVIRONMENTS = {
   dev: "dev",

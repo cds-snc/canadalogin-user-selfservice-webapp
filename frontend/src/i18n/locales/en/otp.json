@@ -1,0 +1,51 @@
+{
+  "TransientOtpSelection": {
+    "title": "Complete 2-step verification",
+    "toChangePassword": "To change your password,",
+    "firstComplete2Step": "first complete 2-step verification.",
+    "chooseMethod": "Choose how you want to receive a verification code",
+    "codeExpiresIn": "Once the code is sent it will expire in",
+    "tenMinutes": "10 minutes.",
+    "carrierCharges": "Carrier charges may apply.",
+    "textMessage": "Text message",
+    "voiceCall": "Voice call",
+    "needHelp": "Need help?",
+    "loading": "Loading...",
+    "helpLink": "Get help with 2-step verification",
+    "toAddPhone": "To add a phone number,",
+    "toDeleteNumber": "To delete this number,",
+    "howToSendCode": "How should we send you the code?",
+    "passkeyOrSecurityKey": "Passkey or security key",
+    "textMe": "Text me",
+    "callMe": "Call me",
+    "verify": "Verify",
+    "chooseVerifyMethod": "Choose how you want to verify",
+    "toDeletePasskey": "To delete a passkey or security key,",
+    "toAddPasskey": "To add a passkey or security key,"
+  },
+  "PasswordVerification": {
+    "title": "First, verify it's you",
+    "toChangePassword": "To change your password,",
+    "enterCurrentPassword": "first enter your current password.",
+    "passwordLabel": "Password",
+    "forgotPassword": "Forgot your password?",
+    "resetPassword": "Reset your password",
+    "toAddPhone": "To add a phone number,",
+    "toDeleteNumber": "To delete this number,",
+    "toAddPasskey": "To add a passkey or security key,",
+    "toDeletePasskey": "To delete a passkey or security key,"
+  },
+  "NoticeFactory": {
+    "successfullyDeleted": "You have successfully deleted",
+    "fromVerificationNumbers": "from your 2-step verification phone numbers",
+    "successfullyAdded": "You have successfully added",
+    "verificationFor": "verification for",
+    "voiceCall": "voice call",
+    "textSms": "text (SMS)",
+    "passkeyCreated": "Your passkey has been created",
+    "yourPasskey": "Your passkey",
+    "renamedPasskeyTo": "You have successfully renamed your passkey to",
+    "deletedFromCanadaLogin": "has been deleted from your CanadaLogin",
+    "notice_title_success": "Success"
+  }
+}

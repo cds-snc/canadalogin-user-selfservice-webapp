@@ -1,0 +1,56 @@
+{
+  "ProfileHome": {
+    "title": "Renseignements personnels",
+    "basicInfo": "Renseignements de base",
+    "preferredName": "Nom d'usage",
+    "exampleName": "Nom Exemple",
+    "edit": "Modifier",
+    "contactInfo": "Coordonnées",
+    "email": "Adresse courriel",
+    "emailDescription": "Cette adresse courriel est utilisée pour la connexion et les communications :",
+    "verified": "Vérification effectuée",
+    "contactPhone": "Numéro de téléphone de communication",
+    "phoneDescription": "Le numéro de téléphone suivant est utilisé pour vous contacter :",
+    "communication": "Communication",
+    "languagePreference": "Langue de communication",
+    "english": "Anglais",
+    "notifications": "Notifications",
+    "notificationDescription": "Nous enverrons des notifications liées à votre compte à l'adresse courriel qui y est associée.",
+    "serviceNotifications": "Vous pourriez également recevoir des notifications provenant de services liés à votre identifiant ConnexionCanada. Vous pouvez gérer ces préférences dans les paramètres de chaque service.",
+    "noPhoneAdded": "Aucun numéro de téléphone de contact n'a été ajouté",
+    "addPhoneNumber": "Ajouter un numéro de téléphone"
+  },
+  "ProfileUpdateName": {
+    "firstName": "Prénom",
+    "lastName": "Nom de famille",
+    "cancel": "Annuler",
+    "title": "Modifier votre nom",
+    "updateNotice": "Cette action modifiera votre nom pour",
+    "everyService": "tous les services auxquels vous avez communiqué votre nom par le biais de ConnexionCanada."
+  },
+  "ProfileUpdateNameConfirmUpdate": {
+    "title": "Voulez-vous vraiment modifier votre nom?",
+    "requestedUpdate": "Vous avez demandé à remplacer votre nom par le nom suivant :",
+    "exampleName": "Exemple: Nouveau nom",
+    "allServicesNotice": "Cette action mettra à jour votre nom pour <bold>tous</bold> les services que vous avez connectés à votre identifiant <bold>ConnexionCanada</bold>.",
+    "headsUp": "Attention",
+    "thisText": "Cette action",
+    "confirmButton": "Oui, mettre à jour",
+    "cancelButton": "Annuler",
+    "doesNot": "ne modifie pas",
+    "legallyChangeName": "votre nom sur le plan légal."
+  },
+  "ProfileUpdateNameSuccess": {
+    "successTitle": "Réussite",
+    "nameUpdatedTo": "Votre nom est maintenant",
+    "updateOtherPlaces": "Vous devez peut-être mettre à jour votre nom ailleurs.",
+    "onlyConnectedServices": "Cette action ne modifie votre nom que pour les services liés à votre identifiant ConnexionCanada.",
+    "notConnectedNotice": "Si vous cherchez à mettre à jour votre nom pour un service qui n'est pas lié à votre identifiant ConnexionCanada, vous devez le faire depuis le compte que vous possédez pour le service en question.",
+    "searchOtherAccounts": "Pour rechercher un autre compte du GC, consultez le",
+    "backToProfile": "Retour au profil",
+    "signOut": "Se déconnecter",
+    "gcAccountDirectory": "répertoire des comptes du GC.",
+    "signingOut": "Déconnexion en cours...",
+    "signOutFailed": "Échec de la déconnexion. Redirection..."
+  }
+}

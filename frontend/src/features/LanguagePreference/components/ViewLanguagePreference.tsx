@@ -6,17 +6,14 @@ import {
   GcdsText,
 } from "@gcds-core/components-react";
 
+import { useTranslation } from "react-i18next";
 import { PAGES, LANGUAGE_DISPLAY_NAMES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import { useUser } from "../../../components/Providers/useUser";
-import type {
-  GcdsNavigationEvent,
-  LanguagePreferenceViewProps,
-} from "../../../types/languagePreference";
+import type { GcdsNavigationEvent } from "../../../types/languagePreference";
 
-export default function ViewLanguagePreferences({
-  pageContent,
-}: LanguagePreferenceViewProps) {
+export default function ViewLanguagePreferences() {
+  const { t } = useTranslation("profile");
   const { language = "en" } = useParams<{ language: string }>();
   const routeLanguage = language === "fr" ? "fr" : "en";
   const { state } = useUser();
@@ -35,7 +32,7 @@ export default function ViewLanguagePreferences({
   return (
     <>
       <GcdsHeading tag="h3" marginTop="300">
-        {pageContent["13"]}
+        {t("ProfileHome.languagePreference")}
       </GcdsHeading>
       <GcdsGrid columns="1fr auto" className="gridInline">
         <GcdsText>{displayLanguageName}</GcdsText>
@@ -47,7 +44,7 @@ export default function ViewLanguagePreferences({
             navigate(event.detail);
           }}
         >
-          {pageContent["5"]}
+          {t("ProfileHome.edit")}
         </GcdsLink>
       </GcdsGrid>
     </>

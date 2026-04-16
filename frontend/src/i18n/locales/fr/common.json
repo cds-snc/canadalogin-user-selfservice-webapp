@@ -1,0 +1,41 @@
+{
+  "Button": {
+    "submit": "Continuer",
+    "cancel": "Annuler"
+  },
+  "Error": {
+    "genericProblem": "Un problème est survenu",
+    "invalidEmail": "Adresse courriel invalide. L'adresse courriel doit contenir un symbole « @ » suivi d'un domaine.",
+    "invalidCode": "Les codes doivent être composés de six chiffres. Veuillez réessayer.",
+    "passwordMinLength": "Les mots de passe doivent être composés de 12 caractères",
+    "passwordLengthRange": "Les mots de passe sont composés d'entre 12 et 65 caractères. Veuillez réessayer.",
+    "codeMismatch": "Code invalide. Veuillez réessayer.",
+    "serverError": "Une erreur du serveur s'est produite. Veuillez réessayer plus tard.",
+    "invalidPhonePrefix": "Numéro de téléphone invalide. Les numéros de téléphone pour le pays que vous avez sélectionné doivent être composés de ",
+    "invalidPhoneSuffix": " chiffres. Assurez-vous d'avoir sélectionné le bon pays ou essayez d'entrer à nouveau votre numéro de téléphone. Les extensions ne sont pas permises.",
+    "phoneRequired": "Veuillez entrer un numéro de téléphone pour continuer.",
+    "lastNameRequired": "Veuillez entrer un nom de famille pour continuer. Si vous n'avez qu'un seul nom, entrez-le dans le champ destiné au nom de famille.",
+    "maxLength": "and a maximum of",
+    "characters": "caractères.",
+    "example_password_used": "Invalid password. Password cannot be the example password. Try again.",
+    "CSIAM0010E": "La tentative d'authentification a échoué",
+    "CSIAM0011E": "Le code de vérification n'est pas valide ou a expiré.",
+    "CSIAM0038E": "Trop de tentatives",
+    "CSIAI0021E": "Le mot de passe que vous avez spécifié a déjà été utilisé et ne peut pas être réutilisé.",
+    "CSIBN0025E": "Le code de vérification n'est pas valide ou a expiré.",
+    "CSIBN0028E": "Le code de vérification n'est pas valide ou a expiré.",
+    "CSIBN0021E": "Le code de vérification n'est pas valide.",
+    "CSIBH0044E": "L'adresse courriel et le mot de passe ne correspondent pas.",
+    "CSIAI0369E": "We could not validate this password. Try again.",
+    "CSIAI0370E": "This password is too easy to guess. Choose a stronger password.",
+    "error_webauthn_not_supported": "WebAuthn is not supported by your browser",
+    "error_failed_to_get_attestation_options": "Failed to get attestation options",
+    "error_duplicate_passkey": "The user attempted to register an authenticator that contains one of the credentials already registered with the relying party.",
+    "error_passkey_name_required": "Passkey name required.",
+    "error_delete_credential": "Failed to delete security key",
+    "error_rename_credential": "Enter a name for your passkey to continue",
+    "error_fido2_verification": "Échec de la vérification avec la clé d'accès",
+    "error_fido2_wrong_passkey": "Vous avez utilisé une clé d'accès différente de celle que vous avez sélectionnée. Veuillez réessayer avec la bonne clé d'accès.",
+    "error_get_assertion_options": "Échec de l'obtention des options d'authentification"
+  }
+}

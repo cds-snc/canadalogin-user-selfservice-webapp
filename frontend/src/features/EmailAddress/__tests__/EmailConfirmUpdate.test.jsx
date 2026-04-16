@@ -20,11 +20,6 @@ vi.mock("react-router", async () => {
   };
 });
 
-// Mock utility functions
-vi.mock("../../../utils/functions", () => ({
-  getPageContent: vi.fn(),
-}));
-
 // Mock constants
 vi.mock("../../../utils/constants", () => ({
   PAGES: {
@@ -100,48 +95,16 @@ vi.mock("react-router", async () => {
   };
 });
 
-// Mock utils functions
-vi.mock("../../utils/functions", () => ({
-  getPageContent: vi.fn(),
-}));
-
-// Mock components
-vi.mock("../../components/RPInfo/RPNameDisplay", () => ({
-  default: ({ rpName }) => <div data-testid="rp-name-display">{rpName}</div>,
-}));
-
-vi.mock("../../components/Layout/SubmitButton", () => ({
-  default: ({ onClick, children }) => (
-    <button data-testid="submit-button" onClick={onClick} type="submit">
-      {children}
-    </button>
-  ),
-}));
-
 // Import mocked functions
 import { useParams } from "react-router";
-import { getPageContent } from "../../../utils/functions";
 
 describe("EmailConfirmUpdate", () => {
   const mockOnSubmit = vi.fn();
   const mockOnCancel = vi.fn();
   const mockUseParams = vi.mocked(useParams);
-  const mockGetPageContent = vi.mocked(getPageContent);
 
   const defaultFormData = {
     emailAddress: "test@example.com",
-  };
-
-  const defaultPageContent = {
-    1: "Confirm your email address change", // Heading
-    2: "Your new email address will be", // Text before email
-    3: "This will be used to:", // Text after email
-    4: "Sign in to your account", // RP name text
-    5: "Confirm", // Submit button text
-  };
-
-  const defaultButtonContent = {
-    cancel: "Cancel",
   };
 
   beforeEach(() => {
@@ -149,15 +112,6 @@ describe("EmailConfirmUpdate", () => {
 
     // Setup default mocks
     mockUseParams.mockReturnValue({ language: "en" });
-    mockGetPageContent.mockImplementation((language, page) => {
-      if (page === "EmailConfirmUpdate") {
-        return defaultPageContent;
-      }
-      if (page === "Button") {
-        return defaultButtonContent;
-      }
-      return {};
-    });
   });
 
   const renderComponent = (props = {}) => {
@@ -190,7 +144,9 @@ describe("EmailConfirmUpdate", () => {
       renderComponent();
 
       const heading = screen.getByTestId("gcds-heading");
-      expect(heading).toHaveTextContent("Confirm your email address change");
+      expect(heading).toHaveTextContent(
+        "Are you sure you want to update your email?",
+      );
     });
 
     it("renders email address confirmation text", () => {
@@ -198,71 +154,37 @@ describe("EmailConfirmUpdate", () => {
 
       expect(
         screen.getByText((content) =>
-          content.includes("Your new email address will be"),
+          content.includes("You've requested to update your email to:"),
         ),
       ).toBeInTheDocument();
       expect(screen.getByText("test@example.com")).toBeInTheDocument();
     });
 
-    it("renders RP name display section", () => {
+    it("renders all services notice text", () => {
       renderComponent();
 
-      expect(screen.getByTestId("rp-name-display")).toBeInTheDocument();
-      expect(screen.getByText("Sign in to your account")).toBeInTheDocument();
+      const textElements = screen.getAllByTestId("gcds-text");
+      const noticeEl = textElements.find((el) =>
+        el.textContent?.includes("all services you have connected to your"),
+      );
+      expect(noticeEl).toBeInTheDocument();
     });
 
     it("renders submit and cancel buttons", () => {
       renderComponent();
 
-      expect(screen.getByTestId("submit-button")).toHaveTextContent("Confirm");
-      expect(screen.getByTestId("cancel-button")).toHaveTextContent("Cancel");
-    });
-
-    it("calls getPageContent with correct parameters", () => {
-      renderComponent();
-
-      expect(mockGetPageContent).toHaveBeenCalledWith(
-        "en",
-        "EmailConfirmUpdate",
+      expect(screen.getByTestId("submit-button")).toHaveTextContent(
+        "Yes, update",
       );
-      expect(mockGetPageContent).toHaveBeenCalledWith("en", "Button");
+      expect(screen.getByTestId("cancel-button")).toHaveTextContent("Cancel");
     });
   });
 
   describe("Language Support", () => {
-    it("renders with French content", () => {
+    it("renders with French language param", () => {
       mockUseParams.mockReturnValue({ language: "fr" });
-      mockGetPageContent.mockImplementation((language, page) => {
-        if (page === "EmailConfirmUpdate") {
-          return {
-            1: "Confirmez le changement d'adresse courriel",
-            2: "Votre nouvelle adresse courriel sera",
-            3: "Cela sera utilisé pour:",
-            4: "Vous connecter à votre compte",
-            5: "Confirmer",
-          };
-        }
-        if (page === "Button") {
-          return { cancel: "Annuler" };
-        }
-        return {};
-      });
 
-      renderComponent();
-
-      expect(mockGetPageContent).toHaveBeenCalledWith(
-        "fr",
-        "EmailConfirmUpdate",
-      );
-      expect(
-        screen.getByText("Confirmez le changement d'adresse courriel"),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByText((content) =>
-          content.includes("Votre nouvelle adresse courriel sera"),
-        ),
-      ).toBeInTheDocument();
-      expect(screen.getByText("Annuler")).toBeInTheDocument();
+      expect(() => renderComponent()).not.toThrow();
     });
 
     it("handles missing language parameter", () => {
@@ -426,19 +348,10 @@ describe("EmailConfirmUpdate", () => {
 
   describe("Error Handling", () => {
     it("handles missing page content gracefully", () => {
-      mockGetPageContent.mockReturnValue({});
-
       expect(() => renderComponent()).not.toThrow();
     });
 
     it("handles missing page content properties", () => {
-      mockGetPageContent.mockImplementation((language, page) => {
-        if (page === "EmailConfirmUpdate") {
-          return { 1: "Test Heading" }; // Partial content
-        }
-        return {};
-      });
-
       expect(() => renderComponent()).not.toThrow();
     });
 
@@ -458,12 +371,20 @@ describe("EmailConfirmUpdate", () => {
   });
 
   describe("Component Integration", () => {
-    it("passes correct props to RPNameDisplay", () => {
+    it("renders allServicesNotice text with bold emphasis", () => {
       renderComponent();
 
-      const rpDisplay = screen.getByTestId("rp-name-display");
-      expect(rpDisplay).toBeInTheDocument();
-      expect(rpDisplay).toHaveTextContent("Sign in to your account");
+      const textElements = screen.getAllByTestId("gcds-text");
+      const noticeEl = textElements.find((el) =>
+        el.textContent?.includes(
+          "This will update your email with all services you have connected to your CanadaLogin.",
+        ),
+      );
+      expect(noticeEl).toBeInTheDocument();
+      const bolds = noticeEl.querySelectorAll("strong");
+      expect(bolds.length).toBe(2);
+      expect(bolds[0].textContent).toBe("all");
+      expect(bolds[1].textContent).toBe("CanadaLogin");
     });
 
     it("passes correct props to SubmitButton", () => {
@@ -471,7 +392,7 @@ describe("EmailConfirmUpdate", () => {
 
       const submitButton = screen.getByTestId("submit-button");
       expect(submitButton).toHaveAttribute("type", "submit");
-      expect(submitButton).toHaveTextContent("Confirm");
+      expect(submitButton).toHaveTextContent("Yes, update");
     });
 
     it("renders all page content elements", () => {
@@ -479,15 +400,20 @@ describe("EmailConfirmUpdate", () => {
 
       // Check all content is present
       expect(
-        screen.getByText("Confirm your email address change"),
+        screen.getByText("Are you sure you want to update your email?"),
       ).toBeInTheDocument();
       expect(
         screen.getByText((content) =>
-          content.includes("Your new email address will be"),
+          content.includes("You've requested to update your email to:"),
         ),
       ).toBeInTheDocument();
-      expect(screen.getByText("This will be used to:")).toBeInTheDocument();
-      expect(screen.getByText("Sign in to your account")).toBeInTheDocument();
+      const textElements = screen.getAllByTestId("gcds-text");
+      const noticeEl = textElements.find((el) =>
+        el.textContent?.includes(
+          "This will update your email with all services you have connected to your CanadaLogin.",
+        ),
+      );
+      expect(noticeEl).toBeInTheDocument();
     });
   });
 
@@ -513,14 +439,14 @@ describe("EmailConfirmUpdate", () => {
       expect(strongEmail.tagName.toLowerCase()).toBe("strong");
     });
 
-    it("renders structured content with list", () => {
+    it("renders all services notice in accessible text element", () => {
       renderComponent();
 
-      const list = screen.getByRole("list");
-      expect(list).toBeInTheDocument();
-
-      const listItem = screen.getByRole("listitem");
-      expect(listItem).toBeInTheDocument();
+      const textElements = screen.getAllByTestId("gcds-text");
+      const noticeText = textElements.find((el) =>
+        el.textContent?.includes("all services you have connected to your"),
+      );
+      expect(noticeText).toBeInTheDocument();
     });
   });
 
@@ -547,8 +473,6 @@ describe("EmailConfirmUpdate", () => {
     });
 
     it("handles empty page content gracefully", () => {
-      mockGetPageContent.mockReturnValue({});
-
       renderComponent();
 
       // Component should render without throwing

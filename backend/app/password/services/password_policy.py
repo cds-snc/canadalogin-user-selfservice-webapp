@@ -7,7 +7,6 @@ from app.utils.access_token import get_auth_request_headers
 from app.password.schemas import IBMVerifyPasswordPolicy
 from app.utils.schemas import ResponseModel
 
-
 logger = logging.getLogger(__name__)
 
 

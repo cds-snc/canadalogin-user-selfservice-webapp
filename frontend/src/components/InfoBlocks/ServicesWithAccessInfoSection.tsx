@@ -1,11 +1,9 @@
 import { GcdsDetails, GcdsText, GcdsLink } from "@gcds-core/components-react";
-import { getContentWithVariables, getPageContent } from "../../utils/functions";
+import { useTranslation } from "react-i18next";
 import {
   EXTERNAL_NAVIGATION_LINKS,
-  PAGES,
   ServicesWithAccessInfoSectionInformation,
 } from "../../utils/constants";
-import RPNameDisplay from "../RPInfo/RPNameDisplay";
 
 interface ServicesWithAccessInfoSectionProps {
   currentLang: string;
@@ -13,48 +11,45 @@ interface ServicesWithAccessInfoSectionProps {
 }
 
 export default function ServicesWithAccessInfoSection({
-  currentLang,
+  currentLang: _currentLang,
   information,
 }: ServicesWithAccessInfoSectionProps) {
-  const pageContentJson: Record<string, string> =
-    getPageContent(currentLang, PAGES.ServicesWithAccessInfo) ?? {};
+  const { t } = useTranslation("layout");
   const informationMap: Record<string, string> = {
-    [ServicesWithAccessInfoSectionInformation.NAME]: pageContentJson["7"],
-    [ServicesWithAccessInfoSectionInformation.CONTACT_PHONE_NUMBER]:
-      pageContentJson["8"],
-    [ServicesWithAccessInfoSectionInformation.LANGUAGE_PREFERENCE]:
-      pageContentJson["9"],
-    [ServicesWithAccessInfoSectionInformation.EMAIL_ADDRESS]:
-      pageContentJson["10"],
+    [ServicesWithAccessInfoSectionInformation.NAME]: t(
+      "ServicesWithAccessInfo.name",
+    ),
+    [ServicesWithAccessInfoSectionInformation.CONTACT_PHONE_NUMBER]: t(
+      "ServicesWithAccessInfo.contactPhone",
+    ),
+    [ServicesWithAccessInfoSectionInformation.LANGUAGE_PREFERENCE]: t(
+      "ServicesWithAccessInfo.languagePreference",
+    ),
+    [ServicesWithAccessInfoSectionInformation.EMAIL_ADDRESS]: t(
+      "ServicesWithAccessInfo.emailAddress",
+    ),
   };
 
   return (
     <GcdsDetails
-      detailsTitle={getContentWithVariables(pageContentJson["1"], {
+      detailsTitle={t("ServicesWithAccessInfo.title", {
         information: informationMap[information],
       })}
     >
       <GcdsText>
-        <span>
-          {getContentWithVariables(pageContentJson["2"], {
-            information: informationMap[information],
-          })}
-        </span>
-      </GcdsText>
-      <ul style={{ margin: 0 }}>
-        <li>
-          <RPNameDisplay rpName={pageContentJson["3"]} />
-        </li>
-      </ul>
-      <GcdsText>
-        {getContentWithVariables(pageContentJson["4"], {
+        {t("ServicesWithAccessInfo.description", {
           information: informationMap[information],
         })}
       </GcdsText>
       <GcdsText>
-        {pageContentJson["5"]}&nbsp;
+        {t("ServicesWithAccessInfo.notConnectedNotice", {
+          information: informationMap[information],
+        })}
+      </GcdsText>
+      <GcdsText>
+        {t("ServicesWithAccessInfo.searchOtherAccounts")}&nbsp;
         <GcdsLink href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}>
-          {pageContentJson["6"]}
+          {t("ServicesWithAccessInfo.gcAccountDirectory")}
         </GcdsLink>
         .
       </GcdsText>

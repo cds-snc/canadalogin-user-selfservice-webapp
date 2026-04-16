@@ -60,7 +60,9 @@ export const LanguageProvider = ({
 export const useLanguage = () => {
   const context = useContext(LanguageContext);
 
-  if (!context) throw new Error("useLanguage should be used within a Provider");
+  if (!context) {
+    throw new Error("useLanguage should be used within a Provider");
+  }
 
   return context;
 };

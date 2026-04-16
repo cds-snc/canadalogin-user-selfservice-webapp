@@ -24,28 +24,14 @@ vi.mock("../../../components/Providers/useUser", () => ({
   useUser: vi.fn(),
 }));
 
-vi.mock("../../../utils/functions", () => ({
-  getPageContent: vi.fn(() => ({
-    1: "Edit language preferences",
-    2: "Select your preferred language for notifications and communications.",
-    3: "Preferred language",
-    13: "English",
-    14: "French",
-    15: "Continue",
-    16: "Cancel",
-  })),
-  convertLanguageToLanguageCode: vi.fn((language) => {
-    if (language === "en" || language === "en-ca") return "en";
-    if (language === "fr" || language === "fr-ca") return "fr";
-    return language;
-  }),
-}));
-
 vi.mock("../../../utils/routeHelpers", () => ({
   path: vi.fn((page, params) => {
-    if (page === "profile-home") return `/${params.language}/profile`;
-    if (page === "confirm-language-update")
+    if (page === "profile-home") {
+      return `/${params.language}/profile`;
+    }
+    if (page === "confirm-language-update") {
       return `/${params.language}/confirm-language`;
+    }
     return `/${params.language}/test-path`;
   }),
 }));
@@ -122,7 +108,9 @@ vi.mock("@gcds-core/components-react", () => ({
 
     const handleChange = (e) => {
       setSelectedValue(e.target.value);
-      if (onChange) onChange(e);
+      if (onChange) {
+        onChange(e);
+      }
     };
 
     return (
@@ -199,7 +187,9 @@ describe("EditLanguagePreferences Component", () => {
       setup();
 
       expect(screen.getByTestId("gcds-heading")).toBeInTheDocument();
-      expect(screen.getByText("Edit language preferences")).toBeInTheDocument();
+      expect(
+        screen.getByText("Edit your language preference"),
+      ).toBeInTheDocument();
     });
 
     it("renders the description text", () => {
@@ -208,7 +198,7 @@ describe("EditLanguagePreferences Component", () => {
       expect(screen.getByTestId("gcds-text")).toBeInTheDocument();
       expect(
         screen.getByText(
-          "Select your preferred language for notifications and communications.",
+          "This will update the official language that CanadaLogin and the services connected to CanadaLogin will send you communications in.",
         ),
       ).toBeInTheDocument();
     });
@@ -217,7 +207,9 @@ describe("EditLanguagePreferences Component", () => {
       setup();
 
       expect(screen.getByTestId("gcds-radios")).toBeInTheDocument();
-      expect(screen.getByText("Preferred language")).toBeInTheDocument();
+      expect(
+        screen.getByText("Choose your language preference"),
+      ).toBeInTheDocument();
       expect(screen.getByTestId("radio-en-ca")).toBeInTheDocument();
       expect(screen.getByTestId("radio-fr-ca")).toBeInTheDocument();
     });

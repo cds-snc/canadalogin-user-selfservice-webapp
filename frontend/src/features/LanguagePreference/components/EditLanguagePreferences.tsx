@@ -9,18 +9,14 @@ import {
   GcdsText,
 } from "@gcds-core/components-react";
 
-import { getPageContent } from "../../../utils/functions";
+import { useTranslation } from "react-i18next";
 import {
-  PAGES,
   PROFILE_LANGUAGES,
   ServicesWithAccessInfoSectionInformation,
 } from "../../../utils/constants";
 import ServicesWithAccessInfoSection from "../../../components/InfoBlocks/ServicesWithAccessInfoSection";
 import SubmitButton from "../../../components/Layout/SubmitButton";
-import type {
-  LanguagePreferenceEditProps,
-  LanguagePreferencePageContent,
-} from "../../../types/languagePreference";
+import type { LanguagePreferenceEditProps } from "../../../types/languagePreference";
 
 export default function EditLanguagePreferences({
   languageFormData,
@@ -32,19 +28,16 @@ export default function EditLanguagePreferences({
 }: LanguagePreferenceEditProps) {
   const { language = "en" } = useParams<{ language: string }>();
 
-  const pageContentJson =
-    (getPageContent(language, PAGES.editLanguagePreferences) as
-      | LanguagePreferencePageContent
-      | undefined) ?? {};
+  const { t } = useTranslation("language");
 
   const englishSelection = {
-    label: pageContentJson["13"],
+    label: t("EditLanguagePreferences.english"),
     id: PROFILE_LANGUAGES.en,
     value: PROFILE_LANGUAGES.en,
     checked: languageFormData.updatedPreferredLanguage === PROFILE_LANGUAGES.en,
   };
   const frenchSelection = {
-    label: pageContentJson["14"],
+    label: t("EditLanguagePreferences.french"),
     id: PROFILE_LANGUAGES.fr,
     value: PROFILE_LANGUAGES.fr,
     checked: languageFormData.updatedPreferredLanguage === PROFILE_LANGUAGES.fr,
@@ -81,8 +74,8 @@ export default function EditLanguagePreferences({
         </GcdsErrorMessage>
       ) : null}
 
-      <GcdsHeading tag="h1">{pageContentJson["1"]}</GcdsHeading>
-      <GcdsText>{pageContentJson["2"]}</GcdsText>
+      <GcdsHeading tag="h1">{t("EditLanguagePreferences.title")}</GcdsHeading>
+      <GcdsText>{t("EditLanguagePreferences.description")}</GcdsText>
 
       <GcdsGrid columns="1fr">
         <ServicesWithAccessInfoSection
@@ -97,7 +90,7 @@ export default function EditLanguagePreferences({
         <GcdsContainer style={{ marginTop: "1rem" }}>
           <GcdsRadios
             name="radio"
-            legend={pageContentJson["3"]}
+            legend={t("EditLanguagePreferences.chooseLanguage")}
             options={languageOptions}
             lang={language}
             onChange={(event) => {
@@ -111,7 +104,7 @@ export default function EditLanguagePreferences({
 
       <GcdsGrid columns="max-content max-content" gap="200">
         <SubmitButton onGcdsClick={onSubmitHandler} currentLang={language}>
-          {pageContentJson["15"]}
+          {t("EditLanguagePreferences.continueButton")}
         </SubmitButton>
 
         <GcdsButton
@@ -121,7 +114,7 @@ export default function EditLanguagePreferences({
             void onCancel();
           }}
         >
-          {pageContentJson["16"]}
+          {t("EditLanguagePreferences.cancelButton")}
         </GcdsButton>
       </GcdsGrid>
     </GcdsContainer>

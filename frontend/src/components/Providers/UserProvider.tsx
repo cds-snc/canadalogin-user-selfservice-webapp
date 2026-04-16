@@ -15,7 +15,7 @@ import UserContext from "./UserContext";
 import { authService } from "../../services/authService";
 import Loader from "../Layout/Loading";
 import SessionTimeoutModal from "../Layout/SessionTimeoutModal";
-import { getPageContent } from "../../utils/functions";
+import { useTranslation } from "react-i18next";
 import type {
   SessionTimeoutState,
   UserAction,
@@ -134,8 +134,7 @@ export function UserProvider({
   );
   const [searchParams] = useSearchParams();
   const { language } = useParams();
-  const pageContentJson: Record<string, string> =
-    getPageContent(language, "SessionManagement") ?? {};
+  const { t } = useTranslation("layout");
 
   // keep latest expire in a ref so SSE handler can compare without capturing stale closure state
   const latestExpireRef = useRef<number | null>(
@@ -258,10 +257,15 @@ export function UserProvider({
       // Update loading text to show error
       userDispatch({
         type: CONTEXT_ACTIONS.set_loading,
-        payload: { isLoading: true, text: pageContentJson["10"] },
+        payload: {
+          isLoading: true,
+          text: t("SessionManagement.signOutFailed"),
+        },
       });
       clearTimers();
-      if (eventSource) eventSource.close();
+      if (eventSource) {
+        eventSource.close();
+      }
 
       // Redirect after error
       setTimeout(() => {
@@ -276,14 +280,16 @@ export function UserProvider({
     (event) => {
       if (event.type === "expired") {
         // Session expired - proceed with logout button
-        if (eventSource) eventSource.close();
+        if (eventSource) {
+          eventSource.close();
+        }
         clearTimers();
       }
       if (event.type === "terminated") {
         // Handle backchannel logout
         userDispatch({
           type: CONTEXT_ACTIONS.set_loading,
-          payload: { isLoading: true, text: pageContentJson["7"] },
+          payload: { isLoading: true, text: t("SessionManagement.signingOut") },
         });
         // Redirect after backchannel logout with a slight delay to show loading message
         setTimeout(() => {
@@ -363,7 +369,7 @@ export function UserProvider({
         // Always set loading to false and reset loading text so PrivateRoute can handle the logic
         userDispatch({
           type: CONTEXT_ACTIONS.set_loading,
-          payload: { isLoading: false, text: pageContentJson["9"] },
+          payload: { isLoading: false, text: t("SessionManagement.loading") },
         });
       }
     };
@@ -372,7 +378,9 @@ export function UserProvider({
     return () => {
       // Cleanup on unmount
       clearTimers();
-      if (eventSource) eventSource.close();
+      if (eventSource) {
+        eventSource.close();
+      }
     };
   }, []);
 
@@ -390,7 +398,9 @@ export function UserProvider({
     return (
       <Loader
         text={
-          userState.loadingText ? userState.loadingText : pageContentJson["9"]
+          userState.loadingText
+            ? userState.loadingText
+            : t("SessionManagement.loading")
         }
       />
     );

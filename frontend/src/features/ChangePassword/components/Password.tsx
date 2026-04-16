@@ -11,10 +11,7 @@ import {
   GcdsButton,
   GcdsHeading,
 } from "@gcds-core/components-react";
-import {
-  getContentWithVariables,
-  getPageContent,
-} from "../../../utils/functions";
+import { useTranslation } from "react-i18next";
 import { authService } from "../../../services/authService";
 import { passwordUpdate } from "../api/passwordUpdate";
 
@@ -59,7 +56,7 @@ export default function Password({
   setLocalLoading,
 }: PasswordProps) {
   const { language } = useParams<{ language: string }>();
-  const { cancel } = getPageContent(language, "Button") ?? {};
+  const { t } = useTranslation(["password", "common"]);
   const [passwordPolicy, setPasswordPolicy] = useState<PasswordPolicy>({
     min: 12,
     max: 110,
@@ -68,7 +65,6 @@ export default function Password({
   const [password, setPassword] = useState("");
 
   const [passwordStrength, setPasswordStrength] = useState(0);
-  const pageContentJson = getPageContent(language, PAGES.password) ?? {};
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
     language,
   });
@@ -144,7 +140,7 @@ export default function Password({
 
   const optionsValues = [
     {
-      label: pageContentJson["11"],
+      label: t("Password.showPassword"),
       id: "checkbox1",
       value: "checkbox1",
       checked: checkedValue,
@@ -154,35 +150,35 @@ export default function Password({
   return (
     <GcdsContainer role="main">
       <GcdsHeading tag="h1" lang={language}>
-        {pageContentJson["14"]}
+        {t("Password.enterNewPassword")}
       </GcdsHeading>
 
       <GcdsText>
-        <span>{pageContentJson["4"]}</span>{" "}
+        <span>{t("Password.requirementsIntro")}</span>{" "}
         <strong>
           <span>
-            {getContentWithVariables(pageContentJson["5"], {
+            {t("Password.minCharacters", {
               minPasswordLength: passwordPolicy.min,
             })}
           </span>
         </strong>
         {". "}
-        <span>{pageContentJson["6"]}</span>
+        <span>{t("Password.multipleWords")}</span>
       </GcdsText>
       <GcdsDetails
-        detailsTitle={pageContentJson["7"]}
+        detailsTitle={t("Password.safetyTipsTitle")}
         style={{ marginBottom: "1rem" }}
       >
-        <GcdsText>{pageContentJson["8"]}</GcdsText>
+        <GcdsText>{t("Password.safetyTipsContent")}</GcdsText>
       </GcdsDetails>
 
       <form onSubmit={onSubmitHandler}>
         <GcdsContainer>
           <GcdsInput
             inputId="input-password"
-            label={pageContentJson["9"]}
+            label={t("Password.label")}
             name="password"
-            hint={pageContentJson["10"]}
+            hint={t("Password.placeholder")}
             type={checkedValue ? "text" : "password"}
             onGcdsInput={handlePasswordChange}
             errorMessage={errorMessage}
@@ -190,20 +186,21 @@ export default function Password({
             maxlength={passwordPolicy.max}
             lang={language}
             autoFocus
+            size={18}
           ></GcdsInput>
 
           <GcdsCheckboxes
             id="checkbox-default"
-            legend={pageContentJson["11"]}
+            legend={t("Password.showPassword")}
             name="checkbox"
             options={optionsValues}
             onGcdsChange={() => setCheckedValue(!checkedValue)}
           ></GcdsCheckboxes>
 
           <GcdsText>
-            <span>{pageContentJson["12"]}</span>{" "}
+            <span>{t("Password.minimumLength")}</span>{" "}
             <strong>{passwordStrength}</strong> / {passwordPolicy.min}{" "}
-            <span>{pageContentJson["13"]}</span>
+            <span>{t("Password.characters")}</span>
           </GcdsText>
 
           <GcdsGrid columns="max-content max-content" gap="200">
@@ -221,7 +218,7 @@ export default function Password({
                 navigate(backToSecuritySettingsPage);
               }}
             >
-              {cancel}
+              {t("Button.cancel", { ns: "common" })}
             </GcdsButton>
           </GcdsGrid>
         </GcdsContainer>

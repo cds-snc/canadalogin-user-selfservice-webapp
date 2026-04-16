@@ -1,12 +1,15 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router";
+import { useTranslation } from "react-i18next";
 import { useLanguage } from "./LanguageProvider.tsx";
 import { useUser } from "./useUser.tsx";
 import { AVAILABLE_LANGUAGES } from "../../utils/constants";
 import { useNavigateHelper } from "../../hooks/useNavigate";
 
 function validateSelectedLanguage(selectedLanguage: any) {
-  if (!selectedLanguage) return undefined;
+  if (!selectedLanguage) {
+    return undefined;
+  }
   const SUPPORTED_LANGUAGES = [AVAILABLE_LANGUAGES.en, AVAILABLE_LANGUAGES.fr];
   const languageValue = selectedLanguage.includes("-")
     ? selectedLanguage.split("-")[0].toLowerCase()
@@ -23,13 +26,16 @@ export const AppLanguageSetup = () => {
   const { state: languageState, setAppLanguage } = useLanguage();
   const { userProfile, isLoading } = state;
   const { language } = languageState;
+  const { i18n } = useTranslation();
 
   const navigateHelper = useNavigateHelper();
 
   const browserLanguage = navigator.language;
 
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading) {
+      return;
+    }
 
     const urlPath = pathname.split("/").filter(Boolean);
     const urlLanguage = urlPath[0]?.toLowerCase();
@@ -49,6 +55,10 @@ export const AppLanguageSetup = () => {
 
     if (languageToDisplay !== language) {
       setAppLanguage(languageToDisplay);
+    }
+
+    if (i18n.language !== languageToDisplay) {
+      i18n.changeLanguage(languageToDisplay);
     }
 
     if (languageToDisplay !== normalizedUrlLanguage) {

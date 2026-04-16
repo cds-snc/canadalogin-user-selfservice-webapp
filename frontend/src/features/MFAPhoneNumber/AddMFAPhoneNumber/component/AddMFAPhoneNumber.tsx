@@ -14,7 +14,7 @@ import { useState } from "react";
 import PhoneInput from "react-phone-input-2";
 import { useParams } from "react-router";
 import { countryMapping, FLOW_TYPES, PAGES } from "../../../../utils/constants";
-import { getPageContent } from "../../../../utils/functions";
+import { useTranslation } from "react-i18next";
 import { path } from "../../../../utils/routeHelpers";
 import SubmitButton from "../../../../components/Layout/SubmitButton";
 
@@ -37,35 +37,34 @@ interface RadioOption {
 
 interface RadioButtonsProps {
   onChangePhoneForm: (field: string, value: string) => void;
-  pageContentJson: Record<string, string>;
   phoneFormData: PhoneFormData;
 }
 
 const RadioButtons = ({
   onChangePhoneForm,
-  pageContentJson,
   phoneFormData,
 }: RadioButtonsProps) => {
+  const { t } = useTranslation("mfa");
   // Set up radio buttons
   const configureRadioOptions = (): RadioOption[] => {
     const radioOptionsValues: RadioOption[] = [];
 
-    const smsLabel = `${pageContentJson["11"]}`;
+    const smsLabel = `${t("AddMFANumber.textMessage")}`;
     const smsOtpRadioOption: RadioOption = {
       label: smsLabel,
       id: `sms-radio-${FLOW_TYPES.sms}`,
       value: FLOW_TYPES.sms,
-      hint: pageContentJson["12"],
+      hint: t("AddMFANumber.textMessageHint"),
       checked: phoneFormData.otpType === FLOW_TYPES.sms,
     };
     radioOptionsValues.push(smsOtpRadioOption);
 
-    const voiceLabel = `${pageContentJson["13"]}`;
+    const voiceLabel = `${t("AddMFANumber.voiceCall")}`;
     const voiceOtpRadioOption: RadioOption = {
       label: voiceLabel,
       id: `voice-radio-${FLOW_TYPES.voice}`,
       value: FLOW_TYPES.voice,
-      hint: pageContentJson["14"],
+      hint: t("AddMFANumber.voiceCallHint"),
       checked: phoneFormData.otpType === FLOW_TYPES.voice,
     };
     radioOptionsValues.push(voiceOtpRadioOption);
@@ -77,8 +76,8 @@ const RadioButtons = ({
   return (
     <GcdsRadios
       name="radio"
-      legend={pageContentJson["10"]}
-      hint={pageContentJson["15"]}
+      legend={t("AddMFANumber.howToSendCode")}
+      hint={t("AddMFANumber.changeNextSignIn")}
       options={radioOptions}
       required={true}
       onGcdsChange={(e: CustomEvent<string>) => {
@@ -88,18 +87,15 @@ const RadioButtons = ({
   );
 };
 
-interface MyCountryIsNotListedProps {
-  pageContentJson: Record<string, string>;
-}
+interface MyCountryIsNotListedProps {}
 
-const MyCountryIsNotListed = ({
-  pageContentJson,
-}: MyCountryIsNotListedProps) => {
+const MyCountryIsNotListed = ({}: MyCountryIsNotListedProps) => {
+  const { t } = useTranslation("mfa");
   return (
     <GcdsText>
-      <GcdsDetails detailsTitle={pageContentJson["8"]}>
+      <GcdsDetails detailsTitle={t("AddMFANumber.countryNotListed")}>
         <GcdsText>
-          <span>{pageContentJson["9"]}</span>
+          <span>{t("AddMFANumber.countryNotSupported")}</span>
         </GcdsText>
       </GcdsDetails>
     </GcdsText>
@@ -125,8 +121,7 @@ export default function AddMFAPhoneNumber({
 }: AddMFAPhoneNumberProps) {
   const { language } = useParams();
   const [phoneNumberValid, setPhoneNumberValid] = useState(true);
-  const pageContentJson = getPageContent(language, PAGES.addMFANumber)!;
-  const { cancel } = getPageContent(language, "Button")!;
+  const { t } = useTranslation(["mfa", "common"]);
   const backtoProfilePage = path(PAGES.ProfileHome, { language: language });
 
   const isPhoneNumberValid = (phoneNumber: string, country: string) => {
@@ -157,13 +152,15 @@ export default function AddMFAPhoneNumber({
       <GcdsGrid columns="1" gap="500">
         <GcdsContainer>
           <GcdsHeading tag="h1" lang={language}>
-            {pageContentJson["1"]}
+            {t("AddMFANumber.title")}
           </GcdsHeading>
-          <GcdsText>{pageContentJson["2"]}</GcdsText>
+          <GcdsText>{t("AddMFANumber.description")}</GcdsText>
           <GcdsText>
-            {pageContentJson["3"]}{" "}
-            <GcdsLink href={backtoProfilePage}>{pageContentJson["4"]}</GcdsLink>{" "}
-            {pageContentJson["5"]}
+            {t("AddMFANumber.onlyFor2Step")}{" "}
+            <GcdsLink href={backtoProfilePage}>
+              {t("AddMFANumber.personalInformation")}
+            </GcdsLink>{" "}
+            {t("AddMFANumber.period")}
           </GcdsText>
         </GcdsContainer>
 
@@ -180,7 +177,7 @@ export default function AddMFAPhoneNumber({
                 required: true,
                 autoFocus: true,
               }}
-              specialLabel={pageContentJson["7"]}
+              specialLabel={t("AddMFANumber.phoneLabel")}
               country={"ca"}
               preferredCountries={["ca"]}
               onlyCountries={countryMapping.countries as unknown as string[]}
@@ -193,7 +190,7 @@ export default function AddMFAPhoneNumber({
               enableSearch={true}
               countryCodeEditable={false}
               disableSearchIcon={false}
-              defaultErrorMessage={pageContentJson["14"]}
+              defaultErrorMessage={t("AddMFANumber.voiceCallHint")}
               onChange={(
                 phone: string,
                 country: { countryCode?: string; iso2?: string },
@@ -216,10 +213,9 @@ export default function AddMFAPhoneNumber({
         </section>
 
         <section>
-          <MyCountryIsNotListed pageContentJson={pageContentJson} />
+          <MyCountryIsNotListed />
           <RadioButtons
             onChangePhoneForm={onChangePhoneForm}
-            pageContentJson={pageContentJson}
             phoneFormData={phoneFormData}
           />
         </section>
@@ -244,7 +240,7 @@ export default function AddMFAPhoneNumber({
             onCancel();
           }}
         >
-          {cancel}
+          {t("Button.cancel", { ns: "common" })}
         </GcdsButton>
       </GcdsGrid>
     </GcdsContainer>

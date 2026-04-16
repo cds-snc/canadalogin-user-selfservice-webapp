@@ -11,7 +11,7 @@ import uuid
 
 import pytest
 
-from app.fido2.mds_service import (
+from app.fido2.services.mds_service import (
     FIDO2MetadataService,
     GLOBALSIGN_ROOT_CERT_URL,
     MDS3_URL,
@@ -156,7 +156,7 @@ def test_get_metadata_unknown_aaguid():
 
     result = service.get_metadata("00000000-0000-0000-0000-000000000000")
     assert result["is_known"] is False
-    assert result["description"] == "Unknown Authenticator"
+    assert result["description"] == ""
     assert result["aaguid"] == "00000000-0000-0000-0000-000000000000"
 
 
@@ -264,9 +264,9 @@ async def test_refresh_downloads_and_stores_in_redis():
         patch.object(
             service, "_get_root_cert", new_callable=AsyncMock, return_value=fake_cert
         ),
-        patch("app.fido2.mds_service.httpx.AsyncClient") as mock_client_cls,
+        patch("app.fido2.services.mds_service.httpx.AsyncClient") as mock_client_cls,
         patch(
-            "app.fido2.mds_service.asyncio.to_thread",
+            "app.fido2.services.mds_service.asyncio.to_thread",
             new_callable=AsyncMock,
             return_value=parsed_data,
         ),
@@ -321,7 +321,7 @@ async def test_get_root_cert_loads_from_file_when_path_configured():
     cert_bytes = b"file-cert-bytes"
 
     with (
-        patch("app.fido2.mds_service._mds_config") as mock_config,
+        patch("app.fido2.services.mds_service._mds_config") as mock_config,
         patch(
             "builtins.open",
             MagicMock(
@@ -350,8 +350,8 @@ async def test_get_root_cert_downloads_successfully():
     expected_cert = b"downloaded-cert-bytes"
 
     with (
-        patch("app.fido2.mds_service._mds_config") as mock_config,
-        patch("app.fido2.mds_service.httpx.AsyncClient") as mock_client_cls,
+        patch("app.fido2.services.mds_service._mds_config") as mock_config,
+        patch("app.fido2.services.mds_service.httpx.AsyncClient") as mock_client_cls,
     ):
         mock_config.FIDO2_MDS_CERT_PATH = None  # skip file path, force live download
         mock_config.FIDO2_GLOBALSIGN_ROOT_CERT_URL = GLOBALSIGN_ROOT_CERT_URL
@@ -375,8 +375,8 @@ async def test_get_root_cert_raises_when_no_cert_path_and_download_fails():
     service = FIDO2MetadataService()
 
     with (
-        patch("app.fido2.mds_service._mds_config") as mock_config,
-        patch("app.fido2.mds_service.httpx.AsyncClient") as mock_client_cls,
+        patch("app.fido2.services.mds_service._mds_config") as mock_config,
+        patch("app.fido2.services.mds_service.httpx.AsyncClient") as mock_client_cls,
     ):
         mock_config.FIDO2_MDS_CERT_PATH = None
         mock_config.FIDO2_GLOBALSIGN_ROOT_CERT_URL = GLOBALSIGN_ROOT_CERT_URL

@@ -1,0 +1,36 @@
+{
+  "TopNavBar": {
+    "appName": "CanadaLogin",
+    "menu": "Menu",
+    "home": "CanadaLogin",
+    "personalInfo": "Personal information",
+    "securitySettings": "Security settings",
+    "returnTo": "Return to ",
+    "signOut": "Sign out",
+    "signingOut": "Signing you out...",
+    "signOutFailed": "Failed to sign you out. Redirecting..."
+  },
+  "SessionManagement": {
+    "sessionEndingWarning": "Your session is about to end due to inactivity ",
+    "autoSignOutNotice": "If you do not continue your session you will be signed out automatically",
+    "continueSessionPrompt": "Do you wish to continue your session?",
+    "staySignedIn": "Stay signed in",
+    "signOut": "Sign out",
+    "extending": "Extending...",
+    "signingOut": "Signing you out...",
+    "sessionExpiryTime": "Your session will expire at {{time}}.",
+    "loading": "Loading...",
+    "signOutFailed": "Failed to sign you out. Redirecting..."
+  },
+  "ServicesWithAccessInfo": {
+    "title": "What services have access to your {{information}}",
+    "description": "Only services you have connected to your CanadaLogin have access to your {{information}}.",
+    "notConnectedNotice": "If you are trying to update your {{information}} with a service that's not connected to CanadaLogin, you'll need to go to that account.",
+    "searchOtherAccounts": "To search for another GC Account, visit the",
+    "gcAccountDirectory": "GC Account directory",
+    "name": "name",
+    "contactPhone": "contact phone number",
+    "languagePreference": "language preference",
+    "emailAddress": "email address"
+  }
+}

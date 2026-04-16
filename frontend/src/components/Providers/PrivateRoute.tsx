@@ -1,10 +1,11 @@
 import { useEffect, useCallback } from "react";
-import { Outlet, useLocation, useSearchParams, useParams } from "react-router";
+import { Outlet, useLocation, useSearchParams } from "react-router";
 import { useUser } from "./useUser";
 import Loader from "../../components/Layout/Loading";
 
-import { isEmailValid, getPageContent } from "../../utils/functions";
-import { FLOW_TYPES, OIDC_REDIRECT, PAGES } from "../../utils/constants";
+import { isEmailValid } from "../../utils/functions";
+import { useTranslation } from "react-i18next";
+import { FLOW_TYPES, OIDC_REDIRECT } from "../../utils/constants";
 import { userProfileDispatch } from "../../utils/userProfileDispatch";
 import { useNavigateHelper } from "../../hooks/useNavigate";
 import type { UserState } from "../../types/user";
@@ -26,20 +27,23 @@ type SignUpGuard = RouteGuard & {
 
 function PrivateRoute() {
   const { state } = useUser();
-  const { language } = useParams();
-  const pageContentJson: Record<string, string> =
-    getPageContent(language, PAGES.otpSelection) ?? {};
+  const { t } = useTranslation("security");
 
   useEffect(() => {
     if (!state.isLoading && !state.userProfile) {
       window.location.href = OIDC_REDIRECT.login;
     }
   }, [state.isLoading, state.userProfile]);
-  if (state.isLoading)
+  if (state.isLoading) {
     return (
-      <Loader text={state.loadingText || pageContentJson["11"] || "Loading"} />
+      <Loader
+        text={state.loadingText || t("OtpSelection.loading") || "Loading"}
+      />
     );
-  if (!state.userProfile) return null;
+  }
+  if (!state.userProfile) {
+    return null;
+  }
 
   return <Outlet />;
 }
@@ -48,11 +52,9 @@ function StepupPrivateRoute({ redirectPath = "" }: StepupPrivateRouteProps) {
   const { state, dispatch } = useUser();
   const { setAuthenticatedPage } = userProfileDispatch(dispatch);
   const { pathname } = useLocation();
-  const { language } = useParams();
   const [searchParams] = useSearchParams();
   const navigateHelper = useNavigateHelper();
-  const pageContentJson: Record<string, string> =
-    getPageContent(language, PAGES.otpSelection) ?? {};
+  const { t } = useTranslation("security");
 
   const returnToPageKey = "returnToPage";
   const returnToPagePath = searchParams.get(returnToPageKey);
@@ -130,7 +132,7 @@ function StepupPrivateRoute({ redirectPath = "" }: StepupPrivateRouteProps) {
   if (!shouldShowContent) {
     // Without this, the password page will appear to the user before we redirect to IDP
     // Loading state - this can be a general loading component or spinner in the future
-    return <Loader text={pageContentJson["1"] || "Loading"} />;
+    return <Loader text={t("OtpSelection.title") || "Loading"} />;
   }
 
   // Render protected sensitive page

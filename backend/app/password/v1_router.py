@@ -81,6 +81,7 @@ async def password_complete(
         request.app.state.request_client,
         request.session,
         payload,
+        user_access_token,
     )
 
 

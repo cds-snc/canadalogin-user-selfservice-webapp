@@ -20,7 +20,6 @@ from app.users.schemas import (
 from app.config import get_configuration
 from fastapi import HTTPException
 
-
 PROFILE_API_URL = "https://fake-tenant.verify.ibm.com/v2.0/Me"
 SANITIZE_PROFILE_IMPORT_PATH = (
     "app.users.services.update_my_profile.sanitize_user_profile_data"

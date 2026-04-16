@@ -270,17 +270,13 @@ export const KeyboardNavigation = {
       // For GCDS components, we need to check if they're accessible by keyboard
       // Try to focus the first button
       let firstButton = buttons[0];
-      let secondButton = buttons[1];
 
       // If shadow DOM is available, try to get the actual button elements
       if (firstButton && firstButton.shadowRoot) {
         const shadowButton = firstButton.shadowRoot.querySelector("button");
-        if (shadowButton) firstButton = shadowButton;
-      }
-
-      if (secondButton && secondButton.shadowRoot) {
-        const shadowButton = secondButton.shadowRoot.querySelector("button");
-        if (shadowButton) secondButton = shadowButton;
+        if (shadowButton) {
+          firstButton = shadowButton;
+        }
       }
 
       // Test focusing
@@ -306,7 +302,9 @@ export const KeyboardNavigation = {
         // If shadow DOM is available, try to get the actual button element
         if (firstButton.shadowRoot) {
           const shadowButton = firstButton.shadowRoot.querySelector("button");
-          if (shadowButton) firstButton = shadowButton;
+          if (shadowButton) {
+            firstButton = shadowButton;
+          }
         }
 
         if (firstButton.focus) {
@@ -331,7 +329,9 @@ export const KeyboardNavigation = {
         // If shadow DOM is available, try to get the actual button element
         if (secondButton.shadowRoot) {
           const shadowButton = secondButton.shadowRoot.querySelector("button");
-          if (shadowButton) secondButton = shadowButton;
+          if (shadowButton) {
+            secondButton = shadowButton;
+          }
         }
 
         if (secondButton.focus) {

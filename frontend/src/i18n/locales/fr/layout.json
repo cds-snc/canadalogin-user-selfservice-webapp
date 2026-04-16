@@ -1,0 +1,35 @@
+{
+  "TopNavBar": {
+    "appName": "ConnexionCanada",
+    "menu": "Menu",
+    "home": "Identifiant ConnexionCanada",
+    "personalInfo": "Renseignements personnels",
+    "securitySettings": "Paramètres de sécurité",
+    "returnTo": "Retour à ",
+    "signOut": "Se déconnecter",
+    "signingOut": "Déconnexion en cours...",
+    "signOutFailed": "Échec de la déconnexion. Redirection..."
+  },
+  "SessionManagement": {
+    "sessionEndingWarning": "Votre session est sur le point de se terminer en raison d'une inactivité",
+    "autoSignOutNotice": "Si vous ne poursuivez pas votre session, vous serez automatiquement déconnecté",
+    "continueSessionPrompt": "Souhaitez-vous poursuivre votre session ?",
+    "staySignedIn": "Rester connecté",
+    "signOut": "Se déconnecter",
+    "extending": "Extension en cours...",
+    "signingOut": "Déconnexion en cours...",
+    "sessionExpiryTime": "Votre session expirera à {{time}}.",
+    "loading": "Chargement...",
+    "signOutFailed": "Échec de la déconnexion. Redirection..."
+  },
+  "ServicesWithAccessInfo": {
+    "title": "Services ayant accès à votre {{information}}",
+    "description": "Seuls les services que vous avez connectés à votre identifiant ConnexionCanada ont accès à votre {{information}}.",
+    "notConnectedNotice": "Si vous cherchez à mettre à jour votre {{information}} pour un service qui n'est pas lié à votre identifiant ConnexionCanada, vous devez le faire depuis le compte que vous possédez pour le service en question.",
+    "searchOtherAccounts": "Pour rechercher un autre compte du GC, consultez le",
+    "gcAccountDirectory": "répertoire des comptes du GC",
+    "name": "nom",
+    "contactPhone": "numéro de téléphone de communication",
+    "languagePreference": "langue de communication"
+  }
+}

@@ -6,12 +6,13 @@ import {
   GcdsHeading,
 } from "@gcds-core/components-react";
 import { useParams } from "react-router";
+import { useTranslation } from "react-i18next";
 import { useError } from "../../hooks/useError";
 import { useNavigateHelper } from "../../hooks/useNavigate";
 import { PAGES } from "../../utils/constants";
-import { getPageContent } from "../../utils/functions";
 import { path } from "../../utils/routeHelpers";
 import { useUser } from "../Providers/useUser";
+import { trackCardClick } from "../../utils/gatag";
 
 type GcdsNavigationEvent = CustomEvent<string> & {
   preventDefault: () => void;
@@ -19,12 +20,11 @@ type GcdsNavigationEvent = CustomEvent<string> & {
 
 export default function ManageDashboard() {
   const { language } = useParams();
+  const { t } = useTranslation("dashboard");
   const { state } = useUser();
-  const { getError, hasErrors } = useError(language ?? "en");
+  const { getError, hasErrors } = useError();
   const username = state?.userProfile?.name?.formatted || "";
   const error = getError("#dashboard");
-  const pageContent: Record<string, string> =
-    getPageContent(language, PAGES.manageDashboard) ?? {};
   const navigateHelper = useNavigateHelper();
 
   const personalInformationLink = path(PAGES.ProfileHome, {
@@ -33,6 +33,30 @@ export default function ManageDashboard() {
   const securitySettingsLink = path(PAGES.securitySettings, {
     language,
   });
+
+  const handlePersonalInfoClick = (event: GcdsNavigationEvent) => {
+    event.preventDefault();
+
+    trackCardClick({
+      card_name: "Personal Information",
+      card_type: "navigation",
+      destination: personalInformationLink,
+    });
+
+    navigateHelper(event.detail);
+  };
+
+  const handleSecuritySettingsClick = (event: GcdsNavigationEvent) => {
+    event.preventDefault();
+
+    trackCardClick({
+      card_name: "Security Settings",
+      card_type: "navigation",
+      destination: securitySettingsLink,
+    });
+
+    navigateHelper(event.detail);
+  };
 
   return (
     <GcdsContainer role="main">
@@ -44,19 +68,16 @@ export default function ManageDashboard() {
         />
       )}
       <GcdsHeading tag="h1">
-        {pageContent["1"]} {username}
+        {t("ManageDashboard.welcome")} {username}
       </GcdsHeading>
 
       <GcdsGrid columns="repeat(auto-fit, minmax(200px, 450px))">
         <GcdsCard
           className="dashboard-card"
-          cardTitle={pageContent["2"]}
+          cardTitle={t("ManageDashboard.personalInfo")}
           cardTitleTag="h3"
           href={personalInformationLink}
-          onGcdsClick={(event: GcdsNavigationEvent) => {
-            event.preventDefault();
-            navigateHelper(event.detail);
-          }}
+          onGcdsClick={handlePersonalInfoClick}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -88,13 +109,10 @@ export default function ManageDashboard() {
         </GcdsCard>
         <GcdsCard
           className="dashboard-card"
-          cardTitle={pageContent["3"]}
+          cardTitle={t("ManageDashboard.securitySettings")}
           cardTitleTag="h3"
           href={securitySettingsLink}
-          onGcdsClick={(event: GcdsNavigationEvent) => {
-            event.preventDefault();
-            navigateHelper(event.detail);
-          }}
+          onGcdsClick={handleSecuritySettingsClick}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
