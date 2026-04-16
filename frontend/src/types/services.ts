@@ -70,6 +70,7 @@ export type RelyingPartyData = {
   id: string;
   linkName: string;
   url: string;
+  localized?: Record<string, { name: string; url: string }> | null;
   [key: string]: unknown;
 };
 
