@@ -8,21 +8,35 @@ import type {
   CardClickParams,
 } from "../types/utils";
 
-const GA_PAGE_TITLE_SUFFIXES: Record<string, string> = {
+const CommonPages = {
   ManageDashboard: "Dashboard",
   ProfileHome: "ProfileHome",
+  SecuritySettings: "SecuritySettings",
+  Manage2FAVerifications: "Manage2FAVerifications",
+};
+
+const ProfileNameSteps = {
   EditProfileNamePage: "Name Change - Step 1: Edit your name",
   ProfileUpdateNameConfirmUpdate: "Name Change - Step 2: Confirm name change",
   ProfileUpdateNameSuccess: "Name Change - Step 3: Name updated",
+};
+
+const LanguageChangeSteps = {
   EditLanguagePreferences: "Language Change - Step 1: Choose language",
   ConfirmLanguageUpdate: "Language Change - Step 2: Confirm language",
   SuccessfullyUpdatedLanguage: "Language Change - Step 3: Language updated",
+};
+
+const PhoneChangeSteps = {
   EditContactPhoneNumberPage:
     "Phone Number Change - Step 1: Enter new phone number",
   PhoneChangeVerifyOtp: "Phone Number Change - Step 2: Verify phone number",
   PhoneChangeConfirmUpdate:
     "Phone Number Change - Step 3: Confirm number change",
   PhoneChangeSuccess: "Phone Number Change - Step 4: Number updated",
+};
+
+const EmailChangeSteps = {
   EditEmailPage: "Email Change - Step 1: Verify it's you",
   EmailChangeOtpSelection: "Email Change - Step 2: Choose verification method",
   EmailChangeOtpValidation: "Email Change - Step 3: Enter verification code",
@@ -30,6 +44,10 @@ const GA_PAGE_TITLE_SUFFIXES: Record<string, string> = {
   EmailChangeVerifyNewEmail: "Email Change - Step 5: Verify new email",
   EmailChangeConfirmUpdate: "Email Change - Step 6: Confirm email change",
   EmailChangeSuccess: "Email Change - Step 7: Email updated",
+};
+
+const PasswordChangeSteps = {
+  Password: "Password Change - Step 1: Verify it's you",
   PasswordChangeVerifyIdentity: "Password Change - Step 1: Verify it's you",
   PasswordChangeOtpSelection:
     "Password Change - Step 2: Choose verification method",
@@ -38,6 +56,10 @@ const GA_PAGE_TITLE_SUFFIXES: Record<string, string> = {
   PasswordChangeEnterNewPassword:
     "Password Change - Step 4: Enter new password",
   PasswordChangeSuccess: "Password Change - Step 5: Password changed",
+};
+
+const AddPhoneNumberSteps = {
+  AddMFAPage: "Add Phone Number - Step 1: Verify it's you",
   AddPhoneNumberVerifyIdentity: "Add Phone Number - Step 1: Verify it's you",
   AddPhoneNumberOtpSelection:
     "Add Phone Number - Step 2: Choose verification method",
@@ -46,6 +68,10 @@ const GA_PAGE_TITLE_SUFFIXES: Record<string, string> = {
   AddPhoneNumberEnterNumber: "Add Phone Number - Step 4: Enter phone number",
   AddPhoneNumberVerifyNumber: "Add Phone Number - Step 5: Verify phone number",
   AddPhoneNumberSecondMethod: "Add Phone Number - Step 6: Set up backup method",
+};
+
+const DeletePhoneNumberSteps = {
+  DeleteMFAPage: "Delete Phone Number - Step 1: Verify it's you",
   DeletePhoneNumberVerifyIdentity:
     "Delete Phone Number - Step 1: Verify it's you",
   DeletePhoneNumberOtpSelection:
@@ -54,13 +80,23 @@ const GA_PAGE_TITLE_SUFFIXES: Record<string, string> = {
     "Delete Phone Number - Step 3: Enter verification code",
   DeletePhoneNumberConfirm:
     "Delete Phone Number - Step 4: Confirm number removal",
-  SecuritySettings: "SecuritySettings",
-  Password: "Password Change - Step 1: Verify it's you",
-  Manage2FAVerifications: "Manage2FAVerifications",
-  AddMFAPage: "Add Phone Number - Step 1: Verify it's you",
-  DeleteMFAPage: "Delete Phone Number - Step 1: Verify it's you",
+};
+
+const Fido2Steps = {
   AddFIDO2PasskeyPage: "AddPasskey",
   DeleteFIDO2PasskeyPage: "DeletePasskey",
+};
+
+const GA_PAGE_TITLE_SUFFIXES: Record<string, string> = {
+  ...CommonPages,
+  ...ProfileNameSteps,
+  ...LanguageChangeSteps,
+  ...PhoneChangeSteps,
+  ...EmailChangeSteps,
+  ...PasswordChangeSteps,
+  ...AddPhoneNumberSteps,
+  ...DeletePhoneNumberSteps,
+  ...Fido2Steps,
 };
 
 function toTitleCase(value?: string) {
