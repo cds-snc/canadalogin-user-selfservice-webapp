@@ -63,7 +63,11 @@ const GA_PAGE_TITLE_SUFFIXES: Record<string, string> = {
   DeleteFIDO2PasskeyPage: "DeletePasskey",
 };
 
-function toTitleCase(value: string) {
+function toTitleCase(value?: string) {
+  if (!value) {
+    return "";
+  }
+
   return value
     .replace(/([a-z])([A-Z])/g, "$1 $2")
     .replace(/[^a-zA-Z0-9]+/g, " ")
@@ -74,8 +78,9 @@ function toTitleCase(value: string) {
     .join(" ");
 }
 
-export function getAnalyticsPageTitle(path: string, pageId?: string) {
-  const pathSuffix = path.split("/").filter(Boolean).slice(1).join(" ");
+export function getAnalyticsPageTitle(path?: string, pageId?: string) {
+  const safePath = typeof path === "string" && path.trim() ? path : "/";
+  const pathSuffix = safePath.split("/").filter(Boolean).slice(1).join(" ");
 
   const mappedTitle = pageId ? GA_PAGE_TITLE_SUFFIXES[pageId] : undefined;
   if (mappedTitle) {
@@ -87,14 +92,15 @@ export function getAnalyticsPageTitle(path: string, pageId?: string) {
   return toTitleCase(suffixSource);
 }
 
-export function trackPage(path: string, pageId?: string) {
-  const title = getAnalyticsPageTitle(path, pageId);
+export function trackPage(path?: string, pageId?: string) {
+  const safePath = typeof path === "string" && path.trim() ? path : "/";
+  const title = getAnalyticsPageTitle(safePath, pageId);
 
   if (typeof document !== "undefined") {
     document.title = title;
   }
 
-  ReactGA.send({ hitType: GA_CATEGORIES.pageView, page: path, title });
+  ReactGA.send({ hitType: GA_CATEGORIES.pageView, page: safePath, title });
 }
 
 export function trackEvent({ category, action, label }: AnalyticsPayload) {
