@@ -20,6 +20,7 @@ import { usePasswordValidation } from "../../../../hooks/usePasswordValidation";
 import { useOtpOperations } from "../../../../hooks/useOtpOperations";
 import { OtpFactor } from "../../../../types/hooks";
 import { useFormTracking } from "../../../../hooks/useFormTracking";
+import { useWizardPageTracking } from "../../../../hooks/useWizardPageTracking";
 import { GA_FORM_EVENTS } from "../../../../utils/analyticsConstants";
 import { DELETE_MFA_ANALYTICS } from "../../../../utils/analyticsConstants";
 
@@ -35,6 +36,13 @@ type WizardStep =
   | "otpSelection"
   | "otpValidation"
   | "deleteMFAPhoneNumberConfirm";
+
+const DELETE_MFA_PAGE_BY_STEP: Record<WizardStep, string> = {
+  passwordVerification: "DeletePhoneNumberVerifyIdentity",
+  otpSelection: "DeletePhoneNumberOtpSelection",
+  otpValidation: "DeletePhoneNumberOtpValidation",
+  deleteMFAPhoneNumberConfirm: "DeletePhoneNumberConfirm",
+};
 
 export default function DeleteMFAPage() {
   const { language } = useParams();
@@ -67,6 +75,8 @@ export default function DeleteMFAPage() {
   const { trackEvent } = useFormTracking({
     formId: DELETE_MFA_ANALYTICS.FLOW_ID,
   });
+
+  useWizardPageTracking(wizardStep, DELETE_MFA_PAGE_BY_STEP);
 
   // Use the password validation hook
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(

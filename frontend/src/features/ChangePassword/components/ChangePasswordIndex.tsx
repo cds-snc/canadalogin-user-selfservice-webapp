@@ -22,6 +22,7 @@ import StepContent from "../../../components/Wizard/StepContent";
 import { usePasswordValidation } from "../../../hooks/usePasswordValidation";
 import { useOtpOperations } from "../../../hooks/useOtpOperations";
 import { useFormTracking } from "../../../hooks/useFormTracking";
+import { useWizardPageTracking } from "../../../hooks/useWizardPageTracking";
 import { GA_FORM_EVENTS } from "../../../utils/analyticsConstants";
 import { CHANGE_PASSWORD_ANALYTICS } from "../../../utils/analyticsConstants";
 import type { AuthServiceError } from "../../../types/services";
@@ -35,6 +36,14 @@ type PasswordUpdateStep =
   | "otpValidation"
   | "passwordChange"
   | "passwordChangedConfirmation";
+
+const PASSWORD_CHANGE_PAGE_BY_STEP: Record<PasswordUpdateStep, string> = {
+  passwordVerification: "PasswordChangeVerifyIdentity",
+  otpSelection: "PasswordChangeOtpSelection",
+  otpValidation: "PasswordChangeOtpValidation",
+  passwordChange: "PasswordChangeEnterNewPassword",
+  passwordChangedConfirmation: "PasswordChangeSuccess",
+};
 
 function getApiErrorMessage(error: unknown): string | undefined {
   if (!error || typeof error !== "object") {
@@ -65,6 +74,8 @@ export default function ChangePasswordIndex() {
   const { trackEvent } = useFormTracking({
     formId: CHANGE_PASSWORD_ANALYTICS.FLOW_ID,
   });
+
+  useWizardPageTracking(passwordUpdateStep, PASSWORD_CHANGE_PAGE_BY_STEP);
 
   const { userProfile } = state;
   const { id, userName } = userProfile ?? {};

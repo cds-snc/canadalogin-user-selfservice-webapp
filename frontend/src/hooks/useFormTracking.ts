@@ -19,18 +19,26 @@ export function useFormTracking({ formId }: UseFormTrackingOptions) {
         params.event === GA_FORM_EVENTS.FORM_STEP_END ||
         params.event === GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE;
 
-      if (
-        shouldEndActiveStep &&
-        activeStepRef.current &&
-        stepStartTimeRef.current !== null
-      ) {
-        trackAnalyticsEvent({
-          event: GA_FORM_EVENTS.FORM_STEP_DURATION,
-          form_id: formId,
-          step: activeStepRef.current,
-          type: params.type,
-          duration_ms: now - stepStartTimeRef.current,
-        });
+      if (shouldEndActiveStep && activeStepRef.current) {
+        if (params.event !== GA_FORM_EVENTS.FORM_STEP_END) {
+          trackAnalyticsEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_END,
+            form_id: formId,
+            step: activeStepRef.current,
+            type: params.type,
+            error: params.error,
+          });
+        }
+
+        if (stepStartTimeRef.current !== null) {
+          trackAnalyticsEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_DURATION,
+            form_id: formId,
+            step: activeStepRef.current,
+            type: params.type,
+            duration_ms: now - stepStartTimeRef.current,
+          });
+        }
       }
 
       trackAnalyticsEvent({ ...params, form_id: formId });

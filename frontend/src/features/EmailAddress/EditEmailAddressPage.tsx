@@ -19,6 +19,7 @@ import { useUser } from "../../components/Providers/useUser";
 import { authService } from "../../services/authService";
 import { userProfileDispatch } from "../../utils/userProfileDispatch";
 import { useFormTracking } from "../../hooks/useFormTracking";
+import { useWizardPageTracking } from "../../hooks/useWizardPageTracking";
 import { GA_FORM_EVENTS } from "../../utils/analyticsConstants";
 import { EMAIL_ADDRESS_ANALYTICS } from "../../utils/analyticsConstants";
 import EditEmailEnterEmail from "./EditEmailEnterEmail";
@@ -26,6 +27,16 @@ import EmailOtpValidation from "./EmailOtpValidation";
 import EmailUpdateSuccess from "./EmailUpdateSuccess";
 import EmailConfirmUpdate from "./EmailConfirmUpdate";
 import type { UserProfile } from "../../types/user";
+
+const EMAIL_PAGE_BY_STEP: Record<string, string> = {
+  passwordVerification: "EditEmailPage",
+  otpSelection: "EmailChangeOtpSelection",
+  otpValidation: "EmailChangeOtpValidation",
+  enterEmail: "EmailChangeEnterEmail",
+  emailOtpValidation: "EmailChangeVerifyNewEmail",
+  emailConfirmUpdate: "EmailChangeConfirmUpdate",
+  emailUpdateSuccess: "EmailChangeSuccess",
+};
 
 type EmailFormData = {
   emailAddress: string;
@@ -57,6 +68,8 @@ export default function EditEmailAddressPage() {
   const { trackEvent } = useFormTracking({
     formId: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
   });
+
+  useWizardPageTracking(wizardStep, EMAIL_PAGE_BY_STEP);
 
   // Use the password validation hook
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(
@@ -424,10 +437,6 @@ export default function EditEmailAddressPage() {
         userOtpValue={userOtpValue}
         handleChange={handleSetUserOtpValue}
         requestOtpCode={async () => {
-          trackEvent({
-            event: GA_FORM_EVENTS.FORM_STEP_START,
-            step: EMAIL_ADDRESS_ANALYTICS.STEPS.EMAIL_OTP_VALIDATION,
-          });
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: EMAIL_ADDRESS_ANALYTICS.STEPS.EMAIL_OTP_VALIDATION,

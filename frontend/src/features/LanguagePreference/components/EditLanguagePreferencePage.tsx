@@ -10,6 +10,7 @@ import { path } from "../../../utils/routeHelpers";
 import { authService } from "../../../services/authService";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch";
 import { useFormTracking } from "../../../hooks/useFormTracking";
+import { useWizardPageTracking } from "../../../hooks/useWizardPageTracking";
 import { GA_FORM_EVENTS } from "../../../utils/analyticsConstants";
 import { LANGUAGE_PREFERENCE_ANALYTICS } from "../../../utils/analyticsConstants";
 import StepContent from "../../../components/Wizard/StepContent";
@@ -36,6 +37,12 @@ function getApiErrorMessage(error: unknown): string | undefined {
   return authError.data?.message ?? authError.response?.data?.message;
 }
 
+const LANGUAGE_PAGE_BY_STEP: Record<LanguagePreferenceWizardStep, string> = {
+  editLanguage: PAGES.editLanguagePreferences,
+  confirmUpdate: PAGES.confirmLanguageUpdate,
+  success: PAGES.successfullyUpdatedLanguage,
+};
+
 export default function EditLanguagePreferencePage() {
   const { language = "en" } = useParams<{ language: string }>();
   const routeLanguage: LanguagePreferenceFormData["languageCode"] =
@@ -60,6 +67,8 @@ export default function EditLanguagePreferencePage() {
   const { trackEvent } = useFormTracking({
     formId: LANGUAGE_PREFERENCE_ANALYTICS.FLOW_ID,
   });
+
+  useWizardPageTracking(wizardStep, LANGUAGE_PAGE_BY_STEP);
 
   const { t } = useTranslation(["security", "common"]);
 
