@@ -216,11 +216,17 @@ class ProfileResponse(ResponseModel):
     data: Optional[IBMVerifyUserProfileSchema]
 
 
+class LocalizedRelyingPartyDetail(BaseModel):
+    name: str
+    url: str
+
+
 class RelyingPartyInfo(BaseModel):
     icon: str
     id: str
     linkName: str
     url: str
+    localized: Optional[dict[str, LocalizedRelyingPartyDetail]] = None
 
 
 # https://docs.verify.ibm.com/verify/reference/searchuserapplication

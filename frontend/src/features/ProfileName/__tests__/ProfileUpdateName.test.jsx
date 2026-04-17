@@ -114,7 +114,6 @@ vi.mock("../../../../utils/functions", () => ({
     2: "You’ve requested to update your name to:",
     3: "Example Newname",
     4: "This will update your name with the following services:",
-    5: "GEO.ca",
     6: "Heads up",
     7: "This",
     8: "Yes, update",

@@ -21,13 +21,16 @@ type BreadcrumbLink = {
 
 export default function Breadcrumbs() {
   const matches = useMatches() as Array<UIMatch<unknown, BreadcrumbHandle>>;
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { state } = useUser();
 
-  const rp: BreadcrumbLink | null = state.relyingPartyInfo
+  const rpInfo = state.relyingPartyInfo;
+  const localizedDetail = rpInfo?.localized?.[i18n.language];
+
+  const rp: BreadcrumbLink | null = rpInfo
     ? {
-        name: state.relyingPartyInfo.linkName,
-        url: state.relyingPartyInfo.url,
+        name: localizedDetail?.name ?? rpInfo.linkName,
+        url: localizedDetail?.url ?? rpInfo.url,
       }
     : null;
 

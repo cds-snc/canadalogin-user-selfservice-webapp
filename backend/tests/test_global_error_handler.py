@@ -3294,10 +3294,23 @@ class TestErrorHandlingRpInfo:
                 SimpleNamespace(
                     id="app-001",
                     name="Non Matching App",
-                    description="does-not-match-any-client-id",
+                    description='{"no-match-id": {"en": {"name": "Non Matching EN", "url": "http://localhost/en"}, "fr": {"name": "Non Matching FR", "url": "http://localhost/fr"}}}',
                     status=["ENABLED"],
                     category=["General"],
-                    links=[],
+                    links=[
+                        SimpleNamespace(
+                            icon="icon-url",
+                            id="link-001",
+                            linkName="Non Matching App",
+                            url="http://localhost:8080",
+                            model_dump=lambda: {
+                                "icon": "icon-url",
+                                "id": "link-001",
+                                "linkName": "Non Matching App",
+                                "url": "http://localhost:8080",
+                            },
+                        )
+                    ],
                 )
             ]
         )
@@ -3321,7 +3334,7 @@ class TestErrorHandlingRpInfo:
                 SimpleNamespace(
                     id="app-002",
                     name="Matching App",
-                    description="client-123",
+                    description='{"123456": {"en": {"name": "Matching EN", "url": "http://localhost/en"}, "fr": {"name": "Matching FR", "url": "http://localhost/fr"}}}',
                     status=["ENABLED"],
                     category=["General"],
                     links=[],

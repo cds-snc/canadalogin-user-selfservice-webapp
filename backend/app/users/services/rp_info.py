@@ -1,9 +1,11 @@
+import json
 import logging
 from typing import Optional
 from fastapi import HTTPException, Request, status
 
 from app.users.schemas import (
     IBMVerifyRelyingPartyUserApplicationsSchema,
+    LocalizedRelyingPartyDetail,
     RelyingPartyResponse,
     RelyingPartyInfo,
 )
@@ -13,15 +15,61 @@ from app.constants.session_keys import SessionKeys
 logger = logging.getLogger(__name__)
 
 
+def _parse_localized_description(
+    description: Optional[str], client_id: str
+) -> tuple[bool, Optional[dict[str, LocalizedRelyingPartyDetail]]]:
+    """Parse the description field which may contain localized RP info as JSON.
+
+    Supports two formats:
+      1. JSON with client_id as key: {"<client_id>": {"en": {...}, "fr": {...}}}
+      2. Legacy plain text where description == client_id
+
+    Returns a tuple of (matched, localized_dict).
+    """
+    if not description:
+        return False, None
+
+    # Legacy format: plain client_id string
+    if description.strip() == client_id:
+        return True, None
+
+    try:
+        parsed = json.loads(description)
+    except (json.JSONDecodeError, TypeError):
+        # May be missing outer braces, e.g. '"client_id": {...}' instead of '{"client_id": {...}}'
+        try:
+            parsed = json.loads("{" + description + "}")
+        except (json.JSONDecodeError, TypeError):
+            return False, None
+
+    if not isinstance(parsed, dict):
+        return False, None
+    if client_id not in parsed:
+        return False, None
+    lang_data = parsed[client_id]
+    if not isinstance(lang_data, dict):
+        return False, None
+    localized = {}
+    for lang, details in lang_data.items():
+        if isinstance(details, dict) and "name" in details and "url" in details:
+            localized[lang] = LocalizedRelyingPartyDetail(**details)
+    return True, localized if localized else None
+
+
 def get_rp_info_from_applications(
     oidc_user_applications_response: IBMVerifyRelyingPartyUserApplicationsSchema,
     client_id: str,
 ) -> Optional[RelyingPartyInfo]:
     applications_list = oidc_user_applications_response.applications
     for app in applications_list:
-        if app.description == client_id:
-            if hasattr(app, "links") and app.links and len(app.links) > 0:
-                return RelyingPartyInfo(**app.links[0].model_dump())
+        if not app.links or len(app.links) == 0:
+            continue
+        link = app.links[0]
+        matched, localized = _parse_localized_description(app.description, client_id)
+        if matched:
+            link_data = link.model_dump()
+            link_data["localized"] = localized
+            return RelyingPartyInfo(**link_data)
     return None
 
 

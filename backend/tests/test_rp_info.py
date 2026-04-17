@@ -1,5 +1,6 @@
 # backend/tests/test_rp_info.py
 
+import json
 import types
 import httpx
 
@@ -48,10 +49,30 @@ def apps_payload_no_match():
             {
                 "id": "app-001",
                 "name": "Non Matching App",
-                "description": "does-not-match-any-client-id",
+                "description": json.dumps(
+                    {
+                        "does-not-match-any-client-id": {
+                            "en": {
+                                "name": "Non Matching App EN",
+                                "url": "http://localhost:8080/en",
+                            },
+                            "fr": {
+                                "name": "Non Matching App FR",
+                                "url": "http://localhost:8080/fr",
+                            },
+                        }
+                    }
+                ),
                 "status": ["ENABLED"],
                 "category": ["General"],
-                "links": [],
+                "links": [
+                    {
+                        "icon": "icon-url",
+                        "id": "link-001",
+                        "linkName": "Non Matching App",
+                        "url": "http://localhost:8080",
+                    }
+                ],
             }
         ]
     }
@@ -63,7 +84,20 @@ def apps_payload_match_but_no_links(client_id: str):
             {
                 "id": "app-002",
                 "name": "Matching App",
-                "description": client_id,
+                "description": json.dumps(
+                    {
+                        client_id: {
+                            "en": {
+                                "name": "Matching App EN",
+                                "url": "http://localhost:8080/en",
+                            },
+                            "fr": {
+                                "name": "Matching App FR",
+                                "url": "http://localhost:8080/fr",
+                            },
+                        }
+                    }
+                ),
                 "status": ["ENABLED"],
                 "category": ["General"],
                 "links": [],

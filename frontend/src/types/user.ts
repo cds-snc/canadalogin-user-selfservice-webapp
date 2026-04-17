@@ -29,11 +29,17 @@ export interface UserProfile {
   } | null;
 }
 
+export interface LocalizedRelyingPartyDetail {
+  name: string;
+  url: string;
+}
+
 export interface RelyingPartyInfo {
   icon: string;
   id: string;
   linkName: string;
   url: string;
+  localized?: Record<string, LocalizedRelyingPartyDetail> | null;
 }
 
 export interface UserData {
