@@ -994,3 +994,67 @@ def test_user_profile_name_auto_capitalizes():
     name = UserProfileName(familyName="O'Neill", givenName="Mary-Jane")
     assert name.familyName == "O'Neill"
     assert name.givenName == "Mary-Jane"
+
+
+def test_user_profile_name_rejects_given_name_over_80_chars():
+    """Test that UserProfileName rejects givenName exceeding 80 characters"""
+    from pydantic import ValidationError
+
+    long_name = "A" * 81
+
+    with pytest.raises(ValidationError) as exc:
+        UserProfileName(givenName=long_name, familyName="Doe")
+
+    assert "First name cannot be more than 80 characters" in str(exc.value)
+
+
+def test_user_profile_name_rejects_family_name_over_80_chars():
+    """Test that UserProfileName rejects familyName exceeding 80 characters"""
+    from pydantic import ValidationError
+
+    long_name = "B" * 81
+
+    with pytest.raises(ValidationError) as exc:
+        UserProfileName(givenName="John", familyName=long_name)
+
+    assert "Last name cannot be more than 80 characters" in str(exc.value)
+
+
+def test_user_profile_name_allows_names_at_exactly_80_chars():
+    """Test that UserProfileName accepts names of exactly 80 characters"""
+    name_80 = "A" * 80
+
+    # Should not raise
+    name = UserProfileName(givenName=name_80, familyName=name_80)
+    assert len(name.givenName) == 80
+    assert len(name.familyName) == 80
+
+
+def test_user_profile_update_request_rejects_empty_family_name():
+    """Test that UserProfileUpdateRequest rejects an empty familyName string.
+
+    An empty familyName is caught at the UserProfileName field validator level
+    (invalid characters check), so the overall request is rejected with a
+    ValidationError regardless of which layer raises it.
+    """
+    from pydantic import ValidationError
+
+    with pytest.raises(ValidationError):
+        UserProfileUpdateRequest(
+            name=UserProfileName(givenName="John", familyName=""),
+        )
+
+
+def test_user_profile_update_request_allows_none_family_name():
+    """Test that UserProfileUpdateRequest still allows familyName=None (field not provided)"""
+    # None means the field is absent from the update request — this is valid
+    request = UserProfileUpdateRequest(
+        name=UserProfileName(givenName="John", familyName=None),
+    )
+    assert request.name.familyName is None
+
+
+def test_user_profile_update_request_allows_none_name():
+    """Test that UserProfileUpdateRequest allows name=None (no name update requested)"""
+    request = UserProfileUpdateRequest(preferredLanguage="en")
+    assert request.name is None

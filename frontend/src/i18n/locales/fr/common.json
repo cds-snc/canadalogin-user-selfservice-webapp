@@ -15,6 +15,8 @@
     "invalidPhoneSuffix": " chiffres. Assurez-vous d'avoir sélectionné le bon pays ou essayez d'entrer à nouveau votre numéro de téléphone. Les extensions ne sont pas permises.",
     "phoneRequired": "Veuillez entrer un numéro de téléphone pour continuer.",
     "lastNameRequired": "Veuillez entrer un nom de famille pour continuer. Si vous n'avez qu'un seul nom, entrez-le dans le champ destiné au nom de famille.",
+    "firstNameMaxLength": "Votre prénom ne peut pas comporter plus de 80 caractères. Veuillez réessayer.",
+    "lastNameMaxLength": "Votre nom de famille ne peut pas comporter plus de 80 caractères. Veuillez réessayer.",
     "maxLength": "and a maximum of",
     "characters": "caractères.",
     "example_password_used": "Invalid password. Password cannot be the example password. Try again.",
