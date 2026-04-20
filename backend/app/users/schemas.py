@@ -12,7 +12,6 @@ from pydantic import (
     Field,
     ValidationInfo,
     field_validator,
-    model_validator,
 )
 
 SCIM_CORE_USER = "urn:ietf:params:scim:schemas:core:2.0:User"
@@ -135,15 +134,10 @@ class UserProfileName(BaseModel):
         v = re.sub(r" +", " ", v)
 
         # givenName is not required; allow empty string without validation
-        if v == "" and info.field_name == "givenName":
+        # familyName empty string is also passed through — the service layer
+        # validates it and raises an HTTPException with an error code
+        if v == "" and info.field_name in ("givenName", "familyName"):
             return v
-
-        # Enforce maximum length of 80 characters
-        if len(v) > 80:
-            field_label = (
-                "First name" if info.field_name == "givenName" else "Last name"
-            )
-            raise ValueError(f"{field_label} cannot be more than 80 characters.")
 
         # Pattern matches valid name characters: letters (including international), spaces, hyphens, apostrophes
         valid_pattern = (
@@ -202,17 +196,6 @@ class UserProfileUpdateRequest(BaseModel):
     emails: Optional[List[EmailItem]] = None
     phoneNumbers: Optional[List[MetaDataTypeValue]] = None
     model_config = ConfigDict(validate_by_name=True, validate_by_alias=True)
-
-    @model_validator(mode="after")
-    def validate_family_name_required(self) -> "UserProfileUpdateRequest":
-        """When a name update is provided, familyName must not be empty."""
-        if self.name is not None:
-            family = self.name.familyName
-            if family is not None and family.strip() == "":
-                raise ValueError(
-                    "Enter a last name to continue. If you have a single name, enter it in the last name field."
-                )
-        return self
 
 
 class IBMVerifyUpdateUserProfile(IBMVerifyUserProfileSchema):
