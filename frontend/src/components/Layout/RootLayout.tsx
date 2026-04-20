@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Outlet, useLocation } from "react-router";
+import { Outlet, useLocation, useMatches } from "react-router";
 import { useLanguage } from "../Providers/LanguageProvider";
 import { getLangValues } from "../../utils/functions";
 import { trackPage } from "../../utils/gatag";
@@ -25,16 +25,21 @@ const DisplayReleaseTag = () => {
 
 export default function RootLayout() {
   const { pathname } = useLocation();
+  const matches = useMatches();
   const { state: languageState } = useLanguage();
   const { language } = languageState;
   const { langHref, currentLang } = getLangValues(
     language ?? undefined,
     pathname,
   );
+  const pageId = [...matches]
+    .reverse()
+    .map((match) => (match.handle as { id?: string } | undefined)?.id)
+    .find(Boolean);
 
   useEffect(() => {
-    trackPage(pathname);
-  }, [pathname]);
+    trackPage(pathname, pageId);
+  }, [pathname, pageId]);
 
   return (
     <div className="mainBody">

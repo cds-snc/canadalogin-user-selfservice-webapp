@@ -13,6 +13,7 @@ import { path } from "../../../utils/routeHelpers";
 import { authService } from "../../../services/authService";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch";
 import { useFormTracking } from "../../../hooks/useFormTracking";
+import { useWizardPageTracking } from "../../../hooks/useWizardPageTracking";
 import { GA_FORM_EVENTS } from "../../../utils/analyticsConstants";
 import { CONTACT_PHONE_ANALYTICS } from "../../../utils/analyticsConstants";
 import StepContent from "../../../components/Wizard/StepContent";
@@ -57,6 +58,13 @@ function getApiErrorMessage(error: unknown): string | undefined {
   return authError.data?.message ?? authError.response?.data?.message;
 }
 
+const CONTACT_PHONE_PAGE_BY_STEP: Record<ContactPhoneWizardStep, string> = {
+  enterPhone: "EditContactPhoneNumberPage",
+  verifyOtp: "PhoneChangeVerifyOtp",
+  confirmUpdate: "PhoneChangeConfirmUpdate",
+  success: "PhoneChangeSuccess",
+};
+
 export default function EditContactPhoneNumberPage() {
   const { language = "en" } = useParams<{ language: string }>();
   const { state, dispatch } = useUser();
@@ -73,6 +81,8 @@ export default function EditContactPhoneNumberPage() {
   const { trackEvent } = useFormTracking({
     formId: CONTACT_PHONE_ANALYTICS.FLOW_ID,
   });
+
+  useWizardPageTracking(wizardStep, CONTACT_PHONE_PAGE_BY_STEP);
 
   const { t } = useTranslation(["security", "common"]);
 

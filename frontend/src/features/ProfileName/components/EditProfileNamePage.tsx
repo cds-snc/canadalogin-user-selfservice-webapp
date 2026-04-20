@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { useNavigate, useParams } from "react-router";
 
@@ -9,6 +9,7 @@ import { path } from "../../../utils/routeHelpers";
 import { authService } from "../../../services/authService";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch";
 import { useFormTracking } from "../../../hooks/useFormTracking";
+import { useWizardPageTracking } from "../../../hooks/useWizardPageTracking";
 import { GA_FORM_EVENTS } from "../../../utils/analyticsConstants";
 import { PROFILE_NAME_ANALYTICS } from "../../../utils/analyticsConstants";
 import StepContent from "../../../components/Wizard/StepContent";
@@ -49,6 +50,12 @@ function getApiErrorMessage(error: unknown): string | undefined {
   return authError.data?.message ?? authError.response?.data?.message;
 }
 
+const PROFILE_NAME_PAGE_BY_STEP: Record<ProfileNameWizardStep, string> = {
+  editName: PAGES.editProfileNamePage,
+  confirmUpdate: PAGES.profileUpdateNameConfirmUpdate,
+  success: PAGES.profileUpdateNameSuccess,
+};
+
 export default function EditProfileNamePage() {
   const { language = "en" } = useParams<{ language: string }>();
   const routeLanguage = language === "fr" ? "fr" : "en";
@@ -72,6 +79,17 @@ export default function EditProfileNamePage() {
 
   const { updateProfileSuccess } = userProfileDispatch(dispatch);
   const backToProfile = path(PAGES.ProfileHome, { language: routeLanguage });
+
+  useEffect(() => {
+    if (wizardStep === "editName") {
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_START,
+        step: PROFILE_NAME_ANALYTICS.STEPS.EDIT_NAME,
+      });
+    }
+  }, [wizardStep, trackEvent]);
+
+  useWizardPageTracking(wizardStep, PROFILE_NAME_PAGE_BY_STEP);
 
   const handleNameFormChange = <TField extends keyof ProfileNameFormData>(
     field: TField,
@@ -180,6 +198,10 @@ export default function EditProfileNamePage() {
         }}
         onCancel={handleBackToProfile}
         onBack={() => {
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+            step: PROFILE_NAME_ANALYTICS.STEPS.EDIT_NAME,
+          });
           setWizardStep("editName");
         }}
         errorMessage={errorMessage}

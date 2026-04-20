@@ -18,7 +18,6 @@ if (config.gatag) {
       debug_mode: config.environment === VITE_ENVIRONMENTS.dev,
     },
   });
-  ReactGA.send({ hitType: "pageview", page: window.location.pathname });
 }
 
 try {

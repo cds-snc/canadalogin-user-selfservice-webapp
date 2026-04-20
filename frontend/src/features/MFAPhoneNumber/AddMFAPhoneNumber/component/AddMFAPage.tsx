@@ -23,6 +23,7 @@ import {
   useOtpOperations,
 } from "../../../../hooks/useOtpOperations";
 import { useFormTracking } from "../../../../hooks/useFormTracking";
+import { useWizardPageTracking } from "../../../../hooks/useWizardPageTracking";
 import { GA_FORM_EVENTS } from "../../../../utils/analyticsConstants";
 import { ADD_MFA_ANALYTICS } from "../../../../utils/analyticsConstants";
 
@@ -43,6 +44,15 @@ type WizardStep =
   | "addMFAValidation"
   | "addSecondMFA";
 
+const ADD_MFA_PAGE_BY_STEP: Record<WizardStep, string> = {
+  passwordVerification: "AddPhoneNumberVerifyIdentity",
+  otpSelection: "AddPhoneNumberOtpSelection",
+  otpValidation: "AddPhoneNumberOtpValidation",
+  addMFANumber: "AddPhoneNumberEnterNumber",
+  addMFAValidation: "AddPhoneNumberVerifyNumber",
+  addSecondMFA: "AddPhoneNumberSecondMethod",
+};
+
 export default function AddMFAPage() {
   const { language } = useParams();
   const { state } = useUser();
@@ -60,6 +70,8 @@ export default function AddMFAPage() {
   const { trackEvent } = useFormTracking({
     formId: ADD_MFA_ANALYTICS.FLOW_ID,
   });
+
+  useWizardPageTracking(wizardStep, ADD_MFA_PAGE_BY_STEP);
 
   const { userProfile } = state;
   const [phoneFormData, setPhoneFormData] = useState<PhoneFormData>({
