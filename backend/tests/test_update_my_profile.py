@@ -994,3 +994,84 @@ def test_user_profile_name_auto_capitalizes():
     name = UserProfileName(familyName="O'Neill", givenName="Mary-Jane")
     assert name.familyName == "O'Neill"
     assert name.givenName == "Mary-Jane"
+
+
+def test_user_profile_name_rejects_given_name_over_80_chars():
+    """Test that validate_name_update rejects givenName exceeding 80 characters"""
+    from app.users.services.update_my_profile import validate_name_update
+
+    request = UserProfileUpdateRequest(
+        name=UserProfileName(givenName="A" * 81, familyName="Doe"),
+    )
+
+    with pytest.raises(HTTPException) as exc:
+        validate_name_update(request)
+
+    assert exc.value.status_code == 400
+    assert exc.value.detail == "firstNameMaxLength"
+
+
+def test_user_profile_name_rejects_family_name_over_80_chars():
+    """Test that validate_name_update rejects familyName exceeding 80 characters"""
+    from app.users.services.update_my_profile import validate_name_update
+
+    request = UserProfileUpdateRequest(
+        name=UserProfileName(givenName="John", familyName="B" * 81),
+    )
+
+    with pytest.raises(HTTPException) as exc:
+        validate_name_update(request)
+
+    assert exc.value.status_code == 400
+    assert exc.value.detail == "lastNameMaxLength"
+
+
+def test_user_profile_name_allows_names_at_exactly_80_chars():
+    """Test that validate_name_update accepts names of exactly 80 characters"""
+    from app.users.services.update_my_profile import validate_name_update
+
+    name_80 = "A" * 80
+
+    request = UserProfileUpdateRequest(
+        name=UserProfileName(givenName=name_80, familyName=name_80),
+    )
+
+    # Should not raise
+    validate_name_update(request)
+
+
+def test_user_profile_update_request_rejects_empty_family_name():
+    """Test that validate_name_update rejects an empty familyName string."""
+    from app.users.services.update_my_profile import validate_name_update
+
+    request = UserProfileUpdateRequest(
+        name=UserProfileName(givenName="John", familyName=""),
+    )
+
+    with pytest.raises(HTTPException) as exc:
+        validate_name_update(request)
+
+    assert exc.value.status_code == 400
+    assert exc.value.detail == "lastNameRequired"
+
+
+def test_user_profile_update_request_allows_none_family_name():
+    """Test that validate_name_update still allows familyName=None (field not provided)"""
+    from app.users.services.update_my_profile import validate_name_update
+
+    request = UserProfileUpdateRequest(
+        name=UserProfileName(givenName="John", familyName=None),
+    )
+
+    # Should not raise
+    validate_name_update(request)
+
+
+def test_user_profile_update_request_allows_none_name():
+    """Test that validate_name_update allows name=None (no name update requested)"""
+    from app.users.services.update_my_profile import validate_name_update
+
+    request = UserProfileUpdateRequest(preferredLanguage="en")
+
+    # Should not raise
+    validate_name_update(request)

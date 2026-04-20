@@ -134,7 +134,9 @@ class UserProfileName(BaseModel):
         v = re.sub(r" +", " ", v)
 
         # givenName is not required; allow empty string without validation
-        if v == "" and info.field_name == "givenName":
+        # familyName empty string is also passed through — the service layer
+        # validates it and raises an HTTPException with an error code
+        if v == "" and info.field_name in ("givenName", "familyName"):
             return v
 
         # Pattern matches valid name characters: letters (including international), spaces, hyphens, apostrophes

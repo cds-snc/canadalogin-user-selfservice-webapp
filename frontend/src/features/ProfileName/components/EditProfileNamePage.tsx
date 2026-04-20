@@ -110,6 +110,21 @@ export default function EditProfileNamePage() {
       .replace(/\s+/g, " ");
     const formatted = `${givenName} ${familyName}`.trim();
 
+    if (!familyName) {
+      setErrorCode("lastNameRequired");
+      return;
+    }
+
+    if (givenName.length > 80) {
+      setErrorCode("firstNameMaxLength");
+      return;
+    }
+
+    if (familyName.length > 80) {
+      setErrorCode("lastNameMaxLength");
+      return;
+    }
+
     setNameFormData((previous) => ({
       ...previous,
       givenName,

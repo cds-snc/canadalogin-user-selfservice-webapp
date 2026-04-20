@@ -15,6 +15,8 @@
     "invalidPhoneSuffix": " digits. Make sure you selected the right country, or try typing your phone number again. Extensions are not allowed.",
     "phoneRequired": "Enter a phone number to continue.",
     "lastNameRequired": "Enter a last name to continue. If you have a single name, enter it in the last name field.",
+    "firstNameMaxLength": "Your first name cannot be more than 80 characters. Try again.",
+    "lastNameMaxLength": "Your last name cannot be more than 80 characters. Try again.",
     "maxLength": "and a maximum of",
     "characters": "characters.",
     "example_password_used": "Invalid password. Password cannot be the example password. Try again.",

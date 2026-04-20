@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import Request
+from fastapi import HTTPException, Request, status
 from httpx import Response
 
 from app.users.schemas import (
@@ -13,6 +13,8 @@ from app.utils.access_token import get_auth_request_headers
 from app.utils.mask_user_profile import mask_profile_details
 from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
 from app.constants.schema_field_names import USER_ID_FIELD, USERNAME_FIELD
+
+MAX_NAME_LENGTH = 80
 
 logger = logging.getLogger(__name__)
 
@@ -96,6 +98,38 @@ def sanitize_user_profile_data(user_data: UserProfileUpdateRequest) -> dict:
     return updated_data_dict
 
 
+def validate_name_update(user_data: UserProfileUpdateRequest) -> None:
+    """
+    Validate name fields on a profile update request.
+
+    Raises HTTPException with an error code that the frontend
+    can map to a translated user-facing message.
+    """
+    if user_data.name is None:
+        return
+
+    family_name = (user_data.name.familyName or "").strip()
+    given_name = (user_data.name.givenName or "").strip()
+
+    if user_data.name.familyName is not None and not family_name:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="lastNameRequired",
+        )
+
+    if len(given_name) > MAX_NAME_LENGTH:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="firstNameMaxLength",
+        )
+
+    if len(family_name) > MAX_NAME_LENGTH:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="lastNameMaxLength",
+        )
+
+
 async def dispatch_update_my_profile(
     request: Request,
     user_profile_payload: str,
@@ -144,6 +178,8 @@ async def update_my_profile(
         ProfileResponse: Updated profile data with masked phone numbers
     """
     logger.info("Starting user profile update")
+
+    validate_name_update(user_data)
 
     updated_user_data_dict = sanitize_user_profile_data(user_data)
 
