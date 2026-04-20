@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.15.0...v1.16.0) (2026-04-20)
+
+
+### Features
+
+* add localized relying party info support in schemas and services ([#1393](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1393)) ([6f45f6c](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/6f45f6c8fe0dbb74e87c1d99b4c4fb7256564e59))
+
 ## [1.15.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.14.2...v1.15.0) (2026-04-14)
 
 
