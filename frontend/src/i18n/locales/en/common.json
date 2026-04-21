@@ -38,6 +38,7 @@
     "error_rename_credential": "Enter a name for your passkey to continue",
     "error_fido2_verification": "Passkey prompt was either cancelled or timed out. Try again.",
     "error_fido2_wrong_passkey": "You used a different passkey than the one you selected. Please try again with the correct passkey.",
-    "error_get_assertion_options": "Failed to get authentication options"
+    "error_get_assertion_options": "Failed to get authentication options",
+    "mfa_phone_duplicate": "This number has already been registered to this CanadaLogin. Enter another number."
   }
 }
