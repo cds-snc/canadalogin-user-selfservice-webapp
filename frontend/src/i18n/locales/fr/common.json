@@ -38,6 +38,7 @@
     "error_rename_credential": "Enter a name for your passkey to continue",
     "error_fido2_verification": "Échec de la vérification avec la clé d'accès",
     "error_fido2_wrong_passkey": "Vous avez utilisé une clé d'accès différente de celle que vous avez sélectionnée. Veuillez réessayer avec la bonne clé d'accès.",
-    "error_get_assertion_options": "Échec de l'obtention des options d'authentification"
+    "error_get_assertion_options": "Échec de l'obtention des options d'authentification",
+    "mfa_phone_duplicate": "Ce numéro de téléphone a déjà été enregistré pour cet identifiant. Veuillez entrer un numéro différent."
   }
 }

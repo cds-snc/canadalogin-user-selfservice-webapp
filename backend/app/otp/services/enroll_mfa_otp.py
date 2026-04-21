@@ -108,5 +108,10 @@ async def dispatch_otp_enrollment(
     response = await global_http_client.post(
         enrollment_url, json=enrollment_data, headers=headers
     )
+    if response.status_code == status.HTTP_409_CONFLICT:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="mfa_phone_duplicate",
+        )
     response.raise_for_status()
     return response
