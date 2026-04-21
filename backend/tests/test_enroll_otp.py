@@ -7,6 +7,7 @@ from app.otp.services.enroll_mfa_otp import (
     handle_otp_enrollment,
 )
 from app.users.schemas import IBMVerifyUserProfileSchema, ProfileResponse
+from fastapi import HTTPException
 
 
 @pytest.fixture
@@ -263,3 +264,43 @@ class TestDispatchFunctions:
                     assert call_args[1]["json"]["userId"] == user_id
                     assert call_args[1]["json"]["phoneNumber"] == "+19025555555"
                     assert call_args[1]["json"]["enabled"] is True
+
+    @pytest.mark.asyncio
+    async def test_dispatch_enrollment_raises_http_exception_on_409(
+        self, mock_sms_enrollment_request
+    ):
+        mock_http_client = AsyncMock()
+        user_id = "user123"
+        user_access_token = "user_token_123"
+
+        mock_response = MagicMock()
+        mock_response.status_code = 409
+        mock_http_client.post.return_value = mock_response
+
+        with patch(
+            "app.otp.services.enroll_mfa_otp.get_auth_request_headers"
+        ) as mock_headers:
+            mock_headers.return_value = {"Authorization": "Bearer user_token_123"}
+
+            with patch(
+                "app.otp.services.enroll_mfa_otp.get_configuration"
+            ) as mock_config:
+                mock_config.return_value.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
+                    "https://test.verify.ibm.com"
+                )
+
+                with patch(
+                    "app.otp.services.enroll_mfa_otp.prepare_pydantic_phone_number_for_verify"
+                ) as mock_format:
+                    mock_format.return_value = "+19025555555"
+
+                    with pytest.raises(HTTPException) as exc_info:
+                        await dispatch_otp_enrollment(
+                            mock_http_client,
+                            mock_sms_enrollment_request,
+                            user_id,
+                            user_access_token,
+                        )
+
+                    assert exc_info.value.status_code == 409
+                    assert exc_info.value.detail == "mfa_phone_duplicate"
