@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.17.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.16.0...v1.17.0) (2026-04-21)
+
+
+### Features
+
+* enforce character length restrictions for first and last names in user profile updates ([#1403](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1403)) ([fac0d77](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/fac0d77d08365568eceac9c8c4cbf68f6cf61f44))
+* handle duplicate phone number during MFA enrollment and add localized error messages ([73658ff](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/73658ffbcd58839bfc9d66a7c6c4c91537b53c4b))
+
+
+### Bug Fixes
+
+* handle duplicate phone number during MFA enrollment and add localized error messages ([#1410](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1410)) ([73658ff](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/73658ffbcd58839bfc9d66a7c6c4c91537b53c4b))
+
+
+### Miscellaneous Chores
+
+* update staging deployed version to 1.16.0 ([#1406](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1406)) ([497a284](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/497a2848a9878950c1d1c63f83a9cea7f49734b5))
+
 ## [1.16.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.15.0...v1.16.0) (2026-04-20)
 
 
