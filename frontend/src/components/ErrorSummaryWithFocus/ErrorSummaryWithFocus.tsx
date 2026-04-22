@@ -5,11 +5,10 @@ import { useTranslation } from "react-i18next";
 
 type GcdsErrorSummaryProps = ComponentPropsWithoutRef<typeof GcdsErrorSummary>;
 
-interface ErrorSummaryWithFocusProps
-  extends Omit<
-    GcdsErrorSummaryProps,
-    "errorLinks" | "heading" | "id" | "lang"
-  > {
+interface ErrorSummaryWithFocusProps extends Omit<
+  GcdsErrorSummaryProps,
+  "errorLinks" | "heading" | "id" | "lang"
+> {
   errorCode?: string | null;
   errorMessage?: string;
   language?: string;
