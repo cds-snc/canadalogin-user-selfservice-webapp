@@ -6,6 +6,7 @@ import { FLOW_TYPES, PAGES, serverMapping } from "../../../../utils/constants";
 import { useTranslation } from "react-i18next";
 import { getErrorMessage } from "../../../../utils/errorUtils";
 import { path } from "../../../../utils/routeHelpers";
+import { useOtpAttemptTracking } from "../../../../hooks/useOtpAttemptTracking";
 import { otpFactors } from "../../../TransientOtp/api/otpFactors";
 import OtpSelection from "../../../TransientOtp/components/OtpSelection";
 import OtpVerification from "../../../TransientOtp/components/OtpVerification";
@@ -145,6 +146,9 @@ export default function AddMFAPage() {
   });
 
   const errorMessage = getErrorMessage(language, errorCode);
+  const { getDisplayError, resetAttempts, isMaxAttemptsReached } =
+    useOtpAttemptTracking(errorCode);
+  const otpDisplayError = getDisplayError(errorMessage);
 
   const handlePhoneForm = (field: string, value: unknown) => {
     setPhoneFormData((prev) => ({
@@ -580,9 +584,11 @@ export default function AddMFAPage() {
           setWizardStep(prevStep);
         }}
         setErrorCode={setErrorCode}
-        errorMessage={errorMessage}
+        errorMessage={otpDisplayError}
         onCancel={async () => navigate(backToManage2FAVerificationsPage)}
         showTryAnotherWay={userPhoneFactors && userPhoneFactors.length > 1}
+        isMaxAttemptsReached={isMaxAttemptsReached}
+        resetAttempts={resetAttempts}
       />
     ),
     addMFANumber: (
@@ -599,7 +605,9 @@ export default function AddMFAPage() {
       <AddMFAOtpVerification
         phoneFormData={phoneFormData}
         onChangePhoneForm={handlePhoneForm}
-        errorMessage={errorMessage}
+        errorMessage={otpDisplayError}
+        isMaxAttemptsReached={isMaxAttemptsReached}
+        resetAttempts={resetAttempts}
         onNext={async () => {
           trackEvent({
             event: GA_FORM_EVENTS.FORM_SUBMIT,
@@ -715,6 +723,7 @@ export default function AddMFAPage() {
     <StepContent
       StepComponent={steps[wizardStep]}
       errorCode={errorCode}
+      errorMessage={otpDisplayError}
       language={language}
     />
   );

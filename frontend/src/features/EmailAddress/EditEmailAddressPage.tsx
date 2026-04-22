@@ -10,6 +10,7 @@ import {
 } from "../../utils/constants";
 import { useTranslation } from "react-i18next";
 import { getErrorMessage } from "../../utils/errorUtils";
+import { useOtpAttemptTracking } from "../../hooks/useOtpAttemptTracking";
 import PasswordVerification from "../TransientOtp/components/PasswordVerification";
 import OtpSelection from "../TransientOtp/components/OtpSelection";
 import OtpVerification from "../TransientOtp/components/OtpVerification";
@@ -313,6 +314,9 @@ export default function EditEmailAddressPage() {
   };
 
   const errorMessage = getErrorMessage(language, errorCode);
+  const { getDisplayError, resetAttempts, isMaxAttemptsReached } =
+    useOtpAttemptTracking(errorCode);
+  const otpDisplayError = getDisplayError(errorMessage);
 
   const steps: Record<string, React.ReactElement> = {
     passwordVerification: (
@@ -390,11 +394,13 @@ export default function EditEmailAddressPage() {
           setWizardStep(prevStep);
         }}
         setErrorCode={setErrorCode}
-        errorMessage={errorMessage}
+        errorMessage={otpDisplayError}
         onCancel={handleBackToProfile}
         showTryAnotherWay={
           userPhoneFactors != null && userPhoneFactors.length > 1
         }
+        isMaxAttemptsReached={isMaxAttemptsReached}
+        resetAttempts={resetAttempts}
       />
     ),
     enterEmail: (
@@ -433,7 +439,7 @@ export default function EditEmailAddressPage() {
         onCancel={handleBackToProfile}
         formData={formData}
         setFormData={setFormData}
-        errorMessage={errorMessage}
+        errorMessage={otpDisplayError}
         userOtpValue={userOtpValue}
         handleChange={handleSetUserOtpValue}
         requestOtpCode={async () => {
@@ -447,6 +453,8 @@ export default function EditEmailAddressPage() {
           });
         }}
         onBack={handleBackToEnterEmail}
+        isMaxAttemptsReached={isMaxAttemptsReached}
+        resetAttempts={resetAttempts}
       />
     ),
     emailConfirmUpdate: (
@@ -491,6 +499,7 @@ export default function EditEmailAddressPage() {
     <StepContent
       StepComponent={steps[wizardStep]}
       errorCode={errorCode}
+      errorMessage={otpDisplayError}
       language={language}
     />
   );

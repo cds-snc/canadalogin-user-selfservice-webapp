@@ -56,6 +56,8 @@ export type ContactPhoneStepProps = {
 export type ContactPhoneOtpVerificationProps = ContactPhoneStepProps & {
   onBack: ContactPhoneAsyncAction;
   requestNewOtpCode: ContactPhoneOtpRequestHandler;
+  isMaxAttemptsReached?: boolean;
+  resetAttempts?: () => void;
 };
 
 export type ContactPhoneConfirmUpdateProps = ContactPhoneStepProps & {

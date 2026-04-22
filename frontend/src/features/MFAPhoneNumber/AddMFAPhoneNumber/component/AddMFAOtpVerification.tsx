@@ -76,6 +76,8 @@ interface AddMFAOtpVerificationProps {
   requestNewOtpCode: () => Promise<void>;
   onUseDifferentPhoneNumber: () => Promise<void>;
   onSetupAlternateMFAMethod: () => Promise<void>;
+  isMaxAttemptsReached?: boolean;
+  resetAttempts?: () => void;
 }
 
 export default function AddMFAOtpVerification({
@@ -88,12 +90,17 @@ export default function AddMFAOtpVerification({
   requestNewOtpCode,
   onUseDifferentPhoneNumber,
   onSetupAlternateMFAMethod,
+  isMaxAttemptsReached = false,
+  resetAttempts,
 }: AddMFAOtpVerificationProps) {
   const { language } = useParams();
 
   const [codeRequested, setCodeRequested] = useState(false);
   const [time, setTime] = useState(initialTime);
   const { t } = useTranslation(["verification", "common"]);
+  const [localError, setLocalError] = useState("");
+
+  const displayError = localError || errorMessage || "";
 
   const clearValues = () => {
     onChangePhoneForm("phoneNumber", "");
@@ -107,12 +114,15 @@ export default function AddMFAOtpVerification({
     requestNewOtpCode();
     setTime(initialTime);
     setCodeRequested(true);
+    setLocalError("");
+    resetAttempts?.();
   };
 
   const handleChange = (e: CustomEvent<string>) => {
     const value = (e.target as HTMLInputElement).value;
     onChangePhoneForm("otp", value);
     setCodeRequested(false);
+    setLocalError("");
   };
 
   // Clear OTP field on mount
@@ -136,6 +146,11 @@ export default function AddMFAOtpVerification({
   const userMfaType = phoneFormData.otpType;
 
   const doSubmit = async () => {
+    if (!/^\d{6}$/.test(phoneFormData.otp)) {
+      setLocalError(t("Error.invalidCode", { ns: "common" }));
+      return;
+    }
+    setLocalError("");
     await onNext();
   };
 
@@ -175,7 +190,7 @@ export default function AddMFAOtpVerification({
             type="text"
             value={phoneFormData.otp}
             validateOn="other"
-            errorMessage={errorMessage}
+            errorMessage={displayError}
             onGcdsInput={handleChange}
             lang={language}
             size={18}
@@ -186,7 +201,7 @@ export default function AddMFAOtpVerification({
 
         <GcdsGrid columns="max-content max-content" gap="200">
           <SubmitButton
-            disabled={phoneFormData.otp.length < 6}
+            disabled={phoneFormData.otp.length < 6 || isMaxAttemptsReached}
             style={{ width: "fit-content" }}
             onGcdsClick={(ev) => {
               ev.preventDefault();

@@ -11,6 +11,7 @@ interface ErrorSummaryWithFocusProps
     "errorLinks" | "heading" | "id" | "lang"
   > {
   errorCode?: string | null;
+  errorMessage?: string;
   language?: string;
   id?: string;
   errorLinks?: Record<string, string>;
@@ -19,6 +20,7 @@ interface ErrorSummaryWithFocusProps
 
 export default function ErrorSummaryWithFocus({
   errorCode,
+  errorMessage: errorMessageProp,
   language,
   id = "errorSummary",
   errorLinks,
@@ -29,9 +31,11 @@ export default function ErrorSummaryWithFocus({
 
   const { t } = useTranslation("common");
 
-  const errorMessage = errorCode
-    ? t(`Error.${errorCode}`, { defaultValue: t("Error.serverError") })
-    : "";
+  const errorMessage =
+    errorMessageProp ||
+    (errorCode
+      ? t(`Error.${errorCode}`, { defaultValue: t("Error.serverError") })
+      : "");
 
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout> | undefined;

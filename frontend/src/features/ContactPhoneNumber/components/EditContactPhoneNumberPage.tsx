@@ -18,6 +18,7 @@ import { GA_FORM_EVENTS } from "../../../utils/analyticsConstants";
 import { CONTACT_PHONE_ANALYTICS } from "../../../utils/analyticsConstants";
 import StepContent from "../../../components/Wizard/StepContent";
 import Loader from "../../../components/Layout/Loading";
+import { useOtpAttemptTracking } from "../../../hooks/useOtpAttemptTracking";
 import EnterPhoneNumber from "./EnterPhoneNumber";
 import OtpVerification from "./OtpVerification";
 import ConfirmUpdate from "./ConfirmUpdate";
@@ -245,6 +246,10 @@ export default function EditContactPhoneNumberPage() {
     errorMessage = errorCode;
   }
 
+  const { getDisplayError, resetAttempts, isMaxAttemptsReached } =
+    useOtpAttemptTracking(errorCode);
+  const otpDisplayError = getDisplayError(errorMessage);
+
   const steps: Record<ContactPhoneWizardStep, ReactNode> = {
     enterPhone: (
       <EnterPhoneNumber
@@ -272,7 +277,7 @@ export default function EditContactPhoneNumberPage() {
         userProfile={userProfile}
         phoneFormData={phoneFormData}
         onChangePhoneForm={handlePhoneFormChange}
-        errorMessage={errorMessage}
+        errorMessage={otpDisplayError}
         onNext={verifyOtp}
         onCancel={handleBackToProfile}
         onBack={() => {
@@ -291,6 +296,8 @@ export default function EditContactPhoneNumberPage() {
           return sendOtp({ reSendOtpCode: true, otpType });
         }}
         setErrorCode={setErrorCode}
+        isMaxAttemptsReached={isMaxAttemptsReached}
+        resetAttempts={resetAttempts}
       />
     ),
     confirmUpdate: (
@@ -330,6 +337,7 @@ export default function EditContactPhoneNumberPage() {
     <StepContent
       StepComponent={steps[wizardStep]}
       errorCode={errorCode}
+      errorMessage={otpDisplayError}
       language={language}
     />
   );

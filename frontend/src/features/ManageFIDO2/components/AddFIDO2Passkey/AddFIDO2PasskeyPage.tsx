@@ -11,6 +11,7 @@ import {
 import { getErrorMessage } from "../../../../utils/errorUtils";
 import { useOtpOperations } from "../../../../hooks/useOtpOperations";
 import { usePasswordValidation } from "../../../../hooks/usePasswordValidation";
+import { useOtpAttemptTracking } from "../../../../hooks/useOtpAttemptTracking";
 import PasswordVerification from "../../../TransientOtp/components/PasswordVerification";
 import OtpSelection from "../../../TransientOtp/components/OtpSelection";
 import OtpVerification from "../../../TransientOtp/components/OtpVerification";
@@ -44,6 +45,9 @@ export default function AddFIDO2PasskeyPage({
   const { userProfile } = state;
   const { id, userName } = userProfile ?? {};
   const errorMessage = getErrorMessage(language, errorCode);
+  const { getDisplayError, resetAttempts, isMaxAttemptsReached } =
+    useOtpAttemptTracking(errorCode);
+  const otpDisplayError = getDisplayError(errorMessage);
   const { t } = useTranslation(["security", "fido2"]);
   const [userPasswordValue, setUserPasswordValue] = useState("");
   const [selected2FAPasskey, setSelected2FAPasskey] =
@@ -274,9 +278,11 @@ export default function AddFIDO2PasskeyPage({
           }
         }}
         setErrorCode={setErrorCode}
-        errorMessage={errorMessage}
+        errorMessage={otpDisplayError}
         onCancel={() => navigate(backToManage2FAVerificationsPage)}
         showTryAnotherWay={userPhoneFactors && userPhoneFactors.length > 1}
+        isMaxAttemptsReached={isMaxAttemptsReached}
+        resetAttempts={resetAttempts}
       />
     ),
     verifyFIDO2Passkey: (
@@ -325,6 +331,7 @@ export default function AddFIDO2PasskeyPage({
     <StepContent
       StepComponent={steps[wizardStep]}
       errorCode={errorCode}
+      errorMessage={otpDisplayError}
       language={language}
     />
   );
