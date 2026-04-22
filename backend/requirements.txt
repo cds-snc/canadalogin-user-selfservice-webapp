@@ -2,7 +2,7 @@ fastapi==0.124.4
 uvicorn==0.38.0
 requests==2.33.0
 python-multipart==0.0.26
-python-dotenv==1.2.1
+python-dotenv==1.2.2
 webauthn==1.11.1
 cryptography==46.0.7
 pydantic-settings==2.12.0
