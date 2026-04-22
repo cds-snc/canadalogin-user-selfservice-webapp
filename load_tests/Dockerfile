@@ -1,6 +1,6 @@
-FROM grafana/k6:0.54.0 AS k6
+FROM grafana/k6:0.59.0 AS k6
 
-FROM amazon/aws-cli:2.22.35
+FROM amazon/aws-cli:2.34.30
 
 # Copy k6 binary from the official image
 COPY --from=k6 /usr/bin/k6 /usr/local/bin/k6
