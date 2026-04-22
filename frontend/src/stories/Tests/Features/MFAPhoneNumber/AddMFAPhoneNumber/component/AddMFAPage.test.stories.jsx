@@ -669,44 +669,20 @@ export const CompleteAddMFAFlowSMS = (() => {
       await step("Complete MFA OTP verification", async () => {
         // Enter MFA OTP code
         await waitFor(async () => {
-          const gcdsInputs = canvasElement.querySelectorAll("gcds-input");
-          await expect(gcdsInputs.length).toBeGreaterThan(0);
-
-          for (const input of gcdsInputs) {
-            if (input.shadowRoot) {
-              const shadowInput =
-                input.shadowRoot.querySelector("input#verificationCode") ||
-                input.shadowRoot.querySelector(
-                  'input[name="verificationCode"]',
-                ) ||
-                input.shadowRoot.querySelector('input[maxlength="6"]');
-              if (shadowInput) {
-                // Clear the field by setting value directly
-                shadowInput.value = "";
-                shadowInput.dispatchEvent(
-                  new Event("input", { bubbles: true }),
-                );
-
-                // Type the OTP code
-                await userEvent.type(shadowInput, "654321");
-
-                // For AddMFAOtpVerification component, trigger change event to update phoneFormData.otp
-                const changeEvent = new Event("input", { bubbles: true });
-                Object.defineProperty(changeEvent, "target", {
-                  value: { value: "654321" },
-                  enumerable: true,
-                });
-                shadowInput.dispatchEvent(changeEvent);
-
-                // Also trigger the gcdsInput event on the gcds-input component
-                const gcdsInputEvent = new CustomEvent("gcdsInput", {
-                  bubbles: true,
-                  detail: { value: "654321" },
-                });
-                input.dispatchEvent(gcdsInputEvent);
-
-                break;
-              }
+          const gcdsInput = canvasElement.querySelector("gcds-input");
+          await expect(gcdsInput).toBeInTheDocument();
+          if (gcdsInput.shadowRoot) {
+            const shadowInput =
+              gcdsInput.shadowRoot.querySelector("input#verificationCode") ||
+              gcdsInput.shadowRoot.querySelector(
+                'input[name="verificationCode"]',
+              ) ||
+              gcdsInput.shadowRoot.querySelector('input[maxlength="6"]');
+            await expect(shadowInput).toBeInTheDocument();
+            if (shadowInput) {
+              shadowInput.value = "";
+              shadowInput.dispatchEvent(new Event("input", { bubbles: true }));
+              await userEvent.type(shadowInput, "654321");
             }
           }
         });
@@ -715,33 +691,22 @@ export const CompleteAddMFAFlowSMS = (() => {
         await waitFor(async () => {
           const continueButton = canvas.getByText(/Continue/i);
           await expect(continueButton).toBeInTheDocument();
-          await expect(continueButton.tagName).toBe("GCDS-BUTTON");
-          await expect(continueButton.shadowRoot).toBeTruthy();
-
-          const actualButton =
-            continueButton.shadowRoot.querySelector('button[part="button"]') ||
-            continueButton.shadowRoot.querySelector("button");
-          await expect(actualButton).toBeInTheDocument();
-          await expect(actualButton.disabled).toBe(false);
-
-          const gcdsClickEvent = new CustomEvent("gcdsClick", {
-            bubbles: true,
-            cancelable: true,
-            detail: {},
-          });
-          Object.defineProperty(gcdsClickEvent, "preventDefault", {
-            value: () => {},
-            writable: false,
-          });
-          continueButton.dispatchEvent(gcdsClickEvent);
+          if (continueButton && continueButton.shadowRoot) {
+            const actualButton =
+              continueButton.shadowRoot.querySelector(
+                'button[part="button"]',
+              ) || continueButton.shadowRoot.querySelector("button");
+            if (actualButton) {
+              await userEvent.click(actualButton);
+            }
+          }
         });
 
         // Wait for navigation/state change
         await waitFor(async () => {
-          const hasVerificationText =
-            canvasElement.textContent.includes(
-              "Set up voice call verification",
-            ) || canvasElement.textContent.includes("Check your phone");
+          const hasVerificationText = canvasElement.textContent.includes(
+            "Set up voice call verification",
+          );
           await expect(hasVerificationText).toBeTruthy();
         });
       });

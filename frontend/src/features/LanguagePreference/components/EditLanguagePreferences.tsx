@@ -94,7 +94,7 @@ export default function EditLanguagePreferences({
             options={languageOptions}
             lang={language}
             onChange={(event) => {
-              const target = event.target as HTMLInputElement | null;
+              const target = event.target as unknown as HTMLInputElement | null;
               applyLanguageSelection(target?.value);
             }}
             onGcdsChange={handleProfileChange}
