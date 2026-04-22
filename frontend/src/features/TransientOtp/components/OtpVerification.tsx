@@ -31,6 +31,8 @@ interface OtpVerificationProps {
   errorMessage?: string;
   onCancel: () => void;
   showTryAnotherWay?: boolean;
+  isMaxAttemptsReached?: boolean;
+  resetAttempts?: () => void;
 }
 
 export default function OtpVerification({
@@ -44,22 +46,32 @@ export default function OtpVerification({
   errorMessage,
   onCancel,
   showTryAnotherWay = true,
+  isMaxAttemptsReached = false,
+  resetAttempts,
 }: OtpVerificationProps) {
   const { language } = useParams();
   const [time, setTime] = useState(initialTime);
   const { t } = useTranslation(["verification", "common"]);
+  const [localError, setLocalError] = useState("");
+
+  const displayError = localError || errorMessage || "";
 
   const handleChange = (e: CustomEvent<string>) => {
     const value = (e.target as HTMLInputElement).value;
     setUserOtpValue(value);
+    setLocalError("");
   };
 
   const doSubmit = async () => {
-    setErrorCode(""); // Clear any previous errors
+    if (!/^\d{6}$/.test(userOtpValue)) {
+      setLocalError(t("Error.invalidCode", { ns: "common" }));
+      return;
+    }
+    setLocalError("");
+    setErrorCode("");
     try {
       await validateOtpCode(userOtpValue);
     } catch (error) {
-      // Handle validation errors
       const apiError = error as CaughtApiError;
       if (apiError?.data?.message) {
         setErrorCode(apiError.data.message);
@@ -125,7 +137,7 @@ export default function OtpVerification({
             name="verificationCode"
             type="text"
             validateOn="other"
-            errorMessage={errorMessage}
+            errorMessage={displayError}
             value={userOtpValue}
             onGcdsInput={handleChange}
             lang={language}
@@ -139,7 +151,7 @@ export default function OtpVerification({
 
         <GcdsGrid columns="max-content max-content" gap="200">
           <SubmitButton
-            disabled={userOtpValue.length < 6}
+            disabled={userOtpValue.length < 6 || isMaxAttemptsReached}
             style={{ width: "fit-content" }}
             onGcdsClick={(ev) => {
               ev.preventDefault();
@@ -192,6 +204,8 @@ export default function OtpVerification({
               setTime(initialTime);
               setErrorCode("");
               setUserOtpValue("");
+              setLocalError("");
+              resetAttempts?.();
             }}
           >
             {userMfaType !== FLOW_TYPES.email

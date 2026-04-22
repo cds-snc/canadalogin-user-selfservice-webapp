@@ -26,6 +26,8 @@ interface EmailOtpValidationProps {
   handleChange: (value: string) => void;
   requestOtpCode: () => Promise<void>;
   onBack: () => void | Promise<void>;
+  isMaxAttemptsReached?: boolean;
+  resetAttempts?: () => void;
 }
 
 const initialTime = 10;
@@ -40,11 +42,16 @@ export default function EmailOtpValidation({
   handleChange,
   requestOtpCode,
   onBack,
+  isMaxAttemptsReached = false,
+  resetAttempts,
 }: EmailOtpValidationProps) {
   const { language } = useParams();
   const { t } = useTranslation(["email", "common"]);
 
   const [time, setTime] = useState(initialTime);
+  const [localError, setLocalError] = useState("");
+
+  const displayError = localError || errorMessage || "";
 
   const clearValues = () => {
     setFormData({ emailAddress: "" });
@@ -53,6 +60,7 @@ export default function EmailOtpValidation({
   const handleInputChange = (e: CustomEvent<string>) => {
     const value = (e.target as HTMLInputElement).value;
     handleChange(value);
+    setLocalError("");
   };
 
   const onSubmitHandler: React.FormEventHandler<HTMLFormElement> = async (
@@ -66,7 +74,9 @@ export default function EmailOtpValidation({
     ev.preventDefault();
     if (requestOtpCode) {
       await requestOtpCode();
-      setTime(initialTime); // Reset timer
+      setTime(initialTime);
+      setLocalError("");
+      resetAttempts?.();
     }
   };
 
@@ -108,7 +118,7 @@ export default function EmailOtpValidation({
           type="text"
           autocomplete="one-time-code"
           validateOn="other"
-          errorMessage={errorMessage}
+          errorMessage={displayError}
           value={userOtpValue}
           onGcdsInput={handleInputChange}
           lang={language}
@@ -122,6 +132,7 @@ export default function EmailOtpValidation({
       <GcdsGrid columns="max-content max-content" gap="200">
         <SubmitButton
           currentLang={language ?? "en"}
+          disabled={isMaxAttemptsReached}
           onGcdsClick={(ev) => {
             ev.preventDefault();
             void onSubmit();

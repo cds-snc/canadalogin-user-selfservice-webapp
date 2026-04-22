@@ -10,6 +10,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { getErrorMessage } from "../../../../utils/errorUtils";
 import { path } from "../../../../utils/routeHelpers";
+import { useOtpAttemptTracking } from "../../../../hooks/useOtpAttemptTracking";
 import OtpSelection from "../../../TransientOtp/components/OtpSelection";
 import OtpVerification from "../../../TransientOtp/components/OtpVerification";
 import { deleteMFAPhoneNumberApi } from "../api/DeleteMFAPhoneNumberAPI";
@@ -58,6 +59,9 @@ export default function DeleteMFAPage() {
 
   const [errorCode, setErrorCode] = useState("");
   const errorMessage = getErrorMessage(language, errorCode);
+  const { getDisplayError, resetAttempts, isMaxAttemptsReached } =
+    useOtpAttemptTracking(errorCode);
+  const otpDisplayError = getDisplayError(errorMessage);
   const [wizardStep, setWizardStep] = useState<WizardStep>(
     "passwordVerification",
   );
@@ -324,9 +328,11 @@ export default function DeleteMFAPage() {
           setWizardStep(prevStep);
         }}
         setErrorCode={setErrorCode}
-        errorMessage={errorMessage}
+        errorMessage={otpDisplayError}
         onCancel={async () => navigate(backToManage2FAVerificationsPage)}
         showTryAnotherWay={userPhoneFactors && userPhoneFactors.length > 1}
+        isMaxAttemptsReached={isMaxAttemptsReached}
+        resetAttempts={resetAttempts}
       />
     ),
     deleteMFAPhoneNumberConfirm: (
@@ -354,6 +360,7 @@ export default function DeleteMFAPage() {
     <StepContent
       StepComponent={steps[wizardStep]}
       errorCode={errorCode}
+      errorMessage={otpDisplayError}
       language={language}
     />
   );

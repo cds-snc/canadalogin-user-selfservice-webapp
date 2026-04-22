@@ -8,6 +8,7 @@ import {
 } from "../../../../utils/constants";
 import { getErrorMessage } from "../../../../utils/errorUtils";
 import { usePasswordValidation } from "../../../../hooks/usePasswordValidation";
+import { useOtpAttemptTracking } from "../../../../hooks/useOtpAttemptTracking";
 import PasswordVerification from "../../../TransientOtp/components/PasswordVerification";
 import { useTranslation } from "react-i18next";
 import StepContent from "../../../../components/Wizard/StepContent";
@@ -45,6 +46,9 @@ export default function DeleteFIDO2PasskeyPage({
   const [wizardStep, setWizardStep] = useState(step ?? "passwordVerification");
   const [errorCode, setErrorCode] = useState("");
   const errorMessage = getErrorMessage(language, errorCode);
+  const { getDisplayError, resetAttempts, isMaxAttemptsReached } =
+    useOtpAttemptTracking(errorCode);
+  const otpDisplayError = getDisplayError(errorMessage);
   const { t } = useTranslation("security");
   const [userPasswordValue, setUserPasswordValue] = useState("");
 
@@ -204,9 +208,11 @@ export default function DeleteFIDO2PasskeyPage({
           }
         }}
         setErrorCode={setErrorCode}
-        errorMessage={errorMessage}
+        errorMessage={otpDisplayError}
         onCancel={() => navigate(backToManage2FAVerificationsPage)}
         showTryAnotherWay={userPhoneFactors && userPhoneFactors.length > 1}
+        isMaxAttemptsReached={isMaxAttemptsReached}
+        resetAttempts={resetAttempts}
       />
     ),
     verifyFIDO2Passkey: (
@@ -242,6 +248,7 @@ export default function DeleteFIDO2PasskeyPage({
     <StepContent
       StepComponent={steps[wizardStep]}
       errorCode={errorCode}
+      errorMessage={otpDisplayError}
       language={language}
     />
   );

@@ -71,12 +71,17 @@ export default function OtpVerification({
   errorMessage,
   requestNewOtpCode,
   setErrorCode,
+  isMaxAttemptsReached = false,
+  resetAttempts,
 }: ContactPhoneOtpVerificationProps) {
   const { language = "en" } = useParams<{ language: string }>();
 
   const [codeRequested, setCodeRequested] = useState(false);
   const [time, setTime] = useState(initialTime);
   const { t } = useTranslation(["verification", "common"]);
+  const [localError, setLocalError] = useState("");
+
+  const displayError = localError || errorMessage || "";
 
   const clearValues = () => {
     onChangePhoneForm("phoneNumber", "");
@@ -90,6 +95,8 @@ export default function OtpVerification({
     await requestNewOtpCode(otpType ?? phoneFormData.otpType);
     setTime(initialTime);
     setCodeRequested(true);
+    setLocalError("");
+    resetAttempts?.();
   };
 
   const handleChange = (event: Event) => {
@@ -97,6 +104,7 @@ export default function OtpVerification({
     onChangePhoneForm("otp", target.value);
     setCodeRequested(false);
     setErrorCode?.("");
+    setLocalError("");
   };
 
   const onSubmitHandler: FormEventHandler<HTMLFormElement> = async (event) => {
@@ -154,7 +162,7 @@ export default function OtpVerification({
             type="text"
             value={phoneFormData.otp}
             validateOn="other"
-            errorMessage={errorMessage}
+            errorMessage={displayError}
             onGcdsInput={handleChange}
             lang={language}
             size={18}
@@ -165,7 +173,7 @@ export default function OtpVerification({
 
         <GcdsGrid columns="max-content max-content" gap="200">
           <SubmitButton
-            disabled={phoneFormData.otp.length < 6}
+            disabled={phoneFormData.otp.length < 6 || isMaxAttemptsReached}
             style={{ width: "fit-content" }}
             onGcdsClick={onSubmitClick}
             currentLang={language}
