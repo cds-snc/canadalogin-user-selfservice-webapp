@@ -22,12 +22,14 @@ type NavigationEvent = {
 };
 
 export default function TopNav({ currentLang }: TopNavProps) {
-  const { t } = useTranslation("layout");
+  const { t, i18n } = useTranslation("layout");
   const { state, dispatch } = useUser();
   const { setLoading } = userProfileDispatch(dispatch);
 
-  const relyingPartyLinkName = state.relyingPartyInfo?.linkName ?? "";
-  const relyingPartyUrl = state.relyingPartyInfo?.url ?? "";
+  const rpInfo = state.relyingPartyInfo;
+  const localizedDetail = rpInfo?.localized?.[i18n.language];
+  const relyingPartyLinkName = localizedDetail?.name ?? rpInfo?.linkName ?? "";
+  const relyingPartyUrl = localizedDetail?.url ?? rpInfo?.url ?? "";
   const shouldRenderRelyingPartyLink = relyingPartyLinkName && relyingPartyUrl;
 
   const { mobile, tablet } = useBreakpoints();
