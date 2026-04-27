@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.17.1](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.17.0...v1.17.1) (2026-04-27)
+
+
+### Bug Fixes
+
+* Fix prod.json filename in CODEOWNERS definition ([#1415](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1415)) ([6cb9a97](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/6cb9a975d5d5b599c3c9f5ca2a2e628bc3f10da6))
+* implement OTP attempt tracking and error handling across multiple components ([#1416](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1416)) ([ac82b47](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/ac82b4735404dee9b12386479d97f462f720ff9d))
+* Update GCDS components to version 1.2.0 and improve language handling in RootLayout ([#1422](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1422)) ([2d4bcd3](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/2d4bcd37b3abe5b19f3efa4654d8574f93e6bbec))
+* Update TopNav to use localized relying party name and URL ([#1420](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1420)) ([ab37164](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/ab371644f5dc23e7833a57321c0e46b6233d50e9))
+
+
+### Miscellaneous Chores
+
+* **deps:** update all minor dependencies ([#1400](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1400)) ([d21b3b6](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/d21b3b616ec8d8e9707358adab8ecdf48b29f318))
+* **deps:** update all patch dependencies ([#1399](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1399)) ([005d9a1](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/005d9a1f98d1d799359b618aecffa9e6aa58222f))
+* **deps:** update dependency prettier to v3.8.3 ([#1401](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1401)) ([e238365](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/e238365ae5b01d2e0d94558b594b2fd3d3d77f2e))
+* update prod deployed version to 1.17.0 ([#1414](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1414)) ([e140d80](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/e140d80bca712cf3071cd8d81ebdfb8dc1f267f8))
+* update staging deployed version to 1.17.0 ([#1412](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1412)) ([6cb2c16](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/6cb2c1677c43da386c4ca4bcdb7dac7e8b7a8530))
+
 ## [1.17.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.16.0...v1.17.0) (2026-04-21)
 
 
