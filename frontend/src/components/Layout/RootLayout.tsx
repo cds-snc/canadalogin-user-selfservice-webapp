@@ -28,10 +28,18 @@ export default function RootLayout() {
   const matches = useMatches();
   const { state: languageState } = useLanguage();
   const { language } = languageState;
-  const { langHref, currentLang } = getLangValues(
-    language ?? undefined,
-    pathname,
-  );
+
+  // Derive language from URL path first (source of truth during navigation),
+  // falling back to context language which may be stale on initial render.
+  const urlLang = pathname.split("/").filter(Boolean)[0]?.toLowerCase();
+  const effectiveLang =
+    urlLang === "en" || urlLang === "fr" ? urlLang : (language ?? undefined);
+  const { langHref, currentLang } = getLangValues(effectiveLang, pathname);
+
+  // Synchronously update <html lang> so GCDS web components pick up the
+  // correct language via their assignLanguage() DOM walk on first render.
+  document.documentElement.lang = currentLang;
+
   const pageId = [...matches]
     .reverse()
     .map((match) => (match.handle as { id?: string } | undefined)?.id)

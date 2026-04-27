@@ -23,8 +23,8 @@
     "install-playwright": "npx playwright install --with-deps chromium"
   },
   "dependencies": {
-    "@gcds-core/components": "^1.0.0",
-    "@gcds-core/components-react": "^1.0.0",
+    "@gcds-core/components": "^1.2.0",
+    "@gcds-core/components-react": "^1.2.0",
     "@react-nano/use-event-source": "^0.16.0",
     "date-fns": "^4.1.0",
     "i18next": "^26.0.3",
