@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef } from "react";
+import { useUser } from "../components/Providers/useUser";
 import { trackAnalyticsEvent } from "../utils/gatag";
 import { GA_FORM_EVENTS } from "../utils/analyticsConstants";
+import { getAnalyticsRelyingPartyParams } from "../utils/relyingPartyAnalytics";
 import type { AnalyticsTrackEvent, GA4EventParams } from "../types/utils";
 
 interface UseFormTrackingOptions {
@@ -12,13 +14,21 @@ export function useFormTracking({
   formId,
   commonParams,
 }: UseFormTrackingOptions) {
+  const { state } = useUser();
+  const rpParams = getAnalyticsRelyingPartyParams(state.relyingPartyInfo);
   const activeStepRef = useRef<string | null>(null);
   const stepStartTimeRef = useRef<number | null>(null);
-  const commonParamsRef = useRef<GA4EventParams | undefined>(commonParams);
+  const commonParamsRef = useRef<GA4EventParams | undefined>({
+    ...rpParams,
+    ...commonParams,
+  });
 
   useEffect(() => {
-    commonParamsRef.current = commonParams;
-  }, [commonParams, formId]);
+    commonParamsRef.current = {
+      ...rpParams,
+      ...commonParams,
+    };
+  }, [commonParams, formId, rpParams]);
 
   const trackEvent = useCallback(
     (params: Omit<AnalyticsTrackEvent, "form_id">) => {

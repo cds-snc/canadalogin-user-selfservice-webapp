@@ -9,7 +9,6 @@ import {
   INVALID_OTP_ERROR_CODES,
   PAGES,
 } from "../../../utils/constants";
-import { getAnalyticsRelyingPartyParams } from "../../../utils/relyingPartyAnalytics";
 import { path } from "../../../utils/routeHelpers";
 import { authService } from "../../../services/authService";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch";
@@ -78,15 +77,13 @@ export default function EditContactPhoneNumberPage() {
   const [localLoading, setLocalLoading] = useState(false);
   const [phoneFormData, setPhoneFormData] =
     useState<ContactPhoneFormData>(initialPhoneFormData);
-  const rpParams = getAnalyticsRelyingPartyParams(state.relyingPartyInfo);
 
   // Initialize form tracking
   const { trackEvent } = useFormTracking({
     formId: CONTACT_PHONE_ANALYTICS.FLOW_ID,
-    commonParams: rpParams,
   });
 
-  useWizardPageTracking(wizardStep, CONTACT_PHONE_PAGE_BY_STEP, rpParams);
+  useWizardPageTracking(wizardStep, CONTACT_PHONE_PAGE_BY_STEP);
 
   const { t } = useTranslation(["security", "common"]);
 

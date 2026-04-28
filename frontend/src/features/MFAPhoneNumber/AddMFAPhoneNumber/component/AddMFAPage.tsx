@@ -3,7 +3,6 @@ import { useNavigate, useParams } from "react-router";
 import Loader from "../../../../components/Layout/Loading";
 import { useUser } from "../../../../components/Providers/useUser";
 import { FLOW_TYPES, PAGES, serverMapping } from "../../../../utils/constants";
-import { getAnalyticsRelyingPartyParams } from "../../../../utils/relyingPartyAnalytics";
 import { useTranslation } from "react-i18next";
 import { getErrorMessage } from "../../../../utils/errorUtils";
 import { path } from "../../../../utils/routeHelpers";
@@ -68,14 +67,12 @@ export default function AddMFAPage() {
     "passwordVerification",
   );
   const [enrollmentLoading, setEnrollmentLoading] = useState(false);
-  const rpParams = getAnalyticsRelyingPartyParams(state.relyingPartyInfo);
 
   const { trackEvent } = useFormTracking({
     formId: ADD_MFA_ANALYTICS.FLOW_ID,
-    commonParams: rpParams,
   });
 
-  useWizardPageTracking(wizardStep, ADD_MFA_PAGE_BY_STEP, rpParams);
+  useWizardPageTracking(wizardStep, ADD_MFA_PAGE_BY_STEP);
 
   const { userProfile } = state;
   const [phoneFormData, setPhoneFormData] = useState<PhoneFormData>({

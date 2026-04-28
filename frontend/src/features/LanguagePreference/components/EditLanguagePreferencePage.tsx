@@ -11,7 +11,6 @@ import { authService } from "../../../services/authService";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch";
 import { useFormTracking } from "../../../hooks/useFormTracking";
 import { useWizardPageTracking } from "../../../hooks/useWizardPageTracking";
-import { getAnalyticsRelyingPartyParams } from "../../../utils/relyingPartyAnalytics";
 import { GA_FORM_EVENTS } from "../../../utils/analyticsConstants";
 import { LANGUAGE_PREFERENCE_ANALYTICS } from "../../../utils/analyticsConstants";
 import StepContent from "../../../components/Wizard/StepContent";
@@ -64,14 +63,12 @@ export default function EditLanguagePreferencePage() {
       updatedPreferredLanguage: state.userProfile?.preferredLanguage || "",
       languageCode: routeLanguage,
     });
-  const rpParams = getAnalyticsRelyingPartyParams(state.relyingPartyInfo);
 
   const { trackEvent } = useFormTracking({
     formId: LANGUAGE_PREFERENCE_ANALYTICS.FLOW_ID,
-    commonParams: rpParams,
   });
 
-  useWizardPageTracking(wizardStep, LANGUAGE_PAGE_BY_STEP, rpParams);
+  useWizardPageTracking(wizardStep, LANGUAGE_PAGE_BY_STEP);
 
   const { t } = useTranslation(["security", "common"]);
 

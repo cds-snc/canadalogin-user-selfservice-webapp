@@ -8,7 +8,6 @@ import {
   PAGES,
   FLOW_TYPES,
 } from "../../utils/constants";
-import { getAnalyticsRelyingPartyParams } from "../../utils/relyingPartyAnalytics";
 import { useTranslation } from "react-i18next";
 import { getErrorMessage } from "../../utils/errorUtils";
 import { useOtpAttemptTracking } from "../../hooks/useOtpAttemptTracking";
@@ -57,7 +56,6 @@ export default function EditEmailAddressPage() {
   const { language } = useParams();
   const { state, dispatch } = useUser();
   const { userProfile } = state;
-  const rpParams = getAnalyticsRelyingPartyParams(state.relyingPartyInfo);
   const { id, userName } = (userProfile ?? {}) as Partial<UserProfile>;
 
   const navigate = useNavigate();
@@ -70,10 +68,9 @@ export default function EditEmailAddressPage() {
   // Initialize form tracking
   const { trackEvent } = useFormTracking({
     formId: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
-    commonParams: rpParams,
   });
 
-  useWizardPageTracking(wizardStep, EMAIL_PAGE_BY_STEP, rpParams);
+  useWizardPageTracking(wizardStep, EMAIL_PAGE_BY_STEP);
 
   // Use the password validation hook
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(

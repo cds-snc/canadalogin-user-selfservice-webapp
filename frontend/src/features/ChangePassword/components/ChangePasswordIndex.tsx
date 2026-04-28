@@ -12,7 +12,6 @@ import { userProfileDispatch } from "../../../utils/userProfileDispatch";
 import { getErrorMessage } from "../../../utils/errorUtils";
 import { authService } from "../../../services/authService";
 import { useOtpAttemptTracking } from "../../../hooks/useOtpAttemptTracking";
-import { getAnalyticsRelyingPartyParams } from "../../../utils/relyingPartyAnalytics";
 
 import { useTranslation } from "react-i18next";
 import { path } from "../../../utils/routeHelpers";
@@ -74,19 +73,13 @@ export default function ChangePasswordIndex() {
 
   const [passwordUpdateStep, setPasswordUpdateStep] =
     useState<PasswordUpdateStep>(defaultPasswordUpdateStep);
-  const rpParams = getAnalyticsRelyingPartyParams(state.relyingPartyInfo);
 
   // Initialize form tracking
   const { trackEvent } = useFormTracking({
     formId: CHANGE_PASSWORD_ANALYTICS.FLOW_ID,
-    commonParams: rpParams,
   });
 
-  useWizardPageTracking(
-    passwordUpdateStep,
-    PASSWORD_CHANGE_PAGE_BY_STEP,
-    rpParams,
-  );
+  useWizardPageTracking(passwordUpdateStep, PASSWORD_CHANGE_PAGE_BY_STEP);
 
   const { userProfile } = state;
   const { id, userName } = userProfile ?? {};
