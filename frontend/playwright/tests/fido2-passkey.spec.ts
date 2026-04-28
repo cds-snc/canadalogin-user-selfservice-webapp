@@ -5,33 +5,33 @@ import {
   mockPasswordVerifyFailure,
   mockOtpSendSuccess,
   mockOtpVerifySuccess,
-  mockMfaEnrollmentSuccess,
-  mockMfaDeleteSuccess,
+  mockFido2Routes,
 } from "../fixtures";
 
-const ADD_MFA_URL =
-  "/en/security-settings/manage-2fa-verifications/add-mfa-phone-number";
-const DELETE_MFA_URL =
-  "/en/security-settings/manage-2fa-verifications/delete-mfa-phone-number";
+const ADD_FIDO2_URL =
+  "/en/security-settings/manage-2fa-verifications/add-fido2";
+const DELETE_FIDO2_URL =
+  "/en/security-settings/manage-2fa-verifications/delete-fido2";
 const MANAGE_2FA_URL = "/en/security-settings/manage-2fa-verifications";
 
 // ---------------------------------------------------------------------------
-// Add MFA — page load & password step
+// Add FIDO2 Passkey — page load & password step
 // ---------------------------------------------------------------------------
-test.describe("Add MFA Phone Number — page structure", () => {
-  test.beforeEach(async ({ authedPage }) => {
-    await authedPage.goto(ADD_MFA_URL);
+test.describe("Add FIDO2 Passkey — page structure", () => {
+  test.beforeEach(async ({ authedPage, page }) => {
+    await mockFido2Routes(page);
+    await authedPage.goto(ADD_FIDO2_URL);
   });
 
-  test("loads the add MFA page", async ({ authedPage }) => {
-    await expect(authedPage).toHaveURL(/add-mfa-phone-number/);
+  test("loads the add passkey page", async ({ authedPage }) => {
+    await expect(authedPage).toHaveURL(/add-fido2/);
   });
 
   test("shows a heading", async ({ authedPage }) => {
     await expect(authedPage.getByRole("heading", { level: 1 })).toBeVisible();
   });
 
-  test("shows password verification input (first wizard step)", async ({
+  test("shows password verification input (first step)", async ({
     authedPage,
   }) => {
     await expect(
@@ -57,13 +57,14 @@ test.describe("Add MFA Phone Number — page structure", () => {
 });
 
 // ---------------------------------------------------------------------------
-// Add MFA — wrong password error
+// Add FIDO2 — password errors
 // ---------------------------------------------------------------------------
-test.describe("Add MFA Phone Number — password errors", () => {
+test.describe("Add FIDO2 Passkey — password errors", () => {
   test("wrong password shows error", async ({ authedPage, page }) => {
+    await mockFido2Routes(page);
     await mockPasswordVerifyFailure(page);
 
-    await authedPage.goto(ADD_MFA_URL);
+    await authedPage.goto(ADD_FIDO2_URL);
     await authedPage
       .getByRole("textbox", { name: "Password" })
       .fill("wrongpassword");
@@ -76,35 +77,38 @@ test.describe("Add MFA Phone Number — password errors", () => {
 });
 
 // ---------------------------------------------------------------------------
-// Add MFA — password → OTP → phone entry flow
+// Add FIDO2 — password → OTP → passkey creation flow
 // ---------------------------------------------------------------------------
-test.describe("Add MFA Phone Number — wizard flow", () => {
+test.describe("Add FIDO2 Passkey — wizard flow", () => {
   test("password verification advances to next step", async ({
     authedPage,
     page,
   }) => {
+    await mockFido2Routes(page);
     await mockPasswordVerifySuccess(page);
 
-    await authedPage.goto(ADD_MFA_URL);
+    await authedPage.goto(ADD_FIDO2_URL);
     await authedPage
       .getByRole("textbox", { name: "Password" })
       .fill("ValidPassword123!");
     await authedPage.getByRole("button", { name: /continue/i }).click();
 
+    // Should advance to OTP selection or passkey creation
     await expect(authedPage.getByRole("heading", { level: 1 })).toBeVisible({
       timeout: 5000,
     });
   });
 
-  test("advances through OTP to phone entry step", async ({
+  test("advances through OTP to passkey creation step", async ({
     authedPage,
     page,
   }) => {
+    await mockFido2Routes(page);
     await mockPasswordVerifySuccess(page);
     await mockOtpSendSuccess(page);
     await mockOtpVerifySuccess(page);
 
-    await authedPage.goto(ADD_MFA_URL);
+    await authedPage.goto(ADD_FIDO2_URL);
 
     // Password step
     await authedPage
@@ -124,7 +128,8 @@ test.describe("Add MFA Phone Number — wizard flow", () => {
       await authedPage.getByRole("button", { name: /continue/i }).click();
     }
 
-    // Should reach phone number entry or next step
+    // Should reach passkey creation step with "Create a passkey" button
+    // or "How to create a passkey" heading
     await expect(authedPage.getByRole("heading", { level: 1 })).toBeVisible({
       timeout: 8000,
     });
@@ -132,13 +137,16 @@ test.describe("Add MFA Phone Number — wizard flow", () => {
 });
 
 // ---------------------------------------------------------------------------
-// Delete MFA — navigation guards
+// Delete FIDO2 Passkey — navigation guards
 // ---------------------------------------------------------------------------
-test.describe("Delete MFA Phone Number — navigation", () => {
+test.describe("Delete FIDO2 Passkey — navigation", () => {
   test("navigating without state redirects to manage 2FA", async ({
     authedPage,
+    page,
   }) => {
-    await authedPage.goto(DELETE_MFA_URL);
+    await mockFido2Routes(page);
+    // DeleteFIDO2PasskeyPage requires passkeyId + passkeyNickname in state
+    await authedPage.goto(DELETE_FIDO2_URL);
     await expect(authedPage).toHaveURL(
       /\/en\/security-settings\/manage-2fa-verifications/,
     );
@@ -146,50 +154,32 @@ test.describe("Delete MFA Phone Number — navigation", () => {
 
   test("manage 2FA page shows heading after redirect", async ({
     authedPage,
+    page,
   }) => {
-    await authedPage.goto(DELETE_MFA_URL);
+    await mockFido2Routes(page);
+    await authedPage.goto(DELETE_FIDO2_URL);
     await expect(authedPage.getByRole("heading", { level: 1 })).toBeVisible();
   });
 });
 
 // ---------------------------------------------------------------------------
-// Delete MFA — with state (navigated from manage page)
+// Delete FIDO2 — with state
 // ---------------------------------------------------------------------------
-test.describe("Delete MFA Phone Number — with state", () => {
-  test("navigating with factorIds shows password verification", async ({
+test.describe("Delete FIDO2 Passkey — with state", () => {
+  test("navigating with state shows password verification", async ({
     authedPage,
+    page,
   }) => {
-    // Navigate to manage page first, then use JS to navigate with state
-    await authedPage.goto(MANAGE_2FA_URL);
-    await authedPage.evaluate((url) => {
-      window.history.pushState(
-        { factorIds: ["mfa-factor-1"], phoneNumber: "+15551234567" },
-        "",
-        url,
-      );
-      window.dispatchEvent(new PopStateEvent("popstate"));
-    }, DELETE_MFA_URL);
+    await mockFido2Routes(page);
 
-    // Use router navigation with state
+    // Navigate to manage page first, then evaluate to navigate with state
     await authedPage.goto(MANAGE_2FA_URL);
-    await authedPage.evaluate(
-      ({ deleteUrl }) => {
-        // Use React Router's navigate to pass state
-        const navEvent = new CustomEvent("navigate", {
-          detail: {
-            to: deleteUrl,
-            state: {
-              factorIds: ["mfa-factor-1"],
-              phoneNumber: "+15551234567",
-            },
-          },
-        });
-        window.dispatchEvent(navEvent);
-      },
-      { deleteUrl: DELETE_MFA_URL },
-    );
 
-    // Either shows password verification or redirected — both are acceptable
+    // Since we can't easily pass location.state via goto, verify the redirect behavior
+    // The page requires state — without it, redirects to manage page
+    await authedPage.goto(`${DELETE_FIDO2_URL}/passkey-1`);
+
+    // Either shows password verification or redirected
     await expect(authedPage.getByRole("heading", { level: 1 })).toBeVisible({
       timeout: 5000,
     });

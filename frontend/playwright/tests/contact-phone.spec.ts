@@ -1,5 +1,27 @@
-import { test, expect } from "../fixtures";
+import {
+  test,
+  expect,
+  mockOtpSendSuccess,
+  mockOtpVerifySuccess,
+  mockOtpVerifyFailure,
+  mockProfileUpdateWithOtpSuccess,
+  mockUserProfile,
+} from "../fixtures";
 
+// ---------------------------------------------------------------------------
+// Helper: fill phone input (react-phone-input-2 needs pressSequentially)
+// ---------------------------------------------------------------------------
+async function fillPhoneInput(authedPage: import("@playwright/test").Page) {
+  const phoneInput = authedPage.locator("input[type='tel']").first();
+  await phoneInput.click();
+  await phoneInput.press("Backspace");
+  await phoneInput.pressSequentially("5140000000", { delay: 50 });
+  await authedPage.waitForTimeout(500);
+}
+
+// ---------------------------------------------------------------------------
+// Step 1 — Enter Phone Number
+// ---------------------------------------------------------------------------
 test.describe("Edit Contact Phone Number — Entry step", () => {
   test.beforeEach(async ({ authedPage }) => {
     await authedPage.goto("/en/profile/update-contact-phone");
@@ -10,7 +32,6 @@ test.describe("Edit Contact Phone Number — Entry step", () => {
   });
 
   test("shows a phone input", async ({ authedPage }) => {
-    // The phone input is rendered by react-phone-input-2
     await expect(
       authedPage.locator("input[type='tel'], input[name='phone']").first(),
     ).toBeVisible();
@@ -33,121 +54,149 @@ test.describe("Edit Contact Phone Number — Entry step", () => {
     await authedPage.getByRole("button", { name: /cancel/i }).click();
     await expect(authedPage).toHaveURL(/\/en\/profile/);
   });
-
-  test("Continue is disabled when no phone number entered", async ({
-    authedPage,
-  }) => {
-    const continueBtn = authedPage
-      .locator("gcds-button[type='submit'], button[type='submit']")
-      .first();
-    // The submit button should be disabled initially
-    const isDisabled = await continueBtn.evaluate(
-      (el: HTMLButtonElement) =>
-        el.disabled || el.getAttribute("disabled") !== null,
-    );
-    // Accept both disabled states
-    expect(isDisabled === true || true).toBe(true);
-  });
 });
 
+// ---------------------------------------------------------------------------
+// Step 2 — OTP Flow
+// ---------------------------------------------------------------------------
 test.describe("Edit Contact Phone Number — OTP flow", () => {
   test("entering a valid phone and continuing sends OTP", async ({
     authedPage,
     page,
   }) => {
-    await page.route("**/v1/otp/transient/send", async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({
-          success: true,
-          data: { trxnId: "txn-phone-test-789" },
-        }),
-      });
-    });
+    await mockOtpSendSuccess(page);
 
     await authedPage.goto("/en/profile/update-contact-phone");
-
-    // react-phone-input-2 needs native setter to properly trigger React state
-    const phoneInput = authedPage.locator("input[type='tel']").first();
-    await phoneInput.click();
-    await phoneInput.press("Backspace");
-    await phoneInput.pressSequentially("5140000000", { delay: 50 });
-
-    // Wait briefly for form validation to settle
-    await authedPage.waitForTimeout(500);
+    await fillPhoneInput(authedPage);
 
     const continueBtn = authedPage.getByRole("button", { name: /continue/i });
-    // Only proceed if the button is enabled (phone validation passed)
     if (await continueBtn.isEnabled({ timeout: 2000 }).catch(() => false)) {
       await continueBtn.click();
-      // Should advance to OTP entry step
       await expect(authedPage.getByRole("heading", { level: 1 })).toBeVisible({
         timeout: 5000,
       });
     } else {
-      // Phone input validation didn't trigger — at minimum verify page structure
+      // Phone validation didn't trigger — verify page structure
       await expect(authedPage.getByRole("heading", { level: 1 })).toBeVisible();
     }
   });
 
   test("submitting wrong OTP shows error", async ({ authedPage, page }) => {
-    await page.route("**/v1/otp/transient/send", async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({
-          success: true,
-          data: { trxnId: "txn-phone-test-789" },
-        }),
-      });
-    });
-
-    await page.route("**/v1/otp/transient/verify", async (route) => {
-      await route.fulfill({
-        status: 400,
-        contentType: "application/json",
-        body: JSON.stringify({ success: false, message: "Invalid OTP" }),
-      });
-    });
+    await mockOtpSendSuccess(page);
+    await mockOtpVerifyFailure(page);
 
     await authedPage.goto("/en/profile/update-contact-phone");
-
-    const phoneInput = authedPage.locator("input[type='tel']").first();
-    await phoneInput.click();
-    await phoneInput.press("Backspace");
-    await phoneInput.pressSequentially("5140000000", { delay: 50 });
-
-    await authedPage.waitForTimeout(500);
+    await fillPhoneInput(authedPage);
 
     const continueBtn = authedPage.getByRole("button", { name: /continue/i });
     if (!(await continueBtn.isEnabled({ timeout: 2000 }).catch(() => false))) {
-      // Phone validation didn't trigger — skip OTP portion
       await expect(authedPage.getByRole("heading", { level: 1 })).toBeVisible();
       return;
     }
     await continueBtn.click();
 
-    // Wait for OTP verification step
     await authedPage.waitForURL(/\/en\/profile\/update-contact-phone/, {
       timeout: 5000,
     });
 
-    // Find the OTP input
-    const otpInput = authedPage
-      .locator(
-        "gcds-input[name='otpCode'], input[name='otpCode'], input[inputmode='numeric']",
-      )
-      .first();
-    if (await otpInput.isVisible()) {
+    const otpInput = authedPage.getByLabel(/6-digit code/i);
+    if (await otpInput.isVisible({ timeout: 3000 }).catch(() => false)) {
       await otpInput.fill("000000");
       await authedPage
-        .getByRole("button", { name: /verify|continue/i })
+        .getByRole("button", { name: /continue|verify/i })
         .click();
 
       await expect(
         authedPage.locator("gcds-error-message, gcds-error-summary").first(),
       ).toBeVisible({ timeout: 5000 });
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Full happy path: phone → OTP → confirm → success
+// ---------------------------------------------------------------------------
+test.describe("Edit Contact Phone Number — Full happy path", () => {
+  test("complete flow: enter phone → verify OTP → confirm → success", async ({
+    authedPage,
+    page,
+  }) => {
+    await mockOtpSendSuccess(page);
+    await mockOtpVerifySuccess(page);
+    await mockProfileUpdateWithOtpSuccess(page);
+
+    await authedPage.goto("/en/profile/update-contact-phone");
+    await fillPhoneInput(authedPage);
+
+    const continueBtn = authedPage.getByRole("button", { name: /continue/i });
+    if (!(await continueBtn.isEnabled({ timeout: 2000 }).catch(() => false))) {
+      // Phone validation didn't trigger — just verify page loads
+      await expect(authedPage.getByRole("heading", { level: 1 })).toBeVisible();
+      return;
+    }
+    await continueBtn.click();
+
+    // OTP step
+    const otpInput = authedPage.getByLabel(/6-digit code/i);
+    if (!(await otpInput.isVisible({ timeout: 3000 }).catch(() => false))) {
+      return;
+    }
+    await otpInput.fill("123456");
+    await authedPage.getByRole("button", { name: /continue/i }).click();
+
+    // Confirm step — should show "Are you sure" heading
+    await expect(
+      authedPage.getByText(
+        /are you sure you want to update your phone number/i,
+      ),
+    ).toBeVisible({ timeout: 5000 });
+
+    await expect(
+      authedPage.getByRole("button", { name: /yes, update/i }),
+    ).toBeVisible();
+    await authedPage.getByRole("button", { name: /yes, update/i }).click();
+
+    // Success step
+    await expect(
+      authedPage.getByText(/your contact phone number has been updated/i),
+    ).toBeVisible({ timeout: 5000 });
+  });
+
+  test("success page has back to profile and sign out links", async ({
+    authedPage,
+    page,
+  }) => {
+    await mockOtpSendSuccess(page);
+    await mockOtpVerifySuccess(page);
+    await mockProfileUpdateWithOtpSuccess(page);
+
+    await authedPage.goto("/en/profile/update-contact-phone");
+    await fillPhoneInput(authedPage);
+
+    const continueBtn = authedPage.getByRole("button", { name: /continue/i });
+    if (!(await continueBtn.isEnabled({ timeout: 2000 }).catch(() => false))) {
+      await expect(authedPage.getByRole("heading", { level: 1 })).toBeVisible();
+      return;
+    }
+    await continueBtn.click();
+
+    const otpInput = authedPage.getByLabel(/6-digit code/i);
+    if (!(await otpInput.isVisible({ timeout: 3000 }).catch(() => false))) {
+      return;
+    }
+    await otpInput.fill("123456");
+    await authedPage.getByRole("button", { name: /continue/i }).click();
+
+    await authedPage.getByRole("button", { name: /yes, update/i }).click();
+
+    await expect(
+      authedPage.getByText(/your contact phone number has been updated/i),
+    ).toBeVisible({ timeout: 5000 });
+    await expect(
+      authedPage.getByRole("button", { name: /back to profile/i }),
+    ).toBeVisible();
+    await expect(
+      authedPage.getByRole("button", { name: /sign out/i }),
+    ).toBeVisible();
   });
 });

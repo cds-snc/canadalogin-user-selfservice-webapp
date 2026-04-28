@@ -63,6 +63,9 @@ test.describe("Route smoke tests", () => {
     "/en/profile/update-name",
     "/en/profile/update-language",
     "/en/profile/update-contact-phone",
+    "/en/profile/update-email",
+    "/en/security-settings/manage-2fa-verifications/add-fido2",
+    "/en/security-settings/manage-2fa-verifications/delete-fido2",
   ];
 
   for (const route of routes) {
