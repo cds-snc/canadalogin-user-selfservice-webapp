@@ -11,6 +11,13 @@ export function useWizardPageTracking<TStep extends string>(
 ) {
   const { pathname } = useLocation();
   const hasTrackedInitialStepView = useRef(false);
+  const additionalParamsRef = useRef<GA4EventParams | undefined>(
+    additionalParams,
+  );
+
+  useEffect(() => {
+    additionalParamsRef.current = additionalParams;
+  }, [additionalParams]);
 
   useEffect(() => {
     if (!hasTrackedInitialStepView.current) {
@@ -18,6 +25,6 @@ export function useWizardPageTracking<TStep extends string>(
       return;
     }
 
-    trackPage(pathname, pageByStep[wizardStep], additionalParams);
-  }, [pathname, pageByStep, wizardStep, additionalParams]);
+    trackPage(pathname, pageByStep[wizardStep], additionalParamsRef.current);
+  }, [pathname, pageByStep, wizardStep]);
 }

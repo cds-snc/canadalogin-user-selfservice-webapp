@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Outlet, useLocation, useMatches } from "react-router";
 import { useLanguage } from "../Providers/LanguageProvider";
 import { useUser } from "../Providers/useUser";
@@ -49,7 +49,10 @@ export default function RootLayout() {
   const effectiveLang =
     urlLang === "en" || urlLang === "fr" ? urlLang : (language ?? undefined);
   const { langHref, currentLang } = getLangValues(effectiveLang, pathname);
-  const rpParams = getAnalyticsRelyingPartyParams(state.relyingPartyInfo);
+  const rpParams = useMemo(
+    () => getAnalyticsRelyingPartyParams(state.relyingPartyInfo),
+    [state.relyingPartyInfo],
+  );
 
   // Synchronously update <html lang> so GCDS web components pick up the
   // correct language via their assignLanguage() DOM walk on first render.
