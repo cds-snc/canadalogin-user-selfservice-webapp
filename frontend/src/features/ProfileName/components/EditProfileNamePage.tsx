@@ -10,6 +10,7 @@ import { authService } from "../../../services/authService";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch";
 import { useFormTracking } from "../../../hooks/useFormTracking";
 import { useWizardPageTracking } from "../../../hooks/useWizardPageTracking";
+import { getAnalyticsRelyingPartyParams } from "../../../utils/relyingPartyAnalytics";
 import { GA_FORM_EVENTS } from "../../../utils/analyticsConstants";
 import { PROFILE_NAME_ANALYTICS } from "../../../utils/analyticsConstants";
 import StepContent from "../../../components/Wizard/StepContent";
@@ -69,10 +70,12 @@ export default function EditProfileNamePage() {
   const [nameFormData, setNameFormData] = useState<ProfileNameFormData>(
     normalizeNameFormData(state?.userProfile?.name),
   );
+  const rpParams = getAnalyticsRelyingPartyParams(state.relyingPartyInfo);
 
   // Initialize form tracking
   const { trackEvent } = useFormTracking({
     formId: PROFILE_NAME_ANALYTICS.FLOW_ID,
+    commonParams: rpParams,
   });
 
   const { t } = useTranslation(["security", "common"]);
@@ -89,7 +92,7 @@ export default function EditProfileNamePage() {
     }
   }, [wizardStep, trackEvent]);
 
-  useWizardPageTracking(wizardStep, PROFILE_NAME_PAGE_BY_STEP);
+  useWizardPageTracking(wizardStep, PROFILE_NAME_PAGE_BY_STEP, rpParams);
 
   const handleNameFormChange = <TField extends keyof ProfileNameFormData>(
     field: TField,
