@@ -1,7 +1,5 @@
 import { test, expect } from "../fixtures";
 
-const API = "http://localhost:8000";
-
 test.describe("Edit Language Preference", () => {
   test.beforeEach(async ({ authedPage }) => {
     await authedPage.goto("/en/profile/update-language");
@@ -41,21 +39,6 @@ test.describe("Edit Language Preference", () => {
     authedPage,
     page,
   }) => {
-    await page.route(`${API}/v1/users/profile`, async (route, request) => {
-      if (request.method() === "PATCH") {
-        await route.fulfill({
-          status: 200,
-          contentType: "application/json",
-          body: JSON.stringify({
-            success: true,
-            data: { preferredLanguage: "fr" },
-          }),
-        });
-      } else {
-        await route.continue();
-      }
-    });
-
     await authedPage.goto("/en/profile/update-language");
 
     // Select French option inside the gcds-radios shadow DOM
@@ -88,7 +71,10 @@ test.describe("Language toggle (EN ↔ FR)", () => {
   test("toggle from /fr to /en route", async ({ authedPage }) => {
     await authedPage.goto("/fr");
 
-    const langToggle = authedPage.getByRole("link", { name: /english|en/i });
+    const langToggle = authedPage.getByRole("link", {
+      name: "English",
+      exact: true,
+    });
     if (await langToggle.isVisible()) {
       await langToggle.click();
       await expect(authedPage).toHaveURL(/\/en/);

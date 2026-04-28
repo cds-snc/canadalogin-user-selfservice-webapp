@@ -10,16 +10,13 @@ test.describe("Authentication guard", () => {
     page,
   }) => {
     // Override profile to return 401 (unauthenticated)
-    await page.route(
-      "http://localhost:8000/v1/users/profile",
-      async (route) => {
-        await route.fulfill({
-          status: 401,
-          contentType: "application/json",
-          body: JSON.stringify({ success: false, message: "Unauthorized" }),
-        });
-      },
-    );
+    await page.route("**/v1/users/profile", async (route) => {
+      await route.fulfill({
+        status: 401,
+        contentType: "application/json",
+        body: JSON.stringify({ success: false, message: "Unauthorized" }),
+      });
+    });
 
     // Intercept navigation to external OIDC — don't actually follow it
     let redirectedToLogin = false;

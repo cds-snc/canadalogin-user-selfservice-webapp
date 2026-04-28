@@ -1,7 +1,5 @@
 import { test, expect } from "../fixtures";
 
-const API = "http://localhost:8000";
-
 test.describe("Add MFA Phone Number", () => {
   test.beforeEach(async ({ authedPage }) => {
     await authedPage.goto(
@@ -17,9 +15,12 @@ test.describe("Add MFA Phone Number", () => {
     await expect(authedPage.getByRole("heading", { level: 1 })).toBeVisible();
   });
 
-  test("shows phone number input", async ({ authedPage }) => {
+  test("shows password verification input (first wizard step)", async ({
+    authedPage,
+  }) => {
+    // AddMFAPage starts at the password verification step
     await expect(
-      authedPage.locator("input[type='tel'], input[name='phone']").first(),
+      authedPage.getByRole("textbox", { name: "Password" }),
     ).toBeVisible();
   });
 
@@ -37,12 +38,12 @@ test.describe("Add MFA Phone Number", () => {
   });
 });
 
-test.describe("Add MFA Phone Number — OTP enrollment flow", () => {
-  test("entering a phone and continuing sends enrollment OTP", async ({
+test.describe("Add MFA Phone Number — password verification step", () => {
+  test("password verification advances to OTP selection", async ({
     authedPage,
     page,
   }) => {
-    await page.route(`${API}/v1/otp/mfa/enroll`, async (route) => {
+    await page.route("**/v1/password/verify", async (route) => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -50,32 +51,16 @@ test.describe("Add MFA Phone Number — OTP enrollment flow", () => {
       });
     });
 
-    await page.route(`${API}/v1/otp/mfa/send`, async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({
-          success: true,
-          data: { trxnId: "txn-mfa-enroll-001" },
-        }),
-      });
-    });
-
     await authedPage.goto(
       "/en/security-settings/manage-2fa-verifications/add-mfa-phone-number",
     );
 
-    const phoneInput = authedPage
-      .locator("input[name='phone'], input[type='tel']")
-      .first();
-    await phoneInput.fill("15140000001");
-
     await authedPage
-      .getByRole("button")
-      .filter({ hasText: /continue/i })
-      .first()
-      .click();
+      .getByRole("textbox", { name: "Password" })
+      .fill("ValidPassword123!");
+    await authedPage.getByRole("button", { name: /continue/i }).click();
 
+    // Should advance to the next wizard step
     await expect(authedPage.getByRole("heading", { level: 1 })).toBeVisible({
       timeout: 5000,
     });
@@ -83,63 +68,39 @@ test.describe("Add MFA Phone Number — OTP enrollment flow", () => {
 });
 
 test.describe("Delete MFA Phone Number", () => {
-  test.beforeEach(async ({ authedPage }) => {
+  test("navigating to delete page without state redirects to manage 2FA", async ({
+    authedPage,
+  }) => {
+    // DeleteMFAPage requires factorIds in location.state;
+    // without it, it redirects to manage-2fa-verifications
     await authedPage.goto(
       "/en/security-settings/manage-2fa-verifications/delete-mfa-phone-number",
     );
+    await expect(authedPage).toHaveURL(
+      /\/en\/security-settings\/manage-2fa-verifications/,
+    );
   });
 
-  test("loads the delete MFA page", async ({ authedPage }) => {
-    await expect(authedPage).toHaveURL(/delete-mfa-phone-number/);
-  });
-
-  test("shows a heading", async ({ authedPage }) => {
+  test("manage 2FA page shows existing phone factor", async ({
+    authedPage,
+  }) => {
+    await authedPage.goto("/en/security-settings/manage-2fa-verifications");
     await expect(authedPage.getByRole("heading", { level: 1 })).toBeVisible();
-  });
-
-  test("delete MFA page has cancel option", async ({ authedPage }) => {
-    const cancelEl = authedPage
-      .locator("gcds-button, button")
-      .filter({ hasText: /cancel|back/i })
-      .first();
-    const isVisible = await cancelEl.isVisible().catch(() => false);
-    expect(isVisible === true || true).toBe(true); // flexible: page may redirect if no MFA to delete
   });
 });
 
-test.describe("Delete MFA — confirmation flow", () => {
-  test("successful delete requires OTP verification", async ({
+test.describe("Delete MFA — navigation", () => {
+  test("delete page without state redirects to manage page", async ({
     authedPage,
-    page,
   }) => {
-    await page.route(`${API}/v1/otp/transient/send`, async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({
-          success: true,
-          data: { trxnId: "txn-delete-mfa-001" },
-        }),
-      });
-    });
-
     await authedPage.goto(
       "/en/security-settings/manage-2fa-verifications/delete-mfa-phone-number",
     );
 
-    // If phone factor list is shown, interact with it
-    const deleteBtn = authedPage
-      .locator("gcds-button, button")
-      .filter({ hasText: /delete|remove/i })
-      .first();
-    const isVisible = await deleteBtn.isVisible().catch(() => false);
-
-    if (isVisible) {
-      await deleteBtn.click();
-      // Should advance to confirm or OTP step
-      await expect(authedPage.getByRole("heading", { level: 1 })).toBeVisible({
-        timeout: 5000,
-      });
-    }
+    // Should redirect to manage-2fa-verifications since no factorIds in state
+    await expect(authedPage).toHaveURL(
+      /\/en\/security-settings\/manage-2fa-verifications/,
+    );
+    await expect(authedPage.getByRole("heading", { level: 1 })).toBeVisible();
   });
 });

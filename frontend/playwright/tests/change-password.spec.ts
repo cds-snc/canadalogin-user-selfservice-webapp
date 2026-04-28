@@ -1,7 +1,5 @@
 import { test, expect } from "../fixtures";
 
-const API = "http://localhost:8000";
-
 test.describe("Change Password — Password Verification step", () => {
   test.beforeEach(async ({ authedPage }) => {
     await authedPage.goto("/en/security-settings/update-password");
@@ -42,7 +40,7 @@ test.describe("Change Password — Password Verification step", () => {
     authedPage,
     page,
   }) => {
-    await page.route(`${API}/v1/password/verify`, async (route) => {
+    await page.route("**/v1/password/verify", async (route) => {
       await route.fulfill({
         status: 400,
         contentType: "application/json",
@@ -54,14 +52,11 @@ test.describe("Change Password — Password Verification step", () => {
     });
 
     // Fill the password input inside the shadow DOM
-    const pwInput = authedPage.locator("input[type='password']").first();
-    await pwInput.fill("wrongpassword");
+    await authedPage
+      .getByRole("textbox", { name: "Password" })
+      .fill("wrongpassword");
 
-    const continueBtn = authedPage
-      .getByRole("button")
-      .filter({ hasText: /continue|verify|confirm/i })
-      .first();
-    await continueBtn.click();
+    await authedPage.getByRole("button", { name: /continue/i }).click();
 
     // An error message component should appear
     await expect(
@@ -76,7 +71,7 @@ test.describe("Change Password — OTP selection step", () => {
     page,
   }) => {
     // Mock a successful password verify so the wizard advances
-    await page.route(`${API}/v1/password/verify`, async (route) => {
+    await page.route("**/v1/password/verify", async (route) => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -86,14 +81,11 @@ test.describe("Change Password — OTP selection step", () => {
 
     await authedPage.goto("/en/security-settings/update-password");
 
-    const pwInput = authedPage.locator("input[type='password']").first();
-    await pwInput.fill("ValidPassword123!");
+    await authedPage
+      .getByRole("textbox", { name: "Password" })
+      .fill("ValidPassword123!");
 
-    const continueBtn = authedPage
-      .getByRole("button")
-      .filter({ hasText: /continue|verify/i })
-      .first();
-    await continueBtn.click();
+    await authedPage.getByRole("button", { name: /continue/i }).click();
 
     // After password step, should show OTP method selection
     await expect(authedPage.getByRole("heading", { level: 1 })).toBeVisible({
@@ -108,7 +100,7 @@ test.describe("Change Password — OTP verification step", () => {
     page,
   }) => {
     // Mock successful password verify
-    await page.route(`${API}/v1/password/verify`, async (route) => {
+    await page.route("**/v1/password/verify", async (route) => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -117,7 +109,7 @@ test.describe("Change Password — OTP verification step", () => {
     });
 
     // Mock OTP send
-    await page.route(`${API}/v1/otp/transient/send`, async (route) => {
+    await page.route("**/v1/otp/transient/send", async (route) => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -130,23 +122,18 @@ test.describe("Change Password — OTP verification step", () => {
 
     await authedPage.goto("/en/security-settings/update-password");
 
-    const pwInput = authedPage.locator("input[type='password']").first();
-    await pwInput.fill("ValidPassword123!");
-
     await authedPage
-      .getByRole("button")
-      .filter({ hasText: /continue|verify/i })
-      .first()
-      .click();
+      .getByRole("textbox", { name: "Password" })
+      .fill("ValidPassword123!");
+
+    await authedPage.getByRole("button", { name: /continue/i }).click();
 
     // Select SMS / Text message option if visible
     const smsOption = authedPage.getByText(/text message|sms/i).first();
     if (await smsOption.isVisible()) {
       await smsOption.click();
       await authedPage
-        .getByRole("button")
-        .filter({ hasText: /continue|next|send/i })
-        .first()
+        .getByRole("button", { name: /continue|next|send/i })
         .click();
     }
 
@@ -163,7 +150,7 @@ test.describe("Change Password — New password step", () => {
     page,
   }) => {
     // Mock policy endpoint with min=12
-    await page.route(`${API}/v1/password/policy`, async (route) => {
+    await page.route("**/v1/password/policy", async (route) => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",

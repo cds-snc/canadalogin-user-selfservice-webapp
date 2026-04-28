@@ -38,13 +38,9 @@ test.describe("Edit Profile Name", () => {
     authedPage,
   }) => {
     await authedPage.goto("/en/profile/update-name");
-    // gcds-input renders a shadow-DOM input; query the host element by name
-    await expect(
-      authedPage.locator("gcds-input[name='firstName']"),
-    ).toBeVisible();
-    await expect(
-      authedPage.locator("gcds-input[name='lastName']"),
-    ).toBeVisible();
+    // gcds-input renders a shadow-DOM input; query by label
+    await expect(authedPage.getByLabel("First name")).toBeVisible();
+    await expect(authedPage.getByLabel("Last name")).toBeVisible();
   });
 
   test("edit name page shows Cancel button", async ({ authedPage }) => {
@@ -59,12 +55,11 @@ test.describe("Edit Profile Name", () => {
   }) => {
     await authedPage.goto("/en/profile/update-name");
 
-    // Click the Continue/Save button without filling in the name
-    const continueBtn = authedPage
-      .getByRole("button")
-      .filter({ hasText: /continue|save|update/i })
-      .first();
-    await continueBtn.click();
+    // Clear the first name field
+    await authedPage.getByLabel("First name").fill("");
+
+    // Click the Continue button
+    await authedPage.getByRole("button", { name: /continue/i }).click();
 
     // An error message or error summary should appear
     const hasError = await authedPage
@@ -87,10 +82,8 @@ test.describe("Edit Profile Name", () => {
     authedPage,
     page,
   }) => {
-    const API = "http://localhost:8000";
-
     // Mock the transient OTP send & verify endpoints
-    await page.route(`${API}/v1/otp/transient/send`, async (route) => {
+    await page.route("**/v1/otp/transient/send", async (route) => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -100,14 +93,14 @@ test.describe("Edit Profile Name", () => {
         }),
       });
     });
-    await page.route(`${API}/v1/otp/transient/verify`, async (route) => {
+    await page.route("**/v1/otp/transient/verify", async (route) => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
         body: JSON.stringify({ success: true }),
       });
     });
-    await page.route(`${API}/v1/users/profile`, async (route, request) => {
+    await page.route("**/v1/users/profile", async (route, request) => {
       if (request.method() === "PATCH") {
         await route.fulfill({
           status: 200,
@@ -115,35 +108,17 @@ test.describe("Edit Profile Name", () => {
           body: JSON.stringify({ success: true, data: { ...mockUserProfile } }),
         });
       } else {
-        await route.continue();
+        await route.fallback();
       }
     });
 
     await authedPage.goto("/en/profile/update-name");
 
-    // Fill in the name fields (pierce shadow DOM)
-    await authedPage
-      .locator("gcds-input[name='firstName']")
-      .evaluate((el: Element) => {
-        el.shadowRoot
-          ?.querySelector("input")
-          ?.setAttribute("value", "NewFirst");
-      });
-    await authedPage
-      .locator("gcds-input[name='firstName']")
-      .locator("input")
-      .fill("NewFirst");
+    // Fill in the name fields
+    await authedPage.getByLabel("First name").fill("NewFirst");
+    await authedPage.getByLabel("Last name").fill("NewLast");
 
-    await authedPage
-      .locator("gcds-input[name='lastName']")
-      .locator("input")
-      .fill("NewLast");
-
-    const continueBtn = authedPage
-      .getByRole("button")
-      .filter({ hasText: /continue|save/i })
-      .first();
-    await continueBtn.click();
+    await authedPage.getByRole("button", { name: /continue/i }).click();
 
     // Should move to confirm step or OTP step
     await expect(authedPage).toHaveURL(/\/en\/profile\/update-name/);

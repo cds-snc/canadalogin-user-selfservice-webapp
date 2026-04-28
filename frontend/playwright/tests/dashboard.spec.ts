@@ -16,11 +16,15 @@ test.describe("Dashboard", () => {
   });
 
   test("shows Personal information card", async ({ authedPage }) => {
-    await expect(authedPage.getByText("Personal information")).toBeVisible();
+    await expect(
+      authedPage.getByRole("main").getByText("Personal information"),
+    ).toBeVisible();
   });
 
   test("shows Security settings card", async ({ authedPage }) => {
-    await expect(authedPage.getByText("Security settings")).toBeVisible();
+    await expect(
+      authedPage.getByRole("main").getByText("Security settings"),
+    ).toBeVisible();
   });
 
   test("root path redirects to /en", async ({ authedPage }) => {
@@ -43,11 +47,10 @@ test.describe("Dashboard — navigation", () => {
     await authedPage.goto("/en");
 
     // gcds-card renders an anchor; click the card title link
-    const card = authedPage
-      .getByRole("link")
-      .filter({ hasText: "Personal information" })
-      .first();
-    await card.click();
+    // Click the card title link (the nav items are not links)
+    await authedPage
+      .getByRole("link", { name: "Personal information", exact: true })
+      .click();
 
     await expect(authedPage).toHaveURL(/\/en\/profile/);
   });
@@ -57,11 +60,9 @@ test.describe("Dashboard — navigation", () => {
   }) => {
     await authedPage.goto("/en");
 
-    const card = authedPage
-      .getByRole("link")
-      .filter({ hasText: "Security settings" })
-      .first();
-    await card.click();
+    await authedPage
+      .getByRole("link", { name: "Security settings", exact: true })
+      .click();
 
     await expect(authedPage).toHaveURL(/\/en\/security-settings/);
   });

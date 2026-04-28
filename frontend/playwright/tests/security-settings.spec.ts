@@ -18,9 +18,11 @@ test.describe("Security Settings page", () => {
   });
 
   test("shows Password section with change link", async ({ authedPage }) => {
-    await expect(authedPage.getByText("Password")).toBeVisible();
     await expect(
-      authedPage.getByRole("link", { name: /change/i }),
+      authedPage.getByRole("heading", { name: "Password" }),
+    ).toBeVisible();
+    await expect(
+      authedPage.getByRole("main").getByRole("link", { name: /change/i }),
     ).toBeVisible();
   });
 
@@ -30,7 +32,7 @@ test.describe("Security Settings page", () => {
 
   test("shows Manage link for 2-step verification", async ({ authedPage }) => {
     await expect(
-      authedPage.getByRole("link", { name: /manage/i }),
+      authedPage.getByRole("link", { name: "Manage", exact: true }),
     ).toBeVisible();
   });
 
@@ -47,7 +49,10 @@ test.describe("Security Settings page", () => {
   test("Manage link navigates to 2FA verifications page", async ({
     authedPage,
   }) => {
-    const manageLink = authedPage.getByRole("link", { name: /manage/i });
+    const manageLink = authedPage.getByRole("link", {
+      name: "Manage",
+      exact: true,
+    });
     await manageLink.click();
     await expect(authedPage).toHaveURL(
       /\/en\/security-settings\/manage-2fa-verifications/,
@@ -70,11 +75,7 @@ test.describe("Manage 2FA Verifications page", () => {
   test("shows Add MFA phone number option or existing number", async ({
     authedPage,
   }) => {
-    // Either shows existing factors or an add button/link
-    const pageContent = await authedPage
-      .locator("main, [role='main']")
-      .textContent();
-    // Page should contain some verification-method related content
-    expect(pageContent).toBeTruthy();
+    // Verify the page renders with content
+    await expect(authedPage.getByRole("heading", { level: 1 })).toBeVisible();
   });
 });
