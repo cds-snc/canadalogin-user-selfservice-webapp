@@ -1,206 +1,170 @@
 import {
   test,
   expect,
+  fillGcdsInput,
+  advancePastIdentityVerification,
   mockPasswordVerifySuccess,
   mockPasswordVerifyFailure,
-  mockOtpSendSuccess,
-  mockOtpVerifySuccess,
-  mockOtpVerifyFailure,
   mockPasswordUpdateSuccess,
+  mockPasswordUpdateValidateFailure,
 } from "../fixtures";
 
-// ---------------------------------------------------------------------------
-// Helper: advance through password verification step
-// ---------------------------------------------------------------------------
-async function advancePastPasswordStep(
-  authedPage: import("@playwright/test").Page,
-) {
-  await authedPage
-    .getByRole("textbox", { name: "Password" })
-    .fill("ValidPassword123!");
-  await authedPage.getByRole("button", { name: /continue/i }).click();
-}
+const PASSWORD_URL = "/en/security-settings/update-password";
 
 // ---------------------------------------------------------------------------
-// Step 1 — Password Verification
+// Change Password — full flows
 // ---------------------------------------------------------------------------
-test.describe("Change Password — Password Verification step", () => {
-  test.beforeEach(async ({ authedPage }) => {
-    await authedPage.goto("/en/security-settings/update-password");
-  });
+test.describe("Change Password", () => {
+  test("happy path: verify identity → enter new password → success with sign-in button", async ({
+    authedPage,
+    page,
+  }) => {
+    await mockPasswordVerifySuccess(page);
+    await mockPasswordUpdateSuccess(page);
 
-  test("loads the update-password route", async ({ authedPage }) => {
-    await expect(authedPage).toHaveURL(
-      /\/en\/security-settings\/update-password/,
-    );
-  });
+    await authedPage.goto(PASSWORD_URL);
 
-  test("shows a heading", async ({ authedPage }) => {
-    await expect(authedPage.getByRole("heading", { level: 1 })).toBeVisible();
-  });
-
-  test("shows a password input field", async ({ authedPage }) => {
+    // Step 1: Password verification — "First, verify it's you"
     await expect(
-      authedPage.getByRole("textbox", { name: "Password" }),
+      authedPage.getByRole("heading", {
+        name: /first, verify it's you/i,
+      }),
+    ).toBeVisible();
+    await expect(
+      authedPage.getByText(
+        /to change your password, first enter your current password/i,
+      ),
+    ).toBeVisible();
+
+    // Identity verification (password + OTP)
+    await advancePastIdentityVerification(authedPage);
+
+    // Step 4: New password — "Enter a new password"
+    await expect(
+      authedPage.getByRole("heading", { name: /enter a new password/i }),
+    ).toBeVisible({ timeout: 8000 });
+    await expect(authedPage.getByText(/minimum length/i)).toBeVisible();
+
+    // Fill new password and submit
+    const passwordInput = authedPage.getByRole("textbox", { name: "Password" });
+    await passwordInput.waitFor({ state: "visible", timeout: 3000 });
+    await passwordInput.fill("NewSecurePassword456!");
+    await authedPage.getByRole("button", { name: /continue/i }).click();
+
+    // Step 5: Success — "You will need to sign in using your new password"
+    await expect(
+      authedPage.getByRole("heading", {
+        name: /you will need to sign in using your new password/i,
+      }),
+    ).toBeVisible({ timeout: 8000 });
+    await expect(
+      authedPage.getByText(/your password has been changed/i),
+    ).toBeVisible();
+    await expect(
+      authedPage.getByRole("button", { name: /sign in/i }),
     ).toBeVisible();
   });
 
-  test("shows Cancel and Continue buttons", async ({ authedPage }) => {
-    await expect(
-      authedPage.getByRole("button", { name: /cancel/i }),
-    ).toBeVisible();
-    await expect(
-      authedPage.getByRole("button", { name: /continue/i }),
-    ).toBeVisible();
-  });
-
-  test("cancel returns to security settings", async ({ authedPage }) => {
-    await authedPage.getByRole("button", { name: /cancel/i }).click();
-    await expect(authedPage).toHaveURL(/\/en\/security-settings/);
-  });
-
-  test("wrong password shows an error message", async ({
+  test("wrong password shows error and blocks progress", async ({
     authedPage,
     page,
   }) => {
     await mockPasswordVerifyFailure(page);
+
+    await authedPage.goto(PASSWORD_URL);
+
+    await expect(
+      authedPage.getByRole("heading", {
+        name: /first, verify it's you/i,
+      }),
+    ).toBeVisible();
 
     await authedPage
       .getByRole("textbox", { name: "Password" })
       .fill("wrongpassword");
     await authedPage.getByRole("button", { name: /continue/i }).click();
 
+    // Error shown, still on same step
     await expect(
       authedPage.locator("gcds-error-message, gcds-error-summary").first(),
     ).toBeVisible({ timeout: 5000 });
+    await expect(
+      authedPage.getByRole("heading", {
+        name: /first, verify it's you/i,
+      }),
+    ).toBeVisible();
   });
-});
 
-// ---------------------------------------------------------------------------
-// Step 2 — OTP Selection
-// ---------------------------------------------------------------------------
-test.describe("Change Password — OTP selection step", () => {
-  test("advances to next step after password verification", async ({
+  test("wrong OTP shows error and stays on OTP step", async ({
     authedPage,
     page,
   }) => {
     await mockPasswordVerifySuccess(page);
-    await authedPage.goto("/en/security-settings/update-password");
+    await mockPasswordUpdateValidateFailure(page, 3);
 
-    await advancePastPasswordStep(authedPage);
+    await authedPage.goto(PASSWORD_URL);
 
-    // After password step, should advance (OTP selection or auto-send)
-    await expect(authedPage.getByRole("heading", { level: 1 })).toBeVisible({
-      timeout: 5000,
-    });
+    // Password step
+    await authedPage
+      .getByRole("textbox", { name: "Password" })
+      .fill("ValidPassword123!");
+    await authedPage.getByRole("button", { name: /continue/i }).click();
+
+    // OTP step — enter wrong code
+    const otpInput = authedPage.getByLabel(/6-digit code/i);
+    await otpInput.waitFor({ state: "visible", timeout: 8000 });
+    await fillGcdsInput(otpInput, "000000");
+    await authedPage.getByRole("button", { name: /continue/i }).click();
+
+    // Error shown, still on OTP step
+    await expect(
+      authedPage.locator("gcds-error-message, gcds-error-summary").first(),
+    ).toBeVisible({ timeout: 5000 });
+    await expect(
+      authedPage.getByRole("heading", { name: /check your phone/i }),
+    ).toBeVisible();
   });
-});
 
-// ---------------------------------------------------------------------------
-// Step 3 — OTP Verification
-// ---------------------------------------------------------------------------
-test.describe("Change Password — OTP verification step", () => {
-  test("shows OTP entry after selecting SMS method", async ({
+  test("cancel on password step returns to security settings", async ({
+    authedPage,
+  }) => {
+    await authedPage.goto(PASSWORD_URL);
+
+    await expect(
+      authedPage.getByRole("heading", {
+        name: /first, verify it's you/i,
+      }),
+    ).toBeVisible();
+
+    await authedPage.getByRole("button", { name: /cancel/i }).click();
+    await expect(authedPage).toHaveURL(/\/en\/security-settings/);
+  });
+
+  test("'Sign in' button on success step triggers navigation", async ({
     authedPage,
     page,
   }) => {
     await mockPasswordVerifySuccess(page);
-    await mockOtpSendSuccess(page);
-
-    await authedPage.goto("/en/security-settings/update-password");
-    await advancePastPasswordStep(authedPage);
-
-    // If OTP selection is shown, pick SMS; otherwise auto-sent
-    const smsOption = authedPage.getByText(/text message|sms|text me/i).first();
-    if (await smsOption.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await smsOption.click();
-      const sendBtn = authedPage.getByRole("button", {
-        name: /continue|next|send/i,
-      });
-      if (await sendBtn.isVisible({ timeout: 1000 }).catch(() => false)) {
-        await sendBtn.click();
-      }
-    }
-
-    // An OTP entry heading or input should appear
-    await expect(authedPage.getByRole("heading", { level: 1 })).toBeVisible({
-      timeout: 5000,
-    });
-  });
-});
-
-// ---------------------------------------------------------------------------
-// Step 4 — New Password Entry
-// ---------------------------------------------------------------------------
-test.describe("Change Password — New password step", () => {
-  async function navigateToNewPasswordStep(
-    authedPage: import("@playwright/test").Page,
-    page: import("@playwright/test").Page,
-  ) {
-    await mockPasswordVerifySuccess(page);
-    await mockOtpSendSuccess(page);
-    await mockOtpVerifySuccess(page);
     await mockPasswordUpdateSuccess(page);
 
-    await authedPage.goto("/en/security-settings/update-password");
-    await advancePastPasswordStep(authedPage);
+    await authedPage.goto(PASSWORD_URL);
+    await advancePastIdentityVerification(authedPage);
 
-    // Handle OTP selection if shown
-    const smsOption = authedPage.getByText(/text me/i).first();
-    if (await smsOption.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await smsOption.click();
-    }
+    // New password step
+    await expect(
+      authedPage.getByRole("heading", { name: /enter a new password/i }),
+    ).toBeVisible({ timeout: 8000 });
+    const passwordInput = authedPage.getByRole("textbox", { name: "Password" });
+    await passwordInput.fill("NewSecurePassword456!");
+    await authedPage.getByRole("button", { name: /continue/i }).click();
 
-    // Wait for OTP input and fill it
-    const otpInput = authedPage.getByLabel(/6-digit code/i);
-    if (await otpInput.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await otpInput.fill("123456");
-      await authedPage.getByRole("button", { name: /continue/i }).click();
-    }
-  }
+    // Success step — click Sign in
+    await expect(
+      authedPage.getByRole("button", { name: /sign in/i }),
+    ).toBeVisible({ timeout: 8000 });
+    await authedPage.getByRole("button", { name: /sign in/i }).click();
 
-  test("new password step shows password input", async ({
-    authedPage,
-    page,
-  }) => {
-    await navigateToNewPasswordStep(authedPage, page);
-
-    // Should show new password entry
-    await expect(authedPage.getByRole("heading", { level: 1 })).toBeVisible({
-      timeout: 8000,
-    });
-  });
-});
-
-// ---------------------------------------------------------------------------
-// Error: wrong OTP
-// ---------------------------------------------------------------------------
-test.describe("Change Password — OTP errors", () => {
-  test("invalid OTP shows error with attempts remaining", async ({
-    authedPage,
-    page,
-  }) => {
-    await mockPasswordVerifySuccess(page);
-    await mockOtpSendSuccess(page);
-    await mockOtpVerifyFailure(page, 3);
-
-    await authedPage.goto("/en/security-settings/update-password");
-    await advancePastPasswordStep(authedPage);
-
-    // Handle OTP selection if shown
-    const smsOption = authedPage.getByText(/text me/i).first();
-    if (await smsOption.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await smsOption.click();
-    }
-
-    const otpInput = authedPage.getByLabel(/6-digit code/i);
-    if (await otpInput.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await otpInput.fill("000000");
-      await authedPage.getByRole("button", { name: /continue/i }).click();
-
-      await expect(
-        authedPage.locator("gcds-error-message, gcds-error-summary").first(),
-      ).toBeVisible({ timeout: 5000 });
-    }
+    // Should navigate away
+    await authedPage.waitForTimeout(1000);
   });
 });

@@ -1,6 +1,8 @@
 import {
   test,
   expect,
+  fillGcdsInput,
+  advancePastIdentityVerification,
   mockPasswordVerifySuccess,
   mockPasswordVerifyFailure,
   mockOtpSendSuccess,
@@ -12,249 +14,244 @@ import {
 const EMAIL_URL = "/en/profile/update-email";
 
 // ---------------------------------------------------------------------------
-// Helper: advance past password verification + OTP steps
+// Edit Email — full flows
 // ---------------------------------------------------------------------------
-async function advanceToEmailEntry(
-  authedPage: import("@playwright/test").Page,
-  page: import("@playwright/test").Page,
-) {
-  await mockPasswordVerifySuccess(page);
-  await mockOtpSendSuccess(page);
-  await mockOtpVerifySuccess(page);
+test.describe("Edit Email Address", () => {
+  test("happy path: verify identity → enter email → email OTP → confirm → success", async ({
+    authedPage,
+    page,
+  }) => {
+    await mockPasswordVerifySuccess(page);
+    await mockOtpSendSuccess(page);
+    await mockOtpVerifySuccess(page);
+    await mockProfileUpdateWithOtpSuccess(page);
 
-  await authedPage.goto(EMAIL_URL);
-
-  // Password step
-  await authedPage
-    .getByRole("textbox", { name: "Password" })
-    .fill("ValidPassword123!");
-  await authedPage.getByRole("button", { name: /continue/i }).click();
-
-  // Wait for OTP verification page (auto-sends when 1 factor)
-  await authedPage.getByText(/enter the code/i).waitFor({ timeout: 8000 });
-
-  // Fill OTP and submit
-  const otpInput = authedPage.getByLabel(/6-digit code/i);
-  await otpInput.fill("123456");
-  await authedPage.getByRole("button", { name: /continue/i }).click();
-
-  // Wait for wizard to advance past OTP step
-  await authedPage.waitForTimeout(2000);
-}
-
-// ---------------------------------------------------------------------------
-// Step 1 — Password Verification
-// ---------------------------------------------------------------------------
-test.describe("Edit Email — Password Verification step", () => {
-  test("loads the update-email page", async ({ authedPage }) => {
     await authedPage.goto(EMAIL_URL);
-    await expect(authedPage).toHaveURL(/\/en\/profile\/update-email/);
-    await expect(authedPage.getByRole("heading", { level: 1 })).toBeVisible();
-  });
 
-  test("shows password input on first step", async ({ authedPage }) => {
-    await authedPage.goto(EMAIL_URL);
+    // Step 1: Password verification — "First, verify it's you"
     await expect(
-      authedPage.getByRole("textbox", { name: "Password" }),
+      authedPage.getByRole("heading", {
+        name: /first, verify it's you/i,
+      }),
+    ).toBeVisible();
+
+    // Identity verification (password + phone OTP)
+    await advancePastIdentityVerification(authedPage);
+
+    // Step 4: Enter email — "Enter a new email address"
+    await expect(
+      authedPage.getByRole("heading", {
+        name: /enter a new email address/i,
+      }),
+    ).toBeVisible({ timeout: 8000 });
+    await expect(
+      authedPage.getByText(/changing your email address will affect/i),
+    ).toBeVisible();
+
+    // Fill email and continue
+    const emailInput = authedPage.getByRole("textbox", { name: /email/i });
+    await emailInput.fill("newemail@example.com");
+    await authedPage.getByRole("button", { name: /continue/i }).click();
+
+    // Step 5: Email OTP — "Check your email"
+    await expect(
+      authedPage.getByRole("heading", { name: /check your email/i }),
+    ).toBeVisible({ timeout: 8000 });
+    await expect(
+      authedPage.getByText(/we have sent an email with a 6-digit code/i),
+    ).toBeVisible();
+
+    // Fill email OTP
+    const emailOtpInput = authedPage.getByLabel(/6-digit code/i);
+    await emailOtpInput.waitFor({ state: "visible", timeout: 5000 });
+    await fillGcdsInput(emailOtpInput, "654321");
+    await authedPage.getByRole("button", { name: /continue/i }).click();
+
+    // Step 6: Confirm — "Are you sure you want to update your email?"
+    await expect(
+      authedPage.getByRole("heading", {
+        name: /are you sure you want to update your email/i,
+      }),
+    ).toBeVisible({ timeout: 8000 });
+    await expect(
+      authedPage.getByRole("button", { name: /yes, update/i }),
+    ).toBeVisible();
+    await authedPage.getByRole("button", { name: /yes, update/i }).click();
+
+    // Step 7: Success — "You may need to update your email other places"
+    await expect(
+      authedPage.getByText(/your email has been updated/i),
+    ).toBeVisible({ timeout: 8000 });
+    await expect(
+      authedPage.getByRole("button", { name: /back to profile/i }),
+    ).toBeVisible();
+    await expect(
+      authedPage.getByRole("button", { name: /sign out/i }),
     ).toBeVisible();
   });
 
-  test("shows Cancel and Continue buttons", async ({ authedPage }) => {
-    await authedPage.goto(EMAIL_URL);
-    await expect(
-      authedPage.getByRole("button", { name: /cancel/i }),
-    ).toBeVisible();
-    await expect(
-      authedPage.getByRole("button", { name: /continue/i }),
-    ).toBeVisible();
-  });
-
-  test("cancel returns to profile page", async ({ authedPage }) => {
-    await authedPage.goto(EMAIL_URL);
-    await authedPage.getByRole("button", { name: /cancel/i }).click();
-    await expect(authedPage).toHaveURL(/\/en\/profile/);
-  });
-
-  test("wrong password shows error", async ({ authedPage, page }) => {
+  test("wrong password shows error and blocks progress", async ({
+    authedPage,
+    page,
+  }) => {
     await mockPasswordVerifyFailure(page);
+
     await authedPage.goto(EMAIL_URL);
+
+    await expect(
+      authedPage.getByRole("heading", {
+        name: /first, verify it's you/i,
+      }),
+    ).toBeVisible();
 
     await authedPage
       .getByRole("textbox", { name: "Password" })
       .fill("wrongpassword");
     await authedPage.getByRole("button", { name: /continue/i }).click();
 
+    // Error shown, still on password step
     await expect(
       authedPage.locator("gcds-error-message, gcds-error-summary").first(),
     ).toBeVisible({ timeout: 5000 });
+    await expect(
+      authedPage.getByRole("heading", {
+        name: /first, verify it's you/i,
+      }),
+    ).toBeVisible();
   });
 
-  test("correct password advances to next step", async ({
+  test("wrong email OTP shows error on confirmation step", async ({
     authedPage,
     page,
   }) => {
     await mockPasswordVerifySuccess(page);
-    await authedPage.goto(EMAIL_URL);
-
-    await authedPage
-      .getByRole("textbox", { name: "Password" })
-      .fill("ValidPassword123!");
-    await authedPage.getByRole("button", { name: /continue/i }).click();
-
-    await expect(authedPage.getByRole("heading", { level: 1 })).toBeVisible({
-      timeout: 5000,
-    });
-  });
-});
-
-// ---------------------------------------------------------------------------
-// Step 4 — Enter Email
-// ---------------------------------------------------------------------------
-test.describe("Edit Email — Enter Email step", () => {
-  test("shows email input after password + OTP steps", async ({
-    authedPage,
-    page,
-  }) => {
-    await advanceToEmailEntry(authedPage, page);
-
-    // Should show email entry step
-    const emailInput = authedPage.getByRole("textbox", { name: /email/i });
-    await expect(emailInput).toBeVisible({ timeout: 8000 });
-  });
-
-  test("email input has Continue and Cancel buttons", async ({
-    authedPage,
-    page,
-  }) => {
-    await advanceToEmailEntry(authedPage, page);
-
-    const emailInput = authedPage.getByRole("textbox", { name: /email/i });
-    if (await emailInput.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await expect(
-        authedPage.getByRole("button", { name: /continue/i }),
-      ).toBeVisible();
-      await expect(
-        authedPage.getByRole("button", { name: /cancel/i }),
-      ).toBeVisible();
-    }
-  });
-
-  test("submitting empty email shows validation error", async ({
-    authedPage,
-    page,
-  }) => {
-    await advanceToEmailEntry(authedPage, page);
-
-    const emailInput = authedPage.getByRole("textbox", { name: /email/i });
-    if (await emailInput.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await emailInput.fill("");
-      await authedPage.getByRole("button", { name: /continue/i }).click();
-
-      const hasError = await authedPage
-        .locator("gcds-error-message, gcds-error-summary")
-        .first()
-        .isVisible({ timeout: 3000 })
-        .catch(() => false);
-      expect(hasError || true).toBe(true);
-    }
-  });
-
-  test("entering valid email and continuing sends email OTP", async ({
-    authedPage,
-    page,
-  }) => {
-    await advanceToEmailEntry(authedPage, page);
-
-    const emailInput = authedPage.getByRole("textbox", { name: /email/i });
-    if (await emailInput.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await emailInput.fill("newemail@example.com");
-      await authedPage.getByRole("button", { name: /continue/i }).click();
-
-      // Should advance to email OTP verification
-      await expect(authedPage.getByRole("heading", { level: 1 })).toBeVisible({
-        timeout: 5000,
-      });
-    }
-  });
-});
-
-// ---------------------------------------------------------------------------
-// Full happy path
-// ---------------------------------------------------------------------------
-test.describe("Edit Email — Full happy path", () => {
-  test("complete flow: password → OTP → email → email OTP → confirm → success", async ({
-    authedPage,
-    page,
-  }) => {
-    await mockProfileUpdateWithOtpSuccess(page);
-    await advanceToEmailEntry(authedPage, page);
-
-    // Email entry step
-    const emailInput = authedPage.getByRole("textbox", { name: /email/i });
-    await expect(emailInput).toBeVisible({ timeout: 5000 });
-    await emailInput.fill("newemail@example.com");
-    await authedPage.getByRole("button", { name: /continue/i }).click();
-
-    // Email OTP step
-    await authedPage.getByText(/check your email/i).waitFor({ timeout: 5000 });
-    const emailOtp = authedPage.getByLabel(/6-digit code/i);
-    await emailOtp.click();
-    await emailOtp.pressSequentially("654321", { delay: 50 });
-    await authedPage.getByRole("button", { name: /continue/i }).click();
-
-    // Confirm step
-    await authedPage
-      .getByText(/are you sure you want to update your email/i)
-      .waitFor({ timeout: 5000 });
-    await authedPage.getByRole("button", { name: /yes, update/i }).click();
-
-    // Success step
-    await expect(
-      authedPage.getByText(/your email has been updated/i),
-    ).toBeVisible({ timeout: 5000 });
-    await expect(
-      authedPage.getByRole("button", { name: /back to profile/i }),
-    ).toBeVisible();
-  });
-});
-
-// ---------------------------------------------------------------------------
-// Email OTP error
-// ---------------------------------------------------------------------------
-test.describe("Edit Email — Email OTP errors", () => {
-  test("wrong email OTP shows error", async ({ authedPage, page }) => {
-    // Override the OTP verify to fail for email step
-    await advanceToEmailEntry(authedPage, page);
-
-    // Now re-mock OTP verify to fail (for the email OTP step)
-    await page.route("**/v1/otp/transient/verify**", async (route) => {
+    await mockOtpSendSuccess(page);
+    await mockOtpVerifySuccess(page);
+    // Mock the profile update-with-otp endpoint to fail (wrong OTP)
+    await page.route("**/v1/users/profile/update-with-otp**", async (route) => {
       await route.fulfill({
         status: 400,
         contentType: "application/json",
         body: JSON.stringify({
           success: false,
-          message: "Invalid code",
+          message: "Invalid code. You have 3 attempts remaining.",
           messageId: "INVALID_OTP",
         }),
       });
     });
 
-    const emailInput = authedPage.getByRole("textbox", { name: /email/i });
-    if (!(await emailInput.isVisible({ timeout: 5000 }).catch(() => false))) {
-      return;
-    }
+    await authedPage.goto(EMAIL_URL);
+    await advancePastIdentityVerification(authedPage);
 
+    // Enter email step
+    await expect(
+      authedPage.getByRole("heading", {
+        name: /enter a new email address/i,
+      }),
+    ).toBeVisible({ timeout: 8000 });
+    const emailInput = authedPage.getByRole("textbox", { name: /email/i });
     await emailInput.fill("newemail@example.com");
     await authedPage.getByRole("button", { name: /continue/i }).click();
 
-    const emailOtp = authedPage.getByLabel(/6-digit code/i);
-    if (await emailOtp.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await emailOtp.fill("000000");
-      await authedPage.getByRole("button", { name: /continue/i }).click();
+    // Email OTP step — enter code
+    await expect(
+      authedPage.getByRole("heading", { name: /check your email/i }),
+    ).toBeVisible({ timeout: 8000 });
+    const emailOtpInput = authedPage.getByLabel(/6-digit code/i);
+    await fillGcdsInput(emailOtpInput, "000000");
+    await authedPage.getByRole("button", { name: /continue/i }).click();
 
-      await expect(
-        authedPage.locator("gcds-error-message, gcds-error-summary").first(),
-      ).toBeVisible({ timeout: 5000 });
-    }
+    // Confirm step — click "Yes, update" — should show error
+    await expect(
+      authedPage.getByRole("heading", {
+        name: /are you sure you want to update your email/i,
+      }),
+    ).toBeVisible({ timeout: 5000 });
+    await authedPage.getByRole("button", { name: /yes, update/i }).click();
+    await expect(
+      authedPage.locator("gcds-error-message, gcds-error-summary").first(),
+    ).toBeVisible({ timeout: 5000 });
+  });
+
+  test("cancel on password step returns to profile page", async ({
+    authedPage,
+  }) => {
+    await authedPage.goto(EMAIL_URL);
+
+    await expect(
+      authedPage.getByRole("heading", {
+        name: /first, verify it's you/i,
+      }),
+    ).toBeVisible();
+
+    await authedPage.getByRole("button", { name: /cancel/i }).click();
+    await expect(authedPage).toHaveURL(/\/en\/profile/);
+  });
+
+  test("'Use a different email' link is visible on email OTP step", async ({
+    authedPage,
+    page,
+  }) => {
+    await mockPasswordVerifySuccess(page);
+    await mockOtpSendSuccess(page);
+    await mockOtpVerifySuccess(page);
+
+    await authedPage.goto(EMAIL_URL);
+    await advancePastIdentityVerification(authedPage);
+
+    // Enter email
+    await expect(
+      authedPage.getByRole("heading", {
+        name: /enter a new email address/i,
+      }),
+    ).toBeVisible({ timeout: 8000 });
+    const emailInput = authedPage.getByRole("textbox", { name: /email/i });
+    await emailInput.fill("newemail@example.com");
+    await authedPage.getByRole("button", { name: /continue/i }).click();
+
+    // Email OTP step should have "Use a different email" link
+    await expect(
+      authedPage.getByRole("heading", { name: /check your email/i }),
+    ).toBeVisible({ timeout: 8000 });
+    await expect(authedPage.getByText(/use a different email/i)).toBeVisible();
+  });
+
+  test("'Back to profile' button on success navigates to profile", async ({
+    authedPage,
+    page,
+  }) => {
+    await mockPasswordVerifySuccess(page);
+    await mockOtpSendSuccess(page);
+    await mockOtpVerifySuccess(page);
+    await mockProfileUpdateWithOtpSuccess(page);
+
+    await authedPage.goto(EMAIL_URL);
+    await advancePastIdentityVerification(authedPage);
+
+    // Enter email
+    const emailInput = authedPage.getByRole("textbox", { name: /email/i });
+    await emailInput.waitFor({ state: "visible", timeout: 8000 });
+    await emailInput.fill("newemail@example.com");
+    await authedPage.getByRole("button", { name: /continue/i }).click();
+
+    // Email OTP
+    const emailOtpInput = authedPage.getByLabel(/6-digit code/i);
+    await emailOtpInput.waitFor({ state: "visible", timeout: 8000 });
+    await fillGcdsInput(emailOtpInput, "654321");
+    await authedPage.getByRole("button", { name: /continue/i }).click();
+
+    // Confirm
+    await authedPage
+      .getByRole("button", { name: /yes, update/i })
+      .waitFor({ state: "visible", timeout: 5000 });
+    await authedPage.getByRole("button", { name: /yes, update/i }).click();
+
+    // Success — click "Back to profile"
+    await expect(
+      authedPage.getByRole("button", { name: /back to profile/i }),
+    ).toBeVisible({ timeout: 8000 });
+    await authedPage.getByRole("button", { name: /back to profile/i }).click();
+
+    await expect(authedPage).toHaveURL(/\/en\/profile/, { timeout: 5000 });
   });
 });

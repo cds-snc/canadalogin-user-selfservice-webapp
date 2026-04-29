@@ -55,16 +55,31 @@ export const mockMfaFactors = [
 export const mockFido2Credentials = [
   {
     id: "passkey-1",
-    nickname: "My Phone",
+    attributes: { nickname: "My Phone" },
     enabled: true,
-    createdAt: "2025-09-08T12:00:00Z",
-    rpId: "test-rp-id",
+    created: "2025-09-08T12:00:00Z",
+    rpId: "localhost",
   },
 ];
 
 // ---------------------------------------------------------------------------
 // Reusable helpers: mock common API responses for wizard flows
 // ---------------------------------------------------------------------------
+
+/**
+ * Fill a GcdsInput web component reliably.
+ * `fill()` sets the DOM value but does NOT fire the `gcdsInput` custom event,
+ * so React state never updates. `pressSequentially` fires individual key events
+ * that the component's event listener picks up.
+ */
+export async function fillGcdsInput(
+  locator: import("@playwright/test").Locator,
+  value: string,
+): Promise<void> {
+  await locator.click();
+  await locator.fill(""); // clear any existing value
+  await locator.pressSequentially(value, { delay: 30 });
+}
 
 /** Mock a successful password verification response */
 export async function mockPasswordVerifySuccess(page: Page): Promise<void> {
@@ -180,7 +195,7 @@ export async function mockMfaEnrollmentSuccess(page: Page): Promise<void> {
       contentType: "application/json",
       body: JSON.stringify({
         success: true,
-        data: { trxnId: "txn-mfa-send" },
+        data: { id: "txn-mfa-send" },
       }),
     });
   });
@@ -210,7 +225,10 @@ export async function mockFido2Routes(page: Page): Promise<void> {
     await route.fulfill({
       status: 200,
       contentType: "application/json",
-      body: JSON.stringify({ success: true, data: mockFido2Credentials }),
+      body: JSON.stringify({
+        success: true,
+        data: { fido2: mockFido2Credentials },
+      }),
     });
   });
   await page.route("**/v1/fido2/attestation/options**", async (route) => {
@@ -220,10 +238,21 @@ export async function mockFido2Routes(page: Page): Promise<void> {
       body: JSON.stringify({
         success: true,
         data: {
-          rp: { name: "CanadaLogin", id: "test-rp" },
-          user: { id: "test-user", name: "test@example.com" },
+          rp: { name: "CanadaLogin", id: "localhost" },
+          user: {
+            id: "dGVzdC11c2Vy",
+            name: "test@example.com",
+            displayName: "Test User",
+          },
           challenge: "dGVzdC1jaGFsbGVuZ2U",
           pubKeyCredParams: [{ type: "public-key", alg: -7 }],
+          authenticatorSelection: {
+            authenticatorAttachment: "platform",
+            residentKey: "preferred",
+            userVerification: "preferred",
+          },
+          timeout: 60000,
+          attestation: "none",
         },
       }),
     });
@@ -267,15 +296,60 @@ export async function mockFido2Routes(page: Page): Promise<void> {
   });
 }
 
-/** Mock password update endpoints (first-step, second-step, final-step) */
+/** Mock password update endpoints (initiate, validate, complete) */
 export async function mockPasswordUpdateSuccess(page: Page): Promise<void> {
-  await page.route("**/v1/password/update**", async (route) => {
+  await page.route("**/v1/password/update/initiate**", async (route) => {
     await route.fulfill({
       status: 200,
       contentType: "application/json",
       body: JSON.stringify({
         success: true,
-        data: { trxnId: "txn-pw-update" },
+        data: { trxId: "txn-pw-initiate-123" },
+      }),
+    });
+  });
+  await page.route("**/v1/password/update/validate**", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        success: true,
+        data: { trxId: "txn-pw-validate-123" },
+      }),
+    });
+  });
+  await page.route("**/v1/password/update/complete**", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ success: true }),
+    });
+  });
+}
+
+/** Mock password update validate failure (wrong OTP) */
+export async function mockPasswordUpdateValidateFailure(
+  page: Page,
+  attemptsRemaining = 3,
+): Promise<void> {
+  await page.route("**/v1/password/update/initiate**", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        success: true,
+        data: { trxId: "txn-pw-initiate-123" },
+      }),
+    });
+  });
+  await page.route("**/v1/password/update/validate**", async (route) => {
+    await route.fulfill({
+      status: 400,
+      contentType: "application/json",
+      body: JSON.stringify({
+        success: false,
+        message: `Invalid code. You have ${attemptsRemaining} attempts remaining.`,
+        messageId: "INVALID_OTP",
       }),
     });
   });
@@ -375,6 +449,50 @@ export async function mockApiRoutes(page: Page): Promise<void> {
       body: JSON.stringify({ success: true, data: { redirect_url: "/" } }),
     });
   });
+}
+
+// ---------------------------------------------------------------------------
+// Flow helper: advance through identity verification (password → OTP)
+// ---------------------------------------------------------------------------
+
+/**
+ * Advances a wizard through the password verification and OTP steps.
+ * Since the mock has only 1 MFA factor, OTP selection is auto-skipped
+ * and OTP is auto-sent to the single factor.
+ *
+ * Prerequisites: mockPasswordVerifySuccess + mockOtpSendSuccess +
+ * mockOtpVerifySuccess must be set up BEFORE calling this.
+ */
+export async function advancePastIdentityVerification(
+  page: Page,
+): Promise<void> {
+  // Password step — "First, verify it's you"
+  const passwordInput = page.getByRole("textbox", { name: "Password" });
+  await passwordInput.waitFor({ state: "visible", timeout: 5000 });
+  await passwordInput.fill("ValidPassword123!");
+  await page.getByRole("button", { name: /continue/i }).click();
+
+  // OTP step — auto-sent to single factor, shows "Check your phone"
+  const otpInput = page.getByLabel(/6-digit code/i);
+  await otpInput.waitFor({ state: "visible", timeout: 8000 });
+  await fillGcdsInput(otpInput, "123456");
+  await page.getByRole("button", { name: /continue/i }).click();
+}
+
+/**
+ * Fills the react-phone-input-2 component with a Canadian phone number.
+ */
+export async function fillPhoneInput(
+  page: Page,
+  number = "5142345678",
+): Promise<void> {
+  const phoneInput = page.locator("input[type='tel']").first();
+  await phoneInput.click();
+  // Clear existing value
+  await phoneInput.press("Meta+a");
+  await phoneInput.press("Backspace");
+  await phoneInput.pressSequentially(number, { delay: 50 });
+  await page.waitForTimeout(300);
 }
 
 // ---------------------------------------------------------------------------
