@@ -17,6 +17,9 @@ if (config.gatag) {
       anonymize_ip: true,
       debug_mode: config.environment === VITE_ENVIRONMENTS.dev,
     },
+    gtagOptions: {
+      send_page_view: false,
+    },
   });
 }
 

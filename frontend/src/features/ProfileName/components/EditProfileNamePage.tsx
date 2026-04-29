@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { useNavigate, useParams } from "react-router";
 
@@ -69,6 +69,7 @@ export default function EditProfileNamePage() {
   const [nameFormData, setNameFormData] = useState<ProfileNameFormData>(
     normalizeNameFormData(state?.userProfile?.name),
   );
+  const hasTrackedInitialEditNameStep = useRef(false);
 
   // Initialize form tracking
   const { trackEvent } = useFormTracking({
@@ -81,7 +82,8 @@ export default function EditProfileNamePage() {
   const backToProfile = path(PAGES.ProfileHome, { language: routeLanguage });
 
   useEffect(() => {
-    if (wizardStep === "editName") {
+    if (wizardStep === "editName" && !hasTrackedInitialEditNameStep.current) {
+      hasTrackedInitialEditNameStep.current = true;
       trackEvent({
         event: GA_FORM_EVENTS.FORM_STEP_START,
         step: PROFILE_NAME_ANALYTICS.STEPS.EDIT_NAME,

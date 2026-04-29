@@ -1,6 +1,7 @@
 import ReactGA from "react-ga4";
 
-import { GA_CATEGORIES, GA_CLICK_EVENTS } from "./analyticsConstants";
+import { GA_CLICK_EVENTS } from "./analyticsConstants";
+import config from "../config";
 import type {
   AnalyticsPayload,
   AnalyticsTrackEvent,
@@ -99,6 +100,13 @@ const GA_PAGE_TITLE_SUFFIXES: Record<string, string> = {
   ...Fido2Steps,
 };
 
+function withCommonAnalyticsParams(params?: GA4EventParams): GA4EventParams {
+  return {
+    ...params,
+    app_environment: config.environment,
+  };
+}
+
 function toTitleCase(value?: string) {
   if (!value) {
     return "";
@@ -128,7 +136,11 @@ export function getAnalyticsPageTitle(path?: string, pageId?: string) {
   return toTitleCase(suffixSource);
 }
 
-export function trackPage(path?: string, pageId?: string) {
+export function trackPage(
+  path?: string,
+  pageId?: string,
+  additionalParams?: GA4EventParams,
+) {
   const safePath = typeof path === "string" && path.trim() ? path : "/";
   const title = getAnalyticsPageTitle(safePath, pageId);
 
@@ -136,24 +148,46 @@ export function trackPage(path?: string, pageId?: string) {
     document.title = title;
   }
 
-  ReactGA.send({ hitType: GA_CATEGORIES.pageView, page: safePath, title });
+  const payload: GA4EventParams = {
+    ...additionalParams,
+    page_title: title,
+    page_path: safePath,
+    page_location:
+      typeof window !== "undefined" ? window.location.href : undefined,
+  };
+
+  ReactGA.event("page_view", withCommonAnalyticsParams(payload));
+}
+
+export function setAnalyticsContext(additionalParams?: GA4EventParams) {
+  ReactGA.set(withCommonAnalyticsParams(additionalParams));
 }
 
 export function trackEvent({ category, action, label }: AnalyticsPayload) {
-  ReactGA.event({ category, action, label });
+  ReactGA.event(
+    action,
+    withCommonAnalyticsParams({
+      event_category: category,
+      ...(label && { event_label: label }),
+    }),
+  );
 }
 export function trackGA4Event(eventName: string, params?: GA4EventParams) {
-  ReactGA.event(eventName, params);
+  ReactGA.event(eventName, withCommonAnalyticsParams(params));
 }
 
-export function trackAnalyticsEvent({
-  event,
-  form_id,
-  step,
-  type,
-  error,
-  duration_ms,
-}: AnalyticsTrackEvent) {
+export function trackAnalyticsEvent(
+  { event, form_id, step, type, error, duration_ms }: AnalyticsTrackEvent,
+  additionalParams?: GA4EventParams,
+) {
+  const reservedKeys = new Set([
+    "form_id",
+    "step",
+    "page",
+    "type",
+    "error",
+    "duration_ms",
+  ]);
   const params: GA4EventParams = {
     form_id,
     step,
@@ -168,7 +202,16 @@ export function trackAnalyticsEvent({
   if (duration_ms !== undefined) {
     params.duration_ms = duration_ms;
   }
-  ReactGA.event(event, params);
+  if (additionalParams) {
+    const safeAdditionalParams = Object.fromEntries(
+      Object.entries(additionalParams).filter(
+        ([key]) => !reservedKeys.has(key),
+      ),
+    ) as GA4EventParams;
+
+    Object.assign(params, safeAdditionalParams);
+  }
+  ReactGA.event(event, withCommonAnalyticsParams(params));
 }
 
 export function trackCardClick(params: CardClickParams) {

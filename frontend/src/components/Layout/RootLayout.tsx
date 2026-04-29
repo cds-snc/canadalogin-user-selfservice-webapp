@@ -1,13 +1,25 @@
 import { useEffect } from "react";
 import { Outlet, useLocation, useMatches } from "react-router";
 import { useLanguage } from "../Providers/LanguageProvider";
+import { useRelyingPartyAnalyticsParams } from "../../hooks/useRelyingPartyAnalyticsParams";
 import { getLangValues } from "../../utils/functions";
-import { trackPage } from "../../utils/gatag";
+import { setAnalyticsContext, trackPage } from "../../utils/gatag";
+import { PAGES } from "../../utils/constants";
 import Header from "../Layout/Header";
 import Footer from "../Layout/Footer";
 import config from "../../config";
 
 import { GcdsContainer, GcdsText } from "@gcds-core/components-react";
+
+const WIZARD_TRACKED_PAGE_IDS = new Set<string>([
+  PAGES.editProfileNamePage,
+  PAGES.editLanguagePreferences,
+  PAGES.editContactPhoneNumberPage,
+  PAGES.editEmailPage,
+  PAGES.password,
+  PAGES.addMFAPage,
+  PAGES.deleteMFAPage,
+]);
 
 const DisplayReleaseTag = () => {
   const { releaseTag } = config as { releaseTag?: string };
@@ -35,6 +47,7 @@ export default function RootLayout() {
   const effectiveLang =
     urlLang === "en" || urlLang === "fr" ? urlLang : (language ?? undefined);
   const { langHref, currentLang } = getLangValues(effectiveLang, pathname);
+  const rpParams = useRelyingPartyAnalyticsParams();
 
   // Synchronously update <html lang> so GCDS web components pick up the
   // correct language via their assignLanguage() DOM walk on first render.
@@ -46,8 +59,16 @@ export default function RootLayout() {
     .find(Boolean);
 
   useEffect(() => {
-    trackPage(pathname, pageId);
-  }, [pathname, pageId]);
+    setAnalyticsContext(rpParams);
+  }, [rpParams]);
+
+  useEffect(() => {
+    if (pageId && WIZARD_TRACKED_PAGE_IDS.has(pageId)) {
+      return;
+    }
+
+    trackPage(pathname, pageId, rpParams);
+  }, [pathname, pageId, rpParams]);
 
   return (
     <div className="mainBody">
