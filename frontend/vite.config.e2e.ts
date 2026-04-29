@@ -12,13 +12,13 @@ export default defineConfig({
   plugins: [react(), svgr()],
   define: {
     "import.meta.env.VITE_BACKEND_API_URL": JSON.stringify(
-      "http://localhost:3000",
+      "http://localhost:3100",
     ),
     "import.meta.env.VITE_ENVIRONMENT": JSON.stringify("dev"),
   },
   server: {
     host: "localhost",
-    port: 3000,
+    port: 3100,
     strictPort: true,
   },
 });
