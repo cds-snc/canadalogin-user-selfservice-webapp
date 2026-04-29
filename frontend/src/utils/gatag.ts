@@ -102,8 +102,8 @@ const GA_PAGE_TITLE_SUFFIXES: Record<string, string> = {
 
 function withCommonAnalyticsParams(params?: GA4EventParams): GA4EventParams {
   return {
-    app_environment: config.environment,
     ...params,
+    app_environment: config.environment,
   };
 }
 
@@ -149,11 +149,11 @@ export function trackPage(
   }
 
   const payload: GA4EventParams = {
+    ...additionalParams,
     page_title: title,
     page_path: safePath,
     page_location:
       typeof window !== "undefined" ? window.location.href : undefined,
-    ...additionalParams,
   };
 
   ReactGA.event("page_view", withCommonAnalyticsParams(payload));
@@ -180,6 +180,14 @@ export function trackAnalyticsEvent(
   { event, form_id, step, type, error, duration_ms }: AnalyticsTrackEvent,
   additionalParams?: GA4EventParams,
 ) {
+  const reservedKeys = new Set([
+    "form_id",
+    "step",
+    "page",
+    "type",
+    "error",
+    "duration_ms",
+  ]);
   const params: GA4EventParams = {
     form_id,
     step,
@@ -195,7 +203,13 @@ export function trackAnalyticsEvent(
     params.duration_ms = duration_ms;
   }
   if (additionalParams) {
-    Object.assign(params, additionalParams);
+    const safeAdditionalParams = Object.fromEntries(
+      Object.entries(additionalParams).filter(
+        ([key]) => !reservedKeys.has(key),
+      ),
+    ) as GA4EventParams;
+
+    Object.assign(params, safeAdditionalParams);
   }
   ReactGA.event(event, withCommonAnalyticsParams(params));
 }

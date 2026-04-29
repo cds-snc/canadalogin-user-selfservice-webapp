@@ -1,11 +1,10 @@
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { Outlet, useLocation, useMatches } from "react-router";
 import { useLanguage } from "../Providers/LanguageProvider";
-import { useUser } from "../Providers/useUser";
+import { useRelyingPartyAnalyticsParams } from "../../hooks/useRelyingPartyAnalyticsParams";
 import { getLangValues } from "../../utils/functions";
 import { setAnalyticsContext, trackPage } from "../../utils/gatag";
 import { PAGES } from "../../utils/constants";
-import { getAnalyticsRelyingPartyParams } from "../../utils/relyingPartyAnalytics";
 import Header from "../Layout/Header";
 import Footer from "../Layout/Footer";
 import config from "../../config";
@@ -39,7 +38,6 @@ const DisplayReleaseTag = () => {
 export default function RootLayout() {
   const { pathname } = useLocation();
   const matches = useMatches();
-  const { state } = useUser();
   const { state: languageState } = useLanguage();
   const { language } = languageState;
 
@@ -49,10 +47,7 @@ export default function RootLayout() {
   const effectiveLang =
     urlLang === "en" || urlLang === "fr" ? urlLang : (language ?? undefined);
   const { langHref, currentLang } = getLangValues(effectiveLang, pathname);
-  const rpParams = useMemo(
-    () => getAnalyticsRelyingPartyParams(state.relyingPartyInfo),
-    [state.relyingPartyInfo],
-  );
+  const rpParams = useRelyingPartyAnalyticsParams();
 
   // Synchronously update <html lang> so GCDS web components pick up the
   // correct language via their assignLanguage() DOM walk on first render.
