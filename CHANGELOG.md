@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.17.2](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.17.1...v1.17.2) (2026-04-29)
+
+
+### Miscellaneous Chores
+
+* update prod version to 1.17.1 ([#1429](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1429)) ([f2c7de6](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/f2c7de65cf7b7bb283e4e61b6121056fa9371cbc))
+* update staging version to 1.17.1 ([#1427](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1427)) ([1b8ac9e](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/1b8ac9e99b09623dc153a6a89f1697325cd8245c))
+
 ## [1.17.1](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.17.0...v1.17.1) (2026-04-27)
 
 
