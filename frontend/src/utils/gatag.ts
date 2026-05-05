@@ -144,10 +144,6 @@ export function trackPage(
   const safePath = typeof path === "string" && path.trim() ? path : "/";
   const title = getAnalyticsPageTitle(safePath, pageId);
 
-  if (typeof document !== "undefined") {
-    document.title = title;
-  }
-
   const payload: GA4EventParams = {
     ...additionalParams,
     page_title: title,
