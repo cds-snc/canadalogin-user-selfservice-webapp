@@ -132,6 +132,7 @@ export const PAGES = {
   deleteFIDO2PasskeyConfirm: "DeleteFIDO2PasskeyConfirm",
   deleteFIDO2PasskeySuccess: "DeleteFIDO2PasskeySuccess",
   idvServiceCanadaCentrePage: "IdvServiceCanadaCentrePage",
+  idvServiceCanadaCentreCodePage: "IdvServiceCanadaCentreCodePage",
 } as const;
 
 export const FOOTERS = {
