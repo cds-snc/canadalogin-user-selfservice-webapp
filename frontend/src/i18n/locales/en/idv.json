@@ -1,0 +1,18 @@
+{
+  "ServiceCanadaCentre": {
+    "pageTitle": "Prove your identity",
+    "heading": "Get ready to visit a Service Canada Centre",
+    "followSteps": "Follow the steps to complete the process",
+    "step1": "Continue to receive your unique identification code for in-person proofing, valid for 30 days",
+    "step2": "Find the closest available Service Canada Centre to visit in-person with your code and one valid identity document",
+    "listOfIds": "List of acceptable IDs",
+    "step3": "Once the Service Canada agent confirms proofing is complete, you can sign back into the service",
+    "receiveCodeHeading": "Receive your unique identification code",
+    "receiveCodeDescription": "The next screen will generate your unique identification code that you will use for your in-person proofing at Service Canada.",
+    "emailInstructions": "Instructions along with your code will also be emailed to your following address:",
+    "continueButton": "Continue",
+    "backButton": "Back",
+    "moreInfoTitle": "For more information",
+    "learnMoreLink": "Learn more about Service Canada Centre identity proofing"
+  }
+}

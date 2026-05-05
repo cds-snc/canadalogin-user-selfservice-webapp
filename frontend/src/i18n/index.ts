@@ -28,6 +28,8 @@ import frSecurity from "./locales/fr/security.json";
 import frMfa from "./locales/fr/mfa.json";
 import frFido2 from "./locales/fr/fido2.json";
 import frOtp from "./locales/fr/otp.json";
+import enIdv from "./locales/en/idv.json";
+import frIdv from "./locales/fr/idv.json";
 
 export const NAMESPACES = [
   "common",
@@ -43,6 +45,7 @@ export const NAMESPACES = [
   "mfa",
   "fido2",
   "otp",
+  "idv",
 ] as const;
 
 export type I18nNamespace = (typeof NAMESPACES)[number];
@@ -108,6 +111,8 @@ export const PAGE_NAMESPACE_MAP: Record<string, I18nNamespace> = {
   TransientOtpSelection: "otp",
   PasswordVerification: "otp",
   NoticeFactory: "otp",
+  // idv
+  IdvServiceCanadaCentrePage: "idv",
 };
 
 i18n.use(initReactI18next).init({
@@ -126,6 +131,7 @@ i18n.use(initReactI18next).init({
       mfa: enMfa,
       fido2: enFido2,
       otp: enOtp,
+      idv: enIdv,
     },
     fr: {
       common: frCommon,
@@ -141,6 +147,7 @@ i18n.use(initReactI18next).init({
       mfa: frMfa,
       fido2: frFido2,
       otp: frOtp,
+      idv: frIdv,
     },
   },
   lng: "en",
