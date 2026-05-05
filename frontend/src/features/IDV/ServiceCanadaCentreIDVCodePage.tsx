@@ -7,7 +7,6 @@ import {
   GcdsGrid,
 } from "@gcds-core/components-react";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router";
 import { useUser } from "../../components/Providers/useUser";
 
 interface ServiceCanadaCentreIDVCodePageProps {
@@ -18,16 +17,10 @@ interface ServiceCanadaCentreIDVCodePageProps {
 export default function ServiceCanadaCentreIDVCodePage({
   idvCode,
 }: ServiceCanadaCentreIDVCodePageProps) {
-  const { language = "en" } = useParams<{ language: string }>();
   const { state } = useUser();
   const { t } = useTranslation("idv");
 
   const email = state?.userProfile?.userName ?? "";
-
-  const findNearestHref =
-    language === "fr"
-      ? "https://www.canada.ca/fr/emploi-developpement-social/ministere/portefeuille/service-canada/centres-service.html"
-      : "https://www.canada.ca/en/employment-social-development/corporate/portfolio/service-canada/centres.html";
 
   return (
     <GcdsContainer role="main">
@@ -36,9 +29,9 @@ export default function ServiceCanadaCentreIDVCodePage({
           {t("ServiceCanadaCentreCode.heading")}
         </GcdsHeading>
 
-        <GcdsText marginBottom="0">
+        <GcdsHeading tag="h2" marginBottom="0" marginTop="0">
           <strong>{idvCode ?? "387DHROGJ"}</strong>
-        </GcdsText>
+        </GcdsHeading>
         <GcdsContainer>
           {" "}
           <GcdsText>
@@ -57,7 +50,10 @@ export default function ServiceCanadaCentreIDVCodePage({
         >
           <GcdsText marginBottom="0">
             {t("ServiceCanadaCentreCode.findNearestBody")}{" "}
-            <GcdsLink href={findNearestHref} external={true}>
+            {
+              //TODO: populate with real URL once available
+            }
+            <GcdsLink href={"#"} external={true}>
               {t("ServiceCanadaCentreCode.findNearestLink")}
             </GcdsLink>
             .
