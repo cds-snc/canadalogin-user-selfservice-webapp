@@ -1,4 +1,4 @@
-.PHONY: install-dev-python install-python fmt-ci-python fmt-python lint-python run-tests setup-hooks uninstall-hooks
+.PHONY: install-dev-python install-python fmt-ci-python fmt-python lint-python run-tests setup-hooks uninstall-hooks check-local-state
 
 install-python: 
 	@pip3 install -r ./backend/requirements.txt
@@ -17,6 +17,9 @@ fmt-ci-python:
 
 lint-python:
 	flake8 .
+
+check-local-state:
+	semgrep --config .semgrep/no-local-state.yml --error backend/app/
 
 run-pytest:
 	pytest
