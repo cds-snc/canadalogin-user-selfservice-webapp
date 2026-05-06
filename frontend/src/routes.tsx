@@ -21,6 +21,7 @@ import { PAGES } from "./utils/constants";
 import EditEmailAddressPage from "./features/EmailAddress/EditEmailAddressPage";
 import AddFIDO2PasskeyPage from "./features/ManageFIDO2/components/AddFIDO2Passkey/AddFIDO2PasskeyPage";
 import DeleteFIDO2PasskeyPage from "./features/ManageFIDO2/components/DeleteFIDO2Passkey/DeleteFIDO2PasskeyPage";
+import ServiceCanadaCentrePage from "./features/IDV/ServiceCanadaCentrePage";
 
 export const appRoutes: RouteObject[] = [
   {
@@ -125,6 +126,11 @@ export const appRoutes: RouteObject[] = [
                     ],
                   },
                 ],
+              },
+              {
+                path: "idv/in-person/service-canada-centre",
+                element: <ServiceCanadaCentrePage />,
+                handle: { id: PAGES.idvServiceCanadaCentrePage },
               },
             ],
           },

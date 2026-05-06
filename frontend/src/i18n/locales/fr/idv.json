@@ -1,0 +1,18 @@
+{
+  "ServiceCanadaCentre": {
+    "pageTitle": "Prouver votre identité",
+    "heading": "Préparez-vous à visiter un Centre Service Canada",
+    "followSteps": "Suivez les étapes pour compléter le processus",
+    "step1": "Continuez pour recevoir votre code d'identification unique pour la vérification en personne, valide pendant 30 jours",
+    "step2": "Trouvez le Centre Service Canada le plus proche pour vous y rendre en personne avec votre code et un document d'identité valide",
+    "listOfIds": "Liste des pièces d'identité acceptables",
+    "step3": "Une fois que l'agent de Service Canada confirme que la vérification est terminée, vous pouvez vous reconnecter au service",
+    "receiveCodeHeading": "Recevez votre code d'identification unique",
+    "receiveCodeDescription": "L'écran suivant générera votre code d'identification unique que vous utiliserez pour votre vérification en personne à Service Canada.",
+    "emailInstructions": "Les instructions ainsi que votre code seront également envoyés par courriel à l'adresse suivante :",
+    "continueButton": "Continuer",
+    "backButton": "Retour",
+    "moreInfoTitle": "Pour plus d'informations",
+    "learnMoreLink": "En savoir plus sur la vérification d'identité du Centre Service Canada"
+  }
+}
