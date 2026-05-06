@@ -1,0 +1,62 @@
+rules:
+  - id: no-local-file-writes
+    patterns:
+      - pattern-either:
+          - pattern: open(..., "w", ...)
+          - pattern: open(..., "a", ...)
+          - pattern: open(..., "wb", ...)
+          - pattern: open(..., "ab", ...)
+          - pattern: open(..., "x", ...)
+          - pattern: open(..., "xb", ...)
+    message: >
+      Writing to the local filesystem breaks horizontal scaling across multiple
+      container instances. Use external storage (S3, Redis, database) instead.
+    severity: ERROR
+    languages: [python]
+    paths:
+      include:
+        - /backend/app/**
+      exclude:
+        - /backend/app/poc_archive/**
+
+  - id: no-local-sqlite
+    pattern: import sqlite3
+    message: >
+      sqlite3 stores data on the local filesystem, which is not shared across
+      container instances and breaks horizontal scaling. Use an external database.
+    severity: ERROR
+    languages: [python]
+    paths:
+      include:
+        - /backend/app/**
+      exclude:
+        - /backend/app/poc_archive/**
+
+  - id: no-local-shelve
+    pattern: import shelve
+    message: >
+      shelve persists data to the local filesystem, which is not shared across
+      container instances and breaks horizontal scaling. Use Redis or a database.
+    severity: ERROR
+    languages: [python]
+    paths:
+      include:
+        - /backend/app/**
+      exclude:
+        - /backend/app/poc_archive/**
+
+  - id: no-mutable-module-global
+    pattern: global $VAR
+    message: >
+      The `global` keyword mutates module-level state, which is not shared across
+      container instances and breaks horizontal scaling. Use external storage
+      (Redis, database) instead. If this is intentional (e.g. a per-process cache
+      of immutable config loaded from environment variables), add a
+      `# nosemgrep: no-mutable-module-global` comment explaining why it is safe.
+    severity: WARNING
+    languages: [python]
+    paths:
+      include:
+        - /backend/app/**
+      exclude:
+        - /backend/app/poc_archive/**
