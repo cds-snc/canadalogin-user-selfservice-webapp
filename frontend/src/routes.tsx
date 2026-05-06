@@ -138,6 +138,11 @@ export const appRoutes: RouteObject[] = [
                 element: <ServiceCanadaCentreIDVCodePage />,
                 handle: { id: PAGES.idvServiceCanadaCentreCodePage },
               },
+              {
+                path: "idv/in-person/service-canada-centre",
+                element: <ServiceCanadaCentrePage />,
+                handle: { id: PAGES.idvServiceCanadaCentrePage },
+              },
             ],
           },
           { path: "*", element: <ManageDashboard /> },

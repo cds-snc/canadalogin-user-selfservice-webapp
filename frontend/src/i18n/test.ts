@@ -14,6 +14,7 @@ import enSecurity from "./locales/en/security.json";
 import enMfa from "./locales/en/mfa.json";
 import enFido2 from "./locales/en/fido2.json";
 import enOtp from "./locales/en/otp.json";
+import enIdv from "./locales/en/idv.json";
 
 import frCommon from "./locales/fr/common.json";
 import frLayout from "./locales/fr/layout.json";
@@ -28,6 +29,7 @@ import frSecurity from "./locales/fr/security.json";
 import frMfa from "./locales/fr/mfa.json";
 import frFido2 from "./locales/fr/fido2.json";
 import frOtp from "./locales/fr/otp.json";
+import frIdv from "./locales/fr/idv.json";
 
 import { NAMESPACES } from "./index";
 
@@ -49,6 +51,7 @@ i18nTest.use(initReactI18next).init({
       mfa: enMfa,
       fido2: enFido2,
       otp: enOtp,
+      idv: enIdv,
     },
     fr: {
       common: frCommon,
@@ -64,6 +67,7 @@ i18nTest.use(initReactI18next).init({
       mfa: frMfa,
       fido2: frFido2,
       otp: frOtp,
+      idv: frIdv,
     },
   },
   lng: "en",
