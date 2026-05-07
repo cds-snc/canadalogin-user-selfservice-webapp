@@ -20,6 +20,13 @@
     "noPhoneAdded": "Aucun numéro de téléphone de contact n'a été ajouté",
     "addPhoneNumber": "Ajouter un numéro de téléphone"
   },
+  "ProvenInformationCard": {
+    "name": "Nom",
+    "dateOfBirth": "Date de naissance",
+    "idDocument": "Document d'identité enregistré dans ConnexionCanada",
+    "updateInfo": "Pour mettre à jour ces renseignements, vous devrez effectuer un autre processus de vérification d'identité.",
+    "updateButton": "Mettre à jour les renseignements"
+  },
   "ProfileUpdateName": {
     "firstName": "Prénom",
     "lastName": "Nom de famille",

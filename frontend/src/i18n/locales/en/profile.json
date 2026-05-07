@@ -18,7 +18,15 @@
     "notificationDescription": "We will send account-related notifications to the email registered to your account.",
     "serviceNotifications": "You may also receive notifications from services connected to your CanadaLogin. You can manage those preferences in each service's settings.",
     "noPhoneAdded": "No contact phone number has been added",
-    "addPhoneNumber": "Add a phone number"
+    "addPhoneNumber": "Add a phone number",
+    "provenInformation": "Proven information"
+  },
+  "ProvenInformationCard": {
+    "name": "Name",
+    "dateOfBirth": "Date of birth",
+    "idDocument": "ID document saved to CanadaLogin",
+    "updateInfo": "To update this information you will need to complete another identity proofing process.",
+    "updateButton": "Update information"
   },
   "ProfileUpdateName": {
     "firstName": "First name",
