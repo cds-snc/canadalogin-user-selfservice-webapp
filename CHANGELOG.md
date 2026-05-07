@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.19.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.18.0...v1.19.0) (2026-05-07)
+
+
+### Features
+
+* **frontend:** add IDV in person ssc unique id verification screen ([#1438](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1438)) ([e55e01e](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/e55e01e9121bfe376b6321b2b16a251f769e8f68))
+
 ## [1.18.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.17.2...v1.18.0) (2026-05-06)
 
 
