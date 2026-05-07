@@ -8,6 +8,7 @@ import {
 } from "@gcds-core/components-react";
 import { useTranslation } from "react-i18next";
 import { useUser } from "../../components/Providers/useUser";
+import { DEV_ONLY_FEATURE } from "../../utils/constants";
 
 interface ServiceCanadaCentreIDVCodePageProps {
   // TODO: replace with real code once API integration is in place
@@ -21,6 +22,10 @@ export default function ServiceCanadaCentreIDVCodePage({
   const { t } = useTranslation("idv");
 
   const email = state?.userProfile?.userName ?? "";
+
+  if (!DEV_ONLY_FEATURE) {
+    return null;
+  }
 
   return (
     <GcdsContainer role="main">

@@ -20,6 +20,10 @@ export default function ServiceCanadaCentrePage() {
 
   const email = state?.userProfile?.userName ?? "";
 
+  if (!DEV_ONLY_FEATURE) {
+    return null;
+  }
+
   return (
     DEV_ONLY_FEATURE && (
       <GcdsContainer role="main">

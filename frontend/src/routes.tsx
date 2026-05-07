@@ -17,7 +17,7 @@ import ChangePasswordIndex from "./features/ChangePassword/components/ChangePass
 import EditContactPhoneNumberPage from "./features/ContactPhoneNumber/components/EditContactPhoneNumberPage";
 import AddMFAPage from "./features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPage";
 import DeleteMFAPage from "./features/MFAPhoneNumber/DeleteMFAPhoneNumber/component/DeleteMFAPage";
-import { PAGES } from "./utils/constants";
+import { DEV_ONLY_FEATURE, PAGES } from "./utils/constants";
 import EditEmailAddressPage from "./features/EmailAddress/EditEmailAddressPage";
 import AddFIDO2PasskeyPage from "./features/ManageFIDO2/components/AddFIDO2Passkey/AddFIDO2PasskeyPage";
 import DeleteFIDO2PasskeyPage from "./features/ManageFIDO2/components/DeleteFIDO2Passkey/DeleteFIDO2PasskeyPage";
@@ -128,16 +128,20 @@ export const appRoutes: RouteObject[] = [
                   },
                 ],
               },
-              {
-                path: "idv/in-person/service-canada-centre",
-                element: <ServiceCanadaCentrePage />,
-                handle: { id: PAGES.idvServiceCanadaCentrePage },
-              },
-              {
-                path: "idv/in-person/service-canada-centre/idv-code",
-                element: <ServiceCanadaCentreIDVCodePage />,
-                handle: { id: PAGES.idvServiceCanadaCentreCodePage },
-              },
+              ...(DEV_ONLY_FEATURE
+                ? [
+                    {
+                      path: "idv/in-person/service-canada-centre",
+                      element: <ServiceCanadaCentrePage />,
+                      handle: { id: PAGES.idvServiceCanadaCentrePage },
+                    },
+                    {
+                      path: "idv/in-person/service-canada-centre/idv-code",
+                      element: <ServiceCanadaCentreIDVCodePage />,
+                      handle: { id: PAGES.idvServiceCanadaCentreCodePage },
+                    },
+                  ]
+                : []),
             ],
           },
           { path: "*", element: <ManageDashboard /> },
