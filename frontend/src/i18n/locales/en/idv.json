@@ -14,5 +14,13 @@
     "backButton": "Back",
     "moreInfoTitle": "For more information",
     "learnMoreLink": "Learn more about Service Canada Centre identity proofing"
+  },
+  "ServiceCanadaCentreCode": {
+    "heading": "Here is your unique identification code for your identity proofing",
+    "codeValidDays": "This code is valid for 30 days and has been emailed to",
+    "visitInstruction": "Visit a Service Canada Centre with your code and one valid ID document.",
+    "findNearestTitle": "Find your nearest Service Canada Centre",
+    "findNearestBody": "Complete your identity proofing at an available",
+    "findNearestLink": "Service Canada Centre near you"
   }
 }

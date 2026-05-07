@@ -64,6 +64,8 @@ export const pageIds = [
   "DeleteFIDO2PasskeyConfirm",
   "DeleteFIDO2PasskeySuccess",
   "IdvServiceCanadaCentrePage",
+  "IdvServiceCanadaCentreCodePage",
+  "IdvServiceCanadaCentrePage",
 ] as const;
 
 export type PageId = (typeof pageIds)[number];
