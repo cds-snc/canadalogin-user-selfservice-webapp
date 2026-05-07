@@ -1,25 +1,5 @@
 # Changelog
 
-## [1.18.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.17.2...v1.18.0) (2026-05-06)
-
-
-### Features
-
-* Add semgrep linter to catch local container state ([#1439](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1439)) ([7b1fd80](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/7b1fd803533e6ea559a3c0cd0c007a1798eccda7))
-* add Service Canada Centre page and localization support ([#1433](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1433)) ([fde0996](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/fde09961d9ffe952b3d44ab99cbf83b88ec78867))
-
-
-### Bug Fixes
-
-* remove document title setting from trackPage function ([78e908d](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/78e908d6855b743b3787e8e3efd05f22e23448e2))
-* Remove renaming browser tab on page change ([#1435](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1435)) ([78e908d](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/78e908d6855b743b3787e8e3efd05f22e23448e2))
-
-
-### Miscellaneous Chores
-
-* bump prod deployed version to 1.17.2 ([#1432](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1432)) ([ea2d85f](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/ea2d85f36c52e1329e581fc731874ce76a6f8b61))
-* bump staging deployed version to 1.17.2 ([#1430](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1430)) ([c6af44e](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/c6af44ec696c3b34140893ecd5f2d8f460cec8cf))
-
 ## [1.17.2](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.17.1...v1.17.2) (2026-04-29)
 
 
