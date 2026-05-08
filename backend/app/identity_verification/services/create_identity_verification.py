@@ -4,7 +4,6 @@ from urllib.parse import urlparse
 
 from httpx import AsyncClient
 
-from app.config import get_configuration
 from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
 from app.utils.request_error_handler import RequestErrorHandler
 from app.utils.schemas import ResponseModel
@@ -32,10 +31,10 @@ async def create_identity_verification(
         global_http_client, user_access_token
     )
     email = profile.userName
-    
+
     state = str(uuid.uuid4())
     nonce = str(uuid.uuid4())
-    
+
     payload = {
         "email": email,
         "rp_client_id": _bluink_config.BLUINK_CLIENT_ID,

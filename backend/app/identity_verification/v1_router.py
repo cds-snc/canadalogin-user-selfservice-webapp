@@ -8,6 +8,7 @@ from app.identity_verification.services.create_identity_verification import crea
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
+
 @router.post(
     "/online",
     response_model=ResponseModel,
