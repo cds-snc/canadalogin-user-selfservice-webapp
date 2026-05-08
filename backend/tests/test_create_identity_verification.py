@@ -116,7 +116,9 @@ class TestCreateIdentityVerification:
         """Should call RequestErrorHandler when Bluink API returns an error"""
         mock_dispatch.return_value = mock_profile
 
-        request = Request("POST", "https://demoeid.bluink.ca/api/prereg/v2/request-registration")
+        request = Request(
+            "POST", "https://demoeid.bluink.ca/api/prereg/v2/request-registration"
+        )
         response = Response(502, request=request)
         exc = HTTPStatusError("Bad Gateway", request=request, response=response)
 
@@ -184,9 +186,7 @@ class TestCreateIdentityVerification:
 
         mock_response = MagicMock()
         mock_response.status_code = 200
-        mock_response.json.return_value = {
-            "url": "https://evil.example.com/phish"
-        }
+        mock_response.json.return_value = {"url": "https://evil.example.com/phish"}
         mock_response.raise_for_status = MagicMock()
         mock_http_client.post = AsyncMock(return_value=mock_response)
         mock_error_handler.handle.side_effect = Exception("bad host")

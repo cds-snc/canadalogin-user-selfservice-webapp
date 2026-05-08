@@ -214,7 +214,9 @@ def create_app():
     )
 
     if is_local_environment:
-        logger.info("Running in local environment, Identity Verification routes will be included")
+        logger.info(
+            "Running in local environment, Identity Verification routes will be included"
+        )
         app.include_router(
             v1_identity_verification_router.router,
             prefix=f"{configuration.V1_API_VERSION}/identity-verification",

@@ -3,7 +3,9 @@ import logging
 from fastapi import APIRouter, Depends, Request, status
 from app.auth.services.auth_user_session import get_users_current_session
 from app.utils.schemas import ResponseModel
-from app.identity_verification.services.create_identity_verification import create_identity_verification
+from app.identity_verification.services.create_identity_verification import (
+    create_identity_verification,
+)
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
