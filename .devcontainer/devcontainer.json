@@ -1,54 +1,54 @@
 {
-	"name": "gcsignin-devcontainer",
-	"image": "mcr.microsoft.com/devcontainers/go:bullseye",
-	"containerEnv": {
-		"SHELL": "/bin/zsh"
-	},
-	"features": {
-		"ghcr.io/devcontainers/features/docker-in-docker:2": {},
-		"ghcr.io/devcontainers/features/python:1": {
-			"version": "3.14",
-			"installTools": "false"
-		},
-		"ghcr.io/devcontainers/features/terraform:1": {
-			"version": "1.9.4",
-			"terragrunt": "0.66.9"
-		},
-		"ghcr.io/dhoeric/features/terraform-docs:1": {
-			"version": "0.19.0"
-		},
-		"node": {
-			"version": "lts",
-			"nodeGypDependencies": true
-		},
-		"ghcr.io/devcontainers/features/aws-cli:1": {
-			"version": "latest"
-		},
-		"ghcr.io/itsmechlark/features/redis-server:1": {
-			"version": "latest"
-		}
-	},
-	"customizations": {
-		"vscode": {
-			"extensions": [
-				"GitHub.copilot",
-				"hashicorp.terraform",
-				"redhat.vscode-yaml",
-				"ms-python.python",
-				"ms-python.debugpy",
-				"hashicorp.hcl",
-				"mermaidchart.vscode-mermaid-chart",
-				"eamodio.gitlens",
-				"github.vscode-github-actions",
-				"ms-vscode.makefile-tools",
-				"jebbs.plantuml",
-				"esbenp.prettier-vscode"
-			],
-			"settings": {
-				"editor.defaultFormatter": "esbenp.prettier-vscode",
-				"editor.formatOnSave": true
-			}
-		}
-	},
-	"postCreateCommand": "make install-dev-python && make install-frontend-deps"
+  "name": "gcsignin-devcontainer",
+  "image": "mcr.microsoft.com/devcontainers/go:bullseye@sha256:80c933b33e6d0b281248a07fa69b37286c9d886ad5e1721a756dd1ab14df5dc8",
+  "containerEnv": {
+    "SHELL": "/bin/zsh"
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.14",
+      "installTools": "false"
+    },
+    "ghcr.io/devcontainers/features/terraform:1": {
+      "version": "1.9.4",
+      "terragrunt": "0.66.9"
+    },
+    "ghcr.io/dhoeric/features/terraform-docs:1": {
+      "version": "0.19.0"
+    },
+    "node": {
+      "version": "lts",
+      "nodeGypDependencies": true
+    },
+    "ghcr.io/devcontainers/features/aws-cli:1": {
+      "version": "latest"
+    },
+    "ghcr.io/itsmechlark/features/redis-server:1": {
+      "version": "latest"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "GitHub.copilot",
+        "hashicorp.terraform",
+        "redhat.vscode-yaml",
+        "ms-python.python",
+        "ms-python.debugpy",
+        "hashicorp.hcl",
+        "mermaidchart.vscode-mermaid-chart",
+        "eamodio.gitlens",
+        "github.vscode-github-actions",
+        "ms-vscode.makefile-tools",
+        "jebbs.plantuml",
+        "esbenp.prettier-vscode"
+      ],
+      "settings": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+      }
+    }
+  },
+  "postCreateCommand": "make install-dev-python && make install-frontend-deps"
 }
