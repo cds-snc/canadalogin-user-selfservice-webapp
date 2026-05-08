@@ -22,6 +22,7 @@ from app.auth import v1_router as v1_auth_router
 from app.password import v1_router as v1_password_router
 from app.otp import v1_router as v1_otp_router
 from app.fido2 import v1_router as v1_fido2_router
+from app.identity_verification import v1_router as v1_identity_verification_router
 from app.fido2.services.mds_service import mds_service
 from app.auth.services import oidc_config
 from app.utils.global_error_handlers import (
@@ -211,6 +212,16 @@ def create_app():
         prefix=f"{configuration.V1_API_VERSION}/fido2",
         tags=["FIDO2"],
     )
+
+    if is_local_environment:
+        logger.info(
+            "Running in local environment, Identity Verification routes will be included"
+        )
+        app.include_router(
+            v1_identity_verification_router.router,
+            prefix=f"{configuration.V1_API_VERSION}/identity-verification",
+            tags=["Identity Verification"],
+        )
 
     app.add_exception_handler(HTTPException, http_exception_handler)
     app.add_exception_handler(OAuthError, oauth_error_handler)
