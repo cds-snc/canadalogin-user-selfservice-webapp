@@ -55,6 +55,8 @@ jobs:
           REDIS_AUTH_SECRET: "test-secret"
           REDIS_DOMAIN: "master.gc-signin-dev-redis.8pd6gb.cac1.cache.amazonaws.com"
           REDIS_PORT: 6379
+          BLUINK_CLIENT_ID: test-bluink-client-id
+          BLUINK_CLIENT_SECRET: test-bluink-client-secret
         run: make run-pytest
 
       - name: Build image
