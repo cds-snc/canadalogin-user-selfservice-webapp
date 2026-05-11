@@ -15,6 +15,7 @@ import ViewContactPhoneNumber from "../../features/ContactPhoneNumber/components
 import ViewNameCard from "../../features/ProfileName/components/ViewProfileNameCard";
 import ViewLanguagePreferences from "../../features/LanguagePreference/components/ViewLanguagePreference";
 import { path } from "../../utils/routeHelpers";
+import ProvenInformationCard from "../../features/IDV/ProvenInformationCard";
 
 interface DisplayEmailInfoProps {
   email: string;
@@ -66,31 +67,56 @@ export default function ProfileHome() {
 
   return (
     <GcdsContainer role="main">
-      <GcdsHeading tag="h1">{t("ProfileHome.title")}</GcdsHeading>
-      <GcdsHeading tag="h2">{t("ProfileHome.basicInfo")}</GcdsHeading>
-
-      <ViewNameCard />
-
-      <GcdsHeading tag="h2" marginTop="300">
-        {t("ProfileHome.contactInfo")}
-      </GcdsHeading>
-      <GcdsContainer className="sectionCard">
-        <DisplayEmailInfo email={email} />
-
-        <div className="separator" />
-        <ViewContactPhoneNumber phoneNumbers={phoneNumbers} />
-      </GcdsContainer>
-
-      <GcdsHeading tag="h2">{t("ProfileHome.communication")}</GcdsHeading>
-      <GcdsContainer className="sectionCard">
-        <ViewLanguagePreferences />
-        <div className="separator" />
-        <GcdsHeading tag="h3" marginTop="300">
-          {t("ProfileHome.notifications")}
+      <GcdsGrid columns="1 auto" gap="300">
+        {" "}
+        <GcdsHeading tag="h1" marginTop="0">
+          {t("ProfileHome.title")}
         </GcdsHeading>
-        <GcdsText>{t("ProfileHome.notificationDescription")}</GcdsText>
-        <GcdsText>{t("ProfileHome.serviceNotifications")}</GcdsText>
-      </GcdsContainer>
+        {DEV_ONLY_FEATURE && (
+          <GcdsContainer>
+            <GcdsGrid columns="1fr auto" className="gridInline">
+              <GcdsHeading tag="h2" marginTop="0">
+                {t("ProfileHome.provenInformation")}
+              </GcdsHeading>
+              <VerifiedBadge text={"Proven January 27, 2026"} />
+            </GcdsGrid>
+
+            <ProvenInformationCard />
+          </GcdsContainer>
+        )}
+        <GcdsContainer>
+          <GcdsHeading tag="h2" marginTop="0">
+            {t("ProfileHome.basicInfo")}
+          </GcdsHeading>
+          <ViewNameCard />
+        </GcdsContainer>
+        <GcdsContainer>
+          <GcdsHeading tag="h2" marginTop="0">
+            {t("ProfileHome.contactInfo")}
+          </GcdsHeading>
+
+          <GcdsContainer className="sectionCard">
+            <DisplayEmailInfo email={email} />
+            <div className="separator" />
+            <ViewContactPhoneNumber phoneNumbers={phoneNumbers} />
+          </GcdsContainer>
+        </GcdsContainer>
+        <GcdsContainer>
+          {" "}
+          <GcdsHeading tag="h2" marginTop="0">
+            {t("ProfileHome.communication")}
+          </GcdsHeading>
+          <GcdsContainer className="sectionCard">
+            <ViewLanguagePreferences />
+            <div className="separator" />
+            <GcdsHeading tag="h3" marginTop="300">
+              {t("ProfileHome.notifications")}
+            </GcdsHeading>
+            <GcdsText>{t("ProfileHome.notificationDescription")}</GcdsText>
+            <GcdsText>{t("ProfileHome.serviceNotifications")}</GcdsText>
+          </GcdsContainer>
+        </GcdsContainer>
+      </GcdsGrid>
     </GcdsContainer>
   );
 }
