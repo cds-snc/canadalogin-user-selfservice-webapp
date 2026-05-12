@@ -89,8 +89,8 @@ class FIDO2MDSConfig(BaseSettings):
 
 
 class BluinkConfig(BaseSettings):
-    BLUINK_CLIENT_ID: str = "7717b7caa20634ccd503"
-    BLUINK_CLIENT_SECRET: str
+    BLUINK_CLIENT_ID: Optional[str] = None
+    BLUINK_CLIENT_SECRET: Optional[str] = None
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore", case_sensitive=True
     )
