@@ -16,6 +16,7 @@ const mockAuthService = authService;
 describe("usePasswordValidation", () => {
   const mockSetErrorCode = vi.fn();
   const mockOnSuccess = vi.fn();
+  const mockOnError = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -161,7 +162,12 @@ describe("usePasswordValidation", () => {
       });
 
       const { result } = renderHook(() =>
-        usePasswordValidation(mockSetErrorCode, mockOnSuccess),
+        usePasswordValidation(
+          mockSetErrorCode,
+          mockOnSuccess,
+          false,
+          mockOnError,
+        ),
       );
 
       await act(async () => {
@@ -173,6 +179,7 @@ describe("usePasswordValidation", () => {
         password: "WrongPassword123",
       });
       expect(mockSetErrorCode).toHaveBeenCalledWith("CSIAM0011E");
+      expect(mockOnError).toHaveBeenCalledWith("CSIAM0011E");
       expect(mockOnSuccess).not.toHaveBeenCalled();
     });
 
@@ -283,6 +290,25 @@ describe("usePasswordValidation", () => {
       expect(mockAuthService.verifyPassword).not.toHaveBeenCalled();
       expect(mockSetErrorCode).toHaveBeenCalledWith("POLICY_ERROR");
       expect(mockOnSuccess).not.toHaveBeenCalled();
+    });
+
+    it("should call onError for client-side password validation errors", async () => {
+      const { result } = renderHook(() =>
+        usePasswordValidation(
+          mockSetErrorCode,
+          mockOnSuccess,
+          false,
+          mockOnError,
+        ),
+      );
+
+      await act(async () => {
+        await result.current.validatePassword("short");
+      });
+
+      expect(mockAuthService.verifyPassword).not.toHaveBeenCalled();
+      expect(mockSetErrorCode).toHaveBeenCalledWith("5");
+      expect(mockOnError).toHaveBeenCalledWith("5");
     });
   });
 

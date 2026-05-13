@@ -128,6 +128,7 @@ export const useOtpOperations = ({
     otpValue: string,
     onSuccess?: UseOtpValidationSuccess,
     overrideOtpType?: string,
+    onError?: (errorCode: string) => void,
   ): Promise<void> => {
     if (!otpSentResponse) {
       return;
@@ -159,6 +160,7 @@ export const useOtpOperations = ({
       const message = getErrorMessage(err);
       if (message) {
         setErrorCode(message);
+        onError?.(message);
       }
     } finally {
       setUserOtpValue("");

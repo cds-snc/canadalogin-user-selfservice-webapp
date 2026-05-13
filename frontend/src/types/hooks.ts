@@ -86,6 +86,7 @@ export type UseOtpOperationsReturn = {
     otpValue: string,
     onSuccess?: UseOtpValidationSuccess,
     overrideOtpType?: string,
+    onError?: (errorCode: string) => void,
   ) => Promise<void>;
   fetchUserOtpPhoneFactors: () => Promise<{
     phoneFactors: OtpFactor[];

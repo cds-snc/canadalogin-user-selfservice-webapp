@@ -115,6 +115,14 @@ export default function AddMFAPage() {
         setWizardStep("otpSelection");
       }
     },
+    false,
+    (message) => {
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_END,
+        step: ADD_MFA_ANALYTICS.STEPS.VERIFY_PASSWORD,
+        error: message,
+      });
+    },
   );
 
   // Create tracked password validation wrapper

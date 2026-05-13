@@ -109,6 +109,14 @@ export default function ChangePasswordIndex() {
         setPasswordUpdateStep("otpSelection");
       }
     },
+    false,
+    (message) => {
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_END,
+        step: CHANGE_PASSWORD_ANALYTICS.STEPS.VERIFY_PASSWORD,
+        error: message,
+      });
+    },
   );
 
   // Create tracked password validation wrapper

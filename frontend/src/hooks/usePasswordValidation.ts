@@ -20,6 +20,7 @@ export function usePasswordValidation(
   setErrorCode: (errorCode: string) => void,
   onSuccess?: PasswordValidationSuccessCallback | null,
   useStepup: boolean = false,
+  onError?: ((errorCode: string) => void) | null,
 ): UsePasswordValidationReturn {
   const [validatePasswordLoading, setValidatePasswordLoading] = useState(false);
 
@@ -40,6 +41,7 @@ export function usePasswordValidation(
           userPasswordValue.length > passwordPolicy.pwdMaxLength
         ) {
           setErrorCode("5");
+          onError?.("5");
           return;
         }
       }
@@ -60,6 +62,7 @@ export function usePasswordValidation(
       const message = getErrorMessage(err);
       if (message) {
         setErrorCode(message);
+        onError?.(message);
       }
     } finally {
       setValidatePasswordLoading(false);
