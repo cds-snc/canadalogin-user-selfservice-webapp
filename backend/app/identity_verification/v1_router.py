@@ -6,6 +6,9 @@ from app.utils.schemas import ResponseModel
 from app.identity_verification.services.create_identity_verification import (
     create_identity_verification,
 )
+from app.identity_verification.services.send_in_person_verification_code import (
+    send_in_person_verification_code,
+)
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -24,5 +27,22 @@ async def user_identity_verification_registeration(
     user_access_token: str = Depends(get_users_current_session),
 ):
     return await create_identity_verification(
+        request.app.state.request_client, user_access_token
+    )
+
+
+@router.post(
+    "/in-person",
+    response_model=ResponseModel,
+    status_code=status.HTTP_200_OK,
+    tags=["Identity Verification"],
+    summary="Send an in-person identity verification code to the user",
+    description="Sends an email via GC Notify containing a verification code the user must present at a Service Canada Centre.",
+)
+async def send_in_person_verification(
+    request: Request,
+    user_access_token: str = Depends(get_users_current_session),
+):
+    return await send_in_person_verification_code(
         request.app.state.request_client, user_access_token
     )

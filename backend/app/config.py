@@ -96,6 +96,13 @@ class BluinkConfig(BaseSettings):
     )
 
 
+class GCNotifyConfig(BaseSettings):
+    GC_NOTIFY_API_KEY: Optional[str] = None
+    model_config = SettingsConfigDict(
+        env_file=".env", env_file_encoding="utf-8", extra="ignore", case_sensitive=True
+    )
+
+
 class Configuration(BaseSettings):
     app_info: AppInfo = AppInfo()
     ibm_verify_config: IBMVerifyConfig = IBMVerifyConfig()
