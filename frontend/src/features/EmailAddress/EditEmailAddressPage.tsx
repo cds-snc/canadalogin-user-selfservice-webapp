@@ -377,19 +377,12 @@ export default function EditEmailAddressPage() {
           });
           return validateOtpCode(
             userOtpValue,
-            (response) => {
-              if ((response as { success?: boolean })?.success) {
-                setWizardStep("enterEmail");
-                trackEvent({
-                  event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
-                  step: EMAIL_ADDRESS_ANALYTICS.STEPS.ENTER_EMAIL,
-                });
-              } else {
-                trackEvent({
-                  event: GA_FORM_EVENTS.FORM_STEP_END,
-                  step: EMAIL_ADDRESS_ANALYTICS.STEPS.OTP_VALIDATION,
-                });
-              }
+            () => {
+              setWizardStep("enterEmail");
+              trackEvent({
+                event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+                step: EMAIL_ADDRESS_ANALYTICS.STEPS.ENTER_EMAIL,
+              });
             },
             undefined,
             (message) => {
