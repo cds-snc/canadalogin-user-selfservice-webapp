@@ -59,11 +59,12 @@ export function usePasswordValidation(
         await onSuccess?.();
       }
     } catch (err) {
-      const message = getErrorMessage(err);
-      if (message) {
-        setErrorCode(message);
-        onError?.(message);
-      }
+      const message =
+        getErrorMessage(err) ||
+        (err instanceof Error ? err.message : String(err)) ||
+        "PASSWORD_VALIDATION_FAILED";
+      setErrorCode(message);
+      onError?.(message);
     } finally {
       setValidatePasswordLoading(false);
     }
