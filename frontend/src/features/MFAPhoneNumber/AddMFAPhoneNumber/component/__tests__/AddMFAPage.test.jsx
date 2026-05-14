@@ -1,4 +1,10 @@
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import {
+  render,
+  screen,
+  waitFor,
+  fireEvent,
+  act,
+} from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import "@testing-library/jest-dom";
 import { createMemoryRouter, RouterProvider } from "react-router";
@@ -12,6 +18,18 @@ import { addMFAPhoneNumberApi } from "../../api/AddMFAPhoneNumberAPI";
 import { deleteMFAPhoneNumberApi } from "../../../DeleteMFAPhoneNumber/api/DeleteMFAPhoneNumberAPI";
 import * as functions from "../../../../../utils/functions";
 import { authService } from "../../../../../services/authService";
+
+const { mockTrackEvent } = vi.hoisted(() => ({
+  mockTrackEvent: vi.fn(),
+}));
+
+vi.mock("../../../../../hooks/useFormTracking", () => ({
+  useFormTracking: () => ({ trackEvent: mockTrackEvent }),
+}));
+
+vi.mock("../../../../../hooks/useWizardPageTracking", () => ({
+  useWizardPageTracking: vi.fn(),
+}));
 
 // Mock dependencies
 vi.mock("../../../../../components/Providers/useUser");
@@ -2565,6 +2583,584 @@ describe("AddMFAPage Unit Tests", () => {
           id: "mfa-123",
           otpType: "sms",
         });
+      });
+    });
+  });
+
+  describe("GA Error Tracking", () => {
+    // Helper: navigate past password verification (password validation always passes)
+    const navigatePastPassword = async () => {
+      usePasswordValidation.mockImplementation(
+        (_setErr, onSuccess, _useStepup, _onError) => ({
+          validatePassword: vi.fn(async () => {
+            onSuccess?.();
+          }),
+          validatePasswordLoading: false,
+        }),
+      );
+    };
+
+    it("emits form_step_end error event when password verify API fails", async () => {
+      let capturedOnError;
+      usePasswordValidation.mockImplementation(
+        (_setErr, _onSuccess, _useStepup, onError) => {
+          capturedOnError = onError;
+          return { validatePassword: vi.fn(), validatePasswordLoading: false };
+        },
+      );
+
+      await act(async () => {
+        render(
+          <TestWrapper>
+            <AddMFAPage />
+          </TestWrapper>,
+        );
+      });
+
+      await act(async () => {
+        capturedOnError?.("CSIAM0011E");
+      });
+
+      expect(mockTrackEvent).toHaveBeenCalledWith({
+        event: "form_step_end",
+        step: "verify_password",
+        error: "CSIAM0011E",
+      });
+    });
+
+    it("emits form_step_end with error when transient OTP verify API fails", async () => {
+      navigatePastPassword();
+
+      otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
+        success: true,
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
+      });
+
+      authService.transientOtpVerify = vi
+        .fn()
+        .mockRejectedValue({ response: { data: { message: "INVALID_OTP" } } });
+
+      render(
+        <TestWrapper>
+          <AddMFAPage />
+        </TestWrapper>,
+      );
+
+      await waitFor(() =>
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument(),
+      );
+
+      fireEvent.click(screen.getByTestId("password-verification-next"));
+
+      await waitFor(() =>
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument(),
+      );
+
+      fireEvent.click(screen.getByTestId("otp-selection-next"));
+
+      await waitFor(() =>
+        expect(screen.getByTestId("otp-verification")).toBeInTheDocument(),
+      );
+
+      fireEvent.click(screen.getByTestId("otp-verification-next"));
+
+      await waitFor(() => {
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_step_end",
+          step: "otp_validation",
+          error: "INVALID_OTP",
+        });
+      });
+    });
+
+    it("emits form_step_end with error when enrollMFA API fails", async () => {
+      navigatePastPassword();
+
+      otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
+        success: true,
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
+      });
+
+      authService.transientOtpVerify = vi
+        .fn()
+        .mockResolvedValue({ success: true });
+
+      addMFAPhoneNumberApi.enrollMFA.mockRejectedValue({
+        data: { message: "ENROLL_MFA_FAILED" },
+      });
+
+      render(
+        <TestWrapper>
+          <AddMFAPage />
+        </TestWrapper>,
+      );
+
+      await waitFor(() =>
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument(),
+      );
+
+      fireEvent.click(screen.getByTestId("password-verification-next"));
+
+      await waitFor(() =>
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument(),
+      );
+
+      fireEvent.click(screen.getByTestId("otp-selection-next"));
+
+      await waitFor(() =>
+        expect(screen.getByTestId("otp-verification")).toBeInTheDocument(),
+      );
+
+      fireEvent.click(screen.getByTestId("otp-verification-next"));
+
+      await waitFor(() =>
+        expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument(),
+      );
+
+      fireEvent.click(screen.getByTestId("add-mfa-phone-number-next"));
+
+      await waitFor(() => {
+        expect(mockTrackEvent).toHaveBeenCalledWith(
+          expect.objectContaining({
+            event: "form_step_end",
+            step: "enroll_mfa",
+            error: "ENROLL_MFA_FAILED",
+          }),
+        );
+      });
+    });
+
+    it("emits form_step_end with error when sendMFAOTP API fails", async () => {
+      navigatePastPassword();
+
+      otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
+        success: true,
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
+      });
+
+      authService.transientOtpVerify = vi
+        .fn()
+        .mockResolvedValue({ success: true });
+
+      addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
+        data: { id: "mfa-123" },
+      });
+
+      addMFAPhoneNumberApi.sendMFAOTP.mockRejectedValue({
+        data: { message: "SEND_OTP_FAILED" },
+      });
+
+      render(
+        <TestWrapper>
+          <AddMFAPage />
+        </TestWrapper>,
+      );
+
+      await waitFor(() =>
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument(),
+      );
+
+      fireEvent.click(screen.getByTestId("password-verification-next"));
+
+      await waitFor(() =>
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument(),
+      );
+
+      fireEvent.click(screen.getByTestId("otp-selection-next"));
+
+      await waitFor(() =>
+        expect(screen.getByTestId("otp-verification")).toBeInTheDocument(),
+      );
+
+      fireEvent.click(screen.getByTestId("otp-verification-next"));
+
+      await waitFor(() =>
+        expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument(),
+      );
+
+      fireEvent.click(screen.getByTestId("add-mfa-phone-number-next"));
+
+      await waitFor(() => {
+        expect(mockTrackEvent).toHaveBeenCalledWith(
+          expect.objectContaining({
+            event: "form_step_end",
+            step: "mfa_otp",
+            error: "SEND_OTP_FAILED",
+          }),
+        );
+      });
+    });
+
+    it("emits form_step_end with error when verifyMFAOTP API fails", async () => {
+      navigatePastPassword();
+
+      otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
+        success: true,
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
+      });
+
+      authService.transientOtpVerify = vi
+        .fn()
+        .mockResolvedValue({ success: true });
+
+      addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
+        data: { id: "mfa-123" },
+      });
+
+      addMFAPhoneNumberApi.sendMFAOTP.mockResolvedValue({
+        data: { id: "txn-456" },
+      });
+
+      addMFAPhoneNumberApi.verifyMFAOTP.mockRejectedValue({
+        data: { message: "VERIFY_MFA_FAILED" },
+      });
+
+      render(
+        <TestWrapper>
+          <AddMFAPage />
+        </TestWrapper>,
+      );
+
+      await waitFor(() =>
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument(),
+      );
+
+      fireEvent.click(screen.getByTestId("password-verification-next"));
+
+      await waitFor(() =>
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument(),
+      );
+
+      fireEvent.click(screen.getByTestId("otp-selection-next"));
+
+      await waitFor(() =>
+        expect(screen.getByTestId("otp-verification")).toBeInTheDocument(),
+      );
+
+      fireEvent.click(screen.getByTestId("otp-verification-next"));
+
+      await waitFor(() =>
+        expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument(),
+      );
+
+      fireEvent.click(screen.getByTestId("add-mfa-phone-number-next"));
+
+      await waitFor(() =>
+        expect(
+          screen.getByTestId("add-mfa-otp-verification"),
+        ).toBeInTheDocument(),
+      );
+
+      fireEvent.click(screen.getByTestId("add-mfa-otp-verification-next"));
+
+      await waitFor(() => {
+        expect(mockTrackEvent).toHaveBeenCalledWith(
+          expect.objectContaining({
+            event: "form_step_end",
+            step: "mfa_enroll_success",
+            error: "VERIFY_MFA_FAILED",
+          }),
+        );
+      });
+    });
+  });
+
+  describe("GA Success Path Tracking", () => {
+    const navigatePastPassword = () => {
+      usePasswordValidation.mockImplementation(
+        (_setErr, onSuccess, _useStepup, _onError) => ({
+          validatePassword: vi.fn(async () => {
+            onSuccess?.();
+          }),
+          validatePasswordLoading: false,
+        }),
+      );
+    };
+
+    it("fires form_step_start at verify_password when password validation begins", async () => {
+      navigatePastPassword();
+
+      render(
+        <TestWrapper>
+          <AddMFAPage />
+        </TestWrapper>,
+      );
+
+      await waitFor(() =>
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument(),
+      );
+
+      fireEvent.click(screen.getByTestId("password-verification-next"));
+
+      expect(mockTrackEvent).toHaveBeenCalledWith({
+        event: "form_step_start",
+        step: "verify_password",
+      });
+    });
+
+    it("fires form_step_change to otp_selection after password validates", async () => {
+      navigatePastPassword();
+
+      render(
+        <TestWrapper>
+          <AddMFAPage />
+        </TestWrapper>,
+      );
+
+      await waitFor(() =>
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument(),
+      );
+
+      fireEvent.click(screen.getByTestId("password-verification-next"));
+
+      await waitFor(() => {
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_step_change",
+          step: "otp_selection",
+        });
+      });
+    });
+
+    it("fires form_submit_complete at otp_validation and form_step_change to enter_phone_number when transientOtpVerify succeeds", async () => {
+      navigatePastPassword();
+
+      otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
+        success: true,
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
+      });
+
+      authService.transientOtpVerify = vi
+        .fn()
+        .mockResolvedValue({ success: true });
+
+      render(
+        <TestWrapper>
+          <AddMFAPage />
+        </TestWrapper>,
+      );
+
+      await waitFor(() =>
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument(),
+      );
+
+      fireEvent.click(screen.getByTestId("password-verification-next"));
+
+      await waitFor(() =>
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument(),
+      );
+
+      fireEvent.click(screen.getByTestId("otp-selection-next"));
+
+      await waitFor(() =>
+        expect(screen.getByTestId("otp-verification")).toBeInTheDocument(),
+      );
+
+      fireEvent.click(screen.getByTestId("otp-verification-next"));
+
+      await waitFor(() => {
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_submit_complete",
+          step: "otp_validation",
+        });
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_step_change",
+          step: "enter_phone_number",
+        });
+      });
+    });
+
+    it("fires form_step_start and form_submit_complete at enroll_mfa when enrollMFA API succeeds", async () => {
+      navigatePastPassword();
+
+      otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
+        success: true,
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
+      });
+
+      authService.transientOtpVerify = vi
+        .fn()
+        .mockResolvedValue({ success: true });
+      addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
+        data: { id: "mfa-123" },
+      });
+      addMFAPhoneNumberApi.sendMFAOTP.mockResolvedValue({
+        data: { id: "txn-456" },
+      });
+
+      render(
+        <TestWrapper>
+          <AddMFAPage />
+        </TestWrapper>,
+      );
+
+      await waitFor(() =>
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument(),
+      );
+
+      fireEvent.click(screen.getByTestId("password-verification-next"));
+
+      await waitFor(() =>
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument(),
+      );
+
+      fireEvent.click(screen.getByTestId("otp-selection-next"));
+
+      await waitFor(() =>
+        expect(screen.getByTestId("otp-verification")).toBeInTheDocument(),
+      );
+
+      fireEvent.click(screen.getByTestId("otp-verification-next"));
+
+      await waitFor(() =>
+        expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument(),
+      );
+
+      fireEvent.click(screen.getByTestId("add-mfa-phone-number-next"));
+
+      await waitFor(() => {
+        expect(mockTrackEvent).toHaveBeenCalledWith(
+          expect.objectContaining({
+            event: "form_step_start",
+            step: "enroll_mfa",
+          }),
+        );
+        expect(mockTrackEvent).toHaveBeenCalledWith(
+          expect.objectContaining({
+            event: "form_submit_complete",
+            step: "enroll_mfa",
+          }),
+        );
+      });
+    });
+
+    it("fires form_submit_complete at mfa_otp and form_step_change to mfa_otp when sendMFAOTP succeeds", async () => {
+      navigatePastPassword();
+
+      otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
+        success: true,
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
+      });
+
+      authService.transientOtpVerify = vi
+        .fn()
+        .mockResolvedValue({ success: true });
+      addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
+        data: { id: "mfa-123" },
+      });
+      addMFAPhoneNumberApi.sendMFAOTP.mockResolvedValue({
+        data: { id: "txn-456" },
+      });
+
+      render(
+        <TestWrapper>
+          <AddMFAPage />
+        </TestWrapper>,
+      );
+
+      await waitFor(() =>
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument(),
+      );
+
+      fireEvent.click(screen.getByTestId("password-verification-next"));
+
+      await waitFor(() =>
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument(),
+      );
+
+      fireEvent.click(screen.getByTestId("otp-selection-next"));
+
+      await waitFor(() =>
+        expect(screen.getByTestId("otp-verification")).toBeInTheDocument(),
+      );
+
+      fireEvent.click(screen.getByTestId("otp-verification-next"));
+
+      await waitFor(() =>
+        expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument(),
+      );
+
+      fireEvent.click(screen.getByTestId("add-mfa-phone-number-next"));
+
+      await waitFor(() => {
+        expect(mockTrackEvent).toHaveBeenCalledWith(
+          expect.objectContaining({
+            event: "form_submit_complete",
+            step: "mfa_otp",
+          }),
+        );
+        expect(mockTrackEvent).toHaveBeenCalledWith(
+          expect.objectContaining({
+            event: "form_step_change",
+            step: "mfa_otp",
+          }),
+        );
+      });
+    });
+
+    it("fires form_submit_complete at mfa_enroll_success when verifyMFAOTP succeeds", async () => {
+      navigatePastPassword();
+
+      otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
+        success: true,
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
+      });
+
+      authService.transientOtpVerify = vi
+        .fn()
+        .mockResolvedValue({ success: true });
+      addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
+        data: { id: "mfa-123" },
+      });
+      addMFAPhoneNumberApi.sendMFAOTP.mockResolvedValue({
+        data: { id: "txn-456" },
+      });
+      addMFAPhoneNumberApi.verifyMFAOTP.mockResolvedValue({ success: true });
+
+      render(
+        <TestWrapper>
+          <AddMFAPage />
+        </TestWrapper>,
+      );
+
+      await waitFor(() =>
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument(),
+      );
+
+      fireEvent.click(screen.getByTestId("password-verification-next"));
+
+      await waitFor(() =>
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument(),
+      );
+
+      fireEvent.click(screen.getByTestId("otp-selection-next"));
+
+      await waitFor(() =>
+        expect(screen.getByTestId("otp-verification")).toBeInTheDocument(),
+      );
+
+      fireEvent.click(screen.getByTestId("otp-verification-next"));
+
+      await waitFor(() =>
+        expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument(),
+      );
+
+      fireEvent.click(screen.getByTestId("add-mfa-phone-number-next"));
+
+      await waitFor(() =>
+        expect(
+          screen.getByTestId("add-mfa-otp-verification"),
+        ).toBeInTheDocument(),
+      );
+
+      fireEvent.click(screen.getByTestId("add-mfa-otp-verification-next"));
+
+      await waitFor(() => {
+        expect(mockTrackEvent).toHaveBeenCalledWith(
+          expect.objectContaining({
+            event: "form_submit_complete",
+            step: "mfa_enroll_success",
+          }),
+        );
       });
     });
   });

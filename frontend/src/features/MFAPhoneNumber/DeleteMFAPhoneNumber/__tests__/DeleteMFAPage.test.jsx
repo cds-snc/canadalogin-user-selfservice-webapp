@@ -13,6 +13,18 @@ import DeleteMFAPage from "../component/DeleteMFAPage";
 import { UserProvider } from "../../../../components/Providers/UserProvider";
 import { LanguageProvider } from "../../../../components/Providers/LanguageProvider";
 import { useOtpOperations } from "../../../../hooks/useOtpOperations";
+
+const { mockTrackEvent } = vi.hoisted(() => ({
+  mockTrackEvent: vi.fn(),
+}));
+
+vi.mock("../../../../hooks/useFormTracking", () => ({
+  useFormTracking: () => ({ trackEvent: mockTrackEvent }),
+}));
+
+vi.mock("../../../../hooks/useWizardPageTracking", () => ({
+  useWizardPageTracking: vi.fn(),
+}));
 import { usePasswordValidation } from "../../../../hooks/usePasswordValidation";
 
 // Mock the navigation hooks
@@ -886,6 +898,298 @@ describe("DeleteMFAPage", () => {
 
       // Component should render correctly with French language
       expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+    });
+  });
+
+  describe("GA Error Tracking", () => {
+    it("emits form_step_end error event when password verify API fails", async () => {
+      let capturedOnError;
+      usePasswordValidation.mockImplementation(
+        (_setErr, _onSuccess, _useStepup, onError) => {
+          capturedOnError = onError;
+          return { validatePassword: vi.fn(), validatePasswordLoading: false };
+        },
+      );
+
+      await act(async () => {
+        renderComponent();
+      });
+
+      await act(async () => {
+        capturedOnError?.("CSIAM0011E");
+      });
+
+      expect(mockTrackEvent).toHaveBeenCalledWith({
+        event: "form_step_end",
+        step: "verify_password",
+        error: "CSIAM0011E",
+      });
+    });
+
+    it("emits form_step_end with error when delete MFA API fails on confirm step", async () => {
+      // deleteMFA rejects with a structured error
+      mockDeleteMFA.mockRejectedValueOnce({
+        data: { message: "DELETE_FAILED" },
+      });
+
+      // Password validation passes
+      usePasswordValidation.mockImplementation((_setErr, onSuccess) => ({
+        validatePassword: vi.fn(async () => {
+          onSuccess?.();
+        }),
+        validatePasswordLoading: false,
+      }));
+
+      // 1 phone factor so OTP selection is skipped
+      useOtpOperations.mockReturnValue({
+        userPhoneFactors: [
+          { id: "factor-1", type: "smsotp", phoneNumber: "+15551234567" },
+        ],
+        userSelectedMfaFactor: {
+          id: "factor-1",
+          type: "smsotp",
+          phoneNumber: "+15551234567",
+        },
+        userOtpValue: "123456",
+        otpSentResponse: { trxnId: "trxn-id" },
+        otpLoading: false,
+        handleChangeUserMfaSelection: vi.fn(),
+        handleSetUserOtpValue: vi.fn(),
+        requestOtpCode: vi.fn().mockResolvedValue(true),
+        validateOtpCode: vi.fn(),
+        fetchUserOtpPhoneFactors: vi
+          .fn()
+          .mockResolvedValue({ success: true, data: [] }),
+      });
+
+      await act(async () => {
+        renderComponent();
+      });
+
+      // Step 1: password verification
+      await waitFor(() =>
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument(),
+      );
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("password-verification-next"));
+      });
+
+      // Step 2: OTP verification (1 factor → selection skipped)
+      await waitFor(() =>
+        expect(screen.getByTestId("otp-verification")).toBeInTheDocument(),
+      );
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("otp-verification-next"));
+      });
+
+      // Step 3: delete confirm step
+      await waitFor(() =>
+        expect(screen.getByTestId("delete-confirm")).toBeInTheDocument(),
+      );
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("delete-confirm-next"));
+      });
+
+      await waitFor(() => {
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_step_end",
+          step: "confirm_delete",
+          error: "DELETE_FAILED",
+        });
+      });
+    });
+  });
+
+  describe("GA Success Path Tracking", () => {
+    beforeEach(() => {
+      usePasswordValidation.mockImplementation((_setErr, onSuccess) => ({
+        validatePassword: vi.fn(async () => {
+          onSuccess?.();
+        }),
+        validatePasswordLoading: false,
+      }));
+
+      useOtpOperations.mockReturnValue({
+        userPhoneFactors: [
+          {
+            id: "factor-1",
+            type: "smsotp",
+            phoneNumber: "+15551234567",
+            destination: "+15551234567",
+          },
+        ],
+        userSelectedMfaFactor: {
+          id: "factor-1",
+          type: "smsotp",
+          destination: "+15551234567",
+        },
+        userOtpValue: "123456",
+        otpSentResponse: { trxnId: "trxn-id" },
+        otpLoading: false,
+        handleChangeUserMfaSelection: vi.fn(),
+        handleSetUserOtpValue: vi.fn(),
+        requestOtpCode: vi.fn().mockResolvedValue(true),
+        validateOtpCode: vi.fn(),
+        fetchUserOtpPhoneFactors: vi
+          .fn()
+          .mockResolvedValue({ success: true, data: [] }),
+      });
+    });
+
+    it("fires form_step_start at verify_password when password validation begins", async () => {
+      await act(async () => {
+        renderComponent();
+      });
+
+      await waitFor(() =>
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument(),
+      );
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("password-verification-next"));
+      });
+
+      expect(mockTrackEvent).toHaveBeenCalledWith({
+        event: "form_step_start",
+        step: "verify_password",
+      });
+    });
+
+    it("fires form_step_change to otp_validation after password validates (1-factor)", async () => {
+      await act(async () => {
+        renderComponent();
+      });
+
+      await waitFor(() =>
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument(),
+      );
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("password-verification-next"));
+      });
+
+      await waitFor(() => {
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_step_change",
+          step: "otp_validation",
+        });
+      });
+    });
+
+    it("fires form_step_start at otp_validation and form_step_change to confirm_delete when OTP is verified", async () => {
+      await act(async () => {
+        renderComponent();
+      });
+
+      await waitFor(() =>
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument(),
+      );
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("password-verification-next"));
+      });
+
+      await waitFor(() =>
+        expect(screen.getByTestId("otp-verification")).toBeInTheDocument(),
+      );
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("otp-verification-next"));
+      });
+
+      await waitFor(() => {
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_step_start",
+          step: "otp_validation",
+        });
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_step_change",
+          step: "confirm_delete",
+        });
+      });
+    });
+
+    it("fires form_submit and form_step_start at confirm_delete when delete is confirmed", async () => {
+      await act(async () => {
+        renderComponent();
+      });
+
+      await waitFor(() =>
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument(),
+      );
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("password-verification-next"));
+      });
+
+      await waitFor(() =>
+        expect(screen.getByTestId("otp-verification")).toBeInTheDocument(),
+      );
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("otp-verification-next"));
+      });
+
+      await waitFor(() =>
+        expect(screen.getByTestId("delete-confirm")).toBeInTheDocument(),
+      );
+
+      mockTrackEvent.mockClear();
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("delete-confirm-next"));
+      });
+
+      expect(mockTrackEvent).toHaveBeenCalledWith({
+        event: "form_submit",
+        step: "confirm_delete",
+      });
+      expect(mockTrackEvent).toHaveBeenCalledWith({
+        event: "form_step_start",
+        step: "confirm_delete",
+      });
+    });
+
+    it("fires form_submit_complete at mfa_delete_success when deleteMFA API succeeds", async () => {
+      mockDeleteMFA.mockResolvedValue(undefined);
+
+      await act(async () => {
+        renderComponent();
+      });
+
+      await waitFor(() =>
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument(),
+      );
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("password-verification-next"));
+      });
+
+      await waitFor(() =>
+        expect(screen.getByTestId("otp-verification")).toBeInTheDocument(),
+      );
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("otp-verification-next"));
+      });
+
+      await waitFor(() =>
+        expect(screen.getByTestId("delete-confirm")).toBeInTheDocument(),
+      );
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("delete-confirm-next"));
+      });
+
+      await waitFor(() => {
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_submit_complete",
+          step: "mfa_delete_success",
+        });
+      });
     });
   });
 });
