@@ -61,10 +61,11 @@ export function usePasswordValidation(
     } catch (err) {
       const message =
         getErrorMessage(err) ||
-        (err instanceof Error ? err.message : String(err)) ||
-        "PASSWORD_VALIDATION_FAILED";
-      setErrorCode(message);
-      onError?.(message);
+        (err instanceof Error ? err.message : undefined);
+      if (message) {
+        setErrorCode(message);
+        onError?.(message);
+      }
     } finally {
       setValidatePasswordLoading(false);
     }

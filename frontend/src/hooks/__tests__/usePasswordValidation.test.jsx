@@ -200,7 +200,7 @@ describe("usePasswordValidation", () => {
       expect(mockAuthService.verifyPassword).toHaveBeenCalledWith({
         password: "ValidPassword123",
       });
-      expect(mockSetErrorCode).not.toHaveBeenCalled();
+      expect(mockSetErrorCode).toHaveBeenCalledWith("Network error");
       expect(mockOnSuccess).not.toHaveBeenCalled();
     });
 

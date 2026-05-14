@@ -116,9 +116,10 @@ export const useOtpOperations = ({
     } catch (err) {
       const message =
         getErrorMessage(err) ||
-        (err instanceof Error ? err.message : String(err)) ||
-        "OTP_SEND_FAILED";
-      setErrorCode(message);
+        (err instanceof Error ? err.message : undefined);
+      if (message) {
+        setErrorCode(message);
+      }
       return false;
     } finally {
       didFetch.current = false;
@@ -160,10 +161,11 @@ export const useOtpOperations = ({
     } catch (err) {
       const message =
         getErrorMessage(err) ||
-        (err instanceof Error ? err.message : String(err)) ||
-        "OTP_VERIFICATION_FAILED";
-      setErrorCode(message);
-      onError?.(message);
+        (err instanceof Error ? err.message : undefined);
+      if (message) {
+        setErrorCode(message);
+        onError?.(message);
+      }
     } finally {
       setUserOtpValue("");
     }
