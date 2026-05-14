@@ -2589,7 +2589,7 @@ describe("AddMFAPage Unit Tests", () => {
 
   describe("GA Error Tracking", () => {
     // Helper: navigate past password verification (password validation always passes)
-    const navigatePastPassword = async () => {
+    const navigatePastPassword = () => {
       usePasswordValidation.mockImplementation(
         (_setErr, onSuccess, _useStepup, _onError) => ({
           validatePassword: vi.fn(async () => {

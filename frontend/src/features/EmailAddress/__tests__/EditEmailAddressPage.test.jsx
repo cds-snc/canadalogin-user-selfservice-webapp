@@ -184,9 +184,7 @@ vi.mock("../../../hooks/useOtpOperations", () => ({
     otpLoading: false,
     handleChangeUserMfaSelection: vi.fn(),
     handleSetUserOtpValue: vi.fn(),
-    requestOtpCode: vi
-      .fn()
-      .mockResolvedValue({ success: true, trxnId: "mock-transaction-id" }),
+    requestOtpCode: vi.fn().mockResolvedValue(true),
     validateOtpCode: vi.fn((otpValue, callback) => {
       if (callback) {
         callback({ success: true });
