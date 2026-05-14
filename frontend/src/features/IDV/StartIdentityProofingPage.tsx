@@ -10,9 +10,9 @@ import {
 } from "@gcds-core/components-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
-import { useUser } from "../../components/Providers/useUser";
 import { DEV_ONLY_FEATURE } from "../../utils/constants";
 import { useState } from "react";
+import { identityVerificationApi } from "./api/identityVerificationApi";
 
 interface RadioOption {
   label: string;
@@ -30,7 +30,7 @@ const IDV_METHOD = {
 type IdvMethod = (typeof IDV_METHOD)[keyof typeof IDV_METHOD];
 
 interface RadioButtonsProps {
-  selectedMethod: IdvMethod;
+  selectedMethod: IdvMethod | undefined;
   onMethodChange: (method: IdvMethod) => void;
 }
 
@@ -70,13 +70,10 @@ const RadioButtons = ({
 };
 
 export default function StartIdentityProofingPage() {
-  const { state } = useUser();
   const navigate = useNavigate();
   const { t } = useTranslation("idv");
   const { t: tLayout } = useTranslation("layout");
-  const [selectedMethod, setSelectedMethod] = useState<IdvMethod>(
-    IDV_METHOD.documentScanning,
-  );
+  const [selectedMethod, setSelectedMethod] = useState<IdvMethod>();
 
   if (!DEV_ONLY_FEATURE) {
     return null;
@@ -113,8 +110,16 @@ export default function StartIdentityProofingPage() {
         <GcdsGrid columns="max-content max-content" gap="200">
           <GcdsButton
             type="button"
-            onClick={() => {
-              // TODO: navigate to next IDV step
+            onGcdsClick={(ev) => {
+              ev.preventDefault();
+              identityVerificationApi
+                .getOnlineIdentityVerificationUrl()
+                .then((response) => {
+                  const { redirect_url } = (
+                    response as { data: { redirect_url: string } }
+                  ).data;
+                  window.location.href = redirect_url;
+                });
             }}
           >
             {t("ServiceCanadaCentre.continueButton")}
