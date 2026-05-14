@@ -4,116 +4,134 @@ import {
   GcdsGrid,
   GcdsHeading,
   GcdsLink,
-  GcdsNotice,
   GcdsText,
   GcdsContainer,
+  GcdsRadios,
 } from "@gcds-core/components-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { useUser } from "../../components/Providers/useUser";
 import { DEV_ONLY_FEATURE } from "../../utils/constants";
+import { useState } from "react";
 
-export default function ServiceCanadaCentrePage() {
+interface RadioOption {
+  label: string;
+  id: string;
+  value: string;
+  hint: string;
+  checked: boolean;
+}
+
+const IDV_METHOD = {
+  documentScanning: "documentScanning",
+  provincialPartner: "provincialPartner",
+} as const;
+
+type IdvMethod = (typeof IDV_METHOD)[keyof typeof IDV_METHOD];
+
+interface RadioButtonsProps {
+  selectedMethod: IdvMethod;
+  onMethodChange: (method: IdvMethod) => void;
+}
+
+const RadioButtons = ({
+  selectedMethod,
+  onMethodChange,
+}: RadioButtonsProps) => {
+  const { t } = useTranslation("idv");
+
+  const radioOptions: RadioOption[] = [
+    {
+      label: t("StartIdentityProofing.documentScanningOption"),
+      id: `radio-${IDV_METHOD.documentScanning}`,
+      value: IDV_METHOD.documentScanning,
+      hint: t("StartIdentityProofing.hintDocumentScanningOption"),
+      checked: selectedMethod === IDV_METHOD.documentScanning,
+    },
+    {
+      label: t("StartIdentityProofing.provincialPartnerOption"),
+      id: `radio-${IDV_METHOD.provincialPartner}`,
+      value: IDV_METHOD.provincialPartner,
+      hint: t("StartIdentityProofing.hintProvincialPartnerOption"),
+      checked: selectedMethod === IDV_METHOD.provincialPartner,
+    },
+  ];
+
+  return (
+    <GcdsRadios
+      name="idv-method"
+      legend={t("StartIdentityProofing.radioOnlineLabel")}
+      options={radioOptions}
+      onGcdsChange={(e: CustomEvent<string>) => {
+        onMethodChange((e.target as HTMLInputElement).value as IdvMethod);
+      }}
+    ></GcdsRadios>
+  );
+};
+
+export default function StartIdentityProofingPage() {
   const { state } = useUser();
   const navigate = useNavigate();
   const { t } = useTranslation("idv");
-
-  const email = state?.userProfile?.userName ?? "";
+  const { t: tLayout } = useTranslation("layout");
+  const [selectedMethod, setSelectedMethod] = useState<IdvMethod>(
+    IDV_METHOD.documentScanning,
+  );
 
   if (!DEV_ONLY_FEATURE) {
     return null;
   }
 
   return (
-    DEV_ONLY_FEATURE && (
-      <GcdsContainer role="main">
-        <GcdsGrid columns="1" gap="450">
-          <GcdsContainer>
-            {" "}
-            <GcdsText marginBottom="0" size="small">
-              {t("ServiceCanadaCentre.pageTitle")}
-            </GcdsText>
-            <GcdsHeading tag="h1">
-              {t("ServiceCanadaCentre.heading")}
-            </GcdsHeading>
-          </GcdsContainer>
-
-          <GcdsContainer>
-            {" "}
-            <GcdsText>
-              <strong>{t("ServiceCanadaCentre.followSteps")}</strong>
-            </GcdsText>
-            <ol>
-              <li>
-                <GcdsText marginBottom="0">
-                  {t("ServiceCanadaCentre.step1")}
-                </GcdsText>
-              </li>
-              <li>
-                <GcdsText marginBottom="0">
-                  {t("ServiceCanadaCentre.step2")}
-                </GcdsText>
-
-                <GcdsDetails detailsTitle={t("ServiceCanadaCentre.listOfIds")}>
-                  {t("ServiceCanadaCentre.listOfIds")}
-                </GcdsDetails>
-              </li>
-              <li>
-                <GcdsText marginBottom="0">
-                  {t("ServiceCanadaCentre.step3")}
-                </GcdsText>
-              </li>
-            </ol>
-          </GcdsContainer>
-
-          <GcdsHeading tag="h2" marginTop="0">
-            {t("ServiceCanadaCentre.receiveCodeHeading")}
+    <GcdsContainer role="main">
+      <GcdsGrid columns="1" gap="450">
+        <GcdsContainer>
+          <GcdsHeading tag="h1">
+            {t("StartIdentityProofing.pageTitle")}
           </GcdsHeading>
+          <GcdsText>
+            <strong>{tLayout("TopNavBar.appName")} </strong>{" "}
+            {t("StartIdentityProofing.heading")}
+          </GcdsText>
 
-          <GcdsContainer>
-            {" "}
-            <GcdsText>
-              {t("ServiceCanadaCentre.receiveCodeDescription")}
-            </GcdsText>
-            <GcdsText>
-              {t("ServiceCanadaCentre.emailInstructions")}{" "}
-              <strong>{email}</strong>
-            </GcdsText>
-          </GcdsContainer>
+          <GcdsLink href="#" external size="regular">
+            {t("StartIdentityProofing.learnMoreDescription")}
+          </GcdsLink>
 
-          <GcdsGrid columns="max-content max-content" gap="200">
-            <GcdsButton
-              type="button"
-              onClick={() => {
-                // TODO: navigate to next IDV step
-              }}
-            >
-              {t("ServiceCanadaCentre.continueButton")}
-            </GcdsButton>
-            <GcdsButton
-              type="button"
-              buttonRole="secondary"
-              onClick={() => {
-                navigate(-1);
-              }}
-            >
-              {t("ServiceCanadaCentre.backButton")}
-            </GcdsButton>
-          </GcdsGrid>
-          <GcdsNotice
-            noticeRole="info"
-            noticeTitleTag="h2"
-            noticeTitle={t("ServiceCanadaCentre.moreInfoTitle")}
+          <GcdsHeading tag="h2" marginTop="300" characterLimit={false}>
+            {t("StartIdentityProofing.howToProveHeading")}
+          </GcdsHeading>
+          <RadioButtons
+            selectedMethod={selectedMethod}
+            onMethodChange={setSelectedMethod}
+          />
+          <GcdsDetails detailsTitle={t("StartIdentityProofing.inPersonOption")}>
+            {t("StartIdentityProofing.additionalInformation")}
+          </GcdsDetails>
+        </GcdsContainer>
+
+        <GcdsGrid columns="max-content max-content" gap="200">
+          <GcdsButton
+            type="button"
+            onClick={() => {
+              // TODO: navigate to next IDV step
+            }}
           >
-            {
-              //TODO: populate with real URL once available
-            }
-            <GcdsLink href={"#"} external={true}>
-              {t("ServiceCanadaCentre.learnMoreLink")}
-            </GcdsLink>
-          </GcdsNotice>
+            {t("ServiceCanadaCentre.continueButton")}
+          </GcdsButton>
+          <GcdsButton
+            buttonRole="secondary"
+            style={{ width: "fit-content" }}
+            onGcdsClick={(ev) => {
+              ev.preventDefault();
+              // back to Relying Party page? For now, navigate to account settings page
+              navigate("/");
+            }}
+          >
+            {t("Button.cancel", { ns: "common" })}
+          </GcdsButton>
         </GcdsGrid>
-      </GcdsContainer>
-    )
+      </GcdsGrid>
+    </GcdsContainer>
   );
 }
