@@ -3,6 +3,11 @@ import logging
 from httpx import AsyncClient
 
 from app.config import GCNotifyConfig
+from app.constants.gc_notify import (
+    GC_NOTIFY_BASE_URL,
+    GCNotifyEndpoint,
+    GCNotifyTemplateID,
+)
 from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
 from app.utils.request_error_handler import RequestErrorHandler
 from app.utils.schemas import ResponseModel
@@ -11,9 +16,7 @@ logger = logging.getLogger(__name__)
 
 _gc_notify_config = GCNotifyConfig()
 
-GC_NOTIFY_BASE_URL = "https://api.notification.canada.ca"
-GC_NOTIFY_EMAIL_ENDPOINT = f"{GC_NOTIFY_BASE_URL}/v2/notifications/email"
-GC_NOTIFY_TEMPLATE_ID = "46c59b2f-945c-4d5e-89fd-f085180cdbed"
+GC_NOTIFY_EMAIL_ENDPOINT = f"{GC_NOTIFY_BASE_URL}{GCNotifyEndpoint.SEND_EMAIL}"
 
 # TODO: Replace with a real generated verification code once that feature exists.
 HARDCODED_VERIFICATION_CODE = "387DHROGJ"
@@ -46,7 +49,7 @@ async def send_in_person_verification_code(
 
     payload = {
         "email_address": email_address,
-        "template_id": GC_NOTIFY_TEMPLATE_ID,
+        "template_id": GCNotifyTemplateID.IN_PERSON_VERIFICATION,
         "personalisation": {
             "verification_code": HARDCODED_VERIFICATION_CODE,
         },
