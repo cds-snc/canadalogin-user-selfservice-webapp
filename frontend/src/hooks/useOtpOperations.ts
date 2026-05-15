@@ -69,6 +69,7 @@ export const useOtpOperations = ({
 
   const requestOtpCode = async (
     override?: OtpRequestOverride,
+    onError?: (errorCode: string) => void,
   ): Promise<boolean> => {
     if (!userName) {
       return false;
@@ -119,6 +120,7 @@ export const useOtpOperations = ({
         (err instanceof Error ? err.message : undefined);
       if (message) {
         setErrorCode(message);
+        onError?.(message);
       }
       return false;
     } finally {

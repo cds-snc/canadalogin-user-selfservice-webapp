@@ -81,7 +81,10 @@ export type UseOtpOperationsReturn = {
   setOtpLoading: React.Dispatch<React.SetStateAction<boolean>>;
   handleChangeUserMfaSelection: (id: string) => void;
   handleSetUserOtpValue: (value: string) => void;
-  requestOtpCode: (override?: OtpRequestOverride) => Promise<boolean>;
+  requestOtpCode: (
+    override?: OtpRequestOverride,
+    onError?: (errorCode: string) => void,
+  ) => Promise<boolean>;
   validateOtpCode: (
     otpValue: string,
     onSuccess?: UseOtpValidationSuccess,
