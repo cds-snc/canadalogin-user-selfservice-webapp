@@ -565,6 +565,8 @@ describe("useOtpOperations", () => {
         },
       });
 
+      const mockOnError = vi.fn();
+
       const { result } = renderHook(
         () =>
           useOtpOperations({
@@ -585,10 +587,16 @@ describe("useOtpOperations", () => {
       });
 
       await act(async () => {
-        await result.current.validateOtpCode("123456", mockOnSuccess);
+        await result.current.validateOtpCode(
+          "123456",
+          mockOnSuccess,
+          undefined,
+          mockOnError,
+        );
       });
 
       expect(defaultProps.setErrorCode).toHaveBeenCalledWith("INVALID_OTP");
+      expect(mockOnError).toHaveBeenCalledWith("INVALID_OTP");
       expect(mockOnSuccess).not.toHaveBeenCalled();
     });
 

@@ -93,6 +93,14 @@ export default function EditEmailAddressPage() {
         setWizardStep("otpSelection");
       }
     },
+    false,
+    (message) => {
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_END,
+        step: EMAIL_ADDRESS_ANALYTICS.STEPS.VERIFY_PASSWORD,
+        error: message,
+      });
+    },
   );
 
   // Create tracked password validation wrapper
@@ -367,20 +375,24 @@ export default function EditEmailAddressPage() {
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: EMAIL_ADDRESS_ANALYTICS.STEPS.OTP_VALIDATION,
           });
-          return validateOtpCode(userOtpValue, (response) => {
-            if ((response as { success?: boolean })?.success) {
+          return validateOtpCode(
+            userOtpValue,
+            () => {
               setWizardStep("enterEmail");
               trackEvent({
                 event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
                 step: EMAIL_ADDRESS_ANALYTICS.STEPS.ENTER_EMAIL,
               });
-            } else {
+            },
+            undefined,
+            (message) => {
               trackEvent({
                 event: GA_FORM_EVENTS.FORM_STEP_END,
                 step: EMAIL_ADDRESS_ANALYTICS.STEPS.OTP_VALIDATION,
+                error: message,
               });
-            }
-          });
+            },
+          );
         }}
         onBack={() => {
           const prevStep =

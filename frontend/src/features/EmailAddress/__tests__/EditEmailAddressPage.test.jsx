@@ -4,6 +4,20 @@ import { act } from "@testing-library/react";
 import { BrowserRouter } from "react-router";
 import React from "react";
 import EditEmailAddressPage from "../EditEmailAddressPage";
+import { usePasswordValidation } from "../../../hooks/usePasswordValidation";
+import { useOtpOperations } from "../../../hooks/useOtpOperations";
+
+const { mockTrackEvent } = vi.hoisted(() => ({
+  mockTrackEvent: vi.fn(),
+}));
+
+vi.mock("../../../hooks/useFormTracking", () => ({
+  useFormTracking: () => ({ trackEvent: mockTrackEvent }),
+}));
+
+vi.mock("../../../hooks/useWizardPageTracking", () => ({
+  useWizardPageTracking: vi.fn(),
+}));
 
 // Setup test environment for GCDS components
 import "../../../setupTests";
@@ -149,37 +163,35 @@ vi.mock("../EmailUpdateSuccess", () => ({
 
 // Mock hooks with real-like behavior
 vi.mock("../../../hooks/usePasswordValidation", () => ({
-  usePasswordValidation: (setErrorCode, onSuccess) => ({
+  usePasswordValidation: vi.fn((setErrorCode, onSuccess) => ({
     validatePassword: () => {
       setErrorCode("");
       onSuccess();
     },
     validatePasswordLoading: false,
-  }),
+  })),
 }));
 
 vi.mock("../../../hooks/useOtpOperations", () => ({
-  useOtpOperations: () => ({
+  useOtpOperations: vi.fn(() => ({
     userPhoneFactors: [
       { id: "phone1", value: "+1234567890", type: "sms" },
       { id: "phone2", value: "+1234567891", type: "voice" },
     ],
     userSelectedMfaFactor: null,
-    userOtpValue: "123456", // Provide a mock OTP value
-    otpSentResponse: { trxnId: "mock-transaction-id" }, // Mock transaction ID
+    userOtpValue: "123456",
+    otpSentResponse: { trxnId: "mock-transaction-id" },
     otpLoading: false,
     handleChangeUserMfaSelection: vi.fn(),
     handleSetUserOtpValue: vi.fn(),
-    requestOtpCode: vi
-      .fn()
-      .mockResolvedValue({ success: true, trxnId: "mock-transaction-id" }),
-    validateOtpCode: (otpValue, callback) => {
+    requestOtpCode: vi.fn().mockResolvedValue(true),
+    validateOtpCode: vi.fn((otpValue, callback) => {
       if (callback) {
         callback({ success: true });
       }
-    },
+    }),
     setOtpLoading: vi.fn(),
-  }),
+  })),
 }));
 
 vi.mock("../../../components/Providers/useUser", () => ({
@@ -710,6 +722,582 @@ describe("EditEmailAddressPage Integration Tests", () => {
       // The component should handle the error gracefully
       // We can't easily test setTimeout behavior without causing timing issues
       expect(screen.getByTestId("email-update-success")).toBeInTheDocument();
+    });
+  });
+
+  describe("GA Error Tracking", () => {
+    beforeEach(() => {
+      // Reset useOtpOperations to the default callback-based implementation before each GA test
+      vi.mocked(useOtpOperations).mockImplementation(() => ({
+        userPhoneFactors: [
+          { id: "phone1", value: "+1234567890", type: "sms" },
+          { id: "phone2", value: "+1234567891", type: "voice" },
+        ],
+        userSelectedMfaFactor: { id: "phone1", type: "sms" },
+        userOtpValue: "123456",
+        otpSentResponse: { trxnId: "mock-transaction-id" },
+        otpLoading: false,
+        handleChangeUserMfaSelection: vi.fn(),
+        handleSetUserOtpValue: vi.fn(),
+        requestOtpCode: vi.fn().mockResolvedValue(true),
+        validateOtpCode: vi.fn((otpValue, callback) => {
+          if (callback) {
+            callback({ success: true });
+          }
+        }),
+        setOtpLoading: vi.fn(),
+      }));
+    });
+
+    it("emits form_step_end error event when password verify API fails", async () => {
+      let capturedOnError;
+      vi.mocked(usePasswordValidation).mockImplementationOnce(
+        (_setErr, _onSuccess, _useStepup, onError) => {
+          capturedOnError = onError;
+          return { validatePassword: vi.fn(), validatePasswordLoading: false };
+        },
+      );
+
+      renderComponent();
+
+      await act(async () => {
+        capturedOnError?.("WRONG_PASSWORD");
+      });
+
+      expect(mockTrackEvent).toHaveBeenCalledWith({
+        event: "form_step_end",
+        step: "verify_password",
+        error: "WRONG_PASSWORD",
+      });
+    });
+
+    it("emits form_step_end error event when OTP verify API fails", async () => {
+      // Override validateOtpCode to immediately invoke the onError callback
+      vi.mocked(useOtpOperations).mockImplementation(() => ({
+        userPhoneFactors: [
+          { id: "phone1", value: "+1234567890", type: "sms" },
+          { id: "phone2", value: "+1234567891", type: "voice" },
+        ],
+        userSelectedMfaFactor: { id: "phone1", type: "sms" },
+        userOtpValue: "123456",
+        otpSentResponse: { trxnId: "mock-transaction-id" },
+        otpLoading: false,
+        handleChangeUserMfaSelection: vi.fn(),
+        handleSetUserOtpValue: vi.fn(),
+        requestOtpCode: vi.fn().mockResolvedValue(true),
+        validateOtpCode: vi.fn((_otp, _onSuccess, _override, onError) => {
+          onError?.("INVALID_OTP_CODE");
+        }),
+        setOtpLoading: vi.fn(),
+      }));
+
+      renderComponent();
+
+      // Advance past password verification
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("validate-password-btn"));
+      });
+
+      // 2 phone factors → OTP selection step is shown
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
+      });
+
+      // Advance past OTP selection
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("otp-next-btn"));
+      });
+
+      // OTP verification step is now shown
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
+      });
+
+      // Click verify — triggers validateOtpCode which calls onError
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("verify-otp-btn"));
+      });
+
+      expect(mockTrackEvent).toHaveBeenCalledWith({
+        event: "form_step_end",
+        step: "otp_validation",
+        error: "INVALID_OTP_CODE",
+      });
+    });
+
+    it("emits form_step_end with error when confirm_update API fails", async () => {
+      const { authService } = await import("../../../services/authService");
+      authService.update_email_with_otp.mockRejectedValueOnce({
+        data: { message: "EMAIL_UPDATE_FAILED" },
+      });
+
+      renderComponent();
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("validate-password-btn"));
+      });
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("otp-next-btn"));
+      });
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("verify-otp-btn"));
+      });
+
+      await waitFor(() =>
+        expect(
+          screen.getByTestId("edit-email-enter-email"),
+        ).toBeInTheDocument(),
+      );
+
+      await act(async () => {
+        fireEvent.change(screen.getByTestId("email-input"), {
+          target: { value: "new@example.com" },
+        });
+      });
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("submit-email-btn"));
+      });
+
+      await waitFor(() =>
+        expect(screen.getByTestId("email-otp-validation")).toBeInTheDocument(),
+      );
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("submit-email-otp-btn"));
+      });
+
+      await waitFor(() =>
+        expect(screen.getByTestId("email-confirm-update")).toBeInTheDocument(),
+      );
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("confirm-update-btn"));
+      });
+
+      await waitFor(() => {
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_step_end",
+          step: "confirm_update",
+          error: "EMAIL_UPDATE_FAILED",
+        });
+      });
+    });
+
+    it("emits form_step_end when logout API fails", async () => {
+      const { authService } = await import("../../../services/authService");
+      // Ensure update succeeds so we reach the success step
+      authService.update_email_with_otp.mockResolvedValueOnce({
+        success: true,
+        data: { userName: "new@example.com" },
+      });
+      authService.logout.mockRejectedValueOnce(new Error("Logout failed"));
+
+      renderComponent();
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("validate-password-btn"));
+      });
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("otp-next-btn"));
+      });
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("verify-otp-btn"));
+      });
+
+      await waitFor(() =>
+        expect(
+          screen.getByTestId("edit-email-enter-email"),
+        ).toBeInTheDocument(),
+      );
+
+      await act(async () => {
+        fireEvent.change(screen.getByTestId("email-input"), {
+          target: { value: "new@example.com" },
+        });
+      });
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("submit-email-btn"));
+      });
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("submit-email-otp-btn"));
+      });
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("confirm-update-btn"));
+      });
+
+      await waitFor(() =>
+        expect(screen.getByTestId("email-update-success")).toBeInTheDocument(),
+      );
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("sign-out-btn"));
+      });
+
+      await waitFor(() => {
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_step_end",
+          step: "logout",
+        });
+      });
+    });
+  });
+
+  describe("GA Success Path Tracking", () => {
+    beforeEach(() => {
+      vi.mocked(useOtpOperations).mockImplementation(() => ({
+        userPhoneFactors: [
+          { id: "phone1", value: "+1234567890", type: "sms" },
+          { id: "phone2", value: "+1234567891", type: "voice" },
+        ],
+        userSelectedMfaFactor: { id: "phone1", type: "sms" },
+        userOtpValue: "123456",
+        otpSentResponse: { trxnId: "mock-transaction-id" },
+        otpLoading: false,
+        handleChangeUserMfaSelection: vi.fn(),
+        handleSetUserOtpValue: vi.fn(),
+        requestOtpCode: vi.fn().mockResolvedValue(true),
+        validateOtpCode: vi.fn((otpValue, callback) => {
+          if (callback) {
+            callback({ success: true });
+          }
+        }),
+        setOtpLoading: vi.fn(),
+      }));
+    });
+
+    it("fires form_step_start at verify_password when password validation begins", async () => {
+      renderComponent();
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("validate-password-btn"));
+      });
+
+      expect(mockTrackEvent).toHaveBeenCalledWith({
+        event: "form_step_start",
+        step: "verify_password",
+      });
+    });
+
+    it("fires form_step_change to otp_selection after password validates (2-factor)", async () => {
+      renderComponent();
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("validate-password-btn"));
+      });
+
+      await waitFor(() => {
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_step_change",
+          step: "otp_selection",
+        });
+      });
+    });
+
+    it("fires form_step_change to otp_validation after OTP factor is selected", async () => {
+      renderComponent();
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("validate-password-btn"));
+      });
+
+      await waitFor(() =>
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument(),
+      );
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("otp-next-btn"));
+      });
+
+      await waitFor(() => {
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_step_change",
+          step: "otp_validation",
+        });
+      });
+    });
+
+    it("fires form_step_start and form_step_change to enter_email after OTP validation succeeds", async () => {
+      renderComponent();
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("validate-password-btn"));
+      });
+
+      await waitFor(() =>
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument(),
+      );
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("otp-next-btn"));
+      });
+
+      await waitFor(() =>
+        expect(screen.getByTestId("otp-verification")).toBeInTheDocument(),
+      );
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("verify-otp-btn"));
+      });
+
+      await waitFor(() => {
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_step_start",
+          step: "otp_validation",
+        });
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_step_change",
+          step: "enter_email",
+        });
+      });
+    });
+
+    it("fires form_step_change to email_otp_validation after valid email is submitted", async () => {
+      renderComponent();
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("validate-password-btn"));
+      });
+      await waitFor(() =>
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument(),
+      );
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("otp-next-btn"));
+      });
+      await waitFor(() =>
+        expect(screen.getByTestId("otp-verification")).toBeInTheDocument(),
+      );
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("verify-otp-btn"));
+      });
+      await waitFor(() =>
+        expect(
+          screen.getByTestId("edit-email-enter-email"),
+        ).toBeInTheDocument(),
+      );
+
+      await act(async () => {
+        fireEvent.change(screen.getByTestId("email-input"), {
+          target: { value: "new@example.com" },
+        });
+      });
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("submit-email-btn"));
+      });
+
+      await waitFor(() => {
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_step_change",
+          step: "email_otp_validation",
+        });
+      });
+    });
+
+    it("fires form_step_start and form_step_change to confirm_update after email OTP submitted", async () => {
+      renderComponent();
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("validate-password-btn"));
+      });
+      await waitFor(() =>
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument(),
+      );
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("otp-next-btn"));
+      });
+      await waitFor(() =>
+        expect(screen.getByTestId("otp-verification")).toBeInTheDocument(),
+      );
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("verify-otp-btn"));
+      });
+      await waitFor(() =>
+        expect(
+          screen.getByTestId("edit-email-enter-email"),
+        ).toBeInTheDocument(),
+      );
+
+      await act(async () => {
+        fireEvent.change(screen.getByTestId("email-input"), {
+          target: { value: "new@example.com" },
+        });
+      });
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("submit-email-btn"));
+      });
+      await waitFor(() =>
+        expect(screen.getByTestId("email-otp-validation")).toBeInTheDocument(),
+      );
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("submit-email-otp-btn"));
+      });
+
+      await waitFor(() => {
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_step_start",
+          step: "email_otp_validation",
+        });
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_step_change",
+          step: "confirm_update",
+        });
+      });
+    });
+
+    it("fires form_submit, form_step_start, and form_submit_complete when email update succeeds", async () => {
+      const { authService: svc } =
+        await import("../../../services/authService");
+      svc.update_email_with_otp.mockResolvedValueOnce({
+        success: true,
+        data: { userName: "new@example.com" },
+      });
+
+      renderComponent();
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("validate-password-btn"));
+      });
+      await waitFor(() =>
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument(),
+      );
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("otp-next-btn"));
+      });
+      await waitFor(() =>
+        expect(screen.getByTestId("otp-verification")).toBeInTheDocument(),
+      );
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("verify-otp-btn"));
+      });
+      await waitFor(() =>
+        expect(
+          screen.getByTestId("edit-email-enter-email"),
+        ).toBeInTheDocument(),
+      );
+
+      await act(async () => {
+        fireEvent.change(screen.getByTestId("email-input"), {
+          target: { value: "new@example.com" },
+        });
+      });
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("submit-email-btn"));
+      });
+      await waitFor(() =>
+        expect(screen.getByTestId("email-otp-validation")).toBeInTheDocument(),
+      );
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("submit-email-otp-btn"));
+      });
+      await waitFor(() =>
+        expect(screen.getByTestId("email-confirm-update")).toBeInTheDocument(),
+      );
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("confirm-update-btn"));
+      });
+
+      await waitFor(() => {
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_submit",
+          step: "confirm_update",
+        });
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_step_start",
+          step: "confirm_update",
+        });
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_submit_complete",
+          step: "email_update_success",
+        });
+      });
+    });
+
+    it("fires form_submit, form_step_start, and form_submit_complete at logout when sign-out succeeds", async () => {
+      const { authService: svc } =
+        await import("../../../services/authService");
+      svc.update_email_with_otp.mockResolvedValueOnce({
+        success: true,
+        data: { userName: "new@example.com" },
+      });
+      svc.logout.mockResolvedValueOnce({
+        data: { redirect_url: "https://logout.example.com" },
+      });
+
+      renderComponent();
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("validate-password-btn"));
+      });
+      await waitFor(() =>
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument(),
+      );
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("otp-next-btn"));
+      });
+      await waitFor(() =>
+        expect(screen.getByTestId("otp-verification")).toBeInTheDocument(),
+      );
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("verify-otp-btn"));
+      });
+      await waitFor(() =>
+        expect(
+          screen.getByTestId("edit-email-enter-email"),
+        ).toBeInTheDocument(),
+      );
+
+      await act(async () => {
+        fireEvent.change(screen.getByTestId("email-input"), {
+          target: { value: "new@example.com" },
+        });
+      });
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("submit-email-btn"));
+      });
+      await waitFor(() =>
+        expect(screen.getByTestId("email-otp-validation")).toBeInTheDocument(),
+      );
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("submit-email-otp-btn"));
+      });
+      await waitFor(() =>
+        expect(screen.getByTestId("email-confirm-update")).toBeInTheDocument(),
+      );
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("confirm-update-btn"));
+      });
+      await waitFor(() =>
+        expect(screen.getByTestId("email-update-success")).toBeInTheDocument(),
+      );
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("sign-out-btn"));
+      });
+
+      await waitFor(() => {
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_submit",
+          step: "logout",
+        });
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_step_start",
+          step: "logout",
+        });
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_submit_complete",
+          step: "logout",
+        });
+      });
     });
   });
 });

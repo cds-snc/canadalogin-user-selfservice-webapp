@@ -69,6 +69,7 @@ export const useOtpOperations = ({
 
   const requestOtpCode = async (
     override?: OtpRequestOverride,
+    onError?: (errorCode: string) => void,
   ): Promise<boolean> => {
     if (!userName) {
       return false;
@@ -114,9 +115,12 @@ export const useOtpOperations = ({
       }
       return false;
     } catch (err) {
-      const message = getErrorMessage(err);
+      const message =
+        getErrorMessage(err) ||
+        (err instanceof Error ? err.message : undefined);
       if (message) {
         setErrorCode(message);
+        onError?.(message);
       }
       return false;
     } finally {
@@ -128,6 +132,7 @@ export const useOtpOperations = ({
     otpValue: string,
     onSuccess?: UseOtpValidationSuccess,
     overrideOtpType?: string,
+    onError?: (errorCode: string) => void,
   ): Promise<void> => {
     if (!otpSentResponse) {
       return;
@@ -156,9 +161,12 @@ export const useOtpOperations = ({
         onSuccess?.(response);
       }
     } catch (err) {
-      const message = getErrorMessage(err);
+      const message =
+        getErrorMessage(err) ||
+        (err instanceof Error ? err.message : undefined);
       if (message) {
         setErrorCode(message);
+        onError?.(message);
       }
     } finally {
       setUserOtpValue("");

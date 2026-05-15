@@ -103,6 +103,14 @@ export default function DeleteMFAPage() {
         setWizardStep("otpSelection");
       }
     },
+    false,
+    (message) => {
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_END,
+        step: DELETE_MFA_ANALYTICS.STEPS.VERIFY_PASSWORD,
+        error: message,
+      });
+    },
   );
 
   // Create tracked password validation wrapper
