@@ -127,7 +127,7 @@
                     },
                     {
                       "key": "refresh_token",
-                      "value": "LNijWg1Ef0GV3RVFTK4hM674A_BI2_abkaRkYNV0-Mw.Iq2UmFLU9rnSDS0-0WF0xeoiJfkbsV4PoyoTR-6xVR6LAa_0nJQl4UEc95HLu4NkoZ53pIe-rwXxsi8eAe6o1g.M18xNzQ4MDA4NzU1XzM4",
+                      "value": "<token-redacted>",
                       "type": "text"
                     }
                   ]
@@ -537,7 +537,7 @@
               "formdata": [
                 {
                   "key": "access_token",
-                  "value": "8iU6m7TrP5lZPUhpVNKKTcfhFCsEhBVUxZ9N9XNvYw8.DGhnqMb3I3zwdv2EcFtcSeYiNE8qbjTVNY8eX_hsDkXFBY1C6VM6DQu3Z4awDGLftAFclffp2XRZQlxJSwMZYQ.M18xNzQ2NjU2MzAzXzM4",
+                  "value": "<token-redacted>",
                   "type": "text"
                 }
               ]

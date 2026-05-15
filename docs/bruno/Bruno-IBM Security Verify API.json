@@ -4722,7 +4722,7 @@
             "auth": {
               "mode": "bearer",
               "bearer": {
-                "token": "fPkZlT9BBackQqf20vsI5lGM_Qy_5wV2VDwKAOZnuM8.wqoIWrGC7F4j2bT3731cNsKaPNeF_IV-VWHO4GUtb_PLI6xoiLu-VvPfOR6LLjtAxLMosANJ2i_DMCduqzDBGQ.M18xNzU3NDU1MDY3XzM4"
+                "token": "<token-redacted>"
               }
             }
           }
@@ -6322,7 +6322,7 @@
             "auth": {
               "mode": "bearer",
               "bearer": {
-                "token": "F5akiZhh2Yoch375MWxrZ3lGBcFgR1CZNBuApt-KTpw.3VqEkMpiGv1BNjxOdR9gcs8Gs-PMqrwQLN_qR6xokKAZmx8Ass8zowpAeLHUXZIYpzI-WWae2X-18cq0nKMcKw.M18xNzYwOTc1MzEyXzM4"
+                "token": "<token-redacted>"
               }
             }
           }
@@ -6445,7 +6445,7 @@
             "auth": {
               "mode": "bearer",
               "bearer": {
-                "token": "F5akiZhh2Yoch375MWxrZ3lGBcFgR1CZNBuApt-KTpw.3VqEkMpiGv1BNjxOdR9gcs8Gs-PMqrwQLN_qR6xokKAZmx8Ass8zowpAeLHUXZIYpzI-WWae2X-18cq0nKMcKw.M18xNzYwOTc1MzEyXzM4"
+                "token": "<token-redacted>"
               }
             }
           }
