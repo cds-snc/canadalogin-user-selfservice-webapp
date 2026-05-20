@@ -1,5 +1,37 @@
 # Changelog
 
+## [1.20.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.19.0...v1.20.0) (2026-05-20)
+
+
+### Features
+
+* add Proven Information Card and integrate into ProfileHome component ([30d8d54](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/30d8d54959d77752b0e867034dbbebcb5c667ede))
+* **frontend:** add Proven Information Card and integrate into ProfileHome component ([#1445](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1445)) ([30d8d54](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/30d8d54959d77752b0e867034dbbebcb5c667ede))
+* **identity-verification:** integrate GC Notify for sending in-person verification codes ([#1463](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1463)) ([8445607](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/8445607843cba3abc8426f55016bd9e7aa4e84f6))
+
+
+### Bug Fixes
+
+* Google Analytics Error Tracking for API Endpoints ([#1461](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1461)) ([d251255](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/d251255c78a75a1dddecd24dfb384816f5815ea0))
+
+
+### Code Refactoring
+
+* **config:** make Bluink Client ID and Secret optional ([#1454](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1454)) ([31760c4](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/31760c4fc1868b241bc9ef52867809800c1511fb))
+
+
+### Miscellaneous Chores
+
+* bump staging deployed version to 1.19.0 ([#1460](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1460)) ([104338e](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/104338ea4f28fb2ad27df95187ee1f82d62aba0a))
+* remove hardcoded API tokens from dev documentation ([32fa191](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/32fa1911ac48f309651ccc636ba739ae41725346))
+* remove stale hardcoded API tokens from dev documentation ([#1464](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1464)) ([32fa191](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/32fa1911ac48f309651ccc636ba739ae41725346))
+
+
+### Continuous Integration
+
+* bump prod version 1.19.0 ([#1467](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1467)) ([447e181](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/447e181ac97056e7d2709888acd2007ce5c2e54c))
+* bump prod version to 1.19.0 ([447e181](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/447e181ac97056e7d2709888acd2007ce5c2e54c))
+
 ## [1.19.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.18.0...v1.19.0) (2026-05-07)
 
 
