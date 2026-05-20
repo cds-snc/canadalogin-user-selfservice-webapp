@@ -1,12 +1,12 @@
 import {
   GcdsButton,
-  GcdsDetails,
   GcdsGrid,
   GcdsHeading,
   GcdsLink,
   GcdsText,
   GcdsContainer,
   GcdsRadios,
+  GcdsNotice,
 } from "@gcds-core/components-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
@@ -34,7 +34,7 @@ interface RadioButtonsProps {
   onMethodChange: (method: IdvMethod) => void;
 }
 
-const RadioButtons = ({
+const OnlineRadioButtons = ({
   selectedMethod,
   onMethodChange,
 }: RadioButtonsProps) => {
@@ -87,8 +87,9 @@ export default function StartIdentityProofingPage() {
             {t("StartIdentityProofing.pageTitle")}
           </GcdsHeading>
           <GcdsText>
-            <strong>{tLayout("TopNavBar.appName")} </strong>{" "}
-            {t("StartIdentityProofing.heading")}
+            {t("StartIdentityProofing.heading", {
+              appName: tLayout("TopNavBar.appName"),
+            })}
           </GcdsText>
 
           <GcdsLink href="#" external size="regular">
@@ -98,13 +99,21 @@ export default function StartIdentityProofingPage() {
           <GcdsHeading tag="h2" marginTop="300" characterLimit={false}>
             {t("StartIdentityProofing.howToProveHeading")}
           </GcdsHeading>
-          <RadioButtons
+          <OnlineRadioButtons
             selectedMethod={selectedMethod}
             onMethodChange={setSelectedMethod}
           />
-          <GcdsDetails detailsTitle={t("StartIdentityProofing.inPersonOption")}>
-            {t("StartIdentityProofing.additionalInformation")}
-          </GcdsDetails>
+
+          <GcdsHeading tag="h4" marginTop="300" characterLimit={false}>
+            {t("StartIdentityProofing.inPersonOption")}
+          </GcdsHeading>
+          <GcdsNotice noticeRole="info" noticeTitleTag="h2" noticeTitle=" ">
+            <GcdsText>
+              {t("StartIdentityProofing.signBackInNotice", {
+                appName: tLayout("TopNavBar.appName"),
+              })}
+            </GcdsText>
+          </GcdsNotice>
         </GcdsContainer>
 
         <GcdsGrid columns="max-content max-content" gap="200">
