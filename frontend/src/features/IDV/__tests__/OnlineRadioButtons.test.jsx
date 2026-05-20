@@ -134,7 +134,9 @@ describe("OnlineRadioButtons", () => {
     render(
       <OnlineRadioButtons
         {...defaultProps}
-        selectedMethod={ONLINE_IDV_METHOD?.documentScanning ?? "documentScanning"}
+        selectedMethod={
+          ONLINE_IDV_METHOD?.documentScanning ?? "documentScanning"
+        }
       />,
     );
 
