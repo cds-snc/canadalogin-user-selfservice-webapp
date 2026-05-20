@@ -1,9 +1,8 @@
 import "@testing-library/jest-dom/vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import InPersonRadioButtons, {
-  IN_PERSON_METHOD,
-} from "../components/InPersonRadioButtons";
+import InPersonRadioButtons from "../components/InPersonRadioButtons";
+import { IN_PERSON_METHOD } from "../components/methods";
 
 // ────────────────────────────────────────────────
 // Mocks

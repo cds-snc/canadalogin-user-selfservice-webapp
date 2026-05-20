@@ -1,9 +1,8 @@
 import "@testing-library/jest-dom/vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import OnlineRadioButtons, {
-  ONLINE_IDV_METHOD,
-} from "../components/OnlineRadioButtons";
+import OnlineRadioButtons from "../components/OnlineRadioButtons";
+import { ONLINE_IDV_METHOD } from "../components/methods";
 
 // ────────────────────────────────────────────────
 // Mocks
