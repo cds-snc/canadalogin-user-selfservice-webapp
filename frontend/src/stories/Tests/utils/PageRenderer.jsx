@@ -22,6 +22,7 @@ import DeleteFIDO2PasskeyPage from "../../../features/ManageFIDO2/components/Del
 import AddFIDO2PasskeyPage from "../../../features/ManageFIDO2/components/AddFIDO2Passkey/AddFIDO2PasskeyPage";
 import ServiceCanadaCentrePage from "../../../features/IDV/ServiceCanadaCentrePage";
 import ServiceCanadaCentreIDVCodePage from "../../../features/IDV/ServiceCanadaCentreIDVCodePage";
+import StartIdentityProofingPage from "../../../features/IDV/StartIdentityProofingPage";
 import ProvenInformationCard from "../../../features/IDV/ProvenInformationCard";
 
 // Storybook Page Renderer - maps page names to components for testing
@@ -76,6 +77,8 @@ const PageRenderer = ({ page, ...props }) => {
       return <ServiceCanadaCentreIDVCodePage />;
     case PAGES.idvProvenInformationCard:
       return <ProvenInformationCard />;
+    case PAGES.startIdentityProofingPage:
+      return <StartIdentityProofingPage />;
     default:
       console.warn(`Unknown page in Storybook: ${page}`);
       return <div>Storybook: Page not found: {page}</div>;
