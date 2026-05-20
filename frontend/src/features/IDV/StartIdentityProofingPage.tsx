@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import {
   GcdsButton,
@@ -10,22 +10,32 @@ import {
   GcdsContainer,
   GcdsNotice,
 } from "@gcds-core/components-react";
-import { DEV_ONLY_FEATURE } from "../../utils/constants";
+
 import { identityVerificationApi } from "./api/identityVerificationApi";
 import OnlineRadioButtons, {
   type IdvMethod,
+  ONLINE_IDV_METHOD,
 } from "./components/OnlineRadioButtons";
 import InPersonRadioButtons, {
   type InPersonMethod,
+  IN_PERSON_METHOD,
 } from "./components/InPersonRadioButtons";
+import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
+import { path } from "../../utils/routeHelpers";
 
 export default function StartIdentityProofingPage() {
   const navigate = useNavigate();
+  const { language } = useParams();
+
   const { t } = useTranslation("idv");
   const { t: tLayout } = useTranslation("layout");
   const [onlineSelectedMethod, setOnlineSelectedMethod] = useState<IdvMethod>();
   const [inPersonSelectedMethod, setInPersonSelectedMethod] =
     useState<InPersonMethod>();
+
+  const serviceCanadaPage = path(PAGES.idvServiceCanadaCentrePage, {
+    language: language,
+  });
 
   const handleOnlineMethodChange = (method: IdvMethod) => {
     setOnlineSelectedMethod(method);
@@ -35,6 +45,36 @@ export default function StartIdentityProofingPage() {
   const handleInPersonMethodChange = (method: InPersonMethod) => {
     setInPersonSelectedMethod(method);
     setOnlineSelectedMethod(undefined);
+  };
+
+  const handleContinue = () => {
+    const selected = onlineSelectedMethod ?? inPersonSelectedMethod;
+
+    switch (selected) {
+      case ONLINE_IDV_METHOD.documentScanning:
+        identityVerificationApi
+          .getOnlineIdentityVerificationUrl()
+          .then((response) => {
+            const { redirect_url } = (
+              response as { data: { redirect_url: string } }
+            ).data;
+            window.location.href = redirect_url;
+          })
+          .catch(() => {
+            // TODO: handle API error
+          });
+        break;
+      case ONLINE_IDV_METHOD.provincialPartner:
+        // TODO: implement provincial partner flow
+        break;
+      case IN_PERSON_METHOD.serviceCanadaLocations:
+        navigate(serviceCanadaPage);
+        break;
+      case IN_PERSON_METHOD.canadaPostLocations:
+        // TODO: implement Canada Post locations flow
+        navigate(serviceCanadaPage);
+        break;
+    }
   };
 
   if (!DEV_ONLY_FEATURE) {
@@ -88,14 +128,7 @@ export default function StartIdentityProofingPage() {
             disabled={!onlineSelectedMethod && !inPersonSelectedMethod}
             onGcdsClick={(ev) => {
               ev.preventDefault();
-              identityVerificationApi
-                .getOnlineIdentityVerificationUrl()
-                .then((response) => {
-                  const { redirect_url } = (
-                    response as { data: { redirect_url: string } }
-                  ).data;
-                  window.location.href = redirect_url;
-                });
+              handleContinue();
             }}
           >
             {t("ServiceCanadaCentre.continueButton")}

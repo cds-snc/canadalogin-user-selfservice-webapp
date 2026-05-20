@@ -10,7 +10,7 @@ interface RadioOption {
   checked: boolean;
 }
 
-const IN_PERSON_METHOD = {
+export const IN_PERSON_METHOD = {
   canadaPostLocations: "canadaPostLocations",
   serviceCanadaLocations: "serviceCanadaLocations",
 } as const;

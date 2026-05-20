@@ -10,7 +10,7 @@ interface RadioOption {
   checked: boolean;
 }
 
-const ONLINE_IDV_METHOD = {
+export const ONLINE_IDV_METHOD = {
   documentScanning: "documentScanning",
   provincialPartner: "provincialPartner",
 } as const;
