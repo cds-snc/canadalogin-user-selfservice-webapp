@@ -1,22 +1,13 @@
 import { GcdsRadios } from "@gcds-core/components-react";
 import { useTranslation } from "react-i18next";
 import { JSX } from "react";
-
+import { IN_PERSON_METHOD, type InPersonMethod } from "./methods";
 interface RadioOption {
   label: string;
   id: string;
   value: string;
-  // hint: string;
   checked: boolean;
 }
-
-export const IN_PERSON_METHOD = {
-  canadaPostLocations: "canadaPostLocations",
-  serviceCanadaLocations: "serviceCanadaLocations",
-} as const;
-
-export type InPersonMethod =
-  (typeof IN_PERSON_METHOD)[keyof typeof IN_PERSON_METHOD];
 
 interface InPersonRadioButtonsProps {
   selectedMethod: InPersonMethod | undefined;

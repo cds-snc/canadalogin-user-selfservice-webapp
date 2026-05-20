@@ -12,14 +12,10 @@ import {
 } from "@gcds-core/components-react";
 
 import { identityVerificationApi } from "./api/identityVerificationApi";
-import OnlineRadioButtons, {
-  type IdvMethod,
-  ONLINE_IDV_METHOD,
-} from "./components/OnlineRadioButtons";
-import InPersonRadioButtons, {
-  type InPersonMethod,
-  IN_PERSON_METHOD,
-} from "./components/InPersonRadioButtons";
+import OnlineRadioButtons from "./components/OnlineRadioButtons";
+import InPersonRadioButtons from "./components/InPersonRadioButtons";
+import { ONLINE_IDV_METHOD, type IdvMethod } from "./components/methods.ts";
+import { IN_PERSON_METHOD, type InPersonMethod } from "./components/methods.ts";
 import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
 import { path } from "../../utils/routeHelpers";
 

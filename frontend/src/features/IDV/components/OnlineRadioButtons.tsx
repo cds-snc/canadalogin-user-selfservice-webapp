@@ -1,7 +1,7 @@
 import { GcdsRadios } from "@gcds-core/components-react";
 import { useTranslation } from "react-i18next";
 import { JSX } from "react";
-
+import { ONLINE_IDV_METHOD, type IdvMethod } from "./methods";
 interface RadioOption {
   label: string;
   id: string;
@@ -9,14 +9,6 @@ interface RadioOption {
   hint: string;
   checked: boolean;
 }
-
-export const ONLINE_IDV_METHOD = {
-  documentScanning: "documentScanning",
-  provincialPartner: "provincialPartner",
-} as const;
-
-export type IdvMethod =
-  (typeof ONLINE_IDV_METHOD)[keyof typeof ONLINE_IDV_METHOD];
 
 interface OnlineRadioButtonsProps {
   selectedMethod: IdvMethod | undefined;
