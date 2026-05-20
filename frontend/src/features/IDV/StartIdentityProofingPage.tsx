@@ -27,6 +27,16 @@ export default function StartIdentityProofingPage() {
   const [inPersonSelectedMethod, setInPersonSelectedMethod] =
     useState<InPersonMethod>();
 
+  const handleOnlineMethodChange = (method: IdvMethod) => {
+    setOnlineSelectedMethod(method);
+    setInPersonSelectedMethod(undefined);
+  };
+
+  const handleInPersonMethodChange = (method: InPersonMethod) => {
+    setInPersonSelectedMethod(method);
+    setOnlineSelectedMethod(undefined);
+  };
+
   if (!DEV_ONLY_FEATURE) {
     return null;
   }
@@ -53,7 +63,7 @@ export default function StartIdentityProofingPage() {
           </GcdsHeading>
           <OnlineRadioButtons
             selectedMethod={onlineSelectedMethod}
-            onMethodChange={setOnlineSelectedMethod}
+            onMethodChange={handleOnlineMethodChange}
           />
 
           <GcdsHeading tag="h4" marginTop="300" characterLimit={false}>
@@ -68,13 +78,14 @@ export default function StartIdentityProofingPage() {
           </GcdsNotice>
           <InPersonRadioButtons
             selectedMethod={inPersonSelectedMethod}
-            onMethodChange={setInPersonSelectedMethod}
+            onMethodChange={handleInPersonMethodChange}
           />
         </GcdsContainer>
 
         <GcdsGrid columns="max-content max-content" gap="200">
           <GcdsButton
             type="button"
+            disabled={!onlineSelectedMethod && !inPersonSelectedMethod}
             onGcdsClick={(ev) => {
               ev.preventDefault();
               identityVerificationApi

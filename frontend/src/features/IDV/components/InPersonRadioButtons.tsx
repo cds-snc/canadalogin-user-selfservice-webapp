@@ -50,6 +50,7 @@ export default function InPersonRadioButtons({
       legend={t("StartIdentityProofing.inPersonOption")} // legend is still required for accessibility even if we choose to hide it visually
       hideLegend
       options={radioOptions}
+      value={selectedMethod ?? ""}
       style={
         // Custom styles to meet design requirements for in-person option
         {

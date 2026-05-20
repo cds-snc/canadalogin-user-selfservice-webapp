@@ -51,6 +51,7 @@ export default function OnlineRadioButtons({
       name="online-idv-method"
       legend={t("StartIdentityProofing.radioOnlineLabel")}
       options={radioOptions}
+      value={selectedMethod ?? ""}
       onGcdsChange={(e: CustomEvent<string>) => {
         onMethodChange((e.target as HTMLInputElement).value as IdvMethod);
       }}
