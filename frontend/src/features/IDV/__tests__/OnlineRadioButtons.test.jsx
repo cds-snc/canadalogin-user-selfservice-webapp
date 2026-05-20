@@ -159,8 +159,6 @@ describe("OnlineRadioButtons", () => {
     });
     fireEvent.click(radio);
 
-    expect(onMethodChange).toHaveBeenCalledWith(
-      ONLINE_IDV_METHOD.documentScanning,
-    );
+    expect(onMethodChange).toHaveBeenCalledWith("documentScanning");
   });
 });
