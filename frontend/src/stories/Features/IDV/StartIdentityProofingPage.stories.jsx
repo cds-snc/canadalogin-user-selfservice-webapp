@@ -1,4 +1,4 @@
-import { AVAILABLE_LANGUAGES, PAGES } from "../../../utils/constants";
+import { AVAILABLE_LANGUAGES } from "../../../utils/constants";
 import { buildTestCase, TestTemplate } from "../../Tests/utils/functions.tsx";
 
 export default {
