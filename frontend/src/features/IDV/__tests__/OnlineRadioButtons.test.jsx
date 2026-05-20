@@ -79,7 +79,9 @@ describe("OnlineRadioButtons", () => {
     render(
       <OnlineRadioButtons
         {...defaultProps}
-        selectedMethod={ONLINE_IDV_METHOD.documentScanning}
+        selectedMethod={
+          ONLINE_IDV_METHOD?.documentScanning ?? "document-scanning"
+        }
       />,
     );
 
@@ -93,7 +95,9 @@ describe("OnlineRadioButtons", () => {
     render(
       <OnlineRadioButtons
         {...defaultProps}
-        selectedMethod={ONLINE_IDV_METHOD.provincialPartner}
+        selectedMethod={
+          ONLINE_IDV_METHOD?.provincialPartner ?? "provincial-partner"
+        }
       />,
     );
 
