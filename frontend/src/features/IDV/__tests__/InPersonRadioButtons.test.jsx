@@ -45,6 +45,11 @@ vi.mock("@gcds-core/components-react", () => ({
 // Tests
 // ────────────────────────────────────────────────
 describe("InPersonRadioButtons", () => {
+  const CANADA_POST_METHOD =
+    IN_PERSON_METHOD?.canadaPostLocations ?? "canadaPostLocations";
+  const SERVICE_CANADA_METHOD =
+    IN_PERSON_METHOD?.serviceCanadaLocations ?? "serviceCanadaLocations";
+
   const defaultProps = {
     selectedMethod: undefined,
     onMethodChange: vi.fn(),
@@ -81,7 +86,7 @@ describe("InPersonRadioButtons", () => {
     render(
       <InPersonRadioButtons
         {...defaultProps}
-        selectedMethod={IN_PERSON_METHOD.canadaPostLocations}
+        selectedMethod={CANADA_POST_METHOD}
       />,
     );
 
@@ -95,7 +100,7 @@ describe("InPersonRadioButtons", () => {
     render(
       <InPersonRadioButtons
         {...defaultProps}
-        selectedMethod={IN_PERSON_METHOD.serviceCanadaLocations}
+        selectedMethod={SERVICE_CANADA_METHOD}
       />,
     );
 
@@ -143,8 +148,6 @@ describe("InPersonRadioButtons", () => {
     });
     fireEvent.click(radio);
 
-    expect(onMethodChange).toHaveBeenCalledWith(
-      IN_PERSON_METHOD.canadaPostLocations,
-    );
+    expect(onMethodChange).toHaveBeenCalledWith(CANADA_POST_METHOD);
   });
 });
