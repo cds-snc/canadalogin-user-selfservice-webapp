@@ -13,6 +13,7 @@ import DeleteMFAPage from "../component/DeleteMFAPage";
 import { UserProvider } from "../../../../components/Providers/UserProvider";
 import { LanguageProvider } from "../../../../components/Providers/LanguageProvider";
 import { useOtpOperations } from "../../../../hooks/useOtpOperations";
+import { usePasskeyOperations } from "../../../../hooks/usePasskeyOperations";
 
 const { mockTrackEvent } = vi.hoisted(() => ({
   mockTrackEvent: vi.fn(),
@@ -50,11 +51,13 @@ vi.mock("../../../../hooks/useNavigate", () => ({
 }));
 
 vi.mock("../../../../hooks/useOtpOperations");
+vi.mock("../../../../hooks/usePasskeyOperations");
 vi.mock("../../../../hooks/usePasswordValidation");
 
 // Mock API modules
 const mockGetUserOtpPhoneFactors = vi.fn();
 const mockDeleteMFA = vi.fn();
+const mockDeleteMFABatch = vi.fn();
 
 vi.mock("../../../TransientOtp/api/otpFactors", () => ({
   otpFactors: {
@@ -65,6 +68,7 @@ vi.mock("../../../TransientOtp/api/otpFactors", () => ({
 vi.mock("../api/DeleteMFAPhoneNumberAPI", () => ({
   deleteMFAPhoneNumberApi: {
     deleteMFA: (...args) => mockDeleteMFA(...args),
+    deleteMFABatch: (...args) => mockDeleteMFABatch(...args),
   },
 }));
 
@@ -162,14 +166,51 @@ vi.mock("@gcds-core/components-react", () => ({
 
 // Mock child components
 vi.mock("../../../TransientOtp/components/OtpSelection", () => ({
-  default: ({ onNext }) => (
+  default: ({ onNext, onSelectFIDO2, fido2Data }) => (
     <div data-testid="otp-selection">
       <button onClick={onNext} data-testid="otp-selection-next">
         Next
       </button>
+      {fido2Data?.length ? (
+        <button
+          onClick={() => onSelectFIDO2?.(fido2Data[0])}
+          data-testid="otp-selection-fido2"
+        >
+          Verify with passkey
+        </button>
+      ) : null}
     </div>
   ),
 }));
+
+vi.mock(
+  "../../../ManageFIDO2/components/VerifyFIDO2Passkey/VerifyFIDO2Passkey",
+  () => ({
+    default: ({ setAssertionResult, onCallback, onTryAnotherWayHandler }) => (
+      <div data-testid="verify-fido2-passkey">
+        <button
+          data-testid="verify-fido2-success"
+          onClick={() => {
+            setAssertionResult?.({
+              id: "assertion-id",
+              rawId: "raw-assertion-id",
+              type: "public-key",
+            });
+            onCallback?.();
+          }}
+        >
+          Success
+        </button>
+        <button
+          data-testid="verify-fido2-try-another-way"
+          onClick={onTryAnotherWayHandler}
+        >
+          Try another way
+        </button>
+      </div>
+    ),
+  }),
+);
 
 vi.mock("../../../TransientOtp/components/PasswordVerification", () => ({
   default: ({ validatePassword, onCancel }) => (
@@ -292,6 +333,16 @@ const mockUserState = {
   },
 };
 
+const defaultPasskeyData = [
+  {
+    id: "passkey-1",
+    attributes: {
+      nickname: "Work Laptop",
+      credentialId: "cred-1",
+    },
+  },
+];
+
 const renderComponent = (userState = mockUserState, locationState = null) => {
   if (locationState !== null) {
     mockLocation.state = locationState;
@@ -333,6 +384,12 @@ describe("DeleteMFAPage", () => {
       fetchUserOtpPhoneFactors: vi
         .fn()
         .mockResolvedValue({ success: true, data: [] }),
+    });
+
+    usePasskeyOperations.mockReturnValue({
+      fido2Data: [],
+      loading: false,
+      refetch: vi.fn(),
     });
 
     // Mock the usePasswordValidation hook
@@ -1188,6 +1245,116 @@ describe("DeleteMFAPage", () => {
         expect(mockTrackEvent).toHaveBeenCalledWith({
           event: "form_submit_complete",
           step: "mfa_delete_success",
+        });
+      });
+    });
+  });
+
+  describe("Passkey authorization", () => {
+    it("routes to method selection after password validation when a passkey is available", async () => {
+      usePasswordValidation.mockImplementation((_setErr, onSuccess) => ({
+        validatePassword: vi.fn(async () => {
+          onSuccess?.();
+        }),
+        validatePasswordLoading: false,
+      }));
+
+      usePasskeyOperations.mockReturnValue({
+        fido2Data: defaultPasskeyData,
+        loading: false,
+        refetch: vi.fn(),
+      });
+
+      await act(async () => {
+        renderComponent();
+      });
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("password-verification-next"));
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
+      });
+      expect(screen.queryByTestId("otp-verification")).not.toBeInTheDocument();
+    });
+
+    it("sends assertionResult when deleting with a verified passkey", async () => {
+      mockDeleteMFA.mockResolvedValue(undefined);
+
+      usePasswordValidation.mockImplementation((_setErr, onSuccess) => ({
+        validatePassword: vi.fn(async () => {
+          onSuccess?.();
+        }),
+        validatePasswordLoading: false,
+      }));
+
+      useOtpOperations.mockReturnValue({
+        userPhoneFactors: [
+          {
+            id: "factor-1",
+            type: "smsotp",
+            destination: "+15551234567",
+          },
+        ],
+        userSelectedMfaFactor: null,
+        userOtpValue: "",
+        otpSentResponse: null,
+        otpLoading: false,
+        handleChangeUserMfaSelection: vi.fn(),
+        handleSetUserOtpValue: vi.fn(),
+        requestOtpCode: vi.fn().mockResolvedValue(true),
+        validateOtpCode: vi.fn(),
+        fetchUserOtpPhoneFactors: vi.fn(),
+      });
+
+      usePasskeyOperations.mockReturnValue({
+        fido2Data: defaultPasskeyData,
+        loading: false,
+        refetch: vi.fn(),
+      });
+
+      await act(async () => {
+        renderComponent();
+      });
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("password-verification-next"));
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-selection-fido2")).toBeInTheDocument();
+      });
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("otp-selection-fido2"));
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId("verify-fido2-passkey")).toBeInTheDocument();
+      });
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("verify-fido2-success"));
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId("delete-confirm")).toBeInTheDocument();
+      });
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("delete-confirm-next"));
+      });
+
+      await waitFor(() => {
+        expect(mockDeleteMFA).toHaveBeenCalledWith({
+          id: "factor-1",
+          otpType: "sms",
+          assertionResult: {
+            id: "assertion-id",
+            rawId: "raw-assertion-id",
+            type: "public-key",
+          },
         });
       });
     });

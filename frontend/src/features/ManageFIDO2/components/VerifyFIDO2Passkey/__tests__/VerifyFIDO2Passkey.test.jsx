@@ -244,12 +244,33 @@ describe("VerifyFIDO2Passkey", () => {
     });
   });
 
+  it("requests required user verification when configured", async () => {
+    renderComponent({
+      assertionOptionsRequest: { userVerification: "required" },
+    });
+
+    await waitFor(() => {
+      expect(mockGetAssertionOptions).toHaveBeenCalledWith({
+        userVerification: "required",
+      });
+    });
+  });
+
   it("calls onCallback after successful auth", async () => {
     const onCallback = vi.fn();
     renderComponent({ onCallback });
 
     await waitFor(() => {
       expect(onCallback).toHaveBeenCalledOnce();
+    });
+  });
+
+  it("calls setAssertionResult with the assertion payload after successful auth", async () => {
+    const setAssertionResult = vi.fn();
+    renderComponent({ setAssertionResult });
+
+    await waitFor(() => {
+      expect(setAssertionResult).toHaveBeenCalledWith(defaultAssertionResult);
     });
   });
 

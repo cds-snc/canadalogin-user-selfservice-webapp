@@ -1,8 +1,8 @@
-"""
-FIDO2 schemas for request/response models
-"""
+"""FIDO2 schemas for request/response models."""
 
-from typing import List, Optional, Dict, Any
+from typing import Any, Dict, List, Literal, Optional
+
+from app.fido2.assertion_schemas import FIDO2AssertionResultRequest
 from pydantic import BaseModel, ConfigDict, field_validator
 from app.utils.schemas import ResponseModel
 from app.otp.schemas import OtpType
@@ -50,8 +50,10 @@ class AttestationOptionsRequest(BaseModel):
 class AssertionOptionsRequest(BaseModel):
     """Request model for getting FIDO2 assertion options (for authentication)"""
 
-    # No additional fields needed - userId is retrieved from session
-    pass
+    # userId is retrieved from session; sensitive flows can tighten verification.
+    userVerification: Optional[Literal["required", "preferred", "discouraged"]] = (
+        None
+    )
 
 
 class UpdateRegistrationRequest(BaseModel):
@@ -89,28 +91,6 @@ class FIDO2AttestationResultRequest(BaseModel):
         if v is not None and not v.strip():
             raise ValueError("nickname cannot be blank or whitespace only")
         return v.strip() if v is not None else v
-
-
-class AssertionResponse(BaseModel):
-    """Response object from the authenticator during assertion"""
-
-    clientDataJSON: str
-    signature: str
-    authenticatorData: str
-    userHandle: Optional[str] = None
-
-
-class FIDO2AssertionResultRequest(BaseModel):
-    """Request model for FIDO2 assertion result (authentication)"""
-
-    model_config = ConfigDict(exclude_none=True)
-
-    response: AssertionResponse
-    id: str
-    rawId: str
-    type: str
-    getClientExtensionResults: Optional[Dict[str, Any]] = None
-    authenticatorAttachment: Optional[str] = None
 
 
 class DeleteRegistrationRequest(BaseModel):

@@ -1,6 +1,7 @@
 from enum import Enum
 from typing import Optional
 
+from app.fido2.assertion_schemas import FIDO2AssertionResultRequest
 from app.utils.schemas import ResponseModel
 from app.utils.string_masking import mask_phone_number, mask_email_address
 from pydantic import (
@@ -178,6 +179,20 @@ class OtpDeletionRequest(BaseModel):
     otpVerificationType: Optional[OtpType] = (
         None  # Type of OTP used for verification (can differ from otpType)
     )
+    assertionResult: Optional[FIDO2AssertionResultRequest] = None
+
+    @model_validator(mode="after")
+    def validate_verification_payload(self):
+        otp_fields = (self.otp, self.trxnId, self.otpVerificationType)
+        has_any_otp_field = any(field is not None for field in otp_fields)
+        has_all_otp_fields = all(field is not None for field in otp_fields)
+
+        if has_any_otp_field and not has_all_otp_fields:
+            raise ValueError(
+                "otp, trxnId, and otpVerificationType must be provided together"
+            )
+
+        return self
 
 
 class OtpFactorItem(BaseModel):
@@ -191,6 +206,25 @@ class OtpBatchDeletionRequest(BaseModel):
     """Request schema for batch-deleting multiple OTP factors with a single OTP verification."""
 
     factors: list[OtpFactorItem]
-    otp: str
-    trxnId: str
-    otpVerificationType: OtpType
+    otp: Optional[str] = None
+    trxnId: Optional[str] = None
+    otpVerificationType: Optional[OtpType] = None
+    assertionResult: Optional[FIDO2AssertionResultRequest] = None
+
+    @model_validator(mode="after")
+    def validate_verification_payload(self):
+        otp_fields = (self.otp, self.trxnId, self.otpVerificationType)
+        has_any_otp_field = any(field is not None for field in otp_fields)
+        has_all_otp_fields = all(field is not None for field in otp_fields)
+
+        if self.assertionResult is None and not has_all_otp_fields:
+            raise ValueError(
+                "either assertionResult or otp, trxnId, and otpVerificationType must be provided"
+            )
+
+        if has_any_otp_field and not has_all_otp_fields:
+            raise ValueError(
+                "otp, trxnId, and otpVerificationType must be provided together"
+            )
+
+        return self

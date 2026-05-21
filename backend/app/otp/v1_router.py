@@ -173,6 +173,7 @@ async def delete_mfa_otp_factor(
         request.app.state.request_client,
         deletion_request,
         user_access_token,
+        request=request,
     )
 
 
@@ -192,4 +193,5 @@ async def delete_mfa_otp_factors_batch(
         request.app.state.request_client,
         deletion_request,
         user_access_token,
+        request=request,
     )

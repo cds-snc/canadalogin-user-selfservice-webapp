@@ -1,5 +1,5 @@
 from datetime import datetime
-from unittest.mock import AsyncMock, Mock
+from unittest.mock import AsyncMock, MagicMock, Mock
 
 import pytest
 from app.otp.schemas import (
@@ -25,6 +25,9 @@ from fastapi import HTTPException, status
 from httpx import AsyncClient, Response
 
 verify_otp_import_path = "app.otp.services.delete_mfa_otp.verify_otp_before_operation"
+submit_assertion_import_path = (
+    "app.otp.services.delete_mfa_otp.submit_assertion_result"
+)
 
 
 def create_mock_user_factors(num_factors=2):
@@ -57,6 +60,19 @@ def create_deletion_request(
         trxnId="txn123",
         otpVerificationType=verification_type,
     )
+
+
+def create_assertion_result():
+    return {
+        "id": "credential-123",
+        "rawId": "credential-123",
+        "type": "public-key",
+        "response": {
+            "clientDataJSON": "client-data",
+            "signature": "signature-data",
+            "authenticatorData": "authenticator-data",
+        },
+    }
 
 
 @pytest.mark.asyncio
@@ -270,6 +286,95 @@ async def test_handle_otp_deletion_last_factor_protection(monkeypatch):
 
         assert exc_info.value.status_code == status.HTTP_409_CONFLICT
         assert "Cannot delete last remaining MFA factor" in str(exc_info.value.detail)
+
+
+@pytest.mark.asyncio
+async def test_handle_otp_deletion_passkey_authorized_success(monkeypatch):
+    """Test successful deletion of a validated OTP factor with passkey authorization."""
+
+    async def mock_submit_assertion_result(
+        request, http_client, user_access_token, request_body, return_jwt=False
+    ):
+        return ResponseModel(
+            success=True,
+            data={"assertion": "verified"},
+            message="FIDO2 authentication completed successfully",
+        )
+
+    async def mock_my_profile(client, token):
+        return ProfileResponse(
+            success=True,
+            message="Profile retrieved successfully",
+            data=IBMVerifyUserProfileSchema(
+                id="user123",
+                userName="testuser@example.com",
+                active=True,
+                meta={
+                    "created": datetime.now().isoformat(),
+                    "lastModified": datetime.now().isoformat(),
+                    "location": "https://example.com/scim/v2/Users/user123",
+                    "resourceType": "User",
+                },
+                emails=[
+                    {"value": "testuser@example.com", "primary": True, "type": "work"}
+                ],
+                name={
+                    "formatted": "Test User",
+                    "givenName": "Test",
+                    "familyName": "User",
+                },
+                phoneNumbers=[{"value": "+1 234-567-8901", "type": "mobile"}],
+            ),
+        )
+
+    async def mock_get_user_otp_factors(client, user_id, validated=True):
+        return create_mock_user_factors(num_factors=2)
+
+    async def mock_dispatch_otp_deletion(
+        client, deletion_request, user_access_token, language=None
+    ):
+        mock_response = Mock(spec=Response)
+        mock_response.status_code = 204
+        return mock_response
+
+    monkeypatch.setattr(
+        submit_assertion_import_path,
+        mock_submit_assertion_result,
+        raising=False,
+    )
+    monkeypatch.setattr(
+        "app.otp.services.delete_mfa_otp.get_my_profile",
+        mock_my_profile,
+    )
+    monkeypatch.setattr(
+        "app.otp.services.delete_mfa_otp.get_user_otp_factors",
+        mock_get_user_otp_factors,
+    )
+    monkeypatch.setattr(
+        "app.otp.services.delete_mfa_otp.dispatch_otp_deletion",
+        mock_dispatch_otp_deletion,
+    )
+
+    deletion_request = OtpDeletionRequest(
+        id="factor123",
+        otpType=OtpType.SMS,
+        assertionResult=create_assertion_result(),
+    )
+    mock_request = MagicMock()
+
+    async with AsyncClient(base_url="http://localhost") as client:
+        result = await handle_otp_deletion(
+            request=mock_request,
+            global_http_client=client,
+            deletion_request=deletion_request,
+            user_access_token="fake-token",
+        )
+
+    assert isinstance(result, ResponseModel)
+    assert result.success is True
+    assert result.data["factorId"] == "factor123"
+    assert result.data["otpType"] == "sms"
+
 
 
 @pytest.mark.asyncio
@@ -628,3 +733,60 @@ async def test_handle_otp_batch_deletion_otp_failure(monkeypatch):
             await handle_otp_batch_deletion(client, batch_request, "fake-token")
 
     assert exc_info.value.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.asyncio
+async def test_handle_otp_batch_deletion_passkey_authorized_success(monkeypatch):
+    """Test successful batch deletion of OTP factors with passkey authorization."""
+
+    async def mock_submit_assertion_result(
+        request, http_client, user_access_token, request_body, return_jwt=False
+    ):
+        return ResponseModel(
+            success=True,
+            data={"assertion": "verified"},
+            message="FIDO2 authentication completed successfully",
+        )
+
+    async def mock_get_user_otp_factors(client, user_id, validated=True):
+        return create_mock_user_factors(num_factors=3)
+
+    async def mock_dispatch_otp_deletion(client, deletion_request, user_access_token):
+        mock_response = Mock(spec=Response)
+        mock_response.status_code = 204
+        return mock_response
+
+    monkeypatch.setattr(
+        submit_assertion_import_path,
+        mock_submit_assertion_result,
+        raising=False,
+    )
+    monkeypatch.setattr(
+        "app.otp.services.delete_mfa_otp.get_user_otp_factors",
+        mock_get_user_otp_factors,
+    )
+    monkeypatch.setattr(
+        "app.otp.services.delete_mfa_otp.dispatch_otp_deletion",
+        mock_dispatch_otp_deletion,
+    )
+
+    batch_request = OtpBatchDeletionRequest(
+        factors=[
+            OtpFactorItem(id="factor1", otpType=OtpType.SMS),
+            OtpFactorItem(id="factor2", otpType=OtpType.VOICE),
+        ],
+        assertionResult=create_assertion_result(),
+    )
+    mock_request = MagicMock()
+
+    async with AsyncClient(base_url="http://localhost") as client:
+        result = await handle_otp_batch_deletion(
+            request=mock_request,
+            global_http_client=client,
+            deletion_request=batch_request,
+            user_access_token="fake-token",
+        )
+
+    assert isinstance(result, ResponseModel)
+    assert result.success is True
+    assert len(result.data["deletedFactors"]) == 2
