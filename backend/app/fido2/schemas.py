@@ -51,9 +51,7 @@ class AssertionOptionsRequest(BaseModel):
     """Request model for getting FIDO2 assertion options (for authentication)"""
 
     # userId is retrieved from session; sensitive flows can tighten verification.
-    userVerification: Optional[Literal["required", "preferred", "discouraged"]] = (
-        None
-    )
+    userVerification: Optional[Literal["required", "preferred", "discouraged"]] = None
 
 
 class UpdateRegistrationRequest(BaseModel):

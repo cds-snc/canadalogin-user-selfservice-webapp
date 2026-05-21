@@ -25,9 +25,7 @@ from fastapi import HTTPException, status
 from httpx import AsyncClient, Response
 
 verify_otp_import_path = "app.otp.services.delete_mfa_otp.verify_otp_before_operation"
-submit_assertion_import_path = (
-    "app.otp.services.delete_mfa_otp.submit_assertion_result"
-)
+submit_assertion_import_path = "app.otp.services.delete_mfa_otp.submit_assertion_result"
 
 
 def create_mock_user_factors(num_factors=2):
@@ -374,7 +372,6 @@ async def test_handle_otp_deletion_passkey_authorized_success(monkeypatch):
     assert result.success is True
     assert result.data["factorId"] == "factor123"
     assert result.data["otpType"] == "sms"
-
 
 
 @pytest.mark.asyncio
