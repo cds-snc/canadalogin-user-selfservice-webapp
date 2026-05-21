@@ -569,4 +569,76 @@ describe("OtpSelection Component", () => {
       await expect(user.click(selectLink)).resolves.not.toThrow();
     });
   });
+
+  // -------------------------------------------------------------------------
+  describe("Email Section", () => {
+    it("does not render email section when emailAddress is not provided", () => {
+      renderComponent({ onSelectEmail: vi.fn() });
+      expect(screen.queryByText("Email")).not.toBeInTheDocument();
+      expect(screen.queryByText("Email me")).not.toBeInTheDocument();
+    });
+
+    it("does not render email section when onSelectEmail is not provided", () => {
+      renderComponent({ emailAddress: "user@example.com" });
+      expect(screen.queryByText("Email")).not.toBeInTheDocument();
+      expect(screen.queryByText("Email me")).not.toBeInTheDocument();
+    });
+
+    it("renders email section when both emailAddress and onSelectEmail are provided", () => {
+      renderComponent({
+        emailAddress: "user@example.com",
+        onSelectEmail: vi.fn(),
+      });
+      expect(screen.getByText("Email")).toBeInTheDocument();
+      expect(screen.getByText("Email me")).toBeInTheDocument();
+    });
+
+    it("renders the email address in the email section", () => {
+      renderComponent({
+        emailAddress: "user@example.com",
+        onSelectEmail: vi.fn(),
+      });
+      expect(screen.getByText("user@example.com")).toBeInTheDocument();
+    });
+
+    it("calls onSelectEmail when 'Email me' link is clicked", async () => {
+      const user = userEvent.setup();
+      const mockOnSelectEmail = vi.fn();
+      renderComponent({
+        emailAddress: "user@example.com",
+        onSelectEmail: mockOnSelectEmail,
+      });
+
+      const emailLink = screen.getByText("Email me");
+      await user.click(emailLink);
+
+      expect(mockOnSelectEmail).toHaveBeenCalledTimes(1);
+    });
+
+    it("renders all four sections when SMS, Voice, FIDO2, and email are present", () => {
+      renderComponent({
+        userPhoneFactors: [
+          { id: "sms-1", type: FLOW_TYPES.sms, destination: "+15551111111" },
+          {
+            id: "voice-1",
+            type: FLOW_TYPES.voice,
+            destination: "+15552222222",
+          },
+        ],
+        fido2Data: [{ id: "passkey-1", attributes: { nickname: "My Key" } }],
+        emailAddress: "user@example.com",
+        onSelectEmail: vi.fn(),
+      });
+
+      expect(screen.getByText("Text message")).toBeInTheDocument();
+      expect(screen.getByText("Voice call")).toBeInTheDocument();
+      expect(screen.getByText("Passkey or security key")).toBeInTheDocument();
+      expect(screen.getByText("Email")).toBeInTheDocument();
+    });
+
+    it("does not render email section when emailAddress is null", () => {
+      renderComponent({ emailAddress: null, onSelectEmail: vi.fn() });
+      expect(screen.queryByText("Email")).not.toBeInTheDocument();
+    });
+  });
 });

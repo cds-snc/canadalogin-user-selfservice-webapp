@@ -127,13 +127,13 @@ async def test_get_user_otp_factors_no_otp_factors(monkeypatch):
     async def mock_dispatch_user_auth_factors(
         client, user_access_token, validated=True
     ):
-        # Valid schema but no SMSOTP or VOICEOTP types
+        # Valid schema but unrecognized type (uppercase EMAILOTP is not a valid OtpType value)
         return {
             "factors": [
                 {
                     "id": "factor1",
                     "userId": "user123",
-                    "type": "EMAILOTP",  # not allowed
+                    "type": "EMAILOTP",  # uppercase – not matched by OtpType enum values
                     "created": datetime.now().isoformat(),
                     "updated": datetime.now().isoformat(),
                     "attempted": datetime.now().isoformat(),
@@ -233,3 +233,102 @@ async def test_get_user_otp_factor(monkeypatch):
         assert result["type"] == OtpType.SMSOTP.value
         # Should return unmasked phone number
         assert result["destination"] == "+1 234-567-8901"
+
+
+@pytest.mark.asyncio
+async def test_parse_phone_auth_factors_response_with_emailotp():
+    """Test that emailotp factors are parsed and included in the results"""
+    factor = Factor(
+        id="email-factor-1",
+        userId="user123",
+        type=OtpType.EMAILOTP.value,
+        created=datetime.now(),
+        updated=datetime.now(),
+        attempted=datetime.now(),
+        enabled=True,
+        validated=True,
+        attributes=Attributes(emailAddress="user@example.com"),
+    )
+
+    data = UserAuthFactorsIbmResponse(
+        factors=[factor],
+        count=1,
+        limit=10,
+        page=1,
+        total=1,
+    )
+
+    result = await parse_phone_auth_factors_response(data)
+    assert isinstance(result, list)
+    assert len(result) == 1
+    assert result[0]["id"] == "email-factor-1"
+    assert result[0]["type"] == OtpType.EMAILOTP.value
+    assert result[0]["destination"] == "user@example.com"
+
+
+@pytest.mark.asyncio
+async def test_parse_phone_auth_factors_response_emailotp_missing_email():
+    """Test that emailotp factors without emailAddress are skipped"""
+    factor = Factor(
+        id="email-factor-no-addr",
+        userId="user123",
+        type=OtpType.EMAILOTP.value,
+        created=datetime.now(),
+        updated=datetime.now(),
+        attempted=datetime.now(),
+        enabled=True,
+        validated=True,
+        attributes=Attributes(),
+    )
+
+    data = UserAuthFactorsIbmResponse(
+        factors=[factor],
+        count=1,
+        limit=10,
+        page=1,
+        total=1,
+    )
+
+    result = await parse_phone_auth_factors_response(data)
+    assert result == []
+
+
+@pytest.mark.asyncio
+async def test_parse_phone_auth_factors_response_mixed_types():
+    """Test that phone and email factors are both returned together"""
+    sms_factor = Factor(
+        id="sms-1",
+        userId="user123",
+        type=OtpType.SMSOTP.value,
+        created=datetime.now(),
+        updated=datetime.now(),
+        attempted=datetime.now(),
+        enabled=True,
+        validated=True,
+        attributes=Attributes(phoneNumber="+1 234-567-8901"),
+    )
+    email_factor = Factor(
+        id="email-1",
+        userId="user123",
+        type=OtpType.EMAILOTP.value,
+        created=datetime.now(),
+        updated=datetime.now(),
+        attempted=datetime.now(),
+        enabled=True,
+        validated=True,
+        attributes=Attributes(emailAddress="user@example.com"),
+    )
+
+    data = UserAuthFactorsIbmResponse(
+        factors=[sms_factor, email_factor],
+        count=2,
+        limit=10,
+        page=1,
+        total=2,
+    )
+
+    result = await parse_phone_auth_factors_response(data)
+    assert len(result) == 2
+    types = {f["type"] for f in result}
+    assert OtpType.SMSOTP.value in types
+    assert OtpType.EMAILOTP.value in types

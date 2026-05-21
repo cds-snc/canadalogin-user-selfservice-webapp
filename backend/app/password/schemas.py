@@ -14,12 +14,13 @@ class UserName(BaseModel):
 class OtpType(str, Enum):
     SMSOTP = "smsotp"
     VOICEOTP = "voiceotp"
+    EMAILOTP = "emailotp"
 
 
 class FirstStepPasswordUpdatePayload(BaseModel):
-    userName: EmailStr
+    userName: Optional[str] = None
     otpType: OtpType
-    enrollmentId: str
+    enrollmentId: Optional[str] = None
 
 
 class NextStep(BaseModel):
