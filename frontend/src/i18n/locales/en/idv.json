@@ -22,5 +22,20 @@
     "findNearestTitle": "Find your nearest Service Canada Centre",
     "findNearestBody": "Complete your identity proofing at an available",
     "findNearestLink": "Service Canada Centre near you"
+  },
+  "StartIdentityProofing": {
+    "pageTitle": "Start identity proofing",
+    "heading": "You're updating verified information. {{appName}} needs to confirm your identity before this change can be made.",
+    "learnMoreDescription": "Learn more about identity proofing",
+    "howToProveHeading": "How do you want to prove your identity?",
+    "radioOnlineLabel": "Do it online",
+    "documentScanningOption": "Selfie and photo of your ID",
+    "hintDocumentScanningOption": "You will be asked to take a photo of yourself and your ID with your phone camera.",
+    "provincialPartnerOption": "Use your provincial sign in",
+    "hintProvincialPartnerOption": "Use your BC Service Card or Alberta.ca account to prove your identity.",
+    "inPersonOption": "or do it in person",
+    "signBackInNotice": "You will need to sign back in to your {{appName}} after proving your identity in person to confirm the proofing process.",
+    "canadaPostLocationsOption": "Canada Post locations",
+    "serviceCanadaLocationsOption": "Service Canada Centres"
   }
 }

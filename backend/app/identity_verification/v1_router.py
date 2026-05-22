@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-@router.post(
+@router.get(
     "/online",
     response_model=ResponseModel,
     status_code=status.HTTP_200_OK,

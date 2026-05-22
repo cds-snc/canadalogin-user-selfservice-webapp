@@ -23,6 +23,7 @@ import AddFIDO2PasskeyPage from "./features/ManageFIDO2/components/AddFIDO2Passk
 import DeleteFIDO2PasskeyPage from "./features/ManageFIDO2/components/DeleteFIDO2Passkey/DeleteFIDO2PasskeyPage";
 import ServiceCanadaCentrePage from "./features/IDV/ServiceCanadaCentrePage";
 import ServiceCanadaCentreIDVCodePage from "./features/IDV/ServiceCanadaCentreIDVCodePage";
+import StartIdentityProofingPage from "./features/IDV/StartIdentityProofingPage";
 
 export const appRoutes: RouteObject[] = [
   {
@@ -130,6 +131,11 @@ export const appRoutes: RouteObject[] = [
               },
               ...(DEV_ONLY_FEATURE
                 ? [
+                    {
+                      path: "idv/",
+                      element: <StartIdentityProofingPage />,
+                      handle: { id: PAGES.idvStartIdentityProofingPage },
+                    },
                     {
                       path: "idv/in-person/service-canada-centre",
                       element: <ServiceCanadaCentrePage />,
