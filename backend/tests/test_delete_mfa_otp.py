@@ -92,7 +92,7 @@ async def test_handle_otp_deletion_sms_success(monkeypatch):
                     "givenName": "Test",
                     "familyName": "User",
                 },
-                phoneNumbers=[{"value": "+1 234-567-8901", "type": "mobile"}],
+                contactNumber="+12345678901",
             ),
         )
 
@@ -167,7 +167,7 @@ async def test_handle_otp_deletion_voice_success(monkeypatch):
                     "givenName": "Test",
                     "familyName": "User",
                 },
-                phoneNumbers=[{"value": "+1 234-567-8901", "type": "mobile"}],
+                contactNumber="+12345678901",
             ),
         )
 
@@ -238,7 +238,7 @@ async def test_handle_otp_deletion_last_factor_protection(monkeypatch):
                     "givenName": "Test",
                     "familyName": "User",
                 },
-                phoneNumbers=[{"value": "+1 234-567-8901", "type": "mobile"}],
+                contactNumber="+12345678901",
             ),
         )
 
@@ -386,7 +386,7 @@ async def test_handle_otp_deletion_unvalidated_factor_success(monkeypatch):
                     "givenName": "Test",
                     "familyName": "User",
                 },
-                phoneNumbers=[{"value": "+1 234-567-8901", "type": "mobile"}],
+                contactNumber="+12345678901",
             ),
         )
 
@@ -478,7 +478,7 @@ async def test_handle_otp_deletion_validated_factor_without_otp(monkeypatch):
                     "givenName": "Test",
                     "familyName": "User",
                 },
-                phoneNumbers=[{"value": "+1 234-567-8901", "type": "mobile"}],
+                contactNumber="+12345678901",
             ),
         )
 

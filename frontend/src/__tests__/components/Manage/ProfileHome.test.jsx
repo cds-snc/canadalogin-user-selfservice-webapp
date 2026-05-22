@@ -20,7 +20,7 @@ vi.mock("../../../components/Providers/useUser", () => ({
     state: {
       userProfile: {
         userName: "test@example.com",
-        phoneNumbers: [{ value: "+15551234567", type: "mobile" }],
+        contactNumber: "+15551234567",
         name: {
           givenName: "Jane",
           familyName: "Doe",

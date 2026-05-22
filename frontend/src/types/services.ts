@@ -74,13 +74,8 @@ export type RelyingPartyData = {
   [key: string]: unknown;
 };
 
-export type PhoneNumberEntry = {
-  value: string;
-  type: "mobile";
-};
-
 export type UpdatePhonePayload = {
-  phoneNumbers: PhoneNumberEntry[];
+  contactNumber: string;
   otp: string;
   trxnId: string;
   otpType: Extract<OtpTransportType, "sms" | "voice">;

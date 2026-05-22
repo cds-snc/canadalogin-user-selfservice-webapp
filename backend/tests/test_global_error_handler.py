@@ -2199,7 +2199,7 @@ class TestErrorHandlingGetMyProfile:
             ],
             "userName": "jo****@example.com",
             "emails": [{"value": "jo****@example.com", "type": "work"}],
-            "phoneNumbers": "invalid_phone_data",
+            "contactNumber": ["invalid", "array", "data"],
             "meta": {
                 "location": "here",
                 "created": "2023-01-01T00:00:00Z",
