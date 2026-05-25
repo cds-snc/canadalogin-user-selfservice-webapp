@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom/vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import ServiceCanadaCentrePage from "../ServiceCanadaCentrePage";
+import ServiceCanadaCentrePage from "../InPerson/ServiceCanadaCentrePage";
 
 // ────────────────────────────────────────────────
 // Mocks

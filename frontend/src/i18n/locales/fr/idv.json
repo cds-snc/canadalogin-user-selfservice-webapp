@@ -23,6 +23,19 @@
     "findNearestBody": "Complétez votre vérification d'identité dans un",
     "findNearestLink": "Centre Service Canada près de chez vous"
   },
+  "ProvincialVerification": {
+    "pageTitle": "Prouver votre identité",
+    "heading": "Préparez-vous pour la connexion avec un partenaire provincial",
+    "followSteps": "Suivez les étapes pour compléter le processus",
+    "step1": "Ayez votre application de partenaire provincial prête",
+    "step2": "Sélectionnez l'option appropriée et suivez les étapes pour prouver votre identité",
+    "step3": "Une fois la vérification terminée, vous serez automatiquement redirigé",
+    "bcServicesCard": "Carte Services C.-B.",
+    "albertaAccount": "Compte Alberta.ca",
+    "backButton": "Retour",
+    "moreInfoTitle": "Pour plus d'informations",
+    "learnMoreLink": "En savoir plus sur la vérification d'identité provinciale"
+  },
   "StartIdentityProofing": {
     "pageTitle": "Start identity proofing",
     "heading": "requires you to prove and share your identity in order to update your information. ",

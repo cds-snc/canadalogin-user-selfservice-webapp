@@ -10,8 +10,8 @@ import {
 } from "@gcds-core/components-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
-import { useUser } from "../../components/Providers/useUser";
-import { DEV_ONLY_FEATURE } from "../../utils/constants";
+import { useUser } from "../../../components/Providers/useUser";
+import { DEV_ONLY_FEATURE } from "../../../utils/constants";
 
 export default function ServiceCanadaCentrePage() {
   const { state } = useUser();

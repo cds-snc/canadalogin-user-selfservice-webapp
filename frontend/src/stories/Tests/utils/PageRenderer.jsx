@@ -20,8 +20,8 @@ import ChangePasswordIndex from "../../../features/ChangePassword/components/Cha
 import EditEmailAddressPage from "../../../features/EmailAddress/EditEmailAddressPage";
 import DeleteFIDO2PasskeyPage from "../../../features/ManageFIDO2/components/DeleteFIDO2Passkey/DeleteFIDO2PasskeyPage";
 import AddFIDO2PasskeyPage from "../../../features/ManageFIDO2/components/AddFIDO2Passkey/AddFIDO2PasskeyPage";
-import ServiceCanadaCentrePage from "../../../features/IDV/ServiceCanadaCentrePage";
-import ServiceCanadaCentreIDVCodePage from "../../../features/IDV/ServiceCanadaCentreIDVCodePage";
+import ServiceCanadaCentrePage from "../../../features/IDV/InPerson/ServiceCanadaCentrePage";
+import ServiceCanadaCentreIDVCodePage from "../../../features/IDV/InPerson/ServiceCanadaCentreIDVCodePage";
 import StartIdentityProofingPage from "../../../features/IDV/StartIdentityProofingPage";
 import ProvenInformationCard from "../../../features/IDV/ProvenInformationCard";
 

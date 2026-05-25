@@ -2,7 +2,7 @@ import "@testing-library/jest-dom/vitest";
 import { BrowserRouter } from "react-router";
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import ServiceCanadaCentreIDVCodePage from "../ServiceCanadaCentreIDVCodePage";
+import ServiceCanadaCentreIDVCodePage from "../InPerson/ServiceCanadaCentreIDVCodePage";
 import { UserProvider } from "../../../components/Providers/UserProvider";
 
 // Mock GCDS components
