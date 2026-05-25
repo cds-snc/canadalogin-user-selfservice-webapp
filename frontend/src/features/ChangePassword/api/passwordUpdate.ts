@@ -1,6 +1,6 @@
 import axios from "axios";
 import config from "../../../config";
-import { SUBMIT_END_POINTS } from "../../../utils/constants";
+import { SUBMIT_END_POINTS, FLOW_TYPES } from "../../../utils/constants";
 import { handleApiError } from "../../../utils/apiErrorHandler";
 import type { OtpFactor } from "../../../types/hooks";
 import type { ApiErrorLike } from "../../../types/utils";
@@ -22,21 +22,28 @@ export type PasswordUpdateApiResponse<TData = unknown> = {
 
 export const passwordUpdate = {
   firstStep: async (
-    userName: string | null | undefined,
+    _userName: string | null | undefined,
     userSelectedMfaFactor: OtpFactor | null,
   ): Promise<
     PasswordUpdateApiResponse<PasswordUpdateTransactionData> | undefined
   > => {
-    if (!userName || !userSelectedMfaFactor) {
+    if (!userSelectedMfaFactor) {
       return undefined;
     }
 
     try {
-      const data = {
-        userName,
-        otpType: userSelectedMfaFactor.type,
-        enrollmentId: userSelectedMfaFactor.id,
+      const otpType =
+        userSelectedMfaFactor.type === FLOW_TYPES.email
+          ? "emailotp"
+          : userSelectedMfaFactor.type;
+
+      const data: Record<string, string> = {
+        otpType,
       };
+
+      if (userSelectedMfaFactor.id) {
+        data.enrollmentId = userSelectedMfaFactor.id;
+      }
 
       const response = await axios.post<
         PasswordUpdateApiResponse<PasswordUpdateTransactionData>

@@ -17,6 +17,7 @@ import type { Fido2Credential, OtpFactor } from "../../../types/hooks";
 import SMSIcon from "../../../assets/icons/sms_icon.svg?react";
 import VoiceIcon from "../../../assets/icons/voicecall_icon.svg?react";
 import FIDO2Icon from "../../../assets/icons/FIDO_Passkey_mark_A_black.svg?react";
+import EmailIcon from "../../../assets/icons/email_icon.svg?react";
 
 const headerGridProps = {
   columns: "max-content 1fr",
@@ -53,6 +54,8 @@ interface OtpSelectionProps {
   onSelectFIDO2?: (passkey: Fido2Credential) => void;
   parentPage: string;
   onCancel: () => void;
+  emailAddress?: string | null;
+  onSelectEmail?: () => void;
 }
 
 export default function OtpSelection({
@@ -63,6 +66,8 @@ export default function OtpSelection({
   onSelectFIDO2,
   parentPage,
   onCancel,
+  emailAddress,
+  onSelectEmail,
 }: OtpSelectionProps) {
   const { language } = useParams();
 
@@ -211,6 +216,36 @@ export default function OtpSelection({
                   </GcdsLink>
                 </GcdsGrid>
               ))}
+            </GcdsContainer>
+          </GcdsContainer>
+        )}
+
+        {/* Email section */}
+        {emailAddress && onSelectEmail && (
+          <GcdsContainer>
+            <SectionHeader
+              icon={<EmailIcon width="23" height="23" />}
+              title={t("TransientOtpSelection.email") ?? ""}
+            />
+            <GcdsContainer style={factorListStyle}>
+              <GcdsText marginBottom="0">
+                {t("TransientOtpSelection.codeExpiresIn")}{" "}
+                <strong>{t("TransientOtpSelection.tenMinutes")}</strong>
+              </GcdsText>
+              <GcdsGrid
+                columns="1fr auto"
+                align-items="center"
+                style={factorRowStyle}
+              >
+                <GcdsText marginBottom="0">{emailAddress}</GcdsText>
+                <GcdsLink
+                  size="regular"
+                  role="button"
+                  onGcdsClick={() => onSelectEmail()}
+                >
+                  {t("TransientOtpSelection.emailMe")}
+                </GcdsLink>
+              </GcdsGrid>
             </GcdsContainer>
           </GcdsContainer>
         )}

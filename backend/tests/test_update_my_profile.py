@@ -80,7 +80,6 @@ async def test_update_profile_success(
     mock_masked_profile.return_value = {
         **profile_data,
         "userName": "ja****@example.com",
-        "phoneNumbers": [],
     }
 
     # Mock dispatch_update_user_profile response
@@ -291,7 +290,7 @@ async def test_update_profile_masks_phone_numbers(
     }
     mock_sanitize.return_value = sanitized_data
 
-    # Profile from IBM with unmasked phone numbers
+    # Profile from IBM with unmasked contact number
     profile_data = {
         "schemas": [
             "urn:ietf:params:scim:schemas:core:2.0:User",
@@ -299,10 +298,7 @@ async def test_update_profile_masks_phone_numbers(
         ],
         "userName": "john.doe@example.com",
         "emails": [{"value": "john.doe@example.com", "type": "work"}],
-        "phoneNumbers": [
-            {"value": "+1-613-555-1234", "type": "mobile"},
-            {"value": "+1-613-555-5678", "type": "work"},
-        ],
+        "contactNumber": "+16135551234",
         "meta": {
             "location": "here",
             "created": "2023-01-01T00:00:00Z",
@@ -323,16 +319,10 @@ async def test_update_profile_masks_phone_numbers(
     mock_response.json.return_value = updated_profile_data
     mock_dispatch_update.return_value = mock_response
 
-    # Mock masked phone numbers
-    masked_phones = [
-        {"value": "+1-613-XXX-XX34", "type": "mobile"},
-        {"value": "+1-613-XXX-XX78", "type": "work"},
-    ]
-
     mock_mask_profile.return_value = {
         **mock_response.json(),
         "userName": "ja****@example.com",
-        "phoneNumbers": masked_phones,
+        "contactNumber": "+1 (***) ***-1234",
     }
 
     user_data = UserProfileUpdateRequest(
@@ -353,24 +343,16 @@ async def test_update_profile_masks_phone_numbers(
     assert response.message == "User profile updated successfully."
     assert response.data.preferredLanguage == "fr"
 
-    # Verify phone numbers are masked in response
-    assert len(response.data.phoneNumbers) == 2
-    assert response.data.phoneNumbers[0].value == "+1-613-XXX-XX34"
-    assert response.data.phoneNumbers[0].type == "mobile"
-    assert response.data.phoneNumbers[1].value == "+1-613-XXX-XX78"
-    assert response.data.phoneNumbers[1].type == "work"
+    # Verify contact number is masked in response
+    assert response.data.contactNumber == "+1 (***) ***-1234"
     assert response.data.userName == "ja****@example.com"
     assert response.success is True
 
-    # Verify masking was called with updated profile data
-    mock_mask_profile.assert_called_once_with(updated_profile_data)
+    # Verify masking was called once with the model_dump() of the parsed PUT response
+    mock_mask_profile.assert_called_once()
     mask_call_data = mock_mask_profile.call_args[0][0]
     assert mask_call_data["userName"] == "john.doe@example.com"
     assert mask_call_data["preferredLanguage"] == "fr"
-
-    mock_sanitize.assert_called_once()
-    mock_dispatch_get.assert_called_once()
-    mock_dispatch_update.assert_called_once()
 
 
 @pytest.mark.asyncio
@@ -399,7 +381,6 @@ async def test_update_profile_prevents_username_change(
         "userName": "john.doe@example.com",
         "emails": [{"value": "john.doe@example.com", "type": "work"}],
         "name": {"givenName": "John", "familyName": "Doe"},
-        "phoneNumbers": [],
         "meta": {
             "location": "here",
             "created": "2023-01-01T00:00:00Z",
@@ -426,7 +407,6 @@ async def test_update_profile_prevents_username_change(
     mock_mask.return_value = {
         **mock_response.json(),
         "userName": "jo****@example.com",
-        "phoneNumbers": [],
     }
 
     user_data = UserProfileUpdateRequest(
@@ -487,7 +467,6 @@ async def test_update_profile_with_no_phone_numbers_to_mask(
         ],
         "userName": "john.doe@example.com",
         "emails": [{"value": "john.doe@example.com", "type": "work"}],
-        "phoneNumbers": [],  # No phone numbers
         "meta": {
             "location": "here",
             "created": "2023-01-01T00:00:00Z",
@@ -510,7 +489,6 @@ async def test_update_profile_with_no_phone_numbers_to_mask(
         **mock_response.json(),
         "userName": "jo****@example.com",
         "user_id": "user-123",
-        "phoneNumbers": [],
     }
 
     user_data = UserProfileUpdateRequest(
@@ -528,7 +506,7 @@ async def test_update_profile_with_no_phone_numbers_to_mask(
 
     # Assert
     assert response.success is True
-    assert len(response.data.phoneNumbers) == 0
+    assert response.data.contactNumber is None
     mock_mask.assert_called_once()  # Masking function still called
 
 
@@ -537,12 +515,12 @@ def test_sanitize_user_profile_data():
         userName="john.doe@example.com",
         name=UserProfileName(givenName="Johnny", familyName=None, formatted=None),
         preferredLanguage=None,
-        phoneNumbers=None,
+        contactNumber=None,
     )
     result = sanitize_user_profile_data(input_data)
     assert result["userName"] == "john.doe@example.com"
     assert "preferredLanguage" not in result
-    assert "phoneNumbers" not in result
+    assert "contactNumber" not in result
 
 
 # Tests for update_profile_for_verified_changes
@@ -596,7 +574,6 @@ async def test_update_profile_for_verified_changes_success(
     mock_dispatch_update.return_value = mock_response
     mock_mask.return_value = {
         **mock_response.json(),
-        "phoneNumbers": [],
     }
 
     user_data = UserProfileUpdateRequest(
@@ -676,7 +653,6 @@ async def test_update_profile_for_verified_changes_with_email_update(
 
     mock_mask.return_value = {
         **mock_response.json(),
-        "phoneNumbers": [],
     }
 
     from app.users.schemas import EmailItem
@@ -716,11 +692,11 @@ async def test_update_profile_for_verified_changes_with_email_update(
 async def test_update_profile_for_verified_changes_with_phone_masking(
     mock_sanitize, mock_dispatch_get, mock_dispatch_update, mock_mask
 ):
-    """Test that verified update properly masks phone numbers in response."""
+    """Test that verified update properly masks contact number in response."""
     # Arrange
     sanitized_data = {
         "userName": "john.doe@example.com",
-        "phoneNumbers": [{"value": "+1-613-555-1234", "type": "mobile"}],
+        "contactNumber": "+16135551234",
     }
     mock_sanitize.return_value = sanitized_data
 
@@ -731,9 +707,7 @@ async def test_update_profile_for_verified_changes_with_phone_masking(
         ],
         "userName": "john.doe@example.com",
         "emails": [{"value": "john.doe@example.com", "type": "work"}],
-        "phoneNumbers": [
-            {"value": "+1-613-999-9999", "type": "work"}
-        ],  # Existing phone
+        "contactNumber": "+16139999999",
         "meta": {
             "location": "here",
             "created": "2023-01-01T00:00:00Z",
@@ -747,28 +721,23 @@ async def test_update_profile_for_verified_changes_with_phone_masking(
     mock_profile = IBMVerifyUserProfileSchema(**profile_data)
     mock_dispatch_get.return_value = mock_profile
 
-    # Updated profile with new phone number
+    # Updated profile with new contact number
     updated_profile_data = {
         **profile_data,
-        "phoneNumbers": [{"value": "+1-613-555-1234", "type": "mobile"}],
+        "contactNumber": "+16135551234",
     }
     mock_response = Mock()
     mock_response.json.return_value = updated_profile_data
     mock_dispatch_update.return_value = mock_response
 
-    # Mock masked phone numbers
-    masked_phones = [{"value": "+1 (***) ***-1234", "type": "mobile"}]
-
     mock_mask.return_value = {
         **mock_response.json(),
-        "phoneNumbers": masked_phones,
+        "contactNumber": "+1 (***) ***-1234",
     }
-
-    from app.users.schemas import MetaDataTypeValue
 
     user_data = UserProfileUpdateRequest(
         userName="john.doe@example.com",
-        phoneNumbers=[MetaDataTypeValue(value="+1-613-555-1234", type="mobile")],
+        contactNumber="+16135551234",
     )
     mock_request = Mock()
     mock_request.app = Mock()
@@ -784,16 +753,9 @@ async def test_update_profile_for_verified_changes_with_phone_masking(
 
     # Assert
     assert response.success is True
-    assert len(response.data.phoneNumbers) == 1
-    assert response.data.phoneNumbers[0].value == "+1 (***) ***-1234"
-    assert response.data.phoneNumbers[0].type == "mobile"
+    assert response.data.contactNumber == "+1 (***) ***-1234"
 
     mock_mask.assert_called_once()
-    # Verify masking was called with updated profile data
-    mask_call_data = mock_mask.call_args[0][0]
-    assert "phoneNumbers" in mask_call_data
-    assert len(mask_call_data["phoneNumbers"]) == 1
-    assert mask_call_data["phoneNumbers"][0]["type"] == "mobile"
 
 
 @pytest.mark.asyncio

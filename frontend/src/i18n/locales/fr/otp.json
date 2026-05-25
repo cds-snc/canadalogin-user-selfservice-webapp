@@ -22,7 +22,9 @@
     "verify": "Vérifier",
     "chooseVerifyMethod": "Choisissez votre méthode de vérification",
     "toDeletePasskey": "Pour supprimer une clé d'accès ou une clé de sécurité,",
-    "toAddPasskey": "Pour ajouter une clé d'accès ou une clé de sécurité,"
+    "toAddPasskey": "Pour ajouter une clé d'accès ou une clé de sécurité,",
+    "email": "Courriel",
+    "emailMe": "M'envoyer un courriel"
   },
   "PasswordVerification": {
     "title": "Veuillez vous authentifier",

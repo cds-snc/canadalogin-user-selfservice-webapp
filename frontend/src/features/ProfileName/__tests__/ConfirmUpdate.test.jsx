@@ -42,7 +42,7 @@ const mockUserState = {
       pwdChangedTime: "2025-09-08T12:00:00Z",
     },
     emails: [{ value: "test@example.com", type: "primary" }],
-    phoneNumbers: [{ value: "+1234567890", type: "primary" }],
+    contactNumber: "+1234567890",
     meta: {
       created: "2025-09-08T12:00:00Z",
       location: "test",

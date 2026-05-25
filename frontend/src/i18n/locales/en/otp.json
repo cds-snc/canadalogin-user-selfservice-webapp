@@ -21,7 +21,9 @@
     "verify": "Verify",
     "chooseVerifyMethod": "Choose how you want to verify",
     "toDeletePasskey": "To delete a passkey or security key,",
-    "toAddPasskey": "To add a passkey or security key,"
+    "toAddPasskey": "To add a passkey or security key,",
+    "email": "Email",
+    "emailMe": "Email me"
   },
   "PasswordVerification": {
     "title": "First, verify it's you",

@@ -26,26 +26,38 @@ async def parse_phone_auth_factors_response(
     if not factors or not factors[0]:
         return []
 
-    phone_factors = []
-    ALLOWED_TYPES = {OtpType.SMSOTP.value, OtpType.VOICEOTP.value}
+    factors_list = []
+    PHONE_TYPES = {OtpType.SMSOTP.value, OtpType.VOICEOTP.value}
 
     for factor in factors:
-        if factor.type in ALLOWED_TYPES:
+        if factor.type in PHONE_TYPES:
             phone_number = getattr(factor.attributes, "phoneNumber", None)
             if not phone_number:
                 logger.warning("Factor %s has no phoneNumber", factor.id)
                 continue
             if masked:
                 phone_number = mask_phone_number(phone_number)
-            phone_factors.append(
+            factors_list.append(
                 {
                     "id": factor.id,
                     "type": factor.type,
                     "destination": phone_number,
                 }
             )
+        elif factor.type == OtpType.EMAILOTP.value:
+            email_address = getattr(factor.attributes, "emailAddress", None)
+            if not email_address:
+                logger.warning("Factor %s has no emailAddress", factor.id)
+                continue
+            factors_list.append(
+                {
+                    "id": factor.id,
+                    "type": factor.type,
+                    "destination": email_address,
+                }
+            )
 
-    return phone_factors
+    return factors_list
 
 
 async def dispatch_user_auth_factors(

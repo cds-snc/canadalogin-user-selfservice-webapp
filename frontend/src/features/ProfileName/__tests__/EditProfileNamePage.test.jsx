@@ -217,7 +217,7 @@ function buildUserState(
         pwdChangedTime: "2025-01-01T00:00:00Z",
       },
       emails: [{ value: "test@example.com", type: "primary" }],
-      phoneNumbers: [],
+      contactNumber: null,
       meta: {
         created: "2025-01-01T00:00:00Z",
         location: "test",

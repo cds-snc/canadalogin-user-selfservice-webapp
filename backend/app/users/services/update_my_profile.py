@@ -74,7 +74,8 @@ async def update_profile_for_verified_changes(
 
     json_data = response.json()
 
-    masked_profile_data = mask_profile_details(json_data)
+    parsed_response = IBMVerifyUserProfileSchema(**json_data)
+    masked_profile_data = mask_profile_details(parsed_response.model_dump())
     response_data = IBMVerifyUserProfileSchema(**masked_profile_data)
 
     return ProfileResponse(
@@ -206,8 +207,8 @@ async def update_my_profile(
     )
     json_data = response.json()
 
-    masked_profile_data = mask_profile_details(json_data)
-
+    parsed_response = IBMVerifyUserProfileSchema(**json_data)
+    masked_profile_data = mask_profile_details(parsed_response.model_dump())
     response_data = IBMVerifyUserProfileSchema(**masked_profile_data)
 
     return ProfileResponse(

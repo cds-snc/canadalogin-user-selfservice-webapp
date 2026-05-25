@@ -30,7 +30,7 @@ def mock_user_profile_response():
         id="user123",
         userName="test@example.com",
         name=UserProfileName(givenName="Test", familyName="User"),
-        phoneNumbers=[],
+        contactNumber=None,
         emails=[],
         active=True,
         meta=Meta(

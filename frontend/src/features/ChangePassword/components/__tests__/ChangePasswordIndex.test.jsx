@@ -42,6 +42,7 @@ vi.mock("../../../../hooks/useOtpOperations", () => ({
     handleChangeUserMfaSelection: vi.fn(),
     handleSetUserOtpValue: vi.fn(),
     setOtpLoading: vi.fn(),
+    setUserSelectedMfaFactor: vi.fn(),
   }),
 }));
 
@@ -219,17 +220,28 @@ describe("ChangePasswordIndex – GA Error Tracking", () => {
     });
   });
 
-  it("emits form_step_end with error when OTP send (requestOtpCode) API fails (1-factor auto-send)", async () => {
-    // With 1 phone factor, password onSuccess auto-calls requestOtpCode — no OTP selection step
+  it("emits form_step_end with error when OTP send (requestOtpCode) API fails", async () => {
+    // With phone factors, password validation goes to OTP selection,
+    // then clicking next triggers requestOtpCode
     passwordUpdate.firstStep.mockRejectedValueOnce({
       data: { message: "OTP_SEND_FAILED" },
     });
 
     renderComponent();
 
-    // Clicking validate triggers onSuccess → auto-calls requestOtpCode → fails → GA event
+    // Clicking validate goes to OTP selection (phone factors exist)
     await act(async () => {
       fireEvent.click(screen.getByTestId("validate-password-btn"));
+    });
+
+    // Wait for OTP selection step
+    await waitFor(() =>
+      expect(screen.getByTestId("otp-selection-next-btn")).toBeInTheDocument(),
+    );
+
+    // Click next → calls requestOtpCode → fails → GA event
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("otp-selection-next-btn"));
     });
 
     await waitFor(() => {
@@ -254,9 +266,18 @@ describe("ChangePasswordIndex – GA Error Tracking", () => {
 
     renderComponent();
 
-    // Password verification → OTP selection (skipped, 1 factor) → OTP validation
+    // Password verification → OTP selection (phone factors exist)
     await act(async () => {
       fireEvent.click(screen.getByTestId("validate-password-btn"));
+    });
+
+    // OTP selection → click next to go to OTP validation
+    await waitFor(() =>
+      expect(screen.getByTestId("otp-selection-next-btn")).toBeInTheDocument(),
+    );
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("otp-selection-next-btn"));
     });
 
     await waitFor(() =>
@@ -282,9 +303,18 @@ describe("ChangePasswordIndex – GA Error Tracking", () => {
 
     renderComponent();
 
-    // Step 1: password verification → auto-requestOtpCode (1 factor) → succeeds → otpValidation
+    // Step 1: password verification → OTP selection (phone factors exist)
     await act(async () => {
       fireEvent.click(screen.getByTestId("validate-password-btn"));
+    });
+
+    // Step 1b: OTP selection → click next → OTP validation
+    await waitFor(() =>
+      expect(screen.getByTestId("otp-selection-next-btn")).toBeInTheDocument(),
+    );
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("otp-selection-next-btn"));
     });
 
     // Step 2: OTP validation
@@ -349,18 +379,35 @@ describe("ChangePasswordIndex – GA Success Path Tracking", () => {
     });
   });
 
-  it("fires GA events after password validates and OTP is sent (verify_password → otp_validation)", async () => {
+  it("fires GA events after password validates and OTP is sent (verify_password → otp_selection → otp_validation)", async () => {
     renderComponent();
 
     await act(async () => {
       fireEvent.click(screen.getByTestId("validate-password-btn"));
     });
 
+    // With phone factors, password validation goes to otp_selection first
     await waitFor(() => {
       expect(mockTrackEvent).toHaveBeenCalledWith({
         event: "form_step_start",
         step: "verify_password",
       });
+      expect(mockTrackEvent).toHaveBeenCalledWith({
+        event: "form_step_change",
+        step: "otp_selection",
+      });
+    });
+
+    // Click next on OTP selection to trigger requestOtpCode
+    await waitFor(() =>
+      expect(screen.getByTestId("otp-selection-next-btn")).toBeInTheDocument(),
+    );
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("otp-selection-next-btn"));
+    });
+
+    await waitFor(() => {
       expect(mockTrackEvent).toHaveBeenCalledWith({
         event: "form_step_change",
         step: "otp_validation",
@@ -377,6 +424,15 @@ describe("ChangePasswordIndex – GA Success Path Tracking", () => {
 
     await act(async () => {
       fireEvent.click(screen.getByTestId("validate-password-btn"));
+    });
+
+    // Go through OTP selection step
+    await waitFor(() =>
+      expect(screen.getByTestId("otp-selection-next-btn")).toBeInTheDocument(),
+    );
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("otp-selection-next-btn"));
     });
 
     await waitFor(() =>
@@ -412,6 +468,15 @@ describe("ChangePasswordIndex – GA Success Path Tracking", () => {
 
     await act(async () => {
       fireEvent.click(screen.getByTestId("validate-password-btn"));
+    });
+
+    // Go through OTP selection step
+    await waitFor(() =>
+      expect(screen.getByTestId("otp-selection-next-btn")).toBeInTheDocument(),
+    );
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("otp-selection-next-btn"));
     });
 
     await waitFor(() =>

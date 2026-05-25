@@ -121,7 +121,6 @@ async def test_verify_user_password_success():
             "active": True,
             "id": "user-123",
             "userName": "john.doe@example.com",
-            "phoneNumbers": [],
             "details": {},
         }
 

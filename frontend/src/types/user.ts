@@ -13,7 +13,7 @@ export interface UserProfile {
     pwdChangedTime: string | null;
   };
   emails?: null | Array<{ value: string; type: string }>;
-  phoneNumbers?: null | Array<{ value: string; type: string }>;
+  contactNumber?: string | null;
   meta?: {
     created: string;
     location: string;
