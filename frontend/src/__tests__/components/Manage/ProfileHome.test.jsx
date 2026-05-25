@@ -38,12 +38,15 @@ vi.mock("../../../utils/constants", () => ({
   },
   PAGES: {
     editEmailPage: "editEmailPage",
+    idvStartIdentityProofingPage: "IdvStartIdentityProofingPage",
   },
   VITE_ENVIRONMENTS: { dev: "dev", test: "test" },
 }));
 
 vi.mock("../../../utils/routeHelpers", () => ({
-  path: vi.fn(() => "/en/update-email"),
+  path: vi.fn((page) =>
+    page === "IdvStartIdentityProofingPage" ? "/en/idv" : "/en/update-email",
+  ),
 }));
 
 vi.mock("@gcds-core/components-react", () => ({
@@ -69,6 +72,22 @@ vi.mock("@gcds-core/components-react", () => ({
     >
       {children}
     </a>
+  ),
+  GcdsNotice: ({ children, noticeTitle }) => (
+    <div data-testid="gcds-notice">
+      <h2>{noticeTitle}</h2>
+      {children}
+    </div>
+  ),
+  GcdsButton: ({ children, onGcdsClick }) => (
+    <button
+      type="button"
+      onClick={(e) => {
+        onGcdsClick?.({ preventDefault: () => e.preventDefault() });
+      }}
+    >
+      {children}
+    </button>
   ),
 }));
 
@@ -177,5 +196,42 @@ describe("ProfileHome", () => {
     expect(
       badges.some((b) => b.textContent === "Proven January 27, 2026"),
     ).toBe(true);
+  });
+
+  it("renders identity proofing notice when DEV_ONLY_FEATURE is true", () => {
+    render(<ProfileHome />);
+
+    expect(screen.getByTestId("gcds-notice")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Complete identity proofing" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Verifying your identity helps you securely access connected government services.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Start identity verification" }),
+    ).toBeInTheDocument();
+  });
+
+  it("hides identity proofing notice when DEV_ONLY_FEATURE is false", () => {
+    mockDevOnlyFeature = false;
+    render(<ProfileHome />);
+
+    expect(screen.queryByTestId("gcds-notice")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: "Complete identity proofing" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("navigates to /idv when clicking identity proofing CTA", () => {
+    render(<ProfileHome />);
+
+    screen
+      .getByRole("button", { name: "Start identity verification" })
+      .click();
+
+    expect(mockNavigate).toHaveBeenCalledWith("/en/idv");
   });
 });

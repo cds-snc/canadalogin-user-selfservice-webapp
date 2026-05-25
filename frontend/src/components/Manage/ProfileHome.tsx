@@ -5,6 +5,8 @@ import {
   GcdsGrid,
   GcdsText,
   GcdsLink,
+  GcdsNotice,
+  GcdsButton,
 } from "@gcds-core/components-react";
 
 import { useTranslation } from "react-i18next";
@@ -60,10 +62,13 @@ const DisplayEmailInfo = ({ email }: DisplayEmailInfoProps) => {
 };
 
 export default function ProfileHome() {
+  const { language } = useParams();
+  const navigate = useNavigate();
   const { t } = useTranslation("profile");
   const { state } = useUser();
   const email = state?.userProfile?.userName || "";
   const contactNumber = state?.userProfile?.contactNumber ?? null;
+  const startIdentityProofingPage = `/${language ?? "en"}/idv`;
 
   return (
     <GcdsContainer role="main">
@@ -72,6 +77,26 @@ export default function ProfileHome() {
         <GcdsHeading tag="h1" marginTop="0">
           {t("ProfileHome.title")}
         </GcdsHeading>
+        {DEV_ONLY_FEATURE && (
+          <GcdsNotice
+            noticeRole="info"
+            noticeTitleTag="h2"
+            noticeTitle={t("ProfileHome.completeIdentityProofingTitle")}
+          >
+            <GcdsText>
+              {t("ProfileHome.completeIdentityProofingDescription")}
+            </GcdsText>
+            <GcdsButton
+              type="button"
+              onGcdsClick={(ev: { preventDefault: () => void }) => {
+                ev.preventDefault();
+                navigate(startIdentityProofingPage);
+              }}
+            >
+              {t("ProfileHome.completeIdentityProofingCta")}
+            </GcdsButton>
+          </GcdsNotice>
+        )}
         {DEV_ONLY_FEATURE && (
           <GcdsContainer>
             <GcdsGrid columns="1fr auto" className="gridInline">

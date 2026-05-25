@@ -18,7 +18,10 @@
     "notificationDescription": "Nous enverrons des notifications liées à votre compte à l'adresse courriel qui y est associée.",
     "serviceNotifications": "Vous pourriez également recevoir des notifications provenant de services liés à votre identifiant ConnexionCanada. Vous pouvez gérer ces préférences dans les paramètres de chaque service.",
     "noPhoneAdded": "Aucun numéro de téléphone de contact n'a été ajouté",
-    "addPhoneNumber": "Ajouter un numéro de téléphone"
+    "addPhoneNumber": "Ajouter un numéro de téléphone",
+    "completeIdentityProofingTitle": "Terminer la vérification d'identité",
+    "completeIdentityProofingDescription": "La vérification de votre identité vous aide à accéder en toute sécurité aux services gouvernementaux connectés.",
+    "completeIdentityProofingCta": "Commencer la vérification d'identité"
   },
   "ProvenInformationCard": {
     "name": "Nom",
