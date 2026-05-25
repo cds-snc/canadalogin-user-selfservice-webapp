@@ -69,7 +69,7 @@ describe("usePasswordValidation", () => {
 
       expect(mockAuthService.requestPasswordPolicy).toHaveBeenCalled();
       expect(mockAuthService.verifyPassword).not.toHaveBeenCalled();
-      expect(mockSetErrorCode).toHaveBeenCalledWith("5");
+      expect(mockSetErrorCode).toHaveBeenCalledWith("passwordMinLength");
       expect(mockOnSuccess).not.toHaveBeenCalled();
     });
 
@@ -86,7 +86,7 @@ describe("usePasswordValidation", () => {
 
       expect(mockAuthService.requestPasswordPolicy).toHaveBeenCalled();
       expect(mockAuthService.verifyPassword).not.toHaveBeenCalled();
-      expect(mockSetErrorCode).toHaveBeenCalledWith("5");
+      expect(mockSetErrorCode).toHaveBeenCalledWith("passwordLengthRange");
       expect(mockOnSuccess).not.toHaveBeenCalled();
     });
 
@@ -101,7 +101,7 @@ describe("usePasswordValidation", () => {
 
       expect(mockAuthService.requestPasswordPolicy).toHaveBeenCalled();
       expect(mockAuthService.verifyPassword).not.toHaveBeenCalled();
-      expect(mockSetErrorCode).toHaveBeenCalledWith("5");
+      expect(mockSetErrorCode).toHaveBeenCalledWith("passwordMinLength");
       expect(mockOnSuccess).not.toHaveBeenCalled();
     });
 
@@ -116,7 +116,7 @@ describe("usePasswordValidation", () => {
 
       expect(mockAuthService.requestPasswordPolicy).toHaveBeenCalled();
       expect(mockAuthService.verifyPassword).not.toHaveBeenCalled();
-      expect(mockSetErrorCode).toHaveBeenCalledWith("5");
+      expect(mockSetErrorCode).toHaveBeenCalledWith("passwordMinLength");
       expect(mockOnSuccess).not.toHaveBeenCalled();
     });
 
@@ -131,7 +131,7 @@ describe("usePasswordValidation", () => {
 
       expect(mockAuthService.requestPasswordPolicy).toHaveBeenCalled();
       expect(mockAuthService.verifyPassword).not.toHaveBeenCalled();
-      expect(mockSetErrorCode).toHaveBeenCalledWith("5");
+      expect(mockSetErrorCode).toHaveBeenCalledWith("passwordMinLength");
       expect(mockOnSuccess).not.toHaveBeenCalled();
     });
 
@@ -270,7 +270,7 @@ describe("usePasswordValidation", () => {
       });
 
       expect(mockAuthService.verifyPassword).not.toHaveBeenCalled();
-      expect(mockSetErrorCode).toHaveBeenCalledWith("5");
+      expect(mockSetErrorCode).toHaveBeenCalledWith("passwordMinLength");
     });
 
     it("should handle password policy request error", async () => {
@@ -307,8 +307,8 @@ describe("usePasswordValidation", () => {
       });
 
       expect(mockAuthService.verifyPassword).not.toHaveBeenCalled();
-      expect(mockSetErrorCode).toHaveBeenCalledWith("5");
-      expect(mockOnError).toHaveBeenCalledWith("5");
+      expect(mockSetErrorCode).toHaveBeenCalledWith("passwordMinLength");
+      expect(mockOnError).toHaveBeenCalledWith("passwordMinLength");
     });
   });
 

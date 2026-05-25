@@ -2,7 +2,7 @@ import logging
 from typing import Dict
 
 from fastapi import HTTPException, status, Request
-from httpx import AsyncClient, Response
+from httpx import AsyncClient, HTTPStatusError, Response
 
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.password.schemas import (
@@ -123,10 +123,27 @@ async def dispatch_verify_password(
         f"{verify_password_endpoint}/{cloud_directory_id}"
     )
 
-    response = await http_client.post(
-        ibm_verify_password_api_endpoint, json=payload, headers=headers
-    )
-    response.raise_for_status()
+    try:
+        response = await http_client.post(
+            ibm_verify_password_api_endpoint, json=payload, headers=headers
+        )
+        response.raise_for_status()
+    except HTTPStatusError as e:
+        if e.response.status_code in [
+            status.HTTP_400_BAD_REQUEST,
+            status.HTTP_401_UNAUTHORIZED,
+        ]:
+            try:
+                body = e.response.json()
+                message_id = body.get("messageId")
+                if message_id:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail=message_id,
+                    )
+            except (ValueError, AttributeError):
+                pass
+        raise
 
     logger.info("Verified successfully with IBM Verify")
     return response

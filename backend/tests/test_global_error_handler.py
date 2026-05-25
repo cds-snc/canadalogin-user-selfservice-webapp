@@ -2895,7 +2895,7 @@ class TestErrorHandlingVerifyPassword:
     @patch.object(verify_password_module, "get_admin_token")
     @patch.object(verify_password_module, "get_auth_request_headers")
     @patch.object(verify_password_module, "get_cloud_directory_id")
-    async def test_dispatch_verify_password_http_error(
+    async def test_dispatch_verify_password_http_error_with_message_id(
         self,
         mock_get_cloud_directory_id,
         mock_get_auth_request_headers,
@@ -2903,6 +2903,7 @@ class TestErrorHandlingVerifyPassword:
         mock_dispatch_get_my_profile_from_ibm,
         mock_test_client,
     ):
+        """IBM Verify returns 401 with messageId — should return 400 with the error code."""
         mock_dispatch_get_my_profile_from_ibm.return_value = MagicMock()
         mock_get_admin_token.return_value = "admin-token-123"
         mock_get_auth_request_headers.return_value = {
@@ -2920,7 +2921,65 @@ class TestErrorHandlingVerifyPassword:
 
         mock_response = Mock(spec=Response)
         mock_response.status_code = 401
-        mock_response.text = "Unauthorized"
+        mock_response.json.return_value = {
+            "messageId": "CSIBH0044E",
+            "messageDescription": "The username or password is incorrect.",
+        }
+
+        # Configure the mock to raise HTTPStatusError when raise_for_status is called
+        http_error = HTTPStatusError(
+            message="Unauthorized",
+            request=mock_request,
+            response=mock_response,
+        )
+        mock_response.raise_for_status.side_effect = http_error
+        mock_client.post.return_value = mock_response
+
+        request_data = {
+            "password": "purple_monkey_dishwasher",
+        }
+
+        client = mock_test_client(mock_client)
+
+        response = client.request("POST", "/v1/password/verify", json=request_data)
+        response_json = response.json()
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert not response_json["success"]
+        assert response_json["message"] == "CSIBH0044E"
+
+    @pytest.mark.asyncio
+    @patch.object(verify_password_module, "dispatch_get_my_profile_from_ibm")
+    @patch.object(verify_password_module, "get_admin_token")
+    @patch.object(verify_password_module, "get_auth_request_headers")
+    @patch.object(verify_password_module, "get_cloud_directory_id")
+    async def test_dispatch_verify_password_http_error_without_message_id(
+        self,
+        mock_get_cloud_directory_id,
+        mock_get_auth_request_headers,
+        mock_get_admin_token,
+        mock_dispatch_get_my_profile_from_ibm,
+        mock_test_client,
+    ):
+        """IBM Verify returns 401 without messageId — should return 502 with generic message."""
+        mock_dispatch_get_my_profile_from_ibm.return_value = MagicMock()
+        mock_get_admin_token.return_value = "admin-token-123"
+        mock_get_auth_request_headers.return_value = {
+            "Authorization": "Bearer admin-token-123",
+            "Content-Type": "application/json",
+        }
+        mock_get_cloud_directory_id.return_value = "test-directory-123"
+
+        # Create a proper httpx Request object
+        mock_client = AsyncMock(spec=AsyncClient)
+        mock_request = Request(
+            method="POST",
+            url="https://example.com",
+        )
+
+        mock_response = Mock(spec=Response)
+        mock_response.status_code = 401
+        mock_response.json.side_effect = ValueError("not JSON")
 
         # Configure the mock to raise HTTPStatusError when raise_for_status is called
         http_error = HTTPStatusError(

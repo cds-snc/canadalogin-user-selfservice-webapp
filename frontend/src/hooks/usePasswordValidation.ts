@@ -37,11 +37,18 @@ export function usePasswordValidation(
       if (passwordPolicyResponse?.success && passwordPolicy) {
         if (
           !userPasswordValue ||
-          userPasswordValue.length < passwordPolicy.pwdMinLength ||
+          userPasswordValue.length < passwordPolicy.pwdMinLength
+        ) {
+          setErrorCode("passwordMinLength");
+          onError?.("passwordMinLength");
+          return;
+        }
+        if (
+          passwordPolicy.pwdMaxLength &&
           userPasswordValue.length > passwordPolicy.pwdMaxLength
         ) {
-          setErrorCode("5");
-          onError?.("5");
+          setErrorCode("passwordLengthRange");
+          onError?.("passwordLengthRange");
           return;
         }
       }
