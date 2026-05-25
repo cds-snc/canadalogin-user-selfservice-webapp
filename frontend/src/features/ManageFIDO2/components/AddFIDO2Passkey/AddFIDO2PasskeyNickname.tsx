@@ -14,7 +14,6 @@ interface AddFIDO2PasskeyNicknameProps {
   setErrorCode: (code: string) => void;
   errorMessage: string;
   onSubmit: (deviceName: string) => Promise<void>;
-  onCancel: () => void;
   registrationLoading: boolean;
   initialNickname?: string;
 }
@@ -23,7 +22,6 @@ export default function AddFIDO2PasskeyNickname({
   setErrorCode,
   errorMessage,
   onSubmit,
-  onCancel,
   registrationLoading,
   initialNickname = "",
 }: AddFIDO2PasskeyNicknameProps) {
@@ -65,7 +63,7 @@ export default function AddFIDO2PasskeyNickname({
             hint={t("AddFIDO2PasskeyNickname.placeholder")}
           />
         </form>
-        <GcdsGrid columns="max-content max-content" gap="200">
+        <GcdsGrid columns="max-content" gap="200">
           <GcdsButton
             onClick={async (e) => {
               e.preventDefault();
@@ -74,13 +72,6 @@ export default function AddFIDO2PasskeyNickname({
             disabled={registrationLoading}
           >
             {t("AddFIDO2PasskeyNickname.continueButton")}
-          </GcdsButton>
-          <GcdsButton
-            buttonRole="secondary"
-            onClick={onCancel}
-            disabled={registrationLoading}
-          >
-            {t("AddFIDO2PasskeyNickname.cancelButton")}
           </GcdsButton>
         </GcdsGrid>
       </GcdsGrid>

@@ -256,16 +256,13 @@ vi.mock("../AddFIDO2Passkey", () => ({
 }));
 
 vi.mock("../AddFIDO2PasskeyNickname", () => ({
-  default: ({ onSubmit, onCancel, registrationLoading }) => (
+  default: ({ onSubmit, registrationLoading }) => (
     <div data-testid="step-addFIDO2PasskeyNickname">
       <button
         data-testid="nickname-submit"
         onClick={() => onSubmit("My Device")}
       >
         Save
-      </button>
-      <button data-testid="nickname-cancel" onClick={onCancel}>
-        Cancel
       </button>
       {registrationLoading && (
         <span data-testid="nickname-loading">Loading...</span>
@@ -702,11 +699,5 @@ describe("AddFIDO2PasskeyPage", () => {
     await waitFor(() => {
       expect(mockNavigate).not.toHaveBeenCalled();
     });
-  });
-
-  it("calls navigate on cancel from addFIDO2PasskeyNickname", async () => {
-    renderPage({ step: "addFIDO2PasskeyNickname" });
-    await userEvent.click(screen.getByTestId("nickname-cancel"));
-    expect(mockNavigate).toHaveBeenCalledWith("/en/mock-path");
   });
 });
