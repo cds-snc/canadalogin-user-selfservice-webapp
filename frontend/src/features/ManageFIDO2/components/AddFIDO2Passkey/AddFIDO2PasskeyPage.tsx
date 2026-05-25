@@ -312,7 +312,6 @@ export default function AddFIDO2PasskeyPage({
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
         onSubmit={handleSubmitAttestation}
-        onCancel={() => navigate(backToManage2FAVerificationsPage)}
         registrationLoading={registrationLoading}
         initialNickname={authenticatorDescription}
       />

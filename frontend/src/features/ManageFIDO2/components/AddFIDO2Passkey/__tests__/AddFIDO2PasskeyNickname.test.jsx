@@ -8,7 +8,6 @@
  * - Validation: whitespace-only name is rejected
  * - Submit button in form (Enter key) triggers correct behaviour
  * - Both buttons are disabled when registrationLoading is true
- * - onCancel is called when the cancel button is clicked
  */
 import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -91,7 +90,6 @@ describe("AddFIDO2PasskeyNickname", () => {
   const defaultProps = {
     setErrorCode: vi.fn(),
     errorMessage: "",
-    onCancel: vi.fn(),
     onSubmit: vi.fn(),
     registrationLoading: false,
   };
@@ -126,24 +124,10 @@ describe("AddFIDO2PasskeyNickname", () => {
     );
   });
 
-  it("renders save and cancel buttons", () => {
+  it("renders the continue button", () => {
     render(<AddFIDO2PasskeyNickname {...defaultProps} />);
     expect(screen.getByText("Continue")).toBeInTheDocument();
-    expect(screen.getByText("Cancel")).toBeInTheDocument();
-  });
-
-  it("cancel button has secondary role", () => {
-    render(<AddFIDO2PasskeyNickname {...defaultProps} />);
-    expect(screen.getByText("Cancel")).toHaveAttribute(
-      "data-role",
-      "secondary",
-    );
-  });
-
-  it("calls onCancel when the cancel button is clicked", async () => {
-    render(<AddFIDO2PasskeyNickname {...defaultProps} />);
-    await userEvent.click(screen.getByText("Cancel"));
-    expect(defaultProps.onCancel).toHaveBeenCalledOnce();
+    expect(screen.queryByText("Cancel")).not.toBeInTheDocument();
   });
 
   it("calls setErrorCode with error_passkey_name_required when name is empty", async () => {
