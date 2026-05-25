@@ -9,8 +9,9 @@ This implements steps 1-2 of the FIDO2 step-up authentication:
 import logging
 import base64
 import time
-from httpx import AsyncClient
-from fastapi import Request
+from httpx import AsyncClient, HTTPStatusError
+from fastapi import HTTPException, Request, status
+from app.utils.global_error_handlers import extract_response_body
 from app.utils.schemas import ResponseModel
 from app.utils.access_token import get_admin_token
 from app.password.schemas import UserPassword, VerifiedUserPassword
@@ -71,15 +72,29 @@ async def verify_password_with_jwt(
         "Authorization": f"Bearer {admin_token}",
     }
 
-    response = await http_client.post(
-        verify_url,
-        json=verify_payload,
-        headers=headers,
-    )
+    try:
+        response = await http_client.post(
+            verify_url,
+            json=verify_payload,
+            headers=headers,
+        )
 
-    logger.info(f"Password verification response status: {response.status_code}")
-    logger.info(f"Password verification response body: {response.text}")
-    response.raise_for_status()
+        logger.info(f"Password verification response status: {response.status_code}")
+        logger.info(f"Password verification response body: {response.text}")
+        response.raise_for_status()
+    except HTTPStatusError as e:
+        if e.response.status_code in [
+            status.HTTP_400_BAD_REQUEST,
+            status.HTTP_401_UNAUTHORIZED,
+        ]:
+            body = extract_response_body(e.response)
+            message_id = body.get("messageId")
+            if message_id:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=message_id,
+                )
+        raise
 
     response_data = response.json()
     user_id = response_data.get("id")

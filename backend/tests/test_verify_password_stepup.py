@@ -9,6 +9,7 @@ Tests the enhanced password verification for FIDO2 step-up authentication flow:
 
 import importlib
 import pytest
+from fastapi import HTTPException
 from httpx import AsyncClient, HTTPStatusError, Request, Response
 from unittest.mock import AsyncMock, MagicMock, patch
 from app.password.schemas import UserPassword
@@ -103,6 +104,43 @@ class TestVerifyPasswordWithJwt:
                 username="user@example.com",
                 password="WrongPassword",
             )
+
+    @pytest.mark.asyncio
+    @patch("app.password.services.verify_password_stepup.get_cloud_directory_id")
+    async def test_handles_invalid_password_with_message_id(
+        self, mock_get_cloud_dir_id, mock_http_client
+    ):
+        """Should raise HTTPException with messageId when IBM Verify returns 401 with messageId"""
+        mock_get_cloud_dir_id.return_value = "cloud-dir-123"
+
+        mock_response = Response(
+            401,
+            json={
+                "messageId": "CSIBH0044E",
+                "messageDescription": "The username or password is incorrect.",
+            },
+        )
+        http_error = HTTPStatusError(
+            "401 Unauthorized",
+            request=MagicMock(spec=Request),
+            response=mock_response,
+        )
+        mock_response_obj = MagicMock()
+        mock_response_obj.raise_for_status.side_effect = http_error
+        mock_http_client.post = AsyncMock(return_value=mock_response_obj)
+
+        with pytest.raises(HTTPException) as exc_info:
+            await verify_password_with_jwt(
+                http_client=mock_http_client,
+                tenant_url="https://tenant.verify.ibm.com",
+                verify_password_endpoint="https://tenant.verify.ibm.com/v2.0/authnmethods/password",
+                admin_token="admin-token-123",
+                username="user@example.com",
+                password="WrongPassword",
+            )
+
+        assert exc_info.value.status_code == 400
+        assert exc_info.value.detail == "CSIBH0044E"
 
     @pytest.mark.asyncio
     @patch("app.password.services.verify_password_stepup.get_cloud_directory_id")
