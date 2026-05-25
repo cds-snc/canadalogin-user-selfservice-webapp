@@ -2,6 +2,7 @@ import logging
 from datetime import datetime
 
 from app.config import get_configuration
+from app.fido2.services.authenticate_fido2_registration import submit_assertion_result
 from app.otp.schemas import (
     OtpBatchDeletionRequest,
     OtpDeletionRequest,
@@ -12,7 +13,7 @@ from app.users.services.otp_factors import get_user_otp_factors
 from app.utils.access_token import get_auth_request_headers
 from app.utils.schemas import ResponseModel
 from app.utils.helpers import verify_otp_before_operation
-from fastapi import HTTPException, status
+from fastapi import HTTPException, Request, status
 from httpx import AsyncClient, HTTPStatusError
 
 logger = logging.getLogger(__name__)
@@ -32,6 +33,7 @@ async def handle_otp_deletion(
     global_http_client: AsyncClient,
     deletion_request: OtpDeletionRequest,
     user_access_token: str,
+    request: Request | None = None,
 ):
     """Delete an OTP factor enrollment (SMS or Voice) after OTP verification.
 
@@ -50,7 +52,7 @@ async def handle_otp_deletion(
     user_language = my_profile_response.data.preferredLanguage or "en"
     logger.info(f"Using user's preferred language: {user_language}")
 
-    if deletion_request.otp is None:
+    if deletion_request.otp is None and deletion_request.assertionResult is None:
         # No OTP provided — only permitted for genuinely unvalidated factors.
         # Fetch the unvalidated factors and confirm this factor is among them.
         unvalidated_factors_response = await get_user_otp_factors(
@@ -71,16 +73,36 @@ async def handle_otp_deletion(
                 detail="OTP verification is required to delete a validated MFA factor",
             )
     else:
-        # Validated factor deletion path — OTP verification required.
-        # Step 1: Verify OTP before proceeding with deletion
-        # Use the verification OTP type (may differ from the factor being deleted)
-        await verify_otp_before_operation(
-            global_http_client=global_http_client,
-            user_access_token=user_access_token,
-            otp=deletion_request.otp,
-            trxn_id=deletion_request.trxnId,
-            otp_type=deletion_request.otpVerificationType,
-        )
+        if deletion_request.assertionResult is not None:
+            if request is None:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Request context required for passkey verification",
+                )
+
+            assertion_response = await submit_assertion_result(
+                request=request,
+                http_client=global_http_client,
+                user_access_token=user_access_token,
+                request_body=deletion_request.assertionResult,
+                return_jwt=False,
+            )
+
+            if not assertion_response.success:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="FIDO2 authentication required to delete MFA factor",
+                )
+        else:
+            # Validated factor deletion path — OTP verification required.
+            # Use the verification OTP type (may differ from the factor being deleted)
+            await verify_otp_before_operation(
+                global_http_client=global_http_client,
+                user_access_token=user_access_token,
+                otp=deletion_request.otp,
+                trxn_id=deletion_request.trxnId,
+                otp_type=deletion_request.otpVerificationType,
+            )
 
         # Step 2: Check if user has multiple factors before allowing deletion
         # Check all factors (validated and unvalidated) to prevent deletion of last remaining factor
@@ -121,6 +143,7 @@ async def handle_otp_batch_deletion(
     global_http_client: AsyncClient,
     deletion_request: OtpBatchDeletionRequest,
     user_access_token: str,
+    request: Request | None = None,
 ):
     """Delete multiple OTP factors with a single OTP verification.
 
@@ -134,14 +157,35 @@ async def handle_otp_batch_deletion(
     )
     start_time = datetime.now()
 
-    # Verify OTP once for the entire batch
-    await verify_otp_before_operation(
-        global_http_client=global_http_client,
-        user_access_token=user_access_token,
-        otp=deletion_request.otp,
-        trxn_id=deletion_request.trxnId,
-        otp_type=deletion_request.otpVerificationType,
-    )
+    if deletion_request.assertionResult is not None:
+        if request is None:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Request context required for passkey verification",
+            )
+
+        assertion_response = await submit_assertion_result(
+            request=request,
+            http_client=global_http_client,
+            user_access_token=user_access_token,
+            request_body=deletion_request.assertionResult,
+            return_jwt=False,
+        )
+
+        if not assertion_response.success:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="FIDO2 authentication required to delete MFA factor",
+            )
+    else:
+        # Verify OTP once for the entire batch
+        await verify_otp_before_operation(
+            global_http_client=global_http_client,
+            user_access_token=user_access_token,
+            otp=deletion_request.otp,
+            trxn_id=deletion_request.trxnId,
+            otp_type=deletion_request.otpVerificationType,
+        )
 
     # Last-factor protection: ensure the user will retain at least one factor
     user_factors_response = await get_user_otp_factors(

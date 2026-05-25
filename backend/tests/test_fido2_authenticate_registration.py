@@ -8,7 +8,7 @@ Uses importlib to import the actual module for patching.
 import importlib
 import time
 import pytest
-from httpx import AsyncClient
+from httpx import AsyncClient, HTTPStatusError, Request, Response
 from unittest.mock import AsyncMock, MagicMock, patch
 from app.fido2.schemas import AssertionOptionsRequest, FIDO2AssertionResultRequest
 
@@ -183,6 +183,54 @@ class TestGetAssertionOptions:
         call_kwargs = mock_http_client.post.call_args[1]
         sent_body = call_kwargs["json"]
         assert sent_body["userVerification"] == "preferred"
+
+    @pytest.mark.asyncio
+    @patch.object(auth_module, "get_auth_request_headers")
+    @patch.object(auth_module, "get_user_profile_info")
+    @patch.object(auth_module, "get_rp_uuid_from_rp_id")
+    @patch.object(auth_module, "get_admin_token")
+    @patch.object(auth_module, "get_rp_id")
+    @patch.object(auth_module, "get_tenant_url")
+    async def test_honours_requested_user_verification(
+        self,
+        mock_get_tenant_url,
+        mock_get_rp_id,
+        mock_get_admin_token,
+        mock_get_rp_uuid_from_rp_id,
+        mock_get_user_profile_info,
+        mock_get_auth_request_headers,
+        mock_http_client,
+    ):
+        """Should pass through requested userVerification for sensitive flows."""
+        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
+        mock_get_rp_id.return_value = "example.com"
+        mock_get_admin_token.return_value = "admin-token"
+        mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
+        mock_get_user_profile_info.return_value = (
+            "user@example.com",
+            "Test User",
+            "user-id-456",
+        )
+        mock_get_auth_request_headers.return_value = {
+            "Authorization": "Bearer admin-token"
+        }
+
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"challenge": "abc123"}
+        mock_response.raise_for_status = MagicMock()
+        mock_http_client.post = AsyncMock(return_value=mock_response)
+
+        request_data = AssertionOptionsRequest(userVerification="required")
+        await get_assertion_options(
+            http_client=mock_http_client,
+            user_access_token="user-token",
+            request_data=request_data,
+        )
+
+        call_kwargs = mock_http_client.post.call_args[1]
+        sent_body = call_kwargs["json"]
+        assert sent_body["userVerification"] == "required"
 
     @pytest.mark.asyncio
     @patch.object(auth_module, "get_auth_request_headers")
@@ -680,6 +728,66 @@ class TestSubmitAssertionResult:
         assert result.data == expected_response
         assert result.data["status"] == "ok"
         assert result.data["verified"] is True
+
+    @pytest.mark.asyncio
+    @patch.object(auth_module, "logger")
+    @patch.object(auth_module, "get_auth_request_headers")
+    @patch.object(auth_module, "get_rp_uuid_from_rp_id")
+    @patch.object(auth_module, "get_admin_token")
+    @patch.object(auth_module, "get_rp_id")
+    @patch.object(auth_module, "get_tenant_url")
+    async def test_logs_upstream_error_details_on_assertion_failure(
+        self,
+        mock_get_tenant_url,
+        mock_get_rp_id,
+        mock_get_admin_token,
+        mock_get_rp_uuid_from_rp_id,
+        mock_get_auth_request_headers,
+        mock_logger,
+        mock_http_client,
+        mock_request,
+        mock_assertion_request,
+    ):
+        """Should log upstream response details when assertion/result returns an error."""
+        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
+        mock_get_rp_id.return_value = "example.com"
+        mock_get_admin_token.return_value = "admin-token"
+        mock_get_rp_uuid_from_rp_id.return_value = "rp-uuid-123"
+        mock_get_auth_request_headers.return_value = {
+            "Authorization": "Bearer user-token"
+        }
+
+        request = Request(
+            "POST",
+            "https://tenant.verify.ibm.com/v2.0/factors/fido2/relyingparties/rp-uuid-123/assertion/result",
+        )
+        response = Response(
+            400,
+            request=request,
+            json={
+                "messageId": "FID018E",
+                "messageDescription": "Assertion validation failed",
+                "details": [{"message": "Credential is not allowed"}],
+            },
+        )
+        mock_http_client.post = AsyncMock(return_value=response)
+
+        with pytest.raises(HTTPStatusError):
+            await submit_assertion_result(
+                request=mock_request,
+                http_client=mock_http_client,
+                user_access_token="user-token",
+                request_body=mock_assertion_request,
+                return_jwt=False,
+            )
+
+        logged_message = mock_logger.error.call_args[0][0]
+        assert "Upstream FIDO2 assertion result request failed" in logged_message
+        assert "status=400" in logged_message
+        assert "rp_uuid=rp-uuid-123" in logged_message
+        assert "credential_id=credential-id" in logged_message
+        assert "FID018E" in logged_message
+        assert "Credential is not allowed" in logged_message
 
 
 class TestExchangeFido2JwtForAccessToken:

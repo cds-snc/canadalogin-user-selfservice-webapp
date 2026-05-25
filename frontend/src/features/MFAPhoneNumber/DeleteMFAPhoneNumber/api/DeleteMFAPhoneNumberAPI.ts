@@ -12,6 +12,7 @@ interface DeleteMFAParams {
   otp?: string;
   trxnId?: string;
   otpVerificationType?: string;
+  assertionResult?: unknown;
 }
 
 interface DeleteMFABatchFactor {
@@ -21,9 +22,10 @@ interface DeleteMFABatchFactor {
 
 interface DeleteMFABatchParams {
   factors: DeleteMFABatchFactor[];
-  otp: string;
-  trxnId: string;
-  otpVerificationType: string;
+  otp?: string;
+  trxnId?: string;
+  otpVerificationType?: string;
+  assertionResult?: unknown;
 }
 
 export const deleteMFAPhoneNumberApi = {
@@ -34,18 +36,22 @@ export const deleteMFAPhoneNumberApi = {
     otp,
     trxnId,
     otpVerificationType,
+    assertionResult,
   }: DeleteMFAParams): Promise<unknown> => {
     try {
+      const data = {
+        id,
+        otpType,
+        ...(assertionResult ? { assertionResult } : {}),
+        ...(otp !== undefined ? { otp } : {}),
+        ...(trxnId !== undefined ? { trxnId } : {}),
+        ...(otpVerificationType !== undefined ? { otpVerificationType } : {}),
+      };
+
       const response = await axios.delete(
         `${config.apiUrl}${SUBMIT_END_POINTS.mfaDelete}`,
         {
-          data: {
-            id,
-            otpType,
-            otp,
-            trxnId,
-            otpVerificationType,
-          },
+          data,
         },
       );
       return response.data;
@@ -60,17 +66,21 @@ export const deleteMFAPhoneNumberApi = {
     otp,
     trxnId,
     otpVerificationType,
+    assertionResult,
   }: DeleteMFABatchParams): Promise<unknown> => {
     try {
+      const data = {
+        factors,
+        ...(assertionResult ? { assertionResult } : {}),
+        ...(otp !== undefined ? { otp } : {}),
+        ...(trxnId !== undefined ? { trxnId } : {}),
+        ...(otpVerificationType !== undefined ? { otpVerificationType } : {}),
+      };
+
       const response = await axios.delete(
         `${config.apiUrl}${SUBMIT_END_POINTS.mfaDeleteBatch}`,
         {
-          data: {
-            factors,
-            otp,
-            trxnId,
-            otpVerificationType,
-          },
+          data,
         },
       );
       return response.data;

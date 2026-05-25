@@ -23,6 +23,17 @@ describe("deleteMFAPhoneNumberApi", () => {
     vi.clearAllMocks();
   });
 
+  const mockAssertionResult = {
+    id: "credential-123",
+    rawId: "credential-123",
+    type: "public-key",
+    response: {
+      clientDataJSON: "client-data",
+      signature: "signature-data",
+      authenticatorData: "authenticator-data",
+    },
+  };
+
   describe("deleteMFA", () => {
     const mockFactorId = "factor-123";
     const mockOtpType = "sms";
@@ -352,6 +363,62 @@ describe("deleteMFAPhoneNumberApi", () => {
           otpType: undefined,
         },
       });
+    });
+
+    it("sends assertionResult when passkey authorization is used", async () => {
+      const mockResponseData = { success: true };
+
+      axios.delete.mockResolvedValue({
+        data: mockResponseData,
+      });
+
+      await deleteMFAPhoneNumberApi.deleteMFA({
+        id: mockFactorId,
+        otpType: mockOtpType,
+        assertionResult: mockAssertionResult,
+      });
+
+      expect(axios.delete).toHaveBeenCalledWith(
+        "http://localhost:8000/v1/otp/mfa/delete",
+        {
+          data: {
+            id: mockFactorId,
+            otpType: mockOtpType,
+            assertionResult: mockAssertionResult,
+          },
+        },
+      );
+    });
+  });
+
+  describe("deleteMFABatch", () => {
+    it("sends assertionResult for batch delete when passkey authorization is used", async () => {
+      const mockResponseData = { success: true };
+
+      axios.delete.mockResolvedValue({
+        data: mockResponseData,
+      });
+
+      await deleteMFAPhoneNumberApi.deleteMFABatch({
+        factors: [
+          { id: "factor-1", otpType: "sms" },
+          { id: "factor-2", otpType: "voice" },
+        ],
+        assertionResult: mockAssertionResult,
+      });
+
+      expect(axios.delete).toHaveBeenCalledWith(
+        "http://localhost:8000/v1/otp/mfa/delete/batch",
+        {
+          data: {
+            factors: [
+              { id: "factor-1", otpType: "sms" },
+              { id: "factor-2", otpType: "voice" },
+            ],
+            assertionResult: mockAssertionResult,
+          },
+        },
+      );
     });
   });
 });

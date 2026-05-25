@@ -12,6 +12,7 @@ import AddMFAPage from "../AddMFAPage";
 import { useUser } from "../../../../../components/Providers/useUser";
 import { useNavigateHelper } from "../../../../../hooks/useNavigate";
 import { useOtpOperations } from "../../../../../hooks/useOtpOperations";
+import { usePasskeyOperations } from "../../../../../hooks/usePasskeyOperations";
 import { usePasswordValidation } from "../../../../../hooks/usePasswordValidation";
 import { otpFactors } from "../../../../TransientOtp/api/otpFactors";
 import { addMFAPhoneNumberApi } from "../../api/AddMFAPhoneNumberAPI";
@@ -44,6 +45,7 @@ vi.mock("react-router", async () => {
   };
 });
 vi.mock("../../../../../hooks/useOtpOperations");
+vi.mock("../../../../../hooks/usePasskeyOperations");
 vi.mock("../../../../../hooks/usePasswordValidation");
 vi.mock("../../../../TransientOtp/api/otpFactors");
 vi.mock("../../api/AddMFAPhoneNumberAPI");
@@ -117,14 +119,44 @@ vi.mock("@gcds-core/components-react", () => ({
 
 // Mock child components
 vi.mock("../../../../TransientOtp/components/OtpSelection", () => ({
-  default: ({ onNext }) => (
+  default: ({ onNext, onSelectFIDO2 }) => (
     <div data-testid="otp-selection">
       <button onClick={onNext} data-testid="otp-selection-next">
         Next
       </button>
+      <button
+        onClick={() =>
+          onSelectFIDO2?.({
+            id: "passkey-42",
+            attributes: { nickname: "Work Laptop", credentialId: "cred-1" },
+          })
+        }
+        data-testid="otp-selection-fido2"
+      >
+        Use FIDO2
+      </button>
     </div>
   ),
 }));
+
+vi.mock(
+  "../../../../ManageFIDO2/components/VerifyFIDO2Passkey/VerifyFIDO2Passkey",
+  () => ({
+    default: ({ onCallback, onTryAnotherWayHandler }) => (
+      <div data-testid="verify-fido2-passkey">
+        <button data-testid="verify-fido2-next" onClick={() => onCallback()}>
+          Verify
+        </button>
+        <button
+          data-testid="verify-fido2-try-another"
+          onClick={() => onTryAnotherWayHandler?.()}
+        >
+          Try another way
+        </button>
+      </div>
+    ),
+  }),
+);
 
 vi.mock("../../../../TransientOtp/components/OtpVerification", () => ({
   default: ({ validateOtpCode, requestOtpCode, onBack }) => {
@@ -303,6 +335,11 @@ describe("AddMFAPage Unit Tests", () => {
       setOtpLoading: vi.fn(),
       setOtpSentResponse: vi.fn(),
       requestOtpCode: vi.fn().mockResolvedValue(true),
+    });
+
+    usePasskeyOperations.mockReturnValue({
+      fido2Data: [],
+      loading: false,
     });
 
     usePasswordValidation.mockImplementation(
@@ -966,6 +1003,85 @@ describe("AddMFAPage Unit Tests", () => {
   });
 
   describe("Step Navigation Functions", () => {
+    it("should show otp selection after password verification when a passkey exists", async () => {
+      useOtpOperations.mockReturnValue({
+        userPhoneFactors: [
+          { id: "factor1", type: "sms", destination: "+1234567890" },
+        ],
+        userSelectedMfaFactor: { type: "sms" },
+        userOtpValue: "",
+        otpSentResponse: { trxnId: "mock-trxn-id" },
+        otpLoading: false,
+        phoneFactorsMap: {},
+        handleChangeUserMfaSelection: vi.fn(),
+        handleSetUserOtpValue: vi.fn(),
+        setUserPhoneFactors: vi.fn(),
+        setUserSelectedMfaFactor: vi.fn(),
+        setOtpLoading: vi.fn(),
+        setOtpSentResponse: vi.fn(),
+        requestOtpCode: vi.fn().mockResolvedValue(true),
+      });
+      usePasskeyOperations.mockReturnValue({
+        fido2Data: [
+          { id: "passkey-42", attributes: { nickname: "Work Laptop" } },
+        ],
+        loading: false,
+      });
+
+      render(
+        <TestWrapper>
+          <AddMFAPage />
+        </TestWrapper>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("password-verification-next"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
+      });
+    });
+
+    it("should navigate to passkey verification and then add phone number", async () => {
+      usePasskeyOperations.mockReturnValue({
+        fido2Data: [
+          { id: "passkey-42", attributes: { nickname: "Work Laptop" } },
+        ],
+        loading: false,
+      });
+
+      render(
+        <TestWrapper>
+          <AddMFAPage />
+        </TestWrapper>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("password-verification-next"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("otp-selection-fido2"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("verify-fido2-passkey")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("verify-fido2-next"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
+      });
+    });
+
     it("should test onBack functions in steps", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,

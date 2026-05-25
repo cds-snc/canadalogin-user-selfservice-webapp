@@ -27,6 +27,9 @@ import { useFormTracking } from "../../../../hooks/useFormTracking";
 import { useWizardPageTracking } from "../../../../hooks/useWizardPageTracking";
 import { GA_FORM_EVENTS } from "../../../../utils/analyticsConstants";
 import { ADD_MFA_ANALYTICS } from "../../../../utils/analyticsConstants";
+import { usePasskeyOperations } from "../../../../hooks/usePasskeyOperations";
+import VerifyFIDO2Passkey from "../../../ManageFIDO2/components/VerifyFIDO2Passkey/VerifyFIDO2Passkey";
+import { Fido2Credential } from "../../../../types/hooks";
 
 interface PhoneFormData {
   phoneNumber: string;
@@ -41,6 +44,7 @@ type WizardStep =
   | "passwordVerification"
   | "otpSelection"
   | "otpValidation"
+  | "verifyFIDO2Passkey"
   | "addMFANumber"
   | "addMFAValidation"
   | "addSecondMFA";
@@ -49,6 +53,7 @@ const ADD_MFA_PAGE_BY_STEP: Record<WizardStep, string> = {
   passwordVerification: "AddPhoneNumberVerifyIdentity",
   otpSelection: "AddPhoneNumberOtpSelection",
   otpValidation: "AddPhoneNumberOtpValidation",
+  verifyFIDO2Passkey: "AddPhoneNumberPasskeyVerification",
   addMFANumber: "AddPhoneNumberEnterNumber",
   addMFAValidation: "AddPhoneNumberVerifyNumber",
   addSecondMFA: "AddPhoneNumberSecondMethod",
@@ -67,6 +72,8 @@ export default function AddMFAPage() {
     "passwordVerification",
   );
   const [enrollmentLoading, setEnrollmentLoading] = useState(false);
+  const [selected2FAPasskey, setSelected2FAPasskey] =
+    useState<Fido2Credential | null>(null);
 
   const { trackEvent } = useFormTracking({
     formId: ADD_MFA_ANALYTICS.FLOW_ID,
@@ -102,11 +109,17 @@ export default function AddMFAPage() {
       trackEvent({
         event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
         step:
-          userPhoneFactors && userPhoneFactors.length === 1
+          userPhoneFactors &&
+          userPhoneFactors.length === 1 &&
+          fido2Data.length === 0
             ? ADD_MFA_ANALYTICS.STEPS.OTP_VALIDATION
             : ADD_MFA_ANALYTICS.STEPS.OTP_SELECTION,
       });
-      if (userPhoneFactors && userPhoneFactors.length === 1) {
+      if (
+        userPhoneFactors &&
+        userPhoneFactors.length === 1 &&
+        fido2Data.length === 0
+      ) {
         const success = await requestOtpCode();
         if (success) {
           setWizardStep("otpValidation");
@@ -151,6 +164,10 @@ export default function AddMFAPage() {
     fallbackNavigationPath: backToSecuritySettingsPage,
     mapType: MAP_TYPES.lastFourDigits,
     mfaTrxnId: phoneFormData?.trxnId,
+  });
+
+  const { fido2Data, loading: passkeyLoading } = usePasskeyOperations({
+    setErrorCode,
   });
 
   const errorMessage = getErrorMessage(language, errorCode);
@@ -535,6 +552,7 @@ export default function AddMFAPage() {
     ),
     otpSelection: (
       <OtpSelection
+        fido2Data={fido2Data}
         userPhoneFactors={userPhoneFactors}
         onChangeUserSelectedMfaFactor={handleChangeUserMfaSelection}
         onNext={() => {
@@ -548,6 +566,10 @@ export default function AddMFAPage() {
               });
             }
           })();
+        }}
+        onSelectFIDO2={(passkey) => {
+          setSelected2FAPasskey(passkey);
+          setWizardStep("verifyFIDO2Passkey");
         }}
         parentPage={PAGES.addMFAPage}
         onCancel={async () => navigate(backToManage2FAVerificationsPage)}
@@ -582,7 +604,9 @@ export default function AddMFAPage() {
         }}
         onBack={() => {
           const prevStep =
-            userPhoneFactors && userPhoneFactors.length === 1
+            userPhoneFactors &&
+            userPhoneFactors.length === 1 &&
+            fido2Data.length === 0
               ? "passwordVerification"
               : "otpSelection";
           trackEvent({
@@ -594,9 +618,26 @@ export default function AddMFAPage() {
         setErrorCode={setErrorCode}
         errorMessage={otpDisplayError}
         onCancel={async () => navigate(backToManage2FAVerificationsPage)}
-        showTryAnotherWay={userPhoneFactors && userPhoneFactors.length > 1}
+        showTryAnotherWay={
+          (userPhoneFactors && userPhoneFactors.length > 1) ||
+          fido2Data.length > 0
+        }
         isMaxAttemptsReached={isMaxAttemptsReached}
         resetAttempts={resetAttempts}
+      />
+    ),
+    verifyFIDO2Passkey: (
+      <VerifyFIDO2Passkey
+        errorMessage={errorMessage}
+        setErrorCode={setErrorCode}
+        selectedPasskey={selected2FAPasskey}
+        onCallback={() => {
+          setWizardStep("addMFANumber");
+        }}
+        onTryAnotherWayHandler={() => {
+          setSelected2FAPasskey(null);
+          setWizardStep("otpSelection");
+        }}
       />
     ),
     addMFANumber: (
@@ -725,7 +766,7 @@ export default function AddMFAPage() {
     ),
   };
 
-  return enrollmentLoading || validatePasswordLoading ? (
+  return enrollmentLoading || validatePasswordLoading || passkeyLoading ? (
     <Loader text={t("OtpSelection.loading")} />
   ) : (
     <StepContent

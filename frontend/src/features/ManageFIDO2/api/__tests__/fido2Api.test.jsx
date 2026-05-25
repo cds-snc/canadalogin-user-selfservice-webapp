@@ -477,6 +477,17 @@ describe("fido2Api", () => {
       expect(handleApiError).not.toHaveBeenCalled();
     });
 
+    it("passes through assertion options request fields when provided", async () => {
+      axios.post.mockResolvedValue({ data: {} });
+
+      await fido2Api.getAssertionOptions({ userVerification: "required" });
+
+      expect(axios.post).toHaveBeenCalledWith(
+        "http://localhost:8000/v1/fido2/assertion/options",
+        { userVerification: "required" },
+      );
+    });
+
     it("sends an empty object as the request body (userId from session)", async () => {
       axios.post.mockResolvedValue({ data: {} });
 

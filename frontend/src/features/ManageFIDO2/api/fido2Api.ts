@@ -3,6 +3,10 @@ import config from "../../../config";
 import { handleApiError } from "../../../utils/apiErrorHandler";
 import type { ApiErrorLike } from "../../../types/utils";
 
+interface AssertionOptionsRequest {
+  userVerification?: "required" | "preferred" | "discouraged";
+}
+
 axios.defaults.withCredentials = true;
 
 export const fido2Api = {
@@ -113,11 +117,11 @@ export const fido2Api = {
   /**
    * Get assertion options for FIDO2 authentication
    */
-  getAssertionOptions: async () => {
+  getAssertionOptions: async (requestData: AssertionOptionsRequest = {}) => {
     try {
       const response = await axios.post(
         `${config.apiUrl}/v1/fido2/assertion/options`,
-        {}, // Empty body - userId is retrieved from session on backend
+        requestData,
       );
       return response.data as unknown;
     } catch (error) {

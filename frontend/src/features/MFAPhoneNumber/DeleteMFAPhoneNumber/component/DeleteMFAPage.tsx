@@ -19,11 +19,13 @@ import PasswordVerification from "../../../TransientOtp/components/PasswordVerif
 import StepContent from "../../../../components/Wizard/StepContent";
 import { usePasswordValidation } from "../../../../hooks/usePasswordValidation";
 import { useOtpOperations } from "../../../../hooks/useOtpOperations";
-import { OtpFactor } from "../../../../types/hooks";
+import { usePasskeyOperations } from "../../../../hooks/usePasskeyOperations";
+import { Fido2Credential, OtpFactor } from "../../../../types/hooks";
 import { useFormTracking } from "../../../../hooks/useFormTracking";
 import { useWizardPageTracking } from "../../../../hooks/useWizardPageTracking";
 import { GA_FORM_EVENTS } from "../../../../utils/analyticsConstants";
 import { DELETE_MFA_ANALYTICS } from "../../../../utils/analyticsConstants";
+import VerifyFIDO2Passkey from "../../../ManageFIDO2/components/VerifyFIDO2Passkey/VerifyFIDO2Passkey";
 
 interface DeletePhoneFormData {
   phoneNumber: string;
@@ -36,12 +38,14 @@ type WizardStep =
   | "passwordVerification"
   | "otpSelection"
   | "otpValidation"
+  | "verifyFIDO2Passkey"
   | "deleteMFAPhoneNumberConfirm";
 
 const DELETE_MFA_PAGE_BY_STEP: Record<WizardStep, string> = {
   passwordVerification: "DeletePhoneNumberVerifyIdentity",
   otpSelection: "DeletePhoneNumberOtpSelection",
   otpValidation: "DeletePhoneNumberOtpValidation",
+  verifyFIDO2Passkey: "DeletePhoneNumberPasskeyVerification",
   deleteMFAPhoneNumberConfirm: "DeletePhoneNumberConfirm",
 };
 
@@ -65,6 +69,9 @@ export default function DeleteMFAPage() {
   const [wizardStep, setWizardStep] = useState<WizardStep>(
     "passwordVerification",
   );
+  const [selected2FAPasskey, setSelected2FAPasskey] =
+    useState<Fido2Credential | null>(null);
+  const [assertionResult, setAssertionResult] = useState<unknown>(null);
   const { userProfile } = state;
   const { id, userName } = userProfile ?? {};
   const navigate = useNavigate();
@@ -90,11 +97,17 @@ export default function DeleteMFAPage() {
       trackEvent({
         event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
         step:
-          userPhoneFactors && userPhoneFactors.length === 1
+          userPhoneFactors &&
+          userPhoneFactors.length === 1 &&
+          fido2Data.length === 0
             ? DELETE_MFA_ANALYTICS.STEPS.OTP_VALIDATION
             : DELETE_MFA_ANALYTICS.STEPS.OTP_SELECTION,
       });
-      if (userPhoneFactors && userPhoneFactors.length === 1) {
+      if (
+        userPhoneFactors &&
+        userPhoneFactors.length === 1 &&
+        fido2Data.length === 0
+      ) {
         const success = await requestOtpCode();
         if (success) {
           setWizardStep("otpValidation");
@@ -139,6 +152,10 @@ export default function DeleteMFAPage() {
     fallbackNavigationPath: backToSecuritySettingsPage,
   });
 
+  const { fido2Data, loading: passkeyLoading } = usePasskeyOperations({
+    setErrorCode,
+  });
+
   const [phoneFormData, setPhoneFormData] = useState<DeletePhoneFormData>({
     phoneNumber: "",
     otp: "",
@@ -155,14 +172,17 @@ export default function DeleteMFAPage() {
 
   const deleteMFA = async () => {
     try {
-      const verificationOtpType = userSelectedMfaFactor
-        ? serverMapping[
-            userSelectedMfaFactor.type as keyof typeof serverMapping
-          ]
-        : serverMapping[
-            phoneFormData.mfaFactorsToDelete[0]
-              ?.type as keyof typeof serverMapping
-          ];
+      const verificationOtpType =
+        assertionResult || !phoneFormData.mfaFactorsToDelete.length
+          ? undefined
+          : userSelectedMfaFactor
+            ? serverMapping[
+                userSelectedMfaFactor.type as keyof typeof serverMapping
+              ]
+            : serverMapping[
+                phoneFormData.mfaFactorsToDelete[0]
+                  ?.type as keyof typeof serverMapping
+              ];
 
       if (phoneFormData.mfaFactorsToDelete.length > 1) {
         // Multiple factors tied to the same phone number — verify OTP once and
@@ -173,9 +193,13 @@ export default function DeleteMFAPage() {
             id: f.id,
             otpType: serverMapping[f.type as keyof typeof serverMapping],
           })),
-          otp: userOtpValue,
-          trxnId: otpSentResponse?.trxnId ?? "",
-          otpVerificationType: verificationOtpType,
+          ...(assertionResult
+            ? { assertionResult }
+            : {
+                otp: userOtpValue,
+                trxnId: otpSentResponse?.trxnId ?? "",
+                otpVerificationType: verificationOtpType,
+              }),
         });
       } else {
         const [firstFactor] = phoneFormData.mfaFactorsToDelete;
@@ -183,9 +207,13 @@ export default function DeleteMFAPage() {
           id: firstFactor.id,
           otpType:
             serverMapping[firstFactor.type as keyof typeof serverMapping],
-          otp: userOtpValue,
-          trxnId: otpSentResponse?.trxnId,
-          otpVerificationType: verificationOtpType,
+          ...(assertionResult
+            ? { assertionResult }
+            : {
+                otp: userOtpValue,
+                trxnId: otpSentResponse?.trxnId,
+                otpVerificationType: verificationOtpType,
+              }),
         });
       }
 
@@ -293,6 +321,7 @@ export default function DeleteMFAPage() {
     ),
     otpSelection: (
       <OtpSelection
+        fido2Data={fido2Data}
         userPhoneFactors={userPhoneFactors}
         onChangeUserSelectedMfaFactor={handleChangeUserMfaSelection}
         onNext={() => {
@@ -306,6 +335,11 @@ export default function DeleteMFAPage() {
               });
             }
           })();
+        }}
+        onSelectFIDO2={(passkey) => {
+          setSelected2FAPasskey(passkey);
+          setAssertionResult(null);
+          setWizardStep("verifyFIDO2Passkey");
         }}
         parentPage={PAGES.deleteMFAPage}
         onCancel={async () => navigate(backToManage2FAVerificationsPage)}
@@ -326,7 +360,9 @@ export default function DeleteMFAPage() {
         validateOtpCode={validateOtpCode}
         onBack={() => {
           const prevStep =
-            userPhoneFactors && userPhoneFactors.length === 1
+            userPhoneFactors &&
+            userPhoneFactors.length === 1 &&
+            fido2Data.length === 0
               ? "passwordVerification"
               : "otpSelection";
           trackEvent({
@@ -338,7 +374,10 @@ export default function DeleteMFAPage() {
         setErrorCode={setErrorCode}
         errorMessage={otpDisplayError}
         onCancel={async () => navigate(backToManage2FAVerificationsPage)}
-        showTryAnotherWay={userPhoneFactors && userPhoneFactors.length > 1}
+        showTryAnotherWay={
+          (userPhoneFactors && userPhoneFactors.length > 1) ||
+          fido2Data.length > 0
+        }
         isMaxAttemptsReached={isMaxAttemptsReached}
         resetAttempts={resetAttempts}
       />
@@ -360,9 +399,25 @@ export default function DeleteMFAPage() {
         phoneFormData={phoneFormData}
       />
     ),
+    verifyFIDO2Passkey: (
+      <VerifyFIDO2Passkey
+        errorMessage={errorMessage}
+        setErrorCode={setErrorCode}
+        setAssertionResult={setAssertionResult}
+        selectedPasskey={selected2FAPasskey}
+        onCallback={() => {
+          setWizardStep("deleteMFAPhoneNumberConfirm");
+        }}
+        onTryAnotherWayHandler={() => {
+          setSelected2FAPasskey(null);
+          setAssertionResult(null);
+          setWizardStep("otpSelection");
+        }}
+      />
+    ),
   };
 
-  return localLoading || validatePasswordLoading ? (
+  return localLoading || validatePasswordLoading || passkeyLoading ? (
     <Loader text={t("OtpSelection.loading")} />
   ) : (
     <StepContent

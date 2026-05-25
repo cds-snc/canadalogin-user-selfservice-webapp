@@ -5,7 +5,7 @@ Service for authenticating with FIDO2 passkeys
 import json
 import logging
 import time
-from httpx import AsyncClient
+from httpx import AsyncClient, HTTPStatusError
 from fastapi import Request
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.schemas import ResponseModel
@@ -23,6 +23,35 @@ import base64
 from app.config import get_configuration
 
 logger = logging.getLogger(__name__)
+
+
+def _format_upstream_assertion_error(response) -> str:
+    """Best-effort extraction of useful upstream error details for logging."""
+    try:
+        payload = response.json()
+    except Exception:
+        payload = None
+
+    if isinstance(payload, dict):
+        details = payload.get("details")
+        if isinstance(details, list):
+            details = "; ".join(
+                str(item.get("message", item)) if isinstance(item, dict) else str(item)
+                for item in details
+            )
+
+        return (
+            f"messageId={payload.get('messageId', 'N/A')} "
+            f"messageDescription={payload.get('messageDescription', 'N/A')} "
+            f"details={details if details else 'N/A'} "
+            f"response_json={json.dumps(payload, default=str)}"
+        )
+
+    response_text = getattr(response, "text", "")
+    if response_text:
+        return f"response_text={response_text}"
+
+    return "response_body=N/A"
 
 
 def _is_token_expired(token_data: dict, token_timestamp: float) -> bool:
@@ -426,7 +455,7 @@ async def get_assertion_options(
 
     # Set proper defaults for FIDO2 assertion
     request_body = {
-        "userVerification": "preferred",
+        "userVerification": request_data.userVerification or "preferred",
     }
 
     tenant_url = get_tenant_url()
@@ -513,7 +542,21 @@ async def submit_assertion_result(
 
     headers = get_auth_request_headers(auth_token, json_content_type=True)
     http_response = await http_client.post(url, headers=headers, json=body_to_send)
-    http_response.raise_for_status()
+    try:
+        http_response.raise_for_status()
+    except HTTPStatusError:
+        logger.error(
+            "Upstream FIDO2 assertion result request failed "
+            f"status={http_response.status_code} "
+            f"url={url} "
+            f"rp_uuid={rp_uuid} "
+            f"return_jwt={return_jwt} "
+            f"credential_id={body_to_send.get('id', 'N/A')} "
+            f"credential_type={body_to_send.get('type', 'N/A')} "
+            f"response_keys={sorted(body_to_send.get('response', {}).keys())} "
+            f"{_format_upstream_assertion_error(http_response)}"
+        )
+        raise
 
     response_data = http_response.json()
     logger.info("Assertion result submitted successfully")

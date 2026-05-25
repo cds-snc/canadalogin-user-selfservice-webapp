@@ -20,20 +20,26 @@ import type { Fido2Credential } from "../../../../types/hooks";
 
 interface VerifyFIDO2PasskeyProps {
   setErrorCode: (code: string) => void;
+  setAssertionResult?: (assertionResult: unknown) => void;
   onCallback?: () => Promise<void> | void;
   submitAttestationResult?: boolean;
   errorMessage: string;
   selectedPasskey?: Fido2Credential | null;
   onTryAnotherWayHandler?: () => void;
+  assertionOptionsRequest?: {
+    userVerification?: "required" | "preferred" | "discouraged";
+  };
 }
 
 export default function VerifyFIDO2Passkey({
   setErrorCode,
+  setAssertionResult,
   onCallback,
   submitAttestationResult = false,
   errorMessage,
   selectedPasskey,
   onTryAnotherWayHandler,
+  assertionOptionsRequest,
 }: VerifyFIDO2PasskeyProps) {
   const { language } = useParams();
   const navigate = useNavigate();
@@ -61,7 +67,9 @@ export default function VerifyFIDO2Passkey({
 
     try {
       // Step 1: Get assertion options from server
-      const optionsResponse = (await fido2Api.getAssertionOptions()) as
+      const optionsResponse = (await fido2Api.getAssertionOptions(
+        assertionOptionsRequest,
+      )) as
         | {
             success?: boolean;
             data?: Record<string, unknown> & {
@@ -93,6 +101,7 @@ export default function VerifyFIDO2Passkey({
 
       // Step 2: Use WebAuthn API to authenticate with the passkey
       const assertionResult = await authenticateFIDO2Credential(assertionData);
+      setAssertionResult?.(assertionResult);
 
       // Step 3 (optional): Submit the assertion result now if needed for immediate verification
       if (submitAttestationResult) {
