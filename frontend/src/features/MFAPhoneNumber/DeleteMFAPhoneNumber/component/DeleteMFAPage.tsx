@@ -405,7 +405,6 @@ export default function DeleteMFAPage() {
         setErrorCode={setErrorCode}
         setAssertionResult={setAssertionResult}
         selectedPasskey={selected2FAPasskey}
-        assertionOptionsRequest={{ userVerification: "required" }}
         onCallback={() => {
           setWizardStep("deleteMFAPhoneNumberConfirm");
         }}

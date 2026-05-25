@@ -631,7 +631,6 @@ export default function AddMFAPage() {
         errorMessage={errorMessage}
         setErrorCode={setErrorCode}
         selectedPasskey={selected2FAPasskey}
-        assertionOptionsRequest={{ userVerification: "required" }}
         onCallback={() => {
           setWizardStep("addMFANumber");
         }}
