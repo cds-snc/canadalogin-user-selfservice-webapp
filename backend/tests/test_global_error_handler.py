@@ -2979,7 +2979,9 @@ class TestErrorHandlingVerifyPassword:
 
         mock_response = Mock(spec=Response)
         mock_response.status_code = 401
-        mock_response.json.side_effect = ValueError("not JSON")
+        mock_response.json.return_value = {
+            "error": "Unauthorized"
+        }  # valid JSON, no messageId key
 
         # Configure the mock to raise HTTPStatusError when raise_for_status is called
         http_error = HTTPStatusError(

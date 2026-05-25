@@ -5,6 +5,7 @@ from fastapi import HTTPException, status, Request
 from httpx import AsyncClient, HTTPStatusError, Response
 
 from app.utils.access_token import get_admin_token, get_auth_request_headers
+from app.utils.global_error_handlers import extract_response_body
 from app.password.schemas import (
     UserPassword,
     VerifiedUserPassword,
@@ -133,16 +134,13 @@ async def dispatch_verify_password(
             status.HTTP_400_BAD_REQUEST,
             status.HTTP_401_UNAUTHORIZED,
         ]:
-            try:
-                body = e.response.json()
-                message_id = body.get("messageId")
-                if message_id:
-                    raise HTTPException(
-                        status_code=status.HTTP_400_BAD_REQUEST,
-                        detail=message_id,
-                    )
-            except (ValueError, AttributeError):
-                pass
+            body = extract_response_body(e.response)
+            message_id = body.get("messageId")
+            if message_id:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=message_id,
+                )
         raise
 
     logger.info("Verified successfully with IBM Verify")

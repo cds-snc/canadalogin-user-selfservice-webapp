@@ -11,6 +11,7 @@ import base64
 import time
 from httpx import AsyncClient, HTTPStatusError
 from fastapi import HTTPException, Request, status
+from app.utils.global_error_handlers import extract_response_body
 from app.utils.schemas import ResponseModel
 from app.utils.access_token import get_admin_token
 from app.password.schemas import UserPassword, VerifiedUserPassword
@@ -86,16 +87,13 @@ async def verify_password_with_jwt(
             status.HTTP_400_BAD_REQUEST,
             status.HTTP_401_UNAUTHORIZED,
         ]:
-            try:
-                body = e.response.json()
-                message_id = body.get("messageId")
-                if message_id:
-                    raise HTTPException(
-                        status_code=status.HTTP_400_BAD_REQUEST,
-                        detail=message_id,
-                    )
-            except (ValueError, AttributeError):
-                pass
+            body = extract_response_body(e.response)
+            message_id = body.get("messageId")
+            if message_id:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=message_id,
+                )
         raise
 
     response_data = response.json()
