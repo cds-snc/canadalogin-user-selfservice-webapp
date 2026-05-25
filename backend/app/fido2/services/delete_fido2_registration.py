@@ -8,6 +8,9 @@ from fastapi import Request
 from app.utils.access_token import get_auth_request_headers
 from app.constants.verify_endpoints import VerifyAPIEndpoint
 from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
+from app.users.services.mfa_delete_guard import (
+    assert_remaining_mfa_factor_after_deletion,
+)
 from app.fido2.schemas import (
     DeleteRegistrationRequest,
 )
@@ -81,6 +84,12 @@ async def delete_registration(
     # Verify ownership
     await verify_registration_ownership(
         http_client, user_access_token, registration_id, user_id
+    )
+
+    await assert_remaining_mfa_factor_after_deletion(
+        http_client=http_client,
+        user_access_token=user_access_token,
+        fido2_registration_ids_to_delete={registration_id},
     )
 
     # Step 3: Delete the registration

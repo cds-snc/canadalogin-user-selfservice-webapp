@@ -9,6 +9,9 @@ from app.otp.schemas import (
     OtpType,
 )
 from app.users.services.get_my_profile import get_my_profile
+from app.users.services.mfa_delete_guard import (
+    assert_remaining_mfa_factor_after_deletion,
+)
 from app.users.services.otp_factors import get_user_otp_factors
 from app.utils.access_token import get_auth_request_headers
 from app.utils.schemas import ResponseModel
@@ -104,17 +107,11 @@ async def handle_otp_deletion(
                 otp_type=deletion_request.otpVerificationType,
             )
 
-        # Step 2: Check if user has multiple factors before allowing deletion
-        # Check all factors (validated and unvalidated) to prevent deletion of last remaining factor
-        user_factors_response = await get_user_otp_factors(
-            global_http_client, user_access_token, validated=None
+        await assert_remaining_mfa_factor_after_deletion(
+            http_client=global_http_client,
+            user_access_token=user_access_token,
+            otp_factor_ids_to_delete={deletion_request.id},
         )
-        if not user_factors_response.success or len(user_factors_response.data) <= 1:
-            logger.warning(f"User {user_id} cannot delete last remaining MFA factor")
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail="Cannot delete last remaining MFA factor",
-            )
 
     # Dispatch the deletion to IBM Verify
     http_client_response = await dispatch_otp_deletion(
@@ -187,21 +184,11 @@ async def handle_otp_batch_deletion(
             otp_type=deletion_request.otpVerificationType,
         )
 
-    # Last-factor protection: ensure the user will retain at least one factor
-    user_factors_response = await get_user_otp_factors(
-        global_http_client, user_access_token, validated=None
+    await assert_remaining_mfa_factor_after_deletion(
+        http_client=global_http_client,
+        user_access_token=user_access_token,
+        otp_factor_ids_to_delete={factor.id for factor in deletion_request.factors},
     )
-    if not user_factors_response.success:
-        raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
-            detail="Unable to retrieve user MFA factors",
-        )
-    total_factors = len(user_factors_response.data)
-    if total_factors - len(deletion_request.factors) < 1:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Cannot delete last remaining MFA factor",
-        )
 
     # Delete each factor
     deleted_factors = []
