@@ -1,5 +1,34 @@
 # Changelog
 
+## [1.21.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.20.0...v1.21.0) (2026-05-26)
+
+
+### Features
+
+* add email otp verification for change password ([#1481](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1481)) ([db66838](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/db668384470a5445c96edaa643f76daa5b58198b))
+* add passkey as option 2fa when add/delete OTP ([#1476](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1476)) ([77571e0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/77571e0a20bcbbea1e9eaf03dac0eba2a15549df))
+* **frontend:** implement online provincial ID verification page ([#1485](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1485)) ([8fcb1a0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/8fcb1a04276929314c28cf2792df45324f3463fa))
+* **frontend:** remove cancel button from passkey nickname screen ([#1484](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1484)) ([24300f8](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/24300f8e6d46d169146e2da79e6162d7a1c024ea))
+* **identity-verification:** start identity proofing ([#1468](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1468)) ([6e81585](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/6e8158520ca15cd7c0ed648794445aa18b3c0ac0))
+* prevent delete last 2fa otp/passkey ([#1491](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1491)) ([38e6072](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/38e607292e3603a6044f2cd6c0402efbaefbaea1))
+
+
+### Bug Fixes
+
+* improve error handling for password verification  ([#1489](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1489)) ([070e4aa](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/070e4aae7a4c4f5eb9c80547d79505c9ce1eff00))
+
+
+### Miscellaneous Chores
+
+* add LICENSE and SECURITY.md ([#1490](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1490)) ([48e9660](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/48e9660c7521ddee93da1c1834841fb2854ea415))
+* bump staging deployed version to 1.20.0 ([#1471](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1471)) ([b59073a](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/b59073a50a38c8c2d28949f4b22732381cfdb987))
+* update feature flag to enable passkeys in test env ([#1494](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1494)) ([f4fc8b8](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/f4fc8b877c7c4529713bd90b9bd9045ff9b10beb))
+
+
+### Continuous Integration
+
+* bump prod version 1.20.0 ([#1475](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/issues/1475)) ([ad6d328](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/commit/ad6d328e8d5763254690d4d6da30c87f68af9ecf))
+
 ## [1.20.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.19.0...v1.20.0) (2026-05-20)
 
 
