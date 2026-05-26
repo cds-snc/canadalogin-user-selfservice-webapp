@@ -8,7 +8,7 @@ import {
 import { useLocation, useNavigate, useParams } from "react-router";
 import { MAP_TYPES, useOtpOperations } from "../../../hooks/useOtpOperations";
 import { usePasskeyOperations } from "../../../hooks/usePasskeyOperations";
-import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
+import { NON_PROD_ENVIRONMENT, PAGES } from "../../../utils/constants";
 import { useTranslation } from "react-i18next";
 import { path } from "../../../utils/routeHelpers";
 import Loader from "../../Layout/Loading";
@@ -93,7 +93,7 @@ export default function Manage2FAVerifications() {
     loading: passkeyLoading,
     refetch: refetchPasskeys,
   } = usePasskeyOperations({
-    enabled: DEV_ONLY_FEATURE,
+    enabled: NON_PROD_ENVIRONMENT,
     setErrorCode: () => {},
   });
 
@@ -162,7 +162,7 @@ export default function Manage2FAVerifications() {
         </GcdsButton>
       </GcdsGrid>
 
-      {DEV_ONLY_FEATURE && (
+      {NON_PROD_ENVIRONMENT && (
         <GcdsGrid {...sectionCardProps}>
           <SectionHeader
             icon={<FIDOPasskeyIcon width="34" height="34" />}

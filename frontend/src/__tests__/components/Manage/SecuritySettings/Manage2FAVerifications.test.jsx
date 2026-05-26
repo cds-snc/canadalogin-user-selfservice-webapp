@@ -84,7 +84,7 @@ vi.mock("../../../../utils/constants", () => ({
   },
   SERVICES: [],
   // Enable so the FIDO2 fetch useEffect runs and setLoading(false) is called
-  DEV_ONLY_FEATURE: true,
+  NON_PROD_ENVIRONMENT: true,
 }));
 
 vi.mock("../../../../utils/routeHelpers", () => ({
@@ -478,8 +478,8 @@ describe("Manage2FAVerifications — additional coverage", () => {
     expect(queryByTestId("notice-factory")).not.toBeInTheDocument();
   });
 
-  it("FIDO2 section is rendered when DEV_ONLY_FEATURE is true", () => {
-    // DEV_ONLY_FEATURE is mocked as true in constants mock
+  it("FIDO2 section is rendered when NON_PROD_ENVIRONMENT is true", () => {
+    // NON_PROD_ENVIRONMENT is mocked as true in constants mock
     const { getByText } = render(<Manage2FAVerifications />);
     // The add-fido2-button is inside the FIDO2 section
     expect(getByText("+ Add a phone number")).toBeInTheDocument(); // OTP section always present
@@ -494,10 +494,10 @@ describe("Manage2FAVerifications — additional coverage", () => {
     expect(mockNavigate).toHaveBeenCalledOnce();
   });
 
-  it("add-fido2 button is rendered inside the FIDO2 section when DEV_ONLY_FEATURE is true", async () => {
+  it("add-fido2 button is rendered inside the FIDO2 section when NON_PROD_ENVIRONMENT is true", async () => {
     const { getByText } = render(<Manage2FAVerifications />);
     // The pageContent["12"] key (add passkey text) + the add-fido2-button
-    // DEV_ONLY_FEATURE is true in our constant mock so the section renders
+    // NON_PROD_ENVIRONMENT is true in our constant mock so the section renders
     await waitFor(() => {
       // The section card with FIDO2PasskeyList mock (returns null) should be present
       // We just verify the component renders without crashing and add-mfa-button is there
