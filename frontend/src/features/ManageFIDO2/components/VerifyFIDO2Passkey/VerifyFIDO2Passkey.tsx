@@ -29,6 +29,7 @@ interface VerifyFIDO2PasskeyProps {
   assertionOptionsRequest?: {
     userVerification?: "required" | "preferred" | "discouraged";
   };
+  onError?: (errorCode: string) => void;
 }
 
 export default function VerifyFIDO2Passkey({
@@ -40,6 +41,7 @@ export default function VerifyFIDO2Passkey({
   selectedPasskey,
   onTryAnotherWayHandler,
   assertionOptionsRequest,
+  onError,
 }: VerifyFIDO2PasskeyProps) {
   const { language } = useParams();
   const navigate = useNavigate();
@@ -111,6 +113,7 @@ export default function VerifyFIDO2Passkey({
     } catch (err) {
       console.error("error_fido2_verification", err);
       setErrorCode("error_fido2_verification");
+      onError?.("error_fido2_verification");
     } finally {
       setLocalLoading(false);
       hasTriggeredRef.current = false;

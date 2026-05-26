@@ -71,6 +71,14 @@ vi.mock("../../../../../utils/errorUtils", () => ({
   getErrorMessage: () => "",
 }));
 
+vi.mock("../../../../../hooks/useFormTracking", () => ({
+  useFormTracking: () => ({ trackEvent: vi.fn() }),
+}));
+
+vi.mock("../../../../../hooks/useWizardPageTracking", () => ({
+  useWizardPageTracking: () => {},
+}));
+
 // ─── Layout primitives ─────────────────────────────────────────────────────
 
 vi.mock("../../../../../components/Layout/Loading", () => ({

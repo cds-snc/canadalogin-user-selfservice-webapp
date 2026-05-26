@@ -19,6 +19,8 @@ const WIZARD_TRACKED_PAGE_IDS = new Set<string>([
   PAGES.password,
   PAGES.addMFAPage,
   PAGES.deleteMFAPage,
+  PAGES.addFIDO2PasskeyPage,
+  PAGES.deleteFIDO2PasskeyPage,
 ]);
 
 const DisplayReleaseTag = () => {
