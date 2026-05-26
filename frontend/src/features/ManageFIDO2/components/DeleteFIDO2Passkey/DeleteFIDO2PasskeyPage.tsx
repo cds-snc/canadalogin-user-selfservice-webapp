@@ -34,6 +34,15 @@ interface DeleteFIDO2PasskeyPageProps {
   step?: string;
 }
 
+const DELETE_PASSKEY_PAGE_BY_STEP: Record<string, string> = {
+  passwordVerification: "DeletePasskeyVerifyIdentity",
+  otpSelection: "DeletePasskeyOtpSelection",
+  otpValidation: "DeletePasskeyOtpValidation",
+  verifyFIDO2Passkey: "DeletePasskeyVerifyPasskey",
+  deleteFIDO2PasskeyConfirmation: "DeletePasskeyConfirm",
+  deleteFIDO2PasskeySuccess: "DeletePasskeySuccess",
+};
+
 export default function DeleteFIDO2PasskeyPage({
   step,
 }: DeleteFIDO2PasskeyPageProps) {
@@ -70,14 +79,6 @@ export default function DeleteFIDO2PasskeyPage({
     formId: DELETE_PASSKEY_ANALYTICS.FLOW_ID,
   });
 
-  const DELETE_PASSKEY_PAGE_BY_STEP: Record<string, string> = {
-    passwordVerification: "DeletePasskeyVerifyIdentity",
-    otpSelection: "DeletePasskeyOtpSelection",
-    otpValidation: "DeletePasskeyOtpValidation",
-    verifyFIDO2Passkey: "DeletePasskeyVerifyPasskey",
-    deleteFIDO2PasskeyConfirmation: "DeletePasskeyConfirm",
-    deleteFIDO2PasskeySuccess: "DeletePasskeySuccess",
-  };
   useWizardPageTracking(wizardStep, DELETE_PASSKEY_PAGE_BY_STEP);
 
   // Use the OTP operations hook
@@ -139,20 +140,16 @@ export default function DeleteFIDO2PasskeyPage({
   );
 
   // Create tracked password validation wrapper
-  const handleValidatePassword = async (password: string) => {
+  async function handleValidatePassword(password: string) {
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_START,
       step: DELETE_PASSKEY_ANALYTICS.STEPS.VERIFY_PASSWORD,
     });
     await validatePassword(password);
-  };
+  }
 
   // Create tracked OTP request wrapper
-  const handleRequestOtpCode = async (): Promise<boolean> => {
-    trackEvent({
-      event: GA_FORM_EVENTS.FORM_STEP_START,
-      step: DELETE_PASSKEY_ANALYTICS.STEPS.OTP_VALIDATION,
-    });
+  async function handleRequestOtpCode(): Promise<boolean> {
     const success = await requestOtpCode();
     if (success) {
       trackEvent({
@@ -161,7 +158,7 @@ export default function DeleteFIDO2PasskeyPage({
       });
     }
     return success;
-  };
+  }
 
   const validateOtpCode = async (_otpValue: string): Promise<void> => {
     trackEvent({
@@ -302,10 +299,6 @@ export default function DeleteFIDO2PasskeyPage({
         validateOtpCode={(otpValue) => {
           trackEvent({
             event: GA_FORM_EVENTS.FORM_SUBMIT,
-            step: DELETE_PASSKEY_ANALYTICS.STEPS.OTP_VALIDATION,
-          });
-          trackEvent({
-            event: GA_FORM_EVENTS.FORM_STEP_START,
             step: DELETE_PASSKEY_ANALYTICS.STEPS.OTP_VALIDATION,
           });
           return validateOtpCode(otpValue);

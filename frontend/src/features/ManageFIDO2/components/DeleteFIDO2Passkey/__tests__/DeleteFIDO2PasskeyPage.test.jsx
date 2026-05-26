@@ -20,6 +20,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import "@testing-library/jest-dom/vitest";
 import DeleteFIDO2PasskeyPage from "../DeleteFIDO2PasskeyPage";
 
+const mockTrackEvent = vi.fn();
+
 // ─── Router ────────────────────────────────────────────────────────────────
 
 const mockNavigate = vi.fn();
@@ -81,7 +83,7 @@ vi.mock("../../../../../utils/errorUtils", () => ({
 }));
 
 vi.mock("../../../../../hooks/useFormTracking", () => ({
-  useFormTracking: () => ({ trackEvent: vi.fn() }),
+  useFormTracking: () => ({ trackEvent: mockTrackEvent }),
 }));
 
 vi.mock("../../../../../hooks/useWizardPageTracking", () => ({
@@ -420,6 +422,16 @@ describe("DeleteFIDO2PasskeyPage", () => {
     expect(mockValidatePassword).toHaveBeenCalledWith("pass");
   });
 
+  it("emits form_step_start for verify_password when password validation begins", async () => {
+    renderPage();
+    await userEvent.click(screen.getByTestId("password-submit"));
+
+    expect(mockTrackEvent).toHaveBeenCalledWith({
+      event: "form_step_start",
+      step: "verify_password",
+    });
+  });
+
   it("calls navigate on cancel from passwordVerification", async () => {
     renderPage();
     await userEvent.click(screen.getByTestId("password-cancel"));
@@ -485,6 +497,26 @@ describe("DeleteFIDO2PasskeyPage", () => {
         getStep("step-deleteFIDO2PasskeyConfirmation"),
       ).toBeInTheDocument(),
     );
+  });
+
+  it("does not emit form_step_start at otp_validation when OTP validate transitions to confirm step", async () => {
+    renderPage({ step: "otpValidation" });
+    await userEvent.click(screen.getByTestId("otp-validate"));
+
+    await waitFor(() =>
+      expect(
+        getStep("step-deleteFIDO2PasskeyConfirmation"),
+      ).toBeInTheDocument(),
+    );
+
+    expect(mockTrackEvent).toHaveBeenCalledWith({
+      event: "form_submit",
+      step: "otp_validation",
+    });
+    expect(mockTrackEvent).not.toHaveBeenCalledWith({
+      event: "form_step_start",
+      step: "otp_validation",
+    });
   });
 
   it("navigates back to otpValidation when delete fails with an invalid OTP error code", async () => {

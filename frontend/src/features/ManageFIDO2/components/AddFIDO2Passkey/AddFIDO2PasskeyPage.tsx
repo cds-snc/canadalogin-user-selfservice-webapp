@@ -40,6 +40,15 @@ interface AddFIDO2PasskeyPageProps {
   step?: string;
 }
 
+const ADD_PASSKEY_PAGE_BY_STEP: Record<string, string> = {
+  passwordVerification: "AddPasskeyVerifyIdentity",
+  otpSelection: "AddPasskeyOtpSelection",
+  otpValidation: "AddPasskeyOtpValidation",
+  verifyFIDO2Passkey: "AddPasskeyVerifyPasskey",
+  addFIDO2Passkey: "AddPasskeyRegister",
+  addFIDO2PasskeyNickname: "AddPasskeySetNickname",
+};
+
 export default function AddFIDO2PasskeyPage({
   step,
 }: AddFIDO2PasskeyPageProps) {
@@ -77,14 +86,6 @@ export default function AddFIDO2PasskeyPage({
     formId: ADD_PASSKEY_ANALYTICS.FLOW_ID,
   });
 
-  const ADD_PASSKEY_PAGE_BY_STEP: Record<string, string> = {
-    passwordVerification: "AddPasskeyVerifyIdentity",
-    otpSelection: "AddPasskeyOtpSelection",
-    otpValidation: "AddPasskeyOtpValidation",
-    verifyFIDO2Passkey: "AddPasskeyVerifyPasskey",
-    addFIDO2Passkey: "AddPasskeyRegister",
-    addFIDO2PasskeyNickname: "AddPasskeySetNickname",
-  };
   useWizardPageTracking(wizardStep, ADD_PASSKEY_PAGE_BY_STEP);
 
   // Use the OTP operations hook
@@ -141,20 +142,16 @@ export default function AddFIDO2PasskeyPage({
   );
 
   // Create tracked password validation wrapper
-  const handleValidatePassword = async (password: string) => {
+  async function handleValidatePassword(password: string) {
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_START,
       step: ADD_PASSKEY_ANALYTICS.STEPS.VERIFY_PASSWORD,
     });
     await validatePassword(password);
-  };
+  }
 
   // Create tracked OTP request wrapper
-  const handleRequestOtpCode = async (): Promise<boolean> => {
-    trackEvent({
-      event: GA_FORM_EVENTS.FORM_STEP_START,
-      step: ADD_PASSKEY_ANALYTICS.STEPS.OTP_VALIDATION,
-    });
+  async function handleRequestOtpCode(): Promise<boolean> {
     const success = await requestOtpCode();
     if (success) {
       trackEvent({
@@ -163,7 +160,7 @@ export default function AddFIDO2PasskeyPage({
       });
     }
     return success;
-  };
+  }
 
   const { fido2Data, loading: passkeyLoading } = usePasskeyOperations({
     setErrorCode,
@@ -293,13 +290,12 @@ export default function AddFIDO2PasskeyPage({
       const errCode =
         err instanceof DOMException && err.name === "InvalidStateError"
           ? "error_duplicate_passkey"
-          : ((err as { data?: { message?: string } })?.data?.message ??
-            "error_submit_attestation");
+          : ((err as { data?: { message?: string } })?.data?.message ?? "");
       setErrorCode(errCode);
       trackEvent({
         event: GA_FORM_EVENTS.FORM_STEP_END,
         step: ADD_PASSKEY_ANALYTICS.STEPS.ADD_NICKNAME,
-        error: errCode,
+        error: errCode || "error_submit_attestation",
       });
       setRegistrationLoading(false);
     }
@@ -330,19 +326,15 @@ export default function AddFIDO2PasskeyPage({
       }
     } catch (err) {
       const errData = err as { response?: { data?: { message?: string } } };
-      if (
-        errData &&
-        errData.response &&
-        errData.response.data &&
-        errData.response.data.message
-      ) {
-        setErrorCode(errData.response.data.message);
-        trackEvent({
-          event: GA_FORM_EVENTS.FORM_STEP_END,
-          step: ADD_PASSKEY_ANALYTICS.STEPS.OTP_VALIDATION,
-          error: errData.response.data.message,
-        });
+      const errorMessage = errData?.response?.data?.message;
+      if (errorMessage) {
+        setErrorCode(errorMessage);
       }
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_END,
+        step: ADD_PASSKEY_ANALYTICS.STEPS.OTP_VALIDATION,
+        error: errorMessage || "error_otp_validation_failed",
+      });
     }
   };
 
