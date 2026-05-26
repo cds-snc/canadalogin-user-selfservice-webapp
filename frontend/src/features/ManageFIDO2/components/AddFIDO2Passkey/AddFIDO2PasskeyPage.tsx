@@ -114,7 +114,7 @@ export default function AddFIDO2PasskeyPage({
         userPhoneFactors.length === 1 &&
         (!fido2Data || fido2Data.length === 0)
       ) {
-        const success = await handleRequestOtpCode();
+        const success = await requestOtpCode();
         if (success) {
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
@@ -147,11 +147,6 @@ export default function AddFIDO2PasskeyPage({
       step: ADD_PASSKEY_ANALYTICS.STEPS.VERIFY_PASSWORD,
     });
     await validatePassword(password);
-  }
-
-  // Create tracked OTP request wrapper
-  async function handleRequestOtpCode(): Promise<boolean> {
-    return requestOtpCode();
   }
 
   const { fido2Data, loading: passkeyLoading } = usePasskeyOperations({
@@ -356,7 +351,7 @@ export default function AddFIDO2PasskeyPage({
         onChangeUserSelectedMfaFactor={handleChangeUserMfaSelection}
         onNext={() => {
           void (async () => {
-            const success = await handleRequestOtpCode();
+            const success = await requestOtpCode();
             if (success) {
               trackEvent({
                 event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
@@ -383,7 +378,7 @@ export default function AddFIDO2PasskeyPage({
         userSelectedMfaFactor={userSelectedMfaFactor!}
         userOtpValue={userOtpValue}
         setUserOtpValue={handleSetUserOtpValue}
-        requestOtpCode={handleRequestOtpCode}
+        requestOtpCode={requestOtpCode}
         validateOtpCode={(otpValue) => {
           trackEvent({
             event: GA_FORM_EVENTS.FORM_SUBMIT,
