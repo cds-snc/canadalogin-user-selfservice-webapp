@@ -74,6 +74,7 @@ export default function DeleteFIDO2PasskeyPage({
     userName: userProfile!.userName,
     setErrorCode,
     fallbackNavigationPath: backToManage2FAVerificationsPage,
+    allowEmptyFactors: true,
   });
 
   const { fido2Data, loading: passkeyLoading } = usePasskeyOperations({

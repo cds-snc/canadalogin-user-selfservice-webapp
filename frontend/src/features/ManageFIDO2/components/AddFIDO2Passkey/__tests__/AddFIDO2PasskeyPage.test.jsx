@@ -306,6 +306,16 @@ describe("AddFIDO2PasskeyPage", () => {
     expect(getStep("step-passwordVerification")).toBeInTheDocument();
   });
 
+  it("allows passkey-only users to stay on add passkey page", () => {
+    renderPage();
+
+    expect(mockUseOtpOperations).toHaveBeenCalledWith(
+      expect.objectContaining({
+        allowEmptyFactors: true,
+      }),
+    );
+  });
+
   it("renders the step provided via the step prop", () => {
     renderPage({ step: "otpSelection" });
     expect(getStep("step-otpSelection")).toBeInTheDocument();

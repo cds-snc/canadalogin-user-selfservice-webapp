@@ -21,8 +21,6 @@ from app.auth.services.auth_user_session import (
 )
 
 from app.otp.schemas import OtpType
-from app.password.schemas import OtpType as PasswordOtpType
-from app.users.schemas import UserPhoneAuthFactorsResponse, UserPhoneOTP
 
 delete_mfa_otp_module = importlib.import_module("app.otp.services.delete_mfa_otp")
 enroll_mfa_otp_module = importlib.import_module("app.otp.services.enroll_mfa_otp")
@@ -187,12 +185,12 @@ class TestErrorHandlingDeleteMfaOtp:
     @pytest.mark.asyncio
     @patch.object(delete_mfa_otp_module, "get_my_profile")
     @patch.object(delete_mfa_otp_module, "verify_otp_before_operation")
-    @patch.object(delete_mfa_otp_module, "get_user_otp_factors")
+    @patch.object(delete_mfa_otp_module, "assert_remaining_mfa_factor_after_deletion")
     @patch.object(delete_mfa_otp_module, "dispatch_otp_deletion")
     async def test_handle_otp_deletion_exception(
         self,
         mock_dispatch_otp_deletion,
-        mock_get_user_otp_factors,
+        mock_assert_remaining_mfa_factor_after_deletion,
         mock_verify_otp_before_operation,
         mock_get_my_profile,
         mock_test_client,
@@ -200,20 +198,7 @@ class TestErrorHandlingDeleteMfaOtp:
     ):
         mock_get_my_profile.return_value = MagicMock()
         mock_verify_otp_before_operation.return_value = None
-        mock_get_user_otp_factors.return_value = UserPhoneAuthFactorsResponse(
-            success=True,
-            message="User factors retrieved successfully",
-            data=[
-                UserPhoneOTP(
-                    id="factor1", type=PasswordOtpType.SMSOTP, destination="5551234567"
-                ),
-                UserPhoneOTP(
-                    id="factor2",
-                    type=PasswordOtpType.VOICEOTP,
-                    destination="5551234567",
-                ),
-            ],
-        )
+        mock_assert_remaining_mfa_factor_after_deletion.return_value = None
         mock_dispatch_otp_deletion.side_effect = Exception("Network error")
 
         deletion_request = {
@@ -235,32 +220,17 @@ class TestErrorHandlingDeleteMfaOtp:
     @pytest.mark.asyncio
     @patch.object(delete_mfa_otp_module, "get_my_profile")
     @patch.object(delete_mfa_otp_module, "verify_otp_before_operation")
-    @patch.object(delete_mfa_otp_module, "get_user_otp_factors")
+    @patch.object(delete_mfa_otp_module, "assert_remaining_mfa_factor_after_deletion")
     async def test_dispatch_otp_deletion_unsupported_type(
         self,
-        mock_get_user_otp_factors,
+        mock_assert_remaining_mfa_factor_after_deletion,
         mock_verify_otp_before_operation,
         mock_get_my_profile,
         mock_test_client,
     ):
         mock_get_my_profile.return_value = MagicMock()
         mock_verify_otp_before_operation.return_value = None
-        mock_get_user_otp_factors.return_value = (
-            mock_get_user_otp_factors.return_value
-        ) = UserPhoneAuthFactorsResponse(
-            success=True,
-            message="User factors retrieved successfully",
-            data=[
-                UserPhoneOTP(
-                    id="factor1", type=PasswordOtpType.SMSOTP, destination="5551234567"
-                ),
-                UserPhoneOTP(
-                    id="factor2",
-                    type=PasswordOtpType.VOICEOTP,
-                    destination="5551234567",
-                ),
-            ],
-        )
+        mock_assert_remaining_mfa_factor_after_deletion.return_value = None
 
         deletion_request = {
             "id": "factor123",
@@ -282,34 +252,21 @@ class TestErrorHandlingDeleteMfaOtp:
     @pytest.mark.asyncio
     @patch.object(delete_mfa_otp_module, "get_my_profile")
     @patch.object(delete_mfa_otp_module, "verify_otp_before_operation")
-    @patch.object(delete_mfa_otp_module, "get_user_otp_factors")
+    @patch.object(delete_mfa_otp_module, "assert_remaining_mfa_factor_after_deletion")
     @patch.object(delete_mfa_otp_module, "get_auth_request_headers")
     @patch.object(delete_mfa_otp_module, "get_configuration")
     async def test_dispatch_otp_deletion_http_error(
         self,
         mock_get_configuration,
         mock_get_auth_request_headers,
-        mock_get_user_otp_factors,
+        mock_assert_remaining_mfa_factor_after_deletion,
         mock_verify_otp_before_operation,
         mock_get_my_profile,
         mock_test_client,
     ):
         mock_get_my_profile.return_value = MagicMock()
         mock_verify_otp_before_operation.return_value = None
-        mock_get_user_otp_factors.return_value = UserPhoneAuthFactorsResponse(
-            success=True,
-            message="User factors retrieved successfully",
-            data=[
-                UserPhoneOTP(
-                    id="factor1", type=PasswordOtpType.SMSOTP, destination="5551234567"
-                ),
-                UserPhoneOTP(
-                    id="factor2",
-                    type=PasswordOtpType.VOICEOTP,
-                    destination="5551234567",
-                ),
-            ],
-        )
+        mock_assert_remaining_mfa_factor_after_deletion.return_value = None
         mock_get_auth_request_headers.side_effect = (
             lambda token, _content_type, _language=None, **kwargs: {
                 "Authorization": f"Bearer {token}",
@@ -359,32 +316,19 @@ class TestErrorHandlingDeleteMfaOtp:
     @pytest.mark.asyncio
     @patch.object(delete_mfa_otp_module, "get_my_profile")
     @patch.object(delete_mfa_otp_module, "verify_otp_before_operation")
-    @patch.object(delete_mfa_otp_module, "get_user_otp_factors")
+    @patch.object(delete_mfa_otp_module, "assert_remaining_mfa_factor_after_deletion")
     @patch.object(delete_mfa_otp_module, "dispatch_otp_deletion")
     async def test_handle_otp_deletion_unexpected_status(
         self,
         mock_dispatch_otp_deletion,
-        mock_get_user_otp_factors,
+        mock_assert_remaining_mfa_factor_after_deletion,
         mock_verify_otp_before_operation,
         mock_get_my_profile,
         mock_test_client,
     ):
         mock_get_my_profile.return_value = MagicMock()
         mock_verify_otp_before_operation.return_value = None
-        mock_get_user_otp_factors.return_value = UserPhoneAuthFactorsResponse(
-            success=True,
-            message="User factors retrieved successfully",
-            data=[
-                UserPhoneOTP(
-                    id="factor1", type=PasswordOtpType.SMSOTP, destination="5551234567"
-                ),
-                UserPhoneOTP(
-                    id="factor2",
-                    type=PasswordOtpType.VOICEOTP,
-                    destination="5551234567",
-                ),
-            ],
-        )
+        mock_assert_remaining_mfa_factor_after_deletion.return_value = None
 
         def mock_dispatch_otp_deletion_return_value(
             client, request, user_token, language=None
@@ -418,14 +362,14 @@ class TestErrorHandlingDeleteMfaOtp:
     @pytest.mark.asyncio
     @patch.object(delete_mfa_otp_module, "get_my_profile")
     @patch.object(delete_mfa_otp_module, "verify_otp_before_operation")
-    @patch.object(delete_mfa_otp_module, "get_user_otp_factors")
+    @patch.object(delete_mfa_otp_module, "assert_remaining_mfa_factor_after_deletion")
     @patch.object(delete_mfa_otp_module, "get_auth_request_headers")
     @patch.object(delete_mfa_otp_module, "get_configuration")
     async def test_dispatch_otp_deletion_generic_exception(
         self,
         mock_get_configuration,
         mock_get_auth_request_headers,
-        mock_get_user_otp_factors,
+        mock_assert_remaining_mfa_factor_after_deletion,
         mock_verify_otp_before_operation,
         mock_get_my_profile,
         mock_test_client,
@@ -433,20 +377,7 @@ class TestErrorHandlingDeleteMfaOtp:
     ):
         mock_get_my_profile.return_value = MagicMock()
         mock_verify_otp_before_operation.return_value = None
-        mock_get_user_otp_factors.return_value = UserPhoneAuthFactorsResponse(
-            success=True,
-            message="User factors retrieved successfully",
-            data=[
-                UserPhoneOTP(
-                    id="factor1", type=PasswordOtpType.SMSOTP, destination="5551234567"
-                ),
-                UserPhoneOTP(
-                    id="factor2",
-                    type=PasswordOtpType.VOICEOTP,
-                    destination="5551234567",
-                ),
-            ],
-        )
+        mock_assert_remaining_mfa_factor_after_deletion.return_value = None
         mock_get_auth_request_headers.side_effect = (
             lambda token, _content_type, _language=None, **kwargs: {
                 "Authorization": f"Bearer {token}",
@@ -1325,6 +1256,9 @@ class TestErrorHandlingFido2DeleteRegistration:
     @patch.object(delete_fido2_registration_module, "dispatch_get_my_profile_from_ibm")
     @patch.object(delete_fido2_registration_module, "submit_assertion_result")
     @patch.object(delete_fido2_registration_module, "get_auth_request_headers")
+    @patch.object(
+        delete_fido2_registration_module, "assert_remaining_mfa_factor_after_deletion"
+    )
     @patch.object(delete_fido2_registration_module, "verify_registration_ownership")
     @patch.object(delete_fido2_registration_module, "get_user_profile_info")
     @patch.object(delete_fido2_registration_module, "get_tenant_url")
@@ -1333,6 +1267,7 @@ class TestErrorHandlingFido2DeleteRegistration:
         mock_get_tenant_url,
         mock_get_user_profile_info,
         mock_verify_registration_ownership,
+        mock_assert_remaining_mfa_factor_after_deletion,
         mock_get_auth_request_headers,
         mock_submit_assertion_result,
         mock_dispatch_get_my_profile_from_ibm,
@@ -1353,6 +1288,7 @@ class TestErrorHandlingFido2DeleteRegistration:
         mock_get_auth_request_headers.return_value = {
             "Authorization": "Bearer admin-token-xyz"
         }
+        mock_assert_remaining_mfa_factor_after_deletion.return_value = None
         mock_profile = MagicMock()
         mock_profile.preferredLanguage = "en"
         mock_dispatch_get_my_profile_from_ibm.return_value = mock_profile
@@ -1432,6 +1368,9 @@ class TestErrorHandlingFido2DeleteRegistration:
     @patch.object(delete_fido2_registration_module, "dispatch_get_my_profile_from_ibm")
     @patch.object(delete_fido2_registration_module, "submit_assertion_result")
     @patch.object(delete_fido2_registration_module, "get_auth_request_headers")
+    @patch.object(
+        delete_fido2_registration_module, "assert_remaining_mfa_factor_after_deletion"
+    )
     @patch.object(delete_fido2_registration_module, "verify_registration_ownership")
     @patch.object(delete_fido2_registration_module, "get_user_profile_info")
     @patch.object(delete_fido2_registration_module, "get_tenant_url")
@@ -1440,6 +1379,7 @@ class TestErrorHandlingFido2DeleteRegistration:
         mock_get_tenant_url,
         mock_get_user_profile_info,
         mock_verify_registration_ownership,
+        mock_assert_remaining_mfa_factor_after_deletion,
         mock_get_auth_request_headers,
         mock_submit_assertion_result,
         mock_dispatch_get_my_profile_from_ibm,
@@ -1461,6 +1401,7 @@ class TestErrorHandlingFido2DeleteRegistration:
         mock_get_auth_request_headers.return_value = {
             "Authorization": "Bearer admin-token-xyz"
         }
+        mock_assert_remaining_mfa_factor_after_deletion.return_value = None
         mock_profile = MagicMock()
         mock_profile.preferredLanguage = "en"
         mock_dispatch_get_my_profile_from_ibm.return_value = mock_profile

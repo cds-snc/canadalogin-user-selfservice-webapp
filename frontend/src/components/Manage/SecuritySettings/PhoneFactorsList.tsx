@@ -1,4 +1,8 @@
-import { GcdsContainer, GcdsLink, GcdsText } from "@gcds-core/components-react";
+import {
+  GcdsButton,
+  GcdsContainer,
+  GcdsText,
+} from "@gcds-core/components-react";
 import { useNavigate, useParams } from "react-router";
 import { PAGES } from "../../../utils/constants";
 import { useTranslation } from "react-i18next";
@@ -7,14 +11,12 @@ import type { OtpFactorReference } from "../../../types/hooks";
 
 interface PhoneFactorsListProps {
   userPhoneFactorsMap: Record<string, OtpFactorReference[]>;
+  totalFactorCount?: number;
 }
-
-type GcdsNavigationEvent = CustomEvent<string> & {
-  preventDefault: () => void;
-};
 
 export default function PhoneFactorsList({
   userPhoneFactorsMap,
+  totalFactorCount,
 }: PhoneFactorsListProps) {
   const { language } = useParams();
   const navigate = useNavigate();
@@ -29,6 +31,11 @@ export default function PhoneFactorsList({
     availableFactorsUIContentMap[factor] || factor;
 
   return Object.entries(userPhoneFactorsMap).map(([phoneNumber, factors]) => {
+    const canDeletePhoneNumber =
+      totalFactorCount === undefined
+        ? Object.keys(userPhoneFactorsMap).length > 1
+        : totalFactorCount - factors.length >= 1;
+
     const availableFactorsComponent = factors.map((factor, index) => {
       return (
         <li key={`${factor.id}-${index}`}>
@@ -44,12 +51,10 @@ export default function PhoneFactorsList({
         </GcdsText>
         <GcdsText>{t("Manage2FAVerifications.codesSentBy")}</GcdsText>
         <ul>{availableFactorsComponent}</ul>
-        {Object.keys(userPhoneFactorsMap).length > 1 && (
-          <GcdsLink
-            href={path(PAGES.deleteMFAPage, { language })}
-            size="regular"
-            onGcdsClick={(event: GcdsNavigationEvent) => {
-              event.preventDefault();
+        {canDeletePhoneNumber && (
+          <GcdsButton
+            buttonRole="secondary"
+            onGcdsClick={() => {
               navigate(path(PAGES.deleteMFAPage, { language }), {
                 state: {
                   phoneNumber,
@@ -60,7 +65,7 @@ export default function PhoneFactorsList({
             }}
           >
             {t("Manage2FAVerifications.deleteButton")}
-          </GcdsLink>
+          </GcdsButton>
         )}
         <div className="separator" />
       </GcdsContainer>

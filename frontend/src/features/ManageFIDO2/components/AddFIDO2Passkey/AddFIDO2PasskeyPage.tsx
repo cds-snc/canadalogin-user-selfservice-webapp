@@ -81,6 +81,7 @@ export default function AddFIDO2PasskeyPage({
     userName,
     setErrorCode,
     fallbackNavigationPath: backToSecuritySettingsPage,
+    allowEmptyFactors: true,
   });
 
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(

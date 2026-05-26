@@ -28,6 +28,16 @@ verify_otp_import_path = "app.otp.services.delete_mfa_otp.verify_otp_before_oper
 submit_assertion_import_path = "app.otp.services.delete_mfa_otp.submit_assertion_result"
 
 
+@pytest.fixture(autouse=True)
+def mock_delete_guard(monkeypatch):
+    mock_guard = AsyncMock()
+    monkeypatch.setattr(
+        "app.otp.services.delete_mfa_otp.assert_remaining_mfa_factor_after_deletion",
+        mock_guard,
+    )
+    return mock_guard
+
+
 def create_mock_user_factors(num_factors=2):
     """Helper function to create mock user factors response"""
     factors = []
@@ -74,7 +84,7 @@ def create_assertion_result():
 
 
 @pytest.mark.asyncio
-async def test_handle_otp_deletion_sms_success(monkeypatch):
+async def test_handle_otp_deletion_sms_success(monkeypatch, mock_delete_guard):
     """Test successful SMS OTP factor deletion"""
 
     # Mock verify_otp_before_operation to succeed
@@ -146,6 +156,11 @@ async def test_handle_otp_deletion_sms_success(monkeypatch):
         assert result.data["factorId"] == "factor123"
         assert result.data["otpType"] == "sms"
         assert "deleted successfully" in result.message
+        mock_delete_guard.assert_awaited_once_with(
+            http_client=client,
+            user_access_token="fake-token",
+            otp_factor_ids_to_delete={"factor123"},
+        )
 
 
 @pytest.mark.asyncio
@@ -226,7 +241,9 @@ async def test_handle_otp_deletion_voice_success(monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_handle_otp_deletion_last_factor_protection(monkeypatch):
+async def test_handle_otp_deletion_last_factor_protection(
+    monkeypatch, mock_delete_guard
+):
     """Test OTP deletion when user has only one factor (should fail)"""
 
     # Mock my_profile to return a valid user profile
@@ -274,6 +291,10 @@ async def test_handle_otp_deletion_last_factor_protection(monkeypatch):
     monkeypatch.setattr(
         "app.otp.services.delete_mfa_otp.get_user_otp_factors",
         mock_get_user_otp_factors,
+    )
+    mock_delete_guard.side_effect = HTTPException(
+        status_code=status.HTTP_409_CONFLICT,
+        detail="Cannot delete last remaining MFA factor",
     )
 
     deletion_request = create_deletion_request()
@@ -637,7 +658,7 @@ def create_batch_deletion_request(
 
 
 @pytest.mark.asyncio
-async def test_handle_otp_batch_deletion_success(monkeypatch):
+async def test_handle_otp_batch_deletion_success(monkeypatch, mock_delete_guard):
     """Test successful batch deletion of multiple OTP factors"""
 
     async def mock_verify_otp(
@@ -676,10 +697,17 @@ async def test_handle_otp_batch_deletion_success(monkeypatch):
     assert result.data["deletedFactors"][0]["factorId"] == "factor1"
     assert result.data["deletedFactors"][1]["factorId"] == "factor2"
     assert "2 MFA factor(s) deleted" in result.message
+    mock_delete_guard.assert_awaited_once_with(
+        http_client=client,
+        user_access_token="fake-token",
+        otp_factor_ids_to_delete={"factor1", "factor2"},
+    )
 
 
 @pytest.mark.asyncio
-async def test_handle_otp_batch_deletion_last_factor_protection(monkeypatch):
+async def test_handle_otp_batch_deletion_last_factor_protection(
+    monkeypatch, mock_delete_guard
+):
     """Test that batch deletion is prevented when it would remove the last factor"""
 
     async def mock_verify_otp(
@@ -695,6 +723,10 @@ async def test_handle_otp_batch_deletion_last_factor_protection(monkeypatch):
     monkeypatch.setattr(
         "app.otp.services.delete_mfa_otp.get_user_otp_factors",
         mock_get_user_otp_factors,
+    )
+    mock_delete_guard.side_effect = HTTPException(
+        status_code=status.HTTP_409_CONFLICT,
+        detail="Cannot delete last remaining MFA factor",
     )
 
     batch_request = create_batch_deletion_request(

@@ -35,6 +35,7 @@ export const useOtpOperations = ({
   userName,
   setErrorCode,
   fallbackNavigationPath,
+  allowEmptyFactors = false,
   mapType = null,
   mfaTrxnId = "",
 }: UseOtpOperationsOptions): UseOtpOperationsReturn => {
@@ -230,6 +231,16 @@ export const useOtpOperations = ({
         }
 
         return { phoneFactors, phoneFactorsMap: factorsMap };
+      }
+
+      if (allowEmptyFactors) {
+        setUserPhoneFactors([]);
+        userSelectedMfaFactorRef.current = null;
+        setUserSelectedMfaFactor(null);
+        if (mapType) {
+          setPhoneFactorsMap({});
+        }
+        return { phoneFactors: [], phoneFactorsMap: {} };
       }
 
       if (fallbackNavigationPath) {

@@ -14,7 +14,6 @@ from app.fido2.services.get_fido2_registrations import (
     get_user_fido2_registrations,
 )
 from app.fido2.services.get_registration_details import get_registration_details
-from app.fido2.services.delete_fido2_registration import delete_registration
 from app.fido2.services.update_fido2_registration import update_registration
 from app.fido2.services.add_fido2_registration import (
     get_attestation_options,
@@ -24,7 +23,6 @@ from app.fido2.services.add_fido2_registration import (
 __all__ = [
     "get_user_fido2_registrations",
     "get_registration_details",
-    "delete_registration",
     "update_registration",
     "get_attestation_options",
     "submit_attestation_result",

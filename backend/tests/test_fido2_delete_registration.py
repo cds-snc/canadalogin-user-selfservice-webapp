@@ -7,6 +7,7 @@ Uses importlib to import the actual module for patching.
 
 import importlib
 import pytest
+from fastapi import HTTPException, status
 from httpx import AsyncClient
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -19,6 +20,16 @@ delete_registration = delete_module.delete_registration
 
 class TestDeleteRegistration:
     """Tests for delete_registration function"""
+
+    @pytest.fixture(autouse=True)
+    def mock_delete_guard(self):
+        """Mock the shared MFA deletion guard for service-level tests."""
+        with patch.object(
+            delete_module,
+            "assert_remaining_mfa_factor_after_deletion",
+            new_callable=AsyncMock,
+        ) as mock_guard:
+            yield mock_guard
 
     @pytest.fixture
     def mock_request(self):
@@ -376,3 +387,47 @@ class TestDeleteRegistration:
         assert result.success is True
         assert result.message == "FIDO2 registration deleted successfully"
         assert result.data is None
+
+    @pytest.mark.asyncio
+    @patch.object(delete_module, "submit_assertion_result")
+    @patch.object(delete_module, "verify_registration_ownership")
+    @patch.object(delete_module, "get_user_profile_info")
+    @patch.object(delete_module, "get_tenant_url")
+    async def test_blocks_deletion_of_last_remaining_mfa_factor(
+        self,
+        mock_get_tenant_url,
+        mock_get_user_profile_info,
+        mock_verify_registration_ownership,
+        mock_submit_assertion_result,
+        mock_delete_guard,
+        mock_http_client,
+        mock_request_data,
+        mock_request,
+    ):
+        """Should prevent deleting the final enabled MFA factor when no OTP factors remain."""
+        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
+        mock_get_user_profile_info.return_value = (
+            "user@example.com",
+            "Test User",
+            "user-456",
+        )
+        mock_verify_registration_ownership.return_value = None
+
+        mock_assertion_response = MagicMock()
+        mock_assertion_response.success = True
+        mock_submit_assertion_result.return_value = mock_assertion_response
+        mock_delete_guard.side_effect = HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Cannot delete last remaining MFA factor",
+        )
+
+        with pytest.raises(HTTPException) as exc_info:
+            await delete_registration(
+                request=mock_request,
+                http_client=mock_http_client,
+                user_access_token="user-token-abc",
+                request_data=mock_request_data,
+            )
+
+        assert exc_info.value.status_code == status.HTTP_409_CONFLICT
+        assert exc_info.value.detail == "Cannot delete last remaining MFA factor"

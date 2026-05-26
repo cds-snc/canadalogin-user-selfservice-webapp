@@ -84,6 +84,7 @@ export default function Manage2FAVerifications() {
       userName: state.userProfile?.userName,
       setErrorCode: () => {},
       fallbackNavigationPath: backToSecuritySettingsPage,
+      allowEmptyFactors: true,
       mapType: MAP_TYPES.fullPhoneNumber,
     });
 
@@ -100,6 +101,12 @@ export default function Manage2FAVerifications() {
     string,
     OtpFactorReference[]
   >;
+  const totalPhoneFactorCount = Object.values(fullPhoneFactorsMap).reduce(
+    (count, factors) => count + factors.length,
+    0,
+  );
+  const totalPasskeyCount = userFIDO2CredentialsData.length;
+  const totalFactorCount = totalPhoneFactorCount + totalPasskeyCount;
 
   return localLoading || passkeyLoading ? (
     <Loader text={t("Manage2FAVerifications.loading")} />
@@ -140,7 +147,10 @@ export default function Manage2FAVerifications() {
           }
           title={t("Manage2FAVerifications.phonesHeading")}
         />
-        <PhoneFactorsList userPhoneFactorsMap={fullPhoneFactorsMap} />
+        <PhoneFactorsList
+          userPhoneFactorsMap={fullPhoneFactorsMap}
+          totalFactorCount={totalFactorCount}
+        />
         <GcdsButton
           id="add-mfa-button"
           onGcdsClick={(event) => {
@@ -200,6 +210,7 @@ export default function Manage2FAVerifications() {
           )}
           <FIDO2PasskeyList
             userFIDO2CredentialsData={userFIDO2CredentialsData}
+            totalFactorCount={totalFactorCount}
             onRenameSuccess={refetchPasskeys}
             setErrorCode={setErrorCode}
             errorMessage={errorMessage}

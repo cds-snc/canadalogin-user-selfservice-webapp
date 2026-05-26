@@ -56,7 +56,7 @@ vi.mock("../../../../components/Providers/useUser", () => ({
 // Create a mock function that can be configured per test
 const mockUseOtpOperations = vi.fn();
 vi.mock("../../../../hooks/useOtpOperations", () => ({
-  useOtpOperations: () => mockUseOtpOperations(),
+  useOtpOperations: (options) => mockUseOtpOperations(options),
   MAP_TYPES: {
     LAST_FOUR_DIGITS: "lastFourDigits",
     FULL_PHONE_NUMBER: "fullPhoneNumber",
@@ -123,7 +123,7 @@ vi.mock("@gcds-core/components-react", () => ({
 vi.mock(
   "../../../../components/Manage/SecuritySettings/PhoneFactorsList",
   () => ({
-    default: ({ userPhoneFactorsMap }) => (
+    default: ({ userPhoneFactorsMap, totalFactorCount }) => (
       <div data-testid="phone-factors-list">
         {Object.keys(userPhoneFactorsMap).map((phoneNumber) => (
           <div key={phoneNumber}>
@@ -137,7 +137,11 @@ vi.mock(
                     : factor.type}
               </div>
             ))}
-            {Object.keys(userPhoneFactorsMap).length > 1 && <a>Remove</a>}
+            {totalFactorCount - userPhoneFactorsMap[phoneNumber].length >= 1 ? (
+              <a>Remove</a>
+            ) : (
+              <span>Remove disabled</span>
+            )}
           </div>
         ))}
       </div>
@@ -148,7 +152,15 @@ vi.mock(
 vi.mock(
   "../../../../components/Manage/SecuritySettings/FIDO2PasskeyList",
   () => ({
-    default: () => null,
+    default: ({ userFIDO2CredentialsData, totalFactorCount }) => (
+      <div data-testid="fido2-passkey-list">
+        {userFIDO2CredentialsData.map((credential) =>
+          totalFactorCount - 1 >= 1 ? (
+            <button key={credential.id}>Delete passkey</button>
+          ) : null,
+        )}
+      </div>
+    ),
   }),
 );
 
@@ -300,6 +312,58 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
       // Should show remove links for multiple phones
       const removeLinks = getAllByText("Remove");
       expect(removeLinks).toHaveLength(3); // One for each phone number
+    });
+  });
+
+  it("keeps delete available when a passkey remains after deleting one phone number", async () => {
+    mockUseOtpOperations.mockReturnValue({
+      phoneFactorsMap: {
+        5551234567: [
+          { phoneNumber: "5551234567", type: "smsotp", id: "factor-1" },
+          { phoneNumber: "5551234567", type: "voiceotp", id: "factor-2" },
+        ],
+      },
+      otpLoading: false,
+    });
+
+    mockUsePasskeyOperations.mockReturnValue({
+      fido2Data: [{ id: "passkey-1", attributes: { nickname: "My passkey" } }],
+      loading: false,
+      refetch: vi.fn(),
+    });
+
+    const { getByText, getByRole } = render(<Manage2FAVerifications />);
+
+    await waitFor(() => {
+      expect(getByText("Remove")).toBeInTheDocument();
+      expect(getByRole("button", { name: "Delete passkey" })).toBeEnabled();
+    });
+  });
+
+  it("disables delete actions when deleting them would remove the last remaining 2FA factor", async () => {
+    mockUseOtpOperations.mockReturnValue({
+      phoneFactorsMap: {
+        5551234567: [
+          { phoneNumber: "5551234567", type: "smsotp", id: "factor-1" },
+          { phoneNumber: "5551234567", type: "voiceotp", id: "factor-2" },
+        ],
+      },
+      otpLoading: false,
+    });
+
+    mockUsePasskeyOperations.mockReturnValue({
+      fido2Data: [],
+      loading: false,
+      refetch: vi.fn(),
+    });
+
+    const { getByText, queryByRole } = render(<Manage2FAVerifications />);
+
+    await waitFor(() => {
+      expect(getByText("Remove disabled")).toBeInTheDocument();
+      expect(
+        queryByRole("button", { name: "Delete passkey" }),
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -458,6 +522,16 @@ describe("Manage2FAVerifications — additional coverage", () => {
     const { getByText } = render(<Manage2FAVerifications />);
     await waitFor(() =>
       expect(getByText("+ Add a phone number")).toBeInTheDocument(),
+    );
+  });
+
+  it("allows passkey-only users to stay on the manage page", () => {
+    render(<Manage2FAVerifications />);
+
+    expect(mockUseOtpOperations).toHaveBeenCalledWith(
+      expect.objectContaining({
+        allowEmptyFactors: true,
+      }),
     );
   });
 });
