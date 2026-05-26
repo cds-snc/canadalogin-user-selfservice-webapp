@@ -296,6 +296,8 @@ export default {
   },
 };
 
+const manage2FARoutePath = "/security-settings/manage-2fa-verifications";
+
 // ─── Story 1: OTP path lands on the nickname screen ───────────────────────
 //
 // Flow: password → OTP selection → select SMS factor → enter OTP →
@@ -305,7 +307,7 @@ export default {
 
 export const OTPPathToNicknameScreen = (() => {
   const baseParams = buildTestCase.parameters(
-    "",
+    manage2FARoutePath,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.profile },
     coreEndpoints(),
   );
@@ -413,7 +415,7 @@ export const OTPPathToNicknameScreen = (() => {
 
 export const CompletePasskeyRegistration = (() => {
   const baseParams = buildTestCase.parameters(
-    "",
+    manage2FARoutePath,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.profile },
     coreEndpoints(),
   );
@@ -468,82 +470,82 @@ export const CompletePasskeyRegistration = (() => {
       await step(
         'Click "Create a passkey" to trigger the WebAuthn popup (mocked)',
         async () => {
-          await waitFor(async () => {
-            const createButton = Array.from(
+          const createButton = await waitFor(() => {
+            const button = Array.from(
               canvasElement.querySelectorAll("gcds-button"),
             ).find((btn) => btn.textContent.trim() === "Create a passkey");
-            await expect(createButton).toBeInTheDocument();
-            if (createButton.shadowRoot) {
-              const actualBtn =
-                createButton.shadowRoot.querySelector(
-                  'button[part="button"]',
-                ) || createButton.shadowRoot.querySelector("button");
-              if (actualBtn) {
-                await userEvent.click(actualBtn);
-              } else {
-                dispatchGcdsClick(createButton);
-              }
+            expect(button).toBeInTheDocument();
+            return button;
+          });
+
+          if (createButton.shadowRoot) {
+            const actualBtn =
+              createButton.shadowRoot.querySelector('button[part="button"]') ||
+              createButton.shadowRoot.querySelector("button");
+            if (actualBtn) {
+              await userEvent.click(actualBtn);
             } else {
               dispatchGcdsClick(createButton);
             }
-          });
+          } else {
+            dispatchGcdsClick(createButton);
+          }
         },
       );
 
       await step("Verify the passkey nickname form is displayed", async () => {
-        await waitFor(async () => {
-          await expect(
-            canvas.getByText(/Name your passkey/i),
-          ).toBeInTheDocument();
-        });
+        await expect(
+          await canvas.findByText(/Name your passkey/i),
+        ).toBeInTheDocument();
       });
 
       await step(
         "Type a name for the new passkey in the input field",
         async () => {
-          await waitFor(async () => {
-            const gcdsInput = canvasElement.querySelector("gcds-input");
-            await expect(gcdsInput).toBeInTheDocument();
-            if (gcdsInput && gcdsInput.shadowRoot) {
-              const shadowInput = gcdsInput.shadowRoot.querySelector("input");
-              if (shadowInput) {
-                shadowInput.value = "";
-                shadowInput.dispatchEvent(
-                  new Event("input", { bubbles: true }),
-                );
-                await userEvent.type(shadowInput, "My Laptop");
-                gcdsInput.dispatchEvent(
-                  new CustomEvent("gcdsInput", {
-                    bubbles: true,
-                    detail: { value: "My Laptop" },
-                  }),
-                );
-              }
-            }
+          const gcdsInput = await waitFor(() => {
+            const input = canvasElement.querySelector("gcds-input");
+            expect(input).toBeInTheDocument();
+            return input;
           });
+
+          if (gcdsInput && gcdsInput.shadowRoot) {
+            const shadowInput = gcdsInput.shadowRoot.querySelector("input");
+            if (shadowInput) {
+              shadowInput.value = "";
+              shadowInput.dispatchEvent(new Event("input", { bubbles: true }));
+              await userEvent.type(shadowInput, "My Laptop");
+              gcdsInput.dispatchEvent(
+                new CustomEvent("gcdsInput", {
+                  bubbles: true,
+                  detail: { value: "My Laptop" },
+                }),
+              );
+            }
+          }
         },
       );
 
       await step("Submit the nickname to complete registration", async () => {
-        await waitFor(async () => {
-          const continueButton = Array.from(
+        const continueButton = await waitFor(() => {
+          const button = Array.from(
             canvasElement.querySelectorAll("gcds-button"),
           ).find((btn) => btn.textContent.trim() === "Continue");
-          await expect(continueButton).toBeInTheDocument();
-          if (continueButton.shadowRoot) {
-            const actualBtn =
-              continueButton.shadowRoot.querySelector(
-                'button[part="button"]',
-              ) || continueButton.shadowRoot.querySelector("button");
-            if (actualBtn) {
-              await userEvent.click(actualBtn);
-            } else {
-              dispatchGcdsClick(continueButton);
-            }
+          expect(button).toBeInTheDocument();
+          return button;
+        });
+
+        if (continueButton.shadowRoot) {
+          const actualBtn =
+            continueButton.shadowRoot.querySelector('button[part="button"]') ||
+            continueButton.shadowRoot.querySelector("button");
+          if (actualBtn) {
+            await userEvent.click(actualBtn);
           } else {
             dispatchGcdsClick(continueButton);
           }
-        });
+        } else {
+          dispatchGcdsClick(continueButton);
+        }
       });
     },
   };
@@ -556,7 +558,7 @@ export const CompletePasskeyRegistration = (() => {
 
 export const SingleFactorSkipsOTPSelection = (() => {
   const baseParams = buildTestCase.parameters(
-    "",
+    manage2FARoutePath,
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.profile },
     // Single SMS factor, no FIDO2 passkeys
     coreEndpoints([], 1),

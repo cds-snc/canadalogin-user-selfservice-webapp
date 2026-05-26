@@ -23,6 +23,7 @@ interface Fido2CredentialWithCreated extends Fido2Credential {
 
 interface FIDO2PasskeyListProps {
   userFIDO2CredentialsData: Fido2CredentialWithCreated[];
+  totalFactorCount?: number;
   onRenameSuccess?: () => Promise<void> | void;
   setErrorCode?: (errorCode: string) => void;
   errorMessage?: string;
@@ -34,6 +35,7 @@ interface RenameRegistrationResponse {
 
 export default function FIDO2PasskeyList({
   userFIDO2CredentialsData,
+  totalFactorCount,
   onRenameSuccess,
   errorMessage = "",
   setErrorCode = () => {},
@@ -86,6 +88,8 @@ export default function FIDO2PasskeyList({
     const isEditing = editingPasskeyId === id;
     const nicknameValue =
       passkeyNicknameInputs[id] ?? attributes?.nickname ?? "";
+    const canDeletePasskey =
+      totalFactorCount === undefined ? true : totalFactorCount - 1 >= 1;
 
     return (
       <GcdsContainer key={id}>
@@ -158,17 +162,19 @@ export default function FIDO2PasskeyList({
               >
                 {t("Manage2FAVerifications.renamePasskey")}
               </GcdsButton>
-              <GcdsButton
-                id="delete-fido2-button"
-                buttonRole="secondary"
-                onClick={() => {
-                  navigate(`${deletePasskeyPage}`, {
-                    state: { passkeyId: id, passkeyNickname: nicknameValue },
-                  });
-                }}
-              >
-                {t("Manage2FAVerifications.deletePasskey")}
-              </GcdsButton>
+              {canDeletePasskey && (
+                <GcdsButton
+                  id="delete-fido2-button"
+                  buttonRole="secondary"
+                  onClick={() => {
+                    navigate(`${deletePasskeyPage}`, {
+                      state: { passkeyId: id, passkeyNickname: nicknameValue },
+                    });
+                  }}
+                >
+                  {t("Manage2FAVerifications.deletePasskey")}
+                </GcdsButton>
+              )}
             </>
           )}
         </GcdsGrid>

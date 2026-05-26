@@ -58,6 +58,7 @@ export type UseOtpOperationsOptions = {
   userName?: string | null;
   setErrorCode: (errorCode: string) => void;
   fallbackNavigationPath?: string;
+  allowEmptyFactors?: boolean;
   mapType?: OtpMapType | null;
   mfaTrxnId?: string;
 };

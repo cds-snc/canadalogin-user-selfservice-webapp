@@ -169,6 +169,38 @@ describe("FIDO2PasskeyList", () => {
     });
   });
 
+  it("hides Delete when the passkey is the last remaining 2FA factor", () => {
+    const credential = makeCredential({
+      id: "cred-1",
+      attributes: { nickname: "My Key" },
+    });
+
+    render(
+      <FIDO2PasskeyList
+        userFIDO2CredentialsData={[credential]}
+        totalFactorCount={1}
+      />,
+    );
+
+    expect(screen.queryByTestId("delete-fido2-button")).not.toBeInTheDocument();
+  });
+
+  it("keeps Delete enabled when another 2FA factor remains", () => {
+    const credential = makeCredential({
+      id: "cred-1",
+      attributes: { nickname: "My Key" },
+    });
+
+    render(
+      <FIDO2PasskeyList
+        userFIDO2CredentialsData={[credential]}
+        totalFactorCount={2}
+      />,
+    );
+
+    expect(screen.getByTestId("delete-fido2-button")).toBeEnabled();
+  });
+
   it("renders a separator for each passkey item", () => {
     const credentials = [
       makeCredential({ id: "cred-1" }),

@@ -162,6 +162,7 @@ export default function AddMFAPage() {
     userName,
     setErrorCode,
     fallbackNavigationPath: backToSecuritySettingsPage,
+    allowEmptyFactors: true,
     mapType: MAP_TYPES.lastFourDigits,
     mfaTrxnId: phoneFormData?.trxnId,
   });

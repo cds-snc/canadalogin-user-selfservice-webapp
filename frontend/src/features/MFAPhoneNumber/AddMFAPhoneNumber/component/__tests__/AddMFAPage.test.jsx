@@ -420,6 +420,22 @@ describe("AddMFAPage Unit Tests", () => {
     });
   });
 
+  it("allows passkey-only users to stay on add phone page", async () => {
+    render(
+      <TestWrapper>
+        <AddMFAPage />
+      </TestWrapper>,
+    );
+
+    await waitFor(() => {
+      expect(useOtpOperations).toHaveBeenCalledWith(
+        expect.objectContaining({
+          allowEmptyFactors: true,
+        }),
+      );
+    });
+  });
+
   describe("StepContent Error Handling", () => {
     it("should display specific error message when errorCode matches errorPageJson key", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({

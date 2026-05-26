@@ -271,6 +271,33 @@ describe("useOtpOperations", () => {
 
       expect(mockNavigate).not.toHaveBeenCalled();
     });
+
+    it("should not navigate when empty phone factors are allowed", async () => {
+      mockGetUserOtpPhoneFactors.mockResolvedValue({
+        success: true,
+        data: [],
+      });
+
+      const { result } = renderHook(
+        () =>
+          useOtpOperations({
+            userId: defaultProps.userId,
+            userName: defaultProps.userName,
+            setErrorCode: defaultProps.setErrorCode,
+            fallbackNavigationPath: defaultProps.fallbackNavigationPath,
+            allowEmptyFactors: true,
+          }),
+        { wrapper },
+      );
+
+      await waitFor(() => {
+        expect(result.current.otpLoading).toBe(false);
+      });
+
+      expect(result.current.userPhoneFactors).toEqual([]);
+      expect(result.current.phoneFactorsMap).toEqual({});
+      expect(mockNavigate).not.toHaveBeenCalled();
+    });
   });
 
   describe("handleChangeUserMfaSelection", () => {
