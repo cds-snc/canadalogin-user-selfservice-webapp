@@ -36,6 +36,20 @@
     "moreInfoTitle": "For more information",
     "learnMoreLink": "Learn more about provincial identity proofing"
   },
+  "OnlineVerificationInfo": {
+    "pageTitle": "Prove your identity",
+    "heading": "Get ready for selfie and ID check",
+    "followSteps": "Follow the steps to complete the process",
+    "step1": "You will need one government issued photo ID",
+    "listOfAcceptableIds": "List of acceptable IDs",
+    "step2": "Take a selfie and a photo of your ID in a well lit room using a mobile phone camera with a high resolution",
+    "step3": "Confirm your submission and get your proofing results to continue",
+    "planForTime": "Plan for about 5 minutes to complete this process.",
+    "continueButton": "Continue",
+    "backButton": "Back",
+    "moreInfoTitle": "For more information",
+    "learnMoreLink": "Learn more about how selfie and ID check works"
+  },
   "StartIdentityProofing": {
     "pageTitle": "Start identity proofing",
     "heading": "requires you to prove and share your identity in order to update your information. ",
