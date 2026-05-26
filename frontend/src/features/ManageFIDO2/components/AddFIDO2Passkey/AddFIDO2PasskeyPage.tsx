@@ -109,15 +109,6 @@ export default function AddFIDO2PasskeyPage({
     setErrorCode,
     async () => {
       // If there's only one MFA factor, skip OTP selection and go directly to validation
-      trackEvent({
-        event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
-        step:
-          userPhoneFactors &&
-          userPhoneFactors.length === 1 &&
-          (!fido2Data || fido2Data.length === 0)
-            ? ADD_PASSKEY_ANALYTICS.STEPS.OTP_VALIDATION
-            : ADD_PASSKEY_ANALYTICS.STEPS.OTP_SELECTION,
-      });
       if (
         userPhoneFactors &&
         userPhoneFactors.length === 1 &&
@@ -125,9 +116,17 @@ export default function AddFIDO2PasskeyPage({
       ) {
         const success = await handleRequestOtpCode();
         if (success) {
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+            step: ADD_PASSKEY_ANALYTICS.STEPS.OTP_VALIDATION,
+          });
           setWizardStep("otpValidation");
         }
       } else {
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+          step: ADD_PASSKEY_ANALYTICS.STEPS.OTP_SELECTION,
+        });
         setWizardStep("otpSelection");
       }
     },
@@ -152,14 +151,7 @@ export default function AddFIDO2PasskeyPage({
 
   // Create tracked OTP request wrapper
   async function handleRequestOtpCode(): Promise<boolean> {
-    const success = await requestOtpCode();
-    if (success) {
-      trackEvent({
-        event: GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE,
-        step: ADD_PASSKEY_ANALYTICS.STEPS.OTP_VALIDATION,
-      });
-    }
-    return success;
+    return requestOtpCode();
   }
 
   const { fido2Data, loading: passkeyLoading } = usePasskeyOperations({

@@ -87,8 +87,9 @@ const AddPasskeySteps = {
   AddFIDO2PasskeyPage: "Add Passkey",
   AddPasskeyVerifyIdentity: "Add Passkey - Step 1: Verify it's you",
   AddPasskeyOtpSelection: "Add Passkey - Step 2: Choose verification method",
-  AddPasskeyOtpValidation: "Add Passkey - Step 3: Enter verification code",
-  AddPasskeyVerifyPasskey: "Add Passkey - Step 3: Verify with existing passkey",
+  AddPasskeyOtpValidation: "Add Passkey - Step 3a: Enter verification code",
+  AddPasskeyVerifyPasskey:
+    "Add Passkey - Step 3b: Verify with existing passkey",
   AddPasskeyRegister: "Add Passkey - Step 4: Register passkey",
   AddPasskeySetNickname: "Add Passkey - Step 5: Name your passkey",
 };
@@ -99,9 +100,9 @@ const DeletePasskeySteps = {
   DeletePasskeyOtpSelection:
     "Delete Passkey - Step 2: Choose verification method",
   DeletePasskeyOtpValidation:
-    "Delete Passkey - Step 3: Enter verification code",
+    "Delete Passkey - Step 3a: Enter verification code",
   DeletePasskeyVerifyPasskey:
-    "Delete Passkey - Step 3: Verify with existing passkey",
+    "Delete Passkey - Step 3b: Verify with existing passkey",
   DeletePasskeyConfirm: "Delete Passkey - Step 4: Confirm removal",
   DeletePasskeySuccess: "Delete Passkey - Step 5: Passkey deleted",
 };
