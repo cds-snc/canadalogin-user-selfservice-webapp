@@ -76,6 +76,17 @@ describe("NoticeFactory", () => {
       const notice = screen.getByTestId("gcds-notice");
       expect(notice).toHaveAttribute("data-notice-role", "success");
     });
+
+    it("renders with passkeyRenamed noticeType", () => {
+      render(
+        <NoticeFactory
+          noticeType="passkeyRenamed"
+          passkeyName="Updated Passkey"
+        />,
+      );
+      const notice = screen.getByTestId("gcds-notice");
+      expect(notice).toHaveAttribute("data-notice-role", "success");
+    });
   });
 
   describe("Notice Type: mfaDeleted", () => {
@@ -132,6 +143,20 @@ describe("NoticeFactory", () => {
       render(<NoticeFactory noticeType="mfaAdded" />);
       const notice = screen.getByTestId("gcds-notice");
       expect(notice).toHaveAttribute("data-notice-title", " ");
+    });
+  });
+
+  describe("Notice Type: passkeyRenamed", () => {
+    it("displays the correct message for passkeyRenamed with passkey name", () => {
+      render(
+        <NoticeFactory
+          noticeType="passkeyRenamed"
+          passkeyName="Updated Passkey"
+        />,
+      );
+
+      expect(screen.getByTestId("gcds-notice")).toBeInTheDocument();
+      expect(screen.getByText("Updated Passkey")).toBeInTheDocument();
     });
   });
 

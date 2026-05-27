@@ -277,7 +277,7 @@ describe("FIDO2PasskeyList — inline rename (Save) flow", () => {
     );
     await userEvent.click(screen.getByTestId("rename-fido2-button"));
     await userEvent.click(screen.getByTestId("save-fido2-button"));
-    await waitFor(() => expect(onRenameSuccess).toHaveBeenCalledOnce());
+    await waitFor(() => expect(onRenameSuccess).toHaveBeenCalledWith("My Key"));
   });
 
   it("exits editing mode (hides input, shows Rename button) after a successful save", async () => {
@@ -389,6 +389,28 @@ describe("FIDO2PasskeyList — inline rename (Save) flow", () => {
       expect(fido2Api.updateRegistration).toHaveBeenCalledWith("cred-1", {
         nickname: "Trimmed",
       }),
+    );
+  });
+
+  it("calls onRenameSuccess with the trimmed nickname after a successful save", async () => {
+    const user = userEvent.setup();
+    const onRenameSuccess = vi.fn();
+
+    render(
+      <FIDO2PasskeyList
+        userFIDO2CredentialsData={[credential]}
+        onRenameSuccess={onRenameSuccess}
+      />,
+    );
+
+    await user.click(screen.getByTestId("rename-fido2-button"));
+    const input = screen.getByTestId("passkeyNickname");
+    await user.clear(input);
+    await user.type(input, "  Trimmed  ");
+    await user.click(screen.getByTestId("save-fido2-button"));
+
+    await waitFor(() =>
+      expect(onRenameSuccess).toHaveBeenCalledWith("Trimmed"),
     );
   });
 });

@@ -22,7 +22,7 @@ import PhoneMfaIcon from "../../../assets/icons/phone_mfa_icon.svg?react";
 import FIDOPasskeyCollage from "../../../assets/icons/passkey_collage.svg?react";
 import type { NoticeType } from "../../InfoBlocks/NoticeFactory";
 import type { OtpFactorReference } from "../../../types/hooks";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getErrorMessage } from "../../../utils/errorUtils";
 import ErrorSummaryWithFocus from "../../ErrorSummaryWithFocus/ErrorSummaryWithFocus";
 
@@ -72,13 +72,36 @@ export default function Manage2FAVerifications() {
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
     language,
   });
+  const manage2FAVerificationsPage = path(PAGES.manage2FAVerifications, {
+    language,
+  });
   const [errorCode, setErrorCode] = useState("");
+  const [inlineNotice, setInlineNotice] = useState<Manage2FANoticeState | null>(
+    null,
+  );
 
   const errorMessage = getErrorMessage(language, errorCode);
 
   const { noticeType, phoneNumber, otpType, passkeyName } =
     (location.state as Manage2FANoticeState | null) || {};
+  const activeNotice = inlineNotice ?? {
+    noticeType,
+    phoneNumber,
+    otpType,
+    passkeyName,
+  };
   const addFido2PagePath = path(PAGES.addFIDO2PasskeyPage, { language });
+
+  useEffect(() => {
+    if (!noticeType) {
+      return;
+    }
+
+    navigate(location.pathname ?? manage2FAVerificationsPage, {
+      replace: true,
+      state: null,
+    });
+  }, [location.pathname, manage2FAVerificationsPage, navigate, noticeType]);
 
   const { phoneFactorsMap: userPhoneFactorsMap, otpLoading: localLoading } =
     useOtpOperations({
@@ -110,17 +133,25 @@ export default function Manage2FAVerifications() {
   const totalPasskeyCount = userFIDO2CredentialsData.length;
   const totalFactorCount = totalPhoneFactorCount + totalPasskeyCount;
 
+  const handlePasskeyRenameSuccess = async (renamedPasskeyName: string) => {
+    await refetchPasskeys();
+    setInlineNotice({
+      noticeType: "passkeyRenamed",
+      passkeyName: renamedPasskeyName,
+    });
+  };
+
   return localLoading || passkeyLoading ? (
     <Loader text={t("Manage2FAVerifications.loading")} />
   ) : (
     <GcdsContainer role="main">
       <ErrorSummaryWithFocus errorCode={errorCode} language={language} />
-      {noticeType && (
+      {activeNotice.noticeType && (
         <NoticeFactory
-          noticeType={noticeType}
-          phoneNumber={phoneNumber}
-          otpType={otpType}
-          passkeyName={passkeyName}
+          noticeType={activeNotice.noticeType}
+          phoneNumber={activeNotice.phoneNumber}
+          otpType={activeNotice.otpType}
+          passkeyName={activeNotice.passkeyName}
         />
       )}
 
@@ -188,7 +219,7 @@ export default function Manage2FAVerifications() {
           <FIDO2PasskeyList
             userFIDO2CredentialsData={userFIDO2CredentialsData}
             totalFactorCount={totalFactorCount}
-            onRenameSuccess={refetchPasskeys}
+            onRenameSuccess={handlePasskeyRenameSuccess}
             setErrorCode={setErrorCode}
             errorMessage={errorMessage}
           />

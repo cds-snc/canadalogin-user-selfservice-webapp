@@ -152,8 +152,15 @@ vi.mock(
 vi.mock(
   "../../../../components/Manage/SecuritySettings/components/FIDO2PasskeyList",
   () => ({
-    default: ({ userFIDO2CredentialsData, totalFactorCount }) => (
+    default: ({
+      userFIDO2CredentialsData,
+      totalFactorCount,
+      onRenameSuccess,
+    }) => (
       <div data-testid="fido2-passkey-list">
+        <button onClick={() => onRenameSuccess?.("Renamed Passkey")}>
+          Trigger rename success
+        </button>
         {userFIDO2CredentialsData.map((credential) =>
           totalFactorCount - 1 >= 1 ? (
             <button key={credential.id}>Delete passkey</button>
@@ -468,10 +475,25 @@ describe("Manage2FAVerifications — additional coverage", () => {
 
   it("renders NoticeFactory when location.state has a noticeType", () => {
     mockUseLocation.mockReturnValue({
+      pathname: "/security-settings",
       state: { noticeType: "passkey-added", passkeyName: "Work Laptop" },
     });
     const { getByTestId } = render(<Manage2FAVerifications />);
     expect(getByTestId("notice-factory")).toHaveTextContent("passkey-added");
+  });
+
+  it("consumes location notice state after the first render", () => {
+    mockUseLocation.mockReturnValue({
+      pathname: "/security-settings",
+      state: { noticeType: "passkeyAdded", passkeyName: "Work Laptop" },
+    });
+
+    render(<Manage2FAVerifications />);
+
+    expect(mockNavigate).toHaveBeenCalledWith("/security-settings", {
+      replace: true,
+      state: null,
+    });
   });
 
   it("does NOT render NoticeFactory when location.state is null", () => {
@@ -483,6 +505,14 @@ describe("Manage2FAVerifications — additional coverage", () => {
     mockUseLocation.mockReturnValue({ state: { phoneNumber: "5551234567" } });
     const { queryByTestId } = render(<Manage2FAVerifications />);
     expect(queryByTestId("notice-factory")).not.toBeInTheDocument();
+  });
+
+  it("renders a renamed passkey success notice after inline rename succeeds", async () => {
+    const { getByText, getByTestId } = render(<Manage2FAVerifications />);
+
+    await userEvent.click(getByText("Trigger rename success"));
+
+    expect(getByTestId("notice-factory")).toHaveTextContent("passkeyRenamed");
   });
 
   it("FIDO2 section is rendered when NON_PROD_ENVIRONMENT is true", () => {

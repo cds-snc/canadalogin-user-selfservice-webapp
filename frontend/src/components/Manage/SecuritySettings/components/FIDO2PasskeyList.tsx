@@ -25,7 +25,7 @@ interface Fido2CredentialWithCreated extends Fido2Credential {
 interface FIDO2PasskeyListProps {
   userFIDO2CredentialsData: Fido2CredentialWithCreated[];
   totalFactorCount?: number;
-  onRenameSuccess?: () => Promise<void> | void;
+  onRenameSuccess?: (passkeyName: string) => Promise<void> | void;
   setErrorCode?: (errorCode: string) => void;
   errorMessage?: string;
 }
@@ -58,7 +58,9 @@ export default function FIDO2PasskeyList({
     passkeyId: string,
     renameDeviceName: string,
   ) => {
-    if (!passkeyId || !renameDeviceName.trim()) {
+    const trimmedNickname = renameDeviceName.trim();
+
+    if (!passkeyId || !trimmedNickname) {
       setErrorCode("error_rename_credential");
       return;
     }
@@ -68,11 +70,11 @@ export default function FIDO2PasskeyList({
 
     try {
       const response = (await fido2Api.updateRegistration(passkeyId, {
-        nickname: renameDeviceName.trim(),
+        nickname: trimmedNickname,
       })) as RenameRegistrationResponse | undefined;
 
       if (response?.success) {
-        await onRenameSuccess?.();
+        await onRenameSuccess?.(trimmedNickname);
       } else {
         throw new Error(t("Error.error_rename_credential", { ns: "common" }));
       }

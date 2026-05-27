@@ -6,6 +6,7 @@ export type NoticeType =
   | "mfaDeleted"
   | "mfaAdded"
   | "passkeyAdded"
+  | "passkeyRenamed"
   | "passkeyDeleted";
 
 interface NoticeFactoryProps {
@@ -68,6 +69,21 @@ export default function NoticeFactory({
           noticeTitle={t("NoticeFactory.notice_title_success")}
         >
           <GcdsText>{t("NoticeFactory.passkeyCreated")}</GcdsText>
+        </GcdsNotice>
+      </GcdsText>
+    ),
+
+    passkeyRenamed: ({ passkeyName: currentPasskeyName }) => (
+      <GcdsText>
+        <GcdsNotice
+          noticeRole="success"
+          noticeTitleTag="h2"
+          noticeTitle={t("NoticeFactory.notice_title_success")}
+        >
+          <GcdsText>
+            {t("NoticeFactory.renamedPasskeyTo")}{" "}
+            <strong>{currentPasskeyName}</strong>
+          </GcdsText>
         </GcdsNotice>
       </GcdsText>
     ),
