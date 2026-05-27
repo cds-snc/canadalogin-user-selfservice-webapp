@@ -6,12 +6,12 @@ import {
   GcdsInput,
 } from "@gcds-core/components-react";
 import { useNavigate, useParams } from "react-router";
-import { PAGES } from "../../../utils/constants";
+import { PAGES } from "../../../../utils/constants";
 import { useTranslation } from "react-i18next";
-import { path } from "../../../utils/routeHelpers";
+import { path } from "../../../../utils/routeHelpers";
 import { useState } from "react";
-import { fido2Api } from "../../../features/ManageFIDO2/api/fido2Api";
-import type { Fido2Credential } from "../../../types/hooks";
+import { fido2Api } from "../../../../features/ManageFIDO2/api/fido2Api";
+import type { Fido2Credential } from "../../../../types/hooks";
 
 interface Fido2CredentialWithCreated extends Fido2Credential {
   created?: string;

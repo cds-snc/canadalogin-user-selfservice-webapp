@@ -85,7 +85,7 @@ export default function ManageDashboard() {
             height="76"
             viewBox="0 0 76 76"
             fill="none"
-            aria-label="Personal Information Icon"
+            aria-hidden="true"
           >
             <circle cx="37.6221" cy="38.4707" r="37.5" fill="#DBEAFE" />
             <path
@@ -120,7 +120,7 @@ export default function ManageDashboard() {
             height="76"
             viewBox="0 0 76 76"
             fill="none"
-            aria-label="Security Settings Icon"
+            aria-hidden="true"
           >
             <circle cx="37.6221" cy="38.4707" r="37.5" fill="#DBEAFE" />
             <path

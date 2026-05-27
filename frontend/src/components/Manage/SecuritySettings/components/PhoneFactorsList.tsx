@@ -4,10 +4,10 @@ import {
   GcdsText,
 } from "@gcds-core/components-react";
 import { useNavigate, useParams } from "react-router";
-import { PAGES } from "../../../utils/constants";
+import { PAGES } from "../../../../utils/constants";
 import { useTranslation } from "react-i18next";
-import { path } from "../../../utils/routeHelpers";
-import type { OtpFactorReference } from "../../../types/hooks";
+import { path } from "../../../../utils/routeHelpers";
+import type { OtpFactorReference } from "../../../../types/hooks";
 
 interface PhoneFactorsListProps {
   userPhoneFactorsMap: Record<string, OtpFactorReference[]>;
@@ -39,7 +39,9 @@ export default function PhoneFactorsList({
     const availableFactorsComponent = factors.map((factor, index) => {
       return (
         <li key={`${factor.id}-${index}`}>
-          <GcdsText>{availableFactorsUIContent(factor.type)}</GcdsText>
+          <GcdsText textRole="secondary">
+            {availableFactorsUIContent(factor.type)}
+          </GcdsText>
         </li>
       );
     });
@@ -49,7 +51,9 @@ export default function PhoneFactorsList({
         <GcdsText>
           <strong>{`${phoneNumber}`}</strong>
         </GcdsText>
-        <GcdsText>{t("Manage2FAVerifications.codesSentBy")}</GcdsText>
+        <GcdsText marginBottom="0" textRole="secondary">
+          {t("Manage2FAVerifications.codesSentBy")}
+        </GcdsText>
         <ul>{availableFactorsComponent}</ul>
         {canDeletePhoneNumber && (
           <GcdsButton

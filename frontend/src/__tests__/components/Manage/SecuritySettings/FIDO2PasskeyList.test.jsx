@@ -12,7 +12,7 @@ import { fido2Api } from "../../../../features/ManageFIDO2/api/fido2Api";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import "@testing-library/jest-dom/vitest";
-import FIDO2PasskeyList from "../../../../components/Manage/SecuritySettings/FIDO2PasskeyList";
+import FIDO2PasskeyList from "../../../../components/Manage/SecuritySettings/components/FIDO2PasskeyList";
 
 const mockNavigate = vi.fn();
 
