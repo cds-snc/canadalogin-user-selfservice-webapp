@@ -134,7 +134,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
 
   const defaultPhoneFormData = {
     phoneNumber: "+16135551234",
-    formattedPhoneNumber: "(613) 555-1234",
+    formattedPhoneNumber: "+1 (613) 555-1234",
     otpType: "smsotp",
     otp: "",
   };
@@ -241,7 +241,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
         </TestWrapper>,
       );
 
-      expect(screen.getByText("(613) 555-1234")).toBeInTheDocument();
+      expect(screen.getByText("+1 (613) 555-1234")).toBeInTheDocument();
     });
 
     it("should show SMS-specific messaging for SMS OTP type", () => {
@@ -261,8 +261,10 @@ describe("AddMFAOtpVerification Unit Tests", () => {
       );
 
       expect(
-        screen.getByText(
-          "We have sent a text message with a 6-digit verification code to:",
+        screen.getByText((content) =>
+          content.includes(
+            "We have sent a text message with a 6-digit verification code to:",
+          ),
         ),
       ).toBeInTheDocument();
       expect(
@@ -287,8 +289,10 @@ describe("AddMFAOtpVerification Unit Tests", () => {
       );
 
       expect(
-        screen.getByText(
-          "We have sent a 6-digit verification code via voice call to:",
+        screen.getByText((content) =>
+          content.includes(
+            "We have sent a 6-digit verification code via voice call to:",
+          ),
         ),
       ).toBeInTheDocument();
       expect(
@@ -493,7 +497,9 @@ describe("AddMFAOtpVerification Unit Tests", () => {
         </TestWrapper>,
       );
 
-      const differentPhoneLink = screen.getByText("Try another way");
+      const differentPhoneLink = screen.getByText(
+        "Use a different phone number",
+      );
 
       await act(async () => {
         differentPhoneLink.click();
@@ -608,8 +614,10 @@ describe("AddMFAOtpVerification Unit Tests", () => {
       );
 
       expect(
-        screen.getByText(
-          "Nous avons envoyé un code de vérification à 6 chiffres au numéro suivant par le biais d'un message texte :",
+        screen.getByText((content) =>
+          content.includes(
+            "Nous avons envoyé un code de vérification à 6 chiffres au numéro suivant par le biais d'un message texte :",
+          ),
         ),
       ).toBeInTheDocument();
     });

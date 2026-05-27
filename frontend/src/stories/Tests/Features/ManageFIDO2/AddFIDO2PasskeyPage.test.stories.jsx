@@ -70,7 +70,6 @@ async function submitPasswordStep(canvasElement) {
       canvas.getByText(/first enter your current password/i),
     ).toBeInTheDocument();
 
-    // Fill all gcds-input fields
     const gcdsInputs = canvasElement.querySelectorAll("gcds-input");
     for (const input of gcdsInputs) {
       if (input.shadowRoot) {
@@ -91,7 +90,6 @@ async function submitPasswordStep(canvasElement) {
       }
     }
 
-    // Submit via the continue button
     const continueButton = canvasElement.querySelector("gcds-button");
     if (continueButton) {
       if (

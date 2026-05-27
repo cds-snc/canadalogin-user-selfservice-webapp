@@ -58,6 +58,28 @@ interface OtpSelectionProps {
   onSelectEmail?: () => void;
 }
 
+function getLastFourDigits(value?: string | null) {
+  if (!value) {
+    return "";
+  }
+
+  const digits = value.replace(/\D/g, "");
+  return digits.slice(-4);
+}
+
+function getMaskedPhoneDestination(destination?: string | null) {
+  if (!destination) {
+    return "";
+  }
+
+  if (destination.includes("*")) {
+    return destination;
+  }
+
+  const lastFourDigits = getLastFourDigits(destination);
+  return lastFourDigits ? `******-${lastFourDigits}` : destination;
+}
+
 export default function OtpSelection({
   onNext,
   onChangeUserSelectedMfaFactor,
@@ -140,10 +162,15 @@ export default function OtpSelection({
                   align-items="center"
                   style={factorRowStyle}
                 >
-                  <GcdsText marginBottom="0">{factor.destination}</GcdsText>
+                  <GcdsText marginBottom="0">
+                    {getMaskedPhoneDestination(factor.destination)}
+                  </GcdsText>
                   <GcdsLink
                     size="regular"
                     role="button"
+                    aria-label={t("TransientOtpSelection.textMeEndingIn", {
+                      digits: getLastFourDigits(factor.destination),
+                    })}
                     onGcdsClick={() => handlePhoneFactorSelect(factor.id)}
                   >
                     {t("TransientOtpSelection.textMe")}
@@ -174,10 +201,15 @@ export default function OtpSelection({
                   align-items="center"
                   style={factorRowStyle}
                 >
-                  <GcdsText marginBottom="0">{factor.destination}</GcdsText>
+                  <GcdsText marginBottom="0">
+                    {getMaskedPhoneDestination(factor.destination)}
+                  </GcdsText>
                   <GcdsLink
                     size="regular"
                     role="button"
+                    aria-label={t("TransientOtpSelection.callMeEndingIn", {
+                      digits: getLastFourDigits(factor.destination),
+                    })}
                     onGcdsClick={() => handlePhoneFactorSelect(factor.id)}
                   >
                     {t("TransientOtpSelection.callMe")}
@@ -210,6 +242,9 @@ export default function OtpSelection({
                   <GcdsLink
                     size="regular"
                     role="button"
+                    aria-label={t("TransientOtpSelection.verifyWithPasskey", {
+                      name: passkey.attributes?.nickname ?? passkey.id,
+                    })}
                     onGcdsClick={() => onSelectFIDO2 && onSelectFIDO2(passkey)}
                   >
                     {t("TransientOtpSelection.verify")}

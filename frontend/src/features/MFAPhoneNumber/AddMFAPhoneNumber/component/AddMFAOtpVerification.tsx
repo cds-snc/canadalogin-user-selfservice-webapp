@@ -29,18 +29,18 @@ const PageHeader = ({
   formattedPhoneNumber,
 }: PageHeaderProps) => {
   const { t } = useTranslation("verification");
+  const sentMessage =
+    userMfaType === FLOW_TYPES.sms
+      ? t("Verification.smsCodeSent")
+      : t("Verification.voiceCodeSent");
+
   return (
     <>
       <GcdsHeading tag="h1" lang={language}>
         {t("Verification.checkYourPhone")}
       </GcdsHeading>
-      <GcdsText marginBottom="0">
-        {userMfaType === FLOW_TYPES.sms
-          ? t("Verification.smsCodeSent")
-          : t("Verification.voiceCodeSent")}
-      </GcdsText>
-      <GcdsText marginTop="0">
-        <strong>{formattedPhoneNumber}</strong>
+      <GcdsText>
+        {sentMessage} <strong>{formattedPhoneNumber}</strong>.
       </GcdsText>
       <GcdsText>
         {userMfaType === FLOW_TYPES.voice
@@ -172,33 +172,37 @@ export default function AddMFAOtpVerification({
         </GcdsNotice>
       )}
 
-      <GcdsContainer>
-        <PageHeader
-          language={language}
-          userMfaType={userMfaType}
-          formattedPhoneNumber={phoneFormData.formattedPhoneNumber}
-        />
+      <section>
+        <GcdsContainer>
+          <PageHeader
+            language={language}
+            userMfaType={userMfaType}
+            formattedPhoneNumber={phoneFormData.formattedPhoneNumber}
+          />
 
-        <GcdsHeading tag="h2">{t("Verification.enterCode")}</GcdsHeading>
-        <form onSubmit={onSubmitHandler}>
-          <GcdsInput
-            inputId="verificationCode"
-            label={t("Verification.sixDigitCode")}
-            autoFocus
-            autocomplete="one-time-code"
-            name="verificationCode"
-            type="text"
-            value={phoneFormData.otp}
-            validateOn="other"
-            errorMessage={displayError}
-            onGcdsInput={handleChange}
-            lang={language}
-            size={18}
-            maxlength={6}
-            minlength={6}
-          ></GcdsInput>
-        </form>
+          <GcdsHeading tag="h2">{t("Verification.enterCode")}</GcdsHeading>
+          <form onSubmit={onSubmitHandler}>
+            <GcdsInput
+              inputId="verificationCode"
+              label={t("Verification.sixDigitCode")}
+              autoFocus
+              autocomplete="one-time-code"
+              name="verificationCode"
+              type="text"
+              value={phoneFormData.otp}
+              validateOn="other"
+              errorMessage={displayError}
+              onGcdsInput={handleChange}
+              lang={language}
+              size={18}
+              maxlength={6}
+              minlength={6}
+            ></GcdsInput>
+          </form>
+        </GcdsContainer>
+      </section>
 
+      <section>
         <GcdsGrid columns="max-content max-content" gap="200">
           <SubmitButton
             disabled={phoneFormData.otp.length < 6 || isMaxAttemptsReached}
@@ -221,54 +225,57 @@ export default function AddMFAOtpVerification({
             {t("Button.cancel", { ns: "common" })}
           </GcdsButton>
         </GcdsGrid>
-      </GcdsContainer>
-      <GcdsHeading tag="h2">{t("Verification.problemsWithCode")}</GcdsHeading>
+      </section>
 
-      <GcdsText>
-        <GcdsLink
-          onGcdsClick={async () => {
-            await onSetupAlternateMFAMethod();
-          }}
-        >
-          {userMfaType === FLOW_TYPES.sms
-            ? t("Verification.setupVoiceInstead")
-            : t("Verification.setupSmsInstead")}
-        </GcdsLink>
-      </GcdsText>
+      <section>
+        <GcdsHeading tag="h2">{t("Verification.problemsWithCode")}</GcdsHeading>
 
-      <GcdsText>
-        {time > 0 ? (
-          <span>
-            {t("Verification.requestNewCodeIn")}
-            <strong>
-              {" "}
-              {time} {t("Verification.seconds")}
-            </strong>
-          </span>
-        ) : (
+        <GcdsText>
           <GcdsLink
-            onGcdsClick={() => {
-              requestNewCode();
+            onGcdsClick={async () => {
+              await onSetupAlternateMFAMethod();
             }}
           >
-            {userMfaType !== FLOW_TYPES.email
-              ? t("Verification.requestNewCode")
-              : t("Verification.sendCodeAgain")}
+            {userMfaType === FLOW_TYPES.sms
+              ? t("Verification.setupVoiceInstead")
+              : t("Verification.setupSmsInstead")}
           </GcdsLink>
-        )}
-      </GcdsText>
+        </GcdsText>
 
-      <GcdsText>
-        <GcdsLink
-          onGcdsClick={async () => {
-            clearValues();
-            await onUseDifferentPhoneNumber();
-            onBack();
-          }}
-        >
-          {t("Verification.tryAnotherWay")}
-        </GcdsLink>
-      </GcdsText>
+        <GcdsText>
+          {time > 0 ? (
+            <span>
+              {t("Verification.requestNewCodeAvailableIn")}
+              <strong>
+                {" "}
+                {time} {t("Verification.seconds")}
+              </strong>
+            </span>
+          ) : (
+            <GcdsLink
+              onGcdsClick={() => {
+                requestNewCode();
+              }}
+            >
+              {userMfaType !== FLOW_TYPES.email
+                ? t("Verification.requestNewCode")
+                : t("Verification.sendCodeAgain")}
+            </GcdsLink>
+          )}
+        </GcdsText>
+
+        <GcdsText>
+          <GcdsLink
+            onGcdsClick={async () => {
+              clearValues();
+              await onUseDifferentPhoneNumber();
+              onBack();
+            }}
+          >
+            {t("Verification.differentPhoneNumber")}
+          </GcdsLink>
+        </GcdsText>
+      </section>
     </GcdsContainer>
   );
 }

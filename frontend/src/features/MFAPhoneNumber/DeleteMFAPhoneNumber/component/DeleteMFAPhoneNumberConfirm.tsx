@@ -39,23 +39,56 @@ export default function DeleteMFAPhoneNumberConfirm({
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="500">
         <GcdsContainer>
-          <GcdsHeading tag="h1" lang={language}>
-            {t("DeleteMFAPhoneNumberConfirm.title")}
-          </GcdsHeading>
-          <GcdsText>
-            {t("DeleteMFAPhoneNumberConfirm.noLongerUse")}{" "}
-            <strong>{phoneFormData?.formattedPhoneNumber}</strong>{" "}
-            {t("DeleteMFAPhoneNumberConfirm.toSignIn")}
-          </GcdsText>
-          <GcdsText>
-            {t("DeleteMFAPhoneNumberConfirm.thisText")}{" "}
-            {t("DeleteMFAPhoneNumberConfirm.willNot")}{" "}
-            {t("DeleteMFAPhoneNumberConfirm.deleteFromContact")}{" "}
-            <GcdsLink href={backtoProfilePage}>
-              {t("DeleteMFAPhoneNumberConfirm.personalInformation")}
-            </GcdsLink>
-            {t("DeleteMFAPhoneNumberConfirm.period")}
-          </GcdsText>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "32px",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "18px",
+              }}
+            >
+              <GcdsHeading tag="h1" lang={language}>
+                {t("DeleteMFAPhoneNumberConfirm.title")}
+              </GcdsHeading>
+              <div
+                data-testid="delete-phone-confirm-accent"
+                style={{
+                  background: "#b13f47",
+                  height: "5px",
+                  width: "47px",
+                }}
+              />
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "24px",
+              }}
+            >
+              <GcdsText>
+                {t("DeleteMFAPhoneNumberConfirm.noLongerUse")}{" "}
+                <strong>{phoneFormData?.formattedPhoneNumber}</strong>{" "}
+                {t("DeleteMFAPhoneNumberConfirm.toSignIn")}
+              </GcdsText>
+              <GcdsText>
+                {t("DeleteMFAPhoneNumberConfirm.thisText")}{" "}
+                {t("DeleteMFAPhoneNumberConfirm.willNot")}{" "}
+                {t("DeleteMFAPhoneNumberConfirm.deleteFromContact")}{" "}
+                <GcdsLink href={backtoProfilePage}>
+                  {t("DeleteMFAPhoneNumberConfirm.personalInformation")}
+                </GcdsLink>
+                {t("DeleteMFAPhoneNumberConfirm.period")}
+              </GcdsText>
+            </div>
+          </div>
         </GcdsContainer>
       </GcdsGrid>
 
