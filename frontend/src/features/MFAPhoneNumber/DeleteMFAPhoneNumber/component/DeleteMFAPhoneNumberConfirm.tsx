@@ -56,14 +56,6 @@ export default function DeleteMFAPhoneNumberConfirm({
               <GcdsHeading tag="h1" lang={language}>
                 {t("DeleteMFAPhoneNumberConfirm.title")}
               </GcdsHeading>
-              <div
-                data-testid="delete-phone-confirm-accent"
-                style={{
-                  background: "#b13f47",
-                  height: "5px",
-                  width: "47px",
-                }}
-              />
             </div>
 
             <div
