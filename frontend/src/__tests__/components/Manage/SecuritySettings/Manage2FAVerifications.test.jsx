@@ -121,7 +121,7 @@ vi.mock("@gcds-core/components-react", () => ({
 }));
 
 vi.mock(
-  "../../../../components/Manage/SecuritySettings/PhoneFactorsList",
+  "../../../../components/Manage/SecuritySettings/components/PhoneFactorsList",
   () => ({
     default: ({ userPhoneFactorsMap, totalFactorCount }) => (
       <div data-testid="phone-factors-list">
@@ -150,7 +150,7 @@ vi.mock(
 );
 
 vi.mock(
-  "../../../../components/Manage/SecuritySettings/FIDO2PasskeyList",
+  "../../../../components/Manage/SecuritySettings/components/FIDO2PasskeyList",
   () => ({
     default: ({ userFIDO2CredentialsData, totalFactorCount }) => (
       <div data-testid="fido2-passkey-list">
@@ -168,6 +168,13 @@ vi.mock("../../../../components/InfoBlocks/NoticeFactory", () => ({
   default: ({ noticeType }) =>
     noticeType ? <div data-testid="notice-factory">{noticeType}</div> : null,
 }));
+
+vi.mock(
+  "../../../../components/Manage/SecuritySettings/components/PasskeyInfoPanel",
+  () => ({
+    default: () => <div data-testid="passkey-info-panel" />,
+  }),
+);
 
 describe("Manage2FAVerifications Component Unit Tests", () => {
   beforeEach(() => {
@@ -413,7 +420,7 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
       expect(getByText("Available second steps")).toBeInTheDocument();
       expect(
         getByText(
-          "You can receive one-time verification codes at these numbers.",
+          "You can use the following 2-step verification methods to sign in.",
         ),
       ).toBeInTheDocument();
     });
@@ -533,5 +540,69 @@ describe("Manage2FAVerifications — additional coverage", () => {
         allowEmptyFactors: true,
       }),
     );
+  });
+
+  it("shows phone empty state text when no phone factors are registered", async () => {
+    mockUseOtpOperations.mockReturnValue({
+      phoneFactorsMap: {},
+      otpLoading: false,
+    });
+
+    const { getByText } = render(<Manage2FAVerifications />);
+
+    await waitFor(() => {
+      expect(
+        getByText(
+          "Receive one-time verification codes via text (SMS) or voice call.",
+        ),
+      ).toBeInTheDocument();
+    });
+  });
+
+  it("does NOT show phone empty state text when phone factors are registered", async () => {
+    mockUseOtpOperations.mockReturnValue({
+      phoneFactorsMap: {
+        5551234567: [{ phoneNumber: "5551234567", type: "smsotp" }],
+      },
+      otpLoading: false,
+    });
+
+    const { queryByText } = render(<Manage2FAVerifications />);
+
+    await waitFor(() => {
+      expect(
+        queryByText(
+          "Receive one-time verification codes via text (SMS) or voice call.",
+        ),
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  it("shows PasskeyInfoPanel when no passkeys are registered", async () => {
+    mockUsePasskeyOperations.mockReturnValue({
+      fido2Data: [],
+      loading: false,
+      refetch: vi.fn(),
+    });
+
+    const { getByTestId } = render(<Manage2FAVerifications />);
+
+    await waitFor(() => {
+      expect(getByTestId("passkey-info-panel")).toBeInTheDocument();
+    });
+  });
+
+  it("does NOT show PasskeyInfoPanel when passkeys are registered", async () => {
+    mockUsePasskeyOperations.mockReturnValue({
+      fido2Data: [{ id: "cred-1", attributes: { nickname: "My Passkey" } }],
+      loading: false,
+      refetch: vi.fn(),
+    });
+
+    const { queryByTestId } = render(<Manage2FAVerifications />);
+
+    await waitFor(() => {
+      expect(queryByTestId("passkey-info-panel")).not.toBeInTheDocument();
+    });
   });
 });

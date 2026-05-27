@@ -146,7 +146,14 @@ export default function OtpSelection({
         {smsFactors.length > 0 && (
           <GcdsContainer>
             <SectionHeader
-              icon={<SMSIcon width="23" height="23" />}
+              icon={
+                <SMSIcon
+                  width="23"
+                  height="23"
+                  aria-hidden="true"
+                  focusable="false"
+                />
+              }
               title={t("TransientOtpSelection.textMessage") ?? ""}
             />
             <GcdsContainer style={factorListStyle}>
@@ -185,7 +192,14 @@ export default function OtpSelection({
         {voiceFactors.length > 0 && (
           <GcdsContainer>
             <SectionHeader
-              icon={<VoiceIcon width="23" height="23" />}
+              icon={
+                <VoiceIcon
+                  width="23"
+                  height="23"
+                  aria-hidden="true"
+                  focusable="false"
+                />
+              }
               title={t("TransientOtpSelection.voiceCall") ?? ""}
             />
             <GcdsContainer style={factorListStyle}>
@@ -224,7 +238,14 @@ export default function OtpSelection({
         {hasFido2 && (
           <GcdsContainer>
             <SectionHeader
-              icon={<FIDO2Icon width="34" height="34" />}
+              icon={
+                <FIDO2Icon
+                  width="34"
+                  height="34"
+                  aria-hidden="true"
+                  focusable="false"
+                />
+              }
               title={t("TransientOtpSelection.passkeyOrSecurityKey") ?? ""}
               paddingBottom="0"
             />
@@ -259,7 +280,14 @@ export default function OtpSelection({
         {emailAddress && onSelectEmail && (
           <GcdsContainer>
             <SectionHeader
-              icon={<EmailIcon width="23" height="23" />}
+              icon={
+                <EmailIcon
+                  width="23"
+                  height="23"
+                  aria-hidden="true"
+                  focusable="false"
+                />
+              }
               title={t("TransientOtpSelection.email") ?? ""}
             />
             <GcdsContainer style={factorListStyle}>

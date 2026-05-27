@@ -138,7 +138,7 @@ export default function VerifyFIDO2Passkey({
         </GcdsText>
 
         <GcdsContainer style={{ justifySelf: "center" }}>
-          <FIDOPasskeyCollage />
+          <FIDOPasskeyCollage aria-hidden="true" focusable="false" />
         </GcdsContainer>
 
         <GcdsText> {t("VerifyFIDO2Passkey.description")} </GcdsText>

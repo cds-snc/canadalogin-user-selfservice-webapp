@@ -138,11 +138,14 @@ export const PAGES = {
   idvProvincialVerificationPage: "IdvProvincialVerificationPage",
 } as const;
 
+export const PRIVACY_NOTICE_LINKS = {
+  en: `${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainEN}/users/privacy/`,
+  fr: `${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainFR}/utilisateurs/confidentialite/`,
+} as const;
+
 export const FOOTERS = {
-  default: {
-    en: `{ "About CanadaLogin": "${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainEN}/users/what-is-canadalogin/", "Help": "${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainEN}/users/", "Terms": "${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainEN}/users/terms/" }`,
-    fr: `{ "À propos de ConnexionCanada": "${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainFR}/utilisateurs/a-propos/", "Aide": "${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainFR}/utilisateurs/", "Avis": "${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainFR}/utilisateurs/avis/" }`,
-  },
+  en: `{ "About CanadaLogin": "${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainEN}/users/what-is-canadalogin/", "Help": "${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainEN}/users/", "Privacy": "${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainEN}/users/privacy/", "Terms and Conditions": "${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainEN}/users/terms/" }`,
+  fr: `{ "À propos de ConnexionCanada": "${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainFR}/utilisateurs/a-propos/", "Aide": "${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainFR}/utilisateurs/", "Confidentialité": "${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainFR}/utilisateurs/confidentialite/", "Avis": "${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainFR}/utilisateurs/avis/" }`,
 } as const;
 
 export const SERVICES = [

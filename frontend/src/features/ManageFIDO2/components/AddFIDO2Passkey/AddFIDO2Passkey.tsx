@@ -35,7 +35,7 @@ export default function AddFIDO2Passkey({
           {t("AddFIDO2Passkey.title")}
         </GcdsHeading>
         <GcdsContainer>
-          <FIDOPasskeyCollage />
+          <FIDOPasskeyCollage aria-hidden="true" focusable="false" />
         </GcdsContainer>
         <ol className="passkey-steps">
           <li>

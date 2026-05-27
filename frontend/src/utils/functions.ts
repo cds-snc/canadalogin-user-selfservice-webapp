@@ -78,10 +78,10 @@ export function getContentWithVariables(
 
 export function getFooter(language: string | undefined) {
   if (language === AVAILABLE_LANGUAGES.fr) {
-    return FOOTERS.default.fr;
+    return FOOTERS.fr;
   }
 
-  return FOOTERS.default.en;
+  return FOOTERS.en;
 }
 
 export function isEmailValid(email: string | null | undefined) {

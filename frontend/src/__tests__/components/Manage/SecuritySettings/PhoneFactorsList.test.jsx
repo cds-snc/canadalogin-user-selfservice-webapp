@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import "@testing-library/jest-dom/vitest";
-import PhoneFactorsList from "../../../../components/Manage/SecuritySettings/PhoneFactorsList";
+import PhoneFactorsList from "../../../../components/Manage/SecuritySettings/components/PhoneFactorsList";
 
 const mockNavigate = vi.fn();
 
@@ -36,6 +36,7 @@ vi.mock("../../../../utils/routeHelpers", () => ({
 vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children }) => <div>{children}</div>,
   GcdsText: ({ children }) => <div>{children}</div>,
+  GcdsSrOnly: () => null,
   GcdsButton: ({ children, onGcdsClick, disabled }) => (
     <button onClick={onGcdsClick} disabled={disabled}>
       {children}

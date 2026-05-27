@@ -14,9 +14,11 @@ import { path } from "../../../utils/routeHelpers";
 import Loader from "../../Layout/Loading";
 import { useUser } from "../../Providers/useUser";
 import NoticeFactory from "../../InfoBlocks/NoticeFactory";
-import PhoneFactorsList from "./PhoneFactorsList";
-import FIDO2PasskeyList from "./FIDO2PasskeyList";
+import PhoneFactorsList from "./components/PhoneFactorsList";
+import FIDO2PasskeyList from "./components/FIDO2PasskeyList";
+import PasskeyInfoPanel from "./components/PasskeyInfoPanel";
 import FIDOPasskeyIcon from "../../../assets/icons/FIDO_Passkey_mark_A_black.svg?react";
+import PhoneMfaIcon from "../../../assets/icons/phone_mfa_icon.svg?react";
 import FIDOPasskeyCollage from "../../../assets/icons/passkey_collage.svg?react";
 import type { NoticeType } from "../../InfoBlocks/NoticeFactory";
 import type { OtpFactorReference } from "../../../types/hooks";
@@ -111,7 +113,7 @@ export default function Manage2FAVerifications() {
   return localLoading || passkeyLoading ? (
     <Loader text={t("Manage2FAVerifications.loading")} />
   ) : (
-    <GcdsContainer>
+    <GcdsContainer role="main">
       <ErrorSummaryWithFocus errorCode={errorCode} language={language} />
       {noticeType && (
         <NoticeFactory
@@ -132,18 +134,12 @@ export default function Manage2FAVerifications() {
       <GcdsGrid {...sectionCardProps}>
         <SectionHeader
           icon={
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
+            <PhoneMfaIcon
               width="16"
-              height="25"
-              viewBox="0 0 16 25"
-              fill="none"
-            >
-              <path
-                d="M2.18182 24.5464C1.58182 24.5464 1.06818 24.3328 0.640909 23.9055C0.213636 23.4782 0 22.9646 0 22.3646V2.7282C0 2.1282 0.213636 1.61457 0.640909 1.1873C1.06818 0.760023 1.58182 0.546387 2.18182 0.546387H13.0909C13.6909 0.546387 14.2045 0.760023 14.6318 1.1873C15.0591 1.61457 15.2727 2.1282 15.2727 2.7282V22.3646C15.2727 22.9646 15.0591 23.4782 14.6318 23.9055C14.2045 24.3328 13.6909 24.5464 13.0909 24.5464H2.18182ZM2.18182 21.2737V22.3646H13.0909V21.2737H2.18182ZM2.18182 19.0918H13.0909V6.00093H2.18182V19.0918ZM2.18182 3.81911H13.0909V2.7282H2.18182V3.81911Z"
-                fill="#333333"
-              />
-            </svg>
+              height="24"
+              aria-hidden="true"
+              focusable="false"
+            />
           }
           title={t("Manage2FAVerifications.phonesHeading")}
         />
@@ -151,6 +147,14 @@ export default function Manage2FAVerifications() {
           userPhoneFactorsMap={fullPhoneFactorsMap}
           totalFactorCount={totalFactorCount}
         />
+        {totalPhoneFactorCount < 1 && (
+          <>
+            <GcdsText textRole="secondary" marginBottom="0">
+              {t("Manage2FAVerifications.phoneEmptyState")}
+            </GcdsText>
+            <div className="separator" />
+          </>
+        )}
         <GcdsButton
           id="add-mfa-button"
           onGcdsClick={(event) => {
@@ -165,47 +169,20 @@ export default function Manage2FAVerifications() {
       {NON_PROD_ENVIRONMENT && (
         <GcdsGrid {...sectionCardProps}>
           <SectionHeader
-            icon={<FIDOPasskeyIcon width="34" height="34" />}
+            icon={
+              <FIDOPasskeyIcon
+                width="34"
+                height="34"
+                aria-hidden="true"
+                focusable="false"
+              />
+            }
             title={t("Manage2FAVerifications.passkeysHeading")}
           />
           {userFIDO2CredentialsData.length < 1 && (
             <>
-              <FIDOPasskeyCollage />
-              <GcdsContainer>
-                <GcdsText marginBottom="0">
-                  {
-                    <strong>
-                      {t("Manage2FAVerifications.passkeysSimplerSignIn")}
-                    </strong>
-                  }
-                </GcdsText>
-                <ul>
-                  <li>
-                    <GcdsText marginBottom="0">
-                      {
-                        <strong>
-                          {t("Manage2FAVerifications.whatArePasskeys")}
-                        </strong>
-                      }
-                    </GcdsText>
-                    <GcdsText marginBottom="0">
-                      {t("Manage2FAVerifications.passkeysDescription")}
-                    </GcdsText>
-                  </li>
-                  <li>
-                    <GcdsText marginBottom="0">
-                      {
-                        <strong>
-                          {t("Manage2FAVerifications.whereSaved")}
-                        </strong>
-                      }
-                    </GcdsText>
-                    <GcdsText marginBottom="0">
-                      {t("Manage2FAVerifications.savedDescription")}
-                    </GcdsText>
-                  </li>
-                </ul>
-              </GcdsContainer>
+              <FIDOPasskeyCollage aria-hidden="true" focusable="false" />
+              <PasskeyInfoPanel />
             </>
           )}
           <FIDO2PasskeyList

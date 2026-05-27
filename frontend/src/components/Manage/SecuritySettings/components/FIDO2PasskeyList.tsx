@@ -4,14 +4,15 @@ import {
   GcdsText,
   GcdsGrid,
   GcdsInput,
+  GcdsSrOnly,
 } from "@gcds-core/components-react";
 import { useNavigate, useParams } from "react-router";
-import { PAGES } from "../../../utils/constants";
+import { PAGES } from "../../../../utils/constants";
 import { useTranslation } from "react-i18next";
-import { path } from "../../../utils/routeHelpers";
+import { path } from "../../../../utils/routeHelpers";
 import { useState } from "react";
-import { fido2Api } from "../../../features/ManageFIDO2/api/fido2Api";
-import type { Fido2Credential } from "../../../types/hooks";
+import { fido2Api } from "../../../../features/ManageFIDO2/api/fido2Api";
+import type { Fido2Credential } from "../../../../types/hooks";
 
 interface Fido2CredentialWithCreated extends Fido2Credential {
   created?: string;
@@ -160,10 +161,16 @@ export default function FIDO2PasskeyList({
                   setEditingPasskeyId(id);
                 }}
               >
-                {t("Manage2FAVerifications.renamePasskey")}
+                <span aria-hidden="true">
+                  {t("Manage2FAVerifications.renamePasskey")}
+                </span>
+                <GcdsSrOnly tag="span">
+                  {t("Manage2FAVerifications.renamePasskey")} {nicknameValue}
+                </GcdsSrOnly>
               </GcdsButton>
               {canDeletePasskey && (
                 <GcdsButton
+                  aria-label="abc"
                   id="delete-fido2-button"
                   buttonRole="secondary"
                   onClick={() => {
@@ -173,6 +180,7 @@ export default function FIDO2PasskeyList({
                   }}
                 >
                   {t("Manage2FAVerifications.deletePasskey")}
+                  <GcdsSrOnly tag="span"> {nicknameValue}</GcdsSrOnly>
                 </GcdsButton>
               )}
             </>

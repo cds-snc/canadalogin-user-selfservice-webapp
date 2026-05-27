@@ -12,7 +12,7 @@ import { fido2Api } from "../../../../features/ManageFIDO2/api/fido2Api";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import "@testing-library/jest-dom/vitest";
-import FIDO2PasskeyList from "../../../../components/Manage/SecuritySettings/FIDO2PasskeyList";
+import FIDO2PasskeyList from "../../../../components/Manage/SecuritySettings/components/FIDO2PasskeyList";
 
 const mockNavigate = vi.fn();
 
@@ -55,6 +55,7 @@ vi.mock("@gcds-core/components-react", () => ({
   ),
   GcdsText: ({ children }) => <div data-testid="gcds-text">{children}</div>,
   GcdsGrid: ({ children }) => <div data-testid="gcds-grid">{children}</div>,
+  GcdsSrOnly: () => null,
   GcdsButton: ({ children, onGcdsClick, onClick, id, disabled }) => (
     <button
       data-testid={id}
