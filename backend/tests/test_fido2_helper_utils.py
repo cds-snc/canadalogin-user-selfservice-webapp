@@ -31,10 +31,11 @@ class TestHelperUtils:
 
     @patch("app.fido2.services.helper_utils.get_configuration")
     def test_get_rp_id(self, mock_get_config):
-        """Test getting RP ID from configuration"""
+        """Test getting RP ID from configuration falls back to tenant URL hostname"""
         # Arrange
         mock_config = Mock()
         mock_config.ibm_verify_config.IBM_VERIFY_TENANT_URL = MOCK_TENANT_URL
+        mock_config.ibm_verify_config.FIDO2_RP_ID = None
         mock_get_config.return_value = mock_config
 
         # Act
@@ -42,6 +43,25 @@ class TestHelperUtils:
 
         # Assert
         assert result == "fake-tenant.verify.ibm.com"
+
+    @patch("app.fido2.services.helper_utils.get_configuration")
+    def test_get_rp_id_uses_explicit_fido2_rp_id(self, mock_get_config):
+        """Test that FIDO2_RP_ID env var overrides the tenant URL hostname"""
+        # Arrange
+        mock_config = Mock()
+        mock_config.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
+            "https://auth.dev.login-connexion.alpha.canada.ca"
+        )
+        mock_config.ibm_verify_config.FIDO2_RP_ID = (
+            "dev.login-connexion.alpha.canada.ca"
+        )
+        mock_get_config.return_value = mock_config
+
+        # Act
+        result = get_rp_id()
+
+        # Assert
+        assert result == "dev.login-connexion.alpha.canada.ca"
 
     @patch("app.fido2.services.helper_utils.get_configuration")
     def test_get_tenant_url(self, mock_get_config):
