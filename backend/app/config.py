@@ -33,6 +33,14 @@ class IBMVerifyConfig(BaseSettings):
     IBM_VERIFY_PROFILE_MANAGEMENT_API_SECRET: str
     IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID: str
     IBM_VERIFY_PROFILE_MANAGEMENT_SECRET: str
+    FIDO2_RP_ID: Optional[str] = Field(
+        default=None,
+        description=(
+            "FIDO2 Relying Party ID. When set, overrides the hostname derived from "
+            "IBM_VERIFY_TENANT_URL. Required when the app domain is a sibling of the "
+            "tenant domain rather than a subdomain (e.g. dev.login-connexion.alpha.canada.ca)."
+        ),
+    )
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore", case_sensitive=True
     )

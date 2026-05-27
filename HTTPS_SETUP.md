@@ -20,7 +20,7 @@ For macOS-specific instructions on trusting local certificates, see: [How to mak
 ```bash
 cd backend
 mkdir -p certs
-mkcert -cert-file certs/cert.pem -key-file certs/key.pem app.cds-gcsignin-dev.verify.ibm.com localhost 127.0.0.1 ::1
+mkcert -cert-file certs/cert.pem -key-file certs/key.pem local.dev.login-connexion.alpha.canada.ca localhost 127.0.0.1 ::1
 ```
 
 **Certificate location**: `backend/certs/` (shared by both frontend and backend)
@@ -33,14 +33,14 @@ sudo nano /etc/hosts
 
 Add this line:
 ```
-127.0.0.1       app.cds-gcsignin-dev.verify.ibm.com
+127.0.0.1       local.dev.login-connexion.alpha.canada.ca
 ```
 
 ### 4. Configure Frontend to Use Shared Certificate
 
-The frontend uses the same certificate as the backend. Update `frontend/vite.config.js`:
+The frontend uses the same certificate as the backend. `frontend/vite.config.ts` is already configured:
 
-```javascript
+```typescript
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import fs from "fs";
@@ -50,9 +50,9 @@ import svgr from "vite-plugin-svgr";
 export default defineConfig({
   plugins: [react(), svgr()],
   server: {
-    host: "app.cds-gcsignin-dev.verify.ibm.com",
+    host: "local.dev.login-connexion.alpha.canada.ca",
     port: 3000,
-    allowedHosts: ["app.cds-gcsignin-dev.verify.ibm.com"],
+    allowedHosts: ["local.dev.login-connexion.alpha.canada.ca"],
     https: {
       key: fs.readFileSync(path.resolve("../backend/certs/key.pem")),
       cert: fs.readFileSync(path.resolve("../backend/certs/cert.pem")),
@@ -100,10 +100,24 @@ The frontend will automatically use the shared certificate from `backend/certs/`
 
 ### 7. Update Configuration
 
+In `backend/.env`, set:
+```env
+IBM_VERIFY_TENANT_URL=https://auth.dev.login-connexion.alpha.canada.ca
+FIDO2_RP_ID=dev.login-connexion.alpha.canada.ca
+PROFILE_MANAGEMENT_DOMAIN=https://local.dev.login-connexion.alpha.canada.ca:3000
+CORS_ORIGINS=local.dev.login-connexion.alpha.canada.ca:3000,local.dev.login-connexion.alpha.canada.ca:8000
+```
+
 In `frontend/.env`, set:
 ```env
-VITE_BACKEND_API_URL=https://app.cds-gcsignin-dev.verify.ibm.com:8000
+VITE_BACKEND_API_URL=https://local.dev.login-connexion.alpha.canada.ca:8000
 ```
+
+> **Note on FIDO2_RP_ID**: The `local.*` and `auth.*` subdomains are siblings under
+> `dev.login-connexion.alpha.canada.ca`. WebAuthn requires the RP ID to be a
+> registrable domain suffix of the page's origin, so `FIDO2_RP_ID` must be set to
+> the shared parent domain. Ensure the FIDO2 Relying Party in your IBM Verify tenant
+> is also configured with `dev.login-connexion.alpha.canada.ca` as the RP ID.
 
 ### 8. Browser Certificate Trust (if needed)
 
@@ -124,26 +138,26 @@ mkcert -install
 
 3. **Completely restart your browser** (not just reload the tab):
    - Quit the browser application entirely
-   - Reopen and navigate to https://app.cds-gcsignin-dev.verify.ibm.com:3000
+   - Reopen and navigate to https://local.dev.login-connexion.alpha.canada.ca:3000
 
 ### 9. Update IBM Verify OAuth Client
 
 Add these redirect URIs to your IBM Verify OAuth client:
-- `https://app.cds-gcsignin-dev.verify.ibm.com:8000/v1/auth/callback`
+- `https://local.dev.login-connexion.alpha.canada.ca:8000/v1/auth/callback`
 - Keep: `http://localhost:8000/v1/auth/callback` (for non-HTTPS development)
 
 ### 10. Access Your Application
 
-- **Backend API**: https://app.cds-gcsignin-dev.verify.ibm.com:8000
-- **Backend Health**: https://app.cds-gcsignin-dev.verify.ibm.com:8000/health/health
-- **Swagger UI**: https://app.cds-gcsignin-dev.verify.ibm.com:8000/docs
-- **Frontend**: https://app.cds-gcsignin-dev.verify.ibm.com:3000
+- **Backend API**: https://local.dev.login-connexion.alpha.canada.ca:8000
+- **Backend Health**: https://local.dev.login-connexion.alpha.canada.ca:8000/health/health
+- **Swagger UI**: https://local.dev.login-connexion.alpha.canada.ca:8000/docs
+- **Frontend**: https://local.dev.login-connexion.alpha.canada.ca:3000
 
 ## Testing
 
 ```bash
 # Test backend HTTPS
-curl https://app.cds-gcsignin-dev.verify.ibm.com:8000/health/health
+curl https://local.dev.login-connexion.alpha.canada.ca:8000/health/health
 
 # Should return:
 # {"status":"healthy","timestamp":"...","service":"gc-signin-backend"}
@@ -173,7 +187,7 @@ Both frontend and backend use the same certificate for:
 - **Consistency**: Single source of truth for SSL configuration
 - **Simplicity**: Only one certificate to generate and manage
 - **Easier troubleshooting**: Both services have identical SSL setup
-- **Same domain**: Both services run on app.cds-gcsignin-dev.verify.ibm.com
+- **Same domain**: Both services run on local.dev.login-connexion.alpha.canada.ca
 
 ### Redis connection error
 Ensure Redis is running:
@@ -188,7 +202,7 @@ brew services start redis
 ## Certificate Information
 
 - **Validity**: 825 days from generation
-- **Domains**: app.cds-gcsignin-dev.verify.ibm.com, localhost, 127.0.0.1, ::1
+- **Domains**: local.dev.login-connexion.alpha.canada.ca, localhost, 127.0.0.1, ::1
 - **Location**: `backend/certs/cert.pem` and `backend/certs/key.pem`
 - **Ignored by Git**: Yes (see `.gitignore`)
 
@@ -204,4 +218,4 @@ Access: http://localhost:8000
 ```bash
 docker run -p 8000:8000 --add-host host.docker.internal:host-gateway --env-file .env -e SESSION_REDIS_URL=redis://host.docker.internal:6379/0 -v $(pwd):/app -v $(pwd)/certs:/app/certs gc-signin-backend uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --ssl-keyfile=/app/certs/key.pem --ssl-certfile=/app/certs/cert.pem
 ```
-Access: https://app.cds-gcsignin-dev.verify.ibm.com:8000
+Access: https://local.dev.login-connexion.alpha.canada.ca:8000

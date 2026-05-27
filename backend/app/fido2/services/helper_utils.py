@@ -16,8 +16,16 @@ logger = logging.getLogger(__name__)
 
 
 def get_rp_id() -> str:
-    """Get the RP ID (relying party ID) from configuration"""
+    """Get the RP ID (relying party ID) from configuration.
+
+    Uses FIDO2_RP_ID if explicitly set (required when the app runs on a sibling
+    domain of the tenant, e.g. local.dev.login-connexion.alpha.canada.ca vs
+    auth.dev.login-connexion.alpha.canada.ca). Falls back to parsing the hostname
+    from IBM_VERIFY_TENANT_URL for backward compatibility.
+    """
     config = get_configuration()
+    if config.ibm_verify_config.FIDO2_RP_ID:
+        return config.ibm_verify_config.FIDO2_RP_ID
     parsed_url = urlparse(config.ibm_verify_config.IBM_VERIFY_TENANT_URL)
     return parsed_url.hostname
 
