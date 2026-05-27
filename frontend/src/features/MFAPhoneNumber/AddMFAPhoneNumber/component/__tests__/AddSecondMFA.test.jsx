@@ -74,7 +74,7 @@ describe("AddSecondMFA Unit Tests", () => {
 
   const defaultPhoneFormData = {
     phoneNumber: "6135551234",
-    formattedPhoneNumber: "(613) 555-1234",
+    formattedPhoneNumber: "+1 (613) 555-1234",
     otpType: "smsotp",
   };
 
@@ -82,8 +82,10 @@ describe("AddSecondMFA Unit Tests", () => {
     mockUseParams.mockReturnValue({ language: "en" });
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     vi.clearAllMocks();
+    await i18n.changeLanguage("en");
+    mockUseParams.mockReturnValue({ language: "en" });
   });
 
   describe("Component Rendering", () => {
@@ -116,11 +118,12 @@ describe("AddSecondMFA Unit Tests", () => {
       const notice = screen.getByTestId("gcds-notice");
       expect(notice).toHaveAttribute("data-notice-role", "success");
       expect(notice).toHaveAttribute("data-notice-title-tag", "h2");
+      expect(notice).toHaveAttribute("data-notice-title", "Success");
 
       // Check grid component
       const grid = screen.getByTestId("gcds-grid");
-      expect(grid).toHaveAttribute("data-columns", "max-content max-content");
-      expect(grid).toHaveAttribute("data-gap", "200");
+      expect(grid).toHaveAttribute("data-columns", "1");
+      expect(grid).toHaveAttribute("data-gap", "300");
 
       // Check headings
       const headings = screen.getAllByTestId("gcds-heading");
@@ -141,7 +144,7 @@ describe("AddSecondMFA Unit Tests", () => {
         </TestWrapper>,
       );
 
-      expect(screen.getByText("(613) 555-1234")).toBeInTheDocument();
+      expect(screen.getByText("+1 (613) 555-1234")).toBeInTheDocument();
     });
 
     it("should display page content from locale data", () => {
@@ -315,7 +318,12 @@ describe("AddSecondMFA Unit Tests", () => {
       expect(screen.getByTestId("gcds-container")).toBeInTheDocument();
 
       // Should show French content - use the actual rendered text
-      expect(screen.getByText("Oui, configurer")).toBeInTheDocument();
+      expect(
+        screen.getByText("Oui, configurer la vérification par appel vocal"),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("Non, ignorer pour l'instant"),
+      ).toBeInTheDocument();
       await i18n.changeLanguage("en");
     });
 
@@ -350,7 +358,7 @@ describe("AddSecondMFA Unit Tests", () => {
       );
 
       // Verify initial state
-      expect(screen.getByText("(613) 555-1234")).toBeInTheDocument();
+      expect(screen.getByText("+1 (613) 555-1234")).toBeInTheDocument();
       expect(
         screen.getByText("Yes, set up voice call verification"),
       ).toBeInTheDocument();
@@ -376,7 +384,7 @@ describe("AddSecondMFA Unit Tests", () => {
       );
 
       // Verify initial state
-      expect(screen.getByText("(613) 555-1234")).toBeInTheDocument();
+      expect(screen.getByText("+1 (613) 555-1234")).toBeInTheDocument();
       expect(screen.getByText("No, skip for now")).toBeInTheDocument();
 
       // User clicks skip link

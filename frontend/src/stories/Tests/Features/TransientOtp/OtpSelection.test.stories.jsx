@@ -110,7 +110,7 @@ SingleFactorNoRadios.play = async ({ canvasElement }) => {
 
   // The factor destination should appear as text in the row
   await waitFor(async () => {
-    const destination = canvas.getByText("+15551234567");
+    const destination = canvas.getByText("******-4567");
     await expect(destination).toBeInTheDocument();
   });
 

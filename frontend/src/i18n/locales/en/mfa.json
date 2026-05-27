@@ -26,12 +26,17 @@
     "nameLabel": "Name"
   },
   "AddMFANumber": {
-    "title": "Enter your new phone number",
+    "title": "Add a phone number",
     "description": "Enter the new phone number you want to receive security codes at each time you sign in.",
     "onlyFor2Step": "This number will only be used for 2-step verification. To manage your contact phone number, go to",
     "personalInformation": "Personal Information",
     "period": ".",
+    "privacyNoticeLead": "Read our",
+    "privacyNoticeLink": "privacy notice",
+    "privacyNoticeSuffix": "for information on how we use your personal information.",
     "countryLabel": "Country",
+    "countryListAriaLabel": "Countries list",
+    "countrySearchLabel": "Search for your country",
     "phoneLabel": "Phone number",
     "countryNotListed": "My country is not listed here",
     "countryNotSupported": "Some countries are not supported due to technical limitations. If your country is not listed, you will be unable to create a CanadaLogin at this time. We apologize for the inconvenience.",

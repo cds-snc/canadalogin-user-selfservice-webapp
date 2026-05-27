@@ -10,13 +10,86 @@ import {
   GcdsText,
 } from "@gcds-core/components-react";
 import { isValidPhoneNumber, CountryCode } from "libphonenumber-js";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/material.css";
 import { useParams } from "react-router";
-import { countryMapping, FLOW_TYPES, PAGES } from "../../../../utils/constants";
+import {
+  countryMapping,
+  EXTERNAL_NAVIGATION_LINKS,
+  FLOW_TYPES,
+  PAGES,
+} from "../../../../utils/constants";
 import { useTranslation } from "react-i18next";
 import { path } from "../../../../utils/routeHelpers";
 import SubmitButton from "../../../../components/Layout/SubmitButton";
+import type { ReactElement } from "react";
+
+type PhoneInputCountryData = {
+  countryCode?: string;
+  dialCode?: string;
+  iso2?: string;
+};
+
+type PhoneInputChangeEvent = Event | React.ChangeEvent<HTMLInputElement>;
+
+interface TypedPhoneInputProps {
+  inputProps?: Record<string, unknown>;
+  specialLabel?: string;
+  country?: string;
+  preferredCountries?: string[];
+  onlyCountries?: string[];
+  className?: string;
+  localization?: Record<string, string>;
+  value?: string;
+  placeholder?: string;
+  enableSearch?: boolean;
+  disableCountryCode?: boolean;
+  disableCountryGuess?: boolean;
+  countryCodeEditable?: boolean;
+  disableSearchIcon?: boolean;
+  defaultErrorMessage?: string;
+  onChange?: (
+    phone: string,
+    country: PhoneInputCountryData,
+    event: PhoneInputChangeEvent,
+    formattedValue: string,
+  ) => void;
+  isValid?: (inputNumber: string, country: PhoneInputCountryData) => boolean;
+}
+
+const TypedPhoneInput = PhoneInput as unknown as (
+  props: TypedPhoneInputProps,
+) => ReactElement;
+
+const getLocalPhoneNumber = (phoneNumber: string, dialCode: string) => {
+  const digitsOnly = phoneNumber.replace(/\D/g, "");
+
+  if (!digitsOnly || !dialCode) {
+    return digitsOnly;
+  }
+
+  return digitsOnly.startsWith(dialCode)
+    ? digitsOnly.slice(dialCode.length)
+    : digitsOnly;
+};
+
+const getFormattedPhoneNumber = (
+  formattedPhoneNumber: string,
+  dialCode: string,
+) => {
+  const trimmedFormattedPhoneNumber = formattedPhoneNumber.trim();
+
+  if (!trimmedFormattedPhoneNumber) {
+    return "";
+  }
+
+  if (trimmedFormattedPhoneNumber.startsWith("+")) {
+    return trimmedFormattedPhoneNumber;
+  }
+
+  return `+${dialCode} ${trimmedFormattedPhoneNumber}`;
+};
 
 interface PhoneFormData {
   phoneNumber: string;
@@ -121,8 +194,13 @@ export default function AddMFAPhoneNumber({
 }: AddMFAPhoneNumberProps) {
   const { language } = useParams();
   const [phoneNumberValid, setPhoneNumberValid] = useState(true);
+  const [selectedDialCode, setSelectedDialCode] = useState("1");
   const { t } = useTranslation(["mfa", "common"]);
   const backtoProfilePage = path(PAGES.ProfileHome, { language: language });
+  const privacyNoticeHref =
+    language === "fr"
+      ? `${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainFR}/utilisateurs/confidentialite/`
+      : `${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainEN}/users/privacy/`;
 
   const isPhoneNumberValid = (phoneNumber: string, country: string) => {
     const capitalize = country.toUpperCase() as CountryCode;
@@ -147,6 +225,38 @@ export default function AddMFAPhoneNumber({
     void doSubmit();
   };
 
+  useEffect(() => {
+    const addAccessibilityAttributes = () => {
+      const countryList = document.querySelector(
+        '.country-list[role="listbox"]',
+      );
+
+      if (countryList && !countryList.getAttribute("aria-label")) {
+        countryList.setAttribute(
+          "aria-label",
+          t("AddMFANumber.countryListAriaLabel"),
+        );
+      }
+    };
+
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        if (mutation.type === "childList") {
+          addAccessibilityAttributes();
+        }
+      }
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+
+    addAccessibilityAttributes();
+
+    return () => observer.disconnect();
+  }, [t]);
+
   return (
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="500">
@@ -162,6 +272,13 @@ export default function AddMFAPhoneNumber({
             </GcdsLink>{" "}
             {t("AddMFANumber.period")}
           </GcdsText>
+          <GcdsText>
+            {t("AddMFANumber.privacyNoticeLead")}{" "}
+            <GcdsLink href={privacyNoticeHref}>
+              {t("AddMFANumber.privacyNoticeLink")}
+            </GcdsLink>{" "}
+            {t("AddMFANumber.privacyNoticeSuffix")}
+          </GcdsText>
         </GcdsContainer>
 
         <section>
@@ -171,44 +288,88 @@ export default function AddMFAPhoneNumber({
             </GcdsErrorMessage>
           )}
           <form onSubmit={onSubmitHandler}>
-            <PhoneInput
-              inputProps={{
-                name: "phone",
-                required: true,
-                autoFocus: true,
-              }}
-              specialLabel={t("AddMFANumber.phoneLabel")}
-              country={"ca"}
-              preferredCountries={["ca"]}
-              onlyCountries={countryMapping.countries as unknown as string[]}
-              localization={
-                language === "fr"
-                  ? countryMapping.frLocalization
-                  : countryMapping.localization
-              }
-              value={phoneFormData.phoneNumber}
-              enableSearch={true}
-              countryCodeEditable={false}
-              disableSearchIcon={false}
-              defaultErrorMessage={t("AddMFANumber.voiceCallHint")}
-              onChange={(
-                phone: string,
-                country: { countryCode?: string; iso2?: string },
-                _event: React.ChangeEvent<HTMLInputElement>,
-                formatted: string,
-              ) => {
-                onChangePhoneForm("phoneNumber", `+${phone}`);
-                onChangePhoneForm("formattedPhoneNumber", formatted);
-                const isNumberValid = isPhoneNumberValid(
-                  phone,
-                  country.countryCode ?? "",
-                );
-                setPhoneNumberValid(isNumberValid);
-              }}
-              isValid={(inputNumber: string, country: { iso2?: string }) => {
-                return isPhoneNumberValid(inputNumber, country.iso2 ?? "");
-              }}
-            />
+            <div
+              className="mfa-phone-input"
+              data-country-search-label={t("AddMFANumber.countrySearchLabel")}
+            >
+              <div className="mfa-phone-input__labels" aria-hidden="true">
+                <span className="mfa-phone-input__label mfa-phone-input__label--country">
+                  {t("AddMFANumber.countryLabel")}
+                </span>
+                <span className="mfa-phone-input__label">
+                  {t("AddMFANumber.phoneLabel")}
+                </span>
+              </div>
+
+              <div
+                className="mfa-phone-input__control-wrap"
+                data-country-dial-code={`+${selectedDialCode}`}
+              >
+                <TypedPhoneInput
+                  inputProps={{
+                    name: "phone",
+                    required: true,
+                    autoFocus: true,
+                    "aria-label": t("AddMFANumber.phoneLabel"),
+                  }}
+                  specialLabel={t("AddMFANumber.phoneLabel")}
+                  country={"ca"}
+                  preferredCountries={["ca"]}
+                  onlyCountries={
+                    countryMapping.countries as unknown as string[]
+                  }
+                  className="high-res mfa-phone-input__control"
+                  localization={
+                    language === "fr"
+                      ? countryMapping.frLocalization
+                      : countryMapping.localization
+                  }
+                  value={getLocalPhoneNumber(
+                    phoneFormData.phoneNumber,
+                    selectedDialCode,
+                  )}
+                  placeholder=""
+                  enableSearch={true}
+                  disableCountryCode={true}
+                  disableCountryGuess={true}
+                  disableSearchIcon={false}
+                  onChange={(
+                    phone: string,
+                    country: {
+                      countryCode?: string;
+                      dialCode?: string;
+                      iso2?: string;
+                    },
+                    _event: PhoneInputChangeEvent,
+                    formatted: string,
+                  ) => {
+                    const dialCode = country.dialCode ?? selectedDialCode;
+
+                    setSelectedDialCode(dialCode);
+                    onChangePhoneForm(
+                      "phoneNumber",
+                      phone ? `+${dialCode}${phone}` : "",
+                    );
+                    onChangePhoneForm(
+                      "formattedPhoneNumber",
+                      getFormattedPhoneNumber(formatted, dialCode),
+                    );
+                    const isNumberValid = isPhoneNumberValid(
+                      phone,
+                      country.countryCode ?? "",
+                    );
+                    setPhoneNumberValid(isNumberValid);
+                    setErrorCode("");
+                  }}
+                  isValid={(
+                    inputNumber: string,
+                    country: { iso2?: string },
+                  ) => {
+                    return isPhoneNumberValid(inputNumber, country.iso2 ?? "");
+                  }}
+                />
+              </div>
+            </div>
           </form>
         </section>
 
@@ -223,7 +384,7 @@ export default function AddMFAPhoneNumber({
 
       <GcdsGrid columns="max-content max-content" gap="200">
         <SubmitButton
-          disabled={!phoneNumberValid}
+          disabled={!phoneNumberValid || !phoneFormData.phoneNumber}
           style={{ width: "fit-content" }}
           onGcdsClick={(ev) => {
             ev.preventDefault();

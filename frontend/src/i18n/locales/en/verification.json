@@ -25,6 +25,7 @@
     "textMeInstead": "Send me a text (SMS) instead",
     "differentPhoneNumber": "Use a different phone number",
     "requestNewCodeIn": "Request a new code in",
+    "requestNewCodeAvailableIn": "You can request a new code in",
     "seconds": "seconds",
     "requestNewCode": "Request a new code",
     "newCodeSent": "We have sent you a new code",

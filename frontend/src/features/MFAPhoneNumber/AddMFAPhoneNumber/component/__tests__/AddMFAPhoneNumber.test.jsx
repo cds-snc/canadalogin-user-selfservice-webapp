@@ -1,5 +1,6 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import React from "react";
 import { BrowserRouter } from "react-router";
 import * as ReactRouter from "react-router";
 import AddMFAPhoneNumber from "../AddMFAPhoneNumber";
@@ -132,6 +133,9 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
 
       const phoneInput = screen.getByRole("textbox");
       expect(phoneInput).toBeInTheDocument();
+      expect(phoneInput).toHaveAttribute("placeholder", "");
+      expect(screen.getByText("Country")).toBeInTheDocument();
+      expect(screen.getAllByText("Phone number")[0]).toBeInTheDocument();
     });
 
     it("should render GCDS components", () => {
@@ -167,6 +171,25 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
 
       expect(screen.getByText("Continue")).toBeInTheDocument();
       expect(screen.getByText("Cancel")).toBeInTheDocument();
+    });
+    it("should render the Figma privacy notice content", () => {
+      render(
+        <TestWrapper>
+          <AddMFAPhoneNumber
+            onNext={mockOnNext}
+            onCancel={mockOnCancel}
+            onChangePhoneForm={mockOnChangePhoneForm}
+            phoneFormData={defaultPhoneFormData}
+          />
+        </TestWrapper>,
+      );
+
+      const [, privacyNoticeLink] = screen.getAllByTestId("gcds-link");
+      expect(privacyNoticeLink).toBeInTheDocument();
+      expect(privacyNoticeLink.textContent).toBe("privacy notice");
+      expect(privacyNoticeLink.parentElement?.textContent).toContain(
+        "for information on how we use your personal information.",
+      );
     });
 
     it("should render radio buttons section", () => {
@@ -205,9 +228,8 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
       );
 
       const phoneInput = screen.getByRole("textbox");
-      expect(phoneInput.value).toContain("555");
-      expect(phoneInput.value).toContain("123");
-      expect(phoneInput.value).toContain("4567");
+      expect(phoneInput.value.replace(/\D/g, "")).toBe("5551234567");
+      expect(phoneInput.value).not.toContain("+1");
     });
 
     it("should handle different OTP types", () => {
@@ -289,9 +311,7 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
       );
 
       const phoneInput = screen.getByRole("textbox");
-      expect(phoneInput.value).toContain("613");
-      expect(phoneInput.value).toContain("555");
-      expect(phoneInput.value).toContain("1234");
+      expect(phoneInput.value.replace(/\D/g, "")).toBe("6135551234");
     });
 
     it("should validate US phone numbers correctly", () => {
@@ -312,7 +332,7 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
       );
 
       const phoneInput = screen.getByRole("textbox");
-      expect(phoneInput.value).toContain("202");
+      expect(phoneInput.value.replace(/\D/g, "")).toBe("2025551234");
     });
 
     it("should handle invalid phone numbers", () => {
@@ -464,7 +484,7 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
       const heading = screen.getByTestId("gcds-heading");
       expect(heading).toBeInTheDocument();
       // The component uses language parameter from useParams and renders a heading
-      expect(heading.textContent).toContain("Enter your new phone number");
+      expect(heading.textContent).toContain("Add a phone number");
     });
   });
 
@@ -529,6 +549,112 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
     });
   });
   describe("Phone Input Change Handling", () => {
+    it("should allow typing local digits without showing the country code", () => {
+      const Harness = () => {
+        const [phoneFormData, setPhoneFormData] = React.useState({
+          phoneNumber: "",
+          formattedPhoneNumber: "",
+          otpType: "smsotp",
+        });
+
+        return (
+          <AddMFAPhoneNumber
+            onNext={mockOnNext}
+            onCancel={mockOnCancel}
+            onChangePhoneForm={(field, value) => {
+              setPhoneFormData((prev) => ({
+                ...prev,
+                [field]: value,
+              }));
+            }}
+            phoneFormData={phoneFormData}
+            setErrorCode={mockSetErrorCode}
+          />
+        );
+      };
+
+      render(
+        <TestWrapper>
+          <Harness />
+        </TestWrapper>,
+      );
+
+      const phoneInput = screen.getByRole("textbox");
+
+      fireEvent.change(phoneInput, { target: { value: "6135551234" } });
+
+      expect(phoneInput.value.replace(/\D/g, "")).toBe("6135551234");
+      expect(phoneInput.value).not.toContain("+1");
+    });
+
+    it("should store the formatted phone number with the country code", () => {
+      render(
+        <TestWrapper>
+          <AddMFAPhoneNumber
+            onNext={mockOnNext}
+            onCancel={mockOnCancel}
+            onChangePhoneForm={mockOnChangePhoneForm}
+            phoneFormData={{
+              phoneNumber: "",
+              formattedPhoneNumber: "",
+              otpType: "smsotp",
+            }}
+            setErrorCode={mockSetErrorCode}
+          />
+        </TestWrapper>,
+      );
+
+      const phoneInput = screen.getByRole("textbox");
+
+      fireEvent.change(phoneInput, { target: { value: "6135551234" } });
+
+      expect(mockOnChangePhoneForm).toHaveBeenCalledWith(
+        "formattedPhoneNumber",
+        expect.stringContaining("+1"),
+      );
+    });
+
+    it("should not treat leading digits in the phone textbox as a new country code", () => {
+      const Harness = () => {
+        const [phoneFormData, setPhoneFormData] = React.useState({
+          phoneNumber: "",
+          formattedPhoneNumber: "",
+          otpType: "smsotp",
+        });
+
+        return (
+          <AddMFAPhoneNumber
+            onNext={mockOnNext}
+            onCancel={mockOnCancel}
+            onChangePhoneForm={(field, value) => {
+              setPhoneFormData((prev) => ({
+                ...prev,
+                [field]: value,
+              }));
+            }}
+            phoneFormData={phoneFormData}
+            setErrorCode={mockSetErrorCode}
+          />
+        );
+      };
+
+      const { container } = render(
+        <TestWrapper>
+          <Harness />
+        </TestWrapper>,
+      );
+
+      const phoneInput = screen.getByRole("textbox");
+      const countryBox = container.querySelector(
+        ".mfa-phone-input__control-wrap",
+      );
+
+      fireEvent.change(phoneInput, { target: { value: "4471234567" } });
+
+      expect(phoneInput.value.replace(/\D/g, "")).toBe("4471234567");
+      expect(countryBox).toHaveAttribute("data-country-dial-code", "+1");
+    });
+
     it("should call onChangePhoneForm when phone input changes", () => {
       const { container } = render(
         <TestWrapper>
@@ -626,9 +752,9 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
         </TestWrapper>,
       );
 
-      const link = screen.getByTestId("gcds-link");
-      expect(link).toBeInTheDocument();
-      expect(link).toHaveProperty("href");
+      const links = screen.getAllByTestId("gcds-link");
+      expect(links).toHaveLength(2);
+      expect(links[0]).toHaveProperty("href");
     });
 
     it("should generate correct profile page path", () => {
@@ -643,10 +769,10 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
         </TestWrapper>,
       );
 
-      const link = screen.getByTestId("gcds-link");
-      expect(link).toBeInTheDocument();
+      const [profileLink] = screen.getAllByTestId("gcds-link");
+      expect(profileLink).toBeInTheDocument();
       // The component generates the path using the path utility function and contains link text
-      expect(link.textContent).toContain("Personal Information");
+      expect(profileLink.textContent).toContain("Personal Information");
     });
   });
 
@@ -1117,7 +1243,7 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
       );
 
       // The path() function call creates the profile link
-      const profileLink = screen.getByTestId("gcds-link");
+      const [profileLink] = screen.getAllByTestId("gcds-link");
       expect(profileLink).toBeInTheDocument();
       expect(profileLink.textContent).toContain("Personal Information");
     });

@@ -70,16 +70,21 @@ vi.mock("@gcds-core/components-react", () => ({
     );
   },
   // Differentiate external links (href) from button-style links (onGcdsClick)
-  GcdsLink: ({ children, href, target, onGcdsClick }) => {
+  GcdsLink: ({ children, href, target, onGcdsClick, ...rest }) => {
     if (href) {
       return (
-        <a data-testid="gcds-link-external" href={href} target={target}>
+        <a
+          data-testid="gcds-link-external"
+          href={href}
+          target={target}
+          {...rest}
+        >
           {children}
         </a>
       );
     }
     return (
-      <button data-testid="gcds-link-button" onClick={onGcdsClick}>
+      <button data-testid="gcds-link-button" onClick={onGcdsClick} {...rest}>
         {children}
       </button>
     );
@@ -236,7 +241,20 @@ describe("OtpSelection Component", () => {
           { id: "sms-1", type: FLOW_TYPES.sms, destination: "+15551234567" },
         ],
       });
-      expect(screen.getByText("+15551234567")).toBeInTheDocument();
+      expect(screen.getByText("******-4567")).toBeInTheDocument();
+    });
+
+    it("adds a screen-reader label for SMS actions using the last four digits", () => {
+      renderComponent({
+        userPhoneFactors: [
+          { id: "sms-1", type: FLOW_TYPES.sms, destination: "+15551234567" },
+        ],
+      });
+
+      expect(screen.getByText("Text me")).toHaveAttribute(
+        "aria-label",
+        "Text me at number ending in 4567",
+      );
     });
 
     it("renders a select link for each SMS factor", () => {
@@ -295,7 +313,24 @@ describe("OtpSelection Component", () => {
           },
         ],
       });
-      expect(screen.getByText("+15559876543")).toBeInTheDocument();
+      expect(screen.getByText("******-6543")).toBeInTheDocument();
+    });
+
+    it("adds a screen-reader label for voice actions using the last four digits", () => {
+      renderComponent({
+        userPhoneFactors: [
+          {
+            id: "voice-1",
+            type: FLOW_TYPES.voice,
+            destination: "+15559876543",
+          },
+        ],
+      });
+
+      expect(screen.getByText("Call me")).toHaveAttribute(
+        "aria-label",
+        "Call me at number ending in 6543",
+      );
     });
 
     it("renders a select link for each voice factor", () => {
@@ -330,8 +365,8 @@ describe("OtpSelection Component", () => {
       });
       expect(screen.getByText("Text message")).toBeInTheDocument();
       expect(screen.getByText("Voice call")).toBeInTheDocument();
-      expect(screen.getByText("+15551111111")).toBeInTheDocument();
-      expect(screen.getByText("+15552222222")).toBeInTheDocument();
+      expect(screen.getByText("******-1111")).toBeInTheDocument();
+      expect(screen.getByText("******-2222")).toBeInTheDocument();
     });
   });
 
@@ -372,6 +407,17 @@ describe("OtpSelection Component", () => {
         ],
       });
       expect(screen.getByText("Work Laptop Key")).toBeInTheDocument();
+    });
+
+    it("adds a screen-reader label for passkey verification actions", () => {
+      renderComponent({
+        fido2Data: [{ id: "passkey-1", attributes: { nickname: "1Password" } }],
+      });
+
+      expect(screen.getByText("Verify")).toHaveAttribute(
+        "aria-label",
+        "Verify with 1Password passkey",
+      );
     });
 
     it("renders passkey id when nickname is not available", () => {
