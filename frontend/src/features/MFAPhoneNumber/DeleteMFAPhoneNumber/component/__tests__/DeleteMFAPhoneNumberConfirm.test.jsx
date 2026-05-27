@@ -51,8 +51,8 @@ describe("DeleteMFAPhoneNumberConfirm", () => {
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getByTestId("delete-phone-confirm-accent"),
-    ).toBeInTheDocument();
+      screen.queryByTestId("delete-phone-confirm-accent"),
+    ).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Yes, delete" })).toHaveAttribute(
       "data-button-role",
       "danger",
