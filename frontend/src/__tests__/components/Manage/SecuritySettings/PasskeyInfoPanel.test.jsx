@@ -65,7 +65,10 @@ describe("PasskeyInfoPanel", () => {
     render(<PasskeyInfoPanel />);
     const privacyLink = screen.getByRole("link", { name: "privacy notice" });
     expect(privacyLink).toBeInTheDocument();
-    expect(privacyLink).toHaveAttribute("href", "#");
+    expect(privacyLink).toHaveAttribute(
+      "href",
+      "https://login.canada.ca/en/users/privacy/",
+    );
   });
 
   it("renders the 'Learn more about passkeys' link", () => {
