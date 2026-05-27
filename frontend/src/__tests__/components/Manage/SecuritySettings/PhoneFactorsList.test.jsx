@@ -36,6 +36,7 @@ vi.mock("../../../../utils/routeHelpers", () => ({
 vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children }) => <div>{children}</div>,
   GcdsText: ({ children }) => <div>{children}</div>,
+  GcdsSrOnly: () => null,
   GcdsButton: ({ children, onGcdsClick, disabled }) => (
     <button onClick={onGcdsClick} disabled={disabled}>
       {children}

@@ -1,6 +1,7 @@
 import {
   GcdsButton,
   GcdsContainer,
+  GcdsSrOnly,
   GcdsText,
 } from "@gcds-core/components-react";
 import { useNavigate, useParams } from "react-router";
@@ -69,6 +70,7 @@ export default function PhoneFactorsList({
             }}
           >
             {t("Manage2FAVerifications.deleteButton")}
+            <GcdsSrOnly tag="span"> {phoneNumber}</GcdsSrOnly>
           </GcdsButton>
         )}
         <div className="separator" />

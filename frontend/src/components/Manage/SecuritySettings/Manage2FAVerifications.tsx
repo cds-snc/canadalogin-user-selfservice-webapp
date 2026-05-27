@@ -148,11 +148,13 @@ export default function Manage2FAVerifications() {
           totalFactorCount={totalFactorCount}
         />
         {totalPhoneFactorCount < 1 && (
-          <GcdsText textRole="secondary" marginBottom="0">
-            {t("Manage2FAVerifications.phoneEmptyState")}
-          </GcdsText>
+          <>
+            <GcdsText textRole="secondary" marginBottom="0">
+              {t("Manage2FAVerifications.phoneEmptyState")}
+            </GcdsText>
+            <div className="separator" />
+          </>
         )}
-        <div className="separator" />
         <GcdsButton
           id="add-mfa-button"
           onGcdsClick={(event) => {

@@ -55,6 +55,7 @@ vi.mock("@gcds-core/components-react", () => ({
   ),
   GcdsText: ({ children }) => <div data-testid="gcds-text">{children}</div>,
   GcdsGrid: ({ children }) => <div data-testid="gcds-grid">{children}</div>,
+  GcdsSrOnly: () => null,
   GcdsButton: ({ children, onGcdsClick, onClick, id, disabled }) => (
     <button
       data-testid={id}
