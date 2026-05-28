@@ -76,15 +76,12 @@ export default function Manage2FAVerifications() {
     language,
   });
   const [errorCode, setErrorCode] = useState("");
-  const [inlineNotice, setInlineNotice] = useState<Manage2FANoticeState | null>(
-    null,
-  );
 
   const errorMessage = getErrorMessage(language, errorCode);
 
   const { noticeType, phoneNumber, otpType, passkeyName } =
     (location.state as Manage2FANoticeState | null) || {};
-  const activeNotice = inlineNotice ?? {
+  const activeNotice = {
     noticeType,
     phoneNumber,
     otpType,
@@ -113,14 +110,11 @@ export default function Manage2FAVerifications() {
       mapType: MAP_TYPES.fullPhoneNumber,
     });
 
-  const {
-    fido2Data: userFIDO2CredentialsData,
-    loading: passkeyLoading,
-    refetch: refetchPasskeys,
-  } = usePasskeyOperations({
-    enabled: NON_PROD_ENVIRONMENT,
-    setErrorCode: () => {},
-  });
+  const { fido2Data: userFIDO2CredentialsData, loading: passkeyLoading } =
+    usePasskeyOperations({
+      enabled: NON_PROD_ENVIRONMENT,
+      setErrorCode: () => {},
+    });
 
   const fullPhoneFactorsMap = userPhoneFactorsMap as Record<
     string,
@@ -132,14 +126,6 @@ export default function Manage2FAVerifications() {
   );
   const totalPasskeyCount = userFIDO2CredentialsData.length;
   const totalFactorCount = totalPhoneFactorCount + totalPasskeyCount;
-
-  const handlePasskeyRenameSuccess = async (renamedPasskeyName: string) => {
-    await refetchPasskeys();
-    setInlineNotice({
-      noticeType: "passkeyRenamed",
-      passkeyName: renamedPasskeyName,
-    });
-  };
 
   return localLoading || passkeyLoading ? (
     <Loader text={t("Manage2FAVerifications.loading")} />
@@ -219,7 +205,6 @@ export default function Manage2FAVerifications() {
           <FIDO2PasskeyList
             userFIDO2CredentialsData={userFIDO2CredentialsData}
             totalFactorCount={totalFactorCount}
-            onRenameSuccess={handlePasskeyRenameSuccess}
             setErrorCode={setErrorCode}
             errorMessage={errorMessage}
           />

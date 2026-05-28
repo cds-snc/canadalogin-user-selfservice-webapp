@@ -16,7 +16,6 @@ export type NoticeType =
   | "mfaAdded"
   | "mfaDeleted"
   | "passkeyAdded"
-  | "passkeyRenamed"
   | "passkeyDeleted";
 
 export const pageIds = [

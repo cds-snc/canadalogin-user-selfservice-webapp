@@ -82,7 +82,6 @@ export const NOTICE_TYPES = {
   mfaAdded: "mfaAdded",
   mfaDeleted: "mfaDeleted",
   passkeyAdded: "passkeyAdded",
-  passkeyRenamed: "passkeyRenamed",
   passkeyDeleted: "passkeyDeleted",
 } as const;
 
