@@ -9,7 +9,11 @@ import {
   GcdsRadios,
   GcdsText,
 } from "@gcds-core/components-react";
-import { isValidPhoneNumber, CountryCode } from "libphonenumber-js";
+import {
+  isValidPhoneNumber,
+  parsePhoneNumberFromString,
+  CountryCode,
+} from "libphonenumber-js";
 import { useEffect, useState } from "react";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/material.css";
@@ -72,6 +76,31 @@ const getLocalPhoneNumber = (phoneNumber: string, dialCode: string) => {
   return digitsOnly.startsWith(dialCode)
     ? digitsOnly.slice(dialCode.length)
     : digitsOnly;
+};
+
+export const getDisplayedPhoneNumber = (
+  phoneNumber: string,
+  dialCode: string,
+) => {
+  const trimmedPhoneNumber = phoneNumber.trim();
+
+  if (!trimmedPhoneNumber || /^\+\d{1,4}$/.test(trimmedPhoneNumber)) {
+    return "";
+  }
+
+  const parsedPhoneNumber = parsePhoneNumberFromString(trimmedPhoneNumber);
+
+  if (parsedPhoneNumber?.nationalNumber) {
+    return parsedPhoneNumber.nationalNumber;
+  }
+
+  return getLocalPhoneNumber(trimmedPhoneNumber, dialCode);
+};
+
+export const getStoredPhoneNumber = (phoneNumber: string, dialCode: string) => {
+  const localPhoneNumber = getLocalPhoneNumber(phoneNumber, dialCode);
+
+  return localPhoneNumber ? `+${dialCode}${localPhoneNumber}` : "";
 };
 
 const getFormattedPhoneNumber = (
@@ -324,7 +353,7 @@ export default function AddMFAPhoneNumber({
                       ? countryMapping.frLocalization
                       : countryMapping.localization
                   }
-                  value={getLocalPhoneNumber(
+                  value={getDisplayedPhoneNumber(
                     phoneFormData.phoneNumber,
                     selectedDialCode,
                   )}
@@ -332,6 +361,7 @@ export default function AddMFAPhoneNumber({
                   enableSearch={true}
                   disableCountryCode={true}
                   disableCountryGuess={true}
+                  countryCodeEditable={false}
                   disableSearchIcon={false}
                   onChange={(
                     phone: string,
@@ -344,15 +374,18 @@ export default function AddMFAPhoneNumber({
                     formatted: string,
                   ) => {
                     const dialCode = country.dialCode ?? selectedDialCode;
+                    const storedPhoneNumber = getStoredPhoneNumber(
+                      phone,
+                      dialCode,
+                    );
 
                     setSelectedDialCode(dialCode);
-                    onChangePhoneForm(
-                      "phoneNumber",
-                      phone ? `+${dialCode}${phone}` : "",
-                    );
+                    onChangePhoneForm("phoneNumber", storedPhoneNumber);
                     onChangePhoneForm(
                       "formattedPhoneNumber",
-                      getFormattedPhoneNumber(formatted, dialCode),
+                      storedPhoneNumber
+                        ? getFormattedPhoneNumber(formatted, dialCode)
+                        : "",
                     );
                     const isNumberValid = isPhoneNumberValid(
                       phone,
