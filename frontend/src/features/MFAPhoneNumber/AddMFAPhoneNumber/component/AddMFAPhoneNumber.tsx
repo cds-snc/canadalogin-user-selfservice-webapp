@@ -9,11 +9,7 @@ import {
   GcdsRadios,
   GcdsText,
 } from "@gcds-core/components-react";
-import {
-  isValidPhoneNumber,
-  parsePhoneNumberFromString,
-  CountryCode,
-} from "libphonenumber-js";
+import { isValidPhoneNumber, CountryCode } from "libphonenumber-js";
 import { useEffect, useState } from "react";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/material.css";
@@ -28,6 +24,10 @@ import { useTranslation } from "react-i18next";
 import { path } from "../../../../utils/routeHelpers";
 import SubmitButton from "../../../../components/Layout/SubmitButton";
 import type { ReactElement } from "react";
+import {
+  getDisplayedPhoneNumber,
+  getStoredPhoneNumber,
+} from "../../../../utils/mfaPhoneNumber";
 
 type PhoneInputCountryData = {
   countryCode?: string;
@@ -65,43 +65,6 @@ interface TypedPhoneInputProps {
 const TypedPhoneInput = PhoneInput as unknown as (
   props: TypedPhoneInputProps,
 ) => ReactElement;
-
-const getLocalPhoneNumber = (phoneNumber: string, dialCode: string) => {
-  const digitsOnly = phoneNumber.replace(/\D/g, "");
-
-  if (!digitsOnly || !dialCode) {
-    return digitsOnly;
-  }
-
-  return digitsOnly.startsWith(dialCode)
-    ? digitsOnly.slice(dialCode.length)
-    : digitsOnly;
-};
-
-export const getDisplayedPhoneNumber = (
-  phoneNumber: string,
-  dialCode: string,
-) => {
-  const trimmedPhoneNumber = phoneNumber.trim();
-
-  if (!trimmedPhoneNumber || /^\+\d{1,4}$/.test(trimmedPhoneNumber)) {
-    return "";
-  }
-
-  const parsedPhoneNumber = parsePhoneNumberFromString(trimmedPhoneNumber);
-
-  if (parsedPhoneNumber?.nationalNumber) {
-    return parsedPhoneNumber.nationalNumber;
-  }
-
-  return getLocalPhoneNumber(trimmedPhoneNumber, dialCode);
-};
-
-export const getStoredPhoneNumber = (phoneNumber: string, dialCode: string) => {
-  const localPhoneNumber = getLocalPhoneNumber(phoneNumber, dialCode);
-
-  return localPhoneNumber ? `+${dialCode}${localPhoneNumber}` : "";
-};
 
 const getFormattedPhoneNumber = (
   formattedPhoneNumber: string,

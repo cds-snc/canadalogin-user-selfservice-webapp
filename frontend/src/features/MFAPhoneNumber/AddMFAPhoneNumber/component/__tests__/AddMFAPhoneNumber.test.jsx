@@ -3,10 +3,11 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import React from "react";
 import { BrowserRouter } from "react-router";
 import * as ReactRouter from "react-router";
-import AddMFAPhoneNumber, {
+import AddMFAPhoneNumber from "../AddMFAPhoneNumber";
+import {
   getDisplayedPhoneNumber,
   getStoredPhoneNumber,
-} from "../AddMFAPhoneNumber";
+} from "../../../../../utils/mfaPhoneNumber";
 import "@testing-library/jest-dom/vitest";
 import i18n from "../../../../../i18n/test";
 
