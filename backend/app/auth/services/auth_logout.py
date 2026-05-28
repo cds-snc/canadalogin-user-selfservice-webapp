@@ -117,7 +117,6 @@ async def logout_user(request: Request, id_token: str):
     config = request.app.state.config
     user_info = await get_user_info(request)
 
-    # Construct the logout redirect URL
     end_session_endpoint = config.end_session_endpoint
     post_logout_redirect_uri = get_base_profile_management_url()
     locale = user_info.get("locale", "en")
@@ -128,7 +127,6 @@ async def logout_user(request: Request, id_token: str):
         "ui_locales": locale,
     }
     redirect_url = f"{end_session_endpoint}?{urlencode(params)}"
-    logger.debug(f"Constructed logout redirect URL: {redirect_url}")
 
     # Create response with the redirect URL
     response_data = LogoutResponseModel(

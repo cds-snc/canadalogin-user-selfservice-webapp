@@ -75,7 +75,10 @@ async def rp_info(
     request: Request,
     user_access_token: None = Depends(get_users_current_session),
 ):
-    return await get_relying_party_info(request)
+    rp_data = await get_relying_party_info(request)
+    if rp_data is None:
+        return RelyingPartyResponse(success=True, message="No relying party", data=None)
+    return rp_data
 
 
 @router.get(

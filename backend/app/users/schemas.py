@@ -265,7 +265,7 @@ class IBMVerifyUpdateUserProfile(IBMVerifyUserProfileSchema):
 
 
 class ProfileResponse(ResponseModel):
-    data: Optional[IBMVerifyUserProfileSchema]
+    data: Optional[IBMVerifyUserProfileSchema] = None
 
 
 class LocalizedRelyingPartyDetail(BaseModel):
@@ -287,7 +287,7 @@ class RelyingPartyInfo(BaseModel):
 class IBMVerifyRelyingPartyInfoSchema(BaseModel):
     name: str
     links: List[RelyingPartyInfo]
-    description: Optional[str]
+    description: Optional[str] = None
     status: List[str]
     category: List[Any]
     id: str
@@ -298,7 +298,7 @@ class IBMVerifyRelyingPartyUserApplicationsSchema(BaseModel):
 
 
 class RelyingPartyResponse(ResponseModel):
-    data: Optional[RelyingPartyInfo]
+    data: Optional[RelyingPartyInfo] = None
 
 
 class Attributes(BaseModel):

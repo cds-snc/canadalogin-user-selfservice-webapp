@@ -127,12 +127,11 @@ export const authService: AuthServiceContract = {
       profileUrl += `?${RP_CLIENT_ID_KEY}=${encodeURIComponent(rpClientId)}`;
     }
 
-    try {
-      const response = await axios.get<AuthServiceResponse>(profileUrl);
-      return response.data;
-    } catch (error) {
-      handleApiError(error as AuthServiceError);
-    }
+    // Do NOT use handleApiError here. A 401 on initial page load is expected (e.g.
+    // after logout) and should be handled silently so PrivateRoute can decide the
+    // correct redirect (including prompt=login after deliberate logout).
+    const response = await axios.get<AuthServiceResponse>(profileUrl);
+    return response.data;
   },
   update_my_user_profile: async (editedProfile) => {
     try {
@@ -220,6 +219,7 @@ export const authService: AuthServiceContract = {
         });
 
         document.body.appendChild(form);
+        sessionStorage.setItem("post_logout", "true");
         HTMLFormElement.prototype.submit.call(form);
       }
 

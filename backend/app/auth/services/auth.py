@@ -1,5 +1,6 @@
 import logging
 
+from typing import Optional
 from fastapi import Request
 from fastapi.responses import RedirectResponse
 from starsessions.session import get_session_handler
@@ -34,15 +35,18 @@ def get_callback_redirect_uri(request: Request):
     return redirect_uri
 
 
-async def redirect_user_to_idp_verify(request: Request):
+async def redirect_user_to_idp_verify(request: Request, prompt: Optional[str] = None):
     """
     Get the redirect URL for the OAuth login flow.
     This function is used to initiate the login process with IBM Verify.
     """
     callback_redirect_uri = get_callback_redirect_uri(request)
     logger.info("Redirecting user to IBM Verify...")
+    extra_params = {}
+    if prompt:
+        extra_params["prompt"] = prompt
     redirect_response = await oauth.verify.authorize_redirect(
-        request, callback_redirect_uri
+        request, callback_redirect_uri, **extra_params
     )
     logger.info("User redirected to IBM Verify for authentication")
     return redirect_response

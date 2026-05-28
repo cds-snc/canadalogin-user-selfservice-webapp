@@ -10,6 +10,7 @@ import {
   CONTEXT_ACTIONS,
   SUBMIT_END_POINTS,
   RP_CLIENT_ID_KEY,
+  OIDC_REDIRECT,
 } from "../../utils/constants";
 import UserContext from "./UserContext";
 import { authService } from "../../services/authService";
@@ -122,6 +123,9 @@ function sessionTimeoutReducer(
   }
 }
 
+// Session timeout configuration (in milliseconds)
+const WARNING_TIME = 5 * 60 * 1000; // 5 minutes before expiry
+
 export function UserProvider({
   children,
   initial = initialUserState,
@@ -151,9 +155,7 @@ export function UserProvider({
   // Timer refs for session management
   const warningTimerRef = useRef<NodeJS.Timeout | null>(null);
   const expireTimerRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Session timeout configuration (in milliseconds)
-  const WARNING_TIME = 5 * 60 * 1000; // 5 minutes before expiry
+  const handleLogoutRef = useRef<() => Promise<void>>(null);
   const shouldConnectSSE = Boolean(
     userState.userProfile && !userState.isLoading,
   );
@@ -190,7 +192,7 @@ export function UserProvider({
     // Only set timers if expire time is in the future
     if (userState.userProfile && timeUntilExpire <= 0) {
       console.warn("Session already expired based on provided expire time");
-      handleLogout();
+      handleLogoutRef.current?.();
       return;
     }
 
@@ -213,8 +215,8 @@ export function UserProvider({
     }
 
     // Set expire timer
-    expireTimerRef.current = setTimeout(async () => {
-      await handleLogout();
+    expireTimerRef.current = setTimeout(() => {
+      handleLogoutRef.current?.();
     }, timeUntilExpire) as unknown as NodeJS.Timeout;
 
     console.log(
@@ -275,6 +277,9 @@ export function UserProvider({
     }
   };
 
+  // Keep ref current so setTimeout callbacks always call the latest handleLogout
+  handleLogoutRef.current = handleLogout;
+
   useEventSourceListener(
     eventSource,
     ["expired", "error", "notification", "terminated"],
@@ -323,14 +328,12 @@ export function UserProvider({
     [sessionTimeoutDispatch], // Dependencies for the listener callback
   );
 
+  // Fetch user profile once on mount. Separated from the eventSource cleanup
+  // effect so that eventSource changes (retries on empty URL) don't re-trigger
+  // the profile fetch.
   useEffect(() => {
     if (hasCustomInitialState) {
-      return () => {
-        clearTimers();
-        if (eventSource) {
-          eventSource.close();
-        }
-      };
+      return;
     }
 
     const getRelyingPartyInfo = async () => {
@@ -341,42 +344,33 @@ export function UserProvider({
             type: CONTEXT_ACTIONS.set_relying_party_data,
             payload: response.data,
           });
-        } else {
-          console.error("Error in getting relying party info:", response);
         }
       } catch (err) {
         console.error("Error in getting relying party info:", err);
       }
     };
 
-    // Simple authentication check - if we're not loading and don't have a profile,
-    // we let PrivateRoute handle the OIDC redirect
     const fetchProfileAndRelyingPartyInfo = async () => {
       try {
-        // This is the first request made after the OIDC redirect back to the app
-        // Try to get user profile to see if user is authenticated
-        // Relying party info (rp_client_id) is passed in the query param of the redirect URL
-        // but after the first request, subsequent requests do not have the rp_client_id
-        // as it's a session based authentication, the backend keeps track of the session
-        // and the relying party info associated with the session
-        // so we need to pass the rp_client_id to the backend to store in the session otherwise it will be lost
         const rp_client_id = searchParams.get(RP_CLIENT_ID_KEY) ?? undefined;
-
         const response = await authService.get_my_user_profile(rp_client_id);
         if (response && response.data) {
-          // User is authenticated, set the profile
           userDispatch({
             type: CONTEXT_ACTIONS.updated_profile_success,
             payload: response.data as UserProfile,
           });
-          // Now that we have the profile, we can get the relying party info if not already set
           await getRelyingPartyInfo();
         }
       } catch (err) {
         console.log("User not authenticated:", err);
-        // User not authenticated - this will trigger OIDC redirect in PrivateRoute
+        // After a deliberate logout, redirect immediately with prompt=login so IBM
+        // Verify shows the login form instead of silently re-authenticating.
+        if (sessionStorage.getItem("post_logout") === "true") {
+          sessionStorage.removeItem("post_logout");
+          window.location.href = `${OIDC_REDIRECT.login}?prompt=login`;
+          return;
+        }
       } finally {
-        // Always set loading to false and reset loading text so PrivateRoute can handle the logic
         userDispatch({
           type: CONTEXT_ACTIONS.set_loading,
           payload: { isLoading: false, text: t("SessionManagement.loading") },
@@ -385,14 +379,18 @@ export function UserProvider({
     };
 
     fetchProfileAndRelyingPartyInfo();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Clean up eventSource and timers when eventSource changes or on unmount
+  useEffect(() => {
     return () => {
-      // Cleanup on unmount
       clearTimers();
       if (eventSource) {
         eventSource.close();
       }
     };
-  }, [eventSource, hasCustomInitialState, searchParams, t, userDispatch]);
+  }, [eventSource]);
 
   // Start timers when newServerSideExpirationTime is set/updated
   useEffect(() => {
@@ -402,6 +400,9 @@ export function UserProvider({
     }
 
     return () => {};
+    // resetSessionTimers is stable in practice (uses refs + dispatch), but isn't
+    // wrapped in useCallback to keep the component readable.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionTimeoutState.newServerSideExpirationTime]);
 
   if (userState.isLoading) {
