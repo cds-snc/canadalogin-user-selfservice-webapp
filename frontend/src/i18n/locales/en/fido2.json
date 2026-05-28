@@ -2,14 +2,11 @@
   "AddFIDO2Passkey": {
     "title": "How to create a passkey",
     "step1": "Select “Create a passkey” below.",
-    "step1Description": "There will be a pop-up on your device. You may have to enable passkey or your password manager on your device to get started.",
-    "step2": "If prompted, choose an email to create your passkey with. ",
-    "selectEmailOnly": "Make sure you select an email only.",
-    "you": "you",
-    "haveControlOver": "have control over.",
-    "step3": "Follow the remaining steps in the pop-up.",
-    "deviceWarning": "Make sure you only create a passkey on a device",
+    "step1Description": "There will be a pop-up on your device. You may have to enable passkey or your password manager in your device settings to get started.",
+    "step2": "Follow the remaining steps in the pop-up.",
+    "deviceWarningPrefix": "Make sure",
     "youControl": "you control",
+    "deviceWarningSuffix": "the device or password manager containing your passkey. Do not create a passkey on a shared device.",
     "createButton": "Create a passkey",
     "cancelButton": "Cancel",
     "problemsTitle": "Problems with passkey?",
@@ -17,7 +14,7 @@
   },
   "AddFIDO2PasskeyNickname": {
     "title": "Name your passkey",
-    "description": "Give your passkey a memorable name that helps you remember what device you created it on.",
+    "description": "You can have multiple passkeys on different devices. Give your passkey a meaningful name so you can identify it later.",
     "label": "Passkey name",
     "placeholder": "example: My Phone",
     "continueButton": "Continue",
@@ -48,10 +45,10 @@
     "loading": "Loading..."
   },
   "DeleteFIDO2PasskeySuccess": {
-    "title": "Remove passkey from your device (optional)",
-    "recommendAlso": "To ensure your password manager doesn’t prompt for  passkeys, we recommend also",
-    "removeFromManager": "removing the passkey from your password manager.",
-    "moreInformation": "For more information on how to do this, see the help centre of your password manager provider.",
+    "title": "Remove passkey from your device or password manager",
+    "recommendAlso": "To ensure your device or password manager doesn’t prompt for this passkey, we recommend also",
+    "removeFromManager": "removing the passkey from your device or password manager.",
+    "moreInformation": "For more information on how to do this, see the help centre of your password manager or device provider.",
     "continueButton": "Continue"
   }
 }

@@ -48,16 +48,6 @@ export default function AddFIDO2Passkey({
             <GcdsText marginBottom="0">
               <strong>{t("AddFIDO2Passkey.step2")}</strong>
             </GcdsText>
-            <GcdsText>
-              {t("AddFIDO2Passkey.selectEmailOnly")}{" "}
-              <strong>{t("AddFIDO2Passkey.you")}</strong>{" "}
-              {t("AddFIDO2Passkey.haveControlOver")}
-            </GcdsText>
-          </li>
-          <li>
-            <GcdsText marginBottom="0">
-              <strong>{t("AddFIDO2Passkey.step3")}</strong>
-            </GcdsText>
           </li>
         </ol>
         <GcdsNotice
@@ -67,8 +57,9 @@ export default function AddFIDO2Passkey({
           lang={language}
         >
           <GcdsText>
-            {t("AddFIDO2Passkey.deviceWarning")}{" "}
-            <strong>{t("AddFIDO2Passkey.youControl")}</strong>
+            {t("AddFIDO2Passkey.deviceWarningPrefix")}{" "}
+            <strong>{t("AddFIDO2Passkey.youControl")}</strong>{" "}
+            {t("AddFIDO2Passkey.deviceWarningSuffix")}
           </GcdsText>
         </GcdsNotice>
 

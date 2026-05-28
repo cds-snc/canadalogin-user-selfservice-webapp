@@ -252,12 +252,7 @@ describe("FIDO2PasskeyList — inline rename (Save) flow", () => {
   });
 
   it("calls fido2Api.updateRegistration with the passkey id and nickname", async () => {
-    render(
-      <FIDO2PasskeyList
-        userFIDO2CredentialsData={[credential]}
-        onRenameSuccess={vi.fn()}
-      />,
-    );
+    render(<FIDO2PasskeyList userFIDO2CredentialsData={[credential]} />);
     await userEvent.click(screen.getByTestId("rename-fido2-button"));
     await userEvent.click(screen.getByTestId("save-fido2-button"));
     await waitFor(() =>
@@ -265,19 +260,6 @@ describe("FIDO2PasskeyList — inline rename (Save) flow", () => {
         nickname: "My Key",
       }),
     );
-  });
-
-  it("calls onRenameSuccess after a successful save", async () => {
-    const onRenameSuccess = vi.fn();
-    render(
-      <FIDO2PasskeyList
-        userFIDO2CredentialsData={[credential]}
-        onRenameSuccess={onRenameSuccess}
-      />,
-    );
-    await userEvent.click(screen.getByTestId("rename-fido2-button"));
-    await userEvent.click(screen.getByTestId("save-fido2-button"));
-    await waitFor(() => expect(onRenameSuccess).toHaveBeenCalledOnce());
   });
 
   it("exits editing mode (hides input, shows Rename button) after a successful save", async () => {
@@ -293,64 +275,40 @@ describe("FIDO2PasskeyList — inline rename (Save) flow", () => {
     });
   });
 
-  it("does NOT call onRenameSuccess when the rename API returns a failure response", async () => {
+  it("returns to read-only mode when the rename API returns a failure response", async () => {
     vi.mocked(fido2Api.updateRegistration).mockResolvedValue({
       success: false,
     });
-    const onRenameSuccess = vi.fn();
-    render(
-      <FIDO2PasskeyList
-        userFIDO2CredentialsData={[credential]}
-        onRenameSuccess={onRenameSuccess}
-      />,
-    );
+    render(<FIDO2PasskeyList userFIDO2CredentialsData={[credential]} />);
     await userEvent.click(screen.getByTestId("rename-fido2-button"));
     await userEvent.click(screen.getByTestId("save-fido2-button"));
-    // Editing always closes after the API call completes
     await waitFor(() =>
       expect(screen.queryByTestId("passkeyNickname")).not.toBeInTheDocument(),
     );
-    expect(onRenameSuccess).not.toHaveBeenCalled();
   });
 
-  it("does NOT call onRenameSuccess when the rename API rejects", async () => {
+  it("returns to read-only mode when the rename API rejects", async () => {
     vi.mocked(fido2Api.updateRegistration).mockRejectedValue(
       new Error("Network error"),
     );
-    const onRenameSuccess = vi.fn();
-    render(
-      <FIDO2PasskeyList
-        userFIDO2CredentialsData={[credential]}
-        onRenameSuccess={onRenameSuccess}
-      />,
-    );
+    render(<FIDO2PasskeyList userFIDO2CredentialsData={[credential]} />);
     await userEvent.click(screen.getByTestId("rename-fido2-button"));
     await userEvent.click(screen.getByTestId("save-fido2-button"));
-    // Editing always closes after the API call completes
     await waitFor(() =>
       expect(screen.queryByTestId("passkeyNickname")).not.toBeInTheDocument(),
     );
-    expect(onRenameSuccess).not.toHaveBeenCalled();
   });
 
-  it("does NOT call onRenameSuccess when the API fails", async () => {
+  it("returns to read-only mode when the API fails", async () => {
     vi.mocked(fido2Api.updateRegistration).mockResolvedValue({
       success: false,
     });
-    const onRenameSuccess = vi.fn();
-    render(
-      <FIDO2PasskeyList
-        userFIDO2CredentialsData={[credential]}
-        onRenameSuccess={onRenameSuccess}
-      />,
-    );
+    render(<FIDO2PasskeyList userFIDO2CredentialsData={[credential]} />);
     await userEvent.click(screen.getByTestId("rename-fido2-button"));
     await userEvent.click(screen.getByTestId("save-fido2-button"));
-    // Wait for editing to close (async API has settled)
     await waitFor(() =>
       expect(screen.getByTestId("rename-fido2-button")).toBeInTheDocument(),
     );
-    expect(onRenameSuccess).not.toHaveBeenCalled();
   });
 
   it("Save button is disabled while the API call is in progress", async () => {
@@ -374,12 +332,7 @@ describe("FIDO2PasskeyList — inline rename (Save) flow", () => {
 
   it("Save button calls updateRegistration with trimmed nickname", async () => {
     const user = userEvent.setup();
-    render(
-      <FIDO2PasskeyList
-        userFIDO2CredentialsData={[credential]}
-        onRenameSuccess={vi.fn()}
-      />,
-    );
+    render(<FIDO2PasskeyList userFIDO2CredentialsData={[credential]} />);
     await user.click(screen.getByTestId("rename-fido2-button"));
     const input = screen.getByTestId("passkeyNickname");
     await user.clear(input);
@@ -390,5 +343,31 @@ describe("FIDO2PasskeyList — inline rename (Save) flow", () => {
         nickname: "Trimmed",
       }),
     );
+  });
+
+  it("keeps the saved nickname after reopening rename and cancelling", async () => {
+    const user = userEvent.setup();
+
+    render(<FIDO2PasskeyList userFIDO2CredentialsData={[credential]} />);
+
+    await user.click(screen.getByTestId("rename-fido2-button"));
+    let input = screen.getByTestId("passkeyNickname");
+    await user.clear(input);
+    await user.type(input, "Renamed Key");
+    await user.click(screen.getByTestId("save-fido2-button"));
+
+    await waitFor(() =>
+      expect(screen.queryByTestId("passkeyNickname")).not.toBeInTheDocument(),
+    );
+    expect(screen.getByText("Renamed Key")).toBeInTheDocument();
+
+    await user.click(screen.getByTestId("rename-fido2-button"));
+    input = screen.getByTestId("passkeyNickname");
+    await user.clear(input);
+    await user.type(input, "Temporary Edit");
+    await user.click(screen.getByTestId("cancel-fido2-button"));
+
+    expect(screen.getByText("Renamed Key")).toBeInTheDocument();
+    expect(screen.queryByText("My Key")).not.toBeInTheDocument();
   });
 });

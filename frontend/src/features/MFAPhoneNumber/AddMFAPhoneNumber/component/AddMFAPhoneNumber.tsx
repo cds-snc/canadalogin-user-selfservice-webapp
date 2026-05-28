@@ -24,6 +24,10 @@ import { useTranslation } from "react-i18next";
 import { path } from "../../../../utils/routeHelpers";
 import SubmitButton from "../../../../components/Layout/SubmitButton";
 import type { ReactElement } from "react";
+import {
+  getDisplayedPhoneNumber,
+  getStoredPhoneNumber,
+} from "../../../../utils/mfaPhoneNumber";
 
 type PhoneInputCountryData = {
   countryCode?: string;
@@ -61,18 +65,6 @@ interface TypedPhoneInputProps {
 const TypedPhoneInput = PhoneInput as unknown as (
   props: TypedPhoneInputProps,
 ) => ReactElement;
-
-const getLocalPhoneNumber = (phoneNumber: string, dialCode: string) => {
-  const digitsOnly = phoneNumber.replace(/\D/g, "");
-
-  if (!digitsOnly || !dialCode) {
-    return digitsOnly;
-  }
-
-  return digitsOnly.startsWith(dialCode)
-    ? digitsOnly.slice(dialCode.length)
-    : digitsOnly;
-};
 
 const getFormattedPhoneNumber = (
   formattedPhoneNumber: string,
@@ -324,7 +316,7 @@ export default function AddMFAPhoneNumber({
                       ? countryMapping.frLocalization
                       : countryMapping.localization
                   }
-                  value={getLocalPhoneNumber(
+                  value={getDisplayedPhoneNumber(
                     phoneFormData.phoneNumber,
                     selectedDialCode,
                   )}
@@ -332,6 +324,7 @@ export default function AddMFAPhoneNumber({
                   enableSearch={true}
                   disableCountryCode={true}
                   disableCountryGuess={true}
+                  countryCodeEditable={false}
                   disableSearchIcon={false}
                   onChange={(
                     phone: string,
@@ -344,15 +337,18 @@ export default function AddMFAPhoneNumber({
                     formatted: string,
                   ) => {
                     const dialCode = country.dialCode ?? selectedDialCode;
+                    const storedPhoneNumber = getStoredPhoneNumber(
+                      phone,
+                      dialCode,
+                    );
 
                     setSelectedDialCode(dialCode);
-                    onChangePhoneForm(
-                      "phoneNumber",
-                      phone ? `+${dialCode}${phone}` : "",
-                    );
+                    onChangePhoneForm("phoneNumber", storedPhoneNumber);
                     onChangePhoneForm(
                       "formattedPhoneNumber",
-                      getFormattedPhoneNumber(formatted, dialCode),
+                      storedPhoneNumber
+                        ? getFormattedPhoneNumber(formatted, dialCode)
+                        : "",
                     );
                     const isNumberValid = isPhoneNumberValid(
                       phone,

@@ -107,7 +107,7 @@ describe("AddFIDO2PasskeyNickname", () => {
     render(<AddFIDO2PasskeyNickname {...defaultProps} />);
     expect(
       screen.getByText(
-        "Give your passkey a memorable name that helps you remember what device you created it on.",
+        "You can have multiple passkeys on different devices. Give your passkey a meaningful name so you can identify it later.",
       ),
     ).toBeInTheDocument();
   });

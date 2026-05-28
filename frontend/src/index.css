@@ -206,7 +206,7 @@ body,
 
 .mfa-phone-input__labels {
   display: grid;
-  grid-template-columns: 94px minmax(0, 1fr);
+  grid-template-columns: 108px minmax(0, 1fr);
   gap: 10px;
   margin-bottom: 8px;
 }
@@ -237,7 +237,7 @@ body,
 
 .mfa-phone-input__control.react-tel-input {
   min-height: 44px;
-  padding-left: 104px;
+  padding-left: 118px;
   position: relative;
   width: 100%;
 }
@@ -252,10 +252,10 @@ body,
   border-radius: 4px;
   bottom: auto;
   left: 0;
-  min-width: 94px;
+  min-width: 108px;
   position: absolute;
   top: 0;
-  width: 94px;
+  width: 108px;
 }
 
 .mfa-phone-input__control.react-tel-input .selected-flag {
@@ -274,9 +274,10 @@ body,
 }
 
 .mfa-phone-input__control.react-tel-input .selected-flag .arrow {
-  left: auto;
+  left: 84px;
   margin-top: -2px;
-  right: 8px;
+  position: absolute;
+  right: auto;
 }
 
 .mfa-phone-input__control.react-tel-input input.form-control {

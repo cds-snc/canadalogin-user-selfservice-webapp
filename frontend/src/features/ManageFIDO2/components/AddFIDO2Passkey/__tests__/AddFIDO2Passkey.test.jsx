@@ -104,25 +104,29 @@ describe("AddFIDO2Passkey", () => {
     expect(screen.getByTestId("passkey-collage")).toBeInTheDocument();
   });
 
-  it("renders all three step headings in the instruction list", () => {
+  it("renders the updated instruction list from the passkey design", () => {
     render(<AddFIDO2Passkey {...defaultProps} />);
     expect(
       screen.getByText("Select \u201cCreate a passkey\u201d below."),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/If prompted, choose an email/),
-    ).toBeInTheDocument();
-    expect(
       screen.getByText("Follow the remaining steps in the pop-up."),
     ).toBeInTheDocument();
+    expect(
+      screen.queryByText(/If prompted, choose an email/),
+    ).not.toBeInTheDocument();
   });
 
   it("renders the warning notice", () => {
     render(<AddFIDO2Passkey {...defaultProps} />);
-    expect(screen.getByTestId("notice")).toBeInTheDocument();
-    expect(
-      screen.getByText(/Make sure you only create a passkey on a device/),
-    ).toBeInTheDocument();
+    const notice = screen.getByTestId("notice");
+    expect(notice).toBeInTheDocument();
+    expect(notice).toHaveTextContent(
+      /Make sure\s+you control\s+the device or password manager containing your passkey\./,
+    );
+    expect(notice).toHaveTextContent(
+      /Do not create a passkey on a shared device\./,
+    );
   });
 
   it("renders the primary and cancel buttons", () => {

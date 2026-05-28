@@ -4,6 +4,10 @@ import React from "react";
 import { BrowserRouter } from "react-router";
 import * as ReactRouter from "react-router";
 import AddMFAPhoneNumber from "../AddMFAPhoneNumber";
+import {
+  getDisplayedPhoneNumber,
+  getStoredPhoneNumber,
+} from "../../../../../utils/mfaPhoneNumber";
 import "@testing-library/jest-dom/vitest";
 import i18n from "../../../../../i18n/test";
 
@@ -71,6 +75,81 @@ vi.mock("@gcds-core/components-react", () => ({
     </details>
   ),
 }));
+
+vi.mock("react-phone-input-2", () => {
+  const MockPhoneInput = ({
+    inputProps,
+    specialLabel,
+    value,
+    className,
+    country = "ca",
+    placeholder,
+    onChange,
+  }) => {
+    const [selectedCountry, setSelectedCountry] = React.useState(country);
+    const dialCodes = {
+      ca: "1",
+      us: "1",
+      gb: "44",
+    };
+
+    const emitChange = (nextValue, nextCountry, formattedValue, event) => {
+      const dialCode = dialCodes[nextCountry] ?? "1";
+
+      onChange?.(
+        nextValue,
+        {
+          countryCode: nextCountry.toUpperCase(),
+          dialCode,
+          iso2: nextCountry,
+        },
+        event,
+        formattedValue,
+      );
+    };
+
+    return (
+      <div className={`react-tel-input ${className ?? ""}`.trim()}>
+        <div className="flag-dropdown">
+          <div className="selected-flag">
+            <div className={`flag ${selectedCountry}`}></div>
+          </div>
+        </div>
+
+        <label htmlFor="phone-input">{specialLabel}</label>
+        <input
+          {...inputProps}
+          id="phone-input"
+          placeholder={placeholder}
+          value={value ?? ""}
+          onChange={(event) => {
+            emitChange(
+              event.target.value,
+              selectedCountry,
+              event.target.value,
+              event,
+            );
+          }}
+        />
+
+        <button
+          type="button"
+          data-testid="mock-country-switch-gb"
+          onClick={() => {
+            setSelectedCountry("gb");
+            emitChange("44", "gb", "+44", { type: "click" });
+          }}
+        >
+          Switch country
+        </button>
+      </div>
+    );
+  };
+
+  return {
+    default: MockPhoneInput,
+  };
+});
 
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
@@ -293,6 +372,22 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
   });
 
   describe("Phone Number Validation Logic", () => {
+    it("keeps the textbox empty when the stored value is only a previous country code", () => {
+      expect(getDisplayedPhoneNumber("+1", "44")).toBe("");
+    });
+
+    it("keeps the local digits when the stored value came from a previous country code", () => {
+      expect(getDisplayedPhoneNumber("+16135551234", "44")).toBe("6135551234");
+    });
+
+    it("stores an empty phone number when only the selected country code is present", () => {
+      expect(getStoredPhoneNumber("44", "44")).toBe("");
+    });
+
+    it("stores the full number when local digits are present", () => {
+      expect(getStoredPhoneNumber("6135551234", "1")).toBe("+16135551234");
+    });
+
     it("should validate Canadian phone numbers correctly", () => {
       const validCanadianPhone = {
         phoneNumber: "+16135551234",
@@ -653,6 +748,41 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
 
       expect(phoneInput.value.replace(/\D/g, "")).toBe("4471234567");
       expect(countryBox).toHaveAttribute("data-country-dial-code", "+1");
+    });
+
+    it("should keep the textbox empty when switching country with no local number", () => {
+      const Harness = () => {
+        const [phoneFormData, setPhoneFormData] = React.useState({
+          phoneNumber: "",
+          formattedPhoneNumber: "",
+          otpType: "smsotp",
+        });
+
+        return (
+          <AddMFAPhoneNumber
+            onNext={mockOnNext}
+            onCancel={mockOnCancel}
+            onChangePhoneForm={(field, value) => {
+              setPhoneFormData((prev) => ({
+                ...prev,
+                [field]: value,
+              }));
+            }}
+            phoneFormData={phoneFormData}
+            setErrorCode={mockSetErrorCode}
+          />
+        );
+      };
+
+      render(
+        <TestWrapper>
+          <Harness />
+        </TestWrapper>,
+      );
+
+      fireEvent.click(screen.getByTestId("mock-country-switch-gb"));
+
+      expect(screen.getByRole("textbox")).toHaveValue("");
     });
 
     it("should call onChangePhoneForm when phone input changes", () => {

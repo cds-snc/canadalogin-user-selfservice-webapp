@@ -25,7 +25,6 @@ interface Fido2CredentialWithCreated extends Fido2Credential {
 interface FIDO2PasskeyListProps {
   userFIDO2CredentialsData: Fido2CredentialWithCreated[];
   totalFactorCount?: number;
-  onRenameSuccess?: () => Promise<void> | void;
   setErrorCode?: (errorCode: string) => void;
   errorMessage?: string;
 }
@@ -37,7 +36,6 @@ interface RenameRegistrationResponse {
 export default function FIDO2PasskeyList({
   userFIDO2CredentialsData,
   totalFactorCount,
-  onRenameSuccess,
   errorMessage = "",
   setErrorCode = () => {},
 }: FIDO2PasskeyListProps) {
@@ -46,6 +44,9 @@ export default function FIDO2PasskeyList({
   const { t } = useTranslation(["mfa", "common"]);
   const [loading, setLoading] = useState(false);
   const [editingPasskeyId, setEditingPasskeyId] = useState<string | null>(null);
+  const [savedPasskeyNicknames, setSavedPasskeyNicknames] = useState<
+    Record<string, string>
+  >({});
   const [passkeyNicknameInputs, setPasskeyNicknameInputs] = useState<
     Record<string, string>
   >({});
@@ -58,7 +59,9 @@ export default function FIDO2PasskeyList({
     passkeyId: string,
     renameDeviceName: string,
   ) => {
-    if (!passkeyId || !renameDeviceName.trim()) {
+    const trimmedNickname = renameDeviceName.trim();
+
+    if (!passkeyId || !trimmedNickname) {
       setErrorCode("error_rename_credential");
       return;
     }
@@ -68,14 +71,22 @@ export default function FIDO2PasskeyList({
 
     try {
       const response = (await fido2Api.updateRegistration(passkeyId, {
-        nickname: renameDeviceName.trim(),
+        nickname: trimmedNickname,
       })) as RenameRegistrationResponse | undefined;
 
-      if (response?.success) {
-        await onRenameSuccess?.();
-      } else {
+      if (!response?.success) {
         throw new Error(t("Error.error_rename_credential", { ns: "common" }));
       }
+
+      setSavedPasskeyNicknames((previous) => ({
+        ...previous,
+        [passkeyId]: trimmedNickname,
+      }));
+      setPasskeyNicknameInputs((previous) => {
+        const next = { ...previous };
+        delete next[passkeyId];
+        return next;
+      });
     } catch (error) {
       console.error(["error_rename_credential"], error);
       setErrorCode("error_rename_credential");
@@ -87,8 +98,11 @@ export default function FIDO2PasskeyList({
 
   return userFIDO2CredentialsData.map(({ id, attributes, created }) => {
     const isEditing = editingPasskeyId === id;
-    const nicknameValue =
-      passkeyNicknameInputs[id] ?? attributes?.nickname ?? "";
+    const savedNickname =
+      savedPasskeyNicknames[id] ?? attributes?.nickname ?? "";
+    const nicknameValue = isEditing
+      ? (passkeyNicknameInputs[id] ?? savedNickname)
+      : savedNickname;
     const canDeletePasskey =
       totalFactorCount === undefined ? true : totalFactorCount - 1 >= 1;
 

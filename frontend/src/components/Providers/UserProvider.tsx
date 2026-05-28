@@ -127,6 +127,7 @@ export function UserProvider({
   initial = initialUserState,
   initialSessionTimeoutState = defaultSessionTimeoutState,
 }: UserProviderProps) {
+  const hasCustomInitialState = initial !== initialUserState;
   const [userState, userDispatch] = useReducer(userReducer, initial);
   const [sessionTimeoutState, sessionTimeoutDispatch] = useReducer(
     sessionTimeoutReducer,
@@ -323,6 +324,15 @@ export function UserProvider({
   );
 
   useEffect(() => {
+    if (hasCustomInitialState) {
+      return () => {
+        clearTimers();
+        if (eventSource) {
+          eventSource.close();
+        }
+      };
+    }
+
     const getRelyingPartyInfo = async () => {
       try {
         const response = await authService.get_rp_info();
@@ -382,7 +392,7 @@ export function UserProvider({
         eventSource.close();
       }
     };
-  }, []);
+  }, [eventSource, hasCustomInitialState, searchParams, t, userDispatch]);
 
   // Start timers when newServerSideExpirationTime is set/updated
   useEffect(() => {

@@ -59,18 +59,20 @@ describe("DeleteFIDO2PasskeySuccess", () => {
   it("renders the success heading", () => {
     render(<DeleteFIDO2PasskeySuccess onNext={onNext} />);
     expect(
-      screen.getByText("Remove passkey from your device (optional)"),
+      screen.getByText("Remove passkey from your device or password manager"),
     ).toBeInTheDocument();
   });
 
   it("renders body text", () => {
     render(<DeleteFIDO2PasskeySuccess onNext={onNext} />);
     expect(
-      screen.getByText("removing the passkey from your password manager."),
+      screen.getByText(
+        "removing the passkey from your device or password manager.",
+      ),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "For more information on how to do this, see the help centre of your password manager provider.",
+        "For more information on how to do this, see the help centre of your password manager or device provider.",
       ),
     ).toBeInTheDocument();
   });
