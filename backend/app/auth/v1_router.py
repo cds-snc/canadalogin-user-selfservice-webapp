@@ -1,7 +1,8 @@
 import logging
 
+from typing import Optional
 from fastapi import APIRouter
-from fastapi import Request, Depends
+from fastapi import Request, Depends, Query
 from app.auth.services.auth import (
     redirect_user_to_idp_verify,
     callback_handler,
@@ -33,8 +34,13 @@ logger = logging.getLogger(__name__)
     summary="Authenticate user via IBM Verify",
     description="",
 )
-async def redirect_url(request: Request):
-    return await redirect_user_to_idp_verify(request)
+async def redirect_url(
+    request: Request,
+    prompt: Optional[str] = Query(
+        default=None, pattern="^(login|none|consent|select_account)$"
+    ),
+):
+    return await redirect_user_to_idp_verify(request, prompt=prompt)
 
 
 @router.get(

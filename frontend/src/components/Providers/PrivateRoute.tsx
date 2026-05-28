@@ -31,7 +31,15 @@ function PrivateRoute() {
 
   useEffect(() => {
     if (!state.isLoading && !state.userProfile) {
-      window.location.href = OIDC_REDIRECT.login;
+      const postLogout = sessionStorage.getItem("post_logout") === "true";
+      if (postLogout) {
+        sessionStorage.removeItem("post_logout");
+        // After deliberate logout, force IBM Verify to show the login form
+        // instead of silently re-authenticating from a live session.
+        window.location.href = `${OIDC_REDIRECT.login}?prompt=login`;
+      } else {
+        window.location.href = OIDC_REDIRECT.login;
+      }
     }
   }, [state.isLoading, state.userProfile]);
   if (state.isLoading) {
