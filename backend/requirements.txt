@@ -6,11 +6,11 @@ python-dotenv==1.2.2
 webauthn==1.11.1
 cryptography==46.0.7
 pydantic-settings==2.13.1
-pydantic==2.13.1
+pydantic==2.13.4
 httpx==0.28.1
 email-validator==2.3.0
 pydantic-extra-types==2.11.1
-phonenumbers==9.0.28
+phonenumbers==9.0.30
 cachetools==5.5.2
 authlib==1.6.11
 itsdangerous==2.2.0
