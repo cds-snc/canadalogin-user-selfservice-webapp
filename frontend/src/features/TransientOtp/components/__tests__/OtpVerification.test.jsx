@@ -1,6 +1,12 @@
 import "@testing-library/jest-dom/vitest";
 import { BrowserRouter } from "react-router";
-import { render, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import userEvent from "@testing-library/user-event";
 import OtpVerification from "../OtpVerification";
@@ -269,6 +275,7 @@ describe("OtpVerification Component", () => {
   afterEach(() => {
     vi.clearAllMocks();
     vi.clearAllTimers();
+    vi.useRealTimers();
   });
 
   describe("Rendering and Layout - SMS", () => {
@@ -317,10 +324,15 @@ describe("OtpVerification Component", () => {
       expect(input).toHaveAttribute("minLength", "6");
     });
 
-    it("renders submit and cancel buttons", () => {
+    it("renders submit and choose different method buttons", () => {
       renderComponent();
       expect(screen.getByTestId("submit-button")).toBeInTheDocument();
-      expect(screen.getByTestId("cancel-button")).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Choose a different method" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: "Cancel" }),
+      ).not.toBeInTheDocument();
     });
 
     it("renders Problems with the code section", () => {
@@ -527,15 +539,43 @@ describe("OtpVerification Component", () => {
     });
   });
 
-  describe("Cancel Button Behavior", () => {
-    it("navigates to security settings when cancel is clicked", async () => {
+  describe("Choose Different Method Behavior", () => {
+    it("calls onBack when choose a different method is clicked", async () => {
       const user = userEvent.setup({ delay: null });
       renderComponent();
 
-      const cancelButton = screen.getByTestId("cancel-button");
-      await user.click(cancelButton);
+      const chooseDifferentMethodButton = screen.getByRole("button", {
+        name: "Choose a different method",
+      });
+      await user.click(chooseDifferentMethodButton);
 
-      expect(mockNavigateHelper).toHaveBeenCalledWith("/en/security-settings");
+      expect(mockOnBack).toHaveBeenCalled();
+    });
+  });
+
+  describe("Resend Code Feedback", () => {
+    it("shows a success notice after requesting a new code", async () => {
+      vi.useFakeTimers();
+      mockRequestOtpCode.mockResolvedValue(true);
+
+      renderComponent();
+
+      for (let second = 0; second < 10; second += 1) {
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(1000);
+        });
+      }
+
+      const requestNewCodeLink = screen.getByText("Request a new code");
+      await act(async () => {
+        fireEvent.click(requestNewCodeLink);
+      });
+
+      expect(mockRequestOtpCode).toHaveBeenCalled();
+      expect(screen.getByTestId("notice-title")).toHaveTextContent("Success");
+      expect(screen.getByTestId("notice")).toHaveTextContent(
+        "We have sent you a new code",
+      );
     });
   });
 
@@ -709,15 +749,23 @@ describe("OtpVerification Component", () => {
       });
     });
 
-    it("handles cancel button preventDefault and navigation", async () => {
+    it("does not render the try another way link when the button is shown", () => {
+      renderComponent();
+
+      expect(screen.queryByText("Try another way")).not.toBeInTheDocument();
+    });
+
+    it("handles choose different method button preventDefault", async () => {
       const user = userEvent.setup({ delay: null });
 
       renderComponent();
 
-      const cancelButton = screen.getByTestId("cancel-button");
-      await user.click(cancelButton);
+      const chooseDifferentMethodButton = screen.getByRole("button", {
+        name: "Choose a different method",
+      });
+      await user.click(chooseDifferentMethodButton);
 
-      expect(mockNavigateHelper).toHaveBeenCalledWith("/en/security-settings");
+      expect(mockOnBack).toHaveBeenCalled();
     });
   });
 
@@ -739,14 +787,26 @@ describe("OtpVerification Component", () => {
       expect(input).toHaveAttribute("autocomplete", "one-time-code");
     });
 
+    it("does not force the verification input into a fixed 12rem width", () => {
+      renderComponent();
+
+      expect(
+        screen.getByTestId("verificationCode").parentElement?.parentElement,
+      ).not.toHaveStyle({
+        width: "12rem",
+      });
+    });
+
     it("renders buttons with proper styles", () => {
       renderComponent();
 
       const submitButton = screen.getByTestId("submit-button");
-      const cancelButton = screen.getByTestId("cancel-button");
+      const chooseDifferentMethodButton = screen.getByRole("button", {
+        name: "Choose a different method",
+      });
 
-      expect(submitButton).toHaveStyle({ width: "fit-content" });
-      expect(cancelButton).toHaveStyle({ width: "fit-content" });
+      expect(submitButton).not.toHaveStyle({ width: "12rem" });
+      expect(chooseDifferentMethodButton).toHaveStyle({ width: "fit-content" });
     });
   });
 
