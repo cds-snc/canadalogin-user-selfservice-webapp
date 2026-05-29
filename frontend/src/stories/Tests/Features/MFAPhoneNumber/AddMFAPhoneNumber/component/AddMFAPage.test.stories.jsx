@@ -6,6 +6,7 @@ import {
   SUBMIT_END_POINTS,
 } from "../../../../../../utils/constants";
 import { buildTestCase, TestTemplate } from "../../../../utils/functions.tsx";
+const FUTURE_OTP_EXPIRY = new Date(Date.now() + 60_000).toISOString();
 
 export default {
   title:
@@ -75,7 +76,7 @@ export const SelectVoiceCallLink = (() => {
         endpoint: `${SUBMIT_END_POINTS.transientOtpSend}`,
         response: {
           success: true,
-          data: { trxnId: "txn-123" },
+          data: { trxnId: "txn-123", expiry: FUTURE_OTP_EXPIRY },
         },
       },
     ],
@@ -249,7 +250,7 @@ export const SelectTextMessageLink = (() => {
         endpoint: `${SUBMIT_END_POINTS.transientOtpSend}`,
         response: {
           success: true,
-          data: { trxnId: "txn-123" },
+          data: { trxnId: "txn-123", expiry: FUTURE_OTP_EXPIRY },
         },
       },
     ],
@@ -408,7 +409,7 @@ export const CompleteAddMFAFlowSMS = (() => {
         endpoint: "/v1/otp/transient/send",
         response: {
           success: true,
-          data: { trxnId: "txn-123" },
+          data: { trxnId: "txn-123", expiry: FUTURE_OTP_EXPIRY },
         },
       },
       {
@@ -792,7 +793,7 @@ export const ResendOtpCode = (() => {
         endpoint: "/v1/otp/transient/send",
         response: {
           success: true,
-          data: { trxnId: "txn-123" },
+          data: { trxnId: "txn-123", expiry: FUTURE_OTP_EXPIRY },
         },
       },
       {
@@ -960,6 +961,9 @@ export const ResendOtpCode = (() => {
           await expect(
             canvas.getByText(/Request a new code in/i),
           ).toBeInTheDocument();
+          await expect(
+            canvas.getByText(/Your code will expire in/i),
+          ).toBeInTheDocument();
         });
         await waitFor(
           async () => {
@@ -1026,7 +1030,7 @@ export const UseDifferentPhoneNumber = (() => {
         endpoint: "/v1/otp/transient/send",
         response: {
           success: true,
-          data: { trxnId: "txn-123" },
+          data: { trxnId: "txn-123", expiry: FUTURE_OTP_EXPIRY },
         },
       },
       {

@@ -23,6 +23,27 @@ type CaughtApiError = {
 
 const initialTime = 10;
 
+function getRemainingSeconds(expiry?: string | null): number | null {
+  if (!expiry) {
+    return null;
+  }
+
+  const expiryMs = new Date(expiry).getTime();
+  if (Number.isNaN(expiryMs)) {
+    return null;
+  }
+
+  const remainingMs = expiryMs - Date.now();
+  return Math.max(0, Math.ceil(remainingMs / 1000));
+}
+
+function formatMinutesAndSeconds(totalSeconds: number): string {
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+
+  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+}
+
 interface OtpVerificationProps {
   userSelectedMfaFactor: OtpFactor;
   setUserOtpValue: (value: string) => void;
@@ -35,6 +56,8 @@ interface OtpVerificationProps {
   errorMessage?: string;
   onCancel: () => void;
   showTryAnotherWay?: boolean;
+  resetAttempts?: () => void;
+  otpExpiry?: string | null;
 }
 
 export default function OtpVerification({
@@ -48,15 +71,26 @@ export default function OtpVerification({
   setErrorMessage,
   errorMessage,
   showTryAnotherWay = true,
+  resetAttempts,
+  otpExpiry = null,
 }: OtpVerificationProps) {
   const { language } = useParams();
   const [time, setTime] = useState(initialTime);
+  const [remainingSeconds, setRemainingSeconds] = useState<number | null>(() =>
+    getRemainingSeconds(otpExpiry),
+  );
   const [codeRequested, setCodeRequested] = useState(false);
   const { t } = useTranslation(["verification", "common"]);
   const [localError, setLocalError] = useState("");
   const [isMaxAttemptsReached, setIsMaxAttemptsReached] = useState(false);
 
   const displayError = localError || errorMessage || "";
+  const hasServerExpiry = remainingSeconds !== null;
+  const isOtpExpired = hasServerExpiry && remainingSeconds <= 0;
+  const countdownDisplay =
+    hasServerExpiry && remainingSeconds !== null
+      ? formatMinutesAndSeconds(remainingSeconds)
+      : null;
 
   const handleChange = (e: CustomEvent<string>) => {
     const value = (e.target as HTMLInputElement).value;
@@ -120,6 +154,22 @@ export default function OtpVerification({
   };
 
   useEffect(() => {
+    setRemainingSeconds(getRemainingSeconds(otpExpiry));
+  }, [otpExpiry]);
+
+  useEffect(() => {
+    if (remainingSeconds === null || remainingSeconds <= 0) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setRemainingSeconds(getRemainingSeconds(otpExpiry));
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [otpExpiry, remainingSeconds]);
+
+  useEffect(() => {
     if (time <= 0) {
       return;
     }
@@ -132,6 +182,22 @@ export default function OtpVerification({
   }, [time]);
 
   const userMfaType = userSelectedMfaFactor?.type;
+  const handleRequestNewCode = async () => {
+    const requestSucceeded = await requestOtpCode();
+
+    if (requestSucceeded === false) {
+      setCodeRequested(false);
+      return;
+    }
+
+    setCodeRequested(true);
+    setTime(initialTime);
+    setErrorCode("");
+    setUserOtpValue("");
+    setLocalError("");
+    resetAttempts?.();
+  };
+
   return (
     <GcdsContainer role="main">
       {codeRequested ? (
@@ -152,82 +218,123 @@ export default function OtpVerification({
             : t("Verification.checkYourPhone")}
         </GcdsHeading>
 
-        <GcdsText>
-          {userMfaType === FLOW_TYPES.voice
-            ? t("Verification.voiceCodeSent")
-            : userMfaType === FLOW_TYPES.sms
-              ? t("Verification.smsCodeSent")
-              : t("Verification.emailCodeSent")}
-          &nbsp;
-          <strong>{userSelectedMfaFactor.destination}</strong>
-        </GcdsText>
-        <GcdsText>
-          {userMfaType === FLOW_TYPES.voice
-            ? t("Verification.callMayTakeMinutes")
-            : userMfaType === FLOW_TYPES.sms
-              ? t("Verification.smsMayTakeMinutes")
-              : t("Verification.emailMayTakeMinutes")}
-        </GcdsText>
-        <GcdsText>
-          {t("Verification.codeExpiresIn")}{" "}
-          <strong>{t("Verification.tenMinutes")}</strong>
-        </GcdsText>
-        {userMfaType !== FLOW_TYPES.email && (
-          <GcdsHeading tag="h2">{t("Verification.enterCode")}</GcdsHeading>
-        )}
+        {isOtpExpired ? (
+          <>
+            <GcdsText>{t("Verification.expiredMessage")}</GcdsText>
 
-        <form onSubmit={onSubmitHandler}>
-          <GcdsInput
-            inputId="verificationCode"
-            label={t("Verification.sixDigitCode")}
-            name="verificationCode"
-            type="text"
-            validateOn="other"
-            errorMessage={displayError}
-            value={userOtpValue}
-            onGcdsInput={handleChange}
-            lang={language}
-            size={18}
-            maxlength={6}
-            minlength={6}
-            autocomplete="one-time-code"
-            autoFocus
-          ></GcdsInput>
-        </form>
-
-        <GcdsGrid
-          columns={
-            showTryAnotherWay ? "max-content max-content" : "max-content"
-          }
-          gap="200"
-        >
-          <SubmitButton
-            disabled={userOtpValue.length < 6 || isMaxAttemptsReached}
-            onGcdsClick={(ev) => {
-              ev.preventDefault();
-              void doSubmit();
-            }}
-            currentLang={language ?? "en"}
-          ></SubmitButton>
-
-          {showTryAnotherWay ? (
-            <GcdsButton
-              buttonRole="secondary"
-              style={{ width: "fit-content" }}
-              onGcdsClick={(ev) => {
-                ev.preventDefault();
-                onBack();
-              }}
+            <GcdsGrid
+              columns={
+                showTryAnotherWay ? "max-content max-content" : "max-content"
+              }
+              gap="200"
             >
-              {t("Verification.chooseDifferentMethod")}
-            </GcdsButton>
-          ) : null}
-        </GcdsGrid>
+              <GcdsButton
+                style={{ width: "fit-content" }}
+                onGcdsClick={(ev) => {
+                  ev.preventDefault();
+                  void handleRequestNewCode();
+                }}
+              >
+                {t("Verification.requestNewCode")}
+              </GcdsButton>
+
+              {showTryAnotherWay ? (
+                <GcdsButton
+                  buttonRole="secondary"
+                  style={{ width: "fit-content" }}
+                  onGcdsClick={(ev) => {
+                    ev.preventDefault();
+                    onBack();
+                  }}
+                >
+                  {t("Verification.chooseDifferentMethod")}
+                </GcdsButton>
+              ) : null}
+            </GcdsGrid>
+          </>
+        ) : (
+          <>
+            <GcdsText>
+              {userMfaType === FLOW_TYPES.voice
+                ? t("Verification.voiceCodeSent")
+                : userMfaType === FLOW_TYPES.sms
+                  ? t("Verification.smsCodeSent")
+                  : t("Verification.emailCodeSent")}
+              &nbsp;
+              <strong>{userSelectedMfaFactor.destination}</strong>
+            </GcdsText>
+            <GcdsText>
+              {userMfaType === FLOW_TYPES.voice
+                ? t("Verification.callMayTakeMinutes")
+                : userMfaType === FLOW_TYPES.sms
+                  ? t("Verification.smsMayTakeMinutes")
+                  : t("Verification.emailMayTakeMinutes")}
+            </GcdsText>
+            <GcdsText>
+              {t("Verification.codeExpiresIn")}{" "}
+              <strong>
+                {countdownDisplay ?? t("Verification.tenMinutes")}
+              </strong>
+            </GcdsText>
+            {userMfaType !== FLOW_TYPES.email && (
+              <GcdsHeading tag="h2">{t("Verification.enterCode")}</GcdsHeading>
+            )}
+
+            <form onSubmit={onSubmitHandler}>
+              <GcdsInput
+                inputId="verificationCode"
+                label={t("Verification.sixDigitCode")}
+                name="verificationCode"
+                type="text"
+                validateOn="other"
+                errorMessage={displayError}
+                value={userOtpValue}
+                onGcdsInput={handleChange}
+                lang={language}
+                size={18}
+                maxlength={6}
+                minlength={6}
+                autocomplete="one-time-code"
+                autoFocus
+              ></GcdsInput>
+            </form>
+
+            <GcdsGrid
+              columns={
+                showTryAnotherWay ? "max-content max-content" : "max-content"
+              }
+              gap="200"
+            >
+              <SubmitButton
+                disabled={userOtpValue.length < 6 || isMaxAttemptsReached}
+                onGcdsClick={(ev) => {
+                  ev.preventDefault();
+                  void doSubmit();
+                }}
+                currentLang={language ?? "en"}
+              ></SubmitButton>
+
+              {showTryAnotherWay ? (
+                <GcdsButton
+                  buttonRole="secondary"
+                  style={{ width: "fit-content" }}
+                  onGcdsClick={(ev) => {
+                    ev.preventDefault();
+                    onBack();
+                  }}
+                >
+                  {t("Verification.chooseDifferentMethod")}
+                </GcdsButton>
+              ) : null}
+            </GcdsGrid>
+          </>
+        )}
       </GcdsContainer>
+
       <GcdsHeading tag="h2">{t("Verification.problemsWithCode")}</GcdsHeading>
 
       <GcdsText>
-        {time > 0 ? (
+        {!isOtpExpired && time > 0 ? (
           <span>
             {t("Verification.requestNewCodeIn")}
             <strong>
@@ -239,22 +346,7 @@ export default function OtpVerification({
           <GcdsLink
             role="button"
             onGcdsClick={() => {
-              void (async () => {
-                const requestSucceeded = await requestOtpCode();
-
-                if (requestSucceeded === false) {
-                  setCodeRequested(false);
-                  return;
-                }
-
-                setCodeRequested(true);
-                setTime(initialTime);
-                setErrorCode("");
-                setErrorMessage?.("");
-                setUserOtpValue("");
-                setLocalError("");
-                setIsMaxAttemptsReached(false);
-              })();
+              void handleRequestNewCode();
             }}
           >
             {userMfaType !== FLOW_TYPES.email

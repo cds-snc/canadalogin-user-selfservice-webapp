@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { render, screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { BrowserRouter } from "react-router";
 import React from "react";
@@ -186,6 +186,10 @@ describe("EmailOtpValidation", () => {
     mockUseParams.mockReturnValue({ language: "en" });
   });
 
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   describe("Component Rendering", () => {
     it("renders the basic component structure", () => {
       renderComponent();
@@ -358,6 +362,24 @@ describe("EmailOtpValidation", () => {
       expect(
         screen.getByText((content) => content.includes("seconds")),
       ).toBeInTheDocument();
+    });
+
+    it("keeps resend availability on the original short delay when OTP expiry exists", async () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date("2099-01-01T00:09:00.000Z"));
+
+      renderComponent({ otpExpiry: "2099-01-01T00:10:00.000Z" });
+
+      expect(screen.queryByText("Request a new code")).not.toBeInTheDocument();
+
+      for (let second = 0; second <= 10; second += 1) {
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(1000);
+        });
+      }
+
+      expect(screen.getByText("Request a new code")).toBeInTheDocument();
+      expect(screen.getByText(/^00:4[89]$/)).toBeInTheDocument();
     });
   });
 

@@ -6,6 +6,7 @@ import {
   SUBMIT_END_POINTS,
 } from "../../../../utils/constants";
 import { buildTestCase, TestTemplate } from "../../utils/functions.tsx";
+const FUTURE_OTP_EXPIRY = new Date(Date.now() + 60_000).toISOString();
 
 export default {
   title:
@@ -38,6 +39,7 @@ export const EditContactPhoneNumber = (() => {
           success: true,
           data: {
             trxnId: "test-transaction-id-12345",
+            expiry: FUTURE_OTP_EXPIRY,
           },
         },
       },
@@ -173,9 +175,13 @@ export const EditContactPhoneNumber = (() => {
 
       // Enter OTP
       await waitFor(async () => {
+        const canvas = within(canvasElement);
         const hasVerificationText =
           canvasElement.textContent.includes("Check your phone");
         await expect(hasVerificationText).toBeTruthy();
+        await expect(
+          canvas.getByText(/your code will expire in/i),
+        ).toBeInTheDocument();
       });
 
       await step("Verify OTP verification page and enter OTP", async () => {

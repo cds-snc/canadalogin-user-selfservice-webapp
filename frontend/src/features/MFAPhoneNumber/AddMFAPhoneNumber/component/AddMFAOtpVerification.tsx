@@ -14,19 +14,20 @@ import { useParams } from "react-router";
 import { FLOW_TYPES } from "../../../../utils/constants";
 import { useTranslation } from "react-i18next";
 import SubmitButton from "../../../../components/Layout/SubmitButton";
-
-const initialTime = 10;
+import { useOtpExpiryCountdown } from "../../../../hooks/useOtpExpiryCountdown";
 
 interface PageHeaderProps {
   language: string | undefined;
   userMfaType: string;
   formattedPhoneNumber: string;
+  countdownDisplay: string;
 }
 
 const PageHeader = ({
   language,
   userMfaType,
   formattedPhoneNumber,
+  countdownDisplay,
 }: PageHeaderProps) => {
   const { t } = useTranslation("verification");
   const sentMessage =
@@ -50,8 +51,7 @@ const PageHeader = ({
             : t("Verification.emailMayTakeMinutes")}
       </GcdsText>
       <GcdsText>
-        {t("Verification.codeExpiresIn")}{" "}
-        <strong>{t("Verification.tenMinutes")}</strong>
+        {t("Verification.codeExpiresIn")} <strong>{countdownDisplay}</strong>
       </GcdsText>
     </>
   );
@@ -62,6 +62,7 @@ interface PhoneFormData {
   otp: string;
   mfaId: string;
   trxnId: string;
+  expiry: string;
   otpType: string;
   formattedPhoneNumber: string;
 }
@@ -96,9 +97,15 @@ export default function AddMFAOtpVerification({
   const { language } = useParams();
 
   const [codeRequested, setCodeRequested] = useState(false);
-  const [time, setTime] = useState(initialTime);
   const { t } = useTranslation(["verification", "common"]);
   const [localError, setLocalError] = useState("");
+  const {
+    fallbackSeconds,
+    formattedCountdown,
+    hasServerExpiry,
+    isExpired,
+    restartFallbackCountdown,
+  } = useOtpExpiryCountdown(phoneFormData.expiry);
 
   const displayError = localError || errorMessage || "";
 
@@ -112,9 +119,9 @@ export default function AddMFAOtpVerification({
   const requestNewCode = () => {
     onChangePhoneForm("otp", "");
     requestNewOtpCode();
-    setTime(initialTime);
     setCodeRequested(true);
     setLocalError("");
+    restartFallbackCountdown();
     resetAttempts?.();
   };
 
@@ -130,18 +137,6 @@ export default function AddMFAOtpVerification({
     onChangePhoneForm("otp", "");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    if (time <= 0) {
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      setTime((prevTime) => prevTime - 1);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, [time]);
 
   const userMfaType = phoneFormData.otpType;
 
@@ -178,53 +173,91 @@ export default function AddMFAOtpVerification({
             language={language}
             userMfaType={userMfaType}
             formattedPhoneNumber={phoneFormData.formattedPhoneNumber}
+            countdownDisplay={
+              hasServerExpiry
+                ? formattedCountdown
+                : t("Verification.tenMinutes")
+            }
           />
 
-          <GcdsHeading tag="h2">{t("Verification.enterCode")}</GcdsHeading>
-          <form onSubmit={onSubmitHandler}>
-            <GcdsInput
-              inputId="verificationCode"
-              label={t("Verification.sixDigitCode")}
-              autoFocus
-              autocomplete="one-time-code"
-              name="verificationCode"
-              type="text"
-              value={phoneFormData.otp}
-              validateOn="other"
-              errorMessage={displayError}
-              onGcdsInput={handleChange}
-              lang={language}
-              size={18}
-              maxlength={6}
-              minlength={6}
-            ></GcdsInput>
-          </form>
+          {isExpired ? (
+            <>
+              <GcdsText>{t("Verification.expiredMessage")}</GcdsText>
+
+              <GcdsGrid columns="max-content max-content" gap="200">
+                <GcdsButton
+                  style={{ width: "fit-content" }}
+                  onGcdsClick={(ev) => {
+                    ev.preventDefault();
+                    requestNewCode();
+                  }}
+                >
+                  {t("Verification.requestNewCode")}
+                </GcdsButton>
+
+                <GcdsButton
+                  buttonRole="secondary"
+                  style={{ width: "fit-content" }}
+                  onGcdsClick={(ev) => {
+                    ev.preventDefault();
+                    void onSetupAlternateMFAMethod();
+                  }}
+                >
+                  {t("Verification.chooseDifferentMethod")}
+                </GcdsButton>
+              </GcdsGrid>
+            </>
+          ) : (
+            <>
+              <GcdsHeading tag="h2">{t("Verification.enterCode")}</GcdsHeading>
+              <form onSubmit={onSubmitHandler}>
+                <GcdsInput
+                  inputId="verificationCode"
+                  label={t("Verification.sixDigitCode")}
+                  autoFocus
+                  autocomplete="one-time-code"
+                  name="verificationCode"
+                  type="text"
+                  value={phoneFormData.otp}
+                  validateOn="other"
+                  errorMessage={displayError}
+                  onGcdsInput={handleChange}
+                  lang={language}
+                  size={18}
+                  maxlength={6}
+                  minlength={6}
+                ></GcdsInput>
+              </form>
+            </>
+          )}
         </GcdsContainer>
       </section>
 
       <section>
-        <GcdsGrid columns="max-content max-content" gap="200">
-          <SubmitButton
-            disabled={phoneFormData.otp.length < 6 || isMaxAttemptsReached}
-            style={{ width: "fit-content" }}
-            onGcdsClick={(ev) => {
-              ev.preventDefault();
-              void doSubmit();
-            }}
-            currentLang={language ?? "en"}
-          ></SubmitButton>
+        {!isExpired ? (
+          <GcdsGrid columns="max-content max-content" gap="200">
+            <SubmitButton
+              disabled={phoneFormData.otp.length < 6 || isMaxAttemptsReached}
+              style={{ width: "fit-content" }}
+              onGcdsClick={(ev) => {
+                ev.preventDefault();
+                void doSubmit();
+              }}
+              currentLang={language ?? "en"}
+            ></SubmitButton>
 
-          <GcdsButton
-            buttonRole="secondary"
-            style={{ width: "fit-content" }}
-            onGcdsClick={(ev) => {
-              ev.preventDefault();
-              onCancel();
-            }}
-          >
-            {t("Button.cancel", { ns: "common" })}
-          </GcdsButton>
-        </GcdsGrid>
+            <GcdsButton
+              buttonRole="secondary"
+              style={{ width: "fit-content" }}
+              onGcdsClick={(ev) => {
+                ev.preventDefault();
+                onCancel();
+              }}
+            >
+              {t("Button.cancel", { ns: "common" })}
+            </GcdsButton>
+          </GcdsGrid>
+        ) : null}
       </section>
 
       <section>
@@ -243,12 +276,12 @@ export default function AddMFAOtpVerification({
         </GcdsText>
 
         <GcdsText>
-          {time > 0 ? (
+          {!isExpired && fallbackSeconds > 0 ? (
             <span>
               {t("Verification.requestNewCodeAvailableIn")}
               <strong>
                 {" "}
-                {time} {t("Verification.seconds")}
+                {fallbackSeconds} {t("Verification.seconds")}
               </strong>
             </span>
           ) : (

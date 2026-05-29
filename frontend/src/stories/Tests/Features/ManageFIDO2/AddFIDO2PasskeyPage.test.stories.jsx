@@ -27,6 +27,7 @@ import {
   SUBMIT_END_POINTS,
 } from "../../../../utils/constants";
 import { buildTestCase, TestTemplate } from "../../utils/functions.tsx";
+const FUTURE_OTP_EXPIRY = new Date(Date.now() + 60_000).toISOString();
 
 // ─── Shared interaction helpers ────────────────────────────────────────────
 
@@ -207,7 +208,10 @@ function coreEndpoints(fido2Data = [], numPhoneFactors = 2) {
     {
       type: "post",
       endpoint: SUBMIT_END_POINTS.transientOtpSend,
-      response: { success: true, data: { trxnId: "txn-123" } },
+      response: {
+        success: true,
+        data: { trxnId: "txn-123", expiry: FUTURE_OTP_EXPIRY },
+      },
     },
     {
       type: "post",

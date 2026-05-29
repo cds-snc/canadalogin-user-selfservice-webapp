@@ -17,6 +17,7 @@
     "pre-push": "./.githooks/pre-push",
     "prepare": "husky",
     "test": "vitest --run --coverage",
+    "test:failed-only": "vitest --run --silent=passed-only --no-coverage",
     "typecheck": "tsc --noEmit",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",

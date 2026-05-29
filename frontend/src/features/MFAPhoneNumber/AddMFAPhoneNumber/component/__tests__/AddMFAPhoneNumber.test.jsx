@@ -84,6 +84,8 @@ vi.mock("react-phone-input-2", () => {
     className,
     country = "ca",
     placeholder,
+    disableCountryCode,
+    countryCodeEditable,
     onChange,
   }) => {
     const [selectedCountry, setSelectedCountry] = React.useState(country);
@@ -123,6 +125,17 @@ vi.mock("react-phone-input-2", () => {
           placeholder={placeholder}
           value={value ?? ""}
           onChange={(event) => {
+            const dialCode = dialCodes[selectedCountry] ?? "1";
+            const requiredPrefix = `+${dialCode}`;
+
+            if (
+              disableCountryCode &&
+              countryCodeEditable === false &&
+              !event.target.value.startsWith(requiredPrefix)
+            ) {
+              return;
+            }
+
             emitChange(
               event.target.value,
               selectedCountry,
@@ -644,6 +657,30 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
     });
   });
   describe("Phone Input Change Handling", () => {
+    it("should reflect typed digits immediately before the parent rerenders", () => {
+      render(
+        <TestWrapper>
+          <AddMFAPhoneNumber
+            onNext={mockOnNext}
+            onCancel={mockOnCancel}
+            onChangePhoneForm={mockOnChangePhoneForm}
+            phoneFormData={{
+              phoneNumber: "",
+              formattedPhoneNumber: "",
+              otpType: "smsotp",
+            }}
+            setErrorCode={mockSetErrorCode}
+          />
+        </TestWrapper>,
+      );
+
+      const phoneInput = screen.getByRole("textbox");
+
+      fireEvent.change(phoneInput, { target: { value: "6135551234" } });
+
+      expect(phoneInput.value.replace(/\D/g, "")).toBe("6135551234");
+    });
+
     it("should allow typing local digits without showing the country code", () => {
       const Harness = () => {
         const [phoneFormData, setPhoneFormData] = React.useState({

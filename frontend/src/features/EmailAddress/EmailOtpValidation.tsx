@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   GcdsButton,
   GcdsContainer,
@@ -11,6 +11,7 @@ import {
 import { useParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import SubmitButton from "../../components/Layout/SubmitButton";
+import { useOtpExpiryCountdown } from "../../hooks/useOtpExpiryCountdown";
 
 type EmailFormData = {
   emailAddress: string;
@@ -28,9 +29,8 @@ interface EmailOtpValidationProps {
   onBack: () => void | Promise<void>;
   isMaxAttemptsReached?: boolean;
   resetAttempts?: () => void;
+  otpExpiry?: string | null;
 }
-
-const initialTime = 10;
 
 export default function EmailOtpValidation({
   onSubmit,
@@ -44,12 +44,19 @@ export default function EmailOtpValidation({
   onBack,
   isMaxAttemptsReached = false,
   resetAttempts,
+  otpExpiry = null,
 }: EmailOtpValidationProps) {
   const { language } = useParams();
-  const { t } = useTranslation(["email", "common"]);
+  const { t } = useTranslation(["email", "verification", "common"]);
 
-  const [time, setTime] = useState(initialTime);
   const [localError, setLocalError] = useState("");
+  const {
+    fallbackSeconds,
+    formattedCountdown,
+    hasServerExpiry,
+    isExpired,
+    restartFallbackCountdown,
+  } = useOtpExpiryCountdown(otpExpiry);
 
   const displayError = localError || errorMessage || "";
 
@@ -74,24 +81,11 @@ export default function EmailOtpValidation({
     ev.preventDefault();
     if (requestOtpCode) {
       await requestOtpCode();
-      setTime(initialTime);
       setLocalError("");
+      restartFallbackCountdown();
       resetAttempts?.();
     }
   };
-
-  // Countdown timer for resend button
-  useEffect(() => {
-    if (time <= 0) {
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      setTime((prevTime) => prevTime - 1);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, [time]);
 
   return (
     <GcdsContainer role="main">
@@ -99,55 +93,88 @@ export default function EmailOtpValidation({
         {t("EmailOtpValidation.title")}
       </GcdsHeading>
 
-      <GcdsText>
-        {t("EmailOtpValidation.codeSent")}{" "}
-        <strong>{formData.emailAddress}</strong>
-      </GcdsText>
+      {isExpired ? (
+        <>
+          <GcdsText>
+            {t("Verification.expiredMessage", { ns: "verification" })}
+          </GcdsText>
 
-      <GcdsText>{t("EmailOtpValidation.emailMayTakeMinutes")}</GcdsText>
+          <GcdsGrid columns="max-content max-content" gap="200">
+            <GcdsButton onGcdsClick={handleResendCode}>
+              {t("EmailOtpValidation.requestNewCode")}
+            </GcdsButton>
+            <GcdsButton
+              buttonRole="secondary"
+              onGcdsClick={async (ev) => {
+                ev.preventDefault();
+                clearValues();
+                await onBack();
+              }}
+            >
+              {t("Verification.chooseDifferentMethod", { ns: "verification" })}
+            </GcdsButton>
+          </GcdsGrid>
+        </>
+      ) : (
+        <>
+          <GcdsText>
+            {t("EmailOtpValidation.codeSent")}{" "}
+            <strong>{formData.emailAddress}</strong>
+          </GcdsText>
 
-      <GcdsText>{t("EmailOtpValidation.codeExpiresIn")}</GcdsText>
+          <GcdsText>{t("EmailOtpValidation.emailMayTakeMinutes")}</GcdsText>
 
-      <form onSubmit={onSubmitHandler}>
-        <GcdsInput
-          style={{ marginTop: "1.5rem" }}
-          label={t("EmailOtpValidation.sixDigitCode")}
-          id="verificationCode"
-          inputId="verificationCode"
-          name="verificationCode"
-          type="text"
-          autocomplete="one-time-code"
-          validateOn="other"
-          errorMessage={displayError}
-          value={userOtpValue}
-          onGcdsInput={handleInputChange}
-          lang={language}
-          size={18}
-          maxlength={6}
-          minlength={6}
-          autoFocus
-        />
-      </form>
+          <GcdsText>
+            {t("EmailOtpValidation.codeExpiresIn")}{" "}
+            <strong>
+              {hasServerExpiry
+                ? formattedCountdown
+                : t("EmailOtpValidation.tenMinutes")}
+            </strong>
+          </GcdsText>
 
-      <GcdsGrid columns="max-content max-content" gap="200">
-        <SubmitButton
-          currentLang={language ?? "en"}
-          disabled={isMaxAttemptsReached}
-          onGcdsClick={(ev) => {
-            ev.preventDefault();
-            void onSubmit();
-          }}
-        />
-        <GcdsButton
-          buttonRole="secondary"
-          onGcdsClick={(ev) => {
-            ev.preventDefault();
-            void onCancel();
-          }}
-        >
-          {t("Button.cancel", { ns: "common" })}
-        </GcdsButton>
-      </GcdsGrid>
+          <form onSubmit={onSubmitHandler}>
+            <GcdsInput
+              style={{ marginTop: "1.5rem" }}
+              label={t("EmailOtpValidation.sixDigitCode")}
+              id="verificationCode"
+              inputId="verificationCode"
+              name="verificationCode"
+              type="text"
+              autocomplete="one-time-code"
+              validateOn="other"
+              errorMessage={displayError}
+              value={userOtpValue}
+              onGcdsInput={handleInputChange}
+              lang={language}
+              size={18}
+              maxlength={6}
+              minlength={6}
+              autoFocus
+            />
+          </form>
+
+          <GcdsGrid columns="max-content max-content" gap="200">
+            <SubmitButton
+              currentLang={language ?? "en"}
+              disabled={isMaxAttemptsReached}
+              onGcdsClick={(ev) => {
+                ev.preventDefault();
+                void onSubmit();
+              }}
+            />
+            <GcdsButton
+              buttonRole="secondary"
+              onGcdsClick={(ev) => {
+                ev.preventDefault();
+                void onCancel();
+              }}
+            >
+              {t("Button.cancel", { ns: "common" })}
+            </GcdsButton>
+          </GcdsGrid>
+        </>
+      )}
 
       <GcdsHeading tag="h2">
         {t("EmailOtpValidation.problemsWithCode")}
@@ -165,12 +192,12 @@ export default function EmailOtpValidation({
       </GcdsText>
 
       <GcdsText>
-        {time > 0 ? (
+        {!isExpired && fallbackSeconds > 0 ? (
           <span>
             {t("EmailOtpValidation.requestNewCodeIn")}
             <strong>
               {" "}
-              {time} {t("EmailOtpValidation.seconds")}
+              {fallbackSeconds} {t("EmailOtpValidation.seconds")}
             </strong>
           </span>
         ) : (

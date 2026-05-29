@@ -372,6 +372,7 @@ export default function DeleteMFAPage() {
         setErrorCode={setErrorCode}
         setErrorMessage={setCustomErrorMessage}
         errorMessage={errorMessage}
+        otpExpiry={otpSentResponse?.expiry}
         onCancel={async () => navigate(backToManage2FAVerificationsPage)}
         showTryAnotherWay={
           (userPhoneFactors && userPhoneFactors.length > 1) ||

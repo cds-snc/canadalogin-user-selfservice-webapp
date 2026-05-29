@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
 import type { FormEventHandler } from "react";
+import { useState } from "react";
 
 import {
   GcdsButton,
@@ -17,23 +17,24 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 import { FLOW_TYPES } from "../../../utils/constants";
 import SubmitButton from "../../../components/Layout/SubmitButton";
+import { useOtpExpiryCountdown } from "../../../hooks/useOtpExpiryCountdown";
 import type {
   ContactPhoneOtpType,
   ContactPhoneOtpVerificationProps,
 } from "../../../types/contactPhoneNumber";
 
-const initialTime = 10;
-
 interface PageHeaderProps {
   language: string;
   userMfaType: ContactPhoneOtpType;
   formattedPhoneNumber: string;
+  countdownDisplay: string;
 }
 
 function PageHeader({
   language,
   userMfaType,
   formattedPhoneNumber,
+  countdownDisplay,
 }: PageHeaderProps) {
   const { t } = useTranslation("verification");
   return (
@@ -55,8 +56,7 @@ function PageHeader({
           : t("Verification.smsMayTakeMinutes")}
       </GcdsText>
       <GcdsText>
-        {t("Verification.codeExpiresIn")}{" "}
-        <strong>{t("Verification.tenMinutes")}</strong>
+        {t("Verification.codeExpiresIn")} <strong>{countdownDisplay}</strong>
       </GcdsText>
     </>
   );
@@ -77,9 +77,15 @@ export default function OtpVerification({
   const { language = "en" } = useParams<{ language: string }>();
 
   const [codeRequested, setCodeRequested] = useState(false);
-  const [time, setTime] = useState(initialTime);
   const { t } = useTranslation(["verification", "common"]);
   const [localError, setLocalError] = useState("");
+  const {
+    fallbackSeconds,
+    formattedCountdown,
+    hasServerExpiry,
+    isExpired,
+    restartFallbackCountdown,
+  } = useOtpExpiryCountdown(phoneFormData.expiry);
 
   const displayError = localError || errorMessage || "";
 
@@ -93,9 +99,9 @@ export default function OtpVerification({
   const requestNewCode = async (otpType?: ContactPhoneOtpType) => {
     onChangePhoneForm("otp", "");
     await requestNewOtpCode(otpType ?? phoneFormData.otpType);
-    setTime(initialTime);
     setCodeRequested(true);
     setLocalError("");
+    restartFallbackCountdown();
     resetAttempts?.();
   };
 
@@ -117,18 +123,6 @@ export default function OtpVerification({
     void onNext();
   };
 
-  useEffect(() => {
-    if (time <= 0) {
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      setTime((prevTime) => prevTime - 1);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, [time]);
-
   const userMfaType = phoneFormData.otpType;
 
   return (
@@ -149,47 +143,86 @@ export default function OtpVerification({
           language={language}
           userMfaType={userMfaType}
           formattedPhoneNumber={phoneFormData.formattedPhoneNumber}
+          countdownDisplay={
+            hasServerExpiry ? formattedCountdown : t("Verification.tenMinutes")
+          }
         />
 
-        <GcdsHeading tag="h2">{t("Verification.enterCode")}</GcdsHeading>
-        <form onSubmit={onSubmitHandler}>
-          <GcdsInput
-            inputId="verificationCode"
-            label={t("Verification.sixDigitCode")}
-            autoFocus
-            autocomplete="one-time-code"
-            name="verificationCode"
-            type="text"
-            value={phoneFormData.otp}
-            validateOn="other"
-            errorMessage={displayError}
-            onGcdsInput={handleChange}
-            lang={language}
-            size={18}
-            maxlength={6}
-            minlength={6}
-          />
-        </form>
+        {isExpired ? (
+          <>
+            <GcdsText>{t("Verification.expiredMessage")}</GcdsText>
 
-        <GcdsGrid columns="max-content max-content" gap="200">
-          <SubmitButton
-            disabled={phoneFormData.otp.length < 6 || isMaxAttemptsReached}
-            style={{ width: "fit-content" }}
-            onGcdsClick={onSubmitClick}
-            currentLang={language}
-          />
+            <GcdsGrid columns="max-content max-content" gap="200">
+              <GcdsButton
+                style={{ width: "fit-content" }}
+                onGcdsClick={(event: Event) => {
+                  event.preventDefault();
+                  void requestNewCode();
+                }}
+              >
+                {t("Verification.requestNewCode")}
+              </GcdsButton>
 
-          <GcdsButton
-            buttonRole="secondary"
-            style={{ width: "fit-content" }}
-            onGcdsClick={(event: Event) => {
-              event.preventDefault();
-              void onCancel();
-            }}
-          >
-            {t("Button.cancel", { ns: "common" })}
-          </GcdsButton>
-        </GcdsGrid>
+              <GcdsButton
+                buttonRole="secondary"
+                style={{ width: "fit-content" }}
+                onGcdsClick={(event: Event) => {
+                  event.preventDefault();
+                  const newOtpType =
+                    userMfaType === FLOW_TYPES.sms
+                      ? FLOW_TYPES.voice
+                      : FLOW_TYPES.sms;
+                  onChangePhoneForm("otpType", newOtpType);
+                  void requestNewCode(newOtpType);
+                }}
+              >
+                {t("Verification.chooseDifferentMethod")}
+              </GcdsButton>
+            </GcdsGrid>
+          </>
+        ) : (
+          <>
+            <GcdsHeading tag="h2">{t("Verification.enterCode")}</GcdsHeading>
+            <form onSubmit={onSubmitHandler}>
+              <GcdsInput
+                inputId="verificationCode"
+                label={t("Verification.sixDigitCode")}
+                autoFocus
+                autocomplete="one-time-code"
+                name="verificationCode"
+                type="text"
+                value={phoneFormData.otp}
+                validateOn="other"
+                errorMessage={displayError}
+                onGcdsInput={handleChange}
+                lang={language}
+                size={18}
+                maxlength={6}
+                minlength={6}
+              />
+            </form>
+
+            <GcdsGrid columns="max-content max-content" gap="200">
+              <SubmitButton
+                disabled={phoneFormData.otp.length < 6 || isMaxAttemptsReached}
+                style={{ width: "fit-content" }}
+                onGcdsClick={onSubmitClick}
+                currentLang={language}
+              />
+
+              <GcdsButton
+                buttonRole="secondary"
+                style={{ width: "fit-content" }}
+                onGcdsClick={(event: Event) => {
+                  event.preventDefault();
+                  void onCancel();
+                }}
+              >
+                {t("Button.cancel", { ns: "common" })}
+              </GcdsButton>
+            </GcdsGrid>
+          </>
+        )}
       </GcdsContainer>
       <GcdsHeading tag="h2">{t("Verification.problemsWithCode")}</GcdsHeading>
 
@@ -212,12 +245,12 @@ export default function OtpVerification({
       </GcdsText>
 
       <GcdsText>
-        {time > 0 ? (
+        {!isExpired && fallbackSeconds > 0 ? (
           <span>
             {t("Verification.requestNewCodeIn")}
             <strong>
               {" "}
-              {time} {t("Verification.seconds")}
+              {fallbackSeconds} {t("Verification.seconds")}
             </strong>
           </span>
         ) : (
