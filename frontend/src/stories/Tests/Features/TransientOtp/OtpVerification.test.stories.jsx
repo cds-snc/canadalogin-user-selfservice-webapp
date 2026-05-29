@@ -1,6 +1,6 @@
 import { expect, within, waitFor } from "@storybook/test";
-import OtpVerification from "../../../../features/TransientOtp/components/OtpVerification.jsx";
-import { AVAILABLE_LANGUAGES, FLOW_TYPES } from "../../../../utils/constants";
+import OtpVerification from "../../../../features/TransientOtp/components/OtpVerification";
+import { FLOW_TYPES } from "../../../../utils/constants";
 
 export default {
   title: "GC Sign In/Tests/Features/TransientOtp/OtpVerification",
@@ -19,12 +19,13 @@ export default {
 
 const Template = (args) => <OtpVerification {...args} />;
 
-// Mock user profile and factors for testing
-const mockUserProfile = {
-  id: "test-user-123",
-  email: "test@example.com",
-  firstName: "John",
-  lastName: "Doe",
+const baseArgs = {
+  setUserOtpValue: () => {},
+  onBack: () => {},
+  onCancel: () => {},
+  requestOtpCode: async () => true,
+  validateOtpCode: async () => {},
+  setErrorCode: () => {},
 };
 
 const mockSMSFactor = {
@@ -51,7 +52,7 @@ const mockEmailFactor = {
 // Test: SMS Verification Flow
 export const SMSVerificationFlow = Template.bind({});
 SMSVerificationFlow.args = {
-  userProfile: mockUserProfile,
+  ...baseArgs,
   userSelectedMfaFactor: mockSMSFactor,
   userOtpValue: "",
   errorMessage: "",
@@ -85,21 +86,20 @@ SMSVerificationFlow.play = async ({ canvasElement }) => {
   // Test that action buttons are present with correct initial states
   await waitFor(async () => {
     const submitButton = canvas.getByText(/continue/i);
-    const cancelButton = canvas.getByText(/cancel/i);
+    const tryAnotherWayButton = canvas.getByText(/choose a different method/i);
 
     await expect(submitButton).toBeInTheDocument();
-    await expect(cancelButton).toBeInTheDocument();
+    await expect(tryAnotherWayButton).toBeInTheDocument();
 
-    // Just verify buttons are present (disable state testing handled at component level)
     await expect(submitButton).toBeInTheDocument();
-    await expect(cancelButton).toBeInTheDocument();
+    await expect(tryAnotherWayButton).toBeInTheDocument();
   });
 };
 
 // Test: Voice Call Verification Flow
 export const VoiceCallVerificationFlow = Template.bind({});
 VoiceCallVerificationFlow.args = {
-  userProfile: mockUserProfile,
+  ...baseArgs,
   userSelectedMfaFactor: mockVoiceFactor,
   userOtpValue: "",
   errorMessage: "",
@@ -129,17 +129,17 @@ VoiceCallVerificationFlow.play = async ({ canvasElement }) => {
   // Test that action buttons are available
   await waitFor(async () => {
     const submitButton = canvas.getByText(/continue/i);
-    const cancelButton = canvas.getByText(/cancel/i);
+    const tryAnotherWayButton = canvas.getByText(/choose a different method/i);
 
     await expect(submitButton).toBeInTheDocument();
-    await expect(cancelButton).toBeInTheDocument();
+    await expect(tryAnotherWayButton).toBeInTheDocument();
   });
 };
 
 // Test: Email Verification Flow
 export const EmailVerificationFlow = Template.bind({});
 EmailVerificationFlow.args = {
-  userProfile: mockUserProfile,
+  ...baseArgs,
   userSelectedMfaFactor: mockEmailFactor,
   userOtpValue: "",
   errorMessage: "",
@@ -169,17 +169,17 @@ EmailVerificationFlow.play = async ({ canvasElement }) => {
   // Test that buttons are functional for email flow
   await waitFor(async () => {
     const submitButton = canvas.getByText(/continue/i);
-    const cancelButton = canvas.getByText(/cancel/i);
+    const tryAnotherWayButton = canvas.getByText(/choose a different method/i);
 
     await expect(submitButton).toBeInTheDocument();
-    await expect(cancelButton).toBeInTheDocument();
+    await expect(tryAnotherWayButton).toBeInTheDocument();
   });
 };
 
 // Test: Input State Management
 export const InputStateManagement = Template.bind({});
 InputStateManagement.args = {
-  userProfile: mockUserProfile,
+  ...baseArgs,
   userSelectedMfaFactor: mockSMSFactor,
   userOtpValue: "123456", // Complete input
   errorMessage: "",
@@ -216,7 +216,7 @@ InputStateManagement.play = async ({ canvasElement }) => {
 // Test: Error State Display
 export const ErrorStateDisplay = Template.bind({});
 ErrorStateDisplay.args = {
-  userProfile: mockUserProfile,
+  ...baseArgs,
   userSelectedMfaFactor: mockSMSFactor,
   userOtpValue: "123456",
   errorMessage: "Invalid verification code. Please try again.",
@@ -235,17 +235,14 @@ ErrorStateDisplay.play = async ({ canvasElement }) => {
   await waitFor(async () => {
     const otpInput = canvasElement.querySelector("gcds-input");
     await expect(otpInput).toBeInTheDocument();
-
-    // Just verify input component is present in error state
-    await expect(otpInput).toBeInTheDocument();
   });
 
   // Test that input and buttons are still functional during error state
   await waitFor(async () => {
     const submitButton = canvas.getByText(/continue/i);
-    const cancelButton = canvas.getByText(/cancel/i);
+    const tryAnotherWayButton = canvas.getByText(/choose a different method/i);
 
     await expect(submitButton).toBeInTheDocument();
-    await expect(cancelButton).toBeInTheDocument();
+    await expect(tryAnotherWayButton).toBeInTheDocument();
   });
 };

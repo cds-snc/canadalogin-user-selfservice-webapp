@@ -7,6 +7,7 @@ import {
   GcdsHeading,
   GcdsInput,
   GcdsLink,
+  GcdsNotice,
   GcdsText,
 } from "@gcds-core/components-react";
 import { useTranslation } from "react-i18next";
@@ -44,13 +45,13 @@ export default function OtpVerification({
   validateOtpCode,
   setErrorCode,
   errorMessage,
-  onCancel,
   showTryAnotherWay = true,
   isMaxAttemptsReached = false,
   resetAttempts,
 }: OtpVerificationProps) {
   const { language } = useParams();
   const [time, setTime] = useState(initialTime);
+  const [codeRequested, setCodeRequested] = useState(false);
   const { t } = useTranslation(["verification", "common"]);
   const [localError, setLocalError] = useState("");
 
@@ -99,6 +100,17 @@ export default function OtpVerification({
   const userMfaType = userSelectedMfaFactor?.type;
   return (
     <GcdsContainer role="main">
+      {codeRequested ? (
+        <GcdsNotice
+          noticeRole="success"
+          noticeTitleTag="h2"
+          noticeTitle={t("Verification.successTitle")}
+          data-testid="linkSuccess"
+        >
+          <GcdsText>{t("Verification.newCodeSent")}</GcdsText>
+        </GcdsNotice>
+      ) : null}
+
       <GcdsContainer>
         <GcdsHeading tag="h1" lang={language}>
           {userMfaType === FLOW_TYPES.email
@@ -149,10 +161,14 @@ export default function OtpVerification({
           ></GcdsInput>
         </form>
 
-        <GcdsGrid columns="max-content max-content" gap="200">
+        <GcdsGrid
+          columns={
+            showTryAnotherWay ? "max-content max-content" : "max-content"
+          }
+          gap="200"
+        >
           <SubmitButton
             disabled={userOtpValue.length < 6 || isMaxAttemptsReached}
-            style={{ width: "fit-content" }}
             onGcdsClick={(ev) => {
               ev.preventDefault();
               void doSubmit();
@@ -160,32 +176,21 @@ export default function OtpVerification({
             currentLang={language ?? "en"}
           ></SubmitButton>
 
-          <GcdsButton
-            buttonRole="secondary"
-            style={{ width: "fit-content" }}
-            onGcdsClick={(ev) => {
-              ev.preventDefault();
-              onCancel();
-            }}
-          >
-            {t("Button.cancel", { ns: "common" })}
-          </GcdsButton>
+          {showTryAnotherWay ? (
+            <GcdsButton
+              buttonRole="secondary"
+              style={{ width: "fit-content" }}
+              onGcdsClick={(ev) => {
+                ev.preventDefault();
+                onBack();
+              }}
+            >
+              {t("Verification.chooseDifferentMethod")}
+            </GcdsButton>
+          ) : null}
         </GcdsGrid>
       </GcdsContainer>
       <GcdsHeading tag="h2">{t("Verification.problemsWithCode")}</GcdsHeading>
-
-      {showTryAnotherWay && (
-        <GcdsText>
-          <GcdsLink
-            role="button"
-            onGcdsClick={() => {
-              onBack();
-            }}
-          >
-            {t("Verification.tryAnotherWay")}
-          </GcdsLink>
-        </GcdsText>
-      )}
 
       <GcdsText>
         {time > 0 ? (
@@ -200,12 +205,21 @@ export default function OtpVerification({
           <GcdsLink
             role="button"
             onGcdsClick={() => {
-              void requestOtpCode();
-              setTime(initialTime);
-              setErrorCode("");
-              setUserOtpValue("");
-              setLocalError("");
-              resetAttempts?.();
+              void (async () => {
+                const requestSucceeded = await requestOtpCode();
+
+                if (requestSucceeded === false) {
+                  setCodeRequested(false);
+                  return;
+                }
+
+                setCodeRequested(true);
+                setTime(initialTime);
+                setErrorCode("");
+                setUserOtpValue("");
+                setLocalError("");
+                resetAttempts?.();
+              })();
             }}
           >
             {userMfaType !== FLOW_TYPES.email
