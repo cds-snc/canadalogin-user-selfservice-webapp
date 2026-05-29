@@ -117,10 +117,12 @@ vi.mock("../../../api/fido2Api", () => ({
 // ─── webAuthnUtils ─────────────────────────────────────────────────────────
 
 const mockAuthenticateFIDO2Credential = vi.fn();
+const mockIsWebAuthnSupported = vi.fn().mockReturnValue(true);
 
 vi.mock("../../../utils/webAuthnUtils", () => ({
   authenticateFIDO2Credential: (...args) =>
     mockAuthenticateFIDO2Credential(...args),
+  isWebAuthnSupported: () => mockIsWebAuthnSupported(),
 }));
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
@@ -172,6 +174,7 @@ describe("VerifyFIDO2Passkey", () => {
     mockGetAssertionOptions.mockResolvedValue(defaultAssertionOptions);
     mockAuthenticateFIDO2Credential.mockResolvedValue(defaultAssertionResult);
     mockSubmitAssertionResult.mockResolvedValue({ success: true });
+    mockIsWebAuthnSupported.mockReturnValue(true);
   });
 
   // ── Loader ────────────────────────────────────────────────────────────
@@ -209,7 +212,7 @@ describe("VerifyFIDO2Passkey", () => {
       screen.getByRole("heading", { name: "Verify with your passkey" }),
     ).toBeInTheDocument();
     expect(screen.getByText("Continue")).toBeInTheDocument();
-    expect(screen.getByText("Cancel")).toBeInTheDocument();
+    expect(screen.getByText("Choose a different method")).toBeInTheDocument();
   });
 
   it("renders the passkey collage SVG icon after loading", async () => {
@@ -428,16 +431,23 @@ describe("VerifyFIDO2Passkey", () => {
 
   // ── Cancel button ─────────────────────────────────────────────────────
 
-  it("navigates back to manage 2FA page when Cancel is clicked", async () => {
-    renderComponent();
+  it("clears error code and calls onTryAnotherWayHandler when Choose a different method is clicked", async () => {
+    const setErrorCode = vi.fn();
+    const onTryAnotherWayHandler = vi.fn();
+    renderComponent({
+      setErrorCode,
+      onTryAnotherWayHandler,
+      errorMessage: "some error",
+    });
 
     await waitFor(() => {
       expect(screen.queryByTestId("loader")).not.toBeInTheDocument();
     });
 
-    await userEvent.click(screen.getByText("Cancel"));
+    await userEvent.click(screen.getByText("Choose a different method"));
 
-    expect(mockNavigate).toHaveBeenCalledWith("/en/mock-path");
+    expect(setErrorCode).toHaveBeenLastCalledWith("");
+    expect(onTryAnotherWayHandler).toHaveBeenCalledOnce();
   });
 
   // ── Nickname display ─────────────────────────────────────────────────
@@ -499,16 +509,80 @@ describe("VerifyFIDO2Passkey", () => {
     );
   });
 
-  it("Cancel button has secondary role", async () => {
+  it("Choose a different method button has secondary role", async () => {
     renderComponent();
 
     await waitFor(() => {
       expect(screen.queryByTestId("loader")).not.toBeInTheDocument();
     });
 
-    expect(screen.getByText("Cancel")).toHaveAttribute(
+    expect(screen.getByText("Choose a different method")).toHaveAttribute(
       "data-role",
       "secondary",
     );
+  });
+
+  // ── WebAuthn not supported ────────────────────────────────────────────
+
+  it("sets error_webauthn_not_supported when WebAuthn is not supported", async () => {
+    mockIsWebAuthnSupported.mockReturnValue(false);
+    const setErrorCode = vi.fn();
+
+    renderComponent({ setErrorCode });
+
+    await waitFor(() => {
+      expect(setErrorCode).toHaveBeenCalledWith("error_webauthn_not_supported");
+    });
+
+    expect(mockGetAssertionOptions).not.toHaveBeenCalled();
+  });
+
+  it("calls onError with error_webauthn_not_supported when WebAuthn is not supported", async () => {
+    mockIsWebAuthnSupported.mockReturnValue(false);
+    const onError = vi.fn();
+
+    renderComponent({ onError });
+
+    await waitFor(() => {
+      expect(onError).toHaveBeenCalledWith("error_webauthn_not_supported");
+    });
+  });
+
+  // ── Deleted passkey ───────────────────────────────────────────────────
+
+  it("sets error_fido2_passkey_deleted when the selected passkey no longer exists server-side", async () => {
+    mockGetAssertionOptions.mockResolvedValue({
+      success: true,
+      data: {
+        challenge: "test-challenge",
+        allowCredentials: [{ id: "cred-other", type: "public-key" }],
+      },
+    });
+    const setErrorCode = vi.fn();
+
+    renderComponent({ setErrorCode });
+
+    await waitFor(() => {
+      expect(setErrorCode).toHaveBeenCalledWith("error_fido2_passkey_deleted");
+    });
+
+    expect(mockAuthenticateFIDO2Credential).not.toHaveBeenCalled();
+  });
+
+  it("calls onError with error_fido2_passkey_deleted when the passkey no longer exists server-side", async () => {
+    mockGetAssertionOptions.mockResolvedValue({
+      success: true,
+      data: {
+        challenge: "test-challenge",
+        allowCredentials: [{ id: "cred-other", type: "public-key" }],
+      },
+    });
+    const onError = vi.fn();
+
+    renderComponent({ onError });
+
+    await waitFor(() => {
+      expect(onError).toHaveBeenCalledWith("error_fido2_passkey_deleted");
+    });
   });
 });

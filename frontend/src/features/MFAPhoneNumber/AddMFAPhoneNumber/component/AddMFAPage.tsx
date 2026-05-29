@@ -6,7 +6,6 @@ import { FLOW_TYPES, PAGES, serverMapping } from "../../../../utils/constants";
 import { useTranslation } from "react-i18next";
 import { getErrorMessage } from "../../../../utils/errorUtils";
 import { path } from "../../../../utils/routeHelpers";
-import { useOtpAttemptTracking } from "../../../../hooks/useOtpAttemptTracking";
 import { otpFactors } from "../../../TransientOtp/api/otpFactors";
 import OtpSelection from "../../../TransientOtp/components/OtpSelection";
 import OtpVerification from "../../../TransientOtp/components/OtpVerification";
@@ -30,6 +29,7 @@ import { ADD_MFA_ANALYTICS } from "../../../../utils/analyticsConstants";
 import { usePasskeyOperations } from "../../../../hooks/usePasskeyOperations";
 import VerifyFIDO2Passkey from "../../../ManageFIDO2/components/VerifyFIDO2Passkey/VerifyFIDO2Passkey";
 import { Fido2Credential } from "../../../../types/hooks";
+import { useOtpAttemptTracking } from "../../../../hooks/useOtpAttemptTracking";
 
 interface PhoneFormData {
   phoneNumber: string;
@@ -171,10 +171,11 @@ export default function AddMFAPage() {
     setErrorCode,
   });
 
-  const errorMessage = getErrorMessage(language, errorCode);
-  const { getDisplayError, resetAttempts, isMaxAttemptsReached } =
+  const [customErrorMessage, setCustomErrorMessage] = useState("");
+  const errorMessage =
+    customErrorMessage || getErrorMessage(language, errorCode);
+  const { resetAttempts, isMaxAttemptsReached } =
     useOtpAttemptTracking(errorCode);
-  const otpDisplayError = getDisplayError(errorMessage);
 
   const handlePhoneForm = (field: string, value: unknown) => {
     setPhoneFormData((prev) => ({
@@ -408,8 +409,15 @@ export default function AddMFAPage() {
       }
     } catch (err) {
       const error = err as {
-        response?: { data?: { message?: string } };
+        response?: { data?: { message?: string; retries?: number } };
       };
+      const hasRetries =
+        error?.response?.data?.retries !== undefined &&
+        error?.response?.data?.retries !== null;
+      if (hasRetries) {
+        // Re-throw so OtpVerification can display "X retries remaining"
+        throw error.response;
+      }
       if (
         error &&
         error.response &&
@@ -617,14 +625,13 @@ export default function AddMFAPage() {
           setWizardStep(prevStep);
         }}
         setErrorCode={setErrorCode}
-        errorMessage={otpDisplayError}
+        setErrorMessage={setCustomErrorMessage}
+        errorMessage={errorMessage}
         onCancel={async () => navigate(backToManage2FAVerificationsPage)}
         showTryAnotherWay={
           (userPhoneFactors && userPhoneFactors.length > 1) ||
           fido2Data.length > 0
         }
-        isMaxAttemptsReached={isMaxAttemptsReached}
-        resetAttempts={resetAttempts}
       />
     ),
     verifyFIDO2Passkey: (
@@ -655,7 +662,7 @@ export default function AddMFAPage() {
       <AddMFAOtpVerification
         phoneFormData={phoneFormData}
         onChangePhoneForm={handlePhoneForm}
-        errorMessage={otpDisplayError}
+        errorMessage={errorMessage}
         isMaxAttemptsReached={isMaxAttemptsReached}
         resetAttempts={resetAttempts}
         onNext={async () => {
@@ -773,7 +780,7 @@ export default function AddMFAPage() {
     <StepContent
       StepComponent={steps[wizardStep]}
       errorCode={errorCode}
-      errorMessage={otpDisplayError}
+      errorMessage={errorMessage}
       language={language}
     />
   );

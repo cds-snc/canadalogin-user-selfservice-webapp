@@ -321,7 +321,9 @@ export default function EditEmailAddressPage() {
     }
   };
 
-  const errorMessage = getErrorMessage(language, errorCode);
+  const [customErrorMessage, setCustomErrorMessage] = useState("");
+  const errorMessage =
+    customErrorMessage || getErrorMessage(language, errorCode);
   const { getDisplayError, resetAttempts, isMaxAttemptsReached } =
     useOtpAttemptTracking(errorCode);
   const otpDisplayError = getDisplayError(errorMessage);
@@ -406,13 +408,12 @@ export default function EditEmailAddressPage() {
           setWizardStep(prevStep);
         }}
         setErrorCode={setErrorCode}
-        errorMessage={otpDisplayError}
+        setErrorMessage={setCustomErrorMessage}
+        errorMessage={errorMessage}
         onCancel={handleBackToProfile}
         showTryAnotherWay={
           userPhoneFactors != null && userPhoneFactors.length > 1
         }
-        isMaxAttemptsReached={isMaxAttemptsReached}
-        resetAttempts={resetAttempts}
       />
     ),
     enterEmail: (

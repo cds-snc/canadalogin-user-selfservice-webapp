@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useParams } from "react-router";
 import {
   GcdsButton,
   GcdsContainer,
@@ -10,10 +10,11 @@ import {
   GcdsText,
 } from "@gcds-core/components-react";
 import { fido2Api } from "../../api/fido2Api";
-import { authenticateFIDO2Credential } from "../../utils/webAuthnUtils";
+import {
+  authenticateFIDO2Credential,
+  isWebAuthnSupported,
+} from "../../utils/webAuthnUtils";
 import { useTranslation } from "react-i18next";
-import { PAGES } from "../../../../utils/constants";
-import { path } from "../../../../utils/routeHelpers";
 import FIDOPasskeyCollage from "../../../../assets/icons/passkey_collage.svg?react";
 import Loader from "../../../../components/Layout/Loading";
 import type { Fido2Credential } from "../../../../types/hooks";
@@ -44,14 +45,9 @@ export default function VerifyFIDO2Passkey({
   onError,
 }: VerifyFIDO2PasskeyProps) {
   const { language } = useParams();
-  const navigate = useNavigate();
   const { t } = useTranslation(["fido2", "common"]);
   const hasTriggeredRef = useRef(false);
   const [localLoading, setLocalLoading] = useState(true);
-
-  const backToManage2FAVerificationsPage = path(PAGES.manage2FAVerifications, {
-    language: language,
-  });
 
   /**
    * Trigger FIDO2 authentication flow
@@ -68,6 +64,13 @@ export default function VerifyFIDO2Passkey({
     hasTriggeredRef.current = true;
 
     try {
+      // Check WebAuthn browser support
+      if (!isWebAuthnSupported()) {
+        setErrorCode("error_webauthn_not_supported");
+        onError?.("error_webauthn_not_supported");
+        return;
+      }
+
       // Step 1: Get assertion options from server
       const optionsResponse = (await fido2Api.getAssertionOptions(
         assertionOptionsRequest,
@@ -99,6 +102,13 @@ export default function VerifyFIDO2Passkey({
         assertionData.allowCredentials = assertionData.allowCredentials.filter(
           (cred) => cred.id === selectedPasskey.attributes!.credentialId,
         );
+
+        // If no matching credentials after filtering, the passkey was deleted server-side
+        if (assertionData.allowCredentials.length === 0) {
+          setErrorCode("error_fido2_passkey_deleted");
+          onError?.("error_fido2_passkey_deleted");
+          return;
+        }
       }
 
       // Step 2: Use WebAuthn API to authenticate with the passkey
@@ -112,6 +122,7 @@ export default function VerifyFIDO2Passkey({
       await onCallback?.();
     } catch (err) {
       console.error("error_fido2_verification", err);
+      // Failed auth response: cancelled or timed out by the user or the browser
       setErrorCode("error_fido2_verification");
       onError?.("error_fido2_verification");
     } finally {
@@ -165,12 +176,12 @@ export default function VerifyFIDO2Passkey({
         <GcdsButton
           buttonRole="secondary"
           style={{ width: "fit-content" }}
-          onGcdsClick={async (ev) => {
-            ev.preventDefault();
-            navigate(backToManage2FAVerificationsPage);
+          onGcdsClick={() => {
+            setErrorCode("");
+            onTryAnotherWayHandler?.();
           }}
         >
-          {t("VerifyFIDO2Passkey.cancelButton")}
+          {t("VerifyFIDO2Passkey.chooseADifferentMethod")}
         </GcdsButton>
       </GcdsGrid>
 
@@ -178,14 +189,6 @@ export default function VerifyFIDO2Passkey({
         <GcdsHeading tag="h2">
           {t("VerifyFIDO2Passkey.problemsTitle")}
         </GcdsHeading>
-        <GcdsLink
-          role="button"
-          onGcdsClick={() => {
-            onTryAnotherWayHandler?.();
-          }}
-        >
-          {t("VerifyFIDO2Passkey.tryAnotherWay")}
-        </GcdsLink>
 
         {/* TODO: add correct hrefs to the links below once domain migrations are done */}
         <GcdsLink target="_blank">{t("VerifyFIDO2Passkey.helpLink")}</GcdsLink>

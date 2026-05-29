@@ -8,7 +8,6 @@ import {
 } from "../../../../utils/constants";
 import { getErrorMessage } from "../../../../utils/errorUtils";
 import { usePasswordValidation } from "../../../../hooks/usePasswordValidation";
-import { useOtpAttemptTracking } from "../../../../hooks/useOtpAttemptTracking";
 import PasswordVerification from "../../../TransientOtp/components/PasswordVerification";
 import { useTranslation } from "react-i18next";
 import StepContent from "../../../../components/Wizard/StepContent";
@@ -60,10 +59,9 @@ export default function DeleteFIDO2PasskeyPage({
   const navigate = useNavigate();
   const [wizardStep, setWizardStep] = useState(step ?? "passwordVerification");
   const [errorCode, setErrorCode] = useState("");
-  const errorMessage = getErrorMessage(language, errorCode);
-  const { getDisplayError, resetAttempts, isMaxAttemptsReached } =
-    useOtpAttemptTracking(errorCode);
-  const otpDisplayError = getDisplayError(errorMessage);
+  const [customErrorMessage, setCustomErrorMessage] = useState("");
+  const errorMessage =
+    customErrorMessage || getErrorMessage(language, errorCode);
   const { t } = useTranslation("security");
   const [userPasswordValue, setUserPasswordValue] = useState("");
 
@@ -301,11 +299,10 @@ export default function DeleteFIDO2PasskeyPage({
           }
         }}
         setErrorCode={setErrorCode}
-        errorMessage={otpDisplayError}
+        setErrorMessage={setCustomErrorMessage}
+        errorMessage={errorMessage}
         onCancel={() => navigate(backToManage2FAVerificationsPage)}
         showTryAnotherWay={userPhoneFactors && userPhoneFactors.length > 1}
-        isMaxAttemptsReached={isMaxAttemptsReached}
-        resetAttempts={resetAttempts}
       />
     ),
     verifyFIDO2Passkey: (
@@ -356,7 +353,7 @@ export default function DeleteFIDO2PasskeyPage({
     <StepContent
       StepComponent={steps[wizardStep]}
       errorCode={errorCode}
-      errorMessage={otpDisplayError}
+      errorMessage={errorMessage}
       language={language}
     />
   );

@@ -162,3 +162,156 @@ async def test_handle_otp_verification_success_returns_model(otp_type):
     assert result_dict.get("success") is True
     msg = result_dict.get("message") or ""
     assert msg == f"{otp_type.value} OTP has been verified"
+
+
+# -----------------------------------------------
+# verify_otp: wrong code — structured error detail
+# -----------------------------------------------
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "otp_type",
+    [OtpType.SMS, OtpType.VOICE, OtpType.EMAIL],
+)
+async def test_verify_otp_wrong_code_raises_400_with_attempts(otp_type):
+    """
+    When IBM Verify returns a non-204 response (wrong OTP), verify_otp must raise
+    HTTPException(400) with structured detail containing messageId, attempts, retries.
+    The attempts/retries are fetched from the retrieve endpoint (GET).
+    """
+    from fastapi import HTTPException
+
+    def handler(request: Request) -> Response:
+        if request.method == "POST":
+            return Response(
+                400,
+                json={
+                    "messageId": "CSIAM0011E",
+                },
+            )
+        # GET — retrieve endpoint returns attempts/retries
+        return Response(
+            200,
+            json={
+                "attempts": 2,
+                "retries": 2,
+            },
+        )
+
+    transport = build_transport(handler)
+    async with AsyncClient(transport=transport) as client:
+        data = UserOtpVerificationInfo(
+            otp="000000", trxnId="tx-wrong-1", otpType=otp_type
+        )
+        with pytest.raises(HTTPException) as excinfo:
+            await verify_otp(client, data, "USER_TOKEN")
+
+    exc = excinfo.value
+    assert exc.status_code == 400
+    assert exc.detail["message"] == "CSIAM0011E"
+    assert exc.detail["attempts"] == 2
+    assert exc.detail["retries"] == 2
+
+
+@pytest.mark.asyncio
+async def test_verify_otp_wrong_code_zero_retries_raises_400():
+    """
+    When IBM Verify returns a non-204 response with retries=0, verify_otp raises
+    HTTPException(400) with retries=0 in the detail.
+    """
+    from fastapi import HTTPException
+
+    def handler(request: Request) -> Response:
+        if request.method == "POST":
+            return Response(
+                400,
+                json={
+                    "messageId": "CSIAM0011E",
+                },
+            )
+        # GET — retrieve endpoint returns retries=0
+        return Response(
+            200,
+            json={
+                "attempts": 4,
+                "retries": 0,
+            },
+        )
+
+    transport = build_transport(handler)
+    async with AsyncClient(transport=transport) as client:
+        data = UserOtpVerificationInfo(
+            otp="000000", trxnId="tx-no-retries", otpType=OtpType.SMS
+        )
+        with pytest.raises(HTTPException) as excinfo:
+            await verify_otp(client, data, "USER_TOKEN")
+
+    exc = excinfo.value
+    assert exc.status_code == 400
+    assert exc.detail["retries"] == 0
+
+
+@pytest.mark.asyncio
+async def test_verify_otp_non_json_error_body_uses_default_message_id():
+    """
+    When IBM Verify returns a non-204 response with a non-JSON body, verify_otp
+    raises HTTPException(400) with the default messageId fallback.
+    The retrieve endpoint also fails, so attempts/retries are None.
+    """
+    from fastapi import HTTPException
+
+    def handler(request: Request) -> Response:
+        if request.method == "POST":
+            return Response(400, content=b"Bad Request")
+        # GET also fails — simulate retrieve endpoint unavailable
+        return Response(500, content=b"Internal Server Error")
+
+    transport = build_transport(handler)
+    async with AsyncClient(transport=transport) as client:
+        data = UserOtpVerificationInfo(
+            otp="000000", trxnId="tx-non-json", otpType=OtpType.SMS
+        )
+        with pytest.raises(HTTPException) as excinfo:
+            await verify_otp(client, data, "USER_TOKEN")
+
+    exc = excinfo.value
+    assert exc.status_code == 400
+    assert exc.detail["message"] == "UNKNOWN"
+    assert exc.detail["attempts"] is None
+    assert exc.detail["retries"] is None
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("otp_type", [OtpType.SMS, OtpType.VOICE, OtpType.EMAIL])
+async def test_handle_otp_verification_wrong_code_propagates_http_exception(otp_type):
+    """
+    handle_otp_verification propagates the HTTPException raised by verify_otp
+    when IBM Verify rejects the OTP code.
+    """
+    from fastapi import HTTPException
+
+    def handler(request: Request) -> Response:
+        if request.method == "POST":
+            return Response(
+                400,
+                json={"messageId": "CSIAM0011E"},
+            )
+        # GET — retrieve endpoint returns attempts/retries
+        return Response(
+            200,
+            json={"attempts": 1, "retries": 3},
+        )
+
+    transport = build_transport(handler)
+    async with AsyncClient(transport=transport) as client:
+        data = UserOtpVerificationInfo(
+            otp="000000", trxnId=f"tx-fail-{otp_type.value}", otpType=otp_type
+        )
+        with pytest.raises(HTTPException) as excinfo:
+            await handle_otp_verification(client, data, "USER_TOKEN")
+
+    exc = excinfo.value
+    assert exc.status_code == 400
+    assert exc.detail["message"] == "CSIAM0011E"
+    assert exc.detail["retries"] == 3

@@ -28,7 +28,7 @@
     "cancelButton": "Cancel",
     "continueButton": "Continue",
     "problemsTitle": "Problems with your passkey?",
-    "tryAnotherWay": "Try another way",
+    "chooseADifferentMethod": "Choose a different method",
     "helpLink": "Help with signing in with a passkey",
     "loading": "Chargement..."
   },

@@ -17,7 +17,9 @@ import { FLOW_TYPES } from "../../../utils/constants";
 import SubmitButton from "../../../components/Layout/SubmitButton";
 import type { OtpFactor } from "../../../types/hooks";
 
-type CaughtApiError = { data?: { message?: string } };
+type CaughtApiError = {
+  data?: { message?: string; retries?: number; attempts?: number };
+};
 
 const initialTime = 10;
 
@@ -29,11 +31,10 @@ interface OtpVerificationProps {
   requestOtpCode: () => Promise<void | boolean>;
   validateOtpCode: (otpValue: string) => Promise<void>;
   setErrorCode: (errorCode: string) => void;
+  setErrorMessage?: (errorMessage: string) => void;
   errorMessage?: string;
   onCancel: () => void;
   showTryAnotherWay?: boolean;
-  isMaxAttemptsReached?: boolean;
-  resetAttempts?: () => void;
 }
 
 export default function OtpVerification({
@@ -44,23 +45,22 @@ export default function OtpVerification({
   requestOtpCode,
   validateOtpCode,
   setErrorCode,
+  setErrorMessage,
   errorMessage,
   showTryAnotherWay = true,
-  isMaxAttemptsReached = false,
-  resetAttempts,
 }: OtpVerificationProps) {
   const { language } = useParams();
   const [time, setTime] = useState(initialTime);
   const [codeRequested, setCodeRequested] = useState(false);
   const { t } = useTranslation(["verification", "common"]);
   const [localError, setLocalError] = useState("");
+  const [isMaxAttemptsReached, setIsMaxAttemptsReached] = useState(false);
 
   const displayError = localError || errorMessage || "";
 
   const handleChange = (e: CustomEvent<string>) => {
     const value = (e.target as HTMLInputElement).value;
     setUserOtpValue(value);
-    setLocalError("");
   };
 
   const doSubmit = async () => {
@@ -70,12 +70,46 @@ export default function OtpVerification({
     }
     setLocalError("");
     setErrorCode("");
+    setErrorMessage?.("");
     try {
       await validateOtpCode(userOtpValue);
     } catch (error) {
       const apiError = error as CaughtApiError;
-      if (apiError?.data?.message) {
-        setErrorCode(apiError.data.message);
+      const messageId = apiError?.data?.message;
+      const retries = apiError?.data?.retries;
+      const attempts = apiError?.data?.attempts;
+
+      if (
+        retries !== undefined &&
+        retries !== null &&
+        attempts !== undefined &&
+        attempts !== null
+      ) {
+        // The backend enriches the error with retries (max allowed) and
+        // attempts (used so far) from the IBM Verify retrieve endpoint.
+        const remaining = retries - attempts;
+
+        if (remaining <= 0) {
+          const maxAttemptsMsg = t("Error.otp_max_attempts", { ns: "common" });
+          setIsMaxAttemptsReached(true);
+          setLocalError(maxAttemptsMsg);
+          setErrorMessage?.(maxAttemptsMsg);
+        } else {
+          const invalidAttemptsMsg = t("Error.otp_invalid_attempts", {
+            ns: "common",
+            count: remaining,
+          });
+          setLocalError(invalidAttemptsMsg);
+          setErrorMessage?.(invalidAttemptsMsg);
+        }
+        // Also set errorCode so the parent's StepContent shows
+        // the error summary at the top of the page
+        if (messageId) {
+          setErrorCode(messageId);
+        }
+      } else if (messageId) {
+        // No retries info — delegate to parent via setErrorCode
+        setErrorCode(messageId);
       }
     }
   };
@@ -216,9 +250,10 @@ export default function OtpVerification({
                 setCodeRequested(true);
                 setTime(initialTime);
                 setErrorCode("");
+                setErrorMessage?.("");
                 setUserOtpValue("");
                 setLocalError("");
-                resetAttempts?.();
+                setIsMaxAttemptsReached(false);
               })();
             }}
           >

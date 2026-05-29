@@ -278,7 +278,11 @@ export const CompleteDeleteViaFIDO2Passkey = (() => {
       id: "passkey-1",
       attributes: {
         nickname: "Work Laptop",
-        credentialId: "cred-id-1",
+        // Must match the allowCredentials.id returned by /v1/fido2/assertion/options
+        // below ("dGVzdA"). VerifyFIDO2Passkey now filters allowCredentials by
+        // selectedPasskey.attributes.credentialId; if no match is found it errors
+        // with error_fido2_passkey_deleted.
+        credentialId: "dGVzdA",
         status: "ACTIVE",
       },
     },

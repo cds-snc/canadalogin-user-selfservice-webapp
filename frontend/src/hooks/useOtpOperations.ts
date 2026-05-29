@@ -162,6 +162,15 @@ export const useOtpOperations = ({
         onSuccess?.(response);
       }
     } catch (err) {
+      // If the error contains retries info, re-throw so OtpVerification
+      // can display "X retries remaining" instead of a generic error
+      const errObj = err as {
+        response?: { data?: { retries?: number; message?: string } };
+      };
+      if (errObj?.response?.data?.retries !== undefined) {
+        throw errObj.response;
+      }
+
       const message =
         getErrorMessage(err) ||
         (err instanceof Error ? err.message : undefined);

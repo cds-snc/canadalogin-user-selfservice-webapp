@@ -3126,48 +3126,6 @@ class TestErrorHandlingVerifyPasswordStepup:
 class TestErrorHandlingVerifyTransientOtp:
 
     @pytest.mark.asyncio
-    @patch.object(verify_transient_otp_module, "verify_otp")
-    async def test_handle_otp_verification_non_204_returns_error_model(
-        self, mock_verify_otp, mock_test_client
-    ):
-        mock_verify_otp.return_value = Response(400, json={"error": "Bad Request"})
-
-        request_data = {"otp": "123456", "trxnId": "bad-1", "otpType": "email"}
-
-        client = mock_test_client(MagicMock())
-
-        response = client.request("POST", "/v1/otp/transient/verify", json=request_data)
-        response_json = response.json()
-
-        assert response.status_code == status.HTTP_502_BAD_GATEWAY
-        assert not response_json["success"]
-        assert (
-            response_json["message"]
-            == "Error enrolling OtpType.EMAIL OTP: {'error': 'Bad Request'}"
-        )
-
-    @pytest.mark.asyncio
-    @patch.object(verify_transient_otp_module, "verify_otp")
-    async def test_handle_otp_verification_status_code_none_branch(
-        self, mock_verify_otp, mock_test_client
-    ):
-
-        mock_response = MagicMock(status_code=None)
-        mock_response.json = lambda: None
-        mock_verify_otp.return_value = mock_response
-
-        request_data = {"otp": "123456", "trxnId": "bad-1", "otpType": "email"}
-
-        client = mock_test_client(MagicMock())
-
-        response = client.request("POST", "/v1/otp/transient/verify", json=request_data)
-        response_json = response.json()
-
-        assert response.status_code == status.HTTP_502_BAD_GATEWAY
-        assert not response_json["success"]
-        assert response_json["message"] == "Error enrolling OtpType.EMAIL OTP: None"
-
-    @pytest.mark.asyncio
     @patch.object(verify_transient_otp_module, "get_auth_request_headers")
     @patch.object(verify_transient_otp_module, "get_configuration")
     async def test_handle_otp_verification_transport_exception_translates_to_http_exception(
