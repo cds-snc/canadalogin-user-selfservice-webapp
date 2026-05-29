@@ -31,13 +31,22 @@ async def http_exception_handler(request: Request, exc: HTTPException):
         f"Correlation ID: {correlation_id} - The request could not be completed."
     )
 
+    base_content = {
+        "correlation_id": correlation_id,
+        "success": False,
+    }
+
+    # If detail is a dict, spread its keys at the top level so callers can
+    # read structured fields (e.g. message, attempts, retries) directly from
+    # response.data. Otherwise, keep the existing { message: <detail> } shape.
+    if isinstance(exc.detail, dict):
+        content = {**base_content, **exc.detail}
+    else:
+        content = {**base_content, "message": exc.detail}
+
     response = JSONResponse(
         status_code=exc.status_code,
-        content={
-            "correlation_id": correlation_id,
-            "success": False,
-            "message": exc.detail,
-        },
+        content=content,
     )
 
     return await standard_logger.log(request, response)

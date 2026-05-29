@@ -12,7 +12,6 @@ import { FLOW_TYPES } from "../../../utils/constants";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch";
 import { getErrorMessage } from "../../../utils/errorUtils";
 import { authService } from "../../../services/authService";
-import { useOtpAttemptTracking } from "../../../hooks/useOtpAttemptTracking";
 
 import { useTranslation } from "react-i18next";
 import { path } from "../../../utils/routeHelpers";
@@ -64,12 +63,10 @@ export default function ChangePasswordIndex() {
   const [otpSentResponse, setOtpSentResponse] =
     useState<PasswordUpdateTransactionData | null>(null);
   const [errorCode, setErrorCode] = useState("");
+  const [customErrorMessage, setCustomErrorMessage] = useState("");
 
-  const errorMessage = getErrorMessage(language, errorCode);
-  const { getDisplayError, resetAttempts, isMaxAttemptsReached } =
-    useOtpAttemptTracking(errorCode);
-
-  const otpDisplayError = getDisplayError(errorMessage);
+  const errorMessage =
+    customErrorMessage || getErrorMessage(language, errorCode);
 
   const [userPasswordValue, setUserPasswordValue] = useState("");
   const { t } = useTranslation(["security", "layout"]);
@@ -240,6 +237,13 @@ export default function ChangePasswordIndex() {
       setErrorCode("");
     } catch (err) {
       const message = getApiErrorMessage(err);
+      const errObj = err as { data?: { retries?: number } };
+      const hasRetries =
+        errObj?.data?.retries !== undefined && errObj?.data?.retries !== null;
+      if (hasRetries) {
+        // Re-throw so OtpVerification can display "X retries remaining"
+        throw err;
+      }
       if (message) {
         setErrorCode(message);
         trackEvent({
@@ -373,11 +377,10 @@ export default function ChangePasswordIndex() {
           setPasswordUpdateStep(prevStep);
         }}
         setErrorCode={setErrorCode}
-        errorMessage={otpDisplayError}
+        setErrorMessage={setCustomErrorMessage}
+        errorMessage={errorMessage}
         onCancel={() => navigate(backToSecuritySettingsPage)}
         showTryAnotherWay={userPhoneFactors.length > 1}
-        isMaxAttemptsReached={isMaxAttemptsReached}
-        resetAttempts={resetAttempts}
       />
     ) : null,
     passwordChange: otpSentResponse ? (
@@ -421,7 +424,7 @@ export default function ChangePasswordIndex() {
     <StepContent
       StepComponent={stepComponent}
       errorCode={errorCode}
-      errorMessage={otpDisplayError}
+      errorMessage={errorMessage}
       language={language}
     />
   );

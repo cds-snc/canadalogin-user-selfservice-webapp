@@ -11,7 +11,6 @@ import {
 import { getErrorMessage } from "../../../../utils/errorUtils";
 import { useOtpOperations } from "../../../../hooks/useOtpOperations";
 import { usePasswordValidation } from "../../../../hooks/usePasswordValidation";
-import { useOtpAttemptTracking } from "../../../../hooks/useOtpAttemptTracking";
 import PasswordVerification from "../../../TransientOtp/components/PasswordVerification";
 import OtpSelection from "../../../TransientOtp/components/OtpSelection";
 import OtpVerification from "../../../TransientOtp/components/OtpVerification";
@@ -57,12 +56,11 @@ export default function AddFIDO2PasskeyPage({
   const navigate = useNavigate();
   const [wizardStep, setWizardStep] = useState(step ?? "passwordVerification");
   const [errorCode, setErrorCode] = useState("");
+  const [customErrorMessage, setCustomErrorMessage] = useState("");
   const { userProfile } = state;
   const { id, userName } = userProfile ?? {};
-  const errorMessage = getErrorMessage(language, errorCode);
-  const { getDisplayError, resetAttempts, isMaxAttemptsReached } =
-    useOtpAttemptTracking(errorCode);
-  const otpDisplayError = getDisplayError(errorMessage);
+  const errorMessage =
+    customErrorMessage || getErrorMessage(language, errorCode);
   const { t } = useTranslation(["security", "fido2"]);
   const [userPasswordValue, setUserPasswordValue] = useState("");
   const [selected2FAPasskey, setSelected2FAPasskey] =
@@ -313,9 +311,17 @@ export default function AddFIDO2PasskeyPage({
         setErrorCode("");
       }
     } catch (err) {
-      const errData = err as { response?: { data?: { message?: string } } };
+      const errData = err as {
+        response?: { data?: { message?: string; retries?: number } };
+      };
       const errorMessage = errData?.response?.data?.message;
-      if (errorMessage) {
+      const hasRetries =
+        errData?.response?.data?.retries !== undefined &&
+        errData?.response?.data?.retries !== null;
+      // When the backend returns retries info, re-throw so OtpVerification can
+      // render "X retries remaining" / max-attempts. For other errors, surface
+      // them via setErrorCode.
+      if (!hasRetries && errorMessage) {
         setErrorCode(errorMessage);
       }
       trackEvent({
@@ -323,6 +329,9 @@ export default function AddFIDO2PasskeyPage({
         step: ADD_PASSKEY_ANALYTICS.STEPS.OTP_VALIDATION,
         error: errorMessage || "error_otp_validation_failed",
       });
+      if (hasRetries) {
+        throw errData.response;
+      }
     }
   };
 
@@ -401,11 +410,10 @@ export default function AddFIDO2PasskeyPage({
           }
         }}
         setErrorCode={setErrorCode}
-        errorMessage={otpDisplayError}
+        setErrorMessage={setCustomErrorMessage}
+        errorMessage={errorMessage}
         onCancel={() => navigate(backToManage2FAVerificationsPage)}
         showTryAnotherWay={userPhoneFactors && userPhoneFactors.length > 1}
-        isMaxAttemptsReached={isMaxAttemptsReached}
-        resetAttempts={resetAttempts}
       />
     ),
     verifyFIDO2Passkey: (
@@ -468,7 +476,7 @@ export default function AddFIDO2PasskeyPage({
     <StepContent
       StepComponent={steps[wizardStep]}
       errorCode={errorCode}
-      errorMessage={otpDisplayError}
+      errorMessage={errorMessage}
       language={language}
     />
   );
