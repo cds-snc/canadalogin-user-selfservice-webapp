@@ -84,6 +84,33 @@ export const EMAIL_ADDRESS_ANALYTICS = {
   },
 } as const;
 
+export const ADD_PASSKEY_ANALYTICS = {
+  FLOW_ID: "add_passkey",
+
+  STEPS: {
+    VERIFY_PASSWORD: "verify_password",
+    OTP_SELECTION: "otp_selection",
+    OTP_VALIDATION: "otp_validation",
+    VERIFY_FIDO2: "verify_fido2_passkey",
+    ADD_PASSKEY: "add_passkey",
+    ADD_NICKNAME: "add_passkey_nickname",
+    SUCCESS: "passkey_added",
+  },
+} as const;
+
+export const DELETE_PASSKEY_ANALYTICS = {
+  FLOW_ID: "delete_passkey",
+
+  STEPS: {
+    VERIFY_PASSWORD: "verify_password",
+    OTP_SELECTION: "otp_selection",
+    OTP_VALIDATION: "otp_validation",
+    VERIFY_FIDO2: "verify_fido2_passkey",
+    CONFIRM_DELETE: "confirm_delete",
+    SUCCESS: "passkey_deleted",
+  },
+} as const;
+
 export const GA_CATEGORIES = {
   pageView: "pageview",
 } as const;

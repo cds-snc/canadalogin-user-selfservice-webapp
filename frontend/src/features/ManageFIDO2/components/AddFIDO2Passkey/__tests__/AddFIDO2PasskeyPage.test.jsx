@@ -20,6 +20,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import "@testing-library/jest-dom/vitest";
 import AddFIDO2PasskeyPage from "../AddFIDO2PasskeyPage";
 
+const mockTrackEvent = vi.fn();
+
 // ─── Router ────────────────────────────────────────────────────────────────
 
 const mockNavigate = vi.fn();
@@ -69,6 +71,14 @@ vi.mock("../../../../../utils/functions", () => ({
 
 vi.mock("../../../../../utils/errorUtils", () => ({
   getErrorMessage: () => "",
+}));
+
+vi.mock("../../../../../hooks/useFormTracking", () => ({
+  useFormTracking: () => ({ trackEvent: mockTrackEvent }),
+}));
+
+vi.mock("../../../../../hooks/useWizardPageTracking", () => ({
+  useWizardPageTracking: () => {},
 }));
 
 // ─── Layout primitives ─────────────────────────────────────────────────────
@@ -435,6 +445,16 @@ describe("AddFIDO2PasskeyPage", () => {
     expect(mockValidatePassword).toHaveBeenCalledWith("pass");
   });
 
+  it("emits form_step_start for verify_password when password validation begins", async () => {
+    renderPage();
+    await userEvent.click(screen.getByTestId("password-submit"));
+
+    expect(mockTrackEvent).toHaveBeenCalledWith({
+      event: "form_step_start",
+      step: "verify_password",
+    });
+  });
+
   it("calls navigate on cancel from passwordVerification", async () => {
     renderPage();
     await userEvent.click(screen.getByTestId("password-cancel"));
@@ -503,6 +523,21 @@ describe("AddFIDO2PasskeyPage", () => {
     await userEvent.click(screen.getByTestId("otp-validate"));
     await waitFor(() =>
       expect(getStep("step-otpValidation")).toBeInTheDocument(),
+    );
+  });
+
+  it("emits fallback form_step_end when OTP verification throws without error message", async () => {
+    mockTransientOtpVerify.mockRejectedValueOnce(new Error("network failure"));
+    renderPage({ step: "otpValidation" });
+
+    await userEvent.click(screen.getByTestId("otp-validate"));
+
+    await waitFor(() =>
+      expect(mockTrackEvent).toHaveBeenCalledWith({
+        event: "form_step_end",
+        step: "otp_validation",
+        error: "error_otp_validation_failed",
+      }),
     );
   });
 

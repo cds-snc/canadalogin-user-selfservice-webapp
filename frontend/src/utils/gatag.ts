@@ -83,9 +83,28 @@ const DeletePhoneNumberSteps = {
     "Delete Phone Number - Step 4: Confirm number removal",
 };
 
-const Fido2Steps = {
-  AddFIDO2PasskeyPage: "AddPasskey",
-  DeleteFIDO2PasskeyPage: "DeletePasskey",
+const AddPasskeySteps = {
+  AddFIDO2PasskeyPage: "Add Passkey",
+  AddPasskeyVerifyIdentity: "Add Passkey - Step 1: Verify it's you",
+  AddPasskeyOtpSelection: "Add Passkey - Step 2: Choose verification method",
+  AddPasskeyOtpValidation: "Add Passkey - Step 3a: Enter verification code",
+  AddPasskeyVerifyPasskey:
+    "Add Passkey - Step 3b: Verify with existing passkey",
+  AddPasskeyRegister: "Add Passkey - Step 4: Register passkey",
+  AddPasskeySetNickname: "Add Passkey - Step 5: Name your passkey",
+};
+
+const DeletePasskeySteps = {
+  DeleteFIDO2PasskeyPage: "Delete Passkey",
+  DeletePasskeyVerifyIdentity: "Delete Passkey - Step 1: Verify it's you",
+  DeletePasskeyOtpSelection:
+    "Delete Passkey - Step 2: Choose verification method",
+  DeletePasskeyOtpValidation:
+    "Delete Passkey - Step 3a: Enter verification code",
+  DeletePasskeyVerifyPasskey:
+    "Delete Passkey - Step 3b: Verify with existing passkey",
+  DeletePasskeyConfirm: "Delete Passkey - Step 4: Confirm removal",
+  DeletePasskeySuccess: "Delete Passkey - Step 5: Passkey deleted",
 };
 
 const GA_PAGE_TITLE_SUFFIXES: Record<string, string> = {
@@ -97,7 +116,8 @@ const GA_PAGE_TITLE_SUFFIXES: Record<string, string> = {
   ...PasswordChangeSteps,
   ...AddPhoneNumberSteps,
   ...DeletePhoneNumberSteps,
-  ...Fido2Steps,
+  ...AddPasskeySteps,
+  ...DeletePasskeySteps,
 };
 
 function withCommonAnalyticsParams(params?: GA4EventParams): GA4EventParams {

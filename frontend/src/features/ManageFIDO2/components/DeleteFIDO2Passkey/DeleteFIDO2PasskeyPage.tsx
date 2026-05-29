@@ -23,10 +23,25 @@ import OtpVerification from "../../../TransientOtp/components/OtpVerification";
 import DeleteFIDO2PasskeySuccess from "./DeleteFIDO2PasskeySuccess";
 import { fido2Api } from "../../api/fido2Api";
 import type { Fido2Credential } from "../../../../types/hooks";
+import { useFormTracking } from "../../../../hooks/useFormTracking";
+import { useWizardPageTracking } from "../../../../hooks/useWizardPageTracking";
+import {
+  GA_FORM_EVENTS,
+  DELETE_PASSKEY_ANALYTICS,
+} from "../../../../utils/analyticsConstants";
 
 interface DeleteFIDO2PasskeyPageProps {
   step?: string;
 }
+
+const DELETE_PASSKEY_PAGE_BY_STEP: Record<string, string> = {
+  passwordVerification: "DeletePasskeyVerifyIdentity",
+  otpSelection: "DeletePasskeyOtpSelection",
+  otpValidation: "DeletePasskeyOtpValidation",
+  verifyFIDO2Passkey: "DeletePasskeyVerifyPasskey",
+  deleteFIDO2PasskeyConfirmation: "DeletePasskeyConfirm",
+  deleteFIDO2PasskeySuccess: "DeletePasskeySuccess",
+};
 
 export default function DeleteFIDO2PasskeyPage({
   step,
@@ -58,6 +73,13 @@ export default function DeleteFIDO2PasskeyPage({
   const backToManage2FAVerificationsPage = path(PAGES.manage2FAVerifications, {
     language: language,
   });
+
+  // Initialize form tracking
+  const { trackEvent } = useFormTracking({
+    formId: DELETE_PASSKEY_ANALYTICS.FLOW_ID,
+  });
+
+  useWizardPageTracking(wizardStep, DELETE_PASSKEY_PAGE_BY_STEP);
 
   // Use the OTP operations hook
   const {
@@ -93,24 +115,67 @@ export default function DeleteFIDO2PasskeyPage({
       ) {
         const success = await requestOtpCode();
         if (success) {
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+            step: DELETE_PASSKEY_ANALYTICS.STEPS.OTP_VALIDATION,
+          });
           setWizardStep("otpValidation");
         }
       } else {
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+          step: DELETE_PASSKEY_ANALYTICS.STEPS.OTP_SELECTION,
+        });
         setWizardStep("otpSelection");
       }
     },
+    false,
+    (message) => {
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_END,
+        step: DELETE_PASSKEY_ANALYTICS.STEPS.VERIFY_PASSWORD,
+        error: message,
+      });
+    },
   );
 
+  // Create tracked password validation wrapper
+  async function handleValidatePassword(password: string) {
+    trackEvent({
+      event: GA_FORM_EVENTS.FORM_STEP_START,
+      step: DELETE_PASSKEY_ANALYTICS.STEPS.VERIFY_PASSWORD,
+    });
+    await validatePassword(password);
+  }
+
   const validateOtpCode = async (_otpValue: string): Promise<void> => {
+    trackEvent({
+      event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+      step: DELETE_PASSKEY_ANALYTICS.STEPS.CONFIRM_DELETE,
+    });
     setWizardStep("deleteFIDO2PasskeyConfirmation");
     setErrorCode("");
   };
 
   const handleDeleteFIDO2 = async () => {
+    trackEvent({
+      event: GA_FORM_EVENTS.FORM_SUBMIT,
+      step: DELETE_PASSKEY_ANALYTICS.STEPS.CONFIRM_DELETE,
+    });
+    trackEvent({
+      event: GA_FORM_EVENTS.FORM_STEP_START,
+      step: DELETE_PASSKEY_ANALYTICS.STEPS.CONFIRM_DELETE,
+    });
+
     const passkeyId = passkeyToDeleteId;
 
     if (!passkeyId) {
       setErrorCode("error_delete_credential");
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_END,
+        step: DELETE_PASSKEY_ANALYTICS.STEPS.CONFIRM_DELETE,
+        error: "error_delete_credential",
+      });
       return;
     }
 
@@ -137,6 +202,14 @@ export default function DeleteFIDO2PasskeyPage({
       )) as { success?: boolean } | undefined;
 
       if (response && response.success) {
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE,
+          step: DELETE_PASSKEY_ANALYTICS.STEPS.CONFIRM_DELETE,
+        });
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+          step: DELETE_PASSKEY_ANALYTICS.STEPS.SUCCESS,
+        });
         setWizardStep("deleteFIDO2PasskeySuccess");
       } else {
         throw new Error("error_delete_credential");
@@ -145,6 +218,11 @@ export default function DeleteFIDO2PasskeyPage({
       const errData = err as { data?: { message?: string } };
       const message = errData?.data?.message ?? "error_delete_credential";
       setErrorCode(message);
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_END,
+        step: DELETE_PASSKEY_ANALYTICS.STEPS.CONFIRM_DELETE,
+        error: message,
+      });
       if (
         (INVALID_OTP_ERROR_CODES as readonly string[]).includes(
           errData?.data?.message ?? "",
@@ -165,7 +243,7 @@ export default function DeleteFIDO2PasskeyPage({
         userPasswordValue={userPasswordValue}
         setUserPasswordValue={setUserPasswordValue}
         onCancel={async () => navigate(backToManage2FAVerificationsPage)}
-        validatePassword={validatePassword}
+        validatePassword={handleValidatePassword}
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
         parentPage={PAGES.deleteFIDO2PasskeyPage}
@@ -180,11 +258,19 @@ export default function DeleteFIDO2PasskeyPage({
           void (async () => {
             const success = await requestOtpCode();
             if (success) {
+              trackEvent({
+                event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+                step: DELETE_PASSKEY_ANALYTICS.STEPS.OTP_VALIDATION,
+              });
               setWizardStep("otpValidation");
             }
           })();
         }}
         onSelectFIDO2={(passkey) => {
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+            step: DELETE_PASSKEY_ANALYTICS.STEPS.VERIFY_FIDO2,
+          });
           setSelected2FAPasskey(passkey);
           setWizardStep("verifyFIDO2Passkey");
         }}
@@ -198,7 +284,13 @@ export default function DeleteFIDO2PasskeyPage({
         userOtpValue={userOtpValue}
         setUserOtpValue={handleSetUserOtpValue}
         requestOtpCode={requestOtpCode}
-        validateOtpCode={validateOtpCode}
+        validateOtpCode={(otpValue) => {
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_SUBMIT,
+            step: DELETE_PASSKEY_ANALYTICS.STEPS.OTP_VALIDATION,
+          });
+          return validateOtpCode(otpValue);
+        }}
         onBack={() => {
           // If there's only one MFA factor, go back to password verification
           // Otherwise, go back to OTP selection
@@ -222,11 +314,26 @@ export default function DeleteFIDO2PasskeyPage({
         setErrorCode={setErrorCode}
         selectedPasskey={selected2FAPasskey}
         onCallback={() => {
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE,
+            step: DELETE_PASSKEY_ANALYTICS.STEPS.VERIFY_FIDO2,
+          });
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+            step: DELETE_PASSKEY_ANALYTICS.STEPS.CONFIRM_DELETE,
+          });
           setWizardStep("deleteFIDO2PasskeyConfirmation");
         }}
         onTryAnotherWayHandler={() => {
           setSelected2FAPasskey(null);
           setWizardStep("otpSelection");
+        }}
+        onError={(errCode) => {
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_END,
+            step: DELETE_PASSKEY_ANALYTICS.STEPS.VERIFY_FIDO2,
+            error: errCode,
+          });
         }}
       />
     ),
