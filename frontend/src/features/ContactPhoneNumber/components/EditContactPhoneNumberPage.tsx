@@ -45,6 +45,7 @@ const initialPhoneFormData: ContactPhoneFormData = {
   phoneNumber: "",
   otp: "",
   trxnId: "",
+  expiry: "",
   otpType: FLOW_TYPES.sms,
   formattedPhoneNumber: "",
 };
@@ -125,6 +126,7 @@ export default function EditContactPhoneNumberPage() {
 
       if (response?.data?.trxnId) {
         handlePhoneFormChange("trxnId", response.data.trxnId);
+        handlePhoneFormChange("expiry", response.data.expiry ?? "");
         trackEvent({
           event: GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE,
           step: CONTACT_PHONE_ANALYTICS.STEPS.VERIFY_OTP,

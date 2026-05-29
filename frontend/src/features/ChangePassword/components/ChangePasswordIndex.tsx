@@ -56,6 +56,15 @@ function getApiErrorMessage(error: unknown): string | undefined {
   return authError.data?.message ?? authError.response?.data?.message;
 }
 
+function normalizePasswordUpdateTransaction(
+  data: PasswordUpdateTransactionData,
+): PasswordUpdateTransactionData {
+  return {
+    ...data,
+    expiry: data.expiry ?? data.expiryTime ?? null,
+  };
+}
+
 export default function ChangePasswordIndex() {
   const { language } = useParams<{ language: string }>();
   const { state, dispatch } = useUser();
@@ -163,7 +172,7 @@ export default function ChangePasswordIndex() {
       const response = await passwordUpdate.firstStep(userName, emailFactor);
 
       if (response?.success && response.data) {
-        setOtpSentResponse(response.data);
+        setOtpSentResponse(normalizePasswordUpdateTransaction(response.data));
         setErrorCode("");
         return true;
       }
@@ -186,7 +195,7 @@ export default function ChangePasswordIndex() {
       );
 
       if (response?.success && response.data) {
-        setOtpSentResponse(response.data);
+        setOtpSentResponse(normalizePasswordUpdateTransaction(response.data));
         trackEvent({
           event: GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE,
           step: CHANGE_PASSWORD_ANALYTICS.STEPS.OTP_VALIDATION,
@@ -379,6 +388,7 @@ export default function ChangePasswordIndex() {
         setErrorCode={setErrorCode}
         setErrorMessage={setCustomErrorMessage}
         errorMessage={errorMessage}
+        otpExpiry={otpSentResponse?.expiry}
         onCancel={() => navigate(backToSecuritySettingsPage)}
         showTryAnotherWay={userPhoneFactors.length > 1}
       />

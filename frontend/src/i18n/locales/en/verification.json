@@ -31,6 +31,7 @@
     "requestNewCode": "Request a new code",
     "newCodeSent": "We have sent you a new code",
     "chooseDifferentMethod": "Choose a different method",
+    "expiredMessage": "Your time-sensitive verification code has expired.",
     "completeTwoStep": "Complete 2-step verification",
     "continueToYour": "to continue to your",
     "account": "account",

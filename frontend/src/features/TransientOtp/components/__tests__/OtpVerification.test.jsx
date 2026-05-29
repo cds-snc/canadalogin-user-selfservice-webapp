@@ -554,6 +554,52 @@ describe("OtpVerification Component", () => {
   });
 
   describe("Resend Code Feedback", () => {
+    it("renders a minute:second countdown from the OTP expiry timestamp", () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date("2099-01-01T00:09:00.000Z"));
+
+      renderComponent({ otpExpiry: "2099-01-01T00:10:00.000Z" });
+
+      expect(screen.getByText("01:00")).toBeInTheDocument();
+      expect(screen.getByText(/10\s+seconds/)).toBeInTheDocument();
+    });
+
+    it("keeps the resend link on the original short delay even when an OTP expiry exists", async () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date("2099-01-01T00:09:00.000Z"));
+
+      renderComponent({ otpExpiry: "2099-01-01T00:10:00.000Z" });
+
+      expect(screen.queryByText("Request a new code")).not.toBeInTheDocument();
+
+      for (let second = 0; second <= 10; second += 1) {
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(1000);
+        });
+      }
+
+      expect(screen.getByText("Request a new code")).toBeInTheDocument();
+      expect(screen.getByText(/^00:4[89]$/)).toBeInTheDocument();
+    });
+
+    it("shows the expired-state screen when the OTP has expired", () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date("2099-01-01T00:10:01.000Z"));
+
+      renderComponent({ otpExpiry: "2099-01-01T00:10:00.000Z" });
+
+      expect(
+        screen.getByText("Your time-sensitive verification code has expired."),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Request a new code" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Choose a different method" }),
+      ).toBeInTheDocument();
+      expect(screen.queryByTestId("verificationCode")).not.toBeInTheDocument();
+    });
+
     it("shows a success notice after requesting a new code", async () => {
       vi.useFakeTimers();
       mockRequestOtpCode.mockResolvedValue(true);

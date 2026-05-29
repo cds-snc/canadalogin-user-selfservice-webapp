@@ -187,6 +187,9 @@ export default function AddMFAPhoneNumber({
   const { language } = useParams();
   const [phoneNumberValid, setPhoneNumberValid] = useState(true);
   const [selectedDialCode, setSelectedDialCode] = useState("1");
+  const [displayedPhoneNumber, setDisplayedPhoneNumber] = useState(() =>
+    getDisplayedPhoneNumber(phoneFormData.phoneNumber, "1"),
+  );
   const { t } = useTranslation(["mfa", "common"]);
   const backtoProfilePage = path(PAGES.ProfileHome, { language: language });
   const privacyNoticeHref =
@@ -216,6 +219,12 @@ export default function AddMFAPhoneNumber({
     ev.preventDefault();
     void doSubmit();
   };
+
+  useEffect(() => {
+    setDisplayedPhoneNumber(
+      getDisplayedPhoneNumber(phoneFormData.phoneNumber, selectedDialCode),
+    );
+  }, [phoneFormData.phoneNumber, selectedDialCode]);
 
   useEffect(() => {
     const addAccessibilityAttributes = () => {
@@ -316,15 +325,12 @@ export default function AddMFAPhoneNumber({
                       ? countryMapping.frLocalization
                       : countryMapping.localization
                   }
-                  value={getDisplayedPhoneNumber(
-                    phoneFormData.phoneNumber,
-                    selectedDialCode,
-                  )}
+                  value={displayedPhoneNumber}
                   placeholder=""
                   enableSearch={true}
                   disableCountryCode={true}
                   disableCountryGuess={true}
-                  countryCodeEditable={false}
+                  countryCodeEditable={true}
                   disableSearchIcon={false}
                   onChange={(
                     phone: string,
@@ -341,8 +347,13 @@ export default function AddMFAPhoneNumber({
                       phone,
                       dialCode,
                     );
+                    const nextDisplayedPhoneNumber = getDisplayedPhoneNumber(
+                      storedPhoneNumber,
+                      dialCode,
+                    );
 
                     setSelectedDialCode(dialCode);
+                    setDisplayedPhoneNumber(nextDisplayedPhoneNumber);
                     onChangePhoneForm("phoneNumber", storedPhoneNumber);
                     onChangePhoneForm(
                       "formattedPhoneNumber",

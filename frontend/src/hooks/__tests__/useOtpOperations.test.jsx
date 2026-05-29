@@ -379,7 +379,10 @@ describe("useOtpOperations", () => {
     beforeEach(() => {
       mockAuthService.transientOtpSend.mockResolvedValue({
         success: true,
-        data: { trxnId: "test-transaction-id" },
+        data: {
+          trxnId: "test-transaction-id",
+          expiry: "2099-01-01T00:10:00.000Z",
+        },
       });
     });
 
@@ -410,6 +413,7 @@ describe("useOtpOperations", () => {
       });
       expect(result.current.otpSentResponse).toEqual({
         trxnId: "test-transaction-id",
+        expiry: "2099-01-01T00:10:00.000Z",
       });
       expect(defaultProps.setErrorCode).toHaveBeenCalledWith("");
     });

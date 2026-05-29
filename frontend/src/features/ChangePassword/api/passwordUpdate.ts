@@ -10,6 +10,8 @@ const passwordUpdateApi = `${config.apiUrl}${SUBMIT_END_POINTS.passwordUpdate}`;
 
 export type PasswordUpdateTransactionData = {
   trxId: string;
+  expiryTime?: string | null;
+  expiry?: string | null;
   [key: string]: unknown;
 };
 
@@ -48,6 +50,15 @@ export const passwordUpdate = {
       const response = await axios.post<
         PasswordUpdateApiResponse<PasswordUpdateTransactionData>
       >(`${passwordUpdateApi}/initiate`, data);
+
+      if (response.data?.data) {
+        response.data.data = {
+          ...response.data.data,
+          expiry:
+            response.data.data.expiry ?? response.data.data.expiryTime ?? null,
+        };
+      }
+
       return response.data;
     } catch (error) {
       handleApiError(error as ApiErrorLike);

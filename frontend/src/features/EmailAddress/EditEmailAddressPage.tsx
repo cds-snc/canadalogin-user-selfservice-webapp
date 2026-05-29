@@ -465,6 +465,7 @@ export default function EditEmailAddressPage() {
             destination: formData.emailAddress,
           });
         }}
+        otpExpiry={otpSentResponse?.expiry}
         onBack={handleBackToEnterEmail}
         isMaxAttemptsReached={isMaxAttemptsReached}
         resetAttempts={resetAttempts}

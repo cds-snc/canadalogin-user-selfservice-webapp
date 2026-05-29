@@ -18,6 +18,7 @@ export default {
 };
 
 const Template = (args) => <OtpVerification {...args} />;
+const FUTURE_OTP_EXPIRY = new Date(Date.now() + 60_000).toISOString();
 
 const baseArgs = {
   setUserOtpValue: () => {},
@@ -245,4 +246,42 @@ ErrorStateDisplay.play = async ({ canvasElement }) => {
     await expect(submitButton).toBeInTheDocument();
     await expect(tryAnotherWayButton).toBeInTheDocument();
   });
+};
+export const ExpiryCountdownWithShortResendDelay = Template.bind({});
+ExpiryCountdownWithShortResendDelay.args = {
+  ...baseArgs,
+  userSelectedMfaFactor: mockSMSFactor,
+  userOtpValue: "",
+  errorMessage: "",
+  otpExpiry: FUTURE_OTP_EXPIRY,
+};
+ExpiryCountdownWithShortResendDelay.parameters = {
+  docs: {
+    description: {
+      story:
+        "Tests that OTP expiry displays as a minute:second countdown while the resend link still unlocks after the original short delay.",
+    },
+  },
+};
+ExpiryCountdownWithShortResendDelay.play = async ({ canvasElement }) => {
+  const canvas = within(canvasElement);
+
+  await waitFor(async () => {
+    await expect(
+      canvas.getByText(/request a new code in/i),
+    ).toBeInTheDocument();
+    await expect(
+      canvas.getByText(/your code will expire in/i),
+    ).toBeInTheDocument();
+  });
+
+  await waitFor(
+    async () => {
+      await expect(canvas.getByText(/request a new code/i)).toBeInTheDocument();
+      await expect(/has expired/i.test(canvasElement.textContent || "")).toBe(
+        false,
+      );
+    },
+    { timeout: 11000 },
+  );
 };

@@ -31,6 +31,7 @@
     "requestNewCode": "Demander un nouveau code",
     "newCodeSent": "Nous vous avons envoyé un nouveau code",
     "chooseDifferentMethod": "Choisir une autre méthode",
+    "expiredMessage": "Votre code de vérification à durée limitée a expiré.",
     "completeTwoStep": "Connectez-vous avec Connextion GC",
     "continueToYour": "pour accéder à vôtre",
     "account": "compte",

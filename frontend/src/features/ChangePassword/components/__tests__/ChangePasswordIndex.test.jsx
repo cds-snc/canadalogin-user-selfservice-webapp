@@ -130,9 +130,10 @@ vi.mock("../../../TransientOtp/components/OtpSelection", () => ({
 }));
 
 vi.mock("../../../TransientOtp/components/OtpVerification", () => ({
-  default: ({ validateOtpCode, userOtpValue }) => (
+  default: ({ validateOtpCode, userOtpValue, otpExpiry }) => (
     <button
       data-testid="verify-otp-btn"
+      data-otp-expiry={otpExpiry ?? ""}
       onClick={() => validateOtpCode(userOtpValue ?? "123456")}
     >
       Verify OTP
@@ -417,6 +418,37 @@ describe("ChangePasswordIndex – GA Success Path Tracking", () => {
         step: "otp_validation",
       });
     });
+  });
+
+  it("passes the password update expiryTime to the OTP verification screen", async () => {
+    const expiryTime = "2026-05-29T12:34:56Z";
+    passwordUpdate.firstStep.mockResolvedValueOnce({
+      success: true,
+      data: { trxId: "trx-123", expiryTime },
+    });
+
+    renderComponent();
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("validate-password-btn"));
+    });
+
+    await waitFor(() =>
+      expect(screen.getByTestId("otp-selection-next-btn")).toBeInTheDocument(),
+    );
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("otp-selection-next-btn"));
+    });
+
+    await waitFor(() =>
+      expect(screen.getByTestId("verify-otp-btn")).toBeInTheDocument(),
+    );
+
+    expect(screen.getByTestId("verify-otp-btn")).toHaveAttribute(
+      "data-otp-expiry",
+      expiryTime,
+    );
   });
 
   it("fires GA events when OTP is validated (otp_validation → change_password)", async () => {
