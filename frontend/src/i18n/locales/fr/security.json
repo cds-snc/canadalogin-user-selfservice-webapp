@@ -2,13 +2,13 @@
   "SecuritySettings": {
     "title": "Paramètres de sécurité",
     "howYouSignIn": "Comment vous vous connectez à ConnexionCanada",
-    "keepInfoUpdated": "Veillez à toujours avoir accès à votre identifiant ConnexionCanada en maintenant ces renseignements à jour.",
+    "keepInfoUpdated": "Veillez à toujours avoir accès à votre compte ConnexionCanada en maintenant ces renseignements à jour.",
     "password": "Mot de passe",
     "lastChangedOn": "Dernière modification le",
     "change": "Modifier",
     "twoStepVerification": "Vérification en deux étapes",
-    "twoStepDescription": "L'ajout d'une étape supplémentaire à la vérification de votre mot de passe permet de confirmer votre identité.",
-    "enabled": "Activée",
+    "twoStepDescription": "Gérez vos clés d’accès ou les numéros de téléphone auxquels vous recevez des codes de vérification.",
+    "enabled": "Active",
     "manage": "Gérer",
     "pageTitle": "Paramètres de sécurité"
   },

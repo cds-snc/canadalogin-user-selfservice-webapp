@@ -640,9 +640,10 @@ describe("AddMFAOtpVerification Unit Tests", () => {
         </TestWrapper>,
       );
 
+      expect(screen.getByText("Check your phone")).toBeInTheDocument();
       expect(
         screen.getByText(
-          "Your email might take a few minutes to arrive. If you do not get an email, check your spam folder.",
+          /Your email might take a few minutes to arrive\. If you cannot find the email in your inbox, check your spam folder\./,
         ),
       ).toBeInTheDocument();
     });

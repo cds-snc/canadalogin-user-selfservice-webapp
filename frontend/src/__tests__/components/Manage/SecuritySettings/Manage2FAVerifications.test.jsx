@@ -475,18 +475,26 @@ describe("Manage2FAVerifications — additional coverage", () => {
     expect(getByTestId("notice-factory")).toHaveTextContent("passkey-added");
   });
 
-  it("consumes location notice state after the first render", () => {
-    mockUseLocation.mockReturnValue({
+  it("persists notice state after location.state becomes null on rerender", () => {
+    let locationValue = {
       pathname: "/security-settings",
       state: { noticeType: "passkeyAdded", passkeyName: "Work Laptop" },
-    });
+    };
+    mockUseLocation.mockImplementation(() => locationValue);
 
-    render(<Manage2FAVerifications />);
+    const { rerender, getByTestId } = render(<Manage2FAVerifications />);
 
-    expect(mockNavigate).toHaveBeenCalledWith("/security-settings", {
-      replace: true,
+    expect(getByTestId("notice-factory")).toHaveTextContent("passkeyAdded");
+
+    locationValue = {
+      pathname: "/security-settings",
       state: null,
-    });
+    };
+
+    rerender(<Manage2FAVerifications />);
+
+    expect(getByTestId("notice-factory")).toHaveTextContent("passkeyAdded");
+    expect(mockNavigate).not.toHaveBeenCalled();
   });
 
   it("does NOT render NoticeFactory when location.state is null", () => {

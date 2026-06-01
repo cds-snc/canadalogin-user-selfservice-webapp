@@ -88,9 +88,11 @@ export default function AddFIDO2Passkey({
         <GcdsHeading tag="h2">{t("AddFIDO2Passkey.problemsTitle")}</GcdsHeading>
 
         {/* TODO: add link to create passkey help page once available */}
-        <GcdsLink href="#" target="_blank">
-          {t("AddFIDO2Passkey.helpLink")}
-        </GcdsLink>
+        <GcdsText>
+          <GcdsLink href="#" target="_blank">
+            {t("AddFIDO2Passkey.helpLink")}
+          </GcdsLink>
+        </GcdsText>
       </GcdsGrid>
     </GcdsContainer>
   );

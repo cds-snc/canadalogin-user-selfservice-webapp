@@ -72,33 +72,24 @@ export default function Manage2FAVerifications() {
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
     language,
   });
-  const manage2FAVerificationsPage = path(PAGES.manage2FAVerifications, {
-    language,
-  });
+
   const [errorCode, setErrorCode] = useState("");
 
   const errorMessage = getErrorMessage(language, errorCode);
 
-  const { noticeType, phoneNumber, otpType, passkeyName } =
-    (location.state as Manage2FANoticeState | null) || {};
-  const activeNotice = {
-    noticeType,
-    phoneNumber,
-    otpType,
-    passkeyName,
-  };
-  const addFido2PagePath = path(PAGES.addFIDO2PasskeyPage, { language });
+  const [savedNoticeState, setSavedNoticeState] =
+    useState<Manage2FANoticeState | null>(
+      (location.state as Manage2FANoticeState | null) || null,
+    );
 
   useEffect(() => {
-    if (!noticeType) {
-      return;
+    const locationState = location.state as Manage2FANoticeState | null;
+    if (locationState?.noticeType) {
+      setSavedNoticeState(locationState);
     }
+  }, [location.state]);
 
-    navigate(location.pathname ?? manage2FAVerificationsPage, {
-      replace: true,
-      state: null,
-    });
-  }, [location.pathname, manage2FAVerificationsPage, navigate, noticeType]);
+  const addFido2PagePath = path(PAGES.addFIDO2PasskeyPage, { language });
 
   const { phoneFactorsMap: userPhoneFactorsMap, otpLoading: localLoading } =
     useOtpOperations({
@@ -132,12 +123,12 @@ export default function Manage2FAVerifications() {
   ) : (
     <GcdsContainer role="main">
       <ErrorSummaryWithFocus errorCode={errorCode} language={language} />
-      {activeNotice.noticeType && (
+      {savedNoticeState?.noticeType && (
         <NoticeFactory
-          noticeType={activeNotice.noticeType}
-          phoneNumber={activeNotice.phoneNumber}
-          otpType={activeNotice.otpType}
-          passkeyName={activeNotice.passkeyName}
+          noticeType={savedNoticeState?.noticeType}
+          phoneNumber={savedNoticeState?.phoneNumber}
+          otpType={savedNoticeState?.otpType}
+          passkeyName={savedNoticeState?.passkeyName}
         />
       )}
 

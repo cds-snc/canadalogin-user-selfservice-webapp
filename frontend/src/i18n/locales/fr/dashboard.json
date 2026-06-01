@@ -2,11 +2,11 @@
   "ManageDashboard": {
     "welcome": "Bienvenue,",
     "personalInfo": "Renseignements personnels",
-    "personalInfoDescription": "Modify your name, contact phone number and language preferences.",
+    "personalInfoDescription": "Modifiez votre nom, votre numéro de téléphone de communication et votre langue de communication.",
     "securitySettings": "Paramètres de sécurité",
-    "securitySettingsDescription": "Manage your password and 2-step verification:",
-    "securitySettingsPhone": "Phone",
-    "securitySettingsPasskey": "Passkey",
+    "securitySettingsDescription": "Gérez votre mot de passe et votre vérification en deux étapes : ",
+    "securitySettingsPhone": "Numéro de téléphone",
+    "securitySettingsPasskey": "Clé d’accès",
     "pageTitle": "Gérer ConnexionCanada"
   }
 }

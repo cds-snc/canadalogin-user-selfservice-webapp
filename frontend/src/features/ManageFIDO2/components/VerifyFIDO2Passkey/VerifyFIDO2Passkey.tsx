@@ -147,7 +147,7 @@ export default function VerifyFIDO2Passkey({
           {t("VerifyFIDO2Passkey.title")}
         </GcdsHeading>
         <GcdsText>
-          {t("VerifyFIDO2Passkey.title")}{" "}
+          {t("VerifyFIDO2Passkey.passkeyNameDescription")}{" "}
           <strong>{selectedPasskey?.attributes?.nickname}</strong>
         </GcdsText>
 

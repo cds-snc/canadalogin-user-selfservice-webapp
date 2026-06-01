@@ -85,14 +85,17 @@ export default function AddSecondMFA({
             {t(`${pageName}.yesSetUp`)}
           </SubmitButton>
 
-          <GcdsLink
-            onGcdsClick={async (ev) => {
-              ev.preventDefault();
-              await onSkipForNow();
-            }}
-          >
-            {t(`${pageName}.noSkip`)}
-          </GcdsLink>
+          <GcdsText>
+            {" "}
+            <GcdsLink
+              onGcdsClick={async (ev) => {
+                ev.preventDefault();
+                await onSkipForNow();
+              }}
+            >
+              {t(`${pageName}.noSkip`)}
+            </GcdsLink>
+          </GcdsText>
         </GcdsGrid>
       </section>
     </GcdsContainer>
