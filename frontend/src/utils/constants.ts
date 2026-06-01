@@ -136,6 +136,7 @@ export const PAGES = {
   idvStartIdentityProofingPage: "IdvStartIdentityProofingPage",
   idvProvenInformationCard: "IdvProvenInformationCard",
   idvProvincialVerificationPage: "IdvProvincialVerificationPage",
+  idvOnlineVerificationInfoPage: "IdvOnlineVerificationInfoPage",
 } as const;
 
 export const PRIVACY_NOTICE_LINKS = {
