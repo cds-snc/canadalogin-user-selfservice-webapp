@@ -27,4 +27,12 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
+# Run production build to catch TypeScript/build regressions
+echo "🏗️ Running production build..."
+npm run build
+if [ $? -ne 0 ]; then
+  echo "❌ Build failed. Please fix build/type errors before pushing."
+  exit 1
+fi
+
 echo "✅ All pre-push checks passed!"

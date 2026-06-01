@@ -31,7 +31,12 @@ describe("utils/userProfileDispatch", () => {
   it("dispatches profile update success payload", () => {
     const dispatch = vi.fn();
     const profileDispatch = userProfileDispatch(dispatch);
-    const payload = { firstName: "Taylor", lastName: "Jordan" };
+    const payload = {
+      id: "user-123",
+      active: true,
+      userName: "taylor.jordan",
+      name: { givenName: "Taylor", familyName: "Jordan" },
+    };
 
     profileDispatch.updateProfileSuccess(payload);
 

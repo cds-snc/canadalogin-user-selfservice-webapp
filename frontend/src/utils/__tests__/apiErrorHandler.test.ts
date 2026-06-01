@@ -27,9 +27,14 @@ describe("utils/apiErrorHandler", () => {
   });
 
   it("handleApiError throws original error when response is absent", () => {
-    const rawError = new Error("network error");
+    const rawError = { message: "network error" };
 
-    expect(() => handleApiError(rawError)).toThrow(rawError);
+    try {
+      handleApiError(rawError);
+      throw new Error("Expected handleApiError to throw");
+    } catch (thrown) {
+      expect(thrown).toEqual(rawError);
+    }
   });
 
   it("handleApiError redirects to login for 401 errors before throwing", () => {
