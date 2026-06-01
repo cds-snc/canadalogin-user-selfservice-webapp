@@ -7,7 +7,7 @@
     "lastChangedOn": "Last changed on",
     "change": "Change",
     "twoStepVerification": "2-step verification",
-    "twoStepDescription": "A second step after your password helps verify it's you signing in.",
+    "twoStepDescription": "Manage your passkeys or phone numbers that receive verification codes.",
     "enabled": "Enabled",
     "manage": "Manage",
     "pageTitle": "Security settings"

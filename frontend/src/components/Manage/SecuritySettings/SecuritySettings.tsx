@@ -23,9 +23,13 @@ export default function SecuritySettings() {
   const { state } = useUser();
   const lastPasswordChange = state?.userProfile?.details?.pwdChangedTime || "";
   const formattedPasswordChangeDate = lastPasswordChange
-    ? format(new Date(lastPasswordChange), "MMMM d, yyyy", {
-        locale: language === "fr" ? frCA : enCA,
-      })
+    ? language === "fr"
+      ? format(new Date(lastPasswordChange), "d MMMM, yyyy", {
+          locale: frCA,
+        })
+      : format(new Date(lastPasswordChange), "MMMM d, yyyy", {
+          locale: enCA,
+        })
     : "";
 
   const passwordPage = path(PAGES.password, { language });

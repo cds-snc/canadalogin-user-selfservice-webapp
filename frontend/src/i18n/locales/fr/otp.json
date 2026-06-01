@@ -17,17 +17,17 @@
     "toDeleteNumber": "Pour supprimer un numéro de téléphone,",
     "howToSendCode": "Comment souhaitez-vous recevoir le code?",
     "passkeyOrSecurityKey": "Clé d'accès ou clé de sécurité",
-    "textMe": "M'envoyer un message texte",
-    "textMeEndingIn": "M'envoyer un message texte au numéro se terminant par {{digits}}",
-    "callMe": "M'appeler",
-    "callMeEndingIn": "M'appeler au numéro se terminant par {{digits}}",
+    "textMe": "Textez-moi",
+    "textMeEndingIn": "Textez-moi au numéro se terminant par {{digits}}",
+    "callMe": "Appelez-moi",
+    "callMeEndingIn": "Appelez-moi au numéro se terminant par {{digits}}",
     "verify": "Vérifier",
     "verifyWithPasskey": "Vérifier avec la clé d'accès {{name}}",
     "chooseVerifyMethod": "Choisissez votre méthode de vérification",
     "toDeletePasskey": "Pour supprimer une clé d'accès ou une clé de sécurité,",
     "toAddPasskey": "Pour ajouter une clé d'accès ou une clé de sécurité,",
     "email": "Courriel",
-    "emailMe": "M'envoyer un courriel"
+    "emailMe": "Écrivez-moi"
   },
   "PasswordVerification": {
     "title": "Veuillez vous authentifier",
