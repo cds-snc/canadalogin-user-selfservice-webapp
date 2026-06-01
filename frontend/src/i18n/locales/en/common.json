@@ -36,7 +36,7 @@
     "error_passkey_name_required": "Passkey name required.",
     "error_delete_credential": "Failed to delete security key",
     "error_rename_credential": "Enter a name for your passkey to continue",
-    "error_fido2_verification": "The passkey request was either cancelled or timed out. Try again.",
+    "error_fido2_verification": "The passkey request was either cancelled, timed out or the device is already registered to this CanadaLogin. Try again or try using another device.",
     "error_fido2_wrong_passkey": "You used a different passkey than the one you selected. Please try again with the correct passkey.",
     "error_fido2_passkey_deleted": "This passkey can no longer be used. Choose a different passkey or sign in with a different method.",
     "error_get_assertion_options": "Failed to get authentication options",

@@ -23,9 +23,9 @@
     "callMeEndingIn": "Appelez-moi au numéro se terminant par {{digits}}",
     "verify": "Vérifier",
     "verifyWithPasskey": "Vérifier avec la clé d'accès {{name}}",
-    "chooseVerifyMethod": "Choisissez votre méthode de vérification",
-    "toDeletePasskey": "Pour supprimer une clé d'accès ou une clé de sécurité,",
-    "toAddPasskey": "Pour ajouter une clé d'accès ou une clé de sécurité,",
+    "chooseVerifyMethod": "Choisissez une méthode de vérification",
+    "toDeletePasskey": "Pour supprimer cette clé d’accès ou clé de sécurité,",
+    "toAddPasskey": "Pour ajouter une clé d’accès ou une clé de sécurité,",
     "email": "Courriel",
     "emailMe": "Écrivez-moi"
   },
@@ -38,8 +38,8 @@
     "resetPassword": "Réinitialiser le mot de passe",
     "toAddPhone": "Pour ajouter un numéro de téléphone,",
     "toDeleteNumber": "Pour supprimer un numéro de téléphone,",
-    "toAddPasskey": "To add a passkey or security key,",
-    "toDeletePasskey": "To delete a passkey or security key,"
+    "toAddPasskey": "Pour ajouter une clé d’accès ou une clé de sécurité,",
+    "toDeletePasskey": "Pour supprimer cette clé d’accès ou clé de sécurité,"
   },
   "NoticeFactory": {
     "successfullyDeleted": "Vous avez supprimé le",
@@ -49,8 +49,8 @@
     "voiceCall": "appel vocal",
     "textSms": "message texte",
     "notice_title_success": "Réussite",
-    "passkeyCreated": "Your passkey has been created",
-    "yourPasskey": "from your 2-step verification passkeys",
-    "renamedPasskeyTo": "You have successfully renamed your passkey to"
+    "passkeyCreated": "Votre clé d’accès a bien été créée",
+    "yourPasskey": "Votre clé d’accès",
+    "deletedFromCanadaLogin": "a été supprimée de votre identifiant ConnexionCanada"
   }
 }
