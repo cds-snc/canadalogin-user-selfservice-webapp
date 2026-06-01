@@ -30,7 +30,7 @@ jobs:
           app-id: ${{ secrets.CDS_RELEASE_BOT_APP_ID }}
           private-key: ${{ secrets.CDS_RELEASE_BOT_PRIVATE_KEY }}
 
-      - uses: googleapis/release-please-action@16a9c90856f42705d54a6fda1823352bdc62cf38 # v4.4.0
+      - uses: googleapis/release-please-action@5c625bfb5d1ff62eadeeb3772007f7f66fdcf071 # v4.4.1
         id: release
         with:
           token: ${{ steps.sre_app_token.outputs.token }}
@@ -161,7 +161,7 @@ jobs:
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
       - name: Audit DNS requests
-        uses: cds-snc/dns-proxy-action@main
+        uses: cds-snc/dns-proxy-action@9ad793100229573be3f5ba78cc69ec523f2c8b7e # main
         env:
           DNS_PROXY_FORWARDTOSENTINEL: "true"
           DNS_PROXY_LOGANALYTICSWORKSPACEID: ${{ secrets.LOG_ANALYTICS_WORKSPACE_ID }}
@@ -176,7 +176,7 @@ jobs:
 
       - name: Login to Amazon ECR
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
+        uses: aws-actions/amazon-ecr-login@fa648b43de3d4d023bcb3f89ed6940096949c419 # v2.1.5
 
       - name: Build and push Docker image (SHA and latest tag)
         working-directory: ./backend/
@@ -221,7 +221,7 @@ jobs:
           docker push "${{ vars.ARTIFACT_ECR_REPOSITORY }}:$RELEASE_TAG"
 
       - name: Docker generate SBOM
-        uses: cds-snc/security-tools/.github/actions/generate-sbom@8d2322011f6b68da2fc47e60f23b41c1907e33e8 # v4.0.2
+        uses: cds-snc/security-tools/.github/actions/generate-sbom@837a88b6337d4842543184c8eac97a8adac8f302 # v4.0.3
         env:
           TRIVY_DB_REPOSITORY: ${{ vars.TRIVY_DB_REPOSITORY }}
         with:
@@ -386,7 +386,7 @@ jobs:
       - name: Update ECS task image
         if: steps.check-deployment-needed.outputs.deployment_needed == 'true'
         id: task-def
-        uses: aws-actions/amazon-ecs-render-task-definition@cbed19f1b86bbb18f59cfffde7107b93cc9b75da # v1.8.1
+        uses: aws-actions/amazon-ecs-render-task-definition@6853cfae8c3a7d978fbf68b5a55453395541dfbb # v1.8.5
         with:
           task-definition: task-definition.json
           container-name: ${{ vars.ECS_SERVICE }}
@@ -394,7 +394,7 @@ jobs:
 
       - name: Deploy updated ECS task
         if: steps.check-deployment-needed.outputs.deployment_needed == 'true'
-        uses: aws-actions/amazon-ecs-deploy-task-definition@7b5ba17dae98c8fd463ddf2cef977d3be43322c5 # v2.5.0
+        uses: aws-actions/amazon-ecs-deploy-task-definition@a310a830f5c14e583e35d84e4e1ec7dd177c3c9c # v2.6.2
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: ${{ vars.ECS_SERVICE }}
@@ -447,7 +447,7 @@ jobs:
 
       - name: Login to Amazon ECR
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
+        uses: aws-actions/amazon-ecr-login@fa648b43de3d4d023bcb3f89ed6940096949c419 # v2.1.5
 
       - name: Build and push load test image
         working-directory: ./load_tests/
