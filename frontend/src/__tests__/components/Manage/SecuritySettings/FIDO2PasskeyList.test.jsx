@@ -13,18 +13,37 @@ import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import "@testing-library/jest-dom/vitest";
 import FIDO2PasskeyList from "../../../../components/Manage/SecuritySettings/components/FIDO2PasskeyList";
+import { GA_FORM_EVENTS } from "../../../../utils/analyticsConstants";
+
+const mockTrackEvent = vi.fn();
+const mockTrackPage = vi.fn();
 
 const mockNavigate = vi.fn();
+const mockPathname = "/en/manage-security-verifications";
+const renamePasskeyStep = "rename_passkey";
+const renamePasskeyPageIds = {
+  edit: "RenamePasskeyEdit",
+  success: "RenamePasskeySuccess",
+};
 
 vi.mock("react-router", () => ({
   useParams: () => ({ language: "en" }),
   useNavigate: () => mockNavigate,
+  useLocation: () => ({ pathname: mockPathname }),
 }));
 
 vi.mock("../../../../features/ManageFIDO2/api/fido2Api", () => ({
   fido2Api: {
     updateRegistration: vi.fn(),
   },
+}));
+
+vi.mock("../../../../hooks/useFormTracking", () => ({
+  useFormTracking: () => ({ trackEvent: mockTrackEvent }),
+}));
+
+vi.mock("../../../../utils/gatag", () => ({
+  trackPage: (...args) => mockTrackPage(...args),
 }));
 
 vi.mock("../../../../utils/functions", () => ({
@@ -47,6 +66,23 @@ vi.mock("../../../../utils/constants", () => ({
 
 vi.mock("../../../../utils/routeHelpers", () => ({
   path: (_page, { language } = {}) => `/${language}/mock-path`,
+}));
+
+vi.mock("react-i18next", () => ({
+  useTranslation: () => ({
+    t: (key) => {
+      const messages = {
+        "Manage2FAVerifications.createdOn": "Created on ",
+        "Manage2FAVerifications.renamePasskey": "Rename",
+        "Manage2FAVerifications.deletePasskey": "Delete",
+        "Manage2FAVerifications.saveButton": "Save",
+        "Manage2FAVerifications.cancelButton": "Cancel",
+        "Manage2FAVerifications.nameLabel": "Passkey name",
+      };
+
+      return messages[key] ?? key;
+    },
+  }),
 }));
 
 vi.mock("@gcds-core/components-react", () => ({
@@ -153,6 +189,14 @@ describe("FIDO2PasskeyList", () => {
     expect(screen.queryByTestId("rename-fido2-button")).not.toBeInTheDocument();
     // Should NOT navigate to a separate page
     expect(mockNavigate).not.toHaveBeenCalled();
+    expect(mockTrackEvent).toHaveBeenCalledWith({
+      event: GA_FORM_EVENTS.FORM_STEP_START,
+      step: renamePasskeyStep,
+    });
+    expect(mockTrackPage).toHaveBeenCalledWith(
+      mockPathname,
+      renamePasskeyPageIds.edit,
+    );
   });
 
   it("navigates to the delete page when Delete is clicked", async () => {
@@ -260,6 +304,10 @@ describe("FIDO2PasskeyList — inline rename (Save) flow", () => {
         nickname: "My Key",
       }),
     );
+    expect(mockTrackEvent).toHaveBeenCalledWith({
+      event: GA_FORM_EVENTS.FORM_SUBMIT,
+      step: renamePasskeyStep,
+    });
   });
 
   it("exits editing mode (hides input, shows Rename button) after a successful save", async () => {
@@ -272,6 +320,28 @@ describe("FIDO2PasskeyList — inline rename (Save) flow", () => {
     await waitFor(() => {
       expect(screen.queryByTestId("passkeyNickname")).not.toBeInTheDocument();
       expect(screen.getByTestId("rename-fido2-button")).toBeInTheDocument();
+    });
+    expect(mockTrackEvent).toHaveBeenCalledWith({
+      event: GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE,
+      step: renamePasskeyStep,
+    });
+    expect(mockTrackPage).toHaveBeenCalledWith(
+      mockPathname,
+      renamePasskeyPageIds.success,
+    );
+  });
+
+  it("tracks rename step end when cancel is clicked", async () => {
+    const user = userEvent.setup();
+
+    render(<FIDO2PasskeyList userFIDO2CredentialsData={[credential]} />);
+
+    await user.click(screen.getByTestId("rename-fido2-button"));
+    await user.click(screen.getByTestId("cancel-fido2-button"));
+
+    expect(mockTrackEvent).toHaveBeenCalledWith({
+      event: GA_FORM_EVENTS.FORM_STEP_END,
+      step: renamePasskeyStep,
     });
   });
 
@@ -297,6 +367,11 @@ describe("FIDO2PasskeyList — inline rename (Save) flow", () => {
     await waitFor(() =>
       expect(screen.queryByTestId("passkeyNickname")).not.toBeInTheDocument(),
     );
+    expect(mockTrackEvent).toHaveBeenCalledWith({
+      event: GA_FORM_EVENTS.FORM_STEP_END,
+      step: renamePasskeyStep,
+      error: "error_rename_credential",
+    });
   });
 
   it("returns to read-only mode when the API fails", async () => {

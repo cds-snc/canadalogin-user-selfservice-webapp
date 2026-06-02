@@ -107,6 +107,11 @@ const DeletePasskeySteps = {
   DeletePasskeySuccess: "Delete Passkey - Step 5: Passkey deleted",
 };
 
+const RenamePasskeySteps = {
+  RenamePasskeyEdit: "Rename Passkey - Step 1: Name your passkey",
+  RenamePasskeySuccess: "Rename Passkey - Step 2: Passkey renamed",
+};
+
 const GA_PAGE_TITLE_SUFFIXES: Record<string, string> = {
   ...CommonPages,
   ...ProfileNameSteps,
@@ -118,6 +123,7 @@ const GA_PAGE_TITLE_SUFFIXES: Record<string, string> = {
   ...DeletePhoneNumberSteps,
   ...AddPasskeySteps,
   ...DeletePasskeySteps,
+  ...RenamePasskeySteps,
 };
 
 function withCommonAnalyticsParams(params?: GA4EventParams): GA4EventParams {
