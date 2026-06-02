@@ -20,6 +20,10 @@ const mockTrackPage = vi.fn();
 
 const mockNavigate = vi.fn();
 const mockPathname = "/en/manage-security-verifications";
+const mockRpParams = {
+  rp_name: "Test RP",
+  rp_client_id: "test-rp-client-id",
+};
 const renamePasskeyStep = "rename_passkey";
 const renamePasskeyPageIds = {
   edit: "RenamePasskeyEdit",
@@ -40,6 +44,10 @@ vi.mock("../../../../features/ManageFIDO2/api/fido2Api", () => ({
 
 vi.mock("../../../../hooks/useFormTracking", () => ({
   useFormTracking: () => ({ trackEvent: mockTrackEvent }),
+}));
+
+vi.mock("../../../../hooks/useRelyingPartyAnalyticsParams", () => ({
+  useRelyingPartyAnalyticsParams: () => mockRpParams,
 }));
 
 vi.mock("../../../../utils/gatag", () => ({
@@ -196,6 +204,7 @@ describe("FIDO2PasskeyList", () => {
     expect(mockTrackPage).toHaveBeenCalledWith(
       mockPathname,
       renamePasskeyPageIds.edit,
+      mockRpParams,
     );
   });
 
@@ -328,7 +337,27 @@ describe("FIDO2PasskeyList — inline rename (Save) flow", () => {
     expect(mockTrackPage).toHaveBeenCalledWith(
       mockPathname,
       renamePasskeyPageIds.success,
+      mockRpParams,
     );
+  });
+
+  it("keeps the rename step active when save is clicked with a blank nickname", async () => {
+    const user = userEvent.setup();
+
+    render(<FIDO2PasskeyList userFIDO2CredentialsData={[credential]} />);
+
+    await user.click(screen.getByTestId("rename-fido2-button"));
+    const input = screen.getByTestId("passkeyNickname");
+    await user.clear(input);
+    await user.click(screen.getByTestId("save-fido2-button"));
+
+    expect(fido2Api.updateRegistration).not.toHaveBeenCalled();
+    expect(screen.getByTestId("passkeyNickname")).toBeInTheDocument();
+    expect(mockTrackEvent).toHaveBeenCalledWith({
+      event: GA_FORM_EVENTS.FORM_SUBMIT,
+      step: renamePasskeyStep,
+      error: "error_rename_credential",
+    });
   });
 
   it("tracks rename step end when cancel is clicked", async () => {

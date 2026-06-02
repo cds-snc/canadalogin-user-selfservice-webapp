@@ -14,6 +14,7 @@ import { useState } from "react";
 import { fido2Api } from "../../../../features/ManageFIDO2/api/fido2Api";
 import type { Fido2Credential } from "../../../../types/hooks";
 import { useFormTracking } from "../../../../hooks/useFormTracking";
+import { useRelyingPartyAnalyticsParams } from "../../../../hooks/useRelyingPartyAnalyticsParams";
 import {
   GA_FORM_EVENTS,
   RENAME_PASSKEY_ANALYTICS,
@@ -71,6 +72,7 @@ export default function FIDO2PasskeyList({
   const { trackEvent } = useFormTracking({
     formId: RENAME_PASSKEY_ANALYTICS.FLOW_ID,
   });
+  const rpParams = useRelyingPartyAnalyticsParams();
 
   const renamePasskeyStep = RENAME_PASSKEY_ANALYTICS.STEPS.RENAME_PASSKEY;
 
@@ -102,7 +104,7 @@ export default function FIDO2PasskeyList({
     if (!passkeyId || !trimmedNickname) {
       setErrorCode(RENAME_PASSKEY_ERROR_CODE);
       trackRenamePasskeyEvent(
-        GA_FORM_EVENTS.FORM_STEP_END,
+        GA_FORM_EVENTS.FORM_SUBMIT,
         RENAME_PASSKEY_ERROR_CODE,
       );
       return;
@@ -128,7 +130,7 @@ export default function FIDO2PasskeyList({
       }));
       clearPasskeyNicknameInput(passkeyId);
       trackRenamePasskeyEvent(GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE);
-      trackPage(pathname, RENAME_PASSKEY_PAGE_IDS.SUCCESS);
+      trackPage(pathname, RENAME_PASSKEY_PAGE_IDS.SUCCESS, rpParams);
     } catch (error) {
       console.error([RENAME_PASSKEY_ERROR_CODE], error);
       setErrorCode(RENAME_PASSKEY_ERROR_CODE);
@@ -216,7 +218,7 @@ export default function FIDO2PasskeyList({
                 buttonRole="secondary"
                 onGcdsClick={() => {
                   trackRenamePasskeyEvent(GA_FORM_EVENTS.FORM_STEP_START);
-                  trackPage(pathname, RENAME_PASSKEY_PAGE_IDS.EDIT);
+                  trackPage(pathname, RENAME_PASSKEY_PAGE_IDS.EDIT, rpParams);
                   setEditingPasskeyId(id);
                 }}
               >
