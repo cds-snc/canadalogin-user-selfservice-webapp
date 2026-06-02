@@ -40,7 +40,7 @@ jobs:
 
       - name: "Cache Playwright browsers"
         id: playwright-cache
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('frontend/package-lock.json') }}
@@ -78,7 +78,7 @@ jobs:
           path: ${{ matrix.module }}
 
       - name: "Report Coverage"
-        uses: davelosert/vitest-coverage-report-action@5b6122e3a819a3be7b27fc961b7faafb3bf00e4d # v2.9.0
+        uses: davelosert/vitest-coverage-report-action@02f3c2e641286b7fa308cd3e430783103ce6103b # v2.12.0
         with:
           vite-config-path: "./vitest.config.js"
           working-directory: "./${{ matrix.module }}"

@@ -40,7 +40,7 @@ jobs:
           BLUINK_CLIENT_SECRET: test-bluink-client-secret
         run: make run-pytest
       - name: Check Coverage
-        uses: orgoro/coverage@v3
+        uses: orgoro/coverage@ca0c362dc1a4f100447309405e6dfea47e251495 # v3.3.1
         with:
           coverageFile: coverage.xml
           token: ${{ secrets.GITHUB_TOKEN }}
