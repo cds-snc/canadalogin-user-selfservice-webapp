@@ -18,7 +18,7 @@ from app.fido2.services.helper_utils import (
 
 # Test Configuration Constants
 MOCK_TENANT_URL = "https://fake-tenant.verify.ibm.com"
-MOCK_RP_ID = "fake-tenant.verify.ibm.com"
+MOCK_ROOT_DOMAIN = "fake-tenant.verify.ibm.com"
 MOCK_RP_UUID = "rp-uuid-123"
 MOCK_USER_ID = "user-123"
 MOCK_ADMIN_TOKEN = "admin-token-123"
@@ -35,7 +35,7 @@ class TestHelperUtils:
         # Arrange
         mock_config = Mock()
         mock_config.ibm_verify_config.IBM_VERIFY_TENANT_URL = MOCK_TENANT_URL
-        mock_config.ibm_verify_config.ROOT_DOMAIN = None
+        mock_config.ROOT_DOMAIN = MOCK_ROOT_DOMAIN
         mock_get_config.return_value = mock_config
 
         # Act
@@ -52,9 +52,7 @@ class TestHelperUtils:
         mock_config.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
             "https://auth.dev.login-connexion.alpha.canada.ca"
         )
-        mock_config.ibm_verify_config.ROOT_DOMAIN = (
-            "dev.login-connexion.alpha.canada.ca"
-        )
+        mock_config.ROOT_DOMAIN = "dev.login-connexion.alpha.canada.ca"
         mock_get_config.return_value = mock_config
 
         # Act
@@ -169,7 +167,7 @@ class TestHelperUtils:
         mock_response = {
             "fido2": {
                 "relyingparties": [
-                    {"rpId": MOCK_RP_ID, "id": MOCK_RP_UUID},
+                    {"rpId": MOCK_ROOT_DOMAIN, "id": MOCK_RP_UUID},
                     {"rpId": "other.rp.com", "id": "other-uuid"},
                 ]
             }
@@ -182,7 +180,9 @@ class TestHelperUtils:
         http_client = AsyncClient()
 
         # Act
-        result = await get_rp_uuid_from_rp_id(http_client, MOCK_ADMIN_TOKEN, MOCK_RP_ID)
+        result = await get_rp_uuid_from_rp_id(
+            http_client, MOCK_ADMIN_TOKEN, MOCK_ROOT_DOMAIN
+        )
 
         # Assert
         assert result == MOCK_RP_UUID
@@ -211,7 +211,9 @@ class TestHelperUtils:
 
         # Act & Assert
         with pytest.raises(HTTPException) as exc_info:
-            await get_rp_uuid_from_rp_id(http_client, MOCK_ADMIN_TOKEN, MOCK_RP_ID)
+            await get_rp_uuid_from_rp_id(
+                http_client, MOCK_ADMIN_TOKEN, MOCK_ROOT_DOMAIN
+            )
 
         assert exc_info.value.status_code == 404
         assert "not found" in str(exc_info.value.detail)
