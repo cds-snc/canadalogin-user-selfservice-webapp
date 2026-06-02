@@ -103,7 +103,7 @@ The frontend will automatically use the shared certificate from `backend/certs/`
 In `backend/.env`, set:
 ```env
 IBM_VERIFY_TENANT_URL=https://auth.dev.login-connexion.alpha.canada.ca
-FIDO2_RP_ID=dev.login-connexion.alpha.canada.ca
+ROOT_DOMAIN=dev.login-connexion.alpha.canada.ca
 PROFILE_MANAGEMENT_DOMAIN=https://local.dev.login-connexion.alpha.canada.ca:3000
 CORS_ORIGINS=local.dev.login-connexion.alpha.canada.ca:3000,local.dev.login-connexion.alpha.canada.ca:8000
 ```
@@ -113,9 +113,9 @@ In `frontend/.env`, set:
 VITE_BACKEND_API_URL=https://local.dev.login-connexion.alpha.canada.ca:8000
 ```
 
-> **Note on FIDO2_RP_ID**: The `local.*` and `auth.*` subdomains are siblings under
+> **Note on ROOT_DOMAIN**: The `local.*` and `auth.*` subdomains are siblings under
 > `dev.login-connexion.alpha.canada.ca`. WebAuthn requires the RP ID to be a
-> registrable domain suffix of the page's origin, so `FIDO2_RP_ID` must be set to
+> registrable domain suffix of the page's origin, so `ROOT_DOMAIN` must be set to
 > the shared parent domain. Ensure the FIDO2 Relying Party in your IBM Verify tenant
 > is also configured with `dev.login-connexion.alpha.canada.ca` as the RP ID.
 
