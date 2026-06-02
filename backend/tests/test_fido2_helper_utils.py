@@ -35,7 +35,7 @@ class TestHelperUtils:
         # Arrange
         mock_config = Mock()
         mock_config.ibm_verify_config.IBM_VERIFY_TENANT_URL = MOCK_TENANT_URL
-        mock_config.ibm_verify_config.FIDO2_RP_ID = None
+        mock_config.ibm_verify_config.ROOT_DOMAIN = None
         mock_get_config.return_value = mock_config
 
         # Act
@@ -45,14 +45,14 @@ class TestHelperUtils:
         assert result == "fake-tenant.verify.ibm.com"
 
     @patch("app.fido2.services.helper_utils.get_configuration")
-    def test_get_rp_id_uses_explicit_fido2_rp_id(self, mock_get_config):
-        """Test that FIDO2_RP_ID env var overrides the tenant URL hostname"""
+    def test_get_rp_id_uses_explicit_root_domain(self, mock_get_config):
+        """Test that ROOT_DOMAIN env var overrides the tenant URL hostname"""
         # Arrange
         mock_config = Mock()
         mock_config.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
             "https://auth.dev.login-connexion.alpha.canada.ca"
         )
-        mock_config.ibm_verify_config.FIDO2_RP_ID = (
+        mock_config.ibm_verify_config.ROOT_DOMAIN = (
             "dev.login-connexion.alpha.canada.ca"
         )
         mock_get_config.return_value = mock_config
