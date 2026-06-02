@@ -101,10 +101,7 @@ export default function FIDO2PasskeyList({
 
     if (!passkeyId || !trimmedNickname) {
       setErrorCode(RENAME_PASSKEY_ERROR_CODE);
-      trackRenamePasskeyEvent(
-        GA_FORM_EVENTS.FORM_STEP_END,
-        RENAME_PASSKEY_ERROR_CODE,
-      );
+      trackRenamePasskeyEvent(GA_FORM_EVENTS.FORM_SUBMIT, RENAME_PASSKEY_ERROR_CODE);
       return;
     }
 
