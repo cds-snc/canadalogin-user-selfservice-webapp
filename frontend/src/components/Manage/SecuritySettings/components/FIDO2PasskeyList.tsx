@@ -132,7 +132,7 @@ export default function FIDO2PasskeyList({
       trackRenamePasskeyEvent(GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE);
       trackPage(pathname, RENAME_PASSKEY_PAGE_IDS.SUCCESS, rpParams);
     } catch (error) {
-      console.error([RENAME_PASSKEY_ERROR_CODE], error);
+      console.error(RENAME_PASSKEY_ERROR_CODE, error);
       setErrorCode(RENAME_PASSKEY_ERROR_CODE);
       trackRenamePasskeyEvent(
         GA_FORM_EVENTS.FORM_STEP_END,
