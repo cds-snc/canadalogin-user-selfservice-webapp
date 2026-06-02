@@ -1,5 +1,44 @@
 # Changelog
 
+## [1.22.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.21.0...v1.22.0) (2026-06-02)
+
+
+### Features
+
+* add FIDO2_RP_ID configuration and refactor RP ID retrieval logic ([#1504](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1504)) ([b7b8519](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/b7b85194f7f15141131c716c8a64a2b193e08e36))
+* add Online Verification Info component ([#1521](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1521)) ([16b8c70](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/16b8c70336fce1afe75a2cd36b0a89d143b2060b))
+* passkey fr localization figma alignment ([#1525](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1525)) ([50a9eb3](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/50a9eb3dec3d7348802b964a790732990e0fc37c))
+
+
+### Bug Fixes
+
+* align add/delete passkey figma design ([#1506](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1506)) ([2c41f56](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/2c41f56c50ba4ba74ebee2245d8cd61e3bf1546d))
+* align add/delete phone number with figma design ([#1498](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1498)) ([b53f4d7](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/b53f4d7ff25cdeb5d29aabbaed9b53b2e5bd3fb1))
+* **auth:** improve sign-out logic and handle prompt for login ([#1508](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1508)) ([4a89d1e](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/4a89d1e36efc5069cb66e8aec3e08fe203e3040f))
+* Implemented GA for Passkey flow ([#1493](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1493)) ([e1d96fd](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/e1d96fd366c7e19591605eb94883a83231bac068))
+* Manage 2FA landing page Figma alignment ([#1497](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1497)) ([96453ea](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/96453ea06fc0e88ebafd484ff99052c795309092))
+* minor fix on UI ([#1503](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1503)) ([eb7a75b](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/eb7a75b616e4a1e7028d389c69e9f2b31b247c5e))
+
+
+### Code Refactoring
+
+* FIDO2 passkey verification Figma alignment ([#1511](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1511)) ([1c34ae7](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/1c34ae7a1f79ba5484d09c5c6e53057c7998d101))
+* replace FIDO2_RP_ID with ROOT_DOMAIN in configuration and related logic ([#1532](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1532)) ([84d95d8](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/84d95d8f8cdf68ee2bf7814e9bc9c400e3733b15))
+* ui align reverify otp ([#1512](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1512)) ([85d59e5](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/85d59e51acd5a2e2ca1ffa2a9a51512c58e2e33a))
+
+
+### Miscellaneous Chores
+
+* **ci:** add PR title check workflow ([#1518](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1518)) ([0ab62a5](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/0ab62a52eb83863bdd9781c90ef668a8f9f1ae43))
+* **deps:** lock file maintenance ([#1425](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1425)) ([a85d3fa](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/a85d3faa00ee5d8b7e5801b8e05c3040d04a56f5))
+* **deps:** update all minor dependencies ([#1424](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1424)) ([c36172a](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/c36172adeadc6613a6395fab09cc3b3981cac2e6))
+* **deps:** update all non-major github action dependencies ([#1090](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1090)) ([b0a7ff8](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/b0a7ff800089198cb01a6bec64be1307d9e79d32))
+* **deps:** update all patch dependencies ([#1423](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1423)) ([fb748f2](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/fb748f2724263e902a572d4aa894c3a8fdffffa4))
+* **deps:** update all patch dependencies ([#1515](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1515)) ([29d3bef](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/29d3bef1113ec0edaaf389c4e828101cc6f3f650))
+* **deps:** update dependency authlib to v1.6.12 [security] ([#1457](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1457)) ([39866e6](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/39866e6321840fc1476276341c6a209ce187aa41))
+* **deps:** update dependency axios to v1.15.2 [security] ([#1436](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1436)) ([6c77da1](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/6c77da13fb885509a774bc3bd7c149ba45c51180))
+* **deps:** update dependency python-multipart to v0.0.27 [security] ([#1441](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1441)) ([0595746](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/059574655cd6f6f0347a523ef399286185f7aef4))
+
 ## [1.21.0](https://github.com/cds-snc/gc-signin-user-selfservice-webapp/compare/v1.20.0...v1.21.0) (2026-05-26)
 
 
