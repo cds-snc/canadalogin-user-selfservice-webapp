@@ -550,3 +550,11 @@ export const countryMapping = {
     zw: "Zimbabwe",
   },
 } as const;
+export const gcHelpCentreLinks = {
+  twoStepVerification: {
+    en: "https://login.alpha.canada.ca/en/users/get-started/two-step-verification-methods/",
+    fr: "https://connexion.alpha.canada.ca/fr/utilisateurs/se-lancer-connexioncanada/verification-deux-etapes/",
+  },
+  cannotAccessPhone:
+    "https://login.alpha.canada.ca/en/users/trouble-signing-in/problems-signing-in-with-2-step-verification/#cannot-access-your-2step-verification-phone",
+} as const;

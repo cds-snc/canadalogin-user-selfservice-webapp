@@ -21,16 +21,6 @@ vi.mock("../../../../hooks/useNavigate.js", () => ({
   useNavigateHelper: () => vi.fn(),
 }));
 
-// ---------------------------------------------------------------------------
-// Utility mocks
-// ---------------------------------------------------------------------------
-vi.mock("../../../../utils/gcHelpCentreLinks", () => ({
-  gcHelpCentreLinks: {
-    twoStepVerification: "https://help.example.com/2fa",
-    recover2StepVerification: "https://help.example.com/no-phone",
-  },
-}));
-
 vi.mock("../../../../utils/routeHelpers", () => ({
   path: vi.fn((page, { language }) => `/${language}/test`),
 }));
@@ -156,7 +146,10 @@ describe("OtpSelection Component", () => {
       renderComponent();
       const links = screen.getAllByTestId("gcds-link-external");
       expect(links).toHaveLength(1);
-      expect(links[0]).toHaveAttribute("href", "https://help.example.com/2fa");
+      expect(links[0]).toHaveAttribute(
+        "href",
+        "https://login.alpha.canada.ca/en/users/get-started/two-step-verification-methods/",
+      );
     });
 
     it("renders help link labels", () => {

@@ -10,7 +10,7 @@ import {
 import { useParams } from "react-router";
 
 import { useTranslation } from "react-i18next";
-import { gcHelpCentreLinks } from "../../../utils/gcHelpCentreLinks";
+import { gcHelpCentreLinks } from "../../../utils/constants";
 
 import { FLOW_TYPES, PAGES } from "../../../utils/constants";
 import type { Fido2Credential, OtpFactor } from "../../../types/hooks";
@@ -91,7 +91,7 @@ export default function OtpSelection({
   emailAddress,
   onSelectEmail,
 }: OtpSelectionProps) {
-  const { language } = useParams();
+  const { language } = useParams<{ language?: "en" | "fr" }>();
 
   const { t } = useTranslation(["otp", "common"]);
 
@@ -331,7 +331,7 @@ export default function OtpSelection({
         </GcdsHeading>
         <GcdsText>
           <GcdsLink
-            href={gcHelpCentreLinks.twoStepVerification}
+            href={gcHelpCentreLinks.twoStepVerification[language ?? "en"]}
             target="_blank"
           >
             {t("TransientOtpSelection.helpLink")}
