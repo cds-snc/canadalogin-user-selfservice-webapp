@@ -64,5 +64,13 @@
     "signBackInNotice": "You will need to sign back in to your {{appName}} after proving your identity in person to confirm the proofing process.",
     "canadaPostLocationsOption": "Canada Post locations",
     "serviceCanadaLocationsOption": "Service Canada Centres"
+  },
+  "MobileCompleteConfirmation": {
+    "pageTitle": "Prove your identity",
+    "heading": "Identity proofing on mobile complete",
+    "continueButton": "Continue",
+    "moreInfoTitle": " ",
+    "moreInfoBody": "Your identity information was successfully verified, and proofing is now complete.",
+    "learnMoreLink": "Continue with the remaining steps. "
   }
 }
