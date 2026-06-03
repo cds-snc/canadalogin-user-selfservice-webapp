@@ -6,13 +6,20 @@ import {
   GcdsInput,
   GcdsSrOnly,
 } from "@gcds-core/components-react";
-import { useNavigate, useParams } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 import { PAGES } from "../../../../utils/constants";
 import { useTranslation } from "react-i18next";
 import { path } from "../../../../utils/routeHelpers";
 import { useState } from "react";
 import { fido2Api } from "../../../../features/ManageFIDO2/api/fido2Api";
 import type { Fido2Credential } from "../../../../types/hooks";
+import { useFormTracking } from "../../../../hooks/useFormTracking";
+import { useRelyingPartyAnalyticsParams } from "../../../../hooks/useRelyingPartyAnalyticsParams";
+import {
+  GA_FORM_EVENTS,
+  RENAME_PASSKEY_ANALYTICS,
+} from "../../../../utils/analyticsConstants";
+import { trackPage } from "../../../../utils/gatag";
 
 interface Fido2CredentialWithCreated extends Fido2Credential {
   created?: string;
@@ -33,6 +40,12 @@ interface RenameRegistrationResponse {
   success?: boolean;
 }
 
+const RENAME_PASSKEY_ERROR_CODE = "error_rename_credential";
+const RENAME_PASSKEY_PAGE_IDS = {
+  EDIT: "RenamePasskeyEdit",
+  SUCCESS: "RenamePasskeySuccess",
+} as const;
+
 export default function FIDO2PasskeyList({
   userFIDO2CredentialsData,
   totalFactorCount,
@@ -40,6 +53,7 @@ export default function FIDO2PasskeyList({
   setErrorCode = () => {},
 }: FIDO2PasskeyListProps) {
   const { language } = useParams();
+  const { pathname } = useLocation();
   const navigate = useNavigate();
   const { t } = useTranslation(["mfa", "common"]);
   const [loading, setLoading] = useState(false);
@@ -55,6 +69,32 @@ export default function FIDO2PasskeyList({
     language,
   });
 
+  const { trackEvent } = useFormTracking({
+    formId: RENAME_PASSKEY_ANALYTICS.FLOW_ID,
+  });
+  const rpParams = useRelyingPartyAnalyticsParams();
+
+  const renamePasskeyStep = RENAME_PASSKEY_ANALYTICS.STEPS.RENAME_PASSKEY;
+
+  const trackRenamePasskeyEvent = (
+    event: (typeof GA_FORM_EVENTS)[keyof typeof GA_FORM_EVENTS],
+    error?: string,
+  ) => {
+    trackEvent({
+      event,
+      step: renamePasskeyStep,
+      ...(error ? { error } : {}),
+    });
+  };
+
+  const clearPasskeyNicknameInput = (passkeyId: string) => {
+    setPasskeyNicknameInputs((previous) => {
+      const next = { ...previous };
+      delete next[passkeyId];
+      return next;
+    });
+  };
+
   const handleRenameFIDO2 = async (
     passkeyId: string,
     renameDeviceName: string,
@@ -62,9 +102,15 @@ export default function FIDO2PasskeyList({
     const trimmedNickname = renameDeviceName.trim();
 
     if (!passkeyId || !trimmedNickname) {
-      setErrorCode("error_rename_credential");
+      setErrorCode(RENAME_PASSKEY_ERROR_CODE);
+      trackRenamePasskeyEvent(
+        GA_FORM_EVENTS.FORM_SUBMIT,
+        RENAME_PASSKEY_ERROR_CODE,
+      );
       return;
     }
+
+    trackRenamePasskeyEvent(GA_FORM_EVENTS.FORM_SUBMIT);
 
     setLoading(true);
     setErrorCode("");
@@ -82,14 +128,16 @@ export default function FIDO2PasskeyList({
         ...previous,
         [passkeyId]: trimmedNickname,
       }));
-      setPasskeyNicknameInputs((previous) => {
-        const next = { ...previous };
-        delete next[passkeyId];
-        return next;
-      });
+      clearPasskeyNicknameInput(passkeyId);
+      trackRenamePasskeyEvent(GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE);
+      trackPage(pathname, RENAME_PASSKEY_PAGE_IDS.SUCCESS, rpParams);
     } catch (error) {
-      console.error(["error_rename_credential"], error);
-      setErrorCode("error_rename_credential");
+      console.error(RENAME_PASSKEY_ERROR_CODE, error);
+      setErrorCode(RENAME_PASSKEY_ERROR_CODE);
+      trackRenamePasskeyEvent(
+        GA_FORM_EVENTS.FORM_STEP_END,
+        RENAME_PASSKEY_ERROR_CODE,
+      );
     } finally {
       setLoading(false);
       setEditingPasskeyId(null);
@@ -154,12 +202,9 @@ export default function FIDO2PasskeyList({
                 id="cancel-fido2-button"
                 buttonRole="secondary"
                 onClick={() => {
-                  setPasskeyNicknameInputs((previous) => {
-                    const next = { ...previous };
-                    delete next[id];
-                    return next;
-                  });
+                  clearPasskeyNicknameInput(id);
                   setEditingPasskeyId(null);
+                  trackRenamePasskeyEvent(GA_FORM_EVENTS.FORM_STEP_END);
                 }}
                 disabled={loading}
               >
@@ -172,6 +217,8 @@ export default function FIDO2PasskeyList({
                 id="rename-fido2-button"
                 buttonRole="secondary"
                 onGcdsClick={() => {
+                  trackRenamePasskeyEvent(GA_FORM_EVENTS.FORM_STEP_START);
+                  trackPage(pathname, RENAME_PASSKEY_PAGE_IDS.EDIT, rpParams);
                   setEditingPasskeyId(id);
                 }}
               >

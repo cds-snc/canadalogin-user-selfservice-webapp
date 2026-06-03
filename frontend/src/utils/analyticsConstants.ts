@@ -111,6 +111,14 @@ export const DELETE_PASSKEY_ANALYTICS = {
   },
 } as const;
 
+export const RENAME_PASSKEY_ANALYTICS = {
+  FLOW_ID: "rename_passkey",
+
+  STEPS: {
+    RENAME_PASSKEY: "rename_passkey",
+  },
+} as const;
+
 export const GA_CATEGORIES = {
   pageView: "pageview",
 } as const;
