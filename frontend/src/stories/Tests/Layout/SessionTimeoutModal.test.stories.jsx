@@ -1,4 +1,4 @@
-import { expect, userEvent } from "@storybook/test";
+import { expect, userEvent } from "storybook/test";
 import {
   waitForModal,
   getClickableButton,

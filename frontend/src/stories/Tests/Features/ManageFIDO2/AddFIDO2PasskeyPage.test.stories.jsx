@@ -19,7 +19,7 @@
  *       passkeys: password → OTP validation shown immediately (selection
  *       skipped)
  */
-import { expect, userEvent, waitFor, within } from "@storybook/test";
+import { expect, userEvent, waitFor, within } from "storybook/test";
 import {
   AVAILABLE_LANGUAGES,
   FLOW_TYPES,
