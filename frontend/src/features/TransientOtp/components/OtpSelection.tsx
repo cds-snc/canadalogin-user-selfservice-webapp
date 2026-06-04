@@ -128,6 +128,10 @@ export default function OtpSelection({
     gap: "1.5rem",
   };
 
+  const actionLinkStyle = {
+    textDecoration: "underline",
+  };
+
   return (
     <GcdsContainer role="main">
       <GcdsContainer className="gcds-gap">
@@ -175,6 +179,7 @@ export default function OtpSelection({
                   <GcdsLink
                     size="regular"
                     role="button"
+                    style={actionLinkStyle}
                     aria-label={t("TransientOtpSelection.textMeEndingIn", {
                       digits: getLastFourDigits(factor.destination),
                     })}
@@ -221,6 +226,7 @@ export default function OtpSelection({
                   <GcdsLink
                     size="regular"
                     role="button"
+                    style={actionLinkStyle}
                     aria-label={t("TransientOtpSelection.callMeEndingIn", {
                       digits: getLastFourDigits(factor.destination),
                     })}
@@ -263,6 +269,7 @@ export default function OtpSelection({
                   <GcdsLink
                     size="regular"
                     role="button"
+                    style={actionLinkStyle}
                     aria-label={t("TransientOtpSelection.verifyWithPasskey", {
                       name: passkey.attributes?.nickname ?? passkey.id,
                     })}
@@ -304,6 +311,7 @@ export default function OtpSelection({
                 <GcdsLink
                   size="regular"
                   role="button"
+                  style={actionLinkStyle}
                   onGcdsClick={() => onSelectEmail()}
                 >
                   {t("TransientOtpSelection.emailMe")}
