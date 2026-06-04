@@ -7,7 +7,7 @@
     "genericProblem": "There was a problem",
     "invalidEmail": "Invalid email. Email must contain an '@' symbol followed by a domain.",
     "invalidCode": "Codes must be six digits. Try again.",
-    "passwordMinLength": "Password must be 12 characters",
+    "passwordMinLength": "Passwords are a minimum of 12 characters and a maximum of 65. Try again.",
     "passwordLengthRange": "Passwords are a minimum of 12 characters and a maximum of 65. Try again.",
     "codeMismatch": "Code sent does not match. Try again.",
     "serverError": "Server Error. Please try again later.",
