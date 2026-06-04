@@ -148,7 +148,7 @@ describe("OtpSelection Component", () => {
       expect(links).toHaveLength(1);
       expect(links[0]).toHaveAttribute(
         "href",
-        "https://login.alpha.canada.ca/en/users/get-started/two-step-verification-methods/",
+        "https://login.canada.ca/en/users/get-started/two-step-verification-methods/",
       );
     });
 
