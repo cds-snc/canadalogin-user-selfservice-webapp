@@ -7,7 +7,7 @@
     "genericProblem": "Un problème est survenu",
     "invalidEmail": "Adresse courriel invalide. L'adresse courriel doit contenir un symbole « @ » suivi d'un domaine.",
     "invalidCode": "Les codes doivent être composés de six chiffres. Veuillez réessayer.",
-    "passwordMinLength": "Les mots de passe doivent être composés de 12 caractères",
+    "passwordMinLength": "Les mots de passe sont composés d'entre 12 et 65 caractères. Veuillez réessayer.",
     "passwordLengthRange": "Les mots de passe sont composés d'entre 12 et 65 caractères. Veuillez réessayer.",
     "codeMismatch": "Code invalide. Veuillez réessayer.",
     "serverError": "Une erreur du serveur s'est produite. Veuillez réessayer plus tard.",
