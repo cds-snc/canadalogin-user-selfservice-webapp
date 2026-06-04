@@ -1,4 +1,4 @@
-import { expect, within, waitFor } from "@storybook/test";
+import { expect, within, waitFor } from "storybook/test";
 import OtpSelection from "../../../../features/TransientOtp/components/OtpSelection.jsx";
 import {
   AVAILABLE_LANGUAGES,

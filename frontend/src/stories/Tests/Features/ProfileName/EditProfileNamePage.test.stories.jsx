@@ -1,4 +1,4 @@
-import { expect, waitFor, userEvent, within } from "@storybook/test";
+import { expect, waitFor, userEvent, within } from "storybook/test";
 import {
   AVAILABLE_LANGUAGES,
   FLOW_TYPES,

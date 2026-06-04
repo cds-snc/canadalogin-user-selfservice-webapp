@@ -1,4 +1,4 @@
-import { expect, within, waitFor } from "@storybook/test";
+import { expect, within, waitFor } from "storybook/test";
 import OtpVerification from "../../../../features/TransientOtp/components/OtpVerification";
 import { FLOW_TYPES } from "../../../../utils/constants";
 

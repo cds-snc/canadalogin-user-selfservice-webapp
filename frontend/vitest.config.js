@@ -3,7 +3,8 @@ import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
-import { storybookTest } from "@storybook/experimental-addon-test/vitest-plugin";
+import { playwright } from "@vitest/browser-playwright";
+import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -87,7 +88,7 @@ export default defineConfig({
           browser: {
             enabled: true,
             headless: true,
-            provider: "playwright",
+            provider: playwright(),
             instances: [{ browser: "chromium" }],
           },
           setupFiles: [".storybook/vitest.setup.js"],
