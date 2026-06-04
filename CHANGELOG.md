@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.22.1](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.22.0...v1.22.1) (2026-06-04)
+
+
+### Bug Fixes
+
+* Correct French translation formatting for OTP message display ([#1558](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1558)) ([ac966f7](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/ac966f73d88eb691ca98bfbcb46064d9370c823e))
+* Fixed Accessibility Defect on Manage App Passkey Screen ([#1542](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1542)) ([f13bf34](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/f13bf343cb0ada3f4dff2fbe59efd1a02376c55a))
+* GA implementation for rename passkey ([#1534](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1534)) ([835ceed](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/835ceedd2ea2a07e0070fc7e529bf7fc2e95eb5b))
+* Underline action links in OtpSelection component to match design specifications ([#1557](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1557)) ([7eb7a12](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/7eb7a12836bec2be05a24cedea9cda23a4a72707))
+* Update help center links and refactor link handling in OtpSelection and VerifyFIDO2Passkey components ([#1544](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1544)) ([8359386](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/835938630a567342f905662ba629a7bbcd921262))
+* Update help center links to use production URLs for two-step verification ([#1547](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1547)) ([1ebe728](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/1ebe728e629fa520640f6eae733583c3534c6b6f))
+* Update password minimum length error messages to match design specifications ([#1556](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1556)) ([d4b9f15](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/d4b9f1508d4c655ebb17ceb30230492b387a7596))
+* Update username retrieval logic to prioritize givenName and familyName ([#1554](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1554)) ([33c5c37](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/33c5c370f03dc1f6c3bb095e2c86f131c3a4c035))
+
 ## [1.22.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.21.0...v1.22.0) (2026-06-02)
 
 
