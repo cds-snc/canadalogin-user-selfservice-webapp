@@ -24,6 +24,23 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </span>
   ),
+  GcdsNotice: ({
+    children,
+    noticeRole,
+    noticeTitle,
+    noticeTitleTag,
+    ...props
+  }) => (
+    <div
+      data-testid="gcds-notice"
+      data-notice-role={noticeRole}
+      data-notice-title={noticeTitle}
+      data-notice-title-tag={noticeTitleTag}
+      {...props}
+    >
+      {children}
+    </div>
+  ),
   GcdsDetails: ({ children, detailsTitle, ...props }) => (
     <details data-testid="gcds-details" {...props}>
       <summary>{detailsTitle}</summary>
@@ -205,6 +222,21 @@ describe("Password Component", () => {
   });
 
   describe("Component Rendering", () => {
+    it("renders success notice after OTP verification", async () => {
+      renderComponent();
+
+      await waitFor(() => {
+        expect(screen.getByTestId("gcds-notice")).toBeInTheDocument();
+      });
+
+      const notice = screen.getByTestId("gcds-notice");
+      expect(notice).toHaveAttribute("data-notice-role", "success");
+      expect(notice).toHaveAttribute("data-notice-title", "Success");
+      expect(
+        screen.getByText("You have verified your CanadaLogin"),
+      ).toBeInTheDocument();
+    });
+
     it("renders the password change form", async () => {
       renderComponent();
 
