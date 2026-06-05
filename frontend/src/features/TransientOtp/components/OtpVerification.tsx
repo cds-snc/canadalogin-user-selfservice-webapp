@@ -214,7 +214,7 @@ export default function OtpVerification({
       <GcdsContainer>
         <GcdsHeading tag="h1" lang={language}>
           {userMfaType === FLOW_TYPES.email
-            ? t("Verification.checkYourEmail")
+            ? t("CheckYourEmail.checkYourEmail")
             : t("Verification.checkYourPhone")}
         </GcdsHeading>
 
@@ -254,12 +254,15 @@ export default function OtpVerification({
           </>
         ) : (
           <>
+            {userMfaType === FLOW_TYPES.email && (
+              <GcdsText>{t("CheckYourEmail.toChangeYourPassword")}</GcdsText>
+            )}
             <GcdsText>
               {userMfaType === FLOW_TYPES.voice
                 ? t("Verification.voiceCodeSent")
                 : userMfaType === FLOW_TYPES.sms
                   ? t("Verification.smsCodeSent")
-                  : t("Verification.emailCodeSent")}
+                  : t("CheckYourEmail.emailCodeSent")}
               &nbsp;
               <strong>{userSelectedMfaFactor.destination}</strong>
             </GcdsText>
@@ -268,7 +271,7 @@ export default function OtpVerification({
                 ? t("Verification.callMayTakeMinutes")
                 : userMfaType === FLOW_TYPES.sms
                   ? t("Verification.smsMayTakeMinutes")
-                  : t("Verification.emailMayTakeMinutes")}
+                  : t("CheckYourEmail.emailMayTakeMinutes")}
             </GcdsText>
             <GcdsText>
               {t("Verification.codeExpiresIn")}{" "}
@@ -351,7 +354,7 @@ export default function OtpVerification({
           >
             {userMfaType !== FLOW_TYPES.email
               ? t("Verification.requestNewCode")
-              : t("Verification.sendCodeAgain")}
+              : t("CheckYourEmail.sendCodeAgain")}
           </GcdsLink>
         )}
       </GcdsText>
