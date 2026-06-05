@@ -20,9 +20,12 @@ export default function ProvenInformationCard() {
   const { state } = useUser();
   const name = state?.userProfile?.name?.formatted || "";
 
-  const identity_verification_flow = path(PAGES.idvStartIdentityProofingPage, {
-    language: language,
-  });
+  const startIdentityVerificationFlow = path(
+    PAGES.idvStartIdentityProofingPage,
+    {
+      language: language,
+    },
+  );
 
   // TODO: populate from IDV API once available
   const dateOfBirth = "February 1, 1990";
@@ -76,7 +79,7 @@ export default function ProvenInformationCard() {
             buttonRole="secondary"
             type="button"
             onGcdsClick={() => {
-              navigate(identity_verification_flow);
+              navigate(startIdentityVerificationFlow);
             }}
           >
             {t("ProvenInformationCard.updateButton")}
