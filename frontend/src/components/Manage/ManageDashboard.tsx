@@ -6,11 +6,12 @@ import {
   GcdsHeading,
   GcdsText,
 } from "@gcds-core/components-react";
+import { useEffect } from "react";
 import { useParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import { useError } from "../../hooks/useError";
 import { useNavigateHelper } from "../../hooks/useNavigate";
-import { PAGES } from "../../utils/constants";
+import { PAGES, SESSION_STORAGE_KEYS } from "../../utils/constants";
 import { path } from "../../utils/routeHelpers";
 import { useUser } from "../Providers/useUser";
 import { trackCardClick } from "../../utils/gatag";
@@ -38,6 +39,22 @@ export default function ManageDashboard() {
   const securitySettingsLink = path(PAGES.securitySettings, {
     language,
   });
+
+  useEffect(() => {
+    const shouldRedirectToSecuritySettings =
+      sessionStorage.getItem(
+        SESSION_STORAGE_KEYS.passwordChangeRedirectToSecurity,
+      ) === "true";
+
+    if (!shouldRedirectToSecuritySettings) {
+      return;
+    }
+
+    sessionStorage.removeItem(
+      SESSION_STORAGE_KEYS.passwordChangeRedirectToSecurity,
+    );
+    navigateHelper(securitySettingsLink, true);
+  }, [navigateHelper, securitySettingsLink]);
 
   const handlePersonalInfoClick = (event: GcdsNavigationEvent) => {
     event.preventDefault();

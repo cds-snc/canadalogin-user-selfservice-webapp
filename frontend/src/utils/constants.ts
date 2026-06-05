@@ -24,6 +24,11 @@ export const OIDC_REDIRECT = {
   reauth: `${config.apiUrl}/v1/auth/reauth`,
 } as const;
 
+export const SESSION_STORAGE_KEYS = {
+  postLogout: "post_logout",
+  passwordChangeRedirectToSecurity: "password_change_redirect_to_security",
+} as const;
+
 export const INVALID_OTP_ERROR_CODES = [
   "CSIAM0011E",
   "CSIBN0025E",
