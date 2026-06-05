@@ -11,7 +11,6 @@ import {
   GcdsNotice,
 } from "@gcds-core/components-react";
 
-import { identityVerificationApi } from "./api/identityVerificationApi";
 import OnlineRadioButtons from "./components/OnlineRadioButtons";
 import InPersonRadioButtons from "./components/InPersonRadioButtons";
 import { ONLINE_IDV_METHOD, type IdvMethod } from "./components/methods.ts";
@@ -37,6 +36,10 @@ export default function StartIdentityProofingPage() {
     language: language,
   });
 
+  const provincialVerificationPage = path(PAGES.idvProvincialVerificationPage, {
+    language: language,
+  });
+
   const handleOnlineMethodChange = (method: IdvMethod) => {
     setOnlineSelectedMethod(method);
     setInPersonSelectedMethod(undefined);
@@ -55,8 +58,7 @@ export default function StartIdentityProofingPage() {
         navigate(onlineVerificationInfoPage);
         break;
       case ONLINE_IDV_METHOD.provincialPartner:
-        // TODO: implement provincial partner flow
-        navigate(serviceCanadaPage);
+        navigate(provincialVerificationPage);
         break;
       case IN_PERSON_METHOD.serviceCanadaLocations:
         navigate(serviceCanadaPage);
