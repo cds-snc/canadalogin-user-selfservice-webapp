@@ -144,6 +144,10 @@ export const PAGES = {
   idvOnlineVerificationInfoPage: "IdvOnlineVerificationInfoPage",
 } as const;
 
+export const ROUTE_PATTERNS = {
+  securitySettings: "/:language/security-settings",
+} as const;
+
 export const PRIVACY_NOTICE_LINKS = {
   en: `${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainEN}/users/privacy/`,
   fr: `${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainFR}/utilisateurs/confidentialite/`,

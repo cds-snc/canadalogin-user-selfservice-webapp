@@ -411,6 +411,10 @@ export default function ChangePasswordIndex() {
         otpSentResponse={otpSentResponse}
         userOtpValue={userOtpValue}
         onNext={() => {
+          sessionStorage.setItem(
+            SESSION_STORAGE_KEYS.passwordChangeRedirectToSecurity,
+            "true",
+          );
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
             step: CHANGE_PASSWORD_ANALYTICS.STEPS.SUCCESS,
