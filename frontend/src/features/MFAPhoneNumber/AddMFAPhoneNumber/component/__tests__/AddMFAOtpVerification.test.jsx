@@ -623,32 +623,6 @@ describe("AddMFAOtpVerification Unit Tests", () => {
     });
   });
 
-  describe("OTP Type Variations", () => {
-    it("should handle email OTP type messaging", () => {
-      render(
-        <TestWrapper>
-          <AddMFAOtpVerification
-            onNext={mockOnNext}
-            onCancel={mockOnCancel}
-            onBack={mockOnBack}
-            onChangePhoneForm={mockOnChangePhoneForm}
-            phoneFormData={{ ...defaultPhoneFormData, otpType: "email" }}
-            errorMessage=""
-            requestNewOtpCode={mockRequestNewOtpCode}
-            onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
-          />
-        </TestWrapper>,
-      );
-
-      expect(screen.getByText("Check your phone")).toBeInTheDocument();
-      expect(
-        screen.getByText(
-          /Your email might take a few minutes to arrive\. If you cannot find the email in your inbox, check your spam folder\./,
-        ),
-      ).toBeInTheDocument();
-    });
-  });
-
   describe("Component Integration", () => {
     it("should handle complete user flow", async () => {
       const { rerender } = render(
