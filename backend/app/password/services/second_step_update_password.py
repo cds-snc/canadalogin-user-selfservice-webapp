@@ -2,6 +2,8 @@ import logging
 from datetime import datetime
 
 from httpx import AsyncClient
+from httpx import HTTPStatusError
+from fastapi import HTTPException, status
 
 from app.config import get_configuration
 from app.password.schemas import (
@@ -10,6 +12,7 @@ from app.password.schemas import (
     UpdatePasswordClientResponsePayload,
 )
 from app.utils.access_token import get_admin_token, get_auth_request_headers
+from app.utils.global_error_handlers import extract_response_body
 from app.utils.schemas import ResponseModel
 
 logger = logging.getLogger(__name__)
@@ -75,6 +78,24 @@ async def dispatch_password_otp_validator(
     )
     logger.info(f"returned response from resetter_otp_api_endpoint: {response.json()}")
 
-    response.raise_for_status()
+    try:
+        response.raise_for_status()
+    except HTTPStatusError as exc:
+        if exc.response and exc.response.status_code == status.HTTP_400_BAD_REQUEST:
+            body = extract_response_body(exc.response)
+            detail = {
+                "message": body.get("messageId", "Bad request"),
+            }
+            if body.get("attempts") is not None:
+                detail["attempts"] = body.get("attempts")
+            if body.get("retries") is not None:
+                detail["retries"] = body.get("retries")
+
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=detail,
+            ) from exc
+        raise
+
     logger.info("resetter_otp_api_endpoint returned successfully")
     return response

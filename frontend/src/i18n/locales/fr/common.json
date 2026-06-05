@@ -44,6 +44,9 @@
     "otp_invalid_attempts_one": "Code invalide. Il vous reste {{count}} tentative.",
     "otp_invalid_attempts_other": "Code invalide. Il vous reste {{count}} tentatives.",
     "otp_max_attempts": "Vous avez atteint la limite de tentatives. Attendez 15 minutes et réessayez.",
+    "password_invalid_attempts_one": "Mot de passe incorrect. Il vous reste {{count}} tentative.",
+    "password_invalid_attempts_other": "Mot de passe incorrect. Il vous reste {{count}} tentatives.",
+    "password_max_attempts": "Vous avez atteint la limite de tentatives de vérification. Attendez 15 minutes et réessayez.",
     "otp_expired": "Votre code a expiré. Demandez un nouveau code ci-dessous."
   }
 }
