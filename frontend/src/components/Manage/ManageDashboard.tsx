@@ -31,7 +31,6 @@ export default function ManageDashboard() {
     state?.userProfile?.name?.givenName || state?.userProfile?.name?.familyName;
   const error = getError("#dashboard");
   const navigateHelper = useNavigateHelper();
-  console.log(state);
 
   const personalInformationLink = path(PAGES.ProfileHome, {
     language,
