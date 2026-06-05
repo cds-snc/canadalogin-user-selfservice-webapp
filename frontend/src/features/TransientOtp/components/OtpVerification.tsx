@@ -73,6 +73,7 @@ export default function OtpVerification({
   showTryAnotherWay = true,
   resetAttempts,
   otpExpiry = null,
+  onCancel,
 }: OtpVerificationProps) {
   const { language } = useParams();
   const [time, setTime] = useState(initialTime);
@@ -224,7 +225,7 @@ export default function OtpVerification({
 
             <GcdsGrid
               columns={
-                showTryAnotherWay ? "max-content max-content" : "max-content"
+                showTryAnotherWay ? "max-content" : "max-content max-content"
               }
               gap="200"
             >
@@ -249,7 +250,18 @@ export default function OtpVerification({
                 >
                   {t("Verification.chooseDifferentMethod")}
                 </GcdsButton>
-              ) : null}
+              ) : (
+                <GcdsButton
+                  buttonRole="secondary"
+                  style={{ width: "fit-content" }}
+                  onGcdsClick={(ev) => {
+                    ev.preventDefault();
+                    onCancel();
+                  }}
+                >
+                  {t("Verification.cancel")}
+                </GcdsButton>
+              )}
             </GcdsGrid>
           </>
         ) : (
@@ -304,7 +316,7 @@ export default function OtpVerification({
 
             <GcdsGrid
               columns={
-                showTryAnotherWay ? "max-content max-content" : "max-content"
+                showTryAnotherWay ? "max-content" : "max-content max-content"
               }
               gap="200"
             >
@@ -328,7 +340,18 @@ export default function OtpVerification({
                 >
                   {t("Verification.chooseDifferentMethod")}
                 </GcdsButton>
-              ) : null}
+              ) : (
+                <GcdsButton
+                  buttonRole="secondary"
+                  style={{ width: "fit-content" }}
+                  onGcdsClick={(ev) => {
+                    ev.preventDefault();
+                    onCancel();
+                  }}
+                >
+                  {t("Verification.cancel")}
+                </GcdsButton>
+              )}
             </GcdsGrid>
           </>
         )}
