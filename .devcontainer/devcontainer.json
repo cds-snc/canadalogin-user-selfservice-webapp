@@ -35,14 +35,14 @@
         "hashicorp.terraform",
         "redhat.vscode-yaml",
         "ms-python.python",
+        "ms-python.debugpy",
         "hashicorp.hcl",
         "mermaidchart.vscode-mermaid-chart",
         "eamodio.gitlens",
         "github.vscode-github-actions",
         "ms-vscode.makefile-tools",
         "jebbs.plantuml",
-        "esbenp.prettier-vscode",
-        "ms-python.debugpy"
+        "esbenp.prettier-vscode"
       ],
       "settings": {
         "editor.defaultFormatter": "esbenp.prettier-vscode",
