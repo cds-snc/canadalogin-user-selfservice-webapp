@@ -4,7 +4,7 @@
  * consistent methods for interacting with GCDS shadow DOM elements.
  */
 
-import { expect, waitFor } from "@storybook/test";
+import { expect, waitFor } from "storybook/test";
 
 /**
  * Default timeout for waitFor operations (in milliseconds)

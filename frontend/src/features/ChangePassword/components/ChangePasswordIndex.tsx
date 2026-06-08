@@ -8,7 +8,6 @@ import Password from "./Password";
 import PasswordChangedConfirmation from "./PasswordChangedConfirmation";
 
 import { PAGES } from "../../../utils/constants";
-import { FLOW_TYPES } from "../../../utils/constants";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch";
 import { getErrorMessage } from "../../../utils/errorUtils";
 import { authService } from "../../../services/authService";
@@ -28,7 +27,6 @@ import { GA_FORM_EVENTS } from "../../../utils/analyticsConstants";
 import { CHANGE_PASSWORD_ANALYTICS } from "../../../utils/analyticsConstants";
 import type { AuthServiceError } from "../../../types/services";
 import type { PasswordUpdateTransactionData } from "../api/passwordUpdate";
-import type { OtpFactor } from "../../../types/hooks";
 
 const defaultPasswordUpdateStep = "passwordVerification";
 
@@ -53,7 +51,12 @@ function getApiErrorMessage(error: unknown): string | undefined {
   }
 
   const authError = error as AuthServiceError;
-  return authError.data?.message ?? authError.response?.data?.message;
+  return (
+    authError.data?.messageId ??
+    authError.response?.data?.messageId ??
+    authError.data?.message ??
+    authError.response?.data?.message
+  );
 }
 
 function normalizePasswordUpdateTransaction(
@@ -73,15 +76,13 @@ export default function ChangePasswordIndex() {
     useState<PasswordUpdateTransactionData | null>(null);
   const [errorCode, setErrorCode] = useState("");
   const [customErrorMessage, setCustomErrorMessage] = useState("");
-
-  const errorMessage =
-    customErrorMessage || getErrorMessage(language, errorCode);
+  const [passwordUpdateStep, setPasswordUpdateStep] =
+    useState<PasswordUpdateStep>(defaultPasswordUpdateStep);
+  const baseErrorMessage = getErrorMessage(language, errorCode);
+  const errorMessage = customErrorMessage || baseErrorMessage;
 
   const [userPasswordValue, setUserPasswordValue] = useState("");
   const { t } = useTranslation(["security", "layout"]);
-
-  const [passwordUpdateStep, setPasswordUpdateStep] =
-    useState<PasswordUpdateStep>(defaultPasswordUpdateStep);
 
   // Initialize form tracking
   const { trackEvent } = useFormTracking({
@@ -101,16 +102,8 @@ export default function ChangePasswordIndex() {
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(
     setErrorCode,
     async () => {
-      // If there are no phone MFA factors, skip OTP selection and go directly to email OTP validation
+      // If there are no enrolled MFA factors, stay on password step.
       if (!userPhoneFactors || userPhoneFactors.length === 0) {
-        trackEvent({
-          event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
-          step: CHANGE_PASSWORD_ANALYTICS.STEPS.OTP_VALIDATION,
-        });
-        const success = await requestEmailOtpCode();
-        if (success) {
-          setPasswordUpdateStep("otpValidation");
-        }
         return;
       }
 
@@ -131,7 +124,7 @@ export default function ChangePasswordIndex() {
     },
   );
 
-  // Create tracked password validation wrapper
+  // Create password validation wrapper
   const handleValidatePassword = async (password: string) => {
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_START,
@@ -150,41 +143,12 @@ export default function ChangePasswordIndex() {
     handleChangeUserMfaSelection,
     handleSetUserOtpValue,
     setOtpLoading: setLocalLoading,
-    setUserSelectedMfaFactor,
   } = useOtpOperations({
     userId: id,
     userName,
     setErrorCode,
+    includeEmailFactors: true,
   });
-
-  // Create an email factor for the email OTP option
-  const emailFactor: OtpFactor = {
-    id: "",
-    type: FLOW_TYPES.email,
-    destination: userName ?? "",
-  };
-
-  // Request OTP code via email for the password change flow
-  const requestEmailOtpCode = async (): Promise<boolean> => {
-    setUserSelectedMfaFactor(emailFactor);
-    userSelectedMfaFactorRef.current = emailFactor;
-    try {
-      const response = await passwordUpdate.firstStep(userName, emailFactor);
-
-      if (response?.success && response.data) {
-        setOtpSentResponse(normalizePasswordUpdateTransaction(response.data));
-        setErrorCode("");
-        return true;
-      }
-      return false;
-    } catch (err) {
-      const message = getApiErrorMessage(err);
-      if (message) {
-        setErrorCode(message);
-      }
-      return false;
-    }
-  };
 
   // Custom requestOtpCode for password change flow using passwordUpdate API
   const requestOtpCode = async (): Promise<boolean> => {
@@ -270,7 +234,7 @@ export default function ChangePasswordIndex() {
     setLoading(true, t("TopNavBar.signingOut", { ns: "layout" }));
 
     try {
-      const response = await authService.logout();
+      const response = await authService.logout(backToSecuritySettingsPage);
 
       const redirectUrl = response?.data?.redirect_url || null;
 
@@ -333,19 +297,6 @@ export default function ChangePasswordIndex() {
         }}
         onCancel={() => navigate(backToSecuritySettingsPage)}
         parentPage={PAGES.password}
-        emailAddress={userName}
-        onSelectEmail={() => {
-          void (async () => {
-            const success = await requestEmailOtpCode();
-            if (success) {
-              setPasswordUpdateStep("otpValidation");
-              trackEvent({
-                event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
-                step: CHANGE_PASSWORD_ANALYTICS.STEPS.OTP_VALIDATION,
-              });
-            }
-          })();
-        }}
       />
     ),
     otpValidation: userSelectedMfaFactor ? (
@@ -358,9 +309,6 @@ export default function ChangePasswordIndex() {
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: CHANGE_PASSWORD_ANALYTICS.STEPS.OTP_VALIDATION,
           });
-          if (userSelectedMfaFactor.type === FLOW_TYPES.email) {
-            return requestEmailOtpCode();
-          }
           return requestOtpCode();
         }}
         validateOtpCode={(userOtp) => {

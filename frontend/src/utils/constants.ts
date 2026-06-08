@@ -24,6 +24,10 @@ export const OIDC_REDIRECT = {
   reauth: `${config.apiUrl}/v1/auth/reauth`,
 } as const;
 
+export const SESSION_STORAGE_KEYS = {
+  postLogout: "post_logout",
+} as const;
+
 export const INVALID_OTP_ERROR_CODES = [
   "CSIAM0011E",
   "CSIBN0025E",
@@ -50,6 +54,7 @@ export const FLOW_TYPES = {
   sms: "smsotp",
   voice: "voiceotp",
   email: "email",
+  emailOtp: "emailotp",
   dashboard: "dashboard",
   profile: "profile",
   manage: "manage",
@@ -162,6 +167,7 @@ export const serverMapping = {
   [FLOW_TYPES.sms]: "sms",
   [FLOW_TYPES.voice]: "voice",
   [FLOW_TYPES.email]: "email",
+  [FLOW_TYPES.emailOtp]: "email",
 } as const;
 
 export const SUBMIT_END_POINTS = {
@@ -549,4 +555,12 @@ export const countryMapping = {
     zm: "Zambie",
     zw: "Zimbabwe",
   },
+} as const;
+export const gcHelpCentreLinks = {
+  twoStepVerification: {
+    en: `${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainEN}/users/get-started/two-step-verification-methods/`,
+    fr: `${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainFR}/fr/utilisateurs/se-lancer-connexioncanada/verification-deux-etapes/`,
+  },
+  cannotAccessPhone:
+    "https://login.alpha.canada.ca/en/users/trouble-signing-in/problems-signing-in-with-2-step-verification/#cannot-access-your-2step-verification-phone",
 } as const;

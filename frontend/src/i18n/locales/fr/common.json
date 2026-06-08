@@ -7,7 +7,7 @@
     "genericProblem": "Un problème est survenu",
     "invalidEmail": "Adresse courriel invalide. L'adresse courriel doit contenir un symbole « @ » suivi d'un domaine.",
     "invalidCode": "Les codes doivent être composés de six chiffres. Veuillez réessayer.",
-    "passwordMinLength": "Les mots de passe doivent être composés de 12 caractères",
+    "passwordMinLength": "Les mots de passe sont composés d'entre 12 et 65 caractères. Veuillez réessayer.",
     "passwordLengthRange": "Les mots de passe sont composés d'entre 12 et 65 caractères. Veuillez réessayer.",
     "codeMismatch": "Code invalide. Veuillez réessayer.",
     "serverError": "Une erreur du serveur s'est produite. Veuillez réessayer plus tard.",
@@ -20,8 +20,9 @@
     "maxLength": "and a maximum of",
     "characters": "caractères.",
     "example_password_used": "Invalid password. Password cannot be the example password. Try again.",
-    "CSIAM0010E": "La tentative d'authentification a échoué",
+    "CSIAM0010E": "Vous avez atteint la limite de tentatives. Attendez 15 minutes et réessayez.",
     "CSIAM0011E": "Le code de vérification n'est pas valide ou a expiré.",
+    "CSIAM0023E": "Vous avez atteint la limite de tentatives. Attendez 15 minutes et réessayez.",
     "CSIAM0038E": "Trop de tentatives",
     "CSIAI0021E": "Le mot de passe que vous avez spécifié a déjà été utilisé et ne peut pas être réutilisé.",
     "CSIBN0025E": "Le code de vérification n'est pas valide ou a expiré.",
@@ -44,6 +45,9 @@
     "otp_invalid_attempts_one": "Code invalide. Il vous reste {{count}} tentative.",
     "otp_invalid_attempts_other": "Code invalide. Il vous reste {{count}} tentatives.",
     "otp_max_attempts": "Vous avez atteint la limite de tentatives. Attendez 15 minutes et réessayez.",
+    "password_invalid_attempts_one": "Mot de passe incorrect. Il vous reste {{count}} tentative.",
+    "password_invalid_attempts_other": "Mot de passe incorrect. Il vous reste {{count}} tentatives.",
+    "password_max_attempts": "Vous avez atteint la limite de tentatives de vérification. Attendez 15 minutes et réessayez.",
     "otp_expired": "Votre code a expiré. Demandez un nouveau code ci-dessous."
   }
 }

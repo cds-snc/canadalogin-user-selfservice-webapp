@@ -170,7 +170,7 @@ export const authService: AuthServiceContract = {
   update_phone_with_otp: async (phoneNumber, otp, trxnId, otpType = "sms") => {
     try {
       const updatePayload: UpdatePhonePayload = {
-        contactNumber: phoneNumber,
+        phoneNumbers: [{ value: phoneNumber, type: "mobile" }],
         otp,
         trxnId,
         otpType,
@@ -195,11 +195,19 @@ export const authService: AuthServiceContract = {
       handleApiError(error as AuthServiceError);
     }
   },
-  logout: async () => {
+  logout: async (returnToPage) => {
     try {
+      const logoutUrl = new URL(
+        `${config.apiUrl}${SUBMIT_END_POINTS.logout}`,
+        window.location.origin,
+      );
+      if (returnToPage) {
+        logoutUrl.searchParams.set("returnToPage", returnToPage);
+      }
+
       const response = await axios.post<
         AuthServiceResponse<LogoutResponseData>
-      >(`${config.apiUrl}${SUBMIT_END_POINTS.logout}`);
+      >(logoutUrl.toString());
       const returnedUrl = response.data?.data?.redirect_url;
 
       if (response.status === 200 && returnedUrl) {

@@ -1,4 +1,4 @@
-import { expect, userEvent, within } from "@storybook/test";
+import { expect, userEvent, within } from "storybook/test";
 import { reactRouterParameters } from "storybook-addon-remix-react-router";
 import { http, HttpResponse } from "msw";
 import config from "../../../config";

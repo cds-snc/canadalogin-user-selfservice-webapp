@@ -7,7 +7,7 @@
     "genericProblem": "There was a problem",
     "invalidEmail": "Invalid email. Email must contain an '@' symbol followed by a domain.",
     "invalidCode": "Codes must be six digits. Try again.",
-    "passwordMinLength": "Password must be 12 characters",
+    "passwordMinLength": "Passwords are a minimum of 12 characters and a maximum of 65. Try again.",
     "passwordLengthRange": "Passwords are a minimum of 12 characters and a maximum of 65. Try again.",
     "codeMismatch": "Code sent does not match. Try again.",
     "serverError": "Server Error. Please try again later.",
@@ -20,8 +20,9 @@
     "maxLength": "and a maximum of",
     "characters": "characters.",
     "example_password_used": "Invalid password. Password cannot be the example password. Try again.",
-    "CSIAM0010E": "The authentication attempt failed",
+    "CSIAM0010E": "You have reached the limit of attempts. Wait 15 minutes and try again.",
     "CSIAM0011E": "The verification code is invalid or has expired.",
+    "CSIAM0023E": "You have reached the limit of attempts. Wait 15 minutes and try again.",
     "CSIAM0038E": "Too Many Attempts",
     "CSIAI0021E": "The password that you specified was used previously, and it cannot be reused.",
     "CSIBN0025E": "The verification code is invalid or has expired.",
@@ -44,6 +45,9 @@
     "otp_invalid_attempts_one": "Invalid code. You have {{count}} attempt remaining.",
     "otp_invalid_attempts_other": "Invalid code. You have {{count}} attempts remaining.",
     "otp_max_attempts": "You have reached the limit of attempts. Wait 15 minutes and try again.",
+    "password_invalid_attempts_one": "Incorrect password. You have {{count}} attempt remaining.",
+    "password_invalid_attempts_other": "Incorrect password. You have {{count}} attempts remaining.",
+    "password_max_attempts": "You have reached the limit for verification attempts. Wait 15 minutes and try again.",
     "otp_expired": "Your code has expired. Request a new code below."
   }
 }

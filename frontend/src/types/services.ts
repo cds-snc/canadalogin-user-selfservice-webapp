@@ -10,11 +10,13 @@ export type AuthServiceResponse<TData = unknown> = {
 export type AuthServiceError = {
   data?: {
     message?: string;
+    messageId?: string;
     [key: string]: unknown;
   };
   response?: ApiErrorResponse & {
     data?: {
       message?: string;
+      messageId?: string;
       [key: string]: unknown;
     };
   };
@@ -74,8 +76,13 @@ export type RelyingPartyData = {
   [key: string]: unknown;
 };
 
+export type PhoneNumberEntry = {
+  value: string;
+  type: "mobile";
+};
+
 export type UpdatePhonePayload = {
-  contactNumber: string;
+  phoneNumbers: PhoneNumberEntry[];
   otp: string;
   trxnId: string;
   otpType: Extract<OtpTransportType, "sms" | "voice">;
@@ -128,7 +135,9 @@ export type AuthServiceContract = {
     otpType?: Extract<OtpTransportType, "sms" | "voice">,
   ) => Promise<AuthServiceResponse | undefined>;
   get_rp_info: () => Promise<AuthServiceResponse<RelyingPartyData> | undefined>;
-  logout: () => Promise<AuthServiceResponse<LogoutResponseData> | undefined>;
+  logout: (
+    returnToPage?: string,
+  ) => Promise<AuthServiceResponse<LogoutResponseData> | undefined>;
   keepAlive: () => Promise<
     AuthServiceResponse<SessionKeepAliveData> | undefined
   >;

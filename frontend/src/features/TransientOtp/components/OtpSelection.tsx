@@ -10,7 +10,7 @@ import {
 import { useParams } from "react-router";
 
 import { useTranslation } from "react-i18next";
-import { gcHelpCentreLinks } from "../../../utils/gcHelpCentreLinks";
+import { gcHelpCentreLinks } from "../../../utils/constants";
 
 import { FLOW_TYPES, PAGES } from "../../../utils/constants";
 import type { Fido2Credential, OtpFactor } from "../../../types/hooks";
@@ -54,8 +54,6 @@ interface OtpSelectionProps {
   onSelectFIDO2?: (passkey: Fido2Credential) => void;
   parentPage: string;
   onCancel: () => void;
-  emailAddress?: string | null;
-  onSelectEmail?: () => void;
 }
 
 function getLastFourDigits(value?: string | null) {
@@ -88,10 +86,8 @@ export default function OtpSelection({
   onSelectFIDO2,
   parentPage,
   onCancel,
-  emailAddress,
-  onSelectEmail,
 }: OtpSelectionProps) {
-  const { language } = useParams();
+  const { language } = useParams<{ language?: "en" | "fr" }>();
 
   const { t } = useTranslation(["otp", "common"]);
 
@@ -99,6 +95,12 @@ export default function OtpSelection({
     userPhoneFactors?.filter((f) => f.type === FLOW_TYPES.sms) ?? [];
   const voiceFactors =
     userPhoneFactors?.filter((f) => f.type === FLOW_TYPES.voice) ?? [];
+  const emailFactors =
+    userPhoneFactors?.filter(
+      (f) => f.type === FLOW_TYPES.email || f.type === FLOW_TYPES.emailOtp,
+    ) ?? [];
+  const isChangePasswordFlow =
+    parentPage.toLowerCase() === PAGES.password.toLowerCase();
   const hasFido2 = fido2Data && fido2Data.length > 0;
 
   const handlePhoneFactorSelect = (factorId: string) => {
@@ -126,6 +128,10 @@ export default function OtpSelection({
     display: "flex",
     flexDirection: "column" as const,
     gap: "1.5rem",
+  };
+
+  const actionLinkStyle = {
+    textDecoration: "underline",
   };
 
   return (
@@ -175,6 +181,7 @@ export default function OtpSelection({
                   <GcdsLink
                     size="regular"
                     role="button"
+                    style={actionLinkStyle}
                     aria-label={t("TransientOtpSelection.textMeEndingIn", {
                       digits: getLastFourDigits(factor.destination),
                     })}
@@ -221,6 +228,7 @@ export default function OtpSelection({
                   <GcdsLink
                     size="regular"
                     role="button"
+                    style={actionLinkStyle}
                     aria-label={t("TransientOtpSelection.callMeEndingIn", {
                       digits: getLastFourDigits(factor.destination),
                     })}
@@ -263,6 +271,7 @@ export default function OtpSelection({
                   <GcdsLink
                     size="regular"
                     role="button"
+                    style={actionLinkStyle}
                     aria-label={t("TransientOtpSelection.verifyWithPasskey", {
                       name: passkey.attributes?.nickname ?? passkey.id,
                     })}
@@ -277,7 +286,7 @@ export default function OtpSelection({
         )}
 
         {/* Email section */}
-        {emailAddress && onSelectEmail && (
+        {isChangePasswordFlow && emailFactors.length > 0 && (
           <GcdsContainer>
             <SectionHeader
               icon={
@@ -295,20 +304,24 @@ export default function OtpSelection({
                 {t("TransientOtpSelection.codeExpiresIn")}{" "}
                 <strong>{t("TransientOtpSelection.tenMinutes")}</strong>
               </GcdsText>
-              <GcdsGrid
-                columns="1fr auto"
-                align-items="center"
-                style={factorRowStyle}
-              >
-                <GcdsText marginBottom="0">{emailAddress}</GcdsText>
-                <GcdsLink
-                  size="regular"
-                  role="button"
-                  onGcdsClick={() => onSelectEmail()}
+              {emailFactors.map((factor) => (
+                <GcdsGrid
+                  key={factor.id}
+                  columns="1fr auto"
+                  align-items="center"
+                  style={factorRowStyle}
                 >
-                  {t("TransientOtpSelection.emailMe")}
-                </GcdsLink>
-              </GcdsGrid>
+                  <GcdsText marginBottom="0">{factor.destination}</GcdsText>
+                  <GcdsLink
+                    size="regular"
+                    role="button"
+                    style={actionLinkStyle}
+                    onGcdsClick={() => handlePhoneFactorSelect(factor.id)}
+                  >
+                    {t("TransientOtpSelection.emailMe")}
+                  </GcdsLink>
+                </GcdsGrid>
+              ))}
             </GcdsContainer>
           </GcdsContainer>
         )}
@@ -331,7 +344,7 @@ export default function OtpSelection({
         </GcdsHeading>
         <GcdsText>
           <GcdsLink
-            href={gcHelpCentreLinks.twoStepVerification}
+            href={gcHelpCentreLinks.twoStepVerification[language ?? "en"]}
             target="_blank"
           >
             {t("TransientOtpSelection.helpLink")}

@@ -12,6 +12,14 @@ from app.auth.services.auth_user_session import update_session_tokens
 logger = logging.getLogger(__name__)
 
 
+def is_safe_return_to_page(return_to_page: Optional[str]) -> bool:
+    """Allow only internal relative paths to avoid open redirects."""
+    if not return_to_page or not isinstance(return_to_page, str):
+        return False
+
+    return return_to_page.startswith("/") and not return_to_page.startswith("//")
+
+
 def get_base_profile_management_url():
     config = get_configuration()
     redirectValue = config.PROFILE_MANAGEMENT_DOMAIN
@@ -35,13 +43,22 @@ def get_callback_redirect_uri(request: Request):
     return redirect_uri
 
 
-async def redirect_user_to_idp_verify(request: Request, prompt: Optional[str] = None):
+async def redirect_user_to_idp_verify(
+    request: Request,
+    prompt: Optional[str] = None,
+    returnToPage: Optional[str] = None,
+):
     """
     Get the redirect URL for the OAuth login flow.
     This function is used to initiate the login process with IBM Verify.
     """
     callback_redirect_uri = get_callback_redirect_uri(request)
     logger.info("Redirecting user to IBM Verify...")
+
+    if is_safe_return_to_page(returnToPage):
+        request.session[SessionKeys.RETURN_TO_PAGE.value] = returnToPage
+        logger.info(f"Return to page set in session from login: {returnToPage}")
+
     extra_params = {}
     if prompt:
         extra_params["prompt"] = prompt
@@ -61,7 +78,7 @@ async def callback_handler(request: Request):
     logger.info("OIDC Callback Handler")
 
     redirectValue = get_base_profile_management_url()
-    returnToPageValue = request.session.get(SessionKeys.RETURN_TO_PAGE.value)
+    returnToPageValue = request.session.pop(SessionKeys.RETURN_TO_PAGE.value, None)
 
     if returnToPageValue:
         clientRedirectValue = f"{returnToPageValue}?{SessionKeys.RETURN_TO_PAGE.value}={returnToPageValue}"

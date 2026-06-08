@@ -222,16 +222,11 @@ export default function FIDO2PasskeyList({
                   setEditingPasskeyId(id);
                 }}
               >
-                <span aria-hidden="true">
-                  {t("Manage2FAVerifications.renamePasskey")}
-                </span>
-                <GcdsSrOnly tag="span">
-                  {t("Manage2FAVerifications.renamePasskey")} {nicknameValue}
-                </GcdsSrOnly>
+                {t("Manage2FAVerifications.renamePasskey")}
+                <GcdsSrOnly tag="span"> {nicknameValue}</GcdsSrOnly>
               </GcdsButton>
               {canDeletePasskey && (
                 <GcdsButton
-                  aria-label="abc"
                   id="delete-fido2-button"
                   buttonRole="secondary"
                   onClick={() => {

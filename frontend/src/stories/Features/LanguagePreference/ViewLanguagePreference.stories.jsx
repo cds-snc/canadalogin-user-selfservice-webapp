@@ -58,6 +58,8 @@ const ViewLanguagePreferencesWrapper = ({
     const preferredLanguage = state?.userProfile?.preferredLanguage || "";
 
     const displayName = LANGUAGE_DISPLAY_NAMES[language][preferredLanguage];
+    const editLabel = pageContent["5"] || "Edit";
+    const editHref = `/${language}/profile/update-language`;
 
     return (
       <>
@@ -72,12 +74,12 @@ const ViewLanguagePreferencesWrapper = ({
         >
           <div>{displayName}</div>
           <a
-            href="#"
+            href={editHref}
             onClick={(ev) => {
               ev.preventDefault();
             }}
           >
-            {pageContent["5"]}
+            {editLabel}
           </a>
         </div>
       </>

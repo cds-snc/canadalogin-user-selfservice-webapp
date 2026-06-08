@@ -191,7 +191,11 @@ export default function VerifyFIDO2Passkey({
         </GcdsHeading>
 
         {/* TODO: add correct hrefs to the links below once domain migrations are done */}
-        <GcdsLink target="_blank">{t("VerifyFIDO2Passkey.helpLink")}</GcdsLink>
+        <GcdsText>
+          <GcdsLink target="_blank">
+            {t("VerifyFIDO2Passkey.helpLink")}
+          </GcdsLink>
+        </GcdsText>
       </GcdsGrid>
     </GcdsContainer>
   );

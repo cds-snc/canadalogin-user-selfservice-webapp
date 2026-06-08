@@ -110,23 +110,19 @@ function ContactPhoneNumber({
 }
 
 export default function ViewContactPhoneNumber({
-  contactNumber,
+  phoneNumbers,
 }: {
-  contactNumber: string | null;
+  phoneNumbers: ContactPhoneDisplayEntry[] | null;
 }) {
   const { language } = useParams<{ language: string }>();
   const { t } = useTranslation("profile");
-
-  const phoneNumbers: ContactPhoneDisplayEntry[] = contactNumber
-    ? [{ value: contactNumber, type: "mobile" }]
-    : [];
 
   return (
     <GcdsContainer>
       <GcdsHeading tag="h3" marginTop="300">
         {t("ProfileHome.contactPhone")}
       </GcdsHeading>
-      {phoneNumbers.length > 0 ? (
+      {phoneNumbers && phoneNumbers.length > 0 ? (
         <ContactPhoneNumber phoneNumbers={phoneNumbers} language={language} />
       ) : (
         <AddPhoneNumber language={language} />

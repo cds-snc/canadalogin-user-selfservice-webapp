@@ -35,8 +35,9 @@ export const passwordUpdate = {
 
     try {
       const otpType =
-        userSelectedMfaFactor.type === FLOW_TYPES.email
-          ? "emailotp"
+        userSelectedMfaFactor.type === FLOW_TYPES.email ||
+        userSelectedMfaFactor.type === FLOW_TYPES.emailOtp
+          ? FLOW_TYPES.emailOtp
           : userSelectedMfaFactor.type;
 
       const data: Record<string, string> = {

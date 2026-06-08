@@ -1,4 +1,4 @@
-import { expect, within, waitFor } from "@storybook/test";
+import { expect, within, waitFor } from "storybook/test";
 import { AVAILABLE_LANGUAGES, PAGES } from "../../../utils/constants";
 import { buildTestCase, TestTemplate } from "../utils/functions.tsx";
 import {
