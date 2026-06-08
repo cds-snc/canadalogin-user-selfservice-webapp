@@ -24,7 +24,7 @@ async def first_step_update_password(
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
 
-    logger.info(f"First step - attempting update password for: {payload}")
+    logger.info("First step - attempting update password")
     start_time = datetime.now()
 
     # Get user's preferred language and unmasked username from their profile
@@ -41,7 +41,7 @@ async def first_step_update_password(
     )
     duration = (datetime.now() - start_time).total_seconds()
     logger.info(
-        f"First step - dispatch_password_reset_otp returned in {duration:.2f} seconds - {payload}"
+        f"First step - dispatch_password_reset_otp returned in {duration:.2f} seconds"
     )
 
     response_json = password_otp_response.json()
