@@ -54,6 +54,7 @@ export const FLOW_TYPES = {
   sms: "smsotp",
   voice: "voiceotp",
   email: "email",
+  emailOtp: "emailotp",
   dashboard: "dashboard",
   profile: "profile",
   manage: "manage",
@@ -166,6 +167,7 @@ export const serverMapping = {
   [FLOW_TYPES.sms]: "sms",
   [FLOW_TYPES.voice]: "voice",
   [FLOW_TYPES.email]: "email",
+  [FLOW_TYPES.emailOtp]: "email",
 } as const;
 
 export const SUBMIT_END_POINTS = {

@@ -6,7 +6,6 @@ from httpx import AsyncClient
 from app.config import get_configuration
 from app.password.schemas import (
     FirstStepPasswordUpdatePayload,
-    OtpType,
     UpdatePasswordIbmApiResponse,
     UpdatePasswordClientResponsePayload,
 )
@@ -36,12 +35,6 @@ async def first_step_update_password(
     payload.userName = user_profile_response.userName
     user_language = user_profile_response.preferredLanguage or "en"
     logger.info(f"Using user's preferred language: {user_language}")
-
-    # For email OTP, use "transient" as the enrollmentId so IBM Verify uses
-    # the user's profile email address without requiring a pre-enrolled email factor.
-    # See: https://docs.verify.ibm.com/verify/reference/resetpassword_0
-    if payload.otpType == OtpType.EMAILOTP:
-        payload.enrollmentId = "transient"
 
     password_otp_response = await dispatch_password_otp(
         global_http_client, payload, user_language

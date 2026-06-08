@@ -54,8 +54,6 @@ interface OtpSelectionProps {
   onSelectFIDO2?: (passkey: Fido2Credential) => void;
   parentPage: string;
   onCancel: () => void;
-  emailAddress?: string | null;
-  onSelectEmail?: () => void;
 }
 
 function getLastFourDigits(value?: string | null) {
@@ -88,8 +86,6 @@ export default function OtpSelection({
   onSelectFIDO2,
   parentPage,
   onCancel,
-  emailAddress,
-  onSelectEmail,
 }: OtpSelectionProps) {
   const { language } = useParams<{ language?: "en" | "fr" }>();
 
@@ -99,6 +95,10 @@ export default function OtpSelection({
     userPhoneFactors?.filter((f) => f.type === FLOW_TYPES.sms) ?? [];
   const voiceFactors =
     userPhoneFactors?.filter((f) => f.type === FLOW_TYPES.voice) ?? [];
+  const emailFactors =
+    userPhoneFactors?.filter(
+      (f) => f.type === FLOW_TYPES.email || f.type === FLOW_TYPES.emailOtp,
+    ) ?? [];
   const hasFido2 = fido2Data && fido2Data.length > 0;
 
   const handlePhoneFactorSelect = (factorId: string) => {
@@ -284,7 +284,7 @@ export default function OtpSelection({
         )}
 
         {/* Email section */}
-        {emailAddress && onSelectEmail && (
+        {emailFactors.length > 0 && (
           <GcdsContainer>
             <SectionHeader
               icon={
@@ -302,21 +302,24 @@ export default function OtpSelection({
                 {t("TransientOtpSelection.codeExpiresIn")}{" "}
                 <strong>{t("TransientOtpSelection.tenMinutes")}</strong>
               </GcdsText>
-              <GcdsGrid
-                columns="1fr auto"
-                align-items="center"
-                style={factorRowStyle}
-              >
-                <GcdsText marginBottom="0">{emailAddress}</GcdsText>
-                <GcdsLink
-                  size="regular"
-                  role="button"
-                  style={actionLinkStyle}
-                  onGcdsClick={() => onSelectEmail()}
+              {emailFactors.map((factor) => (
+                <GcdsGrid
+                  key={factor.id}
+                  columns="1fr auto"
+                  align-items="center"
+                  style={factorRowStyle}
                 >
-                  {t("TransientOtpSelection.emailMe")}
-                </GcdsLink>
-              </GcdsGrid>
+                  <GcdsText marginBottom="0">{factor.destination}</GcdsText>
+                  <GcdsLink
+                    size="regular"
+                    role="button"
+                    style={actionLinkStyle}
+                    onGcdsClick={() => handlePhoneFactorSelect(factor.id)}
+                  >
+                    {t("TransientOtpSelection.emailMe")}
+                  </GcdsLink>
+                </GcdsGrid>
+              ))}
             </GcdsContainer>
           </GcdsContainer>
         )}

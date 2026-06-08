@@ -30,6 +30,10 @@ function getErrorMessage(error: unknown): string | undefined {
   return authError.data?.message ?? authError.response?.data?.message;
 }
 
+function mapFactorTypeToServerOtpType(factorType: string): string {
+  return serverMapping[factorType as keyof typeof serverMapping] ?? factorType;
+}
+
 export const useOtpOperations = ({
   userId,
   userName,
@@ -89,8 +93,7 @@ export const useOtpOperations = ({
     if (currentFactor && !override) {
       userData = {
         user_id: userId,
-        otpType:
-          serverMapping[currentFactor.type as keyof typeof serverMapping],
+        otpType: mapFactorTypeToServerOtpType(currentFactor.type),
         factor_id: currentFactor.id,
       };
     }
@@ -143,8 +146,7 @@ export const useOtpOperations = ({
     if (overrideOtpType) {
       otpType = overrideOtpType;
     } else if (userSelectedMfaFactor) {
-      otpType =
-        serverMapping[userSelectedMfaFactor.type as keyof typeof serverMapping];
+      otpType = mapFactorTypeToServerOtpType(userSelectedMfaFactor.type);
     } else {
       return;
     }
