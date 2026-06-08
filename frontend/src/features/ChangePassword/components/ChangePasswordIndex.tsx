@@ -21,7 +21,9 @@ import { passwordUpdate } from "../api/passwordUpdate";
 import PasswordVerification from "../../TransientOtp/components/PasswordVerification";
 import StepContent from "../../../components/Wizard/StepContent";
 import { usePasswordValidation } from "../../../hooks/usePasswordValidation";
+import { usePasswordAttemptTracking } from "../../../hooks/usePasswordAttemptTracking";
 import { useOtpOperations } from "../../../hooks/useOtpOperations";
+import { useOtpAttemptTracking } from "../../../hooks/useOtpAttemptTracking";
 import { useFormTracking } from "../../../hooks/useFormTracking";
 import { useWizardPageTracking } from "../../../hooks/useWizardPageTracking";
 import { GA_FORM_EVENTS } from "../../../utils/analyticsConstants";
@@ -73,9 +75,19 @@ export default function ChangePasswordIndex() {
     useState<PasswordUpdateTransactionData | null>(null);
   const [errorCode, setErrorCode] = useState("");
   const [customErrorMessage, setCustomErrorMessage] = useState("");
-
-  const errorMessage =
-    customErrorMessage || getErrorMessage(language, errorCode);
+  const {
+    getDisplayError: getPasswordDisplayError,
+    resetAttempts: resetPasswordAttempts,
+  } = usePasswordAttemptTracking(errorCode);
+  const { getDisplayError: getOtpDisplayError, resetAttempts } =
+    useOtpAttemptTracking(errorCode);
+  const trackedPasswordErrorMessage = getPasswordDisplayError(
+    getErrorMessage(language, errorCode),
+  );
+  const trackedOtpErrorMessage = getOtpDisplayError(
+    trackedPasswordErrorMessage,
+  );
+  const errorMessage = customErrorMessage || trackedOtpErrorMessage;
 
   const [userPasswordValue, setUserPasswordValue] = useState("");
   const { t } = useTranslation(["security", "layout"]);
@@ -133,6 +145,7 @@ export default function ChangePasswordIndex() {
 
   // Create tracked password validation wrapper
   const handleValidatePassword = async (password: string) => {
+    resetPasswordAttempts();
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_START,
       step: CHANGE_PASSWORD_ANALYTICS.STEPS.VERIFY_PASSWORD,
@@ -388,6 +401,7 @@ export default function ChangePasswordIndex() {
         setErrorCode={setErrorCode}
         setErrorMessage={setCustomErrorMessage}
         errorMessage={errorMessage}
+        resetAttempts={resetAttempts}
         otpExpiry={otpSentResponse?.expiry}
         onCancel={() => navigate(backToSecuritySettingsPage)}
         showTryAnotherWay={userPhoneFactors.length > 1}
