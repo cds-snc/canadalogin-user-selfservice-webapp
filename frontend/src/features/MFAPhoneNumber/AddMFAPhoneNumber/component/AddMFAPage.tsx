@@ -604,11 +604,12 @@ export default function AddMFAPage() {
             event: GA_FORM_EVENTS.FORM_SUBMIT,
             step: ADD_MFA_ANALYTICS.STEPS.OTP_VALIDATION,
           });
+          const otpTypeLabelReq = getOtpTypeLabel(userSelectedMfaFactor?.type);
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: ADD_MFA_ANALYTICS.STEPS.OTP_VALIDATION,
             flow: ADD_MFA_ANALYTICS.FLOW_ID,
-            type: getOtpTypeLabel(userSelectedMfaFactor?.type),
+            ...(otpTypeLabelReq !== undefined && { type: otpTypeLabelReq }),
           });
           return requestOtpCode();
         }}
@@ -617,11 +618,12 @@ export default function AddMFAPage() {
             event: GA_FORM_EVENTS.FORM_SUBMIT,
             step: ADD_MFA_ANALYTICS.STEPS.OTP_VALIDATION,
           });
+          const otpTypeLabelVal = getOtpTypeLabel(userSelectedMfaFactor?.type);
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: ADD_MFA_ANALYTICS.STEPS.OTP_VALIDATION,
             flow: ADD_MFA_ANALYTICS.FLOW_ID,
-            type: getOtpTypeLabel(userSelectedMfaFactor?.type),
+            ...(otpTypeLabelVal !== undefined && { type: otpTypeLabelVal }),
           });
           return validateOtpCode(userOtp);
         }}

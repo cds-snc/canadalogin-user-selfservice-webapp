@@ -1147,6 +1147,7 @@ describe("EditEmailAddressPage Integration Tests", () => {
         expect(mockTrackEvent).toHaveBeenCalledWith({
           event: "form_step_start",
           step: "email_otp_validation",
+          flow: "email_address_update",
         });
         expect(mockTrackEvent).toHaveBeenCalledWith({
           event: "form_step_change",
@@ -1216,6 +1217,7 @@ describe("EditEmailAddressPage Integration Tests", () => {
         expect(mockTrackEvent).toHaveBeenCalledWith({
           event: "form_step_start",
           step: "confirm_update",
+          flow: "email_address_update",
         });
         expect(mockTrackEvent).toHaveBeenCalledWith({
           event: "form_submit_complete",
@@ -1294,6 +1296,7 @@ describe("EditEmailAddressPage Integration Tests", () => {
         expect(mockTrackEvent).toHaveBeenCalledWith({
           event: "form_step_start",
           step: "logout",
+          flow: "email_address_update",
         });
         expect(mockTrackEvent).toHaveBeenCalledWith({
           event: "form_submit_complete",

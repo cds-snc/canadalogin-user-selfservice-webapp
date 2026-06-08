@@ -370,20 +370,22 @@ export default function EditEmailAddressPage() {
         userOtpValue={userOtpValue}
         setUserOtpValue={handleSetUserOtpValue}
         requestOtpCode={() => {
+          const otpTypeLabelReq = getOtpTypeLabel(userSelectedMfaFactor?.type);
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: EMAIL_ADDRESS_ANALYTICS.STEPS.OTP_VALIDATION,
             flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
-            type: getOtpTypeLabel(userSelectedMfaFactor?.type),
+            ...(otpTypeLabelReq !== undefined && { type: otpTypeLabelReq }),
           });
           return requestOtpCode();
         }}
         validateOtpCode={() => {
+          const otpTypeLabelVal = getOtpTypeLabel(userSelectedMfaFactor?.type);
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: EMAIL_ADDRESS_ANALYTICS.STEPS.OTP_VALIDATION,
             flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
-            type: getOtpTypeLabel(userSelectedMfaFactor?.type),
+            ...(otpTypeLabelVal !== undefined && { type: otpTypeLabelVal }),
           });
           return validateOtpCode(
             userOtpValue,

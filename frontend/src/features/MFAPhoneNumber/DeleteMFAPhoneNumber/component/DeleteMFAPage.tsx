@@ -254,11 +254,12 @@ export default function DeleteMFAPage() {
 
   // Custom validateOtpCode that handles delete MFA flow
   const validateOtpCode = async () => {
+    const otpTypeLabel = getOtpTypeLabel(userSelectedMfaFactor?.type);
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_START,
       step: DELETE_MFA_ANALYTICS.STEPS.OTP_VALIDATION,
       flow: DELETE_MFA_ANALYTICS.FLOW_ID,
-      type: getOtpTypeLabel(userSelectedMfaFactor?.type),
+      ...(otpTypeLabel !== undefined && { type: otpTypeLabel }),
     });
     setWizardStep("deleteMFAPhoneNumberConfirm");
     trackEvent({
@@ -353,11 +354,12 @@ export default function DeleteMFAPage() {
         userOtpValue={userOtpValue}
         setUserOtpValue={handleSetUserOtpValue}
         requestOtpCode={() => {
+          const otpTypeLabel = getOtpTypeLabel(userSelectedMfaFactor?.type);
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: DELETE_MFA_ANALYTICS.STEPS.OTP_VALIDATION,
             flow: DELETE_MFA_ANALYTICS.FLOW_ID,
-            type: getOtpTypeLabel(userSelectedMfaFactor?.type),
+            ...(otpTypeLabel !== undefined && { type: otpTypeLabel }),
           });
           return requestOtpCode();
         }}

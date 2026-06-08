@@ -398,11 +398,12 @@ export default function AddFIDO2PasskeyPage({
             event: GA_FORM_EVENTS.FORM_SUBMIT,
             step: ADD_PASSKEY_ANALYTICS.STEPS.OTP_VALIDATION,
           });
+          const otpTypeLabel = getOtpTypeLabel(userSelectedMfaFactor?.type);
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: ADD_PASSKEY_ANALYTICS.STEPS.OTP_VALIDATION,
             flow: ADD_PASSKEY_ANALYTICS.FLOW_ID,
-            type: getOtpTypeLabel(userSelectedMfaFactor?.type),
+            ...(otpTypeLabel !== undefined && { type: otpTypeLabel }),
           });
           return validateOtpCode(otpValue);
         }}
