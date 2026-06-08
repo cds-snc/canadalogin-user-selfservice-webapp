@@ -24,8 +24,13 @@ vi.mock("../../../utils/constants", () => ({
   },
   PAGES: {
     idvServiceCanadaCentrePage: "idvServiceCanadaCentrePage",
+    idvOnlineVerificationInfoPage: "idvOnlineVerificationInfoPage",
+    idvProvincialVerificationPage: "idvProvincialVerificationPage",
   },
   VITE_ENVIRONMENTS: { dev: "development", test: "test" },
+  SERVICES: [
+    { id: 1, title: "Parks Canada Reservations", description: "", url: "#" },
+  ],
 }));
 
 vi.mock("../../../utils/routeHelpers", () => ({
@@ -241,12 +246,7 @@ describe("StartIdentityProofingPage", () => {
   });
 
   // ── Continue button actions ────────────────────
-  it("calls API and redirects for document scanning option", async () => {
-    const redirectUrl = "https://example.com/verify";
-    mockGetOnlineIdentityVerificationUrl.mockResolvedValue({
-      data: { redirect_url: redirectUrl },
-    });
-
+  it("navigates to online verification info page for document scanning option", () => {
     render(<StartIdentityProofingPage />);
 
     fireEvent.click(
@@ -254,32 +254,22 @@ describe("StartIdentityProofingPage", () => {
     );
     fireEvent.click(screen.getByTestId("continue-button"));
 
-    await waitFor(() => {
-      expect(mockGetOnlineIdentityVerificationUrl).toHaveBeenCalled();
-    });
-    await waitFor(() => {
-      expect(window.location.href).toBe(redirectUrl);
-    });
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "/en/idvOnlineVerificationInfoPage",
+    );
   });
 
-  it("handles API error for document scanning without crashing", async () => {
-    mockGetOnlineIdentityVerificationUrl.mockRejectedValue(
-      new Error("Network error"),
-    );
-
+  it("navigates to provincial verification page for provincial partner option", () => {
     render(<StartIdentityProofingPage />);
 
     fireEvent.click(
-      screen.getByRole("radio", { name: /Selfie and photo of your ID/ }),
+      screen.getByRole("radio", { name: /Use your provincial sign in/ }),
     );
     fireEvent.click(screen.getByTestId("continue-button"));
 
-    await waitFor(() => {
-      expect(mockGetOnlineIdentityVerificationUrl).toHaveBeenCalled();
-    });
-
-    // Should not throw or redirect
-    expect(window.location.href).toBe("");
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "/en/idvProvincialVerificationPage",
+    );
   });
 
   it("navigates to Service Canada page for Service Canada option", () => {
