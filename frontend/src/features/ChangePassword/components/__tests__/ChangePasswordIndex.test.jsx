@@ -48,7 +48,7 @@ vi.mock("../../../../hooks/useOtpOperations", () => ({
 
 vi.mock("../../../../hooks/useOtpAttemptTracking", () => ({
   useOtpAttemptTracking: () => ({
-    getDisplayError: (msg) => msg,
+    getDisplayError: (msg) => `tracked:${msg}`,
     resetAttempts: vi.fn(),
     isMaxAttemptsReached: false,
   }),
@@ -81,7 +81,12 @@ vi.mock("../../../../utils/routeHelpers", () => ({
 }));
 
 vi.mock("../../../../utils/errorUtils", () => ({
-  getErrorMessage: (_lang, code) => code || "",
+  getErrorMessage: (_lang, code) => {
+    if (code === "CSIAM0010E" || code === "CSIAM0023E") {
+      return "otp_max_attempts";
+    }
+    return code || "";
+  },
 }));
 
 vi.mock("../../../../services/authService", () => ({
@@ -130,14 +135,17 @@ vi.mock("../../../TransientOtp/components/OtpSelection", () => ({
 }));
 
 vi.mock("../../../TransientOtp/components/OtpVerification", () => ({
-  default: ({ validateOtpCode, userOtpValue, otpExpiry }) => (
-    <button
-      data-testid="verify-otp-btn"
-      data-otp-expiry={otpExpiry ?? ""}
-      onClick={() => validateOtpCode(userOtpValue ?? "123456")}
-    >
-      Verify OTP
-    </button>
+  default: ({ validateOtpCode, userOtpValue, otpExpiry, errorMessage }) => (
+    <div>
+      <button
+        data-testid="verify-otp-btn"
+        data-otp-expiry={otpExpiry ?? ""}
+        onClick={() => validateOtpCode(userOtpValue ?? "123456")}
+      >
+        Verify OTP
+      </button>
+      <span data-testid="otp-error-message">{errorMessage}</span>
+    </div>
   ),
 }));
 
@@ -297,6 +305,84 @@ describe("ChangePasswordIndex – GA Error Tracking", () => {
         step: "otp_validation",
         error: "INVALID_OTP",
       });
+    });
+  });
+
+  it("shows backend CSIAM0011E message directly on OTP validation", async () => {
+    passwordUpdate.secondStep.mockRejectedValueOnce({
+      data: { message: "CSIAM0011E" },
+    });
+
+    passwordUpdate.firstStep.mockResolvedValueOnce({
+      success: true,
+      data: { trxId: "trx-001" },
+    });
+
+    renderComponent();
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("validate-password-btn"));
+    });
+
+    await waitFor(() =>
+      expect(screen.getByTestId("otp-selection-next-btn")).toBeInTheDocument(),
+    );
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("otp-selection-next-btn"));
+    });
+
+    await waitFor(() =>
+      expect(screen.getByTestId("verify-otp-btn")).toBeInTheDocument(),
+    );
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("verify-otp-btn"));
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId("otp-error-message")).toHaveTextContent(
+        "CSIAM0011E",
+      );
+    });
+  });
+
+  it("maps CSIAM0023E to otp_max_attempts on OTP validation", async () => {
+    passwordUpdate.secondStep.mockRejectedValueOnce({
+      data: { messageId: "CSIAM0023E" },
+    });
+
+    passwordUpdate.firstStep.mockResolvedValueOnce({
+      success: true,
+      data: { trxId: "trx-002" },
+    });
+
+    renderComponent();
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("validate-password-btn"));
+    });
+
+    await waitFor(() =>
+      expect(screen.getByTestId("otp-selection-next-btn")).toBeInTheDocument(),
+    );
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("otp-selection-next-btn"));
+    });
+
+    await waitFor(() =>
+      expect(screen.getByTestId("verify-otp-btn")).toBeInTheDocument(),
+    );
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("verify-otp-btn"));
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId("otp-error-message")).toHaveTextContent(
+        "otp_max_attempts",
+      );
     });
   });
 
