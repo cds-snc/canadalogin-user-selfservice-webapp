@@ -10,6 +10,7 @@ import {
   GcdsGrid,
   GcdsButton,
   GcdsHeading,
+  GcdsNotice,
 } from "@gcds-core/components-react";
 import { useTranslation } from "react-i18next";
 import { authService } from "../../../services/authService";
@@ -149,6 +150,14 @@ export default function Password({
 
   return (
     <GcdsContainer role="main">
+      <GcdsNotice
+        noticeRole="success"
+        noticeTitleTag="h2"
+        noticeTitle={t("Password.otpVerifiedNoticeTitle")}
+      >
+        <GcdsText>{t("Password.otpVerifiedNoticeBody")}</GcdsText>
+      </GcdsNotice>
+
       <GcdsHeading tag="h1" lang={language}>
         {t("Password.enterNewPassword")}
       </GcdsHeading>
