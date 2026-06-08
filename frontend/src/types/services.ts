@@ -10,11 +10,13 @@ export type AuthServiceResponse<TData = unknown> = {
 export type AuthServiceError = {
   data?: {
     message?: string;
+    messageId?: string;
     [key: string]: unknown;
   };
   response?: ApiErrorResponse & {
     data?: {
       message?: string;
+      messageId?: string;
       [key: string]: unknown;
     };
   };

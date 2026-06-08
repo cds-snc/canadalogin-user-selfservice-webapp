@@ -6,7 +6,6 @@ from httpx import AsyncClient
 from app.config import get_configuration
 from app.password.schemas import (
     FirstStepPasswordUpdatePayload,
-    OtpType,
     UpdatePasswordIbmApiResponse,
     UpdatePasswordClientResponsePayload,
 )
@@ -25,7 +24,7 @@ async def first_step_update_password(
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
 
-    logger.info(f"First step - attempting update password for: {payload}")
+    logger.info("First step - attempting update password")
     start_time = datetime.now()
 
     # Get user's preferred language and unmasked username from their profile
@@ -37,18 +36,12 @@ async def first_step_update_password(
     user_language = user_profile_response.preferredLanguage or "en"
     logger.info(f"Using user's preferred language: {user_language}")
 
-    # For email OTP, use "transient" as the enrollmentId so IBM Verify uses
-    # the user's profile email address without requiring a pre-enrolled email factor.
-    # See: https://docs.verify.ibm.com/verify/reference/resetpassword_0
-    if payload.otpType == OtpType.EMAILOTP:
-        payload.enrollmentId = "transient"
-
     password_otp_response = await dispatch_password_otp(
         global_http_client, payload, user_language
     )
     duration = (datetime.now() - start_time).total_seconds()
     logger.info(
-        f"First step - dispatch_password_reset_otp returned in {duration:.2f} seconds - {payload}"
+        f"First step - dispatch_password_reset_otp returned in {duration:.2f} seconds"
     )
 
     response_json = password_otp_response.json()
