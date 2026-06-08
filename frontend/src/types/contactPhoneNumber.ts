@@ -75,7 +75,7 @@ export type ContactPhoneSuccessProps = Pick<
 
 export type ContactPhoneDisplayProps = {
   pageContent: ContactPhonePageContent;
-  contactNumber: string | null;
+  phoneNumbers: ContactPhoneDisplayEntry[] | null;
 };
 
 export type ContactPhoneSectionProps = {

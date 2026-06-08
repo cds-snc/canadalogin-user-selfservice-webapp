@@ -8,6 +8,7 @@ from app.users.schemas import (
     ProfileUpdateWithOtpRequest,
     UserProfileName,
     EmailItem,
+    MetaDataTypeValue,
     IBMVerifyUserProfileSchema,
 )
 from app.users.services.update_profile_with_otp import (
@@ -36,7 +37,7 @@ class TestBuildProfileUpdateRequest:
         current_profile.userName = "oldemail@example.com"
         current_profile.preferredLanguage = "en"
         current_profile.name = UserProfileName(givenName="John", familyName="Doe")
-        current_profile.contactNumber = None
+        current_profile.phoneNumbers = []
         current_profile.emails = [
             EmailItem(type="personal", value="personal@example.com"),
             EmailItem(type="work", value="oldemail@example.com"),
@@ -84,7 +85,7 @@ class TestBuildProfileUpdateRequest:
         current_profile.userName = "oldemail@example.com"
         current_profile.preferredLanguage = "en"
         current_profile.name = UserProfileName(givenName="John", familyName="Doe")
-        current_profile.contactNumber = None
+        current_profile.phoneNumbers = []
         current_profile.emails = [
             EmailItem(type="personal", value="personal@example.com"),
             EmailItem(type="backup", value="backup@example.com"),
@@ -131,7 +132,7 @@ class TestBuildProfileUpdateRequest:
         current_profile.userName = "oldemail@example.com"
         current_profile.preferredLanguage = "en"
         current_profile.name = UserProfileName(givenName="John", familyName="Doe")
-        current_profile.contactNumber = None
+        current_profile.phoneNumbers = []
         current_profile.emails = []
 
         # Act
@@ -161,7 +162,7 @@ class TestBuildProfileUpdateRequest:
         current_profile.userName = "oldemail@example.com"
         current_profile.preferredLanguage = "en"
         current_profile.name = UserProfileName(givenName="John", familyName="Doe")
-        current_profile.contactNumber = None
+        current_profile.phoneNumbers = []
         current_profile.emails = None
 
         # Act
@@ -177,11 +178,11 @@ class TestBuildProfileUpdateRequest:
         assert work_email.value == "newemail@example.com"
 
     def test_phone_number_update_preserves_current_profile(self):
-        """Test that when updating phone number, other profile fields are preserved"""
+        """Test that when updating phone numbers, other profile fields are preserved"""
         # Arrange
-        new_contact_number = "+19876543210"
+        new_phone_numbers = [MetaDataTypeValue(type="work", value="+19876543210")]
         update_data = ProfileUpdateWithOtpRequest(
-            contactNumber=new_contact_number,
+            phoneNumbers=new_phone_numbers,
             otp="123456",
             trxnId="test-trxn",
             otpType=OtpType.SMS,
@@ -192,17 +193,20 @@ class TestBuildProfileUpdateRequest:
         current_profile.userName = "test@example.com"
         current_profile.preferredLanguage = "en"
         current_profile.name = UserProfileName(givenName="John", familyName="Doe")
-        current_profile.contactNumber = "+11234567890"
+        current_profile.phoneNumbers = [
+            MetaDataTypeValue(type="work", value="+11234567890")
+        ]
         current_profile.emails = [EmailItem(type="work", value="test@example.com")]
 
         # Act
         result = _build_profile_update_request(update_data, current_profile)
 
         # Assert
-        # userName and emails should remain unchanged when updating contact number
+        # userName and emails should remain unchanged when updating phone numbers
         assert result.userName == "test@example.com"
-        # Contact number should be updated
-        assert result.contactNumber == new_contact_number
+        # Phone numbers should be updated
+        assert result.phoneNumbers == new_phone_numbers
+        assert result.phoneNumbers[0].value == "+19876543210"
 
 
 # Import paths for mocking
@@ -326,6 +330,7 @@ class TestUpdateProfileWithOtpVerification:
             id="user-123",
             userName="user@example.com",
             emails=[EmailItem(value="user@example.com", type="work")],
+            phoneNumbers=[],
             active=True,
             meta={
                 "location": "https://example.com/users/user-123",
@@ -340,7 +345,7 @@ class TestUpdateProfileWithOtpVerification:
             id="user-123",
             userName="user@example.com",
             emails=[EmailItem(value="user@example.com", type="work")],
-            contactNumber="+15551234567",
+            phoneNumbers=[MetaDataTypeValue(value="+15551234567", type="mobile")],
             active=True,
             meta={
                 "location": "https://example.com/users/user-123",
@@ -361,7 +366,7 @@ class TestUpdateProfileWithOtpVerification:
             otp="123456",
             trxnId="test-trxn-id",
             otpType=OtpType.SMS,
-            contactNumber="+15551234567",
+            phoneNumbers=[MetaDataTypeValue(value="+15551234567", type="mobile")],
         )
 
         # Act
@@ -371,9 +376,9 @@ class TestUpdateProfileWithOtpVerification:
 
         # Assert
         assert response.success is True
-        assert response.data.contactNumber == "+15551234567"
+        assert response.data.phoneNumbers[0].value == "+15551234567"
 
-        # Session should not be updated for contact number changes
+        # Session should not be updated for phone changes
         mock_update_session.assert_not_called()
 
     @pytest.mark.asyncio
@@ -586,17 +591,17 @@ class TestGetUpdateFieldNames:
         assert len(result) == 1
 
     def test_phone_update_returns_phone_field(self):
-        """Test that contact number update returns 'contactNumber' in field names"""
+        """Test that phone update returns 'phoneNumbers' in field names"""
         update_data = ProfileUpdateWithOtpRequest(
             otp="123456",
             trxnId="test-trxn-id",
             otpType=OtpType.SMS,
-            contactNumber="+15551234567",
+            phoneNumbers=[MetaDataTypeValue(value="+15551234567", type="mobile")],
         )
 
         result = _get_update_field_names(update_data)
 
-        assert "contactNumber" in result
+        assert "phoneNumbers" in result
         assert len(result) == 1
 
     def test_multiple_fields_returns_all_fields(self):
@@ -606,13 +611,13 @@ class TestGetUpdateFieldNames:
             trxnId="test-trxn-id",
             otpType=OtpType.EMAIL,
             newEmailAddress="new@example.com",
-            contactNumber="+15551234567",
+            phoneNumbers=[MetaDataTypeValue(value="+15551234567", type="mobile")],
         )
 
         result = _get_update_field_names(update_data)
 
         assert "email" in result
-        assert "contactNumber" in result
+        assert "phoneNumbers" in result
         assert len(result) == 2
 
 
@@ -635,12 +640,12 @@ class TestBuildSessionUpdates:
         assert len(result) == 2
 
     def test_phone_only_change_returns_empty_dict(self):
-        """Test that contact number-only change returns empty session updates"""
+        """Test that phone-only change returns empty session updates"""
         update_data = ProfileUpdateWithOtpRequest(
             otp="123456",
             trxnId="test-trxn-id",
             otpType=OtpType.SMS,
-            contactNumber="+15551234567",
+            phoneNumbers=[MetaDataTypeValue(value="+15551234567", type="mobile")],
         )
 
         result = _build_session_updates(update_data)

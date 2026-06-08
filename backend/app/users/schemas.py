@@ -12,7 +12,6 @@ from pydantic import (
     Field,
     ValidationInfo,
     field_validator,
-    model_validator,
 )
 
 SCIM_CORE_USER = "urn:ietf:params:scim:schemas:core:2.0:User"
@@ -184,32 +183,13 @@ class IBMVerifyUserProfileSchema(BaseModel):
     active: bool
     id: str
     userName: EmailStr
-    contactNumber: Optional[str] = None
+    phoneNumbers: Optional[List[MetaDataTypeValue]] = None
     details: Optional[SCIMUserDetails] = Field(
         default=None,
         validation_alias="urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
         serialization_alias="details",
     )
     model_config = ConfigDict(validate_by_name=True, validate_by_alias=True)
-
-    @model_validator(mode="after")
-    def extract_contact_number_from_custom_attrs(self) -> "IBMVerifyUserProfileSchema":
-        """
-        Fallback: extract contactNumber from customAttributes if not present as a
-        top-level field. IBM Verify returns it directly on GET once the attribute
-        exists, but PUT responses and first-time writes may only include it inside
-        customAttributes.
-        """
-        if (
-            self.contactNumber is None
-            and self.details
-            and self.details.customAttributes
-        ):
-            for attr in self.details.customAttributes:
-                if attr.name == "contactNumber" and attr.values:
-                    self.contactNumber = attr.values[0]
-                    break
-        return self
 
 
 class UserProfileUpdateRequest(BaseModel):
@@ -220,7 +200,7 @@ class UserProfileUpdateRequest(BaseModel):
         None  # refactor required so that userID is not confused with userName
     )
     emails: Optional[List[EmailItem]] = None
-    contactNumber: Optional[str] = None
+    phoneNumbers: Optional[List[MetaDataTypeValue]] = None
     model_config = ConfigDict(validate_by_name=True, validate_by_alias=True)
 
 
@@ -236,32 +216,7 @@ class IBMVerifyUpdateUserProfile(IBMVerifyUserProfileSchema):
         default_factory=IBMNotifyTypeExtension,
         alias=SCIM_IBM_NOTIFICATION_EXT,
     )
-    # Override details to serialize with the IBM extension URI key for the PUT payload
-    details: Optional[SCIMUserDetails] = Field(
-        default=None,
-        validation_alias=SCIM_IBM_USER_EXT,
-        serialization_alias=SCIM_IBM_USER_EXT,
-    )
-    # Exclude contactNumber from PUT payload; use model_validator to embed it in details.customAttributes
-    contactNumber: Optional[str] = Field(default=None, exclude=True)
-
     model_config = ConfigDict(populate_by_name=True)
-
-    @model_validator(mode="after")
-    def set_contact_number_in_custom_attrs(self) -> "IBMVerifyUpdateUserProfile":
-        if self.contactNumber is not None:
-            existing_attrs = []
-            if self.details and self.details.customAttributes:
-                existing_attrs = [
-                    a
-                    for a in self.details.customAttributes
-                    if a.name != "contactNumber"
-                ]
-            existing_attrs.append(
-                CustomAttribute(name="contactNumber", values=[self.contactNumber])
-            )
-            self.details = SCIMUserDetails(customAttributes=existing_attrs)
-        return self
 
 
 class ProfileResponse(ResponseModel):
@@ -354,7 +309,7 @@ class ProfileUpdateWithOtpRequest(BaseModel):
 
     # Sensitive profile fields that require OTP verification (all optional, at least one must be provided)
     newEmailAddress: Optional[EmailStr] = None
-    contactNumber: Optional[str] = None
+    phoneNumbers: Optional[List[MetaDataTypeValue]] = None
 
     # OTP verification fields (always required)
     otp: str
@@ -365,7 +320,7 @@ class ProfileUpdateWithOtpRequest(BaseModel):
         """Validate that at least one sensitive profile field is provided for update"""
         update_fields = [
             self.newEmailAddress,
-            self.contactNumber,
+            self.phoneNumbers,
         ]
 
         if not any(field is not None for field in update_fields):

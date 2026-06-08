@@ -63,7 +63,7 @@ export default function ProfileHome() {
   const { t } = useTranslation("profile");
   const { state } = useUser();
   const email = state?.userProfile?.userName || "";
-  const contactNumber = state?.userProfile?.contactNumber ?? null;
+  const phoneNumbers = state?.userProfile?.phoneNumbers || [];
 
   return (
     <GcdsContainer role="main">
@@ -98,7 +98,7 @@ export default function ProfileHome() {
           <GcdsContainer className="sectionCard">
             <DisplayEmailInfo email={email} />
             <div className="separator" />
-            <ViewContactPhoneNumber contactNumber={contactNumber} />
+            <ViewContactPhoneNumber phoneNumbers={phoneNumbers} />
           </GcdsContainer>
         </GcdsContainer>
         <GcdsContainer>
