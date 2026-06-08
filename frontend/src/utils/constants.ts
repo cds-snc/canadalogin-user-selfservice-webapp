@@ -26,7 +26,6 @@ export const OIDC_REDIRECT = {
 
 export const SESSION_STORAGE_KEYS = {
   postLogout: "post_logout",
-  passwordChangeRedirectToSecurity: "password_change_redirect_to_security",
 } as const;
 
 export const INVALID_OTP_ERROR_CODES = [
@@ -142,10 +141,6 @@ export const PAGES = {
   idvProvenInformationCard: "IdvProvenInformationCard",
   idvProvincialVerificationPage: "IdvProvincialVerificationPage",
   idvOnlineVerificationInfoPage: "IdvOnlineVerificationInfoPage",
-} as const;
-
-export const ROUTE_PATTERNS = {
-  securitySettings: "/:language/security-settings",
 } as const;
 
 export const PRIVACY_NOTICE_LINKS = {

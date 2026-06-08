@@ -12,7 +12,6 @@ import ChangePasswordIndex from "../ChangePasswordIndex";
 import { usePasswordValidation } from "../../../../hooks/usePasswordValidation";
 import { passwordUpdate } from "../../api/passwordUpdate";
 import { authService } from "../../../../services/authService";
-import { SESSION_STORAGE_KEYS } from "../../../../utils/constants";
 
 // ─── Captured spy ─────────────────────────────────────────────────────────────
 
@@ -354,12 +353,6 @@ describe("ChangePasswordIndex – GA Error Tracking", () => {
         error: "Network Error",
       });
     });
-
-    expect(
-      sessionStorage.getItem(
-        SESSION_STORAGE_KEYS.passwordChangeRedirectToSecurity,
-      ),
-    ).toBeNull();
   });
 });
 
@@ -563,11 +556,5 @@ describe("ChangePasswordIndex – GA Success Path Tracking", () => {
         step: "logout",
       });
     });
-
-    expect(
-      sessionStorage.getItem(
-        SESSION_STORAGE_KEYS.passwordChangeRedirectToSecurity,
-      ),
-    ).toBe("true");
   });
 });

@@ -7,11 +7,7 @@ import Loader from "../../../components/Layout/Loading";
 import Password from "./Password";
 import PasswordChangedConfirmation from "./PasswordChangedConfirmation";
 
-import {
-  FLOW_TYPES,
-  PAGES,
-  SESSION_STORAGE_KEYS,
-} from "../../../utils/constants";
+import { FLOW_TYPES, PAGES } from "../../../utils/constants";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch";
 import { getErrorMessage } from "../../../utils/errorUtils";
 import { authService } from "../../../services/authService";
@@ -284,13 +280,9 @@ export default function ChangePasswordIndex() {
 
   const logout = async () => {
     setLoading(true, t("TopNavBar.signingOut", { ns: "layout" }));
-    sessionStorage.setItem(
-      SESSION_STORAGE_KEYS.passwordChangeRedirectToSecurity,
-      "true",
-    );
 
     try {
-      const response = await authService.logout();
+      const response = await authService.logout(backToSecuritySettingsPage);
 
       const redirectUrl = response?.data?.redirect_url || null;
 
@@ -309,9 +301,6 @@ export default function ChangePasswordIndex() {
       }
     } catch (error) {
       console.error("Logout failed:", error);
-      sessionStorage.removeItem(
-        SESSION_STORAGE_KEYS.passwordChangeRedirectToSecurity,
-      );
       const errorMessage =
         error instanceof Error ? error.message : String(error);
       trackEvent({
@@ -425,10 +414,6 @@ export default function ChangePasswordIndex() {
         otpSentResponse={otpSentResponse}
         userOtpValue={userOtpValue}
         onNext={() => {
-          sessionStorage.setItem(
-            SESSION_STORAGE_KEYS.passwordChangeRedirectToSecurity,
-            "true",
-          );
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
             step: CHANGE_PASSWORD_ANALYTICS.STEPS.SUCCESS,
