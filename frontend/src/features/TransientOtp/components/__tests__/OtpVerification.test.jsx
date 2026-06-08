@@ -324,7 +324,7 @@ describe("OtpVerification Component", () => {
       expect(input).toHaveAttribute("minLength", "6");
     });
 
-    it("renders submit and choose different method buttons", () => {
+    it("renders submit, cancel, and choose different method buttons", () => {
       renderComponent();
       expect(screen.getByTestId("submit-button")).toBeInTheDocument();
       expect(
