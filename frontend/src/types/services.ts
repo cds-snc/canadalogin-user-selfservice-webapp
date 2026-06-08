@@ -128,7 +128,9 @@ export type AuthServiceContract = {
     otpType?: Extract<OtpTransportType, "sms" | "voice">,
   ) => Promise<AuthServiceResponse | undefined>;
   get_rp_info: () => Promise<AuthServiceResponse<RelyingPartyData> | undefined>;
-  logout: () => Promise<AuthServiceResponse<LogoutResponseData> | undefined>;
+  logout: (
+    returnToPage?: string,
+  ) => Promise<AuthServiceResponse<LogoutResponseData> | undefined>;
   keepAlive: () => Promise<
     AuthServiceResponse<SessionKeepAliveData> | undefined
   >;

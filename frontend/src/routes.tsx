@@ -9,7 +9,6 @@ import { UserProvider } from "./components/Providers/UserProvider";
 
 import EditLanguagePreferencePage from "./features/LanguagePreference/components/EditLanguagePreferencePage";
 import ManageDashboard from "./components/Manage/ManageDashboard";
-import ManageLanding from "./components/Manage/ManageLanding";
 import ProfileHome from "./components/Manage/ProfileHome";
 import Manage2FAVerifications from "./components/Manage/SecuritySettings/Manage2FAVerifications";
 import SecuritySettings from "./components/Manage/SecuritySettings/SecuritySettings";
@@ -49,7 +48,7 @@ export const appRoutes: RouteObject[] = [
             children: [
               {
                 index: true,
-                element: <ManageLanding />,
+                element: <ManageDashboard />,
               },
               {
                 path: "profile",

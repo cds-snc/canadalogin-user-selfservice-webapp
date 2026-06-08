@@ -39,8 +39,11 @@ async def redirect_url(
     prompt: Optional[str] = Query(
         default=None, pattern="^(login|none|consent|select_account)$"
     ),
+    returnToPage: Optional[str] = Query(default=None),
 ):
-    return await redirect_user_to_idp_verify(request, prompt=prompt)
+    return await redirect_user_to_idp_verify(
+        request, prompt=prompt, returnToPage=returnToPage
+    )
 
 
 @router.get(
@@ -75,8 +78,12 @@ async def reauth(
     summary="Logout user",
     description="",
 )
-async def logout(request: Request, id_token: str = Depends(get_user_id_token)):
-    return await logout_user(request, id_token)
+async def logout(
+    request: Request,
+    returnToPage: Optional[str] = Query(default=None),
+    id_token: str = Depends(get_user_id_token),
+):
+    return await logout_user(request, id_token, returnToPage=returnToPage)
 
 
 @router.post(

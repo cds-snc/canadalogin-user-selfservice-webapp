@@ -228,8 +228,10 @@ def app(monkeypatch, mock_token_transport):
 
     # Login and Reauth entry points
     @base.get("/login")
-    async def login(request: Request):
-        return await auth_module.redirect_user_to_idp_verify(request)
+    async def login(request: Request, returnToPage: str | None = None):
+        return await auth_module.redirect_user_to_idp_verify(
+            request, returnToPage=returnToPage
+        )
 
     @base.get("/reauth")
     async def reauth(request: Request, returnToPage: str = "/"):
@@ -312,6 +314,22 @@ async def test_redirect_user_to_idp_verify_redirects(app, client):
 
 
 @pytest.mark.asyncio
+async def test_login_sets_return_to_page_when_valid(app, client):
+    resp = await client.get(
+        "/login",
+        params={"returnToPage": "/en/security-settings"},
+        follow_redirects=False,
+    )
+    assert resp.status_code in (302, 307)
+
+    dump = await client.get("/session-dump")
+    assert dump.status_code == 200
+    assert (
+        dump.json().get(FakeSessionKeys.RETURN_TO_PAGE.value) == "/en/security-settings"
+    )
+
+
+@pytest.mark.asyncio
 async def test_callback_handler_success_flow_sets_session_and_redirects(app, client):
     # Seed session with RETURN_TO_PAGE so the final redirect includes it
     await client.get("/seed-session", params={"path": "/dashboard"})
@@ -322,6 +340,11 @@ async def test_callback_handler_success_flow_sets_session_and_redirects(app, cli
         resp.headers["location"]
         == "https://pm.example.com/dashboard?returnToPage=/dashboard"
     )
+
+    # returnToPage is one-time and should be consumed by callback_handler
+    dump = await client.get("/session-dump")
+    assert dump.status_code == 200
+    assert dump.json().get(FakeSessionKeys.RETURN_TO_PAGE.value) is None
 
 
 @pytest.mark.asyncio
