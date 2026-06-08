@@ -11,10 +11,25 @@ import {
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { DEV_ONLY_FEATURE } from "../../../utils/constants";
+import { identityVerificationApi } from "../api/identityVerificationApi";
 
 export default function OnlineVerificationInfo() {
   const navigate = useNavigate();
   const { t } = useTranslation("idv");
+
+  const handleContinue = () => {
+    identityVerificationApi
+      .getOnlineIdentityVerificationUrl()
+      .then((response) => {
+        const { redirect_url } = (
+          response as { data: { redirect_url: string } }
+        ).data;
+        window.location.href = redirect_url;
+      })
+      .catch(() => {
+        // TODO: handle API error
+      });
+  };
 
   if (!DEV_ONLY_FEATURE) {
     return null;
@@ -61,8 +76,9 @@ export default function OnlineVerificationInfo() {
         <GcdsGrid columns="max-content max-content" gap="200">
           <GcdsButton
             type="button"
-            onClick={() => {
-              // TODO: navigate to next IDV step
+            onGcdsClick={(ev) => {
+              ev.preventDefault();
+              handleContinue();
             }}
           >
             {t("OnlineVerificationInfo.continueButton")}

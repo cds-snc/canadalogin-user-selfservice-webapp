@@ -7,13 +7,25 @@ import {
 } from "@gcds-core/components-react";
 
 import { useTranslation } from "react-i18next";
+import { useNavigate, useParams } from "react-router";
 import { useUser } from "../../components/Providers/useUser";
-import { DEV_ONLY_FEATURE } from "../../utils/constants";
+import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
+import { path } from "../../utils/routeHelpers";
 
 export default function ProvenInformationCard() {
   const { t } = useTranslation("profile");
+  const navigate = useNavigate();
+  const { language } = useParams();
+
   const { state } = useUser();
   const name = state?.userProfile?.name?.formatted || "";
+
+  const startIdentityVerificationFlow = path(
+    PAGES.idvStartIdentityProofingPage,
+    {
+      language: language,
+    },
+  );
 
   // TODO: populate from IDV API once available
   const dateOfBirth = "February 1, 1990";
@@ -67,7 +79,7 @@ export default function ProvenInformationCard() {
             buttonRole="secondary"
             type="button"
             onGcdsClick={() => {
-              // TODO: navigate to IDV re-proofing flow once available
+              navigate(startIdentityVerificationFlow);
             }}
           >
             {t("ProvenInformationCard.updateButton")}
