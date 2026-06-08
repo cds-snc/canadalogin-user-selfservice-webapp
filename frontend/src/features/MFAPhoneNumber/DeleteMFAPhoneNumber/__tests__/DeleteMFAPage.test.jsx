@@ -978,7 +978,7 @@ describe("DeleteMFAPage", () => {
 
       expect(mockTrackEvent).toHaveBeenCalledWith({
         event: "form_step_end",
-        step: "verify_password",
+        step: "delete_mfa_verify_password",
         error: "CSIAM0011E",
       });
     });
@@ -1111,7 +1111,8 @@ describe("DeleteMFAPage", () => {
 
       expect(mockTrackEvent).toHaveBeenCalledWith({
         event: "form_step_start",
-        step: "verify_password",
+        step: "delete_mfa_verify_password",
+        flow: "delete_mfa_phone_number",
       });
     });
 
@@ -1161,6 +1162,7 @@ describe("DeleteMFAPage", () => {
         expect(mockTrackEvent).toHaveBeenCalledWith({
           event: "form_step_start",
           step: "otp_validation",
+          flow: "delete_mfa_phone_number",
         });
         expect(mockTrackEvent).toHaveBeenCalledWith({
           event: "form_step_change",

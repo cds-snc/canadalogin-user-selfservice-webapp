@@ -438,7 +438,8 @@ describe("DeleteFIDO2PasskeyPage", () => {
 
     expect(mockTrackEvent).toHaveBeenCalledWith({
       event: "form_step_start",
-      step: "verify_password",
+      step: "delete_passkey_verify_password",
+      flow: "delete_passkey",
     });
   });
 

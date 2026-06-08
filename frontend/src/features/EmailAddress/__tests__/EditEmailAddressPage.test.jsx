@@ -766,7 +766,7 @@ describe("EditEmailAddressPage Integration Tests", () => {
 
       expect(mockTrackEvent).toHaveBeenCalledWith({
         event: "form_step_end",
-        step: "verify_password",
+        step: "email_update_verify_password",
         error: "WRONG_PASSWORD",
       });
     });
@@ -982,7 +982,8 @@ describe("EditEmailAddressPage Integration Tests", () => {
 
       expect(mockTrackEvent).toHaveBeenCalledWith({
         event: "form_step_start",
-        step: "verify_password",
+        step: "email_update_verify_password",
+        flow: "email_address_update",
       });
     });
 
@@ -1051,6 +1052,7 @@ describe("EditEmailAddressPage Integration Tests", () => {
         expect(mockTrackEvent).toHaveBeenCalledWith({
           event: "form_step_start",
           step: "otp_validation",
+          flow: "email_address_update",
         });
         expect(mockTrackEvent).toHaveBeenCalledWith({
           event: "form_step_change",

@@ -31,6 +31,7 @@ import { useFormTracking } from "../../../hooks/useFormTracking";
 import { useWizardPageTracking } from "../../../hooks/useWizardPageTracking";
 import { GA_FORM_EVENTS } from "../../../utils/analyticsConstants";
 import { CHANGE_PASSWORD_ANALYTICS } from "../../../utils/analyticsConstants";
+import { getOtpTypeLabel } from "../../../utils/analyticsConstants";
 import type { AuthServiceError } from "../../../types/services";
 import type { PasswordUpdateTransactionData } from "../api/passwordUpdate";
 import type { OtpFactor } from "../../../types/hooks";
@@ -152,6 +153,7 @@ export default function ChangePasswordIndex() {
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_START,
       step: CHANGE_PASSWORD_ANALYTICS.STEPS.VERIFY_PASSWORD,
+      flow: CHANGE_PASSWORD_ANALYTICS.FLOW_ID,
     });
     await validatePassword(password);
   };
@@ -380,6 +382,8 @@ export default function ChangePasswordIndex() {
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: CHANGE_PASSWORD_ANALYTICS.STEPS.OTP_VALIDATION,
+            flow: CHANGE_PASSWORD_ANALYTICS.FLOW_ID,
+            type: getOtpTypeLabel(userSelectedMfaFactor.type),
           });
           if (userSelectedMfaFactor.type === FLOW_TYPES.email) {
             return requestEmailOtpCode();
@@ -394,6 +398,8 @@ export default function ChangePasswordIndex() {
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: CHANGE_PASSWORD_ANALYTICS.STEPS.OTP_VALIDATION,
+            flow: CHANGE_PASSWORD_ANALYTICS.FLOW_ID,
+            type: getOtpTypeLabel(userSelectedMfaFactor.type),
           });
           return validateOtpCode(userOtp);
         }}
@@ -447,6 +453,7 @@ export default function ChangePasswordIndex() {
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: CHANGE_PASSWORD_ANALYTICS.STEPS.LOGOUT,
+            flow: CHANGE_PASSWORD_ANALYTICS.FLOW_ID,
           });
           logout();
         }}

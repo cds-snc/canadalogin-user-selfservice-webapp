@@ -24,6 +24,7 @@ import { useFormTracking } from "../../../../hooks/useFormTracking";
 import { useWizardPageTracking } from "../../../../hooks/useWizardPageTracking";
 import { GA_FORM_EVENTS } from "../../../../utils/analyticsConstants";
 import { DELETE_MFA_ANALYTICS } from "../../../../utils/analyticsConstants";
+import { getOtpTypeLabel } from "../../../../utils/analyticsConstants";
 import VerifyFIDO2Passkey from "../../../ManageFIDO2/components/VerifyFIDO2Passkey/VerifyFIDO2Passkey";
 
 interface DeletePhoneFormData {
@@ -129,6 +130,7 @@ export default function DeleteMFAPage() {
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_START,
       step: DELETE_MFA_ANALYTICS.STEPS.VERIFY_PASSWORD,
+      flow: DELETE_MFA_ANALYTICS.FLOW_ID,
     });
     await validatePassword(password);
   };
@@ -255,6 +257,8 @@ export default function DeleteMFAPage() {
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_START,
       step: DELETE_MFA_ANALYTICS.STEPS.OTP_VALIDATION,
+      flow: DELETE_MFA_ANALYTICS.FLOW_ID,
+      type: getOtpTypeLabel(userSelectedMfaFactor?.type),
     });
     setWizardStep("deleteMFAPhoneNumberConfirm");
     trackEvent({
@@ -352,6 +356,8 @@ export default function DeleteMFAPage() {
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: DELETE_MFA_ANALYTICS.STEPS.OTP_VALIDATION,
+            flow: DELETE_MFA_ANALYTICS.FLOW_ID,
+            type: getOtpTypeLabel(userSelectedMfaFactor?.type),
           });
           return requestOtpCode();
         }}
@@ -390,6 +396,7 @@ export default function DeleteMFAPage() {
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: DELETE_MFA_ANALYTICS.STEPS.CONFIRM_DELETE,
+            flow: DELETE_MFA_ANALYTICS.FLOW_ID,
           });
           await deleteMFA();
         }}

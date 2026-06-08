@@ -34,9 +34,11 @@ vi.mock("../../../../hooks/usePasswordValidation");
 
 vi.mock("../../../../hooks/useOtpOperations", () => ({
   useOtpOperations: () => ({
-    userPhoneFactors: [{ id: "f1", type: "sms", destination: "+15551234567" }],
-    userSelectedMfaFactor: { id: "f1", type: "sms" },
-    userSelectedMfaFactorRef: { current: { id: "f1", type: "sms" } },
+    userPhoneFactors: [
+      { id: "f1", type: "smsotp", destination: "+15551234567" },
+    ],
+    userSelectedMfaFactor: { id: "f1", type: "smsotp" },
+    userSelectedMfaFactorRef: { current: { id: "f1", type: "smsotp" } },
     userOtpValue: "123456",
     otpSentResponse: null,
     otpLoading: false,
@@ -218,7 +220,7 @@ describe("ChangePasswordIndex – GA Error Tracking", () => {
 
     expect(mockTrackEvent).toHaveBeenCalledWith({
       event: "form_step_end",
-      step: "verify_password",
+      step: "password_change_verify_password",
       error: "CSIAM0011E",
     });
   });
@@ -389,7 +391,7 @@ describe("ChangePasswordIndex – GA Success Path Tracking", () => {
     });
   });
 
-  it("fires GA events after password validates and OTP is sent (verify_password → otp_selection → otp_validation)", async () => {
+  it("fires GA events after password validates and OTP is sent (password_change_verify_password → otp_selection → otp_validation)", async () => {
     renderComponent();
 
     await act(async () => {
@@ -400,7 +402,8 @@ describe("ChangePasswordIndex – GA Success Path Tracking", () => {
     await waitFor(() => {
       expect(mockTrackEvent).toHaveBeenCalledWith({
         event: "form_step_start",
-        step: "verify_password",
+        step: "password_change_verify_password",
+        flow: "password_change",
       });
       expect(mockTrackEvent).toHaveBeenCalledWith({
         event: "form_step_change",
@@ -492,6 +495,8 @@ describe("ChangePasswordIndex – GA Success Path Tracking", () => {
       expect(mockTrackEvent).toHaveBeenCalledWith({
         event: "form_step_start",
         step: "otp_validation",
+        flow: "password_change",
+        type: "phone",
       });
       expect(mockTrackEvent).toHaveBeenCalledWith({
         event: "form_submit_complete",
@@ -557,6 +562,7 @@ describe("ChangePasswordIndex – GA Success Path Tracking", () => {
       expect(mockTrackEvent).toHaveBeenCalledWith({
         event: "form_step_start",
         step: "logout",
+        flow: "password_change",
       });
       expect(mockTrackEvent).toHaveBeenCalledWith({
         event: "form_submit_complete",

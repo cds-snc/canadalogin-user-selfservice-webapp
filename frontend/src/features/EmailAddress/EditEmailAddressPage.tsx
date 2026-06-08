@@ -23,6 +23,7 @@ import { useFormTracking } from "../../hooks/useFormTracking";
 import { useWizardPageTracking } from "../../hooks/useWizardPageTracking";
 import { GA_FORM_EVENTS } from "../../utils/analyticsConstants";
 import { EMAIL_ADDRESS_ANALYTICS } from "../../utils/analyticsConstants";
+import { getOtpTypeLabel } from "../../utils/analyticsConstants";
 import EditEmailEnterEmail from "./EditEmailEnterEmail";
 import EmailOtpValidation from "./EmailOtpValidation";
 import EmailUpdateSuccess from "./EmailUpdateSuccess";
@@ -108,6 +109,7 @@ export default function EditEmailAddressPage() {
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_START,
       step: EMAIL_ADDRESS_ANALYTICS.STEPS.VERIFY_PASSWORD,
+      flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
     });
     await validatePassword(password);
   };
@@ -155,6 +157,7 @@ export default function EditEmailAddressPage() {
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_START,
       step: EMAIL_ADDRESS_ANALYTICS.STEPS.ENTER_EMAIL,
+      flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
     });
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
@@ -204,6 +207,7 @@ export default function EditEmailAddressPage() {
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_START,
       step: EMAIL_ADDRESS_ANALYTICS.STEPS.ENTER_EMAIL,
+      flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
     });
 
     if (!formData.emailAddress || !formData.emailAddress.trim()) {
@@ -369,6 +373,8 @@ export default function EditEmailAddressPage() {
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: EMAIL_ADDRESS_ANALYTICS.STEPS.OTP_VALIDATION,
+            flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
+            type: getOtpTypeLabel(userSelectedMfaFactor?.type),
           });
           return requestOtpCode();
         }}
@@ -376,6 +382,8 @@ export default function EditEmailAddressPage() {
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: EMAIL_ADDRESS_ANALYTICS.STEPS.OTP_VALIDATION,
+            flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
+            type: getOtpTypeLabel(userSelectedMfaFactor?.type),
           });
           return validateOtpCode(
             userOtpValue,
@@ -432,6 +440,7 @@ export default function EditEmailAddressPage() {
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: EMAIL_ADDRESS_ANALYTICS.STEPS.EMAIL_OTP_VALIDATION,
+            flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
           });
 
           if (userOtpValue && userOtpValue.trim()) {
@@ -459,6 +468,7 @@ export default function EditEmailAddressPage() {
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: EMAIL_ADDRESS_ANALYTICS.STEPS.EMAIL_OTP_VALIDATION,
+            flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
           });
           await requestOtpCode({
             otpType: FLOW_TYPES.email,
@@ -481,6 +491,7 @@ export default function EditEmailAddressPage() {
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: EMAIL_ADDRESS_ANALYTICS.STEPS.CONFIRM_UPDATE,
+            flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
           });
           return handleEmailChangeWithOtp();
         }}
@@ -500,6 +511,7 @@ export default function EditEmailAddressPage() {
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: EMAIL_ADDRESS_ANALYTICS.STEPS.LOGOUT,
+            flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
           });
           return handleSignOut(e);
         }}

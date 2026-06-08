@@ -22,7 +22,7 @@ export const ADD_MFA_ANALYTICS = {
   FLOW_ID: "mfa_phone_number",
 
   STEPS: {
-    VERIFY_PASSWORD: "verify_password",
+    VERIFY_PASSWORD: "add_mfa_verify_password",
     OTP_SELECTION: "otp_selection",
     OTP_VALIDATION: "otp_validation",
     ENTER_PHONE: "enter_phone_number",
@@ -37,7 +37,7 @@ export const DELETE_MFA_ANALYTICS = {
   FLOW_ID: "delete_mfa_phone_number",
 
   STEPS: {
-    VERIFY_PASSWORD: "verify_password",
+    VERIFY_PASSWORD: "delete_mfa_verify_password",
     OTP_SELECTION: "otp_selection",
     OTP_VALIDATION: "otp_validation",
     CONFIRM_DELETE: "confirm_delete",
@@ -60,7 +60,7 @@ export const CHANGE_PASSWORD_ANALYTICS = {
   FLOW_ID: "password_change",
 
   STEPS: {
-    VERIFY_PASSWORD: "verify_password",
+    VERIFY_PASSWORD: "password_change_verify_password",
     OTP_SELECTION: "otp_selection",
     OTP_VALIDATION: "otp_validation",
     CHANGE_PASSWORD: "change_password",
@@ -73,7 +73,7 @@ export const EMAIL_ADDRESS_ANALYTICS = {
   FLOW_ID: "email_address_update",
 
   STEPS: {
-    VERIFY_PASSWORD: "verify_password",
+    VERIFY_PASSWORD: "email_update_verify_password",
     OTP_SELECTION: "otp_selection",
     OTP_VALIDATION: "otp_validation",
     ENTER_EMAIL: "enter_email",
@@ -88,7 +88,7 @@ export const ADD_PASSKEY_ANALYTICS = {
   FLOW_ID: "add_passkey",
 
   STEPS: {
-    VERIFY_PASSWORD: "verify_password",
+    VERIFY_PASSWORD: "add_passkey_verify_password",
     OTP_SELECTION: "otp_selection",
     OTP_VALIDATION: "otp_validation",
     VERIFY_FIDO2: "verify_fido2_passkey",
@@ -102,7 +102,7 @@ export const DELETE_PASSKEY_ANALYTICS = {
   FLOW_ID: "delete_passkey",
 
   STEPS: {
-    VERIFY_PASSWORD: "verify_password",
+    VERIFY_PASSWORD: "delete_passkey_verify_password",
     OTP_SELECTION: "otp_selection",
     OTP_VALIDATION: "otp_validation",
     VERIFY_FIDO2: "verify_fido2_passkey",
@@ -118,6 +118,16 @@ export const RENAME_PASSKEY_ANALYTICS = {
     RENAME_PASSKEY: "rename_passkey",
   },
 } as const;
+
+export function getOtpTypeLabel(factorType?: string): string | undefined {
+  if (factorType === "email") {
+    return "email";
+  }
+  if (factorType === "smsotp" || factorType === "voiceotp") {
+    return "phone";
+  }
+  return undefined;
+}
 
 export const GA_CATEGORIES = {
   pageView: "pageview",

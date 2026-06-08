@@ -2755,7 +2755,7 @@ describe("AddMFAPage Unit Tests", () => {
 
       expect(mockTrackEvent).toHaveBeenCalledWith({
         event: "form_step_end",
-        step: "verify_password",
+        step: "add_mfa_verify_password",
         error: "CSIAM0011E",
       });
     });
@@ -3026,7 +3026,8 @@ describe("AddMFAPage Unit Tests", () => {
 
       expect(mockTrackEvent).toHaveBeenCalledWith({
         event: "form_step_start",
-        step: "verify_password",
+        step: "add_mfa_verify_password",
+        flow: "mfa_phone_number",
       });
     });
 
