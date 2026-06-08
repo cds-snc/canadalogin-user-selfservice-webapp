@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.22.2](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.22.1...v1.22.2) (2026-06-08)
+
+
+### Bug Fixes
+
+* add success notice for OTP verification in password change flow ([#1570](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1570)) ([3448476](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/3448476fffec2a91a2594d1e66dbb8fdadf12a5b))
+* Implement error handling for OTP validation and add password attempt tracking ([#1569](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1569)) ([aefdf2f](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/aefdf2fb84edb6b669b01e280d95afdbcb2b32cd))
+* implement session storage management for password change redirection ([#1572](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1572)) ([e2830fb](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/e2830fb5bbe7c3d9a6a03a609b1362fbfc9af258))
+* refactor contact number handling to use phoneNumbers array ([#1581](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1581)) ([2831801](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/283180119bec193fa8382379f6b55303f010667f))
+* update email verification messages and translations to align with design specifications ([#1571](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1571)) ([8eb9583](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/8eb95837f5c42f6284829e72be18c5833b941cb5))
+* update package-lock.json to resolve vitest v4 peer dependency conflict ([#1522](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1522)) ([5efa37d](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/5efa37d61155dbfd2e6130f3ac73818a0bc4a93c))
+* update password change flow to use returnToPage for redirection and remove session storage dependency ([#1575](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1575)) ([91ce6aa](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/91ce6aa4f1e0f68e70853bd4bd40a4337201f02f))
+* use enrolled email in change password otp instead of profile attribute ([#1580](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1580)) ([9d9eb3f](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/9d9eb3f4bbf163df7495ad08b605f56c50cdd2d6))
+
 ## [1.22.1](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.22.0...v1.22.1) (2026-06-04)
 
 
