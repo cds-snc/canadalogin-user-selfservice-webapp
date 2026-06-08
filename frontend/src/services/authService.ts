@@ -170,7 +170,7 @@ export const authService: AuthServiceContract = {
   update_phone_with_otp: async (phoneNumber, otp, trxnId, otpType = "sms") => {
     try {
       const updatePayload: UpdatePhonePayload = {
-        contactNumber: phoneNumber,
+        phoneNumbers: [{ value: phoneNumber, type: "mobile" }],
         otp,
         trxnId,
         otpType,

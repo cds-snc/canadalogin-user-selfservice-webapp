@@ -113,7 +113,10 @@ async def test_dispatch_get_my_profile_from_ibm_success(monkeypatch):
         ],
         "userName": "jo****@example.com",
         "emails": [{"value": "jo****@example.com", "type": "work"}],
-        "contactNumber": "+1-613-555-1234",
+        "phoneNumbers": [
+            {"value": "+1-613-555-1234", "type": "mobile"},
+            {"value": "+1-613-555-5678", "type": "work"},
+        ],
         "meta": {
             "location": "here",
             "created": "2023-01-01T00:00:00Z",
@@ -138,12 +141,17 @@ async def test_dispatch_get_my_profile_from_ibm_success(monkeypatch):
     assert response.userName == "jo****@example.com"
     assert response.id == "user-123"
 
-    # Verify contact number is NOT masked
-    assert response.contactNumber == "+1-613-555-1234"
+    # Verify phone numbers are NOT masked
+    assert len(response.phoneNumbers) == 2
+    assert response.phoneNumbers[0].value == "+1-613-555-1234"
+    assert response.phoneNumbers[0].type == "mobile"
+    assert response.phoneNumbers[1].value == "+1-613-555-5678"
+    assert response.phoneNumbers[1].type == "work"
 
     # Ensure no masking characters are present
-    assert "*" not in response.contactNumber
-    assert "X" not in response.contactNumber
+    for phone in response.phoneNumbers:
+        assert "*" not in phone.value
+        assert "X" not in phone.value
 
 
 @pytest.mark.asyncio
@@ -152,7 +160,7 @@ async def test_dispatch_get_my_profile_from_ibm_success(monkeypatch):
 async def test_my_profile_with_masked_phone_numbers(
     mock_dispatch_get, mock_mask_profile
 ):
-    """Test that get_my_profile returns masked contact number."""
+    """Test that get_my_profile returns masked phone numbers."""
     # Arrange
     profile_data = {
         "schemas": [
@@ -161,7 +169,10 @@ async def test_my_profile_with_masked_phone_numbers(
         ],
         "userName": "jo****@example.com",
         "emails": [{"value": "jo****@example.com", "type": "work"}],
-        "contactNumber": "+16135551234",
+        "phoneNumbers": [
+            {"value": "+1-613-555-1234", "type": "mobile"},
+            {"value": "+1-613-555-5678", "type": "work"},
+        ],
         "meta": {
             "location": "here",
             "created": "2023-01-01T00:00:00Z",
@@ -176,12 +187,16 @@ async def test_my_profile_with_masked_phone_numbers(
     mock_profile = IBMVerifyUserProfileSchema(**profile_data)
     mock_dispatch_get.return_value = mock_profile
 
-    masked_profile_data = {
-        **profile_data,
-        "contactNumber": "+1 (***) ***-1234",
-    }
+    # Mock mask_contact_phone_numbers to return masked phone numbers
+    masked_phones = [
+        {"value": "+1-613-XXX-XX34", "type": "mobile"},
+        {"value": "+1-613-XXX-XX78", "type": "work"},
+    ]
 
-    mock_mask_profile.return_value = masked_profile_data
+    mock_mask_profile.return_value = {
+        **profile_data,
+        "phoneNumbers": masked_phones,
+    }
 
     http_client = AsyncClient()
 
@@ -194,14 +209,19 @@ async def test_my_profile_with_masked_phone_numbers(
     assert response.data.userName == "jo****@example.com"
     assert response.data.id == "user-123"
 
-    # Verify contact number is masked
-    assert response.data.contactNumber == "+1 (***) ***-1234"
+    # Verify phone numbers are masked
+    assert len(response.data.phoneNumbers) == 2
+    assert response.data.phoneNumbers[0].value == "+1-613-XXX-XX34"
+    assert response.data.phoneNumbers[0].type == "mobile"
+    assert response.data.phoneNumbers[1].value == "+1-613-XXX-XX78"
+    assert response.data.phoneNumbers[1].type == "work"
 
     # Verify masking function was called with correct data
     mock_mask_profile.assert_called_once_with(mock_profile.model_dump())
 
     call_args = mock_mask_profile.call_args[0][0]
     assert call_args["userName"] == "jo****@example.com"
+    assert len(call_args["phoneNumbers"]) == 2
 
     # Verify dispatch was called
     mock_dispatch_get.assert_called_once_with(http_client, "mock-token")
@@ -220,6 +240,7 @@ async def test_my_profile_with_no_phone_numbers(mock_dispatch_get, mock_mask_pro
         ],
         "userName": "jane.doe@example.com",
         "emails": [{"value": "jane.doe@example.com", "type": "work"}],
+        "phoneNumbers": [],
         "meta": {
             "location": "here",
             "created": "2023-01-01T00:00:00Z",
@@ -235,6 +256,7 @@ async def test_my_profile_with_no_phone_numbers(mock_dispatch_get, mock_mask_pro
     mock_mask_profile.return_value = {
         **profile_data,
         "userName": "ja****@example.com",
+        "phoneNumbers": [],
     }
 
     http_client = AsyncClient()
@@ -246,61 +268,8 @@ async def test_my_profile_with_no_phone_numbers(mock_dispatch_get, mock_mask_pro
     assert response.success is True
 
     assert response.data.userName == "ja****@example.com"
-    assert response.data.contactNumber is None
+    assert len(response.data.phoneNumbers) == 0
 
-    # Verify masking was still called (even with no contact number)
+    # Verify masking was still called (even with empty list)
     mock_mask_profile.assert_called_once()
     mock_dispatch_get.assert_called_once_with(http_client, "mock-token")
-
-
-@pytest.mark.asyncio
-@respx.mock
-async def test_dispatch_get_my_profile_from_ibm_contact_number_in_custom_attrs(
-    monkeypatch,
-):
-    """
-    IBM Verify may return contactNumber only inside customAttributes (e.g. after a
-    first-time PUT write or in certain response formats). The model_validator fallback
-    should extract it so that contactNumber is populated on the schema.
-    """
-    test_url = "https://mocked-api.ibm.com/v2.0/Me"
-
-    monkeypatch.setattr(
-        "app.users.services.get_my_profile.get_configuration",
-        lambda: Mock(profile_api_endpoint=test_url),
-    )
-
-    profile_data = {
-        "schemas": [
-            "urn:ietf:params:scim:schemas:core:2.0:User",
-            "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
-        ],
-        "userName": "jo****@example.com",
-        "emails": [{"value": "jo****@example.com", "type": "work"}],
-        # No top-level contactNumber — only inside customAttributes
-        "urn:ietf:params:scim:schemas:extension:ibm:2.0:User": {
-            "customAttributes": [
-                {"name": "contactNumber", "values": ["+16135551234"]},
-            ]
-        },
-        "meta": {
-            "location": "here",
-            "created": "2023-01-01T00:00:00Z",
-            "lastModified": "2023-09-22T12:30:00Z",
-            "resourceType": "User",
-        },
-        "active": True,
-        "id": "user-123",
-    }
-
-    respx.get(test_url).mock(return_value=Response(status_code=200, json=profile_data))
-
-    http_client = AsyncClient()
-
-    response = await dispatch_get_my_profile_from_ibm(
-        http_client, user_access_token="mock-token"
-    )
-
-    assert isinstance(response, IBMVerifyUserProfileSchema)
-    # Fallback validator should have extracted contactNumber from customAttributes
-    assert response.contactNumber == "+16135551234"
