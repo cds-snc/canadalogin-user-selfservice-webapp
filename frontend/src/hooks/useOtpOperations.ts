@@ -40,6 +40,7 @@ export const useOtpOperations = ({
   setErrorCode,
   fallbackNavigationPath,
   allowEmptyFactors = false,
+  includeEmailFactors = false,
   mapType = null,
   mfaTrxnId = "",
 }: UseOtpOperationsOptions): UseOtpOperationsReturn => {
@@ -220,9 +221,14 @@ export const useOtpOperations = ({
     setOtpLoading(true);
     try {
       const response = await otpFactors.getUserOtpPhoneFactors();
-      const phoneFactors = Array.isArray(response?.data)
+      const fetchedFactors = Array.isArray(response?.data)
         ? (response.data as OtpFactor[])
         : [];
+      const phoneFactors = includeEmailFactors
+        ? fetchedFactors
+        : fetchedFactors.filter(
+            (factor) => factor.type === "smsotp" || factor.type === "voiceotp",
+          );
 
       if (
         response?.success &&

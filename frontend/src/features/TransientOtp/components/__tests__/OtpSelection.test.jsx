@@ -711,5 +711,21 @@ describe("OtpSelection Component", () => {
       renderComponent({ userPhoneFactors: null });
       expect(screen.queryByText("Email")).not.toBeInTheDocument();
     });
+
+    it("does not render email section outside change password flow", () => {
+      renderComponent({
+        parentPage: PAGES.addMFAPage,
+        userPhoneFactors: [
+          {
+            id: "email-1",
+            type: FLOW_TYPES.emailOtp,
+            destination: "user@example.com",
+          },
+        ],
+      });
+
+      expect(screen.queryByText("Email")).not.toBeInTheDocument();
+      expect(screen.queryByText("Email me")).not.toBeInTheDocument();
+    });
   });
 });

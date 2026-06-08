@@ -99,6 +99,8 @@ export default function OtpSelection({
     userPhoneFactors?.filter(
       (f) => f.type === FLOW_TYPES.email || f.type === FLOW_TYPES.emailOtp,
     ) ?? [];
+  const isChangePasswordFlow =
+    parentPage.toLowerCase() === PAGES.password.toLowerCase();
   const hasFido2 = fido2Data && fido2Data.length > 0;
 
   const handlePhoneFactorSelect = (factorId: string) => {
@@ -284,7 +286,7 @@ export default function OtpSelection({
         )}
 
         {/* Email section */}
-        {emailFactors.length > 0 && (
+        {isChangePasswordFlow && emailFactors.length > 0 && (
           <GcdsContainer>
             <SectionHeader
               icon={

@@ -60,6 +60,7 @@ export type UseOtpOperationsOptions = {
   setErrorCode: (errorCode: string) => void;
   fallbackNavigationPath?: string;
   allowEmptyFactors?: boolean;
+  includeEmailFactors?: boolean;
   mapType?: OtpMapType | null;
   mfaTrxnId?: string;
 };

@@ -147,6 +147,7 @@ export default function ChangePasswordIndex() {
     userId: id,
     userName,
     setErrorCode,
+    includeEmailFactors: true,
   });
 
   // Custom requestOtpCode for password change flow using passwordUpdate API
