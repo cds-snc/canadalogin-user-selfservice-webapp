@@ -58,30 +58,26 @@ export const appRoutes: RouteObject[] = [
                     index: true,
                     element: <ProfileHome />,
                   },
-                  ...(DEV_ONLY_FEATURE
-                    ? [
-                        {
-                          path: "update-name/:step?",
-                          element: <EditProfileNamePage />,
-                          handle: { id: PAGES.editProfileNamePage },
-                        },
-                        {
-                          path: "update-language/:step?",
-                          element: <EditLanguagePreferencePage />,
-                          handle: { id: PAGES.editLanguagePreferences },
-                        },
-                        {
-                          path: "update-contact-phone/:step?",
-                          element: <EditContactPhoneNumberPage />,
-                          handle: { id: PAGES.editContactPhoneNumberPage },
-                        },
-                        {
-                          path: "update-email/:step?",
-                          element: <EditEmailAddressPage />,
-                          handle: { id: PAGES.editEmailPage },
-                        },
-                      ]
-                    : []),
+                  {
+                    path: "update-name/:step?",
+                    element: <EditProfileNamePage />,
+                    handle: { id: PAGES.editProfileNamePage },
+                  },
+                  {
+                    path: "update-language/:step?",
+                    element: <EditLanguagePreferencePage />,
+                    handle: { id: PAGES.editLanguagePreferences },
+                  },
+                  {
+                    path: "update-contact-phone/:step?",
+                    element: <EditContactPhoneNumberPage />,
+                    handle: { id: PAGES.editContactPhoneNumberPage },
+                  },
+                  {
+                    path: "update-email/:step?",
+                    element: <EditEmailAddressPage />,
+                    handle: { id: PAGES.editEmailPage },
+                  },
                 ],
               },
               {

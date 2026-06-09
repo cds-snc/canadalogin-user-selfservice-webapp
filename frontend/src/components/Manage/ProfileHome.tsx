@@ -5,7 +5,6 @@ import {
   GcdsGrid,
   GcdsText,
   GcdsLink,
-  GcdsNotice,
 } from "@gcds-core/components-react";
 
 import { useTranslation } from "react-i18next";
@@ -42,18 +41,16 @@ const DisplayEmailInfo = ({ email }: DisplayEmailInfoProps) => {
       <GcdsText>{t("ProfileHome.emailDescription")}</GcdsText>
       <GcdsGrid columns="1fr auto" className="gridInline">
         <GcdsText>{email}</GcdsText>
-        {DEV_ONLY_FEATURE && (
-          <GcdsLink
-            href={editEmail}
-            size="regular"
-            onGcdsClick={(event: GcdsNavigationEvent) => {
-              event.preventDefault();
-              navigate(event.detail);
-            }}
-          >
-            {t("ProfileHome.edit")}
-          </GcdsLink>
-        )}
+        <GcdsLink
+          href={editEmail}
+          size="regular"
+          onGcdsClick={(event: GcdsNavigationEvent) => {
+            event.preventDefault();
+            navigate(event.detail);
+          }}
+        >
+          {t("ProfileHome.edit")}
+        </GcdsLink>
       </GcdsGrid>
       <VerifiedBadge text={t("ProfileHome.verified")} />
     </>
@@ -69,14 +66,6 @@ export default function ProfileHome() {
   return (
     <GcdsContainer role="main">
       <GcdsGrid columns="1 auto" gap="300">
-        {" "}
-        <GcdsNotice
-          noticeRole="warning"
-          noticeTitle={t("ProfileHome.maintenanceTitle")}
-          noticeTitleTag="h2"
-        >
-          <GcdsText>{t("ProfileHome.maintenanceNoticeBody")}</GcdsText>
-        </GcdsNotice>
         <GcdsHeading tag="h1" marginTop="0">
           {t("ProfileHome.title")}
         </GcdsHeading>

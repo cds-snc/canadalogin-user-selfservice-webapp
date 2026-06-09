@@ -8,7 +8,7 @@ import {
 } from "@gcds-core/components-react";
 
 import { useTranslation } from "react-i18next";
-import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
+import { PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import { useUser } from "../../../components/Providers/useUser";
 import { useNavigateHelper } from "../../../hooks/useNavigate";
@@ -32,18 +32,16 @@ export default function ViewProfileNameCard() {
       </GcdsHeading>
       <GcdsGrid columns="1fr auto" className="gridInline">
         <GcdsText>{name}</GcdsText>
-        {DEV_ONLY_FEATURE && (
-          <GcdsLink
-            href={editProfile}
-            size="regular"
-            onGcdsClick={(event: GcdsNavigationEvent) => {
-              event.preventDefault();
-              navigateHelper(event.detail);
-            }}
-          >
-            {t("ProfileHome.edit")}
-          </GcdsLink>
-        )}
+        <GcdsLink
+          href={editProfile}
+          size="regular"
+          onGcdsClick={(event: GcdsNavigationEvent) => {
+            event.preventDefault();
+            navigateHelper(event.detail);
+          }}
+        >
+          {t("ProfileHome.edit")}
+        </GcdsLink>
       </GcdsGrid>
     </GcdsContainer>
   );

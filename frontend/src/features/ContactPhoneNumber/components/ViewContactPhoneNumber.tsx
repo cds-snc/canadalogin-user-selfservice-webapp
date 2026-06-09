@@ -10,7 +10,7 @@ import {
 import parsePhoneNumberFromString from "libphonenumber-js";
 import { useTranslation } from "react-i18next";
 
-import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
+import { PAGES } from "../../../utils/constants";
 import { useNavigateHelper } from "../../../hooks/useNavigate";
 import VerifiedBadge from "../../../components/Badges/VerifiedBadge";
 import { path } from "../../../utils/routeHelpers";
@@ -67,11 +67,9 @@ function AddPhoneNumber({ language }: { language?: string }) {
       <section>
         <GcdsText>{t("ProfileHome.noPhoneAdded")}</GcdsText>
       </section>
-      {DEV_ONLY_FEATURE && (
-        <GcdsButton onGcdsClick={() => navigateHelper(newContactPhoneNumber)}>
-          + {t("ProfileHome.addPhoneNumber")}
-        </GcdsButton>
-      )}
+      <GcdsButton onGcdsClick={() => navigateHelper(newContactPhoneNumber)}>
+        + {t("ProfileHome.addPhoneNumber")}
+      </GcdsButton>
     </GcdsGrid>
   );
 }
@@ -95,18 +93,16 @@ function ContactPhoneNumber({
 
       <GcdsGrid columns="1fr auto">
         <DisplayPhoneNumbers phoneNumbers={phoneNumbers} />
-        {DEV_ONLY_FEATURE && (
-          <GcdsLink
-            href={newContactPhoneNumber}
-            size="regular"
-            onGcdsClick={(event: GcdsNavigationEvent) => {
-              event.preventDefault();
-              navigateHelper(event.detail);
-            }}
-          >
-            {t("ProfileHome.edit")}
-          </GcdsLink>
-        )}
+        <GcdsLink
+          href={newContactPhoneNumber}
+          size="regular"
+          onGcdsClick={(event: GcdsNavigationEvent) => {
+            event.preventDefault();
+            navigateHelper(event.detail);
+          }}
+        >
+          {t("ProfileHome.edit")}
+        </GcdsLink>
       </GcdsGrid>
       <VerifiedBadge text={t("ProfileHome.verified")} />
     </>
