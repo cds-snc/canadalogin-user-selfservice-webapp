@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.23.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.22.2...v1.23.0) (2026-06-09)
+
+
+### Features
+
+* [identity verification] update idv flow to navigate to the correct screen ([#1566](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1566)) ([8d49571](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/8d495716015e301b93cb9421666937338dccaa22))
+
+
+### Bug Fixes
+
+* change password flow go to otp validation if only one mfa factor available ([#1586](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1586)) ([528abfb](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/528abfb8c2cec0c1e987f5bb527bd0098902f9c7))
+* hotfix not delete extra attribute ([#1587](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1587)) ([4e06bd0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/4e06bd04faa291b71618af98010d02028100b6ce))
+
 ## [1.22.2](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.22.1...v1.22.2) (2026-06-08)
 
 
