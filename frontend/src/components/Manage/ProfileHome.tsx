@@ -41,16 +41,18 @@ const DisplayEmailInfo = ({ email }: DisplayEmailInfoProps) => {
       <GcdsText>{t("ProfileHome.emailDescription")}</GcdsText>
       <GcdsGrid columns="1fr auto" className="gridInline">
         <GcdsText>{email}</GcdsText>
-        <GcdsLink
-          href={editEmail}
-          size="regular"
-          onGcdsClick={(event: GcdsNavigationEvent) => {
-            event.preventDefault();
-            navigate(event.detail);
-          }}
-        >
-          {t("ProfileHome.edit")}
-        </GcdsLink>
+        {DEV_ONLY_FEATURE && (
+          <GcdsLink
+            href={editEmail}
+            size="regular"
+            onGcdsClick={(event: GcdsNavigationEvent) => {
+              event.preventDefault();
+              navigate(event.detail);
+            }}
+          >
+            {t("ProfileHome.edit")}
+          </GcdsLink>
+        )}
       </GcdsGrid>
       <VerifiedBadge text={t("ProfileHome.verified")} />
     </>

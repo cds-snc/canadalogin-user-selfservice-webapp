@@ -73,11 +73,15 @@ export const appRoutes: RouteObject[] = [
                     element: <EditContactPhoneNumberPage />,
                     handle: { id: PAGES.editContactPhoneNumberPage },
                   },
-                  {
-                    path: "update-email/:step?",
-                    element: <EditEmailAddressPage />,
-                    handle: { id: PAGES.editEmailPage },
-                  },
+                  ...(DEV_ONLY_FEATURE
+                    ? [
+                        {
+                          path: "update-email/:step?",
+                          element: <EditEmailAddressPage />,
+                          handle: { id: PAGES.editEmailPage },
+                        },
+                      ]
+                    : []),
                 ],
               },
               {
