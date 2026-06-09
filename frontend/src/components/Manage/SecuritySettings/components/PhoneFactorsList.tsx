@@ -31,50 +31,65 @@ export default function PhoneFactorsList({
   const availableFactorsUIContent = (factor: string) =>
     availableFactorsUIContentMap[factor] || factor;
 
-  return Object.entries(userPhoneFactorsMap).map(([phoneNumber, factors]) => {
-    const canDeletePhoneNumber =
-      totalFactorCount === undefined
-        ? Object.keys(userPhoneFactorsMap).length > 1
-        : totalFactorCount - factors.length >= 1;
-
-    const availableFactorsComponent = factors.map((factor, index) => {
-      return (
-        <li key={`${factor.id}-${index}`}>
-          <GcdsText textRole="secondary">
-            {availableFactorsUIContent(factor.type)}
-          </GcdsText>
-        </li>
-      );
-    });
-
-    return (
-      <GcdsContainer key={phoneNumber}>
-        <GcdsText>
-          <strong>{`${phoneNumber}`}</strong>
-        </GcdsText>
-        <GcdsText marginBottom="0" textRole="secondary">
-          {t("Manage2FAVerifications.codesSentBy")}
-        </GcdsText>
-        <ul>{availableFactorsComponent}</ul>
-        {canDeletePhoneNumber && (
-          <GcdsButton
-            buttonRole="secondary"
-            onGcdsClick={() => {
-              navigate(path(PAGES.deleteMFAPage, { language }), {
-                state: {
-                  phoneNumber,
-                  factorIds: factors.map((factor) => factor.id),
-                  formattedPhoneNumber: `${phoneNumber}`,
-                },
-              });
-            }}
-          >
-            {t("Manage2FAVerifications.deleteButton")}
-            <GcdsSrOnly tag="span"> {phoneNumber}</GcdsSrOnly>
-          </GcdsButton>
-        )}
-        <div className="separator" />
-      </GcdsContainer>
+  const filteredPhoneFactorsMap = Object.entries(userPhoneFactorsMap).reduce<
+    Record<string, OtpFactorReference[]>
+  >((acc, [contact, factors]) => {
+    const nonEmailFactors = factors.filter(
+      (factor) => factor.type !== "emailotp",
     );
-  });
+    if (nonEmailFactors.length > 0) {
+      acc[contact] = nonEmailFactors;
+    }
+
+    return acc;
+  }, {});
+
+  return Object.entries(filteredPhoneFactorsMap).map(
+    ([phoneNumber, factors]) => {
+      const canDeletePhoneNumber =
+        totalFactorCount === undefined
+          ? Object.keys(filteredPhoneFactorsMap).length > 1
+          : totalFactorCount - factors.length >= 1;
+
+      const availableFactorsComponent = factors.map((factor, index) => {
+        return (
+          <li key={`${factor.id}-${index}`}>
+            <GcdsText textRole="secondary">
+              {availableFactorsUIContent(factor.type)}
+            </GcdsText>
+          </li>
+        );
+      });
+
+      return (
+        <GcdsContainer key={phoneNumber}>
+          <GcdsText>
+            <strong>{`${phoneNumber}`}</strong>
+          </GcdsText>
+          <GcdsText marginBottom="0" textRole="secondary">
+            {t("Manage2FAVerifications.codesSentBy")}
+          </GcdsText>
+          <ul>{availableFactorsComponent}</ul>
+          {canDeletePhoneNumber && (
+            <GcdsButton
+              buttonRole="secondary"
+              onGcdsClick={() => {
+                navigate(path(PAGES.deleteMFAPage, { language }), {
+                  state: {
+                    phoneNumber,
+                    factorIds: factors.map((factor) => factor.id),
+                    formattedPhoneNumber: `${phoneNumber}`,
+                  },
+                });
+              }}
+            >
+              {t("Manage2FAVerifications.deleteButton")}
+              <GcdsSrOnly tag="span"> {phoneNumber}</GcdsSrOnly>
+            </GcdsButton>
+          )}
+          <div className="separator" />
+        </GcdsContainer>
+      );
+    },
+  );
 }

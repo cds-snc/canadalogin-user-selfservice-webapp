@@ -611,47 +611,76 @@ describe("OtpSelection Component", () => {
 
   // -------------------------------------------------------------------------
   describe("Email Section", () => {
-    it("does not render email section when emailAddress is not provided", () => {
-      renderComponent({ onSelectEmail: vi.fn() });
-      expect(screen.queryByText("Email")).not.toBeInTheDocument();
-      expect(screen.queryByText("Email me")).not.toBeInTheDocument();
-    });
-
-    it("does not render email section when onSelectEmail is not provided", () => {
-      renderComponent({ emailAddress: "user@example.com" });
-      expect(screen.queryByText("Email")).not.toBeInTheDocument();
-      expect(screen.queryByText("Email me")).not.toBeInTheDocument();
-    });
-
-    it("renders email section when both emailAddress and onSelectEmail are provided", () => {
+    it("does not render email section when no enrolled email factors exist", () => {
       renderComponent({
-        emailAddress: "user@example.com",
-        onSelectEmail: vi.fn(),
+        userPhoneFactors: [
+          { id: "sms-1", type: FLOW_TYPES.sms, destination: "+15551111111" },
+        ],
+      });
+      expect(screen.queryByText("Email")).not.toBeInTheDocument();
+      expect(screen.queryByText("Email me")).not.toBeInTheDocument();
+    });
+
+    it("renders email section when enrolled email factor uses FLOW_TYPES.email", () => {
+      renderComponent({
+        userPhoneFactors: [
+          {
+            id: "email-1",
+            type: FLOW_TYPES.email,
+            destination: "user@example.com",
+          },
+        ],
       });
       expect(screen.getByText("Email")).toBeInTheDocument();
       expect(screen.getByText("Email me")).toBeInTheDocument();
     });
 
-    it("renders the email address in the email section", () => {
+    it("renders email section when enrolled email factor type is emailotp", () => {
       renderComponent({
-        emailAddress: "user@example.com",
-        onSelectEmail: vi.fn(),
+        userPhoneFactors: [
+          {
+            id: "email-1",
+            type: FLOW_TYPES.emailOtp,
+            destination: "user@example.com",
+          },
+        ],
       });
+
+      expect(screen.getByText("Email")).toBeInTheDocument();
+      expect(screen.getByText("Email me")).toBeInTheDocument();
+    });
+
+    it("renders the enrolled email destination in the email section", () => {
+      renderComponent({
+        userPhoneFactors: [
+          {
+            id: "email-1",
+            type: FLOW_TYPES.email,
+            destination: "user@example.com",
+          },
+        ],
+      });
+
       expect(screen.getByText("user@example.com")).toBeInTheDocument();
     });
 
-    it("calls onSelectEmail when 'Email me' link is clicked", async () => {
+    it("selects enrolled email factor when 'Email me' is clicked", async () => {
       const user = userEvent.setup();
-      const mockOnSelectEmail = vi.fn();
       renderComponent({
-        emailAddress: "user@example.com",
-        onSelectEmail: mockOnSelectEmail,
+        userPhoneFactors: [
+          {
+            id: "email-1",
+            type: FLOW_TYPES.email,
+            destination: "user@example.com",
+          },
+        ],
       });
 
       const emailLink = screen.getByText("Email me");
       await user.click(emailLink);
 
-      expect(mockOnSelectEmail).toHaveBeenCalledTimes(1);
+      expect(mockOnChangeUserSelectedMfaFactor).toHaveBeenCalledWith("email-1");
+      expect(mockOnNext).toHaveBeenCalledTimes(1);
     });
 
     it("renders all four sections when SMS, Voice, FIDO2, and email are present", () => {
@@ -663,10 +692,13 @@ describe("OtpSelection Component", () => {
             type: FLOW_TYPES.voice,
             destination: "+15552222222",
           },
+          {
+            id: "email-1",
+            type: FLOW_TYPES.emailOtp,
+            destination: "user@example.com",
+          },
         ],
         fido2Data: [{ id: "passkey-1", attributes: { nickname: "My Key" } }],
-        emailAddress: "user@example.com",
-        onSelectEmail: vi.fn(),
       });
 
       expect(screen.getByText("Text message")).toBeInTheDocument();
@@ -675,9 +707,25 @@ describe("OtpSelection Component", () => {
       expect(screen.getByText("Email")).toBeInTheDocument();
     });
 
-    it("does not render email section when emailAddress is null", () => {
-      renderComponent({ emailAddress: null, onSelectEmail: vi.fn() });
+    it("does not render email section when userPhoneFactors is null", () => {
+      renderComponent({ userPhoneFactors: null });
       expect(screen.queryByText("Email")).not.toBeInTheDocument();
+    });
+
+    it("does not render email section outside change password flow", () => {
+      renderComponent({
+        parentPage: PAGES.addMFAPage,
+        userPhoneFactors: [
+          {
+            id: "email-1",
+            type: FLOW_TYPES.emailOtp,
+            destination: "user@example.com",
+          },
+        ],
+      });
+
+      expect(screen.queryByText("Email")).not.toBeInTheDocument();
+      expect(screen.queryByText("Email me")).not.toBeInTheDocument();
     });
   });
 });

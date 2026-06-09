@@ -58,6 +58,7 @@ vi.mock("@gcds-core/components-react", () => ({
     return <Tag {...props}>{children}</Tag>;
   },
   GcdsText: ({ children }) => <p>{children}</p>,
+  GcdsNotice: ({ children, ...props }) => <div {...props}>{children}</div>,
   GcdsLink: ({ children, href, onGcdsClick }) => (
     <a
       data-testid="gcds-link"

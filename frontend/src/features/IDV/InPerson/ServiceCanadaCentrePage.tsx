@@ -9,16 +9,23 @@ import {
   GcdsContainer,
 } from "@gcds-core/components-react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { useUser } from "../../../components/Providers/useUser";
-import { DEV_ONLY_FEATURE } from "../../../utils/constants";
+import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
+import { path } from "../../../utils/routeHelpers";
 
 export default function ServiceCanadaCentrePage() {
   const { state } = useUser();
   const navigate = useNavigate();
+  const { language } = useParams();
+
   const { t } = useTranslation("idv");
 
   const email = state?.userProfile?.userName ?? "";
+
+  const serviceCanadaCodePage = path(PAGES.idvServiceCanadaCentreCodePage, {
+    language: language,
+  });
 
   if (!DEV_ONLY_FEATURE) {
     return null;
@@ -80,7 +87,7 @@ export default function ServiceCanadaCentrePage() {
           <GcdsButton
             type="button"
             onClick={() => {
-              // TODO: navigate to next IDV step
+              navigate(serviceCanadaCodePage);
             }}
           >
             {t("ServiceCanadaCentre.continueButton")}

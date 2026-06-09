@@ -1,5 +1,6 @@
 import logging
 from fastapi import Request
+from typing import Optional
 from urllib.parse import urlencode
 from authlib.jose import jwt
 from authlib.jose.errors import JoseError
@@ -7,10 +8,12 @@ from authlib.jose.rfc7519.jwt import create_load_key
 from app.auth.services.oidc_config import oauth
 from app.auth.services.auth_user_session import get_user_info
 from app.auth.services.auth import get_base_profile_management_url
+from app.auth.services.auth import is_safe_return_to_page
 from app.utils.schemas import ResponseModel
 from app.auth.schemas import LogoutResponseModel
 from app.utils.redis import get_redis_client
 from app.constants.redis_keys import RedisKeys
+from app.constants.session_keys import SessionKeys
 
 logger = logging.getLogger(__name__)
 
@@ -110,7 +113,9 @@ async def mark_session_logout(
     )
 
 
-async def logout_user(request: Request, id_token: str):
+async def logout_user(
+    request: Request, id_token: str, returnToPage: Optional[str] = None
+):
     """
     Logs out the user by clearing the session and redirecting to the logout endpoint.
     """
@@ -134,6 +139,10 @@ async def logout_user(request: Request, id_token: str):
     )
     # Clear the session
     request.session.clear()
+
+    # Preserve one-time post-login redirect target when intentionally provided.
+    if is_safe_return_to_page(returnToPage):
+        request.session[SessionKeys.RETURN_TO_PAGE.value] = returnToPage
 
     await mark_session_logout(request, sid=user_info.get("sid"), source="logout_button")
 

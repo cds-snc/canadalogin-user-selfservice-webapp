@@ -5,6 +5,14 @@ import { describe, it, expect, vi } from "vitest";
 import ServiceCanadaCentreIDVCodePage from "../InPerson/ServiceCanadaCentreIDVCodePage";
 import { UserProvider } from "../../../components/Providers/UserProvider";
 
+vi.mock("../../../utils/constants", async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    DEV_ONLY_FEATURE: true,
+  };
+});
+
 // Mock GCDS components
 vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children, ...props }) => (

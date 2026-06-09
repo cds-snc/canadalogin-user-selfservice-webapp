@@ -28,6 +28,13 @@ vi.mock("../../../utils/routeHelpers", () => ({
   path: vi.fn(() => "/en/manage-dashboard"),
 }));
 
+vi.mock("../../../utils/constants", () => ({
+  DEV_ONLY_FEATURE: true,
+  PAGES: {
+    editContactPhoneNumberPage: "editContactPhoneNumberPage",
+  },
+}));
+
 vi.mock("../../../utils/apiErrorHandler", () => ({
   handleApiError: vi.fn(),
   redirectToLogin: vi.fn(),
@@ -127,7 +134,7 @@ describe("ViewContactPhoneNumber Component", () => {
   it("renders with correct heading", () => {
     render(
       <TestWrapper>
-        <ViewContactPhoneNumber contactNumber={null} />
+        <ViewContactPhoneNumber phoneNumbers={null} />
       </TestWrapper>,
     );
 
@@ -137,10 +144,10 @@ describe("ViewContactPhoneNumber Component", () => {
     );
   });
 
-  it("renders AddPhoneNumber component when contactNumber is null", () => {
+  it("renders AddPhoneNumber component when phoneNumbers is null", () => {
     render(
       <TestWrapper>
-        <ViewContactPhoneNumber contactNumber={null} />
+        <ViewContactPhoneNumber phoneNumbers={null} />
       </TestWrapper>,
     );
 
@@ -153,7 +160,7 @@ describe("ViewContactPhoneNumber Component", () => {
   it("clicking add phone number button navigates to manage dashboard", async () => {
     render(
       <TestWrapper>
-        <ViewContactPhoneNumber contactNumber={null} />
+        <ViewContactPhoneNumber phoneNumbers={null} />
       </TestWrapper>,
     );
 
@@ -166,10 +173,12 @@ describe("ViewContactPhoneNumber Component", () => {
     });
   });
 
-  it("renders ContactPhoneNumber component when contactNumber exists", () => {
+  it("renders ContactPhoneNumber component when phoneNumbers exist", () => {
+    const phoneNumbers = [{ value: "+15551234567" }];
+
     render(
       <TestWrapper>
-        <ViewContactPhoneNumber contactNumber="+15551234567" />
+        <ViewContactPhoneNumber phoneNumbers={phoneNumbers} />
       </TestWrapper>,
     );
 
@@ -180,20 +189,25 @@ describe("ViewContactPhoneNumber Component", () => {
     expect(screen.getByTestId("verified-badge")).toHaveTextContent("Verified");
   });
 
-  it("displays formatted phone number correctly", () => {
+  it("displays formatted phone numbers correctly", () => {
+    const phoneNumbers = [{ value: "+15551234567" }, { value: "+1234567890" }];
+
     render(
       <TestWrapper>
-        <ViewContactPhoneNumber contactNumber="+15551234567" />
+        <ViewContactPhoneNumber phoneNumbers={phoneNumbers} />
       </TestWrapper>,
     );
 
     expect(screen.getByText("(555) 123-4567")).toBeInTheDocument();
+    expect(screen.getByText("(123) 456-7890")).toBeInTheDocument();
   });
 
   it("clicking edit link navigates to manage dashboard", async () => {
+    const phoneNumbers = [{ value: "+15551234567" }];
+
     render(
       <TestWrapper>
-        <ViewContactPhoneNumber contactNumber="+15551234567" />
+        <ViewContactPhoneNumber phoneNumbers={phoneNumbers} />
       </TestWrapper>,
     );
 
@@ -211,9 +225,10 @@ describe("ViewContactPhoneNumber Component", () => {
       parsePhoneNumberFromString.mockImplementation(() => {
         throw new Error("Invalid phone number");
       });
+      const phoneNumbers = [{ value: "invalid-phone" }];
       render(
         <TestWrapper>
-          <ViewContactPhoneNumber contactNumber="invalid-phone" />
+          <ViewContactPhoneNumber phoneNumbers={phoneNumbers} />
         </TestWrapper>,
       );
       expect(screen.getByText("invalid-phone")).toBeInTheDocument();
@@ -228,19 +243,21 @@ describe("ViewContactPhoneNumber Component", () => {
   it("displays original phone number when parsing returns null", () => {
     parsePhoneNumberFromString.mockReturnValue(null);
 
+    const phoneNumbers = [{ value: "1234567890" }];
+
     render(
       <TestWrapper>
-        <ViewContactPhoneNumber contactNumber="1234567890" />
+        <ViewContactPhoneNumber phoneNumbers={phoneNumbers} />
       </TestWrapper>,
     );
 
     expect(screen.getByText("1234567890")).toBeInTheDocument();
   });
 
-  it("handles null contactNumber", () => {
+  it("handles empty phone numbers array", () => {
     render(
       <TestWrapper>
-        <ViewContactPhoneNumber contactNumber={null} />
+        <ViewContactPhoneNumber phoneNumbers={[]} />
       </TestWrapper>,
     );
 

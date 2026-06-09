@@ -4,7 +4,9 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import ProvenInformationCard from "../ProvenInformationCard";
 
 const mockNavigate = vi.fn();
-let mockDevOnlyFeature = true;
+const mockFlags = vi.hoisted(() => ({
+  devOnlyFeature: true,
+}));
 
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
@@ -31,13 +33,21 @@ vi.mock("../../../components/Providers/useUser", () => ({
   }),
 }));
 
-vi.mock("../../../utils/constants", () => ({
-  get DEV_ONLY_FEATURE() {
-    return mockDevOnlyFeature;
-  },
-  PAGES: {},
-  VITE_ENVIRONMENTS: { dev: "dev", test: "test" },
-}));
+vi.mock("../../../utils/constants", async () => {
+  const actual = await vi.importActual("../../../utils/constants");
+  return {
+    ...actual,
+    get DEV_ONLY_FEATURE() {
+      return mockFlags.devOnlyFeature;
+    },
+    PAGES: {
+      ...actual.PAGES,
+      idvServiceCanadaCentrePage: "idvServiceCanadaCentrePage",
+      idvOnlineVerificationInfoPage: "idvOnlineVerificationInfoPage",
+      idvProvincialVerificationPage: "idvProvincialVerificationPage",
+    },
+  };
+});
 
 vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children }) => <div>{children}</div>,
@@ -60,11 +70,11 @@ vi.mock("@gcds-core/components-react", () => ({
 describe("ProvenInformationCard", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockDevOnlyFeature = true;
+    mockFlags.devOnlyFeature = true;
   });
 
   it("renders null when DEV_ONLY_FEATURE is false", () => {
-    mockDevOnlyFeature = false;
+    mockFlags.devOnlyFeature = false;
     const { container } = render(<ProvenInformationCard />);
     expect(container).toBeEmptyDOMElement();
   });

@@ -409,7 +409,8 @@ describe("ErrorSummaryWithFocus Unit Tests", () => {
     const errorCodes = [
       {
         code: "CSIAM0010E",
-        expectedMessage: "The authentication attempt failed",
+        expectedMessage:
+          "You have reached the limit of attempts. Wait 15 minutes and try again.",
       },
       { code: "CSIAM0038E", expectedMessage: "Too Many Attempts" },
       {
@@ -441,7 +442,9 @@ describe("ErrorSummaryWithFocus Unit Tests", () => {
       );
 
       expect(
-        screen.getByText("The authentication attempt failed"),
+        screen.getByText(
+          "You have reached the limit of attempts. Wait 15 minutes and try again.",
+        ),
       ).toBeInTheDocument();
 
       rerender(
@@ -451,7 +454,9 @@ describe("ErrorSummaryWithFocus Unit Tests", () => {
       );
 
       expect(
-        screen.queryByText("The authentication attempt failed"),
+        screen.queryByText(
+          "You have reached the limit of attempts. Wait 15 minutes and try again.",
+        ),
       ).not.toBeInTheDocument();
       expect(screen.getByText("Too Many Attempts")).toBeInTheDocument();
     });
@@ -464,7 +469,9 @@ describe("ErrorSummaryWithFocus Unit Tests", () => {
       );
 
       expect(
-        screen.getByText("The authentication attempt failed"),
+        screen.getByText(
+          "You have reached the limit of attempts. Wait 15 minutes and try again.",
+        ),
       ).toBeInTheDocument();
 
       i18n.changeLanguage("fr");
@@ -475,10 +482,14 @@ describe("ErrorSummaryWithFocus Unit Tests", () => {
       );
 
       expect(
-        screen.queryByText("The authentication attempt failed"),
+        screen.queryByText(
+          "You have reached the limit of attempts. Wait 15 minutes and try again.",
+        ),
       ).not.toBeInTheDocument();
       expect(
-        screen.getByText("La tentative d'authentification a échoué"),
+        screen.getByText(
+          "Vous avez atteint la limite de tentatives. Attendez 15 minutes et réessayez.",
+        ),
       ).toBeInTheDocument();
       i18n.changeLanguage("en");
     });
