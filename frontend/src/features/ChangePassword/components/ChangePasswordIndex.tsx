@@ -106,7 +106,7 @@ export default function ChangePasswordIndex() {
       if (!userPhoneFactors || userPhoneFactors.length === 0) {
         return;
       }
-      if (userPhoneFactors && userPhoneFactors.length === 1) {
+      if (userPhoneFactors.length === 1) {
         const success = await requestOtpCode();
         if (success) {
           setPasswordUpdateStep("otpValidation");
