@@ -189,7 +189,11 @@ class IBMVerifyUserProfileSchema(BaseModel):
         validation_alias="urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
         serialization_alias="details",
     )
-    model_config = ConfigDict(validate_by_name=True, validate_by_alias=True)
+    model_config = ConfigDict(
+        validate_by_name=True,
+        validate_by_alias=True,
+        extra="allow",
+    )
 
 
 class UserProfileUpdateRequest(BaseModel):
@@ -216,7 +220,11 @@ class IBMVerifyUpdateUserProfile(IBMVerifyUserProfileSchema):
         default_factory=IBMNotifyTypeExtension,
         alias=SCIM_IBM_NOTIFICATION_EXT,
     )
-    model_config = ConfigDict(populate_by_name=True)
+    model_config = ConfigDict(
+        populate_by_name=True,
+        validate_by_alias=True,
+        extra="allow",
+    )
 
 
 class ProfileResponse(ResponseModel):

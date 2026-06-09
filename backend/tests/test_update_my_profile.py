@@ -512,6 +512,217 @@ async def test_update_profile_with_no_phone_numbers_to_mask(
     mock_mask.assert_called_once()  # Masking function still called
 
 
+@pytest.mark.asyncio
+@patch("app.users.services.update_my_profile.mask_profile_details")
+@patch(DISPATCH_UPDATE_PROFILE_IMPORT_PATH)
+@patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
+@patch(SANITIZE_PROFILE_IMPORT_PATH)
+async def test_update_profile_preserves_unknown_profile_attributes(
+    mock_sanitize, mock_dispatch_get, mock_dispatch_update, mock_mask
+):
+    """Ensure unknown IBM profile attributes are preserved in PUT payload."""
+    # Arrange
+    mock_sanitize.return_value = {
+        "preferredLanguage": "fr",
+        "user_id": "user-123",
+    }
+
+    enterprise_extension_key = (
+        "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"
+    )
+    enterprise_extension_value = {
+        "department": "Digital",
+        "manager": {"value": "manager-001"},
+    }
+
+    profile_data = {
+        "schemas": [
+            "urn:ietf:params:scim:schemas:core:2.0:User",
+            "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+        ],
+        "userName": "john.doe@example.com",
+        "emails": [{"value": "john.doe@example.com", "type": "work"}],
+        "preferredLanguage": "en",
+        "meta": {
+            "location": "here",
+            "created": "2023-01-01T00:00:00Z",
+            "lastModified": "2023-09-22T12:30:00Z",
+            "resourceType": "User",
+        },
+        "active": True,
+        "id": "user-123",
+        enterprise_extension_key: enterprise_extension_value,
+    }
+
+    mock_profile = IBMVerifyUserProfileSchema(**profile_data)
+    mock_dispatch_get.return_value = mock_profile
+
+    updated_profile_data = {**profile_data, "preferredLanguage": "fr"}
+    mock_response = Mock()
+    mock_response.json.return_value = updated_profile_data
+    mock_dispatch_update.return_value = mock_response
+    mock_mask.return_value = {**updated_profile_data, "userName": "jo****@example.com"}
+
+    user_data = UserProfileUpdateRequest(preferredLanguage="fr", user_id="user-123")
+    mock_request = Mock()
+    mock_request.app = Mock()
+    mock_request.app.state = Mock()
+    mock_request.app.state.request_client = AsyncClient()
+    mock_request.app.state.config = Mock()
+    mock_request.app.state.config.profile_api_endpoint = PROFILE_API_URL
+
+    # Act
+    await update_profile(mock_request, user_data, user_access_token="token")
+
+    # Assert
+    mock_dispatch_update.assert_called_once()
+    update_call_args = mock_dispatch_update.call_args[0]
+    payload_json = update_call_args[1]
+
+    import json
+
+    payload_dict = json.loads(payload_json)
+    assert payload_dict[enterprise_extension_key] == enterprise_extension_value
+    assert payload_dict["preferredLanguage"] == "fr"
+
+
+@pytest.mark.asyncio
+@patch("app.users.services.update_my_profile.mask_profile_details")
+@patch(DISPATCH_UPDATE_PROFILE_IMPORT_PATH)
+@patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
+@patch(SANITIZE_PROFILE_IMPORT_PATH)
+async def test_update_profile_adds_required_notification_schema(
+    mock_sanitize, mock_dispatch_get, mock_dispatch_update, mock_mask
+):
+    """Ensure required notification schema is present even if upstream omits it."""
+    mock_sanitize.return_value = {
+        "preferredLanguage": "fr",
+        "user_id": "user-123",
+    }
+
+    profile_data = {
+        "schemas": [
+            "urn:ietf:params:scim:schemas:core:2.0:User",
+            "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+        ],
+        "userName": "john.doe@example.com",
+        "emails": [{"value": "john.doe@example.com", "type": "work"}],
+        "preferredLanguage": "en",
+        "meta": {
+            "location": "here",
+            "created": "2023-01-01T00:00:00Z",
+            "lastModified": "2023-09-22T12:30:00Z",
+            "resourceType": "User",
+        },
+        "active": True,
+        "id": "user-123",
+    }
+
+    mock_profile = IBMVerifyUserProfileSchema(**profile_data)
+    mock_dispatch_get.return_value = mock_profile
+
+    updated_profile_data = {**profile_data, "preferredLanguage": "fr"}
+    mock_response = Mock()
+    mock_response.json.return_value = updated_profile_data
+    mock_dispatch_update.return_value = mock_response
+    mock_mask.return_value = {**updated_profile_data, "userName": "jo****@example.com"}
+
+    user_data = UserProfileUpdateRequest(preferredLanguage="fr", user_id="user-123")
+    mock_request = Mock()
+    mock_request.app = Mock()
+    mock_request.app.state = Mock()
+    mock_request.app.state.request_client = AsyncClient()
+    mock_request.app.state.config = Mock()
+    mock_request.app.state.config.profile_api_endpoint = PROFILE_API_URL
+
+    await update_profile(mock_request, user_data, user_access_token="token")
+
+    mock_dispatch_update.assert_called_once()
+    update_call_args = mock_dispatch_update.call_args[0]
+    payload_json = update_call_args[1]
+
+    import json
+
+    payload_dict = json.loads(payload_json)
+    assert (
+        "urn:ietf:params:scim:schemas:extension:ibm:2.0:Notification"
+        in payload_dict["schemas"]
+    )
+
+
+@pytest.mark.asyncio
+@patch("app.users.services.update_my_profile.mask_profile_details")
+@patch(DISPATCH_UPDATE_PROFILE_IMPORT_PATH)
+@patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
+@patch(SANITIZE_PROFILE_IMPORT_PATH)
+async def test_update_profile_preserves_ibm_custom_attributes_extension(
+    mock_sanitize, mock_dispatch_get, mock_dispatch_update, mock_mask
+):
+    """Ensure IBM SCIM customAttributes are retained under extension URN key."""
+    mock_sanitize.return_value = {
+        "preferredLanguage": "fr",
+        "user_id": "user-123",
+    }
+
+    extension_key = "urn:ietf:params:scim:schemas:extension:ibm:2.0:User"
+    custom_attributes = [
+        {"name": "testAttr1", "values": ["value-1"]},
+        {"name": "testAttr2", "values": ["value-2"]},
+    ]
+
+    profile_data = {
+        "schemas": [
+            "urn:ietf:params:scim:schemas:core:2.0:User",
+            "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+        ],
+        "userName": "john.doe@example.com",
+        "emails": [{"value": "john.doe@example.com", "type": "work"}],
+        "preferredLanguage": "en",
+        "meta": {
+            "location": "here",
+            "created": "2023-01-01T00:00:00Z",
+            "lastModified": "2023-09-22T12:30:00Z",
+            "resourceType": "User",
+        },
+        "active": True,
+        "id": "user-123",
+        extension_key: {
+            "customAttributes": custom_attributes,
+            "emailVerified": "true",
+        },
+    }
+
+    mock_profile = IBMVerifyUserProfileSchema(**profile_data)
+    mock_dispatch_get.return_value = mock_profile
+
+    updated_profile_data = {**profile_data, "preferredLanguage": "fr"}
+    mock_response = Mock()
+    mock_response.json.return_value = updated_profile_data
+    mock_dispatch_update.return_value = mock_response
+    mock_mask.return_value = {**updated_profile_data, "userName": "jo****@example.com"}
+
+    user_data = UserProfileUpdateRequest(preferredLanguage="fr", user_id="user-123")
+    mock_request = Mock()
+    mock_request.app = Mock()
+    mock_request.app.state = Mock()
+    mock_request.app.state.request_client = AsyncClient()
+    mock_request.app.state.config = Mock()
+    mock_request.app.state.config.profile_api_endpoint = PROFILE_API_URL
+
+    await update_profile(mock_request, user_data, user_access_token="token")
+
+    mock_dispatch_update.assert_called_once()
+    update_call_args = mock_dispatch_update.call_args[0]
+    payload_json = update_call_args[1]
+
+    import json
+
+    payload_dict = json.loads(payload_json)
+    assert extension_key in payload_dict
+    assert payload_dict[extension_key]["customAttributes"] == custom_attributes
+    assert "details" not in payload_dict
+
+
 def test_sanitize_user_profile_data():
     input_data = UserProfileUpdateRequest(
         userName="john.doe@example.com",

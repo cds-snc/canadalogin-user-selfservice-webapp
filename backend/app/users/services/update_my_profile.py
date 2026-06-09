@@ -1,4 +1,5 @@
 import logging
+import json
 
 from fastapi import HTTPException, Request, status
 from httpx import Response
@@ -8,6 +9,9 @@ from app.users.schemas import (
     ProfileResponse,
     UserProfileUpdateRequest,
     IBMVerifyUpdateUserProfile,
+    SCIM_CORE_USER,
+    SCIM_IBM_USER_EXT,
+    SCIM_IBM_NOTIFICATION_EXT,
 )
 from app.utils.access_token import get_auth_request_headers
 from app.utils.mask_user_profile import mask_profile_details
@@ -17,6 +21,36 @@ from app.constants.schema_field_names import USER_ID_FIELD, USERNAME_FIELD
 MAX_NAME_LENGTH = 80
 
 logger = logging.getLogger(__name__)
+
+
+def ensure_required_scim_schemas(profile_data: dict) -> dict:
+    """Ensure payload always includes required SCIM schemas for IBM Verify PUT."""
+    required_schemas = [SCIM_CORE_USER, SCIM_IBM_USER_EXT, SCIM_IBM_NOTIFICATION_EXT]
+    current_schemas = profile_data.get("schemas")
+
+    if not isinstance(current_schemas, list):
+        current_schemas = []
+
+    normalized_schemas = [schema for schema in current_schemas if isinstance(schema, str)]
+    for required_schema in required_schemas:
+        if required_schema not in normalized_schemas:
+            normalized_schemas.append(required_schema)
+
+    profile_data["schemas"] = normalized_schemas
+    return profile_data
+
+
+def build_ibm_put_payload(profile_model: IBMVerifyUpdateUserProfile) -> str:
+    """Build IBM Verify PUT payload with extension fields serialized to SCIM URNs."""
+    payload_dict = profile_model.model_dump(
+        by_alias=True, exclude_none=True, mode="json"
+    )
+
+    # IBM expects the user extension under the SCIM URN key.
+    if "details" in payload_dict:
+        payload_dict[SCIM_IBM_USER_EXT] = payload_dict.pop("details")
+
+    return json.dumps(payload_dict)
 
 
 async def update_profile_for_verified_changes(
@@ -61,12 +95,11 @@ async def update_profile_for_verified_changes(
     # For email changes, we allow the userName and emails to be updated
     # since OTP verification has already been completed
     merged_profile = {**ibm_user_profile, **updated_user_data_dict}
+    merged_profile = ensure_required_scim_schemas(merged_profile)
 
     validate_merged_profile = IBMVerifyUpdateUserProfile(**merged_profile)
 
-    user_profile_payload = validate_merged_profile.model_dump_json(
-        by_alias=True, exclude_none=True
-    )
+    user_profile_payload = build_ibm_put_payload(validate_merged_profile)
 
     response = await dispatch_update_my_profile(
         request, user_profile_payload, user_access_token
@@ -195,12 +228,11 @@ async def update_my_profile(
     updated_user_data_dict.pop(USER_ID_FIELD, None)
 
     merged_profile = {**ibm_user_profile, **updated_user_data_dict}
+    merged_profile = ensure_required_scim_schemas(merged_profile)
 
     validate_merged_profile = IBMVerifyUpdateUserProfile(**merged_profile)
 
-    user_profile_payload = validate_merged_profile.model_dump_json(
-        by_alias=True, exclude_none=True
-    )
+    user_profile_payload = build_ibm_put_payload(validate_merged_profile)
 
     response = await dispatch_update_my_profile(
         request, user_profile_payload, user_access_token
