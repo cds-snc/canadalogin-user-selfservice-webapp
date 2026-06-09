@@ -106,13 +106,18 @@ export default function ChangePasswordIndex() {
       if (!userPhoneFactors || userPhoneFactors.length === 0) {
         return;
       }
-
-      // Always show OTP selection so user can choose between phone and email
-      trackEvent({
-        event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
-        step: CHANGE_PASSWORD_ANALYTICS.STEPS.OTP_SELECTION,
-      });
-      setPasswordUpdateStep("otpSelection");
+      if (userPhoneFactors && userPhoneFactors.length === 1) {
+        const success = await requestOtpCode();
+        if (success) {
+          setPasswordUpdateStep("otpValidation");
+        }
+      } else {
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+          step: CHANGE_PASSWORD_ANALYTICS.STEPS.OTP_SELECTION,
+        });
+        setPasswordUpdateStep("otpSelection");
+      }
     },
     false,
     (message) => {
