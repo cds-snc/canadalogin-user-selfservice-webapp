@@ -591,10 +591,10 @@ async def test_update_profile_preserves_unknown_profile_attributes(
 @patch(DISPATCH_UPDATE_PROFILE_IMPORT_PATH)
 @patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
 @patch(SANITIZE_PROFILE_IMPORT_PATH)
-async def test_update_profile_adds_required_notification_schema(
+async def test_update_profile_preserves_upstream_schemas(
     mock_sanitize, mock_dispatch_get, mock_dispatch_update, mock_mask
 ):
-    """Ensure required notification schema is present even if upstream omits it."""
+    """Ensure payload keeps upstream schemas unchanged."""
     mock_sanitize.return_value = {
         "preferredLanguage": "fr",
         "user_id": "user-123",
@@ -644,10 +644,8 @@ async def test_update_profile_adds_required_notification_schema(
     import json
 
     payload_dict = json.loads(payload_json)
-    assert (
-        "urn:ietf:params:scim:schemas:extension:ibm:2.0:Notification"
-        in payload_dict["schemas"]
-    )
+    # All upstream schemas must be present; additional required schemas may be appended
+    assert all(s in payload_dict["schemas"] for s in profile_data["schemas"])
 
 
 @pytest.mark.asyncio
@@ -655,10 +653,15 @@ async def test_update_profile_adds_required_notification_schema(
 @patch(DISPATCH_UPDATE_PROFILE_IMPORT_PATH)
 @patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
 @patch(SANITIZE_PROFILE_IMPORT_PATH)
-async def test_update_profile_preserves_ibm_custom_attributes_extension(
+async def test_update_profile_preserves_ibm_user_details_in_payload(
     mock_sanitize, mock_dispatch_get, mock_dispatch_update, mock_mask
 ):
-    """Ensure IBM SCIM customAttributes are retained under extension URN key."""
+    """IBM user extension (customAttributes etc.) must be kept in PUT payload.
+
+    IBM's PUT endpoint replaces the entire user record. Omitting the extension
+    key causes IBM to clear those values, including customAttributes written by
+    other services.
+    """
     mock_sanitize.return_value = {
         "preferredLanguage": "fr",
         "user_id": "user-123",

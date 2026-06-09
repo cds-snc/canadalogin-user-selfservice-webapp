@@ -46,9 +46,9 @@ def build_ibm_put_payload(profile_model: IBMVerifyUpdateUserProfile) -> str:
         by_alias=True, exclude_none=True, mode="json"
     )
 
-    # IBM expects the user extension under the SCIM URN key.
     if "details" in payload_dict:
-        payload_dict[SCIM_IBM_USER_EXT] = payload_dict.pop("details")
+        details = payload_dict.pop("details")
+        payload_dict[SCIM_IBM_USER_EXT] = details
 
     return json.dumps(payload_dict)
 
@@ -94,6 +94,9 @@ async def update_profile_for_verified_changes(
 
     # For email changes, we allow the userName and emails to be updated
     # since OTP verification has already been completed
+    # Merge updates over the fetched profile. details (IBM user extension /
+    # customAttributes) comes from the fetched profile and is never present in
+    # updated_user_data_dict, so it is preserved as-is.
     merged_profile = {**ibm_user_profile, **updated_user_data_dict}
     merged_profile = ensure_required_scim_schemas(merged_profile)
 
@@ -227,6 +230,9 @@ async def update_my_profile(
     updated_user_data_dict.pop(USERNAME_FIELD, None)
     updated_user_data_dict.pop(USER_ID_FIELD, None)
 
+    # Merge updates over the fetched profile. details (IBM user extension /
+    # customAttributes) comes from the fetched profile and is never present in
+    # updated_user_data_dict, so it is preserved as-is.
     merged_profile = {**ibm_user_profile, **updated_user_data_dict}
     merged_profile = ensure_required_scim_schemas(merged_profile)
 
