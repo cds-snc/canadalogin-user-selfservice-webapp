@@ -1,6 +1,6 @@
 import ReactGA from "react-ga4";
 
-import { GA_CLICK_EVENTS } from "./analyticsConstants";
+import { GA_CLICK_EVENTS, getOtpTypeLabel } from "./analyticsConstants";
 import config from "../config";
 import type {
   AnalyticsPayload,
@@ -201,8 +201,10 @@ export function trackAnalyticsEvent(
     step,
     page: typeof document !== "undefined" ? document.title : undefined,
   };
-  if (type !== undefined) {
-    params.type = type;
+  const normalizedType =
+    type !== undefined ? (getOtpTypeLabel(type) ?? type) : undefined;
+  if (normalizedType !== undefined) {
+    params.type = normalizedType;
   }
   if (error !== undefined) {
     params.error = error;

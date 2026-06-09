@@ -24,7 +24,6 @@ import { useFormTracking } from "../../../../hooks/useFormTracking";
 import { useWizardPageTracking } from "../../../../hooks/useWizardPageTracking";
 import { GA_FORM_EVENTS } from "../../../../utils/analyticsConstants";
 import { DELETE_MFA_ANALYTICS } from "../../../../utils/analyticsConstants";
-import { getOtpTypeLabel } from "../../../../utils/analyticsConstants";
 import VerifyFIDO2Passkey from "../../../ManageFIDO2/components/VerifyFIDO2Passkey/VerifyFIDO2Passkey";
 
 interface DeletePhoneFormData {
@@ -254,12 +253,11 @@ export default function DeleteMFAPage() {
 
   // Custom validateOtpCode that handles delete MFA flow
   const validateOtpCode = async () => {
-    const otpTypeLabel = getOtpTypeLabel(userSelectedMfaFactor?.type);
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_START,
       step: DELETE_MFA_ANALYTICS.STEPS.OTP_VALIDATION,
       flow: DELETE_MFA_ANALYTICS.FLOW_ID,
-      ...(otpTypeLabel !== undefined && { type: otpTypeLabel }),
+      type: userSelectedMfaFactor?.type,
     });
     setWizardStep("deleteMFAPhoneNumberConfirm");
     trackEvent({
@@ -354,12 +352,11 @@ export default function DeleteMFAPage() {
         userOtpValue={userOtpValue}
         setUserOtpValue={handleSetUserOtpValue}
         requestOtpCode={() => {
-          const otpTypeLabel = getOtpTypeLabel(userSelectedMfaFactor?.type);
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: DELETE_MFA_ANALYTICS.STEPS.OTP_VALIDATION,
             flow: DELETE_MFA_ANALYTICS.FLOW_ID,
-            ...(otpTypeLabel !== undefined && { type: otpTypeLabel }),
+            type: userSelectedMfaFactor?.type,
           });
           return requestOtpCode();
         }}

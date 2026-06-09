@@ -33,7 +33,6 @@ import { useWizardPageTracking } from "../../../../hooks/useWizardPageTracking";
 import {
   GA_FORM_EVENTS,
   ADD_PASSKEY_ANALYTICS,
-  getOtpTypeLabel,
 } from "../../../../utils/analyticsConstants";
 
 interface AddFIDO2PasskeyPageProps {
@@ -398,12 +397,11 @@ export default function AddFIDO2PasskeyPage({
             event: GA_FORM_EVENTS.FORM_SUBMIT,
             step: ADD_PASSKEY_ANALYTICS.STEPS.OTP_VALIDATION,
           });
-          const otpTypeLabel = getOtpTypeLabel(userSelectedMfaFactor?.type);
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: ADD_PASSKEY_ANALYTICS.STEPS.OTP_VALIDATION,
             flow: ADD_PASSKEY_ANALYTICS.FLOW_ID,
-            ...(otpTypeLabel !== undefined && { type: otpTypeLabel }),
+            type: userSelectedMfaFactor?.type,
           });
           return validateOtpCode(otpValue);
         }}

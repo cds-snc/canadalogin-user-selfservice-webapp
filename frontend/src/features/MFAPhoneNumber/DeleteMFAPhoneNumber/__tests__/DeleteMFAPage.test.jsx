@@ -1163,7 +1163,7 @@ describe("DeleteMFAPage", () => {
           event: "form_step_start",
           step: "otp_validation",
           flow: "delete_mfa_phone_number",
-          type: "phone",
+          type: "smsotp",
         });
         expect(mockTrackEvent).toHaveBeenCalledWith({
           event: "form_step_change",

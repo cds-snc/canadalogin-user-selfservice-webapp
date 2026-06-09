@@ -26,7 +26,6 @@ import { useFormTracking } from "../../../../hooks/useFormTracking";
 import { useWizardPageTracking } from "../../../../hooks/useWizardPageTracking";
 import { GA_FORM_EVENTS } from "../../../../utils/analyticsConstants";
 import { ADD_MFA_ANALYTICS } from "../../../../utils/analyticsConstants";
-import { getOtpTypeLabel } from "../../../../utils/analyticsConstants";
 import { usePasskeyOperations } from "../../../../hooks/usePasskeyOperations";
 import VerifyFIDO2Passkey from "../../../ManageFIDO2/components/VerifyFIDO2Passkey/VerifyFIDO2Passkey";
 import { Fido2Credential } from "../../../../types/hooks";
@@ -604,12 +603,11 @@ export default function AddMFAPage() {
             event: GA_FORM_EVENTS.FORM_SUBMIT,
             step: ADD_MFA_ANALYTICS.STEPS.OTP_VALIDATION,
           });
-          const otpTypeLabelReq = getOtpTypeLabel(userSelectedMfaFactor?.type);
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: ADD_MFA_ANALYTICS.STEPS.OTP_VALIDATION,
             flow: ADD_MFA_ANALYTICS.FLOW_ID,
-            ...(otpTypeLabelReq !== undefined && { type: otpTypeLabelReq }),
+            type: userSelectedMfaFactor?.type,
           });
           return requestOtpCode();
         }}
@@ -618,12 +616,11 @@ export default function AddMFAPage() {
             event: GA_FORM_EVENTS.FORM_SUBMIT,
             step: ADD_MFA_ANALYTICS.STEPS.OTP_VALIDATION,
           });
-          const otpTypeLabelVal = getOtpTypeLabel(userSelectedMfaFactor?.type);
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: ADD_MFA_ANALYTICS.STEPS.OTP_VALIDATION,
             flow: ADD_MFA_ANALYTICS.FLOW_ID,
-            ...(otpTypeLabelVal !== undefined && { type: otpTypeLabelVal }),
+            type: userSelectedMfaFactor?.type,
           });
           return validateOtpCode(userOtp);
         }}

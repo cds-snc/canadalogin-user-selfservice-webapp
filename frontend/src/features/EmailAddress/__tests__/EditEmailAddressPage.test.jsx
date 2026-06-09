@@ -1053,6 +1053,7 @@ describe("EditEmailAddressPage Integration Tests", () => {
           event: "form_step_start",
           step: "otp_validation",
           flow: "email_address_update",
+          type: "sms",
         });
         expect(mockTrackEvent).toHaveBeenCalledWith({
           event: "form_step_change",

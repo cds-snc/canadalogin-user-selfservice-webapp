@@ -496,7 +496,7 @@ describe("ChangePasswordIndex – GA Success Path Tracking", () => {
         event: "form_step_start",
         step: "otp_validation",
         flow: "password_change",
-        type: "phone",
+        type: "smsotp",
       });
       expect(mockTrackEvent).toHaveBeenCalledWith({
         event: "form_submit_complete",
