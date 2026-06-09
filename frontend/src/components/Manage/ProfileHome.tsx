@@ -5,6 +5,7 @@ import {
   GcdsGrid,
   GcdsText,
   GcdsLink,
+  GcdsNotice,
 } from "@gcds-core/components-react";
 
 import { useTranslation } from "react-i18next";
@@ -69,6 +70,13 @@ export default function ProfileHome() {
     <GcdsContainer role="main">
       <GcdsGrid columns="1 auto" gap="300">
         {" "}
+        <GcdsNotice
+          noticeRole="warning"
+          noticeTitle={t("ProfileHome.maintenanceTitle")}
+          noticeTitleTag="h2"
+        >
+          <GcdsText>{t("ProfileHome.maintenanceNoticeBody")}</GcdsText>
+        </GcdsNotice>
         <GcdsHeading tag="h1" marginTop="0">
           {t("ProfileHome.title")}
         </GcdsHeading>
