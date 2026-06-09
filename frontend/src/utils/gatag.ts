@@ -38,7 +38,7 @@ const PhoneChangeSteps = {
 const EmailChangeSteps = {
   EditEmailPage: "Email Change - Verify it's you",
   EmailChangeOtpSelection: "Manage - 2 step verification method",
-  EmailChangeOtpValidation: "Manage – Initiate 2-step verification",
+  EmailChangeOtpValidation: "Manage - Initiate 2-step verification",
   EmailChangeEnterEmail: "Email Change - Enter new email",
   EmailChangeVerifyNewEmail: "Email Change - Verify new email",
   EmailChangeConfirmUpdate: "Email Change - Confirm email change",
@@ -212,9 +212,7 @@ export function trackAnalyticsEvent(
   if (duration_ms !== undefined) {
     params.duration_ms = duration_ms;
   }
-  if (flow !== undefined) {
-    params.flow = flow;
-  }
+  params.flow = flow ?? form_id;
   if (additionalParams) {
     const safeAdditionalParams = Object.fromEntries(
       Object.entries(additionalParams).filter(

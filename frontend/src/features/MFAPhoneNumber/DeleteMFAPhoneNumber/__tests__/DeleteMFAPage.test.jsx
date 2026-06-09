@@ -1168,6 +1168,8 @@ describe("DeleteMFAPage", () => {
         expect(mockTrackEvent).toHaveBeenCalledWith({
           event: "form_step_change",
           step: "confirm_delete",
+          flow: "delete_mfa_phone_number",
+          type: "smsotp",
         });
       });
     });

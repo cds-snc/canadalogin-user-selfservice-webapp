@@ -263,6 +263,8 @@ export default function DeleteMFAPage() {
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
       step: DELETE_MFA_ANALYTICS.STEPS.CONFIRM_DELETE,
+      flow: DELETE_MFA_ANALYTICS.FLOW_ID,
+      type: userSelectedMfaFactor?.type,
     });
   };
 
