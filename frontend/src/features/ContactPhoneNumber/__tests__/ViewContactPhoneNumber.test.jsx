@@ -28,6 +28,13 @@ vi.mock("../../../utils/routeHelpers", () => ({
   path: vi.fn(() => "/en/manage-dashboard"),
 }));
 
+vi.mock("../../../utils/constants", () => ({
+  DEV_ONLY_FEATURE: true,
+  PAGES: {
+    editContactPhoneNumberPage: "editContactPhoneNumberPage",
+  },
+}));
+
 vi.mock("../../../utils/apiErrorHandler", () => ({
   handleApiError: vi.fn(),
   redirectToLogin: vi.fn(),
