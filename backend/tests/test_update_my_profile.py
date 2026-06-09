@@ -1,5 +1,6 @@
 import pytest
 import respx
+import json
 from httpx import AsyncClient, Response
 from unittest.mock import AsyncMock, Mock, patch
 from app.utils.request_error_handler import RequestErrorHandler
@@ -523,6 +524,139 @@ def test_sanitize_user_profile_data():
     assert result["userName"] == "john.doe@example.com"
     assert "preferredLanguage" not in result
     assert "phoneNumbers" not in result
+
+
+@pytest.mark.asyncio
+@patch("app.users.services.update_my_profile.mask_profile_details")
+@patch(DISPATCH_UPDATE_PROFILE_IMPORT_PATH)
+@patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
+async def test_update_profile_preserves_ibm_extension_fields_in_put_payload(
+    mock_dispatch_get, mock_dispatch_update, mock_mask
+):
+    """Test that IBM extension fields survive a profile update round-trip."""
+    profile_data = {
+        "schemas": [
+            "urn:ietf:params:scim:schemas:core:2.0:User",
+            "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+        ],
+        "userName": "john.doe@example.com",
+        "emails": [{"value": "john.doe@example.com", "type": "work"}],
+        "preferredLanguage": "en",
+        "meta": {
+            "location": "here",
+            "created": "2023-01-01T00:00:00Z",
+            "lastModified": "2023-09-22T12:30:00Z",
+            "resourceType": "User",
+        },
+        "active": True,
+        "id": "user-123",
+        "urn:ietf:params:scim:schemas:extension:ibm:2.0:User": {
+            "customAttributes": [
+                {"name": "contactNumber", "values": ["1234567890"]},
+                {"name": "identityVerified", "values": ["true"]},
+            ],
+            "lastLogin": "2026-06-09T15:45:18Z",
+            "lastLoginRealm": "cloudIdentityRealm",
+            "lastLoginType": "user_password",
+            "pwdChangedTime": "2026-06-09T13:24:53Z",
+            "realm": "cloudIdentityRealm",
+            "twoFactorAuthentication": False,
+            "userCategory": "regular",
+        },
+    }
+
+    mock_dispatch_get.return_value = IBMVerifyUserProfileSchema(**profile_data)
+
+    mock_response = Mock()
+    mock_response.json.return_value = profile_data
+    mock_dispatch_update.return_value = mock_response
+    mock_mask.return_value = profile_data
+
+    user_data = UserProfileUpdateRequest(preferredLanguage="fr")
+    mock_request = Mock()
+    mock_request.app = Mock()
+    mock_request.app.state = Mock()
+    mock_request.app.state.request_client = AsyncClient()
+    mock_request.app.state.config = Mock()
+    mock_request.app.state.config.profile_api_endpoint = PROFILE_API_URL
+
+    await update_profile(mock_request, user_data, user_access_token="token")
+
+    payload_json = mock_dispatch_update.call_args[0][1]
+    payload_dict = json.loads(payload_json)
+    extension_key = "urn:ietf:params:scim:schemas:extension:ibm:2.0:User"
+
+    assert extension_key in payload_dict
+    assert payload_dict[extension_key]["lastLoginRealm"] == "cloudIdentityRealm"
+    assert payload_dict[extension_key]["userCategory"] == "regular"
+    assert payload_dict[extension_key]["customAttributes"] == [
+        {"name": "contactNumber", "values": ["1234567890"]},
+        {"name": "identityVerified", "values": ["true"]},
+    ]
+    assert payload_dict["preferredLanguage"] == "fr"
+
+
+@pytest.mark.asyncio
+@patch("app.users.services.update_my_profile.mask_profile_details")
+@patch(DISPATCH_UPDATE_PROFILE_IMPORT_PATH)
+@patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
+async def test_update_profile_only_changes_requested_nested_name_field(
+    mock_dispatch_get, mock_dispatch_update, mock_mask
+):
+    """Test that a partial name update preserves unchanged nested name fields."""
+    profile_data = {
+        "schemas": [
+            "urn:ietf:params:scim:schemas:core:2.0:User",
+            "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+        ],
+        "userName": "john.doe@example.com",
+        "emails": [{"value": "john.doe@example.com", "type": "work"}],
+        "name": {
+            "formatted": "John Michael Doe",
+            "givenName": "John Michael",
+            "familyName": "Doe",
+        },
+        "meta": {
+            "location": "here",
+            "created": "2023-01-01T00:00:00Z",
+            "lastModified": "2023-09-22T12:30:00Z",
+            "resourceType": "User",
+        },
+        "active": True,
+        "id": "user-123",
+    }
+
+    mock_dispatch_get.return_value = IBMVerifyUserProfileSchema(**profile_data)
+
+    updated_profile_data = {
+        **profile_data,
+        "name": {
+            "formatted": "John Michael Smith",
+            "givenName": "John Michael",
+            "familyName": "Smith",
+        },
+    }
+    mock_response = Mock()
+    mock_response.json.return_value = updated_profile_data
+    mock_dispatch_update.return_value = mock_response
+    mock_mask.return_value = updated_profile_data
+
+    user_data = UserProfileUpdateRequest(name=UserProfileName(familyName="Smith"))
+    mock_request = Mock()
+    mock_request.app = Mock()
+    mock_request.app.state = Mock()
+    mock_request.app.state.request_client = AsyncClient()
+    mock_request.app.state.config = Mock()
+    mock_request.app.state.config.profile_api_endpoint = PROFILE_API_URL
+
+    await update_profile(mock_request, user_data, user_access_token="token")
+
+    payload_json = mock_dispatch_update.call_args[0][1]
+    payload_dict = json.loads(payload_json)
+
+    assert payload_dict["name"]["givenName"] == "John Michael"
+    assert payload_dict["name"]["familyName"] == "Smith"
+    assert payload_dict["name"]["formatted"] == "John Michael Doe"
 
 
 # Tests for update_profile_for_verified_changes

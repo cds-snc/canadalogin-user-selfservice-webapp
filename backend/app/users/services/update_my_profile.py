@@ -19,6 +19,20 @@ MAX_NAME_LENGTH = 80
 logger = logging.getLogger(__name__)
 
 
+def merge_profile_updates(current_profile: dict, updated_fields: dict) -> dict:
+    """Recursively merge nested profile fields so unchanged attributes are preserved."""
+    merged_profile = current_profile.copy()
+
+    for key, value in updated_fields.items():
+        current_value = merged_profile.get(key)
+        if isinstance(current_value, dict) and isinstance(value, dict):
+            merged_profile[key] = merge_profile_updates(current_value, value)
+        else:
+            merged_profile[key] = value
+
+    return merged_profile
+
+
 async def update_profile_for_verified_changes(
     request: Request,
     user_data: UserProfileUpdateRequest,
@@ -60,7 +74,7 @@ async def update_profile_for_verified_changes(
 
     # For email changes, we allow the userName and emails to be updated
     # since OTP verification has already been completed
-    merged_profile = {**ibm_user_profile, **updated_user_data_dict}
+    merged_profile = merge_profile_updates(ibm_user_profile, updated_user_data_dict)
 
     validate_merged_profile = IBMVerifyUpdateUserProfile(**merged_profile)
 
@@ -194,7 +208,7 @@ async def update_my_profile(
     updated_user_data_dict.pop(USERNAME_FIELD, None)
     updated_user_data_dict.pop(USER_ID_FIELD, None)
 
-    merged_profile = {**ibm_user_profile, **updated_user_data_dict}
+    merged_profile = merge_profile_updates(ibm_user_profile, updated_user_data_dict)
 
     validate_merged_profile = IBMVerifyUpdateUserProfile(**merged_profile)
 

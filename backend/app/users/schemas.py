@@ -6,6 +6,7 @@ from app.otp.schemas import OtpType
 from app.password.schemas import OtpType as PhoneOtpType
 from app.utils.schemas import ResponseModel
 from pydantic import (
+    AliasChoices,
     BaseModel,
     ConfigDict,
     EmailStr,
@@ -81,6 +82,7 @@ class SCIMUserDetails(BaseModel):
     twoFactorAuthentication: Optional[bool] = None
     pwdChangedTime: Optional[str] = None
     customAttributes: Optional[List[CustomAttribute]] = None
+    model_config = ConfigDict(extra="allow")
 
 
 class Meta(BaseModel):
@@ -186,8 +188,9 @@ class IBMVerifyUserProfileSchema(BaseModel):
     phoneNumbers: Optional[List[MetaDataTypeValue]] = None
     details: Optional[SCIMUserDetails] = Field(
         default=None,
-        validation_alias="urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
-        serialization_alias="details",
+        alias=SCIM_IBM_USER_EXT,
+        validation_alias=AliasChoices(SCIM_IBM_USER_EXT, "details"),
+        serialization_alias=SCIM_IBM_USER_EXT,
     )
     model_config = ConfigDict(validate_by_name=True, validate_by_alias=True)
 
