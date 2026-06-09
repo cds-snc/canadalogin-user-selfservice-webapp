@@ -18,7 +18,9 @@
     "notificationDescription": "Nous enverrons des notifications liées à votre compte à l'adresse courriel qui y est associée.",
     "serviceNotifications": "Vous pourriez également recevoir des notifications provenant de services liés à votre identifiant ConnexionCanada. Vous pouvez gérer ces préférences dans les paramètres de chaque service.",
     "noPhoneAdded": "Aucun numéro de téléphone de contact n'a été ajouté",
-    "addPhoneNumber": "Ajouter un numéro de téléphone"
+    "addPhoneNumber": "Ajouter un numéro de téléphone",
+    "maintenanceTitle": "Maintenance",
+    "maintenanceNoticeBody": "Cette page est en cours de maintenance, la modification de vos renseignements sera à nouveau disponible sous peu."
   },
   "ProvenInformationCard": {
     "name": "Nom",

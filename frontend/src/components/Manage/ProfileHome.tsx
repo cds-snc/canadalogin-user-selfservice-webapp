@@ -68,7 +68,6 @@ export default function ProfileHome() {
   return (
     <GcdsContainer role="main">
       <GcdsGrid columns="1 auto" gap="300">
-        {" "}
         <GcdsHeading tag="h1" marginTop="0">
           {t("ProfileHome.title")}
         </GcdsHeading>

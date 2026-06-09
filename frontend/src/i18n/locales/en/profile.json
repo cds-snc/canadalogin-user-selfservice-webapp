@@ -19,7 +19,9 @@
     "serviceNotifications": "You may also receive notifications from services connected to your CanadaLogin. You can manage those preferences in each service's settings.",
     "noPhoneAdded": "No contact phone number has been added",
     "addPhoneNumber": "Add a phone number",
-    "provenInformation": "Proven information"
+    "provenInformation": "Proven information",
+    "maintenanceTitle": "Maintenance",
+    "maintenanceNoticeBody": "This page is under maintenance, editing your information will be available again shortly."
   },
   "ProvenInformationCard": {
     "name": "Name",
