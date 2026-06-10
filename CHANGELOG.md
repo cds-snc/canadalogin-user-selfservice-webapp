@@ -1,5 +1,29 @@
 # Changelog
 
+## [1.23.1](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.23.0...v1.23.1) (2026-06-10)
+
+
+### Bug Fixes
+
+* GA changes for Manage App ([#1576](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1576)) ([c08e108](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/c08e10826d4db7a0463d3897428ca51f8e327fba))
+* update IBMVerifyUserProfileSchema to prioritize details over URN alias and enhance user profile normalization ([#1604](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1604)) ([ddac734](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/ddac7341452044799b918a7524416065b725eee7))
+
+
+### Miscellaneous Chores
+
+* **deps:** bump qs from 6.15.0 to 6.15.2 in /frontend ([#1482](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1482)) ([0a71829](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/0a7182964640b9299994f19145382194b586dad0))
+* **deps:** lock file maintenance ([#1517](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1517)) ([b702e37](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/b702e37d3f10823bc26fe5fd306f5dfb3bbd7a07))
+* **deps:** pin dependencies ([#968](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/968)) ([4f2b984](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/4f2b984288fc74a7a8779abbd0407d5fdcda1cef))
+* **deps:** update all minor dependencies ([#1516](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1516)) ([19f52c0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/19f52c0e639d37a8de538bd79c3dd32f2d7921b2))
+* **deps:** update all patch dependencies ([#1573](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1573)) ([acce785](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/acce785954c5d3fba8ba95b9152ad3b3b0a11765))
+
+
+### Continuous Integration
+
+* bump prod version to 1.23.0 ([7dfdd1e](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/7dfdd1e62129ad45e453d1e0c6cf7d21e3733adb))
+* bump PROD version to 1.23.0 ([#1593](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1593)) ([7dfdd1e](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/7dfdd1e62129ad45e453d1e0c6cf7d21e3733adb))
+* bump staging to 1.23.0 ([#1589](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1589)) ([5c10eb5](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/5c10eb556ba0ec294e97930075277ef11e945fd6))
+
 ## [1.23.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.22.2...v1.23.0) (2026-06-09)
 
 
