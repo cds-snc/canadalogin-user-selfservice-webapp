@@ -1,19 +1,17 @@
 import {
   GcdsButton,
-  GcdsDetails,
   GcdsGrid,
-  GcdsLink,
   GcdsNotice,
   GcdsText,
   GcdsContainer,
   GcdsHeading,
 } from "@gcds-core/components-react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router";
+// import { useNavigate } from "react-router";
 import { DEV_ONLY_FEATURE } from "../../../utils/constants";
 
 export default function MobileCompleteConfirmation() {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const { t } = useTranslation("idv");
 
   if (!DEV_ONLY_FEATURE) {
@@ -39,9 +37,6 @@ export default function MobileCompleteConfirmation() {
               // TODO: populate with real URL once available
             }
             <GcdsText>{t("MobileCompleteConfirmation.moreInfoBody")}</GcdsText>
-            <GcdsLink href={"#"} external={false}>
-              {t("MobileCompleteConfirmation.learnMoreLink")}
-            </GcdsLink>
           </GcdsNotice>
         </GcdsContainer>
 

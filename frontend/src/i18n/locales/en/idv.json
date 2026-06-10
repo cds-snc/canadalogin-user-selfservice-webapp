@@ -67,10 +67,9 @@
   },
   "MobileCompleteConfirmation": {
     "pageTitle": "Prove your identity",
-    "heading": "Identity proofing on mobile complete",
+    "heading": "Identity proofing is complete",
     "continueButton": "Continue",
-    "moreInfoTitle": " ",
-    "moreInfoBody": "Your identity information was successfully verified, and proofing is now complete.",
-    "learnMoreLink": "Continue with the remaining steps. "
+    "moreInfoTitle": "Your identity information was successfully verified, and proofing is now complete.",
+    "moreInfoBody": "You're almost done. Confirm and save your details to CanadaLogin, then share the requested information with [RP Service Portal] to get access."
   }
 }
