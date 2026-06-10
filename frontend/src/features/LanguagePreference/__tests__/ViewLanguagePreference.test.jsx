@@ -23,6 +23,7 @@ vi.mock("../../../utils/routeHelpers", () => ({
 
 // Mock constants
 vi.mock("../../../utils/constants", () => ({
+  DEV_ONLY_FEATURE: true,
   PAGES: {
     editLanguagePreferences: "edit-language-preferences",
   },

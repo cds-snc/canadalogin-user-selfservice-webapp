@@ -33,7 +33,10 @@ vi.mock("../../../../hooks/usePasswordValidation");
 
 vi.mock("../../../../hooks/useOtpOperations", () => ({
   useOtpOperations: () => ({
-    userPhoneFactors: [{ id: "f1", type: "sms", destination: "+15551234567" }],
+    userPhoneFactors: [
+      { id: "f1", type: "sms", destination: "+15551234567" },
+      { id: "f2", type: "email", destination: "test@example.com" },
+    ],
     userSelectedMfaFactor: { id: "f1", type: "sms" },
     userSelectedMfaFactorRef: { current: { id: "f1", type: "sms" } },
     userOtpValue: "123456",

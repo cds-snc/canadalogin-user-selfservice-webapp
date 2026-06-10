@@ -43,17 +43,17 @@ function ensureRouteMap() {
 export function path(id: PageId, params: RouteParams = {}): string {
   ensureRouteMap();
 
+  const routeParamsWithLanguage = {
+    ...params,
+    language: params.language ?? "en",
+  };
+
   const pattern = routeMap?.[id];
 
   if (!pattern) {
-    throw new Error(`No route with id=${id}`);
+    console.warn(`No route with id=${id}; falling back to profile home route.`);
+    return generatePath("/:language/profile", routeParamsWithLanguage);
   }
 
-  const routeParams: RouteParams = { ...params };
-
-  if (!routeParams.language) {
-    routeParams.language = "en";
-  }
-
-  return generatePath(pattern, routeParams);
+  return generatePath(pattern, routeParamsWithLanguage);
 }
